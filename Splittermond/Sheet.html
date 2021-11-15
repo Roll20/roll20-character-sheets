@@ -1062,7 +1062,7 @@
                             <option value="zaehigkeit">Z&auml;higkeit</option>
                             <option value="nix">------ Magieschulen ------</option>
                             <option value="bannmagie">Bannmagie</option>
-                            <option value="beherrschungsmagie">Beherrschung</option>
+                            <option value="beherrschungsmagie">Beherrschungsmagie</option>
                             <option value="bewegungsmagie">Bewegungsmagie</option>
                             <option value="erkenntnismagie">Erkenntnismagie</option>
                             <option value="felsmagie">Felsmagie</option>
@@ -1081,7 +1081,7 @@
                             <option value="wassermagie">Wassermagie</option>
                             <option value="windmagie">Windmagie</option>
                         </select>
-                        <input type=number style="width: 20%; font-weight: bold; text-align: center" name="attr_fertigkeitswertnsc" value="0" min="0">
+                        <input type="number" style="width: 20%; font-weight: bold; text-align: center" name="attr_fertigkeitswertnsc" value="0" min="0">
                         &nbsp;&nbsp;&nbsp;
                         <button type="action" name="act_skill" class="sheet-ability-button">0</button>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1091,11 +1091,11 @@
             </tr>
         </table>
         <br />
-        <!--<table border=1 style="font-weight: bold; padding: 0px; border-collapse: collapse" width="100%">
+        <table border=1 style="font-weight: bold; padding: 0px; border-collapse: collapse" width="100%">
             
 	        <table style="font-weight: bold; padding: 0px; border-collapse: collapse" width="100%">		
 	            <tr bgcolor="#0489B1" style="color:white" align="center">		
-	                <td width="100%"><b>NSC-Import</b></td>		
+	                <td width="100%"><b>NSC-Import (Coming Soon)</b></td>		
 	            </tr>		
 	            <tr>
 	                <td>
@@ -1104,17 +1104,17 @@
 	            </tr>
 	            <tr>		
 	                <td>		
-	                    <textarea name="attr_nscimport" class="nscimport" rows=10 cols=60></textarea>
+	                    <textarea name="attr_nscimport" class="nscimport" rows=10 cols=60 disabled></textarea>
 	                </td>		    
 	            </tr>
 	            <tr>
 	                <td class="centered">
-	                    <button type="action" class="bt-nscimport" name="act_nscimport">Import</button>
+	                    <button type="action" class="bt-nscimport" name="act_nscimport" disabled>Import</button>
 	                </td>
 	            </tr>
 	        </table>
         </table>
-        <br />-->
+        <br />
         <table border=1 style="font-weight: bold; padding: 0px; border-collapse: collapse" width="50%">
             
 	        <table border=1 style="font-weight: bold; padding: 0px; border-collapse: collapse" width="25%">		
@@ -8941,7 +8941,7 @@ function writeToSheet (characterData) {
         if (characterData["notes"] != null) {
             character["notizen"] = characterData["notes"];
         }
-        let meleeskills = {"BEW":"bew","STÃ„":"stae","AUS":"aus","INT":"int","KON":"kon","MYS":"mys","VER":"ver","WIL":"wil"};
+        let meleeskills = {"BEW":"bew","STÄ":"stae","AUS":"aus","INT":"int","KON":"kon","MYS":"mys","VER":"ver","WIL":"wil"};
         if (characterData["meleeWeapons"].length > 0) {
             let merkmale = "";
             let damage;
@@ -8952,6 +8952,7 @@ function writeToSheet (characterData) {
                 merkmale = "";
                 character["repeating_nahkampfwaffen_" + newrowid + "_waffenname"] = characterData["meleeWeapons"][i]["name"];
                 character["repeating_nahkampfwaffen_" + newrowid + "_waffenskill"] = characterData["meleeWeapons"][i]["skill"].toLowerCase();
+                
                 if (characterData["meleeWeapons"][i]["attribute1"] != null) {
                     character["repeating_nahkampfwaffen_" + newrowid + "_waffenattr1"] = meleeskills[characterData["meleeWeapons"][i]["attribute1"]];
                     character["repeating_nahkampfwaffen_" + newrowid + "_waffenattr2"] = meleeskills[characterData["meleeWeapons"][i]["attribute2"]];
@@ -11811,6 +11812,9 @@ on("clicked:repeating_waffennsc:angriff clicked:repeating_waffennsc:aktiveabwehr
                 baseRoll = `${abilityroll} {{waffenname=${waffenname}}} {{Probe=[[ ${baseDice} + [[${defsum}]] ]]}} {{verteidigung=[[${verteidigung}]]}} {{neuerwert=Verteidigung}} {{naming=Parade - ${waffenname}}} {{def=[[1d0 + ${waffendefensiv}]]}} {{charactername=@{namensc}}} {{mod=[[?{Situationsmodifikator|0}]]}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{mode=[[${mode}]]}} {{success=[[0]]}} {{dmgmalus=[[@{schadensmod}d1]]}} {{geblendet=[[@{geblendet}d1]]}} {{basiswert=[[${waffenwert}d1]]}} {{bbeh=[[${bBeh}]]}} {{behinderung=[[${behinderung}]]}} {{grmmode=[[${grmmode}]]}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|15}]]}} {{Ticks=[[3 @{initracker_input}]]}}`;
             }
             
+            console.log("abilityroll: " + abilityroll);
+            console.log("baseRoll: " + baseRoll);
+            
             processRoll(baseRoll); 
         });
     
@@ -11841,8 +11845,9 @@ on("clicked:repeating_fertigkeitennsc:skill", function(eventInfo) {
         }
         
         abilityroll += "&{template:splittermond_generic}";
+        console.log("abilityroll: " + abilityroll);
         baseRoll = `@{abilityroll} {{name=${skillname}}} {{charactername=@{namensc}}} {{Probe=[[ ${baseDice} + [[${sum}]] ]]}} {{mod=[[?{Situationsmodifikator|0}]]}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{mode=[[${mode}]]}} {{success=[[0]]}} {{dmgmalus=[[@{schadensmod}d1]]}} {{basiswert=[[${skillvalue}d1]]}} {{bbeh=[[${bBeh}]]}} {{behinderung=[[${behinderung}]]}} {{grmmode=[[${grmmode}]]}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|15}]]}}`;
-        
+        console.log("baseRoll: " + baseRoll);
         processRoll(baseRoll); 
     });
     
@@ -11909,14 +11914,6 @@ on("change:repeating_fertigkeitennsc", function(eventInfo) {
         
     });
 });
-
-on("clicked:nscimport", function(eventInfo) {
-    getAttrs(['nscimport'], function (values) {
-        let nscimport = values.nscimport;
-        console.log(nscimport.split("\n"));
-    });
-});
-
 
 function getBaseDice(dice_mod) {
     if (dice_mod == 1) {
@@ -12038,6 +12035,286 @@ function modifySum(result, oDice, nDice, mode, success) {
     }
     
     return result;
+}
+
+function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) }
+
+on("clicked:nscimport", function(eventInfo) {
+    getAttrs(['nscimport'], function (values) {
+        let nscimport = values.nscimport;
+        nscimport = nscimport.replace(/\r?\n|\r/g, " ");
+        let merkmale = ["–", "Durchdringung", "Wuchtig", "Scharf", "Exakt", "Kritisch", "Umklammern", "Defensiv", "Entwaffnend", "Ablenkend", "Deckung", "Doppelwaffe", "Improvisiert", "Lange Waffe", "Nahkampftauglich", "Parierwaffe", "Primitiv", "Reiterwaffe", "Standfestigkeit", "Stumpf", "Teilbar", "Unhandlich", "Vielseitig", "Wattiert", "Wurffähig", "Zweihändig"];
+        let attributes = "";
+        let waffen = "";
+        let zauber = "";
+        let fertigkeiten = "";
+        let meisterschaften = "";
+        let nscmerkmale = "";
+        let cAttributes = "Waffen";
+        const nsc = {
+          attributes: [],
+          waffen: [],
+          merkmale: [],
+          fertigkeiten: [],
+          meisterschaften: [],
+          zauber: []
+        };
+        
+        // Attribute
+        if (!nscimport.includes("Waffen")) {
+            cAttributes = "Typus";
+        }
+        attributes = nscimport.substring(
+            nscimport.indexOf("WIL") + 1, 
+            nscimport.lastIndexOf(cAttributes)
+        ).match(/\d+/gm);
+        for (var i = 0; i < attributes.length; i++) {
+            nsc.attributes.push(attributes[i]);
+        }
+        
+        // Waffen
+        if (nscimport.includes("Waffen")) {
+            waffen = nscimport.substring(
+                nscimport.indexOf("INI") + 1, 
+                nscimport.lastIndexOf("Typus")
+            );
+            
+            //nsc.waffen = recursiveWeapons(waffen, [], merkmale);
+            waffen = waffen.split(" ");
+            waffen = stripWeaponString(waffen);
+            waffen.splice(0,2);
+            waffen = removeCharacter(waffen, ",");
+            console.log("Waffen: " + waffen);
+            getWeapons(waffen, merkmale);
+           
+        }
+        
+         // Zauber
+        if (nscimport.search("Zauber") > -1) {
+            zauber = nscimport.substring(
+                nscimport.indexOf("Zauber") + 8, 
+                nscimport.lastIndexOf("Merkmale")
+            );
+            
+            if (zauber.search("Meisterschaften") > -1) {
+                meisterschaften = zauber.split("Meisterschaften")[1];
+                meisterschaften = meisterschaften.substring(2);
+                zauber = zauber.split("Meisterschaften")[0];
+            }
+            
+            let spelltemp = "";
+            if (zauber.match(/[a-zA-Z]*\s\d+/g)) {
+                spelltemp = zauber.match(/[a-zA-Z]*\s\d+/g);
+                zauber = zauber.split(/[a-zA-Z]*\s\d+/g);
+            } else if (zauber.match(/[a-zA-Z]+\s[IV]+:/g)) {
+                spelltemp = zauber.match(/[a-zA-Z]+\s[IV]+:/g);
+                zauber = zauber.split(/[a-zA-Z]+\s[IV]+:/g);
+            }
+            
+            zauber.splice(0,1);
+            
+            for (var i = 0; i < zauber.length; i++) {
+                zauber[i] = spelltemp[i] + zauber[i];
+            }
+            
+            nsc.zauber = zauber;
+        }
+        
+        // Fertigkeiten
+        let temp = "";
+        fertigkeiten = nscimport.substring(
+            nscimport.indexOf("Fertigkeiten") + 1, 
+            nscimport.lastIndexOf("Meisterschaften")
+        )
+        if (fertigkeiten.search("Zauber") > 1) {
+            fertigkeiten = fertigkeiten.split("Zauber")[0];
+        }
+        fertigkeiten = fertigkeiten.split(",");
+        fertigkeiten[0] = fertigkeiten[0].split(" ")[1] + " " + fertigkeiten[0].split(" ")[2];
+        
+        nsc.fertigkeiten = fertigkeiten.map(name => name.toLowerCase());
+        
+        // Meisterschaften
+        if (meisterschaften.length == 0) {
+            meisterschaften = nscimport.substring(
+                nscimport.indexOf("Meisterschaften") + 17, 
+                nscimport.lastIndexOf("Merkmale")
+            )
+        }
+        
+        let mtemp = meisterschaften.match(/\w*\s\([IV]+/g);
+        meisterschaften = meisterschaften.split(/\w*\s\([IV]+/g);
+        
+        meisterschaften.splice(0,1);
+        
+        for (var i = 0; i < meisterschaften.length; i++) {
+            meisterschaften[i] = mtemp[i] + meisterschaften[i];
+        }
+        
+        nsc.meisterschaften = meisterschaften;
+        
+        // Merkmale
+        if (nscimport.search("Beute") > -1) {
+            nscmerkmale = nscimport.substring(
+                nscimport.lastIndexOf("Merkmale") + 10, 
+                nscimport.lastIndexOf("Beute")
+            )
+        } else {
+            nscmerkmale = nscimport.substring(
+                nscimport.lastIndexOf("Merkmale")
+            )
+        }
+        
+        nsc.merkmale = nscmerkmale.split(",");
+        
+        importNsc(nsc);
+        
+        /*console.log("Attribute: " + nsc.attributes);
+        console.log("Waffen: " + nsc.waffen);
+        console.log("Zauber: " + nsc.zauber);
+        console.log("Fertigkeiten: " + nsc.fertigkeiten);
+        console.log("Meisterschaften: " + nsc.meisterschaften);
+        console.log("Merkmale: " + nsc.merkmale);*/
+    });
+});
+
+function stripWeaponString(waffen) {
+    
+    if (waffen.includes("Lange")) {
+        let pos = waffen.indexOf("Lange");
+        if (waffen[pos + 1] == "Waffe,") {
+            waffen[pos] += " Waffe";
+            waffen.splice(pos + 1, 1);
+        }
+    }
+    
+    return waffen;
+}
+
+function importNsc(nsc) {
+    let vAttributes = ["ausstrahlungnsc","beweglichkeitnsc","intuitionnsc","konstitutionnsc","mystiknsc","staerkensc","verstandnsc","willenskraftnsc","groessenklassensc","geschwindigkeitnsc","lebenspunktensc","fokusnscgesamt","verteidigungnsc","schadensreduktionnsc","koerperlicherwiderstandnsc","geistigerwiderstandnsc"];
+    let vSkills = {"anführen":"anfuehren","tierführung":"tierfuehrung","geschichte und mythen":"geschichteundmythen","länderkunde":"laenderkunde","schlösser und fallen":"schloesserundfallen","straßenkunde":"strassenkunde","zähigkeit":"zaehigkeit","stärkungsmagie":"staerkungsmagie"};
+    let newRowId;
+    let waffen = nsc.waffen;
+    let update = {};
+    let temp = "";
+    let ini = 0;
+    /*for (var i = 0; i < nsc.attributes.length; i++) {
+        let attribute = vAttributes[i];
+        let value = nsc.attributes[i];
+        update[attribute] = +value;
+    }
+    getSectionIDs("repeating_fertigkeitennsc", function(idarray) {
+      for(var i=0; i < idarray.length; i++) {
+        removeRepeatingRow("repeating_fertigkeitennsc_" + idarray[i]);
+      }
+    });
+    nsc.fertigkeiten.forEach((fertigkeit) => {
+        console.log("Fertigkeit:" + fertigkeit);
+        let skill = fertigkeit.replace(/\s/g,'').match(/[a-zA-Zäöü]+/g) || "test";
+        let value = parseInt(fertigkeit.replace(/\s/g,'').match(/[\d]+/g), 10) || 0;
+        if(vSkills[skill]) {
+            skill = vSkills[skill];
+        }
+        console.log("skill:" + skill + ",value:" + value);
+        newRowId = generateRowID();
+        update['repeating_fertigkeitennsc_' + newRowId + '_fertigkeitnsc'] = skill;
+        update['repeating_fertigkeitennsc_' + newRowId + '_fertigkeitswertnsc'] = +value;
+    });
+    if (waffen.length > 0) {
+        console.log("Waffen: " + waffen);
+        for (var i = 0; i < waffen.length; i++) {
+            let aWaffen = waffen[i].split("|");
+            let name = aWaffen[0];
+            let wSkill = aWaffen[1];
+            let dmg1 = aWaffen[2].split("W")[0];
+            let dmg2 = aWaffen[2].split("W")[1];
+            let dmg3 = 0;
+            if (dmg2.includes("+")) {
+                dmg3 = dmg2.split("+")[1];
+                dmg2 = dmg2.split("+")[0];
+            } else if (dmg2.includes("-")) {
+                dmg3 = "-".concat(dmg2.split("-")[1]);
+                dmg2 = dmg2.split("-")[0];
+            }
+            dmg2 = "d".concat(dmg2);
+            ini = aWaffen[4].split("-")[0];
+            console.log("Ini: " + ini);
+            let wgs = aWaffen[3];
+            let merkmale = aWaffen[5];
+            newRowId = generateRowID();
+            update['repeating_waffennsc_' + newRowId + '_waffennamensc'] = name;
+            update['repeating_waffennsc_' + newRowId + '_waffenwertnsc'] = wSkill;
+            update['repeating_waffennsc_' + newRowId + '_waffenwgsnsc'] = wgs;
+            update['repeating_waffennsc_' + newRowId + '_waffenschaden1nsc'] = dmg1;
+            update['repeating_waffennsc_' + newRowId + '_waffenschadenwuerfelnsc'] = dmg2;
+            update['repeating_waffennsc_' + newRowId + '_waffenschaden3nsc'] = dmg3;
+            update['repeating_waffennsc_' + newRowId + '_waffenininsc'] = ini;
+            update['repeating_waffennsc_' + newRowId + '_waffenmerkmalensc'] = merkmale;
+        }
+        update['initiativensc'] = +ini;
+    }*/
+    setAttrs(update);
+}
+
+function removeCharacter(sArray, sTerm) {
+    nArray = [];
+    
+    for (var i = 0; i < sArray.length; i++) {
+        if (sArray[i].includes(sTerm)) {
+            nArray[i] = sArray[i].replaceAll(sTerm, "");
+        } else {
+            nArray[i] = sArray[i];
+        }
+    }
+    
+    return nArray;
+}
+
+function getWeapons(waffen, merkmale) {
+    let aMerkmale = [];
+    let aWeapons = [];
+    let temp = "";
+    let j = 0;
+    
+    for (var i = 0; i < waffen.length; i++) {
+        if (merkmale.includes(waffen[i])) {
+            if (waffen[i + 1].match(/[\d]+-[\d]+W[\d]+/g)) {
+                continue;
+            }
+            if (i < waffen.length - 2) {
+                if (waffen[i + 1].match(/^[\d]+$/g)) {
+                    aMerkmale.push([i, waffen[i] + " " + waffen[i+1]]);
+                    continue;
+                }
+            }
+            aMerkmale.push([i, waffen[i]]);
+        }
+    }
+    
+    console.table(aMerkmale);
+        
+    for (var i = 0; i < 999; i++) {
+        if (i < waffen.length) {
+            console.log("i: " + i + ", j: " + j);
+            if (i == j) {
+                console.log("Neue Waffe an Index " + j);
+                for (var k = i + 1; k < aMerkmale.length; k++) {
+                    if ( (aMerkmale[k][0] - aMerkmale[k - 1][0]) > 2) {
+                        let newIndex = aMerkmale[k - 1][0] + 1;
+                        aWeapons.push(waffen.slice(j, newIndex).join("|"));
+                        console.log("Wafen bisher: " + waffen.slice(j, newIndex).join("|"));
+                        j = newIndex;
+                    }
+                }
+            }
+            
+        } else {
+            break;
+        }
+    }
+    
+    console.log("aWeapons: " + aWeapons + ", Länge: " + aWeapons.length);
 }
 
 </script>
