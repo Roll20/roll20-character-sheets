@@ -1,4 +1,5 @@
-﻿& 'D:\git\roll20-character-sheets\AD&D 2E Revised\build\sanitizeFiles.ps1'
+& 'D:\git\roll20-character-sheets\AD&D 2E Revised\build\sanitizeFiles.ps1'
+node buildPug.js
 
 "---- Combining files ----"
 $inputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\html\2ESheet-base.html'
@@ -31,6 +32,7 @@ $inserts | ForEach-Object {
       $rawContent = $rawContent.Replace($replace, $replaces[$i])
    }
    $rawContent = $rawContent -replace "\#REPLACE\d+\#", ""
+   $rawContent = $rawContent -replace "\r?\nmodule\.exports.*;", ""
    
    $regex = "^" + [Regex]::Escape($_.Line) + "$"
    $content = $content -replace $regex, $rawContent

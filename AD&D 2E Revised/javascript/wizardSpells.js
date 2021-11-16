@@ -1,7 +1,7 @@
 /* ---- Wizard spells start ---- */
 const wiz1 = {};
 wiz1['Affect Normal Fires'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
@@ -18,7 +18,7 @@ wiz1['Affect Normal Fires'] = {
 };
 
 wiz1['Alarm'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Abjuration, Evocation',
     'range': '10 yards',
     'duration': '[[4+(0.5*[[@{level-wizard}]])]] hours',
@@ -35,7 +35,7 @@ wiz1['Alarm'] = {
 };
 
 wiz1['Armor'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Conjuration',
     'range': 'Touch',
     'duration': 'Special',
@@ -52,7 +52,7 @@ wiz1['Armor'] = {
 };
 
 wiz1['Audible Glamer'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Illusion/Phantasm',
     'range': '[[60+(10*[[@{level-wizard}]])]] yards',
     'duration': '[[3*[[@{level-wizard}]] ]] rounds',
@@ -68,7 +68,7 @@ wiz1['Audible Glamer'] = {
     'effect': 'When the *audible glamer* spell is cast, the wizard causes a volume of sound to arise, at whatever distance he desires (within range), and seem to recede, approach, or remain at a fixed place as desired. The volume of sound created, however, is directly related to the level of the spellcaster. The noise of the *audible glamer* is that of 4 men per level of the caster. Current noise is [[4*[[@{level-wizard}]] ]] men. Thus, talking, singing, shouting, walking, marching, or running sounds can be created. The auditory illusion created by an *audible glamer* spell can be virtually any type of sound, but the relative volume must be commensurate with the level of the wizard casting the spell. A horde of rats running and squeaking is about the same volume as eight men running and shouting. A roaring lion is equal to the noise volume of 16 men, while a roaring dragon is equal to the noise volume of no fewer than 24 men.\n&emsp;A character stating that he does not believe the sound receives a saving throw, and if it succeeds, the character then hears a faint and obviously false sound, emanating from the caster’s direction. Note that this spell can enhance the effectiveness of the *phantasmal force* spell.'
 };
 wiz1['Burning Hands'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '0',
     'duration': 'Instantaneous',
@@ -84,7 +84,7 @@ wiz1['Burning Hands'] = {
     'effect': 'When the wizard casts this spell, a jet of searing flame shoots from his fingertips. His hands must be held so as to send forth a fanlike sheet of flames: The wizard’s thumbs must touch each other and the fingers must be spread. The burning hands send out flame jets 5 feet long in a horizontal arc of about 120 degrees in front of the wizard. Any creature in the area of the flames suffers 1d3 points of damage, plus 2 points for each level of experience of the spellcaster, to a maximum of 1d3+20 points of fire damage. Those successfully saving vs. spell receive half damage. Flammable materials touched by the fire burn (for example, cloth, paper, parchment, thin wood, etc.). Such materials can be extinguished in the next round if no other action is taken.'
 };
 wiz1['Cantrip'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'All Schools',
     'range': '10 feet',
     'duration': '[[@{level-wizard}]] hours',
@@ -100,7 +100,7 @@ wiz1['Cantrip'] = {
     'effect': 'Cantrips are minor spells studied by wizards during their apprenticeship, regardless of school. The *cantrip* spell is a practice method for the apprentice, teaching him how to tap minute amounts of magical energy. Once cast, the *cantrip* spell enables the caster to create minor magical effects for the duration of the spell. However, these effects are so minor that they have severe limitations. They are completely unable to cause a loss of hit points, cannot affect the concentration of spellcasters, and can only create small, obviously magical materials. Furthermore, materials created by a cantrip are extremely fragile and cannot be used as tools of any sort. Lastly, a cantrip lacks the power to duplicate any other spell effects.\n&emsp;Whatever manifestation the cantrip takes, it remains in effect only as long as the wizard concentrates. Wizards typically use cantrips to impress common folk, amuse children, and brighten dreary lives. Common tricks with cantrips include tinklings of ethereal music, brightening faded flowers, glowing balls that float over the caster’s hand, puffs of wind to flicker candles, spicing up aromas and flavors of bland food, and little whirlwinds to sweep dust under rugs. Combined with the *unseen servant* spell, it’s a tool to make housekeeping and entertaining simpler for the wizard.'
 };
 wiz1['Change Self'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Illusion/Phantasm',
     'range': '0',
     'duration': '[[2d6+2*[[@{level-wizard}]] ]] rounds',
@@ -117,7 +117,7 @@ wiz1['Change Self'] = {
 };
 
 wiz1['Charm Person'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Enchantment/Charm',
     'range': '120 yards',
     'duration': 'Special',
@@ -134,7 +134,7 @@ wiz1['Charm Person'] = {
 };
 
 wiz1['Chill Touch'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Necromancy',
     'range': '0',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
@@ -151,7 +151,7 @@ wiz1['Chill Touch'] = {
 };
 
 wiz1['Color Spray'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '0',
     'duration': 'Instantaneous',
@@ -168,7 +168,7 @@ wiz1['Color Spray'] = {
 };
 
 wiz1['Comprehend Languages'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration (Reversible)',
     'range': 'Touch',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
@@ -185,7 +185,7 @@ wiz1['Comprehend Languages'] = {
 };
 
 wiz1['Dancing Lights'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '[[40+(10*[[@{level-wizard}]])]]',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
@@ -202,7 +202,7 @@ wiz1['Dancing Lights'] = {
 };
 
 wiz1['Detect Magic'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Divination',
     'range': '0',
     'duration': '[[2*[[@{level-wizard}]] ]]',
@@ -219,7 +219,7 @@ wiz1['Detect Magic'] = {
 };
 
 wiz1['Detect Undead'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Divination, Necromancy',
     'range': '0',
     'duration': '3 turns',
@@ -236,7 +236,7 @@ wiz1['Detect Undead'] = {
 };
 
 wiz1['Enlarge'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration (Reversible)',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
@@ -253,7 +253,7 @@ wiz1['Enlarge'] = {
 };
 
 wiz1['Erase'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '30 yards',
     'duration': 'Permanent',
@@ -270,7 +270,7 @@ wiz1['Erase'] = {
 };
 
 wiz1['Feather Fall'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -287,7 +287,7 @@ wiz1['Feather Fall'] = {
 };
 
 wiz1['Find Familiar'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Conjuration/Summoning',
     'range': '[[@{level-wizard}]] miles',
     'duration': 'Special',
@@ -304,7 +304,7 @@ wiz1['Find Familiar'] = {
 };
 
 wiz1['Friends'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Enchantment/Charm',
     'range': '0',
     'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
@@ -321,7 +321,7 @@ wiz1['Friends'] = {
 };
 
 wiz1['Gaze Reflection'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[2+[[@{level-wizard}]] ]] rounds',
@@ -338,7 +338,7 @@ wiz1['Gaze Reflection'] = {
 };
 
 wiz1['Grease'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Conjuration',
     'range': '10 yards',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
@@ -355,7 +355,7 @@ wiz1['Grease'] = {
 };
 
 wiz1['Hold Portal'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '[[20*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -372,7 +372,7 @@ wiz1['Hold Portal'] = {
 };
 
 wiz1['Hypnotism'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Enchantment/Charm',
     'range': '5 yards',
     'duration': '[[1+[[@{level-wizard}]] ]] rounds',
@@ -389,7 +389,7 @@ wiz1['Hypnotism'] = {
 };
 
 wiz1['Identify'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Divination',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
@@ -406,7 +406,7 @@ wiz1['Identify'] = {
 };
 
 wiz1['Jump'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[1d3+[[@{level-wizard}]] ]] rounds',
@@ -423,7 +423,7 @@ wiz1['Jump'] = {
 };
 
 wiz1['Light'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '60 yards',
     'duration': '[[@{level-wizard}]] turns',
@@ -440,7 +440,7 @@ wiz1['Light'] = {
 };
 
 wiz1['Magic Missile'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Evocation',
     'range': '[[60+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Instantaneous',
@@ -457,7 +457,7 @@ wiz1['Magic Missile'] = {
 };
 
 wiz1['Mending'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '30 yards',
     'duration': 'Permanent',
@@ -474,7 +474,7 @@ wiz1['Mending'] = {
 };
 
 wiz1['Message'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
@@ -491,7 +491,7 @@ wiz1['Message'] = {
 };
 
 wiz1['Mount'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Conjuration/Summoning',
     'range': '10 yards',
     'duration': '[[2+[[@{level-wizard}]] ]] hours',
@@ -508,7 +508,7 @@ wiz1['Mount'] = {
 };
 
 wiz1['Nystu\'s Magical Aura'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] days',
@@ -525,7 +525,7 @@ wiz1['Nystu\'s Magical Aura'] = {
 };
 
 wiz1['Phantasmal Force'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Illusion/Phantasm',
     'range': '[[60+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Special',
@@ -542,7 +542,7 @@ wiz1['Phantasmal Force'] = {
 };
 
 wiz1['Protection From Evil'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Abjuration (Reversible)',
     'range': 'Touch',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
@@ -559,7 +559,7 @@ wiz1['Protection From Evil'] = {
 };
 
 wiz1['Read Magic'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Divination',
     'range': '0',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
@@ -576,7 +576,7 @@ wiz1['Read Magic'] = {
 };
 
 wiz1['Shield'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Evocation',
     'range': '0',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
@@ -593,7 +593,7 @@ wiz1['Shield'] = {
 };
 
 wiz1['Shocking Grasp'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Special',
@@ -610,7 +610,7 @@ wiz1['Shocking Grasp'] = {
 };
 
 wiz1['Sleep'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Enchantment/Charm',
     'range': '30 yards',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
@@ -627,7 +627,7 @@ wiz1['Sleep'] = {
 };
 
 wiz1['Spider Climb'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
@@ -644,7 +644,7 @@ wiz1['Spider Climb'] = {
 };
 
 wiz1['Spook'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Illusion/Phantasm',
     'range': '30 feet',
     'duration': 'Special',
@@ -661,7 +661,7 @@ wiz1['Spook'] = {
 };
 
 wiz1['Taunt'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Enchantment',
     'range': '60 yards',
     'duration': '1 round',
@@ -678,7 +678,7 @@ wiz1['Taunt'] = {
 };
 
 wiz1['Tenser\'s Floating Disc'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Evocation',
     'range': '20 yards',
     'duration': '[[3+[[@{level-wizard}]] ]] turns',
@@ -695,7 +695,7 @@ wiz1['Tenser\'s Floating Disc'] = {
 };
 
 wiz1['Unseen Servant'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Conjuration/Summoning',
     'range': '0',
     'duration': '1 hours + [[@{level-wizard}]] turns',
@@ -712,7 +712,7 @@ wiz1['Unseen Servant'] = {
 };
 
 wiz1['Ventriloquism'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Illusion/Phantasm',
     'range': '[[{{[[10*#LEVLE#]],90}kl1}]] yards',
     'duration': '[[4+[[@{level-wizard}]] ]] rounds',
@@ -729,7 +729,7 @@ wiz1['Ventriloquism'] = {
 };
 
 wiz1['Wall of Fog'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Evocation',
     'range': '30 yards',
     'duration': '[[2d4+[[@{level-wizard}]] ]] rounds',
@@ -746,7 +746,7 @@ wiz1['Wall of Fog'] = {
 };
 
 wiz1['Wizard Mark'] = {
-    'level': 'Level 1 Wizard',
+    'level': '1',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -764,7 +764,7 @@ wiz1['Wizard Mark'] = {
 
 let wiz2 = {};
 wiz2['Alter Self'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[3d4+(2*[[@{level-wizard}]])]]',
@@ -781,7 +781,7 @@ wiz2['Alter Self'] = {
 };
 
 wiz2['Bind'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Enchantment',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -798,7 +798,7 @@ wiz2['Bind'] = {
 };
 
 wiz2['Blindness'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Illusion/Phantasm',
     'range': '[[30+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Special',
@@ -815,7 +815,7 @@ wiz2['Blindness'] = {
 };
 
 wiz2['Blur'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Illusion/Phantasm',
     'range': '0',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
@@ -833,7 +833,7 @@ wiz2['Blur'] = {
 
 //Find another place for this
 wiz2['Choke'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Necromancy, Conjuration/Summoning',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -851,7 +851,7 @@ wiz2['Choke'] = {
 // End
 
 wiz2['Continual Light'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration (Reversible)',
     'range': '60 yards',
     'duration': 'Permanent',
@@ -868,7 +868,7 @@ wiz2['Continual Light'] = {
 };
 
 wiz2['Darkness, 15\' Radius'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '1 turn + [[@{level-wizard}]] rounds',
@@ -885,7 +885,7 @@ wiz2['Darkness, 15\' Radius'] = {
 };
 
 wiz2['Deafness'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Illusion/Phantasm',
     'range': '60 yards',
     'duration': 'Special',
@@ -902,7 +902,7 @@ wiz2['Deafness'] = {
 };
 
 wiz2['Deeppockets'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration, Enchantment',
     'range': 'Touch',
     'duration': '[[12+[[@{level-wizard}]] ]] hours',
@@ -919,7 +919,7 @@ wiz2['Deeppockets'] = {
 };
 
 wiz2['Detect Evil'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Divination (Reversible)',
     'range': '0',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
@@ -936,7 +936,7 @@ wiz2['Detect Evil'] = {
 };
 
 wiz2['Detect Invisibility'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Divination',
     'range': '0',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
@@ -953,7 +953,7 @@ wiz2['Detect Invisibility'] = {
 };
 
 wiz2['ESP'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Divination',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
@@ -970,7 +970,7 @@ wiz2['ESP'] = {
 };
 
 wiz2['Flaming Sphere'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Evocation',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -987,7 +987,7 @@ wiz2['Flaming Sphere'] = {
 };
 
 wiz2['Fog Cloud'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': '10 yards',
     'duration': '[[4+[[@{level-wizard}]] ]] rounds',
@@ -1004,7 +1004,7 @@ wiz2['Fog Cloud'] = {
 };
 
 wiz2['Fools\' Gold'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] hours',
@@ -1021,7 +1021,7 @@ wiz2['Fools\' Gold'] = {
 };
 
 wiz2['Forget'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Enchantment/Charm',
     'range': '30 yards',
     'duration': 'Permanent',
@@ -1038,7 +1038,7 @@ wiz2['Forget'] = {
 };
 
 wiz2['Glitterdust'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Conjuration/Summoning',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -1055,7 +1055,7 @@ wiz2['Glitterdust'] = {
 };
 
 wiz2['Hypnotic Pattern'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Illusion/Phantasm',
     'range': '30 yards',
     'duration': 'Special',
@@ -1072,7 +1072,7 @@ wiz2['Hypnotic Pattern'] = {
 };
 
 wiz2['Improved Phantasmal Force'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Illusion/Phantasm',
     'range': '[[60+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Special',
@@ -1089,7 +1089,7 @@ wiz2['Improved Phantasmal Force'] = {
 };
 
 wiz2['Invisibility'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
     'duration': 'Special',
@@ -1106,7 +1106,7 @@ wiz2['Invisibility'] = {
 };
 
 wiz2['Irritation'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -1123,7 +1123,7 @@ wiz2['Irritation'] = {
 };
 
 wiz2['Knock'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration (Reversible)',
     'range': '60 yards',
     'duration': 'Special',
@@ -1140,7 +1140,7 @@ wiz2['Knock'] = {
 };
 
 wiz2['Know Alignment'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Divination (Reversible)',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -1157,7 +1157,7 @@ wiz2['Know Alignment'] = {
 };
 
 wiz2['Leomund\'s Trap'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -1174,7 +1174,7 @@ wiz2['Leomund\'s Trap'] = {
 };
 
 wiz2['Levitate'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': '[[20*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] turns',
@@ -1191,7 +1191,7 @@ wiz2['Levitate'] = {
 };
 
 wiz2['Locate Object'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Divination (Reversible)',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
@@ -1208,7 +1208,7 @@ wiz2['Locate Object'] = {
 };
 
 wiz2['Magic Mouth'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': '10 yards',
     'duration': 'Special',
@@ -1225,7 +1225,7 @@ wiz2['Magic Mouth'] = {
 };
 
 wiz2['Melf\'s Acid Arrow'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Conjuration',
     'range': '180 yards',
     'duration': 'Special',
@@ -1242,7 +1242,7 @@ wiz2['Melf\'s Acid Arrow'] = {
 };
 
 wiz2['Mirror Image'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Illusion/Phantasm',
     'range': '0',
     'duration': '[[3*[[@{level-wizard}]] ]] rounds',
@@ -1259,7 +1259,7 @@ wiz2['Mirror Image'] = {
 };
 
 wiz2['Misdirection'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Illusion/Phantasm',
     'range': '30 yards',
     'duration': '8 hours',
@@ -1276,7 +1276,7 @@ wiz2['Misdirection'] = {
 };
 
 wiz2['Protection From Cantrips'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Abjuration',
     'range': 'Touch',
     'duration': '[[5+[[@{level-wizard}]] ]] hours',
@@ -1293,7 +1293,7 @@ wiz2['Protection From Cantrips'] = {
 };
 
 wiz2['Pyrotechnics'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': '120 yards',
     'duration': 'Special',
@@ -1310,7 +1310,7 @@ wiz2['Pyrotechnics'] = {
 };
 
 wiz2['Ray of Enfeeblement'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Enchantment/Charm',
     'range': '[[10+(5*[[@{level-wizard}]])]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -1327,7 +1327,7 @@ wiz2['Ray of Enfeeblement'] = {
 };
 
 wiz2['Rope Tricks'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[2*[[@{level-wizard}]] ]] turns',
@@ -1344,7 +1344,7 @@ wiz2['Rope Tricks'] = {
 };
 
 wiz2['Scare'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Enchantment/Charm',
     'range': '[[30+(10*[[@{level-wizard}]])]] yards',
     'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
@@ -1361,7 +1361,7 @@ wiz2['Scare'] = {
 };
 
 wiz2['Shatter'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': '[[30+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Instantaneous',
@@ -1378,7 +1378,7 @@ wiz2['Shatter'] = {
 };
 
 wiz2['Spectral Hand'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Necromancy',
     'range': '[[30+(5*[[@{level-wizard}]])]] yards',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
@@ -1395,7 +1395,7 @@ wiz2['Spectral Hand'] = {
 };
 
 wiz2['Stinking Cloud'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Evocation',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -1412,7 +1412,7 @@ wiz2['Stinking Cloud'] = {
 };
 
 wiz2['Strength'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] hours',
@@ -1429,7 +1429,7 @@ wiz2['Strength'] = {
 };
 
 wiz2['Summon Swarm'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Conjuration/Summoning',
     'range': '60 yards',
     'duration': 'Special',
@@ -1446,7 +1446,7 @@ wiz2['Summon Swarm'] = {
 };
 
 wiz2['Tasha\'s Uncontrollable Hideous Laughter'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Enchantment/Charm',
     'range': '60 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -1463,7 +1463,7 @@ wiz2['Tasha\'s Uncontrollable Hideous Laughter'] = {
 };
 
 wiz2['Web'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Evocation',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[2*[[@{level-wizard}]] ]] turns',
@@ -1480,7 +1480,7 @@ wiz2['Web'] = {
 };
 
 wiz2['Whispering Wind'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration, Phantasm',
     'range': '[[@{level-wizard}]] miles',
     'duration': 'Special',
@@ -1497,7 +1497,7 @@ wiz2['Whispering Wind'] = {
 };
 
 wiz2['Wizard Lock'] = {
-    'level': 'Level 2 Wizard',
+    'level': '2',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -1515,7 +1515,7 @@ wiz2['Wizard Lock'] = {
 
 let wiz3 = {};
 wiz3['Blink'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
@@ -1532,7 +1532,7 @@ wiz3['Blink'] = {
 };
 
 wiz3['Clairaudience'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Divination',
     'range': 'Unlimited',
     'duration': '[[@{level-wizard}]] rounds',
@@ -1549,7 +1549,7 @@ wiz3['Clairaudience'] = {
 };
 
 wiz3['Clairvoyance'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Divination',
     'range': 'Unlimited',
     'duration': '[[@{level-wizard}]] rounds',
@@ -1566,7 +1566,7 @@ wiz3['Clairvoyance'] = {
 };
 
 wiz3['Delude'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[@{level-wizard}]] turns',
@@ -1583,7 +1583,7 @@ wiz3['Delude'] = {
 };
 
 wiz3['Dispel Magic'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Abjuration',
     'range': '120 yards',
     'duration': 'Instantaneous',
@@ -1600,7 +1600,7 @@ wiz3['Dispel Magic'] = {
 };
 
 wiz3['Explosive Runes'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Special',
@@ -1617,7 +1617,7 @@ wiz3['Explosive Runes'] = {
 };
 
 wiz3['Feign Death'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Necromancy',
     'range': 'Touch',
     'duration': '1 hour + [[@{level-wizard}]] turns',
@@ -1634,7 +1634,7 @@ wiz3['Feign Death'] = {
 };
 
 wiz3['Fireball'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Evocation',
     'range': '[[10+10*[[@{level-wizard}]] ]] yards',
     'duration': 'Instantaneous',
@@ -1651,7 +1651,7 @@ wiz3['Fireball'] = {
 };
 
 wiz3['Flame Arrow'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Conjuration/Summoning',
     'range': '[[30+10*[[@{level-wizard}]] ]] yards',
     'duration': '1 round',
@@ -1668,7 +1668,7 @@ wiz3['Flame Arrow'] = {
 };
 
 wiz3['Fly'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] + 1d6 turns rolled by the DM',
@@ -1685,7 +1685,7 @@ wiz3['Fly'] = {
 };
 
 wiz3['Gust of Wind'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': '0',
     'duration': '1 round',
@@ -1702,7 +1702,7 @@ wiz3['Gust of Wind'] = {
 };
 
 wiz3['Haste'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': '60 yards.',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
@@ -1719,7 +1719,7 @@ wiz3['Haste'] = {
 };
 
 wiz3['Hold Person'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Enchantment/Charm',
     'range': '120 yards',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
@@ -1736,7 +1736,7 @@ wiz3['Hold Person'] = {
 };
 
 wiz3['Hold Undead'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Necromancy',
     'range': '60 feet',
     'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
@@ -1753,7 +1753,7 @@ wiz3['Hold Undead'] = {
 };
 
 wiz3['Illusionary Script'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] day',
@@ -1770,7 +1770,7 @@ wiz3['Illusionary Script'] = {
 };
 
 wiz3['Infravision'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[2+[[@{level-wizard}]] ]] hours',
@@ -1787,7 +1787,7 @@ wiz3['Infravision'] = {
 };
 
 wiz3['Invisibility, 10\' Radius'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
     'duration': 'Special',
@@ -1804,7 +1804,7 @@ wiz3['Invisibility, 10\' Radius'] = {
 };
 
 wiz3['Item'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[ [[@{level-wizard}]]*4]] hours',
@@ -1821,7 +1821,7 @@ wiz3['Item'] = {
 };
 
 wiz3['Leomund\'s Tiny Hut'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[4+[[@{level-wizard}]] ]] hours',
@@ -1838,7 +1838,7 @@ wiz3['Leomund\'s Tiny Hut'] = {
 };
 
 wiz3['Lightning Bolt'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Evocation',
     'range': '[[40+10*[[@{level-wizard}]] ]] yards',
     'duration': 'Instantaneous',
@@ -1855,7 +1855,7 @@ wiz3['Lightning Bolt'] = {
 };
 
 wiz3['Melf\'s Minute Meteors'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Evocation, Alteration',
     'range': '[[70+10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -1872,7 +1872,7 @@ wiz3['Melf\'s Minute Meteors'] = {
 };
 
 wiz3['Monster Summoning I'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Conjuration/Summoning',
     'range': 'Special',
     'duration': '[[2+[[@{level-wizard}]] ]] rounds',
@@ -1889,7 +1889,7 @@ wiz3['Monster Summoning I'] = {
 };
 
 wiz3['Nondetection'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Abjuration',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] hours',
@@ -1906,7 +1906,7 @@ wiz3['Nondetection'] = {
 };
 
 wiz3['Phantom Steed'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Conjuration, Phantasm',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] hours',
@@ -1923,7 +1923,7 @@ wiz3['Phantom Steed'] = {
 };
 
 wiz3['Protection from Evil, 10\' Radius'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Abjuration (Reversible)',
     'range': 'Touch',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
@@ -1940,7 +1940,7 @@ wiz3['Protection from Evil, 10\' Radius'] = {
 };
 
 wiz3['Protection From Normal Missiles'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Abjuration',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] turns',
@@ -1957,7 +1957,7 @@ wiz3['Protection From Normal Missiles'] = {
 };
 
 wiz3['Secret Page'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Until dispelled',
@@ -1974,7 +1974,7 @@ wiz3['Secret Page'] = {
 };
 
 wiz3['Sepia Snake Sigil'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Conjuration/Summoning',
     'range': '5 yards',
     'duration': 'Special',
@@ -1991,7 +1991,7 @@ wiz3['Sepia Snake Sigil'] = {
 };
 
 wiz3['Slow'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': '[[90+10*[[@{level-wizard}]] ]] yards',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
@@ -2008,7 +2008,7 @@ wiz3['Slow'] = {
 };
 
 wiz3['Spectral Force'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Illusion/Phantasm',
     'range': '[[60+[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -2025,7 +2025,7 @@ wiz3['Spectral Force'] = {
 };
 
 wiz3['Suggestion'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Enchantment/Charm',
     'range': '30 yards',
     'duration': '[[1+[[@{level-wizard}]] ]] hours',
@@ -2042,7 +2042,7 @@ wiz3['Suggestion'] = {
 };
 
 wiz3['Tongues'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration (Reversible)',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2059,7 +2059,7 @@ wiz3['Tongues'] = {
 };
 
 wiz3['Vampiric Touch'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Necromancy',
     'range': '0',
     'duration': 'One touch',
@@ -2076,7 +2076,7 @@ wiz3['Vampiric Touch'] = {
 };
 
 wiz3['Water Breathing'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration (Reversible)',
     'range': 'Touch',
     'duration': '[[ [[@level-wizard}]]+1d4]] hours',
@@ -2094,7 +2094,7 @@ wiz3['Water Breathing'] = {
 
 
 wiz3['Wind Wall'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@level-wizard}]] rounds',
@@ -2111,7 +2111,7 @@ wiz3['Wind Wall'] = {
 };
 
 wiz3['Wraithform'] = {
-    'level': 'Level 3 Wizard',
+    'level': '3',
     'school': 'Alteration, Illusion',
     'range': '0',
     'duration': '[[2*[[@level-wizard}]] ]] rounds',
@@ -2129,7 +2129,7 @@ wiz3['Wraithform'] = {
 
 const wiz4 = {};
 wiz4['Charm Monster'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Enchantment/Charm',
     'range': '60 yards',
     'duration': 'Special',
@@ -2147,7 +2147,7 @@ wiz4['Charm Monster'] = {
 
 
 wiz4['Confusion'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Enchantment/Charm',
     'range': '120 yards',
     'duration': '[[2+[[@{level-wizard}]] ]] rounds',
@@ -2164,7 +2164,7 @@ wiz4['Confusion'] = {
 };
 
 wiz4['Contagion'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Necromancy',
     'range': '30 yards',
     'duration': 'Permanent',
@@ -2181,7 +2181,7 @@ wiz4['Contagion'] = {
 };
 
 wiz4['Detect Scrying'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Divination',
     'range': '0',
     'duration': '[[1d6+[[@{level-wizard}]] ]] turns',
@@ -2198,7 +2198,7 @@ wiz4['Detect Scrying'] = {
 };
 
 wiz4['Dig'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Evocation',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2215,7 +2215,7 @@ wiz4['Dig'] = {
 };
 
 wiz4['Dimension Door'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration',
     'range': '0',
     'duration': 'Instantaneous',
@@ -2232,7 +2232,7 @@ wiz4['Dimension Door'] = {
 };
 
 wiz4['Emotion'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Enchantment/Charm',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -2249,7 +2249,7 @@ wiz4['Emotion'] = {
 };
 
 wiz4['Enchanted Weapon'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Enchantment',
     'range': 'Touch',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
@@ -2266,7 +2266,7 @@ wiz4['Enchanted Weapon'] = {
 };
 
 wiz4['Enervation'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Necromancy',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[1d4+[[@{level-wizard}}]] ]] hours',
@@ -2283,7 +2283,7 @@ wiz4['Enervation'] = {
 };
 
 wiz4['Evard\'s Black Tentacles'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Conjuration/Summoning',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] hours',
@@ -2300,7 +2300,7 @@ wiz4['Evard\'s Black Tentacles'] = {
 };
 
 wiz4['Extension I'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration',
     'range': '0',
     'duration': 'Special',
@@ -2317,7 +2317,7 @@ wiz4['Extension I'] = {
 };
 
 wiz4['Fear'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Illusion/Phantasm',
     'range': '0',
     'duration': 'Special',
@@ -2334,7 +2334,7 @@ wiz4['Fear'] = {
 };
 
 wiz4['Fire Charm'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Enchantment/Charm',
     'range': '10 yards',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
@@ -2352,7 +2352,7 @@ wiz4['Fire Charm'] = {
 
 // start her
 wiz4['Fire Shield'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Evocation, Alteration',
     'range': '0',
     'duration': '[[2+[[@{level-wizard]] ]] rounds',
@@ -2369,7 +2369,7 @@ wiz4['Fire Shield'] = {
 };
 
 wiz4['Fire Trap'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Abjuration, Evocation',
     'range': 'Touch',
     'duration': 'Until discharged',
@@ -2386,7 +2386,7 @@ wiz4['Fire Trap'] = {
 };
 
 wiz4['Fumble'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Enchantment/Charm',
     'range': '[[10*[[@{level-wizard}]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2403,7 +2403,7 @@ wiz4['Fumble'] = {
 };
 
 wiz4['Hallucinatory Terrain'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Illusion/Phantasm',
     'range': '[[20*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] hours',
@@ -2420,7 +2420,7 @@ wiz4['Hallucinatory Terrain'] = {
 };
 
 wiz4['Ice Storm'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Evocation',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -2437,7 +2437,7 @@ wiz4['Ice Storm'] = {
 };
 
 wiz4['Illusionary Wall'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Illusion/Phantasm',
     'range': '30 yards',
     'duration': 'Permanent',
@@ -2454,7 +2454,7 @@ wiz4['Illusionary Wall'] = {
 };
 
 wiz4['Improved Invisibility'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
     'duration': '[[4+[[@{level-wizard}]] ]] rounds',
@@ -2471,7 +2471,7 @@ wiz4['Improved Invisibility'] = {
 };
 
 wiz4['Leomund\'s Secure Shelter'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration, Enchantment',
     'range': '20 yards',
     'duration': '[[1d4+1+[[@{level-wizard}]] ]] hours',
@@ -2488,7 +2488,7 @@ wiz4['Leomund\'s Secure Shelter'] = {
 };
 
 wiz4['Magic Mirror'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Enchantment, Divination',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2505,7 +2505,7 @@ wiz4['Magic Mirror'] = {
 };
 
 wiz4['Massmorph'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -2522,7 +2522,7 @@ wiz4['Massmorph'] = {
 };
 
 wiz4['Minor Creation'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] hours',
@@ -2539,7 +2539,7 @@ wiz4['Minor Creation'] = {
 };
 
 wiz4['Minor Globe of Invulnerability'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Abjuration',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2556,7 +2556,7 @@ wiz4['Minor Globe of Invulnerability'] = {
 };
 
 wiz4['Monster Summoning II'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Conjuration/Summoning',
     'range': 'Special',
     'duration': '[[3+[[@{[level-wizard}]] ]] rounds',
@@ -2573,7 +2573,7 @@ wiz4['Monster Summoning II'] = {
 };
 
 wiz4['Otiluke\'s Resilient Sphere'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration, Evocation',
     'range': '20 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2590,7 +2590,7 @@ wiz4['Otiluke\'s Resilient Sphere'] = {
 };
 
 wiz4['Phantasmal Killer'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Illusion/Phantasm',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2607,7 +2607,7 @@ wiz4['Phantasmal Killer'] = {
 };
 
 wiz4['Plant Growth'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Permanent',
@@ -2624,7 +2624,7 @@ wiz4['Plant Growth'] = {
 };
 
 wiz4['Polymorph Other'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Permanent',
@@ -2641,7 +2641,7 @@ wiz4['Polymorph Other'] = {
 };
 
 wiz4['Polymorph Self'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[2*[[@{level-wizard}]] ]] turns',
@@ -2658,7 +2658,7 @@ wiz4['Polymorph Self'] = {
 };
 
 wiz4['Rainbow Pattern'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration, Illusion/Phantasm',
     'range': '10 yards',
     'duration': 'Special',
@@ -2675,7 +2675,7 @@ wiz4['Rainbow Pattern'] = {
 };
 
 wiz4['Rary\'s Mnemonic Enhancer'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration',
     'range': '0',
     'duration': '1 day',
@@ -2692,7 +2692,7 @@ wiz4['Rary\'s Mnemonic Enhancer'] = {
 };
 
 wiz4['Remove Curse'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Abjuration (Reversible)',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -2709,7 +2709,7 @@ wiz4['Remove Curse'] = {
 };
 
 wiz4['Shadow Monsters'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Illusion/Phantasm',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2726,7 +2726,7 @@ wiz4['Shadow Monsters'] = {
 };
 
 wiz4['Shout'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Evocation',
     'range': '0',
     'duration': 'Instantaneous',
@@ -2743,7 +2743,7 @@ wiz4['Shout'] = {
 };
 
 wiz4['Solid Fog'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration',
     'range': '30 yards',
     'duration': '[[2d4+[[@{level-wizard}]] ]] rounds',
@@ -2760,7 +2760,7 @@ wiz4['Solid Fog'] = {
 };
 
 wiz4['Stoneskin'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Special',
@@ -2777,7 +2777,7 @@ wiz4['Stoneskin'] = {
 };
 
 wiz4['Vacancy'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration, Illusion/Phantasm',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] hours',
@@ -2794,7 +2794,7 @@ wiz4['Vacancy'] = {
 };
 
 wiz4['Wall of Fire'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Evocation',
     'range': '60 yards',
     'duration': 'Special',
@@ -2811,7 +2811,7 @@ wiz4['Wall of Fire'] = {
 };
 
 wiz4['Wall of Ice'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Evocation',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] turns',
@@ -2828,7 +2828,7 @@ wiz4['Wall of Ice'] = {
 };
 
 wiz4['Wizard Eye'] = {
-    'level': 'Level 4 Wizard',
+    'level': '4',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2846,7 +2846,7 @@ wiz4['Wizard Eye'] = {
 
 const wiz5 = {};
 wiz5['Advanced Illusion'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Illusion/Phantasm',
     'range': '[[60+(10*[[@{level-wizard}]])]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2863,7 +2863,7 @@ wiz5['Advanced Illusion'] = {
 };
 
 wiz5['Airy Water'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[@{level-wizard}]] turns',
@@ -2880,7 +2880,7 @@ wiz5['Airy Water'] = {
 };
 
 wiz5['Animal Growth'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Alteration (Reversible)',
     'range': '60 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2897,7 +2897,7 @@ wiz5['Animal Growth'] = {
 };
 
 wiz5['Animate Dead'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Necromancy',
     'range': '10 yards',
     'duration': 'Permanent',
@@ -2914,7 +2914,7 @@ wiz5['Animate Dead'] = {
 };
 
 wiz5['Avoidance'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Abjuration, Alteration (Reversible)',
     'range': '10 yards',
     'duration': 'Permanent until dispelled',
@@ -2931,7 +2931,7 @@ wiz5['Avoidance'] = {
 };
 
 wiz5['Bigby\'s Interposing Hand'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Evocation',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2948,7 +2948,7 @@ wiz5['Bigby\'s Interposing Hand'] = {
 };
 
 wiz5['Chaos'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Enchantment/Charm',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2965,7 +2965,7 @@ wiz5['Chaos'] = {
 };
 
 wiz5['Cloudkill'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Evocation',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -2982,7 +2982,7 @@ wiz5['Cloudkill'] = {
 };
 
 wiz5['Cone of Cold'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Evocation',
     'range': '0',
     'duration': 'Instantaneous',
@@ -2999,7 +2999,7 @@ wiz5['Cone of Cold'] = {
 };
 
 wiz5['Conjure Elemental'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Conjuration/Summoning',
     'range': '60 yards',
     'duration': '[[@{level-wizard}]] turns',
@@ -3016,7 +3016,7 @@ wiz5['Conjure Elemental'] = {
 };
 
 wiz5['Contact Other Plane'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Divination',
     'range': '0',
     'duration': 'Special',
@@ -3033,7 +3033,7 @@ wiz5['Contact Other Plane'] = {
 };
 
 wiz5['Demishadow Monsters'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Illusion/Phantasm',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -3050,7 +3050,7 @@ wiz5['Demishadow Monsters'] = {
 };
 
 wiz5['Dismissal'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Abjuration',
     'range': '10 yards',
     'duration': 'Permanent',
@@ -3067,7 +3067,7 @@ wiz5['Dismissal'] = {
 };
 
 wiz5['Distance Distortion'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[2*[[@{level-wizard}]] ]] turns',
@@ -3084,7 +3084,7 @@ wiz5['Distance Distortion'] = {
 };
 
 wiz5['Domination'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Enchantment/Charm',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -3101,7 +3101,7 @@ wiz5['Domination'] = {
 };
 
 wiz5['Dream'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Invocation, Illusion/Phantasm (Reversible)',
     'range': 'Touch',
     'duration': 'Special',
@@ -3118,7 +3118,7 @@ wiz5['Dream'] = {
 };
 
 wiz5['Extension II'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Alteration',
     'range': '0',
     'duration': 'Special',
@@ -3135,7 +3135,7 @@ wiz5['Extension II'] = {
 };
 
 wiz5['Fabricate'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Enchantment, Alteration',
     'range': '[[5*[[@{level-wizard}]] yards',
     'duration': 'Permanent',
@@ -3152,7 +3152,7 @@ wiz5['Fabricate'] = {
 };
 
 wiz5['False Vision'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Divination',
     'range': '0',
     'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
@@ -3169,7 +3169,7 @@ wiz5['False Vision'] = {
 };
 
 wiz5['Feeblemind'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Enchantment/Charm',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Permanent',
@@ -3186,7 +3186,7 @@ wiz5['Feeblemind'] = {
 };
 
 wiz5['Hold Monster'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Enchantment/Charm',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -3203,7 +3203,7 @@ wiz5['Hold Monster'] = {
 };
 
 wiz5['Leomund\'s Lamentable Belaborment'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Enchantment, Evocation',
     'range': '10 yards',
     'duration': 'Special',
@@ -3220,7 +3220,7 @@ wiz5['Leomund\'s Lamentable Belaborment'] = {
 };
 
 wiz5['Leomund\'s Secret Chest'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Alteration, Conjuration/Summoning',
     'range': 'Special',
     'duration': '60 days',
@@ -3237,7 +3237,7 @@ wiz5['Leomund\'s Secret Chest'] = {
 };
 
 wiz5['Magic Jar'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Necromancy',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -3254,7 +3254,7 @@ wiz5['Magic Jar'] = {
 };
 
 wiz5['Major Creation'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Illusion/Phantasm',
     'range': '10 yards',
     'duration': 'Special',
@@ -3271,7 +3271,7 @@ wiz5['Major Creation'] = {
 };
 
 wiz5['Monster Summoning III'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Conjuration/Summoning',
     'range': 'Special',
     'duration': '[[4+[[@{level-wizard}]] ]] rounds',
@@ -3288,7 +3288,7 @@ wiz5['Monster Summoning III'] = {
 };
 
 wiz5['Mordenkainen\'s Faithful Hound'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Conjuration/Summoning',
     'range': '10 yards',
     'duration': 'Special',
@@ -3305,7 +3305,7 @@ wiz5['Mordenkainen\'s Faithful Hound'] = {
 };
 
 wiz5['Passwall'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Alteration',
     'range': '30 yards',
     'duration': '[[6+[[@{level-wizard}]] ]] turns',
@@ -3322,7 +3322,7 @@ wiz5['Passwall'] = {
 };
 
 wiz5['Seeming'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Illusion/Phantasm',
     'range': '10-foot radius',
     'duration': '12 hours',
@@ -3339,7 +3339,7 @@ wiz5['Seeming'] = {
 };
 
 wiz5['Sending'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Evocation',
     'range': 'Unlimited',
     'duration': 'Special',
@@ -3356,7 +3356,7 @@ wiz5['Sending'] = {
 };
 
 wiz5['Shadow Door'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Illusion/Phantasm',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -3373,7 +3373,7 @@ wiz5['Shadow Door'] = {
 };
 
 wiz5['Shadow Magic'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Illusion/Phantasm',
     'range': '[[50+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Special',
@@ -3390,7 +3390,7 @@ wiz5['Shadow Magic'] = {
 };
 
 wiz5['Stone Shape'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -3407,7 +3407,7 @@ wiz5['Stone Shape'] = {
 };
 
 wiz5['Summon Shadow'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Conjuration/Summoning, Necromancy',
     'range': '10 yards',
     'duration': '[[1+[[@{level-wizard]] ]] rounds',
@@ -3424,7 +3424,7 @@ wiz5['Summon Shadow'] = {
 };
 
 wiz5['Telekinesis'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -3441,7 +3441,7 @@ wiz5['Telekinesis'] = {
 };
 
 wiz5['Teleport'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Instantaneous',
@@ -3458,7 +3458,7 @@ wiz5['Teleport'] = {
 };
 
 wiz5['Transmute Rock to Mud'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Alteration (Reversible)',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -3475,7 +3475,7 @@ wiz5['Transmute Rock to Mud'] = {
 };
 
 wiz5['Wall of Force'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Evocation',
     'range': '30 yards',
     'duration': '1 turn + [[@{level-wizard}]] rounds',
@@ -3492,7 +3492,7 @@ wiz5['Wall of Force'] = {
 };
 
 wiz5['Wall of Iron'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Evocation',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Permanent',
@@ -3509,7 +3509,7 @@ wiz5['Wall of Iron'] = {
 };
 
 wiz5['Wall of Stone'] = {
-    'level': 'Level 5 Wizard',
+    'level': '5',
     'school': 'Evocation',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Permanent',
@@ -3527,7 +3527,7 @@ wiz5['Wall of Stone'] = {
 
 const wiz6 = {};
 wiz6['Antimagic Shell'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Abjuration',
     'range': '0',
     'duration': '[[@{level-wizard}]] turns',
@@ -3544,7 +3544,7 @@ wiz6['Antimagic Shell'] = {
 };
 
 wiz6['Bigby\'s Forceful Hand'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Evocation',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -3561,7 +3561,7 @@ wiz6['Bigby\'s Forceful Hand'] = {
 };
 
 wiz6['Chain Lightning'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Evocation',
     'range': '[[40+5*[[@{level-wizard}]] ]] yards',
     'duration': 'Instantaneous',
@@ -3578,7 +3578,7 @@ wiz6['Chain Lightning'] = {
 };
 
 wiz6['Conjure Animals'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Conjuration/Summoning',
     'range': 'Special',
     'duration': '[[@{level-wizard}]] rounds',
@@ -3595,7 +3595,7 @@ wiz6['Conjure Animals'] = {
 };
 
 wiz6['Contingency'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Evocation',
     'range': '0',
     'duration': '[[@{level-wizard}]] days',
@@ -3612,7 +3612,7 @@ wiz6['Contingency'] = {
 };
 
 wiz6['Control Weather'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[4d6]] hours',
@@ -3629,7 +3629,7 @@ wiz6['Control Weather'] = {
 };
 
 wiz6['Death Fog'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration, Evocation',
     'range': '30 yards',
     'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
@@ -3646,7 +3646,7 @@ wiz6['Death Fog'] = {
 };
 
 wiz6['Death Spell'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Necromancy',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Instantaneous',
@@ -3663,7 +3663,7 @@ wiz6['Death Spell'] = {
 };
 
 wiz6['Demishadow Magic'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Illusion/Phantasm',
     'range': '[[60+[[@{level-wizard}]]*10]] yards',
     'duration': 'Special',
@@ -3680,7 +3680,7 @@ wiz6['Demishadow Magic'] = {
 };
 
 wiz6['Disintegrate'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Instantaneous',
@@ -3697,7 +3697,7 @@ wiz6['Disintegrate'] = {
 };
 
 wiz6['Enchant an Item'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Enchantment, Invocation',
     'range': 'Touch',
     'duration': 'Special',
@@ -3714,7 +3714,7 @@ wiz6['Enchant an Item'] = {
 };
 
 wiz6['Ensnarement'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Conjuration/Summoning',
     'range': '10 yards',
     'duration': 'Special',
@@ -3731,7 +3731,7 @@ wiz6['Ensnarement'] = {
 };
 
 wiz6['Extension III'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration',
     'range': '0',
     'duration': 'Special',
@@ -3748,7 +3748,7 @@ wiz6['Extension III'] = {
 };
 
 wiz6['Eyebite'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Enchantment/Charm, Illusion/Phantasm',
     'range': '20 yards',
     'duration': '[[floor([[@{level-wizard}]]/3)]] rounds',
@@ -3765,7 +3765,7 @@ wiz6['Eyebite'] = {
 };
 
 wiz6['Geas'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Enchantment/Charm',
     'range': '10 yards',
     'duration': 'Special',
@@ -3782,7 +3782,7 @@ wiz6['Geas'] = {
 };
 
 wiz6['Glassee'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] rounds',
@@ -3799,7 +3799,7 @@ wiz6['Glassee'] = {
 };
 
 wiz6['Globe of Invulnerability'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Abjuration',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
@@ -3816,7 +3816,7 @@ wiz6['Globe of Invulnerability'] = {
 };
 
 wiz6['Guards and Wards'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Evocation, Alteration, Enchantment/Charm',
     'range': '0',
     'duration': '[[@{level-wizard}]] hours',
@@ -3833,7 +3833,7 @@ wiz6['Guards and Wards'] = {
 };
 
 wiz6['Invisible Stalker'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Conjuration/Summoning',
     'range': '10 yards',
     'duration': 'Special',
@@ -3850,7 +3850,7 @@ wiz6['Invisible Stalker'] = {
 };
 
 wiz6['Legend Lore'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Divination',
     'range': '0',
     'duration': 'Special',
@@ -3867,7 +3867,7 @@ wiz6['Legend Lore'] = {
 };
 
 wiz6['Lower Water'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration (Reversible)',
     'range': '80 yards',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
@@ -3884,7 +3884,7 @@ wiz6['Lower Water'] = {
 };
 
 wiz6['Mass Suggestion'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Enchantment/Charm',
     'range': '30 yards',
     'duration': '[[4+4*[[@{level-wizard}]] ]] turns',
@@ -3901,7 +3901,7 @@ wiz6['Mass Suggestion'] = {
 };
 
 wiz6['Mirage Arcana'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Illusion/Phantasm, Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -3918,7 +3918,7 @@ wiz6['Mirage Arcana'] = {
 };
 
 wiz6['Mislead'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Illusion/Phantasm',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -3935,7 +3935,7 @@ wiz6['Mislead'] = {
 };
 
 wiz6['Monster Summoning IV'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Conjuration/Summoning',
     'range': 'Special',
     'duration': '[[5+[[@{level-wizard}]] ]] rounds',
@@ -3952,7 +3952,7 @@ wiz6['Monster Summoning IV'] = {
 };
 
 wiz6['Mordenkainen\'s Lucubration'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration',
     'range': '0',
     'duration': 'Instantaneous',
@@ -3969,7 +3969,7 @@ wiz6['Mordenkainen\'s Lucubration'] = {
 };
 
 wiz6['Move Earth'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Permanent',
@@ -3986,7 +3986,7 @@ wiz6['Move Earth'] = {
 };
 
 wiz6['Otiluke\'s Freezing Sphere'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration, Evocation',
     'range': 'Special',
     'duration': 'Special',
@@ -4003,7 +4003,7 @@ wiz6['Otiluke\'s Freezing Sphere'] = {
 };
 
 wiz6['Part Water'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
@@ -4020,7 +4020,7 @@ wiz6['Part Water'] = {
 };
 
 wiz6['Permanent Illusion'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Illusion/Phantasm',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Permanent',
@@ -4037,7 +4037,7 @@ wiz6['Permanent Illusion'] = {
 };
 
 wiz6['Programmed Illusion'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Illusion/Phantasm',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -4054,7 +4054,7 @@ wiz6['Programmed Illusion'] = {
 };
 
 wiz6['Project Image'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration, Illusion/Phantasm',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -4071,7 +4071,7 @@ wiz6['Project Image'] = {
 };
 
 wiz6['Reincarnation'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Necromancy',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -4088,7 +4088,7 @@ wiz6['Reincarnation'] = {
 };
 
 wiz6['Repulsion'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Abjuration',
     'range': '0',
     'duration': '[[floor([[@{level-wizard}]]/2)]] rounds',
@@ -4105,7 +4105,7 @@ wiz6['Repulsion'] = {
 };
 
 wiz6['Shades'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Illusion/Phantasm',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -4122,7 +4122,7 @@ wiz6['Shades'] = {
 };
 
 wiz6['Stone to Flesh'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration (Reversible)',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Permanent',
@@ -4139,7 +4139,7 @@ wiz6['Stone to Flesh'] = {
 };
 
 wiz6['Tenser\'s Transformation'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration, Evocation',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
@@ -4156,7 +4156,7 @@ wiz6['Tenser\'s Transformation'] = {
 };
 
 wiz6['Transmute Water to Dust'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Alteration (Reversible)',
     'range': '60 yards',
     'duration': 'Permanent',
@@ -4173,7 +4173,7 @@ wiz6['Transmute Water to Dust'] = {
 };
 
 wiz6['True Seeing'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Divination',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] rounds',
@@ -4190,7 +4190,7 @@ wiz6['True Seeing'] = {
 };
 
 wiz6['Veil'] = {
-    'level': 'Level 6 Wizard',
+    'level': '6',
     'school': 'Illusion/Phantasm',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] turns',
@@ -4208,7 +4208,7 @@ wiz6['Veil'] = {
 
 const wiz7 = {};
 wiz7['Banishment'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Abjuration',
     'range': '20 yards',
     'duration': 'Instantaneous',
@@ -4225,7 +4225,7 @@ wiz7['Banishment'] = {
 };
 
 wiz7['Bigby\'s Grasping Hand'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Evocation',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -4242,7 +4242,7 @@ wiz7['Bigby\'s Grasping Hand'] = {
 };
 
 wiz7['Charm Plants'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Enchantment/Charm',
     'range': '30 yards',
     'duration': 'Permanent',
@@ -4259,7 +4259,7 @@ wiz7['Charm Plants'] = {
 };
 
 wiz7['Control Undead'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Necromancy',
     'range': '60 feet',
     'duration': '[[3d4+[[@{level-wizard}]] ]] rounds',
@@ -4276,7 +4276,7 @@ wiz7['Control Undead'] = {
 };
 
 wiz7['Delayed Blast Fireball'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Evocation',
     'range': '[[100+10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -4293,7 +4293,7 @@ wiz7['Delayed Blast Fireball'] = {
 };
 
 wiz7['Drawmij\'s Instant Summons'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Conjuration/Summoning',
     'range': 'Infinite + special',
     'duration': 'Instantaneous',
@@ -4310,7 +4310,7 @@ wiz7['Drawmij\'s Instant Summons'] = {
 };
 
 wiz7['Duo-Dimension'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
@@ -4327,7 +4327,7 @@ wiz7['Duo-Dimension'] = {
 };
 
 wiz7['Finger of Death'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Necromancy',
     'range': '60 yards',
     'duration': 'Permanent',
@@ -4344,7 +4344,7 @@ wiz7['Finger of Death'] = {
 };
 
 wiz7['Forcecage'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Evocation',
     'range': '[[10*floor([[@{level-wizard}}]]/2)]] yards',
     'duration': '[[6+[[@{level-wizard}]] ]] turns',
@@ -4361,7 +4361,7 @@ wiz7['Forcecage'] = {
 };
 
 wiz7['Limited Wish'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Conjuration/Summoning, Invocation/Evocation',
     'range': 'Unlimited',
     'duration': 'Special',
@@ -4378,7 +4378,7 @@ wiz7['Limited Wish'] = {
 };
 
 wiz7['Mass Invisibility'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Illusion/Phantasm',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -4395,7 +4395,7 @@ wiz7['Mass Invisibility'] = {
 };
 
 wiz7['Monster Summoning V'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Conjuration/Summoning',
     'range': 'Special',
     'duration': '[[6+[[@{level-wizard}]] ]] rounds',
@@ -4412,7 +4412,7 @@ wiz7['Monster Summoning V'] = {
 };
 
 wiz7['Mordenkainen\'s Magnificent Mansion'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Alteration, Conjuration',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] hours',
@@ -4429,7 +4429,7 @@ wiz7['Mordenkainen\'s Magnificent Mansion'] = {
 };
 
 wiz7['Mordenkainen\'s Sword'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Evocation',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -4446,7 +4446,7 @@ wiz7['Mordenkainen\'s Sword'] = {
 };
 
 wiz7['Phase Door'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[floor([[@{level-wizard}]]/2)]] usages',
@@ -4463,7 +4463,7 @@ wiz7['Phase Door'] = {
 };
 
 wiz7['Power Word, Stun'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Conjuration/Summoning',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -4480,7 +4480,7 @@ wiz7['Power Word, Stun'] = {
 };
 
 wiz7['Prismatic Spray'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Conjuration/Summoning',
     'range': '0',
     'duration': 'Instantaneous',
@@ -4497,7 +4497,7 @@ wiz7['Prismatic Spray'] = {
 };
 
 wiz7['Reverse Gravity'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Alteration',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -4514,7 +4514,7 @@ wiz7['Reverse Gravity'] = {
 };
 
 wiz7['Sequester'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Illusion/Phantasm, Abjuration',
     'range': 'Touch',
     'duration': '[[7+[[@{level-wizard}]] ]] days',
@@ -4531,7 +4531,7 @@ wiz7['Sequester'] = {
 };
 
 wiz7['Shadow Walk'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Illusion, Enchantment',
     'range': 'Touch',
     'duration': '[[6*[[@{level-wizard}]] ]] turns',
@@ -4548,7 +4548,7 @@ wiz7['Shadow Walk'] = {
 };
 
 wiz7['Simulacrum'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -4565,7 +4565,7 @@ wiz7['Simulacrum'] = {
 };
 
 wiz7['Spell Turning'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Abjuration',
     'range': '0',
     'duration': 'Up to [[3*[[@{level-wizard}]] ]] rounds',
@@ -4582,7 +4582,7 @@ wiz7['Spell Turning'] = {
 };
 
 wiz7['Statue'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] hours',
@@ -4599,7 +4599,7 @@ wiz7['Statue'] = {
 };
 
 wiz7['Teleport Without Error'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Instantaneous',
@@ -4616,7 +4616,7 @@ wiz7['Teleport Without Error'] = {
 };
 
 wiz7['Vanish'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Special',
@@ -4633,7 +4633,7 @@ wiz7['Vanish'] = {
 };
 
 wiz7['Vision'] = {
-    'level': 'Level 7 Wizard',
+    'level': '7',
     'school': 'Divination',
     'range': '0',
     'duration': 'Special',
@@ -4651,7 +4651,7 @@ wiz7['Vision'] = {
 
 const wiz8 = {};
 wiz8['Antipathy-Sympathy'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Enchantment/Charm',
     'range': '30 yards',
     'duration': '[[2*[[@{level-wizard}]] ]] hours',
@@ -4668,7 +4668,7 @@ wiz8['Antipathy-Sympathy'] = {
 };
 
 wiz8['Bigby\'s Clenched Fist'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Evocation',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -4685,7 +4685,7 @@ wiz8['Bigby\'s Clenched Fist'] = {
 };
 
 wiz8['Binding'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Enchantment, Evocation',
     'range': '10 yards',
     'duration': 'Special',
@@ -4702,7 +4702,7 @@ wiz8['Binding'] = {
 };
 
 wiz8['Clone'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Necromancy',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -4719,7 +4719,7 @@ wiz8['Clone'] = {
 };
 
 wiz8['Demand'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Evocation, Enchantment/Charm',
     'range': 'Unlimited',
     'duration': 'Special',
@@ -4736,7 +4736,7 @@ wiz8['Demand'] = {
 };
 
 wiz8['Glassteel'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -4753,7 +4753,7 @@ wiz8['Glassteel'] = {
 };
 
 wiz8['Incendiary Cloud'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Alteration, Evocation',
     'range': '30 yards',
     'duration': '[[4+1d6]] rounds',
@@ -4770,7 +4770,7 @@ wiz8['Incendiary Cloud'] = {
 };
 
 wiz8['Mass Charm'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Enchantment/Charm',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -4787,7 +4787,7 @@ wiz8['Mass Charm'] = {
 };
 
 wiz8['Maze'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Conjuration/Summoning',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -4804,7 +4804,7 @@ wiz8['Maze'] = {
 };
 
 wiz8['Mind Blank'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Abjuration',
     'range': '30 yards',
     'duration': '1 day',
@@ -4821,7 +4821,7 @@ wiz8['Mind Blank'] = {
 };
 
 wiz8['Monster Summoning VI'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Conjuration/Summoning',
     'range': 'Special',
     'duration': '[[7+[[@{level-wizard}]] ]] rounds',
@@ -4838,7 +4838,7 @@ wiz8['Monster Summoning VI'] = {
 };
 
 wiz8['Otiluke\'s Telekinetic Sphere'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Evocation, Alteration',
     'range': '20 yards',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
@@ -4855,7 +4855,7 @@ wiz8['Otiluke\'s Telekinetic Sphere'] = {
 };
 
 wiz8['Otto\'s Irresistible Dance'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Enchantment/Charm',
     'range': 'Touch',
     'duration': '[[1d4+1]] rounds',
@@ -4872,7 +4872,7 @@ wiz8['Otto\'s Irresistible Dance'] = {
 };
 
 wiz8['Permanency'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -4889,7 +4889,7 @@ wiz8['Permanency'] = {
 };
 
 wiz8['Polymorph Any Object'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Alteration',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Variable',
@@ -4906,7 +4906,7 @@ wiz8['Polymorph Any Object'] = {
 };
 
 wiz8['Power Word, Blind'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Conjuration/Summoning',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -4923,7 +4923,7 @@ wiz8['Power Word, Blind'] = {
 };
 
 wiz8['Prismatic Wall'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Conjuration/Summoning',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] turns',
@@ -4940,7 +4940,7 @@ wiz8['Prismatic Wall'] = {
 };
 
 wiz8['Screen'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Divination/Illusion',
     'range': '0',
     'duration': '[[@{level-wizard}]] hours',
@@ -4957,7 +4957,7 @@ wiz8['Screen'] = {
 };
 
 wiz8['Serten\'s Spell Immunity'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Abjuration',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] turns',
@@ -4974,7 +4974,7 @@ wiz8['Serten\'s Spell Immunity'] = {
 };
 
 wiz8['Sink'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Enchantment, Alteration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
@@ -4991,7 +4991,7 @@ wiz8['Sink'] = {
 };
 
 wiz8['Symbol'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Conjuration/Summoning',
     'range': 'Touch',
     'duration': 'Special',
@@ -5008,7 +5008,7 @@ wiz8['Symbol'] = {
 };
 
 wiz8['Trap the Soul'] = {
-    'level': 'Level 8 Wizard',
+    'level': '8',
     'school': 'Conjuration/Summoning',
     'range': '10 yards',
     'duration': 'Permanent until broken',
@@ -5026,7 +5026,7 @@ wiz8['Trap the Soul'] = {
 
 const wiz9 = {};
 wiz9['Astral Spell'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Evocation',
     'range': 'Touch',
     'duration': 'Special',
@@ -5043,7 +5043,7 @@ wiz9['Astral Spell'] = {
 };
 
 wiz9['Bigby\'s Crushing Hand'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Evocation',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
@@ -5060,7 +5060,7 @@ wiz9['Bigby\'s Crushing Hand'] = {
 };
 
 wiz9['Crystalbrittle'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -5077,7 +5077,7 @@ wiz9['Crystalbrittle'] = {
 };
 
 wiz9['Energy Drain'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Evocation, Necromancy',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -5094,7 +5094,7 @@ wiz9['Energy Drain'] = {
 };
 
 wiz9['Foresight'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Divination',
     'range': '0',
     'duration': '[[2d4+[[@{level-wizard}]] ]] rounds',
@@ -5111,7 +5111,7 @@ wiz9['Foresight'] = {
 };
 
 wiz9['Gate'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Conjuration/Summoning',
     'range': '30 yards',
     'duration': 'Special',
@@ -5128,7 +5128,7 @@ wiz9['Gate'] = {
 };
 
 wiz9['Imprisonment'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Abjuration (Reversible)',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -5145,7 +5145,7 @@ wiz9['Imprisonment'] = {
 };
 
 wiz9['Meteor Swarm'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Evocation',
     'range': '[[40+[[@{level-wizard}]]*10]] yards',
     'duration': 'Instantaneous',
@@ -5162,7 +5162,7 @@ wiz9['Meteor Swarm'] = {
 };
 
 wiz9['Monster Summoning VII'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Conjuration/Summoning',
     'range': 'Special',
     'duration': '[[8+[[@{level-wizard}]] ]] rounds',
@@ -5179,7 +5179,7 @@ wiz9['Monster Summoning VII'] = {
 };
 
 wiz9['Mordenkainen\'s Disjunction'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Alteration, Enchantment',
     'range': '0',
     'duration': 'Instantaneous',
@@ -5196,7 +5196,7 @@ wiz9['Mordenkainen\'s Disjunction'] = {
 };
 
 wiz9['Power Word, Kill'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Conjuration/Summoning',
     'range': '[[5*[[floor([[@{level-wizard}]]/2)]] yards',
     'duration': 'Permanent',
@@ -5213,7 +5213,7 @@ wiz9['Power Word, Kill'] = {
 };
 
 wiz9['Prismatic Sphere'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Abjuration, Conjuration/Summoning',
     'range': '0',
     'duration': '[[@{level-wizard}]] turns',
@@ -5230,7 +5230,7 @@ wiz9['Prismatic Sphere'] = {
 };
 
 wiz9['Shape Change'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Alteration',
     'range': '0',
     'duration': '[[@{level-wizard}]] turns',
@@ -5247,7 +5247,7 @@ wiz9['Shape Change'] = {
 };
 
 wiz9['Succor'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Alteration, Enchantment',
     'range': 'Touch',
     'duration': 'Special',
@@ -5264,7 +5264,7 @@ wiz9['Succor'] = {
 };
 
 wiz9['Temporal Stasis'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Alteration (Reversible)',
     'range': '10 yards',
     'duration': 'Permanent',
@@ -5281,7 +5281,7 @@ wiz9['Temporal Stasis'] = {
 };
 
 wiz9['Time Stop'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Alteration',
     'range': '0',
     'duration': 'Special',
@@ -5298,7 +5298,7 @@ wiz9['Time Stop'] = {
 };
 
 wiz9['Weird'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Illusion/Phantasm',
     'range': '30 yards',
     'duration': 'Concentration',
@@ -5315,7 +5315,7 @@ wiz9['Weird'] = {
 };
 
 wiz9['Wish'] = {
-    'level': 'Level 9 Wizard',
+    'level': '9',
     'school': 'Conjuration/Summoning',
     'range': 'Unlimited',
     'duration': 'Special',
@@ -5350,3 +5350,4 @@ for (const [_, section] of Object.entries(wizardSpells)) {
 }
 wizardSpells['wizmonster'] = wizmonster;
 /* ---- Wizard spells end ---- */
+module.exports = wizardSpells;
