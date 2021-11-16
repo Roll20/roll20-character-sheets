@@ -38,7 +38,7 @@
     </div>
 
 
-    <div class="content1">
+    <div class="content1Main">
         <div class="statblock">
             <h2>Attributes</h2>
             <div class="statcol statcol1">
@@ -267,6 +267,7 @@ Can lift overhead (Strength + Nethits) x 5kg}}"></button>
                     <div class="rolllabel"><label> </label></div>
                     <div class="rolllabel"><label>Standard Roll</label></div>
                     <div class="rolllabel"><label>Edge Roll</label></div>
+                    <div class="rolllabel"><label>Extended Roll</label></div>
                 </div>
                 <div class="rollrow">
                     <div class="rolllabel"><label>Without Wounds</label></div>
@@ -276,6 +277,9 @@ Can lift overhead (Strength + Nethits) x 5kg}}"></button>
                     <div class="rolllabel">
                         <button type="action" class="standardroll" name="act_roll" title="Roll with a given Dicepool + Edge and exploding sixes without Woundpenalty" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{val1=Dice-Pool}}{{val1_num=[[?{Dice-Pool|6}]]}}{{val2=Edge}}{{val2_num=[[@{edg_total}]]}}{{result=[[(?{Dice-Pool}+@{edg_total})d6!cs>5>5sd]]}}{{description=?{Description}}}"></button>
                     </div>
+                    <div class="rolllabel">
+                        <button type="action" class="standardroll" name="act_extendedroll" title="Roll with a given Dicepool without Woundpenalty" value="@{gmroll}&{template:extendedRoll}{{name=@{character_name}}}{{roll_name=?{Description}}}{{dice_num=[[?{Dice-Pool|6}]]}}{{limit_num=[[?{Limit|6}]]}}{{result=[[(?{Dice-Pool})d6cs>5>5sdkh[[?{Limit}]]]]}}"></button>
+                    </div>
                 </div>
                 <div class="rollrow">
                     <div class="rolllabel"><label>With Wounds and sustained spells</label></div>
@@ -284,6 +288,9 @@ Can lift overhead (Strength + Nethits) x 5kg}}"></button>
                     </div>
                     <div class="rolllabel">
                         <button type="action" class="standardroll" name="act_roll" title="Roll with a given Dicepool + Edge and exploding sixes with Woundpenalty" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{val1=Dice-Pool}}{{val1_num=[[?{Dice-Pool|6}]]}}{{val2=Edge}}{{val2_num=[[@{edg_total}]]}}{{wounds_num=[[@{wound_total}]]}}{{sustainedspells=[[@{sustainedspells}*2]]}}{{result=[[(?{Dice-Pool}+@{edg_total}-[[@{wound_total}]]-[[@{sustainedspells}*2]])d6!cs>5>5sd]]}}{{description=?{Description}}}"></button>
+                    </div>
+                    <div class="rolllabel">
+                        <button type="action" class="standardroll" name="act_extendedroll" title="Roll with a given Dicepool with Woundpenalty" value="@{gmroll}&{template:extendedRoll}{{name=@{character_name}}}{{roll_name=?{Description}}}{{dice_num=[[?{Dice-Pool|6}]]}}{{limit_num=[[?{Limit|6}]]}}{{wounds_num=[[@{wound_total}]]}}{{sustainedspells=[[@{sustainedspells}*2]]}}{{result=[[(?{Dice-Pool}-[[@{wound_total}]]-[[@{sustainedspells}*2]])d6cs>5>5sdkh[[?{Limit}]]]]}}"></button>
                     </div>
                 </div>
             </div>
@@ -2422,7 +2429,7 @@ Can lift overhead (Strength + Nethits) x 5kg}}"></button>
                         <input type="text" name="attr_skillnotes8" title="Description...">
                     </div>
                     <div class="skillspecwrapper">
-                        <input type="checkbox" class="skillspecticker hiddencheckbox" name="attr_skillspec8" value="none" title="Check if Skill has Specialization" checked>
+                        <input type="checkbox" class="skillspecticker hiddencheckbox" name="attr_skillspec8" value="none" title="Check if Skill has Specialization">
                         <div class="checkboxticker skillspecunticked"></div>
                         <input type="text" name="attr_skillspec8" value="none" title="Name of the Specialization; input 'none' to disable.">
                     </div>
@@ -2461,7 +2468,7 @@ Can lift overhead (Strength + Nethits) x 5kg}}"></button>
                                 <input type="text" name="attr_skillnotes" title="Additional Description">
                             </div>
                             <div class="skillspecwrapper">
-                                <input type="checkbox" class="skillspecticker hiddencheckbox" name="attr_skillspec" value="none" title="Check if Skill has Specialization" checked>
+                                <input type="checkbox" class="skillspecticker hiddencheckbox" name="attr_skillspec" value="none" title="Check if Skill has Specialization">
                                 <div class="checkboxticker skillspecunticked"></div>
                                 <input type="text" name="attr_skillspec" value="none" title="Name of the Specialization; input 'none' to disable.">
                             </div>
@@ -10399,6 +10406,7 @@ Click again to switch to Manual and Remote">
 
     <!--     Buttons used for reaction rolls-->
     <div class="hidden-section" style="display:none">
+        <button type="action" name="act_rollextended"></button>
         <button type="action" name="act_reactdodge"></button>
         <button type="action" name="act_reactsoak"></button>
     </div>
@@ -11418,7 +11426,7 @@ on("change:chummercheckbox", async function(){
                         attributes.mag_base=attributesChummer.find(a => a.name_english === "RES").total;
                         attributes.istechnomancer = 1;
                     }
-                    else if(chummerfile.characters.character.magician==="True"){
+                    else if(chummerfile.characters.character.magician==="True" || chummerfile.characters.character.adept==="True"){
                         attributes.mag_base=attributesChummer.find(a => a.name_english === "MAG").total;
                         attributes.istechnomancer = 0;
                     }
@@ -11440,19 +11448,26 @@ on("change:chummercheckbox", async function(){
                 }
                 try{
                     if(chummerfile.characters.character.powers!=null){
-                        console.log("Importing Powers");
+                        console.log("Importing Adept Powers");
                         if(chummerfile.characters.character.powers.power.length>1){
                             for(var i=0;i<chummerfile.characters.character.powers.power.length;i++){
                                 var newrowid=generateRowID();
                                 attributes["repeating_powers_"+newrowid+"_poweryname"]=chummerfile.characters.character.powers.power[i].name;
                                 attributes["repeating_powers_"+newrowid+"_powerdescription"]=chummerfile.characters.character.powers.power[i].rating;
                                 attributes["repeating_powers_"+newrowid+"_powerpoints"]=chummerfile.characters.character.powers.power[i].totalpoints;
+                                if(chummerfile.characters.character.powers.power[i].notes != null) {
+                                    attributes["repeating_powers_"+newrowid+"_powernotes"]=chummerfile.characters.character.powers.power[i].notes;
+                                }
+
                             }
                         }else{
                             var newrowid=generateRowID();
                             attributes["repeating_powers_"+newrowid+"_poweryname"]=chummerfile.characters.character.powers.power.name;
                             attributes["repeating_powers_"+newrowid+"_powerdescription"]=chummerfile.characters.character.powers.power.rating;
                             attributes["repeating_powers_"+newrowid+"_powerpoints"]=chummerfile.characters.character.powers.power.totalpoints;
+                            if(chummerfile.characters.character.powers.power.notes != null) {
+                                    attributes["repeating_powers_"+newrowid+"_powernotes"]=chummerfile.characters.character.powers.power.notes;
+                                }
                         }
                     }
                 }catch(err){
@@ -12169,71 +12184,69 @@ on("change:chummercheckbox", async function(){
 });
 
 function importSingleWeapon(text, weapon, number,  ammunition, attributes) {
-    if(weapon.category != "Gear"){
-        if(weapon.type == "Ranged"){
-            attributes["weaponismelee"+number] = 0;
-            attributes["weaponrc"+number] = weapon.rc.match(/\d+/g).pop()-Math.ceil((parseInt(attributes.str_base) + parseInt(attributes.str_aug))/3)- 1;
-            if(weapon.rawdamage.match(/\d+/) !== null) {
-                attributes["weapondv"+number] = weapon.rawdamage.match(/\d+/)[0];
-            }
-            else {
-                attributes["weapondv"+number] = 0;
-            }
+    if(weapon.type == "Ranged"){
+        attributes["weaponismelee"+number] = 0;
+        attributes["weaponrc"+number] = weapon.rc.match(/\d+/g).pop()-Math.ceil((parseInt(attributes.str_base) + parseInt(attributes.str_aug))/3)- 1;
+        if(weapon.rawdamage.match(/\d+/) !== null) {
+            attributes["weapondv"+number] = weapon.rawdamage.match(/\d+/)[0];
+        }
+        else {
+            attributes["weapondv"+number] = weapon.damage.match(/\d+/)[0];
+        }
 
-            attributes["weapondmgtype"+number] = weapon.rawdamage.match(/\D+/)[0];
+        attributes["weapondmgtype"+number] = weapon.rawdamage.match(/\D+/)[0];
+    }else{
+        attributes["weaponismelee"+number] = "on";
+        attributes["weaponreach"+number] = weapon.reach;
+        attributes["weapondv"+number] = weapon.damage_english.match(/\d+/)[0];
+        attributes["weapondmgtype"+number] = weapon.damage_english.match(/\D+/)[0];
+    }
+
+    attributes["weaponname"+number] = weapon.name;
+    attributes["weaponaccuracy"+number] = weapon.accuracy.match(/\d+/g).pop();
+    if(isNaN(weapon.ap)){
+        attributes["weaponap"+number] = 0;
+    }else{
+        attributes["weaponap"+number] = weapon.ap;
+        if(weapon.rawap != null) {
+            attributes["weaponap"+number] = weapon.rawap;
+        }
+    }
+    attributes["weaponnotes"+number] = "";
+
+    if(typeof weapon.accessories != "undefined"){
+        if(weapon.accessories.accessory.length>1){
+            for(var j=0; j<weapon.accessories.accessory.length; j++){
+                attributes["weaponnotes"+number] += weapon.accessories.accessory[j].name+"\n";
+            }
         }else{
-            attributes["weaponismelee"+number] = "on";
-            attributes["weaponreach"+number] = weapon.reach;
-            attributes["weapondv"+number] = weapon.damage_english.match(/\d+/)[0];
-            attributes["weapondmgtype"+number] = weapon.damage_english.match(/\D+/)[0];
+            attributes["weaponnotes"+number] += weapon.accessories.accessory.name+"\n";
         }
+    }
 
-        attributes["weaponname"+number] = weapon.name;
-        attributes["weaponaccuracy"+number] = weapon.accuracy.match(/\d+/g).pop();
-        if(isNaN(weapon.ap)){
-            attributes["weaponap"+number] = 0;
-        }else{
-            attributes["weaponap"+number] = weapon.ap;
-            if(weapon.rawap != null) {
-                attributes["weaponap"+number] = weapon.rawap;
-            }
-        }
-        attributes["weaponnotes"+number] = "";
+    if(weapon.clips !== null){
+        if(weapon.clips.clip.length>1){
+            for(var j=0; j<weapon.clips.clip.length; j++){
 
-        if(typeof weapon.accessories != "undefined"){
-            if(weapon.accessories.accessory.length>1){
-                for(var j=0; j<weapon.accessories.accessory.length; j++){
-                    attributes["weaponnotes"+number] += weapon.accessories.accessory[j].name+"\n";
+                if(weapon.clips.clip[j].location === "loaded") {
+                    //skip loaded, they will be found later anyway
+                    continue;
                 }
-            }else{
-                attributes["weaponnotes"+number] += weapon.accessories.accessory.name+"\n";
-            }
-        }
 
-        if(weapon.clips !== null){
-            if(weapon.clips.clip.length>1){
-                for(var j=0; j<weapon.clips.clip.length; j++){
-
-                    if(weapon.clips.clip[j].location === "loaded") {
-                        //skip loaded, they will be found later anyway
-                        continue;
-                    }
-
-                    var newrowid=generateRowID();
-                    //find ammo to get stats
-                    ammo = ammunition.find(clip => clip.guid === weapon.clips.clip[j].id);
-                    if(ammo != null) {
-                        importRepeatingAmmo(ammo, number, attributes);
-                    }
-                }
-            }else{
-                var newrowid = generateRowID();
+                var newrowid=generateRowID();
                 //find ammo to get stats
-                ammo = ammunition.find(clip => clip.guid === weapon.clips.clip.id);
-
+                ammo = ammunition.find(clip => clip.guid === weapon.clips.clip[j].id);
                 if(ammo != null) {
                     importRepeatingAmmo(ammo, number, attributes);
                 }
+            }
+        }else{
+            var newrowid = generateRowID();
+            //find ammo to get stats
+            ammo = ammunition.find(clip => clip.guid === weapon.clips.clip.id);
+
+            if(ammo != null) {
+                importRepeatingAmmo(ammo, number, attributes);
             }
         }
     }
@@ -12260,106 +12273,104 @@ function importRepeatingAmmo(ammunition, number, attributes) {
 }
 
 async function importSingleRepeatingWeapon(text, weapon, ammunition, attributes) {
-    if(weapon.category != "Gear"){
-        var row = "repeating_weapons" + "_" + generateRowID() + "_";
-        if(weapon.type == "Ranged"){
-            attributes[row + "weaponismelee"] = 0;
-            attributes[row + "weaponrc"] = weapon.rc.match(/\d+/g).pop()-Math.ceil((parseInt(attributes.str_base) + parseInt(attributes.str_aug))/3)- 1;
-            if(weapon.rawdamage.match(/\d+/) !== null) {
-                attributes[row + "weapondv"] = weapon.rawdamage.match(/\d+/)[0];
-            }
-            else {
-                attributes[row + "weapondv"] = 0;
-            }
+    var row = "repeating_weapons" + "_" + generateRowID() + "_";
+    if(weapon.type == "Ranged"){
+        attributes[row + "weaponismelee"] = 0;
+        attributes[row + "weaponrc"] = weapon.rc.match(/\d+/g).pop()-Math.ceil((parseInt(attributes.str_base) + parseInt(attributes.str_aug))/3)- 1;
+        if(!weapon.rawdamage.includes("STR") &&weapon.rawdamage.match(/\d+/) !== null) {
+            attributes[row + "weapondv"] = weapon.rawdamage.match(/\d+/)[0];
+        }
+        else {
+            attributes[row + "weapondv"] = weapon.damage.match(/\d+/)[0];
+        }
 
-            attributes[row + "weapondmgtype"] = weapon.rawdamage.match(/\D+/)[0];
+        attributes[row + "weapondmgtype"] = weapon.rawdamage.match(/\D+/)[0];
+    }else{
+        attributes[row + "weaponismelee"] = "on";
+        attributes[row + "weaponreach"] = weapon.reach;
+        attributes[row + "weapondv"] = weapon.damage_english.match(/\d+/)[0];
+        attributes[row + "weapondmgtype"] = weapon.damage_english.match(/\D+/)[0];
+    }
+
+    let skills = [];
+    for(var i=43;i<52;i++)
+    {
+        var name = 'skillname'+i;
+        skills.push(name);
+        var rating = 'skillrating'+i;
+        skills.push(rating);
+        var bonus = 'skillbonus'+i;
+        skills.push(bonus);
+        var attr = 'skillattr_value'+i;
+        skills.push(attr);
+    }
+    skills = await asw.getAttrs(skills);
+    for(var i=43; i<52; i++)
+    {
+        var compname = 'skillname'+i;
+        var rating = 'skillrating'+i;
+        var bonus = 'skillbonus'+i;
+        var skillattr = 'skillattr_value'+i;
+
+        if(skills[compname] == weapon.skill){
+            attributes[row + "weaponcategory"] = "@{skilldicepool"+i+"}";
+            let attribute = await asw.getAttrs([skillattr]);
+            let attrTotal = attribute[skillattr].replace(/[^a-zA-Z0-9_]/g, "");
+            let attributeSum = await asw.getAttrs([attrTotal]);
+            let targetAttributes = attributeSum[attrTotal].replace(/[+]/g, ",").replace(/[^a-zA-Z0-9_,]/g, "").split(",");
+            let attributesValues = [attributes[targetAttributes[0]], attributes[targetAttributes[1]]]
+            attributes[row + "weaponbonus"] = weapon.dicepool - skills[rating] - skills[bonus] - attributesValues.reduce((a,b) => parseInt(a) + parseInt(b));
+        }
+    }
+
+    attributes[row + "weaponname"] = weapon.name;
+    attributes[row + "weaponaccuracy"] = weapon.accuracy.match(/\d+/g).pop();
+    if(weapon.ap == null || isNaN(weapon.ap)){
+        attributes[row + "weaponap"] = 0;
+    }else{
+        attributes[row + "weaponap"] = weapon.ap;
+        if(weapon.rawap != null) {
+            attributes[row + "weaponap"] = weapon.rawap;
+        }
+    }
+    attributes[row + "weaponnotes"] = "";
+
+    if(typeof weapon.accessories != "undefined"){
+        if(weapon.accessories.accessory.length>1){
+            for(var j=0; j<weapon.accessories.accessory.length; j++){
+                attributes[row + "weaponnotes"] += weapon.accessories.accessory[j].name+"\n";
+            }
         }else{
-            attributes[row + "weaponismelee"] = "on";
-            attributes[row + "weaponreach"] = weapon.reach;
-            attributes[row + "weapondv"] = weapon.damage_english.match(/\d+/)[0];
-            attributes[row + "weapondmgtype"] = weapon.damage_english.match(/\D+/)[0];
+            attributes[row + "weaponnotes"] += weapon.accessories.accessory.name+"\n";
         }
+    }
 
-        let skills = [];
-        for(var i=43;i<52;i++)
-        {
-            var name = 'skillname'+i;
-            skills.push(name);
-            var rating = 'skillrating'+i;
-            skills.push(rating);
-            var bonus = 'skillbonus'+i;
-            skills.push(bonus);
-            var attr = 'skillattr_value'+i;
-            skills.push(attr);
-        }
-        skills = await asw.getAttrs(skills);
-        for(var i=43; i<52; i++)
-        {
-            var compname = 'skillname'+i;
-            var rating = 'skillrating'+i;
-            var bonus = 'skillbonus'+i;
-            var skillattr = 'skillattr_value'+i;
+    if(weapon.clips !== null){
+        if(weapon.clips.clip.length > 1){
+            let amountImported = 0;
+            for(var j=0; j < weapon.clips.clip.length && amountImported < 4; j++){
 
-            if(skills[compname] == weapon.skill){
-                attributes[row + "weaponcategory"] = "@{skilldicepool"+i+"}";
-                let attribute = await asw.getAttrs([skillattr]);
-                let attrTotal = attribute[skillattr].replace(/[^a-zA-Z0-9_]/g, "");
-                let attributeSum = await asw.getAttrs([attrTotal]);
-                let targetAttributes = attributeSum[attrTotal].replace(/[+]/g, ",").replace(/[^a-zA-Z0-9_,]/g, "").split(",");
-                let attributesValues = [attributes[targetAttributes[0]], attributes[targetAttributes[1]]]
-                attributes[row + "weaponbonus"] = weapon.dicepool - skills[rating] - skills[bonus] - attributesValues.reduce((a,b) => parseInt(a) + parseInt(b));
-            }
-        }
-
-        attributes[row + "weaponname"] = weapon.name;
-        attributes[row + "weaponaccuracy"] = weapon.accuracy.match(/\d+/g).pop();
-        if(weapon.ap == null || isNaN(weapon.ap)){
-            attributes[row + "weaponap"] = 0;
-        }else{
-            attributes[row + "weaponap"] = weapon.ap;
-            if(weapon.rawap != null) {
-                attributes[row + "weaponap"] = weapon.rawap;
-            }
-        }
-        attributes[row + "weaponnotes"] = "";
-
-        if(typeof weapon.accessories != "undefined"){
-            if(weapon.accessories.accessory.length>1){
-                for(var j=0; j<weapon.accessories.accessory.length; j++){
-                    attributes[row + "weaponnotes"] += weapon.accessories.accessory[j].name+"\n";
+                if(weapon.clips.clip[j].location === "loaded") {
+                    //skip loaded, they will be found later anyway
+                    continue;
                 }
-            }else{
-                attributes[row + "weaponnotes"] += weapon.accessories.accessory.name+"\n";
-            }
-        }
 
-        if(weapon.clips !== null){
-            if(weapon.clips.clip.length > 1){
-                let amountImported = 0;
-                for(var j=0; j < weapon.clips.clip.length && amountImported < 4; j++){
-
-                    if(weapon.clips.clip[j].location === "loaded") {
-                        //skip loaded, they will be found later anyway
-                        continue;
-                    }
-
-                    var newrowid=generateRowID();
-                    //find ammo to get stats
-                    ammo = ammunition.find(clip => clip.guid === weapon.clips.clip[j].id);
-
-                    if(ammo != null && !ammo.name_english.includes("Regular")) {
-                        importRepeatingWeaponAmmo(row, ammo, amountImported, attributes);
-                        amountImported++;
-                    }
-                }
-            }else{
-                var newrowid = generateRowID();
+                var newrowid=generateRowID();
                 //find ammo to get stats
-                ammo = ammunition.find(clip => clip.guid === weapon.clips.clip.id);
+                ammo = ammunition.find(clip => clip.guid === weapon.clips.clip[j].id);
 
-                if(ammo != null) {
-                    importRepeatingWeaponAmmo(row, ammo, 0, attributes);
+                if(ammo != null && !ammo.name_english.includes("Regular")) {
+                    importRepeatingWeaponAmmo(row, ammo, amountImported, attributes);
+                    amountImported++;
                 }
+            }
+        }else{
+            var newrowid = generateRowID();
+            //find ammo to get stats
+            ammo = ammunition.find(clip => clip.guid === weapon.clips.clip.id);
+
+            if(ammo != null) {
+                importRepeatingWeaponAmmo(row, ammo, 0, attributes);
             }
         }
     }
@@ -13235,7 +13246,7 @@ on('change:repeating_armors remove:repeating_armors', function(){
 ///////////////////////////
 
 on('clicked:roll', async (event) => {
-  	await startRoll(event.htmlAttributes.value + "{{glitch=[[0]]}}", (results) => {
+  	await startRoll("{{glitch=[[0]]}}" + event.htmlAttributes.value, (results) => {
 
         var glitchComputed = 0;
         var amount = results.results.result.dice.filter(x => x == 1).length;
@@ -13290,7 +13301,9 @@ on('clicked:repeating_knowledge:roll clicked:repeating_alchemy:roll clicked:repe
   	  });
 });
 
+/////////////////////////////////
 //  Things with Hits => drain  //
+/////////////////////////////////
 
 on('clicked:repeating_rituals:roll clicked:rollSummoning',
      async (event) => {
@@ -13329,7 +13342,76 @@ on('clicked:repeating_rituals:roll clicked:rollSummoning',
   	  });
 });
 
+/////////////////////
+// Extended Rolls  //
+/////////////////////
+
+on('clicked:extendedroll', async (event) => {
+  	let results = await startRoll( "{{passthrough=[[0]]}}{{glitch=[[0]]}} {{sumhits=[[0]]}}" + event.htmlAttributes.value);
+
+    var glitchComputed = 0;
+    var amount = results.results.result.dice.filter(x => x == 1).length;
+
+    if(amount > results.results.result.dice.length/2) {
+        glitchComputed = 1;
+
+        if(results.results.result.dice.filter(x => x >= 6).length == 0) {
+            glitchComputed = 2;
+        }
+    }
+
+    // Storing all the passthrough data required for the next roll in an Object helps for larger rolls
+    let rollData = {
+        dice: results.results.dice_num.result,
+        limit: results.results.limit_num.result,
+        totalhits: results.results.result.result,
+        wounds: results.results.wounds_num != null ? results.results.wounds_num.result : 0,
+        sustainedspells: results.results.sustainedspells != null ? results.results.sustainedspells.result : 0,
+    }
+
+    finishRoll(
+        results.rollId,
+        {
+            glitch: glitchComputed,
+            passthrough: rollEscape.escape(rollData),
+            sumhits: results.results.result.result,
+        }
+    );
+});
+
+on('clicked:rollextended', async (ev) => {
+    await rollExtended(ev);
+});
+
+const rollExtended = async (ev) => {
+    // The data we passed into the button will be stored in the originalRollId key
+    let previousRoll = rollEscape.unescape(ev.originalRollId);
+    let attrs = await asw.getAttrs(['character_name', 'gmroll', 'edgeroll','edg_total','edgn','standardroll']);
+
+    let rollBase = `${attrs.gmroll}&{template:extendedRoll}{{passthrough=[[0]]}}{{glitch=[[0]]}}{{sumhits=[[0]]}}{{tries=[[0]]}}{{name=${attrs.character_name}}}{{roll_name=again}}{{limit_num=${previousRoll.limit}}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{wounds_num=[[${previousRoll.wounds}]]}}{{sustainedspells=[[${previousRoll.sustainedspells}]]}}{{dice_num=[[${previousRoll.dice}-1]]}}{{result=[[(${previousRoll.dice}-1-[[${previousRoll.wounds}]]-[[${previousRoll.sustainedspells}]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}kh${previousRoll.limit}]]}}`;
+    let results = await startRoll(rollBase);
+
+    let sumHits = previousRoll.totalhits + results.results.result.result;
+
+    let rollData = {
+        dice: results.results.dice_num.result,
+        limit: previousRoll.limit,
+        totalhits: sumHits,
+        wounds: previousRoll.wounds,
+        sustainedspells: previousRoll.sustainedspells,
+    }
+
+
+    finishRoll(results.rollId, {
+        sumhits: sumHits,
+        passthrough: rollEscape.escape(rollData),
+    });
+}
+
+
+//////////////////////////////
 //  Dogable weapon attacks  //
+//////////////////////////////
 
 on('clicked:rollWeapon', async (event) => {
     let rollPart = event.htmlAttributes.value;
@@ -13469,7 +13551,7 @@ const rollReactSoak = async (ev) => {
     let dmgType = dmgRoll.attackDmgType;
 
     if(dmgType.includes('P')) {
-     dmgType = dmgRoll.attackDamage > (attrs.armor_total - dmgRoll.attackAp + soakRoll.results.mod.result) ? dmgRoll.attackDmgType : 'S';
+     dmgType = dmgRoll.attackDamage > (attrs.armor_total + dmgRoll.attackAp + soakRoll.results.mod.result) ? dmgRoll.attackDmgType : 'S';
     }
 
     finishRoll(soakRoll.rollId, {
@@ -13718,6 +13800,103 @@ const asw = (() => {
     {{/^rollTotal() computed::passthrough 0}}
     {{/rollGreater() result 0}}
 
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-extendedRoll">
+    <table>
+        <tr>
+            <th>
+                {{#name}}{{name}} rolls{{#roll_name}} {{roll_name}}{{/roll_name}}{{/name}}
+            </th>
+        </tr>
+        {{#subheader}}
+        <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+        <tr><td><div class="sheet-rolltemplate-sectionheading">{{subheader}}</div></td></tr>
+        {{/subheader}}
+        <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+        <tr><td><div class="sheet-rolltemplate-sectionheading">Dicepool</div></td></tr>
+        <tr>
+            <td>> Dice Pool({{dice_num}})</td>
+        </tr>
+
+        {{#tries}}
+        {{#^rollTotal() tries 0}}
+        <tr>
+            <td>> Tries({{tries}})</td>
+        </tr>
+        {{/^rollTotal() tries 0}}
+        {{/tries}}
+        {{#sustainedspells}}
+        {{#^rollTotal() sustainedspells 0}}
+        <tr>
+            <td>> Sustained spells({{sustainedspells}})</td>
+        </tr>
+        {{/^rollTotal() sustainedspells 0}}
+        {{/sustainedspells}}
+        {{#wounds_num}}
+        {{#^rollTotal() wounds_num 0}}
+        <tr>
+            <td>>  Woundpenalty({{wounds_num}})</td>
+        </tr>
+        {{/^rollTotal() wounds_num 0}}
+        {{/wounds_num}}
+        {{#edge}}
+        <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+        <tr><td><div class="sheet-rolltemplate-sectionheading">Edge</div></td></tr>
+        <tr>
+            <td><div class="sheet-rolltemplate-limit">> Edge({{edge_num}})</div></td>
+        </tr>
+        {{/edge}}
+        {{^edge}}
+        <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+        <tr><td><div class="sheet-rolltemplate-sectionheading">Limit</div></td></tr>
+        <tr>
+            <td><div class="sheet-rolltemplate-limit">> Limit({{limit_num}})</div></td>
+        </tr>
+        {{/edge}}
+
+        {{#result}}
+        <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+        <tr><td><div class="sheet-rolltemplate-sectionheading">Result</div></td></tr>
+        {{#rollGreater() result 1}}
+        <tr class="sheet-rolltemplate-results-success">
+            <td class="result">{{result}} Successes</td>
+        </tr>
+        {{/rollGreater() result 1}}
+        {{#rollTotal() result 1}}
+        <tr class="sheet-rolltemplate-results-success">
+            <td class="result">{{result}} Success</td>
+        </tr>
+        {{/rollTotal() result 1}}
+        {{#rollTotal() result 0}}
+        <tr class="sheet-rolltemplate-results-fail">
+            <td class="result">{{result}} Successes</td>
+        </tr>
+        {{/rollTotal() result 0}}
+        {{#rollBetween() computed::glitch 1 1}}
+        <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+        <tr class="sheet-rolltemplate-results-fail">
+            <td class="result">Glitch!</td>
+        </tr>
+        {{/rollBetween() computed::glitch 1 1}}
+        {{#rollBetween() computed::glitch 2 2}}
+        <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+        <tr class="sheet-rolltemplate-results-fail">
+            <td class="result">Critical Glitch!</td>
+        </tr>
+        {{/rollBetween() computed::glitch 2 2}}
+        {{/result}}
+
+
+        <tr class="sheet-rolltemplate-after">
+            <td>Sum hits({{computed::sumhits}})</td>
+        </tr>
+    </table>
+    {{#^rollTotal() computed::passthrough 0}}
+    <div class="sheet-rolltemplate-button">
+        [Next Roll](~{{name}}|rollextended||{{computed::passthrough}})
+    </div>
+    {{/^rollTotal() computed::passthrough 0}}
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-hitsToDrain">

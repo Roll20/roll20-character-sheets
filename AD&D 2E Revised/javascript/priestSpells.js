@@ -1,7 +1,7 @@
 /* ---- Priest spells start ---- */
 const pri1 = {}
 pri1['Animal Friendship'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Enchantment/Charm',
     'sphere': 'Animal',
     'range': '10 yards',
@@ -19,7 +19,7 @@ pri1['Animal Friendship'] = {
 };
 
 pri1['Bless'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Conjuration/Summoning (Reversible)',
     'sphere': 'All',
     'range': '60 yards',
@@ -37,7 +37,7 @@ pri1['Bless'] = {
 };
 
 pri1['Combine'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Evocation',
     'sphere': 'All',
     'range': 'Touch',
@@ -55,7 +55,7 @@ pri1['Combine'] = {
 };
 
 pri1['Command'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Enchantment/Charm',
     'sphere': 'Charm',
     'range': '30 yards',
@@ -73,7 +73,7 @@ pri1['Command'] = {
 };
 
 pri1['Create Water'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Alteration (Reversible)',
     'sphere': 'Elemental (Water)',
     'range': '30 yards',
@@ -91,7 +91,7 @@ pri1['Create Water'] = {
 };
 
 pri1['Cure Light Wounds'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Necromancy (Reversible)',
     'sphere': 'Healing',
     'range': 'Touch',
@@ -109,7 +109,7 @@ pri1['Cure Light Wounds'] = {
 };
 
 pri1['Detect Evil'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Divination (Reversible)',
     'sphere': 'All',
     'range': '0',
@@ -127,7 +127,7 @@ pri1['Detect Evil'] = {
 };
 
 pri1['Detect Magic'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '0',
@@ -145,7 +145,7 @@ pri1['Detect Magic'] = {
 };
 
 pri1['Detect Poison'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '0',
@@ -163,7 +163,7 @@ pri1['Detect Poison'] = {
 };
 
 pri1['Detect Snares & Pits'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '0',
@@ -181,7 +181,7 @@ pri1['Detect Snares & Pits'] = {
 };
 
 pri1['Endure Cold/Endure Heat'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Alteration',
     'sphere': 'Protection',
     'range': 'Touch',
@@ -199,7 +199,7 @@ pri1['Endure Cold/Endure Heat'] = {
 };
 
 pri1['Entangle'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Alteration',
     'sphere': 'Plant',
     'range': '80 yards',
@@ -217,7 +217,7 @@ pri1['Entangle'] = {
 };
 
 pri1['Faerie Fire'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Alteration',
     'sphere': 'Weather',
     'range': '80 yards',
@@ -235,7 +235,7 @@ pri1['Faerie Fire'] = {
 };
 
 pri1['Invisibility to Animals'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Alteration',
     'sphere': 'Animal',
     'range': 'Touch',
@@ -253,7 +253,7 @@ pri1['Invisibility to Animals'] = {
 };
 
 pri1['Invisibility to Undead'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Abjuration',
     'sphere': 'Necromantic',
     'range': 'Touch',
@@ -271,7 +271,7 @@ pri1['Invisibility to Undead'] = {
 };
 
 pri1['Light'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Alteration (Reversible)',
     'sphere': 'Sun',
     'range': '120 yards',
@@ -289,7 +289,7 @@ pri1['Light'] = {
 };
 
 pri1['Locate Animals or Plants'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Divination',
     'sphere': 'Divination (Animal, Plant)',
     'range': '[[100+(20*[[@{level-priest}]])]] yards',
@@ -307,7 +307,7 @@ pri1['Locate Animals or Plants'] = {
 };
 
 pri1['Magical Stone'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Enchantment',
     'sphere': 'Combat',
     'range': 'Touch',
@@ -325,7 +325,7 @@ pri1['Magical Stone'] = {
 };
 
 pri1['Pass Without Trace'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Enchantment/Charm',
     'sphere': 'Plant',
     'range': 'Touch',
@@ -343,7 +343,7 @@ pri1['Pass Without Trace'] = {
 };
 
 pri1['Protection From Evil'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Protection',
     'range': 'Touch',
@@ -361,7 +361,7 @@ pri1['Protection From Evil'] = {
 };
 
 pri1['Purify Food & Drink'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Alteration (Reversible)',
     'sphere': 'All',
     'range': '30 yards',
@@ -379,7 +379,7 @@ pri1['Purify Food & Drink'] = {
 };
 
 pri1['Remove Fear'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Charm',
     'range': '10 yards',
@@ -397,7 +397,7 @@ pri1['Remove Fear'] = {
 };
 
 pri1['Sanctuary'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Abjuration',
     'sphere': 'Protection',
     'range': 'Touch',
@@ -415,7 +415,7 @@ pri1['Sanctuary'] = {
 };
 
 pri1['Shillelagh'] = {
-    'level': 'Level 1 Priest',
+    'level': '1',
     'school': 'Alteration',
     'sphere': 'Combat, Plant',
     'range': 'Touch',
@@ -434,7 +434,7 @@ pri1['Shillelagh'] = {
 
 let pri2 = {};
 pri2['Aid'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Necromancy, Conjuration',
     'sphere': 'Necromantic',
     'range': 'Touch',
@@ -452,7 +452,7 @@ pri2['Aid'] = {
 };
 
 pri2['Augury'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '0',
@@ -470,7 +470,7 @@ pri2['Augury'] = {
 };
 
 pri2['Barkskin'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Alteration',
     'sphere': 'Protection, Plant',
     'range': 'Touch',
@@ -488,7 +488,7 @@ pri2['Barkskin'] = {
 };
 
 pri2['Chant'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Conjuring/Summoning',
     'sphere': 'Combat',
     'range': '0',
@@ -506,7 +506,7 @@ pri2['Chant'] = {
 };
 
 pri2['Charm Person or Mammal'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Animal',
     'range': '80 yards',
@@ -524,7 +524,7 @@ pri2['Charm Person or Mammal'] = {
 };
 
 pri2['Detect Charm'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
     'range': '30 yards',
@@ -542,7 +542,7 @@ pri2['Detect Charm'] = {
 };
 
 pri2['Dust Devil'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Conjuration/Summoning',
     'sphere': 'Elemental (Air)',
     'range': '30 yards',
@@ -560,7 +560,7 @@ pri2['Dust Devil'] = {
 };
 
 pri2['Enthrall'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Charm',
     'range': '0',
@@ -578,7 +578,7 @@ pri2['Enthrall'] = {
 };
 
 pri2['Find Traps'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '0',
@@ -596,7 +596,7 @@ pri2['Find Traps'] = {
 };
 
 pri2['Fire Trap'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Abjuration, Evocation',
     'sphere': 'Elemental (Fire)',
     'range': 'Touch',
@@ -614,7 +614,7 @@ pri2['Fire Trap'] = {
 };
 
 pri2['Flame Blade'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Evocation',
     'sphere': 'Elemental (Fire)',
     'range': '0',
@@ -632,7 +632,7 @@ pri2['Flame Blade'] = {
 };
 
 pri2['Goodberry'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Alteration, Evocation (Reversible)',
     'sphere': 'Plant',
     'range': 'Touch',
@@ -650,7 +650,7 @@ pri2['Goodberry'] = {
 };
 
 pri2['Heat Metal'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Alteration (Reversible)',
     'sphere': 'Elemental (Fire)',
     'range': '40 yards',
@@ -668,7 +668,7 @@ pri2['Heat Metal'] = {
 };
 
 pri2['Hold Person'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Charm',
     'range': '120 yards',
@@ -686,7 +686,7 @@ pri2['Hold Person'] = {
 };
 
 pri2['Know Alignment'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
     'range': '10 yards',
@@ -704,7 +704,7 @@ pri2['Know Alignment'] = {
 };
 
 pri2['Messenger'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Animal',
     'range': '[[20*[[@{level-priest}]] ]] yards',
@@ -722,7 +722,7 @@ pri2['Messenger'] = {
 };
 
 pri2['Obscurement'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Alteration',
     'sphere': 'Weather',
     'range': '0',
@@ -740,7 +740,7 @@ pri2['Obscurement'] = {
 };
 
 pri2['Produce Flame'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Alteration',
     'sphere': 'Elemental (Fire)',
     'range': '0',
@@ -758,7 +758,7 @@ pri2['Produce Flame'] = {
 };
 
 pri2['Resist Fire/Resist Cold'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Alteration',
     'sphere': 'Protection',
     'range': 'Touch',
@@ -776,7 +776,7 @@ pri2['Resist Fire/Resist Cold'] = {
 };
 
 pri2['Silence, 15\' Radius'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Alteration',
     'sphere': 'Guardian',
     'range': '120 yards',
@@ -794,7 +794,7 @@ pri2['Silence, 15\' Radius'] = {
 };
 
 pri2['Slow Poison'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Necromancy',
     'sphere': 'Healing',
     'range': 'Touch',
@@ -812,7 +812,7 @@ pri2['Slow Poison'] = {
 };
 
 pri2['Snake Charm'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Animal',
     'range': '30 yards',
@@ -830,7 +830,7 @@ pri2['Snake Charm'] = {
 };
 
 pri2['Speak With Animals'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Alteration',
     'sphere': 'Animal, Divination',
     'range': '0',
@@ -848,7 +848,7 @@ pri2['Speak With Animals'] = {
 };
 
 pri2['Spiritual Hammer'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Invocation',
     'sphere': 'Combat',
     'range': '[[10*[[@{level-priest}]] ]] yards',
@@ -866,7 +866,7 @@ pri2['Spiritual Hammer'] = {
 };
 
 pri2['Trip'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Plant',
     'range': 'Touch',
@@ -884,7 +884,7 @@ pri2['Trip'] = {
 };
 
 pri2['Warp Wood'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Alteration (Reversible)',
     'sphere': 'Plant',
     'range': '[[10*[[@{level-priest}]] ]] yards',
@@ -902,7 +902,7 @@ pri2['Warp Wood'] = {
 };
 
 pri2['Withdraw'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Ateration',
     'sphere': 'Protection',
     'range': '0',
@@ -920,7 +920,7 @@ pri2['Withdraw'] = {
 };
 
 pri2['Wyvern Watch'] = {
-    'level': 'Level 2 Priest',
+    'level': '2',
     'school': 'Evocation',
     'sphere': 'Guardian',
     'range': '30 yards',
@@ -939,7 +939,7 @@ pri2['Wyvern Watch'] = {
 
 const pri3 = {};
 pri3['Animate Dead'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Necromancy',
     'sphere': 'Necromantic',
     'range': '10 yards',
@@ -957,7 +957,7 @@ pri3['Animate Dead'] = {
 };
 
 pri3['Call Lightning'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration',
     'sphere': 'Weather',
     'range': '360 yards',
@@ -975,7 +975,7 @@ pri3['Call Lightning'] = {
 };
 
 pri3['Continual Light'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration (Reversible)',
     'sphere': 'Sun',
     'range': '120 yards',
@@ -993,7 +993,7 @@ pri3['Continual Light'] = {
 };
 
 pri3['Create Food & Water'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration',
     'sphere': 'Creation',
     'range': '10 yards',
@@ -1011,7 +1011,7 @@ pri3['Create Food & Water'] = {
 };
 
 pri3['Cure Blindness or Deafness'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Necromantic',
     'range': 'Touch',
@@ -1029,7 +1029,7 @@ pri3['Cure Blindness or Deafness'] = {
 };
 
 pri3['Cure Disease'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Necromantic',
     'range': 'Touch',
@@ -1047,7 +1047,7 @@ pri3['Cure Disease'] = {
 };
 
 pri3['Dispel Magic'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Abjuration',
     'sphere': 'Protection',
     'range': '60 yards',
@@ -1065,7 +1065,7 @@ pri3['Dispel Magic'] = {
 };
 
 pri3['Feign Death'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Necromancy',
     'sphere': 'Necromantic',
     'range': 'Touch',
@@ -1083,7 +1083,7 @@ pri3['Feign Death'] = {
 };
 
 pri3['Flame Walk'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration',
     'sphere': 'Elemental (Fire)',
     'range': 'Touch',
@@ -1101,7 +1101,7 @@ pri3['Flame Walk'] = {
 };
 
 pri3['Glyph of Warding'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Abjuration, Evocation',
     'sphere': 'Guardian',
     'range': 'Touch',
@@ -1119,7 +1119,7 @@ pri3['Glyph of Warding'] = {
 };
 
 pri3['Hold Animal'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Enchantment/Charm',
     'sphere': 'Animal',
     'range': '80 yards',
@@ -1137,7 +1137,7 @@ pri3['Hold Animal'] = {
 };
 
 pri3['Locate Object'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
     'range': '[[60+10*[[@{level-priest}]]]] yards',
@@ -1155,7 +1155,7 @@ pri3['Locate Object'] = {
 };
 
 pri3['Magical Vestment'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Enchantment',
     'sphere': 'Protection',
     'range': '0',
@@ -1173,7 +1173,7 @@ pri3['Magical Vestment'] = {
 };
 
 pri3['Meld Into Stone'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration',
     'sphere': 'Elemental (Earth)',
     'range': '0',
@@ -1191,7 +1191,7 @@ pri3['Meld Into Stone'] = {
 };
 
 pri3['Negative Plane Protection'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Abjuration',
     'sphere': 'Protection, Necromantic',
     'range': 'Touch',
@@ -1209,7 +1209,7 @@ pri3['Negative Plane Protection'] = {
 };
 
 pri3['Plant Growth'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration',
     'sphere': 'Plant',
     'range': '160 yards',
@@ -1227,7 +1227,7 @@ pri3['Plant Growth'] = {
 };
 
 pri3['Prayer'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Conjuration/Summoning',
     'sphere': 'Combat',
     'range': '0',
@@ -1245,7 +1245,7 @@ pri3['Prayer'] = {
 };
 
 pri3['Protection From Fire'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Abjuration',
     'sphere': 'Protection, Elemental (Fire)',
     'range': 'Touch',
@@ -1263,7 +1263,7 @@ pri3['Protection From Fire'] = {
 };
 
 pri3['Pyrotechnics'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration',
     'sphere': 'Elemental (Fire)',
     'range': '160 yards',
@@ -1281,7 +1281,7 @@ pri3['Pyrotechnics'] = {
 };
 
 pri3['Remove Curse'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Protection',
     'range': 'Touch',
@@ -1299,7 +1299,7 @@ pri3['Remove Curse'] = {
 };
 
 pri3['Remove Paralysis'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Abjuration',
     'sphere': 'Protection',
     'range': '[[10*[[@{level-priest}]] yards',
@@ -1317,7 +1317,7 @@ pri3['Remove Paralysis'] = {
 };
 
 pri3['Snare'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Enchantment/Charm',
     'sphere': 'Plant',
     'range': 'Touch',
@@ -1335,7 +1335,7 @@ pri3['Snare'] = {
 };
 
 pri3['Speak With Dead'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Necromancy',
     'sphere': 'Divination',
     'range': '1',
@@ -1353,7 +1353,7 @@ pri3['Speak With Dead'] = {
 };
 
 pri3['Spike Growth'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration, Enchantment',
     'sphere': 'Plant',
     'range': '60 yards',
@@ -1371,7 +1371,7 @@ pri3['Spike Growth'] = {
 };
 
 pri3['Starshine'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Evocation, Illusion/Phantasm',
     'sphere': 'Sun',
     'range': '[[10*[[@{level-priest}]] ]] yards',
@@ -1389,7 +1389,7 @@ pri3['Starshine'] = {
 };
 
 pri3['Stone Shape'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration',
     'sphere': 'Elemental (Earth)',
     'range': 'Touch',
@@ -1407,7 +1407,7 @@ pri3['Stone Shape'] = {
 };
 
 pri3['Summon Insects'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Conjuration/Summoning',
     'sphere': 'Animal',
     'range': '30 yards',
@@ -1425,7 +1425,7 @@ pri3['Summon Insects'] = {
 };
 
 pri3['Tree'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration',
     'sphere': 'Plant',
     'range': '0',
@@ -1443,7 +1443,7 @@ pri3['Tree'] = {
 };
 
 pri3['Water Breathing'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration (Reversible)',
     'sphere': 'Elemental (Water, Air)',
     'range': 'Touch',
@@ -1461,7 +1461,7 @@ pri3['Water Breathing'] = {
 };
 
 pri3['Water Walk'] = {
-    'level': 'Level 3 Priest',
+    'level': '3',
     'school': 'Alteration',
     'sphere': 'Elemental (Water)',
     'range': '0',
@@ -1480,7 +1480,7 @@ pri3['Water Walk'] = {
 
 const pri4 = {};
 pri4['Abjure'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Abjuration',
     'sphere': 'Summoning',
     'range': '10 yards',
@@ -1498,7 +1498,7 @@ pri4['Abjure'] = {
 };
 
 pri4['Animal Summoning I'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Conjuration, Summoning',
     'sphere': 'Animal, Summoning',
     'range': '1 mile radius',
@@ -1516,7 +1516,7 @@ pri4['Animal Summoning I'] = {
 };
 
 pri4['Call Woodland Beings'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Conjuration/Summoning',
     'sphere': 'Summoning',
     'range': '[[100*[[@{level-priest}]] ]] yards',
@@ -1534,7 +1534,7 @@ pri4['Call Woodland Beings'] = {
 };
 
 pri4['Cloak of Bravery'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Conjuration/Summoning (Reversible)',
     'sphere': 'Charm',
     'range': 'Touch',
@@ -1552,7 +1552,7 @@ pri4['Cloak of Bravery'] = {
 };
 
 pri4['Control Temperature, 10\' Radius'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Alteration',
     'sphere': 'Weather',
     'range': '0',
@@ -1570,7 +1570,7 @@ pri4['Control Temperature, 10\' Radius'] = {
 };
 
 pri4['Cure Serious Wounds'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Necromancy (Reversible)',
     'sphere': 'Healing',
     'range': 'Touch',
@@ -1588,7 +1588,7 @@ pri4['Cure Serious Wounds'] = {
 };
 
 pri4['Detect Lie'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
     'range': '30 yards',
@@ -1606,7 +1606,7 @@ pri4['Detect Lie'] = {
 };
 
 pri4['Divination'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '0',
@@ -1624,7 +1624,7 @@ pri4['Divination'] = {
 };
 
 pri4['Free Action'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Abjuration, Enchantment',
     'sphere': 'Charm',
     'range': 'Touch',
@@ -1642,7 +1642,7 @@ pri4['Free Action'] = {
 };
 
 pri4['Giant Insect'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Alteration (Reversible)',
     'sphere': 'Animal',
     'range': '20 yards',
@@ -1660,7 +1660,7 @@ pri4['Giant Insect'] = {
 };
 
 pri4['Hallucinatory Forest'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Illusion/Phantasm (Reversible)',
     'sphere': 'Plant',
     'range': '80 yards',
@@ -1678,7 +1678,7 @@ pri4['Hallucinatory Forest'] = {
 };
 
 pri4['Hold Plant'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Enchantment/Charm',
     'sphere': 'Plant',
     'range': '80 yards',
@@ -1696,7 +1696,7 @@ pri4['Hold Plant'] = {
 };
 
 pri4['Imbue With Spell Ability'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Enchantment',
     'sphere': 'Charm',
     'range': 'Touch',
@@ -1714,7 +1714,7 @@ pri4['Imbue With Spell Ability'] = {
 };
 
 pri4['Lower Water'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Alteration (Reversible)',
     'sphere': 'Elemental (Water)',
     'range': '120 yards',
@@ -1732,7 +1732,7 @@ pri4['Lower Water'] = {
 };
 
 pri4['Neutralize Poison'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Necromancy (Reversible)',
     'sphere': 'Healing',
     'range': 'Touch',
@@ -1750,7 +1750,7 @@ pri4['Neutralize Poison'] = {
 };
 
 pri4['Plant Door'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Alteration',
     'sphere': 'Plant',
     'range': 'Touch',
@@ -1768,7 +1768,7 @@ pri4['Plant Door'] = {
 };
 
 pri4['Produce Fire'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Alteration (Reversible)',
     'sphere': 'Elemental (Fire)',
     'range': '40 yards',
@@ -1786,7 +1786,7 @@ pri4['Produce Fire'] = {
 };
 
 pri4['Protection From Evil, 10\' Radius'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Protection',
     'range': 'Touch',
@@ -1804,7 +1804,7 @@ pri4['Protection From Evil, 10\' Radius'] = {
 };
 
 pri4['Protection From Lightning'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Abjuration',
     'sphere': 'Protection, Weather',
     'range': 'Touch',
@@ -1822,7 +1822,7 @@ pri4['Protection From Lightning'] = {
 };
 
 pri4['Reflecting Pool'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '10 yards',
@@ -1840,7 +1840,7 @@ pri4['Reflecting Pool'] = {
 };
 
 pri4['Repel Insects'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Abjuration, Alteration',
     'sphere': 'Animal, Protection',
     'range': '0',
@@ -1858,7 +1858,7 @@ pri4['Repel Insects'] = {
 };
 
 pri4['Speak With Plants'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Alteration',
     'sphere': 'Plant',
     'range': '0',
@@ -1876,7 +1876,7 @@ pri4['Speak With Plants'] = {
 };
 
 pri4['Spell Immunity'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Abjuration',
     'sphere': 'Protection',
     'range': 'Touch',
@@ -1894,7 +1894,7 @@ pri4['Spell Immunity'] = {
 };
 
 pri4['Sticks to Snakes'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Alteration (Reversible)',
     'sphere': 'Plant',
     'range': '30 yards',
@@ -1912,7 +1912,7 @@ pri4['Sticks to Snakes'] = {
 };
 
 pri4['Tongues'] = {
-    'level': 'Level 4 Priest',
+    'level': '4',
     'school': 'Alteration (Reversible)',
     'sphere': 'Divination',
     'range': '0',
@@ -1931,7 +1931,7 @@ pri4['Tongues'] = {
 
 const pri5 = {};
 pri5['Air Walk'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Alteration',
     'sphere': 'Elemental (Air)',
     'range': 'Touch',
@@ -1949,7 +1949,7 @@ pri5['Air Walk'] = {
 };
 
 pri5['Animal Growth'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Alteration (Reversible)',
     'sphere': 'Animal',
     'range': '80 yards',
@@ -1967,7 +1967,7 @@ pri5['Animal Growth'] = {
 };
 
 pri5['Animal Summoning II'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Conjuration/Summoning',
     'sphere': 'Animal, Summoning',
     'range': '[[60*[[@{level-priest}]] ]] yards',
@@ -1985,7 +1985,7 @@ pri5['Animal Summoning II'] = {
 };
 
 pri5['Antiplant Shell'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Abjuration',
     'sphere': 'Plant, Protection',
     'range': '0',
@@ -2003,7 +2003,7 @@ pri5['Antiplant Shell'] = {
 };
 
 pri5['Atonement'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Abjuration',
     'sphere': 'All',
     'range': 'Touch',
@@ -2021,7 +2021,7 @@ pri5['Atonement'] = {
 };
 
 pri5['Commune'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '0',
@@ -2039,7 +2039,7 @@ pri5['Commune'] = {
 };
 
 pri5['Commune With Nature'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Divination',
     'sphere': 'Divination, Elemental',
     'range': '0',
@@ -2057,7 +2057,7 @@ pri5['Commune With Nature'] = {
 };
 
 pri5['Control Winds'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Alteration',
     'sphere': 'Weather',
     'range': '0',
@@ -2075,7 +2075,7 @@ pri5['Control Winds'] = {
 };
 
 pri5['Cure Critical Wounds'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Necromancy (Reversible)',
     'sphere': 'Healing',
     'range': 'Touch',
@@ -2093,7 +2093,7 @@ pri5['Cure Critical Wounds'] = {
 };
 
 pri5['Dispel Evil'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Protection, Summoning',
     'range': 'Touch',
@@ -2111,7 +2111,7 @@ pri5['Dispel Evil'] = {
 };
 
 pri5['Flame Strike'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Evocation',
     'sphere': 'Combat',
     'range': '60 yards',
@@ -2129,7 +2129,7 @@ pri5['Flame Strike'] = {
 };
 
 pri5['Insect Plague'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Conjuration/Summoning',
     'sphere': 'Combat',
     'range': '120 yards',
@@ -2147,7 +2147,7 @@ pri5['Insect Plague'] = {
 };
 
 pri5['Magic Font'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Divination',
     'sphere': 'Divination',
     'range': 'Touch',
@@ -2165,7 +2165,7 @@ pri5['Magic Font'] = {
 };
 
 pri5['Moonbeam'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Evocation, Alteration',
     'sphere': 'Sun',
     'range': '[[60+(10*[[@{level-priest}]])]] yards',
@@ -2183,7 +2183,7 @@ pri5['Moonbeam'] = {
 };
 
 pri5['Pass Plant'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Alteration',
     'sphere': 'Plant',
     'range': 'Touch',
@@ -2201,7 +2201,7 @@ pri5['Pass Plant'] = {
 };
 
 pri5['Plane Shift'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Alteration',
     'sphere': 'Astral',
     'range': 'Touch',
@@ -2219,7 +2219,7 @@ pri5['Plane Shift'] = {
 };
 
 pri5['Quest'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Enchantment/Charm',
     'sphere': 'Charm',
     'range': '60 yards',
@@ -2237,7 +2237,7 @@ pri5['Quest'] = {
 };
 
 pri5['Rainbow'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Evocation, Alteration',
     'sphere': 'Weather, Sun',
     'range': '120 yards',
@@ -2255,7 +2255,7 @@ pri5['Rainbow'] = {
 };
 
 pri5['Raise Dead'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Necromancy (Reversible)',
     'sphere': 'Necromantic',
     'range': '120 yards',
@@ -2273,7 +2273,7 @@ pri5['Raise Dead'] = {
 };
 
 pri5['Spike Stones'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Alteration, Enchantment',
     'sphere': 'Elemental (Earth)',
     'range': '30 yards',
@@ -2291,7 +2291,7 @@ pri5['Spike Stones'] = {
 };
 
 pri5['Transmute Rock to Mud'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Alteration (Reversible)',
     'sphere': 'Elemental (Earth, Water)',
     'range': '160 yards',
@@ -2309,7 +2309,7 @@ pri5['Transmute Rock to Mud'] = {
 };
 
 pri5['True Seeing'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Divination',
     'sphere': 'Divination',
     'range': 'Touch',
@@ -2326,7 +2326,7 @@ pri5['True Seeing'] = {
 };
 
 pri5['Wall of Fire'] = {
-    'level': 'Level 5 Priest',
+    'level': '5',
     'school': 'Conjuration/Summoning',
     'sphere': 'Elemental (Fire)',
     'range': '80 yards',
@@ -2345,7 +2345,7 @@ pri5['Wall of Fire'] = {
 
 const pri6 = {};
 pri6['Aerial Servant'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Conjuration/Summoning',
     'sphere': 'Summoning',
     'range': '10 yards',
@@ -2363,7 +2363,7 @@ pri6['Aerial Servant'] = {
 };
 
 pri6['Animal Summoning III'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Conjuration, Summoning',
     'sphere': 'Animal, Summoning',
     'range': '[[100*[[@{level-priest}]] ]] yards',
@@ -2381,7 +2381,7 @@ pri6['Animal Summoning III'] = {
 };
 
 pri6['Animate Object'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Alteration',
     'sphere': 'Creation, Summoning',
     'range': '30 yards',
@@ -2399,7 +2399,7 @@ pri6['Animate Object'] = {
 };
 
 pri6['Antianimal Shell'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Abjuration',
     'sphere': 'Animal, Protection',
     'range': '0',
@@ -2417,7 +2417,7 @@ pri6['Antianimal Shell'] = {
 };
 
 pri6['Blade Barrier'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Evocation',
     'sphere': 'Guardian, Creation',
     'range': '30 yards',
@@ -2435,7 +2435,7 @@ pri6['Blade Barrier'] = {
 };
 
 pri6['Conjure Animals'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Conjuration/Summoning',
     'sphere': 'Summoning',
     'range': '30 yards',
@@ -2453,7 +2453,7 @@ pri6['Conjure Animals'] = {
 };
 
 pri6['Conjure Fire Elemental'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Conjuration/Summoning (Reversible)',
     'sphere': 'Elemental (Fire)',
     'range': '80 yards',
@@ -2471,7 +2471,7 @@ pri6['Conjure Fire Elemental'] = {
 };
 
 pri6['Find the Path'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
     'range': 'Touch',
@@ -2489,7 +2489,7 @@ pri6['Find the Path'] = {
 };
 
 pri6['Fire Seeds'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Conjuration',
     'sphere': 'Elemental (Fire)',
     'range': 'Touch',
@@ -2507,7 +2507,7 @@ pri6['Fire Seeds'] = {
 };
 
 pri6['Forbiddance'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Abjuration',
     'sphere': 'Protection',
     'range': '30 yards',
@@ -2525,7 +2525,7 @@ pri6['Forbiddance'] = {
 };
 
 pri6['Heal'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Necromancy (Reversible)',
     'sphere': 'Healing',
     'range': 'Touch',
@@ -2543,7 +2543,7 @@ pri6['Heal'] = {
 };
 
 pri6['Heroes\' Feast'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Evocation',
     'sphere': 'Creation',
     'range': '10 yards',
@@ -2561,7 +2561,7 @@ pri6['Heroes\' Feast'] = {
 };
 
 pri6['Liveoak'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Enchantment',
     'sphere': 'Plant',
     'range': 'Touch',
@@ -2579,7 +2579,7 @@ pri6['Liveoak'] = {
 };
 
 pri6['Part Water'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Alteration',
     'sphere': 'Elemental (Water)',
     'range': '[[20*[[@{level-priest}]] ]] yards',
@@ -2597,7 +2597,7 @@ pri6['Part Water'] = {
 };
 
 pri6['Speak With Monsters'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Alteration',
     'sphere': 'Divination',
     'range': '30 yards',
@@ -2615,7 +2615,7 @@ pri6['Speak With Monsters'] = {
 };
 
 pri6['Stone Tell'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Divination',
     'sphere': 'Elemental (Earth), Divination',
     'range': 'Touch',
@@ -2633,7 +2633,7 @@ pri6['Stone Tell'] = {
 };
 
 pri6['Transmute Water to Dust'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Alteration (Reversible)',
     'sphere': 'Elemental (Water, Earth)',
     'range': '60 yards',
@@ -2651,7 +2651,7 @@ pri6['Transmute Water to Dust'] = {
 };
 
 pri6['Transport Via Plants'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Alteration',
     'sphere': 'Plant',
     'range': 'Touch',
@@ -2669,7 +2669,7 @@ pri6['Transport Via Plants'] = {
 };
 
 pri6['Turn Wood'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Alteration',
     'sphere': 'Plant',
     'range': '0',
@@ -2687,7 +2687,7 @@ pri6['Turn Wood'] = {
 };
 
 pri6['Wall of Thorns'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Conjuration/Summoning',
     'sphere': 'Plant, Creation',
     'range': '80 yards',
@@ -2705,7 +2705,7 @@ pri6['Wall of Thorns'] = {
 };
 
 pri6['Weather Summoning'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Conjuration/Summoning',
     'sphere': 'Weather',
     'range': '0',
@@ -2723,7 +2723,7 @@ pri6['Weather Summoning'] = {
 };
 
 pri6['Word of Recall'] = {
-    'level': 'Level 6 Priest',
+    'level': '6',
     'school': 'Alteration',
     'sphere': 'Summoning',
     'range': '0',
@@ -2742,7 +2742,7 @@ pri6['Word of Recall'] = {
 
 const pri7 = {};
 pri7['Animate Rock'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Alteration',
     'sphere': 'Elemental (Earth)',
     'range': '40 yards',
@@ -2760,7 +2760,7 @@ pri7['Animate Rock'] = {
 };
 
 pri7['Astral Spell'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Alteration',
     'sphere': 'Astral',
     'range': 'Touch',
@@ -2778,7 +2778,7 @@ pri7['Astral Spell'] = {
 };
 
 pri7['Changestaff'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Evocation, Enchantment',
     'sphere': 'Plant, Creation',
     'range': 'Touch',
@@ -2796,7 +2796,7 @@ pri7['Changestaff'] = {
 };
 
 pri7['Chariot of Sustarre'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Evocation',
     'sphere': 'Elemental (Fire), Creation',
     'range': '10 yards',
@@ -2814,7 +2814,7 @@ pri7['Chariot of Sustarre'] = {
 };
 
 pri7['Confusion'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Enchantment/Charm',
     'sphere': 'Charm',
     'range': '80 yards',
@@ -2832,7 +2832,7 @@ pri7['Confusion'] = {
 };
 
 pri7['Conjure Earth Elemental'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Conjuration/Summoning (Reversible)',
     'sphere': 'Elemental (Earth), Summoning',
     'range': '40 yards',
@@ -2850,7 +2850,7 @@ pri7['Conjure Earth Elemental'] = {
 };
 
 pri7['Control Weather'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Alteration',
     'sphere': 'Weather',
     'range': '0',
@@ -2868,7 +2868,7 @@ pri7['Control Weather'] = {
 };
 
 pri7['Creeping Doom'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Conjuration/Summoning',
     'sphere': 'Animal, Summoning',
     'range': '0',
@@ -2886,7 +2886,7 @@ pri7['Creeping Doom'] = {
 };
 
 pri7['Earthquake'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Alteration',
     'sphere': 'Elemental (Earth)',
     'range': '120 yards',
@@ -2904,7 +2904,7 @@ pri7['Earthquake'] = {
 };
 
 pri7['Exaction'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Evocation, Alteration',
     'sphere': 'Charm, Summoning',
     'range': '10 yards',
@@ -2922,7 +2922,7 @@ pri7['Exaction'] = {
 };
 
 pri7['Fire Storm'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Evocation (Reversible)',
     'sphere': 'Elemental (Fire)',
     'range': '160 yards',
@@ -2940,7 +2940,7 @@ pri7['Fire Storm'] = {
 };
 
 pri7['Gate'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Conjuration/Summoning',
     'sphere': 'Summoning',
     'range': '30 yards',
@@ -2958,7 +2958,7 @@ pri7['Gate'] = {
 };
 
 pri7['Holy Word'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Conjuration/Summoning (Reversible)',
     'sphere': 'Combat',
     'range': '0',
@@ -2976,7 +2976,7 @@ pri7['Holy Word'] = {
 };
 
 pri7['Regenerate'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Necromancy (Reversible)',
     'sphere': 'Necromantic',
     'range': 'Touch',
@@ -2994,7 +2994,7 @@ pri7['Regenerate'] = {
 };
 
 pri7['Reincarnate'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Necromancy',
     'sphere': 'Necromantic',
     'range': 'Touch',
@@ -3012,7 +3012,7 @@ pri7['Reincarnate'] = {
 };
 
 pri7['Restoration'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Necromancy (Reversible)',
     'sphere': 'Necromantic',
     'range': 'Touch',
@@ -3030,7 +3030,7 @@ pri7['Restoration'] = {
 };
 
 pri7['Resurrection'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Necromancy (Reversible)',
     'sphere': 'Necromantic',
     'range': 'Touch',
@@ -3048,7 +3048,7 @@ pri7['Resurrection'] = {
 };
 
 pri7['Succor'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Alteration, Enchantment (Reversible)',
     'sphere': 'Summoning',
     'range': 'Touch',
@@ -3066,7 +3066,7 @@ pri7['Succor'] = {
 };
 
 pri7['Sunray'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Evocation, Alteration',
     'sphere': 'Sun',
     'range': '[[10*[[@{level-priest}]] ]] yards',
@@ -3084,7 +3084,7 @@ pri7['Sunray'] = {
 };
 
 pri7['Symbol'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Conjuration/Summoning',
     'sphere': 'Guardian',
     'range': 'Touch',
@@ -3102,7 +3102,7 @@ pri7['Symbol'] = {
 };
 
 pri7['Transmute Metal to Wood'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Alteration',
     'sphere': 'Elemental (Earth)',
     'range': '80 yards',
@@ -3120,7 +3120,7 @@ pri7['Transmute Metal to Wood'] = {
 };
 
 pri7['Wind Walk'] = {
-    'level': 'Level 7 Priest',
+    'level': '7',
     'school': 'Alteration',
     'sphere': 'Elemental (Air)',
     'range': 'Touch',
@@ -3154,3 +3154,4 @@ for (const [_, section] of Object.entries(priestSpells)) {
 }
 priestSpells['primonster'] = primonster;
 /* ---- Priest spells end ---- */
+module.exports = priestSpells;
