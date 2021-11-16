@@ -10,9 +10,13 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 
 # Version courante
 
-V3.114.1 [Screenshot](cog_v3.png)
+V3.115.0 [Screenshot](cog_v3.png)
 
 # Notes de version
+
+## V3.115.0 (2021.11.12)
+
+- Ajout du nouveau pseudo-attribut permettant d'afficher le token par défaut sur la fiche
 
 ## V3.114.1 (2021.04.28)
 
