@@ -406,8 +406,12 @@ function repeatingMultipleSum(section, valueField, multiplierField, destination,
         .reduce(function(m, r) {
             return m + r.F[valueField] * r.F[multiplierField];
         }, 0, function(t,r,a) {
-            let dec = parseInt(decimals) || 0;
-            a.D[dec][destination] = t;
+            let dec = parseInt(decimals);
+            if (isNaN(dec)) {
+                a[destination] = t;
+            } else {
+                a.D[dec][destination] = t;
+            }
         })
         .execute();
 }
@@ -492,7 +496,7 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
 }
 // --- End summing numbers from repeating spells for wizard and priest --- //
 
-function setupAutoFillSpellInfo(section, spellsTable) {
+function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
     if (!spellsTable[section])
         return;
     
@@ -503,20 +507,20 @@ function setupAutoFillSpellInfo(section, spellsTable) {
             return;
 
         let spellInfo = {
-            [`repeating_spells-${section}_spell-cast-time`]: spell['cast-time'],
-            [`repeating_spells-${section}_spell-level`]: spell['level'],
-            [`repeating_spells-${section}_spell-school`]: spell['school'],
-            [`repeating_spells-${section}_spell-components`]: spell['components'],
-            [`repeating_spells-${section}_spell-range`]: spell['range'],
-            [`repeating_spells-${section}_spell-aoe`]: spell['aoe'],
-            [`repeating_spells-${section}_spell-duration`]: spell['duration'],
-            [`repeating_spells-${section}_spell-damage`]: spell['damage'],
-            [`repeating_spells-${section}_spell-damage-type`]: spell['damage-type'],
-            [`repeating_spells-${section}_spell-saving-throw`]: spell['saving-throw'],
-            [`repeating_spells-${section}_spell-healing`]: spell['healing'],
-            [`repeating_spells-${section}_spell-materials`]: spell['materials'],
-            [`repeating_spells-${section}_spell-reference`]: spell['reference'],
-            [`repeating_spells-${section}_spell-effect`]: spell['effect']
+            [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
+            [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
+            [`repeating_spells-${section}_spell-school`]       : spell['school'],
+            [`repeating_spells-${section}_spell-components`]   : spell['components'],
+            [`repeating_spells-${section}_spell-range`]        : spell['range'],
+            [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
+            [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
+            [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
+            [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
+            [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
+            [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
+            [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
+            [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
+            [`repeating_spells-${section}_spell-effect`]       : spell['effect']
         };
         if (section.startsWith('pri')) {
             spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
@@ -799,6 +803,13 @@ let priestSpellLevelsSections = [
     {level: 'q', sections: ['49', '50', '51', 'priq']},
 ];
 
+function wizardDisplayLevel(s) {
+    return `Level ${s} Wizard`
+}
+function priestDisplayLevel(s) {
+    return `Level ${s} Priest`
+}
+
 // --- Start setup Spell Slots --- //
 wizardSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
@@ -811,10 +822,10 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel);
     }
 });
-setupAutoFillSpellInfo("wizmonster", wizardSpells);
+setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel);
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
@@ -827,11 +838,11 @@ priestSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, priestSpells);
+        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel);
         setupAddPriestSpell(lastSection);
     }
 });
-setupAutoFillSpellInfo("primonster", priestSpells);
+setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel);
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
@@ -1054,6 +1065,53 @@ on('change:repeating_ammo:ammoname', function(eventInfo){
     setAttrs(weaponInfo);
 });
 
+on('clicked:grenade-miss', function (eventInfo) {
+   startRoll('&{template:2Egrenademiss} {{grenade=?{What grenade have been thrown?|Acid,[[1Acid]]|Holy water,[[1Holy water]]|Oil (lit),[[3Oil (lit)]]|Poison,[[1Poison]]}}} {{direction=[[1d10]]}} {{distance=?{How far was it throw?|Short,[[1d6]]|Medium,[[1d10]]|Long,[[2d10]]}}} {{aoe=?{What grenade have been thrown?}}} {{hit=[[0]]}} {{splash=[[0]]}}', function(results) {
+       console.log(results);
+       let distance = results.results.distance;
+       let expression = distance.expression;
+       let displayDistance = '';
+       switch (expression) {
+           case '1d6': displayDistance = 'Short'; break;
+           case '1d10': displayDistance = 'Medium'; break;
+           case '2d10': displayDistance = 'Long'; break;
+           default: displayDistance = 'Invalid'; break;
+       }
+       let aoeSplash = results.results.aoe.result+6;
+       let displayGrenade = results.results.grenade.expression.substring(1);
+       let computedRolls = {
+           distance: displayDistance,
+           grenade: displayGrenade,
+           aoe: aoeSplash,
+           hit: 0,
+           splash: 0
+       };
+       // See if monster is within direct hit
+       if (distance.result < results.results.aoe.result / 2) {
+           console.log(`hit radius: ${results.results.aoe.result / 2}`);
+           let directDamage;
+           switch (displayGrenade) {
+               case 'Acid': directDamage = '2d4 Acid damage'; break;
+               case 'Holy water': directDamage = '1d6+1 damage'; break;
+               case 'Oil (lit)': directDamage = '2d6/1d6 Fire damage'; break;
+               case 'Poison': directDamage = 'Special'; break;
+           }
+           computedRolls.hit = directDamage;
+       } else if (distance.result < aoeSplash / 2) {
+           console.log(`splash radius: ${aoeSplash / 2}`);
+           let splashDamage;
+           switch (displayGrenade) {
+               case 'Acid': splashDamage = '1 Acid damage'; break;
+               case 'Holy water': splashDamage = '2 damage'; break;
+               case 'Oil (lit)': splashDamage = '1d3 Fire damage'; break;
+               case 'Poison': splashDamage = 'Special'; break;
+           }
+           computedRolls.splash = splashDamage;
+       }
+       finishRoll(results.rollId, computedRolls);
+   });
+});
+
 //Follower weapons
 function setupFollowerWeaponsAutoFill(repeating, sections) {
     let prefix = '';
@@ -1174,32 +1232,8 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
         .execute();
 })
 
-function setupCalculateTotalGemsValue(totalField, valueField, multiplierField, section) {
-    let repeatingSection = `repeating_${section}`;
-    let onChange = `change:${valueField} change:${multiplierField} change:${repeatingSection}:${valueField} change:${repeatingSection}:${multiplierField} remove:${repeatingSection}`
-    on(onChange, function(eventInfo){
-        if (doEarlyReturn(eventInfo, [valueField, multiplierField]))
-            return;
-        
-        TAS.repeating(section)
-            .attrs(totalField, valueField, multiplierField)
-            .fields(valueField, multiplierField)
-            .reduce(function(m,r){
-                m.total+=(r.F[valueField]*r.I[multiplierField]);
-                return m;
-            },{total:0},function(m,r,a){
-                m.total+=(a.F[valueField]*a.I[multiplierField]);
-                a[totalField]=m.total;
-            })
-            .execute();
-    });
-}
-
-// --- Start setup gem total value calculation for all settings --- //
-let gemSections = ['', '2', '3', '4', '5', '6'];
-gemSections.forEach(i => {
-    setupCalculateTotalGemsValue(`gemstotalvalue${i}`, `gemvalue${i}`, `gemqty${i}`, `gem${i}`);
-});
-// --- End setup gem total value calculation for all settings --- //
+on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_gem`, function(eventInfo) {
+    repeatingMultipleSum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
+})
 
 // --- ALL SHEET WORKERS END --- //

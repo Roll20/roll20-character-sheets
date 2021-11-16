@@ -1,7 +1,9 @@
 Change Log
 ==============================================
-**2021-11-09 ** v.46 Chuz (James Culp)
-
+**2021-11-09 ** v.47 Chuz (James Culp)
+	Bugfix - Technomancer Complex Forms with no roll were displaying oddly.  This has been fixed, now the roll button that shows up will show the fade and notes section.
+**2021-11-04 ** v.46 Chuz (James Culp)
+	Fix for spells not displaying hits
 **2021-11-02 ** v.45 Chuz (James Culp)
 	Update to the roll-template preparing for future features
 	Updated rolls so mouseover showing the actual dice rolled are red for 1's (2's for bad luck) and green for 5's and 6's instead of the previous only 1's and 6's being colored.
