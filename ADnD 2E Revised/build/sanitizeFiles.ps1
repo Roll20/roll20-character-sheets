@@ -1,5 +1,5 @@
-﻿$htmlFolder = 'D:\git\roll20-character-sheets\AD&D 2E Revised\html'
-$javascriptFolder = 'D:\git\roll20-character-sheets\AD&D 2E Revised\javascript'
+﻿$htmlFolder = 'D:\git\roll20-character-sheets\ADnD 2E Revised\html'
+$javascriptFolder = 'D:\git\roll20-character-sheets\ADnD 2E Revised\javascript'
 
 "---- Sanitize Javascript files ----"
 Get-ChildItem $javascriptFolder | ForEach-Object {
