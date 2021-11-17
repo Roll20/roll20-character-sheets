@@ -2941,6 +2941,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       break;
 
     case 'warrior':
+      log('Enter Warrior');
       warrior250PG = +value.warrior250PG;
       bonusWarrior = 1 + warrior250PG;
 
@@ -2949,8 +2950,6 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       typeHerald = +value.warriorHeraldA;
       typeScholar = +value.warriorScholarA;
       typeScout = +value.warriorScoutA;
-
-      log(value);
 
       if (typeSoldier !== 0) {
         exec.push(`{{special2=${i18n_typeSoldier}}}`);

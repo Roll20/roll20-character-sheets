@@ -223,7 +223,7 @@ monkCeaRoll.forEach((button) => {
 
     let ODMALBarbarian = [];
     let ODMALShaman = [];
-    let ODMALWarrior = [];
+    const ODMALWarrior = [];
 
     let attaquesSurprises = [];
     let attaquesSurprisesValue = [];
@@ -318,7 +318,7 @@ monkCeaRoll.forEach((button) => {
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+    ODMALWarrior.push(MALBonus.ODMALWarrior);
 
     // GESTION DES EFFETS DES DIFFERENTES ATTAQUES
 
