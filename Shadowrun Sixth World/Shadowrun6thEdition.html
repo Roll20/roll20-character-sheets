@@ -2540,7 +2540,7 @@
               </div>
               <fieldset class="repeating_forms">
                 <input name="attr_dicepool" type="hidden" value="0"/>
-                <span class='hide-roll-button' name='attr_skill'></span><span class='show-name' name='attr_name'></span>
+                <span class='hide-roll-button' name='attr_skill'></span><span class='show-name'><button name="act_complexformnoroll" type="action" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{complexform} @{name}}}{{desc=@{notes}}}{{fade=[[@{fade}]]}}"><span name="attr_name"></span></button></span>
                 <button name="act_complexform" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{complexform} @{name}}}{{dice=[[((@{skill}+@{resonance}+@{dicepool_modifier}+@{spec}+@{expert})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=@{notes}}}{{fade=[[@{fade}]]}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
                 <span class="center" name="attr_duration"></span>
                 <span class="center" name="attr_fade"></span>
@@ -2567,7 +2567,6 @@
                       <option data-i18n="cracking" value="@{cracking}">Cracking</option>
                       <option data-i18n="electronics" value="@{electronics}">Electronics</option>
                       <option data-i18n="tasking" value="@{tasking}">Tasking</option>
-                      <option data-i18n="other" value="@{other}">Other</option>
                     </select>
                     <h3 data-i18n="specialization">Specialization</h3>
                     <label data-i18n-title="specialization" title="Specialization">
@@ -5441,7 +5440,7 @@
 <input type="hidden" name="attr_matrix_overclock" value="0" />
 <input type="hidden" name="attr_rerolls" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.46">
+<input type="hidden" name="attr_sheet_version" value="0.47">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 //Sheet workers
@@ -5565,6 +5564,7 @@ const rollButtons = {
 	spriteresistlevel10: "@{gm_toggle} &{template:rolls-computed}{{header=^{level} 10 ^{sprite}}}{{base=Compiling Resist}}{{dice=[[20d6>5]]}}{{desc=[Resist Fade](~@{character_name}|fade)}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
 
 	complexform: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{complexform} @{name}}}{{dice=[[((@{skill}+@{resonance}+@{dicepool_modifier}+@{spec}+@{expert})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=@{notes}}}{{fade=[[@{fade}]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
+	complexformnoroll: "@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{complexform} @{name}}}{{desc=@{notes}}}{{fade=[[@{fade}]]}}",
 
 	connections1: "/w GM &{template:rolls-computed}{{header=@{character_name}}}{{base=^{connection} 1}}{{dice=[[(?{Specialized Knowledge?|N,0|Y,3}+2)d6>5]]}}{{glitch=[[0]]}}{{dicepool=[[0]]}}",
 	connections2: "/w GM &{template:rolls-computed}{{header=@{character_name}}}{{base=^{connection} 2}}{{dice=[[(?{Specialized Knowledge?|N,0|Y,3}+4)d6>5]]}}{{glitch=[[0]]}}{{dicepool=[[0]]}}",
@@ -5822,7 +5822,7 @@ for(c = 1; c < 50; c++) {
 
 
 // Repeating Complex Form Rolls
-['repeating_forms:complexform'].forEach((button) => {
+['repeating_forms:complexform', 'repeating_forms:complexformnoroll'].forEach((button) => {
 	on(`clicked:${button}`, (eventInfo) => {
 		var buttonType = eventInfo.triggerName.split('_')[eventInfo.triggerName.split('_').length - 1];
 		var rollButton = rollButtons[buttonType];
