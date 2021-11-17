@@ -123,7 +123,6 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
   ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
   ODShaman = ODShaman.concat(armorBonus.ODShaman);
   ODWarrior.push(armorBonus.ODWarrior);
-  log(armorBonus);
 
   const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
@@ -159,8 +158,6 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
   bonus = bonus.concat(ODMALBarbarian);
   bonus = bonus.concat(ODMALShaman);
   bonus = bonus.concat(ODMALWarrior);
-
-  log(bonus);
 
   exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
   exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
