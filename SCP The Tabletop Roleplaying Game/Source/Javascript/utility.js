@@ -184,7 +184,7 @@ const initialSetup = function(attributes,setObj,sections){
     setObj[attr] = cascades[attr].calculation(_.clone(cascades[attr]),attributes,setObj,sections);
     debug(`default for ${attr} applied`);
   });
-  ['negotiation/persuade_mod','fashion/etiquette_mod','leadership_mod','disguise/blend_in_mod','intimidate/taunt_mod','showmanship_mod','resist_distress_mod','hp_max','cognitive_resistance','initiative_mod','intuition_mod','occult/scp_lore_mod'].forEach((skill)=>{
+  ['negotiation/persuade_mod','fashion/etiquette_mod','leadership_mod','disguise/blend_in_mod','intimidate/taunt_mod','showmanship_mod','resist_distress_mod','cognitive_resistance','initiative_mod','intuition_mod','occult/scp_lore_mod'].forEach((skill)=>{
     setObj[`${skill}`] = actionModCalc({name:`${skill}`},attributes,setObj,sections);
     debug({[`${skill}`]:setObj[`${skill}_mod`]});
   });

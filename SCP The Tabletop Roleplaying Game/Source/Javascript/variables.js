@@ -2,7 +2,7 @@
 /*jshint -W014,-W084,-W030,-W033,-*/
 //Sheet Variables
 const sheetName = 'SCP';
-const version = 0;
+const version = 1;
 let debugMode = false;
 const abilityScores = ['strength','health','perception','dexterity','fate','charisma','intelligence','willpower'];
 const dieSizes = [8,10,12];
