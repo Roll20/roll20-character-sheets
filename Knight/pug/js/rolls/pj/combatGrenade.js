@@ -79,8 +79,8 @@ rollCombatGrenade.forEach((button) => {
     let ODMALBarbarian = [];
     let ODShaman = [];
     let ODMALShaman = [];
-    let ODWarrior = [];
-    let ODMALWarrior = [];
+    const ODWarrior = [];
+    const ODMALWarrior = [];
 
     const vDiscretion = +attrs.discretion;
     const oDiscretion = +attrs[`${ODValue.discretion}`];
@@ -260,7 +260,7 @@ rollCombatGrenade.forEach((button) => {
 
     ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
-    ODWarrior = ODWarrior.push(armorBonus.ODWarrior);
+    ODWarrior.push(armorBonus.ODWarrior);
 
     if (armure === 'berserk') {
       isTenebricide = true;
@@ -289,7 +289,7 @@ rollCombatGrenade.forEach((button) => {
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+    ODMALWarrior.push(MALBonus.ODMALWarrior);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;

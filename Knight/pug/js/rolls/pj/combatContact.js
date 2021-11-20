@@ -281,8 +281,8 @@ rollCombatContact.forEach((button) => {
     let ODMALBarbarian = [];
     let ODShaman = [];
     let ODMALShaman = [];
-    let ODWarrior = [];
-    let ODMALWarrior = [];
+    const ODWarrior = [];
+    const ODMALWarrior = [];
 
     const vForce = +attrs.force;
     const oForce = +attrs[`${ODValue.force}`];
@@ -692,7 +692,7 @@ rollCombatContact.forEach((button) => {
 
     ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
-    ODWarrior = ODWarrior.push(armorBonus.ODWarrior);
+    ODWarrior.push(armorBonus.ODWarrior);
 
     const MALBonus = getMALBonus(attrs, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
@@ -713,7 +713,7 @@ rollCombatContact.forEach((button) => {
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+    ODMALWarrior.push(MALBonus.ODMALWarrior);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
