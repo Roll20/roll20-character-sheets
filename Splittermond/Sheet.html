@@ -5110,7 +5110,7 @@
                 <td width="47.5%">
                     <table width="100%">
                        <tr bgcolor="#0489B1" style="color:white; text-align:center; font-weight:bold;">
-                            <td colspan="2">Fertigkeitsw&uuml;rfel (Coming soon!)</td>
+                            <td colspan="2">Fertigkeitsw&uuml;rfel</td>
                         </tr>
                         <tr bgcolor="#81BEF7">
                             <td>Altes Design aktivieren (3 Fertigkeitsw&uuml;rfel)?</td>
@@ -5120,7 +5120,15 @@
                 </td>
                 <td width="5%">&nbsp;</td>
                 <td width="47.5%">
-                   &nbsp;
+                   <table width="100%">
+                       <tr bgcolor="#0489B1" style="color:white; text-align:center; font-weight:bold;">
+                            <td colspan="2">Systemanpassungen</td>
+                        </tr>
+                        <tr bgcolor="#81BEF7">
+                            <td>Wer blutet, stirbt</td>
+                            <td><input type="checkbox" value='1' name="attr_werblutetstirbt" unchecked /></td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </table>
@@ -5224,6 +5232,10 @@
         <input type="checkbox" name="attr_updates" class="d--none" value="42" title="Updates" />
     </label>
     <h1 style="color: white;">Letzte Updates</h1> <br/>
+    <h2 style="color: white;">21.11.2021</h2>
+    <ul>
+        <li>Die Systemanpassung <em>Wer blutet, stirbt</em> kann jetzt in den Einstellungen aktiviert werden.</li>
+    </ul>
     <h2 style="color: white;">21.10.2021</h2>
     <ul>
         <li>Der NSC-Bogen wurde komplett auf den neuen W&uuml;rfelmodus umgestellt.</li>
@@ -5235,14 +5247,6 @@
     <ul>
         <li>Die drei Aktive Abwehr-W&uuml;rfel im Kampf-Reiter funktionieren wieder wie gewohnt.</li>
         <li>Einige kleinere Fehler im Zusammenhang mit fehlerhaften Schadensw&uuml;rfen bei Angriffen wurden behoben.</li>
-    </ul>
-    <h2 style="color: white;">02.10.2021</h2>
-    <ul>
-        <li>Auch bei Angriffen werden jetzt die geworfen W&uuml;rfel angezeigt.</li>
-        <li><i>W&uuml;rfelmodus</i> wurde hinzugef&uuml;gt. Dar&uuml;ber wird jetzt ausgew&auml;hlt, in welchem Modus gew&uuml;rfelt werden soll (bisher nur auf dem SC-Bogen). Die Auswahl befindet sich jetzt im oberen grauen Bereich.</li>
-        <li>Die Einstellung, ob der Wurf gefl&uuml;stert werden soll oder nicht, wurde auch dorthin verlegt.</li>
-        <li>F&uuml;r Fertigkeiten, Waffen und Zauber wurde der Gro&szlig;meister-Modus aktiviert (ausw&auml;hlbar an der Fertigkeit, dem Zauber oder der Waffe)</li>
-        <li>Die Auflistung der Modifikatoren im W&uuml;rfeloutput wurde um zahlreiche Modifikatoren erweitert. Der alte Toolip direkt &uuml;ber dem Probenergebnis (schwarzer Hintergrund) ist <em>nicht mehr</em> verl&auml;sslich.</li>
     </ul>
 </div>
 <p class="text--center">Mit Dank an alle begeisterten Splittermond-Spieler, die diesen Charakterbogen nutzen und mit ihrem Feedback f&uuml;r stetige Verbesserungen sorgen!</p>
@@ -8007,37 +8011,23 @@ on("change:fokus", function(e) {
     });
 });
 
-on("change:lebenspunkte_v change:lebenspunkte change:schmerzresistenz change:sw1 change:sw2 change:verwundet change:schadenimmun change:wundabzugsmod", function(e) {
-   getAttrs(["lebenspunkte", "lebenspunkte_v", "lebenspunkte_k", "lebenspunkte_e", "schmerzresistenz", "sw1", "sw2", "verwundet", "schadenimmun", "wundabzugsmod"], function(v) {
+on("change:lebenspunkte_v change:lebenspunkte change:schmerzresistenz change:sw1 change:sw2 change:verwundet change:schadenimmun change:wundabzugsmod change:werblutetstirbt", function(e) {
+   getAttrs(["lebenspunkte", "lebenspunkte_v", "lebenspunkte_k", "lebenspunkte_e", "schmerzresistenz", "sw1", "sw2", "verwundet", "schadenimmun", "wundabzugsmod", "werblutetstirbt"], function(v) {
         var mod;
         var row = Math.ceil( +v.lebenspunkte_v / +v.lebenspunkte );
         row += +v.verwundet;
         var sr = v.schmerzresistenz;
+        var wbs = v.werblutetstirbt;
         var sw1 = v.sw1;
         var sw2 = v.sw2;
         var war = +v.wundabzugsmod;
-        switch(row) {
-            case 0:
-            case 1:
-                mod = 0;
-                break;
-            case 2:
-                mod = 1 - +sr - +sw1 - +sw2;
-                break;
-            case 3:
-                mod = 2 - +sr - +sw1 - +sw2;
-                break;
-            case 4:
-                mod = 4 - +sr - +sw1 - +sw2;
-                break;
-            case 5:
-                mod = 8 - +sr - +sw1 - +sw2;
-                break;
-            default:
-                mod = 8 - +sr - +sw1 - +sw2;
-                break;
-        }
-        mod -= +war;
+        var mods = {0:0,1:0,2:1,3:2,4:4,5:8};
+        
+        if (wbs == 1 && row == 4) { row = 5; }
+        
+        mod = mods[row];
+        mod = mod - +sr - +sw1 - +sw2 - +war;
+        
         if (mod < 0 || v.schadenimmun > 0) { mod = 0; }
         setAttrs({
             schadensmod: +mod
@@ -10784,7 +10774,7 @@ on("clicked:verschnaufpause", function(f) {
 });
 
 on("clicked:ruhephase", function(f) {
-    getAttrs(["fokuskzue", "fokus_k", "fokus_e", "fokus_k", "fokus_e", "fokus_v", "fokus_t", "lebenspunkte_k", "lebenspunkte_e", "lebenspunkte_v", "lebenspunkte_t", "regbonus", "konstitution", "willenskraft", "lebenspunkte", "fokus", "hiddenfokreg", "hiddenlifereg"], function(v) {        let update = {};
+    getAttrs(["fokuskzue", "fokus_k", "fokus_e", "fokus_k", "fokus_e", "fokus_v", "fokus_t", "lebenspunkte_k", "lebenspunkte_e", "lebenspunkte_v", "lebenspunkte_t", "regbonus", "konstitution", "willenskraft", "lebenspunkte", "fokus", "hiddenfokreg", "hiddenlifereg", "werblutetstirbt"], function(v) {        let update = {};
         let kon = +v.konstitution;
         let wil = +v.willenskraft;
         let lifereg = +v.hiddenlifereg;
@@ -10797,6 +10787,7 @@ on("clicked:ruhephase", function(f) {
         let lebenspunkte_max = 0;
         let fokus_max = +v.fokus;
         let lebenspunkte_gesamt = (+v.lebenspunkte * 5);
+        let wbs = v.werblutetstirbt;
         update["fokus_t"] = +v.fokus_t;
         update["fokus_v"] = +v.fokus_v;
         update["fokus_e"] = +v.fokus_e;
@@ -10806,12 +10797,15 @@ on("clicked:ruhephase", function(f) {
         update["lebenspunkte_e"] = +v.lebenspunkte_e;
         lebenspunkte_max = +lebenspunkte_gesamt - +v.lebenspunkte_k;
         fokus_max = +v.fokus;
-        if (lifereg == 2) {
+        if (wbs == 1) {
+            konbonus = 1;
+        } else if (lifereg == 2) {
             konbonus = 3;
-        } 
+        }
         if (fokreg == 2) {
             wilbonus = 3;
         }
+        console.log("konbonus: " + konbonus + ", lifereg: " + lifereg);
         liferegtotal = +regbonus + (+kon * +konbonus);
         fokregtotal = (+wil * +wilbonus);
         update["lebenspunkte_t"] += +update["lebenspunkte_e"];
