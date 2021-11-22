@@ -12133,15 +12133,24 @@ on("change:chummercheckbox", async function(){
                     try{
                        if(chummerfile.characters.character.gears != null){
                             console.log("Importing Cyberdeck");
-                            for( var j = 0; j < chummerfile.characters.character.gears.gear.length; j++) {
-                                if(chummerfile.characters.character.gears.gear[j].category_english == "Cyberdecks"){
-                                    cyberdeck = chummerfile.characters.character.gears.gear[j];
-                                    attributes.attack_base = cyberdeck.attack;
-                                    attributes.sleaze_base = cyberdeck.sleaze;
-                                    attributes.datap_base = cyberdeck.dataprocessing;
-                                    attributes.firewall_base = cyberdeck.firewall;
-                                    attributes.devicertg_base = cyberdeck.devicerating;
-                                    break;
+                            let decks = chummerfile.characters.character.gears.gear.filter(gear => gear.category_english == "Cyberdecks" || gear.category_english == "Rigger Command Consoles").sort((g1,g2) => g1.devicerating < g2.devicerating);
+                            if(decks.length > 0) {
+                                cyberdeck = decks[0];
+                                attributes.attack_base = cyberdeck.attack;
+                                attributes.sleaze_base = cyberdeck.sleaze;
+                                attributes.datap_base = cyberdeck.dataprocessing;
+                                attributes.firewall_base = cyberdeck.firewall;
+                                attributes.devicertg_base = cyberdeck.devicerating;
+                            }
+                            else {
+                                let commlinks = chummerfile.characters.character.gears.gear.filter(gear => gear.category_english == "Commlinks").sort((g1,g2) => g1.devicerating < g2.devicerating);
+                                if(commlinks.length > 0) {
+                                    link = commlinks[0];
+                                    attributes.attack_base = link.attack;
+                                    attributes.sleaze_base = link.sleaze;
+                                    attributes.datap_base = link.dataprocessing;
+                                    attributes.firewall_base = link.firewall;
+                                    attributes.devicertg_base = link.devicerating;
                                 }
                             }
                         }
