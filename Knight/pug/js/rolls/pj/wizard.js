@@ -63,7 +63,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
   let OD = 0;
 
   let ODMALBarbarian = [];
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
   let ODMALShaman = [];
 
   exec.push(roll);
@@ -127,7 +127,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
