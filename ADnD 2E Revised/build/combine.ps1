@@ -1,10 +1,9 @@
-& 'D:\git\roll20-character-sheets\AD&D 2E Revised\build\sanitizeFiles.ps1'
-node buildPug.js
+& 'D:\git\roll20-character-sheets\ADnD 2E Revised\build\sanitizeFiles.ps1'
 
 "---- Combining files ----"
-$inputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\html\2ESheet-base.html'
-$sourceFolder = 'D:\git\roll20-character-sheets\AD&D 2E Revised'
-$outputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\2ESheet.html'
+$inputFile = 'D:\git\roll20-character-sheets\ADnD 2E Revised\html\2ESheet-base.html'
+$sourceFolder = 'D:\git\roll20-character-sheets\ADnD 2E Revised'
+$outputFile = 'D:\git\roll20-character-sheets\ADnD 2E Revised\2ESheet.html'
 
 $replaceConstant = '#REPLACE{0}#'
 
