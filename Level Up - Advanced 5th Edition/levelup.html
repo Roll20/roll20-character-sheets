@@ -200,6 +200,11 @@
 <input type="hidden" class="sheet-npctoggle" name="attr_pcnpcTab" value="pc"/>
 <input type="hidden" class="sheet-statsinfotoggle" name="attr_statsinfoTab" value="stats"/>
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab"  value="Character"/>
+<input type="hidden" name="attr_perception_init"/>
+<input type="hidden" name="attr_athletics_init"/>
+<input type="hidden" name="attr_deception_init"/>
+<input type="hidden" name="attr_insight_init"/>
+<input type="hidden" name="attr_vehicle_init"/>
 
 <div class="sheet-pcnpc">
 	<label data-i18n-title="pc" title="pc">
@@ -442,11 +447,11 @@
 					</label>
 					<label data-i18n-title="initiative2nd" title="initiative2nd">
 						<select data-i18n-placeholder="Ability_skill" name="attr_initiativetype" placeholder="Ability_skill" spellcheck="false" title="@{initiativetype}"  value="">
-							<option value="Wisdom (Perception)">Wisdom (Perception)</option>
-							<option value="Strength (Athletics)">Strength (Athletics)</option>
-							<option value="Charisma (Deception)">Charisma (Deception)</option>
-							<option value="Wisdom (Insight)">Wisdom (Insight)</option>
-							<option value="Dexterity (Vehicles)">Dexterity (Vehicles)</option>
+							<option value="1">Wisdom (Perception)</option>
+							<option value="2">Strength (Athletics)</option>
+							<option value="3">Charisma (Deception)</option>
+							<option value="4">Wisdom (Insight)</option>
+							<option value="5">Dexterity (Vehicles)</option>
 						</select>
 					</label>
 				</div>
@@ -3006,15 +3011,19 @@ on("change:repeating_equipment remove:repeating_equipment", function(){
 				specdice = "1d8";
 			};
 			var setroll = "&{template:default} !?{Stat|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Athletics ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+?{IncludeSpecialty}]]}}";
+			var setinit = "&{template:default} !{{name=Athletics Initiative}}{{roll=[[1d20+"+str+"+"+exdice+" &{tracker}]]}}" ;
 
 			if (jot == 1) {
 				setroll = "&{template:default} !?{Stat|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Athletics ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+"+jotbonus+"+?{IncludeSpecialty}]]}}";
+				setinit = "&{template:default} !{{name=Athletics Initiative}}{{roll=[[1d20+"+str+"+"+jotbonus+"+"+exdice+" &{tracker}]]}}" ;
 			}; 
 			if (prof == 1) {
 				setroll = "&{template:default} !?{Stat|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Athletics ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+"+profbonus+"+?{IncludeSpecialty}]]}}";
+				setinit = "&{template:default} !{{name=Athletics Initiative}}{{roll=[[1d20+"+str+"+"+profbonus+"+"+exdice+" &{tracker}]]}}" ;
 			}; 
 			setAttrs({
 				"athletics_roll": setroll,
+				"athletics_init": setinit,
 			});
 		});
 	});
@@ -3090,15 +3099,19 @@ on("change:repeating_equipment remove:repeating_equipment", function(){
 				specdice = "1d8";
 			};
 			var setroll = "&{template:default} !?{Stat|Charisma, "+cha+"|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Deception ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+?{IncludeSpecialty}]]}}";
+			var setinit = "&{template:default} !{{name=Deception Initiative}}{{roll=[[1d20+"+cha+"+"+exdice+" &{tracker}]]}}" ;
 
 			if (jot == 1) {
 				setroll = "&{template:default} !?{Stat|Charisma, "+cha+"|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Deception ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+"+jotbonus+"+?{IncludeSpecialty}]]}}";
+				setinit = "&{template:default} !{{name=Deception Initiative}}{{roll=[[1d20+"+cha+"+"+jotbonus+"+"+exdice+" &{tracker}]]}}" ;
 			}; 
 			if (prof == 1) {
 				setroll = "&{template:default} !?{Stat|Charisma, "+cha+"|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Deception ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+"+profbonus+"+?{IncludeSpecialty}]]}}";
+				setinit = "&{template:default} !{{name=Deception Initiative}}{{roll=[[1d20+"+cha+"+"+profbonus+"+"+exdice+" &{tracker}]]}}" ;
 			}; 
 			setAttrs({
 				"deception_roll": setroll,
+				"deception_init": setinit,
 			});
 		});
 	});
@@ -3217,17 +3230,21 @@ on("change:repeating_equipment remove:repeating_equipment", function(){
 				specdice = "1d8";
 			};
 			var setroll = "&{template:default} !?{Stat|Wisdom, "+wis+"|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Insight ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+?{IncludeSpecialty}]]}}";
+			var setinit = "&{template:default} !{{name=Insight Initiative}}{{roll=[[1d20+"+wis+"+"+exdice+" &{tracker}]]}}" ;
 
 			if (jot == 1) {
 				setroll = "&{template:default} !?{Stat|Wisdom, "+wis+"|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Insight ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+"+jotbonus+"+?{IncludeSpecialty}]]}}";
+				setinit = "&{template:default} !{{name=Insight Initiative}}{{roll=[[1d20+"+wis+"+"+jotbonus+"+"+exdice+" &{tracker}]]}}" ;
 				bonus = jotbonus;
 			}; 
 			if (prof == 1) {
 				setroll = "&{template:default} !?{Stat|Wisdom, "+wis+"|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Insight ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+"+profbonus+"+?{IncludeSpecialty}]]}}";
+				setinit = "&{template:default} !{{name=Insight Initiative}}{{roll=[[1d20+"+wis+"+"+profbonus+"+"+exdice+" &{tracker}]]}}" ;
 				bonus = profbonus;
 			}; 
 			setAttrs({
 				"insight_roll": setroll,
+				"insight_init": setinit,
 				"passive_insight": bonus+wis+8,
 			});
 		});
@@ -3431,21 +3448,26 @@ on("change:repeating_equipment remove:repeating_equipment", function(){
 				specdice = "1d8";
 			};
 			var setroll = "&{template:default} !?{Stat|Wisdom, "+wis+"|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Perception ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+?{IncludeSpecialty}]]}}";
+			var setinit = "&{template:default} !{{name=Perception Initiative}}{{roll=[[1d20+"+wis+"+"+exdice+" &{tracker}]]}}";
 
 			if (jot == 1) {
 				setroll = "&{template:default} !?{Stat|Wisdom, "+wis+"|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Perception ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+"+jotbonus+"+?{IncludeSpecialty}]]}}";
+				setinit = "&{template:default} !{{name=Perception Initiative}}{{roll=[[1d20+"+wis+"+"+jotbonus+"+"+exdice+" &{tracker}]]}}";
 				bonus = jotbonus;
 			}; 
 			if (prof == 1) {
 				setroll = "&{template:default} !?{Stat|Wisdom, "+wis+"|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Perception ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+"+profbonus+"+?{IncludeSpecialty}]]}}";
+				setinit = "&{template:default} !{{name=Perception Initiative}}{{roll=[[1d20+"+wis+"+"+profbonus+"+"+exdice+" &{tracker}]]}}";
 				bonus = profbonus;
 			}; 
 			setAttrs({
 				"perception_roll": setroll,
+				"perception_init": setinit,
 				"passive_perception": bonus+wis+8,
 			});
 		});
 	});
+	
 	on("change:performance_check change:performance_specialty change:performance_exdice change:proficiencybonus change:strengthmod change:intelligencemod change:wisdommod change:dexteritymod change:constitutionmod change:charismamod change:jackofalltrades_check sheet:opened", function() {
 	  getAttrs(["performance_check","performance_exdice","performance_specialty","proficiencybonus","strengthmod","intelligencemod","wisdommod","dexteritymod","constitutionmod","charismamod","jackofalltrades_check"], function(values) {
 			var prof = values["performance_check"]||0;
@@ -3952,35 +3974,37 @@ on('change:destiny', event => {
     });
 });
 
-on("change:initiativetype change:perception_roll change:athletics_roll change:deception_roll change:insight_roll sheet:opened", function() {
+on("change:initiativetype change:perception_init change:athletics_init change:deception_init change:insight_init change:vehicle_init sheet:opened", function() {
 	   getAttrs([
-		  "initiativetype","perception_roll","athletics_roll","deception_roll","insight_roll"
+		  "initiativetype","perception_init","athletics_init","deception_init","insight_init"
 		], function(values) {
 			var itype = values["initiativetype"]||"";
-			var perception_roll = values["perception_roll"]||"";
-			var athletics_roll = values["athletics_roll"]||"";
-			var deception_roll = values["deception_roll"]||"";
-			var insight_roll = values["insight_roll"]||"";
+			var perception_init = values["perception_init"]||"";
+			var athletics_init = values["athletics_init"]||"";
+			var deception_init = values["deception_init"]||"";
+			var insight_init = values["insight_init"]||"";
+			var vehicle_init = values["vehicle_init"]||"";
 
 			var setroll = "";
 			
-			if (initiativetype == "Wisdom (Perception)") {
-				setroll = perception_roll;
+			if (itype == "1") {
+				setroll = perception_init;
 			}
-			if (initiativetype == "Strength (Athletics)") {
-				setroll = athletics_roll;
+			if (itype == "2") {
+				setroll = athletics_init;
 			}
-			if (initiativetype == "Charisma (Deception)") {
-				setroll = deception_roll;
+			if (itype == "3") {
+				setroll = deception_init;
 			}
-			if (initiativetype == "Wisdom (Insight)") {
-				setroll = insight_roll;
+			if (itype == "4") {
+				setroll = insight_init;
 			}
-
-			
+			if (itype == "5") {
+				setroll = vehicle_init;
+			}
 
 			setAttrs({
-				"initiative_roll": setroll,
+				"initiativeroll": setroll,
 			});
 	   });
 	});	

@@ -8,7 +8,7 @@ Change Log
 	Fixed attack rolls - putting +3 in the Atk Bonus no longer breaks the rolls
 	Fixed Size so you can type in and also has a drop down with standard DnD sizes
 	Fixed tools so that the Roll button actually works
-	Added initiatuve drop down to change initiative type
+	Added initiative drop down to change initiative type (vehicle not working atm)
 **2021-11-03 ** v.3 Paul V
 	ensured the PC tab is first
 	put Heritage and Culture into strict alphabetic order
