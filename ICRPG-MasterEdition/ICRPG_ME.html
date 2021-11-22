@@ -178,10 +178,13 @@
             </tr>
         </table>
         <hr class="break">
-        <button type="action" name="act_heartplus">+</button>
-        <input class="heartnumber" type="text" name="attr_hitpoints" value=10>
+        <button type="action" name="act_heartminus5">-5</button>
         <button type="action" name="act_heartminus">-</button>
-        <input class="heart" type="checkbox" name="attr_heart11" title="Max Heart 1">
+        <input class="heartnumber" type="input" name="attr_hitpoints" value=10>
+        <button type="action" name="act_heartplus">+</button>
+        <button type="action" name="act_heartplus5">+5</button>
+
+        <input class="heart" type="checkbox" name="attr_heart1" title="Max Heart 1">
         <input class="heart" type="checkbox" name="attr_heart2" title="Max Heart 2">
         <input class="heart" type="checkbox" name="attr_heart3" title="Max Heart 3">
         <input class="heart" type="checkbox" name="attr_heart4" title="Max Heart 4">
@@ -1029,6 +1032,7 @@
 <script type="text/worker">
 
 const buttonlist = ["main","NPC"];
+const heartlist = ["heartplus","heartminus","heartplus5","heartminus5"]
 const lootlist=["equipped1","equipped2","equipped3","equipped4","equipped5","equipped6","equipped7","equipped8","equipped9","equipped10","equipped11","equipped12","equipped13","equipped14","equipped15","equipped16","equipped17","equipped18","equipped19","equipped20"];
 const lootbonus=["lootbonus1","lootbonus2","lootbonus3","lootbonus4","lootbonus5","lootbonus6","lootbonus7","lootbonus8","lootbonus9","lootbonus10","lootbonus11","lootbonus12","lootbonus13","lootbonus14","lootbonus15","lootbonus16","lootbonus17","lootbonus18","lootbonus19","lootbonus20"];
 const statlist=["strength","dexterity","constituion","intelligence","wisdom","charisma","defense","basiceffort","tooleffort","magiceffort","guneffort","ultimateeffort"];
@@ -1044,6 +1048,30 @@ on(`clicked:${button}`, function() {
         sheetTab: button
     });
 });
+});
+
+heartlist.forEach(button=> {
+    on(`clicked:${button}`,function() {
+        getAttrs(["hitpoints"], function(values){
+            var hp=parseInt(values.hitpoints)||0;
+            if(button=="heartplus"){
+                hp=hp+1;
+            } else if (button=="heartminus"){
+                hp=hp-1;
+            } else if (button=="heartplus5"){
+                hp=hp+5;
+            } else if (button=="heartminus5"){
+                hp=hp-5;
+            }
+            console.log(values.hitpoints);
+            if (hp<0) {
+                hp=0;
+            }
+            setAttrs({
+                "hitpoints": hp 
+            });
+        });
+    });
 });
 
 changeitems.forEach(lootitem => {
