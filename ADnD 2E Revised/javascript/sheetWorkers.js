@@ -933,16 +933,13 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
 //Related weapons / familiarity penalty
 on('change:nonprof-penalty', function (eventInfo) {
-    if (eventInfo.sourceType === sheetWorker) {
-        return;
-    }
     getAttrs(['nonprof-penalty'], function(values) {
         let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
         let famil = Math.floor(nonprof / 2)
         setAttrs({
             ['nonprof-penalty']: nonprof,
             ['famil-penalty']: famil
-        });
+        },{silent:true});
     });
 })
 
@@ -1066,7 +1063,7 @@ on('change:repeating_ammo:ammoname', function(eventInfo){
 });
 
 on('clicked:grenade-miss', function (eventInfo) {
-   startRoll('&{template:2Egrenademiss} {{grenade=?{What grenade have been thrown?|Acid,[[1Acid]]|Holy water,[[1Holy water]]|Oil (lit),[[3Oil (lit)]]|Poison,[[1Poison]]}}} {{direction=[[1d10]]}} {{distance=?{How far was it throw?|Short,[[1d6]]|Medium,[[1d10]]|Long,[[2d10]]}}} {{aoe=?{What grenade have been thrown?}}} {{hit=[[0]]}} {{splash=[[0]]}}', function(results) {
+   startRoll('&{template:2Egrenademiss} {{grenade=?{What grenade have been thrown?|Acid,[[1Acid]]|Holy water,[[1Holy water]]|Oil (lit),[[3Oil (lit)]]|Poison,[[1Poison]]}}} {{direction=[[1d10]]}} {{distance=?{How far was it throw?|Short,[[1d6]]|Medium,[[1d10]]|Long,[[2d10]]}}} {{aoe=?{What grenade have been thrown?}}} {{hit=[[0]]}} {{hitdmg=[[0]]}} {{splash=[[0]]}} {{splashdmg=[[0]]}}', function(results) {
        console.log(results);
        let distance = results.results.distance;
        let expression = distance.expression;
@@ -1088,25 +1085,22 @@ on('clicked:grenade-miss', function (eventInfo) {
        };
        // See if monster is within direct hit
        if (distance.result < results.results.aoe.result / 2) {
-           console.log(`hit radius: ${results.results.aoe.result / 2}`);
-           let directDamage;
-           switch (displayGrenade) {
-               case 'Acid': directDamage = '2d4 Acid damage'; break;
-               case 'Holy water': directDamage = '1d6+1 damage'; break;
-               case 'Oil (lit)': directDamage = '2d6/1d6 Fire damage'; break;
-               case 'Poison': directDamage = 'Special'; break;
-           }
-           computedRolls.hit = directDamage;
+           computedRolls.hit = 1;
        } else if (distance.result < aoeSplash / 2) {
-           console.log(`splash radius: ${aoeSplash / 2}`);
            let splashDamage;
-           switch (displayGrenade) {
-               case 'Acid': splashDamage = '1 Acid damage'; break;
-               case 'Holy water': splashDamage = '2 damage'; break;
-               case 'Oil (lit)': splashDamage = '1d3 Fire damage'; break;
-               case 'Poison': splashDamage = 'Special'; break;
-           }
-           computedRolls.splash = splashDamage;
+           computedRolls.splash = 1;
+       }
+       switch (displayGrenade) {
+           case 'Acid': computedRolls.hitdmg = '2d4 Acid damage'; break;
+           case 'Holy water': computedRolls.hitdmg = '1d6+1 damage'; break;
+           case 'Oil (lit)': computedRolls.hitdmg = '2d6/1d6 Fire damage'; break;
+           case 'Poison': computedRolls.hitdmg = 'Special'; break;
+       }
+       switch (displayGrenade) {
+           case 'Acid': computedRolls.splashdmg = '1 Acid damage'; break;
+           case 'Holy water': computedRolls.splashdmg = '2 damage'; break;
+           case 'Oil (lit)': computedRolls.splashdmg = '1d3 Fire damage'; break;
+           case 'Poison': computedRolls.splashdmg = 'Special'; break;
        }
        finishRoll(results.rollId, computedRolls);
    });
