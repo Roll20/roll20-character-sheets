@@ -1302,7 +1302,7 @@ pri3['Remove Paralysis'] = {
     'level': '3',
     'school': 'Abjuration',
     'sphere': 'Protection',
-    'range': '[[10*[[@{level-priest}]] yards',
+    'range': '[[10*[[@{level-priest}]] ]] yards',
     'duration': 'Permanent',
     'aoe': '[[1d4]] creatures in 20-foot cube',
     'components': 'V, S',
