@@ -163,7 +163,7 @@ function migrateOtherValuables() {
         newValue['othervalue'] = total;
         
         valuablesFields.forEach(field => {
-            let oldValue = values[field];
+            let oldValue = values[field] || '';
             if (oldValue) {
                 if (valuablesString) {
                     valuablesString += '\n\n';
