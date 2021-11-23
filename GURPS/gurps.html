@@ -4379,6 +4379,12 @@
 					<li>Ranged Weapons Table - Fixed bug where the Option <i>Use Malfuction</i> wasn't being checked correctly. Reported by Mike.</li>
 					<li>Character Sheet Text Update. Changed GCA to GCA4 to avoid conflicts when GCA5 becomes available.</li>
 					<li>Ranged Weapon Roll Results. Updated formatting for Recoil and Malf. Requested by Mike.</li>
+					<li>Version 2.6.8.2 - Bugfix, single line of code introduced into version 2.6.8 needed to get fixed.</li>
+					<li>
+						Version 2.6.8.3 - Legacy Bugfix, the improved type checking made it so you had to delete skills, spells, and techniques twice. 
+						This helped me find a syncing bug and streamline the code and hopefully resolve a nagging legacy issue 
+						where a random blank row showed up or row gets highlighted with a red border. Reported by Mike.
+					</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13215,6 +13221,12 @@ visualize what it will look like in chat.
 				<li>Ranged Weapons Table - Fixed bug where the Option <i>Use Malfuction</i> wasn't being checked correctly. Reported by Mike.</li>
 				<li>Character Sheet Text Update. Changed GCA to GCA4 to avoid conflicts when GCA5 becomes available.</li>
 				<li>Ranged Weapon Roll Results. Updated formatting for Recoil and Malf. Requested by Mike.</li>
+				<li>Version 2.6.8.2 - Bugfix, single line of code introduced into version 2.6.8 needed to get fixed.</li>
+				<li>
+					Version 2.6.8.3 - Legacy Bugfix, the improved type checking made it so you had to delete skills, spells, and techniques twice. 
+					This helped me find a syncing bug and streamline the code and hopefully resolve a nagging legacy issue 
+					where a random blank row showed up or row gets highlighted with a red border. Reported by Mike.
+				</li>
 			</ul>
 
 			<h4>Version: 2.6.7</h4>
@@ -15762,9 +15774,9 @@ visualize what it will look like in chat.
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.6.8";
+	var version = "2.6.8.3";
 
-	var latestChangesDate = "11/10/2021";
+	var latestChangesDate = "11/19/2021";
 
 	var modCascade = true;
 	
@@ -17555,71 +17567,78 @@ visualize what it will look like in chat.
 		});
 	});
 
-	// Update the total cost of Skills
-	on('change:repeating_skills:points change:repeating_skills:difficulty remove:repeating_skills', function (e) {
-	    
-	    // checkForWildCardSkill(e);
-        getAttrs(['repeating_skills_points', 'repeating_skills_difficulty'], function (skill) {
-            
-            var skill_points = +skill.repeating_skills_points;
-            
-            var adjusted_points = 0;
-            
-            var use_wildcard_points = 0;
-            
-            var use_normal_skill = 0; 
-            
-            if (String(skill.repeating_skills_difficulty) == "-5 + 1") {
-                
-                use_wildcard_points = 1;
-                
-                use_normal_points = 0;
-                
-                // minimum point cost is 3
-                if (skill_points < 3) {
-                    
-                    wildcard_skill_points = 0;
-                
-                } else {
-                
-                    wildcard_skill_points = Math.floor(skill_points/3);
-                    
-                }
-                
-            } else {
-                
-                use_wildcard_points = 0;
-                
-                use_normal_points = 1;
-                
-                wildcard_skill_points = skill.repeating_skills_points;
-                
-            }
-            
-			setAttrs({
-			    repeating_skills_wildcard_skill_points: wildcard_skill_points,
-			    repeating_skills_use_wildcard_points: use_wildcard_points,
-			    repeating_skills_use_normal_points: use_normal_points
-			});
-			
-		    sumRepeating('repeating_skills', 'points', function(v) {
-			    setAttrs({ skills_points: v });
-		    });
+	// if skill removed, update total skill points
+	on('remove:repeating_skills', (event) => {
+
+		console.group("remove:repeating_skills");
+		console.info("event: ", event);
+		console.groupEnd();
 		
+		sumRepeating('repeating_skills', 'points', function(v) {
+			setAttrs({ skills_points: v }, {silent: true});
 		});
 		
 	});
-	
-	// watches for a change in a single row, updates row id and skill level
+
+	// Update the total cost of Skills
+	on('change:repeating_skills:points change:repeating_skills:bonus change:repeating_skills:difficulty', function (e) {
+	    
+		// checkForWildCardSkill(e);
+        getAttrs(['repeating_skills_points', 'repeating_skills_difficulty'], function (skill) {
+            		
+			let skill_points = +skill.repeating_skills_points;
+		
+			let adjusted_points = 0;
+			
+			let use_wildcard_points = 0;
+			
+			let use_normal_skill = 0; 
+			
+			if (String(skill.repeating_skills_difficulty) == "-5 + 1") {
+				
+				use_wildcard_points = 1;
+				
+				use_normal_points = 0;
+				
+				// minimum point cost is 3
+				if (skill_points < 3) {
+					
+					wildcard_skill_points = 0;
+				
+				} else {
+				
+					wildcard_skill_points = Math.floor(skill_points/3);
+					
+				}
+				
+			} else {
+				
+				use_wildcard_points = 0;
+				
+				use_normal_points = 1;
+				
+				wildcard_skill_points = skill.repeating_skills_points;
+				
+			}
+			
+			setAttrs({
+				repeating_skills_wildcard_skill_points: wildcard_skill_points,
+				repeating_skills_use_wildcard_points: use_wildcard_points,
+				repeating_skills_use_normal_points: use_normal_points
+			} 
+			, {silent: true}
+			, sumRepeating('repeating_skills', 'points', function(v) {
+			    setAttrs({ skills_points: v });
+		    	})
+			);			
+			
+		});
+		
+	});
+
+	// if toggle is clicked, update the display id.
 	// event = {sourceAttribute, sourceType, triggerName, sourceAttribute, previousValue, newValue}
-	on("change:repeating_spells change:repeating_skills change:repeating_techniquesrevised change:repeating_melee", event => {
-
-		let source = event.sourceType;
-
-		if (event.sourceAttribute === event.triggerName) {
-			//exit. row is being deleted
-			return;
-		}
+	on("change:repeating_spells:spell_toggle_notes change:repeating_skills:skill_toggle_notes change:repeating_techniquesrevised:technique_revised_toggle_notes change:repeating_melee:melee_toggle_notes", event => {
 		
 		let row = event.triggerName;
 
@@ -17627,11 +17646,11 @@ visualize what it will look like in chat.
 
 		switch (section) {
 			case "repeating_spells":
-				updateRowIdDisplay(section, rowId, updateSpellLevelForRow(section, rowId));
+				updateRowIdDisplay(section, rowId);
 				break;
 		
 			case "repeating_skills":
-				updateRowIdDisplay(section, rowId, updateSkillLevelForRow(section, rowId));
+				updateRowIdDisplay(section, rowId);
 				break;
 
 			case "repeating_techniquesrevised":
@@ -21494,6 +21513,10 @@ visualize what it will look like in chat.
     
     // check if skill level mirror changed, if so update repeating sections that match the item that changed
     on("change:repeating_skills:level_mirror", function(event) {
+
+		console.group("change:repeating_skills:level_mirror");
+		console.info("event: ", event);
+		console.groupEnd();
           
         var rowId = getRowIdFromEventInfo(event, "repeating_skills");
         
@@ -21797,14 +21820,15 @@ visualize what it will look like in chat.
 	 */
 	function getSectionRowIdFromChangeEvent(event) {
 
-		// example: repeating_spells_-mi2gev09xkxzckxltdw
+		// example: repeating_skills_-mormdnyobkj-4uwf7lf_skill_toggle_notes
 		let triggerName = event.triggerName;
 
 		// split into an array
-		// example: ["repeating", "spells", "-mi2gev09xkxzckxltdw"]
+		// example: ["repeating", "spells", "-mi2gev09xkxzckxltdw", "skill", "toggle", "notes"]
+		//        : [0, 1, *2*, 3, 4, 5]
 		let arrName = triggerName.split("_");
 
-		let rowId = String(arrName.pop()).toLowerCase;
+		let rowId = String(arrName[2]);
 
 		let sectionName = `${arrName[0]}_${arrName[1]}`;
 
@@ -22523,82 +22547,6 @@ visualize what it will look like in chat.
 	    
 	}
 
-	/**
-	 * Updates the skill level and the display of the row id
-	 * 
-	 * @param string section Repeating section name
-	 * @param string rowId   Row id
-	 *
-	 * @return void
-	 */
-	function updateSkillLevelForRow(sectionName, rowId) {
-
-		let baseFieldName = `${sectionName}_${rowId}_base`;
-	        
-		let difficultyFieldName = `${sectionName}_${rowId}_difficulty`;
-		
-		let bonusFieldName = `${sectionName}_${rowId}_bonus`;
-		
-		let wildcardSkillPointsFieldName = `${sectionName}_${rowId}_wildcard_skill_points`;
-		
-		let useWildcardPointsFieldName = `${sectionName}_${rowId}_use_wildcard_points`;
-		
-		let pointsFieldName = `${sectionName}_${rowId}_points`;
-		
-		let useNormalPointsFieldName = `${sectionName}_${rowId}_use_normal_points`;
-		
-		fields = [
-			baseFieldName,
-			difficultyFieldName,
-			bonusFieldName,
-			wildcardSkillPointsFieldName,
-			useWildcardPointsFieldName,
-			pointsFieldName,
-			useNormalPointsFieldName,
-			"strength",
-			"dexterity",
-			"intelligence",
-			"health",
-			"perception",
-			"willpower"
-		];
-		
-		getAttrs(fields, function(values) {
-			
-			let base = getBaseSkillLevel(values[baseFieldName], values);
-			
-			let difficulty = values[difficultyFieldName];
-			
-			let bonus = +values[bonusFieldName];
-			
-			let wildcardSkillPoints = +values[wildcardSkillPointsFieldName];
-			
-			let useWildcardSkillPoints = +values[useWildcardPointsFieldName];
-			
-			let points = +values[pointsFieldName];
-			
-			let useNormalPoints = +values[useNormalPointsFieldName];
-			
-			// check for wildcard
-			if ( String(difficulty) === "-5 + 1") {
-				difficulty = -4;
-			} else {
-				difficulty = +difficulty; 
-			}
-			
-			let skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, wildcardSkillPoints, useWildcardSkillPoints, points, useNormalPoints);
-			
-			let fieldToUpdate = `${sectionName}_${rowId}_level_mirror`;
-
-			let updateFields = {};
-			
-			updateFields[fieldToUpdate] = skillLevel;
-
-			setAttrs(updateFields, {silent: false});
-			
-		});
-	}
-	
 	function getBaseSkillLevel(baseFieldName, values) {
 	    
 	    var baseLevel = 10;
@@ -22715,66 +22663,6 @@ visualize what it will look like in chat.
 	        
 	    });
 	    
-	}
-
-	/**
-	 * Update the spell level and display row id
-	 * 
-	 * @param string sectionName Repeating section name
-	 * @param string rowId       Row Id that was updated
-	 * 
-	 * @return void
-	 */
-	function updateSpellLevelForRow(sectionName, rowId) {
-
-		let difficultyFieldName = `${sectionName}_${rowId}_difficulty`;
-	        
-		let bonusFieldName = `${sectionName}_${rowId}_spell_modifier`;
-		
-		let pointsFieldName = `${sectionName}_${rowId}_points`;
-		
-		fields = [
-			difficultyFieldName,
-			bonusFieldName,
-			pointsFieldName,
-			"strength",
-			"dexterity",
-			"intelligence",
-			"health",
-			"perception",
-			"willpower",
-			"spell_base",
-			"spell_bonus",
-		];
-		
-		getAttrs(fields, function(values) {
-			
-			let spellBonus = parseInt(values.spell_bonus);
-	        
-	        if ( isNaN(spellBonus) ) {
-	            spellBonus = 0;
-	        }
-
-			let base = getBaseSkillLevel(values.spell_base, values);
-			
-			let difficulty = +values[difficultyFieldName];
-			
-			let bonus = +values[bonusFieldName] + spellBonus;
-			
-			let points = +values[pointsFieldName];
-			
-			let skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, 0, false, points, true);
-			
-			let fieldToUpdate = `${sectionName}_${rowId}_level_mirror`;
-
-			let updateFields = {};
-			
-			updateFields[fieldToUpdate] = skillLevel;
-				
-			setAttrs(updateFields, {silent: false});
-			
-		});
-
 	}
 	
 	/**
@@ -23221,7 +23109,7 @@ visualize what it will look like in chat.
 	// check for changes that effect final technique level
 	on("change:repeating_techniquesrevised:base_level change:repeating_techniquesrevised:default change:repeating_techniquesrevised:max_modifier change:repeating_techniquesrevised:difficulty change:repeating_techniquesrevised:skill_modifier change:repeating_techniquesrevised:points", function(event) {
 
-		var technigueFields = [
+		const technigueFields = [
 			"repeating_techniquesrevised_base_level",
 			"repeating_techniquesrevised_default",
 			"repeating_techniquesrevised_max_modifier",
@@ -23232,21 +23120,21 @@ visualize what it will look like in chat.
 
 		getAttrs(technigueFields, function(values) {
 
-			var finalLevel = 10;
+			let finalLevel = 10;
 
-			var baseLevel = +values.repeating_techniquesrevised_base_level;
+			const baseLevel = +values.repeating_techniquesrevised_base_level;
 
-			var defaultMod = +values.repeating_techniquesrevised_default;
+			const defaultMod = +values.repeating_techniquesrevised_default;
 
-			var customSkillModifier = +values.repeating_techniquesrevised_skill_modifier;
+			const customSkillModifier = +values.repeating_techniquesrevised_skill_modifier;
 			
-			var maxModifier = 0;
+			let maxModifier = 0;
 
-			var maxLevel = 0;
+			let maxLevel = 0;
 
-			var techPoints = +values.repeating_techniquesrevised_points;
+			let techPoints = +values.repeating_techniquesrevised_points;
 
-			var technigueSkillMod = getModifierForTechniqueDifficulty(values.repeating_techniquesrevised_difficulty, techPoints);
+			const technigueSkillMod = getModifierForTechniqueDifficulty(values.repeating_techniquesrevised_difficulty, techPoints);
 
 			if (values.repeating_techniquesrevised_max_modifier) {
 
@@ -31020,8 +30908,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 			let rollValue = values.roll ?? "";
 
 			let rollOption;
-
-			console.log("rollValue", rollValue);
 
 			rollValue = rollValue.trim();
 

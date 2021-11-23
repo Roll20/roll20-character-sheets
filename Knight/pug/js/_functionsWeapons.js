@@ -2875,8 +2875,6 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
     case 'rogue':
       ghost = +value.rogueGhost;
 
-      log(ghost);
-
       if (ghost !== 0) {
         exec.push(`{{special2=${i18n_ghostActive}}}`);
 
@@ -2949,8 +2947,6 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       typeHerald = +value.warriorHeraldA;
       typeScholar = +value.warriorScholarA;
       typeScout = +value.warriorScoutA;
-
-      log(value);
 
       if (typeSoldier !== 0) {
         exec.push(`{{special2=${i18n_typeSoldier}}}`);
@@ -3031,8 +3027,6 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
           if (C4Nom === 'discretion' || C4Nom === 'dexterite' || C4Nom === 'perception') { ODWarrior += bonusWarrior; }
         }
       }
-
-      log(ODWarrior);
 
       if (ODWarrior.length !== 0) { exec.push(`{{vODWarrior=${ODWarrior}}}`); }
       break;
@@ -3414,8 +3408,6 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
 
     case 'precis':
       exec.push(`{{style=${i18n_style} ${i18n_precis}}}`);
-
-      log(cPrecis);
 
       if (isEDeuxMains && !isAAllegee) {
         if (cPrecis.nom !== '0') {
