@@ -1062,64 +1062,63 @@ on('change:repeating_ammo:ammoname', function(eventInfo){
     setAttrs(weaponInfo);
 });
 
-let validGrenade = /1Acid|1Holy water|3Oil (lit)|1Poison|(\d*)#(.*)#(.*)#(.*)/
+const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
+    let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
+    finishRoll(queryRoll.rollId);
+    return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
+};
 
-on('clicked:grenade-miss', function (eventInfo) {
-   startRoll('&{template:2Egrenademiss} {{grenade=[[?{What grenade have been thrown?|Acid,1Acid|Holy water,1Holy water|Oil (lit),3Oil (lit)|Poison,1Poison|Other,?{Area of effect&#124;1&#125;#?{Grenade name&#125;#?{Direct damage&#124;1d6&#125;#?{Splash damage&#124;1d3&#125;}]]}} {{direction=[[1d10]]}} {{distance=?{How far was it throw?|Short,[[1d6]]|Medium,[[1d10]]|Long,[[2d10]]}}} {{aoe=[[?{What grenade have been thrown?}]]}} {{hit=[[0]]}} {{hitdmg=[[0]]}} {{splash=[[0]]}} {{splashdmg=[[0]]}}', function(results) {
-       console.log(results);
-       let computedRolls = {
-           hit: 0,
-           splash: 0
-       };
-       let grenadeExpression = results.results.grenade.expression;
-       let match = grenadeExpression.match(validGrenade);
-       console.log(match);
-       if (!match) {
-           finishRoll(results.rollId, computedRolls);
-           return;
-       }
+on('clicked:grenade-miss', async function (eventInfo) {
+    getAttrs(['character_name'], async function(values) {
+        let characterName = values['character_name'];
+        let finalRollText = '&{template:2Egrenademiss} ';
+        let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
+        switch (grenade) {
+            case 'Acid':       finalRollText += `{{name=Acid}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|acid-hit)}} {{splashdmg=[Damage](~${characterName}|acid-splash)}}`; break;
+            case 'Holy water': finalRollText += `{{name=Holy water}} water]]}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
+            case 'Oil (lit)':  finalRollText += `{{name=Oil (lit)}} {{aoe=[[3]]}} {{aoesplash=[[3+6]]}} {{hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)}} {{splashdmg=[Damage](~${characterName}|oil-lit-splash)}}`; break;
+            case 'Poison':     finalRollText += `{{name=Poison}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=Special}} {{splashdmg=Special}}`; break;
+            case 'Other': {
+                let name = await extractQueryResult('?{Grenade name}');
+                let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
+                let damage = await extractQueryResult('?{Direct damage|1d6}');
+                let splash = await extractQueryResult('?{Splash damage|1d3}');
 
-       switch (grenadeExpression) {
-           case '1Acid': computedRolls.grenade = 'Acid'; break;
-           case '1Holy water': computedRolls.grenade = 'Holy water'; break;
-           case '3Oil (lit)': computedRolls.grenade = 'Oil (lit)'; break;
-           case '1Poison': computedRolls.grenade = 'Poison'; break;
-           default: computedRolls.grenade = match[3]; break;
-       }
-       
-       let distance = results.results.distance;
-       switch (distance.expression) {
-           case '1d6': computedRolls.distance = 'Short'; break;
-           case '1d10': computedRolls.distance = 'Medium'; break;
-           case '2d10': computedRolls.distance = 'Long'; break;
-           default: computedRolls.distance = 'Invalid'; break;
-       }
+                var customGrenade = {}
+                customGrenade['custom-grenade-name'] = name;
+                customGrenade['custom-grenade-hit'] = damage;
+                customGrenade['custom-grenade-splash'] = splash;
+                setAttrs(customGrenade);
 
-       let hitDiameter = results.results.aoe.result;
-       let aoeSplash = computedRolls.aoe = hitDiameter+6;
-       // See if monster is within direct hit
-       if (distance.result <= hitDiameter / 2) {
-           computedRolls.hit = 1;
-       } else if (distance.result <= aoeSplash / 2) {
-           let splashDamage;
-           computedRolls.splash = 1;
-       }
-       switch (grenadeExpression) {
-           case 'Acid': computedRolls.hitdmg = '2d4 Acid damage'; break;
-           case 'Holy water': computedRolls.hitdmg = '1d6+1 damage'; break;
-           case 'Oil (lit)': computedRolls.hitdmg = '2d6/1d6 Fire damage'; break;
-           case 'Poison': computedRolls.hitdmg = 'Special'; break;
-           default: computedRolls.hitdmg = match[4]; break;
-       }
-       switch (grenadeExpression) {
-           case 'Acid': computedRolls.splashdmg = '1 Acid damage'; break;
-           case 'Holy water': computedRolls.splashdmg = '2 damage'; break;
-           case 'Oil (lit)': computedRolls.splashdmg = '1d3 Fire damage'; break;
-           case 'Poison': computedRolls.splashdmg = 'Special'; break;
-           default: computedRolls.splashdmg = match[5]; break;
-       }
-       finishRoll(results.rollId, computedRolls);
-   });
+                finalRollText += `{{name=${name}}} {{aoe=[[${aoe}]]}} {{aoesplash=[[${aoe}+6]]}} {{hitdmg=[Damage](~${characterName}|custom-grenade-hit)}} {{splashdmg=[Damage](~${characterName}|custom-grenade-splash)}}`;
+            }
+        }
+        let distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
+        finalRollText += `{{direction=[[1d10]]}} {{distancename=${distanceName}}} `;
+        switch (distanceName) {
+            case 'Short': finalRollText += '{{distance=[[1d6]]}} '; break;
+            case 'Medium': finalRollText += '{{distance=[[1d10]]}} '; break;
+            case 'Long': finalRollText += '{{distance=[[2d10]]}} '; break;
+        }
+        finalRollText += '{{hit=[[0]]}} {{splash=[[0]]}} ';
+        console.log(finalRollText);
+        startRoll(finalRollText, function (roll) {
+            console.log(roll);
+            let computedRolls = {
+                hit: 0,
+                splash: 0
+            };
+
+            // See if monster is within direct hit
+            if (roll.results.distance.result <= roll.results.aoe.result / 2) {
+                computedRolls.hit = 1;
+            } else if (roll.results.distance.result <= roll.results.aoesplash.result / 2) {
+                computedRolls.splash = 1;
+            }
+            console.log(computedRolls);
+            finishRoll(roll.rollId, computedRolls);
+        });
+    });
 });
 
 //Follower weapons
