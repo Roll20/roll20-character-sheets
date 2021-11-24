@@ -519,7 +519,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
             [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
             [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
             [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-            [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
+            [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
             [`repeating_spells-${section}_spell-effect`]       : spell['effect']
         };
         if (section.startsWith('pri')) {
