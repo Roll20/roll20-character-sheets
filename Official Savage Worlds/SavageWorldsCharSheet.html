@@ -1,7 +1,7 @@
 
 <script type="text/worker">
   const sheetVersionPrefix = "Official Savage Worlds v";
-const sheetVersion = "1.00.19";
+const sheetVersion = "1.00.20";
 
 // Define colors for Logs
 const r20color = "#E948C9";
@@ -460,6 +460,9 @@ const upgradeSheet = function(
             stepwiseFaux("spells","spellskill");
             setattrvals["newcontent"] = "unread";
         }
+        if (versionthree < 0.20) {
+            setattrvals["newcontent"] = "unread";
+        }
         else {
             log(
                 "Upgrade",
@@ -615,14 +618,16 @@ moneylabels.forEach((moneyLabel) => {
 
 /* ---- Button Bar Clicks ---- */
 const buttonlist = [
-    "characterprofile1",
-    "vehicletab3",
-    "journaltab4",
-    "configurationtab2",
-    "releasetab5",
-    "documentationtab6",
-    "combatoptionstab7",
-    "statblockview8",
+    "characterprofile_1",
+    "vehicletab_3",
+    "journaltab_4",
+    "configurationtab_2",
+    "releasetab_5",
+    "documentationtab_6",
+    "combatoptionstab_7",
+    "statblockview_8",
+    "powerarmortab_9",
+    "robotarmortab_10"
 ];
 buttonlist.forEach((button) => {
     on(`clicked:${button}`, function() {
@@ -633,11 +638,12 @@ buttonlist.forEach((button) => {
             buttonClick
         );
         let radioval = `${button}`;
-        radioval = radioval.slice(-1);
-        setattr["sheetTab"] = radioval;
-        if (radioval === "5") {
+        //radioval = radioval.slice(-1);
+        radioval = radioval.split('_');
+        setattr["sheetTab"] = radioval[1];
+        if (radioval[1] === "5") {
             setattr["newcontent"] = "read";
-        } else if (radioval === "6") {
+        } else if (radioval[1] === "6") {
             setattr["newdocumentation"] = "read";
         }
         setAttrs(setattr);
@@ -6120,7 +6126,7 @@ on(
 </script>
 <!-- Necessary Mixins-->
 <!-- Hidden inputs for character sheet versioning, etc-->
-<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.19"/>
+<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.20"/>
 <input type="hidden" name="attr_firstInit" value="0"/>
 <input type="hidden" name="attr_namelength" value="0"/>
 <input type="hidden" name="attr_wdNum" value="1"/>
@@ -6182,17 +6188,40 @@ on(
       <!--"sheet of paper" the character sheet is on.-->
       <div class="buttonbar">
         <div class="navbuttons">
+          <!--
+          button tab key: 
+          1 = character profile
+          2 = Configuration Pane
+          3 = Vehicles
+          4 = Character notes
+          5 = Release Notes
+          6 = Sheet Documentation
+          7 = Combat Options
+          8 = Statblock/Condensed View of Character profile
+          9 = Power Armor
+          10 = Robot Armor
+          -->
           <input class="selectedTab" type="hidden" name="attr_sheetTab" value="1"/>
           <input class="showMiniDisplay" type="checkbox" name="attr_miniDisplay" value="1"/>
           <!-- value 1 = Edit Mode-->
           <button class="topbuttons noEditMode" type="action" name="act_noEditMode" data-i18n-title="go-to-statblock-view">)</button>
           <!-- Set value to 0 = Non-Edit Mode-->
           <button class="topbuttons editMode" type="action" name="act_editMode" data-i18n-title="go-to-full-edit-view">(</button>
-          <button class="topbuttons characterprofile" type="action" name="act_characterprofile1"><span class="jumpto" data-i18n-title="jump-to-character-profile-tab">U</span><span class="ontab" data-i18n-title="on-character-profile-tab">U</span></button>
+          <!-- Tab 1 = Character Profile-->
+          <button class="topbuttons characterprofile" type="action" name="act_characterprofile_1"><span class="jumpto" data-i18n-title="jump-to-character-profile-tab">U</span><span class="ontab" data-i18n-title="on-character-profile-tab">U</span></button>
           <input class="showVehicles hiddenInput" type="checkbox" name="attr_vehicle"/>
-          <button class="topbuttons vehiclesT vehicletab" type="action" name="act_vehicletab3"><span class="jumpto" data-i18n-title="jump-to-vehicle-tab">T</span><span class="ontab" data-i18n-title="on-vehicle-tab">T</span></button>
-          <button class="topbuttons journaltab" type="action" name="act_journaltab4"><span class="jumpto" data-i18n-title="jump-to-journal-tab">n</span><span class="ontab" data-i18n-title="on-journal-tab">n</span></button>
-          <button class="topbuttons configurationtab" type="action" name="act_configurationtab2"><span class="jumpto" data-i18n-title="jump-to-configuration-tab">x</span><span class="ontab" data-i18n-title="on-configuration-tab">x</span></button>
+          <!-- Tab 3 = Vehicles-->
+          <button class="topbuttons vehiclesT vehicletab" type="action" name="act_vehicletab_3"><span class="jumpto" data-i18n-title="jump-to-vehicle-tab">T</span><span class="ontab" data-i18n-title="on-vehicle-tab">T</span></button>
+          <input class="usePowerAmor hiddenInput" type="checkbox" name="attr_power_Armor" value="1"/>
+          <!-- Tab 9 = Power Armor-->
+          <button class="topbuttons showPowerArmor powerArmorTab" type="action" name="act_powerarmortab_9"></button>
+          <input class="useRobotAmor hiddenInput" type="checkbox" name="attr_robot_Armor" value="1"/>
+          <!-- Tab 10 = Robot Armor-->
+          <button class="topbuttons showRobotArmor robotArmorTab" type="action" name="act_robotarmortab_10"></button>
+          <!-- Tab 4 = Journal Tab-->
+          <button class="topbuttons journaltab" type="action" name="act_journaltab_4"><span class="jumpto" data-i18n-title="jump-to-journal-tab">n</span><span class="ontab" data-i18n-title="on-journal-tab">n</span></button>
+          <!-- Tab 2 = Configuration Tab-->
+          <button class="topbuttons configurationtab" type="action" name="act_configurationtab_2"><span class="jumpto" data-i18n-title="jump-to-configuration-tab">x</span><span class="ontab" data-i18n-title="on-configuration-tab">x</span></button>
         </div>
         <div class="functions">
           <!-- value of 0 = Wild Card-->
@@ -6205,13 +6234,16 @@ on(
         <div class="docbuttons">
           <input class="selectedTab" type="hidden" name="attr_sheetTab" value="1"/>
           <input class="showMiniDisplay" type="checkbox" name="attr_miniDisplay" value="1"/>
-          <button class="topbuttons combatOptionstab" type="action" name="act_combatoptionstab7"><span class="jumpto" data-i18n-title="jump-to-combat-options-tab">&#128481;</span><span class="ontab" data-i18n-title="on-combat-options-tab">⚔️</span></button>
+          <!-- Tab 7 = Combat Options-->
+          <button class="topbuttons combatOptionstab" type="action" name="act_combatoptionstab_7"><span class="jumpto" data-i18n-title="jump-to-combat-options-tab">&#128481;</span><span class="ontab" data-i18n-title="on-combat-options-tab">⚔️</span></button>
           <input class="selectedTab" type="hidden" name="attr_sheetTab" value="1"/>
           <input class="showMiniDisplay" type="checkbox" name="attr_miniDisplay" value="1"/>
           <input class="newcontent" type="hidden" name="attr_newcontent" value="unread"/>
-          <button class="topbuttons releasenotesbutton" type="action" name="act_releasetab5"><span class="unreadReleaseNotes" data-i18n-title="unread-releasenotes">N</span><span class="readReleaseNotes" data-i18n-title="read-releasenotes">I</span></button>
+          <!-- Tab 5 = Release Notes-->
+          <button class="topbuttons releasenotesbutton" type="action" name="act_releasetab_5"><span class="unreadReleaseNotes" data-i18n-title="unread-releasenotes">N</span><span class="readReleaseNotes" data-i18n-title="read-releasenotes">I</span></button>
           <input class="newdocumentation" type="hidden" name="attr_newdocumentation" value="unread"/>
-          <button class="topbuttons documentationbutton" type="action" name="act_documentationtab6">i</button>
+          <!-- Tab 6 = Documentation-->
+          <button class="topbuttons documentationbutton" type="action" name="act_documentationtab_6">i</button>
         </div>
       </div>
       <input class="selectedTab" type="hidden" name="attr_sheetTab" value="1"/>
@@ -8169,10 +8201,10 @@ on(
                       <input class="wildDieDesc" type="text" name="attr_unskilledwilddieinfo" placeholder="Standard Wild Die die type" data-i18n-placeholder="no-modifying-edges"/>
                     </div>
                   </details>
-                  <input type="hidden" name="attr_unskilled_rank" value="1d4!-2+@{JackOfAllTrades}[Jack of All Trades Mod]"/>
+                  <input type="hidden" name="attr_unskilled_rank" value="1d4! -2"/>
                   <input type="hidden" name="attr_unskilled_display" value="1d4-2"/>
                   <input type="hidden" name="attr_unskilledSkillRollFormula" value="@{unskilled_rank} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} + [[@{UnskilledEncumbrance}*@{encumbrance}]][Encumbrance Penalty]"/>
-                  <input type="hidden" name="attr_unskilledWildDieFormula" value="1d@{unskilledwilddie}! -2[Unskilled Penalty] + {0,@{JackOfAllTrades}}kh1[Jack of All Trades Modifier] + @{ModSum}[Modifiers] + @{traitmods} + [[@{UnskilledEncumbrance}*@{encumbrance}]][Encumbrance Penalty]"/>
+                  <input type="hidden" name="attr_unskilledWildDieFormula" value="1d@{unskilledwilddie}! -2[Unskilled Penalty] + @{ModSum}[Modifiers] + @{traitmods} + [[@{UnskilledEncumbrance}*@{encumbrance}]][Encumbrance Penalty]"/>
                   <input type="hidden" name="attr_rolltUnskilled" value="{{name=@{character_name} }} {{trait=^{unskilled}}} {{skill_rank=@{unskilled_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions}"/>
                   <input type="hidden" name="attr_unskilledencumbrancebutton" value="@{setmods}"/>
                   <input type="hidden" name="attr_unskilledrollformula" value="@{unskilled_rank} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} + [[@{UnskilledEncumbrance}*@{encumbrance}]] [Encumbrance Penalty]"/>
@@ -13790,6 +13822,208 @@ on(
           </div>
         </div>
       </div>
+      <div class="powerArmor">
+        <!--input(class="usePowerArmor hiddenInput" type="checkbox" name="attr_power_Armor")-->
+        <!-- div(class="ship-RobotArmor") -->
+        <h1 class="groupHeader"> 
+          <input class="headerInput" type="text" name="attr_pa_vehicletype" data-i18n-placeholder="power-armor-type"/>
+        </h1>
+        <div class="ship"> 
+          <div class="shipMainSection"> 
+            <div class="shipMainColumn1"> 
+              <div class="shipMainItem"> 
+                <label class="shipMainLabel" data-i18n="wounds">Wounds:</label>
+                <input class="shipWound" type="number" name="attr_pa_vehiclewounds" value="0"/>&nbsp;<span data-i18n="of">of </span>
+                <input class="shipWound" type="number" name="attr_pa_vehiclewounds_max" value="3"/>
+                <div class="vehicle-incbox" title="Incapcitated" data-i18n-title="incapacitated"> 
+                  <label class="vehicle-incbox"> 
+                    <input class="vehicle-inc" type="checkbox" name="attr_pa_vehicleisinc"/>
+                    <div>&nbsp;</div>
+                  </label>
+                </div>
+              </div>
+              <div class="shipMainSubColumn"> 
+                <div class="vehicleStatContainer"> 
+                  <div class="vehicleSizeBox"> 
+                    <input class="shipMainStatsInput" type="number" name="attr_pa_vehiclesize"/>
+                  </div>
+                  <label class="shipMainStatLabel" data-i18n="size">Size:</label>
+                </div>
+                <div class="vehicleStatContainer"> 
+                  <div class="vehicleHandlingBox"> 
+                    <input class="shipMainStatsInput" type="number" name="attr_pa_vehiclehandling"/>
+                  </div>
+                  <label class="shipMainStatLabel" data-i18n="handling">Handling:</label>
+                </div>
+                <div class="vehicleStatContainer"> 
+                  <div class="vehicleTopSpeedBox"> 
+                    <input class="shipMainStatsInput" type="number" name="attr_pa_vehicletopspeed"/>
+                  </div>
+                  <label class="shipMainStatLabel" data-i18n="top-speed">Top Speed (MPH):</label>
+                </div>
+                <div class="vehicleStatContainer"> 
+                  <div class="vehicleToughnessBox"> 
+                    <input class="shipMainStatsInput" type="text" name="attr_pa_vehicletoughness"/>
+                  </div>
+                  <label class="shipMainStatLabel" data-i18n="toughness">Toughness:</label>
+                </div>
+                <div class="vehicleStatContainer"> 
+                  <div class="vehicleCrewBox"> 
+                    <input class="shipMainStatsInput" type="number" name="attr_pa_vehiclepace"/>
+                  </div>
+                  <label class="shipMainStatLabel" data-i18n="pace">Pace:</label>
+                </div>
+              </div>
+            </div>
+            <div class="shipMainColumn2"> 
+              <h4 class="subsectionHeader panotesheader" data-i18n="cargo">Cargo</h4>
+              <textarea class="vtext panotes" name="attr_vehiclecargo"></textarea>
+            </div>
+            <div class="shipMainColumn3"> 
+              <h4 class="subsectionHeader panotesheader" data-i18n="notes-and-upgrades">Notes and Upgrades</h4>
+              <textarea class="vtext panotes" name="attr_pa_vehiclenotes"></textarea>
+            </div>
+          </div>
+          <!--Armaments-->
+          <div class="shipArmaments"> 
+            <h1 class="groupHeader" data-i18n="armaments">Armaments</h1>
+            <div class="shipWeapons"> 
+              <h4 class="weaponItem shipbutton">&nbsp;</h4>
+              <h4 class="weaponItem shipweapon" data-i18n="weapon">Weapon</h4>
+              <h4 class="weaponItem shiprange alignCenter" data-i18n="range">Range</h4>
+              <h4 class="weaponItem shiprof" data-i18n="rate-of-fire-abbr">ROF</h4>
+              <h4 class="weaponItem shipdamage" data-i18n="damage">Damage</h4>
+              <h4 class="weaponItom shipAP" data-i18n="armor-piercing-abbr">AP</h4>
+              <h4 class="weaponItem shipplacement" data-i18n="placement">Placement</h4>
+              <fieldset class="repeating_pa_shipweapons"> 
+                <div class="shipWeapons"> 
+                  <button class="weaponItem shipbutton" type="roll" name="roll_tShipWeaponDamage" value="@{rolltShipWeaponDamageFormula}">Damage </button>
+                  <input class="weaponItem shipweapon" type="text" name="attr_ShipWeaponType" data-i18n-placeholder="weapon" placeholder="Weapon"/>
+                  <input class="weaponItem shiprange" type="text" name="attr_ShipWeaponRange" data-i18n-placeholder="range" placeholder="Range"/>
+                  <input class="weaponItem shiprof" type="number" name="attr_ShipWeaponRoF" data-i18n-placeholder="rate-of-fire-abbr" placeholder="RoF"/>
+                  <div class="weaponItem shipdamage"> 
+                    <input class="short" type="number" name="attr_NoDmgDice" value="2"/>
+                    <select class="dtype" name="attr_DmgType"> 
+                      <option value="d4!" data-i18n="d4">d4</option>
+                      <option value="d6!" data-i18n="d6">d6</option>
+                      <option value="d8!" data-i18n="d8">d8</option>
+                      <option value="d10!" data-i18n="d10">d10</option>
+                      <option value="d12!" data-i18n="d12">d12</option>
+                    </select>+
+                    <input class="shipDamageMod" type="text" name="attr_DmgMod" value="0"/>
+                  </div>
+                  <input class="weaonItem weaponAP" type="number" name="attr_ShipWeaponAP" value="0"/>
+                  <input class="weaponItem shipplacement" type="text" name="attr_ShipWeaponPlacement" data-i18n-placeholder="placement" placeholder="Placement"/>
+                  <textarea class="weaponItem shipweaponnotes" name="attr_ShipWeaponNotes"></textarea>
+                </div>
+                <input type="hidden" name="attr_rolltShipWeaponDamageFormula" value="&amp;{template:damage} {{namelength=@{namelength}}} {{name=@{vehicletype}}} {{source=@{ShipWeaponType}}} {{dmg_rank=@{NoDmgDice}@{DmgType}+@{DmgMod}}} {{dmg_roll=@{ShipWeaponDamage}}} {{bonus_die=[[@{vbonusdamage}]]}} {{notes=@{ShipWeaponNotes}}}"/>
+                <input type="hidden" name="attr_ShipWeaponDamage" value="[[@{NoDmgDice}@{DmgType}+@{DmgMod} + @{damagemods}]]"/>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="robotArmor">
+        <!--input(class="usePowerArmor hiddenInput" type="checkbox" name="attr_power_Armor")-->
+        <!-- div(class="ship-RobotArmor") -->
+        <h1 class="groupHeader"> 
+          <input class="headerInput" type="text" name="attr_ra_vehicletype" data-i18n-placeholder="robot-armor-type"/>
+        </h1>
+        <div class="ship"> 
+          <div class="shipMainSection"> 
+            <div class="shipMainColumn1"> 
+              <div class="shipMainItem"> 
+                <label class="shipMainLabel" data-i18n="wounds">Wounds:</label>
+                <input class="shipWound" type="number" name="attr_ra_vehiclewounds" value="0"/>&nbsp;<span data-i18n="of">of </span>
+                <input class="shipWound" type="number" name="attr_ra_vehiclewounds_max" value="3"/>
+                <div class="vehicle-incbox" title="Incapcitated" data-i18n-title="incapacitated"> 
+                  <label class="vehicle-incbox"> 
+                    <input class="vehicle-inc" type="checkbox" name="attr_ra_vehicleisinc"/>
+                    <div>&nbsp;</div>
+                  </label>
+                </div>
+              </div>
+              <div class="shipMainSubColumn"> 
+                <div class="vehicleStatContainer"> 
+                  <div class="vehicleSizeBox"> 
+                    <input class="shipMainStatsInput" type="number" name="attr_ra_vehiclesize"/>
+                  </div>
+                  <label class="shipMainStatLabel" data-i18n="size">Size:</label>
+                </div>
+                <div class="vehicleStatContainer"> 
+                  <div class="vehicleHandlingBox"> 
+                    <input class="shipMainStatsInput" type="number" name="attr_ra_vehiclehandling"/>
+                  </div>
+                  <label class="shipMainStatLabel" data-i18n="handling">Handling:</label>
+                </div>
+                <div class="vehicleStatContainer"> 
+                  <div class="vehicleTopSpeedBox"> 
+                    <input class="shipMainStatsInput" type="number" name="attr_ra_vehicletopspeed"/>
+                  </div>
+                  <label class="shipMainStatLabel" data-i18n="top-speed">Top Speed (MPH):</label>
+                </div>
+                <div class="vehicleStatContainer"> 
+                  <div class="vehicleToughnessBox"> 
+                    <input class="shipMainStatsInput" type="text" name="attr_ra-vehicletoughness"/>
+                  </div>
+                  <label class="shipMainStatLabel" data-i18n="toughness">Toughness:</label>
+                </div>
+                <div class="vehicleStatContainer"> 
+                  <div class="vehicleCrewBox"> 
+                    <input class="shipMainStatsInput" type="number" name="attr_ra_vehiclecrew"/>
+                  </div>
+                  <label class="shipMainStatLabel" data-i18n="crew">Crew:</label>
+                </div>
+              </div>
+            </div>
+            <div class="shipMainColumn2"> 
+              <h4 class="subsectionHeader panotesheader" data-i18n="cargo">Cargo</h4>
+              <textarea class="vtext panotes" name="attr_ra_vehiclecargo"></textarea>
+            </div>
+            <div class="shipMainColumn3"> 
+              <h4 class="subsectionHeader panotesheader" data-i18n="notes-and-upgrades">Notes and Upgrades</h4>
+              <textarea class="vtext panotes" name="attr_ra_vehiclenotes"></textarea>
+            </div>
+          </div>
+          <!--Armaments-->
+          <div class="shipArmaments"> 
+            <h1 class="groupHeader" data-i18n="armaments">Armaments</h1>
+            <div class="shipWeapons"> 
+              <h4 class="weaponItem shipbutton">&nbsp;</h4>
+              <h4 class="weaponItem shipweapon" data-i18n="weapon">Weapon</h4>
+              <h4 class="weaponItem shiprange alignCenter" data-i18n="range">Range</h4>
+              <h4 class="weaponItem shiprof" data-i18n="rate-of-fire-abbr">ROF</h4>
+              <h4 class="weaponItem shipdamage" data-i18n="damage">Damage</h4>
+              <h4 class="weaponItom shipAP" data-i18n="armor-piercing-abbr">AP</h4>
+              <h4 class="weaponItem shipplacement" data-i18n="placement">Placement</h4>
+              <fieldset class="repeating_ra_shipweapons"> 
+                <div class="shipWeapons"> 
+                  <button class="weaponItem shipbutton" type="roll" name="roll_tShipWeaponDamage" value="@{rolltShipWeaponDamageFormula}">Damage </button>
+                  <input class="weaponItem shipweapon" type="text" name="attr_ShipWeaponType" data-i18n-placeholder="weapon" placeholder="Weapon"/>
+                  <input class="weaponItem shiprange" type="text" name="attr_ShipWeaponRange" data-i18n-placeholder="range" placeholder="Range"/>
+                  <input class="weaponItem shiprof" type="number" name="attr_ShipWeaponRoF" data-i18n-placeholder="rate-of-fire-abbr" placeholder="RoF"/>
+                  <div class="weaponItem shipdamage"> 
+                    <input class="short" type="number" name="attr_NoDmgDice" value="2"/>
+                    <select class="dtype" name="attr_DmgType"> 
+                      <option value="d4!" data-i18n="d4">d4</option>
+                      <option value="d6!" data-i18n="d6">d6</option>
+                      <option value="d8!" data-i18n="d8">d8</option>
+                      <option value="d10!" data-i18n="d10">d10</option>
+                      <option value="d12!" data-i18n="d12">d12</option>
+                    </select>+
+                    <input class="shipDamageMod" type="text" name="attr_DmgMod" value="0"/>
+                  </div>
+                  <input class="weaonItem weaponAP" type="number" name="attr_ShipWeaponAP" value="0"/>
+                  <input class="weaponItem shipplacement" type="text" name="attr_ShipWeaponPlacement" data-i18n-placeholder="placement" placeholder="Placement"/>
+                  <textarea class="weaponItem shipweaponnotes" name="attr_ShipWeaponNotes"></textarea>
+                </div>
+                <input type="hidden" name="attr_rolltShipWeaponDamageFormula" value="&amp;{template:damage} {{namelength=@{namelength}}} {{name=@{vehicletype}}} {{source=@{ShipWeaponType}}} {{dmg_rank=@{NoDmgDice}@{DmgType}+@{DmgMod}}} {{dmg_roll=@{ShipWeaponDamage}}} {{bonus_die=[[@{vbonusdamage}]]}} {{notes=@{ShipWeaponNotes}}}"/>
+                <input type="hidden" name="attr_ShipWeaponDamage" value="[[@{NoDmgDice}@{DmgType}+@{DmgMod} + @{damagemods}]]"/>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="combatoptions">
         <h1 class="groupHeader" data-i18n="combat-options-and-situational-rules">Combat Options & Situational Rules</h1>
         <div class="combatOptionDetails">
@@ -14225,6 +14459,21 @@ on(
       </div>
       <div class="releasenotesTab">
         <h1 class="groupHeader documentationHeader" data-i18n="release-notes">Release Notes</h1>
+        <!-- Release 1.00.20-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10020" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.20</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10020" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
+          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="unskilled-trait-roll-not-subtracting-two">Fixed an issue where the Unskilled "skill" roll was not subtracting 2 from the final result.</span></li>
+            <li> <span class="black" data-i18n="info-template-button-formatting">Fixed an "issue" where the info rolltemplate was showing all buttons as links. By design, all buttons in this template should be links, but there may be times when you desire to use this template for a chat menu of buttons. In this case, adding {{buttonstyle=y}} to the macro will format buttons as buttons. This fix includes other, minor stying corrections for the info rolltemplate.</span></li>
+          </ul>
+        </div>
         <!-- Release 1.00.19-->
         <label class="rowlabel">
           <input class="releasenotes" type="checkbox" name="attr_releasenotes10019" value="1"/><span class="releasenotesVersion">
@@ -15079,7 +15328,9 @@ on(
                 {{#rollBetween() fear 20 21}}<span data-i18n="fear-table-major-phobia-description" data-i18n-vars="{{fear}}"><strong>Major Phobia</strong> ({{0}}): The character gains the Major Phobia Hindrance.</span>{{/rollBetween() fear 20 21}}
                 {{#rollGreater() fear 21}}<span data-i18n="fear-table-heart-attack-description" data-i18n-vars="{{fear}}|{{heartattack}}"><strong>Heart Attack</strong> ({{0}}): The hero is so overwhelmed with fear that his heart stutters. He must make an immediate Vigor roll at –2. If successful, he's Stunned. If he fails, he's Incapacitated and dies in {{1}} rounds. In the latter case, a Healing roll at –4 saves his life, but he remains Incapacitated. He may be treated normally thereafter.</span>{{/rollGreater() fear 21}}
             {{/fear}}
-			{{#allprops() description item type wildcard fear heartattack ignoremaxheight}}<p><strong>{{key}}:</strong> {{value}}</p>{{/allprops() description item type wildcard fear heartattack ignoremaxheight}}
+			{{#buttonstyle}}<div class="sheet-buttonstyle">{{/buttonstyle}}
+			{{#allprops() description item type wildcard fear heartattack ignoremaxheight buttonstyle}}<p><strong>{{key}}</strong><span>{{value}}</span></p>{{/allprops() description item type wildcard fear heartattack ignoremaxheight buttonstyle}}
+			{{#buttonstyle}}</div>{{/buttonstyle}}
         </div>
     </div>
 </rolltemplate>
