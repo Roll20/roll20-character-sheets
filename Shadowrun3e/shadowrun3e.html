@@ -1262,8 +1262,7 @@
             <div class="magic-spells-table">
                 <div class="table-top-left header" data-i18n="name">Name</div>
                 <div class="table-top-mid header" title="Spell Category" data-i18n="category">Category</div>
-                <div class="table-top-mid header" title="Specialization" data-i18n="specialization-abbreviation">Spec.
-                </div>
+                <div class="table-top-mid header" data-i18n="plus-dice-abbreviation">+Dice</div>
                 <div class="table-top-mid header" title="Force of spell" data-i18n="force">Force</div>
                 <div class="table-top-mid header" title="Reusable Foci" data-i18n="foci">Foci</div>
                 <div class="table-top-mid header" title="Expendable Foci" data-i18n="expendable-abbreviation">Exp.</div>
@@ -1319,7 +1318,7 @@
                     </select>
                     <select name="attr_damage" class="mediumselect2">
                         <option value=0 SELECTED title="Choose for non combat spell">N/A</option>
-                        <option value="?{Damage Level|M,2|S,3|L,1|D,4}"
+                        <option value="?{Damage Level|M,2|S,3|L,1|D,4|L(stun),10|M(stun),11|S(stun),12|D(stun)13}"
                             title="Choose Damage at time of roll, default for combat spells">Choose</option>
                         <option data-i18n="light" value=1>Light</option>
                         <option data-i18n="moderate" value=2>Moderate</option>
@@ -1391,10 +1390,7 @@
                         <option data-i18n="health" value="health">Health</option>
                         <option data-i18n="detection" value="detection">Detection</option>
                         <option data-i18n="illusion" value="illusion">Illusion</option>
-                        <option data-i18n="elemental" value="elemental">Elemental</option>
-                        <option data-i18n="control" value="control">Control</option>
-                        <option data-i18n="telekinetic" value="telekinetic">Telekinetic</option>
-                        <option data-i18n="transformation" value="transformation">Transformation</option>
+                        <option data-i18n="manipulation" value="manipulation">Manipulation</option>
                     </select>
                 </div>
                 <div class="spiritfocus">
@@ -1863,7 +1859,10 @@
                     <div data-i18n="offline-storage">Offline Storage</div>
                     <input type="number" name="attr_deck-offlinestorage" value=0 min=0>
                 </div>
-                <div class="deck-extras"> </div>
+                <div class="deck-extras">
+			<div>Notes</div>
+            		<textarea name="attr_deck-notes" style='width:300px;height:50%;margin-bottom:unset;'></textarea>
+		</div>
             </div>
         </div>
         <div class="matrix-show-frame">
@@ -3897,6 +3896,7 @@
                 <option data-i18n="train" value="train">Train/Monorail</option>
                 <option data-i18n="ultralight" value="ultralight">Ultra-light Aircraft</option>
                 <option data-i18n="yacht" value="yacht">Yacht</option>
+                <option data-i18n="walkers" value="walkers">Walkers</option>
             </select>
             <select name="attr_vehicle-size" class="mediumselect2">
                 <option data-i18n="normal" value="Normal" SELECTED>Normal</option>
@@ -4996,7 +4996,7 @@ deckingtabs.forEach(tab => {
 	});
    });
 
-      const matrixtn={BLUE: {Intruder: 3, Legitimate: 6, secrating: 1, wdmg: 2}, GREEN: {Intruder: 4, Legitimate: 5, secrating: 2, wdmg: 2}, ORANGE: {Intruder: 5, Legitimate: 4, secrating: 3, wdmg: 3}, RED: {Intruder: 6, Legitimate: 3, secrating: 4, wdmg: 3}};
+      const matrixtn={BLUE: {Intruder: 6, Legitimate: 3, secrating: 1, wdmg: 2}, GREEN: {Intruder: 5, Legitimate: 4, secrating: 2, wdmg: 2}, ORANGE: {Intruder: 4, Legitimate: 5, secrating: 3, wdmg: 3}, RED: {Intruder: 3, Legitimate: 6, secrating: 4, wdmg: 3}};
       const matrixsecnumber={1: "BLUE", 2: "GREEN", 3: "ORANGE",4: "RED"};
       const attributes=[ "body", "quickness", "strength", "charisma", "willpower", "intelligence", "force" ];
       const quicknesslinked=["@{blowgun}", "@{bracer}", "@{guncane}", "@{gyrojet}", "@{eyegun}", "@{oralgun}", "@{oralstrike}", "@{pistols}", "@{smgs}", "@{rifles}", "@{assaultrifles}", "@{lasers}", "@{whips}", "@{stealth}", "@{shotguns}"]
@@ -5428,7 +5428,7 @@ deckingtabs.forEach(tab => {
 const iclist = {
 	blackic: ["blackiclethal", "cerebropathic", "psychotropic", "blackicnonlethal", "deckblackhammer", "deckkilljoy"],
 	debuff: ["Crippler", "Ripper"],
-	attack: ["Killer", "Blaster", "Sparky", "blackiclethal", "cerebropathic", "psychotropic", "blackicnonlethal"],
+	attack: ["Killer", "Blaster", "Sparky", "blackiclethal", "cerebropathic", "psychotropic", "blackicnonlethal", "deckblackhammer", "deckkilljoy"],
 	proactive: ["Crippler", "Ripper", "Killer", "Blaster", "Sparky", "Scout", "blackiclethal", "cerebropathic", "psychotropic", "blackicnonlethal", "Trace"],
 	reactive: ["Probe", "Scramble", "Tar Baby", "Tar pit", "Data Bomb", "Pavlov"]
 };
@@ -5698,8 +5698,14 @@ on('clicked:matrixattack', (info) => {
 		});
 
 	});
+	const refreshphase = function() {
+		atts=[];
+		atts["rounds-phase"]=0;
+		atts["sorcery-used"]=0;
+		setAttrs(atts);
+	};
 
-   	var refreshpools = function () {
+   	const refreshpools = function () {
 		atts=[];
 		atts["rounds-phase"]=0;
 		atts["controlpool-used"]=0;
@@ -5720,7 +5726,7 @@ on('clicked:matrixattack', (info) => {
 		const myid=info["htmlAttributes"]["id"]
 		var sourceattr=source.pop();
 		var myrepeat=source.join('_').concat('_'); 
-		const attlist=["target", "force", "drain", "drainlvl", "name", "description", "damage", "range", "spellcategory"];
+		const attlist=["target", "force", "drain", "drainlvl", "name", "description", "damage", "range", "spellcategory", "specialized"];
 		attlist.forEach(attr=>{
 			let myname=myrepeat + attr;
 			atts.push(myname);
@@ -5729,6 +5735,7 @@ on('clicked:matrixattack', (info) => {
 		getAttrs(atts, function(myval) {
 			console.log('vals');
 			console.log(myval);
+			const specdice=parseInt(myval["specialized"]);
 			const magic=myval["magic"];
 			const myname=myval["character_name"];
 			const plane=(myval["astralstate"]=="astral-projection")? "astral" : "physical";
@@ -5750,7 +5757,7 @@ on('clicked:matrixattack', (info) => {
 				resistattr=target.split("|")[2];
 			}
 			var myroll="&{template:spell}";
-			var calcDice="?{" + lang["sorcery-dice"] +"?} + ?{"+ lang["spell-pool-dice"] +"?}";
+			var calcDice="?{" + lang["sorcery-dice"] +"?} + ?{"+ lang["spell-pool-dice"] +"?} + " + specdice;
 			var calcDrainTN="floor(?{" + lang["force"] + "?}/2) + " + drain + " + ( 2 * @{spellsus} )";
 			/* var calcDrainDice="@{willpower|max} + ?{" + lang["sorcery-dice-for-drain"] + "?} + ?{"+ lang["spell-pool-dice-for-drain"] +"?}"; */
 			var calcDrainDice="@{willpower|max}d6!![willpower] + ?{" + lang["sorcery-dice-for-drain"] + "?}d6!![sorcery dice] + ?{"+ lang["spell-pool-dice-for-drain"] +"?}d6!![spell pool]";
@@ -5769,7 +5776,7 @@ on('clicked:matrixattack', (info) => {
 			if ( range == "AoE" ) {
 				targetofspell="AoE";
 				if ( spellcat == "Elemental" ) {
-					calcTN = "4 + @{rangedTN} + (2*(@{spellstack}+@{spellsus})) +@{spellmisc} + @{move}";
+					calcTN = "4 + @{rangedTN} + (2*(@{spellstack}+@{spellsus})) +@{spellmisc}";
 					myroll+="{{targetnumber=[[" + calcTN + "]] + Cover & Target Movement}}";
 					resisttype="resistroll";
 				} else {
@@ -5785,7 +5792,7 @@ on('clicked:matrixattack', (info) => {
 				myroll+="{{roll=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
 			} else {
 				if ( spellcat == "Elemental" ) {
-					calcTN = target + " + 4 + @{rangedTN} + (2*(@{spellstack}+@{spellsus})) +@{spellmisc} + @{move}";
+					calcTN = target + " + 4 + @{rangedTN} + (2*(@{spellstack}+@{spellsus})) +@{spellmisc}";
 					myroll+="{{targetnumber=[[" + calcTN + "]]}}{{dodge=yes}}";
 					resisttype="resistroll";
 				} else {
@@ -5796,7 +5803,7 @@ on('clicked:matrixattack', (info) => {
 				myroll+="{{targetname=[[0[@{target|" + lang["target"] +"|token_name}]]]}}";
 				myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}";
 			}
-			myroll+="{{resisttype=" + resisttype + "}}";
+			myroll+="{{resisttype2=" + resisttype + "}}";
 			myroll+="{{targetofspell=" + targetofspell + "}}";
 			myroll+="{{draintn=[[ " + calcDrainTN + "]]}}";
 			myroll+="{{spellname=" + name + "}}";
@@ -5839,8 +5846,10 @@ on('clicked:matrixattack', (info) => {
 				var draintn=results.results.draintn.result;
 				console.log('draintn before: ' + draintn);
 				if (drainlvl.includes("dmglvl")) {
-					let dmglvl=parseInt(results.results.spelldamage.result);
+					var dmglvl=parseInt(results.results.spelldamage.result);
+					dmglvl=(dmglvl > 4)? dmglvl - 9 : dmglvl;
 					draindmg=eval(drainlvl);
+					draindmg = ( draindmg < 1 )? 1 : draindmg;
 					draintn += ( draindmg > 4 )?  2*(draindmg - 4) : 0;
 					console.log('drdmg calc: ' + draindmg);
 
@@ -5849,6 +5858,7 @@ on('clicked:matrixattack', (info) => {
 					draindmg = parseInt(drainlvl);
 					console.log('drdmg stright: ' + damagetable[draindmg]);
 				}
+				draintn = (draintn <= 2)? 2 : draintn;
 				console.log('draintn after: ' + draintn);
 				console.log('drain damage base ' + draindmg);
 				var dmgmax=4;
@@ -6024,18 +6034,39 @@ on('clicked:matrixattack', (info) => {
 		initiative(init, reaction, dmgpen, mytitle, character);	
 		refreshpools();
  	});
-
-	on('clicked:endturn', (info) => {
+	const getTokenName = async () => {
+	    const rxGrab = /^0\[(.*)\]\s*$/;
+	    let myroll = "! {{mytoken=[[0[@{selected|token_name}]]]}}";
+	    rollresult = await startRoll(myroll),
+            	tokenname = (rollresult.results.mytoken.expression.match(rxGrab) || [])[1]; 
+	    	finishRoll(rollresult.rollId); 
+	    console.log('debug getTokenName ' + tokenname );
+	    return tokenname;
+	};
+	
+	const endTurn = async() => {
+		const tokenname = await getTokenName();
+		console.log('token name ' + tokenname);
 		if (!("yes" in lang)) geti18n();
-        	var myroll="&{template:init} {{character=@{character_name}}}{{type=End Combat Pass}}"
-		myroll += "{{setinit=[[10 &{tracker:-}]]}}"
+        	var myroll="&{template:init} {{character=" + tokenname + "}}{{type=[[0]]}}"
+		var endtypemsg="End Combat Pass";
+		myroll += "{{setinit=[[10 &{tracker:-}]]}}{{initval=[[@{tracker|" + tokenname + "}]]}}"
 		console.log(myroll);
         	startRoll(myroll, (results) => {
-		finishRoll( results.rollId);
-		refreshpools();
+			const initval=results.results.initval.result;
+			if ( initval <= 10 ) refreshpools();
+			else  {
+				refreshphase();
+				endtypemsg="End Combat Turn";
+			}
+			console.log(results.results);
+			finishRoll( results.rollId);
 		});
-	});
+	};
 
+	on('clicked:endturn', (info) => {
+		endTurn(info);
+	});
 
 	on('clicked:resistbanish', (info) => {
 		if (!("yes" in lang)) geti18n();
@@ -6106,12 +6137,17 @@ on('clicked:matrixattack', (info) => {
 	
    	const resistdmg = function (myid, mods) {
 		if (!("yes" in lang)) geti18n();
-	   atts=["ballistic", "impact", "armor-on", "deck-hardening"];
+	   atts=["ballistic", "impact", "armor-on", "deck-hardening", "body_max", "willpower_max"];
 	   getAttrs(atts, function (myval) {
+	   	console.log('myval');
+	   	console.log(myval);
 	   	const ballistic=myval["ballistic"];
 	   	const impact=myval["impact"];
 	   	const armoron=myval["armor-on"];
 	   	const hardening=myval["deck-hardening"];
+		const body = parseInt(myval["body_max"]);
+		const willpower = parseInt(myval["willpower_max"]);
+		var resistattr=body;
 		var armorname;
 		var wdmg;
 		var dmgcode=0;
@@ -6136,7 +6172,8 @@ on('clicked:matrixattack', (info) => {
 			myroll +="{{attacktest=[[" + mods["attacktest"] + "]]}}";
 			myroll+="{{dodge=[[" + mods["dodge"] + "]]}}";
 	 		myroll +="{{AttackType=" + ammo  + "}}";
-			calcTN="?{" + lang["attack-power"] + "} + " +  powermod + " - " + armorval;
+			if (ammo=="deckkilljoy") resistattr = willpower;
+			calcTN="?{" + lang["attack-power"] + "} + " +  powermod + " - " + armorval; 
 			if ( mods["blast"] ) { 
 				myroll+="{{distance=[[?{" + lang["distance-from-explosive-in-meters"] +"|0}]]}}"
 				myroll+="{{blastredux=[[?{" + lang["distance-from-explosive-in-meters"] +"|0} / " + mods["blast"] + "]]}}"
@@ -6155,7 +6192,8 @@ on('clicked:matrixattack', (info) => {
 			myroll += "{{armorvalue=@{" + myid + "}}}"
 		}
 	 	let actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
-	        var calcDice= "@{body|max} + ?{" + lang["combat-pool-dice"] + "}";
+		
+	        var calcDice= resistattr + " + ?{" + lang["combat-pool-dice"] + "}";
 	 	myroll +="{{finaldmg=[[0]]}}{{netresult=[[0]]}}";
 	 	myroll +="{{name=" + actionname + " Armor}}{{character=@{character_name}}}{{combatpool=[[?{" + lang["combat-pool-dice"] + "|0}]]}}";
 	 	myroll +="{{action=" + lang["damage-resistance-test"] + "}}";
@@ -6920,7 +6958,7 @@ on('clicked:matrixattack', (info) => {
     	on('clicked:repeating_rangedweapons:rangedattack', (info) => {
 		if (!("yes" in lang)) geti18n();
 		var setatts={};
-		var atts=["sensors-rating", "combatpool-used", "controlpool-used", "gyro-on", "armor-quickness-pen", "rounds-phase", "character_name"];
+		var atts=["sensors-rating", "combatpool-used", "controlpool-used", "gyro-on", "armor-quickness-pen", "rounds-phase", "character_name", "move"];
 	    	var recoilx=1;
 		var rounds=1;
 		var source=info['sourceAttribute'].split('_');
@@ -6935,6 +6973,7 @@ on('clicked:matrixattack', (info) => {
 			if ( (myval[myrepeat.concat("wfamily")] == "Heavy" )  && ( ( mymode != "vehiclesensor" )  || ( mymode != "vehicleranged" )) ) recoilx=2;
 			var vehiclesensors=0, armorpen=0, armorpenroll="", pool, mypool, poolname, dmgmin=0, dmgmax=4, finalrounds;
 			if ( myval["sensors-rating"] ) vehiclesensors=myval["sensors-rating"] ;
+			const move=parseInt(myval["move"]);
 			const tnmods= myval[myrepeat.concat("tnmods")];
 			const myname= myval["character_name"];
 			const myweapon= myval[myrepeat.concat("name")];
@@ -6988,12 +7027,15 @@ on('clicked:matrixattack', (info) => {
 			   mypool="control"
 
 			} else if ( mymode == "vehicleranged" ) { 
-			   calcTN += " ?{" + lang["range"] + "} + @{rangedTN} + @{target|" + lang["target"] +"|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim + " + @{wp-vehicle}";
+			   const gyrobonus=((move - myval[myrepeat.concat("gyro")]) < 0 )? move: myval[myrepeat.concat("gyro")];
+			   console.log('vehicle ranged')
+			   console.log('move ' + move + ' gyro ' + myval[myrepeat.concat("gyro")] + ' gyrobonus ' + gyrobonus)
+			   calcTN += " ?{" + lang["range"] + "} + @{rangedTN} + @{target|" + lang["target"] +"|targetMove} + " + targetaim + " + @{wp-vehicle} - " + gyrobonus;
 			   poolname="Control";
 			   pool="controlpool";
 			   mypool="control"
 			} else {
-			   calcTN += " ?{" + lang["range"] + "} + @{rangedTN} + @{target|" + lang["target"] +"|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim + " + " + armorpen;
+			   calcTN += " ?{" + lang["range"] + "} + @{rangedTN} + @{target|" + lang["target"] +"|targetMove} + " + targetaim + " + " + armorpen;
 			   poolname="Combat";
 			   pool="combatpool";
 			   mypool="combat"
@@ -7316,64 +7358,6 @@ on('clicked:matrixattack', (info) => {
 		payload="none";
 		const mymode=info["htmlAttributes"]["id"];
 		meleecombat(mymode, payload);
-	});
-    	on('clicked:repeating_meleeweapons2:attack', (info) => {
-		if (!("yes" in lang)) geti18n();
-		console.log(info);
-		var atts=["combatpool-used", "gyro-on", "armor-quickness-pen"];
-		var rounds=1;
-		var source=info['sourceAttribute'].split('_');
-		var sourceattr=source.pop();
-		var myrepeat=source.join('_').concat('_');
-		var mymode=info["htmlAttributes"]["id"];
-		const meleeattrs=["damage", "power", "name", "skill", "reach", "specialized", "notes"] ;
-		meleeattrs.forEach(myatt=>{
-			atts.push(myrepeat.concat(myatt));
-		});
-   		getAttrs(atts, function(myval) {
-			var gyropenroll="";
-			var gyropen=0;
-			if ( myval["gyro-on"] == 1 ) {
-				gyropen=4;
-				gyropenroll = "{{gyropen=" + gyropen + "}}";
-			}
-			const combatused= parseInt(myval["combatpool-used"]);
-			const myweapon= myval[myrepeat.concat("name")];
-			const myreach= myval[myrepeat.concat("reach")];
-			const mydamage= myval[myrepeat.concat("damage")];
-			const mypower= myval[myrepeat.concat("power")];
-			const myskill= myval[myrepeat.concat("skill")];
-			const myspec= myval[myrepeat.concat("specialized")];
-			const mynotes= myval[myrepeat.concat("notes")];
-			var armorpen=0;
-                        var myroll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|" + lang["target"] +"|token_name}}}{{weapondamage=" + mydamage + "}}";
-			if ( quicknesslinked.includes(myskill) ) {
-				console.log('quick pen');
-				armorpen=myval["armor-quickness-pen"];
-				console.log(armorpen);
-				myroll+= "{{armorpen=@{armor-quickness-pen}}}";
-			}
-			calcDice="[[ " + myskill + " + " + myspec + " + ?{" + lang["combat-pool-dice"] + "}]]";
-			calcTN="[[ {2,(4 + @{meleeTN} + " + gyropen + " +  ( ( @{target|" + lang["target"] +"|meleereach|max} - " + myreach + ") * ?{" + lang["use-reach-modifier"] +"?} ) + " + armorpen + ")}kh1 ]]";
-			myroll+= "{{weaponpower=[[" + mypower + "]]}}{{combatpool=[[?{" + lang["combat-pool-dice"] + "|0}]]}}"
-			myroll+= "{{charreach=[[@{meleereach|max}]]}}{{targetreach=[[@{target|" + lang["target"] +"|meleereach|max}]]}}"
-			myroll+="{{weaponname=" + myweapon + "}}{{reachmod=[[?{" + lang["use-reach-modifier"] +"?|" + lang["yes"] + ",1|" + lang["no"] + ",0}]]}}"
-			myroll+="{{reachbonus=[[(@{target|" + lang["target"] +"|meleereach|max} - " + myreach + ") * ?{" + lang["use-reach-modifier"] +"?}]]}}"
-			myroll+="{{rolldice=" + calcDice + "}}{{targetnumber=" + calcTN + "}}"
-			myroll+="{{attacktest=[[" + calcDice + "d6>" + calcTN + "!!  ]] }}" 
-			myroll += "{{meleemods=@{meleeTN}}}";
-			myroll += gyropenroll;
-			console.log(myroll);
-                	startRoll(myroll, (results) => {
-			var reachmodtxt="Reach Bonus Applied" ;
-			if ( results.results.reachmod.result == 0 ) reachmodtxt="Reach Bonus Not Applied";
-			finishRoll( results.rollId, {
-				reachmod: reachmodtxt,
-			});
-			atts["combatpool-used"] = results.results.combatpool.result + combatused;
-			setAttrs(atts);
-			});
-		});
 	});
 
     	on('clicked:repeating_explosives:rangedattack', (info) => {
@@ -9169,7 +9153,7 @@ on("change:dermal-armor change:repeating_armor:equipped change:repeating_armor:b
 });
 
 
-on("sheet:opened change:rangedvizTN change:meleevizTN change:cover change:move change:dualwield change:calledshot change:aim change:enemies change:friends change:meleetargets change:position change:misccombatmods change:stun_pen change:wound_pen change:manualgunneryTN", function() {
+on("sheet:opened change:rangedvizTN change:meleevizTN change:cover change:move change:dualwield change:calledshot change:aim change:enemies change:friends change:meleetargets change:position change:misccombatmods change:stun_pen change:wound_pen change:manualgunneryTN change:rangedselected change:gryo-on", function() {
     updateRangeTNs();
     updateMeleeTNs();
 });
@@ -9321,11 +9305,11 @@ on("change:sorcery-defense change:spellpool-defense change:sorcery-used change:s
 
 });
 
-on("sheet:opened change:deck-masking-final change:decksleaze-rating", function() {
-    getAttrs(["deck-masking-final", "decksleaze-rating"], function (myval) {
+on("sheet:opened change:deck-masking-final change:decksleaze-rating-final", function() {
+    getAttrs(["deck-masking-final", "decksleaze-rating-final"], function (myval) {
 	console.log(myval["deck-masking-final"]);
 	let mymask=parseInt(myval["deck-masking-final"]) || 0;
-	let mysleaze=parseInt(myval["decksleaze-rating"]) || 0;
+	let mysleaze=parseInt(myval["decksleaze-rating-final"]) || 0;
 	let mydf = Math.ceil((mymask + mysleaze ) / 2);
         setAttrs({"deck-detection-max": mydf});
     });
@@ -9608,30 +9592,45 @@ var updateMeleeTNs = function() {
     });
 };
   
-
 var updateRangeTNs = function() {
-    getAttrs(["rangedvizTN", "cover", "move", "dualwield", "calledshot", "aim", "enemies", "friends", "meleetargets", "position", "misccombatmods", "stun_pen","wound_pen", "manualgunneryTN" ], function(myval) {
+    getAttrs(["rangedvizTN", "cover", "move", "dualwield", "calledshot", "aim", "enemies", "friends", "meleetargets", "position", "misccombatmods", "stun_pen","wound_pen", "manualgunneryTN", "rangedselected", "gyro-on", "sheettype" ], function(myval) {
 	console.log(myval);
-        var sets={};
-	console.log('updating ranged tn');
-    	const move=parseInt(myval.move);
-    	const called=parseInt(myval.calledshot);
-    	const viz=parseInt(myval.rangedvizTN);
-    	const cover=parseInt(myval.cover);
-    	const dual=parseInt(myval.dualwield);
-    	const enemies=parseInt(myval.enemies);
-    	const aim=parseInt(myval.aim);
-    	const misc=parseInt(myval.misccombatmods);
-    	const stun=parseInt(myval.stun_pen);
-    	const wound=parseInt(myval.wound_pen);
-    	const gunnery=parseInt(myval.manualgunneryTN);
-        targetNumberRange = called + viz + cover + dual + (2 * enemies) - aim + misc + stun + wound + gunnery;
-	mytargetMove = (move == 0)? -1 : (move ==4)? 2: (move ==6)? 2: 0;
-	sets["rangedTN"]=targetNumberRange;
-	sets["targetMove"]=mytargetMove;
-	console.log('sets');
-	console.log(sets);
-        setAttrs(sets);
+    	moreatts=["rangedselected"];	
+	const gyroon=parseInt(myval["gyro-on"]);
+	const sheettype=myval["sheettype"];
+	var rselect="None";
+	if (( myval["rangedselected"] != "None") && ( myval["gyro-on"] == 1 )) {
+		let mybase= myval["rangedselected"].split("_");
+		const myattr=mybase.pop();
+		const myrepeat=mybase.join('_'); 
+		rselect=myrepeat + "_gyro";
+		moreatts.push(rselect);
+	}
+	getAttrs(moreatts, function(mygyro) {
+		const gyro=(rselect == "None")? 0 : parseInt(mygyro[rselect]) * gyroon ;
+		console.log('gyro val ' + gyro);
+        	var sets={};
+		console.log('updating ranged tn');
+    		const move=parseInt(myval.move);
+    		const called=parseInt(myval.calledshot);
+    		const viz=parseInt(myval.rangedvizTN);
+    		const cover=parseInt(myval.cover);
+    		const dual=parseInt(myval.dualwield);
+    		const enemies=parseInt(myval.enemies);
+    		const aim=parseInt(myval.aim);
+    		const misc=parseInt(myval.misccombatmods);
+    		const stun=parseInt(myval.stun_pen);
+    		const wound=parseInt(myval.wound_pen);
+    		const gunnery=parseInt(myval.manualgunneryTN);
+		const movepen=((move - gyro) < 0 )? 0: move - gyro;
+		console.log('movepen ' + movepen);
+        	targetNumberRange = called + viz + cover + dual + (2 * enemies) - aim + misc + stun + wound + gunnery + movepen;
+		mytargetMove = (move == 0)? -1 : (move ==4)? 2: (move ==6)? 2: 0;
+		sets["rangedTN"]=targetNumberRange;
+		sets["targetMove"]=mytargetMove;
+		console.log(sets);
+        	setAttrs(sets);
+	});
 
     });
 };
@@ -10003,6 +10002,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
             {{#casttest}}{{targetofspell}}:
             {{#dodge}}[Dodge](~{{targetofspell}}|dodge||{{computed::senddata}}){{/dodge}}
             {{#resisttype}}[<span data-i18n="resist">Resist</span>](~{{targetofspell}}|{{computed::resisttype}}||{{computed::senddata}}){{/resisttype}}
+            {{#resisttype2}}[<span data-i18n="resist">Resist</span>](~{{targetofspell}}|{{resisttype2}}||{{computed::senddata}}){{/resisttype2}}
         </div>{{/casttest}}
         {{#roll}}<div class="sheet-rtrow">{{targetofspell}}: [<span data-i18n="area-of-effect-acronym">AOE</span>](~selected|checkaoe||{{computed::senddata}})</div>
         {{/roll}}
