@@ -501,32 +501,55 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
         return;
     
     on(`change:repeating_spells-${section}:spell-name`, function (eventInfo) {
-
         let spell = spellsTable[section][eventInfo.newValue];
-        if (spell === undefined)
+        if (!spell)
             return;
 
-        let spellInfo = {
-            [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-            [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
-            [`repeating_spells-${section}_spell-school`]       : spell['school'],
-            [`repeating_spells-${section}_spell-components`]   : spell['components'],
-            [`repeating_spells-${section}_spell-range`]        : spell['range'],
-            [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
-            [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
-            [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
-            [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
-            [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
-            [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
-            [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-            [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
-            [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-        };
-        if (section.startsWith('pri')) {
-            spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
-        }
+        getAttrs(['book-phb', 'book-tcwhb'], function(values) {
+            let activeBooks = Object.values(values);
+            if (!activeBooks.includes(spell['book'])) {
+                let errorMessage = {
+                    [`repeating_spells-${section}_spell-cast-time`]    : '',
+                    [`repeating_spells-${section}_spell-level`]        : '',
+                    [`repeating_spells-${section}_spell-school`]       : '',
+                    [`repeating_spells-${section}_spell-components`]   : '',
+                    [`repeating_spells-${section}_spell-range`]        : '',
+                    [`repeating_spells-${section}_spell-aoe`]          : '',
+                    [`repeating_spells-${section}_spell-duration`]     : '',
+                    [`repeating_spells-${section}_spell-damage`]       : '',
+                    [`repeating_spells-${section}_spell-damage-type`]  : '',
+                    [`repeating_spells-${section}_spell-saving-throw`] : '',
+                    [`repeating_spells-${section}_spell-healing`]      : '',
+                    [`repeating_spells-${section}_spell-materials`]    : '',
+                    [`repeating_spells-${section}_spell-reference`]    : '',
+                    [`repeating_spells-${section}_spell-effect`]       : `The book **${spell['book']}** is currently not active on your sheet.\nGo to the **Settings** and activate the book (if your DM allows for its usage)`
+                }
+                setAttrs(errorMessage);
+                return;
+            }
+            
+            let spellInfo = {
+                [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
+                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
+                [`repeating_spells-${section}_spell-school`]       : spell['school'],
+                [`repeating_spells-${section}_spell-components`]   : spell['components'],
+                [`repeating_spells-${section}_spell-range`]        : spell['range'],
+                [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
+                [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
+                [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
+                [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
+                [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
+                [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
+                [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
+                [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
+                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
+            };
+            if (section.startsWith('pri')) {
+                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+            }
 
-        setAttrs(spellInfo);
+            setAttrs(spellInfo);
+        });
     });
 }
 
