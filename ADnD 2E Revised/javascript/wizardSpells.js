@@ -5838,8 +5838,8 @@ wiz2['Ice Knife'] = {
     'materials': 'A drop of water from melted snow and a tiny silver dagger.',
     'reference': 'p. 98',
     'book': 'The Complete Wizard\'s Handbook',
-    'damage': 'Hit: 2d4 damage. Shatter: 1d4 cold damage and numb for 1d3 rounds',
-    'damage-type': 'cold damage',
+    'damage': '*Hit*: 2d4 damage. *Shatter*: 1d4 cold damage and numb for 1d3 rounds',
+    'damage-type': '',
     'healing': '',
     'effect': 'This spell fires a dagger of ice at the target. The caster makes a normal attack roll as if attacking with a missile weapon, factoring in the range from the attacker to the target (the *ice knife* has a long range of 30 yards, a medium range of 20 yards, and a short range of 10 yards). A successful hit causes 2-8 (2d4) hit points of damage. If the *ice knife* misses its target, consult the rules for grenade-like missiles on pages 62-63 of the *Dungeon Master’s Guide* to determine where it lands.\n&emsp;When an *ice knife* strikes a solid object or a creature, the knife shatters, releasing a wave of numbing cold. All creatures within a 5-foot radius must make a successful saving throw vs. paralyzation or suffer 1-4 hit points of cold damage and become numb for 1-3 rounds. Numbed creatures have their movement rates reduced by half and their chance to hit reduced by 2. Proximity to major sources of heat, such as a roaring bonfire, improves a creature’s saving throw by +2.\n&emsp;An *ice knife* that misses or is lost cannot be picked up by the caster (or anyone else) and thrown again. If the *ice knife* is touched, it instantly shatters, releasing a wave of cold as described above. If a lost *ice knife* is not touched, it melts away in a pool of water 1 round after it was originally created; this melting occurs regardless of the environmental temperature.'
 }
@@ -6057,7 +6057,7 @@ wiz4['Otiluke\'s Dispelling Screen'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates a shimmering screen of violet energy in any shape the caster desires. Any creature passing through the screen is affected by dispel magic with the same level of effectiveness as that spell cast by the wizard.'
+    'effect': 'This spell creates a shimmering screen of violet energy in any shape the caster desires. Any creature passing through the screen is affected by *dispel magic* with the same level of effectiveness as that spell cast by the wizard.'
 }
 
 wiz4['Wind Breath'] = {
@@ -6072,7 +6072,7 @@ wiz4['Wind Breath'] = {
     'materials': 'A handmade silk fan with a value of at least 1 gp.',
     'reference': 'p. 101',
     'book': 'The Complete Wizard\'s Handbook',
-    'damage': '*30-50 MPH*: 1 damage. *50-70 MPH*: 1d4 damage. 70+ MPH: 1d8 damage',
+    'damage': '*30-50 MPH*: 1 damage. *50-70 MPH*: 1d4 damage. *70+ MPH*: 1d8 damage',
     'damage-type': '',
     'healing': '',
     'effect': 'A variation of *gust of wind*, this spell allows the caster to fill his lungs with air and expel a powerful wind. The strength of this wind is about 5 miles per hour for every level of the caster ([[5*[[@{level-wizard}]] ]] miles per hour). Those outside the area of effect do not notice the tremendous winds, though objects may be blown out of the spell’s area into their path. The DM should determine the precise effects of the *wind breath* using the following parameters as guidelines.\n&emsp;If the *wind breath* is 30-50 miles per hour, there is a 10 percent chance that small boats capsize, a 1 percent chance that ships capsize, and a 10 percent chance that a man is knocked down. There is a 20 percent chance that branches snap, light articles are blown away, and tents and sails tear. Creatures caught in the cone of the *wind breath* suffer 1 hit points of damage from blown sand and grit.\n&emsp;If the *wind breath* is 50-70 miles per hour, there is a 70 percent chance that small boats capsize, a 20 percent chance that ships capsize, and a 50 percent chance that a man is knocked down. Trees bend and there is a 70 percent chance that branches snap, and a 20 percent chance that a trunk snaps. Medium-sized articles are blown away, and there is a 50 percent chance that tents and sails are torn, and a 40 percent chance that shacks are blown down. Creatures caught in the cone of the *wind breath* suffer 1-4 hit points of damage from sand and grit. Flying creatures are blown back 10-40 (10d4) feet.)\n&emsp;If the *wind breath* is 70 miles per hour or more, there is a 100 percent chance that small boats capsize, a 70 percent chance that ships capsize, and a 70 percent chance that a man is knocked down and blown 10-40 (10d4) feet to suffer 1-6 hit points of damage per 10 feet blown. There is a 70 percent chance that tree trunks snap, and a 100 percent chance that branches are ripped from trees. Heavy articles are blown away, medium articles are ripped from fastenings, and tents and sails have a 70 percent chance of being destroyed. There is a 20 percent chance that common buildings are blown down and a 60 percent chance that shacks are flattened. Creatures caught in the cone of the *wind breath* suffer 1-8 hit points of damage from blown objects. Flying creatures are blown back 50-100 (40+10d6) feet.'
@@ -6090,7 +6090,7 @@ wiz5['Force Shapechange'] = {
     'materials': 'A hair from the hide of any lycanthrope and a live butterfly, released when the verbal component is uttered.',
     'reference': 'p. 102',
     'book': 'The Complete Wizard\'s Handbook',
-    'damage': '*Saving throw failed*: 3d10. Saving throw successful: 2d10/2',
+    'damage': '*Saving throw failed*: 3d10. *Saving throw successful*: 2d10/2',
     'damage-type': '',
     'healing': '',
     'effect': 'With this spell, the caster can force any shapechanger or magic-wielder using any form of a *shapechanging* spell to instantly revert to his true form (or his most common form). To use the spell, the caster points at creatures he knows or believes to be shapechangers. If the creatures are indeed shapechangers, they must make a successful saving throw or immediately revert to their true form and suffer 3-30 (3d10) hit points of damage from the wracking pain caused by the forced change. The change takes a full round, during which time a victim can take no other actions. If the saving throw was successful, the victim does not change form, but still suffers half damage (2d10/2).'
