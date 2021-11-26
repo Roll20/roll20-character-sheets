@@ -982,8 +982,9 @@ function getWeaponWithBonus(weaponName, isMonster) {
         'bonus' : `+${bonus}`
     }
     if (isMonster) {
-        weaponWithBonus['small-medium'] += `+${bonus}`
-        weaponWithBonus['thac0'] = `@{monsterthac0}-${bonus}`
+        weaponWithBonus['small-medium'] += `+${bonus}`;
+        weaponWithBonus['large'] += `+${bonus}`;
+        weaponWithBonus['thac0'] = `@{monsterthac0}-${bonus}`;
     }
     
     return weaponWithBonus;
@@ -1181,6 +1182,7 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo){
         [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
         [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'] || '@{monsterthac0}',
         [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
+        [`repeating_monsterweapons_daml`]      : weapon['large'],
         [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
     };
 
