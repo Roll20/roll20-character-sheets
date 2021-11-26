@@ -63,7 +63,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
   let OD = 0;
 
   let ODMALBarbarian = [];
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
   let ODMALShaman = [];
 
   exec.push(roll);
@@ -118,8 +118,6 @@ on('clicked:distanceWizardBorealis', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  exec.push(`{{vOD=${OD}}}`);
-
   const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
@@ -129,7 +127,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -225,6 +223,8 @@ on('clicked:distanceWizardBorealis', async (info) => {
   }
 
   // FIN GESTION DU STYLE
+  OD -= MALBonus.ODMALWarrior;
+  exec.push(`{{vOD=${OD}}}`);
 
   if (cRoll.length === 0) { cRoll.push(0); }
 

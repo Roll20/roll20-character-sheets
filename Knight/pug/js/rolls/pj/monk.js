@@ -223,7 +223,7 @@ monkCeaRoll.forEach((button) => {
 
     let ODMALBarbarian = [];
     let ODMALShaman = [];
-    let ODMALWarrior = [];
+    const ODMALWarrior = [];
 
     let attaquesSurprises = [];
     let attaquesSurprisesValue = [];
@@ -299,8 +299,6 @@ monkCeaRoll.forEach((button) => {
       if (hasArmure) { OD += C4OD; }
     }
 
-    exec.push(`{{vOD=${OD}}}`);
-
     const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
     exec = exec.concat(MALBonus.exec);
@@ -320,7 +318,7 @@ monkCeaRoll.forEach((button) => {
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+    ODMALWarrior.push(MALBonus.ODMALWarrior);
 
     // GESTION DES EFFETS DES DIFFERENTES ATTAQUES
 
@@ -485,6 +483,9 @@ monkCeaRoll.forEach((button) => {
     }
 
     // FIN GESTION DU STYLE
+    OD -= MALBonus.ODMALWarrior;
+
+    exec.push(`{{vOD=${OD}}}`);
 
     exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 

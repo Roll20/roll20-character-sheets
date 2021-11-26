@@ -184,7 +184,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let bonus = [];
   let OD = 0;
 
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
   let ODMALShaman = [];
   let ODMALBarbarian = [];
 
@@ -247,8 +247,6 @@ on('clicked:distanceRangerLongbow', async (info) => {
 
     if (hasArmure) { OD += C4OD; }
   }
-
-  exec.push(`{{vOD=${OD}}}`);
 
   // GESTION DES BONUS DES OD
   if (oDiscretion >= 2) {
@@ -570,7 +568,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -686,6 +684,8 @@ on('clicked:distanceRangerLongbow', async (info) => {
   }
 
   // FIN GESTION DU STYLE
+  OD -= MALBonus.ODMALWarrior;
+  exec.push(`{{vOD=${OD}}}`);
 
   if (cRoll.length === 0) { cRoll.push(0); }
 
