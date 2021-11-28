@@ -3882,15 +3882,14 @@
 	});
 
 	on('clicked:roll clicked:repeating_acitems:roll', (event) => {
-		console.log(event);
 
 		let rollPart = event.htmlAttributes.value;
 		let assignedSkill;
-		if (event.sourceAttribute && event.sourceAttribute.indexOf("repeating_acitems") === 0) {
+		if (event.sourceAttribute && event.sourceAttribute.startsWith("repeating_acitems")) {
 			let trigger = event.triggerName.slice(8);
 			let prefix = trigger.split('_').slice(0,3).join('_') + '_';
 			rollPart = rollPart.replaceAll('prefix-', `${prefix}`);
-			assignedSkill = 'repeating_acitems_'+prefix+'_Assigned_Skill';
+			assignedSkill = prefix+'Magic_Assigned_Skill';
 		} else {
 			const match = rollPart.match(/Magic_\d\d_Name/);
 			if (match) {
@@ -3915,6 +3914,7 @@
 				} else {
 					rollPart = rollPart.replace('{{roll=[[1d6]],[[1d6]]}}','').replace('{{roll=[[1d6]],[[1d6]],[[1d6]]}}','');
 				}
+				rollPart += "{{AssignedSkill=" + skill + "}}";
 			} else {
 				rollPart = rollPart.replace('{{roll=[[1d6]],[[1d6]]}}','').replace('{{roll=[[1d6]],[[1d6]],[[1d6]]}}','');
 			}
@@ -3948,7 +3948,6 @@
 							finishRoll(results.rollId,param);
 						});
 					} else {
-						log(param);
 						finishRoll(results.rollId,param);
 					}
 				} else {
