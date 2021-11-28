@@ -4374,8 +4374,8 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
+				<!-- current version notes: 2.6.9 -->
 				<ul>
-					<li>2.6.9</li>
 					<li>Melee and Ranged tables. Added success, critical success, fail, and critical fail notes. Requested by Mike.</li>
 					<li>Added RAW notes for melee and ranged attacked critical success and fail to roll results table. Requested by Mike.</li>
 					<li>Renamed Sheet option <b>Show Active Defense Notes</b> to <b>Show RAW Notes</b>.</li>
@@ -4390,6 +4390,11 @@
 								the calculation and then change it back.
 							</li>
 						</ul>
+					</li>
+					<li>
+						Bio/Misc Tab - Renamed <i>Miscellaneous</i> section to <i>TECH LEVEL</i> and added <i>Campaign Tech Level</i> and <i>Your Tech Level</i>. Import GCA4 will import the 
+						campaign tech level value and the character's tech level. <b>Suggestion: </b> Use High TL Advantage and Low TL Advantage to set the character's 
+						tech level, avoid using PTS for Your Tech Level.
 					</li>
 				</ul>
 				
@@ -6940,7 +6945,12 @@ and Advantages.
 			<div class="table">
 				<div class="header">
 					<div class="cell col0">
-						<span data-i18n="miscellaneous-label">Miscellaneous</span>
+						<div class="popup">
+							<span data-i18n="technology-level-label">Tech Level</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="technology-level-tooltip">Tech Level Modifiers (B168), Tech Levels (B511-514)</span>
+						</span>
 					</div>
 					<div class="cell col1">
 						<span data-i18n="abbreviation-character-points-label">Pts</span>
@@ -6948,37 +6958,21 @@ and Advantages.
 				</div> <!-- .header -->
 				<div class="row row-tech-level">
 					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="technology-level-label">Tech Level</span>
-						</div>
-						<span class="tooltip">
-							<span data-i18n="technology-level-tooltip">
-This is the technology level that your character is familiar with.<br />
-It costs 5 points to raise this above or below the campaign's<br />
-normal TL.
-<div class="sheet-clearfix"></div>
-<table style="text-align: left;">
-	<tbody>
-		<tr><td>TL0</td><td>Stone Age (Prehistory and later). </td></tr>
-		<tr><td>TL1</td><td>Bronze Age (3500 B.C.+).</td></tr>
-		<tr><td>TL2</td><td>Iron Age (1200 B.C.+).</td></tr>
-		<tr><td>TL3</td><td>Medieval (600 A.D.+).</td></tr>
-		<tr><td>TL4</td><td>Age of Sail (1450+).</td></tr>
-		<tr><td>TL5</td><td>Industrial Revolution (1730+).</td></tr>
-		<tr><td>TL6</td><td>Mechanized Age (1880+).</td></tr>
-		<tr><td>TL7</td><td>Nuclear Age (1940+).</td></tr>
-		<tr><td>TL8</td><td>Digital Age (1980+).</td></tr>
-		<tr><td>TL9</td><td>Microtech Age (2025+?).</td></tr>
-		<tr><td>TL10</td><td>Robotic Age (2070+?).</td></tr>
-		<tr><td>TL11</td><td>Age of Exotic Matter.</td></tr>
-		<tr><td>TL12+</td><td>Whatever the GM likes!</td></tr>
-	</tbody>
-</table>
-							</span>
-						</span>
+						<span data-i18n="campaign-technology-level-label">Campaign Tech Level</span>
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_tl" title="Macro name: tl" />
+						<input type="text" name="attr_campaign_tl" title="Macro name: @{campaign_tl}" />
+					</div>
+					<div class="cell col2">
+						&nbsp;
+					</div>
+				</div> <!-- .row -->
+				<div class="row row-tech-level">
+					<div class="cell col0 label">
+						<span data-i18n="your-technology-level-label">Your Tech Level</span>
+					</div>
+					<div class="cell col1">
+						<input type="text" name="attr_tl" title="Macro name: @{tl}" />
 					</div>
 					<div class="cell col2">
 						<input type="number" step="5" name="attr_tl_pts" value="0" title="Macro name: @{tl_pts}" />
@@ -13338,8 +13332,8 @@ visualize what it will look like in chat.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
+			<!-- current version notes: 2.6.9 -->
 			<ul>
-				<li>2.6.9</li>
 				<li>Melee and Ranged tables. Added success, critical success, fail, and critical fail notes. Requested by Mike.</li>
 				<li>Added RAW notes for melee and ranged attacked critical success and fail to roll results table. Requested by Mike.</li>
 				<li>Renamed Sheet option <b>Show Active Defense Notes</b> to <b>Show RAW Notes</b>.</li>
@@ -13354,6 +13348,11 @@ visualize what it will look like in chat.
 							the calculation and then change it back.
 						</li>
 					</ul>
+				</li>
+				<li>
+					Bio/Misc Tab - Renamed <i>Miscellaneous</i> section to <i>TECH LEVEL</i> and added <i>Campaign Tech Level</i> and <i>Your Tech Level</i>. Import GCA4 will import the 
+					campaign tech level value and the character's tech level. <b>Suggestion: </b> Use High TL Advantage and Low TL Advantage to set the character's 
+					tech level, avoid using PTS for Your Tech Level.
 				</li>
 			</ul>
 
@@ -23086,7 +23085,7 @@ visualize what it will look like in chat.
 			        ];
 			        
 			    getAttrs(attributes, function(values) {
-			        
+			        note
 			        let repeatingTableToUse = "";
 			        
 			        let rowTypeValue = values[rowType];
@@ -27547,7 +27546,11 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 
 		let basePoints = Number(campaign.basepoints);
 
+		const jsonTL = getTraitFromGcaAttributes(attributes, "Tech Level");
+
 		let baseTL = Number(campaign.basetl);
+
+		let characterTL = baseTL;
 
 		let miscNotes = "";
 
@@ -27585,6 +27588,10 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 
 		if (jsonStatus && jsonStatus.score) {
 			status = jsonStatus.score;
+		}
+
+		if (jsonTL && jsonTL.score) {
+			characterTL = Number(jsonTL.score);
 		}
 
 		if (jsonMonthlyPay && jsonMonthlyPay.score) {
@@ -27664,7 +27671,8 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 			size:                  sizeModifier,
 			age:                   general.age,
 			total_points:          basePoints,
-			tl:	                   baseTL,
+			campaign_tl:	       baseTL,
+			tl:					   characterTL,
 			status:				   status,
 			wealth:				   "Average",
 			strength_points:       strPts,
