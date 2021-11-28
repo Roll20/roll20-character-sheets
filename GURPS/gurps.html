@@ -4379,6 +4379,11 @@
 					<li>Melee and Ranged tables. Added success, critical success, fail, and critical fail notes. Requested by Mike.</li>
 					<li>Added RAW notes for melee and ranged attacked critical success and fail to roll results table. Requested by Mike.</li>
 					<li>Renamed Sheet option <b>Show Active Defense Notes</b> to <b>Show RAW Notes</b>.</li>
+					<li>
+						Repeating skills, techniques, and spells code has been changed from <i>auto-calculated</i> to <i>sheet worker script.</i>
+						This allows checking for triggers/changes and fields are only updated when a change is made. Should help speed 
+						up the charactersheet a tiny bit and easier coding.
+					</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -8017,8 +8022,7 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="text" name="attr_tl" title="Macro table name: repeating_skills. Field name: tl" />
 						</div>
 						<div class="cell col3">
-							<input type="hidden" name="attr_level_mirror" value="0" /> 
-							<input type="text" name="attr_level" title="Macro table name: repeating_skills. Field name: level" disabled="disabled" value="@{base} + @{difficulty} + @{bonus} + (floor(((@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) * 0.25) + 2) * ceil( ( ( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2 ) + abs( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2) ) / 256 ) + (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) * abs( ceil( ( ( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2 ) + abs( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2) ) / 256 ) - 1 ))"/>
+							<input type="text" name="attr_level" title="Macro table name: repeating_skills. Field name: level" readonly="readonly" value="10"/>
 						</div>
 						<div class="cell col4">
 							<select name="attr_base" title="Macro table name: repeating_skills. Field name: base">
@@ -8483,7 +8487,6 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="number" name="attr_points" value="0" title="Macro table name: repeating_techniquesrevised. Field name: points" />
 						</div>
 						<div class="cell col8">
-							<input type="hidden" name="attr_level_mirror" value="@{level}" /> 
 							<input type="text" name="attr_level" readonly="readonly" title="Macro table name: repeating_techniquesrevised. Field name: level" value="10"/>
 						</div>
 						<div class="cell col9">
@@ -13083,8 +13086,9 @@ visualize what it will look like in chat.
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Spell Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{spell_roll_modifier}, @{spell_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_spell_modifier_tool}]]}} {{maxNine=[[@{spell_roll_max_nine}]]}} {{rollModifier=[[@{spell_roll_modifier}]]}} {{rollModifierSummary=@{spell_roll_modifier_summary}}} {{rollTraitSummary=@{spell_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{castingTime=@{casttime}}} {{castingDuration=@{duration}}} {{castingCost=@{cost}}} {{castingMaintain=@{maintain}}} {{castingResist=@{spell_resisted_by}}} {{castingClass=@{spell_class}}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{spell_success_note}}} {{customCriticalSuccessNote=@{spell_critical_success_note}}} {{customFailNote=@{spell_fail_note}}} {{customCriticalFailNote=@{spell_critical_fail_note}}} {{spellRoll=true}} {{spellCriticalSuccessNote=@{spell_critical_success_notes}}} {{spellFailNote=@{spell_fail_notes}}} {{spellCriticalFailureNote=@{spell_critical_failure_notes}}} {{showCastingDetails=[[@{show_casting_details}]]}} {{showSpellNotes=[[@{show_spell_notes}]]}} {{spellNotes=@{spell_notes}}}" name="roll_vsSL" />
 						</div>
 						<div class="cell col2">
-							<input type="hidden" name="attr_level_mirror" value="0" />
-							<input type="text" name="attr_level" title="Macro table name: repeating_spells. Field name: level" disabled="disabled" value="@{spell_base} + @{difficulty} +@{spell_modifier} + @{spell_bonus} + (floor((@{points} * 0.25) + 2) * ceil( ( ( @{points} - 2 ) + abs( @{points} - 2) ) / 256 ) + @{points} * abs( ceil( ( ( @{points} - 2 ) + abs( @{points} - 2) ) / 256 ) - 1 ))"/>
+							<input type="text" name="attr_level" title="Macro table name: repeating_spells. Field name: level" readonly="readonly" value="10"/>
+							<!-- TODO: replace this hidden field with a drop-down instead of using one dorp-down for all spells!  -->
+							<input type="hidden" name="attr_base" value="10" />
 						</div>
 						<div class="cell col3">
 							<select name="attr_difficulty" title="Macro table name: repeating_spells. Field name: difficulty">
@@ -13093,6 +13097,8 @@ visualize what it will look like in chat.
 							</select>
 						</div>
 						<div class="cell col4">
+							<!-- TODO: its possible that a character could have different types, maybe add drop-down for spell bonus -->
+							<input type="hidden" name="attr_bonus" value="0" title="Synced with attr_spell_bonus, reduces code" />
 							<input type="number" name="attr_spell_modifier" value="0" title="Macro table name: repeating_spells. Field name: spell_modifier" />
 						</div>
 						<div class="cell col5">
@@ -13330,6 +13336,11 @@ visualize what it will look like in chat.
 				<li>Melee and Ranged tables. Added success, critical success, fail, and critical fail notes. Requested by Mike.</li>
 				<li>Added RAW notes for melee and ranged attacked critical success and fail to roll results table. Requested by Mike.</li>
 				<li>Renamed Sheet option <b>Show Active Defense Notes</b> to <b>Show RAW Notes</b>.</li>
+				<li>
+					Repeating skills, techniques, and spells code has been changed from <i>auto-calculated</i> to <i>sheet worker script.</i>
+					This allows checking for triggers/changes and fields are only updated when a change is made. Should help speed 
+					up the charactersheet a tiny bit and easier coding.
+				</li>
 			</ul>
 
 			<h4>Version: 2.6.8</h4>
@@ -16043,18 +16054,18 @@ visualize what it will look like in chat.
     </rolltemplate>
     
 </div>
-
+ 
 <script type="text/worker">
 	 
 	// this type is required by roll20, be sure to set before uploading
 	// type="text/worker"
 	
-	// if using VS code or similar coding tool, use the type listed below
+	// if using VS code or similar coding tool, use the type listed below or just delete type="text/worker"
 	// type="application/javascript"
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.6.9";
+	var version = "2.6.9.11";
 
 	var latestChangesDate = "11/17/2021";
 
@@ -17079,40 +17090,15 @@ visualize what it will look like in chat.
 
 		updateRepeatingDefenseNotes();
 		
-		// use underscore wrap to update skills, then update melee/ranged linked skills
-		runUpdateRepeatingSkillLevels = _.wrap(updateRepeatingSkillLevels, function() {
-		    
-		    thenUpdateLinkedAttacksSkills(); 
-		    
-		});
+		updateRepeatingSkillLevels(thenUpdateLinkedItems());
 		
-		runUpdateRepeatingSkillLevels();
+		syncModsToRepeatingSpells(thenUpdateLinkedItems());
 		
-		runUpdateRepeatingSpellLevels = _.wrap(updateRepeatingSpellLevels, function() {
-		    
-		    thenUpdateLinkedAttacksSpells(); 
-		    
-		});
-		
-		runUpdateRepeatingSpellLevels();
-
 		updateHitPointThresholds();
 			
 	}
 	
-	function thenUpdateLinkedAttacksSkills() {
-		
-	    updateLinkedSkills("repeating_melee", "melee");
-    
-        updateLinkedSkills("repeating_ranged", "ranged");
-		
-		updateLinkedSkills("repeating_techniquesrevised", "technique");
-
-		updateLinkedSkills("repeating_defense", "defense");
-
-	}
-
-	function thenUpdateLinkedAttacksSpells() {
+	function thenUpdateLinkedItems() {
 		
 	    updateLinkedSkills("repeating_melee", "melee");
     
@@ -17850,31 +17836,53 @@ visualize what it will look like in chat.
 	// if skill removed, update total skill points
 	on('remove:repeating_skills', (event) => {
 
-		console.group("remove:repeating_skills");
-		console.info("event: ", event);
-		console.groupEnd();
-		
 		sumRepeating('repeating_skills', 'points', function(v) {
 			setAttrs({ skills_points: v }, {silent: true});
 		});
 		
 	});
 
-	// Update the total cost of Skills
-	on('change:repeating_skills:points change:repeating_skills:bonus change:repeating_skills:difficulty', function (e) {
-	    
-		// checkForWildCardSkill(e);
-        getAttrs(['repeating_skills_points', 'repeating_skills_difficulty'], function (skill) {
+	// if spell level is updated, updated linked combat or techniques. 
+	on("change:repeating_spells:level", event => {
+
+		const rowId = getRowIdFromEventInfo(event, "repeating_spells");
+
+		updateSectionSkillsLinkedToUpdatedRow(rowId);
+
+	});
+
+	// Update the skill level and update the total cost of Skills 
+	on('change:repeating_skills:base change:repeating_skills:difficulty change:repeating_skills:bonus change:repeating_skills:points', (event) => {
+
+		let fieldValues = [
+			"repeating_skills_base", 
+			"repeating_skills_difficulty", 
+			"repeating_skills_bonus", 
+			"repeating_skills_points", 
+			"strength",
+			"dexterity",
+			"intelligence",
+			"health",
+			"perception",
+			"willpower"
+		];
+
+		getAttrs(fieldValues, (values) => {
             		
-			let skill_points = +skill.repeating_skills_points;
+			const baseLevel = getBaseSkillLevel(values.repeating_skills_base, values);
+
+			let difficulty = values.repeating_skills_difficulty;
+
+			const bonus = Number(values.repeating_skills_bonus);
+
+			const skill_points = Number(values.repeating_skills_points);
 		
-			let adjusted_points = 0;
-			
 			let use_wildcard_points = 0;
 			
-			let use_normal_skill = 0; 
-			
-			if (String(skill.repeating_skills_difficulty) == "-5 + 1") {
+			let use_normal_points = 0; 
+
+			// check for wildcard difficulty
+			if (String(values.repeating_skills_difficulty) == "-5 + 1") {
 				
 				use_wildcard_points = 1;
 				
@@ -17890,6 +17898,8 @@ visualize what it will look like in chat.
 					wildcard_skill_points = Math.floor(skill_points/3);
 					
 				}
+
+				difficulty = -4;
 				
 			} else {
 				
@@ -17897,23 +17907,103 @@ visualize what it will look like in chat.
 				
 				use_normal_points = 1;
 				
-				wildcard_skill_points = skill.repeating_skills_points;
+				wildcard_skill_points = Number(values.repeating_skills_points);
+
+				difficulty = Number(difficulty);
 				
 			}
-			
-			setAttrs({
+
+			const finalSkillLevel = getSkillLevelUsingRaw(baseLevel, difficulty, bonus, wildcard_skill_points, use_wildcard_points, skill_points, use_normal_points);
+
+			const fieldsToUpdate = {
 				repeating_skills_wildcard_skill_points: wildcard_skill_points,
 				repeating_skills_use_wildcard_points: use_wildcard_points,
-				repeating_skills_use_normal_points: use_normal_points
-			} 
-			, {silent: true}
+				repeating_skills_use_normal_points: use_normal_points,
+				repeating_skills_level: finalSkillLevel
+			};
+
+			// if the skill level changes, this will trigger 
+			// the change event to update items linked to that skill; see `on("change:repeating_skills:level")`
+			setAttrs(fieldsToUpdate 
+			, null
 			, sumRepeating('repeating_skills', 'points', function(v) {
 			    setAttrs({ skills_points: v });
 		    	})
-			);			
-			
+			);
+
 		});
 		
+	});
+
+	on("change:repeating_skills:level", (event) => {
+
+		const rowId = getRowIdFromEventInfo(event, "repeating_skills");
+
+		updateSectionSkillsLinkedToUpdatedRow(rowId);
+
+	});
+
+	// keep "spell based on:" and "Magery/PI/Bonus Level" synced with repeating fields
+	// this avoids having to do a lot of coding to get the id of the row
+	// NOTE: this will trigger updating the spell level. 
+	on("change:spell_base change:spell_bonus", event => {
+
+		syncModsToRepeatingSpells();
+
+	});
+
+	// Update the spell level and update the total cost of spells 
+	on('change:repeating_spells:base change:repeating_spells:bonus change:repeating_spells:difficulty change:repeating_spells:spell_modifier change:repeating_spells:points', (event) => {
+
+		let fieldValues = [
+			"repeating_spells_base", 
+			"repeating_spells_bonus", 
+			"repeating_spells_difficulty", 
+			"repeating_spells_spell_modifier", 
+			"repeating_spells_points", 
+			"strength",
+			"dexterity",
+			"intelligence",
+			"health",
+			"perception",
+			"willpower"
+		];
+
+		getAttrs(fieldValues, (values) => {
+
+			const baseLevel = getBaseSkillLevel(values.repeating_spells_base, values);
+
+			let difficulty = Number(values.repeating_spells_difficulty);
+
+			const bonus = Number(values.repeating_spells_bonus);
+
+			const modifier = Number(values.repeating_spells_spell_modifier);
+
+			let totalModifier = bonus + modifier;
+
+			if (isNaN(totalModifier)) {
+				totalModifier = 0;
+			}
+
+			const skill_points = Number(values.repeating_spells_points);
+
+			const finalSkillLevel = getSkillLevelUsingRaw(baseLevel, difficulty, bonus, 0, 0, skill_points, 1);
+
+			const fieldsToUpdate = {
+				repeating_spells_level: finalSkillLevel
+			};
+
+			// if the skill level changes, this will trigger 
+			// the change event to update items linked to that skill; see `on("change:repeating_skills:level")`
+			setAttrs(fieldsToUpdate 
+			, null
+			, sumRepeating('repeating_spells', 'points', function(v) {
+				setAttrs({ spells_points: v });
+				})
+			);
+
+		});
+
 	});
 
 	// if toggle is clicked, update the display id.
@@ -17984,7 +18074,7 @@ visualize what it will look like in chat.
 	});
 	
 	// Update the total cost of Spells
-	on('change:repeating_spells:points remove:repeating_spells', function (e) {
+	on('remove:repeating_spells', function (e) {
 		sumRepeating('repeating_spells', 'points', function(v) {
 			setAttrs({ spells_points: v }, {silent: true});
 		});
@@ -21803,29 +21893,7 @@ visualize what it will look like in chat.
         
         return penalty;
     }
-    
-    // check if skill level mirror changed, if so update repeating sections that match the item that changed
-    on("change:repeating_skills:level_mirror", function(event) {
-
-		console.group("change:repeating_skills:level_mirror");
-		console.info("event: ", event);
-		console.groupEnd();
-          
-        var rowId = getRowIdFromEventInfo(event, "repeating_skills");
         
-        updateSectionSkillsLinkedToUpdatedRow(rowId);
-        
-    });
-    
-    // check if spell level mirror changed
-    on("change:repeating_spells:level_mirror", function(event) {
-        
-		var rowId = getRowIdFromEventInfo(event, "repeating_spells");
-        
-		updateSectionSkillsLinkedToUpdatedRow(rowId);
-        
-	});
-	
 	// check if technique level changed
 	on("change:repeating_techniquesrevised:level", function(event) {
         
@@ -22046,7 +22114,7 @@ visualize what it will look like in chat.
         
         var rowId = "";
         
-        // example: repeating_skills_-l6zk36zhcjhsyvc-kax_level_mirror
+        // example: repeating_skills_-l6zk36zhcjhsyvc-kax_level
         var sourceAttr = event.sourceAttribute;
 		
 		if (sourceAttr) {
@@ -22054,7 +22122,7 @@ visualize what it will look like in chat.
 			// remove the sectionname
 			var regReplace = new RegExp(sectionName+ '_', "ig");
 			
-			// example: -l6zk36zhcjhsyvc-kax_level_mirror
+			// example: -l6zk36zhcjhsyvc-kax_level
 			sourceAttr = sourceAttr.replace(regReplace, "");
 			
 			// now split by the _
@@ -22073,7 +22141,7 @@ visualize what it will look like in chat.
 
 	/**
 	 * finds the row id for row field key for a repeating section name
-	 * example:  repeating_skills_-l6zk36zhcjhsyvc-kax_level_mirror
+	 * example:  repeating_skills_-l6zk36zhcjhsyvc-kax_level
 	 * 
 	 * @param object fieldKey    Field Key name
 	 * @param string sectionName The name of a repeating section
@@ -22082,13 +22150,13 @@ visualize what it will look like in chat.
 		
 		let rowId = "";
 
-		// repeating_skills_-l6zk36zhcjhsyvc-kax_level_mirror
+		// repeating_skills_-l6zk36zhcjhsyvc-kax_level
 		if (fieldKey) {
 
 			// remove the sectionname
 			var regReplace = new RegExp(sectionName+ '_', "ig");
 			
-			// example: -l6zk36zhcjhsyvc-kax_level_mirror
+			// example: -l6zk36zhcjhsyvc-kax_level
 			fieldKey = fieldKey.replace(regReplace, "");
 			
 			// now split by the _
@@ -22404,16 +22472,12 @@ visualize what it will look like in chat.
 	function updateLinkedWeaponSkillByRepeatingRow(sectionName, weaponSkillFieldName, skillMessageFieldName, skillMessageFieldLevel, skillRowIdToggleFieldName, parentFieldName, baseSkillFieldName, repeatingTableToUse, skillRowId, skillMod, defenseType, talentLevel, callback)
 	{
 		// if it's a good row id, let's update stuff
-		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
+		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
 		        
 		let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
 		
-		// if we're getting values from the techniques table, don't use level_mirror
-		if (repeatingTableToUse == "repeating_techniquesrevised" ) {
-
-			skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
-		
-		} else if (repeatingTableToUse == "repeating_melee") {
+		// TODO: update linked defensive skills!
+		if (repeatingTableToUse == "repeating_melee" || repeatingTableToUse == "repeating_ranged") {
 
 			skillFieldName = `${repeatingTableToUse}_${skillRowId}_skill`;
 
@@ -22704,17 +22768,10 @@ visualize what it will look like in chat.
 	function updateLinkedKnockbackSkillByTable(repeatingTableToUse, skillRowId, rowType, callback)
 	{
 		// if it's a good row id, let's update stuff
-		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
+		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
 		        
 		let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
 		
-		// if we're getting values from the techniques table, don't use level_mirror
-		if (repeatingTableToUse == "repeating_techniquesrevised") {
-
-			skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
-		
-		}
-
 		// update the skill level for weapon.
 		getAttrs([skillFieldName, skillFieldNameOfSkill], function(skillValues) {
 
@@ -22749,11 +22806,13 @@ visualize what it will look like in chat.
 	 * This function is used to make sure the repeating 
 	 * skill levels are updated when the version has changed
 	 */
-	function updateRepeatingSkillLevels() {
+	function updateRepeatingSkillLevels(callback) {
 	    
-	    var sectionName = "repeating_skills";
+		callback = callback || noop;
+
+		let sectionName = "repeating_skills";
 	    
-	    getSectionIDs(sectionName, function(ids) {
+	    getSectionIDs(sectionName, function(ids, callback) {
 	        
 	        updateSkillLevel(sectionName, ids);
 	        
@@ -22762,28 +22821,29 @@ visualize what it will look like in chat.
 	}
 	
 	/**
-	 * Update the mirrored skill level when any field
-	 * is updated for skill or spell
+	 * Ensures skill levels are correct when loading 
+	 * a new version of the sheet. This is needed, since the
+	 * skill levels were converted auto-calculating fields to 
+	 * sheet workers. This code ensures older sheets have the 
+	 * correct skill levels when the sheet loads.
 	 */
-	function updateSkillLevel(sectionName, ids) {
-	    
+	function updateSkillLevel(sectionName, ids, callback) {
+
         _.each(ids,function(id) {
             
-            var rowId = id;
+            const baseFieldName = `${sectionName}_${id}_base`;
 	        
-	        var baseFieldName = `${sectionName}_${id}_base`;
+	        const difficultyFieldName = `${sectionName}_${id}_difficulty`;
 	        
-	        var difficultyFieldName = `${sectionName}_${id}_difficulty`;
+	        const bonusFieldName = `${sectionName}_${id}_bonus`;
 	        
-	        var bonusFieldName = `${sectionName}_${id}_bonus`;
+	        const wildcardSkillPointsFieldName = `${sectionName}_${id}_wildcard_skill_points`;
 	        
-	        var wildcardSkillPointsFieldName = `${sectionName}_${id}_wildcard_skill_points`;
+	        const useWildcardPointsFieldName = `${sectionName}_${id}_use_wildcard_points`;
 	        
-	        var useWildcardPointsFieldName = `${sectionName}_${id}_use_wildcard_points`;
+	        const pointsFieldName = `${sectionName}_${id}_points`;
 	        
-	        var pointsFieldName = `${sectionName}_${id}_points`;
-	        
-	        var useNormalPointsFieldName = `${sectionName}_${id}_use_normal_points`;
+	        const useNormalPointsFieldName = `${sectionName}_${id}_use_normal_points`;
 	        
             fields = [
 	            baseFieldName,
@@ -22803,36 +22863,36 @@ visualize what it will look like in chat.
 	        
 	        getAttrs(fields, function(values) {
 	            
-	            var base = getBaseSkillLevel(values[baseFieldName], values);
+	            const base = getBaseSkillLevel(values[baseFieldName], values);
 	            
-	            var difficulty = values[difficultyFieldName];
+	            let difficulty = values[difficultyFieldName];
 	            
-	            var bonus = +values[bonusFieldName];
+	            const bonus = Number(values[bonusFieldName]);
 	            
-	            var wildcardSkillPoints = +values[wildcardSkillPointsFieldName];
+	            const wildcardSkillPoints = Number(values[wildcardSkillPointsFieldName]);
 	            
-	            var useWildcardSkillPoints = +values[useWildcardPointsFieldName];
+	            const useWildcardSkillPoints = Number(values[useWildcardPointsFieldName]);
 	            
-	            var points = +values[pointsFieldName];
+	            const points = Number(values[pointsFieldName]);
 	            
-	            var useNormalPoints = +values[useNormalPointsFieldName];
+	            const useNormalPoints = Number(values[useNormalPointsFieldName]);
 	            
 	            // check for wildcard
 	            if ( String(difficulty) === "-5 + 1") {
 	                difficulty = -4;
 	            } else {
-	               difficulty = +difficulty; 
+	               difficulty = Number(difficulty); 
 	            }
 	            
-	            var skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, wildcardSkillPoints, useWildcardSkillPoints, points, useNormalPoints);
+	            const skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, wildcardSkillPoints, useWildcardSkillPoints, points, useNormalPoints);
 	            
-	            var fieldToUpdate = `${sectionName}_${rowId}_level_mirror`;
+	            const fieldToUpdate = `${sectionName}_${id}_level`;
 	            
-	            var updateFields = {};
+	            let updateFields = {};
 	            
 	            updateFields[fieldToUpdate] = skillLevel;
 	            
-	            setAttrs(updateFields, {silent: false});
+	            setAttrs(updateFields, {silent: false}, callback);
 	            
 	        });
 	        
@@ -22842,32 +22902,32 @@ visualize what it will look like in chat.
 
 	function getBaseSkillLevel(baseFieldName, values) {
 	    
-	    var baseLevel = 10;
+	    let baseLevel = 10;
 	    
 	    switch(baseFieldName) {
 	        
 	        case "@{strength}":
-	            baseLevel = +values.strength;
+	            baseLevel = Number(values.strength);
 	            break;
 	        
 	        case "@{dexterity}":
-	            baseLevel = +values.dexterity;
+	            baseLevel = Number(values.dexterity);
 	            break;
 	            
 	        case "@{intelligence}":
-	            baseLevel = +values.intelligence;
+	            baseLevel = Number(values.intelligence);
 	            break;
 	            
 	        case "@{health}":
-	            baseLevel = +values.health;
+	            baseLevel = Number(values.health);
 	            break;
 	            
 	        case "@{willpower}":
-	            baseLevel = +values.willpower;
+	            baseLevel = Number(values.willpower);
 	            break;
 	           
 	        case "@{perception}":
-	            baseLevel = +values.perception;
+	            baseLevel = Number(values.perception);
 	            break;
 	            
 	        default:
@@ -22875,87 +22935,61 @@ visualize what it will look like in chat.
 	            break;
 	            
 	    }
+
+		if (isNaN(baseLevel)) {
+			baseLevel = 10;
+		}
 	    
 	    return baseLevel;
 	}
 	
 	/**
-	 * This function is used to make sure the repeating 
-	 * skill levels are updated when the version has changed
+	 * Syncs `attr_spell_base` and `attr_spell_bonus` to 
+	 * corresponding repeating_spells fields. This will
+	 * trigger updating the spell level at the same time.
 	 */
-	function updateRepeatingSpellLevels() {
-	    
-	    var sectionName = "repeating_spells";
-	    
-	    // get the base spell level and bonus
-	    getAttrs(["spell_base", "spell_bonus"], function(values) {
-	        
-	        var spellBase = values.spell_base;
-	        
-	        var spellBonus = parseInt(values.spell_bonus);
-	        
-	        if ( isNaN(spellBonus) ) {
-	            spellBonus = 0;
-	        }
-	        
-    	    getSectionIDs(sectionName, function(ids) {
-    	        
-    	        updateSpellLevel( sectionName, ids, spellBase, spellBonus );
-    	        
-    	    });    
-	        
-	    });
-	     
-	}
+	function syncModsToRepeatingSpells(callback) {
 
-	function updateSpellLevel(sectionName, ids, spellBase, spellBonus) {
+		callback = callback || noop;
+
+		const fields = [
+			"spell_base", 
+			"spell_bonus",
+			"strength",
+			"dexterity",
+			"intelligence",
+			"health",
+			"perception",
+			"willpower"
+		];
 	    
-	    _.each(ids,function(id) {
-            
-            var rowId = id;
-	        
-	        var difficultyFieldName = `${sectionName}_${id}_difficulty`;
-	        
-	        var bonusFieldName = `${sectionName}_${id}_spell_modifier`;
-	        
-	        var pointsFieldName = `${sectionName}_${id}_points`;
-	        
-            fields = [
-	            difficultyFieldName,
-	            bonusFieldName,
-	            pointsFieldName,
-	            "strength",
-	            "dexterity",
-	            "intelligence",
-	            "health",
-	            "perception",
-	            "willpower"
-	        ];
-	        
-	        getAttrs(fields, function(values) {
-	            
-	            var base = getBaseSkillLevel(spellBase, values);
-	            
-	            var difficulty = +values[difficultyFieldName];
-	            
-	            var bonus = +values[bonusFieldName] + spellBonus;
-	            
-	            var points = +values[pointsFieldName];
-	            
-	            var skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, 0, false, points, true);
-	            
-	            var fieldToUpdate = `${sectionName}_${rowId}_level_mirror`;
-	            
-	            var updateFields = {};
-	            
-	            updateFields[fieldToUpdate] = skillLevel;
-	             
-	            setAttrs(updateFields, {silent: false});
-	            
-	        });
-	        
-	    });
-	    
+	    getAttrs(fields, values => {
+
+			const baseLevel = String(values.spell_base);
+
+			const bonus = Number(values.spell_bonus);
+
+			const sectionName = "repeating_spells";
+
+			getSectionIDs(sectionName, function (ids) {
+				
+				if (ids.length === 0 ) {
+					return;
+				}
+				
+				let fieldsToUpdate = {};
+				
+				for (let i = 0; i < ids.length; i++) {
+					fieldsToUpdate[`${sectionName}_${ids[i]}_base`] = baseLevel;
+					fieldsToUpdate[`${sectionName}_${ids[i]}_bonus`] = bonus;
+				}
+
+				setAttrs(fieldsToUpdate, null, callback);
+				
+			});
+
+		});
+	     
 	}
 	
 	/**
@@ -22969,9 +23003,16 @@ visualize what it will look like in chat.
 	 */
 	function getSkillLevelUsingRaw(base, difficulty, bonus, wildcardSkillPoints, useWildcardSkillPoints, points, useNormalPoints) {
 	    
-	    var skill = 10;
+	    let skill = 10;
 	    
-	    var skillPoints = 0;
+	    let skillPoints = 0;
+
+		// make sure we have a number.
+		difficulty = Number(difficulty);
+
+		if (isNaN(difficulty)) {
+			difficulty = 0;
+		}
 	    
 	    // determine which points to use
 	    if (useNormalPoints) {
@@ -22984,7 +23025,7 @@ visualize what it will look like in chat.
 	        
 	    }
 	    
-	    var levelFromPoints = Math.floor((skillPoints * 0.25) + 2)
+	    const levelFromPoints = Math.floor((skillPoints * 0.25) + 2)
                               * Math.ceil( ( ( skillPoints - 2 ) + Math.abs( skillPoints - 2) ) / 256 ) 
                               + skillPoints 
                               * Math.abs( Math.ceil( ( ( skillPoints - 2 ) + Math.abs( skillPoints - 2) ) / 256 ) - 1 );
@@ -23072,7 +23113,7 @@ visualize what it will look like in chat.
         		    } else {
         		        
         		        // if there's a row id, let's update stuff
-        		        let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
+        		        let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
         		        
         		        let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
         		        
@@ -23143,9 +23184,10 @@ visualize what it will look like in chat.
         return arr;
     }
     
-	// method to reduce async calls.
+	// method to reduce code
 	['on','maintained'].forEach(onormaintained => {
 		
+		// calculates the spell penalties for either ON or Concentrated
 		on(`change:repeating_spells:spell_${onormaintained}_checked change:penalty_per_spell_${onormaintained} remove:repeating_spells`, function (event) {
 		
 			getSectionIDs('repeating_spells', ids => {
