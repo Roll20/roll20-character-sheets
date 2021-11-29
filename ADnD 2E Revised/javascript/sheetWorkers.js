@@ -522,7 +522,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
                     [`repeating_spells-${section}_spell-healing`]      : '',
                     [`repeating_spells-${section}_spell-materials`]    : '',
                     [`repeating_spells-${section}_spell-reference`]    : '',
-                    [`repeating_spells-${section}_spell-effect`]       : `The book **${spell['book']}** is currently not active on your sheet.\nGo to the **Settings** and activate the book (if your DM allows for its usage)`
+                    [`repeating_spells-${section}_spell-effect`]       : `The book **${spell['book']}** is currently not active on your sheet.\nGo to the **Sheet Settings** and activate the book (if your DM allows for its usage)`
                 }
                 setAttrs(errorMessage);
                 return;
