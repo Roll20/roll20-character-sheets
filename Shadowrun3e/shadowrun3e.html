@@ -8366,6 +8366,7 @@ on("change:deckattacklevel", function() {
 		gets.push(myrepeat.concat("ic-penalty"));
 		gets.push(myrepeat.concat("matrix-iconstatus"));
 		getAttrs(gets, function (myval) {
+			var myroll;
 			var myatt="@{target|" + lang["target"] +"|deck-evasion-final}";
 			const name=myval[myrepeat.concat("icname")];
 			const ictype=myval[myrepeat.concat("ictype")];
@@ -8380,15 +8381,13 @@ on("change:deckattacklevel", function() {
 			if ( (icmode=="proactive") && (ictest.includes("target")) ) targetatt=ictest.split("-")[1];
 			const attacktn =matrixtn[code][targeticon];
 			var senddata="{{senddata=[[0]]}}";
-                	var myroll="&{template:matrix}{{myname=" + name + "}}";
 			var action=lang["attack"];
 			if ( icmode=="proactive" ) {
+                		myroll="&{template:matrix}{{myname=" + name + "}}";
 				ictest=attacktn;
-			} else if ( ictype == "Probe" ) {
-				ictest="@{target|" + lang["decker"] + "|deck-detection-final}";
-				senddata="";
-				action=lang["probe"];
 			} else {
+                		myroll="/w gm &{template:matrix}{{myname=" + name + "}}";
+				myroll += "{{sensor=[[[[@{target|" + lang["decker"] + "|deck-sensors-final}]]d6>[[" + rating + " + @{target|" + lang["decker"] + "|matrix-penalty} ]]!!]]}}";
 				ictest="?{" + lang["utility-rating"] + "?|6}";
 			}
 			const payload = {
@@ -8410,14 +8409,23 @@ on("change:deckattacklevel", function() {
 			var calcDice="@{matrixsecurityrating}"
 			if (( ictype == "Probe") || (ictype == "Scramble"))  calcDice=rating;
 			myroll+=target;
-			myroll+=senddata;
 			myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
 			myroll+="{{basetn=[[" + myatt + "]]}}";
 			myroll+="{{action=" + action + "}}"
 			myroll+="{{roll= [[ [[" + calcDice + "]]d6>[[ {2,(" + calcTN + ")}kh1]]!! ]] }}"
-			if ( icmode=="proactive" ) myroll+="{{wdmg=[[" + matrixtn[code]["wdmg"] + "]]}}";
+			if ( icmode=="proactive" ) { 
+				myroll+="{{wdmg=[[" + matrixtn[code]["wdmg"] + "]]}}";
+				myroll+=senddata;
+			}
+			if ( ictype == "Probe") {
+				myroll += "{{target=@{target|" + lang["decker"] + "|token_name}}}";
+				myroll += "{{targetnumber=[[@{target|" + lang["decker"] + "|deck-detection-final}]]}}";
+				myroll += "{{action=" + lang["probe"] + "}}";
+				myroll += "{{basetn=[[0]]}}";
+				myroll += "{{rolldice=[[ " + rating + "]]}}";
+				myroll += "{{roll=[[[[" + rating +" ]]d6>[[ @{target|" + lang["decker"] + "|deck-detection-final} + " + penalty +"]]!!]]}}";
+			}
 			if (( ictype == "Tar Baby") || (ictype == "Tar pit")) {
-                		myroll="/w gm &{template:matrix}{{myname=" + name + "}}";
 				myroll += "{{target=@{target|" + lang["decker"] + "|token_name}}}";
 				myroll += "{{targetnumber=[[?{" + lang["utility-rating"] + "?|4}]]}}";
 				myroll += "{{action=" + name + " Test}}";
@@ -8425,7 +8433,6 @@ on("change:deckattacklevel", function() {
 				myroll += "{{rolldice=[[ " + rating + "]]}}";
 				myroll += "{{roll=[[[[" + rating +" ]]d6>[[?{" + lang["utility-rating"] + "?} + " + penalty +"]]!!]]}}";
 				myroll += "{{oppose=[[[[?{" + lang["utility-rating"] + "?}]]d6>[[" + rating + " @{target|" + lang["decker"] + "|matrix-penalty}]]!!]]}}";
-				myroll += "{{sensor=[[[[@{target|" + lang["decker"] + "|deck-sensors-final}]]d6>[[" + rating + " + @{target|" + lang["decker"] + "|matrix-penalty} ]]!!]]}}";
 			}
 			console.log(myroll);
 			const finalwdmg=(iclist["attack"].includes(ictype))? damagetable[matrixtn[code]["wdmg"]] : "";
@@ -8769,6 +8776,7 @@ var setmatrixsystem = function (rating) {
 	atts["matrixcode"]=finalcode;
 	atts["matrixsecurityrating"]=system;
 	atts["matrixcontrolrating"]=control;
+	atts["matrixaccessrating"]=access;
 	atts["matrixindexrating"]=index;
 	atts["matrixfilesrating"]=files;
 	atts["matrixslaverating"]=slave;
