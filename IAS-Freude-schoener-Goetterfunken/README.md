@@ -1,25 +1,27 @@
 # Allgemein
 
-Dieser Bogen für das Setting **Freude schöner Götterfunke** unter dem Regelwerk **Icarus Adventure System** entstand als Communityprojekt in direkter Zusammenarbeit mit Donnerhaus.
-Das projekt wurde inspieriert von Hitdice, die auch den Entwicklungsprozess in verschiedenen YouTube-Videos begleitet haben.
+Dieser Bogen für das Setting **Freude, schöner Götterfunke** unter dem Regelwerk **Icarus Adventure System** entstand als Communityprojekt in direkter Zusammenarbeit mit Donnerhaus.
+Das Projekt wurde inspiriert von Hitdice, die auch den Entwicklungsprozess in verschiedenen YouTube-Videos begleitet haben.
 
-Donnerhaus: https://www.donnerhaus.eu/
-Icarus Adventure System: https://www.donnerhaus.eu/spiele/icarus/
-Freude schöner Götterfunke: https://www.donnerhaus.eu/spiele/freude/
-
-Hitdice: https://www.youtube.com/c/hitdice
+- Donnerhaus: https://www.donnerhaus.eu/
+- Icarus Adventure System: https://www.donnerhaus.eu/spiele/icarus/
+- Freude schöner Götterfunke: https://www.donnerhaus.eu/spiele/freude/
+- Hitdice: https://www.youtube.com/c/hitdice
 
 
 # Hilfe zum Sheet
 
-Autor: https://github.com/Gorthian
-Wiki: https://github.com/Gorthian/FSG_CharacterSheet_Roll20/wiki
-Bugs & Features: https://github.com/Gorthian/FSG_CharacterSheet_Roll20/issues
-Forum: https://github.com/Gorthian/FSG_CharacterSheet_Roll20/discussions
+- Autor: https://github.com/Gorthian
+- Wiki: https://github.com/Gorthian/FSG_CharacterSheet_Roll20/wiki
+- Bugs & Features: https://github.com/Gorthian/FSG_CharacterSheet_Roll20/issues
+- Forum: https://github.com/Gorthian/FSG_CharacterSheet_Roll20/discussions
 
 # History
 
-##VLOG 2021-11-20
+## 2021-11-23
+- Bugfix: Reroll bei 5 Würfeln
+
+## VLOG 2021-11-20
 - Drittes Video mit Hitdice
 
 ## 2021-11-14
