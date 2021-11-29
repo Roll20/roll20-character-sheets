@@ -1,5 +1,11 @@
 Change Log
 ==============================================
+**2021-11-23 ** v.48 Chuz (James Culp)
+	Bugfix - Removing Technomancer echos with modifications didn't update things correctly.
+	Bugfix - Replaced translation "Rotarcraft" with correct "Rotorcraft"
+	Added Modifications functionality to Magic->Adept->Powers
+	Added Modifications functionality to Magic->Meta->Metamagics
+	Added Modifications functionality to Technomancer->Complex Forms
 **2021-11-09 ** v.47 Chuz (James Culp)
 	Bugfix - Technomancer Complex Forms with no roll were displaying oddly.  This has been fixed, now the roll button that shows up will show the fade and notes section.
 **2021-11-04 ** v.46 Chuz (James Culp)
