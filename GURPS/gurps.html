@@ -61,7 +61,7 @@
 	<span data-i18n="sheet-show-old-techniques-desc">If checked, original techniques table will be visible.</span>
 	<span data-i18n="sheet-show-new-techniques">Show Revised Techniques Table</span>
 	<span data-i18n="sheet-show-new-techniques-desc">If checked, revised techniques table will be visible.</span>
-	<span data-i18n="sheet-show-raw-defense-notes">Show Active Defense Notes</span>
+	<span data-i18n="sheet-show-raw-defense-notes">Show RAW Notes</span>
 	<span data-i18n="sheet-show-raw-defense-notes-desc">If checked, show Rules as Written (RAW) for Active Defense success/fail notes.</span>
 	<span data-i18n="sheet-style-option">Sheet Style</span>
 	<span data-i18n="sheet-style-desc">Select a visual style for the character sheet.</span>
@@ -4373,20 +4373,31 @@
 					<span data-i18n="sheet-version-title">GURPS Character Sheet Version:</span>
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
-				
+
+				<!-- current version notes: 2.6.9 -->
 				<ul>
-					<li>GCA4 Import - Added code to help avoid typechecking issues in Javascript. Reported by Mike W.</li>
-					<li>Ranged Weapons Table - Fixed bug where the Option <i>Use Malfuction</i> wasn't being checked correctly. Reported by Mike.</li>
-					<li>Character Sheet Text Update. Changed GCA to GCA4 to avoid conflicts when GCA5 becomes available.</li>
-					<li>Ranged Weapon Roll Results. Updated formatting for Recoil and Malf. Requested by Mike.</li>
-					<li>Version 2.6.8.2 - Bugfix, single line of code introduced into version 2.6.8 needed to get fixed.</li>
+					<li>Melee and Ranged tables. Added success, critical success, fail, and critical fail notes. Requested by Mike.</li>
+					<li>Added RAW notes for melee and ranged attacked critical success and fail to roll results table. Requested by Mike.</li>
+					<li>Renamed Sheet option <b>Show Active Defense Notes</b> to <b>Show RAW Notes</b>.</li>
 					<li>
-						Version 2.6.8.3 - Legacy Bugfix, the improved type checking made it so you had to delete skills, spells, and techniques twice. 
-						This helped me find a syncing bug and streamline the code and hopefully resolve a nagging legacy issue 
-						where a random blank row showed up or row gets highlighted with a red border. Reported by Mike.
+						Repeating skills, techniques, and spells code has been changed from <i>auto-calculated</i> to <i>sheet worker script.</i>
+						This allows checking for triggers/changes and fields are only updated when a change is made. Should help speed 
+						up the charactersheet a tiny bit and easier coding.
+						<ul>
+							<li>
+								<b>Note:</b> When loading the new version the skills and spells should get automatically updated to use the <i>sheet worker script</i>. 
+								If skill or spell levels seem wrong, you can try changing the character points or modifier to trigger 
+								the calculation and then change it back.
+							</li>
+						</ul>
+					</li>
+					<li>
+						Bio/Misc Tab - Renamed <i>Miscellaneous</i> section to <i>TECH LEVEL</i> and added <i>Campaign Tech Level</i> and <i>Your Tech Level</i>. Import GCA4 will import the 
+						campaign tech level value and the character's tech level. <b>Suggestion: </b> Use High TL Advantage and Low TL Advantage to set the character's 
+						tech level, avoid using PTS for Your Tech Level.
 					</li>
 				</ul>
-
+				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
 			</div>
@@ -6934,7 +6945,12 @@ and Advantages.
 			<div class="table">
 				<div class="header">
 					<div class="cell col0">
-						<span data-i18n="miscellaneous-label">Miscellaneous</span>
+						<div class="popup">
+							<span data-i18n="technology-level-label">Tech Level</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="technology-level-tooltip">Tech Level Modifiers (B168), Tech Levels (B511-514)</span>
+						</span>
 					</div>
 					<div class="cell col1">
 						<span data-i18n="abbreviation-character-points-label">Pts</span>
@@ -6942,37 +6958,21 @@ and Advantages.
 				</div> <!-- .header -->
 				<div class="row row-tech-level">
 					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="technology-level-label">Tech Level</span>
-						</div>
-						<span class="tooltip">
-							<span data-i18n="technology-level-tooltip">
-This is the technology level that your character is familiar with.<br />
-It costs 5 points to raise this above or below the campaign's<br />
-normal TL.
-<div class="sheet-clearfix"></div>
-<table style="text-align: left;">
-	<tbody>
-		<tr><td>TL0</td><td>Stone Age (Prehistory and later). </td></tr>
-		<tr><td>TL1</td><td>Bronze Age (3500 B.C.+).</td></tr>
-		<tr><td>TL2</td><td>Iron Age (1200 B.C.+).</td></tr>
-		<tr><td>TL3</td><td>Medieval (600 A.D.+).</td></tr>
-		<tr><td>TL4</td><td>Age of Sail (1450+).</td></tr>
-		<tr><td>TL5</td><td>Industrial Revolution (1730+).</td></tr>
-		<tr><td>TL6</td><td>Mechanized Age (1880+).</td></tr>
-		<tr><td>TL7</td><td>Nuclear Age (1940+).</td></tr>
-		<tr><td>TL8</td><td>Digital Age (1980+).</td></tr>
-		<tr><td>TL9</td><td>Microtech Age (2025+?).</td></tr>
-		<tr><td>TL10</td><td>Robotic Age (2070+?).</td></tr>
-		<tr><td>TL11</td><td>Age of Exotic Matter.</td></tr>
-		<tr><td>TL12+</td><td>Whatever the GM likes!</td></tr>
-	</tbody>
-</table>
-							</span>
-						</span>
+						<span data-i18n="campaign-technology-level-label">Campaign Tech Level</span>
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_tl" title="Macro name: tl" />
+						<input type="text" name="attr_campaign_tl" title="Macro name: @{campaign_tl}" />
+					</div>
+					<div class="cell col2">
+						&nbsp;
+					</div>
+				</div> <!-- .row -->
+				<div class="row row-tech-level">
+					<div class="cell col0 label">
+						<span data-i18n="your-technology-level-label">Your Tech Level</span>
+					</div>
+					<div class="cell col1">
+						<input type="text" name="attr_tl" title="Macro name: @{tl}" />
 					</div>
 					<div class="cell col2">
 						<input type="number" step="5" name="attr_tl_pts" value="0" title="Macro name: @{tl_pts}" />
@@ -8023,8 +8023,7 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="text" name="attr_tl" title="Macro table name: repeating_skills. Field name: tl" />
 						</div>
 						<div class="cell col3">
-							<input type="hidden" name="attr_level_mirror" value="0" /> 
-							<input type="text" name="attr_level" title="Macro table name: repeating_skills. Field name: level" disabled="disabled" value="@{base} + @{difficulty} + @{bonus} + (floor(((@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) * 0.25) + 2) * ceil( ( ( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2 ) + abs( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2) ) / 256 ) + (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) * abs( ceil( ( ( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2 ) + abs( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2) ) / 256 ) - 1 ))"/>
+							<input type="text" name="attr_level" title="Macro table name: repeating_skills. Field name: level" readonly="readonly" value="10"/>
 						</div>
 						<div class="cell col4">
 							<select name="attr_base" title="Macro table name: repeating_skills. Field name: base">
@@ -8489,7 +8488,6 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="number" name="attr_points" value="0" title="Macro table name: repeating_techniquesrevised. Field name: points" />
 						</div>
 						<div class="cell col8">
-							<input type="hidden" name="attr_level_mirror" value="@{level}" /> 
 							<input type="text" name="attr_level" readonly="readonly" title="Macro table name: repeating_techniquesrevised. Field name: level" value="10"/>
 						</div>
 						<div class="cell col9">
@@ -8615,12 +8613,12 @@ visualize what it will look like in chat.
 								<div class="note-title">
 									<span data-i18n="success-note-label">Success Note:</span>
 								</div>
-								<textarea name="attr_skill_success_note" title="Macro table name: repeating_skills. Field name: skill_success_note"></textarea>
+								<textarea name="attr_skill_success_note" title="Macro table name: repeating_techniquesrevised. Field name: skill_success_note"></textarea>
 							</div>
 							
 							<div class="note-input">
 								<div class="note-title"><span data-i18n="critical-success-note-label">Critical Success Note:</span></div>
-								<textarea name="attr_skill_critical_success_note" title="Macro table name: repeating_skills. Field name: skill_critical_success_note"></textarea>
+								<textarea name="attr_skill_critical_success_note" title="Macro table name: repeating_techniquesrevised. Field name: skill_critical_success_note"></textarea>
 							</div>
 						</div>
 						
@@ -8630,14 +8628,14 @@ visualize what it will look like in chat.
 								<div class="note-title">
 									<div data-i18n="fail-note-label">Fail Note:</div>
 								</div>
-								<textarea name="attr_skill_fail_note" title="Macro table name: repeating_skills. Field name: skill_fail_note"></textarea>
+								<textarea name="attr_skill_fail_note" title="Macro table name: repeating_techniquesrevised. Field name: skill_fail_note"></textarea>
 							</div>
 							
 							<div class="note-input">
 								<div class="note-title">
 									<span data-i18n="critical-fail-note-label">Critical Fail Note:</span>
 								</div>
-								<textarea name="attr_skill_critical_fail_note" title="Macro table name: repeating_skills. Field name: skill_critical_fail_note"></textarea>
+								<textarea name="attr_skill_critical_fail_note" title="Macro table name: repeating_techniquesrevised. Field name: skill_critical_fail_note"></textarea>
 							</div>
 							
 						</div>
@@ -10863,7 +10861,13 @@ visualize what it will look like in chat.
 									</div>
 								</div>
 							</div>
-							
+
+							<!-- RAW notes for melee and ranged attacked -->
+							<input type="hidden" name="attr_raw_critical_hit_notes" value="" />
+							<input type="hidden" name="attr_raw_hit_notes" value="" />
+							<input type="hidden" name="attr_raw_miss_notes" value="" />
+							<input type="hidden" name="attr_raw_critical_miss_notes" value="" />
+
 							<fieldset class="repeating_melee">
 								<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
 								<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_melee_toggle_notes" />
@@ -10908,7 +10912,7 @@ visualize what it will look like in chat.
 										<input type="text" name="attr_skill" title="Macro table name: repeating_melee. Field name: skill" />
 									</div>
 									<div class="cell col6">
-										<button type="roll" class="template-attack-roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{skill} + @{modifier} + @{melee_roll_modifier}, @{melee_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_melee_modifier_tool}]]}} {{maxNine=[[@{melee_roll_max_nine}]]}} {{rollModifier=[[@{melee_roll_modifier}]]}} {{rollModifierSummary=@{melee_roll_modifier_summary}}} {{rollTraitSummary=@{melee_roll_trait_summary}}} {{hitLocation=@{melee_roll_hit_location}}} {{maneuver=@{melee_roll_maneuver}}} {{allOutAttack=@{melee_roll_allout_attack}}} {{reach=@{reach}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
+										<button type="roll" class="template-attack-roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{skill} + @{modifier} + @{melee_roll_modifier}, @{melee_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_melee_modifier_tool}]]}} {{maxNine=[[@{melee_roll_max_nine}]]}} {{rollModifier=[[@{melee_roll_modifier}]]}} {{rollModifierSummary=@{melee_roll_modifier_summary}}} {{rollTraitSummary=@{melee_roll_trait_summary}}} {{hitLocation=@{melee_roll_hit_location}}} {{maneuver=@{melee_roll_maneuver}}} {{allOutAttack=@{melee_roll_allout_attack}}} {{reach=@{reach}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{success_notes}}} {{customCriticalSuccessNote=@{critical_success_notes}}} {{customFailNote=@{fail_notes}}} {{customCriticalFailNote=@{critical_fail_notes}}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_hit_notes}}} {{rawCriticalSuccessNote=@{raw_critical_hit_notes}}} {{rawFailNote=@{raw_miss_notes}}} {{rawCriticalFailNote=@{raw_critical_miss_notes}}}" name="roll_vsSL" />
 									</div>
 								</div> <!-- .row -->
 								<div class="melee-notebox">
@@ -11055,6 +11059,61 @@ visualize what it will look like in chat.
 											<textarea class="text-left chat-size" name="attr_damage_notes" title="Macro table name: repeating_melee. Field name: damage_notes"></textarea>
 										</div>
 									</div> <!-- .row -->
+
+									<div class="row">
+										<div class="cell">
+											<div class="popup">
+												<span data-i18n="success-note-label">Success Note</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="melee-success-notes-tooltip">
+			<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+			Example: Select Location: ?{Location|Head|Torso}
+												</span>
+											</span>
+											<textarea class="text-left chat-size" name="attr_success_notes" title="Macro table name: repeating_melee. Field name: success_notes"></textarea>
+										</div>
+										<div class="cell">
+											<div class="popup">
+												<span data-i18n="critical-success-note-label">Critical Success Notes</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="melee-critical-success-notes-tooltip">
+			<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+			Example: Does an additional [[1d6]] fire damage.
+												</span>
+											</span>
+											<textarea class="text-left chat-size" name="attr_critical_success_notes" title="Macro table name: repeating_melee. Field name: critical_success_notes"></textarea>
+										</div>
+									</div> <!-- .row -->
+
+									<div class="row">
+										<div class="cell">
+											<div class="popup">
+												<span data-i18n="fail-note-label">Fail Note</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="melee-fail-notes-tooltip">
+			<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+			Example: Select Location: ?{Location|Head|Torso}
+												</span>
+											</span>
+											<textarea class="text-left chat-size" name="attr_fail_notes" title="Macro table name: repeating_melee. Field name: fail_notes"></textarea>
+										</div>
+										<div class="cell">
+											<div class="popup">
+												<span data-i18n="critical-fail-note-label">Critical Fail Notes</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="melee-critical-fail-notes-tooltip">
+			<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+			Example: Does an additional [[1d6]] fire damage.
+												</span>
+											</span>
+											<textarea class="text-left chat-size" name="attr_critical_fail_notes" title="Macro table name: repeating_melee. Field name: critical_fail_notes"></textarea>
+										</div>
+									</div> <!-- .row -->
+									
 									
 								</div> <!-- .ranged-notebox -->
 							</fieldset> <!-- .repeating_melee -->
@@ -11382,7 +11441,7 @@ visualize what it will look like in chat.
 										<input type="text" name="attr_skill" title="Macro table name: repeating_ranged. Field name: skill" />
 									</div>
 									<div class="cell col11">
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Attack}} {{rangedAttack=[[1]]}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{skill} + @{modifier} + @{ranged_roll_modifier}, @{ranged_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_ranged_modifier_tool}]]}} {{maxNine=[[@{ranged_roll_max_nine}]]}} {{rollModifier=[[@{ranged_roll_modifier}]]}} {{rollModifierSummary=@{ranged_roll_modifier_summary}}} {{rollTraitSummary=@{ranged_roll_trait_summary}}} {{hitLocation=@{ranged_roll_hit_location}}} {{maneuver=@{ranged_roll_maneuver}}} {{allOutAttack=@{ranged_roll_allout_attack}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{rof=@{rof}}} {{recoil=@{recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useMalfunction=[[@{use_malfunction}]]}} {{malfunction=[[@{malfunction}]]}} {{verifyMalfunction=[[ @{malfunction_verify} ]]}}" name="roll_vsSL" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Attack}} {{rangedAttack=[[1]]}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{skill} + @{modifier} + @{ranged_roll_modifier}, @{ranged_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_ranged_modifier_tool}]]}} {{maxNine=[[@{ranged_roll_max_nine}]]}} {{rollModifier=[[@{ranged_roll_modifier}]]}} {{rollModifierSummary=@{ranged_roll_modifier_summary}}} {{rollTraitSummary=@{ranged_roll_trait_summary}}} {{hitLocation=@{ranged_roll_hit_location}}} {{maneuver=@{ranged_roll_maneuver}}} {{allOutAttack=@{ranged_roll_allout_attack}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{rof=@{rof}}} {{recoil=@{recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useMalfunction=[[@{use_malfunction}]]}} {{malfunction=[[@{malfunction}]]}} {{verifyMalfunction=[[ @{malfunction_verify} ]]}} {{customSuccessNote=@{success_notes}}} {{customCriticalSuccessNote=@{critical_success_notes}}} {{customFailNote=@{fail_notes}}} {{customCriticalFailNote=@{critical_fail_notes}}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_hit_notes}}} {{rawCriticalSuccessNote=@{raw_critical_hit_notes}}} {{rawFailNote=@{raw_miss_notes}}} {{rawCriticalFailNote=@{raw_critical_miss_notes}}}" name="roll_vsSL" />
 									</div>
 								</div> <!-- .row -->
 								
@@ -11537,6 +11596,60 @@ visualize what it will look like in chat.
 												</span>
 											</span>
 											<textarea class="text-left chat-size" name="attr_damage_notes" title="Macro table name: repeating_ranged. Field name: damage_notes"></textarea>
+										</div>
+									</div> <!-- .row -->
+
+									<div class="row">
+										<div class="cell">
+											<div class="popup">
+												<span data-i18n="success-note-label">Success Note</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="ranged-success-notes-tooltip">
+			<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+			Example: Select Location: ?{Location|Head|Torso}
+												</span>
+											</span>
+											<textarea class="text-left chat-size" name="attr_success_notes" title="Macro table name: repeating_ranged. Field name: success_notes"></textarea>
+										</div>
+										<div class="cell">
+											<div class="popup">
+												<span data-i18n="critical-success-note-label">Critical Success Notes</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="ranged-critical-success-notes-tooltip">
+			<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+			Example: Does an additional [[1d6]] fire damage.
+												</span>
+											</span>
+											<textarea class="text-left chat-size" name="attr_critical_success_notes" title="Macro table name: repeating_ranged. Field name: critical_success_notes"></textarea>
+										</div>
+									</div> <!-- .row -->
+
+									<div class="row">
+										<div class="cell">
+											<div class="popup">
+												<span data-i18n="fail-note-label">Fail Note</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="ranged-fail-notes-tooltip">
+			<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+			Example: Select Location: ?{Location|Head|Torso}
+												</span>
+											</span>
+											<textarea class="text-left chat-size" name="attr_fail_notes" title="Macro table name: repeating_ranged. Field name: fail_notes"></textarea>
+										</div>
+										<div class="cell">
+											<div class="popup">
+												<span data-i18n="critical-fail-note-label">Critical Fail Notes</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="ranged-critical-fail-notes-tooltip">
+			<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+			Example: Does an additional [[1d6]] fire damage.
+												</span>
+											</span>
+											<textarea class="text-left chat-size" name="attr_critical_fail_notes" title="Macro table name: repeating_ranged. Field name: critical_fail_notes"></textarea>
 										</div>
 									</div> <!-- .row -->
 									
@@ -12974,8 +13087,9 @@ visualize what it will look like in chat.
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Spell Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{spell_roll_modifier}, @{spell_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_spell_modifier_tool}]]}} {{maxNine=[[@{spell_roll_max_nine}]]}} {{rollModifier=[[@{spell_roll_modifier}]]}} {{rollModifierSummary=@{spell_roll_modifier_summary}}} {{rollTraitSummary=@{spell_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{castingTime=@{casttime}}} {{castingDuration=@{duration}}} {{castingCost=@{cost}}} {{castingMaintain=@{maintain}}} {{castingResist=@{spell_resisted_by}}} {{castingClass=@{spell_class}}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{spell_success_note}}} {{customCriticalSuccessNote=@{spell_critical_success_note}}} {{customFailNote=@{spell_fail_note}}} {{customCriticalFailNote=@{spell_critical_fail_note}}} {{spellRoll=true}} {{spellCriticalSuccessNote=@{spell_critical_success_notes}}} {{spellFailNote=@{spell_fail_notes}}} {{spellCriticalFailureNote=@{spell_critical_failure_notes}}} {{showCastingDetails=[[@{show_casting_details}]]}} {{showSpellNotes=[[@{show_spell_notes}]]}} {{spellNotes=@{spell_notes}}}" name="roll_vsSL" />
 						</div>
 						<div class="cell col2">
-							<input type="hidden" name="attr_level_mirror" value="0" />
-							<input type="text" name="attr_level" title="Macro table name: repeating_spells. Field name: level" disabled="disabled" value="@{spell_base} + @{difficulty} +@{spell_modifier} + @{spell_bonus} + (floor((@{points} * 0.25) + 2) * ceil( ( ( @{points} - 2 ) + abs( @{points} - 2) ) / 256 ) + @{points} * abs( ceil( ( ( @{points} - 2 ) + abs( @{points} - 2) ) / 256 ) - 1 ))"/>
+							<input type="text" name="attr_level" title="Macro table name: repeating_spells. Field name: level" readonly="readonly" value="10"/>
+							<!-- TODO: replace this hidden field with a drop-down instead of using one dorp-down for all spells!  -->
+							<input type="hidden" name="attr_base" value="10" />
 						</div>
 						<div class="cell col3">
 							<select name="attr_difficulty" title="Macro table name: repeating_spells. Field name: difficulty">
@@ -12984,6 +13098,8 @@ visualize what it will look like in chat.
 							</select>
 						</div>
 						<div class="cell col4">
+							<!-- TODO: its possible that a character could have different types, maybe add drop-down for spell bonus -->
+							<input type="hidden" name="attr_bonus" value="0" title="Synced with attr_spell_bonus, reduces code" />
 							<input type="number" name="attr_spell_modifier" value="0" title="Macro table name: repeating_spells. Field name: spell_modifier" />
 						</div>
 						<div class="cell col5">
@@ -13215,6 +13331,34 @@ visualize what it will look like in chat.
 			<h4>Version: <span name="attr_announcement_version"></span></h4>
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
+
+			<!-- current version notes: 2.6.9 -->
+			<ul>
+				<li>Melee and Ranged tables. Added success, critical success, fail, and critical fail notes. Requested by Mike.</li>
+				<li>Added RAW notes for melee and ranged attacked critical success and fail to roll results table. Requested by Mike.</li>
+				<li>Renamed Sheet option <b>Show Active Defense Notes</b> to <b>Show RAW Notes</b>.</li>
+				<li>
+					Repeating skills, techniques, and spells code has been changed from <i>auto-calculated</i> to <i>sheet worker script.</i>
+					This allows checking for triggers/changes and fields are only updated when a change is made. Should help speed 
+					up the charactersheet a tiny bit and easier coding.
+					<ul>
+						<li>
+							<b>Note:</b> When loading the new version the skills and spells should get automatically updated to use the <i>sheet worker script</i>. 
+							If skill or spell levels seem wrong, you can try changing the character points or modifier to trigger 
+							the calculation and then change it back.
+						</li>
+					</ul>
+				</li>
+				<li>
+					Bio/Misc Tab - Renamed <i>Miscellaneous</i> section to <i>TECH LEVEL</i> and added <i>Campaign Tech Level</i> and <i>Your Tech Level</i>. Import GCA4 will import the 
+					campaign tech level value and the character's tech level. <b>Suggestion: </b> Use High TL Advantage and Low TL Advantage to set the character's 
+					tech level, avoid using PTS for Your Tech Level.
+				</li>
+			</ul>
+
+			<h4>Version: 2.6.8</h4>
+
+			<p>Pull Request: 11/10/2021</p>
 
 			<ul>
 				<li>GCA4 Import - Added code to help avoid typechecking issues in Javascript. Reported by Mike.</li>
@@ -13938,16 +14082,16 @@ visualize what it will look like in chat.
 					
 					<div class="option-container">
 						
-						<h4><span data-i18n="active-defenses-label">Active Defenses</span></h4>
+						<h4><span data-i18n="rules-as-written-label">Rules as Written</span></h4>
 						
 						<div>
 							<input type="checkbox" name="attr_show_raw_defensive_notes" value="1" checked="checked" />
 							<span class="popup">
-								<span data-i18n="abbreviation-show-rules-as-written-notes-label">Show Active Defenses RAW Notes</span>
+								<span data-i18n="abbreviation-show-rules-as-written-notes-label">Show RAW Notes</span>
 							</span>
 							<span class="tooltip">
 								<span data-i18n="abbreviation-show-rules-as-written-notes-tooltip">
-									Show Rules as Written Success/Fail notes
+									Show <b>Rules as Written</b> Success/Fail notes in roll results template. Such as notes for active defenses and attacks.
 								</span>
 							</span>
 						</div>
@@ -14543,11 +14687,35 @@ visualize what it will look like in chat.
                                     {{#showSuccessLabel}}Critical Failure{{/showSuccessLabel}}
                                 </span>
                                 
-                                <!-- block custom critical failure note -->
+                                <!-- raw & custom critical failure note -->
+								{{#rollTotal() showRawDefenseNotes 1}}
 								{{#rawCriticalFailNote}}
-                                    <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
-								{{/rawCriticalFailNote}}
 								
+								<!-- if not using malfunction, just display note as is-->
+                                {{^useMalfunction}}
+								    <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+								{{/useMalfunction}}
+
+								<!-- if using malfunction check for malfunction -->
+								{{#rollTotal() useMalfunction 1}}
+								
+								<!-- If there's no malfuction #, then display note -->
+								{{^malfunction}}
+									<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+								{{/malfunction}}
+								
+								<!-- if there is a malfunction and it's value is 0, then display the note -->
+								{{#malfunction}}
+								{{#rollTotal() malfunction 0}}
+									<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+								{{/rollTotal() malfunction 0}}
+								{{/malfunction}}
+								
+								{{/rollTotal() useMalfunction 1}}
+								
+								{{/rawCriticalFailNote}}
+								{{/rollTotal() showRawDefenseNotes 1}}
+
 								{{#customCriticalFailNote}}
                                     <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                 {{/customCriticalFailNote}}
@@ -14572,7 +14740,7 @@ visualize what it will look like in chat.
                                 <!-- skill of 16 or higher is normal failure, add helper text -->
                                 {{#rollGreater() effectiveSkill 15}}
                                 
-                                    <!-- block custom failure note -->
+                                    <!-- custom failure note -->
                                     {{#rawFailNote}}
                                         <p>{{rawFailNote}}</p>
                                     {{/rawFailNote}}
@@ -14586,10 +14754,34 @@ visualize what it will look like in chat.
                                 <!-- skill of 15 or less is critical, add helper text -->
                                 {{#rollLess() effectiveSkill 16}}
                                 
-                                    <!-- block custom critical failure note -->
-                                    {{#rawCriticalFailNote}}
-                                        <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
-                                    {{/rawCriticalFailNote}}
+                                    <!-- raw & custom critical failure note -->
+									{{#rollTotal() showRawDefenseNotes 1}}
+									{{#rawCriticalFailNote}}
+									
+									<!-- if not using malfunction, just display note as is-->
+									{{^useMalfunction}}
+										<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+									{{/useMalfunction}}
+
+									<!-- if using malfunction check for malfunction -->
+									{{#rollTotal() useMalfunction 1}}
+									
+									<!-- If there's no malfuction #, then display note -->
+									{{^malfunction}}
+										<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+									{{/malfunction}}
+									
+									<!-- if there is a malfunction and it's value is 0, then display the note -->
+									{{#malfunction}}
+									{{#rollTotal() malfunction 0}}
+										<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+									{{/rollTotal() malfunction 0}}
+									{{/malfunction}}
+									
+									{{/rollTotal() useMalfunction 1}}
+									
+									{{/rawCriticalFailNote}}
+									{{/rollTotal() showRawDefenseNotes 1}}
 									
 									{{#customCriticalFailNote}}
                                         <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
@@ -14791,11 +14983,33 @@ visualize what it will look like in chat.
                                                 <p>You lose your grip on whatever you were Blocking with and must take a turn to ready it before you can use it to block again. (B382)</p>
                                             {{/rollTotal() defenseType 3}}
                                             
-                                            <!-- block custom critical fail note -->
+                                            <!-- raw & custom critical fail note -->
                                             {{#rollTotal() showRawDefenseNotes 1}}
-                                    		{{#rawCriticalFailNote}}
-                                                <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
-                                            {{/rawCriticalFailNote}}
+											{{#rawCriticalFailNote}}
+											
+											<!-- if not using malfunction, just display note as is-->
+											{{^useMalfunction}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/useMalfunction}}
+
+											<!-- if using malfunction check for malfunction -->
+											{{#rollTotal() useMalfunction 1}}
+											
+											<!-- If there's no malfuction #, then display note -->
+											{{^malfunction}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/malfunction}}
+											
+											<!-- if there is a malfunction and it's value is 0, then display the note -->
+											{{#malfunction}}
+											{{#rollTotal() malfunction 0}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/rollTotal() malfunction 0}}
+											{{/malfunction}}
+											
+											{{/rollTotal() useMalfunction 1}}
+											
+											{{/rawCriticalFailNote}}
 											{{/rollTotal() showRawDefenseNotes 1}}
                                     
 											{{#customCriticalFailNote}}
@@ -14843,10 +15057,32 @@ visualize what it will look like in chat.
                                                 <p>You lose your grip on whatever you were Blocking with and must take a turn to ready it before you can use it to block again. (B382)</p>
                                             {{/rollTotal() defenseType 3}}
                                             
-                                            <!-- block custom critical fail note -->
+                                            <!-- raw & custom critical fail note -->
                                             {{#rollTotal() showRawDefenseNotes 1}}
-                                    		{{#rawCriticalFailNote}}
-                                                <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{#rawCriticalFailNote}}
+											
+											<!-- if not using malfunction, just display note as is-->
+											{{^useMalfunction}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/useMalfunction}}
+
+											<!-- if using malfunction check for malfunction -->
+											{{#rollTotal() useMalfunction 1}}
+											
+											<!-- If there's no malfuction #, then display note -->
+											{{^malfunction}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/malfunction}}
+											
+											<!-- if there is a malfunction and it's value is 0, then display the note -->
+											{{#malfunction}}
+											{{#rollTotal() malfunction 0}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/rollTotal() malfunction 0}}
+											{{/malfunction}}
+											
+											{{/rollTotal() useMalfunction 1}}
+											
 											{{/rawCriticalFailNote}}
 											{{/rollTotal() showRawDefenseNotes 1}}
                                     
@@ -14895,11 +15131,33 @@ visualize what it will look like in chat.
                                                 <p>You lose your grip on whatever you were Blocking with and must take a turn to ready it before you can use it to block again. (B382)</p>
                                             {{/rollTotal() defenseType 3}}
                                             
-                                            <!-- block custom critical fail note -->
+                                            <!-- raw & custom critical fail note -->
                                             {{#rollTotal() showRawDefenseNotes 1}}
-                                    		{{#rawCriticalFailNote}}
-                                                <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
-                                            {{/rawCriticalFailNote}}
+											{{#rawCriticalFailNote}}
+											
+											<!-- if not using malfunction, just display note as is-->
+											{{^useMalfunction}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/useMalfunction}}
+
+											<!-- if using malfunction check for malfunction -->
+											{{#rollTotal() useMalfunction 1}}
+											
+											<!-- If there's no malfuction #, then display note -->
+											{{^malfunction}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/malfunction}}
+											
+											<!-- if there is a malfunction and it's value is 0, then display the note -->
+											{{#malfunction}}
+											{{#rollTotal() malfunction 0}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/rollTotal() malfunction 0}}
+											{{/malfunction}}
+											
+											{{/rollTotal() useMalfunction 1}}
+											
+											{{/rawCriticalFailNote}}
 											{{/rollTotal() showRawDefenseNotes 1}}
                                     
 											{{#customCriticalFailNote}}
@@ -14947,11 +15205,33 @@ visualize what it will look like in chat.
                                                 <p>You lose your grip on whatever you were Blocking with and must take a turn to ready it before you can use it to block again. (B382)</p>
                                             {{/rollTotal() defenseType 3}}
                                             
-                                            <!-- block custom critical fail note -->
+                                            <!-- raw & custom critical fail note -->
                                             {{#rollTotal() showRawDefenseNotes 1}}
-                                    		{{#rawCriticalFailNote}}
-                                                <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
-                                            {{/rawCriticalFailNote}}
+											{{#rawCriticalFailNote}}
+											
+											<!-- if not using malfunction, just display note as is-->
+											{{^useMalfunction}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/useMalfunction}}
+
+											<!-- if using malfunction check for malfunction -->
+											{{#rollTotal() useMalfunction 1}}
+											
+											<!-- If there's no malfuction #, then display note -->
+											{{^malfunction}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/malfunction}}
+											
+											<!-- if there is a malfunction and it's value is 0, then display the note -->
+											{{#malfunction}}
+											{{#rollTotal() malfunction 0}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/rollTotal() malfunction 0}}
+											{{/malfunction}}
+											
+											{{/rollTotal() useMalfunction 1}}
+											
+											{{/rawCriticalFailNote}}
 											{{/rollTotal() showRawDefenseNotes 1}}
                                     
 											{{#customCriticalFailNote}}
@@ -14999,11 +15279,33 @@ visualize what it will look like in chat.
                                                 <p>You lose your grip on whatever you were Blocking with and must take a turn to ready it before you can use it to block again. (B382)</p>
                                             {{/rollTotal() defenseType 3}}
                                             
-                                            <!-- block custom critical fail note -->
+                                            <!-- raw & custom critical fail note -->
                                             {{#rollTotal() showRawDefenseNotes 1}}
-                                    		{{#rawCriticalFailNote}}
-                                                <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
-                                            {{/rawCriticalFailNote}}
+											{{#rawCriticalFailNote}}
+											
+											<!-- if not using malfunction, just display note as is-->
+											{{^useMalfunction}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/useMalfunction}}
+
+											<!-- if using malfunction check for malfunction -->
+											{{#rollTotal() useMalfunction 1}}
+											
+											<!-- If there's no malfuction #, then display note -->
+											{{^malfunction}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/malfunction}}
+											
+											<!-- if there is a malfunction and it's value is 0, then display the note -->
+											{{#malfunction}}
+											{{#rollTotal() malfunction 0}}
+												<p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/rollTotal() malfunction 0}}
+											{{/malfunction}}
+											
+											{{/rollTotal() useMalfunction 1}}
+											
+											{{/rawCriticalFailNote}}
 											{{/rollTotal() showRawDefenseNotes 1}}
                                     
 											{{#customCriticalFailNote}}
@@ -15490,27 +15792,29 @@ visualize what it will look like in chat.
                 {{/rollResult}}
                 
                 {{#rollTotal() useMalfunction 1}}
-                {{#rollGreater() malfunction 0}}
-                {{#rollBetween() rollResult malfunction 18}}
-                <tr class="malfunction">
-                    <td colspan="2">
-						<span style="color: red; font-weight:bold;">
-							<span data-i18n="rolltemplate-malfunction-label">Malfunction!</span>
-						</span><br />
-						{{#rollTotal() verifyMalfunction 1}}
-							<span data-i18n="rolltemplate-verify-malfunction-description">
-								<span style="color: red; font-weight:bold;">Verify!</span> roll 3d6 again to verify the results. See HT79.<br />
-							</span>
-						{{/rollTotal() verifyMalfunction 1}}
-						<span data-i18n="rolltemplate-malfunction-description">
-							For effect, Roll 3d6 and see table on B407 or use custom table.<br />
-							<b style="color:red;">NOTE:</b> Malfunction has "priority" over a critical miss: if both would occur,
-							only the malfunction takes place. Critical Misses, Basic Set, page 382.
-						</span>
-                    </td>
-                </tr>
-                {{/rollBetween() rollResult malfunction 18}}
-                {{/rollGreater() malfunction 0}}
+					{{#malfunction}}
+						{{#rollGreater() malfunction 0}}
+							{{#rollBetween() rollResult malfunction 18}}
+							<tr class="malfunction">
+								<td colspan="2">
+									<span style="color: red; font-weight:bold;">
+										<span data-i18n="rolltemplate-malfunction-label">Malfunction!</span>
+									</span><br />
+									{{#rollTotal() verifyMalfunction 1}}
+										<span data-i18n="rolltemplate-verify-malfunction-description">
+											<span style="color: red; font-weight:bold;">Verify!</span> roll 3d6 again to verify the results. See HT79.<br />
+										</span>
+									{{/rollTotal() verifyMalfunction 1}}
+									<span data-i18n="rolltemplate-malfunction-description">
+										For effect, Roll 3d6 and see table on B407 or use custom table.<br />
+										<b style="color:red;">NOTE:</b> Malfunction has "priority" over a critical miss: if both would occur,
+										only the malfunction takes place. Critical Misses, Basic Set, page 382.
+									</span>
+								</td>
+							</tr>
+							{{/rollBetween() rollResult malfunction 18}}
+						{{/rollGreater() malfunction 0}}
+					{{/malfunction}}
                 {{/rollTotal() useMalfunction 1}}
                 
                 {{#damageRoll}}
@@ -15649,12 +15953,12 @@ visualize what it will look like in chat.
                         <span class="title">
 							<span data-i18n="recoil-label">Recoil</span><span>:</span></span>
 						<span class="recoil-margin">{{recoil}}</span>
-                        {{#rollGreater() malfunction 0}}
+                        {{#malfunction}}
                             <span class="title">
 								<span data-i18n="abbreviation-malfunction-label">Malf</span>:
 							</span>
 							<span class="normal-text-content">{{malfunction}}</span>
-                        {{/rollGreater() malfunction 0}}
+                        {{/malfunction}}
                     </td>
                 </tr>
 				{{/recoil}}
@@ -15763,20 +16067,20 @@ visualize what it will look like in chat.
     </rolltemplate>
     
 </div>
-
+ 
 <script type="text/worker">
 	 
 	// this type is required by roll20, be sure to set before uploading
 	// type="text/worker"
 	
-	// if using VS code or similar coding tool, use the type listed below
+	// if using VS code or similar coding tool, use the type listed below or just delete type="text/worker"
 	// type="application/javascript"
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.6.8.3";
+	var version = "2.6.9";
 
-	var latestChangesDate = "11/19/2021";
+	var latestChangesDate = "11/28/2021";
 
 	var modCascade = true;
 	
@@ -16605,7 +16909,7 @@ visualize what it will look like in chat.
 		]],
 	]);
 
-	const rawDefenseNotes = getRawActiveDefensesNotes();
+	const rawDefenseNotes = getRawNotes();
 
 	/* Due to the change from auto-calc fields to helper scripts,
 	 * I'm running a "on open" to set various fields. At some point
@@ -16614,10 +16918,12 @@ visualize what it will look like in chat.
 	on('sheet:opened', function() {
 	    
 		console.log('********* Sheet Opened *********');
-
+		
 		syncRollOptions();
 
 		syncModifierPromptOptions();
+
+		updateStaticNotes();
 
 		setAttrs({inventory_fixed_digits: 1}); 
 
@@ -16795,44 +17101,17 @@ visualize what it will look like in chat.
 		
 		updateRepeatingDefenseTypes();
 
-		updateStaticDefenseNotes();
-		
 		updateRepeatingDefenseNotes();
 		
-		// use underscore wrap to update skills, then update melee/ranged linked skills
-		runUpdateRepeatingSkillLevels = _.wrap(updateRepeatingSkillLevels, function() {
-		    
-		    thenUpdateLinkedAttacksSkills(); 
-		    
-		});
+		updateRepeatingSkillLevels(thenUpdateLinkedItems());
 		
-		runUpdateRepeatingSkillLevels();
+		syncModsToRepeatingSpells(thenUpdateLinkedItems());
 		
-		runUpdateRepeatingSpellLevels = _.wrap(updateRepeatingSpellLevels, function() {
-		    
-		    thenUpdateLinkedAttacksSpells(); 
-		    
-		});
-		
-		runUpdateRepeatingSpellLevels();
-
 		updateHitPointThresholds();
 			
 	}
 	
-	function thenUpdateLinkedAttacksSkills() {
-		
-	    updateLinkedSkills("repeating_melee", "melee");
-    
-        updateLinkedSkills("repeating_ranged", "ranged");
-		
-		updateLinkedSkills("repeating_techniquesrevised", "technique");
-
-		updateLinkedSkills("repeating_defense", "defense");
-
-	}
-
-	function thenUpdateLinkedAttacksSpells() {
+	function thenUpdateLinkedItems() {
 		
 	    updateLinkedSkills("repeating_melee", "melee");
     
@@ -17570,31 +17849,53 @@ visualize what it will look like in chat.
 	// if skill removed, update total skill points
 	on('remove:repeating_skills', (event) => {
 
-		console.group("remove:repeating_skills");
-		console.info("event: ", event);
-		console.groupEnd();
-		
 		sumRepeating('repeating_skills', 'points', function(v) {
 			setAttrs({ skills_points: v }, {silent: true});
 		});
 		
 	});
 
-	// Update the total cost of Skills
-	on('change:repeating_skills:points change:repeating_skills:bonus change:repeating_skills:difficulty', function (e) {
-	    
-		// checkForWildCardSkill(e);
-        getAttrs(['repeating_skills_points', 'repeating_skills_difficulty'], function (skill) {
+	// if spell level is updated, updated linked combat or techniques. 
+	on("change:repeating_spells:level", event => {
+
+		const rowId = getRowIdFromEventInfo(event, "repeating_spells");
+
+		updateSectionSkillsLinkedToUpdatedRow(rowId);
+
+	});
+
+	// Update the skill level and update the total cost of Skills 
+	on('change:repeating_skills:base change:repeating_skills:difficulty change:repeating_skills:bonus change:repeating_skills:points', (event) => {
+
+		let fieldValues = [
+			"repeating_skills_base", 
+			"repeating_skills_difficulty", 
+			"repeating_skills_bonus", 
+			"repeating_skills_points", 
+			"strength",
+			"dexterity",
+			"intelligence",
+			"health",
+			"perception",
+			"willpower"
+		];
+
+		getAttrs(fieldValues, (values) => {
             		
-			let skill_points = +skill.repeating_skills_points;
+			const baseLevel = getBaseSkillLevel(values.repeating_skills_base, values);
+
+			let difficulty = values.repeating_skills_difficulty;
+
+			const bonus = Number(values.repeating_skills_bonus);
+
+			const skill_points = Number(values.repeating_skills_points);
 		
-			let adjusted_points = 0;
-			
 			let use_wildcard_points = 0;
 			
-			let use_normal_skill = 0; 
-			
-			if (String(skill.repeating_skills_difficulty) == "-5 + 1") {
+			let use_normal_points = 0; 
+
+			// check for wildcard difficulty
+			if (String(values.repeating_skills_difficulty) == "-5 + 1") {
 				
 				use_wildcard_points = 1;
 				
@@ -17610,6 +17911,8 @@ visualize what it will look like in chat.
 					wildcard_skill_points = Math.floor(skill_points/3);
 					
 				}
+
+				difficulty = -4;
 				
 			} else {
 				
@@ -17617,23 +17920,103 @@ visualize what it will look like in chat.
 				
 				use_normal_points = 1;
 				
-				wildcard_skill_points = skill.repeating_skills_points;
+				wildcard_skill_points = Number(values.repeating_skills_points);
+
+				difficulty = Number(difficulty);
 				
 			}
-			
-			setAttrs({
+
+			const finalSkillLevel = getSkillLevelUsingRaw(baseLevel, difficulty, bonus, wildcard_skill_points, use_wildcard_points, skill_points, use_normal_points);
+
+			const fieldsToUpdate = {
 				repeating_skills_wildcard_skill_points: wildcard_skill_points,
 				repeating_skills_use_wildcard_points: use_wildcard_points,
-				repeating_skills_use_normal_points: use_normal_points
-			} 
-			, {silent: true}
+				repeating_skills_use_normal_points: use_normal_points,
+				repeating_skills_level: finalSkillLevel
+			};
+
+			// if the skill level changes, this will trigger 
+			// the change event to update items linked to that skill; see `on("change:repeating_skills:level")`
+			setAttrs(fieldsToUpdate 
+			, null
 			, sumRepeating('repeating_skills', 'points', function(v) {
 			    setAttrs({ skills_points: v });
 		    	})
-			);			
-			
+			);
+
 		});
 		
+	});
+
+	on("change:repeating_skills:level", (event) => {
+
+		const rowId = getRowIdFromEventInfo(event, "repeating_skills");
+
+		updateSectionSkillsLinkedToUpdatedRow(rowId);
+
+	});
+
+	// keep "spell based on:" and "Magery/PI/Bonus Level" synced with repeating fields
+	// this avoids having to do a lot of coding to get the id of the row
+	// NOTE: this will trigger updating the spell level. 
+	on("change:spell_base change:spell_bonus", event => {
+
+		syncModsToRepeatingSpells();
+
+	});
+
+	// Update the spell level and update the total cost of spells 
+	on('change:repeating_spells:base change:repeating_spells:bonus change:repeating_spells:difficulty change:repeating_spells:spell_modifier change:repeating_spells:points', (event) => {
+
+		let fieldValues = [
+			"repeating_spells_base", 
+			"repeating_spells_bonus", 
+			"repeating_spells_difficulty", 
+			"repeating_spells_spell_modifier", 
+			"repeating_spells_points", 
+			"strength",
+			"dexterity",
+			"intelligence",
+			"health",
+			"perception",
+			"willpower"
+		];
+
+		getAttrs(fieldValues, (values) => {
+
+			const baseLevel = getBaseSkillLevel(values.repeating_spells_base, values);
+
+			let difficulty = Number(values.repeating_spells_difficulty);
+
+			const bonus = Number(values.repeating_spells_bonus);
+
+			const modifier = Number(values.repeating_spells_spell_modifier);
+
+			let totalModifier = bonus + modifier;
+
+			if (isNaN(totalModifier)) {
+				totalModifier = 0;
+			}
+
+			const skill_points = Number(values.repeating_spells_points);
+
+			const finalSkillLevel = getSkillLevelUsingRaw(baseLevel, difficulty, bonus, 0, 0, skill_points, 1);
+
+			const fieldsToUpdate = {
+				repeating_spells_level: finalSkillLevel
+			};
+
+			// if the skill level changes, this will trigger 
+			// the change event to update items linked to that skill; see `on("change:repeating_skills:level")`
+			setAttrs(fieldsToUpdate 
+			, null
+			, sumRepeating('repeating_spells', 'points', function(v) {
+				setAttrs({ spells_points: v });
+				})
+			);
+
+		});
+
 	});
 
 	// if toggle is clicked, update the display id.
@@ -17704,7 +18087,7 @@ visualize what it will look like in chat.
 	});
 	
 	// Update the total cost of Spells
-	on('change:repeating_spells:points remove:repeating_spells', function (e) {
+	on('remove:repeating_spells', function (e) {
 		sumRepeating('repeating_spells', 'points', function(v) {
 			setAttrs({ spells_points: v }, {silent: true});
 		});
@@ -19633,6 +20016,17 @@ visualize what it will look like in chat.
         });
         
     }
+
+	// check for malfunction number. it should always be set to 0 or higher.
+	on("change:repeating_ranged:malfunction", event => {
+
+		const newValue = Number(event.newValue);
+
+		if (isNaN(newValue) || newValue < 0) {
+			setAttrs({"repeating_ranged_malfunction": 0}, {silent: true});
+		}
+		
+	});
     
     // set note values for damage types
     // Update thrust and swing when striking st is updated
@@ -21090,21 +21484,23 @@ visualize what it will look like in chat.
 	/**
 	 * Update the static defense success/fail notes
 	 */
-	function updateStaticDefenseNotes() {
+	function updateStaticNotes() {
 
 		const fields = {
-			"raw_dodge_success_notes":                  getDefenseNotesByCode("dodge_success_notes"),
-			"raw_dodge_critical_success_notes":         getDefenseNotesByCode("dodge_critical_success_notes"),
-			"raw_dodge_fail_notes":                     getDefenseNotesByCode("dodge_fail_notes"),
-			"raw_dodge_critical_fail_notes":            getDefenseNotesByCode("dodge_critical_failure_notes"),
-			"raw_dodge_retreat_success_notes":          getDefenseNotesByCode("dodge_success_notes"),
-			"raw_dodge_retreat_critical_success_notes": getDefenseNotesByCode("dodge_critical_success_notes"),
-			"raw_dodge_retreat_fail_notes":             getDefenseNotesByCode("dodge_fail_notes"),
-			"raw_dodge_retreat_critical_fail_notes":    getDefenseNotesByCode("dodge_critical_failure_notes"),
-			"raw_dodge_drop_success_notes":             getDefenseNotesByCode("dodge_success_notes"),
-			"raw_dodge_drop_critical_success_notes":    getDefenseNotesByCode("dodge_critical_success_notes"),
-			"raw_dodge_drop_fail_notes":                getDefenseNotesByCode("dodge_fail_notes"),
-			"raw_dodge_drop_critical_fail_notes":       getDefenseNotesByCode("dodge_critical_failure_notes"),
+			"raw_dodge_success_notes":                  getNotesByCode("dodge_success_notes"),
+			"raw_dodge_critical_success_notes":         getNotesByCode("dodge_critical_success_notes"),
+			"raw_dodge_fail_notes":                     getNotesByCode("dodge_fail_notes"),
+			"raw_dodge_critical_fail_notes":            getNotesByCode("dodge_critical_failure_notes"),
+			"raw_dodge_retreat_success_notes":          getNotesByCode("dodge_success_notes"),
+			"raw_dodge_retreat_critical_success_notes": getNotesByCode("dodge_critical_success_notes"),
+			"raw_dodge_retreat_fail_notes":             getNotesByCode("dodge_fail_notes"),
+			"raw_dodge_retreat_critical_fail_notes":    getNotesByCode("dodge_critical_failure_notes"),
+			"raw_dodge_drop_success_notes":             getNotesByCode("dodge_success_notes"),
+			"raw_dodge_drop_critical_success_notes":    getNotesByCode("dodge_critical_success_notes"),
+			"raw_dodge_drop_fail_notes":                getNotesByCode("dodge_fail_notes"),
+			"raw_dodge_drop_critical_fail_notes":       getNotesByCode("dodge_critical_failure_notes"),
+			"raw_critical_miss_notes":                  getNotesByCode("critical_miss_notes"),
+			"raw_critical_hit_notes":                   getNotesByCode("critical_hit_notes"),
 		};
 
 		setAttrs(fields);
@@ -21510,29 +21906,7 @@ visualize what it will look like in chat.
         
         return penalty;
     }
-    
-    // check if skill level mirror changed, if so update repeating sections that match the item that changed
-    on("change:repeating_skills:level_mirror", function(event) {
-
-		console.group("change:repeating_skills:level_mirror");
-		console.info("event: ", event);
-		console.groupEnd();
-          
-        var rowId = getRowIdFromEventInfo(event, "repeating_skills");
         
-        updateSectionSkillsLinkedToUpdatedRow(rowId);
-        
-    });
-    
-    // check if spell level mirror changed
-    on("change:repeating_spells:level_mirror", function(event) {
-        
-		var rowId = getRowIdFromEventInfo(event, "repeating_spells");
-        
-		updateSectionSkillsLinkedToUpdatedRow(rowId);
-        
-	});
-	
 	// check if technique level changed
 	on("change:repeating_techniquesrevised:level", function(event) {
         
@@ -21753,7 +22127,7 @@ visualize what it will look like in chat.
         
         var rowId = "";
         
-        // example: repeating_skills_-l6zk36zhcjhsyvc-kax_level_mirror
+        // example: repeating_skills_-l6zk36zhcjhsyvc-kax_level
         var sourceAttr = event.sourceAttribute;
 		
 		if (sourceAttr) {
@@ -21761,7 +22135,7 @@ visualize what it will look like in chat.
 			// remove the sectionname
 			var regReplace = new RegExp(sectionName+ '_', "ig");
 			
-			// example: -l6zk36zhcjhsyvc-kax_level_mirror
+			// example: -l6zk36zhcjhsyvc-kax_level
 			sourceAttr = sourceAttr.replace(regReplace, "");
 			
 			// now split by the _
@@ -21780,7 +22154,7 @@ visualize what it will look like in chat.
 
 	/**
 	 * finds the row id for row field key for a repeating section name
-	 * example:  repeating_skills_-l6zk36zhcjhsyvc-kax_level_mirror
+	 * example:  repeating_skills_-l6zk36zhcjhsyvc-kax_level
 	 * 
 	 * @param object fieldKey    Field Key name
 	 * @param string sectionName The name of a repeating section
@@ -21789,13 +22163,13 @@ visualize what it will look like in chat.
 		
 		let rowId = "";
 
-		// repeating_skills_-l6zk36zhcjhsyvc-kax_level_mirror
+		// repeating_skills_-l6zk36zhcjhsyvc-kax_level
 		if (fieldKey) {
 
 			// remove the sectionname
 			var regReplace = new RegExp(sectionName+ '_', "ig");
 			
-			// example: -l6zk36zhcjhsyvc-kax_level_mirror
+			// example: -l6zk36zhcjhsyvc-kax_level
 			fieldKey = fieldKey.replace(regReplace, "");
 			
 			// now split by the _
@@ -22111,16 +22485,12 @@ visualize what it will look like in chat.
 	function updateLinkedWeaponSkillByRepeatingRow(sectionName, weaponSkillFieldName, skillMessageFieldName, skillMessageFieldLevel, skillRowIdToggleFieldName, parentFieldName, baseSkillFieldName, repeatingTableToUse, skillRowId, skillMod, defenseType, talentLevel, callback)
 	{
 		// if it's a good row id, let's update stuff
-		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
+		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
 		        
 		let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
 		
-		// if we're getting values from the techniques table, don't use level_mirror
-		if (repeatingTableToUse == "repeating_techniquesrevised" ) {
-
-			skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
-		
-		} else if (repeatingTableToUse == "repeating_melee") {
+		// TODO: update linked defensive skills!
+		if (repeatingTableToUse == "repeating_melee" || repeatingTableToUse == "repeating_ranged") {
 
 			skillFieldName = `${repeatingTableToUse}_${skillRowId}_skill`;
 
@@ -22411,17 +22781,10 @@ visualize what it will look like in chat.
 	function updateLinkedKnockbackSkillByTable(repeatingTableToUse, skillRowId, rowType, callback)
 	{
 		// if it's a good row id, let's update stuff
-		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
+		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
 		        
 		let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
 		
-		// if we're getting values from the techniques table, don't use level_mirror
-		if (repeatingTableToUse == "repeating_techniquesrevised") {
-
-			skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
-		
-		}
-
 		// update the skill level for weapon.
 		getAttrs([skillFieldName, skillFieldNameOfSkill], function(skillValues) {
 
@@ -22456,11 +22819,13 @@ visualize what it will look like in chat.
 	 * This function is used to make sure the repeating 
 	 * skill levels are updated when the version has changed
 	 */
-	function updateRepeatingSkillLevels() {
+	function updateRepeatingSkillLevels(callback) {
 	    
-	    var sectionName = "repeating_skills";
+		callback = callback || noop;
+
+		let sectionName = "repeating_skills";
 	    
-	    getSectionIDs(sectionName, function(ids) {
+	    getSectionIDs(sectionName, function(ids, callback) {
 	        
 	        updateSkillLevel(sectionName, ids);
 	        
@@ -22469,28 +22834,29 @@ visualize what it will look like in chat.
 	}
 	
 	/**
-	 * Update the mirrored skill level when any field
-	 * is updated for skill or spell
+	 * Ensures skill levels are correct when loading 
+	 * a new version of the sheet. This is needed, since the
+	 * skill levels were converted auto-calculating fields to 
+	 * sheet workers. This code ensures older sheets have the 
+	 * correct skill levels when the sheet loads.
 	 */
-	function updateSkillLevel(sectionName, ids) {
-	    
+	function updateSkillLevel(sectionName, ids, callback) {
+
         _.each(ids,function(id) {
             
-            var rowId = id;
+            const baseFieldName = `${sectionName}_${id}_base`;
 	        
-	        var baseFieldName = `${sectionName}_${id}_base`;
+	        const difficultyFieldName = `${sectionName}_${id}_difficulty`;
 	        
-	        var difficultyFieldName = `${sectionName}_${id}_difficulty`;
+	        const bonusFieldName = `${sectionName}_${id}_bonus`;
 	        
-	        var bonusFieldName = `${sectionName}_${id}_bonus`;
+	        const wildcardSkillPointsFieldName = `${sectionName}_${id}_wildcard_skill_points`;
 	        
-	        var wildcardSkillPointsFieldName = `${sectionName}_${id}_wildcard_skill_points`;
+	        const useWildcardPointsFieldName = `${sectionName}_${id}_use_wildcard_points`;
 	        
-	        var useWildcardPointsFieldName = `${sectionName}_${id}_use_wildcard_points`;
+	        const pointsFieldName = `${sectionName}_${id}_points`;
 	        
-	        var pointsFieldName = `${sectionName}_${id}_points`;
-	        
-	        var useNormalPointsFieldName = `${sectionName}_${id}_use_normal_points`;
+	        const useNormalPointsFieldName = `${sectionName}_${id}_use_normal_points`;
 	        
             fields = [
 	            baseFieldName,
@@ -22510,36 +22876,36 @@ visualize what it will look like in chat.
 	        
 	        getAttrs(fields, function(values) {
 	            
-	            var base = getBaseSkillLevel(values[baseFieldName], values);
+	            const base = getBaseSkillLevel(values[baseFieldName], values);
 	            
-	            var difficulty = values[difficultyFieldName];
+	            let difficulty = values[difficultyFieldName];
 	            
-	            var bonus = +values[bonusFieldName];
+	            const bonus = Number(values[bonusFieldName]);
 	            
-	            var wildcardSkillPoints = +values[wildcardSkillPointsFieldName];
+	            const wildcardSkillPoints = Number(values[wildcardSkillPointsFieldName]);
 	            
-	            var useWildcardSkillPoints = +values[useWildcardPointsFieldName];
+	            const useWildcardSkillPoints = Number(values[useWildcardPointsFieldName]);
 	            
-	            var points = +values[pointsFieldName];
+	            const points = Number(values[pointsFieldName]);
 	            
-	            var useNormalPoints = +values[useNormalPointsFieldName];
+	            const useNormalPoints = Number(values[useNormalPointsFieldName]);
 	            
 	            // check for wildcard
 	            if ( String(difficulty) === "-5 + 1") {
 	                difficulty = -4;
 	            } else {
-	               difficulty = +difficulty; 
+	               difficulty = Number(difficulty); 
 	            }
 	            
-	            var skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, wildcardSkillPoints, useWildcardSkillPoints, points, useNormalPoints);
+	            const skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, wildcardSkillPoints, useWildcardSkillPoints, points, useNormalPoints);
 	            
-	            var fieldToUpdate = `${sectionName}_${rowId}_level_mirror`;
+	            const fieldToUpdate = `${sectionName}_${id}_level`;
 	            
-	            var updateFields = {};
+	            let updateFields = {};
 	            
 	            updateFields[fieldToUpdate] = skillLevel;
 	            
-	            setAttrs(updateFields, {silent: false});
+	            setAttrs(updateFields, {silent: false}, callback);
 	            
 	        });
 	        
@@ -22549,32 +22915,32 @@ visualize what it will look like in chat.
 
 	function getBaseSkillLevel(baseFieldName, values) {
 	    
-	    var baseLevel = 10;
+	    let baseLevel = 10;
 	    
 	    switch(baseFieldName) {
 	        
 	        case "@{strength}":
-	            baseLevel = +values.strength;
+	            baseLevel = Number(values.strength);
 	            break;
 	        
 	        case "@{dexterity}":
-	            baseLevel = +values.dexterity;
+	            baseLevel = Number(values.dexterity);
 	            break;
 	            
 	        case "@{intelligence}":
-	            baseLevel = +values.intelligence;
+	            baseLevel = Number(values.intelligence);
 	            break;
 	            
 	        case "@{health}":
-	            baseLevel = +values.health;
+	            baseLevel = Number(values.health);
 	            break;
 	            
 	        case "@{willpower}":
-	            baseLevel = +values.willpower;
+	            baseLevel = Number(values.willpower);
 	            break;
 	           
 	        case "@{perception}":
-	            baseLevel = +values.perception;
+	            baseLevel = Number(values.perception);
 	            break;
 	            
 	        default:
@@ -22582,87 +22948,61 @@ visualize what it will look like in chat.
 	            break;
 	            
 	    }
+
+		if (isNaN(baseLevel)) {
+			baseLevel = 10;
+		}
 	    
 	    return baseLevel;
 	}
 	
 	/**
-	 * This function is used to make sure the repeating 
-	 * skill levels are updated when the version has changed
+	 * Syncs `attr_spell_base` and `attr_spell_bonus` to 
+	 * corresponding repeating_spells fields. This will
+	 * trigger updating the spell level at the same time.
 	 */
-	function updateRepeatingSpellLevels() {
-	    
-	    var sectionName = "repeating_spells";
-	    
-	    // get the base spell level and bonus
-	    getAttrs(["spell_base", "spell_bonus"], function(values) {
-	        
-	        var spellBase = values.spell_base;
-	        
-	        var spellBonus = parseInt(values.spell_bonus);
-	        
-	        if ( isNaN(spellBonus) ) {
-	            spellBonus = 0;
-	        }
-	        
-    	    getSectionIDs(sectionName, function(ids) {
-    	        
-    	        updateSpellLevel( sectionName, ids, spellBase, spellBonus );
-    	        
-    	    });    
-	        
-	    });
-	     
-	}
+	function syncModsToRepeatingSpells(callback) {
 
-	function updateSpellLevel(sectionName, ids, spellBase, spellBonus) {
+		callback = callback || noop;
+
+		const fields = [
+			"spell_base", 
+			"spell_bonus",
+			"strength",
+			"dexterity",
+			"intelligence",
+			"health",
+			"perception",
+			"willpower"
+		];
 	    
-	    _.each(ids,function(id) {
-            
-            var rowId = id;
-	        
-	        var difficultyFieldName = `${sectionName}_${id}_difficulty`;
-	        
-	        var bonusFieldName = `${sectionName}_${id}_spell_modifier`;
-	        
-	        var pointsFieldName = `${sectionName}_${id}_points`;
-	        
-            fields = [
-	            difficultyFieldName,
-	            bonusFieldName,
-	            pointsFieldName,
-	            "strength",
-	            "dexterity",
-	            "intelligence",
-	            "health",
-	            "perception",
-	            "willpower"
-	        ];
-	        
-	        getAttrs(fields, function(values) {
-	            
-	            var base = getBaseSkillLevel(spellBase, values);
-	            
-	            var difficulty = +values[difficultyFieldName];
-	            
-	            var bonus = +values[bonusFieldName] + spellBonus;
-	            
-	            var points = +values[pointsFieldName];
-	            
-	            var skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, 0, false, points, true);
-	            
-	            var fieldToUpdate = `${sectionName}_${rowId}_level_mirror`;
-	            
-	            var updateFields = {};
-	            
-	            updateFields[fieldToUpdate] = skillLevel;
-	             
-	            setAttrs(updateFields, {silent: false});
-	            
-	        });
-	        
-	    });
-	    
+	    getAttrs(fields, values => {
+
+			const baseLevel = String(values.spell_base);
+
+			const bonus = Number(values.spell_bonus);
+
+			const sectionName = "repeating_spells";
+
+			getSectionIDs(sectionName, function (ids) {
+				
+				if (ids.length === 0 ) {
+					return;
+				}
+				
+				let fieldsToUpdate = {};
+				
+				for (let i = 0; i < ids.length; i++) {
+					fieldsToUpdate[`${sectionName}_${ids[i]}_base`] = baseLevel;
+					fieldsToUpdate[`${sectionName}_${ids[i]}_bonus`] = bonus;
+				}
+
+				setAttrs(fieldsToUpdate, null, callback);
+				
+			});
+
+		});
+	     
 	}
 	
 	/**
@@ -22676,9 +23016,16 @@ visualize what it will look like in chat.
 	 */
 	function getSkillLevelUsingRaw(base, difficulty, bonus, wildcardSkillPoints, useWildcardSkillPoints, points, useNormalPoints) {
 	    
-	    var skill = 10;
+	    let skill = 10;
 	    
-	    var skillPoints = 0;
+	    let skillPoints = 0;
+
+		// make sure we have a number.
+		difficulty = Number(difficulty);
+
+		if (isNaN(difficulty)) {
+			difficulty = 0;
+		}
 	    
 	    // determine which points to use
 	    if (useNormalPoints) {
@@ -22691,7 +23038,7 @@ visualize what it will look like in chat.
 	        
 	    }
 	    
-	    var levelFromPoints = Math.floor((skillPoints * 0.25) + 2)
+	    const levelFromPoints = Math.floor((skillPoints * 0.25) + 2)
                               * Math.ceil( ( ( skillPoints - 2 ) + Math.abs( skillPoints - 2) ) / 256 ) 
                               + skillPoints 
                               * Math.abs( Math.ceil( ( ( skillPoints - 2 ) + Math.abs( skillPoints - 2) ) / 256 ) - 1 );
@@ -22738,7 +23085,7 @@ visualize what it will look like in chat.
 			        ];
 			        
 			    getAttrs(attributes, function(values) {
-			        
+			        note
 			        let repeatingTableToUse = "";
 			        
 			        let rowTypeValue = values[rowType];
@@ -22779,7 +23126,7 @@ visualize what it will look like in chat.
         		    } else {
         		        
         		        // if there's a row id, let's update stuff
-        		        let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
+        		        let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
         		        
         		        let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
         		        
@@ -22850,9 +23197,10 @@ visualize what it will look like in chat.
         return arr;
     }
     
-	// method to reduce async calls.
+	// method to reduce code
 	['on','maintained'].forEach(onormaintained => {
 		
+		// calculates the spell penalties for either ON or Concentrated
 		on(`change:repeating_spells:spell_${onormaintained}_checked change:penalty_per_spell_${onormaintained} remove:repeating_spells`, function (event) {
 		
 			getSectionIDs('repeating_spells', ids => {
@@ -23248,31 +23596,31 @@ visualize what it will look like in chat.
 
 		switch (defenseType) {
 			case "Dodge":
-				successNote      = getDefenseNotesByCode("dodge_success_notes");
-				successCritNote  = getDefenseNotesByCode("dodge_critical_success_notes");
-				failNote         = getDefenseNotesByCode("dodge_fail_notes");
-				failCriticalNote = getDefenseNotesByCode("dodge_critical_failure_notes");
+				successNote      = getNotesByCode("dodge_success_notes");
+				successCritNote  = getNotesByCode("dodge_critical_success_notes");
+				failNote         = getNotesByCode("dodge_fail_notes");
+				failCriticalNote = getNotesByCode("dodge_critical_failure_notes");
 				break;
 		
 			case "Parry":
-				successNote      = getDefenseNotesByCode("parry_success_notes");
-				successCritNote  = getDefenseNotesByCode("parry_critical_success_notes");
-				failNote         = getDefenseNotesByCode("parry_fail_notes");
-				failCriticalNote = getDefenseNotesByCode("parry_critical_failure_notes");
+				successNote      = getNotesByCode("parry_success_notes");
+				successCritNote  = getNotesByCode("parry_critical_success_notes");
+				failNote         = getNotesByCode("parry_fail_notes");
+				failCriticalNote = getNotesByCode("parry_critical_failure_notes");
 				break;
 		
 			case "Unarmed Parry":
-				successNote      = getDefenseNotesByCode("unarmed_parry_success_notes");
-				successCritNote  = getDefenseNotesByCode("unarmed_parry_critical_success_notes");
-				failNote         = getDefenseNotesByCode("unarmed_parry_fail_notes");
-				failCriticalNote = getDefenseNotesByCode("unarmed_parry_critical_failure_notes");
+				successNote      = getNotesByCode("unarmed_parry_success_notes");
+				successCritNote  = getNotesByCode("unarmed_parry_critical_success_notes");
+				failNote         = getNotesByCode("unarmed_parry_fail_notes");
+				failCriticalNote = getNotesByCode("unarmed_parry_critical_failure_notes");
 				break;
 		
 			case "Block":
-				successNote      = getDefenseNotesByCode("block_success_notes");
-				successCritNote  = getDefenseNotesByCode("block_critical_success_notes");
-				failNote         = getDefenseNotesByCode("block_fail_notes");
-				failCriticalNote = getDefenseNotesByCode("block_critical_failure_notes");
+				successNote      = getNotesByCode("block_success_notes");
+				successCritNote  = getNotesByCode("block_critical_success_notes");
+				failNote         = getNotesByCode("block_fail_notes");
+				failCriticalNote = getNotesByCode("block_critical_failure_notes");
 				break;
 		
 			default:
@@ -23352,7 +23700,7 @@ visualize what it will look like in chat.
 	/**
 	 * Generate a table for storing active defense notes.
 	 */
-	function getRawActiveDefensesNotes() {
+	function getRawNotes() {
 
 		const dodgeSuccessNotes = `If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.`;
 
@@ -23394,6 +23742,13 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		const blockCriticalFailureNotes = `Lose your grip on the your shield and you must take a turn to ready it before you can use it to block again. See B382.`;
 
+		const criticalMissNotes = `Roll on the appropriate Critical Miss Table (B556).`;
+
+		const criticalHitNotes = `Automatic hits – foe does not get an active defense roll! (B381). Roll on appropriate Critical Hits Table (B556). 
+Rapid-fire attack - The first round is a critical hit; All the others are normal hits, and the target may dodge. Rule verification from Kromm.
+For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds (the GM rolls secretly). (B405)
+`;
+
 		const notes = [
 			{code: "dodge_success_notes",                  value: dodgeSuccessNotes},
 			{code: "dodge_critical_success_notes",         value: dodgeCriticalSuccessNotes},
@@ -23411,6 +23766,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 			{code: "block_critical_success_notes",         value: blockCriticalSuccessNotes},
 			{code: "block_fail_notes",                     value: blockFailNotes},
 			{code: "block_critical_failure_notes",         value: blockCriticalFailureNotes},
+			{code: "critical_miss_notes",                  value: criticalMissNotes},
+			{code: "critical_hit_notes",                   value: criticalHitNotes},
 		];
 
 		return notes; 
@@ -23423,10 +23780,10 @@ The attacker may choose to hit the original target or the limb you used to parry
      * Uses the array of json object objects
      * to get the modifier based on speed/range
      **/
-	 const getDefenseNotesByCode = (code) => {
+	 const getNotesByCode = (code) => {
     	
     	const entry = rawDefenseNotes.find( (notes) => notes.code === code );
-    	
+
     	// if no matches, return no string
     	return (entry != undefined ? entry.value : "");
     
@@ -27189,7 +27546,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let basePoints = Number(campaign.basepoints);
 
+		const jsonTL = getTraitFromGcaAttributes(attributes, "Tech Level");
+
 		let baseTL = Number(campaign.basetl);
+
+		let characterTL = baseTL;
 
 		let miscNotes = "";
 
@@ -27227,6 +27588,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		if (jsonStatus && jsonStatus.score) {
 			status = jsonStatus.score;
+		}
+
+		if (jsonTL && jsonTL.score) {
+			characterTL = Number(jsonTL.score);
 		}
 
 		if (jsonMonthlyPay && jsonMonthlyPay.score) {
@@ -27306,7 +27671,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 			size:                  sizeModifier,
 			age:                   general.age,
 			total_points:          basePoints,
-			tl:	                   baseTL,
+			campaign_tl:	       baseTL,
+			tl:					   characterTL,
 			status:				   status,
 			wealth:				   "Average",
 			strength_points:       strPts,
