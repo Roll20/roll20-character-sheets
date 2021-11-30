@@ -4374,30 +4374,13 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.6.9 -->
+				<!-- current version notes: 2.7.0 -->
 				<ul>
-					<li>Melee and Ranged tables. Added success, critical success, fail, and critical fail notes. Requested by Mike.</li>
-					<li>Added RAW notes for melee and ranged attacked critical success and fail to roll results table. Requested by Mike.</li>
-					<li>Renamed Sheet option <b>Show Active Defense Notes</b> to <b>Show RAW Notes</b>.</li>
-					<li>
-						Repeating skills, techniques, and spells code has been changed from <i>auto-calculated</i> to <i>sheet worker script.</i>
-						This allows checking for triggers/changes and fields are only updated when a change is made. Should help speed 
-						up the charactersheet a tiny bit and easier coding.
-						<ul>
-							<li>
-								<b>Note:</b> When loading the new version the skills and spells should get automatically updated to use the <i>sheet worker script</i>. 
-								If skill or spell levels seem wrong, you can try changing the character points or modifier to trigger 
-								the calculation and then change it back.
-							</li>
-						</ul>
-					</li>
-					<li>
-						Bio/Misc Tab - Renamed <i>Miscellaneous</i> section to <i>TECH LEVEL</i> and added <i>Campaign Tech Level</i> and <i>Your Tech Level</i>. Import GCA4 will import the 
-						campaign tech level value and the character's tech level. <b>Suggestion: </b> Use High TL Advantage and Low TL Advantage to set the character's 
-						tech level, avoid using PTS for Your Tech Level.
-					</li>
+					<li>Bugfix - When a sheet with a new version, converting skills from <i>auto-calculated</i> to <i>sheet-worker script</i> wasn't called correctly</li>
+					<li>Updated a few tooltips. Text provided by Mike.</li>
+					<li>Updated default wound modifier notes. Text provided by Mike.</li>
 				</ul>
-				
+		
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
 			</div>
@@ -13332,7 +13315,18 @@ visualize what it will look like in chat.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.6.9 -->
+			<!-- current version notes: 2.7.0 -->
+
+			<ul>
+				<li>Bugfix - When a sheet with a new version, converting skills from <i>auto-calculated</i> to <i>sheet-worker script</i> wasn't called correctly</li>
+				<li>Updated a few tooltips. Text provided by Mike.</li>
+				<li>Updated default wound modifier notes. Text provided by Mike.</li>
+			</ul>
+
+			<h4>Version: 2.6.9</h4>
+
+			<p>Pull Request: 11/28/2021</p>
+
 			<ul>
 				<li>Melee and Ranged tables. Added success, critical success, fail, and critical fail notes. Requested by Mike.</li>
 				<li>Added RAW notes for melee and ranged attacked critical success and fail to roll results table. Requested by Mike.</li>
@@ -14339,6 +14333,7 @@ visualize what it will look like in chat.
 								<td>
 									<textarea name="attr_damage_type_note_cut">CUTTING
 	Damage x1.5
+	* Fractional results round down. (B378)
 	Neck Damage x2
 	Skull Damage x4</textarea>
 									</td>
@@ -14363,6 +14358,7 @@ visualize what it will look like in chat.
 									<textarea name="attr_damage_type_note_cr">CRUSHING
 	Damage x1
 	Neck Damage x1.5
+	* Fractional results round down. (B378)
 	Skull Damage x4</textarea>
 								</td>
 							</tr>
@@ -14373,6 +14369,7 @@ visualize what it will look like in chat.
 								<td>
 									<textarea name="attr_damage_type_note_pi_minus">PIERCING-
 	Damage x .5
+	* Fractional results round down. (B378)
 	Vitals Damage x3
 	Skull Damage x4</textarea>
 								</td>
@@ -14395,6 +14392,7 @@ visualize what it will look like in chat.
 								<td>
 									<textarea name="attr_damage_type_note_pi_plus">PIERCING+
 	Damage x1.5
+	* Fractional results round down. (B378)
 	Arm, Leg, Foot, or Hand x1 (B399)
 	Vitals Damage x3
 	Skull Damage x4</textarea>
@@ -14435,7 +14433,9 @@ visualize what it will look like in chat.
 									<textarea name="attr_damage_type_note_cor">CORRROSION 
 	Damage x1
 	Face Damage x1.5, blind eye if major wound, both eyes if full HP
+	* Fractional results round down. (B378)
 	Neck Damage x1.5
+	* Fractional results round down. (B378)
 	Skull Damage x4
 	-1 DR per 5 points damage</textarea>
 									</td>
@@ -15856,7 +15856,10 @@ visualize what it will look like in chat.
                 {{#rollTotal() useDamageTypeNotes 1}}
                     {{#damageTypeNote}}
                     <tr class="damageTypeNote">
-                        <td colspan="2"><span>{{damageTypeNote}}</span></td>
+                        <td colspan="2">
+							<span>Wounding modifiers AFTER DR.</span>
+							<span>{{damageTypeNote}}</span>
+						</td>
                     </tr>
                     {{/damageTypeNote}}
                 {{/rollTotal() useDamageTypeNotes 1}}
@@ -16076,18 +16079,18 @@ visualize what it will look like in chat.
 	// if using VS code or similar coding tool, use the type listed below or just delete type="text/worker"
 	// type="application/javascript"
 
-	var noop = function () {}; // do nothing callback function.
+	const noop = function () {}; // do nothing callback function.
 
-	var version = "2.6.9";
+	const version = "2.7.0";
 
-	var latestChangesDate = "11/28/2021";
+	const latestChangesDate = "11/28/2021";
 
-	var modCascade = true;
+	let modCascade = true;
 	
-	var modCascadeAll = true;
+	let modCascadeAll = true;
 
 	// add global variable
-	var damageTable = [];
+	let damageTable = [];
 	
 	const decelerationDivisor = 2;
 	
@@ -22825,9 +22828,9 @@ visualize what it will look like in chat.
 
 		let sectionName = "repeating_skills";
 	    
-	    getSectionIDs(sectionName, function(ids, callback) {
+	    getSectionIDs(sectionName, (ids, callback) => {
 	        
-	        updateSkillLevel(sectionName, ids);
+	        updateSkillLevel(sectionName, ids, callback);
 	        
 	    });
 	    
@@ -22841,6 +22844,8 @@ visualize what it will look like in chat.
 	 * correct skill levels when the sheet loads.
 	 */
 	function updateSkillLevel(sectionName, ids, callback) {
+
+		callback = callback || noop;
 
         _.each(ids,function(id) {
             
@@ -22968,12 +22973,6 @@ visualize what it will look like in chat.
 		const fields = [
 			"spell_base", 
 			"spell_bonus",
-			"strength",
-			"dexterity",
-			"intelligence",
-			"health",
-			"perception",
-			"willpower"
 		];
 	    
 	    getAttrs(fields, values => {
@@ -23085,7 +23084,7 @@ visualize what it will look like in chat.
 			        ];
 			        
 			    getAttrs(attributes, function(values) {
-			        note
+			        
 			        let repeatingTableToUse = "";
 			        
 			        let rowTypeValue = values[rowType];
