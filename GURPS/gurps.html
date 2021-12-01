@@ -4374,13 +4374,11 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.7.0 -->
+				<!-- current version notes: 2.7.0.1 -->
 				<ul>
-					<li>Bugfix - When a sheet with a new version, converting skills from <i>auto-calculated</i> to <i>sheet-worker script</i> wasn't called correctly</li>
-					<li>Updated a few tooltips. Text provided by Mike.</li>
-					<li>Updated default wound modifier notes. Text provided by Mike.</li>
+					<li>Streamline how skill and spell levels are updated when a new GURPS version is loaded. This should resolve issues where linked items aren't updating.</li>
 				</ul>
-		
+				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
 			</div>
@@ -7998,6 +7996,7 @@ PU2:126 = Power-Ups 2. Page 126
 					<div class="row row-stats">
 						<div class="cell col0">
 							<input type="text" name="attr_name" title="Macro table name: repeating_skills. Field name: name" />
+							<input type="hidden" name="attr_sync" value="0" />
 						</div>
 						<div class="cell col1">
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{skill_roll_modifier}, @{skill_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_skill_modifier_tool}]]}} {{maxNine=[[@{skill_roll_max_nine}]]}} {{rollModifier=[[@{skill_roll_modifier}]]}} {{rollModifierSummary=@{skill_roll_modifier_summary}}} {{rollTraitSummary=@{skill_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}} {{noteBoxOneShow=@{show_skill_mod_notes}}} {{noteBoxOneLabel=Skill Modifiers}} {{noteBoxOneContent=@{skill_mod_description_notes}}}" name="roll_vsSL" />
@@ -13315,7 +13314,14 @@ visualize what it will look like in chat.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.7.0 -->
+			<!-- current version notes: 2.7.0.1 -->
+			<ul>
+				<li>Streamline how skill and spell levels are updated when a new GURPS version is loaded. This should resolve issues where linked items aren't updating.</li>
+			</ul>
+
+			<h4>Version: 2.7.0</h4>
+
+			<p>Pull Request: 11/29/2021</p>
 
 			<ul>
 				<li>Bugfix - When a sheet with a new version, converting skills from <i>auto-calculated</i> to <i>sheet-worker script</i> wasn't called correctly</li>
@@ -14333,7 +14339,6 @@ visualize what it will look like in chat.
 								<td>
 									<textarea name="attr_damage_type_note_cut">CUTTING
 	Damage x1.5
-	* Fractional results round down. (B378)
 	Neck Damage x2
 	Skull Damage x4</textarea>
 									</td>
@@ -14358,7 +14363,6 @@ visualize what it will look like in chat.
 									<textarea name="attr_damage_type_note_cr">CRUSHING
 	Damage x1
 	Neck Damage x1.5
-	* Fractional results round down. (B378)
 	Skull Damage x4</textarea>
 								</td>
 							</tr>
@@ -14369,7 +14373,6 @@ visualize what it will look like in chat.
 								<td>
 									<textarea name="attr_damage_type_note_pi_minus">PIERCING-
 	Damage x .5
-	* Fractional results round down. (B378)
 	Vitals Damage x3
 	Skull Damage x4</textarea>
 								</td>
@@ -14392,7 +14395,6 @@ visualize what it will look like in chat.
 								<td>
 									<textarea name="attr_damage_type_note_pi_plus">PIERCING+
 	Damage x1.5
-	* Fractional results round down. (B378)
 	Arm, Leg, Foot, or Hand x1 (B399)
 	Vitals Damage x3
 	Skull Damage x4</textarea>
@@ -14433,9 +14435,7 @@ visualize what it will look like in chat.
 									<textarea name="attr_damage_type_note_cor">CORRROSION 
 	Damage x1
 	Face Damage x1.5, blind eye if major wound, both eyes if full HP
-	* Fractional results round down. (B378)
 	Neck Damage x1.5
-	* Fractional results round down. (B378)
 	Skull Damage x4
 	-1 DR per 5 points damage</textarea>
 									</td>
@@ -15856,10 +15856,7 @@ visualize what it will look like in chat.
                 {{#rollTotal() useDamageTypeNotes 1}}
                     {{#damageTypeNote}}
                     <tr class="damageTypeNote">
-                        <td colspan="2">
-							<span>Wounding modifiers AFTER DR.</span>
-							<span>{{damageTypeNote}}</span>
-						</td>
+                        <td colspan="2"><span>{{damageTypeNote}}</span></td>
                     </tr>
                     {{/damageTypeNote}}
                 {{/rollTotal() useDamageTypeNotes 1}}
@@ -16079,18 +16076,18 @@ visualize what it will look like in chat.
 	// if using VS code or similar coding tool, use the type listed below or just delete type="text/worker"
 	// type="application/javascript"
 
-	const noop = function () {}; // do nothing callback function.
+	var noop = function () {}; // do nothing callback function.
 
-	const version = "2.7.0";
+	const version = "2.7.0.1.4";
 
-	const latestChangesDate = "11/28/2021";
+	const latestChangesDate = "12/1/2021";
 
-	let modCascade = true;
+	var modCascade = true;
 	
-	let modCascadeAll = true;
+	var modCascadeAll = true;
 
 	// add global variable
-	let damageTable = [];
+	var damageTable = [];
 	
 	const decelerationDivisor = 2;
 	
@@ -17057,7 +17054,7 @@ visualize what it will look like in chat.
 		});
 
 		sumRepeating('repeating_item', 'weighttotal', function (v) {
-			setAttrs({ total_weight: Math.round(v * 1000) / 1000 }, {silent: false}, thenEncumbrance);
+			setAttrs({ total_weight: Math.round(v * 1000) / 1000 }, null, thenEncumbrance);
 		});
 
 		// Update attributes, then secondary characteristics, and so on...
@@ -17106,26 +17103,14 @@ visualize what it will look like in chat.
 
 		updateRepeatingDefenseNotes();
 		
-		updateRepeatingSkillLevels(thenUpdateLinkedItems());
+		updateRepeatingSkillLevels();
 		
-		syncModsToRepeatingSpells(thenUpdateLinkedItems());
+		syncModsToRepeatingSpells();
 		
 		updateHitPointThresholds();
 			
 	}
 	
-	function thenUpdateLinkedItems() {
-		
-	    updateLinkedSkills("repeating_melee", "melee");
-    
-        updateLinkedSkills("repeating_ranged", "ranged");
-		
-		updateLinkedSkills("repeating_techniquesrevised", "technique");
-
-		updateLinkedSkills("repeating_defense", "defense");
-
-	}
-
 	// Sum values, used in reduce
 	function getSum(total, num) {
 		return (+total || 0) + (+num || 0);
@@ -17311,7 +17296,7 @@ visualize what it will look like in chat.
 				knockback_points: st_display - 2 + knockbackMod,
 				show_size_modifier_strength_message: showMessage,
 				size_modifier_cp_strength_adjustment: pointsNeededForStrength
-			}, {silent: false}, callback);
+			}, null, callback);
 		});
 	}
 
@@ -17330,7 +17315,7 @@ visualize what it will look like in chat.
 			setAttrs({
 				dexterity_base: base,
 				dexterity: base + mod
-			}, {silent: false}, callback);
+			}, null, callback);
 		});
 	}
 
@@ -17349,7 +17334,7 @@ visualize what it will look like in chat.
 			setAttrs({
 				intelligence_base: base,
 				intelligence: base + mod
-			}, {silent: false}, callback);
+			}, null, callback);
 		});
 	}
 
@@ -17368,7 +17353,7 @@ visualize what it will look like in chat.
 			setAttrs({
 				health_base: base,
 				health: base + mod
-			}, {silent: false}, callback);
+			}, null, callback);
 		});
 	}
 
@@ -17427,7 +17412,7 @@ visualize what it will look like in chat.
 				major_wound_threshold: majorWound,
 				show_size_modifier_hit_point_message: showMessage,
 				size_modifier_cp_hit_point_adjustment: pointsNeededForHitPoints
-			}, {silent: false}, callback);
+			}, null, callback);
 		
 		});
 	}
@@ -17447,7 +17432,7 @@ visualize what it will look like in chat.
 			var mod = +v.fatigue_points_mod;
 			setAttrs({
 				fatigue_points_max: base + mod
-			}, {silent: false}, callback);
+			}, null, callback);
 		});
 	}
 
@@ -17466,7 +17451,7 @@ visualize what it will look like in chat.
 			setAttrs({
 				perception_base: base,
 				perception: base + mod
-			}, {silent: false}, callback);
+			}, null, callback);
 		});
 	}
 
@@ -17585,7 +17570,7 @@ visualize what it will look like in chat.
 			setAttrs({
 				basic_speed_base: base,
 				basic_speed: base + mod
-			}, {silent: false}, callback);
+			}, null, callback);
 		});
 	}
 
@@ -17605,7 +17590,7 @@ visualize what it will look like in chat.
 			setAttrs({
 				basic_move_base: base,
 				basic_move: base + mod
-			}, {silent: false}, callback);
+			}, null, callback);
 		});
 	}
 
@@ -17625,7 +17610,7 @@ visualize what it will look like in chat.
 			setAttrs({
 				dodge_base: base,
 				dodge: base + mod
-			}, {silent: false}, callback);
+			}, null, callback);
 		});
 	}
 
@@ -17731,7 +17716,7 @@ visualize what it will look like in chat.
 				dodge_reduced_notes: dodgeNotes,
 				strength_display: strengthDisplay,
 				strength_halved: strengthHalved
-			}, {silent: false}, callback);
+			}, null, callback);
 			
 		});
 	}
@@ -17757,7 +17742,7 @@ visualize what it will look like in chat.
 				lift_st_base: base,
 				lift_st: modded,
 				basic_lift: basicLift
-			}, {silent: false}, callback);
+			}, null, callback);
 		});
 	}
 
@@ -17868,7 +17853,16 @@ visualize what it will look like in chat.
 	});
 
 	// Update the skill level and update the total cost of Skills 
-	on('change:repeating_skills:base change:repeating_skills:difficulty change:repeating_skills:bonus change:repeating_skills:points', (event) => {
+	on('change:repeating_skills:base change:repeating_skills:difficulty change:repeating_skills:bonus change:repeating_skills:points change:repeating_skills:sync', (event) => {
+
+		// check if this is a valid sync
+		const isSync = String(event.sourceAttribute).endsWith("sync");
+		
+		const syncValue = Number(event.newValue);
+
+		if (isSync && syncValue !== 1) {
+			return;
+		}
 
 		let fieldValues = [
 			"repeating_skills_base", 
@@ -17931,11 +17925,13 @@ visualize what it will look like in chat.
 
 			const finalSkillLevel = getSkillLevelUsingRaw(baseLevel, difficulty, bonus, wildcard_skill_points, use_wildcard_points, skill_points, use_normal_points);
 
+			// make sure to reset the sync back to 0. see function updateSkillLevel()
 			const fieldsToUpdate = {
 				repeating_skills_wildcard_skill_points: wildcard_skill_points,
 				repeating_skills_use_wildcard_points: use_wildcard_points,
 				repeating_skills_use_normal_points: use_normal_points,
-				repeating_skills_level: finalSkillLevel
+				repeating_skills_level: finalSkillLevel,
+				repeating_skills_sync: 0
 			};
 
 			// if the skill level changes, this will trigger 
@@ -18208,7 +18204,7 @@ visualize what it will look like in chat.
 					total_weight_gravity: totalGravityWeight,
 					grand_total_weight: grandTotalWeight
 				},
-				{silent: false},
+				null,
 				callback
 			);
 
@@ -18252,7 +18248,7 @@ visualize what it will look like in chat.
 			setAttrs({ 
 				thrust: damageType.thrust,
 				swing: damageType.swing
-			}, {silent: false}, callback);
+			}, null, callback);
 
 		});
 
@@ -22031,7 +22027,7 @@ visualize what it will look like in chat.
 		// loop through each section and update items that match the rowId
 		sections.forEach((section) => {
 
-			toggleRepeatingSectionLinkedToRow(rowId, section.sectionName, section.prefix)
+			toggleRepeatingSectionLinkedToRow(rowId, section.sectionName, section.prefix);
 
 		});
 		
@@ -22300,7 +22296,7 @@ visualize what it will look like in chat.
     	            
     	        updateFields["defense_knockback_skill_row_id_level"] = "";
 
-    	        setAttrs(updateFields, {silent: false}, callback);
+    	        setAttrs(updateFields, null, callback);
     	        
 			} else if (updateMethod == "attribute") {
 
@@ -22373,7 +22369,10 @@ visualize what it will look like in chat.
     	            
     	        updateFields[skillMessageFieldLevel] = "";
     	        
-    	        setAttrs(updateFields, {silent: false}, callback);
+				// change the toggle back to 0
+				updateFields[skillRowIdToggleFieldName] = 0;
+
+    	        setAttrs(updateFields, {silent: true}, callback);
     	        
 			} else if (updateMethod == "attribute") {
 
@@ -22492,7 +22491,6 @@ visualize what it will look like in chat.
 		        
 		let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
 		
-		// TODO: update linked defensive skills!
 		if (repeatingTableToUse == "repeating_melee" || repeatingTableToUse == "repeating_ranged") {
 
 			skillFieldName = `${repeatingTableToUse}_${skillRowId}_skill`;
@@ -22539,13 +22537,13 @@ visualize what it will look like in chat.
 
 				}
 
-				setAttrs(updateFields, {silent: false}, callback);
+				setAttrs(updateFields, {silent: true}, callback);
 				
 			} else {
 
 				updateFields[skillMessageFieldName] = `Could not find ${rowType}.`;
     	            
-    	        setAttrs(updateFields, {silent: false}, callback);
+    	        setAttrs(updateFields, null, callback);
     	        
 			}
 			
@@ -22653,7 +22651,7 @@ visualize what it will look like in chat.
 
 			}
 
-			setAttrs(updateFields);
+			setAttrs(updateFields, {silent: true});
 			
 		});
 		
@@ -22804,7 +22802,7 @@ visualize what it will look like in chat.
 				
 				updateFields["ad_knockback_skill"] = skillLevel;
 				
-				setAttrs(updateFields, {silent: false}, callback);
+				setAttrs(updateFields, null, callback);
 				
 			} else {
 
@@ -22822,15 +22820,13 @@ visualize what it will look like in chat.
 	 * This function is used to make sure the repeating 
 	 * skill levels are updated when the version has changed
 	 */
-	function updateRepeatingSkillLevels(callback) {
+	function updateRepeatingSkillLevels() {
 	    
-		callback = callback || noop;
-
 		let sectionName = "repeating_skills";
 	    
-	    getSectionIDs(sectionName, (ids, callback) => {
+	    getSectionIDs(sectionName, (ids) => {
 	        
-	        updateSkillLevel(sectionName, ids, callback);
+	        updateSkillLevel(sectionName, ids);
 	        
 	    });
 	    
@@ -22839,83 +22835,34 @@ visualize what it will look like in chat.
 	/**
 	 * Ensures skill levels are correct when loading 
 	 * a new version of the sheet. This is needed, since the
-	 * skill levels were converted auto-calculating fields to 
+	 * skill levels were converted from auto-calculating fields to 
 	 * sheet workers. This code ensures older sheets have the 
 	 * correct skill levels when the sheet loads.
+	 * 
+	 * NOTE: if the skill level changes, this will automatically trigger 
+	 *       updating the linked items.
 	 */
-	function updateSkillLevel(sectionName, ids, callback) {
+	function updateSkillLevel(sectionName, ids) {
 
-		callback = callback || noop;
+		// we can trigger an update by setting the sync property to 1
+		let fieldsToUpdate = {};
 
-        _.each(ids,function(id) {
-            
-            const baseFieldName = `${sectionName}_${id}_base`;
+		if (ids.length === 0) {
+			return;
+		}
+
+		ids.forEach(id => {
+
+			const syncFieldName = `${sectionName}_${id}_sync`;
+			
+			fieldsToUpdate[syncFieldName] = 1;
 	        
-	        const difficultyFieldName = `${sectionName}_${id}_difficulty`;
-	        
-	        const bonusFieldName = `${sectionName}_${id}_bonus`;
-	        
-	        const wildcardSkillPointsFieldName = `${sectionName}_${id}_wildcard_skill_points`;
-	        
-	        const useWildcardPointsFieldName = `${sectionName}_${id}_use_wildcard_points`;
-	        
-	        const pointsFieldName = `${sectionName}_${id}_points`;
-	        
-	        const useNormalPointsFieldName = `${sectionName}_${id}_use_normal_points`;
-	        
-            fields = [
-	            baseFieldName,
-	            difficultyFieldName,
-	            bonusFieldName,
-	            wildcardSkillPointsFieldName,
-	            useWildcardPointsFieldName,
-	            pointsFieldName,
-	            useNormalPointsFieldName,
-	            "strength",
-	            "dexterity",
-	            "intelligence",
-	            "health",
-	            "perception",
-	            "willpower"
-	        ];
-	        
-	        getAttrs(fields, function(values) {
-	            
-	            const base = getBaseSkillLevel(values[baseFieldName], values);
-	            
-	            let difficulty = values[difficultyFieldName];
-	            
-	            const bonus = Number(values[bonusFieldName]);
-	            
-	            const wildcardSkillPoints = Number(values[wildcardSkillPointsFieldName]);
-	            
-	            const useWildcardSkillPoints = Number(values[useWildcardPointsFieldName]);
-	            
-	            const points = Number(values[pointsFieldName]);
-	            
-	            const useNormalPoints = Number(values[useNormalPointsFieldName]);
-	            
-	            // check for wildcard
-	            if ( String(difficulty) === "-5 + 1") {
-	                difficulty = -4;
-	            } else {
-	               difficulty = Number(difficulty); 
-	            }
-	            
-	            const skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, wildcardSkillPoints, useWildcardSkillPoints, points, useNormalPoints);
-	            
-	            const fieldToUpdate = `${sectionName}_${id}_level`;
-	            
-	            let updateFields = {};
-	            
-	            updateFields[fieldToUpdate] = skillLevel;
-	            
-	            setAttrs(updateFields, {silent: false}, callback);
-	            
-	        });
-	        
-	    });
-	    
+		});
+
+		// by setting sync to 1, this trigger the change event on("change:repeating_skills:sync")
+		// which updates the skill level
+		setAttrs(fieldsToUpdate);
+
 	}
 
 	function getBaseSkillLevel(baseFieldName, values) {
@@ -22966,13 +22913,17 @@ visualize what it will look like in chat.
 	 * corresponding repeating_spells fields. This will
 	 * trigger updating the spell level at the same time.
 	 */
-	function syncModsToRepeatingSpells(callback) {
-
-		callback = callback || noop;
+	function syncModsToRepeatingSpells() {
 
 		const fields = [
 			"spell_base", 
 			"spell_bonus",
+			"strength",
+			"dexterity",
+			"intelligence",
+			"health",
+			"perception",
+			"willpower"
 		];
 	    
 	    getAttrs(fields, values => {
@@ -22996,7 +22947,7 @@ visualize what it will look like in chat.
 					fieldsToUpdate[`${sectionName}_${ids[i]}_bonus`] = bonus;
 				}
 
-				setAttrs(fieldsToUpdate, null, callback);
+				setAttrs(fieldsToUpdate, null);
 				
 			});
 
@@ -23047,132 +22998,7 @@ visualize what it will look like in chat.
         return skill;
         
 	}
-	
-	/**
-	 * Loops through each designated section and make sure the
-	 * linked skills have the correct information.
-	 */
-	function updateLinkedSkills(sectionName, subName) {
-	    
-	    getSectionIDs(sectionName, function(ids) {
-    	
-    	    // loop through each row
-    	    _.each(ids,function(id) {
-            
-				let rowType = `${sectionName}_${id}_${subName}`;
-	   
-	            let linkedRowId = `${sectionName}_${id}_${subName}_skill_row_id`;
-	            
-	            let linkedSkillMod = `${sectionName}_${id}_${subName}_skill_row_id_modifier`;
-			
-			    let skillMessageFieldName = `${sectionName}_${id}_${subName}_skill_row_id_message`;
-	    
-	            let skillMessageFieldLevel = `${sectionName}_${id}_${subName}_skill_row_id_level`;
-	            
-	            let weaponSkillFieldName = `${sectionName}_${id}_${subName}_skill`;
-	    
-	            // if this gets changed, then the update linked weapon skill gets triggered
-	            let skillRowIdToggleFieldName = `${sectionName}_${id}_${subName}_skill_row_id_toggle`;
-	    
-	            let attributes = [
-			            rowType,
-			            linkedRowId,
-			            linkedSkillMod,
-			            skillMessageFieldName,
-			            skillMessageFieldLevel,
-			            weaponSkillFieldName
-			        ];
-			        
-			    getAttrs(attributes, function(values) {
-			        
-			        let repeatingTableToUse = "";
-			        
-			        let rowTypeValue = values[rowType];
-	    
-            	    switch (rowTypeValue) {
-            	        
-            	        case "Technique":
-            	            repeatingTableToUse = "repeating_techniquesrevised";
-            	            break;
-            	            
-            	        case "Spell":
-            	            repeatingTableToUse = "repeating_spells";
-            	            break;
-            	            
-            	        case "Skill":
-            	        default:
-                            repeatingTableToUse = "repeating_skills";
-            	            break;
-            	            
-            	    }
-            	    
-            	    let skillRowId = values[linkedRowId];
-		    
-        		    let skillMod = +values[linkedSkillMod];
-        		    
-        		    // exit if there's no value
-        		    if (skillRowId.length === 0) {
-        		        
-        		        // clear the field
-        		        let updateFields = {};
-        		        
-        		        updateFields[skillMessageFieldName] = ``;
-            	            
-            	        updateFields[skillMessageFieldLevel] = "";
-            	        
-            	        setAttrs(updateFields);
-            	        
-        		    } else {
-        		        
-        		        // if there's a row id, let's update stuff
-        		        let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
-        		        
-        		        let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
-        		        
-        		        // update the skill level for weapon or linked technique.
-        		        getAttrs([skillFieldName, skillFieldNameOfSkill], function(values) {
-        
-        		            let skillLevel = +values[skillFieldName];
-        		            
-							let updateFields = {};
-
-							// check for a valid skill level							
-							if (skillLevel > 0) {
-						
-								let skillLevelFinal = skillLevel + linkedSkillMod;
-        		            
-								updateFields[weaponSkillFieldName] = skillLevelFinal;
-								
-								updateFields[skillMessageFieldName] = values[skillFieldNameOfSkill];
-								
-								updateFields[skillMessageFieldLevel] = skillLevel;
-								
-								// reset toggle to zero
-								updateFields[skillRowIdToggleFieldName] = 0;
-								
-								setAttrs(updateFields);
-								
-							} else {
-        		        
-								// show an error message
-								updateFields[skillMessageFieldName] = `Could not find ${rowTypeValue}.`;
-									
-								setAttrs(updateFields);
-									
-							}
-							
-        		        });
-        		        
-        		    }
-
-			    });
-			
-			});
-    	
-    	});
-    	
-	}
-	
+		
 	// see: https://stackoverflow.com/questions/3954438/how-to-remove-item-from-array-by-value
 	Array.prototype.remove = function() {
         var what, a = arguments, L = a.length, ax;
@@ -25911,6 +25737,8 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 	 **/
 	function updateHitLocationDropDownsByType(callback) {
 
+		callback = callback || noop;
+
 		getAttrs(["hit_location_type"], values => {
 
 			let type = values.hit_location_type;
@@ -27719,7 +27547,7 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 			updatesMerged = {...updates};
 		}
 
-		setAttrs(updatesMerged, {silent: false}, callback);
+		setAttrs(updatesMerged, null, callback);
 
 	}
 
@@ -29361,7 +29189,7 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 
 		if (saveRows) {
 			
-			setAttrs(rows, {silent: false}, callback);
+			setAttrs(rows, null, callback);
 
 		} else {
 
@@ -29942,7 +29770,7 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 
 		}
 
-		setAttrs(rows, {silent: false}, callback);
+		setAttrs(rows, null, callback);
 
 	}
 
@@ -30054,7 +29882,7 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 
 		}
 
-		setAttrs(rows, {silent: false}, callback);
+		setAttrs(rows, null, callback);
 
 	}
 
@@ -30356,7 +30184,7 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 
 		}
 
-		setAttrs(rows, {silent: false}, callback);
+		setAttrs(rows, null, callback);
 
 	}
 
@@ -30608,7 +30436,7 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 
 		}
 
-		setAttrs(rows, {silent: false}, callback);
+		setAttrs(rows, null, callback);
 
 	}
 
@@ -30832,7 +30660,7 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 
 		}
 
-		setAttrs(rows, {silent: false}, callback);
+		setAttrs(rows, null, callback);
 
 	}
 
@@ -31020,7 +30848,7 @@ For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds 
 
 			}
 
-			setAttrs(rows, {silent: false}, callback);
+			setAttrs(rows, null, callback);
 
 		});
 
