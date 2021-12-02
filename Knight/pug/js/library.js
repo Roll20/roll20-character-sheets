@@ -855,7 +855,10 @@ const i18n_deplacement = getTranslationByKey("deplacement"),
     i18n_lameCinetique = getTranslationByKey("lames-cinetiques-geantes-effets"),
     i18n_attaquesOmbres = getTranslationByKey("capacite-fan-made-Attaque-dans-les-ombres"),
     i18n_porteeMoyenne = getTranslationByKey("portee-moyenne"),
-    i18n_porteeCourte = getTranslationByKey("portee-courte")
+    i18n_porteeCourte = getTranslationByKey("portee-courte"),
+    i18n_devasterAnatheme = getTranslationByKey("devaster-anatheme"),
+    i18n_bourreauTenebres = getTranslationByKey("bourreau-tenebres"),
+    i18n_equilibrerBalance = getTranslationByKey("equilibrer-balance")
     ;
 
 function maxCar(carac, score, aspect)
