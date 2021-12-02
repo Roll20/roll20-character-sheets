@@ -4376,7 +4376,8 @@
 
 				<!-- current version notes: 2.7.0.1 -->
 				<ul>
-					<li>Streamline how skill and spell levels are updated when a new GURPS version is loaded. This should resolve issues where linked items aren't updating.</li>
+					<li>Streamline how skill and spell levels are updated when a new GURPS version is loaded.</li>
+					<li>Resolved issue where linked melee items were not updating. Reported Tsuka and troubleshooted by Mike W.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13072,6 +13073,7 @@ visualize what it will look like in chat.
 							<input type="text" name="attr_level" title="Macro table name: repeating_spells. Field name: level" readonly="readonly" value="10"/>
 							<!-- TODO: replace this hidden field with a drop-down instead of using one dorp-down for all spells!  -->
 							<input type="hidden" name="attr_base" value="10" />
+							<input type="hidden" name="attr_sync" value="0" />
 						</div>
 						<div class="cell col3">
 							<select name="attr_difficulty" title="Macro table name: repeating_spells. Field name: difficulty">
@@ -13316,7 +13318,8 @@ visualize what it will look like in chat.
 
 			<!-- current version notes: 2.7.0.1 -->
 			<ul>
-				<li>Streamline how skill and spell levels are updated when a new GURPS version is loaded. This should resolve issues where linked items aren't updating.</li>
+				<li>Streamline how skill and spell levels are updated when a new GURPS version is loaded.</li>
+				<li>Resolved issue where linked melee items were not updating. Reported Tsuka and troubleshooted by Mike W.</li>
 			</ul>
 
 			<h4>Version: 2.7.0</h4>
@@ -16078,9 +16081,9 @@ visualize what it will look like in chat.
 
 	var noop = function () {}; // do nothing callback function.
 
-	const version = "2.7.0.1.4";
+	const version = "2.7.0.1";
 
-	const latestChangesDate = "12/1/2021";
+	const latestChangesDate = "12/2/2021";
 
 	var modCascade = true;
 	
@@ -17103,9 +17106,9 @@ visualize what it will look like in chat.
 
 		updateRepeatingDefenseNotes();
 		
-		updateRepeatingSkillLevels();
+		syncModsToRepeatingSpells(true, updateRepeatingSkillSpellLevels("repeating_spells"));
 		
-		syncModsToRepeatingSpells();
+		updateRepeatingSkillSpellLevels("repeating_skills");
 		
 		updateHitPointThresholds();
 			
@@ -17960,12 +17963,21 @@ visualize what it will look like in chat.
 	// NOTE: this will trigger updating the spell level. 
 	on("change:spell_base change:spell_bonus", event => {
 
-		syncModsToRepeatingSpells();
+		syncModsToRepeatingSpells(false);
 
 	});
 
 	// Update the spell level and update the total cost of spells 
-	on('change:repeating_spells:base change:repeating_spells:bonus change:repeating_spells:difficulty change:repeating_spells:spell_modifier change:repeating_spells:points', (event) => {
+	on('change:repeating_spells:base change:repeating_spells:bonus change:repeating_spells:difficulty change:repeating_spells:spell_modifier change:repeating_spells:points change:repeating_spells:sync', (event) => {
+
+		// check if this is a valid sync
+		const isSync = String(event.sourceAttribute).endsWith("sync");
+		
+		const syncValue = Number(event.newValue);
+
+		if (isSync && syncValue !== 1) {
+			return;
+		}
 
 		let fieldValues = [
 			"repeating_spells_base", 
@@ -18001,8 +18013,10 @@ visualize what it will look like in chat.
 
 			const finalSkillLevel = getSkillLevelUsingRaw(baseLevel, difficulty, bonus, 0, 0, skill_points, 1);
 
+			// make sure to reset the sync back to 0. see function updateSkillLevel()
 			const fieldsToUpdate = {
-				repeating_spells_level: finalSkillLevel
+				repeating_spells_level: finalSkillLevel,
+				repeating_spells_sync: 0,
 			};
 
 			// if the skill level changes, this will trigger 
@@ -22214,6 +22228,15 @@ visualize what it will look like in chat.
     // if linked data for repeating range changes update the skill level
 	on('change:repeating_ranged:ranged_row_type change:repeating_ranged:ranged_skill_row_id change:repeating_ranged:ranged_skill_row_id_modifier change:repeating_ranged:ranged_skill_row_id_toggle', function(event){
 
+		// check if this is a valid toggle
+		const isToggled = String(event.sourceAttribute).endsWith("_skill_row_id_toggle");
+		
+		const toggledValue = Number(event.newValue);
+
+		if (isToggled && toggledValue !== 1) {
+			return;
+		}
+
 		getAttrs(["repeating_ranged_ranged_row_type"], function(values) {
         
             updateLinkedWeaponSkill("repeating_ranged", "ranged", values.repeating_ranged_ranged_row_type, "", 0);
@@ -22226,7 +22249,16 @@ visualize what it will look like in chat.
 	// if linked data for repeating melee changes update the skill level
 	on('change:repeating_melee:melee_row_type change:repeating_melee:melee_skill_row_id change:repeating_melee:melee_skill_row_id_modifier change:repeating_melee:melee_skill_row_id_toggle', function(event){
 
-        getAttrs(["repeating_melee_melee_row_type"], function(values) {
+        // check if this is a valid toggle
+		const isToggled = String(event.sourceAttribute).endsWith("_skill_row_id_toggle");
+		
+		const toggledValue = Number(event.newValue);
+
+		if (isToggled && toggledValue !== 1) {
+			return;
+		}
+
+		getAttrs(["repeating_melee_melee_row_type"], function(values) {
         
             updateLinkedWeaponSkill("repeating_melee", "melee", values.repeating_melee_melee_row_type, "", 0);
     		
@@ -22236,6 +22268,15 @@ visualize what it will look like in chat.
 
 	// if linked data for repeating techniques changes update the skill level
 	on('change:repeating_techniquesrevised:technique_row_type change:repeating_techniquesrevised:technique_skill_row_id change:repeating_techniquesrevised:technique_skill_row_id_toggle', function(event){
+
+		// check if this is a valid toggle
+		const isToggled = String(event.sourceAttribute).endsWith("_skill_row_id_toggle");
+		
+		const toggledValue = Number(event.newValue);
+
+		if (isToggled && toggledValue !== 1) {
+			return;
+		}
 
 		getAttrs(["repeating_techniquesrevised_technique_row_type"], function(values) {
 
@@ -22247,6 +22288,15 @@ visualize what it will look like in chat.
 
 	// if linked data for repeating defense is changed, get the new linked skill values
 	on('change:repeating_defense:type change:repeating_defense:defense_row_type change:repeating_defense:defense_talent_level change:repeating_defense:defense_skill_row_id change:repeating_defense:defense_skill_row_id_toggle', function(event){
+
+		// check if this is a valid toggle
+		const isToggled = String(event.sourceAttribute).endsWith("_skill_row_id_toggle");
+		
+		const toggledValue = Number(event.newValue);
+
+		if (isToggled && toggledValue !== 1) {
+			return;
+		}
 
 		getAttrs(["repeating_defense_defense_row_type", "repeating_defense_type", "repeating_defense_defense_talent_level"], function(values) {
 
@@ -22506,6 +22556,9 @@ visualize what it will look like in chat.
 			
 			let updateFields = {};
 
+			// reset toggle to zero
+			updateFields[skillRowIdToggleFieldName] = 0;
+				
 			if (skillLevel > 0) {
 
 				updateFields[weaponSkillFieldName] = skillLevelFinal;
@@ -22513,10 +22566,7 @@ visualize what it will look like in chat.
 				updateFields[skillMessageFieldName] = skillValues[skillFieldNameOfSkill];
 				
 				updateFields[skillMessageFieldLevel] = skillLevel;
-				
-				// reset toggle to zero
-				updateFields[skillRowIdToggleFieldName] = 0;
-				
+								
 				// if repeating_techniquesrevised, also update the Parent skill name and base skill level
 				if (sectionName == "repeating_techniquesrevised") {
 
@@ -22537,13 +22587,13 @@ visualize what it will look like in chat.
 
 				}
 
-				setAttrs(updateFields, {silent: true}, callback);
+				setAttrs(updateFields, null, callback);
 				
 			} else {
 
 				updateFields[skillMessageFieldName] = `Could not find ${rowType}.`;
     	            
-    	        setAttrs(updateFields, null, callback);
+    	        setAttrs(updateFields, {silent: true}, callback);
     	        
 			}
 			
@@ -22818,11 +22868,9 @@ visualize what it will look like in chat.
 
 	/**
 	 * This function is used to make sure the repeating 
-	 * skill levels are updated when the version has changed
+	 * skill/spell levels are updated when the version has changed
 	 */
-	function updateRepeatingSkillLevels() {
-	    
-		let sectionName = "repeating_skills";
+	function updateRepeatingSkillSpellLevels(sectionName) {
 	    
 	    getSectionIDs(sectionName, (ids) => {
 	        
@@ -22859,7 +22907,7 @@ visualize what it will look like in chat.
 	        
 		});
 
-		// by setting sync to 1, this trigger the change event on("change:repeating_skills:sync")
+		// by setting sync to 1, this trigger the change event on("change:repeating_skills:sync") OR on("change:repeating_spells:sync")
 		// which updates the skill level
 		setAttrs(fieldsToUpdate);
 
@@ -22913,7 +22961,9 @@ visualize what it will look like in chat.
 	 * corresponding repeating_spells fields. This will
 	 * trigger updating the spell level at the same time.
 	 */
-	function syncModsToRepeatingSpells() {
+	function syncModsToRepeatingSpells(silent = false, callback) {
+
+		callback = callback || noop;
 
 		const fields = [
 			"spell_base", 
@@ -22947,8 +22997,20 @@ visualize what it will look like in chat.
 					fieldsToUpdate[`${sectionName}_${ids[i]}_bonus`] = bonus;
 				}
 
-				setAttrs(fieldsToUpdate, null);
+				if (silent) {
 				
+					// silent is needed when the sheet opens
+					setAttrs(fieldsToUpdate, {silent: true}, callback);
+
+				} else {
+
+					// otherwise if base attribue or bonus changed, 
+					// this will fire the hook to update spells
+					// change:repeating_spells:base, change:repeating_spells:bonus
+					setAttrs(fieldsToUpdate, null, callback);
+
+				}
+
 			});
 
 		});
