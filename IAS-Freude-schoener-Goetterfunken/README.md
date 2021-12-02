@@ -18,6 +18,9 @@ Das Projekt wurde inspiriert von Hitdice, die auch den Entwicklungsprozess in ve
 
 # History
 
+## 2021-11-28
+- Feature: Hoher Kontrast einstellbar
+
 ## 2021-11-23
 - Bugfix: Reroll bei 5 Würfeln
 
