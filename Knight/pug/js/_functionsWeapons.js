@@ -121,12 +121,14 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   let isLeste = false;
   let isLourd = false;
   let isELumiere = false;
+  let isFureur = false;
   let isMeurtrier = false;
   let isObliteration = false;
   let isOrfevrerie = false;
   let isSilencieux = false;
   let isTenebricide = false;
   let isTirRafale = false;
+  let isUltraviolence = false;
 
   const eAntiAnatheme = isApplied(effet[`${prefix}antiAnatheme`]);
   const eAntiVehicule = isApplied(effet[`${prefix}antiVehicule`]);
@@ -262,6 +264,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
 
   if (eFureur) {
     isConditionnelV = true;
+    isFureur = true;
 
     firstExec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
 
@@ -343,8 +346,6 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
     isConditionnelD = true;
     isConditionnelV = true;
 
-    exec.push(`{{tenebricide=${i18n_tenebricide}}} {{tenebricideConditionD=${i18n_tenebricideConditionD}}} {{tenebricideConditionV=${i18n_tenebricideConditionV}}}`);
-
     isTenebricide = true;
   }
 
@@ -357,6 +358,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
 
   if (eUltraviolence) {
     isConditionnelV = true;
+    isUltraviolence = true;
 
     firstExec.push(`{{ultraviolenceValue=[[${eUltraviolenceV}D6]]}}`);
 
@@ -451,6 +453,8 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   result.isAssistantAttaque = isAssistantAttaque;
   result.isAntiAnatheme = isAntiAnatheme;
   result.isTirRafale = isTirRafale;
+  result.isFureur = isFureur;
+  result.isUltraviolence = isUltraviolence;
 
   result.eLumiere = eLumiere;
   result.isELumiere = isELumiere;
@@ -1676,7 +1680,7 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
 
     if (hasArmure) { vSurMesure += oCombat; }
 
-    bAttaque.push(vSurMesure);
+    bDegats.push(vSurMesure);
     exec.push(`{{vSurMesure=${vSurMesure}}}`);
   }
 
@@ -1808,7 +1812,7 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   if (aSurmesure) {
     const vSurMesure = Math.ceil(vBete / 2);
 
-    bAttaque.push(vSurMesure);
+    bDegats.push(vSurMesure);
     exec.push(`{{vSurMesure=${vSurMesure}}}`);
   }
 
@@ -2820,7 +2824,6 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
 
   const ODBarbarian = [];
   const ODShaman = [];
-  const ODWarrior = [];
 
   let goliath = 0;
   let ghost = '';
@@ -2833,11 +2836,16 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   let C6Nom = '';
   let C7Nom = '';
 
+  let ODWarrior = 0;
+  let warrior250PG = 0;
+
   let typeSoldier = '';
   let typeHunter = '';
   let typeHerald = '';
   let typeScholar = '';
   let typeScout = '';
+
+  let bonusWarrior = 0;
 
   switch (armure) {
     case 'barbarian':
@@ -2869,9 +2877,9 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       break;
 
     case 'rogue':
-      ghost = value.rogueGhost;
+      ghost = +value.rogueGhost;
 
-      if (ghost !== '') {
+      if (ghost !== 0) {
         exec.push(`{{special2=${i18n_ghostActive}}}`);
 
         if (isELumiere === false && isASLumiere === false) {
@@ -2907,7 +2915,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
         if (C5 !== '0') {
           exec.push(`{{totem1=${CaracNom[C5Nom]}}}`);
           cRoll.push(C5);
-          ODShaman.push(`@{${ODNom[C5Nom]}}`);
+          ODShaman.push(`@{${ODValue[C5Nom]}}`);
         }
       }
 
@@ -2915,7 +2923,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
         if (C6 !== '0') {
           exec.push(`{{totem2=${CaracNom[C6Nom]}}}`);
           cRoll.push(C6);
-          ODShaman.push(`@{${ODNom[C6Nom]}}`);
+          ODShaman.push(`@{${ODValue[C6Nom]}}`);
         }
       }
 
@@ -2923,7 +2931,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
         if (C7 !== '0') {
           exec.push(`{{totem3=${CaracNom[C7Nom]}}}`);
           cRoll.push(C7);
-          ODShaman.push(`@{${ODNom[C7Nom]}}`);
+          ODShaman.push(`@{${ODValue[C7Nom]}}`);
         }
       }
 
@@ -2935,93 +2943,96 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       break;
 
     case 'warrior':
-      typeSoldier = value.warriorSoldierA;
-      typeHunter = value.warriorHunterA;
-      typeHerald = value.warriorHeraldA;
-      typeScholar = value.warriorScholarA;
-      typeScout = value.warriorScoutA;
+      warrior250PG = +value.warrior250PG;
+      bonusWarrior = 1 + warrior250PG;
+
+      typeSoldier = +value.warriorSoldierA;
+      typeHunter = +value.warriorHunterA;
+      typeHerald = +value.warriorHeraldA;
+      typeScholar = +value.warriorScholarA;
+      typeScout = +value.warriorScoutA;
 
       if (typeSoldier !== 0) {
         exec.push(`{{special2=${i18n_typeSoldier}}}`);
 
-        if (C1Nom === 'deplacement' || C1Nom === 'force' || C1Nom === 'endurance') { ODWarrior.push(typeSoldier); }
+        if (C1Nom === 'deplacement' || C1Nom === 'force' || C1Nom === 'endurance') { ODWarrior += bonusWarrior; }
 
-        if (C2Nom === 'deplacement' || C2Nom === 'force' || C2Nom === 'endurance') { ODWarrior.push(typeSoldier); }
+        if (C2Nom === 'deplacement' || C2Nom === 'force' || C2Nom === 'endurance') { ODWarrior += bonusWarrior; }
 
         if (hasBonus === 1 || hasBonus === 2) {
-          if (C3Nom === 'deplacement' || C3Nom === 'force' || C3Nom === 'endurance') { ODWarrior.push(typeSoldier); }
+          if (C3Nom === 'deplacement' || C3Nom === 'force' || C3Nom === 'endurance') { ODWarrior += bonusWarrior; }
         }
 
         if (hasBonus === 2) {
-          if (C4Nom === 'deplacement' || C4Nom === 'force' || C4Nom === 'endurance') { ODWarrior.push(typeSoldier); }
+          if (C4Nom === 'deplacement' || C4Nom === 'force' || C4Nom === 'endurance') { ODWarrior += bonusWarrior; }
         }
       }
 
       if (typeHunter !== 0) {
         exec.push(`{{special2=${i18n_typeHunter}}}`);
 
-        if (C1Nom === 'hargne' || C1Nom === 'combat' || C1Nom === 'instinct') { ODWarrior.push(typeHunter); }
+        if (C1Nom === 'hargne' || C1Nom === 'combat' || C1Nom === 'instinct') { ODWarrior += bonusWarrior; }
 
-        if (C2Nom === 'hargne' || C2Nom === 'combat' || C2Nom === 'instinct') { ODWarrior.push(typeHunter); }
+        if (C2Nom === 'hargne' || C2Nom === 'combat' || C2Nom === 'instinct') { ODWarrior += bonusWarrior; }
 
         if (hasBonus === 1 || hasBonus === 2) {
-          if (C3Nom === 'hargne' || C3Nom === 'combat' || C3Nom === 'instinct') { ODWarrior.push(typeHunter); }
+          if (C3Nom === 'hargne' || C3Nom === 'combat' || C3Nom === 'instinct') { ODWarrior += bonusWarrior; }
         }
 
         if (hasBonus === 2) {
-          if (C4Nom === 'hargne' || C4Nom === 'combat' || C4Nom === 'instinct') { ODWarrior.push(typeHunter); }
+          if (C4Nom === 'hargne' || C4Nom === 'combat' || C4Nom === 'instinct') { ODWarrior += bonusWarrior; }
         }
       }
 
       if (typeHerald !== 0) {
         exec.push(`{{special2=${i18n_typeHerald}}}`);
 
-        if (C1Nom === 'aura' || C1Nom === 'parole' || C1Nom === 'sf') { ODWarrior.push(typeHerald); }
+        if (C1Nom === 'aura' || C1Nom === 'parole' || C1Nom === 'sf') { ODWarrior += bonusWarrior; }
 
-        if (C2Nom === 'aura' || C2Nom === 'parole' || C2Nom === 'sf') { ODWarrior.push(typeHerald); }
+        if (C2Nom === 'aura' || C2Nom === 'parole' || C2Nom === 'sf') { ODWarrior += bonusWarrior; }
 
         if (hasBonus === 1 || hasBonus === 2) {
-          if (C3Nom === 'aura' || C3Nom === 'parole' || C3Nom === 'sf') { ODWarrior.push(typeHerald); }
+          if (C3Nom === 'aura' || C3Nom === 'parole' || C3Nom === 'sf') { ODWarrior += bonusWarrior; }
         }
 
         if (hasBonus === 2) {
-          if (C4Nom === 'aura' || C4Nom === 'parole' || C4Nom === 'sf') { ODWarrior.push(typeHerald); }
+          if (C4Nom === 'aura' || C4Nom === 'parole' || C4Nom === 'sf') { ODWarrior += bonusWarrior; }
         }
       }
 
       if (typeScholar !== 0) {
         exec.push(`{{special2=${i18n_typeScholar}}}`);
 
-        if (C1Nom === 'tir' || C1Nom === 'savoir' || C1Nom === 'technique') { ODWarrior.push(typeScholar); }
+        if (C1Nom === 'tir' || C1Nom === 'savoir' || C1Nom === 'technique') { ODWarrior += bonusWarrior; }
 
-        if (C2Nom === 'tir' || C2Nom === 'savoir' || C2Nom === 'technique') { ODWarrior.push(typeScholar); }
+        if (C2Nom === 'tir' || C2Nom === 'savoir' || C2Nom === 'technique') { ODWarrior += bonusWarrior; }
 
         if (hasBonus === 1 || hasBonus === 2) {
-          if (C3Nom === 'tir' || C3Nom === 'savoir' || C3Nom === 'technique') { ODWarrior.push(typeScholar); }
+          if (C3Nom === 'tir' || C3Nom === 'savoir' || C3Nom === 'technique') { ODWarrior += bonusWarrior; }
         }
 
         if (hasBonus === 2) {
-          if (C4Nom === 'tir' || C4Nom === 'savoir' || C4Nom === 'technique') { ODWarrior.push(typeScholar); }
+          if (C4Nom === 'tir' || C4Nom === 'savoir' || C4Nom === 'technique') { ODWarrior += bonusWarrior; }
         }
       }
 
       if (typeScout !== 0) {
         exec.push(`{{special2=${i18n_typeScout}}}`);
 
-        if (C1Nom === 'discretion' || C1Nom === 'dexterite' || C1Nom === 'perception') { ODWarrior.push(typeScout); }
+        if (C1Nom === 'discretion' || C1Nom === 'dexterite' || C1Nom === 'perception') { ODWarrior += bonusWarrior; }
 
-        if (C2Nom === 'discretion' || C2Nom === 'dexterite' || C2Nom === 'perception') { ODWarrior.push(typeScout); }
+        if (C2Nom === 'discretion' || C2Nom === 'dexterite' || C2Nom === 'perception') { ODWarrior += bonusWarrior; }
 
         if (hasBonus === 1 || hasBonus === 2) {
-          if (C3Nom === 'discretion' || C3Nom === 'dexterite' || C3Nom === 'perception') { ODWarrior.push(typeScout); }
+          if (C3Nom === 'discretion' || C3Nom === 'dexterite' || C3Nom === 'perception') { ODWarrior += bonusWarrior; }
         }
 
         if (hasBonus === 2) {
-          if (C4Nom === 'discretion' || C4Nom === 'dexterite' || C4Nom === 'perception') { ODWarrior.push(typeScout); }
+          if (C4Nom === 'discretion' || C4Nom === 'dexterite' || C4Nom === 'perception') { ODWarrior += bonusWarrior; }
         }
       }
 
-      if (ODWarrior.length !== 0) { exec.push(`{{vODWarrior=[[${ODWarrior.join('+')}]]}}`); }
+      if (ODWarrior.length !== 0) { exec.push(`{{vODWarrior=${ODWarrior}}}`); }
       break;
   }
 
@@ -3058,7 +3069,7 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
 
   const ODMALBarbarian = [];
   const ODMALShaman = [];
-  const ODMALWarrior = [];
+  const bonusWarrior = 1;
 
   let MALGoliath = 0;
   let MALGhost = '';
@@ -3068,6 +3079,8 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
   let C6 = '';
   let C5Nom = '';
   let C6Nom = '';
+
+  let ODMALWarrior = 0;
 
   switch (armureL) {
     case 'barbarian':
@@ -3155,26 +3168,26 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
       break;
 
     case 'warrior':
-      MALTypeSoldier = value.MALWarriorSoldierA;
-      MALTypeHunter = value.MALWarriorHunterA;
-      MALTypeHerald = value.MALWarriorHeraldA;
-      MALTypeScholar = value.MALWarriorScholarA;
-      MALTypeScout = value.MALWarriorScoutA;
+      MALTypeSoldier = +value.MALWarriorSoldierA;
+      MALTypeHunter = +value.MALWarriorHunterA;
+      MALTypeHerald = +value.MALWarriorHeraldA;
+      MALTypeScholar = +value.MALWarriorScholarA;
+      MALTypeScout = +value.MALWarriorScoutA;
 
       if (MALTypeSoldier !== 0) {
         exec.push(`{{MALspecial2=${i18n_typeSoldier}}}`);
         exec.push('{{MALTypeWarrior=true}}');
 
-        if (C1Nom === 'deplacement' || C1Nom === 'force' || C1Nom === 'endurance') { ODMALWarrior.push(MALTypeSoldier); }
+        if (C1Nom === 'deplacement' || C1Nom === 'force' || C1Nom === 'endurance') { ODMALWarrior += bonusWarrior; }
 
-        if (C2Nom === 'deplacement' || C2Nom === 'force' || C2Nom === 'endurance') { ODMALWarrior.push(MALTypeSoldier); }
+        if (C2Nom === 'deplacement' || C2Nom === 'force' || C2Nom === 'endurance') { ODMALWarrior += bonusWarrior; }
 
         if (hasBonus === 1 || hasBonus === 2) {
-          if (C3Nom === 'deplacement' || C3Nom === 'force' || C3Nom === 'endurance') { ODMALWarrior.push(MALTypeSoldier); }
+          if (C3Nom === 'deplacement' || C3Nom === 'force' || C3Nom === 'endurance') { ODMALWarrior += bonusWarrior; }
         }
 
         if (hasBonus === 2) {
-          if (C4Nom === 'deplacement' || C4Nom === 'force' || C4Nom === 'endurance') { ODMALWarrior.push(MALTypeSoldier); }
+          if (C4Nom === 'deplacement' || C4Nom === 'force' || C4Nom === 'endurance') { ODMALWarrior += bonusWarrior; }
         }
       }
 
@@ -3182,16 +3195,16 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
         exec.push(`{{MALspecial2=${i18n_typeHunter}}}`);
         exec.push('{{MALTypeWarrior=true}}');
 
-        if (C1Nom === 'hargne' || C1Nom === 'combat' || C1Nom === 'instinct') { ODMALWarrior.push(MALTypeHunter); }
+        if (C1Nom === 'hargne' || C1Nom === 'combat' || C1Nom === 'instinct') { ODMALWarrior += bonusWarrior; }
 
-        if (C2Nom === 'hargne' || C2Nom === 'combat' || C2Nom === 'instinct') { ODMALWarrior.push(MALTypeHunter); }
+        if (C2Nom === 'hargne' || C2Nom === 'combat' || C2Nom === 'instinct') { ODMALWarrior += bonusWarrior; }
 
         if (hasBonus === 1 || hasBonus === 2) {
-          if (C3Nom === 'hargne' || C3Nom === 'combat' || C3Nom === 'instinct') { ODMALWarrior.push(MALTypeHunter); }
+          if (C3Nom === 'hargne' || C3Nom === 'combat' || C3Nom === 'instinct') { ODMALWarrior += bonusWarrior; }
         }
 
         if (hasBonus === 2) {
-          if (C4Nom === 'hargne' || C4Nom === 'combat' || C4Nom === 'instinct') { ODMALWarrior.push(MALTypeHunter); }
+          if (C4Nom === 'hargne' || C4Nom === 'combat' || C4Nom === 'instinct') { ODMALWarrior += bonusWarrior; }
         }
       }
 
@@ -3199,16 +3212,16 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
         exec.push(`{{MALspecial2=${i18n_typeHerald}}}`);
         exec.push('{{MALTypeWarrior=true}}');
 
-        if (C1Nom === 'aura' || C1Nom === 'parole' || C1Nom === 'sf') { ODMALWarrior.push(MALTypeHerald); }
+        if (C1Nom === 'aura' || C1Nom === 'parole' || C1Nom === 'sf') { ODMALWarrior += bonusWarrior; }
 
-        if (C2Nom === 'aura' || C2Nom === 'parole' || C2Nom === 'sf') { ODMALWarrior.push(MALTypeHerald); }
+        if (C2Nom === 'aura' || C2Nom === 'parole' || C2Nom === 'sf') { ODMALWarrior += bonusWarrior; }
 
         if (hasBonus === 1 || hasBonus === 2) {
-          if (C3Nom === 'aura' || C3Nom === 'parole' || C3Nom === 'sf') { ODMALWarrior.push(MALTypeHerald); }
+          if (C3Nom === 'aura' || C3Nom === 'parole' || C3Nom === 'sf') { ODMALWarrior += bonusWarrior; }
         }
 
         if (hasBonus === 2) {
-          if (C4Nom === 'aura' || C4Nom === 'parole' || C4Nom === 'sf') { ODMALWarrior.push(MALTypeHerald); }
+          if (C4Nom === 'aura' || C4Nom === 'parole' || C4Nom === 'sf') { ODMALWarrior += bonusWarrior; }
         }
       }
 
@@ -3216,16 +3229,16 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
         exec.push(`{{MALspecial2=${i18n_typeScholar}}}`);
         exec.push('{{MALTypeWarrior=true}}');
 
-        if (C1Nom === 'tir' || C1Nom === 'savoir' || C1Nom === 'technique') { ODMALWarrior.push(MALTypeScholar); }
+        if (C1Nom === 'tir' || C1Nom === 'savoir' || C1Nom === 'technique') { ODMALWarrior += bonusWarrior; }
 
-        if (C2Nom === 'tir' || C2Nom === 'savoir' || C2Nom === 'technique') { ODMALWarrior.push(MALTypeScholar); }
+        if (C2Nom === 'tir' || C2Nom === 'savoir' || C2Nom === 'technique') { ODMALWarrior += bonusWarrior; }
 
         if (hasBonus === 1 || hasBonus === 2) {
-          if (C3Nom === 'tir' || C3Nom === 'savoir' || C3Nom === 'technique') { ODMALWarrior.push(MALTypeScholar); }
+          if (C3Nom === 'tir' || C3Nom === 'savoir' || C3Nom === 'technique') { ODMALWarrior += bonusWarrior; }
         }
 
         if (hasBonus === 2) {
-          if (C4Nom === 'tir' || C4Nom === 'savoir' || C4Nom === 'technique') { ODMALWarrior.push(MALTypeScholar); }
+          if (C4Nom === 'tir' || C4Nom === 'savoir' || C4Nom === 'technique') { ODMALWarrior += bonusWarrior; }
         }
       }
 
@@ -3233,21 +3246,20 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
         exec.push(`{{MALspecial2=${i18n_typeScout}}}`);
         exec.push('{{MALTypeWarrior=true}}');
 
-        if (C1Nom === 'discretion' || C1Nom === 'dexterite' || C1Nom === 'perception') { ODMALWarrior.push(MALTypeScout); }
+        if (C1Nom === 'discretion' || C1Nom === 'dexterite' || C1Nom === 'perception') { ODMALWarrior += bonusWarrior; }
 
-        if (C2Nom === 'discretion' || C2Nom === 'dexterite' || C2Nom === 'perception') { ODMALWarrior.push(MALTypeScout); }
+        if (C2Nom === 'discretion' || C2Nom === 'dexterite' || C2Nom === 'perception') { ODMALWarrior += bonusWarrior; }
 
         if (hasBonus === 1 || hasBonus === 2) {
-          if (C3Nom === 'discretion' || C3Nom === 'dexterite' || C3Nom === 'perception') { ODMALWarrior.push(MALTypeScout); }
+          if (C3Nom === 'discretion' || C3Nom === 'dexterite' || C3Nom === 'perception') { ODMALWarrior += bonusWarrior; }
         }
 
         if (hasBonus === 2) {
-          if (C4Nom === 'discretion' || C4Nom === 'dexterite' || C4Nom === 'perception') { ODMALWarrior.push(MALTypeScout); }
+          if (C4Nom === 'discretion' || C4Nom === 'dexterite' || C4Nom === 'perception') { ODMALWarrior += bonusWarrior; }
         }
       }
 
-      if (ODMALWarrior.length !== 0) { exec.push(`{{vODMALWarrior=[[${ODMALWarrior.join('+')}]]}}`); }
-
+      if (ODMALWarrior.length !== 0) { exec.push(`{{vODMALWarrior=${ODMALWarrior}}}`); }
       break;
   }
 
@@ -3403,7 +3415,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
 
       if (isEDeuxMains && !isAAllegee) {
         if (cPrecis.nom !== '0') {
-          exec.push(`{{cPrecis=${CaracNom[cPrecis.nom]}}}`);
+          exec.push(`{{cPrecis=${cPrecis.nom}}}`);
 
           const CPValue = Number(cPrecis.base);
 
@@ -3598,4 +3610,425 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, hasArmu
   result.diceViolence = dViolence;
 
   return result;
+}
+
+function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, diceViolence, bonusViolence, conditions) {
+  const tSurprise = roll.results.attaqueSurpriseValue || {};
+  const tDestructeur = roll.results.destructeurValue || {};
+  const tFureur = roll.results.fureurValue || {};
+  const tMeurtrier = roll.results.meurtrierValue || {};
+  const tUltraviolence = roll.results.ultraviolenceValue || {};
+
+  const tArmeAzurineValueD = roll.results.armeAzurineValueD || {};
+  const tArmeAzurineValueV = roll.results.armeAzurineValueV || {};
+  const tArmeRougeSangValueD = roll.results.armeRougeSangValueD || {};
+  const tArmeRougeSangValueV = roll.results.armeRougeSangValueV || {};
+  const tCheneSculpte = roll.results.cheneSculpteValue || {};
+  const tGriffuresGraveesValueD = roll.results.griffuresGraveesValueD || {};
+  const tGriffuresGraveesValueV = roll.results.griffuresGraveesValueV || {};
+  const tMasqueBriseValueD = roll.results.masqueBriseValueD || {};
+  const tMasqueBriseValueV = roll.results.masqueBriseValueV || {};
+  const tRouagesCassesValueD = roll.results.rouagesCassesValueD || {};
+  const tRouagesCassesValueV = roll.results.rouagesCassesValueV || {};
+
+  const isTenebricide = conditions.isTenebricide || false;
+  const isSurprise = conditions.isSurprise || false;
+  const isDestructeur = conditions.isDestructeur || false;
+  const isFureur = conditions.isFureur || false;
+  const isMeurtrier = conditions.isMeurtrier || false;
+  const isUltraviolence = conditions.isUltraviolence || false;
+
+  const isArmeAzurine = conditions.isArmeAzurine || false;
+  const isArmeRougeSang = conditions.isArmeRougeSang || false;
+  const isCheneSculpte = conditions.isCheneSculpte || false;
+  const isGriffureGravee = conditions.isGriffureGravee || false;
+  const isMasqueBrise = conditions.isMasqueBrise || false;
+  const isRouagesCasses = conditions.isRouagesCasses || false;
+
+  let tDegats = totalDegats;
+  let tViolence = totalViolence;
+
+  let hDestructeur = 0;
+  let hFureur = 0;
+  let hMeurtrier = 0;
+  let hSurprise = 0;
+  let hUltraviolence = 0;
+
+  let hArmeAzurineValueD = 0;
+  let hArmeAzurineValueV = 0;
+  let hArmeRougeSangValueD = 0;
+  let hArmeRougeSangValueV = 0;
+  let hCheneSculpte = 0;
+  let hGriffuresGraveesValueD = 0;
+  let hGriffuresGraveesValueV = 0;
+  let hMasqueBriseValueD = 0;
+  let hMasqueBriseValueV = 0;
+  let hRouagesCassesValueD = 0;
+  let hRouagesCassesValueV = 0;
+
+  if (isSurprise) { hSurprise = tSurprise.result; }
+  if (isDestructeur) { hDestructeur = tDestructeur.result; }
+  if (isFureur) { hFureur = tFureur.result; }
+  if (isMeurtrier) { hMeurtrier = tMeurtrier.result; }
+  if (isUltraviolence) { hUltraviolence = tUltraviolence.result; }
+
+  if (isArmeAzurine) {
+    hArmeAzurineValueD = tArmeAzurineValueD.result;
+    hArmeAzurineValueV = tArmeAzurineValueV.result;
+  }
+  if (isArmeRougeSang) {
+    hArmeRougeSangValueD = tArmeRougeSangValueD.result;
+    hArmeRougeSangValueV = tArmeRougeSangValueV.result;
+  }
+  if (isCheneSculpte) { hCheneSculpte = tCheneSculpte.result; }
+  if (isGriffureGravee) {
+    hGriffuresGraveesValueD = tGriffuresGraveesValueD.result;
+    hGriffuresGraveesValueV = tGriffuresGraveesValueV.result;
+  }
+  if (isMasqueBrise) {
+    hMasqueBriseValueD = tMasqueBriseValueD.result;
+    hMasqueBriseValueV = tMasqueBriseValueV.result;
+  }
+  if (isRouagesCasses) {
+    hRouagesCassesValueD = tRouagesCassesValueD.result;
+    hRouagesCassesValueV = tRouagesCassesValueV.result;
+  }
+
+  let vTDegats = 0;
+  let vTViolence = 0;
+  let vTDestructeur = 0;
+  let vTFureur = 0;
+  let vTMeurtrier = 0;
+  let vTSurprise = 0;
+  let vTUltraviolence = 0;
+
+  let vTCheneSculpte = 0;
+
+  if (conditions.bourreau || conditions.equilibre) {
+    tDegats = diceDegats.reduce((accumulateur, valeurCourante) => {
+      let newV = +valeurCourante;
+      if (newV <= 3) { newV = 4; }
+
+      return accumulateur + newV;
+    }, 0);
+    if (bonusDegats.length !== 0) { tDegats += bonusDegats.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
+
+    if (isDestructeur) {
+      hDestructeur = tDestructeur.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isMeurtrier) {
+      hMeurtrier = tMeurtrier.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isSurprise) {
+      if (tSurprise.dice.length !== 0) {
+        const normalRoll = tSurprise.dice.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante);
+        const bonusSurprise = +tSurprise.result - +normalRoll;
+
+        hSurprise = tSurprise.dice.reduce((accumulateur, valeurCourante) => {
+          let newV = +valeurCourante;
+          if (newV <= 3) { newV = 4; }
+
+          return accumulateur + newV;
+        }, 0);
+
+        hSurprise += bonusSurprise;
+      }
+    }
+
+    if (isArmeAzurine) {
+      hArmeAzurineValueD = tArmeAzurineValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isArmeRougeSang) {
+      hArmeRougeSangValueD = tArmeRougeSangValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isCheneSculpte) {
+      hCheneSculpte = tCheneSculpte.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isGriffureGravee) {
+      hGriffuresGraveesValueD = tGriffuresGraveesValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isMasqueBrise) {
+      hMasqueBriseValueD = tMasqueBriseValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isRouagesCasses) {
+      hRouagesCassesValueD = tRouagesCassesValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+  }
+
+  if (conditions.devaste || conditions.equilibre) {
+    tViolence = diceViolence.reduce((accumulateur, valeurCourante) => {
+      let newV = valeurCourante;
+      if (newV <= 3) { newV = 4; }
+
+      return accumulateur + newV;
+    }, 0);
+
+    if (bonusViolence.length !== 0) { tViolence += bonusViolence.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
+
+    if (isFureur) {
+      hFureur = tFureur.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isUltraviolence) {
+      hUltraviolence = tUltraviolence.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isArmeAzurine) {
+      hArmeAzurineValueV = tArmeAzurineValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isArmeRougeSang) {
+      hArmeRougeSangValueV = tArmeRougeSangValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isGriffureGravee) {
+      hGriffuresGraveesValueV = tGriffuresGraveesValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isMasqueBrise) {
+      hMasqueBriseValueV = tMasqueBriseValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isRouagesCasses) {
+      hRouagesCassesValueV = tRouagesCassesValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+  }
+
+  if (isTenebricide) {
+    let limiteD = Math.floor(+diceDegats.length / 2);
+    let limiteV = Math.floor(+diceViolence.length / 2);
+
+    if (limiteD < 1) { limiteD = 1; }
+    if (limiteV < 1) { limiteV = 1; }
+
+    vTDegats = diceDegats.reduce((accumulateur, valeurCourante, index) => {
+      let result = +accumulateur;
+
+      if (index < limiteD) {
+        let newV = +valeurCourante;
+
+        if (conditions.bourreau || conditions.equilibre) {
+          if (newV <= 3) { newV = 4; }
+        }
+
+        result += newV;
+      }
+
+      return result;
+    }, 0);
+
+    if (bonusDegats.length !== 0) { vTDegats += bonusDegats.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
+
+    vTViolence = diceViolence.reduce((accumulateur, valeurCourante, index) => {
+      let result = +accumulateur;
+
+      if (index < limiteV) {
+        let newV = +valeurCourante;
+
+        if (conditions.bourreau || conditions.equilibre) {
+          if (newV <= 3) { newV = 4; }
+        }
+
+        result += newV;
+      }
+
+      return result;
+    }, 0);
+
+    if (bonusViolence.length !== 0) { vTViolence += bonusViolence.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
+
+    if (isMeurtrier) {
+      let diceMeurtrier = +tMeurtrier.dice[0];
+
+      if (conditions.bourreau || conditions.equilibre) {
+        if (diceMeurtrier <= 3) { diceMeurtrier = 4; }
+      }
+
+      vTMeurtrier = diceMeurtrier;
+    }
+
+    if (isDestructeur) {
+      let diceDestructeur = +tDestructeur.dice[0];
+
+      if (conditions.bourreau || conditions.equilibre) {
+        if (diceDestructeur <= 3) { diceDestructeur = 4; }
+      }
+
+      vTDestructeur = diceDestructeur;
+    }
+
+    if (isCheneSculpte) {
+      let diceCheneSculpte = +tCheneSculpte.dice[0];
+
+      if (conditions.bourreau || conditions.equilibre) {
+        if (diceCheneSculpte <= 3) { diceCheneSculpte = 4; }
+      }
+
+      vTCheneSculpte = diceCheneSculpte;
+    }
+
+    if (isFureur) {
+      let diceFureur1 = +tFureur.dice[0];
+      let diceFureur2 = +tFureur.dice[1];
+
+      if (conditions.devaste || conditions.equilibre) {
+        if (diceFureur1 <= 3) { diceFureur1 = 4; }
+        if (diceFureur2 <= 3) { diceFureur2 = 4; }
+      }
+
+      vTFureur = diceFureur1 + diceFureur2;
+    }
+
+    if (isSurprise) {
+      let bonusSurprise = +tSurprise.result;
+
+      if (tSurprise.dice.length !== 0) {
+        const dices = tSurprise.dice;
+        const limiteS = Math.floor(+dices.length / 2);
+        const normalRoll = dices.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante);
+        bonusSurprise -= +normalRoll;
+
+        vTSurprise = dices.reduce((accumulateur, valeurCourante, index) => {
+          let result = accumulateur;
+
+          if (index < limiteS) {
+            let newV = +valeurCourante;
+
+            if (conditions.bourreau || conditions.equilibre) {
+              if (newV <= 3) { newV = 4; }
+            }
+
+            result += newV;
+          }
+
+          return result;
+        }, 0);
+      }
+
+      vTSurprise += +bonusSurprise;
+    }
+
+    if (isUltraviolence) {
+      let diceUltraviolence = +tUltraviolence.dice[0];
+
+      if (conditions.devaste || conditions.equilibre) {
+        if (diceUltraviolence <= 3) { diceUltraviolence = 4; }
+      }
+
+      vTUltraviolence = diceUltraviolence;
+    }
+  }
+
+  const computed = {
+    degats: tDegats,
+    violence: tViolence,
+    tenebricideValueD: vTDegats,
+    tenebricideValueV: vTViolence,
+    tenebricideASValue: vTSurprise,
+    destructeurValue: hDestructeur,
+    fureurValue: hFureur,
+    meurtrierValue: hMeurtrier,
+    attaqueSurpriseValue: hSurprise,
+    ultraviolenceValue: hUltraviolence,
+    armeAzurineValueD: hArmeAzurineValueD,
+    armeAzurineValueV: hArmeAzurineValueV,
+    armeRougeSangValueD: hArmeRougeSangValueD,
+    armeRougeSangValueV: hArmeRougeSangValueV,
+    cheneSculpteValue: hCheneSculpte,
+    griffuresGraveesValueD: hGriffuresGraveesValueD,
+    griffuresGraveesValueV: hGriffuresGraveesValueV,
+    masqueBriseValueD: hMasqueBriseValueD,
+    masqueBriseValueV: hMasqueBriseValueV,
+    rouagesCassesValueD: hRouagesCassesValueD,
+    rouagesCassesValueV: hRouagesCassesValueV,
+    tDestructeurValue: vTDestructeur,
+    tFureurValue: vTFureur,
+    tMeurtrierValue: vTMeurtrier,
+    tUltraviolenceValue: vTUltraviolence,
+    tCheneSculpteValue: vTCheneSculpte,
+  };
+
+  return computed;
 }
