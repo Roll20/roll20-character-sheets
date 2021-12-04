@@ -283,7 +283,7 @@
 						</tr>
 						<tr>
 							<td>
-								<select style="width: 95%;-webkit-appearance: auto;" value="" name="attr_global_random_type" title="@{global_random_type}">
+								<select style="width: 95%;-webkit-appearance: auto;" value="" name="attr_global_random_type">
 									<option data-i18n="fluid-0" value="10+1d6" selected>可変(全体)</option>
 									<option data-i18n="fluid-1" value="1">可変(星)</option>
 									<option data-i18n="fluid-2" value="2">可変(獣)</option>
@@ -302,7 +302,7 @@
 						</tr>
 						<tr>
 							<td>
-								<input type="number" class="underlined" name="attr_global_roll_number" title="@{global_roll_number}" value="@{global_roll_number}"/>D6
+								<input type="number" class="underlined" name="attr_global_roll_number" value="@{global_roll_number}"/>D6
 							</td>
 							<td width="30">
 								<button name="act_common" class='dice-roll btn' type='action' value='&{template:Magic} {{name=@{character_name}}} ' ></button>
@@ -3907,7 +3907,7 @@
 					if (num == 0) {
 						rollPart += "{{RandomArea=[[1]]}}{{Area=[[1d6]]}}{{RandomSkill=[[2d6]]}}{{target=[[0]]}}";
 					} else {
-						rollPart += "{{Area=[[" + num + "]]}}{{RandomSkill=[[2d6]]}}{{target=[[0]]}}";
+						rollPart += "{{RandomArea=[[0]]}}{{Area=[[" + num + "]]}}{{RandomSkill=[[2d6]]}}{{target=[[0]]}}";
 					}
 				} else if (getName(skill)) {
 					rollPart += "{{target=[[" + getName(skill) + "]]}}";
@@ -3928,11 +3928,11 @@
 					let param = {};
 					if (area > 10) {
 						area = area - 10;
-						param.Area = area;
 						param.RandomArea = 1;
-						param.area = area;
-						param.randomArea = 1;
+					} else {
+						param.RandomArea = results.results.RandomArea.result;
 					}
+					param.Area = area;
 					if (showButton && showButton.result > 0) {
 						showButton = showButton.result;
 						if (area == 1) { area = "A"; }
@@ -4620,12 +4620,12 @@ Event Table---------------------------------------------------------------------
 						[ㅤ](~{{CharacterID}}|rollgold)
 						{{/ShowButton}}
 						<div>
-							{{#RandomArea}}
+							{{#rollTotal() computed::RandomArea 1}}
 							<span class="area" data-i18n="fluid-0">가변(전체)</span>
-							{{/RandomArea}}
-							{{^RandomArea}}
+							{{/rollTotal() computed::RandomArea 1}}
+							{{#rollTotal() computed::RandomArea 0}}
 							<span class="area" data-i18n="fluid-1">가변(별)</span>
-							{{/RandomArea}}
+							{{/rollTotal() computed::RandomArea 0}}
 							<span data-i18n="gold">黄金</span>
 						</div>
 					{{/rollTotal() RandomSkill 2}}
@@ -4634,12 +4634,12 @@ Event Table---------------------------------------------------------------------
 						[ㅤ](~{{CharacterID}}|rollfield)
 						{{/ShowButton}}
 						<div>
-							{{#RandomArea}}
+							{{#rollTotal() computed::RandomArea 1}}
 							<span class="area" data-i18n="fluid-0">가변(전체)</span>
-							{{/RandomArea}}
-							{{^RandomArea}}
+							{{/rollTotal() computed::RandomArea 1}}
+							{{#rollTotal() computed::RandomArea 0}}
 							<span class="area" data-i18n="fluid-1">가변(별)</span>
-							{{/RandomArea}}
+							{{/rollTotal() computed::RandomArea 0}}
 							<span data-i18n="field">大地</span>
 						</div>
 					{{/rollTotal() RandomSkill 3}}
@@ -4648,12 +4648,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollwoods)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-1">가변(별)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="woods">森</span>
 					</div>
 					{{/rollTotal() RandomSkill 4}}
@@ -4662,12 +4662,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollroad)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-1">가변(별)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="road">道</span>
 					</div>
 					{{/rollTotal() RandomSkill 5}}
@@ -4676,12 +4676,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollsea)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-1">가변(별)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="sea">海</span>
 					</div>
 					{{/rollTotal() RandomSkill 6}}
@@ -4690,12 +4690,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollsilent)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-1">가변(별)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="silent">静寂</span>
 					</div>
 					{{/rollTotal() RandomSkill 7}}
@@ -4704,12 +4704,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollrain)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-1">가변(별)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="rain">雨</span>
 					</div>
 					{{/rollTotal() RandomSkill 8}}
@@ -4718,12 +4718,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollstorm)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-1">가변(별)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="storm">嵐</span>
 					</div>
 					{{/rollTotal() RandomSkill 9}}
@@ -4732,12 +4732,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollsun)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-1">가변(별)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="sun">太陽</span>
 					</div>
 					{{/rollTotal() RandomSkill 10}}
@@ -4746,12 +4746,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollsky)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-1">가변(별)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="sky">天空</span>
 					</div>
 					{{/rollTotal() RandomSkill 11}}
@@ -4760,12 +4760,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollworld)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-1">가변(별)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 							<span data-i18n="world">異界</span>
 						</div>
 					{{/rollTotal() RandomSkill 12}}
@@ -4776,12 +4776,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollmeat)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="meat">肉</span>
 					</div>
 					{{/rollTotal() RandomSkill 2}}
@@ -4790,12 +4790,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollbug)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="bug">蟲</span>
 					</div>
 					{{/rollTotal() RandomSkill 3}}
@@ -4804,12 +4804,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollflower)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="flower">花</span>
 					</div>
 					{{/rollTotal() RandomSkill 4}}
@@ -4818,12 +4818,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollblood)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="blood">血</span>
 					</div>
 					{{/rollTotal() RandomSkill 5}}
@@ -4832,12 +4832,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollscale)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="scale">鱗</span>
 					</div>
 					{{/rollTotal() RandomSkill 6}}
@@ -4846,12 +4846,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollchaos)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="chaos">混沌</span>
 					</div>
 					{{/rollTotal() RandomSkill 7}}
@@ -4860,12 +4860,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rolltooth)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="tooth">牙</span>
 					</div>
 					{{/rollTotal() RandomSkill 8}}
@@ -4874,12 +4874,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollroar)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="roar">叫び</span>
 					</div>
 					{{/rollTotal() RandomSkill 9}}
@@ -4888,12 +4888,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollfury)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="fury">怒り</span>
 					</div>
 					{{/rollTotal() RandomSkill 10}}
@@ -4902,12 +4902,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rollwing)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="wing">翼</span>
 					</div>
 					{{/rollTotal() RandomSkill 11}}
@@ -4916,12 +4916,12 @@ Event Table---------------------------------------------------------------------
 					[ㅤ](~{{CharacterID}}|rolleros)
 					{{/ShowButton}}
 					<div>
-						{{#RandomArea}}
+						{{#rollTotal() computed::RandomArea 1}}
 						<span class="area" data-i18n="fluid-0">가변(전체)</span>
-						{{/RandomArea}}
-						{{^RandomArea}}
+						{{/rollTotal() computed::RandomArea 1}}
+						{{#rollTotal() computed::RandomArea 0}}
 						<span class="area" data-i18n="fluid-2">가변(짐승)</span>
-						{{/RandomArea}}
+						{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="eros">エロス</span>
 					</div>
 					{{/rollTotal() RandomSkill 12}}
@@ -4932,12 +4932,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollgravity)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="gravity">重力</span>
 					</div>
 				{{/rollTotal() RandomSkill 2}}
@@ -4946,12 +4946,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollwind)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="wind">風</span>
 					</div>
 				{{/rollTotal() RandomSkill 3}}
@@ -4960,12 +4960,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollflow)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="flow">流れ</span>
 					</div>
 				{{/rollTotal() RandomSkill 4}}
@@ -4974,12 +4974,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollwater)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="water">水</span>
 					</div>
 				{{/rollTotal() RandomSkill 5}}
@@ -4988,12 +4988,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollwave)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="wave">波</span>
 					</div>
 				{{/rollTotal() RandomSkill 6}}
@@ -5002,12 +5002,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollfreedom)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="freedom">自由</span>
 					</div>
 				{{/rollTotal() RandomSkill 7}}
@@ -5016,12 +5016,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollimpact)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="impact">衝撃</span>
 					</div>
 				{{/rollTotal() RandomSkill 8}}
@@ -5030,12 +5030,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollelectric)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="electric">雷</span>
 					</div>
 				{{/rollTotal() RandomSkill 9}}
@@ -5044,12 +5044,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollflame)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="flame">炎</span>
 					</div>
 				{{/rollTotal() RandomSkill 10}}
@@ -5058,12 +5058,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rolllight)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="light">光</span>
 					</div>
 				{{/rollTotal() RandomSkill 11}}
@@ -5072,12 +5072,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollcycle)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-3">가변(힘)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="cycle">円環</span>
 					</div>
 				{{/rollTotal() RandomSkill 12}}
@@ -5088,12 +5088,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollword)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="word">物語</span>
 					</div>
 				{{/rollTotal() RandomSkill 2}}
@@ -5102,12 +5102,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollmelody)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="melody">旋律</span>
 					</div>
 				{{/rollTotal() RandomSkill 3}}
@@ -5116,12 +5116,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rolltear)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="tear">涙</span>
 					</div>
 				{{/rollTotal() RandomSkill 4}}
@@ -5130,12 +5130,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollfarewell)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="farewell">別れ</span>
 					</div>
 				{{/rollTotal() RandomSkill 5}}
@@ -5144,12 +5144,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollsmile)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="smile">微笑み</span>
 					</div>
 				{{/rollTotal() RandomSkill 6}}
@@ -5158,12 +5158,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollcherish)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="cherish">想い</span>
 					</div>
 				{{/rollTotal() RandomSkill 7}}
@@ -5172,12 +5172,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollvictory)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="victory">勝利</span>
 					</div>
 				{{/rollTotal() RandomSkill 8}}
@@ -5186,12 +5186,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rolllove)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="love">恋</span>
 					</div>
 				{{/rollTotal() RandomSkill 9}}
@@ -5200,12 +5200,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollpassion)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="passion">情熱</span>
 					</div>
 				{{/rollTotal() RandomSkill 10}}
@@ -5214,12 +5214,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollhealing)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="healing">癒し</span>
 					</div>
 				{{/rollTotal() RandomSkill 11}}
@@ -5228,12 +5228,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rolltime)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-4">가변(노래)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="time">時</span>
 					</div>
 				{{/rollTotal() RandomSkill 12}}
@@ -5244,12 +5244,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollmemory)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="memory">追憶</span>
 					</div>
 				{{/rollTotal() RandomSkill 2}}
@@ -5258,12 +5258,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollriddle)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="riddle">謎</span>
 					</div>
 				{{/rollTotal() RandomSkill 3}}
@@ -5272,12 +5272,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rolllie)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="lie">嘘</span>
 					</div>
 				{{/rollTotal() RandomSkill 4}}
@@ -5286,12 +5286,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollanxiety)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="anxiety">不安</span>
 					</div>
 				{{/rollTotal() RandomSkill 5}}
@@ -5300,12 +5300,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollsleep)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="sleep">眠り</span>
 					</div>
 				{{/rollTotal() RandomSkill 6}}
@@ -5314,12 +5314,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollchance)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="chance">偶然</span>
 					</div>
 				{{/rollTotal() RandomSkill 7}}
@@ -5328,12 +5328,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollillusion)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="illusion">幻</span>
 					</div>
 				{{/rollTotal() RandomSkill 8}}
@@ -5342,12 +5342,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollmadness)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="madness">狂気</span>
 					</div>
 				{{/rollTotal() RandomSkill 9}}
@@ -5356,12 +5356,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollpray)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="pray">祈り</span>
 					</div>
 				{{/rollTotal() RandomSkill 10}}
@@ -5370,12 +5370,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollhope)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="hope">希望</span>
 					</div>
 				{{/rollTotal() RandomSkill 11}}
@@ -5384,12 +5384,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollfuture)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-5">가변(꿈)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="future">未来</span>
 					</div>
 				{{/rollTotal() RandomSkill 12}}
@@ -5400,12 +5400,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollabyss)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="abyss">深淵</span>
 					</div>
 				{{/rollTotal() RandomSkill 2}}
@@ -5414,12 +5414,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rolldecay)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="decay">腐敗</span>
 					</div>
 				{{/rollTotal() RandomSkill 3}}
@@ -5428,12 +5428,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollbetrayal)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="betrayal">裏切り</span>
 					</div>
 				{{/rollTotal() RandomSkill 4}}
@@ -5442,12 +5442,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rolldelusion)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="delusion">迷い</span>
 					</div>
 				{{/rollTotal() RandomSkill 5}}
@@ -5456,12 +5456,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollindolence)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="indolence">怠惰</span>
 					</div>
 				{{/rollTotal() RandomSkill 6}}
@@ -5470,12 +5470,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rolldistortion)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="distortion">歪み</span>
 					</div>
 				{{/rollTotal() RandomSkill 7}}
@@ -5484,12 +5484,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollmisfortune)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="misfortune">不幸</span>
 					</div>
 				{{/rollTotal() RandomSkill 8}}
@@ -5498,12 +5498,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollfool)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="fool">バカ</span>
 					</div>
 				{{/rollTotal() RandomSkill 9}}
@@ -5512,12 +5512,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rollmalice)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="malice">悪意</span>
 					</div>
 				{{/rollTotal() RandomSkill 10}}
@@ -5526,12 +5526,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rolldespair)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="despair">絶望</span>
 					</div>
 				{{/rollTotal() RandomSkill 11}}
@@ -5540,12 +5540,12 @@ Event Table---------------------------------------------------------------------
 				[ㅤ](~{{CharacterID}}|rolldeath)
 				{{/ShowButton}}
 				<div>
-					{{#RandomArea}}
+					{{#rollTotal() computed::RandomArea 1}}
 					<span class="area" data-i18n="fluid-0">가변(전체)</span>
-					{{/RandomArea}}
-					{{^RandomArea}}
+					{{/rollTotal() computed::RandomArea 1}}
+					{{#rollTotal() computed::RandomArea 0}}
 					<span class="area" data-i18n="fluid-6">가변(어둠)</span>
-					{{/RandomArea}}
+					{{/rollTotal() computed::RandomArea 0}}
 						<span data-i18n="death">死</span>
 					</div>
 				{{/rollTotal() RandomSkill 12}}
@@ -5559,7 +5559,7 @@ Event Table---------------------------------------------------------------------
 					{{#target}}
 					<span class="dot"> · </span>
 						<span class="lbl bold" data-i18n="target">目標値</span>
-						<span class="mdl">{{target}}</span>
+						<span class="mdl">{{computed::target}}</span>
 					{{/target}}
 				</div>
 				{{/AssignedSkill}}
