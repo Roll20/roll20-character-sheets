@@ -52,3 +52,21 @@ The GM will also need to create a second table named Combat-Dice.  This table wi
 
 ### v1.0 (2020-11-08)
 First release.
+### 1.3 (2021-03-28)
+- Added Threaten as a weapon type, and Display as a Size option.
+- Changed the Talent button icon to a chat bubble to better represent its purpose. Conditionally shows only fields with values.
+- Sorted Talents dropdown lists.
+- Added chat icon button to Belongings.
+- Added **Equipped** checkbox to Belongings.
+- New **Treated** counter for Wounds and Trauma.
+- Number of wounds and treated displayed on physical skill rolls.
+- Number of traumas and treated displayed on mental skill rolls.
+- A new **Status** button will whisper the characters status to the GM.
+- Add a new armor damaged display indicator.  Click on the gold banner atop each armor piece to toggle its damaged indicator.
+- Upkeep spends reset damaged armor.
+- Fixed Warfare skill role to function properly.
+- Fixed some typos.
+- Updated the armor list; also expanded font size on armor dropdown.
+- Reduced Belongings Description field height.
+- Removed Attribute roll button.
+- Added complication roll of 19 & 20 when skill expertise is zero.

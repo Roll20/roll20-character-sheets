@@ -10,18 +10,83 @@ https://discord.gg/F24Ka8E
 
 Things we want to add to the character sheet, presented in no particular order of priority:
 
+- [ ] Allow a second ability score to apply to skill checks
+- [ ] Allow formula calculations for the extra damage fields
+- [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
+- [ ] Add Struggle to the move lists automatically
+- [X] ~~Somehow make it easier to get tokens into initiative. No idea how to accomplish this.~~
 - [x] ~~Display the full bonus to skill checks~~
 - [x] ~~Handle temporary stat changes somehow, this may be a lot of work~~
 - [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
 - [x] ~~Add a Settings page~~
-- [ ] Allow a second ability score to apply to skill checks
-- [ ] Allow formula calculations for the extra damage fields
-- [ ] Allow modifications to movement (maybe just an extra box)
-- [ ] Display the adjusted stat score when temporary stat changes are provided
-- [ ] Display the skills section for Pokémon characters
-- [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
+- [X] ~~Display the adjusted stat score when temporary stat changes are provided~~
+- [X] ~~Display the skills section for Pokémon characters~~
+- [X] ~~Moves deserve a section for "bonuses that apply to all moves." Things that should go here include:~~
+  - [X] ~~A spot for Attack and Special Attack bonuses, for things like Ace Trainer~~
+  - [X] ~~The critical hit range for the moves, as this is used for passives, items, etc.~~
+- [X] ~~Allow modifications to movement (maybe just an extra box)~~
+- [X] ~~Add status effects that you can click~~
+  - [X] ~~Burn, Poison/Toxified, and Paralyzed should modify stats automatically~~
+- [X] ~~JSON import and export of sheet data, to support the Pokelicious Sheets and also migrating/copying characters~~
 
 ## Changelog
+
+### Jul 17th, 2021
+- Added a level field to the `hybrid` _(or Pokémon (Character Class))_ character type.
+  - Uses the `level1` attribute, so it matches what is shown in the main class for the Trainer character type.
+- Altered some CSS ever so slightly to ensure the new _"Level / Honors"_ label is displayed on one line for the default font size.
+
+### Jul 1st, 2021
+- Updated the `roll-quick-move` button value to include an `effectiveness-roll` parameter, so that the roll-template doesn't add an undesired row to the chat log output
+
+### Jun 22nd, 2021
+- Updated the description of some of the configuration options for better wording, and to make them accurate
+- Allows hiding the accuracy check in a customised `move` roll template, by not supplying an `accuracy` field
+
+### Apr 11th, 2021
+- Import/Export support
+  - Supports either roll20 or Pokelicious Google Sheet data
+
+### Mar 21st, 2021
+- You can now set Afflictions in the character sheet, and they modify stats accordingly!
+  - Not everyone will use these, so they can be mostly hidden with just a click
+- Automatic initiative macro - if you have a token associated with a character sheet, you get a free token action
+- Add bonus movement field
+- Rename Attack Damage Bonus and Special Attack Damage Bonus for clarity
+- Fix typo in config page
+- Remove leftover debug logging
+
+### Mar 7th, 2021
+
+- The big stat calculation overhaul!
+  - The stat balls are now read-only, except for HP.
+  - Stats are summed from a stat grid that is listed underneath the stat balls
+  - Grid is collapsible to show only one row for ease of use
+  - Stat changes from natures are calculated automatically
+  - Temporary stat changes work now!
+  - Script to fill in data automatically for any existing character sheets
+- Convert var to let
+- Pokemon can use skills now
+- Moved around some boxes and made skills two columns, mostly to support Pokemon getting them
+- STAB is calculated automatically - the previous box for STAB has been removed
+- New section for bonuses that apply to all moves:
+  - Critical Threshold goes here, and has been removed from Pokemon skills.
+  - Bonuses for Attack and Special Attack, to make the Ace Trainers happy
+  - Accuracy bonus field, for things like Hone Claws
+
+### Feb 23rd, 2021
+
+- Unifies background colours for text areas and number inputs
+- Added collapsing to the Origin Feature and all Class Features
+- Added a send to chat button for the Origin Feature and Class Features to output the name and description in the chat log in a nice and easily readable format
+  - Made the name of the features into the same button when collapsed to improve consistency of design vis-a-vis the moves section
+
+### Feb 18th, 2021
+
+- Expanded the Capture Pokémon skill, allowing modifiers such as Capture Point to be applied
+- Improved the display of the Pokéball selection, and added a display of the effect that each has on the capture roll
+- Added a display of the total modifier to capture rolls
+- Added the option of configuring the default value for Custom Pokéballs
 
 ### Feb 11th, 2021
 
