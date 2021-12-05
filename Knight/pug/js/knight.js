@@ -481,7 +481,7 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
   const berserkRageN3 = +attrs.berserkRageN3DR;
 
   const sorcererCorpFluide = attrs.sorcererMMCorpFluide;
-  const sorcerer150PG = attrs.sorcerer150PG;
+  const sorcerer150PG = +attrs.sorcerer150PG;
   const sorcerer250PG = attrs.sorcerer250PG;
   const sorcererMM250PG = +attrs.sorcererMM250PG;
 
@@ -530,18 +530,18 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
           if (sorcererMM250PG === 1) {
             modif += 2;
 
-            if (sorcerer150PG !== '0') { modif += 1; }
+            if (sorcerer150PG !== 0) { modif += 1; }
           }
         } else if (sorcererCorpFluide !== '0') {
           modif += 2;
 
-          if (sorcerer150PG !== '0') { modif += 1; }
+          if (sorcerer150PG !== 0) { modif += 1; }
         }
       }
 
-      if (armure === 'warmaster' && warmasterEsquive !== '0' && warmasterEsquiveP !== '0') { modif += 2; }
+      if (armure === 'warmaster' && warmasterEsquive !== '0' && warmasterEsquiveP !== 0) { modif += 2; }
 
-      if (armureL === 'warmaster' && MALWarmasterEsquive !== '0' && MALWarmasterEsquiveP !== '0') { modif += 2; }
+      if (armureL === 'warmaster' && MALWarmasterEsquive !== '0' && MALWarmasterEsquiveP !== 0) { modif += 2; }
 
       if (armureL === 'barbarian') { modif -= MALGoliath; }
 
@@ -609,7 +609,7 @@ on('change:fichePNJ change:armure change:armureLegende change:reaction change:rc
   const paladinWatchtower = attrs.paladinWatchtower;
 
   const sorcererCorpFluide = attrs.sorcererMMCorpFluide;
-  const sorcerer150PG = attrs.sorcerer150PG;
+  const sorcerer150PG = +attrs.sorcerer150PG;
   const sorcerer250PG = attrs.sorcerer250PG;
   const sorcererMM250PG = +attrs.sorcererMM250PG;
 
@@ -658,18 +658,18 @@ on('change:fichePNJ change:armure change:armureLegende change:reaction change:rc
           if (sorcererMM250PG === 1) {
             modif += 2;
 
-            if (sorcerer150PG !== '0') { modif += 1; }
+            if (sorcerer150PG !== 0) { modif += 1; }
           }
         } else if (sorcererCorpFluide !== '0') {
           modif += 2;
 
-          if (sorcerer150PG !== '0') { modif += 1; }
+          if (sorcerer150PG !== 0) { modif += 1; }
         }
       }
 
-      if (armure === 'warmaster' && warmasterEsquive !== '0' && warmasterEsquiveP !== '0') { modif += 2; }
+      if (armure === 'warmaster' && warmasterEsquive !== '0' && warmasterEsquiveP !== 0) { modif += 2; }
 
-      if (armureL === 'warmaster' && MALWarmasterEsquive !== '0' && MALWarmasterEsquiveP !== '0') { modif += 2; }
+      if (armureL === 'warmaster' && MALWarmasterEsquive !== '0' && MALWarmasterEsquiveP !== 0) { modif += 2; }
 
       if (armureL === 'barbarian') { modif -= MALGoliath; }
 
@@ -816,13 +816,17 @@ on('change:armurePJModif', async () => {
   await setAttrsAsync({ armureAscension_max: base + modif });
 });
 
-on('change:cdfPJModif', async () => {
-  const attrs = await getAttrsAsync(['cdfPJModif']);
+on('change:cdfPJAscensionModif', async () => {
+  const attrs = await getAttrsAsync(['cdfPJAscensionModif']);
 
   const base = 10;
-  const modif = +attrs.cdfPJModif;
+  const modif = +attrs.cdfPJAscensionModif;
+  const total = base + modif;
 
-  await setAttrsAsync({ cdfAscension_max: base + modif });
+  await setAttrsAsync({
+    cdfAscension: total,
+    cdfAscension_max: total,
+  });
 });
 
 on('change:shamanNbreTotem', async () => {
@@ -973,8 +977,8 @@ on('change:fichePNJ change:armure change:discretion change:dexterite change:perc
   const car3 = +attrs.perception;
 
   const OD1 = +attrs.calODDis;
-  const OD2 = +attrs.calODPer;
-  const OD3 = +attrs.calODDex;
+  const OD2 = +attrs.calODDex;
+  const OD3 = +attrs.calODPer;
 
   const bonus = +attrs.initiativeODBonus;
 
@@ -1442,13 +1446,14 @@ on('change:slotsUDCLTeteTot change:slotsUDCLTorseTot change:slotsUDCLBGTot chang
   if (msg !== '') { setPanneauInformation(msg, true, true); } else { resetPanneauInformation(); }
 });
 
-on('change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseBonus change:repeating_equipDefensif:reactionBonus', async () => {
+on('change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseBonus change:repeating_equipDefensif:reactionBonus', async (eventInfo) => {
   const attrs = await getAttrsAsync([
     'repeating_equipDefensif_defenseBonus',
     'repeating_equipDefensif_reactionBonus',
     'repeating_equipDefensif_porte',
   ]);
 
+  const id = eventInfo.sourceAttribute.split('_')[2];
   const equipe = +attrs.repeating_equipDefensif_porte;
 
   let defense = 0;
@@ -1459,10 +1464,12 @@ on('change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseB
     reaction = +attrs.repeating_equipDefensif_reactionBonus;
   }
 
-  await setAttrsAsync({
-    repeating_equipDefensif_defLigne: defense,
-    repeating_equipDefensif_reaLigne: reaction,
-  });
+  const update = {};
+
+  update[`repeating_equipDefensif_${id}_defLigne`] = defense;
+  update[`repeating_equipDefensif_${id}_reaLigne`] = reaction;
+
+  await setAttrsAsync(update);
 });
 
 on('change:repeating_equipDefensif:reaLigne remove:repeating_equipDefensif:reaLigne', () => {
@@ -1656,7 +1663,7 @@ on('change:warriorSoldierA change:warrior250PG change:deplOD change:forOD change
 
   const PG250 = +attrs.warrior250PG;
 
-  const mode = attrs.warriorSoldierA;
+  const mode = +attrs.warriorSoldierA;
 
   const OD1 = +attrs.deplOD;
   const OD2 = +attrs.forOD;
@@ -1694,7 +1701,7 @@ on('change:warriorHunterA change:warrior250PG change:hargneOD change:combOD chan
 
   const PG250 = +attrs.warrior250PG;
 
-  const mode = attrs.warriorHunterA;
+  const mode = +attrs.warriorHunterA;
 
   const OD1 = +attrs.hargneOD;
   const OD2 = +attrs.combOD;
@@ -1732,7 +1739,7 @@ on('change:warriorScholarA change:warrior250PG change:tirOD change:savoirOD chan
 
   const PG250 = +attrs.warrior250PG;
 
-  const mode = attrs.warriorScholarA;
+  const mode = +attrs.warriorScholarA;
 
   const OD1 = +attrs.tirOD;
   const OD2 = +attrs.savoirOD;
@@ -1770,7 +1777,7 @@ on('change:warriorHeraldA change:warrior250PG change:auraOD change:paroleOD chan
 
   const PG250 = +attrs.warrior250PG;
 
-  const mode = attrs.warriorHeraldA;
+  const mode = +attrs.warriorHeraldA;
 
   const OD1 = +attrs.auraOD;
   const OD2 = +attrs.paroleOD;
@@ -1808,7 +1815,7 @@ on('change:warriorScoutA change:warrior250PG change:discrOD change:percOD change
 
   const PG250 = +attrs.warrior250PG;
 
-  const mode = attrs.warriorScoutA;
+  const mode = +attrs.warriorScoutA;
 
   const OD1 = +attrs.discrOD;
   const OD2 = +attrs.percOD;
@@ -2136,7 +2143,7 @@ on('change:MALWarriorSoldierA change:deplOD change:forOD change:endOD', async ()
     'endOD',
   ]);
 
-  const mode = attrs.MALWarriorSoldierA;
+  const mode = +attrs.MALWarriorSoldierA;
 
   const OD1 = +attrs.deplOD;
   const OD2 = +attrs.forOD;
@@ -2163,7 +2170,7 @@ on('change:MALWarriorHunterA change:hargneOD change:combOD change:instOD', async
     'instOD',
   ]);
 
-  const mode = attrs.MALWarriorHunterA;
+  const mode = +attrs.MALWarriorHunterA;
 
   const OD1 = +attrs.hargneOD;
   const OD2 = +attrs.combOD;
@@ -2190,7 +2197,7 @@ on('change:MALWarriorScholarA change:tirOD change:savoirOD change:technOD', asyn
     'technOD',
   ]);
 
-  const mode = attrs.MALWarriorScholarA;
+  const mode = +attrs.MALWarriorScholarA;
 
   const OD1 = +attrs.tirOD;
   const OD2 = +attrs.savoirOD;
@@ -2217,7 +2224,7 @@ on('change:MALWarriorHeraldA change:auraOD change:paroleOD change:sfOD', async (
     'sfOD',
   ]);
 
-  const mode = attrs.MALWarriorHeraldA;
+  const mode = +attrs.MALWarriorHeraldA;
 
   const OD1 = +attrs.auraOD;
   const OD2 = +attrs.paroleOD;
@@ -2244,7 +2251,7 @@ on('change:MALWarriorScoutA change:discrOD change:percOD change:dextOD', async (
     'dextOD',
   ]);
 
-  const mode = attrs.MALWarriorScoutA;
+  const mode = +attrs.MALWarriorScoutA;
 
   const OD1 = +attrs.discrOD;
   const OD2 = +attrs.percOD;
@@ -2314,7 +2321,7 @@ on('change:bonusCarac', async () => {
     'bonusCarac',
   ]);
 
-  const bonus = attrs.bonusCarac;
+  const bonus = +attrs.bonusCarac;
 
   const update = {};
 
@@ -2356,8 +2363,8 @@ on('change:fichePNJ change:diceInitiative change:bonusInitiativeP change:malusIn
     'MasquePNJAEMaj',
   ]);
 
-  const fiche = attrs.fichePNJ;
-  const masque = attrs.MasquePNJAEMaj;
+  const fiche = +attrs.fichePNJ;
+  const masque = +attrs.MasquePNJAEMaj;
 
   if (fiche === 1 || fiche === 2) {
     if (masque > 0) {
@@ -3173,6 +3180,26 @@ on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceE
 });
 // LONGBOW
 
+// HERAUT DE LEQUILIBRE - CHEVALIER DE LA LUMIERE
+const chevalierHerauts = ['devasterAnatheme', 'bourreauTenebres', 'equilibreBalance'];
+
+chevalierHerauts.forEach((button) => {
+  on(`clicked:${button}`, async () => {
+    const attrs = await getAttrsAsync([button]);
+    const value = +attrs[button];
+    const result = {};
+
+    let newValue = 1;
+
+    if (value === 1) { newValue = 0; }
+
+    result[button] = newValue;
+
+    await setAttrsAsync(result);
+  });
+});
+// HERAUT DE LEQUILIBRE - CHEVALIER DE LA LUMIERE
+
 // Import NPC
 on('clicked:importKNPCG', () => {
   getAttrs(['importKNPCG'], (value) => {
@@ -3676,6 +3703,16 @@ on('change:ameliorationOArmes', (eventInfo) => {
   const update = {};
 
   update['ameliorationOArmes-description'] = getTranslationByKey(text);
+
+  setAttrsAsync(update);
+});
+
+on('change:chevaliersHerauts', () => {
+  const update = {};
+
+  update.devasterAnatheme = 0;
+  update.bourreauTenebres = 0;
+  update.equilibreBalance = 0;
 
   setAttrsAsync(update);
 });

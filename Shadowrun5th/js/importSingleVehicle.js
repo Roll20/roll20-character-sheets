@@ -15,50 +15,51 @@ function importSingleVehicle(vehicle, attributes) {
 
     if(vehicle.mods != null){
         if(vehicle.mods.mod.length > 1){
+            var weaponnumber = 1;
             for(var j = 0; j < vehicle.mods.mod.length; j++){
-                importSingleVehicleMod(vehicle.mods.mod[j], newrowid,  attributes);
+                weaponnumber = importSingleVehicleMod(vehicle.mods.mod[j], newrowid, attributes, weaponnumber);
             }
         }else{
             attributes["repeating_vehicles_"+newrowid+"_vehiclenotes"] += vehicle.mods.mod.name + "\n";
-            importSingleVehicleMod(vehicle.mods.mod, newrowid, attributes);
+            importSingleVehicleMod(vehicle.mods.mod, newrowid, attributes, weaponnumber);
         }
     }
 }
 
-function importSingleVehicleMod(mod, newrowid, attributes) {
+const importSingleVehicleMod = (mod, newrowid, attributes, weaponnumber) => {
     attributes["repeating_vehicles_" + newrowid + "_vehiclenotes"] += mod.name + "\n";
     if(mod.weapons != null && mod.weapons.weapon != null){
-        if(mod.weapons.weapon.length > 1){
-           importSingleVehicleWeapon(mod.weapons.weapon[0], newrowid, attributes);
+        if(mod.weapons.length > 1){
+           return importSingleVehicleWeapon(mod.weapons.weapon[0], newrowid, attributes, weaponnumber);
         }
         else {
-            importSingleVehicleWeapon(mod.weapons.weapon, newrowid, attributes);
+           return importSingleVehicleWeapon(mod.weapons.weapon, newrowid, attributes, weaponnumber);
         }
     }
+    return weaponnumber;
 }
 
-function importSingleVehicleWeapon(weapon, newrowid, attributes) {
-    if(weapon.category != "Gear"){
-        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponname"] = weapon.name;
-        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"] = weapon.accuracy.match(/\d+/g).pop();
-        if(weapon.type == "Ranged")
-            attributes["repeating_vehicles_"+newrowid+"_vehicleweaponrc"] = weapon.rc.match(/\d+/g).pop();
-        if(Number(weapon.ap) != "NaN"){
-            attributes["repeating_vehicles_"+newrowid+"_vehicleweaponap"] = weapon.ap;
-        }else{
-            attributes["repeating_vehicles_"+newrowid+"_vehicleweaponap"] = 0;
-        }
-        attributes["repeating_vehicles_"+newrowid+"_vehicleweapondv"] = weapon.damage_english.match(/\d*/);
-        attributes["repeating_vehicles_"+newrowid+"_vehicleweapondmgtype"] = weapon.damage_english.match(/^\d*/);
-        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"] = "";
-        if(typeof weapon.accessories != "undefined"){
-            if(weapon.accessories.accessory.length > 1){
-                for(var h = 0; h < weapon.accessories.accessory.length; h++){
-                    attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"] += weapon.accessories.accessory[h].name+"\n";
-                }
-            }else{
-                attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"] += weapon.accessories.accessory.name+"\n";
+const importSingleVehicleWeapon = (weapon, newrowid, attributes, weaponnumber) => {
+    attributes["repeating_vehicles_"+newrowid+"_vehicleweaponname" + weaponnumber] = weapon.name;
+    attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"+ weaponnumber] = weapon.accuracy.match(/\d+/g).pop();
+    if(weapon.type == "Ranged")
+        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponrc"+ weaponnumber] = weapon.rc.match(/\d+/g).pop();
+    if(Number(weapon.ap) != "NaN"){
+        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponap"+ weaponnumber] = weapon.ap;
+    }else{
+        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponap"+ weaponnumber] = 0;
+    }
+    attributes["repeating_vehicles_"+newrowid+"_vehicleweapondv"+ weaponnumber] = weapon.damage_english.match(/\d*/);
+    attributes["repeating_vehicles_"+newrowid+"_vehicleweapondmgtype"+ weaponnumber] = weapon.damage_english.match(/^\d*/);
+    attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"+ weaponnumber] = "";
+    if(typeof weapon.accessories != "undefined"){
+        if(weapon.accessories.accessory.length > 1){
+            for(var h = 0; h < weapon.accessories.accessory.length; h++){
+                attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"+ weaponnumber] += weapon.accessories.accessory[h].name+"\n";
             }
+        }else{
+            attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"+ weaponnumber] += weapon.accessories.accessory.name+"\n";
         }
     }
+    return weaponnumber +1;
 }
