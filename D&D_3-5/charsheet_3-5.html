@@ -2507,7 +2507,7 @@ var callRollTemplate = function(rollTemplateStringPart){
 									<td class="sheet-table-data-center-sm" style="padding-top: 7px;">+ &nbsp; -<span data-i18n="not-applicable">N/A</span>- &nbsp; </td>
 									<td class="sheet-table-data-center-sm">+<input type="text" class="sheet-table-data-center-skills" name="attr_decipherscriptmiscmod" title="decipherscriptmiscmod" value="0"></td>
 									<td class="sheet-table-data-center-sm"><textarea rows="1" cols="50" style="width: 160px; height: 20px;" name="attr_decipherscriptnote" title="decipherscriptnote (Notes for the note field on the default macro)" placeholder="Notes" data-i18n-placeholder="notes" ></textarea></td>
-									<td class="sheet-table-data-center-sm"><textarea rows="1" cols="50" style="width: 160px; height: 20px;" name="attr_decipherscriptmacro" title="decipherscriptmacro">@{decipherscriptwgm} &{template:DnD35StdRoll} {{skillflag=true}} {{name=@{character_name} }} {{check=[Decipher Script](http://www.dandwiki.com/wiki/SRD:Decipher_Script_Skill ) check:}} {{checkroll=[[1d20 + @{decipherscript} ]]}} {{notes=If fail, [[1d20 + @{wis-mod} ]] vs dc5 to avoid drawing a false conclusion.}} {{notes=@{decipherscriptnote} }}</textarea></td>
+									<td class="sheet-table-data-center-sm"><textarea rows="1" cols="50" style="width: 160px; height: 20px;" name="attr_decipherscriptmacro" title="decipherscriptmacro">@{decipherscriptwgm} &{template:DnD35StdRoll} {{skillflag=true}} {{name=@{character_name} }} {{check=[Decipher Script](http://www.dandwiki.com/wiki/SRD:Decipher_Script_Skill ) check:}} {{checkroll=[[1d20 + @{decipherscript} ]]}} {{notes=If fail, [[1d20 + @{wis-mod} ]] vs dc5 to avoid drawing a false conclusion. @{decipherscriptnote} }}</textarea></td>
 									<td class="sheet-table-data-center-sm">
 										<select class="sheet-table-data-center-sm" style="height: 24px; width: 44px; font-size: 0.75em;" name="attr_decipherscriptwgm" title="decipherscriptwgm">
 											<option  style="width: 45px;" value="/w gm " data-i18n="yes" selected>Yes</option>
@@ -9381,7 +9381,7 @@ on('clicked:printDivine', info => {
 	var numLevel = 11;
 	var availableSpellsPerLevel = new Map();
 	for(var i = 0; i < numLevel; i++){
-		printPerLevel(i, 1, "spellname", "spellused", "spellprep", availableSpellsPerLevel, numLevel, (used, prep) => prep && prep > used);
+		printPerLevel(i, 1, "spellname", "spellused", "spellprep", "domain", availableSpellsPerLevel, numLevel, (used, prep) => prep && prep > used);
 	}
 });
 
@@ -9404,7 +9404,7 @@ on('clicked:printArcane', info => {
 	var numLevel = 11;
 	var availableSpellsPerLevel = new Map();
 	for(var i = 0; i < numLevel; i++){
-		printPerLevel(i, 2, "spellname", "spellused", "spellprep", availableSpellsPerLevel, numLevel, (used, prep) => prep && prep > used);
+		printPerLevel(i, 2, "spellname", "spellused", "spellprep", null, availableSpellsPerLevel, numLevel, (used, prep) => prep && prep > used);
 	}
 });
 
@@ -9412,7 +9412,7 @@ on('clicked:printPower', info => {
 	var numLevel = 10;
 	var availableSpellsPerLevel = new Map();
 	for(var i = 1; i <= numLevel; i++){
-		printPerLevel(i, 3, "powername", "spellused", "spellprep", availableSpellsPerLevel, numLevel, () => true);
+		printPerLevel(i, 3, "powername", "spellused", "spellprep", null, availableSpellsPerLevel, numLevel, () => true);
 	}
 });
 
@@ -9420,7 +9420,7 @@ on('clicked:printInvocation', info => {
 	var numLevel = 10;
 	var availableSpellsPerLevel = new Map();
 	for(var i = 1; i <= numLevel; i++){
-		printPerLevel(i, 4, "invocationname", "spellused", "spellprep", availableSpellsPerLevel, numLevel, () => true);
+		printPerLevel(i, 4, "invocationname", "spellused", "spellprep", null, availableSpellsPerLevel, numLevel, () => true);
 	}
 });
 
@@ -9465,7 +9465,7 @@ on('clicked:printSpellLike', info => {
 	var numLevel = 1;
 	var availableSpellsPerLevel = new Map();
 	for(var i = 1; i <= numLevel; i++){
-		printPerLevel(i, 6, "spellname", "spellused", "spellprep", availableSpellsPerLevel, numLevel, (used, prep) => prep && prep > used);
+		printPerLevel(i, 6, "spellname", "spellused", "spellprep", null, availableSpellsPerLevel, numLevel, (used, prep) => prep && prep > used);
 	}
 });
 
@@ -9482,33 +9482,40 @@ var resetSpellAttributePerLevel = function(level, section, attribute){
 	});
 };
 
-var printPerLevel = function(level, section, attributeName, attributeUsed, attributePrepared, availableSpellsPerLevel, numLevel, printCondition){
+var printPerLevel = function(level, section, attributeName, attributeUsed, attributePrepared, attributeDomain, availableSpellsPerLevel, numLevel, printCondition){
 	var repeatingElement = `repeating_spells${level}${section}`;
 	var repeatingAttributeName = `${attributeName}${level}${section}`;
 	var repeatingAttributeUsed = `${attributeUsed}${level}${section}`;
 	var repeatingAttributePrepared = `${attributePrepared}${level}${section}`;
+	var repeatingAttributeDomain = `${attributeDomain}${level}${section}`;
 
 	getSectionIDsOrdered(repeatingElement, idarray => {
 		var idName = [];
 		var idUsed = [];
 		var idPrepared = [];
+		var idDomain = [];
 		for(var i = 0; i < idarray.length; i++) {
 			idName.push(repeatingElement + '_' + idarray[i] + '_' + repeatingAttributeName);
 			idUsed.push(repeatingElement + '_' + idarray[i] + '_' + repeatingAttributeUsed);
 			idPrepared.push(repeatingElement + '_' + idarray[i] + '_' + repeatingAttributePrepared);
+			idDomain.push(repeatingElement + '_' + idarray[i] + '_' + repeatingAttributeDomain);
 		}
 
-		var attributeList = [...idName, ...idUsed, ...idPrepared];
+		var attributeList = [...idName, ...idUsed, ...idPrepared, ...idDomain];
 		getAttrs(attributeList , values => {
 			var availableSpells = [];
 			
 			for(var i = 0; i < idName.length; i++ ){
 				if(printCondition(values[idUsed[i]], values[idPrepared[i]])){ 
 					var avaialble = values[idPrepared[i]] - values[idUsed[i]];
+					var domainFlag = "";
+					if(values[idDomain[i]] == 1){
+						domainFlag = " - D - ";
+					}
 					if(avaialble) {
-						availableSpells.push(values[idName[i]] + " (" + avaialble + ")");
+						availableSpells.push(values[idName[i]] + domainFlag + " (" + avaialble + ")");
 					}else{
-						availableSpells.push(values[idName[i]]);
+						availableSpells.push(values[idName[i]] + domainFlag);
 					}
 				}
 			}
