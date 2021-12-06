@@ -816,13 +816,17 @@ on('change:armurePJModif', async () => {
   await setAttrsAsync({ armureAscension_max: base + modif });
 });
 
-on('change:cdfPJModif', async () => {
-  const attrs = await getAttrsAsync(['cdfPJModif']);
+on('change:cdfPJAscensionModif', async () => {
+  const attrs = await getAttrsAsync(['cdfPJAscensionModif']);
 
   const base = 10;
-  const modif = +attrs.cdfPJModif;
+  const modif = +attrs.cdfPJAscensionModif;
+  const total = base + modif;
 
-  await setAttrsAsync({ cdfAscension_max: base + modif });
+  await setAttrsAsync({
+    cdfAscension: total,
+    cdfAscension_max: total,
+  });
 });
 
 on('change:shamanNbreTotem', async () => {
@@ -3176,6 +3180,26 @@ on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceE
 });
 // LONGBOW
 
+// HERAUT DE LEQUILIBRE - CHEVALIER DE LA LUMIERE
+const chevalierHerauts = ['devasterAnatheme', 'bourreauTenebres', 'equilibreBalance'];
+
+chevalierHerauts.forEach((button) => {
+  on(`clicked:${button}`, async () => {
+    const attrs = await getAttrsAsync([button]);
+    const value = +attrs[button];
+    const result = {};
+
+    let newValue = 1;
+
+    if (value === 1) { newValue = 0; }
+
+    result[button] = newValue;
+
+    await setAttrsAsync(result);
+  });
+});
+// HERAUT DE LEQUILIBRE - CHEVALIER DE LA LUMIERE
+
 // Import NPC
 on('clicked:importKNPCG', () => {
   getAttrs(['importKNPCG'], (value) => {
@@ -3679,6 +3703,16 @@ on('change:ameliorationOArmes', (eventInfo) => {
   const update = {};
 
   update['ameliorationOArmes-description'] = getTranslationByKey(text);
+
+  setAttrsAsync(update);
+});
+
+on('change:chevaliersHerauts', () => {
+  const update = {};
+
+  update.devasterAnatheme = 0;
+  update.bourreauTenebres = 0;
+  update.equilibreBalance = 0;
 
   setAttrsAsync(update);
 });

@@ -52,6 +52,9 @@ rollCombatGrenade.forEach((button) => {
       'discretion',
       `${ODValue.discretion}`,
       'tir',
+      'devasterAnatheme',
+      'bourreauTenebres',
+      'equilibreBalance',
     ];
 
     listAttrs = listAttrs.concat(listArmure, listArmureLegende, listStyle, listBase);
@@ -91,6 +94,14 @@ rollCombatGrenade.forEach((button) => {
     let attaquesSurprisesCondition = '';
 
     let isTenebricide = false;
+    let isDestructeur = false;
+    let isMeurtrier = false;
+    let isUltraviolence = false;
+    let isSurprise = false;
+
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
 
     const autresEffets = [];
 
@@ -187,6 +198,9 @@ rollCombatGrenade.forEach((button) => {
 
         exec.push(`{{ultraviolence=${i18n_ultraviolence}}} {{ultraviolenceCondition=${i18n_ultraviolenceCondition}}} {{meurtrier=${i18n_meurtrier}}} {{meurtrierCondition=${i18n_meurtrierCondition}}}`);
         autresEffets.push(`${i18n_dispersion} 6`);
+
+        isMeurtrier = true;
+        isUltraviolence = true;
         break;
       case 'grenade2':
         isConditionnelA = true;
@@ -205,6 +219,8 @@ rollCombatGrenade.forEach((button) => {
         autresEffets.push(`${i18n_perceArmure} 20`);
         autresEffets.push(`${i18n_penetrant} 6`);
         autresEffets.push(`${i18n_dispersion} 6`);
+
+        isDestructeur = true;
         break;
       case 'grenade4':
         isConditionnelA = true;
@@ -334,38 +350,33 @@ rollCombatGrenade.forEach((button) => {
     exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
     exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
-    if (isTenebricide && hasDgts) {
-      let degatsTenebricide = [];
-      let ASTenebricide = [];
-      let ASValueTenebricide = [];
-
-      let violenceTenebricide = [];
-
-      const diceDegatsTenebricide = Math.floor(diceDegats / 2);
-      const diceViolenceTenebricide = Math.floor(diceViolence / 2);
-
-      degatsTenebricide.push(`${diceDegatsTenebricide}D6`);
-      degatsTenebricide = degatsTenebricide.concat(bDegats);
-
-      violenceTenebricide.push(`${diceViolenceTenebricide}D6`);
-      violenceTenebricide = violenceTenebricide.concat(bViolence);
-
-      exec.push(`{{tenebricideValueD=[[${degatsTenebricide.join('+')}]]}}`);
-      exec.push(`{{tenebricideValueV=[[${violenceTenebricide.join('+')}]]}}`);
-
-      if (attaquesSurprises.length > 0) {
-        ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-        ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-
-        exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-        exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
-      }
-    }
-
     if (attaquesSurprises.length > 0 && hasDgts) {
       exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
       exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
       exec.push(attaquesSurprisesCondition);
+
+      isSurprise = true;
+    }
+
+    if (isTenebricide && hasDgts) {
+      exec.push(`{{tenebricide=${i18n_tenebricide}}} {{tenebricideConditionD=${i18n_tenebricideConditionD}}} {{tenebricideConditionV=${i18n_tenebricideConditionV}}}`);
+      exec.push('{{tenebricideValueD=[[0]]}}');
+      exec.push('{{tenebricideValueV=[[0]]}}');
+
+      if (attaquesSurprises.length > 0) {
+        exec.push(`{{tenebricideAS=${attaquesSurprises.join('\n+')}}}`);
+        exec.push('{{tenebricideASValue=[[0]]}}');
+      }
+    }
+
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
     }
 
     if (autresEffets.length > 0) {
@@ -381,50 +392,47 @@ rollCombatGrenade.forEach((button) => {
 
     exec = firstExec.concat(exec);
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    const finalRoll = await startRoll(exec.join(' '));
+    const tJet = finalRoll.results.jet.result;
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    const finalComputed = {
+      jet: tJet + tBonus,
+    };
 
-      const tMeurtrier = results.results.meurtrierValue;
-      let vTMeurtrier = 0;
+    if (hasDgts) {
+      const rDegats = finalRoll.results.degats.dice;
+      const rViolence = finalRoll.results.violence.dice;
 
-      if (tMeurtrier !== undefined) { vTMeurtrier = tMeurtrier.dice[0]; }
+      const tDegats = finalRoll.results.degats.result;
+      const tViolence = finalRoll.results.violence.result;
 
-      const tDestructeur = results.results.destructeurValue;
-      let vTDestructeur = 0;
+      const conditions = {
+        bourreau,
+        devaste,
+        equilibre,
+        isTenebricide,
+        isSurprise,
+        isDestructeur,
+        isMeurtrier,
+        isUltraviolence,
+      };
 
-      if (tDestructeur !== undefined) { vTDestructeur = tDestructeur.dice[0]; }
+      const computed = updateRoll(finalRoll, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
+      Object.assign(finalComputed, computed);
+    }
 
-      const tUltraviolence = results.results.ultraviolenceValue;
+    finishRoll(finalRoll.rollId, finalComputed);
 
-      let vTUltraviolence = 0;
+    if (tJet !== 0 && tJet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+      const tRExploit = exploitRoll.results.jet.result;
+      const exploitComputed = {
+        jet: tRExploit,
+      };
 
-      if (tUltraviolence !== undefined) { vTUltraviolence = tUltraviolence.dice[0]; }
-
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-          meurtrierValue: vTMeurtrier,
-          destructeurValue: vTDestructeur,
-          ultraviolenceValue: vTUltraviolence,
-        },
-      );
-
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
-
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });
