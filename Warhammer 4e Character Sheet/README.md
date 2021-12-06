@@ -73,6 +73,11 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+December 6th 2021 v1.53.1
+
+- Completed experimental talent list (all 166 talents) in the Dev mode, not all are intergrated right now, but most. This is causing a bit of lag on the page as old and new SL currently co-exist on the same sheet. Looking to finish this out in Dev mode in the coming weeks and then fully migrate to the new system once its fully working.
+
+
 September 14th 2021 v1.53
 
 - Various bug fixes
@@ -82,8 +87,6 @@ September 14th 2021 v1.53
 - Melee/Ranged Weapons settings popout style changed a bit, added a wrap box.
 - Skills which are affected by advantage or penaties now have tooltip markers to indicate it.
 - Added experimental SL system and custom roll parsing sheet workers, these are hidden and dont interfere with the base page.
-
--- Added many more integrated talents ~75% of RAW in experimental mode
 
 
 August 25th 2021 v1.52
