@@ -5401,7 +5401,7 @@ deckingtabs.forEach(tab => {
 		myroll+="{{rolldice=[[" + calcDice + "]]}}";
 		myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 		myroll+="{{utilitylevel=Armor Rating @{deckarmor-rating-final}}}"; 
-		myroll+="{{myname=@{character_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}";
+		myroll+="{{myname=@{selected|token_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}";
 		myroll+="{{roll= [[ [[ " + calcDice + "]]d6>[[ {2,( " + calcTN + ")}kh1 ]]!! ]] }}";
 		console.log(myroll);
                 startRoll(myroll, (results) => {
@@ -5455,12 +5455,14 @@ on('clicked:matrixattack', (info) => {
 			if  ( systemrating == "UNKNOWN" )  myroll+="{{systemrating=[[@{target|Host|matrixsecuritynumber}]]}}";
 			else  myroll+="{{systemrating=[[" + matrixtn[systemrating]["secrating"]  + "]]}}";
 			myroll+="{{iconstatus=[[@{target|" + lang["target"] +"|iconstatuscode}]]}}";
-			myroll+="{{myname=@{character_name}}} {{target=@{target|" + lang["target"] +"|token_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}";
+			myroll+="{{mytoken=[[0[@{selected|token_name}]]]}}{{target=@{target|" + lang["target"] +"|token_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}";
 			myroll+="{{utilitylevel=@{deckattack-rating-final}}}"; 
 			myroll+="{{utilitylevel=[[@{" + myid  + "-rating-final}]]}}" 
 			myroll+="{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "}]]}}" 
+			myroll+="{{myname=@{selected|token_name}}}";
 			console.log(myroll);
                 	startRoll(myroll, (results) => {
+				const mytoken=results.results.mytoken.expression.match(/\[(.*)\]/)[1];
 				if ( results.results.iconstatus.result == 0)  myicon="Legitimate";
 				else myicon="Intruder";
 				var finaltn=results.results.targetnumber.result
@@ -5476,7 +5478,7 @@ on('clicked:matrixattack', (info) => {
 				let payload= {
 					ammotype: myammo,
 					wdmg: mydamage,
-					attacker: myval["character_name"],
+					attacker: mytoken,
 					attacktest: finaldice,
 					power: results.results.utilitylevel.result,
 					attacktype: myammo,
