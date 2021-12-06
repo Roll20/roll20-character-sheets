@@ -13096,6 +13096,10 @@ function importSingleDrone(drone, attributes) {
     attributes["repeating_drones_"+newrowid+"_dronearmor"]= drone.armor;
     attributes["repeating_drones_"+newrowid+"_dronenotes"]="";
 
+    if(drone.gears != null) {
+        importAutosofts(drone, newrowid, attributes);
+    }
+
     if(drone.mods != null){
         if(drone.mods.mod.length > 1){
             var weaponnumber = 1;
@@ -13111,6 +13115,7 @@ function importSingleDrone(drone, attributes) {
 
 const importSingleDroneMod = (mod, newrowid, attributes, weaponnumber) => {
     attributes["repeating_drones_" + newrowid + "_dronenotes"] += mod.name + "\n";
+
     if(mod.weapons != null && mod.weapons.weapon != null){
         if(mod.weapons.length > 1){
            return importSingleDroneWeapon(mod.weapons.weapon[0], newrowid, attributes, weaponnumber);
@@ -13145,6 +13150,46 @@ const importSingleDroneWeapon = (weapon, newrowid, attributes, weaponnumber) => 
         }
     }
     return weaponnumber +1;
+}
+
+const importAutosofts = (drone, newrowid, attributes) => {
+
+    let autosofts;
+    if(drone.gears.gear.length > 1) {
+        autosofts = drone.gears.gear.filter(gear => gear.category_english.includes("Autosofts"));
+    }
+    else {
+        if(drone.gears.gear.category_english == "Autosofts") {
+            autosofts = [drone.gears.gear];
+        }
+    }
+
+    if(autosofts != null) {
+        //search for clearsight
+        let clearsight = autosofts.find(soft => soft.name_english.includes("Clearsight Autosoft"));
+        if(clearsight != null) {
+            attributes["repeating_drones_"+newrowid+"_droneperceptionsoft"] = clearsight.rating;
+        }
+
+        //Maneuvering
+        let maneuvering = autosofts.find(soft => soft.name_english.includes("Maneuvering Autosoft"));
+        if(maneuvering != null) {
+            attributes["repeating_drones_"+newrowid+"_dronemaneuversoft"] = maneuvering.rating;
+        }
+
+        //stealth
+        let stealth = autosofts.find(soft => soft.name_english.includes("Stealth Autosoft"));
+        if(stealth != null) {
+            attributes["repeating_drones_"+newrowid+"_dronesneaksoft"] = stealth.rating;
+        }
+
+        //evasion
+        let evasion = autosofts.find(soft => soft.name_english.includes("Evasion Autosoft"));
+        if(evasion != null) {
+            attributes["repeating_drones_"+newrowid+"_dronedodgesoft"] = evasion.rating;
+        }
+    }
+
 }
 
 on("change:wil_base change:wil_aug", function() {
