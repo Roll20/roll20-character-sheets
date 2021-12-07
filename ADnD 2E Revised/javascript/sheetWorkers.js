@@ -1,10 +1,13 @@
 // --- ALL SHEET WORKERS START --- //
-const sheetWorker = 'sheetworker';
-const player = 'player';
-const Success = 'success';
-const Info = 'info';
-const Warning = 'warning';
-const Error = 'error';
+const SHEETWORKER = 'sheetworker';
+const PLAYER = 'player';
+
+const SUCCESS = 'success';
+const INFO = 'info';
+const WARNING = 'warning';
+const ERROR = 'error';
+
+const BOOK_FIELDS = ['book-phb', 'book-tcfhb', 'book-tcwhb'];
 
 on('clicked:hide-toast', function(eventInfo) {
     setAttrs({
@@ -16,10 +19,10 @@ on('clicked:hide-toast', function(eventInfo) {
 function showToast(type, title, message) {
     let content
     switch (type) {
-        case Success: content = 1; break;
-        case Info:    content = 2; break;
-        case Warning: content = 3; break;
-        case Error:   content = 4; break;
+        case SUCCESS: content = 1; break;
+        case INFO:    content = 2; break;
+        case WARNING: content = 3; break;
+        case ERROR:   content = 4; break;
     }
     setAttrs({
         ['toast']: 1,
@@ -27,6 +30,10 @@ function showToast(type, title, message) {
         [`toast-title-${type}`]: title,
         [`toast-message-${type}`]: message
     });
+}
+
+function isBookInactive(books, obj) {
+    return !Object.values(books).includes(obj['book']);
 }
 
 const squareBracketsRegex = /18\[([0-9]{1,3})]/; // Ie. 18[65]
@@ -532,10 +539,9 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
         if (!spell)
             return;
 
-        getAttrs(['book-phb', 'book-tcwhb'], function(values) {
-            let activeBooks = Object.values(values);
-            if (!activeBooks.includes(spell['book'])) {
-                showToast(Error, 'Missing Book', `The book *${spell['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
+        getAttrs(BOOK_FIELDS, function(books) {
+            if (isBookInactive(books, spell)) {
+                showToast(ERROR, 'Missing Book', `The book *${spell['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
                 return;
             }
             
@@ -683,7 +689,7 @@ function setupAddPriestSpell(postfix) {
                 let elementalSpheres = parseSpheres(attributes.map(aField => a.S[aField]), elementalRegex);
 
                 if (primarySpheres.size < 1) {
-                    showToast(Warning, 'No spheres found', `No valid spheres found. Please write or select some spheres`);
+                    showToast(WARNING, 'No spheres found', `No valid spheres found. Please write or select some spheres`);
                     return;
                 }
 
@@ -696,14 +702,14 @@ function setupAddPriestSpell(postfix) {
 
                 console.log(spellsToAdd);
                 if (spellsToAdd.length < 1) {
-                    showToast(Error, 'No spells found', `No spells found for the selected spheres`);
+                    showToast(ERROR, 'No spells found', `No spells found for the selected spheres`);
                     return;
                 }
 
                 spellsToAdd = spellsToAdd.filter(spell => !knownSpells.has(spell));
                 console.log(spellsToAdd);
                 if (spellsToAdd.length < 1) {
-                    showToast(Info, 'All spells added', `Found no more spells to add based on spheres`);
+                    showToast(INFO, 'All spells added', `Found no more spells to add based on spheres`);
                     return;
                 }
 
@@ -972,124 +978,136 @@ on('change:nonprof-penalty', function (eventInfo) {
     });
 })
 
-function getWeaponWithBonus(weaponName, isMonster) {
+function setWeaponWithBonus(weaponName, setWeaponFunc, isMonster) {
     if (!weaponName)
-        return undefined;
+        return;
     
     weaponName = weaponName.toLowerCase();
-    let baseWeapon = weapons[weaponName];
-    if (baseWeapon) {
-        return {
-            ...baseWeapon,
-            'bonus' : '0'
-        };
-    }
-    
-    let match = weaponName.match(/\s*\+([0-9])+\s*/);
-    if (!match)
-        return undefined;
+    getAttrs(BOOK_FIELDS, function(books) {
+        let baseWeapon = weapons[weaponName];
+        if (baseWeapon) {
+            if (isBookInactive(books, baseWeapon)) {
+                showToast(ERROR, 'Missing Book', `The book *${baseWeapon['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`)
+                return;
+            }
 
-    let baseWeaponName = weaponName.replace(match[0], ' ').trim();
-    baseWeapon = weapons[baseWeaponName];
-    if (!baseWeapon)
-        return undefined;
-    
-    let bonusString = match[1];
-    let bonus = parseInt(bonusString)
-    if (isNaN(bonus))
-        return undefined;
-    
-    if (bonus < 1)
-        return {
+            setWeaponFunc({
+                ...baseWeapon,
+                'bonus' : '0'
+            });
+            return;
+        }
+
+        let match = weaponName.match(/\s*\+([0-9])+\s*/);
+        if (!match)
+            return;
+
+        let baseWeaponName = weaponName.replace(match[0], ' ').trim();
+        baseWeapon = weapons[baseWeaponName];
+        if (!baseWeapon)
+            return;
+
+        if (isBookInactive(books, baseWeapon)) {
+            showToast(ERROR, 'Missing Book', `The book *${baseWeapon['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`)
+            return;
+        }
+
+        let bonusString = match[1];
+        let bonus = parseInt(bonusString)
+        if (isNaN(bonus))
+            return;
+
+        if (bonus < 1)
+            setWeaponFunc({
+                ...baseWeapon,
+                'bonus' : '0'
+            });
+            return;
+
+        let weaponWithBonus = {
             ...baseWeapon,
-            'bonus' : '0'
-        };
-    
-    let weaponWithBonus = {
-        ...baseWeapon,
-        'speed' : Math.max(baseWeapon['speed'] - bonus, 0),
-        'bonus' : `+${bonus}`
-    }
-    if (isMonster) {
-        weaponWithBonus['small-medium'] += `+${bonus}`;
-        weaponWithBonus['large'] += `+${bonus}`;
-        weaponWithBonus['thac0'] = `@{monsterthac0}-${bonus}`;
-    }
-    
-    return weaponWithBonus;
+            'speed' : Math.max(baseWeapon['speed'] - bonus, 0),
+            'bonus' : `+${bonus}`
+        }
+        if (isMonster) {
+            weaponWithBonus['small-medium'] += `+${bonus}`;
+            weaponWithBonus['large'] += `+${bonus}`;
+            weaponWithBonus['thac0'] = `@{monsterthac0}-${bonus}`;
+        }
+
+        setWeaponFunc(weaponWithBonus);
+    });
 }
 
 //melee hit autofill
-on('change:repeating_weapons:weaponname', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue);
-    if (weapon === undefined)
-        return;
+on('change:repeating_weapons:weaponname', function(eventInfo) {
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            'repeating_weapons_attackadj'      : weapon['bonus'],
+            'repeating_weapons_range'          : 'Melee',
+            'repeating_weapons_size'           : weapon['size'],
+            'repeating_weapons_weapspeed'      : weapon['speed'],
+            'repeating_weapons_weaptype-slash' : weapon['type'].includes('S') ? 1 : 0,
+            'repeating_weapons_weaptype-pierce': weapon['type'].includes('P') ? 1 : 0,
+            'repeating_weapons_weaptype-blunt' : weapon['type'].includes('B') ? 1 : 0,
+        };
 
-    let weaponInfo = {
-        'repeating_weapons_attackadj'      : weapon['bonus'],
-        'repeating_weapons_range'          : 'Melee',
-        'repeating_weapons_size'           : weapon['size'],
-        'repeating_weapons_weapspeed'      : weapon['speed'],
-        'repeating_weapons_weaptype-slash' : weapon['type'].includes('S') ? 1 : 0,
-        'repeating_weapons_weaptype-pierce': weapon['type'].includes('P') ? 1 : 0,
-        'repeating_weapons_weaptype-blunt' : weapon['type'].includes('B') ? 1 : 0,
+        setAttrs(weaponInfo);
     };
-    
-    setAttrs(weaponInfo);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
 });
 
 //melee damage autofill
 on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue);
-    if (weapon === undefined)
-        return;
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            'repeating_weapons-damage_damadj': weapon['bonus'],
+            'repeating_weapons-damage_damsm': weapon['small-medium'],
+            'repeating_weapons-damage_daml': weapon['large'],
+            'repeating_weapons-damage_knockdown1': weapon['knockdown'] || ''
+        };
 
-    let weaponInfo = {
-        'repeating_weapons-damage_damadj'    : weapon['bonus'],
-        'repeating_weapons-damage_damsm'     : weapon['small-medium'],
-        'repeating_weapons-damage_daml'      : weapon['large'],
-        'repeating_weapons-damage_knockdown1': weapon['knockdown'] || ''
+        setAttrs(weaponInfo);
     };
 
-    setAttrs(weaponInfo);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
 });
 
 //range hit autofill
 on('change:repeating_weapons2:weaponname2', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue);
-    if (weapon === undefined)
-        return;
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            'repeating_weapons2_strbonus2': weapon['strength'] ? 1 : 0,
+            'repeating_weapons2_attacknum2': weapon['rof'] || '',
+            'repeating_weapons2_attackadj2': weapon['bonus'],
+            'repeating_weapons2_range2': weapon['range'] || '',
+            'repeating_weapons2_size2': weapon['size'],
+            'repeating_weapons2_weapspeed2': weapon['speed'],
+            'repeating_weapons2_weaptype-slash2': weapon['type'].includes('S') ? 1 : 0,
+            'repeating_weapons2_weaptype-pierce2': weapon['type'].includes('P') ? 1 : 0,
+            'repeating_weapons2_weaptype-blunt2': weapon['type'].includes('B') ? 1 : 0,
+        };
 
-    let weaponInfo = {
-        'repeating_weapons2_strbonus2'       : weapon['strength'] ? 1 : 0,
-        'repeating_weapons2_attacknum2'      : weapon['rof'] || '',
-        'repeating_weapons2_attackadj2'      : weapon['bonus'],
-        'repeating_weapons2_range2'          : weapon['range'] || '',
-        'repeating_weapons2_size2'           : weapon['size'],
-        'repeating_weapons2_weapspeed2'      : weapon['speed'],
-        'repeating_weapons2_weaptype-slash2' : weapon['type'].includes('S') ? 1 : 0,
-        'repeating_weapons2_weaptype-pierce2': weapon['type'].includes('P') ? 1 : 0,
-        'repeating_weapons2_weaptype-blunt2' : weapon['type'].includes('B') ? 1 : 0,
+        setAttrs(weaponInfo);
     };
-
-    setAttrs(weaponInfo);
+    
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
 });
 
 //range damage autofill
 on('change:repeating_ammo:ammoname', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue);
-    if (weapon === undefined)
-        return;
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            'repeating_weapons2_strbonus3': weapon['strength'] ? 1 : 0,
+            'repeating_ammo_damadj2': weapon['bonus'],
+            'repeating_ammo_damsm2': weapon['small-medium'],
+            'repeating_ammo_daml2': weapon['large'],
+            'repeating_weapons-damage_knockdown2': weapon['knockdown'] || ''
+        };
 
-    let weaponInfo = {
-        'repeating_weapons2_strbonus3'       : weapon['strength'] ? 1 : 0,
-        'repeating_ammo_damadj2'             : weapon['bonus'],
-        'repeating_ammo_damsm2'              : weapon['small-medium'],
-        'repeating_ammo_daml2'               : weapon['large'],
-        'repeating_weapons-damage_knockdown2': weapon['knockdown'] || ''
-    };
-
-    setAttrs(weaponInfo);
+        setAttrs(weaponInfo);
+    }
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
 });
 
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
@@ -1162,24 +1180,23 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
     
     sections.forEach(section => {
         on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
-            let weapon = getWeaponWithBonus(eventInfo.newValue);
-            if (weapon === undefined)
-                return;
-            
-            let weaponInfo = {
-                [`${prefix}attacknumhench${section}`] : weapon['rof'] || '1',
-                [`${prefix}attackadjhench${section}`] : weapon['bonus'],
-                [`${prefix}damadjhench${section}`]    : weapon['bonus'],
-                [`${prefix}damsmhench${section}`]     : weapon['small-medium'],
-                [`${prefix}damlhench${section}`]      : weapon['large'],
-                [`${prefix}rangehench${section}`]     : weapon['range'] || 'Melee',
-                [`${prefix}weaptypehench${section}`]  : weapon['type'],
-                [`${prefix}weapspeedhench${section}`] : weapon['speed'],
+            let setWeaponFunc = function (weapon) {
+                let weaponInfo = {
+                    [`${prefix}attacknumhench${section}`]: weapon['rof'] || '1',
+                    [`${prefix}attackadjhench${section}`]: weapon['bonus'],
+                    [`${prefix}damadjhench${section}`]: weapon['bonus'],
+                    [`${prefix}damsmhench${section}`]: weapon['small-medium'],
+                    [`${prefix}damlhench${section}`]: weapon['large'],
+                    [`${prefix}rangehench${section}`]: weapon['range'] || 'Melee',
+                    [`${prefix}weaptypehench${section}`]: weapon['type'],
+                    [`${prefix}weapspeedhench${section}`]: weapon['speed'],
+                };
+
+                setAttrs(weaponInfo);
             };
-            
-            setAttrs(weaponInfo);
-        })
-    })
+            setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+        });
+    });
 }
 
 const followerWeapons = [
@@ -1203,19 +1220,19 @@ followerWeapons.forEach(fw => {
 
 // Monster weapons
 on('change:repeating_monsterweapons:weaponname', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue, true);
-    if (weapon === undefined)
-        return;
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            [`repeating_monsterweapons_attacknum`]: weapon['rof'] || '1',
+            [`repeating_monsterweapons_ThAC0`]: weapon['thac0'] || '@{monsterthac0}',
+            [`repeating_monsterweapons_damsm`]: weapon['small-medium'],
+            [`repeating_monsterweapons_daml`]: weapon['large'],
+            [`repeating_monsterweapons_weapspeed`]: weapon['speed'],
+        };
 
-    let weaponInfo = {
-        [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
-        [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'] || '@{monsterthac0}',
-        [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
-        [`repeating_monsterweapons_daml`]      : weapon['large'],
-        [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
+        setAttrs(weaponInfo);
     };
 
-    setAttrs(weaponInfo);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, true);
 });
 
 //Weapon proficiency slots
