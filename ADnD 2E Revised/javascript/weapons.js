@@ -818,8 +818,8 @@ weapons['whip'] = {
 //endregion
 
 //region The Complete Fighter's Handbook
-weapons['Belaying pin'] = {
-    'name': 'belaying pin',
+weapons['belaying pin'] = {
+    'name': 'Belaying pin',
     'size': 'S',
     'type': 'B',
     'speed': 4,
@@ -852,7 +852,7 @@ weapons['bolas'] = {
     'large': '1d2',
     'knockdown': 'd8',
     'book': 'The Complete Fighter\'s Handbook',
-    'category': ['Melee','Range']
+    'category': ['Range']
 };
 weapons['cestus'] = {
     'name': 'Cestus',
@@ -918,7 +918,7 @@ weapons['graff/hook'] = {
     'book': 'The Complete Fighter\'s Handbook',
     'category': ['Melee','Range']
 };
-weapon['harpoon (one-handed)'] = {
+weapons['harpoon (one-handed)'] = {
     ...weapons['harpoon'],
     'name': 'Harpoon (One-handed)',
     'small-medium': '1d4+1',
@@ -1053,7 +1053,7 @@ weapons['shuriken'] = {
     'book': 'The Complete Fighter\'s Handbook',
     'category': ['Range']
 };
-weapon['Spear (two-handed)'] = {
+weapons['Spear (two-handed)'] = {
     ...weapons['spear'],
     'name': 'Spear (Two-handed)',
     'small-medium': '1d8+1',
@@ -1078,7 +1078,7 @@ weapons['spear, stone (two-handed)'] = {
     'large': '2d4',
     'knockdown': 'd8',
     'book': 'The Complete Fighter\'s Handbook',
-    'category': ['Melee','Range']
+    'category': ['Melee']
 };
 weapons['long spear (one-handed)'] = {
     'name': 'Long spear (One-handed)',
