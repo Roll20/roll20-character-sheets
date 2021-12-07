@@ -1,6 +1,33 @@
 // --- ALL SHEET WORKERS START --- //
 const sheetWorker = 'sheetworker';
 const player = 'player';
+const Success = 'success';
+const Info = 'info';
+const Warning = 'warning';
+const Error = 'error';
+
+on('clicked:hide-toast', function(eventInfo) {
+    setAttrs({
+        ['toast']: 0,
+        ['toast-content']: 0,
+    });
+});
+
+function showToast(type, title, message) {
+    let content
+    switch (type) {
+        case Success: content = 1; break;
+        case Info:    content = 2; break;
+        case Warning: content = 3; break;
+        case Error:   content = 4; break;
+    }
+    setAttrs({
+        ['toast']: 1,
+        ['toast-content']: content,
+        [`toast-title-${type}`]: title,
+        [`toast-message-${type}`]: message
+    });
+}
 
 const squareBracketsRegex = /18\[([0-9]{1,3})]/; // Ie. 18[65]
 const parenthesisRegex = /18\(([0-9]{1,3})\)/; // Ie. 18(65)
@@ -508,23 +535,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
         getAttrs(['book-phb', 'book-tcwhb'], function(values) {
             let activeBooks = Object.values(values);
             if (!activeBooks.includes(spell['book'])) {
-                let errorMessage = {
-                    [`repeating_spells-${section}_spell-cast-time`]    : '',
-                    [`repeating_spells-${section}_spell-level`]        : '',
-                    [`repeating_spells-${section}_spell-school`]       : '',
-                    [`repeating_spells-${section}_spell-components`]   : '',
-                    [`repeating_spells-${section}_spell-range`]        : '',
-                    [`repeating_spells-${section}_spell-aoe`]          : '',
-                    [`repeating_spells-${section}_spell-duration`]     : '',
-                    [`repeating_spells-${section}_spell-damage`]       : '',
-                    [`repeating_spells-${section}_spell-damage-type`]  : '',
-                    [`repeating_spells-${section}_spell-saving-throw`] : '',
-                    [`repeating_spells-${section}_spell-healing`]      : '',
-                    [`repeating_spells-${section}_spell-materials`]    : '',
-                    [`repeating_spells-${section}_spell-reference`]    : '',
-                    [`repeating_spells-${section}_spell-effect`]       : `The book **${spell['book']}** is currently not active on your sheet.\nGo to the **Sheet Settings** and activate the book (if your DM allows for its usage)`
-                }
-                setAttrs(errorMessage);
+                showToast(Error, 'Missing Book', `The book *${spell['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
                 return;
             }
             
@@ -657,7 +668,6 @@ function setupAddPriestSpell(postfix) {
     on(`clicked:add-spells-${postfix}`, function () {
         const section = `spells-${postfix}`;
         const field = 'spell-name';
-        let errorMessage = `add-spell-error-${postfix}`;
         let attributes = ['sphere-major'];
         if (postfix.match(/[123]/)) 
             attributes.push("sphere-minor");
@@ -672,11 +682,8 @@ function setupAddPriestSpell(postfix) {
                 let primarySpheres = parseSpheres(attributes.map(aField => a.S[aField]), primarySphereRegex);
                 let elementalSpheres = parseSpheres(attributes.map(aField => a.S[aField]), elementalRegex);
 
-                let newValue = {};
-                newValue[errorMessage] = '';
                 if (primarySpheres.size < 1) {
-                    newValue[errorMessage] = 'No valid spheres found. Please write or select some spheres';
-                    setAttrs(newValue);
+                    showToast(Warning, 'No spheres found', `No valid spheres found. Please write or select some spheres`);
                     return;
                 }
 
@@ -689,19 +696,18 @@ function setupAddPriestSpell(postfix) {
 
                 console.log(spellsToAdd);
                 if (spellsToAdd.length < 1) {
-                    newValue[errorMessage] = 'No spells found for the selected spheres';
-                    setAttrs(newValue);
+                    showToast(Error, 'No spells found', `No spells found for the selected spheres`);
                     return;
                 }
 
                 spellsToAdd = spellsToAdd.filter(spell => !knownSpells.has(spell));
                 console.log(spellsToAdd);
                 if (spellsToAdd.length < 1) {
-                    newValue[errorMessage] = 'All spells already added.';
-                    setAttrs(newValue);
+                    showToast(Info, 'All spells added', `Found no more spells to add based on spheres`);
                     return;
                 }
 
+                let newValue = {};
                 spellsToAdd.forEach(spell => {
                     let newrowid = generateRowID();
                     newValue[`repeating_${section}_${newrowid}_${field}`] = spell;
@@ -1267,6 +1273,8 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
 })
 
 on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_gem`, function(eventInfo) {
+    if (doEarlyReturn(eventInfo, ['gemvalue', 'gemqty']))
+        return;
     repeatingMultipleSum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
 })
 
