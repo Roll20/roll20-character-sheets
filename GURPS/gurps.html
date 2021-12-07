@@ -4374,11 +4374,10 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.7.0.2 -->
+				<!-- current version notes: 2.7.1 -->
 				<ul>
-					<li>Streamline how skill and spell levels are updated when a new GURPS version is loaded.</li>
-					<li>Resolved issue where linked melee items were not updating. Reported Tsuka and troubleshooted by Mike W.</li>
-					<li>2.7.0.2 - Repeating Spells Table. Bugfix Mod column stopped working. Reported TechnoMaestro.</li>
+					<li>Ranged Tab - Range Calculator: Clicking the <b>[Reset]</b> button also clears the modifiers from the roll, that mean you don't have to click the <b>[Apply]</b> button. Requested by Mike W.</li>
+					<li>Default Critical Success and Fail notes for repeating skills. If a skill is missing critical success and fail notes, a default message will be displayed instead. Requested by Mike W.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -8001,7 +8000,7 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="hidden" name="attr_sync" value="0" />
 						</div>
 						<div class="cell col1">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{skill_roll_modifier}, @{skill_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_skill_modifier_tool}]]}} {{maxNine=[[@{skill_roll_max_nine}]]}} {{rollModifier=[[@{skill_roll_modifier}]]}} {{rollModifierSummary=@{skill_roll_modifier_summary}}} {{rollTraitSummary=@{skill_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}} {{noteBoxOneShow=@{show_skill_mod_notes}}} {{noteBoxOneLabel=Skill Modifiers}} {{noteBoxOneContent=@{skill_mod_description_notes}}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{isRepeatingSkill=[[1]]}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{skill_roll_modifier}, @{skill_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_skill_modifier_tool}]]}} {{maxNine=[[@{skill_roll_max_nine}]]}} {{rollModifier=[[@{skill_roll_modifier}]]}} {{rollModifierSummary=@{skill_roll_modifier_summary}}} {{rollTraitSummary=@{skill_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}} {{noteBoxOneShow=@{show_skill_mod_notes}}} {{noteBoxOneLabel=Skill Modifiers}} {{noteBoxOneContent=@{skill_mod_description_notes}}}" name="roll_vsSL" />
 						</div>
 						<div class="cell col2">
 							<input type="text" name="attr_tl" title="Macro table name: repeating_skills. Field name: tl" />
@@ -13317,7 +13316,16 @@ visualize what it will look like in chat.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.7.0.2 -->
+			<!-- current version notes: 2.7.1 -->
+			<ul>
+				<li>Ranged Tab - Range Calculator: Clicking the <b>[Reset]</b> button also clears the modifiers from the roll, that mean you don't have to click the <b>[Apply]</b> button. Requested by Mike W.</li>
+				<li>Default Critical Success and Fail notes for repeating skills. If a skill is missing critical success and fail notes, a default message will be displayed instead. Requested by Mike W.</li>
+			</ul>
+
+			<h4>Version: 2.7.0.2</h4>
+
+			<p>Pull Request : 12/5/2021</p>
+
 			<ul>
 				<li>Streamline how skill and spell levels are updated when a new GURPS version is loaded.</li>
 				<li>Resolved issue where linked melee items were not updating. Reported Tsuka and troubleshooted by Mike W.</li>
@@ -14724,6 +14732,12 @@ visualize what it will look like in chat.
 								{{#customCriticalFailNote}}
                                     <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                 {{/customCriticalFailNote}}
+
+								{{#rollTotal() isRepeatingSkill 1}}
+								{{^customCriticalFailNote}}
+									<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+								{{/customCriticalFailNote}}
+								{{/rollTotal() isRepeatingSkill 1}}
                                     
                             </span>
                         {{/rollTotal() rollResult 18}}
@@ -14792,6 +14806,12 @@ visualize what it will look like in chat.
                                         <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                     {{/customCriticalFailNote}}
                                     
+									{{#rollTotal() isRepeatingSkill 1}}
+									{{^customCriticalFailNote}}
+										<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+									{{/customCriticalFailNote}}
+									{{/rollTotal() isRepeatingSkill 1}}
+									
                                 {{/rollLess() effectiveSkill 16}}
                                 
                             </span>
@@ -14840,7 +14860,13 @@ visualize what it will look like in chat.
 									{{#customCriticalSuccessNote}}
                                         <p>{{customCriticalSuccessNote}}</p>
                                     {{/customCriticalSuccessNote}}
-                                    
+
+									{{#rollTotal() isRepeatingSkill 1}}
+									{{^customCriticalSuccessNote}}
+                                        <p><span data-i18n="default-repeating-skill-crit-success-message">The GM may determine what happens to You. (B347)</span></p>
+                                    {{/customCriticalSuccessNote}}
+									{{/rollTotal() isRepeatingSkill 1}}
+									
                                 {{/rollLess() useCriticalPlusTen 2}}
                                                     
                             </span>
@@ -15020,6 +15046,12 @@ visualize what it will look like in chat.
 											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
+
+											{{#rollTotal() isRepeatingSkill 1}}
+											{{^customCriticalFailNote}}
+												<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+											{{/customCriticalFailNote}}
+											{{/rollTotal() isRepeatingSkill 1}}
                                             
                                         {{/rollGreater() rollResult 12}}
                                         
@@ -15094,6 +15126,12 @@ visualize what it will look like in chat.
 											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
+
+											{{#rollTotal() isRepeatingSkill 1}}
+											{{^customCriticalFailNote}}
+												<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+											{{/customCriticalFailNote}}
+											{{/rollTotal() isRepeatingSkill 1}}
                                             
                                         {{/rollGreater() rollResult 13}}
                                         
@@ -15168,6 +15206,12 @@ visualize what it will look like in chat.
 											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
+
+											{{#rollTotal() isRepeatingSkill 1}}
+											{{^customCriticalFailNote}}
+												<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+											{{/customCriticalFailNote}}
+											{{/rollTotal() isRepeatingSkill 1}}
                                             
                                         {{/rollGreater() rollResult 14}}
                                         
@@ -15242,6 +15286,12 @@ visualize what it will look like in chat.
 											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
+
+											{{#rollTotal() isRepeatingSkill 1}}
+											{{^customCriticalFailNote}}
+												<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+											{{/customCriticalFailNote}}
+											{{/rollTotal() isRepeatingSkill 1}}
                                             
                                         {{/rollGreater() rollResult 15}}
                                         
@@ -15316,6 +15366,12 @@ visualize what it will look like in chat.
 											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
+
+											{{#rollTotal() isRepeatingSkill 1}}
+											{{^customCriticalFailNote}}
+												<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+											{{/customCriticalFailNote}}
+											{{/rollTotal() isRepeatingSkill 1}}
                                             
                                         {{/rollGreater() rollResult 16}}
                                         
@@ -15428,6 +15484,12 @@ visualize what it will look like in chat.
                                                         <p>{{customCriticalSuccessNote}}</p>
                                                     {{/customCriticalSuccessNote}}
                                                     
+													{{#rollTotal() isRepeatingSkill 1}}
+													{{^customCriticalSuccessNote}}
+														<p><span data-i18n="default-repeating-skill-crit-success-message">The GM may determine what happens to You. (B347)</span></p>
+													{{/customCriticalSuccessNote}}
+													{{/rollTotal() isRepeatingSkill 1}}
+													
                                                 {{/rollBetween() rollResult 5 6}}
                                                 
                                             {{/rollGreater() effectiveSkill 15}}
@@ -15464,6 +15526,12 @@ visualize what it will look like in chat.
 													{{#customCriticalSuccessNote}}
                                                         <p>{{customCriticalSuccessNote}}</p>
                                                     {{/customCriticalSuccessNote}}
+
+													{{#rollTotal() isRepeatingSkill 1}}
+														{{^customCriticalSuccessNote}}
+															<p><span data-i18n="default-repeating-skill-crit-success-message">The GM may determine what happens to You. (B347)</span></p>
+														{{/customCriticalSuccessNote}}
+													{{/rollTotal() isRepeatingSkill 1}}
                                                     
                                                 {{/rollTotal() rollResult 5}}
                                             
@@ -16083,9 +16151,9 @@ visualize what it will look like in chat.
 
 	var noop = function () {}; // do nothing callback function.
 
-	const version = "2.7.0.2";
+	const version = "2.7.1";
 
-	const latestChangesDate = "12/5/2021";
+	const latestChangesDate = "12/6/2021";
 
 	var modCascade = true;
 	
@@ -20602,13 +20670,15 @@ visualize what it will look like in chat.
 	}
 	
 	on("clicked:range_calc_reset", function() {
-	    resetRangeCalculator();
+	    resetRangeCalculator(resetRollModifiers("ranged"));
 	});
 	
-	function resetRangeCalculator() {
+	function resetRangeCalculator(callback) {
 	    
+		callback = callback || noop;
+
 	    setAttrs(
-	        {
+			{
 	            "firing_distance": 0,
 	            "firing_speed_difference": 0,
 	            "firing_size_mod": 0,
@@ -20616,7 +20686,7 @@ visualize what it will look like in chat.
 				"firing_acc": 0,
 				"firing_aiming_bonus": 0,
 				"firing_rof": 0,
-	        });
+	        }, null, callback);
 	    
 	}
 	
