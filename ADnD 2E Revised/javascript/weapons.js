@@ -780,6 +780,81 @@ weapons['two-handed sword'] = {
     'book': 'PHB',
     'category': ['Melee']
 };
+weapons['acid'] = {
+    'name': 'Acid',
+    'group': 'Throw',
+    'noProf': true,
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '2d4',
+    'large': '1',
+    'book': 'PHB',
+    'category': ['Range']
+};
+weapons['holy water'] = {
+    'name': 'Holy water',
+    'group': 'Throw',
+    'noProf': true,
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1d6+1',
+    'large': '2',
+    'book': 'PHB',
+    'category': ['Range']
+};
+weapons['oil (lit)'] = {
+    'name': 'Oil (lit)',
+    'group': 'Throw',
+    'noProf': true,
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '2d6',
+    'large': '1d3',
+    'book': 'PHB',
+    'category': ['Range']
+};
+weapons['poison'] = {
+    'name': 'Poison',
+    'group': 'Throw',
+    'noProf': true,
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '',
+    'large': '',
+    'book': 'PHB',
+    'category': ['Range']
+};
+weapons['throw misc.'] = {
+    'name': 'Throw misc.',
+    'group': 'Throw',
+    'noProf': true,
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '',
+    'large': '',
+    'book': 'PHB',
+    'category': ['Range']
+};
 weapons['trident'] = {
     'name': 'Trident',
     'size': 'L',

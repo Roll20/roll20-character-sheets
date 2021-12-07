@@ -1165,7 +1165,7 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
                 [`${prefix}attackadjhench${section}`] : weapon['bonus'],
                 [`${prefix}damadjhench${section}`]    : weapon['bonus'],
                 [`${prefix}damsmhench${section}`]     : weapon['small-medium'],
-                [`${prefix}damlhench${section}`]      : weapon['small-medium'],
+                [`${prefix}damlhench${section}`]      : weapon['large'],
                 [`${prefix}rangehench${section}`]     : weapon['range'] || 'Melee',
                 [`${prefix}weaptypehench${section}`]  : weapon['type'],
                 [`${prefix}weapspeedhench${section}`] : weapon['speed'],
