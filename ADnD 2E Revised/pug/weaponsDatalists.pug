@@ -1,18 +1,20 @@
 datalist(id='melee-weapons')
     each weapon in data
+        if (!weapon.category.includes('Melee'))
+            - continue;
         - let group = weapon.group || '';
-        if (weapon.category.includes('Melee'))
-            if (weapon.book !== 'PHB')
-                - group += `, ${weapon.book}`;
-            option(value=weapon.name)= group
+        if (weapon.book !== 'PHB')
+            - group += `, ${weapon.book}`;
+        option(value=weapon.name)= group
             
 datalist(id='ranged-weapons')
     each weapon in data
+        if (!weapon.category.includes('Range'))
+            - continue;
         - let group = weapon.group || '';
-        if (weapon.category.includes('Range'))
-            if (weapon.book !== 'PHB')
-                - group += `, ${weapon.book}`;
-            option(value=weapon.name)= group
+        if (weapon.book !== 'PHB')
+            - group += `, ${weapon.book}`;
+        option(value=weapon.name)= group
 
 datalist(id='all-weapons')
     each weapon in data
@@ -20,3 +22,17 @@ datalist(id='all-weapons')
         if (weapon.book !== 'PHB')
             - group += `, ${weapon.book}`;
         option(value=weapon.name)= group
+
+- let usedWeapons = new Set();
+datalist(id='weapon-proficiencies')
+    each weapon in data
+        if (weapon.notProf)
+            - continue;
+        - let weaponName = weapon.name.split(' (')[0]
+        if (usedWeapons.has(weaponName))
+            - continue;
+        - usedWeapons.add(weaponName);
+        - let group = weapon.group || '';
+        if (weapon.book !== 'PHB')
+            - group += `, ${weapon.book}`;
+        option(value=weaponName)= group

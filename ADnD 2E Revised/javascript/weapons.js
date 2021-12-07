@@ -1,3 +1,4 @@
+//region Player's Handbook
 const weapons = {};
 weapons['arquebus'] = {
     'name': 'Arquebus',
@@ -37,16 +38,10 @@ weapons['blowgun (barbed dart)'] = {
     'category': ['Range']
 };
 weapons['blowgun (needle)'] = {
+    ...weapons['blowgun (barbed dart)'],
     'name': 'Blowgun (Needle)',
-    'rof': '2/1',
-    'range': '10/20/30',
-    'size': 'L',
-    'type': 'P',
-    'speed': 5,
     'small-medium': '1',
     'large': '1',
-    'book': 'PHB',
-    'category': ['Range']
 };
 weapons['short bow (flight arrow)'] = {
     'name': 'Short bow (Flight arrow)',
@@ -75,17 +70,11 @@ weapons['long bow (flight arrow)'] = {
     'category': ['Range']
 };
 weapons['long bow (sheaf arrow)'] = {
+    ...weapons['long bow (flight arrow)'],
     'name': 'Long bow (Sheaf arrow)',
-    'rof': '2/1',
     'range': '50/100/150',
-    'size': 'L',
-    'type': 'P',
-    'speed': 8,
     'small-medium': '1d8',
     'large': '1d8',
-    'knockdown': 'd6',
-    'book': 'PHB',
-    'category': ['Range']
 };
 weapons['composite short bow (flight arrow)'] = {
     'name': 'Composite short bow (Flight arrow)',
@@ -114,17 +103,11 @@ weapons['composite long bow (flight arrow)'] = {
     'category': ['Range']
 };
 weapons['composite long bow (sheaf arrow)'] = {
+    ...weapons['composite long bow (flight arrow)'],
     'name': 'Composite long bow (Sheaf arrow)',
-    'rof': '2/1',
     'range': '40/80/170',
-    'size': 'L',
-    'type': 'P',
-    'speed': 7,
     'small-medium': '1d8',
     'large': '1d8',
-    'knockdown': 'd6',
-    'book': 'PHB',
-    'category': ['Range']
 };
 weapons['club'] = {
     'name': 'Club',
@@ -390,7 +373,7 @@ weapons['medium horse lance'] = {
 weapons['mancatcher'] = {
     'name': 'Mancatcher',
     'size': 'L',
-    'type': '',
+    'type': '—',
     'speed': 7,
     'small-medium': '—',
     'large': '—',
@@ -636,7 +619,7 @@ weapons['quarterstaff'] = {
 weapons['scourge'] = {
     'name': 'Scourge',
     'size': 'S',
-    'type': '',
+    'type': '—',
     'speed': 5,
     'small-medium': '1d4',
     'large': '1d2',
@@ -670,18 +653,11 @@ weapons['sling (bullet)'] = {
     'category': ['Range']
 };
 weapons['sling (stone)'] = {
+    ...weapons['sling (bullet)'],
     'name': 'Sling (Stone)',
-    'strength': true,
-    'rof': '1',
     'range': '40/80/160',
-    'size': 'S',
-    'type': 'B',
-    'speed': 6,
     'small-medium': '1d4',
     'large': '1d4',
-    'knockdown': 'd4',
-    'book': 'PHB',
-    'category': ['Range']
 };
 weapons['spear'] = {
     'name': 'Spear',
@@ -711,18 +687,11 @@ weapons['staff sling (bullet)'] = {
     'category': ['Range']
 };
 weapons['staff sling (stone)'] = {
+    ...weapons['staff sling (bullet)'],
     'name': 'Staff sling (Stone)',
-    'strength': true,
-    'rof': '2/1',
-    'range': '—/30-60/90',
-    'size': 'M',
-    'type': 'B',
-    'speed': 11,
     'small-medium': '1d4',
     'large': '1d4',
     'knockdown': 'd6',
-    'book': 'PHB',
-    'category': ['Range']
 };
 weapons['bastard sword (one-handed)'] = {
     'name': 'Bastard sword (One-handed)',
@@ -736,15 +705,12 @@ weapons['bastard sword (one-handed)'] = {
     'category': ['Melee']
 };
 weapons['bastard sword (two-handed)'] = {
+    ...weapons['bastard sword (one-handed)'],
     'name': 'Bastard sword (Two-handed)',
-    'size': 'M',
-    'type': 'S',
     'speed': 8,
     'small-medium': '2d4',
     'large': '2d8',
     'knockdown': 'd10',
-    'book': 'PHB',
-    'category': ['Melee']
 };
 weapons['broad sword'] = {
     'name': 'Broad sword',
@@ -842,11 +808,399 @@ weapons['warhammer'] = {
 weapons['whip'] = {
     'name': 'Whip',
     'size': 'M',
-    'type': '',
+    'type': '—',
     'speed': 8,
     'small-medium': '1d2',
     'large': '1',
     'book': 'PHB',
     'category': ['Melee']
 };
+//endregion
+
+//region The Complete Fighter's Handbook
+weapons['Belaying pin'] = {
+    'name': 'belaying pin',
+    'size': 'S',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['bo stick'] = {
+    'name': 'Bo stick',
+    'size': 'L',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['bolas'] = {
+    'name': 'Bolas',
+    'strength': true,
+    'rof': '1',
+    'range': '30/60/90',
+    'size': 'M',
+    'type': 'B',
+    'speed': 8,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd8',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapons['cestus'] = {
+    'name': 'Cestus',
+    'size': 'S',
+    'type': 'S',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['chain'] = {
+    'name': 'Chain',
+    'strength': true,
+    'rof': '*',
+    'range': '5/10/20',
+    'size': 'L',
+    'type': 'B',
+    'speed': 5,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapons['dagger, bone'] = {
+    ...weapons['dagger'],
+    'name': 'Dagger, Bone',
+    'small-medium': '1d2',
+    'large': '1d2',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapons['dagger, stone'] = {
+    ...weapons['dagger'],
+    'name': 'Dagger, Stone',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapons['daikyu (daikyu arrow)'] = {
+    'name': 'Daikyu (Daikyu arrow)',
+    'rof': '2/1',
+    'range': '70/140/210',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d8',
+    'large': '1d6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Range']
+};
+weapons['graff/hook'] = {
+    'name': 'Graff/hook',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': 'd4',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapon['harpoon (one-handed)'] = {
+    ...weapons['harpoon'],
+    'name': 'Harpoon (One-handed)',
+    'small-medium': '1d4+1',
+    'large': '1d6+1',
+    'knockdown': '',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapons['javelin, stone (one-handed)'] = {
+    ...weapons['javelin'],
+    'name': 'Javelin, Stone (One-handed)',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Fighter\'s Handbook',
+};
+weapons['javelin, stone (two-handed)'] = {
+    ...weapons['javelin'],
+    'name': 'Javelin, Stone (Two-handed)',
+    'small-medium': '1d4+1',
+    'large': '1d6',
+    'knockdown': '',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['knife, bone'] = {
+    ...weapons['knife'],
+    'name': 'Knife, Bone',
+    'small-medium': '1d2',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapons['knife, stone'] = {
+    ...weapons['knife, bone'],
+    'name': 'Knife, Stone'
+}
+weapons['lasso'] = {
+    'name': 'Lasso',
+    'strength': true,
+    'rof': '*',
+    'range': '10/20/30',
+    'size': 'L',
+    'type': '—',
+    'speed': 10,
+    'small-medium': '',
+    'large': '',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Range']
+};
+weapons['main-gauche'] = {
+    'name': 'Main-gauche',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['net'] = {
+    'name': 'Net',
+    'strength': true,
+    'rof': '*',
+    'range': '10/20/30',
+    'size': 'M',
+    'type': '—',
+    'speed': 10,
+    'small-medium': '',
+    'large': '',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Range']
+};
+weapons['nunchaku'] = {
+    'name': 'Nunchaku',
+    'size': 'M',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd8',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['naginata'] = {
+    'name': 'Naginata',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d8',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['tetsubo'] = {
+    'name': 'Tetsubo',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'B',
+    'speed': 7,
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd12',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['sai'] = {
+    'name': 'Sai',
+    'size': 'S',
+    'type': 'P/B',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['shuriken'] = {
+    'name': 'Shuriken',
+    'strength': true,
+    'rof': '2/1',
+    'range': '20/40/60',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd4',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Range']
+};
+weapon['Spear (two-handed)'] = {
+    ...weapons['spear'],
+    'name': 'Spear (Two-handed)',
+    'small-medium': '1d8+1',
+    'large': '2d6',
+    'knockdown': 'd8',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['spear, stone (one-handed)'] = {
+    ...weapons['spear'],
+    'name': 'Spear, Stone (One-handed)',
+    'small-medium': '1d4',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapons['spear, stone (two-handed)'] = {
+    ...weapons['spear'],
+    'name': 'Spear, Stone (Two-handed)',
+    'small-medium': '1d6',
+    'large': '2d4',
+    'knockdown': 'd8',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapons['long spear (one-handed)'] = {
+    'name': 'Long spear (One-handed)',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'small-medium': '1d8',
+    'large': '1d8+1',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['long spear (two-handed)'] = {
+    ...weapons['long spear (one-handed)'],
+    'name': 'Long spear (Two-handed)',
+    'small-medium': '2d6',
+    'large': '3d6',
+    'knockdown': 'd8',
+};
+weapons['stiletto'] = {
+    'name': 'Stiletto',
+    'strength': true,
+    'rof': '2/1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapons['cutlass'] = {
+    'name': 'Cutlass',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 5,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['drusus'] = {
+    'name': 'Drusus',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 3,
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['katana (one-handed)'] = {
+    'name': 'Katana (One-handed)',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S/P',
+    'speed': 4,
+    'small-medium': '1d10',
+    'large': '1d12',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['katana (two-handed)'] = {
+    ...weapons['katana (one-handed)'],
+    'name': 'Katana (Two-handed)',
+    'small-medium': '2d6',
+    'large': '2d6',
+    'knockdown': 'd8',
+};
+weapons['rapier'] = {
+    'name': 'Rapier',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'P',
+    'speed': 4,
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['sabre'] = {
+    'name': 'Sabre',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 4,
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'knockdown': 'd8',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['wakizashi'] = {
+    'name': 'Wakizashi',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S/P',
+    'speed': 3,
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['trident (one-handed)'] = {
+    ...weapons['trident'],
+    'name': 'Trident (One-handed)',
+    'strength': true,
+    'rof': '1',
+    'range': '0/10/20',
+    'small-medium': '1d6+1',
+    'large': '3d4',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee','Range']
+};
+//endregion
 module.exports = weapons;
