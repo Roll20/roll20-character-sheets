@@ -7,7 +7,7 @@ const INFO = 'info';
 const WARNING = 'warning';
 const ERROR = 'error';
 
-const BOOK_FIELDS = ['book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcwhb'];
+const BOOK_FIELDS = ['book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb'];
 
 on('clicked:hide-toast', function(eventInfo) {
     setAttrs({
