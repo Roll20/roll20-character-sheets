@@ -1278,4 +1278,40 @@ weapons['trident (one-handed)'] = {
     'category': ['Melee','Range']
 };
 //endregion
+
+//region The Complete Priest's Handbook
+weapons['bill'] = {
+    'name': 'Bill',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': '',
+    'book': 'The Complete Priest\'s Handbook',
+    'category': ['Melee']
+};
+weapons['maul'] = {
+    'name': 'Maul',
+    'size': 'L',
+    'type': 'B',
+    'speed': 9,
+    'small-medium': '2d4',
+    'large': '1d10',
+    'knockdown': 'd12',
+    'book': 'The Complete Priest\'s Handbook',
+    'category': ['Melee']
+};
+weapons['scythe'] = {
+    'name': 'Scythe',
+    'size': 'M',
+    'type': 'P/S',
+    'speed': 8,
+    'small-medium': '1d6+1',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'The Complete Priest\'s Handbook',
+    'category': ['Melee']
+};
+//endregion
 module.exports = weapons;
