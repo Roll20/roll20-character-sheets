@@ -13,5 +13,9 @@ console.log('weapons.js')
 const weapons = require(`../javascript/weapons.js`);
 html += pug.renderFile('../pug/weaponsDatalists.pug', {pretty: true, data: weapons});
 
+console.log('nonweaponProficiencies.js')
+const nonweaponProficiencies = require(`../javascript/nonweaponProficiencies.js`);
+html += pug.renderFile('../pug/nonweaponProficienciesDatalists.pug', {pretty: true, data: nonweaponProficiencies});
+
 fs.writeFileSync('../html/dynamicDatalists.html', html);
 console.log('');

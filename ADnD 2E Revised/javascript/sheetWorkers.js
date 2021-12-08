@@ -1250,7 +1250,7 @@ on('change:repeating_profs:profslots remove:repeating_profs', function(eventInfo
 });
 //Nonweapon proficiency autofill
 on('change:repeating_profs:profname', function (eventInfo) {
-    let nonweaponProficiency = NonweaponProficiencies[eventInfo.newValue];
+    let nonweaponProficiency = nonweaponProficiencies[eventInfo.newValue];
     if (nonweaponProficiency === undefined)
         return;
     
