@@ -7,7 +7,7 @@ const INFO = 'info';
 const WARNING = 'warning';
 const ERROR = 'error';
 
-const BOOK_FIELDS = ['book-phb', 'book-tcfhb', 'book-tcwhb'];
+const BOOK_FIELDS = ['book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcwhb'];
 
 on('clicked:hide-toast', function(eventInfo) {
     setAttrs({
@@ -32,8 +32,11 @@ function showToast(type, title, message) {
     });
 }
 
-function isBookInactive(books, obj) {
-    return !Object.values(books).includes(obj['book']);
+function bookInactiveShowToast(books, obj) {
+    let bookInactive = !Object.values(books).includes(obj['book']);
+    if (bookInactive)
+        showToast(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
+    return bookInactive;
 }
 
 const squareBracketsRegex = /18\[([0-9]{1,3})]/; // Ie. 18[65]
@@ -540,10 +543,8 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
             return;
 
         getAttrs(BOOK_FIELDS, function(books) {
-            if (isBookInactive(books, spell)) {
-                showToast(ERROR, 'Missing Book', `The book *${spell['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
+            if (bookInactiveShowToast(books, spell))
                 return;
-            }
             
             let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
@@ -986,10 +987,8 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, isMonster) {
     getAttrs(BOOK_FIELDS, function(books) {
         let baseWeapon = weapons[weaponName];
         if (baseWeapon) {
-            if (isBookInactive(books, baseWeapon)) {
-                showToast(ERROR, 'Missing Book', `The book *${baseWeapon['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`)
+            if (bookInactiveShowToast(books, baseWeapon))
                 return;
-            }
 
             setWeaponFunc({
                 ...baseWeapon,
@@ -1007,10 +1006,8 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, isMonster) {
         if (!baseWeapon)
             return;
 
-        if (isBookInactive(books, baseWeapon)) {
-            showToast(ERROR, 'Missing Book', `The book *${baseWeapon['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`)
+        if (bookInactiveShowToast(books, baseWeapon))
             return;
-        }
 
         let bonusString = match[1];
         let bonus = parseInt(bonusString)
@@ -1254,10 +1251,15 @@ on('change:repeating_profs:profname', function (eventInfo) {
     if (nonweaponProficiency === undefined)
         return;
     
-    setAttrs({
-        'repeating_profs_profslots'  : nonweaponProficiency['slots'],
-        'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
-        'repeating_profs_profmod'    : nonweaponProficiency['modifier'],
+    getAttrs(BOOK_FIELDS, function (books) {
+        if (bookInactiveShowToast(books, nonweaponProficiency))
+            return;
+        
+        setAttrs({
+            'repeating_profs_profslots'  : nonweaponProficiency['slots'],
+            'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
+            'repeating_profs_profmod'    : nonweaponProficiency['modifier'],
+        });
     });
 });
 
