@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.2.3" readonly />
+													<input type="text" class="center" name="attr_version" value="1.2.4" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -9788,7 +9788,9 @@
 			var result = 0;
 			_.each(attrdb[`${attribute}`], (o) => {
 				if (o.targeted == undefined) {
-					if (focus == o.focus || focus == undefined) result = result + o.level;
+					if (focus == o.focus || o.focus == undefined) {
+						result = result + o.level;
+					}
 				}
 			});
 			console.log(`[getSumOfActiveAttrLevels(${attribute})] result = ${result}`);
@@ -10443,18 +10445,18 @@
 			const isMelee = 
 				getIsMelee(debug, focus);
 			const specialty = 
-				(isMelee && type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'meleeattack', focus) :
-				(isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'meleedefense', focus) :
-				(!isMelee && type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'rangedattack', focus) :
-				(!isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'rangeddefense', focus) : 
+				(isMelee && type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'meleeattack', focus) * 2 :
+				(isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'meleedefense', focus) * 2 :
+				(!isMelee && type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'rangedattack', focus) * 2 :
+				(!isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'rangeddefense', focus) * 2 : 
 				0;
 			const state = 
 				(type == 'acv') ? parseInt(value.static_button_targeted_attack) :
 				(type == 'dcv') ? parseInt(value.static_button_targeted_defense) : 
 				0;
 			const enemy = 
-				(type == 'acv') ? getTargetedLevel(attrdb, 'enemyattack') :
-				(type == 'dcv') ? getTargetedLevel(attrdb, 'enemydefense') : 
+				(type == 'acv') ? getTargetedLevel(attrdb, 'enemyattack') * 2 :
+				(type == 'dcv') ? getTargetedLevel(attrdb, 'enemydefense') * 2 : 
 				0;
 			const targeted = 
 				(type == 'acv') ? (invertState && sourceAttr == 'attack') ? (state > 0) ? 
