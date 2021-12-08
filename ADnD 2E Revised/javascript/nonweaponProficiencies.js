@@ -486,6 +486,96 @@ nonweaponProficiencies['Weaponsmithing'] = {
 //endregion
 
 //region The Complete Thief's Handbook
-
+nonweaponProficiencies['Alertness'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +1,
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Animal Noise'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -1,
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Begging'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': '',
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Boating'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +1,
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Fast-Talking'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': '',
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Fortune Telling'] = {
+    'slots': 2,
+    'abilityScore': '@{Charisma}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Information Gathering'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': '',
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Intimidation'] = {
+    'slots': 1,
+    'abilityScore': '',
+    'modifier': '',
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Locksmithing'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Looting'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Observation'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Trailing'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': '',
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
+nonweaponProficiencies['Voice Mimicry'] = {
+    'slots': 2,
+    'abilityScore': '@{Charisma}',
+    'modifier': '',
+    'classes': '',
+    'book': 'The Complete Thief\'s Handbook'
+};
 //endregion
 module.exports = nonweaponProficiencies;
