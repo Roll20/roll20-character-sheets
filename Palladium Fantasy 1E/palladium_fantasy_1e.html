@@ -334,12 +334,12 @@
                 <fieldset class="repeating_rangedattacks"> 
                     <div class='rattack-grid-container' >
                         <input class='rattack-label mint' type="text" title='Weapon name that will display in template header' value="" name="attr_weapon_attack" placeholder="Weapon Name" />
-                        <button class='rangeddice' type='roll' title='Strike (Attack) Roll with Damage' name='roll_rangedattack' value="@{whispertoggle}&{template:custom} {{color=blue}} {{title=**@{character_name}**}} {{subtitle=attacks with @{weapon_attack}}} {{Attack= [[d20cs>@{hth_ranged_critical}+@{weapon_strike}[Weapon]+@{rtemp_strike}]]}} {{Damage= [[@{weapon_damage}+@{rtemp_damage}]]}} {{desc=@{attack_reference}}}">Strike</button>
+                        <button class='rangeddice' type='roll' title='Strike (Attack) Roll with Damage' name='roll_rangedattack' value="@{whispertoggle}&{template:custom} {{color=blue}} {{title=**@{character_name}**}} {{subtitle=attacks with @{weapon_attack}}} {{ammo=@{ammunition}}} {{range=@{weapon_range}}} {{rof=@{weapon_rate_of_fire}}} {{Attack= [[d20cs>@{hth_ranged_critical}+@{weapon_strike}[Weapon]+@{rtemp_strike}]]}} {{Damage= [[@{weapon_damage}+@{rtemp_damage}]]}} {{desc=@{attack_reference}}}">Strike</button>
                         <button class='rangeddice' type='roll' title='Damage Roll Alone' name='roll_rangeddamage' value="@{whispertoggle}&{template:custom} {{color=red}} {{title=**@{character_name}**}} {{subtitle=hits with @{weapon_attack}}} {{@{character_name}'s @{weapon_attack} deals= [[@{weapon_damage}+@{rtemp_damage}]]}} {{desc=@{attack_reference}}}">Damage</button>
                         <input class='damage-dice mint' type="text" title='Damage Dice Calculation' value="" name="attr_weapon_damage" placeholder="xdy+z" />
                         <input class='rattack-text mint' type="text" title='Maximum Range of This Attack' value="" name="attr_weapon_range" />
-                        <input class='rattack-text mint' type="text" title='Rate of Fire per Melee' value="1" name="attr_weapon_rate_of_fire" />
-                        <input class='rattack-text mint' type='text' title='Ammunition' value='0' name='attr_ammunition' />
+                        <input class='rattack-text mint' type="text" title='Rate of Fire per Melee' value="" name="attr_weapon_rate_of_fire" />
+                        <input class='rattack-text mint' type='text' title='Ammunition' value='' name='attr_ammunition' />
                         <input type='checkbox' title='Show Bonus and Notes Fields' name='attr_toggle_rbonus' value="1">
                         <input class='rbonus-toggle' type='hidden' name='attr_toggle_rbonus'>
                         <div class='rbonus-hide'>
@@ -1827,7 +1827,11 @@
         <h1>Sheet Version: 1.0</h1>
         <p>For more information on this sheet, check the page dedicated to it on the Roll20 wiki.  
         <button type="roll" class="statdice" name="roll_wiki" value="&{template:custom} {{color=black}} {{title=**Information Link**}} {{subtitle=Right Click Link to Open in a New Tab.}} {{desc=[Roll20 Wiki Palladium Fantasy 1E](https://wiki.roll20.net/Palladium_Fantasy_1E)}}" >Info Link</button></p>
-        <h5>Recent Change: 8-8-21</h5>
+        <h5>Recent Changes: 11-14-21</h5>
+        <ul>
+            <li>Added ammo count, range, and rate of fire to "custom" roll template used for combat rolls.  Edited ranged strike roll button to include those values in the roll.  Removed the default values for rate of fire and ammo.  Any of those 3 values won't display on the roll template output if left blank. Disabled the visual "spinner" arrows in the number input fields.</li>
+        </ul>
+        <h5>Past Changes: 8-8-21</h5>
         <ul>
             <li>Added the "radius" property to the spell roll template, allowing the header to carry that value for magical abilities that have both range and radius.  Added a radius input for spells, wards, and power circles.  Centered a few labels, and adjusted the background color for inputs to allow autocalc fields to be darker than regular inputs.</li>
         </ul>
@@ -2053,21 +2057,30 @@ on("change:total_weapon change:total_armor change:total_gear change:total_consum
 });    
 
 </script>
+
+<!-- Main Roll Template -->
 <rolltemplate class="sheet-rolltemplate-custom">
   <div class="sheet-container sheet-color-{{color}}">
     <div class="sheet-header">
       {{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
       {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
     </div>
+    <div class="sheet-note">
+            {{#ammo}}<div class="sheet-ammo">Ammo Count: {{ammo}}</div>{{/ammo}}
+            {{#range}}<div class="sheet-range">Range: {{range}}</div>{{/range}}
+            {{#rof}}<div class="sheet-rof">Rate of Fire: {{rof}}</div>{{/rof}}
+    </div>
     <div class="sheet-content">
-      {{#allprops() title subtitle desc color}}
+      {{#allprops() title subtitle ammo range rof desc color}}
       <div class="sheet-key">{{key}}</div>
       <div class="sheet-value">{{value}}</div>
-      {{/allprops() title subtitle desc color}}
+      {{/allprops() title subtitle ammo range rof desc color}}
       {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
     </div>
   </div>
 </rolltemplate>
+
+<!-- Menu Roll Template -->
 <rolltemplate class="sheet-rolltemplate-menu">
   <div class="sheet-container sheet-color-{{color}}">
     <div class="sheet-header">
@@ -2083,6 +2096,7 @@ on("change:total_weapon change:total_armor change:total_gear change:total_consum
     </div>
   </div>
 </rolltemplate>
+
 <!-- Spell Roll Template -->
 <rolltemplate class="sheet-rolltemplate-spells">
     <div class="sheet-container sheet-color-{{color}}">
