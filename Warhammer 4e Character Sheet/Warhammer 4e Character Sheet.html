@@ -1025,7 +1025,7 @@
 				<input type="checkbox" name="attr_MeleeMode_Frenzy" value="1"/>
 				</div>
 				<div class="sheet-col-1-2 sheet-center">
-				<span data-i18n="DEFENSIVE">Defensive</span>
+				<span data-i18n="DEF-STANCE">Defensive</span>
 				<input type="checkbox" name="attr_DefenseMode_Defensive" value="1"/>
 				</div>
 							<span class="sheet-spacer"></span>
@@ -39462,13 +39462,14 @@
 										{{/rollTotal() dangerous 1}}	
 										{{#rollGreater() sureshot 0}}
 											<div class="sheet-col-100-100 sheet-pad-l-md sheet-pad-r-md sheet-rt-effects sheet-no-yellow-bg" style="color: #858585"><span style="margin-right: 3px; color: #858585" data-i18n="SURE-SHOT-EFFECT"></span>{{sureshot}} <span style="color: #858585" data-i18n="SURE-SHOT-EFFECT2"></span></div>
-										{{/rollGreater() sureshot 0}}	
+										{{/rollGreater() sureshot 0}}
+
+										
+										{{/rollGreater() showdmg 0}}	
+										
 										{{#rollGreater() drilled 0}}
 											<div class="sheet-col-100-100 sheet-pad-l-md sheet-pad-r-md sheet-rt-effects sheet-no-yellow-bg" style="color: #858585"><span style="margin-right: 3px; color: #858585" data-i18n="DRILLED-EFFECT"></span> <span style="color: #858585; background-color: yellow">{{drilled}}</span> <span style="color: #858585" data-i18n="DRILLED-EFFECT2"></span></div>
 										{{/rollGreater() drilled 0}}
-
-										
-										{{/rollGreater() showdmg 0}}
 										
 										
 										{{#^rollGreater() showdmg 0}} {{#rollGreater() riposte 0}} {{#rollGreater() fast 0}}
@@ -42583,13 +42584,13 @@
 		const pen = +v.encpenalty || 0;	
 		
 		if ( `${stat}` == 'Agility' ) {
-		var charScorePre   = charStart + charTalents + charAdv;
+		var charScorePre   = charStart + charTalents + charAdv + charMod;
 		var penmod = charScorePre - pen*10;
         if (penmod < 10) { var charScore = 10; }
         if (penmod > 10) { var charScore = penmod }
 		if (charScorePre < 10) { var charScore = charScorePre; }			
 		} else {
-		var charScore   = charStart + charTalents + charTalentsD + charAdv;	
+		var charScore   = charStart + charTalents + charTalentsD + charAdv + charMod;	
 		}
 				
 		if (v.MeleeMode_Frenzy == 1) { 
@@ -46589,6 +46590,7 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
             const SLmod = results.results.SLmod.result
             const slbonusatk = results.results.slbonusatk.result
             	if (trigger == "dualwieldmain") {dualwield = results.results.dualwield.result} else {dualwield = 0;}
+            	if (v.MeleeMode_Drilled  == 1) {drilled = results.results.drilled.result} else {drilled = 0;}
             	if (v.MeleeMode_BNE  == 1) {breakenter = results.results.breakenter.result} else {breakenter = 0;}
             	if (v.MeleeMode_Disarm  == 1) {disarm = results.results.disarm.result} else {disarm = 0;}
             	if (v.MeleeMode_Feint  == 1) {feint = results.results.feint.result} else {feint = 0;}
@@ -46667,7 +46669,7 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
 	    }, {silent: true});				
 			
 			
-			if ( test <= target ) { var computed3 = computed + infadd + disarm + feint + bneadd + dirtyfighting + bfrenzy + dualwield + precise + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
+			if ( test <= target ) { var computed3 = computed + drilled + infadd + disarm + feint + bneadd + dirtyfighting + bfrenzy + dualwield + precise + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
 			if ( test <= target ) { var computed4 = slbonusatk - practical ;} else  { var computed4 = practical ;}
 			if ( test <= target ) { var computed5 = slbonusatk - practical + SLmod ;} else  { var computed5 = practical + SLmod ;}
 	
@@ -46693,7 +46695,7 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
 
 
 on('clicked:meleeopposedmain', (eventInfo) => {
-	getAttrs(["Used_MeleeWeaponSkill", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_Infight"], function(v) {	
+	getAttrs(["Used_MeleeWeaponSkill", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_Infight", "MeleeMode_Drilled"], function(v) {	
 	
    let roll = '{{test=[[@{roll_rule}]]}} {{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{DefensiveTotal}+@{Used_MeleePractical}+@{Talent_RiposteLvl}+@{Talent_ReversalLvl}+(@{Used_MeleeShield}*@{Talent_ShieldsmanLvl})>addsl< [SL TOTAL]]]}} {{sladd=[[0]]}} {{slbonusdef=[[@{slbonusDefMain}>addsl<]]}} {{target=[[ [[@{condgen_see_move}*-1]] [COND] + [[@{Used_MeleeWeaponSkill}]] [SKILL] + ?{Opposed Defense Modifier|@{Used_MeleeBonus}} [MOD] + [[@{Advantage}*10]] [ADV] ]]}} {{modvalue=[[?{Opposed Defense Modifier|@{Used_MeleeBonus}}]]}} {{title=@{Used_MeleeWeapon}}} {{character_name=@{character_name}}} {{advantage=[[@{AdvantageDisplay}]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{attacktype=^{PARRY}}} {{attacktest=true}} {{SLmod=[[?{SL Modifier|0}]]}} {{reach=@{Used_MeleeReach}}} {{rolltype=[[@{Used_MeleeImpale}]]}} {{qualities=@{Used_MeleeQualities}}} {{showdmg=[[@{Used_MeleeOpposedDmg}]]}} {{hitlocation=true}} {{sitmod=[[0]]}} {{damage=[[@{Used_MeleeStrengthBonus}+@{Used_MeleeDamageBonus}+@{Talent_StrikeMightyBlowLvl}-{[[@{Used_MeleeDmgTaken}-@{Used_MeleeDurable}]],[[0]]}kh1]]}} {{damaging=[[@{Used_MeleeDamaging}]]}} {{armorqualities=@{armorQuality}}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Melee_def_modtype1}]]}} {{mod1=@{Used_Melee_def_mod1}}} {{mod2type=[[@{Used_Melee_def_modtype2}]]}} {{mod2=@{Used_Melee_def_mod2}}} {{mod3type=[[@{Used_Melee_def_modtype3}]]}} {{mod3=@{Used_Melee_def_mod3}}} {{NPC=[[0]]}} {{reroll=@{RT-reroll}MeleeOpposedMain)}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{RTriposte=@{RT-ripostedmgmain}}} {{fast=[[@{Used_MeleeFast}]]}} {{slow=[[@{Used_MeleeSlow}]]}} {{hack=[[@{Used_MeleeHack}]]}} {{practical=[[@{Used_MeleePractical}]]}} {{shieldsman=[[@{Used_MeleeShield}*@{Talent_ShieldsmanLvl}]]}} {{defensive=[[@{DefensiveTotal}]]}} {{impact=[[@{Used_MeleeImpact}]]}} {{tiring=[[@{Used_MeleeTiring}]]}} {{penetrating=[[@{Used_MeleePenetrating}]]}} {{pummel=[[@{Used_MeleePummel}]]}} {{riposte=[[@{Talent_RiposteLvl}]]}} {{reversal=[[@{Talent_ReversalLvl}]]}} {{trapblade=[[@{Used_MeleeTrapBlade}]]}} {{RTtrapblade=@{RT-trapblade}}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}}';
    var trigger = eventInfo.triggerName.slice(8);
@@ -46715,6 +46717,7 @@ on('clicked:meleeopposedmain', (eventInfo) => {
    if (battlefrenzy > 0) {addsl += '+@{Talent_BattleRageLvl}';} 
    
 	if (v.MeleeMode_Infight  == 1) {rollPart2 += " {{infight=[[@{Talent_InFighterLvl}]]}}"; addsl += '+@{Talent_InFighterLvl}';}
+	if (v.MeleeMode_Drilled  == 1) {rollPart2 += " {{drilled=[[@{Talent_DrilledLvl}]]}}"; addsl += '+@{Talent_DrilledLvl}';}
  
    let rollPart = rollPart2.replaceAll('>addsl<', addsl);
 				
@@ -46737,6 +46740,7 @@ on('clicked:meleeopposedmain', (eventInfo) => {
             	
 			if (v.MeleeMode_Infight == 1) {infight = results.results.infight.result} else {infight = 0;}	
 			if (infight > 0) {if (v.MeleeMode_Infight  == 1) {infadd = infight;} else {infadd = 0;}} else {infadd = 0;}
+            if (v.MeleeMode_Drilled  == 1) {drilled = results.results.drilled.result} else {drilled = 0;}
 
 			bfrenzy = battlerage * frenzy;
 			
@@ -46745,7 +46749,7 @@ on('clicked:meleeopposedmain', (eventInfo) => {
                console.log(bfrenzy);
                console.log(SLmod);
 			   
-			if ( test <= target ) { var computed3 = computed + infadd + dirtyfighting + bfrenzy + reversal + riposte + defensive + shieldsman + SLmod ;} else  { var computed3 = computed + practical + defensive + shieldsman + SLmod ;}
+			if ( test <= target ) { var computed3 = computed + drilled + infadd + dirtyfighting + bfrenzy + reversal + riposte + defensive + shieldsman + SLmod ;} else  { var computed3 = computed + practical + defensive + shieldsman + SLmod ;}
 			if ( test <= target ) { var computed4 = slbonusdef - practical ;} else  { var computed4 = defensive + practical + shieldsman ;}
 			if ( test <= target ) { var computed5 = slbonusdef - practical + SLmod ;} else  { var computed5 = defensive + practical + shieldsman + SLmod ;}	
 
@@ -46858,7 +46862,7 @@ on('clicked:ripostedmgmain', (eventInfo) => {
 on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clicked:dualwieldoff', (eventInfo) => {
 
 	if (eventInfo.sourceType === 'sheetworker') return;
-			getAttrs(["Used_DefenseWeaponSkill", "Talent_AmbidextrousLvl","Used_MeleeTwohanded","Advantageinput","LastRollMain","LastCritRoll", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_BNE", "MeleeMode_Infight"], function(values) {	
+			getAttrs(["Used_DefenseWeaponSkill", "Talent_AmbidextrousLvl","Used_MeleeTwohanded","Advantageinput","LastRollMain","LastCritRoll", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_BNE", "MeleeMode_Infight", "MeleeMode_Drilled"], function(values) {	
 			
 			lastcrit = values.LastCritRoll;
 	 		prevroll = JSON.stringify(values["LastRollMain"])||0;
@@ -46925,6 +46929,7 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
    
 	if (values.MeleeMode_BNE  == 1) {rollPart4 += " {{breakenter=[[@{Talent_BreakandEnterLvl}]]}}";addsldf += '+@{Talent_BreakandEnterLvl}'; adddmg += '+@{Talent_BreakandEnterLvl}';} 
 	if (values.MeleeMode_Infight  == 1) {rollPart4 += " {{infight=[[@{Talent_InFighterLvl}]]}}"; addsldf += '+@{Talent_InFighterLvl}';}
+	if (values.MeleeMode_Drilled  == 1) {rollPart4 += " {{drilled=[[@{Talent_DrilledLvl}]]}}"; addsldf += '+@{Talent_DrilledLvl}';}
  
    let rollPart = rollPart4.replaceAll('>ambi<', ambipen).replaceAll('>addsldf<', addsldf).replaceAll('>adddmg<', adddmg);
    
@@ -46949,6 +46954,7 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 			if (trigger == "dualwieldoff") {dualwield = results.results.dualwield.result} else  {dualwield = 0}
             if (values.MeleeMode_BNE  == 1) {breakenter = results.results.breakenter.result} else {breakenter = 0;}
 			if (values.MeleeMode_Infight == 1) {infight = results.results.infight.result} else {infight = 0;}
+            if (values.MeleeMode_Drilled  == 1) {drilled = results.results.drilled.result} else {drilled = 0;}
 				
             const computed = (Math.floor(target / 10) - Math.floor(test / 10)) ;
             const computed2 = (((test-1)%10)+1) ;		
@@ -47022,7 +47028,7 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
             "LastUnitDieOff": computed2
 	    }, {silent: true});					   
 			
-			if ( test <= target ) { var computed3 = computed + infadd + bneadd + dirtyfighting + bfrenzy + precise + dualwield + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
+			if ( test <= target ) { var computed3 = computed + drilled + infadd + bneadd + dirtyfighting + bfrenzy + precise + dualwield + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
 			if ( test <= target ) { var computed4 = slbonusatk - practical ;} else  { var computed4 = practical ;}
 			if ( test <= target ) { var computed5 = slbonusatk - practical + SLmod ;} else  { var computed5 = practical + SLmod ;}
 
@@ -47051,7 +47057,7 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 on('clicked:meleeopposedoff', (eventInfo) => {
 
 	if (eventInfo.sourceType === 'sheetworker') return;
-			getAttrs(["Used_DefenseWeaponSkill","Used_DefenseDefensive","Talent_AmbidextrousLvl","Used_MeleeTwohanded", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_Infight"], function(values) {	
+			getAttrs(["Used_DefenseWeaponSkill","Used_DefenseDefensive","Talent_AmbidextrousLvl","Used_MeleeTwohanded", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_Infight", "MeleeMode_Drilled"], function(values) {	
 			
 			console.log(values.Talent_AmbidextrousLvl);
 
@@ -47085,6 +47091,7 @@ on('clicked:meleeopposedoff', (eventInfo) => {
    if (battlefrenzy > 0) {addsl += '+@{Talent_BattleRageLvl}';}
    
 	if (values.MeleeMode_Infight  == 1) {roll += " {{infight=[[@{Talent_InFighterLvl}]]}}"; addsl += '+@{Talent_InFighterLvl}';}
+	if (values.MeleeMode_Drilled  == 1) {roll += " {{drilled=[[@{Talent_DrilledLvl}]]}}"; addsl += '+@{Talent_DrilledLvl}';}
    
    let rollPart = roll.replaceAll('>offpen<', offpen).replaceAll('>addsl<', addsl);
 
@@ -47109,13 +47116,14 @@ on('clicked:meleeopposedoff', (eventInfo) => {
 			
 			if (values.MeleeMode_Infight == 1) {infight = results.results.infight.result} else {infight = 0;}	
 			if (infight > 0) {if (values.MeleeMode_Infight  == 1) {infadd = infight;} else {infadd = 0;}} else {infadd = 0;}
+            if (values.MeleeMode_Drilled  == 1) {drilled = results.results.drilled.result} else {drilled = 0;}
 			
             console.log(values.MeleeMode_Infight);
             console.log(infadd);
 			   
 			bfrenzy = battlerage * frenzy;
 
-			if ( test <= target ) { var computed3 = computed + infadd + dirtyfighting + bfrenzy + reversal + riposte + defensive + shieldsman + SLmod ;} else  { var computed3 = computed + practical + defensive + SLmod ;}
+			if ( test <= target ) { var computed3 = computed + drilled + infadd + dirtyfighting + bfrenzy + reversal + riposte + defensive + shieldsman + SLmod ;} else  { var computed3 = computed + practical + defensive + SLmod ;}
 			if ( test <= target ) { var computed4 = slbonusdef - practical ;} else  { var computed4 = defensive + practical ;}
 			if ( test <= target ) { var computed5 = slbonusdef - practical + SLmod ;} else  { var computed5 = defensive + practical + SLmod ;}
 
