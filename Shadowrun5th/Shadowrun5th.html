@@ -12719,19 +12719,23 @@ function importSingleWeapon(text, weapon, number,  ammunition, attributes) {
     if(weapon.type == "Ranged"){
         attributes["weaponismelee"+number] = 0;
         attributes["weaponrc"+number] = weapon.rc.match(/\d+/g).pop()-Math.ceil((parseInt(attributes.str_base) + parseInt(attributes.str_aug))/3)- 1;
-        if(weapon.rawdamage.match(/\d+/) !== null) {
+
+        if(weapon.rawdamage.match(/\d+/) !== null && !weapon.rawdamage.includes("STR")) {
             attributes["weapondv"+number] = weapon.rawdamage.match(/\d+/)[0];
+        }
+        else if(weapon.rawdamage.includes("STR")) {
+           attributes["weapondv"+number] = weapon.damage.match(/\d+/)[0];
         }
         else {
             attributes["weapondv"+number] = weapon.damage.match(/\d+/) != null ? weapon.damage.match(/\d+/)[0] : 0;
         }
 
-        attributes["weapondmgtype"+number] = weapon.rawdamage.match(/\D+/) != null ? weapon.rawdamage.match(/\D+/)[0] : 0;
+        attributes["weapondmgtype"+number] = weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }else{
         attributes["weaponismelee"+number] = "on";
         attributes["weaponreach"+number] = weapon.reach;
         attributes["weapondv"+number] = weapon.damage_english.match(/\d+/) != null ? weapon.damage_english.match(/\d+/)[0] : 0;
-        attributes["weapondmgtype"+number] = weapon.damage_english.match(/\D+/) != null ? weapon.damage_english.match(/\D+/)[0] : 0;
+        attributes["weapondmgtype"+number] = weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }
 
     attributes["weaponname"+number] = weapon.name;
@@ -12816,12 +12820,12 @@ async function importSingleRepeatingWeapon(text, weapon, ammunition, attributes)
             attributes[row + "weapondv"] = weapon.damage.match(/\d+/) != null ? weapon.damage.match(/\d+/)[0] : 0;
         }
 
-        attributes[row + "weapondmgtype"] = weapon.rawdamage.match(/\D+/)[0];
+        attributes[row + "weapondmgtype"] = weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }else{
         attributes[row + "weaponismelee"] = "on";
         attributes[row + "weaponreach"] = weapon.reach;
         attributes[row + "weapondv"] = weapon.damage_english.match(/\d+/) != null ? weapon.damage_english.match(/\d+/)[0] : 0;
-        attributes[row + "weapondmgtype"] = weapon.damage_english.match(/\D+/) != null ? weapon.damage_english.match(/\D+/)[0] : 0;
+        attributes[row + "weapondmgtype"] = weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }
 
     let skills = [];
@@ -12923,7 +12927,7 @@ async function importRepeatingWeaponAmmo(row, ammunition, number, attributes) {
     else {
         attributes[row + "ammoap" + number] = ammo.weaponbonusap != null? ammo.weaponbonusap : 0;
     }
-    attributes[row + "ammoacc" + number] = mmo.weaponbonusacc != null ? ammo.weaponbonusacc : 0;
+    attributes[row + "ammoacc" + number] = ammo.weaponbonusacc != null ? ammo.weaponbonusacc : 0;
 }
 
 function importSingleArmor(armor, attributes) {
@@ -13057,7 +13061,6 @@ const importSingleVehicleMod = (mod, newrowid, attributes, weaponnumber) => {
 }
 
 const importSingleVehicleWeapon = (weapon, newrowid, attributes, weaponnumber) => {
-    console.log(weapon);
     attributes["repeating_vehicles_"+newrowid+"_vehicleweaponname" + weaponnumber] = weapon.name;
     attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"+ weaponnumber] = weapon.accuracy.match(/\d+/g).pop();
     if(weapon.type == "Ranged")
