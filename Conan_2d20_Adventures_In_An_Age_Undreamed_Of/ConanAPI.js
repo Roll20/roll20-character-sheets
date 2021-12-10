@@ -319,7 +319,7 @@ var ConanAPI = ConanAPI || (function()
 				let expertise =  findInArray(a,"expertise",0);
 				let skilled_roll_index = findInArray(a,"successes1",0);
 				let unskilled_roll_index = findInArray(a,"successes2",0);
-				let num_dice_index =  findInArray(a,"num_dice",0);
+				let show_tn =  findInArray(aclone,"show_tn",0);
 				
 				//get these actual roll values from the converted clone
 				let expertise_chk =  findInArray(aclone,"expertise_chk",0);
@@ -328,9 +328,8 @@ var ConanAPI = ConanAPI || (function()
 				let encumbered_chk =  findInArray(aclone,"encumbered",0);
 				let num_dice =  findInArray(aclone,"num_dice",0);
 				let target_number =  findInArray(aclone,"target_number",0);
-				let show_tn =  findInArray(aclone,"show_tn",0);
-				let bk_nbr =  findInArray(aclone,"bk_nbr",0);
-				let api_chk =  findInArray(aclone,"api_chk",0);
+				let bk_nbr =  findInArray(aclone,"bk_nbr",3);
+				let api_chk =  findInArray(aclone,"api_chk",1);
 
 				let fail_count = libInline.getDice(msg.inlinerolls[0], 'fumble').length;
 				let crit_count = libInline.getDice(msg.inlinerolls[0], 'crit').length;
@@ -345,13 +344,17 @@ var ConanAPI = ConanAPI || (function()
 				
 				total_successes += crit_count;
 
-                let roll_msg = "";    
+                let roll_msg = "&{template:skillapi} {{skill_name="+skill_name+"}} {{character_name="+character_name+"}} {{successes1="+libInline.getRollTip(msg.inlinerolls[skilled_roll_index])+"}}{{successes2="+libInline.getRollTip(msg.inlinerolls[unskilled_roll_index])+"}}{{num_dice="+num_dice+"}} {{target_number="+target_number+"}}{{expertise_chk=[["+expertise_chk+"]]}}{{expertise="+expertise+"}}{{crit_chk=[["+crit_count+"]]}}{{fail_chk=[["+fail_count+"]]}}{{crit_count="+crit_count+"}}{{fail_count="+fail_count+"}}{{total_successes="+total_successes+"}}{{api_chk=[[1]]}}{{bk_nbr=[["+bk_nbr+"]]}}";    
+
+				if (show_tn > 0)
+					roll_msg += "{{show_tn="+show_tn+"}}";
+
                 if (trauma_chk > -1)
                     //tramuma based roll
-                    roll_msg = "&{template:skillapi} {{skill_name="+skill_name+"}} {{character_name="+character_name+"}} {{successes1="+libInline.getRollTip(msg.inlinerolls[skilled_roll_index])+"}} {{successes2="+libInline.getRollTip(msg.inlinerolls[unskilled_roll_index])+"}}{{num_dice="+num_dice+"}} {{target_number="+target_number+"}}{{trauma_chk=[["+trauma_chk+"]]}}{{trauma="+trauma+"}}{{trauma_treated="+trauma_treated+"}}{{expertise_chk=[["+expertise_chk+"]]}}{{expertise="+expertise+"}}{{crit_chk=[["+crit_count+"]]}}{{fail_chk=[["+fail_count+"]]}}{{crit_count="+crit_count+"}}{{fail_count="+fail_count+"}}{{total_successes="+total_successes+"}}{{show_tn=[["+show_tn+"]]}}{{api_chk=[[1]]}}{{bk_nbr=[["+bk_nbr+"]]}}";
+                    roll_msg += "{{trauma_chk=[["+trauma_chk+"]]}}{{trauma="+trauma+"}}{{trauma_treated="+trauma_treated+"}}";
                 else
                     //physcical based roll
-                    roll_msg = "&{template:skillapi} {{skill_name="+skill_name+"}} {{character_name="+character_name+"}} {{successes1="+libInline.getRollTip(msg.inlinerolls[skilled_roll_index])+"}} {{successes2="+libInline.getRollTip(msg.inlinerolls[unskilled_roll_index])+"}}{{num_dice="+num_dice+"}} {{target_number="+target_number+"}}{{wounds_chk=[["+wounds_chk+"]]}}{{wounds="+wounds+"}}{{wounds_treated="+wounds_treated+"}}{{expertise_chk=[["+expertise_chk+"]]}}{{expertise="+expertise+"}}{{encumbered=[["+encumbered_chk+"]]}}{{crit_chk=[["+crit_count+"]]}}{{fail_chk=[["+fail_count+"]]}}{{crit_count="+crit_count+"}}{{fail_count="+fail_count+"}}{{total_successes="+total_successes+"}}{{show_tn=[["+show_tn+"]]}}{{api_chk=[[1]]}}{{bk_nbr=[["+bk_nbr+"]]}}";
+                    roll_msg += "{{wounds_chk=[["+wounds_chk+"]]}}{{wounds="+wounds+"}}{{wounds_treated="+wounds_treated+"}}{{encumbered=[["+encumbered_chk+"]]}}";
 
 				if (api_chk > 0)	//only sending to skillapi template if chk value greater than zero
                 	sendChat(msg.who, roll_msg);
