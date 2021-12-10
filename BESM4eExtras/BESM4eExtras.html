@@ -9799,7 +9799,9 @@
 			var result = 0;
 			_.each(attrdb[`${attribute}`], (o) => {
 				if (o.targeted == undefined) {
-					if (focus == o.focus || o.focus == undefined) result = result + o.level;
+					if (focus == o.focus || o.focus == undefined) {
+						result = result + o.level;
+					}
 				}
 			});
 			console.log(`[getSumOfActiveAttrLevels(${attribute})] result = ${result}`);
@@ -10529,18 +10531,18 @@
 			const isMelee = 
 				getIsMelee(debug, focus);
 			const specialty = 
-				(isMelee && type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'meleeattack', focus) :
-				(isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'meleedefense', focus) :
-				(!isMelee && type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'rangedattack', focus) :
-				(!isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'rangeddefense', focus) : 
+				(isMelee && type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'meleeattack', focus) * 2 :
+				(isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'meleedefense', focus) * 2 :
+				(!isMelee && type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'rangedattack', focus) * 2 :
+				(!isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'rangeddefense', focus) * 2 : 
 				0;
 			const state = 
 				(type == 'acv') ? parseInt(value.static_button_targeted_attack) :
 				(type == 'dcv') ? parseInt(value.static_button_targeted_defense) : 
 				0;
 			const enemy = 
-				(type == 'acv') ? getTargetedLevel(attrdb, 'enemyattack') :
-				(type == 'dcv') ? getTargetedLevel(attrdb, 'enemydefense') : 
+				(type == 'acv') ? getTargetedLevel(attrdb, 'enemyattack') * 2 :
+				(type == 'dcv') ? getTargetedLevel(attrdb, 'enemydefense') * 2 : 
 				0;
 			const targeted = 
 				(type == 'acv') ? (invertState && sourceAttr == 'attack') ? (state > 0) ? 
@@ -10891,7 +10893,14 @@
 			}
 			setObj.maneuverroll = result;
 		}
-		
+		/*
+		function getAttrStatValue(debug, value, rowID) {
+			const stat = value[`repeating_attr_${rowID}_stat`];
+			const statvalue = parseInt(value[`stat_total_${stat}`]);
+			if(debug) console.log(`[getAttrStatValue(${stat})] statvalue = ${statvalue}`);
+			return statvalue;
+		}
+		*/
 		function getDefaultSkillStats(debug, value, skill){
 			const json = JSON.parse(global_templates_skills_json);
 			const skills = json.template;
@@ -11524,6 +11533,9 @@
 											exposeDefectSettingsOnDefectChange(debug, value, rowID, setObj);
 											setDefectdb(debug, attrdb, eventInfo, rowID, setObj);
 											setDefectPointsByRankChange(debug, attrdb, attrIDs, eventInfo, value, sectionName, rowID, setObj);
+										break;
+										case 'stat':
+											getAttrStatValue(debug, value, rowID);
 										break;
 										default:
 											if (isCustomization) {
