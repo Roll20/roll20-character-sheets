@@ -46868,7 +46868,17 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 	if (eventInfo.sourceType === 'sheetworker') return;
 			getAttrs(["Used_DefenseWeaponSkill", "Talent_AmbidextrousLvl","Used_MeleeTwohanded","Advantageinput","LastRollMain","LastCritRoll", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_BNE", "MeleeMode_Infight", "MeleeMode_Drilled"], function(values) {	
 			
-			lastcrit = values.LastCritRoll;
+
+	 		prevcrit = JSON.stringify(values["LastCritRoll"])||0;
+			if (prevcrit >= 1 && prevcrit <= 9) {
+			prevcrit2 = JSON.stringify(prevcrit * 10)||0;
+               console.log(prevcrit2);
+			prevcrit = prevcrit2.split("").reverse().join("");   
+			}
+			critrevc = prevcrit.split("").reverse().join("");
+			if (critrevc == "001") {critrevc = "100"}
+			lastcrit = parseInt(critrevc)||0;			
+			
 	 		prevroll = JSON.stringify(values["LastRollMain"])||0;
 			if (prevroll >= 1 && prevroll <= 9) {
 			prevroll2 = JSON.stringify(prevroll * 10)||0;
@@ -46899,10 +46909,12 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 	}
 	if (trigger == "dualwieldoff") {rollEnd = ' {{berserkcharge=[[0]]}} {{RTfuriousassault=@{RT-furiousassaultoff}}} {{furiousassault=[[@{Talent_FuriousAssaultLvl}]]}} {{reroll=@{RT-reroll}MeleeAttackOff)}} {{dualwield=[[@{Talent_DualWielderLvl}]]}} {{dwuse}}';
 	rollPart2 = roll.replaceAll('>addsl<', '+@{Talent_DualWielderLvl}>addsldf<');
+	if (lastcrit > 0) {	
+	rollPart3 = rollPart2.replaceAll('>test<', `${lastcrit}`);
+	} else {	
 	rollPart3 = rollPart2.replaceAll('>test<', `${rollrev}`);
-	if (lastcrit > 0) {rollPart4 = rollPart3.replaceAll('>target<', `${lastcrit}`);
-	} else {rollPart4 = rollPart3.replaceAll('>target<', ' [[@{condgen_see_move}*-1]] [COND] + [[>ambi<]] [PEN] + [[@{Used_DefenseWeaponSkill}]] [SKILL] + ?{Opposed Attack Modifier|@{Used_DefenseBonus}} [MOD] + [[@{Advantage}*10]] [ADV] ');}
 	}
+	rollPart4 = rollPart3.replaceAll('>target<', ' [[@{condgen_see_move}*-1]] [COND] + [[>ambi<]] [PEN] + [[@{Used_DefenseWeaponSkill}]] [SKILL] + ?{Opposed Attack Modifier|@{Used_DefenseBonus}} [MOD] + [[@{Advantage}*10]] [ADV] ');}
 	if (trigger == "meleechargeoff") {rollEnd = '  {{charge=true}} {{berserkcharge=[[@{Talent_BerserkChargeLvl}]]}} {{RTfuriousassault=@{RT-furiousassaultmain}}} {{furiousassault=[[@{Talent_FuriousAssaultLvl}]]}} {{reroll=@{RT-reroll}MeleeChargeOff)}} {{RTdualwield=@{RT-dualwieldmain}}} {{dualwield=[[@{Talent_DualWielderLvl}]]}}';
 	rollPart2 = roll.replaceAll('>addsl<', '+@{Talent_BerserkChargeLvl}>addsldf<');	
 	rollPart3 = rollPart2.replaceAll('>test<', '@{roll_rule}');
@@ -47445,7 +47457,7 @@ on('clicked:repeating_spellbookpetty:spellcast clicked:repeating_spellbookpetty:
 on('clicked:repeating_spellbookarcane:spellcast clicked:repeating_spellbookarcane:spellcastdmg', (eventInfo) => {
 	getAttrs(["initiative_houserule"], function(v) {	
 	
-   let roll = '{{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Talent_InstinctiveDictionLvl}+@{Talent_PerfectPitchLvl} [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusCast}]]}} {{sladd=[[0]]}} {{modvalue=[[?{@{translation_modifier}|@{prefix2-_SpellMod}}]]}} {{title=@{prefix2-_spellname}}} {{character_name=@{character_name}}} {{advantage=[[@{Advantage}*10*@{Advantage_casting}]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{spelltype=^{PETTY-SPELL}}} {{spellrange=Range: @{prefix2-_spellrange}}} {{spelltarget=Targets: @{prefix2-_spelltarget}}} {{spellduration=Duration: @{prefix2-_spellduration}}} {{target=[[ [[(@{condgen_see}*-1)]] [COND] + [[{@{LangMagick}}]] [SKILL] + ?{@{translation_modifier}|0} [MOD] + [[@{Advantage}*10*@{Advantage_casting}]] [ADV] ]]}} {{spelldescription=@{prefix2-_spelldesc}}} {{test=[[@{roll_rule}]]}} {{SLmod=[[?{SL Modifier|0}]]}} {{spelltest=[[1d10]]}} {{arcanetest=true}} {{rolltype=[[6]]}} {{spellcastingnumber=[[@{prefix2-_spellcastingnumber}]]}} {{accuchanexlsl=[[@{prefix2-_spellchannelsl}]]}} {{mod1type=[[@{prefix2-_ArcaneSpell_modtype1}]]}} {{mod1=@{prefix2-_ArcaneSpell_mod1}}} {{mod2type=[[@{prefix2-_ArcaneSpell_modtype2}]]}} {{mod2=@{prefix2-_ArcaneSpell_mod2}}} {{mod3type=[[@{prefix2-_ArcaneSpell_modtype3}]]}} {{mod3=@{prefix2-_ArcaneSpell_mod3}}} {{NPC=[[0]]}} {{RTminor=@{RT-minor}}} {{RTmajor=@{RT-major}}} {{reroll=[1](~@{character_name}|prefix2-_spellcast)}} {{sptal2=[[@{Talent_InstinctiveDictionLvl}]]}} {{sptal3=[[@{Talent_PerfectPitchLvl}]]}} {{sptal23=[[@{Talent_InstinctiveandPitch}]]}}';
+   let roll = '{{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Talent_InstinctiveDictionLvl}+@{Talent_PerfectPitchLvl} [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusCast}]]}} {{sladd=[[0]]}} {{modvalue=[[?{@{translation_modifier}|@{prefix2-_SpellMod}}]]}} {{title=@{prefix2-_spellname}}} {{character_name=@{character_name}}} {{advantage=[[@{Advantage}*10*@{Advantage_casting}]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{spelltype=^{ARCANE-SPELL}}} {{spellrange=Range: @{prefix2-_spellrange}}} {{spelltarget=Targets: @{prefix2-_spelltarget}}} {{spellduration=Duration: @{prefix2-_spellduration}}} {{target=[[ [[(@{condgen_see}*-1)]] [COND] + [[{@{LangMagick}}]] [SKILL] + ?{@{translation_modifier}|0} [MOD] + [[@{Advantage}*10*@{Advantage_casting}]] [ADV] ]]}} {{spelldescription=@{prefix2-_spelldesc}}} {{test=[[@{roll_rule}]]}} {{SLmod=[[?{SL Modifier|0}]]}} {{spelltest=[[1d10]]}} {{arcanetest=true}} {{rolltype=[[6]]}} {{spellcastingnumber=[[@{prefix2-_spellcastingnumber}]]}} {{accuchanexlsl=[[@{prefix2-_spellchannelsl}]]}} {{mod1type=[[@{prefix2-_ArcaneSpell_modtype1}]]}} {{mod1=@{prefix2-_ArcaneSpell_mod1}}} {{mod2type=[[@{prefix2-_ArcaneSpell_modtype2}]]}} {{mod2=@{prefix2-_ArcaneSpell_mod2}}} {{mod3type=[[@{prefix2-_ArcaneSpell_modtype3}]]}} {{mod3=@{prefix2-_ArcaneSpell_mod3}}} {{NPC=[[0]]}} {{RTminor=@{RT-minor}}} {{RTmajor=@{RT-major}}} {{reroll=[1](~@{character_name}|prefix2-_spellcast)}} {{sptal2=[[@{Talent_InstinctiveDictionLvl}]]}} {{sptal3=[[@{Talent_PerfectPitchLvl}]]}} {{sptal23=[[@{Talent_InstinctiveandPitch}]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var skillpre = trigger.split('_');
    var skill = skillpre[3];
