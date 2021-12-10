@@ -9032,7 +9032,7 @@
 					title = '{{title=Roll 2d6}}';
 					break;
 				case 'acv':
-					cv = getCV(debug, value, attrdb, setObj, sourceAttr, 'acv');
+					cv = getCV(debug, value, attrdb, setObj, sourceAttr, 'acv', '');
 					type = '{{acvroll=1}}';
 					title = '{{title=Roll ACV}}';
 					stat = `{{acv=${cv}}}`;
@@ -9046,7 +9046,7 @@
 					base = cv;
 					break;
 				case 'initiative':
-					cv = getCV(debug, value, attrdb, setObj, sourceAttr, 'acv');
+					cv = getCV(debug, value, attrdb, setObj, sourceAttr, 'acv', '');
 					rollmod = getSumOfActiveSubAttrRanks(attrdb, 'combattechnique', 'lightningreflexes') || 0;
 					type = '{{initiative=1}}';
 					title = '{{title=Roll Initiative}}';
@@ -9605,7 +9605,6 @@
 				case `heightenedawareness`:
 				case `socialmastery`:
 				case `superstrength`:
-				case `swarm`:
 				case `tough`:
 				case `unassailable`:
 					result = { level: level, source: rowID };
@@ -9657,16 +9656,15 @@
 					result = { name: name, level: level, source: rowID, customizations: customizations };
 				break;
 				case `telekinesis`:
-					customizations = value[`repeating_attr_${rowID}_customizations`] || [];
-					result = { level: level, source: rowID, customizations: customizations };
-				break;
 				case `swarm`:
 				case `weapon`:
-					focused = attribute == 'swarm' ?
+					focused = attribute == 'swarm' || attribute == 'telekinesis' ?
 						'unarmed' :
 						value[`repeating_attr_${rowID}_weaponclass`] || "";
 					damagetype = attribute == 'swarm' ? 
 						'penetrating' :
+						attribute == 'telekinesis' ?
+						'blunt' :
 						value[`repeating_attr_${rowID}_damagetype`];
 					customizations = value[`repeating_attr_${rowID}_customizations`] || [];
 					result = { name: name, level: level, focus: focused, damagetype: damagetype, source: rowID, customizations: customizations };
@@ -9801,7 +9799,7 @@
 			var result = 0;
 			_.each(attrdb[`${attribute}`], (o) => {
 				if (o.targeted == undefined) {
-					if (focus == o.focus || focus == undefined) result = result + o.level;
+					if (focus == o.focus || o.focus == undefined) result = result + o.level;
 				}
 			});
 			console.log(`[getSumOfActiveAttrLevels(${attribute})] result = ${result}`);
@@ -9841,12 +9839,11 @@
 		}
 		
 		function setArms(debug, rowID, setObj, name, isActive, hand) {
-			const type = (/(mainhand|offhand)/i.test(hand)) ? 
-				hand : `repeating_extraarm_${hand}`;
+			const handsource = getHandSource(debug, hand);
 			const source = setObj[`repeating_attr_${rowID}_source`];
 			if (isActive) {
-				setObj[`${type}_name`] = name;
-				setObj[`${type}_source`] = rowID;
+				setObj[`${handsource}_name`] = name;
+				setObj[`${handsource}_source`] = rowID;
 				if (source === undefined || source === '') {
 					setObj[`repeating_attr_${rowID}_source`] = hand;
 				} else {
@@ -9854,22 +9851,20 @@
 					setObj[`repeating_attr_${rowID}_source`] = twohanded;
 				}
 			} else {
-				setObj[`${type}_name`] = '';
-				setObj[`${type}_source`] = '';
+				setObj[`${handsource}_name`] = '';
+				setObj[`${handsource}_source`] = '';
 				setObj[`repeating_attr_${rowID}_source`] = '';
 			}
-			if (debug) console.log(`[setArms(${isActive})] type = ${type}`);
+			if (debug) console.log(`[setArms(${isActive})] handsource = ${handsource}`);
 		}
 		
 		function updateWeaponStates(debug, attrdb, extraarmIDs, value, source, sourceAttr, setObj){
-			const state = parseInt(value[`${source}_state`]);
-		
-			console.log(`[updateWeaponStates()] source = ${source}`);
-			console.log(`[updateWeaponStates()] state = ${state}`);
-		
+			const handsource = getHandSource(debug, source);
+			const state = parseInt(value[`${handsource}_state`]);
+			if(debug) console.log(`[updateWeaponStates()] state = ${state}`);
 			if(state > 0) {
-				setWeaponStates(debug, extraarmIDs, value, source, setObj, true);
-				setActiveWeapon(debug, value, source, setObj);
+				setWeaponStates(debug, extraarmIDs, value, handsource, setObj);
+				setActiveWeapon(debug, value, handsource, setObj);
 				setCombatRoll(debug, value, attrdb, value[`${source}_source`], sourceAttr, setObj);
 			}
 		}
@@ -9888,6 +9883,7 @@
 						setArms(debug, rowID, setObj, name, true, extraarmID);
 						setObj[`repeating_extraarm_${extraarmID}_type`] = 0;
 						setObj[`repeating_extraarm_${extraarmID}_label`] = capital(attribute);
+						//updateWeaponStates(debug, attrdb, extraarmIDs, value, extraarmID, sourceAttr, setObj);
 					} else {
 						var source = setObj[`repeating_attr_${rowID}_source`] || 
 							value[`repeating_attr_${rowID}_source`] || "";
@@ -9907,6 +9903,7 @@
 							});
 							result = mountid.toString();
 						}
+						//updateWeaponStates(debug, attrdb, extraarmIDs, value, result, sourceAttr, setObj);
 						removeRepeatingRow(`repeating_extraarm_${result}`);
 					}
 				break;
@@ -10030,8 +10027,7 @@
 				break;
 			}
 			if (debug) {
-				console.log(`[setWeapon(${sourceAttr})] setObj:`);
-				console.log(setObj);
+				console.log(`[setWeapon(${sourceAttr})]`);
 			}
 		}
 		
@@ -10208,8 +10204,8 @@
 					setActiveAttribute(isActive, debug, value, rowID, sourceAttr, setObj, attribute, level);
 				break;
 				case "telekinesis":
-					setAttrdb(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-					setWeapon(isActive, debug, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+					//setAttrdb(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
+					//setWeapon(isActive, debug, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 					setActiveAttribute(isActive, debug, value, rowID, sourceAttr, setObj, attribute, level);
 				break;
 				case "tough":
@@ -10573,9 +10569,14 @@
 		}
 		
 		function setActiveWeapon(debug, value, rowID, setObj) {
-			const result = value[`${rowID}_source`] || '';
+			const state = parseInt(setObj[`${rowID}_state`]) || 0;
+			const result = state > 0 ? value[`${rowID}_source`] : '';
 			setObj.active_weapon = result;
-			if (debug) console.log(`[setActiveWeapon()] result = ${result}`);
+			if (debug){
+				console.log(`[setActiveWeapon()] rowID = ${rowID}`);
+				console.log(`[setActiveWeapon()] state = ${state}`);
+				console.log(`[setActiveWeapon()] result = ${result}`);
+			}
 		}
 		
 		function getIsGrappling(maneuver) {
@@ -10583,58 +10584,41 @@
 		}
 		
 		function setCombatRoll(debug, value, attrdb, rowID, sourceAttr, setObj, invertState = false) {
-			const activeweapon = 
-				rowID === undefined ? setObj.active_weapon || value.active_weapon : rowID;
-				console.log(`[setCombatRoll()] activeweapon = ${activeweapon}`);
+			const activeweapon = setObj.active_weapon;
 			const weapon = 
 				_.find(attrdb.weapon, o => { if (o.source == activeweapon) return o; }) ||
 				_.find(attrdb.swarm, o => { if (o.source == activeweapon) return o; });
-				console.log(`[setCombatRoll()] weapon = ${weapon}`);
 			const isWeapon = 
 				getIsObject(weapon);
-				console.log(`[setCombatRoll()] isWeapon = ${isWeapon}`);
 			const isSwarm = 
 				getIsObject(_.find(attrdb.swarm, o => { if (o.source == activeweapon) return o; }));
-				console.log(`[setCombatRoll()] isSwarm = ${isSwarm}`);
 			const targetedmdState = 
 				parseInt(value.static_button_targeted_damage) || 0;
-				console.log(`[setCombatRoll()] targetedmdState = ${targetedmdState}`);
 			const targetedmdLevel = 
 				getTargetedLevel(attrdb, 'massivedamage') || 0;
-				console.log(`[setCombatRoll()] targetedmdLevel = ${targetedmdLevel}`);
 			const targetedmd = 
 				invertState && sourceAttr == 'damage' ?
 				targetedmdState > 0 ? 0 : targetedmdLevel :
 				targetedmdState > 0 ? targetedmdLevel : 0;
-				console.log(`[setCombatRoll()] targetedmd = ${targetedmd}`);
 			const name = 
 				isWeapon ? weapon.name : 'Unarmed';
-				console.log(`[setCombatRoll()] name = ${name}`);
 			const level = 
 				isWeapon ? weapon.level :
 				getSumOfActiveSubAttrRanks(attrdb, 'combattechnique', 'brutal') || 0;
-				console.log(`[setCombatRoll()] level = ${level}`);
 			const weaponclass = 
 				isWeapon ? weapon.focus : 'unarmed';
-				console.log(`[setCombatRoll()] weaponclass = ${weaponclass}`);
 			const damagetype = 
 				isWeapon ? weapon.damagetype : 'blunt';
-				console.log(`[setCombatRoll()] damagetype = ${damagetype}`);
 			const isMelee = 
 				getIsMelee(debug, weaponclass);
-				console.log(`[setCombatRoll()] isMelee = ${isMelee}`);
 			const muscle = 
 				isMelee > 0 ? 1 :
 				_.find(weapon.customizations, o => { if (o.name == 'muscle') return 1; }) || 0;
-				console.log(`[setCombatRoll()] muscle = ${muscle}`);
 			const massivedamage = 
 				getSumOfActiveAttrLevels(attrdb, 'massivedamage', weaponclass) || 0;
-				console.log(`[setCombatRoll()] massivedamage = ${massivedamage}`);
 			const superstrength = 
 				getSumOfActiveAttrLevels(attrdb, 'superstrength') || 0;
-				console.log(`[setCombatRoll()] superstrength = ${superstrength}`);
 			const shockvalue = parseInt(value.stat_total_shock) || 0;
-			console.log(`[setCombatRoll()] shockvalue = ${shockvalue}`);
 			const forcefield = parseInt(value.protection_forcefield_ar) || 0;
 			const shield = parseInt(value.protection_shield_ar) || 0;
 			const armor1 = parseInt(value.protection_armor1_ar) || 0;
@@ -10648,44 +10632,35 @@
 				setObj.static_activity_maneuver_name || value.static_activity_maneuver_name;
 			maneuver = 
 				`${maneuver.replace(/\s+/g, '')}`;
-				console.log(`[setCombatRoll()] maneuver = ${maneuver}`);
 			const acv = 
 				attack_maneuvers_regex.test(maneuver) ? 
 				isSwarm ?  parseInt(weapon.level) + 4 :
 				getCV(debug, value, attrdb, setObj, sourceAttr, 'acv', weaponclass) : 0;
-				console.log(`[setCombatRoll()] acv = ${acv}`);
 			const dcv = 
 				defense_maneuvers_regex.test(maneuver) ? 
 				isSwarm ? 0 :
 				getCV(debug, value, attrdb, setObj, sourceAttr, 'dcv', weaponclass) : 0;
-				console.log(`[setCombatRoll()] dcv = ${dcv}`);
 			let damage = isSwarm ?
 				Math.round(weapon.critters/10) :
 				((level + (superstrength * muscle) + massivedamage + targetedmd) * 5) + acv;
-				console.log(`[setCombatRoll()] damage = ${damage}`);
 			let edge = 
 				(isWeapon) ? _.find(weapon.customizations, c => { 
 					if (c.name == 'accurate') return true; 
 				}) ||  { rank: 0 } : { rank: 0 };
-				console.log(`[setCombatRoll()] edge:`); console.log(edge); 
 			let obstacle = 
 				(isWeapon) ? _.find(weapon.customizations, c => { 
 					if (c.name == 'inaccurate') return true; 
 				}) || { rank: 0 } : { rank: 0 };
-				console.log(`[setCombatRoll()] obstacle:`); console.log(obstacle); 
 			let rollmod = 
 				edge.rank + obstacle.rank;
-				console.log(`[setCombatRoll()] rollmod = ${rollmod}`);
 			damage = 
-				non_damaging_attack_regex.test(maneuver) ? 0 : damage;
-				console.log(`[setCombatRoll()] damage = ${damage}`);
+				non_damaging_attack_regex.test(maneuver) ? 0 : damage;		
 			rollmod = 
 				minor_obstacle_maneuvers_regex.test(maneuver) ? rollmod - 1 :
 				major_obstacle_maneuvers_regex.test(maneuver) ? rollmod - 2 :
 				maneuver == 'disarm' && isMelee ? rollmod - 1 :
 				maneuver == 'disarm' ? rollmod - 2 :
 				rollmod;
-				console.log(`[setCombatRoll()] rollmod = ${rollmod}`);
 			const weakpoint = 
 				maneuver == 'weakpoint' ? 
 				`{{weakpoint=[[ [[?{Weak Point is|Large, ${setDice(rollmod, -2)}|Small, ${setDice(rollmod, -1)}|Tiny, ${setDice(rollmod, -1)}}]] ]] }}` : 
@@ -10886,7 +10861,34 @@
 				if(absorption2 > 0) result = `${result} {{absorption2=${absorption2}}}`;
 				if(conversion > 0) result = `${result} {{conversion=${conversion}}}`;
 			}
-			if (debug) console.log(`[setCombatRoll()] result = ${result}`);
+			if (debug){
+				console.log(`[setCombatRoll()] activeweapon = ${activeweapon}`);
+				console.log(`[setCombatRoll()] weapon = ${weapon}`);
+				console.log(`[setCombatRoll()] isWeapon = ${isWeapon}`);
+				console.log(`[setCombatRoll()] isSwarm = ${isSwarm}`);
+				console.log(`[setCombatRoll()] targetedmdState = ${targetedmdState}`);
+				console.log(`[setCombatRoll()] targetedmdLevel = ${targetedmdLevel}`);
+				console.log(`[setCombatRoll()] targetedmd = ${targetedmd}`);
+				console.log(`[setCombatRoll()] name = ${name}`);
+				console.log(`[setCombatRoll()] level = ${level}`);
+				console.log(`[setCombatRoll()] weaponclass = ${weaponclass}`);
+				console.log(`[setCombatRoll()] damagetype = ${damagetype}`);
+				console.log(`[setCombatRoll()] isMelee = ${isMelee}`);
+				console.log(`[setCombatRoll()] muscle = ${muscle}`);
+				console.log(`[setCombatRoll()] massivedamage = ${massivedamage}`);
+				console.log(`[setCombatRoll()] superstrength = ${superstrength}`);
+				console.log(`[setCombatRoll()] shockvalue = ${shockvalue}`);
+				console.log(`[setCombatRoll()] maneuver = ${maneuver}`);
+				console.log(`[setCombatRoll()] acv = ${acv}`);
+				console.log(`[setCombatRoll()] dcv = ${dcv}`);
+				console.log(`[setCombatRoll()] damage = ${damage}`);
+				console.log(`[setCombatRoll()] edge:`); console.log(edge); 
+				console.log(`[setCombatRoll()] obstacle:`); console.log(obstacle); 
+				console.log(`[setCombatRoll()] rollmod = ${rollmod}`);
+				console.log(`[setCombatRoll()] damage = ${damage}`);
+				console.log(`[setCombatRoll()] rollmod = ${rollmod}`);
+				console.log(`[setCombatRoll()] result = ${result}`);
+			}
 			setObj.maneuverroll = result;
 		}
 		
@@ -10995,23 +10997,26 @@
 			return result;
 		}
 		
-		function setWeaponStates(debug, extraarmIDs, value, rowID, setObj, update = false) {
-			const type = /(mainhand|offhand)/i.test(rowID) ? 
+		function getHandSource(debug, rowID){
+			const result = /(mainhand|offhand)/i.test(rowID) ? 
 				rowID : `repeating_extraarm_${rowID}`;
-			const armedID = setObj[`${type}_source`] || 
-				value[`${type}_source`] || '';
+			if(debug) console.log(`[getHandSource()] result = ${result}`);
+			return result;
+		}
+		
+		function setWeaponStates(debug, extraarmIDs, value, rowID, setObj) {
+			const armedID = setObj[`${rowID}_source`] || 
+				value[`${rowID}_source`] || '';
 			const handsArray = buildHandsArray(debug, extraarmIDs);
 			const handsStateArray = _.map(handsArray, hand => {
 				const source = value[`${hand}_source`];
-				console.log(`[setWeaponStates()] source = ${source}`);
 				const state = parseInt(value[`${hand}_state`]);
-				console.log(`[setWeaponStates()] state = ${state}`);
-				const handstate = source == armedID ? 1 : 0;
-					console.log(`[setWeaponStates()] handstate = ${handstate}`);
+				const handstate = source == armedID ?
+					state == 0 ? 1 : 0 : 0;
 				return handstate;
 			});
 			if(debug){
-				console.log(`[setWeaponStates(${rowID})] type = ${type}`);
+				console.log(`[setWeaponStates()] rowID = ${rowID}`);
 				console.log(`[setWeaponStates()] armedID = ${armedID}`);
 				console.log(`[setWeaponStates()] handsStateArray:`);
 				console.log(handsStateArray);
@@ -11500,7 +11505,6 @@
 											setLevelElevation(eventInfo, source, `levelelevation`, setObj);
 											setAttrCostByLevelChange(debug, attrdb, eventInfo, value, attrIDs, sectionName, rowID, sourceAttr, setObj);
 											setEffectiveLevelByLevelChange(debug, eventInfo, value, sectionName, rowID, sourceAttr, setObj);
-											
 										break;
 										case `activate`:
 											if (!getIsLocked(debug, value, rowID, sourceAttr)) return;
@@ -11561,8 +11565,9 @@
 								case `extraarm`:
 									switch (sourceAttr) {
 										case `armedstate`:
-											setWeaponStates(debug, extraarmIDs, value, rowID, setObj);
-											setActiveWeapon(debug, value, rowID, setObj);	
+											const handsource = getHandSource(debug, rowID);
+											setWeaponStates(debug, extraarmIDs, value, handsource, setObj);
+											setActiveWeapon(debug, value, handsource, setObj);	
 											setCombatRoll(debug, value, attrdb, value[`${source}_source`], sourceAttr, setObj);
 										break;
 									}
