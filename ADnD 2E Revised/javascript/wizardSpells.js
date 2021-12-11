@@ -5627,7 +5627,6 @@ wiz9['Wish'] = {
 //#endregion
 
 //region The Complete Wizard's Handbook
-
 wiz1['Copy'] = {
     'level': '1',
     'school': 'Evocation',
@@ -6385,6 +6384,45 @@ wiz8['Shadow Form'] = {
 }
 
 //#endregion
+
+//region Tome of Magic
+wiz1['Conjure Spell Component'] = {
+    'level': '1',
+    'school': 'Conjuration/Summoning',
+    'range': '[[@{level-wizard}]] mile(s)',
+    'duration': '1 round',
+    'aoe': '[[3*[[@{level-wizard}]] ]] components',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 106',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard teleports desired items directly to his hand. The objects must be naturally occurring components for spells the wizard knows and they must be within spell range. The components must be items commonly found in the area, such as a twig, feather, firefly, or bit of beeswax in a forest.\n&emsp;If the components lie underground or underwater at a depth greater than 10 feet, they cannot be conjured, even if the caster is at a similar depth (such as in a cavern or at the bottom of a lake).\n&emsp;The spell will not cause the appearance of components whose value exceeds 1 gp. Thus, it is impossible to summon gemstones, crystals, metals, pearls, etc. Additionally, components cannot be manmade or altered from their natural state (coins, jewelry, cut or crushed gems, mirrors, etc.), nor can they be taken from someone else’s possession.\n&emsp;A single *conjure spell component* spell will summon three components per level of the caster. They may be three different components or multiples of a single component.\n&emsp;Attempts to conjure an animal’s body parts (such as bat fur) produce unpredictable results. The DM should roll on the table below.}}{{style=center1 sheet-spell-bottom2}}{{c1-1=**D4**\n**Roll**}}{{c2-1=1}}{{c3-1=2}}{{c4-1=3}}{{c5-1=4}}{{c1-2=**Result**}}{{c2-2=Desired component appears.}}{{c3-2=Component does not appear.}}{{c4-2=Creature is teleported to the caster.}}{{c5-2=Caster is teleported to the creature.}}{{effects2=&emsp;Only animals with Intelligence scores of 1-4 can be affected by this spell. Humanoids and fantastic animals (dragons, bugbears, unicorns, etc.) cannot be affected.\n&emsp;In all cases, the DM must use common sense to determine the likelihood of the component being located within spell range.'
+}
+
+wiz1['Fire Burst'] = {
+    'level': '1',
+    'school': 'Alteration, Evocation',
+    'range': '[[5*[[@{level-wizard}]] ]] yards',
+    'duration': 'Instantaneous',
+    'aoe': 'One 10’-radius circle',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 17',
+    'book': 'Tome of Magic',
+    'damage': '[[{[[@{level-wizard}]],10}kl1]]',
+    'damage-type': 'Fire',
+    'healing': '',
+    'effect': 'When this spell is cast upon a nonmagical fire (such as a campfire, lantern, or candle), it causes the fire to flash and shoot arrows of flame. All creatures within 10 feet of the fire source suffer 1 point of damage per level of the caster (maximum of 10 points). Victims who roll a saving throw successfully suffer no damage.'
+}
+
+//endregion
 
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
