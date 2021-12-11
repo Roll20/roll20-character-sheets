@@ -1,0 +1,1 @@
+Hoja de personaje para el juego Cybersalles de Bastión de Mundos. Cualquier sugerencia/incidencia, contactar conmigo al siguiente email elfonochasis@gmail.com
