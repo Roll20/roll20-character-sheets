@@ -1794,6 +1794,7 @@ wiz3['Haste'] = {
     'saving-throw': 'None',
     'materials': 'A shaving of licorice root',
     'reference': '',
+    'book': 'PHB',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -6420,6 +6421,195 @@ wiz1['Fire Burst'] = {
     'damage-type': 'Fire',
     'healing': '',
     'effect': 'When this spell is cast upon a nonmagical fire (such as a campfire, lantern, or candle), it causes the fire to flash and shoot arrows of flame. All creatures within 10 feet of the fire source suffer 1 point of damage per level of the caster (maximum of 10 points). Victims who roll a saving throw successfully suffer no damage.'
+}
+
+wiz1['Fist of Stone'] = {
+    'level': '1',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': '[[@{level-wizard}]] round(s)',
+    'aoe': 'The caster’s hand',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 17',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Upon completion of this spell, one of the caster’s hands (his choice) turns to stone. It is flexible and can be used to punch, smash, or crush objects and opponents as if the wizard had Strength of 18/00. Combat bonuses for Strength do not apply if the caster uses any weapon other than his fist.\n&emsp;While the spell is in effect, the wizard cannot cast spells requiring somatic components.'
+}
+
+wiz1['Hornung\'s Guess'] = {
+    'category': 'Wild Magic',
+    'level': '1',
+    'school': 'Divination',
+    'range': '300 yards',
+    'duration': 'Instantaneous',
+    'aoe': 'Special',
+    'components': 'Component: V',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 17',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Hornung, one of the leading wizards in the field of wild magic (before his untimely disappearance while experimenting with wildwind ), developed this spell to improve the accuracy of his estimates. The spell provides a wizard with an instant and highly accurate estimate of the number of persons or objects in a group.\n&emsp;The spell’s area of effect is one group of a general class of objects. All objects of the group must be within spell range and the group as a whole must be visible to the caster. The wizard need not see every individual in the group, merely the general limits of the group’s size and area. For example, a wizard on a hill could look down on a forest and estimate the number of trees in all or part of it. He could not get an estimate of the number of goblins within the forest, however, since the group as a whole (the goblins) is concealed from sight.\n&emsp;The estimate generated is accurate to the largest factor of ten (rounded up). For example, if *Hornung’s guess* were cast on a group of 439 horsemen, the estimate would be 400. If there were 2,670 horsemen, the spell would estimate 3,000. If there were 37 horsemen, the answer would be 40. Clearly, using the spell on small groups (especially those with fewer than 10 members) is pointless.\n&emsp;*Hornung’s guess* can be used to quickly estimate the size of treasure hoards and army units. It is particularly popular with moneylenders and generals.'
+}
+
+wiz1['Lasting Breath'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Alteration',
+    'range': '[[5*[[@{level-wizard}]] ]] yards',
+    'duration': '1d4+[[@{level-wizard}]] rounds',
+    'aoe': '[[@{level-wizard}]] creature(s)',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 19',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell increases the amount of time a character can hold his breath. As described in the *Player’s Handbook*, a character can hold his breath for a number of rounds equal to one-third his Constitution score. The effect of this spell is added to that figure.\n&emsp;The duration of the spell is always unknown to the recipient; the DM secretly rolls 1d4 to determine the exact duration. At the end of this time, the character must succeed a Constitution check or be forced to take a breath as per the rules.'
+}
+
+wiz1['Metamorphose Liquids'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '[[@{level-wizard}]]’-cube',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': 'A drop of the liquid that the caster intends to create, which must be placed on the wizard’s tongue and consumed.',
+    'reference': 'p. 19',
+    'book': 'Tome of Magic',
+    'damage': '[[@{level-wizard}]]d4 vs creates from the elemental plane of water',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell transmutes one type of liquid into an equal amount of a different, nonmagical fluid (water, wine, blood, oil, apple cider, etc.). The caster must touch the fluid itself (not simply its container) for the spell to take effect.\n&emsp;Magical liquids (such as potions) receive a saving throw vs. disintegration with a +3 bonus to avoid the spell’s effect. Fluids can be transmuted only into nonmagical liquids; it is not possible to change a magical liquid into another type of magical liquid. Poisons may be rendered harmless through use of this spell, but the spell has no effect on poisons already consumed.\n&emsp;Living creatures are unaffected by the spell, excluding those from the elemental plane of water. Such creatures are allowed a saving throw vs. spell. Failure results in 1d4 points of damage per level of the caster, while success indicates half damage. Only one creature can be affected by a single casting of this spell, regardless of the creature’s size.\n&emsp;Creating poisons through use of this spell is especially dangerous.'
+}
+
+wiz1['Murdock\'s Feathery Flyer'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': '[[@{level-wizard}]] round(s)',
+    'aoe': 'The caster',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'An eagle’s feather.',
+    'reference': 'p. 19',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Upon casting this spell, a feathery membrane grows under the wizard’s arms, extending along his sides all the way to his feet. The membrane appears to merge with the caster’s skin and clothing.\n&emsp;If the caster spreads his arms and jumps from a height, he may glide through the air. For each foot of elevation, the wizard can glide five feet horizontally. Thus, a wizard jumping from a 10-foot wall could glide up to 50 feet. Gliding characters have a movement rate of 12 and Maneuverability Class E.\n&emsp;A wizard attempting to carry more than his normal weight allowance plummets to the earth upon takeoff.\n&emsp;When the spell expires, the feathers instantly disappear. If the wizard is airborne, he immediately plummets toward the ground.'
+}
+
+wiz1['Nahal\'s Reckless Dweomer'] = {
+    'category': 'Wild Magic',
+    'level': '1',
+    'school': 'Invocation/Evocation',
+    'range': 'Special',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'p. 20',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is the wild mage’s ultimate last-resort spell. When cast, the mage releases a sudden flood of wild magical energy in the hope of seizing and shaping that energy into a desired spell effect. The attempt usually fails, but something almost always occurs in the process.\n&emsp;Before casting the spell, the mage announces the spell effect he is trying to create. The mage must be able to cast the spell (i.e., have it in his spell books), but need not have it memorized. After announcing the spell (along with the target and any other conditions required by the spell), the wild mage casts *Nahal’s reckless dweomer*. A burst of magical energy is released, which the wild mage tries to manipulate into the desired form. The actual effect of the spell is rolled randomly on Table 2: Wild Surge Results.\n&emsp;Because the release of energy is planned by the mage, his level is added to the dice roll. If the result indicates success, the mage has shaped the magical energy into the desired effect. More often than not, the effect is completely unexpected. The result may be beneficial to the mage or it may be completely disastrous; this is the risk the mage takes in casting *Nahal’s reckless dweomer*.'
+}
+
+wiz1['Patternweave'] = {
+    'category': 'Wild Magic',
+    'level': '1',
+    'school': 'Divination',
+    'range': '10 yards',
+    'duration': '1 round',
+    'aoe': '10-foot square',
+    'components': 'V, S, M',
+    'cast-time': '3',
+    'saving-throw': 'Special',
+    'materials': 'A small hand lens through which the caster studies the objects. The lens is not consumed in the casting.',
+    'reference': 'p. 20',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Patternweave* allows the caster to make sense of apparent chaos. The caster can see such things as pottery shards reformed into a whole pot, shreds of paper formed into a page, scattered parts as a working machine, or specific trails appearing out of overlapping footprints.\n&emsp;After casting the spell, the mage studies seemingly random elements--broken bits of glass, shreds of paper, intermingled trails, etc. The items to be studied must be tangible--coded flashing lights, garbled speech, or thoughts of any kind cannot be studied.\n&emsp;The wizard must study the random elements for one round, after which the DM secretly makes a saving throw vs. spell for the wizard. If the saving throw is failed, the spell fails. However, if the saving throw is successful, the caster sees in his mind the pattern these objects form. If the items studied are truly random, no information is gained.\n&emsp;After the caster has visualized the pattern, he can attempt to reassemble the parts into their original form. This requires another saving throw vs. spell to determine whether the mage remembers sufficient details to accomplish the task. The amount of time required and the quality of restoration vary according to the complexity of the pattern. Reassembling a shredded map may be easy; reassembling a broken clock is significantly more difficult; rebuilding a shattered mosaic is extremely difficult. In any case, the wizard can make only a reasonable copy of the item. He can use this spell to restore works of art, but they will be worth only a small percentage of their original value.'
+}
+
+wiz2['Chaos Shield'] = {
+    'category': 'Wild Magic',
+    'level': '2',
+    'school': 'Abjuration',
+    'range': '0',
+    'duration': '[[1d10+2*[[@{level-wizard}]] ]] rounds',
+    'aoe': 'The caster',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'p. 21',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Following the discovery of wild magic came the discovery of wild surges and the personal danger such surges create. After several wild mages destroyed themselves by rather spectacular means (or suffered very odd side effects), the *chaos shield* was created as protection from these surges.\n&emsp;This spell imbues the wild mage with special protection against the effects of wild surges. It protects only against wild surges caused by the caster’s own spells, not from the effects of another mage’s wild surges.\n&emsp;When a wild surge affects a caster protected by *chaos shield*, he is allowed a saving throw vs. magic. If the saving throw is successful, the effect of the surge on the caster is negated. If the saving throw is failed, the caster is affected normally by the surge. The spell does not protect against wild surges that might be caused by its own casting.\n&emsp;The *chaos shield* protects only the caster and does not negate the effects of a wild surge for other characters who might be in the area of effect. The caster cannot voluntarily cancel the protection once he has learned the nature of a wild surge; the *chaos shield* protects from both good and harmful effects. Thus, if a wild surge resulted in a heal spell for all characters within 10 feet of the caster, the protected caster might not benefit, while all others in the radius would be healed.\n&emsp;The spell remains in effect until it negates a wild surge or the spell duration expires.'
+}
+
+wiz2['Hornung\'s Baneful Deflector'] = {
+    'category': 'Wild Magic',
+    'level': '2',
+    'school': 'Evocation',
+    'range': 'Touch',
+    'duration': '[[2*[[@{level-wizard}]] ]] rounds',
+    'aoe': 'One creature',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': 'A small prism that shatters when the spell is cast.',
+    'reference': 'p. 21',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell partially surrounds the recipient in a shimmering, hemispherical field of force. The field is transparent and moves with the subject, forming a shell about one foot away from his body. The shell serves as a shield against all forms of individually targeted missile attacks (including *magic missiles* and other spells). The caster designates the position of the shell (protecting the front, rear, side, or top of the recipient). The spell does not protect against area effect spells or other attacks that strike several creatures at once.\n&emsp;Whenever an individual missile attack is directed at a protected creature, the *baneful deflector* activates. Instead of striking the target creature, the missile’s target is determined randomly among all creatures within a 15-foot hemisphere of the protected creature, *including* the protected creature. The missile then changes course toward its new target with normal chances to hit. If the new target is beyond the range of the missile, no target is hit. If the protected creature is struck, the spell immediately fails. If several people are protected by *baneful deflector*, a missile will change course several times before reaching its target.'
+}
+
+wiz2['Insatiable Thirst'] = {
+    'category': '',
+    'level': '2',
+    'school': 'Enchantment/Charm',
+    'range': '[[5*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': 'One creature',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 21',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell instills in the victim an uncontrollable desire to drink. The victim is allowed a saving throw to avoid the effect. If the roll is failed, the creature must consume any potable liquids it can find (including magical potions, which might result in strange effects if potions are mixed). Although poisons are not considered potable, a victim may not realize that a liquid is poisonous. The victim will not consume a liquid he knows to be poisonous.\n&emsp;No matter how much the creature drinks, its magical thirst is not quenched until the spell ends. During this time, the creature can do nothing but drink or look for liquids to drink. Victims of this spell believe they are dying of thirst and (depending upon their nature) may be willing to kill for drinkable fluids.'
 }
 
 //endregion
