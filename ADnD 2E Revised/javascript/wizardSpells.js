@@ -7220,6 +7220,177 @@ wiz4['Unluck'] = {
     'effect': 'With this spell, the wild mage creates a negative pattern in the random forces surrounding one creature. The creature is allowed a saving throw; if successful, the spell fails. If the saving throw is failed, random chance falls into an *unluck*y pattern. Any action involving random chance (i.e., any time a die roll affects the character) performed by the victim during the next 2-20 rounds requires two separate attempts; the worse result is always applied. (The victim rolls twice for attacks, damages, saving throws, etc., always using the worse die roll.)\n&emsp;A *luckstone* or similar magical device will negate *unluck*. Doing so, however, prevents the magical item from functioning for 2d10 rounds.'
 }
 
+wiz5['Far Reaching III'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 34',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell operates exactly like the 3rd-level *far reaching I* spell except that the range of any spell of levels 1-3 is increased by 150% and the range of any 4th- or 5th-level spell is increased by 50%.'
+}
+
+wiz5['Khazid\'s Procurement'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Divination, Summoning',
+    'range': 'Special',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'An exquisite silver mirror of no less than 10,000 gp value and a black opal worth at least 1,000 gp which must be powdered and sprinkled on the mirror. The mirror is not lost after casting and may be used again, but the powdered opal is consumed in the casting.',
+    'reference': 'p. 34',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell allows the caster to more easily access rare or dangerous spell components. The wizard casts this spell upon a silver mirror while concentrating on a mental image of the material he desires. The base chance of success is 50%, modified by the following factors:\n&emsp;•+1% per level of the caster ([[@{level-wizard}]]%)\n&emsp;•+10% if the caster has seen the same type of substance or object before; this bonus is\n&emsp;not cumulative with the following bonus\n&emsp;•+20% if the caster has a sample of the material or the same type of object in his\n&emsp;possession; this bonus is not cumulative with the bonus above\n&emsp;•+30% if the wizard knows the location of the desired object\n&emsp;•-50% if the caster has never seen the same type of material or item before\n&emsp;If the percentile roll indicates failure, the caster is unable to locate the desired ingredient and the spell ends. If the roll indicates success, the wizard has located the object or substance and the mirror becomes a magical gate through which the caster can see the target. The size of the gate is determined by the size of the mirror, to a maximum size of 3 feet by 2 feet.\n&emsp;The gate always appears within arm’s length of the target, allowing the wizard to reach through the mirror, grasp the object of his desire, and draw it back through the gate. The wizard must risk his own safety--the gate does not allow the use of probes, long-handled ladles, tongs, or other equipment to gather the material. The caster cannot move completely through the gate.\n&emsp;The gate vanishes when the spell’s duration expires or when the target or the wizard moves more than 10’ away from it.\n&emsp;The gate is visible from both sides, and other creatures can reach through the gate. Breath weapons, gaze attacks, missiles, spells, and similar attacks cannot be cast through the gate. Because creatures can pass their limbs through the gate, physical attacks and touch spells can be used.\n&emsp;The only limit to the range of this spell is that the caster and the target must be on the same plane of existence. Elemental forces (not creatures) will not pass through the gate. Thus, the wizard does not run the risk of flooding his laboratory by opening a gate beneath the sea, for example. However, the spell does not provide any sort of protection against a hostile environment.'
+}
+
+wiz5['Lower Resistance'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Abjuration, Alteration',
+    'range': '60 yards',
+    'duration': '1 trun+[[@{level-wizard}]] rounds',
+    'aoe': 'One creature',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A broken iron rod.',
+    'reference': 'p. 34',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Using this spell, a wizard may attempt to reduce the magic resistance of a target creature. The magic resistance of the victim works against the *lower resistance* spell itself, but at only half its normal value. No saving throw is permitted in addition to magic resistance.\n&emsp;If the victim does not resist the effects of this spell, his magic resistance is reduced by a base 30% plus 1% per experience level of the wizard casting the spell. Currently [[30+[[@{level-wizard}]] ]]% reduced magic resistance.\n&emsp;This spell has no effect on creatures that have no magic resistance.'
+}
+
+wiz5['Magic Staff'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Enchantment/Charm',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'The wizard’s staff',
+    'components': 'V, S, M',
+    'cast-time': 'Special',
+    'saving-throw': 'None',
+    'materials': 'A staff cut from an ash tree. For each spell level the wizard intends to imbue into the staff, it must be inlaid with rubies worth at least 1,000 gp.',
+    'reference': 'p. 35',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell allows a wizard’s staff to store one spell level for every three levels of the caster. Currently [[floor([[@{level-wizard}]]/3)]] spell levels. Thus, a 9th-level wizard can store three spell levels (three 1st-level spells, one 1st and one 2nd, or one 3rd-level spell).\n&emsp;Spells that are to be stored in the staff must be memorized normally by the wizard. The spells are then cast as normal when charging the staff; casting requires the spell’s normal casting time plus one round. The spell is wiped from memory and material components are consumed. All spells to be stored must be cast into the staff within 1 turn.\n&emsp;All stored spells have a casting time of 1.\n&emsp;Spells remain in the staff until cast or dispelled, or up to 1 hour per level of the caster ([[@{level-wizard}]] hours). After this time, all stored spells fade away.\n&emsp;Only wizards who know the *magic staff* spell can cast spells from another wizard’s staff. This applies to wizards who have never learned or could not normally cast the spells stored in a staff. It is common, however, for the staff’s owner to implement a command word which must be known by anyone wishing to use the staff.'
+}
+
+wiz5['Mind Fog'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Enchantment/Charm',
+    'range': '80 yards',
+    'duration': '3 turns',
+    'aoe': '20-foot cube',
+    'components': 'V, S',
+    'cast-time': '3',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 35',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A *mind fog* is a physical block of fog that enables the wizard to weaken the mental resistance of his victims. Victims are allowed a saving throw at a -2 penalty to avoid the effects.\n&emsp;A creature who falls victim to the *mind fog* suffers -2 penalties to all saving throws against two categories of magic: all spells of the illusion/phantasm and enchantment/charm schools that affect the mind directly; and spells of 1st through 5th level which affect the mind directly. For example, *phantasmal force* is a mind-affecting spell; *phantom steed* is not.\n&emsp;The penalty to saving throws operates cumulatively with any penalties that operate for other reasons. Affected creatures suffer the penalty as long as they remain in the fog and for [[2d6]] rounds thereafter.'
+}
+
+wiz5['Safeguarding'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Abjuration',
+    'range': '0',
+    'duration': '[[1+[[@{level-wizard}]] ]] turns',
+    'aoe': '15-foot-radius sphere',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A piece of preserved skin from any creature that possesses natural magic resistance.',
+    'reference': 'p. 35',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Use of this spell protects the wizard and anyone in the area of effect from damage caused by the rebounding of the wizard’s spells. This includes damage from a *fireball* cast in an area too small for its effects, a reflected *lightning bolt*, or any other offensive area spell that overlaps the *safeguarding’s* area of effect. The protection is effective against spells of 7th level and lower. The protection does not apply to damage from spells rebounded by any form of magical spell turning. This spell does not protect the wizard against damage from spells or attacks cast by enemies or other party members.\n&emsp;A wizard who has cast *safeguarding* is free to move and act normally. The spell’s effect is always centered on him, regardless of his actions. Other creatures are free to enter and exit the area of effect.\n&emsp;An area spell cast by the wizard will take effect normally, but its effects will be negated within the area of the *safeguarding* spell. This applies *only* to area spells centered outside the radius of the *safeguarding* spell. If the wizard casts an offensive area spell within the area of the *safeguarding*, the *safeguarding* is immediately negated and those within the area suffer full damage from the spell. The wizard is free to cast non-offensive area spells and individually targeted spells within the area of the *safeguarding*.'
+}
+
+wiz5['Von Gasik\'s Refusal'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Abjuration',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] hours',
+    'aoe': '[[20*[[@{level-wizard}]] ]]-foot-square',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A pinch of dust from any wizard’s tomb.',
+    'reference': 'p. 36',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This powerful spell is designed to prevent unauthorized spellcasters from entering a hallway, doorway, window, or other point of entry.\n&emsp;The spell creates an invisible barrier that blocks the targeted area. Any nonspellcasters and those spellcasters specifically named by the caster may pass freely. All other spellcasters collide with the invisible barrier. Members of classes with lesser spellcasting abilities (paladins, rangers, and bards) are blocked only if the character is of sufficient level to cast spells.\n&emsp;The wizard is able to ward one area up to 20’-square for each level of his experience. Thus, a 12th-level wizard may protect a square area 240 feet on a side. The area of effect may be divided among several smaller portals as long as the total area does not exceed the caster’s limit. Each portal must be in range and sight of the caster at the time the spell is cast.\n&emsp;The barriers exist for one hour per level of the caster unless they are dismissed by the caster or dispelled by a *dispel magic* spell. A *disintegrate* spell immediately destroys a barrier, as does a *rod of cancellation* or a *sphere of annihilation*.\n&emsp;The invisible walls are not affected by physical blows, cold, heat, or electricity. Thrown and projected weapons (both magical and mundane) are not repelled by the barrier and may pass through the area normally. Spells can be cast through the barrier. *Dimension door*, *teleport*, and similar effects can bypass the barriers.'
+}
+
+wiz5['Vortex'] = {
+    'category': 'Wild Magic',
+    'level': '5',
+    'school': 'Evocation',
+    'range': '30 yards',
+    'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
+    'aoe': '5-foot-diameter circle',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': '½',
+    'materials': 'A silk streamer and a handful of straw.',
+    'reference': 'p. 36',
+    'book': 'Tome of Magic',
+    'damage': '*Nonmagical creations:* [[@{level-wizard}]]d4. *Magical creatures and spellcasters:* [[@{level-wizard}]]d6',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A *vortex* is a swirling mass of magical energy, barely controllable by the caster. On the round of casting, a small sparkle of lights fills the air at the desired position. On the second round, a 7’-tall, multicolored tornado appears. From this moment on, the caster must maintain concentration in order for the *vortex* to remain.\n&emsp;Each round, the caster can move the *vortex* 60 feet. However, control of direction is not perfect. The caster has complete control over distance, but can only suggest the desired direction. The caster has a 50% chance of moving the *vortex* in the direction he desires; if the die roll indicates failure, the *vortex* moves according to the scatter diagram for grenade-like missiles. Thus, the *vortex* usually moves in the general direction desired, but on occasion, it may move to either side or directly toward the caster.\n&emsp;The *vortex* cannot pass through objects larger than its area of effect (it could move through a sapling but not an ancient oak tree) and will be redirected by these, rebounding along the general line of movement. For example, if cast in a narrow hallway, the *vortex* might ricochet down the hall, bouncing from side to side.\n&emsp;The *vortex* is composed of raw magical energy. Nonmagical creatures struck by the *vortex* suffer 1d4 points of damage per level of the caster. Magical creatures and spellcasters suffer 1d6 points of damage per level of the caster. Creatures struck are allowed a saving throw vs. magic to suffer only half damage.\n&emsp;Each time a creature is struck, there is a 5% chance that the *vortex* will explode in a wild surge. Use Table 2 to determine the results of any wild surge. If the *vortex* causes a wild surge, the spell ends immediately.'
+}
+
+wiz5['Waveform'] = {
+    'category': 'Wild Magic',
+    'level': '5',
+    'school': 'Alteration',
+    'range': '40 yards',
+    'duration': '[[1d10]] rounds',
+    'aoe': '10-foot-cube/level',
+    'components': 'S, M',
+    'cast-time': '5',
+    'saving-throw': '½',
+    'materials': 'A small, carved oar decorated with aquamarines worth at least 500 gp. The oar disintegrates when the spell is cast.',
+    'reference': 'p. 36',
+    'book': 'Tome of Magic',
+    'damage': '*Normal creatures*: [[@{level-wizard}]]d4. *Water-based creatures*: [[@{level-wizard}]]d6',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the wild mage is able to shape and direct the patterns of water currents, allowing him to mold liquids into a variety of forms. The spell affects a quantity of liquid no larger than the area of effect. If cast onto a larger body, such as an ocean or large lake, the spell affects only the water within the area of effect.\n&emsp;After casting *waveform*, the mage can form the water into any desired shape. The spell does not bind the liquid together in any fashion; it is still limited by its fluid properties and gravity. Thus, a mage could not use *waveform* to create a humanoid creature with arms and legs and direct it to walk across land. He could, however, create a roughly human shape with flowing arms that rises out of the water, crashes forward in a huge splash, then rises and repeats the process. Other possible shapes include gigantic waves, geysers, whirlpools, and troughs.\n&emsp;The shape takes one round to form, after which it can be maintained by concentration. The shape can be directed to move in any direction at the rate of 90 feet per round. If the *waveform* moves into or through a body of water, the form loses no intensity. However, if the wave is moved over dry ground, it loses one die of damage for every 10 feet crossed.\n&emsp;If propelled against a target, the *waveform* causes 1d4 points of damage per level of the caster to creatures in its path. The *waveform* can be directed against creatures on the surface or underwater. Those struck are allowed a saving throw; success indicates half damage.\n&emsp;If the victims are in or on a body of water, the shape will sweep them along. Creatures of small size are carried with the form, moving at its speed. Medium and large size creatures are swept along at half the water’s speed. Creatures larger than this resist the movement. Those caught in the current can make a Strength check each round to swim free of the current.\n&emsp;Boats and ships are particularly vulnerable to the *waveform*. If the *waveform* is twice the size of the vessel or more, the ship must make a seaworthiness check (as described in Table 77 of the *DMG*). Vessels passing the check suffer damage as described above, reducing seaworthiness ratings for future checks by 2d6 points until repairs are made.\n&emsp;Alternatively, this spell can be cast directly at a single water-based creature--a water weird, water elemental, or other creature from the elemental plane of water. In this case, the spell causes 1d6 points of damage per level of the caster. The effect is instantaneous and the spell ends immediately after the attack is made.'
+}
+
 //endregion
 
 const wizardSpells = {};
