@@ -586,7 +586,7 @@ function setupCalculateRemaining(totalField, sumField, remainingField) {
     });
 }
 
-function setupCalculateTotal(totalField, fieldsToSum) {
+function setupCalculateTotal(totalField, fieldsToSum, maxValue) {
     let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
     on(onChange, function () {
         getAttrs(fieldsToSum, function (values) {
@@ -595,6 +595,9 @@ function setupCalculateTotal(totalField, fieldsToSum) {
                 total += parseInt(values[field]) || 0;
             });
 
+            if (!isNaN(maxValue))
+                total = Math.min(total, maxValue);
+
             setAttrs({
                 [totalField]: total
             });
@@ -602,7 +605,7 @@ function setupCalculateTotal(totalField, fieldsToSum) {
     });
 }
 
-function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName) {
+function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName, maxValue) {
     let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
     let allFields = [...repeatingFieldsToSum];
     allFields.push(repeatingTotalField);
@@ -619,6 +622,10 @@ function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToS
                 repeatingFieldsToSum.forEach(column => {
                     total += row.I[column];
                 });
+
+                if (!isNaN(maxValue))
+                    total = Math.min(total, maxValue);
+
                 row[repeatingTotalField] = total;
             })
             .execute();
@@ -922,15 +929,15 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
 let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
 rogueStandardSkills.forEach(skill => {
-    setupCalculateTotal(`${skill}t`, rogueStandardColumns.map(column => `${skill}${column}`));
-    setupCalculateTotal(`${skill}noarmort`, [`${skill}t`, `${skill}noarmorb`]);
-    setupCalculateTotal(`${skill}armort`, [`${skill}t`, `${skill}armorp`]);
+    setupCalculateTotal(`${skill}t`, rogueStandardColumns.map(column => `${skill}${column}`), 95);
+    setupCalculateTotal(`${skill}noarmort`, [`${skill}t`, `${skill}noarmorb`], 95);
+    setupCalculateTotal(`${skill}armort`, [`${skill}t`, `${skill}armorp`], 95);
 });
 
 // Setup custom rogue skills total
-setupRepeatingRowCalculateTotal('crt', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
-setupRepeatingRowCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogue');
-setupRepeatingRowCalculateTotal('crarmort', ['crt', 'crarmorp'], 'customrogue');
+setupRepeatingRowCalculateTotal('crt', rogueStandardColumns.map(column => `cr${column}`), 'customrogue', 95);
+setupRepeatingRowCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogue', 95);
+setupRepeatingRowCalculateTotal('crarmort', ['crt', 'crarmorp'], 'customrogue', 95);
 // --- End setup Rogue skills total --- //
 
 //Rogue armor modifier auto fill
