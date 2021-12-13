@@ -301,6 +301,9 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
       `${ODValue.tir}`,
       'combat',
       `${ODValue.combat}`,
+      'devasterAnatheme',
+      'bourreauTenebres',
+      'equilibreBalance',
     ];
 
     const arme = [];
@@ -357,6 +360,12 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     const attaquesSurprises = [];
     const attaquesSurprisesValue = [];
     const attaquesSurprisesCondition = '';
+
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
+
+    let isSurprise = false;
 
     const autresEffets = [];
 
@@ -458,6 +467,18 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
       exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
       exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
       exec.push(attaquesSurprisesCondition);
+
+      isSurprise = true;
+    }
+
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
     }
 
     if (autresEffets.length > 0) {
@@ -467,32 +488,45 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
 
     if (isConditionnelD) { exec.push('{{degatsConditionnel=true}}'); }
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    const finalRoll = await startRoll(exec.join(' '));
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    const tJet = finalRoll.results.jet.result;
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-        },
-      );
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
+    const rDegats = finalRoll.results.degats.dice;
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
+    const rViolence = finalRoll.results.violence.dice;
 
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
+
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+      isSurprise,
+    };
+
+    const computed = updateRoll(finalRoll, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
+
+    const finalComputed = {
+      jet: tJet + tBonus,
+    };
+
+    Object.assign(finalComputed, computed);
+
+    finishRoll(finalRoll.rollId, finalComputed);
+
+    if (tJet !== 0 && tJet === tExploit) {
+      const exploitRoll = await startRoll(`@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
+      const tRExploit = exploitRoll.results.jet.result;
+      const exploitComputed = {
+        jet: tRExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 }
 
@@ -641,6 +675,9 @@ rollCombatArchangel.forEach((button) => {
           'canonMetatronCaracteristique4',
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         listAttrs = listAttrs.concat(listStyle);
@@ -751,32 +788,58 @@ rollCombatArchangel.forEach((button) => {
         break;
     }
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-        },
-      );
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
 
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+    const finalRoll = await startRoll(exec.join(' '));
+
+    const tJet = finalRoll.results.jet.result;
+
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
+
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
+
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
+
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+    };
+
+    const computed = updateRoll(finalRoll, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+
+    const finalComputed = {
+      jet: tJet + tBonus,
+    };
+
+    Object.assign(finalComputed, computed);
+
+    finishRoll(finalRoll.rollId, finalComputed);
+
+    if (tJet !== 0 && tJet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
+      const tRExploit = exploitRoll.results.jet.result;
+      const exploitComputed = {
+        jet: tRExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });
 
@@ -795,6 +858,14 @@ rollNephilim.forEach((button) => {
     let tours;
     let degats;
     let violence;
+
+    let devaste = false;
+    let bourreau = false;
+    let equilibre = false;
+
+    let isMeurtrier = false;
+    let isFureur = false;
+
     const effets = [];
 
     exec.push(base);
@@ -817,6 +888,16 @@ rollNephilim.forEach((button) => {
         break;
 
       case 'MANOGStationMissile':
+        attrs = await getAttrsAsync([
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
+        ]);
+
+        devaste = +attrs.devasterAnatheme;
+        bourreau = +attrs.bourreauTenebres;
+        equilibre = +attrs.equilibreBalance;
+
         degats = roll[1];
         violence = roll[2];
 
@@ -828,8 +909,18 @@ rollNephilim.forEach((button) => {
         break;
 
       case 'MANOGStationRoquette':
+        attrs = await getAttrsAsync([
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
+        ]);
+
         degats = roll[1];
         violence = roll[2];
+
+        devaste = +attrs.devasterAnatheme;
+        bourreau = +attrs.bourreauTenebres;
+        equilibre = +attrs.equilibreBalance;
 
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}}`);
         break;
@@ -838,6 +929,9 @@ rollNephilim.forEach((button) => {
         attrs = await getAttrsAsync([
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ]);
 
         degats = attrs[roll[1]];
@@ -848,15 +942,46 @@ rollNephilim.forEach((button) => {
         effets.push(i18n_briserResilience);
         effets.sort();
 
+        isMeurtrier = true;
+        isFureur = true;
+
         exec.push(`{{degats=[[${degats}]]}} {{degatsConditionnel=true}} {{meurtrier=${i18n_meurtrier}}} {{meurtrierValue=[[2D6]]}} {{meurtrierCondition=${i18n_meurtrierCondition}}} {{violence=[[${violence}]]}} {{violenceConditionnel=true}} {{fureur=${i18n_fureur}}} {{fureurValue=[[2D6]]}} {{fureurCondition=${i18n_fureurCondition}}} {{antiAnatheme=${i18n_antiAnatheme}}} {{antiAnathemeCondition=${i18n_antiAnathemeCondition}}} {{effets=${effets.join(' / ')}}}`);
         break;
     }
 
-    startRoll(exec.join(' '), (results) => {
-      finishRoll(
-        results.rollId, {},
-      );
-    });
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
+
+    const finalRoll = await startRoll(exec.join(' '));
+
+    let computed = {};
+
+    if (button === 'MANOGStationMissile' || button === 'MANOGStationRoquette' || button === 'MANMJ') {
+      const rDegats = finalRoll.results.degats.dice;
+      const rViolence = finalRoll.results.violence.dice;
+
+      const tDegats = finalRoll.results.degats.result;
+      const tViolence = finalRoll.results.violence.result;
+
+      const conditions = {
+        bourreau,
+        devaste,
+        equilibre,
+        isFureur,
+        isMeurtrier,
+      };
+
+      computed = updateRoll(finalRoll, tDegats, rDegats, [], tViolence, rViolence, [], conditions);
+    }
+
+    finishRoll(finalRoll.rollId, computed);
   });
 });
 
@@ -892,6 +1017,8 @@ rollCombatNephilim.forEach((button) => {
     let bDegats;
     let violence;
     let bViolence;
+    let isFureur = false;
+    let isUltraviolence = false;
 
     let getStyle;
 
@@ -911,6 +1038,9 @@ rollCombatNephilim.forEach((button) => {
           'canonMagmaCaracteristique2',
           'canonMagmaCaracteristique3',
           'canonMagmaCaracteristique4',
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         listAttrs = listAttrs.concat(listStyle);
@@ -919,6 +1049,8 @@ rollCombatNephilim.forEach((button) => {
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
+
+        isFureur = true;
 
         C1 = attrs.canonMagmaCaracteristique1;
         C2 = attrs.canonMagmaCaracteristique2;
@@ -1022,11 +1154,16 @@ rollCombatNephilim.forEach((button) => {
           'MSurturCaracteristique2',
           'MSurturCaracteristique3',
           'MSurturCaracteristique4',
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         listAttrs = listAttrs.concat(listStyle);
 
         attrs = await getAttrsAsync(listAttrs);
+
+        isUltraviolence = true;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -1127,32 +1264,60 @@ rollCombatNephilim.forEach((button) => {
         break;
     }
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-        },
-      );
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
 
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+    const finalRoll = await startRoll(exec.join(' '));
+
+    const tJet = finalRoll.results.jet.result;
+
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
+
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
+
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
+
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+      isFureur,
+      isUltraviolence,
+    };
+
+    const computed = updateRoll(finalRoll, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+
+    const finalComputed = {
+      jet: tJet + tBonus,
+    };
+
+    Object.assign(finalComputed, computed);
+
+    finishRoll(finalRoll.rollId, finalComputed);
+
+    if (tJet !== 0 && tJet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
+      const tRExploit = exploitRoll.results.jet.result;
+      const exploitComputed = {
+        jet: tRExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });
 
@@ -1169,6 +1334,8 @@ rollDemon.forEach((button) => {
 
     let degats;
     let violence;
+    let bDegats = 0;
+    let bViolence = 0;
 
     exec.push(base);
 
@@ -1178,10 +1345,16 @@ rollDemon.forEach((button) => {
         attrs = await getAttrsAsync([
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ]);
 
         degats = attrs[roll[1]];
         violence = attrs[roll[2]];
+
+        bDegats = +degats.split('+')[1];
+        bViolence = +violence.split('+')[1];
 
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}} {{effets=^{CDF-desactive-pendant} [[1D3]] ^{tours}}}`);
         break;
@@ -1190,6 +1363,9 @@ rollDemon.forEach((button) => {
         attrs = await getAttrsAsync([
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ]);
 
         degats = attrs[roll[1]];
@@ -1199,11 +1375,37 @@ rollDemon.forEach((button) => {
         break;
     }
 
-    startRoll(exec.join(' '), (results) => {
-      finishRoll(
-        results.rollId, {},
-      );
-    });
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
+
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
+
+    const finalRoll = await startRoll(exec.join(' '));
+
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
+
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
+
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+    };
+
+    const computed = updateRoll(finalRoll, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+
+    finishRoll(finalRoll.rollId, computed);
   });
 });
 
@@ -1261,6 +1463,9 @@ rollCombatDemon.forEach((button) => {
           'DSouffleCaracteristique4',
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         listAttrs = listAttrs.concat(listStyle);
@@ -1370,6 +1575,9 @@ rollCombatDemon.forEach((button) => {
           'caracteristiqueWraith4',
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         attrs = await getAttrsAsync(listAttrs);
@@ -1455,6 +1663,9 @@ rollCombatDemon.forEach((button) => {
           'APoingsCaracteristique4',
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         listAttrs = listAttrs.concat(listStyle);
@@ -1563,6 +1774,9 @@ rollCombatDemon.forEach((button) => {
           'LCGCaracteristique4',
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         listAttrs = listAttrs.concat(listStyle);
@@ -1668,31 +1882,61 @@ rollCombatDemon.forEach((button) => {
         break;
     }
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    if (button !== 'MADjinnWraith') {
+      if (devaste || bourreau || equilibre) {
+        const herauts = [];
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-        },
-      );
+        if (devaste) { herauts.push(i18n_devasterAnatheme); }
+        if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+        if (equilibre) { herauts.push(i18n_equilibrerBalance); }
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
-
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
+        exec.push(`{{herauts=${herauts.join(' / ')}}}`);
       }
-    });
+    }
+
+    const finalRoll = await startRoll(exec.join(' '));
+
+    const tJet = finalRoll.results.jet.result;
+
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
+
+    const finalComputed = {
+      jet: tJet + tBonus,
+    };
+
+    if (button !== 'MADjinnWraith') {
+      const rDegats = finalRoll.results.degats.dice;
+      const rViolence = finalRoll.results.violence.dice;
+
+      const tDegats = finalRoll.results.degats.result;
+      const tViolence = finalRoll.results.violence.result;
+
+      const conditions = {
+        bourreau,
+        devaste,
+        equilibre,
+      };
+
+      const computed = updateRoll(finalRoll, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+
+      Object.assign(finalComputed, computed);
+    }
+
+    finishRoll(finalRoll.rollId, finalComputed);
+
+    if (tJet !== 0 && tJet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
+      const tRExploit = exploitRoll.results.jet.result;
+      const exploitComputed = {
+        jet: tRExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });

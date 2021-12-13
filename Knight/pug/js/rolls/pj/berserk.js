@@ -3,10 +3,14 @@
 const berserkIlluminationRoll = ['berserkIlluminationBlaze', 'berserkIlluminationLantern'];
 
 berserkIlluminationRoll.forEach((button) => {
-  on(`clicked:${button}`, (info) => {
+  on(`clicked:${button}`, async (info) => {
     const roll = info.htmlAttributes.value;
 
-    const attributs = [];
+    const attributs = [
+      'devasterAnatheme',
+      'bourreauTenebres',
+      'equilibreBalance',
+    ];
 
     if (button === 'berserkIlluminationBlaze') {
       attributs.push(`${button}Dgts`);
@@ -19,43 +23,79 @@ berserkIlluminationRoll.forEach((button) => {
       attributs.push(`${button}Portee`);
     }
 
-    getAttrs(attributs, (value) => {
-      const exec = [];
-      exec.push(roll);
+    const attrs = await getAttrsAsync(attributs);
+    const exec = [];
+    exec.push(roll);
 
-      const dgts = value[`${button}Dgts`];
-      let violence = 0;
-      const portee = value[`${button}Portee`];
+    const dgts = attrs[`${button}Dgts`];
+    let violence = 0;
+    const portee = attrs[`${button}Portee`];
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
 
-      if (button === 'berserkIlluminationBlaze') {
-        violence = value[`${button}Violence`];
-        exec.push(`{{violence=[[${violence}]]}}`);
+    if (button === 'berserkIlluminationBlaze') {
+      violence = attrs[`${button}Violence`];
+      exec.push(`{{violence=[[${violence}]]}}`);
+    }
+
+    if (button === 'berserkIlluminationLantern') {
+      exec.push(`{{esperance=${i18n_esperance}}}`);
+      exec.push(`{{esperanceConditionD=${i18n_esperanceConditionD}}}`);
+      exec.push('{{degatsConditionnel=true}}');
+    }
+
+    exec.push(`{{degats=[[${dgts}]]}}`);
+    exec.push(`{{portee=${i18n_portee} ${portee}}}`);
+
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
+
+    // ROLL
+    const finalRoll = await startRoll(exec.join(' '));
+
+    const rDegats = finalRoll.results.degats.rolls[0].results;
+
+    let tDegats = finalRoll.results.degats.result;
+    let tViolence = 0;
+
+    if (bourreau || equilibre) {
+      tDegats = rDegats.reduce((accumulateur, valeurCourante) => {
+        let newV = valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (finalRoll.results.violence !== undefined) {
+      const rViolence = finalRoll.results.violence.rolls[0].results;
+
+      tViolence = finalRoll.results.violence.result;
+
+      if (devaste || equilibre) {
+        tViolence = rViolence.reduce((accumulateur, valeurCourante) => {
+          let newV = valeurCourante;
+          if (newV <= 3) { newV = 4; }
+
+          return accumulateur + newV;
+        }, 0);
       }
+    }
 
-      if (button === 'berserkIlluminationLantern') {
-        exec.push(`{{esperance=${i18n_esperance}}}`);
-        exec.push(`{{esperanceConditionD=${i18n_esperanceConditionD}}}`);
-        exec.push('{{degatsConditionnel=true}}');
-      }
+    const computed = {
+      degats: tDegats,
+      violence: tViolence,
+    };
 
-      exec.push(`{{degats=[[${dgts}]]}}`);
-      exec.push(`{{portee=${i18n_portee} ${portee}}}`);
-
-      startRoll(exec.join(' '), (results) => {
-        const tDegats = results.results.degats.result;
-        let tViolence = 0;
-
-        if (results.results.violence !== undefined) { tViolence = results.results.violence.result; }
-
-        finishRoll(
-          results.rollId,
-          {
-            degats: tDegats,
-            violence: tViolence,
-          },
-        );
-      });
-    });
+    finishRoll(finalRoll.rollId, computed);
   });
 });
 
