@@ -34505,7 +34505,7 @@ const ERROR = 'error';
 
 const BOOK_FIELDS = ['book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb', 'book-tom'];
 
-//region Helper function
+//#region Helper function
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
     let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
     finishRoll(queryRoll.rollId);
@@ -34522,16 +34522,23 @@ const extractRollResult = async function(query) {
     let roll = await extractRoll(query);
     return roll.result;
 };
-//endregion
 
-on('clicked:hide-toast', function(eventInfo) {
-    setAttrs({
-        ['toast']: 0,
-        ['toast-content']: 0,
+const calculateFormula = async function(formulaField, calculatedField, defaultValue, silent = false) {
+    getAttrs([formulaField], async function (values) {
+        let rollResult;
+        try {
+            rollResult = await extractRollResult(values[formulaField]);
+        } catch (e) {
+            rollResult = defaultValue;
+        }
+
+        setAttrs({
+            [calculatedField]: rollResult
+        },{silent:silent});
     });
-});
+}
 
-function showToast(type, title, message) {
+const showToast = function(type, title, message) {
     let content
     switch (type) {
         case SUCCESS: content = 1; break;
@@ -34547,19 +34554,104 @@ function showToast(type, title, message) {
     });
 }
 
-function bookInactiveShowToast(books, obj) {
-    let activeBooks = Object.entries(books)
-        .filter(([book, _]) => BOOK_FIELDS.includes(book))
-        .flatMap(arr => arr[1]);
-    let bookInactive = !activeBooks.includes(obj['book']);
+const bookInactiveShowToast = function(books, obj) {
+    let bookInactive = !Object.values(books).includes(obj['book']);
     if (bookInactive)
         showToast(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
     return bookInactive;
 }
 
+const isRemoving0 = function(eventInfo, fieldNames) {
+    return fieldNames.some(fieldName => !parseInt(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_${fieldName}`]));
+}
+
+const isOverwriting0 = function(eventInfo) {
+    return !parseInt(eventInfo.newValue) && !parseInt(eventInfo.previousValue);
+}
+
+const doEarlyReturn = function(eventInfo, fieldNames) {
+    return eventInfo.removedInfo
+        ? isRemoving0(eventInfo, fieldNames)
+        : isOverwriting0(eventInfo);
+}
+
+const repeatingMultiplySum = function(section, valueField, multiplierField, destination, decimals) {
+    TAS.repeating(section)
+        .attr(destination)
+        .field([valueField, multiplierField])
+        .reduce(function(m, r) {
+            return m + r.F[valueField] * r.F[multiplierField];
+        }, 0, function(t,r,a) {
+            let dec = parseInt(decimals);
+            if (isNaN(dec)) {
+                a[destination] = t;
+            } else {
+                a.D[dec][destination] = t;
+            }
+        })
+        .execute();
+}
+//#endregion
+
+//#region Generic Setup functions
+function setupCalculateTotal(totalField, fieldsToSum, maxValue) {
+    let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
+    on(onChange, function () {
+        getAttrs(fieldsToSum, function (values) {
+            let total = 0;
+            fieldsToSum.forEach(field => {
+                total += parseInt(values[field]) || 0;
+            });
+
+            if (!isNaN(maxValue))
+                total = Math.min(total, maxValue);
+
+            setAttrs({
+                [totalField]: total
+            });
+        });
+    });
+}
+
+function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName, maxValue) {
+    let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
+    let allFields = [...repeatingFieldsToSum];
+    allFields.push(repeatingTotalField);
+    on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
+        if (eventInfo.removedInfo)
+            return;
+
+        TAS.repeating(repeatingName)
+            .fields(allFields)
+            .tap(function(rowSet) {
+                let rowId = eventInfo.sourceAttribute.split('_')[2];
+                let row = rowSet[rowId];
+                let total = 0;
+                repeatingFieldsToSum.forEach(column => {
+                    total += row.I[column];
+                });
+
+                if (!isNaN(maxValue))
+                    total = Math.min(total, maxValue);
+
+                row[repeatingTotalField] = total;
+            })
+            .execute();
+    });
+}
+//#endregion
+
+on('clicked:hide-toast', function(eventInfo) {
+    setAttrs({
+        ['toast']: 0,
+        ['toast-content']: 0,
+    });
+});
+
+//#region Ability Scores logic
+// Ability Score Parser function
 const squareBracketsRegex = /18\[([0-9]{1,3})]/; // Ie. 18[65]
 const parenthesisRegex = /18\(([0-9]{1,3})\)/; // Ie. 18(65)
-//Ability Score Parser function
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     if (abilityScoreString === '') {
         return defaultValue;
@@ -34953,45 +35045,15 @@ on('change:charisma change:leadership change:appearance', function() {
         }
     });
 });
+//#endregion
 
-function repeatingMultipleSum(section, valueField, multiplierField, destination, decimals) {
-    TAS.repeating(section)
-        .attr(destination)
-        .field([valueField, multiplierField])
-        .reduce(function(m, r) {
-            return m + r.F[valueField] * r.F[multiplierField];
-        }, 0, function(t,r,a) {
-            let dec = parseInt(decimals);
-            if (isNaN(dec)) {
-                a[destination] = t;
-            } else {
-                a.D[dec][destination] = t;
-            }
-        })
-        .execute();
-}
-
+//#region Wizard and Priest Spells slot counting
 function isNewSpellSection(section) {
     return section.startsWith('wiz') || section.startsWith('pri');
 }
 
-function isRemoving0(eventInfo, fieldNames) {
-    return fieldNames.some(fieldName => !parseInt(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_${fieldName}`]));
-}
-
-function isOverwriting0(eventInfo) {
-    return !parseInt(eventInfo.newValue) && !parseInt(eventInfo.previousValue);
-}
-
-function doEarlyReturn(eventInfo, fieldNames) {
-    return eventInfo.removedInfo
-        ? isRemoving0(eventInfo, fieldNames)
-        : isOverwriting0(eventInfo);
-}
-
 // --- Start summing numbers from repeating spells for wizard and priest --- //
 function recursiveSpellSum(tail, acc, oldField, newField, resultFieldName) {
-
     let head = tail.shift();
     if (head === undefined) {
         console.log(`Summing ended. Final sum is ${acc}`);
@@ -35049,45 +35111,6 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
         });
     });
 }
-// --- End summing numbers from repeating spells for wizard and priest --- //
-
-function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
-    if (!spellsTable[section])
-        return;
-    
-    on(`change:repeating_spells-${section}:spell-name`, function (eventInfo) {
-        let spell = spellsTable[section][eventInfo.newValue];
-        if (!spell)
-            return;
-
-        getAttrs(BOOK_FIELDS, function(books) {
-            if (bookInactiveShowToast(books, spell))
-                return;
-            
-            let spellInfo = {
-                [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
-                [`repeating_spells-${section}_spell-school`]       : spell['school'],
-                [`repeating_spells-${section}_spell-components`]   : spell['components'],
-                [`repeating_spells-${section}_spell-range`]        : spell['range'],
-                [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
-                [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
-                [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
-                [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
-                [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
-                [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
-                [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-                [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
-                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-            };
-            if (section.startsWith('pri')) {
-                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
-            }
-
-            setAttrs(spellInfo);
-        });
-    });
-}
 
 function setupCalculateRemaining(totalField, sumField, remainingField) {
     on(`change:${totalField} change:${sumField}`, function () {
@@ -35103,54 +35126,9 @@ function setupCalculateRemaining(totalField, sumField, remainingField) {
         });
     });
 }
+//#endregion
 
-function setupCalculateTotal(totalField, fieldsToSum, maxValue) {
-    let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
-    on(onChange, function () {
-        getAttrs(fieldsToSum, function (values) {
-            let total = 0;
-            fieldsToSum.forEach(field => {
-                total += parseInt(values[field]) || 0;
-            });
-
-            if (!isNaN(maxValue))
-                total = Math.min(total, maxValue);
-
-            setAttrs({
-                [totalField]: total
-            });
-        });
-    });
-}
-
-function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName, maxValue) {
-    let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
-    let allFields = [...repeatingFieldsToSum];
-    allFields.push(repeatingTotalField);
-    on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
-        if (eventInfo.removedInfo)
-            return;
-        
-        TAS.repeating(repeatingName)
-            .fields(allFields)
-            .tap(function(rowSet) {
-                let rowId = eventInfo.sourceAttribute.split('_')[2];
-                let row = rowSet[rowId];
-                let total = 0;
-                repeatingFieldsToSum.forEach(column => {
-                    total += row.I[column];
-                });
-
-                if (!isNaN(maxValue))
-                    total = Math.min(total, maxValue);
-
-                row[repeatingTotalField] = total;
-            })
-            .execute();
-    });
-}
-
-// --- Start setup for priest spells based on spheres --- //
+//#region Priest Spells based on Spheres
 const primarySphereRegex = /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather|Elemental/gi
 const noElementalRegex =   /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather/gi
 const elementalRegex = /Earth|Air|Fire|Water/gi
@@ -35251,9 +35229,9 @@ function setupAddPriestSpell(postfix) {
             .execute();
     });
 }
-// --- End setup for priest spells based on spheres --- //
+//#endregion
 
-// --- Start defining rest buttons --- //
+//#region Wizard and Priest reset buttons
 function resetCastSlots(row, castField, memField) {
     row.I[castField] = 0;
 }
@@ -35333,7 +35311,47 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
         });
     });
 }
-// --- End defining rest buttons --- //
+//#endregion
+
+//#region Wizard and Priest spells and Powers setup
+function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
+    if (!spellsTable[section])
+        return;
+
+    on(`change:repeating_spells-${section}:spell-name`, function (eventInfo) {
+        let spell = spellsTable[section][eventInfo.newValue];
+        if (!spell)
+            return;
+
+        getAttrs(BOOK_FIELDS, function(books) {
+            if (bookInactiveShowToast(books, spell))
+                return;
+
+            let spellInfo = {
+                [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
+                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
+                [`repeating_spells-${section}_spell-school`]       : spell['school'],
+                [`repeating_spells-${section}_spell-components`]   : spell['components'],
+                [`repeating_spells-${section}_spell-range`]        : spell['range'],
+                [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
+                [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
+                [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
+                [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
+                [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
+                [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
+                [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
+                [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
+                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
+            };
+            if (section.startsWith('pri')) {
+                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+            }
+
+            setAttrs(spellInfo);
+        });
+    });
+}
+
 
 let wizardSpellLevelsSections = [
     {level: '1', sections: ['', '2', '3', 'wiz1']},
@@ -35442,7 +35460,9 @@ setupRepeatingSpellSumming(powerSpellSections, 'cast-max', '', `${spellPower}-av
 setupCalculateRemaining(`${spellPower}-available`, `${spellPower}-sum`, `${spellPower}-remaining`);
 setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 // --- End setup Granted Powers --- //
+//#endregion
 
+//#region Rogue skills
 // --- Start setup Rogue skills total --- //
 let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
 let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
@@ -35491,9 +35511,11 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
         .execute();
 });
 // --- End setup Rogue skills total --- //
+//#endregion
 
 //Related weapons / familiarity penalty
-on('change:nonprof-penalty', function (eventInfo) {
+//Used in version.js
+const updateNonprofPenalty = function () {
     getAttrs(['nonprof-penalty'], function(values) {
         let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
         let famil = Math.floor(nonprof / 2)
@@ -35502,26 +35524,20 @@ on('change:nonprof-penalty', function (eventInfo) {
             ['famil-penalty']: famil
         },{silent:true});
     });
+}
+on('change:nonprof-penalty', function (eventInfo){
+    updateNonprofPenalty();
 });
 
-async function calculateFormula(formulaField, calculatedField, defaultValue) {
-    getAttrs([formulaField], async function (values) {
-        let rollResult;
-        try {
-            rollResult = await extractRollResult(values[formulaField]);
-        } catch (e) {
-            rollResult = defaultValue;
-        }
+//Used in version.js
+const updateThac0 = function (silent) {
+    calculateFormula('thac0-base', 'thac0-base-calc', 20, silent);
+};
+on('change:thac0-base', function(eventInfo) {
+    updateThac0(false);
+});
 
-        setAttrs({
-            [calculatedField]: rollResult
-        });
-    });
-}
-
-const updateThac0 = () => calculateFormula('thac0-base', 'thac0-base-calc', 20);
-on('change:thac0-base', updateThac0);
-
+//#region Weapons autofill
 function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
     if (!weaponName)
         return;
@@ -35529,12 +35545,18 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
     weaponName = weaponName.toLowerCase();
     let fields = [...BOOK_FIELDS, thac0Field].filter(x => x !== undefined);
     getAttrs(fields, function(values) {
-        let baseWeapon = weapons[weaponName];
-        let thac0Int = parseInt(values[thac0Field]);
-        let thac0 = isNaN(thac0Int) ? 20 : thac0Int;
+        let baseWeapon = weapons[weaponName]
+        let thac0 = 20;
+
+        let books = {...values};
+        if (thac0Field) {
+            let thac0Int = parseInt(values[thac0Field]);
+            thac0 = !isNaN(thac0Int) ? thac0Int : thac0;
+            delete books[thac0Field];
+        }
 
         if (baseWeapon) {
-            if (bookInactiveShowToast(values, baseWeapon))
+            if (bookInactiveShowToast(books, baseWeapon))
                 return;
 
             setWeaponFunc({
@@ -35554,7 +35576,7 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
         if (!baseWeapon)
             return;
 
-        if (bookInactiveShowToast(values, baseWeapon))
+        if (bookInactiveShowToast(books, baseWeapon))
             return;
 
         let bonusString = match[1];
@@ -35660,6 +35682,73 @@ on('change:repeating_ammo:ammoname', function(eventInfo){
     setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
 });
 
+//Follower weapons
+function setupFollowerWeaponsAutoFill(repeating, sections) {
+    let prefix = '';
+    let onChange = '';
+    if (repeating !== '') {
+        prefix = `repeating_${repeating}_`
+        onChange = `repeating_${repeating}:`
+    }
+
+    sections.forEach(section => {
+        on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
+            let setWeaponFunc = function (weapon) {
+                let weaponInfo = {
+                    [`${prefix}attacknumhench${section}`]: weapon['rof'] || '1',
+                    [`${prefix}attackadjhench${section}`]: weapon['bonus'],
+                    [`${prefix}damadjhench${section}`]: weapon['bonus'],
+                    [`${prefix}damsmhench${section}`]: weapon['small-medium'],
+                    [`${prefix}damlhench${section}`]: weapon['large'],
+                    [`${prefix}rangehench${section}`]: weapon['range'] || 'Melee',
+                    [`${prefix}weaptypehench${section}`]: weapon['type'],
+                    [`${prefix}weapspeedhench${section}`]: weapon['speed'],
+                };
+
+                setAttrs(weaponInfo);
+            };
+            setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+        });
+    });
+}
+
+const followerWeapons = [
+    {repeating: '',       sections: ['',    '001', '002']},
+    {repeating: 'hench',  sections: ['003', '004', '005']},
+    {repeating: '',       sections: ['006', '007', '008']},
+    {repeating: 'hench2', sections: ['009', '010', '011']},
+    {repeating: '',       sections: ['012', '013', '014']},
+    {repeating: 'hench3', sections: ['015', '016', '017']},
+    {repeating: '',       sections: ['018', '019', '020']},
+    {repeating: 'hench4', sections: ['021', '022', '023']},
+    {repeating: '',       sections: ['024', '025', '026']},
+    {repeating: 'hench5', sections: ['027', '028', '029']},
+    {repeating: '',       sections: ['030', '031', '032']},
+    {repeating: 'hench6', sections: ['033', '034', '035']},
+];
+
+followerWeapons.forEach(fw => {
+    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections)
+});
+
+// Monster weapons
+on('change:repeating_monsterweapons:weaponname', function(eventInfo){
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
+            [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'],
+            [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
+            [`repeating_monsterweapons_daml`]      : weapon['large'],
+            [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
+        };
+
+        setAttrs(weaponInfo);
+    };
+
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'monsterthac0', true);
+});
+//#endregion
+
 on('clicked:grenade-miss', async function (eventInfo) {
     getAttrs(['character_name'], async function(values) {
         let characterName = values['character_name'];
@@ -35713,72 +35802,6 @@ on('clicked:grenade-miss', async function (eventInfo) {
     });
 });
 
-//Follower weapons
-function setupFollowerWeaponsAutoFill(repeating, sections) {
-    let prefix = '';
-    let onChange = ''; 
-    if (repeating !== '') {
-        prefix = `repeating_${repeating}_`
-        onChange = `repeating_${repeating}:`
-    }
-    
-    sections.forEach(section => {
-        on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
-            let setWeaponFunc = function (weapon) {
-                let weaponInfo = {
-                    [`${prefix}attacknumhench${section}`]: weapon['rof'] || '1',
-                    [`${prefix}attackadjhench${section}`]: weapon['bonus'],
-                    [`${prefix}damadjhench${section}`]: weapon['bonus'],
-                    [`${prefix}damsmhench${section}`]: weapon['small-medium'],
-                    [`${prefix}damlhench${section}`]: weapon['large'],
-                    [`${prefix}rangehench${section}`]: weapon['range'] || 'Melee',
-                    [`${prefix}weaptypehench${section}`]: weapon['type'],
-                    [`${prefix}weapspeedhench${section}`]: weapon['speed'],
-                };
-
-                setAttrs(weaponInfo);
-            };
-            setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
-        });
-    });
-}
-
-const followerWeapons = [
-    {repeating: '',       sections: ['',    '001', '002']},
-    {repeating: 'hench',  sections: ['003', '004', '005']},
-    {repeating: '',       sections: ['006', '007', '008']},
-    {repeating: 'hench2', sections: ['009', '010', '011']},
-    {repeating: '',       sections: ['012', '013', '014']},
-    {repeating: 'hench3', sections: ['015', '016', '017']},
-    {repeating: '',       sections: ['018', '019', '020']},
-    {repeating: 'hench4', sections: ['021', '022', '023']},
-    {repeating: '',       sections: ['024', '025', '026']},
-    {repeating: 'hench5', sections: ['027', '028', '029']},
-    {repeating: '',       sections: ['030', '031', '032']},
-    {repeating: 'hench6', sections: ['033', '034', '035']},
-];
-
-followerWeapons.forEach(fw => {
-   setupFollowerWeaponsAutoFill(fw.repeating, fw.sections) 
-});
-
-// Monster weapons
-on('change:repeating_monsterweapons:weaponname', function(eventInfo){
-    let setWeaponFunc = function (weapon) {
-        let weaponInfo = {
-            [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
-            [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'],
-            [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
-            [`repeating_monsterweapons_daml`]      : weapon['large'],
-            [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
-        };
-
-        setAttrs(weaponInfo);
-    };
-
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'monsterthac0', true);
-});
-
 //Weapon proficiency slots
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['weapprofnum']))
@@ -35814,7 +35837,7 @@ on('change:repeating_profs:profname', function (eventInfo) {
 on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['gearweight', 'gearqty']))
         return;
-    repeatingMultipleSum('gear', 'gearweight', 'gearqty', 'gearweighttotal', 2);
+    repeatingMultiplySum('gear', 'gearweight', 'gearqty', 'gearweighttotal', 2);
 });
 
 //Equipment Stored Section
@@ -35841,7 +35864,7 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
 on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_gem`, function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['gemvalue', 'gemqty']))
         return;
-    repeatingMultipleSum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
+    repeatingMultiplySum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
 })
 
 // --- ALL SHEET WORKERS END --- //
@@ -35849,7 +35872,7 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
 // --- Version change start --- //
 
 const sheetName = 'AD&D 2E Revised';
-const sheetVersion = '4.4.0';
+const sheetVersion = '4.5.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -35883,6 +35906,9 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(4, 3, 0))
                 migrate4_3_0();
+
+            if (oldSheetVersion.isBelowMigrate(4,5,0))
+                migrate4_5_0();
             
             //#endregion
         }
@@ -35929,6 +35955,13 @@ function moveStaticToRepeating(section, fieldsToMove) {
             setAttrs(newValue);
         }
     });
+}
+//#endregion
+
+//#region 4.5.0
+function migrate4_5_0() {
+    console.log('Migrating to v4.5.0');
+    updateThac0(true);
 }
 //#endregion
 
@@ -36037,14 +36070,7 @@ function migrateOtherValuables() {
 //#region version 3.4.0
 function migrate3_4_0() {
     console.log('Migrating to v3.4.0');
-    getAttrs(['nonprof-penalty'], function(values) {
-        let nonprof = Math.abs(parseInt(values['nonprof-penalty']) || 0) * -1;
-        let famil = Math.floor(nonprof / 2)
-        setAttrs({
-            ['nonprof-penalty']: nonprof,
-            ['famil-penalty']: famil
-        });
-    });
+    updateNonprofPenalty();
 }
 //#endregion
 

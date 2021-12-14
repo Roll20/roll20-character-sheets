@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
 const sheetName = 'AD&D 2E Revised';
-const sheetVersion = '4.4.0';
+const sheetVersion = '4.5.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -35,6 +35,9 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(4, 3, 0))
                 migrate4_3_0();
+
+            if (oldSheetVersion.isBelowMigrate(4,5,0))
+                migrate4_5_0();
             
             //#endregion
         }
@@ -81,6 +84,13 @@ function moveStaticToRepeating(section, fieldsToMove) {
             setAttrs(newValue);
         }
     });
+}
+//#endregion
+
+//#region 4.5.0
+function migrate4_5_0() {
+    console.log('Migrating to v4.5.0');
+    updateThac0(true);
 }
 //#endregion
 
@@ -189,14 +199,7 @@ function migrateOtherValuables() {
 //#region version 3.4.0
 function migrate3_4_0() {
     console.log('Migrating to v3.4.0');
-    getAttrs(['nonprof-penalty'], function(values) {
-        let nonprof = Math.abs(parseInt(values['nonprof-penalty']) || 0) * -1;
-        let famil = Math.floor(nonprof / 2)
-        setAttrs({
-            ['nonprof-penalty']: nonprof,
-            ['famil-penalty']: famil
-        });
-    });
+    updateNonprofPenalty();
 }
 //#endregion
 
