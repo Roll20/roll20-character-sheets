@@ -1426,7 +1426,7 @@
                 </thead>
                 <tr>
                     <td><input type="text" name="attr_thac0-base" title="@{thac0-base}" class="sheet-spell" list="base-thac0" placeholder="Macro or number"/></td>
-                    <td><input type="text" name="attr_thac0-base-calc" title="@{thac0-base-calc}" class="sheet-table-dynamic" value="[[@{thac0-base}]]" disabled/></td>
+                    <td><input type="number" name="attr_thac0-base-calc" title="@{thac0-base-calc}" class="sheet-table-dynamic" value="20" readonly/></td>
                 </tr>
             </table>
             <br>
@@ -34505,6 +34505,25 @@ const ERROR = 'error';
 
 const BOOK_FIELDS = ['book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb', 'book-tom'];
 
+//region Helper function
+const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
+    let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
+    finishRoll(queryRoll.rollId);
+    return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
+};
+
+const extractRoll = async function(query) {
+    let queryRoll = await startRoll(`!{{roll=[[${query}]]}}`);
+    finishRoll(queryRoll.rollId);
+    return queryRoll.results.roll;
+};
+
+const extractRollResult = async function(query) {
+    let roll = await extractRoll(query);
+    return roll.result;
+};
+//endregion
+
 on('clicked:hide-toast', function(eventInfo) {
     setAttrs({
         ['toast']: 0,
@@ -34529,7 +34548,10 @@ function showToast(type, title, message) {
 }
 
 function bookInactiveShowToast(books, obj) {
-    let bookInactive = !Object.values(books).includes(obj['book']);
+    let activeBooks = Object.entries(books)
+        .filter(([book, _]) => BOOK_FIELDS.includes(book))
+        .flatMap(arr => arr[1]);
+    let bookInactive = !activeBooks.includes(obj['book']);
     if (bookInactive)
         showToast(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
     return bookInactive;
@@ -35480,27 +35502,50 @@ on('change:nonprof-penalty', function (eventInfo) {
             ['famil-penalty']: famil
         },{silent:true});
     });
-})
+});
 
-function setWeaponWithBonus(weaponName, setWeaponFunc, isMonster) {
+async function calculateFormula(formulaField, calculatedField, defaultValue) {
+    getAttrs([formulaField], async function (values) {
+        let rollResult;
+        try {
+            rollResult = await extractRollResult(values[formulaField]);
+        } catch (e) {
+            rollResult = defaultValue;
+        }
+
+        setAttrs({
+            [calculatedField]: rollResult
+        });
+    });
+}
+
+const updateThac0 = () => calculateFormula('thac0-base', 'thac0-base-calc', 20);
+on('change:thac0-base', updateThac0);
+
+function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
     if (!weaponName)
         return;
     
     weaponName = weaponName.toLowerCase();
-    getAttrs(BOOK_FIELDS, function(books) {
+    let fields = [...BOOK_FIELDS, thac0Field].filter(x => x !== undefined);
+    getAttrs(fields, function(values) {
         let baseWeapon = weapons[weaponName];
+        let thac0Int = parseInt(values[thac0Field]);
+        let thac0 = isNaN(thac0Int) ? 20 : thac0Int;
+
         if (baseWeapon) {
-            if (bookInactiveShowToast(books, baseWeapon))
+            if (bookInactiveShowToast(values, baseWeapon))
                 return;
 
             setWeaponFunc({
                 ...baseWeapon,
+                'thac0' : thac0,
                 'bonus' : '0'
             });
             return;
         }
 
-        let match = weaponName.match(/\s*\+([0-9])+\s*/);
+        let match = weaponName.match(/\s*\+([0-9]+)\s*/);
         if (!match)
             return;
 
@@ -35509,7 +35554,7 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, isMonster) {
         if (!baseWeapon)
             return;
 
-        if (bookInactiveShowToast(books, baseWeapon))
+        if (bookInactiveShowToast(values, baseWeapon))
             return;
 
         let bonusString = match[1];
@@ -35517,22 +35562,25 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, isMonster) {
         if (isNaN(bonus))
             return;
 
-        if (bonus < 1)
+        if (bonus < 1) {
             setWeaponFunc({
                 ...baseWeapon,
+                'thac0' : thac0,
                 'bonus' : '0'
             });
             return;
+        }
 
         let weaponWithBonus = {
             ...baseWeapon,
+            'thac0' : thac0,
             'speed' : Math.max(baseWeapon['speed'] - bonus, 0),
             'bonus' : `+${bonus}`
         }
         if (isMonster) {
             weaponWithBonus['small-medium'] += `+${bonus}`;
             weaponWithBonus['large'] += `+${bonus}`;
-            weaponWithBonus['thac0'] = `@{monsterthac0}-${bonus}`;
+            weaponWithBonus['thac0'] = thac0 - bonus;
         }
 
         setWeaponFunc(weaponWithBonus);
@@ -35544,6 +35592,7 @@ on('change:repeating_weapons:weaponname', function(eventInfo) {
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {
             'repeating_weapons_attackadj'      : weapon['bonus'],
+            'repeating_weapons_ThAC0'          : weapon['thac0'],
             'repeating_weapons_range'          : 'Melee',
             'repeating_weapons_size'           : weapon['size'],
             'repeating_weapons_weapspeed'      : weapon['speed'],
@@ -35554,17 +35603,17 @@ on('change:repeating_weapons:weaponname', function(eventInfo) {
 
         setAttrs(weaponInfo);
     };
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
 });
 
 //melee damage autofill
 on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {
-            'repeating_weapons-damage_damadj': weapon['bonus'],
-            'repeating_weapons-damage_damsm': weapon['small-medium'],
-            'repeating_weapons-damage_daml': weapon['large'],
-            'repeating_weapons-damage_knockdown1': weapon['knockdown'] || ''
+            'repeating_weapons-damage_damadj'     : weapon['bonus'],
+            'repeating_weapons-damage_damsm'      : weapon['small-medium'],
+            'repeating_weapons-damage_daml'       : weapon['large'],
+            'repeating_weapons-damage_knockdown1' : weapon['knockdown'] || ''
         };
 
         setAttrs(weaponInfo);
@@ -35577,44 +35626,39 @@ on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
 on('change:repeating_weapons2:weaponname2', function(eventInfo){
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {
-            'repeating_weapons2_strbonus2': weapon['strength'] ? 1 : 0,
-            'repeating_weapons2_attacknum2': weapon['rof'] || '',
-            'repeating_weapons2_attackadj2': weapon['bonus'],
-            'repeating_weapons2_range2': weapon['range'] || '',
-            'repeating_weapons2_size2': weapon['size'],
-            'repeating_weapons2_weapspeed2': weapon['speed'],
-            'repeating_weapons2_weaptype-slash2': weapon['type'].includes('S') ? 1 : 0,
-            'repeating_weapons2_weaptype-pierce2': weapon['type'].includes('P') ? 1 : 0,
-            'repeating_weapons2_weaptype-blunt2': weapon['type'].includes('B') ? 1 : 0,
+            'repeating_weapons2_strbonus2'        : weapon['strength'] ? 1 : 0,
+            'repeating_weapons2_attacknum2'       : weapon['rof'] || '',
+            'repeating_weapons2_attackadj2'       : weapon['bonus'],
+            'repeating_weapons2_ThAC02'           : weapon['thac0'],
+            'repeating_weapons2_range2'           : weapon['range'] || '',
+            'repeating_weapons2_size2'            : weapon['size'],
+            'repeating_weapons2_weapspeed2'       : weapon['speed'],
+            'repeating_weapons2_weaptype-slash2'  : weapon['type'].includes('S') ? 1 : 0,
+            'repeating_weapons2_weaptype-pierce2' : weapon['type'].includes('P') ? 1 : 0,
+            'repeating_weapons2_weaptype-blunt2'  : weapon['type'].includes('B') ? 1 : 0,
         };
 
         setAttrs(weaponInfo);
     };
     
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
 });
 
 //range damage autofill
 on('change:repeating_ammo:ammoname', function(eventInfo){
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {
-            'repeating_weapons2_strbonus3': weapon['strength'] ? 1 : 0,
-            'repeating_ammo_damadj2': weapon['bonus'],
-            'repeating_ammo_damsm2': weapon['small-medium'],
-            'repeating_ammo_daml2': weapon['large'],
-            'repeating_weapons-damage_knockdown2': weapon['knockdown'] || ''
+            'repeating_weapons2_strbonus3'        : weapon['strength'] ? 1 : 0,
+            'repeating_ammo_damadj2'              : weapon['bonus'],
+            'repeating_ammo_damsm2'               : weapon['small-medium'],
+            'repeating_ammo_daml2'                : weapon['large'],
+            'repeating_weapons-damage_knockdown2' : weapon['knockdown'] || ''
         };
 
         setAttrs(weaponInfo);
     }
     setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
 });
-
-const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
-    let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
-    finishRoll(queryRoll.rollId);
-    return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
-};
 
 on('clicked:grenade-miss', async function (eventInfo) {
     getAttrs(['character_name'], async function(values) {
@@ -35627,8 +35671,8 @@ on('clicked:grenade-miss', async function (eventInfo) {
             case 'Oil (lit)':  finalRollText += `{{name=Oil (lit)}} {{aoe=[[3]]}} {{aoesplash=[[3+6]]}} {{hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)}} {{splashdmg=[Damage](~${characterName}|oil-lit-splash)}}`; break;
             case 'Poison':     finalRollText += `{{name=Poison}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=Special}} {{splashdmg=Special}}`; break;
             case 'Other': {
-                let name = await extractQueryResult('?{Grenade name}');
-                let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
+                let name   = await extractQueryResult('?{Grenade name}');
+                let aoe    = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
                 let damage = await extractQueryResult('?{Direct damage|1d6}');
                 let splash = await extractQueryResult('?{Splash damage|1d3}');
 
@@ -35722,17 +35766,17 @@ followerWeapons.forEach(fw => {
 on('change:repeating_monsterweapons:weaponname', function(eventInfo){
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {
-            [`repeating_monsterweapons_attacknum`]: weapon['rof'] || '1',
-            [`repeating_monsterweapons_ThAC0`]: weapon['thac0'] || '@{monsterthac0}',
-            [`repeating_monsterweapons_damsm`]: weapon['small-medium'],
-            [`repeating_monsterweapons_daml`]: weapon['large'],
-            [`repeating_monsterweapons_weapspeed`]: weapon['speed'],
+            [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
+            [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'],
+            [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
+            [`repeating_monsterweapons_daml`]      : weapon['large'],
+            [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
         };
 
         setAttrs(weaponInfo);
     };
 
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, true);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'monsterthac0', true);
 });
 
 //Weapon proficiency slots
