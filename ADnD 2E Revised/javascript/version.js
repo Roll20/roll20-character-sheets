@@ -91,6 +91,8 @@ function moveStaticToRepeating(section, fieldsToMove) {
 function migrate4_5_0() {
     console.log('Migrating to v4.5.0');
     updateThac0(true);
+    updateWeaponProfsTotal();
+    updateNonWeaponProfsTotal();
 }
 //#endregion
 

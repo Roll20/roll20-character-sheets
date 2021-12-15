@@ -27,7 +27,7 @@ const extractRollResult = async function(query) {
     return roll.result;
 };
 
-const calculateFormula = async function(formulaField, calculatedField, defaultValue, silent = false) {
+const calculateFormula = function(formulaField, calculatedField, defaultValue, silent = false) {
     getAttrs([formulaField], async function (values) {
         let rollResult;
         try {
@@ -1034,11 +1034,19 @@ on('change:nonprof-penalty', function (eventInfo){
 });
 
 //Used in version.js
-const updateThac0 = function (silent) {
-    calculateFormula('thac0-base', 'thac0-base-calc', 20, silent);
-};
+const updateThac0 = (silent) => calculateFormula('thac0-base', 'thac0-base-calc', 20, silent);
 on('change:thac0-base', function(eventInfo) {
     updateThac0(false);
+});
+//Used in version.js
+const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc', 0);
+on('change:weapprof-slots-total', function (eventInfo) {
+    updateWeaponProfsTotal();
+});
+//Used in version.js
+const updateNonWeaponProfsTotal = () => calculateFormula('prof-slots-total', 'prof-slots-total-calc', 0);
+on('change:prof-slots-total', function (eventInfo) {
+    updateNonWeaponProfsTotal();
 });
 
 //#region Weapons autofill
