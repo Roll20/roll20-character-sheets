@@ -10,13 +10,17 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.9.2 [Screenshot](coc_v2.png)
+v3.10.0 [Screenshot](coc_v2.png)
 
 # Notes de version
 
+## v3.10.0 (2021-11-12)
+
+- Ajout du token par défaut sur la fiche de personnage
+
 ## v3.9.2 (2021-04-27)
 
-- Correction d'un bug sur le titre de la capacité de rang 4 de la voie n°2
+- Correction d'un bug sur le titre de la capacité de rang 2 de la voie n°4
 - Correction du calcul du rang dans une voie : la case doit être cochée et soit le titre soit le texte de la capacité doit être renseigné
 
 ## v3.9.1 (2021-04-25)

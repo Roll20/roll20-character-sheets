@@ -1,73 +1,88 @@
-on(`clicked:simplePNJ`, function(info) {
-    let roll = info.htmlAttributes.value;
+/* eslint-disable camelcase */
+/* eslint-disable no-undef */
+on('clicked:simplePNJ', async (info) => {
+  const roll = info.htmlAttributes.value;
 
-    let exec = [];
-    let isConditionnel = false;
+  const listAttrs = [
+    'jetModifDes',
+    'aspectPNJ',
+  ];
 
-    let mod = Number(PJData["jetModifDes"]);
+  const attrs = await getAttrsAsync(listAttrs);
+  let attrsAspect = [];
 
-    let aspect = PNJData["aspectPNJ"];
+  const exec = [];
+  const isConditionnel = false;
 
-    let aspectNom = aspect.slice(2, -1);
+  const mod = +attrs.jetModifDes;
+  const aspect = attrs.aspectPNJ;
 
-    let aRoll = [];
-    let aNom = [];
+  const aspectNom = aspect.slice(2, -1);
 
-    let bonus = [];
-    let AE = 0;
+  const aRoll = [];
+  let aNom = '';
 
-    exec.push(roll);
+  const bonus = [];
+  let AE = 0;
 
-    if(aspect != "0") {
-        aNom.push(AspectNom[aspectNom]);
-        aRoll.push(AspectValue[aspectNom].value);
-        AE += AspectValue[aspectNom].AEMin;
-        AE += AspectValue[aspectNom].AEMaj;
-        exec.push("{{vAE=[["+AspectValue[aspectNom].AEMin+"+"+AspectValue[aspectNom].AEMaj+"]]}}");
-    };
+  exec.push(roll);
 
-    exec.push("{{cBase="+aNom.join(" - ")+"}}");
+  if (aspect !== '0') {
+    attrsAspect = await getAttrsAsync([
+      aspectNom,
+      `${aspectNom}PNJAE`,
+      `${aspectNom}PNJAEMaj`,
+    ]);
 
-    if(mod != 0) {
-        aRoll.push(mod);
-        exec.push("{{mod=[["+mod+"]]}}");
-    }
+    const tAE = totalAspect(attrsAspect, aspectNom);
 
-    if(aRoll.length == 0)
-        aRoll.push(0);
+    aNom = AspectNom[aspectNom];
+    aRoll.push(attrsAspect[aspectNom]);
+    AE += tAE;
 
-    bonus.push(AE);        
+    exec.push(`{{vAE=${tAE}}}`);
+  }
 
-    exec.push("{{jet=[[ {[[{"+aRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{tBonus=[["+bonus.join("+")+"+0]]}} {{Exploit=[["+aRoll.join("+")+"]]}}");
+  exec.push(`{{cBase=${aNom}}}`);
 
-    if(isConditionnel == true)
-        exec.push("{{conditionnel=true}}");
+  if (mod !== 0) {
+    aRoll.push(mod);
+    exec.push(`{{mod=[[${mod}]]}}`);
+  }
 
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  if (aRoll.length === 0) { aRoll.push(0); }
 
-        let total = tJet+tBonus;
+  bonus.push(AE);
+
+  exec.push(`{{jet=[[ {[[{${aRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{tBonus=[[${bonus.join('+')}+0]]}} {{Exploit=[[${aRoll.join('+')}]]}}`);
+
+  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
+
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
+
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}} {{jet=[[ {[[{${aRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}} {{jet=[[ {[[{"+aRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });
