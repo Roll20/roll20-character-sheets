@@ -62,3 +62,42 @@ const importSingleDroneWeapon = (weapon, newrowid, attributes, weaponnumber) => 
     }
     return weaponnumber +1;
 }
+const importAutosofts = (drone, newrowid, attributes) => {
+
+    let autosofts;
+    if(drone.gears.gear.length > 1) {
+        autosofts = drone.gears.gear.filter(gear => gear.category_english.includes("Autosofts"));
+    }
+    else {
+        if(drone.gears.gear.category_english == "Autosofts") {
+            autosofts = [drone.gears.gear];
+        }
+    }
+
+    if(autosofts != null) {
+        //search for clearsight
+        let clearsight = autosofts.find(soft => soft.name_english.includes("Clearsight Autosoft"));
+        if(clearsight != null) {
+            attributes["repeating_drones_"+newrowid+"_droneperceptionsoft"] = clearsight.rating;
+        }
+
+        //Maneuvering
+        let maneuvering = autosofts.find(soft => soft.name_english.includes("Maneuvering Autosoft"));
+        if(maneuvering != null) {
+            attributes["repeating_drones_"+newrowid+"_dronemaneuversoft"] = maneuvering.rating;
+        }
+
+        //stealth
+        let stealth = autosofts.find(soft => soft.name_english.includes("Stealth Autosoft"));
+        if(stealth != null) {
+            attributes["repeating_drones_"+newrowid+"_dronesneaksoft"] = stealth.rating;
+        }
+
+        //evasion
+        let evasion = autosofts.find(soft => soft.name_english.includes("Evasion Autosoft"));
+        if(evasion != null) {
+            attributes["repeating_drones_"+newrowid+"_dronedodgesoft"] = evasion.rating;
+        }
+    }
+
+}

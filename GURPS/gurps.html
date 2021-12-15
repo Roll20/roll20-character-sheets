@@ -4374,10 +4374,14 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.7.0.1 -->
+				<!-- current version notes: 2.7.1 -->
 				<ul>
-					<li>Streamline how skill and spell levels are updated when a new GURPS version is loaded.</li>
-					<li>Resolved issue where linked melee items were not updating. Reported Tsuka and troubleshooted by Mike W.</li>
+					<li>Ranged Tab - Range Calculator: Clicking the <b>[Reset]</b> button also clears the modifiers from the roll, that mean you don't have to click the <b>[Apply]</b> button. Requested by Mike W.</li>
+					<li>Default Critical Success and Fail notes for repeating skills. If a skill is missing critical success and fail notes, a default message will be displayed instead. Requested by Mike W.</li>
+					<li>Repeating Melee and Ranged tables. Added <b>Private Notes</b> that will not show on the Roll Template Results.</li>
+					<li>Repeating Advantages. If the advantage has a die roll, Added Success/Fail notes. Requested by Mike W.</li>
+					<li>Repeating Disadvantages. If the disadvantage has a die roll, Added Success/Fail notes. Requested by Mike W.</li>
+					<li>Repeating Racial Traits. If the trai has a die roll, added Success/Fail notes. Requested by Mike W.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -7063,7 +7067,7 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="number" name="attr_foa" min="3" max="18" step="1" title="Macro table name: repeating_traits. Field name: foa" />
 						</div>
 						<div class="cell col2">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Frequency of Appearance Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{foa} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsAFOA" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Frequency of Appearance Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{foa} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{success_notes}}} {{customCriticalSuccessNote=@{critical_success_notes}}} {{customFailNote=@{fail_notes}}} {{customCriticalFailNote=@{critical_fail_notes}}}" name="roll_vsAFOA" />
 						</div>
 						<div class="cell col3">
 							<input type="number" name="attr_points" title="Macro table name: repeating_traits. Field name: points" />
@@ -7072,17 +7076,77 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="text" name="attr_ref" title="Macro table name: repeating_traits. Field name: ref" />
 						</div>
 					</div> <!-- .row -->
-					<div class="row row-details notebox">
-						<div class="cell col-notebox">
-							<div class="show-notes">
-								<input type="checkbox" name="attr_show_notes" value="1" />
-								<span class="label">
-									<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
-								</span>
+
+					<div class="melee-notebox">
+						
+						<div class="row">
+							<div class="cell label">
+								<div class="show-notes">
+									<input type="checkbox" name="attr_show_notes" value="1" />
+									<span class="label">
+										<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
+									</span> 	
+								</div>
+								<textarea class="text-left chat-size" name="attr_notes" title="Macro table name: repeating_traits. Field name: notes"></textarea>
 							</div>
-							<textarea name="attr_notes" title="Macro table name: repeating_traits. Field name: notes"></textarea>
-						</div>
+						</div> <!-- .row -->
+
+						<div class="row success-fail-notes">
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="success-note-label">Success Note</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-success-notes-tooltip">
+	<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+	Example: Select Location: ?{Location|Head|Torso}
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_success_notes" title="Macro table name: repeating_traits. Field name: success_notes"></textarea>
+							</div>
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="critical-success-note-label">Critical Success Notes</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-critical-success-notes-tooltip">
+	<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+	Example: Does an additional [[1d6]] fire damage.
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_critical_success_notes" title="Macro table name: repeating_traits. Field name: critical_success_notes"></textarea>
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row success-fail-notes">
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="fail-note-label">Fail Note</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-fail-notes-tooltip">
+<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+Example: Select Location: ?{Location|Head|Torso}
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_fail_notes" title="Macro table name: repeating_traits. Field name: fail_notes"></textarea>
+							</div>
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="critical-fail-note-label">Critical Fail Notes</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-critical-fail-notes-tooltip">
+<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+Example: Does an additional [[1d6]] fire damage.
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_critical_fail_notes" title="Macro table name: repeating_traits. Field name: critical_fail_notes"></textarea>
+							</div>
+						</div> <!-- .row -->
+
 					</div> <!-- .row -->
+
 				</fieldset> <!-- .repeating_traits -->
 			</div> <!-- .table -->
 		</div> <!-- .box .traits -->
@@ -7328,7 +7392,7 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="number" min="0" step="1" name="attr_control_rating" title="Macro table name: repeating_disadvantages. Field name: control_rating" />
 						</div>
 						<div class="cell col2">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsDSCR" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{success_notes}}} {{customCriticalSuccessNote=@{critical_success_notes}}} {{customFailNote=@{fail_notes}}} {{customCriticalFailNote=@{critical_fail_notes}}}" name="roll_vsDSCR" />
 						</div>
 						<div class="cell col3">
 							<input type="number" name="attr_points" title="Macro table name: repeating_disadvantages. Field name: points" />
@@ -7337,17 +7401,77 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="text" name="attr_ref" title="Macro table name: repeating_disadvantages. Field name: ref" />
 						</div>
 					</div> <!-- .row -->
-					<div class="row row-details notebox">
-						<div class="cell col-notebox">
-							<div class="show-notes">
-								<input type="checkbox" name="attr_show_notes" value="1" />
-								<span class="label">
-									<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
-								</span>
+
+					<div class="melee-notebox">
+						
+						<div class="row">
+							<div class="cell label">
+								<div class="show-notes">
+									<input type="checkbox" name="attr_show_notes" value="1" />
+									<span class="label">
+										<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
+									</span> 	
+								</div>
+								<textarea class="text-left chat-size" name="attr_notes" title="Macro table name: repeating_disadvantages Field name: notes"></textarea>
 							</div>
-							<textarea name="attr_notes" title="Macro table name: repeating_disadvantages. Field name: notes"></textarea>
-						</div>
+						</div> <!-- .row -->
+
+						<div class="row success-fail-notes">
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="success-note-label">Success Note</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-success-notes-tooltip">
+	<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+	Example: Select Location: ?{Location|Head|Torso}
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_success_notes" title="Macro table name: repeating_disadvantages. Field name: success_notes"></textarea>
+							</div>
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="critical-success-note-label">Critical Success Notes</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-critical-success-notes-tooltip">
+	<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+	Example: Does an additional [[1d6]] fire damage.
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_critical_success_notes" title="Macro table name: repeating_disadvantages. Field name: critical_success_notes"></textarea>
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row success-fail-notes">
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="fail-note-label">Fail Note</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-fail-notes-tooltip">
+<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+Example: Select Location: ?{Location|Head|Torso}
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_fail_notes" title="Macro table name: repeating_disadvantages. Field name: fail_notes"></textarea>
+							</div>
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="critical-fail-note-label">Critical Fail Notes</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-critical-fail-notes-tooltip">
+<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+Example: Does an additional [[1d6]] fire damage.
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_critical_fail_notes" title="Macro table name: repeating_disadvantages. Field name: critical_fail_notes"></textarea>
+							</div>
+						</div> <!-- .row -->
+
 					</div> <!-- .row -->
+
 				</fieldset> <!-- .repeating_disadvantages -->
 			</div> <!-- .table -->
 		</div> <!-- .box .disadvantages -->
@@ -7446,7 +7570,7 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="number" min="1" step="1" name="attr_control_rating" title="Macro table name: repeating_racial. Field name: control_rating" />
 						</div>
 						<div class="cell col2">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsRSCR" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{success_notes}}} {{customCriticalSuccessNote=@{critical_success_notes}}} {{customFailNote=@{fail_notes}}} {{customCriticalFailNote=@{critical_fail_notes}}}" name="roll_vsRSCR" />
 						</div>
 						<div class="cell col3">
 							<input type="number" name="attr_points" title="Macro table name: repeating_racial. Field name: points" />
@@ -7455,17 +7579,75 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="text" name="attr_ref" title="Macro table name: repeating_racial. Field name: ref" />
 						</div>
 					</div> <!-- .row -->
-					<div class="row row-details notebox">
-						<div class="cell col-notebox">
-							<div class="show-notes">
-								<input type="checkbox" name="attr_show_notes" value="1" />
-								<span class="label">
-									<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
-								</span>
+					
+					<div class="melee-notebox">
+						
+						<div class="row">
+							<div class="cell label">
+								<div class="show-notes">
+									<input type="checkbox" name="attr_show_notes" value="1" />
+									<span class="label">
+										<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
+									</span> 	
+								</div>
+								<textarea class="text-left chat-size" name="attr_notes" title="Macro table name: repeating_racial Field name: notes"></textarea>
 							</div>
-							<textarea name="attr_notes" title="Macro table name: repeating_racial. Field name: notes"></textarea>
-						</div>
-					</div> <!-- .row -->
+						</div> <!-- .row -->
+
+						<div class="row success-fail-notes">
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="success-note-label">Success Note</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-success-notes-tooltip">
+	<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+	Example: Select Location: ?{Location|Head|Torso}
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_success_notes" title="Macro table name: repeating_racial. Field name: success_notes"></textarea>
+							</div>
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="critical-success-note-label">Critical Success Notes</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-critical-success-notes-tooltip">
+	<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+	Example: Does an additional [[1d6]] fire damage.
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_critical_success_notes" title="Macro table name: repeating_racial. Field name: critical_success_notes"></textarea>
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row success-fail-notes">
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="fail-note-label">Fail Note</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-fail-notes-tooltip">
+<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+Example: Select Location: ?{Location|Head|Torso}
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_fail_notes" title="Macro table name: repeating_racial. Field name: fail_notes"></textarea>
+							</div>
+							<div class="cell">
+								<div class="popup">
+									<span data-i18n="critical-fail-note-label">Critical Fail Notes</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="advantage-critical-fail-notes-tooltip">
+<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+Example: Does an additional [[1d6]] fire damage.
+									</span>
+								</span>
+								<textarea class="text-left chat-size" name="attr_critical_fail_notes" title="Macro table name: repeating_racial. Field name: critical_fail_notes"></textarea>
+							</div>
+						</div> <!-- .row -->
+
 				</fieldset> <!-- .repeating_racial -->
 			</div> <!-- .table -->
 		</div> <!-- .box .racial -->
@@ -8000,7 +8182,7 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="hidden" name="attr_sync" value="0" />
 						</div>
 						<div class="cell col1">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{skill_roll_modifier}, @{skill_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_skill_modifier_tool}]]}} {{maxNine=[[@{skill_roll_max_nine}]]}} {{rollModifier=[[@{skill_roll_modifier}]]}} {{rollModifierSummary=@{skill_roll_modifier_summary}}} {{rollTraitSummary=@{skill_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}} {{noteBoxOneShow=@{show_skill_mod_notes}}} {{noteBoxOneLabel=Skill Modifiers}} {{noteBoxOneContent=@{skill_mod_description_notes}}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{isRepeatingSkill=[[1]]}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{skill_roll_modifier}, @{skill_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_skill_modifier_tool}]]}} {{maxNine=[[@{skill_roll_max_nine}]]}} {{rollModifier=[[@{skill_roll_modifier}]]}} {{rollModifierSummary=@{skill_roll_modifier_summary}}} {{rollTraitSummary=@{skill_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}} {{noteBoxOneShow=@{show_skill_mod_notes}}} {{noteBoxOneLabel=Skill Modifiers}} {{noteBoxOneContent=@{skill_mod_description_notes}}}" name="roll_vsSL" />
 						</div>
 						<div class="cell col2">
 							<input type="text" name="attr_tl" title="Macro table name: repeating_skills. Field name: tl" />
@@ -10898,6 +11080,7 @@ visualize what it will look like in chat.
 										<button type="roll" class="template-attack-roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{skill} + @{modifier} + @{melee_roll_modifier}, @{melee_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_melee_modifier_tool}]]}} {{maxNine=[[@{melee_roll_max_nine}]]}} {{rollModifier=[[@{melee_roll_modifier}]]}} {{rollModifierSummary=@{melee_roll_modifier_summary}}} {{rollTraitSummary=@{melee_roll_trait_summary}}} {{hitLocation=@{melee_roll_hit_location}}} {{maneuver=@{melee_roll_maneuver}}} {{allOutAttack=@{melee_roll_allout_attack}}} {{reach=@{reach}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{success_notes}}} {{customCriticalSuccessNote=@{critical_success_notes}}} {{customFailNote=@{fail_notes}}} {{customCriticalFailNote=@{critical_fail_notes}}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_hit_notes}}} {{rawCriticalSuccessNote=@{raw_critical_hit_notes}}} {{rawFailNote=@{raw_miss_notes}}} {{rawCriticalFailNote=@{raw_critical_miss_notes}}}" name="roll_vsSL" />
 									</div>
 								</div> <!-- .row -->
+
 								<div class="melee-notebox">
 
 									<div class="row">
@@ -10912,7 +11095,6 @@ visualize what it will look like in chat.
 										<div class="cell">
 											<input type="text" readonly="readonly" name="attr_row_id" value="" />
 										</div>
-										
 									</div> <!-- .row -->
 
 
@@ -11013,6 +11195,18 @@ visualize what it will look like in chat.
 										</div>
 										<div class="cell">
 											<input type="number" class="inline" name="attr_armor_divisor" value="1" min="1" step="1" title="Macro table name: repeating_melee. Field name: armor_divisor" />
+										</div>
+									</div> <!-- .row -->
+
+									<div class="row">
+										<div class="cell">
+											<div class="popup">
+												<span data-i18n="private-notes-label">Private Notes</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="private-notes-tooltip">These notes do not appear in any Roll Template; they are just here for your reference.</span>
+											</span>
+											<textarea class="text-left full-size" name="attr_private_notes" title="Macro table name: repeating_melee. Field name: private_notes"></textarea>
 										</div>
 									</div> <!-- .row -->
 									
@@ -11555,6 +11749,18 @@ visualize what it will look like in chat.
 										</div>
 									</div> <!-- .row -->
 									
+									<div class="row">
+										<div class="cell">
+											<div class="popup">
+												<span data-i18n="private-notes-label">Private Notes</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="private-notes-tooltip">These notes do not appear in any Roll Template; they are just here for your reference.</span>
+											</span>
+											<textarea class="text-left full-size" name="attr_private_notes" title="Macro table name: repeating_ranged. Field name: private_notes"></textarea>
+										</div>
+									</div> <!-- .row -->
+
 									<div class="row">
 										<div class="cell">
 											<div class="popup">
@@ -13316,10 +13522,24 @@ visualize what it will look like in chat.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.7.0.1 -->
+			<!-- current version notes: 2.7.1 -->
+			<ul>
+				<li>Ranged Tab - Range Calculator: Clicking the <b>[Reset]</b> button also clears the modifiers from the roll, that mean you don't have to click the <b>[Apply]</b> button. Requested by Mike W.</li>
+				<li>Default Critical Success and Fail notes for repeating skills. If a skill is missing critical success and fail notes, a default message will be displayed instead. Requested by Mike W.</li>
+				<li>Repeating Melee and Ranged tables. Added <b>Private Notes</b> that will not show on the Roll Template Results.</li>
+				<li>Repeating Advantages. If the advantage has a die roll, added Success/Fail notes. Requested by Mike W.</li>
+				<li>Repeating Disadvantages. If the disadvantage has a die roll, added Success/Fail notes. Requested by Mike W.</li>
+				<li>Repeating Racial Traits. If the trai has a die roll, added Success/Fail notes. Requested by Mike W.</li>
+			</ul>
+
+			<h4>Version: 2.7.0.2</h4>
+
+			<p>Pull Request : 12/5/2021</p>
+
 			<ul>
 				<li>Streamline how skill and spell levels are updated when a new GURPS version is loaded.</li>
 				<li>Resolved issue where linked melee items were not updating. Reported Tsuka and troubleshooted by Mike W.</li>
+				<li>2.7.0.2 - Repeating Spells Table. Bugfix Mod column stopped working. Reported TechnoMaestro.</li>
 			</ul>
 
 			<h4>Version: 2.7.0</h4>
@@ -14722,6 +14942,12 @@ visualize what it will look like in chat.
 								{{#customCriticalFailNote}}
                                     <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                 {{/customCriticalFailNote}}
+
+								{{#rollTotal() isRepeatingSkill 1}}
+								{{^customCriticalFailNote}}
+									<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+								{{/customCriticalFailNote}}
+								{{/rollTotal() isRepeatingSkill 1}}
                                     
                             </span>
                         {{/rollTotal() rollResult 18}}
@@ -14790,6 +15016,12 @@ visualize what it will look like in chat.
                                         <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                     {{/customCriticalFailNote}}
                                     
+									{{#rollTotal() isRepeatingSkill 1}}
+									{{^customCriticalFailNote}}
+										<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+									{{/customCriticalFailNote}}
+									{{/rollTotal() isRepeatingSkill 1}}
+									
                                 {{/rollLess() effectiveSkill 16}}
                                 
                             </span>
@@ -14838,7 +15070,13 @@ visualize what it will look like in chat.
 									{{#customCriticalSuccessNote}}
                                         <p>{{customCriticalSuccessNote}}</p>
                                     {{/customCriticalSuccessNote}}
-                                    
+
+									{{#rollTotal() isRepeatingSkill 1}}
+									{{^customCriticalSuccessNote}}
+                                        <p><span data-i18n="default-repeating-skill-crit-success-message">The GM may determine what happens to You. (B347)</span></p>
+                                    {{/customCriticalSuccessNote}}
+									{{/rollTotal() isRepeatingSkill 1}}
+									
                                 {{/rollLess() useCriticalPlusTen 2}}
                                                     
                             </span>
@@ -15018,6 +15256,12 @@ visualize what it will look like in chat.
 											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
+
+											{{#rollTotal() isRepeatingSkill 1}}
+											{{^customCriticalFailNote}}
+												<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+											{{/customCriticalFailNote}}
+											{{/rollTotal() isRepeatingSkill 1}}
                                             
                                         {{/rollGreater() rollResult 12}}
                                         
@@ -15092,6 +15336,12 @@ visualize what it will look like in chat.
 											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
+
+											{{#rollTotal() isRepeatingSkill 1}}
+											{{^customCriticalFailNote}}
+												<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+											{{/customCriticalFailNote}}
+											{{/rollTotal() isRepeatingSkill 1}}
                                             
                                         {{/rollGreater() rollResult 13}}
                                         
@@ -15166,6 +15416,12 @@ visualize what it will look like in chat.
 											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
+
+											{{#rollTotal() isRepeatingSkill 1}}
+											{{^customCriticalFailNote}}
+												<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+											{{/customCriticalFailNote}}
+											{{/rollTotal() isRepeatingSkill 1}}
                                             
                                         {{/rollGreater() rollResult 14}}
                                         
@@ -15240,6 +15496,12 @@ visualize what it will look like in chat.
 											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
+
+											{{#rollTotal() isRepeatingSkill 1}}
+											{{^customCriticalFailNote}}
+												<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+											{{/customCriticalFailNote}}
+											{{/rollTotal() isRepeatingSkill 1}}
                                             
                                         {{/rollGreater() rollResult 15}}
                                         
@@ -15314,6 +15576,12 @@ visualize what it will look like in chat.
 											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
+
+											{{#rollTotal() isRepeatingSkill 1}}
+											{{^customCriticalFailNote}}
+												<p><span data-i18n="default-repeating-skill-crit-fail-message">The GM may determine what happens to You. (B348)</span></p>
+											{{/customCriticalFailNote}}
+											{{/rollTotal() isRepeatingSkill 1}}
                                             
                                         {{/rollGreater() rollResult 16}}
                                         
@@ -15426,6 +15694,12 @@ visualize what it will look like in chat.
                                                         <p>{{customCriticalSuccessNote}}</p>
                                                     {{/customCriticalSuccessNote}}
                                                     
+													{{#rollTotal() isRepeatingSkill 1}}
+													{{^customCriticalSuccessNote}}
+														<p><span data-i18n="default-repeating-skill-crit-success-message">The GM may determine what happens to You. (B347)</span></p>
+													{{/customCriticalSuccessNote}}
+													{{/rollTotal() isRepeatingSkill 1}}
+													
                                                 {{/rollBetween() rollResult 5 6}}
                                                 
                                             {{/rollGreater() effectiveSkill 15}}
@@ -15462,6 +15736,12 @@ visualize what it will look like in chat.
 													{{#customCriticalSuccessNote}}
                                                         <p>{{customCriticalSuccessNote}}</p>
                                                     {{/customCriticalSuccessNote}}
+
+													{{#rollTotal() isRepeatingSkill 1}}
+														{{^customCriticalSuccessNote}}
+															<p><span data-i18n="default-repeating-skill-crit-success-message">The GM may determine what happens to You. (B347)</span></p>
+														{{/customCriticalSuccessNote}}
+													{{/rollTotal() isRepeatingSkill 1}}
                                                     
                                                 {{/rollTotal() rollResult 5}}
                                             
@@ -16081,9 +16361,9 @@ visualize what it will look like in chat.
 
 	var noop = function () {}; // do nothing callback function.
 
-	const version = "2.7.0.1";
+	const version = "2.7.1";
 
-	const latestChangesDate = "12/2/2021";
+	const latestChangesDate = "12/6/2021";
 
 	var modCascade = true;
 	
@@ -18011,7 +18291,7 @@ visualize what it will look like in chat.
 
 			const skill_points = Number(values.repeating_spells_points);
 
-			const finalSkillLevel = getSkillLevelUsingRaw(baseLevel, difficulty, bonus, 0, 0, skill_points, 1);
+			const finalSkillLevel = getSkillLevelUsingRaw(baseLevel, difficulty, totalModifier, 0, 0, skill_points, 1);
 
 			// make sure to reset the sync back to 0. see function updateSkillLevel()
 			const fieldsToUpdate = {
@@ -20600,13 +20880,15 @@ visualize what it will look like in chat.
 	}
 	
 	on("clicked:range_calc_reset", function() {
-	    resetRangeCalculator();
+	    resetRangeCalculator(resetRollModifiers("ranged"));
 	});
 	
-	function resetRangeCalculator() {
+	function resetRangeCalculator(callback) {
 	    
+		callback = callback || noop;
+
 	    setAttrs(
-	        {
+			{
 	            "firing_distance": 0,
 	            "firing_speed_difference": 0,
 	            "firing_size_mod": 0,
@@ -20614,7 +20896,7 @@ visualize what it will look like in chat.
 				"firing_acc": 0,
 				"firing_aiming_bonus": 0,
 				"firing_rof": 0,
-	        });
+	        }, null, callback);
 	    
 	}
 	

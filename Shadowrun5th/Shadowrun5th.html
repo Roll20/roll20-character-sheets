@@ -12719,19 +12719,23 @@ function importSingleWeapon(text, weapon, number,  ammunition, attributes) {
     if(weapon.type == "Ranged"){
         attributes["weaponismelee"+number] = 0;
         attributes["weaponrc"+number] = weapon.rc.match(/\d+/g).pop()-Math.ceil((parseInt(attributes.str_base) + parseInt(attributes.str_aug))/3)- 1;
-        if(weapon.rawdamage.match(/\d+/) !== null) {
+
+        if(weapon.rawdamage.match(/\d+/) !== null && !weapon.rawdamage.includes("STR")) {
             attributes["weapondv"+number] = weapon.rawdamage.match(/\d+/)[0];
+        }
+        else if(weapon.rawdamage.includes("STR")) {
+           attributes["weapondv"+number] = weapon.damage.match(/\d+/)[0];
         }
         else {
             attributes["weapondv"+number] = weapon.damage.match(/\d+/) != null ? weapon.damage.match(/\d+/)[0] : 0;
         }
 
-        attributes["weapondmgtype"+number] = weapon.rawdamage.match(/\D+/) != null ? weapon.rawdamage.match(/\D+/)[0] : 0;
+        attributes["weapondmgtype"+number] = weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }else{
         attributes["weaponismelee"+number] = "on";
         attributes["weaponreach"+number] = weapon.reach;
         attributes["weapondv"+number] = weapon.damage_english.match(/\d+/) != null ? weapon.damage_english.match(/\d+/)[0] : 0;
-        attributes["weapondmgtype"+number] = weapon.damage_english.match(/\D+/) != null ? weapon.damage_english.match(/\D+/)[0] : 0;
+        attributes["weapondmgtype"+number] = weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }
 
     attributes["weaponname"+number] = weapon.name;
@@ -12816,12 +12820,12 @@ async function importSingleRepeatingWeapon(text, weapon, ammunition, attributes)
             attributes[row + "weapondv"] = weapon.damage.match(/\d+/) != null ? weapon.damage.match(/\d+/)[0] : 0;
         }
 
-        attributes[row + "weapondmgtype"] = weapon.rawdamage.match(/\D+/)[0];
+        attributes[row + "weapondmgtype"] = weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }else{
         attributes[row + "weaponismelee"] = "on";
         attributes[row + "weaponreach"] = weapon.reach;
         attributes[row + "weapondv"] = weapon.damage_english.match(/\d+/) != null ? weapon.damage_english.match(/\d+/)[0] : 0;
-        attributes[row + "weapondmgtype"] = weapon.damage_english.match(/\D+/) != null ? weapon.damage_english.match(/\D+/)[0] : 0;
+        attributes[row + "weapondmgtype"] = weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }
 
     let skills = [];
@@ -12923,7 +12927,7 @@ async function importRepeatingWeaponAmmo(row, ammunition, number, attributes) {
     else {
         attributes[row + "ammoap" + number] = ammo.weaponbonusap != null? ammo.weaponbonusap : 0;
     }
-    attributes[row + "ammoacc" + number] = mmo.weaponbonusacc != null ? ammo.weaponbonusacc : 0;
+    attributes[row + "ammoacc" + number] = ammo.weaponbonusacc != null ? ammo.weaponbonusacc : 0;
 }
 
 function importSingleArmor(armor, attributes) {
@@ -13057,7 +13061,6 @@ const importSingleVehicleMod = (mod, newrowid, attributes, weaponnumber) => {
 }
 
 const importSingleVehicleWeapon = (weapon, newrowid, attributes, weaponnumber) => {
-    console.log(weapon);
     attributes["repeating_vehicles_"+newrowid+"_vehicleweaponname" + weaponnumber] = weapon.name;
     attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"+ weaponnumber] = weapon.accuracy.match(/\d+/g).pop();
     if(weapon.type == "Ranged")
@@ -13096,6 +13099,10 @@ function importSingleDrone(drone, attributes) {
     attributes["repeating_drones_"+newrowid+"_dronearmor"]= drone.armor;
     attributes["repeating_drones_"+newrowid+"_dronenotes"]="";
 
+    if(drone.gears != null) {
+        importAutosofts(drone, newrowid, attributes);
+    }
+
     if(drone.mods != null){
         if(drone.mods.mod.length > 1){
             var weaponnumber = 1;
@@ -13111,6 +13118,7 @@ function importSingleDrone(drone, attributes) {
 
 const importSingleDroneMod = (mod, newrowid, attributes, weaponnumber) => {
     attributes["repeating_drones_" + newrowid + "_dronenotes"] += mod.name + "\n";
+
     if(mod.weapons != null && mod.weapons.weapon != null){
         if(mod.weapons.length > 1){
            return importSingleDroneWeapon(mod.weapons.weapon[0], newrowid, attributes, weaponnumber);
@@ -13145,6 +13153,46 @@ const importSingleDroneWeapon = (weapon, newrowid, attributes, weaponnumber) => 
         }
     }
     return weaponnumber +1;
+}
+
+const importAutosofts = (drone, newrowid, attributes) => {
+
+    let autosofts;
+    if(drone.gears.gear.length > 1) {
+        autosofts = drone.gears.gear.filter(gear => gear.category_english.includes("Autosofts"));
+    }
+    else {
+        if(drone.gears.gear.category_english == "Autosofts") {
+            autosofts = [drone.gears.gear];
+        }
+    }
+
+    if(autosofts != null) {
+        //search for clearsight
+        let clearsight = autosofts.find(soft => soft.name_english.includes("Clearsight Autosoft"));
+        if(clearsight != null) {
+            attributes["repeating_drones_"+newrowid+"_droneperceptionsoft"] = clearsight.rating;
+        }
+
+        //Maneuvering
+        let maneuvering = autosofts.find(soft => soft.name_english.includes("Maneuvering Autosoft"));
+        if(maneuvering != null) {
+            attributes["repeating_drones_"+newrowid+"_dronemaneuversoft"] = maneuvering.rating;
+        }
+
+        //stealth
+        let stealth = autosofts.find(soft => soft.name_english.includes("Stealth Autosoft"));
+        if(stealth != null) {
+            attributes["repeating_drones_"+newrowid+"_dronesneaksoft"] = stealth.rating;
+        }
+
+        //evasion
+        let evasion = autosofts.find(soft => soft.name_english.includes("Evasion Autosoft"));
+        if(evasion != null) {
+            attributes["repeating_drones_"+newrowid+"_dronedodgesoft"] = evasion.rating;
+        }
+    }
+
 }
 
 on("change:wil_base change:wil_aug", function() {
