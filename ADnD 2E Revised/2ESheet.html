@@ -9,12 +9,15 @@
         <h2 style="color: black;">Changes in <input type="text" name="attr_version" class="sheet-version-large" readonly/></h2>
         <div class="sheet-announce-items">
             <ul style="font-style:italic">
-                <li>Follower weapons now correctly autofills damage for Large targets</li>
+                <li>PC Weapons autofill now also set ThAC0</li>
+                <li>PC Weapons now update ThAC0 when base-thac0-calc updates (only if the old values matches)</li>
+                <li>Monster Weapons autofill now also set ThAC0</li>
+                <li>Follower weapons now correctly autofill damage for Large targets</li>
                 <li>Rogue abilities now sum to a maximum of 95% as per the Player's Handbook</li>
                 <li>Added Acid, Holy water, Oil (lit), Poison, and Throw misc. as ranged weapons</li>
-                <li>Added <b>weapons</b> from The Complete Fighter's Handbook</li>
-                <li>Added <b>proficiencies</b> from The Complete Thief's Handbook</li>
-                <li>Added <b>weapons</b> from The Complete Priest's Handbook</li>
+                <li>Added <b>Weapons</b> from The Complete Fighter's Handbook</li>
+                <li>Added <b>Proficiencies</b> from The Complete Thief's Handbook</li>
+                <li>Added <b>Weapons</b> from The Complete Priest's Handbook</li>
                 <li>Added <b>Spells</b> from the Tome of Magic</li>
                 <li>Added checkboxes on the Sheet Settings tab to control the new books</li>
                 <li>Added detailed information about potions initiative modifier and duration</li>
@@ -35534,6 +35537,25 @@ const updateThac0 = (silent) => calculateFormula('thac0-base', 'thac0-base-calc'
 on('change:thac0-base', function(eventInfo) {
     updateThac0(false);
 });
+
+on('change:thac0-base-calc', function(eventInfo) {
+    TAS.repeating('weapons')
+        .fields('ThAC0')
+        .each(function (row) {
+            if (`${row['ThAC0']}` === `${eventInfo.previousValue}`)
+                row['ThAC0'] = eventInfo.newValue;
+        })
+        .execute();
+
+    TAS.repeating('weapons2')
+        .fields('ThAC02')
+        .each(function (row) {
+            if (`${row['ThAC02']}` === `${eventInfo.previousValue}`)
+                row['ThAC02'] = eventInfo.newValue;
+        })
+        .execute();
+});
+
 //Used in version.js
 const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc', 0);
 on('change:weapprof-slots-total', function (eventInfo) {

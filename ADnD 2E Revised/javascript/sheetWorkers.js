@@ -1038,6 +1038,25 @@ const updateThac0 = (silent) => calculateFormula('thac0-base', 'thac0-base-calc'
 on('change:thac0-base', function(eventInfo) {
     updateThac0(false);
 });
+
+on('change:thac0-base-calc', function(eventInfo) {
+    TAS.repeating('weapons')
+        .fields('ThAC0')
+        .each(function (row) {
+            if (`${row['ThAC0']}` === `${eventInfo.previousValue}`)
+                row['ThAC0'] = eventInfo.newValue;
+        })
+        .execute();
+
+    TAS.repeating('weapons2')
+        .fields('ThAC02')
+        .each(function (row) {
+            if (`${row['ThAC02']}` === `${eventInfo.previousValue}`)
+                row['ThAC02'] = eventInfo.newValue;
+        })
+        .execute();
+});
+
 //Used in version.js
 const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc', 0);
 on('change:weapprof-slots-total', function (eventInfo) {
