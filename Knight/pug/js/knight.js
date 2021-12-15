@@ -1122,7 +1122,7 @@ on('change:wizard150PG sheet:opened', async () => {
 on('change:wizard250PG sheet:opened', async () => {
   const attrs = await getAttrsAsync(['wizard250PG']);
 
-  const PG250 = +attrs.wizard250PG;
+  const PG250 = attrs.wizard250PG;
 
   let portee = i18n_porteeCourte;
 
