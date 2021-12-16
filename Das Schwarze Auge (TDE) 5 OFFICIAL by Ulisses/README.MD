@@ -5,7 +5,11 @@
 Official feedback hub for the roll 20 ulisses TDE character sheet & future compendium books
 
 
-### Current Version:
+### Changelog
+1.0.5
+* Separated manual modifiers from modifiers caused through special abilities and effects to prevent race conditions between sheet worker updates and improve performance.
+* Condensed combat techniques for upcoming character advancement buttons
+
 1.0.2 Initial Release
 This system is intended for usage with [Roll20](http://https://roll20.net//) to play "Das Schwarze Auge" / "The Dark Eye" 5th edition.
 
