@@ -3317,6 +3317,349 @@ pri7['Wind Walk'] = {
 
 //#endregion
 
+//#region Tome of Magic
+pri1['Analyze Balance'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Divination',
+    'sphere': 'Numbers, Divination',
+    'range': '80 yards',
+    'duration': '[[5+[[@{level-priest}]] ]] round(s)',
+    'aoe': 'One creature, object, or 10’ square',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'Four iron coins which the priest tosses in his hand while concentrating on the spell. The coins are not consumed in the casting.',
+    'reference': 'p. 51',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell allows a priest to sense how far a character, creature, object, or area is from a condition of balance -- in other words, the degree to which its alignment is removed from true Neutral. The spell gives no indication of the “direction” in which the alignment is removed from true Neutral except under certain conditions which follow. The spell does, however, indicate along which axis or axes of alignment the variation lies.\n&emsp;For example, a priest uses this spell to analyze the balance of a Chaotic Neutral creature. The spell indicates that the creature is removed from Neutral by one grade, and the variation is along the Law/Chaos axis; thus, the creature must be either Chaotic Neutral or Lawful Neutral. If the creature were Chaotic Evil, the spell would indicate that it is removed from balance by two grades, one along each axis; thus, the creature must be Chaotic Evil, Chaotic Good, Lawful Evil, or Lawful Good.\n&emsp;A priest has a 5% chance per level ([[5*[[@{level-priest}]] ]]%) of correctly determining the direction of variation along one randomly chosen axis. This means that a 10th-level priest evaluating the balance of a Chaotic Neutral creature would have a 50% chance of learning that the creature is Chaotic (and hence Chaotic Neutral, since it is only one step away from balance).\n&emsp;Similar to spells such as *detect evil*, this spell will not yield a result on a hidden trap. If cast on a creature with an intelligence level of “animal” or “non-,” it will always read true Neutral (i.e., zero steps removed from balance).'
+}
+
+pri1['Anti-Vermin Barrier'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Abjuration',
+    'sphere': 'Wards',
+    'range': '30 yards',
+    'duration': '[[@{level-priest}]] hour(s)',
+    'aoe': '[[10*[[@{level-priest}]] ]]-foot cubes',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'The caster’s holy symbol and a rodent’s whisker.',
+    'reference': 'p. 51',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, the caster creates an invisible force field that repels nonmagical insects, rodents, spiders, snakes, worms, and similar vermin of less than 1 Hit Die. The spell has no effect on giant-sized versions of these creatures unless they are less than 1 Hit Die. The barrier affects summoned creatures, such as those called by a *summon insects* spell.\n&emsp;Any vermin within the area of effect when the spell is cast are not affected; however, when these creatures exit the area, they cannot return.\n&emsp;The spell affects a cubic area whose sides are 10 feet times the caster’s level (for instance, a 2nd-level priest could affect a 20’×20’×20’ cube.'
+}
+
+pri1['Call Upon Faith'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Invocation',
+    'sphere': 'Summoning',
+    'range': '0',
+    'duration': '1 round',
+    'aoe': 'The caster',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol.',
+    'reference': 'p. 51',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Before attempting a difficult task, the priest may cast *call upon faith* to aid his performance. If the priest has been true to his faith (as determined by the DM), the priest gains a +3 (or +15%) bonus to one die roll (his choice) needed to complete the task. The bonus may be used to affect a saving throw, attack roll, ability check, etc. For example, if a priest were about to cross a narrow log high above a chasm, he could cast this spell and gain a +3 bonus to his Dexterity ability check.'
+}
+
+pri1['Courage'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Enchantment/Charm',
+    'sphere': 'War',
+    'range': '240 yards',
+    'duration': 'Special',
+    'aoe': 'One unit up to 200 individuals',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'A cube of cast iron.',
+    'reference': 'p. 52',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell imbues the target unit with a temporary burst of *courage*. To cast this spell, the priest must have an uninterrupted line of sight to the target unit.\n&emsp;A *courage* spell enables a unit to automatically pass its first morale check following the casting of this spell. When circumstances arise that would necessitate a morale check, no die roll is made and the unit is assumed to have passed the check. After this occurs, the spell ends and the unit must make all future morale checks normally.\n&emsp;If a unit under the influence of a *courage* spell is not forced to make any morale checks, the spell expires at the first sunset.\n&emsp;When several different events simultaneously trigger morale checks, the BATTLESYSTEM rules apply penalties to a single morale check. If this occurs to a unit under the influence of a *courage* spell, the player commanding the unit selects one such event and its modifier is ignored.\n&emsp;No more than one *courage* spell can affect a unit at one time. Once the spell has expired, a priest can cast the spell again on the same unit.'
+}
+
+pri1['Emotion Read'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Divination',
+    'sphere': 'Thought',
+    'range': '[[5*[[@{level-priest}]] ]] yards',
+    'duration': 'Instantaneous',
+    'aoe': 'One creature',
+    'components': 'V, S, M',
+    'cast-time': '3',
+    'saving-throw': 'Negate',
+    'materials': 'A square of unmarked white wax.',
+    'reference': 'p. 52',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell allows the priest to perform an instantaneous reading of a single subject’s emotional state. It can be used on any subject possessing Intelligence of 3 or better. This reading is neither deep nor specific and cannot pick out mixed emotions or intricate details. For example, it might tell the priest that the subject is fearful, but the spell cannot reveal what the subject is afraid of or why he is afraid.\n&emsp;*Emotion read* does not reveal individual thoughts or the subject’s motivation. Thus, the spell might reveal that the subject is coldly unemotional at the moment, but not the fact that the subject is contemplating the cold-blooded murder of the priest.\n&emsp;Note that this reading is instantaneous. It reveals only the emotion that is strongest at the instant the spell is used. While this will usually be related to the subject’s overall emotional state, it is always possible that the subject might be distracted for a moment or remember and respond to past events.\n&emsp;The subject is allowed a normal saving throw vs. spells to resist this spell. If the saving throw is successful, the priest receives no reading at all. If the subject’s roll exceeds the necessary number by six or more, the priest perceives an emotion diametrically opposite to the subject’s true emotion.'
+}
+
+pri1['Know Age'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Divination',
+    'sphere': 'Time',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': 'One object or creature',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'A calendar page.',
+    'reference': 'p. 52',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the caster to instantly know the age of any single person, creature, or object on which he concentrates. The age is accurate to the nearest year.'
+}
+
+pri1['Know Direction'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Divination',
+    'sphere': 'Travelers',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'A small scrap of a parchment map that is at least 100 years old.',
+    'reference': 'p. 52',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Know direction* allows the caster to instantly know the direction of north. The spell is effective in any environment, whether underwater, underground, or in darkness (including magical darkness).'
+}
+
+pri1['Know Time'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Divination',
+    'sphere': 'Time',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': 'The caster',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 53',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Know time* is particularly useful when the caster has been unconscious. This spell enables the caster to know the precise time of day to the nearest minute, including the current hour, day, month, and year.'
+}
+
+pri1['Log of Everburning'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Enchantment',
+    'sphere': 'Elemental Fire, Plant',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] hour(s)',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 53',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell increases the amount of time that a wooden object will burn before being consumed. Wood that is enchanted in this manner burns brightly without being consumed for the duration of the spell. When the spell ends, the wooden object crumbles to ash.\n&emsp;This spell does not cause the wood to catch fire; it must be ignited normally. While it burns, the wood gives off twice the normal amount of heat; thus, a single log can make a cozy fire.\n&emsp;The affected wood radiates magic. The priest may enchant up to 1 cubic foot of wood per level of experience. Currently [[@{level-priest}]] cubic feet of wood. The spell is effective on torches.'
+}
+
+pri1['Mistaken Missive'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Alteration',
+    'sphere': 'Chaos',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '[[@{level-priest}]] page(s)',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'Three drops of ink.',
+    'reference': 'p. 53',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell alters the appearance of words written in ink. When the spell is cast upon a written page, the ink imperceptibly begins to move. Over the next few days, the message becomes progressively more illegible. If the page is left undisturbed for six days, an entirely new message forms on the page. The new message is completely legible and is recognizable as the handwriting of the original author, but is contrary in content to the original message.\n&emsp;After the spell is cast, the message will appear different every day. The DM decides the message that the page will carry after the sixth day has passed. Following is a sample of the changes that could take place in a message.\n&emsp;*Day One:* The words of the letter appear faint, as if the author of the letter was running out of ink as he wrote.\n&emsp;*Day Two:* The words have moved slightly from their original positions, as if the person writing the letter were shaking or in a moving carriage when the letter was written.\n&emsp;*Days Three and Four:* The message is gibberish. Although the ink forms groups of letters arranged in lines with punctuation, nearly all the words are meaningless. This may appear to be some sort of code, but it means nothing.\n&emsp;*Day Five:* The ink has formed real words. However, the sentence construction is still meaningless (e.g., Egg west worse green!).\n&emsp;*Day Six (and beyond):* The message is coherent, but the opposite intent of the original message has been created. If the original letter read, “Send troops quickly,” the new letter reads, “All is fine. Keep your men in reserve.”\n\n&emsp;If *mistaken missive* is cast on the pages of a spellbook or a scroll, the ink on the page reforms into a new spell of the same level as the original spell. Thus, a *darkness* spell might become a *maze* spell. However, the spell formula will be wrong. Although it will look like a proper spell, it will not function when cast.\n&emsp;A coded message that is subjected to *mistaken missive* will appear as a coded message on the sixth day but will hold a different meaning than the original message.\n&emsp;A *glass of preserved words* will allow the original message to be read correctly. *Dispel magic* will restore the message to its original form.'
+}
+
+pri1['Morale'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Enchantment/Charm',
+    'sphere': 'War',
+    'range': 'Special',
+    'duration': 'Special',
+    'aoe': 'One unit up to 200 individuals',
+    'components': 'V, S, M',
+    'cast-time': 'Special',
+    'saving-throw': 'None',
+    'materials': '*Way 1:* A gem of at least 100 gp value which is consumed during the casting. *Way 2:* The priest’s holy symbol',
+    'reference': 'p. 53',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell can be used in two distinct ways. The first is appropriate for battlefield use. The priest can cast this spell on any unit within 240 yards in an uninterrupted line of sight. The casting time for this use is one turn.\n&emsp;At the conclusion of this use of the spell, the target unit’s *morale* is modified by 1, either positively or negatively, as the caster desires. This modification remains in effect for 1d4+2 turns.\n&emsp;The second and more powerful use of the spell requires lengthy preparations. Casting must take place inside or within 100 yards of a place of worship dedicated to the casting priest’s deity. Both the priest and the unit to be affected must be present. The casting time for this use is 5 turns.\n&emsp;At the conclusion of this use of the spell, the unit’s *morale* is raised by 3 (maximum of 19). This *morale* increase lasts until the next sunset. Only priests of 10th level or higher can cast this version of the spell.'
+}
+
+pri1['Personal Reading'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Divination',
+    'sphere': 'Numbers',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'One creature',
+    'components': 'V, S, M',
+    'cast-time': '2 turns',
+    'saving-throw': 'None',
+    'materials': 'A small book of numerological formulae and notes (different from the book used in *telethaumaturgy*). The book is not consumed in the casting.',
+    'reference': 'p. 54',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell allows the priest to mathematically analyze personal information about one human or demihuman character and learn valuable facts about that character. To cast this spell, the priest must know the subject’s real name (the name the subject was given as a child) or the date and place of the character’s birth. The priest analyzes this information and is able to build a rough picture of the character’s life history and personal specifics.\n&emsp;The “historical” information discovered through this spell is generally vague. For example, the priest might learn that the subject was born in the woods and moved to the city only after hardship made his life untenable. Specific information is up to the DM. The DM might provide some or all of the following information.\n&emsp;• The subject’s character class or career\n&emsp;The subject’s approximate level (stated in terms such as “novice,” “highly skilled,” “moderately competent,” etc.)\n&emsp;• The subject’s standing in the community (“highly respected,” “mistrusted,” “considered an enigma,” etc.)\n&emsp;• The subject’s success or failure in his profession\n&emsp;• The subject’s prevailing character traits or mannerisms\n\n&emsp;If the priest casts the spell based on an alias or incorrect birth information, the reading will be inaccurate. The DM should develop a history and personality at odds with the truth. This might allow the priest to determine whether the name of the subject is correct--a reading giving information that conflicts with what the priest already knows should be a clue that the name is incorrect.\n&emsp;The subject need not be present during the casting. The priest can cast the spell without ever having met the subject.\n&emsp;A DM may rule that this spell can be cast on humanoids or monstrous creatures. The information available will be similar (considering that words like “profession” will mean something different when applied to an ogre). This spell will categorically fail on creatures that have no concept of a personal name.'
+}
+
+pri1['Ring of Hands'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Abjuration (Reversible)',
+    'sphere': 'Protection',
+    'range': '0',
+    'duration': '[[2d10]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 54',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This is a cooperative magic spell. It requires a minimum of two priests and can accommodate a maximum of ten. Each priest must cast *ring of hands* on the same round. At the end of the casting, the priests involved join hands, thus completing the spell. If any priest breaks the circle, the spell immediately ceases. The priests may not move from their locations but are free to speak. They may not cast spells requiring a somatic or material component while the ring is formed.\n&emsp;The *ring of hands* forms a protective barrier around the priests and everything within their circle. For each priest, assume a five-foot circumference of the circle; thus, three priests would create a circle of 15-foot circumference. For easy calculation, assume that for each priest, the circle can accommodate four persons.\n&emsp;The barrier functions as a *protection from evil* spell. Attacks by evil creatures suffer a -1 penalty for every priest forming the circle. Saving throws made by the priests or anyone in the circle against attacks from such creatures receive a +1 bonus for every priest in the circle.\n&emsp;Attempts at mental control over protected creatures are blocked. Extraplanar and conjured creatures are unable to touch the priests and those within the circle, although melee attacks against such creatures by those within the ring break the barrier.\n&emsp;Because the priests casting the spell cannot move and must hold hands, they do not receive any Dexterity bonuses to Armor Class. Furthermore, opponents gain a +2 bonus on attack rolls against the priests, since there is little they can do to avoid a blow. Creatures within the ring are free to act as they wish. Melee attacks by those within the ring are limited to piercing weapons and suffer a -1 penalty to attack rolls since the priests intervene.\n&emsp;The reverse of this spell, *ring of woe*, functions as detailed above except the effect applies to good creatures as would a *protection from good* spell.'
+}
+
+pri1['Sacred Guardian'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Guardian',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] day(s)',
+    'aoe': 'Creature touched',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'A rose petal that has been kissed by the spell recipient.',
+    'reference': 'p. 55',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By use of this spell, a priest becomes instantly aware when the recipient of the spell is in danger, regardless of the distance between the priest and the recipient. The recipient may be on a different plane of existence than the priest.\n&emsp;When this spell is cast by a priest of at least 3rd level, he receives a mental image of the endangered person’s situation. At no time, however, does the priest know the person’s location through the use of this spell.'
+}
+
+pri1['Speak With Astral Traveler'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Alteration',
+    'sphere': 'Astral',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] round(s)',
+    'aoe': 'One creature',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 55',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a priest casts the 7th-level *astral spell*, he leaves his physical body in suspended animation while his astral body travels. By touching the comatose body and casting *speak with astral traveler*, a priest can mentally communicate with the projected individual. Although communication is mental, it takes the same amount of time as a normal, verbal dialogue. The spell ends abruptly when its duration expires.'
+}
+
+pri1['Thought Capture'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Divination',
+    'sphere': 'Thought',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': '10 yards',
+    'components': 'V, S',
+    'cast-time': '3',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 55',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'One of the more bizarre contentions held by priests of the School of Thought is generally scoffed at by outsiders. The theory states that once a thought has occurred in someone’s brain, it exists as a “freestanding mental object.” This “thought object” usually remains inside the brain of the creature that created it, but sometimes it escapes (this supposedly explains why people forget things). When this happens, the thought object stays in the geographical area where it was lost. Any receptive brain (usually the brain of the creature that initially created the thought) can pick it up again simply by bumping into the invisible, free-floating thought. According to the theory, this is the reason that people can regain a lost thought by going back to the location where the thought was lost. This supposedly works because the free-floating thought is recaptured, not because the locale reminds them of the thought. Unfortunately for philosophers who disagree with this, *thought capture* seems to be extremely strong evidence for this theory.\n&emsp;This spell makes the priest’s brain something of a magnet that attracts thought objects in close proximity. The priest can sense strong thoughts and emotions and can sometimes even see momentary visions of creatures who died or suffered some powerful emotion in the immediate vicinity. Thought objects are always attracted to the priest in the order of the strongest (those attached to powerful emotions or significant events) to the weakest. Thus, if several thought objects share the same vicinity, the priest will perceive information about the most interesting or significant event. The priest might pick up images of a battle from the point of view of a warrior who died there, or he might gain information about the victor of the battle.\n&emsp;The DM dictates the information provided to the priest, and thus can use this spell to provide players with important background information or can add texture to a campaign world. The information provided might be highly cryptic or symbolic, perhaps in the form of a rhyme or riddle.\n&emsp;The priest gains one thought object per casting of the spell. The spell may be cast a number of times in the same locale, with the priest gaining a different thought object with each casting. A locale contains a finite number of thoughts, however, and once the priest has gained all of them (per the DM), the spell will fail in that locale.'
+}
+
+pri1['Weighty Chest'] = {
+    'category': '',
+    'level': '1',
+    'school': 'Alteration',
+    'sphere': 'Wards',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] day(s)',
+    'aoe': '5-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'A lead ball.',
+    'reference': 'p. 55',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the caster to enchant a chest, book, package, or any other nonliving object no larger than a 5’×5’×5’ cube. When the enchanted object is touched by anyone other than the caster, the apparent weight of the object increases, becoming 2-5 ([[1d4+1]]) times the weight of the person or persons touching it. This condition makes the object extremely difficult to move for anyone but the caster. The caster can move the object normally throughout the duration of the spell.'
+}
+
+//#endregion
+
 const priestSpells = {};
 priestSpells['pri1'] = pri1;
 priestSpells['pri2'] = pri2;
