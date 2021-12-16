@@ -1,5 +1,9 @@
 Change Log
 ==============================================
+**2021-12-15 ** v.7 Paul V
+	Fixed NPC CR current using the incorrect attribute --Reset to using attr_CR
+**2021-12-15 ** v.6 Paul V
+	Fixed formatting on Reaction Names and Notes on the NPC Sheet
 **2021-12-05 ** v.5 Paul V
 	Attribute changes to enable importing of characters
 	attr_strengthmod to attr_strength_mod
