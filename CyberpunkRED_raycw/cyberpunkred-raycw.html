@@ -107,7 +107,7 @@
 			</div>
 			<div class='statbox'>
 				<div class="h2">MOVE</div>
-				<div class='outof'><input type="number" name="attr_Movement" /></div>of</div><input type="number" name="attr_Movement_max" /></div>
+				<div class='outof'><input type="number" name="attr_Movement" /><div>of</div><input type="number" name="attr_Movement_max" /></div>
 			</div>
 			<div class='statbox'>
 				<div class="h2">BODY</div>
@@ -813,6 +813,8 @@
 						<div class="bg-white weapon-name"><button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+1d10]]}}">Attack:</button> <input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here..."></div>
 						<div class="bg-white weapon-type">
 							<select name="attr_Weapontype" class="Weapontype">
+								<option value="Brawling">Brawling</option>
+								<option value="Martial Arts">Martial Arts</option>
 								<option value="Melee">Melee</option>
 								<option value="Pistol">Pistol</option>
 								<option value="SMG">SMG</option>
@@ -1437,6 +1439,14 @@
 
 		<div class=header>DV</div>
 
+		<!-- Need to find a way to remove the range table for these two skills -->
+
+		{{#Brawling}}
+		{{/Brawling}}
+		
+		{{#Martial Arts}}
+		{{/Martial Arts}}
+
 		<!-- Table for Pistols -->
 
 		{{#Pistol}}
@@ -1572,48 +1582,32 @@
 			});
 	});
 
-	on("change:Willpower change:Body sheet:opened", function() {
+	on("change:Dexterity_max change:HeadPenalty change:BodyPenalty", function() {
 		getAttrs([
-			"Willpower",
-			"Body"
-			], function(values) {
-
-				const WILL = parseInt(values.Willpower)||0;
-				const BODY = parseInt(values.Body)||0;
-
-				var maxhp = 10 + 5 * Math.ceil((WILL+BODY)/2);
-
-				setAttrs({
-					"hp_max" : maxhp
-				});
-			});
-	});
-
-	on("change:HeadPenalty change:BodyPenalty", function() {
-		getAttrs([
-			"Reflex_max",
+			"HeadPenalty",
+			"BodyPenalty",
 			"Dexterity_max",
+			"Reflex_max",
 			"Movement_max"
 			], function(values) {
 
-				const REF = parseInt(values.Reflex_max)||0;
-				const DEX = parseInt(values.Dexterity_max)||0;
-				const MOVE = parseInt(values.Movement_max)||0;
+				const headpen = Math.abs(parseInt(values.HeadPenalty))||0;
+				const bodypen = Math.abs(parseInt(values.BodyPenalty))||0;
+				const DEX = parseInt(values.Dexterity_max);
+				const REF = parseInt(values.Reflex_max);
+				const MOVE = parseInt(values.Movement_max);
 
-				const HeadPenalty = Math.abs(parseInt(values.HeadPenalty))||0;
-				const BodyPenalty = Math.abs(parseInt(values.BodyPenalty))||0;
-
-				var maxpenalty = Math.max(HeadPenalty, BodyPenalty)||0;
+				var maxpenalty = Math.max(headpen,bodypen)||0;
 
 				setAttrs({
-					"Reflex" : REF - maxpenalty;
-					"Dexterity" : DEX - maxpenalty
+					"Dexterity" : DEX - maxpenalty,
+					"Reflex" : REF - maxpenalty,
 					"Movement" : MOVE - maxpenalty
 				});
 			});
 	});
 
-	on("change:repeating_weapons:Weapontype change:Reflex change:Dexterity sheet:opened", function() {
+	on("change:repeating_weapons:Weapontype change:Dexterity change:Reflex sheet:opened", function() {
 		getAttrs([
 			"repeating_weapons_Weapontype",
 			"repeating_weapons_Weaponmod",
