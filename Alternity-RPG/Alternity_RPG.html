@@ -1,5 +1,38 @@
 <div class="sheet-overall-wrapper">
 
+<script type="text/worker">
+/* ===== PARAMETERS ==========
+destinations = the name of the attribute that stores the total quantity
+        can be a single attribute, or an array: ['total_cost', 'total_weight']
+        If more than one, the matching fields must be in the same order.
+    section = name of repeating fieldset, without the repeating_
+    fields = the name of the attribute field to be summed
+          destination and fields both can be a single attribute: 'weight'
+          or an array of attributes: ['weight','number','equipped']
+*/
+const repeatingSum = (destinations, section, fields) => {
+    if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
+    if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
+    getSectionIDs(`repeating_${section}`, idArray => {
+        const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))], []);
+        getAttrs([...attrArray], v => {
+            const getValue = (section, id, field) => v[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : parseFloat(v[`repeating_${section}_${id}_${field}`]) || 0;
+            const commonMultipliers = (fields.length <= destinations.length) ? [] : fields.splice(destinations.length, fields.length - destinations.length);
+            const output = {};
+            destinations.forEach((destination, index) => {
+                output[destination] = (idArray.reduce((total, id) => total + getValue(section, id, fields[index]) * commonMultipliers.reduce((subtotal, mult) => subtotal * getValue(section, id, mult), 1), 0)).toFixed(2);
+            });
+            setAttrs(output);
+        });
+    });
+};
+
+on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty change:repeating_equipment:ItemIsWorn remove:repeating_equipment', function() {
+	repeatingSum("EquipmentTotal", "equipment", ["ItemMass", "ItemQty", "ItemIsWorn"]);
+});
+
+</script>
+
 <img src="http://i.imgur.com/Qw48Upj.png" title="Alternity Science Fiction Roleplaying Game"/>
 <input type="radio" name="attr_mode" class="sheet-tab sheet-tab21" value="21" title="Character" checked="checked" />
 <span class="sheet-tab sheet-tab21">Character</span>
@@ -23,15 +56,15 @@
 		<td><P class="sheet-broadskill">Career </P></td>
 		<td><input type="text" name="attr_career"></td>
 		<td><P class="sheet-broadskill">Character Trait</P></td>
-		<td><input type="text" name="attr_attributestrait1"></td>		
+		<td><input type="text" name="attr_attributestrait1"></td>
 	</tr>
 	<tr>
 		<td><P class="sheet-broadskill">Motivation</P></td>
-		<td><input type="text" name="attr_attributesmotivation"></td>		
+		<td><input type="text" name="attr_attributesmotivation"></td>
 		<td><P class="sheet-broadskill">Moral Attitude</P></td>
-		<td><input type="text" name="attr_attributesmoral"></td>		
+		<td><input type="text" name="attr_attributesmoral"></td>
 		<td><P class="sheet-broadskill">Character Trait</P></td>
-		<td><input type="text" name="attr_attributestrait2"></td>		
+		<td><input type="text" name="attr_attributestrait2"></td>
 	</tr>
 	<tr>
 		<td><P class="sheet-broadskill">Hero Level </P></td>
@@ -215,7 +248,7 @@
 			</div>
 			<div class="sheet-col">
 				<div class="sheet-skilltitle sheet-row">PERSONAL DATA</div>
-				
+
 				<div class="sheet-col">
 					<div class="sheet-8emwidth sheet-broadskill">Age</div><input type="text" name="attr_age" class="sheet-range">
 					<div class="sheet-8emwidth sheet-broadskill">Hair</div><input type="text" name="attr_hair" class="sheet-range">
@@ -223,15 +256,15 @@
 				<div class="sheet-col">
 					<div class="sheet-8emwidth sheet-broadskill">Height</div><input type="text" name="attr_height" class="sheet-range">
 					<div class="sheet-8emwidth sheet-broadskill">Eyes</div><input type="text" name="attr_eyes" class="sheet-range">
-				</div>				
+				</div>
 				<div class="sheet-col">
 					<div class="sheet-8emwidth sheet-broadskill">Weight</div><input type="text" name="attr_weight" class="sheet-range">
 					<div class="sheet-8emwidth sheet-broadskill">Skintone</div><input type="text" name="attr_skintone" class="sheet-range">
 				</div>
-					
+
 				<div class="sheet-broadskill sheet-row">Appearance</div>
 				<div class="sheet-row"><textarea name="attr_appearance"></textarea></div>
-					
+
 				<div class="sheet-broadskill sheet-row">Contacts</div>
 				<div class="sheet-row"><textarea name="attr_contacts"></textarea></div>
 				<div class="sheet-broadskill sheet-row">Enemies</div>
@@ -306,7 +339,7 @@
 			<TD><input type="text" name="attr_form5damageordinary" class="sheet-dicetype"><input type="text" name="attr_form5damageordinarytype" class="sheet-dmgtype">/<input type="text" name="attr_form5damagegood" class="sheet-dicetype"><input type="text" name="attr_form5damagegoodtype" class="sheet-dmgtype">/<input type="text" name="attr_form5damageamazing" class="sheet-dicetype"><input type="text" name="attr_form5damageamazingtype" class="sheet-dmgtype"></TD>
 		</TR>
 		</TABLE>
-		
+
 		<table>
 		<tr>
 			<th><P class="sheet-skilltitle">WEAPON DATA</p></th>
@@ -1697,20 +1730,28 @@
 			<div class="sheet-col sheet-16emwidth">Item Name</div>
 			<div class="sheet-col" style="width:24em;">Item Description</div>
 			<div class="sheet-col sheet-10emwidth">Location</div>
+			<div class="sheet-col" style="width:3em;">Worn?</div>
 			<div class="sheet-col" style="width:3em;">Mass</div>
-			<div class="sheet-col">Total Mass</div>
+			<div class="sheet-col">Total</div>
 		</div>
-	
+
 	<fieldset class="repeating_equipment">
 		<div class="sheet-row">
 			<div class="sheet-col"><input type="text" name="attr_ItemQty" class="sheet-score" value="0"></div>
 			<div class="sheet-col"><input type="text" name="attr_ItemName" class="sheet-16emwidth" placeholder="Enter Item"></div>
 			<div class="sheet-col"><input type="text" name="attr_ItemDescription" style="width:24em;" placeholder="Enter Description"></div>
 			<div class="sheet-col"><input type="text" name="attr_ItemLocation" class="sheet-12emwidth" placeholder="Item Location"></div>
+			<div class="sheet-col"><input type="checkbox" name="attr_ItemIsWorn" style="width:3em;" placeholder="Item Is Worn" value="1"></div>
 			<div class="sheet-col"><input type="text" name="attr_ItemMass" class="sheet-score" value="0"></div>
 			<div class="sheet-col"><input type="text" name="attr_ItemTotalMass" class="sheet-score" disabled="true" value="@{ItemMass}*@{ItemQty}"></div>
 		</div>
 	</fieldset>
+
+	<div class="sheet-row">
+		<div class="sheet-broadskill sheet-col" style="width: 8em">Total worn mass: </div>
+		<span name="attr_EquipmentTotal"></span>
+	</div>
+
 </div>
 
 <div class="sheet-section-customskills">
@@ -1869,13 +1910,13 @@
 	<div class="sheet-row">
 		<div class="sheet-20emwidth sheet-col"></div>
 		<div class="sheet-col"><h3 class="sheet-row sheet-skilltitle">Starship Weapons</h3></div>
-	</div>	
+	</div>
 	<div class="sheet-row">
 		<div class="sheet-col" style="width:2em;"></div>
 		<div class="sheet-col sheet-broadskill sheet-16emwidth">Weapon Name</div>
 		<div class="sheet-col sheet-broadskill" style="width:3em;">Acc</div>
 		<div class="sheet-col sheet-8emwidth sheet-broadskill">Range</div>
-		<div class="sheet-col sheet-4emwidth sheet-broadskill">Type</div> 
+		<div class="sheet-col sheet-4emwidth sheet-broadskill">Type</div>
 		<div class="sheet-col sheet-20emwidth sheet-broadskill">Damage</div>
 		<div class="sheet-col sheet-broadskill">Actions</div>
 	</div>
@@ -1889,11 +1930,11 @@
 			<div class="sheet-col"><input type="text" name="attr_StarshipWeaponActions" class="sheet-dmgtype"></div>
 		</div>
 	</fieldset>
-	
+
 	<div class="sheet-row">
 		<div class="sheet-20emwidth sheet-col"></div>
 		<div class="sheet-col"><h3 class="sheet-row sheet-skilltitle">Starship Equipment</h3></div>
-	</div>	
+	</div>
 	<div class="sheet-row">
 		<div class="sheet-col sheet-broadskill sheet-10emwidth">Equipment Name</div>
 		<div class="sheet-col sheet-broadskill sheet-8emwidth">Type</div>
@@ -1904,7 +1945,7 @@
 	<fieldset class="repeating_starshipEquipment">
 		<div class="sheet-row">
 			<div class="sheet-col"><input type="text" name="attr_StarshipEquipmentName" class="sheet-12emwidth" placeholder="Enter Equipment Name"></div>
-			<div class="sheet-col" style="height: 2em;"><select name="attr_StarshipEquipmentType" class="sheet-8emwidth">                
+			<div class="sheet-col" style="height: 2em;"><select name="attr_StarshipEquipmentType" class="sheet-8emwidth">
 					<option value="Power">Power</option>
 					<option value="Engines">Engines</option>
 					<option value="Drive">Drive</option>
@@ -1922,7 +1963,7 @@
 			<div class="sheet-col"><input type="text" name="attr_StarshipEquipmentDescription" style="width:30em;"></div>
 		</div>
 	</fieldset>
-	
+
 	<div class="sheet-row">
 		<div class="sheet-20emwidth sheet-col"></div>
 		<div class="sheet-col"><h2 class="sheet-row sheet-skilltitle">Starship Compartments</h2></div>

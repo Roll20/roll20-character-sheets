@@ -88,6 +88,9 @@ on('clicked:distanceRangerLongbow', async (info) => {
     'bVDiversTotalRanger',
     'bVDiversD6',
     'bVDiversFixe',
+    'devasterAnatheme',
+    'bourreauTenebres',
+    'equilibreBalance',
   ];
 
   attributs = attributs.concat(arme, evolutions, effets, ameliorations, special, listBase, listArmureLegende, listStyle);
@@ -118,6 +121,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let attaquesSurprisesValue = [];
   let attaquesSurprisesCondition = '';
 
+  const devaste = +attrs.devasterAnatheme;
+  const bourreau = +attrs.bourreauTenebres;
+  const equilibre = +attrs.equilibreBalance;
+
   const portee = attrs.rangerArmePortee;
   const autresEffets = [];
   const autresAmeliorations = [];
@@ -125,6 +132,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
 
   const energie = attrs.energiePJ;
   let energieDepense = 0;
+
+  let isSurprise = false;
+  let isFureur = false;
+  let isUltraviolence = false;
 
   if (PG50_2 === 'on') {
     diceDegats = Number(attrs.rangerArmeDegatEvol.split('D')[0]);
@@ -169,9 +180,9 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let C3Nom = '';
   let C4Nom = '';
 
-  const vDiscretion = attrs.discretion;
-  const oDiscretion = attrs[ODValue.discretion];
-  const oTir = attrs[ODValue.tir];
+  const vDiscretion = +attrs.discretion;
+  const oDiscretion = +attrs[ODValue.discretion];
+  const oTir = +attrs[ODValue.tir];
 
   let E1 = 2;
   let E2 = 3;
@@ -310,6 +321,8 @@ on('clicked:distanceRangerLongbow', async (info) => {
   }
 
   if (eUltraviolence !== '0') {
+    isUltraviolence = true;
+
     exec.push(`{{ultraviolence=${i18n_ultraviolence}}}`);
     exec.push('{{ultraviolenceValue=[[2D6]]}}');
     exec.push(`{{ultraviolenceCondition=${i18n_ultraviolenceCondition}}}`);
@@ -351,6 +364,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
   }
 
   if (eFureur !== '0') {
+    isFureur = true;
     isConditionnelV = true;
     exec.push(`{{fureur=${i18n_fureur}}}`);
     exec.push('{{fureurValue=[[4D6]]}}');
@@ -726,9 +740,20 @@ on('clicked:distanceRangerLongbow', async (info) => {
     exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
     exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
     exec.push(attaquesSurprisesCondition);
+    isSurprise = true;
   }
 
   if (rChambreDouble !== 0) { exec.push(`{{vChambreDouble=${rChambreDouble}}}`); }
+
+  if (devaste || bourreau || equilibre) {
+    const herauts = [];
+
+    if (devaste) { herauts.push(i18n_devasterAnatheme); }
+    if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+    if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+    exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+  }
 
   if (isConditionnelA === true) { exec.push('{{succesConditionnel=true}}'); }
 
@@ -736,54 +761,60 @@ on('clicked:distanceRangerLongbow', async (info) => {
 
   if (isConditionnelV === true) { exec.push('{{violenceConditionnel=true}}'); }
 
+  let finalRoll;
   if (!pasEnergie) {
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    finalRoll = await startRoll(exec.join(' '));
 
-      const tDegats = results.results.degats.result;
-      const tViolence = results.results.violence.result;
+    const tJet = finalRoll.results.jet.result;
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-          degats: tDegats,
-          violence: tViolence,
-        },
-      );
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
 
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
 
-      setAttrs({
-        energiePJ: resultatEnergie,
-      });
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+      isFureur,
+      isUltraviolence,
+      isSurprise,
+    };
 
-      if (resultatEnergie === 0) {
-        startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=^{ranger-fusil-longbow}}} {{text=${i18n_plusEnergie}}}`, (exploit) => {
-          finishRoll(
-            exploit.rollId, {},
-          );
-        });
-      }
+    const computed = updateRoll(finalRoll, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
+
+    const finalComputed = {
+      jet: tJet + tBonus,
+    };
+
+    Object.assign(finalComputed, computed);
+
+    finishRoll(finalRoll.rollId, finalComputed);
+
+    if (tJet !== 0 && tJet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+      const tRExploit = exploitRoll.results.jet.result;
+      const exploitComputed = {
+        jet: tRExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
+
+    setAttrs({
+      energiePJ: resultatEnergie,
     });
+
+    if (resultatEnergie === 0) {
+      finalRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=^{ranger-fusil-longbow}}} {{text=${i18n_plusEnergie}}}`);
+      finishRoll(finalRoll.rollId, {});
+    }
   } else {
-    startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=^{ranger-fusil-longbow}}} {{text=${i18n_pasEnergie}}}`, (exploit) => {
-      finishRoll(
-        exploit.rollId, {},
-      );
-    });
+    finalRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=^{ranger-fusil-longbow}}} {{text=${i18n_pasEnergie}}}`);
+    finishRoll(finalRoll.rollId, {});
   }
 });

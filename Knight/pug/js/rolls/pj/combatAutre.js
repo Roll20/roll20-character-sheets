@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable max-len */
 /* eslint-disable no-undef */
-const rollCombatAutre = ['repeating_armeautre:armeautre'];
+const rollCombatAutre = ['repeating_armeautre:armeautrepj'];
 
 rollCombatAutre.forEach((button) => {
   on(`clicked:${button}`, async (info) => {

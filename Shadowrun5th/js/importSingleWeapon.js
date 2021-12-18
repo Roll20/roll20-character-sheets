@@ -2,19 +2,23 @@ function importSingleWeapon(text, weapon, number,  ammunition, attributes) {
     if(weapon.type == "Ranged"){
         attributes["weaponismelee"+number] = 0;
         attributes["weaponrc"+number] = weapon.rc.match(/\d+/g).pop()-Math.ceil((parseInt(attributes.str_base) + parseInt(attributes.str_aug))/3)- 1;
-        if(weapon.rawdamage.match(/\d+/) !== null) {
+
+        if(weapon.rawdamage.match(/\d+/) !== null && !weapon.rawdamage.includes("STR")) {
             attributes["weapondv"+number] = weapon.rawdamage.match(/\d+/)[0];
         }
+        else if(weapon.rawdamage.includes("STR")) {
+           attributes["weapondv"+number] = weapon.damage.match(/\d+/)[0];
+        }
         else {
-            attributes["weapondv"+number] = weapon.damage.match(/\d+/)[0];
+            attributes["weapondv"+number] = weapon.damage.match(/\d+/) != null ? weapon.damage.match(/\d+/)[0] : 0;
         }
 
-        attributes["weapondmgtype"+number] = weapon.rawdamage.match(/\D+/)[0];
+        attributes["weapondmgtype"+number] = weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }else{
         attributes["weaponismelee"+number] = "on";
         attributes["weaponreach"+number] = weapon.reach;
         attributes["weapondv"+number] = weapon.damage_english.match(/\d+/)[0];
-        attributes["weapondmgtype"+number] = weapon.damage_english.match(/\D+/)[0];
+        attributes["weapondmgtype"+number] = weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }
 
     attributes["weaponname"+number] = weapon.name;

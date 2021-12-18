@@ -128,10 +128,14 @@ buttonBerserk.forEach((button) => {
     getAttrs([button], (value) => {
       const active = value[button];
       let newValue = 'on';
-
-      if (active === 'on') { newValue = ''; }
-
       const newAttr = {};
+
+      if (active === 'on') {
+        newValue = '';
+
+        if (button === 'berserkRageA') { newAttr.berserkNiveaux = 0; }
+      }
+
       newAttr[button] = newValue;
 
       setAttrs(newAttr);
@@ -145,7 +149,7 @@ buttonNiveauRage.forEach((button) => {
   on(`clicked:${button}`, () => {
     getAttrs(['berserkNiveaux'], (value) => {
       const niveauRage = parseInt(value.berserkNiveaux, 10) || 0;
-      let newValue = button.split('_')[1];
+      let newValue = +button.split('_')[1];
 
       if (niveauRage === newValue) { newValue = 0; }
 

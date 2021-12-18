@@ -121,12 +121,14 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   let isLeste = false;
   let isLourd = false;
   let isELumiere = false;
+  let isFureur = false;
   let isMeurtrier = false;
   let isObliteration = false;
   let isOrfevrerie = false;
   let isSilencieux = false;
   let isTenebricide = false;
   let isTirRafale = false;
+  let isUltraviolence = false;
 
   const eAntiAnatheme = isApplied(effet[`${prefix}antiAnatheme`]);
   const eAntiVehicule = isApplied(effet[`${prefix}antiVehicule`]);
@@ -262,6 +264,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
 
   if (eFureur) {
     isConditionnelV = true;
+    isFureur = true;
 
     firstExec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
 
@@ -343,8 +346,6 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
     isConditionnelD = true;
     isConditionnelV = true;
 
-    exec.push(`{{tenebricide=${i18n_tenebricide}}} {{tenebricideConditionD=${i18n_tenebricideConditionD}}} {{tenebricideConditionV=${i18n_tenebricideConditionV}}}`);
-
     isTenebricide = true;
   }
 
@@ -357,6 +358,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
 
   if (eUltraviolence) {
     isConditionnelV = true;
+    isUltraviolence = true;
 
     firstExec.push(`{{ultraviolenceValue=[[${eUltraviolenceV}D6]]}}`);
 
@@ -451,6 +453,8 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   result.isAssistantAttaque = isAssistantAttaque;
   result.isAntiAnatheme = isAntiAnatheme;
   result.isTirRafale = isTirRafale;
+  result.isFureur = isFureur;
+  result.isUltraviolence = isUltraviolence;
 
   result.eLumiere = eLumiere;
   result.isELumiere = isELumiere;
@@ -3120,7 +3124,7 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
           isConditionnelD = true;
 
           exec.push(`{{vODGhostA=${i18n_ghost}}}`);
-          exec.push(`{{vODGhostAValue=[[${vDiscretion}D6+${oDiscretion}]]}}`);
+          exec.push(`{{vODGhostAValue=[[{${vDiscretion}D6cs2cs4cs6cf1cf3cf5s%2}=0+${oDiscretion}]]}}`);
           exec.push(`{{vODGhostCondition=${i18n_attaqueSurpriseCondition}}}`);
 
           attaquesSurprises.unshift(i18n_ghost);
@@ -3427,7 +3431,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
 
       if (isELourd) {
         const type = value.stylePuissantType;
-        const bonus = Number(value.stylePuissantBonus);
+        const bonus = value.stylePuissantBonus;
         const malus = 0 - bonus;
 
         exec.push(`{{vMStyleA=${malus}D}}`);
@@ -3606,4 +3610,425 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, hasArmu
   result.diceViolence = dViolence;
 
   return result;
+}
+
+function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, diceViolence, bonusViolence, conditions) {
+  const tSurprise = roll.results.attaqueSurpriseValue || {};
+  const tDestructeur = roll.results.destructeurValue || {};
+  const tFureur = roll.results.fureurValue || {};
+  const tMeurtrier = roll.results.meurtrierValue || {};
+  const tUltraviolence = roll.results.ultraviolenceValue || {};
+
+  const tArmeAzurineValueD = roll.results.armeAzurineValueD || {};
+  const tArmeAzurineValueV = roll.results.armeAzurineValueV || {};
+  const tArmeRougeSangValueD = roll.results.armeRougeSangValueD || {};
+  const tArmeRougeSangValueV = roll.results.armeRougeSangValueV || {};
+  const tCheneSculpte = roll.results.cheneSculpteValue || {};
+  const tGriffuresGraveesValueD = roll.results.griffuresGraveesValueD || {};
+  const tGriffuresGraveesValueV = roll.results.griffuresGraveesValueV || {};
+  const tMasqueBriseValueD = roll.results.masqueBriseValueD || {};
+  const tMasqueBriseValueV = roll.results.masqueBriseValueV || {};
+  const tRouagesCassesValueD = roll.results.rouagesCassesValueD || {};
+  const tRouagesCassesValueV = roll.results.rouagesCassesValueV || {};
+
+  const isTenebricide = conditions.isTenebricide || false;
+  const isSurprise = conditions.isSurprise || false;
+  const isDestructeur = conditions.isDestructeur || false;
+  const isFureur = conditions.isFureur || false;
+  const isMeurtrier = conditions.isMeurtrier || false;
+  const isUltraviolence = conditions.isUltraviolence || false;
+
+  const isArmeAzurine = conditions.isArmeAzurine || false;
+  const isArmeRougeSang = conditions.isArmeRougeSang || false;
+  const isCheneSculpte = conditions.isCheneSculpte || false;
+  const isGriffureGravee = conditions.isGriffureGravee || false;
+  const isMasqueBrise = conditions.isMasqueBrise || false;
+  const isRouagesCasses = conditions.isRouagesCasses || false;
+
+  let tDegats = totalDegats;
+  let tViolence = totalViolence;
+
+  let hDestructeur = 0;
+  let hFureur = 0;
+  let hMeurtrier = 0;
+  let hSurprise = 0;
+  let hUltraviolence = 0;
+
+  let hArmeAzurineValueD = 0;
+  let hArmeAzurineValueV = 0;
+  let hArmeRougeSangValueD = 0;
+  let hArmeRougeSangValueV = 0;
+  let hCheneSculpte = 0;
+  let hGriffuresGraveesValueD = 0;
+  let hGriffuresGraveesValueV = 0;
+  let hMasqueBriseValueD = 0;
+  let hMasqueBriseValueV = 0;
+  let hRouagesCassesValueD = 0;
+  let hRouagesCassesValueV = 0;
+
+  if (isSurprise) { hSurprise = tSurprise.result; }
+  if (isDestructeur) { hDestructeur = tDestructeur.result; }
+  if (isFureur) { hFureur = tFureur.result; }
+  if (isMeurtrier) { hMeurtrier = tMeurtrier.result; }
+  if (isUltraviolence) { hUltraviolence = tUltraviolence.result; }
+
+  if (isArmeAzurine) {
+    hArmeAzurineValueD = tArmeAzurineValueD.result;
+    hArmeAzurineValueV = tArmeAzurineValueV.result;
+  }
+  if (isArmeRougeSang) {
+    hArmeRougeSangValueD = tArmeRougeSangValueD.result;
+    hArmeRougeSangValueV = tArmeRougeSangValueV.result;
+  }
+  if (isCheneSculpte) { hCheneSculpte = tCheneSculpte.result; }
+  if (isGriffureGravee) {
+    hGriffuresGraveesValueD = tGriffuresGraveesValueD.result;
+    hGriffuresGraveesValueV = tGriffuresGraveesValueV.result;
+  }
+  if (isMasqueBrise) {
+    hMasqueBriseValueD = tMasqueBriseValueD.result;
+    hMasqueBriseValueV = tMasqueBriseValueV.result;
+  }
+  if (isRouagesCasses) {
+    hRouagesCassesValueD = tRouagesCassesValueD.result;
+    hRouagesCassesValueV = tRouagesCassesValueV.result;
+  }
+
+  let vTDegats = 0;
+  let vTViolence = 0;
+  let vTDestructeur = 0;
+  let vTFureur = 0;
+  let vTMeurtrier = 0;
+  let vTSurprise = 0;
+  let vTUltraviolence = 0;
+
+  let vTCheneSculpte = 0;
+
+  if (conditions.bourreau || conditions.equilibre) {
+    tDegats = diceDegats.reduce((accumulateur, valeurCourante) => {
+      let newV = +valeurCourante;
+      if (newV <= 3) { newV = 4; }
+
+      return accumulateur + newV;
+    }, 0);
+    if (bonusDegats.length !== 0) { tDegats += bonusDegats.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
+
+    if (isDestructeur) {
+      hDestructeur = tDestructeur.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isMeurtrier) {
+      hMeurtrier = tMeurtrier.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isSurprise) {
+      if (tSurprise.dice.length !== 0) {
+        const normalRoll = tSurprise.dice.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante);
+        const bonusSurprise = +tSurprise.result - +normalRoll;
+
+        hSurprise = tSurprise.dice.reduce((accumulateur, valeurCourante) => {
+          let newV = +valeurCourante;
+          if (newV <= 3) { newV = 4; }
+
+          return accumulateur + newV;
+        }, 0);
+
+        hSurprise += bonusSurprise;
+      }
+    }
+
+    if (isArmeAzurine) {
+      hArmeAzurineValueD = tArmeAzurineValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isArmeRougeSang) {
+      hArmeRougeSangValueD = tArmeRougeSangValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isCheneSculpte) {
+      hCheneSculpte = tCheneSculpte.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isGriffureGravee) {
+      hGriffuresGraveesValueD = tGriffuresGraveesValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isMasqueBrise) {
+      hMasqueBriseValueD = tMasqueBriseValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isRouagesCasses) {
+      hRouagesCassesValueD = tRouagesCassesValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+  }
+
+  if (conditions.devaste || conditions.equilibre) {
+    tViolence = diceViolence.reduce((accumulateur, valeurCourante) => {
+      let newV = valeurCourante;
+      if (newV <= 3) { newV = 4; }
+
+      return accumulateur + newV;
+    }, 0);
+
+    if (bonusViolence.length !== 0) { tViolence += bonusViolence.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
+
+    if (isFureur) {
+      hFureur = tFureur.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isUltraviolence) {
+      hUltraviolence = tUltraviolence.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isArmeAzurine) {
+      hArmeAzurineValueV = tArmeAzurineValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isArmeRougeSang) {
+      hArmeRougeSangValueV = tArmeRougeSangValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isGriffureGravee) {
+      hGriffuresGraveesValueV = tGriffuresGraveesValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isMasqueBrise) {
+      hMasqueBriseValueV = tMasqueBriseValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isRouagesCasses) {
+      hRouagesCassesValueV = tRouagesCassesValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= 3) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+  }
+
+  if (isTenebricide) {
+    let limiteD = Math.floor(+diceDegats.length / 2);
+    let limiteV = Math.floor(+diceViolence.length / 2);
+
+    if (limiteD < 1) { limiteD = 1; }
+    if (limiteV < 1) { limiteV = 1; }
+
+    vTDegats = diceDegats.reduce((accumulateur, valeurCourante, index) => {
+      let result = +accumulateur;
+
+      if (index < limiteD) {
+        let newV = +valeurCourante;
+
+        if (conditions.bourreau || conditions.equilibre) {
+          if (newV <= 3) { newV = 4; }
+        }
+
+        result += newV;
+      }
+
+      return result;
+    }, 0);
+
+    if (bonusDegats.length !== 0) { vTDegats += bonusDegats.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
+
+    vTViolence = diceViolence.reduce((accumulateur, valeurCourante, index) => {
+      let result = +accumulateur;
+
+      if (index < limiteV) {
+        let newV = +valeurCourante;
+
+        if (conditions.bourreau || conditions.equilibre) {
+          if (newV <= 3) { newV = 4; }
+        }
+
+        result += newV;
+      }
+
+      return result;
+    }, 0);
+
+    if (bonusViolence.length !== 0) { vTViolence += bonusViolence.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
+
+    if (isMeurtrier) {
+      let diceMeurtrier = +tMeurtrier.dice[0];
+
+      if (conditions.bourreau || conditions.equilibre) {
+        if (diceMeurtrier <= 3) { diceMeurtrier = 4; }
+      }
+
+      vTMeurtrier = diceMeurtrier;
+    }
+
+    if (isDestructeur) {
+      let diceDestructeur = +tDestructeur.dice[0];
+
+      if (conditions.bourreau || conditions.equilibre) {
+        if (diceDestructeur <= 3) { diceDestructeur = 4; }
+      }
+
+      vTDestructeur = diceDestructeur;
+    }
+
+    if (isCheneSculpte) {
+      let diceCheneSculpte = +tCheneSculpte.dice[0];
+
+      if (conditions.bourreau || conditions.equilibre) {
+        if (diceCheneSculpte <= 3) { diceCheneSculpte = 4; }
+      }
+
+      vTCheneSculpte = diceCheneSculpte;
+    }
+
+    if (isFureur) {
+      let diceFureur1 = +tFureur.dice[0];
+      let diceFureur2 = +tFureur.dice[1];
+
+      if (conditions.devaste || conditions.equilibre) {
+        if (diceFureur1 <= 3) { diceFureur1 = 4; }
+        if (diceFureur2 <= 3) { diceFureur2 = 4; }
+      }
+
+      vTFureur = diceFureur1 + diceFureur2;
+    }
+
+    if (isSurprise) {
+      let bonusSurprise = +tSurprise.result;
+
+      if (tSurprise.dice.length !== 0) {
+        const dices = tSurprise.dice;
+        const limiteS = Math.floor(+dices.length / 2);
+        const normalRoll = dices.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante);
+        bonusSurprise -= +normalRoll;
+
+        vTSurprise = dices.reduce((accumulateur, valeurCourante, index) => {
+          let result = accumulateur;
+
+          if (index < limiteS) {
+            let newV = +valeurCourante;
+
+            if (conditions.bourreau || conditions.equilibre) {
+              if (newV <= 3) { newV = 4; }
+            }
+
+            result += newV;
+          }
+
+          return result;
+        }, 0);
+      }
+
+      vTSurprise += +bonusSurprise;
+    }
+
+    if (isUltraviolence) {
+      let diceUltraviolence = +tUltraviolence.dice[0];
+
+      if (conditions.devaste || conditions.equilibre) {
+        if (diceUltraviolence <= 3) { diceUltraviolence = 4; }
+      }
+
+      vTUltraviolence = diceUltraviolence;
+    }
+  }
+
+  const computed = {
+    degats: tDegats,
+    violence: tViolence,
+    tenebricideValueD: vTDegats,
+    tenebricideValueV: vTViolence,
+    tenebricideASValue: vTSurprise,
+    destructeurValue: hDestructeur,
+    fureurValue: hFureur,
+    meurtrierValue: hMeurtrier,
+    attaqueSurpriseValue: hSurprise,
+    ultraviolenceValue: hUltraviolence,
+    armeAzurineValueD: hArmeAzurineValueD,
+    armeAzurineValueV: hArmeAzurineValueV,
+    armeRougeSangValueD: hArmeRougeSangValueD,
+    armeRougeSangValueV: hArmeRougeSangValueV,
+    cheneSculpteValue: hCheneSculpte,
+    griffuresGraveesValueD: hGriffuresGraveesValueD,
+    griffuresGraveesValueV: hGriffuresGraveesValueV,
+    masqueBriseValueD: hMasqueBriseValueD,
+    masqueBriseValueV: hMasqueBriseValueV,
+    rouagesCassesValueD: hRouagesCassesValueD,
+    rouagesCassesValueV: hRouagesCassesValueV,
+    tDestructeurValue: vTDestructeur,
+    tFureurValue: vTFureur,
+    tMeurtrierValue: vTMeurtrier,
+    tUltraviolenceValue: vTUltraviolence,
+    tCheneSculpteValue: vTCheneSculpte,
+  };
+
+  return computed;
 }
