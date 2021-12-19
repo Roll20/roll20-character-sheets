@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
 const sheetName = 'AD&D 2E Revised';
-const sheetVersion = '4.3.0';
+const sheetVersion = '4.4.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -163,7 +163,7 @@ function migrateOtherValuables() {
         newValue['othervalue'] = total;
         
         valuablesFields.forEach(field => {
-            let oldValue = values[field];
+            let oldValue = values[field] || '';
             if (oldValue) {
                 if (valuablesString) {
                     valuablesString += '\n\n';

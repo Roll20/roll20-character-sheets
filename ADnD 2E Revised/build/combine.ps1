@@ -25,10 +25,14 @@ $inserts | ForEach-Object {
       }
    }
    $rawContent = $fileContent -join "`n"
-   $replaces = $split[2..100];
-   for ($i=0; $i -lt $replaces.Length; $i++) {
-      $replace = $replaceConstant -f $i;
-      $rawContent = $rawContent.Replace($replace, $replaces[$i])
+   $replaceValues = $split[2..100];
+   for ($i=0; $i -lt $replaceValues.Length; $i++) {
+      $replaceKey = $replaceConstant -f $i;
+      $replaceValue = $replaceValues[$i];
+      if ($replaceValue.StartsWith("repeating")) {
+         $replaceValue = $replaceValue.Replace("-", "_") #Allows for repeating section inserts
+      }
+      $rawContent = $rawContent.Replace($replaceKey, $replaceValue)
    }
    $rawContent = $rawContent -replace "\#REPLACE\d+\#", ""
    $rawContent = $rawContent -replace "\r?\nmodule\.exports.*;", ""

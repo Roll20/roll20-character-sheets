@@ -501,32 +501,55 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
         return;
     
     on(`change:repeating_spells-${section}:spell-name`, function (eventInfo) {
-
         let spell = spellsTable[section][eventInfo.newValue];
-        if (spell === undefined)
+        if (!spell)
             return;
 
-        let spellInfo = {
-            [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-            [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
-            [`repeating_spells-${section}_spell-school`]       : spell['school'],
-            [`repeating_spells-${section}_spell-components`]   : spell['components'],
-            [`repeating_spells-${section}_spell-range`]        : spell['range'],
-            [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
-            [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
-            [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
-            [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
-            [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
-            [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
-            [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-            [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
-            [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-        };
-        if (section.startsWith('pri')) {
-            spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
-        }
+        getAttrs(['book-phb', 'book-tcwhb'], function(values) {
+            let activeBooks = Object.values(values);
+            if (!activeBooks.includes(spell['book'])) {
+                let errorMessage = {
+                    [`repeating_spells-${section}_spell-cast-time`]    : '',
+                    [`repeating_spells-${section}_spell-level`]        : '',
+                    [`repeating_spells-${section}_spell-school`]       : '',
+                    [`repeating_spells-${section}_spell-components`]   : '',
+                    [`repeating_spells-${section}_spell-range`]        : '',
+                    [`repeating_spells-${section}_spell-aoe`]          : '',
+                    [`repeating_spells-${section}_spell-duration`]     : '',
+                    [`repeating_spells-${section}_spell-damage`]       : '',
+                    [`repeating_spells-${section}_spell-damage-type`]  : '',
+                    [`repeating_spells-${section}_spell-saving-throw`] : '',
+                    [`repeating_spells-${section}_spell-healing`]      : '',
+                    [`repeating_spells-${section}_spell-materials`]    : '',
+                    [`repeating_spells-${section}_spell-reference`]    : '',
+                    [`repeating_spells-${section}_spell-effect`]       : `The book **${spell['book']}** is currently not active on your sheet.\nGo to the **Sheet Settings** and activate the book (if your DM allows for its usage)`
+                }
+                setAttrs(errorMessage);
+                return;
+            }
+            
+            let spellInfo = {
+                [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
+                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
+                [`repeating_spells-${section}_spell-school`]       : spell['school'],
+                [`repeating_spells-${section}_spell-components`]   : spell['components'],
+                [`repeating_spells-${section}_spell-range`]        : spell['range'],
+                [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
+                [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
+                [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
+                [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
+                [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
+                [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
+                [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
+                [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
+                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
+            };
+            if (section.startsWith('pri')) {
+                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+            }
 
-        setAttrs(spellInfo);
+            setAttrs(spellInfo);
+        });
     });
 }
 
@@ -933,16 +956,13 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
 //Related weapons / familiarity penalty
 on('change:nonprof-penalty', function (eventInfo) {
-    if (eventInfo.sourceType === sheetWorker) {
-        return;
-    }
     getAttrs(['nonprof-penalty'], function(values) {
         let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
         let famil = Math.floor(nonprof / 2)
         setAttrs({
             ['nonprof-penalty']: nonprof,
             ['famil-penalty']: famil
-        });
+        },{silent:true});
     });
 })
 
@@ -985,8 +1005,9 @@ function getWeaponWithBonus(weaponName, isMonster) {
         'bonus' : `+${bonus}`
     }
     if (isMonster) {
-        weaponWithBonus['small-medium'] += `+${bonus}`
-        weaponWithBonus['thac0'] = `@{monsterthac0}-${bonus}`
+        weaponWithBonus['small-medium'] += `+${bonus}`;
+        weaponWithBonus['large'] += `+${bonus}`;
+        weaponWithBonus['thac0'] = `@{monsterthac0}-${bonus}`;
     }
     
     return weaponWithBonus;
@@ -1065,51 +1086,63 @@ on('change:repeating_ammo:ammoname', function(eventInfo){
     setAttrs(weaponInfo);
 });
 
-on('clicked:grenade-miss', function (eventInfo) {
-   startRoll('&{template:2Egrenademiss} {{grenade=?{What grenade have been thrown?|Acid,[[1Acid]]|Holy water,[[1Holy water]]|Oil (lit),[[3Oil (lit)]]|Poison,[[1Poison]]}}} {{direction=[[1d10]]}} {{distance=?{How far was it throw?|Short,[[1d6]]|Medium,[[1d10]]|Long,[[2d10]]}}} {{aoe=?{What grenade have been thrown?}}} {{hit=[[0]]}} {{splash=[[0]]}}', function(results) {
-       console.log(results);
-       let distance = results.results.distance;
-       let expression = distance.expression;
-       let displayDistance = '';
-       switch (expression) {
-           case '1d6': displayDistance = 'Short'; break;
-           case '1d10': displayDistance = 'Medium'; break;
-           case '2d10': displayDistance = 'Long'; break;
-           default: displayDistance = 'Invalid'; break;
-       }
-       let aoeSplash = results.results.aoe.result+6;
-       let displayGrenade = results.results.grenade.expression.substring(1);
-       let computedRolls = {
-           distance: displayDistance,
-           grenade: displayGrenade,
-           aoe: aoeSplash,
-           hit: 0,
-           splash: 0
-       };
-       // See if monster is within direct hit
-       if (distance.result < results.results.aoe.result / 2) {
-           console.log(`hit radius: ${results.results.aoe.result / 2}`);
-           let directDamage;
-           switch (displayGrenade) {
-               case 'Acid': directDamage = '2d4 Acid damage'; break;
-               case 'Holy water': directDamage = '1d6+1 damage'; break;
-               case 'Oil (lit)': directDamage = '2d6/1d6 Fire damage'; break;
-               case 'Poison': directDamage = 'Special'; break;
-           }
-           computedRolls.hit = directDamage;
-       } else if (distance.result < aoeSplash / 2) {
-           console.log(`splash radius: ${aoeSplash / 2}`);
-           let splashDamage;
-           switch (displayGrenade) {
-               case 'Acid': splashDamage = '1 Acid damage'; break;
-               case 'Holy water': splashDamage = '2 damage'; break;
-               case 'Oil (lit)': splashDamage = '1d3 Fire damage'; break;
-               case 'Poison': splashDamage = 'Special'; break;
-           }
-           computedRolls.splash = splashDamage;
-       }
-       finishRoll(results.rollId, computedRolls);
-   });
+const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
+    let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
+    finishRoll(queryRoll.rollId);
+    return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
+};
+
+on('clicked:grenade-miss', async function (eventInfo) {
+    getAttrs(['character_name'], async function(values) {
+        let characterName = values['character_name'];
+        let finalRollText = '&{template:2Egrenademiss} ';
+        let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
+        switch (grenade) {
+            case 'Acid':       finalRollText += `{{name=Acid}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|acid-hit)}} {{splashdmg=[Damage](~${characterName}|acid-splash)}}`; break;
+            case 'Holy water': finalRollText += `{{name=Holy water}} water]]}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
+            case 'Oil (lit)':  finalRollText += `{{name=Oil (lit)}} {{aoe=[[3]]}} {{aoesplash=[[3+6]]}} {{hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)}} {{splashdmg=[Damage](~${characterName}|oil-lit-splash)}}`; break;
+            case 'Poison':     finalRollText += `{{name=Poison}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=Special}} {{splashdmg=Special}}`; break;
+            case 'Other': {
+                let name = await extractQueryResult('?{Grenade name}');
+                let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
+                let damage = await extractQueryResult('?{Direct damage|1d6}');
+                let splash = await extractQueryResult('?{Splash damage|1d3}');
+
+                var customGrenade = {}
+                customGrenade['custom-grenade-name'] = name;
+                customGrenade['custom-grenade-hit'] = damage;
+                customGrenade['custom-grenade-splash'] = splash;
+                setAttrs(customGrenade);
+
+                finalRollText += `{{name=${name}}} {{aoe=[[${aoe}]]}} {{aoesplash=[[${aoe}+6]]}} {{hitdmg=[Damage](~${characterName}|custom-grenade-hit)}} {{splashdmg=[Damage](~${characterName}|custom-grenade-splash)}}`;
+            }
+        }
+        let distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
+        finalRollText += `{{direction=[[1d10]]}} {{distancename=${distanceName}}} `;
+        switch (distanceName) {
+            case 'Short': finalRollText += '{{distance=[[1d6]]}} '; break;
+            case 'Medium': finalRollText += '{{distance=[[1d10]]}} '; break;
+            case 'Long': finalRollText += '{{distance=[[2d10]]}} '; break;
+        }
+        finalRollText += '{{hit=[[0]]}} {{splash=[[0]]}} ';
+        console.log(finalRollText);
+        startRoll(finalRollText, function (roll) {
+            console.log(roll);
+            let computedRolls = {
+                hit: 0,
+                splash: 0
+            };
+
+            // See if monster is within direct hit
+            if (roll.results.distance.result <= roll.results.aoe.result / 2) {
+                computedRolls.hit = 1;
+            } else if (roll.results.distance.result <= roll.results.aoesplash.result / 2) {
+                computedRolls.splash = 1;
+            }
+            console.log(computedRolls);
+            finishRoll(roll.rollId, computedRolls);
+        });
+    });
 });
 
 //Follower weapons
@@ -1172,6 +1205,7 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo){
         [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
         [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'] || '@{monsterthac0}',
         [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
+        [`repeating_monsterweapons_daml`]      : weapon['large'],
         [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
     };
 
