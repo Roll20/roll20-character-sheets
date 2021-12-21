@@ -922,7 +922,8 @@ priestSpellLevelsSections.forEach(spellLevel => {
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
         setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel);
-        setupAddPriestSpell(lastSection);
+        if (lastSection !== 'priq')
+            setupAddPriestSpell(lastSection);
     }
 });
 setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel);
