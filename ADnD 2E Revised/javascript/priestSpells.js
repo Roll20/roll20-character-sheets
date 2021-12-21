@@ -5898,6 +5898,246 @@ pri6['Spiritual Wrath'] = {
     'effect': 'This powerful cooperative spell is rarely invoked since it requires the concerted effort of six or more high-level priests. The casting effort severely weakens the priests, discouraging casual use of this spell.\n&emsp;To cast the spell, six or more priests must be within a 15-foot radius. Each priest must cast *spiritual wrath* at the same time. Before beginning the spell, the priests must decide upon the area of effect. The spell causes 10d6+1d6 points of damage per priest casting the spell. (The minimum damage, therefore, is 16d6.) Creatures within the area of effect are allowed a saving throw vs. spell to reduce the damage to half.\n&emsp;The spell strikes as a great wave of force that descends from the sky. Small objects must save vs. crushing blow. Structures suffer damage as if hit by a heavy catapult (2d12). The force of this spell often raises a great cloud of dirt and dust, obscuring the area for 1d4+1 rounds.\n&emsp;The spell’s area of effect is determined by the number of casters. Each priest contributes 10 feet to the radius of the spell. Six casters would create a spell with a radius of 60 feet. No more than twelve casters can cooperate to cast this spell (maximum of 22d6 damage and a 120-foot radius area of effect). This converts to an 8-inch circle in the BATTLESYSTEM rules ground scale.\n&emsp;The spell is difficult to cast, physically taxing the spellcasters so much that each caster suffers 3d10 points of damage from the effort. There is no saving throw allowed to avoid this damage.'
 }
 
+pri7['Age Dragon'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Alteration',
+    'sphere': 'Time',
+    'range': '30 yards',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': 'One dragon',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': 'A handful of dirt taken from a dragon’s footprint.',
+    'reference': 'p. 105',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell allows the caster to cause any dragon to temporarily gain or lose one age level per five levels of the caster. Currently [[floor([[@{level-priest}]]/5)]] age levels. For instance, a 14th-level caster could cause a dragon to gain or lose two age levels; a mature adult dragon could be temporarily transformed into a young adult dragon or into a very old dragon. A dragon’s age cannot be reduced below hatchling or increased beyond great wyrm.\n&emsp;Unwilling dragons are allowed a saving throw vs. spells with a -4 penalty to avoid the effect.\n&emsp;A dragon affected by *age dragon* temporarily acquires the armor class, hit points, spell abilities, combat modifiers, size, and other attributes of his new age level. The dragon retains his memories and personality. At the end of the spell’s duration, the dragon returns to his normal age level.\n&emsp;If the dragon suffered damage while experiencing his modified age, these hit points remain lost when he resumes his normal age. If the dragon loses more hit points at his modified age than he has at his actual age, he dies when the spell expires. For example, a young adult bronze dragon with 110 hit points is aged to a mature adult with 120 hit points. The dragon suffers 115 hit points in combat. Unless the dragon is healed of 6 points of damage before the spell expires, the dragon dies at the end of the spell since his damage is greater than his actual hit points.\n&emsp;If a dragon is killed while under the effect of *age dragon*, he is dead at the end of the spell’s duration.'
+}
+
+pri7['Breath of Life'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Necromantic (Reversible)',
+    'sphere': 'Necromantic',
+    'range': '0',
+    'duration': '[[@{level-priest}]] hours',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '*Breath of Life:* The priest’s holy symbol and a cone of incense that has been blessed by the highest priest of the character’s religion. *Breath of Death:* The priest’s holy symbol and a handful of dust taken from a mummy’s corpse.',
+    'reference': 'p. 105',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This powerful spell enables the caster to cure many persons (even an entire community) who are afflicted with a nonmagical disease. The priest need not touch or even see the diseased people for the spell to be effective, although recipients must be within the area of effect.\n&emsp;This spell does not cure all diseases in the community at one time; the caster must specifically state which disease is to be eliminated (black plague or yellow fever, for example) with each casting of the spell.\n&emsp;When the spell is cast, the priest exhales a sweet-smelling breath. This forms into a breeze that radiates outward, forming a circle that expands in a 50-yard radius per hour. During this time, the caster must remain at the center of the area of effect. For example, after 12 hours, the *breath of life* would cover a circle 1200 yards in diameter (600-yard radius). The breath is of a magical nature rather than a physical nature; therefore, it is unaffected by prevailing winds.\n&emsp;The breeze blows through the community, instantly eliminating the specified disease from all afflicted citizens. The *breath of life* spell does not destroy parasitic monsters (such as green slime, rot grubs, and others), nor does it cure lycanthropy or other magical afflictions. The spell does not prevent recurrence of a disease if the recipients are again exposed.\n&emsp;The *breath of death*, which produces a foul-smelling wind, is the reverse of this spell. Victims who fail a saving throw vs. death magic are afflicted with a nonmagical, fatal disease. To determine the results of this spell, the DM should roll saving throws for major NPCs in the area of effect. The effect on the rest of the community can be calculated as a percentage, based on the saving throw.\n&emsp;Infected creatures do not heal hit points until the disease is cured. The disease is fatal within 1d6 weeks (the duration varies from person to person).'
+}
+
+pri7['Divine Inspiration'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Divination',
+    'sphere': 'Thought, Divination',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': 'The caster',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A gem of at least 500 gp value.',
+    'reference': 'p. 106',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is a more powerful version of the *genius* spell. The priest’s player may ask the DM one question about the current situation or about events that will occur within the next five rounds. Questions about the future must relate to external events, such as “Will the guards respond to the sentry’s yell?” Questions cannot refer to the outcome of combat, such as “Will we win the battle?” The priest’s player is allowed to use this spell to ask the DM for advice. In this case, the spell is the equivalent of asking the gods, “Okay, how do we get out of this one?”\n&emsp;Like the *genius* spell, the DM must be careful in adjudicating this spell. The answer to the question is always relevant and correct, although not necessarily complete. The answer can also be cryptic, in the form of a riddle or rhyme, depending on the DM’s assessment of the situation and how potentially unbalancing the answer might be. In general, the answer will be a short phrase of no more than eight to ten words.\n&emsp;This spell can be cast only once in any 24-hour period.'
+}
+
+pri7['Hovering Road'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Travelers',
+    'range': '0',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A chunk of black marble and a loop of gold wire.',
+    'reference': 'p. 106',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the caster to create a magical 10-foot-wide road extending 10 feet in front of him. The caster can create an unbroken road for the duration of the spell, creating a 10-foot area ahead of him as long as he continues to move forward.\n&emsp;The road is approximately one foot thick and hovers in the air. It has the texture and color of black granite. Characters and creatures can move on the *hovering road* at their normal movement rate, ignoring the effects of surrounding terrain.\n&emsp;The *hovering road* must originate from a solid surface. Once anchored, the caster controls the contour of the road, causing it to rise and fall as he wishes. The road can thus be used to traverse rivers (if the road is anchored on the shore), swamps, and similarly hostile terrain. The caster can cause the *hovering road* to rise over a jungle or cross a chasm.\n&emsp;The road has AC 0. It is impervious to non-magical weapons. If the road suffers 100 points of damage (from magical weapons or other magical forces), it dissipates in a black mist; all those on the road fall to the ground below.\n&emsp;Unless the road is destroyed, the entire *hovering road* remains intact from beginning to end for the duration of the spell, even if the caster is killed or incapacitated. At the end of the spell’s duration, the entire road dissipates.'
+}
+
+pri7['Illusory Fortification'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Illusion/Phantasm',
+    'sphere': 'War',
+    'range': '240 yards',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '10 turns',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol, a handful of stones, powdered mortar, and a gem worth at least 3,000 gp. All components except the holy symbol are consumed in the casting.',
+    'reference': 'p. 107',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The ritual required to cast this spell is time-consuming and extremely complex. As its name implies, *illusory fortification* creates an illusion of a wall of heavy stonework up to 30 feet tall and 160 yards long, topped with crenellations. The illusory wall can be of any color and apparent age, potentially allowing the caster to match the false wall with the real walls of an existing castle. The illusory wall must be continuous (it cannot form two or more shorter walls), but it can follow any corners or bends that the caster desires.\n&emsp;In addition to the wall, the spell creates the illusion of constant movement among the crenellations, as if defending troops were moving atop the wall. The formation of the crenellations makes it impossible for a distant observer to determine exactly how many and what types of defenders are present on the *illusory fortification*.\n&emsp;The illusory wall remains in existence for [[2d12]] hours unless the spell is terminated earlier.\n&emsp;The spell has one very significant limitation: it is strictly two-dimensional and is visible from only one side (the side that the caster deems to be the “outside”). When viewed from the outside, the wall appears real; when viewed from the end, from above, or from the “inside,” the wall is totally invisible except for a faint outline of the shape of the wall. This means that friendly troops, concealed from enemy view by the illusory wall, can see their opponents clearly. The wall is most effective if friendly troops are informed of the wall’s presence and are careful not to walk through the illusion. Such an occurrence does not end the spell, but it will probably advise the enemy of the nature of the wall.\n&emsp;Spells cast at the wall and shots fired at the *illusory fortification* by siege engines appear to strike the wall and inflict normal damage. In reality, the missiles or spells pass through the illusion, possibly striking troops or real fortifications beyond. Such “hits” do not disturb the illusion.\n&emsp;As soon as an enemy unit moves within 10 yards of the *illusory fortification*, the spell terminates and the wall vanishes.\n&emsp;There are two ways in which the spell can be terminated before it expires. First, the priest can terminate the spell at any time. Second, if a friendly unit makes an attack, whether melee or missile combat, through the illusory wall from the “inside” to the “outside,” the spell terminates instantly.\n&emsp;Once the *illusory fortification* has been created, the priest does not need to concentrate on the wall. The spell remains in effect even if the casting priest is killed in the interim.'
+}
+
+pri7['Mind Tracker'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Divination',
+    'sphere': 'Divination',
+    'range': 'Special',
+    'duration': 'Special',
+    'aoe': 'One creature',
+    'components': 'V, S, M',
+    'cast-time': '1 turn/3',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'p. 107',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The mind tracker is a magically-created creature which exists only on the Ethereal plane. It is called into existence when the first portion of this spell is cast.\n&emsp;When seen (which is seldom), the mind tracker has an indistinct body. It seems to be a near-solid coalescence of the vaporous atmosphere of the Ethereal plane itself. It is a roughly elliptical body with three or more limbs protruding at seemingly random locations. The number and size of these appendages shifts slowly, however, as new ones appear from the mist and old ones disappear. The body of the creature averages 2 feet across and 3 feet long, though this, too, tends to vary from minute to minute. The mind tracker has no discernible eyes, ears, nose, or other organs. It cannot be engaged in combat; if attacked, it simply disappears, to reappear after the danger has passed, or somewhere else entirely if its quarry has moved on.\n&emsp;The ceremony which creates the mind tracker takes one turn to perform. Its material components are a whiff of the Ethereal plane’s atmosphere and the brain of a lizard.\n&emsp;Once the tracker is manifested, it must be assigned a quarry within one hour. If no quarry is designated, the tracker dissipates and the spell is wasted.\n&emsp;To assign a quarry to the tracker, the priest must have the quarry within his sight. This includes magical sight such as true seeing, but not remote sighting devices such as crystal balls. With the quarry in sight, the priest mouths the final phrases of the spell. From that point on, the mind tracker is mentally tethered to the victim. It follows its quarry (staying always in the Ethereal plane) wherever it goes. It constantly relays information about the subject to the priest: what it is doing, where it is. The priest does not actually see an image of the quarry, he receives `reports’ from the mind tracker. These reports contain only such information as the tracker can gather by looking. It cannot identify people the quarry is talking to, but can describe them in great detail. Nor can it hear anything the quarry or anyone else says, or read writing, but it recognizes and can report the fact that speaking or reading is happening.\n&emsp;While the tracker is dogging its quarry, its presence can be felt as an eery, creepy sensation of being watched. If the victim makes an initial save vs. paralyzation, each of the following stages lasts three hours instead of two. For the first two hours, the quarry has a general feeling of ill ease. In the third and fourth hours, the victim is distracted and nervous, and suffers a -1 penalty on all saving throws. In the fifth and sixth hours, the victim is convinced someone or something is following him and suffers a -3 penalty on saving throws and a -2 (or -10%) penalty on all other dice rolls. After six hours the victim is near his breaking point. He is unable to concentrate to cast spells or use any of his class’s special abilities. All die rolls have a -5 (or -25%) penalty. After eight hours, he must make a saving throw vs. paralyzation. If he fails, he collapses, fevered and delirious. This state persists until the tracker ceases to exist.\n&emsp;The mind tracker continues to exist for as long as the priest remains conscious of its input. If the priest is knocked out or falls asleep, or simply dismisses his creation, the tracker dissipates.'
+}
+
+pri7['Shadow Engines'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Illusion/Phantasm',
+    'sphere': 'War',
+    'range': '240 yards',
+    'duration': '8 turns',
+    'aoe': '180-yard x 180-yard square',
+    'components': 'V, S, M',
+    'cast-time': '3 turns',
+    'saving-throw': 'None',
+    'materials': 'A finely detailed miniature model of a siege engine (of any type), which is consumed during the casting.',
+    'reference': 'p. 108',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell creates the illusion of as many as four siege engines. The casting priest may choose from ballistae, siege towers, catapults, rams, or any combination thereof. Like the creatures created by the spell *shadow monsters*, these illusory engines have at least a tenuous reality and can inflict damage on enemies.\n&emsp;*Shadow engines* are accompanied by illusory crews of the appropriate number and race. The engines can move at a rate of 20 yards per turn and are unaffected by terrain considerations. (The caster can choose to slow them when passing through rough terrain to aid the illusion of reality.)\n&emsp;*Shadow engines* cannot carry real troops. They can be fired at the same rate as real engines of the appropriate type, but a hit causes only one-half the damage normal for that type of engine (round fractions down).\n&emsp;A *shadow engine* remains in existence until the spell duration expires, until an enemy unit approaches within 10 yards, or until it suffers damage from an enemy missile attack. When any of these conditions occur, the engine vanishes. If a single spell has created multiple engines, only the engine struck vanishes; the others remain.\n&emsp;The crew associated with a *shadow engine* must remain with that engine; it cannot move more than 5 yards away from the engine itself.\n&emsp;*Shadow engines* can move independently of other engines created by the spell as long as they remain within the area of effect and remain within 240 yards of the caster. The caster must maintain concentration to control the *shadow engines*. He cannot cast any other spells, and he is limited to a movement rate of 6. If the caster is struck for damage, the *shadow engines* vanish.'
+}
+
+pri7['Spacewarp'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Alteration',
+    'sphere': 'Numbers',
+    'range': '50 yards',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': '50-foot-diameter sphere',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': 'A lodestone and a sphere of obsidian, both of which are consumed in the casting.',
+    'reference': 'p. 109',
+    'book': 'Tome of Magic',
+    'damage': '1d6 per 10 feet fallen',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'According to one view of the universe, what we perceive as gravity is actually a localized warping of the fabric of space-time. The *spacewarp* spell creates a temporary but very intense warping in a limited area.\n&emsp;When the priest casts this spell, he selects a specific point to be the center of effect. This point may be anywhere within 50 yards of the caster, including in midair.\n&emsp;When the spell is completed, this center of effect gains a gravity field equal to the force felt at the surface of the earth. In other words, gravity is centered at this point; everything within 50 feet of this center that is not attached to something immovable will fall toward the selected point.\n&emsp;This localized gravity affects only loose objects and creatures capable of movement (i.e., not trees, whose roots are buried in the ground). It does not affect the ground itself--soil, plants, desert sand, lake water, etc. are immune to the effect.\n&emsp;An object falling toward the center of gravity gains speed exactly as it would if it were falling toward the ground. When the object reaches the center, it instantly ceases its movement. If objects are already at the center, newly arriving objects will slam into them, causing normal falling damage (1d6 per 10 feet) to the newly arriving objects. Objects previously at the center must save vs. paralyzation or suffer half that amount of damage.\n&emsp;Consider the following example. An orc is 10 feet away from the center of effect when the spell is cast. He falls 10 feet to the center and stops. His companion, a bandit, is 30 feet from the center. It takes him longer to fall to the center, so the orc is already there when he arrives, and the two characters collide forcefully. The bandit suffers 3d6 hit points of damage--the falling damage associated with a 30-foot fall. The orc must save vs. paralyzation or suffer half that amount.\n&emsp;Other things are caught in the effect as well. The bandit’s horse was 50 feet away from the center of effect, so it arrives at the center after the orc and the bandit. It falls 50 feet, suffering 5d6 points of damage, and potentially inflicting half that amount on both the orc and the bandit.\n&emsp;The center of effect can be anywhere within 50 yards of the priest. Possibly one of the most destructive uses of this spell is to cast it directly on an enemy creature. Everyone and everything within 50 feet of that creature falls toward him and strikes him, inflicting damage.\n&emsp;When the spell terminates, gravity returns to normal. If the spell has lifted any characters or objects off the ground, they immediately fall back to the ground, suffering the appropriate amount of falling damage.'
+}
+
+pri7['Spirit of Power'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Summoning, Invocation',
+    'sphere': 'Summoning',
+    'range': '0',
+    'duration': '1 hour',
+    'aoe': 'The casters',
+    'components': 'V, S, M',
+    'cast-time': '3 turns',
+    'saving-throw': 'None',
+    'materials': 'An offering appropriate to the deity. The DM determines the exact nature of this offering.',
+    'reference': 'p. 109',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This cooperative spell is rarely used or spoken of, since its requirements are strict and the outcome is uncertain. The spell must be cast by six priests of the same faith. All six must touch hands at the time of casting. At the completion of the spell, the priests fall into a trance. The life essences of the priests leave their bodies and merge at a point within 10 feet of the casters. The spirits of the priests meld together to form the avatar of the priests’ deity.\n&emsp;In this manner, the six characters become a single being with all the powers and abilities allowed to that avatar. The only stipulation is that the priests’ deity cannot have created all avatars allowed to it at that moment. If this has happened, the spell fails and the priests are drained as described below.\n&emsp;If the spell succeeds, the priests have completely given their wills over to their deity, essentially forming the vessel into which it funnels power. In becoming the avatar, the priests retain the ability to make most of their own decisions. (The six must work in harmony or allow one of their number to decide all actions.) However, the deity can assume direct control of the avatar at any time it desires--the avatar is, after all, an earthly manifestation of the deity.\n&emsp;Although the spell has a duration of one hour, the deity is not obliged to release the priests at that time. If the priests are not released at the end of the spell’s duration, they instantly die. A deity can choose to sacrifice its priests in order to maintain its avatar on the Prime Material plane. Such a cruel and unjust action is almost never undertaken by good deities or those that have any respect for life, free will, or mercy. For dark and sinister gods, the question is much more uncertain. If a deity chooses to maintain the avatar longer than one hour, control of the avatar instantly and permanently passes to the DM. (Clearly, a DM should seldom if ever exercise this power.)\n&emsp;While the priests are formed into the avatar, their bodies remain in a death like trance. The priests have no idea what might be happening to their real bodies (unless the avatar can observe them). Any damage to a priest’s body requires an instant system shock roll. If successful, the damage is recorded normally, but the damage does not take effect until the spell ends (at which point the priest will almost certainly die). If the system shock roll is failed, the character instantly dies and the spell ends. Characters who die in this manner cannot be raised, resurrected, or reincarnated. They have been taken to the ultimate reward (or punishment) for the service they have rendered. If the bodies are moved from their positions, the spell ends.\n&emsp;Even if the deity releases the priests, they are left severely drained. All spells memorized are lost until the priest can rest and perform his prayers once again. The physical drain leaves each priest with only 1 hit point upon awakening, regardless of the number of hit points the character had when the spell was cast. Since damage suffered during the spell takes effect instantly, any priest who is hurt dies immediately (although quick action by others might save him).\n&emsp;Each priest who survives the spell will be bound by a quest (a duty that must be completed in exchange for calling upon their god).'
+}
+
+pri7['Tentacle Walls'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Enchantment',
+    'sphere': 'Wards',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': '50-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'The dried tentacle of an octopus.',
+    'reference': 'p. 110',
+    'book': 'Tome of Magic',
+    'damage': '1d6',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Tentacle walls* enables the caster to enchant a single room whose volume is less than or equal to the area of effect. The spell activates 1d4 rounds after any creature other than the caster enters the room. The intruder must be larger than a normal rat; that is, it must be larger than one-half cubic foot or weigh more than three pounds.\n&emsp;When the spell is activated, six black, leathery tentacles sprout inside the room; the tentacles are evenly divided among the room’s surfaces (for instance, if the room is a cube, one tentacle sprouts from the floor, one sprouts from the ceiling, and one sprouts from each of the four walls).\n&emsp;The whip-like tentacles grow to the length of the room and swing wildly. Each round, a tentacle has a 30% chance of striking a random creature in the room, inflicting 1d6 points of damage (save vs. spell for half damage). Each tentacle has AC 0 and 25 hit points. When a tentacle is reduced to 0 hit points, it disappears in a puff of black smoke.\n&emsp;If all creatures are killed or withdraw from the room, the surviving tentacles withdraw, disappearing into the walls. If the spell is activated again, six tentacles reappear; new tentacles are created to replace any destroyed previously. As long as one tentacle survives an encounter, the tentacles will continue to be replaced. Only when all six tentacles are destroyed is the spell permanently negated.'
+}
+
+pri7['Timelessness'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Alteration',
+    'sphere': 'Numbers',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] days',
+    'aoe': 'One creature',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'Negate',
+    'materials': 'A gem worth at least 1,000 gp and a small cylinder of obsidian. Both are crushed during the casting.',
+    'reference': 'p. 110',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell totally stops the flow of time for a single individual. All signs of life stop and the subject is incapable of any movement or thought. While the spell is in effect, the subject is totally immovable and cannot be affected by any physical or magical forces. Weapons simply bounce off the subject as they would bounce off the hardest stone. Spells, including *dispel magic*, are totally incapable of affecting the subject in any way. The subject does not age.\n&emsp;Aside from the fact that the subject remains visible, frozen in place like a statue, he is effectively no longer part of the universe. (DMs may rule that the most powerful of magics, such as *wishes*, and creatures of demigod or higher status can affect the subject.)\n&emsp;When the priest casts the spell, he or she states the duration for which the spell will remain in effect (the maximum is one full day per level of the caster). Once the spell is cast, this duration cannot be changed; the priest cannot terminate the spell before the stated time has elapsed.\n&emsp;If the subject is unwilling to be affected by the spell, the priest must touch the victim for the spell to take effect; the subject receives a normal saving throw to resist the effects. A willing subject need not make a saving throw.\n&emsp;The priest may cast this spell on himself if desired. This spell can provide a powerful defensive maneuver; while the spell is in effect, the subject is totally invulnerable. *Timelessness* is also an effective form of long-term imprisonment, as long as the priest is around to cast the spell again at the appropriate time.\n&emsp;This is an exceptionally powerful spell. Casting it puts a significant strain on the priest. Each time he casts *timelessness*, the priest must make a system shock roll. If the priest fails this throw, he or she permanently loses 1 point of Constitution.'
+}
+
+pri7['Uncontrolled Weather'] = {
+    'category': '',
+    'level': '7',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Chaos',
+    'range': '0',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': '[[4d4]] square miles',
+    'components': 'V, S',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 111',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell allows the caster to summon weather that is either appropriate or inappropriate to the climate and season of the region. The summoned effects are always dramatic--cool breezes or light fog will not appear. Instead, torrential floods will assault a desert, a heat wave will rage in polar wastelands, and tornadoes and hurricanes will rip across gentle landscapes. A blizzard might spring up in summer or a tornado might materialize in the winter.\n&emsp;The spellcaster has no influence over the weather pattern that emerges. He cannot control the area of effect or the duration of the weather.\n&emsp;Four turns after the spell is cast, the trend of the weather will become apparent--a sudden chill, gust of wind, overcast sky, etc. The *uncontrolled weather* arrives on the fifth turn. Once the weather has arrived, it cannot be dispelled. If the spell is canceled by the caster before the beginning of the fifth turn, the weather slowly reverts to its original condition.\n&emsp;The effects of the spell are the decision of the DM. The effects should be grand and impressive. Following are suggested effects of the weather.\n&emsp;*Torrential Rain/Blizzard:* Visibility is reduced to 100 yards or less; travel is nearly impossible due to water or heavy snow on the ground.\n&emsp;*Storm/Hurricanes:* All flying creatures are driven from the skies; trees are uprooted; roofs are torn off; ships are endangered.\n&emsp;*Heat Wave:* Intense heat immediately causes ice bridges to melt; avalanches of snow and ice roll down mountains.\n&emsp;The DM determines the area of effect randomly. The maximum duration of the spell is one turn per level of the caster; however, the DM may cancel the effect after a shorter time.'
+}
+
 //#endregion
 
 const priestSpells = {};
