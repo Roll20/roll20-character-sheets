@@ -3319,7 +3319,6 @@ pri7['Wind Walk'] = {
 
 //#region Tome of Magic
 pri1['Analyze Balance'] = {
-    'category': '',
     'level': '1',
     'school': 'Divination',
     'sphere': 'Numbers, Divination',
@@ -3339,7 +3338,6 @@ pri1['Analyze Balance'] = {
 }
 
 pri1['Anti-Vermin Barrier'] = {
-    'category': '',
     'level': '1',
     'school': 'Abjuration',
     'sphere': 'Wards',
@@ -3359,7 +3357,6 @@ pri1['Anti-Vermin Barrier'] = {
 }
 
 pri1['Call Upon Faith'] = {
-    'category': '',
     'level': '1',
     'school': 'Invocation',
     'sphere': 'Summoning',
@@ -3379,7 +3376,6 @@ pri1['Call Upon Faith'] = {
 }
 
 pri1['Courage'] = {
-    'category': '',
     'level': '1',
     'school': 'Enchantment/Charm',
     'sphere': 'War',
@@ -3399,7 +3395,6 @@ pri1['Courage'] = {
 }
 
 pri1['Emotion Read'] = {
-    'category': '',
     'level': '1',
     'school': 'Divination',
     'sphere': 'Thought',
@@ -3419,7 +3414,6 @@ pri1['Emotion Read'] = {
 }
 
 pri1['Know Age'] = {
-    'category': '',
     'level': '1',
     'school': 'Divination',
     'sphere': 'Time',
@@ -3439,7 +3433,6 @@ pri1['Know Age'] = {
 }
 
 pri1['Know Direction'] = {
-    'category': '',
     'level': '1',
     'school': 'Divination',
     'sphere': 'Travelers',
@@ -3459,7 +3452,6 @@ pri1['Know Direction'] = {
 }
 
 pri1['Know Time'] = {
-    'category': '',
     'level': '1',
     'school': 'Divination',
     'sphere': 'Time',
@@ -3479,7 +3471,6 @@ pri1['Know Time'] = {
 }
 
 pri1['Log of Everburning'] = {
-    'category': '',
     'level': '1',
     'school': 'Enchantment',
     'sphere': 'Elemental Fire, Plant',
@@ -3499,7 +3490,6 @@ pri1['Log of Everburning'] = {
 }
 
 pri1['Mistaken Missive'] = {
-    'category': '',
     'level': '1',
     'school': 'Alteration',
     'sphere': 'Chaos',
@@ -3519,7 +3509,6 @@ pri1['Mistaken Missive'] = {
 }
 
 pri1['Morale'] = {
-    'category': '',
     'level': '1',
     'school': 'Enchantment/Charm',
     'sphere': 'War',
@@ -3539,7 +3528,6 @@ pri1['Morale'] = {
 }
 
 pri1['Personal Reading'] = {
-    'category': '',
     'level': '1',
     'school': 'Divination',
     'sphere': 'Numbers',
@@ -3559,7 +3547,6 @@ pri1['Personal Reading'] = {
 }
 
 pri1['Ring of Hands'] = {
-    'category': '',
     'level': '1',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Protection',
@@ -3579,7 +3566,6 @@ pri1['Ring of Hands'] = {
 }
 
 pri1['Sacred Guardian'] = {
-    'category': '',
     'level': '1',
     'school': 'Enchantment/Charm',
     'sphere': 'Guardian',
@@ -3599,7 +3585,6 @@ pri1['Sacred Guardian'] = {
 }
 
 pri1['Speak With Astral Traveler'] = {
-    'category': '',
     'level': '1',
     'school': 'Alteration',
     'sphere': 'Astral',
@@ -3619,7 +3604,6 @@ pri1['Speak With Astral Traveler'] = {
 }
 
 pri1['Thought Capture'] = {
-    'category': '',
     'level': '1',
     'school': 'Divination',
     'sphere': 'Thought',
@@ -3639,7 +3623,6 @@ pri1['Thought Capture'] = {
 }
 
 pri1['Weighty Chest'] = {
-    'category': '',
     'level': '1',
     'school': 'Alteration',
     'sphere': 'Wards',
@@ -3659,7 +3642,6 @@ pri1['Weighty Chest'] = {
 }
 
 pri2['Aura of Comfort'] = {
-    'category': '',
     'level': '2',
     'school': 'Evocation',
     'sphere': 'Travelers',
@@ -3679,7 +3661,6 @@ pri2['Aura of Comfort'] = {
 }
 
 pri2['Calm Chaos'] = {
-    'category': '',
     'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Law',
@@ -3699,7 +3680,6 @@ pri2['Calm Chaos'] = {
 }
 
 pri2['Create Holy Symbol'] = {
-    'category': '',
     'level': '2',
     'school': 'Conjuration',
     'sphere': 'Creation',
@@ -3719,7 +3699,6 @@ pri2['Create Holy Symbol'] = {
 }
 
 pri2['Dissension\'s Feast'] = {
-    'category': '',
     'level': '2',
     'school': 'Enchantment/Charm, Alteration',
     'sphere': 'Chaos',
@@ -3739,7 +3718,6 @@ pri2['Dissension\'s Feast'] = {
 }
 
 pri2['Draw Upon Holy Might'] = {
-    'category': '',
     'level': '2',
     'school': 'Invocation',
     'sphere': 'Summoning',
@@ -3759,7 +3737,6 @@ pri2['Draw Upon Holy Might'] = {
 }
 
 pri2['Emotion Perception'] = {
-    'category': '',
     'level': '2',
     'school': 'Divination',
     'sphere': 'War',
@@ -3779,7 +3756,6 @@ pri2['Emotion Perception'] = {
 }
 
 pri2['Frisky Chest'] = {
-    'category': '',
     'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Wards',
@@ -3799,7 +3775,6 @@ pri2['Frisky Chest'] = {
 }
 
 pri2['Hesitation'] = {
-    'category': '',
     'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Time',
@@ -3819,7 +3794,6 @@ pri2['Hesitation'] = {
 }
 
 pri2['Idea'] = {
-    'category': '',
     'level': '2',
     'school': 'Divination',
     'sphere': 'Thought',
@@ -3839,7 +3813,6 @@ pri2['Idea'] = {
 }
 
 pri2['Lighten Load'] = {
-    'category': '',
     'level': '2',
     'school': 'Alteration',
     'sphere': 'Travelers',
@@ -3859,7 +3832,6 @@ pri2['Lighten Load'] = {
 }
 
 pri2['Mind Read'] = {
-    'category': '',
     'level': '2',
     'school': 'Divination',
     'sphere': 'Thought',
@@ -3879,7 +3851,6 @@ pri2['Mind Read'] = {
 }
 
 pri2['Moment'] = {
-    'category': '',
     'level': '2',
     'school': 'Divination',
     'sphere': 'Numbers',
@@ -3899,7 +3870,6 @@ pri2['Moment'] = {
 }
 
 pri2['Music of the Spheres'] = {
-    'category': '',
     'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Numbers, Charm',
@@ -3919,7 +3889,6 @@ pri2['Music of the Spheres'] = {
 }
 
 pri2['Mystic Transfer'] = {
-    'category': '',
     'level': '2',
     'school': 'Invocation',
     'sphere': 'Charm',
@@ -3939,7 +3908,6 @@ pri2['Mystic Transfer'] = {
 }
 
 pri2['Nap'] = {
-    'category': '',
     'level': '2',
     'school': 'Alteration',
     'sphere': 'Time',
@@ -3959,7 +3927,6 @@ pri2['Nap'] = {
 }
 
 pri2['Rally'] = {
-    'category': '',
     'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'War',
@@ -3979,7 +3946,6 @@ pri2['Rally'] = {
 }
 
 pri2['Sanctify'] = {
-    'category': '',
     'level': '2',
     'school': 'Conjuration/Summoning (Reversible)',
     'sphere': 'All',
@@ -3999,7 +3965,6 @@ pri2['Sanctify'] = {
 }
 
 pri2['Zone of Truth'] = {
-    'category': '',
     'level': '2',
     'school': 'Enchantment/Charm',
     'sphere': 'Wards',
@@ -4019,7 +3984,6 @@ pri2['Zone of Truth'] = {
 }
 
 pri3['Accelerate Healing'] = {
-    'category': '',
     'level': '3',
     'school': 'Alteration',
     'sphere': 'Time',
@@ -4039,7 +4003,6 @@ pri3['Accelerate Healing'] = {
 }
 
 pri3['Adaptation'] = {
-    'category': '',
     'level': '3',
     'school': 'Enchantment/Charm, Alteration',
     'sphere': 'War',
@@ -4059,7 +4022,6 @@ pri3['Adaptation'] = {
 }
 
 pri3['Astral Window'] = {
-    'category': '',
     'level': '3',
     'school': 'Divination',
     'sphere': 'Astral',
@@ -4079,7 +4041,6 @@ pri3['Astral Window'] = {
 }
 
 pri3['Caltrops'] = {
-    'category': '',
     'level': '3',
     'school': 'Evocation',
     'sphere': 'War',
@@ -4099,7 +4060,6 @@ pri3['Caltrops'] = {
 }
 
 pri3['Choose Future'] = {
-    'category': '',
     'level': '3',
     'school': 'Divination',
     'sphere': 'Time',
@@ -4119,7 +4079,6 @@ pri3['Choose Future'] = {
 }
 
 pri3['Create Campsite'] = {
-    'category': '',
     'level': '3',
     'school': 'Conjuration/Summoning (Reversible)',
     'sphere': 'Travelers',
@@ -4139,7 +4098,6 @@ pri3['Create Campsite'] = {
 }
 
 pri3['Efficacious Monster Ward'] = {
-    'category': '',
     'level': '3',
     'school': 'Abjuration',
     'sphere': 'Wards',
@@ -4159,7 +4117,6 @@ pri3['Efficacious Monster Ward'] = {
 }
 
 pri3['Emotion Control'] = {
-    'category': '',
     'level': '3',
     'school': 'Alteration, Enchantment/Charm',
     'sphere': 'Thought, Charm',
@@ -4179,7 +4136,6 @@ pri3['Emotion Control'] = {
 }
 
 pri3['Extradimensional Detection'] = {
-    'category': '',
     'level': '3',
     'school': 'Divination',
     'sphere': 'Numbers, Divination',
@@ -4199,7 +4155,6 @@ pri3['Extradimensional Detection'] = {
 }
 
 pri3['Helping Hand'] = {
-    'category': '',
     'level': '3',
     'school': 'Evocation',
     'sphere': 'Travelers',
@@ -4219,7 +4174,6 @@ pri3['Helping Hand'] = {
 }
 
 pri3['Invisibility Purge'] = {
-    'category': '',
     'level': '3',
     'school': 'Abjuration',
     'sphere': 'Wards',
@@ -4239,7 +4193,6 @@ pri3['Invisibility Purge'] = {
 }
 
 pri3['Know Customs'] = {
-    'category': '',
     'level': '3',
     'school': 'Divination',
     'sphere': 'Travelers',
@@ -4259,7 +4212,6 @@ pri3['Know Customs'] = {
 }
 
 pri3['Line of Protection'] = {
-    'category': '',
     'level': '3',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Protection',
@@ -4279,7 +4231,6 @@ pri3['Line of Protection'] = {
 }
 
 pri3['Memory Read'] = {
-    'category': '',
     'level': '3',
     'school': 'Divination',
     'sphere': 'Thought',
@@ -4299,7 +4250,6 @@ pri3['Memory Read'] = {
 }
 
 pri3['Miscast Magic'] = {
-    'category': '',
     'level': '3',
     'school': 'Invocation/Evocation',
     'sphere': 'Chaos',
@@ -4319,7 +4269,6 @@ pri3['Miscast Magic'] = {
 }
 
 pri3['Moment Reading'] = {
-    'category': '',
     'level': '3',
     'school': 'Divination',
     'sphere': 'Numbers',
@@ -4339,7 +4288,6 @@ pri3['Moment Reading'] = {
 }
 
 pri3['Random Causality'] = {
-    'category': '',
     'level': '3',
     'school': 'Alteration',
     'sphere': 'Chaos',
@@ -4359,7 +4307,6 @@ pri3['Random Causality'] = {
 }
 
 pri3['Rigid Thinking'] = {
-    'category': '',
     'level': '3',
     'school': 'Enchantment/Charm',
     'sphere': 'Law',
@@ -4379,7 +4326,6 @@ pri3['Rigid Thinking'] = {
 }
 
 pri3['Slow Rot'] = {
-    'category': '',
     'level': '3',
     'school': 'Abjuration',
     'sphere': 'Plant',
@@ -4399,7 +4345,6 @@ pri3['Slow Rot'] = {
 }
 
 pri3['Squeaking Floors'] = {
-    'category': '',
     'level': '3',
     'school': 'Evocation',
     'sphere': 'Wards',
@@ -4419,7 +4364,6 @@ pri3['Squeaking Floors'] = {
 }
 
 pri3['Strength of One'] = {
-    'category': '',
     'level': '3',
     'school': 'Alteration',
     'sphere': 'Law',
@@ -4439,7 +4383,6 @@ pri3['Strength of One'] = {
 }
 
 pri3['Telepathy'] = {
-    'category': '',
     'level': '3',
     'school': 'Divination, Alteration',
     'sphere': 'Thought',
@@ -4459,7 +4402,6 @@ pri3['Telepathy'] = {
 }
 
 pri3['Telethaumaturgy'] = {
-    'category': '',
     'level': '3',
     'school': 'Enchantment/Charm',
     'sphere': 'Numbers',
@@ -4479,7 +4421,6 @@ pri3['Telethaumaturgy'] = {
 }
 
 pri3['Thief\'s Lament'] = {
-    'category': '',
     'level': '3',
     'school': 'Alteration',
     'sphere': 'Wards',
@@ -4499,7 +4440,6 @@ pri3['Thief\'s Lament'] = {
 }
 
 pri3['Unearthly Choir'] = {
-    'category': '',
     'level': '3',
     'school': 'Invocation',
     'sphere': 'Combat',
@@ -4519,7 +4459,6 @@ pri3['Unearthly Choir'] = {
 }
 
 pri3['Zone of Sweet Air'] = {
-    'category': '',
     'level': '3',
     'school': 'Abjuration',
     'sphere': 'Wards',
@@ -4539,7 +4478,6 @@ pri3['Zone of Sweet Air'] = {
 }
 
 pri4['Addition'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Numbers, Creation',
@@ -4559,7 +4497,6 @@ pri4['Addition'] = {
 }
 
 pri4['Age Plant'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Time',
@@ -4579,7 +4516,6 @@ pri4['Age Plant'] = {
 }
 
 pri4['Blessed Warmth'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Sun',
@@ -4599,7 +4535,6 @@ pri4['Blessed Warmth'] = {
 }
 
 pri4['Body Clock'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Time',
@@ -4619,7 +4554,6 @@ pri4['Body Clock'] = {
 }
 
 pri4['Chaotic Combat'] = {
-    'category': '',
     'level': '4',
     'school': 'Invocation/Evocation',
     'sphere': 'Chaos',
@@ -4639,7 +4573,6 @@ pri4['Chaotic Combat'] = {
 }
 
 pri4['Chaotic Sleep'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Chaos',
@@ -4659,7 +4592,6 @@ pri4['Chaotic Sleep'] = {
 }
 
 pri4['Circle of Privacy'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Travelers',
@@ -4679,7 +4611,6 @@ pri4['Circle of Privacy'] = {
 }
 
 pri4['Compulsive Order'] = {
-    'category': '',
     'level': '4',
     'school': 'Enchantment/Charm',
     'sphere': 'Law',
@@ -4699,7 +4630,6 @@ pri4['Compulsive Order'] = {
 }
 
 pri4['Defensive Harmony'] = {
-    'category': '',
     'level': '4',
     'school': 'Enchantment/Charm',
     'sphere': 'Law',
@@ -4719,7 +4649,6 @@ pri4['Defensive Harmony'] = {
 }
 
 pri4['Dimensional Folding'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Numbers',
@@ -4739,7 +4668,6 @@ pri4['Dimensional Folding'] = {
 }
 
 pri4['Fire Purge'] = {
-    'category': '',
     'level': '4',
     'school': 'Abjuration',
     'sphere': 'Wards',
@@ -4759,7 +4687,6 @@ pri4['Fire Purge'] = {
 }
 
 pri4['Focus'] = {
-    'category': '',
     'level': '4',
     'school': 'Invocation',
     'sphere': 'All',
@@ -4779,7 +4706,6 @@ pri4['Focus'] = {
 }
 
 pri4['Fortify'] = {
-    'category': '',
     'level': '4',
     'school': 'Necromancy',
     'sphere': 'Healing',
@@ -4799,7 +4725,6 @@ pri4['Fortify'] = {
 }
 
 pri4['Genius'] = {
-    'category': '',
     'level': '4',
     'school': 'Divination',
     'sphere': 'Thought',
@@ -4819,7 +4744,6 @@ pri4['Genius'] = {
 }
 
 pri4['Inverted Ethics'] = {
-    'category': '',
     'level': '4',
     'school': 'Enchantment/Charm',
     'sphere': 'Chaos',
@@ -4839,7 +4763,6 @@ pri4['Inverted Ethics'] = {
 }
 
 pri4['Join With Astral Traveler'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Astral',
@@ -4859,7 +4782,6 @@ pri4['Join With Astral Traveler'] = {
 }
 
 pri4['Leadership'] = {
-    'category': '',
     'level': '4',
     'school': 'Enchantment/Charm, Alteration (Reversible)',
     'sphere': 'War',
@@ -4879,7 +4801,6 @@ pri4['Leadership'] = {
 }
 
 pri4['Mental Domination'] = {
-    'category': '',
     'level': '4',
     'school': 'Enchantment/Charm',
     'sphere': 'Thought',
@@ -4899,7 +4820,6 @@ pri4['Mental Domination'] = {
 }
 
 pri4['Modify Memory'] = {
-    'category': '',
     'level': '4',
     'school': 'Enchantment/Charm',
     'sphere': 'Time',
@@ -4919,7 +4839,6 @@ pri4['Modify Memory'] = {
 }
 
 pri4['Probability Control'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Numbers',
@@ -4939,7 +4858,6 @@ pri4['Probability Control'] = {
 }
 
 pri4['Rapport'] = {
-    'category': '',
     'level': '4',
     'school': 'Divination, Alteration',
     'sphere': 'Thought',
@@ -4959,7 +4877,6 @@ pri4['Rapport'] = {
 }
 
 pri4['Solipsism'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Thought',
@@ -4979,7 +4896,6 @@ pri4['Solipsism'] = {
 }
 
 pri4['Tanglefoot'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration, Abjuration (Reversible)',
     'sphere': 'War',
@@ -4999,7 +4915,6 @@ pri4['Tanglefoot'] = {
 }
 
 pri4['Thought Broadcast'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'Thought',
@@ -5019,7 +4934,6 @@ pri4['Thought Broadcast'] = {
 }
 
 pri4['Tree Steed'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration, Enchantment/Charm',
     'sphere': 'Travelers',
@@ -5039,7 +4953,6 @@ pri4['Tree Steed'] = {
 }
 
 pri4['Uplift'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'sphere': 'All',
@@ -5059,7 +4972,6 @@ pri4['Uplift'] = {
 }
 
 pri4['Weather Stasis'] = {
-    'category': '',
     'level': '4',
     'school': 'Abjuration',
     'sphere': 'Wards, Weather',
@@ -5079,7 +4991,6 @@ pri4['Weather Stasis'] = {
 }
 
 pri5['Age Object'] = {
-    'category': '',
     'level': '5',
     'school': 'Alteration (Reversible)',
     'sphere': 'Time',
@@ -5099,7 +5010,6 @@ pri5['Age Object'] = {
 }
 
 pri5['Barrier of Retention'] = {
-    'category': '',
     'level': '5',
     'school': 'Abjuration',
     'sphere': 'Wards',
@@ -5119,7 +5029,6 @@ pri5['Barrier of Retention'] = {
 }
 
 pri5['Blessed Abundance'] = {
-    'category': '',
     'level': '5',
     'school': 'Conjuration',
     'sphere': 'Creation',
@@ -5139,7 +5048,6 @@ pri5['Blessed Abundance'] = {
 }
 
 pri5['Champion\'s Strength'] = {
-    'category': '',
     'level': '5',
     'school': 'Alteration',
     'sphere': 'Law',
@@ -5159,7 +5067,6 @@ pri5['Champion\'s Strength'] = {
 }
 
 pri5['Chaotic Commands'] = {
-    'category': '',
     'level': '5',
     'school': 'Enchantment/Charm',
     'sphere': 'Chaos',
@@ -5179,7 +5086,6 @@ pri5['Chaotic Commands'] = {
 }
 
 pri5['Clear Path'] = {
-    'category': '',
     'level': '5',
     'school': 'Alteration (Reversible)',
     'sphere': 'Travelers',
@@ -5199,7 +5105,6 @@ pri5['Clear Path'] = {
 }
 
 pri5['Cloud of Purification'] = {
-    'category': '',
     'level': '5',
     'school': 'Evocation',
     'sphere': 'Elemental Air, Water',
@@ -5219,7 +5124,6 @@ pri5['Cloud of Purification'] = {
 }
 
 pri5['Consequence'] = {
-    'category': '',
     'level': '5',
     'school': 'Divination',
     'sphere': 'Numbers, Divination',
@@ -5239,7 +5143,6 @@ pri5['Consequence'] = {
 }
 
 pri5['Disguise'] = {
-    'category': '',
     'level': '5',
     'school': 'Illusion/Phantasm',
     'sphere': 'War',
@@ -5259,7 +5162,6 @@ pri5['Disguise'] = {
 }
 
 pri5['Easy March'] = {
-    'category': '',
     'level': '5',
     'school': 'Invocation',
     'sphere': 'Travelers',
@@ -5279,7 +5181,6 @@ pri5['Easy March'] = {
 }
 
 pri5['Elemental Forbiddance'] = {
-    'category': '',
     'level': '5',
     'school': 'Abjuration',
     'sphere': 'Wards, Elemental--Air, Earth, Fire, Water',
@@ -5299,7 +5200,6 @@ pri5['Elemental Forbiddance'] = {
 }
 
 pri5['Extradimensional Manipulation'] = {
-    'category': '',
     'level': '5',
     'school': 'Alteration',
     'sphere': 'Numbers',
@@ -5319,7 +5219,6 @@ pri5['Extradimensional Manipulation'] = {
 }
 
 pri5['Extradimensional Pocket'] = {
-    'category': '',
     'level': '5',
     'school': 'Alteration',
     'sphere': 'Numbers',
@@ -5339,7 +5238,6 @@ pri5['Extradimensional Pocket'] = {
 }
 
 pri5['Grounding'] = {
-    'category': '',
     'level': '5',
     'school': 'Abjuration',
     'sphere': 'Wards',
@@ -5359,7 +5257,6 @@ pri5['Grounding'] = {
 }
 
 pri5['Illusory Artillery'] = {
-    'category': '',
     'level': '5',
     'school': 'Enchantment/Charm',
     'sphere': 'War',
@@ -5379,7 +5276,6 @@ pri5['Illusory Artillery'] = {
 }
 
 pri5['Impeding Permission'] = {
-    'category': '',
     'level': '5',
     'school': 'Enchantment/Charm',
     'sphere': 'Law',
@@ -5399,7 +5295,6 @@ pri5['Impeding Permission'] = {
 }
 
 pri5['Meld'] = {
-    'category': '',
     'level': '5',
     'school': 'Enchantment',
     'sphere': 'Charm',
@@ -5419,7 +5314,6 @@ pri5['Meld'] = {
 }
 
 pri5['Memory Wrack'] = {
-    'category': '',
     'level': '5',
     'school': 'Alteration, Enchantment/Charm',
     'sphere': 'Thought',
@@ -5439,7 +5333,6 @@ pri5['Memory Wrack'] = {
 }
 
 pri5['Mindshatter'] = {
-    'category': '',
     'level': '5',
     'school': 'Enchantment/Charm',
     'sphere': 'Thought',
@@ -5459,7 +5352,6 @@ pri5['Mindshatter'] = {
 }
 
 pri5['Repeat Action'] = {
-    'category': '',
     'level': '5',
     'school': 'Enchantment/Charm',
     'sphere': 'Time',
@@ -5479,7 +5371,6 @@ pri5['Repeat Action'] = {
 }
 
 pri5['Shrieking Walls'] = {
-    'category': '',
     'level': '5',
     'school': 'Enchantment',
     'sphere': 'Wards',
@@ -5499,7 +5390,6 @@ pri5['Shrieking Walls'] = {
 }
 
 pri5['Thoughtwave'] = {
-    'category': '',
     'level': '5',
     'school': 'Divination',
     'sphere': 'Divination',
@@ -5519,7 +5409,6 @@ pri5['Thoughtwave'] = {
 }
 
 pri5['Time Pool'] = {
-    'category': '',
     'level': '5',
     'school': 'Divination',
     'sphere': 'Time',
@@ -5539,7 +5428,6 @@ pri5['Time Pool'] = {
 }
 
 pri5['Unceasing Vigilance of the Holy Sentinel'] = {
-    'category': '',
     'level': '5',
     'school': 'Alteration',
     'sphere': 'Guardian',
@@ -5559,7 +5447,6 @@ pri5['Unceasing Vigilance of the Holy Sentinel'] = {
 }
 
 pri5['Undead Ward'] = {
-    'category': '',
     'level': '5',
     'school': 'Abjuration, Necromancy',
     'sphere': 'Wards',
@@ -5579,7 +5466,6 @@ pri5['Undead Ward'] = {
 }
 
 pri6['Age Creature'] = {
-    'category': '',
     'level': '6',
     'school': 'Alteration (Reversible)',
     'sphere': 'Time',
@@ -5599,7 +5485,6 @@ pri6['Age Creature'] = {
 }
 
 pri6['Crushing Walls'] = {
-    'category': '',
     'level': '6',
     'school': 'Enchantment',
     'sphere': 'Wards',
@@ -5619,7 +5504,6 @@ pri6['Crushing Walls'] = {
 }
 
 pri6['Disbelief'] = {
-    'category': '',
     'level': '6',
     'school': 'Enchantment/Charm',
     'sphere': 'Thought',
@@ -5639,7 +5523,6 @@ pri6['Disbelief'] = {
 }
 
 pri6['Dragonbane'] = {
-    'category': '',
     'level': '6',
     'school': 'Abjuration',
     'sphere': 'Wards',
@@ -5659,7 +5542,6 @@ pri6['Dragonbane'] = {
 }
 
 pri6['Gravity Variation'] = {
-    'category': '',
     'level': '6',
     'school': 'Alteration',
     'sphere': 'War',
@@ -5679,7 +5561,6 @@ pri6['Gravity Variation'] = {
 }
 
 pri6['The Great Circle'] = {
-    'category': '',
     'level': '6',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Sun',
@@ -5699,7 +5580,6 @@ pri6['The Great Circle'] = {
 }
 
 pri6['Group Mind'] = {
-    'category': '',
     'level': '6',
     'school': 'Divination, Enchantment/Charm',
     'sphere': 'Thought',
@@ -5719,7 +5599,6 @@ pri6['Group Mind'] = {
 }
 
 pri6['Land of Stability'] = {
-    'category': '',
     'level': '6',
     'school': 'Abjuration',
     'sphere': 'Wards',
@@ -5739,7 +5618,6 @@ pri6['Land of Stability'] = {
 }
 
 pri6['Legal Thoughts'] = {
-    'category': '',
     'level': '6',
     'school': 'Enchantment/Charm',
     'sphere': 'Law',
@@ -5759,7 +5637,6 @@ pri6['Legal Thoughts'] = {
 }
 
 pri6['Monster Mount'] = {
-    'category': '',
     'level': '6',
     'school': 'Enchantment/Charm',
     'sphere': 'Travelers',
@@ -5779,7 +5656,6 @@ pri6['Monster Mount'] = {
 }
 
 pri6['Physical Mirror'] = {
-    'category': '',
     'level': '6',
     'school': 'Alteration',
     'sphere': 'Numbers',
@@ -5799,7 +5675,6 @@ pri6['Physical Mirror'] = {
 }
 
 pri6['Reverse Time'] = {
-    'category': '',
     'level': '6',
     'school': 'Alteration',
     'sphere': 'Time',
@@ -5819,7 +5694,6 @@ pri6['Reverse Time'] = {
 }
 
 pri6['Seclusion'] = {
-    'category': '',
     'level': '6',
     'school': 'Alteration',
     'sphere': 'Numbers',
@@ -5839,7 +5713,6 @@ pri6['Seclusion'] = {
 }
 
 pri6['Skip Day'] = {
-    'category': '',
     'level': '6',
     'school': 'Invocation/Evocation',
     'sphere': 'Time',
@@ -5859,7 +5732,6 @@ pri6['Skip Day'] = {
 }
 
 pri6['Sol\'s Searing Orb'] = {
-    'category': '',
     'level': '6',
     'school': 'Invocation',
     'sphere': 'Sun',
@@ -5879,7 +5751,6 @@ pri6['Sol\'s Searing Orb'] = {
 }
 
 pri6['Spiritual Wrath'] = {
-    'category': '',
     'level': '6',
     'school': 'Invocation',
     'sphere': 'Combat',
@@ -5899,7 +5770,6 @@ pri6['Spiritual Wrath'] = {
 }
 
 pri7['Age Dragon'] = {
-    'category': '',
     'level': '7',
     'school': 'Alteration',
     'sphere': 'Time',
@@ -5919,7 +5789,6 @@ pri7['Age Dragon'] = {
 }
 
 pri7['Breath of Life'] = {
-    'category': '',
     'level': '7',
     'school': 'Necromantic (Reversible)',
     'sphere': 'Necromantic',
@@ -5939,7 +5808,6 @@ pri7['Breath of Life'] = {
 }
 
 pri7['Divine Inspiration'] = {
-    'category': '',
     'level': '7',
     'school': 'Divination',
     'sphere': 'Thought, Divination',
@@ -5959,7 +5827,6 @@ pri7['Divine Inspiration'] = {
 }
 
 pri7['Hovering Road'] = {
-    'category': '',
     'level': '7',
     'school': 'Conjuration/Summoning',
     'sphere': 'Travelers',
@@ -5979,7 +5846,6 @@ pri7['Hovering Road'] = {
 }
 
 pri7['Illusory Fortification'] = {
-    'category': '',
     'level': '7',
     'school': 'Illusion/Phantasm',
     'sphere': 'War',
@@ -5999,7 +5865,6 @@ pri7['Illusory Fortification'] = {
 }
 
 pri7['Mind Tracker'] = {
-    'category': '',
     'level': '7',
     'school': 'Divination',
     'sphere': 'Divination',
@@ -6019,7 +5884,6 @@ pri7['Mind Tracker'] = {
 }
 
 pri7['Shadow Engines'] = {
-    'category': '',
     'level': '7',
     'school': 'Illusion/Phantasm',
     'sphere': 'War',
@@ -6039,7 +5903,6 @@ pri7['Shadow Engines'] = {
 }
 
 pri7['Spacewarp'] = {
-    'category': '',
     'level': '7',
     'school': 'Alteration',
     'sphere': 'Numbers',
@@ -6059,7 +5922,6 @@ pri7['Spacewarp'] = {
 }
 
 pri7['Spirit of Power'] = {
-    'category': '',
     'level': '7',
     'school': 'Summoning, Invocation',
     'sphere': 'Summoning',
@@ -6079,7 +5941,6 @@ pri7['Spirit of Power'] = {
 }
 
 pri7['Tentacle Walls'] = {
-    'category': '',
     'level': '7',
     'school': 'Enchantment',
     'sphere': 'Wards',
@@ -6099,7 +5960,6 @@ pri7['Tentacle Walls'] = {
 }
 
 pri7['Timelessness'] = {
-    'category': '',
     'level': '7',
     'school': 'Alteration',
     'sphere': 'Numbers',
@@ -6119,7 +5979,6 @@ pri7['Timelessness'] = {
 }
 
 pri7['Uncontrolled Weather'] = {
-    'category': '',
     'level': '7',
     'school': 'Conjuration/Summoning',
     'sphere': 'Chaos',
@@ -6140,7 +5999,6 @@ pri7['Uncontrolled Weather'] = {
 
 const priq = {};
 priq['Abundance'] = {
-    'category': '',
     'level': 'q',
     'school': 'Alteration',
     'sphere': 'Creation, Plant',
@@ -6160,7 +6018,6 @@ priq['Abundance'] = {
 }
 
 priq['Animal Horde'] = {
-    'category': '',
     'level': 'q',
     'school': 'Conjuration/Summoning',
     'sphere': 'Animal, Summoning',
@@ -6180,7 +6037,6 @@ priq['Animal Horde'] = {
 }
 
 priq['Circle of Sunmotes'] = {
-    'category': '',
     'level': 'q',
     'school': 'Alteration, Invocation/Evocation, Necromancy',
     'sphere': 'Sun',
@@ -6200,7 +6056,6 @@ priq['Circle of Sunmotes'] = {
 }
 
 priq['Conformance'] = {
-    'category': '',
     'level': 'q',
     'school': 'Conjuration/Summoning, Invocation',
     'sphere': 'Law',
@@ -6220,7 +6075,6 @@ priq['Conformance'] = {
 }
 
 priq['Elemental Swarm'] = {
-    'category': '',
     'level': 'q',
     'school': 'Conjuration/Summoning',
     'sphere': 'Elemental, Summoning',
@@ -6240,7 +6094,6 @@ priq['Elemental Swarm'] = {
 }
 
 priq['Etherwalk'] = {
-    'category': '',
     'level': 'q',
     'school': 'Alteration',
     'sphere': 'Astral, Travelers',
@@ -6260,7 +6113,6 @@ priq['Etherwalk'] = {
 }
 
 priq['Fear Contagion'] = {
-    'category': '',
     'level': 'q',
     'school': 'Abjuration',
     'sphere': 'Charm, War',
@@ -6280,7 +6132,6 @@ priq['Fear Contagion'] = {
 }
 
 priq['Health Blessing'] = {
-    'category': '',
     'level': 'q',
     'school': 'Necromancy',
     'sphere': 'Healing, Necromantic',
@@ -6300,7 +6151,6 @@ priq['Health Blessing'] = {
 }
 
 priq['Highway'] = {
-    'category': '',
     'level': 'q',
     'school': 'Alteration, Evocation',
     'sphere': 'Travelers',
@@ -6320,7 +6170,6 @@ priq['Highway'] = {
 }
 
 priq['Imago Interrogation'] = {
-    'category': '',
     'level': 'q',
     'school': 'Divination, Enchantment/Charm',
     'sphere': 'Astral, Divination, Time',
@@ -6340,7 +6189,6 @@ priq['Imago Interrogation'] = {
 }
 
 priq['Implosion/Inversion'] = {
-    'category': '',
     'level': 'q',
     'school': 'Invocation',
     'sphere': 'Numbers, Combat',
@@ -6360,7 +6208,6 @@ priq['Implosion/Inversion'] = {
 }
 
 priq['Interdiction'] = {
-    'category': '',
     'level': 'q',
     'school': 'Abjuration',
     'sphere': 'Chaos, Law, Wards',
@@ -6380,7 +6227,6 @@ priq['Interdiction'] = {
 }
 
 priq['Mindnet'] = {
-    'category': '',
     'level': 'q',
     'school': 'Divination, Enchantment/Charm',
     'sphere': 'Thought',
@@ -6400,7 +6246,6 @@ priq['Mindnet'] = {
 }
 
 priq['Planar Quest'] = {
-    'category': '',
     'level': 'q',
     'school': 'Alteration',
     'sphere': 'Astral',
@@ -6420,7 +6265,6 @@ priq['Planar Quest'] = {
 }
 
 priq['Preservation'] = {
-    'category': '',
     'level': 'q',
     'school': 'Abjuration',
     'sphere': 'Wards',
@@ -6440,7 +6284,6 @@ priq['Preservation'] = {
 }
 
 priq['Revelation'] = {
-    'category': '',
     'level': 'q',
     'school': 'Divination',
     'sphere': 'Divination',
@@ -6460,7 +6303,6 @@ priq['Revelation'] = {
 }
 
 priq['Reversion'] = {
-    'category': '',
     'level': 'q',
     'school': 'Alteration, Invocation',
     'sphere': 'Time',
@@ -6480,7 +6322,6 @@ priq['Reversion'] = {
 }
 
 priq['Robe of Healing'] = {
-    'category': '',
     'level': 'q',
     'school': 'Enchantment, Necromancy',
     'sphere': 'Healing',
@@ -6500,7 +6341,6 @@ priq['Robe of Healing'] = {
 }
 
 priq['Siege Wall'] = {
-    'category': '',
     'level': 'q',
     'school': 'Alteration, Invocation',
     'sphere': 'Creation, Guardian',
@@ -6520,7 +6360,6 @@ priq['Siege Wall'] = {
 }
 
 priq['Shooting Stars'] = {
-    'category': '',
     'level': 'q',
     'school': 'Conjuration, Invocation',
     'sphere': 'Combat, Sun, Weather',
@@ -6540,7 +6379,6 @@ priq['Shooting Stars'] = {
 }
 
 priq['Sphere of Security'] = {
-    'category': '',
     'level': 'q',
     'school': 'Abjuration',
     'sphere': 'Protection',
@@ -6560,7 +6398,6 @@ priq['Sphere of Security'] = {
 }
 
 priq['Spiral of Degeneration'] = {
-    'category': '',
     'level': 'q',
     'school': 'Enchantment/Charm, Invocation',
     'sphere': 'Chaos, Thought',
@@ -6580,7 +6417,6 @@ priq['Spiral of Degeneration'] = {
 }
 
 priq['Stalker'] = {
-    'category': '',
     'level': 'q',
     'school': 'Conjuration/Summoning',
     'sphere': 'Creation, Guardian, Plant',
@@ -6600,7 +6436,6 @@ priq['Stalker'] = {
 }
 
 priq['Storm of Vengeance'] = {
-    'category': '',
     'level': 'q',
     'school': 'Evocation',
     'sphere': 'Elemental, War, Weather',
@@ -6620,7 +6455,6 @@ priq['Storm of Vengeance'] = {
 }
 
 priq['Transformation'] = {
-    'category': '',
     'level': 'q',
     'school': 'Alteration, Enchantment, Illusion',
     'sphere': 'Numbers',
@@ -6640,7 +6474,6 @@ priq['Transformation'] = {
 }
 
 priq['Undead Plague'] = {
-    'category': '',
     'level': 'q',
     'school': 'Necromancy',
     'sphere': 'Necromantic',
@@ -6660,7 +6493,6 @@ priq['Undead Plague'] = {
 }
 
 priq['Warband Quest'] = {
-    'category': '',
     'level': 'q',
     'school': 'Enchantment/Charm',
     'sphere': 'Charm, War',
@@ -6680,7 +6512,6 @@ priq['Warband Quest'] = {
 }
 
 priq['Ward Matrix'] = {
-    'category': '',
     'level': 'q',
     'school': 'Invocation/Evocation',
     'sphere': 'Wards',
@@ -6700,7 +6531,6 @@ priq['Ward Matrix'] = {
 }
 
 priq['Wolf Spirits'] = {
-    'category': '',
     'level': 'q',
     'school': 'Conjuration/Summoning, Invocation',
     'sphere': 'Animal, Guardian, Summoning',

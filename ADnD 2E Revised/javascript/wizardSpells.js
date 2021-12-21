@@ -6461,7 +6461,6 @@ wiz1['Hornung\'s Guess'] = {
 }
 
 wiz1['Lasting Breath'] = {
-    'category': '',
     'level': '1',
     'school': 'Alteration',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
@@ -6480,7 +6479,6 @@ wiz1['Lasting Breath'] = {
 }
 
 wiz1['Metamorphose Liquids'] = {
-    'category': '',
     'level': '1',
     'school': 'Alteration',
     'range': 'Touch',
@@ -6499,7 +6497,6 @@ wiz1['Metamorphose Liquids'] = {
 }
 
 wiz1['Murdock\'s Feathery Flyer'] = {
-    'category': '',
     'level': '1',
     'school': 'Alteration',
     'range': '0',
@@ -6594,7 +6591,6 @@ wiz2['Hornung\'s Baneful Deflector'] = {
 }
 
 wiz2['Insatiable Thirst'] = {
-    'category': '',
     'level': '2',
     'school': 'Enchantment/Charm',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
@@ -6613,7 +6609,6 @@ wiz2['Insatiable Thirst'] = {
 }
 
 wiz2['Maximilian\'s Earthen Grasp'] = {
-    'category': '',
     'level': '2',
     'school': 'Evocation',
     'range': '[[10+10*[[@{level-wizard}]] ]] yards',
@@ -6651,7 +6646,6 @@ wiz2['Nahal\'s Nonsensical Nullifier'] = {
 }
 
 wiz2['Past Life'] = {
-    'category': '',
     'level': '2',
     'school': 'Divination',
     'range': 'Touch',
@@ -6670,7 +6664,6 @@ wiz2['Past Life'] = {
 }
 
 wiz2['Protection From Paralysis'] = {
-    'category': '',
     'level': '2',
     'school': 'Abjuration',
     'range': 'Touch',
@@ -6689,7 +6682,6 @@ wiz2['Protection From Paralysis'] = {
 }
 
 wiz2['Ride the Wind'] = {
-    'category': '',
     'level': '2',
     'school': 'Alteration',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
@@ -6708,7 +6700,6 @@ wiz2['Ride the Wind'] = {
 }
 
 wiz2['Sense Shifting'] = {
-    'category': '',
     'level': '2',
     'school': 'Alteration',
     'range': '0',
@@ -6727,7 +6718,6 @@ wiz2['Sense Shifting'] = {
 }
 
 wiz3['Alacrity'] = {
-    'category': '',
     'level': '3',
     'school': 'Alteration',
     'range': '0',
@@ -6746,7 +6736,6 @@ wiz3['Alacrity'] = {
 }
 
 wiz3['Alamir\'s Fundamental Breakdown'] = {
-    'category': '',
     'level': '3',
     'school': 'Divination',
     'range': 'Touch',
@@ -6784,7 +6773,6 @@ wiz3['Alternate Reality'] = {
 }
 
 wiz3['Augmentation I'] = {
-    'category': '',
     'level': '3',
     'school': 'Invocation/Evocation',
     'range': '0',
@@ -6803,7 +6791,6 @@ wiz3['Augmentation I'] = {
 }
 
 wiz3['Far Reaching I'] = {
-    'category': '',
     'level': '3',
     'school': 'Alteration',
     'range': '0',
@@ -6860,7 +6847,6 @@ wiz3['Fool\'s Speech'] = {
 }
 
 wiz3['Maximilian\'s Stony Grasp'] = {
-    'category': '',
     'level': '3',
     'school': 'Evocation',
     'range': '[[20+10*[[@{level-wizard}]] ]] yards',
@@ -6879,7 +6865,6 @@ wiz3['Maximilian\'s Stony Grasp'] = {
 }
 
 wiz3['Minor Malison'] = {
-    'category': '',
     'level': '3',
     'school': 'Enchantment/Charm',
     'range': '60 feet',
@@ -6898,7 +6883,6 @@ wiz3['Minor Malison'] = {
 }
 
 wiz3['Spirit Armor'] = {
-    'category': '',
     'level': '3',
     'school': 'Necromancy',
     'range': '0',
@@ -6917,7 +6901,6 @@ wiz3['Spirit Armor'] = {
 }
 
 wiz3['Squaring the Circle'] = {
-    'category': '',
     'level': '3',
     'school': 'Alteration',
     'range': '0',
@@ -6936,7 +6919,6 @@ wiz3['Squaring the Circle'] = {
 }
 
 wiz3['Watery Double'] = {
-    'category': '',
     'level': '3',
     'school': 'Conjuration/Summoning, Enchantment',
     'range': 'Touch',
@@ -6955,7 +6937,6 @@ wiz3['Watery Double'] = {
 }
 
 wiz3['Wizard Sight'] = {
-    'category': '',
     'level': '3',
     'school': 'Divination',
     'range': '0',
@@ -6974,7 +6955,6 @@ wiz3['Wizard Sight'] = {
 }
 
 wiz4['Dilation I'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'range': '0',
@@ -6993,7 +6973,6 @@ wiz4['Dilation I'] = {
 }
 
 wiz4['Divination Enhancement'] = {
-    'category': '',
     'level': '4',
     'school': 'Evocation',
     'range': '0',
@@ -7012,7 +6991,6 @@ wiz4['Divination Enhancement'] = {
 }
 
 wiz4['Far Reaching II'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration',
     'range': '0',
@@ -7031,7 +7009,6 @@ wiz4['Far Reaching II'] = {
 }
 
 wiz4['Greater Malison'] = {
-    'category': '',
     'level': '4',
     'school': 'Enchantment/Charm',
     'range': '60 feet',
@@ -7050,7 +7027,6 @@ wiz4['Greater Malison'] = {
 }
 
 wiz4['Locate Creature'] = {
-    'category': '',
     'level': '4',
     'school': 'Divination',
     'range': '[[50*[[@{level-wizard}]] ]] yards',
@@ -7069,7 +7045,6 @@ wiz4['Locate Creature'] = {
 }
 
 wiz4['Mask of Death'] = {
-    'category': '',
     'level': '4',
     'school': 'Necromancy',
     'range': 'Touch',
@@ -7088,7 +7063,6 @@ wiz4['Mask of Death'] = {
 }
 
 wiz4['Minor Spell Turning'] = {
-    'category': '',
     'level': '4',
     'school': 'Abjuration',
     'range': '0',
@@ -7107,7 +7081,6 @@ wiz4['Minor Spell Turning'] = {
 }
 
 wiz4['Mordenkainen\'s Celerity'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration, Invocation',
     'range': '0',
@@ -7126,7 +7099,6 @@ wiz4['Mordenkainen\'s Celerity'] = {
 }
 
 wiz4['Summon Lycanthrope'] = {
-    'category': '',
     'level': '4',
     'school': 'Conjuration/Summoning',
     'range': 'Special',
@@ -7164,7 +7136,6 @@ wiz4['There/Not There'] = {
 }
 
 wiz4['Thunder Staff'] = {
-    'category': '',
     'level': '4',
     'school': 'Invocation/Evocation',
     'range': '0',
@@ -7183,7 +7154,6 @@ wiz4['Thunder Staff'] = {
 }
 
 wiz4['Turn Pebble to Boulder'] = {
-    'category': '',
     'level': '4',
     'school': 'Alteration (Reversible)',
     'range': 'Touch',
@@ -7221,7 +7191,6 @@ wiz4['Unluck'] = {
 }
 
 wiz5['Far Reaching III'] = {
-    'category': '',
     'level': '5',
     'school': 'Alteration',
     'range': '0',
@@ -7240,7 +7209,6 @@ wiz5['Far Reaching III'] = {
 }
 
 wiz5['Khazid\'s Procurement'] = {
-    'category': '',
     'level': '5',
     'school': 'Divination, Summoning',
     'range': 'Special',
@@ -7259,7 +7227,6 @@ wiz5['Khazid\'s Procurement'] = {
 }
 
 wiz5['Lower Resistance'] = {
-    'category': '',
     'level': '5',
     'school': 'Abjuration, Alteration',
     'range': '60 yards',
@@ -7278,7 +7245,6 @@ wiz5['Lower Resistance'] = {
 }
 
 wiz5['Magic Staff'] = {
-    'category': '',
     'level': '5',
     'school': 'Enchantment/Charm',
     'range': 'Touch',
@@ -7297,7 +7263,6 @@ wiz5['Magic Staff'] = {
 }
 
 wiz5['Mind Fog'] = {
-    'category': '',
     'level': '5',
     'school': 'Enchantment/Charm',
     'range': '80 yards',
@@ -7316,7 +7281,6 @@ wiz5['Mind Fog'] = {
 }
 
 wiz5['Safeguarding'] = {
-    'category': '',
     'level': '5',
     'school': 'Abjuration',
     'range': '0',
@@ -7335,7 +7299,6 @@ wiz5['Safeguarding'] = {
 }
 
 wiz5['Von Gasik\'s Refusal'] = {
-    'category': '',
     'level': '5',
     'school': 'Abjuration',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
@@ -7392,7 +7355,6 @@ wiz5['Waveform'] = {
 }
 
 wiz6['Augmentation II'] = {
-    'category': '',
     'level': '6',
     'school': 'Evocation',
     'range': '0',
@@ -7411,7 +7373,6 @@ wiz6['Augmentation II'] = {
 }
 
 wiz6['Bloodstone\'s Spectral Steed'] = {
-    'category': '',
     'level': '6',
     'school': 'Necromancy',
     'range': '10 yards',
@@ -7430,7 +7391,6 @@ wiz6['Bloodstone\'s Spectral Steed'] = {
 }
 
 wiz6['Claws of the Umber Hulk'] = {
-    'category': '',
     'level': '6',
     'school': 'Alteration',
     'range': 'Touch',
@@ -7449,7 +7409,6 @@ wiz6['Claws of the Umber Hulk'] = {
 }
 
 wiz6['Dilation II'] = {
-    'category': '',
     'level': '6',
     'school': 'Alteration',
     'range': '0',
@@ -7468,7 +7427,6 @@ wiz6['Dilation II'] = {
 }
 
 wiz6['Forest\'s Fiery Constrictor'] = {
-    'category': '',
     'level': '6',
     'school': 'Conjuration/Summoning',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
@@ -7487,7 +7445,6 @@ wiz6['Forest\'s Fiery Constrictor'] = {
 }
 
 wiz6['Lorloveim\'s Shadowy Transformation'] = {
-    'category': '',
     'level': '6',
     'school': 'Illusion',
     'range': 'Touch',
@@ -7544,7 +7501,6 @@ wiz6['Wildstrike'] = {
 }
 
 wiz7['Acid Storm'] = {
-    'category': '',
     'level': '7',
     'school': 'Evocation',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
@@ -7563,7 +7519,6 @@ wiz7['Acid Storm'] = {
 }
 
 wiz7['Bloodstone\'s Frightful Joining'] = {
-    'category': '',
     'level': '7',
     'school': 'Necromancy',
     'range': 'Touch',
@@ -7582,7 +7537,6 @@ wiz7['Bloodstone\'s Frightful Joining'] = {
 }
 
 wiz7['Hatch the Stone from the Egg'] = {
-    'category': '',
     'level': '7',
     'school': 'Alteration, Enchantment, Evocation',
     'range': 'Touch',
@@ -7620,7 +7574,6 @@ wiz7['Hornung\'s Surge Selector'] = {
 }
 
 wiz7['Intensify Summoning'] = {
-    'category': '',
     'level': '7',
     'school': 'Conjuration/Summoning, Necromancy',
     'range': 'Special',
@@ -7639,7 +7592,6 @@ wiz7['Intensify Summoning'] = {
 }
 
 wiz7['Malec-Keth\'s Flame Fist'] = {
-    'category': '',
     'level': '7',
     'school': 'Evocation',
     'range': '0',
@@ -7658,7 +7610,6 @@ wiz7['Malec-Keth\'s Flame Fist'] = {
 }
 
 wiz7['Shadowcat'] = {
-    'category': '',
     'level': '7',
     'school': 'Illusion',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
@@ -7696,7 +7647,6 @@ wiz7['Spell Shape'] = {
 }
 
 wiz7['Steal Enchantment'] = {
-    'category': '',
     'level': '7',
     'school': 'Enchantment',
     'range': 'Touch',
@@ -7715,7 +7665,6 @@ wiz7['Steal Enchantment'] = {
 }
 
 wiz7['Suffocate'] = {
-    'category': '',
     'level': '7',
     'school': 'Alteration, Necromancy',
     'range': '30 yards',
@@ -7734,7 +7683,6 @@ wiz7['Suffocate'] = {
 }
 
 wiz8['Abi-Dalzim\'s Horrid Wilting'] = {
-    'category': '',
     'level': '8',
     'school': 'Alteration, Necromancy',
     'range': '[[20*[[@{level-wizard}]] ]] yards',
@@ -7753,7 +7701,6 @@ wiz8['Abi-Dalzim\'s Horrid Wilting'] = {
 }
 
 wiz8['Airboat'] = {
-    'category': '',
     'level': '8',
     'school': 'Alteration, Enchantment',
     'range': '1 mile',
@@ -7772,7 +7719,6 @@ wiz8['Airboat'] = {
 }
 
 wiz8['Gunther\'s Kaleidoscopic Strike'] = {
-    'category': '',
     'level': '8',
     'school': 'Invocation/Evocation',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
@@ -7791,7 +7737,6 @@ wiz8['Gunther\'s Kaleidoscopic Strike'] = {
 }
 
 wiz8['Homunculus Shield'] = {
-    'category': '',
     'level': '8',
     'school': 'Evocation, Necromancy',
     'range': '0',
@@ -7848,7 +7793,6 @@ wiz8['Wildzone'] = {
 }
 
 wiz9['Chain Contingency'] = {
-    'category': '',
     'level': '9',
     'school': 'Evocation',
     'range': '0',
@@ -7867,7 +7811,6 @@ wiz9['Chain Contingency'] = {
 }
 
 wiz9['Elemental Aura'] = {
-    'category': '',
     'level': '9',
     'school': 'Abjuration, Evocation',
     'range': '0',
@@ -7886,7 +7829,6 @@ wiz9['Elemental Aura'] = {
 }
 
 wiz9['Estate Transference'] = {
-    'category': '',
     'level': '9',
     'school': 'Alteration',
     'range': '0',
@@ -7905,7 +7847,6 @@ wiz9['Estate Transference'] = {
 }
 
 wiz9['Glorious Transmutation'] = {
-    'category': '',
     'level': '9',
     'school': 'Alteration',
     'range': 'Touch',
@@ -7943,7 +7884,6 @@ wiz9['Stabilize'] = {
 }
 
 wiz9['Wail of the Banshee'] = {
-    'category': '',
     'level': '9',
     'school': 'Necromancy',
     'range': '0',
