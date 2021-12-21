@@ -5438,6 +5438,146 @@ pri5['Memory Wrack'] = {
     'effect': 'This nasty spell “disconnects” the subject’s short-term and long-term memory. While the spell is in effect, the subject is incapable of storing information in long-term memory. Every moment is virtually an independent event for the subject; he or she can remember recent events, thoughts, and sensations for no more than a few seconds (the amount of time they remain in short-term memory).\n&emsp;Memories of events that happened before the onset of the spell are not affected at all; these are safely stored in long-term memory. This means that the subject can cast any spells memorized before the *memory wrack* took effect, but he is likely to have difficulty casting the spell as described below.\n&emsp;The subject of this spell has a limited ability to act. He is restricted to one action at a time and must concentrate mightily to keep the situation and any planned actions in short-term memory. As long as the subject is able to maintain concentration, he may act normally within these limits.\n&emsp;If the subject is distracted (he is struck in combat, affected by a spell, startled, surprised, or a similar event occurs), he forgets everything that occurred from the onset of the spell to the moment of distraction. The subject must re-evaluate the situation as if it had just come to pass.\n&emsp;Consider the following example. The subject of the spell is a soldier assigned to guard the entrance to a building. The priest arrives and casts *memory wrack* on the guard. The guard has no problem remembering his orders, since he received them before the onset of the spell. He also remembers the arrival of the priest. The priest now tries to convince the guard that he is authorized to enter the building. The guard refuses him entry. The priest now picks up a rock and throws it at the guard, striking him and distracting him. The guard forgets everything that happened between the onset of the spell and the moment the rock struck. He forgets that the priest has already tried to con him and that he threw a rock at him. He must reevaluate the situation as though the priest had just arrived. The priest is free to make another attempt at entering the building.\n&emsp;When the spell expires, the subject remembers nothing that happened while the spell was in effect, possibly leading to amusing consequences (“By the gods, how did I get here?”).'
 }
 
+pri5['Mindshatter'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Thought',
+    'range': '[[3*[[@{level-priest}]] ]] yards',
+    'duration': 'Special',
+    'aoe': 'One creature',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': 'A small bust of a human head, about 3” in height, made from fine, delicate china. The priest shatters this bust during the casting.',
+    'reference': 'p. 94',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell allows the priest to create one specific form of insanity in the subject. Five forms of insanity are possible through this spell.\n&emsp;*Schizophrenia:* This form of insanity is characterized by personality loss. The subject has no personality of his own, so he selects a role model and makes every possible attempt to behave like that character. The chosen role model will be as different from the subject as possible. (Thus, an insane wizard might begin to follow the habits of a warrior.) Obviously, a warrior who believes himself to be a wizard will be unable to cast spells (he might *think* that he’s casting spells, or he might construct a sophisticated series of excuses explaining why he’s “not in the mood for magic” at the moment). A character who emulates a member of another class does not gain any of the skills of that class and makes all attacks and saving throws as appropriate to his true class. Certain consequences might arise if the character’s emulation causes him to break restrictions of his class. For example, a priest emulating a warrior might break his deity’s prohibition against edged weapons, or a paladin might emulate a Neutral Evil thief. Both will suffer the appropriate consequences as if they had been compelled to violate their beliefs while charmed. Such characters will certainly have to atone for their actions once they return to normal.\n&emsp;*Dementia praecox:* The subject is totally uninterested in any undertaking. Nothing seems worthwhile, and the individual is lethargic and filled with tremendous feelings of boredom and dissatisfaction. No matter how important the situation, it is 50% likely that the subject will ignore it as meaningless.\n&emsp;*Delusional insanity:* The subject is convinced that he is a famous figure: a monarch, demi-god, or similar personage. Characters who fail to recognize the subject with the honor he deserves incur great hostility or disbelief. The subject acts appropriately to a station that he does not hold. He directs orders at real and imaginary creatures and draws upon resources that do not exist.\n&emsp;*Paranoia:* The subject is convinced that “they” (whoever *they* are) are spying on him and plotting against him. Everyone around the subject, even friends and allies, is part of the plot. If any other character acts in a way that the subject can interpret as reinforcing this delusion, the subject has a 20% chance of reacting with violence.\n&emsp;*Hallucinatory insanity:* The subject sees, hears, and otherwise senses things that do not exist. The more stressful the situation is to the subject, the more likely he will hallucinate. Although most hallucinations are external to the subject (that is, he perceives creatures, objects, and conditions that do not exist), there is a 10% chance that any hallucination will involve the subject’s self-perception. For example, the subject might suddenly believe and act as if he had sprouted wings, grown to giant size, etc.\n&emsp;When this spell is cast by a priest of 13th level or lower, the DM chooses or randomly selects one of these forms of insanity (and should feel free to invent other interesting symptoms). If the priest is 14th level or higher, he can personally select the form of insanity to afflict the subject.\n&emsp;While under the effect of this spell, the subject can cast spells and use innate powers; the use of these abilities will be in accordance with the symptoms of the insanity, however. Player characters affected by this spell should be encouraged to role-play the appropriate effects to the limit.\n&emsp;The duration of this spell depends on the sum of the subject’s Intelligence and Wisdom scores. A saving throw is allowed on a periodic basis depending on this total. The spell is broken if a successful saving throw is rolled. Refer to the table that follows.}}{{style=center}}{{cc1-1=bottom}}{{c1-1=**Int + Wis**}}{{c2-1=8 or less}}{{c3-1=9 to 18}}{{c4-1=19 to 24}}{{c5-1=25 to 30}}{{c6-1=31 to 35}}{{c7-1=36 or more}}{{c1-2=**Time Between Checks**}}{{c2-2=1 month}}{{c3-2=3 weeks}}{{c4-2=2 weeks}}{{c5-2=1 week}}{{c6-2=3 days}}{{c7-2=1 day}}{{effects2=&emsp;The effects of this spell can be removed by a *limited wish*, *wish* (or equally powerful magic), or by a *heal* spell cast for this specific purpose.'
+}
+
+pri5['Repeat Action'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Time',
+    'range': '30 yards',
+    'duration': 'Special',
+    'aoe': 'One creature',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'Negate',
+    'materials': 'Two identical glass spheres, each an inch or less in diameter.',
+    'reference': 'p. 95',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell compels its victim to repeat the action of the previous round. The result of the repetition is always identical to the original result.\n&emsp;For example, if a character fired an arrow and inflicted 4 points of damage, a *repeat action* spell will cause him to fire a second arrow that will also inflict 4 points of damage. As long as the victim of the first arrow is within range, the subject affected by *repeat action* will adjust his aim and fire the second arrow at him. If the victim of the arrow moves out of range, the subject will fire his second arrow in the direction of the recipient. If the recipient is out of sight, the subject will fire in the direction of the recipient’s original location.\n&emsp;The subject of a *repeat action* spell must be capable of performing the indicated action a second time. If a character has no arrows in his quiver, he cannot fire an arrow. If a wizard were ordered to repeat a spell, he would attempt the spell only if he had the spell memorized and had sufficient material components. If a subject discovered a gem during a given round, *repeat action* will only compel him to hunt again; he will not recover another gem unless a second gem is actually present.\n&emsp;An unwilling subject is allowed a saving throw vs. spell to resist the effects of *repeat action*.'
+}
+
+pri5['Shrieking Walls'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Enchantment',
+    'sphere': 'Wards',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] days',
+    'aoe': '20’-cube',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'A small golden bell and a bee’s wing.',
+    'reference': 'p. 95',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enchants any single room no larger than the area of effect. When any creature larger than a normal rat (larger than one-half cubic foot or weighing more than three pounds) enters the room, shrill shrieks begin to emanate from the walls. The shrieks persist for 2-5 ([[1d4+1]]) rounds. The walls do not undergo any physical change.\n&emsp;The shrieks can be heard only by creatures inside the room. Creatures hearing the shrieks experience no ill effects on the first round, allowing them time to leave the room or cover their ears. *Silence, 15’ radius* protects against the effects.\n&emsp;Creatures who remain in the room during the second or subsequent rounds of the shrieks who have not protected their hearing are penalized as follows:\n&emsp;•Creatures whose levels or Hit Dice are greater than the level of the caster are stunned for 2-8 ([[2d4]]) rounds.\n&emsp;•Creatures whose levels or Hit Dice are less than or equal to the level of the caster become deaf for 1-4 hours, suffering a -1 penalty to surprise; deafened spellcasters have a 20% chance of miscasting any spell with a verbal component.'
+}
+
+pri5['Thoughtwave'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Divination',
+    'sphere': 'Divination',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'p. 96',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This cooperative spell can be cast by either a single priest or a group of priests. *Thoughtwave* allows the priest to send a short but powerful message to one or more specific individuals, informing them of his situation and general location. The spell instantly generates a powerful mental impulse indicative of the caster’s general mental state--anger, fear, pain, despair, etc.\n&emsp;The caster can designate as many as ten persons to receive this message, provided they can all be specifically named or grouped in a general category. Thus, the caster could designate a group of characters by name or could target “fellow priests,” “superiors,” “adventuring companions,” “knights of Lord Harcourt,” or “villagers of Dopp.” If more than ten individuals are in the group, those closest to the source will receive the impulse.\n&emsp;There is no range limitation to the spell, although it cannot be projected outside the plane occupied by the caster.\n&emsp;Creatures receiving the impulse automatically know who sent it (even if they have never met the priest before) and gain a clear indication of the mood and situation of the caster. Recipients also intuitively know the general source of the spell, although they are unable to pinpoint rooms, dungeon levels, or landmarks. For example, a fighter could suddenly be struck by an image of Father Rastibon, who is injured and in great pain somewhere along the forest road. A priest might suddenly sense that his patriarch is being tortured in the dungeons of Castle Varrack.\n&emsp;The spell can also be cast by more than one priest, allowing them to either contact greater numbers of individuals or increase the intensity of the message. If greater numbers are desired, ten characters are contacted per priest involved in the casting.\n&emsp;Increasing the intensity of the message makes it more compelling. Doubling the intensity (requiring at least three priests) causes the message to act as a *suggestion*. In this case, the effect is limited to a single target. Tripling the intensity (requiring at least five priests) gives the spell the force of a *quest*. This effect is also limited to a single target. In both cases, the target is allowed a saving throw to avoid the effect of the *suggestion* or *quest*.'
+}
+
+pri5['Time Pool'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Divination',
+    'sphere': 'Time',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A suitable reflective surface and a pinch of powdered quartz.',
+    'reference': 'p. 96',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell allows the caster to cause a mirror, a pool of water, or any other reflective surface to reveal a specific event from the past. The image provides a perfectly clear picture with normal sounds, as if the caster were present at the scene. The image continues for the duration of the spell.\n&emsp;*Time pool* will not reveal images from other planes of existence.\n&emsp;The spell’s success is not automatic. The caster must know the general nature of the event he wishes to view (i.e., “Show me the murder of King Thamak”). The caster’s base chance of viewing the desired scene is 50%, modified as follows, to a maximum of 90%:\n&emsp;•Add 5% for each point of the caster’s Wisdom above 15.\n&emsp;•Add 20% if the caster has successfully used *time pool* to observe the same event before.\n&emsp;Only one of the following may apply:\n&emsp;•Add 20% if the event is one in which the caster participated.\n&emsp;•Add 10% if the caster is well informed about the event.\n&emsp;•Add 5% if the caster is slightly informed about the event.\n&emsp;The caster cannot communicate or otherwise interact with the image. Spells cannot be cast into the *time pool*.'
+}
+
+pri5['Unceasing Vigilance of the Holy Sentinel'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Alteration',
+    'sphere': 'Guardian',
+    'range': '0',
+    'duration': '[[@{level-priest}]] hours',
+    'aoe': '5-foot-radius sphere',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'A special ink containing the powder of a crushed sapphire (at least 1,000 gp value) and a drop of holy water.',
+    'reference': 'p. 97',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enhances a priest’s ability to guard a person, place, or object. The spell’s effect must be centered on a specific area, for it creates an invisible spherical boundary up to 10 feet in diameter. The effect is not mobile; it cannot move with a living creature.\n&emsp;While within the area of effect of this spell, the priest (and only the priest) gains several special abilities:\n&emsp;•His sense of sight is magically enhanced. He can see through normal darkness and can see invisible creatures and objects. He cannot see through solid objects, however, and the range of his magical sight is limited to 60 feet.\n&emsp;•The priest has no need for food, water, or rest. He does not feel fatigue and regenerates 1 hit point per hour spent within the circle. However, he does not actually rest and therefore cannot regain spells until he sleeps.\n&emsp;•He is totally immune to the effects of magical and natural fear, as well as *sleep* and *charm* spells.\n&emsp;If the priest leaves the circle, the spell is broken. When the spell ends, the priest must rest for 1 turn per hour (or portion thereof) spent in the circle. If the priest is forced into action (by being attacked, for example), he can move at only half his normal movement rate, has an Armor Class penalty of -2, an attack penalty of -2, and loses all Dexterity combat bonuses.\n&emsp;To cast this spell, the priest must trace a circle of sigils and runes 10 feet in diameter using a special ink containing the powder of a crushed sapphire (at least 1,000 gp value) and a drop of holy water. This procedure takes 1 turn to complete.'
+}
+
+pri5['Undead Ward'] = {
+    'category': '',
+    'level': '5',
+    'school': 'Abjuration, Necromancy',
+    'sphere': 'Wards',
+    'range': 'Special',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': '[[5*[[@{level-priest}]] ]]-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '2 turns',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol, which must be carried around the perimeter of the area to be warded.',
+    'reference': 'p. 97',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell prevents most types of undead creatures from entering the area of effect (a cube whose sides equal the caster’s level times 5 feet--a 15th-level caster could affect a cube whose sides equal 75 feet).\n&emsp;When an undead creature attempts to enter the protected area, the creature is affected by the ward as if it were being turned by a priest two levels lower than the caster. Currently level [[ [[@{level-priest}]]-2]]. The casting priest need not have the ability to turn undead himself. Thus, an *undead ward* created by a 10th-level priest would turn creatures as if by an 8th-level priest.\n&emsp;The results of the turning attempt are calculated normally. If a large number of undead assault the warded area, not all of them are turned by the spell, since the normal limitations apply. Undead who are unaffected by the turning attempt ignore the *undead ward* for its duration. Undead within the area of effect when the spell is cast are not affected. However, when such undead leave the area of effect, they are subject to the effects of the spell if they attempt to reenter.'
+}
+
 //#endregion
 
 const priestSpells = {};
