@@ -58,26 +58,31 @@ const showToast = function(type, title, message) {
     });
 }
 
+const isBookInactive = function (books, obj) {
+    let activeBooks = BOOK_FIELDS.map(bField => books[bField]);
+    return !activeBooks.includes(obj['book']);
+}
+
 const bookInactiveShowToast = function(books, obj) {
-    let bookInactive = !Object.values(books).includes(obj['book']);
+    let bookInactive = isBookInactive(books, obj);
     if (bookInactive)
         showToast(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
     return bookInactive;
-}
+};
 
 const isRemoving0 = function(eventInfo, fieldNames) {
     return fieldNames.some(fieldName => !parseInt(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_${fieldName}`]));
-}
+};
 
 const isOverwriting0 = function(eventInfo) {
     return !parseInt(eventInfo.newValue) && !parseInt(eventInfo.previousValue);
-}
+};
 
 const doEarlyReturn = function(eventInfo, fieldNames) {
     return eventInfo.removedInfo
         ? isRemoving0(eventInfo, fieldNames)
         : isOverwriting0(eventInfo);
-}
+};
 
 const repeatingMultiplySum = function(section, valueField, multiplierField, destination, decimals) {
     TAS.repeating(section)
@@ -94,7 +99,7 @@ const repeatingMultiplySum = function(section, valueField, multiplierField, dest
             }
         })
         .execute();
-}
+};
 //#endregion
 
 //#region Generic Setup functions
@@ -633,8 +638,15 @@ function setupCalculateRemaining(totalField, sumField, remainingField) {
 //#endregion
 
 //#region Priest Spells based on Spheres
-const primarySphereRegex = /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather|Elemental/gi
-const noElementalRegex =   /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather/gi
+const PRIEST_SPHERES = [
+    // Player's Handbook
+    'All','Animal','Astral','Charm','Combat','Creation','Divination','Elemental','Guardian','Healing',
+    'Necromantic','Plant','Protection','Summoning','Sun','Weather',
+    // Tome of Magic Spheres
+    'Chaos','Law','Numbers','Thought','Time','Travelers','War','Wards'
+];
+const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi')
+const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== 'Elemental').join('|'), 'gi');
 const elementalRegex = /Earth|Air|Fire|Water/gi
 function capitalizeFirst(s) {
     if (typeof s !== 'string')
@@ -653,8 +665,11 @@ function parseSpheres(spheresStrings, regex) {
     return spheres;
 }
 
-function isSpellAvailable(spellName, spellSphereString, availableSpheres, elementalSpheres) {
-    let primarySpellSpheres = spellSphereString.match(noElementalRegex);
+function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, activeBooks) {
+    if (isBookInactive(activeBooks, spell))
+        return false;
+
+    let primarySpellSpheres = spell['sphere'].match(noElementalRegex);
     if (!primarySpellSpheres)
         return false;
     
@@ -665,11 +680,11 @@ function isSpellAvailable(spellName, spellSphereString, availableSpheres, elemen
     if (!availableSpheres.has('Elemental'))
         return false;
 
-    if (!spellSphereString.includes('Elemental'))
+    if (!spell['sphere'].includes('Elemental'))
         return false;
 
-    if (spellSphereString.includes('Elemental ('))
-        return spellSphereString.match(elementalRegex).some((element) => elementalSpheres.has(element))
+    if (spell['sphere'].includes('Elemental ('))
+        return spell['sphere'].match(elementalRegex).some((element) => elementalSpheres.has(element))
 
     // The player and the spell has the elemental sphere (without any sub elements)
     return true;
@@ -682,30 +697,33 @@ function setupAddPriestSpell(postfix) {
     on(`clicked:add-spells-${postfix}`, function () {
         const section = `spells-${postfix}`;
         const field = 'spell-name';
-        let attributes = ['sphere-major'];
-        if (postfix.match(/[123]/)) 
-            attributes.push("sphere-minor");
+        let sphereFields = ['sphere-major'];
+        if (postfix.match(/[123]/))
+            sphereFields.push("sphere-minor");
             
         TAS.repeating(section)
-            .attrs(attributes)
+            .attrs([...sphereFields, ...BOOK_FIELDS])
             .fields(field)
             .reduce(function(memo, row){
                 memo.add(row.S[field]);
                 return memo;
-            }, new Set(), function (knownSpells,_,a){
-                let primarySpheres = parseSpheres(attributes.map(aField => a.S[aField]), primarySphereRegex);
-                let elementalSpheres = parseSpheres(attributes.map(aField => a.S[aField]), elementalRegex);
+            }, new Set(), function (knownSpells,_,attrSet){
+                let primarySpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), primarySphereRegex);
+                let elementalSpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), elementalRegex);
 
                 if (primarySpheres.size < 1) {
                     showToast(WARNING, 'No spheres found', `No valid spheres found. Please write or select some spheres`);
                     return;
                 }
 
+                let booksReadFrom = new Set();
                 let spellsToAdd = [];
                 for (const [spellName, spell] of Object.entries(priestSpells[postfix])) {
-                    let isAvailable = isSpellAvailable(spellName, spell['sphere'], primarySpheres, elementalSpheres);
-                    if (isAvailable)
+                    let isAvailable = isSpellAvailable(spellName, spell, primarySpheres, elementalSpheres, attrSet);
+                    if (isAvailable) {
                         spellsToAdd.push(spellName);
+                        booksReadFrom.add(spell['book']);
+                    }
                 }
 
                 console.log(spellsToAdd);
@@ -726,6 +744,8 @@ function setupAddPriestSpell(postfix) {
                     let newrowid = generateRowID();
                     newValue[`repeating_${section}_${newrowid}_${field}`] = spell;
                 });
+                let books = Array.from(booksReadFrom).map(s => `\n • ${s}`).join('');
+                showToast(SUCCESS, 'Added new spells!', `Spells was added from the following books:${books}`);
 
                 setAttrs(newValue);
 
@@ -1080,15 +1100,8 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
         let baseWeapon = weapons[weaponName]
         let thac0 = 20;
 
-        let books = {...values};
-        if (thac0Field) {
-            let thac0Int = parseInt(values[thac0Field]);
-            thac0 = !isNaN(thac0Int) ? thac0Int : thac0;
-            delete books[thac0Field];
-        }
-
         if (baseWeapon) {
-            if (bookInactiveShowToast(books, baseWeapon))
+            if (bookInactiveShowToast(values, baseWeapon))
                 return;
 
             setWeaponFunc({
@@ -1108,7 +1121,7 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
         if (!baseWeapon)
             return;
 
-        if (bookInactiveShowToast(books, baseWeapon))
+        if (bookInactiveShowToast(values, baseWeapon))
             return;
 
         let bonusString = match[1];
