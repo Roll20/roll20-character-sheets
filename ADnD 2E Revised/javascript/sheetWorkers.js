@@ -887,10 +887,10 @@ let priestSpellLevelsSections = [
 ];
 
 function wizardDisplayLevel(s) {
-    return `Level ${s} Wizard`
+    return `Level ${s} Wizard`;
 }
 function priestDisplayLevel(s) {
-    return `Level ${s} Priest`
+    return s === 'q' ? 'Quest Spell Priest' : `Level ${s} Priest`;
 }
 
 // --- Start setup Spell Slots --- //
