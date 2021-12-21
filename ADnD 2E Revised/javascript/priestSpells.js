@@ -6138,6 +6138,587 @@ pri7['Uncontrolled Weather'] = {
     'effect': 'This spell allows the caster to summon weather that is either appropriate or inappropriate to the climate and season of the region. The summoned effects are always dramatic--cool breezes or light fog will not appear. Instead, torrential floods will assault a desert, a heat wave will rage in polar wastelands, and tornadoes and hurricanes will rip across gentle landscapes. A blizzard might spring up in summer or a tornado might materialize in the winter.\n&emsp;The spellcaster has no influence over the weather pattern that emerges. He cannot control the area of effect or the duration of the weather.\n&emsp;Four turns after the spell is cast, the trend of the weather will become apparent--a sudden chill, gust of wind, overcast sky, etc. The *uncontrolled weather* arrives on the fifth turn. Once the weather has arrived, it cannot be dispelled. If the spell is canceled by the caster before the beginning of the fifth turn, the weather slowly reverts to its original condition.\n&emsp;The effects of the spell are the decision of the DM. The effects should be grand and impressive. Following are suggested effects of the weather.\n&emsp;*Torrential Rain/Blizzard:* Visibility is reduced to 100 yards or less; travel is nearly impossible due to water or heavy snow on the ground.\n&emsp;*Storm/Hurricanes:* All flying creatures are driven from the skies; trees are uprooted; roofs are torn off; ships are endangered.\n&emsp;*Heat Wave:* Intense heat immediately causes ice bridges to melt; avalanches of snow and ice roll down mountains.\n&emsp;The DM determines the area of effect randomly. The maximum duration of the spell is one turn per level of the caster; however, the DM may cancel the effect after a shorter time.'
 }
 
+const priq = {};
+priq['Abundance'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Alteration',
+    'sphere': 'Creation, Plant',
+    'range': '0',
+    'duration': 'Permanent',
+    'aoe': 'Special',
+    'components': '',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 112',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By casting an *abundance* spell, the priest quickens the ripening of a harvest or the growth of woodland. Fields of crops in the affected area will grow, ripen, and be ready for harvest in a single day. Seed must be sown any time before the casting of the spell.\n&emsp;An area of woodland will grow as if it had grown for 25 years in one day plus five years per day for another three days. There must be soil capable of supporting the woodland for the growth to remain healthy.\n&emsp;The priest must stand anywhere within the area to be affected. The priest designates the exact size and shape of the area in the casting.\n&emsp;The area of effect is 10 square miles for ripening a harvest and 25 square miles for woodland growth. This spell does not create effects such as entanglement or enlargement of the flora within the area of effect.'
+}
+
+priq['Animal Horde'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Animal, Summoning',
+    'range': '0',
+    'duration': '1 day',
+    'aoe': '10-mile radius',
+    'components': '',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 112',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This potent spell summons a number of animals to the priest. For each level of the priest, a number of animals totaling 10 hit dice appear. Currently [[10*[[@{level-priest}]] ]] hit dice.\n&emsp;The Power who grants the spell enables the priest to know exactly what types and numbers of animals are within the area of effect. The priest may specify the numbers of animals he wants; for instance, a 16th-level priest could summon 60 HD of wolves, 40 HD of bears, and 60 HD of wolverines. The animals will begin arriving in one round and will be assembled at the priest’s location at the end of three turns.\n&emsp;The animals will not fight among each other even if they are natural enemies. Monsters (dragons, gorgons, hell hounds, etc.) cannot be summoned with this spell.\n&emsp;The summoned animals will aid the priest in any means of which they are capable. They will enter battle, protect the priest and his companions, or perform a specified mission until the priest dismisses them or the spell expires. During this time, the priest can automatically communicate with his animals.\n&emsp;At the end of the spell, the animals instinctively return to their lairs. For the first three turns after the spell expires, the animals will not attack the caster, his companions, or other summoned animals. After this time, the animals will behave normally.'
+}
+
+priq['Circle of Sunmotes'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Alteration, Invocation/Evocation, Necromancy',
+    'sphere': 'Sun',
+    'range': '200 yards',
+    'duration': '3 turns',
+    'aoe': '60-foot-radius hemisphere',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 112',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '*Sun motes:* 1d4+1. *Miniature sun*: 1d8+2',
+    'healing': '*Sun mote: *1d6. *Miniature sun:* 1d8+2',
+    'effect': 'By casting *circle of sunmotes*, the priest creates a hemispherical shell filled with sparkling, glowing motes of bright sunlight. A one-foot radius globe of sunlight appears at the height of the caster’s head in the exact center of the circle.\n&emsp;Creatures within the area of effect who are friendly to the cleric experience the glowing motes as warm, invigorating, inspiring, and healing. They are healed for 1d6 hit points, gain the benefit of an aid spell for 1 turn after the *circle of sunmotes* is created, gain +1 bonuses to all attack and damage rolls, and gain a +2 bonus to morale.\n&emsp;Enemies of the priest experience the same sunmotes as blinding, burning, and damaging. They must save versus spell or be blinded for 1 turn after the sunmotes are created. Each enemy is struck by a small fiery mote causing 1d4+1 points of damage (no saving throw is allowed, but creatures with magical fire resistance suffer only half damage), and suffers a -2 penalty to morale.\n&emsp;Companions of the cleric who step within 10 feet of the glowing miniature sun at the center of the effect are healed of 1d8+2 hit points. This affects each creature only once during the spell’s duration.\n&emsp;Enemies of the priest who come within 10 feet of the minisun are burned for 1d8+2 points of fire damage. No saving throw is allowed, but creatures possessing magical resistance against fire suffer only half damage.\n&emsp;Companions of the priest who are outside the area of effect view enemies within the circle as if they are affected by golden *faerie fire*. Creatures affected by the faerie fire suffer a -2 penalty to armor class from attacks by creatures outside the circle.\n&emsp;Enemies of the priest outside the circle view the priest’s allies as if obscured by a blinding light and suffer a -2 penalty to missile attacks against them.'
+}
+
+priq['Conformance'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Conjuration/Summoning, Invocation',
+    'sphere': 'Law',
+    'range': '0',
+    'duration': '6 turns',
+    'aoe': '80-foot-diameter sphere',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 113',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *conformance* spell has a simple principle with a profound effect: probable events always manifest.\n&emsp;In game terms, this means that events with a probability of 51% or better always occur. Thus, if a saving throw of 9 is required to avoid an effect, no roll is necessary; the save is automatically successful. If a warrior must roll 10 or better to hit an enemy, he automatically hits.\n&emsp;Conversely, improbable actions (those with less than a 50% chance) always fail. If a warrior must roll 12 or better to hit an enemy, he automatically fails. If a thief’s chance to hide in shadows is 49%, he automatically fails.\n&emsp;There are two conditions that affect this spell. First, a *prayer* spell is continuously operative in the area of effect, shifting the balance of combat probabilities toward the favor of the priest who casts this spell and his companions. Second, probabilities of exactly 50% always shift in favor of the spellcasting priest. For example, if a roll of 11 or better is needed to save against a spell effect, this is a 50% chance for success. In such cases, the priest and his friends always make the save and enemies always fail.\n&emsp;This spell is particularly potent if *bless* and *chant* spells are cast in the area of effect.'
+}
+
+priq['Elemental Swarm'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Elemental, Summoning',
+    'range': '240 yards',
+    'duration': '6 turns',
+    'aoe': 'Special',
+    'components': '',
+    'cast-time': '3 turns',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 113',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the caster to open a portal to one elemental plane of his choice (as appropriate for his patron Power). He can then summon elementals from that plane.\n&emsp;After the first turn of casting, 3d3 elementals of 12HD each appear; after the second turn, 2d3 elementals of 16HD each appear; after the third turn, 1d3 elementals of 20HD each appear. Each elemental has at least 5 hit points per hit die. The elementals remain for six turns from the time they first appear.\n&emsp;These elementals will obey the priest explicitly and cannot be turned against the caster. The priest does not need to concentrate to maintain control over the elementals. They cannot be dismissed with spells such as *dismissal*; the elementals remain for the duration of the spell.'
+}
+
+priq['Etherwalk'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Alteration',
+    'sphere': 'Astral, Travelers',
+    'range': 'Special',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': '',
+    'cast-time': '5 rounds',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 113',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By casting this spell, the priest transports himself and as many as 50 followers (who must join hands at the time of casting) to the Border Ethereal. Unwilling creatures are allowed a saving throw at a -4 penalty to avoid transportation.\n&emsp;The spell then allows the priest and his party to make as many as three round-trip journeys to and from the Inner Planes. It then allows them to return to the Prime Material plane.\n&emsp;Travel rates in the Ethereal plane are at four times normal speed. Travel times for locating or searching along curtains are all at the minimum time possible. Encounters with monsters occur at one-fifth the normal frequency. The priest and his party are not affected by the ether cyclone.\n&emsp;The spell expires when the priest and his party return to the Border Ethereal from an inner plane for the third time. They are then instantly transported to the Prime Material plane.'
+}
+
+priq['Fear Contagion'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Abjuration',
+    'sphere': 'Charm, War',
+    'range': '240 yards',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'p. 114',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A priest casting *fear contagion* selects a single creature to be the focus of the spell. The creature is affected by magical fear and receives no saving throw to avoid the effect. All creatures within 10 yards of the target creature must make a saving throw versus spell with a -4 penalty; failure indicates that they are also affected by fear.\n&emsp;If BATTLESYSTEM rules are used, the spell forces the affected unit to make a Morale Check at a -6 penalty. If this roll fails, the unit automatically routs.\n&emsp;Creatures affected by fear will flee in a direction away from the spellcaster for as long as they are able to run (refer to Chapter 14 of the *Player’s Handbook* for rules). Such creatures will then spend one full turn cowering after being forced to rest. During this time, affected creatures suffer -4 penalties to attack rolls, and all dexterity bonuses are negated.\n&emsp;When using BATTLESYSTEM rules, fear-struck creatures are permitted rally tests with a -3 penalty and must engage in rout movement until they rally. However, a rally test is not permitted until two turns of rout movement have been completed.\n&emsp;As creatures run in fear, their fear is contagious. Any creature that comes within 10 yards of a creature affected by this spell must make a saving throw (no penalties) or be forced to flee from the spellcaster. In BATTLESYSTEM rules, creatures make a standard Morale Check with a -3 penalty.\n&emsp;Creatures affected by fear no longer cause fear in others after they have passed one mile from the original center of the spell effect.'
+}
+
+priq['Health Blessing'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Necromancy',
+    'sphere': 'Healing, Necromantic',
+    'range': '100 yards',
+    'duration': '[[@{level-priest}]] days',
+    'aoe': '50 creatures',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 114',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Health blessing* provides a number of human, demi-human, or humanoid creatures with protection against ill health; it also enables subjects to heal others.\n&emsp;Recipients of a *health blessing* are immune to nonmagical disease, gain a +4 bonus to saving throws versus poison and death magic, and can cast *cure light wounds* on themselves once per day for the duration of the spell. In addition, a recipient of *health blessing* can heal one other creature per day as a paladin does by laying hands. The healing conferred is 1 hit point per level or hit die of the healer.'
+}
+
+priq['Highway'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Alteration, Evocation',
+    'sphere': 'Travelers',
+    'range': '0',
+    'duration': '1 day',
+    'aoe': '1,000 square yards',
+    'components': '',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 114',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *highway* spell creates a shimmering plane of force that acts as a magical conveyor for the priest. By standing at the forward edge of the 10 x 100 yard plane, the priest and as many followers as can fit onto the square can travel as outlined below.\n&emsp;The *highway* travels 30 miles per hour (MV 88) over all terrains. The priest sets the height of the *highway* in a range from 1 foot to 100 yards above ground level. The *highway* moves as the priest wills; if the priest wishes to fix a destination in his mind, the *highway* will take the shortest route to that destination until the priest changes the course in his mind.\n&emsp;The *highway* cannot be used offensively. It will automatically travel over or around obstacles such as buildings and large creatures. It protects creatures traveling on it from adverse effects of the elements (ice, rain, gales, etc.). The *highway* can hover in place, but hovering can be achieved only at a height of 12 inches above ground level.\n&emsp;When the spell expires or the destination is reached, the *highway* gently lowers the priest and his party to the ground. The priest may order the *highway* to drop off creatures and collect others at intermediate destinations, although the priest who cast the spell must remain on the *highway* or it will disappear.'
+}
+
+priq['Imago Interrogation'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Divination, Enchantment/Charm',
+    'sphere': 'Astral, Divination, Time',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'The caster',
+    'components': '',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 116',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The imago is a mental image--a form of mental magical body. After casting this spell (requiring 1 turn), the caster falls asleep. After [[1d6]] turns of sleep, the imago of the priest begins to travel. The imago is not subject to any forms of attack and has no effective attacks.\n&emsp;The imago may travel to as many as four different locations separated by any distance, even across the planes and/or backward in time. At these locations, the imago may interrogate the imagos of as many as 10 other sentient creatures (other than Powers), compelling them to reply truthfully to its questions. A maximum of 40 questions may be asked during the spell duration.\n&emsp;Asking one question and listening to the reply takes 4 rounds of time in the caster’s world. Each planar/time jump lasts 3 turns in that world.\n&emsp;Imago communications are telepathic. The questions must be able to be answered in a sentence of reasonable length, or the interrogated creature becomes confused and cannot answer.\n&emsp;The imagos of interrogated creatures will have no recollection of their interrogations. As a result, history cannot be changed through backward time travel using this spell.'
+}
+
+priq['Implosion/Inversion'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Invocation',
+    'sphere': 'Numbers, Combat',
+    'range': '120 yards',
+    'duration': 'Special',
+    'aoe': 'One or more creatures',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 116',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By use of this spectacular spell, the priest rearranges the extradimensional and spatial geometries of the molecules of one or more creatures. The result is that the rearrangement of the target creature causes it to implode (collapse inward upon itself) or invert (its insides become its outsides and vice versa).\n&emsp;The result is usually inversion, unless the target would not be adversely affected by this process (e.g., a slime, ooze, golem, elemental, etc.). In this case, implosion takes place. In either case, the effect kills/destroys the target instantaneously unless it makes a successful saving throw versus death magic at a -4 penalty.\n&emsp;The priest can affect one creature per round with this spell. After each round, the priest must make a Constitution check. If this fails, the priest is overwhelmed with the effort of sustaining the spell, at which time the spell terminates, leaving the priest fatigued (the equivalent of being stunned) for 1d4 rounds. The maximum possible duration of the spell is 3 turns.'
+}
+
+priq['Interdiction'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Abjuration',
+    'sphere': 'Chaos, Law, Wards',
+    'range': '240 yards',
+    'duration': '1 day',
+    'aoe': '[[200*[[@{level-priest}]] ]]-foot cube',
+    'components': '',
+    'cast-time': '2 turns',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'p. 116',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This powerful spell affects all enemies of the spellcasting priest who enter the area of effect. The spell inflicts a -2 penalty on saving throws, a -1 penalty to armor class, and a -1 penalty to attack and damage rolls. Creatures friendly to the cleric gain corresponding bonuses--+2 to saving throws, +1 to attack and damage rolls, and a bonus of 1 to AC. Additional effects are possible, depending on the Power granting the spell; effects must correspond (or at least not conflict) with the spheres the priest normally uses. Multiple effects are possible.\n&emsp;The variation for the Sphere of Wards requires that each hostile creature entering the area of effect make a saving throw vs. spells with a -4 penalty or suffer 4d6 points of damage. An affected creature must then flee the area; it is unable to return. The creature must make a second saving throw vs. spell with a -4 penalty as it leaves the area or be blinded until magically cured.\n&emsp;The variation for the sphere of Law requires that a hostile creature make a saving throw every time it wishes to change an action. Thus, if a creature wishes to stop running and draw a weapon, a successful save is needed or the creature continues to run. Actions that cannot be continued (e.g., firing an arrow if the archer has no more arrows) are repeated as empty automatisms. In addition, creatures hostile to the priest automatically fail saving throws against Enchantment/Charm spells cast by the priest.\n&emsp;The variation for the Sphere of Chaos requires that hostile creatures make saving throws vs. spells at -4 or be affected by *confusion* (as per the spell). Affected creatures have a 5% chance per round of suddenly being attacked by a *phantasmal killer*.\n&emsp;All creatures who enter the area of effect are subject to the effects of the spell. All effects except blindness cease 3 rounds after an affected creature leaves the area. Creatures reentering the area of effect must make new saving throws.'
+}
+
+priq['Mindnet'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Divination, Enchantment/Charm',
+    'sphere': 'Thought',
+    'range': '0',
+    'duration': '12 turns',
+    'aoe': 'Special',
+    'components': '',
+    'cast-time': 'Special',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'p. 117',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The priest casting a *mindnet* spell establishes a telepathic link with as many as 10 other creatures who may be separated from each other by as much as 10 miles. Thus, a chain of creatures 100 miles long could be established.\n&emsp;The Power granting this spell has the final word on the individuals who may be included in the spell. Most commonly, the spell will be cast to include individuals familiar to the caster. However, depending on the purpose of the spell, the Power may allow a stranger known to the caster only by name to be included in the *mindnet*.\n&emsp;Unwilling creatures must make a saving throw at a -4 penalty to avoid being included in the *mindnet*.\n&emsp;Casting the spell requires one round per two creatures in the *mindnet*. The spell’s duration begins after all affected creatures have been linked. Characters of any class may take part in this linkage, benefiting from several effects.\n&emsp;First, each member of the *mindnet* benefits from Intelligence, Wisdom, and Dexterity bonuses. The bonuses are equal to the bonuses held by the member of the *mindnet* with the highest ability score. For example, if five creatures in a *mindnet* have Wisdom scores of 15, 15, 16, 17, and 18, each creature would make saving throws, ability checks, and the like as if he had a Wisdom score of 18. Bonus spells are not gained due to enhanced Wisdom, however.\n&emsp;Second, spells may be pooled among the spellcasters within the *mindnet*. Any priest may use a spell memorized by another priest with two conditions: the priest who has memorized the spell must allow its use; and a priest “borrowing” a spell may use only spells of levels he could normally cast. Such borrowing still causes the spell to be lost from the mind of the caster who memorized it. A caster may *not* borrow spells outside his normal class restrictions. Priests and wizards within a *mindnet* cannot mix their priestly and wizardly spells, nor can a specialist borrow a spell from an opposition school.\n&emsp;Third, each member of the *mindnet* is in constant mental communication. Each member knows what is happening at the locations of all other members.\n&emsp;Finally, twice per turn, the priest casting this spell can instantly teleport any person linked by the *mindnet* to any other person who is also a part of the spell. This massive effort results in a +4 penalty to any Constitution checks made by the priest.\n&emsp;The priest casting the spell cannot perform any other actions while the *mindnet* exists; if he does, the spell is canceled. The priest must make a Constitution check at the end of each turn in order to sustain the spell. A failed check cancels the *mindnet*. The spell can last a maximum of 12 turns.'
+}
+
+priq['Planar Quest'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Alteration',
+    'sphere': 'Astral',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': '',
+    'cast-time': '5 rounds',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 117',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By joining hands with as many as 12 companions and casting this spell, the priest transports his party to any other plane of existence. The priest and his party may arrive at a specific location in a plane (if one is known) or at an unknown destination. Travel time to the destination, whether known or unknown, will always be at the minimum possible. In an inner plane, a friendly guide will always be available to the priest. Hostile encounters occur at one-fifth normal frequency.\n&emsp;Unwilling creatures are allowed a saving throw at a -4 penalty to avoid being transported.\n&emsp;In the inner planes, the party is magically protected in any means necessary for survival. The party does not need to eat, drink, or rest if conditions make these activities impossible. Party members are immune to fire in the elemental plane of fire, and similar immunities are granted by the Power in other planes as necessary. The party can move through any terrain (including the elemental plane of Earth) at its normal movement rate.\n&emsp;In the outer planes, similar immunities apply. The priest is also granted a *power compass* (described in *Manual of the Plane*). Hostile encounters in an outer plane occur only half as often as normal.\n&emsp;The duration of this spell is decided by the Power who grants it. Normally, it is sufficient to allow the priest and his party to undertake the quest that the Power has set forth. When the quest has been completed successfully or has failed beyond recovery, the priest and his party are returned to the Prime Material plane.'
+}
+
+priq['Preservation'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Abjuration',
+    'sphere': 'Wards',
+    'range': '480 yards',
+    'duration': 'Special',
+    'aoe': 'One structure',
+    'components': '',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 118',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell creates a powerful set of protective wards that operate on a single fortified building, temple complex, tower, or similar structure. These wards protect the physical integrity of the structure and prevent magical access.\n&emsp;A building protected by *preservation* suffers only 25% of normal structural damage from sources such as siege engines, earthquakes (both natural and magical), and powerful weather-affecting spells. Spells which directly affect the physical integrity of the structure (e.g., *passwall, stone shape, transmute rock to mud*) simply fail when cast on the protected building.\n&emsp;*Preservation* creates a permanent *protection from evil* spell on the affected building. Every surface of the building benefits from the effects of the spell.\n&emsp;Magical spells allowing access to the building fail. Thus, creatures attempting to *teleport* or *fly* into the building are stopped. Birds and creatures with natural flight may enter the building normally.\n&emsp;If the building is a temple (or other consecrated building) dedicated to the Power that granted the spell, all priests inside it gain the benefit of a *sanctuary* spell for the duration of the *preservation*.\n&emsp;The *preservation* spell expires if the building is destroyed or after 60 days have passed.'
+}
+
+priq['Revelation'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Divination',
+    'sphere': 'Divination',
+    'range': 'Special',
+    'duration': '1 day',
+    'aoe': 'Special',
+    'components': '',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 118',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *revelation* spell grants the priest extraordinary divination powers. He gains the following abilities that are effective to a range of 240 yards.\n&emsp;•The priest gains *true seeing* as per the 5th-level priest spell.\n&emsp;•The priest can see and identify all priest spell effects in the area (assume a line of sight in a 60° arc).\n&emsp;•The priest is instantly aware of any creature’s attempt to lie to him.\n&emsp;•The priest can communicate with animals, creatures, and monsters of all types. He\n&emsp;can communicate with any number of creatures, but may converse with only one at a\n&emsp;time.\n&emsp;•The priest can communicate telepathically with humanoids.\n&emsp;•The priest may use a suitable item as a *crystal ball* once per hour, as per the magical item described in the *DMG* (including range). He gains a +20% bonus to all rolls to determine success.'
+}
+
+priq['Reversion'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Alteration, Invocation',
+    'sphere': 'Time',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': '10-foot-radius sphere',
+    'components': '',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 118',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By casting this spell, the priest reverses certain recent events in the area of effect. The spell affects only creatures friendly to the priest. The magic takes effect immediately after the spell is completed rather than at the end of the round.\n&emsp;All damage suffered by the priest’s allies during the previous turn is undone. This includes energy drains, poison, and all special attack forms *unless* these resulted in instantaneous death. Death from cumulative physical damage is undone, however. Any creature brought back to life by the *reversion* spell is not required to make a resurrection survival roll.\n&emsp;Any spells cast by the priest’s allies during the previous turn are restored and may be used again. This does not apply to magical or spell-like effects from magical items or scrolls. Material components consumed in spellcasting during this time are also restored.\n&emsp;The *reversion* spell affects only creatures and characters. Equipment and magical items are not affected.\n&emsp;Casting this spell ages the priest one year.'
+}
+
+priq['Robe of Healing'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Enchantment, Necromancy',
+    'sphere': 'Healing',
+    'range': 'Touch',
+    'duration': '1 hour',
+    'aoe': 'One robe',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 119',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '1d4+4',
+    'effect': 'This spell enchants the priest’s robe or cloak, enabling him to walk among wounded creatures and heal them. By touching the robe, a wounded creature is cured of 1d4+4 hit points. As many creatures as can physically touch the robe within the spell duration can be healed. A reasonable maximum is 20 creatures per round, allowing a total of 1,200 creatures to be healed. A creature can be affected only once per week by the *robe of healing*.'
+}
+
+priq['Siege Wall'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Alteration, Invocation',
+    'sphere': 'Creation, Guardian',
+    'range': '480 yards',
+    'duration': 'Special',
+    'aoe': 'One building',
+    'components': '',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 119',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A *siege wall* uses magical energy to fortify all external areas of a fortified building, such as walls, battlements, drawbridges, and gates. External surfaces to be protected must be contiguous.\n&emsp;The protective effects of the *siege wall* are compatible with BATTLESYSTEM rules (see Chapter 7). Creatures assaulting the protected building have their movement rates reduced by half when trying to scale the exterior surfaces (scaling ladders, etc.). Attackers suffer a -2 penalty to damage rolls for missile fire.\n&emsp;Damage or AD caused by war machines is reduced by 2 die levels (if normal damage is 1d12, 1d8 is rolled instead; if damage is 1d10, 1d6 is rolled; ballista has AD8). Damage caused by crushing engines is rolled at -2 to the damage roll or ADs. Hits or hit points of crushing engines are reduced by half.\n&emsp;All enemies attacking a building protected by *siege wall* who enter an enclosed wall space are out of command unless they are in the line of sight of their commander, regardless of his control diameter.\n&emsp;All exterior areas of the fortification have their hit points or Hits doubled (see Hits of Building Features in BATTLESYSTEM rules).\n&emsp;The *siege wall* expires if the building is destroyed; it lasts a maximum of 24 hours.'
+}
+
+priq['Shooting Stars'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Conjuration, Invocation',
+    'sphere': 'Combat, Sun, Weather',
+    'range': '120 yards',
+    'duration': 'Instantaneous',
+    'aoe': '40-yard radius',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': '½',
+    'materials': '',
+    'reference': 'p. 119',
+    'book': 'Tome of Magic',
+    'damage': '[[6d10]] Fire and Electrical + 48',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A priest casting *shooting stars* creates a violent turbulence in the air above the area of effect, from which a number of fiery-orange, electrically-charged miniature fireballs erupt and shower onto the ground. Within the area of effect, all creatures suffer 6d10 points of combined fire and electrical damage. A successful saving throw at a -4 penalty indicates half damage.\n&emsp;In addition, four large *shooting stars* materialize within the area of effect. The priest can individually target these at specific creatures. If creatures are not specified, the targets are randomly selected. Each shooting star causes 48 points of damage on impact (no saving throw is allowed). Any creature within 10 feet of impact suffers 24 points of fire damage (half-damage if a saving throw at -4 is successful).'
+}
+
+priq['Sphere of Security'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Abjuration',
+    'sphere': 'Protection',
+    'range': '0',
+    'duration': '6 turns',
+    'aoe': '10-foot-radius sphere',
+    'components': '',
+    'cast-time': 'Special',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 119',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Sphere of security* protects the priest who casts the spell and his companions within the area of effect. Enemy creatures within the area are unaffected.\n&emsp;The sphere grants affected creatures a +2 bonus to armor class, a +2 bonus to all saving throws vs. magic, and 50% magic resistance. Casting this portion of the spell requires 1 round.\n&emsp;In addition, the priest can specify as many as four additional specific protection effects from the List of Protection Scrolls in Appendix 3 of the *DMG*. Each additional protection lengthens casting time by 1 round. The priest may create one effect per 5 levels of his experience, to a maximum of four effects. Currently [[{[[floor(@{level-priest}]]/5),4}kl1]] effects'
+}
+
+priq['Spiral of Degeneration'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Enchantment/Charm, Invocation',
+    'sphere': 'Chaos, Thought',
+    'range': '0',
+    'duration': '6 turns',
+    'aoe': '50-foot-diameter sphere',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'p. 120',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This potent spell affects all creatures hostile to the priest within the area of effect. The Power granting the spell causes the spell’s effects to manifest in one of two ways: the Chaos variation or the Thought variation.\n&emsp;In the Chaos variation, the fabric of reality is altered to change events. Magical items dysfunction because the fabric of magical reality is changed.\n&emsp;In the Thought variation, the thoughts of the victims of the spell are distorted and altered so that they find themselves unable to function coherently and effectively. Magical items dysfunction because the thoughts of their users are warped to either convince them that the items cannot function or block thought so that proper commands cannot be given.\n&emsp;The effects on the victims of the spell are the same for both variations. Each round, there is a 50% chance that a degeneration effect will occur in the area of effect. When this occurs, two events take place. First, spellcasters lose one spell from each level of spell currently memorized (e.g., a spellcaster who has memorized three spells each from levels 1 through 3 loses one spell from each level for a total of three). Lost spells may be regained normally through rest and memorization.\n&emsp;Second, magical items are affected in the following ways:\n&emsp;•Weapons and armor lose one level of enchantment (a *sword +3* becomes a *sword +2*, etc.).\n&emsp;•Magical items that carry charges (wands, rods, staves, etc.) are drained of 1d10 charges.\n&emsp;•Magical items without pluses or charges must make a saving throw versus spell (using the saving throw of their owner) or become nonmagical.\n&emsp;•Potions lose all magic and scrolls lose one randomly determined spell.\n&emsp;•Permanent magical items (swords, boots, armor, etc.) temporarily lose all effects until the spell expires or until the items leave the area of effect and for 1d10 rounds thereafter.\n&emsp;Single-use and charged items are permanently affected by this spell. A potion destroyed by this spell remains useless even after the spell ends.\n&emsp;Within the area of effect, magical communication is impossible due to thought blocks and chaotic effects. No communication magic (*ESP*, *sending*, etc.) will function; any spellcaster trying to cast such a spell will be stunned for 1 round per level of the spell he attempts to cast. A reverse of the *tongues* spell operates continuously in the area of effect. Telepathic communication (e.g., with a familiar) is also impossible.\n&emsp;In the Chaos variation of the spell, the center of the area of effect moves 10’ per round. The direction is randomly determined using 1d8 roll and compass points (1N, 2NE, 3E, 4SE, 5S, 6SW, 7W, 8NW). The radius of the spell effect will never exclude the priest who cast the spell; re-roll any result that leads to this occurrence.'
+}
+
+priq['Stalker'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Creation, Guardian, Plant',
+    'range': '30 yards',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 120',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A priest casting this spell conjures [[1d4+2]] plant creatures which have statistics identical to shambling mounds of 11HD. These creatures will aid the caster in combat or battle, perform a specific mission, or serve as bodyguards. The creatures remain with the priest for seven days unless he dismisses them. If the *stalkers* are summoned only for guard duty, however, the duration of the spell is seven months. In this case, the *stalker*s can only be ordered to guard a specific site or location.\n&emsp;The *stalkers* gain resistance to fire as per shambling mounds *only* if the terrain is suitable (marshy, close to a body of water, etc.)'
+}
+
+priq['Storm of Vengeance'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Evocation',
+    'sphere': 'Elemental, War, Weather',
+    'range': '400 yards',
+    'duration': '1 turn',
+    'aoe': '120-yard radius circle',
+    'components': '',
+    'cast-time': '1 turn',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'p. 121',
+    'book': 'Tome of Magic',
+    'damage': '*Round 2:* 1d4+1 Acid. *Round 3*: 8d8 Lightning. *Round 4* 3d10.',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell requires the priest to concentrate and cast the spell for the full duration of the spell. The casting time and duration are simultaneous; both activities occur in the same turn.\n&emsp;In the first round of casting, the priest summons an enormous black storm cloud over the area of effect. Lightning and crashing claps of thunder appear within the storm; creatures in the area of effect must make a saving throw or be deafened for 1d4 turns.\n&emsp;On the second round, acid rains down in the area, inflicting 1d4+1 points of damage. No saving throw is allowed.\n&emsp;On the third round, the caster calls six lightning bolts down from the cloud. Each is directed at a target by the priest (all may be directed at a single target or they may be directed at six separate targets). Each lightning bolt strike causes 8d8 points of damage (a successful saving throw indicates half damage).\n&emsp;On the fourth round, hailstones rain down in the area, causing 3d10 points of damage (no saving throw).\n&emsp;On the fifth through tenth (and final) rounds, violent rain and wind gusts reduce visibility to five feet. Movement is reduced 75%. Missile fire and spellcasting from within the area of effect are impossible.\n&emsp;The sequence of effects ceases immediately if the priest is disrupted from spellcasting during the 1 turn duration of the spell. The priest may opt to cancel the effects at any time.'
+}
+
+priq['Transformation'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Alteration, Enchantment, Illusion',
+    'sphere': 'Numbers',
+    'range': '0',
+    'duration': '3 turns',
+    'aoe': '100-yard-radius sphere',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 121',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *transformation* spell allows the priest to alter extradimensional and relative geometries within the area of effect. This enables the priest and his companions to use extradimensional links to facilitate rapid movement as follows.\n&emsp;All allies of the priest are able to *blink* (as per the 3rd-level wizard spell) once per round, with the ability to select the direction of movement.\n&emsp;As many as 10 creatures (designated by the priest at the time of spellcasting) can use the *teleport without error* spell. They may teleport anywhere within the area of effect of the *transformation* spell once during the duration of the spell.\n&emsp;As many as 10 creatures (specified by the priest at the time of spellcasting) gain abilities as if wearing *boots of striding and springing* for the spell duration.\n&emsp;At any time during the spell, the priest and as many as 10 other creatures can be affected as per a *shadow walk* spell. Creatures to be affected must stand in a circle and touch hands. As soon as the priest who cast the *transformation* spell leaves the area of effect via the shadow walk, all other effects of the *transformation* are canceled.'
+}
+
+priq['Undead Plague'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': '1 mile',
+    'duration': 'Special',
+    'aoe': '[[100*[[@{level-priest}]] ]]-yard square',
+    'components': '',
+    'cast-time': '2 rounds',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 121',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this potent spell, the priest summons many ranks of skeletons to do his bidding. The skeletons are formed from any and all humanoid bones within the area of effect. The number of skeletons depends on the terrain in the area of effect; a battlesite or graveyard will yield 10 skeletons per 100 square yards; a long-inhabited area will yield three skeletons per 100 square yards; and wilderness will yield one skeleton per 100 square yards.\n&emsp;The spell’s maximum area of effect is 10,000 square yards. Thus, no more than 1,000 skeletons can be summoned by this spell.\n&emsp;The skeletons created by this spell are turned as zombies and remain in existence until destroyed or willed out of existence by the priest who created them.'
+}
+
+priq['Warband Quest'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Charm, War',
+    'range': '240 yards',
+    'duration': 'Special',
+    'aoe': '200 creatures',
+    'components': '',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 122',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A priest may cast *warband quest* on any group of 200 creatures who are capable of understanding his commands. The creatures are then affected in a manner similar to the 5th-level priest spell, *quest*. Unwilling creatures are allowed a saving throw with a -4 penalty to avoid the effects.\n&emsp;The specified quest must be related to the reason that the Power granted this spell (perhaps a quest to slay or overcome a specified enemy).\n&emsp;*Warband quest* gives subjects of the spell a bonus of 2 hp per level of the caster (maximum 20 hp). Currently [[{2*[[@{level-priest}]],20}kl1]] bonus hp. Subjects also gain the effects of a *prayer* spell and have Morale of 18 while on the quest. These benefits last for the duration of the spell; the spell ends when the specified task is completed. A creature who abandons the quest is subject to the wrath of his deity.'
+}
+
+priq['Ward Matrix'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Invocation/Evocation',
+    'sphere': 'Wards',
+    'range': 'Special',
+    'duration': '60 days',
+    'aoe': 'Special',
+    'components': '',
+    'cast-time': '6 turns',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 122',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *ward matrix* spell links as many as six locations within the Prime Material plane. Only locations that have a functioning Wards spell may be linked. *Ward matrix* conjoins the different Wards spells so that each linked site gains the protection of all other wards in the network.\n&emsp;From the place where the *ward matrix* is cast, magical connections spread to the other designated sites. These can be seen with a *true seeing* or similar spell as tendrils of magical energy running through the air just above ground level. The connections target their destinations and move toward them at a rate of 40 miles per turn. They can evade barriers such as *anti-magic shells* by moving above or around them. When the connections reach their destinations, they multiply and spread to connect all other locations in the network; this secondary linkage is established at a rate of 20 miles per turn.\n&emsp;The conjoining of Wards lasts for 60 days unless a linked area is destroyed or a Wards spell is dispelled. Any location that is destroyed or has its Wards spell dispelled is removed from the matrix; other connections remain intact for the duration.'
+}
+
+priq['Wolf Spirits'] = {
+    'category': '',
+    'level': 'q',
+    'school': 'Conjuration/Summoning, Invocation',
+    'sphere': 'Animal, Guardian, Summoning',
+    'range': '30 yards',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': '',
+    'cast-time': '2 turns',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 122',
+    'book': 'Tome of Magic',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The priest casting this spell calls upon the “spirits” of wolves (or another animal, if appropriate). The notion of *wolf spirits* is akin to the Wild Hunt of Celtic mythology: a pack of enormous magical wolves led by a human master who range Celtic lands seeking to destroy evil. The *wolf spirits* spell summons [[2d4+2]] such entities to serve the priest as master.\n&emsp;*Wolf spirits’* statistics are as follows: AC -4; MV 36 Fl 36 (B); HD 5+5; #AT 1; Dmg 3d6; AL N; SZ M; ML 20; THAC0 14. They are immune to all forms of mind control, illusions, gases, paralyzation, and spells which affect only corporeal creatures. They cannot be harmed by weapons of less than +2 enchantment.\n&emsp;*Wolf spirits* can be instructed to perform a service in the manner of the *animal summoning* spells. In this variation in the Animal and Summoning spheres, the spell does not expire until the spirits have performed their commanded service, to a maximum duration of 14 days. In the Guardian variation of this spell, the spirits can only be commanded to keep watch over an area or creature. The spell lasts 100 days for this type of service.'
+}
+
 //#endregion
 
 const priestSpells = {};
@@ -6148,6 +6729,7 @@ priestSpells['pri4'] = pri4;
 priestSpells['pri5'] = pri5;
 priestSpells['pri6'] = pri6;
 priestSpells['pri7'] = pri7;
+priestSpells['priq'] = priq;
 
 const primonster = {};
 for (const [_, section] of Object.entries(priestSpells)) {
