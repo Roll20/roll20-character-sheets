@@ -1040,7 +1040,7 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 // --- End setup Rogue skills total --- //
 //#endregion
 
-//Related weapons / familiarity penalty
+//#region Weapons tab logic and autofil
 //Used in version.js
 const updateNonprofPenalty = function () {
     getAttrs(['nonprof-penalty'], function(values) {
@@ -1338,6 +1338,7 @@ on('clicked:grenade-miss', async function (eventInfo) {
         });
     });
 });
+//#endregion
 
 //#region Proficiencies
 //Used in version.js
