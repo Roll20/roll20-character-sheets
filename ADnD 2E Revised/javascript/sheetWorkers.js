@@ -1097,9 +1097,10 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
     weaponName = weaponName.toLowerCase();
     let fields = [...BOOK_FIELDS, thac0Field].filter(x => x !== undefined);
     getAttrs(fields, function(values) {
-        let baseWeapon = weapons[weaponName]
-        let thac0 = 20;
+        let thac0 = parseInt(values[thac0Field]);
+        thac0 = isNaN(thac0) ? 20 : thac0;
 
+        let baseWeapon = weapons[weaponName]
         if (baseWeapon) {
             if (bookInactiveShowToast(values, baseWeapon))
                 return;

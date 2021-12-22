@@ -17757,7 +17757,7 @@
                     <tr class="sheet-centering">
                         <td><input type="text" name="attr_weaponname" title="@{repeating_monsterweapons_$X_weaponname}" class="sheet-middle" list="all-weapons"></td>
                         <td><input type="text" name="attr_attacknum" title="@{repeating_monsterweapons_$X_attacknum}" class="sheet-table-dynamic" value="1"></td>
-                        <td><input type="text" name="attr_ThAC0" title="@{repeating_monsterweapons_$X_ThAC0}" class="sheet-short" value="@{monsterthac0}"></td>
+                        <td><input type="text" name="attr_ThAC0" title="@{repeating_monsterweapons_$X_ThAC0}" class="sheet-short" value="20"></td>
                         <td><button type="roll" name="roll_hit1" title="%{repeating_monsterweapons_$X_hit1}" value="@{wtype} hits an AC of [[ [[@{ThAC0}]]-(1d20+(?{Misc. bonus|0})) ]] using their @{weaponname}">Hit</button></td>
                         <td><input type="text" name="attr_damsm" title="@{repeating_monsterweapons_$X_damsm}" class="sheet-shortish"></td>
                         <td><button type="roll" name="roll_damsm" title="%{repeating_monsterweapons_$X_damsm}" value="@{wtype} rolls [[@{damsm}+(?{Misc. bonus|0})]] using their @{weaponname}"></button></td>
@@ -39655,9 +39655,10 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
     weaponName = weaponName.toLowerCase();
     let fields = [...BOOK_FIELDS, thac0Field].filter(x => x !== undefined);
     getAttrs(fields, function(values) {
-        let baseWeapon = weapons[weaponName]
-        let thac0 = 20;
+        let thac0 = parseInt(values[thac0Field]);
+        thac0 = isNaN(thac0) ? 20 : thac0;
 
+        let baseWeapon = weapons[weaponName]
         if (baseWeapon) {
             if (bookInactiveShowToast(values, baseWeapon))
                 return;
