@@ -992,15 +992,17 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
 let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
 rogueStandardSkills.forEach(skill => {
-    setupCalculateTotal(`${skill}t`, rogueStandardColumns.map(column => `${skill}${column}`), 95);
-    setupCalculateTotal(`${skill}noarmort`, [`${skill}t`, `${skill}noarmorb`], 95);
-    setupCalculateTotal(`${skill}armort`, [`${skill}t`, `${skill}armorp`], 95);
+    setupCalculateTotal(`${skill}t-hidden`, rogueStandardColumns.map(column => `${skill}${column}`));
+    setupCalculateTotal(`${skill}t`, [`${skill}t-hidden`], 95);
+    setupCalculateTotal(`${skill}noarmort`, [`${skill}t-hidden`, `${skill}noarmorb`], 95);
+    setupCalculateTotal(`${skill}armort`, [`${skill}t-hidden`, `${skill}armorp`], 95);
 });
 
 // Setup custom rogue skills total
-setupRepeatingRowCalculateTotal('crt', rogueStandardColumns.map(column => `cr${column}`), 'customrogue', 95);
-setupRepeatingRowCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogue', 95);
-setupRepeatingRowCalculateTotal('crarmort', ['crt', 'crarmorp'], 'customrogue', 95);
+setupRepeatingRowCalculateTotal('crt-hidden', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
+setupRepeatingRowCalculateTotal('crt', ['crt-hidden'], 'customrogue', 95);
+setupRepeatingRowCalculateTotal('crnoarmort', ['crt-hidden', 'crnoarmorb'], 'customrogue', 95);
+setupRepeatingRowCalculateTotal('crarmort', ['crt-hidden', 'crarmorp'], 'customrogue', 95);
 // --- End setup Rogue skills total --- //
 
 //Rogue armor modifier auto fill
@@ -1076,17 +1078,6 @@ on('change:thac0-base-calc', function(eventInfo) {
                 row['ThAC02'] = eventInfo.newValue;
         })
         .execute();
-});
-
-//Used in version.js
-const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc', 0);
-on('change:weapprof-slots-total', function (eventInfo) {
-    updateWeaponProfsTotal();
-});
-//Used in version.js
-const updateNonWeaponProfsTotal = () => calculateFormula('prof-slots-total', 'prof-slots-total-calc', 0);
-on('change:prof-slots-total', function (eventInfo) {
-    updateNonWeaponProfsTotal();
 });
 
 //#region Weapons autofill
@@ -1348,6 +1339,18 @@ on('clicked:grenade-miss', async function (eventInfo) {
     });
 });
 
+//#region Proficiencies
+//Used in version.js
+const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc', 0);
+on('change:weapprof-slots-total', function (eventInfo) {
+    updateWeaponProfsTotal();
+});
+//Used in version.js
+const updateNonWeaponProfsTotal = () => calculateFormula('prof-slots-total', 'prof-slots-total-calc', 0);
+on('change:prof-slots-total', function (eventInfo) {
+    updateNonWeaponProfsTotal();
+});
+
 //Weapon proficiency slots
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['weapprofnum']))
@@ -1378,7 +1381,9 @@ on('change:repeating_profs:profname', function (eventInfo) {
         });
     });
 });
+//#endregion
 
+//#region Equipment
 //Equipment Carried Section
 on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['gearweight', 'gearqty']))
@@ -1387,7 +1392,6 @@ on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeat
 });
 
 //Equipment Stored Section
-//Mount Equipment Carried Section Continued
 on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['gear-stored-weight', 'gear-stored-qty']))
         return;
@@ -1406,6 +1410,7 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
         })
         .execute();
 })
+//#endregion
 
 on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_gem`, function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['gemvalue', 'gemqty']))
