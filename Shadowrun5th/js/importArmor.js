@@ -44,3 +44,27 @@ function importSingleArmor(armor, attributes) {
         }
     }
 }
+
+function importCyberwareArmor(nightly, cyberware, attributes) {
+    if(nightly != "on") {
+        return;
+    }
+
+    var cyberwareEnhancements = [];
+    if(cyberware.children != null && cyberware.children.cyberware.length > 1) {
+        cyberwareEnhancements = cyberware.children.cyberware;
+    }
+
+    cyberwareEnhancements.forEach(enhancement => importSingleCyberwareArmor(cyberware.name, enhancement, attributes));
+}
+
+function importSingleCyberwareArmor(parentname, cyberware, attributes) {
+
+    if(cyberware.name_english === "Armor") {
+        var newrowid = generateRowID()
+        attributes["repeating_armors_"+newrowid+"_armorname"] = parentname;
+        attributes["repeating_armors_"+newrowid+"_armorworn"] = "on";
+        attributes["repeating_armors_"+newrowid+"_armorrating"] = cyberware.rating;
+        attributes["repeating_armors_"+newrowid+"_armornotes"] = "";
+    }
+}

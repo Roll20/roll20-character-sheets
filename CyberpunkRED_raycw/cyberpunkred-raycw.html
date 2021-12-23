@@ -83,11 +83,11 @@
 			</div>
 			<div class='statbox'>
 				<div class="h2">REF</div>
-				<div><input type="number" name="attr_Reflex" /></div>
+				<div class='outof'><input type="number" name="attr_Reflex" /><div>of</div><input type="number" name="attr_Reflex_max" /></div>
 			</div>
 			<div class='statbox'>
 				<div class="h2">DEX</div>
-				<div><input type="number" name="attr_Dexterity" /></div>
+				<div class='outof'><input type="number" name="attr_Dexterity" /><div>of</div><input type="number" name="attr_Dexterity_max" /></div>
 			</div>
 			<div class='statbox'>
 				<div class="h2">TECH</div>
@@ -107,7 +107,7 @@
 			</div>
 			<div class='statbox'>
 				<div class="h2">MOVE</div>
-				<div><input type="number" name="attr_Movement" /></div>
+				<div class='outof'><input type="number" name="attr_Movement" /><div>of</div><input type="number" name="attr_Movement_max" /></div>
 			</div>
 			<div class='statbox'>
 				<div class="h2">BODY</div>
@@ -813,6 +813,8 @@
 						<div class="bg-white weapon-name"><button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+1d10]]}}">Attack:</button> <input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here..."></div>
 						<div class="bg-white weapon-type">
 							<select name="attr_Weapontype" class="Weapontype">
+								<option value="Brawling">Brawling</option>
+								<option value="Martial Arts">Martial Arts</option>
 								<option value="Melee">Melee</option>
 								<option value="Pistol">Pistol</option>
 								<option value="SMG">SMG</option>
@@ -1437,6 +1439,14 @@
 
 		<div class=header>DV</div>
 
+		<!-- Need to find a way to remove the range table for these two skills -->
+
+		{{#Brawling}}
+		{{/Brawling}}
+		
+		{{#Martial Arts}}
+		{{/Martial Arts}}
+
 		<!-- Table for Pistols -->
 
 		{{#Pistol}}
@@ -1572,24 +1582,32 @@
 			});
 	});
 
-	on("change:Willpower change:Body sheet:opened", function() {
+	on("change:Dexterity_max change:HeadPenalty change:BodyPenalty", function() {
 		getAttrs([
-			"Willpower",
-			"Body"
+			"HeadPenalty",
+			"BodyPenalty",
+			"Dexterity_max",
+			"Reflex_max",
+			"Movement_max"
 			], function(values) {
 
-				const WILL = parseInt(values.Willpower)||0;
-				const BODY = parseInt(values.Body)||0;
+				const headpen = Math.abs(parseInt(values.HeadPenalty))||0;
+				const bodypen = Math.abs(parseInt(values.BodyPenalty))||0;
+				const DEX = parseInt(values.Dexterity_max);
+				const REF = parseInt(values.Reflex_max);
+				const MOVE = parseInt(values.Movement_max);
 
-				var maxhp = 10 + 5 * Math.ceil((WILL+BODY)/2);
+				var maxpenalty = Math.max(headpen,bodypen)||0;
 
 				setAttrs({
-					"hp_max" : maxhp
+					"Dexterity" : DEX - maxpenalty,
+					"Reflex" : REF - maxpenalty,
+					"Movement" : MOVE - maxpenalty
 				});
 			});
 	});
 
-	on("change:repeating_weapons:Weapontype", function() {
+	on("change:repeating_weapons:Weapontype change:Dexterity change:Reflex sheet:opened", function() {
 		getAttrs([
 			"repeating_weapons_Weapontype",
 			"repeating_weapons_Weaponmod",
@@ -1597,6 +1615,8 @@
 			"LVL_Handgun",
 			"LVL_HeavyArms",
 			"LVL_ShoulderArms",
+			"LVL_Brawling",
+			"LVL_Martial",
 			"LVL_Melee",
 			"LVL_Autofire",
 			"Reflex",
@@ -1609,11 +1629,19 @@
 				const Archery = parseInt(values.LVL_Archery)||0;
 				const Handgun = parseInt(values.LVL_Handgun)||0;
 				const HeavyArms = parseInt(values.LVL_HeavyArms)||0;
+				const Brawling = parseInt(values.LVL_Brawling)||0;
+				const Martial = parseInt(values.LVL_Martial)||0;
 				const Melee = parseInt(values.LVL_Melee)||0;
 				const ShoulderArms = parseInt(values.LVL_ShoulderArms)||0;
 				const Autofire = parseInt(values.LVL_Autofire)||0;
 
 				switch(values.repeating_weapons_Weapontype) {
+					case "Brawling":
+					weaponmod = DEX + Brawling;
+					break;
+					case "Martial Arts":
+					weaponmod = DEX + Martial;
+					break;
 					case "Melee":
 					weaponmod = DEX + Melee;
 					break;
@@ -1688,7 +1716,7 @@
 		});
 	});
 
-	const stats = ["Intelligence","Reflex","Dexterity","Technique","Cool","Willpower","Luck_max","Movement","Body","Empathy_max"];
+	const stats = ["Intelligence","Reflex_max","Dexterity_max","Technique","Cool","Willpower","Luck_max","Movement","Body","Empathy_max"];
 
 	stats.forEach(function(stat) {
 		on(`change:${stat}`, function() {

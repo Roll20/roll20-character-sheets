@@ -3124,7 +3124,7 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
           isConditionnelD = true;
 
           exec.push(`{{vODGhostA=${i18n_ghost}}}`);
-          exec.push(`{{vODGhostAValue=[[${vDiscretion}D6+${oDiscretion}]]}}`);
+          exec.push(`{{vODGhostAValue=[[{${vDiscretion}D6cs2cs4cs6cf1cf3cf5s%2}=0+${oDiscretion}]]}}`);
           exec.push(`{{vODGhostCondition=${i18n_attaqueSurpriseCondition}}}`);
 
           attaquesSurprises.unshift(i18n_ghost);
@@ -3431,7 +3431,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
 
       if (isELourd) {
         const type = value.stylePuissantType;
-        const bonus = Number(value.stylePuissantBonus);
+        const bonus = value.stylePuissantBonus;
         const malus = 0 - bonus;
 
         exec.push(`{{vMStyleA=${malus}D}}`);

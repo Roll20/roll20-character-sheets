@@ -1,5 +1,14 @@
 Change Log
 ==============================================
+**2021-12-16 ** v.8 Paul V
+	Increased size of HitDice and Speed on the NPC Sheet
+	Increased size of the Challenge rating section
+	Fixed the formatting of the Damage Vulnerabilities/Resistances/Immunities/Conditional sections so they are left formatted and fit on the same line
+	Left Align Senses and languages on NPC Sheet
+**2021-12-15 ** v.7 Paul V
+	Fixed NPC CR current using the incorrect attribute --Reset to using attr_CR
+**2021-12-15 ** v.6 Paul V
+	Fixed formatting on Reaction Names and Notes on the NPC Sheet
 **2021-12-05 ** v.5 Paul V
 	Attribute changes to enable importing of characters
 	attr_strengthmod to attr_strength_mod
