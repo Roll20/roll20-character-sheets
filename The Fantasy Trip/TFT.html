@@ -46,7 +46,10 @@
 			</span>
 			<span>
 				<b style='display: inline-block; width: 7.5em'>Weight Carried</b>
-				<input type=text style='width: 3.5em;' name="attr_weightcarried" value="0"/>
+				<input type=text style='width: 3.5em;' name="attr_weightcarried" readonly/>
+				<input type=number name='attr_weightequipment' readonly/>
+				<input type=number name='attr_weightarmor' readonly/>
+				<input type=number name='attr_weightweapons' readonly/>
 			</span>
 		</div>
 		<div class="sheet-combat sheet-block">
@@ -183,7 +186,7 @@
 				<b style='display: inline-block; width: 35em;'>Notes</b>
 			</span>
 			<fieldset class=repeating_exphistory>
-				<input type=text name=attr_expabiity style='width: 12em;'>
+				<input type=text name=attr_expability style='width: 12em;'>
 				<input type=number name=attr_expspent style='width: 6em;'>
 				<input type=text name=attr_expnotes style='width: 35em;'>
 			</fieldset>
@@ -193,43 +196,52 @@
 
 <script type="text/worker">
 
-	/* ===== PARAMETERS ==========
-	destinations = the name of the attribute that stores the total quantity
-			can be a single attribute, or an array: ['total_cost', 'total_weight']
-			If more than one, the matching fields must be in the same order.
-		section = name of repeating fieldset, without the repeating_
-		fields = the name of the attribute field to be summed
-				destination and fields both can be a single attribute: 'weight'
-				or an array of attributes: ['weight','number','equipped']
-	*/
-	const repeatingSum = (destinations, section, fields) => {
-		if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
-		if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
-		getSectionIDs(`repeating_${section}`, idArray => {
-			const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))], []);
-			getAttrs([...attrArray], v => {
-					const getValue = (section, id, field) => v[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : parseFloat(v[`repeating_${section}_${id}_${field}`]) || 0;
-					const commonMultipliers = (fields.length <= destinations.length) ? [] : fields.splice(destinations.length, fields.length - destinations.length);
-					const output = {};
-					destinations.forEach((destination, index) => {
-						output[destination] = idArray.reduce((total, id) => total + getValue(section, id, fields[index]) * commonMultipliers.reduce((subtotal, mult) => subtotal * getValue(section, id, mult), 1), 0);
-					});
-					setAttrs(output);
+	// Update experience spent and unspent.
+	on('sheet:opened change:experiencetotal change:repeating_exphistory remove:repeating_exphistory', function() {
+		getSectionIDs("exphistory", function(idarray) {
+			let fieldnames = ["experiencetotal"];
+			for(var i=0; i < idarray.length; i++) {
+					fieldnames.push(`repeating_exphistory_${idarray[i]}_expspent`);
+			}
+			getAttrs(fieldnames, function(v) {
+				let total = parseInt(v.experiencetotal)||0;
+				let unspent = total * 2;
+				for (const property in v) {
+					unspent -= parseInt(v[property])||0;
+				}
+				setAttrs({
+						experienceunspent: unspent,
+						experiencespent: (total - unspent)
+				})
 			});
-		});
-	}
-
-	on('sheet:opened change:experiencetotal change:repeating_exphistory:expspent remove:repeating_exphistory', function() {
-	repeatingSum("experiencespent","exphistory","expspent");
-		getAttrs(["experiencetotal","experiencespent"], function(v) {
-			let total = parseInt(v.experiencetotal)||0;
-			let spent = parseInt(v.experiencespent)||0;
-			let unspent = total - spent;
-			setAttrs({
-					experienceunspent: unspent
-			})
-		});
+		})
 	});
+
+	/*
+    on('sheet:opened change:repeating_equipment remove:repeating_equipment', function() {
+    	repeatingSum("weightequipment","equipment",["equipmentweight","equipmentcount"]);
+    });
+
+    on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
+    	repeatingSum("weightarmor","armor", "defensewt");
+    });
+
+    on('sheet:opened change:repeating_weapons remove:repeating_weapons', function() {
+    	repeatingSum("weightweapons","weapons", "weaponwt");
+    });
+
+	on('sheet:opened change:weightequipment change:weightarmor change:weightweapons', function() {
+		getAttrs(["weightequipment","weightarmor","weightweapons"], function(v) {
+			let equipment = parseInt(v.weightequipment)||0;
+			let armor = parseInt(v.weightarmor)||0;
+			let weapons = parseInt(v.weightweapons)||0;
+			let total = equipment + weapons + armor;
+    		setAttrs({
+    			weightcarried: total
+    		})
+		}
+    });
+    */
 
 	const buttonlist = ["character","journal"];
 	buttonlist.forEach(button => {
