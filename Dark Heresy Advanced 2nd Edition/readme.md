@@ -17,12 +17,12 @@ o Gear
 o Backpack/Vest
 o Stored Gear
 > Gear Calculations: All calculations are done for you regarding Gear now.  The information is also displayed so that you can verify that it is working correctly, these calculations include:
-o Finding Strength and Toughness Bonus and adding them together ( SB+TB: )
-o Using the SB+TB modifier to give your character’s starting weight ( Base: )
-o Location to insert Backpack/Vest weight bonuses ( Pack Bonus: | Vest Bonus: )
-o Adding up the different sections’ total weight ( Pack Weight: | Total Stored Weight: | Total Weight: )
-o Character’s maximum carry weight ( Max: )
-o Remaining weight before being encumbered ( Available: )
+o Finding Strength and Toughness Bonus and adding them together (SB+TB:)
+o Using the SB+TB modifier to give your character’s starting weight (Base:)
+o Location to insert Backpack/Vest weight bonuses (Pack Bonus: | Vest Bonus:)
+o Adding up the different sections’ total weight (Pack Weight: | Total Stored Weight: | Total Weight:)
+o Character’s maximum carry weight (Max:)
+o Remaining weight before being encumbered (Available:)
 
-If you have ides for changes or need something fixed in the DH2E Advanced Character Sheet you are welcome to DM Dustin S on Roll20
+If you have ideas for changes or need something fixed in the DH2E Advanced Character Sheet you are welcome to DM Dustin S on Roll20
 > Dustin S. | Roll20: Online virtual tabletop

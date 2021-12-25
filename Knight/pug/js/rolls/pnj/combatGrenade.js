@@ -1,263 +1,249 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable camelcase */
+/* eslint-disable no-undef */
 
-const rollCombatGrenadePNJ = ["grenade1PNJ", "grenade2PNJ", "grenade3PNJ", "grenade4PNJ", "grenade5PNJ"];
+const rollCombatGrenadePNJ = ['grenade1PNJ', 'grenade2PNJ', 'grenade3PNJ', 'grenade4PNJ', 'grenade5PNJ'];
 
-rollCombatGrenadePNJ.forEach(button => {
-    on(`clicked:${button}`, function(info) {
-        let roll = info.htmlAttributes.value;
+rollCombatGrenadePNJ.forEach((button) => {
+  on(`clicked:${button}`, async (info) => {
+    const roll = info.htmlAttributes.value;
 
-        var hasDgts = true;
-        var hasLumiere = false;
+    let hasDgts = true;
 
-        if(button == "grenade2" || button == "grenade4")
-            hasDgts = false;
+    if (button === 'grenade2' || button === 'grenade4') { hasDgts = false; }
 
-        if(button == "grenade2")
-            hasLumiere = true;
+    const firstExec = [];
+    let exec = [];
+    firstExec.push(roll);
 
-        let firstExec = [];
-        let exec = [];
-        firstExec.push(roll);
+    let isConditionnelA = false;
+    let isConditionnelD = false;
+    let isConditionnelV = false;
 
-        let isConditionnelA = false;
-        let isConditionnelD = false;
-        let isConditionnelV = false;
+    const cBase = [];
+    const cRoll = [];
+    const bonus = [];
 
-        let cBase = [];
-        let cRoll = [];
-        let bonus = [];
+    let AE = 0;
 
-        let AE = 0;
+    let ameliorations = false;
 
-        let vMasque = Number(AspectValue["Masque"].value);
-        let vBete = Number(AspectValue["Bete"].value);
-        let vBeteAEMin = Number(AspectValue["Bete"].AEMin);
-        let vBeteAEMaj = Number(AspectValue["Bete"].AEMaj);
+    let diceDegats = 3;
+    let diceViolence = 3;
 
-        let vBeteD = 0;
-        
-        let ameliorations = false;
+    const bDegats = 0;
+    const bViolence = 0;
 
-        if(PJData["grenadeAvancee"] != "0")
-            ameliorations = true;
-        
-        let mod = PJData["jetModifDes"];
+    const listAttrs = [
+      'jetModifDes',
+      'aspectPNJGrenade',
+      'Masque',
+      'capaciteFanMade',
+      'attaqueOmbre',
+      'grenadeAvancee',
+    ];
 
-        let diceDegats = 3;
-        let diceViolence = 3;
+    const attrs = await getAttrsAsync(listAttrs);
+    let attrsAspect = [];
 
-        let bDegats = 0;
-        let bViolence = 0;
+    const mod = +attrs.jetModifDes;
 
-        let aspect = PNJData[`aspectPNJGrenade`] || "0";
-        
-        let aspectNom = "";
+    if (attrs.grenadeAvancee !== '0') { ameliorations = true; }
 
-        let attaquesSurprises = [];
-        let attaquesSurprisesValue = [];
-        let attaquesSurprisesCondition = "";
+    const vMasque = +attrs.Masque;
 
-        let capacitesFM = PNJData["capaciteFanMade"];
-        let attaquesOmbres = PNJData["attaqueOmbre"];
+    const aspect = attrs.aspectPNJGrenade || '0';
 
-        let autresEffets = [];
+    let aspectNom = '';
 
-        if(aspect != "0") {
-            aspectNom = aspect.slice(2, -1);
+    const attaquesSurprises = [];
+    const attaquesSurprisesValue = [];
+    let attaquesSurprisesCondition = '';
 
-            let aspectValue = Number(AspectValue[aspectNom].value);
-            AE = Number(AspectValue[aspectNom].AEMin)+Number(AspectValue[aspectNom].AEMaj);
+    const capacitesFM = attrs.capaciteFanMade;
+    const attaquesOmbres = attrs.attaqueOmbre;
 
-            cBase.push(AspectNom[aspectNom]);
-            cRoll.push(aspectValue);
-        };
+    const autresEffets = [];
 
-        if(mod != 0) {
-            cRoll.push(mod);
-            exec.push("{{mod="+mod+"}}");
-        }
+    if (aspect !== '0') {
+      aspectNom = aspect.slice(2, -1);
 
-        //GESTION DES BONUS DE BASE
-        if(ameliorations) {
-            diceDegats += 2;
-            diceViolence += 2;
-            
-            exec.push("{{vGrenadesAmeliorees=+2D}}");
-        }
+      attrsAspect = await getAttrsAsync([
+        aspectNom,
+        `${aspectNom}PNJAE`,
+        `${aspectNom}PNJAEMaj`,
+      ]);
 
-        //FIN GESTION DES BONUS DE BASE
+      const aspectValue = +attrsAspect[aspectNom];
+      AE = totalAspect(attrsAspect, aspectNom);
 
-        //GESTION DES BONUS DES ASPECTS EXCEPTIONNELS
-        if(vBeteAEMin > 0 || vBeteAEMaj > 0) {
-            bDegats += vBeteAEMin;
-            bDegats += vBeteAEMaj;
+      cBase.push(AspectNom[aspectNom]);
+      cRoll.push(aspectValue);
 
-            vBeteD += vBeteAEMin;
-            vBeteD += vBeteAEMaj;
-        }
+      exec.push(`{{vAE=${AE}}}`);
+    }
 
-        if(vBeteAEMaj > 0) {
-            bDegats += vBete;
-            vBeteD += vBete;
-        }
+    if (mod !== 0) {
+      cRoll.push(mod);
+      exec.push(`{{mod=${mod}}}`);
+    }
 
-        if(vBeteD > 0)
-            exec.push(`{{vBeteD=${vBeteD}}}`);
-        //FIN DE GESTION DES BONUS DES ASPECTS EXCEPTIONNELS
+    // GESTION DES BONUS DE BASE
+    if (ameliorations) {
+      diceDegats += 2;
+      diceViolence += 2;
 
-        console.log(attaquesSurprisesCondition);
+      exec.push('{{vGrenadesAmeliorees=+2D}}');
+    }
 
-        //GESTION DES EFFETS
+    // FIN GESTION DES BONUS DE BASE
 
-        switch(button) {
-            case "grenade1PNJ":
-                isConditionnelD = true;
-                isConditionnelV = true;
+    // GESTION DES EFFETS
 
-                firstExec.push("{{ultraviolenceValue=[[2D6]]}} {{meurtrierValue=[[2D6]]}}");
+    switch (button) {
+      case 'grenade1PNJ':
+        isConditionnelD = true;
+        isConditionnelV = true;
 
-                exec.push("{{ultraviolence="+i18n_ultraviolence+"}} {{ultraviolenceCondition="+i18n_ultraviolenceCondition+"}} {{meurtrier="+i18n_meurtrier+"}} {{meurtrierCondition="+i18n_meurtrierCondition+"}}");
-                autresEffets.push(i18n_dispersion+" 6");
-                break;
-            case "grenade2PNJ":
-                isConditionnelA = true;
-        
-                exec.push("{{choc="+i18n_choc+" 1}} {{chocCondition="+i18n_chocCondition+"}}");
-                autresEffets.push(i18n_barrage+" 2");
-                autresEffets.push(i18n_lumiere+" 2");
-                autresEffets.push(i18n_dispersion+" 6");
-                break;
-            case "grenade3PNJ":
-                isConditionnelD = true;
+        firstExec.push('{{ultraviolenceValue=[[2D6]]}} {{meurtrierValue=[[2D6]]}}');
 
-                firstExec.push("{{destructeurValue=[[2D6]]}}");
+        exec.push(`{{ultraviolence=${i18n_ultraviolence}}} {{ultraviolenceCondition=${i18n_ultraviolenceCondition}}} {{meurtrier=${i18n_meurtrier}}} {{meurtrierCondition=${i18n_meurtrierCondition}}}`);
+        autresEffets.push(`${i18n_dispersion} 6`);
+        break;
+      case 'grenade2PNJ':
+        isConditionnelA = true;
 
-                exec.push("{{destructeur="+i18n_destructeur+"}} {{destructeurCondition="+i18n_destructeurCondition+"}}");
-                autresEffets.push(i18n_perceArmure+" 20");
-                autresEffets.push(i18n_penetrant+" 6");
-                autresEffets.push(i18n_dispersion+" 6");
-                break;
-            case "grenade4PNJ":
-                isConditionnelA = true;
+        exec.push(`{{choc=${i18n_choc} 1}} {{chocCondition=${i18n_chocCondition}}}`);
+        autresEffets.push(`${i18n_barrage} 2`);
+        autresEffets.push(`${i18n_lumiere} 2`);
+        autresEffets.push(`${i18n_dispersion} 6`);
+        break;
+      case 'grenade3PNJ':
+        isConditionnelD = true;
 
-                exec.push("{{parasitage="+i18n_parasitage+" 2"+"}} {{parasitageCondition="+i18n_parasitageCondition+"}}");
-                autresEffets.push(i18n_dispersion+" 6");
-                hasDgts = false;
-                break;
-            case "grenade5PNJ":
-                isConditionnelA = true;
-        
-                exec.push("{{choc="+i18n_choc+" 1}} {{chocCondition="+i18n_chocCondition+"}} {{grenadeExplosive="+i18n_surVehicule+"}} {{grenadeExplosiveD=[[3D6]]}}");
-                autresEffets.push(i18n_antiVehicule);
-                autresEffets.push(i18n_dispersion+" 3");
-                break;
-        }
+        firstExec.push('{{destructeurValue=[[2D6]]}}');
 
-        if(attaquesOmbres != "0" && capacitesFM != "0") {
-            isConditionnelD = true;
-            
-            attaquesSurprises.push(i18n_attaquesOmbres);
-            attaquesSurprisesValue.push(vMasque);
+        exec.push(`{{destructeur=${i18n_destructeur}}} {{destructeurCondition=${i18n_destructeurCondition}}}`);
+        autresEffets.push(`${i18n_perceArmure} 20`);
+        autresEffets.push(`${i18n_penetrant} 6`);
+        autresEffets.push(`${i18n_dispersion} 6`);
+        break;
+      case 'grenade4PNJ':
+        isConditionnelA = true;
 
-            if(attaquesSurprisesCondition == "")
-                attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`;
-        }
+        exec.push(`{{parasitage=${i18n_parasitage} 2}} {{parasitageCondition=${i18n_parasitageCondition}}}`);
+        autresEffets.push(`${i18n_dispersion} 6`);
+        hasDgts = false;
+        break;
+      case 'grenade5PNJ':
+        isConditionnelA = true;
 
-        console.log(attaquesSurprisesCondition);
+        exec.push(`{{choc=${i18n_choc} 1}} {{chocCondition=${i18n_chocCondition}}} {{grenadeExplosive=${i18n_surVehicule}}} {{grenadeExplosiveD=[[3D6]]}}`);
+        autresEffets.push(i18n_antiVehicule);
+        autresEffets.push(`${i18n_dispersion} 3`);
+        break;
+      default:
+        isConditionnelA = false;
+        break;
+    }
 
-        //FIN GESTION DES EFFETS
+    if (attaquesOmbres !== '0' && capacitesFM !== '0') {
+      isConditionnelD = true;
 
-        if(cRoll.length == 0)
-            cRoll.push(0);
+      attaquesSurprises.push(i18n_attaquesOmbres);
+      attaquesSurprisesValue.push(vMasque);
 
-        if(bonus.length == 0)
-            bonus.push(0);
+      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+    }
 
-        bonus.push(AE);
+    // FIN GESTION DES EFFETS
 
-        if(hasDgts) {
-            exec.push(`{{degats=[[${diceDegats}D6+${bDegats}]]}}`);
-            exec.push(`{{violence=[[${diceViolence}D6+${bViolence}]]}}`);
-        }
+    if (cRoll.length === 0) { cRoll.push(0); }
 
-        if(cBase.length != 0)
-            exec.push("{{cBase="+cBase.join(" - ")+"}}");
+    if (bonus.length === 0) { bonus.push(0); }
 
-        var jet = "{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}";
+    bonus.push(AE);
 
-        firstExec.push(jet);
-        exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
-        exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+    if (hasDgts) {
+      if (diceDegats < 0) { diceDegats = 0; }
 
-        if(attaquesSurprises.length > 0 && hasDgts) {
-            exec.push("{{attaqueSurprise="+attaquesSurprises.join("\n+")+"}}");
-            exec.push("{{attaqueSurpriseValue=[["+attaquesSurprisesValue.join("+")+"]]}}");
-            exec.push(`${attaquesSurprisesCondition}`);
-        }
+      if (diceViolence < 0) { diceViolence = 0; }
 
-        if(autresEffets.length > 0) {
-            autresEffets.sort();
-            exec.push("{{effets="+autresEffets.join(" / ")+"}}");
-        }           
+      exec.push(`{{degats=[[${diceDegats}D6+${bDegats}]]}}`);
+      exec.push(`{{violence=[[${diceViolence}D6+${bViolence}]]}}`);
+    }
 
-        if(isConditionnelA)
-            exec.push("{{succesConditionnel=true}}");
+    if (cBase.length !== 0) { exec.push(`{{cBase=${cBase.join(' - ')}}}`); }
 
-        if(isConditionnelD && hasDgts)
-            exec.push("{{degatsConditionnel=true}}");
+    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
 
-        if(isConditionnelV && hasDgts)
-            exec.push("{{violenceConditionnel=true}}");
+    firstExec.push(jet);
+    exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+    exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
-        exec = firstExec.concat(exec);
+    if (attaquesSurprises.length > 0 && hasDgts) {
+      exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
+      exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
+      exec.push(`${attaquesSurprisesCondition}`);
+    }
 
-        startRoll(exec.join(" "), (results) => {
-            let tJet = results.results.jet.result;
+    if (autresEffets.length > 0) {
+      autresEffets.sort();
+      exec.push(`{{effets=${autresEffets.join(' / ')}}}`);
+    }
 
-            let tBonus = results.results.bonus.result;
-            let tExploit = results.results.Exploit.result;
+    if (isConditionnelA) { exec.push('{{succesConditionnel=true}}'); }
 
-            let tMeurtrier = results.results.meurtrierValue;
-            let vTMeurtrier = 0;
+    if (isConditionnelD && hasDgts) { exec.push('{{degatsConditionnel=true}}'); }
 
-            if(tMeurtrier != undefined)
-                vTMeurtrier = tMeurtrier.dice[0];
+    if (isConditionnelV && hasDgts) { exec.push('{{violenceConditionnel=true}}'); }
 
-            let tDestructeur = results.results.destructeurValue;
-            let vTDestructeur = 0;
+    exec = firstExec.concat(exec);
 
-            if(tDestructeur != undefined)
-                vTDestructeur = tDestructeur.dice[0];
-                            
-            let tUltraviolence = results.results.ultraviolenceValue;
-            
-            let vTUltraviolence = 0;
+    startRoll(exec.join(' '), (results) => {
+      const tJet = results.results.jet.result;
 
-            if(tUltraviolence != undefined)
-                vTUltraviolence = tUltraviolence.dice[0];
+      const tBonus = results.results.bonus.result;
+      const tExploit = results.results.Exploit.result;
 
-            finishRoll(
-                results.rollId, 
-                {
-                    jet:tJet+tBonus,
-                    meurtrierValue:vTMeurtrier,
-                    destructeurValue:vTDestructeur,
-                    ultraviolenceValue:vTUltraviolence,
-                }
-            );
+      const tMeurtrier = results.results.meurtrierValue;
+      let vTMeurtrier = 0;
 
-            if(tJet != 0 && tJet == tExploit) {
-                startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}"+jet, (exploit) => {
-                    let tExploit = exploit.results.jet.result;
+      if (tMeurtrier !== undefined) { vTMeurtrier = tMeurtrier.dice[0]; }
 
-                    finishRoll(
-                        exploit.rollId, 
-                        {
-                            jet:tExploit
-                        }
-                    );
-                });
-            }
+      const tDestructeur = results.results.destructeurValue;
+      let vTDestructeur = 0;
+
+      if (tDestructeur !== undefined) { vTDestructeur = tDestructeur.dice[0]; }
+
+      const tUltraviolence = results.results.ultraviolenceValue;
+
+      let vTUltraviolence = 0;
+
+      if (tUltraviolence !== undefined) { vTUltraviolence = tUltraviolence.dice[0]; }
+
+      finishRoll(
+        results.rollId,
+        {
+          jet: tJet + tBonus,
+          meurtrierValue: vTMeurtrier,
+          destructeurValue: vTDestructeur,
+          ultraviolenceValue: vTUltraviolence,
+        },
+      );
+
+      if (tJet !== 0 && tJet === tExploit) {
+        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`, (exploit) => {
+          const tExploit2 = exploit.results.jet.result;
+
+          finishRoll(
+            exploit.rollId,
+            {
+              jet: tExploit2,
+            },
+          );
         });
-        
+      }
     });
+  });
 });

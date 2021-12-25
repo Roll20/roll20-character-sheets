@@ -1,470 +1,433 @@
-const rollCombatAutre = ["repeating_armeautre:armeautre"];
+/* eslint-disable prefer-destructuring */
+/* eslint-disable camelcase */
+/* eslint-disable max-len */
+/* eslint-disable no-undef */
+const rollCombatAutre = ['repeating_armeautre:armeautrepj'];
 
-rollCombatAutre.forEach(button => {
-    on(`clicked:${button}`, function(info) {
-        let roll = info.htmlAttributes.value;
+rollCombatAutre.forEach((button) => {
+  on(`clicked:${button}`, async (info) => {
+    const roll = info.htmlAttributes.value;
 
-        let id = info.triggerName.split("_")[2];
-        let data = wpnData[id] || [];
-        let effet = wpnE[id] || [];
-        let effetValue = wpnEValue[id] || [];
-        let AA = wpnAA[id] || [];
-        let AAValue = wpnAAValue[id] || [];
-        let special = wpnS[id] || [];   
-        let specialValue = wpnSValue[id] || [];
+    let listAttrs = [];
 
-        let name = data["ArmeAutre"] || "";
-        let portee = data["armeAutrePortee"] || "^{portee-contact}";
+    const id = info.triggerName.split('_')[2];
 
-        let firstExec = [];
-        let exec = [];
-        firstExec.push(roll);
+    const prefix = `repeating_armeautre_${id}_`;
 
-        firstExec.push("{{special1="+name+"}}");
-        firstExec.push("{{portee=^{portee} "+portee+"}}");
+    const effet = wpnEffects.map((a) => `${prefix}${a}`);
+    const effetValue = wpnEffectsValue.map((a) => `${prefix}${a}`);
+    const AA = wpnAmeliorationA.map((a) => `${prefix}${a}`);
+    const AAValue = wpnAmeliorationAValue.map((a) => `${prefix}${a}`);
+    const special = wpnSpecial.map((a) => `${prefix}${a}`);
+    const specialValue = wpnSpecialValue.map((a) => `${prefix}${a}`);
 
-        let isConditionnelA = false;
-        let isConditionnelD = false;
-        let isConditionnelV = false;
+    listAttrs.push(`${prefix}ArmeAutre`);
+    listAttrs.push(`${prefix}armeAutrePortee`);
 
-        let OD = data["armeODAutre"] || 0;
+    listAttrs.push(`${prefix}armeODAutre`);
+    listAttrs.push(`${prefix}armeAttaqueAutre`);
 
-        let cRoll = [
-            data[`armeAttaqueAutre`] || 0
-        ];
-        let bonus = [
-            OD
-        ];
+    listAttrs.push(`${prefix}armeAutreDegat`);
+    listAttrs.push(`${prefix}armeAutreViolence`);
 
-        let baseDegats = 0;
-        let baseViolence = 0;
+    listAttrs.push(`${prefix}armeAutreBDegat`);
+    listAttrs.push(`${prefix}armeAutreBViolence`);
 
-        let diceDegats = 0;
-        let diceViolence = 0;
+    listAttrs = listAttrs.concat(effet, effetValue, AA, AAValue, special, specialValue);
 
-        let bDegats = [];
-        let bViolence = [];
+    const attrs = await getAttrsAsync(listAttrs);
 
-        baseDegats += Number(data[`armeAutreDegat`]) || 0;
-        baseViolence += Number(data[`armeAutreViolence`]) || 0;
+    const name = attrs[`${prefix}ArmeAutre`] || '';
+    const portee = attrs[`${prefix}armeAutrePortee`] || '^{portee-contact}';
 
-        diceDegats += Number(data[`armeAutreDegat`]) || 0;
-        diceViolence += Number(data[`armeAutreViolence`]) || 0;
+    let firstExec = [];
+    let exec = [];
+    firstExec.push(roll);
 
-        bDegats.push(Number(data[`armeAutreBDegat`]) || 0);
-        bViolence.push(Number(data[`armeAutreBViolence`]) || 0);
+    firstExec.push(`{{special1=${name}}}`);
+    firstExec.push(`{{portee=^{portee} ${portee}}}`);
 
-        let degats = [];
-        let violence = [];
+    let isConditionnelA = false;
+    let isConditionnelD = false;
+    let isConditionnelV = false;
 
-        let attaquesSurprises = [];
-        let attaquesSurprisesValue = [];
-        let attaquesSurprisesCondition = "";
+    const OD = Number(attrs[`${prefix}armeODAutre`]) || 0;
 
-        let eASAssassin = "";
-        let eASAssassinValue = 0; 
+    const cRoll = [
+      Number(attrs[`${prefix}armeAttaqueAutre`]) || 0,
+    ];
 
-        let isAssistantAttaque = false;
-        let isAntiAnatheme = false;
-        let isCadence = false;
-        let sCadence = 0;
-        let vCadence = 0;
-        let isChoc = false;
-        let isDeuxMains = false;
-        let isDestructeur = false;
-        let vDestructeur = 0;
-        let isLeste = false;     
-        let isLourd = false;
-        let isMeurtrier = false;
-        let vMeurtrier = 0;
-        let nowSilencieux = false;  
-        let isObliteration = false;   
-        let isOrfevrerie = false;  
-        let isTenebricide = false;
-        let isTirRafale = false;
-        let isChambreDouble = false;
+    let bonus = [
+      OD,
+    ];
 
-        let lumiere = "";
-        let isELumiere = false
-        let lumiereValue = 0;
+    let diceDegats = 0;
+    let diceViolence = 0;
 
-        let isEAkimbo = false;
-        let isEAmbidextrie = false;
+    let bDegats = [];
+    const bViolence = [];
 
-        let autresEffets = [];
-        let autresAmeliorationsA = [];
-        let autresSpecial = [];
+    diceDegats += Number(attrs[`${prefix}armeAutreDegat`]) || 0;
+    diceViolence += Number(attrs[`${prefix}armeAutreViolence`]) || 0;
 
-        //GESTION DES EFFETS
+    bDegats.push(Number(attrs[`${prefix}armeAutreBDegat`]) || 0);
+    bViolence.push(Number(attrs[`${prefix}armeAutreBViolence`]) || 0);
 
-        var effets = getWeaponsEffectsAutre(effet, effetValue);
+    let degats = [];
+    let violence = [];
 
-        bDegats = bDegats.concat(effets.bDegats);
-        eASAssassin = effets.eASAssassin;
-        eASAssassinValue = effets.eASAssassinValue;
+    let attaquesSurprises = [];
+    let attaquesSurprisesValue = [];
+    let attaquesSurprisesCondition = '';
 
-        if(attaquesSurprisesCondition == "" && effets.attaquesSurprisesCondition != "")
-            attaquesSurprisesCondition = effets.attaquesSurprisesCondition;
+    let eASAssassin = '';
+    let eASAssassinValue = 0;
 
-        attaquesSurprises = attaquesSurprises.concat(effets.attaquesSurprises);
-        attaquesSurprisesValue = attaquesSurprisesValue.concat(effets.attaquesSurprisesValue);
+    let isAssistantAttaque = false;
+    let isAntiAnatheme = false;
+    let isCadence = false;
+    let sCadence = 0;
+    let vCadence = 0;
+    let isDestructeur = false;
+    let vDestructeur = 0;
+    let isMeurtrier = false;
+    let vMeurtrier = 0;
+    let nowSilencieux = false;
+    let isObliteration = false;
+    let isTenebricide = false;
+    let isTirRafale = false;
+    let isChambreDouble = false;
 
-        autresEffets = autresEffets.concat(effets.autresEffets);
+    let isELumiere = false;
+    let lumiereValue = 0;
 
-        isAntiAnatheme = effets.isAntiAnatheme;
+    let autresEffets = [];
+    let autresAmeliorationsA = [];
+    const autresSpecial = [];
 
-        isAssistantAttaque = effets.isAssistantAttaque;
-        console.log(wpnE);
+    // GESTION DES EFFETS
 
-        isCadence = effets.isCadence;
-        sCadence = effets.sCadence;
-        vCadence = effets.vCadence;
+    const effets = getWeaponsEffectsAutre(prefix, attrs);
 
-        isChoc = effets.isChoc;
+    bDegats = bDegats.concat(effets.bDegats);
+    eASAssassin = effets.eASAssassin;
+    eASAssassinValue = effets.eASAssassinValue;
 
-        isDestructeur = effets.isDestructeur;
-        vDestructeur = effets.vDestructeur;    
+    if (attaquesSurprisesCondition === '' && effets.attaquesSurprisesCondition !== '') { attaquesSurprisesCondition = effets.attaquesSurprisesCondition; }
 
-        isDeuxMains = effets.isDeuxMains;
-        isLourd = effets.isLourd;
+    attaquesSurprises = attaquesSurprises.concat(effets.attaquesSurprises);
+    attaquesSurprisesValue = attaquesSurprisesValue.concat(effets.attaquesSurprisesValue);
 
-        isLeste = effets.isLeste;
+    autresEffets = autresEffets.concat(effets.autresEffets);
 
-        isMeurtrier = effets.isMeurtrier;
-        vMeurtrier = effets.vMeurtrier;
+    isAntiAnatheme = effets.isAntiAnatheme;
 
-        nowSilencieux = effets.nowSilencieux;
+    isAssistantAttaque = effets.isAssistantAttaque;
 
-        isOrfevrerie = effets.isOrfevrerie;
+    isCadence = effets.isCadence;
+    sCadence = effets.sCadence;
+    vCadence = effets.vCadence;
 
-        isTenebricide = effets.isTenebricide;
+    isDestructeur = effets.isDestructeur;
+    vDestructeur = effets.vDestructeur;
 
-        isObliteration = effets.isObliteration;
-        isTirRafale = effets.isTirRafale;
+    isMeurtrier = effets.isMeurtrier;
+    vMeurtrier = effets.vMeurtrier;
 
-        lumiere = effets.eLumiere;
-        isELumiere = effets.isELumiere;
-        lumiereValue = Number(effets.eLumiereValue);
+    nowSilencieux = effets.nowSilencieux;
 
-        isEAkimbo = effets.isAkimbo;
-        isEAmbidextrie = effets.isAmbidextrie;
+    isTenebricide = effets.isTenebricide;
 
-        if(effets.isConditionnelA)
-            isConditionnelA = true;
+    isObliteration = effets.isObliteration;
+    isTirRafale = effets.isTirRafale;
 
-        if(effets.isConditionnelD)
-            isConditionnelD = true;
+    isELumiere = effets.isELumiere;
+    lumiereValue = Number(effets.eLumiereValue);
 
-        if(effets.isConditionnelV)
-            isConditionnelV = true;
+    if (effets.isConditionnelA) { isConditionnelA = true; }
 
-        console.log(effets);
-        
-        //FIN GESTION DES EFFETS
+    if (effets.isConditionnelD) { isConditionnelD = true; }
 
-        //GESTION DES AMELIORATIONS D'ARMES
+    if (effets.isConditionnelV) { isConditionnelV = true; }
 
-        var ameliorationsA = getWeaponsAutreAA(AA, AAValue, isAssistantAttaque, eASAssassinValue, isCadence, vCadence, nowSilencieux, isTirRafale, isObliteration, isAntiAnatheme);
-        
-        exec = exec.concat(ameliorationsA.exec);
+    // FIN GESTION DES EFFETS
 
-        bonus = bonus.concat(ameliorationsA.bonus);
+    // GESTION DES AMELIORATIONS D'ARMES
 
-        baseDegats += ameliorationsA.diceDegats;
-        baseViolence += ameliorationsA.diceViolence;
+    const ameliorationsA = getWeaponsAutreAA(prefix, attrs, isAssistantAttaque, eASAssassinValue, isCadence, vCadence, nowSilencieux, isTirRafale, isObliteration, isAntiAnatheme);
 
-        diceDegats += ameliorationsA.diceDegats;
-        diceViolence += ameliorationsA.diceViolence;
+    exec = exec.concat(ameliorationsA.exec);
 
-        bDegats = bDegats.concat(ameliorationsA.bDegats);
+    bonus = bonus.concat(ameliorationsA.bonus);
 
-        attaquesSurprises = attaquesSurprises.concat(ameliorationsA.attaquesSurprises);
-        attaquesSurprisesValue = attaquesSurprisesValue.concat(ameliorationsA.attaquesSurprisesValue);
+    diceDegats += ameliorationsA.diceDegats;
+    diceViolence += ameliorationsA.diceViolence;
 
-        if(attaquesSurprisesCondition == "")
-            attaquesSurprisesCondition = ameliorationsA.attaquesSurprisesCondition;
+    bDegats = bDegats.concat(ameliorationsA.bDegats);
 
-        if(ameliorationsA.isChambreDouble) {
-            isCadence = false;
-            isChambreDouble = ameliorationsA.isChambreDouble;
-            sCadence = ameliorationsA.rChambreDouble;
+    attaquesSurprises = attaquesSurprises.concat(ameliorationsA.attaquesSurprises);
+    attaquesSurprisesValue = attaquesSurprisesValue.concat(ameliorationsA.attaquesSurprisesValue);
+
+    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = ameliorationsA.attaquesSurprisesCondition; }
+
+    if (ameliorationsA.isChambreDouble) {
+      isCadence = false;
+      isChambreDouble = ameliorationsA.isChambreDouble;
+      sCadence = ameliorationsA.rChambreDouble;
+    }
+
+    autresEffets = autresEffets.concat(ameliorationsA.autresEffets);
+    autresAmeliorationsA = autresAmeliorationsA.concat(ameliorationsA.autresAmeliorations);
+
+    if (ameliorationsA.aASAssassin !== '') {
+      eASAssassin = ameliorationsA.aASAssassin;
+      eASAssassinValue = ameliorationsA.aASAssassinValue;
+    }
+
+    if (ameliorationsA.isConditionnelA) { isConditionnelA = true; }
+
+    if (ameliorationsA.isConditionnelD) { isConditionnelD = true; }
+
+    if (ameliorationsA.isConditionnelV) { isConditionnelV = true; }
+
+    // FIN GESTION DES AMELIORATIONS D'ARMES
+
+    // GESTION DES BONUS SPECIAUX
+
+    const sBonusDegats = isApplied(attrs[`${prefix}BDDiversTotal`]);
+    const sBonusDegatsD6 = attrs[`${prefix}BDDiversD6`];
+    const sBonusDegatsFixe = attrs[`${prefix}BDDiversFixe`];
+
+    const sBonusViolence = isApplied(attrs[`${prefix}BVDiversTotal`]);
+    const sBonusViolenceD6 = attrs[`${prefix}BVDiversD6`];
+    const sBonusViolenceFixe = attrs[`${prefix}BVDiversFixe`];
+
+    const sEnergie = isApplied(attrs[`${prefix}energie`]);
+    const sEnergieValue = attrs[`${prefix}energieValue`];
+
+    if (sBonusDegats) {
+      exec.push(`{{vMSpecialD=+${sBonusDegatsD6}D6+${sBonusDegatsFixe}}}`);
+      diceDegats += Number(sBonusDegatsD6);
+      bDegats.push(sBonusDegatsFixe);
+    }
+
+    if (sBonusViolence) {
+      exec.push(`{{vMSpecialV=+${sBonusViolenceD6}D6+${sBonusViolenceFixe}}}`);
+      diceViolence += Number(sBonusViolenceD6);
+      bViolence.push(sBonusViolenceFixe);
+    }
+
+    if (sEnergie) {
+      autresSpecial.push(`^{energie} (${sEnergieValue})`);
+    }
+
+    // FIN DE GESTION DES BONUS SPECIAUX
+
+    if (cRoll.length === 0) { cRoll.push(0); }
+
+    if (bonus.length === 0) { bonus.push(0); }
+
+    exec.push('{{OD=true}}');
+    exec.push(`{{vOD=${OD}}}`);
+
+    if (diceDegats < 0) { diceDegats = 0; }
+
+    if (diceViolence < 0) { diceViolence = 0; }
+
+    degats.push(`${diceDegats}D6`);
+    degats = degats.concat(bDegats);
+
+    violence.push(`${diceViolence}D6`);
+    violence = violence.concat(bViolence);
+
+    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}-${sCadence}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+
+    firstExec.push(jet);
+    exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+    exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
+
+    exec.push(`{{degats=[[${degats.join('+')}]]}}`);
+    exec.push(`{{violence=[[${violence.join('+')}]]}}`);
+
+    if (isTenebricide) {
+      let degatsTenebricide = [];
+      let ASTenebricide = [];
+      let ASValueTenebricide = [];
+
+      let violenceTenebricide = [];
+
+      const diceDegatsTenebricide = Math.floor(diceDegats / 2);
+      const diceViolenceTenebricide = Math.floor(diceViolence / 2);
+
+      degatsTenebricide.push(`${diceDegatsTenebricide}D6`);
+      degatsTenebricide = degatsTenebricide.concat(bDegats);
+
+      violenceTenebricide.push(`${diceViolenceTenebricide}D6`);
+      violenceTenebricide = violenceTenebricide.concat(bViolence);
+
+      exec.push(`{{tenebricideValueD=[[${degatsTenebricide.join('+')}]]}}`);
+      exec.push(`{{tenebricideValueV=[[${violenceTenebricide.join('+')}]]}}`);
+
+      if (eASAssassinValue > 0) {
+        eAssassinTenebricideValue = Math.ceil(eASAssassinValue / 2);
+
+        ASTenebricide.unshift(eASAssassin);
+        ASValueTenebricide.unshift(`${eAssassinTenebricideValue}D6`);
+
+        if (attaquesSurprises.length > 0) {
+          ASTenebricide = ASTenebricide.concat(attaquesSurprises);
+          ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
         }
 
-        if(ameliorationsA.isJAkimbo)
-            isEAkimbo = ameliorationsA.isJAkimbo;
-        
-        if(ameliorationsA.isJAmbidextre)  
-            isEAmbidextrie = ameliorationsA.isJAmbidextre;
+        exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
+        exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
+      } else if (attaquesSurprises.length > 0) {
+        ASTenebricide = ASTenebricide.concat(attaquesSurprises);
+        ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
 
-        autresEffets = autresEffets.concat(ameliorationsA.autresEffets);
-        autresAmeliorationsA = autresAmeliorationsA.concat(ameliorationsA.autresAmeliorations);
+        exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
+        exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
+      }
+    }
 
-        if(ameliorationsA.aASAssassin != "") {
-            eASAssassin = ameliorationsA.aASAssassin;
-            eASAssassinValue = ameliorationsA.aASAssassinValue;
-        }
-            
-        if(ameliorationsA.isConditionnelA)
-            isConditionnelA = true;
+    if (isObliteration) {
+      let ASObliteration = [];
+      let ASValueObliteration = [];
 
-        if(ameliorationsA.isConditionnelD)
-            isConditionnelD = true;
+      diceDegatsObliteration = diceDegats * 6;
 
-        if(ameliorationsA.isConditionnelV)
-            isConditionnelV = true;
+      degatsFObliteration = _.reduce(bDegats, (n1, n2) => Number(n1) + Number(n2));
 
-        //FIN GESTION DES AMELIORATIONS D'ARMES
+      const vObliteration = diceDegatsObliteration + degatsFObliteration;
 
-        //GESTION DES BONUS SPECIAUX
+      exec.push(`{{obliterationValue=${vObliteration}}}`);
 
-        let sBonusDegats = special["BDDiversTotal"];
-        let sBonusDegatsD6 = specialValue["BDDiversD6"];
-        let sBonusDegatsFixe = specialValue["BDDiversFixe"];
+      if (isMeurtrier) { exec.push(`{{obliterationMeurtrierValue=${vMeurtrier * 6}}}`); }
 
-        let sBonusViolence = special["BVDiversTotal"];
-        let sBonusViolenceD6 = specialValue["BVDiversD6"];
-        let sBonusViolenceFixe = specialValue["BVDiversFixe"];
+      if (isDestructeur) { exec.push(`{{obliterationDestructeurValue=${vDestructeur * 6}}}`); }
 
-        let sEnergie = special["energie"];
-        let sEnergieValue = specialValue["energieValue"];
+      if (eASAssassinValue > 0) {
+        eAssassinTenebricideValue = eASAssassinValue * 6;
 
-        if(sBonusDegats) {
-            exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
-            diceDegats += Number(sBonusDegatsD6);
-            bDegats.push(sBonusDegatsFixe);
+        ASObliteration.unshift(eASAssassin);
+        ASValueObliteration.unshift(eAssassinTenebricideValue);
+
+        if (attaquesSurprises.length > 0) {
+          ASObliteration = ASObliteration.concat(attaquesSurprises);
+          ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
         }
 
-        if(sBonusViolence) {
-            exec.push("{{vMSpecialV=+"+sBonusViolenceD6+"D6+"+sBonusViolenceFixe+"}}");
-            diceViolence += Number(sBonusViolenceD6);
-            bViolence.push(sBonusViolenceFixe);
-        }
+        exec.push(`{{obliterationAS=${ASObliteration.join('\n+')}}}`);
+        exec.push(`{{obliterationASValue=${_.reduce(ASValueObliteration, (n1, n2) => n1 + n2, 0)}}}`);
+      } else if (attaquesSurprises.length > 0) {
+        ASObliteration = ASObliteration.concat(attaquesSurprises);
+        ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
 
-        if(sEnergie) {
-            autresSpecial.push(`^{energie} (${sEnergieValue})`);
-        }
+        exec.push(`{{obliterationAS=${ASTenebricide.join('\n+')}}}`);
+        exec.push(`{{obliterationASValue=${_.reduce(ASValueObliteration, (n1, n2) => n1 + n2, 0)}}}`);
+      }
+    }
 
-        //FIN DE GESTION DES BONUS SPECIAUX
+    if (isCadence) {
+      exec.push(`{{rCadence=${i18n_cadence} ${vCadence} ${i18n_inclus}}}`);
+      exec.push(`{{vCadence=${sCadence}D}}`);
+    }
 
-        if(cRoll.length == 0)
-            cRoll.push(0);
+    if (isChambreDouble) {
+      exec.push(`{{rCadence=${i18n_chambreDouble} (${i18n_cadence} 2) ${i18n_inclus}}}`);
+      exec.push(`{{vCadence=${sCadence}D}}`);
+    }
 
-        if(bonus.length == 0)
-            bonus.push(0);
-        
-        exec.push(`{{OD=true}}`);
-        exec.push(`{{vOD=${OD}}}`);
+    if (eASAssassinValue > 0) {
+      attaquesSurprises.unshift(eASAssassin);
+      attaquesSurprisesValue.unshift(`${eASAssassinValue}D6`);
+    }
 
-        degats.push(`${diceDegats}D6`);
-        degats = degats.concat(bDegats);
+    if (attaquesSurprises.length > 0) {
+      exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
+      exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
+      exec.push(attaquesSurprisesCondition);
+    }
 
-        violence.push(`${diceViolence}D6`);
-        violence = violence.concat(bViolence);
+    if (isELumiere) { autresEffets.push(`${i18n_lumiere} ${lumiereValue}`); }
 
-        var jet = "{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}";
+    if (autresEffets.length > 0) {
+      autresEffets.sort();
+      exec.push(`{{effets=${autresEffets.join(' / ')}}}`);
+    }
 
-        firstExec.push(jet);
-        exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
-        exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+    if (autresAmeliorationsA.length > 0) {
+      autresAmeliorationsA.sort();
+      exec.push(`{{ameliorations=${autresAmeliorationsA.join(' / ')}}}`);
+    }
 
-        exec.push("{{degats=[["+degats.join("+")+"]]}}");
-        exec.push("{{violence=[["+violence.join("+")+"]]}}");
+    if (autresSpecial.length > 0) {
+      autresSpecial.sort();
+      exec.push(`{{special=${autresSpecial.join(' / ')}}}`);
+    }
 
-        if(isTenebricide) {
-            let degatsTenebricide = [];
-            let ASTenebricide = [];
-            let ASValueTenebricide = [];
+    if (isConditionnelA) { exec.push('{{succesConditionnel=true}}'); }
 
-            let violenceTenebricide = [];
+    if (isConditionnelD) { exec.push('{{degatsConditionnel=true}}'); }
 
-            let diceDegatsTenebricide = Math.floor(diceDegats/2);
-            let diceViolenceTenebricide = Math.floor(diceViolence/2);
+    if (isConditionnelV) { exec.push('{{violenceConditionnel=true}}'); }
 
-            degatsTenebricide.push(diceDegatsTenebricide+"D6");
-            degatsTenebricide = degatsTenebricide.concat(bDegats);
+    if (effets.exec) { exec = exec.concat(effets.exec); }
 
-            violenceTenebricide.push(diceViolenceTenebricide+"D6");
-            violenceTenebricide = violenceTenebricide.concat(bViolence);
-            
-            exec.push("{{tenebricideValueD=[["+degatsTenebricide.join("+")+"]]}}");
-            exec.push("{{tenebricideValueV=[["+violenceTenebricide.join("+")+"]]}}");
+    if (effets.firstExec) { firstExec = firstExec.concat(effets.firstExec); }
 
-            if(eASAssassinValue > 0) {
-                eAssassinTenebricideValue = Math.ceil(eASAssassinValue/2);
+    exec = firstExec.concat(exec);
 
-                ASTenebricide.unshift(eASAssassin);
-                ASValueTenebricide.unshift(eAssassinTenebricideValue+"D6");
+    startRoll(exec.join(' '), (results) => {
+      const tJet = results.results.jet.result;
 
-                if(attaquesSurprises.length > 0) {
-                    ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-                    ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-                }
+      const tBonus = results.results.bonus.result;
+      const tExploit = results.results.Exploit.result;
 
-                exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
-                exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
-            } else if(attaquesSurprises.length > 0) {
+      const tMeurtrier = results.results.meurtrierValue;
+      let vTMeurtrier = 0;
 
-                ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-                ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
+      if (tMeurtrier !== undefined) { vTMeurtrier = tMeurtrier.dice[0]; }
 
-                exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
-                exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
-            }
-        }
+      const tDestructeur = results.results.destructeurValue;
+      let vTDestructeur = 0;
 
-        if(isObliteration) {
-            let ASObliteration = [];
-            let ASValueObliteration = [];
+      if (tDestructeur !== undefined) { vTDestructeur = tDestructeur.dice[0]; }
 
-            diceDegatsObliteration = diceDegats*6;
-            
-            degatsFObliteration = _.reduce(bDegats, function(n1, n2){return Number(n1) + Number(n2);});
+      const tFureur = results.results.fureurValue;
+      let vTFureur = 0;
 
-            let vObliteration = diceDegatsObliteration+degatsFObliteration;
-            
-            exec.push("{{obliterationValue="+vObliteration+"}}");
+      if (tFureur !== undefined) { vTFureur = tFureur.dice[0] + tFureur.dice[1]; }
 
-            if(isMeurtrier)
-                exec.push("{{obliterationMeurtrierValue="+vMeurtrier*6+"}}");
+      const tUltraviolence = results.results.ultraviolenceValue;
 
-            if(isDestructeur)
-                exec.push("{{obliterationDestructeurValue="+vDestructeur*6+"}}");
+      let vTUltraviolence = 0;
 
-            if(eASAssassinValue > 0) {
-                eAssassinTenebricideValue = eASAssassinValue*6;
+      if (tUltraviolence !== undefined) { vTUltraviolence = tUltraviolence.dice[0]; }
 
-                ASObliteration.unshift(eASAssassin);
-                ASValueObliteration.unshift(eAssassinTenebricideValue);
-
-                if(attaquesSurprises.length > 0) {
-                    ASObliteration = ASObliteration.concat(attaquesSurprises);
-                    ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
-                }
-
-                exec.push("{{obliterationAS="+ASObliteration.join("\n+")+"}}");
-                exec.push("{{obliterationASValue="+_.reduce(ASValueObliteration, function(n1, n2){ return n1 + n2; }, 0)+"}}");
-            } else if(attaquesSurprises.length > 0) {
-
-                ASObliteration = ASObliteration.concat(attaquesSurprises);
-                ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
-
-                exec.push("{{obliterationAS="+ASTenebricide.join("\n+")+"}}");
-                exec.push("{{obliterationASValue="+_.reduce(ASValueObliteration, function(n1, n2){ return n1 + n2; }, 0)+"}}");
-            }
-        }
-
-        if(isCadence) {
-            exec.push("{{rCadence="+i18n_cadence+" "+vCadence+" "+i18n_inclus+"}}");
-            exec.push("{{vCadence="+sCadence+"D}}");
-        }
-
-        if(isChambreDouble) {
-            exec.push("{{rCadence="+i18n_chambreDouble+" ("+i18n_cadence+" 2) "+i18n_inclus+"}}");
-            exec.push("{{vCadence="+sCadence+"D}}");
-        }
-
-        if(eASAssassinValue > 0)
+      finishRoll(
+        results.rollId,
         {
-            attaquesSurprises.unshift(eASAssassin);
-            attaquesSurprisesValue.unshift(eASAssassinValue+"D6");
-        }
+          jet: tJet + tBonus,
+          meurtrierValue: vTMeurtrier,
+          destructeurValue: vTDestructeur,
+          fureurValue: vTFureur,
+          ultraviolenceValue: vTUltraviolence,
+        },
+      );
 
-        if(attaquesSurprises.length > 0) {
-            exec.push("{{attaqueSurprise="+attaquesSurprises.join("\n+")+"}}");
-            exec.push("{{attaqueSurpriseValue=[["+attaquesSurprisesValue.join("+")+"]]}}");
-            exec.push(attaquesSurprisesCondition);
-        }
+      if (tJet !== 0 && tJet === tExploit) {
+        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`, (exploit) => {
+          const tExploit2 = exploit.results.jet.result;
 
-        if(isELumiere)
-            autresEffets.push(i18n_lumiere+" "+lumiereValue);
-
-        if(autresEffets.length > 0) {
-            autresEffets.sort();
-            exec.push("{{effets="+autresEffets.join(" / ")+"}}");
-        }
-
-        if(autresAmeliorationsA.length > 0) {
-            autresAmeliorationsA.sort();
-            exec.push("{{ameliorations="+autresAmeliorationsA.join(" / ")+"}}");
-        }                
-
-        if(autresSpecial.length > 0) {
-            autresSpecial.sort();
-            exec.push("{{special="+autresSpecial.join(" / ")+"}}");
-        }                
-
-        if(isConditionnelA)
-            exec.push("{{succesConditionnel=true}}");
-
-        if(isConditionnelD)
-            exec.push("{{degatsConditionnel=true}}");
-
-        if(isConditionnelV)
-            exec.push("{{violenceConditionnel=true}}");
-
-        if(effets.exec)
-            exec = exec.concat(effets.exec);
-        
-        if(effets.firstExec)
-            firstExec = firstExec.concat(effets.firstExec); 
-
-        exec = firstExec.concat(exec);
-
-        startRoll(exec.join(" "), (results) => {
-            let tJet = results.results.jet.result;
-
-            let tBonus = results.results.bonus.result;
-            let tExploit = results.results.Exploit.result;
-
-            let tMeurtrier = results.results.meurtrierValue;
-            let vTMeurtrier = 0;
-
-            if(tMeurtrier != undefined)
-                vTMeurtrier = tMeurtrier.dice[0];
-
-            let tDestructeur = results.results.destructeurValue;
-            let vTDestructeur = 0;
-
-            if(tDestructeur != undefined)
-                vTDestructeur = tDestructeur.dice[0];
-            
-            let tFureur = results.results.fureurValue;
-            let vTFureur = 0;
-
-            if(tFureur != undefined)
-                vTFureur = tFureur.dice[0]+tFureur.dice[1];
-            
-            let tUltraviolence = results.results.ultraviolenceValue;
-            
-            let vTUltraviolence = 0;
-
-            if(tUltraviolence != undefined)
-                vTUltraviolence = tUltraviolence.dice[0];
-
-            finishRoll(
-                results.rollId, 
-                {
-                    jet:tJet+tBonus,
-                    meurtrierValue:vTMeurtrier,
-                    destructeurValue:vTDestructeur,
-                    fureurValue:vTFureur,
-                    ultraviolenceValue:vTUltraviolence,
-                }
-            );
-
-            if(tJet != 0 && tJet == tExploit) {
-                startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}"+jet, (exploit) => {
-                    let tExploit = exploit.results.jet.result;
-
-                    finishRoll(
-                        exploit.rollId, 
-                        {
-                            jet:tExploit
-                        }
-                    );
-                });
-            }
+          finishRoll(
+            exploit.rollId,
+            {
+              jet: tExploit2,
+            },
+          );
         });
-        
+      }
     });
+  });
 });

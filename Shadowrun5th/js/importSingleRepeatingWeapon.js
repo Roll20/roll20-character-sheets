@@ -1,109 +1,110 @@
 async function importSingleRepeatingWeapon(text, weapon, ammunition, attributes) {
-    if(weapon.category != "Gear"){
-        var row = "repeating_weapons" + "_" + generateRowID() + "_";
-        if(weapon.type == "Ranged"){
-            attributes[row + "weaponismelee"] = 0;
-            attributes[row + "weaponrc"] = weapon.rc.match(/\d+/g).pop()-Math.ceil(attributes.str_base + attributes.str_aug)- 1;
-            if(weapon.rawdamage.match(/\d+/) !== null) {
-                attributes[row + "weapondv"] = weapon.rawdamage.match(/\d+/)[0];
-            }
-            else {
-                attributes[row + "weapondv"] = 0;
-            }
+    var row = "repeating_weapons" + "_" + generateRowID() + "_";
+    if(weapon.type == "Ranged"){
+        attributes[row + "weaponismelee"] = 0;
+        attributes[row + "weaponrc"] = weapon.rc.match(/\d+/g).pop()-Math.ceil((parseInt(attributes.str_base) + parseInt(attributes.str_aug))/3)- 1;
 
-            attributes[row + "weapondmgtype"] = weapon.rawdamage.match(/\D+/)[0];
+        if(weapon.rawdamage.match(/\d+/) !== null && !weapon.rawdamage.includes("STR")) {
+            a attributes[row + "weapondv"] = weapon.rawdamage.match(/\d+/)[0];
+        }
+        else if(weapon.rawdamage.includes("STR")) {
+           attributes[row + "weapondv"] = weapon.damage.match(/\d+/)[0];
+        }
+        else {
+            attributes[row + "weapondv"] = weapon.damage.match(/\d+/) != null ? weapon.damage.match(/\d+/)[0] : 0;
+        }
+
+        attributes[row + "weapondmgtype"] = weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
+    }else{
+        attributes[row + "weaponismelee"] = "on";
+        attributes[row + "weaponreach"] = weapon.reach;
+        attributes[row + "weapondv"] = weapon.damage_english.match(/\d+/)[0];
+        attributes[row + "weapondmgtype"] = weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
+    }
+
+    let skills = [];
+    for(var i=43;i<52;i++)
+    {
+        var name = 'skillname'+i;
+        skills.push(name);
+        var rating = 'skillrating'+i;
+        skills.push(rating);
+        var bonus = 'skillbonus'+i;
+        skills.push(bonus);
+        var attr = 'skillattr_value'+i;
+        skills.push(attr);
+    }
+    skills = await asw.getAttrs(skills);
+    for(var i=43; i<52; i++)
+    {
+        var compname = 'skillname'+i;
+        var rating = 'skillrating'+i;
+        var bonus = 'skillbonus'+i;
+        var skillattr = 'skillattr_value'+i;
+
+        if(skills[compname] == weapon.skill){
+            attributes[row + "weaponcategory"] = "@{skilldicepool"+i+"}";
+            let attribute = await asw.getAttrs([skillattr]);
+            let attrTotal = attribute[skillattr].replace(/[^a-zA-Z0-9_]/g, "");
+            let attributeSum = await asw.getAttrs([attrTotal]);
+            let targetAttributes = attributeSum[attrTotal].replace(/[+]/g, ",").replace(/[^a-zA-Z0-9_,]/g, "").split(",");
+            let attributesValues = [attributes[targetAttributes[0]], attributes[targetAttributes[1]]]
+            attributes[row + "weaponbonus"] = weapon.dicepool - skills[rating] - skills[bonus] - attributesValues.reduce((a,b) => parseInt(a) + parseInt(b));
+        }
+    }
+
+    attributes[row + "weaponname"] = weapon.name;
+    attributes[row + "weaponaccuracy"] = weapon.accuracy.match(/\d+/g).pop();
+    if(weapon.ap == null || isNaN(weapon.ap)){
+        attributes[row + "weaponap"] = 0;
+    }else{
+        attributes[row + "weaponap"] = weapon.ap;
+        if(weapon.rawap != null) {
+            attributes[row + "weaponap"] = weapon.rawap;
+        }
+    }
+    attributes[row + "weaponnotes"] = "";
+
+    if(typeof weapon.accessories != "undefined"){
+        if(weapon.accessories.accessory.length>1){
+            for(var j=0; j<weapon.accessories.accessory.length; j++){
+                attributes[row + "weaponnotes"] += weapon.accessories.accessory[j].name+"\n";
+            }
         }else{
-            attributes[row + "weaponismelee"] = "on";
-            attributes[row + "weaponreach"] = weapon.reach;
-            attributes[row + "weapondv"] = weapon.damage_english.match(/\d+/)[0];
-            attributes[row + "weapondmgtype"] = weapon.damage_english.match(/\D+/)[0];
+            attributes[row + "weaponnotes"] += weapon.accessories.accessory.name+"\n";
         }
+    }
 
-        let skills = [];
-        for(var i=43;i<52;i++)
-        {
-            var name = 'skillname'+i;
-            skills.push(name);
-            var rating = 'skillrating'+i;
-            skills.push(rating);
-            var bonus = 'skillbonus'+i;
-            skills.push(bonus);
-            var attr = 'skillattr_value'+i;
-            skills.push(attr);
-        }
-        skills = await asw.getAttrs(skills);
-        for(var i=43; i<52; i++)
-        {
-            var compname = 'skillname'+i;
-            var rating = 'skillrating'+i;
-            var bonus = 'skillbonus'+i;
-            var skillattr = 'skillattr_value'+i;
+    if(weapon.clips !== null){
+        if(weapon.clips.clip.length > 1){
+            let amountImported = 0;
+            for(var j=0; j < weapon.clips.clip.length && amountImported < 4; j++){
 
-            if(skills[compname] == weapon.skill){
-                attributes[row + "weaponcategory"] = "@{skilldicepool"+i+"}";
-                let attribute = await asw.getAttrs([skillattr]);
-                let attrTotal = attribute[skillattr].replace(/[^a-zA-Z0-9_]/g, "");
-                let attributeSum = await asw.getAttrs([attrTotal]);
-                let targetAttributes = attributeSum[attrTotal].replace(/[+]/g, ",").replace(/[^a-zA-Z0-9_,]/g, "").split(",");
-                let attributesValues = [attributes[targetAttributes[0]], attributes[targetAttributes[1]]]
-                attributes[row + "weaponbonus"] = weapon.dicepool - skills[rating] - skills[bonus] - attributesValues.reduce((a,b) => parseInt(a) + parseInt(b));
-            }
-        }
-
-        attributes[row + "weaponname"] = weapon.name;
-        attributes[row + "weaponaccuracy"] = weapon.accuracy.match(/\d+/g).pop();
-        if(weapon.ap == null || isNaN(weapon.ap)){
-            attributes[row + "weaponap"] = 0;
-        }else{
-            attributes[row + "weaponap"] = weapon.ap;
-            if(weapon.rawap != null) {
-                attributes[row + "weaponap"] = weapon.rawap;
-            }
-        }
-        attributes[row + "weaponnotes"] = "";
-
-        if(typeof weapon.accessories != "undefined"){
-            if(weapon.accessories.accessory.length>1){
-                for(var j=0; j<weapon.accessories.accessory.length; j++){
-                    attributes[row + "weaponnotes"] += weapon.accessories.accessory[j].name+"\n";
+                if(weapon.clips.clip[j].location === "loaded") {
+                    //skip loaded, they will be found later anyway
+                    continue;
                 }
-            }else{
-                attributes[row + "weaponnotes"] += weapon.accessories.accessory.name+"\n";
-            }
-        }
 
-        if(text.experimental == "on" && weapon.clips !== null){
-            if(weapon.clips.clip.length > 1){
-                let amountImported = 0;
-                for(var j=0; j < weapon.clips.clip.length && amountImported < 4; j++){
-
-                    if(weapon.clips.clip[j].location === "loaded") {
-                        //skip loaded, they will be found later anyway
-                        continue;
-                    }
-
-                    var newrowid=generateRowID();
-                    //find ammo to get stats
-                    ammo = ammunition.find(clip => clip.guid === weapon.clips.clip[j].id);
-
-                    if(ammo != null && !ammo.name_english.includes("Regular")) {
-                        importRepeatingWeaponAmmo(row, ammo, amountImported, attributes);
-                        amountImported++;
-                    }
-                }
-            }else{
-                var newrowid = generateRowID();
+                var newrowid=generateRowID();
                 //find ammo to get stats
-                ammo = ammunition.find(clip => clip.guid === weapon.clips.clip.id);
+                ammo = ammunition.find(clip => clip.guid === weapon.clips.clip[j].id);
 
-                if(ammo != null) {
-                    importRepeatingWeaponAmmo(row, ammo, 0, attributes);
+                if(ammo != null && !ammo.name_english.includes("Regular")) {
+                    importRepeatingWeaponAmmo(row, ammo, amountImported, attributes);
+                    amountImported++;
                 }
+            }
+        }else{
+            var newrowid = generateRowID();
+            //find ammo to get stats
+            ammo = ammunition.find(clip => clip.guid === weapon.clips.clip.id);
+
+            if(ammo != null) {
+                importRepeatingWeaponAmmo(row, ammo, 0, attributes);
             }
         }
     }
 }
-
 async function importRepeatingWeaponAmmo(row, ammunition, number, attributes) {
 
     attributes[row + "ammoname"+number] = ammo.name;
