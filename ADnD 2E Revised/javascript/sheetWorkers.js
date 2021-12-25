@@ -16,28 +16,62 @@ const extractQueryResult = async function(query){//Sends a message to query the 
     return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
 };
 
-const extractRoll = async function(query) {
-    let queryRoll = await startRoll(`!{{roll=[[${query}]]}}`);
+const isRollValid = function (rollExpression, field) {
+    let expression = rollExpression.trim();
+    if (!expression)
+        return false;
+
+    let message = `In the field @{${field}} you have unmatched opening and closing`;
+
+    let openPara = (expression.match(/\(/g) || []).length
+    let closePara = (expression.match(/\)/g) || []).length
+    if (openPara !== closePara) {
+        showToast(ERROR, 'Unmatched Parenthesis', `${message} parenthesis. You have:\n${openPara}x '('\n${closePara}x ')'`);
+        return false;
+    }
+
+    let openCurly = (expression.match(/{/g) || []).length
+    let closeCurly = (expression.match(/}/g) || []).length
+    if (openCurly !== closeCurly) {
+        showToast(ERROR, 'Unmatched Curly brackets', `${message} curly brackets. You have:\n${openCurly}x '{'\n${closeCurly}x '}'`);
+        return false;
+    }
+
+    let openSquare = (expression.match(/\[/g) || []).length
+    let closeSquare = (expression.match(/]/g) || []).length
+    if (openSquare !== closeSquare) {
+        showToast(ERROR, 'Unmatched Square brackets', `${message} square brackets. You have:\n${openSquare}x '['\n${closeSquare}x ']'`);
+        return false;
+    }
+
+    if (openSquare % 2 !== 0) {
+        showToast(ERROR, 'Square brackets error', `The field @{${field}} have too few square brackets. Square brackets are used in pairs of two, ie. [[ ]].\nThe expression have an uneven number of bracket pairs: ${openSquare}`);
+        return false;
+    }
+
+    return true;
+}
+
+const extractRoll = async function(rollExpression) {
+    let queryRoll = await startRoll(`!{{roll=[[${rollExpression}]]}}`);
     finishRoll(queryRoll.rollId);
     return queryRoll.results.roll;
 };
 
-const extractRollResult = async function(query) {
-    let roll = await extractRoll(query);
+const extractRollResult = async function(rollExpression) {
+    let roll = await extractRoll(rollExpression);
     return roll.result;
 };
 
-const calculateFormula = function(formulaField, calculatedField, defaultValue, silent = false) {
+const calculateFormula = async function(formulaField, calculatedField, silent = false) {
     getAttrs([formulaField], async function (values) {
-        let rollResult;
-        try {
-            rollResult = await extractRollResult(values[formulaField]);
-        } catch (e) {
-            rollResult = defaultValue;
-        }
+        let rollExpression = values[formulaField];
+        let valid = isRollValid(rollExpression, formulaField);
+        if (!valid)
+            return;
 
         setAttrs({
-            [calculatedField]: rollResult
+            [calculatedField]: await extractRollResult(rollExpression, formulaField)
         },{silent:silent});
     });
 }
@@ -1057,7 +1091,7 @@ on('change:nonprof-penalty', function (eventInfo){
 });
 
 //Used in version.js
-const updateThac0 = (silent) => calculateFormula('thac0-base', 'thac0-base-calc', 20, silent);
+const updateThac0 = (silent) => calculateFormula('thac0-base', 'thac0-base-calc', silent);
 on('change:thac0-base', function(eventInfo) {
     updateThac0(false);
 });
@@ -1342,12 +1376,12 @@ on('clicked:grenade-miss', async function (eventInfo) {
 
 //#region Proficiencies
 //Used in version.js
-const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc', 0);
+const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc');
 on('change:weapprof-slots-total', function (eventInfo) {
     updateWeaponProfsTotal();
 });
 //Used in version.js
-const updateNonWeaponProfsTotal = () => calculateFormula('prof-slots-total', 'prof-slots-total-calc', 0);
+const updateNonWeaponProfsTotal = () => calculateFormula('prof-slots-total', 'prof-slots-total-calc');
 on('change:prof-slots-total', function (eventInfo) {
     updateNonWeaponProfsTotal();
 });
