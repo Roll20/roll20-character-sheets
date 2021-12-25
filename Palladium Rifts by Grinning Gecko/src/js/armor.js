@@ -23,6 +23,11 @@ async function applyDamageToNextActiveArmor(section, damage) {
   for (activeRowId of activeIds) {
     currentMdc = +a[`repeating_${section}_${activeRowId}_mdc`] - damageCarry;
     if (currentMdc < 0 && ++i < activeIds.length) {
+      console.log(
+        "applyDamageToNextActiveArmor",
+        "BELOW ZERO on " + activeRowId
+      );
+      // @todo Warn player somehow
       attrs[`repeating_${section}_${activeRowId}_mdc`] = 0;
       damageCarry = Math.abs(currentMdc);
     } else {
@@ -77,6 +82,7 @@ on("clicked:repeating_armor:resetmdc", async (e) => {
   await setAttrsAsync({
     [`repeating_armor_${rowId}_mdc`]: a[`repeating_armor_${rowId}_mdc_max`],
   });
+  await updateActiveArmor(rowId);
 });
 
 on("change:repeating_armor:is_active", async (e) => {

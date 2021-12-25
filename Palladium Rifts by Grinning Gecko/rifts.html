@@ -8911,6 +8911,8 @@
     <label>Version: <span name="attr_version"></span></label>
     <input type="hidden" name="attr_migrated" value="0" />
     <label>Migrated: <span name="attr_migrated"></span></label>
+    <button type="action" name="act_migrate">Migrate</button>
+
     <label
       ><input type="checkbox" name="attr_debug" value="1" /> View Sheet in Debug
       Mode</label
@@ -12061,6 +12063,11 @@ on(
   for (activeRowId of activeIds) {
     currentMdc = +a[`repeating_${section}_${activeRowId}_mdc`] - damageCarry;
     if (currentMdc < 0 && ++i < activeIds.length) {
+      console.log(
+        "applyDamageToNextActiveArmor",
+        "BELOW ZERO on " + activeRowId
+      );
+      // @todo Warn player somehow
       attrs[`repeating_${section}_${activeRowId}_mdc`] = 0;
       damageCarry = Math.abs(currentMdc);
     } else {
@@ -12115,6 +12122,7 @@ on("clicked:repeating_armor:resetmdc", async (e) => {
   await setAttrsAsync({
     [`repeating_armor_${rowId}_mdc`]: a[`repeating_armor_${rowId}_mdc_max`],
   });
+  await updateActiveArmor(rowId);
 });
 
 on("change:repeating_armor:is_active", async (e) => {
@@ -13298,12 +13306,18 @@ async function recalculateMovement(manualFeetPerMelee) {
 on("sheet:opened", async (e) => {
   console.log("sheet:opened", e);
   await setAttrsAsync({ debug: "0" });
+  // await migrateAttributes();
+});
+
+on("clicked:migrate", async (e) => {
+  console.log("clicked:migrate", e);
   await migrateAttributes();
 });
 
   /* endinject */
 
   /**
+   * [] When adding damage type to calculated damage on psionics, it adds the type to the Damage field in Modifiers as well, which will break rolls
    * [] Migrate attributes from existing Rifts sheet
    * [] Add repeating modifiers to Skills and allow them to be added to Profiles
    * [] Represent Critical/Knockout from behind
