@@ -84,13 +84,13 @@
 			<span>
 				<span class=sheet-label style='width: 2.5em;'> </span>
 				<span class=sheet-label style='width: 10em;'>Name</span>
-				<span class=sheet-label style='width: 5em;'>Cost</span>
+				<span class=sheet-label style='width: 3em;'>Cost</span>
 				<span class=sheet-label style='width: 5em;'>IQ Req</span>
 			</span>
 			<fieldset class=repeating_talents>
 				<button type=roll value="@{character_name} uses @{talentname}! Roll [[3d6]]"></button>
 				<input type=text name=attr_talentname style='width: 10em;'>
-				<input type=text name=attr_talentcost value="0" style='width: 5em;'>
+				<input type=text name=attr_talentcost value="0" style='width: 3em;' title='IQ paid for this talent.'>
 				<input type=text name=attr_talentiq value="8" style='width: 5em;'>
 			</fieldset>
 		</div>
@@ -140,12 +140,14 @@
 				<span class=sheet-label style='width: 2.5em;'> </span>
 				<span class=sheet-label style='width: 10em;'>Name</span>
 				<span class=sheet-label style='width: 5em;'>Damage</span>
+				<span class=sheet-label style='width: 3em;' title='IQ paid for this spell.'>Cost</span>
 				<span class=sheet-label style='width: 10em;'>Notes</span>
 			</span>
 			<fieldset class=repeating_spells>
 				<button type=roll value="@{character_name} casts @{spellname}! Roll [[3d6]] vs [[@{DX}]]; Damage [[@{spelldamage}]]"></button>
 				<input type=text name=attr_spellname style='width: 10em;'>
 				<input type=text name=attr_spelldamage style='width: 5em;'>
+				<input type=text name=attr_spellcost value="0" style='width: 3em;'>
 				<input type=text name=attr_spellnotes style='width: 35em;'>
 			</fieldset>
 		</div>
@@ -188,6 +190,9 @@
 				Total Experience <input type=number style='width: 6em;' name="attr_experiencetotal" value="0"/>
 				Spent Experience <input type=number style='width: 6em;' name="attr_experiencespent" readonly/>
 				Unspent Experience <input type=number style='width: 6em;' name="attr_experienceunspent" readonly/>
+				<span title="IQ minus spell and talent costs.">Unspent IQ</span>
+				<input type=number style='width: 4em;' name="attr_iqunspent" readonly/>
+
 			</span>
 			<br>
 			<span>
@@ -216,6 +221,25 @@
 		let property = repeatingPropertyName(repName, id, itemName);
 		let val = parseFloat(v[property]);
 		return isNaN(val) ? 0 : val;
+	}
+
+	// to compute the total we need the object,
+	// the ids, the repName, and various itemnames.
+	const computeRepeatingTotal = function(v, idarray, repName, weightName, countName, notCarriedName) {
+	    let total = 0
+		for(var i=0; i < idarray.length; i++) {
+			let id = idarray[i]
+			let value = getFloatProperty(v, repName, id, weightName);
+			if (countName) {
+				value *= getFloatProperty(v, repName, id, countName);
+			}
+			if (notCarriedName) {
+				let notCarried = getFloatProperty(v, repName, id, notCarriedName);
+				value *= (1.0 - notCarried);
+			}
+			total += value;
+		}
+		return total;
 	}
 
 	// Update experience spent and unspent.
@@ -272,7 +296,7 @@
 				}
 				setAttrs({
 					minustohit: total
-				})
+				});
 			});
 		})
 	});
@@ -291,11 +315,12 @@
 		+ 'change:repeating_weapons remove:repeating_weapons '
 		+ 'change:repeating_armor remove:repeating_armor '
 		+ 'change:repeating_equipment remove:repeating_equipment ', function() {
-		total = 0
-		totalCount = 0
+		let total = 0
+		let totalCount = 0
 
-		const checkAndSet = function()
+		let checkAndSet = function(weight)
 		{
+			total += weight;
 			++totalCount;
 			if (totalCount == 3) {
 				setAttrs({
@@ -306,24 +331,12 @@
 
 		// to compute the total we need the object,
 		// the ids, the repName, and various itemnames.
-		const computeTotal = function(v, idarray, repName, weightName, countName, notCarriedName) {
-			for(var i=0; i < idarray.length; i++) {
-				let id = idarray[i]
-				let value = getFloatProperty(v, repName, id, weightName);
-				if (countName) {
-					value *= getFloatProperty(v, repName, id, countName);
-				}
-				if (notCarriedName) {
-					let notCarried = getFloatProperty(v, repName, id, notCarriedName);
-					value *= (1.0 - notCarried);
-				}
-				total += value;
-			}
-			checkAndSet();
+		let computeTotal = function(v, idarray, repName, weightName, countName, notCarriedName) {
+			checkAndSet(computeRepeatingTotal(v, idarray, repName, weightName, countName, notCarriedName));
 		}
 
 		//e.g: "weapons" and "weaponwt"
-		const grabIds = function(idarray, repName, weightName, countName, notCarriedName) {
+		let grabIds = function(idarray, repName, weightName, countName, notCarriedName) {
 			let attrs = [];
 			for(var i=0; i < idarray.length; i++) {
 				let id = idarray[i];
@@ -340,10 +353,57 @@
 				computeTotal(v, idarray, repName, weightName, countName, notCarriedName);
 			});
 		}
+
 		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weaponwt', '', 'weaponnotcarried');});
 		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defensewt', '', 'defensenotcarried');});
 		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'equipmentweight', 'equipmentcount', 'equipmentnotcarried');});
 	});
+
+	// Update unspent iq points.
+	on('sheet:opened '
+		+ 'change:repeating_talents remove:repeating_talents '
+		+ 'change:repeating_spells remove:repeating_spells '
+		+ 'change:iq_max ', function() {
+		let totalSpent = 0
+		let totalCount = 0
+		console.log('updating iq unspent', totalSpent, totalCount);
+
+		let checkAndSet = function(spent)
+		{
+			totalSpent += spent;
+			++totalCount;
+			if (totalCount == 2) {
+				getAttrs(['iq_max'], function(v) {
+					let unspent = v.iq_max - totalSpent;
+					setAttrs({
+						iqunspent: unspent
+					});
+				});
+			}
+		}
+
+		// to compute the total we need the object,
+		// the ids, the repName, and various itemnames.
+		let computeTotal = function(v, idarray, repName, costName) {
+			checkAndSet(computeRepeatingTotal(v, idarray, repName, costName)); // todo just pass this in...
+		}
+
+		//e.g: "weapons" and "weaponwt"
+		let grabIds = function(idarray, repName, costName) {
+			let attrs = [];
+			for(var i=0; i < idarray.length; i++) {
+				let id = idarray[i];
+				attrs.push(repeatingPropertyName(repName, id, costName));
+			}
+			getAttrs(attrs, function(v) {
+				computeTotal(v, idarray, repName, costName);
+			});
+		}
+
+		getSectionIDs("talents", function(v) {grabIds(v, 'talents', 'talentcost');});
+		getSectionIDs("spells", function(v) {grabIds(v, 'spells', 'spellcost');});
+	});
+
 
 	const buttonlist = ["character","journal"];
 	buttonlist.forEach(button => {
