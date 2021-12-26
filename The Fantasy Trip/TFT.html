@@ -47,9 +47,6 @@
 			<span>
 				<b style='display: inline-block; width: 7.5em'>Weight Carried</b>
 				<input type=text style='width: 3.5em;' name="attr_weightcarried" readonly/>
-				<input type=number name='attr_weightequipment' readonly/>
-				<input type=number name='attr_weightarmor' readonly/>
-				<input type=number name='attr_weightweapons' readonly/>
 			</span>
 		</div>
 		<div class="sheet-combat sheet-block">
@@ -196,12 +193,17 @@
 
 <script type="text/worker">
 
+    // just concats to make a property name.
+    const propertyName = function(repName, id, itemName) {
+        return `repeating_${repName}_${id}_${itemName}`;
+    }
+
 	// Update experience spent and unspent.
 	on('sheet:opened change:experiencetotal change:repeating_exphistory remove:repeating_exphistory', function() {
 		getSectionIDs("exphistory", function(idarray) {
 			let fieldnames = ["experiencetotal"];
 			for(var i=0; i < idarray.length; i++) {
-				fieldnames.push(`repeating_exphistory_${idarray[i]}_expspent`);
+				fieldnames.push(propertyName('exphistory', idarray[i], 'expspent'));
 			}
 			getAttrs(fieldnames, function(v) {
 				let total = parseInt(v.experiencetotal)||0;
@@ -217,31 +219,63 @@
 		})
 	});
 
-	/*
-    on('sheet:opened change:repeating_equipment remove:repeating_equipment', function() {
-    	repeatingSum("weightequipment","equipment",["equipmentweight","equipmentcount"]);
-    });
+	// Update weight carried.
+	on('sheet:opened '
+		+ 'change:repeating_weapons remove:repeating_weapons '
+		+ 'change:repeating_armor remove:repeating_armor '
+		+ 'change:repeating_equipment remove:repeating_equipment ', function() {
+		total = 0
+		totalCount = 0
 
-    on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
-    	repeatingSum("weightarmor","armor", "defensewt");
-    });
-
-    on('sheet:opened change:repeating_weapons remove:repeating_weapons', function() {
-    	repeatingSum("weightweapons","weapons", "weaponwt");
-    });
-
-	on('sheet:opened change:weightequipment change:weightarmor change:weightweapons', function() {
-		getAttrs(["weightequipment","weightarmor","weightweapons"], function(v) {
-			let equipment = parseInt(v.weightequipment)||0;
-			let armor = parseInt(v.weightarmor)||0;
-			let weapons = parseInt(v.weightweapons)||0;
-			let total = equipment + weapons + armor;
-    		setAttrs({
-    			weightcarried: total
-    		})
+		// Safe method to get the property.
+		const getFloatProperty = function(v, repName, id, itemName) {
+			let property = propertyName(repName, id, itemName);
+			let val = parseFloat(v[property]);
+		return isNaN(val) ? 0 : val;
 		}
-    });
-    */
+
+		const checkAndSet = function()
+		{
+			++totalCount;
+			if (totalCount == 3) {
+				setAttrs({
+					weightcarried: total
+				});
+			}
+		}
+
+		// to compute the total we need the object,
+		// the ids, the repName, and various itemnames.
+		const computeTotal = function(v, idarray, repName, weightName, countName) {
+			for(var i=0; i < idarray.length; i++) {
+				let id = idarray[i]
+				let value = getFloatProperty(v, repName, id, weightName);
+				if (countName) {
+					value *= getFloatProperty(v, repName, id, countName);
+				}
+				total += value;
+			}
+			checkAndSet();
+		}
+
+		//e.g: "weapons" and "weaponwt"
+		const grabIds = function(idarray, repName, weightName, countName) {
+			let attrs = [];
+			for(var i=0; i < idarray.length; i++) {
+				let id = idarray[i];
+				attrs.push(propertyName(repName, id, weightName));
+				if (countName) {
+					attrs.push(propertyName(repName, id, countName));
+				}
+			}
+			getAttrs(attrs, function(v) {
+					computeTotal(v, idarray, repName, weightName, countName);
+			});
+		}
+		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weaponwt');});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defensewt');});
+		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'equipmentweight', 'equipmentcount');});
+	});
 
 	const buttonlist = ["character","journal"];
 	buttonlist.forEach(button => {
