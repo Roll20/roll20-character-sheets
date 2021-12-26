@@ -60,19 +60,19 @@
 				<button type=roll value="@{character_name} takes initiative [[@{DX} &{tracker}]]"><b style='font-size: .8em;'>Initiative</b></button>
 			</span>
 			<span>
-				<span class=sheet-label style='width: 7em;'>Hits Taken</span>
+				<span class="sheet-label" style='width: 7em;'>Hits Taken</span>
 				<input type=number style='width: 3.5em;' name="attr_Hits" value="0"/>
 			</span>
 			<span>
-				<b style='display: inline-block; width: 7em;'>Fatigue</b>
+				<span class="sheet-label" style='width: 7em;'>Fatigue</span>
 				<input type=number style='width: 3.5em;' name="attr_Fatigue" value="0"/>
 			</span>
 			<span>
-				<b style='display: inline-block; width: 7em;'>Minus to Hit</b>
+				<span class="sheet-label" style='width: 7em;'>Minus to Hit</span>
 				<input type=number style='width: 3.5em;' name=attr_minustohit value="0" />
 			</span>
 			<span>
-				<b style='display: inline-block; width: 7em;'>Hits Blocked</b>
+				<span class="sheet-label" style='width: 7em;'>Hits Blocked</span>
 				<input type=number style='width: 3.5em;' name=attr_totalblock value="0" />
 			</span>
 		</div>
@@ -98,7 +98,8 @@
 			<span class=sheet-label style='width: 10em;'>Name</span>
 			<span class=sheet-label style='width: 4em;'>Damage</span>
 			<span class=sheet-label style='width: 4em;'>To Hit</span>
-			<span class=sheet-label style='width: 2.5em;'>Lbs</span>
+			<span class=sheet-label style='width: 2.125em;'>Lbs</span>
+			<span class=sheet-label style='width: 1.625em;' title="Not carried, won't count as weight.">NC</span>
 			<span class=sheet-label style='width: 10em;'>Notes</span>
 		</span>
 		<fieldset class=repeating_weapons>
@@ -107,6 +108,7 @@
 			<input type=text name=attr_weapondamage value="1d6" style='width: 4em;'>
 			<input type=text name=attr_weapondex value="" style='width: 4em;'>
 			<input type=text name=attr_weaponwt value="" style='width: 2.5em;'>
+				<input type="checkbox" name="attr_weaponnotcarried" value="1" style='width: 1.25em;'>
 			<input type=text name=attr_weaponnotes  style='width: 30em;'>
 		</fieldset>
 		</div>
@@ -115,13 +117,15 @@
 			<span>
 				<span class=sheet-label style='width: 10em;'>Name</span>
 				<span class=sheet-label style='width: 5em;'>Hits Blocked</span>
-				<span class=sheet-label style='width: 2.5em;'>Lbs</span>
+				<span class=sheet-label style='width: 2.25em;'>Lbs</span>
+				<span class=sheet-label style='width: 1.625em;' title="Not carried, won't count as weight.">NC</span>
 				<span class=sheet-label style='width: 10em;'>Notes</span>
 			</span>
 			<fieldset class=repeating_armor>
 				<input type=text name=attr_defensename value="" style='width: 10em;'>
 				<input type=text name=attr_hitsblocked value="0" style='width: 5em;'>
 				<input type=text name=attr_defensewt value="" style='width: 2.5em;'>
+					 <input type="checkbox" name="attr_defensenotcarried" value="1" style='width: 1.25em;'>
 				<input type=text name=attr_defensenotes style='width: 35em;'>
 			</fieldset>
 		</div>
@@ -145,13 +149,15 @@
 			<span>
 				<span class=sheet-label style='width: 10em;'>Name</span>
 				<span class=sheet-label style='width: 4.5em;'>Count</span>
-				<span class=sheet-label style='width: 2.5em;'>Lbs</span>
+				<span class=sheet-label style='width: 2.25em;'>Lbs</span>
+				<span class=sheet-label style='width: 1.625em;' title="Not carried, won't count as weight.">NC</span>
 				<span class=sheet-label style='width: 10em;'>Notes</span>
 			</span>
 			<fieldset class=repeating_equipment>
 				<input type=text name=attr_equipmentname style='width: 10em;'>
 				<input type=number name=attr_equipmentcount value="1" style='width: 4.5em;'>
 				<input type=text name=attr_equipmentweight value="" style='width: 2.5em;'>
+				<input type=checkbox name=attr_equipmentnotcarried value="1" style='width: 1.25em;'>
 				<input type=text name=attr_equipmentnotes style='width: 36em;'>
 			</fieldset>
 		</div>
@@ -195,17 +201,17 @@
 
 <script type="text/worker">
 
-   // just concats to make a property name.
-    const propertyName = function(repName, id, itemName) {
-        return `repeating_${repName}_${id}_${itemName}`;
-    }
+	// just concats to make a property name.
+	 const repeatingPropertyName = function(repName, id, itemName) {
+		return `repeating_${repName}_${id}_${itemName}`;
+	}
 
 	// Update experience spent and unspent.
 	on('sheet:opened change:experiencetotal change:repeating_exphistory remove:repeating_exphistory', function() {
 		getSectionIDs("exphistory", function(idarray) {
 			let fieldnames = ["experiencetotal"];
 			for(var i=0; i < idarray.length; i++) {
-				fieldnames.push(propertyName('exphistory', idarray[i], 'expspent'));
+				fieldnames.push(repeatingPropertyName('exphistory', idarray[i], 'expspent'));
 			}
 			getAttrs(fieldnames, function(v) {
 				let total = parseInt(v.experiencetotal)||0;
@@ -231,9 +237,9 @@
 
 		// Safe method to get the property.
 		const getFloatProperty = function(v, repName, id, itemName) {
-			let property = propertyName(repName, id, itemName);
+			let property = repeatingPropertyName(repName, id, itemName);
 			let val = parseFloat(v[property]);
-		return isNaN(val) ? 0 : val;
+			 return isNaN(val) ? 0 : val;
 		}
 
 		const checkAndSet = function()
@@ -248,12 +254,16 @@
 
 		// to compute the total we need the object,
 		// the ids, the repName, and various itemnames.
-		const computeTotal = function(v, idarray, repName, weightName, countName) {
+		const computeTotal = function(v, idarray, repName, weightName, countName, notCarriedName) {
 			for(var i=0; i < idarray.length; i++) {
 				let id = idarray[i]
 				let value = getFloatProperty(v, repName, id, weightName);
 				if (countName) {
 					value *= getFloatProperty(v, repName, id, countName);
+				}
+				if (notCarriedName) {
+					 let notCarried = getFloatProperty(v, repName, id, notCarriedName);
+					 value *= (1.0 - notCarried);
 				}
 				total += value;
 			}
@@ -261,22 +271,26 @@
 		}
 
 		//e.g: "weapons" and "weaponwt"
-		const grabIds = function(idarray, repName, weightName, countName) {
+		const grabIds = function(idarray, repName, weightName, countName, notCarriedName) {
 			let attrs = [];
 			for(var i=0; i < idarray.length; i++) {
 				let id = idarray[i];
-				attrs.push(propertyName(repName, id, weightName));
+				attrs.push(repeatingPropertyName(repName, id, weightName));
 				if (countName) {
-					attrs.push(propertyName(repName, id, countName));
+					attrs.push(repeatingPropertyName(repName, id, countName));
+				}
+				if (notCarriedName) {
+					 let propertyName = repeatingPropertyName(repName, id, notCarriedName);
+					attrs.push(propertyName);
 				}
 			}
 			getAttrs(attrs, function(v) {
-					computeTotal(v, idarray, repName, weightName, countName);
+				computeTotal(v, idarray, repName, weightName, countName, notCarriedName);
 			});
 		}
-		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weaponwt');});
-		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defensewt');});
-		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'equipmentweight', 'equipmentcount');});
+		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weaponwt', '', 'weaponnotcarried');});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defensewt', '', 'defensenotcarried');});
+		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'equipmentweight', 'equipmentcount', 'equipmentnotcarried');});
 	});
 
 	const buttonlist = ["character","journal"];
