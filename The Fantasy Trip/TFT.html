@@ -72,11 +72,11 @@
 			</span>
 			<span>
 				<span class=sheet-label style='width: 7em;' title="Subtracted from enemy dex when attacking you.">Minus to Hit</span>
-				<input type=number style='width: 3.5em;' name=attr_minustohit value="0" />
+				<input type=number style='width: 3.5em;' name=attr_minustohit value="0" readonly/>
 			</span>
 			<span>
 				<span class=sheet-label style='width: 7em;' title="Hits blocked per attack by your armor/shields/abilities.">Hits Blocked</span>
-				<input type=number style='width: 3.5em;' name=attr_totalblock value="0" />
+				<input type=number style='width: 3.5em;' name=attr_totalblock value="0" readonly/>
 			</span>
 		</div>
 		<div class="sheet-talents sheet-block">
@@ -119,7 +119,8 @@
 			<label>Armor and Shields:</label>
 			<span>
 				<span class=sheet-label style='width: 10em;'>Name</span>
-				<span class=sheet-label style='width: 4em;'>Hits Blocked</span>
+				<span class=sheet-label style='width: 4em;' title="Damage absorbed per attack.">Hits Blocked</span>
+				<span class=sheet-label style='width: 4em;' title="Subtracted from opponent's Dex when they attack.">Minus to Hit</span>
 				<span class=sheet-label style='width: 35em;'>Notes</span>
 				<span class=sheet-label style='width: 2.5em;' title="Weight per item.">Lbs</span>
 				<span class=sheet-label style='width: 1.625em;' title="Not carried, won't count as weight.">NC</span>
@@ -127,6 +128,7 @@
 			<fieldset class=repeating_armor>
 				<input type=text name=attr_defensename value="" style='width: 10em;'>
 				<input type=text name=attr_hitsblocked value="0" style='width: 4em;'>
+				<input type=text name=attr_defenseminustohit value="0" style='width: 4em;'>
 				<input type=text name=attr_defensenotes style='width: 35em;'>
 				<input type=text name=attr_defensewt value="" style='width: 2.5em;'>
 				<input type="checkbox" name="attr_defensenotcarried" value="1" style='width: 1.25em;'>
@@ -209,6 +211,13 @@
 		return `repeating_${repName}_${id}_${itemName}`;
 	}
 
+	// Safe method to get a repeating property.
+	const getFloatProperty = function(v, repName, id, itemName) {
+		let property = repeatingPropertyName(repName, id, itemName);
+		let val = parseFloat(v[property]);
+		return isNaN(val) ? 0 : val;
+	}
+
 	// Update experience spent and unspent.
 	on('sheet:opened change:experiencetotal change:repeating_exphistory remove:repeating_exphistory', function() {
 		getSectionIDs("exphistory", function(idarray) {
@@ -230,6 +239,44 @@
 		})
 	});
 
+	// Update Hits Blocked
+	on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
+	    getSectionIDs("armor", function(idarray) {
+			let fieldnames = []
+			for(var i=0; i < idarray.length; i++) {
+				fieldnames.push(repeatingPropertyName('armor', idarray[i], 'hitsblocked'));
+			}
+			getAttrs(fieldnames, function(v) {
+				let total = 0
+				for (const property in v) {
+					total += parseInt(v[property])||0;
+				}
+				setAttrs({
+					totalblock: total
+				})
+			});
+		})
+	});
+
+	// Update Minus to Hit
+	on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
+	    getSectionIDs("armor", function(idarray) {
+			let fieldnames = []
+			for(var i=0; i < idarray.length; i++) {
+				fieldnames.push(repeatingPropertyName('armor', idarray[i], 'defenseminustohit'));
+			}
+			getAttrs(fieldnames, function(v) {
+				let total = 0
+				for (const property in v) {
+					total += parseInt(v[property])||0;
+				}
+				setAttrs({
+					minustohit: total
+				})
+			});
+		})
+	});
+
 	on('sheet:opened change:st change:hits change:fatigue', function() {
 		getAttrs(['st', 'hits', 'fatigue'], function(v) {
 			let hitpoints = v.st - v.hits - v.fatigue;
@@ -246,13 +293,6 @@
 		+ 'change:repeating_equipment remove:repeating_equipment ', function() {
 		total = 0
 		totalCount = 0
-
-		// Safe method to get the property.
-		const getFloatProperty = function(v, repName, id, itemName) {
-			let property = repeatingPropertyName(repName, id, itemName);
-			let val = parseFloat(v[property]);
-		    return isNaN(val) ? 0 : val;
-		}
 
 		const checkAndSet = function()
 		{
