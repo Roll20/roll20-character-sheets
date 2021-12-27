@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
 const sheetName = 'AD&D 2E Revised';
-const sheetVersion = '4.5.0';
+const sheetVersion = '4.5.1';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
