@@ -28,24 +28,24 @@
 				<input class=sheet-stat-input type=number name="attr_ST_max" value="8"/>
 				<span class=sheet-stat-label2>Adj</span>
 				<input class=sheet-stat-input type=number name="attr_ST" value="8"/>
-				<button type=roll value="&{template:stat-check3} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}]]}} {{roll1=[[3d6]]}} {{character_name=@{cname}}}" name="roll_strengthCheck3"><span class=sheet-stat-roll>3</span></button>
-				<button type=roll value="&{template:stat-check4} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}]]}} {{roll1=[[4d6]]}} {{character_name=@{cname}}}" name="roll_strengthCheck3"><span class=sheet-stat-roll>4</span></button>
+				<button class=sheet-dice-button type="action" name="act_st_check3">t<span class=sheet-stat-roll>3</span></button>
+				<button class=sheet-dice-button type="action" name="act_st_check4">t<span class=sheet-stat-roll>4</span></button>
 			</span>
 			<span>
 				<span class=sheet-stat-label>DX</span>
 				<input class=sheet-stat-input type=number name="attr_DX_max" value="8"/>
 				<span class=sheet-stat-label2>Adj</span>
 				<input class=sheet-stat-input type=number name="attr_DX" value="8"/>
-				<button type=roll value="&{template:stat-check3} {{stat_a=a}} {{stat_name=dexterity}} {{stat=[[@{dx}]]}} {{roll1=[[3d6]]}} {{character_name=@{cname}}}" name="roll_dexterityCheck3"><span class=sheet-stat-roll>3</span></button>
-				<button type=roll value="&{template:stat-check4} {{stat_a=a}} {{stat_name=dexterity}} {{stat=[[@{dx}]]}} {{roll1=[[4d6]]}} {{character_name=@{cname}}}" name="roll_dexterityCheck4"><span class=sheet-stat-roll>4</span></button>
+				<button class=sheet-dice-button type="action" name="act_dx_check3">t<span class=sheet-stat-roll>3</span></button>
+				<button class=sheet-dice-button type="action" name="act_dx_check4">t<span class=sheet-stat-roll>4</span></button>
 			</span>
 			<span>
 				<span class=sheet-stat-label>IQ</span>
 				<input class=sheet-stat-input type=number name="attr_IQ_max" value="8"/>
 				<span class=sheet-stat-label2>Adj</span>
 				<input class=sheet-stat-input type=number name="attr_IQ" value="8"/>
-				<button type=roll value="&{template:stat-check3} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}]]}} {{roll1=[[3d6]]}} {{character_name=@{cname}}}" name="roll_iqCheck3"><span class=sheet-stat-roll>3</span></button>
-				<button type=roll value="&{template:stat-check4} {{stat_a=a}} {{stat_name=IQ}} {{stat=[[@{iq}]]}} {{roll1=[[4d6]]}} {{character_name=@{cname}}}" name="roll_iqCheck4"><span class=sheet-stat-roll>4</span></button>
+				<button class=sheet-dice-button type="action" name="act_iq_check3">t<span class=sheet-stat-roll>3</span></button>
+				<button class=sheet-dice-button type="action" name="act_iq_check4">t<span class=sheet-stat-roll>4</span></button>
 			</span>
 			<span>
 				<span class=sheet-stat-label>MA</span>
@@ -226,7 +226,7 @@
                  <span style='color:red'>Critical Failure!</span>
             {{/rollTotal() roll1 17}}
             {{#rollTotal() roll1 16}}
-                 <span style='color:red'>Automatic Failure!/span>
+                 <span style='color:red'>Automatic Failure!</span>
             {{/rollTotal() roll1 16}}
             {{#rollTotal() roll1 3}}
                  <span style='color:green'>Critical Success!!</span>
@@ -269,7 +269,7 @@
                  <span style='color:red'>Critical Failure!</span>
             {{/rollTotal() roll1 21}}
             {{#rollTotal() roll1 20}}
-                 <span style='color:red'>Automatic Failure!/span>
+                 <span style='color:red'>Automatic Failure!</span>
             {{/rollTotal() roll1 20}}
             {{#rollTotal() roll1 4}}
                  <span style='color:green'>Critical Success!!!!</span>
@@ -298,6 +298,72 @@
         </div>
     </div>
 </rolltemplate>
+
+
+<rolltemplate class="sheet-rolltemplate-test">
+    <div class="sheet-template-container">
+        <h1>{{name}}</h1>
+        <div class="sheet-results">
+            <h4>Result = {{roll1}}</h4>
+            <h4>Custom Result = {{computed::roll1}}</h4>
+        </div>
+    </div>
+</rolltemplate>
+
+
+<script type="text/worker">
+
+    const diceArrayToString = function(rolls) {
+        let diceString = '';
+        for (i = 0; i < rolls.length; ++i) {
+            let roll = rolls[i];
+            if (roll == 1) diceString += 'a';
+            else if (roll == 2) diceString += 'b';
+            else if (roll == 3) diceString += 'c';
+            else if (roll == 4) diceString += 'd';
+            else if (roll == 5) diceString += 'e';
+            else diceString += 'f';
+        }
+        return diceString;
+    }
+
+    const finishRollWithDiceString = function(rolls, rollId) {
+        let diceString = diceArrayToString(rolls);
+        finishRoll(
+            rollId,
+            {
+                roll1: diceString
+            }
+        );
+    }
+    // do the roll check and compute the dice string.
+    const doRollWithDiceString = function(macro) {
+        macro += ' {{character_name=@{cname}}}';
+        startRoll(macro, (results) => {
+            finishRollWithDiceString(results.results.roll1.dice, results.rollId);
+        });
+    }
+
+    on('clicked:st_check3', (info) => {
+        doRollWithDiceString("&{template:stat-check3} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}]]}} {{roll1=[[3d6]]}}");
+    });
+    on('clicked:st_check4', (info) => {
+        doRollWithDiceString("&{template:stat-check4} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}]]}} {{roll1=[[4d6]]}}");
+    });
+    on('clicked:dx_check3', (info) => {
+        doRollWithDiceString("&{template:stat-check3} {{stat_a=a}} {{stat_name=dexterity}} {{stat=[[@{dx}]]}} {{roll1=[[3d6]]}}");
+    });
+    on('clicked:dx_check4', (info) => {
+        doRollWithDiceString("&{template:stat-check4} {{stat_a=a}} {{stat_name=dexterity}} {{stat=[[@{dx}]]}} {{roll1=[[4d6]]}}");
+    });
+    on('clicked:iq_check3', (info) => {
+        doRollWithDiceString("&{template:stat-check3} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}]]}} {{roll1=[[3d6]]}}");
+    });
+    on('clicked:iq_check4', (info) => {
+        doRollWithDiceString("&{template:stat-check4} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}]]}} {{roll1=[[4d6]]}}");
+    });
+
+</script>
 
 
 <script type="text/worker">
@@ -420,12 +486,6 @@
 			}
 		}
 
-		// to compute the total we need the object,
-		// the ids, the repName, and various itemnames.
-		let computeTotal = function(v, idarray, repName, weightName, countName, notCarriedName) {
-			checkAndSet(computeRepeatingTotal(v, idarray, repName, weightName, countName, notCarriedName));
-		}
-
 		//e.g: "weapons" and "weaponwt"
 		let grabIds = function(idarray, repName, weightName, countName, notCarriedName) {
 			let attrs = [];
@@ -441,7 +501,7 @@
 				}
 			}
 			getAttrs(attrs, function(v) {
-				computeTotal(v, idarray, repName, weightName, countName, notCarriedName);
+			    checkAndSet(computeRepeatingTotal(v, idarray, repName, weightName, countName, notCarriedName));
 			});
 		}
 
@@ -473,13 +533,7 @@
 			}
 		}
 
-		// to compute the total we need the object,
-		// the ids, the repName, and various itemnames.
-		let computeTotal = function(v, idarray, repName, costName) {
-			checkAndSet(computeRepeatingTotal(v, idarray, repName, costName)); // todo just pass this in...
-		}
-
-		//e.g: "weapons" and "weaponwt"
+		//e.g: "weapons" and "weaponwt"  TOOD share this and take a post function.
 		let grabIds = function(idarray, repName, costName) {
 			let attrs = [];
 			for(var i=0; i < idarray.length; i++) {
@@ -487,7 +541,7 @@
 				attrs.push(repeatingPropertyName(repName, id, costName));
 			}
 			getAttrs(attrs, function(v) {
-				computeTotal(v, idarray, repName, costName);
+			    checkAndSet(computeRepeatingTotal(v, idarray, repName, costName)); // todo just pass this in...
 			});
 		}
 
