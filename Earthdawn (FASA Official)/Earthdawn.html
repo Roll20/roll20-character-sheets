@@ -6876,7 +6876,7 @@ Comments JBF@CD are action/reminders to Chris
           </div>    <!-- end Spells - Header -->
           <div class="sheet-Creation sheet-headerbar"> <b class="sheet-creation-order">4b-</b> Spells, Spell Talents, and Matrixes</div>
           <input class="sheet-testAttrCosts" name="attr_Spells-Costs" value="5" type="hidden">
-          <div class="sheet-Creation"> As a spellcaster, you have 2 Free Matrixes that do not count for your 8 Telnt points. Go to your Grimoire (click Spell Tab, and then Grimoire subtab), choose
+          <div class="sheet-Creation"> As a spellcaster, you have 2 Free Matrixes that do not count for your 8 Talent points. Go to your Grimoire (click Spell Tab, and then Grimoire subtab), choose
             <input name="attr_Spells-Costs" class="sheet-numShort sheet-attrCostsRed"
             readonly="readonly" value="5"
             title="@{Spells-Costs}   Number of Spell points remaining from the starting Per Step."
@@ -13541,8 +13541,9 @@ var sanitize = function fnsanitize( name, value) {
   var spellsanitize = function fnspellsanitize( name, value) {
     'use strict';
     try{
+      log("spellsanitize "+name + " "+value);
     let newVal = value.replace( /yards/gi, " y").replace( /Touch/gi, "T").replace( /Self/gi, "S").replace( / /gi, "").replace( /Rank/gi, "Rk").replace( /Rnd/gi, " rd")
-    .replace( /hours/gi, " hr").replace( /Min/gi, " m").replace( /miles/gi, " mi").replace( /Circle/gi, "Cir").replace( /square-yard/gi, " sq-y").replace( /area/gi, "");     // Replace yards by y, Touch by T, Self by S, remove space
+    .replace( /hours/gi, " hr").replace( /Min/gi, " min").replace( /miles/gi, " mi").replace( /Circle/gi, "Cir").replace( /square-yard/gi, " sq-y").replace( /area/gi, "");     // Replace yards by y, Touch by T, Self by S, remove space
     if ( value !== newVal ) {
       let vals = {};
       vals[ name ] = newVal;
@@ -13550,6 +13551,27 @@ var sanitize = function fnsanitize( name, value) {
     }
   } catch(err) {log("Earthdawn:spellsanitize() error caught: " + err );}
 }; // End spellsanitize()
+
+
+
+// Triggered directly by the change of the value
+var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
+  'use strict';
+  try{
+    let isStr = _.isString( eventInfo ),
+    att, newAtt;
+    if( isStr )
+    att = eventInfo;
+    else {
+      att = eventInfo["sourceAttribute"];
+    }
+    if(!att) return;
+    getAttrs([ att ], function gaspellSanitize(values) {
+      if(values[att]) spellsanitize(att,values[att]);
+  });
+} catch(err) {log("Earthdawn:spellsanitize2() error caught: " + err );}
+}; // End spellsanitize2()
+  on("change:repeating_spells:sp_aoe change:repeating_spells:sp_duration change:repeating_spells:sp_range", fn( spellsanitize2 ));
 
 
 
@@ -13849,8 +13871,13 @@ var sanitize = function fnsanitize( name, value) {
       repDisciplineCode(tarray[ i ]);
     });
     getSectionIDs("repeating_spell", function gsIdRepeatingSpellName(tarray) {
-      for( i = 0; i < tarray.length; i++)
-      repSpellName( tarray[ i ]);
+      for( i = 0; i < tarray.length; i++){
+        repSpellName( tarray[ i ]);
+        let pre = buildPre( "SP", tarray[ i ]);
+        spellsanitize2(pre+"Range");
+        spellsanitize2(pre+"AoE");
+        spellsanitize2(pre+"Duration");
+      }
     });
     getSectionIDs("repeating_matrix", function gsIdRepeatingMatrix(tarray) {
       for( i = 0; i < tarray.length; i++)
@@ -14693,11 +14720,11 @@ var sanitize = function fnsanitize( name, value) {
 
             getAttrs( getV , function gaUpdateCharacterSheet(values) {
               'use strict';
-              log("Hide-Spells-Tab" + values["Hide-Spells-tab"]);
 
-                vals["Hide-Spells-Tab"]=values["Hide-Spells-tab"]||"1";
-                newflags=addAPIflag( newflags, "RemoveAttr", "Hide-Spells-tab" );
-                log("corrected Hide-Spells-Tab bug ");
+              // log("Hide-Spells-Tab" + values["Hide-Spells-tab"]);
+              // vals["Hide-Spells-Tab"]=values["Hide-Spells-tab"]||"1";
+              // newflags=addAPIflag( newflags, "RemoveAttr", "Hide-Spells-tab" );
+              // log("corrected Hide-Spells-Tab bug ");
 
 
 
