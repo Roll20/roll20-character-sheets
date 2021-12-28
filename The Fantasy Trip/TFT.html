@@ -85,13 +85,11 @@
 		<div class="sheet-talents sheet-block">
 			<label>Talents:</label>
 			<span>
-				<span class=sheet-label style='width: 2.3em;'> </span>
 				<span class=sheet-label style='width: 10.5em;'>Name</span>
 				<span class=sheet-label style='width: 3em;' title='IQ paid for this talent.'>Cost</span>
 				<span class=sheet-label style='width: 3.5em;'>IQ Req</span>
 			</span>
 			<fieldset class=repeating_talents>
-				<button type=roll value="@{character_name} uses @{talentname}! Roll [[3d6]]"></button>
 				<input type=text name=attr_talentname style='width: 10.5em;'>
 				<input type=text name=attr_talentcost value="0" style='width: 3em;'>
 				<input type=text name=attr_talentiq value="8" style='width: 3em;'>
@@ -213,9 +211,10 @@
 	</div>
 </div>
 
+
 <rolltemplate class="sheet-rolltemplate-stat-check3">
 	<div class="sheet-template-container">
-		<h4>{{character_name}} makes {{stat_a}} {{stat_name}} check.</h4>
+		<h4 class=header>{{character_name}} makes {{stat_a}} {{stat_name}} check.</h4>
 		<div class="sheet-results">
 			<h4 style='position: relative; left: -.5em'>
 				<span class=sheet-rolltemplate-stat-check-dice>{{computed::roll1}}</span>
@@ -255,7 +254,7 @@
 
 <rolltemplate class="sheet-rolltemplate-stat-check4">
 	<div class="sheet-template-container">
-		<h4>{{character_name}} makes {{stat_a}} {{stat_name}} check.</h4>
+		<h4 class=header>{{character_name}} makes {{stat_a}} {{stat_name}} check.</h4>
 		<div class="sheet-results">
 			<h4 style='position: relative; left: -1.5em'>
 				<span class=sheet-rolltemplate-stat-check-dice>{{computed::roll1}}</span>
@@ -398,6 +397,26 @@
 		return total;
 	}
 
+	//e.g: "weapons" and "weaponwt"
+	// postcallback takes attrs, idarray, repName, weightName, countName, notCarriedName
+	let grabIds = function(idarray, repName, weightName, countName, notCarriedName, postcallback) {
+		let attrs = [];
+		for(var i=0; i < idarray.length; i++) {
+			let id = idarray[i];
+			attrs.push(repeatingPropertyName(repName, id, weightName));
+			if (countName) {
+				attrs.push(repeatingPropertyName(repName, id, countName));
+			}
+			if (notCarriedName) {
+				let propertyName = repeatingPropertyName(repName, id, notCarriedName);
+				attrs.push(propertyName);
+			}
+		}
+		getAttrs(attrs, function(v) {
+			postcallback(v, idarray, repName, weightName, countName, notCarriedName);
+		});
+	}
+
 	// Update experience spent and unspent.
 	on('sheet:opened change:experiencetotal change:repeating_exphistory remove:repeating_exphistory', function() {
 		getSectionIDs("exphistory", function(idarray) {
@@ -471,42 +490,21 @@
 		+ 'change:repeating_weapons remove:repeating_weapons '
 		+ 'change:repeating_armor remove:repeating_armor '
 		+ 'change:repeating_equipment remove:repeating_equipment ', function() {
-		let total = 0
-		let totalCount = 0
+		let totalWeight = 0;
+		let totalCallbacks = 0; // how many times called back.
 
-		let checkAndSet = function(weight)
-		{
-			total += weight;
-			++totalCount;
-			if (totalCount == 3) {
+		let idCallback = function(attrs, idarray, repName, weightName, countName, notCarriedName) {
+			totalWeight += computeRepeatingTotal(attrs, idarray, repName, weightName, countName, notCarriedName);
+			if (++totalCallbacks == 3) {
 				setAttrs({
-					weightcarried: total
+					weightcarried: totalWeight
 				});
 			}
 		}
 
-		//e.g: "weapons" and "weaponwt"
-		let grabIds = function(idarray, repName, weightName, countName, notCarriedName) {
-			let attrs = [];
-			for(var i=0; i < idarray.length; i++) {
-				let id = idarray[i];
-				attrs.push(repeatingPropertyName(repName, id, weightName));
-				if (countName) {
-					attrs.push(repeatingPropertyName(repName, id, countName));
-				}
-				if (notCarriedName) {
-				    let propertyName = repeatingPropertyName(repName, id, notCarriedName);
-					attrs.push(propertyName);
-				}
-			}
-			getAttrs(attrs, function(v) {
-			    checkAndSet(computeRepeatingTotal(v, idarray, repName, weightName, countName, notCarriedName));
-			});
-		}
-
-		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weaponwt', '', 'weaponnotcarried');});
-		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defensewt', '', 'defensenotcarried');});
-		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'equipmentweight', 'equipmentcount', 'equipmentnotcarried');});
+		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weaponwt', '', 'weaponnotcarried', idCallback);});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defensewt', '', 'defensenotcarried', idCallback);});
+		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'equipmentweight', 'equipmentcount', 'equipmentnotcarried', idCallback);});
 	});
 
 	// Update unspent iq points.
@@ -514,15 +512,12 @@
 		+ 'change:repeating_talents remove:repeating_talents '
 		+ 'change:repeating_spells remove:repeating_spells '
 		+ 'change:iq_max ', function() {
-		let totalSpent = 0
-		let totalCount = 0
-		console.log('updating iq unspent', totalSpent, totalCount);
+		let totalSpent = 0;
+		let totalCallbacks = 0; // number of times called back.
 
-		let checkAndSet = function(spent)
-		{
-			totalSpent += spent;
-			++totalCount;
-			if (totalCount == 2) {
+		let idCallback = function(attrs, idarray, repName, costName) {
+			totalSpent += computeRepeatingTotal(attrs, idarray, repName, costName);
+			if (++totalCallbacks == 2) {
 				getAttrs(['iq_max'], function(v) {
 					let unspent = v.iq_max - totalSpent;
 					setAttrs({
@@ -532,20 +527,8 @@
 			}
 		}
 
-		//e.g: "weapons" and "weaponwt"  TOOD share this and take a post function.
-		let grabIds = function(idarray, repName, costName) {
-			let attrs = [];
-			for(var i=0; i < idarray.length; i++) {
-				let id = idarray[i];
-				attrs.push(repeatingPropertyName(repName, id, costName));
-			}
-			getAttrs(attrs, function(v) {
-			    checkAndSet(computeRepeatingTotal(v, idarray, repName, costName)); // todo just pass this in...
-			});
-		}
-
-		getSectionIDs("talents", function(v) {grabIds(v, 'talents', 'talentcost');});
-		getSectionIDs("spells", function(v) {grabIds(v, 'spells', 'spellcost');});
+		getSectionIDs("talents", function(v) {grabIds(v, 'talents', 'talentcost', '', '', idCallback);});
+		getSectionIDs("spells", function(v) {grabIds(v, 'spells', 'spellcost', '', '', idCallback);});
 	});
 
 
