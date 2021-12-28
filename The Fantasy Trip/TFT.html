@@ -107,7 +107,7 @@
 			<span class=sheet-label style='width: 1.625em;' title="Not carried, won't count as weight.">NC</span>
 		</span>
 		<fieldset class=repeating_weapons>
-			<button type=roll value="@{character_name} Attacks with their @{weaponname}! Roll [[3d6]] vs [[@{DX} + @{weapondex}]]; Damage [[@{weapondamage}]]"></button>
+		    <button class=sheet-dice-button type="action" name="act_attack">t<span class=sheet-stat-roll>3</span></button>
 			<input type=text name=attr_weaponname style='width: 10em;'>
 			<input type=text name=attr_weapondamage value="1d6" style='width: 4em;'>
 			<input type=text name=attr_weapondex value="" style='width: 3.5em;'>
@@ -212,6 +212,7 @@
 </div>
 
 
+
 <rolltemplate class="sheet-rolltemplate-stat-check3">
 	<div class="sheet-template-container">
 		<h4 class=header>{{character_name}} makes {{stat_a}} {{stat_name}} check.</h4>
@@ -304,6 +305,52 @@
 	</div>
 </rolltemplate>
 
+<!-- For doing an attack -->
+<rolltemplate class="sheet-rolltemplate-attack">
+	<div class="sheet-template-container">
+	    	   <!-- Roll [[3d6]] vs [[@{DX} + @{weapondex}]]; Damage [[@{weapondamage}]]" -->
+
+		<h4 class=header>{{character_name}} attacks with {{pronoun}} {{weaponname}}!</h4>
+		<div class="sheet-results">
+			<h4 style='position: relative; left: -.5em'>
+				<span class=sheet-rolltemplate-stat-check-dice>{{computed::roll1}}</span>
+				= {{roll1}} vs {{tohit}}
+			</h4>
+			{{#rollTotal() roll1 18}}
+				<h4 class=failure>Critical Failure, weapon breaks!</h4>
+			{{/rollTotal() roll1 18}}
+			{{#rollTotal() roll1 17}}
+				<h4 class=failure>Critical Failure, drop weapon!</h4>
+			{{/rollTotal() roll1 17}}
+			{{#rollTotal() roll1 16}}
+				<h4 class=failure>Automatic Failure!</h4>
+			{{/rollTotal() roll1 16}}
+			{{#rollTotal() roll1 3}}
+		    	<h4>Damage: {{damage}}</h4>
+				<h4 class=success>Critical Success, triple Damage!</h4>
+			{{/rollTotal() roll1 3}}
+			{{#rollTotal() roll1 4}}
+		    	<h4>Damage: {{damage}}</h4>
+				<h4 class=success>Critical Success, double Damage!</h4>
+			{{/rollTotal() roll1 4}}
+			{{#rollTotal() roll1 5}}
+    			<h4>Damage: {{damage}}</h4>
+				<h4 class=success>Automatic Success!</h4>
+			{{/rollTotal() roll1 5}}
+    		{{#rollBetween() roll1 6 15}}
+				{{#^rollGreater() roll1 tohit}}
+					<h4>Damage: {{damage}}</h4>
+					<h4 class=success>Success!</h4>
+				{{/^rollGreater() roll1 tohit}}
+				{{#rollGreater() roll1 tohit}}
+        			<h4 style='color:gray'>Damage: {{damage}}</h4>
+					<h4 class=failure>Failure!</h4>
+				{{/rollGreater() roll1 tohit}}
+			{{/rollBetween() roll1 6 15}}
+		</div>
+	</div>
+</rolltemplate>
+
 
 <script type="text/worker">
 
@@ -359,6 +406,24 @@
 	});
 	on('clicked:iq_check4', (info) => {
 		doRollWithDiceString("&{template:stat-check4} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[4d6]]}}");
+	});
+
+	on('clicked:repeating_weapons', (info) => {
+	    getAttrs(['gender'], function(v) {
+            let mstring  = `&{template:attack}`
+                + ` {{weaponname=@{${info.sourceAttribute}_weaponname}}}`
+                + ` {{tohit=[[@{DX}[DEX] + @{${info.sourceAttribute}_weapondex}[WPN_ADJ]]]}}`
+                + ` {{damage=[[@{${info.sourceAttribute}_weapondamage}]]}}`
+                + ` {{roll1=[[3d6]]}}`;
+	        console.log('v.gender is', v);
+	        let gender = v.gender.toLowerCase();
+	        let pronoun = 'their';
+	        if (gender == 'male') pronoun = 'his';
+	        else if (gender == 'female') pronoun = 'her'
+	        console.log('pronoun is', pronoun);
+    	    mstring += ` {{pronoun=${pronoun}}}`;
+            doRollWithDiceString(mstring);
+	    });
 	});
 
 </script>
