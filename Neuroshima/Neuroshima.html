@@ -82,6 +82,11 @@
 			
 			<div>
 				<table class="wspolczynniki">
+					<input type="hidden" name="attr_zrecznosc" value="0">
+					<input type="hidden" name="attr_percepcja" value="0">
+					<input type="hidden" name="attr_charakter" value="0">
+					<input type="hidden" name="attr_spryt" value="0">
+					<input type="hidden" name="attr_budowa" value="0">
 					<tbody>
 						<tr>
 							<td></td>
@@ -106,19 +111,19 @@
 								<h5>Współczynnik</h5>
 							</td>
 							<td>
-								<input type="number" class="wsp_statbase" name="attr_zrecznosc" value="9">
+								<input type="number" class="wsp_statbase" name="attr_zrecznosc_base" value="0">
 							</td>
 							<td>
-								<input type="number" class="wsp_statbase" name="attr_percepcja" value="9">
+								<input type="number" class="wsp_statbase" name="attr_percepcja_base" value="0">
 							</td>
 							<td>
-								<input type="number" class="wsp_statbase" name="attr_charakter" value="9">
+								<input type="number" class="wsp_statbase" name="attr_charakter_base" value="0">
 							</td>
 							<td>
-								<input type="number" class="wsp_statbase" name="attr_spryt" value="9">
+								<input type="number" class="wsp_statbase" name="attr_spryt_base" value="0">
 							</td>
 							<td>
-								<input type="number" class="wsp_statbase" name="attr_budowa" value="9">
+								<input type="number" class="wsp_statbase" name="attr_budowa_base" value="0">
 							</td>
 						</tr>
 						<tr>
@@ -520,7 +525,13 @@
 					<td rowspan=6 class="umj-stat-cell">
 						<span class="umj-stat-span">Zr</span>
 						<br/>
-						<button type='roll' value='d20' name='roll_zrecznosc'></button>
+						<button type='roll'
+										 value='&{template:default}{{name=**@{name}**}} {{Rzuty
+											[[ d20cf>[[@{zrecznosc}+?{Modyfikator|Przeciętny(0), 0|Łatwy(+2), 2|Przeciętny(0), 0|Problematyczny(-2), -2|Trudny(-5), -5| Bardzo Trudny(-8), -8| Cholernie Trudny (-11), -11|Fart(-15), -15}]]cf1cf20cs<[[@{zrecznosc}+?{Modyfikator}]]cs20cs1]][[ d20cf>[[@{zrecznosc}+?{Modyfikator|Przeciętny(0), 0|Łatwy(+2), 2|Przeciętny(0), 0|Problematyczny(-2), -2|Trudny(-5), -5| Bardzo Trudny(-8), -8| Cholernie Trudny (-11), -11|Fart(-15), -15}]]cf1cf20cs<[[@{zrecznosc}+?{Modyfikator}]]cs20cs1]][[ d20cf>[[@{zrecznosc}+?{Modyfikator|Przeciętny(0), 0|Łatwy(+2), 2|Przeciętny(0), 0|Problematyczny(-2), -2|Trudny(-5), -5| Bardzo Trudny(-8), -8| Cholernie Trudny (-11), -11|Fart(-15), -15}]]cf1cf20cs<[[@{zrecznosc}+?{Modyfikator}]]cs20cs1]]
+											= *Zrecznosc @{zrecznosc}*
+											  *Trudność ?{Modyfikator}*
+												}} '
+										 name='roll_zrecznosc'></button>
 					</td>
 				</tr>
 				<tr>
@@ -735,13 +746,7 @@
 						<tr>
 							<td>Zręczność:</td>
 							<td></td>
-							<td> <button type='roll'
-										 value='&{template:default}{{name=**@{name}**}} {{Rzuty
-											[[ d20cf>[[@{zrecznosc}+?{Modyfikator|Przeciętny(0), 0|Łatwy(+2), 2|Przeciętny(0), 0|Problematyczny(-2), -2|Trudny(-5), -5| Bardzo Trudny(-8), -8| Cholernie Trudny (-11), -11|Fart(-15), -15}]]cf1cf20cs<[[@{zrecznosc}+?{Modyfikator}]]cs20cs1]][[ d20cf>[[@{zrecznosc}+?{Modyfikator|Przeciętny(0), 0|Łatwy(+2), 2|Przeciętny(0), 0|Problematyczny(-2), -2|Trudny(-5), -5| Bardzo Trudny(-8), -8| Cholernie Trudny (-11), -11|Fart(-15), -15}]]cf1cf20cs<[[@{zrecznosc}+?{Modyfikator}]]cs20cs1]][[ d20cf>[[@{zrecznosc}+?{Modyfikator|Przeciętny(0), 0|Łatwy(+2), 2|Przeciętny(0), 0|Problematyczny(-2), -2|Trudny(-5), -5| Bardzo Trudny(-8), -8| Cholernie Trudny (-11), -11|Fart(-15), -15}]]cf1cf20cs<[[@{zrecznosc}+?{Modyfikator}]]cs20cs1]]
-											= *Zrecznosc @{zrecznosc}*
-											  *Trudność ?{Modyfikator}*
-												}} '
-										 name='roll_zrecznosc'></button></td>
+							<td> </td>
 						</tr>
 						<tr>
 							<td>Percepcja:</td>
@@ -1912,17 +1917,17 @@ on('change:total_damage_general change:total_damage_head change:total_damage_tor
 
 /******************************************************************/
 /******************* BASE STATS / WSPÓŁCZYNNIKI *******************/
-on("change:zrecznosc change:mod_zrecznosc change:percepcja change:mod_percepcja change:charakter change:mod_charakter change:spryt change:mod_spryt change:budowa change:mod_budowa sheet:opened", function() {  
-  getAttrs([	"zrecznosc","mod_zrecznosc", 
-				"percepcja","mod_percepcja",
-				"charakter","mod_charakter",
-				"spryt","mod_spryt",
-				"budowa", "mod_budowa"], function(values) {
-    let zr = (parseInt(values.zrecznosc)||0) + (parseInt(values.mod_zrecznosc)||0);
-    let pc = (parseInt(values.percepcja)||0) + (parseInt(values.mod_percepcja)||0);
-	let ch = (parseInt(values.charakter)||0) + (parseInt(values.mod_charakter)||0);
-    let sp = (parseInt(values.spryt)||0) + (parseInt(values.mod_spryt)||0);
-	let bd = (parseInt(values.budowa)||0) + (parseInt(values.mod_budowa)||0);
+on("change:zrecznosc_base change:mod_zrecznosc change:percepcja_base change:mod_percepcja change:charakter_base change:mod_charakter change:spryt_base change:mod_spryt change:budowa_base change:mod_budowa sheet:opened", function() {  
+  getAttrs([	"zrecznosc_base","mod_zrecznosc", 
+				"percepcja_base","mod_percepcja",
+				"charakter_base","mod_charakter",
+				"spryt_base","mod_spryt",
+				"budowa_base", "mod_budowa"], function(values) {
+    let zr = (parseInt(values.zrecznosc_base)||0) + (parseInt(values.mod_zrecznosc)||0);
+    let pc = (parseInt(values.percepcja_base)||0) + (parseInt(values.mod_percepcja)||0);
+	let ch = (parseInt(values.charakter_base)||0) + (parseInt(values.mod_charakter)||0);
+    let sp = (parseInt(values.spryt_base)||0) + (parseInt(values.mod_spryt)||0);
+	let bd = (parseInt(values.budowa_base)||0) + (parseInt(values.mod_budowa)||0);
     setAttrs({                            
       "zr_df_0": zr+2,
 	  "pc_df_0": pc+2,
@@ -1935,6 +1940,12 @@ on("change:zrecznosc change:mod_zrecznosc change:percepcja change:mod_percepcja 
 	  "ch_df_1": ch,
 	  "sp_df_1": sp,
 	  "bd_df_1": bd,
+	  
+	  "zrecznosc": zr,
+	  "percepcja": pc,
+	  "charakter": ch,
+	  "spryt": sp,
+	  "budowa": bd,
 	  
 	  "zr_df_2": zr-2,
 	  "pc_df_2": pc-2,
