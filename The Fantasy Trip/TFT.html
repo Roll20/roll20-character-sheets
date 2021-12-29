@@ -594,40 +594,24 @@
 
 	// Update Hits Blocked
 	on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
-		 getSectionIDs("armor", function(idarray) {
-			let fieldnames = []
-			for(var i=0; i < idarray.length; i++) {
-				fieldnames.push(repeatingPropertyName('armor', idarray[i], 'hitsblocked'));
-			}
-			getAttrs(fieldnames, function(v) {
-				let total = 0
-				for (const property in v) {
-					total += parseInt(v[property])||0;
-				}
-				setAttrs({
-					totalblock: total
-				})
+	    let idCallback = function(attrs, idarray, repName, blockedName, countName, notCarriedName) {
+			let totalBlocked = computeRepeatingTotal(attrs, idarray, repName, blockedName, countName, notCarriedName);
+			setAttrs({
+                totalblock: totalBlocked
 			});
-		})
+		}
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'hitsblocked', '', 'defensenotcarried', idCallback);});
 	});
 
 	// Update Minus to Hit
 	on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
-		 getSectionIDs("armor", function(idarray) {
-			let fieldnames = []
-			for(var i=0; i < idarray.length; i++) {
-				fieldnames.push(repeatingPropertyName('armor', idarray[i], 'defenseminustohit'));
-			}
-			getAttrs(fieldnames, function(v) {
-				let total = 0
-				for (const property in v) {
-					total += parseInt(v[property])||0;
-				}
-				setAttrs({
-					minustohit: total
-				});
+	    let idCallback = function(attrs, idarray, repName, minusToHitName, countName, notCarriedName) {
+			let totalMinus = computeRepeatingTotal(attrs, idarray, repName, minusToHitName, countName, notCarriedName);
+			setAttrs({
+                minustohit: totalMinus
 			});
-		})
+		}
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defenseminustohit', '', 'defensenotcarried', idCallback);});
 	});
 
 	on('sheet:opened change:st change:hits change:fatigue', function() {
