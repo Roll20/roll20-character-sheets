@@ -63,7 +63,7 @@
 			</span>
 			<span>
 				<span class=sheet-label style='width: 8em'>Weight Carried</span>
-				<span class=sheet-label name="attr_weightcarried"></span>
+				<span class=sheet-stat-final style='width: 4em;' name="attr_weightcarried"></span>
 			</span>
 		</div>
 		<div class="sheet-combat sheet-block">
@@ -116,6 +116,21 @@
 		<div class="sheet-weapons sheet-block">
 		<label>Weapons:</label>
 		<span>
+			<span class=sheet-label title="Roll to attack selected weapon at a given to-hit value.">To Hit Roll: </span>
+			<button class=sheet-attack-button type="action" name="act_attack-5">-5</button>
+			<button class=sheet-attack-button type="action" name="act_attack-4">-4</button>
+			<button class=sheet-attack-button type="action" name="act_attack-3">-3</button>
+			<button class=sheet-attack-button type="action" name="act_attack-2">-2</button>
+			<button class=sheet-attack-button type="action" name="act_attack-1">-1</button>
+			<button class=sheet-attack-button type="action" name="act_attack0">0</button>
+			<button class=sheet-attack-button type="action" name="act_attack1">1</button>
+			<button class=sheet-attack-button type="action" name="act_attack2">2</button>
+			<button class=sheet-attack-button type="action" name="act_attack3">3</button>
+			<button class=sheet-attack-button type="action" name="act_attack4">4</button>
+			<button class=sheet-attack-button type="action" name="act_attack5">5</button>
+		</span>
+		<br>
+		<span>
 			<span class=sheet-label style='width: 2.2em;'> </span>
 			<span class=sheet-label style='width: 10em;'>Name</span>
 			<span class=sheet-label style='width: 4em;'>Damage</span>
@@ -129,13 +144,13 @@
 				<input title="Click to expand" type="checkbox" name="attr_options-flag"><span></span>
 			</div>
 			<div>
-    			<button class=sheet-dice-button type="action" name="act_attack">t</button>
-    			<input type=text name=attr_weaponname style='width: 10em;'>
-    			<input type=text name=attr_weapondamage value="1d6" style='width: 4em;'>
-    			<input type=text name=attr_weapondex value="" style='width: 3.5em;'>
-    			<input type=text name=attr_weaponnotes style='width: 30em;'>
-    			<input type=text name=attr_weaponwt value="" style='width: 2.5em;'>
-    			<input type="checkbox" name="attr_weaponnotcarried" value="1" style='width: 1.25em;'>
+				<input title="Click to select for attack." type="checkbox" name="attr_selected">
+				<input type=text name=attr_weaponname style='width: 10em;'>
+				<input type=text name=attr_weapondamage style='width: 4em;'>
+				<input type=text name=attr_weapondex style='width: 3.5em;'>
+				<input type=text name=attr_weaponnotes style='width: 30em;'>
+				<input type=text name=attr_weaponwt style='width: 2.5em;'>
+				<input type="checkbox" name="attr_weaponnotcarried" value="1" style='width: 1.25em;'>
 			</div>
 			<input type="checkbox" name="attr_options-flag" hidden class="sheet-toggle">
 			<div class="sheet-toggle-checked" style='margin-left: 4em; width: 50em' >
@@ -160,11 +175,11 @@
 					<input title="Click to expand" type="checkbox" name="attr_options-flag"><span></span>
 				</div>
 				<div>
-                    <button class=sheet-dice-button type="action" name="act_spell">t</button>
-    				<input type=text name=attr_spellname style='width: 10em;'>
-    				<input type=text name=attr_spelldamage style='width: 5em;'>
-    				<input type=text name=attr_spellcost value="0" style='width: 3em;'>
-    				<input type=text name=attr_spellnotes style='width: 35em;'>
+					<button class=sheet-dice-button type="action" name="act_spell">t</button>
+					<input type=text name=attr_spellname style='width: 10em;'>
+					<input type=text name=attr_spelldamage style='width: 5em;'>
+					<input type=text name=attr_spellcost value="0" style='width: 3em;'>
+					<input type=text name=attr_spellnotes style='width: 35em;'>
 				</div>
 				<input type="checkbox" name="attr_options-flag" hidden class="sheet-toggle">
 				<div class="sheet-toggle-checked" style='margin-left: 4em; width: 50em' >
@@ -247,7 +262,7 @@
 		<div class="sheet-notes sheet-block">
 			<label>Notes:</label>
 			<textarea class=sheet-text-area name="attr_inventory" title="Notes"></textarea>
-        </div>
+		</div>
 		</div>
 		<div class="sheet-otherspells sheet-block">
 			<label>Other Spells and Talents:</label>
@@ -352,12 +367,12 @@
 	<div class="sheet-template-container">
 			<!-- Roll [[3d6]] vs [[@{DX} + @{weapondex}]]; Damage [[@{weapondamage}]]" -->
 		<h4 class=header>
-        {{#flavor}}
-            {{character_name}} {{flavor}}
-        {{/flavor}}
-        {{^flavor}}
-            {{character_name}} attacks with {{pronoun}} {{weaponname}}!
-        {{/flavor}}
+		{{#flavor}}
+			{{character_name}} {{flavor}}
+		{{/flavor}}
+		{{^flavor}}
+			{{character_name}} attacks with {{pronoun}} {{weaponname}}!
+		{{/flavor}}
 		</h4>
 		<div class="sheet-results">
 			<h4>
@@ -374,24 +389,36 @@
 				<span class=failure>Automatic miss!</span>
 			{{/rollTotal() roll1 16}}
 			{{#rollTotal() roll1 3}}
-				<span class=damage>Damage: {{damage}}</span>
+				{{#damage}}
+					<span class=damage>Damage: {{damage}}</span>
+				{{/damage}}
 				<span class=success>Critical hit, triple Damage!</span>
 			{{/rollTotal() roll1 3}}
 			{{#rollTotal() roll1 4}}
-			 	<span class=damage>Damage: {{damage}}</span>
+				{{#damage}}
+				 	<span class=damage>Damage: {{damage}}</span>
+				{{/damage}}
 				<span class=success>Critical hit, double Damage!</span>
 			{{/rollTotal() roll1 4}}
 			{{#rollTotal() roll1 5}}
-	 			<span class=damage>Damage: {{damage}}</span>
+				{{#damage}}
+					<span class=damage>Damage: {{damage}}</span>
+				{{/damage}}
 				<span class=success>Automatic hit!</span>
 			{{/rollTotal() roll1 5}}
-	 		{{#rollBetween() roll1 6 15}}
+			{{#rollBetween() roll1 6 15}}
 				{{#^rollGreater() roll1 tohit}}
-					<span class=damage>Damage: {{damage}}</span>
+					{{#damage}}
+						<span class=damage>Damage: {{damage}}</span>
+					{{/damage}}
 					<span class=success>Hit!</span>
 				{{/^rollGreater() roll1 tohit}}
 				{{#rollGreater() roll1 tohit}}
-					<span class=damage style='color:gray'>Damage: {{damage}}</span>
+<!-- At first thought maybe people would do adjustments by hand, but they should be good now or could re-roll.
+					{{#damage}}
+						<span class=damage style='color:gray'>Damage: {{damage}}</span>
+					{{/damage}}
+-->
 					<span class=failure>Miss!</span>
 				{{/rollGreater() roll1 tohit}}
 			{{/rollBetween() roll1 6 15}}
@@ -419,46 +446,46 @@
 				<span class=failure>Automatic Failure!</span>
 			{{/rollTotal() roll1 16}}
 			{{#rollTotal() roll1 3}}
- 				 {{#flavor}}
-                    <span class=flavor>{{flavor}}</span>
- 				 {{/flavor}}
-				 {{#damage}}
-			 		 <span class=damage>Damage: {{damage}}</span>
-				 {{/damage}}
+				{{#flavor}}
+					<span class=flavor>{{flavor}}</span>
+				{{/flavor}}
+				{{#damage}}
+					<span class=damage>Damage: {{damage}}</span>
+				{{/damage}}
 				<span class=success>Critical Success, triple Damage or Effect!</span>
 			{{/rollTotal() roll1 3}}
 			{{#rollTotal() roll1 4}}
- 				 {{#flavor}}
-                    <span class=flavor>{{flavor}}</span>
- 				 {{/flavor}}
-				 {{#damage}}
-			 		 <span class=damage>Damage: {{damage}}</span>
-				 {{/damage}}
+				{{#flavor}}
+					<span class=flavor>{{flavor}}</span>
+				{{/flavor}}
+				{{#damage}}
+					<span class=damage>Damage: {{damage}}</span>
+				{{/damage}}
 				<h4 class=success>Critical Success, double Damage or Effect!</h4>
 			{{/rollTotal() roll1 4}}
 			{{#rollTotal() roll1 5}}
- 				 {{#flavor}}
-                    <span class=flavor>{{flavor}}</span>
- 				 {{/flavor}}
-				 {{#damage}}
-			 		 <span class=damage>Damage: {{damage}}</span>
-				 {{/damage}}
+				{{#flavor}}
+					<span class=flavor>{{flavor}}</span>
+				{{/flavor}}
+				{{#damage}}
+					<span class=damage>Damage: {{damage}}</span>
+				{{/damage}}
 				<span class=success>Automatic Success!</span>
 			{{/rollTotal() roll1 5}}
 	 		{{#rollBetween() roll1 6 15}}
 				{{#^rollGreater() roll1 tohit}}
-	 				 {{#flavor}}
-	 				    <span class=flavor>{{flavor}}</span>
-	 				 {{/flavor}}
-	 				 {{#damage}}
-	 			 		 <span class=damage>Damage: {{damage}}</span>
-	 				 {{/damage}}
+					{{#flavor}}
+						<span class=flavor>{{flavor}}</span>
+					{{/flavor}}
+					{{#damage}}
+						<span class=damage>Damage: {{damage}}</span>
+					{{/damage}}
 					<span class=success>Success!</span>
 				{{/^rollGreater() roll1 tohit}}
 				{{#rollGreater() roll1 tohit}}
-	 				 {{#damage}}
-	 			 		 <span class=damage style='color:gray'>Damage: {{damage}}</span>
-	 				 {{/damage}}
+					{{#damage}}
+						<span class=damage style='color:gray'>Damage: {{damage}}</span>
+					{{/damage}}
 					<span class=failure>Failure!</span>
 				{{/rollGreater() roll1 tohit}}
 			{{/rollBetween() roll1 6 15}}
@@ -474,105 +501,6 @@
 		<span class=footer>&nbsp</span>
 	</div>
 </rolltemplate>
-
-
-<script type="text/worker">
-
-	const diceArrayToString = function(rolls) {
-		let diceString = '';
-		for (i = 0; i < rolls.length; ++i) {
-			let roll = rolls[i];
-			if (roll == 1) diceString += 'a';
-			else if (roll == 2) diceString += 'b';
-			else if (roll == 3) diceString += 'c';
-			else if (roll == 4) diceString += 'd';
-			else if (roll == 5) diceString += 'e';
-			else diceString += 'f';
-
-			if (i < rolls.length -1)
-				diceString +=   '&#8239;' // '&thinsp;'
-
-		}
-		return diceString;
-	}
-
-	const finishRollWithDiceString = function(rolls, rollId) {
-		let diceString = diceArrayToString(rolls);
-		finishRoll(
-			rollId,
-			{
-				roll1: diceString
-			}
-		);
-	}
-	// do the roll check and compute the dice string.
-	const doRollWithDiceString = function(macro) {
-		macro += ' {{character_name=@{cname}}}';
-		startRoll(macro, (results) => {
-			finishRollWithDiceString(results.results.roll1.dice, results.rollId);
-		});
-	}
-
-	on('clicked:st_check3', (info) => {
-		doRollWithDiceString("&{template:stat-check3} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}[STR]]]}} {{roll1=[[3d6]]}}");
-	});
-	on('clicked:st_check4', (info) => {
-		doRollWithDiceString("&{template:stat-check4} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}[STR]]]}} {{roll1=[[4d6]]}}");
-	});
-	on('clicked:dx_check3', (info) => {
-		doRollWithDiceString("&{template:stat-check3} {{stat_a=a}} {{stat_name=dexterity}} {{stat=[[@{dx}[DEX]]]}} {{roll1=[[3d6]]}}");
-	});
-	on('clicked:dx_check4', (info) => {
-		doRollWithDiceString("&{template:stat-check4} {{stat_a=a}} {{stat_name=dexterity}} {{stat=[[@{dx}[DEX]]]}} {{roll1=[[4d6]]}}");
-	});
-	on('clicked:iq_check3', (info) => {
-		doRollWithDiceString("&{template:stat-check3} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[3d6]]}}");
-	});
-	on('clicked:iq_check4', (info) => {
-		doRollWithDiceString("&{template:stat-check4} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[4d6]]}}");
-	});
-
-	on('clicked:repeating_weapons', (info) => {
-		let flavorName = info.sourceAttribute + '_weaponflavor';
-		 getAttrs(['gender', flavorName], function(v) {
-			let mstring  = `&{template:attack}`
-				+ ` {{weaponname=@{${info.sourceAttribute}_weaponname}}}`
-				+ ` {{tohit=[[@{DX}[DEX] + @{${info.sourceAttribute}_weapondex}[WPN_ADJ]]]}}`
-				+ ` {{damage=[[@{${info.sourceAttribute}_weapondamage}]]}}`
-				+ ` {{roll1=[[3d6]]}}`;
-			let gender = v.gender.toLowerCase();
-			let pronoun = 'their';
-			if (gender == 'male') pronoun = 'his';
-			else if (gender == 'female') pronoun = 'her'
-			mstring += ` {{pronoun=${pronoun}}}`;
-			if (v[flavorName] != '') {
-				mstring += ` {{flavor=@{${flavorName}}}}`;
-			}
-			console.log('final string is', mstring);
-    		doRollWithDiceString(mstring);
-		 });
-	});
-
-	on('clicked:repeating_spells', (info) => {
-		let damageName = info.sourceAttribute + '_spelldamage';
-		let flavorName = info.sourceAttribute + '_spellflavor';
-		getAttrs([damageName, flavorName], function(v) {
-				let mstring  = `&{template:cast-spell}`
-					+ ` {{spellname=@{${info.sourceAttribute}_spellname}}}`
-					+ ` {{tohit=[[@{IQ}[IQ]]]}}`
-					+ ` {{roll1=[[3d6]]}}`;
-
-			if (v[damageName] != '' && v[damageName] != '0') {
-				mstring += ` {{damage=[[@{${damageName}}]]}}`;
-			}
-			if (v[flavorName] != '') {
-				mstring += ` {{flavor=@{${flavorName}}}}`;
-			}
-			doRollWithDiceString(mstring);
-		});
-	});
-
-</script>
 
 
 <script type="text/worker">
@@ -628,6 +556,155 @@
 		});
 	}
 
+	const diceArrayToString = function(rolls) {
+		let diceString = '';
+		for (i = 0; i < rolls.length; ++i) {
+			let roll = rolls[i];
+			if (roll == 1) diceString += 'a';
+			else if (roll == 2) diceString += 'b';
+			else if (roll == 3) diceString += 'c';
+			else if (roll == 4) diceString += 'd';
+			else if (roll == 5) diceString += 'e';
+			else diceString += 'f';
+
+			if (i < rolls.length -1)
+				diceString +=   '&#8239;' // '&thinsp;'
+
+		}
+		return diceString;
+	}
+
+	const finishRollWithDiceString = function(rolls, rollId) {
+		let diceString = diceArrayToString(rolls);
+		finishRoll(
+			rollId,
+			{
+				roll1: diceString
+			}
+		);
+	}
+	// do the roll check and compute the dice string.
+	const doRollWithDiceString = function(macro) {
+		macro += ' {{character_name=@{cname}}}';
+		startRoll(macro, (results) => {
+			finishRollWithDiceString(results.results.roll1.dice, results.rollId);
+		});
+	}
+
+	on('clicked:st_check3', (info) => {
+		doRollWithDiceString("&{template:stat-check3} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}[STR]]]}} {{roll1=[[3d6]]}}");
+	});
+	on('clicked:st_check4', (info) => {
+		doRollWithDiceString("&{template:stat-check4} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}[STR]]]}} {{roll1=[[4d6]]}}");
+	});
+	on('clicked:dx_check3', (info) => {
+		doRollWithDiceString("&{template:stat-check3} {{stat_a=a}} {{stat_name=dexterity}} {{stat=[[@{dx}[DEX]]]}} {{roll1=[[3d6]]}}");
+	});
+	on('clicked:dx_check4', (info) => {
+		doRollWithDiceString("&{template:stat-check4} {{stat_a=a}} {{stat_name=dexterity}} {{stat=[[@{dx}[DEX]]]}} {{roll1=[[4d6]]}}");
+	});
+	on('clicked:iq_check3', (info) => {
+		doRollWithDiceString("&{template:stat-check3} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[3d6]]}}");
+	});
+	on('clicked:iq_check4', (info) => {
+		doRollWithDiceString("&{template:stat-check4} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[4d6]]}}");
+	});
+
+	// new attack
+	on('clicked:iq_check4', (info) => {
+		doRollWithDiceString("&{template:stat-check4} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[4d6]]}}");
+	});
+
+	on('clicked:attack-5'
+	+ ' clicked:attack-4'
+	+ ' clicked:attack-3'
+	+ ' clicked:attack-2'
+	+ ' clicked:attack-1'
+	+ ' clicked:attack0'
+	+ ' clicked:attack1'
+	+ ' clicked:attack2'
+	+ ' clicked:attack3'
+	+ ' clicked:attack4'
+	+ ' clicked:attack5', (info) => {
+		let toHit = parseInt(info.triggerName.substring(14))||0;
+
+		// find selected weapon, if any.
+		getSectionIDs("weapons", function(sectionIds) {
+			let selectedIds = [];
+			for (var i = 0; i < sectionIds.length; ++i) {
+				selectedIds.push(repeatingPropertyName('weapons', sectionIds[i], 'selected'));
+			}
+			getAttrs(selectedIds, function(values) {
+				for (var i = 0; i < sectionIds.length; ++i) {
+					let id = sectionIds[i];
+					let selectedName  = repeatingPropertyName('weapons', id, 'selected');
+					if (values[selectedName] == 'on') {
+						// parse the delta.
+						let flavorName = repeatingPropertyName('weapons', id, 'weaponflavor');
+						let weaponDexName  = repeatingPropertyName('weapons', id, 'weapondex');
+						let weaponDamageName = repeatingPropertyName('weapons', id, 'weapondamage');
+						getAttrs(['gender', flavorName, weaponDexName, weaponDamageName], function(v) {
+							let mstring  = `&{template:attack}`
+								+ ` {{weaponname=@{repeating_weapons_${id}_weaponname}}}`
+								+ ` {{roll1=[[3d6]]}}`;
+
+							{ // compute to hit.
+								mstring += ' {{tohit=[[@{DX}[DEX]';
+								// provisionally add weapon dex.
+								if (parseInt(v[weaponDexName])||0) {
+									mstring += ` + @{${weaponDexName}}[WPN_ADJ]`;
+								}
+								// and to hit.
+								if (toHit != 0) {
+									mstring += ` + ${toHit}[TOHIT]`;
+								}
+								// and finish.
+								mstring += ']]}}';
+							}
+
+							// conditionally add damage
+							if (v[weaponDamageName] != '' && v[weaponDamageName] != '0') {
+								mstring += ` {{damage=[[@{${weaponDamageName}}]]}}`;
+							}
+
+							{ // add pronoun.
+								let gender = v.gender.toLowerCase();
+								let pronoun = 'their';
+								if (gender == 'male') pronoun = 'his';
+								else if (gender == 'female') pronoun = 'her'
+								mstring += ` {{pronoun=${pronoun}}}`;
+							}
+
+							if (v[flavorName] != '') {
+								mstring += ` {{flavor=@{${flavorName}}}}`;
+							}
+							doRollWithDiceString(mstring);
+						});
+					}
+				}
+			});
+		});
+	});
+
+	on('clicked:repeating_spells', (info) => {
+		let damageName = info.sourceAttribute + '_spelldamage';
+		let flavorName = info.sourceAttribute + '_spellflavor';
+		getAttrs([damageName, flavorName], function(v) {
+				let mstring  = `&{template:cast-spell}`
+					+ ` {{spellname=@{${info.sourceAttribute}_spellname}}}`
+					+ ` {{tohit=[[@{IQ}[IQ]]]}}`
+					+ ` {{roll1=[[3d6]]}}`;
+
+			if (v[damageName] != '' && v[damageName] != '0') {
+				mstring += ` {{damage=[[@{${damageName}}]]}}`;
+			}
+			if (v[flavorName] != '') {
+				mstring += ` {{flavor=@{${flavorName}}}}`;
+			}
+			doRollWithDiceString(mstring);
+		});
+	});
+
 	// Update experience spent and unspent.
 	on('sheet:opened change:experiencetotal change:repeating_exphistory remove:repeating_exphistory', function() {
 		getSectionIDs("exphistory", function(idarray) {
@@ -651,10 +728,10 @@
 
 	// Update Hits Blocked
 	on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
-	    let idCallback = function(attrs, idarray, repName, blockedName, countName, notCarriedName) {
+		let idCallback = function(attrs, idarray, repName, blockedName, countName, notCarriedName) {
 			let totalBlocked = computeRepeatingTotal(attrs, idarray, repName, blockedName, countName, notCarriedName);
 			setAttrs({
-                totalblock: totalBlocked
+				totalblock: totalBlocked
 			});
 		}
 		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'hitsblocked', '', 'defensenotcarried', idCallback);});
@@ -662,10 +739,10 @@
 
 	// Update Minus to Hit
 	on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
-	    let idCallback = function(attrs, idarray, repName, minusToHitName, countName, notCarriedName) {
+		let idCallback = function(attrs, idarray, repName, minusToHitName, countName, notCarriedName) {
 			let totalMinus = computeRepeatingTotal(attrs, idarray, repName, minusToHitName, countName, notCarriedName);
 			setAttrs({
-                minustohit: totalMinus
+				minustohit: totalMinus
 			});
 		}
 		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defenseminustohit', '', 'defensenotcarried', idCallback);});
@@ -673,13 +750,13 @@
 
 	// Update Dex
 	on('sheet:opened change:repeating_armor remove:repeating_armor change:dx_max change:dx_adj', function() {
-	    let idCallback = function(attrs, idarray, repName, dexPenaltyName, countName, notCarriedName) {
+		let idCallback = function(attrs, idarray, repName, dexPenaltyName, countName, notCarriedName) {
 			let totalPenalty = computeRepeatingTotal(attrs, idarray, repName, dexPenaltyName, countName, notCarriedName);
 			getAttrs(['dx_max', 'dx_adj'], function(v) {
-			    let finalDex = (parseInt(v.dx_max)||0) + (parseInt(v.dx_adj)||0) - totalPenalty;
-    			setAttrs({
-                    dx: finalDex
-    			});
+				let finalDex = (parseInt(v.dx_max)||0) + (parseInt(v.dx_adj)||0) - totalPenalty;
+				setAttrs({
+					dx: finalDex
+				});
 			});
 		}
 		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defensedexpenalty', '', 'defensenotcarried', idCallback);});
@@ -688,9 +765,9 @@
 	// Update Str
 	on('sheet:opened change:st_max change:st_adj', function() {
 		getAttrs(['st_max', 'st_adj'], function(v) {
-		    let finalStr = (parseInt(v.st_max)||0) + (parseInt(v.st_adj)||0);
+			let finalStr = (parseInt(v.st_max)||0) + (parseInt(v.st_adj)||0);
 			setAttrs({
-                st: finalStr
+				st: finalStr
 			});
 		});
 	});
@@ -698,19 +775,19 @@
 	// Update IQ
 	on('sheet:opened change:iq_max change:iq_adj', function() {
 		getAttrs(['iq_max', 'iq_adj'], function(v) {
-		    let finalIQ = (parseInt(v.iq_max)||0) + (parseInt(v.iq_adj)||0);
+			let finalIQ = (parseInt(v.iq_max)||0) + (parseInt(v.iq_adj)||0);
 			setAttrs({
-                iq: finalIQ
+				iq: finalIQ
 			});
 		});
 	});
 
-    // Update MA (todo include weight penalty)
+	// Update MA (todo include weight penalty)
 	on('sheet:opened change:ma_max change:ma_adj', function() {
 		getAttrs(['ma_max', 'ma_adj'], function(v) {
-		    let finalMA = (parseInt(v.ma_max)||0) + (parseInt(v.ma_adj)||0);
+			let finalMA = (parseInt(v.ma_max)||0) + (parseInt(v.ma_adj)||0);
 			setAttrs({
-                ma: finalMA
+				ma: finalMA
 			});
 		});
 	});
@@ -723,6 +800,24 @@
 				stcurrent: hitpoints
 			});
 		});
+	});
+
+	// update selected weapon
+	on('change:repeating_weapons:selected', (info) => {
+		// Radio button them.
+		if (info.newValue == 'on') {
+			// get them all, and de check any not me...
+			getSectionIDs("weapons", function(v) {
+				let valueMap = {};
+				for (var i = 0; i < v.length; ++i) {
+					let propertyName = 'repeating_weapons_' + v[i] + '_selected';
+					if (propertyName != info.triggerName) {
+						valueMap[propertyName] = 0;
+					}
+				}
+				setAttrs(valueMap, {silent: true});
+			});
+		}
 	});
 
 	// Update weight carried.
@@ -772,6 +867,7 @@
 	});
 
 
+	/* Funny stuff with journals */
 	const buttonlist = ["character","journal"];
 	buttonlist.forEach(button => {
 		on(`clicked:${button}`, function() {
