@@ -94,23 +94,31 @@
 			<label>Talents:</label>
 			<span>
 				<span class=sheet-label style='width: 10.5em;'>Name</span>
-				<span class=sheet-label style='width: 3em;' title='IQ paid for this talent.'>Cost</span>
-				<span class=sheet-label style='width: 3.5em;'>IQ Req</span>
 			</span>
 			<fieldset class=repeating_talents>
-				<div class="sheet-checkbox-cog">
-					<input title="Click to expand" type="checkbox" name="attr_options-flag"><span></span>
-				</div>
 				<div>
 					<input type=text name=attr_talentname style='width: 10.5em;'>
-					<input type=text name=attr_talentcost value="0" style='width: 3em;'>
-					<input type=text name=attr_talentiq value="8" style='width: 3em;'>
+					&nbsp;
+            	    <button class=sheet-pict-button title="Quote the description." type="action" name="act_describe">w</button>
+            	    <button class=sheet-pict-button title="Expand and edit more fields." type="action" name="act_expand">y</button>
 				</div>
 				<input type="checkbox" name="attr_options-flag" hidden class="sheet-toggle">
-				<div class="sheet-toggle-checked">
-					<span title="Description that shows when you click the quote button.">Description:</span>
-					<textarea class=sheet-text-area name="attr_talentdescription"></textarea>
-				</div>
+				<div class="sheet-toggle-checked" style='margin-left: 1em; width: 90%'>
+				    <div>
+    					<span title="IQ required to get this talent.">IQ Required: </span>
+    					<input type=number name=attr_talentiq value="8">
+					</div>
+					<div>
+    					<span title="IQ points paid, if any, for this talent. Adds to Spent IQ Points.">IQ Paid: </span>
+        				<input type=number name="attr_talentcost">
+    				</div>
+					<div>
+    					<span title="Experience points paid, if any, for this talent. Adds to Spent Experience Points.">Experience Paid: </span>
+        				<input type=number style='width: 5em' name="attr_expcost">
+    				</div>
+	    			<span title="Description that shows when you click the quote button.">Description:</span>
+					<textarea class=sheet-text-area name="attr_description"></textarea>
+    			</div>
 			</fieldset>
 		</div>
 		<div class="sheet-weapons sheet-block">
@@ -150,15 +158,15 @@
 				<input type=text name=attr_weapondamage style='width: 4em;'>
 				<input type=text name=attr_weapondex style='width: 3.5em;'>
 				<input type=text name=attr_weaponnotes style='width: 30em;'>
-				<input type=text name=attr_weaponwt style='width: 2.5em;'>
-				<input type="checkbox" name="attr_weaponnotcarried" value="1" style='width: 1.25em;'>
+				<input type=text name=attr_weight style='width: 2.5em;'>
+				<input type="checkbox" name="attr_notcarried" value="1" style='width: 1.25em;'>
 			</div>
 			<input type="checkbox" name="attr_options-flag" hidden class="sheet-toggle">
-			<div class="sheet-toggle-checked" style='margin-left: 4em; width: 50em' >
+			<div class="sheet-toggle-checked" style='margin-left: 2.5em; width: 50em' >
 				<span title="Text that displays when attacking, such as 'swings his mighty war axe.'">Flavor Text:</span>
 				<input type=text name="attr_weaponflavor" style='display: block; width:100%'>
 				<span title="Detailed notes about the weapon.">Description:</span>
-				<textarea class=sheet-text-area name="attr_weapondescription"></textarea>
+				<textarea class=sheet-text-area name="attr_description"></textarea>
 			</div>
 		</fieldset>
 		</div>
@@ -187,7 +195,7 @@
 					<span title="Text that displays when the spell succeeds.">Flavor Text:</span>
 					<input type=text name="attr_spellflavor" style='display: block; width:100%'>
 					<span title="Description that shows when you click the quote button.">Description:</span>
-					<textarea class=sheet-text-area name="attr_spelldescription"></textarea>
+					<textarea class=sheet-text-area name="attr_description"></textarea>
 				</div>
 			</fieldset>
 		</div>
@@ -208,8 +216,8 @@
 				<input type=text name=attr_defenseminustohit value="0" style='width: 4em;'>
 				<input type=text name=attr_defensedexpenalty value="0" style='width: 4em;'>
 				<input type=text name=attr_defensenotes style='width: 27em;'>
-				<input type=text name=attr_defensewt value="" style='width: 2.5em;'>
-				<input type="checkbox" name="attr_defensenotcarried" value="1" style='width: 1.25em;'>
+				<input type=text name=attr_weight value="" style='width: 2.5em;'>
+				<input type="checkbox" name="attr_notcarried" value="1" style='width: 1.25em;'>
 			</fieldset>
 		</div>
 		<div class="sheet-equip sheet-block">
@@ -223,10 +231,10 @@
 			</span>
 			<fieldset class=repeating_equipment>
 				<input type=text name=attr_equipmentname style='width: 10em;'>
-				<input type=number name=attr_equipmentcount value="1" style='width: 4.5em;'>
+				<input type=number name=attr_count value="1" style='width: 4.5em;'>
 				<input type=text name=attr_equipmentnotes style='width: 36em;'>
-				<input type=text name=attr_equipmentweight value="" style='width: 2.5em;'>
-				<input type=checkbox name=attr_equipmentnotcarried value="1" style='width: 1.25em;'>
+				<input type=text name=attr_weight value="" style='width: 2.5em;'>
+				<input type=checkbox name=attr_notcarried value="1" style='width: 1.25em;'>
 			</fieldset>
 		</div>
 	</div>
@@ -508,7 +516,7 @@
 <!-- For Descriptions, just nice to have a template -->
 <rolltemplate class="sheet-rolltemplate-description">
 	<div class="sheet-template-container">
-		<h4 class=header>{{item_name}}:</h4>
+		<h4 class=header style='text-transform: capitalize'>{{item_name}}:</h4>
 		<span class=break>&nbsp</span>
         <div class="sheet-results">
             <span class=description>{{description}}</span>
@@ -628,6 +636,18 @@
 		});
 	}
 
+    // 	Describes an item, give it name and description attributes.
+	const describeItem = function(nameAttr, descriptionAttr) {
+		let macro = '&{template:description}'
+		+ ` {{item_name=@{${nameAttr}}}}`
+		+ ` {{description=@{${descriptionAttr}}}}`
+        startRoll(macro, (results) => {
+    		finishRoll( results.rollId, {} );
+		});
+	}
+
+	/* ATTRIBUTE HANDLERS */
+
 	on('clicked:st_check3', (info) => {
 		doRollWithDiceString("&{template:stat-check3} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}[STR]]]}} {{roll1=[[3d6]]}}");
 	});
@@ -652,6 +672,27 @@
 		doRollWithDiceString("&{template:stat-check4} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[4d6]]}}");
 	});
 
+	/* TALENT HANDLERS */
+
+	// Expand or describe a talent.
+	on('clicked:repeating_talents', (info) => {
+        let id = info.sourceAttribute;
+        let name = info.htmlAttributes.name;
+        if (name == 'act_describe') {
+            describeItem(id + '_talentname', id + '_description');
+        }
+        else if (name == 'act_expand') {
+            let optionsName = id + '_options-flag';
+            getAttrs([optionsName], function(v) {
+                let attrMap = {};
+                attrMap[optionsName] = v[optionsName] == 0 ? 'on' : 0;
+                setAttrs(attrMap, {silent: true});
+            });
+        }
+    });
+
+    /* WEAPON HANDLERS */
+
 	// Select a weapon.
 	on('change:repeating_weapons:selected', (info) => {
 		// get them all, and de check any not me...
@@ -672,7 +713,7 @@
 		});
 	});
 
-
+    // Weapon Attack Buttons.
 	on('clicked:attack-5'
 	+ ' clicked:attack-4'
 	+ ' clicked:attack-3'
@@ -730,7 +771,7 @@
 		});
 	});
 
-	/* Expand/Toggle selected weapon */
+	// Expand/Toggle selected weapon
 	on('clicked:expandweapon', (info) => {
         onSelectedWeapon(function (id, sectionIds) {
             let optionsName = repeatingPropertyName('weapons', id, 'options-flag');
@@ -754,13 +795,7 @@
 	/* Describe selected weapon */
 	on('clicked:describeweapon', (info) => {
         onSelectedWeapon(function (id, sectionIds) {
-    		let macro = '&{template:description}'
-    		+ ` {{item_name=@{${repeatingPropertyName('weapons', id, 'weaponname')}}}}`
-    		+ ` {{description=@{${repeatingPropertyName('weapons', id, 'weapondescription')}}}}`
-    		+ ' {{character_name=@{cname}}}';
-            startRoll(macro, (results) => {
-        		finishRoll( results.rollId, {} );
-    		});
+            describeItem(repeatingPropertyName('weapons', id, 'weaponname'), repeatingPropertyName('weapons', id, 'description'));
 		});
 	});
 
@@ -813,7 +848,7 @@
 				totalblock: totalBlocked
 			});
 		}
-		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'hitsblocked', '', 'defensenotcarried', idCallback);});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'hitsblocked', '', 'notcarried', idCallback);});
 	});
 
 	// Update Minus to Hit
@@ -824,7 +859,7 @@
 				minustohit: totalMinus
 			});
 		}
-		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defenseminustohit', '', 'defensenotcarried', idCallback);});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defenseminustohit', '', 'notcarried', idCallback);});
 	});
 
 	// Update Dex
@@ -838,7 +873,7 @@
 				});
 			});
 		}
-		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defensedexpenalty', '', 'defensenotcarried', idCallback);});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defensedexpenalty', '', 'notcarried', idCallback);});
 	});
 
 	// Update Str
@@ -898,9 +933,9 @@
 			}
 		}
 
-		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weaponwt', '', 'weaponnotcarried', idCallback);});
-		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'defensewt', '', 'defensenotcarried', idCallback);});
-		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'equipmentweight', 'equipmentcount', 'equipmentnotcarried', idCallback);});
+		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weight', '', 'notcarried', idCallback);});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'weight', '', 'notcarried', idCallback);});
+		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'weight', 'count', 'notcarried', idCallback);});
 	});
 
 	// Update unspent iq points.
