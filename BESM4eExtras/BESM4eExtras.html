@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.4.2" readonly />
+													<input type="text" class="center" name="attr_version" value="1.4.3" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -6232,10 +6232,18 @@
 				{{/conversion}}
 				<div class="row">
 					<div class="col-5-12 padl padr rt-key">Shock Value</div>
-					<div class="col-7-12 padr rt-value center">{{shock}}</div>
+					<div class="col-7-12 padr rt-value center">{{shockvalue}}</div>
 				</div>
 				{{/defense}} {{#doesnothing}}
 				<div class="rt-emote"><i>{{character_name}} does nothing...</i></div>
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Melee</div>
+					<div class="col-7-12 padr rt-value center">TN 0</div>
+				</div>
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Ranged</div>
+					<div class="col-7-12 padr rt-value center">TN 12</div>
+				</div>
 				{{#forcefield}}
 				<div class="row">
 					<div class="col-5-12 padl padr rt-key">Forcefield</div>
@@ -6284,7 +6292,7 @@
 				{{/conversion}}
 				<div class="row">
 					<div class="col-5-12 padl padr rt-key">Shock Value</div>
-					<div class="col-7-12 padr rt-value center">{{shock}}</div>
+					<div class="col-7-12 padr rt-value center">{{shockvalue}}</div>
 				</div>
 				{{/doesnothing}} {{#twodsix}}
 				<div class="rt-emote"><i>{{character_name}} rolls 2d6...</i></div>
@@ -6319,6 +6327,51 @@
 				<div class="row">
 					<div class="col-5-12 padl padr rt-key">Total</div>
 					<div class="col-7-12 padr rt-value center">{{total}}</div>
+				</div>
+				{{#forcefield}}
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Forcefield</div>
+					<div class="col-7-12 padr rt-value center">{{forcefield}}</div>
+				</div>
+				{{/forcefield}} {{#armor1}}
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Primary Armor</div>
+					<div class="col-7-12 padr rt-value center">{{armor1}}</div>
+				</div>
+				{{/armor1}} {{#armor2}}
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Secondary Armor</div>
+					<div class="col-7-12 padr rt-value center">{{armor2}}</div>
+				</div>
+				{{/armor2}} {{#armor3}}
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Tertiary Armor</div>
+					<div class="col-7-12 padr rt-value center">{{armor3}}</div>
+				</div>
+				{{/armor3}} {{#mindshield}}
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Mind Shield</div>
+					<div class="col-7-12 padr rt-value center">{{mindshield}}</div>
+				</div>
+				{{/mindshield}} {{#absorption1}}
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Absorption - Health</div>
+					<div class="col-7-12 padr rt-value center">{{absorption1}}</div>
+				</div>
+				{{/absorption1}} {{#absorption2}}
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Absorption - Energy</div>
+					<div class="col-7-12 padr rt-value center">{{absorption2}}</div>
+				</div>
+				{{/absorption2}} {{#conversion}}
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Conversion</div>
+					<div class="col-7-12 padr rt-value center">{{conversion}}</div>
+				</div>
+				{{/conversion}}
+				<div class="row">
+					<div class="col-5-12 padl padr rt-key">Shock Value</div>
+					<div class="col-7-12 padr rt-value center">{{shockvalue}}</div>
 				</div>
 				{{/dcvroll}} {{#initiative}}
 				<div class="rt-emote"><i>{{character_name}} rolls {{pronoun}} initiative</i></div>
@@ -6431,7 +6484,7 @@
 		const attack_manuevers_array = ['attack', 'bite', 'bypassarmor', 'disarm', 'grab', 'lock', 'pin', 'reducearmor', 'throw', 'vitalspot', 'weakpoint'];
 		const attack_maneuvers_regex = /(attack|bite|bypassarmor|disarm|grab|lock|pin|reducearmor|throw|vitalspot|weakpoint)/i;
 		const defense_manuevers_array = ['defend', 'defendother', 'doesnothing', 'escape'];
-		const defense_maneuvers_regex = /(defend|defendother|doesnothing|escape)/i;
+		const defense_maneuvers_regex = /(defend|defendother|escape)/i;
 		const non_damaging_attack_regex = /(disarm|grab|pin|defend|defendother|doesnothing|escape)/i;
 		const minor_obstacle_maneuvers_regex = /(bite|reducearmor|defendother)/i;
 		const major_obstacle_maneuvers_regex = /(bypassarmor|vitalspot)/i;
@@ -9166,7 +9219,7 @@
 			let stat = '';
 			let base = 0;
 			let turntracker = '';
-			let result = '';
+			let result = `&{template:besmDefault} {{rolls=1}} {{character_name=@{charactername}}} {{pronoun=@{pronoun}}} `;
 			switch (rolltype) {
 				case '2d6':
 					type = '{{twodsix=1}}';
@@ -9185,6 +9238,7 @@
 					title = '{{title=Roll DCV}}';
 					stat = `{{dcv=${cv}}}`;
 					base = cv;
+					result = `${result} ${buildProtectionsString(debug, value)}`;
 					break;
 				case 'initiative':
 					cv = getCV(debug, value, attrdb, setObj, sourceAttr, 'acv', '');
@@ -9207,8 +9261,8 @@
 					setStatButtonStatsAndRolls(debug, eventInfo, value, rowID, sourceAttr, setObj);
 					break;
 			}
-			result = `&{template:besmDefault} {{rolls=1}} ${type} ${title} {{character_name=@{charactername}}}` +
-				`{{pronoun=@{pronoun}}} ${stat} {{total=[[[[?{Roll is|Normal, ${setDice(rollmod)}` +
+			result = `${result} ${type} ${title} ${stat} ` +
+				`{{total=[[[[?{Roll is|Normal, ${setDice(rollmod)}` +
 				`|Minor Edge, ${setDice(rollmod, 1)}|Minor Obstacle, ${setDice(rollmod, -1)}` +
 				`|Major Edge, ${setDice(rollmod, 2)}|Major Obstacle, ${setDice(rollmod, -2)}}]]` +
 				`+[[${base}]] ${turntracker}]]}} {{roll=$[[0]]}}`;
@@ -10840,8 +10894,10 @@
 			const debugtext = '[setWeaponAmmo()]';
 			const state = setObj[`${handsource}_state`];
 			const rowID = value[`${handsource}_source`];
+			const type = value[`repeating_attr_${rowID}_attribute`];
+			if (type != 'weapon') return;
 			if (state) {//weapon armed, load ammo state
-				const weapon = _.find(attrdb.weapon, w => {
+				const weapon = _.find(attrdb[`${type}`], w => {
 					if (w.source == rowID) return true;
 				});
 				const customization = _.find(weapon.customizations, c => {
@@ -10877,8 +10933,9 @@
 			setObj.weapon_ammo = 0;
 			setObj.weapon_autofire = 0;
 			const weapon = setObj.active_weapon;
+			const type = value[`repeating_attr_${weapon}_attribute`];
 			if (weapon == '') return;
-			const weapondb = attrdb.weapon.find(o => {
+			const weapondb = attrdb[`${type}`].find(o => {
 				if (o.source == weapon) return true;
 			});
 			const customizations = weapondb.customizations;	
@@ -10918,12 +10975,38 @@
 			})
 		}
 		
+		function buildProtectionsString(debug, value, maneuver='') {
+			const shockvalue = parseInt(value.stat_total_shock) || 0;
+			const forcefield = parseInt(value.protection_forcefield_ar) || 0;
+			const shield = parseInt(value.protection_shield_ar) || 0;
+			const armor1 = parseInt(value.protection_armor1_ar) || 0;
+			const armor2 = parseInt(value.protection_armor2_ar) || 0;
+			const armor3 = parseInt(value.protection_armor3_ar) || 0;
+			const mindshield = parseInt(value.protection_mindshield_ar) || 0;
+			const absorption1 = parseInt(value.protection_absorption1_ar) || 0;
+			const absorption2 = parseInt(value.protection_absorption2_ar) || 0;
+			const conversion = parseInt(value.protection_conversion_ar) || 0;
+			let result = '';
+			if(forcefield > 0) result = `${result}{{forcefield=${forcefield}}} `;
+			if(shield > 0 && maneuver == 'doesnothing') result = `${result}{{shield=${shield}}} `;
+			if(armor1 > 0) result = `${result}{{armor1=${armor1}}} `;
+			if(armor2 > 0) result = `${result}{{armor2=${armor2}}} `;
+			if(armor3 > 0) result = `${result}{{armor3=${armor3}}} `;
+			if(mindshield > 0) result = `${result}{{mindshield=${mindshield}}} `;
+			if(absorption1 > 0) result = `${result}{{absorption1=${absorption1}}} `;
+			if(absorption2 > 0) result = `${result}{{absorption2=${absorption2}}} `;
+			if(conversion > 0) result = `${result}{{conversion=${conversion}}} `;
+			result = `${result}{{shockvalue=${shockvalue}}}`;
+			if(debug) console.log(`[buildProtectionsString()] result = ${result}`);
+			return result;
+		}
+		
 		function setCombatRoll(debug, value, attrdb, rowID, sourceAttr, setObj, invertState = false) {
 			const debugtext = '[setCombatRoll()]';
 			const activeweapon = setObj.active_weapon === undefined ? rowID : setObj.active_weapon;
+			const type = value[`repeating_attr_${activeweapon}_attribute`];
 			const weapon = 
-				_.find(attrdb.weapon, o => { if (o.source == activeweapon) return o; }) ||
-				_.find(attrdb.swarm, o => { if (o.source == activeweapon) return o; });
+				_.find(attrdb[`${type}`], o => { if (o.source == activeweapon) return o; });
 			const isWeapon = 
 				getIsObject(weapon);
 			const isSwarm = 
@@ -10954,16 +11037,6 @@
 				getSumOfActiveAttrLevels(attrdb, 'massivedamage', weaponclass) || 0;
 			const superstrength = 
 				getSumOfActiveAttrLevels(attrdb, 'superstrength') || 0;
-			const shockvalue = parseInt(value.stat_total_shock) || 0;
-			const forcefield = parseInt(value.protection_forcefield_ar) || 0;
-			const shield = parseInt(value.protection_shield_ar) || 0;
-			const armor1 = parseInt(value.protection_armor1_ar) || 0;
-			const armor2 = parseInt(value.protection_armor2_ar) || 0;
-			const armor3 = parseInt(value.protection_armor3_ar) || 0;
-			const mindshield = parseInt(value.protection_mindshield_ar) || 0;
-			const absorption1 = parseInt(value.protection_absorption1_ar) || 0;
-			const absorption2 = parseInt(value.protection_absorption2_ar) || 0;
-			const conversion = parseInt(value.protection_conversion_ar) || 0;
 			let maneuver = 
 				setObj.static_weapon_maneuver_name || value.static_weapon_maneuver_name;
 			maneuver = 
@@ -10999,11 +11072,20 @@
 				rollmod;
 			const weakpoint = 
 				maneuver == 'weakpoint' ? 
-				`{{weakpoint=[[ [[?{Weak Point is|Large, ${setDice(rollmod, -2)}|Small, ${setDice(rollmod, -1)}|Tiny, ${setDice(rollmod, -1)}}]] ]] }}` : 
+				`{{weakpoint=[[ [[?{Weak Point is|Large, ${setDice(rollmod, -2)}` +
+				`|Small, ${setDice(rollmod, -1)}|Tiny, ${setDice(rollmod, -1)}}]] ]] }}` : 
 				'';
-			var result = `&{template:besmDefault} {{ismelee=${isMelee}}} {{character_name=@{charactername}}} {{pronoun=@{pronoun}}} {{maneuver=${maneuver}}} {{weapon_name=${name}}} {{shock=${shockvalue}}}`;
+			var result = `&{template:besmDefault} {{ismelee=${isMelee}}} ` +
+				`{{character_name=@{charactername}}} {{pronoun=@{pronoun}}} ` +
+				`{{maneuver=${maneuver}}} {{weapon_name=${name}}}`;
 			if (acv > 0) {
-				result = `${result} {{title=Attack}} {{attack=1}} {{target_name=@{target|charactername}}} {{acv=${acv}}} {{damage_type=${damagetype}}} {{damage2=${Math.round(damage * 0.25)}}} {{damage3=${Math.round(damage * 0.35)}}} {{damage4=${Math.round(damage * 0.45)}}} {{damage5=${Math.round(damage * 0.55)}}} {{damage6=${Math.round(damage * 0.65)}}} {{damage7=${Math.round(damage * 0.75)}}} {{damage8=${Math.round(damage * 0.9)}}} {{damage9=${Math.round(damage * 1.05)}}} {{damage10=${Math.round(damage * 1.2)}}} {{damage11=${Math.round(damage * 1.35)}}} {{damage12=${Math.round(damage * 1.5)}}}`;
+				result = `${result} {{title=Attack}} {{attack=1}} {{target_name=@{target|charactername}}} ` +
+					`{{acv=${acv}}} {{damage_type=${damagetype}}} {{damage2=${Math.round(damage * 0.25)}}} ` +
+					`{{damage3=${Math.round(damage * 0.35)}}} {{damage4=${Math.round(damage * 0.45)}}} ` +
+					`{{damage5=${Math.round(damage * 0.55)}}} {{damage6=${Math.round(damage * 0.65)}}} ` +
+					`{{damage7=${Math.round(damage * 0.75)}}} {{damage8=${Math.round(damage * 0.9)}}} ` +
+					`{{damage9=${Math.round(damage * 1.05)}}} {{damage10=${Math.round(damage * 1.2)}}} ` +
+					`{{damage11=${Math.round(damage * 1.35)}}} {{damage12=${Math.round(damage * 1.5)}}}`;
 				if (isWeapon > 0){
 					_.each(weapon.customizations, customization => {
 						console.log(`${debugtext} customization:`); console.log(customization);
@@ -11178,29 +11260,21 @@
 						}
 					});
 				}
-				result = `${result} {{total=[[[[?{Roll is|Normal, ${setDice(rollmod)}|Minor Edge, ${setDice(rollmod, 1)}|Minor Obstacle, ${setDice(rollmod, -1)}|Major Edge, ${setDice(rollmod, 2)}|Major Obstacle, ${setDice(rollmod, -2)}}]]+[[${acv}]]]]}} {{roll=$[[0]]}}`;
+				result = `${result} {{total=[[[[?{Roll is|Normal, ${setDice(rollmod)}` +
+					`|Minor Edge, ${setDice(rollmod, 1)}|Minor Obstacle, ${setDice(rollmod, -1)}` +
+					`|Major Edge, ${setDice(rollmod, 2)}|Major Obstacle, ${setDice(rollmod, -2)}}]]+` +
+					`[[${acv}]]]]}} {{roll=$[[0]]}}`;
 			} else if (dcv > 0) {
 				if (maneuver == 'defendother') result = `${result} {{target_name=@{target|charactername}}}`;
-				result = `${result} {{dcv=${dcv}}} {{title=Defend}} {{defense=1}} {{total=[[[[?{Roll is|Normal, ${setDice(rollmod)}|Minor Edge, ${setDice(rollmod, 1)}|Minor Obstacle, ${setDice(rollmod, -1)}|Major Edge, ${setDice(rollmod, 2)}|Major Obstacle, ${setDice(rollmod, -2)}}]]+[[${dcv}]]]]}} {{roll=$[[0]]}}`;
-				if(forcefield > 0) result = `${result} {{forcefield=${forcefield}}}`;
-				if(armor1 > 0) result = `${result} {{armor1=${armor1}}}`;
-				if(armor2 > 0) result = `${result} {{armor2=${armor2}}}`;
-				if(armor3 > 0) result = `${result} {{armor3=${armor3}}}`;
-				if(mindshield > 0) result = `${result} {{mindshield=${mindshield}}}`;
-				if(absorption1 > 0) result = `${result} {{absorption1=${absorption1}}}`;
-				if(absorption2 > 0) result = `${result} {{absorption2=${absorption2}}}`;
-				if(conversion > 0) result = `${result} {{conversion=${conversion}}}`;
+				result = `${result} {{dcv=${dcv}}} {{title=Defend}} {{defense=1}} ` +
+					`{{total=[[[[?{Roll is|Normal, ${setDice(rollmod)}` +
+					`|Minor Edge, ${setDice(rollmod, 1)}|Minor Obstacle, ${setDice(rollmod, -1)}` +
+					`|Major Edge, ${setDice(rollmod, 2)}|Major Obstacle, ${setDice(rollmod, -2)}}]]+` +
+					`[[${dcv}]]]]}} {{roll=$[[0]]}} ${buildProtectionsString(debug, value, maneuver)}`;
 			} else {
-				result = `&{template:besmDefault} {{character_name=@{charactername}}} {{maneuver=${sourceAttr}}} {{doesnothing=1}} {{title=Does Nothing}}`;
-				if(forcefield > 0) result = `${result} {{forcefield=${forcefield}}}`;
-				if(shield > 0) result = `${result} {{shield=${shield}}}`;
-				if(armor1 > 0) result = `${result} {{armor1=${armor1}}}`;
-				if(armor2 > 0) result = `${result} {{armor2=${armor2}}}`;
-				if(armor3 > 0) result = `${result} {{armor3=${armor3}}}`;
-				if(mindshield > 0) result = `${result} {{mindshield=${mindshield}}}`;
-				if(absorption1 > 0) result = `${result} {{absorption1=${absorption1}}}`;
-				if(absorption2 > 0) result = `${result} {{absorption2=${absorption2}}}`;
-				if(conversion > 0) result = `${result} {{conversion=${conversion}}}`;
+				result = `&{template:besmDefault} {{character_name=@{charactername}}} ` +
+					`{{maneuver=does nothing}} {{doesnothing=1}} {{title=Does Nothing}} ` +
+					`${buildProtectionsString(debug, value, maneuver)}`;
 			}
 			if (debug){
 				console.log(`[setCombatRoll()] activeweapon = ${activeweapon}`);
@@ -11218,7 +11292,6 @@
 				console.log(`[setCombatRoll()] muscle = ${muscle}`);
 				console.log(`[setCombatRoll()] massivedamage = ${massivedamage}`);
 				console.log(`[setCombatRoll()] superstrength = ${superstrength}`);
-				console.log(`[setCombatRoll()] shockvalue = ${shockvalue}`);
 				console.log(`[setCombatRoll()] maneuver = ${maneuver}`);
 				console.log(`[setCombatRoll()] acv = ${acv}`);
 				console.log(`[setCombatRoll()] dcv = ${dcv}`);
