@@ -116,7 +116,7 @@
 		<div class="sheet-weapons sheet-block">
 		<label>Weapons:</label>
 		<span>
-			<span class=sheet-label title="Roll to attack selected weapon at a given to-hit value.">To Hit Roll: </span>
+			<span class=sheet-label title="Roll to attack selected weapon at a given to-hit value.">Attack Roll: </span>
 			<button class=sheet-attack-button type="action" name="act_attack-5">-5</button>
 			<button class=sheet-attack-button type="action" name="act_attack-4">-4</button>
 			<button class=sheet-attack-button type="action" name="act_attack-3">-3</button>
@@ -128,10 +128,14 @@
 			<button class=sheet-attack-button type="action" name="act_attack3">3</button>
 			<button class=sheet-attack-button type="action" name="act_attack4">4</button>
 			<button class=sheet-attack-button type="action" name="act_attack5">5</button>
+			<span style='width:14.5em; display:inline-block;'>&nbsp;</span>
+    	    <button class=sheet-pict-button title="Quote the selected weapon description." type="action" name="act_describeweapon">w</button>
+    	    <button class=sheet-pict-button title="Expand and edit more fields in the selected weapon." type="action" name="act_expandweapon">y</button>
+		  </span>
 		</span>
 		<br>
 		<span>
-			<span class=sheet-label style='width: 2.2em;'> </span>
+			<span class=sheet-label style='width: 1em;'> </span>
 			<span class=sheet-label style='width: 10em;'>Name</span>
 			<span class=sheet-label style='width: 4em;'>Damage</span>
 			<span class=sheet-label style='width: 3.5em;' title="Dex adjustment to hit an enemy.">To Hit</span>
@@ -140,11 +144,8 @@
 			<span class=sheet-label style='width: 1.625em;' title="Not carried, won't count as weight.">NC</span>
 		</span>
 		<fieldset class=repeating_weapons>
-			<div class="sheet-checkbox-cog">
-				<input title="Click to expand" type="checkbox" name="attr_options-flag"><span></span>
-			</div>
 			<div>
-				<input title="Click to select for attack." type="checkbox" name="attr_selected">
+				<input title="Click to select for Attack/Expand/Describe." type="checkbox" name="attr_selected">
 				<input type=text name=attr_weaponname style='width: 10em;'>
 				<input type=text name=attr_weapondamage style='width: 4em;'>
 				<input type=text name=attr_weapondex style='width: 3.5em;'>
@@ -494,6 +495,7 @@
 	</div>
 </rolltemplate>
 
+
 <!-- For initiative, just nice to have a template -->
 <rolltemplate class="sheet-rolltemplate-initiative">
 	<div class="sheet-template-container">
@@ -501,6 +503,20 @@
 		<span class=footer>&nbsp</span>
 	</div>
 </rolltemplate>
+
+
+<!-- For Descriptions, just nice to have a template -->
+<rolltemplate class="sheet-rolltemplate-description">
+	<div class="sheet-template-container">
+		<h4 class=header>{{item_name}}:</h4>
+		<span class=break>&nbsp</span>
+        <div class="sheet-results">
+            <span class=description>{{description}}</span>
+    	</div
+		<span class=footer>&nbsp</span>
+	</div>
+</rolltemplate>
+
 
 
 <script type="text/worker">
@@ -591,6 +607,27 @@
 		});
 	}
 
+	// calls back on this selected weapon or fails.
+	// callback takes the id of the selected one, and all the ids.
+	const onSelectedWeapon = function(callback) {
+		// find selected weapon, if any.
+		getSectionIDs("weapons", function(sectionIds) {
+    		let selectedIds = [];
+    		for (var i = 0; i < sectionIds.length; ++i) {
+    			selectedIds.push(repeatingPropertyName('weapons', sectionIds[i], 'selected'));
+    		}
+    		getAttrs(selectedIds, function(values) {
+    			for (var i = 0; i < sectionIds.length; ++i) {
+    				let id = sectionIds[i];
+    				let selectedName  = repeatingPropertyName('weapons', id, 'selected');
+    				if (values[selectedName] == 'on') {
+    				    callback(id, sectionIds);
+    				}
+    			}
+    		});
+		});
+	}
+
 	on('clicked:st_check3', (info) => {
 		doRollWithDiceString("&{template:stat-check3} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}[STR]]]}} {{roll1=[[3d6]]}}");
 	});
@@ -615,6 +652,27 @@
 		doRollWithDiceString("&{template:stat-check4} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[4d6]]}}");
 	});
 
+	// Select a weapon.
+	on('change:repeating_weapons:selected', (info) => {
+		// get them all, and de check any not me...
+		getSectionIDs("weapons", function(v) {
+    		// Radio button them.
+			let valueMap = {};
+            for (var i = 0; i < v.length; ++i) {
+        		if (info.newValue == 'on') {
+    				let propertyName = repeatingPropertyName('weapons', v[i], 'selected');
+	    			if (propertyName != info.triggerName) {
+		    		    valueMap[propertyName] = 0;
+			    	}
+        		}
+				// and de-expand them all.
+                valueMap[repeatingPropertyName('weapons', v[i], 'options-flag')] = 0;
+        	}
+			setAttrs(valueMap, {silent: true});
+		});
+	});
+
+
 	on('clicked:attack-5'
 	+ ' clicked:attack-4'
 	+ ' clicked:attack-3'
@@ -628,63 +686,84 @@
 	+ ' clicked:attack5', (info) => {
 		let toHit = parseInt(info.triggerName.substring(14))||0;
 
-		// find selected weapon, if any.
-		getSectionIDs("weapons", function(sectionIds) {
-			let selectedIds = [];
-			for (var i = 0; i < sectionIds.length; ++i) {
-				selectedIds.push(repeatingPropertyName('weapons', sectionIds[i], 'selected'));
-			}
-			getAttrs(selectedIds, function(values) {
-				for (var i = 0; i < sectionIds.length; ++i) {
-					let id = sectionIds[i];
-					let selectedName  = repeatingPropertyName('weapons', id, 'selected');
-					if (values[selectedName] == 'on') {
-						// parse the delta.
-						let flavorName = repeatingPropertyName('weapons', id, 'weaponflavor');
-						let weaponDexName  = repeatingPropertyName('weapons', id, 'weapondex');
-						let weaponDamageName = repeatingPropertyName('weapons', id, 'weapondamage');
-						getAttrs(['gender', flavorName, weaponDexName, weaponDamageName], function(v) {
-							let mstring  = `&{template:attack}`
-								+ ` {{weaponname=@{repeating_weapons_${id}_weaponname}}}`
-								+ ` {{roll1=[[3d6]]}}`;
+		onSelectedWeapon(function(id, selectedIds) {
+    		let flavorName = repeatingPropertyName('weapons', id, 'weaponflavor');
+    		let weaponDexName  = repeatingPropertyName('weapons', id, 'weapondex');
+    		let weaponDamageName = repeatingPropertyName('weapons', id, 'weapondamage');
+    		getAttrs(['gender', flavorName, weaponDexName, weaponDamageName], function(v) {
+    			let mstring  = `&{template:attack}`
+    				+ ` {{weaponname=@{repeating_weapons_${id}_weaponname}}}`
+    				+ ` {{roll1=[[3d6]]}}`;
 
-							{ // compute to hit.
-								mstring += ' {{tohit=[[@{DX}[DEX]';
-								// provisionally add weapon dex.
-								if (parseInt(v[weaponDexName])||0) {
-									mstring += ` + @{${weaponDexName}}[WPN_ADJ]`;
-								}
-								// and to hit.
-								if (toHit != 0) {
-									mstring += ` + ${toHit}[TOHIT]`;
-								}
-								// and finish.
-								mstring += ']]}}';
-							}
+    			{ // compute to hit.
+    				mstring += ' {{tohit=[[@{DX}[DEX]';
+    				// provisionally add weapon dex.
+    				if (parseInt(v[weaponDexName])||0) {
+    					mstring += ` + @{${weaponDexName}}[WPN_ADJ]`;
+    				}
+    				// and to hit.
+    				if (toHit != 0) {
+    					mstring += ` + ${toHit}[TOHIT]`;
+    				}
+    				// and finish.
+    				mstring += ']]}}';
+    			}
 
-							// conditionally add damage
-							if (v[weaponDamageName] != '' && v[weaponDamageName] != '0') {
-								mstring += ` {{damage=[[@{${weaponDamageName}}]]}}`;
-							}
+    			// conditionally add damage
+    			if (v[weaponDamageName] != '' && v[weaponDamageName] != '0') {
+    				mstring += ` {{damage=[[@{${weaponDamageName}}]]}}`;
+    			}
 
-							{ // add pronoun.
-								let gender = v.gender.toLowerCase();
-								let pronoun = 'their';
-								if (gender == 'male') pronoun = 'his';
-								else if (gender == 'female') pronoun = 'her'
-								mstring += ` {{pronoun=${pronoun}}}`;
-							}
+    			{ // add pronoun.
+    				let gender = v.gender.toLowerCase();
+    				let pronoun = 'their';
+    				if (gender == 'male') pronoun = 'his';
+    				else if (gender == 'female') pronoun = 'her'
+    				mstring += ` {{pronoun=${pronoun}}}`;
+    			}
 
-							if (v[flavorName] != '') {
-								mstring += ` {{flavor=@{${flavorName}}}}`;
-							}
-							doRollWithDiceString(mstring);
-						});
-					}
-				}
-			});
+    			if (v[flavorName] != '') {
+    				mstring += ` {{flavor=@{${flavorName}}}}`;
+    			}
+    			doRollWithDiceString(mstring);
+		    });
 		});
 	});
+
+	/* Expand/Toggle selected weapon */
+	on('clicked:expandweapon', (info) => {
+        onSelectedWeapon(function (id, sectionIds) {
+            let optionsName = repeatingPropertyName('weapons', id, 'options-flag');
+            getAttrs([optionsName], function(v) {
+                let attrMap = {};
+                // Turn them all off except for the one we want
+                // to turn on or off.
+                for (var i = 0; i < sectionIds.length; ++i) {
+                    let oName = repeatingPropertyName('weapons', sectionIds[i], 'options-flag');
+                    let val = 0;
+                    if (oName == optionsName && v[optionsName] == 0) {
+                        val = 'on';
+                    }
+                    attrMap[oName] = val;
+                }
+                setAttrs(attrMap, {silent: true});
+            });
+	   });
+	});
+
+	/* Describe selected weapon */
+	on('clicked:describeweapon', (info) => {
+        onSelectedWeapon(function (id, sectionIds) {
+    		let macro = '&{template:description}'
+    		+ ` {{item_name=@{${repeatingPropertyName('weapons', id, 'weaponname')}}}}`
+    		+ ` {{description=@{${repeatingPropertyName('weapons', id, 'weapondescription')}}}}`
+    		+ ' {{character_name=@{cname}}}';
+            startRoll(macro, (results) => {
+        		finishRoll( results.rollId, {} );
+    		});
+		});
+	});
+
 
 	on('clicked:repeating_spells', (info) => {
 		let damageName = info.sourceAttribute + '_spelldamage';
@@ -800,24 +879,6 @@
 				stcurrent: hitpoints
 			});
 		});
-	});
-
-	// update selected weapon
-	on('change:repeating_weapons:selected', (info) => {
-		// Radio button them.
-		if (info.newValue == 'on') {
-			// get them all, and de check any not me...
-			getSectionIDs("weapons", function(v) {
-				let valueMap = {};
-				for (var i = 0; i < v.length; ++i) {
-					let propertyName = 'repeating_weapons_' + v[i] + '_selected';
-					if (propertyName != info.triggerName) {
-						valueMap[propertyName] = 0;
-					}
-				}
-				setAttrs(valueMap, {silent: true});
-			});
-		}
 	});
 
 	// Update weight carried.
