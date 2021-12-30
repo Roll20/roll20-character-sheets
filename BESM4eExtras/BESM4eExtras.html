@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.4.3" readonly />
+													<input type="text" class="center" name="attr_version" value="1.4.4" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -10900,11 +10900,14 @@
 				const weapon = _.find(attrdb[`${type}`], w => {
 					if (w.source == rowID) return true;
 				});
+				if (!getIsObject(weapon)) return;
 				const customization = _.find(weapon.customizations, c => {
 					if (c.name == 'ammo') return true;
 				});
+				if (!getIsObject(customization)) return;
 				const ammo = isNaN(parseInt(value[`repeating_attr_${rowID}_ammostate`])) ?
-					getAmmoMax(debug, customization.rank) : parseInt(value[`repeating_attr_${rowID}_ammostate`]);
+					getAmmoMax(debug, customization.rank) : 
+					parseInt(value[`repeating_attr_${rowID}_ammostate`]);
 				const capacity = isNaN(parseInt(value[`repeating_attr_${rowID}_capacitystate`])) ?
 					0 : //parseInt(value[`repeating_attr_${rowID}_capacity`]) :
 					parseInt(value[`repeating_attr_${rowID}_capacitystate`]);
@@ -11029,6 +11032,7 @@
 			const damagetype = 
 				isWeapon ? weapon.damagetype : 'blunt';
 			const isMelee = 
+				type == 'shield' ? true :
 				getIsMelee(debug, weaponclass);
 			const muscle = 
 				isMelee > 0 ? 1 :
@@ -11054,7 +11058,7 @@
 				((level + (superstrength * muscle) + massivedamage + targetedmd) * 5) + acv;
 			let edge = 
 				(isWeapon) ? _.find(weapon.customizations, c => { 
-					if (c.name == 'accurate') return true; 
+					if (c.name == 'accurate' || c.name == 'parry') return true; 
 				}) ||  { rank: 0 } : { rank: 0 };
 			let obstacle = 
 				(isWeapon) ? _.find(weapon.customizations, c => { 
@@ -11266,6 +11270,7 @@
 					`[[${acv}]]]]}} {{roll=$[[0]]}}`;
 			} else if (dcv > 0) {
 				if (maneuver == 'defendother') result = `${result} {{target_name=@{target|charactername}}}`;
+				//if ()
 				result = `${result} {{dcv=${dcv}}} {{title=Defend}} {{defense=1}} ` +
 					`{{total=[[[[?{Roll is|Normal, ${setDice(rollmod)}` +
 					`|Minor Edge, ${setDice(rollmod, 1)}|Minor Obstacle, ${setDice(rollmod, -1)}` +
