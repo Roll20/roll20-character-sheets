@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.4.5" readonly />
+													<input type="text" class="center" name="attr_version" value="1.4.6" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -6504,6 +6504,7 @@
 		const special_defects_regex = /uniquedefect/i;
 		const rollable_attributes_regex = /(healing|inspire|unaffected|exorcism|illusion|metamorphosis|mimic|mindcontrol|nullify|powerflux|powervariation|projection|sixthsense|supersense|telepathy|transfer|transmute)/i;
 		const targetable_attributes_regex = /(healing|exorcism|illusion|metamorphosis|mimic|mindcontrol|nullify|telepathy|transfer)/i;
+		const dymanicGrouRegex = /(flux|variation)/i;
 		
 		const upgrade_to_1_3_1_array = ["upgraded_1_3_1", "attrdb"];
 		const upgrade_to_1_2_2_array = ["upgraded_1_2_2", "name", "charactername"];
@@ -6852,7 +6853,7 @@
 		
 		function setGroupDefectPointsOnActivation(debug, attrIDs, attrdb, value, sectionName, rowID, setObj){
 			const groupid = getGroupID(value, 'attr');
-			const groupType = value[`static_attrgroup_${groupid}_type`] || 'standard';
+			const groupType = value[`static_attrgroup_${groupid}_type`] || 'Standard';
 			const groupSourceID = value[`static_attrgroup_${groupid}_source`];
 			const isPowerFlux = /flux/i.test(groupType);
 			const fluxcost = parseInt(value[`repeating_attr_${groupSourceID}_totalcost`]);
@@ -6888,7 +6889,7 @@
 			const groupType = value[`static_attrgroup_${groupid}_type`];
 			const groupSourceID = value[`static_attrgroup_${groupid}_source`];
 			const isGroupActive = parseInt(value[`repeating_attr_${groupSourceID}_activate`]) || 0;
-			const result = groupType == 'power flux' ? groupSourceID == rowID ? true : 
+			const result = /flux/i.test(groupType) ? groupSourceID == rowID ? true : 
 				isGroupActive ? true : false : true;
 			if(debug){
 				console.log(`${debugtext} groupid = ${groupid}`);
@@ -6903,7 +6904,7 @@
 		function setPoolCostIfGroupIsVariation(debug, isActive, attrIDs, value, rowID, setObj){
 			const debugtext = '[setPoolCostIfGroupIsVariation()]';
 			const groupid = getGroupID(value, 'attr');
-			const groupType = value[`static_attrgroup_${groupid}_type`] || 'standard';
+			const groupType = value[`static_attrgroup_${groupid}_type`] || 'Standard';
 			const isPowerVariation = /variation/i.test(groupType);
 			const groupSourceID = value[`static_attrgroup_${groupid}_source`];
 			const groupIsActive = parseInt(value[`repeating_attr_${groupSourceID}_activate`]);
@@ -6939,7 +6940,7 @@
 		function setPoolCostIfGroupIsFlux(debug, isActive, attrIDs, value, rowID, setObj){
 			const debugtext = '[setPoolCostIfGroupIsFlux()]';
 			const groupid = getGroupID(value, 'attr');
-			const groupType = value[`static_attrgroup_${groupid}_type`] || 'standard';
+			const groupType = value[`static_attrgroup_${groupid}_type`] || 'Standard';
 			const isPowerFlux = /flux/i.test(groupType);
 			if(!isPowerFlux){
 				if(debug) console.log(`${debugtext} isPowerFlux = ${isPowerFlux}`);
@@ -7468,11 +7469,11 @@
 		}
 		
 		function convertToDynamicGroup(debug, attrIDs, attrdb, eventInfo, value, rowID, setObj){
-			const groupType = eventInfo.newValue.toLowerCase();
+			const groupType = capital(eventInfo.newValue);
 			if(debug) console.log(`[convertToDynamicGroup()] groupType = ${groupType}`);
-			if(groupType == 'power flux'){
+			if (/flux/i.test(groupType)) {
 				makeGroupPowerFlux(debug, attrIDs, attrdb, eventInfo, value, rowID, setObj);
-			}else if(groupType == 'power variation'){
+			}else if (/variation/i.test(groupType)) {
 				makeGroupPowerVariation(debug, attrIDs, attrdb, eventInfo, value, rowID, setObj);
 			}else{
 				return;
@@ -7489,21 +7490,21 @@
 			setObj[`static_attrgroup_${groupid}_changemax`] = 0;
 			setObj[`static_attrgroup_${groupid}_changegroup`] = 1;
 			setObj[`static_attrgroup_${groupid}_pointype`] = 'Flux Points';
-			setObj[`static_attrgroup_${groupid}_type`] = 'power flux';
+			setObj[`static_attrgroup_${groupid}_type`] = 'Power Flux';
 			setObj[`static_attrgroup_${groupid}_spent`] = aggregatePoolCost;
 			setObj[`static_attrgroup_${groupid}_groupcost`] = aggregateAttrCost + aggregateDefectPoints;
 		}
 		
-		function makeGroupPowerVariation(debug, attrIDs, attrdb, value, rowID, setObj){
+		function makeGroupPowerVariation(debug, attrIDs, attrdb, eventInfo, value, rowID, setObj){
 			const groupid = getGroupID(value, 'attr');
 			const aggregateAttrCost = getAggregateAttrGroupCost(debug, attrIDs, value, 'attr', rowID, setObj);
 			const aggregateDefectPoints = getAggregateGroupDefectPoints(debug, attrIDs, attrdb, value, rowID, setObj);
-			const aggregatePoolCost = getAggregatePoolCost(debug, attrIDs, value, 'attr', rowID, setObj);
+			const aggregatePoolCost = getAggregatePoolCost(debug, attrIDs, eventInfo, value, 'attr', rowID, setObj);
 			if(debug) console.log(`[makeGroupPowerVariation()] groupid = ${groupid}`);
 			setObj[`static_attrgroup_${groupid}_changemax`] = 1;
 			setObj[`static_attrgroup_${groupid}_changegroup`] = 1;
 			setObj[`static_attrgroup_${groupid}_pointype`] = 'Character Points';
-			setObj[`static_attrgroup_${groupid}_type`] = 'power variation';
+			setObj[`static_attrgroup_${groupid}_type`] = 'Power Variation';
 			setObj[`static_attrgroup_${groupid}_spent`] = aggregatePoolCost;
 			setObj[`static_attrgroup_${groupid}_groupcost`] = aggregateAttrCost + aggregateDefectPoints;
 		}
@@ -7524,11 +7525,12 @@
 		}
 		
 		function setGroupType(debug, attrIDs, attrdb, eventInfo, value, sectionName, rowID, setObj){
-			const dymanicGrouRegex = /(flux|variation)/i;
 			const dynamicGroup = attr => dymanicGrouRegex.test(attr);
-			if(!dynamicGroup(eventInfo.newValue) && !dynamicGroup(eventInfo.previousValue)){
+			const isDynamic = dynamicGroup(eventInfo.newValue);
+			const wasDynamic = dynamicGroup(eventInfo.previousValue);
+			if(!isDynamic && !wasDynamic){
 				return;
-			}else if(!dynamicGroup(eventInfo.newValue) && dynamicGroup(eventInfo.previousValue)){
+			}else if(!isDynamic && wasDynamic){
 				convertToStandardGroup(debug, attrIDs, attrdb, value, rowID, setObj);
 			}else{
 				convertToDynamicGroup(debug, attrIDs, attrdb, eventInfo, value, rowID, setObj);
@@ -7541,22 +7543,22 @@
 				case `standard`: //standard
 					setObj[`static_attrgroup_${groupid}_changegroup`] = 0;
 					setObj[`static_attrgroup_${groupid}_pointype`] = "";
-					setObj[`static_attrgroup_${groupid}_type`] = "standard";
+					setObj[`static_attrgroup_${groupid}_type`] = "Standard";
 					break;
 				case `power flux`: //power flux
 					setObj[`static_attrgroup_${groupid}_changegroup`] = 1;
 					setObj[`static_attrgroup_${groupid}_pointype`] = "Flux Points";
-					setObj[`static_attrgroup_${groupid}_type`] = "power flux";
+					setObj[`static_attrgroup_${groupid}_type`] = "Power Flux";
 					break;
 				case `power variation`: //power variation
 					setObj[`static_attrgroup_${groupid}_changegroup`] = 1;
 					setObj[`static_attrgroup_${groupid}_pointype`] = "Character Points";
-					setObj[`static_attrgroup_${groupid}_type`] = "power variation";
+					setObj[`static_attrgroup_${groupid}_type`] = "Power Variation";
 					break;
 				default:
 					setObj[`static_attrgroup_${groupid}_changegroup`] = 0;
 					setObj[`static_attrgroup_${groupid}_pointype`] = "";
-					setObj[`static_attrgroup_${groupid}_type`] = "standard";
+					setObj[`static_attrgroup_${groupid}_type`] = "Standard";
 			}
 			if (debug) {
 				console.log(`[setAttrGroupType(${sourceAttr})] grouptype = ${grouptype}`);
@@ -7621,7 +7623,7 @@
 		}
 		
 		function getGroupID(value, sectionName) {
-			return parseInt(value[`static_${sectionName}group_selected_tab`].replace(/\D/g, '')) || 0;
+			return parseInt(value[`static_${sectionName}group_selected_tab`].replace(/\D/ig, '')) || 0;
 		}
 		
 		function setDynamicGroupSourceID(debug, eventInfo, value, attrIDs, source, rowID, setObj) {
@@ -9243,22 +9245,14 @@
 						parseInt(value.static_button_personal_defense) ?
 						'personal' :
 						'';
-					console.log(`[setCombatRoll(TEST)] defensetype = ${defensetype}`);
-					
 					const bonus = defensetype != '' ? 
 						getSumOfActiveAttrLevels(attrdb, 'rangeddefense', defensetype) * 2 :
 						0;
-					console.log(`[setCombatRoll(TEST)] bonus = ${bonus}`);
-					
 					cv = getCV(debug, value, attrdb, setObj, sourceAttr, 'dcv')  + bonus;
-					console.log(`[setCombatRoll(TEST)] cv = ${cv}`);
-		
 					type = '{{dcvroll=1}}';
 					title = '{{title=Roll DCV}}';
 					stat = `{{dcv=${cv}}}`;
 					base = cv;
-					console.log(`[setCombatRoll(TEST)] base = ${base}`);
-		
 					result = `${result} ${buildProtectionsString(debug, value)}`;
 					break;
 				case 'initiative':
@@ -10131,7 +10125,6 @@
 						setArms(debug, rowID, setObj, name, true, extraarmID);
 						setObj[`repeating_extraarm_${extraarmID}_type`] = 0;
 						setObj[`repeating_extraarm_${extraarmID}_label`] = capital(attribute);
-						//updateWeaponStates(debug, attrdb, extraarmIDs, value, extraarmID, sourceAttr, setObj);
 					} else {
 						var source = setObj[`repeating_attr_${rowID}_source`] || 
 							value[`repeating_attr_${rowID}_source`] || "";
@@ -10151,7 +10144,6 @@
 							});
 							result = mountid.toString();
 						}
-						//updateWeaponStates(debug, attrdb, extraarmIDs, value, result, sourceAttr, setObj);
 						removeRepeatingRow(`repeating_extraarm_${result}`);
 					}
 				break;
@@ -10549,15 +10541,15 @@
 					const totalcost = parseInt(value[`repeating_attr_${id}_totalcost`]);
 					const appliedCost = group == groupid ? 
 						id == rowID ? 0 : 
-						groupType == 'power flux' ? activated ? totalcost : 0 :
+						/flux/i.test(groupType) ? activated ? totalcost : 0 :
 						totalcost : 0;
 					return appliedCost;
 				})
 				.reduce((memo, num)=>{ return memo + num; }, 0)
 				.value();
-			const max = isActive ? groupType == 'power flux' ? 
+			const max = isActive ? /flux/i.test(groupType) ? 
 				parseInt(value[`repeating_${sectionName}_${rowID}_effectivelevel`]) * 5 : 
-				groupType == 'power variation' ? groupCost : 0 : 0;
+				/variation/i.test(groupType) ? groupCost : 0 : 0;
 			setObj[`static_${sectionName}group_${groupid}_groupmax`] = max;
 		}
 		
@@ -10571,15 +10563,15 @@
 					const activated = parseInt(setObj[`repeating_${sectionName}_${id}_activate`]) ||
 						parseInt(value[`repeating_${sectionName}_${id}_activate`]);
 					const totalcost = parseInt(value[`repeating_${sectionName}_${id}_totalcost`]);
-					const appliedCost = group == groupid ? groupType == 'power flux' ? activated ? totalcost : 0 :
-						groupType == 'power variation' ? totalcost : 0 : 0;
+					const appliedCost = group == groupid ? /flux/i.test(groupType) ? activated ? totalcost : 0 :
+						/variation/i.test(groupType) ? totalcost : 0 : 0;
 					return appliedCost;
 				})
 				.reduce((memo, num)=>{ return memo + num; }, 0)
 				.value();
 			if(isActive){
-				const groupcost = groupType == 'power flux' ? dynamicGroupCost : 
-					groupType == 'power variation' ? aggregateAttrCost : 0;
+				const groupcost = /flux/i.test(groupType) ? dynamicGroupCost : 
+					/variation/i.test(groupType) ? aggregateAttrCost : 0;
 				setObj[`static_${sectionName}group_${groupid}_spent`] = aggregateAttrCost - dynamicGroupCost;
 				setObj[`static_${sectionName}group_${groupid}_groupcost`] = groupcost;
 			}else{
@@ -10930,7 +10922,7 @@
 					getAmmoMax(debug, customization.rank) : 
 					parseInt(value[`repeating_attr_${rowID}_ammostate`]);
 				const capacity = isNaN(parseInt(value[`repeating_attr_${rowID}_capacitystate`])) ?
-					0 : //parseInt(value[`repeating_attr_${rowID}_capacity`]) :
+					0 :
 					parseInt(value[`repeating_attr_${rowID}_capacitystate`]);
 				setObj.weapon_ammo_reloads = ammo;
 				setObj.weapon_ammo_capacity = capacity;
@@ -11291,7 +11283,6 @@
 					`[[${acv}]]]]}} {{roll=$[[0]]}}`;
 			} else if (dcv > 0) {
 				if (maneuver == 'defendother') result = `${result} {{target_name=@{target|charactername}}}`;
-				//if ()
 				result = `${result} {{dcv=${dcv}}} {{title=Defend}} {{defense=1}} ` +
 					`{{total=[[[[?{Roll is|Normal, ${setDice(rollmod)}` +
 					`|Minor Edge, ${setDice(rollmod, 1)}|Minor Obstacle, ${setDice(rollmod, -1)}` +
