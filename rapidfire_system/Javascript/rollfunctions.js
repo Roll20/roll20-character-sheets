@@ -16,6 +16,20 @@ const skillRollDetails = function({section,rowID,sections,attributes,rollObj,act
   rollObj.roll = `[[1d6 + ${stat} + [[0${skill}]][${rollObj.header}] + ${penalty}[Damage Penalty]${actionPenalty}]]`;
 };
 
+//determines which health track's penalties should affect an attribute
+const determineHealthType = function(section,field){
+  const attrCharacterLookup = {
+    'situational-awareness':'structure',
+    'remnant-initiative':'structure',
+    'assault-roll':'structure',
+    'strike-roll':'structure',
+    'motion-roll':'structure',
+    repeating_drone:'structure',
+    'repeating_remnant-weapon':'structure'
+  };
+  return attrCharacterLookup[section] || attrCharacterLookup[field] || 'health';
+};
+
 const weaponRollDetails = function({section,rowID,field,sections,attributes,rollObj,actionPenalty}){
   rollObj.header = attributes[`${section}_${rowID}_name`];
   let skill;
@@ -74,7 +88,7 @@ const droneRollDetails = async function({section,rowID,field,attributes,rollObj,
 };
 
 const initiateRoll = function(event){
-  let [section,rowID,field] = parseClickTrigger(event.triggerName);
+  let [section,rowID,field] = parseTriggerName(event.triggerName);
   field = field.replace(/-action/,'');
   const rollSwitch = {
     repeating_weapon:weaponRollDetails,
@@ -116,6 +130,7 @@ const initiateRoll = function(event){
     executeRoll(rollObj);
   }});
 };
+funcs.initiateRoll = initiateRoll;
 
 const determineActionPenalty = function(attributes){
   const stateSwitch = {
