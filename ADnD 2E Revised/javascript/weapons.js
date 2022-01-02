@@ -1174,6 +1174,7 @@ weapons['long spear (two-handed)'] = {
 };
 weapons['stiletto'] = {
     'name': 'Stiletto',
+    'group': 'Knife',
     'strength': true,
     'rof': '2/1',
     'range': '10/20/30',
@@ -1314,4 +1315,80 @@ weapons['scythe'] = {
     'category': ['Melee']
 };
 //endregion
+
+//#region Arms and Equipment
+weapons['parrying dagger'] = {
+    'name': 'Parrying dagger',
+    'noProf': true,
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Melee']
+};
+weapons['renseur'] = {
+    'name': 'Renseur',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'small-medium': '2d4',
+    'large': '2d4',
+    'knockdown': 'd8',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Melee']
+};
+weapons['sap'] = {
+    'name': 'Sap',
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'small-medium': '1d2',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Melee']
+};
+weapons['staff sling (stinkpot)'] = {
+    'name': 'Staff sling (Stinkpot)',
+    'strength': true,
+    'rof': '2/1',
+    'range': '—/30-60/90',
+    'size': 'M',
+    'type': 'B',
+    'speed': 11,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Range']
+};
+weapons['claymore'] = {
+    'name': 'Claymore',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 8,
+    'small-medium': '2d4',
+    'large': '2d8',
+    'knockdown': 'd10',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Melee']
+};
+weapons['falchion'] = {
+    'name': 'Falchion',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 5,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Melee']
+};
+//#endregion
 module.exports = weapons;

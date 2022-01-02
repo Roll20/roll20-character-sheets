@@ -7,7 +7,7 @@ const INFO = 'info';
 const WARNING = 'warning';
 const ERROR = 'error';
 
-const BOOK_FIELDS = ['book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb', 'book-tom'];
+const BOOK_FIELDS = ['book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb', 'book-tom', 'book-aaeg'];
 
 //#region Helper function
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
@@ -1408,7 +1408,7 @@ on('change:repeating_profs:profname', function (eventInfo) {
     getAttrs(BOOK_FIELDS, function (books) {
         if (bookInactiveShowToast(books, nonweaponProficiency))
             return;
-        
+
         setAttrs({
             'repeating_profs_profslots'  : nonweaponProficiency['slots'],
             'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
