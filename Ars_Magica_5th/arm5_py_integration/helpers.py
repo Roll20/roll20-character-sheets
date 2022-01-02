@@ -145,7 +145,7 @@ class RollTemplate:
             f"&{{template:{self.name}}}",
             *("{{%s=%s}}" % field for field in self.fields.items()),
             "{{botch-button=[@{botch_i18n}!](~@{character_name}|%s)}}" % self.botch,
-            "{{crit-button=[@{botch_i18n}!](~@{character_name}|%s)}}" % self.critical,
+            "{{crit-button=[@{critical_i18n}!](~@{character_name}|%s)}}" % self.critical,
         ]
         return " ".join(parts)
 
