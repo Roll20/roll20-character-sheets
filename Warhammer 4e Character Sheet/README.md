@@ -76,7 +76,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 January 3rd 2022 v1.53.2
 
 - Fix for Characteristics modifier which was adding twice on the skill target display in rolls.
-
+- Resolved issue with Custom Spell Advantage rule (which basic removed advantage modifier from casting), this will now also disable Advantage for Langange Magick skill roll aswell as spellbook rolls. And removes the gold star indicator when disabled too.
 
 December 6th 2021 v1.53.1
 
