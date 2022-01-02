@@ -19,6 +19,7 @@ TRANSLATION_ATTRS = (
         ("critical", "Critical", "critical"),
         ("damage", "Damage", "damage"),
         ("defense", "Defense", "defense"),
+        ("deficiency", "Deficiency", "deficiency"),
         ("encumbrance", "Encumbrance", "encumbrance"),
         ("exaggerated", "Exaggerated", "gestures-exaggerated"),
         ("fatigue", "Fatigue", "fatigue-m"),

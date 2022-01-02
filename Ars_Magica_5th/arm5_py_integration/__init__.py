@@ -12,6 +12,8 @@ from .helpers import (
     TECHNIQUES,
     enumerate_helper,
     repeat_template,
+    rolltemplate,
+    roll,
 )
 from .translations import translation_attrs, translation_attrs_setup
 
@@ -115,29 +117,17 @@ GLOBALS = {
 
 
 # Personality traits
-personnality_roll = (
-    "[[@{Personality_Trait$$_Score}]] [@{Personality_Trait$$}] "
-    "+ (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]"
+personnality_roll = roll(
+    "[[@{Personality_Trait$$_Score}]] [@{Personality_Trait$$}]",
+    "(?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]",
 )
-personnality_roll_template = (
-    "&{template:generic} "
-    "{{Banner=^{personality} ^{roll}}} "
-    "{{Label=@{Personality_Trait$$}}} "
-    "{{Result=[[%(die)s + %(roll)s ]]}} "
+personnality_template = rolltemplate(
+    "generic",
+    Banner="^{personality} ^{roll}",
+    Label="@{Personality_Trait$$}",
+    Result=f"[[ %(die)s + {personnality_roll} ]]",
 )
-personnality_roll_template_simple = personnality_roll_template % {
-    "roll": personnality_roll,
-    "die": "@{simple-die}",
-}
-personnality_roll_template_stress = (
-    (personnality_roll_template % {"roll": personnality_roll, "die": "@{stress-die}"})
-    # Additional roll template fields for stress rolls
-    + (
-        "{{stress=1}} "
-        "{{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} "
-        "{{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
-    )
-)
+
 GLOBALS["personality_trait_rows"] = repeat_template(
     textwrap.dedent(
         f"""\
@@ -145,8 +135,8 @@ GLOBALS["personality_trait_rows"] = repeat_template(
             <td><input type="text" class="heading_2" style="width:245px" name="attr_Personality_Trait$$"/></td>
             <td><input type="text" class="number_1" style="width:70px;" name="attr_Personality_Trait$$_score"/></td>
             <td><div class="flex-container">
-                <button type="roll" class="button simple-roll" name="roll_personality$$_simple" value="{personnality_roll_template_simple}"></button>
-                <button type="roll" class="button stress-roll" name="roll_personality$$_stress" value="{personnality_roll_template_stress}"></button>
+                <button type="roll" class="button simple-roll" name="roll_personality$$_simple" value="{personnality_template.simple}"></button>
+                <button type="roll" class="button stress-roll" name="roll_personality$$_stress" value="{personnality_template.stress}"></button>
             </div></td>
         </tr>"""
     ),
@@ -156,28 +146,15 @@ GLOBALS["personality_trait_rows"] = repeat_template(
 
 
 # Reputations
-reputation_roll = (
-    "[[@{Reputations$$_Score}]] [@{Reputations$$}] "
-    "+ (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]"
+reputation_roll = roll(
+    "[[@{Reputations$$_Score}]] [@{Reputations$$}]",
+    "(?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]",
 )
-reputation_roll_template = (
-    "&{template:generic} "
-    "{{Banner=^{reputation} ^{roll}}} "
-    "{{Label=@{Reputations$$}}} "
-    "{{Result=[[%(die)s + %(roll)s ]] }}"
-)
-reputation_roll_template_simple = reputation_roll_template % {
-    "roll": reputation_roll,
-    "die": "@{simple-die}",
-}
-reputation_roll_template_stress = (
-    (reputation_roll_template % {"roll": reputation_roll, "die": "@{simple-die}"})
-    # Additiona roll template fields for stress rolls
-    + (
-        " {{stress=1}} "
-        "{{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} "
-        "{{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
-    )
+reputation_template = rolltemplate(
+    "generic",
+    Banner="^{reputation} ^{roll}",
+    Label="@{Reputations$$}",
+    Result=f"[[ %(die)s + {reputation_roll} ]]",
 )
 GLOBALS["reputation_rows"] = repeat_template(
     textwrap.dedent(
@@ -187,8 +164,8 @@ GLOBALS["reputation_rows"] = repeat_template(
             <td><input type="text" class="heading_2a" name="attr_Reputations$$_type"/></td>
             <td><input type="text" class="number_1" style="width:50px;" name="attr_Reputations$$_score"/></td>
             <td><div class="flex-container">
-                <button type="roll" class="button simple-roll" name="roll_reputation$$_simple" value="{reputation_roll_template_simple}"></button>
-                <button type="roll" class="button stress-roll" name="roll_reputation$$_stress" value="{reputation_roll_template_stress}"></button>
+                <button type="roll" class="button simple-roll" name="roll_reputation$$_simple" value="{reputation_template.simple}"></button>
+                <button type="roll" class="button stress-roll" name="roll_reputation$$_stress" value="{reputation_template.stress}"></button>
             </div></td>
         </tr>"""
     ),
@@ -198,39 +175,25 @@ GLOBALS["reputation_rows"] = repeat_template(
 
 
 # Characteristics definitions
-characteristic_roll = (
-    "(@{%(Char)s_Score}) [@{%(char)s_i18n}] "
-    "+ (@{wound_total}) [@{wounds_i18n}] "
-    "+ ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] "
-    "+ (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]"
+characteristic_roll = roll(
+    "(@{%%(Char)s_Score}) [@{%%(char)s_i18n}]",
+    "(@{wound_total}) [@{wounds_i18n}]",
+    "([[floor(@{Fatigue})]]) [@{fatigue_i18n}]",
+    "(?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]",
 )
-characteristic_roll_template = (
-    "&{template:ability} "
-    "{{name= @{character_name}}} "
-    "{{label0=^{%%(char)s}}} "
-    "{{banner=@{%%(Char)s_Description}}} "
-    "{{label1=^{score}}} "
-    "{{result1=@{%%(Char)s_Score}}} "
-    "{{label2=^{characteristic-m}}} "
-    "{{label2=^{weakness-m}}} "
-    "{{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} "
-    "{{label3=^{circumstances-m}}} "
-    "{{result3=[[(?{@{circumstantial_i18n}|0})]]}} "
-    "{{result0=[[ %(die)s + %(roll)s ]]}} "
-    "{{stress=%(stress)s}} "
-    "{{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} "
-    "{{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
+characteristic_template = rolltemplate(
+    "ability",
+    name="@{character_name}",
+    label0="^{%%(char)s}",
+    result0=f"[[ %(die)s + {characteristic_roll} ]]",
+    banner="@{%%(Char)s_Description}",
+    label1="^{score}",
+    result1="@{%%(Char)s_Score}",
+    label2="^{weakness-m}",
+    result2="[[ [[floor(@{Fatigue})]] [@{fatigue_i18n}] + @{wound_total} [@{wounds_i18n}] ]]",
+    label3="^{circumstances-m}",
+    result3="[[(?{@{circumstantial_i18n}|0})]]",
 )
-characteristic_roll_template_simple = characteristic_roll_template % {
-    "roll": characteristic_roll,
-    "die": "@{simple-die}",
-    "stress": "",
-}
-characteristic_roll_template_stress = characteristic_roll_template % {
-    "roll": characteristic_roll,
-    "die": "@{stress-die}",
-    "stress": "1",
-}
 GLOBALS["characteristic_rows"] = repeat_template(
     textwrap.dedent(
         f"""\
@@ -240,8 +203,8 @@ GLOBALS["characteristic_rows"] = repeat_template(
             <td><input type="text" class="number_1" name="attr_%(Char)s_Score" value="0"/></td>
             <td><input type="text" class="number_1" name="attr_%(Char)s_Aging" value="0"/></td>
             <td><div class="flex-container">
-                <button type="roll" class="button simple-roll" name="roll_%(Char)s_simple" value="{characteristic_roll_template_simple}"></button>
-                <button type="roll" class="button stress-roll" name="roll_%(Char)s_stress" value="{characteristic_roll_template_stress}"></button>
+                <button type="roll" class="button simple-roll" name="roll_%(Char)s_simple" value="{characteristic_template.simple}"></button>
+                <button type="roll" class="button stress-roll" name="roll_%(Char)s_stress" value="{characteristic_template.stress}"></button>
             </div></td>
         </tr>"""
     ),
@@ -279,50 +242,44 @@ GLOBALS["characteristic_name_ask_attr"] = (
 )
 
 # Abilities
-ability_roll = (
-    "(@{Ability_Score} + @{Ability_Puissant}) [@{Ability_name}] "
-    "+ (@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_Score@{sys_rbk}) [@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_i18n@{sys_rbk}] "
-    "+ (@{wound_total}) [@{wounds_i18n}] "
-    "+ ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] "
-    "+ (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]"
+ability_roll = roll(
+    "(@{Ability_Score} + @{Ability_Puissant}) [@{Ability_name}]",
+    "(@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_Score@{sys_rbk}) [@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_i18n@{sys_rbk}]",
+    "(@{wound_total}) [@{wounds_i18n}]",
+    "([[floor(@{Fatigue})]]) [@{fatigue_i18n}]",
+    "(?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]",
 )
-ability_roll_template = (
-    "&{template:ability} "
-    "{{name=@{character_name}}} "
-    "{{label0=@{Ability_name}}} "
-    "{{banner=@{Ability_Speciality}}} "
-    "{{label1=^{rank}}} "
-    "{{result1= [[ @{Ability_Score} + @{Ability_Puissant} ]]}} "
-    "{{label2=@{Ability_CharacName}}} "
-    "{{result2=[[@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_Score@{sys_rbk}]]}} "
-    "{{label3=^{weakness-m}}} "
-    "{{result3=[[ ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (@{wound_total}) [@{wounds_i18n}] ]]}} "
-    "{{label4=^{circumstances-m}}} "
-    "{{result4=[[(?{@{circumstantial_i18n}|0})]]}} "
-    "{{result0=[[ %(die)s + %(roll)s ]]}} "
-    "{{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} "
-    "{{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
+ability_template = rolltemplate(
+    "ability",
+    name="@{character_name}",
+    label0="@{Ability_name}",
+    result0=f"[[ %(die)s + {ability_roll} ]]",
+    banner="@{Ability_Speciality}",
+    label1="^{rank}",
+    result1="[[ @{Ability_Score} + @{Ability_Puissant} ]]",
+    label2="@{Ability_CharacName}",
+    result2="[[ @{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_Score@{sys_rbk} ]]",
+    label3="^{weakness-m}",
+    result3="[[ ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (@{wound_total}) [@{wounds_i18n}] ]]",
+    label4="^{circumstances-m}",
+    result4="[[ (?{@{circumstantial_i18n}|0}) ]]",
 )
 
-GLOBALS["ability_roll_simple"] = ability_roll_template % {
-    "roll": ability_roll,
-    "die": "@{simple-die}",
-}
-GLOBALS["ability_roll_stress"] = (
-    ability_roll_template % {"roll": ability_roll, "die": "@{stress-die}"}
-) + " {{stress=1}}"
+GLOBALS["ability_roll_simple"] = ability_template.simple
+GLOBALS["ability_roll_stress"] = ability_template.stress
 
 
 # Technique definitions
 GLOBALS["technique_definitions"] = repeat_template(
-    """<tr>
-    <td><input type="text" class="number_3" name="attr_%(Tech)s_Score" value="0"/></td>
-    <td data-i18n="%(tech)s" >%(Tech)s</td>
-    <td>"""
-    + xp("%(Tech)s")
-    + """</td>
-    <td style="text-align: center"><input type="text" class="number_3 minor" name="attr_%(Tech)s_Puissant" value="0"/></td>
-</tr>""",
+    textwrap.dedent(
+        f"""\
+        <tr>
+            <td><input type="text" class="number_3" name="attr_%(Tech)s_Score" value="0"/></td>
+            <td data-i18n="%(tech)s" >%(Tech)s</td>
+            <td>{xp("%(Tech)s")}</td>
+            <td style="text-align: center"><input type="text" class="number_3 minor" name="attr_%(Tech)s_Puissant" value="0"/></td>
+        </tr>"""
+    ),
     TECHNIQUES,
     str_key="tech",
 )
@@ -351,15 +308,14 @@ GLOBALS["technique_enumerated_options"] = repeat_template(
 )
 
 # Form definitions
-form_template = (
-    """<tr>
-    <td><input type="text" class="number_3" name="attr_%(Form)s_Score" value="0"/></td>
-    <td data-i18n="%(form)s" >%(Form)s</td>
-    <td>"""
-    + xp("%(Form)s")
-    + """</td>
-    <td style="text-align: center"><input type="text" class="number_3 minor" name="attr_%(Form)s_Puissant" value="0"/></td>
-</tr>"""
+form_template = textwrap.dedent(
+    f"""\
+    <tr>
+        <td><input type="text" class="number_3" name="attr_%(Form)s_Score" value="0"/></td>
+        <td data-i18n="%(form)s" >%(Form)s</td>
+        <td>{xp("%(Form)s")}</td>
+        <td style="text-align: center"><input type="text" class="number_3 minor" name="attr_%(Form)s_Puissant" value="0"/></td>
+    </tr>"""
 )
 GLOBALS["form_definitions_1"] = repeat_template(
     form_template, FORMS[:5], str_key="form"
@@ -394,150 +350,121 @@ GLOBALS["form_enumerated_options"] = repeat_template(
 
 # Casting rolls
 ## Magic tab
-spontaneous_roll_template = (
-    "&{template:arcane} "
-    "{{label0=^{spontaneous} ^{casting}}} "
-    "{{result0=%(roll)s}} "
-    "{{label1=^{aura}}} "
-    "{{result1=@{aura}}} "
-    "{{label2=^{weakness-m}}} "
-    "{{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} "
-    "{{label3=^{circumstances-m}}} "
-    "{{result3=?{@{modifiers_i18n}|0}}} "
-    "{{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} "
-    "{{crit-button=[@{critical_i18n}!](~@{character_name}|critical-spontaneous)}}"
+spontaneous_roll = roll(
+    "@{Spontaneous1_Technique}",
+    "@{Spontaneous1_Form}",
+    "([[@{Spontaneous1_Focus}]]) [@{focus_i18n}]",
+    "(@{gestures})",
+    "(@{words})",
+    "(@{Stamina_Score}) [@{stamina_i18n}]",
+    "(@{aura}) [@{aura_i18n}]",
+    "([[floor(@{Fatigue})]]) [@{fatigue_i18n}]",
+    "(@{wound_total}) [@{wounds_i18n}]",
+    "(?{@{modifiers_i18n}|0}) [@{modifiers_i18n}]",
 )
-spontaneous_roll = (
-    "[[("
-    "%(die)s "
-    "+ @{Spontaneous1_Technique} "
-    "+ @{Spontaneous1_Form} "
-    "+ ([[@{Spontaneous1_Focus}]]) [@{focus_i18n}] "
-    "+ (@{gestures}) "
-    "+ (@{words}) "
-    "+ (@{Stamina_Score}) [@{stamina_i18n}] "
-    "+ (@{aura}) [@{aura_i18n}] "
-    "+ ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] "
-    "+ (@{wound_total}) [@{wounds_i18n}] "
-    "+ (?{@{modifiers_i18n}|0}) [@{modifiers_i18n}]"
-    " )/2 ]]"
+spontaneous_template = rolltemplate(
+    "arcane",
+    label0="^{spontaneous} ^{casting}",
+    result0=f"[[ (%(die)s + {spontaneous_roll} )/2 ]]",
+    label1="^{aura}",
+    result1="@{aura}",
+    label2="^{weakness-m}",
+    result2="[[ (@{wound_total}) [@{wounds_i18n}] + [[floor(@{fatigue})]] [@{fatigue_i18n}] ]]",
+    label3="^{circumstances-m}",
+    result3="[[ ?{@{modifiers_i18n}|0} ]]",
+    critical="critical-spontaneous",
 )
-GLOBALS["spontaneous_roll_simple"] = spontaneous_roll_template % {
-    "roll": spontaneous_roll % {"die": "@{simple-die}"}
-}
-GLOBALS["spontaneous_roll_stress"] = (
-    spontaneous_roll_template % {"roll": spontaneous_roll % {"die": "@{stress-die}"}}
-) + " {{stress=1}}"
-
-ceremonial_roll_template = (
-    "&{template:arcane} "
-    "{{label0=^{ceremonial} ^{casting}}} "
-    "{{result0= %(roll)s }} "
-    "{{label1=^{aura}}} "
-    "{{result1=@{aura}}} "
-    "{{label2=^{weakness-m}}} "
-    "{{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} "
-    "{{label3=^{circumstances-m}}} "
-    "{{result3=?{@{modifiers_i18n}|0}}} "
-    "{{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} "
-    "{{crit-button=[@{critical_i18n}!](~@{character_name}|critical-spontaneous)}}"
-)
-ceremonial_roll = (
-    "[[("
-    "%(die)s"
-    "+ @{Ceremonial_Technique} "
-    "+ @{Ceremonial_Form} "
-    "+ ([[@{Ceremonial_Focus}]]) [@{focus_i18n}] "
-    "+ (@{gestures}) "
-    "+ (@{words}) "
-    "+ (@{Stamina_Score}) [@{stamina_i18n}] "
-    "+ (@{aura}) [@{aura_i18n}] "
-    "+ ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] "
-    "+ (@{wound_total}) [@{wounds_i18n}] "
-    "+ (@{Ceremonial_Artes_Lib}) [@{artes_i18n}] "
-    "+ (@{Ceremonial_Philos}) [@{philos_i18n}] "
-    "+ (?{@{modifiers_i18n}|0}) [@{modifiers_i18n}] "
-    ")/2  ]]"
-)
-GLOBALS["ceremonial_roll_simple"] = ceremonial_roll_template % {
-    "roll": ceremonial_roll % {"die": "@{simple-die}"}
-}
-GLOBALS["ceremonial_roll_stress"] = (
-    ceremonial_roll_template % {"roll": ceremonial_roll % {"die": "@{stress-die}"}}
-) + " {{stress=1}}"
+# GLOBALS["spontaneous_roll_simple"] = spontaneous_template.simple
+GLOBALS["spontaneous_roll_stress"] = spontaneous_template.stress
 
 
-formulaic_roll_template = (
-    "&{template:arcane} "
-    "{{label0=^{formulaic} ^{casting}}} "
-    "{{result0= %(roll)s }} "
-    "{{label1=^{aura}}} "
-    "{{result1=@{aura}}} "
-    "{{label2=^{weakness-m}}} "
-    "{{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} "
-    "{{label3=^{circumstances-m}}} "
-    "{{result3=?{@{modifiers_i18n}|0}}} "
-    "{{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} "
-    "{{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
+ceremonial_roll = roll(
+    "@{Ceremonial_Technique}",
+    "@{Ceremonial_Form}",
+    "([[@{Ceremonial_Focus}]]) [@{focus_i18n}]",
+    "(@{gestures})",
+    "(@{words})",
+    "(@{Stamina_Score}) [@{stamina_i18n}]",
+    "(@{aura}) [@{aura_i18n}]",
+    "([[floor(@{Fatigue})]]) [@{fatigue_i18n}]",
+    "(@{wound_total}) [@{wounds_i18n}]",
+    "(@{Ceremonial_Artes_Lib}) [@{artes_i18n}]",
+    "(@{Ceremonial_Philos}) [@{philos_i18n}]",
+    "(?{@{modifiers_i18n}|0}) [@{modifiers_i18n}]",
 )
-formulaic_roll = (
-    "[["
-    "%(die)s "
-    "+ @{Formulaic_Technique} "
-    "+ @{Formulaic_Form} "
-    "+ ([[@{Formulaic_Focus}]]) [@{focus_i18n}] "
-    "+ (@{gestures}) "
-    "+ (@{words}) "
-    "+ (@{Stamina_Score}) [@{stamina_i18n}] "
-    "+ (@{aura}) [@{aura_i18n}] "
-    "+ ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (@{wound_total}) [@{wounds_i18n}] "
-    "+ (?{@{modifiers_i18n}|0}) [@{modifiers_i18n}] "
-    "]]"
+ceremonial_template = rolltemplate(
+    "arcane",
+    label0="^{ceremonial} ^{casting}",
+    result0=f"[[ (%(die)s + {ceremonial_roll} )/2 ]]",
+    label1="^{aura}",
+    result1="@{aura}",
+    label2="^{weakness-m}}} ",
+    result2="[[ (@{wound_total}) [@{wounds_i18n}] + [[floor(@{fatigue})]] [@{fatigue_i18n}] ]]",
+    label3="^{circumstances-m}",
+    result3="?{@{modifiers_i18n}|0}",
+    critical="critical-spontaneous",
 )
-GLOBALS["formulaic_roll_simple"] = formulaic_roll_template % {
-    "roll": formulaic_roll % {"die": "@{simple-die}"}
-}
-GLOBALS["formulaic_roll_stress"] = (
-    formulaic_roll_template % {"roll": formulaic_roll % {"die": "@{stress-die}"}}
-) + " {{stress=1}}"
 
-ritual_roll_template = (
-    "&{template:arcane} "
-    "{{label0=^{ritual} ^{casting}}} "
-    "{{result0= %(roll)s }} "
-    "{{label1=^{aura}}} "
-    "{{result1=@{aura}}} "
-    "{{label2=^{weakness-m}}} "
-    "{{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} "
-    "{{label3=^{circumstances-m}}} "
-    "{{result3=?{@{modifiers_i18n}|0}}} "
-    "{{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} "
-    "{{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
+# GLOBALS["ceremonial_roll_simple"] = ceremonial_template.simple
+GLOBALS["ceremonial_roll_stress"] = ceremonial_template.stress
+
+
+formulaic_roll = roll(
+    "@{Formulaic_Technique}",
+    "@{Formulaic_Form}",
+    "([[@{Formulaic_Focus}]]) [@{focus_i18n}]",
+    "(@{gestures})",
+    "(@{words})",
+    "(@{Stamina_Score}) [@{stamina_i18n}]",
+    "(@{aura}) [@{aura_i18n}]",
+    "([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (@{wound_total}) [@{wounds_i18n}]",
+    "(?{@{modifiers_i18n}|0}) [@{modifiers_i18n}]",
 )
-ritual_roll = (
-    "[["
-    "%(die)s "
-    "+ @{Ritual_Technique} "
-    "+ @{Ritual_Form} "
-    "+ ([[@{Ritual_Focus}]]) [@{focus_i18n}] "
-    "+ (@{Stamina_Score}) [@{stamina_i18n}] "
-    "+ (@{aura}) [@{aura_i18n}] "
-    "+ (@{Ritual_Artes_Lib}) [@{artes_i18n}] "
-    "+ (@{Ritual_Philos}) [@{philos_i18n}] "
-    "+ (@{wound_total}) [@{wounds_i18n}] "
-    "+ ([[floor(@{fatigue})]]) [@{fatigue_i18n}] "
-    "+ (?{@{modifiers_i18n}|0}) [@{modifiers_i18n}] "
-    "]]"
+formulaic_template = rolltemplate(
+    "arcane",
+    label0="^{formulaic} ^{casting}",
+    result0=f"[[ %(die)s + {formulaic_roll} ]]",
+    label1="^{aura}",
+    result1="@{aura}",
+    label2="^{weakness-m}",
+    result2="[[ (@{wound_total}) [@{wounds_i18n}] + [[floor(@{fatigue})]] [@{fatigue_i18n}] ]]",
+    label3="^{circumstances-m}",
+    result3="?{@{modifiers_i18n}|0}",
 )
-GLOBALS["ritual_roll_simple"] = ritual_roll_template % {
-    "roll": ritual_roll % {"die": "@{simple-die}"}
-}
-GLOBALS["ritual_roll_stress"] = (
-    ritual_roll_template % {"roll": ritual_roll % {"die": "@{stress-die}"}}
-) + " {{stress=1}}"
+
+GLOBALS["formulaic_roll_simple"] = formulaic_template.simple
+GLOBALS["formulaic_roll_stress"] = formulaic_template.stress
+
+
+ritual_roll = roll(
+    "@{Ritual_Technique}",
+    "@{Ritual_Form}",
+    "([[@{Ritual_Focus}]]) [@{focus_i18n}]",
+    "(@{Stamina_Score}) [@{stamina_i18n}]",
+    "(@{aura}) [@{aura_i18n}]",
+    "(@{Ritual_Artes_Lib}) [@{artes_i18n}]",
+    "(@{Ritual_Philos}) [@{philos_i18n}]",
+    "(@{wound_total}) [@{wounds_i18n}]",
+    "([[floor(@{fatigue})]]) [@{fatigue_i18n}]",
+    "(?{@{modifiers_i18n}|0}) [@{modifiers_i18n}]",
+)
+ritual_template = rolltemplate(
+    "arcane",
+    label0="^{ritual} ^{casting}",
+    result0=f"[[ %(die)s + {ritual_roll} ]]",
+    label1="^{aura}",
+    result1="@{aura}",
+    label2="^{weakness-m}",
+    result2="[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]",
+    label3="^{circumstances-m}",
+    result3="?{@{modifiers_i18n}|0}",
+)
+
+GLOBALS["ritual_roll_simple"] = ritual_template.simple
+GLOBALS["ritual_roll_stress"] = ritual_template.stress
 
 ## Spells
-# Deferred attribute access to get the spell's technique value
+# Deferred attribute access to get the spell's technique & form values
 spell_tech_value = (
     "("
     "@{sys_at}@{character_name}@{sys_pipe}@{spell_tech_name}_Score@{sys_rbk} "
@@ -556,43 +483,38 @@ spell_form_value = (
 GLOBALS["spell_tech_value"] = spell_tech_value
 GLOBALS["spell_form_value"] = spell_form_value
 
-spell_roll_template = (
-    "&{template:spell} "
-    "{{spell= @{spell_name}}} "
-    "{{character= @{character_name} }} "
-    "{{sigil=@{sigil}}} {{roll= %(roll)s }} "
-    "{{range= @{spell_range} }} "
-    "{{duration= @{spell_duration} }} "
-    "{{target= @{spell_target} }} "
-    "{{effect= @{spell_note} }} "
-    "{{mastery= @{spell_note-2} }} "
-    "{{Technique= @{sys_at}@{character_name}@{sys_pipe}@{spell_tech_name}_i18n@{sys_rbk} }} "
-    "{{Form= @{sys_at}@{character_name}@{sys_pipe}@{spell_form_name}_i18n@{sys_rbk} }} "
-    "{{Level= @{spell_level} }} "
-    "{{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} "
-    "{{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
+
+spell_roll = roll(
+    "(@{Stamina_Score}) [@{stamina_i18n}]",
+    f"{spell_tech_value}",
+    f"{spell_form_value}",
+    "([[@{spell_Focus}]]) [@{focus_i18n}]",
+    "(@{spell_bonus}) [@{bonus_i18n}]",
+    "(@{gestures})",
+    "(@{words})",
+    "(@{aura}) [@{aura_i18n}]",
+    "([[floor(@{Fatigue})]]) [@{fatigue_i18n}]",
+    "(@{wound_total}) [@{wounds_i18n}]",
+    "(?{@{modifiers_i18n}|0}) [@{modifiers_i18n}]",
 )
-spell_roll = (
-    "[["
-    "%(die)s "
-    "+ (@{Stamina_Score}) [@{stamina_i18n}] "
-    f"+ {spell_tech_value} "
-    f"+ {spell_form_value}"
-    "+ ([[@{spell_Focus}]]) [@{focus_i18n}] "
-    "+ (@{spell_bonus}) [@{bonus_i18n}] "
-    "+ (@{gestures}) "
-    "+ (@{words}) "
-    "+ (@{aura}) [@{aura_i18n}] "
-    "+ ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] "
-    "+ (@{wound_total}) [@{wounds_i18n}] "
-    "+ (?{@{modifiers_i18n}|0}) [@{modifiers_i18n}] ]]"
+spell_template = rolltemplate(
+    "spell",
+    spell="@{spell_name}",
+    character="@{character_name}",
+    sigil="@{sigil}",
+    roll=f"[[ (%(die)s + {spell_roll}) * [[ 1 / (1 + @{{spell_Deficiency}}) ]] ]]",
+    range="@{spell_range}",
+    duration="@{spell_duration}",
+    target="@{spell_target}",
+    effect="@{spell_note}",
+    mastery="@{spell_note-2}",
+    Technique="@{sys_at}@{character_name}@{sys_pipe}@{spell_tech_name}_i18n@{sys_rbk}",
+    Form="@{sys_at}@{character_name}@{sys_pipe}@{spell_form_name}_i18n@{sys_rbk}",
+    Level="@{spell_level}",
 )
-GLOBALS["spell_roll_simple"] = spell_roll_template % {
-    "roll": spell_roll % {"die": "@{simple-die}"}
-}
-GLOBALS["spell_roll_stress"] = (
-    spell_roll_template % {"roll": spell_roll % {"die": "@{stress-die}"}}
-) + " {{stress=1}}"
+
+GLOBALS["spell_roll_simple"] = spell_template.simple
+GLOBALS["spell_roll_stress"] = spell_template.stress
 
 
 # Botch formula
@@ -616,12 +538,15 @@ GLOBALS["fatigue_levels_options"] = repeat_template(
     """<option value="%%">%%</option>""", range(0, add_fatigue_lvl_num + 1)
 )
 GLOBALS["additional_fatigue_levels"] = repeat_template(
-    """<tr class="addfatigue-%(num)s">
-    <td><input type="radio" class="radio_1" name="attr_Fatigue" value="%(value)s"><span></span></td>
-    <td style="text-align:center;">0</td>
-    <td>2 min.</td>
-    <td data-i18n="winded" >Winded</td>
-</tr>""",
+    textwrap.dedent(
+    """\
+    <tr class="addfatigue-%(num)s">
+        <td><input type="radio" class="radio_1" name="attr_Fatigue" value="%(value)s"><span></span></td>
+        <td style="text-align:center;">0</td>
+        <td>2 min.</td>
+        <td data-i18n="winded" >Winded</td>
+    </tr>"""
+    ),
     [(str(i), str(i / 1000)) for i in range(1, add_fatigue_lvl_num + 1)],
     tuple_keys=("num", "value"),
 )
@@ -651,7 +576,7 @@ GLOBALS["documentation"] = html.prettify()
 
 
 # Rolltemplate
-## Custom rolltemplate colors
+## colors for the "custom" rolltemplate
 with open(Path(__file__).parent / "css_colors.csv", newline="") as f:
     reader = csv.DictReader(f)
     css_rules = []
