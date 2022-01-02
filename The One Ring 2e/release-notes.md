@@ -30,6 +30,7 @@ More info: [Readme](https://github.com/Roll20/roll20-character-sheets/blob/maste
 | changed | treaure       | treasure          |
 
 # Versioning
+
 Versions have three numbers Major.Minor.Release
 
 **Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.  May include major UI changes to sheet layout and design.
