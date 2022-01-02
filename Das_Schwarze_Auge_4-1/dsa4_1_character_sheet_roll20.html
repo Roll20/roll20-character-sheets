@@ -12744,6 +12744,15 @@
 <!-- The invisible field for the attribute which contains the ability call -->
 <input type="hidden" name="attr_blitz_action" value="">
 
+<!-- The visible and draggable button for the macro bar -->
+<button type="roll" name="roll_eidsegen" value="@{eidsegen_action}">Eidsegen</button>
+
+<!-- The invisible button allowing the use of custom roll parsing -->
+<button type="action" name="act_eidsegen-action" class="sheet-default-hide"></button>
+
+<!-- The invisible field for the attribute which contains the ability call -->
+<input type="hidden" name="attr_eidsegen_action" value="">
+
 		<div class="sheet-hide">
 			<!-- Comfort Attributes (= to shorten rolls) -->
 			AT-Wert aus aktiver Waffe (bei Wahl mehrerer aktiver Waffen wird addiert!)
@@ -13255,6 +13264,39 @@
 			<td colspan="2" class="sheet-templates-warning"><span class="sheet-abbr" title="Der Wurf enthält zwei kritische Fehlschläge und wäre daher ohne den Vorteil Feste Matrix automatisch misslungen.">Feste Matrix hat Schlimmeres verhindert!</span></td>
 		</tr>
 		{{/rollBetween() computed::result -1 -1}}
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-liturgie">
+{{#rollBetween() computed::result 1 1}}
+<table class="sheet-templates-succ-uncr">
+{{/rollBetween() computed::result 1 1}}
+{{#rollBetween() computed::result 0 0}}
+<table class="sheet-templates-fail-uncr">
+{{/rollBetween() computed::result 0 0}}
+		<tr>
+			<th colspan="2">{{name}}</th>
+		</tr>
+		<tr>
+			<td colspan="2" class="sheet-templates-result">
+				Mirakelprobe
+				{{#rollLess() mod 0}}{{mod}}{{/rollLess() mod 0}}
+				{{#rollTotal() mod 0}}&#177;{{mod}}{{/rollTotal() mod 0}}
+				{{#rollGreater() mod 0}}+{{mod}}{{/rollGreater() mod 0}}
+
+				{{#rollBetween() computed::result 1 1}}
+				gelungen
+				{{/rollBetween() computed::result 1 1}}
+				{{#rollBetween() computed::result 0 0}}
+				misslungen
+				{{/rollBetween() computed::result 0 0}}
+
+				({{computed::roll}} <span class="sheet-abbr" title="übrigbehaltene Liturgiekenntnispunkte">LkP*</span>).</td>
+		</tr>
+		<tr>
+			<td><span class="sheet-abbr" title="Liturgiekenntniswert">LkW</span>: {{wert}}</td>
+			<td>Eigenschaften: {{computed::stats}}</td>
+		</tr>
 	</table>
 </rolltemplate>
 
@@ -18578,11 +18620,12 @@ function calcCritLevels (effects) {
 }
 
 on("sheet:opened change:character_name", function(eventInfo) {
-	safeGetAttrs(["character_name", "athletik_action", "athletik-ebe_action", "blitz_action"], function(v) {
+	safeGetAttrs(["character_name", "athletik_action", "athletik-ebe_action", "blitz_action", "eidsegen_action"], function(v) {
 		var attrsToChange = {};
 		attrsToChange["athletik_action"] = "%{" + v["character_name"] + "|athletik-action}";
 		attrsToChange["athletik-ebe_action"] = "%{" + v["character_name"] + "|athletik-ebe-action}";
 		attrsToChange["blitz_action"] = "%{" + v["character_name"] + "|blitz-action}";
+		attrsToChange["eidsegen_action"] = "%{" + v["character_name"] + "|eidsegen-action}";
 
 		safeSetAttrs(attrsToChange);
 	});
@@ -19004,5 +19047,72 @@ on('clicked:blitz-action', async (info) => {
 			}
 		);
 	});
+});
+
+on('clicked:eidsegen-action', async (info) => {
+	results = await startRoll(
+		"@{gm_roll_opt} " +
+		"&{template:liturgie} " +
+		"{{name=Eidsegen}} " +
+		"{{wert=[[@{Liturgiekenntnis}d1cs0cf2]]}} " +
+		"{{mod=[[ ?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2 ]]}} " +
+		"{{stats=[[ [Eigenschaft 1:] [[@{MU}]]d1cs0cf2 + [Eigenschaft 2:] [[@{IN}]]d1cs0cf2 + [Eigenschaft 3:] [[@{CH}]]d1cs0cf2]]}} " +
+		"{{roll=[[3d20cs<0cf>21]]}} " +
+		"{{result=[[0]]}} "
+	);
+	console.log("test: info:", info, "results:", results);
+	var rollID = results.rollId;
+	results = results.results;
+	var TaW = results.wert.result;
+	var mod = results.mod.result;
+	var stats = [
+		results.stats.rolls[0].dice,
+		results.stats.rolls[1].dice,
+		results.stats.rolls[2].dice
+	];
+	var rolls = results.roll.rolls[0].results;
+	/* Result
+	0	Failure
+	1	Success
+	*/
+	var result = 0;
+
+	/*
+		TaP*-Berechnung
+	*/
+	var effRolls = rolls;
+	var effTaW = TaW - mod;
+	var TaPstar = effTaW;
+
+	// Negativer TaW: |effTaW| zu Teilwürfen addieren
+	if (effTaW < 0)
+	{
+		for (roll in rolls)
+		{
+			effRolls[roll] = rolls[roll] + Math.abs(effTaW);
+		}
+		TaPstar = 0;
+	}
+
+	// TaP-Verbrauch für jeden Wurf
+	for (roll in effRolls)
+	{
+		TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
+	}
+
+	// Max. TaP* = TaW
+	TaPstar = Math.min(TaW, TaPstar);
+
+	// Ergebnis hängt nur von TaP* ab
+	result = TaPstar < 0 ? 0 : 1;
+
+	finishRoll(
+		rollID,
+		{
+			roll: TaPstar,
+			result: result,
+			stats: stats.toString().replaceAll(",", "/")
+		}
+	);
 });
 </script>
