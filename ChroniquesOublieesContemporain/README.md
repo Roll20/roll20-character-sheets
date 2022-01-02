@@ -10,9 +10,19 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.10.0 [Screenshot](coc_v2.png)
+v3.10.1 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.10.1 (2021-12-18)
+
+Corrections de bugs
+
+- Dysfonctionnement des boutons d'états préjudiciables
+- Libellé du modificateur d'attaque persistant après avoir été annulé
+- Meilleur support des modificateurs de DM sous formes de jets de dés
+- Mauvais affichage en cas de sélection du setting Surhumains
+- Affichage de la version de la fiche sur l'onglet Configuration
 
 ## v3.10.0 (2021-11-12)
 

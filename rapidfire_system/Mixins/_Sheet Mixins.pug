@@ -1,0 +1,42 @@
+//- File for system specific mixins
+- const characterFields = ['character name','player name','nationality','organization affiliations'];
+- const stats = ['body','mind','spirit'];
+- const secondaries = ['defence','resist'];
+- const secondaryDefaults = {defence:3,resist:0};
+- const combatGear = ['armour bonus','shield bonus','action penalty'];
+- const remnantRatings = ['situational awareness','remnant defence'];
+- const remnantStats = ['armour','speed','inspiring','terrifying','structure'];
+- const remnantCombatStats = ['assault damage','strike damage','strike range'];
+- const droneStats = ['sa','def','arm','spd','struct','assault','assault dam','strike','strike dam','strikerange'];
+- const abbreviations = {'situational awareness':'situation awareness abbreviation','remnant defence':'defence','strike dam':'strike damage','assault dam':'assault damage','strikerange':'strike range',sa:'situation awareness abbreviation',def:'defence',arm:'armour',spd:'speed',struct:'structure'};
+- const remnantSkills = ['assault','strike','motion'];
+- const remnantWeaponInputs = ['name','skill','bonus','damage','damage bonus','type'];
+- varObjects.trackerMonitors = [];
+mixin track(header,name)
+	.health-track
+		+h2({'data-i18n':header,class:'health-track__header'})
+		+hidden({name:`${name} max`,value:'1',class:'health-track__max-control'})
+		+fieldset(name)
+			+checkbox({name:'fill',hidden:'',class:'health-track__fill-control',value:'1'})
+			+checkbox({name:'damaged',class:'health-track__clear-control health-track__checkbox',value:'1',title:attrTitle('health','damaged')})
+			- addIfUnique(`repeating_${name}:clear`,'trackerMonitors');
+			+action({name:'clear',class:'health-track__clearer',title:buttonTitle('health','clear')})
+			+number({name:'penalty',class:'boxed health-track__number',title:attrTitle('health','penalty')})
+//- End Mixin
+mixin hexagon(attribs={},status)
+	.hexagon&attributes(attributes)&attributes(attribs)
+		if status
+			+rollLess({values:`computed::${status} -2`})
+				span(hidden='').fumble-toggle
+			+rollGreater({values:`computed::${status} 4`})
+				span(hidden='').crit-toggle
+		.hexagon__hex-wrapper
+			.hexagon__hex-wrapper__hex-border
+				.hexagon__hex-wrapper__hex-border__hex-content
+					block
+//-End Mixin
+mixin userTemplateFields
+	+allProps({values:`description damage difficulty roll ${[1,2,3,4,5,6].map((num)=>`roll${num}`).join(' ')} header footer character_id system single-roll custom_description status`})
+		h4 {{key}}
+		span {{value}}
+//- End Mixin
