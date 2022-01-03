@@ -20265,13 +20265,31 @@ const effectiveEncumbrance = {
 }
 
 on("sheet:opened change:character_name", function(eventInfo) {
-	safeGetAttrs(["character_name", "athletik_action", "athletik-ebe_action", "blitz_action", "eidsegen_action"], function(v) {
+	var func = "Action Listener for Updating Roll Button Actions on Character Name Updates";
+	// Build list of attributes
+	var attrsToGet = ["character_name"];
+	var ebeTalents = []
+	for(talent of talents_ebe)
+	{
+		ebeTalents.push(talent + "-ebe");
+	}
+	for(attr of [].concat(talents, ebeTalents, spells))
+	{
+		attrsToGet.push(attr + "_action");
+	}
+	safeGetAttrs(attrsToGet, function(v) {
 		var attrsToChange = {};
-		attrsToChange["athletik_action"] = "%{" + v["character_name"] + "|athletik-action}";
-		attrsToChange["athletik-ebe_action"] = "%{" + v["character_name"] + "|athletik-ebe-action}";
-		attrsToChange["blitz_action"] = "%{" + v["character_name"] + "|blitz-action}";
+
+		for (attr of attrsToGet)
+		{
+			// No action buttons for character name and combat techniques required
+			if (attr.match("t_ka_") || attr === "character_name") continue;
+			attrsToChange[attr] = "%{" + v["character_name"] + "|" + attr.replace(/_action$/gm, "") + "-action}";
+		}
+
 		attrsToChange["eidsegen_action"] = "%{" + v["character_name"] + "|eidsegen-action}";
 
+		debugLog(func, attrsToChange);
 		safeSetAttrs(attrsToChange);
 	});
 });
