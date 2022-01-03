@@ -1,5 +1,5 @@
 const nonweaponProficiencies = {};
-//region Player's Handbook
+//#region Player's Handbook
 nonweaponProficiencies['Agriculture'] = {
     'slots': 1,
     'abilityScore': '@{Intelligence}',
@@ -483,9 +483,9 @@ nonweaponProficiencies['Weaponsmithing'] = {
     'classes': 'Warrior',
     'book': 'PHB'
 };
-//endregion
+//#endregion
 
-//region The Complete Thief's Handbook
+//#region The Complete Thief's Handbook
 nonweaponProficiencies['Alertness'] = {
     'slots': 1,
     'abilityScore': '@{Wisdom}',
@@ -577,5 +577,99 @@ nonweaponProficiencies['Voice Mimicry'] = {
     'classes': '',
     'book': 'The Complete Thief\'s Handbook'
 };
-//endregion
+//#endregion
+
+//#region The Complete Book of Dwarves
+nonweaponProficiencies['Boatwright'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Dwarf Runes'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Fungi Recognition'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +3,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Local Dwarf History'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Sign Language'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Signalling'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Slow Respiration'] = {
+    'slots': 1,
+    'abilityScore': '@{NA}',
+    'modifier': 'NA',
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Smelting'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Sound Analysis'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Survival, Underground'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Underground Navigation'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Survival (Hill, Mountain)'] = {
+    'slots': 1,
+    'abilityScore': '@{NA}',
+    'modifier': 'NA',
+    'classes': 'Warrior',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Pest Control'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Thief',
+    'book': 'The Complete Book of Dwarves'
+};
+//#endregion
 module.exports = nonweaponProficiencies;
