@@ -1391,4 +1391,77 @@ weapons['falchion'] = {
     'category': ['Melee']
 };
 //#endregion
+
+//#region The Complete Book of Dwarves
+weapons['two-handed battle axe'] = {
+    'name': 'Two-handed Battle axe',
+    'size': 'M',
+    'type': 'S',
+    'speed': 9,
+    'small-medium': '1d10',
+    'large': '2d8',
+    'knockdown': 'd12',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+weapons['head spike'] = {
+    'name': 'Head spike',
+    'group': 'Close Combat',
+    'noProf': true,
+    'size': 'M',
+    'type': 'P',
+    'speed': 4,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+weapons['elbow spike'] = {
+    'name': 'Elbow spike',
+    'group': 'Close Combat',
+    'noProf': true,
+    'size': 'S',
+    'type': 'S',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+weapons['knee spike'] = {
+    'name': 'Knee spike',
+    'group': 'Close Combat',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P',
+    'speed': 1,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+weapons['glove nail'] = {
+    'name': 'Glove Nail',
+    'group': 'Close Combat',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+weapons['chain flail'] = {
+    'name': 'Chain flail',
+    'group': 'Close Combat',
+    'size': 'L',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d4+2',
+    'large': '1d4+1',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+//#endregion
 module.exports = weapons;
