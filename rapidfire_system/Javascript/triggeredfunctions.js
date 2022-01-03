@@ -1,8 +1,11 @@
 /*jshint esversion: 11, laxcomma:true, eqeqeq:true*/
 /*jshint -W014,-W084,-W030,-W033*/
 // Triggered Functions
-const setActionCalls = function(trigger,attributes,sections){
+const setActionCalls = function({attributes,sections}){
   debug('setting action calls');
+  debug({actionAttributes});
+  debug({attributes});
+  debug({character_name:attributes.character_name,assault_roll_action:attributes.assault_roll_action});
   actionAttributes.forEach((base)=>{
     let [section,,field] = parseTriggerName(base);
     let fieldAction = field.replace(/_/g,'-');
@@ -14,10 +17,10 @@ const setActionCalls = function(trigger,attributes,sections){
       attributes[`${field}`] = `%{${attributes.character_name}|${fieldAction}}`;
     }
   });
-  debug({updates:attributes.updates});
 };
+funcs.setActionCalls = setActionCalls;
 
-const checkHealth = function(trigger,attributes,sections){
+const checkHealth = function({trigger,attributes,sections}){
   debug('checking current health trackers')
   let [section,rowID] = parseRepeatName(trigger.name);
   let currDamage = sections[section].indexOf(rowID);
@@ -28,8 +31,9 @@ const checkHealth = function(trigger,attributes,sections){
     attributes[`${section}_${id}_fill`] = index < currDamage ? 1 : 0;
   });
 };
+funcs.checkHealth = checkHealth;
 
-const updateTrack = function(section,attributes,sections){
+const updateTrack = function({section,attributes,sections}){
   let newTracks = attributes[`${section}_max`] - sections[`repeating_${section}`].length;
   if(newTracks > 0){
     _.range(newTracks).forEach((n)=>{
@@ -57,26 +61,29 @@ const updateTrack = function(section,attributes,sections){
     });
   }
 };
+funcs.updateTrack = updateTrack;
 
-const maxHealth = function(type,attributes){
+const maxHealth = function({type,attributes}){
   const typeSwitch = {
     structure:()=> attributes.structure_base,
-    health:()=> 3 + attributes.body + attributes.spirit + attributes.health_mod
+    health:()=> 3 + attributes.body + attributes.body_mod + attributes.spirit + attributes.spirit_mod + attributes.health_mod
   }
   return Math.max(typeSwitch[type](),1);
 };
+funcs.maxHealth = maxHealth;
 
-const calcHealth = function(trigger,attributes,sections){
+const calcHealth = function({trigger,attributes,sections}){
   const type = trigger.name.replace(/_max/,'');
   debug(`calculating ${type}`);
-  attributes[`${type}_max`] = maxHealth(type,attributes);
+  attributes[`${type}_max`] = maxHealth({type,attributes});
   let healthDiff = attributes[`${type}_max`] - value(attributes.attributes[`${type}_max`]);
-  updateTrack(type,attributes,sections);
+  updateTrack({section:type,attributes,sections});
   attributes[type] = attributes[type] + healthDiff;
-  syncHealth(trigger,attributes,sections);
+  syncHealth({trigger,attributes,sections});
 };
+funcs.calcHealth = calcHealth;
 
-const skillEffects = function(trigger,attributes,sections){
+const skillEffects = function({trigger,attributes,sections}){
   let [section,rowID,field] = parseRepeatName(trigger.name);
   let skillName = attributes[`${section}_${rowID}_name`];
   const skillSwitch = {
@@ -87,9 +94,11 @@ const skillEffects = function(trigger,attributes,sections){
     trigger.affects = [...trigger.affects,...skillSwitch[skillName]];
   }
 };
+funcs.skillEffects = skillEffects;
 
-const validateActionPenalty = function(trigger,attributes,sections){
+const validateActionPenalty = function({attributes}){
   if(attributes.action_penalty > 0){
     attributes.action_penalty = attributes.action_penalty * -1;
   }
 };
+funcs.validateActionPenalty = validateActionPenalty;
