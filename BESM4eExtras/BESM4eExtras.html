@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.4.7" readonly />
+													<input type="text" class="center" name="attr_version" value="1.4.8" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -11126,10 +11126,11 @@
 				getSumOfActiveAttrLevels(attrdb, 'massivedamage', weaponclass) || 0;
 			const superstrength = 
 				getSumOfActiveAttrLevels(attrdb, 'superstrength') || 0;
-			let maneuver = 
-				setObj.static_weapon_maneuver_name || value.static_weapon_maneuver_name;
-			maneuver = 
-				`${maneuver.replace(/\s+/g, '')}`;
+			const maneuverSelected =_.isString(setObj.static_weapon_maneuver_name) ? 
+				setObj.static_weapon_maneuver_name : 
+				value.static_weapon_maneuver_name;
+			const maneuverTitleCase = capital(maneuverSelected);
+			const maneuver = maneuverSelected.replace(/\s+/g, '');
 			const acv = 
 				attack_maneuvers_regex.test(maneuver) ? 
 				isSwarm ?  parseInt(weapon.level) + 4 :
@@ -11166,7 +11167,7 @@
 				'';
 			var result = `&{template:besmDefault} {{ismelee=${isMelee}}} ` +
 				`{{character_name=@{charactername}}} {{pronoun=@{pronoun}}} ` +
-				`{{maneuver=${maneuver}}} {{weapon_name=${name}}}`;
+				`{{maneuver=${maneuverTitleCase}}} {{weapon_name=${name}}}`;
 			if (acv > 0) {
 				result = `${result} {{title=Attack}} {{attack=1}} {{target_name=@{target|charactername}}} ` +
 					`{{acv=${acv}}} {{damage_type=${damagetype}}} {{damage2=${Math.round(damage * 0.25)}}} ` +
