@@ -1,12 +1,13 @@
 Backlog
 =======
 
+- favoured/ill-favoured rolls for adversaries
 - (later) evaluate use of custom API to give better user feedback on rolls
 
 01.01.00
 ========
 
-- (done) optimize favoured rolls using sheet workers (currently the roll included an ugly binary switches that are not easy to read for users)
+- (done) optimize favoured rolls using sheet workers (currently the roll includes an ugly binary switche that is not easy to read for players)
 
 01.00.00
 ========
