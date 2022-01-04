@@ -537,8 +537,25 @@
 		<div><h1>{{character_name}} casts <span class=capitalize>{{spellname}}</span>!</h1></div>
 		<div class=arrow-container><div class=arrow-right></div></div>
 		<div>
-			<span class=template-dice>{{computed::roll1}}</span>
-			= {{roll1}} vs {{tohit}}
+			<div>
+				<span class=template-dice>{{computed::roll1}}</span>
+				<span>= {{roll1}} vs </span>
+				{{#simpletohit}}
+					{{tohit}}
+				{{/simpletohit}}
+			</div>
+			{{^simpletohit}}
+				<div>
+					{{dx}}
+					{{#spelladj}}
+					<span> + {{spelladj}}</span>
+					{{/spelladj}}
+					{{#tohitadj}}
+					<span> + {{tohitadj}}</span>
+					{{/tohitadj}}
+					<span> = {{tohit}}</span>
+				</div>
+			{{/simpletohit}}
 		</div>
 		{{#rollTotal() roll1 18}}
 			<div class=failure>Critical Failure, staff breaks!</div>
@@ -909,8 +926,8 @@
 						+ ` {{roll1=[[3d6]]}}`;
 
 					// short description means no toHit or Weapon bonuses, can all be on one line or with no summation and =
-					let simpleToHit = true;
 					{ // compute total and separate to hits.
+						let simpleToHit = true;
 						let dxAdj = `@{DX}[DEX]`;
 						mstring += ` {{tohit=[[${dxAdj}`;
 						mstring = `{{dx=[[${dxAdj}]]}} ` + mstring;
@@ -965,17 +982,31 @@
 						+ ' {{roll1=[[3d6]]}}';
 
 					{ // compute to hit
-						mstring += '{{tohit=[[@{DX}[DEX]';
+						let simpleToHit = true;
+						let dxAdj = `@{DX}[DEX]`;
+						mstring += ` {{tohit=[[${dxAdj}`;
+						mstring = `{{dx=[[${dxAdj}]]}} ` + mstring;
+
 						// provisionally add spell toHit.
 						if (parseInt(v[toHitName])||0) {
-							mstring += ` + @{${toHitName}}[SPELL_ADJ]`;
+							let spellAdj = `@{${toHitName}}[SPELL_ADJ]`;
+							mstring += ` + ${spellAdj}`;
+							mstring = `{{spelladj=[[${spellAdj}]]}} ` + mstring;
+							simpleToHit = false;
 						}
 						// and rolled to hit.
 						if (toHit != 0) {
-							mstring += ` + ${toHit}[TOHIT]`;
+							let toHitAdj = `${toHit}[TO_HIT]`
+							mstring += ` + ${toHitAdj}`;
+							mstring = `{{tohitadj=[[${toHitAdj}]]}} ` + mstring;
+							simpleToHit = false;
 						}
 						// and finish.
 						mstring += ']]}}';
+
+						if (simpleToHit) {
+							mstring += ' {{simpletohit=1}}'
+						}
 					}
 					if (v[damageName] != '' && v[damageName] != '0') {
 						mstring += ` {{damage=[[@{${damageName}}]]}}`;
