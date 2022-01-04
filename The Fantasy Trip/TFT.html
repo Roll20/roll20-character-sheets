@@ -155,9 +155,9 @@
 			</div>
 		</div>
 		<div class="sheet-attack sheet-block">
-			<div>
+			<div style='display: flex; flex-flow: row wrap; justify-content: space-between; align-items: center;' >
 				<span class="sheet-label sheet-first-word" title="Roll to attack with selected Weapon or cast Spell at a given to-hit value.">Attack/Cast&nbsp;</span>
-				<span style='white-space:nowrap; text-align: center'>
+				<span style='white-space:nowrap'>
 					<button class=sheet-attack-button type="action" name="act_attack-6">-6</button>
 					<button class=sheet-attack-button type="action" name="act_attack-5">-5</button>
 					<button class=sheet-attack-button title="Ranged at Prone behind cover" type="action" name="act_attack-4">-4</button>
@@ -172,6 +172,12 @@
 					<button class=sheet-attack-button type="action" name="act_attack5">5</button>
 					<button class=sheet-attack-button type="action" name="act_attack5">6</button>
 				</span>
+				<span title="Check if opponent is Defending (physical) or Dodging (ranged) attacks, rolls 4d6">
+					<span class=sheet-label>&nbsp;Defend</span>
+					<input type=checkbox name=attr_defending>
+				</span>
+			</span>
+
 			</div>
 		</div>
 		<div class="sheet-weapons sheet-block">
@@ -491,44 +497,92 @@
 				</div>
 			{{/simpletohit}}
 		</div>
-		{{#rollTotal() roll1 18}}
-			<div class=failure>Critical miss, weapon breaks!</div>
-		{{/rollTotal() roll1 18}}
-		{{#rollTotal() roll1 17}}
-			<div class=failure>Critical miss, drop weapon!</div>
-		{{/rollTotal() roll1 17}}
-		{{#rollTotal() roll1 16}}
-			<div class=failure>Automatic miss</div>
-		{{/rollTotal() roll1 16}}
-		{{#rollTotal() roll1 3}}
-			<div class=success>Critical hit, triple Damage!</div>
-			{{#damage}}
-				<div class=keyvalue><span>Damage: </span>{{damage}}</div>
-			{{/damage}}
-		{{/rollTotal() roll1 3}}
-		{{#rollTotal() roll1 4}}
-			<div class=success>Critical hit, double Damage!</div>
-			{{#damage}}
-				<div class=keyvalue><span>Damage: </span>{{damage}}</div>
-			{{/damage}}
-		{{/rollTotal() roll1 4}}
-		{{#rollTotal() roll1 5}}
-			<div class=success>Automatic hit!</div>
-			{{#damage}}
-				<div class=keyvalue><span>Damage: </span>{{damage}}</div>
-			{{/damage}}
-		{{/rollTotal() roll1 5}}
-		{{#rollBetween() roll1 6 15}}
-			{{#^rollGreater() roll1 tohit}}
-				<div class=success>Hit!</div>
+		{{^defending}}
+			{{#rollTotal() roll1 18}}
+				<div class=failure>Critical miss, weapon breaks!</div>
+			{{/rollTotal() roll1 18}}
+			{{#rollTotal() roll1 17}}
+				<div class=failure>Critical miss, drop weapon!</div>
+			{{/rollTotal() roll1 17}}
+			{{#rollTotal() roll1 16}}
+				<div class=failure>Automatic miss</div>
+			{{/rollTotal() roll1 16}}
+			{{#rollTotal() roll1 3}}
+				<div class=success>Critical hit, triple Damage!</div>
 				{{#damage}}
 					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
 				{{/damage}}
-			{{/^rollGreater() roll1 tohit}}
-			{{#rollGreater() roll1 tohit}}
-				<div class=failure>Miss</div>
-			{{/rollGreater() roll1 tohit}}
-		{{/rollBetween() roll1 6 15}}
+			{{/rollTotal() roll1 3}}
+			{{#rollTotal() roll1 4}}
+				<div class=success>Critical hit, double Damage!</div>
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+				{{/damage}}
+			{{/rollTotal() roll1 4}}
+			{{#rollTotal() roll1 5}}
+				<div class=success>Automatic hit!</div>
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+				{{/damage}}
+			{{/rollTotal() roll1 5}}
+			{{#rollBetween() roll1 6 15}}
+				{{#^rollGreater() roll1 tohit}}
+					<div class=success>Hit!</div>
+					{{#damage}}
+						<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+					{{/damage}}
+				{{/^rollGreater() roll1 tohit}}
+				{{#rollGreater() roll1 tohit}}
+					<div class=failure>Miss</div>
+				{{/rollGreater() roll1 tohit}}
+			{{/rollBetween() roll1 6 15}}
+		{{/defending}}
+		{{#defending}}
+			{{#rollBetween() roll1 23 24}}
+				<div class=failure>Critical miss, weapon breaks or 1d6 damage!</div>
+			{{/rollBetween() roll1 23 24}}
+			{{#rollBetween() roll1 21 22}}
+				<div class=failure>Critical miss, drop weapon or 1d6 damage!</div>
+			{{/rollBetween() roll1 21 22}}
+			{{#rollTotal() roll1 20}}
+				<div class=failure>Automatic miss</div>
+			{{/rollTotal() roll1 20}}
+			<!-- Note that this is slightly problematic.
+				Page 9 clearly states the rules for critical success and failure on 4 die,
+				However, page 117 mentions dodging and describes
+				automatic misses consistent with critical misses, but weirdly only mentions
+				4 and 5 as the two critical hits (doing triple and double damage) and doesn't mention an
+				automatic hit at 6, much less 7 or 8.  Typo? Brain fart?
+				it *is* true that 4d6 <= 8 is probability of .054 and 3d6 <= 5 is .046
+				so rolling 4d6 has a slightly greater chance of an automatic or critical hit.
+				So I don't know, could go either way. But why remove an automatic hit at 6 or 7
+				that would still be lower odds of automatic hit (.012 and .027 respectively)
+				I'm going to assume it's intentional, ie dodging makes it MUCH harder to get crits or auto-hits.
+			-->
+			{{#rollTotal() roll1 4}}
+				<div class=success>Critical hit, triple Damage!</div>
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+				{{/damage}}
+			{{/rollTotal() roll1 4}}
+			{{#rollTotal() roll1 5}}
+				<div class=success>Critical hit, double Damage!</div>
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+				{{/damage}}
+			{{/rollTotal() roll1 5}}
+			{{#rollBetween() roll1 6 19}}
+				{{#^rollGreater() roll1 tohit}}
+					<div class=success>Hit!</div>
+					{{#damage}}
+						<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+					{{/damage}}
+				{{/^rollGreater() roll1 tohit}}
+				{{#rollGreater() roll1 tohit}}
+					<div class=failure>Miss</div>
+				{{/rollGreater() roll1 tohit}}
+			{{/rollBetween() roll1 6 19}}
+		{{/defending}}
 	</div>
 </rolltemplate>
 
@@ -559,16 +613,81 @@
 				</div>
 			{{/simpletohit}}
 		</div>
-		{{#rollTotal() roll1 18}}
+		{{^defending}}
+			{{#rollTotal() roll1 18}}
+				<div class=failure>Critical Failure, staff breaks!</div>
+			{{/rollTotal() roll1 18}}
+			{{#rollTotal() roll1 17}}
+				<div class=failure>Critical Failure, lose ST, drop staff!</div>
+			{{/rollTotal() roll1 17}}
+			{{#rollTotal() roll1 16}}
+				<div class=failure>Automatic Failure</div>
+			{{/rollTotal() roll1 16}}
+			{{#rollTotal() roll1 3}}
+				{{#flavor}}
+					<div class=description>{{flavor}}</div>
+				{{/flavor}}
+				<div class=success>Critical Success, triple Damage or Effect!</div>
+				{{#damage}}
+					<div>Damage: {{damage}}</div>
+				{{/damage}}
+			{{/rollTotal() roll1 3}}
+			{{#rollTotal() roll1 4}}
+				<div class=success>Critical Success, double Damage or Effect!</div>
+				{{#flavor}}
+					<div class=description>{{flavor}}</div>
+				{{/flavor}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+				{{/damage}}
+			{{/rollTotal() roll1 4}}
+			{{#rollTotal() roll1 5}}
+				<div class=success>Automatic Success!</div>
+				{{#flavor}}
+					<div class=description>{{flavor}}</div>
+				{{/flavor}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+				{{/damage}}
+			{{/rollTotal() roll1 5}}
+			{{#rollBetween() roll1 6 15}}
+				{{#^rollGreater() roll1 tohit}}
+					<div class=success>Success!</div>
+					{{#flavor}}
+						<div class=description>{{flavor}}</div>
+					{{/flavor}}
+					{{#damage}}
+						<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+					{{/damage}}
+				{{/^rollGreater() roll1 tohit}}
+				{{#rollGreater() roll1 tohit}}
+					<div class=failure>Failure</div>
+				{{/rollGreater() roll1 tohit}}
+			{{/rollBetween() roll1 6 15}}
+		{{/defending}}
+		{{#defending}}
+		{{#rollBetween() roll1 23 24}}
 			<div class=failure>Critical Failure, staff breaks!</div>
-		{{/rollTotal() roll1 18}}
-		{{#rollTotal() roll1 17}}
+		{{/rollBetween() roll1 23 24}}
+		{{#rollBetween() roll1 21 22}}
 			<div class=failure>Critical Failure, lose ST, drop staff!</div>
-		{{/rollTotal() roll1 17}}
-		{{#rollTotal() roll1 16}}
+		{{/rollBetween() roll1 21 22}}
+		{{#rollTotal() roll1 20}}
 			<div class=failure>Automatic Failure</div>
-		{{/rollTotal() roll1 16}}
-		{{#rollTotal() roll1 3}}
+		{{/rollTotal() roll1 20}}
+			<!-- Note that this is slightly problematic.
+				Page 9 clearly states the rules for critical success and failure on 4 die,
+				However, page 117 mentions dodging and describes
+				automatic misses consistent with critical misses, but weirdly only mentions
+				4 and 5 as the two critical hits (doing triple and double damage) and doesn't mention an
+				automatic hit at 6, much less 7 or 8.  Typo? Brain fart?
+				it *is* true that 4d6 <= 8 is probability of .054 and 3d6 <= 5 is .046
+				so rolling 4d6 has a slightly greater chance of an automatic or critical hit.
+				So I don't know, could go either way. But why remove an automatic hit at 6 or 7
+				that would still be lower odds of automatic hit (.012 and .027 respectively)
+				I'm going to assume it's intentional, ie dodging makes it MUCH harder to get crits or auto-hits.
+			-->
+		{{#rollTotal() roll1 4}}
 			{{#flavor}}
 				<div class=description>{{flavor}}</div>
 			{{/flavor}}
@@ -576,8 +695,8 @@
 			{{#damage}}
 				<div>Damage: {{damage}}</div>
 			{{/damage}}
-		{{/rollTotal() roll1 3}}
-		{{#rollTotal() roll1 4}}
+		{{/rollTotal() roll1 4}}
+		{{#rollTotal() roll1 5}}
 			<div class=success>Critical Success, double Damage or Effect!</div>
 			{{#flavor}}
 				<div class=description>{{flavor}}</div>
@@ -585,17 +704,8 @@
 			{{#damage}}
 				<div class=keyvalue><span>Damage: </span>{{damage}}</div>
 			{{/damage}}
-		{{/rollTotal() roll1 4}}
-		{{#rollTotal() roll1 5}}
-			<div class=success>Automatic Success!</div>
-			{{#flavor}}
-				<div class=description>{{flavor}}</div>
-			{{/flavor}}
-			{{#damage}}
-				<div class=keyvalue><span>Damage: </span>{{damage}}</div>
-			{{/damage}}
 		{{/rollTotal() roll1 5}}
- 		{{#rollBetween() roll1 6 15}}
+		{{#rollBetween() roll1 6 19}}
 			{{#^rollGreater() roll1 tohit}}
 				<div class=success>Success!</div>
 				{{#flavor}}
@@ -608,7 +718,8 @@
 			{{#rollGreater() roll1 tohit}}
 				<div class=failure>Failure</div>
 			{{/rollGreater() roll1 tohit}}
-		{{/rollBetween() roll1 6 15}}
+		{{/rollBetween() roll1 6 19}}
+	{{/defending}}
 	</div>
 </rolltemplate>
 
@@ -928,10 +1039,17 @@
 				let flavorName = repeatingPropertyName('weapons', id, 'flavor');
 				let weaponToHitName  = repeatingPropertyName('weapons', id, 'tohit');
 				let weaponDamageName = repeatingPropertyName('weapons', id, 'weapondamage');
-				getAttrs(['gender', flavorName, weaponToHitName, weaponDamageName], function(v) {
+				getAttrs(['gender', flavorName, weaponToHitName, weaponDamageName, 'defending'], function(v) {
 					let mstring  = `&{template:attack}`
-						+ ` {{weaponname=@{${repeatingPropertyName('weapons', id, 'weaponname')}}}}`
-						+ ` {{roll1=[[3d6]]}}`;
+						+ ` {{weaponname=@{${repeatingPropertyName('weapons', id, 'weaponname')}}}}`;
+
+					// we are defending, so need 4d6, arg.
+					if (v.defending == 'on') {
+						mstring += ' {{roll1=[[4d6]]}}';
+						mstring = ' {{defending=1}}' + mstring; // tell us.
+					} else {
+						mstring += ' {{roll1=[[3d6]]}}';
+					}
 
 					// short description means no toHit or Weapon bonuses, can all be on one line or with no summation and =
 					{ // compute total and separate to hits.
@@ -984,10 +1102,17 @@
 				let damageName = repeatingPropertyName('spells', id, 'spelldamage');
 				let flavorName = repeatingPropertyName('spells', id, 'flavor');
 				let toHitName  = repeatingPropertyName('spells', id, 'tohit');
-				getAttrs([flavorName, toHitName, damageName], function(v) {
+				getAttrs([flavorName, toHitName, damageName, 'defending'], function(v) {
 					let mstring  = `&{template:cast-spell}`
-						+ ` {{spellname=@{${repeatingPropertyName('spells', id, 'spellname')}}}}`
-						+ ' {{roll1=[[3d6]]}}';
+						+ ` {{spellname=@{${repeatingPropertyName('spells', id, 'spellname')}}}}`;
+
+					// we are defending, so need 4d6, arg.
+					if (v.defending == 'on') {
+						mstring += ' {{roll1=[[4d6]]}}';
+						mstring = ' {{defending=1}}' + mstring; // tell us.
+					} else {
+						mstring += ' {{roll1=[[3d6]]}}';
+					}
 
 					{ // compute to hit
 						let simpleToHit = true;
