@@ -1,6 +1,18 @@
+Backlog
+=======
+
+- (later) evaluate use of custom API to give better user feedback on rolls
+
+01.01.00
+========
+
+- (done) optimize favoured rolls using sheet workers (currently the roll included an ugly binary switches that are not easy to read for users)
+
 01.00.00
 ========
+
 Character Sheet
+
 - (done) rewrite with grid layout
 - (done) readd attributes: name, age
 - (reject) add attributes: weaponlist 5-6
@@ -14,13 +26,13 @@ Character Sheet
 - (done) mark totalparry, protection and load as readonly (they are calculated by sheetworkers)
 
 Adversary Sheet
+
 - (done) initial version
 - (done) correct layout to common style
 - (done) implement attack and protection rolls
 
 Technical:
+
 - (done) reimplement sheet workers to a universal version (without copy and paste) 
 - (done) migration for the treasure attribute
-- (later) optimize favoured rolls using sheet workers (currently the roll included an ugly binary switch that is not easy to read for users)
-- (later) evaluate use of custom API to give better user feedback on rolls
 - (done) update sheet.jpg

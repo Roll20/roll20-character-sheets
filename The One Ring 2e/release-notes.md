@@ -3,6 +3,9 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 01.01.00 (Build 2)
+- added sheet worker to set the skill rolls on every update of the favoured skill state or global favoured state. This replaces the static switches in the rolls that were hard to read for players. 
+
 ## 01.00.00 (Build 1)
 
 - Technical rewrite (based on a css grid)
