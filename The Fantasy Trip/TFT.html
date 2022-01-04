@@ -469,8 +469,13 @@
 		</h1></div>
 		<div class=arrow-container><div class="arrow-right"></div></div>
 		<div>
-			<span class=template-dice>{{computed::roll1}}</span>
-			= {{roll1}} vs {{tohit}}
+			<div>
+				<span class=template-dice>{{computed::roll1}}</span>
+				= {{roll1}} vs
+			</div>
+			<div>
+				{{dx}} + {{weaponadj}} + {{tohitadj}} = {{tohit}}
+			</div>
 		</div>
 		{{#rollTotal() roll1 18}}
 			<div class=failure>Critical miss, weapon breaks!</div>
@@ -890,19 +895,25 @@
 					let mstring  = `&{template:attack}`
 						+ ` {{weaponname=@{${repeatingPropertyName('weapons', id, 'weaponname')}}}}`
 						+ ` {{roll1=[[3d6]]}}`;
-
-					{ // compute to hit.
-						mstring += ' {{tohit=[[@{DX}[DEX]';
+					{ // compute total and separate to hits.
+						let dxAdj = `@{DX}[DEX]`;
+						mstring += ` {{tohit=[[${dxAdj}`;
+						mstring = `{{dx=[[${dxAdj}]]}} ` + mstring;
 						// provisionally add weapon toHit.
 						if (parseInt(v[weaponToHitName])||0) {
-							mstring += ` + @{${weaponToHitName}}[WPN_ADJ]`;
+							let weaponAdj = `@{${weaponToHitName}}[WPN_ADJ]`;
+							mstring += ` + ${weaponAdj}`;
+							mstring = `{{weaponadj=[[${weaponAdj}]]}} ` + mstring;
 						}
 						// and to hit.
 						if (toHit != 0) {
-							mstring += ` + ${toHit}[TOHIT]`;
+							let toHitAdj = `${toHit}[TO_HIT]`
+							mstring += ` + ${toHitAdj}`;
+							mstring = `{{tohitadj=[[${toHitAdj}]]}} ` + mstring;
 						}
 						// and finish.
 						mstring += ']]}}';
+						console.log('final string', mstring);
 					}
 
 					// conditionally add damage
