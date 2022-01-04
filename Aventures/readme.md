@@ -3,6 +3,7 @@ Cette MAJ d'Aventures contient :
 
     Correction du CSS pour Chrome
     Correction du roll des compétences qui ne prenait pas en compte les malus des cartons
+    Ajout d'un champ fixe pour les dégâts des dons
     Ajout de la traduction, langues FR-EN
     Correction de différents bugs visuels
 
