@@ -20979,21 +20979,48 @@ on(talents.map(talent => "clicked:" + talent + "-action").join(" "), async (info
 	);
 });
 
-on('clicked:athletik-ebe-action', async (info) => {
-	results = await startRoll(
+on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), async (info) => {
+	var func = "Action Listener for Talent Roll Buttons With Encumbrance";
+	var trigger = info["triggerName"].replace(/clicked:([^-]+)-ebe-action/, '$1');
+	var nameInternal = talentsData[trigger]["internal"];
+	var nameUI = talentsData[trigger]["ui"];
+	debugLog(func, trigger, talentsData[trigger]);
+
+	// Build Roll Macro
+	var rollMacro = "";
+	var ebeMacro = "@{BE}";
+	var talentEbeData = effectiveEncumbrance[trigger];
+	console.log(talentEbeData);
+	if (talentEbeData["type"] === "factor")
+	{
+		ebeMacro = talentEbeData["value"].toString() + " * " + ebeMacro;
+	} else if (talentEbeData["type"] === "summand") {
+		ebeMacro += talentEbeData["value"].toString();
+	}
+
+	rollMacro +=
 		"@{gm_roll_opt} " +
 		"&{template:talent-ebe} " +
-		"{{name=Athletik}} " +
-		"{{wert=[[@{TaW_athletik}d1cs0cf2]]}} " +
-		"{{mod=[[ 0d1cs0cf2 + ?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2 + [[2 * @{BE}]]d1cs0cf2 ]]}} " +
-		"{{stats=[[ [Eigenschaft 1:] [[@{Eigenschaft1athletik}]]d1cs0cf2 + [Eigenschaft 2:] [[@{Eigenschaft2athletik}]]d1cs0cf2 + [Eigenschaft 3:] [[@{Eigenschaft3athletik}]]d1cs0cf2]]}} " +
+		"{{name=" + nameUI + "}} " +
+		"{{wert=[[@{TaW_" + nameInternal + "}d1cs0cf2]]}} " +
+		"{{mod=[[ 0d1 + ?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2 + [[{0d1 + " + ebeMacro + ", 0d1}kh1]]d1cs0cf2 ]]}} " +
+		"{{stats=[[ " +
+			"[Eigenschaft 1:] [[@{Eigenschaft1" + nameInternal + "}]]d1cs0cf2 + " +
+			"[Eigenschaft 2:] [[@{Eigenschaft2" + nameInternal + "}]]d1cs0cf2 + " +
+			"[Eigenschaft 3:] [[@{Eigenschaft3" + nameInternal + "}]]d1cs0cf2" +
+			"]]}} " +
 		"{{roll=[[3d20cs<@{cs_talent}cf>@{cf_talent}]]}} " +
 		"{{result=[[0]]}} " +
 		"{{criticality=[[0]]}} " +
 		"{{critThresholds=[[[[@{cs_talent}]]d1cs0cf2 + [[@{cf_talent}]]d1cs0cf2]]}} " +
-		"{{ebe=[[@{BE} * 2]]}} "
-	);
-	console.log("test: info:", info, "results:", results);
+		"{{ebe=[[{0d1 + " + ebeMacro + ", 0d1}kh1]]}} ";
+	debugLog(func, rollMacro);
+
+	// Execute Roll
+	results = await startRoll(rollMacro);
+	debugLog(func, "test: info:", info, "results:", results);
+
+	// Process Roll
 	var rollID = results.rollId;
 	results = results.results;
 	var TaW = results.wert.result;
