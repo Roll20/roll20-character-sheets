@@ -471,11 +471,23 @@
 		<div>
 			<div>
 				<span class=template-dice>{{computed::roll1}}</span>
-				= {{roll1}} vs
+				<span>= {{roll1}} vs </span>
+				{{#simpletohit}}
+					{{tohit}}
+				{{/simpletohit}}
 			</div>
-			<div>
-				{{dx}} + {{weaponadj}} + {{tohitadj}} = {{tohit}}
-			</div>
+			{{^simpletohit}}
+				<div>
+					{{dx}}
+					{{#weaponadj}}
+					<span> + {{weaponadj}}</span>
+					{{/weaponadj}}
+					{{#tohitadj}}
+					<span> + {{tohitadj}}</span>
+					{{/tohitadj}}
+					<span> = {{tohit}}</span>
+				</div>
+			{{/simpletohit}}
 		</div>
 		{{#rollTotal() roll1 18}}
 			<div class=failure>Critical miss, weapon breaks!</div>
@@ -895,25 +907,34 @@
 					let mstring  = `&{template:attack}`
 						+ ` {{weaponname=@{${repeatingPropertyName('weapons', id, 'weaponname')}}}}`
 						+ ` {{roll1=[[3d6]]}}`;
+
+					// short description means no toHit or Weapon bonuses, can all be on one line or with no summation and =
+					let simpleToHit = true;
 					{ // compute total and separate to hits.
 						let dxAdj = `@{DX}[DEX]`;
 						mstring += ` {{tohit=[[${dxAdj}`;
 						mstring = `{{dx=[[${dxAdj}]]}} ` + mstring;
+
 						// provisionally add weapon toHit.
 						if (parseInt(v[weaponToHitName])||0) {
 							let weaponAdj = `@{${weaponToHitName}}[WPN_ADJ]`;
 							mstring += ` + ${weaponAdj}`;
 							mstring = `{{weaponadj=[[${weaponAdj}]]}} ` + mstring;
+							simpleToHit = false;
 						}
-						// and to hit.
+						// and to hit adjustment
 						if (toHit != 0) {
 							let toHitAdj = `${toHit}[TO_HIT]`
 							mstring += ` + ${toHitAdj}`;
 							mstring = `{{tohitadj=[[${toHitAdj}]]}} ` + mstring;
+							simpleToHit = false;
 						}
 						// and finish.
 						mstring += ']]}}';
-						console.log('final string', mstring);
+
+						if (simpleToHit) {
+							mstring += ' {{simpletohit=1}}'
+						}
 					}
 
 					// conditionally add damage
