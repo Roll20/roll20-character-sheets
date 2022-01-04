@@ -327,6 +327,15 @@
 					&nbsp
 					<span title="Experience you can spend on Attributes, Talents, or Spells.">Unspent <span class=sheet-stat-final name="attr_experienceunspent"/></span>
 				</div>
+				<div style='margin-bottom: .5em'>
+					<span title="Total number of attribute points you have.">
+						Attribute Points <span class=sheet-stat-final name="attr_totalattrpoints"/>
+					</span>
+					&nbsp
+					<span title="Experience cost to get the next attribute point.">
+						Next Attribute Cost <span class=sheet-stat-final name="attr_nextattrcost"/>
+					</span>
+				</div>
 			</span>
 			<br>
 			<div class='sheet-fieldset-header sheet-flex-section'>
@@ -1171,11 +1180,39 @@
 		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'dexpenalty', '', 'notcarried', dexCallback);});
 	});
 
+	// Attribute points and next attribute cost.
+	on('sheet:opened '
+	+ 'change:st_max '
+	+ 'change:dx_max '
+	+ 'change:iq_max ', function() {
+		getAttrs(['st_max', 'dx_max', 'iq_max'], function(v) {
+			let total = (parseInt(v.st_max)||0) + (parseInt(v.dx_max)||0) + (parseInt(v.iq_max)||0);
+			let nextCost = 0; // just a table based on total
+			let added = total + 1; // since next..
+			if (added <= 34)
+				nextCost = 100;
+			else if (added == 35)
+				nextCost = 200;
+			else if (added == 36)
+				nextCost = 300;
+			else if (added == 37)
+				nextCost = 600;
+			else
+				nextCost = 1000 << (added - 38);
+
+			setAttrs({
+				totalattrpoints: total,
+				nextattrcost: nextCost
+			});
+		});
+	});
+
+
 	// Update unspent iq points.
 	on('sheet:opened '
-		+ 'change:repeating_talents remove:repeating_talents '
-		+ 'change:repeating_spells remove:repeating_spells '
-		+ 'change:iq_max ', function() {
+	+ 'change:repeating_talents remove:repeating_talents '
+	+ 'change:repeating_spells remove:repeating_spells '
+	+ 'change:iq_max ', function() {
 		let totalSpent = 0;
 		let totalCallbacks = 0; // number of times called back.
 
@@ -1183,7 +1220,7 @@
 			totalSpent += computeRepeatingTotal(attrs, idarray, repName, costName);
 			if (++totalCallbacks == 2) {
 				getAttrs(['iq_max'], function(v) {
-					let unspent = v.iq_max - totalSpent;
+					let unspent = (parseInt(v.iq_max)||0) - totalSpent;
 					setAttrs({
 						iqunspent: unspent
 					});
