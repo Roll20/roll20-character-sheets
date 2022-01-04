@@ -672,4 +672,49 @@ nonweaponProficiencies['Pest Control'] = {
     'book': 'The Complete Book of Dwarves'
 };
 //#endregion
+
+//#region The Complete Bard's Handbook
+nonweaponProficiencies['Acting'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': -1,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+nonweaponProficiencies['Chanting'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+nonweaponProficiencies['Craft Instrument'] = {
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+nonweaponProficiencies['Crowd Working'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+nonweaponProficiencies['Poetry'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+nonweaponProficiencies['Whistling/Humming'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+//#endregion
 module.exports = nonweaponProficiencies;

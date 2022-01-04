@@ -10,7 +10,7 @@ const ERROR = 'error';
 const BOOK_FIELDS = [
     'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
     'book-tom', 'book-aaeg',
-    'book-tcbod'];
+    'book-tcbod', 'book-tcbhb'];
 
 //#region Helper function
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
