@@ -1,7 +1,7 @@
 
 <script type="text/worker">
   const sheetVersionPrefix = "Official Savage Worlds v";
-const sheetVersion = "1.00.21";
+const sheetVersion = "1.00.22";
 
 // Define colors for Logs
 const r20color = "#E948C9";
@@ -470,6 +470,12 @@ const upgradeSheet = function(
             setattrvals["pastrengthname"] = getTranslationByKey("pastrengthname");
             setattrvals["rastrengthname"] = getTranslationByKey("rastrengthname");
             // Will want to faux swap HBRaiseRule so the multiple dice bonus stuff works
+            fauxChange("RaiseHBRule", "3")
+            setattrvals["newcontent"] = "unread";
+            setattrvals["newdocumentation"] = "unread";
+        }
+        if (versionthree < 0.22) {
+            // Will want to faux swap HBRaiseRule so the multiple dice bonus stuff works for spells
             fauxChange("RaiseHBRule", "3")
             setattrvals["newcontent"] = "unread";
             setattrvals["newdocumentation"] = "unread";
@@ -2310,8 +2316,6 @@ const weaponfields = [
     "dmgnumdice",
     "dmgdietype",
     "dmgbonusnum",
-    "weaponsbdtnum",
-    "weaponsbdt",
     "weaponnotes",
     "weaponweight",
     "weaponminstrength",
@@ -2389,6 +2393,7 @@ const armorfields = [
     "armorstack",
     "ArmorTypeWeight",
     "ArmorNotes",
+    "embeddedtoughness"
 ];
 const shieldfields = [
     "ShieldType",
@@ -3933,11 +3938,11 @@ function getBonusFields(repSection, setField) {
             log(`Key`,`repeating_${repSection}_${idArray[i]}_${preBonusDmg}bonusdmg`,"yellow");
             log(`Value`,`@{${setField}}`,"yellow");
             //Made change here on 12/17/2021
-            setField === "weaponsbdt" ? fieldlist[
-                `repeating_${repSection}_${idArray[i]}_${preBonusDmg}bonusdmg`
-            ] = "@{weaponsbdtnum}@{" + setField + "}" : fieldlist[
-                `repeating_${repSection}_${idArray[i]}_${preBonusDmg}bonusdmg`
-            ] = "@{" + setField + "}";
+            setField === "weaponsbdt" 
+                ? fieldlist[`repeating_${repSection}_${idArray[i]}_${preBonusDmg}bonusdmg`] = "@{weaponsbdtnum}@{" + setField + "}" 
+                : setField === "spellsbdt" 
+                ? fieldlist[`repeating_${repSection}_${idArray[i]}_${preBonusDmg}bonusdmg`] = "@{spellssbdtnum}@{" + setField + "}"
+                : fieldlist[`repeating_${repSection}_${idArray[i]}_${preBonusDmg}bonusdmg`] = "@{" + setField + "}";
         }
         log("fieldlist", JSON.stringify(fieldlist), "yellow");
         setAttrs(fieldlist);
@@ -4033,7 +4038,7 @@ function setBonusAutoroll(autoRollSetting, repSection) {
 }
 
 on(
-    "change:autorollbonusdmg change:repeating_weapons:weapon change:repeating_weapons:weapondamage change:repeating_weapons:weaponsbdt change:repeating_weapons:weaponsbdtnum change:repeating_spells:power change:repeating_spells:powerdamage change:repeating_spells:spellsbdt change:repeating_paweapons:weapon change:repeating_paweapons:weapondamage change:repeating_paweapons:weaponsbdt change:repeating_paweapons:weaponsbdtnum change:repeating_raweapons:weapon change:repeating_raweapons:weapondamage change:repeating_raweapons:weaponsbdtchange:repeating_raweapons:weaponsbdtnum",
+    "change:autorollbonusdmg change:repeating_weapons:weapon change:repeating_weapons:weapondamage change:repeating_weapons:weaponsbdt change:repeating_weapons:weaponsbdtnum change:repeating_spells:power change:repeating_spells:powerdamage change:repeating_spells:spellsbdt change:repeating_spells:spellsbdtnum change:repeating_paweapons:weapon change:repeating_paweapons:weapondamage change:repeating_paweapons:weaponsbdt change:repeating_paweapons:weaponsbdtnum change:repeating_raweapons:weapon change:repeating_raweapons:weapondamage change:repeating_raweapons:weaponsbdtchange:repeating_raweapons:weaponsbdtnum",
     function(eventInfo) {
         //If a new weapon or spell is created, need to configure the Bonus Damage roll appropriately
         //Get which repeating section the change is from
@@ -4067,7 +4072,7 @@ on(
                 vbonusRoll 
                     ? valueString[`repeating_${rSection}_${preBonusDmg}bonusdmg`] = `@{${raiseRule}}` 
                     // : valueString[`repeating_${rSection}_${preBonusDmg}bonusdmg`] = `@{dmgbonusnum}@{${raiseRule}}`;
-                    : valueString[`repeating_${rSection}_${preBonusDmg}bonusdmg`] = `@{weaponsbdtnum}@{${raiseRule}}`;
+                    : valueString[`repeating_${rSection}_${preBonusDmg}bonusdmg`] = `@{${preBonusDmg}bdtnum}@{${raiseRule}}`;
                 console.log(valueString);
                 setAttrs(valueString);
             });
@@ -6401,7 +6406,7 @@ on(
 </script>
 <!-- Necessary Mixins-->
 <!-- Hidden inputs for character sheet versioning, etc-->
-<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.21"/>
+<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.22"/>
 <input type="hidden" name="attr_firstInit" value="0"/>
 <input type="hidden" name="attr_namelength" value="0"/>
 <input type="hidden" name="attr_wdNum" value="1"/>
@@ -7635,6 +7640,10 @@ on(
                 </div>
                 <div class="vbonusdamage">
                   <label class="configlabels" data-i18n="bonus-damage-die-type">Bonus Damage Die Type</label>
+                  <div class="numOfBonusDice"> 
+                    <input type="number" name="attr_spellsbdtnum" value="1"/>
+                    <label class="underLabel" data-i18n="number-of-dice-abbr"># of dice</label>
+                  </div>
                   <select class="dtype" name="attr_spellsbdt" title="@{repeating_spells_$#_spellsbdt}">
                     <option value="d4" data-i18n="d4">d4</option>
                     <option value="d6" selected="selected" data-i18n="d6">d6</option>
@@ -13590,6 +13599,10 @@ on(
                     </div>
                     <div class="vbonusdamage">
                       <label class="configlabels" data-i18n="bonus-damage-die-type">Bonus Damage Die Type</label>
+                      <div class="numOfBonusDice"> 
+                        <input type="number" name="attr_spellsbdtnum" value="1"/>
+                        <label class="underLabel" data-i18n="number-of-dice-abbr"># of dice</label>
+                      </div>
                       <select class="dtype" name="attr_spellsbdt" title="@{repeating_spells_$#_spellsbdt}">
                         <option value="d4" data-i18n="d4">d4</option>
                         <option value="d6" selected="selected" data-i18n="d6">d6</option>
