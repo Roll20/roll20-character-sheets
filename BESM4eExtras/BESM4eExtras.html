@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.4.8" readonly />
+													<input type="text" class="center" name="attr_version" value="1.4.9" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -9266,7 +9266,7 @@
 					title = '{{title=Roll 2d6}}';
 					break;
 				case 'acv':
-					cv = getCV(debug, value, attrdb, setObj, sourceAttr, 'acv', '');
+					cv = getCV(debug, value, attrdb, setObj, sourceAttr, 'acv', '', true);
 					type = '{{acvroll=1}}';
 					title = '{{title=Roll ACV}}';
 					stat = `{{acv=${cv}}}`;
@@ -9286,7 +9286,7 @@
 					const bonus = defensetype != '' ? 
 						getSumOfActiveAttrLevels(attrdb, 'rangeddefense', defensetype) * 2 :
 						0;
-					cv = getCV(debug, value, attrdb, setObj, sourceAttr, 'dcv')  + bonus;
+					cv = getCV(debug, value, attrdb, setObj, sourceAttr, 'dcv', '', true)  + bonus;
 					type = '{{dcvroll=1}}';
 					title = '{{title=Roll DCV}}';
 					stat = `{{dcv=${cv}}}`;
@@ -10841,8 +10841,14 @@
 				(!isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'rangeddefense', focus) * 2 : 
 				0;
 			const state = 
-				(type == 'acv') ? parseInt(value.static_button_targeted_attack) :
-				(type == 'dcv') ? parseInt(value.static_button_targeted_defense) : 
+				(type == 'acv') ? 
+				isNaN(parseInt(setObj.static_button_targeted_attack)) ?
+				parseInt(value.static_button_targeted_attack) :
+				parseInt(setObj.static_button_targeted_attack) :
+				(type == 'dcv') ? 
+				isNaN(parseInt(setObj.static_button_targeted_defense)) ?
+				parseInt(value.static_button_targeted_defense) :
+				parseInt(setObj.static_button_targeted_defense) :
 				0;
 			const enemy = 
 				(type == 'acv') ? getTargetedLevel(attrdb, 'enemyattack') * 2 :
@@ -12181,6 +12187,11 @@
 								break;
 								case `button`:
 									if (rowID == 'targeted') {
+										const rolltype = selection => 
+											selection == 'acv' || selection == 'dcv' ?
+											setDynamicRollValue(debug, eventInfo, value, attrdb, rowID, sourceAttr, setObj) :
+											false;
+										rolltype(value.static_roll_type_selection);
 										setButtonState(debug, value, source, rowID, sourceAttr, setObj);
 										setCombatRoll(debug, value, attrdb, undefined, sourceAttr, setObj, true);
 									}
