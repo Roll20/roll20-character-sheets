@@ -1,9 +1,10 @@
 /*jshint esversion: 11, laxcomma:true, eqeqeq:true*/
 /*jshint -W014,-W084,-W030,-W033*/
 //Initial change functions
-const syncHealth = function(trigger,attributes,sections){
+const syncHealth = function({trigger,attributes,sections}){
   debug('syncing token and character health');
-  const type = trigger.name.replace(/_max/,'');
+  debug({sections,trigger});
+  const type = trigger.name.replace(/_(?:mod|max)/,'');
   let damage = attributes[`${type}_max`] - attributes[type];
   let damageIndex = damage - 1;
   sections[`repeating_${type}`].forEach((id,index)=>{
@@ -14,3 +15,4 @@ const syncHealth = function(trigger,attributes,sections){
     attributes[type] = attributes[`${type}_max`];
   }
 };
+funcs.syncHealth = syncHealth;
