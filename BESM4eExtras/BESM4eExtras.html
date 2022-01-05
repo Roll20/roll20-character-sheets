@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.4.9" readonly />
+													<input type="text" class="center" name="attr_version" value="1.4.10" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -9591,23 +9591,51 @@
 			}
 		}
 		
-		function setExtraArms(isActive, debug, value, rowID, sourceAttr, setObj) {
-			const extraarms = parseInt(value[`repeating_attr_${rowID}_extraarms`]) || 0,
-				label = value[`repeating_attr_${rowID}_name`];
+		function setExtraArms(isActive, debug, extraarmIDs, value, rowID, sourceAttr, setObj, isTelekinesis = false) {
+			const extraarms = isTelekinesis ? 2 :
+				parseInt(value[`repeating_attr_${rowID}_extraarms`]) || 0;
+			const label = value[`repeating_attr_${rowID}_name`];
 			if (isActive) {
-				var extraarmIDs = [];
+				var armIDs = [];
 				for (let i = 0; i < extraarms; i++) {
-					const extraarmID = generateRowID();
-					setObj[`repeating_extraarm_${extraarmID}_label`] = label;
-					setObj[`repeating_extraarm_${extraarmID}_type`] = 1;
-					extraarmIDs[i] = extraarmID;
+					const armID = generateRowID();
+					setObj[`repeating_extraarm_${armID}_label`] = label;
+					setObj[`repeating_extraarm_${armID}_type`] = 1;
+					armIDs[i] = armID;
 				}
-				setObj[`repeating_attr_${rowID}_source`] = extraarmIDs.join();
+				setObj[`repeating_attr_${rowID}_source`] = armIDs.join();
 			} else {
-				const extraarmIDs = value[`repeating_attr_${rowID}_source`].split(',');
-				_.each(extraarmIDs, (extraarmID) => {
-					removeRepeatingRow(`repeating_extraarm_${extraarmID}`);
+				let sources = value[`repeating_attr_${rowID}_source`].toLowerCase().split(',');
+				const armpositions = _.chain(sources)
+					.map((id, i) => {
+						i+=1;
+						const armpos = extraarmIDs.indexOf(id) >= 0 ? i : '';
+						return armpos;
+					})
+					.compact()
+					.map(pos => {
+						pos--;
+						return pos;
+					})
+					.value();
+				sources = value[`repeating_attr_${rowID}_source`].split(',');
+				const armIDs = _.map(armpositions, pos => {
+					return sources[pos];
 				});
+				_.each(armIDs, id => {
+					removeRepeatingRow(`repeating_extraarm_${id.toLowerCase()}`);
+				});
+				sources = _.chain(sources)
+					.map((source, i) => {
+						const result = armpositions.indexOf(i) >= 0 ? '' : source;
+						return result;
+					})
+					.compact()
+					.value();
+				const write = test => test.indexOf(',') > 0 ? 
+					setObj[`repeating_attr_${rowID}_source`] = test.join() :
+					setObj[`repeating_attr_${rowID}_source`] = test;
+				write(sources);
 			}
 			if (debug) {
 				console.log(`[setExtraArms(${sourceAttr})] extraarms = ${extraarms}`);
@@ -10455,7 +10483,7 @@
 					setActiveAttribute(isActive, debug, value, rowID, sourceAttr, setObj, attribute, level);
 				break;
 				case "extraarms":
-					setExtraArms(isActive, debug, value, rowID, sourceAttr, setObj);
+					setExtraArms(isActive, debug, extraarmIDs, value, rowID, sourceAttr, setObj);
 				break;
 				case "heightenedawareness":
 					setAttrdb(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
@@ -10509,8 +10537,10 @@
 					setActiveAttribute(isActive, debug, value, rowID, sourceAttr, setObj, attribute, level);
 				break;
 				case "telekinesis":
-					//setAttrdb(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-					//setWeapon(isActive, debug, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+					if (level > 1) {
+						setAttrdb(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
+						setWeapon(isActive, debug, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+					}
 					setActiveAttribute(isActive, debug, value, rowID, sourceAttr, setObj, attribute, level);
 				break;
 				case "tough":
@@ -11096,6 +11126,8 @@
 				_.find(attrdb[`${type}`], o => { if (o.source == activeweapon) return o; });
 			const isWeapon = 
 				getIsObject(weapon);
+			const isTelekinesis =
+				getIsObject(_.find(attrdb.telekinesis, o => { if (o.source == activeweapon) return o; }));
 			const isSwarm = 
 				getIsObject(_.find(attrdb.swarm, o => { if (o.source == activeweapon) return o; }));
 			const targetedmdState = 
@@ -11147,6 +11179,8 @@
 				getCV(debug, value, attrdb, setObj, sourceAttr, 'dcv', weaponclass) : 0;
 			let damage = isSwarm ?
 				Math.round(weapon.critters/10) :
+				isTelekinesis ?
+				(((level - 2) + massivedamage + targetedmd) * 5) + acv :
 				((level + (superstrength * muscle) + massivedamage + targetedmd + rushattack) * 5) + acv;
 			let edge = 
 				(isWeapon) ? _.find(weapon.customizations, c => { 
