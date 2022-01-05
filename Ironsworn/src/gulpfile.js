@@ -12,7 +12,7 @@ gulp.task('html', () => {
   return gulp.src('./app/Ironsworn.pug')
     .pipe(pug({
       pretty: true,
-      locals: require('../translation.json')
+      locals: { translations: require('../translation.json'), fs: require('fs')}
     }))
     .pipe(gulp.dest('../'))
 })

@@ -3105,6 +3105,35 @@
 			}
 		});
 
+		getAttrs(["update_3"], function(values) 
+		{
+			let getUpdated = parseInt(values["update_3"], 10)||0;
+			
+			if(getUpdated != 1)
+			{
+				getSectionIDs("repeating_weapons", function (ids) 
+				{
+					_.each(ids,function(id) 
+					{
+						getAttrs(["repeating_weapons_"+id+"_weapon_strbonus"], function (v) 
+						{					
+							const strB = v["repeating_weapons_"+id+"_weapon_strbonus"];
+							
+							if(strB == "@{agi_mod})") {
+								setAttrs({
+								["repeating_weapons_"+id+"_weapon_strbonus"]: "@{agi_mod}"
+								});
+							}
+						});
+					});
+				});
+			
+				setAttrs({
+					update_3: 1
+				});
+			}
+		});	
+		
 		setAttrs({
 			modifiersTrad: getTranslationByKey("modifiers"),
 			fatigueTrad: getTranslationByKey("fatigue"),
@@ -3114,6 +3143,7 @@
 			useTrad: getTranslationByKey("use"),
 			maintTrad: getTranslationByKey("maintenance")
 		});
+			
 	});
 </script>
 
@@ -3186,7 +3216,7 @@
 	
 	<label>
 		<span data-i18n="presence">Presence</span>
-		<input type="number" name="attr_presence" value="(@{character_level}*100 +500)/20" disabled />
+		<input type="number" name="attr_presence" value="((@{character_level}*100 +500)/20)" disabled />
 	</label>
 </div>
 <div class="menu">
@@ -3231,6 +3261,7 @@
 </div>
 <input type="hidden" name="attr_update_1" value="0" readonly />
 <input type="hidden" name="attr_update_2" value="0" readonly />
+<input type="hidden" name="attr_update_3" value="0" readonly />
 <input type="hidden" name="attr_update_1MS" value="0" readonly />
 <input type="hidden" name="attr_aap" value="((((@{aam})+(@{AMTransDraSceaux}*5)) - abs((@{aam}+(@{AMTransDraSceaux}*5)))) / 2)" disabled />
 <input type="hidden" name="attr_tab" class="tabExtend" value="1" />
@@ -8534,7 +8565,7 @@
 						<span>+</span>
 						<select name="attr_weapon_strbonus">
 							<option value="(0)" data-i18n="not-available" selected>N/A</option>
-							<option value="@{agi_mod})" data-i18n="agility">Agility</option>
+							<option value="@{agi_mod}" data-i18n="agility">Agility</option>
 							<option value="@{con_mod}" data-i18n="constitution">Constitution</option>
 							<option value="@{dex_mod}" data-i18n="dexterity">Dexterity</option>
 							<option value="@{str_mod}" data-i18n="strength" selected="true">Strength</option>
@@ -8567,7 +8598,7 @@
 						<span>=</span>
 					</div>
 					
-					<input type="number" name="attr_weapon_finaldmg" value="@{weapon_basedmg}+@{weapon_strbonus}+@{weapon_twohanded}*@{weapon_strbonus}+2*@{weapon_quality}+@{aura_extension}+@{increased_damage}" disabled />
+					<input type="number" name="attr_weapon_finaldmg" value="@{weapon_basedmg}+@{weapon_strbonus}+@{weapon_twohanded}*(@{weapon_strbonus})+2*@{weapon_quality}+@{aura_extension}+@{increased_damage}" disabled />
 				</div>
 				<div>
 					<span data-i18n="fortitude">Fortitude</span>

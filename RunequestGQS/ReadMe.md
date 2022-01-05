@@ -35,6 +35,56 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
 
+## 25.10.2021
+
+	Fixed Strike issues with DEX 19+.  DEX will have to be changed for this to be triggered.
+	Added headers to Parry & Attack Rolls
+	Added delimiters to clarigy the start and end of attacks and parries.
+
+## 06.10.2021
+
+	To account for damage reduction in the attack results tables
+	Added display of special damage and normal damage to critical attack results
+	Added display of normal damage to critical attack results
+
+## 23.08.2021
+
+	Added inputs for final attack and parry values
+	
+	Added input for magical damage bonus
+
+	Added support for minimum chance of  success of 5%
+
+	Increased the size of the modifier inputs in the weapons to allow for calculations instead of fixed value e.g. 10-25 as possible clarification for reducing skills to 100 for opposed rolls.  
+	
+	Added Other Notes section  
+
+
+
+## 09.08.2021
+
+	Added missing translation tags 
+
+	Added missing weapon types for datalists
+
+	Added spirit combat and spirit combat damage for npcs.
+
+	Added magic tab with expanded areas for spells including a new area to include a description  of spell effects and turn order buttons
+
+	Added self to range options for spells
+	
+	Added Spcl  (Special) to duration
+
+	Added parry button and parry modifiers to cover different modifiers for attack and parry
+
+	Added support for penalties for multiple parry and dodges. The modifier should be reset at the start of each turn.
+
+	Added resistance button for characteristics.  POW resistance button is repeated in the magic tab
+
+	Fixed Magic skills with base of 0 and 0 experience should have a skill total of 0 no matter the category bonus.
+
+	Changed spell characteristic defaults for new spells.   
+
 
 ## 14.7.2021
 
