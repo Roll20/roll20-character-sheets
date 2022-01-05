@@ -177,8 +177,10 @@ Those are omitted in the following list of rolltemplate names and supported valu
 + **`arcane`**:
     + `label0` through `label6`
     + `result0` through`result6`
-    + `textfield`
     + `textlabel`
+    + `textsublabel`
+    + `textfield`
+
 
 ### Changelog
 + **March 2021, v1.6.4**

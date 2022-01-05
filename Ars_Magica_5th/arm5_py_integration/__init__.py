@@ -516,6 +516,23 @@ spell_template = rolltemplate(
 GLOBALS["spell_roll_simple"] = spell_template.simple
 GLOBALS["spell_roll_stress"] = spell_template.stress
 
+spont_template = rolltemplate(
+    "arcane",
+    label0="@{spell_name}",
+    result0=f"[[ (%(die)s + {spell_roll} )/2 * [[ 1 / (1 + @{{spell_Deficiency}}) ]]]]",
+    label1="^{aura}",
+    result1="@{aura}",
+    label2="^{weakness-m}",
+    result2="[[ (@{wound_total}) [@{wounds_i18n}] + [[floor(@{fatigue})]] [@{fatigue_i18n}] ]]",
+    label3="^{circumstances-m}",
+    result3="[[ ?{@{modifiers_i18n}|0} ]]",
+    textlabel="@{spell_tech_name} @{spell_form_name} @{spell_level}",
+    textsublabel="@{spell_range} - @{spell_duration} - @{spell_target}",
+    textfield="@{spell_note}",
+    critical="critical-spontaneous",
+)
+GLOBALS["saved_spontaneous_roll_stress"] = spont_template.stress
+
 
 # Botch formula
 

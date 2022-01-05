@@ -103,8 +103,9 @@ class RollTemplate:
             *(f"{n}{i}" for n in ("label", "result") for i in range(5)),
         },
         "arcane": {
+            "textlabel",
+            "textsublabel",
             "textfield",
-            "labelfield",
             *(f"{n}{i}" for n in ("label", "result") for i in range(7)),
         },
         "spell": {
