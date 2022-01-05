@@ -1279,6 +1279,8 @@ const listStyle = [
     `atkAmbidextre`,
     `atkDefensif`,
     `atkPilonnage`,
+    `stylePuissantType`,
+    `stylePuissantBonus`,
     `styleSuppressionD`,
     `styleSuppressionV`,
 ];
@@ -6237,7 +6239,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
 
       if (isELourd) {
         const type = value.stylePuissantType;
-        const bonus = Number(value.stylePuissantBonus);
+        const bonus = +value.stylePuissantBonus;
         const malus = 0 - bonus;
 
         exec.push(`{{vMStyleA=${malus}D}}`);
@@ -7169,9 +7171,9 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
   const goliath = +attrs.barbarianGoliath;
   const goliathMAL = +attrs.MALBarbarianGoliath;
 
-  const corpMetal = attrs.sorcererMMCorpMetal;
+  const corpMetal = +attrs.sorcererMMCorpMetal;
   const CM150PG = attrs.sorcerer150PG;
-  const CM250PG = attrs.sorcererMM250PG;
+  const CM250PG = +attrs.sorcererMM250PG;
 
   const warmasterForce = attrs.warmasterImpForce;
   const warmasterForcePers = +attrs.warmasterImpFPersonnel;
@@ -7180,6 +7182,8 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
   const warmasterForcePersMAL = +attrs.MALWarmasterImpFPersonnel;
 
   let total = max + modif;
+
+  log(corpMetal);
 
   switch (armure) {
     case 'barbarian':
@@ -7190,7 +7194,7 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
       if (corpMetal !== 0 || CM250PG !== 0) {
         total += 2;
 
-        if (CM150PG !== 0) total += 2;
+        if (CM150PG !== '0') total += 2;
       }
       break;
 
@@ -7906,7 +7910,7 @@ on('change:monk150PG change:monk250PG sheet:opened', async () => {
 on('change:priest200PG', async () => {
   const attrs = await getAttrsAsync(['priest200PG']);
 
-  const PG200 = +attrs.priest200PG;
+  const PG200 = attrs.priest200PG;
 
   let contactDice = 3;
   let distanceDice = 2;
@@ -12896,7 +12900,7 @@ rollCombatContact.forEach((button) => {
         ASObliteration = ASObliteration.concat(attaquesSurprises);
         ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
 
-        exec.push(`{{obliterationAS=${ASTenebricide.join('\n+')}}}`);
+        exec.push(`{{obliterationAS=${attaquesSurprises.join('\n+')}}}`);
         exec.push(`{{obliterationASValue=${_.reduce(ASValueObliteration, (n1, n2) => n1 + n2, 0)}}}`);
       }
 
@@ -14489,6 +14493,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     listAttrs = listAttrs.concat(listBase);
     listAttrs = listAttrs.concat(listArmure);
     listAttrs = listAttrs.concat(listArmureLegende);
+    listAttrs = listAttrs.concat(listStyle);
 
     const attrs = await getAttrsAsync(listAttrs);
 
@@ -14617,7 +14622,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     // GESTION DU STYLE
     let getStyle;
 
-    if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
+    if (type.includes('&{template:combat} {{portee=^{portee-contact}}}')) {
       getStyle = getStyleContactMod(attrs, [], baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false);
     } else {
       getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, hasArmure, oTir, false, false, false, false);
@@ -51312,7 +51317,7 @@ on('clicked:rollVehicule', async (info) => {
                     </div>
                     <div class="lastCol armeJet">
                         <input class="bonus" type="number" name="attr_armeODAutre" value="0" />
-                        <button class="rollDice" type="action" name="act_armeautre" value="@{jetGM} &{template:combat} {{Nom=@{name}}}"></button>
+                        <button class="rollDice" type="action" name="act_armeautrepj" value="@{jetGM} &{template:combat} {{Nom=@{name}}}"></button>
                     </div>
                 </div>
 
