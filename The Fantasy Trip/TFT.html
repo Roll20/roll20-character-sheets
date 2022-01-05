@@ -256,7 +256,7 @@
 					</div>
 					<div>
 						<span title="Text that displays when the spell succeeds, optional.">Flavor Text:</span>
-						<input type=text name="attr_flavor" style='display: block; width:100%' placeholder="<A giant wolf appears.>">
+						<input type=text name="attr_successflavor" style='display: block; width:100%' placeholder="<A giant wolf appears.>">
 					</div>
 					<div title="Description that shows when you click the Describe button.">Description:</div>
 					<textarea class=sheet-text-area name="attr_description"></textarea>
@@ -636,7 +636,7 @@
 			{{/rollTotal() roll1 16}}
 			{{#rollTotal() roll1 3}}
 				{{#flavor}}
-					<div class=description>{{flavor}}</div>
+					<div class=flavor-success>{{flavor}}</div>
 				{{/flavor}}
 				<div class=success>Critical Success, triple Damage or Effect!</div>
 				{{#damage}}
@@ -644,28 +644,30 @@
 				{{/damage}}
 			{{/rollTotal() roll1 3}}
 			{{#rollTotal() roll1 4}}
-				<div class=success>Critical Success, double Damage or Effect!</div>
 				{{#flavor}}
-					<div class=description>{{flavor}}</div>
+					<div class=flavor-success>{{flavor}}</div>
 				{{/flavor}}
+				<div class=success>Critical Success, double Damage or Effect!</div>
 				{{#damage}}
 					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
 				{{/damage}}
 			{{/rollTotal() roll1 4}}
 			{{#rollTotal() roll1 5}}
-				<div class=success>Automatic Success!</div>
 				{{#flavor}}
-					<div class=description>{{flavor}}</div>
+					<div class=flavor-success>{{flavor}}</div>
 				{{/flavor}}
+				<div class=success>Automatic Success!</div>
 				{{#damage}}
 					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
 				{{/damage}}
 			{{/rollTotal() roll1 5}}
 			{{#rollBetween() roll1 6 15}}
 				{{#^rollGreater() roll1 tohit}}
-					<div class=success>Success!</div>
 					{{#flavor}}
-						<div class=description>{{flavor}}</div>
+						<div class=flavor-success>{{flavor}}</div>
+					{{/flavor}}
+					{{^flavor}}
+						<div class=success>Success!</div>
 					{{/flavor}}
 					{{#damage}}
 						<div class=keyvalue><span>Damage: </span>{{damage}}</div>
@@ -700,7 +702,7 @@
 			-->
 		{{#rollTotal() roll1 4}}
 			{{#flavor}}
-				<div class=description>{{flavor}}</div>
+				<div class=flavor-success>{{flavor}}</div>
 			{{/flavor}}
 			<div class=success>Critical Success, triple Damage or Effect!</div>
 			{{#damage}}
@@ -708,19 +710,21 @@
 			{{/damage}}
 		{{/rollTotal() roll1 4}}
 		{{#rollTotal() roll1 5}}
-			<div class=success>Critical Success, double Damage or Effect!</div>
 			{{#flavor}}
-				<div class=description>{{flavor}}</div>
+				<div class=flavor-success>{{flavor}}</div>
 			{{/flavor}}
+			<div class=success>Critical Success, double Damage or Effect!</div>
 			{{#damage}}
 				<div class=keyvalue><span>Damage: </span>{{damage}}</div>
 			{{/damage}}
 		{{/rollTotal() roll1 5}}
 		{{#rollBetween() roll1 6 19}}
 			{{#^rollGreater() roll1 tohit}}
-				<div class=success>Success!</div>
 				{{#flavor}}
-					<div class=description>{{flavor}}</div>
+					<div class=flavor-success>{{flavor}}</div>
+				{{/flavor}}
+				{{^flavor}}
+					<div class=success>Success!</div>
 				{{/flavor}}
 				{{#damage}}
 					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
@@ -1141,9 +1145,10 @@
 				});
 			} else if (type == 'spell') {
 				let damageName = repeatingPropertyName('spells', id, 'spelldamage');
-				let flavorName = repeatingPropertyName('spells', id, 'flavor');
+				let flavorName = repeatingPropertyName('spells', id, 'successflavor');
 				let toHitName  = repeatingPropertyName('spells', id, 'tohit');
 				getAttrs([flavorName, toHitName, damageName, 'defending'], function(v) {
+
 					let mstring  = `&{template:cast-spell}`
 						+ ` {{spellname=@{${repeatingPropertyName('spells', id, 'spellname')}}}}`;
 
@@ -1188,6 +1193,7 @@
 					if (v[flavorName] != '') {
 						mstring += ` {{flavor=@{${flavorName}}}}`;
 					}
+					console.log('mstring is', mstring);
 					doRollWithDiceString(mstring);
 				});
 			}
