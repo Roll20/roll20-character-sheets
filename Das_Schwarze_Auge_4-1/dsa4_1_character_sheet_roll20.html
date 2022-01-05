@@ -13749,6 +13749,8 @@
         </div>
 
 		<div class="sheet-hide">
+<button type="action" name="act_test">1W20-Kampfwurf</button>
+<button type="action" name="act_reacttest">Click me 2</button>
 			<!-- Comfort Attributes (= to shorten rolls) -->
 			AT-Wert aus aktiver Waffe (bei Wahl mehrerer aktiver Waffen wird addiert!)
 			<!-- Berechnung AT Wert -->
@@ -14640,6 +14642,7 @@
     <b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="sheet-stat-immutable sheet-stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20220821"><input type="hidden" class="sheet-stat-immutable sheet-stat-immutable-version" readonly="readonly" name="attr_data_version" value=""></b>
     </table>
 </div>
+
 <rolltemplate class="sheet-rolltemplate-check">
 3W20: {{computed::roll}} (Stats: {{computed::stats}}), Result: {{computed::result}}, Criticality {{computed::criticality}}
 {{#rollBetween() computed::criticality 2 2}}Doppel-1!{{/rollBetween() computed::criticality 2 2}}
@@ -14886,6 +14889,37 @@
 			<td>Eigenschaften: {{computed::stats}}</td>
 		</tr>
 	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-test">
+    <div class="sheet-template-container">
+        <div class="sheet-results">
+					<table>
+						<tr>
+							<th>{{name}}</th>
+						</tr>
+						<tr>
+							<td>Character ID: {{characterid}}</td>
+						</tr>
+						<tr>
+							<td>Character Name: {{charactername}}</td>
+						</tr>
+						<tr>
+							<td>Wert: {{taw}}</td>
+						</tr>
+						<tr>
+							<td>Wurf: {{roll}}</td>
+						</tr>
+						<tr>
+							<td>
+        				<div class="sheet-rolltemplate-button-outer">
+									<span class="sheet-rolltemplate-button-inner">[ZWEITA BATTEN](~{{characterid}}|reacttest||{{computed::passthrough}})</span>
+								</div>
+							</td>
+						</tr>
+					</table>
+        </div>
+    </div>
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-DSA-Talente">
@@ -22478,6 +22512,49 @@ on('clicked:eidsegen-action', async (info) => {
 			roll: TaPstar,
 			result: result,
 			stats: stats.toString().replaceAll(",", "/")
+		}
+	);
+});
+
+on('clicked:test', (info) => {
+	startRoll(
+		"&{template:test} " +
+		"{{name=Kampfwurf, 1. Wurf}} " +
+		"{{taw=[[@{TaW_akrobatik}]]}} " +
+		"{{roll=[[1d20cs1cf20]]}} " +
+		"{{characterid=@{character_id}}} " +
+		"{{charactername=@{character_name}}} " +
+		"{{passthrough=[[0]]}}",
+		(results) => {
+			console.log("test: info:", info, "results:", results);
+			rolls = results.results.roll.rolls[0].results;
+			console.log(rolls);
+
+			finishRoll(
+				results.rollId,
+				{
+					originator: "Testo"
+				}
+			);
+		}
+	);
+});
+
+on('clicked:reacttest', (info) => {
+	startRoll(
+		"&{template:test} " +
+		"{{name=Kampfwurf, 2. Wurf}} " +
+		"{{taw=[[@{TaW_akrobatik}]]}} " +
+		"{{roll=[[1d20cs1cf20]]}} " +
+		"{{characterid=@{character_id}}} " +
+		"{{charactername=@{character_name}}} " +
+		"{{passthrough=[[0]]}}",
+		(results) => {
+			console.log("test: info:", info, "results:", results);
+			roll = results.results.roll.result;
+			taw = results.results.taw.result;
+
+			finishRoll(results.rollId);
 		}
 	);
 });
