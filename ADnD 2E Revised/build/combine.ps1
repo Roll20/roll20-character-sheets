@@ -1,9 +1,11 @@
-& 'D:\git\roll20-character-sheets\ADnD 2E Revised\build\sanitizeFiles.ps1'
+$sanitizeScript = Join-Path $PSScriptRoot "sanitizeFiles.ps1"
+& $sanitizeScript
 
 "---- Combining files ----"
-$inputFile = 'D:\git\roll20-character-sheets\ADnD 2E Revised\html\2ESheet-base.html'
-$sourceFolder = 'D:\git\roll20-character-sheets\ADnD 2E Revised'
-$outputFile = 'D:\git\roll20-character-sheets\ADnD 2E Revised\2ESheet.html'
+
+$sourceFolder = Join-Path $PSScriptRoot ".."
+$inputFile = Join-Path $sourceFolder "html" "2ESheet-base.html"
+$outputFile = Join-Path $sourceFolder '2ESheet.html'
 
 $replaceConstant = '#REPLACE{0}#'
 
