@@ -1314,6 +1314,7 @@ weapons['trident (one-handed)'] = {
 weapons['shield-punch'] = {
     'name': 'Shield-Punch',
     'group': 'Buckler/Small/Medium Shield',
+    'noProf': true,
     'size': 'S/M',
     'type': 'B',
     'speed': 2,
@@ -1326,6 +1327,7 @@ weapons['shield-punch'] = {
 weapons['shield-rush'] = {
     'name': 'Shield-Rush',
     'group': 'Medium/Body Shield',
+    'noProf': true,
     'size': 'M/L',
     'type': 'B',
     'speed': 0,
@@ -1336,6 +1338,7 @@ weapons['shield-rush'] = {
 }
 weapons['martial arts'] = {
     'name': 'Martial Arts',
+    'noProf': true,
     'size': 'S',
     'type': 'B',
     'speed': 3,

@@ -25,14 +25,21 @@ datalist(id='all-weapons')
 
 - let usedWeapons = new Set();
 datalist(id='weapon-proficiencies')
+    - let book = 'PHB'
     each weapon in data
         if (weapon.noProf)
-            - continue;
+            - continue
         - let weaponName = weapon.name.split(/\s\(|,/)[0]
         if (usedWeapons.has(weaponName))
-            - continue;
+            - continue
         - usedWeapons.add(weaponName);
         - let group = weapon.group || ''
+        if (weapon.book !== book)
+            each prof, profName in proficiencies
+                if prof.book !== book
+                    - continue
+                option(value=profName)= prof.book
+            - book = weapon.book
         if (weapon.book !== 'PHB')
             - group += (group ? ', ' : '') + weapon.book
         option(value=weaponName)= group
