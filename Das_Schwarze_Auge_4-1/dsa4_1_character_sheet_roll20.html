@@ -21164,19 +21164,36 @@ on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), asy
 	);
 });
 
-on('clicked:blitz-action', async (info) => {
-	results = await startRoll(
+on(spells.map(spell => "clicked:" + spell + "-action").join(" "), async (info) => {
+	var func = "Action Listener for Spell Roll Buttons";
+	var trigger = info["triggerName"].replace(/clicked:([^-]+)-action/, '$1');
+	var nameInternal = spellsData[trigger]["internal"];
+	var nameUI = spellsData[trigger]["ui"];
+	var stats = spellsData[trigger]["stats"];
+	debugLog(func, trigger, spellsData[trigger]);
+
+	// Build Roll Macro
+	var rollMacro = "";
+
+	rollMacro +=
 		"@{gm_roll_opt} " +
 		"&{template:zauber} " +
-		"{{name=Blitz dich find}} " +
-		"{{wert=[[@{ZfW_blitz}d1cs0cf2]]}} " +
-		"{{mod=[[ ?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2 ]]}} " +
-		"{{stats=[[ [Eigenschaft 1:] [[@{Eigenschaft1athletik}]]d1cs0cf2 + [Eigenschaft 2:] [[@{Eigenschaft2athletik}]]d1cs0cf2 + [Eigenschaft 3:] [[@{Eigenschaft3athletik}]]d1cs0cf2]]}} " +
+		"{{name=" + nameUI + "}} " +
+		"{{wert=[[@{ZfW_" + nameInternal + "}d1cs0cf2]]}} " +
+		"{{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]}} " +
+		"{{stats=[[ " +
+			"[Eigenschaft 1:] [[@{" + stats[0] + "}]]d1cs0cf2 + " +
+			"[Eigenschaft 2:] [[@{" + stats[1] + "}]]d1cs0cf2 + " +
+			"[Eigenschaft 3:] [[@{" + stats[2] + "}]]d1cs0cf2" +
+			"]]}} " +
 		"{{roll=[[3d20cs<@{cs_zauber}cf>@{cf_zauber}]]}} " +
 		"{{result=[[0]]}} " +
 		"{{criticality=[[0]]}} " +
-		"{{critThresholds=[[[[@{cs_zauber}]]d1cs0cf2 + [[@{cf_zauber}]]d1cs0cf2]]}} "
-	);
+		"{{critThresholds=[[[[@{cs_zauber}]]d1cs0cf2 + [[@{cf_zauber}]]d1cs0cf2]]}} ";
+	debugLog(func, rollMacro);
+
+	// Execute Roll
+	results = await startRoll(rollMacro);
 	console.log("test: info:", info, "results:", results);
 	var rollID = results.rollId;
 	results = results.results;
