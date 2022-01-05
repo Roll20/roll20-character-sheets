@@ -329,9 +329,9 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
   const goliath = +attrs.barbarianGoliath;
   const goliathMAL = +attrs.MALBarbarianGoliath;
 
-  const corpMetal = attrs.sorcererMMCorpMetal;
+  const corpMetal = +attrs.sorcererMMCorpMetal;
   const CM150PG = attrs.sorcerer150PG;
-  const CM250PG = attrs.sorcererMM250PG;
+  const CM250PG = +attrs.sorcererMM250PG;
 
   const warmasterForce = attrs.warmasterImpForce;
   const warmasterForcePers = +attrs.warmasterImpFPersonnel;
@@ -340,6 +340,8 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
   const warmasterForcePersMAL = +attrs.MALWarmasterImpFPersonnel;
 
   let total = max + modif;
+
+  log(corpMetal);
 
   switch (armure) {
     case 'barbarian':
@@ -350,7 +352,7 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
       if (corpMetal !== 0 || CM250PG !== 0) {
         total += 2;
 
-        if (CM150PG !== 0) total += 2;
+        if (CM150PG !== '0') total += 2;
       }
       break;
 
@@ -1066,7 +1068,7 @@ on('change:monk150PG change:monk250PG sheet:opened', async () => {
 on('change:priest200PG', async () => {
   const attrs = await getAttrsAsync(['priest200PG']);
 
-  const PG200 = +attrs.priest200PG;
+  const PG200 = attrs.priest200PG;
 
   let contactDice = 3;
   let distanceDice = 2;

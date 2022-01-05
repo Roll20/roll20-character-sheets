@@ -4374,12 +4374,12 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.7.3 -->
+				<!-- current version notes: 2.7.4 -->
 				<ul>
-					<li>Skills Table. Show Skill Modifier checkbox state was reversed, fixed. Reported by Mike W.</li>
-					<li>General Tab - Encumbrance Table. The row that matches the current encumberance level is now highlighted.</li>
-					<li>Combat Tab - Tools. Improvements to <b>Falling and Collision</b>. Added <i>Hard Object</i> checkbox, added tooltip for terminal velocity, updated RAW notes for Falling and Collision.</li>
-					<li>Combat Tab - Damage table. Added <i>Flexible Armor</i> tooltip.</li>
+					<li>Spells Table. Fixed bug where new spells were not using the <b>SPELLS BASED ON:</b> drop-down and <b>MAGERY/PI/BONUS LEVEL</b> input box.</li>
+					<li>Spells Table. Added <i>Average</i> to the difficulty drop-down, for use with <b>GURPS Least of Spells</b>. Requested by GM Aurelien.</li>
+					<li>Ranged Table. Fixed issue if you have the campaign sheet option <b>Use Malfunction</b> unchecked and add a new character. The Ranged table for malfunction would not be grayed out. Reported by Mike W.</li>
+					<li>Active Defense Table. Apply Combat Reflexes will also modify defenses listed below <i>Knockback save vs crushing or cutting attacks</i>.<br /><b>Note:</b> If you already applied combat reflexes, you will need to uncheck/check to apply them to the repeating defenses table. Captain Joy on Discord.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -10818,6 +10818,7 @@ visualize what it will look like in chat.
 								<div class="combat-reflexes">
 									
 									<div style="float: left;">
+										<input type="hidden" name="attr_apply_combat_reflexes_to_mod_is_new" value="1" />
 										<input type="checkbox" class="boolean combat-reflex-check" name="attr_combat_reflexes" value="1" />
 										<div class="popup">
 											<span data-i18n="apply-combat-reflexes-label">Apply Combat Reflexes</span>
@@ -11592,7 +11593,7 @@ visualize what it will look like in chat.
 								</div>
 							</div>
 							
-							<input type="hidden" name="attr_use_malfunction" />
+							<input type="hidden" name="attr_use_malfunction" value="0" />
 							<fieldset class="repeating_ranged">
 								<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
 								<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_ranged_toggle_notes" />
@@ -13356,19 +13357,20 @@ visualize what it will look like in chat.
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
-							<input type="text" name="attr_name" title="Macro table name: repeating_spells. Field name: name" />
+							<input type="text" name="attr_name" title="Macro: repeating_spells_{$1}_name. $1 = Row number OR the Row ID." />
 						</div>
 						<div class="cell col1">
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Spell Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{spell_roll_modifier}, @{spell_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_spell_modifier_tool}]]}} {{maxNine=[[@{spell_roll_max_nine}]]}} {{rollModifier=[[@{spell_roll_modifier}]]}} {{rollModifierSummary=@{spell_roll_modifier_summary}}} {{rollTraitSummary=@{spell_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{castingTime=@{casttime}}} {{castingDuration=@{duration}}} {{castingCost=@{cost}}} {{castingMaintain=@{maintain}}} {{castingResist=@{spell_resisted_by}}} {{castingClass=@{spell_class}}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{spell_success_note}}} {{customCriticalSuccessNote=@{spell_critical_success_note}}} {{customFailNote=@{spell_fail_note}}} {{customCriticalFailNote=@{spell_critical_fail_note}}} {{spellRoll=true}} {{spellCriticalSuccessNote=@{spell_critical_success_notes}}} {{spellFailNote=@{spell_fail_notes}}} {{spellCriticalFailureNote=@{spell_critical_failure_notes}}} {{showCastingDetails=[[@{show_casting_details}]]}} {{showSpellNotes=[[@{show_spell_notes}]]}} {{spellNotes=@{spell_notes}}}" name="roll_vsSL" />
 						</div>
 						<div class="cell col2">
-							<input type="text" name="attr_level" title="Macro table name: repeating_spells. Field name: level" readonly="readonly" value="10"/>
-							<!-- TODO: replace this hidden field with a drop-down instead of using one dorp-down for all spells!  -->
-							<input type="hidden" name="attr_base" value="10" />
+							<input type="text" name="attr_level" title="Macro: repeating_spells_{$1}_level. $1 = Row number OR the Row ID." readonly="readonly" value="10"/>
+							<!-- TODO: replace this hidden field with a drop-down instead of using one drop-down for all spells!  -->
+							<input type="hidden" name="attr_base" value="new" />
 							<input type="hidden" name="attr_sync" value="0" />
 						</div>
 						<div class="cell col3">
-							<select name="attr_difficulty" title="Macro table name: repeating_spells. Field name: difficulty">
+							<select name="attr_difficulty" title="Macro: repeating_spells_{$1}_difficulty. $1 = Row number OR the Row ID.">
+								<option value="-2"><span data-i18n="abbreviation-option-average">A</span></option>
 								<option value="-3" selected="selected"><span data-i18n="abbreviation-option-hard">H</span></option>
 								<option value="-4"><span data-i18n="abbreviation-option-very-hard">VH</span></option>
 							</select>
@@ -13379,7 +13381,7 @@ visualize what it will look like in chat.
 							<input type="number" name="attr_spell_modifier" value="0" title="Macro table name: repeating_spells. Field name: spell_modifier" />
 						</div>
 						<div class="cell col5">
-							<input type="number" name="attr_points" value="1" title="Macro table name: repeating_spells. Field name: points" />
+							<input type="number" name="attr_points" value="1" title="Macro: repeating_spells_{$1}_difficultpointsy. $1 = Row number OR the Row ID." />
 						</div>
 						<div class="cell col12">
 							<input type="number" value="" min="0" max="20" step="1" title="Adjust to mark spell as on." name="attr_spell_on_checked" />
@@ -13388,19 +13390,19 @@ visualize what it will look like in chat.
 							<input type="number" value="" min="0" max="20" step="1" title="Adjust to mark spell as on." name="attr_spell_maintained_checked" />
 						</div>
 						<div class="cell col7">
-							<input type="text" name="attr_spell_resisted_by" placeholder="Resist" title="Macro table name: repeating_spells. Field name: spell_resisted_by" />
+							<input type="text" name="attr_spell_resisted_by" placeholder="Resist" title="Macro: repeating_spells_{$1}_spell_resisted_by. $1 = Row number OR the Row ID." />
 						</div>
 						<div class="cell col8">
-							<input type="text" name="attr_duration" placeholder="Duration" title="Macro table name: repeating_spells. Field name: duration" />
+							<input type="text" name="attr_duration" placeholder="Duration" title="Macro: repeating_spells_{$1}_duration. $1 = Row number OR the Row ID." />
 						</div>
 						<div class="cell col9">
-							<input type="text" name="attr_cost" placeholder="Cost to Cast" title="Macro table name: repeating_spells. Field name: cost" />
+							<input type="text" name="attr_cost" placeholder="Cost to Cast" title="Macro: repeating_spells_{$1}_cost. $1 = Row number OR the Row ID." />
 						</div>
 						<div class="cell col10">
-							<input type="text" name="attr_casttime" placeholder="Casting Time" title="Macro table name: repeating_spells. Field name: casttime" />
+							<input type="text" name="attr_casttime" placeholder="Casting Time" title="Macro: repeating_spells_{$1}_casttime. $1 = Row number OR the Row ID." />
 						</div>
 						<div class="cell col11">
-							<input type="text" name="attr_maintain" placeholder="Cost to Maintain" title="Macro table name: repeating_spells. Field name: maintain" />
+							<input type="text" name="attr_maintain" placeholder="Cost to Maintain" title="Macro: repeating_spells_{$1}_maintain. $1 = Row number OR the Row ID." />
 						</div>
 					</div> <!-- .row -->
 					
@@ -13423,7 +13425,7 @@ visualize what it will look like in chat.
 								<input type="text" readonly="readonly" name="attr_row_id" value="" />
 							</div>
 							<div class="cell align-right col3">
-								<input type="text" name="attr_ref" title="Macro table name: repeating_spells. Field name: ref" />	
+								<input type="text" name="attr_ref" title="Macro: repeating_spells_{$1}_ref. $1 = Row number OR the Row ID." />	
 							</div>
 							<div class="cell align-right ref-label">
 								<div class="popup"><span data-i18n="abbreviation-book-reference-label">Ref</span></div>
@@ -13443,7 +13445,7 @@ visualize what it will look like in chat.
 								<span data-i18n="reason-for-modifier-label">Reason for MOD (Modifier):</span>
 							</div>
 							<div class="cell spell-mod-notes">
-								<input type="text" name="attr_spell_mod_notes" title="Macro table name: repeating_spells. Field name: spell_mod_notes" />
+								<input type="text" name="attr_spell_mod_notes" title="Macro: repeating_spells_{$1}_spell_mod_notes. $1 = Row number OR the Row ID." />
 							</div>
 						</div> <!-- .row -->
 						
@@ -13460,19 +13462,19 @@ visualize what it will look like in chat.
 								</div>
 							</div>
 							<div class="cell">
-								<input type="text" name="attr_spell_class" title="Macro table name: repeating_spells. Field name: spell_class" />
+								<input type="text" name="attr_spell_class" title="Macro: repeating_spells_{$1}_spell_class. $1 = Row number OR the Row ID." />
 							</div>
 							<div class="cell label">
 								<span data-i18n="colleges-label">Primary College:</span>
 							</div>
 							<div class="cell text-college-width">
-								<input type="text" name="attr_spell_college" title="Macro table name: repeating_spells. Field name: spell_college" />
+								<input type="text" name="attr_spell_college" title="Macro: repeating_spells_{$1}_college. $1 = Row number OR the Row ID." />
 							</div>
 							<div class="cell label">
 								<span data-i18n="colleges-secondary-label">Secondary College:</span>
 							</div>
 							<div class="cell text-college-width">
-								<input type="text" name="attr_spell_college_secondary" title="Macro table name: repeating_spells. Field name: spell_college_secondary" />
+								<input type="text" name="attr_spell_college_secondary" title="Macro: repeating_spells_{$1}_spell_college_secondary. $1 = Row number OR the Row ID." />
 							</div>
 							
 						</div> <!-- .row -->
@@ -13496,7 +13498,7 @@ visualize what it will look like in chat.
 									<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
 								</span>
 							</div>
-							<textarea name="attr_notes" title="Macro table name: repeating_spells. Field name: notes"></textarea>
+							<textarea name="attr_notes" title="Macro: repeating_spells_{$1}_notes. $1 = Row number OR the Row ID."></textarea>
 						</div>
 						
 						<div class="col-notebox">
@@ -13506,7 +13508,7 @@ visualize what it will look like in chat.
 									<span data-i18n="show-spell-modifier-notes-label">Show Spell Modifier notes (see actual spell description)</span>
 								</span>
 							</div>
-							<textarea name="attr_spell_notes" title="Macro table name: repeating_spells. Field name: spell_notes"></textarea>
+							<textarea name="attr_spell_notes" title="Macro: repeating_spells_{$1}_spell_notes. $1 = Row number OR the Row ID."></textarea>
 						</div>
 						
 						<div class="rolltable-result-notes">
@@ -13515,12 +13517,12 @@ visualize what it will look like in chat.
 								<div class="note-title">
 									<span data-i18n="success-note-label">Success Note:</span>
 								</div>
-								<textarea name="attr_spell_success_note" title="Macro table name: repeating_spells. Field name: spell_success_note"></textarea>
+								<textarea name="attr_spell_success_note" title="Macro: repeating_spells_{$1}_spell_success_note. $1 = Row number OR the Row ID."></textarea>
 							</div>
 							
 							<div class="note-input">
 								<div class="note-title"><span data-i18n="critical-success-note-label">Critical Success Note:</span></div>
-								<textarea name="attr_spell_critical_success_note" title="Macro table name: repeating_spells. Field name: spell_critical_success_note"></textarea>
+								<textarea name="attr_spell_critical_success_note" title="Macro: repeating_spells_{$1}_spell_critical_success_note. $1 = Row number OR the Row ID."></textarea>
 							</div>
 							
 						</div>
@@ -13529,12 +13531,12 @@ visualize what it will look like in chat.
 							
 							<div class="note-input">
 								<div class="note-title"><div data-i18n="fail-note-label">Fail Note:</div></div>
-								<textarea name="attr_spell_fail_note" title="Macro table name: repeating_spells. Field name: spell_fail_note"></textarea>
+								<textarea name="attr_spell_fail_note" title="Macro: repeating_spells_{$1}_spell_fail_note. $1 = Row number OR the Row ID."></textarea>
 							</div>
 							
 							<div class="note-input">
 								<div class="note-title"><span data-i18n="critical-fail-note-label">Critical Fail Note:</span></div>
-								<textarea name="attr_spell_critical_fail_note" title="Macro table name: repeating_spells. Field name: spell_critical_fail_note"></textarea>
+								<textarea name="attr_spell_critical_fail_note" title="Macro: repeating_spells_{$1}_spell_critical_fail_note. $1 = Row number OR the Row ID."></textarea>
 							</div>
 							
 						</div>
@@ -13608,7 +13610,18 @@ visualize what it will look like in chat.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.7.3 -->
+			<!-- current version notes: 2.7.4 -->
+
+			<ul>
+				<li>Spells Table. Fixed bug where new spells were not using the <b>SPELLS BASED ON:</b> drop-down and <b>MAGERY/PI/BONUS LEVEL</b> input box.</li>
+				<li>Spells Table. Added <i>Average</i> to the difficulty drop-down, for use with <b>GURPS Least of Spells</b>. Requested by GM Aurelien.</li>
+				<li>Ranged Table. Fixed issue if you have the campaign sheet option <b>Use Malfunction</b> unchecked and add a new character. The Ranged table for malfunction would not be grayed out. Reported by Mike W.</li>
+				<li>Active Defense Table. Apply Combat Reflexes will also modify defenses listed below <i>Knockback save vs crushing or cutting attacks</i>.<br /><b>Note:</b> If you already applied combat reflexes, you will need to uncheck/check to apply them to the repeating defenses table. Captain Joy on Discord.</li>
+			</ul>
+			
+			<h4>Version: 2.7.3</h4>
+
+			<p>Pull Request: 12/16/2021</p>
 
 			<ul>
 				<li>Skills Table. Show Skill Modifier checkbox state was reversed, fixed. Reported by Mike W.</li>
@@ -16526,9 +16539,9 @@ visualize what it will look like in chat.
 
 	var noop = function () {}; // do nothing callback function.
 
-	const version = "2.7.3";
+	const version = "2.7.4";
 
-	const latestChangesDate = "12/16/2021";
+	const latestChangesDate = "12/30/2021";
 
 	var modCascade = true;
 	
@@ -18300,6 +18313,28 @@ visualize what it will look like in chat.
 
 	});
 
+	// check for "new" spell row. Only able to check for changes to a value,
+	// using "name" to check for a new row and the base="new"
+	on("change:repeating_spells:name", event => {
+
+		getAttrs(["repeating_spells_name", "repeating_spells_base", "spell_base", "spell_bonus"], values => {
+
+			console.log("values: ", values);
+
+			if (values.repeating_spells_base === "new") {
+
+				// if new, set the repeating base and bonus to the global spell_base drop-down and bonus
+				setAttrs({
+					repeating_spells_base: values.spell_base,
+					repeating_spells_bonus: values.spell_bonus
+				});
+
+			}
+
+		});
+
+	});
+
 	// Update the skill level and update the total cost of Skills 
 	on('change:repeating_skills:base change:repeating_skills:difficulty change:repeating_skills:bonus change:repeating_skills:points change:repeating_skills:sync', (event) => {
 
@@ -18874,9 +18909,9 @@ visualize what it will look like in chat.
 	}
 	
 	// check for combat reflexes toggle box
-	on('change:combat_reflexes', function(e){
+	on('change:combat_reflexes change:apply_combat_reflexes_to_mod', function(e) {
 
-        updateActiveDefenses();
+        updateActiveDefenses(updateRepeatingDefensesWithCombatReflexes());
 
 	});
 
@@ -18886,7 +18921,7 @@ visualize what it will look like in chat.
 	function updateActiveDefenses(callback) {
 
 		// get the defense values
-		getAttrs(['combat_reflexes', 'dodge_mod', 'fear_check_mod'], function(values) {
+		getAttrs(['combat_reflexes', 'dodge_mod', 'fear_check_mod', 'apply_combat_reflexes_to_mod'], function(values) {
 
 			callback = callback || noop;
 
@@ -18935,6 +18970,90 @@ visualize what it will look like in chat.
 			setAttrs({ 
 				dodge_mod: new_dodge_mod,
 				fear_check_mod: new_fear_check_mod
+			}, null, callback);
+
+		});
+
+	}
+
+	function updateRepeatingDefensesWithCombatReflexes() {
+
+		getAttrs(["combat_reflexes", "apply_combat_reflexes_to_mod_is_new"], values => {
+
+			const useCombatReflexes = values.combat_reflexes === "1";
+
+			// this is needed to check if the sheet has never used the new repeating defenses modifier for combat reflexes
+			// we DON'T to subtract values if it's new
+			const applyToModifierColumnIsNew = values.apply_combat_reflexes_to_mod_is_new === "1";
+			
+			const combatReflexesDescription = "+1 from combat reflexes. ";
+
+			getSectionIDs("repeating_defense", ids => {
+
+				ids.forEach(id => {
+					
+					// get the original modifier and modifier description
+					const modifierField = `repeating_defense_${id}_skill_mod`;
+
+					const modifierDescriptionField = `repeating_defense_${id}_defense_mod_reason`;
+
+					getAttrs([modifierField, modifierDescriptionField], values => {
+						
+						let currentDefenseModifier = Number(values[modifierField]);
+
+						if (Number.isNaN(currentDefenseModifier)) {
+							currentDefenseModifier = 0;
+						}
+
+						let activeDefenseModifier = -1;
+
+						const currentModifierDescription = String(values[modifierDescriptionField]);
+
+						let newModifierDescription = "";
+
+						if (useCombatReflexes) {
+							
+							activeDefenseModifier = 1;
+
+							// add combat reflexes description
+							newModifierDescription = combatReflexesDescription + currentModifierDescription;
+						
+						} else if (applyToModifierColumnIsNew) {
+
+							// DON'T change any values. 
+							activeDefenseModifier = 0;
+
+							newModifierDescription = currentModifierDescription;
+
+						} else {
+
+							activeDefenseModifier = -1;
+
+							// remove combat reflexes description
+							newModifierDescription = currentModifierDescription.replace(combatReflexesDescription, "");
+
+						}
+
+						const newFinalDefenseModifier = currentDefenseModifier + activeDefenseModifier;
+
+						let updatedFields = {};
+
+						updatedFields[modifierField] = newFinalDefenseModifier;
+
+						updatedFields[modifierDescriptionField] = newModifierDescription;
+
+						setAttrs(updatedFields);
+
+					});
+
+
+				});
+
+			});
+
+			// after everything is done, make sure we set the hidden field to zero.
+			setAttrs({
+				apply_combat_reflexes_to_mod_is_new: 0
 			});
 
 		});

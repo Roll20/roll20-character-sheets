@@ -1,5 +1,5 @@
-﻿$htmlFolder = 'D:\git\roll20-character-sheets\ADnD 2E Revised\html'
-$javascriptFolder = 'D:\git\roll20-character-sheets\ADnD 2E Revised\javascript'
+﻿$htmlFolder = Join-Path $PSScriptRoot ".." "html"
+$javascriptFolder = Join-Path $PSScriptRoot ".." "javascript"
 
 "---- Sanitize Javascript files ----"
 Get-ChildItem $javascriptFolder | ForEach-Object {
@@ -14,7 +14,8 @@ Get-ChildItem $javascriptFolder | ForEach-Object {
 }
 ""
 
-node buildPug.js
+$buildPug = Join-Path $PSScriptRoot "buildPug.js"
+node $buildPug
 
 "---- Sanitize HTML files ----"
 Get-ChildItem $htmlFolder | ForEach-Object {
