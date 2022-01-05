@@ -1,4 +1,4 @@
-//region Player's Handbook
+//#region Player's Handbook
 const weapons = {};
 weapons['arquebus'] = {
     'name': 'Arquebus',
@@ -890,7 +890,40 @@ weapons['whip'] = {
     'book': 'PHB',
     'category': ['Melee']
 };
-//endregion
+weapons['punching (bare-handed)'] = {
+    'name': 'Punching (Bare-handed)',
+    'noProf': true,
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1d2',
+    'large': '1d2',
+    'book': 'PHB',
+    'category': ['Melee']
+};
+weapons['punching (gauntlets / knuckles)'] = {
+    'name': 'Punching (Gauntlets / Knuckles)',
+    'noProf': true,
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'book': 'PHB',
+    'category': ['Melee']
+};
+weapons['wrestling'] = {
+    'name': 'Wrestling',
+    'noProf': true,
+    'size': '—',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1',
+    'large': '1',
+    'book': 'PHB',
+    'category': ['Melee']
+}
+//#endregion
 
 //region The Complete Fighter's Handbook
 weapons['belaying pin'] = {
@@ -1278,6 +1311,39 @@ weapons['trident (one-handed)'] = {
     'book': 'The Complete Fighter\'s Handbook',
     'category': ['Melee','Range']
 };
+weapons['shield-punch'] = {
+    'name': 'Shield-Punch',
+    'group': 'Buckler/Small/Medium Shield',
+    'size': 'S/M',
+    'type': 'B',
+    'speed': 2,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+}
+weapons['shield-rush'] = {
+    'name': 'Shield-Rush',
+    'group': 'Medium/Body Shield',
+    'size': 'M/L',
+    'type': 'B',
+    'speed': 0,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+}
+weapons['martial arts'] = {
+    'name': 'Martial Arts',
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '',
+    'large': '',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+}
 //endregion
 
 //region The Complete Priest's Handbook
@@ -1463,5 +1529,31 @@ weapons['chain flail'] = {
     'book': 'The Complete Book of Dwarves',
     'category': ['Melee']
 };
+//#endregion
+
+//#region The Complete Book of Elves
+weapons['bow (melee)'] = {
+    'name': 'Bow (Melee)',
+    'noProf': true,
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d6-1',
+    'large': '1d4',
+    'book': 'The Complete Book of Elves',
+    'category': ['Melee']
+};
+weapons['elven bow (melee)'] = {
+    'name': 'Elven Bow (Melee)',
+    'noProf': true,
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d6',
+    'large': '1d3',
+    'book': 'The Complete Book of Elves',
+    'category': ['Melee']
+};
+
 //#endregion
 module.exports = weapons;
