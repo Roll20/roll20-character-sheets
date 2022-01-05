@@ -88,17 +88,20 @@
 			</div>
 		</div>
 		<div class="sheet-combat sheet-block">
-			<div> <!-- just to stop from wrapping -->
+			<div> <!-- stops from stretching -->
+				<div class=sheet-flex-centered style='margin-bottom: .5rem'>
+					<button class=sheet-dice-button type="action" title="Add yourself to Turn Order." name="act_turnorder">Turn Order</button>
+					<button class=sheet-dice-button type="action" title="Roll team Initiative." name="act_initiative">Initiative</button>
+				</div>
 				<div class=sheet-flex-centered>
-					<button type=roll title="Add yourself to Turn Order." value="&{template:initiative} {{character_name=@{character_name}}} {{initiative=[[@{DX}[DEX] &{tracker}]]}}"><b style='font-size: .8em;'>Initiative</b></button>
+					<span>
+						<span class='sheet-label sheet-first-word' style='width: 5rem' title="Current Strength adjusted by Wounds and Fatigue.">Health </span>
+						<span class=sheet-stat-final name="attr_stcurrent"/>
+					</span>
 					<span>
 						<button class=sheet-dice-button type="action" title="3d6 Health Check" name="act_health_check3">3</button>
 						<button class=sheet-dice-button type="action" title="4d6 Health Check" name="act_health_check4">4</button>
 					</span>
-				</div>
-				<div >
-					<span class='sheet-label sheet-first-word' style='width: 5rem' title="Current Strength adjusted by Wounds and Fatigue.">Health </span>
-					<span class=sheet-stat-final name="attr_stcurrent"/>
 				</div>
 				<div class=sheet-nowrap>
 					<span class=sheet-label style='width: 5rem;' title="Damage done to your Health, must be healed.">Wounds </span>
@@ -158,12 +161,12 @@
 			<div class=sheet-flex-centered>
 				<span class="sheet-label sheet-first-word" title="Roll to attack with selected Weapon or cast Spell at a given to-hit value.">Attack/Cast&nbsp;</span>
 				<span class=sheet-nowrap>
-					<button class=sheet-attack-button type="action" name="act_attack-6">-6</button>
+					<button class=sheet-attack-button title="Against invisible" type="action" name="act_attack-6">-6</button>
 					<button class=sheet-attack-button type="action" name="act_attack-5">-5</button>
-					<button class=sheet-attack-button title="Ranged at Prone behind cover" type="action" name="act_attack-4">-4</button>
+					<button class=sheet-attack-button title="Projectiles against Prone behind cover or Flying" type="action" name="act_attack-4">-4</button>
 					<button class=sheet-attack-button title="Health at 3 or less" type="action" name="act_attack-3">-3</button>
 					<button class=sheet-attack-button title="Severely Wounded (-5 or more) last turn" type="action" name="act_attack-2">-2</button>
-					<button class=sheet-attack-button type="action" name="act_attack-1">-1</button>
+					<button class=sheet-attack-button title="Projectiles per 10 vertical feet" type="action" name="act_attack-1">-1</button>
 					<button class=sheet-attack-button type="action" name="act_attack0">0</button>
 					<button class=sheet-attack-button type="action" name="act_attack1">1</button>
 					<button class=sheet-attack-button title="Flank Attack" type="action" name="act_attack2">2</button>
@@ -731,22 +734,37 @@
 	</div>
 </rolltemplate>
 
-
-<!-- For initiative, just nice to have a template -->
+<!-- For Initiative order -->
 <rolltemplate class="sheet-rolltemplate-initiative">
 	<div class=container>
 		<div><h1>
 			{{character_name}} takes initiative!
 		</h1></div>
 		<div class=arrow-container><div class=arrow-right></div></div>
-		<div class=keyvalue>
-			<span>Dexterity: </span><span>{{initiative}}</span>
+		<div>
+			<div>
+				<span class=template-dice>{{computed::roll1}}</span>
+			</div>
 		</div>
 	</div>
 </rolltemplate>
 
 
-<!-- For Descriptions, just nice to have a template -->
+<!-- For turn order -->
+<rolltemplate class="sheet-rolltemplate-turnorder">
+	<div class=container>
+		<div><h1>
+			{{character_name}}'s Turn Order
+		</h1></div>
+		<div class=arrow-container><div class=arrow-right></div></div>
+		<div class=keyvalue>
+			<span>Dexterity: </span><span>{{turnorder}}</span>
+		</div>
+	</div>
+</rolltemplate>
+
+
+<!-- For Descriptions -->
 <rolltemplate class="sheet-rolltemplate-description">
 	<div class=container>
 		<div><h1>
@@ -831,23 +849,23 @@
 
 	const diceArrayToString = function(rolls) {
 		let diceString = '';
-		for (i = 0; i < rolls.length; ++i) {
-			let roll = rolls[i];
-			if (roll == 1) diceString += 'a';
-			else if (roll == 2) diceString += 'b';
-			else if (roll == 3) diceString += 'c';
-			else if (roll == 4) diceString += 'd';
-			else if (roll == 5) diceString += 'e';
-			else diceString += 'f';
-
-			if (i < rolls.length -1)
-				diceString +=   '&#8239;' // '&thinsp;'
-
+		if (rolls) {
+			for (i = 0; i < rolls.length; ++i) {
+				let roll = rolls[i];
+				if (roll == 1) diceString += 'a';
+				else if (roll == 2) diceString += 'b';
+				else if (roll == 3) diceString += 'c';
+				else if (roll == 4) diceString += 'd';
+				else if (roll == 5) diceString += 'e';
+				else diceString += 'f';
+				if (i < rolls.length -1)
+					diceString +=   '&#8239;' // '&thinsp;'
+			}
 		}
 		return diceString;
 	}
 
-	const finishRollWithDiceString = function(rolls, rollId) {
+	const finishRollWithDiceString = function(rollId, rolls) {
 		let diceString = diceArrayToString(rolls);
 		finishRoll(
 			rollId,
@@ -860,7 +878,12 @@
 	const doRollWithDiceString = function(macro) {
 		macro += ' {{character_name=@{cname}}}';
 		startRoll(macro, (results) => {
-			finishRollWithDiceString(results.results.roll1.dice, results.rollId);
+			if ('roll1' in results.results) {
+				finishRollWithDiceString(results.rollId, results.results.roll1.dice);
+			}
+			else {
+				finishRollWithDiceString(results.rollId);
+			}
 		});
 	}
 
@@ -1011,6 +1034,15 @@
 	on('clicked:health_check4', (info) => {
 		doRollWithDiceString("&{template:stat-check4} {{stat_a=a}} {{stat_name=health}} {{stat=[[@{stcurrent}[HEALTH]]]}} {{roll1=[[4d6]]}}");
 	});
+
+	on('clicked:initiative', (info) => {
+		doRollWithDiceString("&{template:initiative} {{roll1=[[1d6]]}}");
+	});
+
+	on('clicked:turnorder', (info) => {
+		doRollWithDiceString("&{template:turnorder} {{character_name=@{character_name}}} {{turnorder=[[@{DX}[DEX] &{tracker}]]}}");
+	});
+
 
 	/* TALENT HANDLERS */
 
@@ -1417,7 +1449,6 @@
 			});
 		});
 	});
-
 
 	// Update unspent iq points.
 	on('sheet:opened '
