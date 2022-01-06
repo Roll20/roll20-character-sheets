@@ -1058,6 +1058,25 @@
 		});
 	}
 
+	// a const value, not an attribute, no @ in front.  Optionally as roll.
+	const rollTemplateValue = function(templateName, attrName, asRoll) {
+		return asRoll ? ` {{${templateName}=[[${attrName}]]}}` :  ` {{${templateName}=${attrName}}}`;
+	}
+
+	// Return a template string if attrs contains attrName
+	const rollTemplateProperty = function(templateName, attrName, attrs, asRoll) {
+		if (asRoll) {
+			if ( !attrs || (attrs[attrName] != '' && attrs[attrName] != '0')) {
+				return rollTemplateValue(templateName, `@{${attrName}}`, true);
+			}
+		} else {
+			if (!attrs || (attrs[attrName] != '')) {
+				return rollTemplateValue(templateName, `@{${attrName}}`);
+			}
+		}
+		return '';
+	}
+
 	// Update Str
 	on('sheet:opened change:st_max change:st_adj', function() {
 		getAttrs(['st_max', 'st_adj'], function(v) {
@@ -1145,6 +1164,16 @@
 
 		onSelectedWeaponOrSpell(function(id, selectedIds, type) {
 
+			// return the string depending on whether we are defending or not.
+			const defendingProperties = function (attrs) {
+				// we are defending, so need 4d6, arg.
+				if (attrs.defending == 'on') {
+					return rollTemplateValue('defending', '1') + rollTemplateValue('roll1', '4d6', true);
+				} else {
+					return rollTemplateValue('roll1', '3d6', true);
+				}
+			}
+
 			if (type == 'weapon') {
 				let attackFlavorName = repeatingPropertyName('weapons', id, 'attackflavor');
 				let successFlavorName = repeatingPropertyName('weapons', id, 'successflavor');
@@ -1152,116 +1181,93 @@
 				let weaponDamageName = repeatingPropertyName('weapons', id, 'weapondamage');
 				getAttrs(['gender', attackFlavorName, successFlavorName, weaponToHitName, weaponDamageName, 'defending'], function(v) {
 					let mstring  = `&{template:attack}`
-						+ ` {{weaponname=@{${repeatingPropertyName('weapons', id, 'weaponname')}}}}`;
-
-					// we are defending, so need 4d6, arg.
-					if (v.defending == 'on') {
-						mstring += ' {{roll1=[[4d6]]}}';
-						mstring = ' {{defending=1}}' + mstring; // tell us.
-					} else {
-						mstring += ' {{roll1=[[3d6]]}}';
-					}
+						+ rollTemplateProperty('weaponname', repeatingPropertyName('weapons', id, 'weaponname'))
+						+ defendingProperties(v);
 
 					// short description means no toHit or Weapon bonuses, can all be on one line or with no summation and =
 					{ // compute total and separate to hits.
 						let simpleToHit = true;
 						let dxAdj = `@{DX}[DEX]`;
-						mstring += ` {{tohit=[[${dxAdj}`;
-						mstring = `{{dx=[[${dxAdj}]]}} ` + mstring;
+						let toHitString = ` {{tohit=[[${dxAdj}`;
+						let oldHitLength = toHitString.length;
+						mstring += rollTemplateValue('dx', dxAdj, true);
 
 						// provisionally add weapon toHit.
 						if (parseInt(v[weaponToHitName])||0) {
 							let weaponAdj = `@{${weaponToHitName}}[WPN_ADJ]`;
-							mstring += ` + ${weaponAdj}`;
-							mstring = `{{weaponadj=[[${weaponAdj}]]}} ` + mstring;
-							simpleToHit = false;
+							toHitString += ` + ${weaponAdj}`;
+							mstring += rollTemplateValue('weaponadj', weaponAdj, true);
 						}
 						// and to hit adjustment
 						if (toHit != 0) {
 							let toHitAdj = `${toHit}[TO_HIT]`
-							mstring += ` + ${toHitAdj}`;
-							mstring = `{{tohitadj=[[${toHitAdj}]]}} ` + mstring;
-							simpleToHit = false;
+							toHitString += ` + ${toHitAdj}`;
+							mstring += rollTemplateValue('tohitadj', toHitAdj, true);
 						}
+
+						if (oldHitLength == toHitString.length) {
+							mstring += rollTemplateValue('simpletohit', '1');
+						}
+
 						// and finish.
-						mstring += ']]}}';
-
-						if (simpleToHit) {
-							mstring += ' {{simpletohit=1}}'
-						}
+						toHitString += ']]}}';
+						mstring += toHitString;
 					}
 
-					// conditionally add damage
-					if (v[weaponDamageName] != '' && v[weaponDamageName] != '0') {
-						mstring += ` {{damage=[[@{${weaponDamageName}}]]}}`;
-					}
+					// conditionally add damage as roll.
+					mstring += rollTemplateProperty('damage', weaponDamageName, v, true);
 
 					{ // add pronoun.
 						let gender = v.gender.toLowerCase();
 						let pronoun = 'their';
 						if (gender == 'male') pronoun = 'his';
 						else if (gender == 'female') pronoun = 'her'
-						mstring += ` {{pronoun=${pronoun}}}`;
+						mstring += rollTemplateValue('pronoun', pronoun);
 					}
+					mstring += rollTemplateProperty('attackflavor', attackFlavorName, v);
+					mstring += rollTemplateProperty('successflavor', successFlavorName, v);
 
-					if (v[attackFlavorName] != '') {
-						mstring += ` {{attackflavor=@{${attackFlavorName}}}}`;
-					}
-					if (v[successFlavorName] != '') {
-						mstring += ` {{successflavor=@{${successFlavorName}}}}`;
-					}
 					doRollWithDiceString(mstring);
 				});
-			} else if (type == 'spell') {
+			}
+			else if (type == 'spell') {
 				let damageName = repeatingPropertyName('spells', id, 'spelldamage');
 				let flavorName = repeatingPropertyName('spells', id, 'successflavor');
 				let toHitName  = repeatingPropertyName('spells', id, 'tohit');
 				getAttrs([flavorName, toHitName, damageName, 'defending'], function(v) {
-
 					let mstring  = `&{template:cast-spell}`
-						+ ` {{spellname=@{${repeatingPropertyName('spells', id, 'spellname')}}}}`;
-
-					// we are defending, so need 4d6, arg.
-					if (v.defending == 'on') {
-						mstring += ' {{roll1=[[4d6]]}}';
-						mstring = ' {{defending=1}}' + mstring; // tell us.
-					} else {
-						mstring += ' {{roll1=[[3d6]]}}';
-					}
+						+ rollTemplateProperty('spellname', repeatingPropertyName('spells', id, 'spellname'))
+						+ defendingProperties(v);
 
 					{ // compute to hit
-						let simpleToHit = true;
 						let dxAdj = `@{DX}[DEX]`;
-						mstring += ` {{tohit=[[${dxAdj}`;
-						mstring = `{{dx=[[${dxAdj}]]}} ` + mstring;
+						let toHitString = ` {{tohit=[[${dxAdj}`;
+						let oldHitLength = toHitString.length;
+						mstring += rollTemplateValue('dx', dxAdj, true);
 
 						// provisionally add spell toHit.
 						if (parseInt(v[toHitName])||0) {
 							let spellAdj = `@{${toHitName}}[SPELL_ADJ]`;
-							mstring += ` + ${spellAdj}`;
-							mstring = `{{spelladj=[[${spellAdj}]]}} ` + mstring;
-							simpleToHit = false;
+							toHitString += ` + ${spellAdj}`;
+							mstring += rollTemplateValue('spelladj', spellAdj, true);
 						}
 						// and rolled to hit.
 						if (toHit != 0) {
-							let toHitAdj = `${toHit}[TO_HIT]`
-							mstring += ` + ${toHitAdj}`;
-							mstring = `{{tohitadj=[[${toHitAdj}]]}} ` + mstring;
-							simpleToHit = false;
+							let toHitAdj = `${toHit}[TO_HIT]`;
+							toHitString += ` + ${toHitAdj}`;
+							mstring += rollTemplateValue('tohitadj', toHitAdj, true);
+						}
+
+						// just dex.
+						if (toHitString.length == oldHitLength) {
+							mstring += rollTemplateValue('simpletohit', '1');
 						}
 						// and finish.
-						mstring += ']]}}';
-
-						if (simpleToHit) {
-							mstring += ' {{simpletohit=1}}'
-						}
-					}
-					if (v[damageName] != '' && v[damageName] != '0') {
-						mstring += ` {{damage=[[@{${damageName}}]]}}`;
-					}
-					if (v[flavorName] != '') {
-						mstring += ` {{flavor=@{${flavorName}}}}`;
-					}
+						toHitString += ']]}}';
+						mstring += toHitString;
+				}
+					mstring += rollTemplateProperty('damage', damageName, v, true);
+					mstring += rollTemplateProperty('flavor', flavorName, v);
 					doRollWithDiceString(mstring);
 				});
 			}
