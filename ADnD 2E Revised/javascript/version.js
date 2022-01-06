@@ -38,6 +38,9 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(4,5,0))
                 migrate4_5_0();
+
+            if (oldSheetVersion.isBelowMigrate(4,6,0))
+                migrate4_6_0();
             
             //#endregion
         }
@@ -84,6 +87,14 @@ function moveStaticToRepeating(section, fieldsToMove) {
             setAttrs(newValue);
         }
     });
+}
+//#endregion
+
+//#region 4.6.0
+function migrate4_6_0() {
+    console.log('Migrating to v4.6.0');
+    updateWeaponProfsRemaining();
+    updateNonWeaponProfsRemaining();
 }
 //#endregion
 

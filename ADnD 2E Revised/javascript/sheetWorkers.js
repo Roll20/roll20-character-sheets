@@ -137,6 +137,19 @@ const repeatingMultiplySum = function(section, valueField, multiplierField, dest
         })
         .execute();
 };
+const repeatingCalculateRemaining = function(repeatingName, repeatingFieldsToSum, totalField, remainingField) {
+    TAS.repeating(repeatingName)
+        .attrs([totalField, remainingField])
+        .fields(repeatingFieldsToSum)
+        .reduce(function (memo, row) {
+            repeatingFieldsToSum.forEach(column => {
+                memo += row.I[column];
+            });
+            return memo;
+        }, 0, function (memo,_,attrSet) {
+            attrSet.I[remainingField] = attrSet.I[totalField] - memo;
+        }).execute();
+};
 //#endregion
 
 //#region Generic Setup functions
@@ -741,9 +754,9 @@ function setupAddPriestSpell(postfix) {
         TAS.repeating(section)
             .attrs([...sphereFields, ...BOOK_FIELDS])
             .fields(field)
-            .reduce(function(memo, row){
-                memo.add(row.S[field]);
-                return memo;
+            .reduce(function(knownSpells, row){
+                knownSpells.add(row.S[field]);
+                return knownSpells;
             }, new Set(), function (knownSpells,_,attrSet){
                 let primarySpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), primarySphereRegex);
                 let elementalSpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), elementalRegex);
@@ -1378,34 +1391,50 @@ on('clicked:grenade-miss', async function (eventInfo) {
 //#endregion
 
 //#region Proficiencies
+//Weapon proficiency slots
 //Used in version.js
 const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc');
 on('change:weapprof-slots-total', function (eventInfo) {
     updateWeaponProfsTotal();
 });
+const updateWeaponProfsRemaining = () => repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
+on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprof-slots-total-calc', function(eventInfo) {
+    if (doEarlyReturn(eventInfo, ['weapprofnum']))
+        return;
+    updateWeaponProfsRemaining();
+});
+//Weapon proficiency autofill
+on('change:repeating_weaponprofs:weapprofname', function(eventInfo) {
+    let weaponProficiency = weaponProficiencies[eventInfo.newValue];
+    if (!weaponProficiency)
+        return;
+
+    getAttrs(BOOK_FIELDS, function (books) {
+        if (bookInactiveShowToast(books, weaponProficiency))
+            return;
+
+        setAttrs({
+            'repeating_weaponprofs_weapprofnum'  : weaponProficiency['slots'],
+        });
+    });
+});
+
+//Nonweapon proficiency slots
 //Used in version.js
 const updateNonWeaponProfsTotal = () => calculateFormula('prof-slots-total', 'prof-slots-total-calc');
 on('change:prof-slots-total', function (eventInfo) {
     updateNonWeaponProfsTotal();
 });
-
-//Weapon proficiency slots
-on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(eventInfo) {
-    if (doEarlyReturn(eventInfo, ['weapprofnum']))
-        return;
-    TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
-});
-
-//Nonweapon proficiency slots
-on('change:repeating_profs:profslots remove:repeating_profs', function(eventInfo){
+const updateNonWeaponProfsRemaining = () => repeatingCalculateRemaining('profs', ['profslots'], 'prof-slots-total-calc', 'prof-slots-remain');
+on('change:repeating_profs:profslots remove:repeating_profs change:prof-slots-total-calc', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['profslots']))
         return;
-    TAS.repeatingSimpleSum('profs', 'profslots', 'profslotssum');
+    updateNonWeaponProfsRemaining();
 });
 //Nonweapon proficiency autofill
 on('change:repeating_profs:profname', function (eventInfo) {
     let nonweaponProficiency = nonweaponProficiencies[eventInfo.newValue];
-    if (nonweaponProficiency === undefined)
+    if (!nonweaponProficiency)
         return;
     
     getAttrs(BOOK_FIELDS, function (books) {
