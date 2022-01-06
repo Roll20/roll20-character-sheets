@@ -717,4 +717,70 @@ nonweaponProficiencies['Whistling/Humming'] = {
     'book': 'The Complete Bard\'s Handbook'
 };
 //#endregion
+
+//#region The Complete Book of Humanoids
+nonweaponProficiencies['Cheesemaking'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Danger Sense'] = {
+    'slots': 2,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +1,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Drinking'] = {
+    'slots': 1,
+    'abilityScore': '@{Constitution}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Eating'] = {
+    'slots': 1,
+    'abilityScore': '@{Constitution}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Hiding'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Winemaking'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Close-quarter Fighting'] = {
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': 'Warrior/Rogue',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Natural Fighting'] = {
+    'slots': 2,
+    'abilityScore': '@{Strength}',
+    'modifier': +1,
+    'classes': 'Warrior',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Wild Fighting'] = {
+    'slots': 2,
+    'abilityScore': '@{Constitution}',
+    'modifier': 0,
+    'classes': 'Warrior',
+    'book': 'The Complete Book of Humanoids'
+};
+//#endregion
 module.exports = nonweaponProficiencies;
