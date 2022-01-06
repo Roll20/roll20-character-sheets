@@ -4,6 +4,12 @@ Backlog
 - favoured/ill-favoured rolls for adversaries
 - (later) evaluate use of custom API to give better user feedback on rolls
 
+02.00.00
+========
+
+- integrate custom roll parsing to get rid of custom roll tables.
+- integration of armour qualities in the layout (cunning make and close fitting)
+
 01.01.00
 ========
 
