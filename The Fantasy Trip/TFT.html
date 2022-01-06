@@ -108,18 +108,21 @@
 						<span class=sheet-label style='width: 5rem;' title="Damage done to your Health, must be healed.">Wounds </span>
 						<input type=number class=sheet-stat-input name="attr_Hits" value="0"/>
 					</span>
-					<button class=sheet-dice-button type="action" title="Shield Rush Save vs weaker (unwounded strength) rusher." name="act_shieldrushweaker">S.R.W.</button>
+					<button class=sheet-dice-button type="action" title="Reaction to attacker initiating Hand to Hand Combat." name="act_hthreaction">HTH</button>
 				</div>
 				<div class=sheet-flex-centered>
 					<span>
 						<span class=sheet-label style='width: 5rem;'title="Temporary damage done to your Health as for spellcasting.">Fatigue </span>
 						<input type=number class=sheet-stat-input name="attr_Fatigue" value="0"/>
 					</span>
-					<button class=sheet-dice-button type="action" title="Shield Rush Save vs same or stronger (unwounded strength) rusher." name="act_shieldrushstronger">S.R.S.</button>
+					<button class=sheet-dice-button type="action" title="Shield Rush Save vs equal or stronger (unwounded strength) rusher." name="act_shieldrushstronger">SRS</button>
 				</div>
-				<div class=sheet-nowrap>
-					<span class=sheet-label style='width: 8rem' title="Subtract from enemy dex when attacking you.">Minus to Hit </span>
-					<span class=sheet-stat-final name="attr_minustohit"/>
+				<div class=sheet-flex-centered>
+					<span>
+						<span class=sheet-label style='width: 8rem' title="Subtract from enemy dex when attacking you.">Minus to Hit </span>
+						<span class=sheet-stat-final name="attr_minustohit"/>
+					</span>
+					<button class=sheet-dice-button type="action" title="Shield Rush Save vs weaker (unwounded strength) rusher." name="act_shieldrushweaker">SRW</button>
 				</div class=sheet-nowrap>
 				<div>
 					<span class=sheet-label style='width: 8rem' title="Hits blocked per attack by your armor/shields/abilities.">Hits Blocked </span>
@@ -177,7 +180,7 @@
 					<button class=sheet-attack-button title="Missile per attackable extra hex of a multi hex creature" type="action" name="act_attack1">1</button>
 					<button class=sheet-attack-button title="Melee/Thrown against Flank, or pole set against charger" type="action" name="act_attack2">2</button>
 					<button class=sheet-attack-button type="action" name="act_attack3">3</button>
-					<button class=sheet-attack-button title="Melee/Thrown against Rear or Prone" type="action" name="act_attack4">4</button>
+					<button class=sheet-attack-button title="Melee/Thrown against Rear, Prone, or in HTH" type="action" name="act_attack4">4</button>
 					<button class=sheet-attack-button type="action" name="act_attack5">5</button>
 					<button class=sheet-attack-button type="action" name="act_attack5">6</button>
 				</span>
@@ -617,6 +620,50 @@
 	</div>
 </rolltemplate>
 
+<!-- HTH Reaction -->
+<rolltemplate class="sheet-rolltemplate-hth-reaction">
+	<div class=container>
+		<div><h1>{{character_name}} reacts to Hand to Hand Combat.</h1></div>
+		<div class=arrow-container><div class=arrow-right></div></div>
+		<div>
+			<span class=template-dice>{{computed::roll1}}</span>
+		</div>
+		{{#rollBetween() roll1 1 2}}
+			<div class=description>
+				<div>Drops weapon and shield unless main-gouche or dagger.</div>
+				<div>Must fight bare handed this turn.</div>
+				<div>Drops to ground with attacker.</div>
+			<div>
+		{{/rollBetween() roll1 1 2}}
+		{{#rollBetween() roll1 3 4}}
+			<div class=description>
+				<div>Drops weapon and shield unless main-gouche or dagger.</div>
+				<div>Readies dagger and can use it this turn.</div>
+				<div>Drops to ground with attacker.</div>
+			<div>
+		{{/rollBetween() roll1 3 4}}
+		{{#rollTotal() roll1 5}}
+			<div class=description>
+				<div>Keeps weapon and shield!</div>
+				<div>Attacker backs up to adjacent hex in the direction they came from.</div>
+				<div>No Hand to Hand combat.</div>
+		{{/rollTotal() roll1 5}}
+		{{#rollTotal() roll1 6}}
+			<div class=description>
+				<div>Keeps weapon and shield!</div>
+				<div>Automatically hits the attacker RIGHT NOW.</div>
+				<div>Attacker backs up to adjacent hex in the direction they came from.</div>
+				<div>No Hand to Hand combat.</div>
+				<div class=keyvalue>
+					<span>Note: </span>
+					<span>
+						If attacked from behind or has no weapon and no unarmed-combat skill, re-roll this.
+					</span>
+				</div>
+			<div>
+		{{/rollTotal() roll1 6}}
+	</div>
+</rolltemplate>
 
 <!-- For Descriptions -->
 <rolltemplate class="sheet-rolltemplate-description">
@@ -953,7 +1000,11 @@
 	});
 
 	on('clicked:turnorder', (info) => {
-		doRollWithDiceString("&{template:turnorder} {{character_name=@{character_name}}} {{turnorder=[[@{DX}[DEX] &{tracker}]]}}");
+		doRollWithDiceString("&{template:turnorder} {{turnorder=[[@{DX}[DEX] &{tracker}]]}}");
+	});
+
+	on('clicked:hthreaction', (info) => {
+		doRollWithDiceString("&{template:hth-reaction} {{roll1=[[1d6]]}}");
 	});
 
 	// Do a roll with stats.
