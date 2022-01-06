@@ -114,4 +114,11 @@ weaponProficiencies['Martial Arts'] = {
 };
 //#endregion
 
+//#region The Complete Book of Elves
+weaponProficiencies['Bladesong Fighting Style'] = {
+    'slots': 2,
+    'book': 'The Complete Book of Elves'
+};
+//#endregion
+
 module.exports = weaponProficiencies;
