@@ -8068,6 +8068,62 @@ wiz4['Conjure Cabinet'] = {
 }
 //#endregion
 
+//#region The Complete Book of Elves
+wiz2['Camouflage'] = {
+    'level': '2',
+    'school': 'Alteration',
+    'range': '20’ radius',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': '[[@{level-wizard}]] persons',
+    'components': 'S, M',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': 'A mistletoe berry.',
+    'reference': 'p. 101',
+    'book': 'The Complete Book of Elves',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The elves jealously guard this spell. It allows the mage to instantly and completely hide the number of people allowed by the spell, concealing them against even thorough searches. This spell functions only in the wilderness, however, for it changes the appearance of the affected characters into a facsimile of natural surroundings. It is effective even against infravision and is therefore perfect for use by spies and infiltrators. Characters in this form still have all their faculties and abilities, and they can emerge from this cover at any time they desire.\n&emsp;It is even possible for characters to move while within this form. Those affected may move up to 10 feet in a single round, creeping more closely to their targets. If they travel faster than this, the spell dissipates. As long as the movement is surreptitious and stealthy (“Look, Thrag! That bush *moving*!”), they should be safe. As with the *invisibility* spell, if the enspelled characters attack they gain the initiative and a +4 bonus to attack rolls because of total surprise, yet lose the benefits of the spell.\n&emsp;The characters cannot be detected except by magic or by moving stupidly. Until the spell wears off, the characters can enjoy near-total invisibility and gain much-needed information.'
+}
+
+wiz2['Seeking'] = {
+    'level': '2',
+    'school': 'Enchantment, Invocation',
+    'range': '100 yards',
+    'duration': '1 turn',
+    'aoe': '[[{floor([[@{level-wizard}]]/3),5}kl1]] missile(s)',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 102',
+    'book': 'The Complete Book of Elves',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *seeking* spell takes the normal laws of momentum and gravity, and then twists them slightly in a way that is favorable to the caster of the spell.\n&emsp;The caster can ensorcel a number of normal, nonenchanted missiles no larger than a javelin, equal to one-third his level, to a maximum of five missiles. When they have been enchanted, the caster may either use them or distribute them to his or her companions.\n&emsp;When shot or hurled at a target, the missiles unerringly seek the target. They will hit nothing else but that target. The missiles can go around objects of corners if the target was visible when the spell was cast, but the missiles cannot pass through solid obstructions. For example, if the target closes a door, the missiles slam into the door and cannot be removed until the spell wears off.\n&emsp;The normal range can be extended to the distance of the target creature as long as the opponent uses only ordinary methods of escape. If the target *plane shifts*, *teleports*, *blinks*, or uses some other means of instantaneous transport, the missile can no longer home in on its target. It falls to the ground, useless.\n&emsp;This spell is not an automatic guarantee of success. Rather, it ensures that archers and slingers, when firing into melee, will not accidentally hit those who are on their side. This spell is especially useful for battles or shots in narrow corridors. If the person firing the arrow or bullet can see the target, he can fire for normal damage without fear of damaging comrades.'
+}
+
+wiz5['Conduit'] = {
+    'level': '5',
+    'school': 'Enchantment, Invocation',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': '5 missiles',
+    'components': 'V, S,M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A copper wire twisted into the shape of an arrow.',
+    'reference': 'p. 102',
+    'book': 'The Complete Book of Elves',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Using this spell, the caster can temporarily enchant five missiles with another spell of a level no higher than 4th. This spell combines the best aspects of fighters and mages, for they can work in harmony to maximize both the effects of the spell and the damage of the missile.\n&emsp;The *conduit* spell effectively extends the range of the second spell, casting that spell out to its full range *from the target point* when the missile hits the target. Unless otherwise specified when the spell is cast, the effects of the spell radiate forward from the point the arrowhead strikes.\n&emsp;Missiles affected by this spell must begin to be fired within one turn after the last is enchanted, and they will not hold the spells for longer than an hour. Since the missiles are not specially prepared to hold enchantments for longer, the spells tend to bleed off with the passage of time.\n&emsp;The spells cast on the missiles must be separate ones that the caster has memorized that day. For example, if a sorceress has memorized *conduit* and a single *fireball*, she can place a *fireball* only on one of her arrows, not on all five.\n&emsp;The loaded spells are triggered when the head of the missile strikes something, whether that be the target, the ground, a tree, a rock, or whatever. This is good for radius attacks, such as a fireball, although it does no good for spells such as *burning hands* or *shocking grasp*.\n&emsp;Targets are allowed normal saves against these spells, as if the wizard were right there casting the spell. However, if the missile carries the enspelled arrow beyond the spell’s normal range, the wizard has no more control over the spell.\n&emsp;For example, *web* and *dimension door* spells require the caster to manipulate the spell, and casters cannot do so unless the range of their spell can reach back to them. Unless such wizards want to make the necessary calculations before casting the spell into the missile, these spells usually won’t work. If a caster wishes to do so, fine, but this is assuming a lot of faith in the ability of whoever fires the bow, for the archer must make a successful attack roll against AC 6 (including modifiers for range) to hit the area.\n&emsp;The casting time does not include the casting time of the loaded spells.'
+}
+//#endregion
+
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
 wizardSpells['wiz2'] = wiz2;
