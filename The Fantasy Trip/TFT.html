@@ -532,7 +532,7 @@
 				<div class=success>Success!</div>
 			{{/flavor}}
 			{{#damage}}
-				<div>Damage: {{damage}}</div>
+				<div class=keyvalue><span>Damage: </span><span>{{damage}}</span></div>
 			{{/damage}}
 			{{#rollTotal() computed::success 4}}
 				<div class=success>Critical: Triple Damage or Effect!</div>
@@ -587,6 +587,36 @@
 		</div>
 	</div>
 </rolltemplate>
+
+<!-- Shield Rush -->
+<rolltemplate class="sheet-rolltemplate-shield-rush">
+	<div class=container>
+		<div><h1>{{character_name}} makes a Shield Rush save.</h1></div>
+		{{#weaker}}
+			<div><h2>Rusher is weaker</h2></div>
+		{{/weaker}}
+		{{^weaker}}
+			<div><h2>Rusher is equal or stronger</h2></div>
+		{{/weaker}}
+		<div class=arrow-container><div class=arrow-right></div></div>
+		<div>
+			<span class=template-dice>{{computed::roll1}}</span>
+			= {{roll1}} vs {{stat}}
+		</div>
+		<!-- Success! -->
+		{{#rollGreater() computed::success 0}}
+			<div class=success>Remains standing!<div>
+		{{/rollGreater() computed::success 0}}
+		<!-- Failure -->
+		{{#rollLess() computed::success 0}}
+			<div class=failure>Falls prone!<div>
+			{{#rollTotal() computed::success -2}}
+				<div class=failure>Automatic Failure.</div>
+			{{/rollTotal() computed::success -2}}
+		{{/rollLess() computed::success 0}}
+	</div>
+</rolltemplate>
+
 
 <!-- For Descriptions -->
 <rolltemplate class="sheet-rolltemplate-description">
@@ -926,6 +956,45 @@
 		doRollWithDiceString("&{template:turnorder} {{character_name=@{character_name}}} {{turnorder=[[@{DX}[DEX] &{tracker}]]}}");
 	});
 
+	// Do a roll with stats.
+	const doShieldRush = function(macro) {
+		// returns success level.  positive is success.
+		// negative is failure.
+		const successLevel = function(results) {
+			let roll = results.roll1.result;
+			let stat = results.stat.result;
+
+			// Check all the crits first.
+			if (results.roll1.dice.length == 3) {
+				// 3d6
+				if (roll >= 16) return -2; // auto fail
+			}
+			else {
+				// 2d6
+				if (roll == 12) return -2;
+			}
+			// Normal to-hit check.
+			return (roll <= stat) ? 1 : -1;
+		}
+
+		macro += ' {{character_name=@{cname}}}';
+		macro += rollTemplateValue('success', 0, true); // level of success, crits, etc.
+		startRoll(macro, (results) => {
+			let level = successLevel(results.results);
+			let diceString = diceArrayToString(results.results.roll1.dice);
+			finishRoll( results.rollId, {
+				'roll1': diceString,
+				'success': level
+			});
+		});
+	}
+
+	on('clicked:shieldrushweaker', (info) => {
+		doShieldRush("&{template:shield-rush} {{weaker=1}} {{stat=[[@{DX}[DEX]]]}} {{roll1=[[2d6]]}}");
+	});
+	on('clicked:shieldrushstronger', (info) => {
+		doShieldRush("&{template:shield-rush} {{stat=[[@{DX}[DEX]]]}} {{roll1=[[3d6]]}}");
+	});
 
 	/* TALENT HANDLERS */
 
