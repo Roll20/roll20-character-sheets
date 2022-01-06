@@ -1119,6 +1119,19 @@
 				return (roll <= tohit) ? 1 : -1;
 			}
 
+			// Do the Attack roll with success level.
+			const doAttackRoll = function(macro) {
+				macro += ' {{character_name=@{cname}}}';
+				startRoll(macro, (results) => {
+					let level = successLevel(results.results);
+					let diceString = diceArrayToString(results.results.roll1.dice);
+					finishRoll( results.rollId, {
+						'roll1': diceString,
+						'success': level
+					});
+				});
+			}
+
 			if (type == 'weapon') {
 				let attackFlavorName = repeatingPropertyName('weapons', id, 'attackflavor');
 				let successFlavorName = repeatingPropertyName('weapons', id, 'successflavor');
@@ -1171,16 +1184,8 @@
 					}
 					mstring += rollTemplateProperty('attackflavor', attackFlavorName, v);
 					mstring += rollTemplateProperty('successflavor', successFlavorName, v);
-					mstring += rollTemplateValue('success', '1d6', true); // level of success, crits, etc.
-					mstring += ' {{character_name=@{cname}}}';
-					startRoll(mstring, (results) => {
-						let level = successLevel(results.results);
-						let diceString = diceArrayToString(results.results.roll1.dice);
-						finishRoll( results.rollId, {
-							'roll1': diceString,
-							'success': level
-						});
-					});
+					mstring += rollTemplateValue('success', 0, true); // level of success, crits, etc.
+					doAttackRoll(mstring);
 				});
 			}
 			else if (type == 'spell') {
