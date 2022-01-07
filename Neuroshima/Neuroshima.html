@@ -521,27 +521,59 @@
 		</div>
 		<div class="page-umiejetnosci">
 			<h1>Ustawienia rzutu</h1>
-			<div class="sheet-radios">
-			  <input type="hidden" class="sheet-radio" name="attr_level" value="1" />
-			  <button type="action" name="act_level_1" class="sheet-radio sheet-radio-1">
-				<span class="sheet-checked">Łatwy</span>
-			  </button>
-			  <button type="action" name="act_level_2" class="sheet-radio sheet-radio-2">
-				<span class="sheet-checked">Przeciętny</span>
-			  </button>
-			  <button type="action" name="act_level_3" class="sheet-radio sheet-radio-3">
-				<span class="sheet-checked">Problematyczny</span>
-			  </button>
-			  <button type="action" name="act_level_4" class="sheet-radio sheet-radio-4">
-				<span class="sheet-checked">Trudny</span>
-			  </button>
-			  <button type="action" name="act_level_5" class="sheet-radio sheet-radio-5">
-				<span class="sheet-checked">Cholernie Trudny</span>
-			  </button>
-			  <button type="action" name="act_level_6" class="sheet-radio sheet-radio-6">
-				<span class="sheet-checked">Fart</span>
-			  </button>
-			</div>
+            <input type="hidden" name="attr_final_test_penalty" value="0">
+            <div class="params-holder">
+                <div class="sheet-radios">
+                    <input type="hidden" class="sheet-radio" name="attr_level" value="1" />
+                    <button type="action" name="act_level_1" class="sheet-radio sheet-radio-1">
+                        <span class="sheet-checked">Łatwy</span>
+                    </button>
+                    <button type="action" name="act_level_2" class="sheet-radio sheet-radio-2">
+                        <span class="sheet-checked">Przeciętny</span>
+                    </button>
+                    <button type="action" name="act_level_3" class="sheet-radio sheet-radio-3">
+                        <span class="sheet-checked">Problematyczny</span>
+                    </button>
+                    <button type="action" name="act_level_4" class="sheet-radio sheet-radio-4">
+                        <span class="sheet-checked">Trudny</span>
+                    </button>
+                    <button type="action" name="act_level_5" class="sheet-radio sheet-radio-5">
+                        <span class="sheet-checked">Cholernie Trudny</span>
+                    </button>
+                    <button type="action" name="act_level_6" class="sheet-radio sheet-radio-6">
+                        <span class="sheet-checked">Fart</span>
+                    </button>
+                </div>
+                <div class="param-page">
+                    <div class="param-row">
+                        <label><input type="checkbox" name="attr_modi_battle">Test Walki</label>
+                    </div>
+                    <div class="param-row">
+                        <label><input type="checkbox" name="attr_modi_open">Test Otwarty</label>
+                    </div>
+                    <div class="param-row">
+                        <label><input type="checkbox" name="attr_modi_penalties">Kary</label>
+                        <input type="number" class="big-inactive-box" name="attr_total_wounds" value="0" readonly>
+                        <span class="postfix">%</span>
+                    </div>
+                    <div class="param-row">
+                        <label><input type="checkbox" name="attr_modi_armor_penalties">Pancerz</label>
+                        <input type="number" class="big-inactive-box" name="attr_total_armor_penalties" value="0" readonly>
+                        <span class="postfix">%</span>
+                    </div>
+                    <div class="param-row">
+                        <label><input type="checkbox" name="attr_dummy" class="layout-element">Utrudnienie</label>
+                        <input type="number" class="big-black-box" name="attr_custom_penalty" value="0"> 
+                        <span class="postfix">%</span>
+                    </div>
+                    <hr>
+                    <div class="param-row">
+                        <label><input type="checkbox" name="attr_dummy2" class="layout-element">Do testu</label>
+                        <input type="number" class="big-inactive-box" name="attr_final_test_penalty" value="0" readonly> 
+                        <span class="postfix">%</span>
+                    </div>
+                </div>
+            </div>
 			<h1>Umiejętności</h1>
 			
 			<table class="umj-table"><tbody>
@@ -2024,9 +2056,22 @@ const levelRadioValues = ["1","2","3","4","5","6"];
 /******************************************************************/
 
  on('clicked:test', (info) => {
-        startRoll("&{template:test} {{name=Test}} {{roll1={[[1d20]],[[1d20]],[[1d20]]}}}", (results) => {
-            const total = results.results.roll1.result;
-            const computed = total % 4;
+        startRoll("&{template:test} {{name=Test}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}", (results) => {
+            const total = results.results.roll1.result + results.results.roll2.result + results.results.roll3.result;
+            const computed = total + 10;
+            
+            // Difficulty Modifiers
+            let modifier = 0.5;
+
+            // Difficulty Level
+            let lvl = 3;
+
+            // Slider
+
+            // Critical rolls ( 1 / 20 )
+
+            // Successes and failures
+
 
             finishRoll(
                 results.rollId,
@@ -2057,7 +2102,10 @@ on('clicked:test2', (info) => {
     <div class="sheet-template-container">
         <h1>{{name}}</h1>
         <div class="sheet-results">
-            <h4>Result = {{roll1}}</h4>
+            <h4>D1 = {{roll1}}</h4>
+            <h4>D2 = {{roll2}}</h4>
+            <h4>D3 = {{roll3}}</h4>
+            <h4>dice = {{dice::roll1}}</h4>
             <h4>Custom Result = {{computed::roll1}}</h4>
         </div>
     </div>
