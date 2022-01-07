@@ -172,20 +172,21 @@
 				<span class=sheet-nowrap>
 					<button class=sheet-attack-button title="Vs. Invisible or in total darkness/blind" type="action" name="act_attack-6">-6</button>
 					<button class=sheet-attack-button type="action" name="act_attack-5">-5</button>
-					<button class=sheet-attack-button title="Vs. Flying, or Missile/Thrown against Prone behind cover" type="action" name="act_attack-4">-4</button>
+					<button class=sheet-attack-button title="Missile/Thrown against Prone behind cover or only head and shoulders visible, or vs. Flying" type="action" name="act_attack-4">-4</button>
 					<button class=sheet-attack-button title="Health at 3 or less" type="action" name="act_attack-3">-3</button>
-					<button class=sheet-attack-button title="Severely Wounded (-5 or more) last turn, standing on a body, or Missile at 5+6 MH" type="action" name="act_attack-2">-2</button>
-					<button class=sheet-attack-button title="Vs. per 10 vertical feet, Missile at 3+4 MH, or Thrown per hex" type="action" name="act_attack-1">-1</button>
+					<button class=sheet-attack-button title="Missile at 5+6 MH, Severely Wounded (-5 or more) last turn, standing on a body, vertical cover, melee from > half yard below" type="action" name="act_attack-2">-2</button>
+					<button class=sheet-attack-button title="Missile at 3+4 MH, Thrown per hex, Molotail per MH, or Projectile per 10 vertical feet," type="action" name="act_attack-1">-1</button>
 					<button class=sheet-attack-button type="action" name="act_attack0">0</button>
 					<button class=sheet-attack-button title="Missile per attackable extra hex of a multi hex creature" type="action" name="act_attack1">1</button>
 					<button class=sheet-attack-button title="Melee/Thrown against Flank, or pole set against charger" type="action" name="act_attack2">2</button>
 					<button class=sheet-attack-button type="action" name="act_attack3">3</button>
 					<button class=sheet-attack-button title="Melee/Thrown against Rear, Prone, or in HTH" type="action" name="act_attack4">4</button>
 					<button class=sheet-attack-button type="action" name="act_attack5">5</button>
-					<button class=sheet-attack-button type="action" name="act_attack5">6</button>
+					<button class=sheet-attack-button type="action" name="act_attack6">6</button>
 				</span>
-				<span title="Check if opponent is Defending (physical) or Dodging (ranged) attacks, rolls 4d6">
-					<span class=sheet-label>Defend</span>
+				<button class=sheet-attack-button title="Automatic attack/cast success, use for HTH Reaction=6, bound victims, etc." type="action" name="act_attacka">A</button>
+				<span title="Roll 4d6, use vs. Defending/Dodging or Unskilled Attack">
+					<span class=sheet-label>4d6</span>
 					<input type=checkbox name=attr_defending>
 				</span>
 			</div>
@@ -438,28 +439,33 @@
 		{{#defending}}
 			<div><h2>Opponent is defending/dodging</h2></div>
 		{{/defending}}
+		{{^roll1}}
+			<div><h2>Automatic Hit</h2></div>
+		{{/roll1}}
 		<div class=arrow-container><div class="arrow-right"></div></div>
-		<div>
+		{{#roll1}}
 			<div>
-				<span class=template-dice>{{computed::roll1}}</span>
-				<span>= {{roll1}} vs </span>
-				{{#simpletohit}}
-					{{tohit}}
+				<div>
+					<span class=template-dice>{{computed::roll1}}</span>
+					<span>= {{roll1}} vs </span>
+					{{#simpletohit}}
+						{{tohit}}
+					{{/simpletohit}}
+				</div>
+				{{^simpletohit}}
+					<div>
+						{{dx}}
+						{{#weaponadj}}
+						<span> + <span style='color: rgb(150, 1, 150);'>{{weaponadj}}</span></span>
+						{{/weaponadj}}
+						{{#tohitadj}}
+						<span> + {{tohitadj}}</span>
+						{{/tohitadj}}
+						<span> = {{tohit}}</span>
+					</div>
 				{{/simpletohit}}
 			</div>
-			{{^simpletohit}}
-				<div>
-					{{dx}}
-					{{#weaponadj}}
-					<span> + <span style='color: rgb(150, 1, 150);'>{{weaponadj}}</span></span>
-					{{/weaponadj}}
-					{{#tohitadj}}
-					<span> + {{tohitadj}}</span>
-					{{/tohitadj}}
-					<span> = {{tohit}}</span>
-				</div>
-			{{/simpletohit}}
-		</div>
+		{{/roll1}}
 		<!-- Success! -->
 		{{#rollGreater() computed::success 0}}
 			{{#successflavor}}
@@ -504,28 +510,33 @@
 		{{#defending}}
 			<div><h2>Opponent is defending/dodging</h2></div>
 		{{/defending}}
+		{{^roll1}}
+			<div><h2>Automatic Success</h2></div>
+		{{/roll1}}
 		<div class=arrow-container><div class=arrow-right></div></div>
-		<div>
+		{{#roll1}}
 			<div>
-				<span class=template-dice>{{computed::roll1}}</span>
-				<span>= {{roll1}} vs </span>
-				{{#simpletohit}}
-					{{tohit}}
+				<div>
+					<span class=template-dice>{{computed::roll1}}</span>
+					<span>= {{roll1}} vs </span>
+					{{#simpletohit}}
+						{{tohit}}
+					{{/simpletohit}}
+				</div>
+				{{^simpletohit}}
+					<div>
+						{{dx}}
+						{{#spelladj}}
+						<span> + <span style='color: rgb(150, 0, 150);'>{{spelladj}}</span></span>
+						{{/spelladj}}
+						{{#tohitadj}}
+						<span> + {{tohitadj}}</span>
+						{{/tohitadj}}
+						<span> = {{tohit}}</span>
+					</div>
 				{{/simpletohit}}
 			</div>
-			{{^simpletohit}}
-				<div>
-					{{dx}}
-					{{#spelladj}}
-					<span> + <span style='color: rgb(150, 0, 150);'>{{spelladj}}</span></span>
-					{{/spelladj}}
-					{{#tohitadj}}
-					<span> + {{tohitadj}}</span>
-					{{/tohitadj}}
-					<span> = {{tohit}}</span>
-				</div>
-			{{/simpletohit}}
-		</div>
+		{{/roll1}}
 		<!-- Success -->
 		{{#rollGreater() computed::success 0}}
 			{{#flavor}}
@@ -1064,7 +1075,8 @@
 	/* WEAPON HANDLERS */
 
 	// Weapon Attack Buttons.
-	on('clicked:attack-5'
+	on('clicked:attack-6'
+	+ ' clicked:attack-5'
 	+ ' clicked:attack-4'
 	+ ' clicked:attack-3'
 	+ ' clicked:attack-2'
@@ -1074,13 +1086,20 @@
 	+ ' clicked:attack2'
 	+ ' clicked:attack3'
 	+ ' clicked:attack4'
-	+ ' clicked:attack5', (info) => {
-		let toHit = parseInt(info.triggerName.substring(14))||0;
+	+ ' clicked:attack5'
+	+ ' clicked:attack6'
+	+ ' clicked:attacka', (info) => {
+		let toHitCharacter = info.triggerName.substring(14);
+		let toHit = parseInt(toHitCharacter)||0;
 
 		onSelectedWeaponOrSpell(function(id, selectedIds, type) {
 
 			// return the string depending on whether we are defending or not.
-			const defendingProperties = function (attrs) {
+			const diceProperties = function (attrs, toHitName) {
+				// if no to hit, then no nothing.
+				if (!(toHitName in attrs)) {
+					return ''; // nothing, automatic hit.
+				}
 				// we are defending, so need 4d6, arg.
 				if (attrs.defending == 'on') {
 					return rollTemplateValue('defending', '1') + rollTemplateValue('roll1', '4d6', true);
@@ -1092,9 +1111,13 @@
 			// returns success level.  positive is success.
 			// negative is failure.
 			const successLevel = function(results) {
+
+				// if no roll, normal success.
+				if (!('roll1' in results)) {
+					return 1;
+				}
 				let roll = results.roll1.result;
 				let tohit = results.tohit.result;
-
 				// Check all the crits first.
 				if (results.roll1.dice.length == 3) {
 					// 3d6
@@ -1134,27 +1157,30 @@
 				macro += rollTemplateValue('success', 0, true); // level of success, crits, etc.
 				startRoll(macro, (results) => {
 					let level = successLevel(results.results);
-					let diceString = diceArrayToString(results.results.roll1.dice);
-					finishRoll( results.rollId, {
-						'roll1': diceString,
-						'success': level
-					});
+					let computed = {'success': level};
+					if ('roll1' in results.results) {
+						computed['roll1'] = diceArrayToString(results.results.roll1.dice);
+					}
+					finishRoll( results.rollId, computed );
 				});
 			}
 
 			if (type == 'weapon') {
 				let attackFlavorName = repeatingPropertyName('weapons', id, 'attackflavor');
 				let successFlavorName = repeatingPropertyName('weapons', id, 'successflavor');
-				let weaponToHitName  = repeatingPropertyName('weapons', id, 'tohit');
 				let weaponDamageName = repeatingPropertyName('weapons', id, 'weapondamage');
-				getAttrs(['gender', attackFlavorName, successFlavorName, weaponToHitName, weaponDamageName, 'defending'], function(v) {
+				let attrNames = ['gender', attackFlavorName, successFlavorName, weaponDamageName, 'defending'];
+				let weaponToHitName  = repeatingPropertyName('weapons', id, 'tohit');
+				if (toHitCharacter != 'a') {
+					attrNames.push(weaponToHitName);
+				}
+				getAttrs(attrNames, function(v) {
 					let mstring  = `&{template:attack}`
 						+ rollTemplateProperty('weaponname', repeatingPropertyName('weapons', id, 'weaponname'))
-						+ defendingProperties(v);
+						+ diceProperties(v, weaponToHitName);
 
-					// short description means no toHit or Weapon bonuses, can all be on one line or with no summation and =
-					{ // compute total and separate to hits.
-						let simpleToHit = true;
+					// append total and separate to hits, if present.
+					if (weaponToHitName in v) {
 						let dxAdj = `@{DX}[DEX]`;
 						let toHitString = ` {{tohit=[[${dxAdj}`;
 						let oldHitLength = toHitString.length;
@@ -1172,11 +1198,9 @@
 							toHitString += ` + ${toHitAdj}`;
 							mstring += rollTemplateValue('tohitadj', toHitAdj, true);
 						}
-
 						if (oldHitLength == toHitString.length) {
 							mstring += rollTemplateValue('simpletohit', '1');
 						}
-
 						// and finish.
 						toHitString += ']]}}';
 						mstring += toHitString;
@@ -1200,21 +1224,26 @@
 			else if (type == 'spell') {
 				let damageName = repeatingPropertyName('spells', id, 'spelldamage');
 				let flavorName = repeatingPropertyName('spells', id, 'successflavor');
-				let toHitName  = repeatingPropertyName('spells', id, 'tohit');
-				getAttrs([flavorName, toHitName, damageName, 'defending'], function(v) {
+				let attrNames = [flavorName, damageName, 'defending'];
+				let spellToHitName  = repeatingPropertyName('spells', id, 'tohit');
+				if (toHitCharacter != 'a') {
+					attrNames.push(spellToHitName);
+				}
+				getAttrs(attrNames, function(v) {
 					let mstring  = `&{template:cast-spell}`
 						+ rollTemplateProperty('spellname', repeatingPropertyName('spells', id, 'spellname'))
-						+ defendingProperties(v);
+						+ diceProperties(v, spellToHitName);
 
-					{ // compute to hit
+					// append to hit values if present.
+					if (spellToHitName in v) {
 						let dxAdj = `@{DX}[DEX]`;
 						let toHitString = ` {{tohit=[[${dxAdj}`;
 						let oldHitLength = toHitString.length;
 						mstring += rollTemplateValue('dx', dxAdj, true);
 
 						// provisionally add spell toHit.
-						if (parseInt(v[toHitName])||0) {
-							let spellAdj = `@{${toHitName}}[SPELL_ADJ]`;
+						if (parseInt(v[spellToHitName])||0) {
+							let spellAdj = `@{${spellToHitName}}[SPELL_ADJ]`;
 							toHitString += ` + ${spellAdj}`;
 							mstring += rollTemplateValue('spelladj', spellAdj, true);
 						}
