@@ -1,5 +1,6 @@
 <input type="hidden" name="attr_version" value="02-00-00"/>
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
+<input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" hidden readonly />
 <div class="sheet-pc">
 	<div id="content">
 		<div id="character">
@@ -46,12 +47,14 @@
 				<span class="diamond-small-red"><input name="attr_wisdom" value="0" type="number" min=1 max=6></span>
 				<span class="diamond-small"><input name="attr_fellowship" value="0" type="number"></span>
 				<span>
-					<button type="roll" value="@{valour_roll}" name="roll_valourcheck"></button>
+					<button type="roll" class="table-rolls" value="@{valour_roll}" name="roll_valourcheck"></button>
+					<button type="action" class="parsed-rolls" name="act_valour" id="roll_valour"></button>
 					<input type="checkbox" name="attr_valour_favoured">
 					<label data-i18n="valour" data-i18n-title="valour-description">Valour</label>
 				</span>
 				<span>
-					<button type="roll" value="@{wisdom_roll}" name="roll_wisdomcheck"></button>
+					<button type="roll" class="table-rolls" value="@{wisdom_roll}" name="roll_wisdomcheck"></button>
+					<button type="action" class="parsed-rolls" name="act_wisdom" id="roll_wisdom"></button>
 					<input type="checkbox" name="attr_wisdom_favoured">
 					<label data-i18n="wisdom" data-i18n-title="wisdom-description">Wisdom</label>
 				</span>
@@ -150,9 +153,23 @@
 				<label><input name="attr_wounded" type="checkbox">Wounded</label>
 			</div>
 			<label>Injury<input name="attr_injury" type="text"></label>
-			<br /><br /><br />
+			<br/>
+			<br/>
+			<div class="center">
+				<label>Parsed rolls</label>
+				<div class="sheet-hover-info" data-i18n="parsedroll-description">When enabled the dice rolls will be parsed and calculated, with output displayed in a rolltemplate. This removes the need for roll tables. </div>
+				<span class="toggle">
+					<input type="radio" name="attr_parsedrolls" value="1" selected id="config_parsedrolls" />
+					&nbsp;
+					<input type="radio" name="attr_parsedrolls" value="0" id="config_tablerolls" />
+				</span>
+				<label>Table rolls</label>
+				<br/>
+				<div class="sheet-hover-info" data-i18n="tableroll-description">When enabled the dice rolls will be using preconfigured rollable tables according to instructions for The One Ring 1st Edition, with output displayed in a rolltemplate.</div>
+			</div>
+			<br/>
 			<button type="action" name="act_notestoggle" data-i18n="notes">Notes</button>
-		</div>
+		</div>	
 		<div id="protection">
 			<h1 class="bordertop">Protection</h1>
 			<div id="protection-nested">
@@ -166,10 +183,10 @@
 						readonly="readonly"></span>
 				<span class="diamond-small"><input name="attr_helmprot" value="0" type="number"></span>
 				<span class="diamond-small"><input name="attr_otherprot" value="0" type="number"></span>
-				<label><button type="roll"
-						value="/me rolls for Protection against Injury TN.\n/roll @{favorill} + (@{protection}+?{Bonus Dice|0})t[@{wearytype}]"
-						name="roll_protectioncheck"></button>
-						<button type="action" class="parsed-rolls" name="act_protection" id="roll_protection"></button>Total</label>
+				<label>
+					<button type="roll" class="table-rolls" name="roll_protectioncheck"
+						value="/me rolls for Protection against Injury TN.\n/roll @{favorill} + (@{protection}+?{Bonus Dice|0})t[@{wearytype}]"></button>
+					<button type="action" class="parsed-rolls" name="act_protection" id="roll_protection"></button>Total</label>
 				
 				<span class="diamond-small"><input name="attr_stanceprot" value="0" type="number"></span>
 				<label class="left"><input type="checkbox" name="attr_otherprot_active" value=1
@@ -182,7 +199,7 @@
 		<div id="skill-strength">
 			<h1>&nbsp;</h1>
 			<div class=sheet-row>
-				<button type="roll" value="@{awe_roll}" name="roll_awecheck"></button>
+				<button type="roll" class="table-rolls" value="@{awe_roll}" name="roll_awecheck"></button>
 				<button type="action" class="parsed-rolls" name="act_awe" id="roll_awe"></button>
 				<input type="checkbox" name="attr_awe_favoured">
 				<label data-i18n="awe">Awe</label>
@@ -198,7 +215,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{athletics_roll}" name="roll_athleticscheck"></button>
+				<button type="roll" class="table-rolls" value="@{athletics_roll}" name="roll_athleticscheck"></button>
 				<button type="action" class="parsed-rolls" name="act_athletics" id="roll_athletics"></button>
 				<input type="checkbox" name="attr_athletics_favoured">
 				<label data-i18n="athletics">Athletics</label>
@@ -214,7 +231,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{awareness_roll}" name="roll_awarenesscheck"></button>
+				<button type="roll" class="table-rolls" value="@{awareness_roll}" name="roll_awarenesscheck"></button>
 				<button type="action" class="parsed-rolls" name="act_awareness" id="roll_awareness"></button>
 				<input type="checkbox" name="attr_awareness_favoured">
 				<label data-i18n="awareness">Awareness</label>
@@ -230,7 +247,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{hunting_roll}" name="roll_huntingcheck"></button>
+				<button type="roll" class="table-rolls" value="@{hunting_roll}" name="roll_huntingcheck"></button>
 				<button type="action" class="parsed-rolls" name="act_hunting" id="roll_hunting"></button>
 				<input type="checkbox" name="attr_hunting_favoured">
 				<label data-i18n="hunting">Hunting</label>
@@ -246,7 +263,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{song_roll}" name="roll_songcheck"></button>
+				<button type="roll" class="table-rolls" value="@{song_roll}" name="roll_songcheck"></button>
 				<button type="action" class="parsed-rolls" name="act_song" id="roll_song"></button>
 				<input type="checkbox" name="attr_song_favoured">
 				<label data-i18n="song">Song</label>
@@ -262,7 +279,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{craft_roll}" name="roll_craftcheck"></button>
+				<button type="roll" class="table-rolls" value="@{craft_roll}" name="roll_craftcheck"></button>
 				<button type="action" class="parsed-rolls" name="act_craft" id="roll_craft"></button>
 				<input type="checkbox" name="attr_craft_favoured">
 				<label data-i18n="craft">Craft</label>
@@ -281,7 +298,7 @@
 		<div id="skill-heart">
 			<h1 class="center">Skills</h1>
 			<div class=sheet-row>
-				<button type="roll" value="@{enhearten_roll}" name="roll_enheartencheck"></button>
+				<button type="roll" class="table-rolls" value="@{enhearten_roll}" name="roll_enheartencheck"></button>
 				<button type="action" class="parsed-rolls" name="act_enhearten" id="roll_enhearten"></button>
 				<input type="checkbox" name="attr_enhearten_favoured">
 				<label data-i18n="enhearten">Enhearten</label>
@@ -297,7 +314,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{travel_roll}" name="roll_travelcheck"></button>
+				<button type="roll" class="table-rolls" value="@{travel_roll}" name="roll_travelcheck"></button>
 				<button type="action" class="parsed-rolls" name="act_travel" id="roll_travel"></button>
 				<input type="checkbox" name="attr_travel_favoured">
 				<label data-i18n="travel">Travel</label>
@@ -313,7 +330,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{insight_roll}" name="roll_insightcheck"></button>
+				<button type="roll" class="table-rolls" value="@{insight_roll}" name="roll_insightcheck"></button>
 				<button type="action" class="parsed-rolls" name="act_insight" id="roll_insight"></button>
 				<input type="checkbox" name="attr_insight_favoured">
 				<label data-i18n="insight">Insight</label>
@@ -329,7 +346,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{healing_roll}" name="roll_healingcheck"></button>
+				<button type="roll" class="table-rolls" value="@{healing_roll}" name="roll_healingcheck"></button>
 				<button type="action" class="parsed-rolls" name="act_healing" id="roll_healing"></button>
 				<input type="checkbox" name="attr_healing_favoured">
 				<label data-i18n="healing">Healing</label>
@@ -345,7 +362,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{courtesy_roll}" name="roll_courtesycheck"></button>
+				<button type="roll" class="table-rolls" value="@{courtesy_roll}" name="roll_courtesycheck"></button>
 				<button type="action" class="parsed-rolls" name="act_courtesy" id="roll_courtesy"></button>
 				<input type="checkbox" name="attr_courtesy_favoured">
 				<label data-i18n="courtesy">Courtesy</label>
@@ -361,7 +378,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{battle_roll}" name="roll_battlecheck"></button>
+				<button type="roll" class="table-rolls" value="@{battle_roll}" name="roll_battlecheck"></button>
 				<button type="action" class="parsed-rolls" name="act_battle" id="roll_battle"></button>
 				<input type="checkbox" name="attr_battle_favoured">
 				<label data-i18n="battle">Battle</label>
@@ -380,7 +397,7 @@
 		<div id="skill-wits">
 			<h1>&nbsp;</h1>
 			<div class=sheet-row>
-				<button type="roll" value="@{persuade_roll}" name="roll_persuadecheck"></button>
+				<button type="roll" class="table-rolls" value="@{persuade_roll}" name="roll_persuadecheck"></button>
 				<button type="action" class="parsed-rolls" name="act_persuade" id="roll_persuade"></button>
 				<input type="checkbox" name="attr_persuade_favoured">
 				<label data-i18n="persuade">Persuade</label>
@@ -396,7 +413,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{stealth_roll}" name="roll_stealthcheck"></button>
+				<button type="roll" class="table-rolls" value="@{stealth_roll}" name="roll_stealthcheck"></button>
 				<button type="action" class="parsed-rolls" name="act_stealth" id="roll_stealth"></button>
 				<input type="checkbox" name="attr_stealth_favoured">
 				<label data-i18n="stealth">Stealth</label>
@@ -412,7 +429,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{scan_roll}" name="roll_scancheck"></button>
+				<button type="roll" class="table-rolls" value="@{scan_roll}" name="roll_scancheck"></button>
 				<button type="action" class="parsed-rolls" name="act_scan" id="roll_scan"></button>
 				<input type="checkbox" name="attr_scan_favoured">
 				<label data-i18n="scan">Scan</label>
@@ -428,7 +445,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{explore_roll}" name="roll_explorecheck"></button>
+				<button type="roll" class="table-rolls" value="@{explore_roll}" name="roll_explorecheck"></button>
 				<button type="action" class="parsed-rolls" name="act_explore" id="roll_explore"></button>
 				<input type="checkbox" name="attr_explore_favoured">
 				<label data-i18n="explore">Explore</label>
@@ -444,7 +461,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{riddle_roll}" name="roll_riddlecheck"></button>
+				<button type="roll" class="table-rolls" value="@{riddle_roll}" name="roll_riddlecheck"></button>
 				<button type="action" class="parsed-rolls" name="act_riddle" id="roll_riddle"></button>
 				<input type="checkbox" name="attr_riddle_favoured">
 				<label data-i18n="riddle">Riddle</label>
@@ -460,7 +477,7 @@
 				</div>
 			</div>
 			<div class=sheet-row>
-				<button type="roll" value="@{lore_roll}" name="roll_lorecheck"></button>
+				<button type="roll" class="table-rolls" value="@{lore_roll}" name="roll_lorecheck"></button>
 				<button type="action" class="parsed-rolls" name="act_lore" id="roll_lore"></button>
 				<input type="checkbox" name="attr_lore_favoured">
 				<label data-i18n="lore">Lore</label>
@@ -596,9 +613,9 @@
 				<input class="center number" type="number" name="attr_shieldparry" value="0">
 				<label>Load</label>
 				<input class="center number" type="number" name="attr_shieldload" value="0">
-				<label title="reinforced">RI</label>
+				<label title="Reinforced: add 1 to your shield’s Parry bonus.">RI</label>
 				<input type="checkbox" class="center gridcol4" value="1" name="attr_shieldreinf"></checkbox> 	
-				<label title="cunning make">CM</label>
+				<label title="Cunning Make: reduce the Load rating of the item by 2 (to a minimum of 0 Load">CM</label>
 				<input type="checkbox" class="center gridcol5" value="1" name="attr_shieldcm"></checkbox> 								
 				<span />
 				<label>Mount</label>
@@ -621,10 +638,11 @@
 				<label class="center">Damage</label>
 				<label class="center">Injury</label>
 				<label class="center">Load</label>
-				<label class="center">F</label>
-				<label class="center">G</label>
-				<label class="center">K</label>
+				<label class="center" title="Fell: Add 2 to the Injury rating of the selected weapon">F</label>
+				<label class="center" title="Grievious: Add 1 to the damage rating of the weapon">G</label>
+				<label class="center" title="Keen: Attack rolls made with a Keen weapon score a Piercing Blow also on a result of 9 on the Feat die">K</label>
 				<label>Notes</label>
+				<span class="table-rolls"/>
 				<button type="action" name="act_weapon_1" id="roll_weapon1" class="parsed-rolls"></button>
 				<input name="attr_weapon_skill_name_1" type="text"></input>
 				<select name="attr_weapon_combat_prof_1">
@@ -641,6 +659,7 @@
 				<input type="checkbox" class="center" value="1" name="attr_weapon_grievous_1"> 
 				<input type="checkbox" class="center" value="1" name="attr_weapon_keen_1"> 
 				<input name="attr_weapon_note_1" type="text">
+				<span class="table-rolls"/>
 				<button type="action" name="act_weapon_2" id="roll_weapon2" class="parsed-rolls"></button>
 				<input name="attr_weapon_skill_name_2" type="text">
 				<select name="attr_weapon_combat_prof_2">
@@ -657,6 +676,7 @@
 				<input type="checkbox" class="center" name="attr_weapon_grievous_2"> 
 				<input type="checkbox" class="center" name="attr_weapon_keen_2"> 
 				<input name="attr_weapon_note_2" type="text">
+				<span class="table-rolls"/>
 				<button type="action" name="act_weapon_2" id="roll_weapon2" class="parsed-rolls"></button>
 				<input name="attr_weapon_skill_name_3" type="text">
 				<select name="attr_weapon_combat_prof_3">
@@ -673,6 +693,7 @@
 				<input type="checkbox" class="center" name="attr_weapon_grievous_3"> 
 				<input type="checkbox" class="center" name="attr_weapon_keen_3"> 
 				<input name="attr_weapon_note_3" type="text">
+				<span class="table-rolls"/>
 				<button type="action" name="act_weapon_2" id="roll_weapon2" class="parsed-rolls"></button>
 				<input name="attr_weapon_skill_name_4" type="text">
 				<select name="attr_weapon_combat_prof_4">
@@ -826,6 +847,7 @@
 	<input name="attr_lore_favill">
 	<input name="attr_valour_favill">
 	<input name="attr_wisdom_favill">
+	<input name="attr_illfavoured">
 </div>
 <!-- Sheet Workers -->
 <script type="text/worker">
@@ -1092,31 +1114,164 @@
 		});
 	});
 	
+
+	/*==========================
+	  Conditions / Stance / Load 
+	============================*/
+	
+	// weary roll table change 
+	on("change:weary sheet:opened", function() {
+		getAttrs(["weary"], function(values) {
+			let weary = values.weary||0;
+			if (weary === "on") {
+				wearytype = "weary";
+			}
+			else {
+				wearytype = "normal";
+			}
+
+			setAttrs({
+				wearytype: wearytype,
+			});
+		});
+	});
+	// Calculate Weary condition and check that current endurance is not higher than max endurance
+	on("change:endurance change:currentendurance change:load change:fatigue sheet:opened", () => {
+		getAttrs(["endurance", "currentendurance", "weary", "fatigue", "load"], (values) => {
+			const fatigue = int(values.fatigue),
+				load = int(values.load),
+				endurance = int(values.endurance);
+			let weary = values.weary,
+				currentendurance = int(values.currentendurance); 
+				clog(`Endurance: ${JSON.stringify(values)}`);
+				if ( load >= (currentendurance-fatigue) ) { weary = "on"; } else { weary = "off"}
+				if ( currentendurance > endurance ) { currentendurance = endurance; }
+				setAttrs({
+					weary: weary,
+					currentendurance: currentendurance,
+				});
+		});
+	});
+	// calc miserable and illfavoured
+	on("change:currenthope change:shadow change:shadowscars sheet:opened", () => {
+		getAttrs(["currenthope", "hope", "shadow", "shadowscar", "illfavoured", "favorill"], (values) => {
+			const currenthope = int(values.currenthope),
+				hope = int(values.hope),
+				shadow = int(values.shadow),
+				scars = int(values.shadowscar),
+				maxshadow = hope - scars;
+				if ( (shadow + scars) >= currenthope ) {
+					setAttrs({
+						miserable: 'on',
+					});
+					clog(`Set miserable based on shadow score: shadow ${shadow} + scars ${scars} higher than current hope ${currenthope}.`);
+				}  else {				
+					setAttrs({
+						miserable: 'off',
+					});
+				} /**/
+				if ( (shadow + scars) >= hope ) {
+					setAttrs({
+						illfavoured: 1,
+						favorill : "{2t[feat]}kl1", // to make table rolls consistent
+						shadow: maxshadow,
+					});
+					clog(`Set illfavoured based on shadow score: shadow ${shadow} + scars ${scars} higher than maximum hope ${hope}.`);
+				} else {
+					setAttrs({
+						illfavoured: 0,
+						favorill : "{1t[feat]}", // to make table rolls consistent
+					});
+					clog(`Reset illfavoured based on shadow score: shadow ${shadow} + scars ${scars} higher than maximum hope ${hope}.`);
+				}
+		});
+	});
+
+	// automatic stance toggle of attack damage/bonus, parry (open stance) and protection (defensive)
+	on( "change:stance sheet:opened", function() {
+		getAttrs(["stance"], function(values) {
+			let attr = new Map([
+				["stanceparry_active", 0],
+				["stanceprot_active", 0],
+				["stanceattack_active", 0]
+			]);
+			
+			if (values.stance === "Forward"){
+				console.log("Handle forward stance toggle");
+				attr.set("stanceattack_active", 1);
+			} else if (values.stance === "Open"){
+				console.log("Handle open stance toggle");
+				attr.set("stanceparry_active", 1);
+			} else if (values.stance === "Defensive"){
+				console.log("Handle defensive stance toggle");
+				attr.set("stanceprot_active", 1);
+			} else if (values.stance === "Rear"){
+				console.log("Handle rearward stance toggle");
+			}
+			setAttrs({
+				stanceparry_active: attr.get("stanceparry_active"),
+				stanceprot_active: attr.get("stanceprot_active"),
+				stanceattack_active: attr.get("stanceattack_active")
+			})
+		});
+	});
+
 	// calc total load on change events for weapons, armour and treasure
 	on( "change:weapon_load_1 change:weapon_load_2 change:weapon_load_3 change:weapon_load_4 change:weapon_load_5 change:weapon_load_6 " + 
 		"change:armourload change:helmload change:shieldload change:treasureload " + 
 		"change:fatigue change:load sheet:opened", function() {
 		getAttrs(["weapon_load_1","weapon_load_2","weapon_load_3","weapon_load_4","weapon_load_5","weapon_load_6",
 					"armourload","shieldload","helmload","fatigue","treasureload"], function(values) {
-			let weaponload1 = parseInt(values.weapon_load_1,10)||0;
-			let weaponload2 = parseInt(values.weapon_load_2,10)||0;
-			let weaponload3 = parseInt(values.weapon_load_3,10)||0;
-			let weaponload4 = parseInt(values.weapon_load_4,10)||0;
-			// the 2e sheet supports only 4 weapons by now, we include the rest for compatability - todo: remove
-			let weaponload5 = parseInt(values.weapon_load_5,10)||0;
-			let weaponload6 = parseInt(values.weapon_load_6,10)||0;
-			let armourload = parseInt(values.armourload,10)||0;
-			let shieldload = parseInt(values.shieldload,10)||0;
-			let helmload = parseInt(values.helmload,10)||0;
-			let fatigue = parseInt(values.fatigue,10)||0;
-			let treasureload = parseInt(values.treasureload,10)||0;
-			let loadtotal = weaponload1 + weaponload2 + weaponload3 + weaponload4 + weaponload5 + weaponload6 + 
-							armourload + shieldload + helmload + treasureload + fatigue;
+			const 	weaponload1 = int(values.weapon_load_1),
+					weaponload2 = int(values.weapon_load_2),
+					weaponload3 = int(values.weapon_load_3),
+					weaponload4 = int(values.weapon_load_4),
+					weaponload5 = int(values.weapon_load_5),
+					weaponload6 = int(values.weapon_load_6),
+					armourload = int(values.armourload),
+					shieldload = int(values.shieldload),
+					helmload = int(values.helmload),
+					treasureload = int(values.treasureload),
+					load = armourload + shieldload + helmload + weaponload1 + weaponload2 + weaponload3 + weaponload4 + weaponload5 + weaponload6 + treasureload; // Removed Fatigue, used to calculate vs Current Endurance and Weary condition below. 
 			setAttrs({
-				load: loadtotal,
+				load: load,
 			});
 		});
 	});
+
+
+	/*==================
+	  Valour & Wisdom
+	====================*/
+
+    // parsed valour roll
+    on('clicked:valour', async (ev) => {
+        clog(`Starting first roll`);
+		let action = 'valour',
+			data = await asw.getAttrs(['character_name', 'hearttn', 'valour', 'valour_favoured']),
+			actdice = data.valour,
+			actfav = data.valour_favoured;
+		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, protection value: ${actdice}`);
+        await rollFirst(data.character_name, action, actdice, data.hearttn, actfav, "valour");
+        clog(`Completed first roll`);
+    });
+
+    // parsed wisdom roll
+    on('clicked:wisdom', async (ev) => {
+        clog(`Starting first roll`);
+		let action = 'wisdom',
+			data = await asw.getAttrs(['character_name', 'witstn', 'wisdom', 'wisdom_favoured']),
+			actdice = data.wisdom,
+			actfav = data.wisdom_favoured;
+		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, protection value: ${actdice}`);
+        await rollFirst(data.character_name, action, actdice, data.witstn, actfav, "wisdom");
+        clog(`Completed first roll`);
+    });
+
+	/*==================
+	  Protection and Parry
+	====================*/
+
 	// calc total protection on change events for the checkboxes and values
 	on( "change:armourprot_active change:helmprot_active change:otherprot_active change:stanceprot_active " +
 		"change:armourprot change:helmprot change:otherprot change:stanceprot " +
@@ -1155,75 +1310,7 @@
 		});
 	});
 
-	// automatic stance toggle of parry (open stance) and protection (defensive)
-	on( "change:stance sheet:opened", function() {
-		getAttrs(["stance"], function(values) {
-			let attr = new Map([
-				["stanceparry_active", 0],
-				["stanceprot_active", 0],
-				["stanceattack_active", 0]
-			]);
-			
-			if (values.stance === "Forward"){
-				console.log("Handle forward stance toggle");
-				attr.set("stanceattack_active", 1);
-			} else if (values.stance === "Open"){
-				console.log("Handle open stance toggle");
-				attr.set("stanceparry_active", 1);
-			} else if (values.stance === "Defensive"){
-				console.log("Handle defensive stance toggle");
-				attr.set("stanceprot_active", 1);
-			} else if (values.stance === "Rear"){
-				console.log("Handle rearward stance toggle");
-			}
-			setAttrs({
-				stanceparry_active: attr.get("stanceparry_active"),
-				stanceprot_active: attr.get("stanceprot_active"),
-				stanceattack_active: attr.get("stanceattack_active")
-			})
-		});
-	});
-
-	on("change:weary sheet:opened", function() {
-		getAttrs(["weary"], function(values) {
-			let weary = values.weary||0;
-			if (weary == 0) {
-				wearytype = "normal";
-			}
-			else {
-				wearytype = "weary";
-			}
-
-			setAttrs({
-				wearytype: wearytype,
-			});
-		});
-	});
-    // Valour roll
-    on('clicked:valour', async (ev) => {
-        clog(`Starting first roll`);
-		let action = 'valour',
-			data = await asw.getAttrs(['character_name', 'hearttn', 'valour', 'valour_favoured']),
-			actdice = data.valour,
-			actfav = data.valour_favoured;
-		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, protection value: ${actdice}`);
-        await rollFirst(data.character_name, action, actdice, data.hearttn, actfav, "valour");
-        clog(`Completed first roll`);
-    });
-
-    // Wisdom roll
-    on('clicked:wisdom', async (ev) => {
-        clog(`Starting first roll`);
-		let action = 'wisdom',
-			data = await asw.getAttrs(['character_name', 'witstn', 'wisdom', 'wisdom_favoured']),
-			actdice = data.wisdom,
-			actfav = data.wisdom_favoured;
-		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, protection value: ${actdice}`);
-        await rollFirst(data.character_name, action, actdice, data.witstn, actfav, "wisdom");
-        clog(`Completed first roll`);
-    });
-
-	// Protection rolls
+	// parsed protection rolls
 	on('clicked:protection', async (ev) => {
 		clog(`Starting first roll`);
 		let action = (ev.htmlAttributes.name).slice(4),
@@ -1240,59 +1327,12 @@
 		clog(`Completed first roll`);
 	});
 	
-	// combat rolls per weapon
-	on("clicked:weapon_1 clicked:weapon_2 clicked:weapon_3 clicked:weapon_4 clicked:weapon_5", async (ev) => {
-		let index = (ev.htmlAttributes.name).slice(11);
-		clog(`Starting first roll: weapon_${index}`);
-		let data = await asw.getAttrs(['character_name', 'strengthtn', `weapon_skill_name_${index}`, `weapon_combat_prof_${index}`, `weapon_damage_${index}`, `weapon_injury_${index}`, `weapon_notes_${index}`, `weapon_fell_${index}`, `weapon_grievous_${index}`, `weapon_keen_${index}`, 'axes', 'bows', 'spears', 'swords']),
-			action = data[`weapon_skill_name_${index}`],
-			combatprof = data[`weapon_combat_prof_${index}`],
-			damage = data[`weapon_damage_${index}`],
-			injury = data[`weapon_injury_${index}`],
-			notes = data[`weapon_notes_${index}`],
-			keen = int(data[`weapon_keen_${index}`],0) === 0 ? "" : "Keen, ",
-			fell = int(data[`weapon_fell_${index}`],0) === 0 ? "" : "Fell, ",
-			grievous = int(data[`weapon_grievous_${index}`],0) === 0 ? "" : "Grievous, ",
-			actdice = int(data[`${combatprof}`]);
-		clog(`First roll: ${JSON.stringify(data)}, Action: ${action}, Dice: ${actdice}, Keen: ${keen}, tn: ${data.strengthtn}`);
-		await rollFirst(data.character_name, action, actdice, data.strengthtn, 0, "combat", `weapon='${keen}${fell}${grievous}Damage: ${damage}, Injury: ${injury}'; additional='Notes: ${notes}';`);
-		clog(`Completed first roll: weapon_${index}`);
-	});
 
-	// Strength based skill rolls
-	on('clicked:awe clicked:athletics clicked:awareness clicked:hunting clicked:song clicked:craft', async (ev) => {
-		clog(`Starting first roll`);
-		let action = (ev.htmlAttributes.name).slice(4),
-			data = await asw.getAttrs(['character_name', 'strengthtn', action, `${action}_favoured`]),
-			actdice = data[action],
-			act_fav = data[`${action}_favoured`];
-		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, Action value: ${actdice}, Action favoured value: ${act_fav}`);
-		await rollFirst(data.character_name, action, actdice, data.strengthtn, act_fav, "skill");
-		clog(`Completed first roll`);
-	});
-	// Heart based skill rolls
-	on('clicked:enhearten clicked:travel clicked:insight clicked:healing clicked:courtesy clicked:battle', async (ev) => {
-        clog(`Starting first roll`);
-		let action = (ev.htmlAttributes.name).slice(4),
-			data = await asw.getAttrs(['character_name', 'hearttn', action, `${action}_favoured`]),
-			actdice = data[action],
-			act_fav = data[`${action}_favoured`];
-		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, Action value: ${actdice}, Action favoured value: ${act_fav}`);
-        await rollFirst(data.character_name, action, actdice, data.hearttn, act_fav, "skill");
-        clog(`Completed first roll`);
-    });
-    // Wits based skill rolls
-    on('clicked:persuade clicked:stealth clicked:scan clicked:explore clicked:riddle clicked:lore', async (ev) => {
-        clog(`Starting first roll`);
-		let action = (ev.htmlAttributes.name).slice(4),
-			data = await asw.getAttrs(['character_name', 'witstn', action, `${action}_favoured`]),
-			actdice = data[action],
-			act_fav = data[`${action}_favoured`];
-		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, Action value: ${actdice}, Action favoured value: ${act_fav}`);
-        await rollFirst(data.character_name, action, actdice, data.witstn, act_fav, "skill");
-        clog(`Completed first roll`);
-    });
+	/*==================
+	  Skills
+	====================*/
 
+	// table rolls skills
 	// This sheet worker will derive the correct normal / favoured / illfavoured rolls based on the 
 	// global favoured status and the attribute specific favoured status	
 	let attrmap = new Map([
@@ -1340,7 +1380,45 @@
 		});
 	});
 
-	// update battle rolls to reflect the active stance attack bonus 
+	// parsed strength based skill rolls
+	on('clicked:awe clicked:athletics clicked:awareness clicked:hunting clicked:song clicked:craft', async (ev) => {
+		clog(`Starting first roll`);
+		let action = (ev.htmlAttributes.name).slice(4),
+			data = await asw.getAttrs(['character_name', 'strengthtn', action, `${action}_favoured`]),
+			actdice = data[action],
+			act_fav = data[`${action}_favoured`];
+		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, Action value: ${actdice}, Action favoured value: ${act_fav}`);
+		await rollFirst(data.character_name, action, actdice, data.strengthtn, act_fav, "skill");
+		clog(`Completed first roll`);
+	});
+	// parsed heart based skill rolls
+	on('clicked:enhearten clicked:travel clicked:insight clicked:healing clicked:courtesy clicked:battle', async (ev) => {
+        clog(`Starting first roll`);
+		let action = (ev.htmlAttributes.name).slice(4),
+			data = await asw.getAttrs(['character_name', 'hearttn', action, `${action}_favoured`]),
+			actdice = data[action],
+			act_fav = data[`${action}_favoured`];
+		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, Action value: ${actdice}, Action favoured value: ${act_fav}`);
+        await rollFirst(data.character_name, action, actdice, data.hearttn, act_fav, "skill");
+        clog(`Completed first roll`);
+    });
+    // parsed wits based skill rolls
+    on('clicked:persuade clicked:stealth clicked:scan clicked:explore clicked:riddle clicked:lore', async (ev) => {
+        clog(`Starting first roll`);
+		let action = (ev.htmlAttributes.name).slice(4),
+			data = await asw.getAttrs(['character_name', 'witstn', action, `${action}_favoured`]),
+			actdice = data[action],
+			act_fav = data[`${action}_favoured`];
+		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, Action value: ${actdice}, Action favoured value: ${act_fav}`);
+        await rollFirst(data.character_name, action, actdice, data.witstn, act_fav, "skill");
+        clog(`Completed first roll`);
+    });
+
+	/*==================
+	  COMBAT PROFICIENCES
+	====================*/
+
+	// table combat proficiency rolls (to reflect the active stance attack bonus) 
 	const battleattrs = ["axes", "bows", "spears", "swords"]; 
 	on(`change:stanceattack_active sheet:opened`, function() {
 		getAttrs(["stanceattack_active"], function(values) {
@@ -1363,7 +1441,41 @@
 		});
 	});
 
-	// Migration scripts. 
+	// parsed combat proficiency rolls
+	   on('clicked:axes clicked:bows clicked:spears clicked:swords', async (ev) => {
+        clog(`Starting first roll`);
+		let action = (ev.htmlAttributes.name).slice(4),
+			data = await asw.getAttrs(['character_name', 'strengthtn', action, `${action}_favoured`]),
+			actdice = data[action],
+			act_fav = data[`${action}_favoured`];
+		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, Action value: ${actdice}, Action favoured value: ${act_fav}`);
+        await rollFirst(data.character_name, action, actdice, data.strengthtn, act_fav, "combat");
+        clog(`Completed first roll`);
+    });
+
+	// parsed combat rolls per weapon
+	on("clicked:weapon_1 clicked:weapon_2 clicked:weapon_3 clicked:weapon_4 ", async (ev) => {
+		let index = (ev.htmlAttributes.name).slice(11);
+		clog(`Starting first roll: weapon_${index}`);
+		let data = await asw.getAttrs(['character_name', 'strengthtn', `weapon_skill_name_${index}`, `weapon_combat_prof_${index}`, `weapon_damage_${index}`, `weapon_injury_${index}`, `weapon_note_${index}`, `weapon_fell_${index}`, `weapon_grievous_${index}`, `weapon_keen_${index}`, 'axes', 'bows', 'spears', 'swords']),
+			action = data[`weapon_skill_name_${index}`],
+			combatprof = data[`weapon_combat_prof_${index}`],
+			damage = data[`weapon_damage_${index}`],
+			injury = data[`weapon_injury_${index}`],
+			note = data[`weapon_note_${index}`],
+			keen = int(data[`weapon_keen_${index}`],0) === 0 ? "" : "Keen, ",
+			fell = int(data[`weapon_fell_${index}`],0) === 0 ? "" : "Fell, ",
+			grievous = int(data[`weapon_grievous_${index}`],0) === 0 ? "" : "Grievous, ",
+			actdice = int(data[`${combatprof}`]);
+		clog(`First roll: ${JSON.stringify(data)}, Action: ${action}, Dice: ${actdice}, Keen: ${keen}, tn: ${data.strengthtn}`);
+		await rollFirst(data.character_name, action, actdice, data.strengthtn, 0, "combat", `weapon='${keen}${fell}${grievous}Damage: ${damage}, Injury: ${injury}'; additional='Notes: ${note}';`);
+		clog(`Completed first roll: weapon_${index}`);
+	});
+
+
+	/*==================
+	  Migration scripts.
+	====================*/
 	on("sheet:opened", function() {
 		getAttrs(["build", "version", "sheettab"], function(v) {
 			const build = parseInt(v.build) || 0;
