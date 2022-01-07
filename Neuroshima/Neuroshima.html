@@ -9,6 +9,7 @@
 		</div>
 		<div class="page-wspolczynniki">
 			<table class="padded" align="left">
+			<table class="padded">
 				<tbody>
 					<tr>
 						<td colspan="2">
@@ -560,6 +561,9 @@
 				<tr>
 					<td class="umj-group-cell">Walka wręcz</td>
 					<td class="umj-skill-cell">
+                        <button type="action" name="act_test">Test</button>
+
+                        
 						<input type="number" name="attr_bijatyka" value="0">
 						<button type='roll' value='d20' name='roll_pistolety'></button>
 						Bijatyka
@@ -581,6 +585,8 @@
 					</td>
 					<td class="umj-skill-cell">
 						<input type="number" name="attr_pistolety" value="0">
+                        <button type="action" name="act_test2">Test2</button>
+
 						<button type='roll' value='d20' name='roll_pistolety'></button>
 						Pistolety
 					</td>
@@ -2016,5 +2022,64 @@ const levelRadioValues = ["1","2","3","4","5","6"];
   });
 /************************** ROLL PARAMETERS ***********************/
 /******************************************************************/
+
+ on('clicked:test', (info) => {
+        startRoll("&{template:test} {{name=Test}} {{roll1={[[1d20]],[[1d20]],[[1d20]]}}}", (results) => {
+            const total = results.results.roll1.result;
+            const computed = total % 4;
+
+            finishRoll(
+                results.rollId,
+                {
+                    roll1: computed,
+                }
+            );
+        });
+});
+
+on('clicked:test2', (info) => {
+    startRoll("&{template:test2} {{name=Test2}} {{roll1=[[1d20]]}}", (results) => {
+        const total = results.results.roll1.result;
+        const computed = total % 4;
+
+        finishRoll(
+            results.rollId,
+            {
+                roll1: computed,
+            }
+        );
+    });
+});
+
 </script>
 
+<rolltemplate class="sheet-rolltemplate-test">
+    <div class="sheet-template-container">
+        <h1>{{name}}</h1>
+        <div class="sheet-results">
+            <h4>Result = {{roll1}}</h4>
+            <h4>Custom Result = {{computed::roll1}}</h4>
+        </div>
+    </div>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-test2">
+    <div class="sheet-template-container">
+        <h1>{{name}}</h1>
+        <div class="sheet-results">
+            <h4>Result = {{roll1}}</h4>
+            <h4>Custom Result = {{computed::roll1}}</h4>
+            {{#rollTotal() computed::roll1 0}}
+                <h5>Total 0!</h5>
+            {{/rollTotal() computed::roll1 0}}
+            {{#rollGreater() computed::roll1 1}}
+                <h5>Greater Than 1!</h5>
+            {{/rollGreater() computed::roll1 1}}
+            {{#rollLess() computed::roll1 2}}
+                <h5>Less Than 2</h5>
+            {{/rollLess() computed::roll1 2}}
+            {{#rollBetween() computed::roll1 1 3}}
+                <h5>Between 1 and 3</h5>
+            {{/rollBetween() computed::roll1 1 3}}
+        </div>
+    </div>
+</rolltemplate>
