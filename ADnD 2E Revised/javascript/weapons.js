@@ -1650,18 +1650,6 @@ weapons['punch-cutter'] = {
     'book': 'The Complete Book of Humanoids',
     'category': ['Melee']
 };
-weapons['giant-kin long bow'] = {
-    'name': 'Giant-kin Long bow',
-    'rof': '2/1',
-    'range': '50/100/170',
-    'size': 'G',
-    'type': 'P',
-    'speed': 10,
-    'small-medium': '1d8',
-    'large': '1d8',
-    'book': 'The Complete Book of Humanoids',
-    'category': ['Range']
-};
 weapons['giant-kin long bow (voadkyn)'] = {
     'name': 'Giant-kin Long bow (Voadkyn)',
     'rof': '2/1',
