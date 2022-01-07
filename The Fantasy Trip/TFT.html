@@ -433,7 +433,12 @@
 				{{character_name}} {{attackflavor}}
 			{{/attackflavor}}
 			{{^attackflavor}}
-				{{character_name}} attacks with {{pronoun}} <span class=capitalize>{{weaponname}}</span>!
+				{{#weaponname}}
+					{{character_name}} attacks with {{pronoun}} <span class=capitalize>{{weaponname}}</span>!
+				{{/weaponname}}
+				{{^weaponname}}
+					{{character_name}} Attacks!</span>
+				{{/weaponname}}
 			{{/attackflavor}}
 		</h1></div>
 		{{#defending}}
@@ -777,18 +782,17 @@
 		return diceString;
 	}
 
-	const finishRollWithDiceString = function(rollId, rolls) {
-		let diceString = diceArrayToString(rolls);
-		finishRoll(
-			rollId,
-			{
-				roll1: diceString
-			}
-		);
-	}
-
 	// do the roll check and compute the dice string.
 	const doRollWithDiceString = function(macro) {
+		const finishRollWithDiceString = function(rollId, rolls) {
+			let diceString = diceArrayToString(rolls);
+			finishRoll(
+				rollId,
+				{
+					roll1: diceString
+				}
+			);
+		}
 		macro += ' {{character_name=@{cname}}}';
 		startRoll(macro, (results) => {
 			if ('roll1' in results.results) {
@@ -802,6 +806,7 @@
 
 	// calls back on this selected weapon or fails.
 	// callback takes the id of the selected one, and all the ids.
+	// calls with all empty and null if nothing found.
 	const onSelectedWeaponOrSpell = function(callback) {
 		// find selected weapon, if any.
 		getSectionIDs("weapons", function(sectionIds) {
@@ -833,6 +838,8 @@
 								return;
 							}
 						}
+						// Nothing was found, pass in empty for the type.
+						callback('', null, '');
 					});
 				});
 			});
@@ -904,7 +911,7 @@
 
 	// a const value, not an attribute, no @ in front.  Optionally as roll.
 	const rollTemplateValue = function(templateName, attrName, asRoll) {
-		return asRoll ? ` {{${templateName}=[[${attrName}]]}}` :  ` {{${templateName}=${attrName}}}`;
+		return asRoll ? ` {{${templateName}=[[${attrName}]]}}` : ` {{${templateName}=${attrName}}}`;
 	}
 
 	// Return a template string if attrs contains attrName
@@ -1095,11 +1102,7 @@
 		onSelectedWeaponOrSpell(function(id, selectedIds, type) {
 
 			// return the string depending on whether we are defending or not.
-			const diceProperties = function (attrs, toHitName) {
-				// if no to hit, then no nothing.
-				if (!(toHitName in attrs)) {
-					return ''; // nothing, automatic hit.
-				}
+			const diceProperties = function (attrs) {
 				// we are defending, so need 4d6, arg.
 				if (attrs.defending == 'on') {
 					return rollTemplateValue('defending', '1') + rollTemplateValue('roll1', '4d6', true);
@@ -1111,7 +1114,6 @@
 			// returns success level.  positive is success.
 			// negative is failure.
 			const successLevel = function(results) {
-
 				// if no roll, normal success.
 				if (!('roll1' in results)) {
 					return 1;
@@ -1165,7 +1167,34 @@
 				});
 			}
 
-			if (type == 'weapon') {
+			// Nothing selected, do a generic roll.
+			if (type == '') {
+				getAttrs(['defending'], function(v) {
+					let mstring  = `&{template:attack}`;
+					// append total and separate to hits, if present.
+					if (toHitCharacter != 'a') {
+						mstring += diceProperties(v);
+						let dxAdj = `@{DX}[DEX]`;
+						let toHitString = ` {{tohit=[[${dxAdj}`;
+						let oldHitLength = toHitString.length;
+						mstring += rollTemplateValue('dx', dxAdj, true);
+
+						// and to hit adjustment
+						if (toHit != 0) {
+							let toHitAdj = `${toHit}[TO_HIT]`
+							toHitString += ` + ${toHitAdj}`;
+							mstring += rollTemplateValue('tohitadj', toHitAdj, true);
+						}
+						if (oldHitLength == toHitString.length) {
+							mstring += rollTemplateValue('simpletohit', '1');
+						}
+						// and finish.
+						toHitString += ']]}}';
+						mstring += toHitString;
+					}
+					doAttackRoll(mstring);
+				});
+			} else if (type == 'weapon') {
 				let attackFlavorName = repeatingPropertyName('weapons', id, 'attackflavor');
 				let successFlavorName = repeatingPropertyName('weapons', id, 'successflavor');
 				let weaponDamageName = repeatingPropertyName('weapons', id, 'weapondamage');
@@ -1176,11 +1205,11 @@
 				}
 				getAttrs(attrNames, function(v) {
 					let mstring  = `&{template:attack}`
-						+ rollTemplateProperty('weaponname', repeatingPropertyName('weapons', id, 'weaponname'))
-						+ diceProperties(v, weaponToHitName);
+						+ rollTemplateProperty('weaponname', repeatingPropertyName('weapons', id, 'weaponname'));
 
 					// append total and separate to hits, if present.
 					if (weaponToHitName in v) {
+						mstring += diceProperties(v);
 						let dxAdj = `@{DX}[DEX]`;
 						let toHitString = ` {{tohit=[[${dxAdj}`;
 						let oldHitLength = toHitString.length;
@@ -1231,11 +1260,11 @@
 				}
 				getAttrs(attrNames, function(v) {
 					let mstring  = `&{template:cast-spell}`
-						+ rollTemplateProperty('spellname', repeatingPropertyName('spells', id, 'spellname'))
-						+ diceProperties(v, spellToHitName);
+						+ rollTemplateProperty('spellname', repeatingPropertyName('spells', id, 'spellname'));
 
 					// append to hit values if present.
 					if (spellToHitName in v) {
+						mstring += diceProperties(v);
 						let dxAdj = `@{DX}[DEX]`;
 						let toHitString = ` {{tohit=[[${dxAdj}`;
 						let oldHitLength = toHitString.length;
