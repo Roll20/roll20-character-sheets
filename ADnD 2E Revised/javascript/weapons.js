@@ -1604,8 +1604,8 @@ weapons['goblin stick'] = {
     'book': 'The Complete Book of Humanoids',
     'category': ['Melee']
 };
-weapons['lance, flight'] = {
-    'name': 'Lance, flight',
+weapons['flight lance'] = {
+    'name': 'Flight lance',
     'size': 'L',
     'type': 'P',
     'speed': 6,
@@ -1650,9 +1650,20 @@ weapons['punch-cutter'] = {
     'book': 'The Complete Book of Humanoids',
     'category': ['Melee']
 };
-weapons['voadkyn long bow'] = {
-    'name': 'Voadkyn Long bow',
-    'group': 'Giant-kin',
+weapons['giant-kin long bow'] = {
+    'name': 'Giant-kin Long bow',
+    'rof': '2/1',
+    'range': '50/100/170',
+    'size': 'G',
+    'type': 'P',
+    'speed': 10,
+    'small-medium': '1d8',
+    'large': '1d8',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Range']
+};
+weapons['giant-kin long bow (voadkyn)'] = {
+    'name': 'Giant-kin Long bow (Voadkyn)',
     'rof': '2/1',
     'range': '75/150/255',
     'size': 'G',
@@ -1663,8 +1674,8 @@ weapons['voadkyn long bow'] = {
     'book': 'The Complete Book of Humanoids',
     'category': ['Range']
 };
-weapons['dagger (giant-kin)'] = {
-    'name': 'Dagger (Giant-kin)',
+weapons['giant-kin dagger'] = {
+    'name': 'Giant-kin Dagger',
     'strength': true,
     'rof': '2/1',
     'range': '10/20/30',
@@ -1676,8 +1687,8 @@ weapons['dagger (giant-kin)'] = {
     'book': 'The Complete Book of Humanoids',
     'category': ['Melee', 'Range']
 };
-weapons['halberd (giant-kin)'] = {
-    'name': 'Halberd (Giant-kin)',
+weapons['giant-kin halberd'] = {
+    'name': 'Giant-kin Halberd',
     'size': 'G',
     'type': 'P/S',
     'speed': 12,
@@ -1686,9 +1697,8 @@ weapons['halberd (giant-kin)'] = {
     'book': 'The Complete Book of Humanoids',
     'category': ['Melee']
 };
-weapons['mace (giant-kin)'] = {
-    'name': 'Mace (Giant-kin)',
-    'group': 'Giant-kin',
+weapons['giant-kin mace'] = {
+    'name': 'Giant-kin Mace',
     'size': 'G',
     'type': 'B',
     'speed': 8,
@@ -1697,8 +1707,8 @@ weapons['mace (giant-kin)'] = {
     'book': 'The Complete Book of Humanoids',
     'category': ['Melee']
 };
-weapons['two-handed sword (giant-kin)'] = {
-    'name': 'Two-handed sword (Giant-kin)',
+weapons['giant-kin two-handed sword'] = {
+    'name': 'Giant-kin Two-handed sword',
     'size': 'G',
     'type': 'S',
     'speed': 13,
@@ -1755,7 +1765,7 @@ weapons['pixie sword'] = {
 };
 weapons['bladeback flail'] = {
     'name': 'Bladeback flail',
-    'group': 'Saurial Weapons',
+    'group': 'Saurial Weapon',
     'size': 'L',
     'type': 'B',
     'speed': 9,
@@ -1766,7 +1776,7 @@ weapons['bladeback flail'] = {
 };
 weapons['bladeback mace'] = {
     'name': 'Bladeback mace',
-    'group': 'Saurial Weapons',
+    'group': 'Saurial Weapon',
     'size': 'L',
     'type': 'B',
     'speed': 9,
@@ -1777,7 +1787,7 @@ weapons['bladeback mace'] = {
 };
 weapons['hornhead staff'] = {
     'name': 'Hornhead staff',
-    'group': 'Saurial Weapons',
+    'group': 'Saurial Weapon',
     'size': 'L',
     'type': 'B',
     'speed': 6,
