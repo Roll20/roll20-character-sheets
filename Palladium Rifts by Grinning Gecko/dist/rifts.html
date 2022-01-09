@@ -12067,6 +12067,11 @@ on(
         "applyDamageToNextActiveArmor",
         "BELOW ZERO on " + activeRowId
       );
+      const { character_name: characterName } = await getAttrsAsync([
+        "character_name",
+      ]);
+      const warning = await startRoll(`${characterName} is going to die`);
+      finishRoll(warning.rollId);
       // @todo Warn player somehow
       attrs[`repeating_${section}_${activeRowId}_mdc`] = 0;
       damageCarry = Math.abs(currentMdc);
@@ -12111,8 +12116,17 @@ on("change:repeating_armor:movementpenalty", async (e) => {
 
 on("clicked:armorapplydamage", async (e) => {
   console.log("clicked:armorapplydamage", e);
-  const a = await getAttrsAsync([`armordamage`]);
+  const a = await getAttrsAsync([`armordamage`, `character_name`]);
   await applyDamageToNextActiveArmor("armor", +a[`armordamage`]);
+  const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
+  const chat = await startRoll(
+    `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
+      a["armordamage"]
+    }}} {{name=${b[`active_armor_name`]}}} {{remaining=${
+      b[`active_armor_mdc`]
+    }}}`
+  );
+  finishRoll(chat.rollId);
 });
 
 on("clicked:repeating_armor:resetmdc", async (e) => {
@@ -12156,6 +12170,11 @@ async function updateActiveProfile(rowId) {
   await setAttrsAsync(attrs);
 }
 
+//   const a = await getAttrsAsync(["psionic_ability"]);
+//   const attrs = {};
+//   attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
+//     a["psionic_ability"];
+
 async function updateProfile(rowId) {
   const bonusIds = (
     await getAttrsAsync(["repeating_profiles_bonus_ids"])
@@ -12168,9 +12187,12 @@ async function updateProfile(rowId) {
     (acc, cur) => `${acc}     ✔︎${cur}`.trim(),
     ""
   );
+  const globals = await getAttrsAsync(["psionic_ability"]);
   await setAttrsAsync({
     [`repeating_profiles_${rowId}_bonus_names`]: names,
     [`repeating_profiles_${rowId}_rowid`]: `repeating_profiles_${rowId}_`,
+    [`repeating_profiles_${rowId}_global_psionic_ability`]:
+      globals["psionic_ability"],
   });
   await combineBonuses(bonusIds, `repeating_profiles_${rowId}`);
   const isActive = await isDefault("profiles", rowId);
@@ -12337,15 +12359,15 @@ on(
   }
 );
 
-on("change:repeating_profiles", async (e) => {
-  console.log("change:repeating_profiles", e);
-  const [r, section, rowId] = e.sourceAttribute.split("_");
-  const a = await getAttrsAsync(["psionic_ability"]);
-  const attrs = {};
-  attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
-    a["psionic_ability"];
-  await setAttrsAsync(attrs);
-});
+// on("change:repeating_profiles", async (e) => {
+//   console.log("change:repeating_profiles", e);
+//   const [r, section, rowId] = e.sourceAttribute.split("_");
+//   const a = await getAttrsAsync(["psionic_ability"]);
+//   const attrs = {};
+//   attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
+//     a["psionic_ability"];
+//   await setAttrsAsync(attrs);
+// });
 
 on("change:_reporder:profiles", async (e) => {
   console.log("change:_reporder:profiles", e);
@@ -12903,9 +12925,21 @@ on("change:repeating_skills:name", async (e) => {
   /* inject:js/magic_psionics_abilities.js */
   on("clicked:repeating_magic:usespell", async (e) => {
   console.log(e);
-  const a = await getAttrsAsync(["repeating_magic_ppecost", "currentppe"]);
+  const a = await getAttrsAsync([
+    "repeating_magic_ppecost",
+    "currentppe",
+    "repeating_magic_name",
+    "character_name",
+  ]);
   console.log(a);
-  await setAttrsAsync({ currentppe: a.currentppe - a.repeating_magic_ppecost });
+  const newppe = a.currentppe - a.repeating_magic_ppecost;
+  await setAttrsAsync({ currentppe: newppe });
+  const chat = await startRoll(
+    `&{template:castspell} {{character_name=${a["character_name"]}}} {{spent=${
+      a["repeating_magic_ppecost"]
+    }}} {{name=${a[`repeating_magic_name`]}}} {{remaining=${newppe}}}`
+  );
+  finishRoll(chat.rollId);
 });
 
 on("clicked:resetppe", async (e) => {
@@ -12915,11 +12949,21 @@ on("clicked:resetppe", async (e) => {
 
 on("clicked:repeating_psionics:usepsionic", async (e) => {
   console.log(e);
-  const a = await getAttrsAsync(["repeating_psionics_ispcost", "currentisp"]);
+  const a = await getAttrsAsync([
+    "repeating_psionics_ispcost",
+    "repeating_psionics_name",
+    "currentisp",
+    "character_name",
+  ]);
   console.log(a);
-  await setAttrsAsync({
-    currentisp: a.currentisp - a.repeating_psionics_ispcost,
-  });
+  const newisp = a.currentisp - a.repeating_psionics_ispcost;
+  await setAttrsAsync({ currentisp: newisp });
+  const chat = await startRoll(
+    `&{template:usepsionic} {{character_name=${a["character_name"]}}} {{spent=${
+      a["repeating_psionics_ispcost"]
+    }}} {{name=${a[`repeating_psionics_name`]}}} {{remaining=${newisp}}}`
+  );
+  finishRoll(chat.rollId);
 });
 
 on("clicked:resetisp", async (e) => {
@@ -13548,7 +13592,15 @@ on("clicked:migrate", async (e) => {
       {{/rollGreater() roll target }}
       <!-- -->
       {{#^rollGreater() roll target }}
+      <!-- -->
+      {{#successtext}}
+      <div class="sheet-template-row">{{successtext}}</div>
+      {{/successtext}}
+      <!-- -->
+      {{^successtext}}
       <div class="sheet-template-row">Success!</div>
+      {{/successtext}}
+      <!-- -->
       {{/^rollGreater() roll target }}
     </div>
   </div>
@@ -13643,6 +13695,33 @@ on("clicked:migrate", async (e) => {
       <div class="sheet-desc">{{desc}}</div>
       {{/desc}}
     </div>
+  </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-damage">
+  <div class="sheet-container sheet-color-{{color}}">
+    <span class="character_name">{{character_name}}</span> got hit for
+    <span class="spent">{{spent}}</span> points of damage, reducing their
+    <span class="name">{{name}}</span> to
+    <span class="remaining">{{remaining}}</span>!
+  </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-castspell">
+  <div class="sheet-container sheet-color-{{color}}">
+    <span class="character_name">{{character_name}}</span> casts
+    <span class="name">{{name}}</span> for
+    <span class="spent">{{spent}}</span> PPE, leaving them
+    <span class="remaining">{{remaining}}</span> PPE!
+  </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-usepsionic">
+  <div class="sheet-container sheet-color-{{color}}">
+    <span class="character_name">{{character_name}}</span> uses
+    <span class="name">{{name}}</span> for
+    <span class="spent">{{spent}}</span> ISP, leaving them
+    <span class="remaining">{{remaining}}</span> ISP!
   </div>
 </rolltemplate>
 
