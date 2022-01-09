@@ -13,7 +13,7 @@ EXPORTS["technique_definitions"] = repeat_format(
         <tr>
             <td><input type="text" class="number_3" name="attr_%(Tech)s_Score" value="0"/></td>
             <td data-i18n="%(tech)s" >%(Tech)s</td>
-            <td>{xp("%(Tech)s")}</td>
+            <td>{xp("%(Tech)s", factor=1)}</td>
             <td style="text-align: center"><input type="text" class="number_3 minor" name="attr_%(Tech)s_Puissant" value="0"/></td>
         </tr>"""
     ),
@@ -55,7 +55,7 @@ form_template = textwrap.dedent(
     <tr>
         <td><input type="text" class="number_3" name="attr_%(Form)s_Score" value="0"/></td>
         <td data-i18n="%(form)s" >%(Form)s</td>
-        <td>{xp("%(Form)s")}</td>
+        <td>{xp("%(Form)s", factor=1)}</td>
         <td style="text-align: center"><input type="text" class="number_3 minor" name="attr_%(Form)s_Puissant" value="0"/></td>
     </tr>"""
 )
