@@ -922,7 +922,7 @@ weapons['wrestling'] = {
     'large': '1',
     'book': 'PHB',
     'category': ['Melee']
-}
+};
 //#endregion
 
 //region The Complete Fighter's Handbook
@@ -1063,7 +1063,7 @@ weapons['knife, bone'] = {
 weapons['knife, stone'] = {
     ...weapons['knife, bone'],
     'name': 'Knife, Stone'
-}
+};
 weapons['lasso'] = {
     'name': 'Lasso',
     'strength': true,
@@ -1323,7 +1323,7 @@ weapons['shield-punch'] = {
     'knockdown': 'd6',
     'book': 'The Complete Fighter\'s Handbook',
     'category': ['Melee']
-}
+};
 weapons['shield-rush'] = {
     'name': 'Shield-Rush',
     'group': 'Medium/Body Shield',
@@ -1335,7 +1335,7 @@ weapons['shield-rush'] = {
     'large': '1d3',
     'book': 'The Complete Fighter\'s Handbook',
     'category': ['Melee']
-}
+};
 weapons['martial arts'] = {
     'name': 'Martial Arts',
     'noProf': true,
@@ -1346,7 +1346,7 @@ weapons['martial arts'] = {
     'large': '',
     'book': 'The Complete Fighter\'s Handbook',
     'category': ['Melee']
-}
+};
 //endregion
 
 //region The Complete Priest's Handbook
