@@ -6591,6 +6591,179 @@ pri2['Seeking'] = {
 }
 //#endregion
 
+//#region The Complete Rangers Handbook
+pri1['Allergy Field'] = {
+    'level': '1',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': '[[10*[[@{level-priest}]] ]] yards',
+    'duration': '[[3+[[@{level-priest}]] ]] rounds',
+    'aoe': '[[5*[[@{level-priest}]] ]]-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'Negate',
+    'materials': 'A pinch of ragweed.',
+    'reference': 'p. 87',
+    'book': 'The Complete Ranger\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell causes characters entering the affected area to suffer extreme allergic reactions. It may be cast on any field, meadow, forest, or other outdoor area with an abundance of plant life, causing the plants to produce pollen, antigens, or similar allergens. Characters coming in contact with the affected area who fail their saving throws vs. spell, experience swelling of the eyes, fits of sneezing, and dull headaches for the next 2-5 (1d4+1) turns. During that time, they make all attack rolls and ability checks at a -1 penalty.\n&emsp;The spell affects a cubic volume whose sides are 5 feet long per level of the caster; thus, a 9th-level caster could affect a 45’ ✕ 45’ ✕ 45’ cube. The spell lasts until the end of the indicated duration, or until the first frost, whichever comes first.'
+}
+
+pri1['Recover Trail'] = {
+    'level': '1',
+    'school': 'Divination',
+    'sphere': 'Plant',
+    'range': 'Special',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '4 + Special',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 87',
+    'book': 'The Complete Ranger\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A caster who has lost a quarry’s trail while using the tracking proficiency can use this spell to proceed. The spell only works in terrain containing some type of vegetation (such as trees, grass, or seaweed). The quarry must have left some potential trail on which the spell can act (the spell cannot track a creature that has *teleported* or *plane shifted*, for example).\n&emsp;If successful, within an hour after casting the spell, the vegetation in a particular area will begin to flutter, as if being blown by a gentle breeze. If the wind is already blowing, the vegetation moves up and down, or moves in another unusual way to attract the caster’s attention. When examining this area, the caster will notice a footprint, broken twig, or other sign previously overlooked, indicating to correct trail. The spell has a success chance of 60% + 2% per level of the caster. Currently [[60+2*[[@{level-priest}]] ]]%.\n&emsp;This spell will immediately negate a *pass without trace* spell if cast directly for that purpose, otherwise it will still function normally to allow tracking along the disguised trail.\n&emsp;Any spellcaster with access to both the plant sphere and the tracking proficiency can use this spell.'
+}
+
+pri1['Revitalize Animal'] = {
+    'level': '1',
+    'school': 'Necromancy',
+    'sphere': 'Animal',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': 'One animal',
+    'components': 'V, S',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 88',
+    'book': 'The Complete Ranger\'s Handbook',
+    'damage': '1d4 or 2d4',
+    'damage-type': '',
+    'healing': '1d4 or 2d4',
+    'effect': 'This spell allows the caster to heal an animal by transferring life force (hit points) from himself to the animal. If the animal is touched with one hand, it regains [[1d4]] hit points, just as if it had received a *cure light wounds* spell. Touching the animal with both hands restores [[2d4]] hit points. In either case, the caster temporarily loses the number of hit points that the animal regains. The caster will recover his lost hit points 1-4 hours later (if he transferred 3 hit points, he recovers 3 hit points in 1-4 hours). The caster’s recovery of these hit points has no effect on the restored animal.\n&emsp;During the 1-4 hours before the caster recovers his transferred hit points, he feels weak and dizzy, making all attack rolls at a -1 penalty during that time. Should the ranger die during that 1-4 hour period, the recovery process stops immediately and *no* hit points are recovered.\n&emsp;The animal cannot recover hit points beyond the normal allotment. For instance, an animal that normally has 10 hit points, but has been reduced to 6 due an injury, can’t receive more than 4 hit points from this spell. Also, the caster will have at least 1 hit point remaining after using this spell; if the caster has 6 hit points, he won’t transfer more than 5 to a damaged animal.\n&emsp;*Revitalize animal* works on animals only; it has no effect on humans, demihumans, humanoids, magical creatures, etc. The spell is not reversible; that is, an injured caster can’t receive hit points from an animal.'
+}
+
+pri2['Animal Eyes'] = {
+    'level': '2',
+    'school': 'Necromancy',
+    'sphere': 'Animal',
+    'range': '0',
+    'duration': '[[3+[[@{level-priest}]] ]] rounds',
+    'aoe': 'One creature',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A glass lens no larger than one inch in diameter as a focus, which is not consumed in the casting.',
+    'reference': 'p. 88',
+    'book': 'The Complete Ranger\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By using this spell, the caster can temporarily see through the eyes of any animal. The caster points at any single animal within 100 yards, then closes his eyes and remains stationary. In his mind’s eye, he sees whatever the animal is seeing. If the subject animal is a squirrel studying the party from a tree branch, the caster sees himself and the party from the perspective of the squirrel. If the subject animal is a bird soaring overhead, the caster gets a bird’s eye view of the area below.\n&emsp;The spell has no effect on the subject animal, nor can the caster control the animal’s actions in any way. The animal is unaware of the spell and acts as it normally would. The spell persists until the end of its duration, or the caster moves or takes another action. The caster may voluntarily negate the spell by opening his eyes. The spell also ends if the animal is killed, or moves more than 100 yards away from the caster.\n&emsp;The subject animal must be one normally found in nature. It may not be supernatural, human, demihuman, nor of extraplanar origin.'
+}
+
+pri2['Locate Animal Follower'] = {
+    'level': '2',
+    'school': 'Divination (Reversible)',
+    'sphere': 'Animal',
+    'range': '[[60+10*[[@{level-priest}]] ]] yards',
+    'duration': '8 hours',
+    'aoe': '1 animal follower',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A hair, feather, scale or other physical remnant of the lost follower.',
+    'reference': 'p. 88',
+    'book': 'The Complete Ranger\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Occasionally, a ranger’s animal follower may wander away in search of food or a mate. An animal follower may also be abducted or trapped. The *locate animal follower* spell helps the ranger find such lost creatures.\n&emsp;The spell takes affect once the ranger fixes in his mind the follower being sought. The spell locates only that specific follower.\n&emsp;Once the spell is cast, the ranger slowly turns in a circle. If the follower is within range, the ranger senses when he is facing in the direction of the sought follower. If the follower isn’t within range, the spell doesn’t work. If the follower moves out of the area of effect, the spell is immediately negated. As soon as the ranger sees the lost follower, the spell ends. The spell is blocked by lead.\n&emsp;The spell works only on a natural animal follower (including giant animals); not a supernatural creature, human, demihuman, humanoid, or other. If the follower is dead, the spell still seeks it out, providing other conditions of casting are met.\n&emsp;The reverse of this spell, *obscure follower*, hides an animal follower from detection by spells, crystal balls, and similar means for eight hours.'
+}
+
+pri3['Call Follower'] = {
+    'level': '3',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Animal',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': '[[10*[[@{level-priest}]] ]] mile radius',
+    'components': 'V, S',
+    'cast-time': '6',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 89',
+    'book': 'The Complete Ranger\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A ranger who has not yet received his full allotment of followers can use this spell in an attempt to summon one. After the spell is cast, the DM secretly consults the list of followers he’s chosen for the ranger, or rolls an appropriate table. If the DM decides that a potential follower exists within the area of effect, the follower appears within the next 24 hours. If the DM decides that a follower isn’t available within the area of effect, nothing happens (no follower appears). Note that the ranger can’t request a specific type of follower; as always, the type of follower is up to the DM. The spell can be attempted no more than once per month.\n&emsp;*DM Note:* Notes on staging the arrival of the follower are also given in Chapter 3.'
+}
+
+pri3['Chatterbark'] = {
+    'level': '3',
+    'school': 'Divination',
+    'sphere': 'Plant',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'One tree',
+    'components': 'V, S',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 89',
+    'book': 'The Complete Ranger\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A variation of the 4th-level priest spell, *speak with plants*, this spell enables a ranger to ask a simple question to a tree and receive a spoken response. The tree can be any species, so long as its trunk is at least 1 foot in diameter. Before casting the spell, the ranger must spend at least an hour carving a humanoid face in the trunk; if the ranger has a proficiency in wood carving (a variation of artistic ability), he can carve a suitable face in one turn.\n&emsp;After carving the face, the ranger spends 1 turn casting the spell, at which time the face becomes animated, twitching and grimacing as if just awakening from a long sleep. The tree face then looks at the caster expectantly, waiting for a question. The caster may ask the tree any single question that can be answered in a single word or short phrase. Typical questions might include: “Has a dragon passed this way within the last few days?” “Has it rained here recently?” “Are there any fruit trees nearby?” The tree answers the question honestly. If the question is beyond the scope of its knowledge, the tree says, “I don’t know.” After answering, the face disappears.\n&emsp;The DM should keep in mind that a typical tree doesn’t know very much, as it has little experience, never travels, and rarely interacts with other living things in meaningful ways. As a rule of thumb, a tree’s knowledge is limited to things it has observed (passersby, weather conditions) and general information about the immediate area (animal populations, location of landmarks). A tree can’t give dependable advice or make judgements. If the DM is in doubt about what a particular tree knows, the tree answers, “I don’t know.”'
+}
+
+pri3['Animal Trick'] = {
+    'level': '3',
+    'school': 'Enchantment',
+    'sphere': 'Animal',
+    'range': '30 yards',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': 'One animal',
+    'components': 'V, S',
+    'cast-time': '6',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'p. 90',
+    'book': 'The Complete Ranger\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell temporarily enables any animal to perform a trick it normally doesn’t know or lacks the intelligence to execute. The animal must be within 30 yards of the caster and must be able to hear his spoken commands. If these conditions are met, the animal will do exactly what the ranger tells it. A lion will batter down the door of a cell, a cat will fetch a key and carry it in its mouth, a parrot will draw a circle in the sand with its claw. A creature with less than 5 hit dice and no prior allegiances receives no saving throw. Any willing creature predisposed to aid the caster (such as an animal follower) will not resist this spell at all.\n&emsp;The animal can’t execute a trick or task that exceeds its physical limitations. A snake can’t pick a lock, and a horse can’t play a trumpet. Note also that the caster must give specific instructions, not general commands. If the caster commands a lion to “Get something to help me put out this fire,” the puzzled lion won’t know what do to. However, if the caster says, “Take this bucket in your mouth, dip it in the stream, and carry the water back to me,” the lion will do as it’s told.\n&emsp;The caster can take other actions while the animal is completing the trick. Once the animal completes its trick, the caster may give it additional tricks to complete until the spell expires. If the spell expires while the animal is in the middle of a trick, or if the spell is broken by some means, the animal immediately stops what it’s doing.'
+}
+
+pri3['Polymorph Plant'] = {
+    'level': '3',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': 'One plant',
+    'components': 'V, S, M',
+    'cast-time': '6',
+    'saving-throw': 'None',
+    'materials': 'Any seed.',
+    'reference': 'p. 91',
+    'book': 'The Complete Ranger\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables a ranger to transform any single plant, including a fungus or mold, into any other type of plant of the ranger’s choice. The change is permanent. The changed plant has the physical appearance of its new form, but not all of the associated properties. If edible, the new form tastes as bland as cotton. If normally used as a spell component, the new form has only a 50% chance of actually functioning as a component. If normally used for medical purposes (such as for a healing salve or poison antidote), the new form has only a 50% chance of having any beneficial properties.\n&emsp;Only living plants can be polymorphed; the spell won’t work on a fallen leaf, a nut, or a picked fruit. The size of the plant is not relevant; a blade of grass may be polymorphed into a towering oak tree and vice versa. The new form doesn’t have to be indigenous to the environment; an evergreen tree on a frigid mountain may be polymorphed into a cactus (although it may not thrive for long).\n&emsp;Neither the original vegetation nor its polymorphed form can be an intelligent plant or a plant-like creature. Nor are unnatural plant forms allowed; a mushroom may be transformed into a normal-sized cornstalk, but not a 50-foot-tall cornstalk or a stalk that produces apples instead of corn.'
+};
+//#endregion
+
 const priestSpells = {};
 priestSpells['pri1'] = pri1;
 priestSpells['pri2'] = pri2;

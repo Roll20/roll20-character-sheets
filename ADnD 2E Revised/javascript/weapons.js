@@ -1785,4 +1785,80 @@ weapons['hornhead staff'] = {
     'category': ['Melee']
 };
 //#endregion
+
+//#region The Complete Ranger's Handbook
+weapons['grain flail'] = {
+    'name': 'Grain flail',
+    'size': 'M',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['hatchet'] = {
+    'name': 'Hatchet',
+    'size': 'S',
+    'type': 'S',
+    'speed': 4,
+    'small-medium': '1d4+1',
+    'large': '1d4+1',
+    'knockdown': 'd6',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['ice pick'] = {
+    'name': 'Ice Pick',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['knife, harness'] = {
+    'name': 'Knife, Harness',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 2,
+    'small-medium': '1d2',
+    'large': '1',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['machete'] = {
+    'name': 'Machete',
+    'size': 'M',
+    'type': 'S',
+    'speed': 8,
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['ritiik'] = {
+    'name': 'Ritiik',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['snow blade (iuak)'] = {
+    'name': 'Snow Blade (Iuak)',
+    'size': 'M',
+    'type': 'S',
+    'speed': 4,
+    'small-medium': '1d4',
+    'large': '1d6',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+//#endregion
 module.exports = weapons;

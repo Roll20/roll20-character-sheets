@@ -783,4 +783,98 @@ nonweaponProficiencies['Wild Fighting'] = {
     'book': 'The Complete Book of Humanoids'
 };
 //#endregion
+
+//#region The Complete Ranger's Handbook
+nonweaponProficiencies['Cartography'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Distance Sense'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Falconry'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Persuasion'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Riding, Sea-based'] = {
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Signaling'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Camouflage'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Fighter/Rogue',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Foraging'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Warrior/Rogue',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Spelunking'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Warrior',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Trail Marking'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Warrior',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Trail Signs'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': 'Warrior/Rogue',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Veterinary Healing'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -3,
+    'classes': 'Priest',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Weaponsmithing, Crude'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Warrior',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+//#endregion
 module.exports = nonweaponProficiencies;
