@@ -877,4 +877,42 @@ nonweaponProficiencies['Weaponsmithing, Crude'] = {
     'book': 'The Complete Ranger\'s Handbook'
 };
 //#endregion
+
+//#region The Complete Paladin's Handbook
+nonweaponProficiencies['Bureaucracy'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Priest/Rogue',
+    'book': 'The Complete Paladin\'s Handbook'
+};
+nonweaponProficiencies['Diagnostics'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -1,
+    'classes': 'Priest',
+    'book': 'The Complete Paladin\'s Handbook'
+};
+nonweaponProficiencies['Jousting'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': +2,
+    'classes': 'Warrior',
+    'book': 'The Complete Paladin\'s Handbook'
+};
+nonweaponProficiencies['Law'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Warrior/Priest',
+    'book': 'The Complete Paladin\'s Handbook'
+};
+nonweaponProficiencies['Oratory'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': 'Warrior/Priest',
+    'book': 'The Complete Paladin\'s Handbook'
+};
+//#endregion
 module.exports = nonweaponProficiencies;
