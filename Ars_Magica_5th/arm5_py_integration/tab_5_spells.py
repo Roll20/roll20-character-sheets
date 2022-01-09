@@ -42,7 +42,7 @@ spell_template = rolltemplate(
     spell="@{spell_name}",
     character="@{character_name}",
     sigil="@{sigil}",
-    roll=f"[[ (%(die)s + {spell_roll}) * [[ 1 / (1 + @{{spell_Deficiency}}) ]] ]]",
+    roll=f"[[ (%(die)s + {spell_roll}) / ([[1 + (@{{spell_Deficiency}})]] [@{{deficiency_i18n}}]) ]]",
     range="@{spell_range}",
     duration="@{spell_duration}",
     target="@{spell_target}",
@@ -59,7 +59,7 @@ EXPORTS["spell_roll_stress"] = spell_template.stress
 spont_template = rolltemplate(
     "arcane",
     label0="@{spell_name}",
-    result0=f"[[ (%(die)s + {spell_roll} )/2 * [[ 1 / (1 + @{{spell_Deficiency}}) ]]]]",
+    result0=f"[[ (%(die)s + {spell_roll} ) / ([[1 + (@{{spell_Deficiency}})]] [@{{deficiency_i18n}}]) /2 ]]",
     label1="^{aura}",
     result1="@{aura}",
     label2="^{weakness-m}",

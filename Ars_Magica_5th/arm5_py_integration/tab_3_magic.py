@@ -101,7 +101,7 @@ spontaneous_roll = roll(
 spontaneous_template = rolltemplate(
     "arcane",
     label0="^{spontaneous} ^{casting}",
-    result0=f"[[ (%(die)s + {spontaneous_roll} )/2 ]]",
+    result0=f"[[ (%(die)s + {spontaneous_roll} ) / ([[1 + (@{{Spontaneous1_Deficiency}})]] [@{{deficiency_i18n}}]) /2]]",
     label1="^{aura}",
     result1="@{aura}",
     label2="^{weakness-m}",
@@ -131,7 +131,7 @@ ceremonial_roll = roll(
 ceremonial_template = rolltemplate(
     "arcane",
     label0="^{ceremonial} ^{casting}",
-    result0=f"[[ (%(die)s + {ceremonial_roll} )/2 ]]",
+    result0=f"[[ (%(die)s + {ceremonial_roll} ) / ([[1 + (@{{Ceremonial_Deficiency}})]] [@{{deficiency_i18n}}]) /2 ]]",
     label1="^{aura}",
     result1="@{aura}",
     label2="^{weakness-m}}} ",
@@ -158,7 +158,7 @@ formulaic_roll = roll(
 formulaic_template = rolltemplate(
     "arcane",
     label0="^{formulaic} ^{casting}",
-    result0=f"[[ %(die)s + {formulaic_roll} ]]",
+    result0=f"[[ (%(die)s + {formulaic_roll}) / ([[1 + (@{{Formulaic_Deficiency}})]] [@{{deficiency_i18n}}]) ]]",
     label1="^{aura}",
     result1="@{aura}",
     label2="^{weakness-m}",
@@ -185,7 +185,7 @@ ritual_roll = roll(
 ritual_template = rolltemplate(
     "arcane",
     label0="^{ritual} ^{casting}",
-    result0=f"[[ %(die)s + {ritual_roll} ]]",
+    result0=f"[[ (%(die)s + {ritual_roll}) / ([[1 + (@{{Ritual_Deficiency}})]] [@{{deficiency_i18n}}]) ]]",
     label1="^{aura}",
     result1="@{aura}",
     label2="^{weakness-m}",
