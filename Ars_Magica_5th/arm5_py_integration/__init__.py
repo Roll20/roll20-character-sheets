@@ -5,7 +5,7 @@ from pathlib import Path
 
 import markdown
 
-from . import tab_1_character, tab_2_abilities, tab_3_magic, tab_4_combat, tab_5_spells, tab_6_help
+from . import tab_1_character, tab_2_abilities, tab_3_magic, tab_4_combat, tab_5_spells, tab_6_sheet
 from .helpers import xp
 from .translations import translation_attrs, translation_attrs_setup
 
@@ -161,4 +161,4 @@ EXPORTS.update(tab_2_abilities.EXPORTS)
 EXPORTS.update(tab_3_magic.EXPORTS)
 EXPORTS.update(tab_4_combat.EXPORTS)
 EXPORTS.update(tab_5_spells.EXPORTS)
-EXPORTS.update(tab_6_help.EXPORTS)
+EXPORTS.update(tab_6_sheet.EXPORTS)

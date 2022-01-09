@@ -22,7 +22,7 @@ EXPORTS["personality_trait_rows"] = repeat_format(
         <tr>
             <td><input type="text" class="heading_2" style="width:245px" name="attr_Personality_Trait$$"/></td>
             <td><input type="text" class="number_1" style="width:70px;" name="attr_Personality_Trait$$_score"/></td>
-            <td><div class="flex-container">
+            <td><div class="flex-container-center">
                 <button type="roll" class="button simple-roll" name="roll_personality$$_simple" value="{personnality_template.simple}"></button>
                 <button type="roll" class="button stress-roll" name="roll_personality$$_stress" value="{personnality_template.stress}"></button>
             </div></td>
@@ -51,7 +51,7 @@ EXPORTS["reputation_rows"] = repeat_format(
             <td><input type="text" class="heading_2" name="attr_Reputations$$"/></td>
             <td><input type="text" class="heading_2a" name="attr_Reputations$$_type"/></td>
             <td><input type="text" class="number_1" style="width:50px;" name="attr_Reputations$$_score"/></td>
-            <td><div class="flex-container">
+            <td><div class="flex-container-center">
                 <button type="roll" class="button simple-roll" name="roll_reputation$$_simple" value="{reputation_template.simple}"></button>
                 <button type="roll" class="button stress-roll" name="roll_reputation$$_stress" value="{reputation_template.stress}"></button>
             </div></td>

@@ -33,7 +33,7 @@ EXPORTS["characteristic_rows"] = repeat_format(
             <td><input type="text" class="heading_2" name="attr_%(Char)s_Description"/></td>
             <td><input type="text" class="number_1" name="attr_%(Char)s_Score" value="0"/></td>
             <td><input type="text" class="number_1" name="attr_%(Char)s_Aging" value="0"/></td>
-            <td><div class="flex-container">
+            <td><div class="flex-container-center">
                 <button type="roll" class="button simple-roll" name="roll_%(Char)s_simple" value="{characteristic_template.simple}"></button>
                 <button type="roll" class="button stress-roll" name="roll_%(Char)s_stress" value="{characteristic_template.stress}"></button>
             </div></td>
