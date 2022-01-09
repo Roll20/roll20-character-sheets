@@ -10,10 +10,10 @@ import itertools
 CHARACTERISTICS = [
     "intelligence",
     "perception",
-    "strength",
-    "stamina",
     "presence",
     "communication",
+    "strength",
+    "stamina",
     "dexterity",
     "quickness",
 ]

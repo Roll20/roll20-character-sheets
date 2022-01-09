@@ -6,7 +6,7 @@ EXPORTS = {}
 
 # Personality traits
 personnality_roll = roll(
-    "[[@{Personality_Trait$$_Score}]] [@{Personality_Trait$$}]",
+    "(@{Personality_Trait$$_Score}) [@{Personality_Trait$$}]",
     "(?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]",
 )
 personnality_template = rolltemplate(
@@ -35,7 +35,7 @@ EXPORTS["personality_trait_rows"] = repeat_format(
 
 # Reputations
 reputation_roll = roll(
-    "[[@{Reputations$$_Score}]] [@{Reputations$$}]",
+    "(@{Reputations$$_Score}) [@{Reputations$$}]",
     "(?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]",
 )
 reputation_template = rolltemplate(
