@@ -2,9 +2,9 @@
 Small module for helper code that could be helpful everywhere in the part module
 """
 
-from typing import Dict, Set, ClassVar, List
+from typing import Dict, Set, ClassVar, List, Collection, Union, Tuple
 from dataclasses import dataclass
-import string
+import itertools
 
 # Useful constants
 CHARACTERISTICS = [
@@ -38,49 +38,126 @@ FORMS = [
     "vim",
 ]
 
+def _match_lengths(
+    left: Union[str, Collection[str]],
+    right: Union[str, Collection[str]],
+    lname:str="left",
+    rname:str="rigth"
+):
+    left_len = 1 if isinstance(left, str) else len(left)
+    right_len = 1 if isinstance(right, str) else len(right)
 
-def repeat_template(
-    tpl, values, *, sep="\n", str_key="value", tuple_keys=(), rep_key="%%"
+    if left_len != right_len and left_len != 1 and right_len != 1:
+        raise ValueError(
+            f"Cannot match {lname} length {left_len} to {rname} length {right_len}"
+        )
+    
+    if isinstance(left, str) and isinstance(right, str):
+        return zip([left], [right])
+    left_iter = itertools.repeat(left) if isinstance(left, str) else left
+    right_iter = itertools.repeat(right) if isinstance(right, str) else right
+    return zip(left_iter, right_iter)
+
+def repeat_format(
+    string: str,
+    *,
+    replace: Union[str, Collection[str]]=None,
+    by: Union[str, Collection[str]]=None,
+    keys: Union[str, Collection[str]]=None,
+    values: Union[str, Collection[str]]=None,
+    keyvalues: Union[Tuple[str, str], Collection[Tuple[str, str]]]=None,
+    separator: str="\n"
 ):
     """
-    Repeatedly formats a template with values from the list.
+    Repeatedly format a string and concatenate teh results
 
-    This function behaves differently based on the type of values:
-    - if the value is a str, it uses %-formatting with a dict where:
-        - key.lower() maps to value.lower()
-        - key.capitalize() maps to value.capitalize()
-    -if the value is a tuple, it uses %-formatting with a dict where:
-        - the i-th key found in tuple_keys has the i-th value found in the tuple
-        ( the shortes length between the two is used)
-    - else, it uses str.replace(rep_key, str(value)) to format the template
+    Two formatting options are available through different arguments.
+    Simple formatting uses `str.replace()` and dictionary formatting uses
+    "%"-style string formatting:
+
+        - `str.replace()` formatting
+           The function matches the length of ``replace`` and ``by`` and
+           repeatedly calls `string.replace(replace, by)` on the elemnts
+           from those arguments
+        - "%"-style formatting
+          The function matches the length of ``keys`` and ``values`` and
+          repeatedly calls `string % mapping`, where mapping is a dict
+          containing `key`, `key.lower()` and `key.title()` mapped to respective
+          transformation of `value`.
+    
+    In both usage, an argument may be a single string to be used for each
+    iterations.
 
     Arguments:
-        tpl: template to repeatedly format
-        values: iterable of values to format the template with
-        str_key: key to use for the string behavior
-        rep_key: key to replace when the value is not a string
-        sep: separator used to join all formatted templates
+        string: str object to repeatedly format
+        replace: collection of parts of `string` to replace using `str.replace`
+        by: collection of values to replace by, using `str.replace`
+        keys: collection of keys to replace using %-style formatting
+        values: collection of values to replace using %-style formatting
+        keyvalues: specifies both `keys` and `values` as a collection of pairs.
+            Useful when passing a zip of a dictitem object.
+
     """
-    elements = []
-    for value in values:
-        if isinstance(value, str):
-            elements.append(
-                tpl
-                % {
-                    str_key.lower(): value.lower(),
-                    str_key.capitalize(): value.capitalize(),
-                }
-            )
-        elif isinstance(value, tuple):
-            elements.append(tpl % dict(zip(tuple_keys, value)))
+    if (replace is None) != (by is None):
+        raise ValueError(
+            "Simple formatting requires both 'replace' and 'by' arguments"
+        )
+    if (keys is None) != (values is None):
+        raise ValueError(
+            "Dictionary formatting requires both 'keys' and "
+            "'values' arguments"
+        )
+    if (keys is not None) and (keyvalues is not None):
+        raise ValueError(
+            "Cannot use 'keys' or 'values' arguments with "
+            "'keyvalues'"
+        )
+    if replace is None and keys is None and values is None:
+        raise ValueError("No formatting arguments")
+
+    if replace is not None and by is not None:
+        # simple formatting with str.replace()
+        return separator.join(
+            string.replace(key, value)
+            for key, value in _match_lengths(replace, by, "'replace'", "'by'")
+        )
+    elif (keys is not None and values is not None) or keyvalues is not None:
+        # dictionary formatting
+        if keys is not None and values is not None:
+            pairs = _match_lengths(keys, values, "'keys'", "'values'")
+        elif keyvalues is not None:
+            pairs = keyvalues
         else:
-            elements.append(tpl.replace(rep_key, str(value)))
-    return sep.join(elements)
+            raise RuntimeError
+        return separator.join(
+            string % {
+                key.lower(): value.lower(),
+                key.title(): value.title(),
+                key: value
+            }
+            for key, value in pairs
+        )
 
 
 def enumerate_helper(iterable, funcs=(), start=0):
     for i, v in enumerate(iterable, start=start):
         yield (i, v, *tuple(f(v) for f in funcs))
+
+def xp(
+    name: str, *, suffix="_exp", adv_suffix="_advancementExp", tot_suffix="_totalExp"
+) -> str:
+    """
+    Generate the HTML for the Xp parts of arts & abilities
+    """
+    return (
+        "["
+        f"""<input type="text" class="number_3" name="attr_{name}{suffix}" value="0"/>"""
+        "/"
+        f"""<input type="text" class="number_3 advance" name="attr_{name}{adv_suffix}" value="0" readonly/>"""
+        "/"
+        f"""<input type="text" class="number_3 total" name="attr_{name}{tot_suffix}" value="0" readonly/>"""
+        "]"
+    )
 
 
 def roll(*parts: str) -> str:
@@ -95,6 +172,16 @@ def roll(*parts: str) -> str:
 
 @dataclass
 class RollTemplate:
+    """
+    Helper class to create rolltemplate strings
+
+    This class holds all the parts of a rolltemplate in-chat call and allows
+    easier formatting of the rolltemplates. It also handles the simple die or
+    stress die version of the rolltemplate through common mecanism.
+
+    Note:
+        It is specialized to the Ars Magica 5th sheet
+    """
     TEMPLATES: ClassVar[Dict[str, Set[str]]] = {
         "generic": {"Label", "Banner", "Result"},
         "ability": {
@@ -122,6 +209,7 @@ class RollTemplate:
             "target",
             "Technique",
         },
+        "soak": {"name", "rollsoak", "armorsoak", "soakbonus", "formlabel", "formbonus"}
     }
     SHARED_KEYS: ClassVar[List[str]] = ["stress", "botch-button", "crit-button"]
 
@@ -133,10 +221,10 @@ class RollTemplate:
     def __post_init__(self):
         msg = f"If you added it recently, update TEMPLATES in {__file__}"
         if self.name not in self.TEMPLATES:
-            raise ValueError(f"No roll-template named '{self.name}'. " + msg)
+            raise ValueError(f"No rolltemplate named '{self.name}'. " + msg)
         if invalids := (self.fields.keys() - self.TEMPLATES[self.name]):
             raise ValueError(
-                "roll-template '%s' has no key %s. %s"
+                "rolltemplate '%s' has no key %s. %s"
                 % (self.name, ", ".join(invalids), msg)
             )
 
@@ -169,10 +257,10 @@ def rolltemplate(
     **kwargs,
 ) -> RollTemplate:
     """
-    Generate a rolltemplate call as a string
+    Generate a RollTemplate object
 
     Arguments:
-        templae: name of the template to use
+        template: name of the template to use
         fields: fields to add to the template
         botch: name of the roll button to use for botches
         critical: name of the roll button to use for criticals

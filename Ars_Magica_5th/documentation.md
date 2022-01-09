@@ -161,6 +161,8 @@ Those are omitted in the following list of rolltemplate names and supported valu
     + `name`
     + `rollsoak`
     + `soakbonus`
+    + `formlabel`
+    + `formbonus`
 + **`initiative`**:
     + `name`
     + `roll`

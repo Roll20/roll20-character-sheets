@@ -45,12 +45,12 @@ $$alert(
     ID="161-spell-update"
 )$$
 $$alert(
-    "January 2020 v1.7 update - Magic update",
+    "January 2020 v1.7 - Magic update",
     markdown.markdown(
-        """- Added a toggle to hide magi-specific elements of the sheet in last tab
+        """- Added a toggle to hide  elements of the sheet that are specific to Magi (see Help tab)
 - Added deficiency toggles that halves casting totals
-- Added grimoire of useful spontaneous spells in the "Spells" tab
-        """),
+- Added Soak computations including Form bonuses
+- Added list for useful spontaneous spells in the "Spells" tab"""),
         level="info"
 )$$
 
@@ -101,7 +101,7 @@ $$alert(
 </div>
 
 <div class="tab-br"></div>
-<input type="hidden" class="tabstoggle" name="attr_sheetTab" value="character"/>
+<input type="hidden" class="tabstoggle" name="attr_sheetTab" value="sheet"/>
 <input type="hidden" name="attr_simple-die" value="(1d10cs0cf0) [@{simple-die_i18n}]"/>
 <input type="hidden" name="attr_stress-die" value="ceil(((((1d10cs1cf10 %9) -1)+9) %9) *1.1) [@{stress-die_i18n}]"/>
 <input type="hidden" class="dtype-selector" name="attr_die-type-selection-proxy" value="toggle"/>
@@ -114,7 +114,7 @@ $$alert(
         <button type="action" name="act_magic" class="tabbutton magi-only" data-i18n="magic" >Magic</button>
         <button type="action" name="act_combat" class="tabbutton" data-i18n="combat" >Combat</button>
         <button type="action" name="act_spells" class="tabbutton magi-only" data-i18n="spells" >Spells</button>
-        <button type="action" name="act_help" class="tabbutton" data-i18n="help">Help</button>
+        <button type="action" name="act_sheet" class="tabbutton" data-i18n="sheet" style="margin-left: 10px;">Sheet</button>
     </div>
     <div class="tabblank"></div>
     <div class="functions">
@@ -125,7 +125,7 @@ $$alert(
         <button type="roll" class="critical" name="roll_critical" title="Critical" value="&{template:critical} {{roll=[[?{@{total_i18n}|0} [@{total_i18n}] + (2*2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die]]]}}" data-i18n="critical">Critical</button>
         <!-- Invisible critical button with a divide by 2, for spontaneous criticals -->
         <button type="roll" class="critical" name="roll_critical-spontaneous" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0} [@{total_i18n}] + (2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die]]]}} {{type=@{spontaneous_i18n}}}" />
-        <!-- Invisible critical button for initiative that adds to turn tracker -->
+        <!-- Invisible critical button for initiative critical that adds to turn tracker -->
         <button type="roll" class="critical" name="roll_critical-init" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0} [@{total_i18n}] + (2*2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die] &{tracker}]]}} {{type=@{initiative_i18n}}}" />
     </div>
 </div>
@@ -443,7 +443,7 @@ $$alert(
                 <fieldset class="repeating_ability">
                     <table class="table_2" style="width:400px;">
                         <tr>
-                            <td width="30px"><div class="flex-container">
+                            <td width="30px"><div class="flex-container-center">
                                 <button type="roll" class="button simple-roll" name="roll_ability_simple" value="$$ability_roll_simple$$"></button>
                                 <button type="roll" class="button stress-roll" name="roll_ability_stress" value="$$ability_roll_stress$$"></button>
                             </div></td>
@@ -545,7 +545,7 @@ $$alert(
             </tr>
             <tr>
                 <td data-i18n="fatiguing" >Fatiguing</td>
-                <td><div class="flex-container">
+                <td><div class="flex-container-center">
                     <!-- <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Spontaneous1_simple" value="$spontaneous_roll_simple$"></button> -->
                     <button style="margin: 0px auto;" type="roll" class="button stress-roll single-roll" name="roll_Spontaneous1_stress" value="$$spontaneous_roll_stress$$"></button>
                 </div></td>
@@ -570,7 +570,7 @@ $$alert(
             </tr>
             <tr>
                 <td data-i18n="ceremonial" >Ceremonial</td>
-                <td><div class="flex-container">
+                <td><div class="flex-container-center">
                     <!-- <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Ceremonial_simple" value="$ceremonial_roll_simple$"></button> -->
                     <button style="margin: 0px auto;" type="roll" class="button stress-roll single-roll" name="roll_Ceremonial_stress" value="$$ceremonial_roll_stress$$"></button>
                 </div></td>
@@ -623,7 +623,7 @@ $$alert(
             </tr>
             <tr>
                 <td data-i18n="formulaic" >Formulaic</td>
-                <td><div class="flex-container">
+                <td><div class="flex-container-center">
                     <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Formulaic_simple" value="$$formulaic_roll_simple$$"></button>
                     <button style="margin: 0px auto;" type="roll" class="button stress-roll" name="roll_Formulaic_stress" value="$$formulaic_roll_stress$$"></button>
                 </div></td>
@@ -648,7 +648,7 @@ $$alert(
             </tr>
             <tr>
                 <td data-i18n="ritual" >Ritual</td>
-                <td><div class="flex-container">
+                <td><div class="flex-container-center">
                     <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Ritual_simple" value="$$ritual_roll_simple$$"></button>
                     <button style="margin: 0px auto;" type="roll" class="button stress-roll" name="roll_Ritual_stress" value="$$ritual_roll_stress$$"></button>
                 </div></td>
@@ -812,7 +812,7 @@ $$alert(
                             <th colspan="2" data-i18n="basic-lab-total" >Basic Lab Total</th>
                             <td><div style="width:60px;"><input type="number" class="number_2" name="attr_Lab" value="@{Intelligence_Score} + @{Lab_Theory} + @{aura} + @{lab_Technique} + @{lab_Form} + (@{Lab_Focus}) + @{LabModifiers} + @{labbonus_total} + @{LabGeneralQuality_Score}" disabled="true"/></div></td>
                             <td colspan="2">
-                                <div class="flex-container_2">
+                                <div class="flex-container-between">
                                     <span>
                                         <input type="checkbox" class="check" name="attr_Lab_Focus" value="((@{lab_Technique} + @{lab_Form} - abs((@{lab_Technique}) - (@{lab_Form}))) /2)"/>
                                         <span data-i18n="focus">Focus</span>
@@ -956,7 +956,7 @@ $$alert(
                 <tr>
                     <td data-i18n="light-wounds" >Light Wounds</td>
                     <td><input type="text" class="heading_3" name="attr_Wounds_Light_range"/></td>
-                    <td><div class="flex-container">
+                    <td><div class="flex-container-center">
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light1" value="-1"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light2" value="-1"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light3" value="-1"><span></span>
@@ -968,7 +968,7 @@ $$alert(
                 <tr>
                     <td data-i18n="medium-wounds" >Medium Wounds</td>
                     <td><input type="text" class="heading_3" name="attr_Wounds_Medium_range"/></td>
-                    <td><div class="flex-container">
+                    <td><div class="flex-container-center">
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium1" value="-3"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium2" value="-3"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium3" value="-3"><span></span>
@@ -980,7 +980,7 @@ $$alert(
                 <tr>
                     <td data-i18n="heavy-wounds" >Heavy Wounds</td>
                     <td><input type="text" class="heading_3" name="attr_Wounds_Heavy_range"/></td>
-                    <td><div class="flex-container">
+                    <td><div class="flex-container-center">
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy1" value="-5"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy2" value="-5"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy3" value="-5"><span></span>
@@ -1020,12 +1020,14 @@ $$alert(
             </tr>
         </table>
     </div>
-    <div>
+    <!-- Soak -->
+    <div style="padding-bottom: 15px;" >
+        <h4 class="heading_label" data-i18n="soak" >Soak</h4>
         <table class="table_2" style="width:380px">
             <tr>
                 <td></td>
                 <th data-i18n="soak">Soak</th>
-                <th data-i18n="soak-bonus">Soak Bonus</th>
+                <th data-i18n="bonus">Bonus</th>
                 <th data-i18n="armor-protection" >Armor Protection</th>
                 <th data-i18n="armor-load" >Armor Load</th>
                 <td></td>
@@ -1040,6 +1042,12 @@ $$alert(
                 <th colspan="2"><input type="number" class="number_2" name="attr_armor_load" value="0"/></th>
             </tr>
         </table>
+        <div class="magi-only">
+            <h4 class="heading_label" style="margin-bottom:0px;" data-i18n="soak-forms" >Soak by Forms</h4>
+            <div class='artgrid' style="border:1px solid black">
+                $$soak_by_forms$$
+            </div>
+        </div>
     </div>
     <!--    Weapons -->
     <div>
@@ -1191,12 +1199,12 @@ $$alert(
             <td></td>
         </tr>
     </table>
-
+    <!-- Formulaic spells -->
     <h4 class="heading_label" style="margin-top:10px;" data-i18n="formulaic-spells" >Formulaic spells</h4>
     <fieldset class="repeating_spell">
         <table style="margin-top:10px;">
             <tr>
-                <th style="padding-left:10px;"><div class="flex-container">
+                <th style="padding-left:10px;"><div class="flex-container-center">
                     <button type="roll" class="button simple-roll" name="roll_spell_simple" value="$$spell_roll_simple$$"></button>
                     <button type="roll" class="button stress-roll" name="roll_spell_stress" value="$$spell_roll_stress$$"></button>
                 </div></th>
@@ -1243,20 +1251,20 @@ $$alert(
                         </select>
                     </td>
                     <td colspan="4">
-                        <div class="flex-container_2">
-                            <span>
-                                <span data-i18n="focus">Focus</span>
+                        <div class="flex-container-between">
+                            <span class="vcenter">
+                                <span data-i18n="focus" style="padding-right: 5px;">Focus</span>
                                 <input type="checkbox" class="check" name="attr_spell_Focus" value="[[{($$spell_tech_value$$), ($$spell_form_value$$)}kl1]] [@{focus_i18n}]"></input>
                             </span>
-                            <span>
-                                <span data-i18n="deficiency">Deficiency</span>
+                            <span class="vcenter">
+                                <span data-i18n="deficiency" style="padding-right: 5px;">Deficiency</span>
                                 <input type="checkbox" class="check" name="attr_spell_Deficiency" value="1 [@{deficiency_i18n}]"></input>
                             </span>
-                            <span>
+                            <span class="vcenter">
                                 <span data-i18n="level" >Level</span>
                                 <input type="number" class="number_2" name="attr_spell_level" value="0"/>
                             </span>
-                            <span>
+                            <span class="vcenter">
                                 <span data-i18n="bonus" >Bonus</span>
                                 <input type="number" class="number_2" name="attr_spell_bonus" value="0"/>
                             </span>
@@ -1295,11 +1303,12 @@ $$alert(
         </div>
     </fieldset>
 
+    <!-- Spontaneous Spells -->
     <h4 class="heading_label" style="margin-top:10px;" data-i18n="spontaneous-spells" >Spontaneous spells</h4>
     <fieldset class="repeating_spontaneous">
         <table style="margin-top:10px;">
             <tr>
-                <th style="padding-left:10px;"><div class="flex-container">
+                <th style="padding-left:10px;"><div class="flex-container-center">
                     <button style="margin: 0px auto;" type="roll" class="button stress-roll single-roll" name="roll_saved_spontaneous_stress" value="$$saved_spontaneous_roll_stress$$"></button>
                 </div></th>
                 <th style="padding-left:10px;"><input style="width:645px;" type="text" class="heading_2" name="attr_spell_name" placeholder="Spell Name" data-i18n-placeholder="spell-name" /></th>
@@ -1312,16 +1321,6 @@ $$alert(
                 <tr>
                     <td data-i18n="technique">Technique</td>
                     <td>
-                        <!--
-                        This select tag is left in comment for reference purposes. A worker will translate from that old select
-                        to the new format below
-                        -->
-                        <!--
-                        <select class="select_1" name="attr_Technique_select">
-                            <option class="italic" value="0" data-i18n="technique" >Technique</option>
-                            $$technique_enumerated_options$$
-                        </select>
-                        -->
                         <select class="select_1" name="attr_spell_tech_name">
                             <option class="italic" value="unselected" data-i18n="technique" >Technique</option>
                             $$technique_name_options$$
@@ -1329,29 +1328,19 @@ $$alert(
                     </td>
                     <td data-i18n="form" >Form</td>
                     <td>
-                        <!--
-                        This select tag is left in comment for reference purposes. A worker will translate from that old select
-                        to the new format below
-                        -->
-                        <!--
-                        <select class="select_1" name="attr_Form_select">
-                            <option class="italic" value="0" data-i18n="form" >Form</option>
-                            $$form_enumerated_options$$
-                        </select>
-                        -->
                         <select class="select_1" name="attr_spell_form_name">
                             <option class="italic" value="unselected" data-i18n="form" >Form</option>
                             $$form_name_options$$
                         </select>
                     </td>
-                    <td>
-                        <span data-i18n="focus">Focus</span>
+                    <td><span class="vcenter">
+                        <span data-i18n="focus" style="padding-right: 5px;" >Focus</span>
                         <input type="checkbox" class="check" name="attr_spell_Focus" value="[[{($$spell_tech_value$$), ($$spell_form_value$$)}kl1]] [@{focus_i18n}]"></input>
-                    </td>
-                    <td>
-                        <span data-i18n="deficiency">Deficiency</span>
+                    </span></td>
+                    <td><span class="vcenter">
+                        <span data-i18n="deficiency" style="padding-right: 5px;" >Deficiency</span>
                         <input type="checkbox" class="check" name="attr_spell_Deficiency" value="1 [@{deficiency_i18n}]"></input>
-                    </td>
+                    </span></td>
                     <td data-i18n="level" >Level</td>
                     <td><input type="number" class="number_2" name="attr_spell_level" value="0"/></td>
                 </tr>
@@ -1383,7 +1372,7 @@ $$alert(
     </fieldset>
 </div>
 
-<!-- 6 Help -->
+<!-- 6 Sheet -->
 <div class="tab-content tab6">
     <div>
         <h2 class="heading_label">Configuration</h2>
@@ -1628,6 +1617,12 @@ $$alert(
                 <td class="display-default"><div style="text-align:center;">{{soakbonus}}</div></td>
             </tr>
             {{/soakbonus}}
+            {{#formlabel}}
+            <tr>
+                <td><div style="text-align:center;">{{formlabel}}</div></td>
+                <td class="display-default"><div style="text-align:center;">{{formbonus}}</div></td>
+            </tr>
+            {{/formlabel}}
         </table>
     </rolltemplate>
     
@@ -1869,7 +1864,7 @@ $$translation_attrs$$
 
 <!-- Sheet Worker Scripts -->
 <script type="text/worker">
-["character","abilities","magic","combat","spells","help"].forEach(function (button) {
+["character","abilities","magic","combat","spells","sheet"].forEach(function (button) {
     on("clicked:" + button, function() {
         setAttrs({
             "sheetTab": button
