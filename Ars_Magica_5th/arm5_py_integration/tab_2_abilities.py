@@ -25,7 +25,7 @@ characteristic_template = rolltemplate(
     label3="^{circumstances-m}",
     result3="[[(?{@{circumstantial_i18n}|0})]]",
 )
-EXPORTS["characteristic_rows"] = repeat_format(
+EXPORTS["mental_characteristic_rows"] = repeat_format(
     textwrap.dedent(
         f"""\
         <tr>
@@ -40,7 +40,25 @@ EXPORTS["characteristic_rows"] = repeat_format(
         </tr>"""
     ),
     keys="char",
-    values=CHARACTERISTICS
+    values=CHARACTERISTICS[:4]
+)
+
+EXPORTS["physical_characteristic_rows"] = repeat_format(
+    textwrap.dedent(
+        f"""\
+        <tr>
+            <th data-i18n="%(char)s" >%(Char)s</th>
+            <td><input type="text" class="heading_2" name="attr_%(Char)s_Description"/></td>
+            <td><input type="text" class="number_1" name="attr_%(Char)s_Score" value="0"/></td>
+            <td><input type="text" class="number_1" name="attr_%(Char)s_Aging" value="0"/></td>
+            <td><div class="flex-container-center">
+                <button type="roll" class="button simple-roll" name="roll_%(Char)s_simple" value="{characteristic_template.simple}"></button>
+                <button type="roll" class="button stress-roll" name="roll_%(Char)s_stress" value="{characteristic_template.stress}"></button>
+            </div></td>
+        </tr>"""
+    ),
+    keys="char",
+    values=CHARACTERISTICS[4:]
 )
 
 # Characteristic options

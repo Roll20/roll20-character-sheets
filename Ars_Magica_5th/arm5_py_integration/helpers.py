@@ -253,24 +253,30 @@ class RollTemplate:
                 % (self.name, ", ".join(invalids), msg)
             )
 
-    @property
-    def _base(self) -> str:
+    def _base(self, with_roll=True) -> str:
         parts = [
             f"&{{template:{self.name}}}",
             *("{{%s=%s}}" % field for field in self.fields.items()),
-            "{{botch-button=[@{botch_i18n}!](~@{character_name}|%s)}}" % self.botch,
-            "{{crit-button=[@{critical_i18n}!](~@{character_name}|%s)}}" % self.critical,
         ]
+        if with_roll:
+            parts.extend([
+                "{{botch-button=[@{botch_i18n}!](~@{character_name}|%s)}}" % self.botch,
+                "{{crit-button=[@{critical_i18n}!](~@{character_name}|%s)}}" % self.critical,
+            ])
         return " ".join(parts)
+    
+    @property
+    def no_roll(self) -> str:
+        return self._base(with_roll=False)
 
     @property
     def simple(self) -> str:
-        s = self._base + " {{stress=}}"
+        s = self._base() + " {{stress=}}"
         return s % {"die": "@{simple-die}"}
 
     @property
     def stress(self) -> str:
-        s = self._base + " {{stress=1}}"
+        s = self._base() + " {{stress=1}}"
         return s % {"die": "@{stress-die}"}
 
 

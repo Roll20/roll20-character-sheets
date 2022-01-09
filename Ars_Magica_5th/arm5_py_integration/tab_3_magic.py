@@ -143,6 +143,31 @@ ceremonial_template = rolltemplate(
 # EXPORTS["ceremonial_roll_simple"] = ceremonial_template.simple
 EXPORTS["ceremonial_roll_stress"] = ceremonial_template.stress
 
+nf_spontaneous_roll = roll(
+    "@{Spontaneous2_Technique}",
+    "@{Spontaneous2_Form}",
+    "([[@{Spontaneous2_Focus}]]) [@{focus_i18n}]",
+    "(@{gestures})",
+    "(@{words})",
+    "(@{Stamina_Score}) [@{stamina_i18n}]",
+    "(@{aura}) [@{aura_i18n}]",
+    "([[floor(@{Fatigue})]]) [@{fatigue_i18n}]",
+    "(@{wound_total}) [@{wounds_i18n}]",
+    "(?{@{modifiers_i18n}|0}) [@{modifiers_i18n}]",
+)
+nf_spontaneous_template = rolltemplate(
+    "arcane",
+    label0="^{spontaneous} ^{casting}",
+    result0=f"[[ ( {nf_spontaneous_roll} ) / ([[1 + (@{{Spontaneous1_Deficiency}})]] [@{{deficiency_i18n}}]) /5]]",
+    label1="^{aura}",
+    result1="@{aura}",
+    label2="^{weakness-m}",
+    result2="[[ (@{wound_total}) [@{wounds_i18n}] + [[floor(@{fatigue})]] [@{fatigue_i18n}] ]]",
+    label3="^{circumstances-m}",
+    result3="[[ ?{@{modifiers_i18n}|0} ]]",
+)
+EXPORTS["spontaneous_nodice"] = nf_spontaneous_template.no_roll
+
 
 formulaic_roll = roll(
     "@{Formulaic_Technique}",
