@@ -44,6 +44,8 @@ Use `gulp watch` to automatically build the `dist/` folder when editing an HTML 
 
 ### Apply Damage to Character
 
+> This macro requires API access.
+
 For each character in the party (or any NPCs you may want to use this on), copy everything after, and including, `{{Character Name`. Then replace each instance of `Character Name` in each section with the names of your characters. Running the macro will prompt for damage, then put a table in chat where you can click the damage value to set it on that particular characters' sheet, then click Apply to trigger the Apply Damage action button.
 
 ```
