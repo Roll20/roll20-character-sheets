@@ -1,6 +1,6 @@
 ## Sheet Documentation
 
-Welcome the th Ars Magica 5th Edition character sheet. This page contains the documentation for the sheet.
+Welcome the Ars Magica 5th Edition character sheet. This page contains the documentation for the sheet.
 
 ### Experience
 The fields for experience work as follows:

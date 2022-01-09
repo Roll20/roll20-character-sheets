@@ -6,7 +6,6 @@ TRANSLATION_ATTRS = (
         ("ability", "Abiliy", "ability"),
         ("armor", "Armor", "armor"),
         ("artes", "Artes Lib.", "artes-lib-"),
-        ("ask", "Ask", "ask"),
         ("attack", "Attack", "attack"),
         ("aura", "Aura", "aura"),
         ("bold", "Bold", "gestures-bold"),

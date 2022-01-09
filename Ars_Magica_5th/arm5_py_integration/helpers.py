@@ -2,6 +2,7 @@
 Small module for helper code that could be helpful everywhere in the part module
 """
 
+import textwrap
 from typing import Dict, Set, ClassVar, List, Collection, Union, Tuple
 from dataclasses import dataclass
 import itertools
@@ -149,15 +150,39 @@ def xp(
     """
     Generate the HTML for the Xp parts of arts & abilities
     """
-    return (
-        "["
-        f"""<input type="text" class="number_3" name="attr_{name}{suffix}" value="0"/>"""
-        "/"
-        f"""<input type="text" class="number_3 advance" name="attr_{name}{adv_suffix}" value="0" readonly/>"""
-        "/"
-        f"""<input type="text" class="number_3 total" name="attr_{name}{tot_suffix}" value="0" readonly/>"""
-        "]"
+    return textwrap.dedent(
+        f"""\
+        <span class="flex-container-left">
+            <span class="has-tooltip">
+                <input type="text" class="number_3" name="attr_{name}{suffix}" value="0"/>
+                <span class="tooltip">
+                    XP points in this art or ability. You can store either the total amount of XP, or just the XP towards the next score.
+                </span>
+            </span>
+            <span class="flex-container-center">
+                (
+                <span class="has-tooltip">
+                    <input type="text" class="number_3 advance" name="attr_{name}{adv_suffix}" value="0" readonly/>
+                    <span class="tooltip">Additional XP required for the next score</span>
+                </span>
+                /
+                <span class="has-tooltip">
+                    <input type="text" class="number_3 total" name="attr_{name}{tot_suffix}" value="0" readonly/>
+                    <span class="tooltip">XP required for the current score</span>
+                </span>
+                )
+            </span>
+        </span>
+        """
     )
+    # return (
+    #     f"""<input type="text" class="number_3" name="attr_{name}{suffix}" value="0"/>"""
+    #     "("
+    #     f"""<input type="text" class="number_3 advance" name="attr_{name}{adv_suffix}" value="0" readonly/>"""
+    #     "/"
+    #     f"""<input type="text" class="number_3 total" name="attr_{name}{tot_suffix}" value="0" readonly/>"""
+    #     ")"
+    # )
 
 
 def roll(*parts: str) -> str:
