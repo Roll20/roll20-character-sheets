@@ -149,9 +149,9 @@
                     parsed and calculated, with output displayed in a rolltemplate. This removes the need for roll
                     tables. </div>
                 <span class="toggle">
-                    <input type="radio" name="attr_parsedrolls" value="1" selected id="config_parsedrolls" />
+                    <input type="checkbox" name="attr_parsedrolls" value="1" selected id="config_parsedrolls" />
                     &nbsp;
-                    <input type="radio" name="attr_parsedrolls" value="0" id="config_tablerolls" />
+                    <input type="checkbox" name="attr_parsedrolls" value="0" id="config_tablerolls" />
                 </span>
                 <label>Table rolls</label>
                 <br />
@@ -787,9 +787,9 @@
                 parsed and calculated, with output displayed in a rolltemplate. This removes the need for roll
                 tables. </div>
             <span class="toggle">
-                <input type="radio" name="attr_parsedrolls" value="1" selected id="config_parsedrolls" />
+                <input type="checkbox" name="attr_parsedrolls" value="1" selected id="config_parsedrolls" />
                 &nbsp;
-                <input type="radio" name="attr_parsedrolls" value="0" id="config_tablerolls" />
+                <input type="checkbox" name="attr_parsedrolls" value="0" id="config_tablerolls" />
             </span>
             <label>Table rolls</label>
             <br />
@@ -1058,7 +1058,7 @@
         }
         modifiers = rolltype !== "custom" ? await getQuery(`?{Modifiers?|0}`) : 0;
         // add stance attack modifier
-        modifiers = modifiers + (stanceAttackActive * stanceAttackBonus);
+        modifiers = int(modifiers) + (int(stanceAttackActive) * int(stanceAttackBonus));
         let modStr = modifiers == 0 ? "" : (modifiers > 0 ? `{{modification=+${modifiers}}}` : `{{modification=${modifiers}}}`);
 
         // FEAT DIE ROLL DATA
@@ -1197,7 +1197,7 @@
     // toggle notes area visibility
     on( "clicked:notestoggle", function(){
         getAttrs(["notesactive"], function(values){
-            let state = parseInt(values.notesactive,10)||0;
+            let state = int(values.notesactive);
             let newstate = 1-state; // xor
             setAttrs({notesactive:newstate});
             console.log("Toggle notes state: " + newstate);
@@ -1374,10 +1374,10 @@
         "change:protection sheet:opened", function() {
         getAttrs(["armourprot", "helmprot", "stanceprot", "otherprot",
                     "armourprot_active", "helmprot_active", "stanceprot_active", "otherprot_active"], function(values) {
-            let armourprot = (values.armourprot_active == 1) ? parseInt(values.armourprot,10)||0 : 0;
-            let helmprot = (values.helmprot_active == 1) ? parseInt(values.helmprot,10)||0 : 0;	
-            let otherprot = (values.otherprot_active == 1) ? parseInt(values.otherprot,10)||0 : 0;	
-            let stanceprot = (values.stanceprot_active == 1) ? parseInt(values.stanceprot,10)||0 : 0;
+            let armourprot = (values.armourprot_active == 1) ? int(values.armourprot) : 0;
+            let helmprot = (values.helmprot_active == 1) ? int(values.helmprot) : 0;	
+            let otherprot = (values.otherprot_active == 1) ? int(values.otherprot) : 0;	
+            let stanceprot = (values.stanceprot_active == 1) ? int(values.stanceprot) : 0;
             let protectiontotal = armourprot + helmprot + otherprot + stanceprot;
             setAttrs({
                 protection: protectiontotal,
@@ -1392,10 +1392,10 @@
         "change:totalparry sheet:opened", function() {
         getAttrs(["parry", "shieldparry", "stanceparry", "otherparry",
                     "parry_active", "shieldparry_active", "stanceparry_active", "otherparry_active"], function(values) {
-            let parry = (values.parry_active == 1) ? parseInt(values.parry,10)||0 : 0;
-            let shieldparry = (values.shieldparry_active == 1) ? parseInt(values.shieldparry,10)||0 : 0;	
-            let stanceparry = (values.stanceparry_active == 1) ? parseInt(values.stanceparry,10)||0 : 0;	
-            let otherparry = (values.otherparry_active == 1) ? parseInt(values.otherparry,10)||0 : 0;
+            let parry = (values.parry_active == 1) ? int(values.parry) : 0;
+            let shieldparry = (values.shieldparry_active == 1) ? int(values.shieldparry) : 0;	
+            let stanceparry = (values.stanceparry_active == 1) ? int(values.stanceparry) : 0;	
+            let otherparry = (values.otherparry_active == 1) ? int(values.otherparry) : 0;
             let parrytotal = parry + shieldparry + stanceparry + otherparry;
             setAttrs({
                 totalparry: parrytotal,
@@ -1597,7 +1597,7 @@
     ====================*/
     on("sheet:opened", function() {
         getAttrs(["build", "version", "sheettab"], function(v) {
-            const build = parseInt(v.build) || 0;
+            const build = int(v.build);
             var attrs = {};
             console.log("Current version: " + v.version);
             // get attribute updates for each version until the sheet has completed all steps
@@ -1608,7 +1608,7 @@
                 attrs["build"] = 1;
                 if (v.sheettab === "isPC"){
                     getAttrs(["treaure"], function(values){
-                        let treaure = parseInt(values.treaure) || 0;
+                        let treaure = int(values.treaure);
                         attrs["treasure"] = treaure;
                     });
                 }
