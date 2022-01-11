@@ -6764,6 +6764,426 @@ pri3['Polymorph Plant'] = {
 };
 //#endregion
 
+//#region The Complete Druid's Handbook
+pri1['Beastmask'] = {
+    'level': '1',
+    'school': 'Illusion/Phantasm',
+    'sphere': 'Animal',
+    'range': 'Touch',
+    'duration': '12 hours',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'Negate',
+    'materials': 'A miniature wooden mask carved to look like the animal.',
+    'reference': 'p. 91',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Beastmask* may affect any single person or animal, or characters may cast it on themselves. It allows the subject to take on the illusory form of a single animal species--but only that species of animal can perceive the illusion. The subject may not assume an animal form more than twice or less than one-quarter the character’s size.\n&emsp;The almost perfect illusion the spell creates deceives the animal’s sight, hearing, smell, and touch. For instance, once a character casts a “bear” illusion on a subject, bears believe that subject to be a bear, while to humans, other races, and other creatures, the subject remains the same.\n&emsp;Characters normally use *beastmask* to travel among or hunt a particular species. This spell lets a druid assume the guise of a caribou to move among a herd without causing them to panic. A character also could avoid being attacked by a pack of dire wolves by wearing a wolf’s “mask.”\n&emsp;*Beastmask* does not allow communication with the animal species, though it can be used with animal communication spells.'
+};
+
+pri1['Puffball'] = {
+    'level': '1',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': 'Touch',
+    'duration': '[[2*[[@{level-priest}]] ]] rounds',
+    'aoe': '1 mushroom, etc.',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'Special',
+    'materials': 'A pinch of ground puffball, sprinkled over the fungus to be enchanted.',
+    'reference': 'p. 87',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A character who casts *puffball* on a normal mushroom, truffle, or toadstool (up to 6 inches in diameter) transforms the fungus into a magical *puffball*, which the character may drop or throw. The DM should decide what type of roll, if any, is required to hit the target (Strength, Dexterity, etc.) See the *DMG*, pgs. 62-63, for rules on grenadelike missiles.\n&emsp;The *puffball* bursts upon landing, releasing a cloud of spores 10 feet in diameter. Those caught in the spore cloud must save vs. poison or suffer an attack of coughing and choking. Victims can make no attacks and lose all Dexterity bonuses to Armor Class and saving throws. The cloud dissipates in [[1d3+1]] rounds; residual effects still afflict characters one round after they escape the cloud or it fades.\n&emsp;The spell’s effects do not affect undead or similar nonbreathing creatures. If no one throws (or drops) the missile by the time its duration expires, the enchantment is lost.'
+};
+
+pri1['Whisperward'] = {
+    'level': '1',
+    'school': 'Alteration',
+    'sphere': 'Guardian, Weather',
+    'range': 'Touch',
+    'duration': 'Permanent until triggered',
+    'aoe': '1 item',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol.',
+    'reference': 'p. 87',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Whisperward* can be cast on any single item, portal, or closure (such as a book, door, or lid). It may ward up to a 30-foot radius.\n&emsp;The character keys the ward to become activated (like a *magic mouth* spell) under specific conditions--such as when a certain individual enters the area or opens the warded closure. When the ward is triggered, a soft whispering breeze blows across the caster’s face. The caster must stay within 1 mile per experience level of the ward to receive the warning. Currently [[@{level-priest}]] mile(s).'
+};
+
+pri2['Animal Spy'] = {
+    'level': '2',
+    'school': 'Divination',
+    'sphere': 'Animal',
+    'range': '10 yards',
+    'duration': '[[floor([[@{level-priest}]]/2)]] turn(s)',
+    'aoe': '1 animal',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 87',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Only a normal (real-world) animal or a giant version of a normal animal species may become an animal spy. This spell enables the caster to share the animal’s senses--see through the animal’s eyes, hear with its ears, smell with its nose, and so on. The animal is completely unaware of the spell’s effect, unless the druid warns the beast before casting. *Animal spy* grants no control over the creature. However, most casters will use it on a trained animal or one befriended via the *animal friendship* spell.\n&emsp;For the duration of the spell, the caster remains in a trance, unable to move or use human senses. This consequence can prove dangerous; for instance, characters attacked while using the spell cannot feel injuries to their bodies. However, at the start of any round, the caster may choose to return the animal’s senses to the creature and resume control of the human body. This decision ends the spell immediately. The spell also ends if the animal travels more than 100 yards away per level of the caster. Currently [[100*[[@{level-priest}]] ]] yards.'
+};
+
+pri2['Beastspite'] = {
+    'level': '2',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Animal',
+    'range': '10 yards',
+    'duration': '[[@{level-priest}]] hours',
+    'aoe': '1 person',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 88',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Beastspite* afflicts a single person with a magical aura that induces one species of animal to hate and fear the character. The character becomes loathed by any species of normal (real-world) animal. While this range excludes monsters, it includes giant animals of the same real-world species. (For example, if *beastspite* causes bats to hate the subject, giant bats will react similarly.)\n&emsp;When the character comes within 30 yards of an animal from the target species, the creature will make warning signals (barks, growls, etc.). Its further reaction depends on the animal’s nature.\n&emsp;• Aggressive animals, including all predators and most trained guard animals, attack the spell recipient.\n&emsp;• Nonaggressive beasts shun the character, fleeing or attacking if approached.\n&emsp;• Owners can restrain their domesticated animals, but the beasts show obvious distress and may become very hostile if the character tries to touch them.\n&emsp;• If the subject was riding when the spell took effect, the mount tries to throw off the character. The subject must make a riding proficiency check each round to stay astride and to avoid a fall if thrown off.\n&emsp;• An animal extremely loyal to the subject, such as a pet dog, a creature influenced by an *animal friendship* spell, a wizard’s familiar, or a paladin’s war horse does not become utterly hostile to its owner. Instead it notices something “wrong” about the character and acts unusually nervous.'
+};
+
+pri2['Fortifying Stew'] = {
+    'level': '2',
+    'school': 'Necromancy',
+    'sphere': 'Healing',
+    'range': 'Touch',
+    'duration': 'Stew retains enchantment 1 turn',
+    'aoe': '[[@{level-priest}]] bowls of stew, etc.',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A vial of stock made of the first fruit of the harvest.',
+    'reference': 'p. 88',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Any bowl of broth, porridge, or stew the priest has concocted can become subject to *fortifying stew*. A character can enchant one bowl of stew (about 8 ounces) per experience level. Someone must consume the enchanted meal within one turn of the casting.\n&emsp;Anyone partaking of an entire bowlful reaps magical benefits. First, the diner gains nourishment for an entire day from the single meal. In addition, for two hours plus one round per the caster’s level, the character receives [[1d4+1]] temporary hit points. Currently 2 hours and [[@{level-priest}]] rounds. Any damage suffered comes off the extra hit points first. The effects of multiple helpings of *fortifying stew* are not cumulative.\n&emsp;For example, Snapdragon, a 7th-level druid, cooks a meaty broth, casts *fortifying stew* on it, and eats the bowlful. A roll of 2 gives her 3 extra hit points. When the spell’s effects wear off just over three hours, she loses these extra points. If she suffers 5 points of damage in the meantime, she actually loses only 2 hp of her own, since 3 hp came off the extra hit points.'
+};
+
+pri2['Gift of Speech'] = {
+    'level': '2',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Animal',
+    'range': '[[10*[[@{level-priest}]] ]] yards',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': '1 animal',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol.',
+    'reference': 'p. 90',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *gift of speech* spell grants a normal animal (or a giant version of a normal animal) the ability to speak any *one* of the languages the caster knows, whichever the caster chooses, along with the ability to understand words and simple concepts expressed in that language. The affected animal’s reactions do not change, nor does its Intelligence increase. The spell has no effect if cast on a creature with an Intelligence score of less than 1.'
+};
+
+pri3['Pass Without Trace, 10\' Radius'] = {
+    'level': '3',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Plant',
+    'range': '0',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': 'Radius 10 feet around caster',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A sprig of pine burned to ash. Upon casting the spell, the character scatters the powder in a circle.',
+    'reference': 'p. 90',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Identical in function to *pass without trace*, *pass without trace, 10’ radius* affects everyone within 10 feet of the caster. The effect moves with the caster, so creatures must stay within 10 feet of the caster to continue to avoid leaving tracks. A creature who leaves the area of effect can then be tracked normally. Creatures moving into the area of effect after casting are unaffected.'
+};
+
+pri3['Shape Wood'] = {
+    'level': '3',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '9 cubic feet+[[@{level-priest}]] cubic foots',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A pinch of fine sawdust, which is blown over the wooden subject of the spell.',
+    'reference': 'p. 90',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of *shape wood*, the caster can reform wood. For example, the character can cast it upon any appropriate-sized piece of wood to fashion a wooden weapon, make a rough door, or even create a crude figurine.\n&emsp;The spell also allows the caster to reshape an existing wooden door, perhaps to escape imprisonment. Again, the volume of the wooden object must be appropriate to the desired result and fit in the area of effect.\n&emsp;While a character might form a wooden coffer from a tree stump or a door from a wooden wall, the result does not bear high-quality detail. If a shaping has moving parts, there is a 30% chance they do not work.\n&emsp;The alteration endures permanently, at least until the wood rots or is physically destroyed.'
+};
+
+pri4['Detect Animal Attacker'] = {
+    'level': '4',
+    'school': 'Divination',
+    'sphere': 'Animal',
+    'range': 'Touch',
+    'duration': 'Instantaneous',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol.',
+    'reference': 'p. 90',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Depending on how it is cast, *detect animal attacker* gives the druid a visual image either of a creature that injured an animal or of an animal that attacked any victim.\n&emsp;While casting the spell upon any victim of an attack by a natural animal (a victim whose body still bears the marks of claws, fangs, or other natural weapons), the druid touches the victim’s wound. This brief touch gives the caster a fleeting vision of the animal that caused the injuries as it looked at the time of the attack.\n&emsp;Likewise, a druid casting the spell upon an injured real-world animal can touch its wound and receive a vision of the person, monster, or animal that harmed it.\n&emsp;Even if the caster receives a vision of an unfamiliar attacker, the character usually can get an idea of its size, primary attack method, and alignment. (The druid senses good, evil, or neutrality.)\n&emsp;In addition, if the creature still lives and fails a saving throw vs. spell, the caster senses its current position, location, and direction of travel.\n&emsp;*Detect animal attacker* works only within one hour per level of the caster after the victim receives the injury in question. Currently [[@{level-priest}]] hours. The spell is effective regardless of whether the attack proved fatal.'
+};
+
+pri4['Earthmaw'] = {
+    'level': '4',
+    'school': 'Alteration',
+    'sphere': 'Elemental (earth)',
+    'range': '50 yards',
+    'duration': '1 round',
+    'aoe': '10-foot diameter circle',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'Negate',
+    'materials': 'A tooth from any predatory creature.',
+    'reference': 'p. 91',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '[[@{level-priest}]]d4',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Earthmaw* causes a patch of ground 10 feet in diameter to open and form a gigantic mouth with stalactite teeth. The mouth springs forth on a short serpentine neck, much like a water weird, and attacks once in a direction the caster dictates. Then it retracts into the earth and closes solidly. The site of an *earthmaw* spell appears as if the ground has been tilled recently.\n&emsp;The mouth can attack one large creature, two man-sized creatures, or four small-sized creatures within 10 feet of its outer edge. It can strike multiple creatures only if they remain clustered within a 10-foot diameter circle adjacent to the maw.\n&emsp;The earthmaw attacks as a monster with Hit Dice equal to the caster’s level. Creatures standing on the site of the maw suffer a +3 penalty to Armor Class for purposes of this attack only. Creatures standing next to the maw suffer no AC penalty.\n&emsp;A successful hit inflicts 1d4 points of damage per level of the caster. An *unmodified* roll of 19 or 20 means the maw has swallowed the victim whole, burying the character 2d4 feet below ground. Victims can be dug out manually, with appropriate spells (such as *dig*), or with magical items (such as a *spade of colossal excavation*). A creature trapped underground will suffocate unless freed within a number of rounds equal to one-third its Constitution score.\n&emsp;*Earthmaw* may be cast on any area of loose or packed earth, sand, or vegetation-covered soil. It may be cast indoors on an earthen surface: for example, on the dirt floor of a barn or basement, but not on the marble floor of a home or temple. It may not be cast on an area containing a tree, any portion of a building, or any type of pavement.\n&emsp;An object present on the site of the maw (such as a campfire or a tent, etc.) counts as a creature of that object’s size in attacks.'
+};
+
+pri4['Hunger'] = {
+    'level': '4',
+    'school': 'Alteration',
+    'sphere': 'Animal, Plant',
+    'range': '10 yards',
+    'duration': '[[@{level-priest}]] days',
+    'aoe': '1 person',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'Negate',
+    'materials': 'A pinch of the food that can end the spell.',
+    'reference': 'p. 92',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Those affected by *hunger* no longer gain sustenance from food. No matter how much they eat, they still feel hungry. If the spell did not end, victims eventually would starve, visibly wasting away.\n&emsp;After one day under the spell’s effect, victims’ concentration suffers (due to their preoccupation with their constant hungry feeling), causing them to suffer a -2 penalty to all ability and proficiency checks. On the eighth day without food, victims who have been maintaining normal activity levels lose 1 Strength point; on the ninth day, they lose 1 Constitution point. This alternating pattern continues until one of the character’s ability scores falls to 3; at this point, the character becomes comatose. If a score reaches 0 before the *hunger* spell ends, the recipient dies. The victim regains lost points after the spell ends at a rate of 1 Strength and 1 Constitution point per day.\n&emsp;When casting the spell, the character secretly whispers a particular type of food; by eating the specified food, the victim breaks the spell. It must be a single, natural food (such as lamb, honey, or an apple) but can be exotic (dragon meat) as long as the caster has tasted it personally at some point.\n&emsp;*Hunger* cannot be dispelled, but can be broken by the *remove curse* spell. Failing all else, a sufferer must wait to find relief until the spell’s duration elapses.'
+};
+
+pri4['Knurl'] = {
+    'level': '4',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': '[[5*[[@{level-priest}]] ]] yards',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': '1 person',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'Negate',
+    'materials': 'A small twig.',
+    'reference': 'p. 93',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Casting a *knurl* spell transforms a creature’s arm into a tree branch of the same thickness, covered with bark and twigs. The new limb possesses neither elbow nor wrist joints not even a hand. The “arm” remains attached to the shoulder. The spell’s recipient can use it as a club but not to manipulate tools, weapons, or spell components.\n&emsp;The caster chooses which of the recipient’s arms to affect. A character could use multiple *knurl* spells to transform both arms of a humanoid. The arm is treated for all purposes as a tree branch: It becomes subject to fire, wood-altering spells, and tree diseases. *Dispel magic* ends the spell’s effects.'
+};
+
+pri4['Needlestorm'] = {
+    'level': '4',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': '60 yards',
+    'duration': 'Instantaneous',
+    'aoe': '1 tree or plant',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'Save vs. spell for half damage',
+    'materials': 'A spine from a needle-bearing tree or plant.',
+    'reference': 'p. 93',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '[[floor([[@{level-priest}]]/3)]]d12',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A favorite of cold-forest and desert druids, *needlestorm* causes the spines on any pine tree or similar needle-bearing plant to spray out in a deadly barrage. The shower of needles has a radius of approximately 1 foot for every 2 feet of the subject plant’s height.\n&emsp;Everyone within this area suffers one attack, which inflicts 1d12 points of damage for every three full levels the caster has achieved. Thus, a spruce tree enchanted by a 7th-level character attacks with a THAC0 of 16 and inflicts 2d12 points of damage.'
+};
+
+pri5['Cloudscape'] = {
+    'level': '5',
+    'school': 'Alteration',
+    'sphere': 'Weather',
+    'range': '120 yards',
+    'duration': '[[3*[[@{level-priest}]] ]] turns',
+    'aoe': '[[1000*[[@{level-priest}]] ]] cubic feet',
+    'components': 'V, S',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 93',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A character can cast *cloudscape* on a single cloud or part of a cloud bank, usually from a nearby mountaintop or while flying. It causes 1,000 cubic feet of cloud per level of the caster to become solid enough to support any weight. The solidified clouds remain airborne and feel like a thick carpet.\n&emsp;A creature that falls onto the magically strengthened cloud sustains falling damage per the *PH*, p. 139. An animal or individual that flies into the solidified cloud falls, stunned, for a round and must make a successful Dexterity check to recover. If a creature is flying through a cloud at the moment it becomes solidified, it may make a saving throw vs. petrification. Those who succeed escape the cloud in time. Creatures that fail the save become trapped as the cloud solidifies around them. However, as the cloud is porous, they can continue to breathe until the spell’s duration elapses.\n&emsp;The solidified cloud itself continues to drift with the wind as usual. While the caster cannot use this particular spell to propel the cloud at all, a *control winds* spell can summon a great gust of air to turn the *cloudscape* into a unique flying conveyance easily enough.'
+};
+
+pri5['Nature\'s Charm'] = {
+    'level': '5',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Elemental (earth, water)',
+    'range': 'Touch',
+    'duration': '[[2*[[@{level-priest}]] ]] hours',
+    'aoe': '[[15*[[@{level-priest}]] ]]-foot radius',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Creatures native to the area of effect are not affected.',
+    'materials': 'The druid’s holy symbol.',
+    'reference': 'p. 94',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Nature’s charm* causes a particular place to exert a special fascination beyond mere beauty to anyone entering the area except the spellcaster.\n&emsp;This spell must target a site of notable natural splendor that possesses both edible plants and fresh water. The spot may not be larger than the spell’s area of effect. For instance, a 12th-level druid could cast this spell on a forest glade up to 360 feet across, with flowers and fruit-bearing trees centered around a waterfall.\n&emsp;Anyone coming upon the enchanted region must save vs. spell; those who fail invariably make up excuses to remain there long after they should have left. They say they want only to bathe, rest, admire the beauty a bit longer, eat the berries or fruit, paint a picture of the area, or defend the spot jealously from others.\n&emsp;Whatever the reason, those who fall victim to the enchantment forcefully resist all attempts to make them leave until the spell’s duration ends.'
+};
+
+pri5['Strengthen Stone'] = {
+    'level': '5',
+    'school': 'Alteration',
+    'sphere': 'Elemental (earth)',
+    'range': '10 yards',
+    'duration': 'Permanent',
+    'aoe': '1 building or wall',
+    'components': 'V, S, M',
+    'cast-time': '1 hour',
+    'saving-throw': 'None',
+    'materials': 'A diamond chip worth at least 500 gp, must be crushed and sprinkled on the construction.',
+    'reference': 'p. 94',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Strengthen stone* can reinforce any stone construction (house, tower, wall segment, aqueduct, etc.), against physical damage. The DM adds +4 to the structure’s saving throw against any kind of damage, from siege engines to natural earthquakes. The stone object gains a saving throw vs. the *earthquake* spell. (See the PH, p. 295.) The spell may be cast only once on any stone object.\n&emsp;If a character casts this spell on a stone golem or other animated stone being (like one created by *animate rock*), the creature receives a -1 bonus to its Armor Class and adds a +1 bonus to its saving throws for the duration of the spell. *Strengthen stone* has no effect on earth elementals or galeb duhr.'
+};
+
+pri5['Thornwrack'] = {
+    'level': '5',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] thorns',
+    'aoe': '1 person',
+    'components': 'V, S',
+    'cast-time': '8',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 94',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '[[1d3]] ✕ [[@{level-priest}]]',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Thornwrack* causes long, painful thorns to grow out of the spell recipient’s flesh, piercing the skin from the inside. One thorn appears each round, inflicting 1d3 points of damage, until all the thorns have appeared. When the number of thorns exceeds the subject’s experience level or HD, a victim still conscious becomes immobilized by the pain, unable to take any action.\n&emsp;One round after the last thorn erupts from the victim’s flesh, the first one disappears. The thorns continue receding at a rate of one per turn. Immobilized subjects can move again once the number of thorns falls below their HD or experience level. For instance, say the body of a 4th-level character has seven thorns. After four turns had passed, only three thorns would remain, so the victim would no longer be immobile.\n&emsp;*Cure* spells can restore hit points but do not eliminate the thorns. *Dispel magic* will end the spell but prevents existing thorns from receding. A *heal* spell cancels the *thornwrack*, eliminates all existing thorns, and cures all damage. Without the benefit of magical remedies, the spell ends when the last thorn has receded.'
+};
+
+pri6['Earthwrack'] = {
+    'level': '6',
+    'school': 'Alteration',
+    'sphere': 'Necromantic, Plant',
+    'range': '[[20*[[@{level-priest}]] ]] yards',
+    'duration': '[[2d4+10]] years',
+    'aoe': '[[30*[[@{level-priest}]] ]]-foot radius',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol.',
+    'reference': 'p. 95',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '1d4/round to plant-based creatures',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell causes an area of soil to become barren and blighted. Healthy plants wither and die within [[1d4]] days of casting. No seed planted there will grow for the duration of the spell. Plant-based creatures entering the despoiled area can see the ruin and feel an intense “wrongness” within the soil. Each round they remain within the area, they suffer 1d4 points of damage.\n&emsp;The blight can be cured using a *limited wish*, a *wish*, or by casting a *remove curse* spell (at the 12th level of experience) and a *plant growth* spell simultaneously.\n&emsp;Most druids consider *earthwrack* an abomination, although some Shadow Circle druids use it as last-ditch “scorched earth” vengeance against an unruly hamlet.'
+};
+
+pri6['Ivy Siege'] = {
+    'level': '6',
+    'school': 'Enchantment',
+    'sphere': 'Plant',
+    'range': '90 yards',
+    'duration': '6 turns',
+    'aoe': '1 building or similar structure',
+    'components': 'V, S, M',
+    'cast-time': '9',
+    'saving-throw': 'Special',
+    'materials': 'An ivy leaf.',
+    'reference': 'p. 95',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *ivy siege* spell must be cast upon a stone or brick building constructed upon the earth; flying castles and the like remain unaffected. Immediately after casting, ivy begins to grow at a fantastic rate, climbing from the ground up the building’s walls. At the end of one turn, the ivy has climbed the walls. At the end of the second turn, green creepers have covered the structure. On the third turn, the ivy has deepened to a black-green and begins to squeeze the building.\n&emsp;Starting on the third turn and every turn thereafter, the building must make a saving throw vs. siege damage, as if attacked by a small catapult (*DMG*, p. 105). Two cubic feet of the building crumbles away for each point by which the saving throw misses each turn. This cycle continues until the spell’s duration expires or the building is destroyed. The ivy rots away instantly at the spell’s end.\n&emsp;A druid can cast only one *ivy siege* per building at a time. After the ivy has rotted away, the druid may cast the spell on the same building again. However, multiple druids can cast several *ivy siege* spells on the same building. In the case of a large, interconnected series of buildings (like a castle), each casting affects only a single tower, keep, or wall segment, to a maximum of 1,000 cubic feet per level of the caster. Currently [[1000*[[@{level-priest}]] ]] cubic feet.\n&emsp;The DM may choose to prohibit arctic and desert druids from using this spell if they are not familiar with ivy.'
+};
+
+pri7['Tree Spirit'] = {
+    'level': '7',
+    'school': 'Necromancy',
+    'sphere': 'Plant',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 tree',
+    'components': 'V, S',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 96',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Tree spirit* permanently links the soul of the caster with a tree, usually chosen carefully for its health, vigor, and remote environment. Casting this spell joins the life force of the druid with that of the tree; as long as the tree lives, the caster ages at one-tenth the normal rate. (Because the spell causes the tree to devote all its energy to maintaining health rather than growth, it always remains exactly the size it was at the time of casting.) Moreover, the caster’s spirit merges with the tree at the character’s death. No form of reincarnation or resurrection (except a *wish*) on the character’s body will work unless it lies within 10 feet of the tree.\n&emsp;One year after the caster dies, the druid’s spirit animates the tree as a treant. (DMs should roll up treant statistics for the tree at the time the spell is cast, to determine the tree’s Armor Class, Hit Dice, etc.) The chosen tree must be of treant height; the exact size determines the size of the new treant, which possesses the caster’s memories and personality but has no granted powers or spellcasting ability. It must communicate as a treant.\n&emsp;The DM decides whether to consider this treant an NPC or allow the player to control it. (DMs should use the guidelines that apply to PCs who become lycanthropes or undead.)\n&emsp;However, when a druid uses *tree spirit* to link with a tree, the character suffers any physical damage inflicted on the tree. For instance, if someone hacks at the tree with an axe and causes 4 points of damage, the caster also loses 4 hit points; the druid knows the tree has been harmed, but does not know the nature of the injury.\n&emsp;If the tree dies but does not sustain enough damage to kill the caster, the character feels stunned for 1d6 rounds and must make a successful system shock roll to avoid death. Spells that heal the druid do not affect the tree.\n&emsp;Damage to the caster does not affect the tree, as the extra energy the tree expends on strength and health makes any damage the player sustains negligible to the tree. However, it’s usually in the druid’s best interest to have an animal friend or two guard the tree.\n&emsp;In addition, the druid should choose the tree carefully; if the surrounding land is cleared for construction work or lumber before the druid’s prolonged life span finally ends, the character is in trouble.\n&emsp;Casting *tree spirit* first requires a full month’s preparation. The druid lives near the tree during this time of prayer and mediation. Then the character conducts a private bonding ceremony at the height of a solstice. This spell often is cast by ancient druids, who wish to preserve their wisdom or make sure their groves remain defended even after their death.'
+};
+
+pri7['Unwilling Wood'] = {
+    'level': '7',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Plant',
+    'range': '[[5*[[@{level-priest}]] ]] yards',
+    'duration': 'Permanent',
+    'aoe': '10-yard radius',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': 'A bit of tree root and the priest’s holy symbol.',
+    'reference': 'p. 97',
+    'book': 'The Complete Druid\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A caster can transform one or more living creatures within a 10-yard radius into *unwilling wood*, causing them to sprout roots, branches, and leaves. The victims become trees of a type native to the region and of the characters’ age before the transformation. The spell works only if cast on beings occupying ground that could support a tree; recipients flying or suspended in water at the time of casting remain unaffected.\n&emsp;This spell can mutate a number of creatures equal in total Hit Dice (or levels) to the caster’s level—within the area of effect, of course. Currently [[@{level-priest}]] Hit Dice or levels. If this area holds a group of creatures with Hit Dice (or levels) totaling a number greater than the caster’s experience level, the character may decide the order in which the creatures become affected.\n&emsp;For instance, say a 14th-level druid casts *unwilling wood* into a target area containing a giant with 12 Hit Dice and two 3rd-level warriors. The druid can transform either the giant or two warriors, but not all three. “Leftover” Hit Dice or levels are lost.\n&emsp;Each creature affected may attempt to save vs. polymorph. The spell mutates all those failing their saving throw, along with any items they carry. A new tree has a height of 5 feet per level (or Hit Die) of the victim. The effect is permanent; a person transformed into a tree ages as a tree and dies as a tree. However, affected characters retain awareness, memories, personality, and intelligence. Only damage severe enough to kill the tree can kill an *unwilling wood* victim.\n&emsp;Tree-characters can return to normal if a spellcaster of greater level than the original caster uses *remove curse*. The original caster can release a transformed entity at will.'
+};
+//#endregion
+
 const priestSpells = {};
 priestSpells['pri1'] = pri1;
 priestSpells['pri2'] = pri2;
