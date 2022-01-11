@@ -1083,7 +1083,6 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
         .reduce(function(m,r){
             m.crl+=(r.I.crl);
             return m;
-
         },{crl:0},function(m,r,a){
             a.newskill=m.crl;
         })
