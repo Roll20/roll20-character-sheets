@@ -11,7 +11,7 @@ const BOOK_FIELDS = [
     'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
     'book-tom', 'book-aaeg',
     'book-tcbod', 'book-tcbhb', 'book-tcboe', 'book-tcboh', 'book-tcrhb',
-    'book-tcpahb'
+    'book-tcpahb', 'book-tcdhb'
 ];
 
 //#region Helper function
