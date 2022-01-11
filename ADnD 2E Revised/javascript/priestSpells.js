@@ -6958,7 +6958,7 @@ pri4['Detect Animal Attacker'] = {
 pri4['Earthmaw'] = {
     'level': '4',
     'school': 'Alteration',
-    'sphere': 'Elemental (earth)',
+    'sphere': 'Elemental (Earth)',
     'range': '50 yards',
     'duration': '1 round',
     'aoe': '10-foot diameter circle',
@@ -7053,7 +7053,7 @@ pri5['Cloudscape'] = {
 pri5['Nature\'s Charm'] = {
     'level': '5',
     'school': 'Enchantment/Charm',
-    'sphere': 'Elemental (earth, water)',
+    'sphere': 'Elemental (Earth, Water)',
     'range': 'Touch',
     'duration': '[[2*[[@{level-priest}]] ]] hours',
     'aoe': '[[15*[[@{level-priest}]] ]]-foot radius',
@@ -7072,7 +7072,7 @@ pri5['Nature\'s Charm'] = {
 pri5['Strengthen Stone'] = {
     'level': '5',
     'school': 'Alteration',
-    'sphere': 'Elemental (earth)',
+    'sphere': 'Elemental (Earth)',
     'range': '10 yards',
     'duration': 'Permanent',
     'aoe': '1 building or wall',

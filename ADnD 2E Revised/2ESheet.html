@@ -16,6 +16,7 @@
                     </ul>
                 </li>
                 <li>Added Initiative button for Turn Undead</li>
+                <li>Added all priest Spheres to sphere datalists</li>
                 <li>Added Silenced Elven chain mail to Thief Armor information and rogue skills autofill</li>
                 <li>Added Weapon Styles, Ambidexterity, Tight / Broad weapon groups, Punching, Wrestling, and Martial Arts proficiencies from The Complete Fighter's Handbook</li>
                 <li>Added Shield-Punch, Shield-Rush, Punch, Wrestle, and Martial Arts as weapons/attacks</li>
@@ -18335,6 +18336,30 @@
     <option value="">Ranger</option>
     <option value="All, Astral, Charm, Combat, Creation, Divination, Guardian, Healing, Necromantic, Protection, Summoning, Sun">Cleric</option>
     <option value="All, Animal, Elemental (Earth, Air, Fire, Water), Healing, Plant, Weather">Druid</option>
+    <option value="All"></option>
+    <option value="Animal"></option>
+    <option value="Astral"></option>
+    <option value="Charm"></option>
+    <option value="Combat"></option>
+    <option value="Creation"></option>
+    <option value="Divination"></option>
+    <option value="Elemental (Earth, Air, Fire, Water)"></option>
+    <option value="Guardian"></option>
+    <option value="Healing"></option>
+    <option value="Necromantic"></option>
+    <option value="Plant"></option>
+    <option value="Protection"></option>
+    <option value="Summoning"></option>
+    <option value="Sun"></option>
+    <option value="Weather"></option>
+    <option value="Chaos">Tome of Magic</option>
+    <option value="Law">Tome of Magic</option>
+    <option value="Numbers">Tome of Magic</option>
+    <option value="Thought">Tome of Magic</option>
+    <option value="Time">Tome of Magic</option>
+    <option value="Travelers">Tome of Magic</option>
+    <option value="War">Tome of Magic</option>
+    <option value="Wards">Tome of Magic</option>
 </datalist>
 
 <datalist id="sphere-minor">
@@ -18342,6 +18367,30 @@
     <option value="Animal, Plant">Ranger</option>
     <option value="Elemental (Earth, Air, Fire, Water)">Cleric</option>
     <option value="Divination">Druid</option>
+    <option value="All"></option>
+    <option value="Animal"></option>
+    <option value="Astral"></option>
+    <option value="Charm"></option>
+    <option value="Combat"></option>
+    <option value="Creation"></option>
+    <option value="Divination"></option>
+    <option value="Elemental (Earth, Air, Fire, Water)"></option>
+    <option value="Guardian"></option>
+    <option value="Healing"></option>
+    <option value="Necromantic"></option>
+    <option value="Plant"></option>
+    <option value="Protection"></option>
+    <option value="Summoning"></option>
+    <option value="Sun"></option>
+    <option value="Weather"></option>
+    <option value="Chaos">Tome of Magic</option>
+    <option value="Law">Tome of Magic</option>
+    <option value="Numbers">Tome of Magic</option>
+    <option value="Thought">Tome of Magic</option>
+    <option value="Time">Tome of Magic</option>
+    <option value="Travelers">Tome of Magic</option>
+    <option value="War">Tome of Magic</option>
+    <option value="Wards">Tome of Magic</option>
 </datalist>
 
 <!-- Monster sheet datalists -->
@@ -40539,7 +40588,7 @@ pri4['Detect Animal Attacker'] = {
 pri4['Earthmaw'] = {
     'level': '4',
     'school': 'Alteration',
-    'sphere': 'Elemental (earth)',
+    'sphere': 'Elemental (Earth)',
     'range': '50 yards',
     'duration': '1 round',
     'aoe': '10-foot diameter circle',
@@ -40634,7 +40683,7 @@ pri5['Cloudscape'] = {
 pri5['Nature\'s Charm'] = {
     'level': '5',
     'school': 'Enchantment/Charm',
-    'sphere': 'Elemental (earth, water)',
+    'sphere': 'Elemental (Earth, Water)',
     'range': 'Touch',
     'duration': '[[2*[[@{level-priest}]] ]] hours',
     'aoe': '[[15*[[@{level-priest}]] ]]-foot radius',
@@ -40653,7 +40702,7 @@ pri5['Nature\'s Charm'] = {
 pri5['Strengthen Stone'] = {
     'level': '5',
     'school': 'Alteration',
-    'sphere': 'Elemental (earth)',
+    'sphere': 'Elemental (Earth)',
     'range': '10 yards',
     'duration': 'Permanent',
     'aoe': '1 building or wall',
@@ -40803,6 +40852,11 @@ const BOOK_FIELDS = [
 ];
 
 //#region Helper function
+const conditionalLog = function (bool, msg) {
+    if (b)
+        console.log(msg);
+}
+
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
     let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
     finishRoll(queryRoll.rollId);
@@ -41478,15 +41532,17 @@ function setupCalculateRemaining(totalField, sumField, remainingField) {
 //#endregion
 
 //#region Priest Spells based on Spheres
+const ELEMENTAL = 'Elemental';
 const PRIEST_SPHERES = [
     // Player's Handbook
-    'All','Animal','Astral','Charm','Combat','Creation','Divination','Elemental','Guardian','Healing',
+    'All','Animal','Astral','Charm','Combat','Creation','Divination',ELEMENTAL,'Guardian','Healing',
     'Necromantic','Plant','Protection','Summoning','Sun','Weather',
     // Tome of Magic Spheres
     'Chaos','Law','Numbers','Thought','Time','Travelers','War','Wards'
 ];
-const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi')
-const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== 'Elemental').join('|'), 'gi');
+
+const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
+const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
 const elementalRegex = /Earth|Air|Fire|Water/gi
 function capitalizeFirst(s) {
     if (typeof s !== 'string')
@@ -41509,21 +41565,18 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
     if (isBookInactive(activeBooks, spell))
         return false;
 
-    let primarySpellSpheres = spell['sphere'].match(noElementalRegex);
-    if (!primarySpellSpheres)
-        return false;
-    
+    let primarySpellSpheres = spell['sphere'].match(noElementalRegex) || [];
     let isAvailable = primarySpellSpheres.some((sphere) => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
 
-    if (!availableSpheres.has('Elemental'))
+    if (!availableSpheres.has(ELEMENTAL))
         return false;
 
-    if (!spell['sphere'].includes('Elemental'))
+    if (!spell['sphere'].includes(ELEMENTAL))
         return false;
 
-    if (spell['sphere'].includes('Elemental ('))
+    if (spell['sphere'].includes(`${ELEMENTAL} (`))
         return spell['sphere'].match(elementalRegex).some((element) => elementalSpheres.has(element))
 
     // The player and the spell has the elemental sphere (without any sub elements)

@@ -15,6 +15,11 @@ const BOOK_FIELDS = [
 ];
 
 //#region Helper function
+const conditionalLog = function (bool, msg) {
+    if (b)
+        console.log(msg);
+}
+
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
     let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
     finishRoll(queryRoll.rollId);
@@ -690,15 +695,17 @@ function setupCalculateRemaining(totalField, sumField, remainingField) {
 //#endregion
 
 //#region Priest Spells based on Spheres
+const ELEMENTAL = 'Elemental';
 const PRIEST_SPHERES = [
     // Player's Handbook
-    'All','Animal','Astral','Charm','Combat','Creation','Divination','Elemental','Guardian','Healing',
+    'All','Animal','Astral','Charm','Combat','Creation','Divination',ELEMENTAL,'Guardian','Healing',
     'Necromantic','Plant','Protection','Summoning','Sun','Weather',
     // Tome of Magic Spheres
     'Chaos','Law','Numbers','Thought','Time','Travelers','War','Wards'
 ];
-const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi')
-const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== 'Elemental').join('|'), 'gi');
+
+const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
+const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
 const elementalRegex = /Earth|Air|Fire|Water/gi
 function capitalizeFirst(s) {
     if (typeof s !== 'string')
@@ -721,21 +728,18 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
     if (isBookInactive(activeBooks, spell))
         return false;
 
-    let primarySpellSpheres = spell['sphere'].match(noElementalRegex);
-    if (!primarySpellSpheres)
-        return false;
-    
+    let primarySpellSpheres = spell['sphere'].match(noElementalRegex) || [];
     let isAvailable = primarySpellSpheres.some((sphere) => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
 
-    if (!availableSpheres.has('Elemental'))
+    if (!availableSpheres.has(ELEMENTAL))
         return false;
 
-    if (!spell['sphere'].includes('Elemental'))
+    if (!spell['sphere'].includes(ELEMENTAL))
         return false;
 
-    if (spell['sphere'].includes('Elemental ('))
+    if (spell['sphere'].includes(`${ELEMENTAL} (`))
         return spell['sphere'].match(elementalRegex).some((element) => elementalSpheres.has(element))
 
     // The player and the spell has the elemental sphere (without any sub elements)
