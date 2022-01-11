@@ -3580,8 +3580,8 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, hasArmu
       exec.push(`{{style=${i18n_style} ${i18n_suppression}}}`);
 
       if (isLourd) {
-        const suppressionD = Math.floor(Number(value.styleSuppressionD) / 2);
-        const suppressionV = Math.floor(Number(value.styleSuppressionV) / 2);
+        const suppressionD = Number(value.styleSuppressionD);
+        const suppressionV = Number(value.styleSuppressionV);
 
         if (suppressionD !== 0) {
           dDegats -= suppressionD;
