@@ -1049,6 +1049,26 @@
         <span>Toggle Heroic Character:</span>
         <input  type="checkbox" name="attr_heroic_character" title="@{heroic_character}"  value="1"/>
     </div>
+    
+    <div>
+        <span>Add Max Physical Injuries:</span>
+        <input type="number" name="attr_extra_physical_injuries" title="@{extra_physical_injuries}" class="sheet-biomenu" min = "0" step="1">
+    </div>
+    
+    <div>
+        <span>Add Max Mental Injuries:</span>
+        <input type="number" name="attr_extra_mental_injuries" title="@{extra_mental_injuries}" class="sheet-biomenu" min = "0" step="1">
+    </div>
+    
+    <div>
+        <span>Add Max Exhaustion:</span>
+        <input type="number" name="attr_extra_exhaustion" title="@{extra_exhaustion}" class="sheet-biomenu" min = "0" step="1">
+    </div>
+	
+    <div>
+        <span>Add Max Blood Points:</span>
+        <input type="number" name="attr_extra_blood_points" title="@{extra_blood_points}" class="sheet-biomenu" min = "0" step="1">
+    </div>
 </div>
 
 <!--Custom roll table for this sheet, uses Jakob's Better Default Rolltemplate with some customization-->
@@ -1081,29 +1101,33 @@
     });
     
     //Changing max injuries, blood points, and max exhaustion
-    on("change:willpower change:constitution change:heroic_character sheet:opened", function() {
-        getAttrs(["willpower", "constitution", "heroic_character"], function(values) {
+    on("change:willpower change:constitution change:heroic_character change:extra_physical_injuries change:extra_mental_injuries change:extra_exhaustion change:extra_blood_points change:sheet:opened", function() {
+        getAttrs(["willpower", "constitution", "extra_physical_injuries", "extra_mental_injuries", "extra_exhaustion", "extra_blood_points", "heroic_character"], function(values) {
             let will = parseInt(values["willpower"]) || 0;
             let con = parseInt(values["constitution"]) || 0;
             let heroic = parseInt(values["heroic_character"]) || 0;
-            console.log(heroic);
+            let extraphys = parseInt(values["extra_physical_injuries"]) || 0;
+            let extrament = parseInt(values["extra_mental_injuries"]) || 0;
+            let extraexh = parseInt(values["extra_exhaustion"]) || 0;
+            let extrabp = parseInt(values["extra_blood_points"]) || 0;
+	    console.log(heroic);
             
-            let mentInjMax = will / 2;
-            let physInjMax = con / 2;
+            let mentInjMax = extrament + (will / 2);
+            let physInjMax = extraphys + (con / 2);
             let maxInj = Math.max(mentInjMax, physInjMax);
             let minInj = Math.min(mentInjMax, physInjMax)
 
             if (heroic == 1) {
-                var exhMax = (2 * maxInj) + minInj;
+                var exhMax = (2 * maxInj) + minInj + extraexh;
             }
             else {
-                var exhMax = mentInjMax + physInjMax;
+                var exhMax = mentInjMax + physInjMax + extraexh;
             }
             
             setAttrs({                            
                 mental_injuries_max: mentInjMax,
                 physical_injuries_max: physInjMax,
-                blood_points_max: con,
+                blood_points_max: con + extrabp,
                 exhaustion_max: exhMax
             });
             
