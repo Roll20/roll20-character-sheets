@@ -23,6 +23,16 @@ async function applyDamageToNextActiveArmor(section, damage) {
   for (activeRowId of activeIds) {
     currentMdc = +a[`repeating_${section}_${activeRowId}_mdc`] - damageCarry;
     if (currentMdc < 0 && ++i < activeIds.length) {
+      console.log(
+        "applyDamageToNextActiveArmor",
+        "BELOW ZERO on " + activeRowId
+      );
+      const { character_name: characterName } = await getAttrsAsync([
+        "character_name",
+      ]);
+      const warning = await startRoll(`${characterName} is going to die`);
+      finishRoll(warning.rollId);
+      // @todo Warn player somehow
       attrs[`repeating_${section}_${activeRowId}_mdc`] = 0;
       damageCarry = Math.abs(currentMdc);
     } else {
@@ -66,8 +76,17 @@ on("change:repeating_armor:movementpenalty", async (e) => {
 
 on("clicked:armorapplydamage", async (e) => {
   console.log("clicked:armorapplydamage", e);
-  const a = await getAttrsAsync([`armordamage`]);
+  const a = await getAttrsAsync([`armordamage`, `character_name`]);
   await applyDamageToNextActiveArmor("armor", +a[`armordamage`]);
+  const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
+  const chat = await startRoll(
+    `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
+      a["armordamage"]
+    }}} {{name=${b[`active_armor_name`]}}} {{remaining=${
+      b[`active_armor_mdc`]
+    }}}`
+  );
+  finishRoll(chat.rollId);
 });
 
 on("clicked:repeating_armor:resetmdc", async (e) => {
@@ -77,6 +96,7 @@ on("clicked:repeating_armor:resetmdc", async (e) => {
   await setAttrsAsync({
     [`repeating_armor_${rowId}_mdc`]: a[`repeating_armor_${rowId}_mdc_max`],
   });
+  await updateActiveArmor(rowId);
 });
 
 on("change:repeating_armor:is_active", async (e) => {
