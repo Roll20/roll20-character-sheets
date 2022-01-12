@@ -11252,14 +11252,20 @@ async function migrateAttributes() {
         },
       ],
     },
+    {
+      version: "1.3.0",
+      attributes: [],
+    },
   ];
 
+  let latest;
   const { version, migrated } = await getAttrsAsync(["version", "migrated"]);
+  console.log(version, migrated);
   if (!version || !Boolean(+migrated)) {
     migrateFromOldSheet();
   } else {
     // https://stackoverflow.com/a/65687141/177943
-    const [latest] = versions.slice(-1);
+    [latest] = versions.slice(-1);
     if (
       latest.version.localeCompare(version, ...lcOpts) < 1 &&
       Boolean(+migrated)
@@ -11294,7 +11300,9 @@ async function migrateAttributes() {
         if (Array.isArray(attribute.from) && Array.isArray(attribute.to)) {
           const a = await getAttrsAsync(attribute.from);
           const attrs = attribute.from.reduce((acc, cur, idx) => {
-            acc[attribute.to[idx]] = a[cur];
+            if (a[cur]) {
+              acc[attribute.to[idx]] = a[cur];
+            }
             return acc;
           }, {});
           await setAttrsAsync(attrs);
@@ -11302,7 +11310,7 @@ async function migrateAttributes() {
       }
     }
   }
-  // await setAttrsAsync({ version: latest.version, migrated: 1 });
+  await setAttrsAsync({ version: latest.version, migrated: 1 });
 }
 
   /* endinject */
