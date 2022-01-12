@@ -86,7 +86,7 @@ const calculateFormula = async function(formulaField, calculatedField, silent = 
     });
 }
 
-const showToast = function(type, title, message) {
+const getToastObject = function (type, title, message) {
     let content
     switch (type) {
         case SUCCESS: content = 1; break;
@@ -94,12 +94,16 @@ const showToast = function(type, title, message) {
         case WARNING: content = 3; break;
         case ERROR:   content = 4; break;
     }
-    setAttrs({
+    return {
         ['toast']: 1,
         ['toast-content']: content,
         [`toast-title-${type}`]: title,
         [`toast-message-${type}`]: message
-    });
+    }
+}
+
+const showToast = function(type, title, message) {
+    setAttrs(getToastObject(type, title, message));
 }
 
 const isBookInactive = function (books, obj) {
@@ -772,13 +776,11 @@ function setupAddPriestSpell(postfix) {
                     return;
                 }
 
-                let booksReadFrom = new Set();
                 let spellsToAdd = [];
                 for (const [spellName, spell] of Object.entries(priestSpells[postfix])) {
                     let isAvailable = isSpellAvailable(spellName, spell, primarySpheres, elementalSpheres, attrSet);
                     if (isAvailable) {
-                        spellsToAdd.push(spellName);
-                        booksReadFrom.add(spell['book']);
+                        spellsToAdd.push({name: spellName, book: spell['book']});
                     }
                 }
 
@@ -788,20 +790,21 @@ function setupAddPriestSpell(postfix) {
                     return;
                 }
 
-                spellsToAdd = spellsToAdd.filter(spell => !knownSpells.has(spell));
+                spellsToAdd = spellsToAdd.filter(spell => !knownSpells.has(spell.name));
                 console.log(spellsToAdd);
                 if (spellsToAdd.length < 1) {
                     showToast(INFO, 'All spells added', `Found no more spells to add based on spheres`);
                     return;
                 }
 
-                let newValue = {};
+                let books = [...new Set(spellsToAdd.map(s => `\n • ${s.book}`))].join('');
+                let toastObject = getToastObject(SUCCESS, 'Added new spells!', `Spells was added from the following books:${books}`);
+
+                let newValue = {...toastObject};
                 spellsToAdd.forEach(spell => {
                     let newrowid = generateRowID();
-                    newValue[`repeating_${section}_${newrowid}_${field}`] = spell;
+                    newValue[`repeating_${section}_${newrowid}_${field}`] = spell.name;
                 });
-                let books = Array.from(booksReadFrom).map(s => `\n • ${s}`).join('');
-                showToast(SUCCESS, 'Added new spells!', `Spells was added from the following books:${books}`);
 
                 setAttrs(newValue);
 
