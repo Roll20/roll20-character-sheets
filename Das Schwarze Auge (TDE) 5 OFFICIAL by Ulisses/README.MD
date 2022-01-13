@@ -5,6 +5,11 @@
 
 
 ### Changelog
+1.0.7
+* Modifier "Wound Threshold" added
+* Compendium now includes spell extensions
+* Combatskills better defaults
+
 1.0.6
 * Fixed a bug with the skill rating calculation of talents
 

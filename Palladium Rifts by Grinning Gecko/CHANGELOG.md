@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.3.0] - 2022-01-11
+
+### Added
+
+- Add roll templates for damage, casting spell, and using psionic.
+- Add optional `successtext` to skill roll template.
+- Add Break Fall to bonuses.
+
+### Changed
+
+- Move Modern Strike: Pulse to Strike: Single bonus.
+- Added Migrate button instead of auto-migrating on sheet load.
+- Output PPE/ISP/MDC to chat when an amount is deducted from the sheet using the action buttons.
+
 ## [1.2.0] - 2021-10-15
 
 ### Added
