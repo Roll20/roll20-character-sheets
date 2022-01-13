@@ -213,8 +213,8 @@ on("change:zrecznosc_base change:mod_zrecznosc change:percepcja_base change:mod_
 /************************** ROLL PARAMETERS ***********************/
 const lastPassingPercent = [0,10,30,60,90,120,160,9999];
 const reftab = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, ];
-const levelRadioValues = ["1","2","3","4","5","6"];
-const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Cholernie Trudny", "Fart"];
+const levelRadioValues = ["1","2","3","4","5","6","7"];
+const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Bardzo Trudny", "Cholernie Trudny", "Fart"];
   levelRadioValues.forEach(function(value) {
     on(`clicked:level_${value}`, function() {
       setAttrs({
@@ -244,7 +244,7 @@ on("change:level change:modi_battle change:modi_open change:modi_penalties chang
         let final_test_level = (final_test_penalty <= reftab[0] ? 0 : (final_test_penalty>=rtl ? reftab[rtl-1] : reftab[final_test_penalty]));
         let final_test_level_label = levelLabels[final_test_level];
         setAttrs({                            
-            "final_test_level": final_test_penalty,
+            "final_test_level": final_test_level,
             "final_test_penalty": final_test_penalty,
             "final_test_level_display": final_test_level_label
         });
