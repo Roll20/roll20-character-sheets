@@ -173,7 +173,7 @@
 						<input type="hidden" name="attr_damageRoll" value="" />
 						<div class="weapon-row">
 							<span data-i18n="name-type" class="label-capsule-weapon">NAME/TYPE</span><input type="text" class="weapon-name" name="attr_weapon_name" spellcheck="false" />
-							<button class="weapon-button" type="roll" name="PcDamageRoll" value="@{whispertype} &{template:strek}@{damageRoll}{{attribute=@{weapon_quality}}}{{discipline=@{weapon_effect}}}{{rollname=@{weapon_name}}}" title="Security + Weapon Damage">
+							<button class="weapon-button" type="roll" name="PcDamageRoll" value="@{whispertype} &{template:strek}@{damageRoll}{{attribute=@{weapon_quality}}}{{discipline=@{weapon_effect}}}{{rollname=@{weapon_name}}}" title="Weapon Damage">
 								<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Trek%20Adventures%20by%20Roll20/images/STA_starfleet_insignia_full.png" />
 							</button>
 							<input type="number" class="capsule" name="attr_weapon_damage" value="0" title="Weapon Damage" />
@@ -710,7 +710,7 @@
 						<div class="weapon-row">
 							<span data-i18n="name-type-s" class="label-capsule-weapon">NAME/TYPE</span>
 							<input type="text" class="weapon-name" name="attr_weapon_name" spellcheck="false" spellcheck="false"/>
-							<button class="weapon-button" type="roll" name="ShipDamageRoll" value="@{whispertype} &{template:strek}{{attribute=@{weapon_quality}}}{{discipline=@{weapon_effect}}}{{rollname=@{weapon_name}}}@{damageRoll}" title="Security + Weapon Damage">
+							<button class="weapon-button" type="roll" name="ShipDamageRoll" value="@{whispertype} &{template:strek}{{attribute=@{weapon_quality}}}{{discipline=@{weapon_effect}}}{{rollname=@{weapon_name}}}@{damageRoll}" title="Weapon Damage">
 								<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Trek%20Adventures%20by%20Roll20/images/STA_starfleet_insignia_full.png" />
 							</button>
 							<input type="number" class="capsule" name="attr_weapon_damage" title="Weapon Damage" value="0" />
@@ -1333,29 +1333,14 @@
 	//Configure weapon damage
 	on("change:repeating_weapons:weapon_damage", () => {
 		getAttrs(["repeating_weapons_weapon_damage", "security"], (v) => {
-			setAttrs({"repeating_weapons_damageRoll": calcDamageRoll(v.repeating_weapons_weapon_damage, "",v.security,0)});
-		});
-	});
-	on("change:security", () => {
-		getSectionIDs("repeating_weapons", (ids) => {
-			if(ids.length) {
-				let fields = ["security"];
-				fields.push(...ids.map((id) => `repeating_weapons_${id}_weapon_damage`));
-				getAttrs(fields, (v) => {
-					let update = {};
-					_.each(ids, (id) => {
-						update[`repeating_weapons_${id}_damageRoll`] = calcDamageRoll(v[`repeating_ship_${id}_weapon_damage`],"",v.security,0);
-					});
-					setAttrs(update);
-				});
-			}
+			setAttrs({"repeating_weapons_damageRoll": calcDamageRoll(v.repeating_weapons_weapon_damage, "",0)});
 		});
 	});
 
 	//Configure damage for ships
 	on("change:repeating_ship:weapon_damage change:repeating_ship:weapon_type", () => {
 		getAttrs(["repeating_ship_weapon_damage","repeating_ship_weapon_type", "ship_security" ,"ship_scale"], (v) => {
-			setAttrs({"repeating_ship_damageRoll": calcDamageRoll(v.repeating_ship_weapon_damage,v.repeating_ship_weapon_type,v.ship_security,v.ship_scale)});
+			setAttrs({"repeating_ship_damageRoll": calcDamageRoll(v.repeating_ship_weapon_damage,v.repeating_ship_weapon_type,v.ship_scale)});
 		});
 	});
 	on("change:ship_security change:ship_scale", () => {
@@ -1372,15 +1357,15 @@
 				getAttrs(fields, (v) => {
 					let update = {};
 					_.each(ids, (id) => {
-						update[`repeating_ship_${id}_damageRoll`] = calcDamageRoll(v[`repeating_ship_${id}_weapon_damage`],v[`repeating_ship_${id}_weapon_type`],v.ship_security,v.ship_scale);
+						update[`repeating_ship_${id}_damageRoll`] = calcDamageRoll(v[`repeating_ship_${id}_weapon_damage`],v[`repeating_ship_${id}_weapon_type`],v.ship_scale);
 					});
 					setAttrs(update);
 				});
 			}
 		});
 	};
-	const calcDamageRoll = function(damage, type, security, scale) {
-		let roll = "", total = 0 + (parseInt(damage) || 0) + (parseInt(security) || 0) + ((type || "Energy").toLowerCase() == "energy" ? (parseInt(scale) || 0) : 0);
+	const calcDamageRoll = function(damage, type, scale) {
+		let roll = "", total = 0 + (parseInt(damage) || 0) + ((type || "Energy").toLowerCase() == "energy" ? (parseInt(scale) || 0) : 0);
 		if(total) {
 			for(let i = 1; i <= total; i++) {
 				roll += `{{cdice${i}=[[1d6]]}}`;
