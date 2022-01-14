@@ -21,6 +21,11 @@ async function updateActiveProfile(rowId) {
   await setAttrsAsync(attrs);
 }
 
+//   const a = await getAttrsAsync(["psionic_ability"]);
+//   const attrs = {};
+//   attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
+//     a["psionic_ability"];
+
 async function updateProfile(rowId) {
   const bonusIds = (
     await getAttrsAsync(["repeating_profiles_bonus_ids"])
@@ -33,9 +38,12 @@ async function updateProfile(rowId) {
     (acc, cur) => `${acc}     ✔︎${cur}`.trim(),
     ""
   );
+  const globals = await getAttrsAsync(["psionic_ability"]);
   await setAttrsAsync({
     [`repeating_profiles_${rowId}_bonus_names`]: names,
     [`repeating_profiles_${rowId}_rowid`]: `repeating_profiles_${rowId}_`,
+    [`repeating_profiles_${rowId}_global_psionic_ability`]:
+      globals["psionic_ability"],
   });
   await combineBonuses(bonusIds, `repeating_profiles_${rowId}`);
   const isActive = await isDefault("profiles", rowId);
@@ -202,15 +210,15 @@ on(
   }
 );
 
-on("change:repeating_profiles", async (e) => {
-  console.log("change:repeating_profiles", e);
-  const [r, section, rowId] = e.sourceAttribute.split("_");
-  const a = await getAttrsAsync(["psionic_ability"]);
-  const attrs = {};
-  attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
-    a["psionic_ability"];
-  await setAttrsAsync(attrs);
-});
+// on("change:repeating_profiles", async (e) => {
+//   console.log("change:repeating_profiles", e);
+//   const [r, section, rowId] = e.sourceAttribute.split("_");
+//   const a = await getAttrsAsync(["psionic_ability"]);
+//   const attrs = {};
+//   attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
+//     a["psionic_ability"];
+//   await setAttrsAsync(attrs);
+// });
 
 on("change:_reporder:profiles", async (e) => {
   console.log("change:_reporder:profiles", e);
