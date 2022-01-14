@@ -90,6 +90,7 @@ rollCombatAutre.forEach((button) => {
     let vCadence = 0;
     let isDestructeur = false;
     let vDestructeur = 0;
+    let isFureur = false;
     let isMeurtrier = false;
     let vMeurtrier = 0;
     let nowSilencieux = false;
@@ -97,6 +98,8 @@ rollCombatAutre.forEach((button) => {
     let isTenebricide = false;
     let isTirRafale = false;
     let isChambreDouble = false;
+    let isUltraviolence = false;
+    let isSurprise = false;
 
     let isELumiere = false;
     let lumiereValue = 0;
@@ -133,6 +136,10 @@ rollCombatAutre.forEach((button) => {
 
     isMeurtrier = effets.isMeurtrier;
     vMeurtrier = effets.vMeurtrier;
+
+    isFureur = effets.isFureur;
+
+    isUltraviolence = effets.isUltraviolence;
 
     nowSilencieux = effets.nowSilencieux;
 
@@ -347,6 +354,8 @@ rollCombatAutre.forEach((button) => {
       exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
       exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
       exec.push(attaquesSurprisesCondition);
+
+      isSurprise = true;
     }
 
     if (isELumiere) { autresEffets.push(`${i18n_lumiere} ${lumiereValue}`); }
@@ -378,56 +387,46 @@ rollCombatAutre.forEach((button) => {
 
     exec = firstExec.concat(exec);
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    // ROLL
+    const finalRoll = await startRoll(exec.join(' '));
+    const tJet = finalRoll.results.jet.result;
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
 
-      const tMeurtrier = results.results.meurtrierValue;
-      let vTMeurtrier = 0;
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
 
-      if (tMeurtrier !== undefined) { vTMeurtrier = tMeurtrier.dice[0]; }
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
 
-      const tDestructeur = results.results.destructeurValue;
-      let vTDestructeur = 0;
+    const conditions = {
+      isTenebricide,
+      isDestructeur,
+      isFureur,
+      isSurprise,
+      isMeurtrier,
+      isUltraviolence,
+    };
 
-      if (tDestructeur !== undefined) { vTDestructeur = tDestructeur.dice[0]; }
+    const computed = updateRoll(finalRoll, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
 
-      const tFureur = results.results.fureurValue;
-      let vTFureur = 0;
+    const finalComputed = {
+      jet: tJet + tBonus,
+    };
 
-      if (tFureur !== undefined) { vTFureur = tFureur.dice[0] + tFureur.dice[1]; }
+    Object.assign(finalComputed, computed);
 
-      const tUltraviolence = results.results.ultraviolenceValue;
+    finishRoll(finalRoll.rollId, finalComputed);
 
-      let vTUltraviolence = 0;
+    if (tJet !== 0 && tJet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+      const tRExploit = exploitRoll.results.jet.result;
+      const exploitComputed = {
+        jet: tRExploit,
+      };
 
-      if (tUltraviolence !== undefined) { vTUltraviolence = tUltraviolence.dice[0]; }
-
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-          meurtrierValue: vTMeurtrier,
-          destructeurValue: vTDestructeur,
-          fureurValue: vTFureur,
-          ultraviolenceValue: vTUltraviolence,
-        },
-      );
-
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
-
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });
