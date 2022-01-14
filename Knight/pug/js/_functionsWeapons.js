@@ -4019,6 +4019,8 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
     }
   }
 
+  log(vTDestructeur);
+
   const computed = {
     degats: tDegats,
     violence: tViolence,
