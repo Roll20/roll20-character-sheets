@@ -1101,7 +1101,7 @@
 <!--Sheet Worker-->
 <script type="text/worker">
 	// Global variables
-	const staglobals_currentversion = 1.5;
+	const staglobals_currentversion = 1.6;
 
     // Check for default attributes and disciplines (system and department for ships) and rolls, if not set
     on("sheet:opened", () => {
@@ -1332,24 +1332,22 @@
 
 	//Configure weapon damage
 	on("change:repeating_weapons:weapon_damage", () => {
-		getAttrs(["repeating_weapons_weapon_damage", "security"], (v) => {
-			setAttrs({"repeating_weapons_damageRoll": calcDamageRoll(v.repeating_weapons_weapon_damage, "",0)});
-		});
+		updateWeaponsAll();
 	});
 
 	//Configure damage for ships
 	on("change:repeating_ship:weapon_damage change:repeating_ship:weapon_type", () => {
-		getAttrs(["repeating_ship_weapon_damage","repeating_ship_weapon_type", "ship_security" ,"ship_scale"], (v) => {
+		getAttrs(["repeating_ship_weapon_damage","repeating_ship_weapon_type", "ship_scale"], (v) => {
 			setAttrs({"repeating_ship_damageRoll": calcDamageRoll(v.repeating_ship_weapon_damage,v.repeating_ship_weapon_type,v.ship_scale)});
 		});
 	});
-	on("change:ship_security change:ship_scale", () => {
+	on("change:ship_scale", () => {
 		updateShipWeaponsAll();
 	});
 	const updateShipWeaponsAll = function() {
 		getSectionIDs("repeating_ship", (ids) => {
 			if(ids.length) {
-				let fields = ["ship_security", "ship_scale"];
+				let fields = ["ship_scale"];
 				fields.push(
 					...ids.map((id) => `repeating_ship_${id}_weapon_damage`)
 					, ...ids.map((id) => `repeating_ship_${id}_weapon_type`)
@@ -1364,6 +1362,11 @@
 			}
 		});
 	};
+    const updateWeaponsAll = function() {
+        getAttrs(["repeating_weapons_weapon_damage"], (v) => {
+			setAttrs({"repeating_weapons_damageRoll": calcDamageRoll(v.repeating_weapons_weapon_damage, "",0)});
+		});
+    };
 	const calcDamageRoll = function(damage, type, scale) {
 		let roll = "", total = 0 + (parseInt(damage) || 0) + ((type || "Energy").toLowerCase() == "energy" ? (parseInt(scale) || 0) : 0);
 		if(total) {
@@ -1380,10 +1383,11 @@
 			let vrs = parseFloat(v["version"]) || 0.0;
 			if (vrs === staglobals_currentversion) {
 				console.log("Star Trek Adventures by Roll20 v" + vrs);
-			} else if (vrs < 1.5) {
-				console.log("UPDATING TO 1.5");
-				updateShipWeaponsAll();
-				setAttrs({"version": "1.5"}, {silent: true}, () => {
+            } else if (vrs < 1.6) {
+				console.log("UPDATING TO 1.6");
+				updateWeaponsAll();
+                updateShipWeaponsAll();
+				setAttrs({"version": "1.6"}, {silent: true}, () => {
 					versioning();
 				});
 			} else {
