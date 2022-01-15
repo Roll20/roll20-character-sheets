@@ -76,17 +76,26 @@ on("change:repeating_armor:movementpenalty", async (e) => {
 
 on("clicked:armorapplydamage", async (e) => {
   console.log("clicked:armorapplydamage", e);
-  const a = await getAttrsAsync([`armordamage`, `character_name`]);
+  const a = await getAttrsAsync([
+    `armordamage`,
+    `character_name`,
+    `active_armor_mdc`,
+    `active_armor_name`,
+    `outputusage`,
+  ]);
   await applyDamageToNextActiveArmor("armor", +a[`armordamage`]);
-  const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
-  const chat = await startRoll(
-    `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
-      a["armordamage"]
-    }}} {{name=${b[`active_armor_name`]}}} {{remaining=${
-      b[`active_armor_mdc`]
-    }}}`
-  );
-  finishRoll(chat.rollId);
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    // const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
+    const chat = await startRoll(
+      `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
+        a["armordamage"]
+      }}} {{name=${a[`active_armor_name`]}}} {{remaining=${
+        a[`active_armor_mdc`]
+      }}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:repeating_armor:resetmdc", async (e) => {

@@ -5,16 +5,22 @@ on("clicked:repeating_magic:usespell", async (e) => {
     "currentppe",
     "repeating_magic_name",
     "character_name",
+    "outputusage",
   ]);
   console.log(a);
   const newppe = a.currentppe - a.repeating_magic_ppecost;
   await setAttrsAsync({ currentppe: newppe });
-  const chat = await startRoll(
-    `&{template:castspell} {{character_name=${a["character_name"]}}} {{spent=${
-      a["repeating_magic_ppecost"]
-    }}} {{name=${a[`repeating_magic_name`]}}} {{remaining=${newppe}}}`
-  );
-  finishRoll(chat.rollId);
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    const chat = await startRoll(
+      `&{template:castspell} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["repeating_magic_ppecost"]}}} {{name=${
+        a[`repeating_magic_name`]
+      }}} {{remaining=${newppe}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:resetppe", async (e) => {
@@ -29,16 +35,22 @@ on("clicked:repeating_psionics:usepsionic", async (e) => {
     "repeating_psionics_name",
     "currentisp",
     "character_name",
+    "outputusage",
   ]);
   console.log(a);
   const newisp = a.currentisp - a.repeating_psionics_ispcost;
   await setAttrsAsync({ currentisp: newisp });
-  const chat = await startRoll(
-    `&{template:usepsionic} {{character_name=${a["character_name"]}}} {{spent=${
-      a["repeating_psionics_ispcost"]
-    }}} {{name=${a[`repeating_psionics_name`]}}} {{remaining=${newisp}}}`
-  );
-  finishRoll(chat.rollId);
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    const chat = await startRoll(
+      `&{template:usepsionic} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["repeating_psionics_ispcost"]}}} {{name=${
+        a[`repeating_psionics_name`]
+      }}} {{remaining=${newisp}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:resetisp", async (e) => {

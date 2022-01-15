@@ -8917,6 +8917,10 @@
       ><input type="checkbox" name="attr_debug" value="1" /> View Sheet in Debug
       Mode</label
     >
+    <label
+      ><input type="checkbox" name=attr_outputusage" value="1" /> Output
+      ISP/PPE/Damage usage</label
+    >
     <hr />
     <label
       ><input
@@ -12124,17 +12128,26 @@ on("change:repeating_armor:movementpenalty", async (e) => {
 
 on("clicked:armorapplydamage", async (e) => {
   console.log("clicked:armorapplydamage", e);
-  const a = await getAttrsAsync([`armordamage`, `character_name`]);
+  const a = await getAttrsAsync([
+    `armordamage`,
+    `character_name`,
+    `active_armor_mdc`,
+    `active_armor_name`,
+    `outputusage`,
+  ]);
   await applyDamageToNextActiveArmor("armor", +a[`armordamage`]);
-  const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
-  const chat = await startRoll(
-    `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
-      a["armordamage"]
-    }}} {{name=${b[`active_armor_name`]}}} {{remaining=${
-      b[`active_armor_mdc`]
-    }}}`
-  );
-  finishRoll(chat.rollId);
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    // const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
+    const chat = await startRoll(
+      `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
+        a["armordamage"]
+      }}} {{name=${a[`active_armor_name`]}}} {{remaining=${
+        a[`active_armor_mdc`]
+      }}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:repeating_armor:resetmdc", async (e) => {
@@ -12938,16 +12951,22 @@ on("change:repeating_skills:name", async (e) => {
     "currentppe",
     "repeating_magic_name",
     "character_name",
+    "outputusage",
   ]);
   console.log(a);
   const newppe = a.currentppe - a.repeating_magic_ppecost;
   await setAttrsAsync({ currentppe: newppe });
-  const chat = await startRoll(
-    `&{template:castspell} {{character_name=${a["character_name"]}}} {{spent=${
-      a["repeating_magic_ppecost"]
-    }}} {{name=${a[`repeating_magic_name`]}}} {{remaining=${newppe}}}`
-  );
-  finishRoll(chat.rollId);
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    const chat = await startRoll(
+      `&{template:castspell} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["repeating_magic_ppecost"]}}} {{name=${
+        a[`repeating_magic_name`]
+      }}} {{remaining=${newppe}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:resetppe", async (e) => {
@@ -12962,16 +12981,22 @@ on("clicked:repeating_psionics:usepsionic", async (e) => {
     "repeating_psionics_name",
     "currentisp",
     "character_name",
+    "outputusage",
   ]);
   console.log(a);
   const newisp = a.currentisp - a.repeating_psionics_ispcost;
   await setAttrsAsync({ currentisp: newisp });
-  const chat = await startRoll(
-    `&{template:usepsionic} {{character_name=${a["character_name"]}}} {{spent=${
-      a["repeating_psionics_ispcost"]
-    }}} {{name=${a[`repeating_psionics_name`]}}} {{remaining=${newisp}}}`
-  );
-  finishRoll(chat.rollId);
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    const chat = await startRoll(
+      `&{template:usepsionic} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["repeating_psionics_ispcost"]}}} {{name=${
+        a[`repeating_psionics_name`]
+      }}} {{remaining=${newisp}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:resetisp", async (e) => {
