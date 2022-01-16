@@ -18097,6 +18097,58 @@ function migrateTo20211010(migrationChain) {
 	});
 }
 
+/*
+	Migration steps:
+	- Initialize new attributes for critical success/failure to default
+	- Build beta roll button ability calls
+*/
+function migrateTo20220116(migrationChain) {
+	var caller = "migrateTo20220116";
+	debugLog(caller, "Invoked.");
+
+	var results = calcCritLevels({'Tollpatsch': 0, 'wilde Magie': 0});
+	var attrsToChange = {
+		'cs_talent': results['talent']['success'],
+		'cf_talent': results['talent']['failure'],
+		'cs_kampf_at': results['kampf_at']['success'],
+		'cf_kampf_at': results['kampf_at']['failure'],
+		'cs_kampf_pa': results['kampf_pa']['success'],
+		'cf_kampf_pa': results['kampf_pa']['failure'],
+		'cs_kampf_fk': results['kampf_fk']['success'],
+		'cf_kampf_fk': results['kampf_fk']['failure'],
+		'cs_zauber': results['zauber']['success'],
+		'cf_zauber': results['zauber']['failure'],
+		'cs_ritual': results['ritual']['success'],
+		'cf_ritual': results['ritual']['failure']
+	}
+
+	// Build list of attributes
+	var attrsToGet = ["character_name"];
+	var ebeTalents = []
+	for(talent of talents_ebe)
+	{
+		ebeTalents.push(talent + "-ebe");
+	}
+	for(attr of [].concat(talents, ebeTalents, spells))
+	{
+		attrsToGet.push(attr + "_action");
+	}
+	safeGetAttrs(attrsToGet, function(v) {
+		for (attr of attrsToGet)
+		{
+			// No action buttons for character name and combat techniques required
+			if (attr.match("t_ka_") || attr === "character_name") continue;
+			attrsToChange[attr] = "%{" + v["character_name"] + "|" + attr.replace(/_action$/gm, "") + "-action}";
+		}
+
+		attrsToChange["eidsegen_action"] = "%{" + v["character_name"] + "|eidsegen-action}";
+
+		debugLog(caller, attrsToChange);
+		safeSetAttrs(attrsToChange, {}, function(){
+			callNextMigration(migrationChain);
+		});
+	});
+}
 
 on("sheet:opened", function() {
     migrationCheck();
