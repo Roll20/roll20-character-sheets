@@ -17374,18 +17374,25 @@ on("change:mu change:kl change:in change:ch change:ff change:ge change:ko change
 });
 
 on(
+"change:beta_crp_crit_rolls " +
 "change:safe-sheet-open " +
 "change:n_tollpatsch " +
 "change:n_wildemagie", function(eventInfo) {
 	var caller = "Action Listener (Crit Level Updater)";
+	var trigger = eventInfo["triggerName"];
+	var newValue = eventInfo["newValue"];
 	const attrsToGet = [
 		"n_tollpatsch",
 		"n_wildemagie"
 	];
-
 	safeGetAttrs(attrsToGet, function(v) {
+		// If the beta is turned off, return all cs/cf values to the old default 20
+		if (trigger === "beta_crp_crit_rolls" && newValue === "0")
+		{
+			v['n_tollpatsch'] = "0";
+			v['n_wildemagie'] = "0";
+		}
 		var results = calcCritLevels({'Tollpatsch': v['n_tollpatsch'], 'wilde Magie': v['n_wildemagie']});
-
 		var attrsToChange = {
 			'cs_talent': results['talent']['success'],
 			'cf_talent': results['talent']['failure'],
