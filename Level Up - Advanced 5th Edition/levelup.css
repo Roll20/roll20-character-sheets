@@ -34,31 +34,101 @@ button[type=roll]:before {
   }
 
 
-.sheet-hover-info {
-    position: absolute;
-    background: white;
-    z-index: 10;
-    padding: 20px;
-    width: 300px;
-    visibility: hidden;
+.sheet-dots {
+    display: inline-block;
+    float: right;
+    top: 2px;
+    right: 0;
+}
+
+.sheet-dots input[type='radio'] {
     opacity: 0;
-    box-shadow: 0 3px 15px rgba(0,0,0,.1);
-    transition:visibility 0s linear 0.3s, opacity 0.3s linear;
-    text-align: left;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: 5px;
+    left: 6px;
+    margin: -10px;
+    cursor: pointer;
+    z-index: 1;
 }
-.sheet-hover-info.sheet-margin-left-140px {
-    margin-left: -140px;
+input[type="radio"] + span::before
+{
+    margin-right: 3px;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 10px;
+    width: 10px;
+    height: 10px;
+    content: "x";
+    opacity:0;
+}
+.sheet-dots input[type="radio"]:not([value="0"]) + span {
+    background: url("https://raw.githubusercontent.com/seregrauko/roll20-character-sheets/master/Level%20Up%20-%20Advanced%205th%20Edition/checkbox%20crossed.png") no-repeat;
+    background-size:100%;
 }
 
-span.label:hover + .sheet-hover-info,
-span.sheet-label:hover + .sheet-hover-info,
-input:hover + span.sheet-label + .sheet-hover-info {
-    visibility: visible;
-    opacity: 1;
-    transition-delay: 1s;
+.sheet-dots input[type='radio']:checked ~ input[type='radio'] + span {
+    background: url("https://raw.githubusercontent.com/seregrauko/roll20-character-sheets/master/Level%20Up%20-%20Advanced%205th%20Edition/checkbox%20empty.png") no-repeat;
+    background-size:100%;
 }
 
+/* Remove dot from all radios _after_ selected one */
+input[type="radio"]:checked ~ input[type="radio"] + span::before
+{    
+    content: "";
+}
 
+/*pc npc logic*/
+div.sheet-pcnpc input[type="radio"]:checked + span {
+	color: white;
+	background-color: #222222;
+	box-shadow: inset 0px 0px 3px 3px #333333; 
+	}
+	
+div.sheet-pcnpc {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  margin: 5px;
+  width: calc(100% - 10px); 
+  }
+  div.sheet-pcnpc input[type="radio"] {
+    height: 100%;
+    opacity: 0;
+    width: 100%;
+    z-index: 2; 
+	}
+  div.sheet-pcnpc label {
+    display: grid;
+    color: black;
+    text-align: center;
+    font-size: 1em; 
+	}
+    div.sheet-pcnpc label input, div.sheet-pcnpc label span {
+      grid-area: 1 / 1 / 1 / 1; 
+	  }
+    div.sheet-pcnpc  span {
+      background-color: #e9e7e2;
+      border-radius: 5px;
+      box-shadow: 0 1px 1px #757575;
+      display: inline-block;
+      font-weight: bold;
+      height: 1em;
+      padding: 5% 2%; 
+	  }
+
+	  
+div.sheet-PC,
+div.sheet-NPC {
+	display: none; 
+	}
+
+.sheet-npctoggle[value="pc"] ~ div.sheet-PC,
+.sheet-npctoggle[value="npc"] ~ div.sheet-NPC {
+    display: block;
+}
 /* character sheet header */
 div.sheet-header {
 	display: flex;
@@ -78,7 +148,8 @@ div.sheet-character-name {
     display: flex;
   	flex-direction: column;
     padding: 0; 
-	text-decoration: none min-width: 33%;
+	text-decoration: none;
+	min-width: 33%;
 	}
     div.sheet-character-name > label > span {
 		background: #ffffff;
@@ -154,7 +225,7 @@ div.sheet-character-info {
     div.sheet-character-info > label > input {
 		margin: 0;
 		flex: 2;
-		font-size: 0.8em;
+		font-size: 1em;
 		border: 0;
 		padding: .5em;
 		padding-left: 1em;
@@ -183,7 +254,7 @@ div.sheet-character-info {
 	}
 		div.sheet-character-info label[data-i18n-title="repeatingclass"] > input {
 			font-family:Times,serif;
-			font-size: 0.7em;
+			font-size: 0.8em;
 			border: none;
 			border-bottom: solid 1pt;
 			border-radius:0;
@@ -265,11 +336,11 @@ div.sheet-spells {
 	display: none; 
 	}
 
-.sheet-tabstoggle[value="character"] ~ div.sheet-character,
-.sheet-tabstoggle[value="features"] ~ div.sheet-features,
-.sheet-tabstoggle[value="backgrounds"] ~ div.sheet-backgrounds,
-.sheet-tabstoggle[value="inventory"] ~ div.sheet-inventory,
-.sheet-tabstoggle[value="spells"] ~ div.sheet-spells {
+.sheet-tabstoggle[value="character"] ~ div.sheet-PC>div.sheet-character,
+.sheet-tabstoggle[value="features"] ~ div.sheet-PC>div.sheet-features,
+.sheet-tabstoggle[value="backgrounds"] ~ div.sheet-PC>div.sheet-backgrounds,
+.sheet-tabstoggle[value="inventory"] ~ div.sheet-PC>div.sheet-inventory,
+.sheet-tabstoggle[value="spells"] ~ div.sheet-PC>div.sheet-spells {
     display: block;
 }
 
@@ -298,7 +369,7 @@ div.sheet-abilityscores {
 	}
 	
 	div.sheet-display-strength {
-		background-image: url(https://raw.githubusercontent.com/seregrauko/roll20-character-sheets/master/Level Up - Advanced 5th Edition/levelup-statframe.jpg);
+		background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Level%20Up%20-%20Advanced%205th%20Edition/levelup-statframe.jpg);
 		background-size: contain;
 		background-repeat: no-repeat;
 		display: grid;
@@ -329,39 +400,42 @@ div.sheet-abilityscores {
 			width: 98px !important;
 			height: 35px !important;
 		}
-		div.sheet-display-strength label[data-i18n-title="strengthmod"] {
+		div.sheet-display-strength label[data-i18n-title="strength_mod"] {
 			grid-area: 16 / 8 / 16 / 14; 
 		}
-		div.sheet-display-strength label[data-i18n-title="strengthmod"] > input {
+		div.sheet-display-strength label[data-i18n-title="strength_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 50px !important;
 			height: 25px !important;
 		}
-		div.sheet-display-strength label[data-i18n-title="strengthsave"] {
-			grid-area: 1 / 26 / 6 / 26; 
+		div.sheet-display-strength label[data-i18n-title="strengthroll"] {
+			grid-area: 17 / 14 / 17 / 14; 
 		}
-		div.sheet-display-strength label[data-i18n-title="strengthsave"] > span {
+		div.sheet-display-strength label[data-i18n-title="strength_save_mod"] {
+			grid-area: 6 / 26 / 6 / 26; 
+		}
+		div.sheet-display-strength label[data-i18n-title="strength_save_mod"] > span {
 			font-size: 0.9em;
 		}
-		div.sheet-display-strength label[data-i18n-title="strengthsave"] > button {
-			font-size: 0.9em;
-		}
-		div.sheet-display-strength label[data-i18n-title="strengthsave"] > input {
+		div.sheet-display-strength label[data-i18n-title="strength_save_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 35px !important;
 			height: 15px !important;
 		}
-		div.sheet-display-strength label[data-i18n-title="strengthsaveprof"] {
+		div.sheet-display-strength label[data-i18n-title="strength_save_roll"]{
+			grid-area: 6 / 32 / 6 / 32; 
+		}
+		div.sheet-display-strength label[data-i18n-title="strength_save_prof"] {
 			grid-area: 15 / 25 / 15 / -1; 
 		}
-		div.sheet-display-strength label[data-i18n-title="strengthsaveprof"] > span {
+		div.sheet-display-strength label[data-i18n-title="strength_save_prof"] > span {
 			font-size: 0.7em;
 			width: 20px;
 		}
 	div.sheet-display-dexterity {
-		background-image: url(https://raw.githubusercontent.com/seregrauko/roll20-character-sheets/master/Level Up - Advanced 5th Edition/levelup-statframe.jpg);
+		background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Level%20Up%20-%20Advanced%205th%20Edition/levelup-statframe.jpg);
 		background-size: contain;
 		background-repeat: no-repeat;
 		display: grid;
@@ -392,36 +466,42 @@ div.sheet-abilityscores {
 			width: 98px !important;
 			height: 35px !important;
 		}
-		div.sheet-display-dexterity label[data-i18n-title="dexteritymod"] {
+		div.sheet-display-dexterity label[data-i18n-title="dexterity_mod"] {
 			grid-area: 16 / 8 / 16 / 14; 
 		}
-		div.sheet-display-dexterity label[data-i18n-title="dexteritymod"] > input {
+		div.sheet-display-dexterity label[data-i18n-title="dexterity_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 50px !important;
 			height: 25px !important;
 		}
-		div.sheet-display-dexterity label[data-i18n-title="dexteritysave"] {
-			grid-area: 1 / 26 / 6 / 26; 
+		div.sheet-display-dexterity label[data-i18n-title="dexterityroll"] {
+			grid-area: 17 / 14 / 17 / 14; 
 		}
-		div.sheet-display-dexterity label[data-i18n-title="dexteritysave"] > span {
+		div.sheet-display-dexterity label[data-i18n-title="dexterity_save_roll"] {
+			grid-area: 6 / 32 / 6 / 32; 
+		}
+		div.sheet-display-dexterity label[data-i18n-title="dexterity_save_mod"] {
+			grid-area: 6 / 26 / 6 / 26; 
+		}
+		div.sheet-display-dexterity label[data-i18n-title="dexterity_save_mod"] > span {
 			font-size: 0.9em;
 		}
-		div.sheet-display-dexterity label[data-i18n-title="dexteritysave"] > input {
+		div.sheet-display-dexterity label[data-i18n-title="dexterity_save_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 35px !important;
 			height: 15px !important;
 		}
-		div.sheet-display-dexterity label[data-i18n-title="dexteritysaveprof"] {
+		div.sheet-display-dexterity label[data-i18n-title="dexterity_save_prof"] {
 			grid-area: 15 / 25 / 15 / -1; 
 		}
-		div.sheet-display-dexterity label[data-i18n-title="dexteritysaveprof"] > span {
+		div.sheet-display-dexterity label[data-i18n-title="dexterity_save_prof"] > span {
 			font-size: 0.7em;
 			width: 20px;
 		}
 	div.sheet-display-constitution {
-		background-image: url(https://raw.githubusercontent.com/seregrauko/roll20-character-sheets/master/Level Up - Advanced 5th Edition/levelup-statframe.jpg);
+		background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Level%20Up%20-%20Advanced%205th%20Edition/levelup-statframe.jpg);
 		background-size: contain;
 		background-repeat: no-repeat;
 		display: grid;
@@ -452,36 +532,42 @@ div.sheet-abilityscores {
 			width: 98px !important;
 			height: 35px !important;
 		}
-		div.sheet-display-constitution label[data-i18n-title="constitutionmod"] {
+		div.sheet-display-constitution label[data-i18n-title="constitution_mod"] {
 			grid-area: 16 / 8 / 16 / 14; 
 		}
-		div.sheet-display-constitution label[data-i18n-title="constitutionmod"] > input {
+		div.sheet-display-constitution label[data-i18n-title="constitution_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 50px !important;
 			height: 25px !important;
 		}
-		div.sheet-display-constitution label[data-i18n-title="constitutionsave"] {
-			grid-area: 1 / 26 / 6 / 26; 
+		div.sheet-display-constitution label[data-i18n-title="constitutionroll"] {
+			grid-area: 17 / 14 / 17 / 14; 
 		}
-		div.sheet-display-constitution label[data-i18n-title="constitutionsave"] > span {
+		div.sheet-display-constitution label[data-i18n-title="constitution_save_roll"] {
+			grid-area: 6 / 32 / 6 / 32; 
+		}
+		div.sheet-display-constitution label[data-i18n-title="constitution_save_mod"] {
+			grid-area: 6 / 26 / 6 / 26; 
+		}
+		div.sheet-display-constitution label[data-i18n-title="constitution_save_mod"] > span {
 			font-size: 0.9em;
 		}
-		div.sheet-display-constitution label[data-i18n-title="constitutionsave"] > input {
+		div.sheet-display-constitution label[data-i18n-title="constitution_save_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 35px !important;
 			height: 15px !important;
 		}
-		div.sheet-display-constitution label[data-i18n-title="constitutionsaveprof"] {
+		div.sheet-display-constitution label[data-i18n-title="constitution_save_prof"] {
 			grid-area: 15 / 25 / 15 / -1; 
 		}
-		div.sheet-display-constitution label[data-i18n-title="constitutionsaveprof"] > span {
+		div.sheet-display-constitution label[data-i18n-title="constitution_save_prof"] > span {
 			font-size: 0.7em;
 			width: 20px;
 		}
 	div.sheet-display-intelligence {
-		background-image: url(https://raw.githubusercontent.com/seregrauko/roll20-character-sheets/master/Level Up - Advanced 5th Edition/levelup-statframe.jpg);
+		background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Level%20Up%20-%20Advanced%205th%20Edition/levelup-statframe.jpg);
 		background-size: contain;
 		background-repeat: no-repeat;
 		display: grid;
@@ -512,36 +598,42 @@ div.sheet-abilityscores {
 			width: 98px !important;
 			height: 35px !important;
 		}
-		div.sheet-display-intelligence label[data-i18n-title="intelligencemod"] {
+		div.sheet-display-intelligence label[data-i18n-title="intelligence_mod"] {
 			grid-area: 16 / 8 / 16 / 14; 
 		}
-		div.sheet-display-intelligence label[data-i18n-title="intelligencemod"] > input {
+		div.sheet-display-intelligence label[data-i18n-title="intelligence_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 50px !important;
 			height: 25px !important;
 		}
-		div.sheet-display-intelligence label[data-i18n-title="intelligencesave"] {
-			grid-area: 1 / 26 / 6 / 26; 
+		div.sheet-display-intelligence label[data-i18n-title="intelligenceroll"] {
+			grid-area: 17 / 14 / 17 / 14; 
 		}
-		div.sheet-display-intelligence label[data-i18n-title="intelligencesave"] > span {
+		div.sheet-display-intelligence label[data-i18n-title="intelligence_save_roll"] {
+			grid-area: 6 / 32 / 6 / 32; 
+		}
+		div.sheet-display-intelligence label[data-i18n-title="intelligence_save_mod"] {
+			grid-area: 6 / 26 / 6 / 26; 
+		}
+		div.sheet-display-intelligence label[data-i18n-title="intelligence_save_mod"] > span {
 			font-size: 0.9em;
 		}
-		div.sheet-display-intelligence label[data-i18n-title="intelligencesave"] > input {
+		div.sheet-display-intelligence label[data-i18n-title="intelligence_save_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 35px !important;
 			height: 15px !important;
 		}
-		div.sheet-display-intelligence label[data-i18n-title="intelligencesaveprof"] {
+		div.sheet-display-intelligence label[data-i18n-title="intelligence_save_prof"] {
 			grid-area: 15 / 25 / 15 / -1; 
 		}
-		div.sheet-display-intelligence label[data-i18n-title="intelligencesaveprof"] > span {
+		div.sheet-display-intelligence label[data-i18n-title="intelligence_save_prof"] > span {
 			font-size: 0.7em;
 			width: 20px;
 		}
 	div.sheet-display-wisdom {
-		background-image: url(https://raw.githubusercontent.com/seregrauko/roll20-character-sheets/master/Level Up - Advanced 5th Edition/levelup-statframe.jpg);
+		background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Level%20Up%20-%20Advanced%205th%20Edition/levelup-statframe.jpg);
 		background-size: contain;
 		background-repeat: no-repeat;
 		display: grid;
@@ -572,36 +664,42 @@ div.sheet-abilityscores {
 			width: 98px !important;
 			height: 35px !important;
 		}
-		div.sheet-display-wisdom label[data-i18n-title="wisdommod"] {
+		div.sheet-display-wisdom label[data-i18n-title="wisdom_mod"] {
 			grid-area: 16 / 8 / 16 / 14; 
 		}
-		div.sheet-display-wisdom label[data-i18n-title="wisdommod"] > input {
+		div.sheet-display-wisdom label[data-i18n-title="wisdom_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 50px !important;
 			height: 25px !important;
 		}
-		div.sheet-display-wisdom label[data-i18n-title="wisdomsave"] {
-			grid-area: 1 / 26 / 6 / 26; 
+		div.sheet-display-wisdom label[data-i18n-title="wisdomroll"] {
+			grid-area: 17 / 14 / 17 / 14; 
 		}
-		div.sheet-display-wisdom label[data-i18n-title="wisdomsave"] > span {
+		div.sheet-display-wisdom label[data-i18n-title="wisdom_save_roll"] {
+			grid-area: 6 / 32 / 6 / 32; 
+		}
+		div.sheet-display-wisdom label[data-i18n-title="wisdom_save_mod"] {
+			grid-area: 6 / 26 / 6 / 26; 
+		}
+		div.sheet-display-wisdom label[data-i18n-title="wisdom_save_mod"] > span {
 			font-size: 0.9em;
 		}
-		div.sheet-display-wisdom label[data-i18n-title="wisdomsave"] > input {
+		div.sheet-display-wisdom label[data-i18n-title="wisdom_save_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 35px !important;
 			height: 15px !important;
 		}
-		div.sheet-display-wisdom label[data-i18n-title="wisdomsaveprof"] {
+		div.sheet-display-wisdom label[data-i18n-title="wisdom_save_prof"] {
 			grid-area: 15 / 25 / 15 / -1; 
 		}
-		div.sheet-display-wisdom label[data-i18n-title="wisdomsaveprof"] > span {
+		div.sheet-display-wisdom label[data-i18n-title="wisdom_save_prof"] > span {
 			font-size: 0.7em;
 			width: 20px;
 		}
 	div.sheet-display-charisma {
-		background-image: url(https://raw.githubusercontent.com/seregrauko/roll20-character-sheets/master/Level Up - Advanced 5th Edition/levelup-statframe.jpg);
+		background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Level%20Up%20-%20Advanced%205th%20Edition/levelup-statframe.jpg);
 		background-size: contain;
 		background-repeat: no-repeat;
 		display: grid;
@@ -632,31 +730,37 @@ div.sheet-abilityscores {
 			width: 98px !important;
 			height: 35px !important;
 		}
-		div.sheet-display-charisma label[data-i18n-title="charismamod"] {
+		div.sheet-display-charisma label[data-i18n-title="charismaroll"] {
+			grid-area: 17 / 14 / 17 / 14; 
+		}
+		div.sheet-display-charisma label[data-i18n-title="charisma_mod"] {
 			grid-area: 16 / 8 / 16 / 14; 
 		}
-		div.sheet-display-charisma label[data-i18n-title="charismamod"] > input {
+		div.sheet-display-charisma label[data-i18n-title="charisma_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 50px !important;
 			height: 25px !important;
 		}
-		div.sheet-display-charisma label[data-i18n-title="charismasave"] {
-			grid-area: 1 / 26 / 6 / 26; 
+		div.sheet-display-charisma label[data-i18n-title="charisma_save_roll"] {
+			grid-area: 6 / 32 / 6 / 32; 
 		}
-		div.sheet-display-charisma label[data-i18n-title="charismasave"] > span {
+		div.sheet-display-charisma label[data-i18n-title="charisma_save_mod"] {
+			grid-area: 6 / 26 / 6 / 26; 
+		}
+		div.sheet-display-charisma label[data-i18n-title="charisma_save_mod"] > span {
 			font-size: 0.9em;
 		}
-		div.sheet-display-charisma label[data-i18n-title="charismasave"] > input {
+		div.sheet-display-charisma label[data-i18n-title="charisma_save_mod"] > input {
 			font-size: 1.5em;
 			font-weight: bold;
 			width: 35px !important;
 			height: 15px !important;
 		}
-		div.sheet-display-charisma label[data-i18n-title="charismasaveprof"] {
+		div.sheet-display-charisma label[data-i18n-title="charisma_save_prof"] {
 			grid-area: 15 / 25 / 15 / -1; 
 		}
-		div.sheet-display-charisma label[data-i18n-title="charismasaveprof"] > span {
+		div.sheet-display-charisma label[data-i18n-title="charisma_save_prof"] > span {
 			font-size: 0.7em;
 			width: 20px;
 		}
@@ -720,8 +824,9 @@ div.sheet-miscscores {
 		font-weight: bold; 
 		border: 4pt double;
 		border-radius: 0px 0px 10px 10px;
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+		grid-template-rows: 1fr 1fr;
 		height: 60px;
 	}
 		div.sheet-display-initiative label[data-i18n-title="initiative"] {
@@ -729,29 +834,35 @@ div.sheet-miscscores {
 			width: 100%;
 			height: 100%;
 			margin: 5px;
-			display: grid;
-			grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+			grid-column: 1 / span 16;
+			grid-row: 1;
 		}
 			div.sheet-display-initiative label[data-i18n-title="initiative"] > span {
 				border: none;
 				text-align: center;
 				font-size: 1.1em;
-				grid-area: 1 / 4 / 1 / 5;
 			}
+		div.sheet-display-initiative label[data-i18n-title="initiativeroll"] {
+			border: none;
+			width: 100%;
+			height: 100%;
+			margin: 5px;
+			grid-column: 5 ;
+			grid-row: 1;
+		}
 		div.sheet-display-initiative label[data-i18n-title="initiative2nd"] {
 			border: none;
 			width: 100%;
 			height: auto;
-			display: grid;
-			grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+			grid-row: 2;
+			grid-column: 1 / span 6;
 		}
-			div.sheet-display-initiative label[data-i18n-title="initiative2nd"] > span {
+			div.sheet-display-initiative label[data-i18n-title="initiative2nd"] > select {
 				border: none;
-				height: 60%;
+				height: 80%;
 				font-size: 0.7em;
 				width: 100% !important;
 				text-align: center !important;
-				grid-column: 1 / span 15;
 			}
 
 	div.sheet-display-acsizespeed {
@@ -760,7 +871,7 @@ div.sheet-miscscores {
 		flex-direction: row;
 		height: 100px;
 	}
-		div.sheet-display-armor_class {
+		div.sheet-display-armour_class {
 			font-family:Times,serif;
 			font-weight: bold; 
 			border: 4pt double;
@@ -773,14 +884,14 @@ div.sheet-miscscores {
 			margin:0px;
 			margin-right: 5px;
 		}
-		div.sheet-display-armor_class label[data-i18n-title="armor_classstat"] {
+		div.sheet-display-armour_class label[data-i18n-title="armour_classstat"] {
 			border: none;
 			width: 100%;
 			grid-area: 3 / 1 / 3 / 6;
 			display: grid;
 			grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 		}
-			div.sheet-display-armor_class label[data-i18n-title="armor_classstat"] > input {
+			div.sheet-display-armour_class label[data-i18n-title="armour_classstat"] > input {
 				border: none;
 				height: 80%;
 				font-size: 2.75em;
@@ -788,14 +899,14 @@ div.sheet-miscscores {
 				text-align: center !important;
 				grid-area: 2 / 6 / 2 / 6;
 			}
-		div.sheet-display-armor_class label[data-i18n-title="armor_class"] {
+		div.sheet-display-armour_class label[data-i18n-title="armour_class"] {
 			border: 2pt solid;
 			background: #ffffff;
 			grid-area: 5 / 1 / 6 / 6;
 			text-align: center !important;
 		}
-			div.sheet-display-armor_class label[data-i18n-title="armor_class"] > span {
-				font-size: 0.7em;
+			div.sheet-display-armour_class label[data-i18n-title="armour_class"] > span {
+				font-size: 0.65em;
 				font-family:Times,serif;
 				font-weight: bold; 
 				text-align: center !important;
@@ -891,6 +1002,7 @@ div.sheet-miscscores {
 		border-radius: 10px;
 		height: 450px;
 		margin-top: 10px;
+		margin-left: 10px;
 	}
 		div.sheet-display-hp {
 			border: 1pt solid;
@@ -970,7 +1082,7 @@ div.sheet-miscscores {
 					}
 				div.sheet-display-hd label[data-i18n-title="hit_dice_total"] {
 					border: none;
-					grid-row: 3;
+					grid-row: 6;
 					grid-column: 1 / span 7;
 					width: 100%;
 					min-width: 0;
@@ -1027,8 +1139,11 @@ div.sheet-miscscores {
 			flex-direction: column;
 			height: 70px !important;
 			width: 97%;
-			gap: 1px 1px 0px 1px;
-			margin: 3pt 1pt 0pt 1pt !important;
+			gap: 1px 1px 1px 1px;
+			/*margin: 3pt 1pt 1pt 1pt !important;*/
+			margin-top: 2px;
+			margin-left: 1pt;
+			margin-right: 1pt;
 		}
 			div.sheet-display-hptemp label[data-i18n-title="hit_points_temp"] {
 				border: none;
@@ -1088,39 +1203,13 @@ div.sheet-miscscores {
 					font-family:Times,serif;
 					font-size: 1em;
 				}
-			div.sheet-display-death_saves label[data-i18n-title="death_saves_success1"] {
+			div.sheet-display-death_saves label[data-i18n-title="death_saves_successes"] {
 				border: none;
 				width: 100%;
 				grid-row: 2;
-				grid-column: 12;
+				grid-column: 6 / span 12 !important;
 				margin: 0px;
 			}
-				div.sheet-display-death_saves label[data-i18n-title="death_saves_success1"] > input {
-					border: none;
-					text-align: center;
-				}
-			div.sheet-display-death_saves label[data-i18n-title="death_saves_success2"] {
-				border: none;
-				width: 100%;
-				grid-row: 2;
-				grid-column: 14;
-				margin: 0px;
-			}
-				div.sheet-display-death_saves label[data-i18n-title="death_saves_success2"] > input {
-					border: none;
-					text-align: center;
-				}
-			div.sheet-display-death_saves label[data-i18n-title="death_saves_success3"] {
-				border: none;
-				width: 100%;
-				grid-row: 2;
-				grid-column: 16;
-				margin: 0px;
-			}
-				div.sheet-display-death_saves label[data-i18n-title="death_saves_success3"] > input {
-					border: none;
-					text-align: center;
-				}
 			div.sheet-display-death_saves label[data-i18n-title="death_saves_fail"] {
 				border: none;
 				width: 100%;
@@ -1134,54 +1223,27 @@ div.sheet-miscscores {
 					font-family:Times,serif;
 					font-size: 1em;
 				}
-			div.sheet-display-death_saves label[data-i18n-title="death_saves_fail1"] {
+			div.sheet-display-death_saves label[data-i18n-title="death_saves_fails"] {
 				border: none;
 				width: 100%;
 				grid-row: 3;
-				grid-column: 12;
+				grid-column: 6 / span 12;
 				margin: 0px;
 			}
-				div.sheet-display-death_saves label[data-i18n-title="death_saves_fail1"] > span {
-					border: none;
-					text-align: center;
-				}
-			div.sheet-display-death_saves label[data-i18n-title="death_saves_fail2"] {
-				border: none;
-				width: 100%;
-				grid-row: 3;
-				grid-column: 14;
-				margin: 0px;
-			}
-				div.sheet-display-death_saves label[data-i18n-title="death_saves_fail2"] > span {
-					border: none;
-					text-align: center;
-				}
-			div.sheet-display-death_saves label[data-i18n-title="death_saves_fail3"] {
-				border: none;
-				width: 100%;
-				grid-row: 3;
-				grid-column: 16;
-				margin: 0px;
-			}
-				div.sheet-display-death_saves label[data-i18n-title="death_saves_fail3"] > span {
-					border: none;
-					text-align: center;
-				}
 		div.sheet-display-fatigue_strife {
 			border: 1pt solid;
 			display: grid;
 			grid-template-columns: repeat(20,minmax(0,1fr));
 			grid-template-rows: repeat(2,minmax(0,1fr));
-			height: 40px !important;
+			height: 45px !important;
 			width: 97%;
-			gap: 1px 1px 0px 1px;
+			/*gap: 1px 1px 0px 1px;*/
 			margin: 1pt 1pt 0pt 1pt !important;
 		}
 			div.sheet-display-fatigue_strife label[data-i18n-title="fatigue"] {
 				border: none;
-				width: 100%;
 				grid-row: 1;
-				grid-column: 1 /span 6;
+				grid-column: 1 / span 2;
 				margin: 0px !important;
 				align-content: right;
 			}
@@ -1189,90 +1251,22 @@ div.sheet-miscscores {
 					border: none;
 					text-align: right;
 					font-family:Times,serif;
-					font-size: 0.7em;
+					font-size: 0.8em;
 				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="fatigue1"] {
+			div.sheet-display-fatigue_strife label[data-i18n-title="fatigues"] {
 				border: none;
-				width: 100%;
 				grid-row: 1;
-				grid-column: 7;
+				width: 150% !important;
+				grid-column: 6 / span 14;
 				margin: 0px !important;
-				align-content: right;
+				align-content: left;
+				vertical-align: middle;
 			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="fatigue1"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="fatigue2"] {
-				border: none;
-				width: 100%;
-				grid-row: 1;
-				grid-column: 9;
-				margin: 0px !important;
-				align-content: right;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="fatigue2"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="fatigue3"] {
-				border: none;
-				width: 100%;
-				grid-row: 1;
-				grid-column: 11;
-				margin: 0px !important;
-				align-content: right;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="fatigue3"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="fatigue4"] {
-				border: none;
-				width: 100%;
-				grid-row: 1;
-				grid-column: 13;
-				margin: 0px !important;
-				align-content: right;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="fatigue4"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="fatigue5"] {
-				border: none;
-				width: 100%;
-				grid-row: 1;
-				grid-column: 15;
-				margin: 0px !important;
-				align-content: right;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="fatigue5"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="fatigue6"] {
-				border: none;
-				width: 100%;
-				grid-row: 1;
-				grid-column: 17;
-				margin: 0px !important;
-				align-content: right;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="fatigue6"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="fatigue7"] {
-				border: none;
-				width: 100%;
-				grid-row: 1;
-				grid-column: 19;
-				margin: 0px !important;
-				align-content: right;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="fatigue7"] > span {
-					border: none;
-				}
 			div.sheet-display-fatigue_strife label[data-i18n-title="strife"] {
 				border: none;
 				width: 100%;
 				grid-row: 2;
-				grid-column: 1 /span 6;
+				grid-column: 1 / span 6;
 				margin: 0px;
 				align-content: center;
 			}
@@ -1280,85 +1274,17 @@ div.sheet-miscscores {
 					border: none;
 					text-align: center;
 					font-family:Times,serif;
-					font-size: 0.7em;
+					font-size: 0.8em;
 				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="strife1"] {
+			div.sheet-display-fatigue_strife label[data-i18n-title="strifes"] {
 				border: none;
 				width: 100%;
 				grid-row: 2;
-				grid-column: 7;
+				grid-column: 6 / span 14;
 				margin: 0px;
 				align-content: center;
+				vertical-align: middle;
 			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="strife1"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="strife2"] {
-				border: none;
-				width: 100%;
-				grid-row: 2;
-				grid-column: 9;
-				margin: 0px;
-				align-content: center;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="strife2"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="strife3"] {
-				border: none;
-				width: 100%;
-				grid-row: 2;
-				grid-column: 11;
-				margin: 0px;
-				align-content: center;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="strife3"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="strife4"] {
-				border: none;
-				width: 100%;
-				grid-row: 2;
-				grid-column: 13;
-				margin: 0px;
-				align-content: center;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="strife4"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="strife5"] {
-				border: none;
-				width: 100%;
-				grid-row: 2;
-				grid-column: 15;
-				margin: 0px;
-				align-content: center;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="strife5"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="strife6"] {
-				border: none;
-				width: 100%;
-				grid-row: 2;
-				grid-column: 17;
-				margin: 0px;
-				align-content: center;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="strife6"] > span {
-					border: none;
-				}
-			div.sheet-display-fatigue_strife label[data-i18n-title="strife7"] {
-				border: none;
-				width: 100%;
-				grid-row: 2;
-				grid-column: 19;
-				margin: 0px;
-				align-content: center;
-			}
-				div.sheet-display-fatigue_strife label[data-i18n-title="strife7"] > span {
-					border: none;
-				}
 		div.sheet-display-supply {
 			border: 1pt solid;
 			border-radius: 0px 0px 10px 10px;
@@ -1367,7 +1293,7 @@ div.sheet-miscscores {
 			justify-content: no-space;
 			height: 90px !important;
 			width: 97%;
-			margin: 2pt 1pt 0pt 1pt !important;
+			margin: 1pt 1pt 0pt 1pt !important;
 		}
 			div.sheet-display-supply label[data-i18n-title="supply"] {
 				border: none;
@@ -3502,7 +3428,7 @@ div.sheet-attacks {
 		}
 	div.sheet-attacks label[data-i18n-title="name"] {
 		width: 100%;
-		grid-column: 2 / span 8;
+		grid-column: 3 / span 8;
 		grid-row: 3;
 		margin: 2pt 0pt 0pt 0pt;
 	}
@@ -3604,6 +3530,7 @@ div.sheet-attacks {
 		}
 		div.sheet-attacks label[data-i18n-title="repeatingattacks"] > input[data-i18n-placeholder="attackdamagetype"]{
 			grid-column: 20 / span 3;
+			width: 75px;
 		}
 		div.sheet-attacks label[data-i18n-title="repeatingattacks"] > input[data-i18n-placeholder="attackrange"]{
 			grid-column: 24 / span 3;
@@ -4240,7 +4167,7 @@ div.sheet-equipment {
 		}
 	div.sheet-equipment label[data-i18n-title="wt"] {
 		width: 100%;
-		grid-column: 2 / span 8;
+		grid-column: 3 / span 8;
 		grid-row: 3;
 		margin: 2pt 0pt 0pt 0pt;
 	}
@@ -4262,7 +4189,7 @@ div.sheet-equipment {
 		}
 	div.sheet-equipment label[data-i18n-title="properties"] {
 		width: 100%;
-		grid-column: 19 / span 4;
+		grid-column: 28 / span 4;
 		grid-row: 3;
 		margin: 2pt 0pt 0pt 0pt;
 	}
@@ -5801,3 +5728,969 @@ div.sheet-display-spells {
 			div.sheet-display-level9 label[data-i18n-title="repeatinglvl9"] > input[data-i18n-placeholder="spellpg"]{
 				grid-column: 18 / span 2 !important;
 			}
+
+
+div.sheet-statsinfo input[type="radio"]:checked + span {
+	color: white;
+	background-color: #222222;
+	box-shadow: inset 0px 0px 3px 3px #333333; 
+	}
+div.sheet-statsinfo {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  margin: 5px;
+  width: calc(100% - 10px); 
+  }
+  div.sheet-statsinfo input[type="radio"] {
+    opacity: 0;
+    width: 100%;
+    z-index: 2; 
+	}
+  div.sheet-statsinfo label {
+    display: grid;
+	color: black;
+    text-align: center;
+    font-size: 1em; 
+	}
+    div.sheet-statsinfo label input, div.sheet-statsinfo label span {
+      grid-area: 1 / 1 / 1 / 1; 
+      height: 20px !important;
+	  }
+    div.sheet-statsinfo  span {
+      background-color: #e9e7e2;
+      border-radius: 5px;
+      box-shadow: 0 1px 1px #757575;
+      display: inline-block;
+      font-weight: bold;
+      padding: 5% 2%; 
+      height: 1em;
+	  }
+
+
+div.sheet-npc-info,
+div.sheet-npc-stats {
+	display: none; 
+	}
+
+.sheet-statsinfotoggle[value="info"] ~ div.sheet-NPC > div.sheet-npc-info,
+.sheet-statsinfotoggle[value="stats"] ~ div.sheet-NPC > div.sheet-npc-stats {
+    display: block;
+}
+
+
+div.sheet-npc-header {
+	display: grid;
+	grid-template-columns: repeat(20, 1fr);
+	grid-template-rows: repeat(1, auto);
+	width: calc(100% - 10px); 
+	min-width: 90%;
+	border: double 4pt;
+	border-radius: 10px;
+	margin: 0;
+	font-family:Times,serif;
+	font-size:15.1px;
+	font-weight:bold;
+	font-style:normal;
+	text-align: center;
+	color:rgb(43,42,41);
+	}
+	div.sheet-npc-header label[data-i18n-title="npc_name"] {
+		grid-column: 1 / span 10 ;
+		grid-row: 1 ;
+		text-align: centre;
+		}
+	div.sheet-npc-header label[data-i18n-title="npc_name"] input {
+		border: 0;
+		margin: 1px;
+		vertical-align: middle;
+		text-align: centre;
+		font-weight: bold !important;
+		font-size: 25.1px;
+		width: 100%;
+		}
+	div.sheet-npc-header label[data-i18n-title="ChallengeRating"]{
+		grid-column: 12 / span 7 ;
+		grid-row: 1 ;
+		}
+	div.sheet-npc-header label[data-i18n-title="ChallengeRating"] span{
+		border: 0;
+		vertical-align: middle;
+		}
+	div.sheet-npc-header label[data-i18n-title="ChallengeRating"] input{
+		border: 0;
+		text-align: left;
+		}
+	div.sheet-npc-header label[data-i18n-title="CreatureSizeType"]  {
+		grid-column: 1 / span 10 ;
+		grid-row: 2 ;
+		}
+	div.sheet-npc-header label[data-i18n-title="CreatureSizeType"]  input{
+		border: 0;
+		}
+	div.sheet-npc-header label[data-i18n-title="XPReward"]  {
+		grid-column: 12 / span 6 ;
+		grid-row: 2 ;
+		}
+	div.sheet-npc-header label[data-i18n-title="XPReward"] input {
+		width: 50%;
+		border: 0;
+		}
+
+div.sheet-npc-stats {
+	display: grid;
+	grid-template-columns: repeat(20, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	width: calc(100% - 10px); 
+	min-width: 90%;
+	border: 2px solid #222222;
+	border-radius: 10px;
+	margin: 0;
+	font-family:Times,serif;
+	font-size:15.1px;
+	font-weight:bold;
+	font-style:normal;
+	text-align: center;
+	color:rgb(43,42,41);
+	}
+
+	div.sheet-npc-stats label[data-i18n-title="armourclass"]{
+		grid-column: 1 / span 10 ;
+		grid-row: 1 ;
+		}
+	div.sheet-npc-stats label[data-i18n-title="armourclass"] input{
+		border: 0;
+		width: 80%;
+		text-align: left;
+		}
+	div.sheet-npc-stats label[data-i18n-title="hit_points"]{
+		grid-column: 1 / span 5 ;
+		grid-row: 2 ;
+		}
+	div.sheet-npc-stats label[data-i18n-title="hit_points"] input[type=number] {
+		border: 0;
+		text-align: left;
+		}
+	div.sheet-npc-stats label[data-i18n-title="hit_points"] input[type=text] {
+		width: 60%;
+		border: 0;
+		text-align: left;
+		}
+	div.sheet-npc-stats label[data-i18n-title="speed"]{
+		grid-column: 1 / span 10 ;
+		grid-row: 3 ;
+		}
+	div.sheet-npc-stats label[data-i18n-title="speed"] input {
+		border: 0;
+		text-align: left;
+		width: 70%;
+		}
+	
+
+	div.sheet-npc-stats > div.sheet-statblock {
+		grid-column: 1 / span 20 ;
+		grid-row: 6 / span 2;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+
+	div.sheet-statblock {
+		display: grid;
+		grid-template-columns: repeat(24, 1fr);
+		grid-template-rows: repeat(3, 25px);
+		height: 100px !important;
+		grid-gap: 0px !important;
+		margin: 0pt;
+	}
+ 	div.sheet-statblock label[data-i18n-title="str"]{
+		grid-column: 1 / span 3 ;
+		grid-row: 1 ;
+		text-align: center;
+		}
+ 	div.sheet-statblock label[data-i18n-title="dex"]{
+		grid-column: 5 / span 3 ;
+		grid-row: 1 ;
+		text-align: center;
+		}
+ 	div.sheet-statblock label[data-i18n-title="con"]{
+		grid-column: 9 / span 3 ;
+		grid-row: 1 ;
+		text-align: center;
+		}
+ 	div.sheet-statblock label[data-i18n-title="int"]{
+		grid-column: 13 / span 3 ;
+		grid-row: 1 ;
+		text-align: center;
+		}
+ 	div.sheet-statblock label[data-i18n-title="wis"]{
+		grid-column: 17 / span 3 ;
+		grid-row: 1 ;
+		text-align: center;
+		}
+  	div.sheet-statblock label[data-i18n-title="cha"]{
+		grid-column: 21 / span 3 ;
+		grid-row: 1 ;
+		text-align: center;
+		}
+ 	div.sheet-statblock label[data-i18n-title="save"]{
+		grid-column: 1 / span 2 ;
+		grid-row: 3 ;
+		text-align: left;
+		}
+ 	div.sheet-statblock label[data-i18n-title="strengthstat"]{
+		grid-column: 1 ;
+		grid-row: 2 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="strengthstat"] input{
+		border: 0;
+		width: 30px !important;
+		}
+ 	div.sheet-statblock label[data-i18n-title="strength_mod"]{
+		grid-column: 2 / span 2 ;
+		grid-row: 2 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="strength_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+ 	div.sheet-statblock label[data-i18n-title="strength_save_mod"]{
+		grid-column: 2 / span 3;
+		grid-row: 3 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="strength_save_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+ 	div.sheet-statblock label[data-i18n-title="dexteritystat"]{
+		grid-column: 5 ;
+		grid-row: 2 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="dexteritystat"] input{
+		border: 0;
+		width: 30px !important;
+		}
+ 	div.sheet-statblock label[data-i18n-title="dexterity_mod"]{
+		grid-column: 6 / span 2 ;
+		grid-row: 2 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="dexterity_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+ 	div.sheet-statblock label[data-i18n-title="dexterity_save_mod"]{
+		grid-column: 6 / span 3;
+		grid-row: 3 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="dexterity_save_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+ 	div.sheet-statblock label[data-i18n-title="constitutionstat"]{
+		grid-column: 9 ;
+		grid-row: 2 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="constitutionstat"] input{
+		border: 0;
+		}
+ 	div.sheet-statblock label[data-i18n-title="constitution_mod"]{
+		grid-column: 10 / span 2 ;
+		grid-row: 2 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="constitution_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+ 	div.sheet-statblock label[data-i18n-title="constitution_save_mod"]{
+		grid-column: 10 / span 3;
+		grid-row: 3 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="constitution_save_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+ 	div.sheet-statblock label[data-i18n-title="intelligencestat"]{
+		grid-column: 13 ;
+		grid-row: 2 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="intelligencestat"] input{
+		border: 0;
+		width: 30px !important;
+		}
+ 	div.sheet-statblock label[data-i18n-title="intelligence_mod"]{
+		grid-column: 14 / span 2 ;
+		grid-row: 2 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="intelligence_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+ 	div.sheet-statblock label[data-i18n-title="intelligence_save_mod"]{
+		grid-column: 14 / span 3;
+		grid-row: 3 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="intelligence_save_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+ 	div.sheet-statblock label[data-i18n-title="wisdomstat"]{
+		grid-column: 17 ;
+		grid-row: 2 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="wisdomstat"] input{
+		border: 0;
+		width: 30px !important;
+		}
+ 	div.sheet-statblock label[data-i18n-title="wisdom_mod"]{
+		grid-column: 18 / span 2 ;
+		grid-row: 2 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="wisdom_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+  	div.sheet-statblock label[data-i18n-title="wisdom_save_mod"]{
+		grid-column: 18 / span 3;
+		grid-row: 3 ;
+		}
+ 	div.sheet-statblock label[data-i18n-title="wisdom_save_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+ 	div.sheet-statblock label[data-i18n-title="charismastat"]{
+		grid-column: 21 ;
+		grid-row: 2 ;
+		}
+  	div.sheet-statblock label[data-i18n-title="charismastat"] input{
+		border: 0;
+		width: 30px !important;
+		}
+  	div.sheet-statblock label[data-i18n-title="charisma_mod"]{
+		grid-column: 22 / span 2;
+		grid-row: 2 ;
+		}
+  	div.sheet-statblock label[data-i18n-title="charisma_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+  	div.sheet-statblock label[data-i18n-title="charisma_save_mod"]{
+		grid-column: 22 / span 3;
+		grid-row: 3 ;
+		}
+  	div.sheet-statblock label[data-i18n-title="charisma_save_mod"] input{
+		width: 30px !important;
+		border: 0;
+		}
+	
+	div.sheet-npc-stats > div.sheet-profman  {
+		grid-column: 1 / span 20 ;
+		grid-row: 8 ;
+		}
+
+div.sheet-profman {
+	width: 98.5%;
+	border: double 4pt;
+	border-radius: 10px;
+	display: grid;
+	grid-template-columns: repeat(20,minmax(0,1fr));
+	justify-content: no-space;
+	margin: 4pt 1pt 0pt 1pt !important;
+	text-align: center;
+	}
+		
+	div.sheet-profman label[data-i18n-title="prof"]  {
+		grid-column: 1 / span 12 ;
+		grid-row: 1;
+		}
+	div.sheet-profman label[data-i18n-title="prof"]  input{
+		border: 0;
+		}
+	div.sheet-profman label[data-i18n-title="maneuverdc"]  {
+		grid-column: 8 / span 5 ;
+		grid-row: 1;
+		}
+	div.sheet-profman label[data-i18n-title="maneuverdc"] input {
+		border: 0;
+		}
+		
+	div.sheet-npc-stats > div.sheet-skills  {
+		grid-column: 1 / span 20 ;
+		grid-row: 9 ;
+		}
+		
+div.sheet-skills {
+	width: 98.5%;
+	border: double 4pt;
+	border-radius: 10px;
+	display: grid;
+	grid-template-columns: repeat(20,minmax(0,1fr));
+	justify-content: no-space;
+	margin: 4pt 1pt 0pt 1pt !important;
+	}
+	
+	div.sheet-skills label[data-i18n-title="skills"] {
+		width: 100%;
+		grid-column: 1 / span 20;
+		grid-row: 1;
+		margin: 2pt 0pt 0pt 0pt;
+		text-align: center;
+	}
+		div.sheet-skills label[data-i18n-title="skills"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 2em;
+		}
+	div.sheet-skills label[data-i18n-title="skill"] {
+		width: 100%;
+		grid-column: 3 / span 8;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-skills label[data-i18n-title="skill"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-skills label[data-i18n-title="skill_bonus"] {
+		width: 100%;
+		grid-column: 12 / span 4;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-skills label[data-i18n-title="skill_bonus"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-skills label[data-i18n-title="expertise_dice"] {
+		width: 100%;
+		grid-column: 16 / span 4;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-skills label[data-i18n-title="expertise_dice"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-skilllist {
+		width: 100%;
+		grid-row: 4;
+		grid-column: 1 / span 40;
+	}
+	div.sheet-skilllist label[data-i18n-title="repeatingskills"] {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(20,minmax(0,1fr));
+		margin: 2pt 0pt 0pt 0pt;
+		justify-content: no-space;
+		min-width: 0;
+		width: 100%;
+	}
+		div.sheet-skills label[data-i18n-title="repeatingskills"] > input {
+			font-family:Times,serif;
+			font-size: 0.7em;
+			height: 30px;
+			border: none;
+			border-bottom: solid 1pt;
+			border-radius:0;
+			min-width: 0;
+			width: 100%;
+		}
+		div.sheet-skills label[data-i18n-title="repeatingskills"] > button[data-i18n-placeholder="skillroll"]{
+			grid-column: 1 / span 2;
+		}
+		div.sheet-skills label[data-i18n-title="repeatingskills"] > input[data-i18n-placeholder="skillname"]{
+			grid-column: 3 / span 8;
+		}
+		div.sheet-skills label[data-i18n-title="repeatingskills"] > input[data-i18n-placeholder="skillbonus"]{
+			grid-column: 12 / span 3;
+		}
+		div.sheet-skills label[data-i18n-title="repeatingskills"] > input[data-i18n-placeholder="skillexdice"]{
+			grid-column: 16 / span 3;
+		}
+		
+	div.sheet-npc-stats > div.sheet-vulresinn {
+		grid-column: 1 / span 20 ;
+		grid-row: 10 / span 4;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-npc-stats > div.sheet-senlang {
+		grid-column: 1 / span 20 ;
+		grid-row: 14 / span 2;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+
+	div.sheet-vulresinn label[data-i18n-title="damage vulnerabilities"] > input {
+		border: 0;
+		width: 70%;
+		text-align: left;
+		}
+	div.sheet-vulresinn label[data-i18n-title="damage resistances"] > input  {
+		border: 0;
+		width: 80%;
+		text-align: left;
+		}
+	div.sheet-vulresinn label[data-i18n-title="damage immunities"] > input  {
+		border: 0;
+		width: 80%;
+		text-align: left;
+		}
+	div.sheet-vulresinn label[data-i18n-title="condition immunities"] > input  {
+		border: 0;
+		width: 70%;
+		text-align: left;
+		}
+	
+	div.sheet-npc-stats label[data-i18n-title="senses"]  {
+		grid-column: 2 / span 20 ;
+		grid-row: 14 ;
+		}
+	div.sheet-npc-stats label[data-i18n-title="senses"] input  {
+		border: 0;
+		width: 80%;
+		text-align: left;
+		}
+	div.sheet-npc-stats label[data-i18n-title="languages"]  {
+		grid-column: 2 / span 20 ;
+		grid-row: 15 ;
+		}
+	div.sheet-npc-stats label[data-i18n-title="languages"] input  {
+		border: 0;
+		width: 80%;
+		text-align: left;
+		}
+		
+	div.sheet-npc-stats > div.sheet-abilities_and_powers {
+		grid-column: 1 / span 20 ;
+		grid-row: 16;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-npc-stats label[data-i18n-title="abilities_and_powers"]  textarea {
+		border: 0;
+		width: 98.5%;
+		}
+		
+	div.sheet-npc-stats > div.sheet-attacks  {
+		grid-column: 1 / span 20 ;
+		grid-row: 17 ;
+		}
+	div.sheet-npc-stats > div.sheet-bonusactions  {
+		grid-column: 1 / span 20 ;
+		grid-row: 18 ;
+		}
+	div.sheet-npc-stats > div.sheet-reactions  {
+		grid-column: 1 / span 20 ;
+		grid-row: 19 ;
+		}
+	div.sheet-npc-stats > div.sheet-legendaryactions  {
+		grid-column: 1 / span 20 ;
+		grid-row: 20 ;
+		}
+
+div.sheet-actions {
+	width: 98.5%;
+	border: double 4pt;
+	border-radius: 10px;
+	display: grid;
+	grid-template-columns: repeat(20,minmax(0,1fr));
+	justify-content: no-space;
+	margin: 4pt 1pt 0pt 1pt !important;
+	}
+	
+	div.sheet-actions label[data-i18n-title="actions"] {
+		width: 100%;
+		grid-column: 1 / span 20;
+		grid-row: 1;
+		margin: 2pt 0pt 0pt 0pt;
+		text-align: center;
+	}
+		div.sheet-actions label[data-i18n-title="actions"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 2em;
+		}
+	div.sheet-actions label[data-i18n-title="name"] {
+		width: 100%;
+		grid-column: 2 / span 5;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-actions label[data-i18n-title="name"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-actions label[data-i18n-title="description"] {
+		width: 100%;
+		grid-column: 12 / span 4;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-actions label[data-i18n-title="description"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-actionlist {
+		width: 100%;
+		grid-row: 4;
+		grid-column: 1 / span 40;
+	}
+	div.sheet-actionlist label[data-i18n-title="repeatingactions"] {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(20,minmax(0,1fr));
+		margin: 2pt 0pt 0pt 0pt;
+		justify-content: no-space;
+		min-width: 0;
+		width: 100%;
+	}
+		div.sheet-actions label[data-i18n-title="repeatingactions"] > input {
+			font-family:Times,serif;
+			font-size: 0.7em;
+			height: 30px;
+			border: none;
+			border-bottom: solid 1pt;
+			border-radius:0;
+			min-width: 0;
+			width: 100%;
+		}
+		div.sheet-actions label[data-i18n-title="repeatingactions"] > input[data-i18n-placeholder="actionname"]{
+			grid-column: 2 / span 5;
+		}
+		div.sheet-actions label[data-i18n-title="repeatingactions"] > input[data-i18n-placeholder="actionnotes"]{
+			grid-column: 8 / span 12;
+		}
+
+div.sheet-bonusactions {
+	width: 98.5%;
+	border: double 4pt;
+	border-radius: 10px;
+	display: grid;
+	grid-template-columns: repeat(20,minmax(0,1fr));
+	justify-content: no-space;
+	margin: 4pt 1pt 0pt 1pt !important;
+	}
+	
+	div.sheet-bonusactions label[data-i18n-title="bonusactions"] {
+		width: 100%;
+		grid-column: 1 / span 20;
+		grid-row: 1;
+		margin: 2pt 0pt 0pt 0pt;
+		text-align: center;
+	}
+		div.sheet-bonusactions label[data-i18n-title="bonusactions"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 2em;
+		}
+	div.sheet-bonusactions label[data-i18n-title="name"] {
+		width: 100%;
+		grid-column: 2 / span 5;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-bonusactions label[data-i18n-title="name"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-bonusactions label[data-i18n-title="description"] {
+		width: 100%;
+		grid-column: 12 / span 4;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-bonusactions label[data-i18n-title="description"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-bonuslist {
+		width: 100%;
+		grid-row: 4;
+		grid-column: 1 / span 40;
+	}
+	div.sheet-bonuslist label[data-i18n-title="repeatingbonusactions"] {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(20,minmax(0,1fr));
+		margin: 2pt 0pt 0pt 0pt;
+		justify-content: no-space;
+		min-width: 0;
+		width: 100%;
+	}
+		div.sheet-bonusactions label[data-i18n-title="repeatingbonusactions"] > input {
+			font-family:Times,serif;
+			font-size: 0.7em;
+			height: 30px;
+			border: none;
+			border-bottom: solid 1pt;
+			border-radius:0;
+			min-width: 0;
+			width: 100%;
+		}
+		div.sheet-bonusactions label[data-i18n-title="repeatingbonusactions"] > input[data-i18n-placeholder="bonusname"]{
+			grid-column: 2 / span 5;
+		}
+		div.sheet-bonusactions label[data-i18n-title="repeatingbonusactions"] > input[data-i18n-placeholder="bonusnotes"]{
+			grid-column: 8 / span 12;
+		}
+
+div.sheet-reactions {
+	width: 98.5%;
+	border: double 4pt;
+	border-radius: 10px;
+	display: grid;
+	grid-template-columns: repeat(20,minmax(0,1fr));
+	justify-content: no-space;
+	margin: 4pt 1pt 0pt 1pt !important;
+	}
+	
+	div.sheet-reactions label[data-i18n-title="reactions"] {
+		width: 100%;
+		grid-column: 1 / span 20;
+		grid-row: 1;
+		margin: 2pt 0pt 0pt 0pt;
+		text-align: center;
+	}
+		div.sheet-reactions label[data-i18n-title="reactions"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 2em;
+		}
+	div.sheet-reactions label[data-i18n-title="name"] {
+		width: 100%;
+		grid-column: 2 / span 5;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-reactions label[data-i18n-title="name"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-reactions label[data-i18n-title="description"] {
+		width: 100%;
+		grid-column: 12 / span 4;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-reactions label[data-i18n-title="description"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-reactionslist {
+		width: 100%;
+		grid-row: 4;
+		grid-column: 1 / span 40;
+	}
+	div.sheet-reactionslist label[data-i18n-title="repeatingreactions"] {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(20,minmax(0,1fr));
+		margin: 2pt 0pt 0pt 0pt;
+		justify-content: no-space;
+		min-width: 0;
+		width: 100%;
+	}
+		div.sheet-reactions label[data-i18n-title="repeatingreactions"] > input {
+			font-family:Times,serif;
+			font-size: 0.7em;
+			height: 30px;
+			border: none;
+			border-bottom: solid 1pt;
+			border-radius:0;
+			min-width: 0;
+			width: 100%;
+		}
+		div.sheet-reactions label[data-i18n-title="repeatingreactions"] > input[data-i18n-placeholder="reactionsname"]{
+			grid-column: 2 / span 5;
+		}
+		div.sheet-reactions label[data-i18n-title="repeatingreactions"] > input[data-i18n-placeholder="reactionsnotes"]{
+			grid-column: 8 / span 12;
+		}
+
+div.sheet-legendaryactions {
+	width: 98.5%;
+	border: double 4pt;
+	border-radius: 10px;
+	display: grid;
+	grid-template-columns: repeat(20,minmax(0,1fr));
+	justify-content: no-space;
+	margin: 4pt 1pt 0pt 1pt !important;
+	}
+	
+	div.sheet-legendaryactions label[data-i18n-title="legendaryactions"] {
+		width: 100%;
+		grid-column: 1 / span 20;
+		grid-row: 1;
+		margin: 2pt 0pt 0pt 0pt;
+		text-align: center;
+	}
+		div.sheet-legendaryactions label[data-i18n-title="legendaryactions"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 2em;
+		}
+	div.sheet-legendaryactions label[data-i18n-title="name"] {
+		width: 100%;
+		grid-column: 2 / span 5;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-legendaryactions label[data-i18n-title="name"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-legendaryactions label[data-i18n-title="description"] {
+		width: 100%;
+		grid-column: 12 / span 4;
+		grid-row: 3;
+		margin: 2pt 0pt 0pt 0pt;
+	}
+		div.sheet-legendaryactions label[data-i18n-title="description"] > span {
+			text-align: center;
+			font-family:Times,serif;
+			font-size: 1em;
+		}
+	div.sheet-legendarylist {
+		width: 100%;
+		grid-row: 4;
+		grid-column: 1 / span 40;
+	}
+	div.sheet-legendarylist label[data-i18n-title="repeatinglegendaryactions"] {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(20,minmax(0,1fr));
+		margin: 2pt 0pt 0pt 0pt;
+		justify-content: no-space;
+		min-width: 0;
+		width: 100%;
+	}
+		div.sheet-legendaryactions label[data-i18n-title="repeatinglegendaryactions"] > input {
+			font-family:Times,serif;
+			font-size: 0.7em;
+			height: 30px;
+			border: none;
+			border-bottom: solid 1pt;
+			border-radius:0;
+			min-width: 0;
+			width: 100%;
+		}
+		div.sheet-legendaryactions label[data-i18n-title="repeatinglegendaryactions"] > input[data-i18n-placeholder="legendaryname"]{
+			grid-column: 2 / span 5;
+		}
+		div.sheet-legendaryactions label[data-i18n-title="repeatinglegendaryactions"] > input[data-i18n-placeholder="legendarynotes"]{
+			grid-column: 8 / span 12;
+		}
+
+
+	div.sheet-npc-info > div.sheet-NPCNotes {
+		grid-column: 1 / span 20 ;
+		grid-row: 16;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-NPCNotes label[data-i18n-title="NPCNotes"]  textarea {
+		border: 0;
+		width: 98.5%;
+		}
+	div.sheet-npc-info > div.sheet-NPCNotes {
+		grid-column: 1 / span 20 ;
+		grid-row: 16;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-NPCNotes label[data-i18n-title="NPCNotes"]  textarea {
+		border: 0;
+		width: 98.5%;
+		}
+	div.sheet-npc-info > div.sheet-NPClegend_and_lore {
+		grid-column: 1 / span 20 ;
+		grid-row: 16;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-NPClegend_and_lore label[data-i18n-title="NPClegend_and_lore"]  textarea {
+		border: 0;
+		width: 98.5%;
+		}
+	div.sheet-npc-info > div.sheet-NPCEncounters {
+		grid-column: 1 / span 20 ;
+		grid-row: 16;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-NPCEncounters label[data-i18n-title="NPCEncounters"]  textarea {
+		border: 0;
+		width: 98.5%;
+		}
+	div.sheet-npc-info > div.sheet-NPCRules {
+		grid-column: 1 / span 20 ;
+		grid-row: 16;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-NPCRules label[data-i18n-title="NPCRules"]  textarea {
+		border: 0;
+		width: 98.5%;
+		}
+	div.sheet-npc-info > div.sheet-NPCSigns {
+		grid-column: 1 / span 20 ;
+		grid-row: 16;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-NPCSigns label[data-i18n-title="NPCSigns"]  textarea {
+		border: 0;
+		width: 98.5%;
+		}
+	div.sheet-npc-info > div.sheet-NPCBehaviour {
+		grid-column: 1 / span 20 ;
+		grid-row: 16;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-NPCBehaviour label[data-i18n-title="NPCBehaviour"]  textarea {
+		border: 0;
+		width: 98.5%;
+		}
+	div.sheet-npc-info > div.sheet-NPCCombat {
+		grid-column: 1 / span 20 ;
+		grid-row: 16;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-NPCCombat label[data-i18n-title="NPCCombat"]  textarea {
+		border: 0;
+		width: 98.5%;
+		}
+	div.sheet-npc-info > div.sheet-NPCNames {
+		grid-column: 1 / span 20 ;
+		grid-row: 16;
+		width: 98.5%;
+		border: double 4pt;
+		border-radius: 10px;
+	}
+	div.sheet-NPCNames label[data-i18n-title="NPCNames"]  textarea {
+		border: 0;
+		width: 98.5%;
+		}

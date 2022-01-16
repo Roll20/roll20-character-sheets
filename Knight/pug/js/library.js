@@ -1,3 +1,7 @@
+/* eslint-disable no-global-assign */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-undef */
 /* ---- BEGIN: TheAaronSheet.js ---- */
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
 // By:       The Aaron, Arcane Scriptomancer
@@ -229,6 +233,7 @@ debugMode = function(){
 
 getCallstack = function(){
     var e = new Error('dummy'),
+        // eslint-disable-next-line no-useless-escape
         stack = _.map(_.rest(e.stack.replace(/^[^\(]+?[\n$]/gm, '')
         .replace(/^\s+at\s+/gm, '')
         .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
@@ -848,7 +853,12 @@ const i18n_deplacement = getTranslationByKey("deplacement"),
     i18n_briserResilience = getTranslationByKey("briser-resilience"),
     i18n_poingsSoniques = getTranslationByKey("poings-soniques-effets"),
     i18n_lameCinetique = getTranslationByKey("lames-cinetiques-geantes-effets"),
-    i18n_attaquesOmbres = getTranslationByKey("capacite-fan-made-Attaque-dans-les-ombres")
+    i18n_attaquesOmbres = getTranslationByKey("capacite-fan-made-Attaque-dans-les-ombres"),
+    i18n_porteeMoyenne = getTranslationByKey("portee-moyenne"),
+    i18n_porteeCourte = getTranslationByKey("portee-courte"),
+    i18n_devasterAnatheme = getTranslationByKey("devaster-anatheme"),
+    i18n_bourreauTenebres = getTranslationByKey("bourreau-tenebres"),
+    i18n_equilibrerBalance = getTranslationByKey("equilibrer-balance")
     ;
 
 function maxCar(carac, score, aspect)
@@ -859,7 +869,21 @@ function maxCar(carac, score, aspect)
             [carac]: aspect
         });
     }
-};
+}
+
+function totalADruid(attrs, aspect) {
+    let base = +attrs[`${aspect}Base`];
+    let evol = +attrs[`${aspect}Evol`];
+
+    return base+evol;
+}
+
+function totalAspect(attrs, aspect) {
+    let min = +attrs[`${aspect}PNJAE`];
+    let maj = +attrs[`${aspect}PNJAEMaj`];
+
+    return min+maj;
+}
 
 function setPanneauInformation(texte, reset = false, slot = false, energie = false)
 {	
@@ -903,7 +927,7 @@ function setPanneauInformation(texte, reset = false, slot = false, energie = fal
         
     if(energie == true)
         PI["msgEnergie"] = 1;
-};
+}
 
 function resetPanneauInformation()
 {
@@ -915,7 +939,105 @@ function resetPanneauInformation()
     PI["msgSlot"] = 0;
     
     PI["msgEnergie"] = 0;
-};
+}
+
+function setActiveCharacterId(charId){
+    var oldAcid=getActiveCharacterId();
+    var ev = new CustomEvent("message");
+    ev.data={"id":"0", "type":"setActiveCharacter", "data":charId};
+    self.dispatchEvent(ev); 
+    return oldAcid;
+}
+
+var _sIn=setInterval;
+setInterval=function(callback, timeout){
+    var acid=getActiveCharacterId();
+    _sIn(
+        function(){
+            var prevAcid=setActiveCharacterId(acid);
+            callback();
+            setActiveCharacterId(prevAcid);
+        }
+    ,timeout);
+}
+
+var _sto=setTimeout
+setTimeout=function(callback, timeout){
+    var acid=getActiveCharacterId();
+    _sto(
+        function(){
+            var prevAcid=setActiveCharacterId(acid);
+            callback();
+            setActiveCharacterId(prevAcid);
+        }
+    ,timeout);
+}
+
+function getAttrsAsync(props){
+    var acid=getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
+    var prevAcid=null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
+            try{
+                getAttrs(props,(values)=>{  resolve(values); }); 
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
+    });
+}
+
+//use the same pattern for each of the following...
+function setAttrsAsync(propObj, options){
+    var acid=getActiveCharacterId(); 
+    var prevAcid=null;               
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);  
+            try{
+                setAttrs(propObj,options,(values)=>{ resolve(values); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); 
+    });
+}
+
+function getSectionIDsAsync(sectionName){
+    var acid=getActiveCharacterId(); 
+    var prevAcid=null;               
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);  
+            try{
+                getSectionIDs(sectionName,(values)=>{ resolve(values); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); 
+    });
+}
+
+function getSingleAttrAsync(prop){ 
+    var acid=getActiveCharacterId(); 
+    var prevAcid=null;               
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);  
+            try{
+                getAttrs([prop],(values)=>{  resolve(values[prop]); }); 
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); 
+    });
+}
+
+function isApplied(e) {
+    let result = false;
+
+    if(e != "0")
+        result = e;
+
+    return result;
+}
 
 var PI = {
     "msgSlot":0,
@@ -924,220 +1046,102 @@ var PI = {
 
 const listeArmure = ["Guardian", "Barbarian", "Bard", "Berserk", "Druid", "Monk", "Necromancer", "Paladin", "Priest", "Psion", "Ranger", "Rogue", "Shaman", "Sorcerer", "Warlock","Warmaster", "Warrior", "Wizard"];
 
-const donneesPJ = {};
-
-var armure = {
+const dataArmure = {
     "sans":{
-        armure:0,
         armureMax:0,
-        armureModif:0,
-        energie:0,
         energieMax:0,
-        energieModif:0,
-        cdf:0,
-        cdfMax:0,
-        cdfModif:0
+        cdfMax:0
     },
     "guardian":{
-        armure:5,
         armureMax:5,
-        armureModif:0,
-        energie:0,
         energieMax:0,
-        energieModif:0,
-        cdf:5,
-        cdfMax:5,
-        cdfModif:0
+        cdfMax:5
     },
     "barbarian":{
-        armure:60,
         armureMax:60,
-        armureModif:0,
-        energie:60,
         energieMax:60,
-        energieModif:0,
-        cdf:12,
         cdfMax:12,
-        cdfModif:0
     },
     "bard":{
-        armure:40,
         armureMax:40,
-        armureModif:0,
-        energie:80,
         energieMax:80,
-        energieModif:0,
-        cdf:12,
-        cdfMax:12,
-        cdfModif:0
+        cdfMax:12
     },
     "berserk":{
-        armure:60,
         armureMax:60,
-        armureModif:0,
-        energie:0,
         energieMax:0,
-        energieModif:0,
         egide:6,
-        cdf:8,
         cdfMax:8,
-        cdfModif:0
     },
     "druid":{
-        armure:50,
         armureMax:50,
-        armureModif:0,
-        energie:80,
         energieMax:80,
-        energieModif:0,
-        cdf:12,
         cdfMax:12,
-        cdfModif:0
     },
     "monk":{
-        armure:60,
         armureMax:60,
-        armureModif:0,
-        energie:50,
         energieMax:50,
-        energieModif:0,
-        cdf:14,
-        cdfMax:14,
-        cdfModif:0
+        cdfMax:14
     },
     "necromancer":{
-        armure:80,
         armureMax:80,
-        armureModif:0,
-        energie:100,
         energieMax:100,
-        energieModif:0,
-        cdf:12,
-        cdfMax:12,
-        cdfModif:0
+        cdfMax:12
     },
     "paladin":{
-        armure:120,
         armureMax:120,
-        armureModif:0,
-        energie:20,
         energieMax:20,
-        energieModif:0,
-        cdf:8,
-        cdfMax:8,
-        cdfModif:0
+        cdfMax:8
     },
     "priest":{
-        armure:70,
         armureMax:70,
-        armureModif:0,
-        energie:60,
         energieMax:60,
-        energieModif:0,
-        cdf:10,
-        cdfMax:10,
-        cdfModif:0
+        cdfMax:10
     },
     "psion":{
-        armure:50,
         armureMax:50,
-        armureModif:0,
-        energie:60,
         energieMax:60,
-        energieModif:0,
-        cdf:14,
-        cdfMax:14,
-        cdfModif:0
+        cdfMax:14
     },
     "ranger":{
-        armure:50,
         armureMax:50,
-        armureModif:0,
-        energie:70,
         energieMax:70,
-        energieModif:0,
-        cdf:12,
-        cdfMax:12,
-        cdfModif:0
+        cdfMax:12
     },
     "rogue":{
-        armure:50,
         armureMax:50,
-        armureModif:0,
-        energie:70,
         energieMax:70,
-        energieModif:0,
-        cdf:12,
-        cdfMax:12,
-        cdfModif:0
+        cdfMax:12
     },
     "shaman":{
-        armure:60,
         armureMax:60,
-        armureModif:0,
-        energie:80,
         energieMax:80,
-        energieModif:0,
-        cdf:10,
-        cdfMax:10,
-        cdfModif:0
+        cdfMax:10
     },
     "sorcerer":{
-        armure:60,
         armureMax:60,
-        armureModif:0,
-        energie:80,
         energieMax:80,
-        energieModif:0,
-        cdf:14,
-        cdfMax:14,
-        cdfModif:0
+        cdfMax:14
     },
     "warlock":{
-        armure:60,
         armureMax:60,
-        armureModif:0,
-        energie:60,
         energieMax:60,
-        energieModif:0,
-        cdf:8,
-        cdfMax:8,
-        cdfModif:0
+        cdfMax:8
     },
     "warmaster":{
-        armure:90,
         armureMax:90,
-        armureModif:0,
-        energie:50,
         energieMax:50,
-        energieMax150:60,
-        energieMax250:70,
-        energieModif:0,
-        cdf:8,
-        cdfMax:8,
-        cdfModif:0
+        cdfMax:8
     },
     "warrior":{
-        armure:100,
         armureMax:100,
-        armureModif:0,
-        energie:40,
         energieMax:40,
-        energieModif:0,
-        cdf:8,
-        cdfMax:8,
-        cdfModif:0
+        cdfMax:8
     },		
     "wizard":{
-        armure:40,
         armureMax:40,
-        armureModif:0,
-        energie:80,
         energieMax:80,
-        energieModif:0,
-        cdf:14,
-        cdfMax:14,
-        cdfModif:0
+        cdfMax:14
     }
 };
 
@@ -1159,25 +1163,7 @@ const CaracNom = {
     "perception":i18n_perception,
 };
 
-const ODNom = {
-    "deplacement":"deplOD",
-    "force":"forOD",
-    "endurance":"endOD",
-    "hargne":"hargneOD",
-    "combat":"combOD",
-    "instinct":"instOD",
-    "tir":"tirOD",
-    "savoir":"savoirOD",
-    "technique":"technOD",
-    "aura":"auraOD",
-    "parole":"paroleOD",
-    "sf":"sfOD",
-    "discretion":"discrOD",
-    "dexterite":"dextOD",
-    "perception":"percOD",
-};
-
-const ODTotalNom = {
+const ODValue = {
     "deplacement":"calODDep",
     "force":"calODFor",
     "endurance":"calODEnd",
@@ -1193,84 +1179,6 @@ const ODTotalNom = {
     "discretion":"calODDis",
     "dexterite":"calODDex",
     "perception":"calODPer",
-};
-
-const CaracValue = {
-    "deplacement":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "force":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "endurance":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "hargne":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "combat":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "instinct":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "tir":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "savoir":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "technique":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "aura":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "parole":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "sang-froid":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "discretion":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "dexterite":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    },
-    "perception":{
-        "value":0,
-        "OD":0,
-        "VraiOD":0
-    }
 };
 
 const aspectCompanionsDruid = {
@@ -1306,129 +1214,6 @@ const aspectCompanionsDruid = {
     "MALDruidCrowMasque":i18n_masque
 };
 
-const aspectCompanionsDruidValue = {
-    "druidLionChair":{
-        "value":0,
-        "AE":0
-    },
-    "druidLionBete":{
-        "value":0,
-        "AE":0
-    },
-    "druidLionMachine":{
-        "value":0,
-        "AE":0
-    },
-    "druidLionDame":{
-        "value":0,
-        "AE":0
-    },
-    "druidLionMasque":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidLionChair":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidLionBete":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidLionMachine":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidLionDame":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidLionMasque":{
-        "value":0,
-        "AE":0
-    },
-    "druidWolfChair":{
-        "value":0,
-        "AE":0
-    },
-    "druidWolfBete":{
-        "value":0,
-        "AE":0
-    },
-    "druidWolfMachine":{
-        "value":0,
-        "AE":0
-    },
-    "druidWolfDame":{
-        "value":0,
-        "AE":0
-    },
-    "druidWolfMasque":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidWolfChair":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidWolfBete":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidWolfMachine":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidWolfDame":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidWolfMasque":{
-        "value":0,
-        "AE":0
-    },
-    "druidCrowChair":{
-        "value":0,
-        "AE":0
-    },
-    "druidCrowBete":{
-        "value":0,
-        "AE":0
-    },
-    "druidCrowMachine":{
-        "value":0,
-        "AE":0
-    },
-    "druidCrowDame":{
-        "value":0,
-        "AE":0
-    },
-    "druidCrowMasque":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidCrowChair":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidCrowBete":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidCrowMachine":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidCrowDame":{
-        "value":0,
-        "AE":0
-    },
-    "MALDruidCrowMasque":{
-        "value":0,
-        "AE":0
-    }
-};
-
 const AspectNom = {
     "Chair":i18n_chair,
     "Bete":i18n_bete,
@@ -1437,7 +1222,7 @@ const AspectNom = {
     "Masque":i18n_masque,
 };
 
-const AENom = {
+const AEValue = {
     "Chair_Min":"ChairPNJAE",
     "Chair_Maj":"ChairPNJAEMaj",
     "Bete_Min":"BetePNJAE",
@@ -1450,332 +1235,170 @@ const AENom = {
     "Masque_Maj":"MasquePNJAEMaj",
 };
 
-const AspectValue = {
-    "Chair":{
-        "value":0,
-        "AEMin":0,
-        "AEMaj":0
-    },
-    "Bete":{
-        "value":0,
-        "AEMin":0,
-        "AEMaj":0
-    },
-    "Machine":{
-        "value":0,
-        "AEMin":0,
-        "AEMaj":0
-    },
-    "Dame":{
-        "value":0,
-        "AEMin":0,
-        "AEMaj":0
-    },
-    "Masque":{
-        "value":0,
-        "AEMin":0,
-        "AEMaj":0
-    }
-};
+const listBase = [
+    `armure`,
+    `armureLegende`,
+    `jetModifDes`,
+    `bonusCarac`,
+];
 
-const PJData = {
-    "bonusCarac":0,
-    "jetModifDes":0,
-    "santepj":0,
-    "santepj_max":0,
-    "armurePJ":0,
-    "armurePJ_max":0,
-    "energiePJ":0,
-    "energiePJ_max":0,
-    "espoir":0,
-    "espoir_max":0,
-    "styleCombat":0,
-    "atkDefensif":0,
-    "atkCouvert":0,
-    "atkAgressif":0,
-    "atkAkimbo":0,
-    "atkAmbidextre":0,
-    "atkPilonnage":0,
-    "atkPuissant":0,
-    "barbarianGoliath":0,
-    "MALBarbarianGoliath":0,
-    "rogueGhost":0,
-    "MALRogueGhost":0,
-    "shamanNbreTotem":0,
-    "MALShamanNbreTotem":0,
-    "caracteristiqueTotem1":0,
-    "MALCaracteristiqueTotem1":0,
-    "caracteristiqueTotem2":0,
-    "MALCaracteristiqueTotem2":0,
-    "caracteristiqueTotem3":0,
-    "warriorSoldierA":0,
-    "MALWarriorSoldierA":0,
-    "warriorHunterA":0,
-    "MALWarriorHunterA":0,
-    "warriorScholarA":0,
-    "MALWarriorScholarA":0,
-    "warriorHeraldA":0,
-    "MALWarriorHeraldA":0,
-    "warriorScoutA":0,
-    "MALWarriorScoutA":0,
-    "poingCcaracteristique1Equipement":0,
-    "poingCcaracteristique2Equipement":0,
-    "poingCcaracteristique3Equipement":0,
-    "poingCcaracteristique4Equipement":0,
-    "poingMACcaracteristique1Equipement":0,
-    "poingMACcaracteristique2Equipement":0,
-    "poingMACcaracteristique3Equipement":0,
-    "poingMACcaracteristique4Equipement":0,
-    "pSCcaracteristique1Equipement":0,
-    "pSCcaracteristique2Equipement":0,
-    "pSCcaracteristique3Equipement":0,
-    "pSCcaracteristique4Equipement":0,
-    "pSCcaracteristiqueSPrecis":0,
-    "mECcaracteristique1Equipement":0,
-    "mECcaracteristique2Equipement":0,
-    "mECcaracteristique3Equipement":0,
-    "mECcaracteristique4Equipement":0,
-    "mECcaracteristiqueSPrecis":0,
-    "pScaracteristique1Equipement":0,
-    "pScaracteristique2Equipement":0,
-    "pScaracteristique3Equipement":0,
-    "pScaracteristique4Equipement":0,
-    "mEcaracteristique1Equipement":0,
-    "mEcaracteristique2Equipement":0,
-    "mEcaracteristique3Equipement":0,
-    "mEcaracteristique4Equipement":0,
-    "pSpilonnage":0,
-    "mEpilonnage":0,
-    "caracteristique1Grenade":0,
-    "caracteristique2Grenade":0,
-    "caracteristique3Grenade":0,
-    "caracteristique4Grenade":0,
-    "grenadeAvancee":0,
-    "utilisationArmeAI":0,
-    "caracteristique3ArmeImprovisee":0,
-    "caracteristique4ArmeImprovisee":0,
-    "diceInitiative":0,
-    "bonusInitiative":0,
-    "bonusInitiativeP":0,
-    "malusInitiative":0,
-}
+const listArmure = [
+    `barbarianGoliath`,
+    `rogueGhost`,
+    `shamanNbreTotem`,
+    `caracteristiqueTotem1`,
+    `caracteristiqueTotem2`,
+    `caracteristiqueTotem3`,
+    `warriorSoldierA`,
+    `warriorHunterA`,
+    `warriorHeraldA`,
+    `warriorScholarA`,
+    `warriorScoutA`,
+    `warrior250PG`,
+];
 
-const PNJData = {
-    "aspectPNJ":0,
-    "pSCAspectPNJ":0,
-    "mECAspectPNJ":0,
-    "pSAspectPNJ":0,
-    "mEDistancePNJ":0,
-    "aspectPNJGrenade":0,
-    "utilisationArmeAIPNJ":0,
-    "capaciteFanMade":0,
-    "attaqueOmbre":0,
-    "energiePNJ":0,
-    "energiePNJ_max":0,
-}
+const listArmureLegende = [
+    `MALBarbarianGoliath`,
+    `MALRogueGhost`,
+    `MALShamanNbreTotem`,
+    `MALCaracteristiqueTotem1`,
+    `MALCaracteristiqueTotem2`,
+    `MALWarriorSoldierA`,
+    `MALWarriorHunterA`,
+    `MALWarriorHeraldA`,
+    `MALWarriorScholarA`,
+    `MALWarriorScoutA`,
+];
 
-const VehiculeData = {
-    "desVehicule":0,
-    "ODVehicule":0,
-}
+const listStyle = [
+    `styleCombat`,
+    `atkCouvert`,
+    `atkAgressif`,
+    `atkAkimbo`,
+    `atkAmbidextre`,
+    `atkDefensif`,
+    `atkPilonnage`,
+    `stylePuissantType`,
+    `stylePuissantBonus`,
+    `styleSuppressionD`,
+    `styleSuppressionV`,
+];
 
-const MAData = {
-    "mechaArmureManoeuvrabilite":0,
-    "mechaArmurePuissance":0,
-    "MAAGOfferingNE":0,
-    "MAAGCurseNE":0,
-    "MAAGMiracleSante":0,
-    "MAAGMiracleArmure":0,
-    "MAAGMiracleBlindage":0,
-    "MAAGMiracleRésilience":0,
-    "canonMetatronCaracteristique1":"0",
-    "canonMetatronCaracteristique2":"0",
-    "canonMetatronCaracteristique3":"0",
-    "canonMetatronCaracteristique4":"0",
-    "MAACanonMetatronDgts":0,
-    "MAACanonMetatronViolence":0,
-    "MAACanonMetatronPortee":0,
-    "MAACanonNoeArmure":0,
-    "MAACanonNoeBlindage":0,
-    "MAACanonNoeResilience":0,
-    "MANOGInvulnerabiliteDuree":0,
-    "MANOGStationTourDebordement":0,
-    "MANMJPortee":0,
-    "MANMJDgts":0,
-    "MANMJViolence":0,
-    "canonMagmaCaracteristique1":0,
-    "canonMagmaCaracteristique2":0,
-    "canonMagmaCaracteristique3":0,
-    "canonMagmaCaracteristique4":0,
-    "MANCanonMagmaDgts":0,
-    "MANCanonMagmaViolence":0,
-    "MSurturCaracteristique1":0,
-    "MSurturCaracteristique2":0,
-    "MSurturCaracteristique3":0,
-    "MSurturCaracteristique4":0,
-    "MANMSurturDgts":0,
-    "MANMSurturViolence":0,
-    "DSouffleCaracteristique1":0,
-    "DSouffleCaracteristique2":0,
-    "DSouffleCaracteristique3":0,
-    "DSouffleCaracteristique4":0,
-    "MADSDDgts":0,
-    "MADSDViol":0,
-    "caracteristiqueWraith1":0,
-    "caracteristiqueWraith2":0,
-    "caracteristiqueWraith3":0,
-    "caracteristiqueWraith4":0,
-    "MADDjinnWraithActive":0,
-    "APoingsCaracteristique1":0,
-    "APoingsCaracteristique2":0,
-    "APoingsCaracteristique3":0,
-    "APoingsCaracteristique4":0,
-    "MADAPSDgts":0,
-    "MADAPSViol":0,
-    "MAAMIDgts":0,
-    "MAAMIViol":0,
-    "LCGCaracteristique1":0,
-    "LCGCaracteristique2":0,
-    "LCGCaracteristique3":0,
-    "LCGCaracteristique4":0,
-    "MADLCGDgts":0,
-    "MADLCGViol":0,
-    "MAATLADgts":0,
-    "MAATLAViol":0,
-};
+async function getCarac(hasBonus, C1, C2, C3, C4, CO1 = false) {
+    let tC1 = isApplied(C1);
+    let tC2 = isApplied(C2);
+    let tC3 = isApplied(C3);
+    let tC4 = isApplied(C4);
+    let tCO1 = false;
 
-//ENREGISTREMENT DES DONNEES
-on("sheet:opened",function()
-{
-    getAttrs(["armure", "armureLegende"], function(v)
-    {
-        const armure = v["armure"];
-        const armureL = v["armureLegende"];
+    if(CO1)
+        tCO1 = isApplied(CO1);
+
+    let listCaracs = [];
+
+    let result = {};
+
+    let tC1Nom = "0"
+    let tC2Nom = "0"
+    let tC3Nom = "0"
+    let tC4Nom = "0"
+    let tCO1Nom = "0"
+
+    if(tC1) {
+        tC1Nom = String(tC1).slice(2, -1);
+        result["C1"] = true;
+        result["C1Brut"] = tC1Nom;
+        result["C1Nom"] = CaracNom[tC1Nom];
+
+        listCaracs.push(tC1Nom);
+        listCaracs.push(ODValue[tC1Nom]);
+    } else
+    result["C1"] = false;
+
+    if(tC2) {
+        tC2Nom = String(tC2).slice(2, -1);
+        result["C2"] = true;
+        result["C2Brut"] = tC2Nom;
+        result["C2Nom"] = CaracNom[tC2Nom];
+
+        listCaracs.push(tC2Nom);
+        listCaracs.push(ODValue[tC2Nom]);
+    } else
+    result["C2"] = false;
+
+    if(hasBonus == 1 || hasBonus == 2) {
+        if(tC3) {
+            tC3Nom = String(tC3).slice(2, -1);
+            result["C3"] = true;
+            result["C3Brut"] = tC3Nom;
+            result["C3Nom"] = CaracNom[tC3Nom];
+    
+            listCaracs.push(tC3Nom);
+            listCaracs.push(ODValue[tC3Nom]);
+        } else
+        result["C3"] = false;
+
+        if(hasBonus == 2) {
+            if(tC4) {
+                tC4Nom = String(tC4).slice(2, -1);
+                result["C4"] = true;
+                result["C4Brut"] = tC4Nom;
+                result["C4Nom"] = CaracNom[tC4Nom];
         
-        donneesPJ["Armure"] = armure;
-        donneesPJ["ArmureLegende"] = armureL;
-    });
-});
+                listCaracs.push(tC4Nom);
+                listCaracs.push(ODValue[tC4Nom]);
+            } else
+            result["C4"] = false;
+        } else
+        result["C4"] = false;
+    } else {
+        result["C3"] = false;
+        result["C4"] = false;
+    }
 
-_.each(CaracNom, function( value, key ) {
-    let OD = ODNom[key];
-    let vOD = ODTotalNom[key];
+    if(tCO1) {
+        tCO1Nom = String(tCO1).slice(2, -1);
+        result["CO1"] = true;
+        result["CO1Brut"] = tCO1Nom;
+        result["CO1Nom"] = CaracNom[tCO1Nom];
 
-    on(`change:${key} change:${OD} change:${vOD} sheet:opened`, function() {                
-        getAttrs([key, OD, vOD], function(v)
-        {
-            let value = Number(v[key]);
-            let tOD = Number(v[OD]);
-            let tVOD = Number(v[vOD]);
-            
-            CaracValue[key] = {
-                "value":value,
-                "OD":tOD,
-                "VraiOD":tVOD
-            };
-        });
-    });
-});
+        listCaracs.push(tCO1Nom);
+        listCaracs.push(ODValue[tCO1Nom]);
+    }
 
-_.each(aspectCompanionsDruid, function( value, key ) {
-    let base = key+"Base";
-    let evol = key+"Evol";
-    let AE = key+"AE";
+    let attrsCarac = await getAttrsAsync(listCaracs);
 
-    on(`change:${base} change:${evol} change:${AE} sheet:opened`, function() {                
-        getAttrs([base, evol, AE], function(v)
-        {
-            let tBase = Number(v[base]);
-            let tEvol = Number(v[evol]);
-            let tAE = Number(v[AE]);
- 
-            let total = tBase+tEvol;
-            
-            aspectCompanionsDruidValue[key] = {
-                "value":total,
-                "AE":tAE
-            };
-        });
-    });
-});
+    if(tC1) {
+        result["C1Base"] = +attrsCarac[tC1Nom];
+        result["C1OD"] = +attrsCarac[ODValue[tC1Nom]];
+    }
 
-_.each(AspectNom, function( value, key ) {
-    let AEMin = AENom[key+"_Min"];
-    let AEMaj = AENom[key+"_Maj"];
+    if(tC2) {
+        result["C2Base"] = +attrsCarac[tC2Nom];
+        result["C2OD"] = +attrsCarac[ODValue[tC2Nom]];
+    }
 
-    on(`change:${key} change:${AEMin} change:${AEMaj} sheet:opened`, function() {                
-        getAttrs([key, AEMin, AEMaj], function(v)
-        {
-            let value = Number(v[key]);
-            let min = Number(v[AEMin]);
-            let maj = Number(v[AEMaj]);
-            
-            AspectValue[key] = {
-                "value":value,
-                "AEMin":min,
-                "AEMaj":maj
-            };
+    if(hasBonus == 1 || hasBonus == 2) {
+        if(tC3) {
+            result["C3Base"] = +attrsCarac[tC3Nom];
+            result["C3OD"] = +attrsCarac[ODValue[tC3Nom]];
+        }
 
-            console.log(AspectValue);
-        });
-    });
-});
+        if(hasBonus == 2) {
+            if(tC4) {
+                result["C4Base"] = +attrsCarac[tC4Nom];
+                result["C4OD"] = +attrsCarac[ODValue[tC4Nom]];
+            }
+        }
+    }
 
-_.each(PJData, function( val, key ) {
-    on(`change:${key} sheet:opened`, function() {                
-        getAttrs([key], function(v)
-        {
-            let value = v[key];
+    if(tCO1) {
+        result["CO1Base"] = +attrsCarac[tCO1Nom];
+        result["CO1OD"] = +attrsCarac[ODValue[tCO1Nom]];
+    }
 
-            if(!isNaN(Number(value)))            
-                PJData[key] = Number(value);
-            else
-                PJData[key] = value;
-        });
-    });
-});
-
-_.each(PNJData, function( val, key ) {
-    on(`change:${key} sheet:opened`, function() {                
-        getAttrs([key], function(v)
-        {
-            let value = v[key];
-
-            if(!isNaN(Number(value)))            
-                PNJData[key] = Number(value);
-            else
-                PNJData[key] = value;
-        });
-    });
-});
-
-_.each(VehiculeData, function( val, key ) {
-    on(`change:${key} sheet:opened`, function() {                
-        getAttrs([key], function(v)
-        {
-            let value = v[key];
-
-            if(!isNaN(Number(value)))            
-                VehiculeData[key] = Number(value);
-            else
-                VehiculeData[key] = value;
-        });
-    });
-});
-
-_.each(MAData, function( val, key ) {
-    on(`change:${key} sheet:opened`, function() {                
-        getAttrs([key], function(v)
-        {
-            let value = v[key];
-
-            if(!isNaN(Number(value)))            
-                MAData[key] = Number(value);
-            else
-                MAData[key] = value;
-        });
-    });
-});
+    return result;
+}
 
 //Versioning 
 on("sheet:opened",function()
@@ -1831,13 +1454,13 @@ on("sheet:opened",function()
                             
                             var vCdfModif = parseInt(value["cdf"+nCorrection+"Modif"], 10)||0;
                             
-                            armure[nMin]["armure"] = vArmure;
-                            armure[nMin]["armureModif"] = vArmureModif;
+                            dataArmure[nMin]["armure"] = vArmure;
+                            dataArmure[nMin]["armureModif"] = vArmureModif;
                             
-                            armure[nMin]["energie"] = vEnergie;
-                            armure[nMin]["energieModif"] = vEnergieModif;
+                            dataArmure[nMin]["energie"] = vEnergie;
+                            dataArmure[nMin]["energieModif"] = vEnergieModif;
                             
-                            armure[nMin]["cdfModif"] = vCdfModif;
+                            dataArmure[nMin]["cdfModif"] = vCdfModif;
                         });
                     });
                     
@@ -1852,11 +1475,11 @@ on("sheet:opened",function()
                         const W150PG = value["warmaster150PG"];
                         const W250PG = value["warmaster250PG"];
 
-                        const armModif = armure[actuel]["armureModif"];
-                        const eneModif = armure[actuel]["energieModif"];
-                        const cdfModif = armure[actuel]["cdfModif"];
+                        const armModif = dataArmure[actuel]["armureModif"];
+                        const eneModif = dataArmure[actuel]["energieModif"];
+                        const cdfModif = dataArmure[actuel]["cdfModif"];
                         
-                        var totalEnergie = armure[actuel]["energieMax"]+eneModif;
+                        var totalEnergie = dataArmure[actuel]["energieMax"]+eneModif;
                         
                         var bonusCDF = 0;
                         
@@ -1880,10 +1503,10 @@ on("sheet:opened",function()
                                 bonusCDF += 2;
                         
                             if(W150PG != 0)
-                                totalEnergie = armure[actuel]["energieMax150"]+eneModif;
+                                totalEnergie = dataArmure[actuel]["energieMax150"]+eneModif;
                                 
                             if(W250PG != 0)
-                                totalEnergie = armure[actuel]["energieMax250"]+eneModif;
+                                totalEnergie = dataArmure[actuel]["energieMax250"]+eneModif;
                         }
                         
                         setAttrs({
@@ -1932,8 +1555,7 @@ on("sheet:opened",function()
                         
                         if(M250 == 1)
                         {
-                            setAttrs
-                            ({
+                            setAttrs({
                                 monkSalveEffets: "Parasitage 1 / Dispersion 6 / Ultraviolence / Destructeur",
                                 monkVagueEffets: "Parasitage 4 / Dispersion 3 / Choc 2",
                                 monkRayonEffets: "Parasitage 1 / Ignore Armure"
@@ -1941,8 +1563,7 @@ on("sheet:opened",function()
                         }
                         else
                         {
-                            setAttrs
-                            ({
+                            setAttrs({
                                 monkSalveEffets: "Parasitage 1 / Dispersion 3 / Ultraviolence / Destructeur",
                                 monkVagueEffets: "Parasitage 2 / Dispersion 3 / Choc 2",
                                 monkRayonEffets: "Parasitage 1 / Perce Armure 40"
@@ -3125,7 +2746,6 @@ on("sheet:opened",function()
                 pSCcaracteristique2Equipement: "0",
                 pSCcaracteristique3Equipement: "0",
                 pSCcaracteristique4Equipement: "0",
-                pSCcaracteristique4Equipement: "0",
                 pSCcaracteristiqueSPrecis: "0",
                 mECcaracteristique1Equipement: "0",
                 mECcaracteristique2Equipement: "0",
@@ -3182,707 +2802,6 @@ on("sheet:opened",function()
                 mEAspectPNJ:"0",
                 aspectPNJGrenade:"0",
                 version:17,
-            });
-        
-            getSectionIDs("repeating_armeCaC", function(idarray) 
-            {
-                _.each(idarray,function(id) {
-                    setAttrs({
-                        ["repeating_armeCaC_"+id+"_caracteristique1Equipement"]:"0",
-                        ["repeating_armeCaC_"+id+"_caracteristique2Equipement"]:"0",
-                        ["repeating_armeCaC_"+id+"_caracteristique3Equipement"]:"0",
-                        ["repeating_armeCaC_"+id+"_caracteristique4Equipement"]:"0",
-                        ["repeating_armeCaC_"+id+"_caracteristiqueSPrecis"]:"0",
-                        ["repeating_armeCaC_"+id+"_aspectPNJ"]:"0"
-                    });
-                });
-            });
-        
-            getSectionIDs("repeating_armeDist", function(idarray) 
-            {
-                _.each(idarray,function(id) {
-                    setAttrs({
-                        ["repeating_armeDist_"+id+"_caracteristique1Equipement"]:"0",
-                        ["repeating_armeDist_"+id+"_caracteristique2Equipement"]:"0",
-                        ["repeating_armeDist_"+id+"_caracteristique3Equipement"]:"0",
-                        ["repeating_armeDist_"+id+"_caracteristique4Equipement"]:"0",
-                        ["repeating_armeDist_"+id+"_aspectPNJ"]:"0"
-                    });
-                });
-            });
-        
-            getSectionIDs("repeating_armeDistVehicule", function(idarray) 
-            {
-                _.each(idarray,function(id) {
-                    setAttrs({
-                        ["repeating_armeDistVehicule_"+id+"_caracteristique1Equipement"]:"0",
-                        ["repeating_armeDistVehicule_"+id+"_caracteristique2Equipement"]:"0",
-                        ["repeating_armeDistVehicule_"+id+"_caracteristique3Equipement"]:"0",
-                        ["repeating_armeDistVehicule_"+id+"_caracteristique4Equipement"]:"0",
-                        ["repeating_armeDistVehicule_"+id+"_aspectPNJ"]:"0"
-                    });
-                });
-            });
-        
-            getSectionIDs("repeating_armeDruidLion", function(idarray) 
-            {
-                _.each(idarray,function(id) {
-                    setAttrs({
-                        ["repeating_armeDruidLion_"+id+"_aspectDruidLion"]:"druidLionChair"
-                    });
-                });
-            });
-        
-            getSectionIDs("repeating_armemaldruidlion", function(idarray) 
-            {
-                _.each(idarray,function(id) {
-                    setAttrs({
-                        ["repeating_armemaldruidlion_"+id+"_aspectDruidLion"]:"MALDruidLionChair"
-                    });
-                });
-            });
-        
-            _.each(wpnEffects,function(effet) {
-                let couteauService = "pSC";
-                let marteauContact = "mEC";
-                let pistoletService = "pS";
-                let marteauDistance = "mE";
-        
-                getAttrs([`${couteauService}${effet}`], function(v){
-                    let value = v[`${couteauService}${effet}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnE[couteauService][effet] = nValue;
-                });
-        
-                getAttrs([`${marteauContact}${effet}`], function(v){
-                    let value = v[`${marteauContact}${effet}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnE[marteauContact][effet] = nValue;
-                });
-        
-                getAttrs([`${pistoletService}${effet}`], function(v){
-                    let value = v[`${pistoletService}${effet}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnE[pistoletService][effet] = nValue;
-                });
-        
-                getAttrs([`${marteauDistance}${effet}`], function(v){
-                    let value = v[`${marteauDistance}${effet}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnE[marteauDistance][effet] = nValue;
-                });
-            });
-        
-            _.each(wpnEffectsValue,function(effet) {
-                let couteauService = "pSC";
-                let marteauContact = "mEC";
-                let pistoletService = "pS";
-                let marteauDistance = "mE";
-        
-                getAttrs([`${couteauService}${effet}`], function(v){
-                    let value = v[`${couteauService}${effet}`];
-        
-                    wpnEValue[couteauService][effet] = value;
-                });
-        
-                getAttrs([`${marteauContact}${effet}`], function(v){
-                    let value = v[`${marteauContact}${effet}`];
-        
-                    wpnEValue[marteauContact][effet] = value;
-                });
-        
-                getAttrs([`${pistoletService}${effet}`], function(v){
-                    let value = v[`${pistoletService}${effet}`];
-        
-                    wpnEValue[pistoletService][effet] = value;
-                });
-        
-                getAttrs([`${marteauDistance}${effet}`], function(v){
-                    let value = v[`${marteauDistance}${effet}`];
-        
-                    wpnEValue[marteauDistance][effet] = value;
-                });
-            });
-        
-            _.each(wpnAmeliorationS,function(AS) {
-                let couteauService = "pSC";
-                let marteauContact = "mEC";
-        
-                getAttrs([`${couteauService}${AS}`], function(v){
-                    let value = v[`${couteauService}${AS}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnAS[couteauService][AS] = nValue;
-                });
-        
-                getAttrs([`${marteauContact}${AS}`], function(v){
-                    let value = v[`${marteauContact}${AS}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnAS[marteauContact][AS] = nValue;
-                });
-            });
-        
-            _.each(wpnAmeliorationO,function(AO) {
-                let couteauService = "pSC";
-                let marteauContact = "mEC";
-        
-                getAttrs([`${couteauService}${AO}`], function(v){
-                    let value = v[`${couteauService}${AO}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnAO[couteauService][AO] = nValue;
-                });
-        
-                getAttrs([`${marteauContact}${AO}`], function(v){
-                    let value = v[`${marteauContact}${AO}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnAO[marteauContact][AO] = nValue;
-                });
-            });
-        
-            _.each(wpnSpecial,function(special) {
-                let poingMA = "poingMAC";
-                let couteauService = "pSC";
-                let marteauContact = "mEC";
-                let pistoletService = "pS";
-                let marteauDistance = "mE";
-        
-                getAttrs([`${poingMA}${special}`], function(v){
-                    let value = v[`${poingMA}${special}`];
-                    let nValue = true;
-        
-                    if(value == "0" || special == "energie")
-                        nValue = false;
-        
-                    wpnS[poingMA][special] = nValue;
-                });
-        
-                getAttrs([`${couteauService}${special}`], function(v){
-                    let value = v[`${couteauService}${special}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnS[couteauService][special] = nValue;
-                });
-        
-                getAttrs([`${marteauContact}${special}`], function(v){
-                    let value = v[`${marteauContact}${special}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnS[marteauContact][special] = nValue;
-                });
-        
-                getAttrs([`${pistoletService}${special}`], function(v){
-                    let value = v[`${pistoletService}${special}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnS[pistoletService][special] = nValue;
-                });
-        
-                getAttrs([`${marteauDistance}${special}`], function(v){
-                    let value = v[`${marteauDistance}${special}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnS[marteauDistance][special] = nValue;
-                });
-            });
-        
-            _.each(wpnSpecialValue,function(special) {
-                let poingMA = "poingMAC";
-                let couteauService = "pSC";
-                let marteauContact = "mEC";
-                let pistoletService = "pS";
-                let marteauDistance = "mE";
-        
-                getAttrs([`${poingMA}${special}`], function(v){
-                    let value = v[`${poingMA}${special}`];
-        
-                    wpnSValue[poingMA][special] = value;
-                });
-        
-                getAttrs([`${couteauService}${special}`], function(v){
-                    let value = v[`${couteauService}${special}`];
-        
-                    wpnSValue[couteauService][special] = value;
-                });
-        
-                getAttrs([`${marteauContact}${special}`], function(v){
-                    let value = v[`${marteauContact}${special}`];
-        
-                    wpnSValue[marteauContact][special] = value;
-                });
-        
-                getAttrs([`${pistoletService}${special}`], function(v){
-                    let value = v[`${pistoletService}${special}`];
-        
-                    wpnSValue[pistoletService][special] = value;
-                });
-        
-                getAttrs([`${marteauDistance}${special}`], function(v){
-                    let value = v[`${marteauDistance}${special}`];
-        
-                    wpnSValue[marteauDistance][special] = value;
-                });
-            });
-        
-            _.each(wpnAmeliorationA,function(AA) {
-                let pistoletService = "pS";
-                let marteauDistance = "mE";
-        
-                getAttrs([`${pistoletService}${AA}`], function(v){
-                    let value = v[`${pistoletService}${AA}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnAA[pistoletService][AA] = nValue;
-                });
-        
-                getAttrs([`${marteauDistance}${AA}`], function(v){
-                    let value = v[`${marteauDistance}${AA}`];
-                    let nValue = true;
-        
-                    if(value == "0")
-                        nValue = false;
-        
-                    wpnAA[marteauDistance][AA] = nValue;
-                });
-            });
-            
-            _.each(wpnAmeliorationAValue,function(AAV) {
-                let pistoletService = "pS";
-                let marteauDistance = "mE";
-        
-                getAttrs([`${pistoletService}${AAV}`], function(v){
-                    let value = v[`${pistoletService}${AAV}`];
-        
-                    wpnAAValue[pistoletService][AAV] = value;
-                });
-        
-                getAttrs([`${marteauDistance}${AAV}`], function(v){
-                    let value = v[`${marteauDistance}${AAV}`];
-        
-                    wpnAAValue[marteauDistance][AAV] = value;
-                });
-            });
-            
-            getSectionIDs("repeating_armeCaC", function(idarray) {
-                _.each(idarray,function(id) {
-                    _.each(wpnContactData,function(data) {
-                        getAttrs([`repeating_armeCaC_${id}_${data}`], function(v){
-                            let value = v[`repeating_armeCaC_${id}_${data}`] || "0";
-        
-                            if(wpnData[id] == undefined)
-                                wpnData[id] = {};
-        
-                            wpnData[id][data] = value;
-                        });
-                    });
-        
-                    _.each(wpnEffects,function(effet) {
-                        getAttrs([`repeating_armeCaC_${id}_${effet}`], function(v){
-                            let value = v[`repeating_armeCaC_${id}_${effet}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnE[id] == undefined)
-                                wpnE[id] = {};
-        
-                            wpnE[id][effet] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnEffectsValue,function(effet) {
-                        getAttrs([`repeating_armeCaC_${id}_${effet}`], function(v){
-                            let value = v[`repeating_armeCaC_${id}_${effet}`] || "0";
-        
-                            if(wpnEValue[id] == undefined)
-                                wpnEValue[id] = {};
-        
-                            wpnEValue[id][effet] = value;
-                        });
-                    });
-        
-                    _.each(wpnAmeliorationS,function(AS) {
-                        getAttrs([`repeating_armeCaC_${id}_${AS}`], function(v){
-                            let value = v[`repeating_armeCaC_${id}_${AS}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnAS[id] == undefined)
-                                wpnAS[id] = {};
-        
-                            wpnAS[id][AS] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnAmeliorationO,function(AO) {
-                        getAttrs([`repeating_armeCaC_${id}_${AO}`], function(v){
-                            let value = v[`repeating_armeCaC_${id}_${AO}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnAO[id] == undefined)
-                                wpnAO[id] = {};
-        
-                            wpnAO[id][AO] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnSpecial,function(special) {
-                        getAttrs([`repeating_armeCaC_${id}_${special}`], function(v){
-                            let value = v[`repeating_armeCaC_${id}_${special}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnS[id] == undefined)
-                                wpnS[id] = {};
-        
-                            wpnS[id][special] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnSpecialValue,function(special) {
-                        getAttrs([`repeating_armeCaC_${id}_${special}`], function(v){
-                            let value = v[`repeating_armeCaC_${id}_${special}`] || "0";
-        
-                            if(wpnSValue[id] == undefined)
-                                wpnSValue[id] = {};
-        
-                            wpnSValue[id][special] = value;
-                        });
-                    });
-                });
-            
-            });
-        
-            getSectionIDs("repeating_armeDist", function(idarray) {
-                _.each(idarray,function(id) {
-                    _.each(wpnDistanceData,function(data) {
-                        getAttrs([`repeating_armeDist_${id}_${data}`], function(v){
-                            let value = v[`repeating_armeDist_${id}_${data}`] || "0";
-        
-                            if(wpnData[id] == undefined)
-                                wpnData[id] = {};
-        
-                            wpnData[id][data] = value;
-                        });
-                    });
-        
-                    _.each(wpnEffects,function(effet) {
-                        getAttrs([`repeating_armeDist_${id}_${effet}`], function(v){
-                            let value = v[`repeating_armeDist_${id}_${effet}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnE[id] == undefined)
-                                wpnE[id] = {};
-        
-                            wpnE[id][effet] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnEffectsValue,function(effet) {
-                        getAttrs([`repeating_armeDist_${id}_${effet}`], function(v){
-                            let value = v[`repeating_armeDist_${id}_${effet}`] || "0";
-        
-                            if(wpnEValue[id] == undefined)
-                                wpnEValue[id] = {};
-        
-                            wpnEValue[id][effet] = value;
-                        });
-                    });
-        
-                    _.each(wpnAmeliorationA,function(AA) {
-                        getAttrs([`repeating_armeDist_${id}_${AA}`], function(v){
-                            let value = v[`repeating_armeDist_${id}_${AA}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnAA[id] == undefined)
-                                wpnAA[id] = {};
-        
-                            wpnAA[id][AA] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnAmeliorationAValue,function(AAV) {
-                        getAttrs([`repeating_armeDist_${id}_${AAV}`], function(v){
-                            let value = v[`repeating_armeDist_${id}_${AAV}`] || "0";
-        
-                            if(wpnAAValue[id] == undefined)
-                                wpnAAValue[id] = {};
-        
-                            wpnAAValue[id][AAV] = value;
-                        });
-                    });
-        
-                    _.each(wpnSpecial,function(special) {
-                        getAttrs([`repeating_armeDist_${id}_${special}`], function(v){
-                            let value = v[`repeating_armeDist_${id}_${special}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnS[id] == undefined)
-                                wpnS[id] = {};
-        
-                            wpnS[id][special] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnSpecialValue,function(special) {
-                        getAttrs([`repeating_armeDist_${id}_${special}`], function(v){
-                            let value = v[`repeating_armeDist_${id}_${special}`] || "0";
-        
-                            if(wpnSValue[id] == undefined)
-                                wpnSValue[id] = {};
-        
-                            wpnSValue[id][special] = value;
-                        });
-                    });
-                });    
-            });
-        
-            getSectionIDs("repeating_armeautre", function(idarray) {
-                _.each(idarray,function(id) {
-                    _.each(wpnAutreData,function(data) {
-                        getAttrs([`repeating_armeautre_${id}_${data}`], function(v){
-                            let value = v[`repeating_armeautre_${id}_${data}`] || "0";
-        
-                            if(wpnData[id] == undefined)
-                                wpnData[id] = {};
-        
-                            wpnData[id][data] = value;
-                        });
-                    });
-        
-                    _.each(wpnEffects,function(effet) {
-                        getAttrs([`repeating_armeautre_${id}_${effet}`], function(v){
-                            let value = v[`repeating_armeautre_${id}_${effet}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnE[id] == undefined)
-                                wpnE[id] = {};
-        
-                            wpnE[id][effet] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnEffectsValue,function(effet) {
-                        getAttrs([`repeating_armeautre_${id}_${effet}`], function(v){
-                            let value = v[`repeating_armeautre_${id}_${effet}`] || "0";
-        
-                            if(wpnEValue[id] == undefined)
-                                wpnEValue[id] = {};
-        
-                            wpnEValue[id][effet] = value;
-                        });
-                    });
-        
-                    _.each(wpnAmeliorationA,function(AA) {
-                        getAttrs([`repeating_armeautre_${id}_${AA}`], function(v){
-                            let value = v[`repeating_armeautre_${id}_${AA}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnAA[id] == undefined)
-                                wpnAA[id] = {};
-        
-                            wpnAA[id][AA] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnAmeliorationAValue,function(AAV) {
-                        getAttrs([`repeating_armeautre_${id}_${AAV}`], function(v){
-                            let value = v[`repeating_armeautre_${id}_${AAV}`] || "0";
-        
-                            if(wpnAAValue[id] == undefined)
-                                wpnAAValue[id] = {};
-        
-                            wpnAAValue[id][AAV] = value;
-                        });
-                    });
-        
-                    _.each(wpnSpecial,function(special) {
-                        getAttrs([`repeating_armeautre_${id}_${special}`], function(v){
-                            let value = v[`repeating_armeautre_${id}_${special}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnS[id] == undefined)
-                                wpnS[id] = {};
-        
-                            wpnS[id][special] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnSpecialValue,function(special) {
-                        getAttrs([`repeating_armeautre_${id}_${special}`], function(v){
-                            let value = v[`repeating_armeautre_${id}_${special}`] || "0";
-        
-                            if(wpnSValue[id] == undefined)
-                                wpnSValue[id] = {};
-        
-                            wpnSValue[id][special] = value;
-                        });
-                    });
-                });    
-            });
-            
-            getSectionIDs("repeating_armeDistVehicule", function(idarray) {
-                _.each(idarray,function(id) {
-                    _.each(wpnDistanceData,function(data) {
-                        getAttrs([`repeating_armeDistVehicule_${id}_${data}`], function(v){
-                            let value = v[`repeating_armeDistVehicule_${id}_${data}`] || "0";
-        
-                            if(wpnData[id] == undefined)
-                                wpnData[id] = {};
-        
-                            wpnData[id][data] = value;
-                        });
-                    });
-        
-                    _.each(wpnEffects,function(effet) {
-                        getAttrs([`repeating_armeDistVehicule_${id}_${effet}`], function(v){
-                            let value = v[`repeating_armeDistVehicule_${id}_${effet}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnE[id] == undefined)
-                                wpnE[id] = {};
-        
-                            wpnE[id][effet] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnEffectsValue,function(effet) {
-                        getAttrs([`repeating_armeDistVehicule_${id}_${effet}`], function(v){
-                            let value = v[`repeating_armeDistVehicule_${id}_${effet}`] || "0";
-        
-                            if(wpnEValue[id] == undefined)
-                                wpnEValue[id] = {};
-        
-                            wpnEValue[id][effet] = value;
-                        });
-                    });
-        
-                    _.each(wpnAmeliorationA,function(AA) {
-                        getAttrs([`repeating_armeDistVehicule_${id}_${AA}`], function(v){
-                            let value = v[`repeating_armeDistVehicule_${id}_${AA}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnAA[id] == undefined)
-                                wpnAA[id] = {};
-        
-                            wpnAA[id][AA] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnAmeliorationAValue,function(AAV) {
-                        getAttrs([`repeating_armeDistVehicule_${id}_${AAV}`], function(v){
-                            let value = v[`repeating_armeDistVehicule_${id}_${AAV}`] || "0";
-        
-                            if(wpnAAValue[id] == undefined)
-                                wpnAAValue[id] = {};
-        
-                            wpnAAValue[id][AAV] = value;
-                        });
-                    });
-        
-                    _.each(wpnSpecial,function(special) {
-                        getAttrs([`repeating_armeDistVehicule_${id}_${special}`], function(v){
-                            let value = v[`repeating_armeDistVehicule_${id}_${special}`] || "0";
-                            let nValue = false;
-        
-                            if(value != "0")
-                                nValue = true;
-        
-                            if(wpnS[id] == undefined)
-                                wpnS[id] = {};
-        
-                            wpnS[id][special] = nValue;
-                        });
-                    });
-        
-                    _.each(wpnSpecialValue,function(special) {
-                        getAttrs([`repeating_armeDistVehicule_${id}_${special}`], function(v){
-                            let value = v[`repeating_armeDistVehicule_${id}_${special}`] || "0";
-        
-                            if(wpnSValue[id] == undefined)
-                                wpnSValue[id] = {};
-        
-                            wpnSValue[id][special] = value;
-                        });
-                    });
-                });    
             });
         }
     });
