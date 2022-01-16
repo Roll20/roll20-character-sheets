@@ -894,6 +894,13 @@
             <div class="sheet-hover-info" data-i18n="tableroll-description">When enabled the dice rolls will be
                 using preconfigured rollable tables according to instructions for The One Ring 1st Edition.</div>
         </div>
+        <div class="center">
+            <span class="toggle">
+                <label><input name="attr_favorill" type="checkbox" value="{1t[feat]}" checked="checked">Normal</label>
+                <label><input name="attr_favorill" type="checkbox" value="{2t[feat]}kh1">Favoured</label>
+                <label><input name="attr_favorill" type="checkbox" value="{2t[feat]}kl1">Ill Fav.</label>
+            </span>
+        </div>
     </div>
     <div class="adversary-attributes">
         <span />
@@ -938,10 +945,24 @@
         <label class="center" data-i18n-title="weapon-injury" title="inj">Injury</label>
         <label class="left" data-i18n-title="special-damage" title="special-damage">Special damage</label>
         <span>
+            <!--<input type="hidden" name="attr_adv_weapon1_roll1" />
+            <button type="roll" class="table-rolls" name="roll_adv_weapon1_roll1_check" value="@{adv_adv_weapon1_roll1}"></button> -->
             <button type="roll" class="table-rolls"
-                value="/me attacks @{target|name} against parry @{target|totalparry}.\n/roll 1t[lm-feat] + [[(@{weapon_rating_1}+?{Bonus Dice|0})]]t[normal]"
+                value="/me attacks against parry ?{Parry|0}.\n/roll 1t[lm-feat] + [[(@{weapon_rating_1}+?{Bonus Dice|0})]]t[normal]"
                 name="roll_weapon1"></button>
-            <button type="action" class="parsed-rolls" name="act_adv_weapon1" id="roll_adv_weapon1"></button>
+            <!-- <input type="hidden" name="attr_adv_weapon1_roll2" />
+            <button type="roll" class="table-rolls crosshair" name="roll_adv_weapon1_roll2_check"
+                value="@{adv_weapon1_roll2}"></button> -->
+            <button type="roll" class="table-rolls crosshair"
+                value="/me attacks @{target|name} against parry @{target|totalparry}.\n/roll 1t[lm-feat] + [[(@{weapon_rating_1}+?{Bonus Dice|0})]]t[normal]"
+                name="roll_weapon1_target"></button>
+            <span class="parsed-rolls">
+                <button type="action" name="act_adv_weapon1" id="roll_adv_weapon1" class="parsed-rolls"
+                    title="Use this button when you don't have a Parry Rating to enter manually.  "></button>
+                <button type="action" name="act_adv_weapon1_target" id="roll_adv_weapon1_target"
+                    class="parsed-rolls crosshair"
+                    title="Use this button when you have an adversary token to target.  "></button>
+            </span>
             <input name="attr_weapon_skill_name_1" type="text">
         </span>
         <input name="attr_weapon_rating_1" value="0" class="number" type="number">
@@ -949,10 +970,24 @@
         <input name="attr_weapon_injury_1" value="0" class="number" type="number">
         <input name="attr_weapon_special_damage_1" type="text">
         <span>
+            <!--<input type="hidden" name="attr_adv_weapon2_roll1" />
+            <button type="roll" class="table-rolls" name="roll_adv_weapon2_roll1_check" value="@{adv_adv_weapon2_roll1}"></button> -->
             <button type="roll" class="table-rolls"
-                value="/me attacks target against parry @{target|totalparry}.\n/roll 1t[lm-feat] + [[(@{weapon_rating_2}+?{Bonus Dice|0})]]t[normal]"
+                value="/me attacks against parry ?{Parry|0}.\n/roll 1t[lm-feat] + [[(@{weapon_rating_2}+?{Bonus Dice|0})]]t[normal]"
                 name="roll_weapon2"></button>
-            <button type="action" class="parsed-rolls" name="act_adv_weapon2" id="roll_adv_weapon2"></button>
+            <!--<input type="hidden" name="attr_adv_weapon2_roll2" />
+            <button type="roll" class="table-rolls crosshair" name="roll_adv_weapon2_roll2_check" 
+                value="@{adv_weapon2_roll2}"></button>-->
+            <button type="roll" class="table-rolls crosshair"
+                value="/me attacks @{target|name} against parry @{target|totalparry}.\n/roll 1t[lm-feat] + [[(@{weapon_rating_2}+?{Bonus Dice|0})]]t[normal]"
+                name="roll_weapon2_target"></button>
+            <span class="parsed-rolls">
+                <button type="action" name="act_adv_weapon2" id="roll_adv_weapon2" class="parsed-rolls"
+                    title="Use this button when you don't have a Parry Rating to enter manually.  "></button>
+                <button type="action" name="act_adv_weapon2_target" id="roll_adv_weapon2_target"
+                    class="parsed-rolls crosshair"
+                    title="Use this button when you have an adversary token to target.  "></button>
+            </span>
             <input name="attr_weapon_skill_name_2" type="text">
         </span>
         <input name="attr_weapon_rating_2" value="0" class="number" type="number">
@@ -1140,13 +1175,17 @@
 			if ( rolltype.includes("target") ) {
 				tn = await getQuery(`?{Injury rating|@{target|weapon_injury_1}|@{target|weapon_injury_2}}`);
 			} else {
-				tn = await getQuery(`?{Injury rating|0}`);
+				tn = await getQuery(`?{Injury rating|14}`);
 			}            
         } else if ( rolltype.startsWith("combat") ) {
             favId = favourill_id;
             if ( rolltype.includes("target") ) {
 				//parrymod = await getQuery(`?{Parry rating|@{target|parry}}`);
-				parrymodStr = "{{parrymod= [[@{target|parry}]]}}";
+                if (lm){
+                    parrymodStr = "{{parrymod= [[@{target|totalparry}]]}}";
+                } else {
+				    parrymodStr = "{{parrymod= [[@{target|parry}]]}}";
+                }
 			} else {
 				parrymod = await getQuery(`?{Parry rating|0}`); 
 				parrymodStr = `{{parrymod= [[${parrymod}]]}}`;
@@ -1265,11 +1304,17 @@
         let rollTotal = rollSuccess + rollFeat,
             rollDiff = rollTotal - int(tn);
         clog(`rollFeat: ${rollFeat}, rollTotal: ${rollTotal}, Target Number: ${tn}, Diff: ${rollDiff}`);
-               
         // Miserable logic, if Feat die is 0 (eye) then fail automatically, overrides all of below (adversaries don't get miserable)
-        if (miserable == 1 && rollFeat == fumble){
-            outcome = -2;                
-            clog(`Outcome after Miserable: ${outcome}`);
+        if (rollFeat == fumble){
+            if (lm) {
+                outcome = 0;
+                clog(`Adversaries fail on gandalf rune! Outcome: ${outcome}`); 
+            } else if (miserable == 1) {
+                outcome = -2;                
+                clog(`PC fail on Eye of Sauron and Miserable. Outcome: ${outcome}`);
+            } else {
+                clog('PC do not fail on Eye of Sauron if not Miserable!');
+            }
         } else if ( rollFeat == crit ) { // outcome 2 = Feat Success (Gandalf or Eye of Sauron)
             outcome = 2; 
             //rollFeat = 0; // crit success doesnt have a value, also doesnt matter with regards to success since it always succeeds
@@ -1277,14 +1322,14 @@
         } else if (rollTotal >= tn) {
             outcome = 1; // normal success
             clog(`Outcome after normal success: ${outcome}`);
-        } else if (weary == 1) {
-            outcome = -1; // weary failure
+        } else if (lm && weary == 1) {
+            outcome = -1; // weary failure for PC
             clog(`Outcome after weary failure: ${outcome}`);
         } else {
             outcome = 0; // normal failure
             clog(`Outcome: ${outcome}`);
         }
-        
+
         // GREATNESS & FEAT DIE 
         // Test for piercing blow on crit success or 10
         outcome = (rolltype === "combat") && (outcome === 1 || outcome === 2) && (rollFeat === crit || rollFeat === 10) ? 3 : outcome; 
@@ -1398,12 +1443,12 @@
         getAttrs(["currenthope", "hope", "shadow", "shadowscar", "favourill_id", "favorill", "sheetTab" ], (values) => {
             if (values.sheetTab ==="isPC"){
                 const currenthope = int(values.currenthope),
-                    hope = int(values.hope),
-                    shadow = int(values.shadow),
-                    scars = int(values.shadowscar),
-                    favorill = values.favorill,
-                    favorill_id = int(values.favourill_id),
-                    maxshadow = hope - scars;
+                        hope = int(values.hope),
+                        shadow = int(values.shadow),
+                        scars = int(values.shadowscar),
+                        favorill = values.favorill,
+                        favorill_id = int(values.favourill_id),
+                        maxshadow = hope - scars;
                 // miserable
                 if ( (shadow + scars) >= currenthope ) {
                     setAttrs({
@@ -1421,22 +1466,41 @@
                         favourill_id: 0,
                         favorill : "{2t[feat]}kl1" // to make table rolls consistent
                     });
-                    clog(`Set illfavoured based on shadow score: shadow ${shadow} + scars ${scars} higher than maximum hope ${hope}.`);
+                    clog(`Set illfavoured rolls global state or shadow score: shadow ${shadow} + scars ${scars} higher than maximum hope ${hope}.`);
                 } else if (favorill === "{1t[feat]}"){
                     setAttrs({
                         favourill_id: 1,
                     });
-                    clog(`Reset illfavoured based on global state and shadow score: shadow ${shadow} + scars ${scars} higher than maximum hope ${hope}.`);
+                    clog(`Reset normal rolls based on global state.`);
                 } else if (favorill === "{2t[feat]}kh1"){
                     setAttrs({
                         favourill_id: 2,
                     });
-                    clog(`Reset illfavoured based on global state and shadow score: shadow ${shadow} + scars ${scars} higher than maximum hope ${hope}.`);
+                    clog(`Reset favoured rolls based on global state.`);
                 };
-;
+            } else if (values.sheetTab ==="isAdversary") {
+                const favorill = values.favorill,
+                      favorill_id = int(values.favourill_id);
+                if (favorill === "{2t[feat]}kl1"){
+                    setAttrs({
+                        favourill_id: 0,
+                    });
+                    clog(`Set favourill_id to illfavoured.`);
+                } else if (favorill === "{2t[feat]}kh1"){
+                    setAttrs({
+                        favourill_id: 2,
+                    });
+                    clog(`Set favourill_id to favoured.`);
+                } else {
+                    setAttrs({
+                        favourill_id: 1,
+                    });
+                    clog(`Reset favourill_id to normal`);
+                };
             };
         });
     });
+    
     // automatic stance toggle of attack damage/bonus, parry (open stance) and protection (defensive)
     on( "change:stance sheet:opened", function() {
         getAttrs(["stance"], function(values) {
@@ -1564,8 +1628,9 @@
     on('clicked:protection', async (ev) => {
         clog(`Starting first roll`);
         let action = (ev.htmlAttributes.name).slice(4),
-            data = await asw.getAttrs(['character_name', action, 'protection', 'armourcf', 'armourcm', 'helmetcf', 'helmetcm']),
-            actdice = int(data.protection);
+            data = await asw.getAttrs(['character_name', action, 'protection', 'armourcf', 'armourcm', 'helmetcf', 'helmetcm', "sheetTab"]),
+            actdice = int(data.protection),
+            lm = data.sheetTab ==="isAdversary" ? true : false;
         let additionalStr = "";
         additionalStr = additionalStr + ((data.armourcf == "1") ? "Close fitting armour, " : "");
         additionalStr = additionalStr + ((data.helmetcf == "1") ? "Close fitting helm, " : "");
@@ -1573,7 +1638,7 @@
         additionalStr = additionalStr + ((data.helmetcm == "1") ? "Cunning made helm, " : "");
         additionalStr = additionalStr.slice(0,-2);
         clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, protection value: ${actdice}, Additional: ${additionalStr}`);
-        await rollFirst(data.character_name, action, actdice, "0", "0", "protection", `additional='${additionalStr}';`);
+        await rollFirst(data.character_name, action, actdice, "0", "0", "protection", `additional='${additionalStr}';`, lm);
         clog(`Completed first roll`);
     });
     
@@ -1690,22 +1755,26 @@
             });
         });
     });
-    // weapon_rating_1, weapon_damage_1, weapon_injury_1, weapon_special_damage_1
-    // act_adv_weapon1
+
     // parsed adversary combat proficiency rolls
-    on('clicked:adv_weapon1 clicked:adv_weapon2', async (ev) => {
+    // act_adv_weapon1_target
+    on('clicked:adv_weapon1 clicked:adv_weapon1_target clicked:adv_weapon2 clicked:adv_weapon2_target ', async (ev) => {
         clog(`Starting first roll`);
-        let index = (ev.htmlAttributes.name).slice(14),
-            data = await asw.getAttrs(['character_name', `weapon_skill_name_${index}`,`weapon_rating_${index}`, `weapon_damage_${index}`, `weapon_injury_${index}`]),
+        let index = (ev.htmlAttributes.name).slice(14).split("_")[0],
+            target = (ev.htmlAttributes.name).slice(14).split("_")[1] || "",
+            data = await asw.getAttrs(['character_name', `weapon_skill_name_${index}`,`weapon_rating_${index}`, `weapon_damage_${index}`, `weapon_injury_${index}`, 'favorill', 'favourill_id']),
             action = data[`weapon_skill_name_${index}`],
             actdice = data[`weapon_rating_${index}`],
             damage = data[`weapon_damage_${index}`],
-            injury = data[`weapon_injury_${index}`];
+            injury = data[`weapon_injury_${index}`],
+            favorill = data['favorill'] || "{1t[feat]}",
+            favourill_id = data['favourill_id'];
+        clog(`Index: ${index}, Target: ${target}, Action: ${action}`);
         clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, Action value: ${actdice}`);
-        await rollFirst(data.character_name, action, actdice, 14, 0, "combat", `weapon='Damage: ${damage}, Injury: ${injury}';`);
+        await rollFirst(data.character_name, action, actdice, 0, 0, "combat"+target, `weapon='Damage: ${damage}, Injury: ${injury}';`, true);
         clog(`Completed first roll`);
     });
-
+    
     // parsed combat proficiency rolls
     on('clicked:axes clicked:bows clicked:spears clicked:swords clicked:axes_target clicked:bows_target clicked:spears_target clicked:swords_target', async (ev) => {
         clog(`Starting first roll`);
@@ -1716,8 +1785,9 @@
             favorill = data['favorill'] || "{1t[feat]}",
             favourill_id = data['favourill_id'],
             act_fav = data[`${action}_favoured`] || 0;
+        clog(`Action: ${action}`);
 		action = action.split("_")[0] || action;
-		clog(`Action: ${action}, Target: ${target}`);
+		clog(`Target: ${target}`);
         if (favorill === "{2t[feat]}kh1"){
             act_fav = 1;
         } else if (favorill === "{2t[feat]}kl1"){
