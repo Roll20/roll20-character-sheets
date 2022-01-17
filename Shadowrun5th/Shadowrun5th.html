@@ -14056,11 +14056,12 @@ on("change:chummercheckbox", async function(){
             var equipmentstab = importEquipmentTab(text.experimental, chummerfile);
             var socialtab = importSocialTab(chummerfile);
 
-            let results = await Promise.all([maintab, skilltab, magictab, enhancementtab, matrixtab, vehiclestab, equipmentstab, socialtab]);
+            let results = await Promise.all([maintab, skilltab, enhancementtab, socialtab]);
+            let dependingResults = await Promise.all([magictab, matrixtab, vehiclestab, equipmentstab]);
 
             attributes.warningcheckbox="0";
             attributes.chummercheckbox="0";
-            attributes.chummertext= results.join("") + "\nREMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING."
+            attributes.chummertext= results.join("") + dependingResults.join("") + "\nREMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING."
 
             try{
                 setAttrs(attributes);
@@ -14283,27 +14284,8 @@ async function importSkillsTab(experimental, chummerfile) {
                     if(chummerfile.characters.character.skills.skill[i].spec != null) {
                         attributes["skillspec"+j] = chummerfile.characters.character.skills.skill[i].spec;
                     }
-                    else
+                    else {
                         attributes["skillspec"+j]="none";
-
-                    if(chummerfile.characters.character.weapons!=null){
-                        if(chummerfile.characters.character.weapons.weapon.length>1){
-                            for(var h=1;h<chummerfile.characters.character.weapons.weapon.length+1&&h<9;h++){
-                                if(chummerfile.characters.character.weapons.weapon[h-1].category!="Gear"){
-                                    if(names[compname] == chummerfile.characters.character.weapons.weapon[h-1].skill){
-                                        attributes["weaponcategory"+h]="@{skilldicepool"+j+"}";
-                                        attributes["weaponbonus"+h]=chummerfile.characters.character.weapons.weapon[h-1].dicepool-chummerfile.characters.character.skills.skill[i].total;
-                                    }
-                                }
-                            }
-                        }else{
-                            if(chummerfile.characters.character.weapons.weapon.category!="Gear"){
-                                if(names[compname] == chummerfile.characters.character.weapons.weapon.skill){
-                                    attributes["weaponcategory1"]="@{skilldicepool"+j+"}";
-                                    attributes["weaponbonus1"]=chummerfile.characters.character.weapons.weapon.dicepool-chummerfile.characters.character.skills.skill[i].total;
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -15268,6 +15250,37 @@ async function importSingleWeapon(weapon, number,  ammunition, attributes) {
         }
     }
     attributes["weaponnotes"+number] = "";
+
+    let skills = [];
+    for(var i=43;i<52;i++)
+    {
+        var name = 'skillname'+i;
+        skills.push(name);
+        var rating = 'skillrating'+i;
+        skills.push(rating);
+        var bonus = 'skillbonus'+i;
+        skills.push(bonus);
+        var attr = 'skillattr_value'+i;
+        skills.push(attr);
+    }
+    skills = await asw.getAttrs(skills);
+    for(var i=43; i<52; i++)
+    {
+        var compname = 'skillname'+i;
+        var rating = 'skillrating'+i;
+        var bonus = 'skillbonus'+i;
+        var skillattr = 'skillattr_value'+i;
+
+        if(skills[compname] == weapon.skill){
+            attributes["weaponcategory" + number] = "@{skilldicepool"+i+"}";
+            let attribute = await asw.getAttrs([skillattr]);
+            let attrTotal = attribute[skillattr].replace(/[^a-zA-Z0-9_]/g, "");
+            let attributeSum = await asw.getAttrs([attrTotal]);
+            let targetAttributes = attributeSum[attrTotal].replace(/[+]/g, ",").replace(/[^a-zA-Z0-9_,]/g, "").split(",");
+            let attributesValues = [attributes[targetAttributes[0]], attributes[targetAttributes[1]]]
+            attributes["weaponbonus" + number] = weapon.dicepool - skills[rating] - skills[bonus] - attributesValues.reduce((a,b) => parseInt(a) + parseInt(b));
+        }
+    }
 
     if(typeof weapon.accessories != "undefined"){
         if(weapon.accessories.accessory.length>1){
