@@ -1,4 +1,4 @@
-//region Player's Handbook
+//#region Player's Handbook
 const weapons = {};
 weapons['arquebus'] = {
     'name': 'Arquebus',
@@ -890,7 +890,40 @@ weapons['whip'] = {
     'book': 'PHB',
     'category': ['Melee']
 };
-//endregion
+weapons['punching (bare-handed)'] = {
+    'name': 'Punching (Bare-handed)',
+    'noProf': true,
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1d2',
+    'large': '1d2',
+    'book': 'PHB',
+    'category': ['Melee']
+};
+weapons['punching (gauntlets / knuckles)'] = {
+    'name': 'Punching (Gauntlets / Knuckles)',
+    'noProf': true,
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'book': 'PHB',
+    'category': ['Melee']
+};
+weapons['wrestling'] = {
+    'name': 'Wrestling',
+    'noProf': true,
+    'size': '—',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1',
+    'large': '1',
+    'book': 'PHB',
+    'category': ['Melee']
+};
+//#endregion
 
 //region The Complete Fighter's Handbook
 weapons['belaying pin'] = {
@@ -1030,7 +1063,7 @@ weapons['knife, bone'] = {
 weapons['knife, stone'] = {
     ...weapons['knife, bone'],
     'name': 'Knife, Stone'
-}
+};
 weapons['lasso'] = {
     'name': 'Lasso',
     'strength': true,
@@ -1174,6 +1207,7 @@ weapons['long spear (two-handed)'] = {
 };
 weapons['stiletto'] = {
     'name': 'Stiletto',
+    'group': 'Knife',
     'strength': true,
     'rof': '2/1',
     'range': '10/20/30',
@@ -1277,6 +1311,42 @@ weapons['trident (one-handed)'] = {
     'book': 'The Complete Fighter\'s Handbook',
     'category': ['Melee','Range']
 };
+weapons['shield-punch'] = {
+    'name': 'Shield-Punch',
+    'group': 'Buckler/Small/Medium Shield',
+    'noProf': true,
+    'size': 'S/M',
+    'type': 'B',
+    'speed': 2,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['shield-rush'] = {
+    'name': 'Shield-Rush',
+    'group': 'Medium/Body Shield',
+    'noProf': true,
+    'size': 'M/L',
+    'type': 'B',
+    'speed': 0,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
+weapons['martial arts'] = {
+    'name': 'Martial Arts',
+    'noProf': true,
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '',
+    'large': '',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
 //endregion
 
 //region The Complete Priest's Handbook
@@ -1314,4 +1384,481 @@ weapons['scythe'] = {
     'category': ['Melee']
 };
 //endregion
+
+//#region Arms and Equipment
+weapons['parrying dagger'] = {
+    'name': 'Parrying dagger',
+    'noProf': true,
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Melee']
+};
+weapons['renseur'] = {
+    'name': 'Renseur',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'small-medium': '2d4',
+    'large': '2d4',
+    'knockdown': 'd8',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Melee']
+};
+weapons['sap'] = {
+    'name': 'Sap',
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'small-medium': '1d2',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Melee']
+};
+weapons['staff sling (stinkpot)'] = {
+    'name': 'Staff sling (Stinkpot)',
+    'strength': true,
+    'rof': '2/1',
+    'range': '—/30-60/90',
+    'size': 'M',
+    'type': 'B',
+    'speed': 11,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Range']
+};
+weapons['claymore'] = {
+    'name': 'Claymore',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 8,
+    'small-medium': '2d4',
+    'large': '2d8',
+    'knockdown': 'd10',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Melee']
+};
+weapons['falchion'] = {
+    'name': 'Falchion',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 5,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Arms and Equipment Guide',
+    'category': ['Melee']
+};
+//#endregion
+
+//#region The Complete Book of Dwarves
+weapons['two-handed battle axe'] = {
+    'name': 'Two-handed Battle axe',
+    'size': 'M',
+    'type': 'S',
+    'speed': 9,
+    'small-medium': '1d10',
+    'large': '2d8',
+    'knockdown': 'd12',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+weapons['head spike'] = {
+    'name': 'Head spike',
+    'group': 'Close Combat',
+    'noProf': true,
+    'size': 'M',
+    'type': 'P',
+    'speed': 4,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+weapons['elbow spike'] = {
+    'name': 'Elbow spike',
+    'group': 'Close Combat',
+    'noProf': true,
+    'size': 'S',
+    'type': 'S',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+weapons['knee spike'] = {
+    'name': 'Knee spike',
+    'group': 'Close Combat',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P',
+    'speed': 1,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+weapons['glove nail'] = {
+    'name': 'Glove Nail',
+    'group': 'Close Combat',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+weapons['chain flail'] = {
+    'name': 'Chain flail',
+    'group': 'Close Combat',
+    'size': 'L',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d4+2',
+    'large': '1d4+1',
+    'book': 'The Complete Book of Dwarves',
+    'category': ['Melee']
+};
+//#endregion
+
+//#region The Complete Book of Elves
+weapons['bow (melee)'] = {
+    'name': 'Bow (Melee)',
+    'noProf': true,
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d6-1',
+    'large': '1d4',
+    'book': 'The Complete Book of Elves',
+    'category': ['Melee']
+};
+weapons['elven bow (melee)'] = {
+    'name': 'Elven Bow (Melee)',
+    'noProf': true,
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d6',
+    'large': '1d3',
+    'book': 'The Complete Book of Elves',
+    'category': ['Melee']
+};
+//#endregion
+
+//#region The Complete Book of Humanoids
+weapons['great club'] = {
+    'name': 'Great Club',
+    'size': 'M',
+    'type': 'B',
+    'speed': 7,
+    'small-medium': '2d4',
+    'large': '1d6+1',
+    'knockdown': 'd12',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['dart, barbed '] = {
+    'name': 'Dart, barbed',
+    'strength': true,
+    'rof': '3/1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'P',
+    'speed': 3,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee', 'Range']
+};
+weapons['flindbar'] = {
+    'name': 'Flindbar',
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['goblin stick'] = {
+    'name': 'Goblin stick',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d4',
+    'large': '1d6',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['flight lance'] = {
+    'name': 'Flight lance',
+    'size': 'L',
+    'type': 'P',
+    'speed': 6,
+    'small-medium': '1d6+1',
+    'large': '2d6',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['body spikes'] = {
+    'name': 'Body spikes',
+    'group': 'Close-quarter',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '',
+    'large': '',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['kick-slasher'] = {
+    'name': 'Kick-slasher',
+    'group': 'Close-quarter',
+    'noProf': true,
+    'size': 'S',
+    'type': 'S',
+    'speed': 2,
+    'small-medium': '1d4+1',
+    'large': '1d6+1',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['punch-cutter'] = {
+    'name': 'Punch-cutter',
+    'group': 'Close-quarter',
+    'noProf': true,
+    'size': 'S',
+    'type': 'S',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['giant-kin long bow (voadkyn)'] = {
+    'name': 'Giant-kin Long bow (Voadkyn)',
+    'rof': '2/1',
+    'range': '75/150/255',
+    'size': 'G',
+    'type': 'P',
+    'speed': 10,
+    'small-medium': '1d8',
+    'large': '1d8',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Range']
+};
+weapons['giant-kin dagger'] = {
+    'name': 'Giant-kin Dagger',
+    'strength': true,
+    'rof': '2/1',
+    'range': '10/20/30',
+    'size': 'G',
+    'type': 'P',
+    'speed': 3,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee', 'Range']
+};
+weapons['giant-kin halberd'] = {
+    'name': 'Giant-kin Halberd',
+    'size': 'G',
+    'type': 'P/S',
+    'speed': 12,
+    'small-medium': '1d12',
+    'large': '2d8',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['giant-kin mace'] = {
+    'name': 'Giant-kin Mace',
+    'size': 'G',
+    'type': 'B',
+    'speed': 8,
+    'small-medium': '1d8*2',
+    'large': '1d6*2',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['giant-kin two-handed sword'] = {
+    'name': 'Giant-kin Two-handed sword',
+    'size': 'G',
+    'type': 'S',
+    'speed': 13,
+    'small-medium': '1d10*2',
+    'large': '3d6*2',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['pixie bow (forget arrow)'] = {
+    'name': 'Pixie Bow (Forget arrow)',
+    'rof': '2/1',
+    'range': '25/50/75',
+    'size': 'T',
+    'type': 'P',
+    'speed': 4,
+    'small-medium': '',
+    'large': '',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Range']
+};
+weapons['pixie bow (sleep arrow)'] = {
+    'name': 'Pixie Bow (Sleep arrow)',
+    'rof': '2/1',
+    'range': '25/50/75',
+    'size': 'T',
+    'type': 'P',
+    'speed': 4,
+    'small-medium': '',
+    'large': '',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Range']
+};
+weapons['pixie bow (war arrow)'] = {
+    'name': 'Pixie Bow (War arrow)',
+    'rof': '2/1',
+    'range': '25/50/75',
+    'size': 'T',
+    'type': 'P',
+    'speed': 4,
+    'small-medium': '1d4+1',
+    'large': '1d4+1',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Range']
+};
+weapons['pixie sword'] = {
+    'name': 'Pixie Sword',
+    'size': 'T',
+    'type': 'S',
+    'speed': 4,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['bladeback flail'] = {
+    'name': 'Bladeback flail',
+    'group': 'Saurial Weapon',
+    'size': 'L',
+    'type': 'B',
+    'speed': 9,
+    'small-medium': '1d8+1',
+    'large': '2d6',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['bladeback mace'] = {
+    'name': 'Bladeback mace',
+    'group': 'Saurial Weapon',
+    'size': 'L',
+    'type': 'B',
+    'speed': 9,
+    'small-medium': '1d8+1',
+    'large': '1d8',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+weapons['hornhead staff'] = {
+    'name': 'Hornhead staff',
+    'group': 'Saurial Weapon',
+    'size': 'L',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '2d6',
+    'large': '2d6',
+    'book': 'The Complete Book of Humanoids',
+    'category': ['Melee']
+};
+//#endregion
+
+//#region The Complete Ranger's Handbook
+weapons['grain flail'] = {
+    'name': 'Grain flail',
+    'size': 'M',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['hatchet'] = {
+    'name': 'Hatchet',
+    'size': 'S',
+    'type': 'S',
+    'speed': 4,
+    'small-medium': '1d4+1',
+    'large': '1d4+1',
+    'knockdown': 'd6',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['ice pick'] = {
+    'name': 'Ice Pick',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['knife, harness'] = {
+    'name': 'Knife, Harness',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 2,
+    'small-medium': '1d2',
+    'large': '1',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['machete'] = {
+    'name': 'Machete',
+    'size': 'M',
+    'type': 'S',
+    'speed': 8,
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['ritiik'] = {
+    'name': 'Ritiik',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+weapons['snow blade (iuak)'] = {
+    'name': 'Snow Blade (Iuak)',
+    'size': 'M',
+    'type': 'S',
+    'speed': 4,
+    'small-medium': '1d4',
+    'large': '1d6',
+    'book': 'The Complete Ranger\'s Handbook',
+    'category': ['Melee']
+};
+//#endregion
 module.exports = weapons;
