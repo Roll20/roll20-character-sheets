@@ -1861,4 +1861,161 @@ weapons['snow blade (iuak)'] = {
     'category': ['Melee']
 };
 //#endregion
+
+//#region The Complete Barbarians Handbook
+weapons['artengak'] = {
+    'name': 'Artengak',
+    'size': 'L',
+    'type': 'P',
+    'speed': 5,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['atlatl'] = {
+    'name': 'Atlatl',
+    'rof': '1',
+    'range': '30/60/90',
+    'size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['atlatl, dart'] = {
+    'name': 'Atlatl, Dart',
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['boomerang, nonreturning'] = {
+    'name': 'Boomerang, Nonreturning',
+    'rof': '1',
+    'range': '30/70/100',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d3+1',
+    'large': '1d4+1',
+    'knockdown': 'd8',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['boomerang, returning'] = {
+    'name': 'Boomerang, Returning',
+    'rof': '1',
+    'range': '20/40/60',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d3+1',
+    'large': '1d4+1',
+    'knockdown': 'd8',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['celt'] = {
+    'name': 'Celt',
+    'size': 'S',
+    'type': 'B/P',
+    'speed': 4,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['club, spiked'] = {
+    'name': 'Club, Spiked',
+    'size': 'M',
+    'type': 'P',
+    'speed': 4,
+    'small-medium': '1d6+1',
+    'large': '1d4+1',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['club, throwing (melee)'] = {
+    'name': 'Club, Throwing (Melee)',
+    'size': 'S',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d2',
+    'large': '1',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['club, throwing (ranged)'] = {
+    'name': 'Club, Throwing (Ranged)',
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['forearm axe'] = {
+    'name': 'Forearm Axe',
+    'size': 'S',
+    'type': 'S/P',
+    'speed': 3,
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['rabbit stick'] = {
+    'name': 'Rabbit stick',
+    'size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['stick sling (flint disk)'] = {
+    'name': 'Stick sling (Flint Disk)',
+    'rof': '2/1',
+    'range': '30/60/90',
+    'size': 'S',
+    'type': 'B',
+    'speed': 11,
+    'small-medium': '1d4+1',
+    'large': '1d6+1',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['stick sling (grooved stone)'] = {
+    'name': 'Stick sling (Grooved Stone)',
+    'rof': '2/1',
+    'range': '30/60/90',
+    'size': 'S',
+    'type': 'B',
+    'speed': 11,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['sling, string (flint disk)'] = {
+    ...weapons['stick sling (flint disk)'],
+    'name': 'Sling, String (Flint Disk)',
+};
+weapons['sling, string (grooved stone)'] = {
+    ...weapons['stick sling (grooved stone)'],
+    'name': 'Sling, String (Grooved Stone)',
+};
+//#endregion
 module.exports = weapons;
