@@ -1,14 +1,15 @@
 Backlog
 =======
 
-- favoured/ill-favoured rolls for adversaries
-- (later) evaluate use of custom API to give better user feedback on rolls
 
-02.00.00
+02.00.00 (many thanks to @dwarfwing for joining the dev and contributing his great 2e sheet!!)
 ========
 
-- integrate custom roll parsing to get rid of custom roll tables.
+- integrate roll parsing to get rid of custom roll tables.
 - integration of armour qualities in the layout (cunning make and close fitting)
+- favoured/ill-favoured rolls for adversaries
+- integrate roll-templates 
+- numerous layout optimizations and UI improvments
 
 01.01.00
 ========

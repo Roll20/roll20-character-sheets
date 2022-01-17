@@ -1,5 +1,5 @@
 # Release Notes
-This is a rewrite based on the early 2e (basic) and 1e edition that also includes a 2e sheet for adversaries. It features correct handling of favoured rolls and stance related bonus changes to attack rating, parry, protection and damage.
+This is a rewrite based on the early 2e (basic) and 1e edition that also includes a 2e sheet for adversaries. It features correct handling of favoured rolls, weary/miserable state, bonus dice and stance related bonus changes to attack rating, parry, protection and damage.
 
 # Release History
 

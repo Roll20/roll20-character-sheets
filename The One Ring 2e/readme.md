@@ -30,5 +30,5 @@ This should work but is not tested extensively at the moment. I would recommend 
 
 ## Upgrade from 1e version ##
 
-Currently there is no data migrations from 1e available at the moment. This means some attributenames have changed and there is no automatic upgrade available. So in the end Players would need to manually upgrade their character sheet and reenter some attributes. Additionally the 1e sheet has some fields (e.g. the journey log) that are not available in the 2e edition. You should be aware that this data is not available in the 2e version.
+Currently there is no data migrations from 1e available at the moment (help welcome!). This means some attributenames have changed and there is no automatic upgrade available. So in the end Players would need to manually upgrade their character sheet and reenter some attributes. Additionally the 1e sheet has some fields (e.g. the journey log) that are not available in the 2e edition. You should be aware that this data is not available in the 2e version.
 I would recommend to make a copy of your existing 1e game and look closely at the missing things, e.g. there is no loremaster charactersheets and due to the rule changes the pc and adversary sheet have changed.
