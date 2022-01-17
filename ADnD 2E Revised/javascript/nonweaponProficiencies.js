@@ -915,4 +915,70 @@ nonweaponProficiencies['Oratory'] = {
     'book': 'The Complete Paladin\'s Handbook'
 };
 //#endregion
+
+//#region The Complete Barbarian's Handbook
+nonweaponProficiencies['Animal Rending'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Clothesmaking, Crude'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': '',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Armorer, Crude'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': 'Fighter',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Bowyer/Fletcher, Crude'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': 'Fighter',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Horde Summoning'] = {
+    'slots': 2,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': 'Fighter',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Leadership'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': 'Fighter',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Light Sleeping'] = {
+    'slots': 1,
+    'abilityScore': '@{Constitution}',
+    'modifier': -1,
+    'classes': 'Fighter',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Weapon Improvisation'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -1,
+    'classes': 'Fighter',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Armorer, Crude'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': 'Fighter',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+//#endregion
 module.exports = nonweaponProficiencies;
