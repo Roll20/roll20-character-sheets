@@ -10,8 +10,8 @@ const ERROR = 'error';
 const BOOK_FIELDS = [
     'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
     'book-tom', 'book-aaeg',
-    'book-tcbod', 'book-tcbhb', 'book-tcboe', 'book-tcboh', 'book-tcrhb',
-    'book-tcpahb', 'book-tcdhb', 'book-tcbarbhb',
+    'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
+    'book-paladins', 'book-druids', 'book-barbarians'
 ];
 
 //#region Helper function
