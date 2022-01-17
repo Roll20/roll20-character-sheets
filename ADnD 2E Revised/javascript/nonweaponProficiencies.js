@@ -917,13 +917,6 @@ nonweaponProficiencies['Oratory'] = {
 //#endregion
 
 //#region The Complete Barbarian's Handbook
-nonweaponProficiencies['Animal Rending'] = {
-    'slots': 1,
-    'abilityScore': '@{Dexterity}',
-    'modifier': +2,
-    'classes': '',
-    'book': 'The Complete Barbarian\'s Handbook'
-};
 nonweaponProficiencies['Clothesmaking, Crude'] = {
     'slots': 1,
     'abilityScore': '@{Intelligence}',
@@ -931,53 +924,67 @@ nonweaponProficiencies['Clothesmaking, Crude'] = {
     'classes': '',
     'book': 'The Complete Barbarian\'s Handbook'
 };
+nonweaponProficiencies['Animal Rending'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': +2,
+    'classes': 'Warrior',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
 nonweaponProficiencies['Armorer, Crude'] = {
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
-    'classes': 'Fighter',
+    'classes': 'Warrior',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Bartering'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Rogue',
     'book': 'The Complete Barbarian\'s Handbook'
 };
 nonweaponProficiencies['Bowyer/Fletcher, Crude'] = {
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
-    'classes': 'Fighter',
+    'classes': 'Warrior',
     'book': 'The Complete Barbarian\'s Handbook'
 };
 nonweaponProficiencies['Horde Summoning'] = {
     'slots': 2,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
-    'classes': 'Fighter',
+    'classes': 'Warrior',
     'book': 'The Complete Barbarian\'s Handbook'
 };
 nonweaponProficiencies['Leadership'] = {
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
-    'classes': 'Fighter',
+    'classes': 'Warrior',
     'book': 'The Complete Barbarian\'s Handbook'
 };
 nonweaponProficiencies['Light Sleeping'] = {
     'slots': 1,
     'abilityScore': '@{Constitution}',
     'modifier': -1,
-    'classes': 'Fighter',
+    'classes': 'Warrior',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Soothsaying'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Priest',
     'book': 'The Complete Barbarian\'s Handbook'
 };
 nonweaponProficiencies['Weapon Improvisation'] = {
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
-    'classes': 'Fighter',
-    'book': 'The Complete Barbarian\'s Handbook'
-};
-nonweaponProficiencies['Armorer, Crude'] = {
-    'slots': 1,
-    'abilityScore': '@{Intelligence}',
-    'modifier': -1,
-    'classes': 'Fighter',
+    'classes': 'Warrior',
     'book': 'The Complete Barbarian\'s Handbook'
 };
 //#endregion
