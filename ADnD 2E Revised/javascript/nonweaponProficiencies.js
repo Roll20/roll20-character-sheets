@@ -988,4 +988,42 @@ nonweaponProficiencies['Weapon Improvisation'] = {
     'book': 'The Complete Barbarian\'s Handbook'
 };
 //#endregion
+
+//#region The Complete Book of Necromancers
+nonweaponProficiencies['Anatomy'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Necromancers'
+};
+nonweaponProficiencies['Necrology'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Necromancers'
+};
+nonweaponProficiencies['Netherworld Knowledge'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -3,
+    'classes': '',
+    'book': 'The Complete Book of Necromancers'
+};
+nonweaponProficiencies['Spirit Lore'] = {
+    'slots': 2,
+    'abilityScore': '@{Charisma}',
+    'modifier': -4,
+    'classes': '',
+    'book': 'The Complete Book of Necromancers'
+};
+nonweaponProficiencies['Venom Handling'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Book of Necromancers'
+};
+//#endregion
 module.exports = nonweaponProficiencies;

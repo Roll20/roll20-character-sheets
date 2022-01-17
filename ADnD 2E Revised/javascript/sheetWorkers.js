@@ -11,7 +11,7 @@ const BOOK_FIELDS = [
     'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
     'book-tom', 'book-aaeg',
     'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
-    'book-paladins', 'book-druids', 'book-barbarians'
+    'book-paladins', 'book-druids', 'book-barbarians', 'book-necromancers'
 ];
 
 //#region Helper function
