@@ -1,9 +1,11 @@
-& 'D:\git\roll20-character-sheets\ADnD 2E Revised\build\sanitizeFiles.ps1'
+$sanitizeScript = Join-Path $PSScriptRoot "sanitizeFiles.ps1"
+& $sanitizeScript
 
 "---- Combining files ----"
-$inputFile = 'D:\git\roll20-character-sheets\ADnD 2E Revised\html\2ESheet-base.html'
-$sourceFolder = 'D:\git\roll20-character-sheets\ADnD 2E Revised'
-$outputFile = 'D:\git\roll20-character-sheets\ADnD 2E Revised\2ESheet.html'
+
+$sourceFolder = Join-Path $PSScriptRoot ".."
+$inputFile = Join-Path $sourceFolder "html" "2ESheet-base.html"
+$outputFile = Join-Path $sourceFolder '2ESheet.html'
 
 $replaceConstant = '#REPLACE{0}#'
 
@@ -25,10 +27,14 @@ $inserts | ForEach-Object {
       }
    }
    $rawContent = $fileContent -join "`n"
-   $replaces = $split[2..100];
-   for ($i=0; $i -lt $replaces.Length; $i++) {
-      $replace = $replaceConstant -f $i;
-      $rawContent = $rawContent.Replace($replace, $replaces[$i])
+   $replaceValues = $split[2..100];
+   for ($i=0; $i -lt $replaceValues.Length; $i++) {
+      $replaceKey = $replaceConstant -f $i;
+      $replaceValue = $replaceValues[$i];
+      if ($replaceValue.StartsWith("repeating")) {
+         $replaceValue = $replaceValue.Replace("-", "_") #Allows for repeating section inserts
+      }
+      $rawContent = $rawContent.Replace($replaceKey, $replaceValue)
    }
    $rawContent = $rawContent -replace "\#REPLACE\d+\#", ""
    $rawContent = $rawContent -replace "\r?\nmodule\.exports.*;", ""

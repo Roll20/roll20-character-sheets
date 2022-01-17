@@ -41,7 +41,7 @@ rollCombatDistancePNJ.forEach((button) => {
     let special = [];
     let specialValue = [];
 
-    const AE = 0;
+    let AE = 0;
 
     let diceDegats = 0;
     let diceViolence = 0;
@@ -252,6 +252,7 @@ rollCombatDistancePNJ.forEach((button) => {
       aspect = `{{cBase=${AspectNom[aspectNom]}}}`;
 
       cRoll.push(aspectValue);
+      AE += AEValue;
       exec.push(aspect);
       exec.push(`{{vAE=${AEValue}}}`);
     }
@@ -552,12 +553,18 @@ rollCombatDistancePNJ.forEach((button) => {
 
     exec = firstExec.concat(exec);
 
+    log(bonus);
+    log(exec);
+
     if (pasEnergie === false) {
       startRoll(exec.join(' '), (results) => {
         const tJet = results.results.jet.result;
 
         const tBonus = results.results.bonus.result;
         const tExploit = results.results.Exploit.result;
+
+        log(tJet);
+        log(tBonus);
 
         const tMeurtrier = results.results.meurtrierValue;
         let vTMeurtrier = 0;

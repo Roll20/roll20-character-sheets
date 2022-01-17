@@ -73,6 +73,17 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+January 3rd 2022 v1.53.2
+
+- Fixed issue where Twohanded weapons when selected would show offhand penality added to the target value of the specific weapon. This did not effect the Roll itself.
+- Fix for Characteristics modifier which was adding twice on the skill target display in rolls.
+- Resolved issue with Custom Spell Advantage rule (which basic removed advantage modifier from casting), this will now also disable Advantage for Langange Magick skill roll aswell as spellbook rolls. And removes the gold star indicator when disabled too.
+
+December 6th 2021 v1.53.1
+
+- Completed experimental talent list (all 166 talents) in the Dev mode, nearly all are implemented at this time. This causes talent bonuses to show when rolling skills and weapons, to allow superior flow of game and especially combat. Includes advanced combat actions, like Charge/Furious Assault/Feint/DW/Fast Shot etc rules which are implemented directly into the sheet so they show when rolling ( i.e. you don't have to remember at the +SL or complex rule). Also includes a new SL system which adds together the total SL bonus each roll. Enable Dev mode to test this feature.
+
+
 September 14th 2021 v1.53
 
 - Various bug fixes
@@ -82,8 +93,6 @@ September 14th 2021 v1.53
 - Melee/Ranged Weapons settings popout style changed a bit, added a wrap box.
 - Skills which are affected by advantage or penaties now have tooltip markers to indicate it.
 - Added experimental SL system and custom roll parsing sheet workers, these are hidden and dont interfere with the base page.
-
--- Added many more integrated talents ~75% of RAW in experimental mode
 
 
 August 25th 2021 v1.52

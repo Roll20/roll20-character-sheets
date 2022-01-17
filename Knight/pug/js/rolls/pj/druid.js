@@ -110,6 +110,9 @@ on('clicked:druidLionArmeBase', async (info) => {
     'coupBVDiversTotal',
     'bVDiversD6',
     'bVDiversFixe',
+    'devasterAnatheme',
+    'bourreauTenebres',
+    'equilibreBalance',
   ];
 
   attributs = attributs.concat(arme, special);
@@ -153,6 +156,10 @@ on('clicked:druidLionArmeBase', async (info) => {
   const bete = totalADruid(attrs, 'druidLionBete');
   const AEBete = +attrs.druidLionBeteAE;
 
+  const devaste = +attrs.devasterAnatheme;
+  const bourreau = +attrs.bourreauTenebres;
+  const equilibre = +attrs.equilibreBalance;
+
   const cRoll = [];
   const AE = [];
   let bonus = [];
@@ -164,10 +171,10 @@ on('clicked:druidLionArmeBase', async (info) => {
   cRoll.push(aspectValue);
 
   diceDegats = +attrs.druidLionBaseDegats;
-  bonusDegats.push(attrs.druidLionBaseDegatsBonus);
+  bonusDegats.push(+attrs.druidLionBaseDegatsBonus);
 
   diceViolence = +attrs.druidLionBaseViolence;
-  bonusViolence.push(attrs.druidLionBaseViolenceBonus);
+  bonusViolence.push(+attrs.druidLionBaseViolenceBonus);
 
   // GESTION DES BONUS DIVERS
   const bChairD = Math.ceil(vChair / 2);
@@ -178,9 +185,9 @@ on('clicked:druidLionArmeBase', async (info) => {
 
   // GESTION DES ASPECTS EXCEPTIONNELS
   if (AEBete > 0) {
-    let bonusBete = AEBete;
+    let bonusBete = +AEBete;
 
-    if (AEBete > 5) { bonusBete += bete; }
+    if (AEBete > 5) { bonusBete += +bete; }
 
     exec.push(`{{vBeteD=+${bonusBete}}}`);
     bonusDegats.push(bonusBete);
@@ -190,11 +197,11 @@ on('clicked:druidLionArmeBase', async (info) => {
   // GESTION DES BONUS SPECIAUX
   const sBonusDegats = attrs.coupBDDiversTotal;
   const sBonusDegatsD6 = attrs.bDDiversD6;
-  const sBonusDegatsFixe = attrs.bDDiversFixe;
+  const sBonusDegatsFixe = +attrs.bDDiversFixe;
 
   const sBonusViolence = attrs.coupBVDiversTotal;
   const sBonusViolenceD6 = attrs.bVDiversD6;
-  const sBonusViolenceFixe = attrs.bVDiversFixe;
+  const sBonusViolenceFixe = +attrs.bVDiversFixe;
 
   if (sBonusDegats !== '0') {
     exec.push(`{{vMSpecialD=+${sBonusDegatsD6}D6+${sBonusDegatsFixe}}}`);
@@ -234,42 +241,61 @@ on('clicked:druidLionArmeBase', async (info) => {
   exec.push(`{{degats=[[${degats.join('+')}]]}}`);
   exec.push(`{{violence=[[${violence.join('+')}]]}}`);
 
+  if (devaste || bourreau || equilibre) {
+    const herauts = [];
+
+    if (devaste) { herauts.push(i18n_devasterAnatheme); }
+    if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+    if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+    exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+  }
+
   if (isConditionnelA === true) { exec.push('{{succesConditionnel=true}}'); }
 
   if (isConditionnelD === true) { exec.push('{{degatsConditionnel=true}}'); }
 
   if (isConditionnelV === true) { exec.push('{{violenceConditionnel=true}}'); }
 
-  startRoll(exec.join(' '), (results) => {
-    const tJet = results.results.jet.result;
-    const tBonus = results.results.bonus.result;
-    const tExploit = results.results.Exploit.result;
+  const finalRoll = await startRoll(exec.join(' '));
 
-    const tDegats = results.results.degats.result;
-    const tViolence = results.results.violence.result;
+  const tJet = finalRoll.results.jet.result;
 
-    finishRoll(
-      results.rollId,
-      {
-        jet: tJet + tBonus,
-        degats: tDegats,
-        violence: tViolence,
-      },
-    );
+  const tBonus = finalRoll.results.bonus.result;
+  const tExploit = finalRoll.results.Exploit.result;
 
-    if (tJet !== 0 && tJet === tExploit) {
-      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
-        const tExploit2 = exploit.results.jet.result;
+  const rDegats = finalRoll.results.degats.dice;
+  const rViolence = finalRoll.results.violence.dice;
 
-        finishRoll(
-          exploit.rollId,
-          {
-            jet: tExploit2,
-          },
-        );
-      });
-    }
-  });
+  const tDegats = finalRoll.results.degats.result;
+  const tViolence = finalRoll.results.violence.result;
+
+  const conditions = {
+    bourreau,
+    devaste,
+    equilibre,
+  };
+
+  const computed = updateRoll(finalRoll, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
+
+  const finalComputed = {
+    jet: tJet + tBonus,
+  };
+
+  Object.assign(finalComputed, computed);
+
+  finishRoll(finalRoll.rollId, finalComputed);
+
+  if (tJet !== 0 && tJet === tExploit) {
+    const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+    const tRExploit = exploitRoll.results.jet.result;
+
+    const exploitComputed = {
+      jet: tRExploit,
+    };
+
+    finishRoll(exploitRoll.rollId, exploitComputed);
+  }
 });
 
 on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
@@ -390,6 +416,9 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     'repeating_armeDruidLion_bVDiversFixe',
     'repeating_armeDruidLion_energie',
     'repeating_armeDruidLion_energieValue',
+    'devasterAnatheme',
+    'bourreauTenebres',
+    'equilibreBalance',
   ];
 
   attributs = attributs.concat(wpn, effets, ameliorations, special);
@@ -453,6 +482,17 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
   const vMasque = totalADruid(attrs, 'druidLionMasque');
   const vAEMasque = +attrs.druidLionMasqueAE;
 
+  const devaste = +attrs.devasterAnatheme;
+  const bourreau = +attrs.bourreauTenebres;
+  const equilibre = +attrs.equilibreBalance;
+
+  let isDestructeur = false;
+  let isFureur = false;
+  let isMeurtrier = false;
+  let isUltraviolence = false;
+  let isSurprise = false;
+  let isTenebricide = false;
+
   const cRoll = [];
   const AE = [];
   let bonus = [];
@@ -466,10 +506,10 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
   cRoll.push(aspectValue);
 
   diceDegats = Number(attrs.repeating_armeDruidLion_degatDruidLion);
-  bonusDegats.push(attrs.repeating_armeDruidLion_degatBonusDruidLion);
+  bonusDegats.push(+attrs.repeating_armeDruidLion_degatBonusDruidLion);
 
   diceViolence = Number(attrs.repeating_armeDruidLion_violenceDruidLion);
-  bonusViolence.push(attrs.repeating_armeDruidLion_violenceBonusDruidLion);
+  bonusViolence.push(+attrs.repeating_armeDruidLion_violenceBonusDruidLion);
 
   // GESTION DES BONUS DIVERS
   let bChairD = Math.ceil(vChair / 2);
@@ -482,7 +522,7 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
 
   // GESTION DES ASPECTS EXCEPTIONNELS
   if (vAEBete > 0) {
-    let bonusBete = vAEBete;
+    let bonusBete = +vAEBete;
 
     if (vAEBete > 5) { bonusBete += vBete; }
 
@@ -574,6 +614,7 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
   }
 
   if (eAssassin !== '0') {
+    isConditionnelD = true;
     eASAssassin = i18n_assassin;
     eASAssassinValue = eAssassinV;
 
@@ -601,6 +642,8 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{destructeur=${i18n_destructeur}}}`);
     exec.push(`{{destructeurValue=[[${eDestructeurV}D6]]}}`);
     exec.push(`{{destructeurCondition=${i18n_destructeurCondition}}}`);
+
+    isDestructeur = true;
   }
 
   if (eEnChaine !== '0') {
@@ -622,6 +665,8 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{fureur=${i18n_fureur}}}`);
     exec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
     exec.push(`{{fureurCondition=${i18n_fureurCondition}}}`);
+
+    isFureur = true;
   }
 
   if (eLeste !== '0') {
@@ -636,6 +681,8 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{meurtrier=${i18n_meurtrier}}}`);
     exec.push(`{{meurtrierValue=[[${eMeurtrierV}D6]]}}`);
     exec.push(`{{meurtrierCondition=${i18n_meurtrierCondition}}}`);
+
+    isMeurtrier = true;
   }
 
   if (eObliteration !== '0') {
@@ -670,6 +717,7 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
 
     attaquesSurprises.push(i18n_silencieux);
     attaquesSurprisesValue.push(totalSilencieux);
+    isConditionnelD = true;
 
     if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
   }
@@ -684,17 +732,23 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{tenebricide=${i18n_tenebricide}}}`);
     exec.push(`{{tenebricideConditionD=${i18n_tenebricideConditionD}}}`);
     exec.push(`{{tenebricideConditionV=${i18n_tenebricideConditionV}}}`);
+    isConditionnelD = true;
+    isConditionnelV = true;
   }
 
   if (eTirRafale !== '0') {
     exec.push(`{{tirRafale=${i18n_tirRafale}}}`);
     exec.push(`{{tirRafaleCondition=${i18n_tirRafaleCondition}}}`);
+    isConditionnelD = true;
   }
 
   if (eUltraviolence !== '0') {
     exec.push(`{{ultraviolence=${i18n_ultraviolence}}}`);
     exec.push(`{{ultraviolenceValue=[[${eUltraviolenceV}D6]]}}`);
     exec.push(`{{ultraviolenceCondition=${i18n_ultraviolenceCondition}}}`);
+
+    isConditionnelV = true;
+    isUltraviolence = true;
   }
 
   if (eAntiVehicule !== '0') { autresEffets.push(i18n_antiVehicule); }
@@ -864,11 +918,11 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
   // GESTION DES BONUS SPECIAUX
   const sBonusDegats = attrs.repeating_armeDruidLion_bDDiversTotal;
   const sBonusDegatsD6 = attrs.repeating_armeDruidLion_bDDiversD6;
-  const sBonusDegatsFixe = attrs.repeating_armeDruidLion_bDDiversFixe;
+  const sBonusDegatsFixe = +attrs.repeating_armeDruidLion_bDDiversFixe;
 
   const sBonusViolence = attrs.repeating_armeDruidLion_bVDiversTotal;
   const sBonusViolenceD6 = attrs.repeating_armeDruidLion_bVDiversD6;
-  const sBonusViolenceFixe = attrs.repeating_armeDruidLion_bVDiversFixe;
+  const sBonusViolenceFixe = +attrs.repeating_armeDruidLion_bVDiversFixe;
 
   const sEnergie = attrs.repeating_armeDruidLion_energie;
   const sEnergieValue = attrs.repeating_armeDruidLion_energieValue;
@@ -937,47 +991,6 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
   exec.push(`{{degats=[[${degats.join('+')}]]}}`);
   exec.push(`{{violence=[[${violence.join('+')}]]}}`);
 
-  if (eTenebricide !== '0') {
-    let degatsTenebricide = [];
-    let ASTenebricide = [];
-    let ASValueTenebricide = [];
-
-    let violenceTenebricide = [];
-
-    diceDegatsTenebricide = Math.floor(diceDegats / 2);
-    diceViolenceTenebricide = Math.floor(diceViolence / 2);
-
-    degatsTenebricide.push(`${diceDegatsTenebricide}D6`);
-    degatsTenebricide = degatsTenebricide.concat(bonusDegats);
-
-    violenceTenebricide.push(`${diceViolenceTenebricide}D6`);
-    violenceTenebricide = violenceTenebricide.concat(bonusViolence);
-
-    exec.push(`{{tenebricideValueD=[[${degatsTenebricide.join('+')}]]}}`);
-    exec.push(`{{tenebricideValueV=[[${violenceTenebricide.join('+')}]]}}`);
-
-    if (eASAssassinValue > 0) {
-      eAssassinTenebricideValue = Math.ceil(eASAssassinValue / 2);
-
-      ASTenebricide.unshift(eASAssassin);
-      ASValueTenebricide.unshift(`${eAssassinTenebricideValue}D6`);
-
-      if (attaquesSurprises.length > 0) {
-        ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-        ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-      }
-
-      exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-      exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
-    } else if (attaquesSurprises.length > 0) {
-      ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-      ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-
-      exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-      exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
-    }
-  }
-
   if (eObliteration !== '0') {
     let ASObliteration = [];
     let ASValueObliteration = [];
@@ -1032,6 +1045,35 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
     exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
     exec.push(attaquesSurprisesCondition);
+
+    isSurprise = true;
+  }
+
+  if (eTenebricide !== '0') {
+    isTenebricide = true;
+
+    exec.push('{{tenebricideValueD=[[0]]}}');
+    exec.push('{{tenebricideValueV=[[0]]}}');
+
+    if (attaquesSurprises.length > 0) {
+      exec.push(`{{tenebricideAS=${attaquesSurprises.join('\n+')}}}`);
+      exec.push('{{tenebricideASValue=[[0]]}}');
+    }
+
+    if (isMeurtrier) { firstExec.push('{{tMeurtrierValue=[[0]]}}'); }
+    if (isDestructeur) { firstExec.push('{{tDestructeurValue=[[0]]}}'); }
+    if (isFureur) { firstExec.push('{{tFureurValue=[[0]]}}'); }
+    if (isUltraviolence) { firstExec.push('{{tUltraviolenceValue=[[0]]}}'); }
+  }
+
+  if (devaste || bourreau || equilibre) {
+    const herauts = [];
+
+    if (devaste) { herauts.push(i18n_devasterAnatheme); }
+    if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+    if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+    exec.push(`{{herauts=${herauts.join(' / ')}}}`);
   }
 
   if (autresEffets.length > 0) { exec.push(`{{effets=${autresEffets.join(' / ')}}}`); }
@@ -1046,84 +1088,68 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
 
   if (isConditionnelV === true) { exec.push('{{violenceConditionnel=true}}'); }
 
+  log(exec);
+
   if (pasDEnergie === false) {
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
-      const tJetDice = results.results.jet.dice.length;
+    const finalRoll = await startRoll(exec.join(' '));
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    const tJet = finalRoll.results.jet.result;
+    const tJetDice = finalRoll.results.jet.dice.length;
 
-      const tDegats = results.results.degats.result;
-      const tViolence = results.results.violence.result;
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
 
-      const tMeurtrier = results.results.meurtrierValue;
-      let vTMeurtrier = 0;
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
 
-      if (tMeurtrier !== undefined) { vTMeurtrier = tMeurtrier.dice[0]; }
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
 
-      const tDestructeur = results.results.destructeurValue;
-      let vTDestructeur = 0;
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+      isTenebricide,
+      isSurprise,
+      isDestructeur,
+      isFureur,
+      isMeurtrier,
+      isUltraviolence,
+    };
 
-      if (tDestructeur !== undefined) { vTDestructeur = tDestructeur.dice[0]; }
+    const computed = updateRoll(finalRoll, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
 
-      const tFureur = results.results.fureurValue;
-      let vTFureur = 0;
+    const finalComputed = {
+      jet: tJet + tBonus,
+    };
 
-      if (tFureur !== undefined) { vTFureur = tFureur.dice[0] + tFureur.dice[1]; }
+    Object.assign(finalComputed, computed);
 
-      const tUltraviolence = results.results.ultraviolenceValue;
+    finishRoll(finalRoll.rollId, finalComputed);
 
-      let vTUltraviolence = 0;
+    if (tJet !== 0 && tJet === tExploit) {
+      const exploitRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${i18n_exploit}}} {{jet=[[ {[[{${tJetDice}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+      const tRExploit = exploitRoll.results.jet.result;
+      const exploitComputed = {
+        jet: tRExploit,
+      };
 
-      if (tUltraviolence !== undefined) { vTUltraviolence = tUltraviolence.dice[0]; }
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-          degats: tDegats,
-          violence: tViolence,
-          meurtrierValue: vTMeurtrier,
-          destructeurValue: vTDestructeur,
-          fureurValue: vTFureur,
-          ultraviolenceValue: vTUltraviolence,
-        },
-      );
+    if (sEnergie !== '0') {
+      setAttrs({
+        [nEnergie]: newEnergie,
+      });
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${i18n_exploit}}} {{jet=[[ {[[{${tJetDice}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
-
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
+      if (newEnergie === 0) {
+        const noEnergieRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${arme}}} {{text=${sEnergieText}}}`);
+        finishRoll(noEnergieRoll.rollId, {});
       }
-
-      if (sEnergie !== '0') {
-        setAttrs({
-          [nEnergie]: newEnergie,
-        });
-
-        if (newEnergie === 0) {
-          startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${arme}}} {{text=${sEnergieText}}}`, (exploit) => {
-            finishRoll(
-              exploit.rollId, {},
-            );
-          });
-        }
-      }
-    });
+    }
   } else {
-    startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${arme}}} {{text=${sEnergieText}}}`, (text) => {
-      finishRoll(
-        text.rollId, {},
-      );
-    });
+    finalRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${arme}}} {{text=${sEnergieText}}}`);
+    finishRoll(finalRoll.rollId, {});
   }
 });
 
@@ -1235,6 +1261,9 @@ on('clicked:MALDruidLionArmeBase', async (info) => {
     'MALCoupBVDiversTotal',
     'MALBVDiversD6',
     'MALBVDiversFixe',
+    'devasterAnatheme',
+    'bourreauTenebres',
+    'equilibreBalance',
   ];
 
   attributs = attributs.concat(arme, special);
@@ -1278,6 +1307,10 @@ on('clicked:MALDruidLionArmeBase', async (info) => {
   const bete = totalADruid(attrs, 'MALDruidLionBete');
   const AEBete = +attrs.MALDruidLionBeteAE;
 
+  const devaste = +attrs.devasterAnatheme;
+  const bourreau = +attrs.bourreauTenebres;
+  const equilibre = +attrs.equilibreBalance;
+
   const cRoll = [];
   const AE = [];
   let bonus = [];
@@ -1289,10 +1322,10 @@ on('clicked:MALDruidLionArmeBase', async (info) => {
   cRoll.push(aspectValue);
 
   diceDegats = Number(attrs.MALDruidLionBaseDegats);
-  bonusDegats.push(attrs.MALDruidLionBaseDegatsBonus);
+  bonusDegats.push(+attrs.MALDruidLionBaseDegatsBonus);
 
   diceViolence = Number(attrs.MALDruidLionBaseViolence);
-  bonusViolence.push(attrs.MALDruidLionBaseViolenceBonus);
+  bonusViolence.push(+attrs.MALDruidLionBaseViolenceBonus);
 
   // GESTION DES BONUS DIVERS
   const bChairD = Math.ceil(vChair / 2);
@@ -1303,9 +1336,9 @@ on('clicked:MALDruidLionArmeBase', async (info) => {
 
   // GESTION DES ASPECTS EXCEPTIONNELS
   if (AEBete > 0) {
-    let bonusBete = AEBete;
+    let bonusBete = +AEBete;
 
-    if (AEBete > 5) { bonusBete += bete; }
+    if (AEBete > 5) { bonusBete += +bete; }
 
     exec.push(`{{vBeteD=+${bonusBete}}}`);
     bonusDegats.push(bonusBete);
@@ -1315,11 +1348,11 @@ on('clicked:MALDruidLionArmeBase', async (info) => {
   // GESTION DES BONUS SPECIAUX
   const sBonusDegats = attrs.MALCoupBDDiversTotal;
   const sBonusDegatsD6 = attrs.MALBDDiversD6;
-  const sBonusDegatsFixe = attrs.MALBDDiversFixe;
+  const sBonusDegatsFixe = +attrs.MALBDDiversFixe;
 
   const sBonusViolence = attrs.MALCoupBVDiversTotal;
   const sBonusViolenceD6 = attrs.MALBVDiversD6;
-  const sBonusViolenceFixe = attrs.MALBVDiversFixe;
+  const sBonusViolenceFixe = +attrs.MALBVDiversFixe;
 
   if (sBonusDegats !== '0') {
     exec.push(`{{vMSpecialD=+${sBonusDegatsD6}D6+${sBonusDegatsFixe}}}`);
@@ -1359,42 +1392,61 @@ on('clicked:MALDruidLionArmeBase', async (info) => {
   exec.push(`{{degats=[[${degats.join('+')}]]}}`);
   exec.push(`{{violence=[[${violence.join('+')}]]}}`);
 
+  if (devaste || bourreau || equilibre) {
+    const herauts = [];
+
+    if (devaste) { herauts.push(i18n_devasterAnatheme); }
+    if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+    if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+    exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+  }
+
   if (isConditionnelA === true) { exec.push('{{succesConditionnel=true}}'); }
 
   if (isConditionnelD === true) { exec.push('{{degatsConditionnel=true}}'); }
 
   if (isConditionnelV === true) { exec.push('{{violenceConditionnel=true}}'); }
 
-  startRoll(exec.join(' '), (results) => {
-    const tJet = results.results.jet.result;
-    const tBonus = results.results.bonus.result;
-    const tExploit = results.results.Exploit.result;
+  const finalRoll = await startRoll(exec.join(' '));
 
-    const tDegats = results.results.degats.result;
-    const tViolence = results.results.violence.result;
+  const tJet = finalRoll.results.jet.result;
 
-    finishRoll(
-      results.rollId,
-      {
-        jet: tJet + tBonus,
-        degats: tDegats,
-        violence: tViolence,
-      },
-    );
+  const tBonus = finalRoll.results.bonus.result;
+  const tExploit = finalRoll.results.Exploit.result;
 
-    if (tJet !== 0 && tJet === tExploit) {
-      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
-        const tExploit2 = exploit.results.jet.result;
+  const tDegats = finalRoll.results.degats.result;
+  const tViolence = finalRoll.results.violence.result;
 
-        finishRoll(
-          exploit.rollId,
-          {
-            jet: tExploit2,
-          },
-        );
-      });
-    }
-  });
+  const rDegats = finalRoll.results.degats.dice;
+  const rViolence = finalRoll.results.violence.dice;
+
+  const conditions = {
+    bourreau,
+    devaste,
+    equilibre,
+  };
+
+  const computed = updateRoll(finalRoll, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
+
+  const finalComputed = {
+    jet: tJet + tBonus,
+  };
+
+  Object.assign(finalComputed, computed);
+
+  finishRoll(finalRoll.rollId, finalComputed);
+
+  if (tJet !== 0 && tJet === tExploit) {
+    const exploitRoll = await startRoll(`$${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+    const tRExploit = exploitRoll.results.jet.result;
+
+    const exploitComputed = {
+      jet: tRExploit,
+    };
+
+    finishRoll(exploitRoll.rollId, exploitComputed);
+  }
 });
 
 on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
@@ -1515,6 +1567,9 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     'repeating_armeMALDruidLion_bVDiversFixe',
     'repeating_armeMALDruidLion_energie',
     'repeating_armeMALDruidLion_energieValue',
+    'devasterAnatheme',
+    'bourreauTenebres',
+    'equilibreBalance',
   ];
 
   attributs = attributs.concat(wpn, effets, ameliorations, special);
@@ -1578,9 +1633,20 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
   const vMasque = totalADruid(attrs, 'MALDruidLionMasque');
   const vAEMasque = +attrs.MALDruidLionMasqueAE;
 
+  const devaste = +attrs.devasterAnatheme;
+  const bourreau = +attrs.bourreauTenebres;
+  const equilibre = +attrs.equilibreBalance;
+
   const cRoll = [];
   const AE = [];
   let bonus = [];
+
+  let isDestructeur = false;
+  let isFureur = false;
+  let isMeurtrier = false;
+  let isUltraviolence = false;
+  let isTenebricide = false;
+  let isSurprise = false;
 
   AE.push(AEValue);
 
@@ -1591,10 +1657,10 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
   cRoll.push(aspectValue);
 
   diceDegats = +attrs.repeating_armeMALDruidLion_degatDruidLion;
-  bonusDegats.push(attrs.repeating_armeMALDruidLion_degatBonusDruidLion);
+  bonusDegats.push(+attrs.repeating_armeMALDruidLion_degatBonusDruidLion);
 
   diceViolence = +attrs.repeating_armeMALDruidLion_violenceDruidLion;
-  bonusViolence.push(attrs.repeating_armeMALDruidLion_violenceBonusDruidLion);
+  bonusViolence.push(+attrs.repeating_armeMALDruidLion_violenceBonusDruidLion);
 
   // GESTION DES BONUS DIVERS
   let bChairD = Math.ceil(vChair / 2);
@@ -1607,9 +1673,9 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
 
   // GESTION DES ASPECTS EXCEPTIONNELS
   if (vAEBete > 0) {
-    let bonusBete = vAEBete;
+    let bonusBete = +vAEBete;
 
-    if (vAEBete > 5) { bonusBete += vBete; }
+    if (vAEBete > 5) { bonusBete += +vBete; }
 
     exec.push(`{{vBeteD=+${bonusBete}}}`);
     bonusDegats.push(bonusBete);
@@ -1723,6 +1789,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
 
   if (eDestructeur !== '0') {
     isConditionnelD = true;
+    isDestructeur = true;
     exec.push(`{{destructeur=${i18n_destructeur}}}`);
     exec.push(`{{destructeurValue=[[${eDestructeurV}D6]]}}`);
     exec.push(`{{destructeurCondition=${i18n_destructeurCondition}}}`);
@@ -1744,6 +1811,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
 
   if (eFureur !== '0') {
     isConditionnelV = true;
+    isFureur = true;
     exec.push(`{{fureur=${i18n_fureur}}}`);
     exec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
     exec.push(`{{fureurCondition=${i18n_fureurCondition}}}`);
@@ -1758,6 +1826,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
 
   if (eMeurtrier !== '0') {
     isConditionnelD = true;
+    isMeurtrier = true;
     exec.push(`{{meurtrier=${i18n_meurtrier}}}`);
     exec.push(`{{meurtrierValue=[[${eMeurtrierV}D6]]}}`);
     exec.push(`{{meurtrierCondition=${i18n_meurtrierCondition}}}`);
@@ -1809,17 +1878,26 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{tenebricide=${i18n_tenebricide}}}`);
     exec.push(`{{tenebricideConditionD=${i18n_tenebricideConditionD}}}`);
     exec.push(`{{tenebricideConditionV=${i18n_tenebricideConditionV}}}`);
+
+    isTenebricide = true;
+    isConditionnelD = true;
+    isConditionnelV = true;
   }
 
   if (eTirRafale !== '0') {
     exec.push(`{{tirRafale=${i18n_tirRafale}}}`);
     exec.push(`{{tirRafaleCondition=${i18n_tirRafaleCondition}}}`);
+
+    isConditionnelD = true;
   }
 
   if (eUltraviolence !== '0') {
     exec.push(`{{ultraviolence=${i18n_ultraviolence}}}`);
     exec.push(`{{ultraviolenceValue=[[${eUltraviolenceV}D6]]}}`);
     exec.push(`{{ultraviolenceCondition=${i18n_ultraviolenceCondition}}}`);
+
+    isConditionnelV = true;
+    isUltraviolence = true;
   }
 
   if (eAntiVehicule !== '0') { autresEffets.push(i18n_antiVehicule); }
@@ -1989,11 +2067,11 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
   // GESTION DES BONUS SPECIAUX
   const sBonusDegats = attrs.repeating_armeMALDruidLion_bDDiversTotal;
   const sBonusDegatsD6 = attrs.repeating_armeMALDruidLion_bDDiversD6;
-  const sBonusDegatsFixe = attrs.repeating_armeMALDruidLion_bDDiversFixe;
+  const sBonusDegatsFixe = +attrs.repeating_armeMALDruidLion_bDDiversFixe;
 
   const sBonusViolence = attrs.repeating_armeMALDruidLion_bVDiversTotal;
   const sBonusViolenceD6 = attrs.repeating_armeMALDruidLion_bVDiversD6;
-  const sBonusViolenceFixe = attrs.repeating_armeMALDruidLion_bVDiversFixe;
+  const sBonusViolenceFixe = +attrs.repeating_armeMALDruidLion_bVDiversFixe;
 
   const sEnergie = attrs.repeating_armeMALDruidLion_energie;
   const sEnergieValue = attrs.repeating_armeMALDruidLion_energieValue;
@@ -2062,47 +2140,6 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
   exec.push(`{{degats=[[${degats.join('+')}]]}}`);
   exec.push(`{{violence=[[${violence.join('+')}]]}}`);
 
-  if (eTenebricide !== '0') {
-    let degatsTenebricide = [];
-    let ASTenebricide = [];
-    let ASValueTenebricide = [];
-
-    let violenceTenebricide = [];
-
-    diceDegatsTenebricide = Math.floor(diceDegats / 2);
-    diceViolenceTenebricide = Math.floor(diceViolence / 2);
-
-    degatsTenebricide.push(`${diceDegatsTenebricide}D6`);
-    degatsTenebricide = degatsTenebricide.concat(bonusDegats);
-
-    violenceTenebricide.push(`${diceViolenceTenebricide}D6`);
-    violenceTenebricide = violenceTenebricide.concat(bonusViolence);
-
-    exec.push(`{{tenebricideValueD=[[${degatsTenebricide.join('+')}]]}}`);
-    exec.push(`{{tenebricideValueV=[[${violenceTenebricide.join('+')}]]}}`);
-
-    if (eASAssassinValue > 0) {
-      eAssassinTenebricideValue = Math.ceil(eASAssassinValue / 2);
-
-      ASTenebricide.unshift(eASAssassin);
-      ASValueTenebricide.unshift(`${eAssassinTenebricideValue}D6`);
-
-      if (attaquesSurprises.length > 0) {
-        ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-        ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-      }
-
-      exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-      exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
-    } else if (attaquesSurprises.length > 0) {
-      ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-      ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-
-      exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-      exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
-    }
-  }
-
   if (eObliteration !== '0') {
     let ASObliteration = [];
     let ASValueObliteration = [];
@@ -2157,6 +2194,19 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
     exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
     exec.push(attaquesSurprisesCondition);
+    isSurprise = true;
+    isConditionnelD = true;
+  }
+
+  if (eTenebricide !== '0') {
+    isTenebricide = true;
+    exec.push('{{tenebricideValueD=[[0]]}}');
+    exec.push('{{tenebricideValueV=[[0]]}}');
+
+    if (attaquesSurprises.length > 0) {
+      exec.push(`{{tenebricideAS=${attaquesSurprises.join('\n+')}}}`);
+      exec.push('{{tenebricideASValue=[[0]]}}');
+    }
   }
 
   if (autresEffets.length > 0) { exec.push(`{{effets=${autresEffets.join(' / ')}}}`); }
@@ -2172,83 +2222,65 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
   if (isConditionnelV === true) { exec.push('{{violenceConditionnel=true}}'); }
 
   if (pasDEnergie === false) {
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
-      const tJetDice = results.results.jet.dice.length;
+    const finalRoll = await startRoll(exec.join(' '));
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    const tJet = finalRoll.results.jet.result;
+    const tJetDice = finalRoll.results.jet.dice.length;
 
-      const tDegats = results.results.degats.result;
-      const tViolence = results.results.violence.result;
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
 
-      const tMeurtrier = results.results.meurtrierValue;
-      let vTMeurtrier = 0;
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
 
-      if (tMeurtrier !== undefined) { vTMeurtrier = tMeurtrier.dice[0]; }
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
 
-      const tDestructeur = results.results.destructeurValue;
-      let vTDestructeur = 0;
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+      isTenebricide,
+      isSurprise,
+      isDestructeur,
+      isFureur,
+      isMeurtrier,
+      isUltraviolence,
+    };
 
-      if (tDestructeur !== undefined) { vTDestructeur = tDestructeur.dice[0]; }
+    const computed = updateRoll(finalRoll, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
 
-      const tFureur = results.results.fureurValue;
-      let vTFureur = 0;
+    const finalComputed = {
+      jet: tJet + tBonus,
+    };
 
-      if (tFureur !== undefined) { vTFureur = tFureur.dice[0] + tFureur.dice[1]; }
+    Object.assign(finalComputed, computed);
 
-      const tUltraviolence = results.results.ultraviolenceValue;
+    finishRoll(finalRoll.rollId, finalComputed);
 
-      let vTUltraviolence = 0;
+    if (tJet !== 0 && tJet === tExploit) {
+      const exploitRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${i18n_exploit}}} {{jet=[[ {[[{${tJetDice}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+      const tRExploit = exploitRoll.results.jet.result;
+      const exploitComputed = {
+        jet: tRExploit,
+      };
 
-      if (tUltraviolence !== undefined) { vTUltraviolence = tUltraviolence.dice[0]; }
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-          degats: tDegats,
-          violence: tViolence,
-          meurtrierValue: vTMeurtrier,
-          destructeurValue: vTDestructeur,
-          fureurValue: vTFureur,
-          ultraviolenceValue: vTUltraviolence,
-        },
-      );
+    if (sEnergie !== '0') {
+      setAttrs({
+        [nEnergie]: newEnergie,
+      });
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${i18n_exploit}}} {{jet=[[ {[[{${tJetDice}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
-
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
+      if (newEnergie === 0) {
+        const noEnergieRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${arme}}} {{text=${sEnergieText}}}`);
+        finishRoll(noEnergieRoll.rollId, {});
       }
-
-      if (sEnergie !== '0') {
-        setAttrs({
-          [nEnergie]: newEnergie,
-        });
-
-        if (newEnergie === 0) {
-          startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${arme}}} {{text=${sEnergieText}}}`, (exploit) => {
-            finishRoll(
-              exploit.rollId, {},
-            );
-          });
-        }
-      }
-    });
+    }
   } else {
-    startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${arme}}} {{text=${sEnergieText}}}`, (text) => {
-      finishRoll(
-        text.rollId, {},
-      );
-    });
+    finalRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B=${arme}}} {{text=${sEnergieText}}}`);
+    finishRoll(finalRoll.rollId, {});
   }
 });
 
@@ -2315,7 +2347,11 @@ druidRollFighter.forEach((button) => {
   on(`clicked:${button}`, async (info) => {
     const roll = info.htmlAttributes.value;
 
-    const attributs = [];
+    const attributs = [
+      'devasterAnatheme',
+      'bourreauTenebres',
+      'equilibreBalance',
+    ];
     let nbreW = '';
 
     if (button === 'DWolfFighterRoll') { nbreW = 'druidNombreCompagnon'; } else if (button === 'MALDWolfFighterN1Roll') { nbreW = 'MALDruidNombreCompagnon'; }
@@ -2329,6 +2365,10 @@ druidRollFighter.forEach((button) => {
     const exec = [];
     exec.push(roll);
 
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
+
     const degats = [];
     const violence = [];
 
@@ -2338,18 +2378,35 @@ druidRollFighter.forEach((button) => {
     exec.push(`{{degats=[[${degats.join('+')}]]}}`);
     exec.push(`{{violence=[[${violence.join('+')}]]}}`);
 
-    startRoll(exec.join(' '), (results) => {
-      const tDegats = results.results.degats.result;
-      const tViolence = results.results.violence.result;
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
 
-      finishRoll(
-        results.rollId,
-        {
-          degats: tDegats,
-          violence: tViolence,
-        },
-      );
-    });
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
+
+    // ROLL
+
+    const finalRoll = await startRoll(exec.join(' '));
+
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
+
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
+
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+    };
+
+    const computed = updateRoll(finalRoll, tDegats, rDegats, [], tViolence, rViolence, [], conditions);
+
+    finishRoll(finalRoll.rollId, computed);
   });
 });
 

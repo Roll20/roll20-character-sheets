@@ -1,11 +1,25 @@
 ﻿each levelObject, level in data
     datalist(id=`${level}-spells`)
         each spell, spellName in levelObject
+            - let category = spell.category || ''
             if level.endsWith('monster')
+                if level === 'priq'
+                    continue
+                - let displayLevel
                 case spell.level
-                    when '1': option(value!=spellName)= `${spell.level}st level`
-                    when '2': option(value!=spellName)= `${spell.level}nd level`
-                    when '3': option(value!=spellName)= `${spell.level}rd level`
-                    default:  option(value!=spellName)= `${spell.level}th level`
+                    when '1': - displayLevel = `${spell.level}st level`
+                    when '2': - displayLevel = `${spell.level}nd level`
+                    when '3': - displayLevel = `${spell.level}rd level`
+                    default:  - displayLevel = `${spell.level}th level`
+
+                if (category)
+                    - displayLevel += `, ${category}`
+                if (spell.book !== 'PHB')
+                    - displayLevel += `, ${spell.book}`
+                option(value!=spellName)= displayLevel
             else
-                option(value!=spellName)
+                if (spell.book !== 'PHB')
+                    if (category)
+                        - category += ', '
+                    - category += `${spell.book}`
+                option(value!=spellName)= category

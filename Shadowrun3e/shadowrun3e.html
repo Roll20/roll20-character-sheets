@@ -1740,8 +1740,7 @@
                 <div><input type="number" name="attr_deck-masking-mods" value=0></div>
                 <div><span name="attr_deck-masking-final"></span></div>
                 <div data-i18n="sensors">Sensors</div>
-                <div><button type="action" name="act_matrixtest" class="d6-button" title="Sensors Test"
-                        id="deck-sensors-final">L</button></div>
+                <div><button type="action" name="act_matrixtest" class="d6-button" title="Sensors Test" id="deck-sensors-final">L</button></div>
                 <div> <span name="attr_deck-sensors-max"></span></div>
                 <div><input type="number" name="attr_deck-sensors-mods" value=0></div>
                 <div><span name="attr_deck-sensors-final"></span></div>
@@ -3500,7 +3499,6 @@
             <header class="table-top-mid" data-i18n="initiative">Initiative</header>
             <header class="table-top-mid" data-i18n="damage">Damage</header>
             <header class="table-top-mid" data-i18n="type">Type</header>
-            <header class="table-top-mid" data-i18n="icon-status">Icon Status</header>
             <header class="table-top-mid" data-i18n="test-target">Test Target</header>
             <header class="table-top-mid" data-i18n="sensor">Sensor</header>
             <header class="table-top-mid" data-i18n="evade">Evade</header>
@@ -3536,10 +3534,6 @@
                         <option data-i18n="cerebropathic" value="cerebropathic">Cerebropathic</option>
                         <option data-i18n="psychotropic" value="psychotropic">Psychotropic</option>
                     </select></div>
-                <div><select name="attr_matrix-iconstatus" class="mediumselect2">
-                        <option data-i18n="intruder" value="Intruder" SELECTED>Intruder</option>
-                        <option data-i18n="legitimate" value="Legitimate">Legitimate</option>
-                    </select></div>
                 <div><select name="attr_ictargettest" class="mediumselect2">
                         <option value="@{target|decker|deck-bod-final}" data-i18n="bod">Bod</option>
                         <option value="@{target|decker|deck-evasion-final}" data-i18n="evasion">Evasion</option>
@@ -3552,12 +3546,12 @@
                         </option>
                         <option value="@{target|decker|deck-mpcp-final}" data-i18n="mpcp">MPCP</option>
                     </select></div>
-                <div><button type="action" class="pictos-button" name="act_combat" title="Sensor Test" id="icsensortest">f</button></div>
-                <div><button type="action" class="d6-button" name="act_combat" title="Evade Detection" id="icevade">L</button></div>
-                <div><button type="action" class="d6-button" name="act_combat" title="Parry Attack" id="icparry">L</button></div>
-                <div><button type="action" class="d6-button" name="act_combat" title="Position Attack" id="icposition">L</button></div>
+                <div><button type="action" name="act_matrixtest" class="pictos-button" title="Sensors Test" id="deck-sensors-final">f</button></div>
+                <div><button type="action" class="d6-button" name="act_matrixmaneuvers" title="Evade Detection" id="icevade">L</button></div>
+                <div><button type="action" class="d6-button" name="act_matrixmaneuvers" title="Parry Attack" id="icparry">L</button></div>
+                <div><button type="action" class="d6-button" name="act_matrixmaneuvers" title="Position Attack" id="icposition">L</button></div>
                 <div><button type="action" class="pictos-custom-button" name="act_combat" title="IC Execute" id="icattack">[</button></div>
-                <div><button type="action" class="pictos3-button" name="act_combat" title="IC Resist" id="icresist">b</button></div>
+                <div><button type="action" class="pictos3-button" name="act_matrixresist" title="IC Resist" id="icresist">b</button></div>
                 <div><textarea name="attr_icnotes" style='width:275px;height:25px;'></textarea>
                 </div>
         </fieldset>
@@ -5356,7 +5350,13 @@ deckingtabs.forEach(tab => {
 		});
 	});
 	
-        on('clicked:matrixresist', (info) => {
+        on('clicked:matrixresist clicked:repeating_ic:matrixresist', (info) => {
+		if (info['sourceAttribute']) {
+			var source=info['sourceAttribute'].split('_');
+			var sourceattr=source.pop();
+			var myrepeat=source.join('_').concat('_') + "ic-penalty";
+			atts.push(myrepeat);
+		}
 		if (!("yes" in lang)) geti18n();
 		var payload, myid, attacktest, wdmg;
 	 	if ( info["htmlAttributes"]["id"] != undefined)  {
@@ -5393,15 +5393,16 @@ deckingtabs.forEach(tab => {
 			console.log('tst myattr: ' + myattr + ' lang: ' + lang[myattr]);
 			myroll+= (iclist["debuff"].includes(attacktype))? "{{debuff=" + lang[myattr] +"}}": "{{resist=yes}}";
 		} else {
+			console.log('no payload');
 			calcTN="?{" + lang["attack-power"] +"?|0} - @{deckarmor-rating-final}";
 			calcDice="@{deck-bod-final} + ?{" + lang["hacking-pool-dice"] + "|0}";
-			myroll+="{{target=?{" + lang["attack-power"] +"?}}}";
+			myroll+="{{target=?{" + lang["attack-power"] +"?|0}}}";
 		}
 		myroll+="{{action=" + lang["damage-resistance-test"] + "}}";
 		myroll+="{{rolldice=[[" + calcDice + "]]}}";
 		myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 		myroll+="{{utilitylevel=Armor Rating @{deckarmor-rating-final}}}"; 
-		myroll+="{{myname=@{character_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}";
+		myroll+="{{myname=@{selected|token_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}";
 		myroll+="{{roll= [[ [[ " + calcDice + "]]d6>[[ {2,( " + calcTN + ")}kh1 ]]!! ]] }}";
 		console.log(myroll);
                 startRoll(myroll, (results) => {
@@ -5455,12 +5456,14 @@ on('clicked:matrixattack', (info) => {
 			if  ( systemrating == "UNKNOWN" )  myroll+="{{systemrating=[[@{target|Host|matrixsecuritynumber}]]}}";
 			else  myroll+="{{systemrating=[[" + matrixtn[systemrating]["secrating"]  + "]]}}";
 			myroll+="{{iconstatus=[[@{target|" + lang["target"] +"|iconstatuscode}]]}}";
-			myroll+="{{myname=@{character_name}}} {{target=@{target|" + lang["target"] +"|token_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}";
+			myroll+="{{mytoken=[[0[@{selected|token_name}]]]}}{{target=@{target|" + lang["target"] +"|token_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}";
 			myroll+="{{utilitylevel=@{deckattack-rating-final}}}"; 
 			myroll+="{{utilitylevel=[[@{" + myid  + "-rating-final}]]}}" 
 			myroll+="{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "}]]}}" 
+			myroll+="{{myname=@{selected|token_name}}}";
 			console.log(myroll);
                 	startRoll(myroll, (results) => {
+				const mytoken=results.results.mytoken.expression.match(/\[(.*)\]/)[1];
 				if ( results.results.iconstatus.result == 0)  myicon="Legitimate";
 				else myicon="Intruder";
 				var finaltn=results.results.targetnumber.result
@@ -5476,7 +5479,7 @@ on('clicked:matrixattack', (info) => {
 				let payload= {
 					ammotype: myammo,
 					wdmg: mydamage,
-					attacker: myval["character_name"],
+					attacker: mytoken,
 					attacktest: finaldice,
 					power: results.results.utilitylevel.result,
 					attacktype: myammo,
@@ -5509,7 +5512,7 @@ on('clicked:matrixattack', (info) => {
 			myroll+="{{matrixdmg=[[" + dmg + "]]}}";
 			myroll+="{{rolldice=[[" + calcDice + "]]}}"
 			myroll+="{{targetnumber=[[" + calcTN + "]]}}";
-			myroll+="{{myname=@{character_name}}}{{target=" + pentn +"}}";
+			myroll+="{{myname=@{selected|token_name}}}{{target=" + pentn +"}}";
 			myroll+="{{utilitylevel=@{deckmedic-rating-final}}}" 
 			myroll+="{{roll= [[ [[ " + calcDice + "]]d6>[[ {2,( " + calcTN + ")}kh1 ]]!! ]] }}"
 			myroll+="{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "}]]}}" 
@@ -5569,31 +5572,44 @@ on('clicked:matrixattack', (info) => {
 		});
 	});
 
-    	on('clicked:matrixtest', (info) => {
-		if (!("yes" in lang)) geti18n();
-		var atts=[];
-		if ( info['sourceAttribute'] ) console.log(' got ' + info['sourceAttribute'] );
-		/* var source=info['sourceAttribute'].split('_');
-		var sourceattr=source.pop();
-		var myrepeat=source.join('_').concat('_'); */
+    	on('clicked:matrixtest clicked:repeating_ic:matrixtest', (info) => {
 		console.log(info);
+		if (!("yes" in lang)) geti18n();
 		const mytitle=info["htmlAttributes"]["title"]
 		const myid=info["htmlAttributes"]["id"]
-		var calcTN="?{" + lang["target-number"] +"?} + @{wp-matrix}"; 
-		var calcDice="@{" + myid + "} + ?{" + lang["hacking-pool-dice"] + "}"
-                var myroll="&{template:matrix}{{myname=@{character_name}}}{{target=?{" + lang["target-number"] +"?|4}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}"
-		myroll+= "{{action=" + mytitle + "}}{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
-		myroll+= "{{roll= [[ [[ " + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!!]] }}"
-                startRoll(myroll, (results) => {
-			updatepoolused("hackingpool", results.results.hackingpool.result);	
-			finishRoll( results.rollId);
+		var atts=["stun_pen", "wound_pen", "matrix-penalty"];
+		atts.push(myid);
+		if (info['sourceAttribute']) {
+			var source=info['sourceAttribute'].split('_');
+			var sourceattr=source.pop();
+			var myrepeat=source.join('_').concat('_') + "ic-penalty";
+			atts.push(myrepeat);
+		}
+		getAttrs(atts, function(myval) {
+			const wpmatrix=(info['sourceAttribute'])? parseInt(myval[myrepeat]) : parseInt(myval["matrix-penalty"]) + parseInt(myval["stun_pen"]) + parseInt(myval["wound_pen"]);
+			var calcTN="?{" + lang["target-number"] + "?} + " + wpmatrix; 
+			var calcDice= parseInt(myval[myid]) + " + ?{" + lang["hacking-pool-dice"] + "}";
+                	var myroll="&{template:matrix}{{target=?{" + lang["target-number"] +"?|4}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}"
+			myroll+="{{myname=@{selected|token_name}}}";
+			myroll+= "{{action=" + mytitle + "}}{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
+			myroll+= "{{roll= [[ [[ " + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!!]] }}"
+                	startRoll(myroll, (results) => {
+				updatepoolused("hackingpool", results.results.hackingpool.result);	
+				finishRoll( results.rollId);
+			});
 		});
 
 	});
 
-    	on('clicked:matrixmaneuvers', (info) => {
+    	on('clicked:matrixmaneuvers clicked:repeating_ic:matrixmaneuvers', (info) => {
+		atts=["character_name", "deck-evasion-final", "deck-sensors-final", "decklockon-rating-final", "deckcloak-rating-final", "stun_pen", "wound_pen", "matrix-penalty", "decking"];
+		if (info['sourceAttribute']) {
+			var source=info['sourceAttribute'].split('_');
+			var sourceattr=source.pop();
+			var myrepeat=source.join('_').concat('_') + "ic-penalty";
+			atts.push(myrepeat);
+		}
 		if (!("yes" in lang)) geti18n();
-		atts=["character_name", "deck-evasion-final", "deck-sensors-final", "decklockon-rating-final", "deckcloak-rating-final", "wp-matrix", "decking"];
 		getAttrs(atts, function(myval) {
 			const myid=info["htmlAttributes"]["id"]
 			var mytitle=info["htmlAttributes"]["title"]
@@ -5601,7 +5617,7 @@ on('clicked:matrixattack', (info) => {
 			const sensors=myval["deck-sensors-final"];
 			const cloak=myval["deckcloak-rating-final"];
 			const lockon=myval["decklockon-rating-final"];
-			const wpmatrix=myval["wp-matrix"];
+			const wpmatrix=(info['sourceAttribute'])? parseInt(myval[myrepeat]) : parseInt(myval["matrix-penalty"]) + parseInt(myval["stun_pen"]) + parseInt(myval["wound_pen"]);
 			const decking=myval["decking"];
 			if ( info["originalRollId"] != undefined ) var payload=rollEscape.unescape(info["originalRollId"]);
 			var calcDice=evasion + " + ?{" + lang["hacking-pool-dice"] + "}";
@@ -5680,7 +5696,8 @@ on('clicked:matrixattack', (info) => {
 			var calcDrainTN="ceil((@{" + myid + "} + @{adept" + myid + "boost} ) /2 )";
 			var calcDrainDice="@{willpower|max}";
 
-			var myroll="&{template:adept}{{myname=@{character_name}}}";
+			var myroll="&{template:adept}";
+			myroll+="{{myname=@{selected|token_name}}}";
 			myroll+="{{rolldice=[[" + calcDice + "]]}}";
 			myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 			myroll+="{{targetofspell=@{" + uppermyid + "}}}";
@@ -8203,6 +8220,7 @@ on("change:matrixsecurityrating", function() {
 		atlist.forEach(at=> {
 			sets[at]=sr;
 		});
+		sets["matrix-iconstatus"]=(sr > 0 )? "Legitimate" : "Intruder";
 		console.log(sets);
 		setAttrs(sets);
 	});
@@ -8316,15 +8334,16 @@ on("change:deck-systemrating change:matrix-iconstatus change:deck-activemem chan
 	});
 });
 
-on("sheet:opened change:deck-systemrating change:matrix-iconstatus", function() {
-	getAttrs(["deck-systemrating","matrix-iconstatus"], function(myval) {
+on("sheet:opened change:deck-systemrating change:matrix-iconstatus change:matrixsecurityrating", function() {
+	getAttrs(["deck-systemrating","matrix-iconstatus", "matrixsecurityrating"], function(myval) {
 		sets={};
 		var mytn=0;
 		const rating=myval["deck-systemrating"].toUpperCase();
 		const icon=myval["matrix-iconstatus"];
+		const secrat=myval["matrixsecurityrating"];
 		if ( rating != "UNKNOWN") sets["deck-tn"]=matrixtn[rating][icon];
-		if ( icon  == "Legitimate") sets["iconstatuscode"]=0;
-		else sets["iconstatuscode"]=1;
+		console.log('debug sec rat ' + secrat);
+		sets["iconstatuscode"]=(icon  == "Legitimate")? 0 : (secrat > 0)? 0 : 1 ;
 		console.log(sets)
 		setAttrs(sets);
 	});
@@ -8366,6 +8385,7 @@ on("change:deckattacklevel", function() {
 		gets.push(myrepeat.concat("ic-penalty"));
 		gets.push(myrepeat.concat("matrix-iconstatus"));
 		getAttrs(gets, function (myval) {
+			var myroll;
 			var myatt="@{target|" + lang["target"] +"|deck-evasion-final}";
 			const name=myval[myrepeat.concat("icname")];
 			const ictype=myval[myrepeat.concat("ictype")];
@@ -8380,15 +8400,16 @@ on("change:deckattacklevel", function() {
 			if ( (icmode=="proactive") && (ictest.includes("target")) ) targetatt=ictest.split("-")[1];
 			const attacktn =matrixtn[code][targeticon];
 			var senddata="{{senddata=[[0]]}}";
-                	var myroll="&{template:matrix}{{myname=" + name + "}}";
 			var action=lang["attack"];
 			if ( icmode=="proactive" ) {
-				ictest=attacktn;
-			} else if ( ictype == "Probe" ) {
-				ictest="@{target|" + lang["decker"] + "|deck-detection-final}";
-				senddata="";
-				action=lang["probe"];
+                		myroll="&{template:matrix}{{myname=" + name + "}}";
+				myroll+="{{iconstatus=[[@{target|" + lang["decker"] +"|iconstatuscode}]]}}";
+				myroll +="{{attack=yes}}";
+				ictest=0;
 			} else {
+                		myroll="/w gm &{template:matrix}{{myname=" + name + "}}";
+				myroll +="{{basic=yes}}";
+				myroll += "{{sensor=[[[[@{target|" + lang["decker"] + "|deck-sensors-final}]]d6>[[" + rating + " + @{target|" + lang["decker"] + "|matrix-penalty} ]]!!]]}}";
 				ictest="?{" + lang["utility-rating"] + "?|6}";
 			}
 			const payload = {
@@ -8410,14 +8431,23 @@ on("change:deckattacklevel", function() {
 			var calcDice="@{matrixsecurityrating}"
 			if (( ictype == "Probe") || (ictype == "Scramble"))  calcDice=rating;
 			myroll+=target;
-			myroll+=senddata;
 			myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
 			myroll+="{{basetn=[[" + myatt + "]]}}";
 			myroll+="{{action=" + action + "}}"
 			myroll+="{{roll= [[ [[" + calcDice + "]]d6>[[ {2,(" + calcTN + ")}kh1]]!! ]] }}"
-			if ( icmode=="proactive" ) myroll+="{{wdmg=[[" + matrixtn[code]["wdmg"] + "]]}}";
+			if ( icmode=="proactive" ) { 
+				myroll+="{{wdmg=[[" + matrixtn[code]["wdmg"] + "]]}}";
+				myroll+=senddata;
+			}
+			if ( ictype == "Probe") {
+				myroll += "{{target=@{target|" + lang["decker"] + "|token_name}}}";
+				myroll += "{{targetnumber=[[@{target|" + lang["decker"] + "|deck-detection-final}]]}}";
+				myroll += "{{action=" + lang["probe"] + "}}";
+				myroll += "{{basetn=[[0]]}}";
+				myroll += "{{rolldice=[[ " + rating + "]]}}";
+				myroll += "{{roll=[[[[" + rating +" ]]d6>[[ @{target|" + lang["decker"] + "|deck-detection-final} + " + penalty +"]]!!]]}}";
+			}
 			if (( ictype == "Tar Baby") || (ictype == "Tar pit")) {
-                		myroll="/w gm &{template:matrix}{{myname=" + name + "}}";
 				myroll += "{{target=@{target|" + lang["decker"] + "|token_name}}}";
 				myroll += "{{targetnumber=[[?{" + lang["utility-rating"] + "?|4}]]}}";
 				myroll += "{{action=" + name + " Test}}";
@@ -8425,19 +8455,37 @@ on("change:deckattacklevel", function() {
 				myroll += "{{rolldice=[[ " + rating + "]]}}";
 				myroll += "{{roll=[[[[" + rating +" ]]d6>[[?{" + lang["utility-rating"] + "?} + " + penalty +"]]!!]]}}";
 				myroll += "{{oppose=[[[[?{" + lang["utility-rating"] + "?}]]d6>[[" + rating + " @{target|" + lang["decker"] + "|matrix-penalty}]]!!]]}}";
-				myroll += "{{sensor=[[[[@{target|" + lang["decker"] + "|deck-sensors-final}]]d6>[[" + rating + " + @{target|" + lang["decker"] + "|matrix-penalty} ]]!!]]}}";
 			}
 			console.log(myroll);
 			const finalwdmg=(iclist["attack"].includes(ictype))? damagetable[matrixtn[code]["wdmg"]] : "";
 			console.log('finalwdmg: ' + finalwdmg);
                 	startRoll(myroll, (results) => {
-				payload["basetn"]=results.results.basetn.result;
-				payload["attacktest"]=results.results.roll.result;
-			   	finishRoll( results.rollId,
-                		{
-					wdmg: finalwdmg,
-					senddata: rollEscape.escape(payload),
-                		});
+				if ( icmode=="proactive" ) { 
+					let iconstat=results.results.iconstatus.result;
+					const iconstatus =( results.results.iconstatus.result == 0 )? "Legitimate" : "Intruder";
+					const finaltn = results.results.targetnumber.result + matrixtn[code][iconstatus];
+					const finaldice = (results.results.roll.dice.filter(mydice=> mydice >= finaltn )).length;
+					console.log('final tn ' + finaltn);
+					console.log('dice : ' + results.results.roll.dice);
+					console.log('finaldice : ' + finaldice);
+					payload["basetn"]=finaltn;
+					payload["attacktest"]=finaldice;
+			   		finishRoll( results.rollId,
+                			{
+						wdmg: finalwdmg,
+						targetnumber: finaltn,
+						roll: finaldice, 
+						senddata: rollEscape.escape(payload),
+                			});
+				} else {
+					payload["basetn"]=results.results.basetn.result;
+					payload["attacktest"]=results.results.roll.result;
+			   		finishRoll( results.rollId,
+                			{
+						wdmg: finalwdmg,
+						senddata: rollEscape.escape(payload),
+                			});
+				}
 			});
 		});
 
@@ -8769,6 +8817,7 @@ var setmatrixsystem = function (rating) {
 	atts["matrixcode"]=finalcode;
 	atts["matrixsecurityrating"]=system;
 	atts["matrixcontrolrating"]=control;
+	atts["matrixaccessrating"]=access;
 	atts["matrixindexrating"]=index;
 	atts["matrixfilesrating"]=files;
 	atts["matrixslaverating"]=slave;
@@ -9222,7 +9271,10 @@ on("change:sheettype", function(){
 			myatts["sheettab"]="character";
 		}
 		if ((mysheet == "Critter") || (mysheet == "Spirit")) myatts["gunneryswitch"]="hide";
-		if (mysheet == "Matrix") myatts["iconstatuscode"]=0;
+		if (mysheet == "Matrix") { 
+			myatts["iconstatuscode"]=0;
+			myatts["matrix-iconstatus"]="Legitimate";
+		}
 		
 		setAttrs(myatts);
 	});
