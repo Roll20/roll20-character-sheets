@@ -872,7 +872,7 @@ nonweaponProficiencies['Veterinary Healing'] = {
 nonweaponProficiencies['Weaponsmithing, Crude'] = {
     'slots': 1,
     'abilityScore': '@{Wisdom}',
-    'modifier': 0,
+    'modifier': -3,
     'classes': 'Warrior',
     'book': 'The Complete Ranger\'s Handbook'
 };
