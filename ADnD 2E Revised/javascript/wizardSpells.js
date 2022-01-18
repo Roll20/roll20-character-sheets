@@ -8124,6 +8124,27 @@ wiz5['Conduit'] = {
 };
 //#endregion
 
+//#region The Complete Books of Necromancers
+wiz1['Animate Dead Animals'] = {
+    'level': '1',
+    'school': 'Necromancy',
+    'range': '10 feet',
+    'duration': 'Permanent',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '2 rounds',
+    'saving-throw': 'None',
+    'materials': 'A blood drop and bone chip from the same species as the target remains (only animals belonging to the same species may be animated per spell).',
+    'reference': 'p. 96',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell creates undead skeletons and zombies from the bones and bodies of dead animals, specifically vertebrates (fish, amphibians, reptiles, birds, and mammals). The animated remains obey simple verbal commands given by the caster, regardless of the language employed. Only naturally occurring animals of no higher than semi-intelligence can be animated with this particular spell (lizards, cats, frogs, weasels, tigers, and so on), including minimals and non-magical, giant-sized animals. These undead remain animated until they are destroyed in combat or turned; the animating magic cannot be dispelled.\n&emsp;The number of undead that a wizard can animate depends on the animal’s original hit dice, the caster’s level, and the type of undead being created. The caster can create the following number of animal skeletons:\n&emsp;• ¼ HD animal or less: 4/caster level ([[4*[[@{level-wizard}]]]])\n&emsp;• ½ to 1 HD animal: 2/caster level ([[2*[[@{level-wizard}]]]])\n&emsp;• 1+ to 3 HD animal: 1/caster level ([[@{level-wizard}]])\n&emsp;• 3+ to 6 HD animal: 1/2 caster levels ([[floor([[@{level-wizard}]]/2)]])\n&emsp;• Animal of over 6 HD: 1/4 caster levels ([[floor([[@{level-wizard}]]/4)]])\n&emsp;The caster can create the following number of animal zombies:\n&emsp;• ¼ HD animal or less: 2/caster level ([[2*[[@{level-wizard}]]]])\n&emsp;• ½ to 1–1 HD animal: 1/caster level ([[@{level-wizard}]])\n&emsp;• 1 to 3 HD animal: 1/2 caster levels ([[floor([[@{level-wizard}]]/2)]])\n&emsp;• Animal of over 3 HD: 1/4 caster levels ([[floor([[@{level-wizard}]]/4)]])\n&emsp;Animated skeletons of animals that had ¼ to 1 HD conform to the statistics of animal skeletons (see “Skeleton” in the *MC*). Skeletons of animals that had less than ¼ HD when living conform to those same statistics, with the following changes: AC 9, HD 1-4; hp 1, #AT 1, Dmg 1. Skeletons of those animals of over 1 HD conform to the regular animal statistics in the *MM*, with the following changes: armor class is worsened by two (AC 10 maximum), damage per attack is reduced by two (1 hp minimum), and movement is reduced by half. Animal zombies conform to the statistics for the particular animal that has been animated, with the following changes: the animal’s number of hit dice is increased by one, AC is worsened by three (AC 8 maximum), and movement is reduced by half.\n&emsp;Skeletal and zombie animals gain the standard undead immunities (resistance to cold-based, *sleep*, *charm*, and *hold* spells), but lose any normal defenses that the living animal might have had. They also lose any special attacks (raking of rear claws, swallowing whole, and so on) and cannot inject poison or emit fluids, such as musk or saliva. Swallowing does no further damage to the creature swallowed, except to trap it within the swallower’s rib cage. Priests gain a +1 bonus when turning these undead.\n&emsp;This spell is often a necromancer’s first experience animating corpses. For this to work, the animal bodies or skeletons must be intact.'
+};
+
+//#endregion
+
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
 wizardSpells['wiz2'] = wiz2;
