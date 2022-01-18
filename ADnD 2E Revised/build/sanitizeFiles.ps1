@@ -8,6 +8,8 @@ Get-ChildItem $javascriptFolder | ForEach-Object {
 
     $replace = $content -replace [Regex]::Escape("\\"), "\"
     $replace = $replace -replace [Regex]::Escape(" \n"), "\n"
+    $replace = $replace -replace [Regex]::Escape("[[[["), "[[ [["
+    $replace = $replace -replace [Regex]::Escape("]]]]"), "]] ]]"
     if ($replace -cne $content) {
         $replace | Set-Content -NoNewline -Path $_.FullName
     }
