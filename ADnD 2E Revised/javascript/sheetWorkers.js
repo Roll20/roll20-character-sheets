@@ -7,9 +7,19 @@ const INFO = 'info';
 const WARNING = 'warning';
 const ERROR = 'error';
 
-const BOOK_FIELDS = ['book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb', 'book-tom'];
+const BOOK_FIELDS = [
+    'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
+    'book-tom', 'book-aaeg',
+    'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
+    'book-paladins', 'book-druids'
+];
 
 //#region Helper function
+const conditionalLog = function (bool, msg) {
+    if (b)
+        console.log(msg);
+}
+
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
     let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
     finishRoll(queryRoll.rollId);
@@ -76,7 +86,7 @@ const calculateFormula = async function(formulaField, calculatedField, silent = 
     });
 }
 
-const showToast = function(type, title, message) {
+const getToastObject = function (type, title, message) {
     let content
     switch (type) {
         case SUCCESS: content = 1; break;
@@ -84,12 +94,16 @@ const showToast = function(type, title, message) {
         case WARNING: content = 3; break;
         case ERROR:   content = 4; break;
     }
-    setAttrs({
+    return {
         ['toast']: 1,
         ['toast-content']: content,
         [`toast-title-${type}`]: title,
         [`toast-message-${type}`]: message
-    });
+    }
+}
+
+const showToast = function(type, title, message) {
+    setAttrs(getToastObject(type, title, message));
 }
 
 const isBookInactive = function (books, obj) {
@@ -133,6 +147,19 @@ const repeatingMultiplySum = function(section, valueField, multiplierField, dest
             }
         })
         .execute();
+};
+const repeatingCalculateRemaining = function(repeatingName, repeatingFieldsToSum, totalField, remainingField) {
+    TAS.repeating(repeatingName)
+        .attrs([totalField, remainingField])
+        .fields(repeatingFieldsToSum)
+        .reduce(function (memo, row) {
+            repeatingFieldsToSum.forEach(column => {
+                memo += row.I[column];
+            });
+            return memo;
+        }, 0, function (memo,_,attrSet) {
+            attrSet.I[remainingField] = attrSet.I[totalField] - memo;
+        }).execute();
 };
 //#endregion
 
@@ -672,15 +699,17 @@ function setupCalculateRemaining(totalField, sumField, remainingField) {
 //#endregion
 
 //#region Priest Spells based on Spheres
+const ELEMENTAL = 'Elemental';
 const PRIEST_SPHERES = [
     // Player's Handbook
-    'All','Animal','Astral','Charm','Combat','Creation','Divination','Elemental','Guardian','Healing',
+    'All','Animal','Astral','Charm','Combat','Creation','Divination',ELEMENTAL,'Guardian','Healing',
     'Necromantic','Plant','Protection','Summoning','Sun','Weather',
     // Tome of Magic Spheres
     'Chaos','Law','Numbers','Thought','Time','Travelers','War','Wards'
 ];
-const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi')
-const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== 'Elemental').join('|'), 'gi');
+
+const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
+const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
 const elementalRegex = /Earth|Air|Fire|Water/gi
 function capitalizeFirst(s) {
     if (typeof s !== 'string')
@@ -703,21 +732,18 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
     if (isBookInactive(activeBooks, spell))
         return false;
 
-    let primarySpellSpheres = spell['sphere'].match(noElementalRegex);
-    if (!primarySpellSpheres)
-        return false;
-    
+    let primarySpellSpheres = spell['sphere'].match(noElementalRegex) || [];
     let isAvailable = primarySpellSpheres.some((sphere) => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
 
-    if (!availableSpheres.has('Elemental'))
+    if (!availableSpheres.has(ELEMENTAL))
         return false;
 
-    if (!spell['sphere'].includes('Elemental'))
+    if (!spell['sphere'].includes(ELEMENTAL))
         return false;
 
-    if (spell['sphere'].includes('Elemental ('))
+    if (spell['sphere'].includes(`${ELEMENTAL} (`))
         return spell['sphere'].match(elementalRegex).some((element) => elementalSpheres.has(element))
 
     // The player and the spell has the elemental sphere (without any sub elements)
@@ -738,9 +764,9 @@ function setupAddPriestSpell(postfix) {
         TAS.repeating(section)
             .attrs([...sphereFields, ...BOOK_FIELDS])
             .fields(field)
-            .reduce(function(memo, row){
-                memo.add(row.S[field]);
-                return memo;
+            .reduce(function(knownSpells, row){
+                knownSpells.add(row.S[field]);
+                return knownSpells;
             }, new Set(), function (knownSpells,_,attrSet){
                 let primarySpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), primarySphereRegex);
                 let elementalSpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), elementalRegex);
@@ -750,13 +776,11 @@ function setupAddPriestSpell(postfix) {
                     return;
                 }
 
-                let booksReadFrom = new Set();
                 let spellsToAdd = [];
                 for (const [spellName, spell] of Object.entries(priestSpells[postfix])) {
                     let isAvailable = isSpellAvailable(spellName, spell, primarySpheres, elementalSpheres, attrSet);
                     if (isAvailable) {
-                        spellsToAdd.push(spellName);
-                        booksReadFrom.add(spell['book']);
+                        spellsToAdd.push({name: spellName, book: spell['book']});
                     }
                 }
 
@@ -766,20 +790,21 @@ function setupAddPriestSpell(postfix) {
                     return;
                 }
 
-                spellsToAdd = spellsToAdd.filter(spell => !knownSpells.has(spell));
+                spellsToAdd = spellsToAdd.filter(spell => !knownSpells.has(spell.name));
                 console.log(spellsToAdd);
                 if (spellsToAdd.length < 1) {
                     showToast(INFO, 'All spells added', `Found no more spells to add based on spheres`);
                     return;
                 }
 
-                let newValue = {};
+                let books = [...new Set(spellsToAdd.map(s => `\n • ${s.book}`))].join('');
+                let toastObject = getToastObject(SUCCESS, 'Added new spells!', `Spells was added from the following books:${books}`);
+
+                let newValue = {...toastObject};
                 spellsToAdd.forEach(spell => {
                     let newrowid = generateRowID();
-                    newValue[`repeating_${section}_${newrowid}_${field}`] = spell;
+                    newValue[`repeating_${section}_${newrowid}_${field}`] = spell.name;
                 });
-                let books = Array.from(booksReadFrom).map(s => `\n • ${s}`).join('');
-                showToast(SUCCESS, 'Added new spells!', `Spells was added from the following books:${books}`);
 
                 setAttrs(newValue);
 
@@ -1065,7 +1090,6 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
         .reduce(function(m,r){
             m.crl+=(r.I.crl);
             return m;
-
         },{crl:0},function(m,r,a){
             a.newskill=m.crl;
         })
@@ -1375,40 +1399,56 @@ on('clicked:grenade-miss', async function (eventInfo) {
 //#endregion
 
 //#region Proficiencies
+//Weapon proficiency slots
 //Used in version.js
 const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc');
 on('change:weapprof-slots-total', function (eventInfo) {
     updateWeaponProfsTotal();
 });
+const updateWeaponProfsRemaining = () => repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
+on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprof-slots-total-calc', function(eventInfo) {
+    if (doEarlyReturn(eventInfo, ['weapprofnum']))
+        return;
+    updateWeaponProfsRemaining();
+});
+//Weapon proficiency autofill
+on('change:repeating_weaponprofs:weapprofname', function(eventInfo) {
+    let weaponProficiency = weaponProficiencies[eventInfo.newValue];
+    if (!weaponProficiency)
+        return;
+
+    getAttrs(BOOK_FIELDS, function (books) {
+        if (bookInactiveShowToast(books, weaponProficiency))
+            return;
+
+        setAttrs({
+            'repeating_weaponprofs_weapprofnum'  : weaponProficiency['slots'],
+        });
+    });
+});
+
+//Nonweapon proficiency slots
 //Used in version.js
 const updateNonWeaponProfsTotal = () => calculateFormula('prof-slots-total', 'prof-slots-total-calc');
 on('change:prof-slots-total', function (eventInfo) {
     updateNonWeaponProfsTotal();
 });
-
-//Weapon proficiency slots
-on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(eventInfo) {
-    if (doEarlyReturn(eventInfo, ['weapprofnum']))
-        return;
-    TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
-});
-
-//Nonweapon proficiency slots
-on('change:repeating_profs:profslots remove:repeating_profs', function(eventInfo){
+const updateNonWeaponProfsRemaining = () => repeatingCalculateRemaining('profs', ['profslots'], 'prof-slots-total-calc', 'prof-slots-remain');
+on('change:repeating_profs:profslots remove:repeating_profs change:prof-slots-total-calc', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['profslots']))
         return;
-    TAS.repeatingSimpleSum('profs', 'profslots', 'profslotssum');
+    updateNonWeaponProfsRemaining();
 });
 //Nonweapon proficiency autofill
 on('change:repeating_profs:profname', function (eventInfo) {
     let nonweaponProficiency = nonweaponProficiencies[eventInfo.newValue];
-    if (nonweaponProficiency === undefined)
+    if (!nonweaponProficiency)
         return;
     
     getAttrs(BOOK_FIELDS, function (books) {
         if (bookInactiveShowToast(books, nonweaponProficiency))
             return;
-        
+
         setAttrs({
             'repeating_profs_profslots'  : nonweaponProficiency['slots'],
             'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
