@@ -8135,12 +8135,372 @@ wiz1['Animate Dead Animals'] = {
     'cast-time': '2 rounds',
     'saving-throw': 'None',
     'materials': 'A blood drop and bone chip from the same species as the target remains (only animals belonging to the same species may be animated per spell).',
-    'reference': 'p. 96',
+    'reference': 'p. 48',
     'book': 'The Complete Book of Necromancers',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates undead skeletons and zombies from the bones and bodies of dead animals, specifically vertebrates (fish, amphibians, reptiles, birds, and mammals). The animated remains obey simple verbal commands given by the caster, regardless of the language employed. Only naturally occurring animals of no higher than semi-intelligence can be animated with this particular spell (lizards, cats, frogs, weasels, tigers, and so on), including minimals and non-magical, giant-sized animals. These undead remain animated until they are destroyed in combat or turned; the animating magic cannot be dispelled.\n&emsp;The number of undead that a wizard can animate depends on the animal’s original hit dice, the caster’s level, and the type of undead being created. The caster can create the following number of animal skeletons:\n&emsp;• ¼ HD animal or less: 4/caster level ([[4*[[@{level-wizard}]] ]])\n&emsp;• ½ to 1 HD animal: 2/caster level ([[2*[[@{level-wizard}]] ]])\n&emsp;• 1+ to 3 HD animal: 1/caster level ([[@{level-wizard}]])\n&emsp;• 3+ to 6 HD animal: 1/2 caster levels ([[floor([[@{level-wizard}]]/2)]])\n&emsp;• Animal of over 6 HD: 1/4 caster levels ([[floor([[@{level-wizard}]]/4)]])\n&emsp;The caster can create the following number of animal zombies:\n&emsp;• ¼ HD animal or less: 2/caster level ([[2*[[@{level-wizard}]] ]])\n&emsp;• ½ to 1–1 HD animal: 1/caster level ([[@{level-wizard}]])\n&emsp;• 1 to 3 HD animal: 1/2 caster levels ([[floor([[@{level-wizard}]]/2)]])\n&emsp;• Animal of over 3 HD: 1/4 caster levels ([[floor([[@{level-wizard}]]/4)]])\n&emsp;Animated skeletons of animals that had ¼ to 1 HD conform to the statistics of animal skeletons (see “Skeleton” in the *MC*). Skeletons of animals that had less than ¼ HD when living conform to those same statistics, with the following changes: AC 9, HD 1-4; hp 1, #AT 1, Dmg 1. Skeletons of those animals of over 1 HD conform to the regular animal statistics in the *MM*, with the following changes: armor class is worsened by two (AC 10 maximum), damage per attack is reduced by two (1 hp minimum), and movement is reduced by half. Animal zombies conform to the statistics for the particular animal that has been animated, with the following changes: the animal’s number of hit dice is increased by one, AC is worsened by three (AC 8 maximum), and movement is reduced by half.\n&emsp;Skeletal and zombie animals gain the standard undead immunities (resistance to cold-based, *sleep*, *charm*, and *hold* spells), but lose any normal defenses that the living animal might have had. They also lose any special attacks (raking of rear claws, swallowing whole, and so on) and cannot inject poison or emit fluids, such as musk or saliva. Swallowing does no further damage to the creature swallowed, except to trap it within the swallower’s rib cage. Priests gain a +1 bonus when turning these undead.\n&emsp;This spell is often a necromancer’s first experience animating corpses. For this to work, the animal bodies or skeletons must be intact.'
+    'effect': 'This spell creates undead skeletons and zombies from the bones and bodies of dead animals, specifically vertebrates (fish, amphibians, reptiles, birds, and mammals). The animated remains obey simple verbal commands given by the caster, regardless of the language employed. Only naturally occurring animals of no higher than semi-intelligence can be animated with this particular spell (lizards, cats, frogs, weasels, tigers, and so on), including minimals and non-magical, giant-sized animals. These undead remain animated until they are destroyed in combat or turned; the animating magic cannot be dispelled.\n&emsp;The number of undead that a wizard can animate depends on the animal’s original hit dice, the caster’s level, and the type of undead being created. The caster can create the following number of animal skeletons:\n\n&emsp;• ¼ HD animal or less: 4/caster level ([[4*[[@{level-wizard}]] ]])\n&emsp;• ½ to 1 HD animal: 2/caster level ([[2*[[@{level-wizard}]] ]])\n&emsp;• 1+ to 3 HD animal: 1/caster level ([[@{level-wizard}]])\n&emsp;• 3+ to 6 HD animal: 1/2 caster levels ([[floor([[@{level-wizard}]]/2)]])\n&emsp;• Animal of over 6 HD: 1/4 caster levels ([[floor([[@{level-wizard}]]/4)]])\n\n&emsp;The caster can create the following number of animal zombies:\n\n&emsp;• ¼ HD animal or less: 2/caster level ([[2*[[@{level-wizard}]] ]])\n&emsp;• ½ to 1–1 HD animal: 1/caster level ([[@{level-wizard}]])\n&emsp;• 1 to 3 HD animal: 1/2 caster levels ([[floor([[@{level-wizard}]]/2)]])\n&emsp;• Animal of over 3 HD: 1/4 caster levels ([[floor([[@{level-wizard}]]/4)]])\n\n&emsp;Animated skeletons of animals that had ¼ to 1 HD conform to the statistics of animal skeletons (see “Skeleton” in the *MC*). Skeletons of animals that had less than ¼ HD when living conform to those same statistics, with the following changes: AC 9, HD 1-4; hp 1, #AT 1, Dmg 1. Skeletons of those animals of over 1 HD conform to the regular animal statistics in the *MM*, with the following changes: armor class is worsened by two (AC 10 maximum), damage per attack is reduced by two (1 hp minimum), and movement is reduced by half. Animal zombies conform to the statistics for the particular animal that has been animated, with the following changes: the animal’s number of hit dice is increased by one, AC is worsened by three (AC 8 maximum), and movement is reduced by half.\n&emsp;Skeletal and zombie animals gain the standard undead immunities (resistance to cold-based, *sleep*, *charm*, and *hold* spells), but lose any normal defenses that the living animal might have had. They also lose any special attacks (raking of rear claws, swallowing whole, and so on) and cannot inject poison or emit fluids, such as musk or saliva. Swallowing does no further damage to the creature swallowed, except to trap it within the swallower’s rib cage. Priests gain a +1 bonus when turning these undead.\n&emsp;This spell is often a necromancer’s first experience animating corpses. For this to work, the animal bodies or skeletons must be intact.'
+};
+
+wiz1['Corpse Link'] = {
+    'level': '1',
+    'school': 'Necromancy, Alteration',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': 'Caster',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'A fresh corpse or a newly-animated zombie. Unless some form of preservative magic has been employed to protect the corpse’s decaying sensory organs (such as *embalm* or *spirit bind*), this spell cannot be employed on the remains of one who has been dead for longer than 1 day per level of the caster. Currently [[@{level-wizard}]] days. This spell also requires the appropriate sensory organ of an animal or monster noted for its keen senses (such as the eyes of a hawk, ear of a rabbit, snout of a pig, and so on).',
+    'reference': 'p. 49',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this versatile spell, a wizard establishes a sensory link between him- or herself and a corpse or freshly animated zombie of a human, demihuman, or humanoid within the spell’s range. This link allows the caster to gather sensory information from the vicinity of the cadaver or undead being. For every three levels of experience past the 1st, the wizard gains the ability to collect information from an additional sense via the corpse link. Currently [[{1+floor(([[@{level-wizard}]]-1)/3),5}kl1]] senses. At 4th level, for instance, the wizard may choose up to two senses (up to three at 7th level, four at 10th level, and all five at 13th level).\n&emsp;*Sight:* The caster can see what the corpse or undead creature sees as if looking through one of the creature’s eyes.\n&emsp;*Sound:* The wizard can now hear through one ear, exactly as if standing at the corpse’s current location (if a wizard/thief, the caster can use his or her hear noise ability too).\n&emsp;*Smell:* With one nostril, the wizard can now smell things exactly as if standing at the corpse’s current location. The spell conveniently masks the putrefying stench of the cadaver (if any) so that subtle variations of aroma (like the scent of a rose) can easily be detected.\n&emsp;*Taste:* The caster can taste any substance which is introduced into the corpse’s mouth. The substance (which may be solid or liquid) tastes exactly as if the wizard had placed it on one side of his or her own tongue. This can be especially useful when checking for poison in food or *identifying* unknown potions. Thankfully, the taste of the corpse’s own rotting flesh can be masked out by the spell.\n&emsp;*Touch:* The caster gains the ability to sense the textural and environmental conditions, with a single hand, as if standing at the corpse’s location. The wizard can gauge the surface texture and temperature of any object or substance which is placed in contact with the corresponding hand of the corpse.\n&emsp;The type and number of sensory signals is chosen by the wizard at the time of casting, and cannot be changed for the duration of the spell. The caster collects all the sensory information through a single organ (eye, ear, nostril, half of the tongue, or hand) belonging to the corpse or undead recipient. *This organ need not be attached to the rest of the cadaver for the spell to function properly*.\n&emsp;While the spell is in effect, the wizard can still see/hear/smell/taste/touch normally through other (unlinked) organs. For example, a necromancer harvests the left eye from a fresh cadaver (with a successful Anatomy ability check) and places it on a high ledge, with a strategic view of a front door. If the spell is now cast, the wizard’s left eye would be able to see through the left eye of the corpse and spy on any visitors, while his or her right eye remains normal.\n&emsp;Furthermore, if the target of the spell is a zombie, the magic enables the caster to issue simple commands to the undead creature via this link. The commands can be no longer than four words and can deal only with the creature’s movement (turn left, walk forward two steps, and so on) If either the caster or the undead creature moves beyond the range of the spell, the effects are negated. *Corpse link* does not impart any animation to dead tissue; if cast on a regular cadaver, it remains stationary for the duration of the spell.'
+};
+
+wiz1['Exterminate'] = {
+    'level': '1',
+    'school': 'Necromancy',
+    'range': '10 feet',
+    'duration': 'Instantaneous',
+    'aoe': '[[{[[@{level-wizard}]],10}kl1]]small creature or cubic feet.',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'A pinch of lavender and dried garlic.',
+    'reference': 'p. 49',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'In the hands of a novice spell-caster, this spell instantaneously snuffs out the life forces of small rodents and vermin in the area of effect, including such normal pests as flies, mice, beetles, rats, spiders, and the like. Only creatures with 1–3 hp per level of the caster (9 hp maximum) (currently [[{3*[[@{level-wizard}]],9}kl1]] hp maximum) and animal intelligence can be *exterminated*. More powerful wizards can thus affect bigger pests, including large spiders, stirges, poisonous snakes, and giant or huge centipedes. If the targeted creatures are extremely small (1 hp or less), then an area up to 1 cubic foot per level (10 cubic feet maximum) can be cleansed of pests.\n&emsp;This spell is well-suited to indoor or outdoor applications and is a favorite among necromancers who live among pestilence. Occasionally, cruel mages have been known to *exterminate* benign animals (and sometimes even others’ pets) with the spell. The somatic gesture is a pointed finger, while the caster verbalizes a low *zzzt* sound.'
+};
+
+wiz1['Locate Remains'] = {
+    'level': '1',
+    'school': 'Necromancy, Divination',
+    'range': '0',
+    'duration': '1 turn + [[5*[[@{level-wizard}]] ]] rounds',
+    'aoe': '[[30+5*[[@{level-wizard}]] ]]’ long',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'Either a small piece of bone from a human cadaver (for the general version) or else an article of clothing, personal possession, or strand of hair (for the specific version).',
+    'reference': 'p. 50',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell attunes the caster to the physical remains of dead beings in the area of effect. *Locate remains* will thus easily detect the presence of unburied corpses or corporeal undead (such as skeletons, zombies, or ghasts), but has no effect on noncorporeal undead (such as ghosts or spectres). The area of effect extends in a 10’ wide path, facing the in the caster’s current direction. Scanning in a direction requires one round, during which time the caster remains motionless in concentration.\n&emsp;*Locate remains* is mostly unaffected by walls or obstacles, though the area of effect is decreased (to [[10+[[@{level-wizard}]] ]]’) by more than three feet of solid stone, ten feet of wood or packed earth, or one inch of metal.\n&emsp;In the most general application, the spell precisely locates any and all physical remains of individuals in the area of effect, regardless of sex, species, and undead status. This spell does not impart any knowledge regarding the identity (or undead nature) of the remains; only the current locations of corpses within the area of effect are learned. If a personal item or a small fragment of the deceased individual is available at the time of casting, the spell can be used to locate the remains of that specific individual. In that case, the spell does not register the presence of any remains except those of the desired individual.\n&emsp;Both the general and specific versions of the spell have no effect if cast on a living creature of any kind. This spell is popular in regions with strict burial customs.'
+};
+
+wiz1['Spectral Voice'] = {
+    'level': '1',
+    'school': 'Necromancy, Alteration',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': 'Caster',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'A preserved tongue.',
+    'reference': 'p. 50',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is similar to the 1st-level spell *ventriloquism* in that it allows the caster to throw his or her voice. However, the caster’s voice issues only from the mouth of a specified corpse, skeleton, or zombie. The voice coming from the cadaver or undead creature will not sound like the caster’s voice. In the case of a cadaver or zombie, it will sound similar to the hoarse, scratchy voice of the deceased individual. In the case of a skeleton, the voice will sound like a soft, raspy whisper. For the duration of the spell (which cannot be ended prematurely), the caster’s voice emanates from the corpse or undead creature. As a result, the wizard is unable to cast any additional spells requiring verbal components until after the *spectral voice* has expired.'
+};
+
+wiz2['Embalm'] = {
+    'level': '2',
+    'school': 'Necromancy, Alteration',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 corpse',
+    'components': 'V, S, M',
+    'cast-time': '2 rounds',
+    'saving-throw': 'None',
+    'materials': 'A drop of vinegar.',
+    'reference': 'p. 50',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'An *embalm* spell enables the caster to protect a corpse (or a harvested part thereof) against the natural forces of decay and dissolution, until some later time when it is needed for a spell. If the *embalm*ed cadaver is later animated as a zombie, golem, or other form of animated undead, the creature gains +2 hit points per hit die (8 hp/HD maximum) because of the greater strength and resiliency imparted by the spell to the dead tissue. It has no beneficial effect if cast on skeletal remains or on previously animated undead.\n&emsp;Thus preserved, a corpse permanently retains the same odor and appearance it had at the time of casting. *Embalm* does not reverse the effects of putrefaction, but it does prevent any further decay of an individual’s physical remains. Unlike more powerful spells (such as *Nulathoe’s ninemen (FOR)* or the clerical spell *spirit bind*), *embalm* does not facilitate subsequent resurrection of a corpse.'
+};
+
+wiz2['Living Link'] = {
+    'level': '2',
+    'school': 'Necromancy, Divination',
+    'range': '[[90+10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 51',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, a wizard establishes a sensory link between him- or herself and any living creature within range. If the wizard knows a specific creature or person within range, then the spell can take effect on that specific creature. Otherwise, the *living link* will be established with any sentient creature within range, determined randomly.\n&emsp;Similar to the 1st-level spell *corpse link* (which only works with fresh cadavers and zombies), *living link* allows the caster to gather sensory information from the vicinity of the targeted creature (sight, sound, smell, taste, or touch). For every four levels of experience past the 1st, the wizard can collect information from an additional sense (up to two senses at 5th level, three at 9th, four at 13th, and all five at the 17th level of experience). Currently [[1+floor(([[@{level-wizard}]]-1)/4)]] senses.\n&emsp;The target creature of this spell experiences nothing to indicate that its senses have been tapped, and it remains in control of its own actions, entirely unaware of the magical connection to the wizard. In other words, the wizard cannot force the subject to look at something (listen at a keyhole, taste a glass of wine, pick up an object, and so on). This spell merely enables the wizard to directly experience the world through another creature’s perceptions. For instance, looking through another creature’s eyes gives the wizard all of its visual capabilities, like infravision should the creature have that ability.\n&emsp;While the spell is in effect, the *living link* overrides the wizard’s own sensory perceptions. Thus, while a wizard is seeing through another creature’s eyes, he or she is unable to see through his or her own. The spell can be ended early with no risk to the caster.'
+};
+
+wiz2['Skeletal Hands'] = {
+    'level': '2',
+    'school': 'Necromancy, Evocation',
+    'range': '[[10+10*floor([[@{level-wizard}]]/3)]] feet',
+    'duration': '1 turn + [[5*[[@{level-wizard}]] ]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'The complete, *skeletal hands* of any human, demihuman, or humanoid. These hand bones may be reused in multiple castings of the spell, providing the hands have not been damaged or destroyed in combat.',
+    'reference': 'p. 51',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By casting this spell, a wizard animates a pair of *skeletal hands* that levitate in midair and move as directed by the caster, who uses verbal commands and somatic gestures to guide them. The hands can perform only simple grasping, lifting, and carrying activities. They cannot perform complex movements that require great dexterity, such as picking locks. They can, however, open unlocked doors and chests, or turn pages in a spell book. The hands can also make two clawing attacks per round, each attack directed against a different target. They attack using the wizard’s table at the same level as the spellcaster, and each inflicts 1–3 hp damage on a successful hit. The hands may be physically attacked in turn (each hand has AC 5, hp 4, and MV 6) and may move anywhere within their range.\n&emsp;The hands can carry up to 5 pounds each; together, they can carry an object of up to 20 pounds. The hands may wield weapons within these weight limits. When using weapons, the *skeletal hands* attack on the wizard’s combat table, with a level half that of the spellcaster and with applicable penalties for nonproficiency. Hand-held melee weapons do half their normal damage (round up fractions), because the hands cannot generate the proper forces that the weapons need in order to inflict normal damage. The hands may fire an already loaded crossbow and inflict normal damage, because the crossbow provides the necessary force to propel the bolt. All other missile weapons have their ranges reduced to one quarter and inflict their normal damage (round up fractions).'
+};
+
+wiz3['Bone Dance'] = {
+    'level': '3',
+    'school': 'Necromancy',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[3*[[@{level-wizard}]] ]] turns',
+    'aoe': 'Special',
+    'components': 'S, M',
+    'cast-time': '3 rounds',
+    'saving-throw': 'None',
+    'materials': 'An intact skeleton or corpse and a small, crude puppet which the caster must manipulate with both hands to choreograph the *bone dance*.',
+    'reference': 'p. 52',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell temporarily animates the physical remains of a human, demihuman, or humanoid. *Bone dance* forges a mystical link with the newly made undead creature, enabling the caster to mentally control its movements, just as a master puppeteer manipulates the actions of a wooden puppet.\n&emsp;The skeleton or zombie animated by this spell is incapable of carrying out any independent actions—the wizard must mentally command his or her undead puppet to walk forward, pick up a sword, strike an opponent with it, and so on. While the caster concentrates on maintaining the *bone dance*, he or she may not speak, cast other spells, or actively engage in melee. The spell occupies the greater part of the caster’s attention.\n&emsp;The skeleton or zombie created by this spell conforms to the normal variety described in the *MM*. It is compatible with (can be affected by) other necromantic spells that affect undead, and the creature may perform all of the simple actions outlined in the *skeletal hands* spell. If directed into combat, it fights as a regular skeleton (even if it still has some flesh on its bones).\n&emsp;When combined with *spectral voice*, *bone dance* can make for an effective decoy, a menacing bluff, or at least a ghastly form of entertainment. When augmented by *corpse link*, a *dancing* cadaver may serve as an effective (and ultimately expendable) scout that can work beyond the immediate visual range of the caster.\n&emsp;Normally, the *bone dance* progresses for the duration of the spell or until the caster loses concentration. The *dance* also ends prematurely if the caster causes the skeleton to move beyond spell range or out of direct sight (certain divinations, such as *corpse link* or *clairvoyance*, may lift this hindrance). The *bone dance* may be destroyed in combat, or broken by a successful *dispel magic*.'
+};
+
+wiz3['False Face'] = {
+    'level': '3',
+    'school': 'Necromancy, Alteration',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': 'Caster',
+    'components': 'V, S, M',
+    'cast-time': '3',
+    'saving-throw': 'None',
+    'materials': 'A small ball of natural rubber and a small mirror, both of which are consumed in the casting.',
+    'reference': 'p. 53',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables a necromancer to copy the face of another human, demihuman, or humanoid, either living or dead. It has no effect on undead. The wizard gains the facial features of the chosen individual of either sex, providing the subject lies within range and the caster can clearly see the face he or she is trying to emulate.\n&emsp;The caster does not gain any sensory abilities (or disabilities) associated with the new face. For example, if the caster copies a blind man’s face, the wizard still retains his or her normal sight. The caster retains his or her normal voice, too, as well as height, bodily appearance, spells, and spell-like abilities.\n&emsp;The *false face* serves as an effective disguise, though it radiates a magical aura of necromancy. Spells that detect or banish illusions have no effect on this disguise; the *false face* is not illusionary. It may be reversed with *dispel magic*.'
+};
+
+wiz3['Skulltrap'] = {
+    'level': '3',
+    'school': 'Necromancy, Evocation',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'One Skull',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': '½',
+    'materials': 'A pinch of dust from the physical remains of a corporeal undead being with strong ties to the Negative Material Plane, such as a wight or vampire.',
+    'reference': 'p. 53',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '2d4 + [[@{level-wizard}]]d4',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This ward may be placed on any non-living skull or the skull of an undead skeleton. The *skulltrap* remains dormant until the skull is touched by living matter or is struck and damaged by non-living matter (for instance, it’s struck by in combat or falls to the floor). Assume a normal skull is AC 8 and has 2 hp. This simple warding does not discriminate; it can just as easily be triggered by the wizard who cast the spell as by a curious rat brushing up against it.\n&emsp;When the *skulltrap* discharges, the skull flashes briefly with red or violet light and violently explodes, releasing a blast of energy drawn from the Negative Material plane. The burst of negative energy does 2d4 hp damage plus 1d4 hp damage for every level of the caster. All living creatures within 10’ of the skull must make a saving throw vs. breath weapon to suffer only half damage from the blast.\n&emsp;Because the trap is so easily triggered, the skull is often placed in its final resting place before casting the spell on it. The trapped skull may be moved without triggering the trap, but it must be moved very slowly and without contact with living matter. Gloves or any other thin materials used to cover the flesh of a living being are not enough to prevent the *skulltrap* from being discharged.'
+};
+
+wiz4['Brainkill'] = {
+    'level': '4',
+    'school': 'Necromancy',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 54',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '[[1d6]]',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A wizard using this spell, which operates much like a *forget* spell, can permanently burn from the memory of any one creature all knowledge of either a specific place or person or a time period of up to one year (the spellcaster may choose the desired result). The spell works on any intelligent creature by destroying a portion of its brain, but a victim is entitled to a saving throw vs. death magic to resist the effects of the spell. If successful, the creature suffers only a painful headache, which dissipates in 1–4 hours but is otherwise harmless. If failed, the victim suffers 1–6 points of damage from an excruciating headache, leaving him or her with selected gaps in his memory.\n&emsp;*Brainkill* can affect only the victim’s memory and ability to recall factual information. For example, a person thus affected might be completely unable to remember details of a place, the name, appearance, or any traits of a person, or might have a one-year blank in his or her memory. The spell has no effect on a person’s learned abilities or skills. For instance, suppose an individual gained a swimming proficiency six months before coming under the influence of this spell. While the victim will no longer recall the swimming lessons, he or she still retains the ability, though it might not become evident until the victim jumps into a large body of water. Aside from relearning it as best as one can, the lost knowledge and memories can never be regained except by a *wish*.'
+};
+
+wiz4['Empathic Wound Transfer'] = {
+    'level': '4',
+    'school': 'Necromancy',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': 'Creature touched',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'Hair and blood from both the recipient and the caster, two newt eyes, and two wolf teeth (each from a different animal). These components are consumed in the casting.',
+    'reference': 'p. 54',
+    'book': 'The Complete Book of Necromancers',
+    'damage': 'Up to [[{2*[[@{level-wizard}]],@{HP}}kl1]] to self / "Hoovering on death’ door" up to [[{2*[[@{level-wizard}]],@{HP}+9}kl1]] to self',
+    'damage-type': '',
+    'healing': 'Up to [[{2*[[@{level-wizard}]],@{HP}}kl1]] to other / "Hoovering on death’ door" up to [[{2*[[@{level-wizard}]],@{HP}+9}kl1]] to other',
+    'effect': 'By casting this spell, a wizard transfers some of the wounds of another creature to him- or herself, thereby partially curing the recipient. Up to 2 hp per level of the caster may be transferred, so a 10th level necromancer could cure an ally of a 20-hp wound (but the wizard will then take 20 hp in damage).\n&emsp;The hit point loss could have originally resulted from physical attacks, certain poisons, spell effects, diseases, or curses (except those that cannot be removed by the *remove curse* spell). This spell cannot restore amputated limbs, drained life levels, or lost life. It also cannot undo any continuously acting poison or disease. The spell only temporarily reverses such harm, which will then continue to affect the victim.\n&emsp;The caster cannot drain his or her own life. Normally, a wizard can only transfer up to his or her current number of hit points. However, if the DM makes use of the rules for “hovering on death’s door” (page 104 of the *DMG*), then a necromancer might be voluntarily drained to the brink of death (–9 hp). Of course, the mage immediately loses consciousness in such a case (as noted in the *DMG*), but his or her condition does not deteriorate unless further wounded by another agent. At the DM’s discretion, this spell also enables a necromancer to immediately restore an incapacitated and dying victim, as per the 3rd-level priest spell *death’s door*. Unlike the priest version, however, hit points cured by the *wound transfer* are inflicted on the caster. Hit points lost by the wizard may be regained by normal healing or magic.\n&emsp;Finally, after the *transfer* is complete, the wizard temporarily loses four points of Constitution due to extreme exhaustion; each point may be recovered by six turns of complete rest. If the caster’s Constitution drops below 3, unconsciousness results, and full Constitution is not regained for 24 hours.'
+};
+
+wiz4['Summon Spirit'] = {
+    'level': '4',
+    'school': 'Necromancy',
+    'range': '10 yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '1 dead human or demihuman',
+    'components': 'V, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'Special',
+    'materials': 'A shallow pit filled with the blood from a slaughtered ram.',
+    'reference': 'p. 54',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell allows the wizard to raise up the spirit of a dead human or demihuman, which may answer questions put to it by those present at the summoning. Of course, the questioners must speak the same language as the dead creature.\n&emsp;Summoning a dead spirit is far from a certain or trouble-free enterprise. The base chance that a spirit will answer the summons is 50% + 1% for each experience level of the wizard casting the spell. Currently [[50+[[@{level-wizard}]] ]]%. This chance of success also depends on the authority of the caster in the spirit world, the length of time the subject has been dead, and the specific time of day during the casting (see Table 11).\n&emsp;Regardless of actual penalties or bonuses, the chance of success never drops below 5% or rises above 95%. If the spell fails, there is always the chance that the summoning will attract the attention of some other (potentially hostile) spirit or undead creature, either from the netherworld or the general vicinity of the caster. The chances of summoning a malicious undead are 5%, cumulative with every failed attempt by the same caster. The DM may roll on the table for the clerical spell *summon undead*. Note that this spell in no way protects the wizard (or those present at the casting) from the attacks of inadvertently summoned undead.\n&emsp;If the summoning is successful, the desired spirit slowly rises from the ground before the caster. The spirit’s willingness to answer questions will first determine the effectiveness of the spell. If the spirit is of a different alignment than the caster or formerly had more hit dice than the caster’s current level of experience, the shade is entitled to a saving throw vs. spells to resist the interrogation.\n&emsp;Provided that the spirit is agreeable, it can answer no more than one question for every three levels of the caster. Currently [[floor([[@{level-wizard}]]/3)]] questions. Summoned spirits tend to be evasive and cryptic when questioned by the living. In general, their knowledge is limited to what they knew while alive. A spirit may also be called upon to answer specific questions about the near future, regarding actions undertaken before the next nightfall. Questions and predictions about future events are subject to the same conditions and limitations as the priest spell *augury*.}}{{c1-1=**Table 11:** Spirit Summoning Modifiers\n\n}}{{cs1-1=2}}{{c2-1=**Modifier**}}{{c3-1=+5%}}{{c4-1=+5%}}{{c5-1=+10%}}{{c6-1=None}}{{c7-1=–5%}}{{c8-1=–10%}}{{c9-1=–15%}}{{c10-1=–20%}}{{c11-1=–30%}}{{c12-1=–50%}}{{c13-1=–25%}}{{c14-1=None}}{{c15-1=+10%}}{{c16-1=+25%}}{{c17-1=+10%}}{{c18-1=–10%}}{{c2-2=**Condition**}}{{c3-2=Caster is a necromancer}}{{c4-2=Caster has spirit lore proficiency}}{{c5-2=Caster is a member of the Witch kit}}{{c6-2=Subject dead for up to 1 week}}{{c7-2=Subject dead for up to 1 month}}{{c8-2=Subject dead for up to 1 year}}{{c9-2=Subject dead for up to 10 years}}{{c10-2=Subject dead for up to 100 years}}{{c11-2=Subject dead for up to 1000 years}}{{c12-2=Subject dead 1000 years +}}{{c13-2=Spell cast by day}}{{c14-2=Spell cast at night}}{{c15-2=Spell cast at full moon}}{{c16-2=cast on a holy day associated with the dead}}{{c17-2=Ancestor present at summoning}}{{c18-2=Spirit previously summoned within the same month}}{{effects2=This spell requires a shallow pit filled with the blood from a slaughtered ram. The pit opens a symbolic link with the netherworld, while the blood serves to lure a spirit back into the world of the living. Note that the blood may also attract hostile undead (if the summoning fails). The DM may care to modify this spell so that it always summons a host of spirits (numbering 1–20) who must be individually questioned and placated before the desired shade arrives. The DM may also care to increase the chances of summoning a hostile undead (even if the spell succeeds) to reflect the caster’s location and the tone of the campaign. Obviously, calling a beneficial spirit near the burial mound of a wraith may bring both creatures to investigate the unusual summons.'
+};
+
+wiz5['Bind Undead'] = {
+    'level': '5',
+    'school': 'Necromancy',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[2*[[@{level-wizard}]] ]] rounds',
+    'aoe': '[[@{level-wizard}]] undeads',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'Special',
+    'materials': 'The bone of any creature, held in the wizard’s left hand at the time of casting.',
+    'reference': 'p. 55',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Bind undead* is highly effective against certain kinds of undead (it has no effect on living creatures). This spell automatically affects all chosen corporeal undead of 6+ or less HD (including coffer corpses, crypt things, ghouls, ghasts, great ghuls, huecuva, mummies, all types of skeletons, sons of Kyuss, wights, and all manner of zombies), with no saving throw. Such creatures curl into a ball (if more than one undead is affected, they are all gathered into one tightly-packed sphere). Affected undead are held helpless and immobile, their special abilities in stasis, until the spell expires or the caster frees them. The diameter of this ball of undead is typically 2–3 feet per affected creature. Typically, this “boneball” is rolled off a cliff or into an obstacle or fire, or conveyed into the midst of foes, whereupon the caster ends the magic, freeing the undead to fight.\n&emsp;Against noncorporeal undead (such as ghosts and spectres) and all undead of 7 or more HD who don’t turn as “Special” (including vampires and liches), *bind undead* acts only as a *slow* spell. These undead are entitled to a saving throw vs. spells to resist the effect. *Bind undead* does not effect “Special” undead.'
+};
+
+wiz5['Bone Blight'] = {
+    'level': '5',
+    'school': 'Necromancy/Alteration (Reversible)',
+    'range': '30 yards',
+    'duration': 'Permanent',
+    'aoe': 'One creature',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'Negate',
+    'materials': 'A drop of aqua regia for *bone blight* and a drop of milk for *bone growth*.',
+    'reference': 'p. 56',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This nasty curse slowly erodes the healthy bone of any chosen creature within range, who is entitled to a saving throw vs. spells. If failed, all bone in the creature slowly begins to dissolve, eventually reducing it to a quivering mound of formless flesh.\n&emsp;Except for experiencing a strange “tingling sensation” at the time of casting, the victim is not immediately aware of the spell’s effect (making it even more insidious). In the short term (starting at the moment of casting up to the first full day), the bones of the victim become embrittled, greatly increasing his or her susceptibility to crushing attacks or falling damage. At the onset, the subject of this spell sustains double normal damage from such attacks; by the end of the first day, the victim’s current hit points are reduced by 20%.\n&emsp;In the medium term (lasting [[1d6+1]] days from the time of the casting), a victim is subject to frequent, painful fractures. All attacks by piercing and slashing weapons inflict double normal damage, while crushing attacks inflict quadruple damage. By the end of this period, the creature’s hit points are reduced by 60%. In the terminal stage of this spell, a victim’s bones finally dissolve, collapsing the subject’s spine and skull, bringing a slow and painful death.\n&emsp;While under the effects of this spell, the victim’s body is unable to undergo normal healing processes. Magical healing (spells or potions) slows the onset of the terminal stage, but it cannot halt the bone loss process completely. Every 10 hp of magical healing effectively prolongs the victim’s life in the intermediate stage of the affliction for one full day. The slow dissolution of bone can only be halted by a successful *dispel magic* or by *remove curse*, *cure disease*, *limited wish*, *wish*, *heal*, or *restoration* spells. Once the spell has been broken, lost hit points can be healed by normal or magical means.\n&emsp;The reverse of the spell, *bone growth*, immediately halts the *bone blight* and slowly (over a period of 1–6 days) restores all damage caused by that spell. *Bone growth* can also be used to fuse normal fractures by accelerating the recipient’s normal healing processes. Mild compression fractures heal in a day, while more serious ruptures (such as a broken leg or back) might take 1–4 days to fuse (assuming complete bed rest for the patient; otherwise healing time is doubled). This spell does not affect wounds or soft tissue damage, including cuts and sprains, nor does it correct for improper alignment of the bones while healing.\n&emsp;Both versions of this spell only work on living creatures and have no effect if cast on undead.'
+};
+
+wiz5['Graft Flesh'] = {
+    'level': '5',
+    'school': 'Necromancy/Alteration',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'One individual',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'The host’s own severed limb or else a suitable replacement from a fresh corpse (dead for no longer than 1 day per level of the caster. Currently [[@{level-wizard}]] days). Grafted tissue must be harvested from the same species as the host.',
+    'reference': 'p. 56',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, a wizard can graft any freshly harvested flesh to the body of the recipient, either replacing a lost limb or serving as a disguise. The duration is limited only by the compatibility of the grafted flesh to the host’s own body. Flesh harvested from the recipient him- or herself (such as a severed limb) can be permanently reattached with this spell. If the grafted limb were taken from a fresh corpse, however, the maximum duration of the spell would be 1 day/level of the caster. Currently [[@{level-wizard}]] days. Only musculo-skeletal tissues are affected by this spell; it cannot be used to graft organs or attach additional appendages (such as an extra arm) to the recipient.\n&emsp;*Graft flesh* can also disguise the subject (who may be the caster) with the flesh from a cadaver. While the subject gains the facial and bodily appearance of the deceased individual, the transformation is only “skin deep.” The recipient retains his normal voice, knowledge, spells, and other abilities. Furthermore, the subject does not gain any physical or sensory abilities associated with his new appearance (the spell cannot, for instance, increase the host’s physical strength or replace lost eyesight). This application lasts 1 day/level of the caster. Currently [[@{level-wizard}]] days.\n&emsp;For the duration of the spell, grafted flesh literally becomes an extension of the host’s own body (affected tissue radiates a faint aura of necromancy, however). The recipient has complete control over the flesh as if it were his or her own. At the conclusion of the spell, the grafted flesh slowly deadens and ultimately drops away. A successful *dispel magic* ends the spell prematurely.\n&emsp;*Graft flesh* only functions on living human, demihuman, or humanoid subjects. *Graft flesh* cannot be combined with other enchantments (such as *embalm* or *spirit bind*) which are used to preserve a corpse. By the conclusion of the spell, all grafted flesh has decayed past all utility and cannot be used in a subsequent casting.'
+};
+
+wiz6['Corpse Host'] = {
+    'level': '6',
+    'school': 'Necromancy',
+    'range': 'Touch',
+    'duration': '[[@{level-wizard}]] days',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'Include a fresh corpse (of an individual who has been dead for no longer than 1 day per level of the caster. Currently [[@{level-wizard}]] days) and a freshly-excised patch of the recipient’s skin.',
+    'reference': 'p. 58',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '[[1d3]] to the recipient',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables an individual touched by the caster to transfer his or her life force to temporarily animate the fresh corpse of a human, demihuman, or humanoid. This spell will fail if cast on undead. The recipient wills the cadaver to move and act and can even cast spells through it—all while his or her own body is safely up to 5 miles away per level of the caster. Currently [[5*[[@{level-wizard}]] ]]. While animated by the host’s life force, the corpse ceases to decay; however, unless illusionary magic is cast upon it, the cadaver will appear to be a form of undead (such a ju-ju zombie).\n&emsp;The recipient (who may be the caster) can see, hear, and sense through the *corpse host*. The host can fight, talk hoarsely (with the voice of the corpse), and carry things—in fact, it can perform all tasks less exacting than lock-picking, sewing, and similar handicrafts. It can even go adventuring and earn experience points for its “master.”\n&emsp;The recipient’s mind functions in two places simultaneously—within the *corpse host* and within his or her real body. The real body can still sense (see, hear, and so on) exactly as before, even benefiting from enhancements such as a magical ring. The tradeoff is paralysis. Aside from breathing, blinking, and moving his or her eyes, the recipient cannot move his or her real body while the host is animated. (Friendly guards are a wise precaution. So is a pleasant or strategic view). The real body does not need to eat, drink, or sleep.\n&emsp;The recipient is vulnerable when his or her *corpse host* is the target of magical and psionic powers that affect the mind. The host can be fooled by illusion spells to the same degree as the recipient. It works this way because both recipient and host are actually sharing the same mind.\n&emsp;Physical attacks against the corpse host don’t damage the real body, though they do harm the host. The latter has a number of “hit points” equal to the recipient’s normal maximum (even if the recipient is currently crippled). The host has the recipient’s natural armor class (10), though it may wear armor and employ weaponry with the same restrictions that apply to the recipient. The host does not benefit from anything worn or carried by the recipient’s real body, however.\n&emsp;The corpse host can withstand attacks as well as (or as poorly as) the recipient can normally. Note that since the host is not undead, it may not be turned or affected with spells or magical items that influence such creatures.\n&emsp;If the host drops to 0 or fewer hit points, the owner must make a system shock roll. Failure indicates that the real body also dies along with the host. The spiritual link between the recipient and host can also be abruptly severed by (successfully) casting the wizard spells *dispel magic*, *limited wish* or *wish* or by employing the clerical spells *spirit release* or *dispel evil*. Severance of the spiritual link also requires the recipient to make a system shock roll in order to survive the ordeal.\n&emsp;The recipient of this spell can abandon the link with the *corpse host* at any time, with no harm to him- or herself. The host immediately collapses (resuming its usual decay), and the recipient immediately regains control of his or her real body. The same thing occurs when the spell ends or the *corpse host* somehow moves beyond the spell’s range or to another plane.\n&emsp;Harvesting the piece of flesh from the recipient’s at the time of casting also inflicts 1–3 hit points of damage. At the conclusion of the spell, the recipient is entitled to a saving throw vs. death magic. If failed, the hit point loss is permanent (consumed by the spell) and cannot be reversed or magically healed except with a *wish* or *restoration* spell. If successful, the loss in hit points, while temporary, can only be regained by normal rest.'
+};
+
+wiz6['Ghoul Gauntlet'] = {
+    'level': '6',
+    'school': 'Alteration, Necromancy',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '6',
+    'saving-throw': 'Negate',
+    'materials': 'Include the freshly harvested fingernail of a corpse and a pinch of mandrake root. Both of these are consumed by the casting of the spell.',
+    'reference': 'p. 59',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '[[1d2]] per round',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This rare and horrible spell causes the victim to be slowly transformed into a ravening, flesh-eating ghoul (see the description in the *MONSTROUS MANUAL* for all about the lives of ghouls). The transformation process usually begins at the limb or extremity (usually the hand or arm) closest to the location touched by the caster at the onset of the spell. The victim suffers 1–2 hit points of damage each round while the body slowly dies and transforms into a ghoul’s cold, undying flesh.\n&emsp;The victim is entitled to an initial saving throw to resist this deadly transformation. If failed, only a *limited wish*, *wish*, or *restoration* will end the condition. A *dispel magic* or *remove curse* may be effective, but only if cast within three rounds of the touch that confers the *ghoul gauntlet*. During the early stages of the spell, the original afflicted extremity may be severed and burned to terminate the spell.\n&emsp;If the extremity affected by the *ghoul gauntlet* is amputated while the victim has lost less than 20% of his or her total hit points, then only a hand or a foot may need to be severed (inflicting 1d4+1 hp of damage, requiring a system shock roll to remain conscious, and resulting in the loss of the limb’s mobility and functions). After the victim has lost 20%–50% of his or her hit points, however, an entire limb will have to be cut off, with the loss of 1d12+4 hp and a system shock roll. Initially, the transformed flesh of the victim has no paralytic powers or any of the special abilities associated with ghouls. As the spell unfolds, the advancing front of dying flesh inexorably traverses the entire body, and the victim immediately dies once the *ghoul gauntlet* reaches the heart or brain (upon reaching 0 hp due to the spell). Healing spells, potions, or magical items have no power to cure or reverse this affliction while the *ghoul gauntlet* runs its course.\n&emsp;One full day after the victim has died (unless the remains are burned), the subject awakens as a full-fledged ghoul as outlined in the *MONSTROUS MANUAL*. The undead is now a fawning slave, utterly under the control of the necromancer who cast the nefarious spell.'
+};
+
+wiz6['Transmute Bone to Steel'] = {
+    'level': '6',
+    'school': 'Alteration, Necromancy (Reversible)',
+    'range': '30 yards',
+    'duration': 'Permanent',
+    'aoe': '1 creature or object',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': 'Steel filings and powdered bone for both versions of the spell.',
+    'reference': 'p. 59',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A wizard casting this spell makes any object made of bone, including a skeleton, as strong as steel. The spell may be cast only upon dead, inanimate bones; after they have been transmuted, the bones may now be animated by the usual means. Despite their increased strength, the bones do not change in appearance, and they retain their original weight. Bone objects make all future saving throws as if they were hard metal (*DMG*, page 39). Transmuted skeletons now have AC 3 and take half the usual damage from physical attacks. However, these skeletons still take normal damage from holy water and magical attacks and are also subject to spells affecting metal (*transmute metal to wood* or *heat metal*) and the attacks of creatures that especially affect metal, such as rust monsters.\n&emsp;The reverse of this spell, *transmute steel to bone*, weakens any metal by making it as brittle as dry bone (altering all saving throws appropriately). Each non-living recipient of this spell must make an item saving throw vs. disintegration. If failed, the former metal item makes all future saves as if it were fashioned from bone. Metal armor loses its effectiveness,\n&emsp;becoming AC 7. Whenever a successful hit is made by or upon the item, the transmuted object must make a save vs. crushing blow to remain intact and functional. Magic items weakened by this spell remain magical, with any bonuses applied to their saving throws. Weapons affected by this spell inflict –2 hp per die of damage (and must save to avoid breakage whenever they hit a target). Physical attacks versus transmuted metal creatures inflict +2 hp per die of damage.'
+};
+
+wiz7['Wound Conferral'] = {
+    'level': '7',
+    'school': 'Necromancy',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': 'Two creatures',
+    'components': 'V, S, M',
+    'cast-time': '2 rounds',
+    'saving-throw': 'Negate',
+    'materials': 'The same as for as the *empathic wound transfer* spell, except for a specially fashioned ruby brooch or pendant (worth at least 5,000 gp) which must be worn by the wizard at the time of casting. The ruby, which serves as a temporary receptacle or buffer for the exchanged life force, shatters upon the completion of the spell.',
+    'reference': 'p. 60',
+    'book': 'The Complete Book of Necromancers',
+    'damage': 'Up to [[{3*[[@{level-wizard}]],@{HP}}kl1]]',
+    'damage-type': '',
+    'healing': 'Up to [[{3*[[@{level-wizard}]],@{HP}}kl1]]',
+    'effect': 'This spell is similar to the 4th-level wizard spell *empathic wound transfer*, except that it enables the caster to transfer the wounds (up to 3 hp per level of the caster) between any two creatures, excluding the caster. The wizard must be able to grasp both the creature with the disability and the creature about to receive the disability without having to make attack rolls. Thus, the two beings must either be willing to undergo the spell, or else be sleeping, unconscious, or otherwise bound and secured from escaping the caster’s grasp.\n&emsp;The recipient of the disability is entitled to a saving throw vs. spells if unwilling. If the recipient’s saving throw succeeds, the transfer is incomplete and nothing further happens. If failed, the recipient gains the wounds of the disabled creature, subject to a few limitations.\n&emsp;The total amount of transferred hit points is limited to the caster’s current hit points (or 3 hp per level, whichever is *smaller*). Normally, the spell functions by conveying the wounds from the disabled creature to the caster (during the first round of casting) and then from the caster to the final recipient (during the second round of the spell). Should an conferred disability drain the wizard below zero hit points (if the wizard unwittingly attempts to channel more hit points than he or she currently possesses), the exchange effectively backfires and now operates on the wizard himself as an *empathic wound transfer*. The spell also backfires if it is interrupted during the second round of casting, before the final conferral of life force to the recipient.\n&emsp;At the DM’s discretion, this spell will never backfire when employed by a necromancer, who is presumably an expert in these rites. If interrupted during casting, the spell merely fails without any transfer of wounds from the disabled creature. When cast by a necromancer, this spell can also immediately restore an incapacitated and unconscious creature, as per the 3rd-level priest spell *death’s door*.\n&emsp;This spell is terribly exhausting for the caster. After the exchange is complete, the wizard temporarily loses seven points of Constitution; each point may be recovered by two hours of complete rest. If the caster’s Constitution drops below 3, unconsciousness results, and the full Constitution is not regained for 24 hours.'
 };
 
 //#endregion
