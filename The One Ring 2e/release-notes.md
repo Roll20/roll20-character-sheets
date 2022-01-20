@@ -3,6 +3,16 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.00.01 (Build 4)
+- rename Advancement Points -> Adventure Points
+
+## 02.00.00 (Build 3)
+- integrate roll parsing to get rid of custom roll tables.
+- integration of armour qualities in the layout (cunning make and close fitting)
+- favoured/ill-favoured rolls for adversaries
+- integrate roll-templates 
+- numerous layout optimizations and UI improvments
+
 ## 01.01.00 (Build 2)
 - added sheet worker to set the skill rolls on every update of the favoured skill state or global favoured state. This replaces the static switches in the rolls that were hard to read for players. 
 
