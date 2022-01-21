@@ -7184,6 +7184,124 @@ pri7['Unwilling Wood'] = {
 };
 //#endregion
 
+//#region The Complete Book of Necromancers
+
+pri1['Ebony Hand'] = {
+    'level': '1',
+    'school': 'Evocation, Necromancy',
+    'sphere': 'Necromantic',
+    'range': '0',
+    'duration': '[[3+[[@{level-priest}]] ]] rounds',
+    'aoe': 'Personal',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'Varies from religion to religion, but it is usually a piece of apparel or jewelry which is worn on the caster’s hand to help focus the meditation (often a black glove or a simple silver or onyx ring). Regardless of the actual focus employed, the material component is not consumed by the spell and may be employed in multiple castings.',
+    'reference': 'p. 77',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This minor meditation focuses a baneful, necromantic aura in the caster’s chosen hand, enveloping the fingers in a dark, flickering radiance. The aura of the *ebony hand* enhances the delivery of harmful, touch-related spells (such as *cause light wounds* or *cause disease*) by providing a +1 bonus on the priest’s attack roll for every three levels of experience past the first (+2 to hit at 4th level, +3 at 7th level, to a maximum of +4 to hit at 10th level). Currently +[[{1+floor(([[@{level-priest}]]-1)/3),4}kl1]] to hit.\n&emsp;Once the *ebony hand* is cast, the magic of the touch-delivered spell is no longer conducted though physical contact with the caster’s fingertips, but through the flickering aura of the *ebony hand*.\n&emsp;The companion touch-delivered spell(s) may be cast either before or after the creation of the *ebony hand*, which does not expire with a single, successful touch and may be used to deliver multiple attacks if the spell duration permits. Note that the *ebony hand* does not enhance attacks with weapons or other ranged spells.\n&emsp;As the spell description implies, the *ebony hand* may only be granted by malevolent deities to their evil priests.'
+};
+
+pri1['Skeletal Servant'] = {
+    'level': '1',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': '10 yards',
+    'duration': 'One week',
+    'aoe': 'One body or skeleton',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'A handful of graveyard dirt.',
+    'reference': 'p. 78',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell temporarily animates the bones of a dead human, demihuman, or humanoid creature of man-size or less. The resultant skeleton will obey only simple commands until it is destroyed, turned, or dispelled, or the spell duration expires. As with the creations of the more powerful *animate dead* spell, a *skeletal servant* can be commanded to guard an area, follow the caster, carry heavy objects,and so on. The servant is not well suited to complex tasks (such as cooking, for instance) and is generally created to serve as a porter or temporary bodyguard.\n&emsp;A priest may have only one *skeletal servant* per level of experience in service at once. Currently [[@{level-priest}]] *skeletal servants*. As with the more powerful *animate dead* spell, the creation of a *skeletal servant* is not a good act, and only evil priests use it frequently.'
+};
+
+pri1['Spectral Senses'] = {
+    'level': '1',
+    'school': 'Divination/Necromancy',
+    'sphere': 'Divination, Necromantic',
+    'range': '[[30*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] hours',
+    'aoe': 'Caster',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'The priest’s unholy symbol and a black, hooded cowl which must be worn over the eyes and ears of the priest to benefit from the *spectral senses*.',
+    'reference': 'p. 78',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell establishes a sensual link between the priest and an skeleton or a zombie within the spell’s range. This link allows the caster to see what the undead sees as if the priest were looking through the creature’s eyes. The link also enables the priest to hear any sounds that occur in the vicinity of the undead being. The priest can hear and see exactly as if he or she were standing at the same location as the undead creature. The spell also allows the priest to issue simple commands via this link. The spell ends abruptly if either the caster or the undead creature moves out of range or is somehow moved to another plane.\n&emsp;Alternatively, the spell may be cast upon an (inanimate) corpse. In such a case, the spell transmits visual and auditory senses to the priest, but does not confer any ability to command or animate the body.'
+};
+
+pri1['Undead Alacrity'] = {
+    'level': '1',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': '1 turn + [[2*[[@{level-wizard}]] ]] rounds',
+    'aoe': '[[@{level-wizard}]] undead(s)',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'Three drops of water, sinew of any mammal, and a drop of quicksilver.',
+    'reference': 'p. 78',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell only affects skeletons and zombies, which temporarily gain the speed and agility of a living human in a peak, healthy state (a movement rate of 12). The undead also gain the same dexterity, initiative, and saving throws as the caster (providing, of course, that these attributes are better than those of the undead). Because of their alacrity, the armor class of the undead is automatically improved by 1 (and possibly further modified by the defense adjustment of the caster, if any).'
+};
+
+pri2['Hear Heartbeat'] = {
+    'level': '2',
+    'school': 'Divination, Necromancy',
+    'sphere': 'Divination, Necromantic',
+    'range': '0',
+    'duration': '1 turn + [[2*[[@{level-priest}]] ]] rounds',
+    'aoe': '[[10*[[@{level-priest}]] ]]’ radius',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'Beeswax mixed with a tiny drop of the priest’s own blood (to block the sound of his or her own heartbeat). While casting the spell, the priest places the wax in his ears to blot out normal sound and trigger the magical effect.',
+    'reference': 'p. 78',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'For the duration of this spell, a priest becomes completely deaf to all normal sounds and may hear only the noise of other creatures’ beating hearts. The heartbeat of each person, animal, or monster in the area of effect is clearly distinct and may convey information about the being’s proximity, direction, size, emotional distress, general health, and race or species. For instance, the heartbeat of a frail old wizard would be much softer and weaker than that of the *invisible* ogre bodyguard, standing behind him. This spell can provide quite confusing results if cast in the presence of numerous individuals (such as on a crowded city street) and is most effective when cast by a cleric in relative seclusion. A priest never hears his or her own heartbeat with this spell. It is effectively masked out by the power of the *hear heartbeat* spell.\n&emsp;Obviously, this spell is of little use with creatures without functioning hearts (such as plants or undead). The spell’s range is diminished if more than a one-inch thickness of wood, stone, or metal lies between the caster and a subject. Each inch of a barrier’s thickness should be treated as 10’ of open space.\n&emsp;Note that the priest is completely oblivious to normal sounds (such as talking or music) while the spell is in effect.'
+};
+
+pri2['Resist Turning'] = {
+    'level': '2',
+    'school': 'Abjuration',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': '1 turn + [[2*[[@{level-priest}]] ]] rounds',
+    'aoe': '3” diameter circle',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 79',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'While this spell is in effect, all undead within a 15-yard radius of the affected object or creature gain a resistance to being turned (or commanded) by the clerics and paladins of an opposing religion (compared to that of the caster). The base resistance of the undead to being turned is 20%, plus 5% for every two levels of experience of the caster (60% at 4th, 65% at 6th, 70% at 8th, up to a maximum of 95% at 18th level). Currently [[{50+floor([[@{level-priest}]]/2)*5,95}kl1]]% (**Note:** Base resistance set to 50% to make math match examples).\n&emsp;This resistance roll is made secretly by the DM before each turning attempt is made. A single priest can continue attempting to turn or command the resistant undead creatures each round until either the resistance is overcome or the turn roll indicates failure. The spell can be centered on a stationary object or upon any moving creature, including the caster.'
+};
+
+//#endregion
+
 const priestSpells = {};
 priestSpells['pri1'] = pri1;
 priestSpells['pri2'] = pri2;
