@@ -513,6 +513,8 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   let isMeurtrier = false;
   let isOrfevrerie = false;
   let isSilencieux = false;
+  let isFureur = false;
+  let isUltraviolence = false;
 
   const eAnatheme = isApplied(data[`${prefix}anatheme`]);
   const eAntiAnatheme = isApplied(data[`${prefix}antiAnatheme`]);
@@ -650,6 +652,7 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
 
   if (eFureur) {
     isConditionnelV = true;
+    isFureur = true;
 
     firstExec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
 
@@ -742,6 +745,7 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
 
   if (eUltraviolence) {
     isConditionnelV = true;
+    isUltraviolence = true;
 
     firstExec.push(`{{ultraviolenceValue=[[${eUltraviolenceV}D6]]}}`);
 
@@ -816,6 +820,8 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   result.isMeurtrier = isMeurtrier;
   result.isOrfevrerie = isOrfevrerie;
   result.isSilencieux = isSilencieux;
+  result.isFureur = isFureur;
+  result.isUltraviolence = isUltraviolence;
 
   result.attaquesSurprises = attaquesSurprises;
   result.attaquesSurprisesValue = attaquesSurprisesValue;
@@ -872,6 +878,8 @@ function getWeaponsEffectsAutre(prefix, effet) {
   let isSilencieux = false;
   let isTenebricide = false;
   let isTirRafale = false;
+  let isFureur = false;
+  let isUltraviolence = false;
 
   const eAntiAnatheme = isApplied(effet[`${prefix}antiAnatheme`]);
   const eAntiVehicule = isApplied(effet[`${prefix}antiVehicule`]);
@@ -1007,6 +1015,7 @@ function getWeaponsEffectsAutre(prefix, effet) {
 
   if (eFureur) {
     isConditionnelV = true;
+    isFureur = true;
 
     firstExec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
 
@@ -1086,6 +1095,7 @@ function getWeaponsEffectsAutre(prefix, effet) {
 
   if (eUltraviolence) {
     isConditionnelV = true;
+    isUltraviolence = true;
 
     firstExec.push(`{{ultraviolenceValue=[[${eUltraviolenceV}D6]]}}`);
 
@@ -1166,6 +1176,8 @@ function getWeaponsEffectsAutre(prefix, effet) {
   result.isAssistantAttaque = isAssistantAttaque;
   result.isAntiAnatheme = isAntiAnatheme;
   result.isTirRafale = isTirRafale;
+  result.isFureur = isFureur;
+  result.isUltraviolence = isUltraviolence;
 
   result.eLumiere = eLumiere;
   result.isELumiere = isELumiere;
@@ -1231,6 +1243,8 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   let isSilencieux = false;
   let isTenebricide = false;
   let isTirRafale = false;
+  let isUltraviolence = false;
+  let isFureur = false;
 
   const eAnatheme = isApplied(effet[`${prefix}anatheme`]);
   const eAntiAnatheme = isApplied(effet[`${prefix}antiAnatheme`]);
@@ -1367,6 +1381,7 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
 
   if (eFureur) {
     isConditionnelV = true;
+    isFureur = true;
 
     firstExec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
 
@@ -1446,6 +1461,7 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
 
   if (eUltraviolence) {
     isConditionnelV = true;
+    isUltraviolence = true;
 
     firstExec.push(`{{ultraviolenceValue=[[${eUltraviolenceV}D6]]}}`);
 
@@ -1528,6 +1544,8 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   result.isAssistantAttaque = isAssistantAttaque;
   result.isAntiAnatheme = isAntiAnatheme;
   result.isTirRafale = isTirRafale;
+  result.isFureur = isFureur;
+  result.isUltraviolence = isUltraviolence;
 
   result.eLumiere = eLumiere;
   result.isELumiere = isELumiere;
@@ -3431,7 +3449,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
 
       if (isELourd) {
         const type = value.stylePuissantType;
-        const bonus = value.stylePuissantBonus;
+        const bonus = +value.stylePuissantBonus;
         const malus = 0 - bonus;
 
         exec.push(`{{vMStyleA=${malus}D}}`);
@@ -3580,8 +3598,8 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, hasArmu
       exec.push(`{{style=${i18n_style} ${i18n_suppression}}}`);
 
       if (isLourd) {
-        const suppressionD = Math.floor(Number(value.styleSuppressionD) / 2);
-        const suppressionV = Math.floor(Number(value.styleSuppressionV) / 2);
+        const suppressionD = Number(value.styleSuppressionD);
+        const suppressionV = Number(value.styleSuppressionV);
 
         if (suppressionD !== 0) {
           dDegats -= suppressionD;
@@ -4000,6 +4018,8 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
       vTUltraviolence = diceUltraviolence;
     }
   }
+
+  log(vTDestructeur);
 
   const computed = {
     degats: tDegats,

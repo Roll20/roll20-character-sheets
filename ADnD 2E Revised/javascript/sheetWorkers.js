@@ -1,10 +1,227 @@
 // --- ALL SHEET WORKERS START --- //
-const sheetWorker = 'sheetworker';
-const player = 'player';
+const SHEETWORKER = 'sheetworker';
+const PLAYER = 'player';
 
+const SUCCESS = 'success';
+const INFO = 'info';
+const WARNING = 'warning';
+const ERROR = 'error';
+
+const BOOK_FIELDS = [
+    'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
+    'book-tom', 'book-aaeg',
+    'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
+    'book-paladins', 'book-druids'
+];
+
+//#region Helper function
+const conditionalLog = function (bool, msg) {
+    if (b)
+        console.log(msg);
+}
+
+const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
+    let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
+    finishRoll(queryRoll.rollId);
+    return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
+};
+
+const isRollValid = function (rollExpression, field) {
+    let expression = rollExpression.trim();
+    if (!expression)
+        return false;
+
+    let message = `In the field @{${field}} you have unmatched opening and closing`;
+
+    let openPara = (expression.match(/\(/g) || []).length
+    let closePara = (expression.match(/\)/g) || []).length
+    if (openPara !== closePara) {
+        showToast(ERROR, 'Unmatched Parenthesis', `${message} parenthesis. You have:\n${openPara}x '('\n${closePara}x ')'`);
+        return false;
+    }
+
+    let openCurly = (expression.match(/{/g) || []).length
+    let closeCurly = (expression.match(/}/g) || []).length
+    if (openCurly !== closeCurly) {
+        showToast(ERROR, 'Unmatched Curly brackets', `${message} curly brackets. You have:\n${openCurly}x '{'\n${closeCurly}x '}'`);
+        return false;
+    }
+
+    let openSquare = (expression.match(/\[/g) || []).length
+    let closeSquare = (expression.match(/]/g) || []).length
+    if (openSquare !== closeSquare) {
+        showToast(ERROR, 'Unmatched Square brackets', `${message} square brackets. You have:\n${openSquare}x '['\n${closeSquare}x ']'`);
+        return false;
+    }
+
+    if (openSquare % 2 !== 0) {
+        showToast(ERROR, 'Square brackets error', `The field @{${field}} have too few square brackets. Square brackets are used in pairs of two, ie. [[ ]].\nThe expression have an uneven number of bracket pairs: ${openSquare}`);
+        return false;
+    }
+
+    return true;
+}
+
+const extractRoll = async function(rollExpression) {
+    let queryRoll = await startRoll(`!{{roll=[[${rollExpression}]]}}`);
+    finishRoll(queryRoll.rollId);
+    return queryRoll.results.roll;
+};
+
+const extractRollResult = async function(rollExpression) {
+    let roll = await extractRoll(rollExpression);
+    return roll.result;
+};
+
+const calculateFormula = async function(formulaField, calculatedField, silent = false) {
+    getAttrs([formulaField], async function (values) {
+        let rollExpression = values[formulaField];
+        let valid = isRollValid(rollExpression, formulaField);
+        if (!valid)
+            return;
+
+        setAttrs({
+            [calculatedField]: await extractRollResult(rollExpression, formulaField)
+        },{silent:silent});
+    });
+}
+
+const getToastObject = function (type, title, message) {
+    let content
+    switch (type) {
+        case SUCCESS: content = 1; break;
+        case INFO:    content = 2; break;
+        case WARNING: content = 3; break;
+        case ERROR:   content = 4; break;
+    }
+    return {
+        ['toast']: 1,
+        ['toast-content']: content,
+        [`toast-title-${type}`]: title,
+        [`toast-message-${type}`]: message
+    }
+}
+
+const showToast = function(type, title, message) {
+    setAttrs(getToastObject(type, title, message));
+}
+
+const isBookInactive = function (books, obj) {
+    let activeBooks = BOOK_FIELDS.map(bField => books[bField]);
+    return !activeBooks.includes(obj['book']);
+}
+
+const bookInactiveShowToast = function(books, obj) {
+    let bookInactive = isBookInactive(books, obj);
+    if (bookInactive)
+        showToast(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
+    return bookInactive;
+};
+
+const isRemoving0 = function(eventInfo, fieldNames) {
+    return fieldNames.some(fieldName => !parseInt(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_${fieldName}`]));
+};
+
+const isOverwriting0 = function(eventInfo) {
+    return !parseInt(eventInfo.newValue) && !parseInt(eventInfo.previousValue);
+};
+
+const doEarlyReturn = function(eventInfo, fieldNames) {
+    return eventInfo.removedInfo
+        ? isRemoving0(eventInfo, fieldNames)
+        : isOverwriting0(eventInfo);
+};
+
+const repeatingMultiplySum = function(section, valueField, multiplierField, destination, decimals) {
+    TAS.repeating(section)
+        .attr(destination)
+        .field([valueField, multiplierField])
+        .reduce(function(m, r) {
+            return m + r.F[valueField] * r.F[multiplierField];
+        }, 0, function(t,r,a) {
+            let dec = parseInt(decimals);
+            if (isNaN(dec)) {
+                a[destination] = t;
+            } else {
+                a.D[dec][destination] = t;
+            }
+        })
+        .execute();
+};
+const repeatingCalculateRemaining = function(repeatingName, repeatingFieldsToSum, totalField, remainingField) {
+    TAS.repeating(repeatingName)
+        .attrs([totalField, remainingField])
+        .fields(repeatingFieldsToSum)
+        .reduce(function (memo, row) {
+            repeatingFieldsToSum.forEach(column => {
+                memo += row.I[column];
+            });
+            return memo;
+        }, 0, function (memo,_,attrSet) {
+            attrSet.I[remainingField] = attrSet.I[totalField] - memo;
+        }).execute();
+};
+//#endregion
+
+//#region Generic Setup functions
+function setupCalculateTotal(totalField, fieldsToSum, maxValue) {
+    let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
+    on(onChange, function () {
+        getAttrs(fieldsToSum, function (values) {
+            let total = 0;
+            fieldsToSum.forEach(field => {
+                total += parseInt(values[field]) || 0;
+            });
+
+            if (!isNaN(maxValue))
+                total = Math.min(total, maxValue);
+
+            setAttrs({
+                [totalField]: total
+            });
+        });
+    });
+}
+
+function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName, maxValue) {
+    let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
+    let allFields = [...repeatingFieldsToSum];
+    allFields.push(repeatingTotalField);
+    on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
+        if (eventInfo.removedInfo)
+            return;
+
+        TAS.repeating(repeatingName)
+            .fields(allFields)
+            .tap(function(rowSet) {
+                let rowId = eventInfo.sourceAttribute.split('_')[2];
+                let row = rowSet[rowId];
+                let total = 0;
+                repeatingFieldsToSum.forEach(column => {
+                    total += row.I[column];
+                });
+
+                if (!isNaN(maxValue))
+                    total = Math.min(total, maxValue);
+
+                row[repeatingTotalField] = total;
+            })
+            .execute();
+    });
+}
+//#endregion
+
+on('clicked:hide-toast', function(eventInfo) {
+    setAttrs({
+        ['toast']: 0,
+        ['toast-content']: 0,
+    });
+});
+
+//#region Ability Scores logic
+// Ability Score Parser function
 const squareBracketsRegex = /18\[([0-9]{1,3})]/; // Ie. 18[65]
 const parenthesisRegex = /18\(([0-9]{1,3})\)/; // Ie. 18(65)
-//Ability Score Parser function
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     if (abilityScoreString === '') {
         return defaultValue;
@@ -398,45 +615,15 @@ on('change:charisma change:leadership change:appearance', function() {
         }
     });
 });
+//#endregion
 
-function repeatingMultipleSum(section, valueField, multiplierField, destination, decimals) {
-    TAS.repeating(section)
-        .attr(destination)
-        .field([valueField, multiplierField])
-        .reduce(function(m, r) {
-            return m + r.F[valueField] * r.F[multiplierField];
-        }, 0, function(t,r,a) {
-            let dec = parseInt(decimals);
-            if (isNaN(dec)) {
-                a[destination] = t;
-            } else {
-                a.D[dec][destination] = t;
-            }
-        })
-        .execute();
-}
-
+//#region Wizard and Priest Spells slot counting
 function isNewSpellSection(section) {
     return section.startsWith('wiz') || section.startsWith('pri');
 }
 
-function isRemoving0(eventInfo, fieldNames) {
-    return fieldNames.some(fieldName => !parseInt(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_${fieldName}`]));
-}
-
-function isOverwriting0(eventInfo) {
-    return !parseInt(eventInfo.newValue) && !parseInt(eventInfo.previousValue);
-}
-
-function doEarlyReturn(eventInfo, fieldNames) {
-    return eventInfo.removedInfo
-        ? isRemoving0(eventInfo, fieldNames)
-        : isOverwriting0(eventInfo);
-}
-
 // --- Start summing numbers from repeating spells for wizard and priest --- //
 function recursiveSpellSum(tail, acc, oldField, newField, resultFieldName) {
-
     let head = tail.shift();
     if (head === undefined) {
         console.log(`Summing ended. Final sum is ${acc}`);
@@ -494,64 +681,6 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
         });
     });
 }
-// --- End summing numbers from repeating spells for wizard and priest --- //
-
-function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
-    if (!spellsTable[section])
-        return;
-    
-    on(`change:repeating_spells-${section}:spell-name`, function (eventInfo) {
-        let spell = spellsTable[section][eventInfo.newValue];
-        if (!spell)
-            return;
-
-        getAttrs(['book-phb', 'book-tcwhb'], function(values) {
-            let activeBooks = Object.values(values);
-            if (!activeBooks.includes(spell['book'])) {
-                let errorMessage = {
-                    [`repeating_spells-${section}_spell-cast-time`]    : '',
-                    [`repeating_spells-${section}_spell-level`]        : '',
-                    [`repeating_spells-${section}_spell-school`]       : '',
-                    [`repeating_spells-${section}_spell-components`]   : '',
-                    [`repeating_spells-${section}_spell-range`]        : '',
-                    [`repeating_spells-${section}_spell-aoe`]          : '',
-                    [`repeating_spells-${section}_spell-duration`]     : '',
-                    [`repeating_spells-${section}_spell-damage`]       : '',
-                    [`repeating_spells-${section}_spell-damage-type`]  : '',
-                    [`repeating_spells-${section}_spell-saving-throw`] : '',
-                    [`repeating_spells-${section}_spell-healing`]      : '',
-                    [`repeating_spells-${section}_spell-materials`]    : '',
-                    [`repeating_spells-${section}_spell-reference`]    : '',
-                    [`repeating_spells-${section}_spell-effect`]       : `The book **${spell['book']}** is currently not active on your sheet.\nGo to the **Sheet Settings** and activate the book (if your DM allows for its usage)`
-                }
-                setAttrs(errorMessage);
-                return;
-            }
-            
-            let spellInfo = {
-                [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
-                [`repeating_spells-${section}_spell-school`]       : spell['school'],
-                [`repeating_spells-${section}_spell-components`]   : spell['components'],
-                [`repeating_spells-${section}_spell-range`]        : spell['range'],
-                [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
-                [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
-                [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
-                [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
-                [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
-                [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
-                [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-                [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
-                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-            };
-            if (section.startsWith('pri')) {
-                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
-            }
-
-            setAttrs(spellInfo);
-        });
-    });
-}
 
 function setupCalculateRemaining(totalField, sumField, remainingField) {
     on(`change:${totalField} change:${sumField}`, function () {
@@ -567,49 +696,20 @@ function setupCalculateRemaining(totalField, sumField, remainingField) {
         });
     });
 }
+//#endregion
 
-function setupCalculateTotal(totalField, fieldsToSum) {
-    let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
-    on(onChange, function () {
-        getAttrs(fieldsToSum, function (values) {
-            let total = 0;
-            fieldsToSum.forEach(field => {
-                total += parseInt(values[field]) || 0;
-            });
+//#region Priest Spells based on Spheres
+const ELEMENTAL = 'Elemental';
+const PRIEST_SPHERES = [
+    // Player's Handbook
+    'All','Animal','Astral','Charm','Combat','Creation','Divination',ELEMENTAL,'Guardian','Healing',
+    'Necromantic','Plant','Protection','Summoning','Sun','Weather',
+    // Tome of Magic Spheres
+    'Chaos','Law','Numbers','Thought','Time','Travelers','War','Wards'
+];
 
-            setAttrs({
-                [totalField]: total
-            });
-        });
-    });
-}
-
-function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName) {
-    let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
-    let allFields = [...repeatingFieldsToSum];
-    allFields.push(repeatingTotalField);
-    on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
-        if (eventInfo.removedInfo)
-            return;
-        
-        TAS.repeating(repeatingName)
-            .fields(allFields)
-            .tap(function(rowSet) {
-                let rowId = eventInfo.sourceAttribute.split('_')[2];
-                let row = rowSet[rowId];
-                let total = 0;
-                repeatingFieldsToSum.forEach(column => {
-                    total += row.I[column];
-                });
-                row[repeatingTotalField] = total;
-            })
-            .execute();
-    });
-}
-
-// --- Start setup for priest spells based on spheres --- //
-const primarySphereRegex = /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather|Elemental/gi
-const noElementalRegex =   /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather/gi
+const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
+const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
 const elementalRegex = /Earth|Air|Fire|Water/gi
 function capitalizeFirst(s) {
     if (typeof s !== 'string')
@@ -628,23 +728,23 @@ function parseSpheres(spheresStrings, regex) {
     return spheres;
 }
 
-function isSpellAvailable(spellName, spellSphereString, availableSpheres, elementalSpheres) {
-    let primarySpellSpheres = spellSphereString.match(noElementalRegex);
-    if (!primarySpellSpheres)
+function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, activeBooks) {
+    if (isBookInactive(activeBooks, spell))
         return false;
-    
+
+    let primarySpellSpheres = spell['sphere'].match(noElementalRegex) || [];
     let isAvailable = primarySpellSpheres.some((sphere) => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
 
-    if (!availableSpheres.has('Elemental'))
+    if (!availableSpheres.has(ELEMENTAL))
         return false;
 
-    if (!spellSphereString.includes('Elemental'))
+    if (!spell['sphere'].includes(ELEMENTAL))
         return false;
 
-    if (spellSphereString.includes('Elemental ('))
-        return spellSphereString.match(elementalRegex).some((element) => elementalSpheres.has(element))
+    if (spell['sphere'].includes(`${ELEMENTAL} (`))
+        return spell['sphere'].match(elementalRegex).some((element) => elementalSpheres.has(element))
 
     // The player and the spell has the elemental sphere (without any sub elements)
     return true;
@@ -657,54 +757,53 @@ function setupAddPriestSpell(postfix) {
     on(`clicked:add-spells-${postfix}`, function () {
         const section = `spells-${postfix}`;
         const field = 'spell-name';
-        let errorMessage = `add-spell-error-${postfix}`;
-        let attributes = ['sphere-major'];
-        if (postfix.match(/[123]/)) 
-            attributes.push("sphere-minor");
+        let sphereFields = ['sphere-major'];
+        if (postfix.match(/[123]/))
+            sphereFields.push("sphere-minor");
             
         TAS.repeating(section)
-            .attrs(attributes)
+            .attrs([...sphereFields, ...BOOK_FIELDS])
             .fields(field)
-            .reduce(function(memo, row){
-                memo.add(row.S[field]);
-                return memo;
-            }, new Set(), function (knownSpells,_,a){
-                let primarySpheres = parseSpheres(attributes.map(aField => a.S[aField]), primarySphereRegex);
-                let elementalSpheres = parseSpheres(attributes.map(aField => a.S[aField]), elementalRegex);
+            .reduce(function(knownSpells, row){
+                knownSpells.add(row.S[field]);
+                return knownSpells;
+            }, new Set(), function (knownSpells,_,attrSet){
+                let primarySpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), primarySphereRegex);
+                let elementalSpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), elementalRegex);
 
-                let newValue = {};
-                newValue[errorMessage] = '';
                 if (primarySpheres.size < 1) {
-                    newValue[errorMessage] = 'No valid spheres found. Please write or select some spheres';
-                    setAttrs(newValue);
+                    showToast(WARNING, 'No spheres found', `No valid spheres found. Please write or select some spheres`);
                     return;
                 }
 
                 let spellsToAdd = [];
                 for (const [spellName, spell] of Object.entries(priestSpells[postfix])) {
-                    let isAvailable = isSpellAvailable(spellName, spell['sphere'], primarySpheres, elementalSpheres);
-                    if (isAvailable)
-                        spellsToAdd.push(spellName);
+                    let isAvailable = isSpellAvailable(spellName, spell, primarySpheres, elementalSpheres, attrSet);
+                    if (isAvailable) {
+                        spellsToAdd.push({name: spellName, book: spell['book']});
+                    }
                 }
 
                 console.log(spellsToAdd);
                 if (spellsToAdd.length < 1) {
-                    newValue[errorMessage] = 'No spells found for the selected spheres';
-                    setAttrs(newValue);
+                    showToast(ERROR, 'No spells found', `No spells found for the selected spheres`);
                     return;
                 }
 
-                spellsToAdd = spellsToAdd.filter(spell => !knownSpells.has(spell));
+                spellsToAdd = spellsToAdd.filter(spell => !knownSpells.has(spell.name));
                 console.log(spellsToAdd);
                 if (spellsToAdd.length < 1) {
-                    newValue[errorMessage] = 'All spells already added.';
-                    setAttrs(newValue);
+                    showToast(INFO, 'All spells added', `Found no more spells to add based on spheres`);
                     return;
                 }
 
+                let books = [...new Set(spellsToAdd.map(s => `\n • ${s.book}`))].join('');
+                let toastObject = getToastObject(SUCCESS, 'Added new spells!', `Spells was added from the following books:${books}`);
+
+                let newValue = {...toastObject};
                 spellsToAdd.forEach(spell => {
                     let newrowid = generateRowID();
-                    newValue[`repeating_${section}_${newrowid}_${field}`] = spell;
+                    newValue[`repeating_${section}_${newrowid}_${field}`] = spell.name;
                 });
 
                 setAttrs(newValue);
@@ -713,9 +812,9 @@ function setupAddPriestSpell(postfix) {
             .execute();
     });
 }
-// --- End setup for priest spells based on spheres --- //
+//#endregion
 
-// --- Start defining rest buttons --- //
+//#region Wizard and Priest reset buttons
 function resetCastSlots(row, castField, memField) {
     row.I[castField] = 0;
 }
@@ -795,7 +894,47 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
         });
     });
 }
-// --- End defining rest buttons --- //
+//#endregion
+
+//#region Wizard and Priest spells and Powers setup
+function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
+    if (!spellsTable[section])
+        return;
+
+    on(`change:repeating_spells-${section}:spell-name`, function (eventInfo) {
+        let spell = spellsTable[section][eventInfo.newValue];
+        if (!spell)
+            return;
+
+        getAttrs(BOOK_FIELDS, function(books) {
+            if (bookInactiveShowToast(books, spell))
+                return;
+
+            let spellInfo = {
+                [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
+                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
+                [`repeating_spells-${section}_spell-school`]       : spell['school'],
+                [`repeating_spells-${section}_spell-components`]   : spell['components'],
+                [`repeating_spells-${section}_spell-range`]        : spell['range'],
+                [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
+                [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
+                [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
+                [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
+                [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
+                [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
+                [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
+                [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
+                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
+            };
+            if (section.startsWith('pri')) {
+                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+            }
+
+            setAttrs(spellInfo);
+        });
+    });
+}
+
 
 let wizardSpellLevelsSections = [
     {level: '1', sections: ['', '2', '3', 'wiz1']},
@@ -827,10 +966,10 @@ let priestSpellLevelsSections = [
 ];
 
 function wizardDisplayLevel(s) {
-    return `Level ${s} Wizard`
+    return `Level ${s} Wizard`;
 }
 function priestDisplayLevel(s) {
-    return `Level ${s} Priest`
+    return s === 'q' ? 'Quest Spell Priest' : `Level ${s} Priest`;
 }
 
 // --- Start setup Spell Slots --- //
@@ -862,7 +1001,8 @@ priestSpellLevelsSections.forEach(spellLevel => {
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
         setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel);
-        setupAddPriestSpell(lastSection);
+        if (lastSection !== 'priq')
+            setupAddPriestSpell(lastSection);
     }
 });
 setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel);
@@ -904,20 +1044,24 @@ setupRepeatingSpellSumming(powerSpellSections, 'cast-max', '', `${spellPower}-av
 setupCalculateRemaining(`${spellPower}-available`, `${spellPower}-sum`, `${spellPower}-remaining`);
 setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 // --- End setup Granted Powers --- //
+//#endregion
 
+//#region Rogue skills
 // --- Start setup Rogue skills total --- //
 let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
 let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
 rogueStandardSkills.forEach(skill => {
-    setupCalculateTotal(`${skill}t`, rogueStandardColumns.map(column => `${skill}${column}`));
-    setupCalculateTotal(`${skill}noarmort`, [`${skill}t`, `${skill}noarmorb`]);
-    setupCalculateTotal(`${skill}armort`, [`${skill}t`, `${skill}armorp`]);
+    setupCalculateTotal(`${skill}t-hidden`, rogueStandardColumns.map(column => `${skill}${column}`));
+    setupCalculateTotal(`${skill}t`, [`${skill}t-hidden`], 95);
+    setupCalculateTotal(`${skill}noarmort`, [`${skill}t-hidden`, `${skill}noarmorb`], 95);
+    setupCalculateTotal(`${skill}armort`, [`${skill}t-hidden`, `${skill}armorp`], 95);
 });
 
 // Setup custom rogue skills total
-setupRepeatingRowCalculateTotal('crt', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
-setupRepeatingRowCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogue');
-setupRepeatingRowCalculateTotal('crarmort', ['crt', 'crarmorp'], 'customrogue');
+setupRepeatingRowCalculateTotal('crt-hidden', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
+setupRepeatingRowCalculateTotal('crt', ['crt-hidden'], 'customrogue', 95);
+setupRepeatingRowCalculateTotal('crnoarmort', ['crt-hidden', 'crnoarmorb'], 'customrogue', 95);
+setupRepeatingRowCalculateTotal('crarmort', ['crt-hidden', 'crarmorp'], 'customrogue', 95);
 // --- End setup Rogue skills total --- //
 
 //Rogue armor modifier auto fill
@@ -946,16 +1090,17 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
         .reduce(function(m,r){
             m.crl+=(r.I.crl);
             return m;
-
         },{crl:0},function(m,r,a){
             a.newskill=m.crl;
         })
         .execute();
 });
 // --- End setup Rogue skills total --- //
+//#endregion
 
-//Related weapons / familiarity penalty
-on('change:nonprof-penalty', function (eventInfo) {
+//#region Weapons tab logic and autofil
+//Used in version.js
+const updateNonprofPenalty = function () {
     getAttrs(['nonprof-penalty'], function(values) {
         let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
         let famil = Math.floor(nonprof / 2)
@@ -964,133 +1109,240 @@ on('change:nonprof-penalty', function (eventInfo) {
             ['famil-penalty']: famil
         },{silent:true});
     });
-})
+}
+on('change:nonprof-penalty', function (eventInfo){
+    updateNonprofPenalty();
+});
 
-function getWeaponWithBonus(weaponName, isMonster) {
+//Used in version.js
+const updateThac0 = (silent) => calculateFormula('thac0-base', 'thac0-base-calc', silent);
+on('change:thac0-base', function(eventInfo) {
+    updateThac0(false);
+});
+
+on('change:thac0-base-calc', function(eventInfo) {
+    TAS.repeating('weapons')
+        .fields('ThAC0')
+        .each(function (row) {
+            if (`${row['ThAC0']}` === `${eventInfo.previousValue}`)
+                row['ThAC0'] = eventInfo.newValue;
+        })
+        .execute();
+
+    TAS.repeating('weapons2')
+        .fields('ThAC02')
+        .each(function (row) {
+            if (`${row['ThAC02']}` === `${eventInfo.previousValue}`)
+                row['ThAC02'] = eventInfo.newValue;
+        })
+        .execute();
+});
+
+//#region Weapons autofill
+function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
     if (!weaponName)
-        return undefined;
+        return;
     
     weaponName = weaponName.toLowerCase();
-    let baseWeapon = weapons[weaponName];
-    if (baseWeapon) {
-        return {
-            ...baseWeapon,
-            'bonus' : '0'
-        };
-    }
-    
-    let match = weaponName.match(/\s*\+([0-9])+\s*/);
-    if (!match)
-        return undefined;
+    let fields = [...BOOK_FIELDS, thac0Field].filter(x => x !== undefined);
+    getAttrs(fields, function(values) {
+        let thac0 = parseInt(values[thac0Field]);
+        thac0 = isNaN(thac0) ? 20 : thac0;
 
-    let baseWeaponName = weaponName.replace(match[0], ' ').trim();
-    baseWeapon = weapons[baseWeaponName];
-    if (!baseWeapon)
-        return undefined;
-    
-    let bonusString = match[1];
-    let bonus = parseInt(bonusString)
-    if (isNaN(bonus))
-        return undefined;
-    
-    if (bonus < 1)
-        return {
+        let baseWeapon = weapons[weaponName]
+        if (baseWeapon) {
+            if (bookInactiveShowToast(values, baseWeapon))
+                return;
+
+            setWeaponFunc({
+                ...baseWeapon,
+                'thac0' : thac0,
+                'bonus' : '0'
+            });
+            return;
+        }
+
+        let match = weaponName.match(/\s*\+([0-9]+)\s*/);
+        if (!match)
+            return;
+
+        let baseWeaponName = weaponName.replace(match[0], ' ').trim();
+        baseWeapon = weapons[baseWeaponName];
+        if (!baseWeapon)
+            return;
+
+        if (bookInactiveShowToast(values, baseWeapon))
+            return;
+
+        let bonusString = match[1];
+        let bonus = parseInt(bonusString)
+        if (isNaN(bonus))
+            return;
+
+        if (bonus < 1) {
+            setWeaponFunc({
+                ...baseWeapon,
+                'thac0' : thac0,
+                'bonus' : '0'
+            });
+            return;
+        }
+
+        let weaponWithBonus = {
             ...baseWeapon,
-            'bonus' : '0'
-        };
-    
-    let weaponWithBonus = {
-        ...baseWeapon,
-        'speed' : Math.max(baseWeapon['speed'] - bonus, 0),
-        'bonus' : `+${bonus}`
-    }
-    if (isMonster) {
-        weaponWithBonus['small-medium'] += `+${bonus}`;
-        weaponWithBonus['large'] += `+${bonus}`;
-        weaponWithBonus['thac0'] = `@{monsterthac0}-${bonus}`;
-    }
-    
-    return weaponWithBonus;
+            'thac0' : thac0,
+            'speed' : Math.max(baseWeapon['speed'] - bonus, 0),
+            'bonus' : `+${bonus}`
+        }
+        if (isMonster) {
+            weaponWithBonus['small-medium'] += `+${bonus}`;
+            weaponWithBonus['large'] += `+${bonus}`;
+            weaponWithBonus['thac0'] = thac0 - bonus;
+        }
+
+        setWeaponFunc(weaponWithBonus);
+    });
 }
 
 //melee hit autofill
-on('change:repeating_weapons:weaponname', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue);
-    if (weapon === undefined)
-        return;
+on('change:repeating_weapons:weaponname', function(eventInfo) {
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            'repeating_weapons_attackadj'      : weapon['bonus'],
+            'repeating_weapons_ThAC0'          : weapon['thac0'],
+            'repeating_weapons_range'          : 'Melee',
+            'repeating_weapons_size'           : weapon['size'],
+            'repeating_weapons_weapspeed'      : weapon['speed'],
+            'repeating_weapons_weaptype-slash' : weapon['type'].includes('S') ? 1 : 0,
+            'repeating_weapons_weaptype-pierce': weapon['type'].includes('P') ? 1 : 0,
+            'repeating_weapons_weaptype-blunt' : weapon['type'].includes('B') ? 1 : 0,
+        };
 
-    let weaponInfo = {
-        'repeating_weapons_attackadj'      : weapon['bonus'],
-        'repeating_weapons_range'          : 'Melee',
-        'repeating_weapons_size'           : weapon['size'],
-        'repeating_weapons_weapspeed'      : weapon['speed'],
-        'repeating_weapons_weaptype-slash' : weapon['type'].includes('S') ? 1 : 0,
-        'repeating_weapons_weaptype-pierce': weapon['type'].includes('P') ? 1 : 0,
-        'repeating_weapons_weaptype-blunt' : weapon['type'].includes('B') ? 1 : 0,
+        setAttrs(weaponInfo);
     };
-    
-    setAttrs(weaponInfo);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
 });
 
 //melee damage autofill
 on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue);
-    if (weapon === undefined)
-        return;
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            'repeating_weapons-damage_damadj'     : weapon['bonus'],
+            'repeating_weapons-damage_damsm'      : weapon['small-medium'],
+            'repeating_weapons-damage_daml'       : weapon['large'],
+            'repeating_weapons-damage_knockdown1' : weapon['knockdown'] || ''
+        };
 
-    let weaponInfo = {
-        'repeating_weapons-damage_damadj'    : weapon['bonus'],
-        'repeating_weapons-damage_damsm'     : weapon['small-medium'],
-        'repeating_weapons-damage_daml'      : weapon['large'],
-        'repeating_weapons-damage_knockdown1': weapon['knockdown'] || ''
+        setAttrs(weaponInfo);
     };
 
-    setAttrs(weaponInfo);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
 });
 
 //range hit autofill
 on('change:repeating_weapons2:weaponname2', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue);
-    if (weapon === undefined)
-        return;
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            'repeating_weapons2_strbonus2'        : weapon['strength'] ? 1 : 0,
+            'repeating_weapons2_attacknum2'       : weapon['rof'] || '',
+            'repeating_weapons2_attackadj2'       : weapon['bonus'],
+            'repeating_weapons2_ThAC02'           : weapon['thac0'],
+            'repeating_weapons2_range2'           : weapon['range'] || '',
+            'repeating_weapons2_size2'            : weapon['size'],
+            'repeating_weapons2_weapspeed2'       : weapon['speed'],
+            'repeating_weapons2_weaptype-slash2'  : weapon['type'].includes('S') ? 1 : 0,
+            'repeating_weapons2_weaptype-pierce2' : weapon['type'].includes('P') ? 1 : 0,
+            'repeating_weapons2_weaptype-blunt2'  : weapon['type'].includes('B') ? 1 : 0,
+        };
 
-    let weaponInfo = {
-        'repeating_weapons2_strbonus2'       : weapon['strength'] ? 1 : 0,
-        'repeating_weapons2_attacknum2'      : weapon['rof'] || '',
-        'repeating_weapons2_attackadj2'      : weapon['bonus'],
-        'repeating_weapons2_range2'          : weapon['range'] || '',
-        'repeating_weapons2_size2'           : weapon['size'],
-        'repeating_weapons2_weapspeed2'      : weapon['speed'],
-        'repeating_weapons2_weaptype-slash2' : weapon['type'].includes('S') ? 1 : 0,
-        'repeating_weapons2_weaptype-pierce2': weapon['type'].includes('P') ? 1 : 0,
-        'repeating_weapons2_weaptype-blunt2' : weapon['type'].includes('B') ? 1 : 0,
+        setAttrs(weaponInfo);
     };
-
-    setAttrs(weaponInfo);
+    
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
 });
 
 //range damage autofill
 on('change:repeating_ammo:ammoname', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue);
-    if (weapon === undefined)
-        return;
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            'repeating_weapons2_strbonus3'        : weapon['strength'] ? 1 : 0,
+            'repeating_ammo_damadj2'              : weapon['bonus'],
+            'repeating_ammo_damsm2'               : weapon['small-medium'],
+            'repeating_ammo_daml2'                : weapon['large'],
+            'repeating_weapons-damage_knockdown2' : weapon['knockdown'] || ''
+        };
 
-    let weaponInfo = {
-        'repeating_weapons2_strbonus3'       : weapon['strength'] ? 1 : 0,
-        'repeating_ammo_damadj2'             : weapon['bonus'],
-        'repeating_ammo_damsm2'              : weapon['small-medium'],
-        'repeating_ammo_daml2'               : weapon['large'],
-        'repeating_weapons-damage_knockdown2': weapon['knockdown'] || ''
-    };
-
-    setAttrs(weaponInfo);
+        setAttrs(weaponInfo);
+    }
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
 });
 
-const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
-    let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
-    finishRoll(queryRoll.rollId);
-    return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
-};
+//Follower weapons
+function setupFollowerWeaponsAutoFill(repeating, sections) {
+    let prefix = '';
+    let onChange = '';
+    if (repeating !== '') {
+        prefix = `repeating_${repeating}_`
+        onChange = `repeating_${repeating}:`
+    }
+
+    sections.forEach(section => {
+        on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
+            let setWeaponFunc = function (weapon) {
+                let weaponInfo = {
+                    [`${prefix}attacknumhench${section}`]: weapon['rof'] || '1',
+                    [`${prefix}attackadjhench${section}`]: weapon['bonus'],
+                    [`${prefix}damadjhench${section}`]: weapon['bonus'],
+                    [`${prefix}damsmhench${section}`]: weapon['small-medium'],
+                    [`${prefix}damlhench${section}`]: weapon['large'],
+                    [`${prefix}rangehench${section}`]: weapon['range'] || 'Melee',
+                    [`${prefix}weaptypehench${section}`]: weapon['type'],
+                    [`${prefix}weapspeedhench${section}`]: weapon['speed'],
+                };
+
+                setAttrs(weaponInfo);
+            };
+            setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+        });
+    });
+}
+
+const followerWeapons = [
+    {repeating: '',       sections: ['',    '001', '002']},
+    {repeating: 'hench',  sections: ['003', '004', '005']},
+    {repeating: '',       sections: ['006', '007', '008']},
+    {repeating: 'hench2', sections: ['009', '010', '011']},
+    {repeating: '',       sections: ['012', '013', '014']},
+    {repeating: 'hench3', sections: ['015', '016', '017']},
+    {repeating: '',       sections: ['018', '019', '020']},
+    {repeating: 'hench4', sections: ['021', '022', '023']},
+    {repeating: '',       sections: ['024', '025', '026']},
+    {repeating: 'hench5', sections: ['027', '028', '029']},
+    {repeating: '',       sections: ['030', '031', '032']},
+    {repeating: 'hench6', sections: ['033', '034', '035']},
+];
+
+followerWeapons.forEach(fw => {
+    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections)
+});
+
+// Monster weapons
+on('change:repeating_monsterweapons:weaponname', function(eventInfo){
+    let setWeaponFunc = function (weapon) {
+        let weaponInfo = {
+            [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
+            [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'],
+            [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
+            [`repeating_monsterweapons_daml`]      : weapon['large'],
+            [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
+        };
+
+        setAttrs(weaponInfo);
+    };
+
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'monsterthac0', true);
+});
+//#endregion
 
 on('clicked:grenade-miss', async function (eventInfo) {
     getAttrs(['character_name'], async function(values) {
@@ -1103,8 +1355,8 @@ on('clicked:grenade-miss', async function (eventInfo) {
             case 'Oil (lit)':  finalRollText += `{{name=Oil (lit)}} {{aoe=[[3]]}} {{aoesplash=[[3+6]]}} {{hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)}} {{splashdmg=[Damage](~${characterName}|oil-lit-splash)}}`; break;
             case 'Poison':     finalRollText += `{{name=Poison}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=Special}} {{splashdmg=Special}}`; break;
             case 'Other': {
-                let name = await extractQueryResult('?{Grenade name}');
-                let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
+                let name   = await extractQueryResult('?{Grenade name}');
+                let aoe    = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
                 let damage = await extractQueryResult('?{Direct damage|1d6}');
                 let splash = await extractQueryResult('?{Splash damage|1d3}');
 
@@ -1144,109 +1396,77 @@ on('clicked:grenade-miss', async function (eventInfo) {
         });
     });
 });
+//#endregion
 
-//Follower weapons
-function setupFollowerWeaponsAutoFill(repeating, sections) {
-    let prefix = '';
-    let onChange = ''; 
-    if (repeating !== '') {
-        prefix = `repeating_${repeating}_`
-        onChange = `repeating_${repeating}:`
-    }
-    
-    sections.forEach(section => {
-        on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
-            let weapon = getWeaponWithBonus(eventInfo.newValue);
-            if (weapon === undefined)
-                return;
-            
-            let weaponInfo = {
-                [`${prefix}attacknumhench${section}`] : weapon['rof'] || '1',
-                [`${prefix}attackadjhench${section}`] : weapon['bonus'],
-                [`${prefix}damadjhench${section}`]    : weapon['bonus'],
-                [`${prefix}damsmhench${section}`]     : weapon['small-medium'],
-                [`${prefix}damlhench${section}`]      : weapon['small-medium'],
-                [`${prefix}rangehench${section}`]     : weapon['range'] || 'Melee',
-                [`${prefix}weaptypehench${section}`]  : weapon['type'],
-                [`${prefix}weapspeedhench${section}`] : weapon['speed'],
-            };
-            
-            setAttrs(weaponInfo);
-        })
-    })
-}
-
-const followerWeapons = [
-    {repeating: '',       sections: ['',    '001', '002']},
-    {repeating: 'hench',  sections: ['003', '004', '005']},
-    {repeating: '',       sections: ['006', '007', '008']},
-    {repeating: 'hench2', sections: ['009', '010', '011']},
-    {repeating: '',       sections: ['012', '013', '014']},
-    {repeating: 'hench3', sections: ['015', '016', '017']},
-    {repeating: '',       sections: ['018', '019', '020']},
-    {repeating: 'hench4', sections: ['021', '022', '023']},
-    {repeating: '',       sections: ['024', '025', '026']},
-    {repeating: 'hench5', sections: ['027', '028', '029']},
-    {repeating: '',       sections: ['030', '031', '032']},
-    {repeating: 'hench6', sections: ['033', '034', '035']},
-];
-
-followerWeapons.forEach(fw => {
-   setupFollowerWeaponsAutoFill(fw.repeating, fw.sections) 
-});
-
-// Monster weapons
-on('change:repeating_monsterweapons:weaponname', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue, true);
-    if (weapon === undefined)
-        return;
-
-    let weaponInfo = {
-        [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
-        [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'] || '@{monsterthac0}',
-        [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
-        [`repeating_monsterweapons_daml`]      : weapon['large'],
-        [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
-    };
-
-    setAttrs(weaponInfo);
-});
-
+//#region Proficiencies
 //Weapon proficiency slots
-on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(eventInfo) {
+//Used in version.js
+const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc');
+on('change:weapprof-slots-total', function (eventInfo) {
+    updateWeaponProfsTotal();
+});
+const updateWeaponProfsRemaining = () => repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
+on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprof-slots-total-calc', function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['weapprofnum']))
         return;
-    TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
+    updateWeaponProfsRemaining();
 });
+//Weapon proficiency autofill
+on('change:repeating_weaponprofs:weapprofname', function(eventInfo) {
+    let weaponProficiency = weaponProficiencies[eventInfo.newValue];
+    if (!weaponProficiency)
+        return;
 
-//Nonweapon proficiency slots
-on('change:repeating_profs:profslots remove:repeating_profs', function(eventInfo){
-    if (doEarlyReturn(eventInfo, ['profslots']))
-        return;
-    TAS.repeatingSimpleSum('profs', 'profslots', 'profslotssum');
-});
-//Nonweapon proficiency autofill
-on('change:repeating_profs:profname', function (eventInfo) {
-    let nonweaponProficiency = NonweaponProficiencies[eventInfo.newValue];
-    if (nonweaponProficiency === undefined)
-        return;
-    
-    setAttrs({
-        'repeating_profs_profslots'  : nonweaponProficiency['slots'],
-        'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
-        'repeating_profs_profmod'    : nonweaponProficiency['modifier'],
+    getAttrs(BOOK_FIELDS, function (books) {
+        if (bookInactiveShowToast(books, weaponProficiency))
+            return;
+
+        setAttrs({
+            'repeating_weaponprofs_weapprofnum'  : weaponProficiency['slots'],
+        });
     });
 });
 
+//Nonweapon proficiency slots
+//Used in version.js
+const updateNonWeaponProfsTotal = () => calculateFormula('prof-slots-total', 'prof-slots-total-calc');
+on('change:prof-slots-total', function (eventInfo) {
+    updateNonWeaponProfsTotal();
+});
+const updateNonWeaponProfsRemaining = () => repeatingCalculateRemaining('profs', ['profslots'], 'prof-slots-total-calc', 'prof-slots-remain');
+on('change:repeating_profs:profslots remove:repeating_profs change:prof-slots-total-calc', function(eventInfo){
+    if (doEarlyReturn(eventInfo, ['profslots']))
+        return;
+    updateNonWeaponProfsRemaining();
+});
+//Nonweapon proficiency autofill
+on('change:repeating_profs:profname', function (eventInfo) {
+    let nonweaponProficiency = nonweaponProficiencies[eventInfo.newValue];
+    if (!nonweaponProficiency)
+        return;
+    
+    getAttrs(BOOK_FIELDS, function (books) {
+        if (bookInactiveShowToast(books, nonweaponProficiency))
+            return;
+
+        setAttrs({
+            'repeating_profs_profslots'  : nonweaponProficiency['slots'],
+            'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
+            'repeating_profs_profmod'    : nonweaponProficiency['modifier'],
+        });
+    });
+});
+//#endregion
+
+//#region Equipment
 //Equipment Carried Section
 on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['gearweight', 'gearqty']))
         return;
-    repeatingMultipleSum('gear', 'gearweight', 'gearqty', 'gearweighttotal', 2);
+    repeatingMultiplySum('gear', 'gearweight', 'gearqty', 'gearweighttotal', 2);
 });
 
 //Equipment Stored Section
-//Mount Equipment Carried Section Continued
 on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['gear-stored-weight', 'gear-stored-qty']))
         return;
@@ -1265,9 +1485,12 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
         })
         .execute();
 })
+//#endregion
 
 on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_gem`, function(eventInfo) {
-    repeatingMultipleSum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
+    if (doEarlyReturn(eventInfo, ['gemvalue', 'gemqty']))
+        return;
+    repeatingMultiplySum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
 })
 
 // --- ALL SHEET WORKERS END --- //
