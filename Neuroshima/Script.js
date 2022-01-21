@@ -256,16 +256,27 @@ on("change:level change:modi_battle change:modi_open change:modi_penalties chang
 /*************************** ROLL HANDLERS ************************/
 
  on('clicked:test', (info) => {
-        startRoll("&{template:test} {{name=Test}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}", (results) => {
+        startRoll("&{template:test} {{initiallevel=@{final_test_level} }} {{finaldifficulty=[[0[computed value]]]}} {{name=Test}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}", (results) => {
             const total = results.results.roll1.result + results.results.roll2.result + results.results.roll3.result;
+            const vals = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
             const computed = total + 10;
 
             // Difficulty Level - attr_final_test_level
-            let lvl = 3;
-
+            let lvl = results.results.initiallevel.result;
+            
             // Slider
-
+            
             // Critical rolls ( 1 / 20 )
+            for (let x=0; x<3; ++x) {
+                if(vals[x]==1)
+                {
+                    lvl -= 1;
+                }
+                if(vals[x]==20)
+                {
+                    lvl += 1;
+                }
+            }
 
             // Successes and failures
 
@@ -274,6 +285,7 @@ on("change:level change:modi_battle change:modi_open change:modi_penalties chang
                 results.rollId,
                 {
                     roll1: computed,
+                    finaldifficulty: lvl
                 }
             );
         });
