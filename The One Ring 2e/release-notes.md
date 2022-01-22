@@ -2,6 +2,7 @@
 This is a rewrite based on the early 2e (basic) and 1e edition that also includes a 2e sheet for adversaries. It features correct handling of favoured rolls, weary/miserable state, bonus dice and stance related bonus changes to attack rating, parry, protection and damage.
 
 # Release History
+## 02.01.00 (Build 5)
 
 ## 02.00.01 (Build 4)
 - rename Advancement Points -> Adventure Points
