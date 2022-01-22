@@ -254,40 +254,96 @@ on("change:level change:modi_battle change:modi_open change:modi_penalties chang
 /******************************************************************/
 /******************************************************************/
 /*************************** ROLL HANDLERS ************************/
-
+const stats2wsp = {
+    "bijatyka" : "zrecznosc",
+    "bron_reczna" : "zrecznosc",
+    "rzucanie" : "zrecznosc",
+    "pistolety" : "zrecznosc",
+    "pistolety" : "zrecznosc",
+    "karabiny": "zrecznosc",
+    "bron_maszynowa" : "zrecznosc",
+    "luk" : "zrecznosc",
+    "kusza" : "zrecznosc",
+    "proca" : "zrecznosc",
+    "samochod" : "zrecznosc",
+    "ciezarowka" : "zrecznosc",
+    "motocykl" : "zrecznosc",
+    "kradziez_kieszonkowa" : "zrecznosc",
+    "zwinne_dlonie" : "zrecznosc",
+    "otwieranie_zamkow" : "zrecznosc"
+};
  on('clicked:test', (info) => {
-        startRoll("&{template:test} {{initiallevel=@{final_test_level} }} {{finaldifficulty=[[0[computed value]]]}} {{name=Test}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}", (results) => {
-            const total = results.results.roll1.result + results.results.roll2.result + results.results.roll3.result;
-            const vals = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
-            const computed = total + 10;
+        startRoll("&{template:test} {{base_wsp_name=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=bijatyki}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}", (results) => {
+            getAttrs(["final_test_level", "bijatyka"], function(values) {
+                let skill_name = "bijatyka"   
+                let skill = (parseInt(values.bijatyka)||0);
 
-            // Difficulty Level - attr_final_test_level
-            let lvl = results.results.initiallevel.result;
-            
-            // Slider
-            
-            // Critical rolls ( 1 / 20 )
-            for (let x=0; x<3; ++x) {
-                if(vals[x]==1)
-                {
-                    lvl -= 1;
+                let skill_remaining = skill;
+                let final_test_level = (parseInt(values.final_test_level)||0);
+                let skill_wsp_name = stats2wsp[skill_name];
+
+                const total = results.results.roll1.result + results.results.roll2.result + results.results.roll3.result;
+                const vals = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
+                const computed = total + 10;
+                let x = 0;
+                
+                // Slider
+                let advantage = parseInt(skill/4);
+                final_test_level -= advantage;
+                
+                // Critical rolls ( 1 / 20 )
+                for (x=0; x<3; ++x) {
+                    if(vals[x]==1)
+                    {
+                        final_test_level -= 1;
+                    }
+                    if(vals[x]==20)
+                    {
+                        final_test_level += 1;
+                    }
                 }
-                if(vals[x]==20)
-                {
-                    lvl += 1;
+                
+                // Constrain
+                final_test_level = final_test_level < 0 ? 0 : (final_test_level > 6 ? 6 : final_test_level);
+
+                // Successes and failures
+                let statbase = 10;
+                let dice_style = [0,1,2,3];
+                const difficulties = [-2,0,2,5,8,11,15];
+                
+                let statreq = statbase - difficulties[final_test_level];
+                let succ = 0;
+                for (x=0; x<3; ++x) {
+                    if(vals[x] <= statreq) {
+                        succ += 1;
+                    } else {
+                        if ( vals[x] + skill_remaining <= statreq ) {
+                            skill_remaining -= (statreq - vals[x]);
+                            succ += 1;
+                            dice_style[x] = 1;
+                        } else if ( skill_remaining ){
+                            skill_remaining = 0;
+                            dice_style[x] = 2;
+                        } else {
+                            dice_style[x] = 3;
+                        }
+                    }
                 }
-            }
+                
 
-            // Successes and failures
+                finishRoll(
+                    results.rollId,
+                    {
+                        roll1: dice_style[0],
+                        roll2: dice_style[1],
+                        roll3: dice_style[2],
+                        finaldifficulty: final_test_level,
+                        successes : succ,
+                        base_wsp_name : skill_wsp_name
 
-
-            finishRoll(
-                results.rollId,
-                {
-                    roll1: computed,
-                    finaldifficulty: lvl
-                }
-            );
+                    }
+                );
+            });
         });
 });
 
