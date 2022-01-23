@@ -223,9 +223,9 @@ const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Bardz
     });
 });
 
-on("change:level change:modi_battle change:modi_open change:modi_penalties change:total_wounds change:modi_armor_penalties change:total_armor_penalties change:custom_penalty", function() {  
+on("change:level change:modi_battle change:modi_open change:modi_penalties change:total_wounds change:modi_armor_penalties change:total_armor_penalties change:custom_penalty change:modi_custom_penalty", function() {  
     getAttrs([	"level", "modi_battle","modi_open", "modi_penalties","total_wounds", 
-    "modi_armor_penalties","total_armor_penalties", "custom_penalty"], function(values) {
+    "modi_armor_penalties","total_armor_penalties", "custom_penalty", "modi_custom_penalty"], function(values) {
         let level = ((parseInt(values.level))||0);
         let modi_battle = (parseInt(values.modi_battle)||0);
         let modi_open = (parseInt(values.modi_open)||0);
@@ -234,11 +234,12 @@ on("change:level change:modi_battle change:modi_open change:modi_penalties chang
         let modi_armor_penalties = (parseInt(values.modi_armor_penalties)||0);
         let total_armor_penalties = (parseInt(values.total_armor_penalties)||0);
         let custom_penalty = (parseInt(values.custom_penalty)||0);
+        let modi_custom_penalty = (parseInt(values.modi_custom_penalty)||0);
 
         let final_test_penalty =(   startingPercent[level] + 
                                     ( modi_penalties ? total_wounds : 0 ) +
                                     ( modi_armor_penalties ? total_armor_penalties: 0 ) +
-                                    custom_penalty
+                                    ( modi_custom_penalty ? custom_penalty : 0 )
                                 );
         let final_test_level = 0;
         while( final_test_penalty > lastPassingPercent[final_test_level] ) {
@@ -293,8 +294,8 @@ const stats2wsp = {
                 const computed = total + 10;
                 let x = 0;
                 
-                // Slider
-                let advantage = parseInt(skill/4);
+                // Slider - no skill means test is harder by 1 level. Git gud.
+                let advantage = skill ? parseInt(skill/4) : -1; 
                 final_test_level -= advantage;
                 
                 // Critical rolls ( 1 / 20 )
