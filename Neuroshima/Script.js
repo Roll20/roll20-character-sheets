@@ -211,9 +211,9 @@ on("change:zrecznosc_base change:mod_zrecznosc change:percepcja_base change:mod_
 /******************************************************************/
 /******************************************************************/
 /************************** ROLL PARAMETERS ***********************/
-const lastPassingPercent = [0,10,30,60,90,120,160,9999];
-const reftab = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, ];
-const levelRadioValues = ["1","2","3","4","5","6","7"];
+const startingPercent = [-20, 0, 11, 31, 61, 91, 121]
+const lastPassingPercent = [-1,10,30,60,90,120,99999];
+const levelRadioValues = ["0","1","2","3","4","5","6"];
 const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Bardzo Trudny", "Cholernie Trudny", "Fart"];
   levelRadioValues.forEach(function(value) {
     on(`clicked:level_${value}`, function() {
@@ -226,7 +226,7 @@ const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Bardz
 on("change:level change:modi_battle change:modi_open change:modi_penalties change:total_wounds change:modi_armor_penalties change:total_armor_penalties change:custom_penalty", function() {  
     getAttrs([	"level", "modi_battle","modi_open", "modi_penalties","total_wounds", 
     "modi_armor_penalties","total_armor_penalties", "custom_penalty"], function(values) {
-        let level = ((parseInt(values.level)-1)||0);
+        let level = ((parseInt(values.level))||0);
         let modi_battle = (parseInt(values.modi_battle)||0);
         let modi_open = (parseInt(values.modi_open)||0);
         let modi_penalties = (parseInt(values.modi_penalties)||0);
@@ -235,13 +235,19 @@ on("change:level change:modi_battle change:modi_open change:modi_penalties chang
         let total_armor_penalties = (parseInt(values.total_armor_penalties)||0);
         let custom_penalty = (parseInt(values.custom_penalty)||0);
 
-        let final_test_penalty =(   lastPassingPercent[level] + 
+        let final_test_penalty =(   startingPercent[level] + 
                                     ( modi_penalties ? total_wounds : 0 ) +
                                     ( modi_armor_penalties ? total_armor_penalties: 0 ) +
                                     custom_penalty
                                 );
-        let rtl = reftab.length;
-        let final_test_level = (final_test_penalty <= reftab[0] ? 0 : (final_test_penalty>=rtl ? reftab[rtl-1] : reftab[final_test_penalty]));
+        let final_test_level = 0;
+        while( final_test_penalty > lastPassingPercent[final_test_level] ) {
+            final_test_level++;
+            if(final_test_level > 6 ) {
+                final_test_level = 6;
+                break;
+            }
+        }
         let final_test_level_label = levelLabels[final_test_level];
         setAttrs({                            
             "final_test_level": final_test_level,

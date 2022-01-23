@@ -312,7 +312,7 @@
                     <tr>
                         <td class="label">
                             <h5>Fart</h5>
-                            <h6>121 - 160 %  -15</h6>
+                            <h6>121 - ... %  -15</h6>
                         </td>
                         <td>
                             <input class="wsp-star-control" type="hidden" name="attr_zr_df_6" value="0">
@@ -515,26 +515,27 @@
     <input type="hidden" name="attr_final_test_level" value="0">
     <div class="params-holder">
         <div class="sheet-radios">
-            <input type="hidden" class="sheet-radio" name="attr_level" value="1" />
-            <button type="action" name="act_level_1" class="sheet-radio sheet-radio-1">
+            <input type="hidden" class="sheet-radio-selected" name="attr_final_test_level" value="0" />
+            <input type="hidden" class="sheet-radio" name="attr_level" value="0" />
+            <button type="action" name="act_level_0" class="sheet-radio sheet-radio-selected sheet-radio-0">
                 <span class="sheet-checked">Łatwy</span>
             </button>
-            <button type="action" name="act_level_2" class="sheet-radio sheet-radio-2">
+            <button type="action" name="act_level_1" class="sheet-radio sheet-radio-selected sheet-radio-1">
                 <span class="sheet-checked">Przeciętny</span>
             </button>
-            <button type="action" name="act_level_3" class="sheet-radio sheet-radio-3">
+            <button type="action" name="act_level_2" class="sheet-radio sheet-radio-selected sheet-radio-2">
                 <span class="sheet-checked">Problematyczny</span>
             </button>
-            <button type="action" name="act_level_4" class="sheet-radio sheet-radio-4">
+            <button type="action" name="act_level_3" class="sheet-radio sheet-radio-selected sheet-radio-3">
                 <span class="sheet-checked">Trudny</span>
             </button>
-            <button type="action" name="act_level_5" class="sheet-radio sheet-radio-5">
+            <button type="action" name="act_level_4" class="sheet-radio sheet-radio-selected sheet-radio-4">
                 <span class="sheet-checked">Bardzo Trudny</span>
             </button>
-            <button type="action" name="act_level_6" class="sheet-radio sheet-radio-6">
+            <button type="action" name="act_level_5" class="sheet-radio sheet-radio-selected sheet-radio-5">
                 <span class="sheet-checked">Cholernie Trudny</span>
             </button>
-            <button type="action" name="act_level_7" class="sheet-radio sheet-radio-7">
+            <button type="action" name="act_level_6" class="sheet-radio sheet-radio-selected sheet-radio-6">
                 <span class="sheet-checked">Fart</span>
             </button>
         </div>
@@ -2036,9 +2037,9 @@ on("change:zrecznosc_base change:mod_zrecznosc change:percepcja_base change:mod_
 /******************************************************************/
 /******************************************************************/
 /************************** ROLL PARAMETERS ***********************/
-const lastPassingPercent = [0,10,30,60,90,120,160,9999];
-const reftab = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, ];
-const levelRadioValues = ["1","2","3","4","5","6","7"];
+const startingPercent = [-20, 0, 11, 31, 61, 91, 121]
+const lastPassingPercent = [-1,10,30,60,90,120,99999];
+const levelRadioValues = ["0","1","2","3","4","5","6"];
 const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Bardzo Trudny", "Cholernie Trudny", "Fart"];
   levelRadioValues.forEach(function(value) {
     on(`clicked:level_${value}`, function() {
@@ -2051,7 +2052,7 @@ const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Bardz
 on("change:level change:modi_battle change:modi_open change:modi_penalties change:total_wounds change:modi_armor_penalties change:total_armor_penalties change:custom_penalty", function() {  
     getAttrs([	"level", "modi_battle","modi_open", "modi_penalties","total_wounds", 
     "modi_armor_penalties","total_armor_penalties", "custom_penalty"], function(values) {
-        let level = ((parseInt(values.level)-1)||0);
+        let level = ((parseInt(values.level))||0);
         let modi_battle = (parseInt(values.modi_battle)||0);
         let modi_open = (parseInt(values.modi_open)||0);
         let modi_penalties = (parseInt(values.modi_penalties)||0);
@@ -2060,13 +2061,19 @@ on("change:level change:modi_battle change:modi_open change:modi_penalties chang
         let total_armor_penalties = (parseInt(values.total_armor_penalties)||0);
         let custom_penalty = (parseInt(values.custom_penalty)||0);
 
-        let final_test_penalty =(   lastPassingPercent[level] + 
+        let final_test_penalty =(   startingPercent[level] + 
                                     ( modi_penalties ? total_wounds : 0 ) +
                                     ( modi_armor_penalties ? total_armor_penalties: 0 ) +
                                     custom_penalty
                                 );
-        let rtl = reftab.length;
-        let final_test_level = (final_test_penalty <= reftab[0] ? 0 : (final_test_penalty>=rtl ? reftab[rtl-1] : reftab[final_test_penalty]));
+        let final_test_level = 0;
+        while( final_test_penalty > lastPassingPercent[final_test_level] ) {
+            final_test_level++;
+            if(final_test_level > 6 ) {
+                final_test_level = 6;
+                break;
+            }
+        }
         let final_test_level_label = levelLabels[final_test_level];
         setAttrs({                            
             "final_test_level": final_test_level,
