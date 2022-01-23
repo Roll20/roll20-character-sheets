@@ -279,7 +279,7 @@ const stats2wsp = {
     "zwinne_dlonie" : "zrecznosc",
     "otwieranie_zamkow" : "zrecznosc"
 };
- on('clicked:test', (info) => {
+ on('clicked:test_bijatyka', (info) => {
         startRoll("&{template:test} {{base_wsp_name=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=bijatyki}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}", (results) => {
             getAttrs(["final_test_level", "bijatyka"], function(values) {
                 let skill_name = "bijatyka"   
@@ -315,35 +315,40 @@ const stats2wsp = {
 
                 // Successes and failures
                 let statbase = 10;
-                let dice_style = [0,1,2,3];
+                let dice_style = [0,0,0];
+                let vals_s = vals.concat();
+                let vals_i = [-1,-1,-1];
                 const difficulties = [-2,0,2,5,8,11,15];
                 
-                let statreq = statbase - difficulties[final_test_level];
+                let statreq = statbase + difficulties[final_test_level];
                 let succ = 0;
                 for (x=0; x<3; ++x) {
-                    if(vals[x] <= statreq) {
+                    if(vals_s[x] <= statreq) {
                         succ += 1;
+                        dice_style[x] = 0;
                     } else {
-                        if ( vals[x] + skill_remaining <= statreq ) {
-                            skill_remaining -= (statreq - vals[x]);
+                        if ( vals_s[x] + skill_remaining <= statreq ) {
+                            skill_remaining -= (statreq - vals_s[x]);
                             succ += 1;
                             dice_style[x] = 1;
                         } else if ( skill_remaining ){
                             skill_remaining = 0;
                             dice_style[x] = 2;
-                        } else {
-                            dice_style[x] = 3;
                         }
                     }
+                }
+                let dice_unsort = [0,0,0];
+                for(x=0; x<3; ++x) {
+                    dice_unsort[x] = dice_style[vals_i[x]];
                 }
                 
 
                 finishRoll(
                     results.rollId,
                     {
-                        roll1: dice_style[0],
-                        roll2: dice_style[1],
-                        roll3: dice_style[2],
+                        roll1: dice_unsort[0] ,
+                        roll2: dice_unsort[1] ,
+                        roll3: dice_unsort[2] ,
                         finaldifficulty: final_test_level,
                         successes : succ,
                         base_wsp_name : skill_wsp_name
