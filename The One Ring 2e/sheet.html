@@ -225,7 +225,8 @@
                     parsed and calculated, with output displayed in a rolltemplate. This removes the need for roll
                     tables. </div>
                 <span class="toggle">
-                    <input type="checkbox" name="attr_parsedrolls" value="1" selected id="config_parsedrolls" />
+                    <input type="checkbox" name="attr_parsedrolls" value="1" checked="checked"
+                        id="config_parsedrolls" />
                     &nbsp;
                     <input type="checkbox" name="attr_parsedrolls" value="0" id="config_tablerolls" />
                 </span>
@@ -887,7 +888,7 @@
                 parsed and calculated, with output displayed in a rolltemplate. This removes the need for roll
                 tables. </div>
             <span class="toggle">
-                <input type="checkbox" name="attr_parsedrolls" value="1" selected id="config_parsedrolls" />
+                <input type="checkbox" name="attr_parsedrolls" value="1" checked="checked" id="config_parsedrolls" />
                 &nbsp;
                 <input type="checkbox" name="attr_parsedrolls" value="0" id="config_tablerolls" />
             </span>
@@ -956,7 +957,7 @@
             <button type="roll" class="table-rolls crosshair" name="roll_adv_weapon1_roll2_check"
                 value="@{adv_weapon1_roll2}"></button> -->
             <button type="roll" class="table-rolls crosshair"
-                value="/me attacks @{target|name} against parry @{target|totalparry}.\n/roll 1t[lm-feat] + [[(@{weapon_rating_1}+?{Bonus Dice|0})]]t[normal]"
+                value="/me attacks @{target|name} against parry @{target|totalparry}.\n/roll 1t[lm-feat] + [[(@{weapon_rating_1}+?{Bonus Dice|0}+@{target|stanceattackbonus})]]t[normal]"
                 name="roll_weapon1_target"></button>
             <span class="parsed-rolls">
                 <button type="action" name="act_adv_weapon1" id="roll_adv_weapon1" class="parsed-rolls"
@@ -981,7 +982,7 @@
             <button type="roll" class="table-rolls crosshair" name="roll_adv_weapon2_roll2_check" 
                 value="@{adv_weapon2_roll2}"></button>-->
             <button type="roll" class="table-rolls crosshair"
-                value="/me attacks @{target|name} against parry @{target|totalparry}.\n/roll 1t[lm-feat] + [[(@{weapon_rating_2}+?{Bonus Dice|0})]]t[normal]"
+                value="/me attacks @{target|name} against parry @{target|totalparry}.\n/roll 1t[lm-feat] + [[(@{weapon_rating_2}+?{Bonus Dice|0}+@{target|stanceattackbonus})]]t[normal]"
                 name="roll_weapon2_target"></button>
             <span class="parsed-rolls">
                 <button type="action" name="act_adv_weapon2" id="roll_adv_weapon2" class="parsed-rolls"
@@ -1181,10 +1182,13 @@
 			}            
         } else if ( rolltype.startsWith("combat") ) {
             favId = favourill_id;
+            stanceattackmodStr = "0"
             if ( rolltype.includes("target") ) {
 				//parrymod = await getQuery(`?{Parry rating|@{target|parry}}`);
                 if (lm){
                     parrymodStr = "{{parrymod= [[@{target|totalparry}]]}}";
+                    // we include targets stance modifier
+                    stanceattackmodStr = "@{target|stanceattackbonus}";
                 } else {
 				    parrymodStr = "{{parrymod= [[@{target|parry}]]}}";
                 }
@@ -1243,7 +1247,7 @@
         // SUCCESS DICE ROLL DATA
         successdice = int(dice) + int(modifiers); 
         successdice = successdice < 0 ? 0 : successdice;
-        successStr = `${successdice}d6${closefitStr}`;
+        successStr = `[[${successdice}+${stanceattackmodStr}]]d6${closefitStr}`;
 
         // WEAPON INFO & ADDITIONAL INFO
         // Weapon info
