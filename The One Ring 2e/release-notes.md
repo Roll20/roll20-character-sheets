@@ -3,6 +3,11 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 ## 02.01.00 (Build 5)
+### Features
+- changed stance values from "Forward/Open/Defensive/Rearward" to "1/2/3/4" because this opens the way for players to easily toggle stance by using the token bar
+- stance changes toggle the stance attack bonus automatically (forward:1/open:0/defensive:-1/rearward:0). The checkbox now only effects the attack damage bonus and is automatically activated when in forward stance (this can be used for Beorning with GREAT STRENGTH virtue to get +1 damage bonus in forward stance). 
+### Bugfixes
+- CM checkbox not clickable (armour with cunning make), https://trello.com/c/lM1rrRA9
 
 ## 02.00.01 (Build 4)
 - rename Advancement Points -> Adventure Points
