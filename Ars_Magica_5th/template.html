@@ -44,6 +44,20 @@ $$alert(
     <b>Note:</b> The script is run each time you open your character sheet, as long as this banner is visible. If it completes normally, it will hide this banner before you can see it.""",
     ID="161-spell-update"
 )$$
+$$alert(
+    "January 2020 v1.7 - Magic update",
+    markdown.markdown(
+        """-Added Welcome message to the "Sheet" tab, and made that tab the default
+- Added tooltips to some elements of the sheet to provide info about them (e.g. XP fields)
+- Repeated items (such as items, abilities, spells...) start expanded for easier completion.
+- Added a toggle to hide  elements of the sheet that are specific to Magi (see Sheet tab)
+- Added deficiency toggles that halves casting totals
+- Added a roll button for non-fatiguing spontaneous casting
+- Separated the Artes Liberales and Philosophia fields of ceremonial and ritual casting to accomodate specialisation in either
+- Added Soak computations including Form bonuses
+- Added list for useful spontaneous spells in the "Spells" tab"""),
+        level="info"
+)$$
 
 <div class="top_bar">
     <div>
@@ -92,19 +106,20 @@ $$alert(
 </div>
 
 <div class="tab-br"></div>
-<input type="hidden" class="tabstoggle" name="attr_sheetTab" value="character"/>
+<input type="hidden" class="tabstoggle" name="attr_sheetTab" value="sheet"/>
 <input type="hidden" name="attr_simple-die" value="(1d10cs0cf0) [@{simple-die_i18n}]"/>
 <input type="hidden" name="attr_stress-die" value="ceil(((((1d10cs1cf10 %9) -1)+9) %9) *1.1) [@{stress-die_i18n}]"/>
 <input type="hidden" class="dtype-selector" name="attr_die-type-selection-proxy" value="toggle"/>
 <input type="hidden" class="selected-die" name="attr_selected-die" value="simple"/>
+<input type="hidden" class="toggle-magi" name="attr_isMagi" value="yes" />
 <div class="buttonbar">
     <div class="navbuttons">
         <button type="action" name="act_character" class="tabbutton" data-i18n="character" >Character</button>
         <button type="action" name="act_abilities" class="tabbutton" data-i18n="abilities" >Abilities</button>
-        <button type="action" name="act_magic" class="tabbutton" data-i18n="magic" >Magic</button>
+        <button type="action" name="act_magic" class="tabbutton magi-only" data-i18n="magic" >Magic</button>
         <button type="action" name="act_combat" class="tabbutton" data-i18n="combat" >Combat</button>
-        <button type="action" name="act_spells" class="tabbutton" data-i18n="spells" >Spells</button>
-        <button type="action" name="act_help" class="tabbutton" data-i18n="help">Help</button>
+        <button type="action" name="act_spells" class="tabbutton magi-only" data-i18n="spells" >Spells</button>
+        <button type="action" name="act_sheet" class="tabbutton" data-i18n="sheet" style="margin-left: 10px;">Sheet</button>
     </div>
     <div class="tabblank"></div>
     <div class="functions">
@@ -112,11 +127,11 @@ $$alert(
         <button type="action" name="act_die-toggle-stress" class="die-toggle-stress" data-i18n="stress">Stress</button>
         <button type="roll" class="reroll" name="roll_reroll" title="Reroll" value="&{template:reroll} {{roll= [[1d10cs0cf0]]}}" data-i18n="roll">Roll</button>
         <button type="roll" class="botch" name="roll_botch" title="Botch" value="@{botch_formula}" data-i18n="botch" >Botch</button>
-        <button type="roll" class="critical" name="roll_critical" title="Critical" value="&{template:critical} {{roll=[[?{@{total_i18n}|0}[@{total_i18n}] + (2*2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die]]]}}" data-i18n="critical">Critical</button>
+        <button type="roll" class="critical" name="roll_critical" title="Critical" value="&{template:critical} {{roll=[[?{@{total_i18n}|0} [@{total_i18n}] + (2*2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die]]]}}" data-i18n="critical">Critical</button>
         <!-- Invisible critical button with a divide by 2, for spontaneous criticals -->
-        <button type="roll" class="critical" name="roll_critical-spontaneous" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0}[@{total_i18n}] + (2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die]]]}} {{type=@{spontaneous_i18n}}}" />
-        <!-- Invisible critical button for initiative that adds to turn tracker -->
-        <button type="roll" class="critical" name="roll_critical-init" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0}[@{total_i18n}] + (2*2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die] &{tracker}]]}} {{type=@{initiative_i18n}}}" />
+        <button type="roll" class="critical" name="roll_critical-spontaneous" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0} [@{total_i18n}] + (2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die]]]}} {{type=@{spontaneous_i18n}}}" />
+        <!-- Invisible critical button for initiative critical that adds to turn tracker -->
+        <button type="roll" class="critical" name="roll_critical-init" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0} [@{total_i18n}] + (2*2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die] &{tracker}]]}} {{type=@{initiative_i18n}}}" />
     </div>
 </div>
 <div class="tab-br"></div> 
@@ -124,6 +139,7 @@ $$alert(
 <!-- 1 Details -->
 <div class="tab-content tab1">
     <div>
+        <!-- Genera Information -->
         <div class='2colrow'>
         <div class='col'>
                 <div>
@@ -228,8 +244,8 @@ $$alert(
             </div>
         </div>
     </div>
-
-    <div>
+    <!-- Magus background -->
+    <div class="magi-only">
         <h4 class="heading_label" style="margin-bottom:0px;" data-i18n="magus-background" >Magus Background</h4>
         <div class='2colrow' style="border:1px solid black;">
             <div class='col'>
@@ -274,6 +290,7 @@ $$alert(
         </div>
     </div>
     <br>
+    <!-- Virtues & Flaws -->
     <div>
         <div class='2colrow'>
             <div class='col'>
@@ -331,6 +348,7 @@ $$alert(
         </div>
     </div>
     <br>
+    <!-- Personnality traits & Reputations -->
     <div>
         <div class='2colrow'>
             <div class='col'>
@@ -357,6 +375,7 @@ $$alert(
             </div>
         </div>
     </div>
+    <!-- Inventory -->
     <div>
         <h4 class="heading_label" data-i18n="inventory" >Inventory</h4>
         <table class="table_2" style="width:830px">
@@ -391,6 +410,7 @@ $$alert(
     <div>
         <div class='2colrow' style="margin-top:10px;">
             <div class='col'>
+                <!-- Characteristics -->
                 <div>
                     <h4 class="heading_label" data-i18n="characteristics" >Characteristics</h4>
                     <table class="table_2" style="border:0px">
@@ -401,9 +421,13 @@ $$alert(
                             <td data-i18n="aging" >Aging</td>
                             <td data-i18n="bonus" >Bonus</td>
                         </tr>
-                        $$characteristic_rows$$
+                        $$mental_characteristic_rows$$
+                        <tr><td colspan="5" style="padding-top: 15px ;margin-bottom: 5px;border-bottom: black 1px solid;"></td></tr>
+                        <tr><td colspan="5" style="padding-bottom: 13px"></td></tr>
+                        $$physical_characteristic_rows$$
                     </table>
                 </div>
+                <!-- Aging -->
                 <div>
                     <table class="table_2" style="border-width: 0px;">
                         <tr>
@@ -415,13 +439,24 @@ $$alert(
                         </tr>
                     </table>
                 </div>
+                <!-- Effects -->
                 <div>
                     <h4 class="heading_label" style="margin-bottom: 0px;" data-i18n="ongoing-effects" >Ongoing Effects</h4>
                     <textarea class="textarea_2" name="attr_Longevity_Scars"></textarea>
                 </div>
             </div>
+            <!-- Abilities -->
             <div class='col'>
-                <h4 class="heading_label" data-i18n="abilities" >Abilities</h4>
+                <h4 class="heading_label" data-i18n="abilities" style="margin-bottom: 15px;">Abilities</h4>
+                <div>
+                    <span class="has-tooltip">
+                        <span data-i18n="characteristic" style="font-family: 'Macondo', cursive; color: #663333; font-size: 1.3em;">Characteristic</span>
+                        <span class="tooltip">Default characteristic to use. Can be overriden per ability.</span>
+                    </span>
+                    <select class="select_1" name="attr_global_Ability_CharacName">
+                        $$characteristic_name_options$$
+                    </select>
+                </div>
                 <table class="table_2" style="width:400px;">
                     <tr>
                         <td><div style="width:40px;"></div></td>
@@ -433,7 +468,7 @@ $$alert(
                 <fieldset class="repeating_ability">
                     <table class="table_2" style="width:400px;">
                         <tr>
-                            <td width="30px"><div class="flex-container">
+                            <td width="30px"><div class="flex-container-center">
                                 <button type="roll" class="button simple-roll" name="roll_ability_simple" value="$$ability_roll_simple$$"></button>
                                 <button type="roll" class="button stress-roll" name="roll_ability_stress" value="$$ability_roll_stress$$"></button>
                             </div></td>
@@ -443,10 +478,15 @@ $$alert(
                         </tr>
                     </table>
                     <input type="checkbox" class="hider hidden" value="1" name="attr_Ability_show" checked/>
-                    <div class="hide">
-                        <table class="table_2" style="width:400px;">
+                    <div class="hide" style="margin-bottom: 15px;">
+                        <table class="table_2" style="width:400px">
                             <tr>
-                                <th data-i18n="characteristic" >Characteristic</th>
+                                <th style="padding-bottom: 2px;">
+                                    <span class="has-tooltip">
+                                        <span data-i18n="characteristic">Characteristic</span>
+                                        <span class="tooltip">Select the caracteristic to use. Overrides the gobal selector. "-Characteristic-" uses the global selector, "-Ask-" triggers a roll query (pop-up) for each roll.</span>
+                                    </span>
+                                </th>
                                 <th data-i18n="speciality" >Speciality</th>
                                 <th data-i18n="score" >Score</th>
                                 <th data-i18n="bonus" >Bonus</th>
@@ -454,8 +494,8 @@ $$alert(
                             <tr>
                                 <td>
                                     <select class="select_1" name="attr_Ability_CharacName">
-                                        <option class="italic" value="unselected" data-i18n="characteristic" >Characteristic</option>
-                                        <option class="italic" value="ask" data-i18n="ask" >Ask</option>                                        
+                                        <option class="italic" value="global_char" data-i18n="characteristic-choice" >-Characteristic-</option>
+                                        <option class="italic" value="ask" data-i18n="ask" >-Ask-</option>
                                         $$characteristic_name_options$$
                                     </select>
                                 </td>
@@ -464,7 +504,7 @@ $$alert(
                                 <td><input type="text" class="number_2" name="attr_Ability_Puissant" value="0"/><span></span></td>
                             </tr>
                             <tr>
-                                <th colspan="2">XP $$xp("Ability")$$</th>
+                                <th colspan="2"><span class="flex-container-left">XP $$xp("Ability")$$</span></th>
                                 <td colspan="2"><span data-i18n="accelerated-">Accelerated</span> <input type="hidden" value="5" name="attr_AcceleratedCheck"><input type="checkbox" class="check" value="1" name="attr_AcceleratedCheck"></td>
                             </tr>
                         </table>
@@ -477,6 +517,7 @@ $$alert(
 
 <!-- 3 Magic -->
 <div class="tab-content tab3">
+    <!-- Techniques & Forms -->
     <div>
         <div class="3colrow" style="margin-top:10px;">
             <div class='col' style="margin-right: 20px">
@@ -518,6 +559,7 @@ $$alert(
         </div>
     </div>
     <div class="divider" style="height:15px;"><span>&nbsp;</span></div>
+    <!-- Casting totals -->
     <div>
         <h4 class="heading_label" data-i18n="base-casting-totals" >Base Casting Totals</h4>
         <table class="table_3" style="width:100%;">
@@ -528,18 +570,20 @@ $$alert(
                 <th data-i18n="technique" >Technique</th>
                 <th data-i18n="form" >Form</th>
                 <th data-i18n="focus" >Focus</th>
+                <th data-i18n="deficiency" >Deficiency</th>
                 <th data-i18n="sta" >Sta</th>
                 <th data-i18n="aura" >Aura</th>
                 <th data-i18n="artes-lib-" >Artes Lib.</th>
                 <th data-i18n="philos-" >Philos.</th>
             </tr>
+            <!-- Fatiguing Spontaneous -->
             <tr>
                 <td data-i18n="fatiguing" >Fatiguing</td>
-                <td><div class="flex-container">
-                    <!-- <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Spontaneous1_simple" value="$$spontaneous_roll_simple$$"></button> -->
+                <td><div class="flex-container-center">
+                    <!-- <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Spontaneous1_simple" value="$spontaneous_roll_simple$"></button> -->
                     <button style="margin: 0px auto;" type="roll" class="button stress-roll single-roll" name="roll_Spontaneous1_stress" value="$$spontaneous_roll_stress$$"></button>
                 </div></td>
-                <td><input type="number" class="number_2" name="attr_Spontaneous1" value="(@{Spontaneous1_Technique} + @{Spontaneous1_Form} + (@{Spontaneous1_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura})/2" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Spontaneous1" value="((@{Spontaneous1_Technique} + @{Spontaneous1_Form} + (@{Spontaneous1_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura})/2) / (1 + (@{Spontaneous1_Deficiency}))" disabled="true"/></td>
                 <td>
                     <select class="select_1" name="attr_Spontaneous1_Technique">
                         <option class="italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
@@ -552,19 +596,21 @@ $$alert(
                         $$form_score_options$$
                     </select>
                 </td>
-                <td><input type="checkbox" class="check" name="attr_Spontaneous1_Focus" value="((@{Spontaneous1_Technique} + @{Spontaneous1_Form} - abs(@{Spontaneous1_Technique} - @{Spontaneous1_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Spontaneous1_Focus" value="((@{Spontaneous1_Technique} + @{Spontaneous1_Form} - abs(@{Spontaneous1_Technique} - @{Spontaneous1_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Spontaneous1_Deficiency" value="1"></input></td>
                 <td><input type="number" class="number_2" name="attr_Spontaneous1_Sta" value="@{Stamina_Score}" disabled="true"/></td>
                 <td><input type="number" class="number_2" name="attr_Spontaneous1_aura" value="@{aura}" disabled="true"/></td>
                 <td></td>
                 <td></td>
             </tr>
+            <!-- Ceremonial Spontaneous -->
             <tr>
                 <td data-i18n="ceremonial" >Ceremonial</td>
-                <td><div class="flex-container">
-                    <!-- <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Ceremonial_simple" value="$$ceremonial_roll_simple$$"></button> -->
+                <td><div class="flex-container-center">
+                    <!-- <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Ceremonial_simple" value="$ceremonial_roll_simple$"></button> -->
                     <button style="margin: 0px auto;" type="roll" class="button stress-roll single-roll" name="roll_Ceremonial_stress" value="$$ceremonial_roll_stress$$"></button>
                 </div></td>
-                <td><input type="number" class="number_2" name="attr_Ceremonial" value="(@{Ceremonial_Technique} + @{Ceremonial_Form} + (@{Ceremonial_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura} + @{Ceremonial_Artes_Lib} + @{Ceremonial_Philos})/2" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Ceremonial" value="((@{Ceremonial_Technique} + @{Ceremonial_Form} + (@{Ceremonial_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura} + @{Ceremonial_Artes_Lib} + @{Ceremonial_Philos})/2 ) / (1 + (@{Ceremonial_Deficiency}))" disabled="true"/></td>
                 <td>
                     <select class="select_1" name="attr_Ceremonial_Technique">
                         <option class="italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
@@ -577,18 +623,21 @@ $$alert(
                         $$form_score_options$$
                     </select>
                 </td>
-                <td><input type="checkbox" class="check" name="attr_Ceremonial_Focus" value="((@{Ceremonial_Technique} + @{Ceremonial_Form} - abs(@{Ceremonial_Technique} - @{Ceremonial_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Ceremonial_Focus" value="((@{Ceremonial_Technique} + @{Ceremonial_Form} - abs(@{Ceremonial_Technique} - @{Ceremonial_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Ceremonial_Deficiency" value="1"></input></td>
                 <td><input type="number" class="number_2" name="attr_Ceremonial_Sta" value="@{Stamina_Score}" disabled="true"/></td>
                 <td><input type="number" class="number_2" name="attr_Ceremonial_aura" value="@{aura}" disabled="true"/></td>
                 <td><input type="number" class="number_2" name="attr_Ceremonial_Artes_Lib" value="0"/></td>
                 <td><input type="number" class="number_2" name="attr_Ceremonial_Philos" value="0"/></td>
 
             </tr>
-
+            <!-- Non Fatiguing Spontaneous -->
             <tr>
                 <td data-i18n="non-fatiguing" >Non-Fatiguing</td>
-                <td></td>
-                <td><input type="number" class="number_2" name="attr_Spontaneous2" value="(@{Spontaneous2_Technique} + @{Spontaneous2_Form} + (@{Spontaneous2_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura})/5" disabled="true"/></td>
+                <td><div class="flex-container-center">
+                    <button style="margin: 0px auto;" type="roll" class="button simple-roll single-roll" name="roll_Spontaneous2_nodice" value="$$spontaneous_nodice$$"></button>
+                </div></td>
+                <td><input type="number" class="number_2" name="attr_Spontaneous2" value="((@{Spontaneous2_Technique} + @{Spontaneous2_Form} + (@{Spontaneous2_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura})/5) / (1 + (@{Spontaneous2_Deficiency}))" disabled="true"/></td>
                 <td>
                     <select class="select_1" name="attr_Spontaneous2_Technique">
                         <option class="italic" value="0" data-i18n="technique" >Technique</option>
@@ -601,7 +650,8 @@ $$alert(
                         $$form_score_options$$
                     </select>
                 </td>
-                <td><input type="checkbox" class="check" name="attr_Spontaneous2_Focus" value="((@{Spontaneous2_Technique} + @{Spontaneous2_Form} - abs(@{Spontaneous2_Technique} - @{Spontaneous2_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Spontaneous2_Focus" value="((@{Spontaneous2_Technique} + @{Spontaneous2_Form} - abs(@{Spontaneous2_Technique} - @{Spontaneous2_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Spontaneous2_Deficiency" value="1"></input></td>
                 <td><input type="number" class="number_2" name="attr_Spontaneous2_Sta" value="@{Stamina_Score}" disabled="true"/></td>
                 <td><input type="number" class="number_2" name="attr_Spontaneous2_aura" value="@{aura}" disabled="true"/></td>
                 <td></td>
@@ -611,13 +661,14 @@ $$alert(
                 <th data-i18n="designed-spells" >Designed Spells</th>
                 <td colspan="9"></td>
             </tr>
+            <!-- Formulaic -->
             <tr>
                 <td data-i18n="formulaic" >Formulaic</td>
-                <td><div class="flex-container">
+                <td><div class="flex-container-center">
                     <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Formulaic_simple" value="$$formulaic_roll_simple$$"></button>
                     <button style="margin: 0px auto;" type="roll" class="button stress-roll" name="roll_Formulaic_stress" value="$$formulaic_roll_stress$$"></button>
                 </div></td>
-                <td><input type="number" class="number_2" name="attr_Formulaic" value="@{Formulaic_Technique} + @{Formulaic_Form} + (@{Formulaic_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura}" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Formulaic" value="(@{Formulaic_Technique} + @{Formulaic_Form} + (@{Formulaic_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura}) / (1 + (@{Formulaic_Deficiency}))" disabled="true"/></td>
                 <td>
                     <select class="select_1" name="attr_Formulaic_Technique">
                         <option class="italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
@@ -630,19 +681,21 @@ $$alert(
                         $$form_score_options$$
                     </select>
                 </td>
-                <td><input type="checkbox" class="check" name="attr_Formulaic_Focus" value="((@{Formulaic_Technique} + @{Formulaic_Form} - abs(@{Formulaic_Technique} - @{Formulaic_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Formulaic_Focus" value="((@{Formulaic_Technique} + @{Formulaic_Form} - abs(@{Formulaic_Technique} - @{Formulaic_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Formulaic_Deficiency" value="1"></input></td>
                 <td><input type="number" class="number_2" name="attr_Formulaic_Sta" value="@{Stamina_Score}" disabled="true"/></td>
                 <td><input type="number" class="number_2" name="attr_Formulaic_aura" value="@{aura}" disabled="true"/></td>
                 <td></td>
                 <td></td>
             </tr>
+            <!-- Ritual -->
             <tr>
                 <td data-i18n="ritual" >Ritual</td>
-                <td><div class="flex-container">
+                <td><div class="flex-container-center">
                     <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Ritual_simple" value="$$ritual_roll_simple$$"></button>
                     <button style="margin: 0px auto;" type="roll" class="button stress-roll" name="roll_Ritual_stress" value="$$ritual_roll_stress$$"></button>
                 </div></td>
-                <td><input type="number" class="number_2" name="attr_Ritual" value="@{Ritual_Technique} + @{Ritual_Form} + (@{Ritual_Focus}) + @{Stamina_Score} + @{aura} + @{Ritual_Artes_Lib} + @{Ritual_Philos}" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Ritual" value="(@{Ritual_Technique} + @{Ritual_Form} + (@{Ritual_Focus}) + @{Stamina_Score} + @{aura} + @{Ritual_Artes_Lib} + @{Ritual_Philos}) / (1 + (@{Ritual_Deficiency}))" disabled="true"/></td>
                 <td>
                     <select class="select_1" name="attr_Ritual_Technique">
                         <option class="italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
@@ -655,11 +708,12 @@ $$alert(
                         $$form_score_options$$
                     </select>
                 </td>
-                <td><input type="checkbox" class="check" name="attr_Ritual_Focus" value="((@{Ritual_Technique} + @{Ritual_Form} - abs(@{Ritual_Technique} - @{Ritual_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Ritual_Focus" value="((@{Ritual_Technique} + @{Ritual_Form} - abs(@{Ritual_Technique} - @{Ritual_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Ritual_Deficiency" value="1"></input></td>
                 <td><input type="number" class="number_2" name="attr_Ritual_Sta" value="@{Stamina_Score}" disabled="true"/></td>
                 <td><input type="number" class="number_2" name="attr_Ritual_aura" value="@{aura}" disabled="true"/></td>
-                <td><input type="number" class="number_2" name="attr_Ritual_Artes_Lib" value="@{Ceremonial_Artes_Lib}" disabled="true"/></td>
-                <td><input type="number" class="number_2" name="attr_Ritual_Philos" value="@{Ceremonial_Philos}" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Ritual_Artes_Lib" value="0"/></td>
+                <td><input type="number" class="number_2" name="attr_Ritual_Philos" value="0"/></td>
             </tr>
             <tr></tr>
             <tr>
@@ -693,6 +747,7 @@ $$alert(
     </div>
     <br>
     <div class="divider" style="height:15px;"><span>&nbsp;</span></div>
+    <!-- Laboratory -->
     <div>
         <div class='2colrow'>
             <div class='col'>
@@ -802,7 +857,7 @@ $$alert(
                             <th colspan="2" data-i18n="basic-lab-total" >Basic Lab Total</th>
                             <td><div style="width:60px;"><input type="number" class="number_2" name="attr_Lab" value="@{Intelligence_Score} + @{Lab_Theory} + @{aura} + @{lab_Technique} + @{lab_Form} + (@{Lab_Focus}) + @{LabModifiers} + @{labbonus_total} + @{LabGeneralQuality_Score}" disabled="true"/></div></td>
                             <td colspan="2">
-                                <div class="flex-container_2">
+                                <div class="flex-container-between">
                                     <span>
                                         <input type="checkbox" class="check" name="attr_Lab_Focus" value="((@{lab_Technique} + @{lab_Form} - abs((@{lab_Technique}) - (@{lab_Form}))) /2)"/>
                                         <span data-i18n="focus">Focus</span>
@@ -946,7 +1001,7 @@ $$alert(
                 <tr>
                     <td data-i18n="light-wounds" >Light Wounds</td>
                     <td><input type="text" class="heading_3" name="attr_Wounds_Light_range"/></td>
-                    <td><div class="flex-container">
+                    <td><div class="flex-container-center">
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light1" value="-1"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light2" value="-1"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light3" value="-1"><span></span>
@@ -958,7 +1013,7 @@ $$alert(
                 <tr>
                     <td data-i18n="medium-wounds" >Medium Wounds</td>
                     <td><input type="text" class="heading_3" name="attr_Wounds_Medium_range"/></td>
-                    <td><div class="flex-container">
+                    <td><div class="flex-container-center">
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium1" value="-3"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium2" value="-3"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium3" value="-3"><span></span>
@@ -970,7 +1025,7 @@ $$alert(
                 <tr>
                     <td data-i18n="heavy-wounds" >Heavy Wounds</td>
                     <td><input type="text" class="heading_3" name="attr_Wounds_Heavy_range"/></td>
-                    <td><div class="flex-container">
+                    <td><div class="flex-container-center">
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy1" value="-5"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy2" value="-5"><span></span>
                         <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy3" value="-5"><span></span>
@@ -1010,12 +1065,14 @@ $$alert(
             </tr>
         </table>
     </div>
-    <div>
+    <!-- Soak -->
+    <div style="padding-bottom: 15px;" >
+        <h4 class="heading_label" data-i18n="soak" >Soak</h4>
         <table class="table_2" style="width:380px">
             <tr>
                 <td></td>
                 <th data-i18n="soak">Soak</th>
-                <th data-i18n="soak-bonus">Soak Bonus</th>
+                <th data-i18n="bonus">Bonus</th>
                 <th data-i18n="armor-protection" >Armor Protection</th>
                 <th data-i18n="armor-load" >Armor Load</th>
                 <td></td>
@@ -1030,6 +1087,12 @@ $$alert(
                 <th colspan="2"><input type="number" class="number_2" name="attr_armor_load" value="0"/></th>
             </tr>
         </table>
+        <div class="magi-only">
+            <h4 class="heading_label" style="margin-bottom:0px;" data-i18n="soak-forms" >Soak by Forms</h4>
+            <div class='artgrid' style="border:1px solid black">
+                $$soak_by_forms$$
+            </div>
+        </div>
     </div>
     <!--    Weapons -->
     <div>
@@ -1154,6 +1217,7 @@ $$alert(
 
 <!-- 5  Spells -->
 <div class="tab-content tab5">
+    <!-- Bonuses -->
     <h4 class="heading_label" style="margin-top:10px;" data-i18n="bonus" >Bonus</h4>
     <table class="table_3" style="width:400px;">
         <tr></tr>
@@ -1181,11 +1245,12 @@ $$alert(
             <td></td>
         </tr>
     </table>
-    <h4 class="heading_label" style="margin-top:10px;" data-i18n="spells" >Spells</h4>
+    <!-- Formulaic spells -->
+    <h4 class="heading_label" style="margin-top:10px;" data-i18n="formulaic-spells" >Formulaic spells</h4>
     <fieldset class="repeating_spell">
         <table style="margin-top:10px;">
             <tr>
-                <th style="padding-left:10px;"><div class="flex-container">
+                <th style="padding-left:10px;"><div class="flex-container-center">
                     <button type="roll" class="button simple-roll" name="roll_spell_simple" value="$$spell_roll_simple$$"></button>
                     <button type="roll" class="button stress-roll" name="roll_spell_stress" value="$$spell_roll_stress$$"></button>
                 </div></th>
@@ -1197,7 +1262,7 @@ $$alert(
         <div class="hide">
             <table class="table_2" >
                 <tr>
-                    <td data-i18n="technique" >Technique</td>
+                    <td data-i18n="technique">Technique</td>
                     <td>
                         <!--
                         This select tag is left in comment for reference purposes. A worker will translate from that old select
@@ -1231,13 +1296,26 @@ $$alert(
                             $$form_name_options$$
                         </select>
                     </td>
-                    <td data-i18n="focus" >Focus</td>
-                    <td><input type="checkbox" class="check" name="attr_spell_Focus" value="[[{($$spell_tech_value$$), ($$spell_form_value$$)}kl1]] [@{focus_i18n}]"></input></td>
-                    <td data-i18n="level" >Level</td>
-                    <td><input type="number" class="number_2" name="attr_spell_level" value="0"/></td>
-                    <td data-i18n="bonus" >Bonus</td>
-                    <td><input type="number" class="number_2" name="attr_spell_bonus" value="0"/></td>
-                    <td></td>
+                    <td colspan="4">
+                        <div class="flex-container-between">
+                            <span class="vcenter">
+                                <span data-i18n="focus" style="padding-right: 5px;">Focus</span>
+                                <input type="checkbox" class="check" name="attr_spell_Focus" value="[[{($$spell_tech_value$$), ($$spell_form_value$$)}kl1]] [@{focus_i18n}]"></input>
+                            </span>
+                            <span class="vcenter">
+                                <span data-i18n="deficiency" style="padding-right: 5px;">Deficiency</span>
+                                <input type="checkbox" class="check" name="attr_spell_Deficiency" value="1"></input>
+                            </span>
+                            <span class="vcenter">
+                                <span data-i18n="level" >Level</span>
+                                <input type="number" class="number_2" name="attr_spell_level" value="0"/>
+                            </span>
+                            <span class="vcenter">
+                                <span data-i18n="bonus" >Bonus</span>
+                                <input type="number" class="number_2" name="attr_spell_bonus" value="0"/>
+                            </span>
+                        </div>
+                    </td>
                 </tr>
                 <!--
                 <tr>
@@ -1252,48 +1330,159 @@ $$alert(
                 <tr>
                     <td data-i18n="range" >Range</td>
                     <td><input type="text" class="heading_2" name="attr_spell_range" value=""/></td>
-                    <td data-i18n="duration" >Duration</td>
+                    <td data-i18n="duration" > Duration</td>
                     <td><input type="text" class="heading_2" name="attr_spell_duration" value=""/></td>
                     <td data-i18n="target" >Target</td>
-                    <td colspan="3"><input type="text" class="heading_2" name="attr_spell_target" value="" /></td>
-                    <td data-i18n="exp" >Exp</td>
-                    <td>[<input type="number" class="number_2" name="attr_spell_exp" value="0"/></td>
-                    <td>/<input type="number" class="number_2" name="attr_spell_exp-2" value="0"/>]</td>
+                    <td><input type="text" class="heading_2" name="attr_spell_target" value="" /></td>
+                    <td data-i18n="exp">Exp</td>
+                    <td>
+                        [<input type="number" class="number_2" name="attr_spell_exp" value="0"/>/<input type="number" class="number_2" name="attr_spell_exp-2" value="0"/>]
+                    </td>
                 </tr>
                 <tr>
-                    <td colspan="11"><textarea class="textarea_2" style="width:815px;" name="attr_spell_note" placeholder="Spell Description" data-i18n-placeholder="spell-description"></textarea></td>
+                    <td colspan="8"><textarea class="textarea_2" style="width:815px;" name="attr_spell_note" placeholder="Spell Description" data-i18n-placeholder="spell-description"></textarea></td>
                 </tr>
                 <tr>
-                    <td colspan="11"><textarea class="textarea_2" style="width:815px;height:36px" name="attr_spell_note-2" data-i18n-placeholder="spell-mastery" placeholder="Spell Mastery "></textarea></td>
+                    <td colspan="8"><textarea class="textarea_2" style="width:815px;height:36px" name="attr_spell_note-2" data-i18n-placeholder="spell-mastery" placeholder="Spell Mastery "></textarea></td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
+
+    <!-- Spontaneous Spells -->
+    <h4 class="heading_label" style="margin-top:10px;" data-i18n="spontaneous-spells" >Spontaneous spells</h4>
+    <fieldset class="repeating_spontaneous">
+        <table style="margin-top:10px;">
+            <tr>
+                <th style="padding-left:10px;"><div class="flex-container-center">
+                    <button style="margin: 0px auto;" type="roll" class="button stress-roll single-roll" name="roll_saved_spontaneous_stress" value="$$saved_spontaneous_roll_stress$$"></button>
+                </div></th>
+                <th style="padding-left:10px;"><input style="width:645px;" type="text" class="heading_2" name="attr_spell_name" placeholder="Spell Name" data-i18n-placeholder="spell-name" /></th>
+                <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_Spell_show" value="1" checked/><span></span></div></th>
+            </tr>
+        </table>
+        <input type="checkbox" class="hider hidden" value="1" name="attr_Spell_show" checked/>
+        <div class="hide">
+            <table class="table_2" >
+                <tr>
+                    <td data-i18n="technique">Technique</td>
+                    <td>
+                        <select class="select_1" name="attr_spell_tech_name">
+                            <option class="italic" value="unselected" data-i18n="technique" >Technique</option>
+                            $$technique_name_options$$
+                        </select>
+                    </td>
+                    <td data-i18n="form" >Form</td>
+                    <td>
+                        <select class="select_1" name="attr_spell_form_name">
+                            <option class="italic" value="unselected" data-i18n="form" >Form</option>
+                            $$form_name_options$$
+                        </select>
+                    </td>
+                    <td><span class="vcenter">
+                        <span data-i18n="focus" style="padding-right: 5px;" >Focus</span>
+                        <input type="checkbox" class="check" name="attr_spell_Focus" value="[[{($$spell_tech_value$$), ($$spell_form_value$$)}kl1]] [@{focus_i18n}]"></input>
+                    </span></td>
+                    <td><span class="vcenter">
+                        <span data-i18n="deficiency" style="padding-right: 5px;" >Deficiency</span>
+                        <input type="checkbox" class="check" name="attr_spell_Deficiency" value="1"></input>
+                    </span></td>
+                    <td data-i18n="level" >Level</td>
+                    <td><input type="number" class="number_2" name="attr_spell_level" value="0"/></td>
+                </tr>
+                <!--
+                <tr>
+                    <td></td>
+                    <td><input type="text" class="hidden" name="attr_Technique_name" value="Technique"/></td>
+                    <td><input type="number" class="hidden" name="attr_spell_Technique" value="0"/></td></td>
+                    <td><input type="text" class="hidden" name="attr_Form_name" value="Form"/></td>
+                    <td><input type="number" class="hidden" name="attr_spell_Form" value="0"/></td></td>
+                    <td></td>
+                </tr>
+                -->
+                <tr>
+                    <td data-i18n="range" >Range</td>
+                    <td><input type="text" class="heading_2" name="attr_spell_range" value=""/></td>
+                    <td data-i18n="duration" > Duration</td>
+                    <td><input type="text" class="heading_2" name="attr_spell_duration" value=""/></td>
+                    <td data-i18n="target" >Target</td>
+                    <td><input type="text" class="heading_2" name="attr_spell_target" value="" /></td>
+                    <td data-i18n="bonus" >Bonus</td>
+                    <td><input type="number" class="number_2" name="attr_spell_bonus" value="0"/></td>
+                </tr>
+                <tr>
+                    <td colspan="8"><textarea class="textarea_2" style="width:815px;" name="attr_spell_note" placeholder="Spell Description" data-i18n-placeholder="spell-description"></textarea></td>
                 </tr>
             </table>
         </div>
     </fieldset>
 </div>
 
-<!-- 6 Help -->
+<!-- 6 Sheet -->
 <div class="tab-content tab6">
-    <div>
-        <h2 class="heading_label">Configuration</h2>
-        <div class="config">
-            <div class="config-entry">
-                <span>Botch formula</span>
-                <select class="select_1" name="attr_botch_formula">
-                    <option value="&{template:botch} {{roll= [[{[[?{@{botch_num_i18n}|1}]]d10cs0cf10}=10]] }} {{type=Grouped}}">Grouped rolls</option>
-                    <option value="$$botch_separate$$">Separate rolls</option>
-                </select>
-            </div>
+    <!-- Welcome message -->
+    <div class="welcome">
+        <h3 class="heading_label" style="margin-bottom: 5px;">Ars Magica 5th Edition Sheet - v1.7</h3>
+        <div>
+            Welcome to the Ars Magica 5th Edition Sheet !
+        </div>
+        <br>
+        <div>
+            Those are a few important notes you'll need to read before using the sheet.
+        A more complete documentation can be found below.
+        </div>
+        <br>
+        <div>
+            First, this sheet features some configuration options, found below. Be sure to
+        review those. Configure is your character is a Magi, how you want botches to be
+        rolled and display in chat, and how you want to chose between simple and stress
+        rolls (when applicable).
+        </div>
+        <br>
+        <div>
+            Second, you might want to read a bit the section on the documentation
+        on how rolls works. The stress dice of Ars Magica 5th edition are quite
+        complicated, and Roll20 isn't <i>quite</i> able to handle them completely
+        automatically. You'll need to copy the result before the critical roll,
+        for instance.
+        </div>
+        <br>
+        <div>
+            Third, some element of the sheet are <span class="has-tooltip">
+                underlined
+                <span class="tooltip">Underlined text features tooltip with additional informations</span>
+            </span>: this means they have a
+            tooltip that shows additional info about them. 
+        </div>
 
-            <div class="config-entry">
-                <span>Dice type</span>
-                <select class="select_1" name="attr_die-type-selection">
-                    <option value="toggle">Toggle</option>
-                    <option value="both">Both</option>
-                </select>
-            </div>
+    </div>
+    <!-- Configuration -->
+    <div>
+        <h3 class="heading_label" style="margin-top: 15px;">Configuration</h3>
+        <div class="config">
+            <span>Botch formula</span>
+            <select class="select_1" name="attr_botch_formula">
+                <option value="&{template:botch} {{roll= [[{[[?{@{botch_num_i18n}|1}]]d10cs0cf10}=10]] }} {{type=Grouped}}">Grouped rolls</option>
+                <option value="$$botch_separate$$">Separate rolls</option>
+            </select>
+
+            <span>Dice type</span>
+            <select class="select_1" name="attr_die-type-selection">
+                <option value="toggle">Toggle</option>
+                <option value="both">Both</option>
+            </select>
+
+            <span>Magi character</span>
+            <select class="select_1" name="attr_isMagi">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
         </div>
     </div>
-    <div class="documentation" style="margin-top:35px">
+
+    <!-- Embedded documentation -->
+    <div class="divider" style="height:15px;"><span>&nbsp;</span></div>
+    <div class="documentation" style="margin-top:5px">
         $$documentation$$
     </div>
     
@@ -1508,6 +1697,12 @@ $$alert(
                 <td class="display-default"><div style="text-align:center;">{{soakbonus}}</div></td>
             </tr>
             {{/soakbonus}}
+            {{#formlabel}}
+            <tr>
+                <td><div style="text-align:center;">{{formlabel}}</div></td>
+                <td class="display-default"><div style="text-align:center;">{{formbonus}}</div></td>
+            </tr>
+            {{/formlabel}}
         </table>
     </rolltemplate>
     
@@ -1693,16 +1888,23 @@ $$alert(
             </tr>
             {{/label6}}
             {{#textlabel}}
-            <tr name="divider">
+            <!--<tr name="divider">
                 <td colspan="2"><hr style="margin-bottom:0px;"></td>
-            </tr>
+            </tr>-->
             <tr>
-                <td class="label" colspan="2">{{textlabel}}</td>
+                <td class="label" colspan="2" style="padding-top: 20px;">{{textlabel}}</td>
             </tr>
+            {{/textlabel}}
+            {{#textsublabel}}
+            <tr>
+                <td class="textfield" colspan="2" style="text-align: center;">{{textsublabel}}</td>
+            </tr>
+            {{/textsublabel}}
+            {{#textfield}}
             <tr>
                 <td class="textfield" colspan="2">{{textfield}}</td>
             </tr>
-            {{/textlabel}}
+            {{/textfield}}
         </table>
         </div>
         <div style="background-image:url(https://i.imgur.com/DdTHJT1.jpg); width:235px; height:125px; position:relative; top:-50px;"></div>
@@ -1734,6 +1936,9 @@ $$translation_attrs$$
 <input name="attr_Unselected_Score" type="hidden" value="0" />
 <input name="attr_Unselected_Puissant" type="hidden" value="0" />
 <input name="attr_ask_Score" type="hidden" value="$$characteristic_name_ask_attr$$" />
+<!-- Those two attribute delegates to the global selector using another deferred attribute -->
+<input name="attr_global_char_Score" type="hidden" value="@{sys_at}@{character_name}@{sys_pipe}@{global_Ability_CharacName}_Score@{sys_rbk}" />
+<input name="attr_global_char_i18n" type="hidden" value="@{sys_at}@{character_name}@{sys_pipe}@{global_Ability_CharacName}_i18n@{sys_rbk}" />
 <input name ="attr_sys_at" type="hidden" value="@{" />
 <input name ="attr_sys_pipe" type="hidden" value="|" />
 <input name ="attr_sys_rbk" type="hidden" value="}" />
@@ -1742,7 +1947,7 @@ $$translation_attrs$$
 
 <!-- Sheet Worker Scripts -->
 <script type="text/worker">
-["character","abilities","magic","combat","spells","help"].forEach(function (button) {
+["character","abilities","magic","combat","spells","sheet"].forEach(function (button) {
     on("clicked:" + button, function() {
         setAttrs({
             "sheetTab": button
@@ -1776,33 +1981,6 @@ on("change:additionalFatigue", function() {
     getAttrs(["additionalFatigue"], function(values) {
         setAttrs({
             "additionalFatigueProxy": values.additionalFatigue
-        });
-    });
-});
-
-// Ability Experience Calculations
-
-on("change:repeating_ability:ability_score change:repeating_ability:acceleratedcheck", function() {
-    getAttrs(["repeating_ability_Ability_Score", "repeating_ability_AcceleratedCheck"], function(values) {
-        var n = Math.abs(parseInt(values.repeating_ability_Ability_Score)||0);
-        var a = parseInt(values.repeating_ability_AcceleratedCheck)||5;
-        setAttrs({
-            repeating_ability_Ability_totalExp: ((n*(n+1)/2)*a),
-            repeating_ability_Ability_advancementExp: ((n+1)*a)
-        });
-    });
-});
-
-// Art Experience Calculations
-
-['creo', 'intellego', 'muto', 'perdo', 'rego', 'animal', 'aquam', 'auram', 'corpus', 'herbam', 'ignem', 'imaginem', 'mentem', 'terram', 'vim'].forEach(function (name) {
-    on("change:" + name + "_score", function () {
-        getAttrs([name + "_score"], function(values) {
-            const n = parseInt(values[name + "_score"])||0;
-            setAttrs({
-                [name + "_advancementExp"]: (n+1),
-                [name + "_totalExp"]: (n*(n+1)/2)
-            });
         });
     });
 });

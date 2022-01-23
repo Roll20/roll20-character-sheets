@@ -1,6 +1,6 @@
 ## Sheet Documentation
 
-Welcome the th Ars Magica 5th Edition character sheet. This page contains the documentation for the sheet.
+Welcome the Ars Magica 5th Edition character sheet. This page contains the documentation for the sheet.
 
 ### Experience
 The fields for experience work as follows:
@@ -161,6 +161,8 @@ Those are omitted in the following list of rolltemplate names and supported valu
     + `name`
     + `rollsoak`
     + `soakbonus`
+    + `formlabel`
+    + `formbonus`
 + **`initiative`**:
     + `name`
     + `roll`
@@ -177,8 +179,10 @@ Those are omitted in the following list of rolltemplate names and supported valu
 + **`arcane`**:
     + `label0` through `label6`
     + `result0` through`result6`
-    + `textfield`
     + `textlabel`
+    + `textsublabel`
+    + `textfield`
+
 
 ### Changelog
 + **March 2021, v1.6.4**
