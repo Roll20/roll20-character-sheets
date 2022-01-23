@@ -1,6 +1,6 @@
 import textwrap
 
-from .helpers import roll, rolltemplate, repeat_format
+from .helpers import repeat_format, roll, rolltemplate
 
 EXPORTS = {}
 

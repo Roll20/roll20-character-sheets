@@ -1,23 +1,26 @@
 import textwrap
 
-from .helpers import roll, rolltemplate, FORMS, repeat_format
+from .helpers import FORMS, repeat_format, roll, rolltemplate
 
 EXPORTS = {}
 
 # Additional fatigue levels
 add_fatigue_lvl_num = 10
 EXPORTS["fatigue_levels_options"] = repeat_format(
-    """<option value="%%">%%</option>""", replace="%%", by=list(map(str, range(0, add_fatigue_lvl_num + 1)))
+    """<option value="%%">%%</option>""",
+    replace="%%",
+    by=list(map(str, range(0, add_fatigue_lvl_num + 1))),
 )
 EXPORTS["additional_fatigue_levels"] = "\n".join(
     textwrap.dedent(
-    f"""\
+        f"""\
     <tr class="addfatigue-{level}">
         <td><input type="radio" class="radio_1" name="attr_Fatigue" value="{level / 1000}"><span></span></td>
         <td style="text-align:center;">0</td>
         <td>2 min.</td>
         <td data-i18n="winded" >Winded</td>
-    </tr>""")
+    </tr>"""
+    )
     for level in range(1, add_fatigue_lvl_num + 1)
 )
 
@@ -29,9 +32,9 @@ for level in range(1, add_fatigue_lvl_num + 1):
     # IF the additional fatigue select is not on a value for which the level
     # is visible
     line = "".join(
-            f':not(.sheet-fatigue-proxy[value="{selector}"])'
-            for selector in range(level, add_fatigue_lvl_num + 1)
-        )
+        f':not(.sheet-fatigue-proxy[value="{selector}"])'
+        for selector in range(level, add_fatigue_lvl_num + 1)
+    )
     line += f" + table tr.sheet-addfatigue-{level} "
     lines.append(line)
     # Then hide it
@@ -40,8 +43,6 @@ for level in range(1, add_fatigue_lvl_num + 1):
     lines.append("}")
 lines.append("/*")
 EXPORTS["fatigue_level_css"] = "\n".join(lines)
-
-
 
 
 # Soak by forms that include form bonuses
@@ -57,7 +58,7 @@ soak_roll = roll(
     "(@{Stamina_Score}) [@{stamina_i18n}]",
     "(@{soak_bonus}) [@{soakbns_i18n}]",
     "(@{armor_soak_bonus}) [@{armor_i18n}]",
-    "ceil(((@{%%(Form)s_Score}) + (@{%%(Form)s_Puissant})) / 5) [@{%%(form)s_i18n}]"
+    "ceil(((@{%%(Form)s_Score}) + (@{%%(Form)s_Puissant})) / 5) [@{%%(form)s_i18n}]",
 )
 soak_template = rolltemplate(
     "soak",
@@ -66,7 +67,7 @@ soak_template = rolltemplate(
     armorsoak="@{armor_soak_bonus}",
     soakbonus="@{soak_bonus}",
     formlabel="^{%%(form)s}",
-    formbonus="[[ ceil(((@{%%(Form)s_Score}) + (@{%%(Form)s_Puissant})) / 5) ]]"
+    formbonus="[[ ceil(((@{%%(Form)s_Score}) + (@{%%(Form)s_Puissant})) / 5) ]]",
 )
 
 # We do not use repeat_format because we need the index for the grid pos
@@ -77,9 +78,11 @@ for i, form in enumerate(FORMS):
         "Form": form.title(),
     }
     values["rollbutton"] = soak_template.stress % values
-    values.update({
-        "col": str(i % 5 + 1),
-        "row": str(i // 5 + 1),
-    })
+    values.update(
+        {
+            "col": str(i % 5 + 1),
+            "row": str(i // 5 + 1),
+        }
+    )
     soak_by_form_lines.append(soak_html % values)
 EXPORTS["soak_by_forms"] = "\n".join(soak_by_form_lines)

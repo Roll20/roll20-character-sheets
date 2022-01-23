@@ -184,41 +184,4 @@ Those are omitted in the following list of rolltemplate names and supported valu
     + `textfield`
 
 
-### Changelog
-+ **March 2021, v1.6.4**
-    - Added `lalign` and `ralign` to the `custom` rolltemplate
-+ **March 2021, v1.6.3**
-    - Added `roll-color` and `button-color` properties to the `custom` rolltemplate, with all CSSv3 colors
-+ **February 2021, v1.6.2**
-    - Fixed centering not working
-    - Fixed translation of spellcasting words options
-    - Added support for the `custom` rolltemplate from the forum, with all CSS colors. Can be useful for spell tables or similar chat menus
-+ **February 2021, v1.6.1**
-    - Fixed botch die botching on 1s instead of 10s
-    - Fixed critical dice displaying 10s as exploding, instead of 1s
-    - Fixed spell's arts value not being updated when the character's arts are modified
-        + Completely changed how arts are handled inside spells
-        + A script will be run to convert your data to the new format, but may fail for some spells
-    - Added a critical roll for initiative that sets the turn tracker initiative (not visible in the sheet, use the chat button)
-    - Added option to always ask which characteristic to use when rolling abilities
-    - Centered the sheet in its tab 
-+ **February 2021, v1.6**
-    - Added inline labels to all rolls
-    - Fixed tabs not displaying properly (now attched to an attribute again)
-    - Added simple/stress die handling
-    - Support for focus in magic totals & rolls
-    - Support for additional fatigue levels
-    - Fixed ability rolltemplate being too wide in some cases
-    - Added documentation direclty to the sheet
-+ **May 2020, v1.51**
-    - Small change to the Ability roll template for legibility
-+ **April 2020, v1.5**
-    - Incorporated new fonts throughout the sheet!
-    - Polished several roll templates and added new ones for Defending. Stylish!
-    - Added an extra button for rerolling stress explosions, can be found next to the botch button. 
-    - Fixed several missing translation tags and side-effects of having translations added into the sheet. In particular, Abilities should now have access to the Accelerated Ability option. 
-    - Updated the sheet space and button for Soak/Armor Protection to use the combat roller templates. 
-    - Relinked images from imgur to github asset folders. 
-+ **October 2019**
-    - Initiatives now output to Roll20's Tracker while selecting a token. 
-    - Character sheet tabs no longer attached to an attribute, so multiple players can view the same character sheet without wrestling over tab controls.
+

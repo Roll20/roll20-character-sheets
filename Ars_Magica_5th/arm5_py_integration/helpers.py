@@ -2,10 +2,10 @@
 Small module for helper code that could be helpful everywhere in the part module
 """
 
-import textwrap
-from typing import Dict, Set, ClassVar, List, Collection, Union, Tuple
-from dataclasses import dataclass
 import itertools
+import textwrap
+from dataclasses import dataclass
+from typing import ClassVar, Collection, Dict, List, Set, Tuple, Union
 
 # Useful constants
 CHARACTERISTICS = [
@@ -39,11 +39,12 @@ FORMS = [
     "vim",
 ]
 
+
 def _match_lengths(
     left: Union[str, Collection[str]],
     right: Union[str, Collection[str]],
-    lname:str="left",
-    rname:str="rigth"
+    lname: str = "left",
+    rname: str = "rigth",
 ):
     left_len = 1 if isinstance(left, str) else len(left)
     right_len = 1 if isinstance(right, str) else len(right)
@@ -52,22 +53,23 @@ def _match_lengths(
         raise ValueError(
             f"Cannot match {lname} length {left_len} to {rname} length {right_len}"
         )
-    
+
     if isinstance(left, str) and isinstance(right, str):
         return zip([left], [right])
     left_iter = itertools.repeat(left) if isinstance(left, str) else left
     right_iter = itertools.repeat(right) if isinstance(right, str) else right
     return zip(left_iter, right_iter)
 
+
 def repeat_format(
     string: str,
     *,
-    replace: Union[str, Collection[str]]=None,
-    by: Union[str, Collection[str]]=None,
-    keys: Union[str, Collection[str]]=None,
-    values: Union[str, Collection[str]]=None,
-    keyvalues: Union[Tuple[str, str], Collection[Tuple[str, str]]]=None,
-    separator: str="\n"
+    replace: Union[str, Collection[str]] = None,
+    by: Union[str, Collection[str]] = None,
+    keys: Union[str, Collection[str]] = None,
+    values: Union[str, Collection[str]] = None,
+    keyvalues: Union[Tuple[str, str], Collection[Tuple[str, str]]] = None,
+    separator: str = "\n",
 ):
     """
     Repeatedly format a string and concatenate teh results
@@ -85,7 +87,7 @@ def repeat_format(
           repeatedly calls `string % mapping`, where mapping is a dict
           containing `key`, `key.lower()` and `key.title()` mapped to respective
           transformation of `value`.
-    
+
     In both usage, an argument may be a single string to be used for each
     iterations.
 
@@ -100,19 +102,13 @@ def repeat_format(
 
     """
     if (replace is None) != (by is None):
-        raise ValueError(
-            "Simple formatting requires both 'replace' and 'by' arguments"
-        )
+        raise ValueError("Simple formatting requires both 'replace' and 'by' arguments")
     if (keys is None) != (values is None):
         raise ValueError(
-            "Dictionary formatting requires both 'keys' and "
-            "'values' arguments"
+            "Dictionary formatting requires both 'keys' and " "'values' arguments"
         )
     if (keys is not None) and (keyvalues is not None):
-        raise ValueError(
-            "Cannot use 'keys' or 'values' arguments with "
-            "'keyvalues'"
-        )
+        raise ValueError("Cannot use 'keys' or 'values' arguments with " "'keyvalues'")
     if replace is None and keys is None and values is None:
         raise ValueError("No formatting arguments")
 
@@ -131,11 +127,8 @@ def repeat_format(
         else:
             raise RuntimeError
         return separator.join(
-            string % {
-                key.lower(): value.lower(),
-                key.title(): value.title(),
-                key: value
-            }
+            string
+            % {key.lower(): value.lower(), key.title(): value.title(), key: value}
             for key, value in pairs
         )
 
@@ -144,8 +137,14 @@ def enumerate_helper(iterable, funcs=(), start=0):
     for i, v in enumerate(iterable, start=start):
         yield (i, v, *tuple(f(v) for f in funcs))
 
+
 def xp(
-    name: str, *, suffix="_exp", adv_suffix="_advancementExp", tot_suffix="_totalExp", factor=5
+    name: str,
+    *,
+    suffix="_exp",
+    adv_suffix="_advancementExp",
+    tot_suffix="_totalExp",
+    factor=5,
 ) -> str:
     """
     Generate the HTML for the Xp parts of arts & abilities
@@ -199,6 +198,7 @@ class RollTemplate:
     Note:
         It is specialized to the Ars Magica 5th sheet
     """
+
     TEMPLATES: ClassVar[Dict[str, Set[str]]] = {
         "generic": {"Label", "Banner", "Result"},
         "ability": {
@@ -226,7 +226,14 @@ class RollTemplate:
             "target",
             "Technique",
         },
-        "soak": {"name", "rollsoak", "armorsoak", "soakbonus", "formlabel", "formbonus"}
+        "soak": {
+            "name",
+            "rollsoak",
+            "armorsoak",
+            "soakbonus",
+            "formlabel",
+            "formbonus",
+        },
     }
     SHARED_KEYS: ClassVar[List[str]] = ["stress", "botch-button", "crit-button"]
 
@@ -251,12 +258,16 @@ class RollTemplate:
             *("{{%s=%s}}" % field for field in self.fields.items()),
         ]
         if with_roll:
-            parts.extend([
-                "{{botch-button=[@{botch_i18n}!](~@{character_name}|%s)}}" % self.botch,
-                "{{crit-button=[@{critical_i18n}!](~@{character_name}|%s)}}" % self.critical,
-            ])
+            parts.extend(
+                [
+                    "{{botch-button=[@{botch_i18n}!](~@{character_name}|%s)}}"
+                    % self.botch,
+                    "{{crit-button=[@{critical_i18n}!](~@{character_name}|%s)}}"
+                    % self.critical,
+                ]
+            )
         return " ".join(parts)
-    
+
     @property
     def no_roll(self) -> str:
         return self._base(with_roll=False)

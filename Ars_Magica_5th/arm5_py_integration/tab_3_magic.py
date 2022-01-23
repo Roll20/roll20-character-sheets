@@ -1,8 +1,14 @@
-
 import textwrap
 
-from .helpers import FORMS, TECHNIQUES, repeat_format, enumerate_helper, roll, rolltemplate, xp
-
+from .helpers import (
+    FORMS,
+    TECHNIQUES,
+    enumerate_helper,
+    repeat_format,
+    roll,
+    rolltemplate,
+    xp,
+)
 
 EXPORTS = {}
 
@@ -20,8 +26,6 @@ EXPORTS["technique_definitions"] = repeat_format(
     keys="tech",
     values=TECHNIQUES,
 )
-
-
 
 
 # Technique options
@@ -47,8 +51,6 @@ EXPORTS["technique_enumerated_options"] = "\n".join(
 )
 
 
-
-
 # Form definitions
 form_template = textwrap.dedent(
     f"""\
@@ -59,30 +61,35 @@ form_template = textwrap.dedent(
         <td style="text-align: center"><input type="text" class="number_3 minor" name="attr_%(Form)s_Puissant" value="0"/></td>
     </tr>"""
 )
-EXPORTS["form_definitions_1"] = repeat_format(form_template, keys="form", values=FORMS[:5])
-EXPORTS["form_definitions_2"] = repeat_format(form_template, keys="form", values=FORMS[5:])
-
+EXPORTS["form_definitions_1"] = repeat_format(
+    form_template, keys="form", values=FORMS[:5]
+)
+EXPORTS["form_definitions_2"] = repeat_format(
+    form_template, keys="form", values=FORMS[5:]
+)
 
 
 # Form options
 EXPORTS["form_score_options"] = repeat_format(
     """<option value="(@{%(Form)s_Score} + @{%(Form)s_Puissant}) [@{%(form)s_i18n}]" data-i18n="%(form)s" >%(Form)s</option>""",
-    keys="form", values=FORMS
+    keys="form",
+    values=FORMS,
 )
 EXPORTS["form_score_options_unlabeled"] = repeat_format(
     """<option value="@{%(Form)s_Score} + @{%(Form)s_Puissant}" data-i18n="%(form)s" >%(Form)s</option>""",
-    keys="form", values=FORMS
+    keys="form",
+    values=FORMS,
 )
 EXPORTS["form_name_options"] = repeat_format(
     """<option value="%(Form)s" data-i18n="%(form)s" >%(Form)s</option>""",
-    keys="form", values=FORMS
+    keys="form",
+    values=FORMS,
 )
 
 EXPORTS["form_enumerated_options"] = "\n".join(
     f"""<option value="{index}" data-i18n="{form.lower()}" >{form.title()}</option>"""
     for index, form in enumerate(FORMS, start=1)
 )
-
 
 
 # Casting rolls

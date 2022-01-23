@@ -1,14 +1,22 @@
 """Module for providing the parts in the template.html file"""
 import csv
+import re
 import textwrap
 from pathlib import Path
 
 import markdown
+from bs4 import BeautifulSoup as soup
 
-from . import tab_1_character, tab_2_abilities, tab_3_magic, tab_4_combat, tab_5_spells, tab_6_sheet
+from . import (
+    tab_1_character,
+    tab_2_abilities,
+    tab_3_magic,
+    tab_4_combat,
+    tab_5_spells,
+    tab_6_sheet,
+)
 from .helpers import xp
 from .translations import translation_attrs, translation_attrs_setup
-
 
 # Alert system to display update notes and warnings on top of the sheet
 # Originaly developed to warn about loss of data during an update
@@ -116,9 +124,11 @@ EXPORTS["botch_separate"] = (
     + " }} {{type=Grouped}}"
 )
 
-# Colors for the "custom" rolltemplate
-with open(Path(__file__).parent / "css_colors.csv", newline="") as f:
-    reader = csv.DictReader(f)
+# Colors for the "custom" rolltemplate, loaded from css_colors.csv
+with open(
+    Path(__file__).parent / "css_colors.csv", newline="", encoding="utf-8"
+) as file:
+    reader = csv.DictReader(file)
     css_rules = []
     for color_def in reader:
         # Base CSS rules
@@ -154,6 +164,53 @@ with open(Path(__file__).parent / "css_colors.csv", newline="") as f:
             css_rules.append("\n".join(lines))
 
     EXPORTS["custom_rt_color_css"] = "*/\n" + "\n".join(css_rules) + "\n/*"
+
+# Load the changelog file, parse it to HTML
+with open(Path(__file__).parents[1] / "changelog.md", encoding="utf-8") as file:
+    html = markdown.markdown("".join(file))
+# Parse the HTML
+html = soup(html, "html.parser")
+
+# Prepare a regex to find version strings
+# A version is composed of one-or-more digits (\d+) groups, separated by dots
+RE_VERSION = re.compile(r"v(\d+\.)*(\d+)")
+
+# Iterate on the content of the top-level list in the changelog
+updates = {}
+if html.ul is None:
+    raise ValueError(
+        "Cannot find the tope-level <ul> in changelog.md. Is the file proper markdown ?"
+    )
+for child in html.ul.children:
+    if isinstance(child, str):
+        continue
+    if child.strong is None:
+        raise ValueError(
+            "The following changelog item doesn't have a <strong> tag. "
+            "Did you forget boldface markers (double star) around the title ?\n"
+            f"{child}"
+        )
+    match = RE_VERSION.search(child.strong.string)
+    if not match:
+        raise ValueError(
+            f"WARNING: changelog.md item '{child.strong}' doesn't have a version number"
+        )
+    version = match.group()
+    if version in updates:
+        raise ValueError(f"Multiple changelog items with version {version}")
+    updates[version] = child
+
+# make alerts for all updates
+EXPORTS["update_alerts"] = "\n".join(
+    alert(
+        str(item.strong),
+        item.ul.prettify(),
+        level="info",
+        ID=f"alert-update-{version.replace('.', '-')}",
+    )
+    for version, item in updates.items()
+)
+
 
 # Add the variables from all tabs
 EXPORTS.update(tab_1_character.EXPORTS)

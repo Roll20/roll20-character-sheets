@@ -1,7 +1,6 @@
 import textwrap
 
-
-from .helpers import roll, rolltemplate, repeat_format, CHARACTERISTICS
+from .helpers import CHARACTERISTICS, repeat_format, roll, rolltemplate
 
 EXPORTS = {}
 
@@ -40,7 +39,7 @@ EXPORTS["mental_characteristic_rows"] = repeat_format(
         </tr>"""
     ),
     keys="char",
-    values=CHARACTERISTICS[:4]
+    values=CHARACTERISTICS[:4],
 )
 
 EXPORTS["physical_characteristic_rows"] = repeat_format(
@@ -58,14 +57,14 @@ EXPORTS["physical_characteristic_rows"] = repeat_format(
         </tr>"""
     ),
     keys="char",
-    values=CHARACTERISTICS[4:]
+    values=CHARACTERISTICS[4:],
 )
 
 # Characteristic options
 EXPORTS["characteristic_score_options"] = repeat_format(
     """<option value="@{%(Char)s_Score}" data-i18n="%(char)s" >%(Char)s</option>""",
     keys="char",
-    values=CHARACTERISTICS
+    values=CHARACTERISTICS,
 )
 EXPORTS["characteristic_score_ask"] = (
     "?{@{characteristic_i18n}|"
@@ -79,7 +78,7 @@ EXPORTS["characteristic_score_ask"] = (
 EXPORTS["characteristic_name_options"] = repeat_format(
     """<option value="%(Char)s" data-i18n="%(char)s" >%(Char)s</option>""",
     keys="char",
-    values=CHARACTERISTICS
+    values=CHARACTERISTICS,
 )
 EXPORTS["characteristic_name_ask_attr"] = (
     "?{@{characteristic_i18n}|"
