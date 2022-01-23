@@ -154,7 +154,7 @@ def xp(
         <span class="flex-container-left">
             <span class="has-tooltip">
                 <input type="text" class="number-xp" name="attr_{name}{suffix}" value="0"/>
-                <span class="tooltip">
+                <span class="tooltip" data-i18n="tooltip-xp-input">
                     XP points in this art or ability. You can store either the total amount of XP, or just the XP towards the next score.
                 </span>
             </span>
@@ -162,12 +162,12 @@ def xp(
                 (
                 <span class="has-tooltip">
                     <input type="number" class="number-xp advance" name="attr_{name}{adv_suffix}" value="{factor} * ((@{{{name}_Score}}) + 1)" disabled="true"/>
-                    <span class="tooltip">Additional XP required for the next score</span>
+                    <span class="tooltip" style="width: 200px; margin-left: -100px;" data-i18n="tooltip-xp-step">Additional XP required for the next score, beyond the XP for the current level.<br>If you store only the XP towards the next score in the xp input, increase the score when this amount is reached.</span>
                 </span>
                 /
                 <span class="has-tooltip">
                     <input type="number" class="number-xp total" name="attr_{name}{tot_suffix}" value="{factor} * (((@{{{name}_Score}}) + 1) * ((@{{{name}_Score}}) + 2) / 2)" disabled="true"/>
-                    <span class="tooltip">Total XP required for the next score</span>
+                    <span class="tooltip" style="width: 200px; margin-left: -100px;" data-i18n="tooltip-xp-total">Total XP required for the next score.<br>If you store the total XP in the XP input, increase the score when this amount is reached.</span>
                 </span>
                 )
             </span>
@@ -234,6 +234,9 @@ class RollTemplate:
             "formlabel",
             "formbonus",
         },
+        "initiative": {"name", "roll", "weapon"},
+        "attack": {"name", "weapon", "attack", "damage"},
+        "defend": {"name", "weapon", "defend"},
     }
     SHARED_KEYS: ClassVar[List[str]] = ["stress", "botch-button", "crit-button"]
 

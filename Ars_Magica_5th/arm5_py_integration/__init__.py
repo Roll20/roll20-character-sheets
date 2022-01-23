@@ -170,6 +170,11 @@ with open(Path(__file__).parents[1] / "changelog.md", encoding="utf-8") as file:
     html = markdown.markdown("".join(file))
 # Parse the HTML
 html = soup(html, "html.parser")
+# replace code blocks because Roll20 removes them
+# Convert code tags to span with a class, because Roll20 removes code tags
+for tag in html.find_all("code"):
+    tag.name = "span"
+    tag.attrs["class"] = tag.get("class", "") + " codespan"
 
 # Prepare a regex to find version strings
 # A version is composed of one-or-more digits (\d+) groups, separated by dots

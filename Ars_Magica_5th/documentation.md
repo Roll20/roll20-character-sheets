@@ -41,12 +41,12 @@ The icon for stress dice is a die with a <span style="color:#ee3f2f">red</span> 
 
 The formula for a stress die (you can see it by hovering over a result, see also "Labels" below) is quite complex, but does something simple:
 
-+ on a 10, the value will be 0. You then roll botch dice to see if you botch
++ on a 0 (or 10 on the standard d10), the value will be 0. You then roll botch dice to see if you botch
 + on a critical (natural 1), the value will also be 0
 + Otherwise, the result is whatever was rolled
 
 #### Botch
-When you roll a 10, the formula for a stress die yields a value of 0 (though other modifiers will apply). A roll of 10 can be easily seen, as the result will be bright red. You must then roll botch dice. To roll botch dice, you have to equivalent options:
+When you roll a 0, the formula for a stress die yields a value of 0 (though other modifiers will apply). A roll of 0 can be easily seen, as the result will be bright red. You must then roll botch dice. To roll botch dice, you have to equivalent options:
 
 + click on <span style="color:#ee3f2f">Botch</span> right to the tabs on top of the sheet
 + click the "botch!" button n direclty in the chat near the result
@@ -54,7 +54,7 @@ When you roll a 10, the formula for a stress die yields a value of 0 (though oth
 In the configuration section (above this documentation), you will find a setting for how you want to roll botch dice:
 
 + on "separate", all botch die will be displayed individually in the chat, and you choose the number of botch dice with a dropdown menu (limited to 8 botch dice)
-+ on "grouped", only the total number of botch will be displayed (i.e. the number of 1s rolled). You enter the number of botch dice as a number. You can still see the individual rolls by hovering on the result in chat
++ on "grouped", only the total number of botch will be displayed (i.e. the number of 0s rolled). You enter the number of botch dice as a number. You can still see the individual rolls by hovering on the result in chat
 
 When you do botch (i.e roll 10s), the output will be coloured bright red.
 

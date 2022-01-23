@@ -20,6 +20,13 @@ $$alert(
     level="warning",
     ID="alert-update-v1_6-dataloss"
 )$$
+$$alert(
+    "January 2022 - v1.7 - Armory Update",
+    "The armory and Combat modifiers list replace the old armor and combat modifier text areas. "
+    "The old entries and data can be found in the 'Sheet' tab, under 'Legacy'.",
+    ID="alert-update-v1-7-armorylegacy"
+)
+$$
 <!-- Alerts are now generated in python from the changelog.md file -->
 $$update_alerts$$
 
@@ -415,7 +422,7 @@ $$update_alerts$$
                 <div>
                     <span class="has-tooltip">
                         <span data-i18n="characteristic" style="font-family: 'Macondo', cursive; color: #663333; font-size: 1.3em;">Characteristic</span>
-                        <span class="tooltip">Default characteristic to use. Can be overriden per ability.</span>
+                        <span class="tooltip" data-i18n="tooltip-default-characteristic">Default characteristic to use. Can be overriden per ability.</span>
                     </span>
                     <select class="select_1" name="attr_global_Ability_CharacName">
                         $$characteristic_name_options$$
@@ -448,7 +455,7 @@ $$update_alerts$$
                                 <th style="padding-bottom: 2px;">
                                     <span class="has-tooltip">
                                         <span data-i18n="characteristic">Characteristic</span>
-                                        <span class="tooltip">Select the caracteristic to use. Overrides the gobal selector. "-Characteristic-" uses the global selector, "-Ask-" triggers a roll query (pop-up) for each roll.</span>
+                                        <span class="tooltip" data-i18n="tooltip-ability-characteristic">Select the caracteristic to use. Overrides the gobal selector.<br>"-Characteristic-" uses the global selector, "-Ask-" triggers a roll query (pop-up) for each roll.</span>
                                     </span>
                                 </th>
                                 <th data-i18n="speciality" >Speciality</th>
@@ -866,7 +873,7 @@ $$update_alerts$$
                         <tr>
                             <th><div style="width:300px;padding-left:10px;" data-i18n="specializations-bonuses" >Specializations & Bonuses</div></th>
                             <th><div style="width:40px;" data-i18n="score" >Score</div></th>
-                            <th><div style="width:40px;" data-i18n="inc-" >Inc.</div></th>
+                            <th><div style="width:40px;"><span class="has-tooltip"><span data-i18n="inc-">Inc.</span><span class="tooltip" data-i18n="tooltip-inc-">Included<br>Check if the item is active. Unchecked items are not used in the computation</span></span></div></th>
                         </tr>
                     </table>
                     <fieldset class="repeating_labSpecializations">
@@ -894,6 +901,7 @@ $$update_alerts$$
 <!-- 4 Combat -->
 <div class="tab-content tab4" >
     <div style="margin-top:10px;">
+        <!-- Fatigue -->
         <div class='col'>
             <h4 class="heading_label" style="margin-bottom:15px" data-i18n="fatigue-levels" >Fatigue Levels <input type="number" class="counter" style="width:50px" name="attr_Fatigue_total" value="@{Fatigue}" disabled="true"/></h4>
             <table class="table_2" style="width:300px;">
@@ -953,6 +961,7 @@ $$update_alerts$$
                 </tr>
             </table>
         </div>
+        <!-- Wounds -->
         <div class='col'>
             <h4 class="heading_label" data-i18n="wounds" >Wounds <input type="number" class="counter" name="attr_wound_total" value="0" /></h4>
             <table class="table_3" style="width:500px;" >
@@ -1015,19 +1024,99 @@ $$update_alerts$$
             </table>
         </div>
     </div>
-    <!--    Armor -->
-    <div>
-        <h4 class="heading_label" data-i18n="armor" >Armor</h4>
-        <table class="table_2" style="width:800px;">
-            <tr>
-                <th colspan="2" data-i18n="armor-worn" >Armor Worn</th>
-                <th colspan="2" data-i18n="combat-modifiers" >Combat Modifiers</th>
-            </tr>
-            <tr>
-                <th colspan="2"><textarea class="textarea_2" name="attr_ArmorWorn"></textarea></th>
-                <th colspan="2"><textarea class="textarea_2" name="attr_ArmorModifiers"></textarea></th>
-            </tr>
-        </table>
+    
+    <div class="2colgrid">
+        <!-- Armor -->
+        <div class='col' style="width:415px; padding-right: 2px; border-right: 1px solid #663333; margin-right: 2px;">
+            <h4 class="heading_label" data-i18n="armor" >Armor</h4>
+            <div style="width: 100%;">
+                <table class="table_2" style="margin-top:10px;">
+                    <tr>
+                        <th style="width: 240px;"></th>
+                        <th style="width:  80px; text-align: right;"><span data-i18n="protection">Protection</span></th>
+                        <th style="width:  60px; text-align: center;"><span data-i18n="load">Load</span></th>
+                        <th style="width:  30px; text-align: center;"></th>
+                    </tr>
+                    <tr>
+                        <th style="width: 240px;"><span data-i18n="armor">Armor</span></th>
+                        <td style="width:  75px; text-align: right; padding-right: 5px;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_armors_total_prot" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_armors_total_prot_detailed" value=" "/>
+                        </td>
+                        <td style="width:  60px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_armors_total_load" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_armors_total_load_detailed" value=" "/>
+                        </td>
+                        <td style="width:  30px;"><span class="has-tooltip"><span data-i18n="inc-">Inc.</span><span class="tooltip" data-i18n="tooltip-inc-">"Included<br>Check if the item is active. Unchecked items are not used in the computation"</span></span></td>
+                    </tr>
+                </table>
+                <fieldset class="repeating_armors">
+                    <table class="table_2">
+                        <tr>
+                            <td style="width: 240px;"><input type="text" class="heading_2" name="attr_armors_name" style="width: 235px;"/></td>
+                            <td style="width:  75px; text-align: right; padding-right: 5px;"><input type="text" class="number_2" name="attr_armors_prot" value="0" /></td>
+                            <td style="width:  60px; text-align: center;"><input type="text" class="number_2" name="attr_armors_load" value="0" /></td>
+                            <td style="width:  30px;"><div class="flex-container-center"><input type="checkbox" name="attr_isactive" value="1" checked/></div></td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+
+        <!-- Bonuses -->
+        <div class='col' style="width:100%; padding-right: 5px;">
+            <h4 class="heading_label" data-i18n="combat-modifiers">Combat Modifiers</h4>
+            <div style="width: 100%;">
+                <table class="table_2" style="margin-top:10px;">
+                    <tr>
+                        <th style="width: 170px;"></th>
+                        <th style="width:  40px; text-align: center;"><span data-i18n="init">Init</span></th>
+                        <th style="width:  40px; text-align: center;"><span data-i18n="atk">Atk</span></th>
+                        <th style="width:  40px; text-align: center;"><span data-i18n="dfn">Dfn</span></th>
+                        <th style="width:  40px; text-align: center;"><span data-i18n="dam">Dam</span></th>
+                        <th style="width:  40px; text-align: center;"><span data-i18n="soak">Soak</span></th>
+                        <th style="width:  30px; text-align: center;"></th>
+                    </tr>
+                    <tr>
+                        <th style="width: 160px;"><span data-i18n="bonus">Bonus</span></th>
+                        <td style="width:  40px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_combat-mods_total_init" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_combat-mods_total_init_detailed" value=" "/>
+                        </td>
+                        <td style="width:  40px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_combat-mods_total_atk" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_combat-mods_total_atk_detailed" value=" "/>
+                        </td>
+                        <td style="width:  40px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_combat-mods_total_dfn" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_combat-mods_total_dfn_detailed" value=" "/>
+                        </td>
+                        <td style="width:  40px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_combat-mods_total_dam" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_combat-mods_total_dam_detailed" value=" "/>
+                        </td>
+                        <td style="width:  40px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_combat-mods_total_soak" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_combat-mods_total_soak_detailed" value=" "/>
+                        </td>
+                        <td style="width:  30px;"><span class="has-tooltip"><span data-i18n="inc-">Inc.</span><span class="tooltip" data-i18n="tooltip-inc-">"Included<br>Check if the item is active. Unchecked items are not used in the computation"</span></span></td>
+                    </tr>
+                </table>
+                <fieldset class="repeating_combat-mods">
+                    <table class="table_2">
+                        <tr>
+                            <td style="width: 170px;"><input type="text" class="heading_2" name="attr_combat-mods_name" style="width: 170px;"/></td>
+                            <td style="width:  40px; text-align: center;"><input type="text" class="number_2" name="attr_combat-mods_init" value="0"/></td>
+                            <td style="width:  40px; text-align: center;"><input type="text" class="number_2" name="attr_combat-mods_atk" value="0"/></td>
+                            <td style="width:  40px; text-align: center;"><input type="text" class="number_2" name="attr_combat-mods_dfn" value="0"/></td>
+                            <td style="width:  40px; text-align: center;"><input type="text" class="number_2" name="attr_combat-mods_dam" value="0"/></td>
+                            <td style="width:  40px; text-align: center;"><input type="text" class="number_2" name="attr_combat-mods_soak" value="0"/></td>
+                            <td style="width:  30px;"><div class="flex-container-center"><input type="checkbox" name="attr_isactive" value="1" checked/></div></td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+        </div>
     </div>
     <!-- Soak -->
     <div style="padding-bottom: 15px;" >
@@ -1035,20 +1124,23 @@ $$update_alerts$$
         <table class="table_2" style="width:380px">
             <tr>
                 <td></td>
-                <th data-i18n="soak">Soak</th>
-                <th data-i18n="bonus">Bonus</th>
-                <th data-i18n="armor-protection" >Armor Protection</th>
-                <th data-i18n="armor-load" >Armor Load</th>
-                <td></td>
+                <th data-i18n="soak" style="text-align: center;">Soak</th>
+                <th data-i18n="sta" style="text-align: center;">sta</th>
+                <th data-i18n="armor" style="text-align: center;">Armor</th>
+                <th data-i18n="bonus" style="text-align: center;">Bonus</th>
+                <th data-i18n="bonus" style="text-align: center;">Bonus</th>
+                <th data-i18n="load" style="text-align: center;">Load</th>
             </tr>
             <tr>
                 <td style="width:30px;">
-                    <button type="roll" class="button stress-roll single-roll" name="roll_soak" value="&{template:soak} {{name= @{character_name} }} {{armorsoak= @{armor_soak_bonus}}} {{soakbonus= @{soak_bonus}}} {{rollsoak= [[@{stress-die} + (@{Stamina_Score}) [@{stamina_i18n}] + (@{soak_bonus}) [@{soakbns_i18n}] + (@{armor_soak_bonus}) [@{armor_i18n}]]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"></button>
+                    <button type="roll" class="button stress-roll single-roll" name="roll_soak" value="$$soak_roll_stress$$"></button>
                 </td>
-                <td><input type="text" class="number_1" name="attr_Soak" value="((@{Stamina_Score}) + (@{soak_bonus}) + (@{armor_soak_bonus}))" disabled="true"/></td>
-                <td><input type="number" class="number_2" name="attr_soak_bonus" value="0"/></td>
-                <td><input type="number" class="number_2" name="attr_armor_soak_bonus" value="0"/></td>
-                <th colspan="2"><input type="number" class="number_2" name="attr_armor_load" value="0"/></th>
+                <td style="text-align: center;"><input type="number" class="number_1" name="attr_Soak" value="($$soak_total$$)" disabled="true"/></td>
+                <td style="text-align: center;"><input type="number" class="number_1" name="attr_soak_stamina" disabled="true" value="(@{Stamina_Score})"></td>
+                <td style="text-align: center;"><input type="number" class="number_2" name="attr_armors_total_prot" value="0" readonly/></td>
+                <td style="text-align: center;"><input type="number" class="number_2" name="attr_soak_bonus" value="0"/></td>
+                <td style="text-align: center;"><input type="number" class="number_2" name="attr_combat-mods_total_soak" value="0" readonly/></td>
+                <th style="text-align: center;"><input type="number" class="number_2" name="attr_armors_total_load" value="0" readonly/></th>
             </tr>
         </table>
         <div class="magi-only">
@@ -1069,10 +1161,10 @@ $$update_alerts$$
                 <td><div style="width:25px"></div></td>
                 <th><div style="width:60px" data-i18n="atk" >Atk</div></th>
                 <td><div style="width:30px"></div></td>
-                <th><div style="width:45px" data-i18n="dfn-u" >DFN</div></th>
+                <th><div style="width:45px" data-i18n="dfn" >Dfn</div></th>
                 <td><div style="width:18px;"></div></td>
                 <th><div style="width:45px" data-i18n="dam" >Dam</div></th>
-                <td><div style="width:50px" data-i18n="ability" >Ability</div></td>
+                <th><div style="width:50px" data-i18n="ability" >Ability</div></th>
                 <th><div style="width:50px" data-i18n="load" >Load</div></th>
                 <th><div style="width:40px" data-i18n="range" >Range</div></th>
                 <th><div style="width:60px"></div></th>
@@ -1083,97 +1175,118 @@ $$update_alerts$$
                 <tr>
                     <th><input type="text" class="heading_3" name="attr_Weapon_name"/></th>
 
-                    <td><button type="roll" class="button stress-roll single-roll" name="roll_weapon_Init" value="&{template:initiative} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{roll= [[ @{stress-die} + (@{Quickness_Score}) [@{quickness_i18n}] + (@{Init_Weap}) [@{Weapon_name}] - (@{Init_Enc}) [@{encumbrance_i18n}] + (@{wound_total}) [@{wounds_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (?{@{initiative_i18n} @{modifiers_i18n}|0}) [@{initiative_i18n} @{modifiers_i18n}] &{tracker}]] }} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical-init)}}" data-i18n="init" >Init</button></td>
-                    <td><input type="text" class="number_1" name="attr_Init" value="(@{Quickness_Score} + @{Init_Weap} - @{Init_Enc})" disabled="true"/></td>
+                    <td><button type="roll" class="button stress-roll single-roll" name="roll_weapon_Init" value="$$init_roll$$" data-i18n="init" >Init</button></td>
+                    <td><input type="text" class="number_1" name="attr_Init" value="$$init_total$$" disabled="true"/></td>
 
-                    <td><button type="roll" class="button stress-roll single-roll" name="roll_weapon_Atk" value="&{template:attack} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{attack= [[ @{stress-die} + (@{Dexterity_Score}) [@{dexterity_i18n}] + (@{WeaponAbility}) [@{ability_i18n}] + (@{Atk_Weap}) [@{Weapon_name}] + (@{wound_total}) [@{wounds_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{attack_i18n}|0}) [@{circumstantial_i18n} @{attack_i18n}] ]] }} {{damage= [[ (@{Strength_Score}) [@{strength_i18n}] + (@{Dam_Weap}) [@{Weapon_name}] + (?{@{circumstantial_i18n} @{damage_i18n}|0}) [@{circumstantial_i18n} @{damage_i18n}] ]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="atk" >Atk</button></td>
-                    <td><input type="text" class="number_1" name="attr_Atk" value="(@{Dexterity_Score} + @{WeaponAbility} + @{Atk_Weap})" disabled="true"/></td>
+                    <td><button type="roll" class="button stress-roll single-roll" name="roll_weapon_Atk" value="$$atk_roll$$" data-i18n="atk" >Atk</button></td>
+                    <td><input type="text" class="number_1" name="attr_Atk" value="$$atk_total$$" disabled="true"/></td>
 
-                    <td><button type="roll" class="button stress-roll single-roll" name="roll_weapon_Dfn" value="&{template:defend} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{defend= [[ @{stress-die} + (@{Quickness_Score}) [@{quickness_i18n}] + (@{WeaponAbility}) [@{ability_i18n}] + (@{Dfn_Weap}) [@{Weapon_name}] + (@{wound_total}) [@{wounds_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{defense_i18n}|0}) [@{circumstantial_i18n} @{defense_i18n}] ]] }} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="dfn" >Dfn</button></td>
-                    <td><input type="text" class="number_1" name="attr_DFN" value="(@{Quickness_Score} + @{WeaponAbility} + @{Dfn_Weap})" disabled="true"/></td>
+                    <td><button type="roll" class="button stress-roll single-roll" name="roll_weapon_Dfn" value="$$dfn_roll$$" data-i18n="dfn" >Dfn</button></td>
+                    <td><input type="text" class="number_1" name="attr_Dfn" value="$$dfn_total$$" disabled="true"/></td>
                     
                     <td><div style="width:10px;"></div></td>
-                    <td><input type="text" class="number_1" name="attr_Dam" value="@{Strength_Score} + @{Dam_Weap}" disabled="true"/></td>
-                    <td><input type="text" class="number_1" name="attr_WeaponAbility" value="0"/></td>
-                    <td><input type="text" class="number_1" name="attr_Wounds_Load" value="0"/></td>
-                    <td><input type="text" class="number_1" name="attr_Wounds_Range"/></td>
+                    <td><input type="number" class="number_1" name="attr_Dam" value="((@{Strength_Score}) + (@{combat-mods_total_dam}) + (@{Dam_Weap}))" disabled="true"/></td>
+                    <td><input type="number" class="number_1" name="attr_WeaponAbility" value="0"/></td>
+                    <td><input type="number" class="number_1" name="attr_Weapon_Load" value="0"/></td>
+                    <td><input type="text" class="number_1" name="attr_Weapon_Range"/></td>
                     <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_Weapon_show" value="1" checked/><span></span></div></th>
                 </tr>
             </table>
             <input type="checkbox" class="hider hidden" name="attr_Weapon_show" value="1" checked/><span></span>
             <div class="hide" style="border-color:#e6dbc6; border-style: inset;">
-                    <table class="table_3" style="display:inline; margin-right:10px;">
-                        <tr >
-                            <th colspan="5"><div style="width:200px;text-align:center;" data-i18n="initiative" >Initiative</div></th>
-                        </tr>
-                        <tr>
-                            <td data-i18n="qik" >Qik</td>
-                            <td></td>
-                            <td data-i18n="weap" >Weap.</td>
-                            <td></td>
-                            <td data-i18n="enc-" >Enc.</td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" class="number_2" name="attr_Init_Qik" value="@{Quickness_Score}" disabled='true'/></td>
-                            <td>+</td>
-                            <td><input type="text" class="number_2" name="attr_Init_Weap" value="0"/></td>
-                            <td>-</td>
-                            <td><input type="text" class="number_2" name="attr_Init_Enc" value="0"/></td>
-                        </tr>
-                    </table>
-                    <table class="table_3" style="display:inline; margin-right:10px;">
-                        <tr>
-                            <th colspan="5"><div style="width:200px;text-align:center;" data-i18n="attack" >Attack</div></th>
-                        </tr>
-                        <tr>
-                            <td data-i18n="dex" >Dex</td>
-                            <td></td>
-                            <td data-i18n="ability" >Ability</td>
-                            <td></td>
-                            <td data-i18n="weap" >Weap</td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" class="number_2" name="attr_Atk_Dex"  value="@{Dexterity_Score}" disabled='true'/></td>
-                            <td>+</td>
-                            <td><input type="text" class="number_2" name="attr_Atk_Ability" value="@{WeaponAbility}" disabled="true"/></td>
-                            <td>+</td>
-                            <td><input type="text" class="number_2" name="attr_Atk_Weap" value="0"/></td>
-                        </tr>
-                    </table>
-                    <table class="table_3" style="display:inline; margin-right:10px;">
-                        <tr>
-                            <th colspan="5"><div style="width:200px;text-align:center;" data-i18n="defense" >Defense</div></th>
-                        </tr>
-                        <tr>
-                            <td data-i18n="qik" >Qik</td>
-                            <td></td>
-                            <td data-i18n="ability" >Ability</td>
-                            <td></td>
-                            <td data-i18n="weapon" >Weapon</td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" class="number_2" name="attr_Dfn_Qik" value="@{Quickness_Score}" disabled='true'/></td>
-                            <td>+</td>
-                            <td><input type="text" class="number_2" name="attr_Dfn_Ability" value="@{WeaponAbility}" disabled="true"/></td>
-                            <td>+</td>
-                            <td><input type="text" class="number_2" name="attr_Dfn_Weap" value="0"/></td>
-                        </tr>
-                    </table>
-                    <table class="table_3" style="display:inline;">
-                        <tr>
-                            <th colspan="3"><div style="width:150px;text-align:center;" data-i18n="damage" >Damage</div></th>
-                        </tr>
-                        <tr>
-                            <td data-i18n="strength" >Strength</td>
-                            <td></td>
-                            <td data-i18n="weapon" >Weapon</td>
-                        </tr>
-                        <tr>
-                            <td><input type="text" class="number_2" name="attr_Dam_Str" value="@{Strength_Score}" disabled='true'/></td>
-                            <td>+</td>
-                            <td><input type="text" class="number_2" name="attr_Dam_Weap" value="0"/></td>
-                        </tr>
-                    </table>
+                <table class="table_3 table_center" style="display:inline; margin-right:10px;">
+                    <tr >
+                        <th colspan="7"><div style="width:200px;text-align:center;" data-i18n="initiative" >Initiative</div></th>
+                    </tr>
+                    <tr>
+                        <td data-i18n="qik" >Qik</td>
+                        <td></td>
+                        <td data-i18n="weap" >Weap.</td>
+                        <td></td>
+                        <td data-i18n="bonus" >Bonus</td>
+                        <td></td>
+                        <td data-i18n="enc-" >Enc.</td>
+                    </tr>
+                    <tr>
+                        <td><input type="number" class="number_2" name="attr_Init_Qik" value="(@{Quickness_Score})" disabled='true'/></td>
+                        <td>+</td>
+                        <td><input type="number" class="number_2" name="attr_Init_Weap" value="0"/></td>
+                        <td>+</td>
+                        <td><input type="number" class="number_2" name="attr_combat-mods_total_init" value="0" readonly/></td>
+                        <td>-</td>
+                        <td>
+                            <input type="hidden" class="number_2" name="attr_Init_Burden" value="floor((((8*((@{Weapon_Load}) + (@{armors_total_load})) + 1) ** (1/2)) - 1) / 2)" disabled="true"/>
+                            <!-- The formula are equivalent to max(0, burden - max(0, strength)), written using max(a,0) = (a + abs(a)) / 2 -->
+                            <input type="hidden" class="number_2" name="attr_Init_Relative_Encumbrance" value="((@{Init_Burden}) - (((@{Strength_Score}) + abs((@{Strength_Score}))) / 2))" disabled="true" />
+                            <input type="number" class="number_2" name="attr_Init_Encumbrance" value="((@{Init_Relative_Encumbrance}) + abs((@{Init_Relative_Encumbrance}))) / 2" disabled="true" />
+                        </td>
+                    </tr>
+                </table>
+                <table class="table_3 table_center" style="display:inline; margin-right:10px;">
+                    <tr>
+                        <th colspan="7"><div style="width:200px;text-align:center;" data-i18n="attack" >Attack</div></th>
+                    </tr>
+                    <tr>
+                        <td data-i18n="dex" >Dex</td>
+                        <td></td>
+                        <td data-i18n="ability" >Ability</td>
+                        <td></td>
+                        <td data-i18n="bonus" >Bonus</td>
+                        <td></td>
+                        <td data-i18n="weap" >Weap</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="number_2" name="attr_Atk_Dex"  value="(@{Dexterity_Score})" disabled='true'/></td>
+                        <td>+</td>
+                        <td><input type="text" class="number_2" name="attr_Atk_Ability" value="(@{WeaponAbility})" disabled="true"/></td>
+                        <td>+</td>
+                        <td><input type="number" class="number_2" name="attr_combat-mods_total_atk" value="0" readonly/></td>
+                        <td>+</td>
+                        <td><input type="text" class="number_2" name="attr_Atk_Weap" value="0"/></td>
+                    </tr>
+                </table>
+                <table class="table_3 table_center" style="display:inline; margin-right:10px;">
+                    <tr>
+                        <th colspan="7"><div style="width:200px;text-align:center;" data-i18n="defense" >Defense</div></th>
+                    </tr>
+                    <tr>
+                        <td data-i18n="qik" >Qik</td>
+                        <td></td>
+                        <td data-i18n="ability" >Ability</td>
+                        <td></td>
+                        <td data-i18n="bonus" >Bonus</td>
+                        <td></td>
+                        <td data-i18n="weapon" >Weapon</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="number_2" name="attr_Dfn_Qik" value="(@{Quickness_Score})" disabled='true'/></td>
+                        <td>+</td>
+                        <td><input type="text" class="number_2" name="attr_Dfn_Ability" value="(@{WeaponAbility})" disabled="true"/></td>
+                        <td>+</td>
+                        <td><input type="number" class="number_2" name="attr_combat-mods_total_dfn" value="0" readonly/></td>
+                        <td>+</td>
+                        <td><input type="text" class="number_2" name="attr_Dfn_Weap" value="0"/></td>
+                    </tr>
+                </table>
+                <table class="table_3 table_center" style="display:inline;">
+                    <tr>
+                        <th colspan="5"><div style="width:150px;text-align:center;" data-i18n="damage" >Damage</div></th>
+                    </tr>
+                    <tr>
+                        <td data-i18n="strength" >Strength</td>
+                        <td></td>
+                        <td data-i18n="bonus" >Bonus</td>
+                        <td></td>
+                        <td data-i18n="weapon" >Weapon</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="number_2" name="attr_Dam_Str" value="@{Strength_Score}" disabled='true'/></td>
+                        <td>+</td>
+                        <td><input type="number" class="number_2" name="attr_combat-mods_total_dam" value="0" readonly/></td>
+                        <td>+</td>
+                        <td><input type="text" class="number_2" name="attr_Dam_Weap" value="0"/></td>
+                    </tr>
+                </table>
             </div>
         </fieldset>
     </div>
@@ -1387,60 +1500,81 @@ $$update_alerts$$
     <!-- Welcome message -->
     <div class="welcome">
         <h3 class="heading_label" style="margin-bottom: 5px;">Ars Magica 5th Edition Sheet - v1.7</h3>
-        <div>
+        <div data-i18n="welcome-title">
             Welcome to the Ars Magica 5th Edition Sheet !
         </div>
         <br>
-        <div>
+        <div data-i18n="welcome-0">
             Those are a few important notes you'll need to read before using the sheet.
         A more complete documentation can be found below.
         </div>
         <br>
-        <div>
+        <div data-i18n="welcome-1">
             First, this sheet features some configuration options, found below. Be sure to
         review those. Configure is your character is a Magi, how you want botches to be
         rolled and display in chat, and how you want to chose between simple and stress
         rolls (when applicable).
         </div>
         <br>
-        <div>
+        <div data-i18n="welcome-2">
             Second, you might want to read a bit the section on the documentation
         on how rolls works. The stress dice of Ars Magica 5th edition are quite
-        complicated, and Roll20 isn't <i>quite</i> able to handle them completely
+        complicated, and this sheet isn't <i>quite</i> able to handle them completely
         automatically. You'll need to copy the result before the critical roll,
         for instance.
         </div>
         <br>
         <div>
-            Third, some element of the sheet are <span class="has-tooltip">
-                underlined
-                <span class="tooltip">Underlined text features tooltip with additional informations</span>
-            </span>: this means they have a
-            tooltip that shows additional info about them. 
+            <span data-i18n="welcome-3a">Third, some element of the sheet are</span> 
+            <span class="has-tooltip">
+                <span data-i18n="welcome-3b">underlined</span>
+                <span class="tooltip" data-i18n="tooltip-welcome">Underlined text features tooltip with additional informations</span>
+            </span>: <span data-i18n="welcome-3c">this means they have a tooltip that shows additional info about them.</span>
         </div>
-
     </div>
+
     <!-- Configuration -->
     <div>
-        <h3 class="heading_label" style="margin-top: 15px;">Configuration</h3>
+        <h3 class="heading_label" style="margin-top: 15px;" data-i18n="config-configuration">Configuration</h3>
         <div class="config">
-            <span>Botch formula</span>
+            <span data-i18n="config-botch">Botch formula</span>
             <select class="select_1" name="attr_botch_formula">
-                <option value="&{template:botch} {{roll= [[{[[?{@{botch_num_i18n}|1}]]d10cs0cf10}=10]] }} {{type=Grouped}}">Grouped rolls</option>
-                <option value="$$botch_separate$$">Separate rolls</option>
+                <option value="&{template:botch} {{roll= [[{[[?{@{botch_num_i18n}|1}]]d10cs0cf10}=10]] }} {{type=Grouped}}" data-i18n="config-botch-grouped">Grouped rolls</option>
+                <option value="$$botch_separate$$" data-i18n="config-botch-separate">Separate rolls</option>
             </select>
 
-            <span>Dice type</span>
+            <span data-i18n="config-dice">Dice type</span>
             <select class="select_1" name="attr_die-type-selection">
-                <option value="toggle">Toggle</option>
-                <option value="both">Both</option>
+                <option value="toggle" data-i18n="config-dice-toggle">Toggle</option>
+                <option value="both" data-i18n="config-dice-both">Both</option>
             </select>
 
-            <span>Magi character</span>
+            <span data-i18n="config-magi">Magi character</span>
             <select class="select_1" name="attr_isMagi">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
+                <option value="yes" data-i18n="config-magi-yes">Yes</option>
+                <option value="no" data-i18n="config-magi-no">No</option>
             </select>
+        </div>
+    </div>
+    <!-- Legacy -->
+    <div>
+        <h3 class="heading_label" style="margin-top: 15px; margin-bottom: 10px;" data-i18n="legacy-title">Legacy</h3>
+        <div class="welcome" data-i18n="legacy-content">
+            This section contains part of the sheet that are no longer used, but cannot be removed because
+            they contain character data.
+        </div>
+        <div style="margin-top: 15px;">
+            <h4 class="heading_label" data-i18n="armor" >Armor</h4>
+            <table class="table_2" style="width:800px;">
+                <tr>
+                    <th colspan="2" data-i18n="armor-worn" >Armor Worn</th>
+                    <th colspan="2" data-i18n="combat-modifiers" >Combat Modifiers</th>
+                </tr>
+                <tr>
+                    <th colspan="2"><textarea class="textarea_2" name="attr_ArmorWorn"></textarea></th>
+                    <th colspan="2"><textarea class="textarea_2" name="attr_ArmorModifiers"></textarea></th>
+                </tr>
+            </table>
         </div>
     </div>
 
@@ -1575,6 +1709,11 @@ $$update_alerts$$
             <tr>
                 <th colspan="2">{{name}}</th>
             </tr>
+            {{#weapon}}
+            <tr>
+                <td colspan="2" style="text-align: center;">{{weapon}}</td>
+            </tr>
+            {{/weapon}}
             <tr>
                 <td><div style="text-align:center;" data-i18n="attack">Attack</div></td>
                 {{^stress}}
@@ -1607,6 +1746,11 @@ $$update_alerts$$
                 <tr>
                     <th colspan="2">{{name}}</th>
                 </tr>
+                {{#weapon}}
+                <tr>
+                    <td colspan="2" style="text-align: center;">{{weapon}}</td>
+                </tr>
+                {{/weapon}}
                 <tr>
                     <td data-i18n="defend-rt">Defend</td>
                     {{^stress}}
@@ -1974,9 +2118,6 @@ on("change:repeating_labspecializations:labbonus remove:repeating_labspecializat
     });
 });
 
-
-// Basic Math
-//Stats
 //Wounds
 on("change:Wounds_Light1 change:Wounds_Light2 change:Wounds_Light3 change:Wounds_Light4 change:Wounds_Light5 change:Wounds_Medium1 change:Wounds_Medium2 change:Wounds_Medium3 change:Wounds_Medium4 change:Wounds_Medium5 change:Wounds_Heavy1 change:Wounds_Heavy2 change:Wounds_Heavy3 change:Wounds_Heavy4 change:Wounds_Heavy5 change:Wounds_Incapacitated change:Wounds_Dead sheet:opened", function() {
     getAttrs(["Wounds_Light1", "Wounds_Light2", "Wounds_Light3", "Wounds_Light4", "Wounds_Light5", "Wounds_Medium1", "Wounds_Medium2", "Wounds_Medium3", "Wounds_Medium4", "Wounds_Medium5", "Wounds_Heavy1", "Wounds_Heavy2", "Wounds_Heavy3", "Wounds_Heavy4", "Wounds_Heavy5", "Wounds_Incapacitated", "Wounds_Dead"], function(values) {
@@ -1985,6 +2126,131 @@ on("change:Wounds_Light1 change:Wounds_Light2 change:Wounds_Light3 change:Wounds
         });
     });
 });
+
+// Function to create a sheet-worker that updates totals computed from repeating sections
+// The sections must follow some naming conventions, see code
+
+function register_repeated_section_totals(section, properties) {
+    var events = (
+        "sheet:opened"
+        + " remove:repeating_" + section
+        + " change:repeating_" + section + ":isactive"
+        + " change:repeating_" + section + ":" + section + "_name"
+    );
+    properties.forEach(function(prop, index, array) {
+        events += " change:repeating_" + section + ":" + section + "_" + prop;
+    });
+
+    console.log("Registering events for section: " + section + " -> " + events);
+
+    on(events, function() {
+        getSectionIDs("repeating_" + section, function(id_array) {
+
+            var attr_names = [];
+            for (var i=0; i < id_array.length; i++) {
+                attr_names.push("repeating_" + section + "_" + id_array[i] + "_" + section + "_name");
+                attr_names.push("repeating_" + section + "_" + id_array[i] + "_isactive");
+                properties.forEach(function(prop, index, array) {
+                    attr_names.push("repeating_" + section + "_" + id_array[i] + "_" + section + "_" + prop);
+                });
+            }
+            console.log("Attributes to get: " + attr_names.toString());
+
+            var totals = {};
+            properties.forEach(function(prop, index, array) {
+                totals[section + "_total_" + prop] = 0
+                totals[section + "_total_" + prop + "_detailed"] = "0";
+            });
+            console.log("Totals to compute: " + JSON.stringify(totals, null, 1));
+
+            getAttrs(attr_names, function(attrs){
+                var prefix = "";
+                var value = 0;
+                console.log("Got attributes: " + JSON.stringify(attrs, null, 1));
+
+                for (var i=0; i < id_array.length; i++) {
+                    console.log("Handling item #" + i);
+                    prefix = "repeating_" + section + "_" + id_array[i] + "_";
+
+                    properties.forEach(function(prop, index, array) {
+                        if ((parseInt(attrs[prefix + "isactive"]) || 0) === 1) {
+                            value = (parseFloat(attrs[prefix + section + "_" + prop]) || 0);
+                            if (value != 0) {
+                                totals[section + "_total_" + prop] += value;
+                                totals[section + "_total_" + prop + "_detailed"] += (
+                                    " + " + value.toString() + " [" + attrs[prefix + section + "_name"] + "]"
+                                );
+                            }
+                        }
+                    });
+                }
+                console.log("Computed totals: " + JSON.stringify(totals, null, 1));
+
+                properties.forEach(function(prop, index, array) {
+                    totals[section + "_total_" + prop] = Math.ceil(totals[section + "_total_" + prop]);
+                    totals[section + "_total_" + prop + "_detailed"] = "ceil(" + totals[section + "_total_" + prop + "_detailed"] + ")";
+                });
+    
+                console.log("computed totals: " + JSON.stringify(totals, null, 1));
+                setAttrs(totals);
+            });
+        });
+    });
+}
+
+register_repeated_section_totals("armors", ["prot", "load"]);
+register_repeated_section_totals("combat-mods", ["init", "atk", "dfn", "dam", "soak"]);
+
+// Fix weapon attributes
+
+on("sheet:opened", function() {
+    const fixes = {
+        "_Wounds_Load": "_Weapon_Load",
+        "_Wounds_Range": "_Weapon_Range",
+    };
+    const keys = Object.keys(fixes);
+    getSectionIDs("repeating_weapons", function(id_array) {
+        var attr_names = [];
+        id_array.forEach( (id_) => (keys.forEach((key) => attr_names.push("repeating_weapons_" + id_ + key))));
+
+        getAttrs(attr_names, function(attrs) {
+            var value = 0;
+            var updates = {};
+            id_array.forEach( (id_) => (keys.forEach(function(key) {
+                if (attrs["repeating_weapons_" + id_ + key]) {
+                    console.log(attrs["repeating_weapons_" + id_ + key]);
+                    console.log("Fixing " + "repeating_weapons_" + id_ + key + " to " + "repeating_weapons_" + id_ + fixes[key]);
+                    updates["repeating_weapons_" + id_ + fixes[key]] = parseInt(attrs["repeating_weapons_" + id_ + key]) || 0;
+                    updates["repeating_weapons_" + id_ + key] = "";
+                }
+            })));
+            console.log("All fixes :" + JSON.stringify(updates, null, 1));
+            setAttrs(updates);
+        });
+    });
+});
+
+// Duplicate the global bonuses inside the weapons repeating section for display
+// From https://app.roll20.net/forum/post/10297616/how-do-i-reference-a-global-attribute-in-a-span-in-a-repeating-section
+
+const section = "weapons";
+const repeating_stats = ["init", "atk", "dfn", "dam", "soak"].map(prop => `combat-mods_total_${prop}`);
+const changes = repeating_stats.reduce((str, stat) => `${str} change:${stat.toLowerCase()}`, 'sheet:opened');
+on(changes, () => {
+    getSectionIDs(`repeating_${section}`, idarray => {
+        const fieldnames = idarray.reduce((rows,id) => [...rows, ...repeating_stats.map(stat => `repeating_${section}_${id}_${stat}`)], []);
+        getAttrs([...repeating_stats, ...fieldnames], v => {
+            const output = {};
+            idarray.forEach(id => {
+                repeating_stats.forEach(stat => {
+                    output[`repeating_${section}_${id}_${stat}`] = v[stat];
+                });
+            });
+            setAttrs(output);
+        });
+    });
+});
+
 
 // Translation key replacement
 on("sheet:opened", function(eventInfo){

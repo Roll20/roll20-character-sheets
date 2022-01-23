@@ -1,15 +1,21 @@
 ## Changelog
 
-+ **January 2022 - v1.7 - Magic update**
-    - Added Welcome message to the "Sheet" tab, and made that tab the default tab
-    - Added tooltips to some elements of the sheet to provide info about them (e.g. XP fields)
-    - Repeated items (such as items, abilities, spells...) start expanded for easier completion.
-    - Added a toggle to hide  elements of the sheet that are specific to Magi (see Sheet tab)
-    - Added deficiency toggles that halves casting totals
-    - Added a roll button for non-fatiguing spontaneous casting
-    - Separated the Artes Liberales and Philosophiae fields of ceremonial and ritual casting, to accomodate specialisation in either
-    - Added Soak computations with Form bonuses
-    - Added list for useful spontaneous spells in the "Spells" tab
++ **January 2022 - v1.7 - Magic & Armory update**
+    - *General changes*:
+        - Added Welcome message to the "Sheet" tab, and made that tab the default tab
+        - Added tooltips to some elements of the sheet to provide info about them (e.g. XP fields)
+        - Repeated items (such as items, abilities, spells...) start expanded for easier completion.
+    - *Magic Update*:
+        - Added a toggle to hide elements of the sheet that are specific to Magi (see Sheet tab)
+        - Added deficiency toggles that halves casting totals
+        - Added a roll button for non-fatiguing spontaneous casting
+        - Separated the Artes Liberales and Philosophiae fields of ceremonial and ritual casting, to accomodate specialisation in either
+        - Added Soak computations with Form bonuses
+        - Added list for useful spontaneous spells in the "Spells" tab
+    - *Armory Update*:
+        - Added an armor list with togglable elements. Can store multiple armor (parts).
+        - Burden and Encumbrance are now computed automatically
+        - Added combat modifiers list that is applied to rolls
 + **October 2021 v1.6.5**
     - Fix to laboratory focus for characters with an affinity bonus to one of the arts used.
 + **March 2021, v1.6.4**
