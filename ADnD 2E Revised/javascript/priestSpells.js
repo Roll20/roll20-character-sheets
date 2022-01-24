@@ -7300,6 +7300,233 @@ pri2['Resist Turning'] = {
     'effect': 'While this spell is in effect, all undead within a 15-yard radius of the affected object or creature gain a resistance to being turned (or commanded) by the clerics and paladins of an opposing religion (compared to that of the caster). The base resistance of the undead to being turned is 20%, plus 5% for every two levels of experience of the caster (60% at 4th, 65% at 6th, 70% at 8th, up to a maximum of 95% at 18th level). Currently [[{50+floor([[@{level-priest}]]/2)*5,95}kl1]]% (**Note:** Base resistance set to 50% to make math match examples).\n&emsp;This resistance roll is made secretly by the DM before each turning attempt is made. A single priest can continue attempting to turn or command the resistant undead creatures each round until either the resistance is overcome or the turn roll indicates failure. The spell can be centered on a stationary object or upon any moving creature, including the caster.'
 };
 
+pri3['Death\'s Door'] = {
+    'level': '3',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] hours',
+    'aoe': 'One human or demihuman',
+    'components': 'V, S, M',
+    'cast-time': '6',
+    'saving-throw': 'None',
+    'materials': 'The cleric’s holy/unholy symbol, a bit of white linen, and any form of unguent.',
+    'reference': 'p. 78',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a cleric employs this spell, he or she touches a subject who is injured, unconscious and “at *death’s door*” (–1 to –9 hit points). The spell immediately brings the wounded individual back up to 0 hit points, bringing the subject back from *death’s door*. Although the victim remains unconscious, bleeding and deterioration are stopped for the duration of the spell. The subject (now at 0 hit points) can be brought immediately to consciousness by clerical spells or items that restore lost hit points.\n&emsp;The DM should modify this spell if he or she disallows the optional rule for “hovering on *death’s door*” (page 104 of the *DMG*). If the DM considers characters to be immediately dead once they reach 0 hit points, then this spell may bring mortally wounded (0 to –9 hit points) characters back to life, providing it is cast within 1–10 rounds of the victim’s demise. The subject must make a system shock roll to survive the transition, and if successful, he or she permanently loses a point of Constitution.\n&emsp;This modified version restores the victim to 1 hit point, which may now be immediately increased by further magical healing, as outlined above. Once too much time elapses after an individual’s death, the victim can only be brought back to life with a *raise dead* spell or some other, more powerful form of necromancy.'
+};
+
+pri3['Life Drain'] = {
+    'level': '3',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'One creature',
+    'components': 'V',
+    'cast-time': '6',
+    'saving-throw': '½',
+    'materials': '',
+    'reference': 'p. 80',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '[[1d8+[[@{level-priest}]] ]]',
+    'damage-type': '',
+    'healing': 'Same as damage',
+    'effect': 'By casting this spell and touching another individual, a priest may fortify another’s life force at the expense of a victim. This spell enables the priest to drain 1–8 hit points plus 1 hp per level of the caster from a living creature. The priest may immediately bestow the hit points on him- or herself, or transfer them to another individual within 1–4 rounds of the casting. The stolen hit points can increase those of the recipient beyond the normal maximum, and these extra hit points only last for up to one turn per the caster’s level. Currently [[@{level-priest}]] turns. Any damage suffered by the subject is first subtracted from these additional hit points.\n&emsp;Though predominantly employed by evil priests at the expense of innocents, the spell may be used by those of noble intent, but only if all participants act of their own accord. However, if the victim (the donor of the life force) is unwilling, a saving throw indicates that the spell was partially resisted and only half the hit points were drained. Undead can neither benefit nor be harmed by *life draining*. It is possible, however, for an undead priest to drain hit points from a victim and bestow them on a living ally.'
+};
+
+pri3['Spirit Bind'] = {
+    'level': '3',
+    'school': 'Necromancy (Reversible)',
+    'sphere': 'Necromantic',
+    'range': '10 yards',
+    'duration': 'Permanent',
+    'aoe': 'One corpse',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 80',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When cast near the corpse of a newly dead individual, this spell binds an individual’s life force to its physical remains, preventing a spirit’s departure to the afterlife. The (presumably unwilling) spirit of the deceased is entitled to a saving throw vs. spells to resist the effect (made as if still alive), modified by a –1 penalty for every three levels of experience past the 1st of the priest (–2 penalty at 7th level, –3 at 10th level, to a maximum of –6 at 19th level). Currently [[{ceil(([[@{level-priest}]]-1)/-3),-6}kh1]].\n&emsp;*Spirit bind* must be cast on the body of the deceased within one round of the individuals’ death, for every level of experience of the caster. Currently [[@{level-priest}]] rounds. Thus a 10th-level priest may bind the spirit of an individual who was dead for up to a turn. If successful, the *spirit bound* corpse takes on a pale silvery or mauve radiance. Normal animals and even monsters of low intelligence will involuntarily shun this necromantic aura.\n&emsp;While under the effect of this spell, a cadaver becomes immune to the normal effects of rot and decay. *Spirit bind* may thus be employed to preserve a body for a subsequent *raising* or *resurrection*, for which the spirit bound individual is considered to have been dead for less than a day. Furthermore, because of the strong, necromantic link already forged between the spirit and the body, the victim receives a –10% bonus on his or her system shock roll.\n&emsp;However, this spell is more often put to much darker ends by death priests. Note that, for the deceased, being *spirit bound* is not a pleasant experience. The spirit may not be aware of its current location or the passage of time (or so good-aligned priests who employ this spell may like to think), but it is most certainly aware of being trapped or constrained. Once *bound* to its body, a spirit is much easier to coerce with threats of permanent imprisonment and to interrogate with *speak with dead* spells. Some sages speculate *spirit bind* may be also involved in the loathsome creation of a flesh golem.\n&emsp;While immune to normal decay and dissolution (and the ravaging of animals and dumb monsters), the *spirit bound* corpse is in no way protected from destruction by a sentient creature or individual. Should its body be destroyed, the spirit instead becomes *bound* to the last area resided by the physical remains. Such a restless, quasi-liberated spirit might become a non-corporeal undead (such as an apparition, banshee, haunt, poltergeist, wraith, ghost, or spectre). A spirit imprisoned in this manner may only be released by casting the reverse of this spell (see below) or *dispel evil* (*dispel magic* and *reverse curse* are ineffective). Because of the considerable dangers for the subject and moral quandaries involved, good-aligned priests are naturally reluctant to employ *spirit bind* except in the most dire emergencies.\n&emsp;The reverse of this spell, *spirit release*, severs a spirit’s ties with the material world and is a common practice at formal funerals. Unwilling, non-corporeal undead are entitled to a saving throw to resist the spell’s effects, subject to the same penalties as outlined for *spirit bind*. If failed, the undead spirit departs for the outer planes and is effectively dispersed. Note that neither version of this spell affects corporeal undead (such as ghouls, liches, and vampires), nor do they affect extraplanar creatures.'
+};
+
+pri4['Cause Insanity'] = {
+    'level': '4',
+    'school': 'Necromancy (Reversible)',
+    'sphere': 'Necromantic, Thought',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': 'Creature touched',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 81',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell drives a victim insane. The DM may consult the madness table in Chapter Three or choose a form of insanity to suit the wicked caster. A death priest, for instance, might inflict a victim with an exaggerated fear of dying (requiring the character to make a saving throw vs. paralyzation to avoid the effects of a *fear* spell whenever he or she encounters a cadaver, human bones, a graveyard, or even an open coffin). Alternatively, the victim might become convinced that all corpses were undead, waiting to rip him or her to shreds. In a combat situation, a death priest will probably choose to quickly neutralize an opponent with an incapacitating form of insanity, such as *confusion* or *feeblemindedness*. The insanity is permanent and cannot be dispelled except by casting *cure insanity* (the reverse), *heal*, *restoration*, or *wish*.\n&emsp;The reverse of this spell immediately cures insanity due to most causes (no saving throw). The spell must be administered while the patient is exhibiting insane symptoms. *Cure insanity* can heal a conscious victim of the effects of hallucinatory spores and repair psychic trauma (resulting from a mindwipe or other psionic assault). The spell also diminishes psychic exhaustion (restoring 5–40 PSPs). It cures madness resulting from spells (such as *confusion*, *chaos*, *contact other plane*, *feeblemind*, *symbol of insanity*, and *prismatic spray*, *wall*, or *sphere*) and also heals the insanity caused by certain magical items (such as an *elixir of madness* or a *scarab of insanity*). However, the spell will not control aberrant behaviors caused by lycanthropy, undeath, or powerful curses (such as a *geas* or *quest*). Finally, at the DM’s discretion, *cure insanity* may temporarily calm the demented behavior of certain extraplanar creatures (such as slaad).'
+};
+
+pri4['Heart Blight'] = {
+    'level': '4',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': '[[10*[[@{level-priest}]] ]]’',
+    'duration': 'Special (up to three rounds)',
+    'aoe': 'One living creature',
+    'components': 'V, S',
+    'cast-time': '7',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 82',
+    'book': 'The Complete Book of Necromancers',
+    'damage': 'Round 1: 1d8, Round 2: 25%, Round 3: Death',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, an evil necromancer priest may exert his or her dark will on the still-beating heart of any living victim, provided the target remains in clear view (line of sight) and within the spell’s range. After casting the spell, the priest must focus his or her entire concentration on the victim’s heart for three rounds, during which time the caster may not cast other spells or engage in melee. The priest may, however, walk, talk, and take ordinary defensive precautions while the spell runs its course through the victim.\n&emsp;During the first round of the spell, the victim must make a saving throw vs. death magic with a –2 penalty. This saving throw is modified according to the victim’s hit point adjustment due to Constitution (+1 bonus for 15 Con, +2 for 16 Con, and so on; see page 21 in the *PHB* for more on this).\n&emsp;If the victim makes this first saving throw, the spell fails to take hold of his or her heart and has no further effect. If the victim fails the save, however, then he or she suffers a massive spasm of pain in the chest (similar to that felt in a heart attack), inflicting 1–8 points of damage on the victim and completely incapacitating the individual for one excruciating round.\n&emsp;During the second round, the victim is entitled to another saving throw, this time with a –1 penalty (plus any bonuses for Con). As before, if the victim makes the save, the spell ends with no further effect. If failed, however, the victim’s chest pain intensifies, as if a searing band of iron were being slowly tightened around the heart. The character experiences severe dizziness, disorientation, and terrible shooting pains in the arms, jaw, and left shoulder.\n&emsp;Meanwhile, the victim loses 25% of any remaining hit points, is paralyzed with pain for 2–5 rounds, and immediately loses 2–5 points of Strength, Constitution, and Dexterity. Providing the victim survives the final stage of the spell (see below), these lost points are regained at a rate of 1 point in each these three ability scores per day.\n&emsp;On the third round of the spell, the target must make a (third, unmodified) saving throw vs. death magic or suffer a massive heart attack, resulting in immediate death (onset time is 1 round, during which time, the victim is completely incapacitated). Alternatively, a kind DM might decide that the final phase of the spell merely plunges the victim into a deep, death-like coma, lasting 1–4 days and resulting in the permanent loss of 1 point of Constitution.\n&emsp;This deadly spell may be thwarted in a number of ways. Successfully casting *dispel magic* on either the victim or the priest will disrupt the *heart blight*, as will casting a simple *protection from evil* spell on the victim or wearing a *scarab of protection* (this drains a charge, however). Furthermore, the victim may be entitled to repeat a saving throw with a +2 bonus if treated by another character with the healing non-weapon proficiency. Finally, the spell is immediately broken if the victim is transported out of range or removed from the priest’s line of sight. Because of its murderous effect, this spell is only granted to wicked priests by the gods of Death, Disease, and Evil.'
+};
+
+pri4['Plague Curse'] = {
+    'level': '4',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': 'See below',
+    'aoe': 'One creature or object',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': 'The priest’s unholy symbol and a small ball of myrrh.',
+    'reference': 'p. 82',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, a necromancer bestows a powerful curse on a person or object which becomes a carrier for plague and contagion. Every person or animal that comes in direct physical contact with the cursed carrier must make a saving throw vs. death magic or contract a fatal disease (as described in the 3rd-level priest spell *cause disease* on pages 267 of the *PHB*), resulting in a victim’s slow, agonizing demise within 2–5 weeks. The living focus of a *plague curse* is completely immune from the effects of the disease he or she carries. In many cases, the carrier will be oblivious to his cursed condition—especially if the carrier is a frequent traveler and does not remain in a single location long enough for the plague symptoms to surface in those he or she contacts.\n&emsp;The carrier of a *plague curse* displays no outward signs of disease and radiates only a very faint aura of necromancy (only a 5% chance of detecting per level). The curse may only be removed from an individual by a priest of higher level than the caster (*dispel magic* has no effect); alternatively, a cursed object may be cleansed by destruction in fire.\n&emsp;Normally, the curse only expires after it has claimed one life for each level of the original caster. As for the deadly affliction caused by a *plague curse*, it may be successfully treated with a paladin’s healing touch or with such spells as *cure disease*, *heal*, or *restoration*.\n&emsp;The secrets of this malignant incantation are known only to the scant few priests who serve the cold gods of Pestilence and Decay. It is rumored that some Plague Priests must willingly accept this curse for their religion. Invoking a *plague curse* ages the caster by one year.'
+};
+
+pri5['Undead Spell Focus'] = {
+    'level': '5',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'One undead',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 83',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'For the duration of this spell, the recipient undead becomes a magical focus for the caster, who can now funnel any chosen, currently-carried “companion” spell through the undead. Any companion spell is emitted from the undead, but all casting activity (including component use) is performed by the priest. Distance does not matter, so long as priest and undead remain on the same plane.\n&emsp;However, unless other spells (such as *spectral sense*s, *reflecting pool*, or *magic font*) are employed to “see” the undead’s current surroundings (or it is in a known location), companion spells will be hurled blindly. A priest can cast multiple spells, one per round, through the undead, until it is destroyed or a maximum of one spell per level of the priest has been cast or the spell expires (it lasts up to 10 turns per level). Currently up to [[@{level-priest}]] spells or [[10*[[@{level-priest}]] ]] turns.\n&emsp;With this spell, a hidden priest can avoid direct combat, employing an undead as a spell-casting fighting-focus. This spell can be cast on an undead affected by *spectral sense*s, *undead alacrity*, or *resist turning*, and the spells will function simultaneously. Finally, the undead may be controlled by clerical ability, spell, or magical item, without hampering the imbuement.'
+};
+
+pri5['Scourge'] = {
+    'level': '5',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': '120 yards',
+    'duration': 'Permanent',
+    'aoe': '[[@{level-priest}]] creatures',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'Negate',
+    'materials': 'A specially prepared, black whip or riding crop, which is cracked in the direction of the intended victims during the casting of the spell.',
+    'reference': 'p. 83',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This nasty spell causes a major disease and weakness in victims who fail a saving throw vs. spells at a –3 penalty. Afflicted individuals are immediately stricken with a sickening *scourge* that quickly spreads to cover their entire bodies. The blackened boils, magenta blotches, violet lesions, seeping abscesses, and malignant cysts are excruciatingly painful, and highly debilitating.\n&emsp;In the short term, the Strength, Dexterity, and Charisma of each victim are reduced by 3. Attack rolls are similarly decreased by 3. The agonizing symptoms persist until a victim receives a *cure disease*, *heal*, or *restoration* spell bestowed by a more powerful priest than the original caster. *Dispel magic* and *remove curse* are powerless to mediate the symptoms of a *scourge*, but a *wish* will eradicate the infection immediately.\n&emsp;A *scourge* may also lead to a long-term, debilitating illness. Those ignoring the malignant disease resulting from the spell’s effects for more than a few days may be susceptible to much worse afflictions (such as gangrene, plague, or leprosy) that ultimately result in the victim’s untimely death within 1–4 weeks.\n&emsp;Furthermore, if a victim of the spell enters an area of dense population, there is always a chance that the disease may spread (1% per caster level, currently [[@{level-priest}]]%) into an epidemic of massive proportions. These long-term effects of the *scourge* are left to the discretion of the DM.\n&emsp;Because of its horrific affect, *scourge* is typically only granted to high priests of a malignant and evil god who is dedicated to spreading death and disease.'
+};
+
+pri5['Undead Regeneration'] = {
+    'level': '5',
+    'school': 'Necromancy (Reversible)',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': 'Instantaneous',
+    'aoe': 'One undead',
+    'components': 'V, S',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 84',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '[[2d4+[[@{level-priest}]] ]] to undeads',
+    'effect': 'With this spell, the priest can “heal” an undead, restoring to its unlife 2d4 hit points plus one point per level of the caster’s experience. As with most spells that restore hit points, *undead regeneration* cannot raise a creature above its normal maximum. Noncorporeal undead can also be affected by reaching into the space they occupy. During the “healing” process, the spell temporarily shields the priest from dangerous contact with the undead, such as aging or paralysis.\n&emsp;The reverse of this spell, *drain undead*, inflicts a like amount of damage. Note that the damage “drained” from the undead creature is lost. It is not gained as healing or extra hit points for the caster. The same protections against undead powers are conferred on the caster as with *undead regeneration*.\n&emsp;Only one undead can be affected by either version of this spell.'
+};
+
+pri6['Asphyxiate'] = {
+    'level': '6',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': '120 yards',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': '[[floor([[@{level-priest}]]/2)]] individuals',
+    'components': 'V, S, M',
+    'cast-time': '9',
+    'saving-throw': 'Negate',
+    'materials': 'An unholy symbol and a (symbolic) silken gag, which the priest loosely wraps around his or her own mouth after casting the spell.',
+    'reference': 'p. 84',
+    'book': 'The Complete Book of Necromancers',
+    'damage': 'Saving throw fail: [[1d6]]. Saving throw success: [[1d3]]',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell asphyxiates individuals (chosen by the priest) who fail a saving throw vs. death magic. If fewer than six individuals are targeted with this spell, each receives a –1 penalty on their save (–2 for three creatures or less, –4 if the entire spell is focused on a single creature). This necromancy induces a victim’s throat to constrict and his or her lungs to swell shut, similar to a severe allergic reaction, for so long as the subject remains within range of the spell.\n&emsp;Each round, a victim must attempt a Constitution check. If failed, the victim suffers 1–6 points of damage. If successful, the subject manages to gasp in enough air to reduce the damage to 1–3 points. During its struggles against *asphyxiation*, the affected creature becomes effectively *slowed* (as per the 3rd-level wizard spell). A victim who fails three consecutive Constitution checks has been smothered and dies automatically on the following round.\n&emsp;The effects of *asphyxiate* continue until either the spell expires, a victim withdraws beyond range of the spell, or a successful *dispel magic* is employed on a victim. Victims remain slowed for 1–3 rounds after the spell ends. This spell normally affects only humans or demihumans, though the DM may extend the dominion of the spell to include man-sized or smaller animals and monsters. Obviously, creatures (such as undead and plant creatures) that never breathe cannot be affected by this spell.\n&emsp;Because of its murderous effect, *asphyxiate* is typically granted only to priests serving evil deities.'
+};
+
+pri6['Summon Undead'] = {
+    'level': '6',
+    'school': 'Necromancy, Summoning',
+    'sphere': 'Necromantic, Summoning',
+    'range': '60 yards',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 84',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell summons one or more undead into the general vicinity of the priest. The creatures answer the summons within 7–12 rounds ([[1d6+6]]). Upon their arrival, lesser undead will usually seek to eliminate the priest at once unless he (or she) is suitably fortified behind *protection from evil 10’ radius*. More powerful, intelligent undead may attempt to parley with the priest, but they will invariably end the conversation and attack once their initial curiosity has been satisfied. A priest must be prepared to command, cajole, entice, or destroy whatever creature has been called into his service.\n&emsp;Whenever possible, the DM should choose what kind of undead answers the priest’s summoning, based on the caster’s current surroundings, level of ability, and alignment. Alternatively, the DM may roll a d20 and consult the following table:}}{{cc1-1=bottom}}{{c1-1=**Roll**}}{{c2-1=1–8}}{{c3-1=9–12}}{{c4-1=13–14}}{{c5-1=15}}{{c6-1=16}}{{c7-1=17}}{{c8-1=18–20}}{{c1-2=**Summoned Undead (Number Appearing)**}}{{c2-2=Ghouls (4–16)}}{{c3-2=Ghasts (2–8)}}{{c4-2=Shadows or Wights (2–5)}}{{c5-2=Wraiths or Mummy (1–3)}}{{c6-2=Spectre, Ghost, or Banshee (1)}}{{c7-2=Special (1)}}{{c8-2=No undead in range (0)}}{{effects2=&emsp;Special undead might include sons of Kyuss, apparitions, crypt things, eyes of fear and flame, and any other unusual undead creature the DM may *wish* to introduce. In truly rare circumstances (for instance, if the spell is cast near a creature’s lair), this spell might attract the attention of a more powerful undead, such as a death knight, vampire, or even a lich. These beings will seldom arrive in a predictable fashion and are the most likely to demand some form of nasty retribution or lavish sacrifice to appease.\n&emsp;The summoned undead remain in the vicinity of the priest for at least one turn per level and may be commanded to assist the priest in his or her endeavors (including, possibly, attacking the caster’s opponents). Unless fortified with *resist turning*, the undead summoned by this spell can be turned (or commanded) by priests other than the caster. Because it enlists the service of powerful and malicious undead, *summon undead* is granted only to priests serving evil deities.'
+};
+
+pri7['Death Pact'] = {
+    'level': '7',
+    'school': 'Necromancy, Alteration',
+    'sphere': 'Necromantic, Summoning',
+    'range': 'Change',
+    'duration': 'Special',
+    'aoe': 'One individual (usually caster)',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'An (un)holy sanctuary consecrated to the caster’s deity and seven drops each of the caster’s blood, the recipient’s blood, (un)holy water, and dew.',
+    'reference': 'p. 85',
+    'book': 'The Complete Book of Necromancers',
+    'damage': '',
+    'damage-type': '',
+    'healing': 'All hit points except [[1d4+1]]',
+    'effect': 'By completing this ritual, a high priest forges a powerful pact with his or her deity. The covenant ensures that a chosen individual will survive an untimely death. A *death pact* is triggered whenever the protected individual is reduced to fewer than 0 hit points (mortally wounded) due to combat, spell, or accident. In the same round, the subject receives the following benefits:\n&emsp;• The individual (or his or her remains) and all possessions are transported immediately back to a religious sanctuary as if by a *word of recall* (the location of the sanctuary must be specified at the time of forging the *death pact*).\n&emsp;• Upon arrival, the individual receives a *raise dead* spell (if necessary) and automatically makes any required system shock roll.\n&emsp;• Any physical damage sustained by the individual is completely *healed* except for 2–5 (1d4+1) points of damage.\n&emsp;• Any severed or amputated limbs are instantaneously *regenerated*.\n&emsp;• The body is cleared of lingering enchantments with a *dispel magic* (bestowed at caster’s level), whether beneficial or baneful, and cleansed of all poisons, diseases, blindness, curses, and insanity.\n&emsp;A *death pact* will remain in effect indefinitely until the conditions established at the time of its forging have been fulfilled. The *pact* may be established to benefit an individual other than the caster. However, in almost all cases, the chosen one must be in good standing with the caster’s religion and agree to undertake a mission that will directly benefit the deity or dark power responsible for granting the spell. A *dispel magic* cannot end a *death pact* prematurely.\n&emsp;This powerful spell is not without its costs, however. Forging a *death pact* is an exhaustively stressful process, drawing the priest into draining audiences with extraplanar powers. As a result, establishing a *death pact* ages the caster five years and requires at least one week for complete recuperation, during which time the priest cannot cast any spells or engage in any physically demanding activity. Furthermore, when the pact is invoked, the mystical transport and instantaneous healing exacts another toll, this time aging the recipient for five years (if the individual was *raised*, he or she also loses one point of Constitution permanently). Thus, if the priest casts the spell on him- or herself, he or she must be prepared to sacrifice at least ten years of life!\n&emsp;This powerful pact has enabled many “slain” priests to return from the dead and eliminate their enemies. Wicked necromancers in the service of evil deities are rumored to have significantly reduced the terrible personal toll on the caster by some unspeakably foul sacrifice. Note that powerful wizard necromancers might achieve a similar effect with *wish*-fortified *contingency* spells.'
+};
 //#endregion
 
 const priestSpells = {};
