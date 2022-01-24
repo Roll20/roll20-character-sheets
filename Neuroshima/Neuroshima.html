@@ -2132,30 +2132,38 @@ const stats2wsp = {
                 // Successes and failures
                 let statbase = 10;
                 let dice_style = [0,0,0];
-                let vals_s = vals.concat();
-                let vals_i = [-1,-1,-1];
+                let vals_s = vals.concat().sort(function(a, b){return a-b});;
                 const difficulties = [-2,0,2,5,8,11,15];
                 
-                let statreq = statbase + difficulties[final_test_level];
+                let statreq = statbase - difficulties[final_test_level];
                 let succ = 0;
                 for (x=0; x<3; ++x) {
                     if(vals_s[x] <= statreq) {
                         succ += 1;
                         dice_style[x] = 0;
                     } else {
-                        if ( vals_s[x] + skill_remaining <= statreq ) {
-                            skill_remaining -= (statreq - vals_s[x]);
+                        if ( vals_s[x] - skill_remaining <= statreq ) {
+                            skill_remaining -= (vals_s[x] - statreq);
                             succ += 1;
                             dice_style[x] = 1;
                         } else if ( skill_remaining ){
                             skill_remaining = 0;
                             dice_style[x] = 2;
+                        } else {
+                            dice_style[x] = 2;
                         }
                     }
                 }
-                let dice_unsort = [0,0,0];
+                let dice_unsort = [3,3,3];
                 for(x=0; x<3; ++x) {
-                    dice_unsort[x] = dice_style[vals_i[x]];
+                    for(let y=0; y<3; ++y) {
+                        if(vals[x]==vals_s[y]) {
+                            dice_unsort[x] = dice_style[y];
+                            vals_s[y] = -1;
+                            vals[x] = 0;
+                            break;
+                        }
+                    }
                 }
                 
 
@@ -2212,25 +2220,25 @@ on('clicked:test2', (info) => {
             test {{skill-name}} na {{computed::base_wsp_name}}</h1>
 
             
-            {{#rollTotal() computed::roll1 0}}<div style="background-color:rgba(72, 209, 205, 0.3);">{{/rollTotal() computed::roll1 0}}
-            {{#rollTotal() computed::roll1 1}}<div style="background-color:rgba(255, 68, 0, 0.3);">{{/rollTotal() computed::roll1 1}}
-            {{#rollTotal() computed::roll1 2}}<div style="background-color:rgba(255, 68, 0, 0.45);">{{/rollTotal() computed::roll1 2}}
+            {{#rollTotal() computed::roll1 0}}<div style="background-color:rgba(0, 255, 0, 0.3);">{{/rollTotal() computed::roll1 0}}
+            {{#rollTotal() computed::roll1 1}}<div style="background-color:rgba(0, 200, 128, 0.3);">{{/rollTotal() computed::roll1 1}}
+            {{#rollTotal() computed::roll1 2}}<div style="background-color:rgba(255, 68, 0, 0.6);">{{/rollTotal() computed::roll1 2}}
             {{#rollTotal() computed::roll1 3}}<div style="background-color: rgba(0, 0, 0, 0.4);">{{/rollTotal() computed::roll1 3}}
                 <h4>D1 = {{roll1}}</h4>
             </div>
 
             
-            {{#rollTotal() computed::roll2 0}}<div style="background-color:rgba(72, 209, 205, 0.3);">{{/rollTotal() computed::roll2 0}}
-            {{#rollTotal() computed::roll2 1}}<div style="background-color:rgba(255, 68, 0, 0.3);">{{/rollTotal() computed::roll2 1}}
-            {{#rollTotal() computed::roll2 2}}<div style="background-color:rgba(255, 68, 0, 0.45);">{{/rollTotal() computed::roll2 2}}
+            {{#rollTotal() computed::roll2 0}}<div style="background-color:rgba(0, 255, 0, 0.3);">{{/rollTotal() computed::roll2 0}}
+            {{#rollTotal() computed::roll2 1}}<div style="background-color:rgba(0, 200, 128, 0.3);">{{/rollTotal() computed::roll2 1}}
+            {{#rollTotal() computed::roll2 2}}<div style="background-color:rgba(255, 68, 0, 0.6);">{{/rollTotal() computed::roll2 2}}
             {{#rollTotal() computed::roll2 3}}<div style="background-color: rgba(0, 0, 0, 0.4);">{{/rollTotal() computed::roll2 3}}
                 <h4>D2 = {{roll2}}</h4>
             </div>
 
             
-            {{#rollTotal() computed::roll3 0}}<div style="background-color:rgba(72, 209, 205, 0.3);">{{/rollTotal() computed::roll3 0}}
-            {{#rollTotal() computed::roll3 1}}<div style="background-color:rgba(255, 68, 0, 0.3);">{{/rollTotal() computed::roll3 1}}
-            {{#rollTotal() computed::roll3 2}}<div style="background-color:rgba(255, 68, 0, 0.45);">{{/rollTotal() computed::roll3 2}}
+            {{#rollTotal() computed::roll3 0}}<div style="background-color:rgba(0, 255, 0, 0.3);">{{/rollTotal() computed::roll3 0}}
+            {{#rollTotal() computed::roll3 1}}<div style="background-color:rgba(0, 200, 128, 0.3);">{{/rollTotal() computed::roll3 1}}
+            {{#rollTotal() computed::roll3 2}}<div style="background-color:rgba(255, 68, 0, 0.6);">{{/rollTotal() computed::roll3 2}}
             {{#rollTotal() computed::roll3 3}}<div style="background-color: rgba(0, 0, 0, 0.4);">{{/rollTotal() computed::roll3 3}}
                 <h4>D3 = {{roll3}}</h4>
             </div>

@@ -316,30 +316,38 @@ const stats2wsp = {
                 // Successes and failures
                 let statbase = 10;
                 let dice_style = [0,0,0];
-                let vals_s = vals.concat();
-                let vals_i = [-1,-1,-1];
+                let vals_s = vals.concat().sort(function(a, b){return a-b});;
                 const difficulties = [-2,0,2,5,8,11,15];
                 
-                let statreq = statbase + difficulties[final_test_level];
+                let statreq = statbase - difficulties[final_test_level];
                 let succ = 0;
                 for (x=0; x<3; ++x) {
                     if(vals_s[x] <= statreq) {
                         succ += 1;
                         dice_style[x] = 0;
                     } else {
-                        if ( vals_s[x] + skill_remaining <= statreq ) {
-                            skill_remaining -= (statreq - vals_s[x]);
+                        if ( vals_s[x] - skill_remaining <= statreq ) {
+                            skill_remaining -= (vals_s[x] - statreq);
                             succ += 1;
                             dice_style[x] = 1;
                         } else if ( skill_remaining ){
                             skill_remaining = 0;
                             dice_style[x] = 2;
+                        } else {
+                            dice_style[x] = 2;
                         }
                     }
                 }
-                let dice_unsort = [0,0,0];
+                let dice_unsort = [3,3,3];
                 for(x=0; x<3; ++x) {
-                    dice_unsort[x] = dice_style[vals_i[x]];
+                    for(let y=0; y<3; ++y) {
+                        if(vals[x]==vals_s[y]) {
+                            dice_unsort[x] = dice_style[y];
+                            vals_s[y] = -1;
+                            vals[x] = 0;
+                            break;
+                        }
+                    }
                 }
                 
 
