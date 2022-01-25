@@ -2,7 +2,15 @@
 This is a rewrite based on the early 2e (basic) and 1e edition that also includes a 2e sheet for adversaries. It features correct handling of favoured rolls, weary/miserable state, bonus dice and stance related bonus changes to attack rating, parry, protection and damage.
 
 # Release History
-
+## 02.01.00 (Build 5)
+### Features
+- changed stance values from "Forward/Open/Defensive/Rearward" to "1/2/3/4" because this opens the way for players to easily toggle stance by using the token bar
+- stance changes toggle the stance attack bonus automatically (forward:1/open:0/defensive:-1/rearward:0). The checkbox now only effects the attack damage bonus and is automatically activated when in forward stance (this can be used for Beorning with GREAT STRENGTH virtue to get +1 damage bonus in forward stance). 
+- adversary targeted attack will take the opponent's stance into account and modify the success dice with +1/0/-1 automatically.
+- favoured protection rolls (e.g. due to dwarf virtue "stone hard")
+### Bugfixes
+- CM checkbox not clickable (armour with cunning make), https://trello.com/c/lM1rrRA9
+- swapped position of Valour and Wisdom
 ## 02.00.01 (Build 4)
 - rename Advancement Points -> Adventure Points
 
