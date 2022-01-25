@@ -6788,6 +6788,22 @@
                     {{/rollGreater() result 130}}
                 {{/rollBetween() naming 0 0}}
             </td>
+            <!--{{#rollBetween() naming 1 1}}
+                <tr>
+                    <td>Fokus: {{fokus}}</td>
+                </tr>
+                <tr>
+                    <td>Neg. EG: {{computed:neg}}</td>
+                </tr>
+            {{/rollBetween() naming 1 1}}
+            {{#rollBetween() naming 0 0}}
+                <tr>
+                    <td>Fokus: {{fokus}}</td>
+                </tr>
+                <tr>
+                    <td>Neg. EG: {{computed:neg}}</td>
+                </tr>
+            {{/rollBetween() naming 0 0}} -->
         </tr> 
     </table>
 </rolltemplate>
@@ -11563,9 +11579,7 @@ on("clicked:repeating_nahkampfwaffen:angriff clicked:repeating_nahkampfwaffen:ak
             let waffenmod = parseInt(values['repeating_nahkampfwaffen_waffenmod'], 10) || 0;
             let damageroll = values['repeating_nahkampfwaffen_damageroll'];
             let rolldamage = values['repeating_nahkampfwaffen_rolldamage'];
-            console.log("Rolldamage: " + rolldamage);
             let rollpatzer = values['rollpatzer'];
-            console.log("Rollpatzer: " + rollpatzer);
             let nahwaffenattrmod = parseInt(values['repeating_nahkampfwaffen_nahwaffenattrmod'], 10) || 0;
             let angriffsbonus = parseInt(values['repeating_nahkampfwaffen_angriffsbonus'], 10) || 0;
             let kampffertigkeitenbonus = parseInt(values['repeating_nahkampfwaffen_kampffertigkeitenbonus'], 10) || 0;
@@ -11669,12 +11683,20 @@ on("clicked:repeating_zauber:roll", function(eventInfo) {
         let zauberschwierigkeit = parseInt(values['repeating_zauber_zauberschwierigkeit'], 10) || 0;
         let sum = +zauberwert + +zaubermod1 + +zaubermod2 + +hiddenmod + +zauberattrmod + +hiddenallfert - +geblendet - +glaubenskrise - +schadensmod;
         
+        if (zauberkosten.indexOf("K") > -1) {
+            if (zauberkosten.indexOf("V") > -1) {
+                zauberkosten = zauberkosten.substr(zauberkosten.indexOf("K") + 1, zauberkosten.indexOf("V") - 1);
+            } else {
+                zauberkosten = zauberkosten.substr(zauberkosten.indexOf("K") + 1);
+            }
+        } 
+        
         if (gmroll == 0) {
             abilityroll += "/w GM ";
         }
     
         abilityroll += "&{template:splittermond_generic}";
-        baseRoll = `${abilityroll} {{name=Zauber: ${zaubername}}} {{Probe=[[ ${baseDice} + [[${sum}]] ]]}} {{damage=${rolldamagespell}}} {{mod=[[?{Situationsmodifikator|0}]]}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{mode=[[${mode}]]}} {{success=[[0]]}} {{changer=${spelldamagechanger}}} {{damage=${rolldamagespell}}} {{charactername=@{character_name}}} {{dmgmalus=[[@{schadensmod}d1]]}} {{grmmode=[[${grmmode}]]}} {{basiswert=[[${zauberwert}d1]]}} {{erschoepft=[[@{erschoepft}d1]]}} {{geblendet=[[@{geblendet}d1]]}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|${zauberschwierigkeit}}]]}} {{Ticks=[[3+@{gesamttickplus}+@{benommen} @{initracker_input}]]}} {{rollzauberpatzer=${rollzauberpatzer}}} {{patzer=[[2]]}} {{fokus=${zauberkosten}}}`;
+        baseRoll = `${abilityroll} {{name=Zauber: ${zaubername}}} {{Probe=[[ ${baseDice} + [[${sum}]] ]]}} {{neg=[[0]]}} {{damage=${rolldamagespell}}} {{mod=[[?{Situationsmodifikator|0}]]}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{mode=[[${mode}]]}} {{success=[[0]]}} {{changer=${spelldamagechanger}}} {{damage=${rolldamagespell}}} {{charactername=@{character_name}}} {{dmgmalus=[[@{schadensmod}d1]]}} {{grmmode=[[${grmmode}]]}} {{basiswert=[[${zauberwert}d1]]}} {{erschoepft=[[@{erschoepft}d1]]}} {{geblendet=[[@{geblendet}d1]]}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|${zauberschwierigkeit}}]]}} {{Ticks=[[3+@{gesamttickplus}+@{benommen} @{initracker_input}]]}} {{rollzauberpatzer=${rollzauberpatzer}}} {{patzer=[[2]]}} {{fokus=${zauberkosten}}}`;
         
         processRoll(baseRoll); 
     });
