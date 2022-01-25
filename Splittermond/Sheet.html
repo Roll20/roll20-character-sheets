@@ -3139,6 +3139,9 @@
                         <div class="d--flex">
                             <b class="text--right mr--1">Zauberpatzer</b>
                             <button class="button" type=roll value="&{template:splittermond_patzer} {{charactername=@{character_name}}} {{naming=[[?{Zauber- oder Priesterpatzer?|Zauberpatzer, 1|Priesterpatzer, 0}]]}} {{charactername=@{character_name}}} {{result=[[2d10 + ?{Negative Erfolgsgrade|1} * ?{Fokuskosten|1}]]}} {{fk=[[?{Fokuskontrolle oder Nichts passiert?|------, 0|Fokuskontrolle, 1|Nichts passiert!, 2}]]}} {{sbm=[[@{hiddensbm}]]}} {{s1=[[1d6]]}} {{s2=[[2d6]]}} {{s3=[[2d10]]}} {{s4=[[3d10]]}} {{s5=[[4d10]]}} {{s6=[[5d10]]}} {{s7=[[7d10]]}} {{s8=[[10d10]]}}"></button>
+                            <input type="hidden" name="attr_rollzauberpatzer" value="[Wirf!](~show_zauberpatzertext)" />
+                            <button type="roll" name="roll_show_zauberpatzertext" style="display: none" value="@{zauberpatzertext}" class="btn ui-draggable"></button>
+                            <input type="hidden" name="attr_zauberpatzertext" value="&{template:splittermond_patzer} {{charactername=@{character_name}}} {{naming=[[?{Zauber- oder Priesterpatzer?|Zauberpatzer, 1|Priesterpatzer, 0}]]}} {{charactername=@{character_name}}} {{result=[[2d10 + ?{Negative Erfolgsgrade|1} * ?{Fokuskosten|1}]]}} {{fk=[[?{Fokuskontrolle oder Nichts passiert?|------, 0|Fokuskontrolle, 1|Nichts passiert!, 2}]]}} {{sbm=[[@{hiddensbm}]]}} {{s1=[[1d6]]}} {{s2=[[2d6]]}} {{s3=[[2d10]]}} {{s4=[[3d10]]}} {{s5=[[4d10]]}} {{s6=[[5d10]]}} {{s7=[[7d10]]}} {{s8=[[10d10]]}}" />
                         </div>
                     </div>
                 </div>
@@ -5252,6 +5255,10 @@
         <input type="checkbox" name="attr_updates" class="d--none" value="42" title="Updates" />
     </label>
     <h1 style="color: white;">Letzte Updates</h1> <br/>
+    <h2 style="color: white;">25.01.2022</h2>
+    <ul>
+        <li>Patzerw&uuml;rfe im Kampf (Kampffertigkeiten &amp; Zauber) k&ouml;nnen jetzt direkt aus dem Chat heraus gew&uuml;rfelt werden.</li>
+    </ul>
     <h2 style="color: white;">21.11.2021</h2>
     <ul>
         <li>Die Systemanpassung <em>Wer blutet, stirbt</em> kann jetzt in den Einstellungen aktiviert werden.</li>
@@ -5262,11 +5269,6 @@
         <li>Beim NSC-Bogen wurde au&szlig;erdem der Gro&szlig;meisterw&uuml;rfel implementiert.</li>
         <li>In den Einstellungen kann man bei den Fertigkeiten jetzt zum alten 3-W&uuml;rfel-Design wechseln.</li>
         <li>Kleinere Fehlerkorrekturen im Zusammenhang mit fehlerhaftem Chat-Output.</li>
-    </ul>
-    <h2 style="color: white;">11.10.2021</h2>
-    <ul>
-        <li>Die drei Aktive Abwehr-W&uuml;rfel im Kampf-Reiter funktionieren wieder wie gewohnt.</li>
-        <li>Einige kleinere Fehler im Zusammenhang mit fehlerhaften Schadensw&uuml;rfen bei Angriffen wurden behoben.</li>
     </ul>
 </div>
 <p class="text--center">Mit Dank an alle begeisterten Splittermond-Spieler, die diesen Charakterbogen nutzen und mit ihrem Feedback f&uuml;r stetige Verbesserungen sorgen!</p>
@@ -5892,13 +5894,20 @@
                 {{/changer}}
             </div>
         </div>
-        <div class="d--flex d--flex--align-baseline roll-message__fight">
-            <div class="d--flex__item--grow2 text--right">
-                {{#rollBetween() computed::success 1 1}}
-                    <span>Patzertabelle</span> {{rollpatzer}}
-                {{/rollBetween() computed::success 1 1}}
+        {{#rollBetween() computed::success 1 1}}
+            {{#patzer}}
+                <div class="d--flex d--flex--align-baseline roll-message__fight">
+                    <div class="d--flex__item--grow2 text--right">
+                        {{#rollBetween() patzer 1 1}}
+                            <span>Patzertabelle</span> {{rollpatzer}}
+                        {{/rollBetween() patzer 1 1}}
+                        {{#rollBetween() patzer 2 2}}
+                            <span>Patzertabelle</span> {{rollzauberpatzer}}
+                        {{/rollBetween() patzer 2 2}}
+                    </div>
             </div>
-        </div>
+            {{/patzer}}
+        {{/rollBetween() computed::success 1 1}}
         <div class="roll-message__footer"> 
             <span>Erfolgsgrade</span>
             <span class="success-num">
@@ -11554,7 +11563,9 @@ on("clicked:repeating_nahkampfwaffen:angriff clicked:repeating_nahkampfwaffen:ak
             let waffenmod = parseInt(values['repeating_nahkampfwaffen_waffenmod'], 10) || 0;
             let damageroll = values['repeating_nahkampfwaffen_damageroll'];
             let rolldamage = values['repeating_nahkampfwaffen_rolldamage'];
+            console.log("Rolldamage: " + rolldamage);
             let rollpatzer = values['rollpatzer'];
+            console.log("Rollpatzer: " + rollpatzer);
             let nahwaffenattrmod = parseInt(values['repeating_nahkampfwaffen_nahwaffenattrmod'], 10) || 0;
             let angriffsbonus = parseInt(values['repeating_nahkampfwaffen_angriffsbonus'], 10) || 0;
             let kampffertigkeitenbonus = parseInt(values['repeating_nahkampfwaffen_kampffertigkeitenbonus'], 10) || 0;
@@ -11575,7 +11586,7 @@ on("clicked:repeating_nahkampfwaffen:angriff clicked:repeating_nahkampfwaffen:ak
             
             if (modus == "angriff") {
                 abilityroll += "&{template:splittermond_generic}";
-                baseRoll = `${abilityroll} {{name=${waffenname}}} {{Probe=[[ ${baseDice} + [[${sum}]] ]]}} {{damage=${rolldamage}}} {{charactername=@{character_name}}} {{rollpatzer=${rollpatzer}}} {{mod=[[?{Situationsmodifikator|0}]]}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{mode=[[${mode}]]}} {{success=[[0]]}} {{dmgmalus=[[@{schadensmod}d1]]}} {{geblendet=[[@{geblendet}d1]]}} {{basiswert=[[${waffenwert}d1]]}} {{skillbonus=[[${waffenmod}]]}} {{angriffsbonus=[[${angriffsbonus}]]}} {{kampffertigkeitenbonus=[[${kampffertigkeitenbonus}]]}} {{erschoepft=[[@{erschoepft}d1]]}} {{bbeh=[[${bBeh}]]}} {{behinderung=[[${behinderung}]]}} {{grmmode=[[${grmmode}]]}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|15}]]}}`;
+                baseRoll = `${abilityroll} {{name=${waffenname}}} {{Probe=[[ ${baseDice} + [[${sum}]] ]]}} {{damage=${rolldamage}}} {{charactername=@{character_name}}} {{rollpatzer=${rollpatzer}}} {{mod=[[?{Situationsmodifikator|0}]]}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{mode=[[${mode}]]}} {{success=[[0]]}} {{dmgmalus=[[@{schadensmod}d1]]}} {{geblendet=[[@{geblendet}d1]]}} {{basiswert=[[${waffenwert}d1]]}} {{skillbonus=[[${waffenmod}]]}} {{angriffsbonus=[[${angriffsbonus}]]}} {{kampffertigkeitenbonus=[[${kampffertigkeitenbonus}]]}} {{erschoepft=[[@{erschoepft}d1]]}} {{bbeh=[[${bBeh}]]}} {{behinderung=[[${behinderung}]]}} {{grmmode=[[${grmmode}]]}} {{patzer=[[1]]}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|15}]]}}`;
             } else if (modus == "aktiveabwehr") {
                 abilityroll += "&{template:splittermond_aktiveabwehr}";
                 baseRoll = `${abilityroll} {{waffenname=${waffenname}}} {{Probe=[[ ${baseDice} + [[${defsum}]] ]]}} {{verteidigung=[[${verteidigung}]]}} {{neuerwert=Verteidigung}} {{naming=Parade - ${waffenname}}} {{def=[[1d0 + ${waffendefensiv}]]}} {{charactername=@{character_name}}} {{mod=[[?{Situationsmodifikator|0}]]}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{standardwurf=$[[2]]}} {{mode=[[${mode}]]}} {{success=[[0]]}} {{dmgmalus=[[@{schadensmod}d1]]}} {{geblendet=[[@{geblendet}d1]]}} {{basiswert=[[${waffenwert}d1]]}} {{skillbonus=[[${waffenmod}]]}} {{kampffertigkeitenbonus=[[${kampffertigkeitenbonus}]]}} {{erschoepft=[[@{erschoepft}d1]]}} {{bbeh=[[${bBeh}]]}} {{behinderung=[[${behinderung}]]}} {{grmmode=[[${grmmode}]]}} {{rollpatzer=${rollpatzer}}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|15}]]}} {{Ticks=[[3 @{initracker_input}]]}}`;
@@ -11619,7 +11630,7 @@ on("clicked:repeating_fernkampfwaffen:angriff", function(eventInfo) {
             }
             
             abilityroll += "&{template:splittermond_generic}";
-            baseRoll = `${abilityroll} {{name=${waffenname}}} {{Probe=[[ ${baseDice} + [[${sum}]] ]]}} {{damage=${rolldamage}}} {{charactername=@{character_name}}} {{mod=[[?{Situationsmodifikator|0}]]}} {{rollpatzer=${rollpatzer}}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{mode=[[${mode}]]}} {{success=[[0]]}} {{dmgmalus=[[@{schadensmod}d1]]}} {{geblendet=[[@{geblendet}d1]]}} {{basiswert=[[${waffenwert}d1]]}} {{skillbonus=[[${waffenmod}]]}} {{angriffsbonus=[[${angriffsbonus}]]}} {{kampffertigkeitenbonus=[[${kampffertigkeitenbonus}]]}} {{erschoepft=[[@{erschoepft}d1]]}} {{bbeh=[[${bBeh}]]}} {{behinderung=[[${behinderung}]]}} {{grmmode=[[${grmmode}]]}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|15}]]}}`;
+            baseRoll = `${abilityroll} {{name=${waffenname}}} {{Probe=[[ ${baseDice} + [[${sum}]] ]]}} {{damage=${rolldamage}}} {{charactername=@{character_name}}} {{mod=[[?{Situationsmodifikator|0}]]}} {{rollpatzer=${rollpatzer}}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{mode=[[${mode}]]}} {{success=[[0]]}} {{dmgmalus=[[@{schadensmod}d1]]}} {{geblendet=[[@{geblendet}d1]]}} {{basiswert=[[${waffenwert}d1]]}} {{skillbonus=[[${waffenmod}]]}} {{angriffsbonus=[[${angriffsbonus}]]}} {{kampffertigkeitenbonus=[[${kampffertigkeitenbonus}]]}} {{erschoepft=[[@{erschoepft}d1]]}} {{bbeh=[[${bBeh}]]}} {{behinderung=[[${behinderung}]]}} {{grmmode=[[${grmmode}]]}} {{patzer=[[1]]}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|15}]]}}`;
             
             processRoll(baseRoll); 
         });
@@ -11628,7 +11639,7 @@ on("clicked:repeating_fernkampfwaffen:angriff", function(eventInfo) {
 
 on("clicked:repeating_zauber:roll", function(eventInfo) {
     
-    getAttrs(['repeating_zauber_gm', 'repeating_zauber_zaubername', 'repeating_zauber_damagerollspell', 'repeating_zauber_rolldamagespell', 'repeating_zauber_zauberwert', 'repeating_zauber_zaubermod1', 'repeating_zauber_zaubermod2', 'repeating_zauber_hiddenmod', 'repeating_zauber_zauberattrmod', 'repeating_zauber_zauberkosten', 'repeating_zauber_spelldamagechanger', 'initracker_input', 'hiddenallfert', 'geblendet', 'erschoepft', 'schadensmod', 'dice_mod', 'glaubenskrise', 'repeating_zauber_zauberschwierigkeit', 'gmroll'], function (values) {
+    getAttrs(['repeating_zauber_gm', 'repeating_zauber_zaubername', 'repeating_zauber_damagerollspell', 'repeating_zauber_rolldamagespell', 'repeating_zauber_zauberwert', 'repeating_zauber_zaubermod1', 'repeating_zauber_zaubermod2', 'repeating_zauber_hiddenmod', 'repeating_zauber_zauberattrmod', 'repeating_zauber_zauberkosten', 'repeating_zauber_spelldamagechanger', 'initracker_input', 'hiddenallfert', 'geblendet', 'erschoepft', 'schadensmod', 'dice_mod', 'glaubenskrise', 'repeating_zauber_zauberschwierigkeit', 'gmroll', 'rollzauberpatzer'], function (values) {
         let baseRoll = "";
         let dice_mod = parseInt(values['dice_mod'], 10) || 0;
         let wuerfel = getWuerfel(dice_mod);
@@ -11641,6 +11652,7 @@ on("clicked:repeating_zauber:roll", function(eventInfo) {
         let zauberwert = parseInt(values['repeating_zauber_zauberwert'], 10) || 0;
         let damagerollspell = values['repeating_zauber_damagerollspell'];
         let rolldamagespell = values['repeating_zauber_rolldamagespell'];
+        let rollzauberpatzer = values['rollzauberpatzer'];
         let spelldamagechanger = values['repeating_zauber_spelldamagechanger'];
         let zaubermod1 = parseInt(values['repeating_zauber_zaubermod1'], 10) || 0;
         let zaubermod2 = parseInt(values['repeating_zauber_zaubermod2'], 10) || 0;
@@ -11662,7 +11674,7 @@ on("clicked:repeating_zauber:roll", function(eventInfo) {
         }
     
         abilityroll += "&{template:splittermond_generic}";
-        baseRoll = `${abilityroll} {{name=Zauber: ${zaubername}}} {{Probe=[[ ${baseDice} + [[${sum}]] ]]}} {{damage=${rolldamagespell}}} {{mod=[[?{Situationsmodifikator|0}]]}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{mode=[[${mode}]]}} {{success=[[0]]}} {{changer=${spelldamagechanger}}} {{damage=${rolldamagespell}}} {{charactername=@{character_name}}} {{dmgmalus=[[@{schadensmod}d1]]}} {{grmmode=[[${grmmode}]]}} {{basiswert=[[${zauberwert}d1]]}} {{erschoepft=[[@{erschoepft}d1]]}} {{geblendet=[[@{geblendet}d1]]}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|${zauberschwierigkeit}}]]}} {{Ticks=[[3+@{gesamttickplus}+@{benommen} @{initracker_input}]]}} {{fokus=${zauberkosten}}}`;
+        baseRoll = `${abilityroll} {{name=Zauber: ${zaubername}}} {{Probe=[[ ${baseDice} + [[${sum}]] ]]}} {{damage=${rolldamagespell}}} {{mod=[[?{Situationsmodifikator|0}]]}} {{grossmeister=[[1d10]]}} {{erfolge=[[1]]}} ${wuerfel} {{mode=[[${mode}]]}} {{success=[[0]]}} {{changer=${spelldamagechanger}}} {{damage=${rolldamagespell}}} {{charactername=@{character_name}}} {{dmgmalus=[[@{schadensmod}d1]]}} {{grmmode=[[${grmmode}]]}} {{basiswert=[[${zauberwert}d1]]}} {{erschoepft=[[@{erschoepft}d1]]}} {{geblendet=[[@{geblendet}d1]]}} {{schwierigkeit=[[1d0 + ?{Schwierigkeit|${zauberschwierigkeit}}]]}} {{Ticks=[[3+@{gesamttickplus}+@{benommen} @{initracker_input}]]}} {{rollzauberpatzer=${rollzauberpatzer}}} {{patzer=[[2]]}} {{fokus=${zauberkosten}}}`;
         
         processRoll(baseRoll); 
     });
