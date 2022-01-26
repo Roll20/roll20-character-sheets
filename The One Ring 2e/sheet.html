@@ -1,6 +1,7 @@
 <input type="hidden" name="attr_version" value="02-01-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
-<input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" hidden readonly />
+<input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
+    readonly />
 <div class="sheet-pc">
     <div id="content">
         <div id="character">
@@ -92,7 +93,7 @@
                         <span><input class="" name="attr_strength" value="0" type="number"></span></span>
                     <span></span>
                     <span class="diamond-small">
-                        <span><input class="" name="attr_endurance" value="0" type="number"></span></span>
+                        <span><input class="" name="attr_endurance" value="1" type="number"></span></span>
                     <label data-i18n="endurance-short" data-i18n-title="endurance" class="left">Endur.</label>
                 </div>
 
@@ -102,7 +103,7 @@
                         <span><input class="strong" name="attr_strengthtn" value="0" type="number"></span></span>
                     <span></span>
                     <span class="diamond-red">
-                        <span><input class="strong" name="attr_currentendurance" value="0" type="number"></span></span>
+                        <span><input class="strong" name="attr_currentendurance" value="1" type="number"></span></span>
                     <label data-i18n="current-endurance" data-i18n-title="current-endurance" class="left">Current
                         Endurance</label>
                     <span></span>
@@ -134,7 +135,7 @@
                         <span><input name="attr_heart" value="0" type="number"></span></span>
                     <span></span>
                     <span class="diamond-small">
-                        <span><input class="" name="attr_hope" value="0" type="number"></span></span>
+                        <span><input class="" name="attr_hope" value="1" type="number"></span></span>
                     <label data-i18n="hope" class="left">Hope</label>
                 </div>
 
@@ -144,7 +145,7 @@
                         <span><input class="strong" name="attr_hearttn" value="0" type="number"></span></span>
                     <span></span>
                     <span class="diamond-red">
-                        <span><input class="strong" name="attr_currenthope" value="0" type="number"></span></span>
+                        <span><input class="strong" name="attr_currenthope" value="1" type="number"></span></span>
                     <label data-i18n="current-hope" class="left">Current Hope</label>
                 </div>
 
@@ -363,7 +364,7 @@
                         data-i18n-title="stance-attack-modifier-description">Attack
                         Mod.:</label><input name="attr_stanceattackbonus" value="0" type="number" readonly>
                     <label><input name="attr_stanceattack_active" type="checkbox" value="1">Stance Damage:</label><input
-                        name="attr_stancedamagebonus" value="1" type="number">
+                        name="attr_stancedamagebonus" value="0" type="number">
                 </div>
             </div>
         </div>
@@ -1029,26 +1030,6 @@
 </div>
 <div style="display: none;">
     <input name="attr_wearytype">
-    <input name="attr_awe_fav">
-    <input name="attr_athletics_fav">
-    <input name="attr_awareness_fav">
-    <input name="attr_hunting_fav">
-    <input name="attr_song_fav">
-    <input name="attr_craft_fav">
-    <input name="attr_enhearten_fav">
-    <input name="attr_travel_fav">
-    <input name="attr_insight_fav">
-    <input name="attr_healing_fav">
-    <input name="attr_courtesy_fav">
-    <input name="attr_battle_fav">
-    <input name="attr_persuade_fav">
-    <input name="attr_stealth_fav">
-    <input name="attr_scan_fav">
-    <input name="attr_explore_fav">
-    <input name="attr_riddle_fav">
-    <input name="attr_lore_fav">
-    <input name="attr_valour_fav">
-    <input name="attr_wisdom_fav">
     <input name="attr_awe_roll">
     <input name="attr_athletics_roll">
     <input name="attr_awareness_roll">
@@ -1419,7 +1400,7 @@
     ============================*/
     // weary roll table change 
     on("change:weary sheet:opened", function() {
-        getAttrs(["weary","sheetTab"], function(values) {
+        getAttrs(["weary", "wearytype", "sheetTab"], function(values) {
             if (values.sheetTab === "isPC"){
                 let weary = values.weary||0;
                 if (weary === "on" || weary == 1) {
@@ -1430,6 +1411,11 @@
                 }
                 setAttrs({
                     wearytype: wearytype,
+                });
+            } else {
+                // setting default for adversaries and if sheet is opened the first time
+                setAttrs({
+                    wearytype: "normal",
                 });
             };
         });
@@ -1444,13 +1430,13 @@
                     endurance = int(values.endurance);
                 let weary = values.weary,
                     currentendurance = int(values.currentendurance); 
-                    clog(`Endurance: ${JSON.stringify(values)}`);
-                    if ( load >= (currentendurance-fatigue) ) { weary = 1; } else { weary = 0}
-                    if ( currentendurance > endurance ) { currentendurance = endurance; }
-                    setAttrs({
-                        weary: weary,
-                        currentendurance: currentendurance,
-                    });
+                clog(`Endurance: ${JSON.stringify(values)}`);
+                if ( load >= (currentendurance-fatigue) ) { weary = 1; } else { weary = 0}
+                if ( currentendurance > endurance ) { currentendurance = endurance; }
+                setAttrs({
+                    weary: weary,
+                    currentendurance: currentendurance,
+                });
                 
             };
         });
