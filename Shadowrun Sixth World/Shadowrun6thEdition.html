@@ -713,6 +713,17 @@
 							<label data-i18n="hotsiminitiativedice">Hot Sim VR Initiative Dice</label><input type="number" name="attr_hot_sim_initiative_dice_temp" title="@{hot_sim_initiative_dice_temp}" /><input type="checkbox" name="attr_hot_sim_initiative_dice_temp_flag" value="on" checked />
 						</div>
 					</div>
+
+					<div class="importer">
+						<input class="collapse-flag" name="attr_display_flag" type="checkbox"/>
+						<span class="pictos">c</span>
+						<div class="collapse importer-input">
+							<button class="import-button" name="act_import" type="action" value="">Import</button>
+							<textarea name="attr_import_data" placeholder="WARNING! Anything placed here CAN completely corrupt your character, make a copy!" title="Paste Genesis JSON Here"></textarea>
+						</div>
+						<span class="importer-feedback" name="attr_import_feedback"></span>
+					</div>
+
 				</div>
 			</div>
 		</div>
@@ -3728,7 +3739,7 @@
         <label class="settings" data-i18n-title="conditionmonitor" title="Condition Monitor">
           <input name="attr_physical" placeholder="0" title="@{physical}" type="number" value=""/>
         </label>
-        <span class="toggle-display" name="attr_physical" title="@{physical}"></span>
+        <span class="toggle-display" name="attr_physical_max" title="@{physical_max}"></span>
       </div>
       <div class="rows vehicle">
         <button data-i18n="conditionmonitorpm" name="act_cond_reset" type="action">Condition Monitor (P/M)</button>
@@ -3736,7 +3747,7 @@
           <input name="attr_physical" placeholder="0" title="@{physical}" type="number" value="0"/>
         </label><span class="settings">/</span>
         <label class="settings" data-i18n-title="matrix" title="matrix">
-          <input name="attr_matrix" placeholder="0" title="@{matrix}" type="number" value="0"/>
+          <input name="attr_matrix_max" placeholder="0" title="@{matrix_max}" type="number" value="0"/>
         </label>
         <span class="toggle-display"> <span class="settings tiny-span">=</span><span name="attr_physical" title="@{physical}"></span><span>/</span><span name="attr_matrix" title="@{matrix}"></span></span>
       </div>
@@ -6987,7 +6998,6 @@ on("change:repeating_armor change:body change:charisma", (eventInfo) => {
 		});
 
 	});
-
 });
 
 
@@ -7047,9 +7057,16 @@ const update_track = (track) => {
 
 
 //Calculate Device Rating Track
-on("change:device_rating change:matrix_modifier", () => {
-	getAttrs(["device_rating","matrix_modifier","matrix"], (v) =>{
-		const dev = parseInt(v.device_rating) || 0, mod = parseInt(v.matrix_modifier) || 0;
+on("change:device_rating change:matrix_modifier change:sensor", () => {
+	getAttrs(["sheet_type", "device_rating","matrix_modifier","matrix", "sensor"], (v) =>{
+		if(v.sheet_type == "vehicle") {
+			dev = parseInt(v.sensor) || 0;
+			mod = parseInt(v.matrix_modifier) || 0;
+		} else {
+			dev = parseInt(v.device_rating) || 0;
+			mod = parseInt(v.matrix_modifier) || 0;
+		}
+
 		const dam = parseInt(v.matrix) || 0;
 		const tot = Math.ceil(dev/2) + 8 + mod;
 		const current = (dam > 0) ? dam : tot;
@@ -8893,100 +8910,6 @@ on("change:measurement1 change:measurement2", (eventInfo) => {
 });
 
 
-/****************************/
-/* CHARACTERMANCER IMPORTER */
-/****************************/
-on("clicked:import_launch", (eventInfo) => {
-	startCharactermancer("importer");
-});
-
-on("page:importer", () => {
-	setAttrs({builder: "Chummer"});
-	setCharmancerText({
-		"directions" : chummerDirections
-	});
-});
-
-on("clicked:import", () => {
-	const mancerData = getCharmancerData();
-	const mancerValues = mancerData["importer"].values;
-	let applyEnabled = true;
-	let setText = {};
-
-	// Verify the user entered a JSON in the textarea. If not, provide user feedabck.
-	if (mancerValues.jsonData) {
-		const parsedData = JSON.parse(mancerValues.jsonData) || false;
-		setText[`import-feedback`] = "";
-		// There is a value in the textarea! Check to see if its a valid JSON. Provide users feeadback
-		if (parsedData) {
-			setText[`import-feedback`] += `<p class="feedback">A valid JSON was imported for ${mancerValues.builder}.</p>`
-			// Send the parsed data to the selected importer or let users know something went wrong
-			if (mancerValues.builder && mancerValues.builder === "Chummer") {
-				if (parsedData.characters && parsedData.characters.character) {
-					importChummer(parsedData.characters.character);
-				} else {
-					setText[`import-feedback`] += `<p class="warning">Parsed JSON is missing character data.</p>`;
-					applyEnabled = false
-				}
-			} else if (mancerValues.builder && mancerValues.builder === "Hero Lab") {
-				importHeroLab();
-				setText[`import-feedback`] += `<p class="warning">Coming Soon....</p>`;
-			} else {
-				setText[`import-feedback`] += `<p class="warning">A character builder was not selected. Try changing your selection then change it back if needed.</p>`;
-				applyEnabled = false
-			}
-		} else {
-			setText[`import-feedback`] += `<p class="warning"><span>The text imported is not a valid JSON. Verify the JSON is formatted correctly. Check the format at,</span> JSONLint.com.</p>`;
-			applyEnabled = false
-		};
-	} else {
-		setText[`import-feedback`] = `<p class="warning">No information was entered in the JSON text area.</p>`;
-		applyEnabled = false
-	};
-
-	let buttonStatus = (applyEnabled) ? "" : "disabled";
-	setText[`finish-button`] = `<button class="finish" type="finish" value="apply" data-i18n="apply" ${buttonStatus}>Apply</button>`;
-
-	setCharmancerText(setText);
-});
-
-const chummerDirections = `<ol>
-			<li>In Chummer mark your character as created</li>
-			<li>Go to File -> Export -> Export JSON</li>
-			<li>Copy the JSON in the file</li>
-			<li>Paste it into the textfield below</li>
-			<li>Click the Import button</li>
-			<li>Review the data. Use the checkbox <strong>Show Hidden Inputs</strong> to fix data.</li>
-			<li>Click Apply to <u>overwrite</u> information on the character sheet</li>
-		</ol>`;
-
-const herolabDirections = `
-	<ol>
-		<li>Download the file "HLtoRoll20Export.hl" from: https://drive.google.com/file/d/0B3E3jkp51s8aRmpTU1NMRjRIVkk/view</li>
-		<li>Double click the file. Hero Lab will import it automatically now.</li>
-		<li>Load a character</li>
-		<li>Go to File/Save Custom Output and select the "Roll20 Export"</li>
-		<li>Save the file. It should open automatically in your browser</li>
-		<li>Follow the directions.</li>
-	</ol>`;
-
-on("change:builder", (eventInfo) => {
-	let setText = {};
-	setText[`directions`] = (eventInfo.newValue === "Chummer") ? chummerDirections : herolabDirections;
-	setCharmancerText(setText);
-});
-
-const clean = () => {
-	['active', 'knowledge', 'language', 'quality', 'martial', 'range', 'melee', 'weapon', 'armor', 'augementations', 'items', 'NPCspell', 'spell', 'rituals', 'preps', 'powers', 'contacts', 'vehicle', 'lifestyle', "programs", "forms"].forEach(group => {
-		getSectionIDs(`repeating_${group}`, (ids) => {
-			ids.forEach((id) => {
-				removeRepeatingRow(`repeating_${group}_${id}`);
-			});
-		});
-	});
-};
-
-
 
 //USEFUL FUNCTIONS
 const capitialize = (string) => {
@@ -9023,5 +8946,219 @@ mylog = function(msg) {
 	let lines = new Error().stack.split("\n");
 	log(d.toUTCString() + " " + lines[2].trim() + " " + msg);
 }
+
+
+
+/************/
+/* IMPORTER */
+/************/
+on("clicked:import", (eventInfo) => {
+console.log(eventInfo);
+	let setText = {};
+	let applyEnabled = true;
+
+	getAttrs(['import_data'], (v) => {
+console.log(v.import_data);
+
+		// Verify the user entered a JSON in the textarea. If not, provide user feedabck.
+		let parsedData = '';
+		if (v.import_data) {
+			setText[`import-feedback`] = "";
+
+			// Try to parse the JSON
+			try{
+				parsedData = JSON.parse(v.import_data) || false;
+			} catch(e) {
+				setText[`import-feedback`] += `JSON Parse Error: ` + e + "\n";
+			}
+
+			// There is a value in the textarea! Check to see if its a valid JSON. Provide users feeadback
+			if (parsedData) {
+				setText[`import-feedback`] += `Valid JSON was imported.` + "\n";
+			} else {
+				setText[`import-feedback`] += `The text imported is not valid JSON. Verify the JSON is formatted correctly. Check the format at, JSONLint.com.` + "\n";
+				applyEnabled = false
+			};
+		} else {
+			setText[`import-feedback`] = `Nothing entered in the JSON text area.` + "\n";
+			applyEnabled = false
+		};
+
+		let import_feedback = '';
+		if(applyEnabled) {
+			let success = doImport(parsedData);
+
+			if(success) {
+				import_feedback = 'Import successful. ' + "\n";
+			} else {
+				import_feedback = 'Import failed. ' + "\n";
+				import_feedback += setText[`import-feedback`];
+			}
+		} else {
+			import_feedback = 'Import failed. ' + "\n";
+			import_feedback += setText[`import-feedback`];
+		}
+console.log(import_feedback);
+		setAttrs({
+			import_feedback: import_feedback
+		});
+	});
+});
+
+// clear the import_feedback when they change the contents of import_data
+on("change:import_data", (eventInfo) => {
+console.log("import_data changed");
+	setAttrs({
+		import_feedback: " "
+	});
+});
+
+var doImport = (json) => {
+	// wipe the current character
+	clean();
+console.log("Doing character import");
+console.log(json);
+
+// Mappings [Genesis attr]: [Roll20 attr]
+	// top level data
+	var base = {
+		name: "birth_name",
+		metaType: "metatype",
+		age: "age",
+		freeKarma: "karma",
+		gender: "sex",
+		karma: "total_karma",
+		notes: "notes",
+		nuyen: "nuyen",
+		streetName: "character_name",
+		weight: "weight",
+		initiation: "initiate_grade",
+		submersion: "submersion_level",
+	};
+
+	var attributes = {
+		BODY: "body_base",
+		AGILITY: "agility_base",
+		REACTION: "reaction_base",
+		STRENGTH: "strength_base",
+		WILLPOWER: "willpower_base",
+		LOGIC: "logic_base",
+		INTUITION: "intuition_base",
+		CHARISMA: "charisma_base",
+		EDGE: "edge",
+		MAGIC: "magic_base",
+		RESONANCE: "resonance_base",
+		POWER_POINTS: "power_points"
+	};
+
+
+	var attrs = {};
+	Object.keys(base).forEach(key => {
+		if(json[key]) {
+			attrs[base[`${key}`]] = json[`${key}`];
+		}
+	});
+console.log("Character base imported.");
+
+	json.attributes.forEach(attribute => {
+		if(attribute.id && attribute.modifiedValue) {
+			attrs[attributes[attribute.id]] = attribute.modifiedValue;
+		}
+	});
+console.log("Character attributes imported.");
+
+	json.qualities.forEach(quality => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		if(quality.choice) {
+			rowattrs["repeating_quality_" + row_id + "_quality"] = quality.name + " (" + quality.choice + ")";
+		} else {
+			rowattrs["repeating_quality_" + row_id + "_quality"] = quality.name;
+		}
+		rowattrs["repeating_quality_" + row_id + "_type"] = quality.positive ? "P" : "N";
+		rowattrs["repeating_quality_" + row_id + "_notes"] = quality.page;
+//		rowattrs["repeating_quality_" + row_id + "_rank"] = quality.rank;
+
+		setAttrs(rowattrs);
+	});
+console.log("Character qualities imported.");
+
+	json.skills.forEach(skill => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		if(skill.id != "knowledge" && skill.id != "language") {
+			rowattrs["repeating_skills_" + row_id + "_name"] = skill.name;
+			rowattrs["repeating_skills_" + row_id + "_display_attribute"] = skill.attribute;
+			rowattrs["repeating_skills_" + row_id + "_rating"] = skill.rating;
+			if(skill.specializations) {
+				skill.specializations.forEach(spec => {
+					if(spec.expertise) {
+						rowattrs["repeating_skills_" + row_id + "_expert"] = spec.name;
+						rowattrs["repeating_skills_" + row_id + "_display_expert"] = spec.name;
+					} else {
+						rowattrs["repeating_skills_" + row_id + "_spec"] = spec.name;
+						rowattrs["repeating_skills_" + row_id + "_display_spec"] = spec.name;
+					}
+				});
+			}
+			if(skill.influencedBy) {
+				rowattrs["repeating_skills_" + row_id + "_notes"] = skill.influencedBy.join(", ");
+			}
+		} else {
+			rowattrs["repeating_knowledges_" + row_id + "_name"] = skill.name;
+			rowattrs["repeating_knowledges_" + row_id + "_type"] = skill.id.charAt(0).toUpperCase() + skill.id.slice(1);
+			if(skill.influencedBy) {
+				rowattrs["repeating_knowledges_" + row_id + "_notes"] = skill.influencedBy.join(", ");
+			}
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character skills, knowledges and languages imported.");
+
+	json.armors.forEach(armor => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_armor_" + row_id + "_name"] = armor.name;
+		rowattrs["repeating_armor_" + row_id + "_rating"] = armor.rating;
+		rowattrs["repeating_armor_" + row_id + "_social"] = (armor.social) ? armor.social : 0;
+		rowattrs["repeating_armor_" + row_id + "_notes"] = armor.page;
+
+		if(armor.accessories) {
+			armor.accessories.forEach(acc => {
+				rowattrs["repeating_armor_" + row_id + "_notes"] += ", " + acc.name;
+
+				if(acc.name.includes(" Resistance", -11)) {
+					var resist = acc.name.slice(0, 4);
+					resist = resist.toLowerCase();
+
+					rowattrs["repeating_armor_" + row_id + "_" + resist] = 1;
+				}
+			});
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character armor imported");
+
+
+	setAttrs(attrs);
+
+	return true;
+};
+
+const clean = () => {
+	["quality", "skills", "knowledges", "armor"].forEach(group => {
+		getSectionIDs(`repeating_${group}`, (ids) => {
+			ids.forEach((id) => {
+				removeRepeatingRow(`repeating_${group}_${id}`);
+			});
+		});
+	});
+};
+
 </script>
 </div>
