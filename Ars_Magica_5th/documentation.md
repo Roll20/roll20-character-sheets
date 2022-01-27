@@ -1,6 +1,6 @@
 ## Sheet Documentation
 
-Welcome the th Ars Magica 5th Edition character sheet. This page contains the documentation for the sheet.
+Welcome the Ars Magica 5th Edition character sheet. This page contains the documentation for the sheet.
 
 ### Experience
 The fields for experience work as follows:
@@ -41,12 +41,12 @@ The icon for stress dice is a die with a <span style="color:#ee3f2f">red</span> 
 
 The formula for a stress die (you can see it by hovering over a result, see also "Labels" below) is quite complex, but does something simple:
 
-+ on a 10, the value will be 0. You then roll botch dice to see if you botch
++ on a 0 (or 10 on the standard d10), the value will be 0. You then roll botch dice to see if you botch
 + on a critical (natural 1), the value will also be 0
 + Otherwise, the result is whatever was rolled
 
 #### Botch
-When you roll a 10, the formula for a stress die yields a value of 0 (though other modifiers will apply). A roll of 10 can be easily seen, as the result will be bright red. You must then roll botch dice. To roll botch dice, you have to equivalent options:
+When you roll a 0, the formula for a stress die yields a value of 0 (though other modifiers will apply). A roll of 0 can be easily seen, as the result will be bright red. You must then roll botch dice. To roll botch dice, you have to equivalent options:
 
 + click on <span style="color:#ee3f2f">Botch</span> right to the tabs on top of the sheet
 + click the "botch!" button n direclty in the chat near the result
@@ -54,7 +54,7 @@ When you roll a 10, the formula for a stress die yields a value of 0 (though oth
 In the configuration section (above this documentation), you will find a setting for how you want to roll botch dice:
 
 + on "separate", all botch die will be displayed individually in the chat, and you choose the number of botch dice with a dropdown menu (limited to 8 botch dice)
-+ on "grouped", only the total number of botch will be displayed (i.e. the number of 1s rolled). You enter the number of botch dice as a number. You can still see the individual rolls by hovering on the result in chat
++ on "grouped", only the total number of botch will be displayed (i.e. the number of 0s rolled). You enter the number of botch dice as a number. You can still see the individual rolls by hovering on the result in chat
 
 When you do botch (i.e roll 10s), the output will be coloured bright red.
 
@@ -161,6 +161,8 @@ Those are omitted in the following list of rolltemplate names and supported valu
     + `name`
     + `rollsoak`
     + `soakbonus`
+    + `formlabel`
+    + `formbonus`
 + **`initiative`**:
     + `name`
     + `roll`
@@ -177,44 +179,9 @@ Those are omitted in the following list of rolltemplate names and supported valu
 + **`arcane`**:
     + `label0` through `label6`
     + `result0` through`result6`
-    + `textfield`
     + `textlabel`
+    + `textsublabel`
+    + `textfield`
 
-### Changelog
-+ **March 2021, v1.6.4**
-    - Added `lalign` and `ralign` to the `custom` rolltemplate
-+ **March 2021, v1.6.3**
-    - Added `roll-color` and `button-color` properties to the `custom` rolltemplate, with all CSSv3 colors
-+ **February 2021, v1.6.2**
-    - Fixed centering not working
-    - Fixed translation of spellcasting words options
-    - Added support for the `custom` rolltemplate from the forum, with all CSS colors. Can be useful for spell tables or similar chat menus
-+ **February 2021, v1.6.1**
-    - Fixed botch die botching on 1s instead of 10s
-    - Fixed critical dice displaying 10s as exploding, instead of 1s
-    - Fixed spell's arts value not being updated when the character's arts are modified
-        + Completely changed how arts are handled inside spells
-        + A script will be run to convert your data to the new format, but may fail for some spells
-    - Added a critical roll for initiative that sets the turn tracker initiative (not visible in the sheet, use the chat button)
-    - Added option to always ask which characteristic to use when rolling abilities
-    - Centered the sheet in its tab 
-+ **February 2021, v1.6**
-    - Added inline labels to all rolls
-    - Fixed tabs not displaying properly (now attched to an attribute again)
-    - Added simple/stress die handling
-    - Support for focus in magic totals & rolls
-    - Support for additional fatigue levels
-    - Fixed ability rolltemplate being too wide in some cases
-    - Added documentation direclty to the sheet
-+ **May 2020, v1.51**
-    - Small change to the Ability roll template for legibility
-+ **April 2020, v1.5**
-    - Incorporated new fonts throughout the sheet!
-    - Polished several roll templates and added new ones for Defending. Stylish!
-    - Added an extra button for rerolling stress explosions, can be found next to the botch button. 
-    - Fixed several missing translation tags and side-effects of having translations added into the sheet. In particular, Abilities should now have access to the Accelerated Ability option. 
-    - Updated the sheet space and button for Soak/Armor Protection to use the combat roller templates. 
-    - Relinked images from imgur to github asset folders. 
-+ **October 2019**
-    - Initiatives now output to Roll20's Tracker while selecting a token. 
-    - Character sheet tabs no longer attached to an attribute, so multiple players can view the same character sheet without wrestling over tab controls.
+
+
