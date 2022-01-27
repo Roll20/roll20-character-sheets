@@ -55,7 +55,6 @@
 						<div class="sheet-col-1-6 sheet-padl sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_height"><br/>Height</div>
 						<div class="sheet-col-1-6 sheet-padl sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_weight"><br/>Weight</div>
 						<div class="sheet-col-1-6 sheet-padl sheet-center" title="Morale"><input class="sheet-center" type="number" name="attr_Morale" value="0" min="-10" max="10"><span>Morale</span></div>
-					<!--	<div class="sheet-col-1-6 sheet-padl sheet-center"><input class="sheet-center" type="number" name="attr_showencumbrance" value="@{encumbrance}" disabled="disabled"><br/>Can Carry</div> -->
 					</div>
 					<div class="sheet-row">
 						<div class="sheet-col-1 sheet-center">&nbsp;</div>
@@ -96,7 +95,10 @@
 						<div class="sheet-col-1-7 sheet-padl sheet-center" title="Base Damage Bonus"><input class="sheet-center sheet-highlight" type="number" name="attr_showDAM" value="@{DAM}" disabled="disabled"><span>Damage Bonus</span></div>
 						<div class="sheet-col-1-7 sheet-padl sheet-center" title="Number of Attacks"><input class="sheet-center sheet-highlight" type="number" name="attr_shownumATK" value="@{numATK}" disabled="disabled"><span># Attacks</span></div>
 						<div class="sheet-col-1-7 sheet-padl sheet-center" title="Base Speed is based on your Race and Armour"><input class="sheet-center sheet-highlight" type="number" name="attr_showSpeed" value="(@{Speed}+@{armorspeedTotal})" disabled="disabled"><span>Base Speed</span></div>
-						<div class="sheet-col-1-7 sheet-padl sheet-center" title="Current Load"><input class="sheet-center sheet-highlight" type="number" name="attr_shownumATK" value="@{currentEncumbrance}" disabled="disabled"><span>Current Load</span></div>
+						<div class="sheet-col-1-7 sheet-padl sheet-center" title="Current Load">
+						<input type="hidden" class="enccheck" value="0" name="attr_enc_exceeded"/>
+						<input class="sheet-center sheet-redbox" type="number" name="attr_showLoad" value="@{currentEncumbrance}" disabled="disabled"><span>Current Load</span>
+						</div>
 					</div>
 				</div>		
 				<div class="sheet-row">
@@ -504,8 +506,16 @@
 						<div class="sheet-col-1-6 sheet-centre"><input class="sheet-center sheet-highlight" type="number" name="attr_itemEncumbranceTotal" value="@{itemLoadTotal}" disabled="disabled"/><span>Items</span></div>
 						<div class="sheet-col-1-6 sheet-centre"><input class="sheet-center sheet-highlight" type="number" disabled="disabled" name="attr_show_combatEncumbrance" value="@{combatLoadTotal}"/><span>Combat</span></div>
 						<div class="sheet-col-1-6 sheet-centre"><input class="sheet-center sheet-highlight" type="number" name="attr_coinEncumbranceTotal" value="@{coinLoadTotal}" disabled="disabled"/><span>Coins</span></div>
-						<div class="sheet-col-1-6 sheet-centre"><input class="sheet-centre sheet-highlight" type="number" disabled="disabled" name="attr_showCurrentEncumbrance" value="@{currentEncumbrance}"/><span>Total Load</span></div>
-					</div>
+						<div class="sheet-col-1-6 sheet-centre">
+						<input type="hidden" class="enccheck" value="0" name="attr_enc_exceeded"/>
+						<input class="sheet-centre sheet-highlight sheet-redbox" type="number" disabled="disabled" name="attr_showCurrentEncumbrance" value="@{currentEncumbrance}"/><span>Total Load</span></div>
+						
+<!--					<div class="sheet-col-1-7 sheet-padl sheet-center" title="Current Load">
+						<input type="hidden" class="enccheck" value="0" name="attr_enc_exceeded"/>
+						<input class="sheet-center sheet-redbox" type="number" name="attr_showLoad" value="@{currentEncumbrance}" disabled="disabled"><span>Current Load</span>
+						</div>	
+-->
+	</div>
 					<div class="sheet-row sheet-padb">&nbsp;</div>
 					<h4 class="sheet-center">Consumables</h4>
 					<div class="sheet-row sheet-center">	
@@ -1321,8 +1331,10 @@ on("sheet:opened change:Race", function() {
 
 //calculate encumbrance
 var recalculateEncumbrance = function recalculateEncumbrance() {
-	getAttrs(["containerLoadTotal","itemcount","itemcount2","itemcount3","itemcount4", "itemcount5", "CP", "SP", "GP", "PP", "armorLoadTotal", "rangedLoadTotal", "meleeLoadTotal"], function(v) {
-		
+	getAttrs(["encumbrance","enc_exceeded","containerLoadTotal","itemcount","itemcount2","itemcount3","itemcount4", "itemcount5", "CP", "SP", "GP", "PP", "armorLoadTotal", "rangedLoadTotal", "meleeLoadTotal"], function(v) {
+	
+	const canCarry = v.encumbrance||10;
+	var toggle_overload = 0;
 	const armorLoad = v.armorLoadTotal||0;
 	const rangedLoad = v.rangedLoadTotal||0;
 	const meleeLoad = v.meleeLoadTotal||0;
@@ -1334,7 +1346,7 @@ var recalculateEncumbrance = function recalculateEncumbrance() {
 	const torch = parseInt(v.itemcount4) ||0;
 	const flask = parseInt(v.itemcount5) ||0;
 	var totalContainerLoad = v.containerLoadTotal||0;
-	var totalItemLoad = (water/2) + (fRats/4) + (bRats/2) +(torch/10) +(flask/3);
+	var totalItemLoad = (water/2) + (fRats/4) + (bRats/2) +(torch/10) +(flask/4);
 	
 	var cp=parseInt(v.CP)||0;
 	var sp=parseInt(v.SP)||0;
@@ -1343,12 +1355,14 @@ var recalculateEncumbrance = function recalculateEncumbrance() {
 	var totalCoinLoad=(cp+sp+gp+pp)/500;
 	
 	var totalEncumbrance = (totalCoinLoad + totalCombatLoad + totalItemLoad + totalContainerLoad);
+	if (totalEncumbrance > canCarry) {toggle_overload = 1;}
 	
 		setAttrs({
 			itemLoadTotal : (totalItemLoad + totalContainerLoad).toFixed(1),
 			combatLoadTotal : totalCombatLoad.toFixed(1),
 			coinLoadTotal : totalCoinLoad.toFixed(1),
-			currentEncumbrance: totalEncumbrance.toFixed(1)
+			currentEncumbrance: totalEncumbrance.toFixed(1),
+			enc_exceeded: toggle_overload
 	
 		});
 	})
