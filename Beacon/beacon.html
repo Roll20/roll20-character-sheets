@@ -481,7 +481,7 @@
 						<div class="sheet-row">
 							<div class="sheet-col-1-8 sheet-padl sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_containerEquip" checked /></div>
 							<div class="sheet-col-1-3 sheet-padl sheet-center"><input type="text" name="attr_containerName"></div>
-							<div class="sheet-col-1-8 sheet-padl sheet-center"><input type="number" value="1" min="1" name="attr_containerWeight"></div>
+							<div class="sheet-col-1-8 sheet-padl sheet-center"><input type="number" value="0" min="0" name="attr_containerWeight"></div>
 							<input type="checkbox" name="attr_containerShowContent" class="sheet-spelltypetab sheet-spelltypeDescription" value="1"/>
 							<span class="sheet-col-1-14 sheet-spelltypetab sheet-spelltypeDescription">Contents</span>
 							<div class="sheet-spell-type-Description">
@@ -513,7 +513,7 @@
 						<div class="sheet-col-1-6 sheet-center"><input type="number" value="0" min="0" name="attr_itemCount2">Field Rations</div>
 						<div class="sheet-col-1-6 sheet-center"><input type="number" value="0" min="0" name="attr_itemCount3">Bulk Rations</div>
 						<div class="sheet-col-1-6 sheet-center"><input type="number" value="0" min="0" name="attr_itemCount4">Torches</div>
-					<!--	<div class="sheet-col-1-6 sheet-center"><input type="number" value="0" min="0" name="attr_itemCount5">Flasks/Potions</div>				-->		
+					    <div class="sheet-col-1-6 sheet-center"><input type="number" value="0" min="0" name="attr_itemCount5">Potions & Flasks</div>	
 					</div>
 					<div class="sheet-row sheet-padb">&nbsp;</div>
 					<h4 class="sheet-center">Money</h4>
@@ -1321,38 +1321,39 @@ on("sheet:opened change:Race", function() {
 
 //calculate encumbrance
 var recalculateEncumbrance = function recalculateEncumbrance() {
-	getAttrs(["containerLoadTotal","itemcount","itemcount2","itemcount3","itemcount4", "CP", "SP", "GP", "PP", "armorLoadTotal", "rangedLoadTotal", "meleeLoadTotal"], function(v) {
+	getAttrs(["containerLoadTotal","itemcount","itemcount2","itemcount3","itemcount4", "itemcount5", "CP", "SP", "GP", "PP", "armorLoadTotal", "rangedLoadTotal", "meleeLoadTotal"], function(v) {
 		
-	var armorLoad = parseInt(v.armorLoadTotal)||0;
-	var rangedLoad = parseInt(v.rangedLoadTotal)||0;
-	var meleeLoad = parseInt(v.meleeLoadTotal)||0;
+	const armorLoad = v.armorLoadTotal||0;
+	const rangedLoad = v.rangedLoadTotal||0;
+	const meleeLoad = v.meleeLoadTotal||0;
 	var totalCombatLoad = (armorLoad + rangedLoad + meleeLoad);
 	
-	var water = parseInt(v.itemcount)||0;
-	var fRats = parseInt(v.itemcount2)||0;
-	var bRats = parseInt(v.itemcount3)||0;
-	var torch = parseInt(v.itemcount4) ||0;
-	var totalContainerLoad = parseInt(v.containerLoadTotal)||0;
-	var totalItemLoad= Math.round((water/2) + (fRats/3) + (bRats/2) +(torch/10));
+	const water = parseInt(v.itemcount)||0;
+	const fRats = parseInt(v.itemcount2)||0;
+	const bRats = parseInt(v.itemcount3)||0;
+	const torch = parseInt(v.itemcount4) ||0;
+	const flask = parseInt(v.itemcount5) ||0;
+	var totalContainerLoad = v.containerLoadTotal||0;
+	var totalItemLoad = (water/2) + (fRats/4) + (bRats/2) +(torch/10) +(flask/3);
 	
 	var cp=parseInt(v.CP)||0;
 	var sp=parseInt(v.SP)||0;
 	var gp=parseInt(v.GP)||0;
 	var pp=parseInt(v.PP)||0;
-	var totalCoinLoad=Math.round((cp+sp+gp+pp)/500);
+	var totalCoinLoad=(cp+sp+gp+pp)/500;
 	
 	var totalEncumbrance = (totalCoinLoad + totalCombatLoad + totalItemLoad + totalContainerLoad);
 	
 		setAttrs({
-			itemLoadTotal : totalItemLoad + totalContainerLoad,
-			combatLoadTotal : totalCombatLoad,
-			coinLoadTotal : totalCoinLoad,
-			currentEncumbrance: totalEncumbrance
+			itemLoadTotal : (totalItemLoad + totalContainerLoad).toFixed(1),
+			combatLoadTotal : totalCombatLoad.toFixed(1),
+			coinLoadTotal : totalCoinLoad.toFixed(1),
+			currentEncumbrance: totalEncumbrance.toFixed(1)
 	
 		});
 	})
 };
-on("sheet:opened change:encumbrance change:containerLoadTotal change:itemcount change:itemcount2 change:itemcount3 change:itemcount4 change:meleeLoadTotal change:rangedLoadTotal change:armorLoadTotal change:CP change:SP change:GP change:PP", recalculateEncumbrance);
+on("sheet:opened change:encumbrance change:containerLoadTotal change:itemcount change:itemcount2 change:itemcount3 change:itemcount4 change:itemcount5 change:meleeLoadTotal change:rangedLoadTotal change:armorLoadTotal change:CP change:SP change:GP change:PP", recalculateEncumbrance);
 
 // Calculate Armour
 var recalculateArmorModifiers = function recalculateArmorModifiers() {
@@ -1516,11 +1517,10 @@ var recalculateRangedModifiers = function recalculateRangedModifiers() {
 				const magicBonus = parseInt(values["repeating_rangedweapon_"+ idArray[i] + "_rangedMagic"])||0;
 				const range = parseInt(values["repeating_rangedweapon_"+ idArray[i] + "_rangedDistance"])||0;
 				const type = values["repeating_rangedweapon_"+ idArray[i] + "_rangedWeaponType"];
-				const Ammo = parseInt(values["repeating_rangedweapon_"+ idArray[i] + "_rangedAmmo"])||0;
+				var Ammo = parseInt(values["repeating_rangedweapon_"+ idArray[i] + "_rangedAmmo"])||0;
 				var Dam = 3;
 				var maxrange = parseInt(3);
-				var Enc = parseInt(0);
-				var Num = parseInt(1);
+				var Enc = parseInt(1);
 				var size = values["repeating_rangedweapon_"+ idArray[i] + "_rangedWeaponsize"];
 				var checkEquip = (values["repeating_rangedweapon_"+ idArray[i] + "_rangedEquip"] == "on") ? true : false;
 				var calcHitbonus = parseInt(0);
@@ -1529,15 +1529,15 @@ var recalculateRangedModifiers = function recalculateRangedModifiers() {
 				if (size == "light-rogue" && sclass != "Rogue") {size="light";}
 				if (size == "small-rogue" && sclass != "Rogue") {size="small";}
 				
-				if (type == "missile") {maxrange=5*range;}
-				else {maxrange=3*range; Num = Ammo}
+				if (type == "missile") {maxrange=5*range; Ammo=1}
+				else {maxrange=3*range;}
 				
 				switch (size) {
-					case "small":  Dam = 3; Enc = 0.2*Num; calcHitbonus = Attack + DEXBonus + AttackMod + magicBonus; calcDambonus = Damage + DamageMod + magicBonus; break;
-					case "small-rogue":  Dam = 3; Enc = 0.2*Num; calcHitbonus = Attack + DEXBonus + AttackMod + magicBonus; calcDambonus = Damage + subtBonus + DamageMod + magicBonus; break;
-					case "light":  Dam = 3; Enc = 0.5*Num; calcHitbonus = Attack + DEXBonus + AttackMod + magicBonus; calcDambonus = Damage + DamageMod + magicBonus; break;
-					case "light-rogue":  Dam = 3; Enc = 0.5*Num; calcHitbonus = Attack + DEXBonus + AttackMod + magicBonus; calcDambonus = Damage + subtBonus + DamageMod + magicBonus; break;
-					case "heavy":  Dam = 4; Enc = 1*Num; calcHitbonus = Attack + DEXBonus + AttackMod + magicBonus; calcDambonus = Damage + STRBonus + DamageMod + magicBonus; break;
+					case "small":  Dam = 3; Enc = 0.2*Ammo; calcHitbonus = Attack + DEXBonus + AttackMod + magicBonus; calcDambonus = Damage + DamageMod + magicBonus; break;
+					case "small-rogue":  Dam = 3; Enc = 0.2*Ammo; calcHitbonus = Attack + DEXBonus + AttackMod + magicBonus; calcDambonus = Damage + subtBonus + DamageMod + magicBonus; break;
+					case "light":  Dam = 3; Enc = 0.5*Ammo; calcHitbonus = Attack + DEXBonus + AttackMod + magicBonus; calcDambonus = Damage + DamageMod + magicBonus; break;
+					case "light-rogue":  Dam = 3; Enc = 0.5*Ammo; calcHitbonus = Attack + DEXBonus + AttackMod + magicBonus; calcDambonus = Damage + subtBonus + DamageMod + magicBonus; break;
+					case "heavy":  Dam = 4; Enc = Ammo; calcHitbonus = Attack + DEXBonus + AttackMod + magicBonus; calcDambonus = Damage + STRBonus + DamageMod + magicBonus; break;
 					}
 				
 				if (sclass == "Hunter") {calcDambonus += survBonus;}
