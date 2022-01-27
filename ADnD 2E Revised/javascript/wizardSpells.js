@@ -8576,6 +8576,26 @@ wiz9['Life Force Exchange'] = {
 };
 //#endregion
 
+//#region Player's Option: Spells & Magic
+wiz1['Cantrip']['school-s&m']                  = "Universal Magic"
+wiz1['Comprehend Languages']['school-s&m']     = "Universal Magic"
+wiz1['Detect Magic']['school-s&m']             = "Universal Magic"
+wiz1['Hold Portal']['school-s&m']              = "Universal Magic"
+wiz1['Identify']['school-s&m']                 = "Universal Magic"
+wiz1['Read Magic']['school-s&m']               = "Universal Magic"
+wiz1['Wizard Mark']['school-s&m']              = "Universal Magic"
+wiz2['Knock']['school-s&m']                    = "Universal Magic"
+wiz2['Protection From Cantrips']['school-s&m'] = "Universal Magic"
+wiz2['Wizard Lock']['school-s&m']              = "Universal Magic"
+wiz3['Dispel Magic']['school-s&m']             = "Universal Magic"
+wiz4['Remove Curse']['school-s&m']             = "Universal Magic"
+wiz5['Teleport']['school-s&m']                 = "Universal Magic"
+wiz6['Enchant an Item']['school-s&m']          = "Universal Magic"
+wiz7['Teleport Without Error']['school-s&m']   = "Universal Magic"
+wiz8['Permanency']['school-s&m']               = "Universal Magic"
+wiz9['Astral Spell']['school-s&m']             = "Universal Magic"
+//#endregion
+
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
 wizardSpells['wiz2'] = wiz2;

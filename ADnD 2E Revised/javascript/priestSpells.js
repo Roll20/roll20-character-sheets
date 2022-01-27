@@ -6765,6 +6765,11 @@ pri3['Polymorph Plant'] = {
 //#endregion
 
 //#region The Complete Druid's Handbook
+pri4['Call Woodland Beings']['sphere-druids'] = "Animal"
+pri5['Commune With Nature']['sphere-druids'] = "Animal, Plant"
+pri5['Insect Plague']['sphere-druids'] = "Animal"
+pri7['Reincarnate']['sphere-druids'] = "Animal"
+
 pri1['Beastmask'] = {
     'level': '1',
     'school': 'Illusion/Phantasm',
@@ -7185,6 +7190,13 @@ pri7['Unwilling Wood'] = {
 //#endregion
 
 //#region The Complete Book of Necromancers
+pri2['Slow Poison']['sphere-necromancers'] = "Necromantic"
+pri3['Remove Paralysis']['sphere-necromancers'] = "Necromantic"
+pri3['Speak With Dead']['sphere-necromancers'] = "Necromantic"
+pri4['Fortify']['sphere-necromancers'] = "Necromantic"
+pri4['Neutralize Poison']['sphere-necromancers'] = "Necromantic"
+pri5['Dispel Evil']['sphere-necromancers'] = "Necromantic"
+pri5['Undead Ward']['sphere-necromancers'] = "Necromantic"
 
 pri1['Ebony Hand'] = {
     'level': '1',
