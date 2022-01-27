@@ -329,9 +329,9 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
   const goliath = +attrs.barbarianGoliath;
   const goliathMAL = +attrs.MALBarbarianGoliath;
 
-  const corpMetal = attrs.sorcererMMCorpMetal;
+  const corpMetal = +attrs.sorcererMMCorpMetal;
   const CM150PG = attrs.sorcerer150PG;
-  const CM250PG = attrs.sorcererMM250PG;
+  const CM250PG = +attrs.sorcererMM250PG;
 
   const warmasterForce = attrs.warmasterImpForce;
   const warmasterForcePers = +attrs.warmasterImpFPersonnel;
@@ -340,6 +340,8 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
   const warmasterForcePersMAL = +attrs.MALWarmasterImpFPersonnel;
 
   let total = max + modif;
+
+  log(corpMetal);
 
   switch (armure) {
     case 'barbarian':
@@ -350,7 +352,7 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
       if (corpMetal !== 0 || CM250PG !== 0) {
         total += 2;
 
-        if (CM150PG !== 0) total += 2;
+        if (CM150PG !== '0') total += 2;
       }
       break;
 
@@ -816,13 +818,17 @@ on('change:armurePJModif', async () => {
   await setAttrsAsync({ armureAscension_max: base + modif });
 });
 
-on('change:cdfPJModif', async () => {
-  const attrs = await getAttrsAsync(['cdfPJModif']);
+on('change:cdfPJAscensionModif', async () => {
+  const attrs = await getAttrsAsync(['cdfPJAscensionModif']);
 
   const base = 10;
-  const modif = +attrs.cdfPJModif;
+  const modif = +attrs.cdfPJAscensionModif;
+  const total = base + modif;
 
-  await setAttrsAsync({ cdfAscension_max: base + modif });
+  await setAttrsAsync({
+    cdfAscension: total,
+    cdfAscension_max: total,
+  });
 });
 
 on('change:shamanNbreTotem', async () => {
@@ -1062,7 +1068,7 @@ on('change:monk150PG change:monk250PG sheet:opened', async () => {
 on('change:priest200PG', async () => {
   const attrs = await getAttrsAsync(['priest200PG']);
 
-  const PG200 = +attrs.priest200PG;
+  const PG200 = attrs.priest200PG;
 
   let contactDice = 3;
   let distanceDice = 2;
@@ -1118,7 +1124,7 @@ on('change:wizard150PG sheet:opened', async () => {
 on('change:wizard250PG sheet:opened', async () => {
   const attrs = await getAttrsAsync(['wizard250PG']);
 
-  const PG250 = +attrs.wizard250PG;
+  const PG250 = attrs.wizard250PG;
 
   let portee = i18n_porteeCourte;
 
@@ -3176,6 +3182,26 @@ on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceE
 });
 // LONGBOW
 
+// HERAUT DE LEQUILIBRE - CHEVALIER DE LA LUMIERE
+const chevalierHerauts = ['devasterAnatheme', 'bourreauTenebres', 'equilibreBalance'];
+
+chevalierHerauts.forEach((button) => {
+  on(`clicked:${button}`, async () => {
+    const attrs = await getAttrsAsync([button]);
+    const value = +attrs[button];
+    const result = {};
+
+    let newValue = 1;
+
+    if (value === 1) { newValue = 0; }
+
+    result[button] = newValue;
+
+    await setAttrsAsync(result);
+  });
+});
+// HERAUT DE LEQUILIBRE - CHEVALIER DE LA LUMIERE
+
 // Import NPC
 on('clicked:importKNPCG', () => {
   getAttrs(['importKNPCG'], (value) => {
@@ -3584,7 +3610,7 @@ on('sheet:opened', async () => {
   await setAttrsAsync({
     bardEffetAttSpe: bard.join(' / '),
     berserkIlluminationBlazePortee: getTranslationByKey('portee-contact'),
-    berserkIlluminationBeaconPortee: getTranslationByKey('portee-contact'),
+    berserkIlluminationBeaconPortee: getTranslationByKey('portee-courte'),
     berserkIlluminationProjectorPortee: getTranslationByKey('portee-courte'),
     berserkIlluminationLighthousePortee: getTranslationByKey('portee-courte'),
     berserkIlluminationLanternPortee: getTranslationByKey('portee-courte'),
@@ -3679,6 +3705,16 @@ on('change:ameliorationOArmes', (eventInfo) => {
   const update = {};
 
   update['ameliorationOArmes-description'] = getTranslationByKey(text);
+
+  setAttrsAsync(update);
+});
+
+on('change:chevaliersHerauts', () => {
+  const update = {};
+
+  update.devasterAnatheme = 0;
+  update.bourreauTenebres = 0;
+  update.equilibreBalance = 0;
 
   setAttrsAsync(update);
 });

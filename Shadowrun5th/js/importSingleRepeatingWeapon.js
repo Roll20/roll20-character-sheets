@@ -1,21 +1,55 @@
+function provideRepeatingWeaponRowName(weapon) {
+
+    var weaponrow = "weapons";
+
+    switch(weapon.skill) {
+        case "Pistols":
+            weaponrow = weapon.skill.replaceAll(' ', '').toLowerCase();
+            break;
+        case "Automatics":
+            weaponrow = weapon.skill.replaceAll(' ', '').toLowerCase();
+            break;
+        case "Longarms":
+            weaponrow = weapon.skill.replaceAll(' ', '').toLowerCase();
+            break;
+        case "Heavy Weapons":
+            weaponrow = weapon.skill.replaceAll(' ', '').toLowerCase();
+            break;
+        case "Unarmed Combat":
+            weaponrow = "closecombat"
+            break;
+        case "Blades":
+            weaponrow = "closecombat"
+            break;
+        case "Clubs":
+            weaponrow = "closecombat"
+            break;
+    }
+
+    var row = "repeating_" + weaponrow + "_" + generateRowID() + "_";
+
+    return row;
+}
+
 async function importSingleRepeatingWeapon(text, weapon, ammunition, attributes) {
-    var row = "repeating_weapons" + "_" + generateRowID() + "_";
+    var row = provideRepeatingWeaponRowName(weapon);
+    console.log(row);
     if(weapon.type == "Ranged"){
         attributes[row + "weaponismelee"] = 0;
         attributes[row + "weaponrc"] = weapon.rc.match(/\d+/g).pop()-Math.ceil((parseInt(attributes.str_base) + parseInt(attributes.str_aug))/3)- 1;
-        if(!weapon.rawdamage.includes("STR") &&weapon.rawdamage.match(/\d+/) !== null) {
+        if(!weapon.rawdamage.includes("STR") && weapon.rawdamage.match(/\d+/) !== null) {
             attributes[row + "weapondv"] = weapon.rawdamage.match(/\d+/)[0];
         }
         else {
-            attributes[row + "weapondv"] = weapon.damage.match(/\d+/)[0];
+            attributes[row + "weapondv"] = weapon.damage.match(/\d+/) != null ? weapon.damage.match(/\d+/)[0] : 0;
         }
 
-        attributes[row + "weapondmgtype"] = weapon.rawdamage.match(/\D+/)[0];
+        attributes[row + "weapondmgtype"] = weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.rawdamage.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }else{
         attributes[row + "weaponismelee"] = "on";
         attributes[row + "weaponreach"] = weapon.reach;
-        attributes[row + "weapondv"] = weapon.damage_english.match(/\d+/)[0];
-        attributes[row + "weapondmgtype"] = weapon.damage_english.match(/\D+/)[0];
+        attributes[row + "weapondv"] = weapon.damage_english.match(/\d+/) != null ? weapon.damage_english.match(/\d+/)[0] : 0;
+        attributes[row + "weapondmgtype"] = weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/) != null ? weapon.damage_english.match(/S\(e\)|S\b|P|Special\b/)[0] : 0;
     }
 
     let skills = [];
@@ -101,30 +135,21 @@ async function importSingleRepeatingWeapon(text, weapon, ammunition, attributes)
         }
     }
 }
+
 async function importRepeatingWeaponAmmo(row, ammunition, number, attributes) {
 
     attributes[row + "ammoname"+number] = ammo.name;
 
-    if(ammo.weaponbonusdamage_english != null && ammo.weaponbonusap != null && ammo.weaponbonusacc != null) {
-        attributes[row + "ammodv" + number] = ammo.weaponbonusdamage_english.substring(0,2);
-        attributes[row + "ammodmgtype" + number] = ammo.weaponbonusdamage_english.substring(2);
-        if(ammo.name_english === "Ammo: Stick-n-Shock") {
-            attributes[row + "_ammoap" + number] = -5 - attributes[row + "weaponap"]
-        }
-        else {
-            attributes[row + "ammoap" + number] = ammo.weaponbonusap;
-        }
-        attributes[row + "ammoacc" + number] = ammo.weaponbonusacc;
+    attributes[row + "ammodv" + number] = ammo.weaponbonusdamage_english != null ? ammo.weaponbonusdamage_english.substring(0,2) : 0;
+    if(ammo.weaponbonusdamage_english != null) {
+         attributes[row + "ammodmgtype" + number] = ammo.weaponbonusdamage_english.substring(2);
+    }
+
+    if(ammo.name_english === "Ammo: Stick-n-Shock") {
+        attributes[row + "_ammoap" + number] = -5 - attributes[row + "weaponap"]
     }
     else {
-        attributes[row + "ammodv" + number] = 0;
-        attributes[row + "ammodmgtype" + number] = 0;
-        if(ammo.name_english === "Ammo: Stick-n-Shock") {
-            attributes[row + "ammoap" + number] = -5 - attributes[row + "weaponap"]
-        }
-        else {
-            attributes[row + "ammoap" + number] = 0;
-        }
-        attributes[row + "ammoacc" + number] = 0;
+        attributes[row + "ammoap" + number] = ammo.weaponbonusap != null? ammo.weaponbonusap : 0;
     }
+    attributes[row + "ammoacc" + number] = ammo.weaponbonusacc != null ? ammo.weaponbonusacc : 0;
 }

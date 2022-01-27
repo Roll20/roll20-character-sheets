@@ -15,17 +15,17 @@ mixin ability(asset, ability, number, name)
     - var translationAbility = `asset-${name}-ability-${number}`
     - var assetBodyPlaceholder=translation[translationAbility]
     .asset-ability
-      div.i18n-text(data-i18n=translationAbility)!=assetBodyPlaceholder
+      div.i18n-text(data-i18n=translationAbility) !{assetBodyPlaceholder}
       if ability.Input
         each field in ability.Input
           - var translationAbilityField = `asset-${name}-ability-${number}-textinput-${_.kebabCase(field)}`
-          span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField)=translation[translationAbilityField]
+          span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField) !{translation[translationAbilityField]}
           input.border-bottom.no-border(type='text' name=`attr_ability_field${field}` value='')
 
 mixin description(asset, key)
   .asset-description
     - var translationDesc = `asset-${key}-description`
-    .asset-description-text(data-i18n=translationDesc)=translation[translationDesc]
+    .asset-description-text(data-i18n=translationDesc) !{translation[translationDesc]}
 
 mixin field(field, assetName)
   .write-in-container
@@ -49,14 +49,13 @@ mixin track(track, assetName)
 mixin assetTemplate(asset, options)
   - let id = asset.id
   - let name = `${id.replace(/asset-/i, "")}`
-  - let category = _.kebabCase(asset.Category)
-  - let assetNameClass = name;
+  - let category = _.kebabCase(asset["Asset Type"])
   if options.visiblityToggle === true
-    input(class=`${options.classes} ${assetNameClass}` type='checkbox' name=`attr_${name}`)
-  div(class=`${options.classes} ${assetNameClass} category-${category}`)
+    input(class=`${options.classes} asset-${name} asset-toggle` type='checkbox' name=`attr_${name}`)
+  div(class=`${options.classes} asset-card asset-${name} category-${category}`)
     .asset-content-header
       .asset-details
-        .category=asset.Category
+        .category=asset["Asset Type"]
         span.asset-name=asset.Name
       .background-svg
     if asset.Description
@@ -75,12 +74,14 @@ mixin genericAssetBuilder(assetsArray, listId)
   //- Asset Datalist
   input.asset-options-header(type='text' list=listId name='attr_asset' placeholder=translation["type-asset-name"])
   datalist(id=listId)
+    - console.log("Generating", assetsArray.length, "assets")
     each asset in assetsArray
-      - let assetNameClass = `${asset.id.replace(/asset-/i, "")}`
+      - let assetNameClass = asset.id.replace(/asset-/i, "")
+      - console.log("Generating", asset.id)
       //- generates classes and outputs to stdout
       //- - console.log(`input[type=checkbox].${assetNameClass}:checked ~ div.${assetNameClass},`)
-      option.i18n-text(data-i18n=`${asset.id}-name` value=assetNameClass)=translation[`${asset.id}-name`]
-    option.i18n-text(data-i18n=`asset-custom-name` value='custom')=translation[`asset-custom-name`]
+      option.i18n-text(data-i18n=`${asset.id}-name` value=assetNameClass) !{translation[`${asset.id}-name`]}
+    option.i18n-text(data-i18n=`asset-custom-name` value='custom') !{translation["asset-custom-name"]}
 
   //- Asset Content
   each asset in assetsArray
