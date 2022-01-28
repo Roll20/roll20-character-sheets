@@ -8953,13 +8953,10 @@ mylog = function(msg) {
 /* IMPORTER */
 /************/
 on("clicked:import", (eventInfo) => {
-console.log(eventInfo);
 	let setText = {};
 	let applyEnabled = true;
 
 	getAttrs(['import_data'], (v) => {
-console.log(v.import_data);
-
 		// Verify the user entered a JSON in the textarea. If not, provide user feedabck.
 		let parsedData = '';
 		if (v.import_data) {
@@ -8998,7 +8995,7 @@ console.log(v.import_data);
 			import_feedback = 'Import failed. ' + "\n";
 			import_feedback += setText[`import-feedback`];
 		}
-console.log(import_feedback);
+
 		setAttrs({
 			import_feedback: import_feedback
 		});
@@ -9007,7 +9004,6 @@ console.log(import_feedback);
 
 // clear the import_feedback when they change the contents of import_data
 on("change:import_data", (eventInfo) => {
-console.log("import_data changed");
 	setAttrs({
 		import_feedback: " "
 	});
@@ -9017,7 +9013,6 @@ var doImport = (json) => {
 	// wipe the current character
 	clean();
 console.log("Doing character import");
-console.log(json);
 
 // Mappings [Genesis attr]: [Roll20 attr]
 	// top level data
@@ -9144,6 +9139,94 @@ console.log("Character skills, knowledges and languages imported.");
 	});
 console.log("Character armor imported");
 
+	json.items.forEach(item => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_items_" + row_id + "_item"] = item.name;
+//		rowattrs["repeating_items_" + row_id + "_rating"] = item.rating;
+		rowattrs["repeating_items_" + row_id + "_quantity"] = item.count;
+
+		rowattrs["repeating_items_" + row_id + "_notes"] = '[' + item.type + ']{' + item.subType + '} ' + item.page + "\n";
+
+		rowattrs["repeating_items_" + row_id + "_type"] = item.type;
+		rowattrs["repeating_items_" + row_id + "_sub_type"] = item.subType;
+
+		if(item.accessories) {
+			item.accessories.forEach(acc => {
+				rowattrs["repeating_items_" + row_id + "_notes"] += ", " + acc.name;
+			});
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character items imported");
+
+	json.augmentations.forEach(augmentation => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		if(augmentation.level == '-') {
+			augmentation.level = '';
+		}
+
+		// some augs have the rating in the name...
+		if(augmentation.name.includes("Rating")) {
+			const re = /^(.*), Rating (\d+)/i;
+			var m = augmentation.name.match(re);
+
+			if(m && m[1]) {
+				augmentation.name = m[1];
+			}
+			if(m && m[2] && ! augmentation.level) {
+				augmentation.level = parseInt(m[2]);
+			}
+		}
+
+		rowattrs["repeating_augmentations_" + row_id + "_augmentation"] = augmentation.name;
+		rowattrs["repeating_augmentations_" + row_id + "_rating"] = augmentation.level;
+		rowattrs["repeating_augmentations_" + row_id + "_essence_cost"] = augmentation.essence;
+
+		rowattrs["repeating_augmentations_" + row_id + "_notes"] = augmentation.page + "\n";
+
+		if(augmentation.accessories) {
+			augmentation.accessories.forEach(acc => {
+				rowattrs["repeating_augmentations_" + row_id + "_notes"] += ", " + acc.name;
+			});
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character augmentations imported");
+
+	json.vehicles.concat(json.drones).forEach(vehicle => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_vehicle_" + row_id + "_name"] = vehicle.name;
+		rowattrs["repeating_vehicle_" + row_id + "_handling_onroad"] = vehicle.handlOn;
+		rowattrs["repeating_vehicle_" + row_id + "_handling_offroad"] = vehicle.handlOff;
+		rowattrs["repeating_vehicle_" + row_id + "_acceleration_base"] = vehicle.accelOn;
+		rowattrs["repeating_vehicle_" + row_id + "_speed_base"] = vehicle.speedIntOn;
+		rowattrs["repeating_vehicle_" + row_id + "_speed_max"] = vehicle.speed;
+		rowattrs["repeating_vehicle_" + row_id + "_body_base"] = vehicle.body;
+		rowattrs["repeating_vehicle_" + row_id + "_armor_base"] = vehicle.armor;
+		rowattrs["repeating_vehicle_" + row_id + "_pilot_base"] = vehicle.pilot;
+		rowattrs["repeating_vehicle_" + row_id + "_sensor_base"] = vehicle.sensor;
+//		rowattrs["repeating_vehicle_" + row_id + "_seats"] = vehicle.seats;
+
+		rowattrs["repeating_vehicle_" + row_id + "_notes"] = vehicle.page + "\n";
+
+		if(vehicle.accessories) {
+			vehicle.accessories.forEach(acc => {
+				rowattrs["repeating_vehicle_" + row_id + "_notes"] += ", " + acc.name;
+			});
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character vehicles and drones imported");
+
 
 	setAttrs(attrs);
 
@@ -9151,7 +9234,7 @@ console.log("Character armor imported");
 };
 
 const clean = () => {
-	["quality", "skills", "knowledges", "armor"].forEach(group => {
+	["quality", "skills", "knowledges", "armor", "items", "augmentations", "vehicle"].forEach(group => {
 		getSectionIDs(`repeating_${group}`, (ids) => {
 			ids.forEach((id) => {
 				removeRepeatingRow(`repeating_${group}_${id}`);
