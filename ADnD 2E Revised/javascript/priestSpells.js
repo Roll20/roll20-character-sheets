@@ -7613,9 +7613,7 @@ priestSpells['pri7'] = pri7;
 priestSpells['priq'] = priq;
 
 const primonster = {};
-for (const [sectionName, section] of Object.entries(priestSpells)) {
-    if (sectionName === 'priq') // skipping quest spells for monsters
-        continue;
+for (const [_, section] of Object.entries(priestSpells)) {
     for (const [spellName, spell] of Object.entries(section)) {
         primonster[spellName] = spell;
     }
