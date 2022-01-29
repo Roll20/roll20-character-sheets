@@ -8,6 +8,7 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 - bugfix miserable 
 - bugfix favourill not initialized
 - css cleanup
+- fixing two issues that might have had an impact on the roll-template issue! (fingers crossed)
 
 ## 02.01.00 (Build 5)
 ### Features
