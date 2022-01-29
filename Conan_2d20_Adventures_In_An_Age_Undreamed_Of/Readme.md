@@ -70,7 +70,8 @@ First release.
 - Reduced Belongings Description field height.
 - Removed Attribute roll button.
 - Added complication roll of 19 & 20 when skill expertise is zero.
-### 1.4 (2021-03-28)
+### 1.4 (2022-01-29)
 - Added translation support to the character sheet.
 - Added translation sorting for the Skills.
 - Added translation sorting for the Talents Base dropdown and the Talents Skill dropdown.
+- Added alternate Skill roll chat output format with extended information when using the ConanAPI.js api script.
