@@ -2,6 +2,13 @@
 This is a rewrite based on the early 2e (basic) and 1e edition that also includes a 2e sheet for adversaries. It features correct handling of favoured rolls, weary/miserable state, bonus dice and stance related bonus changes to attack rating, parry, protection and damage.
 
 # Release History
+## 02.02.00 (Build 6)
+-  The macro bar is now available for parsed rolls (which is not easy to achieve as parsed roll buttons are action buttons and need special treatment to be available for the macro bar). You can drag / drop attack and protection rolls from the sheet into the macro bar and click those actions directly without opening the sheet. This is especially useful in conjunction with targeted attacks and will smooth and speed up battles.
+### Bugfixes
+- bugfix miserable 
+- bugfix favourill not initialized
+- css cleanup
+
 ## 02.01.00 (Build 5)
 ### Features
 - changed stance values from "Forward/Open/Defensive/Rearward" to "1/2/3/4" because this opens the way for players to easily toggle stance by using the token bar
