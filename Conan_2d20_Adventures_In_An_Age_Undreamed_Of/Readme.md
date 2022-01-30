@@ -75,3 +75,5 @@ First release.
 - Added translation sorting for the Skills.
 - Added translation sorting for the Talents Base dropdown and the Talents Skill dropdown.
 - Added alternate Skill roll chat output format with extended information when using the ConanAPI.js api script.
+- Added support for macro roll features; see the Info option on the sheet for more details.
+- added new chat template background colors to use with macros.
