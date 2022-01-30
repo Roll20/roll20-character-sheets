@@ -275,24 +275,40 @@ on("change:level change:modi_battle change:modi_open change:modi_penalties chang
 /******************************************************************/
 /******************************************************************/
 /*************************** ROLL HANDLERS ************************/
+const W_ZR = 0;
+const W_PC = 1;
+const W_CH = 2;
+const W_SP = 3;
+const W_BD = 4;
+const statslist = [
+    "bijatyka", "bron_reczna", "rzucanie", 
+    "pistolety", "karabiny", "bron_maszynowa",
+    "luk",            "kusza",              "proca",
+    "samochod",       "ciezarowka",         "motocykl",
+    "kradziez_kieszonkowa","zwinne_dlonie", "otwieranie_zamkow"
+];
 const stats2wsp = {
-    "bijatyka" : "zrecznosc",
-    "bron_reczna" : "zrecznosc",
-    "rzucanie" : "zrecznosc",
-    "pistolety" : "zrecznosc",
-    "pistolety" : "zrecznosc",
-    "karabiny": "zrecznosc",
-    "bron_maszynowa" : "zrecznosc",
-    "luk" : "zrecznosc",
-    "kusza" : "zrecznosc",
-    "proca" : "zrecznosc",
-    "samochod" : "zrecznosc",
-    "ciezarowka" : "zrecznosc",
-    "motocykl" : "zrecznosc",
-    "kradziez_kieszonkowa" : "zrecznosc",
-    "zwinne_dlonie" : "zrecznosc",
-    "otwieranie_zamkow" : "zrecznosc"
+    "bijatyka" : W_ZR,          "bron_reczna":W_ZR,                 "rzucanie":W_ZR,
+    "pistolety":W_ZR,           "karabiny": "zrecznosc",            "bron_maszynowa":W_ZR,
+    "luk":W_ZR,                 "kusza":W_ZR,                       "proca":W_ZR,
+    "samochod":W_ZR,            "ciezarowka":W_ZR,                  "motocykl":W_ZR,
+    "kradziez_kieszonkowa":W_ZR,"zwinne_dlonie":W_ZR,               "otwieranie_zamkow":W_ZR
 };
+
+statslist.forEach((attribute) => {
+    on(`change:${attribute}`, () => {
+        getAttrs([attribute], (values) => {
+            let statval = (parseInt(values[attribute])||0);
+            statval = clamp(statval, 0, 20);
+            let dictionary = {};
+            dictionary[attribute] = statval;
+            setAttrs(dictionary);
+        });
+    });
+});
+
+
+
  on('clicked:test_bijatyka', (info) => {
         startRoll("&{template:test} {{base_wsp_name=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=bijatyki}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}", (results) => {
             getAttrs(["final_test_level", "bijatyka", "modi_battle", "modi_open"], function(values) {
