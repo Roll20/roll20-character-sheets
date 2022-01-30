@@ -1154,9 +1154,13 @@
             console.log(output, textStyle);
         }
     };
+    const capitalize = (str) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+
     const stripaction = (str) => {
         return str.replace(/_action/g,'');
-    }
+    };
 
     // ASYNC ATTRIBUTE METHODS
     const asw = (() => {
@@ -1209,6 +1213,22 @@
         }
     }
 
+    // isolate target call
+    const getTarget = async () => {
+        const rxGrab = /^0\[(.*)\]\s*$/;
+        //{{charname=[[0[@{target|character_name}]]]}} 
+        let rollBase = `! {{parrytotal=[[@{target|totalparry}]]}} {{parry=[[@{target|parry}]]}}`,
+            targetRoll = await startRoll(rollBase),
+            target = {
+                //name: targetRoll.results.charname.expression.match(rxGrab)[1],
+                name: "",
+                parrytotal: targetRoll.results.parrytotal.result,
+                parry: targetRoll.results.parry.result,
+            };
+        finishRoll(targetRoll.rollId);
+        return target;
+    };
+
     // ROLL FROM ACTION BUTTONS, FUNCTIONS BELOW
     const rollFirst = async (char, act, dice, tn, act_fav, rolltype, additional="", lm=false) => {
         
@@ -1226,9 +1246,10 @@
             additionalStr = "",
 			parrymod = 0,
 			parrymodStr = "",
-            stanceattackmodStr = "";
+            stanceattackmodStr = "",
+            targetnameStr = "";
 
-        act = act.charAt(0).toUpperCase() + act.slice(1); // Capitalise the action
+        act = capitalize(act); 
         act = (act === "Wisdom" || act === "Valour") ? "Shadow test: "+act : act; 
         clog(`Character name: ${name}, Roll name: ${act}, Target number: ${tn}, Action favoured: ${act_fav}`);
 
@@ -1237,7 +1258,6 @@
             "favorill", "weary", "miserable", "currenthope", "shadow", "shadowscar", "favourill_id",
             "stanceattack_active", "stanceattackbonus", "stancedamagebonus"
         ]);
-        clog(`Weary: ${attrs.weary}, Miserable: ${attrs.miserable}`);
         let wearyStr = (attrs.weary == "on" || attrs.weary == 1) ? "{{weary=Weary}}" : "",
             weary = (attrs.weary == "on" || attrs.weary == 1) ? 1 : 0;
             miserableStr = (attrs.miserable == "on" || attrs.miserable == 1) ? "{{miserable=Miserable}}" : "",
@@ -1248,7 +1268,7 @@
             stanceAttackActive = int(attrs.stanceattack_active),
             stanceAttackBonus = int(attrs.stanceattackbonus),
             stanceDamageBonus = int(attrs.stancedamagebonus);
-        clog(`Weary Str: ${wearyStr}, Miserable Str: ${miserableStr}, Favourill_id: ${favourill_id}, StanceAttackActive: ${stanceAttackActive}, StanceAttackBonus: ${stanceAttackBonus}, StanceDamageBonus: ${stanceDamageBonus}`);
+        clog(`Weary: ${attrs.weary}, Weary Str: ${wearyStr}, Miserable: ${attrs.miserable}, Miserable Str: ${miserableStr}, Favourill_id: ${favourill_id}, StanceAttackActive: ${stanceAttackActive}, StanceAttackBonus: ${stanceAttackBonus}, StanceDamageBonus: ${stanceDamageBonus}`);
 
         // GET MODIFIER AND FAVOURED HERE
         if (rolltype.startsWith("protection") ) {
@@ -1261,21 +1281,22 @@
             favId = favourill_id;
             stanceattackmodStr = "0"
             if ( rolltype.includes("target") ) {
-				//parrymod = await getQuery(`?{Parry rating|@{target|parry}}`);
                 if (lm){
                     parrymodStr = "{{parrymod= [[@{target|totalparry}]]}}";
                     // we include targets stance modifier
                     stanceattackmodStr = "@{target|stanceattackbonus}";
                 } else {
 				    parrymodStr = "{{parrymod= [[@{target|parry}]]}}";
+                    // getting the name is tricky, as the parser expects numbers
+                    // see https://app.roll20.net/forum/permalink/10353782/
+                    //targetnameStr = "{{tgtname= [[ 0 [@{target|name}] ]] }}";
+                    // Uncaught TypeError: Cannot read properties of undefined (reading 'length')
+                    targetnameStr = "";
                 }
 			} else {
 				parrymod = await getQuery(`?{Target's Parry|0}`); 
 				parrymodStr = `{{parrymod= [[${parrymod}]]}}`;
 			}		
-			//tn = int(tn) + int(parrymod);
-			//clog(`Parry mod adjusted tn: ${tn}`);	 
-			//parrymodStr = `{{parrymod=[[${parrymod}]] }}`;
 			clog(`Parry modifier string: ${parrymodStr}`);
         } 
         
@@ -1343,24 +1364,24 @@
         clog(`Additional info: ${additionalStr}`);
 
         //LOG 
-        clog(`Character: ${char}, Base dice: ${successdice}, base string ${successStr}, modifiers: ${modifiers}, target: ${tn}, favoured ${featRoll}, skill favoured: ${act_fav}`);
+        clog(`Character: ${char}, Base dice: ${successdice}, base string ${successStr}, modifiers: ${modifiers}, target: ${tn}, targetname: ${targetnameStr}, favoured ${featRoll}, skill favoured: ${act_fav}`);
 
         // START ROLL
-        rollBase = `&{template:tor} {{character-name=${char} }} {{roll-name=${act} }} {{total=[[0]]}} {{diff=[[0]]}} {{greatness=[[0]]}} {{passthroughdata=[[0]]}} {{outcome=[[0]]}} {{successes=[[0]]}} {{target=[[${tn}]] }} ${featRoll} {{r1=[[ ${successStr} ]] }} ${parrymodStr} ${favouredStr} ${wearyStr} ${miserableStr} ${modStr} {{skill-fav=${act_fav}}} ${weaponStr} ${additionalStr}`;
+        rollBase = `&{template:tor} {{character-name=${char} }} {{roll-name=${act} }} {{total=[[0]]}} {{diff=[[0]]}} {{greatness=[[0]]}} {{passthroughdata=[[0]]}} {{outcome=[[0]]}} {{successes=[[0]]}} {{target=[[${tn}]] }} ${featRoll} {{r1=[[ ${successStr} ]] }} ${targetnameStr} ${parrymodStr} ${favouredStr} ${wearyStr} ${miserableStr} ${modStr} {{skill-fav=${act_fav}}} ${weaponStr} ${additionalStr}`;
         let rollresult = await startRoll(rollBase),
             rollSuccess = int(rollresult.results.r1.result,0),
             rollFeat = int(rollresult.results.feat.result,0);
 			
         clog(`Roll: ${JSON.stringify(rollresult)}`);
-        if ( parrymodStr !== "") {
-            clog(`Parry mod: ${JSON.stringify(rollresult.results.parrymod.result)}`);
 
-        }
         if (rolltype.startsWith("combat") ) {
             clog(`TN before parry modification: ${tn}`);
             tn = int(tn) + int(rollresult.results.parrymod.result);
             clog(`TN after parry modification: ${tn}`);
         }
+
+        //let targetname = rolltype.includes("target") ? `attacks ${rollresult.results.tgtname.expression.match(/\[(.*)\]/)[1]}` : "";
+        let targetname = "";
 
         // FEAT DIE AND MISERABLE
         // Outcomes: Failure = 0, Success = 1, Feat success = 2, Piercing blow = 3, Weary failure = -1, Miserable failure = -2 
@@ -1453,6 +1474,7 @@
         //rollData.favoured = favouredStr; 
         rollData.outcome = outcome;
         rollData.greatness = successDegree;
+        rollData.targetname = targetname;
         console.log('Roll data: ' + JSON.stringify(rollData));
         //rollData.passthroughdata = "This is a test";
 
