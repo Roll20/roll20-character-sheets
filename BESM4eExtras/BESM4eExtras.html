@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.4.12" readonly />
+													<input type="text" class="center" name="attr_version" value="1.4.13" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -7101,21 +7101,34 @@
 			const groupSourceID = value[`static_${sectionName}group_${groupid}_source`];
 			const aggregatePoolCost = _.chain(ids)
 				.map(id=>{
-					const attribute = value[`repeating_${sectionName}_${id}_attribute`];
-					const group = parseInt(value[`repeating_${sectionName}_${id}_group`]);
-					const activated = sectionName == 'skill' ? 1 :
-						isNaN(parseInt(setObj[`repeating_${sectionName}_${id}_activate`])) ?
-						parseInt(value[`repeating_${sectionName}_${id}_activate`]) :
-						parseInt(setObj[`repeating_${sectionName}_${id}_activate`]);
+					const isGroupMember = 
+						parseInt(value[`repeating_${sectionName}_${id}_group`]) == groupid ?
+						true : false;
+					const isDefect = 
+						value[`repeating_attr_${id}_attribute`] == 'defect' ? 
+						true : false;
+					const isStandardGroup = groupType.toLowerCase() == 'standard' ?
+						true : false;
+					const isGroupSourceAttr = id == groupSourceID ?
+						true : false;
+					const isFluxGroup = groupType.toLowerCase() == 'powerflux' ?
+						true : false;
+					const isActivated = sectionName == 'skill' ? 1 :
+						isNaN(parseInt(setObj[`repeating_attr_${id}_activate`])) ?
+						parseInt(value[`repeating_attr_${id}_activate`]) :
+						parseInt(setObj[`repeating_attr_${id}_activate`]);
 					const attrcost = id == rowID ? 
 						parseInt(eventInfo.newValue) * getAttrCostPerLevel(debug, value, rowID) : 
 						parseInt(value[`repeating_${sectionName}_${id}_totalcost`]);
-					const appliedCost = group == groupid ? 
-						/defect/i.test(attribute) ? 0 :	
-						/standard/i.test(groupType) ? 0 :
-						id == groupSourceID ? 0 :
-						/flux/i.test(groupType) ? activated ? attrcost : 0 :
-						attrcost : 0;
+					const appliedCost = isGroupMember ? 
+						isDefect ? 0 :	
+							isStandardGroup ? 0 : 
+								isGroupSourceAttr ? 0 : 
+									isFluxGroup ? 
+										isActivated ? 
+											attrcost : 0 :
+									attrcost : 
+						0;
 					return appliedCost;
 				})
 				.reduce((memo, num)=>{ return memo + num; }, 0)
@@ -7123,27 +7136,33 @@
 			return aggregatePoolCost;
 		}
 		
-		function getAggregateAttrGroupCost(debug, ids, value, sectionName, rowID, setObj){
+		function getAggregateAttrGroupCost(debug, ids, value, sectionName, rowID, setObj, groupType){
 			const groupid = getGroupID(value, sectionName);
-			const groupType = removeWhiteSpace(setObj[`static_${sectionName}group_${groupid}_type`] || 
-				value[`static_${sectionName}group_${groupid}_type`] || 'standard');
+			const isPowerFlux = groupType == 'Power Flux';
 			const groupSourceID = value[`static_${sectionName}group_${groupid}_source`];
 			const aggregateGroupCost = _.chain(ids)
 				.map(id=>{
+					const isCurrAttr = id == rowID ? true : false;
 					const attribute = value[`repeating_${sectionName}_${id}_attribute`];
 					const group = parseInt(value[`repeating_${sectionName}_${id}_group`]);
-					const activated = isNaN(parseInt(setObj[`repeating_${sectionName}_${id}_activate`])) ?
-						parseInt(value[`repeating_${sectionName}_${id}_activate`]) :
-						parseInt(setObj[`repeating_${sectionName}_${id}_activate`]);
-					const attrcost = isNaN(parseInt(setObj[`repeating_${sectionName}_${id}_totalcost`])) ? 
-						parseInt(value[`repeating_${sectionName}_${id}_totalcost`]) :
-						parseInt(setObj[`repeating_${sectionName}_${id}_totalcost`]);
-					const appliedCost = group == groupid ? 
-						attribute == 'defect' ? 0 :	
-						groupType.toLowerCase() == 'powerflux' ? 
-							id == groupSourceID ? attrcost : 
-							activated ? attrcost : 0 :
-						attrcost : 0;
+					const activated = isCurrAttr ? 
+						parseInt(setObj[`repeating_${sectionName}_${id}_activate`])	:
+						parseInt(value[`repeating_${sectionName}_${id}_activate`]);
+					const attrcost = isCurrAttr ? 
+						0 :
+						parseInt(value[`repeating_${sectionName}_${id}_totalcost`]);
+					const isGroupMember = group == groupid ? true : false;
+					const isGroupSourceAttr = id == groupSourceID ? true : false;
+					const isDefect = attribute == 'defect' ? true : false;
+					const appliedCost = 
+						isGroupMember ? 
+							isDefect ? 0 :	
+								isPowerFlux ? 
+									isGroupSourceAttr ? attrcost : 
+										activated ? 
+											attrcost : 0 :
+							attrcost : 
+						0;
 					return appliedCost;
 				})
 				.reduce((memo, num)=>{ return memo + num; }, 0)
@@ -7202,25 +7221,26 @@
 		function setAttrCostByLevelChange(debug, attrdb, eventInfo, value, attrIDs, sectionName, rowID, sourceAttr, setObj) {
 			const debugtext = `[setAttrCostByLevelChange(${sourceAttr})]`;
 			const groupid = getGroupID(value, sectionName);
-			const groupType = value[`static_${sectionName}group_${groupid}_type`] || 'standard';
-			const isPowerFlux = /flux/i.test(groupType);
-			const isPowerVariation = /variation/i.test(groupType);
+			const groupType = value[`static_${sectionName}group_${groupid}_type`] || 'Standard';
+			const isPowerFlux = groupType == 'Power Flux';
+			const isPowerVariation = groupType == 'Power Variation';
 			const groupSourceID = value[`static_${sectionName}group_${groupid}_source`];
+			const isGroupSourceAttr = groupSourceID == rowID ? true : false;
 			const lockGroupCost = parseInt(value[`static_${sectionName}group_${groupid}_groupcost`]);
 			const poolCost = parseInt(value[`repeating_${sectionName}_${groupSourceID}_totalcost`]) || 0;
-			const groupActive = parseInt(value[`static_${sectionName}group_${groupid}_active`]) || 0;
+			const isGroupActive = parseInt(value[`static_${sectionName}group_${groupid}_active`]) || 0;
 			const level = parseInt(value[`repeating_${sectionName}_${rowID}_level`]) || 0;
 			const cost = parseInt(value[`repeating_${sectionName}_${rowID}_costperlevel`]) || 0;
 			const attrcost = level * cost;
 		
-			const aggregateAttrCost = getAggregateAttrGroupCost(debug, attrIDs, value, sectionName, rowID, setObj);
+			const aggregateAttrCost = getAggregateAttrGroupCost(debug, attrIDs, value, sectionName, rowID, setObj, groupType);
 			const aggregatePoolCost = getAggregatePoolCost(debug, attrIDs, eventInfo, value, sectionName, rowID, setObj);
 			const aggregateDefectPoints = getAggregateGroupDefectPoints(debug, attrIDs, attrdb, value, rowID, setObj);
 			const poolSpent = aggregatePoolCost;
-			const groupCost = isPowerFlux ? groupActive ? poolCost : 
-				groupSourceID == rowID ? attrcost :
+			const groupCost = isPowerFlux ? isGroupActive ? poolCost : 
+				isGroupSourceAttr ? attrcost :
 				poolCost + aggregateAttrCost + aggregateDefectPoints + attrcost :
-				isPowerVariation ? groupActive ? lockGroupCost :
+				isPowerVariation ? isGroupActive ? lockGroupCost :
 				aggregateAttrCost + aggregateDefectPoints + attrcost :
 				aggregateAttrCost + aggregateDefectPoints + attrcost;
 		
@@ -7231,7 +7251,7 @@
 				console.log(`${debugtext} isPowerVariation = ${isPowerVariation}`);
 				console.log(`${debugtext} groupSourceID = ${groupSourceID}`);
 				console.log(`${debugtext} poolCost = ${poolCost}`);
-				console.log(`${debugtext} groupActive = ${groupActive}`);
+				console.log(`${debugtext} isGroupActive = ${isGroupActive}`);
 				console.log(`${debugtext} level = ${level}`);
 				console.log(`${debugtext} cost = ${cost}`);
 				console.log(`${debugtext} attrcost = ${attrcost}`);
