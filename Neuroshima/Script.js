@@ -281,6 +281,14 @@ const W_CH = "charakter";
 const W_SP = "spryt";
 const W_BD = "budowa";
 
+const wsp2accusative = {
+    "zrecznosc":"zręczność",
+    "percepcja":"percepcję",
+    "charakter":"charakter",
+    "spryt":"spryt",
+    "budowa":"budowę"
+};
+
 const statslist = [
     "bijatyka",                         "bron_reczna",                  "rzucanie", 
     "pistolety",                        "karabiny",                     "bron_maszynowa",
@@ -468,7 +476,7 @@ statslist.forEach((attribute) => {
                         roll3: dice_unsort[2] ,
                         finaldifficulty: final_test_level,
                         successes : succ,
-                        base_wsp_name : skill_wsp_name
+                        base_wsp_name : wsp2accusative[skill_wsp_name]
 
                     }
                 );
