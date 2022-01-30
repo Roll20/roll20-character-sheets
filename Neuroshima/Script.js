@@ -275,11 +275,12 @@ on("change:level change:modi_battle change:modi_open change:modi_penalties chang
 /******************************************************************/
 /******************************************************************/
 /*************************** ROLL HANDLERS ************************/
-const W_ZR = 0;
-const W_PC = 1;
-const W_CH = 2;
-const W_SP = 3;
-const W_BD = 4;
+const W_ZR = "zrecznosc";
+const W_PC = "percepcja";
+const W_CH = "charakter";
+const W_SP = "spryt";
+const W_BD = "budowa";
+
 const statslist = [
     "bijatyka", "bron_reczna", "rzucanie", 
     "pistolety", "karabiny", "bron_maszynowa",
@@ -294,6 +295,13 @@ const stats2wsp = {
     "samochod":W_ZR,            "ciezarowka":W_ZR,                  "motocykl":W_ZR,
     "kradziez_kieszonkowa":W_ZR,"zwinne_dlonie":W_ZR,               "otwieranie_zamkow":W_ZR
 };
+const stats2genitive = {
+    "bijatyka" : "bijatyki",          "bron_reczna":"broni ręcznej",                 "rzucanie":"rzucania",
+    "pistolety":"pistoletów",           "karabiny": "karabinów",            "bron_maszynowa":"broni maszynowej",
+    "luk":"łucznictwa",                 "kusza":"kusznictwa",                       "proca":W_ZR,
+    "samochod":W_ZR,            "ciezarowka":W_ZR,                  "motocykl":W_ZR,
+    "kradziez_kieszonkowa":W_ZR,"zwinne_dlonie":W_ZR,               "otwieranie_zamkow":W_ZR
+}
 
 statslist.forEach((attribute) => {
     on(`change:${attribute}`, () => {
@@ -311,19 +319,19 @@ statslist.forEach((attribute) => {
 
  on('clicked:test_bijatyka', (info) => {
         startRoll("&{template:test} {{base_wsp_name=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=bijatyki}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}", (results) => {
-            getAttrs(["final_test_level", "bijatyka", "modi_battle", "modi_open"], function(values) {
+            let base_wsp = stats2wsp["bijatyka"];
+            getAttrs(["final_test_level", "bijatyka", "modi_battle", "modi_open", base_wsp], function(values) {
                 let skill_name = "bijatyka"   
                 let skill = (parseInt(values.bijatyka)||0);
                 let modi_battle = (parseInt(values.modi_battle)||0);
                 let modi_open = (parseInt(values.modi_open)||0);
+                let statbase = parseInt(values[base_wsp]);
 
                 let skill_remaining = skill;
                 let final_test_level = (parseInt(values.final_test_level)||0);
                 let skill_wsp_name = stats2wsp[skill_name];
 
-                const total = results.results.roll1.result + results.results.roll2.result + results.results.roll3.result;
                 const vals = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
-                const computed = total + 10;
                 let x = 0;
                 
                 if( !modi_battle ){
@@ -348,7 +356,7 @@ statslist.forEach((attribute) => {
                 final_test_level = final_test_level < 0 ? 0 : (final_test_level > 6 ? 6 : final_test_level);
 
                 // Successes and failures
-                let statbase = 10;
+                
                 let dice_style = [3,3,3];
                 let vals_s = vals.concat().sort(function(a, b){return a-b});;
                 const difficulties = [-2,0,2,5,8,11,15];
