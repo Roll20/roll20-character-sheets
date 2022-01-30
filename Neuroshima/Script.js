@@ -54,6 +54,10 @@ const repeatingSum = (destinations, section, fields) => {
     }); 
 };
 
+function clamp(number, min, max) {
+    return Math.max(min, Math.min(number, max));
+}
+
 /******************************************************************/
 /****************************** TABS ******************************/
 const buttonlist = ["wspolczynniki","umiejetnosci","inwentarz"];
@@ -151,11 +155,17 @@ on("change:zrecznosc_base change:mod_zrecznosc change:percepcja_base change:mod_
 				"charakter_base","mod_charakter",
 				"spryt_base","mod_spryt",
 				"budowa_base", "mod_budowa"], function(values) {
-    let zr = (parseInt(values.zrecznosc_base)||0) + (parseInt(values.mod_zrecznosc)||0);
-    let pc = (parseInt(values.percepcja_base)||0) + (parseInt(values.mod_percepcja)||0);
-	let ch = (parseInt(values.charakter_base)||0) + (parseInt(values.mod_charakter)||0);
-    let sp = (parseInt(values.spryt_base)||0) + (parseInt(values.mod_spryt)||0);
-	let bd = (parseInt(values.budowa_base)||0) + (parseInt(values.mod_budowa)||0);
+    let zr_b = clamp((parseInt(values.zrecznosc_base)||0), 1, 40);
+    let pc_b = clamp((parseInt(values.percepcja_base)||0), 1, 40);
+    let ch_b = clamp((parseInt(values.charakter_base)||0), 1, 40);
+    let sp_b = clamp((parseInt(values.spryt_base)||0), 1, 40);
+    let bd_b = clamp((parseInt(values.budowa_base)||0), 1, 40);
+
+    let zr =  zr_b + (parseInt(values.mod_zrecznosc)||0);
+    let pc =  pc_b + (parseInt(values.mod_percepcja)||0);
+	let ch =  ch_b + (parseInt(values.mod_charakter)||0);
+    let sp =  sp_b + (parseInt(values.mod_spryt)||0);
+	let bd =  bd_b + (parseInt(values.mod_budowa)||0);
     setAttrs({                            
       "zr_df_0": zr+2,
 	  "pc_df_0": pc+2,
@@ -169,6 +179,12 @@ on("change:zrecznosc_base change:mod_zrecznosc change:percepcja_base change:mod_
 	  "sp_df_1": sp,
 	  "bd_df_1": bd,
 	  
+      "zrecznosc_base": zr_b,
+      "percepcja_base": pc_b,
+      "charakter_base": ch_b,
+      "spryt_base": sp_b,
+      "budowa_base": bd_b,
+
 	  "zrecznosc": zr,
 	  "percepcja": pc,
 	  "charakter": ch,
@@ -346,13 +362,10 @@ const stats2wsp = {
                             succ += 1;
                             dice_style[x] = 0;
                         } else {
-                            if ( vals_s[x] - skill_remaining <= statreq ) {
+                            if ( vals_s[x] - skill_remaining <= statreq && statreq > 0 ) {
                                 skill_remaining -= (vals_s[x] - statreq);
                                 succ += 1;
                                 dice_style[x] = 1;
-                            } else if ( skill_remaining ){
-                                skill_remaining = 0;
-                                dice_style[x] = 2;
                             } else {
                                 dice_style[x] = 2;
                             }
