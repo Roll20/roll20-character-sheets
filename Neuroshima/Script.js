@@ -366,23 +366,20 @@ statslist.forEach((attribute) => {
             setAttrs(dictionary);
         });
     });
-});
 
-
-
- on('clicked:test_bijatyka', (info) => {
-        startRoll("&{template:test} {{base_wsp_name=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=bijatyki}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}", (results) => {
-            let base_wsp = stats2wsp["bijatyka"];
-            getAttrs(["final_test_level", "bijatyka", "modi_battle", "modi_open", base_wsp], function(values) {
-                let skill_name = "bijatyka"   
-                let skill = (parseInt(values.bijatyka)||0);
+    on(`clicked:test_${attribute}`, (info) => {
+        let genitive = stats2genitive[attribute];
+        startRoll(`&{template:test} {{base_wsp_name=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=${genitive}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
+            let base_wsp = stats2wsp[attribute];
+            let skill_wsp_name = stats2wsp[attribute];
+            getAttrs(["final_test_level", "modi_battle", "modi_open", base_wsp, attribute], function(values) {
+                let skill = (parseInt(values[attribute])||0);
+                let statbase = parseInt(values[base_wsp]);
                 let modi_battle = (parseInt(values.modi_battle)||0);
                 let modi_open = (parseInt(values.modi_open)||0);
-                let statbase = parseInt(values[base_wsp]);
-
+                
                 let skill_remaining = skill;
                 let final_test_level = (parseInt(values.final_test_level)||0);
-                let skill_wsp_name = stats2wsp[skill_name];
 
                 const vals = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
                 let x = 0;
@@ -477,19 +474,6 @@ statslist.forEach((attribute) => {
                 );
             });
         });
-});
-
-on('clicked:test2', (info) => {
-    startRoll("&{template:test2} {{name=Test2}} {{roll1=[[3d20]]}}", (results) => {
-        const total = results.results.roll1.result;
-        const computed = total % 4;
-
-        finishRoll(
-            results.rollId,
-            {
-                roll1: computed,
-            }
-        );
     });
 });
 
