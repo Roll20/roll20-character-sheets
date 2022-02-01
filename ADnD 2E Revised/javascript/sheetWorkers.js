@@ -1493,4 +1493,24 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
     repeatingMultiplySum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
 })
 
+// Psionic tabs, control hidden or visible options
+const setPsionicDisciplineVisibility = function(newValue) {
+    let elements = $20('.sheet-section-psionics .sheet-hidden');
+    if (newValue === "1") {
+        elements.addClass('sheet-show');
+    } else {
+        elements.removeClass('sheet-show');
+    }
+}
+on('change:tab8', function (eventInfo) {
+    setPsionicDisciplineVisibility(eventInfo.newValue);
+});
+on('sheet:opened', function () {
+    getAttrs(['tab8'], function (values) {
+        setPsionicDisciplineVisibility(values['tab8']);
+    })
+});
+
+
+
 // --- ALL SHEET WORKERS END --- //
