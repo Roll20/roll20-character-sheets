@@ -1,7 +1,4 @@
 // --- ALL SHEET WORKERS START --- //
-const SHEETWORKER = 'sheetworker';
-const PLAYER = 'player';
-
 const SUCCESS = 'success';
 const INFO = 'info';
 const WARNING = 'warning';
@@ -13,6 +10,9 @@ const BOOK_FIELDS = [
     'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
     'book-paladins', 'book-druids', 'book-barbarians', 'book-necromancers'
 ];
+
+const SCHOOL_FIELDS = ['school-spells&magic'];
+const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', 'sphere-spells&magic'];
 
 //#region Helper function
 const conditionalLog = function (bool, msg) {
