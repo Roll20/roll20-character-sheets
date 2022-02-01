@@ -275,6 +275,14 @@ on("change:level change:modi_battle change:modi_open change:modi_penalties chang
 /******************************************************************/
 /******************************************************************/
 /*************************** ROLL HANDLERS ************************/
+const wsplist = [
+    "zrecznosc",
+    "percepcja",
+    "charakter",
+    "spryt",
+    "budowa"
+];
+
 const W_ZR = "zrecznosc";
 const W_PC = "percepcja";
 const W_CH = "charakter";
@@ -288,6 +296,14 @@ const wsp2accusative = {
     "spryt":"spryt",
     "budowa":"budowę"
 };
+
+const wsp2genitive = {
+    "zrecznosc":"zręczności",
+    "percepcja":"percepcji",
+    "charakter":"charakteru",
+    "spryt":"sprytu",
+    "budowa":"budowy"
+}
 
 const statslist = [
     "bijatyka",                         "bron_reczna",                  "rzucanie", 
@@ -377,9 +393,11 @@ statslist.forEach((attribute) => {
 
     on(`clicked:test_${attribute}`, (info) => {
         let genitive = stats2genitive[attribute];
-        startRoll(`&{template:test} {{base_wsp_name=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=${genitive}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
+        let skill_wsp_name = stats2wsp[attribute];
+        let wsp_name = wsp2accusative[skill_wsp_name]
+        startRoll(`&{template:test} {{base_wsp_name=${wsp_name}}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=${genitive}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
             let base_wsp = stats2wsp[attribute];
-            let skill_wsp_name = stats2wsp[attribute];
+            
             getAttrs(["final_test_level", "modi_battle", "modi_open", base_wsp, attribute], function(values) {
                 let skill = (parseInt(values[attribute])||0);
                 let statbase = parseInt(values[base_wsp]);
@@ -476,8 +494,86 @@ statslist.forEach((attribute) => {
                         roll3: dice_unsort[2] ,
                         finaldifficulty: final_test_level,
                         successes : succ,
-                        base_wsp_name : wsp2accusative[skill_wsp_name]
+                    }
+                );
+            });
+        });
+    });
+});
 
+
+
+wsplist.forEach((wspolczyn) => {
+    on(`clicked:test_${wspolczyn}`, (info) => {
+        let genitive = wsp2genitive[wspolczyn];
+        startRoll(`&{template:test-wsp} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{wsp-name=${genitive}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
+            getAttrs(["final_test_level", "modi_battle", "modi_open", wspolczyn], function(values) {
+                let statbase = parseInt(values[wspolczyn]);
+                let modi_battle = (parseInt(values.modi_battle)||0);
+                let modi_open = (parseInt(values.modi_open)||0);
+                
+                let final_test_level = (parseInt(values.final_test_level)||0);
+
+                const vals = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
+                let x = 0;
+                
+                // Critical rolls ( 1 / 20 )
+                for (x=0; x<3; ++x) {
+                    if(vals[x]==1)
+                    {
+                        final_test_level -= 1;
+                    }
+                    if(vals[x]==20)
+                    {
+                        final_test_level += 1;
+                    }
+                }
+                
+                // Constrain
+                final_test_level = final_test_level < 0 ? 0 : (final_test_level > 6 ? 6 : final_test_level);
+
+                // Successes and failures
+                
+                let dice_style = [3,3,3];
+                let vals_s = vals.concat().sort(function(a, b){return a-b});;
+                const difficulties = [-2,0,2,5,8,11,15];
+                let statreq = statbase - difficulties[final_test_level];
+                let succ = 0;
+                if (modi_open) {
+                    succ = statreq - vals_s[1];
+                    dice_style[1] = 0;
+                } else {
+                    for (x=0; x<3; ++x) {
+                        if(vals_s[x] <= statreq) {
+                            succ += 1;
+                            dice_style[x] = 0;
+                        } else {
+                            dice_style[x] = 2;
+                        }
+                    }    
+                }
+
+                let dice_unsort = [3,3,3];
+                    for(x=0; x<3; ++x) {
+                        for(let y=0; y<3; ++y) {
+                            if(vals[x]==vals_s[y]) {
+                                dice_unsort[x] = dice_style[y];
+                                vals_s[y] = -1;
+                                vals[x] = 0;
+                                break;
+                            }
+                        }
+                    }
+                
+
+                finishRoll(
+                    results.rollId,
+                    {
+                        roll1: dice_unsort[0] ,
+                        roll2: dice_unsort[1] ,
+                        roll3: dice_unsort[2] ,
+                        finaldifficulty: final_test_level,
+                        successes : succ,
                     }
                 );
             });
