@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.5.0" readonly />
+													<input type="text" class="center" name="attr_version" value="1.5.1" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -12483,12 +12483,167 @@
 			return result;
 		}
 		
+		function getStandardLimiterTooltipDescription(debug, customization, rank) {
+			const standard_limiter_descriptions_obj = {
+				'activation':[
+					'Spend one round preparing the Attribute before it is used',
+					'Spend one minute preparing the Attribute before it is used',
+					'Spend one hour preparing the Attribute before it is used'
+				],
+				'assisted':[
+					'A single assistant is required for the Attribute to function',
+					'A small group of assistants (2-10) are required for the Attribute to function',
+					'A large group of assistants (11-100) are required for the Attribute to function'
+				],
+				'backlash':[
+					'The Backlash occurs if the character fails their roll by an significant margin (6 or more)',
+					'The Backlash occurs if the character fails their roll by a moderate margin (3 or more)',
+					'The Backlash occurs if the character fails their roll'
+				],
+				'charges':[
+					'Only use the Attribute four to six times a day (or session)',
+					'Only use the Attribute two or three times a day (or session)',
+					'Only use the Attribute once a day (or session)'
+				],
+				'concentration':[
+					'Requires slight Concentration. The character can still perform ' +
+					'other general actions but cannot perform any combatrelated actions ' +
+					'or use other Attributes that also require Concentration',
+					'Requires intense Concentration. The character can move at slow ' +
+					'speeds and talk with others while using the Attribute but cannot ' +
+					'perform any complex actions (including combat) or use any other Attribute',
+					'Requires full Concentration. The character cannot do anything ' +
+					'else while using the Attribute and must remain still to devote their ' +
+					'full attention to the Attribute'
+				],
+				'consumable':[
+					'Focus is easy to replace',
+					'Focus is hard to replace',
+					'Focus is very difficult to replace'
+				],
+				'delay':[
+					'Delay of a few minutes before it takes full effect',
+					'Delay of a few hours before it takes full effect',
+					'Delay of a few days before it takes full effect'
+				],
+				'dependant':[
+					'Dependent Attribute does not take effect until one other Attribute is activated',
+					'Dependent Attribute does not take effect until two other Attributes are activated',
+					'Dependent Attribute does not take effect until three other Attribute are activated'
+				],
+				'deplete':[
+					'Attributes with immediate effects burn 10 Energy Points for each ' +
+					'use (or attempted use); ongoing Attributes burn 10 Energy Point ' +
+					'each minute of use',
+					'Attributes with immediate effects burn 20 Energy Points for each ' +
+					'use (or attempted use); ongoing Attributes burn 5 Energy Point ' +
+					'each round of use',
+					'Attributes with immediate effects burn 30 Energy Points for each ' +
+					'use (or attempted use); ongoing Attributes burn 20 Energy Point ' +
+					'each round of use'
+				],
+				'detectable':[
+					'Detectable using 1-2 methods',
+					'Detectable using 3-5 methods',
+					'Detectable using 6-10 methods'
+				],
+				'emotional':[
+					'Use requires significant Emotional investment',
+					'Use requires strong Emotional investment',
+					'Use requires extreme Emotional investment'
+				],
+				'environmental':[
+					'Adventures often take place in or near the specific environment',
+					'Adventures occasionally take place in or near the specific environment',
+					'Adventures rarely take place in or near the specific environment'
+				],
+				'equipment':[
+					'Equipment is easily portable, such as a smartphone, wagon, or spell book',
+					'Equipment is awkward to move, such as a statue, portable altar, or large furniture',
+					'Equipment is static, such as workshop, laboratory, or shrine'
+				],
+				'imbue':[
+					'Imbue 4-5 people',
+					'Imbue 2-3 people',
+					'Imbue 1 person'
+				],
+				'irreversible':[
+					'It takes several hours of work or special circumstances to enable ' +
+					'the character to transform back to an earlier form',
+					'It takes several hours of work or special circumstances to enable ' +
+					'the character to transform back to an earlier form, and requires ' +
+					'expensive or rare replacement components, ingredients, or prerequisites',
+					'It takes several days of work or special circumstances to enable ' +
+					'the character to transform back to an earlier form, and requires ' +
+					'expensive or rare replacement components, ingredients, or prerequisites'
+				],
+				'localized':[
+					'Affects a large part of the body (torso, both legs or arms, etc.)',
+					'Affects a small part of the body (one leg or arm, abdomen, chest, head, etc.)',
+					'Affects a tiny part of the body (one hand or foot, face, groin, knee, etc.)'
+				],
+				'maximum':[
+					'The character’s Attribute is at Level 3-4 and always functions at ' +
+					'its Maximum effectiveness',
+					'The character’s Attribute is at Level 2 and always functions at ' +
+					'its Maximum effectiveness',
+					'The character’s Attribute is at Level 5+ and always functions at ' +
+					'its Maximum effectiveness'
+				],
+				'object':[
+					'The Item’s Attribute still provides moderate benefit to the character',
+					'The Item’s Attribute still provides slight benefit to the character',
+					'The Item’s Attribute hardly provides any benefit to the character'
+				],
+				'permanent':[
+					'Permanent Attribute is a slight inconvenience',
+					'Permanent Attribute is a minor inconvenience',
+					'Permanent Attribute is a moderate inconvenience'
+				],
+				'recovery':[
+					'For every 1 minute the character uses the Attribute, the Recovery ' +
+					'time is 1 minute before the Attribute functions again. The ' +
+					'Attribute can be used for a maximum of 12 hours.',
+					'For every 1 minute the character uses the Attribute, the Recovery ' +
+					'time is 10 minutes before the Attribute functions again. The ' +
+					'Attribute can be used for a maximum of 4 hours.',
+					'For every 1 minute the character uses the Attribute, the Recovery ' +
+					'time is 1 hour before the Attribute functions again. The ' +
+					'Attribute can be used for a maximum of 1 hour.'
+				],
+				'semipermanent':[
+					'a minor inconvenience to the character; can be turned off at a ' +
+					'cost of 1 Energy Points/minute',
+					'a moderate inconvenience to the character; can be turned off at a ' +
+					'cost of 10 Energy Points/minute',
+					'a major inconvenience to the character; can be turned off at a ' +
+					'cost of 10 Energy Points/round'
+				],
+				'unique':[
+					'imposes minor restrictions on the Attribute',
+					'imposes moderate restrictions on the Attribute',
+					'imposes major restrictions on the Attribute'
+				],
+				'unpredictable':[
+					'must make a successful average Stat roll (TN 12) to use the Attribute',
+					'must make a successful difficult Stat roll (TN 15) to use the Attribute',
+					'must make a successful challenging Stat roll (TN 18) to use the Attribute'
+				]
+			};
+			const standard_limiter_descriptions_array = 
+				standard_limiter_descriptions_obj[customization] || [];
+			const result = rank > 0 ?
+				standard_limiter_descriptions_array[rank - 1] : '';
+			if(debug) console.log(`[getStandardLimiterTooltipDescription()] result = ${result}`);
+			return result;
+		}
+		
 		function getCustomizationsTooltipString(debug, attrobj, attrdb) {
 			const base_values_obj = {
-				'area':'Area: individual\n',
-				'duration':'Duration: instant\n',
-				'range':'Range: self or touch\n',
-				'targets':'Targets: self or 1 target\n'
+				'area':'Area: individual\n\n',
+				'duration':'Duration: instant\n\n',
+				'range':'Range: self or touch\n\n',
+				'targets':'Targets: self or 1 target\n\n'
 			};
 			const standard_enhancements_array = 
 				getAttrStandardEnhancements(debug, attrobj.attribute);
@@ -12504,9 +12659,9 @@
 						getDuration(debug, rank) :
 					c.name == 'targets' ?
 						 getTargets(debug, rank) :
-					rank :
+					getStandardLimiterTooltipDescription(debug, c.name, rank) :
 				'';
-				standardEnhancementsObj[`${c.name}`] = `${capital(c.name)}: ${getRankString(c.rank)}\n`;
+				standardEnhancementsObj[`${c.name}`] = `${capital(c.name)}: ${getRankString(c.rank)}\n\n`;
 			});
 			const result = _.values(standardEnhancementsObj).join("");
 			if(debug) console.log(`[getCustomizationsTooltipString()] result = ${result}`);
@@ -12520,7 +12675,7 @@
 				if (attr.source == rowID) return true;
 			}) || {};
 			const customizations = getCustomizationsTooltipString(debug, attrobj, attrdb);
-			const result = stat.length > 0 ? `Stat: ${capital(stat)}\n${customizations}` : customizations;
+			const result = stat.length > 0 ? `Stat: ${capital(stat)}\n\n${customizations}` : customizations;
 			if(debug) console.log(`[buildActiveAttrTooltip()] result = ${result}`);
 			return result;
 		}
