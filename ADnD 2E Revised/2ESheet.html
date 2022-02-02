@@ -13,7 +13,11 @@
                 <li>Added Spells and Proficiencies from The Complete Book of Necromancers</li>
                 <li>Added Sphere extensions from The Complete Druid's Handbook</li>
                 <li>Added Sphere extensions from The Complete Book of Necromancers</li>
+                <li>Added fields to keep track of Psionic Primary and Secondary Disciplines</li>
+                <li>Added help text for Psionic Disciplines</li>
                 <li>Added styling for the sheet settings table</li>
+                <li>Fixed the Grenade Miss button when using Holy water</li>
+                <li>Corrected the output text when using Holy water, splash damage</li>
             </ul>
             <hr>
             <p>
@@ -1511,7 +1515,7 @@
                 <button type="roll" name="roll_acid-hit" value="/em rolls [[2d4]] acid damage using their Acid! (Direct hit)"></button>
                 <button type="roll" name="roll_acid-splash" value="/em rolls [[1]] acid damage using their Acid! (Splash)"></button>
                 <button type="roll" name="roll_holy-water-hit" value="/em rolls [[1d6+1]] damage using their Holy water! (Direct hit)"></button>
-                <button type="roll" name="roll_holy-water-splash" value="/em rolls [[2]] avid damage using their Holy water! (Splash)"></button>
+                <button type="roll" name="roll_holy-water-splash" value="/em rolls [[2]] damage using their Holy water! (Splash)"></button>
                 <button type="roll" name="roll_oil-lit-hit1" value="/em rolls [[2d6]] fire damage using their Oil (lit)! (Direct hit, first round)"></button>
                 <button type="roll" name="roll_oil-lit-hit2" value="/em rolls [[1d6]] fire damage using their Oil (lit)! (Direct hit, second round)"></button>
                 <button type="roll" name="roll_oil-lit-splash" value="/em rolls [[1d3]] fire damage using their Oil (lit)! (Splash)"></button>
@@ -9305,8 +9309,8 @@
                             <option>Clairsentience</option>
                             <option>Psychokinesis</option>
                             <option>Psychometabolism</option>
+                            <option>Pschoportation</option>
                             <option>Telepathy</option>
-                            <option class="sheet-hidden">Metapsionics</option>
                         </select>
                     </td>
                 </tr>
@@ -9324,6 +9328,7 @@
                                 <option>Clairsentience</option>
                                 <option>Psychokinesis</option>
                                 <option>Psychometabolism</option>
+                                <option>Pschoportation</option>
                                 <option>Telepathy</option>
                                 <option class="sheet-hidden">Metapsionics</option>
                             </select>
@@ -9331,6 +9336,14 @@
                     </tr>
                 </table>
             </fieldset>
+            <details>
+                <summary>Psionic discipline rules</summary>
+                From <em>The Complete Psionics Handbook</em> p. 12:
+                <ul>
+                    <li>Within a single discipline, the number of devotions that a character knows must be at least twice the number of sciences.</li>
+                    <li>The first discipline chosen is the character's primary discipline.  A character can never learn as many sciences or devotions in another discipline as he currently knows in his primary discipline.</li>
+                </ul>
+            </details>
             <br>
 
             <div class="sheet-tab-content sheet-section-psionic-standard">
@@ -43547,7 +43560,7 @@ on('clicked:grenade-miss', async function (eventInfo) {
         let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
         switch (grenade) {
             case 'Acid':       finalRollText += `{{name=Acid}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|acid-hit)}} {{splashdmg=[Damage](~${characterName}|acid-splash)}}`; break;
-            case 'Holy water': finalRollText += `{{name=Holy water}} water]]}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
+            case 'Holy water': finalRollText += `{{name=Holy water}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
             case 'Oil (lit)':  finalRollText += `{{name=Oil (lit)}} {{aoe=[[3]]}} {{aoesplash=[[3+6]]}} {{hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)}} {{splashdmg=[Damage](~${characterName}|oil-lit-splash)}}`; break;
             case 'Poison':     finalRollText += `{{name=Poison}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=Special}} {{splashdmg=Special}}`; break;
             case 'Other': {

@@ -1351,7 +1351,7 @@ on('clicked:grenade-miss', async function (eventInfo) {
         let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
         switch (grenade) {
             case 'Acid':       finalRollText += `{{name=Acid}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|acid-hit)}} {{splashdmg=[Damage](~${characterName}|acid-splash)}}`; break;
-            case 'Holy water': finalRollText += `{{name=Holy water}} water]]}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
+            case 'Holy water': finalRollText += `{{name=Holy water}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
             case 'Oil (lit)':  finalRollText += `{{name=Oil (lit)}} {{aoe=[[3]]}} {{aoesplash=[[3+6]]}} {{hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)}} {{splashdmg=[Damage](~${characterName}|oil-lit-splash)}}`; break;
             case 'Poison':     finalRollText += `{{name=Poison}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=Special}} {{splashdmg=Special}}`; break;
             case 'Other': {
