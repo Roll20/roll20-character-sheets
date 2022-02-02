@@ -16,7 +16,8 @@ More info: [Readme](https://github.com/Roll20/roll20-character-sheets/blob/maste
 - Rolls for skills, wisdom, valour, attack and protection including favoured/ illfavoured / weary modifiers and optional bonus dice 
 - Automated calculation of total parry and protection depending on stance and equipped gear.
 - Automated calculation of load
-- Attacks with optional selecting target and integrating target's parry
+- Attacks with optionally selecting target and integrating target's parry
+- Attack button macro bar support
 
 ### Adversarysheet ###
 
