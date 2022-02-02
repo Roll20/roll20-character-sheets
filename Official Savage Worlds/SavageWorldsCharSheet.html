@@ -1,7 +1,7 @@
 
 <script type="text/worker">
   const sheetVersionPrefix = "Official Savage Worlds v";
-const sheetVersion = "1.00.23";
+const sheetVersion = "1.00.24";
 
 // Define colors for Logs
 const r20color = "#E948C9";
@@ -481,6 +481,9 @@ const upgradeSheet = function(
             setattrvals["newdocumentation"] = "unread";
         }
         if (versionthree < 0.23) {
+            setattrvals["newcontent"] = "unread";
+        }
+        if (versionthree < 0.24) {
             setattrvals["newcontent"] = "unread";
         }
         else {
@@ -6361,7 +6364,7 @@ on(
 </script>
 <!-- Necessary Mixins-->
 <!-- Hidden inputs for character sheet versioning, etc-->
-<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.23"/>
+<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.24"/>
 <input type="hidden" name="attr_firstInit" value="0"/>
 <input type="hidden" name="attr_namelength" value="0"/>
 <input type="hidden" name="attr_wdNum" value="1"/>
@@ -6465,7 +6468,7 @@ on(
           <input class="isWC" type="hidden" name="attr_is_npc" value="1"/>
           <button class="statblock" type="roll" name="roll_fullstatblock" data-i18n-title="send-statblock-chatlog" value="@{whisperstatblock} &amp;{template:statblock} @{chardesc} {{charatts=@{charatts}}} {{charskills=@{charskills}}} {{charderived=@{charderived}}} {{chargear=@{chargear}}} {{charhindrances=@{charhindrances}}} {{charedges=@{charedges}}} {{showspec=@{showspec}}} {{charspecabilities=@{charspecabilities}}} {{powercount=[[1d0+@{powercount}]]}} {{charpowers=@{charpowers}}}"><span class="showWCicon" name="attr_WCI"></span><img style="height: 28px;" src="http://imgsrv.roll20.net/?src=github.com/finderski/SWT/blob/master/BackgroundImages/statblock_profile.png%3Fraw%3Dtrue"/></button>
           <input class="showFear" type="checkbox" name="attr_showFear" value="1" checked="checked"/>
-          <button class="topbuttons fearButton" type="roll" name="roll_fearCheckRoll" title="@{fearCheckRoll}" value="@{spiritbutton} {{ReRoll=^{reroll}(~fearCheckRoll)}}  {{DmgRoll=[Fear Result](~fearRoll)}}">&#128561;</button>
+          <button class="topbuttons fearButton" type="roll" name="roll_fearCheckRoll" title="@{fearCheckRoll}" value="@{spiritbutton} {{skill_roll=[[@{spiritRollFormula}]]}} {{wild_die=[[@{spiritWildDieFormula}]]}} {{ReRoll=^{reroll}(~fearCheckRoll)}}  {{DmgRoll=[Fear Result](~fearRoll)}}">&#128561;</button>
           <button class="hiddenInput" type="roll" name="roll_fearRoll" data-i18n-title="fear-roll" value="&amp;{template:info} {{name=Fear Table}} {{item=Result for @{character_name}}} {{fear=[[1d20+?{Fear Roll Modifier|0}]]}} {{heartattack=[[2d6]]}}">&#128561;</button>
         </div>
         <div class="docbuttons">
@@ -6587,15 +6590,16 @@ on(
               <h3 class="groupHeading groupBlock" data-i18n="attributes">Attributes</h3>
               <input class="showMiniDisplay" type="checkbox" name="attr_miniDisplay" value="1"/>
               <input class="deltabutton" type="hidden" name="attr_agility_delta" value="0"/>
-              <button class="traitbutton miniButton" type="roll" name="roll_tAgilityRoll" title="@{tAgilityRoll}" value="@{agilitybutton} @{unshakeTemplate}"> <span data-i18n="agility">Agility </span>&nbsp; (<span name="attr_agility_display"> </span>)</button>
+              <!--Added skill and wild die formula for roll template.-->
+              <button class="traitbutton miniButton" type="roll" name="roll_tAgilityRoll" title="@{tAgilityRoll}" value="@{agilitybutton} {{skill_roll=[[@{agilityRollFormula}]]}} {{wild_die=[[@{agilityWildDieFormula}]]}} @{unshakeTemplate}"> <span data-i18n="agility">Agility </span>&nbsp; (<span name="attr_agility_display"> </span>)</button>
               <input class="deltabutton" type="hidden" name="attr_smarts_delta" value="0"/>
-              <button class="traitbutton miniButton" type="roll" name="roll_tSmartsRoll" title="@{tSmartsRoll}" value="@{smartsbutton} @{unshakeTemplate}"> <span data-i18n="smarts">Smarts </span><span name="attr_animalsmarts_display"> </span>(<span name="attr_smarts_display"> </span>)</button>
+              <button class="traitbutton miniButton" type="roll" name="roll_tSmartsRoll" title="@{tSmartsRoll}" value="@{smartsbutton} {{skill_roll=[[@{smartsRollFormula}]]}} {{wild_die=[[@{smartsWildDieFormula}]]}} @{unshakeTemplate}"> <span data-i18n="smarts">Smarts </span><span name="attr_animalsmarts_display"> </span>(<span name="attr_smarts_display"> </span>)</button>
               <input class="deltabutton" type="hidden" name="attr_spirit_delta" value="0"/>
-              <button class="traitbutton miniButton" type="roll" name="roll_tSpiritRoll" title="@{tSpiritRoll}" value="@{spiritbutton} @{unshakeTemplate}"> <span data-i18n="spirit">Spirit </span>&nbsp; (<span name="attr_spirit_display"> </span>)</button>
+              <button class="traitbutton miniButton" type="roll" name="roll_tSpiritRoll" title="@{tSpiritRoll}" value="@{spiritbutton} {{skill_roll=[[@{spiritRollFormula}]]}} {{wild_die=[[@{spiritWildDieFormula}]]}} @{unshakeTemplate}"> <span data-i18n="spirit">Spirit </span>&nbsp; (<span name="attr_spirit_display"> </span>)</button>
               <input class="deltabutton" type="hidden" name="attr_strength_delta" value="0"/>
-              <button class="traitbutton miniButton" type="roll" name="roll_tStrengthRoll" title="@{tStrengthRoll}" value="@{strengthbutton} @{unshakeTemplate}"> <span data-i18n="strength">Strength </span>&nbsp; (<span name="attr_strength_display"> </span>)</button>
+              <button class="traitbutton miniButton" type="roll" name="roll_tStrengthRoll" title="@{tStrengthRoll}" value="@{strengthbutton} {{skill_roll=[[@{strengthRollFormula}]]}} {{wild_die=[[@{strengthWildDieFormula}]]}} @{unshakeTemplate}"> <span data-i18n="strength">Strength </span>&nbsp; (<span name="attr_strength_display"> </span>)</button>
               <input class="deltabutton" type="hidden" name="attr_vigor_delta" value="0"/>
-              <button class="traitbutton miniButton" type="roll" name="roll_tVigorRoll" title="@{tVigorRoll}" value="@{vigorbutton} @{unshakeTemplate}"> <span data-i18n="vigor">Vigor </span>&nbsp; (<span name="attr_vigor_display"> </span>)</button>
+              <button class="traitbutton miniButton" type="roll" name="roll_tVigorRoll" title="@{tVigorRoll}" value="@{vigorbutton} {{skill_roll=[[@{vigorRollFormula}]]}} {{wild_die=[[@{vigorWildDieFormula}]]}} @{unshakeTemplate}"> <span data-i18n="vigor">Vigor </span>&nbsp; (<span name="attr_vigor_display"> </span>)</button>
             </div>
             <div class="derivedCondensed"> 
               <h3 class="groupHeading groupBlock" data-i18n="derived">Derived</h3>
@@ -7355,8 +7359,8 @@ on(
                     </details>
                     <input type="hidden" name="attr_knowledgeother_rank" value="1d4!"/>
                     <input type="hidden" name="attr_knowledgeother_display" value="d4"/>
-                    <input type="hidden" name="attr_knowledgeotherSkillRollFormula" value="@{knowledgeother_rank} + @{KnowledgeotherskillMod}+ @{linkedknowledgeotherattformula} + @{traitmods}"/>
-                    <input type="hidden" name="attr_knowledgeotherWildDieFormula" value="1d@{knowledgeotherwilddie}! + @{knowledgeothermod} + @{KnowledgeotherskillMod} + @{linkedknowledgeotherattformula} + @{traitmods}"/>
+                    <input type="hidden" name="attr_knowledgeotherSkillRollFormula" value="@{knowledgeother_rank} + @{KnowledgeotherskillMod} [@{knowledgeotherModType}] + @{linkedknowledgeotherattformula} + @{traitmods}"/>
+                    <input type="hidden" name="attr_knowledgeotherWildDieFormula" value="1d@{knowledgeotherwilddie}! + @{knowledgeothermod} + @{KnowledgeotherskillMod} [@{knowledgeotherModType}] + @{linkedknowledgeotherattformula} + @{traitmods}"/>
                     <input type="hidden" name="attr_rolltKnowledgeother" value="{{name=@{character_name} }} {{skill_rank=@{knowledgeother_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                     <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                     <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -8577,8 +8581,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_academics_rank" value="1d4!"/>
                   <input type="hidden" name="attr_academics_display" value="d4"/>
-                  <input type="hidden" name="attr_academicsSkillRollFormula" value="@{academics_rank} + @{AcademicsskillMod}+ @{linkedacademicsattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_academicsWildDieFormula" value="1d@{academicswilddie}! + @{academicsmod} + @{AcademicsskillMod} + @{linkedacademicsattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_academicsSkillRollFormula" value="@{academics_rank} + @{AcademicsskillMod} [@{academicsModType}] + @{linkedacademicsattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_academicsWildDieFormula" value="1d@{academicswilddie}! + @{academicsmod} + @{AcademicsskillMod} [@{academicsModType}] + @{linkedacademicsattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltAcademics" value="{{name=@{character_name} }} {{skill_rank=@{academics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -8694,8 +8698,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_athletics_rank" value="1d4!"/>
                   <input type="hidden" name="attr_athletics_display" value="d4"/>
-                  <input type="hidden" name="attr_athleticsSkillRollFormula" value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_athleticsWildDieFormula" value="1d@{athleticswilddie}! + @{athleticsmod} + @{AthleticsskillMod} + @{linkedathleticsattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_athleticsSkillRollFormula" value="@{athletics_rank} + @{AthleticsskillMod} [@{athleticsModType}] + @{linkedathleticsattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_athleticsWildDieFormula" value="1d@{athleticswilddie}! + @{athleticsmod} + @{AthleticsskillMod} [@{athleticsModType}] + @{linkedathleticsattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltAthletics" value="{{name=@{character_name} }} {{skill_rank=@{athletics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -8806,8 +8810,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_battle_rank" value="1d4!"/>
                   <input type="hidden" name="attr_battle_display" value="d4"/>
-                  <input type="hidden" name="attr_battleSkillRollFormula" value="@{battle_rank} + @{BattleskillMod}+ @{linkedbattleattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_battleWildDieFormula" value="1d@{battlewilddie}! + @{battlemod} + @{BattleskillMod} + @{linkedbattleattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_battleSkillRollFormula" value="@{battle_rank} + @{BattleskillMod} [@{battleModType}] + @{linkedbattleattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_battleWildDieFormula" value="1d@{battlewilddie}! + @{battlemod} + @{BattleskillMod} [@{battleModType}] + @{linkedbattleattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltBattle" value="{{name=@{character_name} }} {{skill_rank=@{battle_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -8918,8 +8922,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_boating_rank" value="1d4!"/>
                   <input type="hidden" name="attr_boating_display" value="d4"/>
-                  <input type="hidden" name="attr_boatingSkillRollFormula" value="@{boating_rank} + @{BoatingskillMod}+ @{linkedboatingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_boatingWildDieFormula" value="1d@{boatingwilddie}! + @{boatingmod} + @{BoatingskillMod} + @{linkedboatingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_boatingSkillRollFormula" value="@{boating_rank} + @{BoatingskillMod} [@{boatingModType}] + @{linkedboatingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_boatingWildDieFormula" value="1d@{boatingwilddie}! + @{boatingmod} + @{BoatingskillMod} [@{boatingModType}] + @{linkedboatingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltBoating" value="{{name=@{character_name} }} {{skill_rank=@{boating_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -9030,8 +9034,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_commonknowledge_rank" value="1d4!"/>
                   <input type="hidden" name="attr_commonknowledge_display" value="d4"/>
-                  <input type="hidden" name="attr_commonknowledgeSkillRollFormula" value="@{commonknowledge_rank} + @{CommonknowledgeskillMod}+ @{linkedcommonknowledgeattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_commonknowledgeWildDieFormula" value="1d@{commonknowledgewilddie}! + @{commonknowledgemod} + @{CommonknowledgeskillMod} + @{linkedcommonknowledgeattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_commonknowledgeSkillRollFormula" value="@{commonknowledge_rank} + @{CommonknowledgeskillMod} [@{commonknowledgeModType}] + @{linkedcommonknowledgeattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_commonknowledgeWildDieFormula" value="1d@{commonknowledgewilddie}! + @{commonknowledgemod} + @{CommonknowledgeskillMod} [@{commonknowledgeModType}] + @{linkedcommonknowledgeattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltCommonknowledge" value="{{name=@{character_name} }} {{skill_rank=@{commonknowledge_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -9142,8 +9146,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_driving_rank" value="1d4!"/>
                   <input type="hidden" name="attr_driving_display" value="d4"/>
-                  <input type="hidden" name="attr_drivingSkillRollFormula" value="@{driving_rank} + @{DrivingskillMod}+ @{linkeddrivingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_drivingWildDieFormula" value="1d@{drivingwilddie}! + @{drivingmod} + @{DrivingskillMod} + @{linkeddrivingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_drivingSkillRollFormula" value="@{driving_rank} + @{DrivingskillMod} [@{drivingModType}] + @{linkeddrivingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_drivingWildDieFormula" value="1d@{drivingwilddie}! + @{drivingmod} + @{DrivingskillMod} [@{drivingModType}] + @{linkeddrivingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltDriving" value="{{name=@{character_name} }} {{skill_rank=@{driving_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -9254,8 +9258,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_electronics_rank" value="1d4!"/>
                   <input type="hidden" name="attr_electronics_display" value="d4"/>
-                  <input type="hidden" name="attr_electronicsSkillRollFormula" value="@{electronics_rank} + @{ElectronicsskillMod}+ @{linkedelectronicsattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_electronicsWildDieFormula" value="1d@{electronicswilddie}! + @{electronicsmod} + @{ElectronicsskillMod} + @{linkedelectronicsattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_electronicsSkillRollFormula" value="@{electronics_rank} + @{ElectronicsskillMod} [@{electronicsModType}] + @{linkedelectronicsattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_electronicsWildDieFormula" value="1d@{electronicswilddie}! + @{electronicsmod} + @{ElectronicsskillMod} [@{electronicsModType}] + @{linkedelectronicsattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltElectronics" value="{{name=@{character_name} }} {{skill_rank=@{electronics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -9366,8 +9370,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_faith_rank" value="1d4!"/>
                   <input type="hidden" name="attr_faith_display" value="d4"/>
-                  <input type="hidden" name="attr_faithSkillRollFormula" value="@{faith_rank} + @{FaithskillMod}+ @{linkedfaithattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_faithWildDieFormula" value="1d@{faithwilddie}! + @{faithmod} + @{FaithskillMod} + @{linkedfaithattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_faithSkillRollFormula" value="@{faith_rank} + @{FaithskillMod} [@{faithModType}] + @{linkedfaithattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_faithWildDieFormula" value="1d@{faithwilddie}! + @{faithmod} + @{FaithskillMod} [@{faithModType}] + @{linkedfaithattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltFaith" value="{{name=@{character_name} }} {{skill_rank=@{faith_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -9478,8 +9482,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_fighting_rank" value="1d4!"/>
                   <input type="hidden" name="attr_fighting_display" value="d4"/>
-                  <input type="hidden" name="attr_fightingSkillRollFormula" value="@{fighting_rank} + @{FightingskillMod}+ @{linkedfightingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_fightingWildDieFormula" value="1d@{fightingwilddie}! + @{fightingmod} + @{FightingskillMod} + @{linkedfightingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_fightingSkillRollFormula" value="@{fighting_rank} + @{FightingskillMod} [@{fightingModType}] + @{linkedfightingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_fightingWildDieFormula" value="1d@{fightingwilddie}! + @{fightingmod} + @{FightingskillMod} [@{fightingModType}] + @{linkedfightingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltFighting" value="{{name=@{character_name} }} {{skill_rank=@{fighting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -9590,8 +9594,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_focus_rank" value="1d4!"/>
                   <input type="hidden" name="attr_focus_display" value="d4"/>
-                  <input type="hidden" name="attr_focusSkillRollFormula" value="@{focus_rank} + @{FocusskillMod}+ @{linkedfocusattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_focusWildDieFormula" value="1d@{focuswilddie}! + @{focusmod} + @{FocusskillMod} + @{linkedfocusattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_focusSkillRollFormula" value="@{focus_rank} + @{FocusskillMod} [@{focusModType}] + @{linkedfocusattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_focusWildDieFormula" value="1d@{focuswilddie}! + @{focusmod} + @{FocusskillMod} [@{focusModType}] + @{linkedfocusattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltFocus" value="{{name=@{character_name} }} {{skill_rank=@{focus_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -9702,8 +9706,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_gambling_rank" value="1d4!"/>
                   <input type="hidden" name="attr_gambling_display" value="d4"/>
-                  <input type="hidden" name="attr_gamblingSkillRollFormula" value="@{gambling_rank} + @{GamblingskillMod}+ @{linkedgamblingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_gamblingWildDieFormula" value="1d@{gamblingwilddie}! + @{gamblingmod} + @{GamblingskillMod} + @{linkedgamblingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_gamblingSkillRollFormula" value="@{gambling_rank} + @{GamblingskillMod} [@{gamblingModType}] + @{linkedgamblingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_gamblingWildDieFormula" value="1d@{gamblingwilddie}! + @{gamblingmod} + @{GamblingskillMod} [@{gamblingModType}] + @{linkedgamblingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltGambling" value="{{name=@{character_name} }} {{skill_rank=@{gambling_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -9814,8 +9818,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_hacking_rank" value="1d4!"/>
                   <input type="hidden" name="attr_hacking_display" value="d4"/>
-                  <input type="hidden" name="attr_hackingSkillRollFormula" value="@{hacking_rank} + @{HackingskillMod}+ @{linkedhackingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_hackingWildDieFormula" value="1d@{hackingwilddie}! + @{hackingmod} + @{HackingskillMod} + @{linkedhackingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_hackingSkillRollFormula" value="@{hacking_rank} + @{HackingskillMod} [@{hackingModType}] + @{linkedhackingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_hackingWildDieFormula" value="1d@{hackingwilddie}! + @{hackingmod} + @{HackingskillMod} [@{hackingModType}] + @{linkedhackingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltHacking" value="{{name=@{character_name} }} {{skill_rank=@{hacking_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -9926,8 +9930,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_healing_rank" value="1d4!"/>
                   <input type="hidden" name="attr_healing_display" value="d4"/>
-                  <input type="hidden" name="attr_healingSkillRollFormula" value="@{healing_rank} + @{HealingskillMod}+ @{linkedhealingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_healingWildDieFormula" value="1d@{healingwilddie}! + @{healingmod} + @{HealingskillMod} + @{linkedhealingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_healingSkillRollFormula" value="@{healing_rank} + @{HealingskillMod} [@{healingModType}] + @{linkedhealingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_healingWildDieFormula" value="1d@{healingwilddie}! + @{healingmod} + @{HealingskillMod} [@{healingModType}] + @{linkedhealingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltHealing" value="{{name=@{character_name} }} {{skill_rank=@{healing_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -10038,8 +10042,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_intimidation_rank" value="1d4!"/>
                   <input type="hidden" name="attr_intimidation_display" value="d4"/>
-                  <input type="hidden" name="attr_intimidationSkillRollFormula" value="@{intimidation_rank} + @{IntimidationskillMod}+ @{linkedintimidationattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_intimidationWildDieFormula" value="1d@{intimidationwilddie}! + @{intimidationmod} + @{IntimidationskillMod} + @{linkedintimidationattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_intimidationSkillRollFormula" value="@{intimidation_rank} + @{IntimidationskillMod} [@{intimidationModType}] + @{linkedintimidationattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_intimidationWildDieFormula" value="1d@{intimidationwilddie}! + @{intimidationmod} + @{IntimidationskillMod} [@{intimidationModType}] + @{linkedintimidationattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltIntimidation" value="{{name=@{character_name} }} {{skill_rank=@{intimidation_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -10150,8 +10154,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_language_rank" value="1d4!"/>
                   <input type="hidden" name="attr_language_display" value="d4"/>
-                  <input type="hidden" name="attr_languageSkillRollFormula" value="@{language_rank} + @{LanguageskillMod}+ @{linkedlanguageattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_languageWildDieFormula" value="1d@{languagewilddie}! + @{languagemod} + @{LanguageskillMod} + @{linkedlanguageattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_languageSkillRollFormula" value="@{language_rank} + @{LanguageskillMod} [@{languageModType}] + @{linkedlanguageattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_languageWildDieFormula" value="1d@{languagewilddie}! + @{languagemod} + @{LanguageskillMod} [@{languageModType}] + @{linkedlanguageattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltLanguage" value="{{name=@{character_name} }} {{skill_rank=@{language_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -10262,8 +10266,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_notice_rank" value="1d4!"/>
                   <input type="hidden" name="attr_notice_display" value="d4"/>
-                  <input type="hidden" name="attr_noticeSkillRollFormula" value="@{notice_rank} + @{NoticeskillMod}+ @{linkednoticeattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_noticeWildDieFormula" value="1d@{noticewilddie}! + @{noticemod} + @{NoticeskillMod} + @{linkednoticeattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_noticeSkillRollFormula" value="@{notice_rank} + @{NoticeskillMod} [@{noticeModType}] + @{linkednoticeattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_noticeWildDieFormula" value="1d@{noticewilddie}! + @{noticemod} + @{NoticeskillMod} [@{noticeModType}] + @{linkednoticeattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltNotice" value="{{name=@{character_name} }} {{skill_rank=@{notice_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -10374,8 +10378,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_occult_rank" value="1d4!"/>
                   <input type="hidden" name="attr_occult_display" value="d4"/>
-                  <input type="hidden" name="attr_occultSkillRollFormula" value="@{occult_rank} + @{OccultskillMod}+ @{linkedoccultattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_occultWildDieFormula" value="1d@{occultwilddie}! + @{occultmod} + @{OccultskillMod} + @{linkedoccultattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_occultSkillRollFormula" value="@{occult_rank} + @{OccultskillMod} [@{occultModType}] + @{linkedoccultattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_occultWildDieFormula" value="1d@{occultwilddie}! + @{occultmod} + @{OccultskillMod} [@{occultModType}] + @{linkedoccultattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltOccult" value="{{name=@{character_name} }} {{skill_rank=@{occult_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -10486,8 +10490,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_performance_rank" value="1d4!"/>
                   <input type="hidden" name="attr_performance_display" value="d4"/>
-                  <input type="hidden" name="attr_performanceSkillRollFormula" value="@{performance_rank} + @{PerformanceskillMod}+ @{linkedperformanceattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_performanceWildDieFormula" value="1d@{performancewilddie}! + @{performancemod} + @{PerformanceskillMod} + @{linkedperformanceattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_performanceSkillRollFormula" value="@{performance_rank} + @{PerformanceskillMod} [@{performanceModType}] + @{linkedperformanceattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_performanceWildDieFormula" value="1d@{performancewilddie}! + @{performancemod} + @{PerformanceskillMod} [@{performanceModType}] + @{linkedperformanceattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltPerformance" value="{{name=@{character_name} }} {{skill_rank=@{performance_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -10598,8 +10602,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_persuasion_rank" value="1d4!"/>
                   <input type="hidden" name="attr_persuasion_display" value="d4"/>
-                  <input type="hidden" name="attr_persuasionSkillRollFormula" value="@{persuasion_rank} + @{PersuasionskillMod}+ @{linkedpersuasionattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_persuasionWildDieFormula" value="1d@{persuasionwilddie}! + @{persuasionmod} + @{PersuasionskillMod} + @{linkedpersuasionattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_persuasionSkillRollFormula" value="@{persuasion_rank} + @{PersuasionskillMod} [@{persuasionModType}] + @{linkedpersuasionattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_persuasionWildDieFormula" value="1d@{persuasionwilddie}! + @{persuasionmod} + @{PersuasionskillMod} [@{persuasionModType}] + @{linkedpersuasionattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltPersuasion" value="{{name=@{character_name} }} {{skill_rank=@{persuasion_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -10710,8 +10714,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_piloting_rank" value="1d4!"/>
                   <input type="hidden" name="attr_piloting_display" value="d4"/>
-                  <input type="hidden" name="attr_pilotingSkillRollFormula" value="@{piloting_rank} + @{PilotingskillMod}+ @{linkedpilotingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_pilotingWildDieFormula" value="1d@{pilotingwilddie}! + @{pilotingmod} + @{PilotingskillMod} + @{linkedpilotingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_pilotingSkillRollFormula" value="@{piloting_rank} + @{PilotingskillMod} [@{pilotingModType}] + @{linkedpilotingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_pilotingWildDieFormula" value="1d@{pilotingwilddie}! + @{pilotingmod} + @{PilotingskillMod} [@{pilotingModType}] + @{linkedpilotingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltPiloting" value="{{name=@{character_name} }} {{skill_rank=@{piloting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -10827,8 +10831,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_psionics_rank" value="1d4!"/>
                   <input type="hidden" name="attr_psionics_display" value="d4"/>
-                  <input type="hidden" name="attr_psionicsSkillRollFormula" value="@{psionics_rank} + @{PsionicsskillMod}+ @{linkedpsionicsattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_psionicsWildDieFormula" value="1d@{psionicswilddie}! + @{psionicsmod} + @{PsionicsskillMod} + @{linkedpsionicsattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_psionicsSkillRollFormula" value="@{psionics_rank} + @{PsionicsskillMod} [@{psionicsModType}] + @{linkedpsionicsattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_psionicsWildDieFormula" value="1d@{psionicswilddie}! + @{psionicsmod} + @{PsionicsskillMod} [@{psionicsModType}] + @{linkedpsionicsattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltPsionics" value="{{name=@{character_name} }} {{skill_rank=@{psionics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -10939,8 +10943,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_repair_rank" value="1d4!"/>
                   <input type="hidden" name="attr_repair_display" value="d4"/>
-                  <input type="hidden" name="attr_repairSkillRollFormula" value="@{repair_rank} + @{RepairskillMod}+ @{linkedrepairattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_repairWildDieFormula" value="1d@{repairwilddie}! + @{repairmod} + @{RepairskillMod} + @{linkedrepairattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_repairSkillRollFormula" value="@{repair_rank} + @{RepairskillMod} [@{repairModType}] + @{linkedrepairattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_repairWildDieFormula" value="1d@{repairwilddie}! + @{repairmod} + @{RepairskillMod} [@{repairModType}] + @{linkedrepairattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltRepair" value="{{name=@{character_name} }} {{skill_rank=@{repair_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -11051,8 +11055,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_research_rank" value="1d4!"/>
                   <input type="hidden" name="attr_research_display" value="d4"/>
-                  <input type="hidden" name="attr_researchSkillRollFormula" value="@{research_rank} + @{ResearchskillMod}+ @{linkedresearchattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_researchWildDieFormula" value="1d@{researchwilddie}! + @{researchmod} + @{ResearchskillMod} + @{linkedresearchattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_researchSkillRollFormula" value="@{research_rank} + @{ResearchskillMod} [@{researchModType}] + @{linkedresearchattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_researchWildDieFormula" value="1d@{researchwilddie}! + @{researchmod} + @{ResearchskillMod} [@{researchModType}] + @{linkedresearchattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltResearch" value="{{name=@{character_name} }} {{skill_rank=@{research_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -11163,8 +11167,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_riding_rank" value="1d4!"/>
                   <input type="hidden" name="attr_riding_display" value="d4"/>
-                  <input type="hidden" name="attr_ridingSkillRollFormula" value="@{riding_rank} + @{RidingskillMod}+ @{linkedridingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_ridingWildDieFormula" value="1d@{ridingwilddie}! + @{ridingmod} + @{RidingskillMod} + @{linkedridingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_ridingSkillRollFormula" value="@{riding_rank} + @{RidingskillMod} [@{ridingModType}] + @{linkedridingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_ridingWildDieFormula" value="1d@{ridingwilddie}! + @{ridingmod} + @{RidingskillMod} [@{ridingModType}] + @{linkedridingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltRiding" value="{{name=@{character_name} }} {{skill_rank=@{riding_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -11275,8 +11279,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_science_rank" value="1d4!"/>
                   <input type="hidden" name="attr_science_display" value="d4"/>
-                  <input type="hidden" name="attr_scienceSkillRollFormula" value="@{science_rank} + @{ScienceskillMod}+ @{linkedscienceattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_scienceWildDieFormula" value="1d@{sciencewilddie}! + @{sciencemod} + @{ScienceskillMod} + @{linkedscienceattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_scienceSkillRollFormula" value="@{science_rank} + @{ScienceskillMod} [@{scienceModType}] + @{linkedscienceattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_scienceWildDieFormula" value="1d@{sciencewilddie}! + @{sciencemod} + @{ScienceskillMod} [@{scienceModType}] + @{linkedscienceattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltScience" value="{{name=@{character_name} }} {{skill_rank=@{science_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -11387,8 +11391,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_shooting_rank" value="1d4!"/>
                   <input type="hidden" name="attr_shooting_display" value="d4"/>
-                  <input type="hidden" name="attr_shootingSkillRollFormula" value="@{shooting_rank} + @{ShootingskillMod}+ @{linkedshootingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_shootingWildDieFormula" value="1d@{shootingwilddie}! + @{shootingmod} + @{ShootingskillMod} + @{linkedshootingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_shootingSkillRollFormula" value="@{shooting_rank} + @{ShootingskillMod} [@{shootingModType}] + @{linkedshootingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_shootingWildDieFormula" value="1d@{shootingwilddie}! + @{shootingmod} + @{ShootingskillMod} [@{shootingModType}] + @{linkedshootingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltShooting" value="{{name=@{character_name} }} {{skill_rank=@{shooting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -11507,8 +11511,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_spellcasting_rank" value="1d4!"/>
                   <input type="hidden" name="attr_spellcasting_display" value="d4"/>
-                  <input type="hidden" name="attr_spellcastingSkillRollFormula" value="@{spellcasting_rank} + @{SpellcastingskillMod}+ @{linkedspellcastingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_spellcastingWildDieFormula" value="1d@{spellcastingwilddie}! + @{spellcastingmod} + @{SpellcastingskillMod} + @{linkedspellcastingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_spellcastingSkillRollFormula" value="@{spellcasting_rank} + @{SpellcastingskillMod} [@{spellcastingModType}] + @{linkedspellcastingattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_spellcastingWildDieFormula" value="1d@{spellcastingwilddie}! + @{spellcastingmod} + @{SpellcastingskillMod} [@{spellcastingModType}] + @{linkedspellcastingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltSpellcasting" value="{{name=@{character_name} }} {{skill_rank=@{spellcasting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -11619,8 +11623,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_stealth_rank" value="1d4!"/>
                   <input type="hidden" name="attr_stealth_display" value="d4"/>
-                  <input type="hidden" name="attr_stealthSkillRollFormula" value="@{stealth_rank} + @{StealthskillMod}+ @{linkedstealthattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_stealthWildDieFormula" value="1d@{stealthwilddie}! + @{stealthmod} + @{StealthskillMod} + @{linkedstealthattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_stealthSkillRollFormula" value="@{stealth_rank} + @{StealthskillMod} [@{stealthModType}] + @{linkedstealthattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_stealthWildDieFormula" value="1d@{stealthwilddie}! + @{stealthmod} + @{StealthskillMod} [@{stealthModType}] + @{linkedstealthattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltStealth" value="{{name=@{character_name} }} {{skill_rank=@{stealth_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -11731,8 +11735,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_survival_rank" value="1d4!"/>
                   <input type="hidden" name="attr_survival_display" value="d4"/>
-                  <input type="hidden" name="attr_survivalSkillRollFormula" value="@{survival_rank} + @{SurvivalskillMod}+ @{linkedsurvivalattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_survivalWildDieFormula" value="1d@{survivalwilddie}! + @{survivalmod} + @{SurvivalskillMod} + @{linkedsurvivalattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_survivalSkillRollFormula" value="@{survival_rank} + @{SurvivalskillMod} [@{survivalModType}] + @{linkedsurvivalattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_survivalWildDieFormula" value="1d@{survivalwilddie}! + @{survivalmod} + @{SurvivalskillMod} [@{survivalModType}] + @{linkedsurvivalattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltSurvival" value="{{name=@{character_name} }} {{skill_rank=@{survival_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -11843,8 +11847,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_taunt_rank" value="1d4!"/>
                   <input type="hidden" name="attr_taunt_display" value="d4"/>
-                  <input type="hidden" name="attr_tauntSkillRollFormula" value="@{taunt_rank} + @{TauntskillMod}+ @{linkedtauntattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_tauntWildDieFormula" value="1d@{tauntwilddie}! + @{tauntmod} + @{TauntskillMod} + @{linkedtauntattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_tauntSkillRollFormula" value="@{taunt_rank} + @{TauntskillMod} [@{tauntModType}] + @{linkedtauntattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_tauntWildDieFormula" value="1d@{tauntwilddie}! + @{tauntmod} + @{TauntskillMod} [@{tauntModType}] + @{linkedtauntattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltTaunt" value="{{name=@{character_name} }} {{skill_rank=@{taunt_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -11955,8 +11959,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_thievery_rank" value="1d4!"/>
                   <input type="hidden" name="attr_thievery_display" value="d4"/>
-                  <input type="hidden" name="attr_thieverySkillRollFormula" value="@{thievery_rank} + @{ThieveryskillMod}+ @{linkedthieveryattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_thieveryWildDieFormula" value="1d@{thieverywilddie}! + @{thieverymod} + @{ThieveryskillMod} + @{linkedthieveryattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_thieverySkillRollFormula" value="@{thievery_rank} + @{ThieveryskillMod} [@{thieveryModType}] + @{linkedthieveryattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_thieveryWildDieFormula" value="1d@{thieverywilddie}! + @{thieverymod} + @{ThieveryskillMod} [@{thieveryModType}] + @{linkedthieveryattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltThievery" value="{{name=@{character_name} }} {{skill_rank=@{thievery_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -12067,8 +12071,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_trade_rank" value="1d4!"/>
                   <input type="hidden" name="attr_trade_display" value="d4"/>
-                  <input type="hidden" name="attr_tradeSkillRollFormula" value="@{trade_rank} + @{TradeskillMod}+ @{linkedtradeattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_tradeWildDieFormula" value="1d@{tradewilddie}! + @{trademod} + @{TradeskillMod} + @{linkedtradeattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_tradeSkillRollFormula" value="@{trade_rank} + @{TradeskillMod} [@{tradeModType}] + @{linkedtradeattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_tradeWildDieFormula" value="1d@{tradewilddie}! + @{trademod} + @{TradeskillMod} [@{tradeModType}] + @{linkedtradeattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltTrade" value="{{name=@{character_name} }} {{skill_rank=@{trade_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -12187,8 +12191,8 @@ on(
                   </details>
                   <input type="hidden" name="attr_weirdscience_rank" value="1d4!"/>
                   <input type="hidden" name="attr_weirdscience_display" value="d4"/>
-                  <input type="hidden" name="attr_weirdscienceSkillRollFormula" value="@{weirdscience_rank} + @{WeirdscienceskillMod}+ @{linkedweirdscienceattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_weirdscienceWildDieFormula" value="1d@{weirdsciencewilddie}! + @{weirdsciencemod} + @{WeirdscienceskillMod} + @{linkedweirdscienceattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_weirdscienceSkillRollFormula" value="@{weirdscience_rank} + @{WeirdscienceskillMod} [@{weirdscienceModType}] + @{linkedweirdscienceattformula} + @{traitmods}"/>
+                  <input type="hidden" name="attr_weirdscienceWildDieFormula" value="1d@{weirdsciencewilddie}! + @{weirdsciencemod} + @{WeirdscienceskillMod} [@{weirdscienceModType}] + @{linkedweirdscienceattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_rolltWeirdscience" value="{{name=@{character_name} }} {{skill_rank=@{weirdscience_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                   <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -12324,8 +12328,8 @@ on(
                       </details>
                       <input type="hidden" name="attr_knowledgeother_rank" value="1d4!"/>
                       <input type="hidden" name="attr_knowledgeother_display" value="d4"/>
-                      <input type="hidden" name="attr_knowledgeotherSkillRollFormula" value="@{knowledgeother_rank} + @{KnowledgeotherskillMod}+ @{linkedknowledgeotherattformula} + @{traitmods}"/>
-                      <input type="hidden" name="attr_knowledgeotherWildDieFormula" value="1d@{knowledgeotherwilddie}! + @{knowledgeothermod} + @{KnowledgeotherskillMod} + @{linkedknowledgeotherattformula} + @{traitmods}"/>
+                      <input type="hidden" name="attr_knowledgeotherSkillRollFormula" value="@{knowledgeother_rank} + @{KnowledgeotherskillMod} [@{knowledgeotherModType}] + @{linkedknowledgeotherattformula} + @{traitmods}"/>
+                      <input type="hidden" name="attr_knowledgeotherWildDieFormula" value="1d@{knowledgeotherwilddie}! + @{knowledgeothermod} + @{KnowledgeotherskillMod} [@{knowledgeotherModType}] + @{linkedknowledgeotherattformula} + @{traitmods}"/>
                       <input type="hidden" name="attr_rolltKnowledgeother" value="{{name=@{character_name} }} {{skill_rank=@{knowledgeother_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                       <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                       <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -14339,8 +14343,8 @@ on(
                 </details>
                 <input type="hidden" name="attr_pastrength_rank" value="1d4!"/>
                 <input type="hidden" name="attr_pastrength_display" value="d4"/>
-                <input type="hidden" name="attr_pastrengthSkillRollFormula" value="@{pastrength_rank} + @{PastrengthskillMod}+ @{linkedpastrengthattformula} + @{traitmods}"/>
-                <input type="hidden" name="attr_pastrengthWildDieFormula" value="1d@{pastrengthwilddie}! + @{pastrengthmod} + @{PastrengthskillMod} + @{linkedpastrengthattformula} + @{traitmods}"/>
+                <input type="hidden" name="attr_pastrengthSkillRollFormula" value="@{pastrength_rank} + @{PastrengthskillMod} [@{pastrengthModType}] + @{linkedpastrengthattformula} + @{traitmods}"/>
+                <input type="hidden" name="attr_pastrengthWildDieFormula" value="1d@{pastrengthwilddie}! + @{pastrengthmod} + @{PastrengthskillMod} [@{pastrengthModType}] + @{linkedpastrengthattformula} + @{traitmods}"/>
                 <input type="hidden" name="attr_rolltPastrength" value="{{name=@{character_name} }} {{skill_rank=@{pastrength_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                 <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                 <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -14776,8 +14780,8 @@ on(
                 </details>
                 <input type="hidden" name="attr_rastrength_rank" value="1d4!"/>
                 <input type="hidden" name="attr_rastrength_display" value="d4"/>
-                <input type="hidden" name="attr_rastrengthSkillRollFormula" value="@{rastrength_rank} + @{RastrengthskillMod}+ @{linkedrastrengthattformula} + @{traitmods}"/>
-                <input type="hidden" name="attr_rastrengthWildDieFormula" value="1d@{rastrengthwilddie}! + @{rastrengthmod} + @{RastrengthskillMod} + @{linkedrastrengthattformula} + @{traitmods}"/>
+                <input type="hidden" name="attr_rastrengthSkillRollFormula" value="@{rastrength_rank} + @{RastrengthskillMod} [@{rastrengthModType}] + @{linkedrastrengthattformula} + @{traitmods}"/>
+                <input type="hidden" name="attr_rastrengthWildDieFormula" value="1d@{rastrengthwilddie}! + @{rastrengthmod} + @{RastrengthskillMod} [@{rastrengthModType}] + @{linkedrastrengthattformula} + @{traitmods}"/>
                 <input type="hidden" name="attr_rolltRastrength" value="{{name=@{character_name} }} {{skill_rank=@{rastrength_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
                 <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                 <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
@@ -15435,6 +15439,22 @@ on(
       </div>
       <div class="releasenotesTab">
         <h1 class="groupHeader documentationHeader" data-i18n="release-notes">Release Notes</h1>
+        <!-- Release 1.00.24-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10024" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.24</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10024" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
+          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="fixed-typo-wild-die">Fixed a type on the Skill Wild Die Modifier description.</span></li>
+            <li> <span class="black" data-i18n="empty-rolls-when-using-statblock-view">Fixed an issue where rolls were empty if made when the sheet was in statblock view.</span></li>
+            <li><span class="black" data-i18n="fixed-fear-check-roll-button">Fixed an issue with the Fear Check button was making an empty roll.</span></li>
+          </ul>
+        </div>
         <!-- Release 1.00.23-->
         <label class="rowlabel">
           <input class="releasenotes" type="checkbox" name="attr_releasenotes10023" value="1"/><span class="releasenotesVersion">
