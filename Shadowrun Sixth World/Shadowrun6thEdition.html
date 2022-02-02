@@ -6439,6 +6439,8 @@ on("clicked:reload", (eventInfo) => {
 	});
 });
 
+
+// 2022-02-01 I don't think this does anything
 ["active", "knowledge", "language"].forEach((attr) => {
 	on(`clicked:repeating_${attr}:skill`, (eventInfo) => {
 		settingsToggle(eventInfo);
@@ -6451,6 +6453,7 @@ on("clicked:reload", (eventInfo) => {
 	});
 });
 
+// This triggers hiding settings when the player clicks one of the roll buttons
 const settingsToggle = (eventInfo) => {
 	const split = eventInfo.sourceAttribute.split("_");
 	const source = `${split[0]}_${split[1]}_${split[2]}`;
@@ -6460,6 +6463,8 @@ const settingsToggle = (eventInfo) => {
 		});
 	});
 };
+
+
 
 [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`, `notes`, `rolls`].forEach(attr => {
 	on(`clicked:tab_${attr}`, () => {
@@ -7355,27 +7360,19 @@ on("change:repeating_weapon", () => {
 					 const ammo = b('amm');
 					 return [
 						  b('type'),
-						  b('acc', 'ACC'),
 						  b('dv', 'DV'),
-						  b('ap', 'AP', true),
 						  b('mode'),
-						  b('rc', 'RC'),
 						  ammo ? `${ammo} (c)` : '',
 						  b('note')
 					 ];
 					 case '1': return [
 						  b('type'),
-						  b('reach', 'Reach', true),
-						  b('acc', 'ACC'),
 						  b('dv', 'DV'),
-						  b('ap', 'AP', true),
 						  b('note')
 					 ];
 					 default: return [
 						  b('type'),
-						  b('acc', 'ACC'),
 						  b('dv', 'DV'),
-						  b('ap', 'AP', true),
 						  b('note')
 					 ];
 				}
@@ -7603,6 +7600,7 @@ var update_skill_attribute = (prefix, skill) => {
 			getAttrs([`${source}`], (v) => {
 				const attribute   = v[`${source}`].slice(2, -1);
 				const translation = getTranslationByKey(`${attribute}`);
+
 				setAttrs({
 					[`${field}_display_attribute`]: translation
 				});
@@ -7625,7 +7623,7 @@ var update_skill_attribute = (prefix, skill) => {
 					[`${field}_display_expert`]: display
 				});
 			});
-		} else if (source.includes("skill")) {
+		} else if (source.endsWith("skill")) {
 			getAttrs([`${source}`], (v) => {
 				const bas   = v[`${source}`];
 				const size  = bas.length;
@@ -7645,7 +7643,7 @@ var update_skill_attribute = (prefix, skill) => {
 				});
 			});
 		}  else  {
-			console.log(`Change to ${field} did not set attr`);
+//			console.log('Change to '+source+' did not set attr');
 		};
 	});
 });
@@ -7659,7 +7657,7 @@ var update_skill_attribute = (prefix, skill) => {
 		const newV   = eventInfo.newValue;
 		const type   = weap.slice(-5);
 
-		getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `${weap}_attribute`, `${weap}_attr_rating`, `${weap}_primary`, `${weap}_firing_modes`, `${weap}_damage`, `${weap}_close`, `${weap}_near`, `${weap}_medium`, `${weap}_far`, `${weap}_extreme`, `sheet_type`], (v) => {
+		getAttrs([`${weap}_weapon`, `${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `${weap}_attribute`, `${weap}_attr_rating`, `${weap}_primary`, `${weap}_firing_modes`, `${weap}_damage`, `${weap}_close`, `${weap}_near`, `${weap}_medium`, `${weap}_far`, `${weap}_extreme`, `sheet_type`], (v) => {
 			if(v.sheet_type != 'pc') {
 				return;
 			}
@@ -9029,6 +9027,7 @@ console.log("Doing character import");
 		weight: "weight",
 		initiation: "initiate_grade",
 		submersion: "submersion_level",
+		notes: "player_notes",
 	};
 
 	var attributes = {
@@ -9048,19 +9047,38 @@ console.log("Doing character import");
 
 
 	var attrs = {};
+	attrs.flag_special = 'mundane';
+
 	Object.keys(base).forEach(key => {
 		if(json[key]) {
 			attrs[base[`${key}`]] = json[`${key}`];
 		}
 	});
+
+	attrs.player_notes = 'Character imported on ' + new Date().toJSON() + "\n" + attrs.player_notes + "\n";
 console.log("Character base imported.");
 
 	json.attributes.forEach(attribute => {
 		if(attribute.id && attribute.modifiedValue) {
 			attrs[attributes[attribute.id]] = attribute.modifiedValue;
+
+			// change character type (flag_special) for technomancers and awakened
+			if(attribute.id == "MAGIC" && attribute.modifiedValue > 0) {
+				attrs.flag_special = 'magic';
+			} else if (attribute.id == "RESONANCE" && attribute.modifiedValue > 0) {
+				attrs.flag_special = 'resonance';
+			}
+
+			// update edge hexes too
+			if(attribute.id == "EDGE") {
+				attrs.edge_hex = attribute.modifiedValue;
+			}
 		}
 	});
 console.log("Character attributes imported.");
+
+
+	setAttrs(attrs);
 
 	json.qualities.forEach(quality => {
 		rowattrs = {};
@@ -9074,6 +9092,7 @@ console.log("Character attributes imported.");
 		rowattrs["repeating_quality_" + row_id + "_type"] = quality.positive ? "P" : "N";
 		rowattrs["repeating_quality_" + row_id + "_notes"] = quality.page;
 //		rowattrs["repeating_quality_" + row_id + "_rank"] = quality.rank;
+		rowattrs["repeating_quality_" + row_id + "_flag"] = 'display';
 
 		setAttrs(rowattrs);
 	});
@@ -9086,7 +9105,13 @@ console.log("Character qualities imported.");
 		if(skill.id != "knowledge" && skill.id != "language") {
 			rowattrs["repeating_skills_" + row_id + "_name"] = skill.name;
 			rowattrs["repeating_skills_" + row_id + "_display_attribute"] = skill.attribute;
+			rowattrs["repeating_skills_" + row_id + "_attribute"] = skill.attribute;
 			rowattrs["repeating_skills_" + row_id + "_rating"] = skill.rating;
+			rowattrs["repeating_skills_" + row_id + "_dicepool"] = skill.rating;
+			rowattrs["repeating_skills_" + row_id + "_display_rating"] = skill.rating;
+			rowattrs["repeating_skills_" + row_id + "_flag"] = 'display';
+			rowattrs[skill.name] = skill.rating;
+
 			if(skill.specializations) {
 				skill.specializations.forEach(spec => {
 					if(spec.expertise) {
@@ -9104,6 +9129,7 @@ console.log("Character qualities imported.");
 		} else {
 			rowattrs["repeating_knowledges_" + row_id + "_name"] = skill.name;
 			rowattrs["repeating_knowledges_" + row_id + "_type"] = skill.id.charAt(0).toUpperCase() + skill.id.slice(1);
+			rowattrs["repeating_knowledges_" + row_id + "_flag"] = 'display';
 			if(skill.influencedBy) {
 				rowattrs["repeating_knowledges_" + row_id + "_notes"] = skill.influencedBy.join(", ");
 			}
@@ -9121,6 +9147,7 @@ console.log("Character skills, knowledges and languages imported.");
 		rowattrs["repeating_armor_" + row_id + "_rating"] = armor.rating;
 		rowattrs["repeating_armor_" + row_id + "_social"] = (armor.social) ? armor.social : 0;
 		rowattrs["repeating_armor_" + row_id + "_notes"] = armor.page;
+		rowattrs["repeating_armor_" + row_id + "_flag"] = 'display';
 
 		if(armor.accessories) {
 			armor.accessories.forEach(acc => {
@@ -9146,6 +9173,7 @@ console.log("Character armor imported");
 		rowattrs["repeating_items_" + row_id + "_item"] = item.name;
 //		rowattrs["repeating_items_" + row_id + "_rating"] = item.rating;
 		rowattrs["repeating_items_" + row_id + "_quantity"] = item.count;
+		rowattrs["repeating_items_" + row_id + "_flag"] = 'display';
 
 		rowattrs["repeating_items_" + row_id + "_notes"] = '[' + item.type + ']{' + item.subType + '} ' + item.page + "\n";
 
@@ -9186,6 +9214,7 @@ console.log("Character items imported");
 		rowattrs["repeating_augmentations_" + row_id + "_augmentation"] = augmentation.name;
 		rowattrs["repeating_augmentations_" + row_id + "_rating"] = augmentation.level;
 		rowattrs["repeating_augmentations_" + row_id + "_essence_cost"] = augmentation.essence;
+		rowattrs["repeating_augmentations_" + row_id + "_flag"] = 'display';
 
 		rowattrs["repeating_augmentations_" + row_id + "_notes"] = augmentation.page + "\n";
 
@@ -9214,6 +9243,7 @@ console.log("Character augmentations imported");
 		rowattrs["repeating_vehicle_" + row_id + "_pilot_base"] = vehicle.pilot;
 		rowattrs["repeating_vehicle_" + row_id + "_sensor_base"] = vehicle.sensor;
 //		rowattrs["repeating_vehicle_" + row_id + "_seats"] = vehicle.seats;
+		rowattrs["repeating_vehicle_" + row_id + "_flag"] = 'display';
 
 		rowattrs["repeating_vehicle_" + row_id + "_notes"] = vehicle.page + "\n";
 
@@ -9227,14 +9257,213 @@ console.log("Character augmentations imported");
 	});
 console.log("Character vehicles and drones imported");
 
+	var sins = {};
+	json.sins.forEach(sin => {
+		sins[sin.name] = sin;
+		sins[sin.name].lifestyle = '';
+		sins[sin.name].licenses = '';
+	});
+	json.lifestyles.forEach(life => {
+		sins[life.sin].lifestyle += '(' + life.customName + ', ' + life.name + ', ' + life.paidMonths + ' months)';
+	});
+	json.licenses.forEach(lic => {
+		sins[lic.sin].licenses += '(' + lic.name + ') ';
+	});
 
-	setAttrs(attrs);
+	Object.keys(sins).forEach(key => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_lifestyle_" + row_id + "_name"] = sins[key].name;
+		rowattrs["repeating_lifestyle_" + row_id + "_rating"] = sins[key].quality;
+		rowattrs["repeating_lifestyle_" + row_id + "_lifestyle"] = sins[key].lifestyle;
+		rowattrs["repeating_lifestyle_" + row_id + "_licenses"] = sins[key].licenses;
+		rowattrs["repeating_lifestyle_" + row_id + "_notes"] = sins[key].description || '';
+		rowattrs["repeating_lifestyle_" + row_id + "_flag"] = 'display';
+
+		setAttrs(rowattrs);
+	});
+console.log("Character sins, lifestyles and licenses imported");
+
+	json.contacts.forEach(contact => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_contacts_" + row_id + "_favors"] = '0';
+		if(contact.name && contact.name.includes("FP")) {
+			const re = /\s*\((\d+)\s*FP\)/i;
+			var m = contact.name.match(re);
+			rowattrs["repeating_contacts_" + row_id + "_favors"] = m[1] || '';
+			contact.name = contact.name.replace(re, '');
+		}
+		rowattrs["repeating_contacts_" + row_id + "_name"] = contact.name || 'Anonymous ' + contact.type;
+		rowattrs["repeating_contacts_" + row_id + "_loyalty"] = contact.loyalty || 0;
+		rowattrs["repeating_contacts_" + row_id + "_influence"] = contact.influence || 0;
+		rowattrs["repeating_contacts_" + row_id + "_notes"] = contact.type + "\n" + contact.description;
+		rowattrs["repeating_contacts_" + row_id + "_flag"] = 'display';
+
+		setAttrs(rowattrs);
+	});
+console.log("Character contacts imported");
+
+	json.longRangeWeapons.forEach(range => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_range_" + row_id + "_weapon"] = range.name;
+		rowattrs["repeating_range_" + row_id + "_pool"] = range.pool;
+		rowattrs["repeating_range_" + row_id + "_dicepool_base"] = range.pool;
+		rowattrs["repeating_range_" + row_id + "_damage"] = range.damage;
+		rowattrs["repeating_range_" + row_id + "_flag"] = 'display';
+
+		var ARs = range.attackRating.split('/');
+		rowattrs["repeating_range_" + row_id + "_close"] = ARs[0];
+		rowattrs["repeating_range_" + row_id + "_near"] = ARs[1];
+		rowattrs["repeating_range_" + row_id + "_medium"] = ARs[2];
+		rowattrs["repeating_range_" + row_id + "_far"] = ARs[3];
+		rowattrs["repeating_range_" + row_id + "_extreme"] = ARs[4];
+
+		var re = /(\d+)/;
+		var m = range.ammunition.match(re);
+		if(m) {
+			rowattrs["repeating_range_" + row_id + "_ammo"] = m[1] || 0;
+		} else {
+			rowattrs["repeating_range_" + row_id + "_ammo"] = 0;
+		}
+
+		rowattrs["repeating_range_" + row_id + "_firing_modes"] = range.mode;
+
+		rowattrs["repeating_range_" + row_id + "_notes"] = range.page + "\n";
+		if(range.wifi) {
+			range.wifi.forEach(wifi => {
+				rowattrs["repeating_range_" + row_id + "_notes"] += "Wireless: " + wifi + "\n";
+			});
+		}
+
+		var modifier = 0;
+		if(range.accessories) {
+			var accessories = [];
+			range.accessories.forEach(acc => {
+				accessories.push(acc.name);
+
+				if(acc.name.includes('martlink') || acc.name.includes('martgun')) {
+					modifier = 1;
+				}
+			});
+			rowattrs["repeating_range_" + row_id + "_notes"] += accessories.join(', ');
+
+		}
+		rowattrs["repeating_range_" + row_id + "_dicepool_modifier"] = modifier;
+
+		setAttrs(rowattrs);
+	});
+console.log("Character long range weapons imported");
+
+	json.closeCombatWeapons.forEach(melee => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_melee_" + row_id + "_weapon"] = melee.name;
+		rowattrs["repeating_melee_" + row_id + "_dicepool"] = melee.pool;
+		rowattrs["repeating_melee_" + row_id + "_dicepool_base"] = melee.pool;
+		rowattrs["repeating_melee_" + row_id + "_damage"] = melee.damage;
+		rowattrs["repeating_melee_" + row_id + "_flag"] = 'display';
+
+		var ARs = melee.attackRating.split('/');
+		rowattrs["repeating_melee_" + row_id + "_close"] = ARs[0];
+		rowattrs["repeating_melee_" + row_id + "_near"] = ARs[1];
+		rowattrs["repeating_melee_" + row_id + "_medium"] = ARs[2];
+		rowattrs["repeating_melee_" + row_id + "_far"] = ARs[3];
+		rowattrs["repeating_melee_" + row_id + "_extreme"] = ARs[4];
+
+		rowattrs["repeating_melee_" + row_id + "_notes"] = melee.page + "\n";
+		if(melee.wifi) {
+			melee.wifi.forEach(wifi => {
+				rowattrs["repeating_melee_" + row_id + "_notes"] += "Wireless: " + wifi + "\n";
+			});
+		}
+
+
+		var modifier = 0;
+		if(melee.accessories) {
+			var accessories = [];
+			melee.accessories.forEach(acc => {
+				accessories.push(acc.name);
+			});
+			rowattrs["repeating_melee_" + row_id + "_notes"] += accessories.join(', ');
+
+		}
+		rowattrs["repeating_melee_" + row_id + "_dicepool_modifier"] = modifier;
+
+		setAttrs(rowattrs);
+	});
+console.log("Character melee weapons imported");
+
+	var categories = {
+		'Combat spells': 'Combat',
+		'Detection spells': 'Detection',
+		'Heal spells': 'Health',
+		'Illusion spells': 'Illusion',
+		'Manipulation spells': 'Manipulation'
+	};
+	var effect_types = {
+		'Direct Combat': 'Direct Combat',
+		'Indirect Combat': 'Indirect Combat',
+		'Direct Combat, Area': 'Direct Combat, Area',
+		'Indirect Combat, Area': 'Indirect Combat, Area',
+		'Single-Sense': 'Single-Sense',
+		'Multi-Sense': 'Multi-Sense'
+	};
+	var durations = {
+		'Instantaneous': 'Instant',
+		'Sustained': 'Sustained',
+		'Limited': 'Limited',
+		'Permanent': 'Permanent'
+	};
+	var ranges = {
+		'Line of sight': 'LOS',
+		'Line of sight (Area)': 'LOS (A)',
+		'Special': 'Special',
+		'Touch': 'T'
+	};
+
+
+	json.spells.forEach(spell => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_spell_" + row_id + "_name"] = spell.name;
+		rowattrs["repeating_spell_" + row_id + "_category"] = categories[spell.category];
+		rowattrs["repeating_spell_" + row_id + "_effect_type"] = '';
+//		rowattrs["repeating_spell_" + row_id + "_effect_type"] = effect_types[spell.effect_type];
+		rowattrs["repeating_spell_" + row_id + "_type"] = spell.type;
+		rowattrs["repeating_spell_" + row_id + "_duration"] = durations[spell.duration];
+		rowattrs["repeating_spell_" + row_id + "_range"] = ranges[spell.range];
+		rowattrs["repeating_spell_" + row_id + "_drain"] = spell.drain;
+		rowattrs["repeating_spell_" + row_id + "_skill"] = '@{sorcery}';
+
+		rowattrs["repeating_spell_" + row_id + "_display_flag"] = 'display';
+
+		rowattrs["repeating_spell_" + row_id + "_notes"] = spell.page + "\n";
+		if(spell.influencedBy[0]) {
+			rowattrs["repeating_spell_" + row_id + "_notes"] += "Influenced By: ";
+			var influences = [];
+			spell.influencedBy.forEach(inf => {
+				influences.push(inf);
+			});
+			rowattrs["repeating_spell_" + row_id + "_notes"] += influences.join(', ') + "\n";
+		}
+console.log(rowattrs);
+		setAttrs(rowattrs);
+	});
+console.log("Character spells imported");
+
 
 	return true;
 };
 
 const clean = () => {
-	["quality", "skills", "knowledges", "armor", "items", "augmentations", "vehicle"].forEach(group => {
+	["quality", "skills", "knowledges", "armor", "items", "augmentations", "vehicle", "lifestyle", "contacts", "range", "melee", "spell"].forEach(group => {
 		getSectionIDs(`repeating_${group}`, (ids) => {
 			ids.forEach((id) => {
 				removeRepeatingRow(`repeating_${group}_${id}`);
