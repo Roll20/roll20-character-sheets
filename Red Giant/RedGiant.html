@@ -44,17 +44,17 @@
 
 	<div class="col" style="width: 100%; height: 10px;"></div>
 	
-	<!-- Game Name, roll toggles, and tab switching -->
+	<!-- line 1 of stats -->
 	<div class='sheet-stat1'> 
 	
 		<span> </span>
 		
-		<label class="sheet-regular-label" > Strength (STR) </label>
+		<label class="sheet-regular-label" title="STR" > Strength </label>
 		<select name="attr_strength" class="sheet-die-dropdowns">
             <option value="4">D4</option><option value="6">D6</option><option value="8">D8</option><option value="10">D10</option><option value="12">D12</option>
         </select>
 		
-		<label class="sheet-regular-label" > Reflex (RFX) </label>
+		<label class="sheet-regular-label" title="RFX" > Reflex </label>
 		<select name="attr_reflex" class="sheet-die-dropdowns">
             <option value="4">D4</option><option value="6">D6</option><option value="8">D8</option><option value="10">D10</option><option value="12">D12</option>
         </select>
@@ -74,7 +74,80 @@
 	
 	</div>
 	
+	<!-- Spacing fix -->
 
+	<div class="col" style="width: 100%; height: 10px;"></div>
+	
+	
+	<!-- line 2 of stats -->
+	<div class='sheet-stat2'> 
+	
+		<span> </span>
+		
+		<label class="sheet-regular-label" title="MND" > Mind </label>
+		<select name="attr_mind" class="sheet-die-dropdowns">
+            <option value="4">D4</option><option value="6">D6</option><option value="8">D8</option><option value="10">D10</option><option value="12">D12</option>
+        </select>
+		
+		<label class="sheet-regular-label" title="CHA" > Charm </label>
+		<select name="attr_charm" class="sheet-die-dropdowns">
+            <option value="4">D4</option><option value="6">D6</option><option value="8">D8</option><option value="10">D10</option><option value="12">D12</option>
+        </select>
+		
+		<label class="sheet-regular-label" > Health </label>
+		
+		<input name="attr_health" class="sheet-stat-inputs" type="number" value="0" />
+		
+		<label class="sheet-regular-label" > / </label>
+		
+		<input name="attr_health_max" class="sheet-stat-inputs" type="number" value="0" />
+		
+		<label class="sheet-regular-label" > Spirit </label>
+		
+		<input name="attr_spirit" class="sheet-stat-inputs" type="number" value="0" />
+		
+		<label class="sheet-regular-label" > / </label>
+		
+		<input name="attr_spirit_max" class="sheet-stat-inputs" type="number" value="0" />
+		
+	
+	</div>
+	
+	<!-- Spacing fix -->
+
+	<div class="col" style="width: 100%; height: 10px;"></div>
+	
+	
+	<!-- line 3 of stats -->
+	<div class='sheet-stat3'> 
+	
+		<label class="sheet-regular-label"  > Player </label>
+		<input name="attr_player_name" class="sheet-char-inputs" type="text"/>
+		<span> </span>
+		
+		<input type="hidden" name="attr_attribute1die" value="">
+		<select name="attr_attribute1name" class="sheet-attribute-dropdowns">
+            <option value="Strength">Strength</option><option value="Reflex">Reflex</option><option value="Mind">Mind</option><option value="Charm">Charm</option>
+        </select>
+		
+		<label class="sheet-regular-label" > + </label>
+		
+		<input type="hidden" name="attr_attribute2die" value="">
+		<select name="attr_attribute2name" class="sheet-attribute-dropdowns">
+            <option value="Strength">Strength</option><option value="Reflex">Reflex</option><option value="Mind">Mind</option><option value="Charm">Charm</option>
+        </select>
+		
+		<button type="roll" name="roll_attribute_check" class="sheet-statrollbuttonshort" >Roll!</button> 
+		
+		
+		<label class="sheet-regular-label"  > Character </label>
+		<input name="attr_character_name" class="sheet-char-inputs-long" type="text"/>
+		
+	
+	</div>
+	
+	
+	
 	
 	
 	
@@ -105,6 +178,73 @@
       });
     });
   });
+  
+  // trigger when the sheet is opened for the first time in a session or @{statname} changes
+on('sheet:opened change:attribute1name', () => {
+    getAttrs(['attribute1name','strength','reflex','mind','charm','attribute1die'], (values) => {
+        // Based on attribute1name, set the correct variable value for attribute1die
+        const attribute1name = values.attribute1name.trim();
+		let attribute1dienew = values.attribute1die || 0;
+		
+		if (attribute1name === "Strength") {
+	
+			attribute1dienew = values.strength || 0;;
+		}
+		else if (attribute1name === "Reflex") {
+	
+			attribute1dienew = values.reflex || 0;;
+		}
+		else if (attribute1name === "Mind") {
+	
+			attribute1dienew = values.mind || 0;;
+		}
+		else if (attribute1name === "Charm") {
+	
+			attribute1dienew = values.charm || 0;;
+		}
+		
+		setAttrs({
+			attribute1die: attribute1dienew
+		});
+		
+		
+    });
+});
+
+
+on('sheet:opened change:attribute2name', () => {
+    getAttrs(['attribute2name','strength','reflex','mind','charm','attribute2die'], (values) => {
+        // Based on attribute2name, set the correct variable value for attribute2die
+        const attribute2name = values.attribute2name.trim();
+		let attribute2dienew = values.attribute2die || 0;
+		
+		if (attribute2name === "Strength") {
+	
+			attribute2dienew = values.strength || 0;;
+		}
+		else if (attribute2name === "Reflex") {
+	
+			attribute2dienew = values.reflex || 0;;
+		}
+		else if (attribute2name === "Mind") {
+	
+			attribute2dienew = values.mind || 0;;
+		}
+		else if (attribute2name === "Charm") {
+	
+			attribute2dienew = values.charm || 0;;
+		}
+		
+		setAttrs({
+			attribute2die: attribute2dienew
+		});
+		
+		
+    });
+});
+
+
+
 	
 	
 </script>
