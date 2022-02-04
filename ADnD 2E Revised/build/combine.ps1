@@ -52,9 +52,7 @@ function CombineRecursive([String[]] $inputContent) {
                $fileContent[$i] = $fileContent[$i].Replace($key, $replaceDic[$key])
             }
          }
-      }
-      # Remove unused replace keys
-      for ($i = 0; $i -lt $fileContent.Length; $i++) {
+         # Remove unused replace keys
          $fileContent[$i] = $fileContent[$i] -replace "\#REPLACE\d+\#", ""
       }
 
