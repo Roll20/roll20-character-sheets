@@ -9,16 +9,16 @@ $outputFile = Join-Path $sourceFolder '2ESheet.html'
 
 $replaceConstant = '#REPLACE{0}#'
 
-function CreateReplaceDictionary([String[]] $split) {
-   $replaceValues = $split[2..100];
+function CreateReplaceDictionary([String] $argumentsString) {
    $dic = @{}
+   if (-not $argumentsString) {
+      return $dic
+   }
+
+   $replaceValues = $argumentsString.Substring(1, $argumentsString.Length-2).Split(",");
    for ($i=0; $i -lt $replaceValues.Length; $i++) {
       $replaceKey = $replaceConstant -f $i;
       $replaceValue = $replaceValues[$i];
-      if ( $replaceValue.StartsWith("repeating"))
-      {
-         $replaceValue = $replaceValue.Replace("-", "_") #Allows for repeating section inserts
-      }
       $dic.Add($replaceKey, $replaceValue)
    }
    return $dic
@@ -34,13 +34,14 @@ function CombineRecursive([String[]] $inputContent) {
 
    $inserts | ForEach-Object {
       Write-Host $_.Line.Trim()
-      $split = $_.Line.Split('_')
+      $split = $_.Line.Split('_', 3)
       $whiteSpace = $split[0].Replace('insert', '')
       $fileName = $split[1]
+      $arguments = $split[2]
       $file = Get-ChildItem -Path $sourceFolder -Filter $fileName -Recurse
       $fileContent = Get-Content -Path $file.FullName
 
-      $replaceDic = CreateReplaceDictionary($split)
+      $replaceDic = CreateReplaceDictionary($arguments)
 
       for ($i = 0; $i -lt $fileContent.Length; $i++)
       {
