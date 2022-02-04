@@ -3465,7 +3465,7 @@ on('clicked:importKNPCG', () => {
             newrowattrsW[`${path + newrowidW}_penetrantValue`] = Number(value2);
             break;
 
-          case 'perce Armure':
+          case 'perce armure':
             newrowattrsW[`${path + newrowidW}_perceArmure`] = '{{perceArmure=^{perce-armure} @{perceArmureValue}}}';
             newrowattrsW[`${path + newrowidW}_perceArmureValue`] = Number(value2);
             break;
