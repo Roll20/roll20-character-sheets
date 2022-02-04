@@ -3294,6 +3294,8 @@ on('clicked:importKNPCG', () => {
 
         let raw = result.raw - lAspects.bête.mineur - lAspects.bête.majeur;
 
+        if (lAspects.bête.majeur > 0) { raw -= bete.score; }
+
         if (raw < 0) { raw = 0; }
 
         newrowattrsW[`${path + newrowidW}_ArmeCaC`] = result.name;
