@@ -9,6 +9,7 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 ### CSS
 
 - import fonts from fonts.google
+- update to higher resolution borders
 
 ## 02.02.01 (Build 7)
 
