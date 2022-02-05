@@ -4,6 +4,12 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.03.00 (Build 8)
+
+### CSS
+
+- import fonts from fonts.google
+
 ## 02.02.01 (Build 7)
 
 ### CSS fixes
