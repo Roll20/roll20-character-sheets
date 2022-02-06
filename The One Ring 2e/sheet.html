@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="02-02-01" />
+<input type="hidden" name="attr_version" value="02-03-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -1162,7 +1162,7 @@
         return str.replace(/_action/g,'');
     };
 
-    // ASYNC ATTRIBUTE METHODS
+    // ASYNC ATTRIBUTE METHODS (see https://app.roll20.net/forum/post/10346883/adventures-with-startroll)
     const asw = (() => {
         const setActiveCharacterId = function(charId){
             let oldAcid=getActiveCharacterId();
@@ -1213,19 +1213,22 @@
         }
     }
 
-    // isolate target call
+    // isolated target call
     const getTarget = async () => {
         const rxGrab = /^0\[(.*)\]\s*$/;
-        //{{charname=[[0[@{target|character_name}]]]}} 
-        let rollBase = `! {{parrytotal=[[@{target|totalparry}]]}} {{parry=[[@{target|parry}]]}}`,
-            targetRoll = await startRoll(rollBase),
-            target = {
-                //name: targetRoll.results.charname.expression.match(rxGrab)[1],
-                name: "",
-                parrytotal: targetRoll.results.parrytotal.result,
-                parry: targetRoll.results.parry.result,
-            };
+        // target charactername roll is tricky, as we can only make rolls on numeric attributes. Thus we use roll labels to get alphanumeric attributes from the target
+        let rollBase = `! {{charname=[[0[@{target|character_name}]]]}} {{stanceattackbonus=[[@{target|stanceattackbonus}]]}} {{parrytotal=[[@{target|totalparry}]]}} {{parry=[[@{target|parry}]]}}`;
+
+        let targetRoll = await startRoll(rollBase);
+        clog (`targetRoll: ${JSON.stringify(targetRoll)})`);
         finishRoll(targetRoll.rollId);
+        let target = {
+                name: targetRoll.results.charname.expression.match(rxGrab)[1],
+                stanceattackbonus: targetRoll.results.stanceattackbonus.result,
+                parrytotal: targetRoll.results.parrytotal.result,
+                parry: targetRoll.results.parry.result, 
+            };
+        clog (`target charname: ${target.name}, target stanceattackbonus: ${target.stanceattackbonus}, target parrytotal: ${target.parrytotal}, target parry: ${target.parry}`)
         return target;
     };
 
@@ -1247,7 +1250,8 @@
 			parrymod = 0,
 			parrymodStr = "",
             stanceattackmodStr = "",
-            targetnameStr = "";
+            targetnameStr = "",
+            target;
 
         act = capitalize(act); 
         act = (act === "Wisdom" || act === "Valour") ? "Shadow test: "+act : act; 
@@ -1270,6 +1274,10 @@
             stanceDamageBonus = int(attrs.stancedamagebonus);
         clog(`Weary: ${attrs.weary}, Weary Str: ${wearyStr}, Miserable: ${attrs.miserable}, Miserable Str: ${miserableStr}, Favourill_id: ${favourill_id}, StanceAttackActive: ${stanceAttackActive}, StanceAttackBonus: ${stanceAttackBonus}, StanceDamageBonus: ${stanceDamageBonus}`);
 
+        if (rolltype.includes("target")){
+            target = await getTarget();
+            targetnameStr = `{{targetname=${target.name}}}`;
+        }
         // GET MODIFIER AND FAVOURED HERE
         if (rolltype.startsWith("protection") ) {
 			if ( rolltype.includes("target") ) {
@@ -1282,20 +1290,15 @@
             stanceattackmodStr = "0"
             if ( rolltype.includes("target") ) {
                 if (lm){
-                    parrymodStr = "{{parrymod= [[@{target|totalparry}]]}}";
+                    // totalparry includes shield, stance and other bonus
+                    parrymodStr = `{{parrymod=[[${target.parrytotal}]]}}`
                     // we include targets stance modifier
-                    stanceattackmodStr = "@{target|stanceattackbonus}";
+                    stanceattackmodStr = target.stanceattackbonus;
                 } else {
-				    parrymodStr = "{{parrymod= [[@{target|parry}]]}}";
-                    // getting the name is tricky, as the parser expects numbers
-                    // see https://app.roll20.net/forum/permalink/10353782/
-                    //targetnameStr = "{{tgtname= [[ 0 [@{target|name}] ]] }}";
-                    // Uncaught TypeError: Cannot read properties of undefined (reading 'length')
-                    targetnameStr = "";
+                    parrymodStr = `{{parrymod=[[${target.parry}]]}}`
                 }
 			} else {
-				parrymod = await getQuery(`?{Target's Parry|0}`); 
-				parrymodStr = `{{parrymod= [[${parrymod}]]}}`;
+				parrymodStr = `{{parrymod=[[?{Target's Parry|0}]]}}`;
 			}		
 			clog(`Parry modifier string: ${parrymodStr}`);
         } 
@@ -1364,10 +1367,10 @@
         clog(`Additional info: ${additionalStr}`);
 
         //LOG 
-        clog(`Character: ${char}, Base dice: ${successdice}, base string ${successStr}, modifiers: ${modifiers}, target: ${tn}, targetname: ${targetnameStr}, favoured ${featRoll}, skill favoured: ${act_fav}`);
+        clog(`Character: ${char}, Base dice: ${successdice}, base string ${successStr}, modifiers: ${modifiers}, target: ${tn}, favoured ${featRoll}, skill favoured: ${act_fav}, parry mod: ${parrymodStr}`);
 
         // START ROLL
-        rollBase = `&{template:tor} {{character-name=${char} }} {{roll-name=${act} }} {{total=[[0]]}} {{diff=[[0]]}} {{greatness=[[0]]}} {{passthroughdata=[[0]]}} {{outcome=[[0]]}} {{successes=[[0]]}} {{target=[[${tn}]] }} ${featRoll} {{r1=[[ ${successStr} ]] }} ${targetnameStr} ${parrymodStr} ${favouredStr} ${wearyStr} ${miserableStr} ${modStr} {{skill-fav=${act_fav}}} ${weaponStr} ${additionalStr}`;
+        rollBase = `&{template:tor} {{character-name=${char}}} {{roll-name=${act}}} {{total=[[0]]}} {{diff=[[0]]}} {{greatness=[[0]]}} {{passthroughdata=[[0]]}} {{outcome=[[0]]}} {{successes=[[0]]}} {{target=[[${tn}]] }} ${featRoll} {{r1=[[ ${successStr} ]] }} ${parrymodStr} ${favouredStr} ${wearyStr} ${miserableStr} ${modStr} {{skill-fav=${act_fav}}} ${weaponStr} ${additionalStr} ${targetnameStr}`;
         let rollresult = await startRoll(rollBase),
             rollSuccess = int(rollresult.results.r1.result,0),
             rollFeat = int(rollresult.results.feat.result,0);
@@ -1379,9 +1382,6 @@
             tn = int(tn) + int(rollresult.results.parrymod.result);
             clog(`TN after parry modification: ${tn}`);
         }
-
-        //let targetname = rolltype.includes("target") ? `attacks ${rollresult.results.tgtname.expression.match(/\[(.*)\]/)[1]}` : "";
-        let targetname = "";
 
         // FEAT DIE AND MISERABLE
         // Outcomes: Failure = 0, Success = 1, Feat success = 2, Piercing blow = 3, Weary failure = -1, Miserable failure = -2 
@@ -1474,7 +1474,6 @@
         //rollData.favoured = favouredStr; 
         rollData.outcome = outcome;
         rollData.greatness = successDegree;
-        rollData.targetname = targetname;
         console.log('Roll data: ' + JSON.stringify(rollData));
         //rollData.passthroughdata = "This is a test";
 
@@ -2054,6 +2053,7 @@
         <div class="sheet-header">
             {{#character-name}}<div class="sheet-title sheet-text-center">{{character-name}}</div>{{/character-name}}
             {{#roll-name}}<div class="sheet-subtitle sheet-text-center">{{roll-name}}</div>{{/roll-name}}
+            {{#targetname}}<div class="sheet-subtitle sheet-text-center">Target: {{targetname}}</div>{{/targetname}}
         </div>
         <div class="sheet-content">
             <div class="sheet-full-col sheet-center sheet-die-title sheet-target-number">Target Number</div>
@@ -2076,9 +2076,10 @@
             <div class="sheet-half-col sheet-die-result sheet-feat-die">
                 <span class="sheet-rotated-box">{{feat}}</span>
             </div>
-            {{/rollBetween() feat 1 10}}{{^feat}}
+            {{/rollBetween() feat 1 10}}
+            {{^feat}}
             <div class="sheet-half-col sheet-die-result sheet-feat-die"><span class="sheet-rotated-box"><span>-</span></span></div>
-            {{/feat}}
+            {{/^feat}}
             <div class="sheet-half-col sheet-die-result sheet-success-die"><span class="sheet-rotated-box">{{r1}}</span></div>
             <div class="sheet-half-col sheet-die-comment sheet-favoured">
                 {{#favoured}}{{favoured}}{{/favoured}}
@@ -2092,7 +2093,8 @@
             <div class="sheet-half-col sheet-die-comment sheet-weary sheet-red">
                 {{#weary}}{{weary}}{{/weary}}
             </div>
-            <div class="sheet-full-col sheet-center sheet-die-result sheet-roll-total"><span class="sheet-rotated-box">{{computed::total}}</span>
+            <div class="sheet-full-col sheet-center sheet-die-result sheet-roll-total">
+                <span class="sheet-rotated-box">{{computed::total}}</span>
             </div>
             <div class="sheet-full-col sheet-center sheet-die-title sheet-roll-total">Total</div>
             <div class="sheet-full-col sheet-center sheet-roll-outcome">
