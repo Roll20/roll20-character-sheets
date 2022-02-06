@@ -9,13 +9,12 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 ### Features
 
 - Roll-Template: Target rolls now show the targetname in the roll-template. This is especially helpfull for lm rolls, to assign rolls to the corresponding characters.
-- Roll-Template: If the roll has failed the roll-template will not show the damage details to save space.
+- Roll-Template: If the roll has failed the roll-template will not show the damage and weapon details to save space.
 
 ### CSS
 
 - import fonts from fonts.google
 - update to higher resolution borders
-- found another bug in the roll-template html
 
 ## 02.02.01 (Build 7)
 
