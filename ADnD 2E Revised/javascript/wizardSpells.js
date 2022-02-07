@@ -8576,6 +8576,242 @@ wiz9['Life Force Exchange'] = {
 };
 //#endregion
 
+//#region The Complete Ninja's Handbook
+wiz1['Face-Blur'] = {
+    'level': '1',
+    'school': 'Illusion',
+    'range': '0',
+    'duration': '[[@{level-wizard}]] hour(s)',
+    'aoe': 'One creature',
+    'components': 'S',
+    'cast-time': '4 rounds',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 16',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The ninja casts this spell on himself or on another. It may be cast only on a willing target, who gets no saving throw.\n&emsp;The spell alters the target’s features slightly, making them unremarkable—neither handsome nor ugly. The gaze of any witness slides right off the features of a ninja affected by this spell.\n&emsp;A person who is keenly and alertly looking at the faces of everyone he sees—such as a dedicated guard scanning a crowd to find someone who has just disappeared into it—gets a saving throw against the effects of the spell. If the observer makes his saving throw, he sees the ninja’s actual features instead of the nondescript face. Immunity to the spell lasts the length of the spell duration, but the spell itself is not dispelled and will work on people who have not made their saving throws. The person who successfully saves against this spell has no idea that a spell is in effect; he does not see the false features fade away and feels no hint of magic.\n&emsp;This spell’s success depends on the ninja’s maintaining a mental attitude of dullness and boredom. When a ninja deliberately does something interesting while wearing this spell—if he attacks someone, saves a life, or robs a merchant—the spell ends and every witness can see his true features.\n&emsp;This spell can be canceled by a *dispel magic* spell.'
+};
+
+wiz1['False Tracks'] = {
+    'level': '1',
+    'school': 'Illusion',
+    'range': '0',
+    'duration': '[[@{level-wizard}]] turn(s)',
+    'aoe': 'The caster',
+    'components': 'S',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 16',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'For the duration of this spell, the ninja leaves tracks appropriate to a common normal animal (herd beast, deer, fox, etc.). The ninja chooses the species when the spell is cast. His foot prints will be those of an animal, moving at whatever pace the ninja maintains. (If the ninja is running, he leaves behind the running foot prints of the animal.) If bits of the ninja’s clothing become snagged on underbrush, they will appear to be bits of animal hide. However, if the ninja drops an item of equipment or a garment, this spell will not conceal its nature.\n&emsp;No saving throw is allowed. However, the spell can be removed by a *dispel magic* spell. If such a spell is cast on any part of the trail the ninja has left behind, the entire spell is canceled and all tracks revert to normal.\n&emsp;The effects of this spell are entirely illusory. When the spell duration ends, all affected footprints revert to normal.\n&emsp;Ninja use this spell to elude pursuers. When someone a ninja wishes to ambush is hunting a specific type of animal, the ninja will leave tracks of that animal for the quarry to follow.'
+};
+
+wiz1['Find Direction'] = {
+    'level': '1',
+    'school': 'Divination',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': 'Special',
+    'components': 'S',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 17',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By performing kuji-kiri finger exercises, the ninja obtains a momentary understanding of her current direction. This can be very helpful when she has become lost.\n&emsp;The ninja understands the actual direction in relation to true north, south, east, and west; the presence lodestones will not affect the spell. The spell works underground, in darkness, when the ninja is upside down, and in any sort of disorienting circumstance.'
+};
+
+wiz1['Lesser Distraction'] = {
+    'level': '1',
+    'school': 'Illusion',
+    'range': '[[5*[[@{level-wizard}]] ]] feets',
+    'duration': 'Instantaneous',
+    'aoe': 'One creature',
+    'components': 'S',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 17',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, the caster causes the victim to hear a faint noise or see something indistinct out of the corner of his eye. The caster must decide if the illusion will be auditory or visual but cannot choose to further define the distraction. It will be a sound, but not a footstep or a low moan. Or it will be a glimpse of something, but not of a person.\n&emsp;The victim who does not successfully save vs. spell believes the sight or sound to originate from a direction of the spellcaster’s choice. (The spellcaster *cannot* choose distance. A victim can be made to believe that he heard a sound behind him, but not that it was something moving 30 feet behind him. He can be made to think that he saw motion off to his right, but not that it was something moving at the top of a wall 50 feet from him.)\n&emsp;The victim is free to act as he chooses on the illusion. He may ignore it or may be moved by duty or curiosity to investigate.\n&emsp;Because the illusion is quick and not detailed, the victim has a -4 penalty to his chance to save. If he fails the saving throw, he believes the sight or sound to be real but does not know what made it. If he makes the saving throw, he assumes that he was “seeing things” or “hearing things” and does not act on the distraction. Even if he makes his saving throw, he does not know that he was the target of a spell.\n&emsp;This spell is used by ninja attempting an escape or infiltration. It is designed to encourage a guard to leave his post for a moment.'
+};
+
+wiz2['Deepen Shadows'] = {
+    'level': '2',
+    'school': 'Illusion',
+    'range': '0 or 6 yards (see below)',
+    'duration': '[[@{level-wizard}]] hours',
+    'aoe': '[[@{level-wizard}]] 10’✕10’ areas',
+    'components': 'S',
+    'cast-time': '5 rounds',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 18',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell slowly, inconspicuously darkens the room where the ninja is. The change is gradual, taking five rounds (five minutes). With a successful saving throw at a -4 penalty, someone inside the room can notice that it is getting darker, but this observation does not affect the spell’s progress.\n&emsp;When the spell is completed, the room is as full of shadow and darkness as possible without arousing suspicion. If it is daylight outside, it will seem that a cloud has passed over the sun. If it is nighttime, the candles and fire seem to have burned low. The dimming of the light does not appear at all menacing to people in the area, though a *detect magic* spell will reveal the presence of the *deepen shadows* spell.\n&emsp;The caster receives a +2% bonus per experience level to her hide in shadows roll within the effect of the *deepen shadows* spell. Currently +[[2*[[@{level-wizard}]] ]]%. Only the caster receives this bonus, because only she has complete understanding of the way the shadows fall.\n&emsp;This spell is useful to a ninja who cannot use her ability to hide in shadows because the area is too bright. The shadows created by this spell can help ninja to escape, to infiltrate, to pull sleight-of-hand switches, etc.\n&emsp;If the casting ninja is in a portal or doorway between rooms, she may choose which room is darkened by this spell.\n&emsp;If the ninja is of sufficient level that she could cover more than the area of the room she occupies, the excess area is lost unless there is an open portal between the ninja’s room and an adjacent room, and the ninja’s spell can affect enough area to cover both mms completely.\n&emsp;If the ninja is not of sufficient level to affect the entire area of a room, the spell automatically fails.\n\n&emsp;**Example:** As a 10th-level Spirit Warrior, Noriko casts magic as a 2nd-level spellcaster and thus can cover a 1O’✕20’ area with her *deepen shadows* spell. However, she is standing in a 2O’✕20’ room and so cannot cover the entire area. If she attempts to cast her spell here, the casting will fail.'
+};
+
+wiz2['Featherfoot'] = {
+    'level': '2',
+    'school': 'Alteration (Reversible)',
+    'range': 'Touch',
+    'duration': '1 turn',
+    'aoe': 'One creature',
+    'components': 'S',
+    'cast-time': '[[5*[[@{level-wizard}]] ]] rounds',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 19',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The person affected by this spell gains the magical ability to move quietly and weightlessly at a normal walking pace or slower. If he tries to go any faster, the effect of the spell is lost.\n&emsp;While the spell is in effect, the character gains +30% to his move silently roll. (If he does not possess this skill, for the duration of the spell he performs as though he does possess the skill with a score of 30%.)\n&emsp;The person affected by this spell does not leave any footprints,nor does he set off weight- or pressure-based traps.\n&emsp;The reverse of this spell, *leadfoot*, affects one creature. The victim is allowed a saving throw to avoid being affected by the spell.\n&emsp;The victim of a *leadfoot* spell moves loudly and heavily. He cannot move silently or hide in shadows, and automatically sets off any pressure-based traps he steps on. (No roll is necessary.)\n&emsp;A *leadfooted* character inside the area of a silence spell moves normally; he can be heard if he fails to make a move silently roll.'
+};
+
+wiz3['Age to Destruction'] = {
+    'level': '3',
+    'school': 'Alteration/Necromancy',
+    'range': '[[2*[[@{level-wizard}]] ]] feet',
+    'duration': 'Instantaneous',
+    'aoe': '1 object (3 cubic feet)',
+    'components': 'S',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 19',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, the ninja can age any nonliving material (of a maximum volume of 3 cubic feet) by about 100 years. An object affected by the spell may make a normal saving throw vs. disintegration (see the *DUNGEON MASTER Guide*, Chapter 6) to avoid the spell’s effect.\n&emsp;An object that fails its saving throw suffers the ravages of a hundred years of aging, on the inside. On the outside it appears normal, but a little more weathered than before. Stone items are affected very little, but wood rots, metal rusts or corrodes through, and other materials suffer similar results. The next time an object affected by this spell is picked up or otherwise used, it crumbles into ruin. If the object is already under strain when the spell is cast on it, it gives way immediately.\n&emsp;This spell allows a spellcaster to sabotage crucial objects or pieces of equipment: a ladder rung, a wooden step, the sword of an enemy, etc. A fleeing ninja can use this spell to drop a portcullis, booby trap the stairway she has just descended, or destroy a weapon about to be wielded against her. It will not allow the character to sink a boat; the keel exceeds the spell’s volume limitations. (However, a hull patch that does not exceed the volume limitation could be destroyed by the spell.)\n&emsp;This spell does not affect living creatures. It will not cancel the effects of a potion of *longevity*. If cast on such a potion, the spell permanently renders the potion useless. A potion of *longevity* is the only item that does not receive a saving throw against this spell.'
+};
+
+wiz3['Detect the Living'] = {
+    'level': '3',
+    'school': 'Divination',
+    'range': '0',
+    'duration': '3 turns',
+    'aoe': '[[60+10*[[@{level-wizard}]] ]] feets',
+    'components': 'S',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 19',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell acts much like a *detect undead* spell but allows the ninja to detect the presence of living beings.\n&emsp;The spell works on living beings belonging to animal species with half a hit die or more of hit points. Thus the spell will not detect members of very small animal species or any plant species.\n&emsp;The spell’s area of effect extends in a path 10 feet wide and 60 feet long (plus 10 feet longer per spellcasting level of the ninja) in the direction the caster is facing. Scanning a direction requires one round, and the caster must be motionless except for the somatic element of his spell (kuji-kiri finger exercises). When the spell is successful, the caster sees a glow in the direction of the life-form; no one else can see the glow. The spell indicates direction only; it does not give specific location or distance.\n&emsp;This spell can detect living beings through walls and obstacles but is blocked by 1 foot of solid stone, 1 yard of wood or loose earth, or a thin coating of metal. The spell does not indicate the type (species or level) of creature detected, only that such a being is present.\n&emsp;Ninja use this spell to detect someone hiding behind a paper room divider or a false wall. They can then attack through the wall to surprise their prey. Such attacks, when they are successful, are startling and sometimes deadly, but even when aided by a *detect the living* spell, a ninja striking in this way suffers a -4 penalty to his attack roll.'
+};
+
+wiz3['Greater Distraction'] = {
+    'level': '3',
+    'school': 'Illusion',
+    'range': '[[10*[[@{level-wizard}]] ]] feet',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': 'One creature',
+    'components': 'S',
+    'cast-time': '3',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'p. 20',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, the caster causes the victim to become distracted by a sensation. The caster decides what the sensation will be before he casts the spell. Typical sensations include itching, the feeling that one’s hands are grubby, or the need to answer nature’s call.\n&emsp;If the victim fails the saving throw, the sensation will not stop distracting him until he deals with it (by scratching the itch, washing his hands, etc.) or until the spell duration ends. Once either of these conditions is met, the distracting sensation ends. If the victim makes the save, he feels the sensation momentarily but it goes away almost immediately. The victim is never aware that a spell was cast on him, whether he saves or not.\n&emsp;This is another spell used by intruding ninja to maneuver guards or intended targets out of position.'
+};
+
+wiz4['Improved Featherfoot'] = {
+    'level': '4',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': 'One creature',
+    'components': 'S',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 20',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell improves on the 2nd-level *featherfoot* spell by additionally allowing the ninja to walk across still or gently moving water surfaces (the water of a pond or a slow river, for example).\n&emsp;Such travel leaves the bottoms of the ninja’s feet wet, so she must take care to leave no trail after leaving the water.'
+};
+
+wiz4['Improved Mirror Image'] = {
+    'level': '4',
+    'school': 'Illusion/Phantasm',
+    'range': '0',
+    'duration': '[[3*[[@{level-wizard}]] ]] rounds',
+    'aoe': '30-foot radius',
+    'components': 'S',
+    'cast-time': '2 rounds',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 20',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell works much like the 2nd-level wizard spell *mirror image*, with some important differences.\n&emsp;The *mirror images* appear in the vicinity of the caster, but they can move up to 30 feet away. Although the images must face the same target or enemy (whichever one the spellcaster is facing), they do not have to perform exactly the same actions. They can draw different weapons or appear to choose different tactics in combat.\n&emsp;When struck in combat, these images collapse as if “injured or killed, feeling solid to the person attacking them. Only at the start of the next combat round do “injured” images disappear.\n&emsp;Like the images created by a *mirror image* spell, these visions can do no actual damage. If they attack an enemy in combat, all their attacks seem to miss until they are struck or the spell duration ends.\n&emsp;To determine how many images appear, the DM rolls 1d4 and adds 1 for every three levels of the ninja’s spellcasting experience. Currently [[floor([[@{level-wizard}]]/3)]] additional images.'
+};
+
+wiz5['Shadow-Form'] = {
+    'level': '5',
+    'school': 'Illusion/Phantasm',
+    'range': 'Unlimited',
+    'duration': 'One hour or until struck',
+    'aoe': 'One creature',
+    'components': 'S',
+    'cast-time': '5 rounds',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 21',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, the ninja creates a transparent duplicate of himself. The duplicate, or *shadow-form*, appears adjacent to the spellcaster. It wears all the clothing and carries all the equipment that were in the ninja’s possession when he cast the spell, leaving him unclothed and unarmed; the clothing and equipment are not transparent.\n&emsp;For the duration of the spell, the ninja controls the *shadow-form*’s actions and sees through its eyes. It is an extension of him and possesses all of his physical and mental skills but not his magical abilities. (In other words, it moves, sounds, and fights just as he does but cannot cast spells.) The ninja sees through both sets of eyes at once. When the *shadow-form* is waiting or resting, the ninja can take actions on his own, but he cannot make both his real body and his *shadow-form* act at the same time.\n&emsp;If the *shadow-form* is hit in combat or struck with a *dispel magic* spell, it disappears—leaving behind all the clothing and equipment it was carrying. Also left behind is a handful of leaves inside the clothes, all that remains of the insubstantial body.\n&emsp;Spirit Warriors and spellcasting shinobi use this spell to perform particularly frightening short-term assignments.The *shadow-form* may be sent off to attack someone, to deliver a message, to scout a dangerous area, or to undertake any sort of action in which the ninja cannot afford to be caught. Usually the spellcaster dresses in a ninja night-suit before casting this spell, so that it is not readily obvious that the person within the clothing is transparent. When the *shadow-form* wears a night-suit and moves around in the dark, it is difficult to see that it is not a physical being.'
+};
+
+wiz6['Sense Treason'] = {
+    'level': '6',
+    'school': 'Divination',
+    'range': 'special',
+    'duration': 'Instantaneous',
+    'aoe': 'the caster',
+    'components': 'S',
+    'cast-time': '5 rounds',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 22',
+    'book': 'The Complete Ninja\'s Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, a shinobi spellcaster can determine that the clan has been deliberately betrayed.\n&emsp;The DM determines what constitutes such betrayal, but the spell normally reacts when a clan member has deliberately taken an action that puts his own welfare above the clan’s.\n&emsp;However, the spellcaster cannot determine the identity of the betrayer or reveal details of that betrayal. The spell has no range, so the traitor could be anyone in the clan.\n&emsp;The spell does not react to exiles, outcasts, or clan members the spellcaster believes to be dead.\n&emsp;This is a spell used most often by Shinobi Mage advisors to clan leaders. Though it is necessary to know about such betrayals in order to protect the clan, this spell can be as much a curse as it is a blessing, because it makes the clan lord and his advisors paranoid.'
+};
+//#endregion
+
 //#region Player's Option: Spells & Magic
 wiz1['Cantrip']['school-spells&magic']                  = "Universal Magic"
 wiz1['Comprehend Languages']['school-spells&magic']     = "Universal Magic"

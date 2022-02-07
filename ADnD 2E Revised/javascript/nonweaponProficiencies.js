@@ -1026,4 +1026,105 @@ nonweaponProficiencies['Venom Handling'] = {
     'book': 'The Complete Book of Necromancers'
 };
 //#endregion
+
+//#region The Complete Ninja's Handbook
+nonweaponProficiencies['City Familiarity'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Style Analysis'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': 'Warrior',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Assimilation'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Detect Signing'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +1,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Enamor'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': -2,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Escape'] = {
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Feign/Detect Sleep'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Giant Kite Flying'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -3,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Hold Breath'] = {
+    'slots': 1,
+    'abilityScore': '@{Constitution}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Night Vision'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -2,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Toxicology'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Quick Study'] = {
+    'slots': 2,
+    'abilityScore': '',
+    'modifier': -3,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Underclass'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Water Walking'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -1,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+//#endregion
 module.exports = nonweaponProficiencies;
