@@ -4,6 +4,11 @@ Buttons are indicated by the text changes to read when the mouse cursor is hover
 Skill and Weapons can be edited when the cog to the left are yellow.  When the cog is clicked it will tirn white and becomes a button.
 Wound penalties area  automatically applied to Difficulty Factors when the Wound Track is changed.
 
+# Configuration
+The cog on the top right of each sheet opens the configuration. From here the sheet can be toggle between PC,MAjor NPC and squad sheets.
+
+In the configuration for the PC sheet there are toggles to remove the Photography ability and the Torture skill.
+
 # Weapons
 The performance modifiers for Single  Shot and Automatic fire are not automatically added 
 Multi should be checked when single shots  are fired at multiple targets see  MULTIPLE TARGET FIRE on page 46 of the Classified rules 
@@ -17,6 +22,7 @@ Shots is the number of shots being fired.     This will roll all the shots and o
 # Hand to Hand Weapons (including Grenades)
 If the damage rating (DR) is entered as a number the weapon will treated as weapon such as a knife or unarmed.  If the damage is entered as a Letter from H–L the damage   will be treated as AREA WEAPON DAMAGE (i.e. a grenade) see page 41 of the rules 
 
+There a switch in the configuration so instead of inputing a targets speed when a non area atack hand to hand attack is made a target token can be selected instead.
 # Vehicles
 
 The Performance Modifier for the vehicle is automatically added to Maneuver and  Control Rolls
