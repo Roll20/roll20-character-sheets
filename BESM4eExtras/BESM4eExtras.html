@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.5.2" readonly />
+													<input type="text" class="center" name="attr_version" value="1.5.3" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -12512,13 +12512,13 @@
 					'Only use the Attribute once a day (or session)'
 				],
 				'concentration':[
-					'Requires slight Concentration. The character can still perform ' +
+					'Requires slight concentration. The character can still perform ' +
 					'other general actions but cannot perform any combatrelated actions ' +
 					'or use other Attributes that also require Concentration',
-					'Requires intense Concentration. The character can move at slow ' +
+					'Requires intense concentration. The character can move at slow ' +
 					'speeds and talk with others while using the Attribute but cannot ' +
 					'perform any complex actions (including combat) or use any other Attribute',
-					'Requires full Concentration. The character cannot do anything ' +
+					'Requires full concentration. The character cannot do anything ' +
 					'else while using the Attribute and must remain still to devote their ' +
 					'full attention to the Attribute'
 				],
@@ -12679,6 +12679,8 @@
 				({ ...o, [key]: base_values_obj[key]}), {}) : 
 				{};
 			const resilient_customizations_array = ['acidic','aging','asphyxiation','cold','compression','deadening','decompression','disease','electric','heat','psychosomatic','radiation','rest','sustenance','toxin'];
+			const controlenvironment_customizations_array = ['arid','clouds','cold','darkness','gaseous','heat','humidity','light','liquid','smell','sound','storms','vacuum'];
+			let controlled_environments_array = [];
 			_.each(attrobj.customizations, c => {
 				const getRankString = rank => rank ? 
 					c.name == 'area' || c.name == 'range' ? 
@@ -12691,12 +12693,19 @@
 						getStandardLimiterTooltipDescription(debug, c.name, rank) :
 					resilient_customizations_array.indexOf(c.name) !== -1 ?
 						getResilientTooltopDescription(debug, c.name, rank) :
+					controlenvironment_customizations_array.indexOf(c.name) !== -1 ?
+						controlled_environments_array.push(c.name) :
 					rank :
 				'';
+				console.log(`[getCustomizationsTooltipString(TEST)] controlled_environments_array = ${controlled_environments_array}`);
 				attrobj.attribute == 'resilient' ? 
-				customizationsObj[`${c.name}`] = `${getRankString(c.rank)}\n\n`:
+					customizationsObj[`${c.name}`] = `${getRankString(c.rank)}\n\n`:
+				controlenvironment_customizations_array.indexOf(c.name) !== -1 ? 
+					getRankString(c.rank) :
 				customizationsObj[`${c.name}`] = `${capital(c.name)}: ${getRankString(c.rank)}\n\n`;
 			});
+			attrobj.attribute == 'controlenvironment' ? 
+				customizationsObj['controlenvironment'] = `Contolled Environments: ${controlled_environments_array.join(', ')}\n\n` : '';
 			const result = _.values(customizationsObj).join("");
 			if(debug) console.log(`[getCustomizationsTooltipString()] result = ${result}`);
 			return result;
