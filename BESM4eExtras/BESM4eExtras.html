@@ -7568,7 +7568,7 @@
 		const controlable_environments_array = ['arid', 'clouds', 'cold', 'darkness', 'heat', 'humidity', 'light', 'liquid', 'gaseous', 'smell', 'sound', 'storms', 'unique', 'vacuum'];
 		const sixthsense_phenomena_array = ['attrsrc', 'danger', 'dimensions', 'elements', 'emotions', 'extraplanarbeings', 'illusions', 'morality', 'objects', 'placesofpower', 'uniquephenomena'];
 		const special_movements_array = ['balance', 'catlike', 'fast', 'lightfooted', 'slithering', 'swinging', 'untrackable', 'wallbouncing', 'wallcrawling', 'waterwalking', 'zendirection'];
-		const undetectable_methods_array = ['hearing', 'sight', 'smell', 'taste', 'touch', 'echolocation', 'infrasound', 'radio', 'ultrasound', 'infrared', 'ultraviolet', 'x-ray', 'odorant', 'tastant', 'magnetic', 'radiation', 'seismic', 'thermal'];
+		const undetectable_methods_array = ['echolocation', 'hearing', 'infrared', 'infrasound', 'magnetic', 'odorant', 'radiation', 'radio', 'seismic', 'sight', 'smell', 'tastant', 'taste', 'thermal', 'touch', 'ultrasound', 'ultraviolet', 'x-ray'];
 		const unaffected_attrs_array = ['alternateform','alternateidentity','changestate','dataaccess','dimensionwalk','dynamicpowers','exorcism','features','forcefield','illusion','metamorphosis','mindcontrol','nullify','plantcontrol','portal','projection','sensoryblock','sizechange','telekinesis','telepathy','teleport','transmute','undetectable','weapon'];
 		const unaffected_states_array = ['alternateformstate', 'alternateidentitystate', 'changestatestate', 'dataaccessstate', 'dimensionwalkstate', 'dynamicpowersstate', 'exorcismstate', 'featuresstate', 'forcefieldstate', 'illusionstate', 'metamorphosisstate', 'mindcontrolstate', 'nullifystate', 'plantcontrolstate', 'portalstate', 'projectionstate', 'sensoryblockstate', 'sizechangestate', 'telekinesisstate', 'telepathystate', 'teleportstate', 'transmutestate', 'undetectablestate', 'weaponstate'];
 		const non_actionable_events = ['costperlevel','visible','new','source','characteristic','rollable','attrdefecttoggle','damagetype'];
@@ -11613,6 +11613,7 @@
 				case "combattechnique":
 					setAttrdb(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj); 
 					setTargeted(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
+					setActiveAttribute(isActive, debug, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "conversion":
 					setProtection(isActive, debug, value, rowID, sourceAttr, attribute, setObj);
@@ -12680,7 +12681,7 @@
 				{};
 			const resilient_customizations_array = ['acidic','aging','asphyxiation','cold','compression','deadening','decompression','disease','electric','heat','psychosomatic','radiation','rest','sustenance','toxin'];
 			const controlenvironment_customizations_array = ['arid','clouds','cold','darkness','gaseous','heat','humidity','light','liquid','smell','sound','storms','vacuum'];
-			let controlled_environments_array = [];
+			let customizations_array = [];
 			_.each(attrobj.customizations, c => {
 				const getRankString = rank => rank ? 
 					c.name == 'area' || c.name == 'range' ? 
@@ -12688,24 +12689,34 @@
 					c.name == 'duration' ?
 						getDuration(debug, rank) :
 					c.name == 'targets' ?
-							getTargets(debug, rank) :
+						getTargets(debug, rank) :
+					controlenvironment_customizations_array.indexOf(c.name) !== -1 &&
+					attrobj.attribute == 'controlenvironment' || 
+					undetectable_methods_array.indexOf(c.name) !== -1 &&
+					attrobj.attribute == 'undetectable'?
+						customizations_array.push(c.name) :
+					resilient_customizations_array.indexOf(c.name) !== -1 && 
+					attrobj.attribute == 'resilient' ?
+						getResilientTooltopDescription(debug, c.name, rank) :
 					standard_limiters_array.indexOf(c.name) !== -1 ?
 						getStandardLimiterTooltipDescription(debug, c.name, rank) :
-					resilient_customizations_array.indexOf(c.name) !== -1 ?
-						getResilientTooltopDescription(debug, c.name, rank) :
-					controlenvironment_customizations_array.indexOf(c.name) !== -1 ?
-						controlled_environments_array.push(c.name) :
 					rank :
 				'';
-				console.log(`[getCustomizationsTooltipString(TEST)] controlled_environments_array = ${controlled_environments_array}`);
 				attrobj.attribute == 'resilient' ? 
 					customizationsObj[`${c.name}`] = `${getRankString(c.rank)}\n\n`:
-				controlenvironment_customizations_array.indexOf(c.name) !== -1 ? 
+				controlenvironment_customizations_array.indexOf(c.name) !== -1 ||
+				undetectable_methods_array.indexOf(c.name) !== -1 ? 
 					getRankString(c.rank) :
 				customizationsObj[`${c.name}`] = `${capital(c.name)}: ${getRankString(c.rank)}\n\n`;
 			});
-			attrobj.attribute == 'controlenvironment' ? 
-				customizationsObj['controlenvironment'] = `Contolled Environments: ${controlled_environments_array.join(', ')}\n\n` : '';
+			const prefix = attrobj.attribute == 'controlenvironment' ? 
+				'Contolled Environments:' :
+			attrobj.attribute == 'undetectable' ?
+				'Senses and Techniques:' :
+			'';
+			attrobj.attribute == 'controlenvironment' || attrobj.attribute == 'undetectable' ? 
+				customizationsObj['attreffects'] = `${prefix} ${customizations_array.join(', ')}\n\n` :
+			'';
 			const result = _.values(customizationsObj).join("");
 			if(debug) console.log(`[getCustomizationsTooltipString()] result = ${result}`);
 			return result;
