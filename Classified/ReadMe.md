@@ -5,7 +5,7 @@ Skill and Weapons can be edited when the cog to the left are yellow.  When the c
 Wound penalties area  automatically applied to Difficulty Factors when the Wound Track is changed.
 
 # Configuration
-The cog on the top right of each sheet opens the configuration. From here the sheet can be toggle between PC,MAjor NPC and squad sheets.
+The cog on the top right of each sheet opens the configuration. From here the sheet can be toggled between PC,Major NPC and Squad sheets.
 
 In the configuration for the PC sheet there are toggles to remove the Photography ability and the Torture skill.
 
