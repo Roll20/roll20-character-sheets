@@ -1,8 +1,8 @@
 <!--
 	EDITED by 			Gorthian
 	INSPIRED by			Hitdice (https://www.youtube.com/c/Hitdice)
-	Version				1.2
-	Letzte Änderung		2021-11-28
+	Version				1.3
+	Letzte Änderung		2022-02-07
 	
 	GitHub				https://github.com/Gorthian/FSG_CharacterSheet_Roll20
 	Wiki				https://github.com/Gorthian/FSG_CharacterSheet_Roll20/wiki
@@ -214,6 +214,22 @@
 		<span class="sheet-title" data-i18n="challenge-u"></span>		
 		<table>
 			<tr>
+				<td colspan="3">					
+					<select class="sheet-fullwidth" name="attr_challenge_difficulty">
+						<option value="0" data-i18n="difficulty-0-u">0</option>
+						<option value="5" data-i18n="difficulty-5-u">5</option>
+						<option value="10" data-i18n="difficulty-10-u">10</option>
+						<option value="15" data-i18n="difficulty-15-u">15</option>
+						<option value="20" data-i18n="difficulty-20-u">20</option>
+						<option value="25" data-i18n="difficulty-25-u">25</option>
+						<option value="30" data-i18n="difficulty-30-u">30</option>
+						<option value="40" data-i18n="difficulty-40-u">40</option>
+						<option value="50" data-i18n="difficulty-50-u">50</option>
+						<option value="60" data-i18n="difficulty-60-u">60</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
 				<td colspan="2">
 					<span class="sheet-label" name="attr_challenge_attribute_name"></span>
 				</td>
@@ -349,6 +365,7 @@
 		</table>		
 		<div style="height:100% !important; text-align: center; vertical-align: center;">
 			<button type="action" class="sheet-challenge" name="act_challenge"></button>
+			
 			<button type="action" class="sheet-reroll" name="act_reroll"><span data-i18n="reroll-u"></span></button>
 			<select class="sheet-reroll" name="attr_challenge_reroll_dice">
 				<option value="1" selected>1</option>
@@ -395,16 +412,21 @@
 			<div class="sheet-template-key"><span data-i18n="pool-u"></span>:</div>
 			<div class="sheet-template-value">{{pool}}</div>			
 		</div>
-		{{#allprops() pool result}}
+		<div class="sheet-template-row">
+			<div class="sheet-template-key"><span data-i18n="difficulty-u"></span>:</div>
+			<div class="sheet-template-value">{{difficulty}}</div>			
+		</div>
+		{{#allprops() pool result difficulty level}}
 		<div class="sheet-template-row">
 			<div class="sheet-template-key"><span data-i18n="dice-u"></span> {{key}}:</div>
 			<div class="sheet-template-value">{{value}}</div>
 		</div>
-		{{/allprops() pool result}}
+		{{/allprops() pool result difficulty level}}
 		<div class="sheet-template-row">
 			<div class="sheet-template-key"><span data-i18n="result-u"></span>:</div>
 			<div class="sheet-template-value">{{computed::result}}</div>			 
 		</div>
+		<div class="sheet-template-header">{{computed::level}}</div>
 	</div>
 </rolltemplate>
 <!-- Sheet Workers //-->
@@ -442,24 +464,41 @@
 	/* Funktionen                   */
 	/********************************/
 	
+	function calcChallengeLevel(iLevel) {
+		let sLevel = ""
+		
+		if (iLevel < -15) {sLevel = getTranslationByKey("challenge-level-0-u");} else	//-16 und weniger	-> Verboten
+		if (iLevel < -10) {sLevel = getTranslationByKey("challenge-level-1-u");} else	//-11 bis -15 		-> Nein, und
+		if (iLevel < -5) {sLevel = getTranslationByKey("challenge-level-2-u");} else	//-6 bis -10 		-> Nein
+		if (iLevel < 0) {sLevel = getTranslationByKey("challenge-level-3-u");} else		//-1 bis -5 		-> Nein, aber
+		if (iLevel < 10) {sLevel = getTranslationByKey("challenge-level-4-u");} else    //0 bis 9			-> Ja, aber
+		if (iLevel < 20) {sLevel = getTranslationByKey("challenge-level-5-u");} else 	//10 bis 19			-> Ja
+		{sLevel = getTranslationByKey("challenge-level-6-u");}							//20 und mehr		-> Ja, und
+	
+		return sLevel;
+	}
+	
 	function rollChallenge()
 	{
 		console.log("rollChallenge");
-		getAttrs(["challenge_pool","challenge_dices"], function (values){
+		getAttrs(["challenge_pool","challenge_dices","challenge_difficulty"], function (values){
 			let iChallengePool = values["challenge_pool"]||0;
 			let iChallengeDices = values["challenge_dices"]||1;
+			let iChallengeDifficulty = values["challenge_difficulty"]||15;
 			let iCounter = 1;
 			let iRollSum = iChallengePool;
 			let sRoll = "";
 
-			sRoll = "&{template:challenge} {{pool=@{challenge_pool}}} {{result=[[1d10]]}}"
+			sRoll = "&{template:challenge} {{difficulty=@{challenge_difficulty}}} {{pool=@{challenge_pool}}} {{result=[[1d10]]}} {{level=[[1d10]]}}"
 			while (iCounter <= iChallengeDices) {
 				sRoll = sRoll + " {{" + iCounter + "=[[1d10]]}}"
 				iCounter = iCounter + 1;
 			}
 
 			startRoll(sRoll, (results) => {
-					let aAttributes = {};
+					let aAttributes = {};	
+					let iLevel = 0;	
+					let sLevel = "";
 
 					iCounter = iCounter - 1;
 					while (iCounter > 0)
@@ -468,11 +507,15 @@
 						aAttributes["challenge_roll_" + iCounter] = results.results[iCounter].result;
 						iCounter = iCounter - 1;
 					}
-					setAttrs(aAttributes);
+					iLevel = iRollSum - iChallengeDifficulty;					
+					sLevel = calcChallengeLevel(iLevel);
 					
+					setAttrs(aAttributes);
+
 					finishRoll(
 						results.rollId, {
-							result: iRollSum
+							result: iRollSum,
+							level: sLevel
 						}
 					);
 			});			
@@ -482,7 +525,7 @@
 	function rerollChallenge()
 	{
 		console.log("rerollChallenge")
-		getAttrs(["challenge_pool","challenge_dices","challenge_reroll_dice","challenge_roll_1","challenge_roll_2","challenge_roll_3","challenge_roll_4","challenge_roll_5"], function (values){
+		getAttrs(["challenge_pool","challenge_dices","challenge_reroll_dice","challenge_roll_1","challenge_roll_2","challenge_roll_3","challenge_roll_4","challenge_roll_5","challenge_difficulty"], function (values){
 			let iChallengePool = values["challenge_pool"]||0;
 			let iChallengeRerollDice = values["challenge_reroll_dice"]||1;
 			let iChallengeDices = values["challenge_dices"]||1;
@@ -491,11 +534,12 @@
 			let iChallengeDice3 = values["challenge_roll_3"]||0;
 			let iChallengeDice4 = values["challenge_roll_4"]||0;
 			let iChallengeDice5 = values["challenge_roll_5"]||0;
+			let iChallengeDifficulty = values["challenge_difficulty"]||15;
 			let sRoll = "";
 			let iCounter = 1;
 			let iRollSum = iChallengePool;
 
-			sRoll = "&{template:challenge} {{pool=@{challenge_pool}}} {{result=[[1d10]]}}"
+			sRoll = "&{template:challenge} {{difficulty=@{challenge_difficulty}}} {{pool=@{challenge_pool}}} {{result=[[1d10]]}} {{level=[[1d10]]}}"
 
 			while (iCounter <= iChallengeDices) {
 				if (iCounter == iChallengeRerollDice) {
@@ -509,6 +553,8 @@
 			console.log(sRoll);
 			startRoll(sRoll, (results) => {
 				let aAttributes = {};
+				let iLevel = 0;	
+				let sLevel = "";
 	
 				iCounter = iCounter - 1;
 				while (iCounter > 0)
@@ -519,15 +565,19 @@
 					} else {
 						iRollSum = iRollSum + eval("iChallengeDice" + iCounter);
 						aAttributes["challenge_roll_" + iCounter] = eval("iChallengeDice" + iCounter);
-					}
+					}					
 					
 					iCounter = iCounter - 1;
 				}
+				iLevel = iRollSum - iChallengeDifficulty;					
+				sLevel = calcChallengeLevel(iLevel);
+
 				setAttrs(aAttributes);
 				
 				finishRoll(
 					results.rollId, {
-						result: iRollSum
+						result: iRollSum,
+						level: sLevel
 					}
 				);
 			});
