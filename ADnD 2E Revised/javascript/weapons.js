@@ -2591,6 +2591,31 @@ weapons['sang kauw (two-handed) (two-handed spear)'] = {
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
+weapons['trident (one-handed) (ninja)'] = {
+    'name': 'Trident (One-handed) (ninja)',
+    'group': 'Spear',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d6+1',
+    'large': '3d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee', 'Range']
+};
+weapons['trident (two-handed) (ninja)'] = {
+    'name': 'Trident (Two-handed) (ninja)',
+    'group': 'Spear',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d8',
+    'large': '2d8',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
 weapons['shakujo yari (one-handed) (staff spear)'] = {
     'name': 'Shakujo yari (One-handed) (staff spear)',
     'strength': true,
