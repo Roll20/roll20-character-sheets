@@ -9,6 +9,7 @@
         <h2 style="color: black;">Changes in <input type="text" name="attr_version" class="sheet-version-large" readonly/></h2>
         <div class="sheet-announce-items">
             <ul style="font-style:italic">
+                <li>Added Dwarf specific Nonweapon Proficiencies from The Complete Book of Dwarves</li>
                 <li>Added Weapons and Proficiencies from The Complete Barbarian's Handbook</li>
                 <li>Added Spells and Proficiencies from The Complete Book of Necromancers</li>
                 <li>Added Sphere extensions from The Complete Druid's Handbook</li>
@@ -18229,9 +18230,32 @@
         </tr>
         <tr>
             <td>The Complete Ninja's Handbook</td>
-            <td>1995 March</td>
+            <td>1995 August</td>
             <td>Weapons, Spells, and Proficiencies</td>
             <td><label><input type='checkbox' name='attr_book-ninjas' title="@{book-ninjas}" value="The Complete Ninja's Handbook"/><span></span></label></td>
+        </tr>
+    </table>
+    <br>
+    <h4>Optional rules for spells</h4>
+    These optional rules can be activated independently of the content of the same book, selected above
+    <table class="sheet-default-header-first-row sheet-padding-right-column1 sheet-centering-padding-5-column3">
+        <tr>
+            <th>Book</th>
+            <th>Rules</th>
+            <th>Active</th>
+            <th>Reference</th>
+        </tr>
+        <tr>
+            <td>The Complete Druid's Handbook</td>
+            <td>Animal & Plant Sphere Expansions</td>
+            <td><label><input type='checkbox' name='attr_sphere-druids' title="@{sphere-druids}" value="Animal & Plant expansion"/><span></span></label></td>
+            <td>Page. 86</td>
+        </tr>
+        <tr>
+            <td>The Complete Book of Necromancers</td>
+            <td>Necromantic Sphere Expansion</td>
+            <td><label><input type='checkbox' name='attr_sphere-necromancers' title="@{sphere-necromancers}" value="Necromantic expansion"/><span></span></label></td>
+            <td>Page 77 + 126</td>
         </tr>
     </table>
     <br>
@@ -45904,11 +45928,14 @@ function migrateOtherValuables() {
         let total = 0;
         let valuablesString = '';
         gpFields.forEach(field => {
-            total += parseInt(values[field]) || 0;
-            newValue[field] = '';
+            if (values[field]) {
+                total += parseInt(values[field]) || 0;
+                newValue[field] = '';
+            }
         });
-        newValue['othervalue'] = total;
-        
+        if (total !== 0)
+            newValue['othervalue'] = total;
+
         valuablesFields.forEach(field => {
             let oldValue = values[field] || '';
             if (oldValue) {
@@ -45926,9 +45953,11 @@ function migrateOtherValuables() {
                 }
             }
         });
-        newValue['otherval'] = valuablesString;
-        
-        setAttrs(newValue);
+        if (valuablesString)
+            newValue['otherval'] = valuablesString;
+
+        if (!_.isEmpty(newValue))
+            setAttrs(newValue);
     });
 }
 //#endregion

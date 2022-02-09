@@ -180,11 +180,14 @@ function migrateOtherValuables() {
         let total = 0;
         let valuablesString = '';
         gpFields.forEach(field => {
-            total += parseInt(values[field]) || 0;
-            newValue[field] = '';
+            if (values[field]) {
+                total += parseInt(values[field]) || 0;
+                newValue[field] = '';
+            }
         });
-        newValue['othervalue'] = total;
-        
+        if (total !== 0)
+            newValue['othervalue'] = total;
+
         valuablesFields.forEach(field => {
             let oldValue = values[field] || '';
             if (oldValue) {
@@ -202,9 +205,11 @@ function migrateOtherValuables() {
                 }
             }
         });
-        newValue['otherval'] = valuablesString;
-        
-        setAttrs(newValue);
+        if (valuablesString)
+            newValue['otherval'] = valuablesString;
+
+        if (!_.isEmpty(newValue))
+            setAttrs(newValue);
     });
 }
 //#endregion
