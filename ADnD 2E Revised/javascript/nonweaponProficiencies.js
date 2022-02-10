@@ -876,9 +876,44 @@ nonweaponProficiencies['Navigation (Dwarf)'] = {
 };
 nonweaponProficiencies['Swimming (Dwarf)'] = {
     'slots': 1,
-    'abilityScore': '@{Stregnth}',
+    'abilityScore': '@{Strength}',
     'modifier': -1,
     'classes': 'Special Background',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Grade or Slope in Passage'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +4,
+    'classes': '(Optional) Dwarven Detection',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['New Tunnel/Passage Construction'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +4,
+    'classes': '(Optional) Dwarven Detection',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Sliding/Shifting Walls or Rooms'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +2,
+    'classes': '(Optional) Dwarven Detection',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Stonework Traps, Pits, and Deadfalls'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '(Optional) Dwarven Detection',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Approximate Depth Underground'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '(Optional) Dwarven Detection',
     'book': 'The Complete Book of Dwarves'
 };
 //#endregion
