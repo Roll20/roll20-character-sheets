@@ -7549,7 +7549,7 @@
 		const minor_obstacle_maneuvers_regex = /(bite|reducearmor|defendother)/i;
 		const major_obstacle_maneuvers_regex = /(bypassarmor|vitalspot)/i;
 		const weapon_customizations_array = ['accurate', 'area', 'duration', 'range', 'aura', 'autofire', 'blight', 'contact', 'contageous', 'continuing', 'drain', 'enervation', 'flare', 'flexible', 'homing', 'inaccurate', 'incapacitating', 'incurable', 'insidious', 'irritant', 'knockback', 'multidimensional', 'penetrating', 'piercing', 'psychic', 'quake', 'reach', 'selective', 'spreading', 'stun', 'tangle', 'trap', 'vampiric'];
-		const combattechniques_array = ['blackout', 'blindfighting', 'blindshooting', 'criticalstrike', 'enhancedknockback', 'extendedrange', 'farshot', 'lethalblow', 'multipletargets', 'perciseaim', 'rushattack', 'twoweapons'];
+		const combattechniques_array = ['blackout','blindfighting','blindshooting','brutal','concealment','criticalstrike','deadeye','defelction','enhancedknockback','extendedrange','farshot','hardboiled','judgeopponent','lethalblow','lightningreflexes','multipletargets','portablearmory','preciseaim','reflection','rushattack','steadyhand','tournamentencyclopedia','twoweapons','weaponsencyclopedia'];
 		const stats_array = ['static_stat_type_set', 'static_stat_temp_energy', 'static_stat_temp_health', 'stat_total_social', 'static_stat_total_shame', 'stat_total_sanity', 'static_stat_total_maddness', 'stat_total_energy', 'static_stat_total_fatigue', 'stat_total_health', 'static_stat_total_wounds', 'stat_total_shock', 'static_character_points_spent', 'bodystate', 'mindstate', 'soulstate', 'static_stat_base_body', 'static_stat_base_mind', 'static_stat_base_soul', 'stat_total_body', 'stat_total_mind', 'stat_total_soul', 'stat_total_acv', 'stat_total_dcv', 'stat_total_str', 'stat_total_cre', 'stat_total_com', 'stat_total_awa', 'stat_total_dex', 'stat_total_agi', 'stat_total_con', 'stat_total_int', 'stat_total_per', 'stat_total_rea', 'stat_total_wil', 'stat_total_cha', 'strstate', 'agistate', 'dexstate', 'constate', 'intstate', 'reastate', 'perstate', 'crestate', 'wilstate', 'chastate', 'awastate', 'comstate'];
 		const rolls_array = ['static_roll_type_selection','static_button_personal_defense','static_button_movement_defense'];
 		const combat_stats_array = ['static_weapon_autofire_selection','weapon_ammo_capacity','weapon_ammo_reloads','static_weapon_range_selection','mainhand_state', 'offhand_state', 'mainhand_source', 'offhand_source', 'extraarms', 'extraarms_inuse', 'attrdb', 'static_button_targeted_rushdamage', 'static_button_targeted_damage', 'static_button_targeted_attack', 'static_button_targeted_defense', 'massivedamage_targeted', 'massivedamage', 'enemyattack', 'enemydefense'];
@@ -10927,8 +10927,8 @@
 		function getRushAttack(debug, attrdb) {
 			let rank = 0;
 			_.each(attrdb.combattechnique, c => {
-				_.each(c.subattrs, s => {
-					if (s.name = 'rushattack') {
+				_.each(c.customizations, s => {
+					if (s.name == 'rushattack') {
 						rank = s.rank;
 						return;
 					}
@@ -10986,23 +10986,37 @@
 		}
 		
 		function getSubAttrs(debug, customizations, attribute) {
-			var result = [];
+			console.log(`[getSubAttrs(TEST)] customizations:`); console.log(customizations);
 			const subattrs =
-				(attribute == "combattechnique") ? [
+				attribute == "combattechnique" ? combattechniques_array
+				/*
+				[
 					'blackout', 'blindfighting', 'blindshooting', 'brutal', 'concealment',
 					'criticalstrike', 'deadeye', 'deflection', 'enhancedknockback', 'extendedrange',
 					'farshot', 'hardboiled', 'lethalblow', 'lightningreflexes', 'multipletargets',
 					'preciseaim', 'reflection', 'rushattack', 'steadyhand', 'twoweapons'
+				]
+				*/
+				:
+				attribute == "heightenedsenses" ? [
+					`heightenedsight`, `heightenedhearing`, `heightenedtouch`, `heightenedsmell`,
+					`heightenedtaste`
 				] :
-					(attribute == "heightenedsenses") ? [
-						`heightenedsight`, `heightenedhearing`, `heightenedtouch`, `heightenedsmell`,
-						`heightenedtaste`
-					] :
-						[];
+			[];
+			console.log(`[getSubAttrs(TEST)] subattrs:`); console.log(subattrs);
+			/*
 			_.each(subattrs, (subattr) => {
 				let lookup = getCustomizationExists(subattr, customizations) || { name: subattr, rank: 0 };
-				if (lookup.rank > 0) result[result.length] = { name: lookup.name, rank: lookup.rank };
+				console.log(`[getSubAttrs(${subattr})] lookup:`); console.log(lookup);
+				if (lookup.rank > 0) result[result.length] = lookup;
 			});
+			*/
+			const result = _.chain(subattrs)
+				.map(o => {
+					return getCustomizationExists(o, customizations) || null;
+				})
+				.compact()
+				.value();
 			if (debug) { console.log(`[getSubAttrs(${attribute})] result:`); console.log(result); }
 			return result;
 		}
@@ -11078,7 +11092,7 @@
 					result = { name: name, attribute: attribute, level: level, focus: stat, source: rowID };
 				break;
 				case `combattechnique`:
-					result = { name: name, attribute: attribute, subattrs: getSubAttrs(debug, customizations, attribute), source: rowID };
+					result = { name: name, attribute: attribute, customizations: customizations, source: rowID };// subattrs: getSubAttrs(debug, customizations, attribute), source: rowID };
 				break;
 				case `enemyattack`:
 				case `enemydefense`:
@@ -12645,7 +12659,7 @@
 			return result;
 		}
 		
-		function getSingleDescriptionTooltipText() {
+		function getSingleDescriptionTooltipText(debug, customization) {
 			const tooltipDescriptionObj = {
 				'blackout':'Opponent suffers minor obstacle to their Shock check vs Stun attacks.',
 				'blindfighting':'Can fight hand-to-hand in poor light or absolute darkness, or against an invisible opponent, just as effectively as under normal conditions.',
@@ -12656,19 +12670,25 @@
 				'deadeye':'Attacks made against fast-moving targets reduce their obstacles by one level (minor becomes none, major becomes minor).',
 				'defelction':'With a successful defense roll, the character can deflect a ranged attack away harmlessly instead of dodging or blocking.',
 				'enhancedknockback':'Add double Attack Combat Value, in meters, to the knockback distance of a successful hit.',
-				'extendedrange':'Can use ranged weapons at twice their normal range. (automatically factored in to ranged weapons, only affects weapon ranges greater than 10m)',
-				'farshot':'',
-				'hardboiled':'',
-				'judgeopponent':'',
-				'lethalblow':'',
-				'portablearmory':'',
-				'preciseaim':'',
-				'rushattack':'',
-				'steadyhand':'',
-				'tournamentencyclopedia':'',
-				'twoweapons':'',
-				'weaponsencyclopedia':''
-			}
+				'extendedrange':'Can use ranged weapons at twice their normal range.',
+				'farshot':'Ranged attacks penalized for distance are reduced by one category (minor obstacle becomes none, major obstacle becomes minor).',
+				'hardboiled':'Each rank assignment increases Shock Value by 10, up to one-half Health Points. (automatically factored in to Shock Value)',
+				'judgeopponent':'Ability to judge opponent’s approximate combat prowess and health status.',
+				'lethalblow':'Unarmed attacks to normal damage instead of stun. (automatically factored into unarmed attack damage)',
+				'lightningreflexes':'Provides minor or major edge to initiative rolls. (automatically factored into initiative rolls)',
+				'multipletargets':'Obstacles applied from attacking multiple targets are reduced by one category (minor obstacle becomes none, major obstacle becomes minor).',
+				'portablearmory':'Weapons and accessories are always available, requiring no special shortage, and can make simple field modifications in a single round.',
+				'preciseaim':'Obstacles applied from called shots or otherwise ‘trick maneuvers’ are reduced by one category (minor obstacle becomes none, major obstacle becomes minor).',
+				'rushattack':'In melee combat, ability to use momentum by rushing, leaping, or diving at an opponent.  DM is increased by 1 on successful attack.  Failed rush attack results in minor obstacle for all defense rolls until next initiative the following round. (activated manually under Armed Weapon)',
+				'steadyhand':'Obstacles applied to attack rolls while moving or performing complex stunts are reduced by one category (minor obstacle becomes none, major obstacle becomes minor).',
+				'reflection':'After a successful Deflection defense roll, a Reflection attack roll may be attempted toward any target within range.  Reflection attempts consume the next action.',
+				'tournamentencyclopedia':'Ability to recall statistics, strengths, and weaknesses of opponents participating in a tournament or conflict.',
+				'twoweapons':'Obstacles applied to attack rolls while dual wielding are reduced by one category (minor obstacle becomes none, major obstacle becomes minor).  Defending while dual wielding is treated as having 1 level of Extra Defense, defense rolls are made with a minor obstacle.',
+				'weaponsencyclopedia':'Ability to recall statistics, strength, and weaknesses of all known commercially available weapons.'
+			};
+			const result = tooltipDescriptionObj[customization] || '';
+			if(debug) console.log(`[getSingleDescriptionTooltipText()] result = ${result}`);
+			return result;
 		}
 		
 		function getResilientTooltopDescription(debug, customization, rank) {
@@ -12724,15 +12744,14 @@
 					resilient_customizations_array.indexOf(c.name) !== -1 && 
 					attrobj.attribute == 'resilient' ?
 						getResilientTooltopDescription(debug, c.name, rank) :
+					combattechniques_array.indexOf(c.name) !== -1 ?
+						getSingleDescriptionTooltipText(debug, c.name) :
 					standard_limiters_array.indexOf(c.name) !== -1 ?
 						getStandardLimiterTooltipDescription(debug, c.name, rank) :
 					rank :
 				'';
 				attrobj.attribute == 'resilient' ? 
 					customizationsObj[`${c.name}`] = `${getRankString(c.rank)}\n\n`:
-				controlenvironment_customizations_array.indexOf(c.name) !== -1 ||
-				undetectable_methods_array.indexOf(c.name) !== -1 ? 
-					getRankString(c.rank) :
 				customizationsObj[`${c.name}`] = `${capital(c.name)}: ${getRankString(c.rank)}\n\n`;
 			});
 			const prefix = attrobj.attribute == 'controlenvironment' ? 
@@ -13714,7 +13733,7 @@
 		
 					getAttrs(getAttrsString, (value) => {
 		
-						//console.log(`[Captured Attributes] value:`); console.log(value);
+						console.log(`[Captured Attributes] value:`); console.log(value);
 						
 						const debug = parseInt(value[`show_debug_messages`]) || 0;
 						var attrdb = JSON.parse(value.attrdb);
