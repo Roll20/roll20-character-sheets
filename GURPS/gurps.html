@@ -1,20 +1,4 @@
-﻿<script type="text/worker">
-	var styleCount = 9; // THIS NUMBER MUST BE EQUAL TO THE NUMBER OF COLOR SETTINGS
-	on("change:sheetstyle sheet:opened", function(event) {
-		var styleAttrs = {};
-
-		for(i = 0; i < styleCount; i++){
-			styleAttrs["styleset"+i]="off";
-		}
-		
-		getAttrs(["sheetstyle"] ,function(values) {
-			var on = values.sheetstyle;
-			styleAttrs["styleset"+on]="on";
-			setAttrs(styleAttrs);
-		});
-	});
-</script>
-<input type="checkbox" name="attr_styleset0" class="color-setting color-setting-0" ></input> <!-- Used to activate the color setting rule, add one to add a new style, mind the numbering-->
+﻿<input type="checkbox" name="attr_styleset0" class="color-setting color-setting-0" ></input> <!-- Used to activate the color setting rule, add one to add a new style, mind the numbering-->
 <input type="checkbox" name="attr_styleset1" class="color-setting color-setting-1" ></input>
 <input type="checkbox" name="attr_styleset2" class="color-setting color-setting-2" ></input>
 <input type="checkbox" name="attr_styleset3" class="color-setting color-setting-3" ></input>
@@ -4421,7 +4405,7 @@
 			<input type="hidden" name="attr_show_size_modifier_hit_point_message" value="0" />
 			<input type="hidden" name="attr_size_modifier_cp_hit_point_adjustment" value="0" />
 			<div class="message-box size-modifier-hit-point-message">
-				<span data-i18n="size-modifier-hit-point-warning-message"><b style="color: red;">Warning!</b> Due to your Size Modifier <span name="attr_size"></span> you only need to spend <span name="attr_size_modifier_cp_hit_point_adjustment"></span> character points for Extra Hit Points.</span>
+				<span data-i18n="size-modifier-hit-point-warning-message"><b style="color: red;">Warning!</b> Due to your Size Modifier <span name="attr_size"></span> you only need to spend <span name="attr_size_modifier_cp_hit_point_adjustment"></span> character points for Extra Hit Points <span name="attr_hit_points_max"></span>.</span>
 			</div>
 
 			<input type="hidden" name="attr_show_size_modifier_striking_st_message" value="0" />
@@ -5199,8 +5183,9 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_striking_st_bas
 									<span data-i18n="abbreviation-maximum-hit-points">Max HP</span>
 								</div>
 								<span class="tooltip">
+									<input type="hidden" name="attr_extra_hit_points_per_level" value="2" />
 									<span data-i18n="maximum-hit-poits-tooltip">
-Hit Points - Based on Strength - 2pts/level<br />
+Hit Points - Based on Strength - <span name="attr_extra_hit_points_per_level"></span> pts/level<br />
 Cost reduced by -10% per SM+1 (B15)
 									</span>
 								</span>
@@ -13658,7 +13643,6 @@ visualize what it will look like in chat.
 				</li>
 			</ul>
 
-
 			<h4>Version: 2.7.5</h4>
 
 			<p>Pull Request: 1/13/2022</p>
@@ -17446,6 +17430,21 @@ visualize what it will look like in chat.
 
 	const rawDefenseNotes = getRawNotes();
 
+	const styleCount = 9; // THIS NUMBER MUST BE EQUAL TO THE NUMBER OF COLOR SETTINGS
+	on("change:sheetstyle sheet:opened", function(event) {
+		var styleAttrs = {};
+
+		for(i = 0; i < styleCount; i++){
+			styleAttrs["styleset"+i]="off";
+		}
+		
+		getAttrs(["sheetstyle"] ,function(values) {
+			var on = values.sheetstyle;
+			styleAttrs["styleset"+on]="on";
+			setAttrs(styleAttrs);
+		});
+	});
+
 	/* Due to the change from auto-calc fields to helper scripts,
 	 * I'm running a "on open" to set various fields. At some point
 	 * in the future this might no longer be needed.
@@ -17931,7 +17930,7 @@ visualize what it will look like in chat.
 
 				showMessage = 1;
 
-				pointsNeededForHitPoints = Math.floor(pointsPerLevel * modByCharacterPoints);
+				pointsNeededForHitPoints = Math.ceil(pointsPerLevel * modByCharacterPoints);
 
 			}
 			
@@ -17947,7 +17946,8 @@ visualize what it will look like in chat.
 				hit_points_max: hitPoints,
 				major_wound_threshold: majorWound,
 				show_size_modifier_hit_point_message: showMessage,
-				size_modifier_cp_hit_point_adjustment: pointsNeededForHitPoints
+				size_modifier_cp_hit_point_adjustment: pointsNeededForHitPoints,
+				extra_hit_points_per_level: pointsPerLevel,
 			}, null, callback);
 		
 		});
