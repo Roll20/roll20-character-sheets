@@ -10923,7 +10923,7 @@
 			});
 			return result;
 		}
-		
+	/*
 		function getRushAttack(debug, attrdb) {
 			let rank = 0;
 			_.each(attrdb.combattechnique, c => {
@@ -10938,10 +10938,11 @@
 			if(debug) console.log(`[getRushAttack()] result = ${result}`);
 			return result;
 		}
-		
+	*/	
 		function setTargeted(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj) {
 			const isRushAttack = attribute == "combattechnique" ?
-				getRushAttack(debug, attrdb) : 0;
+				//getRushAttack(debug, attrdb) : 0;
+				getSumOfActiveSubAttrRanks(attrdb, 'combattechnique', 'rushattack') : 0;
 			if (attribute == "massivedamage" || attribute == "enemyattack" ||
 				attribute == "enemydefense" || isRushAttack) {
 				const targeted = isRushAttack ? isRushAttack :
@@ -10961,7 +10962,14 @@
 					console.log(`[setTargeted(${sourceAttr})] enable = ${enable}`);
 				}
 				setObj[`enable_${attribute}`] = enable;
-			} else { return; }
+			} else { 
+				if (attribute == "combattechnique") {
+					setObj.enable_rushattack = 0;
+					setObj.static_button_targeted_rushdamage = 0;
+				}
+				//return; 
+			}
+			setCombatRoll(debug, value, attrdb, rowID, sourceAttr, setObj);
 		}
 		
 		function setExtraActions(debug, attrdb, attribute, setObj) {
@@ -11024,10 +11032,14 @@
 		function getSumOfActiveSubAttrRanks(attrdb, attribute, subattr) {
 			var result = 0;
 			_.each(attrdb[`${attribute}`], (o) => {
-				_.find(o, (i) => {
-					if (i.name == subattr) result = result + i.rank;
+				_.find(o.customizations, (i) => {
+					if (i.name == subattr) {
+						result = result + i.rank;
+						return true;
+					}
 				});
 			});
+			console.log(`[getSumOfActiveSubAttrRanks(TEST)] result = ${result}`);
 			return result;
 		}
 		
@@ -11627,6 +11639,9 @@
 				case "combattechnique":
 					setAttrdb(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj); 
 					setTargeted(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
+					if (value.static_roll_type_selection == 'initiative') {
+						setDynamicRollValue(debug, false, value, attrdb, rowID, sourceAttr, setObj);
+					}
 					setActiveAttribute(isActive, debug, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "conversion":
@@ -12831,7 +12846,8 @@
 				parseInt(value.static_button_targeted_rushdamage) :
 				parseInt(setObj.static_button_targeted_rushdamage);
 			const rushattackLevel = 
-				getRushAttack(debug, attrdb);
+				//getRushAttack(debug, attrdb);
+				getSumOfActiveSubAttrRanks(attrdb, 'combattechnique', 'rushattack');
 			const rushattack = rushattackState ? rushattackLevel : 0;
 			const name = 
 				isWeapon ? weapon.name : 'Unarmed';
