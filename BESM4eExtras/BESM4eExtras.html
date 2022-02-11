@@ -11710,6 +11710,7 @@
 					setDerivedValue(debug, attrdb, value, setObj, 'social');
 				break;
 				case "specialmovement":
+					setAttrdb(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setActiveAttribute(isActive, debug, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "socialmastery":
@@ -12685,11 +12686,11 @@
 				'deadeye':'Attacks made against fast-moving targets reduce their obstacles by one level (minor becomes none, major becomes minor).',
 				'defelction':'With a successful defense roll, the character can deflect a ranged attack away harmlessly instead of dodging or blocking.',
 				'enhancedknockback':'Add double Attack Combat Value, in meters, to the knockback distance of a successful hit.',
-				'extendedrange':'Can use ranged weapons at twice their normal range.',
+				'extendedrange':'Can use ranged weapons at twice their normal range. (automatically factored in to ranged attacks)',
 				'farshot':'Ranged attacks penalized for distance are reduced by one category (minor obstacle becomes none, major obstacle becomes minor).',
 				'hardboiled':'Each rank assignment increases Shock Value by 10, up to one-half Health Points. (automatically factored in to Shock Value)',
 				'judgeopponent':'Ability to judge opponent’s approximate combat prowess and health status.',
-				'lethalblow':'Unarmed attacks to normal damage instead of stun. (automatically factored into unarmed attack damage)',
+				'lethalblow':'Unarmed attacks do normal damage instead of stun.',
 				'lightningreflexes':'Provides minor or major edge to initiative rolls. (automatically factored into initiative rolls)',
 				'multipletargets':'Obstacles applied from attacking multiple targets are reduced by one category (minor obstacle becomes none, major obstacle becomes minor).',
 				'portablearmory':'Weapons and accessories are always available, requiring no special shortage, and can make simple field modifications in a single round.',
@@ -12699,7 +12700,18 @@
 				'reflection':'After a successful Deflection defense roll, a Reflection attack roll may be attempted toward any target within range.  Reflection attempts consume the next action.',
 				'tournamentencyclopedia':'Ability to recall statistics, strengths, and weaknesses of opponents participating in a tournament or conflict.',
 				'twoweapons':'Obstacles applied to attack rolls while dual wielding are reduced by one category (minor obstacle becomes none, major obstacle becomes minor).  Defending while dual wielding is treated as having 1 level of Extra Defense, defense rolls are made with a minor obstacle.',
-				'weaponsencyclopedia':'Ability to recall statistics, strength, and weaknesses of all known commercially available weapons.'
+				'weaponsencyclopedia':'Ability to recall statistics, strength, and weaknesses of all known commercially available weapons.',
+				'balance':'Never loses balance, even when running on a narrow rope or beam.',
+				'catlike':'Only take half damage (round down) from most falls and always lands on feet.',
+				'fast':'Body (Agility) Stat is doubled for each rank when calculating running speed.',
+				'lightfooted':'Can skim over sand, snow, or ice at full speed.',
+				'slithering':'Can slither along the ground at normal walking/running speeds; able to move quickly while maintaining a very low profile.',
+				'swinging':'Can swing through forests and cities using vines, ropes, webbing, arms, etc.',
+				'untrackable':'Never leave footprints or tracks when walking or running.',
+				'wallbouncing':'Can move at regular walking speed without touching the ground by bounding back and forth between nearby vertical surfaces (walls).',
+				'wallcrawling':'Can cling to walls or ceilings as though they were on the ground or floor.',
+				'waterwalking':'Can walk or run over water as if on land.',
+				'zendirection':'Will always move in the right direction.'
 			};
 			const result = tooltipDescriptionObj[customization] || '';
 			if(debug) console.log(`[getSingleDescriptionTooltipText()] result = ${result}`);
@@ -12759,7 +12771,8 @@
 					resilient_customizations_array.indexOf(c.name) !== -1 && 
 					attrobj.attribute == 'resilient' ?
 						getResilientTooltopDescription(debug, c.name, rank) :
-					combattechniques_array.indexOf(c.name) !== -1 ?
+					combattechniques_array.indexOf(c.name) !== -1 ||
+					special_movements_array.indexOf(c.name) !== -1 ?
 						getSingleDescriptionTooltipText(debug, c.name) :
 					standard_limiters_array.indexOf(c.name) !== -1 ?
 						getStandardLimiterTooltipDescription(debug, c.name, rank) :
