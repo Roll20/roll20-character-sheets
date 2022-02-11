@@ -7,8 +7,8 @@ weapons['arquebus'] = {
     'size': 'M',
     'type': 'P',
     'speed': 15,
-    'small-medium': '1d10',
-    'large': '1d10',
+    'small-medium': '1d10!',
+    'large': '1d10!',
     'knockdown': 'd8',
     'book': 'PHB',
     'category': ['Range']
