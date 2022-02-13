@@ -4,6 +4,16 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.04.00 (Build 7)
+
+### Sheet fixes
+
+- fixed common bonus dice not tied to stance anymore
+
+### CSS fixes
+
+- fixed hover info word-wrapping
+
 ## 02.03.00 (Build 8)
 
 ### Features
