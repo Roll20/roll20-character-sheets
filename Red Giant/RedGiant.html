@@ -449,7 +449,21 @@
 				
 			</div>
 			
+			<div class="col" style="width: 100%; height: 7px;"></div>
 			
+			<!--Healing -->
+			<div class='sheet-healing'>
+				
+				<label class="sheet-left-label-1"  > HEALING </label>
+				
+				<button type='action' name='act_treatwound' class="sheet-healingbuttonshort" >Treat Wound</button>
+				
+				<span> </span>
+				
+				<button type='action' name='act_mealandrest' class="sheet-healingbutton" >Meal and Full Night's Rest</button>
+				
+				
+			</div>
 			
 			
 			
@@ -488,6 +502,25 @@
         </div>
         <div class="sheet-attribute-type">
             {{attribute1}} {{die1}} + {{attribute2}} {{die2}} + {{mod}}
+        </div>
+    </div>
+</rolltemplate>
+
+
+<rolltemplate class="sheet-rolltemplate-treatwounds">
+    <div class="sheet-treatwounds-container">
+        <div class="sheet-treatwounds-roll-header">
+            <br> {{charname}}
+        </div>
+		<div class="sheet-treatwounds-type">
+            Treat Wounds
+        </div>
+		<div class="sheet-treatwounds-hp-header">
+            HP Regained  &nbsp;
+			<span class="treatwounds-hp-result">
+				&nbsp; {{computed::hpresult}}<BR>
+				
+			</span>
         </div>
     </div>
 </rolltemplate>
@@ -582,6 +615,64 @@ on('sheet:opened change:attribute2name', () => {
 
 
 
+// Custom Roll Parsing - for healing, so that the attributes can increase automatically
+
+const parseClickTrigger = function(string){
+  let match = string.match(/clicked:(?:(repeating_[^_]+)_([^_]+)_)?(.+)/);
+  match.shift();
+  return match;
+};
+
+//Treat Wounds
+
+  const initiateRollTreatWounds = async function(event){
+  
+  let [section,rowID,button] = parseClickTrigger(event.triggerName);//Returns an array with values of ['repeating_section','rowID','button name']
+    let message = `&{template:treatwounds} {{charname=@{character_name}}} {{showroll=[[1]]}} {{hpresult=[[0[computed result]]]}} {{roll1=[[1d4]]}} `;
+    let roll = await startRoll(message);
+    const computeObj = {};
+  
+  let rollResults = [1].map((num)=>roll.results[`roll${num}`]);
+  console.log("Original rolls");
+  console.log(rollResults);
+  let result = rollResults.map(a => a.result);
+  console.log("Original rolls - easier format");
+  console.log(result);
+  
+  console.log("HP Increase rolled");
+  let hpresult = result[0];
+  console.log(hpresult);
+  computeObj.hpresult = result[0];
+  
+  // Get HP, and adjust it to lower of HP + hpresult, and HP max
+  getAttrs(["health","health_max"], function(values) {
+      let hpcurrent = parseInt(values.health)||0;
+	  let hpmax = parseInt(values.health_max)||0;
+	  console.log("HP Max");
+	  console.log(hpmax);
+	  let hpmaxhealing = hpcurrent + hpresult;
+	  console.log("HP Max Healing");
+	  console.log(hpmaxhealing);
+	  
+	  let lowerResults = [hpmaxhealing,hpmax];
+	  var hphealed = Math.min.apply(null, lowerResults); // get the min of the array
+	  console.log("Healing result");
+	  console.log(hphealed);
+	  
+        setAttrs({                            
+		    health: hphealed
+		});
+		
+	  
+	  finishRoll(roll.rollId,computeObj);
+	
+	
+  });
+  
+  
+};
+	
+on('clicked:treatwound',initiateRollTreatWounds);
 	
 	
 </script>
