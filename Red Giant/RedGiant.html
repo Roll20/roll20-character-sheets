@@ -518,13 +518,44 @@
 		<div class="sheet-treatwounds-hp-header">
             HP Regained  &nbsp;
 			<span class="treatwounds-hp-result">
-				&nbsp; {{computed::hpresult}}<BR>
+				&nbsp; &nbsp; &nbsp; &nbsp; {{computed::hpresult}}<BR>
 				
 			</span>
         </div>
     </div>
 </rolltemplate>
 
+<rolltemplate class="sheet-rolltemplate-mealandrest">
+    <div class="sheet-mealandrest-container">
+        <div class="sheet-mealandrest-roll-header">
+            <br> {{charname}}
+        </div>
+		<div class="sheet-mealandrest-type">
+            Meal and Full Night's Rest
+        </div>
+		<div class="sheet-mealandrest-hp-header">
+            HP Regained  &nbsp;
+			<span class="mealandrest-hp-result">
+				&nbsp; &nbsp; &nbsp; &nbsp; {{computed::hpresult}}<BR>
+				
+			</span>
+        </div>
+		<div class="sheet-mealandrest-spirit-header">
+            Spirit Regained  &nbsp;
+			<span class="mealandrest-spirit-result">
+				&nbsp; &nbsp; {{computed::spiritresult}}<BR>
+				
+			</span>
+        </div>
+		<div class="sheet-mealandrest-sanity-header">
+            Sanity Regained  &nbsp;
+			<span class="mealandrest-sanity-result">
+				&nbsp; {{computed::sanityresult}}<BR>
+				
+			</span>
+        </div>
+    </div>
+</rolltemplate>
 
 
 
@@ -642,7 +673,7 @@ const parseClickTrigger = function(string){
   console.log("HP Increase rolled");
   let hpresult = result[0];
   console.log(hpresult);
-  computeObj.hpresult = result[0];
+  computeObj.hpresult = hpresult;
   
   // Get HP, and adjust it to lower of HP + hpresult, and HP max
   getAttrs(["health","health_max"], function(values) {
@@ -673,6 +704,98 @@ const parseClickTrigger = function(string){
 };
 	
 on('clicked:treatwound',initiateRollTreatWounds);
+
+
+//Meal and Rest
+
+  const initiateRollMealAndRest = async function(event){
+  
+  let [section,rowID,button] = parseClickTrigger(event.triggerName);//Returns an array with values of ['repeating_section','rowID','button name']
+    let message = `&{template:mealandrest} {{charname=@{character_name}}} {{showroll=[[1]]}} {{hpresult=[[0[computed result]]]}} {{spiritresult=[[0[computed result]]]}} {{sanityresult=[[0[computed result]]]}} {{roll1=[[1d6]]}} {{roll2=[[1d6]]}} `;
+    let roll = await startRoll(message);
+    const computeObj = {};
+  
+  let rollResults = [1,2].map((num)=>roll.results[`roll${num}`]);
+  console.log("Original rolls");
+  console.log(rollResults);
+  let result = rollResults.map(a => a.result);
+  console.log("Original rolls - easier format");
+  console.log(result);
+  
+  console.log("HP Increase rolled");
+  let hpresult = result[0];
+  console.log(hpresult);
+  computeObj.hpresult = hpresult;
+  
+  console.log("Spirit Increase rolled");
+  let spiritresult = result[1];
+  console.log(spiritresult);
+  computeObj.spiritresult = spiritresult;
+  
+  console.log("Sanity Increase (default)");
+  let sanityresult = 1;
+  console.log(sanityresult);
+  computeObj.sanityresult = sanityresult;
+  
+  // Get HP, and adjust it to lower of HP + hpresult, and HP max
+  getAttrs(["health","health_max","spirit","spirit_max","sanity","sanity_max"], function(values) {
+      let hpcurrent = parseInt(values.health)||0;
+	  let hpmax = parseInt(values.health_max)||0;
+	  console.log("HP Max");
+	  console.log(hpmax);
+	  let hpmaxhealing = hpcurrent + hpresult;
+	  console.log("HP Max Healing");
+	  console.log(hpmaxhealing);
+	  
+	  let lowerResultsHP = [hpmaxhealing,hpmax];
+	  var hphealed = Math.min.apply(null, lowerResultsHP); // get the min of the array
+	  console.log("Healing result");
+	  console.log(hphealed);
+	  
+	  
+	  let spiritcurrent = parseInt(values.spirit)||0;
+	  let spiritmax = parseInt(values.spirit_max)||0;
+	  console.log("Spirit Max");
+	  console.log(spiritmax);
+	  let spiritmaxhealing = spiritcurrent + spiritresult;
+	  console.log("Spirit Max Healing");
+	  console.log(spiritmaxhealing);
+	  
+	  let lowerResultsSpirit = [spiritmaxhealing,spiritmax];
+	  var spirithealed = Math.min.apply(null, lowerResultsSpirit); // get the min of the array
+	  console.log("Spirit result");
+	  console.log(spirithealed);
+	  
+	  
+	  let sanitycurrent = parseInt(values.sanity)||0;
+	  let sanitymax = parseInt(values.sanity_max)||0;
+	  console.log("Sanity Max");
+	  console.log(sanitymax);
+	  let sanitymaxhealing = sanitycurrent + sanityresult;
+	  console.log("Sanity Max Healing");
+	  console.log(sanitymaxhealing);
+	  
+	  let lowerResultsSanity = [sanitymaxhealing,sanitymax];
+	  var sanityhealed = Math.min.apply(null, lowerResultsSanity); // get the min of the array
+	  console.log("Sanity result");
+	  console.log(sanityhealed);
+	  
+        setAttrs({                            
+		    health: hphealed,
+			spirit: spirithealed,
+			sanity: sanityhealed
+		});
+		
+	  
+	  finishRoll(roll.rollId,computeObj);
+	
+	
+  });
+  
+  
+};
+	
+on('clicked:mealandrest',initiateRollMealAndRest);
 	
 	
 </script>
