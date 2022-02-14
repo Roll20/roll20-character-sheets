@@ -329,9 +329,9 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
   const goliath = +attrs.barbarianGoliath;
   const goliathMAL = +attrs.MALBarbarianGoliath;
 
-  const corpMetal = attrs.sorcererMMCorpMetal;
+  const corpMetal = +attrs.sorcererMMCorpMetal;
   const CM150PG = attrs.sorcerer150PG;
-  const CM250PG = attrs.sorcererMM250PG;
+  const CM250PG = +attrs.sorcererMM250PG;
 
   const warmasterForce = attrs.warmasterImpForce;
   const warmasterForcePers = +attrs.warmasterImpFPersonnel;
@@ -340,6 +340,8 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
   const warmasterForcePersMAL = +attrs.MALWarmasterImpFPersonnel;
 
   let total = max + modif;
+
+  log(corpMetal);
 
   switch (armure) {
     case 'barbarian':
@@ -350,7 +352,7 @@ on('change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:
       if (corpMetal !== 0 || CM250PG !== 0) {
         total += 2;
 
-        if (CM150PG !== 0) total += 2;
+        if (CM150PG !== '0') total += 2;
       }
       break;
 
@@ -1066,7 +1068,7 @@ on('change:monk150PG change:monk250PG sheet:opened', async () => {
 on('change:priest200PG', async () => {
   const attrs = await getAttrsAsync(['priest200PG']);
 
-  const PG200 = +attrs.priest200PG;
+  const PG200 = attrs.priest200PG;
 
   let contactDice = 3;
   let distanceDice = 2;
@@ -1122,7 +1124,7 @@ on('change:wizard150PG sheet:opened', async () => {
 on('change:wizard250PG sheet:opened', async () => {
   const attrs = await getAttrsAsync(['wizard250PG']);
 
-  const PG250 = +attrs.wizard250PG;
+  const PG250 = attrs.wizard250PG;
 
   let portee = i18n_porteeCourte;
 
@@ -3292,6 +3294,8 @@ on('clicked:importKNPCG', () => {
 
         let raw = result.raw - lAspects.bête.mineur - lAspects.bête.majeur;
 
+        if (lAspects.bête.majeur > 0) { raw -= bete.score; }
+
         if (raw < 0) { raw = 0; }
 
         newrowattrsW[`${path + newrowidW}_ArmeCaC`] = result.name;
@@ -3461,7 +3465,7 @@ on('clicked:importKNPCG', () => {
             newrowattrsW[`${path + newrowidW}_penetrantValue`] = Number(value2);
             break;
 
-          case 'perce Armure':
+          case 'perce armure':
             newrowattrsW[`${path + newrowidW}_perceArmure`] = '{{perceArmure=^{perce-armure} @{perceArmureValue}}}';
             newrowattrsW[`${path + newrowidW}_perceArmureValue`] = Number(value2);
             break;
@@ -3608,7 +3612,7 @@ on('sheet:opened', async () => {
   await setAttrsAsync({
     bardEffetAttSpe: bard.join(' / '),
     berserkIlluminationBlazePortee: getTranslationByKey('portee-contact'),
-    berserkIlluminationBeaconPortee: getTranslationByKey('portee-contact'),
+    berserkIlluminationBeaconPortee: getTranslationByKey('portee-courte'),
     berserkIlluminationProjectorPortee: getTranslationByKey('portee-courte'),
     berserkIlluminationLighthousePortee: getTranslationByKey('portee-courte'),
     berserkIlluminationLanternPortee: getTranslationByKey('portee-courte'),

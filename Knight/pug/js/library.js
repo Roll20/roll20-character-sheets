@@ -1278,6 +1278,8 @@ const listStyle = [
     `atkAmbidextre`,
     `atkDefensif`,
     `atkPilonnage`,
+    `stylePuissantType`,
+    `stylePuissantBonus`,
     `styleSuppressionD`,
     `styleSuppressionV`,
 ];

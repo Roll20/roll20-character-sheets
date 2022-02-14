@@ -809,7 +809,7 @@ rollCombatContact.forEach((button) => {
         ASObliteration = ASObliteration.concat(attaquesSurprises);
         ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
 
-        exec.push(`{{obliterationAS=${ASTenebricide.join('\n+')}}}`);
+        exec.push(`{{obliterationAS=${attaquesSurprises.join('\n+')}}}`);
         exec.push(`{{obliterationASValue=${_.reduce(ASValueObliteration, (n1, n2) => n1 + n2, 0)}}}`);
       }
 

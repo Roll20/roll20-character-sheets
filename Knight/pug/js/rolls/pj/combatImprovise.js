@@ -137,6 +137,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     listAttrs = listAttrs.concat(listBase);
     listAttrs = listAttrs.concat(listArmure);
     listAttrs = listAttrs.concat(listArmureLegende);
+    listAttrs = listAttrs.concat(listStyle);
 
     const attrs = await getAttrsAsync(listAttrs);
 
@@ -265,7 +266,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     // GESTION DU STYLE
     let getStyle;
 
-    if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
+    if (type.includes('&{template:combat} {{portee=^{portee-contact}}}')) {
       getStyle = getStyleContactMod(attrs, [], baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false);
     } else {
       getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, hasArmure, oTir, false, false, false, false);
