@@ -4,6 +4,23 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.04.00 (Build 7)
+
+### New Features
+
+- adversary sheet and rolls include weary modifier
+- new roll-template to denote non-roll messages. Format &{template:msg} {{header=Generic Header}} {{sub1=Subheadline1}} {{sub2=Subheadline2}} {{msg=This is a test}}
+
+### Sheet fixes
+
+- fixed common bonus dice pick up stance bonus
+- fixed targeted adversary attack rolls don't pickup target's stance in bonus dice query
+- set default favourill to "normal" for new characters and adversaries
+
+### CSS fixes
+
+- fixed hover info word-wrapping
+
 ## 02.03.00 (Build 8)
 
 ### Features
