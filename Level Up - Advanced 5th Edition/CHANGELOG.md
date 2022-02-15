@@ -1,5 +1,12 @@
 Change Log
 ==============================================
+**2022-02-15 ** v.9 Paul V
+	---Split the Archtypes so only the selected class's archtypes will appear in the list -- can't get this working at the moment
+	Added Marshal into the Class list, removed the no longer used Warlord
+	Added a check box to each spell list allowing spell notes to be added to each spell
+	Added Notes Tab to Character sheet
+	Added a check box to equipment allowing notes to be added to each equipment item
+	Added a check box to maneuver allowing notes to be added to each maneuver item
 **2021-12-16 ** v.8 Paul V
 	Increased size of HitDice and Speed on the NPC Sheet
 	Increased size of the Challenge rating section
