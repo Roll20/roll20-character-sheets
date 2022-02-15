@@ -2111,42 +2111,18 @@ weapons['hankyu (sheaf arrow)'] = {
     'small-medium': '1d8',
     'large': '1d6',
 };
-weapons['pellet bow (armor piercer arrow)'] = {
-    'name': 'Pellet bow (Armor piercer arrow)',
+weapons['pellet bow (pellet)'] = {
+    'name': 'Pellet bow (Pellet)',
     'rof': '1',
     'range': '60/120/180',
     'size': 'M',
     'type': 'P',
     'speed': 7,
-    'small-medium': '1d4+1',
+    'small-medium': '1d4',
     'large': '1d4',
+    'knockdown': 'd4',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Range']
-};
-weapons['pellet bow (flight arrow)'] = {
-    ...weapons['pellet bow (armor piercer arrow)'],
-    'name': 'Pellet bow (Flight arrow)',
-    'small-medium': '1d6',
-    'large': '1d6',
-};
-weapons['pellet bow (frog crotch arrow)'] = {
-    ...weapons['pellet bow (armor piercer arrow)'],
-    'name': 'Pellet bow (Frog crotch arrow)',
-    'type': 'S',
-    'small-medium': '1d6',
-    'large': '1d3',
-};
-weapons['pellet bow (humming bulb arrow)'] = {
-    ...weapons['pellet bow (armor piercer arrow)'],
-    'name': 'Pellet bow (Humming bulb arrow)',
-    'small-medium': '1d2',
-    'large': '1d2',
-};
-weapons['pellet bow (sheaf arrow)'] = {
-    ...weapons['pellet bow (armor piercer arrow)'],
-    'name': 'Pellet bow (Sheaf arrow)',
-    'small-medium': '1d8',
-    'large': '1d6',
 };
 weapons['chopsticks'] = {
     'name': 'Chopsticks',
@@ -2200,6 +2176,7 @@ weapons['gunsen (war fan)'] = {
     'speed': 5,
     'small-medium': '1d3',
     'large': '1d2',
+    'knockdown': 'd4',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2220,6 +2197,7 @@ weapons['jitter'] = {
     'speed': 3,
     'small-medium': '1d4',
     'large': '1d2',
+    'knockdown': 'd6',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2250,6 +2228,7 @@ weapons['kau sin ke (whipping chain)'] = {
     'speed': 7,
     'small-medium': '1d8',
     'large': '1d6',
+    'knockdown': 'd8',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2263,6 +2242,7 @@ weapons['kawanaga (grapnel)'] = {
     'speed': 6,
     'small-medium': '1d3',
     'large': '1d2',
+    'knockdown': 'd6',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee', 'Range']
 };
@@ -2286,6 +2266,7 @@ weapons['kusari-gama (chain-sickle)'] = {
     'speed': 6,
     'small-medium': '1d6',
     'large': '1d4',
+    'knockdown': 'd6',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee', 'Range']
 };
@@ -2362,16 +2343,6 @@ weapons['nekode (climbing claws)'] = {
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
-weapons['nunchaku (threshing flail)'] = {
-    'name': 'Nunchaku (threshing flail)',
-    'size': 'M',
-    'type': 'B',
-    'speed': 3,
-    'small-medium': '1d6',
-    'large': '1d6',
-    'book': 'The Complete Ninja\'s Handbook',
-    'category': ['Melee']
-};
 weapons['kumade (rake)'] = {
     'name': 'Kumade (rake)',
     'group': 'Polearm',
@@ -2391,17 +2362,7 @@ weapons['lajatang'] = {
     'speed': 7,
     'small-medium': '1d10',
     'large': '1d10',
-    'book': 'The Complete Ninja\'s Handbook',
-    'category': ['Melee']
-};
-weapons['kumade (rake)'] = {
-    'name': 'Kumade (rake)',
-    'group': 'Polearm',
-    'size': 'L',
-    'type': 'B/P',
-    'speed': 7,
-    'small-medium': '1d4',
-    'large': '1d3',
+    'knockdown': 'd8',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2411,8 +2372,9 @@ weapons['nagimaki (horseman\'s halberd)'] = {
     'size': 'L',
     'type': 'S/P',
     'speed': 6,
-    'small-medium': '1d8',
-    'large': '1d10',
+    'small-medium': '1d6',
+    'large': '1d8',
+    'knockdown': 'd6',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2422,8 +2384,9 @@ weapons['naginata (halberd)'] = {
     'size': 'L',
     'type': 'S/P',
     'speed': 8,
-    'small-medium': '1d4',
-    'large': '1d3',
+    'small-medium': '1d8',
+    'large': '1d10',
+    'knockdown': 'd8',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2434,6 +2397,7 @@ weapons['sai (short trident)'] = {
     'speed': 3,
     'small-medium': '1d4',
     'large': '1d2',
+    'knockdown': 'd6',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2473,6 +2437,7 @@ weapons['shuriken, small star (throwing star)'] = {
     'speed': 2,
     'small-medium': '1d4',
     'large': '1d4',
+    'knockdown': 'd4',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Range']
 };
@@ -2496,6 +2461,7 @@ weapons['sling (bullet) (ninja)'] = {
     'speed': 6,
     'small-medium': '1d4',
     'large': '1d6+1',
+    'knockdown': 'd4',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Range']
 };
@@ -2509,6 +2475,7 @@ weapons['sling (stone) (ninja)'] = {
     'speed': 6,
     'small-medium': '1d4',
     'large': '1d4',
+    'knockdown': 'd4',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Range']
 };
@@ -2535,6 +2502,7 @@ weapons['staff sling (stone) (ninja)'] = {
     'speed': 11,
     'small-medium': '1d8',
     'large': '2d4',
+    'knockdown': 'd6',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Range']
 };
@@ -2602,6 +2570,7 @@ weapons['trident (one-handed) (ninja)'] = {
     'speed': 7,
     'small-medium': '1d6+1',
     'large': '3d4',
+    'knockdown': 'd6',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee', 'Range']
 };
@@ -2613,6 +2582,7 @@ weapons['trident (two-handed) (ninja)'] = {
     'speed': 7,
     'small-medium': '1d8',
     'large': '2d8',
+    'knockdown': 'd8',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2689,6 +2659,7 @@ weapons['ninja-to (ninja sword)'] = {
     'speed': 4,
     'small-medium': '1d8',
     'large': '1d6',
+    'knockdown': 'd6',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2699,6 +2670,7 @@ weapons['no-daichi (two-handed sword)'] = {
     'speed': 10,
     'small-medium': '1d10',
     'large': '3d6',
+    'knockdown': 'd10',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2730,6 +2702,7 @@ weapons['wakizashi (samurai short sword)'] = {
     'speed': 3,
     'small-medium': '1d8',
     'large': '1d8',
+    'knockdown': 'd6',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
@@ -2766,6 +2739,7 @@ weapons['three-section staff'] = {
     'speed': 6,
     'small-medium': '1d6',
     'large': '1d4',
+    'knockdown': 'd8',
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee']
 };
