@@ -7597,6 +7597,7 @@
 		const unaffected_states_array = ['alternateformstate', 'alternateidentitystate', 'changestatestate', 'dataaccessstate', 'dimensionwalkstate', 'dynamicpowersstate', 'exorcismstate', 'featuresstate', 'forcefieldstate', 'illusionstate', 'metamorphosisstate', 'mindcontrolstate', 'nullifystate', 'plantcontrolstate', 'portalstate', 'projectionstate', 'sensoryblockstate', 'sizechangestate', 'telekinesisstate', 'telepathystate', 'teleportstate', 'transmutestate', 'undetectablestate', 'weaponstate'];
 		const non_actionable_events = ['costperlevel','visible','new','source','characteristic','rollable','attrdefecttoggle','damagetype'];
 		const standard_limiters_array = ['activation','assisted','backlash','charges','concentration','consumable','delay','dependant','deplete','detectable','emotional','environmental','equipment','imbue','irreversible','localized','maximum','object','permanent','recovery','semipermanent','unique','unpredictable'];
+		const attribute_settings_by_customization_array = ['ammo','attrsrc','broadcategory','charges','continuing','deplete','drain','enemy','focuseddamage','intensity','objects','specialized','specific','targeted','targeteddamage','uniquephenomena','unpredictable'];
 		
 		const upgrade_to_1_5_0_array = ["upgraded_1_5_0"];
 		const upgrade_to_1_3_1_array = ["upgraded_1_3_1", "attrdb"];
@@ -7835,6 +7836,7 @@
 				'attrsrc',
 				'augmentedstat',
 				'bonus',
+				'broadcategory',
 				'capacity',
 				'capacitystate',
 				'capacitytype',
@@ -7842,6 +7844,7 @@
 				'charges',
 				'collectiontype',
 				'conditions',
+				'continuing',
 				'continuingtype',
 				'conversiontype',
 				'costperlevel',
@@ -7850,7 +7853,9 @@
 				'defect',
 				'defectaspect',
 				'defenseclass',
+				'deplete',
 				'display',
+				'drain',
 				'draintype',
 				'effect',
 				'effectivelevel',
@@ -7859,8 +7864,10 @@
 				'enhancementassignments',
 				'extraarms',
 				'fluxenable',
+				'focuseddamage',
 				'group',
 				'immunityrole',
+				'intensity',
 				'isflux',
 				'level',
 				'limiterassignments',
@@ -7868,6 +7875,7 @@
 				'name',
 				'new',
 				'object',
+				'objects',
 				'options',
 				'rank',
 				'rollable',
@@ -7876,12 +7884,17 @@
 				'skill',
 				'skillgroup',
 				'source',
+				'specialized',
+				'specific',
 				'stat',
 				'supersense',
+				'targeted',
+				'targeteddamage',
 				'totalcost',
-				'uniquephenomena',
-				'visible',
 				'unaffectedattributes',
+				'uniquephenomena',
+				'unpredictable',
+				'visible',
 				'weaponclass'
 			];
 			_.each(attrIDs, id => {
@@ -10949,7 +10962,7 @@
 			});
 			return result;
 		}
-	/*
+		/*
 		function getRushAttack(debug, attrdb) {
 			let rank = 0;
 			_.each(attrdb.combattechnique, c => {
@@ -10964,7 +10977,7 @@
 			if(debug) console.log(`[getRushAttack()] result = ${result}`);
 			return result;
 		}
-	*/	
+		*/	
 		function setTargeted(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj) {
 			const isRushAttack = attribute == "combattechnique" ?
 				//getRushAttack(debug, attrdb) : 0;
@@ -11112,12 +11125,44 @@
 			}
 		}
 		
+		function getAttributeSettingByCustomization(debug, value, rowID, customizations) {
+			const attribute_settings_by_customization_obj = {
+				'ammo':'ammo',
+				'attrsrc':'attrsrc',
+				'broadcategory':'broadcategory',
+				'charges':'charges',
+				'continuing':'continuing',
+				'deplete':'endurance',
+				'drain':'drain',
+				'enemy':'enemy',
+				'focuseddamage':'weaponclass',
+				'intensity':'intensity',
+				'objects':'object',
+				'specialized':'damagetype',
+				'specific':'damagecategory',
+				'targeted':'enemy`',
+				'targeteddamage':'enemy',
+				'uniquephenomena':'uniquephenomena',
+				'unpredictable':'variablestat'
+			};
+			_.each(customizations, c => {
+				if (attribute_settings_by_customization_array.indexOf(c.name) !== -1) {
+					const setting = value[`repeating_attr_${rowID}_${attribute_settings_by_customization_obj[c.name]}`];
+					c[c.name] = setting;			
+				}
+			});
+			if(debug) {
+				console.log(`[getAttributeSettingByCustomization()] customizations:`); console.log(customizations);
+			}
+		}
+		
 		function setAttrdb(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj) {
 			const name = value[`repeating_attr_${rowID}_name`] || "";
 			const level = parseInt(value[`repeating_attr_${rowID}_effectivelevel`]) || 0;
 			const length = attrdb[`${attribute}`] === undefined ? 
 				0 : attrdb[`${attribute}`].length;
 			const customizations = value[`repeating_attr_${rowID}_customizations`] || [];
+			getAttributeSettingByCustomization(debug, value, rowID, customizations);
 			let result = {};
 			let stat = 0;
 			let focused = 0;
@@ -11127,14 +11172,14 @@
 			switch (attribute) {
 				case 'augmented':
 					stat = value[`repeating_attr_${rowID}_augmentedstat`] || "";
-					result = { name: name, attribute: attribute, level: level, focus: stat, source: rowID };
+					result = { name: name, attribute: attribute, level: level, focus: stat, source: rowID, customizations: customizations };
 				break;
 				case `combattechnique`:
-					result = { name: name, attribute: attribute, customizations: customizations, source: rowID };// subattrs: getSubAttrs(debug, customizations, attribute), source: rowID };
+					result = { name: name, attribute: attribute, source: rowID, customizations: customizations };// subattrs: getSubAttrs(debug, customizations, attribute), source: rowID };
 				break;
 				case `enemyattack`:
 				case `enemydefense`:
-					result = { name: name, attribute: attribute, level: level, targeted: 1, source: rowID };
+					result = { name: name, attribute: attribute, level: level, targeted: 1, source: rowID, customizations: customizations };
 				break;
 				case `attackmastery`:
 				case `defensemastery`:
@@ -11145,22 +11190,22 @@
 				case `superstrength`:
 				case `tough`:
 				case `unassailable`:
-					result = { name: name, attribute: attribute, level: level, source: rowID };
+					result = { name: name, attribute: attribute, level: level, source: rowID, customizations: customizations };
 				break;
 				case `meleeattack`:
 				case `rangedattack`:
 				case `meleedefense`:
 					focused = value[`repeating_attr_${rowID}_weaponclass`] || "";
-					result = { name: name, attribute: attribute, level: level, focus: focused, source: rowID };
+					result = { name: name, attribute: attribute, level: level, focus: focused, source: rowID, customizations: customizations };
 				break;
 				case `rangeddefense`:
 					defense = value[`repeating_attr_${rowID}_defenseclass`] || "";
-					result = { name: name, attribute: attribute, level: level, focus: defense, source: rowID };
+					result = { name: name, attribute: attribute, level: level, focus: defense, source: rowID, customizations: customizations };
 				break;
 				case `massivedamage`:
 					targeted = getCustomizationValue(debug, value, rowID, 'rank', "targeteddamage") || 0;
 					focused = value[`repeating_attr_${rowID}_weaponclass`] || "";
-					result = { name: name, attribute: attribute, level: level, targeted: targeted, focus: focused, source: rowID };
+					result = { name: name, attribute: attribute, level: level, targeted: targeted, focus: focused, source: rowID, customizations: customizations };
 				break;
 				case `heightenedsenses`:
 					result = {
@@ -11188,7 +11233,8 @@
 								rank: getCustomizationValue(debug, value, rowID, 'rank', 'heightenedtaste')
 							}
 						],
-						source: rowID
+						source: rowID, 
+						customizations: customizations
 					};
 				break;
 				case `shield`:
@@ -12801,6 +12847,15 @@
 			return result;
 		}
 		
+		function getAttributeSettingTooltipDescription(debug, attrobj, name) {
+			const customization = _.find(attrobj.customizations, c => {
+				if (c.name === name) return true;
+			});
+			const result = customization[name];
+			if(debug) console.log(`[getAttributeSettingTooltipDescription()] result = ${result}`);
+			return result;
+		}
+		
 		function getCustomizationsTooltipString(debug, attrobj, attrdb) {
 			const base_values_obj = {
 				'area':'Area: individual\n\n',
@@ -12845,6 +12900,8 @@
 					standard_limiters_array.indexOf(c.name) !== -1 ||
 					multivalue_customizations_array.indexOf(c.name) !== -1 ?
 						getMultivalueCustomizationTooltipDescription(debug, c.name, rank) :
+					attribute_settings_by_customization_array.indexOf(c.name) !== -1 ?
+						getAttributeSettingTooltipDescription(debug, attrobj, c.name) :
 					rank :
 				'';
 				attrobj.attribute == 'controlenvironment' || 
