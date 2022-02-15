@@ -10,9 +10,16 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.10.1 [Screenshot](coc_v2.png)
+v3.11.0 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.11.0 (2022-01-16)
+
+Nouvelles fonctionnalités
+
+- Possibilité de sélectionner le mod de test (mod carac + buff/debuff) dans les bonus aux DM des attaques
+- Possibilité d'afficher le token du personnage dans les jets de dés de la fiche
 
 ## v3.10.1 (2021-12-18)
 

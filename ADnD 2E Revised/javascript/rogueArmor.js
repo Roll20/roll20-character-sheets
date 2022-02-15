@@ -18,6 +18,15 @@ rogueArmor['Elven Chain Mail'] = {
     'Detect Noise'     : '-5',
     'Climb Walls'      : '-20',
 };
+rogueArmor['Silenced Elven Chain Mail'] = {
+    'Pick Pockets'     : '-25',
+    'Open Locks'       : '-5',
+    'Find/Remove Traps': '-5',
+    'Move Silently'    : '',
+    'Hide in Shadows'  : '-10',
+    'Detect Noise'     : '',
+    'Climb Walls'      : '-25',
+};
 // Bard Armor
 rogueArmor['Ring Mail'] = rogueArmor['Chain Mail'] = {
     'Pick Pockets'     : '-25',
