@@ -735,7 +735,7 @@ function parseSpheres(spheresStrings, regex) {
     return spheres;
 }
 
-const getSpellSpheres = function (spellName, spell, sphereRules) {
+const getSpellSpheres = function (spell, sphereRules) {
     let sphere = spell['sphere'];
     sphereRules.forEach(rule => sphere += spell[rule] || '');
     return sphere;
@@ -745,7 +745,7 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
     if (!activeBooks.includes(spell['book']))
         return false;
 
-    let spheres = getSpellSpheres(spellName, spell, optionalSpheres);
+    let spheres = getSpellSpheres(spell, optionalSpheres);
 
     let primarySpellSpheres = spheres.match(noElementalRegex) || [];
     let isAvailable = primarySpellSpheres.some(sphere => availableSpheres.has(sphere));
@@ -794,8 +794,6 @@ function setupAddPriestSpell(postfix) {
 
                 let activeBooks = getActiveSettings(BOOK_FIELDS, attrSet);
                 let optionalSpheres = getActiveSettings(SPHERE_FIELDS, attrSet);
-                console.log(activeBooks);
-                console.log(optionalSpheres);
 
                 let spellsToAdd = [];
                 for (const [spellName, spell] of Object.entries(priestSpells[postfix])) {
@@ -918,7 +916,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
 //#endregion
 
 //#region Wizard and Priest spells and Powers setup
-function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
+function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFields) {
     if (!spellsTable[section])
         return;
 
@@ -927,7 +925,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
         if (!spell)
             return;
 
-        getAttrs(BOOK_FIELDS, function(books) {
+        getAttrs([...BOOK_FIELDS, ...optionalRulesFields], function(books) {
             if (bookInactiveShowToast(books, spell))
                 return;
 
@@ -948,7 +946,8 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
             if (section.startsWith('pri')) {
-                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+                let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
+                spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
             }
 
             setAttrs(spellInfo);
@@ -1005,10 +1004,10 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel, []);
     }
 });
-setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel);
+setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel, []);
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
@@ -1021,12 +1020,10 @@ priestSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel);
-        if (lastSection !== 'priq')
-            setupAddPriestSpell(lastSection);
+        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel, SPHERE_FIELDS);
     }
 });
-setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel);
+setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel, SPHERE_FIELDS);
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //

@@ -15,6 +15,11 @@
                 <li>Added Weapons, Spells, and Proficiencies from The Complete Ninja's Handbook</li>
                 <li>Added Sphere extensions from The Complete Druid's Handbook</li>
                 <li>Added Sphere extensions from The Complete Book of Necromancers</li>
+                <li>Added introductory text for Wizards and Priest, on how to create Scrolls, Potions, and other Magical items
+                    <ul>
+                        <li>The amount of information is intentionally kept sparse as the in depth details are for the DM only.</li>
+                    </ul>
+                </li>
                 <li>Added fields to keep track of Psionic Primary and Secondary Disciplines</li>
                 <li>Added help text for Psionic Disciplines</li>
                 <li>Added fields to track temporary attack, damage, and speed buffs</li>
@@ -1658,8 +1663,8 @@
                             <th title="Weapon name">Weapon</th>
                             <th class="sheet-centering-padding-2" title="Specialist: +2">Spec</th>
                             <th title="Damage adjustment">Damage<br>Adj.</th>
-                            <th colspan="3" title="Damage Small/Medium">Dam SM</th>
-                            <th colspan="3" title="Damage Large">Dam L</th>
+                            <th colspan="3" title="Damage Small/Medium">Damage S/M</th>
+                            <th colspan="3" title="Damage Large">Damage L</th>
                         </tr>
                         <tr class="sheet-centering sheet-collapse">
                             <td><label><input type='checkbox' title="@{strbonus1}" value='1' checked/><span></span></label></td>
@@ -1682,8 +1687,8 @@
                             <th>Weapon</th>
                             <th class="sheet-centering-padding-2">Spec</th>
                             <th>Damage<br>Adj.</th>
-                            <th colspan="3">Dam SM</th>
-                            <th colspan="3">Dam L</th>
+                            <th colspan="3">Damage S/M</th>
+                            <th colspan="3">Damage L</th>
                         </tr>
                         <tr class="sheet-centering">
                             <td><label><input type='checkbox' name='attr_strbonus1' title="@{repeating_weapons-damage_$X_strbonus1}" value='1' checked/><span></span></label></td>
@@ -1832,8 +1837,8 @@
                             <th class="sheet-centering-padding-2" title="Strength damage adjustment">Str</th>
                             <th title="Ammunition name">Ammo</th>
                             <th title="Damage adjustment">Damage<br>Adj.</th>
-                            <th colspan="3" title="Damage Small/Medium">Dam SM</th>
-                            <th colspan="3" title="Damage Large">Dam L</th>
+                            <th colspan="3" title="Damage Small/Medium">Damage S/M</th>
+                            <th colspan="3" title="Damage Large">Damage L</th>
                             <th title="Amount of ammunition">Amount</th>
                         </tr>
                         <tr class="sheet-centering sheet-collapse">
@@ -1856,8 +1861,8 @@
                             <th class="sheet-centering-padding-2">Str</th>
                             <th>Ammo</th>
                             <th>Damage<br>Adj.</th>
-                            <th colspan="3">Dam SM</th>
-                            <th colspan="3">Dam L</th>
+                            <th colspan="3">Damage S/M</th>
+                            <th colspan="3">Damage L</th>
                             <th>Amount</th>
                         </tr>
                         <tr class="sheet-centering">
@@ -44999,7 +45004,7 @@ function parseSpheres(spheresStrings, regex) {
     return spheres;
 }
 
-const getSpellSpheres = function (spellName, spell, sphereRules) {
+const getSpellSpheres = function (spell, sphereRules) {
     let sphere = spell['sphere'];
     sphereRules.forEach(rule => sphere += spell[rule] || '');
     return sphere;
@@ -45009,7 +45014,7 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
     if (!activeBooks.includes(spell['book']))
         return false;
 
-    let spheres = getSpellSpheres(spellName, spell, optionalSpheres);
+    let spheres = getSpellSpheres(spell, optionalSpheres);
 
     let primarySpellSpheres = spheres.match(noElementalRegex) || [];
     let isAvailable = primarySpellSpheres.some(sphere => availableSpheres.has(sphere));
@@ -45058,8 +45063,6 @@ function setupAddPriestSpell(postfix) {
 
                 let activeBooks = getActiveSettings(BOOK_FIELDS, attrSet);
                 let optionalSpheres = getActiveSettings(SPHERE_FIELDS, attrSet);
-                console.log(activeBooks);
-                console.log(optionalSpheres);
 
                 let spellsToAdd = [];
                 for (const [spellName, spell] of Object.entries(priestSpells[postfix])) {
@@ -45182,7 +45185,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
 //#endregion
 
 //#region Wizard and Priest spells and Powers setup
-function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
+function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFields) {
     if (!spellsTable[section])
         return;
 
@@ -45191,7 +45194,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
         if (!spell)
             return;
 
-        getAttrs(BOOK_FIELDS, function(books) {
+        getAttrs([...BOOK_FIELDS, ...optionalRulesFields], function(books) {
             if (bookInactiveShowToast(books, spell))
                 return;
 
@@ -45212,7 +45215,8 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
             if (section.startsWith('pri')) {
-                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+                let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
+                spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
             }
 
             setAttrs(spellInfo);
@@ -45269,10 +45273,10 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel, []);
     }
 });
-setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel);
+setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel, []);
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
@@ -45285,12 +45289,10 @@ priestSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel);
-        if (lastSection !== 'priq')
-            setupAddPriestSpell(lastSection);
+        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel, SPHERE_FIELDS);
     }
 });
-setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel);
+setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel, SPHERE_FIELDS);
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
@@ -45803,7 +45805,7 @@ on('sheet:opened', function () {
 // --- Version change start --- //
 
 const sheetName = 'AD&D 2E Revised';
-const sheetVersion = '4.6.0';
+const sheetVersion = '4.7.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
