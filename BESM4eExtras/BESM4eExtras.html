@@ -7576,7 +7576,7 @@
 		const combattechniques_array = ['blackout','blindfighting','blindshooting','brutal','concealment','criticalstrike','deadeye','defelction','enhancedknockback','extendedrange','farshot','hardboiled','judgeopponent','lethalblow','lightningreflexes','multipletargets','portablearmory','preciseaim','reflection','rushattack','steadyhand','tournamentencyclopedia','twoweapons','weaponsencyclopedia'];
 		const stats_array = ['static_stat_type_set', 'static_stat_temp_energy', 'static_stat_temp_health', 'stat_total_social', 'static_stat_total_shame', 'stat_total_sanity', 'static_stat_total_maddness', 'stat_total_energy', 'static_stat_total_fatigue', 'stat_total_health', 'static_stat_total_wounds', 'stat_total_shock', 'static_character_points_spent', 'bodystate', 'mindstate', 'soulstate', 'static_stat_base_body', 'static_stat_base_mind', 'static_stat_base_soul', 'stat_total_body', 'stat_total_mind', 'stat_total_soul', 'stat_total_acv', 'stat_total_dcv', 'stat_total_str', 'stat_total_cre', 'stat_total_com', 'stat_total_awa', 'stat_total_dex', 'stat_total_agi', 'stat_total_con', 'stat_total_int', 'stat_total_per', 'stat_total_rea', 'stat_total_wil', 'stat_total_cha', 'strstate', 'agistate', 'dexstate', 'constate', 'intstate', 'reastate', 'perstate', 'crestate', 'wilstate', 'chastate', 'awastate', 'comstate'];
 		const rolls_array = ['static_roll_type_selection','static_button_personal_defense','static_button_movement_defense'];
-		const combat_stats_array = ['static_weapon_autofire_selection','weapon_ammo_capacity','weapon_ammo_reloads','static_weapon_range_selection','mainhand_state', 'offhand_state', 'mainhand_source', 'offhand_source', 'extraarms', 'extraarms_inuse', 'attrdb', 'static_button_targeted_rushdamage', 'static_button_targeted_damage', 'static_button_targeted_attack', 'static_button_targeted_defense', 'massivedamage_targeted', 'massivedamage', 'enemyattack', 'enemydefense'];
+		const combat_stats_array = ['static_weapon_autofire_selection','weapon_ammo_capacity','weapon_ammo_reloads','static_weapon_range_selection','mainhand_state', 'offhand_state', 'mainhand_source', 'offhand_source', 'extraarms', 'extraarms_inuse', 'static_button_targeted_rushdamage', 'static_button_targeted_damage', 'static_button_targeted_attack', 'static_button_targeted_defense', 'massivedamage_targeted', 'massivedamage', 'enemyattack', 'enemydefense'];
 		const size_template_values_array = ['size', 'height', 'mass', 'size_lift', 'size_strdmg', 'size_ar', 'size_extradmg', 'size_rnghitdef', 'size_rngspd'];
 		const all_attributes_array = ['absorption','alternate form','alternate identity','armor','attack mastery','augmented','capacity','change state','cognition','combat technique','companion','connected','control environment','conversion','data access','defect','defense mastery','dimension walk','dynamic powers','elasticity','enemy attack','enemy defense','energized','exorcism','extra actions','extra arms','extra defenses','features','flight','forcefield','gear','ground speed','healing','heightened awareness','heightened senses','illusion','immovable','immunity','immutable','inspire','jumping','massive damage','melee attack','melee defense','merge','metamorphosis','mimic','mind control','mind shield','minions','mulligan','nullify','plant control','pocket dimension','portal','power flux','power variation','projection','ranged attack','ranged defense','regeneration','reincarnation','resilient','sensory block','shield','sixth sense','size change','skill','social mastery','spaceflight','special movement','summon creatures','supersense','superspeed','superstrength','swarm','telekinesis','telepathy','teleport','tough','transfer','transmute','tunneling','unaffected','unassailable','undetectable','unique attribute','unknown power','water speed','wealth','weapon'];
 		const all_attributes_regex = /(absorption|alternate form|alternate identity|armor|attack mastery|augmented|capacity|change state|cognition|combat technique|companion|connected|control environment|conversion|data access|defect|defense mastery|dimension walk|dynamic powers|elasticity|enemy attack|enemy defense|energized|exorcism|extra actions|extra arms|extra defenses|features|flight|forcefield|gear|ground speed|healing|heightened awareness|heightened senses|illusion|immovable|immunity|immutable|inspire|jumping|massive damage|melee attack|melee defense|merge|metamorphosis|mimic|mind control|mind shield|minions|mulligan|nullify|plant control|pocket dimension|portal|power flux|power variation|projection|ranged attack|ranged defense|regeneration|reincarnation|resilient|sensory block|shield|sixth sense|size change|skill|social mastery|spaceflight|special movement|summon creatures|supersense|superspeed|superstrength|swarm|telekinesis|telepathy|teleport|tough|transfer|transmute|tunneling|unaffected|unassailable|undetectable|unique attribute|unknown power|water speed|wealth|weapon)/i;
@@ -7608,6 +7608,14 @@
 			.value();
 		
 		/** Utility Functions **/
+		function getTimestamp(event, timerStart, timecache) {
+			const timeNow = Date.now();
+			const timeElapsed = timeNow - timerStart;
+			const timeTaken = timeElapsed - timecache;
+			console.log('\x1b[33m%s\x1b[0m',`[timestamp(${timeElapsed}[${timeTaken}])]: ${event}`);
+			return timeElapsed;
+		}
+		
 		function capital(str) {
 			if (str.length == 0) return;
 			const whitespace = /\s/g.test(str);
@@ -8167,6 +8175,18 @@
 			const wasDynamicGroup = attr => attr === undefined ? false : true;
 			if(debug) console.log(`[cleanupGroupType()] attribute = ${attribute}`);
 			if(wasDynamicGroup(attribute)) convertToStandardGroup(debug, attrIDs, attrdb, value, rowID, setObj);
+		}
+		
+		function cleanupSheetdb(debug, removedInfo, value) {
+			_.chain(removedInfo)
+			.keys()
+			.each( o => {
+				delete value[o.toLowerCase()];
+			});
+			if(debug) {
+				console.log(`[cleanupSheetdb()] value:`);
+				console.log(value);
+			}
 		}
 		
 		function restoreActiveAttribute(removedInfo){
@@ -13802,31 +13822,78 @@
 			];
 		
 		on("sheet:opened", () => {
-			getAttrs(on_sheet_open_array, (value) => {
-				var setObj = {};
-				if (value.global_initialized != 1) {
-					buildSizeUI(global_templates_size_names, setObj);
-					buildSkillsUI();
-					writeHiddenDamageAttributes(setObj);
-					createAttrdbJSON(setObj);
-					setObj.global_initialized = 1;
-				}else{
-					doUpgrade(value, setObj);
-				}
-				setAttrs(setObj);
+			
+			getSectionIDs('attr', attrIDs => {
+			getSectionIDs('skill', skillIDs => {
+			getSectionIDs('extraarm', extraarmIDs => {
+				let getAttrsString = [];
+		
+				getAttrsString = getAttrsString.concat(buildReapeatingAttrValuesArray(attrIDs));
+				getAttrsString = getAttrsString.concat(buildReapeatingSkillValuesArray(skillIDs));
+				//getAttrsString = getAttrsString.concat(buildSkillTemplateValuesArray(rowID));
+				//getAttrsString = getAttrsString.concat(buildSizeTemplateValuesArray(rowID));
+				getAttrsString = getAttrsString.concat(combat_stats_array);
+				getAttrsString = getAttrsString.concat(buildConditionStateArray());
+				getAttrsString = getAttrsString.concat(buildAttrGroupValuesArray());
+				getAttrsString = getAttrsString.concat(buildSkillGroupValuesArray());
+				getAttrsString = getAttrsString.concat(buildProtectionValuesArray());
+				getAttrsString = getAttrsString.concat(buildRepeatingExtraArmValuesArray(extraarmIDs));
+				getAttrsString = getAttrsString.concat(stats_array);
+				getAttrsString = getAttrsString.concat(rolls_array);
+				getAttrsString = getAttrsString.concat([
+					'show_debug_messages',
+					'theme', 
+					'static_weapon_maneuver_name', 
+					'active_weapon', 
+					'static_attrgroup_selected_tab', 
+					'static_skillgroup_selected_tab'
+				]);
+				getAttrsString = getAttrsString.concat(size_template_values_array);
+				getAttrsString = getAttrsString.concat(buildStatButtonStatesArray());
+				const getValues = getAttrsString.concat(on_sheet_open_array);
+			
+				getAttrs(getValues, (value) => {
+					const setObj = {};
+					const sheetdb = {};
+					sheetdb.attrIDs = attrIDs;
+					sheetdb.skillIDs = skillIDs;
+					sheetdb.extraarmIDs = extraarmIDs;
+		
+					_.each(getAttrsString, o => {
+						if(value[o] !== undefined) sheetdb[o] = value[o];
+					});
+					console.log(`[TEST sheetdb]:`); console.log(sheetdb);
+					setObj.sheetdb = JSON.stringify(value);
+		
+					if (value.global_initialized != 1) {
+						buildSizeUI(global_templates_size_names, setObj);
+						buildSkillsUI();
+						writeHiddenDamageAttributes(setObj);
+						createAttrdbJSON(setObj);
+						setObj.global_initialized = 1;
+					}else{
+						doUpgrade(value, setObj);
+					}
+					setAttrs(setObj);
+				});
+			});
+			});
 			});
 		});
 		
 		on("clicked:attrgroup1 clicked:attrgroup2 clicked:attrgroup3 clicked:attrgroup4 clicked:attrgroup5 clicked:attrgroup6 clicked:attrgroup7 clicked:attrgroup8 clicked:attrgroup9 clicked:attrgroup10 clicked:skillgroup1 clicked:skillgroup2 clicked:skillgroup3 clicked:skillgroup4 clicked:skillgroup5", (eventInfo) => {
 			const button = eventInfo.triggerName.substring(8, eventInfo.triggerName.length);
 			const section = button.replace(/[0-9]/g, "");
-			let setObj = [];
+			const setObj = {};
 			setObj[`static_${section}_selected_tab`] = button;
 			setAttrs(setObj);
 			return;
 		});
 		
 		on(events, (eventInfo) => {
+			const timerStart = Date.now(); //console.log(`[timestamp(TEST)] timerStart = ${timerStart}`);
+			var timecache = 0;
+			timecache = getTimestamp('Main script fired',timerStart,timecache);
 		
 			/** Script Main **/
 			const isRemoved = /remove/i.test(eventInfo.triggerName);
@@ -13834,24 +13901,45 @@
 			eventInfo.sourceAttribute = isRemoved ? `${eventInfo.sourceAttribute}_removed` : 
 				eventInfo.sourceAttribute;
 		
+			timecache = getTimestamp('Checked for removed event',timerStart,timecache);
+		
 			if(eventInfo.sourceAttribute === undefined){
 				eventInfo.sourceAttribute = eventInfo.triggerName.substring(8, eventInfo.triggerName.length);
 			}
+		
+			timecache = getTimestamp('Checked if event was a button push',timerStart,timecache);
+		
 			if(/clicked/i.test(eventInfo.triggerName)){
 				if(/repeating_skill_/i.test(eventInfo.triggerName)){
 					const button = eventInfo.htmlAttributes.name.substring(3,eventInfo.htmlAttributes.name.length);
 					eventInfo.sourceAttribute = `${eventInfo.sourceAttribute}${button}`;
 				}
 			}
+		
+			timecache = getTimestamp('Checked for skill button push',timerStart,timecache);
+		
 			setPreviousValue(eventInfo);
+			timecache = getTimestamp('Fixed previousValue',timerStart,timecache);
+		
 			console.log(`[Event Listener] eventInfo:`); console.log(eventInfo);
 		
+			timecache = getTimestamp('Display event listener',timerStart,timecache);
+		
 			eventInfo.sourceAttribute.replace(/^((.+?)_(.+?)_(.+?))_(.+)/, (match, source, sourceType, sectionName, rowID, sourceAttr) => {
+		
+				timecache = getTimestamp('Breakdown event into steering variables',timerStart,timecache);
+		
+				//if (`${sourceType}` == `repeating` && /(costperlevel|visible|new|source|characteristic|rollable|attrdefecttoggle|damagetype)/i.test(`${sourceAttr}`)) return;
+				if (sourceType == `repeating` && non_actionable_events.indexOf(sourceAttr) >= 0) return;
+		
+				timecache = getTimestamp('Checked for non-actionable events',timerStart,timecache);
 		
 				const originalCaseRowID = rowID;
 				source = source.toLowerCase();
 				match = match.toLowerCase();
 				rowID = rowID.toLowerCase();
+		
+				timecache = getTimestamp('Normalize steering variables',timerStart,timecache);
 		
 				console.log(`match = ${match}`);
 				console.log(`source = ${source}`);
@@ -13860,17 +13948,27 @@
 				console.log(`rowID = ${rowID}`);
 				console.log(`sourceAttr = ${sourceAttr}`);
 		
-				//if (`${sourceType}` == `repeating` && /(costperlevel|visible|new|source|characteristic|rollable|attrdefecttoggle|damagetype)/i.test(`${sourceAttr}`)) return;
-				if (sourceType == `repeating` && non_actionable_events.indexOf(sourceAttr) >= 0) return;
+				let getAttrsString = [`show_debug_messages`];
+				const setObj = {};
 		
-				var getAttrsString = [`show_debug_messages`];
-				var setObj = {};
-		
+				timecache = getTimestamp('Set global variables for attr reading/writing',timerStart,timecache);
+		/*
 				getSectionIDs('attr', attrIDs => {
+					
+					timecache = getTimestamp('Got attrIDs',timerStart,timecache);
+		
 				getSectionIDs('skill', skillIDs => {
+		
+					timecache = getTimestamp('Got skillIDs',timerStart,timecache);
+		
 				getSectionIDs('extraarm', extraarmIDs => {
+		
+					timecache = getTimestamp('Got extraarmIDs',timerStart,timecache);
+		
 				getSectionIDs('sizetemplate', sizetempateIDs => { 
 		
+					timecache = getTimestamp('Got sizetemplateIDs',timerStart,timecache);
+		/*
 					getAttrsString = getAttrsString.concat(buildReapeatingAttrValuesArray(attrIDs));
 					getAttrsString = getAttrsString.concat(buildReapeatingSkillValuesArray(skillIDs));
 					getAttrsString = sectionName=='skilltemplate' ? getAttrsString.concat(buildSkillTemplateValuesArray(rowID)): getAttrsString;
@@ -13892,13 +13990,37 @@
 					]);
 					getAttrsString = getAttrsString.concat(size_template_values_array);
 					getAttrsString = getAttrsString.concat(buildStatButtonStatesArray());
+		*/
 		
-					getAttrs(getAttrsString, (value) => {
+					getAttrsString = getAttrsString.concat([
+						'attrdb',
+						'sheetdb'
+					]);
+		
+					timecache = getTimestamp('Built getAttrsString to fetch databases',timerStart,timecache);
+		
+					getAttrs(getAttrsString, (v) => {
+		
+						timecache = getTimestamp('Got all the data',timerStart,timecache);
+		
+						let value = JSON.parse(v.sheetdb);
+						const attrIDs = value.attrIDs;
+						const skillIDs = value.skillIDs;
+						const extraarmIDs = value.extraarmIDs;
+						!isRemoved ? value[match] = eventInfo.newValue !== undefined ? eventInfo.newValue :
+							value[match] : false;
+		
+						timecache = getTimestamp('Loaded sheetdb as value',timerStart,timecache);
 		
 						console.log(`[Captured Attributes] value:`); console.log(value);
+		
+						const attrdb = JSON.parse(v.attrdb);
+		
+						timecache = getTimestamp('Loaded attrdb',timerStart,timecache);
 						
 						const debug = parseInt(value[`show_debug_messages`]) || 0;
-						var attrdb = JSON.parse(value.attrdb);
+		
+						timecache = getTimestamp('Set debug variable',timerStart,timecache);
 		
 						if(isRemoved){
 							if(getWasActive(removedInfo, originalCaseRowID)){
@@ -13913,11 +14035,17 @@
 										cleanupSkillCosts(debug, skillIDs, value, rowID, setObj);
 									break;
 								}
+								cleanupSheetdb(debug, removedInfo, value);
 								if(debug){ console.log('[Changes To Sheet Values] setObj:'); console.log(setObj); }
+								value = {...value, ...setObj};
+								setObj.sheetdb = JSON.stringify(value);
 								setAttrs(setObj,{silent:true});
 							}
 							return;
 						}else if (sourceType==`repeating`) {
+		
+							timecache = getTimestamp('Is repeating event',timerStart,timecache);
+		
 							const isCustomization = getIsCustomization(debug, sourceAttr);//(enhancement|limiter)/i.test(`${sourceAttr}`);
 							const customizationType = getCustomizationType(debug, sourceAttr);
 							const customization = (isCustomization) ?
@@ -13927,6 +14055,9 @@
 								} :
 								undefined;
 							sourceAttr = isCustomization ? 'customization' : sourceAttr;
+		
+							timecache = getTimestamp('Checked for customization',timerStart,timecache);
+		
 							switch (sectionName) {
 								case `attr`:
 									const isNew = parseInt(value[`${source}_new`]) || 0;
@@ -13960,17 +14091,42 @@
 											setAttrCharacteristic(debug, value, rowID, setObj);
 										break;
 										case `activate`:
+											
+											timecache = getTimestamp('sourceAttr == "activate"',timerStart,timecache);
+										
 											if (!getIsLocked(debug, value, rowID, sourceAttr)) return;
 											if (!getFluxGroupIsActive(debug, value, rowID)) return;
 											const isActive = setButtonState(debug, value, source, rowID, sourceAttr, setObj);
 											const handsource = getHandSource(debug, value[`repeating_attr_${rowID}_source`]);
 											const handstate = parseInt(value[`${handsource}_state`]);
+		
+											timecache = getTimestamp('Passed checks and set variables',timerStart,timecache);
+		
 											setAttrEffects(debug, isActive, value, attrdb, extraarmIDs, attrIDs, sectionName, rowID, sourceAttr, setObj);
+		
+											timecache = getTimestamp('Completed setAttrEffects',timerStart,timecache);
+		
 											setPoolCostIfGroupIsFlux(debug, isActive, attrIDs, value, rowID, setObj);
+		
+											timecache = getTimestamp('Completed setPoolCostIfGroupIsFlux',timerStart,timecache);
+		
 											setPoolCostIfGroupIsVariation(debug, isActive, attrIDs, value, rowID, setObj);
-											if (handstate) setWeaponAmmo(debug, attrdb, value, handsource, setObj);
+		
+											timecache = getTimestamp('Compelted setPoolCostIFGroupIsVariation',timerStart,timecache);
+		
+											if (handstate) {
+												setWeaponAmmo(debug, attrdb, value, handsource, setObj);
+												timecache = getTimestamp('Completed setWeaponAmmo',timerStart,timecache);
+											}
+		
 											disableActiveWeapon(debug, value, rowID, setObj);
+		
+											timecache = getTimestamp('Completed disableActiveWeapon',timerStart,timecache);
+		
 											setGroupDefectPointsOnActivation(debug, attrIDs, attrdb, value, sectionName, rowID, setObj);
+		
+											timecache = getTimestamp('Completed setGroupDefectPointsOnActivation',timerStart,timecache);
+		
 										break;
 										case `lock`:
 											if (resetOnActive(debug, eventInfo, value, match, rowID, setObj)) return;
@@ -14063,9 +14219,19 @@
 								console.log('[Changes To Sheet Values] setObj:'); 
 								console.log(setObj); 
 							}
+							
+							timecache = getTimestamp('Ready to write',timerStart,timecache);
+							value = {...value, ...setObj};
+							setObj.sheetdb = JSON.stringify(value);
 							setAttrs(setObj,{silent:true});
+		
+							timecache = getTimestamp('Writing complete',timerStart,timecache);
+		
 							return;
 						} else if (sourceType==`static`) {
+		
+							timecache = getTimestamp('Is static event',timerStart,timecache);
+		
 							switch (sectionName) {
 								case `weapon`:
 									switch (rowID) {
@@ -14159,17 +14325,24 @@
 								break;
 							}
 							if(debug){ console.log('[Changes To Sheet Values] setObj:'); console.log(setObj); }
+							value = {...value, ...setObj};
+							setObj.sheetdb = JSON.stringify(value);
+							timecache = getTimestamp('Ready to write',timerStart,timecache);
+							
 							setAttrs(setObj,{silent:true});
+		
+							timecache = getTimestamp('Writing complete',timerStart,timecache);
+		
 							return;
 						} else {
 							if(debug) console.log(`[sourceType = ${sourceType}] no matching sourceType, exiting.`);
 							return;
 						}
 					});
-				});
-				});
-				});
-				});
+			//	});
+			//	});
+			//	});
+			//	});
 			});
 		});
 	</script>
