@@ -33,7 +33,7 @@
           <br/>
           <span class="sheet-new-feature sheet-large-label" title="New! Easily select your action die from here. Doesn't apply to weapons/spells. Mostly applies to class skills. This may change in the future">❗<span class="sheet-small-label">Current action die</span></span>
         </div>
-        <div class="sheet-col-1-8 sheet-center sheet-margin-top"><p class="sheet-last-updated">Sheet last updated<br>15 January 2021</p></div>
+        <div class="sheet-col-1-8 sheet-center sheet-margin-top"><p class="sheet-last-updated">Sheet last updated<br>19 February 2022</p></div>
       </div>
     </div>
 
@@ -45,6 +45,8 @@
   <span class="sheet-maintab sheet-player">1+ level</span>
   <input type="radio" name="attr_maintab" class="sheet-maintab sheet-monster" value="4" title="NPC/Monster">
   <span class="sheet-maintab sheet-monster">NPC/Monster</span>
+  <input type="radio" name="attr_maintab" class="sheet-maintab sheet-options" value="5" title="Options">
+  <span class="sheet-maintab sheet-options">Options</span><span class="sheet-new-feature sheet-large-label" title="New tab! Future options/settings will also go here">❗</span>
 
   <div class="sheet-maintab-content sheet-player">
 
@@ -10056,6 +10058,35 @@
 
     </div>
 
+  <div class="sheet-maintab-content sheet-options">
+      <h5 class="sheet-center">Options</h5>
+      <div class="sheet-row sheet-sub-header">
+        <div class="sheet-col-1-5 sheet-center sheet-inspiration-label">
+          Tools
+        </div>
+      </div>
+      <div class="sheet-row sheet-hd-row">
+        <div class="sheet-col-1-3">
+          <button type="action" name="act_import_from_other_sheet" value="?{Confirm}">
+            Import attributes from other DCC character sheet
+          </button>
+          <div class="sheet-small-label">
+            <p>
+              <span name="attr_import_from_other_sheet_status"></span>
+            </p>
+          </div>
+        </div>
+        <div class="sheet-col-2-3 sheet-padl">
+          <p>
+            If this character was originally created using the other DCC character sheet, pressing this button will copy over the old values to this character sheet. This will over-write values on this sheet, so if you have already entered data using this character sheet, <b>it may be lost!</b>
+          </p>
+          <p>
+            The process is not perfect, but makes a best effort. For example, if you had a bard, your values for corruption can be found under the wizard class tab.
+          </p>
+        </div>
+      </div>
+    </div>
+
 
 </div>
 
@@ -11394,16 +11425,757 @@
 
 
 <script type="text/worker">
+  function setActiveCharacterId(charId){
+    var oldAcid=getActiveCharacterId();
+    var ev = new CustomEvent("message");
+    ev.data={"id":"0", "type":"setActiveCharacter", "data":charId};
+    self.dispatchEvent(ev);
+    return oldAcid;
+}
+var _sIn=setInterval;
+setInterval=function(callback, timeout){
+    var acid=getActiveCharacterId();
+    _sIn(
+        function(){
+            var prevAcid=setActiveCharacterId(acid);
+            callback();
+            setActiveCharacterId(prevAcid);
+        }
+    ,timeout);
+}
+var _sto=setTimeout
+setTimeout=function(callback, timeout){
+    var acid=getActiveCharacterId();
+    _sto(
+        function(){
+            var prevAcid=setActiveCharacterId(acid);
+            callback();
+            setActiveCharacterId(prevAcid);
+        }
+    ,timeout);
+}
+function getAttrsAsync(props){
+    var acid=getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs
+    var prevAcid=null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
+            try{
+                getAttrs(props,(values)=>{  resolve(values); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
+    });
+}
+//use the same pattern for each of the following...
+function setAttrsAsync(propObj, options){
+    var acid=getActiveCharacterId();
+    var prevAcid=null;
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);
+            try{
+                setAttrs(propObj,options,(values)=>{ resolve(values); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid);
+    });
+}
+
+function getSectionIDsAsync(sectionName){
+    var acid=getActiveCharacterId();
+    var prevAcid=null;
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);
+            try{
+                getSectionIDs(sectionName,(values)=>{ resolve(values); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid);
+    });
+}
+function getSingleAttrAsync(prop){
+    var acid=getActiveCharacterId();
+    var prevAcid=null;
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);
+            try{
+                getAttrs([prop],(values)=>{  resolve(values[prop]); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid);
+    });
+}
+
   /* ---- BEGIN: TheAaronSheet.js ---- */
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
 // By:       The Aaron, Arcane Scriptomancer
-// Version:  0.2.5
 // Contact:  https://app.roll20.net/users/104025/the-aaron
-// Minified with http://jscompress.com/
-var TAS=TAS||function(){"use strict";function u(t,o,e){_.each(e,function(e){var n=function(e){switch(typeof e){case"string":return"string";case"boolean":return"boolean";case"number":return _.isNaN(e)?"NaN":e.toString().match(/\./)?"decimal":"integer";case"function":return"function: "+(e.name?e.name+"()":"(anonymous)");case"object":return _.isArray(e)?"array":_.isArguments(e)?"arguments":_.isNull(e)?"null":"object";default:return typeof e}}(e);switch(n){case"string":t(e);break;case"undefined":case"null":case"NaN":t("["+n+"]");break;case"number":case"not a number":case"integer":case"decimal":case"boolean":t("["+n+"]: "+e);break;default:t("["+n+"]:========================================="),o(e),t("=========================================================")}})}function e(e){var n=e.key,t=e.title||"TAS",o=e.color&&e.color.bgLabel||"blue",r=e.color&&e.color.label||"white",c=e.color&&e.color.bgText||"blue",a=e.color&&e.color.text||"white",i=function(e){console.log("%c "+t+": %c "+e+" ","background-color: "+o+";color: "+r+"; font-weight:bold;","background-color: "+c+";color: "+a+";")};return function(){"TAS"!==n&&!p.logging[n]||u(i,function(e){console.log(e)},_.toArray(arguments))}}function b(){var e=new Error("dummy");return _.map(_.rest(e.stack.replace(/^[^(]+?[\n$]/gm,"").replace(/^\s+at\s+/gm,"").replace(/^Object.<anonymous>\s*\(/gm,"{anonymous}()@").split("\n")),function(e){return e.replace(/\s+.*$/,"")})}function n(e,n,t){var o,r,c,a,i,u,l,f;return"function"==typeof e&&(t=n,n=e,e=void 0),p.debugMode?((o=b()).shift(),a=n,i=t,u=o,l=e,-1===(f=_.findIndex(h,function(e){return _.difference(e.stack,u).length===_.difference(u,e.stack).length&&0===_.difference(e.stack,u).length&&e.label===l}))&&(f=h.length,h.push({stack:u,label:l})),new Function("cb","ctx","TASlog","return function TAS_CALLSTACK_"+f+"(){var start,end;TASlog('Entering: '+(cb.name||'(anonymous function)'));start=_.now();cb.apply(ctx||{},arguments);end=_.now();TASlog('Exiting: '+(cb.name||'(anonymous function)')+' :: '+(end-start)+'ms elapsed');};")(a,i,S)):(r=n,c=t,function(){r.apply(c||{},arguments)})}function i(e,n){m[e]=n}function d(n,e,t,o){var r,c,a;r=_.contains(["S","F","I","D"],e)?"_"+e:e,c=o||e,a=t,_.each(["S","I","F"],function(e){_.has(n,e)||Object.defineProperty(n,e,{value:{},enumerable:!1,readonly:!0})}),_.has(n,"D")||Object.defineProperty(n,"D",{value:_.reduce(_.range(10),function(e,n){return Object.defineProperty(e,n,{value:{},enumerable:!0,readonly:!0}),e},{}),enumerable:!1,readonly:!0}),Object.defineProperty(n,r,{enumerable:!0,set:function(e){e!==a&&i(c,a=e)},get:function(){return a}}),Object.defineProperty(n.S,r,{enumerable:!0,set:function(e){var n=e.toString();n!==a&&i(c,a=n)},get:function(){return a.toString()}}),Object.defineProperty(n.I,r,{enumerable:!0,set:function(e){var n=parseInt(e,10)||0;n!==a&&i(c,a=n)},get:function(){return parseInt(a,10)||0}}),Object.defineProperty(n.F,r,{enumerable:!0,set:function(e){var n=parseFloat(e)||0;n!==a&&i(c,a=n)},get:function(){return parseFloat(a)||0}}),_.each(_.range(10),function(t){Object.defineProperty(n.D[t],r,{enumerable:!0,set:function(e){var n=(parseFloat(e)||0).toFixed(t);n!==a&&i(c,a=n)},get:function(){return(parseFloat(a)||0).toFixed(t)}})})}function r(e){return l=e,f=[],b=[],s=[],g=[],{attrs:n,attr:n,column:t,columns:t,field:t,fields:t,reduce:o,inject:o,foldl:o,map:r,collect:r,each:c,forEach:c,tap:a,do:a,after:i,last:i,done:i,execute:u,go:u,run:u};function n(){return f=j(arguments,f),this}function t(){return b=j(arguments,b),this}function o(e,n,t,o){return s.push({type:"reduce",func:e&&_.isFunction(e)&&e||_.noop,memo:(_.isUndefined(n),n),final:t&&_.isFunction(t)&&t||_.noop,context:o||{}}),this}function r(e,n,t){return s.push({type:"map",func:e&&_.isFunction(e)&&e||_.noop,final:n&&_.isFunction(n)&&n||_.noop,context:t||{}}),this}function c(e,n,t){return s.push({type:"each",func:e&&_.isFunction(e)&&e||_.noop,final:n&&_.isFunction(n)&&n||_.noop,context:t||{}}),this}function a(e,n){return s.push({type:"tap",final:e&&_.isFunction(e)&&e||_.noop,context:n||{}}),this}function i(e,n){return g.push({callback:e&&_.isFunction(e)&&e||_.noop,context:n||{}}),this}function u(e,n){var o={},r={},t=[],c=[];i(e,n),getSectionIDs("repeating_"+l,function(e){t=e,c=_.reduce(t,function(e,n){return e.concat(_.map(b,function(e){return"repeating_"+l+"_"+n+"_"+e}))},[]),getAttrs(_.uniq(f.concat(c)),function(c){_.each(f,function(e){c.hasOwnProperty(e)&&d(r,e,c[e])}),o=_.reduce(t,function(e,t){var n,o,r={};return n=r,o=t,Object.defineProperty(n,"id",{value:o,writable:!1,enumerable:!1}),_.each(b,function(e){var n="repeating_"+l+"_"+t+"_"+e;d(r,e,c[n],n)}),e[t]=r,e},{}),_.each(s,function(n){var t;switch(n.type){case"tap":_.bind(n.final,n.context,o,r)();break;case"each":_.each(o,function(e){_.bind(n.func,n.context,e,r,e.id,o)()}),_.bind(n.final,n.context,o,r)();break;case"map":t=_.map(o,function(e){return _.bind(n.func,n.context,e,r,e.id,o)()}),_.bind(n.final,n.context,t,o,r)();break;case"reduce":t=n.memo,_.each(o,function(e){t=_.bind(n.func,n.context,t,e,r,e.id,o)()}),_.bind(n.final,n.context,t,o,r)()}}),setAttrs(m),m={},_.each(g,function(e){_.bind(e.callback,e.context)()})})})}var l,f,b,s,g}var t={key:"error",title:"Error",color:{bgLabel:"#C11713",label:"white",bgText:"#C11713",text:"white"}},o={key:"warn",title:"Warning",color:{bgLabel:"#F29140",label:"white",bgText:"#FFD8B7",text:"black"}},c={key:"info",title:"Info",color:{bgLabel:"#413FA9",label:"white",bgText:"#B3B2EB",text:"black"}},a={key:"notice",title:"Notice",color:{bgLabel:"#33C133",label:"white",bgText:"#ADF1AD",text:"black"}},l={key:"log",title:"Log",color:{bgLabel:"#f2f240",label:"black",bgText:"#ffff90",text:"black"}},f={key:"TAS",title:"function",color:{bgLabel:"#413FA9",label:"white",bgText:"#B3B2EB",text:"black"}},s={key:"TAS",title:"ASYNC CALL",color:{bgLabel:"#413FA9",label:"white",bgText:"#413FA9",text:"white"}},g={key:"TAS",title:"TAS",color:{bgLabel:"grey",label:"black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)",bgText:"grey",text:"black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)"}},p={debugMode:!1,logging:{log:!0,notice:!0,info:!0,warn:!0,error:!0,debug:!1}},h=[],m={},y=e({key:"debug",title:"DEBUG",color:{bgLabel:"#7732A2",label:"#F2EF40",bgText:"#FFFEB7",text:"#7732A2"}}),x=e(t),k=e(o),A=e(c),w=e(a),F=e(l),S=e(g),v=e(f),T=e(s),L=function(e){var n,t;_.find(e,function(e){return(n=e.match(/TAS_CALLSTACK_(\d+)/))?(t=h[n[1]],T("===================="+(t.label?"> "+t.label+" <":"")+"===================="),L(t.stack),!0):(v(e),!1)})},j=function(t,e){return _.chain(t).reduce(function(e,n){return"string"==typeof n?e.push(n):(_.isArray(t)||_.isArguments(t))&&(e=j(n,e)),e},_.isArray(e)&&e||[]).uniq().value()};return console.log("%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v0.2.5  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•","background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;"),console.log("%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: "+new Date(1504710542e3)+"  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•","background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;"),{repeatingSimpleSum:function(e,t,o){r(e).attr(o).field(t).reduce(function(e,n){return e+n.F[t]},0,function(e,n,t){t.S[o]=e}).execute()},repeating:r,config:function(e){var n=_.defaults(e,p);n.logging=_.defaults(e&&e.logging||{},p.logging),p=n},callback:n,callstack:function(){var e;p.debugMode&&((e=b()).shift(),S("==============================> CALLSTACK <=============================="),L(e),S("========================================================================="))},debugMode:function(){p.logging.debug=!0,p.debugMode=!0},isDebugMode:function(){return p.debugMode},_fn:n,debug:y,error:x,warn:k,info:A,notice:w,log:F}}();
+
+var TAS = TAS || (function(){
+    'use strict';
+
+    var version = '0.2.5',
+        lastUpdate = 1504710542,
+
+        loggingSettings = {
+            debug: {
+                key:     'debug',
+                title:   'DEBUG',
+                color: {
+                    bgLabel: '#7732A2',
+                    label:   '#F2EF40',
+                    bgText:  '#FFFEB7',
+                    text:    '#7732A2'
+                }
+            },
+            error: {
+                key:     'error',
+                title:   'Error',
+                color: {
+                    bgLabel: '#C11713',
+                    label:   'white',
+                    bgText:  '#C11713',
+                    text:    'white'
+                }
+            },
+            warn: {
+                key:     'warn',
+                title:   'Warning',
+                color: {
+                    bgLabel: '#F29140',
+                    label:   'white',
+                    bgText:  '#FFD8B7',
+                    text:    'black'
+                }
+            },
+            info: {
+                key:     'info',
+                title:   'Info',
+                color: {
+                    bgLabel: '#413FA9',
+                    label:   'white',
+                    bgText:  '#B3B2EB',
+                    text:    'black'
+                }
+            },
+            notice: {
+                key:     'notice',
+                title:   'Notice',
+                color: {
+                    bgLabel: '#33C133',
+                    label:   'white',
+                    bgText:  '#ADF1AD',
+                    text:    'black'
+                }
+            },
+            log: {
+                key:     'log',
+                title:   'Log',
+                color: {
+                    bgLabel: '#f2f240',
+                    label:   'black',
+                    bgText:  '#ffff90',
+                    text:    'black'
+                }
+            },
+            callstack: {
+                key:     'TAS',
+                title:   'function',
+                color: {
+                    bgLabel: '#413FA9',
+                    label:   'white',
+                    bgText:  '#B3B2EB',
+                    text:    'black'
+                }
+            },
+            callstack_async: {
+                key:     'TAS',
+                title:   'ASYNC CALL',
+                color: {
+                    bgLabel: '#413FA9',
+                    label:   'white',
+                    bgText:  '#413FA9',
+                    text:    'white'
+                }
+            },
+            TAS: {
+                key:     'TAS',
+                title:   'TAS',
+                color: {
+                    bgLabel: 'grey',
+                    label:   'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)',
+                    bgText:  'grey',
+                    text:    'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)'
+                }
+            }
+        },
+
+
+        config = {
+            debugMode: false,
+            logging: {
+                log: true,
+                notice: true,
+                info: true,
+                warn: true,
+                error: true,
+                debug: false
+            }
+        },
+
+        callstackRegistry = [],
+		queuedUpdates = {}, //< Used for delaying saves till the last moment.
+
+    complexType = function(o){
+        switch(typeof o){
+            case 'string':
+                return 'string';
+            case 'boolean':
+                return 'boolean';
+            case 'number':
+                return (_.isNaN(o) ? 'NaN' : (o.toString().match(/\./) ? 'decimal' : 'integer'));
+            case 'function':
+                return 'function: '+(o.name ? o.name+'()' : '(anonymous)');
+            case 'object':
+                return (_.isArray(o) ? 'array' : (_.isArguments(o) ? 'arguments' : ( _.isNull(o) ? 'null' : 'object')));
+            default:
+                return typeof o;
+        }
+    },
+
+	dataLogger = function(primaryLogger,secondaryLogger,data){
+        _.each(data,function(m){
+            var type = complexType(m);
+            switch(type){
+                case 'string':
+                    primaryLogger(m);
+                    break;
+                case 'undefined':
+                case 'null':
+                case 'NaN':
+                    primaryLogger('['+type+']');
+                    break;
+                case 'number':
+                case 'not a number':
+                case 'integer':
+                case 'decimal':
+                case 'boolean':
+                    primaryLogger('['+type+']: '+m);
+                    break;
+                default:
+                    primaryLogger('['+type+']:=========================================');
+                    secondaryLogger(m);
+                    primaryLogger('=========================================================');
+                    break;
+            }
+        });
+	},
+
+
+    colorLog = function(options){
+        var coloredLoggerFunction,
+            key = options.key,
+            label = options.title || 'TAS',
+            lBGColor = (options.color && options.color.bgLabel) || 'blue',
+            lTxtColor = (options.color && options.color.label) || 'white',
+            mBGColor = (options.color && options.color.bgText) || 'blue',
+            mTxtColor = (options.color && options.color.text) || 'white';
+
+        coloredLoggerFunction = function(message){
+            /* eslint-disable no-console */
+            console.log(
+                '%c '+label+': %c '+message + ' ',
+                'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
+                'background-color: '+mBGColor+';color: '+mTxtColor+';'
+            ); 
+            /* eslint-enable no-console */
+        };
+        return function(){
+            if('TAS'===key || config.logging[key]){
+                /* eslint-disable no-console */
+               dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments)); 
+                /* eslint-enable no-console */
+            }
+        };
+    },
+
+    logDebug  = colorLog(loggingSettings.debug),
+    logError  = colorLog(loggingSettings.error),
+    logWarn   = colorLog(loggingSettings.warn),
+    logInfo   = colorLog(loggingSettings.info),
+    logNotice = colorLog(loggingSettings.notice),
+    logLog    = colorLog(loggingSettings.log),
+    log       = colorLog(loggingSettings.TAS),
+    logCS     = colorLog(loggingSettings.callstack),
+    logCSA    = colorLog(loggingSettings.callstack_async),
+
+    registerCallstack = function(callstack,label){
+        var idx=_.findIndex(callstackRegistry,function(o){
+            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length) &&
+                _.difference(o.stack,callstack).length === 0 &&
+                o.label === label;
+        });
+        if(-1 === idx){
+            idx=callstackRegistry.length;
+            callstackRegistry.push({
+                stack: callstack,
+                label: label
+            });
+        }
+        return idx;
+    },
+
+    setConfigOption = function(options){
+        var newconf =_.defaults(options,config);
+        newconf.logging=_.defaults(
+            (options && options.logging)||{},
+            config.logging
+        );
+        config=newconf;
+    },
+    
+    isDebugMode = function(){
+        return config.debugMode;
+    },
+
+    debugMode = function(){
+        config.logging.debug=true;
+        config.debugMode = true;
+    },
+
+    getCallstack = function(){
+        var e = new Error('dummy'),
+            stack = _.map(_.rest(e.stack.replace(/^[^(]+?[\n$]/gm, '')
+            .replace(/^\s+at\s+/gm, '')
+            .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
+            .split('\n')),function(l){
+                return l.replace(/\s+.*$/,'');
+            });
+        return stack;
+    },
+    logCallstackSub = function(cs){
+        var matches, csa;
+        _.find(cs,function(line){
+            matches = line.match(/TAS_CALLSTACK_(\d+)/);
+            if(matches){
+               csa=callstackRegistry[matches[1]];
+               logCSA( '===================='+(csa.label ? '> '+csa.label+' <' : '')+'====================');
+               logCallstackSub(csa.stack);
+               return true;
+            } 
+            logCS(line);
+            return false;
+        });
+    },
+    logCallstack = function(){
+        var cs;
+        if(config.debugMode){
+            cs = getCallstack();
+            cs.shift();
+            log('==============================> CALLSTACK <==============================');
+            logCallstackSub(cs);
+            log('=========================================================================');
+        }
+    },
+
+
+    wrapCallback = function (label, callback, context){
+        var callstack;
+        if('function' === typeof label){
+            context=callback;
+            callback=label;
+            label=undefined;
+        }
+        if(!config.debugMode){
+            return (function(cb,ctx){
+                return function(){
+                    cb.apply(ctx||{},arguments);
+                };
+            }(callback,context));
+        }
+        
+        callstack = getCallstack();
+        callstack.shift();
+        
+        return (function(cb,ctx,cs,lbl){
+            var ctxref=registerCallstack(cs,lbl);
+
+            /*jshint -W054 */
+            return new Function('cb','ctx','TASlog',
+                "return function TAS_CALLSTACK_"+ctxref+"(){"+
+                    "var start,end;"+
+                    "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
+                    "start=_.now();"+
+                    "cb.apply(ctx||{},arguments);"+
+                    "end=_.now();"+
+                    "TASlog('Exiting: '+(cb.name||'(anonymous function)')+' :: '+(end-start)+'ms elapsed');"+
+                "};")(cb,ctx,log);
+            /*jshint +W054 */
+        }(callback,context,callstack,label));
+    },
+
+
+    prepareUpdate = function( attribute, value ){
+        queuedUpdates[attribute]=value;
+    },
+
+    applyQueuedUpdates = function() {
+      setAttrs(queuedUpdates);
+      queuedUpdates = {};
+    },
+
+	namesFromArgs = function(args,base){
+        return _.chain(args)
+            .reduce(function(memo,attr){
+                if('string' === typeof attr) {
+                    memo.push(attr);
+                } else if(_.isArray(args) || _.isArguments(args)){
+                    memo = namesFromArgs(attr,memo);
+                }
+                return memo;
+            },(_.isArray(base) && base) || [])
+            .uniq()
+            .value();
+	},
+
+	addId = function(obj,value){
+		Object.defineProperty(obj,'id',{
+			value: value,
+			writable: false,
+			enumerable: false
+		});
+	},
+
+	addProp = function(obj,prop,value,fullname){
+		(function(){
+            var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
+                full_pname = fullname || prop,
+                pvalue=value;
+
+            _.each(['S','I','F'],function(p){
+                if( !_.has(obj,p)){
+                    Object.defineProperty(obj, p, {
+                        value: {},
+                        enumerable: false,
+                        readonly: true
+                    });
+                }
+            });
+            if( !_.has(obj,'D')){
+                Object.defineProperty(obj, 'D', {
+                    value: _.reduce(_.range(10),function(m,d){
+                            Object.defineProperty(m, d, {
+                                value: {},
+                                enumerable: true,
+                                readonly: true
+                            });
+                            return m;
+                        },{}),
+                    enumerable: false,
+                    readonly: true
+                });
+            }
+
+
+            // Raw value
+			Object.defineProperty(obj, pname, {
+                enumerable: true,
+				set: function(v){
+                    if(v!==pvalue) {
+                        pvalue=v;
+                        prepareUpdate(full_pname,v);
+                    }
+				},
+				get: function(){
+					return pvalue;
+				}
+			});
+            
+            // string value
+			Object.defineProperty(obj.S, pname, {
+                enumerable: true,
+				set: function(v){
+                    var val=v.toString();
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
+				},
+				get: function(){
+					return pvalue.toString();
+				}
+			});
+
+            // int value
+			Object.defineProperty(obj.I, pname, {
+                enumerable: true,
+				set: function(v){
+                    var val=parseInt(v,10) || 0;
+                    if(val !== pvalue){
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
+				},
+				get: function(){
+					return parseInt(pvalue,10) || 0;
+				}
+			});
+
+            // float value
+			Object.defineProperty(obj.F, pname, {
+                enumerable: true,
+				set: function(v){
+                    var val=parseFloat(v) || 0;
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
+				},
+				get: function(){
+					return parseFloat(pvalue) || 0;
+				}
+			});
+            _.each(_.range(10),function(d){
+                Object.defineProperty(obj.D[d], pname, {
+                    enumerable: true,
+                    set: function(v){
+                        var val=(parseFloat(v) || 0).toFixed(d);
+                        if(val !== pvalue){
+                            pvalue=val;
+                            prepareUpdate(full_pname,val);
+                        }
+                    },
+                    get: function(){
+                        return (parseFloat(pvalue) || 0).toFixed(d);
+                    }
+                });
+            });
+
+		}());
+	},
+	
+	repeating = function( section ) {
+		return (function(s){
+			var sectionName = s,
+				attrNames = [],
+				fieldNames = [],
+				operations = [],
+                after = [],
+			
+			repAttrs = function TAS_Repeating_Attrs(){
+				attrNames = namesFromArgs(arguments,attrNames);
+				return this;
+			},
+			repFields = function TAS_Repeating_Fields(){
+				fieldNames = namesFromArgs(arguments,fieldNames);
+				return this;
+			},
+			repReduce = function TAS_Repeating_Reduce(func, initial, final, context) { 
+				operations.push({
+                    type: 'reduce',
+                    func: (func && _.isFunction(func) && func) || _.noop,
+                    memo: (_.isUndefined(initial) && 0) || initial,
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+			},
+			repMap = function TAS_Repeating_Map(func, final, context) {
+				operations.push({
+                    type: 'map',
+                    func: (func && _.isFunction(func) && func) || _.noop,
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+			},
+            repEach = function TAS_Repeating_Each(func, final, context) {
+				operations.push({
+                    type: 'each',
+                    func: (func && _.isFunction(func) && func) || _.noop,
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+            },
+            repTap = function TAS_Repeating_Tap(final, context) {
+				operations.push({
+                    type: 'tap',
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+            },
+            repAfter = function TAS_Repeating_After(callback,context) {
+				after.push({
+                    callback: (callback && _.isFunction(callback) && callback) || _.noop,
+                    context: context || {}
+                });
+				return this;
+            },
+			repExecute = function TAS_Repeating_Execute(callback,context){
+				var rowSet = {},
+					attrSet = {},
+					fieldIds = [],
+					fullFieldNames = [];
+
+                repAfter(callback,context);
+
+				// call each operation per row.
+				// call each operation's final
+				getSectionIDs("repeating_"+sectionName,function(ids){
+					fieldIds = ids;
+					fullFieldNames = _.reduce(fieldIds,function(memo,id){
+						return memo.concat(_.map(fieldNames,function(name){
+							return 'repeating_'+sectionName+'_'+id+'_'+name;  
+						}));
+					},[]);
+					getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
+						_.each(attrNames,function(aname){
+							if(values.hasOwnProperty(aname)){
+								addProp(attrSet,aname,values[aname]);
+							}
+						});
+
+						rowSet = _.reduce(fieldIds,function(memo,id){
+							var r={};
+							addId(r,id);
+							_.each(fieldNames,function(name){
+								var fn = 'repeating_'+sectionName+'_'+id+'_'+name;  
+								addProp(r,name,values[fn],fn);
+							});
+
+							memo[id]=r;
+
+							return memo;
+						},{});
+
+                        _.each(operations,function(op){
+                            var res;
+                            switch(op.type){
+                                case 'tap':
+                                    _.bind(op.final,op.context,rowSet,attrSet)();
+                                    break;
+
+                                case 'each':
+                                    _.each(rowSet,function(r){
+                                        _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+                                    });
+                                    _.bind(op.final,op.context,rowSet,attrSet)();
+                                    break;
+
+                                case 'map':
+                                    res = _.map(rowSet,function(r){
+                                        return _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+                                    });
+                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
+                                    break;
+
+                                case 'reduce':
+                                    res = op.memo;
+                                    _.each(rowSet,function(r){
+                                        res = _.bind(op.func,op.context,res,r,attrSet,r.id,rowSet)();
+                                    });
+                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
+                                    break;
+                            }
+                        });
+
+                        // finalize attrs
+                        applyQueuedUpdates();
+                        _.each(after,function(op){
+                          console.log("Processing after");
+                          console.log(op);
+                            _.bind(op.callback,op.context)();
+                        });
+					});
+				});
+			};
+				
+			return {
+				attrs: repAttrs,
+				attr: repAttrs,
+
+				column: repFields,
+				columns: repFields,
+				field: repFields,
+				fields: repFields,
+
+				reduce: repReduce,
+				inject: repReduce,
+				foldl: repReduce,
+
+				map: repMap,
+				collect: repMap,
+
+				each: repEach,
+                forEach: repEach,
+
+                tap: repTap,
+                'do': repTap,
+
+				after: repAfter,
+				last: repAfter,
+				done: repAfter,
+
+				execute: repExecute,
+				go: repExecute,
+				run: repExecute
+			};
+		}(section));
+	},
+
+
+    repeatingSimpleSum = function(section, field, destination){
+        repeating(section)
+            .attr(destination)
+            .field(field)
+            .reduce(function(m,r){
+                return m + (r.F[field]);
+            },0,function(t,r,a){
+                a.S[destination]=t;
+            })
+            .execute();
+    };
+
+    /* eslint-disable no-console */
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v'+version+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: '+(new Date(lastUpdate*1000))+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+    /* eslint-enable no-console */
+
+
+    return {
+        /* Repeating Sections */
+        repeatingSimpleSum: repeatingSimpleSum,
+		repeating: repeating,
+
+        /* Configuration */
+        config: setConfigOption,
+
+        /* Debugging */
+        callback: wrapCallback,
+        callstack: logCallstack,
+        debugMode: debugMode,
+        isDebugMode: isDebugMode,
+        _fn: wrapCallback,
+
+        /* Logging */
+        debug: logDebug,
+        error: logError,
+        warn: logWarn,
+        info: logInfo,
+        notice: logNotice,
+        log: logLog
+    };
+}());
+
 /* ---- END: TheAaronSheet.js ---- */
 
-  var VERSION = '1.5.4'
+
+  var VERSION = '1.5.6'
 var diceChain = [3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 20, 24, 30]
 
 /**
@@ -11668,6 +12440,154 @@ var recalculateRangedModifiers = function(e) {
 };
 
 on("change:repeating_rangedweapon", recalculateRangedModifiers);
+
+on("clicked:import_from_other_sheet", function(eventInfo) {
+  var attrMapOtherToThis = {"ActionDice1":"ActionDie","ActionDice2":"ActionDie2","Agility":"agi","Agility_max":"agiMax","BardCalltoArms":"callToArmsCheckMisc","BardCalm":"calmCheckMisc","BardChallenge":"challengeCheckMisc","BardLore":"loreCheckMisc","BardSpell":"spellName","BardSpellCheckMisc":"arcaneMod","BardSpellLevel":"spellLevel","BardSpellMercurial":"spellMercurialMagic","ClericDisapproval":"disapproval","ClericSpell":"spellNameCleric","ClericSpellCheckMisc":"divineMod","ClericSpellLevel":"spellLevel","ClericSpellNotes":"spellDescriptionCleric","ElfSpell":"spellName","ElfSpellCheckMisc":"arcaneMod","ElfSpellLevel":"spellLevel","ElfSpellNotes":"spellMercurialMagic","GnomeSpell":"spellName","GnomeSpellCheckMisc":"arcaneMod","GnomeSpellLevel":"spellLevel","GnomeSpellMercurial":"spellMercurialMagic","Intelligence":"int","Intelligence_max":"intMax","Level_max":"className","Luck_max":"luckMax","PaladinSpell":"spellNameCleric","PaladinSpellCheckMisc":"divineMod","PaladinSpellLevel":"spellLevel","PaladinSpellNotes":"spellDescriptionCleric","Personality":"per","Personality_max":"perMax","RangerClimb":"rangerClimbCheckMisc","RangerSneak":"rangerSneakCheckMisc","RangerStrider":"rangerStriderCheckMisc","RangerSurvival":"rangerSurvivalCheckMisc","RangerTraps":"rangerFindTrapsCheckMisc","Stamina":"sta","Stamina_max":"staMax","Strength":"str","Strength_max":"strMax","WeaponAtk":"OtherToHitBonus","WeaponDmg":"Dmg","WeaponName":"WeaponName","WeaponSpecial":"WeaponSpecial","WizardSpell":"spellName","WizardSpellCheckMisc":"arcaneMod","WizardSpellLevel":"spellLevel","WizardSpellMercurial":"spellMercurialMagic"}
+
+  /*
+   * Handle non-repeating attributes
+   */
+  getAttrs(_.keys(attrMapOtherToThis), function(oldAttrs) {
+    var newAttrs = _.reduce(oldAttrs, function(memo, value, oldAttrName) {
+      var key = attrMapOtherToThis[oldAttrName];
+      memo[key] = value || "";
+      return memo;
+    }, {});
+    setAttrs(newAttrs);
+  });
+
+  /*
+   * Handle repeating attributes, namely weapons and spells
+   */
+  TAS.repeating("weapons")
+    .attrs(["WarriorThreat"])
+    .fields(["WeaponAtk", "WeaponDmg", "WeaponName", "WeaponRange", "WeaponSpecial"])
+    .each(function(row, attrSet, id, rowSet) {
+      var newId = generateRowID();
+      var weaponType = "melee";
+      if (row.WeaponRange) {
+        weaponType = "ranged";
+      }
+      var prefix = `repeating_${weaponType}weapon_${newId}`;
+      var newAttrs = _.reduce(_.omit(row, ["WeaponRange"]), function(memo, value, oldAttrName) {
+        var key = `${prefix}_${weaponType}${attrMapOtherToThis[oldAttrName]}`;
+        memo[key] = value || "";
+        return memo;
+      }, {});
+
+      if (weaponType === "ranged") {
+        // make a best-effort attempt to parse the range values. just look for three numbers
+        var rangeRegex = /(\d+)\D+(\d+)\D+(\d+)/;
+        const match = row.WeaponRange.match(rangeRegex);
+        if (match) {
+          var keyPrefix = `${prefix}_rangedDistance`;
+          newAttrs[`${keyPrefix}Short`] = match[1];
+          newAttrs[`${keyPrefix}Med`] = match[2];
+          newAttrs[`${keyPrefix}Long`] = match[3];
+        }
+      }
+      if (attrSet.WarriorThreat) {
+        newAttrs[`${prefix}_${weaponType}CritThreat`] = attrSet.WarriorThreat
+      }
+      setAttrs(newAttrs);
+    })
+    .execute();
+
+  var importSpells = function(className, spellsType) {
+    return function(row, attrSet, id, rowSet) {
+      var spellLevel = row[`${className}SpellLevel`] || "1";
+      var newId = generateRowID();
+      var spellbookTypePrefix = spellsType === "divine" ? "divine" : "";
+      var prefix = `repeating_${spellbookTypePrefix}spellbooklevel${spellLevel}_${newId}`;
+      var newAttrs = _.reduce(row, function(memo, value, oldAttrName) {
+        var key = `${prefix}_${attrMapOtherToThis[oldAttrName]}`;
+        memo[key] = value || "";
+        return memo;
+      }, {});
+      setAttrs(newAttrs);
+    };
+  };
+
+  TAS.repeating("bardspells")
+    .fields(["BardSpell", "BardSpellCheckMisc", "BardSpellLevel", "BardSpellMercurial"])
+    .each(importSpells("Bard", "arcane"))
+    .execute();
+
+  TAS.repeating("gnomespells")
+    .fields(["GnomeSpell", "GnomeSpellCheckMisc", "GnomeSpellLevel", "GnomeSpellMercurial"])
+    .each(importSpells("Gnome", "arcane"))
+    .execute();
+
+  TAS.repeating("wizardspells")
+    .fields(["WizardSpell", "WizardSpellCheckMisc", "WizardSpellLevel", "WizardSpellMercurial"])
+    .each(importSpells("Wizard", "arcane"))
+    .execute();
+
+  /*
+   * Elf's Invoke Patron and Patron Bond have to be done manually
+   */
+
+  const elfSpecialAttrs = [
+    "ElfInvokePatronMisc",
+    "ElfInvokePatronNotes",
+    "ElfPatronBondMisc"
+  ];
+
+  getAttrs(elfSpecialAttrs, function(attrs) {
+    if (attrs.ElfInvokePatronMisc || attrs.ElfInvokePatronNotes) {
+      var newId = generateRowID();
+      var prefix = `repeating_spellbooklevel1_${newId}`;
+      var newAttrs = {};
+      newAttrs[`${prefix}_spellName`] = "Invoke Patron";
+      newAttrs[`${prefix}_arcaneMod`] = attrs.ElfInvokePatronMisc || "";
+      newAttrs[`${prefix}_spellMercurialMagic`] = attrs.ElfInvokePatronNotes || "";
+      setAttrs(newAttrs);
+    }
+    if (attrs.ElfPatronBondMisc) {
+      var newId = generateRowID();
+      var prefix = `repeating_spellbooklevel1_${newId}`;
+      var newAttrs = {};
+      newAttrs[`${prefix}_spellName`] = "Patron Bond";
+      newAttrs[`${prefix}_arcaneMod`] = attrs.ElfPatronBondMisc || "";
+      setAttrs(newAttrs);
+    }
+  });
+
+  TAS.repeating("elfspells")
+    .fields(["ElfSpell", "ElfSpellCheckMisc", "ElfSpellLevel", "ElfSpellNotes"])
+    .each(importSpells("Elf", "arcane"))
+    .execute();
+
+  TAS.repeating("clericspells")
+    .fields(["ClericSpell", "ClericSpellCheckMisc", "ClericSpellLevel", "ClericSpellNotes"])
+    .each(importSpells("Cleric", "divine"))
+    .execute();
+
+  TAS.repeating("paladinspells")
+    .fields(["PaladinSpell", "PaladinSpellCheckMisc", "PaladinSpellLevel", "PaladinSpellNotes"])
+    .each(importSpells("Paladin", "divine"))
+    .execute();
+
+  TAS.repeating("armor")
+    .fields(["ArmorBonus"])
+    .each(function(row, attrSet, id, rowSet) {
+      var attrName = 'repeating_armor_'+id+'_armorAcBase';
+      var newAttrs = {};
+      newAttrs[attrName] = row.ArmorBonus;
+      setAttrs(newAttrs);
+    })
+    .execute();
+
+  setAttrs({
+    import_from_other_sheet_status: "Done! Any attributes from the other DCC sheet have been copied to this one."
+  });
+
+  setTimeout(function() {
+    // NOTE: This requires roll20Async sheet to work properly
+    setAttrs({ import_from_other_sheet_status: "" });
+  }, 5000);
+
+});
 
 /**
  * Runs all migrations that are equal to or later than the given version
