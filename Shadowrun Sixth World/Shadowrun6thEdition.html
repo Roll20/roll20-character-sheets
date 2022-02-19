@@ -5463,12 +5463,205 @@
 <input type="hidden" name="attr_matrix_overclock" value="0" />
 <input type="hidden" name="attr_rerolls" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.48">
+<input type="hidden" name="attr_sheet_version" value="0.49">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
-//Sheet workers
 
 
+// Sheet workers
+
+// Data conversion for changes between sheet versions
+on("sheet:opened", function() {
+	getAttrs(['sheet_type', 'sheet_version', 'data_version'], (v) => {
+		console.log(`%c Shadowrun 6th World v${v['sheet_version']}`, "color: blue; font-weight:bold");
+		console.log(`%c Sheet Type: ${v['sheet_type']}`, "color: red; font-weight:bold");
+		console.log(`%c Data Version: v${v['data_version']}`, "color: black; font-weight:bold");
+
+		if(v.sheet_version != v.data_version) {
+			console.log("Sheet and Data version mismatch, updating...");
+			switch(v.data_version) {
+				case '0':
+					// fixed broken soak values
+					update_common_rolls(["body", "soak_modifier", "soak_temp", `soak_temp_flag`]);
+
+					['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'magic', 'resonance'].forEach(attr => {
+						update_attributes(attr);
+					});
+
+					update_essence();
+					techno_update();
+					update_initiative();
+					update_astral_initiative();
+					update_matrix_initiative();
+					sprite_update();
+
+				case '0.37':
+					_pre_v37_update();
+					console.log("Data now fits v.37");
+				case '0.38':
+					_v38_update();
+					console.log("Data now fits v.38");
+				case '0.39':
+					_v39_update();
+					console.log("Data now fits v.39");
+				case '0.41':
+					_v41_update();
+					console.log("Data now fits v.42");
+				default:
+					setAttrs({
+						'data_version': v.sheet_version
+					});
+					break;
+			}
+
+			console.log("Done.");
+		}
+
+	});
+});
+
+
+var _v41_update = () => {
+	// Update repeating_skills_${x}_attribute and _display_attribute
+	getSectionIDs('repeating_skills', (skillRows) => {
+		skillRows.forEach((row) => {
+			getAttrs([`repeating_skills_${row}_name`], (v) => {
+				update_skill_attribute(`repeating_skills_${row}`, v[`repeating_skills_${row}_name`]);
+			});
+		});
+	});
+};
+
+
+var _v39_update = () => {
+	// this section updates the AR values that were set for attr_close - attr_extreme to be the value for the previously undefined attr_close_base - attr_extreme_base
+	['range', 'melee'].forEach((type) => {
+		getSectionIDs(`repeating_${type}`, (sections) => {
+			sections.forEach((section) => {
+				[`repeating_${type}_${section}_close`, `repeating_${type}_${section}_near`, `repeating_${type}_${section}_medium`, `repeating_${type}_${section}_far`, `repeating_${type}_${section}_extreme`, `repeating_${type}_${section}_dicepool`, `repeating_${type}_${section}_damage`, 'sheet_type'].forEach((attr) => {
+					getAttrs([`${attr}`], (v) => {
+						setAttrs({
+							[`${attr}_base`]: v[`${attr}`]
+						});
+					});
+				});
+			});
+		});
+	});
+};
+
+var _v38_update = () => {
+	getAttrs(['sheet_type'], (v) => {
+		if(v.sheet_type === 'grunt') {
+			// Grunt skills somehow ended up thinking they were all based on agility at least for the display part and for many apparently the actual selected attribute.
+			// this code just sets them to their default associated attribute which should annoy the fewest users.
+			getSectionIDs('repeating_skills', (skill) => {
+				skill.forEach((skillID) => {
+					getAttrs([`repeating_skills_${skillID}_attribute`, `repeating_skills_${skillID}_display_attribute`, `repeating_skills_${skillID}_name`], (attrs) => {
+						var attribute;
+						switch(attrs[`repeating_skills_${skillID}_name`]) {
+							case 'Athletics':
+							case 'Close Combat':
+							case 'Exotic Weapons':
+							case 'Firearms':
+							case 'Stealth':
+								attribute = 'Agility';
+								break;
+							case 'Con':
+							case 'Influence':
+								attribute = 'Charisma';
+								break;
+							case 'Astral':
+							case 'Outdoors':
+							case 'Perception':
+								attribute = 'Intuition';
+								break;
+							case 'Biotech':
+							case 'Cracking':
+							case 'Electronics':
+							case 'Engineering':
+								attribute = 'Logic';
+								break;
+							case 'Conjuring':
+							case 'Enchanting':
+							case 'Sorcery':
+								attribute = 'Magic';
+								break;
+							case 'Piloting':
+								attribute = 'Reaction';
+								break;
+							case 'Tasking':
+								attribute = 'Resonance';
+								break;
+							default:
+								attribute = 'Agility';
+								break;
+						}
+
+						setAttrs({
+							[`repeating_skills_${skillID}_attribute`]: '@{'+attribute.toLowerCase()+'}',
+							[`repeating_skills_${skillID}_display_attribute`]: attribute
+						});
+					});
+				});
+			});
+		}
+	});
+}
+
+var _pre_v37_update = () => {
+	// Update trigger sheetworkers for weapons to set attribute and attr_rating values
+	['melee', 'range'].forEach((type) => {
+		getSectionIDs(`${type}`, function(ids) {
+			for(var i = 0; i < ids.length; i++) {
+				let skill = `repeating_${type}_` + ids[i] + "_skill";
+				let attr = `repeating_${type}_` + ids[i] + "_attribute";
+				let rating = `repeating_${type}_` + ids[i] + "_attr_rating";
+				let prim = `repeating_${type}_` + ids[i] + "_primary";
+				let updme = `repeating_${type}_` + ids[i] + "_updateme";
+
+				getAttrs([skill, prim, 'agility', 'logic', `primary_${type}_weapon_dicepool_modifier`], (v) => {
+					var attribute = 'Agility';
+					var attr_rating = v.agility;
+					switch(v[`${skill}`]) {
+						case 'engineering':
+							attribute = 'Logic';
+							attr_rating = v.logic;
+							break;
+						case 'athletics':
+						case 'close combat':
+						case 'exotic weapons':
+						case 'firearms':
+						default:
+							attribute = 'Agility';
+							attr_rating = v.agility;
+							break;
+					}
+
+					setAttrs({
+						[attr]: attribute,
+						[rating]: attr_rating
+					});
+
+					if(v[`${prim}`] === "primary") {
+						var dpm = v[`primary_${type}_weapon_dicepool_modifier`] || 0;
+
+						setAttrs({
+							[`primary_${type}_weapon_attribute`]: attribute,
+							[`primary_${type}_weapon_attr_rating`]: attr_rating,
+							[`primary_${type}_weapon_dicepool_modifier`]: dpm,
+							[`${updme}`]: ".37"
+						});
+					}
+				});
+			}
+		});
+	});
+
+}
+
+
+// Allows changes to "notes" fields to act as a pseudo-importer
 on("change:repeating_spell:notes change:repeating_npcspell:notes change:repeating_augmentations:notes change:repeating_quality:notes change:repeating_IC:IC_note change:repeating_range:notes change:repeating_melee:notes", (eventInfo) => {
 	if(eventInfo.sourceType != 'player') {
 		return;
@@ -5493,6 +5686,9 @@ on("change:repeating_spell:notes change:repeating_npcspell:notes change:repeatin
 
 
 
+/*************************************************************
+* Post Roll Processing                                       *
+*************************************************************/
 // Roll Button Definitions
 const rollButtons = {
 //	d6: "@{gm_toggle} &{template:rolls-computed}{{dice=[[(?{d6s|0}d6>5cs>5cf<[[(1+@{bad_luck})]]?{Exploding 6's?|N, |Y,!})]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=@{rerolls}}}{{header=@{character_name}}}{{base=^{d6}}}",
@@ -5699,7 +5895,8 @@ const initiatives = {
 	matrix_initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{matrixinitiative}}}{{initiative=[[(@{matrix_initiative_base}+@{modifiers_toggle})+(@{matrix_initiative_dice}d6cf0)]]}}",
 };
 
-// Initiatives
+
+// Initiative Rollers
 Object.keys(initiatives).forEach((ini) => {
 	on(`clicked:${ini}`, (eventInfo) => {
 
@@ -5734,7 +5931,7 @@ Object.keys(initiatives).forEach((ini) => {
 });
 
 
-// Normal non-repeating rolls
+// Normal non-repeating rollers
 ['d6',
 'body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge',
 'composure', 'judge_intentions', 'memory', 'social_rating', 'lift_carry', 'sprint',
@@ -5757,7 +5954,6 @@ console.log(rollButton);
 	});
 });
 
-
 // Bump 4s 1-7
 for(c = 1; c < 7; c++) {
 	on(`clicked:bump_fours${c}`, (eventInfo) => {
@@ -5770,7 +5966,6 @@ for(c = 1; c < 7; c++) {
 	});
 }
 
-
 // Rerolls 1-50
 for(c = 1; c < 50; c++) {
 	on(`clicked:reroll${c}`, (eventInfo) => {
@@ -5782,7 +5977,6 @@ for(c = 1; c < 50; c++) {
 		rollProcessor(rollButton);
 	});
 }
-
 
 // Repeating Skill Rolls
 ['repeating_skills:skill', 'repeating_skills:spec', 'repeating_skills:expert'].forEach((button) => {
@@ -5803,7 +5997,6 @@ for(c = 1; c < 50; c++) {
 	});
 });
 
-
 // Repeating Weapon Rolls
 ['repeating_range:rangeweapon', 'repeating_melee:meleeweapon', 'repeating_grenade:grenadeweapon'].forEach((button) => {
 	on(`clicked:${button}`, (eventInfo) => {
@@ -5822,7 +6015,6 @@ for(c = 1; c < 50; c++) {
 		rollProcessor(rollButton);
 	});
 });
-
 
 // Repeating Spell/Preparation/Ritual Rolls
 ['repeating_spell:spell', 'repeating_preparations:preparation', 'repeating_ritual:ritual'].forEach((button) => {
@@ -5843,7 +6035,6 @@ for(c = 1; c < 50; c++) {
 	});
 });
 
-
 // Repeating Complex Form Rolls
 ['repeating_forms:complexform', 'repeating_forms:complexformnoroll'].forEach((button) => {
 	on(`clicked:${button}`, (eventInfo) => {
@@ -5862,7 +6053,6 @@ for(c = 1; c < 50; c++) {
 		rollProcessor(rollButton);
 	});
 });
-
 
 // Repeating Vehicle Rolls
 ['repeating_vehicle:pcclearsight', 'repeating_vehicle:pcevasion', 'repeating_vehicle:pcstealth', 'repeating_vehicle:pcelectronicwarfare', 'repeating_vehicle:pcmaneuvering', 'repeating_vehicle:pctargeting'].forEach((button) => {
@@ -5884,7 +6074,10 @@ for(c = 1; c < 50; c++) {
 });
 
 
-
+/************************************
+* Roll Processor
+* - This does the heavy lifting
+************************************/
 var rollProcessor = (rollButton) => {
 	getAttrs(["bad_luck"], (v) => {
 		startRoll(rollButton, (results) => {
@@ -5895,7 +6088,6 @@ console.log(results.results);
 			if(! results.results.wilddie) {
 				results.results.wilddie = {dice: []}
 			}
-
 
 			var rolled = results.results.dice.dice;
 console.log("Dicepool: "+rolled.length);
@@ -5938,7 +6130,6 @@ console.log("Wild Die Rolled High!");
 					wd_hits += 2;
 				}
 			});
-
 
 console.log("Hit Threshold: "+hits_threshold);
 			var hits = rolled.reduce((a, v) => (v >= hits_threshold ? a + 1 : a), 0);
@@ -5992,196 +6183,11 @@ console.log("total_hits: "+total_hits);
 
 
 
-on("sheet:opened", function() {
-	getAttrs(['sheet_type', 'sheet_version', 'data_version'], (v) => {
-		console.log(`%c Shadowrun 6th World v${v['sheet_version']}`, "color: blue; font-weight:bold");
-		console.log(`%c Sheet Type: ${v['sheet_type']}`, "color: red; font-weight:bold");
-		console.log(`%c Data Version: v${v['data_version']}`, "color: black; font-weight:bold");
-
-		if(v.sheet_version != v.data_version) {
-			console.log("Sheet and Data version mismatch, updating...");
-			switch(v.data_version) {
-				case '0':
-					// fixed broken soak values
-					update_common_rolls(["body", "soak_modifier", "soak_temp", `soak_temp_flag`]);
-
-					['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'magic', 'resonance'].forEach(attr => {
-						update_attributes(attr);
-					});
-
-					update_essence();
-					techno_update();
-					update_initiative();
-					update_astral_initiative();
-					update_matrix_initiative();
-					sprite_update();
-
-				case '0.37':
-					_pre_v37_update();
-					console.log("Data now fits v.37");
-				case '0.38':
-					_v38_update();
-					console.log("Data now fits v.38");
-				case '0.39':
-					_v39_update();
-					console.log("Data now fits v.39");
-				case '0.41':
-					_v41_update();
-					console.log("Data now fits v.42");
-				default:
-					setAttrs({
-						'data_version': v.sheet_version
-					});
-					break;
-			}
-
-			console.log("Done.");
-		}
-
-	});
-});
-
-
-var _v41_update = () => {
-	// Update repeating_skills_${x}_attribute and _display_attribute
-	getSectionIDs('repeating_skills', (skillRows) => {
-		skillRows.forEach((row) => {
-			getAttrs([`repeating_skills_${row}_name`], (v) => {
-				update_skill_attribute(`repeating_skills_${row}`, v[`repeating_skills_${row}_name`]);
-			});
-		});
-	});
-};
-
-
-var _v39_update = () => {
-	// this section updates the AR values that were set for attr_close - attr_extreme to be the value for the previously undefined attr_close_base - attr_extreme_base
-	['range', 'melee'].forEach((type) => {
-		getSectionIDs(`repeating_${type}`, (sections) => {
-			sections.forEach((section) => {
-				[`repeating_${type}_${section}_close`, `repeating_${type}_${section}_near`, `repeating_${type}_${section}_medium`, `repeating_${type}_${section}_far`, `repeating_${type}_${section}_extreme`, `repeating_${type}_${section}_dicepool`, `repeating_${type}_${section}_damage`, 'sheet_type'].forEach((attr) => {
-					getAttrs([`${attr}`], (v) => {
-						setAttrs({
-							[`${attr}_base`]: v[`${attr}`]
-						});
-					});
-				});
-			});
-		});
-	});
-};
-
-var _v38_update = () => {
-	getAttrs(['sheet_type'], (v) => {
-		if(v.sheet_type === 'grunt') {
-			// Grunt skills somehow ended up thinking they were all based on agility at least for the display part and for many apparently the actual selected attribute.
-			// this code just sets them to their default associated attribute which should annoy the fewest users.
-			getSectionIDs('repeating_skills', (skill) => {
-				skill.forEach((skillID) => {
-					getAttrs([`repeating_skills_${skillID}_attribute`, `repeating_skills_${skillID}_display_attribute`, `repeating_skills_${skillID}_name`], (attrs) => {
-						var attribute;
-						switch(attrs[`repeating_skills_${skillID}_name`]) {
-							case 'Athletics':
-							case 'Close Combat':
-							case 'Exotic Weapons':
-							case 'Firearms':
-							case 'Stealth':
-								attribute = 'Agility';
-								break;
-							case 'Con':
-							case 'Influence':
-								attribute = 'Charisma';
-								break;
-							case 'Astral':
-							case 'Outdoors':
-							case 'Perception':
-								attribute = 'Intuition';
-								break;
-							case 'Biotech':
-							case 'Cracking':
-							case 'Electronics':
-							case 'Engineering':
-								attribute = 'Logic';
-								break;
-							case 'Conjuring':
-							case 'Enchanting':
-							case 'Sorcery':
-								attribute = 'Magic';
-								break;
-							case 'Piloting':
-								attribute = 'Reaction';
-								break;
-							case 'Tasking':
-								attribute = 'Resonance';
-								break;
-							default:
-								attribute = 'Agility';
-								break;
-						}
-
-						setAttrs({
-							[`repeating_skills_${skillID}_attribute`]: '@{'+attribute.toLowerCase()+'}',
-							[`repeating_skills_${skillID}_display_attribute`]: attribute
-						});
-					});
-				});
-			});
-		}
-	});
-}
-
-var _pre_v37_update = () => {
-	// Update trigger sheetworkers for weapons to set attribute and attr_rating values
-	['melee', 'range'].forEach((type) => {
-		getSectionIDs(`${type}`, function(ids) {
-			for(var i = 0; i < ids.length; i++) {
-				let skill = `repeating_${type}_` + ids[i] + "_skill";
-				let attr = `repeating_${type}_` + ids[i] + "_attribute";
-				let rating = `repeating_${type}_` + ids[i] + "_attr_rating";
-				let prim = `repeating_${type}_` + ids[i] + "_primary";
-				let updme = `repeating_${type}_` + ids[i] + "_updateme";
-
-				getAttrs([skill, prim, 'agility', 'logic', `primary_${type}_weapon_dicepool_modifier`], (v) => {
-					var attribute = 'Agility';
-					var attr_rating = v.agility;
-					switch(v[`${skill}`]) {
-						case 'engineering':
-							attribute = 'Logic';
-							attr_rating = v.logic;
-							break;
-						case 'athletics':
-						case 'close combat':
-						case 'exotic weapons':
-						case 'firearms':
-						default:
-							attribute = 'Agility';
-							attr_rating = v.agility;
-							break;
-					}
-
-					setAttrs({
-						[attr]: attribute,
-						[rating]: attr_rating
-					});
-
-					if(v[`${prim}`] === "primary") {
-						var dpm = v[`primary_${type}_weapon_dicepool_modifier`] || 0;
-
-						setAttrs({
-							[`primary_${type}_weapon_attribute`]: attribute,
-							[`primary_${type}_weapon_attr_rating`]: attr_rating,
-							[`primary_${type}_weapon_dicepool_modifier`]: dpm,
-							[`${updme}`]: ".37"
-						});
-					}
-				});
-			}
-		});
-	});
-
-}
-
-
+/*******************************************
+* Modifications field processing           *
+* - This allows custom attribute overrides *
+*   via the 'Modifications' inputs         *
+*******************************************/
 on("change:repeating_quality:modifications remove:repeating_quality change:repeating_augmentations:modifications remove:repeating_augmentations change:repeating_items:modifications remove:repeating_items change:repeating_devices:modifications remove:repeating_devices change:repeating_programs:modifications change:repeating_programs:powered_on remove:repeating_programs change:repeating_echoes:modifications remove:repeating_echoes change:repeating_forms:modifications remove:repeating_forms change:repeating_powers:modifications remove:repeating_powers change:repeating_metamagic remove:repeating_metamagic", (eventInfo) => {
 	var allowed_modifiers = [
 		'body_modifier', 'agility_modifier', 'reaction_modifier', 'strength_modifier', 'willpower_modifier', 'logic_modifier', 'intuition_modifier', 'charisma_modifier',
