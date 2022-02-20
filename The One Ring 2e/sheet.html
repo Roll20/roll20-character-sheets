@@ -1374,26 +1374,22 @@
         let rollTotal = rollSuccess + rollFeat,
             rollDiff = rollTotal - int(tn);
         clog(`rollFeat: ${rollFeat}, rollTotal: ${rollTotal}, Target Number: ${tn}, Diff: ${rollDiff}`);
-        // Miserable logic, if Feat die is 0 (eye) then fail automatically, overrides all of below (adversaries don't get miserable)
-        if (rollFeat == fumble){
-            if (lm) {
-                outcome = 0;
-                clog(`Adversaries fail on gandalf rune! Outcome: ${outcome}`); 
-            } else if (miserable == 1) {
-                outcome = -2;                
-                clog(`PC fail on Eye of Sauron and Miserable. Outcome: ${outcome}`);
-            } else {
-                clog('PC do not fail on Eye of Sauron if not Miserable!');
-            }
-        } else if ( rollFeat == crit ) { // outcome 2 = Feat Success (Gandalf or Eye of Sauron)
-            outcome = 2; 
-            //rollFeat = 0; // crit success doesnt have a value, also doesnt matter with regards to success since it always succeeds
+
+        // Determine outcome
+        if ( rollFeat === crit ) { 
+            outcome = 2; // Feat Success (Gandalf or Eye of Sauron)
             clog(`Outcome after critical success: ${outcome}`);
+        } else if (rollFeat === fumble && lm){
+            outcome = 0; // normal failure
+            clog(`Adversaries fail on gandalf rune! Outcome: ${outcome}`);
+        } else if (rollFeat === fumble && !lm && miserable){
+            outcome = -2; // miserable failure               
+            clog(`PC fail on Eye of Sauron and Miserable. Outcome: ${outcome}`);
         } else if (rollTotal >= tn) {
             outcome = 1; // normal success
             clog(`Outcome after normal success: ${outcome}`);
-        } else if (lm && weary == 1) {
-            outcome = -1; // weary failure for PC
+        } else if (weary) {
+            outcome = -1; // weary failure 
             clog(`Outcome after weary failure: ${outcome}`);
         } else {
             outcome = 0; // normal failure
@@ -1405,7 +1401,7 @@
         outcome = (rolltype === "combat") && (outcome === 1 || outcome === 2) && (rollFeat === crit || rollFeat === 10) ? 3 : outcome; 
         clog(`Outcome after Piercing: ${outcome}`);
         // Piercing blow also at 9 if the weapon used is keen 
-        outcome = rolltype === "combat" && keen > 0 && rollFeat === 9 && (outcome === 1 || outcome === 2) ? 3 : outcome; 
+        outcome = rolltype === "combat" && (outcome === 1 || outcome === 2) && rollFeat === 9 && keen > 0 ? 3 : outcome; 
         clog(`Outcome after Keen: ${outcome}`);
         // count number of 6s in success, great or extraordinary success
         // Count the number of sixes rolled, to report degree of success
