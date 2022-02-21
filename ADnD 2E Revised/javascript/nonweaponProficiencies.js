@@ -1,5 +1,5 @@
 const nonweaponProficiencies = {};
-//region Player's Handbook
+//#region Player's Handbook
 nonweaponProficiencies['Agriculture'] = {
     'slots': 1,
     'abilityScore': '@{Intelligence}',
@@ -483,9 +483,9 @@ nonweaponProficiencies['Weaponsmithing'] = {
     'classes': 'Warrior',
     'book': 'PHB'
 };
-//endregion
+//#endregion
 
-//region The Complete Thief's Handbook
+//#region The Complete Thief's Handbook
 nonweaponProficiencies['Alertness'] = {
     'slots': 1,
     'abilityScore': '@{Wisdom}',
@@ -577,5 +577,342 @@ nonweaponProficiencies['Voice Mimicry'] = {
     'classes': '',
     'book': 'The Complete Thief\'s Handbook'
 };
-//endregion
+//#endregion
+
+//#region The Complete Book of Dwarves
+nonweaponProficiencies['Boatwright'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Dwarf Runes'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Fungi Recognition'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +3,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Local Dwarf History'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Sign Language'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Signalling'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Slow Respiration'] = {
+    'slots': 1,
+    'abilityScore': '@{NA}',
+    'modifier': 'NA',
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Smelting'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Sound Analysis'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Survival, Underground'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Underground Navigation'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Survival (Hill, Mountain)'] = {
+    'slots': 1,
+    'abilityScore': '@{NA}',
+    'modifier': 'NA',
+    'classes': 'Warrior',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Pest Control'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Thief',
+    'book': 'The Complete Book of Dwarves'
+};
+//#endregion
+
+//#region The Complete Bard's Handbook
+nonweaponProficiencies['Acting'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': -1,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+nonweaponProficiencies['Chanting'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+nonweaponProficiencies['Craft Instrument'] = {
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+nonweaponProficiencies['Crowd Working'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+nonweaponProficiencies['Poetry'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+nonweaponProficiencies['Whistling/Humming'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Bard\'s Handbook'
+};
+//#endregion
+
+//#region The Complete Book of Humanoids
+nonweaponProficiencies['Cheesemaking'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Danger Sense'] = {
+    'slots': 2,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +1,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Drinking'] = {
+    'slots': 1,
+    'abilityScore': '@{Constitution}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Eating'] = {
+    'slots': 1,
+    'abilityScore': '@{Constitution}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Hiding'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Winemaking'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Close-quarter Fighting'] = {
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': 'Warrior/Rogue',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Natural Fighting'] = {
+    'slots': 2,
+    'abilityScore': '@{Strength}',
+    'modifier': +1,
+    'classes': 'Warrior',
+    'book': 'The Complete Book of Humanoids'
+};
+nonweaponProficiencies['Wild Fighting'] = {
+    'slots': 2,
+    'abilityScore': '@{Constitution}',
+    'modifier': 0,
+    'classes': 'Warrior',
+    'book': 'The Complete Book of Humanoids'
+};
+//#endregion
+
+//#region The Complete Ranger's Handbook
+nonweaponProficiencies['Cartography'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Distance Sense'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Falconry'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Persuasion'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Riding, Sea-based'] = {
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Signaling'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Camouflage'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Fighter/Rogue',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Foraging'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Warrior/Rogue',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Spelunking'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Warrior',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Trail Marking'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Warrior',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Trail Signs'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': 'Warrior/Rogue',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Veterinary Healing'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -3,
+    'classes': 'Priest',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+nonweaponProficiencies['Weaponsmithing, Crude'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -3,
+    'classes': 'Warrior',
+    'book': 'The Complete Ranger\'s Handbook'
+};
+//#endregion
+
+//#region The Complete Paladin's Handbook
+nonweaponProficiencies['Bureaucracy'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Priest/Rogue',
+    'book': 'The Complete Paladin\'s Handbook'
+};
+nonweaponProficiencies['Diagnostics'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -1,
+    'classes': 'Priest',
+    'book': 'The Complete Paladin\'s Handbook'
+};
+nonweaponProficiencies['Jousting'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': +2,
+    'classes': 'Warrior',
+    'book': 'The Complete Paladin\'s Handbook'
+};
+nonweaponProficiencies['Law'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Warrior/Priest',
+    'book': 'The Complete Paladin\'s Handbook'
+};
+nonweaponProficiencies['Oratory'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': 'Warrior/Priest',
+    'book': 'The Complete Paladin\'s Handbook'
+};
+//#endregion
 module.exports = nonweaponProficiencies;
