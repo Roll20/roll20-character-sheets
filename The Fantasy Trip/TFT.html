@@ -546,18 +546,26 @@
 			{{^successflavor}}
 				<div class=success>Hit!</div>
 			{{/successflavor}}
-			{{#damage}}
-				<div class=keyvalue><span>Damage: </span>{{damage}}</div>
-			{{/damage}}
 			{{#rollTotal() computed::success 4}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}} &times 3 = {{computed::damage}}</div>
+				{{/damage}}
 				<div class=success>Critical: Triple Damage!</div>
 			{{/rollTotal() computed::success 4}}
 			{{#rollTotal() computed::success 3}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}} &times 2 = {{computed::damage}}</div>
+				{{/damage}}
 				<div class=success>Critical: Double Damage!</div>
 			{{/rollTotal() computed::success 3}}
-			{{#rollTotal() computed::success 2}}
-				<div class=success>Automatic hit.</div>
-			{{/rollTotal() computed::success 2}}
+			{{#rollLess() computed::success 3}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+				{{/damage}}
+				{{#rollTotal() computed::success 2}}
+					<div class=success>Automatic hit.</div>
+				{{/rollTotal() computed::success 2}}
+			{{/rollLess() computed::success 3}}
 		{{/rollGreater() computed::success 0}}
 		<!-- Failure -->
 		{{#rollLess() computed::success 0}}
@@ -622,18 +630,26 @@
 			{{^successflavor}}
 				<div class=success>Success!</div>
 			{{/successflavor}}
-			{{#damage}}
-				<div class=keyvalue><span>Damage: </span><span>{{damage}}</span></div>
-			{{/damage}}
 			{{#rollTotal() computed::success 4}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}} &times 3 = {{computed::damage}}</div>
+				{{/damage}}
 				<div class=success>Critical: Triple Damage or Effect!</div>
 			{{/rollTotal() computed::success 4}}
 			{{#rollTotal() computed::success 3}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}} &times 2 = {{computed::damage}}</div>
+				{{/damage}}
 				<div class=success>Critical: Double Damage or Effect!</div>
 			{{/rollTotal() computed::success 3}}
-			{{#rollTotal() computed::success 2}}
-				<div class=success>Automatic success.</div>
-			{{/rollTotal() computed::success 2}}
+			{{#rollLess() computed::success 3}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+				{{/damage}}
+				{{#rollTotal() computed::success 2}}
+					<div class=success>Automatic success.</div>
+				{{/rollTotal() computed::success 2}}
+			{{/rollLess() computed::success 3}}
 		{{/rollGreater() computed::success 0}}
 		<!-- Failure -->
 		{{#rollLess() computed::success 0}}
@@ -1232,15 +1248,14 @@
 
 			// Do the Attack roll with success level.
 			const doAttackRoll = function(macro) {
-
-				// @TEST remove me!
-				console.log(macro);
-
 				macro += ' {{character_name=@{cname}}}';
 				macro += rollTemplateValue('success', 0, true); // level of success, crits, etc.
 				startRoll(macro, (results) => {
-					let level = successLevel(results.results);
+					let level = successLevel(results.results)
 					let computed = {'success': level};
+					if (('damage' in results.results) && level > 2) {
+						computed['damage'] = results.results.damage.result * (level - 1);
+					}
 					if ('roll1' in results.results) {
 						computed['roll1'] = diceArrayToString(results.results.roll1.dice);
 					}
