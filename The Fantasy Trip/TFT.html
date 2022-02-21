@@ -120,7 +120,7 @@
 					<button class=sheet-dice-button type="action" title="Add yourself to Turn Order, select your Token first." name="act_turnorder">Turn Order</button>
 					<span>
 						<button class=sheet-dice-button type="action" title="Roll team Initiative." name="act_initiative">Initiative</button>
-						<input class=sheet-onechar-input type=text title="Bonus to initiative, like 1 for Leadership" name="attr_initiative_adj"/>
+						<input class=sheet-onechar-input type=text title="Bonus to Initiative, as for Tactics or Strategist." name="attr_initiative_adj"/>
 					</span>
 
 				</div>
@@ -685,7 +685,12 @@
 		<div class=arrow-container><div class=arrow-right></div></div>
 		<div>
 			<div>
-				<span class=template-dice>{{computed::roll1}}</span> = {{roll1}}
+				{{#initiativeadj}}
+					<span class=template-dice>{{computed::roll1}}</span> + {{initiativeadj}} = {{roll1}}
+				{{/initiativeadj}}
+				{{^initiativeadj}}
+					<span class=template-dice>{{computed::roll1}}</span> = {{roll1}}
+				{{/initiativeadj}}
 			</div>
 		</div>
 	</div>
@@ -1111,9 +1116,20 @@
 	});
 
 	on('clicked:initiative', (info) => {
-		let macro = "&{template:initiative}"
-		macro += rollTemplateValue('roll1', '1d6+@{initiative_adj}', true);
-		doRollWithDiceString(macro);
+		let initiativeAdjName = 'initiative_adj';
+		let attrNames = [initiativeAdjName];
+		getAttrs(attrNames, function(v) {
+			let mstring = "&{template:initiative}"
+			let initiativeRoll = '1d6';
+			// provisionally add initiative adjustment
+			if (parseInt(v[initiativeAdjName])||0) {
+				let initiativeAdj = `@{${initiativeAdjName}}[INITIATIVE_ADJ]`;
+				initiativeRoll += ` + ${initiativeAdj}`;
+				mstring += rollTemplateValue('initiativeadj', initiativeAdj, true);
+			}
+			mstring += rollTemplateValue('roll1', initiativeRoll, true);
+			doRollWithDiceString(mstring);
+		});
 	});
 
 	on('clicked:turnorder', (info) => {
