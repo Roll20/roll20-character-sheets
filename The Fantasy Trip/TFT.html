@@ -118,7 +118,11 @@
 			<div> <!-- stops from stretching -->
 				<div class=sheet-flex-centered style='margin-bottom: .5rem'>
 					<button class=sheet-dice-button type="action" title="Add yourself to Turn Order, select your Token first." name="act_turnorder">Turn Order</button>
-					<button class=sheet-dice-button type="action" title="Roll team Initiative." name="act_initiative">Initiative</button>
+					<span>
+						<button class=sheet-dice-button type="action" title="Roll team Initiative." name="act_initiative">Initiative</button>
+						<input class=sheet-onechar-input type=text title="Bonus to initiative, like 1 for Leadership" name="attr_initiative_adj"/>
+					</span>
+
 				</div>
 				<div class=sheet-flex-centered>
 					<span title="Wounded ST, current Strength reduced by Wounds and Fatigue.">
@@ -681,7 +685,7 @@
 		<div class=arrow-container><div class=arrow-right></div></div>
 		<div>
 			<div>
-				<span class=template-dice>{{computed::roll1}}</span>
+				<span class=template-dice>{{computed::roll1}}</span> = {{roll1}}
 			</div>
 		</div>
 	</div>
@@ -1107,7 +1111,9 @@
 	});
 
 	on('clicked:initiative', (info) => {
-		doRollWithDiceString("&{template:initiative} {{roll1=[[1d6]]}}");
+		let macro = "&{template:initiative}"
+		macro += rollTemplateValue('roll1', '1d6+@{initiative_adj}', true);
+		doRollWithDiceString(macro);
 	});
 
 	on('clicked:turnorder', (info) => {
