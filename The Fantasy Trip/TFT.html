@@ -262,6 +262,8 @@
 					<input type=text name="attr_attackflavor" style='display: block; width:100%' placeholder="swings his mighty war axe.">
 					<span title="Text shown when the attack hits, optional.">Success Flavor Text:</span>
 					<input type=text name="attr_successflavor" style='display: block; width:100%' placeholder="The axe hits with a sickening crunch!">
+					<span title="Text shown when the attack misses, optional.">Failure Flavor Text:</span>
+					<input type=text name="attr_failureflavor" style='display: block; width:100%' placeholder="The axe swooshes air!">
 					<span title="Details about the weapon, quoted with the Describe button.">Description:</span>
 					<textarea class=sheet-text-area spellcheck="false" name="attr_description"></textarea>
 				</div>
@@ -550,12 +552,17 @@
 				<div class=success>Critical: Double Damage!</div>
 			{{/rollTotal() computed::success 3}}
 			{{#rollTotal() computed::success 2}}
-				<div class=success>Critical: Automatic hit.</div>
+				<div class=success>Automatic hit.</div>
 			{{/rollTotal() computed::success 2}}
 		{{/rollGreater() computed::success 0}}
 		<!-- Failure -->
 		{{#rollLess() computed::success 0}}
-			<div class=failure>Miss!</div>
+			{{#failureflavor}}
+				<div class=flavor-failure>{{failureflavor}}</div>
+			{{/failureflavor}}
+			{{^failureflavor}}
+				<div class=failure>Miss!</div>
+			{{/failureflavor}}
 			{{#rollTotal() computed::success -4}}
 				<div class=failure>Critical: Weapon breaks or 1d6 damage!</div>
 			{{/rollTotal() computed::success -4}}
@@ -563,7 +570,7 @@
 				<div class=failure>Critical: Drops weapon or 1d6 damage!</div>
 			{{/rollTotal() computed::success -3}}
 			{{#rollTotal() computed::success -2}}
-				<div class=failure>Critical: Automatic miss.</div>
+				<div class=failure>Automatic miss.</div>
 			{{/rollTotal() computed::success -2}}
 		{{/rollLess() computed::success 0}}
 	</div>
@@ -621,7 +628,7 @@
 				<div class=success>Critical: Double Damage or Effect!</div>
 			{{/rollTotal() computed::success 3}}
 			{{#rollTotal() computed::success 2}}
-				<div class=success>Critical: Automatic success.</div>
+				<div class=success>Automatic success.</div>
 			{{/rollTotal() computed::success 2}}
 		{{/rollGreater() computed::success 0}}
 		<!-- Failure -->
@@ -634,7 +641,7 @@
 				<div class=failure>Critical: Lose ST, drop staff!</div>
 			{{/rollTotal() computed::success -3}}
 			{{#rollTotal() computed::success -2}}
-				<div class=failure>Critical: Automatic fail.</div>
+				<div class=failure>Automatic fail.</div>
 			{{/rollTotal() computed::success -2}}
 		{{/rollLess() computed::success 0}}
 	</div>
@@ -1258,8 +1265,9 @@
 			} else if (type == 'weapon') {
 				let attackFlavorName = repeatingPropertyName('weapons', id, 'attackflavor');
 				let successFlavorName = repeatingPropertyName('weapons', id, 'successflavor');
+				let failureFlavorName = repeatingPropertyName('weapons', id, 'failureflavor');
 				let weaponDamageName = repeatingPropertyName('weapons', id, 'weapondamage');
-				let attrNames = ['gender', attackFlavorName, successFlavorName, weaponDamageName, 'defending'];
+				let attrNames = ['gender', attackFlavorName, successFlavorName, failureFlavorName, weaponDamageName, 'defending'];
 				let weaponToHitName  = repeatingPropertyName('weapons', id, 'tohit');
 				if (toHitCharacter != 'a') {
 					attrNames.push(weaponToHitName);
@@ -1308,6 +1316,7 @@
 					}
 					mstring += rollTemplateProperty('attackflavor', attackFlavorName, v);
 					mstring += rollTemplateProperty('successflavor', successFlavorName, v);
+					mstring += rollTemplateProperty('failureflavor', failureFlavorName, v);
 					doAttackRoll(mstring);
 				});
 			}
