@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable max-len */
 /* eslint-disable no-undef */
-const rollCombatAutre = ['repeating_armeautre:armeautrepj'];
+const rollCombatAutre = ['repeating_armeautre:armeautrepj', 'repeating_armeautre:armeautrepjvehicule'];
 
 rollCombatAutre.forEach((button) => {
   on(`clicked:${button}`, async (info) => {
@@ -32,6 +32,8 @@ rollCombatAutre.forEach((button) => {
 
     listAttrs.push(`${prefix}armeAutreBDegat`);
     listAttrs.push(`${prefix}armeAutreBViolence`);
+
+    listAttrs.push('energieVehicule');
 
     listAttrs = listAttrs.concat(effet, effetValue, AA, AAValue, special, specialValue);
 
@@ -103,6 +105,8 @@ rollCombatAutre.forEach((button) => {
 
     let isELumiere = false;
     let lumiereValue = 0;
+
+    const energie = attrs.energieVehicule;
 
     let autresEffets = [];
     let autresAmeliorationsA = [];
@@ -212,6 +216,10 @@ rollCombatAutre.forEach((button) => {
     const sEnergie = isApplied(attrs[`${prefix}energie`]);
     const sEnergieValue = attrs[`${prefix}energieValue`];
 
+    let newEnergie = 0;
+    let pasEnergie = false;
+    let sEnergieText = '';
+
     if (sBonusDegats) {
       exec.push(`{{vMSpecialD=+${sBonusDegatsD6}D6+${sBonusDegatsFixe}}}`);
       diceDegats += Number(sBonusDegatsD6);
@@ -225,7 +233,19 @@ rollCombatAutre.forEach((button) => {
     }
 
     if (sEnergie) {
-      autresSpecial.push(`^{energie} (${sEnergieValue})`);
+      if (button === 'repeating_armeautre:armeautrepjvehicule') {
+        autresSpecial.push(`${i18n_energieRetiree} (${sEnergieValue})`);
+
+        newEnergie = Number(energie) - Number(sEnergieValue);
+
+        if (newEnergie === 0) {
+          sEnergieText = i18n_plusEnergie;
+        } else if (newEnergie < 0) {
+          newEnergie = 0;
+          sEnergieText = i18n_pasEnergie;
+          pasEnergie = true;
+        }
+      } else { autresSpecial.push(`^{energie} (${sEnergieValue})`); }
     }
 
     // FIN DE GESTION DES BONUS SPECIAUX
@@ -363,45 +383,61 @@ rollCombatAutre.forEach((button) => {
     exec = firstExec.concat(exec);
 
     // ROLL
-    const finalRoll = await startRoll(exec.join(' '));
-    const tJet = finalRoll.results.jet.result;
+    let finalRoll;
 
-    const tBonus = finalRoll.results.bonus.result;
-    const tExploit = finalRoll.results.Exploit.result;
+    if (pasEnergie === false) {
+      finalRoll = await startRoll(exec.join(' '));
+      const tJet = finalRoll.results.jet.result;
 
-    const rDegats = finalRoll.results.degats.dice;
-    const rViolence = finalRoll.results.violence.dice;
+      const tBonus = finalRoll.results.bonus.result;
+      const tExploit = finalRoll.results.Exploit.result;
 
-    const tDegats = finalRoll.results.degats.result;
-    const tViolence = finalRoll.results.violence.result;
+      const rDegats = finalRoll.results.degats.dice;
+      const rViolence = finalRoll.results.violence.dice;
 
-    const conditions = {
-      isTenebricide,
-      isDestructeur,
-      isFureur,
-      isSurprise,
-      isMeurtrier,
-      isUltraviolence,
-    };
+      const tDegats = finalRoll.results.degats.result;
+      const tViolence = finalRoll.results.violence.result;
 
-    const computed = updateRoll(finalRoll, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
-
-    const finalComputed = {
-      jet: tJet + tBonus,
-    };
-
-    Object.assign(finalComputed, computed);
-
-    finishRoll(finalRoll.rollId, finalComputed);
-
-    if (tJet !== 0 && tJet === tExploit) {
-      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
-      const tRExploit = exploitRoll.results.jet.result;
-      const exploitComputed = {
-        jet: tRExploit,
+      const conditions = {
+        isTenebricide,
+        isDestructeur,
+        isFureur,
+        isSurprise,
+        isMeurtrier,
+        isUltraviolence,
       };
 
-      finishRoll(exploitRoll.rollId, exploitComputed);
+      const computed = updateRoll(finalRoll, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
+
+      const finalComputed = {
+        jet: tJet + tBonus,
+      };
+
+      Object.assign(finalComputed, computed);
+
+      finishRoll(finalRoll.rollId, finalComputed);
+
+      if (tJet !== 0 && tJet === tExploit) {
+        const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+        const tRExploit = exploitRoll.results.jet.result;
+        const exploitComputed = {
+          jet: tRExploit,
+        };
+
+        finishRoll(exploitRoll.rollId, exploitComputed);
+      }
+
+      if (sEnergie !== false && button === 'repeating_armeautre:armeautrepjvehicule') {
+        setAttrs({ energieVehicule: newEnergie });
+
+        if (newEnergie === 0) {
+          const noEnergieRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{text=${sEnergieText}}}${name}`);
+          finishRoll(noEnergieRoll.rollId, {});
+        }
+      }
+    } else {
+      finalRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{text=${sEnergieText}}}${name}`);
+      finishRoll(finalRoll.rollId, {});
     }
   });
 });
