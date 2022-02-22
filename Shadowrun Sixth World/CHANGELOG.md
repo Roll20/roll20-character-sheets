@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2022-02-22 ** v.49 Chuz (James Culp)
+	Added the ability to import character data from the RPG Framework Genesis character generator. (see official Roll20 thread notes)
 **2021-11-23 ** v.48 Chuz (James Culp)
 	Bugfix - Removing Technomancer echos with modifications didn't update things correctly.
 	Bugfix - Replaced translation "Rotarcraft" with correct "Rotorcraft"
