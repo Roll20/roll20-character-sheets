@@ -580,10 +580,10 @@ nonweaponProficiencies['Voice Mimicry'] = {
 //#endregion
 
 //#region The Complete Book of Dwarves
-nonweaponProficiencies['Boatwright'] = {
+nonweaponProficiencies['Appraising (Dwarf)'] = {
     'slots': 1,
     'abilityScore': '@{Intelligence}',
-    'modifier': -2,
+    'modifier': +3,
     'classes': '',
     'book': 'The Complete Book of Dwarves'
 };
@@ -591,6 +591,20 @@ nonweaponProficiencies['Dwarf Runes'] = {
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Dwarf Runes (Dwarf)'] = {
+    'slots': 0,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Endurance (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Constitution}',
+    'modifier': 0,
     'classes': '',
     'book': 'The Complete Book of Dwarves'
 };
@@ -608,6 +622,20 @@ nonweaponProficiencies['Local Dwarf History'] = {
     'classes': '',
     'book': 'The Complete Book of Dwarves'
 };
+nonweaponProficiencies['Navigation, Underground'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Riding, Land-Based (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
 nonweaponProficiencies['Sign Language'] = {
     'slots': 1,
     'abilityScore': '@{Intelligence}',
@@ -622,17 +650,17 @@ nonweaponProficiencies['Signalling'] = {
     'classes': '',
     'book': 'The Complete Book of Dwarves'
 };
+nonweaponProficiencies['Singing (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': +2,
+    'classes': '',
+    'book': 'The Complete Book of Dwarves'
+};
 nonweaponProficiencies['Slow Respiration'] = {
     'slots': 1,
     'abilityScore': '@{NA}',
     'modifier': 'NA',
-    'classes': '',
-    'book': 'The Complete Book of Dwarves'
-};
-nonweaponProficiencies['Smelting'] = {
-    'slots': 1,
-    'abilityScore': '@{Intelligence}',
-    'modifier': 0,
     'classes': '',
     'book': 'The Complete Book of Dwarves'
 };
@@ -650,11 +678,172 @@ nonweaponProficiencies['Survival, Underground'] = {
     'classes': '',
     'book': 'The Complete Book of Dwarves'
 };
-nonweaponProficiencies['Underground Navigation'] = {
+nonweaponProficiencies['Armorer (Dwarf)'] = {
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
-    'classes': '',
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Blacksmithing (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Strength}',
+    'modifier': +1,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Bowyer/Fletcher (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Brewing (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +1,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Engineering (Dwarf)'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Gem Cutting (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Herbalism (Dwarf)'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Locksmithing (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': +1,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Mining (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Pottery (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -3,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Seamstress/Tailor (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -2,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Smelting'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Stonemasonry (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Strength}',
+    'modifier': 0,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Weaponsmithing (Dwarf)'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Weaving (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Crafts',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Ancient History (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Priest',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Blind-fighting (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{NA}',
+    'modifier': 'NA',
+    'classes': 'Warrior/Thief',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Disguise (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': -2,
+    'classes': 'Thief',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Forgery (Dwarf)'] = {
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -1,
+    'classes': 'Thief',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Hunting (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': '-2',
+    'classes': 'Warrior',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Juggling (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -2,
+    'classes': 'Thief',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Lip Reading (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Thief',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Musical Instrument (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -2,
+    'classes': 'Thief/Priest',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Pest Control'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Thief',
     'book': 'The Complete Book of Dwarves'
 };
 nonweaponProficiencies['Survival (Hill, Mountain)'] = {
@@ -664,11 +853,67 @@ nonweaponProficiencies['Survival (Hill, Mountain)'] = {
     'classes': 'Warrior',
     'book': 'The Complete Book of Dwarves'
 };
-nonweaponProficiencies['Pest Control'] = {
+nonweaponProficiencies['Boating (Dwarf)'] = {
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
-    'classes': 'Thief',
+    'classes': 'Special Background',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Boatwright'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Special Background',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Navigation (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -3,
+    'classes': 'Special Background',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Swimming (Dwarf)'] = {
+    'slots': 1,
+    'abilityScore': '@{Strength}',
+    'modifier': -1,
+    'classes': 'Special Background',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Grade or Slope in Passage'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +4,
+    'classes': '(Optional) Dwarven Detection',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['New Tunnel/Passage Construction'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +4,
+    'classes': '(Optional) Dwarven Detection',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Sliding/Shifting Walls or Rooms'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +2,
+    'classes': '(Optional) Dwarven Detection',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Stonework Traps, Pits, and Deadfalls'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '(Optional) Dwarven Detection',
+    'book': 'The Complete Book of Dwarves'
+};
+nonweaponProficiencies['Approximate Depth Underground'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '(Optional) Dwarven Detection',
     'book': 'The Complete Book of Dwarves'
 };
 //#endregion
@@ -913,6 +1158,218 @@ nonweaponProficiencies['Oratory'] = {
     'modifier': 0,
     'classes': 'Warrior/Priest',
     'book': 'The Complete Paladin\'s Handbook'
+};
+//#endregion
+
+//#region The Complete Barbarian's Handbook
+nonweaponProficiencies['Clothesmaking, Crude'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': '',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Animal Rending'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': +2,
+    'classes': 'Warrior',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Armorer, Crude'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': 'Warrior',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Bartering'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Rogue',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Bowyer/Fletcher, Crude'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': 'Warrior',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Horde Summoning'] = {
+    'slots': 2,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': 'Warrior',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Leadership'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': 'Warrior',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Light Sleeping'] = {
+    'slots': 1,
+    'abilityScore': '@{Constitution}',
+    'modifier': -1,
+    'classes': 'Warrior',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Soothsaying'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Priest',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+nonweaponProficiencies['Weapon Improvisation'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -1,
+    'classes': 'Warrior',
+    'book': 'The Complete Barbarian\'s Handbook'
+};
+//#endregion
+
+//#region The Complete Book of Necromancers
+nonweaponProficiencies['Anatomy'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Necromancers'
+};
+nonweaponProficiencies['Necrology'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Book of Necromancers'
+};
+nonweaponProficiencies['Netherworld Knowledge'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -3,
+    'classes': '',
+    'book': 'The Complete Book of Necromancers'
+};
+nonweaponProficiencies['Spirit Lore'] = {
+    'slots': 2,
+    'abilityScore': '@{Charisma}',
+    'modifier': -4,
+    'classes': '',
+    'book': 'The Complete Book of Necromancers'
+};
+nonweaponProficiencies['Venom Handling'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -2,
+    'classes': '',
+    'book': 'The Complete Book of Necromancers'
+};
+//#endregion
+
+//#region The Complete Ninja's Handbook
+nonweaponProficiencies['City Familiarity'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': '',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Style Analysis'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': 'Warrior',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Assimilation'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Detect Signing'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +1,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Enamor'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': -2,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Escape'] = {
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Feign/Detect Sleep'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Giant Kite Flying'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -3,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Hold Breath'] = {
+    'slots': 1,
+    'abilityScore': '@{Constitution}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Night Vision'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -2,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Toxicology'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Quick Study'] = {
+    'slots': 2,
+    'abilityScore': '',
+    'modifier': -3,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Underclass'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
+};
+nonweaponProficiencies['Water Walking'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -1,
+    'classes': 'Rogue',
+    'book': 'The Complete Ninja\'s Handbook'
 };
 //#endregion
 module.exports = nonweaponProficiencies;
