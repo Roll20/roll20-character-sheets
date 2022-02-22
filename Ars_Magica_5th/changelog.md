@@ -1,5 +1,7 @@
 ## Changelog
 
++ **February 2022 - v1.7.1 - Fix**
+    - Fixed accelerated abilities
 + **January 2022 - v1.7 - Magic & Armory update**
     - *General changes*:
         - Added Welcome message to the "Sheet" tab, and made that tab the default tab
