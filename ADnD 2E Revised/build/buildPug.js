@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const jsFolder = path.join(__dirname, '..', 'javascript');
 const pugFolder = path.join(__dirname, '..', 'pug');
-const htmlFolder = path.join(__dirname, '..', 'html');
+const htmlFolder = path.join(__dirname, '..', 'html', 'components');
 
 console.log('---- Generating dynamicDatalists ----');
 const spellsJs = ['wizardSpells.js', 'priestSpells.js'];

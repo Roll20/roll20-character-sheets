@@ -4,6 +4,17 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.05.00 (Build 8)
+
+### Sheet fixes
+
+- Parsed rolls: fixed Eye of Sauron fails roll even if not miserable and roll >= TN
+- Added missing sheet translation support (missing rolltemplate translation will follow in a later release)
+
+### CSS fixes
+
+- Removed 1d12-1 display for the feat die, because this was not easy to understand for players
+
 ## 02.04.00 (Build 7)
 
 ### New Features

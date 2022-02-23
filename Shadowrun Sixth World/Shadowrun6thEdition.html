@@ -713,6 +713,17 @@
 							<label data-i18n="hotsiminitiativedice">Hot Sim VR Initiative Dice</label><input type="number" name="attr_hot_sim_initiative_dice_temp" title="@{hot_sim_initiative_dice_temp}" /><input type="checkbox" name="attr_hot_sim_initiative_dice_temp_flag" value="on" checked />
 						</div>
 					</div>
+
+					<div class="importer">
+						<input class="collapse-flag" name="attr_display_flag" type="checkbox"/>
+						<span class="pictos">c</span>
+						<div class="collapse importer-input">
+							<button class="import-button" name="act_import" type="action" value="">Import</button>
+							<textarea name="attr_import_data" placeholder="WARNING! Anything placed here CAN completely corrupt your character, make a copy!" title="Paste Genesis JSON Here"></textarea>
+						</div>
+						<span class="importer-feedback" name="attr_import_feedback"></span>
+					</div>
+
 				</div>
 			</div>
 		</div>
@@ -2402,6 +2413,7 @@
 										<option data-i18n="cyberdeck" value="Cyberdeck">Cyberdeck</option>
 										<option data-i18n="cyberjack" value="Cyberjack">Cyberjack</option>
 										<option data-i18n="commandconsole" value="Command Console">Command Console</option>
+										<option data-i18n="mtoc" value="M-TOC">M-TOC</option>
 									</select>
 								</label>
 								<span>&nbsp;</span>
@@ -2864,20 +2876,31 @@
 								<label data-i18n="type" style="width: 10%; text-align: right;">Type</label>
 								<select class="attribute-select"  style="width: 30%" name="attr_type" title="@{repeating_vehicle_${x}_type}">
 									<option data-i18n="bike" value="Bike">Bike</option>
+									<option data-i18n="atv" value="ATV">ATV</option>
 									<option data-i18n="car" value="Car">Car</option>
 									<option data-i18n="truck" value="Truck">Truck</option>
-									<option data-i18n="van" value="Van">van</option>
+									<option data-i18n="van" value="Van">Van</option>
+									<option data-i18n="bus" value="Bus">Bus</option>
+									<option data-i18n="tracked" value="Tracked">Tracked</option>
+									<option data-i18n="hovercraft" value="Hovercraft">Hovercraft</option>
+									<option data-i18n="pwc" value="PWC">PWC</option>
 									<option data-i18n="boat" value="Boat">Boat</option>
+									<option data-i18n="ship" value="Ship">Ship</option>
 									<option data-i18n="submarine" value="Submarine">Submarine</option>
 									<option data-i18n="fixedwingaircraft" value="Fixed Wing Aircraft">Fixed Wing Aircraft</option>
 									<option data-i18n="rotorcraft" value="Rotorcraft">Rotorcraft</option>
 									<option data-i18n="vtolvstol" value="VTOL/VSTOL">VTOL/VSTOL</option>
+									<option data-i18n="ltav" value="LTAV">LTAV</option>
+									<option data-i18n="lav" value="LAV">LAV</option>
+									<option data-i18n="gravity" value="Gravity">Gravity</option>
+									<option data-i18n="trailer" value="Trailer">Trailer</option>
+									<option data-i18n="other" value="Other">Other</option>
+									<option data-i18n="drone" value="Drone">Drone</option>
 									<option data-i18n="microdrone" value="Microdrone">Microdrone</option>
 									<option data-i18n="minidrone" value="Minidrone">Minidrone</option>
 									<option data-i18n="smalldrone" value="Small Drone">Small Drone</option>
 									<option data-i18n="mediumdrone" value="Medium Drone">Medium Drone</option>
 									<option data-i18n="largedrone" value="Large Drone">Large Drone</option>
-									<option data-i18n="other" value="Other">Other</option>
 								</select>
 							</div>
 							<div class="row-long">
@@ -3728,7 +3751,7 @@
         <label class="settings" data-i18n-title="conditionmonitor" title="Condition Monitor">
           <input name="attr_physical" placeholder="0" title="@{physical}" type="number" value=""/>
         </label>
-        <span class="toggle-display" name="attr_physical" title="@{physical}"></span>
+        <span class="toggle-display" name="attr_physical_max" title="@{physical_max}"></span>
       </div>
       <div class="rows vehicle">
         <button data-i18n="conditionmonitorpm" name="act_cond_reset" type="action">Condition Monitor (P/M)</button>
@@ -3736,7 +3759,7 @@
           <input name="attr_physical" placeholder="0" title="@{physical}" type="number" value="0"/>
         </label><span class="settings">/</span>
         <label class="settings" data-i18n-title="matrix" title="matrix">
-          <input name="attr_matrix" placeholder="0" title="@{matrix}" type="number" value="0"/>
+          <input name="attr_matrix_max" placeholder="0" title="@{matrix_max}" type="number" value="0"/>
         </label>
         <span class="toggle-display"> <span class="settings tiny-span">=</span><span name="attr_physical" title="@{physical}"></span><span>/</span><span name="attr_matrix" title="@{matrix}"></span></span>
       </div>
@@ -5440,12 +5463,205 @@
 <input type="hidden" name="attr_matrix_overclock" value="0" />
 <input type="hidden" name="attr_rerolls" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.48">
+<input type="hidden" name="attr_sheet_version" value="0.49">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
-//Sheet workers
 
 
+// Sheet workers
+
+// Data conversion for changes between sheet versions
+on("sheet:opened", function() {
+	getAttrs(['sheet_type', 'sheet_version', 'data_version'], (v) => {
+		console.log(`%c Shadowrun 6th World v${v['sheet_version']}`, "color: blue; font-weight:bold");
+		console.log(`%c Sheet Type: ${v['sheet_type']}`, "color: red; font-weight:bold");
+		console.log(`%c Data Version: v${v['data_version']}`, "color: black; font-weight:bold");
+
+		if(v.sheet_version != v.data_version) {
+			console.log("Sheet and Data version mismatch, updating...");
+			switch(v.data_version) {
+				case '0':
+					// fixed broken soak values
+					update_common_rolls(["body", "soak_modifier", "soak_temp", `soak_temp_flag`]);
+
+					['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'magic', 'resonance'].forEach(attr => {
+						update_attributes(attr);
+					});
+
+					update_essence();
+					techno_update();
+					update_initiative();
+					update_astral_initiative();
+					update_matrix_initiative();
+					sprite_update();
+
+				case '0.37':
+					_pre_v37_update();
+					console.log("Data now fits v.37");
+				case '0.38':
+					_v38_update();
+					console.log("Data now fits v.38");
+				case '0.39':
+					_v39_update();
+					console.log("Data now fits v.39");
+				case '0.41':
+					_v41_update();
+					console.log("Data now fits v.42");
+				default:
+					setAttrs({
+						'data_version': v.sheet_version
+					});
+					break;
+			}
+
+			console.log("Done.");
+		}
+
+	});
+});
+
+
+var _v41_update = () => {
+	// Update repeating_skills_${x}_attribute and _display_attribute
+	getSectionIDs('repeating_skills', (skillRows) => {
+		skillRows.forEach((row) => {
+			getAttrs([`repeating_skills_${row}_name`], (v) => {
+				update_skill_attribute(`repeating_skills_${row}`, v[`repeating_skills_${row}_name`]);
+			});
+		});
+	});
+};
+
+
+var _v39_update = () => {
+	// this section updates the AR values that were set for attr_close - attr_extreme to be the value for the previously undefined attr_close_base - attr_extreme_base
+	['range', 'melee'].forEach((type) => {
+		getSectionIDs(`repeating_${type}`, (sections) => {
+			sections.forEach((section) => {
+				[`repeating_${type}_${section}_close`, `repeating_${type}_${section}_near`, `repeating_${type}_${section}_medium`, `repeating_${type}_${section}_far`, `repeating_${type}_${section}_extreme`, `repeating_${type}_${section}_dicepool`, `repeating_${type}_${section}_damage`, 'sheet_type'].forEach((attr) => {
+					getAttrs([`${attr}`], (v) => {
+						setAttrs({
+							[`${attr}_base`]: v[`${attr}`]
+						});
+					});
+				});
+			});
+		});
+	});
+};
+
+var _v38_update = () => {
+	getAttrs(['sheet_type'], (v) => {
+		if(v.sheet_type === 'grunt') {
+			// Grunt skills somehow ended up thinking they were all based on agility at least for the display part and for many apparently the actual selected attribute.
+			// this code just sets them to their default associated attribute which should annoy the fewest users.
+			getSectionIDs('repeating_skills', (skill) => {
+				skill.forEach((skillID) => {
+					getAttrs([`repeating_skills_${skillID}_attribute`, `repeating_skills_${skillID}_display_attribute`, `repeating_skills_${skillID}_name`], (attrs) => {
+						var attribute;
+						switch(attrs[`repeating_skills_${skillID}_name`]) {
+							case 'Athletics':
+							case 'Close Combat':
+							case 'Exotic Weapons':
+							case 'Firearms':
+							case 'Stealth':
+								attribute = 'Agility';
+								break;
+							case 'Con':
+							case 'Influence':
+								attribute = 'Charisma';
+								break;
+							case 'Astral':
+							case 'Outdoors':
+							case 'Perception':
+								attribute = 'Intuition';
+								break;
+							case 'Biotech':
+							case 'Cracking':
+							case 'Electronics':
+							case 'Engineering':
+								attribute = 'Logic';
+								break;
+							case 'Conjuring':
+							case 'Enchanting':
+							case 'Sorcery':
+								attribute = 'Magic';
+								break;
+							case 'Piloting':
+								attribute = 'Reaction';
+								break;
+							case 'Tasking':
+								attribute = 'Resonance';
+								break;
+							default:
+								attribute = 'Agility';
+								break;
+						}
+
+						setAttrs({
+							[`repeating_skills_${skillID}_attribute`]: '@{'+attribute.toLowerCase()+'}',
+							[`repeating_skills_${skillID}_display_attribute`]: attribute
+						});
+					});
+				});
+			});
+		}
+	});
+}
+
+var _pre_v37_update = () => {
+	// Update trigger sheetworkers for weapons to set attribute and attr_rating values
+	['melee', 'range'].forEach((type) => {
+		getSectionIDs(`${type}`, function(ids) {
+			for(var i = 0; i < ids.length; i++) {
+				let skill = `repeating_${type}_` + ids[i] + "_skill";
+				let attr = `repeating_${type}_` + ids[i] + "_attribute";
+				let rating = `repeating_${type}_` + ids[i] + "_attr_rating";
+				let prim = `repeating_${type}_` + ids[i] + "_primary";
+				let updme = `repeating_${type}_` + ids[i] + "_updateme";
+
+				getAttrs([skill, prim, 'agility', 'logic', `primary_${type}_weapon_dicepool_modifier`], (v) => {
+					var attribute = 'Agility';
+					var attr_rating = v.agility;
+					switch(v[`${skill}`]) {
+						case 'engineering':
+							attribute = 'Logic';
+							attr_rating = v.logic;
+							break;
+						case 'athletics':
+						case 'close combat':
+						case 'exotic weapons':
+						case 'firearms':
+						default:
+							attribute = 'Agility';
+							attr_rating = v.agility;
+							break;
+					}
+
+					setAttrs({
+						[attr]: attribute,
+						[rating]: attr_rating
+					});
+
+					if(v[`${prim}`] === "primary") {
+						var dpm = v[`primary_${type}_weapon_dicepool_modifier`] || 0;
+
+						setAttrs({
+							[`primary_${type}_weapon_attribute`]: attribute,
+							[`primary_${type}_weapon_attr_rating`]: attr_rating,
+							[`primary_${type}_weapon_dicepool_modifier`]: dpm,
+							[`${updme}`]: ".37"
+						});
+					}
+				});
+			}
+		});
+	});
+
+}
+
+
+// Allows changes to "notes" fields to act as a pseudo-importer
 on("change:repeating_spell:notes change:repeating_npcspell:notes change:repeating_augmentations:notes change:repeating_quality:notes change:repeating_IC:IC_note change:repeating_range:notes change:repeating_melee:notes", (eventInfo) => {
 	if(eventInfo.sourceType != 'player') {
 		return;
@@ -5470,6 +5686,9 @@ on("change:repeating_spell:notes change:repeating_npcspell:notes change:repeatin
 
 
 
+/*************************************************************
+* Post Roll Processing                                       *
+*************************************************************/
 // Roll Button Definitions
 const rollButtons = {
 //	d6: "@{gm_toggle} &{template:rolls-computed}{{dice=[[(?{d6s|0}d6>5cs>5cf<[[(1+@{bad_luck})]]?{Exploding 6's?|N, |Y,!})]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=@{rerolls}}}{{header=@{character_name}}}{{base=^{d6}}}",
@@ -5676,7 +5895,8 @@ const initiatives = {
 	matrix_initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{matrixinitiative}}}{{initiative=[[(@{matrix_initiative_base}+@{modifiers_toggle})+(@{matrix_initiative_dice}d6cf0)]]}}",
 };
 
-// Initiatives
+
+// Initiative Rollers
 Object.keys(initiatives).forEach((ini) => {
 	on(`clicked:${ini}`, (eventInfo) => {
 
@@ -5711,7 +5931,7 @@ Object.keys(initiatives).forEach((ini) => {
 });
 
 
-// Normal non-repeating rolls
+// Normal non-repeating rollers
 ['d6',
 'body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge',
 'composure', 'judge_intentions', 'memory', 'social_rating', 'lift_carry', 'sprint',
@@ -5734,7 +5954,6 @@ console.log(rollButton);
 	});
 });
 
-
 // Bump 4s 1-7
 for(c = 1; c < 7; c++) {
 	on(`clicked:bump_fours${c}`, (eventInfo) => {
@@ -5747,7 +5966,6 @@ for(c = 1; c < 7; c++) {
 	});
 }
 
-
 // Rerolls 1-50
 for(c = 1; c < 50; c++) {
 	on(`clicked:reroll${c}`, (eventInfo) => {
@@ -5759,7 +5977,6 @@ for(c = 1; c < 50; c++) {
 		rollProcessor(rollButton);
 	});
 }
-
 
 // Repeating Skill Rolls
 ['repeating_skills:skill', 'repeating_skills:spec', 'repeating_skills:expert'].forEach((button) => {
@@ -5780,7 +5997,6 @@ for(c = 1; c < 50; c++) {
 	});
 });
 
-
 // Repeating Weapon Rolls
 ['repeating_range:rangeweapon', 'repeating_melee:meleeweapon', 'repeating_grenade:grenadeweapon'].forEach((button) => {
 	on(`clicked:${button}`, (eventInfo) => {
@@ -5799,7 +6015,6 @@ for(c = 1; c < 50; c++) {
 		rollProcessor(rollButton);
 	});
 });
-
 
 // Repeating Spell/Preparation/Ritual Rolls
 ['repeating_spell:spell', 'repeating_preparations:preparation', 'repeating_ritual:ritual'].forEach((button) => {
@@ -5820,7 +6035,6 @@ for(c = 1; c < 50; c++) {
 	});
 });
 
-
 // Repeating Complex Form Rolls
 ['repeating_forms:complexform', 'repeating_forms:complexformnoroll'].forEach((button) => {
 	on(`clicked:${button}`, (eventInfo) => {
@@ -5839,7 +6053,6 @@ for(c = 1; c < 50; c++) {
 		rollProcessor(rollButton);
 	});
 });
-
 
 // Repeating Vehicle Rolls
 ['repeating_vehicle:pcclearsight', 'repeating_vehicle:pcevasion', 'repeating_vehicle:pcstealth', 'repeating_vehicle:pcelectronicwarfare', 'repeating_vehicle:pcmaneuvering', 'repeating_vehicle:pctargeting'].forEach((button) => {
@@ -5861,7 +6074,10 @@ for(c = 1; c < 50; c++) {
 });
 
 
-
+/************************************
+* Roll Processor
+* - This does the heavy lifting
+************************************/
 var rollProcessor = (rollButton) => {
 	getAttrs(["bad_luck"], (v) => {
 		startRoll(rollButton, (results) => {
@@ -5872,7 +6088,6 @@ console.log(results.results);
 			if(! results.results.wilddie) {
 				results.results.wilddie = {dice: []}
 			}
-
 
 			var rolled = results.results.dice.dice;
 console.log("Dicepool: "+rolled.length);
@@ -5915,7 +6130,6 @@ console.log("Wild Die Rolled High!");
 					wd_hits += 2;
 				}
 			});
-
 
 console.log("Hit Threshold: "+hits_threshold);
 			var hits = rolled.reduce((a, v) => (v >= hits_threshold ? a + 1 : a), 0);
@@ -5969,198 +6183,12 @@ console.log("total_hits: "+total_hits);
 
 
 
-on("sheet:opened", function() {
-	getAttrs(['sheet_type', 'sheet_version', 'data_version'], (v) => {
-		console.log(`%c Shadowrun 6th World v${v['sheet_version']}`, "color: blue; font-weight:bold");
-		console.log(`%c Sheet Type: ${v['sheet_type']}`, "color: red; font-weight:bold");
-		console.log(`%c Data Version: v${v['data_version']}`, "color: black; font-weight:bold");
-
-		if(v.sheet_version != v.data_version) {
-			console.log("Sheet and Data version mismatch, updating...");
-			switch(v.data_version) {
-				case '0':
-					// fixed broken soak values
-					update_common_rolls(["body", "soak_modifier", "soak_temp", `soak_temp_flag`]);
-
-					['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'magic', 'resonance'].forEach(attr => {
-						update_attributes(attr);
-					});
-
-					update_essence();
-					techno_update();
-					update_initiative();
-					update_astral_initiative();
-					update_matrix_initiative();
-					sprite_update();
-
-				case '0.37':
-					_pre_v37_update();
-					console.log("Data now fits v.37");
-				case '0.38':
-					_v38_update();
-					console.log("Data now fits v.38");
-				case '0.39':
-					_v39_update();
-					console.log("Data now fits v.39");
-				case '0.41':
-					_v41_update();
-					console.log("Data now fits v.42");
-				default:
-					setAttrs({
-						'data_version': v.sheet_version
-					});
-					break;
-			}
-
-			console.log("Done.");
-		}
-
-	});
-});
-
-
-var _v41_update = () => {
-	// Update repeating_skills_${x}_attribute and _display_attribute
-	getSectionIDs('repeating_skills', (skillRows) => {
-		skillRows.forEach((row) => {
-			getAttrs([`repeating_skills_${row}_name`], (v) => {
-				update_skill_attribute(`repeating_skills_${row}`, v[`repeating_skills_${row}_name`]);
-			});
-		});
-	});
-};
-
-
-var _v39_update = () => {
-	// this section updates the AR values that were set for attr_close - attr_extreme to be the value for the previously undefined attr_close_base - attr_extreme_base
-	['range', 'melee'].forEach((type) => {
-		getSectionIDs(`repeating_${type}`, (sections) => {
-			sections.forEach((section) => {
-				[`repeating_${type}_${section}_close`, `repeating_${type}_${section}_near`, `repeating_${type}_${section}_medium`, `repeating_${type}_${section}_far`, `repeating_${type}_${section}_extreme`, `repeating_${type}_${section}_dicepool`, `repeating_${type}_${section}_damage`, 'sheet_type'].forEach((attr) => {
-					getAttrs([`${attr}`], (v) => {
-						setAttrs({
-							[`${attr}_base`]: v[`${attr}`]
-						});
-					});
-				});
-			});
-		});
-	});
-};
-
-var _v38_update = () => {
-	getAttrs(['sheet_type'], (v) => {
-		if(v.sheet_type === 'grunt') {
-			// Grunt skills somehow ended up thinking they were all based on agility at least for the display part and for many apparently the actual selected attribute.
-			// this code just sets them to their default associated attribute which should annoy the fewest users.
-			getSectionIDs('repeating_skills', (skill) => {
-				skill.forEach((skillID) => {
-					getAttrs([`repeating_skills_${skillID}_attribute`, `repeating_skills_${skillID}_display_attribute`, `repeating_skills_${skillID}_name`], (attrs) => {
-						var attribute;
-						switch(attrs[`repeating_skills_${skillID}_name`]) {
-							case 'Athletics':
-							case 'Close Combat':
-							case 'Exotic Weapons':
-							case 'Firearms':
-							case 'Stealth':
-								attribute = 'Agility';
-								break;
-							case 'Con':
-							case 'Influence':
-								attribute = 'Charisma';
-								break;
-							case 'Astral':
-							case 'Outdoors':
-							case 'Perception':
-								attribute = 'Intuition';
-								break;
-							case 'Biotech':
-							case 'Cracking':
-							case 'Electronics':
-							case 'Engineering':
-								attribute = 'Logic';
-								break;
-							case 'Conjuring':
-							case 'Enchanting':
-							case 'Sorcery':
-								attribute = 'Magic';
-								break;
-							case 'Piloting':
-								attribute = 'Reaction';
-								break;
-							case 'Tasking':
-								attribute = 'Resonance';
-								break;
-							default:
-								attribute = 'Agility';
-								break;
-						}
-
-						setAttrs({
-							[`repeating_skills_${skillID}_attribute`]: '@{'+attribute.toLowerCase()+'}',
-							[`repeating_skills_${skillID}_display_attribute`]: attribute
-						});
-					});
-				});
-			});
-		}
-	});
-}
-
-var _pre_v37_update = () => {
-	// Update trigger sheetworkers for weapons to set attribute and attr_rating values
-	['melee', 'range'].forEach((type) => {
-		getSectionIDs(`${type}`, function(ids) {
-			for(var i = 0; i < ids.length; i++) {
-				let skill = `repeating_${type}_` + ids[i] + "_skill";
-				let attr = `repeating_${type}_` + ids[i] + "_attribute";
-				let rating = `repeating_${type}_` + ids[i] + "_attr_rating";
-				let prim = `repeating_${type}_` + ids[i] + "_primary";
-				let updme = `repeating_${type}_` + ids[i] + "_updateme";
-
-				getAttrs([skill, prim, 'agility', 'logic', `primary_${type}_weapon_dicepool_modifier`], (v) => {
-					var attribute = 'Agility';
-					var attr_rating = v.agility;
-					switch(v[`${skill}`]) {
-						case 'engineering':
-							attribute = 'Logic';
-							attr_rating = v.logic;
-							break;
-						case 'athletics':
-						case 'close combat':
-						case 'exotic weapons':
-						case 'firearms':
-						default:
-							attribute = 'Agility';
-							attr_rating = v.agility;
-							break;
-					}
-
-					setAttrs({
-						[attr]: attribute,
-						[rating]: attr_rating
-					});
-
-					if(v[`${prim}`] === "primary") {
-						var dpm = v[`primary_${type}_weapon_dicepool_modifier`] || 0;
-
-						setAttrs({
-							[`primary_${type}_weapon_attribute`]: attribute,
-							[`primary_${type}_weapon_attr_rating`]: attr_rating,
-							[`primary_${type}_weapon_dicepool_modifier`]: dpm,
-							[`${updme}`]: ".37"
-						});
-					}
-				});
-			}
-		});
-	});
-
-}
-
-
+/*******************************************
+* Modifications field processing           *
+* - This allows custom attribute overrides *
+*   via the 'Modifications' inputs         *
+*******************************************/
 on("change:repeating_quality:modifications remove:repeating_quality change:repeating_augmentations:modifications remove:repeating_augmentations change:repeating_items:modifications remove:repeating_items change:repeating_devices:modifications remove:repeating_devices change:repeating_programs:modifications change:repeating_programs:powered_on remove:repeating_programs change:repeating_echoes:modifications remove:repeating_echoes change:repeating_forms:modifications remove:repeating_forms change:repeating_powers:modifications remove:repeating_powers change:repeating_metamagic remove:repeating_metamagic", (eventInfo) => {
-console.log(eventInfo);
 	var allowed_modifiers = [
 		'body_modifier', 'agility_modifier', 'reaction_modifier', 'strength_modifier', 'willpower_modifier', 'logic_modifier', 'intuition_modifier', 'charisma_modifier',
 		'magic_modifier', 'resonance_modifier',
@@ -6186,12 +6214,10 @@ console.log(eventInfo);
 
 	getAttrs(attrsToGet, (v) => {
 		if(v.enable_modifiers != "1") {
-console.log("Modifiers not enabled.");
 			return;
 		}
 
 		if(prog && prog[1] && v[`${prog[1]}_powered_on`] !== "on") {
-console.log("Program not active");
 			return;
 		}
 
@@ -6428,6 +6454,8 @@ on("clicked:reload", (eventInfo) => {
 	});
 });
 
+
+// 2022-02-01 I don't think this does anything
 ["active", "knowledge", "language"].forEach((attr) => {
 	on(`clicked:repeating_${attr}:skill`, (eventInfo) => {
 		settingsToggle(eventInfo);
@@ -6440,6 +6468,7 @@ on("clicked:reload", (eventInfo) => {
 	});
 });
 
+// This triggers hiding settings when the player clicks one of the roll buttons
 const settingsToggle = (eventInfo) => {
 	const split = eventInfo.sourceAttribute.split("_");
 	const source = `${split[0]}_${split[1]}_${split[2]}`;
@@ -6449,6 +6478,8 @@ const settingsToggle = (eventInfo) => {
 		});
 	});
 };
+
+
 
 [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`, `notes`, `rolls`].forEach(attr => {
 	on(`clicked:tab_${attr}`, () => {
@@ -6519,7 +6550,6 @@ on("change:stun_modifier", () => {
 });
 
 on("change:combat_paralysis", (eventInfo) => {
-console.log(eventInfo);
 	if(eventInfo.newValue == 1) {
 		setAttrs({
 			'combat_paralysis_initiative_mod': '/2'
@@ -6987,7 +7017,6 @@ on("change:repeating_armor change:body change:charisma", (eventInfo) => {
 		});
 
 	});
-
 });
 
 
@@ -7047,9 +7076,16 @@ const update_track = (track) => {
 
 
 //Calculate Device Rating Track
-on("change:device_rating change:matrix_modifier", () => {
-	getAttrs(["device_rating","matrix_modifier","matrix"], (v) =>{
-		const dev = parseInt(v.device_rating) || 0, mod = parseInt(v.matrix_modifier) || 0;
+on("change:device_rating change:matrix_modifier change:sensor", () => {
+	getAttrs(["sheet_type", "device_rating","matrix_modifier","matrix", "sensor"], (v) =>{
+		if(v.sheet_type == "vehicle") {
+			dev = parseInt(v.sensor) || 0;
+			mod = parseInt(v.matrix_modifier) || 0;
+		} else {
+			dev = parseInt(v.device_rating) || 0;
+			mod = parseInt(v.matrix_modifier) || 0;
+		}
+
 		const dam = parseInt(v.matrix) || 0;
 		const tot = Math.ceil(dev/2) + 8 + mod;
 		const current = (dam > 0) ? dam : tot;
@@ -7338,27 +7374,19 @@ on("change:repeating_weapon", () => {
 					 const ammo = b('amm');
 					 return [
 						  b('type'),
-						  b('acc', 'ACC'),
 						  b('dv', 'DV'),
-						  b('ap', 'AP', true),
 						  b('mode'),
-						  b('rc', 'RC'),
 						  ammo ? `${ammo} (c)` : '',
 						  b('note')
 					 ];
 					 case '1': return [
 						  b('type'),
-						  b('reach', 'Reach', true),
-						  b('acc', 'ACC'),
 						  b('dv', 'DV'),
-						  b('ap', 'AP', true),
 						  b('note')
 					 ];
 					 default: return [
 						  b('type'),
-						  b('acc', 'ACC'),
 						  b('dv', 'DV'),
-						  b('ap', 'AP', true),
 						  b('note')
 					 ];
 				}
@@ -7586,6 +7614,7 @@ var update_skill_attribute = (prefix, skill) => {
 			getAttrs([`${source}`], (v) => {
 				const attribute   = v[`${source}`].slice(2, -1);
 				const translation = getTranslationByKey(`${attribute}`);
+
 				setAttrs({
 					[`${field}_display_attribute`]: translation
 				});
@@ -7608,7 +7637,7 @@ var update_skill_attribute = (prefix, skill) => {
 					[`${field}_display_expert`]: display
 				});
 			});
-		} else if (source.includes("skill")) {
+		} else if (source.endsWith("skill")) {
 			getAttrs([`${source}`], (v) => {
 				const bas   = v[`${source}`];
 				const size  = bas.length;
@@ -7628,7 +7657,7 @@ var update_skill_attribute = (prefix, skill) => {
 				});
 			});
 		}  else  {
-			console.log(`Change to ${field} did not set attr`);
+//			console.log('Change to '+source+' did not set attr');
 		};
 	});
 });
@@ -7642,7 +7671,7 @@ var update_skill_attribute = (prefix, skill) => {
 		const newV   = eventInfo.newValue;
 		const type   = weap.slice(-5);
 
-		getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `${weap}_attribute`, `${weap}_attr_rating`, `${weap}_primary`, `${weap}_firing_modes`, `${weap}_damage`, `${weap}_close`, `${weap}_near`, `${weap}_medium`, `${weap}_far`, `${weap}_extreme`, `sheet_type`], (v) => {
+		getAttrs([`${weap}_weapon`, `${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `${weap}_attribute`, `${weap}_attr_rating`, `${weap}_primary`, `${weap}_firing_modes`, `${weap}_damage`, `${weap}_close`, `${weap}_near`, `${weap}_medium`, `${weap}_far`, `${weap}_extreme`, `sheet_type`], (v) => {
 			if(v.sheet_type != 'pc') {
 				return;
 			}
@@ -7787,7 +7816,7 @@ var update_skill_attribute = (prefix, skill) => {
 							update[`primary_${type}_weapon_ammo`]     = v[`${source}`];
 							update[`primary_${type}_weapon_ammo_max`] = v[`${source}`];
 						} else {
-							console.log(eventInfo);
+//							console.log(eventInfo);
 						};
 
 						setAttrs(update);
@@ -8893,100 +8922,6 @@ on("change:measurement1 change:measurement2", (eventInfo) => {
 });
 
 
-/****************************/
-/* CHARACTERMANCER IMPORTER */
-/****************************/
-on("clicked:import_launch", (eventInfo) => {
-	startCharactermancer("importer");
-});
-
-on("page:importer", () => {
-	setAttrs({builder: "Chummer"});
-	setCharmancerText({
-		"directions" : chummerDirections
-	});
-});
-
-on("clicked:import", () => {
-	const mancerData = getCharmancerData();
-	const mancerValues = mancerData["importer"].values;
-	let applyEnabled = true;
-	let setText = {};
-
-	// Verify the user entered a JSON in the textarea. If not, provide user feedabck.
-	if (mancerValues.jsonData) {
-		const parsedData = JSON.parse(mancerValues.jsonData) || false;
-		setText[`import-feedback`] = "";
-		// There is a value in the textarea! Check to see if its a valid JSON. Provide users feeadback
-		if (parsedData) {
-			setText[`import-feedback`] += `<p class="feedback">A valid JSON was imported for ${mancerValues.builder}.</p>`
-			// Send the parsed data to the selected importer or let users know something went wrong
-			if (mancerValues.builder && mancerValues.builder === "Chummer") {
-				if (parsedData.characters && parsedData.characters.character) {
-					importChummer(parsedData.characters.character);
-				} else {
-					setText[`import-feedback`] += `<p class="warning">Parsed JSON is missing character data.</p>`;
-					applyEnabled = false
-				}
-			} else if (mancerValues.builder && mancerValues.builder === "Hero Lab") {
-				importHeroLab();
-				setText[`import-feedback`] += `<p class="warning">Coming Soon....</p>`;
-			} else {
-				setText[`import-feedback`] += `<p class="warning">A character builder was not selected. Try changing your selection then change it back if needed.</p>`;
-				applyEnabled = false
-			}
-		} else {
-			setText[`import-feedback`] += `<p class="warning"><span>The text imported is not a valid JSON. Verify the JSON is formatted correctly. Check the format at,</span> JSONLint.com.</p>`;
-			applyEnabled = false
-		};
-	} else {
-		setText[`import-feedback`] = `<p class="warning">No information was entered in the JSON text area.</p>`;
-		applyEnabled = false
-	};
-
-	let buttonStatus = (applyEnabled) ? "" : "disabled";
-	setText[`finish-button`] = `<button class="finish" type="finish" value="apply" data-i18n="apply" ${buttonStatus}>Apply</button>`;
-
-	setCharmancerText(setText);
-});
-
-const chummerDirections = `<ol>
-			<li>In Chummer mark your character as created</li>
-			<li>Go to File -> Export -> Export JSON</li>
-			<li>Copy the JSON in the file</li>
-			<li>Paste it into the textfield below</li>
-			<li>Click the Import button</li>
-			<li>Review the data. Use the checkbox <strong>Show Hidden Inputs</strong> to fix data.</li>
-			<li>Click Apply to <u>overwrite</u> information on the character sheet</li>
-		</ol>`;
-
-const herolabDirections = `
-	<ol>
-		<li>Download the file "HLtoRoll20Export.hl" from: https://drive.google.com/file/d/0B3E3jkp51s8aRmpTU1NMRjRIVkk/view</li>
-		<li>Double click the file. Hero Lab will import it automatically now.</li>
-		<li>Load a character</li>
-		<li>Go to File/Save Custom Output and select the "Roll20 Export"</li>
-		<li>Save the file. It should open automatically in your browser</li>
-		<li>Follow the directions.</li>
-	</ol>`;
-
-on("change:builder", (eventInfo) => {
-	let setText = {};
-	setText[`directions`] = (eventInfo.newValue === "Chummer") ? chummerDirections : herolabDirections;
-	setCharmancerText(setText);
-});
-
-const clean = () => {
-	['active', 'knowledge', 'language', 'quality', 'martial', 'range', 'melee', 'weapon', 'armor', 'augementations', 'items', 'NPCspell', 'spell', 'rituals', 'preps', 'powers', 'contacts', 'vehicle', 'lifestyle', "programs", "forms"].forEach(group => {
-		getSectionIDs(`repeating_${group}`, (ids) => {
-			ids.forEach((id) => {
-				removeRepeatingRow(`repeating_${group}_${id}`);
-			});
-		});
-	});
-};
-
-
 
 //USEFUL FUNCTIONS
 const capitialize = (string) => {
@@ -9023,5 +8958,888 @@ mylog = function(msg) {
 	let lines = new Error().stack.split("\n");
 	log(d.toUTCString() + " " + lines[2].trim() + " " + msg);
 }
+
+
+
+/************/
+/* IMPORTER */
+/************/
+on("clicked:import", (eventInfo) => {
+	let setText = {};
+	let applyEnabled = true;
+
+	getAttrs(['import_data'], (v) => {
+		// Verify the user entered a JSON in the textarea. If not, provide user feedabck.
+		let parsedData = '';
+		if (v.import_data) {
+			setText[`import-feedback`] = "";
+
+			// Try to parse the JSON
+			try{
+				parsedData = JSON.parse(v.import_data) || false;
+			} catch(e) {
+				setText[`import-feedback`] += `JSON Parse Error: ` + e + "\n";
+			}
+
+			// There is a value in the textarea! Check to see if its a valid JSON. Provide users feeadback
+			if (parsedData) {
+				setText[`import-feedback`] += `Valid JSON was imported.` + "\n";
+			} else {
+				setText[`import-feedback`] += `The text imported is not valid JSON. Verify the JSON is formatted correctly. Check the format at, JSONLint.com.` + "\n";
+				applyEnabled = false
+			};
+		} else {
+			setText[`import-feedback`] = `Nothing entered in the JSON text area.` + "\n";
+			applyEnabled = false
+		};
+
+		let import_feedback = '';
+		if(applyEnabled) {
+			let success = doImport(parsedData);
+
+			if(success) {
+				import_feedback = 'Import successful. ' + "\n";
+			} else {
+				import_feedback = 'Import failed. ' + "\n";
+				import_feedback += setText[`import-feedback`];
+			}
+		} else {
+			import_feedback = 'Import failed. ' + "\n";
+			import_feedback += setText[`import-feedback`];
+		}
+
+		setAttrs({
+			import_feedback: import_feedback
+		});
+	});
+});
+
+// clear the import_feedback when they change the contents of import_data
+on("change:import_data", (eventInfo) => {
+	setAttrs({
+		import_feedback: " "
+	});
+});
+
+var doImport = (json) => {
+	setAttrs({
+		import_feedback: ' '
+	});
+	// wipe the current character
+	clean();
+console.log("Doing character import");
+
+// Mappings [Genesis attr]: [Roll20 attr]
+	// top level data
+	var base = {
+		name: "birth_name",
+		metaType: "metatype",
+		age: "age",
+		freeKarma: "karma",
+		gender: "sex",
+		karma: "total_karma",
+		notes: "notes",
+		nuyen: "nuyen",
+		streetName: "character_name",
+		weight: "weight",
+		size: "height",
+		initiation: "initiate_grade",
+		submersion: "submersion_level",
+		notes: "player_notes",
+		heat: "heat",
+		reputation: "reputation",
+	};
+
+	var attributes = {
+		BODY: "body_base",
+		AGILITY: "agility_base",
+		REACTION: "reaction_base",
+		STRENGTH: "strength_base",
+		WILLPOWER: "willpower_base",
+		LOGIC: "logic_base",
+		INTUITION: "intuition_base",
+		CHARISMA: "charisma_base",
+		EDGE: "edge",
+		MAGIC: "magic_base",
+		RESONANCE: "resonance_base",
+		POWER_POINTS: "power_points"
+	};
+
+
+	var attrs = {};
+	attrs.flag_special = 'mundane';
+
+	Object.keys(base).forEach(key => {
+		if(json[key]) {
+			attrs[base[`${key}`]] = json[`${key}`];
+		}
+	});
+
+	attrs.player_notes = 'Character imported on ' + new Date().toJSON() + "\n" + attrs.player_notes + "\n";
+console.log("Character base imported.");
+
+
+	json.attributes.forEach(attribute => {
+		if(attribute.id && attribute.modifiedValue) {
+			attrs[attributes[attribute.id]] = attribute.modifiedValue;
+
+			// change character type (flag_special) for technomancers and awakened
+			if(attribute.id == "MAGIC" && attribute.modifiedValue > 0) {
+				attrs.flag_special = 'magic';
+			} else if (attribute.id == "RESONANCE" && attribute.modifiedValue > 0) {
+				attrs.flag_special = 'resonance';
+			}
+
+			// update edge hexes too
+			if(attribute.id == "EDGE") {
+				attrs.edge_hex = attribute.modifiedValue;
+			}
+		}
+	});
+console.log("Character attributes imported.");
+
+	// Set the non-repeating attributes now
+	setAttrs(attrs);
+
+
+	// Process qualities
+	json.qualities.forEach(quality => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		if(quality.choice) {
+			rowattrs["repeating_quality_" + row_id + "_quality"] = quality.name + " (" + quality.choice + ")";
+		} else {
+			rowattrs["repeating_quality_" + row_id + "_quality"] = quality.name;
+		}
+		rowattrs["repeating_quality_" + row_id + "_type"] = quality.positive ? "P" : "N";
+		rowattrs["repeating_quality_" + row_id + "_notes"] = quality.page;
+		rowattrs["repeating_quality_" + row_id + "_rating"] = quality.rating || '';
+		rowattrs["repeating_quality_" + row_id + "_flag"] = 'display';
+
+		setAttrs(rowattrs);
+	});
+console.log("Character qualities imported.");
+
+
+	// Process skills, knowledges and languages
+	json.skills.forEach(skill => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		if(skill.id != "knowledge" && skill.id != "language") {
+			rowattrs["repeating_skills_" + row_id + "_name"] = skill.name;
+			rowattrs["repeating_skills_" + row_id + "_display_attribute"] = skill.attribute;
+			rowattrs["repeating_skills_" + row_id + "_attribute"] = skill.attribute;
+			rowattrs["repeating_skills_" + row_id + "_rating"] = skill.rating;
+			rowattrs["repeating_skills_" + row_id + "_dicepool"] = skill.rating;
+			rowattrs["repeating_skills_" + row_id + "_display_rating"] = skill.rating;
+			rowattrs["repeating_skills_" + row_id + "_flag"] = 'display';
+			rowattrs[skill.name] = skill.rating;
+
+			if(skill.specializations) {
+				skill.specializations.forEach(spec => {
+					if(spec.expertise) {
+						rowattrs["repeating_skills_" + row_id + "_expert"] = spec.name;
+						rowattrs["repeating_skills_" + row_id + "_display_expert"] = spec.name;
+					} else {
+						rowattrs["repeating_skills_" + row_id + "_spec"] = spec.name;
+						rowattrs["repeating_skills_" + row_id + "_display_spec"] = spec.name;
+					}
+				});
+			}
+			if(skill.influencedBy) {
+				rowattrs["repeating_skills_" + row_id + "_notes"] = skill.influencedBy.join(", ");
+			}
+		} else {
+			rowattrs["repeating_knowledges_" + row_id + "_name"] = skill.name;
+			rowattrs["repeating_knowledges_" + row_id + "_type"] = skill.id.charAt(0).toUpperCase() + skill.id.slice(1);
+			rowattrs["repeating_knowledges_" + row_id + "_flag"] = 'display';
+			if(skill.influencedBy) {
+				rowattrs["repeating_knowledges_" + row_id + "_notes"] = skill.influencedBy.join(", ");
+			}
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character skills, knowledges and languages imported.");
+
+
+	// Process armor
+	json.armors.forEach(armor => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_armor_" + row_id + "_name"] = armor.name;
+		rowattrs["repeating_armor_" + row_id + "_rating"] = armor.rating;
+		rowattrs["repeating_armor_" + row_id + "_social"] = (armor.socialrating) ? armor.socialrating : 0;
+		rowattrs["repeating_armor_" + row_id + "_notes"] = armor.page;
+		rowattrs["repeating_armor_" + row_id + "_flag"] = 'display';
+
+		if(! armor.isIgnored) {
+			rowattrs["repeating_armor_" + row_id + "_cumulative"] = 'cumulative';
+		}
+
+		if(armor.accessories) {
+			armor.accessories.forEach(acc => {
+				rowattrs["repeating_armor_" + row_id + "_notes"] += ", " + acc.name;
+
+				if(acc.name.includes(" Protection", -11)) {
+					var resist = acc.name.slice(0, 4);
+					resist = resist.toLowerCase();
+
+					rowattrs["repeating_armor_" + row_id + "_" + resist] = acc.rating || 1;
+				} else if(acc.name.includes(" Resistance", -11)) {
+					var resist = acc.name.slice(0, 4);
+					resist = resist.toLowerCase();
+
+					rowattrs["repeating_armor_" + row_id + "_" + resist] = acc.rating || 1;
+				}
+			});
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character armor imported");
+
+
+	// Process items
+	json.items.forEach(item => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_items_" + row_id + "_item"] = item.name;
+		rowattrs["repeating_items_" + row_id + "_rating"] = item.rating;
+		rowattrs["repeating_items_" + row_id + "_quantity"] = item.count;
+		rowattrs["repeating_items_" + row_id + "_flag"] = 'display';
+
+		rowattrs["repeating_items_" + row_id + "_notes"] = '[' + item.type + ']{' + item.subType + '} ' + item.page + "\n";
+
+		rowattrs["repeating_items_" + row_id + "_type"] = item.type;
+		rowattrs["repeating_items_" + row_id + "_sub_type"] = item.subType;
+
+		if(item.accessories) {
+			item.accessories.forEach(acc => {
+				rowattrs["repeating_items_" + row_id + "_notes"] += ", " + acc.name;
+			});
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character items imported");
+
+
+	// Process augmentations
+	var aug_grades = {
+		'STANDARD': 'Standard',
+		'ALPHA': 'Alphaware',
+		'BETA': 'Betaware',
+		'DELTA': 'Deltaware',
+		'USED': 'Used'
+	};
+	json.augmentations.forEach(augmentation => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		if(augmentation.level == '-') {
+			augmentation.level = '';
+		}
+
+		// some augs have the rating in the name...
+		if(augmentation.name.includes("Rating")) {
+			const re = /^(.*), Rating (\d+)/i;
+			var m = augmentation.name.match(re);
+
+			if(m && m[1]) {
+				augmentation.name = m[1];
+			}
+			if(m && m[2] && ! augmentation.level) {
+				augmentation.level = parseInt(m[2]);
+			}
+		}
+
+		rowattrs["repeating_augmentations_" + row_id + "_augmentation"] = augmentation.name;
+		rowattrs["repeating_augmentations_" + row_id + "_rating"] = augmentation.level;
+		rowattrs["repeating_augmentations_" + row_id + "_grade"] = aug_grades[augmentation.quality];
+		rowattrs["repeating_augmentations_" + row_id + "_essence_cost"] = augmentation.essence;
+		rowattrs["repeating_augmentations_" + row_id + "_flag"] = 'display';
+
+		rowattrs["repeating_augmentations_" + row_id + "_notes"] = augmentation.page + "\n";
+
+		if(augmentation.accessories) {
+			augmentation.accessories.forEach(acc => {
+				rowattrs["repeating_augmentations_" + row_id + "_notes"] += ", " + acc.name;
+			});
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character augmentations imported");
+
+
+	// Process vehicles and drones
+	veh_types = {
+ 		'VEHICLES': {
+			'BIKES': 'Bikes',
+			'ATVS': 'ATV',
+			'CARS': 'Car',
+			'TRUCKS': 'Truck',
+			'VANS': 'Van',
+			'BUS': 'Bus',
+			'TRACKED': 'Tracked',
+			'HOVERCRAFT': 'Hovercraft',
+			'PWC': 'PWC',
+			'BOATS': 'Boat',
+			'SHIPS': 'Ship',
+			'SUBMARINES': 'Submarine',
+			'FIXED_WING': 'Fixed Wing Aircraft',
+			'ROTORCRAFT': 'Rotorcraft',
+			'VTOL': 'VTOL/VSTOL',
+			'LTAV': 'LTAV',
+			'LAV': 'LAV',
+			'GRAV': 'Gravity',
+			'MOD_TRAILER': 'Trailer',
+			'OTHER': 'Other'
+		},
+		'DRONES': {
+			'DRONE_LARGE': 'Large Drone',
+			'DRONE_MEDIUM': 'Medium Drone',
+			'DRONE_SMALL': 'Small Drone',
+			'DRONE_MINI': 'Minidrone',
+			'DRONE_MICRO': 'Microdrone',
+		}
+	};
+	json.vehicles.concat(json.drones).forEach(vehicle => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		if(vehicle.type && vehicle.type == 'VEHICLES') {
+			rowattrs["repeating_vehicle_" + row_id + "_type"] = veh_types.VEHICLES[vehicle.subtype] || 'Other';
+			rowattrs["repeating_vehicle_" + row_id + "_subtype"] = vehicle.subtype || ' ';
+		} else {
+			rowattrs["repeating_vehicle_" + row_id + "_type"] = veh_types.DRONES[vehicle.type] || 'Drone';
+			rowattrs["repeating_vehicle_" + row_id + "_subtype"] = vehicle.subtype || ' ';
+		}
+		rowattrs["repeating_vehicle_" + row_id + "_name"] = vehicle.name;
+		rowattrs["repeating_vehicle_" + row_id + "_handling_onroad"] = vehicle.handlOn;
+		rowattrs["repeating_vehicle_" + row_id + "_handling_offroad"] = vehicle.handlOff;
+		rowattrs["repeating_vehicle_" + row_id + "_acceleration_base"] = vehicle.accelOn;
+		rowattrs["repeating_vehicle_" + row_id + "_speed_base"] = vehicle.speedIntOn;
+		rowattrs["repeating_vehicle_" + row_id + "_speed_max"] = vehicle.speed;
+		rowattrs["repeating_vehicle_" + row_id + "_body_base"] = vehicle.body;
+		rowattrs["repeating_vehicle_" + row_id + "_armor_base"] = vehicle.armor;
+		rowattrs["repeating_vehicle_" + row_id + "_pilot_base"] = vehicle.pilot;
+		rowattrs["repeating_vehicle_" + row_id + "_sensor_base"] = vehicle.sensor;
+		rowattrs["repeating_vehicle_" + row_id + "_seats"] = vehicle.seats || 0;
+		rowattrs["repeating_vehicle_" + row_id + "_flag"] = 'display';
+
+		rowattrs["repeating_vehicle_" + row_id + "_notes"] = vehicle.page + "\n";
+
+		if(vehicle.accessories) {
+			var accs = [];
+			vehicle.accessories.forEach(acc => {
+				accs.push(acc.name);
+			});
+			rowattrs["repeating_vehicle_" + row_id + "_notes"] += accs.join(', ');
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character vehicles and drones imported");
+
+
+	// Process SINs
+	var sins = {};
+	json.sins.forEach(sin => {
+		sins[sin.name] = sin;
+		sins[sin.name].lifestyle = '';
+		sins[sin.name].licenses = '';
+	});
+	json.lifestyles.forEach(life => {
+		sins[life.sin].lifestyle += '(' + life.customName + ', ' + life.name + ', ' + life.paidMonths + ' months)';
+	});
+	json.licenses.forEach(lic => {
+		sins[lic.sin].licenses += '(' + lic.name + ') ';
+	});
+
+	Object.keys(sins).forEach(key => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_lifestyle_" + row_id + "_name"] = sins[key].name;
+		rowattrs["repeating_lifestyle_" + row_id + "_rating"] = sins[key].quality;
+		rowattrs["repeating_lifestyle_" + row_id + "_lifestyle"] = sins[key].lifestyle;
+		rowattrs["repeating_lifestyle_" + row_id + "_licenses"] = sins[key].licenses;
+		rowattrs["repeating_lifestyle_" + row_id + "_notes"] = sins[key].description || '';
+		rowattrs["repeating_lifestyle_" + row_id + "_flag"] = 'display';
+
+		setAttrs(rowattrs);
+	});
+console.log("Character sins, lifestyles and licenses imported");
+
+
+	// Process contacts
+	json.contacts.forEach(contact => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_contacts_" + row_id + "_favors"] = '0';
+		if(contact.name && contact.name.includes("FP")) {
+			const re = /\s*\((\d+)\s*FP\)/i;
+			var m = contact.name.match(re);
+			rowattrs["repeating_contacts_" + row_id + "_favors"] = m[1] || '';
+			contact.name = contact.name.replace(re, '');
+		}
+		rowattrs["repeating_contacts_" + row_id + "_name"] = contact.name || 'Anonymous ' + contact.type;
+		rowattrs["repeating_contacts_" + row_id + "_loyalty"] = contact.loyalty || 0;
+		rowattrs["repeating_contacts_" + row_id + "_influence"] = contact.influence || 0;
+		rowattrs["repeating_contacts_" + row_id + "_notes"] = contact.type + "\n" + contact.description;
+		rowattrs["repeating_contacts_" + row_id + "_flag"] = 'display';
+
+		setAttrs(rowattrs);
+	});
+console.log("Character contacts imported");
+
+
+	// Process ranged weapons
+	var weapon_skills = {
+		'firearms': 'Firearms',
+		'exotic_weapons': 'Exotic Weapons',
+		'athletics': 'Athletics',
+		'close_combat': 'Close Combat',
+		'engineering': 'Engineering'
+	};
+	json.longRangeWeapons.forEach(range => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_range_" + row_id + "_weapon"] = range.name;
+		rowattrs["repeating_range_" + row_id + "_pool"] = range.pool;
+		rowattrs["repeating_range_" + row_id + "_dicepool_base"] = range.pool;
+		rowattrs["repeating_range_" + row_id + "_damage"] = range.damage;
+		rowattrs["repeating_range_" + row_id + "_skill"] = weapon_skills[range.skill];
+		rowattrs["repeating_range_" + row_id + "_type"] = range.type || '';
+		rowattrs["repeating_range_" + row_id + "_subtype"] = range.subtype || '';
+		rowattrs["repeating_range_" + row_id + "_flag"] = 'display';
+
+		var ARs = range.attackRating.split('/');
+		rowattrs["repeating_range_" + row_id + "_close"] = ARs[0];
+		rowattrs["repeating_range_" + row_id + "_near"] = ARs[1];
+		rowattrs["repeating_range_" + row_id + "_medium"] = ARs[2];
+		rowattrs["repeating_range_" + row_id + "_far"] = ARs[3];
+		rowattrs["repeating_range_" + row_id + "_extreme"] = ARs[4];
+
+		var re = /(\d+)/;
+		var m = range.ammunition.match(re);
+		if(m) {
+			rowattrs["repeating_range_" + row_id + "_ammo"] = m[1] || 0;
+		} else {
+			rowattrs["repeating_range_" + row_id + "_ammo"] = 0;
+		}
+
+		rowattrs["repeating_range_" + row_id + "_firing_modes"] = range.mode;
+
+		rowattrs["repeating_range_" + row_id + "_notes"] = range.page + "\n";
+		if(range.wifi) {
+			range.wifi.forEach(wifi => {
+				rowattrs["repeating_range_" + row_id + "_notes"] += "Wireless: " + wifi + "\n";
+			});
+		}
+
+		var modifier = 0;
+		if(range.accessories) {
+			var accessories = [];
+			range.accessories.forEach(acc => {
+				accessories.push(acc.name);
+
+				if(acc.name.includes('martlink') || acc.name.includes('martgun')) {
+					modifier = 1;
+				}
+			});
+			rowattrs["repeating_range_" + row_id + "_notes"] += accessories.join(', ');
+
+		}
+		rowattrs["repeating_range_" + row_id + "_dicepool_modifier"] = modifier;
+
+		setAttrs(rowattrs);
+	});
+console.log("Character long range weapons imported");
+
+
+	// Process melee weapons
+	json.closeCombatWeapons.forEach(melee => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_melee_" + row_id + "_weapon"] = melee.name;
+		rowattrs["repeating_melee_" + row_id + "_dicepool"] = melee.pool;
+		rowattrs["repeating_melee_" + row_id + "_dicepool_base"] = melee.pool;
+		rowattrs["repeating_melee_" + row_id + "_damage"] = melee.damage;
+		rowattrs["repeating_melee_" + row_id + "_type"] = melee.type || '';
+		rowattrs["repeating_melee_" + row_id + "_subtype"] = melee.subtype || '';
+		rowattrs["repeating_melee_" + row_id + "_skill"] = weapon_skills[melee.skill];
+		rowattrs["repeating_melee_" + row_id + "_flag"] = 'display';
+
+		var ARs = melee.attackRating.split('/');
+		rowattrs["repeating_melee_" + row_id + "_close"] = ARs[0];
+		rowattrs["repeating_melee_" + row_id + "_near"] = ARs[1];
+		rowattrs["repeating_melee_" + row_id + "_medium"] = ARs[2];
+		rowattrs["repeating_melee_" + row_id + "_far"] = ARs[3];
+		rowattrs["repeating_melee_" + row_id + "_extreme"] = ARs[4];
+
+		rowattrs["repeating_melee_" + row_id + "_notes"] = melee.page + "\n";
+		if(melee.wifi) {
+			melee.wifi.forEach(wifi => {
+				rowattrs["repeating_melee_" + row_id + "_notes"] += "Wireless: " + wifi + "\n";
+			});
+		}
+
+
+		var modifier = 0;
+		if(melee.accessories) {
+			var accessories = [];
+			melee.accessories.forEach(acc => {
+				accessories.push(acc.name);
+			});
+			rowattrs["repeating_melee_" + row_id + "_notes"] += accessories.join(', ');
+
+		}
+		rowattrs["repeating_melee_" + row_id + "_dicepool_modifier"] = modifier;
+
+		setAttrs(rowattrs);
+	});
+console.log("Character melee weapons imported");
+
+
+	// Process spells and Preparations
+	var categories = {
+		'Combat spells': 'Combat',
+		'Detection spells': 'Detection',
+		'Heal spells': 'Health',
+		'Illusion spells': 'Illusion',
+		'Manipulation spells': 'Manipulation'
+	};
+	var effect_types = {
+		'Direct Combat': 'Direct Combat',
+		'Indirect Combat': 'Indirect Combat',
+		'Direct Combat, Area': 'Direct Combat, Area',
+		'Indirect Combat, Area': 'Indirect Combat, Area',
+		'Single-Sense': 'Single-Sense',
+		'Multi-Sense': 'Multi-Sense'
+	};
+	var durations = {
+		'Instantaneous': 'Instant',
+		'Sustained': 'Sustained',
+		'Limited': 'Limited',
+		'Permanent': 'Permanent'
+	};
+	var ranges = {
+		'Line of sight': 'LOS',
+		'Line of sight (Area)': 'LOS (A)',
+		'Special': 'Special',
+		'Touch': 'T'
+	};
+	json.spells.forEach(spell => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		var spell_type = 'spell';
+		if(spell.isAlchemistic) {
+			spell_type = 'preparations';
+		}
+
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_name"] = spell.name;
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_category"] = categories[spell.category];
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_effect_type"] = '';
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_type"] = spell.type;
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_duration"] = durations[spell.duration];
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_range"] = ranges[spell.range];
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_drain"] = spell.drain;
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_skill"] = '@{sorcery}';
+
+		if(spell.features) {
+			var effect_type = '';
+			var effect_area = '';
+			spell.features.forEach(fea => {
+				if(fea == 'area') {
+					effect_area = 'area';
+				} else {
+					effect_type = fea;
+				}
+			});
+
+			switch(effect_type) {
+				case 'direct':
+					effect_type = 'Direct Combat';
+					break;
+				case 'indirect':
+					effect_type = 'Indirect Combat';
+					break;
+				case 'sense_single':
+					effect_type = 'Single-Sense';
+					break;
+				case 'sense_multi':
+					effect_type = 'Multi-Sense';
+					break;
+				default:
+					effect_type = 'None';
+					break;
+			}
+
+			spell.effect_type = effect_type;
+			if(effect_area == 'area') {
+				spell.effect_type = spell.effect_type + ', Area';
+			}
+
+			rowattrs["repeating_" + spell_type + "_" + row_id + "_effect_type"] = spell.effect_type;
+		}
+
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_display_flag"] = 'display';
+
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] = spell.page + "\n";
+		if(spell.influencedBy[0]) {
+			rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] += "Influenced By: ";
+			var influences = [];
+			spell.influencedBy.forEach(inf => {
+				influences.push(inf);
+			});
+			rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] += influences.join(', ') + "\n";
+		}
+
+		setAttrs(rowattrs);
+	});
+console.log("Character spells and preparations imported");
+
+
+	// Process rituals
+	json.rituals.forEach(ritual => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		rowattrs["repeating_ritual_" + row_id + "_name"] = ritual.name;
+		rowattrs["repeating_ritual_" + row_id + "_threshold"] = ritual.threshold;
+
+		rowattrs["repeating_ritual_" + row_id + "_flag"] = 'display';
+
+		rowattrs["repeating_ritual_" + row_id + "_notes"] = ritual.page + "\n";
+		if(ritual.features[0]) {
+			rowattrs["repeating_ritual_" + row_id + "_notes"] += "Features: ";
+			var feats = [];
+			ritual.features.forEach(inf => {
+				feats.push(inf);
+			});
+			rowattrs["repeating_ritual_" + row_id + "_notes"] += feats.join(', ') + "\n";
+		}
+console.log(rowattrs);
+		setAttrs(rowattrs);
+	});
+console.log("Character rituals imported");
+
+
+	// Process adept powers
+	var powerActivations = {
+		'MAJOR_ACTION': 'Major',
+		'MINOR_ACTION': 'Minor',
+		'PASSIVE': 'Passive',
+	};
+	json.adeptPowers.forEach(power => {
+		rowattrs = {};
+		row_id = generateRowID();
+
+		power.rating = 1;
+		re = /\s*(\d+)$/;
+		var m = power.name.match(re);
+		if(m && m[1]) {
+			power.rating = m[1];
+			power.name = power.name.replace(re, '');
+		}
+
+		rowattrs["repeating_powers_" + row_id + "_name"] = power.name;
+		rowattrs["repeating_powers_" + row_id + "_rating"] = power.level || '';
+		rowattrs["repeating_powers_" + row_id + "_cost"] = power.cost;
+		rowattrs["repeating_powers_" + row_id + "_activation"] = powerActivations[power.activation];
+
+		rowattrs["repeating_powers_" + row_id + "_display_flag"] = 'display';
+
+		rowattrs["repeating_powers_" + row_id + "_notes"] = power.page + "\n";
+
+		setAttrs(rowattrs);
+	});
+console.log("Character adept powers imported");
+
+
+	// Process metamagic
+	if(json.metamagic) {
+		json.metamagic.forEach(meta => {
+			rowattrs = {};
+			row_id = generateRowID();
+
+			rowattrs["repeating_metamagic_" + row_id + "_name"] = meta.name;
+			rowattrs["repeating_metamagic_" + row_id + "_display_flag"] = 'display';
+			rowattrs["repeating_metamagic_" + row_id + "_notes"] = meta.page + "\n";
+console.log(rowattrs);
+			setAttrs(rowattrs);
+		});
+console.log("Character meta magics imported");
+	}
+
+
+	// Process echoes
+	if(json.echoes) {
+		json.echoes.forEach(echo => {
+			rowattrs = {};
+			row_id = generateRowID();
+
+			rowattrs["repeating_echoes_" + row_id + "_echo"] = echo.name;
+			rowattrs["repeating_echoes_" + row_id + "_display_flag"] = 'display';
+			rowattrs["repeating_echoes_" + row_id + "_notes"] = echo.page + "\n";
+
+			setAttrs(rowattrs);
+		});
+console.log("Character echoes imported");
+	}
+
+
+	// Process complex forms
+	var cf_durations = {
+		'Sustained': 'Sustained',
+		'Immediate': 'Instant',
+		'Permanent': 'Permanent'
+	};
+	if(json.complexForms) {
+		json.complexForms.forEach(form => {
+			rowattrs = {};
+			row_id = generateRowID();
+
+			rowattrs["repeating_forms_" + row_id + "_name"] = form.name;
+			rowattrs["repeating_forms_" + row_id + "_duration"] = cf_durations[form.duration];
+			rowattrs["repeating_forms_" + row_id + "_fade"] = form.fading;
+			rowattrs["repeating_forms_" + row_id + "_display_flag"] = 'display';
+
+			rowattrs["repeating_forms_" + row_id + "_notes"] = form.page + "\n";
+
+			if(form.influences[0]) {
+				rowattrs["repeating_forms_" + row_id + "_notes"] += "Influenced By: ";
+				var influences = [];
+				form.influences.forEach(inf => {
+					influences.push(inf);
+				});
+				rowattrs["repeating_forms_" + row_id + "_notes"] += influences.join(', ') + "\n";
+			}
+
+			setAttrs(rowattrs);
+		});
+console.log("Character complex forms imported");
+	}
+
+
+	// Process martial arts
+	if(json.martialArts) {
+		json.martialArts.forEach(mart => {
+			if(mart.techniques[0]) {
+				mart.techniques.forEach(tech => {
+					rowattrs = {};
+					row_id = generateRowID();
+
+					rowattrs["repeating_martial_" + row_id + "_technique"] = tech;
+					rowattrs["repeating_martial_" + row_id + "_style"] = mart.name;
+					rowattrs["repeating_martial_" + row_id + "_display_flag"] = 'display';
+
+					rowattrs["repeating_martial_" + row_id + "_notes"] = mart.page + "\n";
+
+					setAttrs(rowattrs);
+				});
+			}
+
+		});
+console.log("Character martial arts imported");
+	}
+
+
+	// Process matrix devices
+	var programs = {};
+	var prog_list = [];
+	var matrix_device_types = {
+		'COMMLINK': 'Commlink',
+		'CYBERDECK': 'Cyberdeck',
+		'CYBER_HEADWARE': 'Cyberjack',
+		'RIGGER_CONSOLE': 'Command Console',
+		'TAC_NET': 'M-TOC'
+	}
+	if(json.matrixItems) {
+		json.matrixItems.forEach(dev => {
+			rowattrs = {};
+			row_id = generateRowID();
+
+			rowattrs["repeating_devices_" + row_id + "_device"] = dev.name;
+			rowattrs["repeating_devices_" + row_id + "_device_rating"] = dev.deviceRating;
+			rowattrs["repeating_devices_" + row_id + "_type"] = matrix_device_types[dev.subType];
+			rowattrs["repeating_devices_" + row_id + "_active_program_slots"] = dev.concurrentPrograms;
+			rowattrs["repeating_devices_" + row_id + "_attack"] = dev.attack;
+			rowattrs["repeating_devices_" + row_id + "_sleaze"] = dev.sleaze;
+			rowattrs["repeating_devices_" + row_id + "_data_processing"] = dev.dataProcessing;
+			rowattrs["repeating_devices_" + row_id + "_firewall"] = dev.firewall;
+			rowattrs["repeating_devices_" + row_id + "_display_flag"] = 'display';
+
+			rowattrs["repeating_devices_" + row_id + "_notes"] = dev.page + "\n";
+
+			if(dev.accessories) {
+				var accessories = [];
+				dev.accessories.forEach(acc => {
+					if(acc.rating) {
+						accessories.push(acc.name + ' ' + acc.rating);
+					} else {
+						accessories.push(acc.name);
+					}
+				});
+				rowattrs["repeating_devices_" + row_id + "_notes"] += accessories.join(', ');
+
+			}
+
+			// Build the list of programs to be used later
+			if(dev.programs) {
+				dev.programs.forEach(prog => {
+					if(! prog_list.includes(prog.name)) {
+						prog_list.push(prog.name);
+						programs[prog.name] = prog;
+					}
+				});
+			}
+
+			setAttrs(rowattrs);
+		});
+
+console.log("Character matrix devices imported");
+	}
+
+
+	// Process programs
+	if(programs) {
+		rowattrs = {};
+		Object.keys(programs).forEach(key => {
+			row_id = generateRowID();
+
+			rowattrs["repeating_programs_" + row_id + "_program"] = programs[key].name;
+			rowattrs["repeating_programs_" + row_id + "_notes"] = programs[key].page;
+		});
+
+		setAttrs(rowattrs);
+		console.log("Character programs imported");
+	}
+
+
+	return true;
+};
+
+const clean = () => {
+	["quality", "skills", "knowledges", "armor", "items", "augmentations", "vehicle", "lifestyle", "contacts", "range", "melee", "spell", "ritual", "powers", "metamagic", "echoes", "forms", "martial", "devices", "programs"].forEach(group => {
+		getSectionIDs(`repeating_${group}`, (ids) => {
+			ids.forEach((id) => {
+				removeRepeatingRow(`repeating_${group}_${id}`);
+			});
+		});
+	});
+};
+
 </script>
 </div>
