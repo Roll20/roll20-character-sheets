@@ -6285,7 +6285,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
   return result;
 }
 
-function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd) {
+function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd) {
   const result = {};
 
   const exec = [];
@@ -6393,19 +6393,23 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, hasArmu
       cRoll.push(Number(modA));
 
       if (isDeuxMains) {
-        let bDegats = Number(pilonnage) - 1;
+        if (pilonnageType === 'degats') {
+          let bDegats = Number(pilonnage) - 1;
 
-        if (bDegats < 0) { bDegats = 0; }
+          if (bDegats < 0) { bDegats = 0; }
 
-        exec.push(`{{vMStyleD=+${bDegats}D6}}`);
-        dDegats += Number(bDegats);
+          exec.push(`{{vMStyleD=+${bDegats}D6}}`);
+          dDegats += Number(bDegats);
+        }
 
-        let bViolence = Number(pilonnage) - 1;
+        if (pilonnageType === 'violence') {
+          let bViolence = Number(pilonnage) - 1;
 
-        if (bViolence < 0) { bViolence = 0; }
+          if (bViolence < 0) { bViolence = 0; }
 
-        exec.push(`{{vMStyleV=+${bViolence}D6}}`);
-        bViolence += Number(bViolence);
+          exec.push(`{{vMStyleV=+${bViolence}D6}}`);
+          bViolence += Number(bViolence);
+        }
       }
       break;
 
@@ -13196,6 +13200,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push('pScaracteristique3Equipement');
         listAttrs.push('pScaracteristique4Equipement');
         listAttrs.push('pSpilonnage');
+        listAttrs.push('pSpilonnageType');
 
         baseDegats = 2;
         baseViolence = 1;
@@ -13226,6 +13231,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push('mEcaracteristique3Equipement');
         listAttrs.push('mEcaracteristique4Equipement');
         listAttrs.push('mEpilonnage');
+        listAttrs.push('mEpilonnageType');
 
         baseDegats = 3;
         baseViolence = 3;
@@ -13256,6 +13262,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push(`${prefix}caracteristique3Equipement`);
         listAttrs.push(`${prefix}caracteristique4Equipement`);
         listAttrs.push(`${prefix}pilonnage`);
+        listAttrs.push(`${prefix}pilonnageType`);
 
         listAttrs.push(`${prefix}ArmeDist`);
         listAttrs.push(`${prefix}armeDistPortee`);
@@ -13286,6 +13293,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push(`${prefix}caracteristique3Equipement`);
         listAttrs.push(`${prefix}caracteristique4Equipement`);
         listAttrs.push(`${prefix}pilonnage`);
+        listAttrs.push(`${prefix}pilonnageType`);
 
         listAttrs.push(`${prefix}ArmeDist`);
         listAttrs.push(`${prefix}armeDistPortee`);
@@ -13351,6 +13359,7 @@ rollCombatDistance.forEach((button) => {
     const C3 = attrs[`${prefix}caracteristique3Equipement`] || '0';
     const C4 = attrs[`${prefix}caracteristique4Equipement`] || '0';
     const vPilonnage = attrs[`${prefix}pilonnage`] || 0;
+    const vPilonnageType = attrs[`${prefix}pilonnageType`] || 0;
 
     if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
 
@@ -13611,7 +13620,7 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd);
+    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, vPilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);
@@ -32853,6 +32862,13 @@ on('clicked:rollVehicule', async (info) => {
                 <span>Pilonnage, tir n°</span>
                 <input type="number" name="attr_pilonnageRanger" value="1" min="1" max="7" />
             </label>
+            <label class="pilonnage">
+                <span data-i18n="pilonnageDegatsOuViolence">Pilonnage, dégâts ou violence ?</span>
+                <select name="attr_pilonnageRangerType">
+                    <option value="degats" selected>Dégâts</option>
+                    <option value="violence">Violence</option>
+                </select>
+            </label>
             <div class="bonusCarac">
                 <select name="attr_caracteristique3">
                     <option value="0" selected></option>
@@ -43562,8 +43578,15 @@ on('clicked:rollVehicule', async (info) => {
                         <input class="deuxMains" type="hidden" name="attr_pSdeuxMains" value="0" />
                         
                         <label class="pilonnage">
-                            <span>Pilonnage, tir n°</span>
+                            <span data-i18n="pilonnageTirNumero">Pilonnage, tir n°</span>
                             <input type="number" name="attr_pSpilonnage" value="1" min="1" max="7" />
+                        </label>
+                        <label class="pilonnage">
+                            <span data-i18n="pilonnageDegatsOuViolence">Pilonnage, dégâts ou violence ?</span>
+                            <select name="attr_pSpilonnageType">
+                                <option value="degats" selected>Dégâts</option>
+                                <option value="violence">Violence</option>
+                            </select>
                         </label>
 
                         <div class="bonusCarac">
@@ -44013,8 +44036,15 @@ on('clicked:rollVehicule', async (info) => {
                     <div class="bonus">
                         <input class="deuxMains" type="hidden" name="attr_mEdeuxMains" value="0" />
                         <label class="pilonnage">
-                            <span>Pilonnage, tir n°</span>
+                            <span data-i18n="pilonnageTirNumero">Pilonnage, tir n°</span>
                             <input type="number" name="attr_mEpilonnage" value="1" min="1" max="7" />
+                        </label>
+                        <label class="pilonnage">
+                            <span data-i18n="pilonnageDegatsOuViolence">Pilonnage, dégâts ou violence ?</span>
+                            <select name="attr_mEpilonnageType">
+                                <option value="degats" selected>Dégâts</option>
+                                <option value="violence">Violence</option>
+                            </select>
                         </label>
 
                         <div class="bonusCarac">
@@ -44470,8 +44500,15 @@ on('clicked:rollVehicule', async (info) => {
                         <input class="deuxMains" type="hidden" name="attr_deuxMains" value="0" />
 
                         <label class="pilonnage">
-                            <span>Pilonnage, tir n°</span>
+                            <span data-i18n="pilonnageTirNumero">Pilonnage, tir n°</span>
                             <input type="number" name="attr_pilonnage" value="1" min="1" max="7" />
+                        </label>
+                        <label class="pilonnage">
+                            <span data-i18n="pilonnageDegatsOuViolence">Pilonnage, dégâts ou violence ?</span>
+                            <select name="attr_pilonnageType">
+                                <option value="degats" selected>Dégâts</option>
+                                <option value="violence">Violence</option>
+                            </select>
                         </label>
 
                         <div class="bonusCarac">
@@ -50871,6 +50908,14 @@ on('clicked:rollVehicule', async (info) => {
                     <label class="pilonnage">
                         <span>Pilonnage, tir n°</span>
                         <input type="number" name="attr_pilonnage" value="1" min="1" max="7" />
+                    </label>
+
+                    <label class="pilonnage">
+                        <span data-i18n="pilonnageDegatsOuViolence">Pilonnage, dégâts ou violence ?</span>
+                        <select name="attr_pilonnageType">
+                            <option value="degats" selected>Dégâts</option>
+                            <option value="violence">Violence</option>
+                        </select>
                     </label>
 
                     <div class="bonusCarac">
