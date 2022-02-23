@@ -3294,6 +3294,8 @@ on('clicked:importKNPCG', () => {
 
         let raw = result.raw - lAspects.bête.mineur - lAspects.bête.majeur;
 
+        if (lAspects.bête.majeur > 0) { raw -= bete.score; }
+
         if (raw < 0) { raw = 0; }
 
         newrowattrsW[`${path + newrowidW}_ArmeCaC`] = result.name;
@@ -3463,7 +3465,7 @@ on('clicked:importKNPCG', () => {
             newrowattrsW[`${path + newrowidW}_penetrantValue`] = Number(value2);
             break;
 
-          case 'perce Armure':
+          case 'perce armure':
             newrowattrsW[`${path + newrowidW}_perceArmure`] = '{{perceArmure=^{perce-armure} @{perceArmureValue}}}';
             newrowattrsW[`${path + newrowidW}_perceArmureValue`] = Number(value2);
             break;
