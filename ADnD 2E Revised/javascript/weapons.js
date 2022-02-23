@@ -7,8 +7,8 @@ weapons['arquebus'] = {
     'size': 'M',
     'type': 'P',
     'speed': 15,
-    'small-medium': '1d10',
-    'large': '1d10',
+    'small-medium': '1d10!',
+    'large': '1d10!',
     'knockdown': 'd8',
     'book': 'PHB',
     'category': ['Range']
@@ -1311,6 +1311,13 @@ weapons['trident (one-handed)'] = {
     'book': 'The Complete Fighter\'s Handbook',
     'category': ['Melee','Range']
 };
+weapons['trident (two-handed)'] = {
+    ...weapons['trident'],
+    'name': 'Trident (Two-handed)',
+    'small-medium': '1d8+1',
+    'book': 'The Complete Fighter\'s Handbook',
+    'category': ['Melee']
+};
 weapons['shield-punch'] = {
     'name': 'Shield-Punch',
     'group': 'Buckler/Small/Medium Shield',
@@ -1859,6 +1866,918 @@ weapons['snow blade (iuak)'] = {
     'large': '1d6',
     'book': 'The Complete Ranger\'s Handbook',
     'category': ['Melee']
+};
+//#endregion
+
+//#region The Complete Barbarians Handbook
+weapons['artengak'] = {
+    'name': 'Artengak',
+    'size': 'L',
+    'type': 'P',
+    'speed': 5,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['atlatl'] = {
+    'name': 'Atlatl',
+    'rof': '1',
+    'range': '30/60/90',
+    'size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['atlatl, dart'] = {
+    'name': 'Atlatl, Dart',
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['boomerang, nonreturning'] = {
+    'name': 'Boomerang, Nonreturning',
+    'rof': '1',
+    'range': '30/70/100',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d3+1',
+    'large': '1d4+1',
+    'knockdown': 'd8',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['boomerang, returning'] = {
+    'name': 'Boomerang, Returning',
+    'rof': '1',
+    'range': '20/40/60',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d3+1',
+    'large': '1d4+1',
+    'knockdown': 'd8',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['celt'] = {
+    'name': 'Celt',
+    'size': 'S',
+    'type': 'B/P',
+    'speed': 4,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['club, spiked'] = {
+    'name': 'Club, Spiked',
+    'size': 'M',
+    'type': 'P',
+    'speed': 4,
+    'small-medium': '1d6+1',
+    'large': '1d4+1',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['club, throwing (melee)'] = {
+    'name': 'Club, Throwing (Melee)',
+    'size': 'S',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d2',
+    'large': '1',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['club, throwing (ranged)'] = {
+    'name': 'Club, Throwing (Ranged)',
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['forearm axe'] = {
+    'name': 'Forearm Axe',
+    'size': 'S',
+    'type': 'S/P',
+    'speed': 3,
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['rabbit stick'] = {
+    'name': 'Rabbit stick',
+    'size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Melee']
+};
+weapons['stick sling (flint disk)'] = {
+    'name': 'Stick sling (Flint Disk)',
+    'rof': '2/1',
+    'range': '30/60/90',
+    'size': 'S',
+    'type': 'B',
+    'speed': 11,
+    'small-medium': '1d4+1',
+    'large': '1d6+1',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['stick sling (grooved stone)'] = {
+    'name': 'Stick sling (Grooved Stone)',
+    'rof': '2/1',
+    'range': '30/60/90',
+    'size': 'S',
+    'type': 'B',
+    'speed': 11,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Barbarian\'s Handbook',
+    'category': ['Range']
+};
+weapons['sling, string (flint disk)'] = {
+    ...weapons['stick sling (flint disk)'],
+    'name': 'Sling, String (Flint Disk)',
+};
+weapons['sling, string (grooved stone)'] = {
+    ...weapons['stick sling (grooved stone)'],
+    'name': 'Sling, String (Grooved Stone)',
+};
+//#endregion
+
+//#region The Complete Ninja's Handbook
+weapons['bo (staff)'] = {
+    'name': 'Bo (staff)',
+    'size': 'L',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['daikyu (armor piercer arrow)'] = {
+    'name': 'Daikyu (Armor piercer arrow)',
+    'rof': '2/1',
+    'range': '70/140/210',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['daikyu (flight arrow)'] = {
+    ...weapons['daikyu (armor piercer arrow)'],
+    'name': 'Daikyu (Flight arrow)',
+    'small-medium': '1d6',
+    'large': '1d6',
+};
+weapons['daikyu (frog crotch arrow)'] = {
+    ...weapons['daikyu (armor piercer arrow)'],
+    'name': 'Daikyu (Frog crotch arrow)',
+    'type': 'S',
+    'small-medium': '1d6',
+    'large': '1d3',
+};
+weapons['daikyu (humming bulb arrow)'] = {
+    ...weapons['daikyu (armor piercer arrow)'],
+    'name': 'Daikyu (Humming bulb arrow)',
+    'small-medium': '1d2',
+    'large': '1d2',
+};
+weapons['daikyu (sheaf arrow)'] = {
+    ...weapons['daikyu (armor piercer arrow)'],
+    'name': 'Daikyu (Sheaf arrow)',
+    'small-medium': '1d8',
+    'large': '1d6',
+};
+weapons['hankyu (armor piercer arrow)'] = {
+    'name': 'Hankyu (Armor piercer arrow)',
+    'rof': '2/1',
+    'range': '50/100/150',
+    'size': 'M',
+    'type': 'P',
+    'speed': 6,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['hankyu (flight arrow)'] = {
+    ...weapons['hankyu (armor piercer arrow)'],
+    'name': 'Hankyu (Flight arrow)',
+    'small-medium': '1d6',
+    'large': '1d6',
+};
+weapons['hankyu (frog crotch arrow)'] = {
+    ...weapons['hankyu (armor piercer arrow)'],
+    'name': 'Hankyu (Frog crotch arrow)',
+    'type': 'S',
+    'small-medium': '1d6',
+    'large': '1d3',
+};
+weapons['hankyu (humming bulb arrow)'] = {
+    ...weapons['hankyu (armor piercer arrow)'],
+    'name': 'Hankyu (Humming bulb arrow)',
+    'small-medium': '1d2',
+    'large': '1d2',
+};
+weapons['hankyu (sheaf arrow)'] = {
+    ...weapons['hankyu (armor piercer arrow)'],
+    'name': 'Hankyu (Sheaf arrow)',
+    'small-medium': '1d8',
+    'large': '1d6',
+};
+weapons['pellet bow (pellet)'] = {
+    'name': 'Pellet bow (Pellet)',
+    'rof': '1',
+    'range': '60/120/180',
+    'size': 'M',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['chopsticks'] = {
+    'name': 'Chopsticks',
+    'size': 'S',
+    'type': 'P',
+    'speed': 1,
+    'small-medium': '1',
+    'large': '1',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['chu-ko-nu (repeater)'] = {
+    'name': 'Chu-ko-nu (repeater)',
+    'group': 'Crossbow',
+    'rof': '3/2',
+    'range': '20/40/60',
+    'size': 'M',
+    'type': 'P',
+    'speed': 10,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['fang'] = {
+    'name': 'Fang',
+    'size': 'M',
+    'type': 'P',
+    'speed': 6,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['fukimi-bari (mouth darts)'] = {
+    'name': 'Fukimi-bari (mouth darts)',
+    'rof': '1',
+    'range': '3’/—/—',
+    'size': 'S',
+    'type': 'P',
+    'speed': 1,
+    'small-medium': '1d2',
+    'large': '1d2',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['gunsen (war fan)'] = {
+    'name': 'Gunsen (war fan)',
+    'size': 'S',
+    'type': 'B',
+    'speed': 5,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['hanbo (half staff)'] = {
+    'name': 'Hanbo (half staff)',
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['jitter'] = {
+    'name': 'Jitter',
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['jo (stick)'] = {
+    'name': 'Jo (stick)',
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d6',
+    'large': '1d3',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['kama (sickle)'] = {
+    'name': 'Kama (sickle)',
+    'size': 'S',
+    'type': 'S',
+    'speed': 3,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['kau sin ke (whipping chain)'] = {
+    'name': 'Kau sin ke (whipping chain)',
+    'size': 'L',
+    'type': 'B',
+    'speed': 7,
+    'small-medium': '1d8',
+    'large': '1d6',
+    'knockdown': 'd8',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['kawanaga (grapnel)'] = {
+    'name': 'Kawanaga (grapnel)',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'L',
+    'type': 'B/P',
+    'speed': 6,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee', 'Range']
+};
+weapons['kiseru (pipe)'] = {
+    'name': 'Kiseru (pipe)',
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['kusari-gama (chain-sickle)'] = {
+    'name': 'Kusari-gama (chain-sickle)',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'L',
+    'type': 'B/S',
+    'speed': 6,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee', 'Range']
+};
+weapons['kyogetsu-shogi (cord-and-dagger)'] = {
+    'name': 'Kyogetsu-shogi (cord-and-dagger)',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'L',
+    'type': 'B/S',
+    'speed': 6,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee', 'Range']
+};
+weapons['manriki-gusari (chain)'] = {
+    'name': 'Manriki-gusari (chain)',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'L',
+    'type': 'B',
+    'speed': 5,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee', 'Range']
+};
+weapons['metsubishi (blinding powders)'] = {
+    'name': 'Metsubishi (blinding powders)',
+    'rof': '1/2',
+    'range': '3’/—/—',
+    'size': 'S',
+    'type': '—',
+    'speed': 3,
+    'small-medium': '—',
+    'large': '—',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['nage teppo (grenades)'] = {
+    'name': 'Nage teppo (grenades)',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': '—',
+    'type': 'B',
+    'speed': 9,
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['needle'] = {
+    'name': 'Needle',
+    'rof': '1',
+    'range': '3’/—/—',
+    'size': 'S',
+    'type': 'P',
+    'speed': 1,
+    'small-medium': '1',
+    'large': '1',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['nekode (climbing claws)'] = {
+    'name': 'Nekode (climbing claws)',
+    'size': 'S',
+    'type': 'S',
+    'speed': 1,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['kumade (rake)'] = {
+    'name': 'Kumade (rake)',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'B/P',
+    'speed': 7,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['lajatang'] = {
+    'name': 'Lajatang',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S/P',
+    'speed': 7,
+    'small-medium': '1d10',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['nagimaki (horseman\'s halberd)'] = {
+    'name': 'Nagimaki (horseman\'s halberd)',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S/P',
+    'speed': 6,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['naginata (halberd)'] = {
+    'name': 'Naginata (halberd)',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S/P',
+    'speed': 8,
+    'small-medium': '1d8',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['sai (short trident)'] = {
+    'name': 'Sai (short trident)',
+    'size': 'S',
+    'type': 'P/B',
+    'speed': 3,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['shuriken, spike (throwing star)'] = {
+    'name': 'Shuriken, Spike (throwing star)',
+    'strength': true,
+    'rof': '2/1',
+    'range': '10/—/—',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['shuriken, large star (throwing star)'] = {
+    'name': 'Shuriken, Large star (throwing star)',
+    'strength': true,
+    'rof': '3/1',
+    'range': '5/10/20',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee','Range']
+};
+weapons['shuriken, small star (throwing star)'] = {
+    'name': 'Shuriken, Small star (throwing star)',
+    'strength': true,
+    'rof': '4/1',
+    'range': '5/10/20',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['siangkam'] = {
+    'name': 'Siangkam',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['sling (bullet) (ninja)'] = {
+    'name': 'Sling (Bullet) (ninja)',
+    'strength': true,
+    'rof': '1',
+    'range': '50/100/200',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d4',
+    'large': '1d6+1',
+    'knockdown': 'd4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['sling (stone) (ninja)'] = {
+    'name': 'Sling (Stone) (ninja)',
+    'strength': true,
+    'rof': '1',
+    'range': '40/80/1600',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['staff sling (bullet) (ninja)'] = {
+    'name': 'Staff sling (Bullet) (ninja)',
+    'strength': true,
+    'rof': '1/2',
+    'range': '—/30-60/90',
+    'size': 'M',
+    'type': 'B',
+    'speed': 11,
+    'small-medium': '2d4',
+    'large': '1d6+2',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['staff sling (stone) (ninja)'] = {
+    'name': 'Staff sling (Stone) (ninja)',
+    'strength': true,
+    'rof': '1',
+    'range': '—/30-60/200',
+    'size': 'S',
+    'type': 'B',
+    'speed': 11,
+    'small-medium': '1d8',
+    'large': '2d4',
+    'knockdown': 'd6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['sode garami (sleeve entangler)'] = {
+    'name': 'Sode garami (sleeve entangler)',
+    'size': 'L',
+    'type': 'B',
+    'speed': 7,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['chijiriki (one-handed) (chain spear)'] = {
+    'name': 'Chijiriki (One-handed) (chain spear)',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'L',
+    'type': 'B/P',
+    'speed': 7,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee', 'Range']
+};
+weapons['chijiriki (two-handed) (chain spear)'] = {
+    'name': 'Chijiriki (Two-handed) (chain spear)',
+    'size': 'L',
+    'type': 'B/P',
+    'speed': 7,
+    'small-medium': '1d8+1',
+    'large': '2d6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['sang kauw (one-handed) (two-handed spear)'] = {
+    'name': 'Sang kauw (One-handed) (two-handed spear)',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d8',
+    'large': '1d6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['sang kauw (two-handed) (two-handed spear)'] = {
+    'name': 'Sang kauw (Two-handed) (two-handed spear)',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '2d6',
+    'large': '1d8+1',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['trident (one-handed) (ninja)'] = {
+    'name': 'Trident (One-handed) (ninja)',
+    'group': 'Spear',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d6+1',
+    'large': '3d4',
+    'knockdown': 'd6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee', 'Range']
+};
+weapons['trident (two-handed) (ninja)'] = {
+    'name': 'Trident (Two-handed) (ninja)',
+    'group': 'Spear',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d8',
+    'large': '2d8',
+    'knockdown': 'd8',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['shakujo yari (one-handed) (staff spear)'] = {
+    'name': 'Shakujo yari (One-handed) (staff spear)',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'M',
+    'type': 'P',
+    'speed': 6,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['shakujo yari (two-handed) (staff spear)'] = {
+    'name': 'Shakujo yari (Two-handed) (staff spear)',
+    'size': 'M',
+    'type': 'P',
+    'speed': 6,
+    'small-medium': '1d8+1',
+    'large': '2d6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['yari (one-handed) (spear)'] = {
+    'name': 'Yari (One-handed) (spear)',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'small-medium': '1d8',
+    'large': '1d8+1',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['yari (two-handed) (spear)'] = {
+    'name': 'Yari (Two-handed) (spear)',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'small-medium': '2d6',
+    'large': '3d6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['bokken (one-handed) (wooden sword)'] = {
+    'name': 'Bokken (One-handed) (spear)',
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['bokken (two-handed) (wooden sword)'] = {
+    'name': 'Bokken (Two-handed) (wooden sword)',
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '2d6',
+    'large': '1d6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['ninja-to (ninja sword)'] = {
+    'name': 'Ninja-to (ninja sword)',
+    'size': 'M',
+    'type': 'S/P',
+    'speed': 4,
+    'small-medium': '1d8',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['no-daichi (two-handed sword)'] = {
+    'name': 'No-daichi (two-handed sword)',
+    'size': 'L',
+    'type': 'S',
+    'speed': 10,
+    'small-medium': '1d10',
+    'large': '3d6',
+    'knockdown': 'd10',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['parang (chopping blade)'] = {
+    'name': 'Parang (chopping blade)',
+    'group': 'Sword',
+    'size': 'L',
+    'type': 'S',
+    'speed': 10,
+    'small-medium': '1d10',
+    'large': '3d6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['tetsu-to (iron sword)'] = {
+    'name': 'Tetsu-to (iron sword)',
+    'size': 'L',
+    'type': 'S',
+    'speed': 15,
+    'small-medium': '1d12',
+    'large': '3d6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['wakizashi (samurai short sword)'] = {
+    'name': 'Wakizashi (samurai short sword)',
+    'size': 'S',
+    'type': 'S/P',
+    'speed': 3,
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['tanto (dagger)'] = {
+    'name': 'Tanto (dagger)',
+    'strength': true,
+    'rof': '2/1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'S/P',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee', 'Range']
+};
+weapons['tetsu-bishi (caltrops)'] = {
+    'name': 'Tetsu-bishi (caltrops)',
+    'strength': true,
+    'rof': '1',
+    'range': '5’/10’/20’',
+    'size': 'S',
+    'type': 'P',
+    'speed': 3,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Range']
+};
+weapons['three-section staff'] = {
+    'name': 'Three-section staff',
+    'size': 'L',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['tonfa (handle)'] = {
+    'name': 'Tonfa (handle)',
+    'size': 'S',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee']
+};
+weapons['uchi-ne (short javelin)'] = {
+    'name': 'Uchi-ne (short javelin)',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'P',
+    'speed': 3,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee', 'Range']
+};
+weapons['yoroi-toshi'] = {
+    'name': 'Yoroi-Toshi',
+    'strength': true,
+    'rof': '1',
+    'range': '10/20/30',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': 'The Complete Ninja\'s Handbook',
+    'category': ['Melee', 'Range']
 };
 //#endregion
 module.exports = weapons;
