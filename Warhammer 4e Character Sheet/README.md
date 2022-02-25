@@ -73,6 +73,11 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+January 3rd 2022 v1.53.3
+
+- Added Ogre to the race list race with stats from Archives of the Empire vol 2
+- Fix for melee weapons list target display for any weapon except 2H
+
 January 3rd 2022 v1.53.2
 
 - Fixed issue where Twohanded weapons when selected would show offhand penality added to the target value of the specific weapon. This did not effect the Roll itself.
