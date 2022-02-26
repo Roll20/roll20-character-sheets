@@ -1,5 +1,11 @@
 Change Log
 ==============================================
+**2022-02-22 ** v.50 Chuz (James Culp)
+	Bugfix - updated spirit sheet to default to having the "Reset" toggle on since the majority of the time having it on is the right choice.
+	Bugfix - updated spirits with Engulf and Elemental Attack close/ranged attacks listed even though they are optional power to now state the optional power is required in the notes.  This is a gentle reminder to players/GMs since the alternative is the player/GM having to add the attacks every time a spirit is summoned.
+	Added resist_pain modification attribute.  This attribute when set to a positive value will modify wound penalties per the spell in the CRB pg.137.
+**2022-02-22 ** v.49 Chuz (James Culp)
+	Added the ability to import character data from the RPG Framework Genesis character generator. (see official Roll20 thread notes)
 **2021-11-23 ** v.48 Chuz (James Culp)
 	Bugfix - Removing Technomancer echos with modifications didn't update things correctly.
 	Bugfix - Replaced translation "Rotarcraft" with correct "Rotorcraft"

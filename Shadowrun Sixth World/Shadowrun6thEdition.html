@@ -3275,7 +3275,7 @@
 	     </span>
         <span class="spirit">
 	        <label class="switch" data-i18n-title="resettoggle" title="Reset skills, powers and weapons when changing type or force">
-	          <input name="attr_spirit_reset_toggle" type="checkbox" value="reset"/><span class="slider"></span>
+	          <input name="attr_spirit_reset_toggle" type="checkbox" checked="checked" value="reset"/><span class="slider"></span>
 	        </label>
 	     </span>
         <span class="host vehicle sprite">&nbsp;</span>
@@ -5439,6 +5439,10 @@
 <input type="hidden" name="attr_bad_luck" value="0" />
 <input type="hidden" name="attr_matrix_overclock" value="0" />
 <input type="hidden" name="attr_rerolls" value="0" />
+<input type="hidden" name="attr_phys_wound_threshold" value="3" />
+<input type="hidden" name="attr_stun_wound_threshold" value="3" />
+<input type="hidden" name="attr_resist_pain" value="0" />
+<input type="hidden" name="attr_damage_compensator" value="0" />
 
 <input type="hidden" name="attr_sheet_version" value="0.48">
 <input type="hidden" name="attr_data_version" value="0">
@@ -6243,6 +6247,7 @@ console.log("Program not active");
 			if(! allowed_modifiers.includes(k) && v[`enable_unrestricted_modifiers`] != 1) {
 				console.log('Unrestricted Modifiers not enabled, tried to update ('+k+') which is not whitelisted');
 			} else if(k !== "0" && k !== "on") {
+console.log("k: "+k+"\nold: "+mods.old[k]+"\nnew: "+mods.new[k]);
 				update_attribute({
 					'key': k,
 					'old': mods.old[k],
@@ -6283,8 +6288,8 @@ var update_attribute = (attr) => {
 
 			newV = parseInt(v[`${attr.key}`]) + parseInt(diff)
 		}
-
-
+console.log(attr.key);
+console.log("newV: "+newV+"\ncurrentV: "+currentV[2]);
 		setAttrs({
 			[`${attr.key}`]: newV + currentV[2]
 		});
@@ -6296,17 +6301,20 @@ var update_attribute = (attr) => {
 
 var modify_value = (params) => {
 	var diff = 0;
-	var re = /([+-]*)([\d+])/;
-
+	var re = /([+-]*)(\d+)/;
+console.log(params);
 	var oldV = re.exec(params[0]);
 	var newV = re.exec(params[1]);
-
+console.log("oldV: "+oldV+"\nnewV: "+newV);
 	if(parseInt(oldV[0]) > parseInt(newV[0])) { // oldV is higher, we are subtracting
 		diff = -1 * (parseInt(oldV[0]) - parseInt(newV[0]));
+console.log("subtracting: "+diff);
 	} else if(parseInt(oldV[0]) < parseInt(newV[0])) { // newV is higher, we are adding
 		diff = parseInt(newV[0]) - parseInt(oldV[0]);
+console.log("adding: "+diff);
 	} else { // they are equal
 		// no change diff still 0;
+console.log("no change: "+diff);
 	}
 
 	return diff;
@@ -6539,7 +6547,7 @@ on("change:body change:soak_modifier change:soak_temp change:soak_temp_flag", ()
 	update_common_rolls(["body", "doesntmatter", "soak_modifier", "soak_temp", `soak_temp_flag`]);
 });
 
-on("change:pain_tolerance", () => {
+on("change:pain_tolerance change:resist_pain change:damage_compensator", () => {
 	update_wounds();
 });
 
@@ -7085,20 +7093,134 @@ on("change:device_rating change:matrix_modifier", () => {
 
 
 const update_wounds = () => {
-	getAttrs(["stun_damage", "physical_damage", "pain_tolerance"], (v) => {
-		const stu = parseInt(v.stun_damage) || 0,
+	getAttrs(["stun_damage", "physical_damage", "pain_tolerance", "phys_wound_threshold", "stun_wound_threshold", "resist_pain", "damage_compensator"], (v) => {
+		let stu = parseInt(v.stun_damage) || 0,
 				phy = parseInt(v.physical_damage) || 0,
-				pai = parseInt(v.pain_tolerance) || 0;
-		pMod = (phy > 0) ? (Math.floor(phy/3)) : 0;
-		sMod = (stu > 0) ? (Math.floor(stu/3)) : 0;
+				pain_tolerance = parseInt(v.pain_tolerance) || 0,
+				phys_thresh = parseInt(v.phys_wound_threshold) || 3,
+				stun_thresh = parseInt(v.stun_wound_threshold) || 3;
+
+//console.log(v);
+//console.log("stu: "+stu+"\nphy: "+phy+"\npain_tolerance: "+pain_tolerance+"\nphys_thresh: "+phys_thresh+"\nstun_thresh: "+stun_thresh);
+
+		// Damage Compensator
+		if(v.damage_compensator > 0) {
+			p_int = Math.floor(phy / phys_thresh) || 0;
+			p_modulus = phy % phys_thresh || 0;
+			s_int = Math.floor(stu / stun_thresh) || 0;
+			s_modulus = stu % stun_thresh || 0;
+			dcomp = parseInt(v.damage_compensator);
+//console.log("p_int: "+p_int+"\np_modulus: "+p_modulus+"\ns_int: "+s_int+"\ns_modulus: "+s_modulus);
+//console.log("dcomp: "+dcomp);
+			if(p_int > 0 && s_int > 0) {
+				// both have wound mods
+//console.log("both phys and stun");
+
+				// if dcomp can wipe out both modulus + 2 (effectively removing 2 penalty dice) do it
+				// if not but it is greater than p_modulus + 1 or s_modulus + 1 get rid of one of the penalty dice
+				if(dcomp >= (p_modulus + s_modulus + 2)) {
+					phy -= (p_modulus + 1);
+					stu -= (s_modulus + 1);
+					dcomp -= (p_modulus + s_modulus + 2);
+				} else if(dcomp > (p_modulus + 1)) {
+					phy -= (p_modulus + 1);
+					dcomp -= (p_modulus + 1);
+				} else if(dcomp > (s_modulus + 1)) {
+					stu -= (s_modulus + 1);
+					dcomp -= (s_modulus + 1);
+				}
+//console.log("phy: "+phy+"\nstu: "+stu+"\ndcomp: "+dcomp);
+
+				// If there's still dcomp to use up if it's greater than phy_threshold or stu_threshold and they have penalties wipe them out.
+//console.log((phy - (phys_thresh - 1)) + (stu - (stun_thresh - 1)));
+				if(dcomp >= (phy - (phys_thresh - 1)) + (stu - (stun_thresh - 1))) {
+					phy = phys_thresh - 1;
+					stu = stun_thresh - 1;
+				}
+
+//console.log("phy: "+phy+"\nstu: "+stu+"\ndcomp: "+dcomp);
+
+				if(phys_thresh == stun_thresh || phys_thresh > stun_thresh) {
+					// stun has the lower threshold or they're the same, knock it's penalties out first
+					while((dcomp >= phys_thresh || dcomp >= stun_thresh) && (phy > phys_thresh || stu > stun_thresh)) {
+						if(dcomp >= stun_thresh && stu > stun_thresh - 1) {
+							stu -= stun_thresh;
+							dcomp -= stun_thresh;
+//console.log("lowering stu by: "+stun_thresh+"\ndcomp: "+dcomp);
+						} else if(dcomp >= phys_thresh && phy > phys_thresh - 1) {
+							phy -= phys_thresh;
+							dcomp -= phys_thresh;
+//console.log("lowering phy by: "+phys_thresh+"\ndcomp: "+dcomp);
+						} else {
+//console.log("breaking, phy: "+phy+" stu: "+stu+" dcomp: "+dcomp);
+							break;
+						}
+					}
+				} else {
+					// physical has the lower threshold, knock it's penalties out first
+					while(dcomp >= phys_thresh && dcomp > stun_thresh && phy >= phys_thresh && stu > stun_thresh) {
+						if(dcomp >= phys_thresh && phy > phys_thresh - 1) {
+							phy -= phys_thresh;
+							dcomp -= phys_thresh;
+						} else if(dcomp >= stun_thresh && stu > stun_thresh - 1) {
+							stu -= stun_thresh;
+							dcomp -= stun_thresh;
+						} else {
+							break;
+						}
+					}
+				}
+//console.log("phy: "+phy+"\nstu: "+stu);
+
+
+			} else if(p_int > 0) {
+				// physical is the only one impacting the PC
+//console.log("just phys");
+
+				if(phy > v.damage_compensator) {
+					phy = phy - parseInt(v.damage_compensator);
+				} else {
+					phy = 0;
+				}
+//console.log("phy now: "+phy);
+			} else if(s_int > 0) {
+				// stun is the only one impacting the PC
+//console.log("just stun");
+
+				if(stu > v.damage_compensator) {
+					stu = stu - parseInt(v.damage_compensator);
+				} else {
+					stu = 0;
+				}
+//console.log("stu now: "+stu);
+			} else {
+				// neither is impacting the PC
+//console.log("neither phys nor stun");
+			}
+		}
+
+		pMod = (phy > 0) ? (Math.floor(phy / phys_thresh)) : 0;
+		sMod = (stu > 0) ? (Math.floor(stu / stun_thresh)) : 0;
+//console.log("pMod: "+pMod+"\nsMod: "+sMod);
 		wou = Math.floor(-(pMod) + -(sMod));
 
-		if(pai < 0) {
+//console.log("wou: "+wou);
+		// Pain Tolerance (high or low)
+		if(pain_tolerance < 0) {
 			wou = wou * 2;
-		} else if(pai > 0 && wou < 0) {
+		} else if(pain_tolerance > 0 && wou < 0) {
 			wou = wou + 1;
 		}
 
+//console.log("post pain_tolerance wou: "+wou);
+		// Resist Pain
+		if(v.resist_pain > 0) {
+			wou = wou + parseInt(v.resist_pain);
+			if(wou > 0) {
+				wou = 0;
+			}
+		}
+//console.log("post resist_pain wou: "+wou);
 		setAttrs({wounds: wou});
 	});
 };
@@ -8255,7 +8377,7 @@ var spirit_update = () => {
 					'm': ((force * 2) - 8),
 					'f': ((force * 2) - 10),
 					'e': 0,
-					'notes': ''
+					'notes': 'Requires Elemental Attack Optional Power'
 				};
 				close = {
 					'weapon': 'Engulf',
@@ -8266,7 +8388,7 @@ var spirit_update = () => {
 					'm': 0,
 					'f': 0,
 					'e': 0,
-					'notes': 'Damage adds Fatigue'
+					'notes': 'Damage adds Fatigue I'
 				};
 				break;
 			case 'Beasts':
@@ -8304,7 +8426,7 @@ var spirit_update = () => {
 					'm': 0,
 					'f': 0,
 					'e': 0,
-					'notes': 'Only if Natural Weapon (claws/bite) Optional Power is selected'
+					'notes': 'Requires Natural Weapon (claws/bite) Optional Power'
 				};
 				break;
 			case 'Earth':
@@ -8341,9 +8463,19 @@ var spirit_update = () => {
 					'm': ((force * 2) - 8),
 					'f': ((force * 2) - 10),
 					'e': 0,
-					'notes': ''
+					'notes': 'Requires Elemental Attack Optional Power'
 				};
-				close = {};
+				close = {
+					'weapon': 'Engulf',
+					'pool': force + spirit.agility,
+					'dam': parseInt(force + 2) + 'S',
+					'c': (force * 2) + 1,
+					'n': 0,
+					'm': 0,
+					'f': 0,
+					'e': 0,
+					'notes': 'Requires Engulf Optional Power, Damage adds Fatigue I'
+				};
 				break;
 			case 'Fire':
 				spirit.tasks_modifier = '';
@@ -8390,7 +8522,7 @@ var spirit_update = () => {
 					'm': 0,
 					'f': 0,
 					'e': 0,
-					'notes': ''
+					'notes': 'Damage adds Fatigue I'
 				};
 				break;
 			case 'Kin':
@@ -8465,7 +8597,7 @@ var spirit_update = () => {
 					'm': ((force * 2) - 8),
 					'f': ((force * 2) - 10),
 					'e': 0,
-					'notes': ''
+					'notes': 'Requires Elemental Attack Optional Power'
 				};
 				close = {
 					'weapon': 'Engulf',
@@ -8514,7 +8646,7 @@ var spirit_update = () => {
 					'm': 0,
 					'f': 0,
 					'e': 0,
-					'notes': ''
+					'notes': 'Damage adds Fatigue I'
 				};
 				break;
 			case 'Guardian':
@@ -8542,7 +8674,17 @@ var spirit_update = () => {
 				skills = ['Astral', 'Close Combat', 'Exotic Ranged Weapon', 'Perception'];
 				powers = ['Astral Form', 'Fear', 'Guard', 'Magical Guard', 'Materialization', 'Movement', 'Sapience'];
 				optional_powers = ['Animal Control', 'Concealment', 'Elemental Attack', 'Natural Weapon', 'Psychokinesis', 'Skill Specialization'];
-				ranged = {};
+				ranged = {
+					'weapon': 'Elemental Attack',
+					'pool': force + spirit.agility,
+					'dam': force + 'P',
+					'c': force * 2,
+					'n': ((force * 2) - 2),
+					'm': ((force * 2) - 8),
+					'f': ((force * 2) - 10),
+					'e': 0,
+					'notes': 'Requires Elemental Attack Optional Power'
+				};
 				close = {
 					'weapon': 'Natural Weapon',
 					'pool': force + spirit.agility,
@@ -8552,7 +8694,7 @@ var spirit_update = () => {
 					'm': 0,
 					'f': 0,
 					'e': 0,
-					'notes': 'Optional, requires "Natural Weapon" optional power.'
+					'notes': 'Requires Natural Weapon Optional Power'
 				};
 				break;
 			case 'Guidance':
@@ -8581,7 +8723,17 @@ var spirit_update = () => {
 				powers = ['Astral Form', 'Confusion', 'Divining', 'Guard', 'Magical Guard', 'Materialization', 'Sapience', 'Search', 'Shadow Cloak'];
 				optional_powers = ['Engulf', 'Enhanced Senses (Hearing)', 'Enhanced Senses (Low-Light Vision)', 'Enhanced Senses (Thermographic Vision)', 'Enhanced Senses (Smell)', 'Fear', 'Influence'];
 				ranged = {};
-				close = {};
+				close = {
+					'weapon': 'Engulf',
+					'pool': force + spirit.agility,
+					'dam': force + 'S',
+					'c': force * 3,
+					'n': 0,
+					'm': 0,
+					'f': 0,
+					'e': 0,
+					'notes': 'Requires Engulf Optional Power, Damage adds Fatigue I'
+				};
 				break;
 			case 'Task':
 				spirit.tasks_modifier = '1';
