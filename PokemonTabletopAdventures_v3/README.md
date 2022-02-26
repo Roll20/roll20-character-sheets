@@ -10,24 +10,15 @@ https://discord.gg/F24Ka8E
 
 Things we want to add to the character sheet, presented in no particular order of priority:
 
+- [ ] Mobile support!
+  - [X] Set legacy to false
+  - [ ] Refactor sheets to minimize overhead
+  - [ ] Reasonable user experience on the Companion App
+  - [ ] Full "optimized for use" support for Companion App
 - [ ] Allow a second ability score to apply to skill checks
 - [ ] Allow formula calculations for the extra damage fields
 - [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
-- [ ] Add Struggle to the move lists automatically
-- [X] ~~Somehow make it easier to get tokens into initiative. No idea how to accomplish this.~~
-- [x] ~~Display the full bonus to skill checks~~
-- [x] ~~Handle temporary stat changes somehow, this may be a lot of work~~
-- [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
-- [x] ~~Add a Settings page~~
-- [X] ~~Display the adjusted stat score when temporary stat changes are provided~~
-- [X] ~~Display the skills section for Pokémon characters~~
-- [X] ~~Moves deserve a section for "bonuses that apply to all moves." Things that should go here include:~~
-  - [X] ~~A spot for Attack and Special Attack bonuses, for things like Ace Trainer~~
-  - [X] ~~The critical hit range for the moves, as this is used for passives, items, etc.~~
-- [X] ~~Allow modifications to movement (maybe just an extra box)~~
-- [X] ~~Add status effects that you can click~~
-  - [X] ~~Burn, Poison/Toxified, and Paralyzed should modify stats automatically~~
-- [X] ~~JSON import and export of sheet data, to support the Pokelicious Sheets and also migrating/copying characters~~
+
 
 ## Changelog
 
