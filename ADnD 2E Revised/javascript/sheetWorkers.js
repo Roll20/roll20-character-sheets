@@ -1,7 +1,4 @@
 // --- ALL SHEET WORKERS START --- //
-const SHEETWORKER = 'sheetworker';
-const PLAYER = 'player';
-
 const SUCCESS = 'success';
 const INFO = 'info';
 const WARNING = 'warning';
@@ -11,10 +8,20 @@ const BOOK_FIELDS = [
     'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
     'book-tom', 'book-aaeg',
     'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
-    'book-paladins', 'book-druids'
+    'book-paladins', 'book-druids', 'book-barbarians', 'book-necromancers', 'book-ninjas'
 ];
 
+const SCHOOL_FIELDS = ['school-spells&magic'];
+const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', 'sphere-spells&magic'];
+
 //#region Helper function
+function capitalizeFirst(s) {
+    if (typeof s !== 'string')
+        return '';
+
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
 const conditionalLog = function (bool, msg) {
     if (b)
         console.log(msg);
@@ -24,6 +31,17 @@ const extractQueryResult = async function(query){//Sends a message to query the 
     let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
     finishRoll(queryRoll.rollId);
     return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
+};
+
+const extractRoll = async function(rollExpression) {
+    let queryRoll = await startRoll(`!{{roll=[[${rollExpression}]]}}`);
+    finishRoll(queryRoll.rollId);
+    return queryRoll.results.roll;
+};
+
+const extractRollResult = async function(rollExpression) {
+    let roll = await extractRoll(rollExpression);
+    return roll.result;
 };
 
 const isRollValid = function (rollExpression, field) {
@@ -62,17 +80,6 @@ const isRollValid = function (rollExpression, field) {
     return true;
 }
 
-const extractRoll = async function(rollExpression) {
-    let queryRoll = await startRoll(`!{{roll=[[${rollExpression}]]}}`);
-    finishRoll(queryRoll.rollId);
-    return queryRoll.results.roll;
-};
-
-const extractRollResult = async function(rollExpression) {
-    let roll = await extractRoll(rollExpression);
-    return roll.result;
-};
-
 const calculateFormula = async function(formulaField, calculatedField, silent = false) {
     getAttrs([formulaField], async function (values) {
         let rollExpression = values[formulaField];
@@ -106,8 +113,14 @@ const showToast = function(type, title, message) {
     setAttrs(getToastObject(type, title, message));
 }
 
+const getActiveSettings = function (settingFields, values) {
+    return settingFields.map(bField => values[bField])
+        .filter(Boolean)
+        .filter(book => book !== '0')
+}
+
 const isBookInactive = function (books, obj) {
-    let activeBooks = BOOK_FIELDS.map(bField => books[bField]);
+    let activeBooks = getActiveSettings(BOOK_FIELDS, books);
     return !activeBooks.includes(obj['book']);
 }
 
@@ -711,12 +724,6 @@ const PRIEST_SPHERES = [
 const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
 const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
 const elementalRegex = /Earth|Air|Fire|Water/gi
-function capitalizeFirst(s) {
-    if (typeof s !== 'string')
-        return '';
-
-    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-}
 
 function parseSpheres(spheresStrings, regex) {
     let spheres = new Set();
@@ -728,25 +735,34 @@ function parseSpheres(spheresStrings, regex) {
     return spheres;
 }
 
-function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, activeBooks) {
-    if (isBookInactive(activeBooks, spell))
+const getSpellSpheres = function (spell, sphereRules) {
+    let sphere = spell['sphere'];
+    sphereRules.forEach(rule => sphere += spell[rule] || '');
+    return sphere;
+}
+
+function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, activeBooks, optionalSpheres) {
+    if (!activeBooks.includes(spell['book']))
         return false;
 
-    let primarySpellSpheres = spell['sphere'].match(noElementalRegex) || [];
-    let isAvailable = primarySpellSpheres.some((sphere) => availableSpheres.has(sphere));
+    let spheres = getSpellSpheres(spell, optionalSpheres);
+
+    let primarySpellSpheres = spheres.match(noElementalRegex) || [];
+    let isAvailable = primarySpellSpheres.some(sphere => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
 
     if (!availableSpheres.has(ELEMENTAL))
         return false;
 
-    if (!spell['sphere'].includes(ELEMENTAL))
+    if (!spheres.includes(ELEMENTAL))
         return false;
 
-    if (spell['sphere'].includes(`${ELEMENTAL} (`))
-        return spell['sphere'].match(elementalRegex).some((element) => elementalSpheres.has(element))
+    if (spheres.includes(`${ELEMENTAL} (`))
+        return spheres.match(elementalRegex).some((element) => elementalSpheres.has(element))
 
     // The player and the spell has the elemental sphere (without any sub elements)
+    // Currently only 'Commune With Nature' in the revised Player's Handbook (1995) has this property
     return true;
 }
 
@@ -762,7 +778,7 @@ function setupAddPriestSpell(postfix) {
             sphereFields.push("sphere-minor");
             
         TAS.repeating(section)
-            .attrs([...sphereFields, ...BOOK_FIELDS])
+            .attrs([...sphereFields, ...BOOK_FIELDS, ...SPHERE_FIELDS])
             .fields(field)
             .reduce(function(knownSpells, row){
                 knownSpells.add(row.S[field]);
@@ -776,9 +792,12 @@ function setupAddPriestSpell(postfix) {
                     return;
                 }
 
+                let activeBooks = getActiveSettings(BOOK_FIELDS, attrSet);
+                let optionalSpheres = getActiveSettings(SPHERE_FIELDS, attrSet);
+
                 let spellsToAdd = [];
                 for (const [spellName, spell] of Object.entries(priestSpells[postfix])) {
-                    let isAvailable = isSpellAvailable(spellName, spell, primarySpheres, elementalSpheres, attrSet);
+                    let isAvailable = isSpellAvailable(spellName, spell, primarySpheres, elementalSpheres, activeBooks, optionalSpheres);
                     if (isAvailable) {
                         spellsToAdd.push({name: spellName, book: spell['book']});
                     }
@@ -897,7 +916,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
 //#endregion
 
 //#region Wizard and Priest spells and Powers setup
-function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
+function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFields) {
     if (!spellsTable[section])
         return;
 
@@ -906,7 +925,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
         if (!spell)
             return;
 
-        getAttrs(BOOK_FIELDS, function(books) {
+        getAttrs([...BOOK_FIELDS, ...optionalRulesFields], function(books) {
             if (bookInactiveShowToast(books, spell))
                 return;
 
@@ -927,7 +946,8 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
             if (section.startsWith('pri')) {
-                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+                let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
+                spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
             }
 
             setAttrs(spellInfo);
@@ -984,10 +1004,10 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel, []);
     }
 });
-setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel);
+setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel, []);
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
@@ -1000,12 +1020,10 @@ priestSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel);
-        if (lastSection !== 'priq')
-            setupAddPriestSpell(lastSection);
+        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel, SPHERE_FIELDS);
     }
 });
-setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel);
+setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel, SPHERE_FIELDS);
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
@@ -1351,7 +1369,7 @@ on('clicked:grenade-miss', async function (eventInfo) {
         let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
         switch (grenade) {
             case 'Acid':       finalRollText += `{{name=Acid}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|acid-hit)}} {{splashdmg=[Damage](~${characterName}|acid-splash)}}`; break;
-            case 'Holy water': finalRollText += `{{name=Holy water}} water]]}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
+            case 'Holy water': finalRollText += `{{name=Holy water}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
             case 'Oil (lit)':  finalRollText += `{{name=Oil (lit)}} {{aoe=[[3]]}} {{aoesplash=[[3+6]]}} {{hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)}} {{splashdmg=[Damage](~${characterName}|oil-lit-splash)}}`; break;
             case 'Poison':     finalRollText += `{{name=Poison}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=Special}} {{splashdmg=Special}}`; break;
             case 'Other': {
@@ -1492,5 +1510,25 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
         return;
     repeatingMultiplySum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
 })
+
+// Psionic tabs, control hidden or visible options
+const setPsionicDisciplineVisibility = function(newValue) {
+    let elements = $20('.sheet-section-psionics .sheet-hidden');
+    if (newValue === "1") {
+        elements.addClass('sheet-show');
+    } else {
+        elements.removeClass('sheet-show');
+    }
+}
+on('change:tab8', function (eventInfo) {
+    setPsionicDisciplineVisibility(eventInfo.newValue);
+});
+on('sheet:opened', function () {
+    getAttrs(['tab8'], function (values) {
+        setPsionicDisciplineVisibility(values['tab8']);
+    })
+});
+
+
 
 // --- ALL SHEET WORKERS END --- //
