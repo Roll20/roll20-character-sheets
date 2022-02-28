@@ -1071,6 +1071,21 @@
 					<label data-i18n-title="intimidation_exdice" title="intimidation_exdice">
 						<input data-i18n-placeholder="intimidation_exdice" name="attr_intimidation_exdice" placeholder="intimidation_exdice" spellcheck="false" title="@{intimidation_exdice}" type="text" value="" list="dicelist" />
 					</label>
+					<label data-i18n-title="vehicles_check" title="vehicles_check">
+						<input data-i18n-placeholder="vehicles_check" name="attr_vehicles_check" placeholder="vehicles_check" spellcheck="false" title="@{vehicles_check}" type="checkbox" value="1" />
+					</label>
+					<label data-i18n-title="vehicles_button" title="vehicles_button">
+						<button type="roll" name="attr_vehicles_roll"/>
+					</label>
+					<label data-i18n-title="vehicles" title="vehicles">
+						<span data-i18n="vehicles">vehicles</span>
+					</label>
+					<label data-i18n-title="vehicles_specialty" title="vehicles_specialty">
+						<input data-i18n-placeholder="vehicles_specialty" name="attr_vehicles_specialty" placeholder="vehicles_specialty" spellcheck="false" title="@{vehicles_specialty}" type="text" value="" />
+					</label>
+					<label data-i18n-title="vehicles_exdice" title="vehicles_exdice">
+						<input data-i18n-placeholder="vehicles_exdice" name="attr_vehicles_exdice" placeholder="vehicles_exdice" spellcheck="false" title="@{vehicles_exdice}" type="text" value="" list="dicelist" />
+					</label>
 					<label data-i18n-title="misc1_check" title="misc1_check">
 						<input data-i18n-placeholder="misc1_check" name="attr_misc1_check" placeholder="misc1_check" spellcheck="false" title="@{misc1_check}" type="checkbox" value="1" />
 					</label>
@@ -4120,6 +4135,53 @@ on("change:repeating_equipment remove:repeating_equipment", function(){
 		});
 	});
 
+	on("change:vehicles_check change:vehicles_specialty change:vehicles_exdice change:PB change:strength_mod change:intelligence_mod change:wisdom_mod change:dexterity_mod change:constitution_mod change:charisma_mod change:jackofalltrades_check sheet:opened", function() {
+	  getAttrs(["vehicles_check","vehicles_exdice","vehicles_specialty","PB","strength_mod","intelligence_mod","wisdom_mod","dexterity_mod","constitution_mod","charisma_mod","jackofalltrades_check"], function(values) {
+			var prof = values["vehicles_check"]||0;
+			var jot = values["jackofalltrades_check"]||0;
+			var str = parseInt(values["strength_mod"])||0;
+			var intel = parseInt(values["intelligence_mod"])||0;
+			var dex = parseInt(values["dexterity_mod"])||0;
+			var wis = parseInt(values["wisdom_mod"])||0;
+			var con = parseInt(values["constitution_mod"])||0;
+			var cha = parseInt(values["charisma_mod"])||0;
+			var profbonus = parseInt(values["PB"])||0;
+			var exdice = values["vehicles_exdice"]||"";
+			var specialty = values["vehicles_specialty"]||"";
+			var jotbonus = Math.floor(profbonus/2);
+
+			var specdice = "1d4";
+			if (exdice == "") {
+				exdice = "0d6";
+				specdice = "1d4";
+			};
+			if (exdice == "1d4") {
+				specdice = "1d6";
+			};
+			if (exdice == "1d6") {
+				specdice = "1d8";
+			};
+			if (exdice == "1d8") {
+				specdice = "1d8";
+			};
+			var setroll = "&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Vehicles ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+?{IncludeSpecialty}]]}}";
+			var setinit = "&{template:default} !{{name=Vehicles Initiative}}{{roll=[[1d20+"+dex+"+"+exdice+" &{tracker}]]}}" ;
+
+			if (jot == 1) {
+				setroll = "&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Vehicles ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+"+jotbonus+"+?{IncludeSpecialty}]]}}";
+				setinit = "&{template:default} !{{name=Vehicles Initiative}}{{roll=[[1d20+"+dex+"+"+jotbonus+"+"+exdice+" &{tracker}]]}}" ;
+			}; 
+			if (prof == 1) {
+				setroll = "&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Vehicles ("+specialty+") Roll}}{{roll=[[1d20+?{Stat}+"+profbonus+"+?{IncludeSpecialty}]]}}";
+				setinit = "&{template:default} !{{name=Vehicles Initiative}}{{roll=[[1d20+"+dex+"+"+profbonus+"+"+exdice+" &{tracker}]]}}" ;
+			}; 
+			setAttrs({
+				"vehicles_roll": setroll,
+				"vehicles_init": setinit,
+			});
+		});
+	});
+	
 	on("change:PB change:strength_mod change:dexterity_mod sheet:opened", function() {
 	  getAttrs(["PB","strength_mod","dexterity_mod"], function(values) {
 			var str = parseInt(values["strength_mod"])||0;
