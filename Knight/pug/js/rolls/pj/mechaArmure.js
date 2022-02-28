@@ -422,7 +422,7 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
       getStyle = getStyleContactMod(attrs, '', baseDegats, baseViolence, true, 0, false, false, false, false, false, false, false, false, false);
     } else {
-      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, true, 0, false, false, false, false);
+      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, 0, true, 0, false, false, false, false);
     }
 
     exec = exec.concat(getStyle.exec);
@@ -740,7 +740,7 @@ rollCombatArchangel.forEach((button) => {
 
         if (cBonus.length > 0) { exec.push(cBonus.join(' - ')); }
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -1101,7 +1101,7 @@ rollCombatNephilim.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -1217,7 +1217,7 @@ rollCombatNephilim.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -1524,7 +1524,7 @@ rollCombatDemon.forEach((button) => {
         violence = Number(attrs[roll[2]]);
         bViolence = 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -1724,7 +1724,7 @@ rollCombatDemon.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -1834,7 +1834,7 @@ rollCombatDemon.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
