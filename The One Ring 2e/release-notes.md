@@ -4,6 +4,20 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.06.00 (Build 9)
+
+### Features
+
+- Parsed rolls: changed feat die rolls from 1d12-1 to 1d12. Implemented correct handling of (11,12) values for pc and lm rolls and for favoured and ill-favoured rolls
+- Parsed rolls: reenabled feat die hover, as the semantics are now better to understand
+
+### Attribute migrations (handle by automatic migration)
+
+- endurance -> endurance_max
+- currentendurace -> endurance
+- hope -> hope_max
+- currenthope -> hope
+
 ## 02.05.00 (Build 8)
 
 ### Sheet fixes
