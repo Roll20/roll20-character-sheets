@@ -1157,6 +1157,33 @@ on('change:thac0-base-calc', function(eventInfo) {
 });
 
 //#region Weapons autofill
+function getBaseWeapon(weaponName, books) {
+    if (!weaponName)
+        return;
+
+    let baseWeapon = weapons[weaponName]
+    if (baseWeapon) {
+        if (bookInactiveShowToast(books, baseWeapon))
+            return;
+
+        return baseWeapon
+    }
+
+    let match = weaponName.match(/\s*\+([0-9]+)\s*/);
+    if (!match)
+        return;
+
+    let baseWeaponName = weaponName.replace(match[0], ' ').trim();
+    baseWeapon = weapons[baseWeaponName];
+    if (!baseWeapon)
+        return;
+
+    if (bookInactiveShowToast(books, baseWeapon))
+        return;
+
+    return baseWeapon;
+}
+
 function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
     if (!weaponName)
         return;
@@ -1413,6 +1440,130 @@ on('clicked:grenade-miss', async function (eventInfo) {
             finishRoll(roll.rollId, computedRolls);
         });
     });
+});
+
+const sizeToInt = function(size) {
+    switch (size) {
+        case 'T': return 0;
+        case 'Tiny': return 0;
+        case 'S': return 1;
+        case 'Small': return 1;
+        case 'M': return 2;
+        case 'Medium': return 2;
+        case 'L': return 3;
+        case 'Large': return 3;
+        case 'H': return 4;
+        case 'Huge': return 4;
+        case 'G': return 5;
+        case 'Gargantuan': return 5;
+    }
+}
+const displayWeaponType = function (type) {
+    switch (type) {
+        case 'S': return 'Slashing';
+        case 'P': return 'Piercing';
+        case 'B': return 'Bludgeoning';
+        default: return type;
+    }
+}
+on('clicked:crit-melee', function(eventInfo) {
+    TAS.repeating('weapons-damage')
+        .attrs(['strengthdmg', 'dexmissile', 'temp-damadj', 'misc-mod', ...BOOK_FIELDS])
+        .fields('strbonus1', 'dexbonus1', 'weaponname1', 'specialist-damage', 'mastery-damage', 'damadj', 'damsm', 'daml')
+        .map(function (row){
+            return row;
+        }, async function (rows, attrSet){
+            console.log(rows);
+            let weaponSelect = rows.map(r => `${r['weaponname1']}, ${r.id}`)
+                .join('|');
+            let rowId = await extractQueryResult(`?{What weapon did you use?|${weaponSelect}}`);
+            let row = rows.find(row => row.id === rowId);
+
+            let finalRollText = '&{template:2Edefault} {{name=Test Critical hit}}';
+
+            let attackType = await extractQueryResult('?{How are you attacking?|Regular Attack|Low Attack|High Attack}');
+            let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
+            let targetSize = await extractQueryResult('?{Target size?|Tiny|Small|Medium|Large|Huge|Gargantuan}');
+
+            let baseWeapon = getBaseWeapon(row['weaponname1'], attrSet);
+            let weaponSize;
+            let weaponType;
+            if (baseWeapon) {
+                weaponSize = baseWeapon['size'];
+                weaponType = baseWeapon['type'];
+                if (weaponType.includes('/')) {
+                    let displayTypes = weaponType.split('/')
+                        .map(s => displayWeaponType(s))
+                        .join('|');
+                    weaponType = await extractQueryResult(`?{How are your attack with your weapon?|${displayTypes}`)
+                }
+            } else {
+                weaponSize = await extractQueryResult('?{Weapon size?|Small|Medium|Large}');
+                weaponType = await extractQueryResult('?{Weapon type?|Slashing|Piercing|Bludgeoning}')
+            }
+
+            finalRollText += `{{Weapon name=${row['weaponname1']}} `;
+            finalRollText += `{{Weapon type=${attackType}} `;
+            finalRollText += `{{Weapon size=${weaponSize}} `;
+            finalRollText += `{{Target type=${targetType}} `;
+            finalRollText += `{{Target size=${targetSize}} `;
+
+            let locationDice;
+            switch (attackType) {
+                case 'Middle Attack': locationDice = '1d10'; break;
+                case 'Low Attack': locationDice = '1d6'; break;
+                case 'High Attack': locationDice = '1d6+4'; break;
+            }
+            let locationResult = await extractRollResult(locationDice);
+            console.log(locationResult);
+            console.log(typeof locationResult);
+            let location = LOCATION_TABLE[targetType][locationResult];
+
+
+            const sizeDiff = sizeToInt(weaponSize) - sizeToInt(targetSize);
+            let severityEffect;
+            let severityResult;
+            if (sizeDiff < 0) {
+                severityEffect = 'Minor';
+                severityResult = await extractRollResult('1d6');
+            } else if (sizeDiff === 0) {
+                severityEffect = 'Major';
+                severityResult = await extractRollResult('2d4');
+            } else if (sizeDiff === 1) {
+                severityEffect = 'Severe';
+                severityResult = await extractRollResult('2d6');
+            } else if (sizeDiff > 1) {
+                severityEffect = 'Mortal';
+                severityResult = await extractRollResult('2d8');
+            }
+
+            finalRollText += `{{Severity effect=${severityEffect}} `;
+            finalRollText += `{{Severity roll=${severityResult}} `;
+
+            let weaponDamage = sizeToInt(targetSize) < 3 ? row['damsm'] : row['daml'];
+            if (severityResult > 12) {
+                finalRollText += `{{Critical damage=[[(${weaponDamage})*3]]}} `;
+                severityResult = 12;
+            } else {
+                finalRollText += `{{Critical damage=[[(${weaponDamage})*2]]}} `;
+            }
+
+            finalRollText += `{{Location roll=[[${locationResult}]]}} `;
+            finalRollText += `{{Location hit=${location['hitLocation']}} `;
+
+            let critEffect = severityResult < 4
+                ? 'No unusual effect'
+                : CRIT_EFFECT_TABLE[weaponType][targetType][location['location']][severityResult];
+            finalRollText += `{{Critical effect=${critEffect}}`;
+
+            startRoll(finalRollText, function (roll) {
+                console.log(roll);
+                let computedRolls = {};
+                finishRoll(roll.rollId, computedRolls);
+            });
+
+        })
+        .execute();
 });
 //#endregion
 
