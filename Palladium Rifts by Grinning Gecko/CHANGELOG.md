@@ -6,7 +6,7 @@
 
 - Add "Output ISP/PPE/Damage usage to chat" option.
 - Display level alongside modifier name in Modifier Picker list.
-- Add Battleram, Bombard, and Space Figher combats to the Hand to Hand & RPA Combat selector.
+- Add Battleram, Bombard, and Space Fighter combats to the Hand to Hand & RPA Combat selector.
 - Add styles for dark mode.
 - Add "Show Armor warnings when damage is taken on last layer" option.
 
