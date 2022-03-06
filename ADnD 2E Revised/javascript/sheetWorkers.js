@@ -22,6 +22,46 @@ function capitalizeFirst(s) {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
+const displaySize = function(size) {
+    size = size.toLowerCase();
+    switch (size) {
+        case 't': return 'Tiny';
+        case 'tiny': return 'Tiny';
+        case 's': return 'Small';
+        case 'small': return 'Small';
+        case 'm': return 'Medium';
+        case 'medium': return 'Medium';
+        case 'l': return 'Large';
+        case 'large': return 'Large';
+        case 'h': return 'Huge';
+        case 'huge': return 'Huge';
+        case 'g': return 'Gargantuan';
+        case 'gargantuan': return 'Gargantuan';
+        default: return capitalizeFirst(size);
+    }
+}
+
+const sizeToInt = function(size) {
+    size = displaySize(size);
+    switch (size) {
+        case 'Tiny': return 0;
+        case 'Small': return 1;
+        case 'Medium': return 2;
+        case 'Large': return 3;
+        case 'Huge': return 4;
+        case 'Gargantuan': return 5;
+    }
+}
+const displayWeaponType = function (type) {
+    type = type.toLowerCase();
+    switch (type) {
+        case 's': return 'Slashing';
+        case 'p': return 'Piercing';
+        case 'b': return 'Bludgeoning';
+        default: return capitalizeFirst(type);
+    }
+}
+
 const conditionalLog = function (bool, msg) {
     if (b)
         console.log(msg);
@@ -1161,6 +1201,7 @@ function getBaseWeapon(weaponName, books) {
     if (!weaponName)
         return;
 
+    weaponName = weaponName.toLowerCase();
     let baseWeapon = weapons[weaponName]
     if (baseWeapon) {
         if (bookInactiveShowToast(books, baseWeapon))
@@ -1442,39 +1483,14 @@ on('clicked:grenade-miss', async function (eventInfo) {
     });
 });
 
-const sizeToInt = function(size) {
-    switch (size) {
-        case 'T': return 0;
-        case 'Tiny': return 0;
-        case 'S': return 1;
-        case 'Small': return 1;
-        case 'M': return 2;
-        case 'Medium': return 2;
-        case 'L': return 3;
-        case 'Large': return 3;
-        case 'H': return 4;
-        case 'Huge': return 4;
-        case 'G': return 5;
-        case 'Gargantuan': return 5;
-    }
-}
-const displayWeaponType = function (type) {
-    switch (type) {
-        case 'S': return 'Slashing';
-        case 'P': return 'Piercing';
-        case 'B': return 'Bludgeoning';
-        default: return type;
-    }
-}
 on('clicked:crit-melee', function(eventInfo) {
     TAS.repeating('weapons-damage')
         .attrs(['strengthdmg', 'dexmissile', 'temp-damadj', 'misc-mod', ...BOOK_FIELDS])
         .fields('strbonus1', 'dexbonus1', 'weaponname1', 'specialist-damage', 'mastery-damage', 'damadj', 'damsm', 'daml')
         .map(function (row){
             return row;
-        }, async function (rows, attrSet){
-            console.log(rows);
-            let weaponSelect = rows.map(r => `${r['weaponname1']}, ${r.id}`)
+        }, async function (rows, _, attrSet){
+            let weaponSelect = rows.map(r => `${r['weaponname1']},${r.id}`)
                 .join('|');
             let rowId = await extractQueryResult(`?{What weapon did you use?|${weaponSelect}}`);
             let row = rows.find(row => row.id === rowId);
@@ -1489,34 +1505,35 @@ on('clicked:crit-melee', function(eventInfo) {
             let weaponSize;
             let weaponType;
             if (baseWeapon) {
-                weaponSize = baseWeapon['size'];
+                weaponSize = displaySize(baseWeapon['size']);
                 weaponType = baseWeapon['type'];
                 if (weaponType.includes('/')) {
                     let displayTypes = weaponType.split('/')
                         .map(s => displayWeaponType(s))
                         .join('|');
-                    weaponType = await extractQueryResult(`?{How are your attack with your weapon?|${displayTypes}`)
+
+                    weaponType = await extractQueryResult(`?{How are your attack with your weapon?|${displayTypes}}`)
+                } else {
+                    weaponType = displayWeaponType(weaponType);
                 }
             } else {
                 weaponSize = await extractQueryResult('?{Weapon size?|Small|Medium|Large}');
                 weaponType = await extractQueryResult('?{Weapon type?|Slashing|Piercing|Bludgeoning}')
             }
 
-            finalRollText += `{{Weapon name=${row['weaponname1']}} `;
-            finalRollText += `{{Weapon type=${attackType}} `;
-            finalRollText += `{{Weapon size=${weaponSize}} `;
-            finalRollText += `{{Target type=${targetType}} `;
-            finalRollText += `{{Target size=${targetSize}} `;
+            finalRollText += `{{Weapon name=${row['weaponname1']}}} `;
+            finalRollText += `{{Weapon type=${attackType}}} `;
+            finalRollText += `{{Weapon size=${weaponSize}}} `;
+            finalRollText += `{{Target type=${targetType}}} `;
+            finalRollText += `{{Target size=${targetSize}}} `;
 
             let locationDice;
             switch (attackType) {
-                case 'Middle Attack': locationDice = '1d10'; break;
+                case 'Regular Attack': locationDice = '1d10'; break;
                 case 'Low Attack': locationDice = '1d6'; break;
                 case 'High Attack': locationDice = '1d6+4'; break;
             }
             let locationResult = await extractRollResult(locationDice);
-            console.log(locationResult);
-            console.log(typeof locationResult);
             let location = LOCATION_TABLE[targetType][locationResult];
 
 
@@ -1537,8 +1554,8 @@ on('clicked:crit-melee', function(eventInfo) {
                 severityResult = await extractRollResult('2d8');
             }
 
-            finalRollText += `{{Severity effect=${severityEffect}} `;
-            finalRollText += `{{Severity roll=${severityResult}} `;
+            finalRollText += `{{Severity effect=${severityEffect}}} `;
+            finalRollText += `{{Severity roll=${severityResult}}} `;
 
             let weaponDamage = sizeToInt(targetSize) < 3 ? row['damsm'] : row['daml'];
             if (severityResult > 12) {
@@ -1549,12 +1566,13 @@ on('clicked:crit-melee', function(eventInfo) {
             }
 
             finalRollText += `{{Location roll=[[${locationResult}]]}} `;
-            finalRollText += `{{Location hit=${location['hitLocation']}} `;
+            finalRollText += `{{Location hit=${location['hitLocation']}}} `;
 
             let critEffect = severityResult < 4
                 ? 'No unusual effect'
                 : CRIT_EFFECT_TABLE[weaponType][targetType][location['location']][severityResult];
-            finalRollText += `{{Critical effect=${critEffect}}`;
+            finalRollText += `{{Critical effect=${critEffect}}}`;
+            console.log(finalRollText)
 
             startRoll(finalRollText, function (roll) {
                 console.log(roll);
