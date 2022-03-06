@@ -8,8 +8,9 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 ### Features
 
-- Add weapons weapon checkboxes to equip/drop (e.g. to reduce load after throwing a spear)
+- Added weapons weapon checkboxes to equip/drop (e.g. to reduce load after throwing a spear)
 - Armour checkboxes now also reduce load if unchecked
+- Added two weapon slots
 
 ### CSS
 
