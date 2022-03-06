@@ -1,10 +1,12 @@
 async function applyDamageToNextActiveArmor(section, damage) {
   console.log("applyDamageToNextActiveArmor", section, damage);
   const ids = await getSectionIDsOrderedAsync(section);
-  const attrKeys = ids.flatMap((id) => [
-    `repeating_${section}_${id}_is_active`,
-    `repeating_${section}_${id}_mdc`,
-  ]);
+  const attrKeys = ids
+    .flatMap((id) => [
+      `repeating_${section}_${id}_is_active`,
+      `repeating_${section}_${id}_mdc`,
+    ])
+    .concat(["outputarmorwarnings"]);
   const attrs = {};
   const a = await getAttrsAsync(attrKeys);
   let damageCarry = damage;
@@ -30,9 +32,12 @@ async function applyDamageToNextActiveArmor(section, damage) {
       const { character_name: characterName } = await getAttrsAsync([
         "character_name",
       ]);
-      const warning = await startRoll(`${characterName} is going to die`);
-      finishRoll(warning.rollId);
-      // @todo Warn player somehow
+      if (Boolean(Number(a["outputarmorwarnings"]))) {
+        const warning = await startRoll(
+          `${characterName} is taking damage to their last layer!`
+        );
+        finishRoll(warning.rollId);
+      }
       attrs[`repeating_${section}_${activeRowId}_mdc`] = 0;
       damageCarry = Math.abs(currentMdc);
     } else {
@@ -42,6 +47,7 @@ async function applyDamageToNextActiveArmor(section, damage) {
   }
   await setAttrsAsync(attrs);
   await updateActiveArmor(activeRowId);
+  return currentMdc;
 }
 
 /**
@@ -76,17 +82,27 @@ on("change:repeating_armor:movementpenalty", async (e) => {
 
 on("clicked:armorapplydamage", async (e) => {
   console.log("clicked:armorapplydamage", e);
-  const a = await getAttrsAsync([`armordamage`, `character_name`]);
-  await applyDamageToNextActiveArmor("armor", +a[`armordamage`]);
-  const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
-  const chat = await startRoll(
-    `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
-      a["armordamage"]
-    }}} {{name=${b[`active_armor_name`]}}} {{remaining=${
-      b[`active_armor_mdc`]
-    }}}`
+  const a = await getAttrsAsync([
+    `armordamage`,
+    `character_name`,
+    `active_armor_mdc`,
+    `active_armor_name`,
+    `outputusage`,
+  ]);
+  const currentMdc = await applyDamageToNextActiveArmor(
+    "armor",
+    +a[`armordamage`]
   );
-  finishRoll(chat.rollId);
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    // const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
+    const chat = await startRoll(
+      `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
+        a["armordamage"]
+      }}} {{name=${a[`active_armor_name`]}}} {{remaining=${currentMdc}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:repeating_armor:resetmdc", async (e) => {

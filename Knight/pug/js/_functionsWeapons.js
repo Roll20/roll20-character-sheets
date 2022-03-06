@@ -3477,7 +3477,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
   return result;
 }
 
-function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd) {
+function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd) {
   const result = {};
 
   const exec = [];
@@ -3585,12 +3585,21 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, hasArmu
       cRoll.push(Number(modA));
 
       if (isDeuxMains) {
-        let bDegats = Number(pilonnage) - 1;
+        let bPilonnage = Number(pilonnage) - 1;
 
-        if (bDegats < 0) { bDegats = 0; }
+        if (pilonnageType === 'degats') {
+          if (bPilonnage < 0) { bPilonnage = 0; }
 
-        exec.push(`{{vMStyleD=+${bDegats}D6}}`);
-        dDegats += Number(bDegats);
+          exec.push(`{{vMStyleD=+${bPilonnage}D6}}`);
+          dDegats += Number(bPilonnage);
+        }
+
+        if (pilonnageType === 'violence') {
+          if (bPilonnage < 0) { bPilonnage = 0; }
+
+          exec.push(`{{vMStyleV=+${bPilonnage}D6}}`);
+          bViolence += Number(bPilonnage);
+        }
       }
       break;
 

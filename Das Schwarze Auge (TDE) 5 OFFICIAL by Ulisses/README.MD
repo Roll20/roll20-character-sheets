@@ -5,6 +5,15 @@
 
 
 ### Changelog
+1.1.1
+* Advancement cost caluclation and payment of skills and attributes
+* Improved rolltemplates for 3d20 checks
+* QS/QL and FP/SP modifiers for effects
+* Offhand botch table fixed
+* Custom condition modifier fixed
+* Compendium abilities adventure points are now payable
+* Rolltemplate damage buttons
+
 1.0.7
 * Modifier "Wound Threshold" added
 * Compendium now includes spell extensions

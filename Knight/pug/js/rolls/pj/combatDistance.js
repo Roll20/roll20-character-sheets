@@ -70,6 +70,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push('pScaracteristique3Equipement');
         listAttrs.push('pScaracteristique4Equipement');
         listAttrs.push('pSpilonnage');
+        listAttrs.push('pSpilonnageType');
 
         baseDegats = 2;
         baseViolence = 1;
@@ -100,6 +101,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push('mEcaracteristique3Equipement');
         listAttrs.push('mEcaracteristique4Equipement');
         listAttrs.push('mEpilonnage');
+        listAttrs.push('mEpilonnageType');
 
         baseDegats = 3;
         baseViolence = 3;
@@ -130,6 +132,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push(`${prefix}caracteristique3Equipement`);
         listAttrs.push(`${prefix}caracteristique4Equipement`);
         listAttrs.push(`${prefix}pilonnage`);
+        listAttrs.push(`${prefix}pilonnageType`);
 
         listAttrs.push(`${prefix}ArmeDist`);
         listAttrs.push(`${prefix}armeDistPortee`);
@@ -160,6 +163,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push(`${prefix}caracteristique3Equipement`);
         listAttrs.push(`${prefix}caracteristique4Equipement`);
         listAttrs.push(`${prefix}pilonnage`);
+        listAttrs.push(`${prefix}pilonnageType`);
 
         listAttrs.push(`${prefix}ArmeDist`);
         listAttrs.push(`${prefix}armeDistPortee`);
@@ -225,6 +229,7 @@ rollCombatDistance.forEach((button) => {
     const C3 = attrs[`${prefix}caracteristique3Equipement`] || '0';
     const C4 = attrs[`${prefix}caracteristique4Equipement`] || '0';
     const vPilonnage = attrs[`${prefix}pilonnage`] || 0;
+    const vPilonnageType = attrs[`${prefix}pilonnageType`] || 0;
 
     if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
 
@@ -485,7 +490,7 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd);
+    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, vPilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);

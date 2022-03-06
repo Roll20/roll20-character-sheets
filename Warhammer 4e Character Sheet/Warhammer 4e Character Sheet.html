@@ -36,6 +36,7 @@
 									<option value="Dwarf" data-i18n="DWARF">Dwarf</option>
 									<option value="Halfling" data-i18n="HALFLING">Halfling</option>
 									<option value="Gnome" data-i18n="GNOME">Gnome</option>
+									<option value="Ogre" data-i18n="OGRE">Ogre</option>
 								</select>
 								<div class="sheet-wrap-box-label sheet-center">
 									<span data-i18n="RACE">Race</span>
@@ -27306,25 +27307,12 @@
 							</div>
 							<div class="sheet-col-8-100 sheet-center sheet-talents-border">
 								<span data-i18n="ABBREVIATE-STRENGTH"></span>
-								<input class="sheet-center" type="hidden" name="attr_Talent_RiposteChar" value="(@{AgilityBonus})" readonly />
-								<select class="sheet-hidden" name="attr_Talent_ShieldsmanChar">
-										<option value="(@{WeaponSkillBonus})" data-i18n="ABBREVIATE-WEAPON-SKILL">WS</option>
-										<option value="(@{BallisticSkillBonus})" data-i18n="ABBREVIATE-BALLISTIC-SKILL">BS</option>
-										<option value="(@{StrengthBonus})" data-i18n="ABBREVIATE-STRENGTH" selected="selected">S</option>
-										<option value="(@{ToughnessBonus})" data-i18n="ABBREVIATE-TOUGHNESS">T</option>
-										<option value="(@{InitiativeBonus})" data-i18n="ABBREVIATE-INITIATIVE">I</option>
-										<option value="(@{AgilityBonus})" data-i18n="ABBREVIATE-AGILITY" selected="selected">Ag</option>
-										<option value="(@{DexterityBonus})" data-i18n="ABBREVIATE-DEXTERITY">Dex</option>
-										<option value="(@{IntelligenceBonus})" data-i18n="ABBREVIATE-INTELLIGENCE">Int</option>
-										<option value="(@{WillPowerBonus})" data-i18n="ABBREVIATE-WILL-POWER">Wp</option>
-										<option value="(@{FellowshipBonus})" data-i18n="ABBREVIATE-FELLOWSHIP">Fel</option>
-								</select>
 							</div>
 							<div class="sheet-col-8-100 sheet-center sheet-vert-middle">
 								<input class="sheet-center" type="number" name="attr_Talent_ShieldsmanLvl" value="0" min="0" />
 							</div>
 							<div class="sheet-col-8-100 sheet-center sheet-vert-middle">
-								<input class="sheet-center" type="number" name="attr_Talent_ShieldsmanMax" value="@{Talent_ShieldsmanChar}" disabled />
+								<input class="sheet-center" type="number" name="attr_Talent_ShieldsmanMax" value="@{StrengthBonus}" disabled />
 							</div>
 							<button class="sheet-right" type="compendium" value="Talents:Shieldsman" data-i18n-title="COMPENDIUM-LINK"></button>
 							<span style="font-family: pictos; color: #55b800;" data-i18n-title="SHEET-INTEGRATION" >j</span>
@@ -28262,7 +28250,7 @@
 								<input type="number" name="attr_MeleeBonus" value="0" />
 							</div>
 							
-		<input type="checkbox" name="attr_UsedTwoHanded" class="sheet-hidden sheet-hider" value="0" />	
+		<input type="checkbox" name="attr_UsedTwoHanded" class="sheet-hidden sheet-hider" value="0" checked/>	
 							<div class="sheet-col-4-100 sheet-center sheet-pad-r-sm">
 								<input type="value" class="sheet-center" name="attr_targetmelee" value="(@{MeleeWeaponSkill}+@{MeleeBonus}+(@{Advantage}*10))+(@{UsedDefense}*(-20+(10*@{Talent_AmbidextrousLvl})))+(@{condgen_see_move}*-1)" disabled />
 							</div>
@@ -28309,7 +28297,7 @@
 					</div>
 					<div class="sheet-row">
 						<div class="sheet-col-1-8 sheet-center sheet-pad-r-sm">
-							<input type="checkbox" name="attr_UsedTwoHanded" value="0" />
+							<input type="checkbox" name="attr_UsedTwoHanded" value="0" checked/>
 						</div>
 						<div class="sheet-col-1-8 sheet-center sheet-pad-r-sm">
 							<input type="checkbox" name="attr_UsedTwoHanded" value="1" />
@@ -32422,7 +32410,7 @@
 				</div>			
 
 				<div class="sheet-col-1-10 sheet-center sheet-pad-r-sm">
-					<input type="number" name="attr_MaxEnc" value="[[@{StrengthBonus}+@{ToughnessBonus}+@{Talent_StrongBackLvl}+(@{Talent_SturdyLvl}*2)]]" disabled="true" />
+					<input type="number" name="attr_MaxEnc" value="(@{StrengthBonus}*@{LargeEnc})+(@{ToughnessBonus}*@{LargeEnc})+@{Talent_StrongBackLvl}+(@{Talent_SturdyLvl}*2)" disabled />
 				</div>				
 				<div class="sheet-col-1-10 sheet-center sheet-pad-r-sm">
 					<input type="hidden" name="attr_OverEncCal" value="[[@{TotalEnc}]]" />			
@@ -33746,7 +33734,7 @@
 		<div class="sheet-spacer-xl"></div>
 		<!-- FOOTER -->
 		<div class="sheet-row sheet-footer">
-			<div class="sheet-col-1 sheet-small-label sheet-center">Sheet version 1.53.1 : December 6th 2021 | by Djjus & Pote</div>
+			<div class="sheet-col-1 sheet-small-label sheet-center">Sheet version 1.53.3 : February 25th 2022 | by Djjus & Pote</div>
 		</div>
 		</div>
 	</div>		
@@ -42694,14 +42682,20 @@ on("change:strengthbonus change:toughnessbonus change:willpowerbonus change:race
 		const wil = +w.WillPowerBonus || 0;
 		const race = w.Race.toLowerCase();
 		let wounds = str + tou*2 + wil;
+		let lenc = 1;
 		if(race === 'halfling') {
 		wounds -= str;
 		}
 		if(race === 'gnome') {
 		wounds -= str;
 		}
+		if(race === 'ogre') {
+		wounds = (str + tou*2 + wil)*2;
+		lenc = 2;
+		}
 		setAttrs({
-		Wounds: wounds
+		Wounds: wounds,
+		LargeEnc: lenc
 		});
 		});
 		});
