@@ -21460,7 +21460,7 @@
                 <tr>
                     <td colspan="3" class="attack-c5">CRITICAL HIT!{{#crit}}<br><span class='attack-crit'>{{crit}}</span>{{/crit}}</td>
                 </tr>
-                {{/rollWasCrit() ac_hit}}
+                {{/rollWasCrit() ac_hit }}
                 {{#^rollWasCrit() ac_hit}}
                 <tr>
                     <td class="attack-c3" rowspan="2">{{dmg_s}}</td>
@@ -44299,6 +44299,53 @@ function capitalizeFirst(s) {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
+const displaySize = function(size) {
+    if (typeof s !== 'string')
+        return '';
+
+    size = size.toLowerCase();
+    switch (size) {
+        case 't': return 'Tiny';
+        case 'tiny': return 'Tiny';
+        case 's': return 'Small';
+        case 'small': return 'Small';
+        case 'm': return 'Medium';
+        case 'medium': return 'Medium';
+        case 'l': return 'Large';
+        case 'large': return 'Large';
+        case 'h': return 'Huge';
+        case 'huge': return 'Huge';
+        case 'g': return 'Gargantuan';
+        case 'gargantuan': return 'Gargantuan';
+        default: capitalizeFirst(size);
+    }
+}
+
+const sizeToInt = function(size) {
+    size = displaySize(size);
+    switch (size) {
+        case 'Tiny': return 0;
+        case 'Small': return 1;
+        case 'Medium': return 2;
+        case 'Large': return 3;
+        case 'Huge': return 4;
+        case 'Gargantuan': return 5;
+    }
+}
+
+const displayWeaponType = function (type) {
+    if (typeof s !== 'string')
+        return '';
+
+    type = type.toLowerCase();
+    switch (type) {
+        case 's': return 'Slashing';
+        case 'p': return 'Piercing';
+        case 'b': return 'Bludgeoning';
+        default: capitalizeFirst(type);
+    }
+}
+
 const conditionalLog = function (bool, msg) {
     if (b)
         console.log(msg);
@@ -44961,7 +45008,7 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
         on(onChange, function (eventInfo) {
             if (doEarlyReturn(eventInfo, [fieldName]))
                 return;
-            
+
             console.log(`Summing started by section ${repeatingName}. Fieldname ${fieldName}`);
             console.time('Summing time');
             let levelsCopy = [...sections];
@@ -45053,7 +45100,7 @@ function setupAddPriestSpell(postfix) {
         let sphereFields = ['sphere-major'];
         if (postfix.match(/[123]/))
             sphereFields.push("sphere-minor");
-            
+
         TAS.repeating(section)
             .attrs([...sphereFields, ...BOOK_FIELDS, ...SPHERE_FIELDS])
             .fields(field)
@@ -45130,9 +45177,9 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
     let attributes = ['spell-slot-reset-sections', 'spell-slot-reset-function']
     if (!isPowers)
         attributes.push(tab);
-    
+
     on(`clicked:${buttonName}`, function () {
-        
+
         getAttrs(attributes, function (values) {
             let resetSection = values['spell-slot-reset-sections'];
             let resetFunction = values['spell-slot-reset-function'];
@@ -45144,17 +45191,17 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 let level = values[tab];
                 if (!level)
                     return;
-                
+
                 let spellLevel = spellLevels.spellLevel(sl => sl.level === level);
                 if (!spellLevel)
                     return;
-                
+
                 sections = spellLevel.sections || [];
             }
-            
+
             if (!sections.length)
                 return
-            
+
             let updateFunction;
             if (resetFunction === '1' || isPowers)
                 updateFunction = resetCastSlots;
@@ -45162,7 +45209,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 updateFunction = resetCastAndMemSlots;
             else if (resetFunction === '3')
                 updateFunction = resetSpentSlots;
-            
+
             if (!updateFunction)
                 return;
 
@@ -45364,7 +45411,7 @@ on('change:armorname', function(eventInfo) {
     let armor = rogueArmor[eventInfo.newValue];
     if (armor === undefined)
         return;
-    
+
     let armorModifiers = {
         'pparmorp': armor['Pick Pockets'],
         'olarmorp': armor['Open Locks'] || '-0',
@@ -45437,7 +45484,7 @@ on('change:thac0-base-calc', function(eventInfo) {
 function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
     if (!weaponName)
         return;
-    
+
     weaponName = weaponName.toLowerCase();
     let fields = [...BOOK_FIELDS, thac0Field].filter(x => x !== undefined);
     getAttrs(fields, function(values) {
@@ -45552,7 +45599,7 @@ on('change:repeating_weapons2:weaponname2', function(eventInfo){
 
         setAttrs(weaponInfo);
     };
-    
+
     setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
 });
 
@@ -45739,7 +45786,7 @@ on('change:repeating_profs:profname', function (eventInfo) {
     let nonweaponProficiency = nonweaponProficiencies[eventInfo.newValue];
     if (!nonweaponProficiency)
         return;
-    
+
     getAttrs(BOOK_FIELDS, function (books) {
         if (bookInactiveShowToast(books, nonweaponProficiency))
             return;
@@ -45765,7 +45812,7 @@ on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeat
 on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['gear-stored-weight', 'gear-stored-qty']))
         return;
-    
+
     TAS.repeating('gear-stored')
         .attrs('mount-gear-weight-total','stored-gear-weight-total')
         .fields('on-mount','gear-stored-weight','gear-stored-qty')
@@ -45806,14 +45853,22 @@ on('sheet:opened', function () {
     })
 });
 
-
+// Fix for Roll20 not handling quotes correctly from sheet.json
+on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
+    console.log(eventInfo);
+    if (eventInfo.newValue && eventInfo.newValue.includes('’')) {
+        let newValue = {};
+        newValue[eventInfo.sourceAttribute] = eventInfo.newValue.replaceAll('’', '\'');
+        setAttrs(newValue,{silent:true});
+    }
+});
 
 // --- ALL SHEET WORKERS END --- //
 
 // --- Version change start --- //
 
-const sheetName = 'AD&D 2E Revised';
-const sheetVersion = '4.7.0';
+const SHEET_NAME = 'AD&D 2E Revised';
+const SHEET_VERSION = '4.7.1';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -45821,20 +45876,18 @@ on('sheet:opened', function(){
         let sheet_name=cs[1] || '';
         let sheet_version=cs[2] || '0.0.0';
 
-        // do something with sheet_name and sheet_version, if you might be converting
-
-        if(sheet_name !== sheetName || sheet_version !== sheetVersion) {
-            console.log(`Updating character sheet from ${sheet_version} to ${sheetVersion}`);
+        if(sheet_name !== SHEET_NAME || sheet_version !== SHEET_VERSION) {
+            console.log(`Updating character sheet from ${sheet_version} to ${SHEET_VERSION}`);
             setAttrs({
-                character_sheet: `${sheetName} v${sheetVersion}`,
-                version: `v${sheetVersion}`,
+                character_sheet: `${SHEET_NAME} v${SHEET_VERSION}`,
+                version: `v${SHEET_VERSION}`,
                 announcement: 1
             },{silent:true});
-            
+
             //#region Migrations
-            
+
             let oldSheetVersion = new SheetVersion(sheet_version);
-         
+
             // Starting with the oldest version, just in case some field has been moved from A -> B, B -> C
             if (oldSheetVersion.isBelowMigrate(3, 3, 0))
                 migrate3_3_0();
@@ -45853,7 +45906,7 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(4,6,0))
                 migrate4_6_0();
-            
+
             //#endregion
         }
     });
@@ -45948,7 +46001,7 @@ function migrateGems() {
                     (row.hasOwnProperty(gemvalue) && row.F[gemvalue]) ||
                     (row.hasOwnProperty(gemqty) && row.F[gemqty])) {
                     console.log(`Moving repeating gem: '${row[gemdesc]}'`)
-                    
+
                     memo.push(oldGemFields.map(field => row[field] || ''));
                     removeRepeatingRow(`repeating_${sectionName}_${row.id}`);
                 }
@@ -45960,7 +46013,7 @@ function migrateGems() {
                     (attrSet.hasOwnProperty(gemvalue) && attrSet.F[gemvalue]) ||
                     (attrSet.hasOwnProperty(gemqty) && attrSet.F[gemqty])) {
                     console.log(`Moving static gem: '${attrSet[gemdesc]}'`)
-                    
+
                     memo.splice(0, 0, oldGemFields.map(field => attrSet[field]));
                     newValue[gemdesc] = '';
                     newValue[gemvalue] = '';
@@ -46006,7 +46059,7 @@ function migrateOtherValuables() {
                 if (valuablesString) {
                     valuablesString += '\n\n';
                 }
-                
+
                 if (field === 'otherval') { // Standard case, no name needed
                     valuablesString += oldValue;
                 } else {
@@ -46051,7 +46104,7 @@ function migrate3_3_2() {
     moveStaticToRepeating('weapons', ['weaponname', 'strbonus', 'dexbonus', 'prof-level', 'attacknum', 'attackadj', 'ThAC0', 'crit-thresh', 'range', 'size', 'weaptype-slash', 'weaptype-pierce', 'weaptype-blunt', 'weapspeed']);
     moveStaticToRepeating('weapons-damage', ['weaponname1', 'strbonus1', 'dexbonus1', 'specialist-damage', 'mastery-damage', 'damadj', 'damsm', 'daml', 'knockdown1']);
 }
-//#endregion 
+//#endregion
 
 //#region version 3.3.0
 function migrate3_3_0() {

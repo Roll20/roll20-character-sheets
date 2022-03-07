@@ -22,6 +22,53 @@ function capitalizeFirst(s) {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
+const displaySize = function(size) {
+    if (typeof s !== 'string')
+        return '';
+
+    size = size.toLowerCase();
+    switch (size) {
+        case 't': return 'Tiny';
+        case 'tiny': return 'Tiny';
+        case 's': return 'Small';
+        case 'small': return 'Small';
+        case 'm': return 'Medium';
+        case 'medium': return 'Medium';
+        case 'l': return 'Large';
+        case 'large': return 'Large';
+        case 'h': return 'Huge';
+        case 'huge': return 'Huge';
+        case 'g': return 'Gargantuan';
+        case 'gargantuan': return 'Gargantuan';
+        default: capitalizeFirst(size);
+    }
+}
+
+const sizeToInt = function(size) {
+    size = displaySize(size);
+    switch (size) {
+        case 'Tiny': return 0;
+        case 'Small': return 1;
+        case 'Medium': return 2;
+        case 'Large': return 3;
+        case 'Huge': return 4;
+        case 'Gargantuan': return 5;
+    }
+}
+
+const displayWeaponType = function (type) {
+    if (typeof s !== 'string')
+        return '';
+
+    type = type.toLowerCase();
+    switch (type) {
+        case 's': return 'Slashing';
+        case 'p': return 'Piercing';
+        case 'b': return 'Bludgeoning';
+        default: capitalizeFirst(type);
+    }
+}
+
 const conditionalLog = function (bool, msg) {
     if (b)
         console.log(msg);
@@ -684,7 +731,7 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
         on(onChange, function (eventInfo) {
             if (doEarlyReturn(eventInfo, [fieldName]))
                 return;
-            
+
             console.log(`Summing started by section ${repeatingName}. Fieldname ${fieldName}`);
             console.time('Summing time');
             let levelsCopy = [...sections];
@@ -776,7 +823,7 @@ function setupAddPriestSpell(postfix) {
         let sphereFields = ['sphere-major'];
         if (postfix.match(/[123]/))
             sphereFields.push("sphere-minor");
-            
+
         TAS.repeating(section)
             .attrs([...sphereFields, ...BOOK_FIELDS, ...SPHERE_FIELDS])
             .fields(field)
@@ -853,9 +900,9 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
     let attributes = ['spell-slot-reset-sections', 'spell-slot-reset-function']
     if (!isPowers)
         attributes.push(tab);
-    
+
     on(`clicked:${buttonName}`, function () {
-        
+
         getAttrs(attributes, function (values) {
             let resetSection = values['spell-slot-reset-sections'];
             let resetFunction = values['spell-slot-reset-function'];
@@ -867,17 +914,17 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 let level = values[tab];
                 if (!level)
                     return;
-                
+
                 let spellLevel = spellLevels.spellLevel(sl => sl.level === level);
                 if (!spellLevel)
                     return;
-                
+
                 sections = spellLevel.sections || [];
             }
-            
+
             if (!sections.length)
                 return
-            
+
             let updateFunction;
             if (resetFunction === '1' || isPowers)
                 updateFunction = resetCastSlots;
@@ -885,7 +932,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 updateFunction = resetCastAndMemSlots;
             else if (resetFunction === '3')
                 updateFunction = resetSpentSlots;
-            
+
             if (!updateFunction)
                 return;
 
@@ -1087,7 +1134,7 @@ on('change:armorname', function(eventInfo) {
     let armor = rogueArmor[eventInfo.newValue];
     if (armor === undefined)
         return;
-    
+
     let armorModifiers = {
         'pparmorp': armor['Pick Pockets'],
         'olarmorp': armor['Open Locks'] || '-0',
@@ -1160,7 +1207,7 @@ on('change:thac0-base-calc', function(eventInfo) {
 function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
     if (!weaponName)
         return;
-    
+
     weaponName = weaponName.toLowerCase();
     let fields = [...BOOK_FIELDS, thac0Field].filter(x => x !== undefined);
     getAttrs(fields, function(values) {
@@ -1275,7 +1322,7 @@ on('change:repeating_weapons2:weaponname2', function(eventInfo){
 
         setAttrs(weaponInfo);
     };
-    
+
     setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
 });
 
@@ -1462,7 +1509,7 @@ on('change:repeating_profs:profname', function (eventInfo) {
     let nonweaponProficiency = nonweaponProficiencies[eventInfo.newValue];
     if (!nonweaponProficiency)
         return;
-    
+
     getAttrs(BOOK_FIELDS, function (books) {
         if (bookInactiveShowToast(books, nonweaponProficiency))
             return;
@@ -1488,7 +1535,7 @@ on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeat
 on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['gear-stored-weight', 'gear-stored-qty']))
         return;
-    
+
     TAS.repeating('gear-stored')
         .attrs('mount-gear-weight-total','stored-gear-weight-total')
         .fields('on-mount','gear-stored-weight','gear-stored-qty')
@@ -1529,6 +1576,14 @@ on('sheet:opened', function () {
     })
 });
 
-
+// Fix for Roll20 not handling quotes correctly from sheet.json
+on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
+    console.log(eventInfo);
+    if (eventInfo.newValue && eventInfo.newValue.includes('’')) {
+        let newValue = {};
+        newValue[eventInfo.sourceAttribute] = eventInfo.newValue.replaceAll('’', '\'');
+        setAttrs(newValue,{silent:true});
+    }
+});
 
 // --- ALL SHEET WORKERS END --- //
