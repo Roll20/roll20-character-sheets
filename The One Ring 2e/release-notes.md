@@ -15,6 +15,7 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 ### CSS
 
 - Rolltemplate layout optimization
+- fixed darkmode
 
 ### Fixes
 
