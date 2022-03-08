@@ -4,6 +4,10 @@ Change Log
 	Bugfix - updated spirit sheet to default to having the "Reset" toggle on since the majority of the time having it on is the right choice.
 	Bugfix - updated spirits with Engulf and Elemental Attack close/ranged attacks listed even though they are optional power to now state the optional power is required in the notes.  This is a gentle reminder to players/GMs since the alternative is the player/GM having to add the attacks every time a spirit is summoned.
 	Added resist_pain modification attribute.  This attribute when set to a positive value will modify wound penalties per the spell in the CRB pg.137.
+	Added damage_compensator attribute to affect optimal reduction in wound penalties based on the rating of the damage compensators
+	Added a prompt to the D6 roller to query the reason for the roll, if the user just hits ENTER it defaults to D6
+	Updated styles a little to make dark mode not quite so broken.
+	Enabled Rerolls and Bump 4's functionality on the d6 roll button to see if anyone hates it.
 **2022-02-22 ** v.49 Chuz (James Culp)
 	Added the ability to import character data from the RPG Framework Genesis character generator. (see official Roll20 thread notes)
 **2021-11-23 ** v.48 Chuz (James Culp)
