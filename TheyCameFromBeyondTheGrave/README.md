@@ -12,4 +12,4 @@ Differences to the PDF in the book include:-
 - A tabbed section at the bottom to give more space (General, Relationships, Equipment and Notes).
 - A toggle on the General tab you can set to whisper all rolls to the GM.
 - Repeating sections for Relationships, Equipment and Notes.
-- Notes! Never forget what happens in a session of They Came From Beneath The Grave! again!
+- Notes! Never forget what happens in a session of They Came From Beyond The Grave! again!
