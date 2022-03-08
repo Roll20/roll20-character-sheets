@@ -9274,7 +9274,7 @@ console.log("Character attributes imported.");
 			rowattrs["repeating_quality_" + row_id + "_quality"] = quality.name;
 		}
 		rowattrs["repeating_quality_" + row_id + "_type"] = quality.positive ? "P" : "N";
-		rowattrs["repeating_quality_" + row_id + "_notes"] = quality.page;
+		rowattrs["repeating_quality_" + row_id + "_notes"] = quality.page + "\n" + quality.description;
 		rowattrs["repeating_quality_" + row_id + "_rating"] = quality.rating || '';
 		rowattrs["repeating_quality_" + row_id + "_flag"] = 'display';
 
@@ -9310,14 +9310,14 @@ console.log("Character qualities imported.");
 				});
 			}
 			if(skill.influencedBy) {
-				rowattrs["repeating_skills_" + row_id + "_notes"] = skill.influencedBy.join(", ");
+				rowattrs["repeating_skills_" + row_id + "_notes"] = skill.influencedBy.join(", ") + "\n" + skill.description;
 			}
 		} else {
 			rowattrs["repeating_knowledges_" + row_id + "_name"] = skill.name;
 			rowattrs["repeating_knowledges_" + row_id + "_type"] = skill.id.charAt(0).toUpperCase() + skill.id.slice(1);
 			rowattrs["repeating_knowledges_" + row_id + "_flag"] = 'display';
 			if(skill.influencedBy) {
-				rowattrs["repeating_knowledges_" + row_id + "_notes"] = skill.influencedBy.join(", ");
+				rowattrs["repeating_knowledges_" + row_id + "_notes"] = skill.influencedBy.join(", ") + "\n" + skill.description;
 			}
 		}
 
@@ -9334,11 +9334,13 @@ console.log("Character skills, knowledges and languages imported.");
 		rowattrs["repeating_armor_" + row_id + "_name"] = armor.name;
 		rowattrs["repeating_armor_" + row_id + "_rating"] = armor.rating;
 		rowattrs["repeating_armor_" + row_id + "_social"] = (armor.socialrating) ? armor.socialrating : 0;
-		rowattrs["repeating_armor_" + row_id + "_notes"] = armor.page;
+		rowattrs["repeating_armor_" + row_id + "_notes"] = armor.page + "\n" + armor.description;
 		rowattrs["repeating_armor_" + row_id + "_flag"] = 'display';
 
-		if(! armor.isIgnored) {
+		if(! armor.isIgnored && ! armor.primary) {
 			rowattrs["repeating_armor_" + row_id + "_cumulative"] = 'cumulative';
+		} else if(armor.primary) {
+			rowattrs["repeating_armor_" + row_id + "_primary"] = 'primary';
 		}
 
 		if(armor.accessories) {
@@ -9374,7 +9376,7 @@ console.log("Character armor imported");
 		rowattrs["repeating_items_" + row_id + "_quantity"] = item.count;
 		rowattrs["repeating_items_" + row_id + "_flag"] = 'display';
 
-		rowattrs["repeating_items_" + row_id + "_notes"] = '[' + item.type + ']{' + item.subType + '} ' + item.page + "\n";
+		rowattrs["repeating_items_" + row_id + "_notes"] = '[' + item.type + ']{' + item.subType + '} ' + item.page + "\n" + item.description + "\n";
 
 		rowattrs["repeating_items_" + row_id + "_type"] = item.type;
 		rowattrs["repeating_items_" + row_id + "_sub_type"] = item.subType;
@@ -9425,7 +9427,7 @@ console.log("Character items imported");
 		rowattrs["repeating_augmentations_" + row_id + "_essence_cost"] = augmentation.essence;
 		rowattrs["repeating_augmentations_" + row_id + "_flag"] = 'display';
 
-		rowattrs["repeating_augmentations_" + row_id + "_notes"] = augmentation.page + "\n";
+		rowattrs["repeating_augmentations_" + row_id + "_notes"] = augmentation.page + "\n" + augmentation.description + "\n";
 
 		if(augmentation.accessories) {
 			augmentation.accessories.forEach(acc => {
@@ -9494,7 +9496,7 @@ console.log("Character augmentations imported");
 		rowattrs["repeating_vehicle_" + row_id + "_seats"] = vehicle.seats || 0;
 		rowattrs["repeating_vehicle_" + row_id + "_flag"] = 'display';
 
-		rowattrs["repeating_vehicle_" + row_id + "_notes"] = vehicle.page + "\n";
+		rowattrs["repeating_vehicle_" + row_id + "_notes"] = vehicle.page + "\n" + vehicle.description + "\n";
 
 		if(vehicle.accessories) {
 			var accs = [];
@@ -9600,7 +9602,7 @@ console.log("Character contacts imported");
 
 		rowattrs["repeating_range_" + row_id + "_firing_modes"] = range.mode;
 
-		rowattrs["repeating_range_" + row_id + "_notes"] = range.page + "\n";
+		rowattrs["repeating_range_" + row_id + "_notes"] = range.page + "\n" + range.description + "\n";
 		if(range.wifi) {
 			range.wifi.forEach(wifi => {
 				rowattrs["repeating_range_" + row_id + "_notes"] += "Wireless: " + wifi + "\n";
@@ -9648,7 +9650,7 @@ console.log("Character long range weapons imported");
 		rowattrs["repeating_melee_" + row_id + "_far"] = ARs[3];
 		rowattrs["repeating_melee_" + row_id + "_extreme"] = ARs[4];
 
-		rowattrs["repeating_melee_" + row_id + "_notes"] = melee.page + "\n";
+		rowattrs["repeating_melee_" + row_id + "_notes"] = melee.page + "\n" + melee.description + "\n";
 		if(melee.wifi) {
 			melee.wifi.forEach(wifi => {
 				rowattrs["repeating_melee_" + row_id + "_notes"] += "Wireless: " + wifi + "\n";
@@ -9757,7 +9759,7 @@ console.log("Character melee weapons imported");
 
 		rowattrs["repeating_" + spell_type + "_" + row_id + "_display_flag"] = 'display';
 
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] = spell.page + "\n";
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] = spell.page + "\n" + spell.description + "\n";
 		if(spell.influencedBy[0]) {
 			rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] += "Influenced By: ";
 			var influences = [];
@@ -9782,7 +9784,7 @@ console.log("Character spells and preparations imported");
 
 		rowattrs["repeating_ritual_" + row_id + "_flag"] = 'display';
 
-		rowattrs["repeating_ritual_" + row_id + "_notes"] = ritual.page + "\n";
+		rowattrs["repeating_ritual_" + row_id + "_notes"] = ritual.page + "\n" + ritual.description + "\n";
 		if(ritual.features[0]) {
 			rowattrs["repeating_ritual_" + row_id + "_notes"] += "Features: ";
 			var feats = [];
@@ -9822,7 +9824,7 @@ console.log("Character rituals imported");
 
 		rowattrs["repeating_powers_" + row_id + "_display_flag"] = 'display';
 
-		rowattrs["repeating_powers_" + row_id + "_notes"] = power.page + "\n";
+		rowattrs["repeating_powers_" + row_id + "_notes"] = power.page + "\n" + power.description + "\n";
 
 		setAttrs(rowattrs);
 	});
@@ -9837,7 +9839,7 @@ console.log("Character adept powers imported");
 
 			rowattrs["repeating_metamagic_" + row_id + "_name"] = meta.name;
 			rowattrs["repeating_metamagic_" + row_id + "_display_flag"] = 'display';
-			rowattrs["repeating_metamagic_" + row_id + "_notes"] = meta.page + "\n";
+			rowattrs["repeating_metamagic_" + row_id + "_notes"] = meta.page + "\n" + meta.description + "\n";
 console.log(rowattrs);
 			setAttrs(rowattrs);
 		});
@@ -9853,7 +9855,7 @@ console.log("Character meta magics imported");
 
 			rowattrs["repeating_echoes_" + row_id + "_echo"] = echo.name;
 			rowattrs["repeating_echoes_" + row_id + "_display_flag"] = 'display';
-			rowattrs["repeating_echoes_" + row_id + "_notes"] = echo.page + "\n";
+			rowattrs["repeating_echoes_" + row_id + "_notes"] = echo.page + "\n" + echo.description + "\n";
 
 			setAttrs(rowattrs);
 		});
@@ -9877,7 +9879,7 @@ console.log("Character echoes imported");
 			rowattrs["repeating_forms_" + row_id + "_fade"] = form.fading;
 			rowattrs["repeating_forms_" + row_id + "_display_flag"] = 'display';
 
-			rowattrs["repeating_forms_" + row_id + "_notes"] = form.page + "\n";
+			rowattrs["repeating_forms_" + row_id + "_notes"] = form.page + "\n" + form.description + "\n";
 
 			if(form.influences[0]) {
 				rowattrs["repeating_forms_" + row_id + "_notes"] += "Influenced By: ";
@@ -9906,7 +9908,7 @@ console.log("Character complex forms imported");
 					rowattrs["repeating_martial_" + row_id + "_style"] = mart.name;
 					rowattrs["repeating_martial_" + row_id + "_display_flag"] = 'display';
 
-					rowattrs["repeating_martial_" + row_id + "_notes"] = mart.page + "\n";
+					rowattrs["repeating_martial_" + row_id + "_notes"] = mart.page + "\n" + mart.description + "\n";
 
 					setAttrs(rowattrs);
 				});
@@ -9942,7 +9944,7 @@ console.log("Character martial arts imported");
 			rowattrs["repeating_devices_" + row_id + "_firewall"] = dev.firewall;
 			rowattrs["repeating_devices_" + row_id + "_display_flag"] = 'display';
 
-			rowattrs["repeating_devices_" + row_id + "_notes"] = dev.page + "\n";
+			rowattrs["repeating_devices_" + row_id + "_notes"] = dev.page + "\n" + dev.description + "\n";
 
 			if(dev.accessories) {
 				var accessories = [];
@@ -9981,7 +9983,7 @@ console.log("Character matrix devices imported");
 			row_id = generateRowID();
 
 			rowattrs["repeating_programs_" + row_id + "_program"] = programs[key].name;
-			rowattrs["repeating_programs_" + row_id + "_notes"] = programs[key].page;
+			rowattrs["repeating_programs_" + row_id + "_notes"] = programs[key].page + "\n" + programs[key].description;
 		});
 
 		setAttrs(rowattrs);

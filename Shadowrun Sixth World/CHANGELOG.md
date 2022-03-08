@@ -8,6 +8,8 @@ Change Log
 	Added a prompt to the D6 roller to query the reason for the roll, if the user just hits ENTER it defaults to D6
 	Updated styles a little to make dark mode not quite so broken.
 	Enabled Rerolls and Bump 4's functionality on the d6 roll button to see if anyone hates it.
+	Added custom description imports from Genesis, if the player has spent the time to manually add the custom descriptions in Genesis, now they don't have to do it again for the character sheet.
+	Added handling of Genesis exports of primary armor.
 **2022-02-22 ** v.49 Chuz (James Culp)
 	Added the ability to import character data from the RPG Framework Genesis character generator. (see official Roll20 thread notes)
 **2021-11-23 ** v.48 Chuz (James Culp)
