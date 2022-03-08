@@ -4,6 +4,23 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.07.00 (Build 10)
+
+### Features
+
+- Added weapons weapon checkboxes to equip/drop (e.g. to reduce load after throwing a spear)
+- Armour checkboxes now also reduce load if unchecked
+- Added two weapon slots
+
+### CSS
+
+- Rolltemplate layout optimization
+- fixed darkmode
+
+### Fixes
+
+- Fixed: global illfavoured in combination with a favoured skill doesn't result in a "normal" roll
+
 ## 02.06.00 (Build 9)
 
 ### Features
