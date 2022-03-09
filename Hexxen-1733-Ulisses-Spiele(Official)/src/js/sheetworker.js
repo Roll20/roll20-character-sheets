@@ -1,5 +1,67 @@
 
-    const debug = false;
+    const logEvents = true;
+
+    // Roll20 API helpers
+    const rh = {};
+    rh.clearAttrs = (keys, updates) => {
+        if (!Array.isArray(keys)) {
+            console.error('keys is not an array');
+            return;
+        }
+        // It's not possible to delete attributes form sheetworkers!
+        // Setting them to an empty string is the closest thing possible.
+        const attrs = keys.reduce((ret, val) => {
+            ret[val] = '';
+            return ret;
+        }, updates ?? {});
+        // don't save the attributes if an updates object has been passed
+        // IMPORTANT: This will create a change:<name> event!
+        if (updates === undefined) setAttrs(attrs);
+    };
+
+    // Compendium drag&drop helpers
+    const dh = {};
+    dh.triggerName = 'drop-data';
+    dh.dropKeys = Object.freeze(['drop-data', 'drop-name', 'drop-uniquename', 'drop-content', 'drop-category']);
+
+    dh.clearDropFields = (updates) => {
+        rh.clearAttrs(dh.dropKeys, updates);
+    };
+
+    dh.handleCompendiumDrop = (event) => {
+        if (logEvents) console.log('handleCompendiumDrop', event);
+        // filter events caused by clearing the drop attributes
+        if (event.sourceType === 'sheetworker' && event.newValue === undefined) {
+            if (logEvents) console.log('skipped clear event');
+            return;
+        }
+
+        getAttrs(dh.dropKeys, (attrs) => {
+            const drop = attrs['drop-data'];
+            // avoid processing empty string
+            if (!drop) {
+                console.log('bad attributes data');
+                dh.clearDropFields();
+                return;
+            }
+            const data = JSON.parse(drop);
+            data['Name'] = attrs['drop-name'];
+            data['UniqueName'] = attrs['drop-uniquename'];
+            data['Content'] = attrs['drop-content']?.trim();
+            
+            // update object for collecting all modifications
+            const updates = {}; 
+            // do something with data
+
+            // append entries for clearing the drop fields to updates object
+            dh.clearDropFields(updates);
+            // 
+            setAttrs(updates);
+        });
+    };
+
+
+
 
     const buttonlist = ["character","combat","npc","configuration"];
     buttonlist.forEach(button => {
@@ -86,7 +148,7 @@
     ];
     resourcebuttonlist.forEach(button => {
         on(`clicked:${button}`, function(event) {
-            if (debug) console.log("add/remove resource:", event);
+            if (logEvents) console.log("add/remove resource:", event);
             const action = button.substr(0,3);
             const ressource = button.substr(3);
             getAttrs([ressource], function(values) {
@@ -105,7 +167,7 @@
     });
 
     on("change:blessing change:rage", (event) => {
-        if (debug) console.log("change resource:", event);
+        if (logEvents) console.log("change resource:", event);
         
         // blessing vs. rage (Hjd p.102)
         getAttrs(['blessing','rage'], (values) => {
@@ -654,5 +716,12 @@
             });
         });
     });
+
+    on('sheet:compendium-drop', (event) => {
+        console.log(event);
+    });
+
+    on(`change:${dh.triggerName}`, dh.handleCompendiumDrop);
+    
 
 
