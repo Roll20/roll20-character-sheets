@@ -10,13 +10,34 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.9.2 [Screenshot](coc_v2.png)
+v3.11.0 [Screenshot](coc_v2.png)
 
 # Notes de version
 
+## v3.11.0 (2022-01-16)
+
+Nouvelles fonctionnalités
+
+- Possibilité de sélectionner le mod de test (mod carac + buff/debuff) dans les bonus aux DM des attaques
+- Possibilité d'afficher le token du personnage dans les jets de dés de la fiche
+
+## v3.10.1 (2021-12-18)
+
+Corrections de bugs
+
+- Dysfonctionnement des boutons d'états préjudiciables
+- Libellé du modificateur d'attaque persistant après avoir été annulé
+- Meilleur support des modificateurs de DM sous formes de jets de dés
+- Mauvais affichage en cas de sélection du setting Surhumains
+- Affichage de la version de la fiche sur l'onglet Configuration
+
+## v3.10.0 (2021-11-12)
+
+- Ajout du token par défaut sur la fiche de personnage
+
 ## v3.9.2 (2021-04-27)
 
-- Correction d'un bug sur le titre de la capacité de rang 4 de la voie n°2
+- Correction d'un bug sur le titre de la capacité de rang 2 de la voie n°4
 - Correction du calcul du rang dans une voie : la case doit être cochée et soit le titre soit le texte de la capacité doit être renseigné
 
 ## v3.9.1 (2021-04-25)

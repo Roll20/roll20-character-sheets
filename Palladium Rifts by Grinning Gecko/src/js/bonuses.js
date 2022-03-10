@@ -355,36 +355,52 @@ on("change:repeating_bonusselections:enabled", async (e) => {
   await outputSelectedBonusIds();
 });
 
-async function insertSelection(name, bonusRowId) {
-  console.log("insertSelection", name, bonusRowId);
+const insertedBonuses = [];
+async function insertSelection(name, bonusRowId, level) {
+  console.log("insertSelection", name, bonusRowId, level);
+  if (insertedBonuses.includes(bonusRowId)) {
+    return;
+  } else {
+    insertedBonuses.push(bonusRowId);
+  }
   const selectionRowId = generateRowID();
   const attrs = {};
   attrs[`repeating_bonusselections_${selectionRowId}_bonus_id`] = bonusRowId;
-  attrs[`repeating_bonusselections_${selectionRowId}_name`] = name;
+  attrs[
+    `repeating_bonusselections_${selectionRowId}_name`
+  ] = `${name} (${level})`;
   attrs[`repeating_bonuses_${bonusRowId}_selection_id`] = selectionRowId;
   console.log(attrs);
   await setAttrsAsync(attrs);
 }
 
-async function updateSelection(name, selectionRowId) {
-  console.log("updateSelection", name, selectionRowId);
+async function updateSelection(name, selectionRowId, level) {
+  console.log("updateSelection", name, selectionRowId, level);
   const attrs = {};
-  attrs[`repeating_bonusselections_${selectionRowId}_name`] = name;
+  attrs[
+    `repeating_bonusselections_${selectionRowId}_name`
+  ] = `${name} (${level})`;
   await setAttrsAsync(attrs);
 }
 
-on("change:repeating_bonuses:name", async (e) => {
-  console.log("change:repeating_bonuses:name", e);
-  const [r, section, rowId] = e.sourceAttribute.split("_");
-  const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
-  const a = await getAttrsAsync([selectionIdKey]);
-  console.log(a);
-  if (a[selectionIdKey]) {
-    await updateSelection(e.newValue, a[selectionIdKey]);
-  } else {
-    await insertSelection(e.newValue, rowId);
+on(
+  "change:repeating_bonuses:name \
+  change:repeating_bonuses:level",
+  async (e) => {
+    console.log("change:repeating_bonuses:name", e);
+    const [r, section, rowId] = e.sourceAttribute.split("_");
+    const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
+    const levelKey = `repeating_bonuses_${rowId}_level`;
+    const nameKey = `repeating_bonuses_${rowId}_name`;
+    const a = await getAttrsAsync([selectionIdKey, levelKey, nameKey]);
+    console.log(a);
+    if (a[selectionIdKey]) {
+      await updateSelection(a[nameKey], a[selectionIdKey], a[levelKey]);
+    } else {
+      await insertSelection(a[nameKey], rowId, a[levelKey]);
+    }
   }
-});
+);
 
 on("change:repeating_profiles:name", async (e) => {
   console.log("change:repeating_profiles:name", e);

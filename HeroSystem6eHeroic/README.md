@@ -60,7 +60,7 @@ Note that the total points may not update immediately. You may force an update b
 
 The first page displays characteristics, combat abilities, and movement abilities. Note that if your campaign does not use characteristic maximums (doubling points on abilities above these maximums) remember to uncheck this option on the Options Page.
 
-The first page also includes a portrait section designed as a slideshow. The first shown is a "rule card" that is by default a welcome message. The second is the player's avatar image, which is currently a feature of the Dev Server, but should be available for general use soon. The third is a sticky note for text.
+The first page also includes a portrait section designed as a slideshow. The first shown is a "rule card" that is by default a welcome message. The second is the player's avatar image that can be assigned via the Character's "Bio and Info" tab (250 by 250 pixels). The third is a sticky note for text.
 
 ## Health Status Indicator
 

@@ -35,7 +35,13 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
 
-## 10.06.2021
+## 25.10.2021
+
+	Fixed Strike issues with DEX 19+.  DEX will have to be changed for this to be triggered.
+	Added headers to Parry & Attack Rolls
+	Added delimiters to clarigy the start and end of attacks and parries.
+
+## 06.10.2021
 
 	To account for damage reduction in the attack results tables
 	Added display of special damage and normal damage to critical attack results
