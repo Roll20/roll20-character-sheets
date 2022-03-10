@@ -6,6 +6,10 @@ Official feedback hub for the roll 20 ulisses TDE character sheet & future compe
 
 
 ### Changelog
+1.1.2
+* Fixed "Entrückung" combat modifier
+* Fixed critical success and botch inversion
+
 1.1.1
 * Advancement cost caluclation and payment of skills and attributes
 * Improved rolltemplates for 3d20 checks
