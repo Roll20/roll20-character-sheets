@@ -6943,6 +6943,38 @@
 		<input type="hidden" name="attr_stat_cost_body" value=0 />
 		<input type="hidden" name="attr_stat_cost_mind" value=0 />
 		<input type="hidden" name="attr_stat_cost_soul" value=0 />
+		<select class="hidden" name="attr_game_genre">
+			<option value="0">Multi-Genre</option>
+			<option value="1">Action Adventure</option>
+			<option value="2">Animal Adventures</option>
+			<option value="3">Classic Horror</option>
+			<option value="4">Detective</option>
+			<option value="5">Loony Cartoons</option>
+			<option value="6">Romantic Comedy</option>
+			<option value="7">Slice of Life</option>
+			<option value="8">Spy Thriller</option>
+			<option value="9">Supernatural Occult</option>
+			<option value="10">Eco Fantasy</option>
+			<option value="11">High Fantasy</option>
+			<option value="12">Low Fantasy</option>
+			<option value="13">Urban Fantasy</option>
+			<option value="14">Cyberpunk/Realitypunk</option>
+			<option value="15">Hard SF</option>
+			<option value="16">Mecha Drama</option>
+			<option value="17">Post- Apocalyptic</option>
+			<option value="18">Soft SF</option>
+			<option value="19">Space Opera</option>
+			<option value="20">20th Century War</option>
+			<option value="21">Age of Discovery</option>
+			<option value="22">Age of Pirates</option>
+			<option value="23">Age of Samurai</option>
+			<option value="24">Ancient Mediterranean</option>
+			<option value="25">Industrial Age</option>
+			<option value="26">Middle Ages</option>
+			<option value="27">Steampunk</option>
+			<option value="28">Stone Age</option>
+			<option value="29">Wild West</option>
+		</select>
 	</div>
 
 	<!-- ************************ Roll Templates ************************ -->
@@ -7855,7 +7887,7 @@
 			return result;
 		}
 		
-		function buildSkillsUI(setObj, sheetdb) {
+		function buildSkillsUI(value, setObj, sheetdb) {
 			const json = JSON.parse(global_templates_skills_json);
 			const skills = json.template;
 			let skills_array = [];
@@ -7864,13 +7896,14 @@
 				const rowID = generateRowID();
 				const majorstat = getSkillStatsDisplay(skill.statallaspect);
 				const minorstat = getSkillStatsDisplay(skill.statmajor);
-				const description = "Name: " + skill.name + "\r\n\r\nDescription: " + skill.description + "\r\n\r\nSpecializations: " + skill.specializations + "\r\n\r\nStat: " + capital(majorstat) + " (" + allcaps(minorstat) + ")\r\n\r\nCost: " + skill.cost[global_templates_game_genre];
+				const game_genre = parseInt(value.game_genre) || 0;
+				const description = "Name: " + skill.name + "\r\n\r\nDescription: " + skill.description + "\r\n\r\nSpecializations: " + skill.specializations + "\r\n\r\nStat: " + capital(majorstat) + " (" + allcaps(minorstat) + ")\r\n\r\nCost: " + skill.cost[game_genre];
 				setObj[`repeating_skilltemplate_${rowID}_label`] = skill.name;
 				setObj[`repeating_skilltemplate_${rowID}_description`] = description;
 				setObj[`repeating_skilltemplate_${rowID}_specializations`] = skill.specializations;
 				setObj[`repeating_skilltemplate_${rowID}_statallaspect`] = skill.statallaspect;
 				setObj[`repeating_skilltemplate_${rowID}_statmajor`] = skill.statmajor;
-				setObj[`repeating_skilltemplate_${rowID}_cost`] = skill.cost[global_templates_game_genre];
+				setObj[`repeating_skilltemplate_${rowID}_cost`] = skill.cost[game_genre];
 				skills_array.push({ rowID: rowID, name: skill.name });
 				//setAttrs(writeSkill,{silent:true});
 			});
@@ -8550,15 +8583,16 @@
 			return aggregateGroupCost;
 		}
 		
-		function getSkillCost(debug, timer, name){
+		function getSkillCost(debug, timer, value, name){
 			const json = JSON.parse(global_templates_skills_json);
 			const skills = json.template;
 			const skill = _.find(skills, s => {
 				const result = s.name == name ? true : false;
 				return result;
 			});
-			clog(debug, timer, `${name} =`, skill.cost[global_templates_game_genre], 'getSkillCost()');
-			return skill.cost[global_templates_game_genre];
+			const game_genre = parseInt(value.game_genre) || 0;
+			clog(debug, timer, `${name} =`, skill.cost[game_genre], 'getSkillCost()');
+			return skill.cost[game_genre];
 		}
 		
 		function getAggregateSkillGroupCost(debug, timer, skillIDs, value, rowID, groupID, setObj){
@@ -8589,7 +8623,7 @@
 			clog(debug, timer, 'groupid =', groupid);
 			const skillname = value[`repeating_skill_${rowID}_name`];
 			clog(debug, timer, 'skillname =', skillname);
-			const skillcost = getSkillCost(debug, timer, skillname);
+			const skillcost = getSkillCost(debug, timer, value, skillname);
 			clog(debug, timer, 'skillcost =', skillcost);
 			const skillrank = isNaN(parseInt(setObj[`repeating_skill_${rowID}_level`])) ?
 				parseInt(value[`repeating_skill_${rowID}_level`]) : 
@@ -13771,7 +13805,7 @@
 			clog(debug, timer, 'specilizationscost =', specilizationscost);
 			const skillname = value[`repeating_skill_${rowID}_name`];
 			clog(debug, timer, 'skillname =', skillname);
-			const skillcost = getSkillCost(debug, timer, skillname);
+			const skillcost = getSkillCost(debug, timer, value, skillname);
 			clog(debug, timer, 'skillcost =', skillcost);
 			const skillrank = parseInt(value[`repeating_skill_${rowID}_level`]);
 			clog(debug, timer, 'skillrank =', skillrank);
@@ -13809,7 +13843,8 @@
 			//console.log('skill:'); console.log(skill);
 			const group = getGroupID(value, 'skill');
 			const name = skill.name;
-			const cost = skill.cost[global_templates_game_genre];
+			const game_genre = parseInt(value.game_genre) || 0;
+			const cost = skill.cost[game_genre];
 			const specializations = skill.specializations;
 			const statallaspect = skill.statallaspect;
 			const statmajor = skill.statmajor;
@@ -14046,7 +14081,8 @@
 					'static_attrgroup_selected_tab', 
 					'static_skillgroup_selected_tab',
 					'version',
-					'global_version'
+					'global_version',
+					'game_genre'
 				]);
 				getAttrsString = getAttrsString.concat(size_template_values_array);
 				getAttrsString = getAttrsString.concat(buildStatButtonStatesArray());
@@ -14066,7 +14102,7 @@
 		
 					if (value.global_initialized != 1) {
 						buildSizeUI(global_templates_size_names, setObj);
-						buildSkillsUI(setObj, sheetdb);
+						buildSkillsUI(value, setObj, sheetdb);
 						writeHiddenDamageAttributes(sheetdb);
 						createAttrdbJSON(setObj);
 						setObj.global_initialized = 1;
