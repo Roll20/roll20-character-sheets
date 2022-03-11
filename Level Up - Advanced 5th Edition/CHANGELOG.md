@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2022-03-07 ** v.11 Paul V
+	Split the Archtypes so only the selected class's archtypes will appear in the list 
+	Fixed bug in NPC Sheet
 **2022-02-31 ** v.10 Paul V
 	---Split the Archtypes so only the selected class's archtypes will appear in the list -- can't get this working at the moment
 	Improved the readability of TextBoxes, increase the text size and darkened the colour a little
