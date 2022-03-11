@@ -23,7 +23,7 @@ function capitalizeFirst(s) {
 }
 
 const displaySize = function(size) {
-    if (typeof s !== 'string')
+    if (typeof size !== 'string')
         return '';
 
     size = size.toLowerCase();
@@ -57,7 +57,7 @@ const sizeToInt = function(size) {
 }
 
 const displayWeaponType = function (type) {
-    if (typeof s !== 'string')
+    if (typeof type !== 'string')
         return '';
 
     type = type.toLowerCase();
@@ -70,7 +70,7 @@ const displayWeaponType = function (type) {
 }
 
 const conditionalLog = function (bool, msg) {
-    if (b)
+    if (bool)
         console.log(msg);
 }
 
