@@ -109,6 +109,10 @@
   <option value="RPA Combat: Light Ground Robots"></option>
   <option value="RPA Combat: Glitter Boy"></option>
   <option value="RPA Combat: Silverhawk"></option>
+  <option value="RPA Combat: Battleram"></option>
+  <option value="RPA Combat: Bombard"></option>
+  <option value="Space Fighter: Basic"></option>
+  <option value="Space Fighter: Elite"></option>
 </datalist>
 <datalist id="weapon-proficiencies">
   <option value="W.P. Archery"></option>
@@ -140,7 +144,6 @@
   <option value="W.P. Submachinegun"></option>
   <option value="W.P. Flamethrower"></option>
 </datalist>
-
       <!-- endinject -->
 
       <!-- inject:partials/core.html -->
@@ -7215,17 +7218,6 @@
       />
       <span name="attr_mod_spdfly" title="Flying Speed"></span>
     </label>
-    <label
-      ><span>Break Fall</span>
-      <input type="hidden" value="0" name="attr_breakfall" />
-      <span>+</span>
-      <span name="attr_breakfall"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} attempts to break fall!}} {{Break Fall=[[d20+@{breakfall}]]}}"
-        name="roll_bonus_breakfall"
-      ></button>
-    </label>
   </div>
   <div class="bonus-type-container">
     <label
@@ -8386,17 +8378,6 @@
       />
       <span name="attr_mod_spdfly" title="Flying Speed"></span>
     </label>
-    <label
-      ><span>Break Fall</span>
-      <input type="hidden" value="0" name="attr_breakfall" />
-      <span>+</span>
-      <span name="attr_breakfall"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} attempts to break fall!}} {{Break Fall=[[d20+@{breakfall}]]}}"
-        name="roll_bonus_breakfall"
-      ></button>
-    </label>
   </div>
   <div class="bonus-type-container">
     <label
@@ -8916,6 +8897,14 @@
     <label
       ><input type="checkbox" name="attr_debug" value="1" /> View Sheet in Debug
       Mode</label
+    >
+    <label
+      ><input type="checkbox" name=attr_outputusage" value="1" /> Output
+      ISP/PPE/Damage usage to chat</label
+    >
+    <label
+      ><input type="checkbox" name=attr_outputarmorwarnings" value="1" /> Show
+      Armor warnings when damage is taken on last layer</label
     >
     <hr />
     <label
@@ -11673,36 +11662,52 @@ on("change:repeating_bonusselections:enabled", async (e) => {
   await outputSelectedBonusIds();
 });
 
-async function insertSelection(name, bonusRowId) {
-  console.log("insertSelection", name, bonusRowId);
+const insertedBonuses = [];
+async function insertSelection(name, bonusRowId, level) {
+  console.log("insertSelection", name, bonusRowId, level);
+  if (insertedBonuses.includes(bonusRowId)) {
+    return;
+  } else {
+    insertedBonuses.push(bonusRowId);
+  }
   const selectionRowId = generateRowID();
   const attrs = {};
   attrs[`repeating_bonusselections_${selectionRowId}_bonus_id`] = bonusRowId;
-  attrs[`repeating_bonusselections_${selectionRowId}_name`] = name;
+  attrs[
+    `repeating_bonusselections_${selectionRowId}_name`
+  ] = `${name} (${level})`;
   attrs[`repeating_bonuses_${bonusRowId}_selection_id`] = selectionRowId;
   console.log(attrs);
   await setAttrsAsync(attrs);
 }
 
-async function updateSelection(name, selectionRowId) {
-  console.log("updateSelection", name, selectionRowId);
+async function updateSelection(name, selectionRowId, level) {
+  console.log("updateSelection", name, selectionRowId, level);
   const attrs = {};
-  attrs[`repeating_bonusselections_${selectionRowId}_name`] = name;
+  attrs[
+    `repeating_bonusselections_${selectionRowId}_name`
+  ] = `${name} (${level})`;
   await setAttrsAsync(attrs);
 }
 
-on("change:repeating_bonuses:name", async (e) => {
-  console.log("change:repeating_bonuses:name", e);
-  const [r, section, rowId] = e.sourceAttribute.split("_");
-  const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
-  const a = await getAttrsAsync([selectionIdKey]);
-  console.log(a);
-  if (a[selectionIdKey]) {
-    await updateSelection(e.newValue, a[selectionIdKey]);
-  } else {
-    await insertSelection(e.newValue, rowId);
+on(
+  "change:repeating_bonuses:name \
+  change:repeating_bonuses:level",
+  async (e) => {
+    console.log("change:repeating_bonuses:name", e);
+    const [r, section, rowId] = e.sourceAttribute.split("_");
+    const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
+    const levelKey = `repeating_bonuses_${rowId}_level`;
+    const nameKey = `repeating_bonuses_${rowId}_name`;
+    const a = await getAttrsAsync([selectionIdKey, levelKey, nameKey]);
+    console.log(a);
+    if (a[selectionIdKey]) {
+      await updateSelection(a[nameKey], a[selectionIdKey], a[levelKey]);
+    } else {
+      await insertSelection(a[nameKey], rowId, a[levelKey]);
+    }
   }
-});
+);
 
 on("change:repeating_profiles:name", async (e) => {
   console.log("change:repeating_profiles:name", e);
@@ -12049,10 +12054,12 @@ on(
   async function applyDamageToNextActiveArmor(section, damage) {
   console.log("applyDamageToNextActiveArmor", section, damage);
   const ids = await getSectionIDsOrderedAsync(section);
-  const attrKeys = ids.flatMap((id) => [
-    `repeating_${section}_${id}_is_active`,
-    `repeating_${section}_${id}_mdc`,
-  ]);
+  const attrKeys = ids
+    .flatMap((id) => [
+      `repeating_${section}_${id}_is_active`,
+      `repeating_${section}_${id}_mdc`,
+    ])
+    .concat(["outputarmorwarnings"]);
   const attrs = {};
   const a = await getAttrsAsync(attrKeys);
   let damageCarry = damage;
@@ -12078,9 +12085,12 @@ on(
       const { character_name: characterName } = await getAttrsAsync([
         "character_name",
       ]);
-      const warning = await startRoll(`${characterName} is going to die`);
-      finishRoll(warning.rollId);
-      // @todo Warn player somehow
+      if (Boolean(Number(a["outputarmorwarnings"]))) {
+        const warning = await startRoll(
+          `${characterName} is taking damage to their last layer!`
+        );
+        finishRoll(warning.rollId);
+      }
       attrs[`repeating_${section}_${activeRowId}_mdc`] = 0;
       damageCarry = Math.abs(currentMdc);
     } else {
@@ -12090,6 +12100,7 @@ on(
   }
   await setAttrsAsync(attrs);
   await updateActiveArmor(activeRowId);
+  return currentMdc;
 }
 
 /**
@@ -12124,17 +12135,27 @@ on("change:repeating_armor:movementpenalty", async (e) => {
 
 on("clicked:armorapplydamage", async (e) => {
   console.log("clicked:armorapplydamage", e);
-  const a = await getAttrsAsync([`armordamage`, `character_name`]);
-  await applyDamageToNextActiveArmor("armor", +a[`armordamage`]);
-  const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
-  const chat = await startRoll(
-    `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
-      a["armordamage"]
-    }}} {{name=${b[`active_armor_name`]}}} {{remaining=${
-      b[`active_armor_mdc`]
-    }}}`
+  const a = await getAttrsAsync([
+    `armordamage`,
+    `character_name`,
+    `active_armor_mdc`,
+    `active_armor_name`,
+    `outputusage`,
+  ]);
+  const currentMdc = await applyDamageToNextActiveArmor(
+    "armor",
+    +a[`armordamage`]
   );
-  finishRoll(chat.rollId);
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    // const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
+    const chat = await startRoll(
+      `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
+        a["armordamage"]
+      }}} {{name=${a[`active_armor_name`]}}} {{remaining=${currentMdc}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:repeating_armor:resetmdc", async (e) => {
@@ -12938,16 +12959,22 @@ on("change:repeating_skills:name", async (e) => {
     "currentppe",
     "repeating_magic_name",
     "character_name",
+    "outputusage",
   ]);
   console.log(a);
   const newppe = a.currentppe - a.repeating_magic_ppecost;
   await setAttrsAsync({ currentppe: newppe });
-  const chat = await startRoll(
-    `&{template:castspell} {{character_name=${a["character_name"]}}} {{spent=${
-      a["repeating_magic_ppecost"]
-    }}} {{name=${a[`repeating_magic_name`]}}} {{remaining=${newppe}}}`
-  );
-  finishRoll(chat.rollId);
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    const chat = await startRoll(
+      `&{template:castspell} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["repeating_magic_ppecost"]}}} {{name=${
+        a[`repeating_magic_name`]
+      }}} {{remaining=${newppe}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:resetppe", async (e) => {
@@ -12962,16 +12989,22 @@ on("clicked:repeating_psionics:usepsionic", async (e) => {
     "repeating_psionics_name",
     "currentisp",
     "character_name",
+    "outputusage",
   ]);
   console.log(a);
   const newisp = a.currentisp - a.repeating_psionics_ispcost;
   await setAttrsAsync({ currentisp: newisp });
-  const chat = await startRoll(
-    `&{template:usepsionic} {{character_name=${a["character_name"]}}} {{spent=${
-      a["repeating_psionics_ispcost"]
-    }}} {{name=${a[`repeating_psionics_name`]}}} {{remaining=${newisp}}}`
-  );
-  finishRoll(chat.rollId);
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    const chat = await startRoll(
+      `&{template:usepsionic} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["repeating_psionics_ispcost"]}}} {{name=${
+        a[`repeating_psionics_name`]
+      }}} {{remaining=${newisp}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:resetisp", async (e) => {
