@@ -15,7 +15,7 @@ More Information
 * Cleaned up some formatting
 ### MAJOR SHIP SHEET OVERHAUL
 ##### CORE SHIP SHEET CHANGES
-* Added Intelligence, Wisdom, and Charisma modifers and relevant saves
+* Added Intelligence, Wisdom, and Charisma modifiers and relevant saves
 * Added all ship skills
 * Changed hit dice to Hull Dice and added Shield Dice, now will update the maximum number of HD and SD based on ship size and tier changes
 * Fixed issue with Ship Sheet Hit Dice (now Hull Dice) not updating the correct hit dice based on ship size
@@ -25,7 +25,7 @@ More Information
 * Added Power Die system specific roll callout names
 * Moved the Attack box to bottom of the core sheet and added ship weapon category, ship facing, and range
 * Added calculation that will generate starting hull points based on ship size, tier, and armor choice
-* Added calculation that will generate starting shield pointis based on ship size, tier
+* Added calculation that will generate starting shield points based on ship size, tier
 * Added recalculation of shield dice based on change on STR mod
 * Added recalculation of hull dice based on change in CON mod
 * Added Calculation to determine number of credits needed to upgrade to next tier and will populate the field
@@ -41,9 +41,9 @@ More Information
 * Added Notes text box to Cargo tab
 ###### MODS TAB
 * Added Mods Tab to ship sheet and moved current modifications box there
-* Added tracker for Modification Capacity, Fixed Hardpoints, Turet Hardpoints to the mods tab.
+* Added tracker for Modification Capacity, Fixed Hardpoints, Turret Hardpoints to the mods tab.
 * Added calculation that will generate starting modification capacity based on ship size to the mods tab
-* Added tracker for Modification Capacity, Fixed Hardpoints, Turet Hardpoints to the mods tab.
+* Added tracker for Modification Capacity, Fixed Hardpoints, Turret Hardpoints to the mods tab.
 * Added cost and grade to the modifications repeating list
 ###### SUITES TAB
 * Added Suite tab and added an additional suite modifications box to that tab
@@ -51,7 +51,7 @@ More Information
 * Added calculation that will generate starting suite capacity based on ship size on the the suite tab
 * Added cost and grade to the suites modifications repeating list
 ##### SHIP OPTIONS TAB
-* Added options panel on ship sheet that allows for choosing Proficently or Expertly Equipped to allow overriding skills rolls
+* Added options panel on ship sheet that allows for choosing Proficiently or Expertly Equipped to allow overriding skills rolls
 * Moved existing armor and shield repeating list here to try to ensure legacy sheets using it do not break, it can now be used for custom armor
 
 ## 2019-08-20
