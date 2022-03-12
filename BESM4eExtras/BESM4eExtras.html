@@ -7907,7 +7907,8 @@
 				setObj[`repeating_skilltemplate_${rowID}_statallaspect`] = skill.statallaspect;
 				setObj[`repeating_skilltemplate_${rowID}_statmajor`] = skill.statmajor;
 				setObj[`repeating_skilltemplate_${rowID}_cost`] = skill.cost[game_genre];
-				skills_array.push({ rowID: rowID, name: skill.name });
+				const skillID = rowID.toLowerCase();
+				skills_array.push({ [skillID]: skill.name });
 			});
 			sheetdb.skillmap = skills_array;
 		}
@@ -13799,13 +13800,17 @@
 		function createSkill(debug, timer, value, skillmap, rowID, setObj){
 			const json = JSON.parse(global_templates_skills_json);
 			const skills = json.template;
+			clog(debug, timer, 'rowID =', rowID, 'creatSkill(TEST)')
 			const skillmatch = 
-			_.find(skillmap, s => {
-				if (s[rowID] !== undefined) return true;
-			});
-			const skill = _.find(skills, s => {
-				if (s.name === skillmatch[rowID]) return true;
-			});
+				_.find(skillmap, s => {
+					clog(debug, timer, 'skillmap.s:', s);
+					if (s[rowID] !== undefined) return true;
+				});
+			const skill = 
+				_.find(skills, s => {
+					clog(debug, timer, 'skills.s:', s);
+					if (s.name === skillmatch[rowID]) return true;
+				});
 			const group = getGroupID(value, 'skill');
 			const name = skill.name;
 			const game_genre = parseInt(value.static_options_selection_gamegenre) || 0;
