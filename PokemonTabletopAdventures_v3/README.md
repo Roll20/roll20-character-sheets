@@ -10,17 +10,30 @@ https://discord.gg/F24Ka8E
 
 Things we want to add to the character sheet, presented in no particular order of priority:
 
-- [ ] Mobile support!
+- [X] Mobile support!
   - [X] Set legacy to false
-  - [ ] Refactor sheets to minimize overhead
-  - [ ] Reasonable user experience on the Companion App
+  - [X] Refactor sheets to minimize overhead
+  - [X] Reasonable user experience on the Companion App
   - [ ] Full "optimized for use" support for Companion App
+- [X] Support Dark Mode sheet
+- [ ] Support Dark Mode roll templates
 - [ ] Allow a second ability score to apply to skill checks
 - [ ] Allow formula calculations for the extra damage fields
 - [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
 
 
 ## Changelog
+
+### Mar 12th, 2022
+- Removed some old legacy load-time backwards compatibility scripts. Nobody needs this anymore and it slows down the sheet.
+- Set legacy to false, and updated things to make sure that the sheets still work the same way.
+- Mobile support! Not perfect, but useable.
+- Dark mode support for the sheet (roll templates will be a future project)
+
+Current mobile bugs that I'm pretty sure are roll20 bugs:
+- HP updates seem to clear out the _max value sometimes?
+- Stat in parenthesis for skill checks doesn't populate
+- The roll20 dice font is not available
 
 ### Jul 17th, 2021
 - Added a level field to the `hybrid` _(or Pokémon (Character Class))_ character type.
