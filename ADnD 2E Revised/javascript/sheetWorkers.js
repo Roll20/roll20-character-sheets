@@ -1,7 +1,4 @@
 // --- ALL SHEET WORKERS START --- //
-const SHEETWORKER = 'sheetworker';
-const PLAYER = 'player';
-
 const SUCCESS = 'success';
 const INFO = 'info';
 const WARNING = 'warning';
@@ -11,12 +8,69 @@ const BOOK_FIELDS = [
     'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
     'book-tom', 'book-aaeg',
     'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
-    'book-paladins', 'book-druids'
+    'book-paladins', 'book-druids', 'book-barbarians', 'book-necromancers', 'book-ninjas'
 ];
 
+const SCHOOL_FIELDS = ['school-spells&magic'];
+const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', 'sphere-spells&magic'];
+
 //#region Helper function
+function capitalizeFirst(s) {
+    if (typeof s !== 'string')
+        return '';
+
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
+const displaySize = function(size) {
+    if (typeof size !== 'string')
+        return '';
+
+    size = size.toLowerCase();
+    switch (size) {
+        case 't': return 'Tiny';
+        case 'tiny': return 'Tiny';
+        case 's': return 'Small';
+        case 'small': return 'Small';
+        case 'm': return 'Medium';
+        case 'medium': return 'Medium';
+        case 'l': return 'Large';
+        case 'large': return 'Large';
+        case 'h': return 'Huge';
+        case 'huge': return 'Huge';
+        case 'g': return 'Gargantuan';
+        case 'gargantuan': return 'Gargantuan';
+        default: capitalizeFirst(size);
+    }
+}
+
+const sizeToInt = function(size) {
+    size = displaySize(size);
+    switch (size) {
+        case 'Tiny': return 0;
+        case 'Small': return 1;
+        case 'Medium': return 2;
+        case 'Large': return 3;
+        case 'Huge': return 4;
+        case 'Gargantuan': return 5;
+    }
+}
+
+const displayWeaponType = function (type) {
+    if (typeof type !== 'string')
+        return '';
+
+    type = type.toLowerCase();
+    switch (type) {
+        case 's': return 'Slashing';
+        case 'p': return 'Piercing';
+        case 'b': return 'Bludgeoning';
+        default: capitalizeFirst(type);
+    }
+}
+
 const conditionalLog = function (bool, msg) {
-    if (b)
+    if (bool)
         console.log(msg);
 }
 
@@ -24,6 +78,17 @@ const extractQueryResult = async function(query){//Sends a message to query the 
     let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
     finishRoll(queryRoll.rollId);
     return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
+};
+
+const extractRoll = async function(rollExpression) {
+    let queryRoll = await startRoll(`!{{roll=[[${rollExpression}]]}}`);
+    finishRoll(queryRoll.rollId);
+    return queryRoll.results.roll;
+};
+
+const extractRollResult = async function(rollExpression) {
+    let roll = await extractRoll(rollExpression);
+    return roll.result;
 };
 
 const isRollValid = function (rollExpression, field) {
@@ -62,17 +127,6 @@ const isRollValid = function (rollExpression, field) {
     return true;
 }
 
-const extractRoll = async function(rollExpression) {
-    let queryRoll = await startRoll(`!{{roll=[[${rollExpression}]]}}`);
-    finishRoll(queryRoll.rollId);
-    return queryRoll.results.roll;
-};
-
-const extractRollResult = async function(rollExpression) {
-    let roll = await extractRoll(rollExpression);
-    return roll.result;
-};
-
 const calculateFormula = async function(formulaField, calculatedField, silent = false) {
     getAttrs([formulaField], async function (values) {
         let rollExpression = values[formulaField];
@@ -106,8 +160,14 @@ const showToast = function(type, title, message) {
     setAttrs(getToastObject(type, title, message));
 }
 
+const getActiveSettings = function (settingFields, values) {
+    return settingFields.map(bField => values[bField])
+        .filter(Boolean)
+        .filter(book => book !== '0')
+}
+
 const isBookInactive = function (books, obj) {
-    let activeBooks = BOOK_FIELDS.map(bField => books[bField]);
+    let activeBooks = getActiveSettings(BOOK_FIELDS, books);
     return !activeBooks.includes(obj['book']);
 }
 
@@ -671,7 +731,7 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
         on(onChange, function (eventInfo) {
             if (doEarlyReturn(eventInfo, [fieldName]))
                 return;
-            
+
             console.log(`Summing started by section ${repeatingName}. Fieldname ${fieldName}`);
             console.time('Summing time');
             let levelsCopy = [...sections];
@@ -711,12 +771,6 @@ const PRIEST_SPHERES = [
 const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
 const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
 const elementalRegex = /Earth|Air|Fire|Water/gi
-function capitalizeFirst(s) {
-    if (typeof s !== 'string')
-        return '';
-
-    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-}
 
 function parseSpheres(spheresStrings, regex) {
     let spheres = new Set();
@@ -728,25 +782,34 @@ function parseSpheres(spheresStrings, regex) {
     return spheres;
 }
 
-function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, activeBooks) {
-    if (isBookInactive(activeBooks, spell))
+const getSpellSpheres = function (spell, sphereRules) {
+    let sphere = spell['sphere'];
+    sphereRules.forEach(rule => sphere += spell[rule] || '');
+    return sphere;
+}
+
+function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, activeBooks, optionalSpheres) {
+    if (!activeBooks.includes(spell['book']))
         return false;
 
-    let primarySpellSpheres = spell['sphere'].match(noElementalRegex) || [];
-    let isAvailable = primarySpellSpheres.some((sphere) => availableSpheres.has(sphere));
+    let spheres = getSpellSpheres(spell, optionalSpheres);
+
+    let primarySpellSpheres = spheres.match(noElementalRegex) || [];
+    let isAvailable = primarySpellSpheres.some(sphere => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
 
     if (!availableSpheres.has(ELEMENTAL))
         return false;
 
-    if (!spell['sphere'].includes(ELEMENTAL))
+    if (!spheres.includes(ELEMENTAL))
         return false;
 
-    if (spell['sphere'].includes(`${ELEMENTAL} (`))
-        return spell['sphere'].match(elementalRegex).some((element) => elementalSpheres.has(element))
+    if (spheres.includes(`${ELEMENTAL} (`))
+        return spheres.match(elementalRegex).some((element) => elementalSpheres.has(element))
 
     // The player and the spell has the elemental sphere (without any sub elements)
+    // Currently only 'Commune With Nature' in the revised Player's Handbook (1995) has this property
     return true;
 }
 
@@ -760,9 +823,9 @@ function setupAddPriestSpell(postfix) {
         let sphereFields = ['sphere-major'];
         if (postfix.match(/[123]/))
             sphereFields.push("sphere-minor");
-            
+
         TAS.repeating(section)
-            .attrs([...sphereFields, ...BOOK_FIELDS])
+            .attrs([...sphereFields, ...BOOK_FIELDS, ...SPHERE_FIELDS])
             .fields(field)
             .reduce(function(knownSpells, row){
                 knownSpells.add(row.S[field]);
@@ -776,9 +839,12 @@ function setupAddPriestSpell(postfix) {
                     return;
                 }
 
+                let activeBooks = getActiveSettings(BOOK_FIELDS, attrSet);
+                let optionalSpheres = getActiveSettings(SPHERE_FIELDS, attrSet);
+
                 let spellsToAdd = [];
                 for (const [spellName, spell] of Object.entries(priestSpells[postfix])) {
-                    let isAvailable = isSpellAvailable(spellName, spell, primarySpheres, elementalSpheres, attrSet);
+                    let isAvailable = isSpellAvailable(spellName, spell, primarySpheres, elementalSpheres, activeBooks, optionalSpheres);
                     if (isAvailable) {
                         spellsToAdd.push({name: spellName, book: spell['book']});
                     }
@@ -834,9 +900,9 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
     let attributes = ['spell-slot-reset-sections', 'spell-slot-reset-function']
     if (!isPowers)
         attributes.push(tab);
-    
+
     on(`clicked:${buttonName}`, function () {
-        
+
         getAttrs(attributes, function (values) {
             let resetSection = values['spell-slot-reset-sections'];
             let resetFunction = values['spell-slot-reset-function'];
@@ -848,17 +914,17 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 let level = values[tab];
                 if (!level)
                     return;
-                
+
                 let spellLevel = spellLevels.spellLevel(sl => sl.level === level);
                 if (!spellLevel)
                     return;
-                
+
                 sections = spellLevel.sections || [];
             }
-            
+
             if (!sections.length)
                 return
-            
+
             let updateFunction;
             if (resetFunction === '1' || isPowers)
                 updateFunction = resetCastSlots;
@@ -866,7 +932,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 updateFunction = resetCastAndMemSlots;
             else if (resetFunction === '3')
                 updateFunction = resetSpentSlots;
-            
+
             if (!updateFunction)
                 return;
 
@@ -897,7 +963,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
 //#endregion
 
 //#region Wizard and Priest spells and Powers setup
-function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
+function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFields) {
     if (!spellsTable[section])
         return;
 
@@ -906,7 +972,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
         if (!spell)
             return;
 
-        getAttrs(BOOK_FIELDS, function(books) {
+        getAttrs([...BOOK_FIELDS, ...optionalRulesFields], function(books) {
             if (bookInactiveShowToast(books, spell))
                 return;
 
@@ -927,7 +993,8 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
             if (section.startsWith('pri')) {
-                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+                let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
+                spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
             }
 
             setAttrs(spellInfo);
@@ -984,10 +1051,10 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel, []);
     }
 });
-setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel);
+setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel, []);
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
@@ -1000,12 +1067,10 @@ priestSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel);
-        if (lastSection !== 'priq')
-            setupAddPriestSpell(lastSection);
+        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel, SPHERE_FIELDS);
     }
 });
-setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel);
+setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel, SPHERE_FIELDS);
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
@@ -1069,7 +1134,7 @@ on('change:armorname', function(eventInfo) {
     let armor = rogueArmor[eventInfo.newValue];
     if (armor === undefined)
         return;
-    
+
     let armorModifiers = {
         'pparmorp': armor['Pick Pockets'],
         'olarmorp': armor['Open Locks'] || '-0',
@@ -1142,7 +1207,7 @@ on('change:thac0-base-calc', function(eventInfo) {
 function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
     if (!weaponName)
         return;
-    
+
     weaponName = weaponName.toLowerCase();
     let fields = [...BOOK_FIELDS, thac0Field].filter(x => x !== undefined);
     getAttrs(fields, function(values) {
@@ -1257,7 +1322,7 @@ on('change:repeating_weapons2:weaponname2', function(eventInfo){
 
         setAttrs(weaponInfo);
     };
-    
+
     setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
 });
 
@@ -1351,7 +1416,7 @@ on('clicked:grenade-miss', async function (eventInfo) {
         let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
         switch (grenade) {
             case 'Acid':       finalRollText += `{{name=Acid}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|acid-hit)}} {{splashdmg=[Damage](~${characterName}|acid-splash)}}`; break;
-            case 'Holy water': finalRollText += `{{name=Holy water}} water]]}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
+            case 'Holy water': finalRollText += `{{name=Holy water}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
             case 'Oil (lit)':  finalRollText += `{{name=Oil (lit)}} {{aoe=[[3]]}} {{aoesplash=[[3+6]]}} {{hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)}} {{splashdmg=[Damage](~${characterName}|oil-lit-splash)}}`; break;
             case 'Poison':     finalRollText += `{{name=Poison}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=Special}} {{splashdmg=Special}}`; break;
             case 'Other': {
@@ -1444,7 +1509,7 @@ on('change:repeating_profs:profname', function (eventInfo) {
     let nonweaponProficiency = nonweaponProficiencies[eventInfo.newValue];
     if (!nonweaponProficiency)
         return;
-    
+
     getAttrs(BOOK_FIELDS, function (books) {
         if (bookInactiveShowToast(books, nonweaponProficiency))
             return;
@@ -1470,7 +1535,7 @@ on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeat
 on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['gear-stored-weight', 'gear-stored-qty']))
         return;
-    
+
     TAS.repeating('gear-stored')
         .attrs('mount-gear-weight-total','stored-gear-weight-total')
         .fields('on-mount','gear-stored-weight','gear-stored-qty')
@@ -1492,5 +1557,33 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
         return;
     repeatingMultiplySum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
 })
+
+// Psionic tabs, control hidden or visible options
+const setPsionicDisciplineVisibility = function(newValue) {
+    let elements = $20('.sheet-section-psionics .sheet-hidden');
+    if (newValue === "1") {
+        elements.addClass('sheet-show');
+    } else {
+        elements.removeClass('sheet-show');
+    }
+}
+on('change:tab8', function (eventInfo) {
+    setPsionicDisciplineVisibility(eventInfo.newValue);
+});
+on('sheet:opened', function () {
+    getAttrs(['tab8'], function (values) {
+        setPsionicDisciplineVisibility(values['tab8']);
+    })
+});
+
+// Fix for Roll20 not handling quotes correctly from sheet.json
+on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
+    console.log(eventInfo);
+    if (eventInfo.newValue && eventInfo.newValue.includes('’')) {
+        let newValue = {};
+        newValue[eventInfo.sourceAttribute] = eventInfo.newValue.replaceAll('’', '\'');
+        setAttrs(newValue,{silent:true});
+    }
+});
 
 // --- ALL SHEET WORKERS END --- //
