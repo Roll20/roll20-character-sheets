@@ -8108,7 +8108,7 @@
 			return result;
 		}
 		
-		function setStatCost(debug, timer, eventInfo, setObj, sourceAttr) {
+		function setStatCost(debug, timer, eventInfo, value, setObj, sourceAttr) {
 			const newValue = parseInt(eventInfo.newValue) || 0;
 			const previousValue = parseInt(eventInfo.previousValue) || 0;
 			const diffValue = newValue - previousValue;
@@ -8121,7 +8121,8 @@
 					(((newValue - 12) * 8) + 48) - (previousValue * 4) : 
 				newValue <= 12 && previousValue > 12 ? 
 					(newValue * 4) - (((previousValue - 12) * 8) + 48) : 0;
-			setObj[`stat_cost_${sourceAttr}`] = statCost;
+			//setObj[`stat_cost_${sourceAttr}`] = statCost;
+			writeValues(debug, timer, value, `stat_cost_${sourceAttr}`, statCost, setObj);
 			clog(debug, timer, 'statCost =', statCost, 'setStatCost()');
 		}
 		
@@ -8721,7 +8722,7 @@
 			//setObj[`stat_total_${stat}`] = result;
 			writeValues(debug, timer, value, `stat_total_${stat}`, result, setObj);
 			clog(debug, timer, 'result =', result, 'setAllAspectStats()');
-			setStatCost(debug, timer, eventInfo, setObj, stat);
+			setStatCost(debug, timer, eventInfo, value, setObj, stat);
 			setStatAspectLevels(debug, timer, attrdb, value, stat, result, setObj)
 		}
 		
@@ -8741,7 +8742,8 @@
 				})
 				.value();
 			_.each(minorstats, (minorstat, i) => { 
-				setObj[`stat_total_${minorstat}`] = result[i];
+				//setObj[`stat_total_${minorstat}`] = result[i];
+				writeValues(debug, timer, value, `stat_total_${minorstat}`, result[i], setObj);
 			});
 			clog(debug, timer, 'result:', result, 'setStatAspectLevels()');
 		}
@@ -8894,22 +8896,24 @@
 				derivedvalue == 'social' ? 
 					Math.round((bodyormind + soul) / 2) + bonus + temp :
 				0;
-			setObj[`stat_total_${derivedvalue}`] = result;
+			//setObj[`stat_total_${derivedvalue}`] = result;
+			writeValues(debug, timer, value, `stat_total_${derivedvalue}`, result, setObj);
 			clog(debug, timer, derivedvalue, result, 'setDerivedValue()');
 		}
 		
-		function setTotalShock(debug, timer, attrdb, setObj, sourceAttr) {
+		function setTotalShock(debug, timer, value, attrdb, setObj) {
 			const health = 
 				parseInt(setObj.stat_total_health) || 
 				parseInt(value.stat_total_health) || 0;
 			const hardboiled = 
 				getSumOfActiveSubAttrRanks(attrdb, 'combattechnique', 'hardboiled') || 0;
 			const result = Math.round(health / 5) + hardboiled;
-			setObj.stat_total_shock = result;
+			//setObj.stat_total_shock = result;
+			writeValues(debug, timer, value, 'stat_total_shock', result, setObj);
 			clog(debug, timer, 'result =', result, 'setTotalShock()');
 		}
 		
-		function setTotalMovement(debug, timer, value, attrdb, setObj, sourceAttr) {
+		function setTotalMovement(debug, timer, value, attrdb, setObj) {
 			const body = 
 				parseInt(setObj.stat_total_body) || 
 				parseInt(value.stat_total_body) || 0;
@@ -12056,7 +12060,7 @@
 				break;
 				case "specialmovement":
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-					setTotalMovement(debug, timer, value, attrdb, setObj, sourceAttr);
+					setTotalMovement(debug, timer, value, attrdb, setObj);
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "socialmastery":
@@ -12642,8 +12646,6 @@
 				const capacity = isNaN(parseInt(value[`repeating_attr_${rowID}_capacitystate`])) ?
 					0 :
 					parseInt(value[`repeating_attr_${rowID}_capacitystate`]);
-				//setObj.weapon_ammo_reloads = ammo;
-				//setObj.weapon_ammo_capacity = capacity;
 				writeValues(debug, timer, value, 'weapon_ammo_reloads', ammo, setObj);
 				writeValues(debug, timer, value, 'weapon_ammo_capacity', capacity, setObj);
 				clog(debug, timer, 'ammo =', ammo, 'setWeaponAmmo()');
@@ -12651,8 +12653,6 @@
 			} else {//weapon unarmed, save ammo state
 				const ammostate = parseInt(value.weapon_ammo_reloads);
 				const capacitystate = parseInt(value.weapon_ammo_capacity);
-				//setObj[`repeating_attr_${rowID}_ammostate`] = ammostate;
-				//setObj[`repeating_attr_${rowID}_capacitystate`] = capacitystate;
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_ammostate`, ammostate, setObj);
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_capacitystate`, capacitystate, setObj);
 				clog(debug, timer, 'ammostate =', ammostate, 'setWeaponAmmo()');
@@ -13625,9 +13625,10 @@
 			let result = [];
 			_.each(stats, (stat) => {
 				const lowerstat = stat.toLowerCase();
-				result[result.length] = (sourceAttr == lowerstat) ?
-					parseInt(setObj[`${skill}${lowerstat}state`]) || 0 :
-					parseInt(value[`${skill}${lowerstat}state`]) || 0;
+				result[result.length] =
+					isNaN(parseInt(setObj[`${skill}${lowerstat}state`])) ?
+						parseInt(value[`${skill}${lowerstat}state`]) || 0 :
+						parseInt(setObj[`${skill}${lowerstat}state`]) || 0;
 			});
 			clog(debug, timer, 'stats:', stats, 'getStatStateArray()]');
 			clog(debug, timer, 'result =', result);
@@ -13688,6 +13689,7 @@
 		
 		function setSkillRoll(debug, timer, value, source, rowID, sourceAttr, level, setObj, type) {
 			clog(debug, timer, 'level =', level, 'setSkillRoll(TEST)');
+			clog(debug, timer, 'source =', source);
 			const base = getStatRollBase(debug, timer, value, sourceAttr, setObj, type, source);
 			const roll = getRollString(debug, timer, 'rolls', 'skillroll', 'Skill Roll', base + level);
 			setObj[`repeating_skill_${rowID}_skillrollvalue`] = roll;
@@ -13715,10 +13717,12 @@
 			clog(debug, timer, `value[${eventInfo.sourceAttribute}] =`, value[eventInfo.sourceAttribute]);
 		}
 		
-		function updateSkillRolls(debug, timer, value, source, skillIDs, sourceAttr, setObj) {
+		function updateSkillRolls(debug, timer, value, skillIDs, sourceAttr, setObj) {
+			clog(debug, timer, 'sourceAttr =', sourceAttr, 'updateSkillRolls(TEST)');
 			const type = getStatType(value);
 			_.each(skillIDs, id => {
-				const level = parseInt(value[`repeating_skill_${id}_level`]) || 0;
+				const source = `repeating_skill_${id}`;
+				const level = parseInt(value[`${source}_level`]) || 0;
 				setSkillRoll(debug, timer, value, source, id, sourceAttr, level, setObj, type);
 			})
 		}
@@ -13844,7 +13848,7 @@
 			const type = getStatType(value);
 			_.each(statarray,stat=>{
 				//setObj[`repeating_skill_${skillID}_${stat}state`] = 1;
-				writeValues(debug, timer, value, `repeating_skill_${skillID}_${stat}state`, 1 ,setObj);
+				writeValues(debug, timer, value, `repeating_skill_${skillID}_${stat}state`, 1 , setObj);
 			});
 			const stats = type.major==1 ? statmajor: statallaspect;
 			const sum = _.chain(stats)
@@ -14348,7 +14352,8 @@
 									case 'statselection':
 									case 'option':
 										const state = parseInt(value[`${source}_${sourceAttr}`]) > 0 ? 0: 1;
-										setObj[`${source}_${sourceAttr}`] = state;
+										//setObj[`${source}_${sourceAttr}`] = state;
+										writeValues(debug, timer, value, `${source}_${sourceAttr}`, state, setObj);
 									break;
 									default:
 										setSkillStatButtonState(debug, timer, value, match, sourceAttr, setObj);
@@ -14429,9 +14434,9 @@
 										setDerivedValue(debug, timer, attrdb, value, setObj, 'energy');
 										setDerivedValue(debug, timer, attrdb, value, setObj, 'sanity');
 										setDerivedValue(debug, timer, attrdb, value, setObj, 'social');
-										setTotalShock(debug, timer, attrdb, setObj, sourceAttr);
-										setTotalMovement(debug, timer, value, attrdb, setObj, sourceAttr);
-										updateSkillRolls(debug, timer, value, source, skillIDs, sourceAttr, setObj);
+										setTotalShock(debug, timer, value, attrdb, setObj);
+										setTotalMovement(debug, timer, value, attrdb, setObj);
+										updateSkillRolls(debug, timer, value, skillIDs, sourceAttr, setObj);
 									break;
 								}
 							break;
