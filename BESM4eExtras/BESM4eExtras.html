@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.6.0" readonly />
+													<input type="text" class="center" name="attr_version" value="1.6.1" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -44,6 +44,42 @@
 												</span></h4></div>
 												<div class="col-1-5"><h4 class="center border"><span name="attr_label_class">Debug
 													<select name="attr_show_debug_messages"><option value="0">Off</option><option value="1">Information</option><option value="2">Events</option><option value="3">Performance</option></select>
+												</span></h4></div>
+											</div>
+											<div>
+												<div class="col-1-5"><h4 class="center border"><span>Game Genre
+													<select name="attr_static_options_selection_gamegenre">
+														<option value="0">Multi-Genre</option>
+														<option value="1">Action Adventure</option>
+														<option value="2">Animal Adventures</option>
+														<option value="3">Classic Horror</option>
+														<option value="4">Detective</option>
+														<option value="5">Loony Cartoons</option>
+														<option value="6">Romantic Comedy</option>
+														<option value="7">Slice of Life</option>
+														<option value="8">Spy Thriller</option>
+														<option value="9">Supernatural Occult</option>
+														<option value="10">Eco Fantasy</option>
+														<option value="11">High Fantasy</option>
+														<option value="12">Low Fantasy</option>
+														<option value="13">Urban Fantasy</option>
+														<option value="14">Cyberpunk/Realitypunk</option>
+														<option value="15">Hard SF</option>
+														<option value="16">Mecha Drama</option>
+														<option value="17">Post- Apocalyptic</option>
+														<option value="18">Soft SF</option>
+														<option value="19">Space Opera</option>
+														<option value="20">20th Century War</option>
+														<option value="21">Age of Discovery</option>
+														<option value="22">Age of Pirates</option>
+														<option value="23">Age of Samurai</option>
+														<option value="24">Ancient Mediterranean</option>
+														<option value="25">Industrial Age</option>
+														<option value="26">Middle Ages</option>
+														<option value="27">Steampunk</option>
+														<option value="28">Stone Age</option>
+														<option value="29">Wild West</option>
+													</select>
 												</span></h4></div>
 											</div>
 											<div class="row center padb padt">
@@ -1313,7 +1349,7 @@
 												<button type="action" class="allaspects-stat" name="act_static_button_stat_body" value="">Body
 													<div class="flex-skillcontainer">
 														<div class="flex-1">
-															<div class="border" style="background: white;"><span style="color: black;" class="center" name="attr_stat_total_body"></span>
+															<div class="border" style="background: white;"><span style="color: black;" class="center" name="attr_stat_total_body" value="0"></span>
 														</div>
 													</div>
 												</button>
@@ -1323,7 +1359,7 @@
 												<button type='action' class="allaspects-stat" name='act_static_button_stat_mind' value="">Mind
 													<div class="flex-skillcontainer">
 														<div class="flex-1">
-															<div class="border" style="background: white;"><span style="color: black;" class="center" name="attr_stat_total_mind"></span>
+															<div class="border" style="background: white;"><span style="color: black;" class="center" name="attr_stat_total_mind" value="0"></span>
 														</div>
 													</div>
 												</button>
@@ -1333,7 +1369,7 @@
 												<button type='action' class="allaspects-stat" name='act_static_button_stat_soul' value="">Soul
 													<div class="flex-skillcontainer">
 														<div class="flex-1">
-															<div class="border" style="background: white;"><span style="color: black;" class="center" name="attr_stat_total_soul"></span>
+															<div class="border" style="background: white;"><span style="color: black;" class="center" name="attr_stat_total_soul" value="0"></span>
 														</div>
 													</div>
 												</button>
@@ -7748,7 +7784,7 @@
 				return;
 			}else{*/
 				if (value.attrdb !== undefined) {
-					const attrdb = isString(value.attrdb) ? 
+					const attrdb = _.isString(value.attrdb) ? 
 						JSON.parse(value.attrdb) : value.attrdb;
 					const defectdb = attrdb.defect;
 					_.each(defectdb, defect => {
@@ -7855,26 +7891,25 @@
 			return result;
 		}
 		
-		function buildSkillsUI(setObj, sheetdb) {
+		function buildSkillsUI(value, setObj, sheetdb) {
 			const json = JSON.parse(global_templates_skills_json);
 			const skills = json.template;
 			let skills_array = [];
 			_.each(skills, skill => {
-				//let writeSkill = {};
 				const rowID = generateRowID();
 				const majorstat = getSkillStatsDisplay(skill.statallaspect);
 				const minorstat = getSkillStatsDisplay(skill.statmajor);
-				const description = "Name: " + skill.name + "\r\n\r\nDescription: " + skill.description + "\r\n\r\nSpecializations: " + skill.specializations + "\r\n\r\nStat: " + capital(majorstat) + " (" + allcaps(minorstat) + ")\r\n\r\nCost: " + skill.cost[global_templates_game_genre];
+				const game_genre = parseInt(value.static_options_selection_gamegenre) || 0;
+				const description = "Name: " + skill.name + "\r\n\r\nDescription: " + skill.description + "\r\n\r\nSpecializations: " + skill.specializations + "\r\n\r\nStat: " + capital(majorstat) + " (" + allcaps(minorstat) + ")\r\n\r\nCost: " + skill.cost[game_genre];
 				setObj[`repeating_skilltemplate_${rowID}_label`] = skill.name;
 				setObj[`repeating_skilltemplate_${rowID}_description`] = description;
 				setObj[`repeating_skilltemplate_${rowID}_specializations`] = skill.specializations;
 				setObj[`repeating_skilltemplate_${rowID}_statallaspect`] = skill.statallaspect;
 				setObj[`repeating_skilltemplate_${rowID}_statmajor`] = skill.statmajor;
-				setObj[`repeating_skilltemplate_${rowID}_cost`] = skill.cost[global_templates_game_genre];
-				skills_array.push({ rowID: rowID, name: skill.name });
-				//setAttrs(writeSkill,{silent:true});
+				setObj[`repeating_skilltemplate_${rowID}_cost`] = skill.cost[game_genre];
+				const skillID = rowID.toLowerCase();
+				skills_array.push({ [skillID]: skill.name });
 			});
-			//console.log('skills_array:'); console.log(skills_array) ;
 			sheetdb.skillmap = skills_array;
 		}
 		
@@ -8063,7 +8098,7 @@
 					const state = (stat == sourceAttr ? 
 						parseInt(setObj[`repeating_skill_${skillID}_${stat}state`]):
 						parseInt(value[`repeating_skill_${skillID}_${stat}state`])) || 0;
-					const active = state>0 ? stat: '';
+					const active = state > 0 ? stat: '';
 					return active;
 				})
 				.compact()
@@ -8550,15 +8585,16 @@
 			return aggregateGroupCost;
 		}
 		
-		function getSkillCost(debug, timer, name){
+		function getSkillCost(debug, timer, value, name){
 			const json = JSON.parse(global_templates_skills_json);
 			const skills = json.template;
 			const skill = _.find(skills, s => {
 				const result = s.name == name ? true : false;
 				return result;
 			});
-			clog(debug, timer, `${name} =`, skill.cost[global_templates_game_genre], 'getSkillCost()');
-			return skill.cost[global_templates_game_genre];
+			const game_genre = parseInt(value.static_options_selection_gamegenre) || 0;
+			clog(debug, timer, `${name} =`, skill.cost[game_genre], 'getSkillCost()');
+			return skill.cost[game_genre];
 		}
 		
 		function getAggregateSkillGroupCost(debug, timer, skillIDs, value, rowID, groupID, setObj){
@@ -8589,7 +8625,7 @@
 			clog(debug, timer, 'groupid =', groupid);
 			const skillname = value[`repeating_skill_${rowID}_name`];
 			clog(debug, timer, 'skillname =', skillname);
-			const skillcost = getSkillCost(debug, timer, skillname);
+			const skillcost = getSkillCost(debug, timer, value, skillname);
 			clog(debug, timer, 'skillcost =', skillcost);
 			const skillrank = isNaN(parseInt(setObj[`repeating_skill_${rowID}_level`])) ?
 				parseInt(value[`repeating_skill_${rowID}_level`]) : 
@@ -8668,14 +8704,22 @@
 			return aggregateRank;
 		}
 		
+		function writeValues(debug, timer, value, key, result, setObj) {
+			clog(debug, timer, `setObj.${key} =`, result, 'writeValues()');
+			setObj[key] = result;
+			const lowerkey = key.toLowerCase();
+			clog(debug, timer, `value.${lowerkey} =`, result);
+			value[lowerkey] = result;
+		}
+		
 		function setAllAspectStats(debug, timer, eventInfo, attrdb, value, setObj, stat) {
-			//if (/(body|mind|soul)/i.test(stat) == false) return;
 			if (allaspects_stats_array.indexOf(stat) === -1) return;
 			const newValue = getStatBase(value, stat);
 			const augmented = getSumOfActiveAttrLevels(attrdb, 'augmented', stat) || 0;
 			const shortcoming = getShortcomingRank(debug, timer, attrdb, value, stat);
 			const result = newValue + augmented - shortcoming;
-			setObj[`stat_total_${stat}`] = result;
+			//setObj[`stat_total_${stat}`] = result;
+			writeValues(debug, timer, value, `stat_total_${stat}`, result, setObj);
 			clog(debug, timer, 'result =', result, 'setAllAspectStats()');
 			setStatCost(debug, timer, eventInfo, setObj, stat);
 			setStatAspectLevels(debug, timer, attrdb, value, stat, result, setObj)
@@ -12654,6 +12698,12 @@
 			});
 		}
 		
+		function adjustSkillGenreCosts(debug, timer, value, skillIDs, setObj) {
+			_.each(skillIDs, id => {
+				setSkillCostByRankChange(debug, timer, skillIDs, value, id, setObj);
+			});
+		}
+		
 		function getStatByAttr(debug, timer, defectdb, attribute) {
 			const attrs_stat_obj = {
 				'absorption':['body','con'],
@@ -13438,43 +13488,7 @@
 			clog(debug, timer, 'result =', result, 'setCombatRoll()');
 			setObj.maneuverroll = result;
 		}
-		/*
-		function getDefaultSkillStats(debug, timer, value, skill){
-			const json = JSON.parse(global_templates_skills_json);
-			const skills = json.template;
-			const type = value.static_stat_type_set;
-			const stat = _.find(skills,s=>{
-				const search = s.name==skill ? true: false;
-				return search;
-			});
-			if(debug){
-				console.log(`[getSkillStats(${skill})] stat:`);
-				console.log(stat);
-			}
-			return stat[`stat${type}`];
-		}
 		
-		function getSelectedSkillStats(debug, eventInfo, value, rowID, sourceAttr){
-			var result = [];
-			const type = value.static_stat_type_set==major ? 
-				allaspects_stats_array: major_stats_array;
-			const stats = _.each(type, stat=>{
-				const state = stat==sourceAttr ? 
-					eventInfo.newValue: value[`repeating_skill_${rowID}_${stat}state`];
-				if(state>0) result[result.length] = stat;
-			});
-			if(debug){
-				console.log(`[getSelectedSkillStats()] result:`);
-				console.log(result);
-			}
-			return result;
-		}
-		
-		function getSkillStatValue(value, rowID, setObj){
-			const type = getStatType(value);
-			const statarray = type.major=1 ? major_stats_array: allaspects_stats_array;
-		}
-		*/
 		function setSizeTemplate(value, sizetempateIDs, rowID, setObj) {
 				_.each(sizetempateIDs, templateID => { 
 					if (templateID!=rowID) setObj[`repeating_sizetemplate_${templateID}_selection`] = 0;
@@ -13601,13 +13615,14 @@
 		}
 		
 		function getStatStateArray(debug, timer, value, sourceAttr, setObj, type, source = '') {
-			const stats = type.major == 1 ? major_stats_array: allaspects_stats_array;
-			const skill = source.length>0 ? `${source}_`: '';
+			const stats = type.major == 1 ? major_stats_array : allaspects_stats_array;
+			const skill = source.length > 0 ? `${source}_` : '';
 			let result = [];
 			_.each(stats, (stat) => {
-				result[result.length] = (sourceAttr == stat.toLowerCase()) ?
-					parseInt(setObj[`${skill}${stat.toLowerCase()}state`]) || 0 :
-					parseInt(value[`${skill}${stat.toLowerCase()}state`]) || 0;
+				const lowerstat = stat.toLowerCase();
+				result[result.length] = (sourceAttr == lowerstat) ?
+					parseInt(setObj[`${skill}${lowerstat}state`]) || 0 :
+					parseInt(value[`${skill}${lowerstat}state`]) || 0;
 			});
 			clog(debug, timer, 'stats:', stats, 'getStatStateArray()]');
 			clog(debug, timer, 'result =', result);
@@ -13646,10 +13661,10 @@
 		}
 		
 		function getStatRollBase(debug, timer, value, sourceAttr, setObj, type, source = '') {
-			const statStates = getStatStateArray(debug, timer, value, sourceAttr, setObj, type, source),
-				statValues = getStatValuesArray(value, type),
-				denominator = getStateDenominator(statStates),
-				base = getActivatedStatsBase(debug, timer, statStates, statValues, denominator);
+			const statStates = getStatStateArray(debug, timer, value, sourceAttr, setObj, type, source);
+			const statValues = getStatValuesArray(value, type);
+			const denominator = getStateDenominator(statStates);
+			const base = getActivatedStatsBase(debug, timer, statStates, statValues, denominator);
 			clog(debug, timer, 'base =', base, 'getStatRollBase()');
 			return base;
 		}
@@ -13667,6 +13682,7 @@
 		}
 		
 		function setSkillRoll(debug, timer, value, source, rowID, sourceAttr, level, setObj, type) {
+			clog(debug, timer, 'level =', level, 'setSkillRoll(TEST)');
 			const base = getStatRollBase(debug, timer, value, sourceAttr, setObj, type, source);
 			const roll = getRollString(debug, timer, 'rolls', 'skillroll', 'Skill Roll', base + level);
 			setObj[`repeating_skill_${rowID}_skillrollvalue`] = roll;
@@ -13692,6 +13708,14 @@
 					value[eventInfo.sourceAttribute] = 0;
 			clog(debug, timer, 'result =', result);
 			clog(debug, timer, `value[${eventInfo.sourceAttribute}] =`, value[eventInfo.sourceAttribute]);
+		}
+		
+		function updateSkillRolls(debug, timer, value, source, skillIDs, sourceAttr, setObj) {
+			const type = getStatType(value);
+			_.each(skillIDs, id => {
+				const level = parseInt(value[`repeating_skill_${id}_level`]) || 0;
+				setSkillRoll(debug, timer, value, source, id, sourceAttr, level, setObj, type);
+			})
 		}
 		
 		function recordSheetChanges(eventInfo, value, setObj) {
@@ -13730,9 +13754,7 @@
 		
 		function setSkillStatButtonState(debug, timer, value, match, sourceAttr, setObj) {
 			const skillStatButtonState = button => 
-				//allaspects_stats_regex.test(button) || 
 				allaspects_stats_array.indexOf(button) !== -1 ||
-				//major_stats_regex.test(button) ? 
 				major_stats_array.indexOf(button) !== -1 ?
 					parseInt(value[`${match}state`]) > 0 ?
 						setObj[`${match}state`] = 0 : 
@@ -13771,7 +13793,7 @@
 			clog(debug, timer, 'specilizationscost =', specilizationscost);
 			const skillname = value[`repeating_skill_${rowID}_name`];
 			clog(debug, timer, 'skillname =', skillname);
-			const skillcost = getSkillCost(debug, timer, skillname);
+			const skillcost = getSkillCost(debug, timer, value, skillname);
 			clog(debug, timer, 'skillcost =', skillcost);
 			const skillrank = parseInt(value[`repeating_skill_${rowID}_level`]);
 			clog(debug, timer, 'skillrank =', skillrank);
@@ -13794,22 +13816,21 @@
 		function createSkill(debug, timer, value, skillmap, rowID, setObj){
 			const json = JSON.parse(global_templates_skills_json);
 			const skills = json.template;
-			//console.log('skills:'); console.log(skills);
-			//console.log(`rowID = ${rowID}`);
+			clog(debug, timer, 'rowID =', rowID, 'creatSkill(TEST)')
 			const skillmatch = 
-			_.find(skillmap, s => {
-				//console.log(`s:`); console.log(s);
-				//console.log(`s[rowID] = ${s[rowID]}`);
-				if (s[rowID] !== undefined) return true;
-			});
-			//console.log(`skillmatch = ${skillmatch}`);// console.log(skillmatch);
-			const skill = _.find(skills, s => {
-				if (s.name === skillmatch[rowID]) return true;
-			});
-			//console.log('skill:'); console.log(skill);
+				_.find(skillmap, s => {
+					clog(debug, timer, 'skillmap.s:', s);
+					if (s[rowID] !== undefined) return true;
+				});
+			const skill = 
+				_.find(skills, s => {
+					clog(debug, timer, 'skills.s:', s);
+					if (s.name === skillmatch[rowID]) return true;
+				});
 			const group = getGroupID(value, 'skill');
 			const name = skill.name;
-			const cost = skill.cost[global_templates_game_genre];
+			const game_genre = parseInt(value.static_options_selection_gamegenre) || 0;
+			const cost = skill.cost[game_genre];
 			const specializations = skill.specializations;
 			const statallaspect = skill.statallaspect;
 			const statmajor = skill.statmajor;
@@ -13817,7 +13838,8 @@
 			const skillID = generateRowID();
 			const type = getStatType(value);
 			_.each(statarray,stat=>{
-				setObj[`repeating_skill_${skillID}_${stat}state`] = 1;
+				//setObj[`repeating_skill_${skillID}_${stat}state`] = 1;
+				writeValues(debug, timer, value, `repeating_skill_${skillID}_${stat}state`, 1 ,setObj);
 			});
 			const stats = type.major==1 ? statmajor: statallaspect;
 			const sum = _.chain(stats)
@@ -13828,7 +13850,7 @@
 					return memo + stat;
 				})
 				.value();
-			const base = sum / stats.length;
+			const base = Math.round(sum / stats.length);
 			const roll = `&{template:besmDefault} {{rolls=1}} {{skillroll=1}} {{title=Skill Roll}} {{character_name=@{charactername}}} {{pronoun=@{pronoun}}} {{skill=${name}}} {{level=0}} {{base=${base}}} {{total=[[ [[?{Roll is|Normal, 2d6|Minor Edge, 3d6kh2|Minor Obstacle, 3d6kl2|Major Edge, 4d6kh2|Major Obstacle, 4d6kl2}]] + [[${base}]] ]]}} {{roll=$[[0]]}}`;
 			clog(debug, timer, "name =", name, "createSkill()");
 			clog(debug, timer, "group =", group);
@@ -13854,6 +13876,7 @@
 			value[`repeating_skill_${id}_minorstats`] = type.minor;
 			value[`repeating_skill_${id}_stat`] = getSkillStatsDisplay(stats);
 			value[`repeating_skill_${id}_skillrollvalue`] = roll;
+			value.skillIDs = value.skillIDs.push(id);
 		}
 		
 		function buildSkillTemplateValuesArray(skilltemplateIDs){
@@ -13908,6 +13931,7 @@
 		
 		function registerEvents() {
 			const eventsToRegister = [
+				"static_options_selection_gamegenre",
 				"show_debug_messages",
 				"static_weapon_autofire_selection",
 				"static_weapon_range_selection",
@@ -14046,7 +14070,8 @@
 					'static_attrgroup_selected_tab', 
 					'static_skillgroup_selected_tab',
 					'version',
-					'global_version'
+					'global_version',
+					'static_options_selection_gamegenre'
 				]);
 				getAttrsString = getAttrsString.concat(size_template_values_array);
 				getAttrsString = getAttrsString.concat(buildStatButtonStatesArray());
@@ -14066,12 +14091,14 @@
 		
 					if (value.global_initialized != 1) {
 						buildSizeUI(global_templates_size_names, setObj);
-						buildSkillsUI(setObj, sheetdb);
+						buildSkillsUI(value, setObj, sheetdb);
 						writeHiddenDamageAttributes(sheetdb);
 						createAttrdbJSON(setObj);
 						setObj.global_initialized = 1;
+						setObj.stat_total_body = '0';
+						setObj.stat_total_mind = '0';
+						setObj.stat_total_soul = '0';
 						doUpgrade(value, sheetdb, skilltempIDs, setObj);
-						//setObj.global_version = value.version;
 					}else{
 						const skillmap = _.chain(skilltempIDs)
 						.map( id => {
@@ -14082,9 +14109,7 @@
 						sheetdb.skillmap = skillmap;
 						doUpgrade(value, sheetdb, skilltempIDs, setObj);
 					}
-					//console.log('sheetdb:'); console.log(sheetdb);
 					setObj.sheetdb = JSON.stringify(sheetdb);
-					//console.log('setObj:'); console.log(setObj);
 					clog(3, timer, 'Ready to write setObj to cache:', setObj, 'setAttrs()');
 					setAttrs(setObj,{silent:true});
 					clog(3, timer, 'Write complete', '');
@@ -14121,9 +14146,7 @@
 			];
 		
 			getAttrs(get_attrs_array, (v) => {
-				//console.log('v:'); console.log(v);
 				let value = JSON.parse(v.sheetdb);
-				//console.log('value:'); console.log(value);
 				if (recordSheetChanges(eventInfo, value, setObj)) return;
 				const debug = parseInt(value[`show_debug_messages`]) || 0;
 				const attrdb = JSON.parse(v.attrdb);
@@ -14131,9 +14154,6 @@
 				let skillIDs = value.skillIDs;
 				let extraarmIDs = value.extraarmIDs;
 				const skillmap = value.skillmap;
-				//console.log('skillmap:'); console.log(skillmap);
-				//console.log('attrdb:'); console.log(attrdb);
-		
 				const isRemoved = eventInfo.triggerName.indexOf('remove') !== -1 ? true : false;
 				!isRemoved ? updateCache(debug, timer, eventInfo, value) : false;
 		
@@ -14145,13 +14165,10 @@
 					eventInfo.sourceAttribute = eventInfo.triggerName.substring(8, eventInfo.triggerName.length);
 				}
 		
-				//if(/clicked/i.test(eventInfo.triggerName)){
-					//if(/repeating_skill_/i.test(eventInfo.triggerName)){
-					if(eventInfo.triggerName.indexOf('repeating_skill_') !== -1 && eventInfo.htmlAttributes !== undefined){
-						const button = eventInfo.htmlAttributes.name.substring(3,eventInfo.htmlAttributes.name.length);
-						eventInfo.sourceAttribute = `${eventInfo.sourceAttribute}${button}`;
-					}
-				//}
+				if(eventInfo.triggerName.indexOf('repeating_skill_') !== -1 && eventInfo.htmlAttributes !== undefined){
+					const button = eventInfo.htmlAttributes.name.substring(3,eventInfo.htmlAttributes.name.length);
+					eventInfo.sourceAttribute = `${eventInfo.sourceAttribute}${button}`;
+				}
 		
 				setPreviousValue(eventInfo);
 				
@@ -14159,8 +14176,6 @@
 				clog(debug, timer, 'value:', value, 'getAttrs()', 'info');
 		
 				eventInfo.sourceAttribute.replace(/^((.+?)_(.+?)_(.+?))_(.+)/, (match, source, sourceType, sectionName, rowID, sourceAttr) => {
-		
-					//if (sourceType == `repeating` && non_actionable_events.indexOf(sourceAttr) !== -1) return;
 		
 					const originalCaseRowID = rowID;
 					source = source.toLowerCase();
@@ -14276,11 +14291,6 @@
 										exposeDefectSettingsOnDefectChange(debug, timer, value, rowID, setObj);
 										setDefectPointsByRankChange(debug, timer, eventInfo, value, rowID, setObj);
 									break;
-									/*
-									case 'stat':
-										getAttrStatValue(debug, timer, value, rowID);
-									break;
-									*/
 									case 'rank':
 										setDefectPointsByRankChange(debug, timer, eventInfo, value, rowID, setObj);
 									break;
@@ -14307,7 +14317,7 @@
 							break;
 							case `skill`:
 								if (getIsSheetworker(eventInfo.sourceType)) return;
-								const level = parseInt(value[`${source}_level`]);
+								const level = parseInt(value[`${source}_level`]) || 0;
 								const type = getStatType(value);
 								switch (sourceAttr) {
 									case `level`:
@@ -14359,7 +14369,6 @@
 						persistCache(value, attrdb, attrIDs, skillIDs, extraarmIDs, skillmap);
 						clog(debug, timer, 'setObj:', setObj, 'Changes To Sheet Values', 'info');
 						value = {...value, ...setObj};
-						//console.log('value:'); console.log(value);
 						setObj.sheetdb = JSON.stringify(value);
 						setAttrs(setObj,{silent:true});
 						clog(debug, timer, 'Changes written to sheet', '', 'setAttrs()', 'info');
@@ -14371,7 +14380,6 @@
 									case `autofire`:
 									case `maneuver`:
 									case `range`:
-										//if (sectionName == 'weapon') 
 										setCombatRoll(debug, timer, value, attrdb, value.active_weapon, sourceAttr, setObj);
 									break;
 								}
@@ -14406,6 +14414,7 @@
 										setDerivedValue(debug, timer, attrdb, value, setObj, 'social');
 										setTotalShock(debug, timer, attrdb, setObj, sourceAttr);
 										setTotalMovement(debug, timer, value, attrdb, setObj, sourceAttr);
+										updateSkillRolls(debug, timer, value, source, skillIDs, sourceAttr, setObj);
 									break;
 								}
 							break;
@@ -14456,11 +14465,13 @@
 								setRollUI(debug, timer, value, setObj);
 								setDynamicRollValue(debug, timer, eventInfo, value, attrdb, rowID, sourceAttr, setObj);
 							break;
+							case 'options':
+								adjustSkillGenreCosts(debug, timer, value, skillIDs, setObj);
+							break;
 						}
 						persistCache(value, attrdb, attrIDs, skillIDs, extraarmIDs, skillmap);
 						clog(debug, timer, 'setObj:', setObj, 'Changes To Sheet Values', 'info');
 						value = {...value, ...setObj};
-						//console.log('value:'); console.log(value);
 						setObj.sheetdb = JSON.stringify(value);
 						setAttrs(setObj,{silent:true});
 						clog(debug, timer, 'Changes written to sheet', '', 'setAttrs()', 'info');
