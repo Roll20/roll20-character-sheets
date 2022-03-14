@@ -76,11 +76,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 March 11th 2022 v1.54
 
 - Added official support for Roll20 Dark Mode
+- Added Hypnotism to Advanced Skills (Power behind the Throne, EiS vol3)
 
 
 February 25th 2022 v1.53.3
 
-- Added Ogre to the race list race with stats from Archives of the Empire vol 2
+- Added Ogre to the race list race with stats (Archives of the Empire vol 2)
 - Fix for melee weapons list target display for any weapon except 2H
 
 
