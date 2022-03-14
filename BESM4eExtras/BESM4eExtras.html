@@ -11079,39 +11079,29 @@
 			setObj[`protection_${attr}${layer}${type}_ar`] = rating;
 		}
 		
-		function setAugmented(isActive, debug, timer, value, rowID, setObj) {
-			const stat = value[`repeating_attr_${rowID}_augmentedstat`] || "";
-			const level = parseInt(value[`repeating_attr_${rowID}_effectivelevel`]) || 0;
+		function setAugmented(isActive, debug, timer, value, attrdb, rowID, setObj) {
+			const stat = value[`repeating_attr_${rowID}_augmentedstat`] || ""; //body, mind, soul
 			const base = parseInt(value[`static_stat_base_${stat}`]) || 0;
-			let adj = parseInt(value[`stat_adj_${stat}`]) || 0;
-			let total = 0;
-			adj = (isActive) ? adj + level : adj - level;
-			total = base + adj;
-			setObj[`stat_adj_${stat}`] = adj;
-			setObj[`stat_total_${stat}`] = total;
+			const augmented = _.chain(attrdb.augmented)
+				.map( a => {
+					const augStat = 
+						a.focus === stat && a.rowID === rowID && isActive ?
+							a.level :
+						a.focus === stat && a.rowID !== rowID ?
+							a.level :
+						0;
+					return augStat;
+				})
+				.reduce((memo, num) => { return memo + num; }, 0)
+				.value();
+			const result = base + augmented;
+			writeValues(debug, timer, value, `stat_total_${stat}`, result, setObj);
 			clog(debug, timer, 'stat =', stat, 'setAugmented()');
-			clog(debug, timer, 'level = ', level);
 			clog(debug, timer, 'base = ', base);
-			clog(debug, timer, 'adj = ', adj);
-			clog(debug, timer, 'total = ', total);
+			clog(debug, timer, 'augmented = ', augmented);
+			clog(debug, timer, 'result = ', result);
 		}
-		/*
-		function setEnergized(isActive, debug, value, rowID, sourceAttr, setObj) {
-			const level = parseInt(value[`repeating_attr_${rowID}_effectivelevel`]) * 10 || 0,
-				mind = parseInt(value[`static_stat_base_mind`]) || 0,
-				soul = parseInt(value[`static_stat_base_soul`]) || 0,
-				prevAdj = parseInt(value[`stat_adj_energy`]) || 0,
-				newAdj = (isActive) ? prevAdj + level : prevAdj - level,
-				energy = ((mind + soul) * 5) + newAdj;
-			setObj.stat_total_energy = energy;
-			setObj.stat_adj_energy = newAdj;
-			if (debug) {
-				console.log(`[setEnergized(${sourceAttr})] prevAdj = ${prevAdj}`);
-				console.log(`[setEnergized(${sourceAttr})] newAdj = ${newAdj}`);
-				console.log(`[setEnergized(${sourceAttr})] energy = ${energy}`);
-			}
-		}
-		*/
+		
 		function setExtraArms(isActive, debug, timer, extraarmIDs, value, rowID, sourceAttr, setObj, isTelekinesis = false) {
 			const extraarms = isTelekinesis ? 2 :
 				parseInt(value[`repeating_attr_${rowID}_extraarms`]) || 0;
@@ -11161,21 +11151,7 @@
 			clog(debug, timer, 'extraarms =', extraarms, 'setExtraArms()]');
 			clog(debug, timer, 'label = ', label);
 		}
-		/*
-		function getPerception(debug, value, sourceAttr, setObj) {
-			const mind = parseInt(setObj.static_stat_base_mind) || parseInt(value.static_stat_base_mind) || 0,
-				augmented = parseInt(setObj.stat_adj_mind) || parseInt(value.stat_adj_mind) || 0,
-				shortcoming = parseInt(setObj.stat_adj_per) || parseInt(value.stat_adj_per) || 0,
-				result = mind + augmented + shortcoming;
-			if (debug) {
-				console.log(`[getPerception(${sourceAttr}) mind = ${mind}]`);
-				console.log(`[getPerception(${sourceAttr}) augmented = ${augmented}]`);
-				console.log(`[getPerception(${sourceAttr}) shortcoming = ${shortcoming}]`);
-				console.log(`[getPerception(${sourceAttr}) result = ${result}]`);
-			}
-			return result;
-		}
-		*/
+		
 		function getPerceptionRollBase(debug, timer, value, attrdb, setObj) {
 			const perception = parseInt(setObj.stat_total_per) || 
 				parseInt(value.stat_total_per) || 0;
@@ -11965,7 +11941,7 @@
 			clog(debug, timer, 'rollstring =', rollstring);
 		}
 		
-		function setAttrEffects(debug, timer, isActive, value, attrdb, extraarmIDs, attrIDs, sectionName, rowID, sourceAttr, setObj) {
+		function setAttrEffects(debug, timer, isActive, value, attrdb, extraarmIDs, attrIDs, skillIDs, sectionName, rowID, sourceAttr, setObj) {
 			const attribute = removeWhiteSpace(value[`repeating_attr_${rowID}_attribute`]);
 			const level = parseInt(value[`repeating_attr_${rowID}_effectivelevel`]);
 			switch (attribute) {
@@ -11982,7 +11958,8 @@
 				break;
 				case "augmented":
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-					setAugmented(isActive, debug, timer, value, rowID, setObj);
+					setAugmented(isActive, debug, timer, value, attrdb, rowID, setObj);
+					updateSkillRolls(debug, timer, value, skillIDs, sourceAttr, setObj);
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "combattechnique":
@@ -13519,6 +13496,8 @@
 		}
 		
 		function disableActiveWeapon(debug, timer, value, rowID, setObj) {
+			const attribute = value[`repeating_attr_${rowID}_attribute`];
+			if (attribute !== 'weapon') return;
 			const activeweapon = value.active_weapon;
 			recordAmmoState(debug, timer, value, setObj);
 			setObj.weapon_range = 0;
@@ -14292,7 +14271,7 @@
 										const isActive = setButtonState(debug, timer, value, source, rowID, sourceAttr, setObj);
 										const handsource = getHandSource(debug, timer, extraarmIDs, value[`repeating_attr_${rowID}_source`]);
 										const handstate = handsource !== false ? parseInt(value[`${handsource}_state`]) : false;
-										setAttrEffects(debug, timer, isActive, value, attrdb, extraarmIDs, attrIDs, sectionName, rowID, sourceAttr, setObj);
+										setAttrEffects(debug, timer, isActive, value, attrdb, extraarmIDs, attrIDs, skillIDs, sectionName, rowID, sourceAttr, setObj);
 										//setPoolCostIfGroupIsFlux(debug, timer, attrIDs, value, rowID, setObj);
 										setAttrGroupPoolSpentByActivation(debug, timer, isActive, attrIDs, value, rowID, setObj);
 										//setPoolCostIfGroupIsVariation(debug, timer, isActive, attrIDs, value, rowID, setObj);
