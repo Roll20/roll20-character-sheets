@@ -12602,27 +12602,22 @@
 		}
 		
 		function getAmmoMax(debug, timer, rank) {
-			const result = rank == 4 ? 0 : 6 / rank;
+			const result = 
+				rank == 4 ? 0 : 
+				rank == 3 ? 1 : 
+				6 / rank;
 			clog(debug, timer, 'result =', result, 'getAmmoMax()');
 			return result;
 		}
 		
 		function setWeaponReload(debug, timer, attrdb, value, setObj) {
 			const rowID = value.active_weapon;
-			//const weapon = _.find(attrdb.weapon, w => {
-			//	if (w.source == rowID) return true;
-			//});
-			//const customization = _.find(weapon.customizations, c => {
-			//	if (c.name == 'ammo') return true;
-			//});
-			//const ammo = getAmmoMax(debug, timer, customization.rank);
 			const capacity = parseInt(value[`repeating_attr_${rowID}_capacity`]);
 			let ammostate = parseInt(value.weapon_ammo_reloads);
-			let capacitystate = parseInt(value.weapon_ammo_capacity);
-			const reloadammo = ammo => ammo > 0 ? ammostate -= 1 : ammostate;
-			const reloadcapacity = ammo => ammo > 0 ? capacitystate = capacity : capacitystate;
-			setObj.weapon_ammo_reloads = reloadammo(ammostate);
-			setObj.weapon_ammo_capacity = reloadcapacity(ammostate);
+			const reloadcapacity = ammostate > 0 ? capacity : 0;
+			const reloadammo = ammostate > 0 ? ammostate -= 1 : 0;
+			writeValues(debug, timer, value, 'weapon_ammo_reloads', reloadammo, setObj);
+			writeValues(debug, timer, value, 'weapon_ammo_capacity', reloadcapacity, setObj);
 			clog(debug, timer, 'reloads =', setObj.weapon_ammo_reloads, 'setWeaponReload()');
 			clog(debug, timer, 'capacity =', setObj.weapon_ammo_capacity);
 		}
@@ -12647,15 +12642,19 @@
 				const capacity = isNaN(parseInt(value[`repeating_attr_${rowID}_capacitystate`])) ?
 					0 :
 					parseInt(value[`repeating_attr_${rowID}_capacitystate`]);
-				setObj.weapon_ammo_reloads = ammo;
-				setObj.weapon_ammo_capacity = capacity;
+				//setObj.weapon_ammo_reloads = ammo;
+				//setObj.weapon_ammo_capacity = capacity;
+				writeValues(debug, timer, value, 'weapon_ammo_reloads', ammo, setObj);
+				writeValues(debug, timer, value, 'weapon_ammo_capacity', capacity, setObj);
 				clog(debug, timer, 'ammo =', ammo, 'setWeaponAmmo()');
 				clog(debug, timer, 'capacity =', capacity);
 			} else {//weapon unarmed, save ammo state
 				const ammostate = parseInt(value.weapon_ammo_reloads);
 				const capacitystate = parseInt(value.weapon_ammo_capacity);
-				setObj[`repeating_attr_${rowID}_ammostate`] = ammostate;
-				setObj[`repeating_attr_${rowID}_capacitystate`] = capacitystate;
+				//setObj[`repeating_attr_${rowID}_ammostate`] = ammostate;
+				//setObj[`repeating_attr_${rowID}_capacitystate`] = capacitystate;
+				writeValues(debug, timer, value, `repeating_attr_${rowID}_ammostate`, ammostate, setObj);
+				writeValues(debug, timer, value, `repeating_attr_${rowID}_capacitystate`, capacitystate, setObj);
 				clog(debug, timer, 'ammostate =', ammostate, 'setWeaponAmmo()');
 				clog(debug, timer, 'capacitystate =', capacitystate);
 			}	
@@ -13514,20 +13513,26 @@
 			});
 		}
 		
+		function recordAmmoState(debug, timer, value, setObj) {
+			writeValues(debug, timer, value, `repeating_attr_${value.active_weapon}_ammostate`, value.weapon_ammo_reloads, setObj);
+			writeValues(debug, timer, value, `repeating_attr_${value.active_weapon}_capacitystate`, value.weapon_ammo_capacity, setObj);
+		}
+		
 		function disableActiveWeapon(debug, timer, value, rowID, setObj) {
+			const activeweapon = value.active_weapon;
+			recordAmmoState(debug, timer, value, setObj);
 			setObj.weapon_range = 0;
 			setObj.weapon_ammo_autofire = 0;
 			setObj.weapon_ammo = 0;
 			setObj.weapon_autofire = 0;
 			const state = parseInt(setObj[`repeating_attr_${rowID}_activate`]) || 
 				parseInt(value[`repeating_attr_${rowID}_activate`]);
-			const activeweapon = value.active_weapon;
+			clog(debug, timer, 'state =', state, 'disableActiveWeapon()');
+			clog(debug, timer, 'activeweapon =', activeweapon);
 			if (!state) return;
 			if (activeweapon == rowID) {
 				setObj.active_weapon = '';
 			}
-			clog(debug, timer, 'state =', state, 'disableActiveWeapon()');
-			clog(debug, timer, 'activeweapon =', activeweapon);
 		}
 		
 		function setButtonState(debug, timer, value, source, rowID, sourceAttr, setObj) {
@@ -13719,7 +13724,7 @@
 		}
 		
 		function recordSheetChanges(eventInfo, value, setObj) {
-			const sheet_change_array = ['show_debug_messages'];
+			const sheet_change_array = ['show_debug_messages','weapon_ammo_reloads','weapon_ammo_capacity'];
 			const recordChange = sheet_change_array.indexOf(eventInfo.sourceAttribute) !== -1 ?
 				true : false;
 			if (recordChange) {
@@ -13940,6 +13945,8 @@
 		
 		function registerEvents() {
 			const eventsToRegister = [
+				"weapon_ammo_reloads",
+				"weapon_ammo_capacity",
 				"static_options_selection_gamegenre",
 				"show_debug_messages",
 				"static_weapon_autofire_selection",
@@ -14285,10 +14292,11 @@
 										//setPoolCostIfGroupIsFlux(debug, timer, attrIDs, value, rowID, setObj);
 										setAttrGroupPoolSpentByActivation(debug, timer, isActive, attrIDs, value, rowID, setObj);
 										//setPoolCostIfGroupIsVariation(debug, timer, isActive, attrIDs, value, rowID, setObj);
+										disableActiveWeapon(debug, timer, value, rowID, setObj);
 										if (handstate) {
 											setWeaponAmmo(debug, timer, attrdb, value, handsource, setObj);
 										}
-										disableActiveWeapon(debug, timer, value, rowID, setObj);
+										
 										setGroupDefectPointsOnActivation(debug, timer, attrIDs, attrdb, value, sectionName, rowID, setObj);
 									break;
 									case `lock`:
