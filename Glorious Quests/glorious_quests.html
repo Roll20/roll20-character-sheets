@@ -1,0 +1,129 @@
+<main>
+  <section class="header f-center">
+    <img
+      src="https://raw.githubusercontent.com/carpedavid/roll20_heroic_tales/main/Glorious%20Quests/horizontal-logo.svg"
+      alt="Glorious Quests" />
+  </section>
+
+  <section class="common">
+    <h1>Character Information</h1>
+    <div class="f-row wide">
+      <div class="wrap c-half">
+        <input id="attr_character_name" name="attr_character_name" type="text">
+        <label for="attr_character_name">Name</label>
+      </div>
+      <div class="wrap c-half">
+        <input id="attr_pronouns" name="attr_pronouns" type="text">
+        <label for="attr_pronouns">Pronouns</label>
+      </div>
+    </div>
+    <div class="f-row">
+      <div class="wrap c-half">
+        <input id="attr_species" name="attr_species" list="species" type="text">
+        <label for="attr_species">Species</label>
+      </div>
+      <div class="wrap c-quarter">
+        <input id="attr_level" name="attr_level" type="number" min="1" max="10">
+        <label for="attr_level">Level</label>
+      </div>
+      <div class="wrap c-quarter">
+        <input id="attr_base_dice" name="attr_base_dice" type="number" min="1" max="5">
+        <label for="attr_base_dice">Base Dice</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="skill f-col">
+    <h1>Attributes</h1>
+    <div class="f-row nowrap">
+      <div class="wrap">
+        <input type="number" id="attr_body" name="attr_body" class="numbers" min="1" max="3">
+        <label for="attr_body">Body</label>
+      </div>
+      <button type="roll" name="roll_body"
+        value="&{template:rolls} {{title=Body}} {{subtitle=@{character_name} }} {{successes= [[(@{base_dice}+@{body})d6>4f<2 ]]}}">
+      </button>
+    </div>
+    <div class="f-row nowrap">
+      <div class="wrap">
+        <input type="number" id="attr_mind" name="attr_mind" class="numbers" min="1" max="3">
+        <label for="attr_mind">Mind</label>
+      </div>
+      <button type="roll" name="roll_mind"
+        value="&{template:rolls} {{title=Mind}} {{subtitle=@{character_name} }} {{successes= [[(@{base_dice}+@{mind})d6>4f<2 ]]}}">
+      </button>
+    </div>
+    <div class="f-row nowrap">
+      <div class="wrap">
+        <input type="number" id="attr_spirit" name="attr_spirit" class="numbers" min="1" max="3">
+        <label for="attr_spirit">Spirit</label>
+      </div>
+      <button type="roll" name="roll_spirit"
+        value="&{template:rolls} {{title=Spirit}} {{subtitle=@{character_name} }} {{successes= [[(@{base_dice}+@{spirit})d6>4f<2 ]]}}">
+      </button>
+    </div>
+  </section>
+
+  <section class="power f-col">
+    <h1>Wondrous Items</h1>
+    <fieldset class="repeating_item">
+      <input id="attr_item" name="attr_item" type="text">
+      <label for="attr_item">Item</label>
+    </fieldset>
+  </section>
+
+  <section class="desc f-col">
+    <label for="attr_desc">Description</label>
+    <textarea id="attr_desc" name="attr_desc"></textarea>
+  </section>
+
+  <section class="notes f-col">
+    <label for="attr_notes">Notes</label>
+    <textarea id="attr_notes" name="attr_notes"></textarea>
+  </section>
+
+  <footer class="f-col f-center">
+    <span>Heroic Tales and Glorious Quests © 2022 by David Garrett. This work is licensed under CC-BY-4.0</span>
+  </footer>
+</main>
+
+<!-- data lists -->
+<datalist id="species">
+  <option value="Dwarf">
+  <option value="Elf">
+  <option value="Gnome">
+  <option value="Human">
+</datalist>
+
+<!-- roll template -->
+
+<rolltemplate class="sheet-rolltemplate-rolls">
+  <div class="sheet-container">
+    <div class="sheet-header">
+      {{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+      {{#name}}<div class="sheet-name">{{name}}</div>{{/name}}
+      {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+    </div>
+    <div class="sheet-content">
+      {{#allprops() title name subtitle desc}}
+      <div class="sheet-key">{{key}}</div>
+      <div class="sheet-value">{{value}}</div>
+      {{/allprops() title name subtitle desc}}
+      {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+    </div>
+  </div>
+</rolltemplate>
+
+<!-- auto calculations -->
+<script type="text/worker">
+
+  on("change:level sheet:opened", function() {
+    getAttrs(["level"], function(values) {
+      let level = parseInt(values.level) || 1;
+      let bd = Math.ceil(level / 2);
+
+      setAttrs({"base_dice": bd});
+    });
+  });
+    
+    </script>
