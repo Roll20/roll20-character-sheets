@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="02-07-00" />
+<input type="hidden" name="attr_version" value="02-08-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -61,6 +61,7 @@
         </div>
         <div id="gear">
             <h2 data-i18n="gear">Gear</h2>
+            <div><span /><span class="diamond-small-red" /></div>
             <textarea name="attr_travellinggear" />
         </div>
         <div id="experience">
@@ -940,9 +941,9 @@
                     title="Other modifiers for Protection" data-i18n-title="Other-protection"
                     data-i18n-placeholder="other-placeholder">
                 <input class="center number" type="number" name="attr_otherprot" value="0">
-                <span></span>
-                <span></span>
-                <span></span>
+                <input class="center number" type="number" name="attr_otherload" value="0">
+                <input type="checkbox" class="center gridcol4" value="1" name="attr_othercf"></checkbox>
+                <input type="checkbox" class="center gridcol5" value="1" name="attr_othercm"></checkbox>
 
                 <span></span>
                 <label data-i18n="shield">Shield</label>
@@ -1775,13 +1776,13 @@
 
     // calc total load on change events for weapons, armour and treasure
     on( "change:weapon_load_1 change:weapon_load_2 change:weapon_load_3 change:weapon_load_4 change:weapon_load_5 change:weapon_load_6 " + 
-        "change:armourload change:helmload change:shieldload change:treasureload " + 
-        "change:armourprot_active change:shieldparry_active change:helmprot_active " + 
+        "change:armourload change:helmload change:shieldload change:otherload change:treasureload " + 
+        "change:armourprot_active change:shieldparry_active change:helmprot_active change:otherprot_active " + 
         "change:weapon_active_1 change:weapon_active_2 change:weapon_active_3 change:weapon_active_4 change:weapon_active_5 change:weapon_active_6 " + 
         "change:fatigue change:load sheet:opened", function() {
         getAttrs(["weapon_load_1","weapon_load_2","weapon_load_3","weapon_load_4","weapon_load_5","weapon_load_6",
-                  "armourload","shieldload","helmload","fatigue","treasureload",
-                  "armourprot_active", "helmprot_active", "shieldparry_active",
+                  "armourload","shieldload","helmload", "otherload", "fatigue","treasureload",
+                  "armourprot_active", "helmprot_active", "shieldparry_active", "otherprot_active", 
                   "weapon_active_1", "weapon_active_2", "weapon_active_3", "weapon_active_4", "weapon_active_5", "weapon_active_6"], function(values) {
             const 	weaponload1 = (int(values.weapon_active_1) == 1) ? int(values.weapon_load_1) : 0,
                     weaponload2 = (int(values.weapon_active_2) == 1) ? int(values.weapon_load_2) : 0,
@@ -1792,8 +1793,9 @@
                     armourload = (int(values.armourprot_active) == 1) ? int(values.armourload) : 0,
                     shieldload = (int(values.shieldparry_active) == 1) ? int(values.shieldload) : 0,
                     helmload = (int(values.helmprot_active) == 1) ? int(values.helmload) : 0,
+                    otherload = (int(values.otherprot_active) == 1) ? int(values.otherload) : 0,
                     treasureload = int(values.treasureload),
-                    load = armourload + shieldload + helmload + weaponload1 + weaponload2 + weaponload3 + weaponload4 + weaponload5 + weaponload6 + treasureload; // Removed Fatigue, used to calculate vs Current Endurance and Weary condition below. 
+                    load = armourload + shieldload + helmload + otherload + weaponload1 + weaponload2 + weaponload3 + weaponload4 + weaponload5 + weaponload6 + treasureload; // Removed Fatigue, used to calculate vs Current Endurance and Weary condition below. 
             setAttrs({
                 load: load,
             });
@@ -1875,15 +1877,17 @@
     on('clicked:protection_action', async (ev) => {
         clog(`Starting first roll`);
         let action = 'protection',
-            data = await asw.getAttrs(['character_name', action, 'protection', 'armourcf', 'armourcm', 'helmetcf', 'helmetcm', 'sheetTab', 'protection_favoured']),
+            data = await asw.getAttrs(['character_name', action, 'protection', 'armourcf', 'armourcm', 'helmetcf', 'helmetcm', 'othercf', 'othercm', 'sheetTab', 'protection_favoured']),
             actdice = int(data.protection),
             actfav = data.protection_favoured,
             lm = data.sheetTab ==="isAdversary" ? true : false;
         let additionalStr = "";
         additionalStr = additionalStr + ((data.armourcf == "1") ? "Close fitting armour, " : "");
         additionalStr = additionalStr + ((data.helmetcf == "1") ? "Close fitting helm, " : "");
+        additionalStr = additionalStr + ((data.othercf == "1") ? "Close fitting other, " : "");
         additionalStr = additionalStr + ((data.armourcm == "1") ? "Cunning made armour, " : "");
         additionalStr = additionalStr + ((data.helmetcm == "1") ? "Cunning made helm, " : "");
+        additionalStr = additionalStr + ((data.helmetcm == "1") ? "Other Cunning made, " : "");
         additionalStr = additionalStr.slice(0,-2);
         clog(`First roll: ${JSON.stringify(data)}, Action : ${action}, protection value: ${actdice}, Additional: ${additionalStr}, Favoured: ${actfav}`);
         await rollFirst(data.character_name, action, actdice, "0", actfav, "protection", `additional='${additionalStr}';`, lm);
