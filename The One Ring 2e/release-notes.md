@@ -4,6 +4,16 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.08.00 (Build 11)
+
+### Features
+
+- add Close Fitting to other armour slot to allow for a selectable +2 protection bonus (e.g. due to a virtue)
+
+### CSS
+
+- minor layout improvements
+
 ## 02.07.00 (Build 10)
 
 ### Features
