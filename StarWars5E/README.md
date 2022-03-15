@@ -11,6 +11,7 @@ More Information
 ## 2022-03-14
 * Fix for CSS for issue where new sheet tab selectors were covered when Advantage Toggle was on
 * Fix for Hull and Shield Dice calculation that was not including the con or str mod with the first die
+* Changed Hit Points on Ship Sheet to read Hull Points, added Damage Reduction field (this is not tied to any automation, but will allow a place for it for those that use errata)
 ## 2022-03-11
 ### GLOBAL SHEET CHANGES
 * Temporary Fix for CSS for subcontainers that were having contents extend over themselves vertically in other languages changed height to min-height.
