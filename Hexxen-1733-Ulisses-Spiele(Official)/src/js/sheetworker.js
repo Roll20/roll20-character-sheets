@@ -1,6 +1,12 @@
 
     const logEvents = true;
 
+    // map charachter sheet terms to compendium terms
+    const categoryMap = {
+        'motivation': 'motivation',
+        'hunterpowers': 'hunter-ability'
+    }
+
     // Roll20 API helpers
     const rh = {};
     rh.clearAttrs = (keys, updates) => {
@@ -18,6 +24,21 @@
         // IMPORTANT: This will create a change:<name> event!
         if (updates === undefined) setAttrs(attrs);
     };
+    rh.sendChatMessage = (msg) => {
+        startRoll(msg, (results) => finishRoll(results.rollId, {}));
+    }
+
+    rh.sendChatCard = (data) => {
+        const query = Object.keys(data).reduce((out, key) => {
+            out.push(`{{${key}=${data[key] ?? ''}}}`);
+            return out;
+        }, []).join(' ');
+        console.log(data, query);
+        startRoll(`&{template:abilitycard} ${query}`, (result) => {
+            finishRoll(result.rollId, {});
+        });
+    }
+
 
     // Compendium drag&drop helpers
     const dh = {};
@@ -62,6 +83,26 @@
 
 
 
+    on('clicked:motivation_chat clicked:repeating_hunterpowers:chat', (event) => {
+        if (logEvents) console.log(event);
+        // find out which button was clicked
+        let prefix = event.triggerName.match(/^clicked:(.*)_chat$/)?.[1] ?? ''; // should be "repeating_<cat>_<id>", a non-repeating category or ''
+        if (prefix.startsWith('repeating_')) prefix = prefix.substring(0, prefix.lastIndexOf('_')); // remove <id> from repeating categories
+        // derive category
+        let category = prefix.startsWith('repeating_') ? prefix.substring(prefix.indexOf('_') + 1) : prefix;
+        category = categoryMap[category] ?? category;
+        // prepare keys to query the required values
+        const keys = { name: `${prefix}_name`, desc: `${prefix}_description` };
+        if (prefix === 'motivation') keys.desc = `${prefix}_perk`;
+        // read values
+        getAttrs(keys, (values) => {
+            const name = values[keys.name];
+            const desc = values[keys.desc];
+            const type = getTranslationByKey(category) || category; 
+            const comp = name; // `Jägerkräfte:${name}`; // TODO: uniquename
+            rh.sendChatCard({ name, desc, type, comp });
+        });
+    });
 
     const buttonlist = ["character","combat","npc","configuration"];
     buttonlist.forEach(button => {
