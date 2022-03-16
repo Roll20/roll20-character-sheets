@@ -4371,6 +4371,9 @@
 						Active Defenses. When adding a brand new active defense, the Combat Reflexes bonus is now applied to the final base skill
 						instead of adding a modifier bonus. Missed feature when converting Combat Reflexes in Version 2.7.8.
 					</li>
+					<li>
+						Active Defenses. Added the option to <b>Dodge</b> or <b>Current Dodge</b> as a link type.
+					</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -10610,6 +10613,7 @@ visualize what it will look like in chat.
 								<div class="row row-details notebox">
 								
 									<input type="hidden" name="attr_type" />
+									<input type="hidden" name="attr_defense_row_type" />
 									<div class="row active-defense-formula">
 										<div class="cell label">
 											<div class="popup">
@@ -10640,6 +10644,12 @@ visualize what it will look like in chat.
 											</div>
 											<div class="formula formula-power-block-mental">
 												<span data-i18n="power-block-mental-description">3 + (WILL + Talent)/2, rounded down.</span>
+											</div>
+											<div class="formula formula-base-dodge">
+												<span data-i18n="formula-base-dodge-description">Base Dodge attribute.</span>
+											</div>
+											<div class="formula formula-current-dodge">
+												<span data-i18n="formula-current-dodge-description">Current Dodge affected by HP, FP, and Encumbrance.</span>
 											</div>
 										</div>
 										<div class="cell formula-combat-reflexes">
@@ -10673,6 +10683,8 @@ visualize what it will look like in chat.
 												<option value="WILL" data-i18n="option-will">WILL</option>
 												<option value="HT" data-i18n="option-health">HT</option>
 												<option value="SPEED" data-i18n="option-basic-speed">Basic Speed</option>
+												<option value="DODGE" data-i18n="option-dodge">Dodge</option>
+												<option value="CURRENT_DODGE" data-i18n="option-current-dodge">Current Dodge</option>
 												<option value="10">10</option>
 											</select>
 										</div>
@@ -13661,6 +13673,9 @@ visualize what it will look like in chat.
 				<li>
 					Active Defenses. When adding a brand new active defense, the Combat Reflexes bonus is now applied to the final base skill
 					instead of adding a modifier bonus. Missed feature when converting Combat Reflexes in Version 2.7.8.
+				</li>
+				<li>
+					Active Defenses. Added the option to <b>Dodge</b> or <b>Current Dodge</b> as a link type.
 				</li>
 			</ul>
 
@@ -23252,11 +23267,13 @@ visualize what it will look like in chat.
 	// check if combat reflex was applied to active defense.
 	on("change:repeating_defense:defense_combat_reflexes", event => {
 
-		getAttrs(["repeating_defense_defense_combat_reflexes"], values => {
+		getAttrs(["repeating_defense_defense_combat_reflexes", "repeating_defense_defense_row_type"], values => {
 
-			const useReflexes = values.repeating_defense_defense_combat_reflexes === "1";
+			const isDodge = values.repeating_defense_defense_row_type == "DODGE" || values.repeating_defense_defense_row_type == "CURRENT_DODGE";
 
-			const reflexBonus = useReflexes ? 1 : 0;
+			const useReflexes = values.repeating_defense_defense_combat_reflexes === "1" && isDodge === false;
+
+			const reflexBonus = useReflexes ? "1" : "0";
 
 			setAttrs({
 				repeating_defense_defense_combat_reflexes_bonus: reflexBonus
@@ -23463,6 +23480,10 @@ visualize what it will look like in chat.
 				method = "attribute";
 				break;
 	
+			case "CURRENT_DODGE":
+				method = "attribute";
+				break;
+	
 			case "SPEED":
 				method = "attribute";
 				break;
@@ -23637,6 +23658,10 @@ visualize what it will look like in chat.
 				fieldName = "dodge";
 				break;
 	
+			case "CURRENT_DODGE":
+				fieldName = "current_dodge";
+				break;
+	
 			case "10":
 			default:
 				fieldName = "base_attribute_level";
@@ -23680,7 +23705,16 @@ visualize what it will look like in chat.
 				updateFields["repeating_defense_defense_formula_level"] = calculatedSkillLevel;
 	
 				updateFields["repeating_defense_skill"] = calculatedSkillLevel;
-	
+
+				// if dodge or current dodge is selected as the skill link make sure to turn OFF combat reflexes
+				if (rowType === "DODGE" || rowType === "CURRENT_DODGE") {
+
+					updateFields["repeating_defense_defense_combat_reflexes"] = "";
+
+					updateFields["repeating_defense_defense_combat_reflexes_bonus"] = "0";
+
+				}
+				
 			}
 	
 			setAttrs(updateFields, { silent: true });
@@ -24439,7 +24473,7 @@ visualize what it will look like in chat.
 	
 			if (isNew) {
 	
-				let checked = "0";
+				let checked = "";
 
 				let bonus = 0;
 
@@ -24447,12 +24481,12 @@ visualize what it will look like in chat.
 					
 					checked = "1";
 
-					bonus = 1;
+					bonus = "1";
 				}
 				
 				const fields = {
-					defense_combat_reflexes: checked,
-					defense_combat_reflexes_bonus: bonus,
+					repeating_defense_defense_combat_reflexes: checked,
+					repeating_defense_defense_combat_reflexes_bonus: bonus,
 					repeating_defense_new: 0
 				};
 	
