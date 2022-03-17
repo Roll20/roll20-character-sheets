@@ -8,6 +8,9 @@ More Information
 - [Star Wars 5e Discord](https://discord.gg/zYcPYTu)
 
 # Changelog
+
+## 2022-03-17
+* Put in a check against a new behavior that began today sheet attributes are not being set on sheet open even when defined with a value in hidden attributes.  This caused HP and Shield calcs to fail until the related modifiers were changed at least once.  I have added a NaN check against this at least for the ship portion of the sheet.
 ## 2022-03-14
 * Fix for CSS for issue where new sheet tab selectors were covered when Advantage Toggle was on
 * Fix for Hull and Shield Dice calculation that was not including the con or str mod with the first die
