@@ -1,6 +1,6 @@
 <!-- ATTENTION: This Pull Request template changed on 03/17/22. Please ensure that you are completing this template to the fullest extent possible. -->
 
-# Roll20 Checklist
+# Submission Checklist
 ## Required
 
 <!-- Check these off by adding an 'x' to each of these boxes. If you fail to meet all these criteria, your PR will be rejected. -->
