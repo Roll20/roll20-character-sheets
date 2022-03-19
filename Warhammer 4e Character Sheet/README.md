@@ -75,7 +75,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
 March 19th 2022 v1.55
 
-- Devmode renamed Talent and Quailties Integration
+- Devmode renamed Talent and Quality Integration
 - Added official Cubicle 7 Up in Arms rule set support
 - Up in Arms - Group Advantage - (select in Advantage Rules in setting) - include the appropriate Talent changes
 - Up in Arms - Critical Damage Tables - (select in Advantage Rules in setting) - include the appropriate Talent changes
