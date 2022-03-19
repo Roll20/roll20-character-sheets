@@ -78,7 +78,7 @@ March 19th 2022 v1.55
 - Devmode renamed Talent and Quality Integration
 - Added official Cubicle 7 Up in Arms rule set support
 - Up in Arms - Group Advantage - (select in Advantage Rules in setting) - include the appropriate Talent changes
-- Up in Arms - Critical Damage Tables - (select in Advantage Rules in setting) - include the appropriate Talent changes
+- Up in Arms - Critical Damage Tables - (select in Critical Rules in setting)
 - Up in Arms - New Weapon Qualities - Added to Talent and Quailties Integration.
 - Talent and Quailties Integration - Re-ordered Melee Bonus assister, added Called Shot and Strike to Stun
 
