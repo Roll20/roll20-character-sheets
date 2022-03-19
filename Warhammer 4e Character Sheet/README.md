@@ -73,6 +73,16 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+March 19th 2022 v1.55
+
+- Devmode renamed Talent and Quailties Integration
+- Added official Cubicle 7 Up in Arms rule set support
+- Up in Arms - Group Advantage - (select in Advantage Rules in setting) - include the appropriate Talent changes
+- Up in Arms - Critical Damage Tables - (select in Advantage Rules in setting) - include the appropriate Talent changes
+- Up in Arms - New Weapon Qualities - Added to Talent and Quailties Integration.
+- Talent and Quailties Integration - Re-ordered Melee Bonus assister, added Called Shot and Strike to Stun
+
+
 March 11th 2022 v1.54
 
 - Added official support for Roll20 Dark Mode
