@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.6.1" readonly />
+													<input type="text" class="center" name="attr_version" value="1.6.3" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -8752,6 +8752,15 @@
 		}
 		
 		function writeValues(debug, timer, value, key, result, setObj) {
+			const isUndefined = 
+				key === undefined ? true :
+				key === "" ? true :
+				key.indexOf('undefined') !== -1 ? true :
+				false;
+			if (isUndefined) {
+				clog(debug, timer, 'key is undefined, write cancelled:', key, 'writeValues()');
+				return;
+			}
 			clog(debug, timer, `setObj.${key} =`, result, 'writeValues()');
 			setObj[key] = result;
 			const lowerkey = key.toLowerCase();
@@ -9118,15 +9127,7 @@
 				groupmax = (type == 2) ? (level - groupenhancement) * 10 : 0;
 			setObj[`${source}_groupmax`] = groupmax;
 		}
-		/*
-		function setEffectivePoolLevel(debug, value, source, sourceAttr, setObj) {
-			let poolenhancement = parseInt(value[`${source}_groupmodification`]) || 0,
-				poollevel = parseInt(value[`${source}_grouplevel`]) || 0,
-				effectivelevel = poollevel - poolenhancement;
-			setObj[`${source}_groupelevel`] = effectivelevel;
-			if (debug) { console.log(`[setEffectivePoolLevel(${sourceAttr})] effectivelevel = ${effectivelevel}`); }
-		}
-		*/
+		
 		function setLevelElevation(eventInfo, source, target, setObj) {
 			const level = parseInt(eventInfo.newValue) || 0;
 			if (level == 7) { 
@@ -9170,24 +9171,7 @@
 		function getGroupID(value, sectionName) {
 			return parseInt(value[`static_${sectionName}group_selected_tab`].replace(/\D/ig, '')) || 0;
 		}
-		/*
-		function setDynamicGroupSourceID(debug, timer, eventInfo, value, attrIDs, source, rowID, setObj) {
-			const isDynamicAttr = dymanicGrouRegex.test(value[`${source}_attribute`]);
-			const wasDynamicAttr = dymanicGrouRegex.test(eventInfo.previousValue);
-			const dynamicGroupSourceID = setObj[`repeating_attr_${rowID}_dynamicgroupsource`] || 
-					value[`repeating_attr_${rowID}_dynamicgroupsource`];
-			if (debug) {
-				console.log(`[setDynamicGroupSourceID()] isDynamicAttr = ${isDynamicAttr}`);
-				console.log(`[setDynamicGroupSourceID()] wasDynamicAttr = ${wasDynamicAttr}`);
-				console.log(`[setDynamicGroupSourceID(${rowID})] dynamicGroupSourceID = ${dynamicGroupSourceID}`);
-			}
-			if (isDynamicAttr && dynamicGroupSourceID === undefined) {
-				setObj[`${source}_dynamicgroupsource`] = rowID;
-			} else if (wasDynamicAttr && dynamicGroupSourceID === rowID) {
-				setObj[`${source}_dynamicgroupsource`] = undefined;
-			}
-		}
-		*/
+		
 		function resetOnAlreadyDynamicGroup(debug, timer, eventInfo, value, sectionName, match, source, rowID, setObj) {
 			const attribute = value[`${source}_attribute`];
 			const isDynamicAttr = 
@@ -9208,19 +9192,7 @@
 			clog(debug, timer, debugtext, '','resetOnAlreadyDynamicGroup()]');
 			return result;
 		}
-		/*
-		function setGroupCostByType(debug, value, source, rowID, sourceAttr, setObj) {
-			let type = parseInt(value[`${source}_type`]) || 0,
-				poolcp = parseInt(value[`${source}_poolcp`]),
-				poollevel = parseInt(value[`${source}_grouplevel`]) || 0,
-				attributescost = parseInt(value[`${source}_attributescost`]) || 0,
-				groupcost = (type == 2) ? 10 * poollevel : (type == 3) ? (4 * poollevel) + poolcp : attributescost || 0,
-				poolspent = (type == 3) ? attributescost : 0;
-			setObj[`${source}_groupcost`] = groupcost;
-			setObj[`${source}_groupspent`] = poolspent;
-			if (debug) { console.log(`[setGroupCostByType(${sourceAttr})] groupcost = ${groupcost}`); console.log(`[setGroupCostByType(${sourceAttr})] poolspent = ${poolspent}`); }
-		}
-		*/
+		
 		function setGroupMembership(value, setObj, source, sectionName) {
 			const tab = value[`static_${sectionName}group_selected_tab`];
 			const currGroup = tab.replace(/attrgroup/g, '');
@@ -9273,20 +9245,7 @@
 				return true;
 			} else { return false; }
 		}
-		/*
-		function resetOnPoolLevelNotZero(debug, timer, eventInfo, value, match, source, setObj) {
-			if (eventInfo.sourceType === "sheetworker") return;
-			let level = parseInt(value[`${source}_grouplevel`]),
-				reset = (eventInfo.previousValue == eventInfo.newValue) ? 0 : eventInfo.previousValue;
-			if (level) {
-				if (debug) console.log(`[resetOnPoolLevelNotZero(${match})] can't change Type when Level is greater than 0, exiting`);
-				setObj[`${match}`] = reset;
-				clog(debug, timer, 'setObj:', setObj, 'Changes To Sheet Values', 'info');
-				setAttrs(setObj,{silent:true});
-				return true;
-			} else { return false; }
-		}
-		*/
+		
 		function resetOnNoAttr(debug, timer, timer, eventInfo, value, match, rowID, setObj) {
 			if (eventInfo.sourceType === "sheetworker") return;
 			const attr = value[`repeating_attr_${rowID}_attribute`] || '';
@@ -9299,43 +9258,7 @@
 				return true;
 			} else { return false; }
 		}
-		/*
-		function resetOnActiveGroup(debug, timer, eventInfo, value, match, source, setObj) {
-			if (eventInfo.sourceType === "sheetworker") return;
-			let groupCost = parseInt(value[`${source}_groupcost`]),
-				reset = (eventInfo.previousValue == eventInfo.newValue) ? 1 : eventInfo.previousValue;
-			if (groupCost > 0) {
-				if (debug) console.log(`[resetOnActiveGroup(${match})] can't change Group Type when group Attributes have a level > 0, exiting`);
-				setObj[`${match}`] = reset;
-				clog(debug, timer, 'setObj:', setObj, 'Changes To Sheet Values', 'info');
-				setAttrs(setObj,{silent:true});
-				return true;
-			} else { return false; }
-		}
-		*//*
-		function resetOnActiveFluxGroup(debug, eventInfo, value, match, groupID, attrIDs, setObj) {
-			if (eventInfo.sourceType === "sheetworker") return;
-			var result = false;
-			_.each(attrIDs, (rowID) => {
-				let group = parseInt(value[`repeating_attr_${rowID}_group`]),
-					fluxenable = parseInt(value[`repeating_attr_${rowID}_fluxenable`]),
-					reset = (eventInfo.previousValue == eventInfo.newValue) ? 1 : eventInfo.previousValue;
-				if (fluxenable && group == groupID) {
-					result = true;
-					setObj[`static_attrgroup_${group}_type`] = reset;
-				}
-			});
-			if (result) {
-				if (debug) {
-					console.log(`[resetOnActiveFluxGroup(${match})] can't change Group Type when flux Attributes are active, exiting`);
-					console.log('[Changes To Sheet Values] setObj:'); 
-					console.log(setObj); 
-				}
-				setAttrs(setObj,{silent:true});
-			}
-			return result;
-		}
-		*/
+		
 		function setAttrCostPerLevel(debug, timer, value, rowID, setObj) {
 			let attribute = value[`repeating_attr_${rowID}_attribute`],
 				obj = {
@@ -9535,300 +9458,7 @@
 			clog(debug, timer, 'result =', result, 'getAttrCostPerLevel()');
 			return result;
 		}
-		/*
-		function getBonus(debug, setObj, attribute) {
-			var value = {
-				"absorption": 5,
-				"alternateform": 5,
-				"alternate identity": 1,
-				"armor": 5,
-				"attack mastery": 1,
-				"augmented": 1,
-				"capacity": 0,
-				"change state": 0,
-				"cognition": 2,
-				"combat technique": 1,
-				"companion": 10,
-				"connected": 0,
-				"control environment": 1,
-				"conversion": 1,
-				"data access": 0,
-				"defense mastery": 1,
-				"dimension walk": 0,
-				"dynamic powers": 0,
-				"elasticity": 0,
-				"enemy attack": 2,
-				"enemy defend": 2,
-				"energized": 10,
-				"exorcism": 2,
-				"extra actions": 1,
-				"extra arms": 0,
-				"features": 0,
-				"flight": 0,
-				"forcefield": 10,
-				"gear": 0,
-				"ground speed": 0,
-				"healing": 5,
-				"heightened awareness": 2,
-				"heightened senses": 1,
-				"illusion": 0,
-				"immunity": 0,
-				"immutable": 2,
-				"inspire": 1,
-				"jumping": 0,
-				"massive damage": 1,
-				"melee attack": 2,
-				"melee defense": 2,
-				"merge": 10,
-				"metamorphosis": 5,
-				"mimic": 1,
-				"mind control": 0,
-				"mind shield": 2,
-				"minions": 0,
-				"mulligan": 2,
-				"nullify": 1,
-				"plant control": 0,
-				"pocket dimension": 0,
-				"portal": 1,
-				"projection": 0,
-				"ranged attack": 2,
-				"ranged defense": 2,
-				"regeneration": 5,
-				"reincarnation": 0,
-				"resilient": 1,
-				"sensory block": 1,
-				"shield": 5,
-				"sixth sense": 1,
-				"size change": 1,
-				"skill": 0,
-				"spaceflight": 0,
-				"special movement": 1,
-				"summon creatures": 0,
-				"supersense": 0,
-				"superspeed": 0,
-				"superstrength": 0,
-				"swarm": 0,
-				"telekinesis": 0,
-				"telepathy": 0,
-				"teleport": 0,
-				"tough": 10,
-				"transfer": 1,
-				"transmute": 5,
-				"tunneling": 0,
-				"unaffected": -2,
-				"undetectable": 1,
-				"unique attribute": 0,
-				"unknown power": 0,
-				"water speed": 0,
-				"wealth": 0,
-				"weapon": 1,
-				"default": 0
-			},
-				result = (value[attribute] || 0);
-			if (debug) console.log(`[getBonus()] result = ${result}`);
-			return result;
-		}
-		*//*
-		function getFastValue(debug, newValue) {
-			var value = {
-				0: 0,
-				1: 1,
-				2: 10,
-				3: 100,
-				4: 1,
-				5: 10,
-				6: 100,
-				7: 1,
-				8: 10,
-				9: 100,
-				10: 1,
-				11: 10,
-				12: 100,
-				13: 1,
-				14: 10,
-				15: 100,
-				16: 1
-			},
-				result = (value[newValue] || 0);
-			if (debug) console.log(`[getFastValue()] result = ${result}`);
-			return result;
-		}
 		
-		function getFastUnit(debug, newValue) {
-			var value = {
-				0: "",
-				1: "",
-				2: "",
-				3: "",
-				4: " k",
-				5: " k",
-				6: " k",
-				7: " M",
-				8: " M",
-				9: " M",
-				10: " B",
-				11: " B",
-				12: " B",
-				13: " T",
-				14: " T",
-				15: " T",
-				16: " Q"
-			},
-				result = (value[newValue] || "");
-			if (debug) console.log(`[getFastUnit()] result = ${result}`);
-			return result;
-		}
-		
-		function getMediumValue(debug, newValue) {
-			var value = {
-				0: 0,
-				1: 1,
-				2: 3,
-				3: 10,
-				4: 30,
-				5: 100,
-				6: 300,
-				7: 1,
-				8: 3,
-				9: 10,
-				10: 30,
-				11: 100,
-				12: 300,
-				13: 1,
-				14: 3,
-				15: 10,
-				16: 100
-			},
-				result = (value[newValue] || 0);
-			if (debug) console.log(`[getMediumValue()] result = ${result}`);
-			return result;
-		}
-		
-		function getMediumUnit(debug, newValue) {
-			var value = {
-				0: "",
-				1: "",
-				2: "",
-				3: "",
-				4: "",
-				5: "",
-				6: "",
-				7: " k",
-				8: " k",
-				9: " k",
-				10: " k",
-				11: " k",
-				12: " k",
-				13: " M",
-				14: " M",
-				15: " M",
-				16: " M"
-			},
-				result = (value[newValue] || "");
-			if (debug) console.log(`[getMediumUnit()] result = ${result}`);
-			return result;
-		}
-		
-		function getSlowValue(debug, newValue) {
-			var value = {
-				0: 0,
-				1: 1,
-				2: 2,
-				3: 4,
-				4: 8,
-				5: 15,
-				6: 30,
-				7: 60,
-				8: 125,
-				9: 250,
-				10: 500,
-				11: 1,
-				12: 2,
-				13: 4,
-				14: 8,
-				15: 15,
-				16: 30
-			},
-				result = (value[newValue] || 0);
-			if (debug) console.log(`[getSlowValue()] result = ${result}`);
-			return result;
-		}
-		
-		function getSlowUnit(debug, newValue) {
-			var value = {
-				0: "",
-				1: "",
-				2: "",
-				3: "",
-				4: "",
-				5: "",
-				6: "",
-				7: "",
-				8: "",
-				9: "",
-				10: "",
-				11: " k",
-				12: " k",
-				13: " k",
-				14: " k",
-				15: " k",
-				16: " k"
-			},
-				result = (value[newValue] || "");
-			if (debug) console.log(`[getSlowUnit()] result = ${result}`);
-			return result;
-		}
-		
-		function getTimeValue(debug, newValue) {
-			var value = {
-				0: 0,
-				1: 1,
-				2: 5,
-				3: 1,
-				4: 10,
-				5: 1,
-				6: 4,
-				7: 12,
-				8: 1,
-				9: 1,
-				10: 1,
-				11: 1,
-				12: 1,
-				13: 10,
-				14: 100,
-				15: 1000,
-				16: 0
-			},
-				result = (value[newValue] || 0);
-			if (debug) console.log(`[getTimeValue()] result = ${result}`);
-			return result;
-		}
-		
-		function getTimeUnit(debug, newValue) {
-			var value = {
-				0: "",
-				1: " round",
-				2: " rounds",
-				3: " minute",
-				4: " minutes",
-				5: " hour",
-				6: " hours",
-				7: " hours",
-				8: " day",
-				9: " week",
-				10: " month",
-				11: " season",
-				12: " year",
-				13: " years",
-				14: " years",
-				15: " years",
-				16: "Permanent"
-			},
-				result = (value[newValue] || "");
-			if (debug) console.log(`[getTimeUnit()] result = ${result}`);
-			return result;
-		}
-		*/
 		function setDefectCharacteristic(debug, timer,attrdb, value, rowID, setObj){
 			const defect = value[`repeating_attr_${rowID}_defect`];
 			const defectid = removeWhiteSpace(defect);
@@ -10202,7 +9832,7 @@
 		}
 		
 		function getShieldParryBonus(debug, timer, value, rowID) {
-			const parry = getCustomizationValue(debug, timer, value, rowID, 'value', 'parry');
+			const parry = getCustomizationValue(debug, timer, value, rowID, 'rank', 'parry');
 			const result = (parry.rank == 2) ? `; Major Egde Parry` : 
 				(parry.rank == 1) ? '; Minor Edge Parry' : '';
 			clog(debug, timer, 'result =', result, 'getShieldParryBonus()');
@@ -11092,8 +10722,8 @@
 				clog(debug, timer, 'attrstate =', attrstate);
 			}
 			if (attr == `armor`) {
-				const specialized = (isActive) ? parseInt(getCustomizationValue(debug, timer, value, rowID, 'rank', "specialized")) : 0,
-					gap = (isActive) ? parseInt(getCustomizationValue(debug, timer, value, rowID, 'rank', "gap")) : 0,
+				const specialized = (isActive) ? getCustomizationValue(debug, timer, value, rowID, 'rank', "specialized") : 0,
+					gap = (isActive) ? getCustomizationValue(debug, timer, value, rowID, 'rank', "gap") : 0,
 					damagetype = (isActive) ? value[`repeating_attr_${rowID}_damagetype`] : "";
 				setObj[`protection_${attr}${layer}_specialized`] = specialized;
 				setObj[`protection_${attr}${layer}_gap`] = gap;
@@ -11103,7 +10733,7 @@
 				clog(debug, timer, 'gap =', gap);
 			}
 			if (attr == `forcefield`) {
-				const impacting = (isActive) ? parseInt(getCustomizationValue(debug, timer, value, rowID, 'rank', "impacting")) : 0;
+				const impacting = (isActive) ? getCustomizationValue(debug, timer, value, rowID, 'rank', "impacting") : 0;
 				setObj[`protection_${attr}_impacting`] = impacting;
 				clog(debug, timer, 'impacting =', impacting);
 			}
@@ -11116,7 +10746,7 @@
 				clog(debug, timer, 'capped =', capped);
 			}
 			if (attr == `conversion` && type == 1) {
-				const escalate = (isActive) ? parseInt(getCustomizationValue(debug, timer, value, rowID, 'rank', "escalate")) : 0;
+				const escalate = (isActive) ? getCustomizationValue(debug, timer, value, rowID, 'rank', "escalate") : 0;
 				setObj[`protection_${attr}_escalate`] = escalate;
 				clog(debug, timer, 'escalate =', escalate);
 			}
@@ -11344,39 +10974,7 @@
 			setObj[`${type}`] = result;
 			clog(debug, timer, `${type}`, result, 'setExtraActions()');
 		}
-		/*
-		function getCombatTechniques(debug, customizations) {
-			var result = [];
-			const combattechniques = ['blackout', 'brutal', 'criticalstrike', 'enhancedknockback', 'extendedrange', 'lethalblow'];
-			_.each(combattechniques, (technique) => {
-				let lookup = getCustomizationExists(technique, customizations) || { name: technique, value: 0 };
-				if (lookup.value > 0) result[result.length] = { name: lookup.name, value: lookup.value };
-			});
-			if (debug) { console.log(`[getCombatTechniques()] result:`); console.log(result); }
-			return result;
-		}
-		*//*
-		function getSubAttrs(debug, customizations, attribute) {
-			console.log(`[getSubAttrs(TEST)] customizations:`); console.log(customizations);
-			const subattrs =
-				attribute == "combattechnique" ? combattechniques_array
-				:
-				attribute == "heightenedsenses" ? [
-					`heightenedsight`, `heightenedhearing`, `heightenedtouch`, `heightenedsmell`,
-					`heightenedtaste`
-				] :
-			[];
-			console.log(`[getSubAttrs(TEST)] subattrs:`); console.log(subattrs);
-			const result = _.chain(subattrs)
-				.map(o => {
-					return getCustomizationExists(o, customizations) || null;
-				})
-				.compact()
-				.value();
-			if (debug) { console.log(`[getSubAttrs(${attribute})] result:`); console.log(result); }
-			return result;
-		}
-		*/
+		
 		function getSumOfActiveSubAttrRanks(attrdb, attribute, subattr) {
 			var result = 0;
 			_.each(attrdb[`${attribute}`], (o) => {
@@ -11400,18 +10998,7 @@
 			});
 			return result;
 		}
-		/*
-		function setHeightenedSensesLevels(attrdb, setObj) {
-			const senses = ['heightenedsenses', 'heightenedsight', 'heightenedhearing',
-				'heightenedtouch', 'heightenedsmell', 'heightenedtaste'];
-			const display = ['enhancedsighttab', 'enhancedhearingtab', 'enhancedtouchtab',
-					'enhancedsmelltab', 'enhancedtastetab'];
-			_.each(senses, (sense, i) => {
-				const heightenedsense = attrdb.heightenedsenses[`${sense}`];
-				setObj[`${display[i]}`] = heightenedsense.rank;
-			});
-		}
-		*/
+		
 		function setDefectdb(isActive, debug, timer, attrdb, value, rowID, setObj){
 			var defectdb = attrdb.defect;
 			const defect = removeWhiteSpace(value[`repeating_attr_${rowID}_defect`]);
@@ -11585,43 +11172,7 @@
 			}
 			clog(debug, timer, 'attrdb:', attrdb, 'setAttrdb()');
 		}
-		/*
-		function getUndetectableCharacteristic(debug, timer, value, rowID, setObj) {
-			var methods = [];
-			const customizations = 
-				setObj[`repeating_attr_${rowID}_customizations`] || 
-				value[`repeating_attr_${rowID}_customizations`] || [];
-			_.each(customizations, (customization) => {
-				if (undetectable_methods_array.indexOf(customization.name) !== -1 && customization.value == 1) {
-					methods[methods.length] = capital(customization.name);
-				}
-			});
-			if (methods.length > 0) methods.join(', ');
-			if (debug) console.log(`[getUndetectableCharacteristic()] methods = ${methods}`);
-			console.log(setObj);
-			return methods;
-		}
-		*//*
-		function setArmWeaponName(debug, value, rowID, sourceAttr) {
-			let weapon = value[`repeating_attr_${rowID}_name`] || "";
-			if (debug) console.log(`[setArmWeapon(${sourceAttr})] weapon = ${weapon}`);
-			return weapon;
-		}
-		*//*
-		function setArmWeaponClass(debug, timer, value, rowID) {
-			const wpnclass = 
-				getCustomizationValue(debug, timer, value, rowID, 'rank', "wpnclass") || "";
-			clog(debug, timer, 'wpnclass =', wpnclass, 'setArmWeaponClass()');
-			return wpnclass;
-		}
-		*//*
-		function setArmDamageType(debug, value, rowID, sourceAttr) {
-			let type = value[`repeating_attr_${rowID}_damagetype`] || "";
-			if (type != "") type = capital(type);
-			if (debug) console.log(`[setArmDamageType(${sourceAttr})] type = ${type}`);
-			return type;
-		}
-		*/
+		
 		function getIsMelee(debug, timer, wpnclass) {
 			const melee_types_array = ['exotic','hafted','hilted','polearm','unarmed'];
 			const result = melee_types_array.indexOf(wpnclass) !== -1 ? 1 : 0;
@@ -11644,54 +11195,7 @@
 			clog(debug, timer, 'result =', result, 'getAttackMod()');
 			return result;
 		}
-		/*
-		function setArmACV(debug, timer, value, attrIDs, rowID, sourceAttr) {
-			let accuracy = getCustomizationValue(debug, timer, value, rowID, 'rank', "accuracy") || 0,
-				inacurracy = getCustomizationValue(debug, timer, value, rowID, 'rank', "inacurracy") || 0,
-				acv = parseInt(value.stat_total_acv),
-				wpnclass = getCustomizationValue(debug, timer, value, rowID, 'rank', "wpnclass") || "",
-				attackmod = getAttackMod(debug, timer, value, attrIDs, wpnclass, sourceAttr),
-				result = accuracy + inacurracy + acv + attackmod;
-			if (debug) console.log(`[setArmACV(sourceAttr)] result = ${result}`);
-			return result;
-		}
-		*//*
-		function setCV(debug, value, sourceAttr) {
-			let body = parseInt(value.body),
-				mind = parseInt(value.mind),
-				soul = parseInt(value.soul),
-				cv = Math.round((body + mind + soul) / 3);
-			if (debug) console.log(`[setCV(sourceAttr)] cv = ${cv}`);
-			return cv;
-		}
-		*//*
-		function getDefenseMod(debug, timer, value, attrIDs, wpnclass, sourceAttr) {
-			var result = 0,
-				ismelee = getIsMelee(debug, timer, wpnclass);
-			if (ismelee) {
-				_.each(attrIDs, (rowID) => {
-					let match = getCustomizationValue(debug, timer, value, rowID, 'rank', "mdclass");
-					if (wpnclass == match) {
-						let active = parseInt(value[`repeating_attr_${rowID}_activate`]);
-						if (active) result = result + parseInt(value[`repeating_attr_${rowID}_level`]);
-					}
-				});
-			}
-			if (debug) console.log(`[getDefenseMod(sourceAttr)] result = ${result}`);
-			return result;
-		}
-		*//*
-		function setArmDCV(debug, timer, value, attrIDs, rowID, sourceAttr) {
-			let defense = getCustomizationValue(debug, timer, value, rowID, 'rank', "defense") || 0,
-				unbalanced = getCustomizationValue(debug, timer, value, rowID, 'rank', "unbalanced") || 0,
-				dcv = value.stat_total_dcv,
-				wpnclass = getCustomizationValue(debug, timer, value, rowID, 'rank', "wpnclass") || "",
-				defensemod = getDefenseMod(debug, timer, value, attrIDs, wpnclass, sourceAttr),
-				result = defense + unbalanced + dcv + defensemod;
-			if (debug) console.log(`[setArmDCV(sourceAttr)] result = ${result}`);
-			return result;
-		}
-		*/
+		
 		function getSumOfActiveAttrLevels(attrdb, attribute, focus = '') {
 			var result = 0;
 			_.each(attrdb[`${attribute}`], (o) => {
@@ -11703,50 +11207,18 @@
 			});
 			return result;
 		}
-		/*
-		function setArmDamage(debug, timer, value, attrIDs, rowID, sourceAttr) {
-			let damage = parseInt(value[`repeating_attr_${rowID}_level`]) || 0,
-				wpnclass = getCustomizationValue(debug, timer, value, rowID, 'rank', "wpnclass") || "",
-				massivedamage = getMassiveDamage(debug, value, attrIDs, wpnclass, sourceAttr) || 0,
-				superstrength = getSuperStrength(debug, value, attrIDs, rowID, sourceAttr) || 0,
-				acv = parseInt(value.stat_total_acv);
-			damage = damage * (5 + massivedamage + superstrength) + acv;
-			if (debug) console.log(`[setArmDamage(sourceAttr)] damage = ${damage}`);
-			return damage;
-		}
-		*//*
-		function getAttrIDs(debug, value, attrIDs, sourceAttr, attribute) {
-			var result = [];
-			_.each(attrIDs, (rowID) => {
-				let attr = value[`repeating_attr_${rowID}_attribute`];
-				if (attr == attribute) result[result.length] = rowID;
-			});
-			if (debug) { console.log(`[getAttrID(sourceAttr)] result:`); console.log(result); }
-			return result;
-		}
 		
-		function getHasTwoWeapon(debug, timer, value, attrIDs, sourceAttr) {
-			var result = false;
-			let combattechnique = getAttrIDs(debug, value, attrIDs, sourceAttr, "combat technique");
-			_.each(combattechnique, (rowID) => {
-				let hasTwoWeapon = getCustomizationValue(debug, timer, value, rowID, 'rank', "twoweapon") || 0;
-				if (hasTwoWeapon) result = true;
-			});
-			if (debug) console.log(`[getHasTwoWeapon(sourceAttr)] result = ${result}`);
-			return result;
-		}
-		*/
 		function setArms(debug, timer, value, rowID, setObj, name, isActive, hand) {
 			const extraarmIDs = value.extraarmIDs;
 			const handsource = getHandSource(debug, timer, extraarmIDs, hand);
 			const source = setObj[`repeating_attr_${rowID}_source`];
 			if (isActive) {
 				setObj[`${handsource}_name`] = name;
-				setObj[`${handsource}_source`] = rowID;
+				writeValues(debug, timer, value, `${handsource}_source`, rowID, setObj);
 				if (source === undefined || source === '') {
 					setObj[`repeating_attr_${rowID}_source`] = hand;
 				} else {
-					let twohanded = source + ',' + hand;
+					const twohanded = `${source},${hand}`;
 					setObj[`repeating_attr_${rowID}_source`] = twohanded;
 				}
 			} else {
@@ -11770,9 +11242,10 @@
 		
 		function setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute) {
 			const name = value[`repeating_attr_${rowID}_name`] || "";
-			const hands = attribute == 'telekinesis' || attribute == 'swarm' ? 0 :
-					getCustomizationValue(debug, timer, value, rowID, 'rank', 'hands') ? 2 :
-					getCustomizationValue(debug, timer, value, rowID, 'rank', 'nohands') ? 0 : 1;
+			const hands = 
+				attribute === 'telekinesis' || attribute === 'swarm' ? 0 :
+				getCustomizationValue(debug, timer, value, rowID, 'rank', 'hands') ? 2 :
+				getCustomizationValue(debug, timer, value, rowID, 'rank', 'nohands') ? 0 : 1;
 			const mainsource = value.mainhand_source || "";
 			const offsource = value.offhand_source || "";
 			switch (hands) {
@@ -11780,38 +11253,47 @@
 					if (isActive) {
 						const extraarmID = generateRowID();
 						setArms(debug, timer, value, rowID, setObj, name, true, extraarmID);
-						setObj[`repeating_extraarm_${extraarmID}_type`] = 0;
-						setObj[`repeating_extraarm_${extraarmID}_label`] = capital(attribute);
+						extraarmIDs.push(extraarmID.toLowerCase());
+						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_state`, 0, setObj);
+						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_type`, 0, setObj);
+						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_name`, name, setObj);
+						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_label`, capital(attribute), setObj);
 					} else {
-						var source = setObj[`repeating_attr_${rowID}_source`] || 
-							value[`repeating_attr_${rowID}_source`] || "";
-						var result = (source.length > 0) ? source.toLowerCase() : source;
-						if (result.indexOf(',') > 0) {
+						let source = 
+							setObj[`repeating_attr_${rowID}_source`] || 
+							value[`repeating_attr_${rowID}_source`] || 
+							"";
+						let result = source !== "" ? source.toLowerCase() : source;
+						if (result.indexOf(',') !== -1) {
 							source = source.split(',');
 							result = result.split(',');
 							const mountid = _.intersection(result, extraarmIDs);
-							_.find(result, (c, i, extraarmIDs) => {
-								_.find(extraarmIDs, (id) => {
-									if (c == id) {
-										source.splice(i, 1).toString();
-										setObj[`repeating_attr_${rowID}_source`] = source;
-										return true;
-									}
-								});
-							});
+							source = source.splice(source.indexOf(mountid), 1).toString();
+							writeValues(debug, timer, value, `repeating_attr_${rowID}_source`, source, setObj);
 							result = mountid.toString();
 						}
 						removeRepeatingRow(`repeating_extraarm_${result}`);
+						extraarmIDs.splice(extraarmIDs.indexOf(result), 1);
+						value.extraarmIDs = extraarmIDs;
 					}
 				break;
 				case 1: //single handed
 					if (isActive) {
 						const extrahands = _.chain(extraarmIDs)
-							.each((handID, i) => {
-								if (parseInt(value[`repeating_extraarm_${handID}_type`]) == 0 || 
-									value[`repeating_extraarm_${handID}_source`].length > 0) {
-										delete handID[i];
+							/*	
+							.each((id, i) => {
+								if (parseInt(value[`repeating_extraarm_${id}_type`]) == 0 || 
+									value[`repeating_extraarm_${id}_source`].length > 0) {
+										delete id[i];
 								}
+							})
+							*/
+							.map(id => {
+								const availableHand =
+									parseInt(value[`repeating_extraarm_${id}_type`]) === 0 ? '' :
+									value[`repeating_extraarm_${id}_source`].length > 0 ? '' :
+									id;
+								return availableHand;
 							})
 							.compact()
 							.value();
@@ -11870,11 +11352,20 @@
 				case 2: //two-handed
 					if (isActive) {
 						const extrahands = _.chain(extraarmIDs)
+							/*
 							.each((handID, i) => {
 								if (parseInt(value[`repeating_extraarm_${handID}_type`]) == 0 || 
 									value[`repeating_extraarm_${handID}_source`].length > 0) {
 										delete handID[i];
 								}
+							})
+							*/
+							.map(id => {
+								const availableHand =
+									parseInt(value[`repeating_extraarm_${id}_type`]) === 0 ? '' :
+									value[`repeating_extraarm_${id}_source`].length > 0 ? '' :
+									id;
+								return availableHand;
 							})
 							.compact()
 							.value();
@@ -11961,9 +11452,11 @@
 			} else {
 				const source = setObj[`repeating_attr_${rowID}_source`] || value[`repeating_attr_${rowID}_source`] || "";
 				setObj[`repeating_attr_${rowID}_source`] = "";
-				if(source.length>0) removeRepeatingRow(`${target}_${source}`);
-				clog(debug, timer, 'target =', target);
-				clog(debug, timer, 'source =', source);
+				if(source.length>0) {
+					const rowString = `${target}_${source.toLowerCase()}`;
+					clog(debug, timer, 'rowString =', rowString);
+					removeRepeatingRow(rowString);
+				}
 			}
 		}
 		
@@ -12358,7 +11851,9 @@
 			const match = customizations.find((o) => {
 				if (o.name === customization) return true;
 			});
-			const result = match === undefined ? 0 : match[`${type}`];
+			const result = match === undefined ? 0 : 
+				type === 'rank'	? parseInt(match[`${type}`]) :
+				match[`${type}`];
 			clog(debug, timer, `${customization} ${type} =`, result, 'getCustomizationValue()');
 			return result;
 		}
@@ -12446,22 +11941,7 @@
 			clog(debug, timer, 'effectivelevel =', effectivelevel, 'setEffectiveLevelByCustomization()');
 			setObj[`repeating_attr_${rowID}_effectivelevel`] = effectivelevel;
 		}
-		/*
-		function setEnhancement(debug, eventInfo, value, rowID, enhancement, setObj) {
-			let enhancements = value[`repeating_attr_${rowID}_enhancements`] || [];
-			const cust = getCustomizationExists(customization, customizations);
-			if (cust) {
-				let obj = customizations.find((o, i) => {
-					if (o.name === customization) {
-						customizations[i] = { name: customization, value: eventInfo.newValue };
-						return true;
-					}
-				});
-			} else { customizations[customizations.length] = { name: customization, value: eventInfo.newValue }; }
-			setObj[`repeating_attr_${rowID}_customizations`] = customizations;
-			if (debug) { console.log(`[getCustomization(${customization})] customizations:`); console.log(customizations); }
-		}
-		*/
+		
 		function setDamageType(debug, timer, source, sourceAttr, setObj) {
 			//const hasDamageType = /(weapon|armor)/i.test(`${sourceAttr}`);
 			const weapon_or_armor_array = ['weapon','armor'];
@@ -12471,13 +11951,7 @@
 			setObj[`${source}_damagetypeenable`] = setDamageType;
 			clog(debug, timer, 'setDamageType', setDamageType,'setDamageType()');
 		}
-		/*
-		function getIsDefense(debug, timer, maneuver, sourceAttr) {
-			let result = /(defend|nothing|escape)/i.test(maneuver);
-			if (debug) console.log(`[getIsDefense(${sourceAttr})] result = ${result}`);
-			return result;
-		}
-		*/
+		
 		function getCV(debug, timer, value, attrdb, setObj, sourceAttr, type, focus = 'unarmed', invertState = false) {
 			const mastery = 
 				(type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'attackmastery') :
@@ -12535,7 +12009,7 @@
 			const state = parseInt(setObj[`${rowID}_state`]) || 0;
 			const result = state > 0 ? value[`${rowID}_source`] : '';
 			setObj.active_weapon = result;
-			clog(debug, timer, `${result} =`, state, 'setActiveWeapon()');
+			clog(debug, timer, 'source =', result, 'setActiveWeapon()');
 		}
 		
 		function getIsGrappling(maneuver) {
@@ -13546,8 +13020,8 @@
 		function disableActiveWeapon(debug, timer, value, rowID, setObj) {
 			const attribute = value[`repeating_attr_${rowID}_attribute`];
 			if (attribute !== 'weapon') return;
-			const activeweapon = value.active_weapon;
-			recordAmmoState(debug, timer, value, setObj);
+			const activeweapon = value.active_weapon || 'empty';
+			if (activeweapon.length === 20) recordAmmoState(debug, timer, value, setObj);
 			setObj.weapon_range = 0;
 			setObj.weapon_ammo_autofire = 0;
 			setObj.weapon_ammo = 0;
@@ -13592,9 +13066,8 @@
 		}
 		
 		function getHandSource(debug, timer, extraarmIDs, rowID){
-			const handsource = ///(mainhand|offhand)/i.test(rowID) ? 
-				hands_array.indexOf(rowID) !== -1 ? rowID : 
-				extraarmIDs.indexOf(rowID) !== -1 ? `repeating_extraarm_${rowID}` : '';
+			const handsource = /(mainhand|offhand)/i.test(rowID) ? 
+				rowID : `repeating_extraarm_${rowID}`;
 			const handscheck = handsource !== '' ? handsource.indexOf(',') > 0 ? 
 				handsource.split(',') : handsource : false;
 			const result = handscheck !== false ? _.isArray(handscheck) ? 
@@ -13604,16 +13077,21 @@
 		}
 		
 		function setWeaponStates(debug, timer, extraarmIDs, value, rowID, setObj) {
-			const armedID = setObj[`${rowID}_source`] ||
-				value[`${rowID}_source`] || '';
+			const armedID = 
+				setObj[`${rowID}_source`] ||
+				value[`${rowID}_source`];
 			const handsArray = buildHandsArray(debug, timer, extraarmIDs);
-			const handsStateArray = _.map(handsArray, hand => {
-				const source = value[`${hand}_source`];
-				const state = parseInt(value[`${hand}_state`]);
-				const handstate = source == armedID ?
-					state == 0 ? 1 : 0 : 0;
-				return handstate;
-			});
+			const handsStateArray = 
+				_.map(handsArray, hand => {
+					const source = setObj[`${hand}_source`] || value[`${hand}_source`];
+					const state = parseInt(setObj[`${hand}_state`]) || parseInt(value[`${hand}_state`]);
+					const isExtraArm = extraarmIDs.indexOf(hand) !== -1 ? true : false;
+					const extraArmType = parseInt(value[`${hand}_type`]) || false;
+					const isWeaponMount = isExtraArm && extraArmType === 0 ? true : false;
+					const handstate = source == armedID ?
+							state == 0 ? 1 : 0 : 0;
+					return handstate;
+				});
 			clog(debug, timer, 'handsStateArray:', handsStateArray, 'setWeaponStates()');
 			_.each(handsArray, (hand, i) => {
 				setObj[`${hand}_state`] = handsStateArray[i];
@@ -13715,8 +13193,6 @@
 		}
 		
 		function setSkillRoll(debug, timer, value, source, rowID, sourceAttr, level, setObj, type) {
-			clog(debug, timer, 'level =', level, 'setSkillRoll(TEST)');
-			clog(debug, timer, 'source =', source);
 			const base = getStatRollBase(debug, timer, value, sourceAttr, setObj, type, source);
 			const roll = getRollString(debug, timer, 'rolls', 'skillroll', 'Skill Roll', base + level);
 			setObj[`repeating_skill_${rowID}_skillrollvalue`] = roll;
@@ -13745,7 +13221,6 @@
 		}
 		
 		function updateSkillRolls(debug, timer, value, skillIDs, sourceAttr, setObj) {
-			clog(debug, timer, 'sourceAttr =', sourceAttr, 'updateSkillRolls(TEST)');
 			const type = getStatType(value);
 			_.each(skillIDs, id => {
 				const source = `repeating_skill_${id}`;
@@ -13852,15 +13327,12 @@
 		function createSkill(debug, timer, value, skillmap, rowID, setObj){
 			const json = JSON.parse(global_templates_skills_json);
 			const skills = json.template;
-			clog(debug, timer, 'rowID =', rowID, 'creatSkill(TEST)')
 			const skillmatch = 
 				_.find(skillmap, s => {
-					clog(debug, timer, 'skillmap.s:', s);
 					if (s[rowID] !== undefined) return true;
 				});
 			const skill = 
 				_.find(skills, s => {
-					clog(debug, timer, 'skills.s:', s);
 					if (s.name === skillmatch[rowID]) return true;
 				});
 			const group = getGroupID(value, 'skill');
@@ -13874,7 +13346,6 @@
 			const skillID = generateRowID();
 			const type = getStatType(value);
 			_.each(statarray,stat=>{
-				//setObj[`repeating_skill_${skillID}_${stat}state`] = 1;
 				writeValues(debug, timer, value, `repeating_skill_${skillID}_${stat}state`, 1 , setObj);
 			});
 			const stats = type.major==1 ? statmajor: statallaspect;
@@ -13888,38 +13359,11 @@
 				.value();
 			const base = Math.round(sum / stats.length);
 			const roll = `&{template:besmDefault} {{rolls=1}} {{skillroll=1}} {{title=Skill Roll}} {{character_name=@{charactername}}} {{pronoun=@{pronoun}}} {{skill=${name}}} {{level=0}} {{base=${base}}} {{total=[[ [[?{Roll is|Normal, 2d6|Minor Edge, 3d6kh2|Minor Obstacle, 3d6kl2|Major Edge, 4d6kh2|Major Obstacle, 4d6kl2}]] + [[${base}]] ]]}} {{roll=$[[0]]}}`;
-			clog(debug, timer, "name =", name, "createSkill()");
-			clog(debug, timer, "group =", group);
-			clog(debug, timer, "costperlevel =", cost);
-			clog(debug, timer, "specializations =", specializations);
-			clog(debug, timer, "statallaspect =", statallaspect);
-			clog(debug, timer, "statmajor =", statmajor);
 			const skill_attributes = ['group','name','skillspecilizations','majorstats','minorstats','stat','skillrollvalue'];
 			const skill_attributes_values = [group, name, specializations, type.major, type.minor, getSkillStatsDisplay(stats), roll];
 			_.each(skill_attributes, (a,i) => {
 				writeValues(debug, timer, value, `repeating_skill_${skillID}_${a}`, skill_attributes_values[i], setObj);
 			});
-			/*
-			setObj[`repeating_skill_${skillID}_group`] = group;
-			setObj[`repeating_skill_${skillID}_name`] = name;
-			setObj[`repeating_skill_${skillID}_costperlevel`] = cost;
-			setObj[`repeating_skill_${skillID}_skillspecilizations`] = specializations;
-			setObj[`repeating_skill_${skillID}_majorstats`] = type.major;
-			setObj[`repeating_skill_${skillID}_minorstats`] = type.minor;
-			setObj[`repeating_skill_${skillID}_stat`] = getSkillStatsDisplay(stats);
-			setObj[`repeating_skill_${skillID}_skillrollvalue`] = roll;
-			
-			
-			value[`repeating_skill_${id}_group`] = group;
-			value[`repeating_skill_${id}_name`] = name;
-			value[`repeating_skill_${id}_costperlevel`] = cost;
-			value[`repeating_skill_${id}_skillspecilizations`] = specializations;
-			value[`repeating_skill_${id}_majorstats`] = type.major;
-			value[`repeating_skill_${id}_minorstats`] = type.minor;
-			value[`repeating_skill_${id}_stat`] = getSkillStatsDisplay(stats);
-			value[`repeating_skill_${id}_skillrollvalue`] = roll;
-			*/
-			//const id = skillID.toLowerCase();
 			value.skillIDs = value.skillIDs.push(skillID.toLowerCase());
 			setObj.skillmanagement = 0;
 		}
@@ -14327,7 +13771,6 @@
 										if (handstate) {
 											setWeaponAmmo(debug, timer, attrdb, value, handsource, setObj);
 										}
-										
 										setGroupDefectPointsOnActivation(debug, timer, attrIDs, attrdb, value, sectionName, rowID, setObj);
 									break;
 									case `lock`:
