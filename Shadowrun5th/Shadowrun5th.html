@@ -9707,7 +9707,7 @@ Click again to switch to Manual and Remote">
                                     <input type="number" name="attr_dronedamagep" value="0" title="How much pyhsical Damage the drone took">
                                 </div>
                                 <div class="dronedmginput">
-                                    <input type="number" name="attr_dronedamageprem" value="12+ceil(@{dronebody}/2)-@{dronedamagep}" title="How much physical Damage remaining" disabled="true">
+                                    <input type="number" name="attr_dronedamageprem" value="6 + ceil(@{dronebody}/2)-@{dronedamagep}" title="How much physical Damage remaining" disabled="true">
                                 </div>
                             </div>
                             <div class="dronedmgmatrix">
@@ -9715,7 +9715,7 @@ Click again to switch to Manual and Remote">
                                     <input type="number" name="attr_dronedamagem" value="0" title="How much Matrix Damage the drone took">
                                 </div>
                                 <div class="dronedmginput">
-                                    <input type="number" name="attr_dronedamagemrem" value="8+ceil(@{dronepilot}/2)-@{dronedamagem}" title="How much Matrix Damage remaining" disabled="true">
+                                    <input type="number" name="attr_dronedamagemrem" value="8 + ceil(@{dronepilot}/2)-@{dronedamagem}" title="How much Matrix Damage remaining" disabled="true">
                                 </div>
                             </div>
                         </div>
@@ -13052,7 +13052,7 @@ Click again to switch to Manual and Remote">
             </label>
             <label>
                 <input class="experimental-checkbox" type="checkbox" name="attr_nightly">
-                Enable additional imports which use Chummer nightly only features (cyberware armor)
+                Enable additional imports which use Chummer nightly only features (currently none)
             </label>
         </div>
         <div class="experimental">
@@ -14634,7 +14634,7 @@ async function importEnhancementTab(text, chummerfile) {
                     attributes["repeating_ware_"+newrowid+"_waregrade"]=chummerfile.characters.character.cyberwares.cyberware[i].grade;
                     attributes["repeating_ware_"+newrowid+"_warekarma"]=chummerfile.characters.character.cyberwares.cyberware[i].ess;
                     essence += Number(chummerfile.characters.character.cyberwares.cyberware[i].ess.replace(",","."));
-                    importCyberwareArmor(text.nightly, chummerfile.characters.character.cyberwares.cyberware[i], attributes)
+                    importCyberwareArmor(chummerfile.characters.character.cyberwares.cyberware[i], attributes)
                 }
             }else{
                 var newrowid=generateRowID();
@@ -14961,7 +14961,7 @@ async function importEquipmentTab(experimental, chummerfile) {
         ammunition = [];
         if(chummerfile.characters.character.gears != null) {
             for( var j = 0; j < chummerfile.characters.character.gears.gear.length; j++) {
-                if(chummerfile.characters.character.gears.gear[j].category_english == "Ammunition" ||
+                if(chummerfile.characters.character.gears.gear[j].category_english.includes("Ammunition") ||
                     chummerfile.characters.character.gears.gear[j].name_english == "Micro Flares"
                 ){
                     ammunition.push(chummerfile.characters.character.gears.gear[j]);
@@ -15546,10 +15546,7 @@ async function importSingleArmor(armor, attributes) {
     }
 }
 
-async function importCyberwareArmor(nightly, cyberware, attributes) {
-    if(nightly != "on") {
-        return;
-    }
+async function importCyberwareArmor(cyberware, attributes) {
 
     var cyberwareEnhancements = [];
     if(cyberware.children != null && cyberware.children.cyberware.length > 1) {

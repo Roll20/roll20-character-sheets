@@ -1,5 +1,25 @@
 Change Log
 ==============================================
+**2022-03-15 ** v.51 Chuz (James Culp)
+	Bugfix - Sprites -> update power/skills now updated when sprite type or level are changed.
+	Bugfix - NPCs had a maximum essence of 6, HMHVV victims can have >6 essence.
+	New Feature - actually got in in v.50 - Damage Compensators are now supported as advanced modifications using 'damage_compensator: x' where 'x' is the level of damage compensators.
+	New Feature - actually got in in v.50 - Resist Pain (per the spell) can be applied to wounds if advanced modifications are on, currently you can add it as a quality -> Modification 'resist_pain: x' where 'x' is the number of hits (wound penalties ignored)
+	Bugfix - Fixed text color for some text on the NPC sheets in darkmode.
+	Bugfix - Fixed maximum of 4 on npc initiative dice (should be 5)
+	Updated Matrix Roll buttons in the Rolls tab to "Training Level?" because it now also includes an option for Untrained (-1 dicepool)
+	Bugfix/New Feature - NPC->Host Sheet now prompts for alternate attributes when rolling the Attack, Sleaze, Data Processing and Firewall attribute buttons at the top of the sheet.
+	Bugfix - NPC sheets made a few dark mode fixes.
+**2022-03-08 ** v.50 Chuz (James Culp)
+	Bugfix - updated spirit sheet to default to having the "Reset" toggle on since the majority of the time having it on is the right choice.
+	Bugfix - updated spirits with Engulf and Elemental Attack close/ranged attacks listed even though they are optional power to now state the optional power is required in the notes.  This is a gentle reminder to players/GMs since the alternative is the player/GM having to add the attacks every time a spirit is summoned.
+	Added resist_pain modification attribute.  This attribute when set to a positive value will modify wound penalties per the spell in the CRB pg.137.
+	Added damage_compensator attribute to affect optimal reduction in wound penalties based on the rating of the damage compensators
+	Added a prompt to the D6 roller to query the reason for the roll, if the user just hits ENTER it defaults to D6
+	Updated styles a little to make dark mode not quite so broken.
+	Enabled Rerolls and Bump 4's functionality on the d6 roll button to see if anyone hates it.
+	Added custom description imports from Genesis, if the player has spent the time to manually add the custom descriptions in Genesis, now they don't have to do it again for the character sheet.
+	Added handling of Genesis exports of primary armor.
 **2022-02-22 ** v.49 Chuz (James Culp)
 	Added the ability to import character data from the RPG Framework Genesis character generator. (see official Roll20 thread notes)
 **2021-11-23 ** v.48 Chuz (James Culp)
