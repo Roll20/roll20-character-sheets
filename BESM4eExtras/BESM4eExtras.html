@@ -10787,17 +10787,28 @@
 				var armIDs = [];
 				for (let i = 0; i < extraarms; i++) {
 					const armID = generateRowID();
-					setObj[`repeating_extraarm_${armID}_label`] = label;
-					setObj[`repeating_extraarm_${armID}_type`] = 1;
+					//setObj[`repeating_extraarm_${armID}_label`] = label;
+					//setObj[`repeating_extraarm_${armID}_type`] = 1;
+					//setObj[`repeating_extraarm_${armID}_state`] = 0;
+					writeValues(debug, timer, value, `repeating_extraarm_${armID}_label`, label, setObj);
+					writeValues(debug, timer, value, `repeating_extraarm_${armID}_type`, 1, setObj);
+					writeValues(debug, timer, value, `repeating_extraarm_${armID}_state`, 0, setObj);
 					armIDs[i] = armID;
 				}
 				setObj[`repeating_attr_${rowID}_source`] = armIDs.join();
+				const lowerarmIDs = _.map(armIDs, id => {
+					return id.toLowerCase();
+				});
+				_.each(lowerarmIDs, id => {
+					extraarmIDs.push(id);
+				})
 			} else {
 				let sources = value[`repeating_attr_${rowID}_source`].toLowerCase().split(',');
 				const armpositions = _.chain(sources)
 					.map((id, i) => {
 						i+=1;
-						const armpos = extraarmIDs.indexOf(id) >= 0 ? i : '';
+						const test = extraarmIDs.indexOf(id);
+						const armpos = test !== -1 ? i : '';
 						return armpos;
 					})
 					.compact()
@@ -10810,17 +10821,19 @@
 				const armIDs = _.map(armpositions, pos => {
 					return sources[pos];
 				});
+				clog(debug, timer, 'armIDs:', armIDs);
 				_.each(armIDs, id => {
 					removeRepeatingRow(`repeating_extraarm_${id.toLowerCase()}`);
 				});
 				sources = _.chain(sources)
 					.map((source, i) => {
-						const result = armpositions.indexOf(i) >= 0 ? '' : source;
+						const result = armpositions.indexOf(i) !== -1 ? '' : source;
 						return result;
 					})
 					.compact()
 					.value();
-				const write = test => test.indexOf(',') > 0 ? 
+				clog(debug, timer, 'sources:', sources);
+				const write = test => test.indexOf(',') !== -1 ? 
 					setObj[`repeating_attr_${rowID}_source`] = test.join() :
 					setObj[`repeating_attr_${rowID}_source`] = test;
 				write(sources);
@@ -12008,7 +12021,10 @@
 		function setActiveWeapon(debug, timer, value, rowID, setObj) {
 			const state = parseInt(setObj[`${rowID}_state`]) || 0;
 			const result = state > 0 ? value[`${rowID}_source`] : '';
-			setObj.active_weapon = result;
+			if (result !== undefined) {
+				setObj.previous_weapon = setObj.active_weapon || value.active_weapon;
+				setObj.active_weapon = result;
+			}
 			clog(debug, timer, 'source =', result, 'setActiveWeapon()');
 		}
 		
@@ -12129,7 +12145,15 @@
 			const state = setObj[`${handsource}_state`];
 			const rowID = value[`${handsource}_source`];
 			const type = value[`repeating_attr_${rowID}_attribute`];
-			if (type != 'weapon') return;
+			const ammostate = parseInt(value.weapon_ammo_reloads);
+			const capacitystate = parseInt(value.weapon_ammo_capacity);
+			if (rowID !== setObj.previous_weapon) {
+				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_ammostate`, ammostate, setObj);
+				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_capacitystate`, capacitystate, setObj);
+				clog(debug, timer, 'ammostate =', ammostate, 'setWeaponAmmo()');
+				clog(debug, timer, 'capacitystate =', capacitystate);
+			}
+			if (type === 'telekinesis' || type === 'swarm') return;
 			if (state) {//weapon armed, load ammo state
 				const weapon = _.find(attrdb[`${type}`], w => {
 					if (w.source == rowID) return true;
@@ -12150,8 +12174,8 @@
 				clog(debug, timer, 'ammo =', ammo, 'setWeaponAmmo()');
 				clog(debug, timer, 'capacity =', capacity);
 			} else {//weapon unarmed, save ammo state
-				const ammostate = parseInt(value.weapon_ammo_reloads);
-				const capacitystate = parseInt(value.weapon_ammo_capacity);
+				//const ammostate = parseInt(value.weapon_ammo_reloads);
+				//const capacitystate = parseInt(value.weapon_ammo_capacity);
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_ammostate`, ammostate, setObj);
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_capacitystate`, capacitystate, setObj);
 				clog(debug, timer, 'ammostate =', ammostate, 'setWeaponAmmo()');
@@ -12166,6 +12190,7 @@
 			setObj.weapon_ammo = 0;
 			setObj.weapon_autofire = 0;
 			const weapon = setObj.active_weapon;
+			if (!weapon) return;
 			const type = value[`repeating_attr_${weapon}_attribute`];
 			if (weapon == '') return;
 			const weapondb = attrdb[`${type}`].find(o => {
@@ -13229,12 +13254,13 @@
 			})
 		}
 		
-		function recordSheetChanges(eventInfo, value, setObj) {
+		function recordSheetChanges(timer, eventInfo, value, setObj) {
 			const sheet_change_array = ['show_debug_messages','weapon_ammo_reloads','weapon_ammo_capacity'];
 			const recordChange = sheet_change_array.indexOf(eventInfo.sourceAttribute) !== -1 ?
 				true : false;
 			if (recordChange) {
 				setObj[`${eventInfo.sourceAttribute}`] = eventInfo.newValue;
+				clog(3, timer, 'setObj:', setObj, 'Changes To Sheet Values');
 				value = {...value, ...setObj};
 				setObj.sheetdb = JSON.stringify(value);
 				setAttrs(setObj,{silent:true});
@@ -13562,7 +13588,8 @@
 					'static_skillgroup_selected_tab',
 					'version',
 					'global_version',
-					'static_options_selection_gamegenre'
+					'static_options_selection_gamegenre',
+					'previous_weapon'
 				]);
 				getAttrsString = getAttrsString.concat(size_template_values_array);
 				getAttrsString = getAttrsString.concat(buildStatButtonStatesArray());
@@ -13638,7 +13665,7 @@
 		
 			getAttrs(get_attrs_array, (v) => {
 				let value = JSON.parse(v.sheetdb);
-				if (recordSheetChanges(eventInfo, value, setObj)) return;
+				if (recordSheetChanges(timer, eventInfo, value, setObj)) return;
 				const debug = parseInt(value[`show_debug_messages`]) || 0;
 				const attrdb = JSON.parse(v.attrdb);
 				let attrIDs = value.attrIDs;
