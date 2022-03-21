@@ -797,7 +797,7 @@
         <h4>Hand to Hand Combat Skill 2</h4>
         <div class="arrowbody">
             <div class='combat-grid-container' >
-                <input class='combat-field parchment' type="text parchment" class='combat-text' name="attr_combatskill2_type" placeholder="Combat Type" />
+                <input class='combat-field parchment' type="text" class='combat-text' name="attr_combatskill2_type" placeholder="Combat Type" />
                 <div class='space-holder'></div>
                 <div class='space-holder'></div>
                 <textarea wrap="soft" class="combat-textarea parchment" value="" name="attr_combatskill2_notes" placeholder="Style Details like kick attack, disarms, racial bite or claw attacks, etc." /></textarea>
@@ -2290,6 +2290,7 @@
             <p>Instead of creating an entirely new reactive color layout for the sheet and roll templates, the sheet and template output was tweaked so that it should work no matter how the toggle is set.</p>
             <p>Added a verticle pixel limit of 500px to the description sections of the templates.  If you have output longer than that, there will be a scroll bar to reveal the rest of the output.</p>
             <p>Added roll buttons to the inventory tab.</p>
+            <p>Fixed lift capacity with normal strength over 16.  Supernatural strength now uses x500 instead of x400 for lift.</p>
             <h4>November 2021</h4>
             <p>Removed the spinner buttons from number inputs. Removed the default value from the ammo input field in the ranged attack section.</p>
             <p>Added ammo and range to the "custom" roll template header.  Added calls for ammo and range to the macro for ranged attacks.  If there is a value filled in for range and ammo, they will display in chat below the title and subtitle.  Ammo or Range will not display if they have a blank value.</p>
@@ -2375,7 +2376,7 @@ on("change:ps change:strengthtoggle sheet:opened", function () {
     getAttrs(['ps','strengthtoggle'], function (values) {
         const ps = parseInt(values.ps)||0;
         const s_toggle = parseInt(values.strengthtoggle)||0;
-        const lift = s_toggle > 1 ? ps * s_toggle * 100 : ps * 20;
+        const lift = s_toggle >3 ? ps * (s_toggle +1) * 100 : s_toggle > 1 ? ps * s_toggle * 100 : ps * 20 * (ps > 16 ? 2 : 1);
         const carry = s_toggle > 1 ? ps * (s_toggle -1) * 100 : ps * 10 * (ps > 16 ? 2 : 1);
         const ps_bonus = Math.max(ps -15, 0);
         setAttrs({
