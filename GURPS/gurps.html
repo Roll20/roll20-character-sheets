@@ -16737,7 +16737,7 @@ visualize what it will look like in chat.
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.8.0.1";
+	const version = "2.8.0.2";
 	
 	const latestChangesDate = "3/21/2022";
 	
@@ -20898,19 +20898,35 @@ visualize what it will look like in chat.
 	// based on the lowest skill level.
 	on("change:repeating_ranged:malfunction", event => {
 	
-		const newValue = Number(event.newValue);
+		getAttrs(["repeating_ranged_malfunction", "use_malfunction"], values => {
 
-		let maxValue = newValue;
+			const useMalfunction = values.use_malfunction === "1";
+
+			const malfunctionValue = Number(values.repeating_ranged_malfunction);
+
+			let maxValue = 100;
 	
-		if (isNaN(newValue) || newValue <= 0) {
-			setAttrs({ "repeating_ranged_malfunction": 0 }, { silent: true });
+			// check to see if we need to set the value to 0
+			if (isNaN(malfunctionValue) || malfunctionValue < 0) {
+				
+				malfunctionValue = 0;
+				
+				setAttrs({ "repeating_ranged_malfunction": 0 }, { silent: true });
+			}
 
-			// set max value to 100 to make sure it's not used as effective skill
-			maxValue = 100;
-		}
+			// check for using malfunction and setting max value
+			if (useMalfunction && malfunctionValue > 0) {
+				maxValue = malfunctionValue;
+			}
 
-		setAttrs({"repeating_ranged_malf_max_value": maxValue});
+			setAttrs({"repeating_ranged_malf_max_value": maxValue});
 
+		});	
+
+	});
+
+	on("change:use_malfunction", event => {
+		setRangedMaxMalfunctionValues();
 	});
 
 	/**
@@ -20925,7 +20941,7 @@ visualize what it will look like in chat.
 				return;
 			}
 	
-			let getFields = [];
+			let getFields = ["use_malfunction"];
 	
 			// loop through the rows
 			for (let i = 0; i < ids.length; i++) {
@@ -20940,6 +20956,8 @@ visualize what it will look like in chat.
 			getAttrs(getFields, function (values) {
 	
 				let updateFields = {};
+
+				const useMalfunction = values["use_malfunction"] === "1";
 	
 				// loop through the row ids again so we can get the values
 				// and fill array of note values to update
@@ -20954,7 +20972,7 @@ visualize what it will look like in chat.
 
 					let maxMalfunctionValue = Number(malfunctionValue);
 	
-					if (isNaN(maxMalfunctionValue) || maxMalfunctionValue <= 0) {
+					if (useMalfunction === false || isNaN(maxMalfunctionValue) || maxMalfunctionValue <= 0) {
 						maxMalfunctionValue = 100;
 					}
 	
