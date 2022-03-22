@@ -1710,7 +1710,7 @@
 													value='@{whisper}&{template:singleroll} {{title=SPELL CASTING}} {{name=@{character_name}}} {{roll=[[1d10!+@{will}[STAT]+@{spell_casting_total}[SKILL]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}'>
 												BASIC ROLL
 											</button>
-											<button type='action' name='act_roll' data-i18n="detailed-rol-u" class='sheet-skill-roller2'
+											<button type='action' name='act_roll_spellcasting_detailed' data-i18n="detailed-rol-u" class='sheet-skill-roller2'
 													value='@{whisper}&{template:singleroll} {{title=SPELL CASTING}} {{name=@{character_name}}} {{roll=[[1d10!+@{will}[STAT]+@{spell_casting_total}[SKILL]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]?{TARGET LOCATION |None/Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}'>
 												DETAILED ROLL
 											</button>
@@ -4000,6 +4000,10 @@ on('clicked:roll', (event) => {
 			{
 				roll2Computed = results.results.roll2.result - results.results.fumble2.result-1;
 			}
+
+			if(results.results.roll2.expression.includes("0[LOCATION]")) {
+				rolllocation = 1
+			}
 		}
 
 		if(results.results.roll.expression.includes("0[LOCATION]")) {
@@ -4016,6 +4020,32 @@ on('clicked:roll', (event) => {
 		);
   	  });
 });
+
+on('clicked:roll_spellcasting_detailed', (event) => {
+  	startRoll("@{whisper}&{template:singleroll} {{title=SPELL CASTING}} {{name=@{character_name}}} {{roll=[[1d10!+@{will}[STAT]+@{spell_casting_total}[SKILL]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]?{TARGET LOCATION |None/Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{fumble=[[1d10!]]}}{{fumble2=[[1d10!]]}}{{rolllocation=[[0]]}}", (results) => {
+		var rollComputed = results.results.roll.result;
+		var roll2Computed = 0;
+		var rolllocation = 0;
+
+		if(results.results.roll.dice[0] == 1) // We check if the first die is a fumble.
+		{
+			rollComputed = results.results.roll.result - results.results.fumble.result-1;
+		}
+
+		if(results.results.roll.expression.includes("0[LOCATION]")) {
+			rolllocation = 1
+		}
+
+		finishRoll(
+			results.rollId,
+			{
+				roll: rollComputed,
+				rolllocation: rolllocation
+			}
+		);
+  	  });
+});
+
 
 on('clicked:repeating_finearts:roll clicked:repeating_performance:roll clicked:repeating_npcskill:roll', (event) => {
 
@@ -4295,6 +4325,9 @@ on('clicked:repeating_finearts:roll clicked:repeating_performance:roll clicked:r
         <tr><td><strong class="template-title">DMG: </strong> {{damage}} &#160;| <strong class="template-title" style='text-align: justify; font-size: 12px;'> RANGE: </strong> {{range}}</td></tr>
         <tr><td style='font-size: 12px;'><strong class="template-title">DEFENSE: </strong> {{defense}}</td></tr>
     </table>
+	<div class="sheet-rolltemplate-button">
+		[Spellcasting](~{{name}}|roll_spellcasting_detailed)
+	</div>
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-ritual">
