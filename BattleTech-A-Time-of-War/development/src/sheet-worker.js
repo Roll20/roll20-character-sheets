@@ -1,5 +1,5 @@
 import {
-    calculateAbilityScore,
+    calculateAttributeScore,
     linkedAttributeDisplayNames
 } from './attributes'
 import {
@@ -43,7 +43,17 @@ const recalculateSkills = () => {
 }
 
 // calculate stat values when XP amount changes
-on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp change:intelligence_xp change:will_xp change:charisma_xp change:edge_xp", calculateAbilityScore)
+on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp change:intelligence_xp change:will_xp change:charisma_xp change:edge_xp", ({
+    sourceAttribute,
+    newValue
+}) => {
+    const attributes = calculateAttributeScore(sourceAttribute, newValue)
+
+    const set = {}
+    set[attributes.name] = attributes.value
+    set[attributes.linkName] = attributes.linkValue
+    setAttrs(set, {}, recalculateSkills)
+})
 
 on("change:repeating_skills:skill change:repeating_skills:sub_skill", _ => {
     getAttrs(["repeating_skills_skill_xp", ], ({
@@ -72,7 +82,7 @@ const skillXPChanged = ({
         const skillNameLookupKey = skillName.split("_")[0]
         const subSkill = values[subSkillAttrName]
 
-        let skillAttributesToSet = {}
+        const skillAttributesToSet = {}
 
         skillAttributesToSet[skillLevel] = calculateSkillLevel(Number(newValue), values.learning_speed)
 

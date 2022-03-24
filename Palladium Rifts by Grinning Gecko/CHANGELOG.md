@@ -1,8 +1,87 @@
 # Changelog
 
-## [1.2.0]
+## [1.5.0] - 2022-03-13
 
 ### Added
+
+- `Level Acquired` for Skills, Hand to Hand, and Weapon Proficiencies. Current level calculation is done based on that value and the current character level.
+
+### Changed
+
+- Fix for a change in dark mode.
+- Fix `Migrate` button.
+- Fix issue where adding custom Weapon Proficiencies would break the process that runs when the Character Level is changed, and prevent Skills/Abilities/etc. from updating.
+- Fix issue where sometimes Skills/Weapon Proficiencies would auto-adjust their level when opening the sheet.
+- Improve alignment between headings and values in Weapon Proficiencies, Abilities, Magic, and Psionics.
+- Add `from Active Profile` to reset ISP/PPE buttons.
+- Fix issue with broken roll templates on certain checks (Despair, Mind Control, etc.).
+
+## [1.4.0] - 2022-03-02
+
+### Added
+
+- Add "Output ISP/PPE/Damage usage to chat" option.
+- Display level alongside modifier name in Modifier Picker list.
+- Add Battleram, Bombard, and Space Fighter combats to the Hand to Hand & RPA Combat selector.
+- Add styles for dark mode.
+- Add "Show Armor warnings when damage is taken on last layer" option.
+
+### Changed
+
+- Fix issue where adding a modifier duplicated it in the Modifier Picker.
+- Fix issue where remaining armor output was displaying the pre-damage amount.
+- Fix issue where activating/deactivating a top-level Armor wasn't always modifying the Active Armor section.
+- Fix issue where clicking Reset MDC on a top-level Armor didn't update the Active Armor.
+
+### Removed
+
+- Remove extraneous Break Fall in a couple of places.
+
+## [1.3.0] - 2022-01-11
+
+### Added
+
+- Add roll templates for damage, casting spell, and using psionic.
+- Add optional `successtext` to skill roll template.
+- Add Break Fall to bonuses.
+
+### Changed
+
+- Move Modern Strike: Pulse to Strike: Single bonus.
+- Added Migrate button instead of auto-migrating on sheet load.
+- Output PPE/ISP/MDC to chat when an amount is deducted from the sheet using the action buttons.
+
+## [1.2.0] - 2021-10-15
+
+### Added
+
+- Prompt for gunfire dodge penalty if option is enabled
+- Add hand-to-hand selector and calculator
+- Add RPA Combat selector and calculator
+- Add "Racial" and "Other" skill categories
+- Add Break Fall defense bonus
+- Add Body Block/Tackle, Leg Hook, and Backward Sweep Kick bonuses
+- Global Active Profile and Active Armor section
+- Add "ly" (Light Years) to distance units
+- Add number of actions as title attribute for range attacks
+- Add initiative roll button that adds to turn tracker, Palladium style (requires `dup-turn` API script)
+- Add option to include IQ bonus on skill-based abilities
+
+### Changed
+
+- Fix issue with absolute value calculation in profile
+- Change "WPs" tab to "Combat Skills"
+- Move Combat section above Attributes section in profile
+- Change `currentmdc` and `basemdc` armor attributes to `mdc` and `mdc_max` respectively, including migration
+- Change readonly spans from `overflow:scroll` to `overflow:auto` to get rid of the non-functional scrollbars on Windows
+- Moved all instructions to the Options tab and updated them / made them more thorough
+- Reorganized Ancient and Modern bonus sections
+- Fix text on `strike: burst` roll
+- Make Disease save a roll query
+- Fix issue with skills not updating when character level changes
+- Fix issue with export of units (range, damage, dc, duration)
+- Prompt for additional modifier on range disarm
+- Styling changes/fixes
 
 ## [1.1.0] - 2021-09-06
 

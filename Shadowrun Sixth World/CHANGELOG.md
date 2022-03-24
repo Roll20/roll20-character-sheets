@@ -1,5 +1,48 @@
 Change Log
 ==============================================
+**2022-03-15 ** v.51 Chuz (James Culp)
+	Bugfix - Sprites -> update power/skills now updated when sprite type or level are changed.
+	Bugfix - NPCs had a maximum essence of 6, HMHVV victims can have >6 essence.
+	New Feature - actually got in in v.50 - Damage Compensators are now supported as advanced modifications using 'damage_compensator: x' where 'x' is the level of damage compensators.
+	New Feature - actually got in in v.50 - Resist Pain (per the spell) can be applied to wounds if advanced modifications are on, currently you can add it as a quality -> Modification 'resist_pain: x' where 'x' is the number of hits (wound penalties ignored)
+	Bugfix - Fixed text color for some text on the NPC sheets in darkmode.
+	Bugfix - Fixed maximum of 4 on npc initiative dice (should be 5)
+	Updated Matrix Roll buttons in the Rolls tab to "Training Level?" because it now also includes an option for Untrained (-1 dicepool)
+	Bugfix/New Feature - NPC->Host Sheet now prompts for alternate attributes when rolling the Attack, Sleaze, Data Processing and Firewall attribute buttons at the top of the sheet.
+	Bugfix - NPC sheets made a few dark mode fixes.
+**2022-03-08 ** v.50 Chuz (James Culp)
+	Bugfix - updated spirit sheet to default to having the "Reset" toggle on since the majority of the time having it on is the right choice.
+	Bugfix - updated spirits with Engulf and Elemental Attack close/ranged attacks listed even though they are optional power to now state the optional power is required in the notes.  This is a gentle reminder to players/GMs since the alternative is the player/GM having to add the attacks every time a spirit is summoned.
+	Added resist_pain modification attribute.  This attribute when set to a positive value will modify wound penalties per the spell in the CRB pg.137.
+	Added damage_compensator attribute to affect optimal reduction in wound penalties based on the rating of the damage compensators
+	Added a prompt to the D6 roller to query the reason for the roll, if the user just hits ENTER it defaults to D6
+	Updated styles a little to make dark mode not quite so broken.
+	Enabled Rerolls and Bump 4's functionality on the d6 roll button to see if anyone hates it.
+	Added custom description imports from Genesis, if the player has spent the time to manually add the custom descriptions in Genesis, now they don't have to do it again for the character sheet.
+	Added handling of Genesis exports of primary armor.
+**2022-02-22 ** v.49 Chuz (James Culp)
+	Added the ability to import character data from the RPG Framework Genesis character generator. (see official Roll20 thread notes)
+**2021-11-23 ** v.48 Chuz (James Culp)
+	Bugfix - Removing Technomancer echos with modifications didn't update things correctly.
+	Bugfix - Replaced translation "Rotarcraft" with correct "Rotorcraft"
+	Added Modifications functionality to Magic->Adept->Powers
+	Added Modifications functionality to Magic->Meta->Metamagics
+	Added Modifications functionality to Technomancer->Complex Forms
+**2021-11-09 ** v.47 Chuz (James Culp)
+	Bugfix - Technomancer Complex Forms with no roll were displaying oddly.  This has been fixed, now the roll button that shows up will show the fade and notes section.
+**2021-11-04 ** v.46 Chuz (James Culp)
+	Fix for spells not displaying hits
+**2021-11-02 ** v.45 Chuz (James Culp)
+	Update to the roll-template preparing for future features
+	Updated rolls so mouseover showing the actual dice rolled are red for 1's (2's for bad luck) and green for 5's and 6's instead of the previous only 1's and 6's being colored.
+	Add SR Title to "Character Sheet" tab
+	Make Bio & Info, Character Sheet and Attributes & Abilities tabs stay in view as the sheet is scrolled.	Modified Notes tab to have an automatic scrollbar and removed the expand widget since it did nothing.
+	Modified Notes tab to have an automatic scrollbar and removed the expand widget since it did nothing.
+	Added matrix_overclock attribute which can be put in the Modifications box for a program which will cause the Matrix Rolls on the Rolls tab automatically add 2 dice, one of which is the wild die to rolls.  If added via the Matrix->Programs->Modifications when the Program is toggled off/on it will turn the effect off/on.  Valid values 1|0.  This will also indicate in the header of the rolls-computed roll template the +2 dicepool bonus.
+**2021-10-26 ** v.44 Chuz (James Culp)
+	Bugfix returned notes to the roll template outputs for PC roll buttons in repeating sections.
+**2021-10-11 ** v.43 Chuz (James Culp)
+	Added roll post-processing to PC sheet buttons.  This includes a new way to handle Wild Dice and glitch/crit glitch detection.
 **2021-09-21 ** v.42 Chuz (James Culp)
 	Removed Firing Modes from Arms->Ranged because it did nothing in that section.
 	Moved "Primary" selector outside the settings area so it's easier to select a primary weapon.

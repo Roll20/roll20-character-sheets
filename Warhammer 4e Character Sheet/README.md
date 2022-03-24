@@ -73,6 +73,40 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+March 19th 2022 v1.55
+
+- Devmode renamed Talent and Quality Integration
+- Added official Cubicle 7 Up in Arms rule set support
+- Up in Arms - Group Advantage - (select in Advantage Rules in setting) - include the appropriate Talent changes
+- Up in Arms - Critical Damage Tables - (select in Critical Rules in setting)
+- Up in Arms - New Weapon Qualities - Added to Talent and Quailties Integration.
+- Talent and Quailties Integration - Re-ordered Melee Bonus assister, added Called Shot and Strike to Stun
+
+
+March 11th 2022 v1.54
+
+- Added official support for Roll20 Dark Mode
+- Added Hypnotism to Advanced Skills (Power behind the Throne, EiS vol3)
+
+
+February 25th 2022 v1.53.3
+
+- Added Ogre to the race list race with stats (Archives of the Empire vol 2)
+- Fix for melee weapons list target display for any weapon except 2H
+
+
+January 3rd 2022 v1.53.2
+
+- Fixed issue where Twohanded weapons when selected would show offhand penality added to the target value of the specific weapon. This did not effect the Roll itself.
+- Fix for Characteristics modifier which was adding twice on the skill target display in rolls.
+- Resolved issue with Custom Spell Advantage rule (which basic removed advantage modifier from casting), this will now also disable Advantage for Langange Magick skill roll aswell as spellbook rolls. And removes the gold star indicator when disabled too.
+
+
+December 6th 2021 v1.53.1
+
+- Completed experimental talent list (all 166 talents) in the Dev mode, nearly all are implemented at this time. This causes talent bonuses to show when rolling skills and weapons, to allow superior flow of game and especially combat. Includes advanced combat actions, like Charge/Furious Assault/Feint/DW/Fast Shot etc rules which are implemented directly into the sheet so they show when rolling ( i.e. you don't have to remember at the +SL or complex rule). Also includes a new SL system which adds together the total SL bonus each roll. Enable Dev mode to test this feature.
+
+
 September 14th 2021 v1.53
 
 - Various bug fixes
