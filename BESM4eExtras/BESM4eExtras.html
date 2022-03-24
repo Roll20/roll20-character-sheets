@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.6.3" readonly />
+													<input type="text" class="center" name="attr_version" value="1.7.0" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -79,6 +79,12 @@
 														<option value="27">Steampunk</option>
 														<option value="28">Stone Age</option>
 														<option value="29">Wild West</option>
+													</select>
+												</span></h4></div>
+												<div class="col-1-5"><h4 class="center border"><span>Alt Deplete
+													<select name="attr_static_rules_deplete_alt">
+														<option value="0">False</option>
+														<option value="1">True</option>
 													</select>
 												</span></h4></div>
 											</div>
@@ -6093,9 +6099,19 @@
 																		<div class="col-1-2 padr fontsize-12px"><input type="text" value="Dependent" disabled /></div>
 																		<div class="col-1-2 padr fontsize-12px"><select name="attr_limiterdependent"><option value=0>False</option><option value=1>Requires 1 activated attribute</option><option value=2>Requires 2 activated attributes</option><option value=3>Requires 3 activated attributes</option></select></div>
 																	</div>
-																	<div class="row">
-																		<div class="col-1-2 padr fontsize-12px"><input type="text" value="Deplete" disabled /></div>
-																		<div class="col-1-2 padr fontsize-12px"><select name="attr_limiterdeplete"><option value=0>0 endurance</option><option value=1>x1 Immediate/x2 Ongoing</option><option value=2>x2 Immediate/x4 Ongoing</option><option value=3>x3 Immediate/x6 Ongoing</option></select></div>
+																	<div>
+																		<input type="checkbox" class="block-switch" name="attr_altdeplete" value="1" />
+																		<div class="block-a"><div class="row">
+																			<div class="col-1-2 padr fontsize-12px"><input type="text" value="Deplete" disabled /></div>
+																			<div class="col-1-2 padr fontsize-12px"><select name="attr_limiterdeplete"><option value=0>False</option><option value=1>10 EP per use/10 EP per minute</option><option value=2>20 EP per use/5 EP per round</option><option value=3>30 EP per use/20 EP per round</option></select></div>
+																		</div>
+																	</div>
+																		<div class="block-b">
+																			<div class="row">
+																				<div class="col-1-2 padr fontsize-12px"><input type="text" value="Deplete" disabled /></div>
+																				<div class="col-1-2 padr fontsize-12px"><select name="attr_limiterdeplete"><option value=0>False</option><option value=1>10 EP instant/5 EP ongoing</option><option value=2>20 EP instant/10 EP ongoing</option><option value=3>30 EP instant/15 EP ongoing</option></select></div>
+																			</div>
+																		</div>
 																	</div>
 																	<div class="row">
 																		<div class="col-1-2 padr fontsize-12px"><input type="text" value="Detectable" disabled /></div>
@@ -7694,6 +7710,8 @@
 		const standard_limiters_array = ['activation','assisted','backlash','charges','concentration','consumable','delay','dependant','deplete','detectable','emotional','environmental','equipment','imbue','irreversible','localized','maximum','object','permanent','recovery','semipermanent','unique','unpredictable'];
 		const attribute_settings_by_customization_array = ['ammo','attrsrc','broadcategory','charges','continuing','deplete','drain','enemy','focuseddamage','intensity','objects','specialized','specific','targeted','targeteddamage','uniquephenomena','unpredictable'];
 		const hands_array = ['mainhand', 'offhand'];
+		const instantaneous_attributes_array = ['absorption','cognition','conversion','data access','defense mastery','elasticity','exorcism','healing','immovable','massive damage','metamorphosis','mulligan','nullify','plant control','portal','power flux','power variation','reincarnation','sixth sense','telekinesis','telepathy','teleport','transfer','transmute','weapon'];
+		//const ongoing_attributes_array = ['alternate form','alternate identity','armor','attack mastery','augmented','capacity','change state','combat technique','companion','connected','control environment','dimension walk','dynamic powers','enemy attack','enemy defense','energized','extra actions','extra arms','extra defenses','features','flight','forcefield','gear','ground speed','heightened awareness','heightened senses','illusion','immunity','immutable','inspire','jumping','melee attack','melee defense','merge','mimic','mind control','mind shield','minions','pocket dimension','projection','ranged attack','ranged defense','regeneration','resilient','sensory block','shield','size change','skill','social mastery','spaceflight','special movement','summon creatures','supersense','superspeed','superstrength','swarm','tough','tunneling','unaffected','unassailable','undetectable','unique attribute','unknown power','water speed','wealth'];
 		
 		const upgrade_to_1_5_0_array = ["upgraded_1_5_0"];
 		const upgrade_to_1_3_1_array = ["upgraded_1_3_1", "attrdb"];
@@ -8883,7 +8901,6 @@
 		}
 		
 		function setDamageLevelByDamageTaken(debug, timer, value, setObj, sourceAttr) {
-			//const isDamage = /(wounds|fatigue|maddness|shame|health|energy)/i.test(`${sourceAttr}`); if (!isDamage) return;
 			const damage_taken_array = ['wounds','fatigue','maddness','shame','health','energy'];
 			if (damage_taken_array.indexOf(sourceAttr) === -1) return;
 			const source = 
@@ -8919,7 +8936,6 @@
 		}
 		
 		function setDerivedValue(debug, timer, attrdb, value, setObj, derivedvalue = '') {
-			//if (/(health|energy|sanity|social)/i.test(derivedvalue) == false) return;
 			const derived_values_array = ['health','energy','sanity','social'];
 			if (derived_values_array.indexOf(derivedvalue) === -1) return;
 			const stat = (derivedvalue == 'health') ? 'body' : 'mind';
@@ -8951,7 +8967,6 @@
 				derivedvalue == 'social' ? 
 					Math.round((bodyormind + soul) / 2) + bonus + temp :
 				0;
-			//setObj[`stat_total_${derivedvalue}`] = result;
 			writeValues(debug, timer, value, `stat_total_${derivedvalue}`, result, setObj);
 			clog(debug, timer, derivedvalue, result, 'setDerivedValue()');
 		}
@@ -8963,7 +8978,6 @@
 			const hardboiled = 
 				getSumOfActiveSubAttrRanks(attrdb, 'combattechnique', 'hardboiled') || 0;
 			const result = Math.round(health / 5) + hardboiled;
-			//setObj.stat_total_shock = result;
 			writeValues(debug, timer, value, 'stat_total_shock', result, setObj);
 			clog(debug, timer, 'result =', result, 'setTotalShock()');
 		}
@@ -8994,7 +9008,6 @@
 		}
 		
 		function setAttrVisibilityByGroup(value, eventInfo, attrIDs, setObj, sectionName) {
-			//const section = sectionName.replace(/group/i, "");
 			const section = sectionName.substring(0, sectionName.length - 5);
 			_.each(attrIDs, (id) => {
 				const group = parseInt(value[`repeating_${section}_${id}_group`]);
@@ -9193,9 +9206,11 @@
 			return result;
 		}
 		
-		function setGroupMembership(value, setObj, source, sectionName) {
+		function setGroupMembership(debug, timer, value, setObj, source, sectionName) {
 			const tab = value[`static_${sectionName}group_selected_tab`];
+			clog(debug, timer, 'tab =', tab, 'setGroupMembership()');
 			const currGroup = tab.replace(/attrgroup/g, '');
+			clog(debug, timer, 'currGroup =', currGroup);
 			setObj[`${source}_new`] = 0;
 			setObj[`${source}_group`] = currGroup;
 		}
@@ -10644,7 +10659,7 @@
 				case 'broadcategory': result ='showbroadcategory'; break;
 				case 'charges': result = 'showcharges'; break;
 				case 'continuing': result = 'showcontinuing'; break;
-				case 'deplete': result = 'showendurance'; break;
+				//case 'deplete': result = 'showendurance'; break;
 				case 'drain': result = 'showdrain'; break;
 				case 'enemy': result = 'showenemy'; break;
 				case 'focuseddamage': result = 'showweaponclass'; break;
@@ -11502,6 +11517,7 @@
 				case "armor": 
 				case "forcefield":
 				case "mindshield":
+					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setProtection(isActive, debug, timer, value, rowID, sourceAttr, attribute, setObj);
 				break;
 				case "attackmastery":
@@ -11525,6 +11541,7 @@
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "conversion":
+					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setProtection(isActive, debug, timer, value, rowID, sourceAttr, attribute, setObj);
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
@@ -11550,6 +11567,7 @@
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "extraarms":
+					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setExtraArms(isActive, debug, timer, extraarmIDs, value, rowID, sourceAttr, setObj);
 				break;
 				case "heightenedawareness":
@@ -11571,17 +11589,20 @@
 				break;
 				case "powerflux":
 				case "powervariation":
+					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setPoolMax(isActive, value, attrIDs, sectionName, rowID, setObj);
 					convertAttrGroupCost(isActive, debug, timer, value, sectionName, attrIDs, rowID, setObj);
 					setPoolActive(isActive, value, sectionName, setObj);
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "shield":
+					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setProtection(isActive, debug, timer, value, rowID, sourceAttr, attribute, setObj);
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 				break;
 				case "skill": 
+					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setSkillGroup(isActive, timer, debug, value, rowID, setObj, level);
 					setSkillGroupMaxByLevelChange(isActive, timer, debug, value, rowID, setObj);
 				break;
@@ -11606,8 +11627,9 @@
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "telekinesis":
+					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					if (level > 1) {
-						setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
+						//setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 						setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 					}
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
@@ -13127,8 +13149,7 @@
 			const result = 
 				sourceAttr.indexOf('enhancement') !== -1 || 
 				sourceAttr.indexOf('limiter') !== -1 ?
-				//sourceAttr.includes("enhancement") || sourceAttr.includes("limiter") ? 
-				true : false;
+					true : false;
 			clog(debug, timer, 'result =', result,'getIsCustomization()');
 			return result;
 		}
@@ -13137,8 +13158,6 @@
 			const result = 
 				sourceAttr.indexOf('enhancement') !== -1 ? 'enhancement' :
 				sourceAttr.indexOf('limiter') !== -1 ? 'limiter' : '';
-				//sourceAttr.includes("enhancement") ? "enhancement" : 
-				//sourceAttr.includes("limiter") ? "limiter" : "";
 			clog(debug, timer, 'result =', result,'getCustomizationType()');
 			return result;
 		}
@@ -13147,6 +13166,45 @@
 			const result = sourceAttr.replace(type, '');
 			clog(debug, timer, 'result =', result,'getCustomizationName()');
 			return result;
+		}
+		
+		function setDepleteRules(debug, timer, value, attrIDs, setObj) {
+			const state = parseInt(value.static_rules_deplete_alt) == 1 ?
+				1 : 0;
+			if (_.isArray(attrIDs)) {
+				_.each(attrIDs, id => {
+					setObj[`repeating_attr_${id}_altdeplete`] = state;
+				});
+			} else {
+				setObj[`repeating_attr_${attrIDs}_altdeplete`] = state;
+			}
+			clog(debug, timer, 'state =', state, 'setDepleteRules()');
+		}
+		
+		function setDepleteResurvation(debug, timer, attrdb, value, rowID, setObj) {
+			const depleteRank = getCustomizationValue(debug, timer, value, rowID, 'rank', 'deplete');
+			const useDepleteAltRules = parseInt(value.static_rules_deplete_alt);
+			if (!depleteRank && !useDepleteAltRules) return;
+			const totalDepete = _.chain(all_attributes_array)
+				.map( a => {
+					if (_.isEmpty(attrdb[a])) return 0;
+					const isInstantaneousAttr = 
+						instantaneous_attributes_array.indexOf(a) !== -1 ? 2 : 1;
+					const attr_deplete = _.chain(attrdb[a]).map( o => {
+						const deplete = _.find(o.customizations, c => {
+							if (c.name === 'deplete') return true;
+						});
+						if (deplete === undefined) return 0;
+						const reservedEP = (deplete.rank * 5) * isInstantaneousAttr;
+						return reservedEP;
+					}).reduce((memo,stat)=>{ return memo + stat; }).value() || 0;
+					return attr_deplete;
+				}).reduce((memo,stat)=>{ return memo + stat; }).value();
+			setDerivedValue(debug, timer, attrdb, value, setObj, 'energy');
+			const result = setObj.stat_total_energy - totalDepete;
+			writeValues(debug, timer, value, 'stat_total_energy', result, setObj);
+			clog(debug, timer, 'result =', result, 'setDepleteResurvation()');
+			setDamageLevelByDamageTaken(debug, timer, value, setObj, 'fatigue');
 		}
 		
 		function getStatStateArray(debug, timer, value, sourceAttr, setObj, type, source = '') {
@@ -13324,22 +13382,14 @@
 		
 		function setSkillCostBySpecilizationChange(debug, timer, skillIDs, eventInfo, value, sectionName, rowID, setObj){
 			const specilizations = value[`repeating_skill_${rowID}_specializations`];
-			clog(debug, timer, 'specilizations =', specilizations, 'setSkillCostBySpecilizationChange()');
 			const specilizationscost = specilizations === "" ? 0 :
 				(specilizations.match(/,/g) || []).length;
-			clog(debug, timer, 'specilizationscost =', specilizationscost);
 			const skillname = value[`repeating_skill_${rowID}_name`];
-			clog(debug, timer, 'skillname =', skillname);
 			const skillcost = getSkillCost(debug, timer, value, skillname);
-			clog(debug, timer, 'skillcost =', skillcost);
 			const skillrank = parseInt(value[`repeating_skill_${rowID}_level`]);
-			clog(debug, timer, 'skillrank =', skillrank);
 			const totalcost = (skillcost * skillrank) + specilizationscost;
-			clog(debug, timer, 'totalcost =', totalcost);
 			const groupid = getGroupID(value, 'skill');
-			clog(debug, timer, 'groupid =', groupid);
 			const spent = getAggregateSkillGroupCost(debug, timer, skillIDs, value, rowID, groupid, setObj);
-			clog(debug, timer, 'spent =', spent);
 			setObj[`static_skillgroup_${groupid}_spent`] = spent + totalcost;
 			setObj[`repeating_skill_${rowID}_totalcost`] = totalcost;
 		}
@@ -13446,6 +13496,7 @@
 		
 		function registerEvents() {
 			const eventsToRegister = [
+				"static_rules_deplete_alt",
 				"weapon_ammo_reloads",
 				"weapon_ammo_capacity",
 				"static_options_selection_gamegenre",
@@ -13589,7 +13640,8 @@
 					'version',
 					'global_version',
 					'static_options_selection_gamegenre',
-					'previous_weapon'
+					'previous_weapon',
+					'static_rules_deplete_alt'
 				]);
 				getAttrsString = getAttrsString.concat(size_template_values_array);
 				getAttrsString = getAttrsString.concat(buildStatButtonStatesArray());
@@ -13606,6 +13658,7 @@
 					_.each(getAttrsString, o => {
 						if(value[o] !== undefined) sheetdb[o] = value[o];
 					});
+					clog(3, timer, 'value:', value);
 		
 					if (value.global_initialized != 1) {
 						buildSizeUI(global_templates_size_names, setObj);
@@ -13735,7 +13788,7 @@
 						return;
 					} else if (sourceType==`repeating`) {
 		
-						const isCustomization = getIsCustomization(debug, timer, sourceAttr);//(enhancement|limiter)/i.test(`${sourceAttr}`);
+						const isCustomization = getIsCustomization(debug, timer, sourceAttr);
 						const customizationType = isCustomization ? 
 							getCustomizationType(debug, timer, sourceAttr) : undefined;
 						const customization = isCustomization ?
@@ -13750,9 +13803,9 @@
 							case `attr`:
 								const isNew = parseInt(value[`${source}_new`]) || 1;
 								if(isNew === 1) {
-									setGroupMembership(value, setObj, source, sectionName);
+									setGroupMembership(debug, timer, value, setObj, source, sectionName);
 									attrIDs.indexOf(rowID) === -1 ? attrIDs.push(rowID) : false;
-		
+									setDepleteRules(debug, timer, value, rowID, setObj);
 								}
 								if(getIsSheetworker(eventInfo.sourceType)) return;
 								switch (sourceAttr) {
@@ -13799,6 +13852,7 @@
 											setWeaponAmmo(debug, timer, attrdb, value, handsource, setObj);
 										}
 										setGroupDefectPointsOnActivation(debug, timer, attrIDs, attrdb, value, sectionName, rowID, setObj);
+										setDepleteResurvation(debug, timer, attrdb, value, rowID, setObj);
 									break;
 									case `lock`:
 										if (resetOnActive(debug, timer, eventInfo, value, match, rowID, setObj)) return;
@@ -13986,6 +14040,9 @@
 							break;
 							case 'options':
 								adjustSkillGenreCosts(debug, timer, value, skillIDs, setObj);
+							break;
+							case 'rules':
+								setDepleteRules(debug, timer, value, attrIDs, setObj);
 							break;
 						}
 						persistCache(value, attrdb, attrIDs, skillIDs, extraarmIDs, skillmap);
