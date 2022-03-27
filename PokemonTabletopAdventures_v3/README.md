@@ -16,13 +16,24 @@ Things we want to add to the character sheet, presented in no particular order o
   - [X] Reasonable user experience on the Companion App
   - [ ] Full "optimized for use" support for Companion App
 - [X] Support Dark Mode sheet
-- [ ] Support Dark Mode roll templates
+- [X] Support Dark Mode roll templates
 - [ ] Allow a second ability score to apply to skill checks
 - [ ] Allow formula calculations for the extra damage fields
 - [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
 
 
 ## Changelog
+
+### Mar 27, 2022
+- Reworked dark mode colors
+  - First dark mode attempt was pretty awful in terms of color theory and not being painful to look at over time.
+  - This time, took a totally different approach based on community feedback
+- Roll templates now work in dark mode thanks to sheet-rolltemplate-darkmode existing now
+- Buttons restyled and are no longer jarringly out of place
+
+### Mar 24, 2022
+- Water type background is always light - fixed
+- Electric type text background in light mode is weird - fixed
 
 ### Mar 12th, 2022
 - Removed some old legacy load-time backwards compatibility scripts. Nobody needs this anymore and it slows down the sheet.
