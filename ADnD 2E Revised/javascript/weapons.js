@@ -18,6 +18,7 @@ weapons['battle axe'] = {
     'size': 'M',
     'type': 'S',
     'speed': 7,
+    'reach': '1',
     'small-medium': '1d8',
     'large': '1d8',
     'knockdown': 'd10',
@@ -245,9 +246,10 @@ weapons['hand axe'] = {
     'size': 'M',
     'type': 'S',
     'speed': 4,
+    'reach': '1',
     'small-medium': '1d6',
     'large': '1d4',
-    'knockdown': 'd10',
+    'knockdown': 'd8',
     'book': 'PHB',
     'category': ['Melee','Range']
 };
@@ -1474,6 +1476,7 @@ weapons['two-handed battle axe'] = {
     'size': 'M',
     'type': 'S',
     'speed': 9,
+    'reach': '1',
     'small-medium': '1d10',
     'large': '2d8',
     'knockdown': 'd12',
@@ -2779,5 +2782,47 @@ weapons['yoroi-toshi'] = {
     'book': 'The Complete Ninja\'s Handbook',
     'category': ['Melee', 'Range']
 };
+//#endregion
+
+//#region Player's Option: Combat & Tactics
+weapons['adze'] = {
+    'name': 'Adze',
+    'size': 'S',
+    'type': 'S/P',
+    'speed': 4,
+    'reach': '1',
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+weapons['ankus'] = {
+    'name': 'Ankus',
+    'size': 'M',
+    'type': 'P/B',
+    'speed': 6,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+weapons['stone axe'] = {
+    'name': 'Stone axe',
+    'size': 'M',
+    'type': 'B/S',
+    'speed': 6,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
 //#endregion
 module.exports = weapons;
