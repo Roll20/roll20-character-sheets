@@ -4,6 +4,12 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.10.00 (Build 13)
+
+### Features
+
+- removed parsed rolls buttons from combat proficiencies to improve UI clarity
+
 ## 02.09.00 (Build 12)
 
 ### Features
