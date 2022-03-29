@@ -1583,6 +1583,7 @@ on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
     if (currentValue) {
         if (currentValue.includes('’')) {
             newValue[eventInfo.sourceAttribute] = currentValue.replaceAll('’', '\'');
+            console.log(`${eventInfo.sourceAttribute} was updated via eventInfo.newValue`);
             setAttrs(newValue,{silent:true});
         }
         return;
@@ -1592,6 +1593,7 @@ on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
         currentValue = values[eventInfo.sourceAttribute];
         if (currentValue.includes('’')) {
             newValue[eventInfo.sourceAttribute] = currentValue.replaceAll('’', '\'');
+            console.log(`${eventInfo.sourceAttribute} was updated via getAttrs`);
             setAttrs(newValue,{silent:true});
         }
     })
