@@ -1578,12 +1578,26 @@ on('sheet:opened', function () {
 
 // Fix for Roll20 not handling quotes correctly from sheet.json
 on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
-    console.log(eventInfo);
-    if (eventInfo.newValue && eventInfo.newValue.includes('’')) {
-        let newValue = {};
-        newValue[eventInfo.sourceAttribute] = eventInfo.newValue.replaceAll('’', '\'');
-        setAttrs(newValue,{silent:true});
+    let currentValue = eventInfo.newValue;
+    let newValue = {};
+    if (currentValue) {
+        if (currentValue.includes('’')) {
+            newValue[eventInfo.sourceAttribute] = currentValue.replaceAll('’', '\'');
+            console.log(`${eventInfo.sourceAttribute} was updated from eventInfo.newValue`)
+            setAttrs(newValue,{silent:true});
+        }
+        return;
     }
+
+    getAttrs([eventInfo.sourceAttribute], function(values) {
+        console.log(values);
+        currentValue = values[eventInfo.sourceAttribute];
+        if (currentValue.includes('’')) {
+            newValue[eventInfo.sourceAttribute] = currentValue.replaceAll('’', '\'');
+            console.log(`${eventInfo.sourceAttribute} was updated from getAttrs`)
+            setAttrs(newValue,{silent:true});
+        }
+    })
 });
 
 // --- ALL SHEET WORKERS END --- //
