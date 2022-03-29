@@ -45851,26 +45851,26 @@ on('sheet:opened', function () {
 });
 
 // Fix for Roll20 not handling quotes correctly from sheet.json
-on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
-    let currentValue = eventInfo.newValue;
-    let newValue = {};
-    if (currentValue) {
-        if (currentValue.includes('’')) {
-            newValue[eventInfo.sourceAttribute] = currentValue.replaceAll('’', '\'');
-            console.log(`${eventInfo.sourceAttribute} was updated via eventInfo.newValue`);
-            setAttrs(newValue,{silent:true});
-        }
-        return;
+const fixQuotes = function (currentValue, attribute, event) {
+    if (currentValue.includes('’')) {
+        let newValue = {};
+        newValue[attribute] = currentValue.replaceAll('’', '\'');
+        console.log(`${attribute} was updated via ${event}`);
+        setAttrs(newValue,{silent:true});
     }
+}
 
-    getAttrs([eventInfo.sourceAttribute], function (values) {
-        currentValue = values[eventInfo.sourceAttribute];
-        if (currentValue.includes('’')) {
-            newValue[eventInfo.sourceAttribute] = currentValue.replaceAll('’', '\'');
-            console.log(`${eventInfo.sourceAttribute} was updated via getAttrs`);
-            setAttrs(newValue,{silent:true});
-        }
-    })
+on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
+    let attribute = eventInfo.sourceAttribute;
+    let currentValue = eventInfo.newValue;
+    if (currentValue) {
+        fixQuotes(currentValue, attribute, "eventInfo.newValue");
+    } else {
+        getAttrs([attribute], function (values) {
+            currentValue = values[attribute];
+            fixQuotes(currentValue, attribute, "getAttrs");
+        });
+    }
 });
 
 // --- ALL SHEET WORKERS END --- //
