@@ -73,6 +73,13 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+
+March 25th 2022 v1.55a
+
+- Fixed UiA crit tables, some of the Crit Damage was out by 1.
+- Cast and Channel fumbles clarified, added 10s fumble for channelling and casting now shows when a 8 unit die (chaos) is rolled.
+
+
 March 19th 2022 v1.55
 
 - Devmode renamed Talent and Quality Integration

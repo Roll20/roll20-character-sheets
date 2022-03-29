@@ -45851,12 +45851,22 @@ on('sheet:opened', function () {
 });
 
 // Fix for Roll20 not handling quotes correctly from sheet.json
-on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
-    console.log(eventInfo);
-    if (eventInfo.newValue && eventInfo.newValue.includes('’')) {
+const fixQuotes = function (currentValue, attribute, event) {
+    if (currentValue.includes('’')) {
         let newValue = {};
-        newValue[eventInfo.sourceAttribute] = eventInfo.newValue.replaceAll('’', '\'');
+        newValue[attribute] = currentValue.replaceAll('’', '\'');
+        console.log(`${attribute} was updated via ${event}`);
         setAttrs(newValue,{silent:true});
+    }
+}
+
+on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
+    if (eventInfo.newValue) {
+        fixQuotes(eventInfo.newValue, eventInfo.sourceAttribute, "eventInfo.newValue");
+    } else {
+        getAttrs([eventInfo.sourceAttribute], function (values) {
+            fixQuotes(values[eventInfo.sourceAttribute], eventInfo.sourceAttribute, "getAttrs");
+        });
     }
 });
 
@@ -45865,7 +45875,7 @@ on(BOOK_FIELDS.map(b => `change:${b}`).join(' '), function (eventInfo) {
 // --- Version change start --- //
 
 const SHEET_NAME = 'AD&D 2E Revised';
-const SHEET_VERSION = '4.7.1';
+const SHEET_VERSION = '4.7.2';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
