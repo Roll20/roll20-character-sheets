@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.7.1" readonly />
+													<input type="text" class="center" name="attr_version" value="1.7.2" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -7802,46 +7802,57 @@
 			}
 		}
 		
-		function doUpgrade(value, sheetdb, skilltempIDs, setObj){
-			const sheet_version = value.version.split('.').map(Number);
-			const global_version = value.global_version.split('.').map(Number);
-			//clog(2, {}, 'sheet_version =', sheet_version);
+		function doUpgrade(value, attrIDs, setObj){
+			clog(2, {}, `global_version =`, value.global_version, 'doUpgrade()');
+			clog(2, {}, 'sheet_version =', value.version);
+			const sheet_version = value.version;
+			let global_version = value.global_version.split('.').map(Number);
+			const major_global_version = parseInt(global_version.shift());
+			const minor_global_version = parseFloat(global_version.join('.'));
 			//clog(2, {}, 'global_version =', global_version);
-			clog(2, {}, 'sheet_version =', value.version, 'doUpgrade()');
-			if (global_version[0] <= 1 && global_version[1] <= 2 && global_version[2] < 2 || value.upgraded_1_2_2 === true) {
+			//clog(2, {}, 'major_global_version =', major_global_version);
+			//clog(2, {}, 'minor_global_version =', minor_global_version);
+			//const isLesserThan122 = global_version[0] <= 1 && global_version[1] <= 2 && global_version[2] < 2 ?
+			const isLesserThan122 = major_global_version <= 1 && minor_global_version < 2.2 ?
+				true : false;
+			//clog(2, {}, 'isLesserThan122 =', isLesserThan122);
+			if (isLesserThan122) {
 				upgradeTo_1_2_2(value, setObj);
 			}
-			if (global_version[0] <= 1 && global_version[1] <= 3 && global_version[2] < 1 || value.upgraded_1_3_1 === true) {
+			//const isLesserThan131 = global_version[0] <= 1 && global_version[1] <= 3 && global_version[2] < 1 ?
+			const isLesserThan131 = major_global_version <= 1 && minor_global_version < 3.1 ?
+				true : false;
+			//clog(2, {}, 'isLesserThan131 =', isLesserThan131);
+			if (isLesserThan131) {
 				upgradeTo_1_3_1(value, setObj);
 			}
-			if (global_version[0] <= 1 && global_version[1] < 5 || value.upgraded_1_5_0 === true) {
-				upgradeTo_1_5_0(value, setObj);
+			//const isLesserThan150 = global_version[0] <= 1 && global_version[1] < 5 ?
+			const isLesserThan150 = major_global_version <= 1 && minor_global_version < 5.0 ?
+				true : false;
+			//clog(2, {}, 'isLesserThan150 =', isLesserThan150);
+			if (isLesserThan150) {
+				upgradeTo_1_5_0(setObj);
 			}
-			/*if (global_version[0] === 1 && global_version[1] < 6) {
-				upgradeTo_1_6_0(value, sheetdb, skilltempIDs, setObj);
-			}*/
-			setObj.global_version = sheet_version.join('.');
-			clog(2, {}, `global_version =`, setObj.global_version);
+			//const isLesserThan172 = global_version[0] <= 1 && global_version[1] <= 7 && global_version[2] < 2 ?
+			const isLesserThan172 = major_global_version <= 1 && minor_global_version < 7.2 ?
+				true : false;
+			//clog(2, {}, 'isLesserThan172 =', isLesserThan172);
+			if (isLesserThan172) {
+				upgradeTo_1_7_2(attrIDs, setObj);
+			}
+			setObj.global_version = sheet_version;
 		}
 		
 		function upgradeTo_1_2_2(value, setObj){
-			/*if(value.upgraded_1_2_2 == true){
-				return;
-			}*/
 			const oldname = value.name || '';
 			const newname = value.charactername || '';
 			if(oldname.length > 0 && newname.length == 0){
 				setObj.charactername = oldname;
 			}
-			//setObj.upgraded_1_2_2 = true;
-			//value.global_version = '1.2.2';
 			clog(2, {}, 'upgraded to 1.2.2');
 		}
 		
 		function upgradeTo_1_3_1(value, setObj){
-			/*if(value.upgraded_1_3_1 == true){
-				return;
-			}else{*/
 				if (value.attrdb !== undefined) {
 					const attrdb = _.isString(value.attrdb) ? 
 						JSON.parse(value.attrdb) : value.attrdb;
@@ -7852,16 +7863,10 @@
 						setObj[`repeating_attr_${rowID}_rank`] = rank;
 					});
 				}		
-				//setObj.upgraded_1_3_1 = true;
-				//sheetdb.global_version = '1.3.1';
-			//}
 			clog(2, {}, 'upgraded to 1.3.1');
 		}
 		
-		function upgradeTo_1_5_0(value, setObj){
-			/*if(value.upgraded_1_5_0 == true){
-				return;
-			}else{*/
+		function upgradeTo_1_5_0(setObj){
 				const limiters_array = ['activation','ammo','assisted','backblast','backlash','bothdirections','broadcategory','capped','category','category','categoty','charges','concentration','consumable','delay','dependent','deplete','detectable','emotional','environmental','equipment','exclusive','fieldless','focused','focuseddamage','gap','glide','group','hands','imbue','impacting','inaccurate','ingest','intensity','internal','irreversible','localized','maintain','maximum','nonadjacent','nonpenetrating','nostun','object','permanent','proportionaldamage','recovery','roadbound','semipermanent','skillflux','skim','specialized','specificattribute','spread','stoppable','targeteddamage','toxic','unique','unpredictable','unreliable'];
 				getSectionIDs('attr', attrIDs => {
 					const attr_customization_array = _.map(attrIDs, id => {
@@ -7888,28 +7893,26 @@
 						})
 					});
 				});
-				//setObj.upgraded_1_5_0 = true;
-				//sheetdb.global_version = '1.5.0';
-			//}	
 			clog(2, {}, 'upgraded to 1.5.0');
 		}
 		
 		function upgradeTo_1_6_0(value, sheetdb, skilltempIDs, setObj){
-			/*value.attrdb !== undefined ? 
-				_.isString(value.attrdb) ? 
-					sheetdb.attrdb = JSON.parse(value.attrdb) : 
-					sheetdb.attrdb = value.attrdb : 
-				createAttrdbJSON(sheetdb);*/
 			const skillmap = _.chain(skilltempIDs)
 				.map( id => {
 					return { [id]: value[`repeating_skilltemplate_${id}_label`] };
 				})
 				.compact()
 				.value();
-			//console.log(`on open skillmap = ${skillmap}`);
 			sheetdb.skillmap = skillmap;
-			//sheetdb.global_version = '1.6.0';
 			clog(2, {}, 'upgraded to 1.6.0');
+		}
+		
+		function upgradeTo_1_7_2(attrIDs, setObj) {
+			_.each(attrIDs, id => {
+				setObj[`repeating_attr_${id}_lock`] = "1";
+				setObj[`repeating_attr_${id}_options`] = 0;
+			});
+			clog(2, {}, 'upgraded to 1.7.2');
 		}
 		
 		/** Build UI Functions **/
@@ -13664,7 +13667,7 @@
 						setObj.stat_total_body = '0';
 						setObj.stat_total_mind = '0';
 						setObj.stat_total_soul = '0';
-						doUpgrade(value, sheetdb, skilltempIDs, setObj);
+						doUpgrade(value, attrIDs, setObj);
 					}else{
 						const skillmap = _.chain(skilltempIDs)
 						.map( id => {
@@ -13673,7 +13676,7 @@
 							.compact()
 							.value();
 						sheetdb.skillmap = skillmap;
-						doUpgrade(value, sheetdb, skilltempIDs, setObj);
+						doUpgrade(value, attrIDs, setObj);
 					}
 					setObj.sheetdb = JSON.stringify(sheetdb);
 					clog(3, timer, 'Ready to write setObj to cache:', setObj, 'setAttrs()');
