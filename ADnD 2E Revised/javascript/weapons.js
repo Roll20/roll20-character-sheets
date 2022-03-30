@@ -2785,7 +2785,8 @@ weapons['yoroi-toshi'] = {
 //#endregion
 
 //#region Player's Option: Combat & Tactics
-weapons['adze'] = {
+const poWeapons = {};
+poWeapons['adze'] = {
     'name': 'Adze',
     'size': 'S',
     'type': 'S/P',
@@ -2798,7 +2799,7 @@ weapons['adze'] = {
     'category': ['Melee']
 };
 
-weapons['ankus'] = {
+poWeapons['ankus'] = {
     'name': 'Ankus',
     'size': 'M',
     'type': 'P/B',
@@ -2811,7 +2812,7 @@ weapons['ankus'] = {
     'category': ['Melee']
 };
 
-weapons['stone axe'] = {
+poWeapons['stone axe'] = {
     'name': 'Stone axe',
     'size': 'M',
     'type': 'B/S',
