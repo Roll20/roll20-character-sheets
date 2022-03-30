@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.7.2" readonly />
+													<input type="text" class="center" name="attr_version" value="1.7.3" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -2953,7 +2953,7 @@
 								<div class="flex-container-evenlyspace padb">
 									<div class="flex-1">
 										<div>
-											<input type="checkbox" class="block-switch" name="attr_options" value="1" />
+											<input type="checkbox" class="block-switch" name="attr_options" value="1" checked />
 											<div class="block-a"></div>
 											<div class="block-b">
 												<div class="row">
@@ -9209,8 +9209,10 @@
 			clog(debug, timer, 'tab =', tab, 'setGroupMembership()');
 			const currGroup = tab.replace(/attrgroup/g, '');
 			clog(debug, timer, 'currGroup =', currGroup);
-			setObj[`${source}_new`] = 0;
-			setObj[`${source}_group`] = currGroup;
+			//setObj[`${source}_new`] = 0;
+			//setObj[`${source}_group`] = currGroup;
+			writeValues(debug, timer, value, `${source}_new`, 0, setObj);
+			writeValues(debug, timer, value, `${source}_group`, currGroup, setObj);
 		}
 		
 		function resetOnActive(debug, timer, eventInfo, value, match, rowID, setObj) {
@@ -13799,8 +13801,9 @@
 		
 						switch (sectionName) {
 							case `attr`:
-								const isNew = parseInt(value[`${source}_new`]) || 1;
-								if(isNew === 1) {
+								const isNew = parseInt(value[`${source}_new`]) === 0 ? false : true;
+								clog(debug, timer, `${source}_new =`, value[`${source}_new`], 'Attribute is new?');
+								if(isNew) {
 									setGroupMembership(debug, timer, value, setObj, source, sectionName);
 									attrIDs.indexOf(rowID) === -1 ? attrIDs.push(rowID) : false;
 									setDepleteRules(debug, timer, value, rowID, setObj);
@@ -13856,9 +13859,8 @@
 									break;
 									case `lock`:
 										if (resetOnActive(debug, timer, eventInfo, value, match, rowID, setObj)) return;
-										if (eventInfo.newValue == "1") setObj[`${source}_options`] = 0;
-										const state = parseInt(value[`${source}_options`]) > 0 ? 0: 1;
-										setObj[`${source}_options`] = state;
+										const state = eventInfo.newValue === "1" ? 0 : 1;
+										writeValues(debug, timer, value, `${source}_options`, state, setObj);
 									break;
 									case 'defect':
 										resetRank(value, rowID, setObj);
