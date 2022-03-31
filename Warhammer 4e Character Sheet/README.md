@@ -73,6 +73,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+March 31th 2022 v1.55b
+
+- Corrected UiA critTable not activing in certain situations.
+- Corrected but Encumbrance Max value not displaying, related to new Orge Race.
+- Various fixes and additions to Talent integration (with community support!)
+
 
 March 25th 2022 v1.55a
 
