@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
-const sheetName = 'AD&D 2E Revised';
-const sheetVersion = '4.5.1';
+const SHEET_NAME = 'AD&D 2E Revised';
+const SHEET_VERSION = '4.7.2';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -9,20 +9,18 @@ on('sheet:opened', function(){
         let sheet_name=cs[1] || '';
         let sheet_version=cs[2] || '0.0.0';
 
-        // do something with sheet_name and sheet_version, if you might be converting
-
-        if(sheet_name !== sheetName || sheet_version !== sheetVersion) {
-            console.log(`Updating character sheet from ${sheet_version} to ${sheetVersion}`);
+        if(sheet_name !== SHEET_NAME || sheet_version !== SHEET_VERSION) {
+            console.log(`Updating character sheet from ${sheet_version} to ${SHEET_VERSION}`);
             setAttrs({
-                character_sheet: `${sheetName} v${sheetVersion}`,
-                version: `v${sheetVersion}`,
+                character_sheet: `${SHEET_NAME} v${SHEET_VERSION}`,
+                version: `v${SHEET_VERSION}`,
                 announcement: 1
             },{silent:true});
-            
+
             //#region Migrations
-            
+
             let oldSheetVersion = new SheetVersion(sheet_version);
-         
+
             // Starting with the oldest version, just in case some field has been moved from A -> B, B -> C
             if (oldSheetVersion.isBelowMigrate(3, 3, 0))
                 migrate3_3_0();
@@ -38,7 +36,10 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(4,5,0))
                 migrate4_5_0();
-            
+
+            if (oldSheetVersion.isBelowMigrate(4,6,0))
+                migrate4_6_0();
+
             //#endregion
         }
     });
@@ -87,6 +88,14 @@ function moveStaticToRepeating(section, fieldsToMove) {
 }
 //#endregion
 
+//#region 4.6.0
+function migrate4_6_0() {
+    console.log('Migrating to v4.6.0');
+    updateWeaponProfsRemaining();
+    updateNonWeaponProfsRemaining();
+}
+//#endregion
+
 //#region 4.5.0
 function migrate4_5_0() {
     console.log('Migrating to v4.5.0');
@@ -125,7 +134,7 @@ function migrateGems() {
                     (row.hasOwnProperty(gemvalue) && row.F[gemvalue]) ||
                     (row.hasOwnProperty(gemqty) && row.F[gemqty])) {
                     console.log(`Moving repeating gem: '${row[gemdesc]}'`)
-                    
+
                     memo.push(oldGemFields.map(field => row[field] || ''));
                     removeRepeatingRow(`repeating_${sectionName}_${row.id}`);
                 }
@@ -137,7 +146,7 @@ function migrateGems() {
                     (attrSet.hasOwnProperty(gemvalue) && attrSet.F[gemvalue]) ||
                     (attrSet.hasOwnProperty(gemqty) && attrSet.F[gemqty])) {
                     console.log(`Moving static gem: '${attrSet[gemdesc]}'`)
-                    
+
                     memo.splice(0, 0, oldGemFields.map(field => attrSet[field]));
                     newValue[gemdesc] = '';
                     newValue[gemvalue] = '';
@@ -169,18 +178,21 @@ function migrateOtherValuables() {
         let total = 0;
         let valuablesString = '';
         gpFields.forEach(field => {
-            total += parseInt(values[field]) || 0;
-            newValue[field] = '';
+            if (values[field]) {
+                total += parseInt(values[field]) || 0;
+                newValue[field] = '';
+            }
         });
-        newValue['othervalue'] = total;
-        
+        if (total !== 0)
+            newValue['othervalue'] = total;
+
         valuablesFields.forEach(field => {
             let oldValue = values[field] || '';
             if (oldValue) {
                 if (valuablesString) {
                     valuablesString += '\n\n';
                 }
-                
+
                 if (field === 'otherval') { // Standard case, no name needed
                     valuablesString += oldValue;
                 } else {
@@ -191,9 +203,11 @@ function migrateOtherValuables() {
                 }
             }
         });
-        newValue['otherval'] = valuablesString;
-        
-        setAttrs(newValue);
+        if (valuablesString)
+            newValue['otherval'] = valuablesString;
+
+        if (!_.isEmpty(newValue))
+            setAttrs(newValue);
     });
 }
 //#endregion
@@ -223,7 +237,7 @@ function migrate3_3_2() {
     moveStaticToRepeating('weapons', ['weaponname', 'strbonus', 'dexbonus', 'prof-level', 'attacknum', 'attackadj', 'ThAC0', 'crit-thresh', 'range', 'size', 'weaptype-slash', 'weaptype-pierce', 'weaptype-blunt', 'weapspeed']);
     moveStaticToRepeating('weapons-damage', ['weaponname1', 'strbonus1', 'dexbonus1', 'specialist-damage', 'mastery-damage', 'damadj', 'damsm', 'daml', 'knockdown1']);
 }
-//#endregion 
+//#endregion
 
 //#region version 3.3.0
 function migrate3_3_0() {
