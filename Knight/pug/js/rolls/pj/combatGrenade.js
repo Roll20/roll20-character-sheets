@@ -246,7 +246,7 @@ rollCombatGrenade.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, '', hasArmure, oTir, false, false, false, false);
+    const getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, '', '', hasArmure, oTir, false, false, false, false);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);

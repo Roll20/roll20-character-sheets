@@ -4358,18 +4358,21 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.7.7 -->				
+				<!-- current version notes: 2.7.9 -->				
 				<ul>
 					<li>
-						Removed a modern javascript operator that wasn't supported by Roll20's API. If you had custom API script, you may have noticed this error.
-						This should be fixed now.
-						<ul>
-							<li>SyntaxError: Decimals with leading zeros are not allowed in strict mode.</li>
-							<li>syntaxerror unexpected token '.'</li>
-						</ul>
+						Combat Ranged tab. Updated the <b>Range Calculator</b> tool so you don't have to check the sheet option <b>Use Ranged Attack Modifier Tool</b>. 
+						If you click the <b>Apply</b> button for the Range Calculator tool, it will apply the modifiers and you will see them on the results table.
 					</li>
 					<li>
-						Updated the link to the Community Forum GURPS Thread. 
+						Traits Tab. Increased the size of the notes text boxes for Advantages, Disadvantages, and Racial Traits.
+					</li>
+					<li>
+						Active Defenses. When adding a brand new active defense, the Combat Reflexes bonus is now applied to the final base skill
+						instead of adding a modifier bonus. Missed feature when converting Combat Reflexes in Version 2.7.8.
+					</li>
+					<li>
+						Active Defenses. Added the option to <b>Dodge</b> or <b>Current Dodge</b> as a link type.
 					</li>
 				</ul>
 				
@@ -4807,17 +4810,18 @@ Roll at the end of your turn after Do Nothing
 						</div>
 						<span class="tooltip">
 							<span data-i18n="attribute-knock-down-tooltip">
-Knockdown & Stunning Check, based on Health.<br />
-Roll: <br />
-Whenever you suffer a major wound. B420<br />
-Whenever you are struck in the head (skull, face, or eye) or<br />
-vitals for enough injury to cause a shock penalty,<br />
-You must make an immediate HT roll to avoid knockdown and stunning. <br />
-<i>>Modifiers:</i> <br />
--5 for a major wound to the face or vitals (or to the groin, on a humanoid male).<br />
--10 for a major wound to the skull or eye. <br />
-+3 High Pain Threshold<br />
--4 Low Pain Threshold
+Knockdown and Stunning check (B420), based on HT (Health).<br />
+Roll <span style="font-style: italic; font-weight: bold; text-decoration: underline;">immediately</span> whenever the following happens:<br />
+<ul>
+	<li>You suffer a Major Wound (B420) - This is any <span style="font-style: italic; font-weight: bold; text-decoration: underline;">single injury</span> that inflicts a wound in excess of ½ your HP.</li>
+	<li>You suffer any Crippling Injury (B420-421).</li>
+	<li>Whenever you are struck in the Head (Skull, Face, or Eye) or Vitals for enough injury to cause a Shock (B419) penalty.</li>
+</ul>
+<span style="font-style: italic;">Modifiers:</span><br />
+<ul>
+	<li>- 5 for a Major Wound (B420) to the Face or Vitals (or to the Groin on a humanoid male).</li>
+	<li>- 10 for a Major Wound (B420) to the Skull or Eye.</li>
+</ul>		
 							</span>
 						</span>
 					</div>
@@ -4918,7 +4922,7 @@ Unmodified: <span name="attr_basic_speed_base" value="10"></span>
 						<input type="number" name="attr_basic_speed_points" value="0" step="5" title="Macro name: basic_speed_points" />
 					</div>
 					<div class="cell col4">
-						<button title="Reminder: You must select your Token first.&#013;This will add the Token's Speed plus DX&#013;as a single number in the Turn Order." class="roll-tracker" type="roll" value="@{speed_tracker} [[[[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] &{tracker:=}]] &{template:addToTracker} {{characterName=@{character_name}}} {{skillName=Added to the Turn Order as [[ [[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] ]]}} {{basicSpeed=Speed: @{selected|Basic_Speed} &nbsp;&nbsp; DX: @{selected|dexterity}}}" name="roll_init" />
+						<button title="Reminder: You must select your Token first.&#013;This will add the Token's Speed plus DX&#013;as a single number in the Turn Order.&#013;DX was added to Speed to help break ties. (B363)" class="roll-tracker" type="roll" value="@{speed_tracker} [[[[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] &{tracker:=}]] &{template:addToTracker} {{characterName=@{character_name}}} {{skillName=Added to the Turn Order as [[ [[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] ]]}} {{basicSpeed=Speed: @{selected|Basic_Speed} &nbsp;&nbsp; DX: @{selected|dexterity}}}" name="roll_init" />
 					</div>
 				</div> <!-- .row -->
 				<div class="row row-basic-move">
@@ -5017,7 +5021,7 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_lift_st_base" r
 							<span data-i18n="attribute-lift">Lift</span>
 						</div>
 						<span class="tooltip">
-							<span data-i18n="attribute-basic-lift-tooltip">Basic Lift Table B17, in pounds. (B15)</span>
+							<span data-i18n="attribute-basic-lift-tooltip">Basic Lift Table B17, in <span name="attr_weight_system"></span>. (B15)</span>
 						</span>
 					</div>
 					<div class="cell col1">
@@ -5544,7 +5548,7 @@ Examples include:<br />
 								</span>
 							</div>
 							<div class="cell col1">
-								<span data-i18n="weight-label">Weight</span>
+								<span name="attr_weight_system"></span>
 							</div>
 						</div> <!-- .header -->
 						<div class="row row-simple-lift">
@@ -6990,7 +6994,7 @@ and Advantages.
 						<div class="popup">
 							<span data-i18n="abbreviation-character-points-label">Pts</span>
 						</div>
-						<span class="tooltip">
+						<span class="tooltip tooltip-skills-ref">
 							<span data-i18n="cultural-point-cost">Native culture cost is 0. Otherwise cost is 1 or 2 (Consult with GM). (B23)</span>
 						</span>
 					</div>
@@ -7014,7 +7018,7 @@ and Advantages.
 						
 						<div class="row">
 							<div class="cell label">
-								<textarea class="text-left notes" name="attr_notes" title="Macro: repeating_ranged_{$1}_notes. $1 = Row number OR the Row ID."></textarea>
+								<textarea class="text-left notes" name="attr_notes" title="Macro: repeating_cultures_{$1}_notes. $1 = Row number OR the Row ID."></textarea>
 							</div>
 						</div> <!-- .row -->
 					</div>
@@ -7070,7 +7074,7 @@ Frequency of Appearance<br />
 						<div class="popup">
 							<span data-i18n="abbreviation-book-reference-label">Ref</span>
 						</div>
-						<div class="tooltip">
+						<div class="tooltip tooltip-skills-ref">
 							<span data-i18n="book-reference-tooltip">
 Reference to book and page numbers.<br />
 Examples:<br />
@@ -7110,14 +7114,14 @@ PU2:126 = Power-Ups 2. Page 126
 					<div class="melee-notebox">
 						
 						<div class="row">
-							<div class="cell label">
+							<div class="cell label full-width-margin-right-sm">
 								<div class="show-notes">
 									<input type="checkbox" name="attr_show_notes" value="1" />
 									<span class="label">
 										<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
 									</span> 	
 								</div>
-								<textarea class="text-left chat-size" name="attr_notes" title="Macro table name: repeating_traits. Field name: notes"></textarea>
+								<textarea class="text-left full-width-margin-zero texbox-height-medium" name="attr_notes" title="Macro table name: repeating_traits. Field name: notes"></textarea>
 							</div>
 						</div> <!-- .row -->
 
@@ -7301,7 +7305,7 @@ Frequency of Appearance<br />
 						<div class="popup">
 							<span data-i18n="abbreviation-book-reference-label">Ref</span>
 						</div>
-						<div class="tooltip tooltip-spell-ref">
+						<div class="tooltip tooltip-skills-ref">
 							<span data-i18n="book-reference-tooltip">
 Reference to book and page numbers.<br />
 Examples:<br />
@@ -7395,7 +7399,7 @@ Frequency of Appearance<br />
 						<div class="popup">
 							<span data-i18n="abbreviation-book-reference-label">Ref</span>
 						</div>
-						<div class="tooltip tooltip-spell-ref">
+						<div class="tooltip tooltip-skills-ref">
 							<span data-i18n="book-reference-tooltip">
 Reference to book and page numbers.<br />
 Examples:<br />
@@ -7435,14 +7439,14 @@ PU2:126 = Power-Ups 2. Page 126
 					<div class="melee-notebox">
 						
 						<div class="row">
-							<div class="cell label">
+							<div class="cell label full-width-margin-right-sm">
 								<div class="show-notes">
 									<input type="checkbox" name="attr_show_notes" value="1" />
 									<span class="label">
 										<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
 									</span> 	
 								</div>
-								<textarea class="text-left chat-size" name="attr_notes" title="Macro table name: repeating_disadvantages Field name: notes"></textarea>
+								<textarea class="text-left full-width-margin-zero texbox-height-medium" name="attr_notes" title="Macro table name: repeating_disadvantages Field name: notes"></textarea>
 							</div>
 						</div> <!-- .row -->
 
@@ -7549,7 +7553,7 @@ Frequency of Appearance<br />
 						<div class="popup">
 							<span data-i18n="abbreviation-book-reference-label">Ref</span>
 						</div>
-						<div class="tooltip tooltip-spell-ref">
+						<div class="tooltip tooltip-skills-ref">
 							<span data-i18n="book-reference-tooltip">
 Reference to book and page numbers.<br />
 Examples:<br />
@@ -7613,14 +7617,14 @@ PU2:126 = Power-Ups 2. Page 126
 					<div class="melee-notebox">
 						
 						<div class="row">
-							<div class="cell label">
+							<div class="cell label full-width-margin-right-sm">
 								<div class="show-notes">
 									<input type="checkbox" name="attr_show_notes" value="1" />
 									<span class="label">
 										<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
 									</span> 	
 								</div>
-								<textarea class="text-left chat-size" name="attr_notes" title="Macro table name: repeating_racial Field name: notes"></textarea>
+								<textarea class="text-left full-width-margin-zero texbox-height-medium" name="attr_notes" title="Macro table name: repeating_racial Field name: notes"></textarea>
 							</div>
 						</div> <!-- .row -->
 
@@ -9080,7 +9084,7 @@ visualize what it will look like in chat.
 								<div class="item item8">
 									<input type="number" name="attr_encumbrance_level" value="" readonly="readonly" title="Macro: @{NAME|encumbrance_level}" />
 								</div>
-								<div class="item item9">
+								<div class="item item9 load">
 									<input type="hidden" name="attr_total_weight" value="" />
 									<input type="text" name="attr_total_weight_gravity" value="" readonly="readonly" title="Macro: @{NAME|total_weight_gravity}" />
 								</div>
@@ -10599,7 +10603,7 @@ visualize what it will look like in chat.
 										<input type="number" step="1" value="0" name="attr_skill_mod" title="Macro: repeating_defense_{$1}_skill_mod. $1 = Row number OR the Row ID." />
 									</div>
 									<div class="cell col3">
-										<input type="text" name="attr_skill_final" value="@{skill} + @{skill_mod}" disabled="disabled" title="Macro: repeating_defense_{$1}_skill_final. $1 = Row number OR the Row ID." />
+										<input type="text" name="attr_skill_final" value="@{skill} + @{skill_mod} + @{defense_combat_reflexes_bonus}" disabled="disabled" title="Macro: repeating_defense_{$1}_skill_final. $1 = Row number OR the Row ID." />
 									</div>
 									<div class="cell col4">
 										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{skill_final} + @{modifier} + @{defense_roll_modifier}, @{defense_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_defense_modifier_tool}]]}} {{maxNine=[[@{defense_roll_max_nine}]]}} {{rollModifier=[[@{defense_roll_modifier}]]}} {{rollModifierSummary=@{defense_roll_modifier_summary}}} {{rollTraitSummary=@{defense_roll_trait_summary}}} {{showNotes=[[@{show_notes}]]}} {{notes=@{info_description} @{notes} }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_success_note}}} {{rawCriticalSuccessNote=@{raw_critical_success_note}}} {{rawFailNote=@{raw_fail_note}}} {{rawCriticalFailNote=@{raw_critical_fail_note}}} {{customSuccessNote=@{defense_success_note}}} {{customCriticalSuccessNote=@{defense_critical_success_note}}} {{customFailNote=@{defense_fail_note}}} {{customCriticalFailNote=@{defense_critical_fail_note}}}" name="roll_vsSL" />
@@ -10609,6 +10613,7 @@ visualize what it will look like in chat.
 								<div class="row row-details notebox">
 								
 									<input type="hidden" name="attr_type" />
+									<input type="hidden" name="attr_defense_row_type" />
 									<div class="row active-defense-formula">
 										<div class="cell label">
 											<div class="popup">
@@ -10623,7 +10628,7 @@ visualize what it will look like in chat.
 												<span data-i18n="formula-as-is-description">Enter a value or use the linked item value as is.</span>
 											</div>
 											<div class="formula formula-parry">
-												<span data-i18n="formula-parry-description">3 + (Skill or DX)/2, rounded down.</span>
+												<span data-i18n="formula-parry-description">3 + (Skill or DX)/2, rounded down</span>
 											</div>
 											<div class="formula formula-block">
 												<span data-i18n="formula-block-description">3 + (Shield or Cloak skill)/2, rounded down.</span>
@@ -10640,7 +10645,19 @@ visualize what it will look like in chat.
 											<div class="formula formula-power-block-mental">
 												<span data-i18n="power-block-mental-description">3 + (WILL + Talent)/2, rounded down.</span>
 											</div>
+											<div class="formula formula-base-dodge">
+												<span data-i18n="formula-base-dodge-description">Base Dodge attribute.</span>
+											</div>
+											<div class="formula formula-current-dodge">
+												<span data-i18n="formula-current-dodge-description">Current Dodge affected by HP, FP, and Encumbrance.</span>
+											</div>
 										</div>
+										<div class="cell formula-combat-reflexes">
+											<b><span data-i18n="combat-reflexes-label">Combat Reflexes:</span></b>
+											<input type="checkbox" value="1" name="attr_defense_combat_reflexes" />
+											<input type="hidden" value="0" name="attr_defense_combat_reflexes_bonus" />
+										</div>
+
 									</div>
 
 									<div class="row">
@@ -10666,6 +10683,8 @@ visualize what it will look like in chat.
 												<option value="WILL" data-i18n="option-will">WILL</option>
 												<option value="HT" data-i18n="option-health">HT</option>
 												<option value="SPEED" data-i18n="option-basic-speed">Basic Speed</option>
+												<option value="DODGE" data-i18n="option-dodge">Dodge</option>
+												<option value="CURRENT_DODGE" data-i18n="option-current-dodge">Current Dodge</option>
 												<option value="10">10</option>
 											</select>
 										</div>
@@ -10847,7 +10866,7 @@ visualize what it will look like in chat.
 								<div class="combat-reflexes">
 									
 									<div style="float: left;">
-										<input type="hidden" name="attr_apply_combat_reflexes_to_mod_is_new" value="1" />
+										<input type="hidden" name="attr_reflexes_converted_to_base_skill" value="0" />
 										<input type="checkbox" class="boolean combat-reflex-check" name="attr_combat_reflexes" value="1" />
 										<div class="popup">
 											<span data-i18n="apply-combat-reflexes-label">Apply Combat Reflexes</span>
@@ -11551,13 +11570,12 @@ visualize what it will look like in chat.
 							</div> <!-- .header -->
 
 							<!-- attr_use_ranged_modifier_tool is linked to checkbox on options sheet -->
-							<input type="hidden" name="attr_use_ranged_modifier_tool" value="0" />
 							<div class="row roll-modifiers">
 								<div class="cell label">
 									<div class="popup">
 										<span data-i18n="modifier-label">Modifier:</span>
 									</div>
-									<div class="tooltip">
+									<div class="tooltip" style="margin-left: -50px;">
 										<span data-i18n="modifier-dialog-tooltip">Enter a modifier to apply to any rolls on the this table.<br />Use the pencil/paper icon to select modifiers.<br /><b>NOTE:</b> Changing the modifier or check status of <i>Max skill of 9</i> will clear modifiers used by dialog box.</span>
 									</div>
 								</div>
@@ -11570,9 +11588,10 @@ visualize what it will look like in chat.
 									<input type="hidden" value="" name="attr_ranged_roll_allout_attack" />
 								</div>
 								<div class="cell">
-									<button type="action" name="act_show_roll_modifiers_for_ranged" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
+									<input type="hidden" name="attr_use_ranged_modifier_tool" value="1">
+									<button type="action" name="act_show_roll_modifiers_for_ranged" class="btn show-skill-modifier-button" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
 								</div>
-								<div class="cell cell-popup">
+								<div class="cell cell-popup margin-left-small">
 									<div>
 										<input type="checkbox" name="attr_ranged_roll_max_nine" value="1" title="Macro: @{NAME|ranged_roll_max_nine}" />
 										<input type="hidden" name="attr_ranged_roll_max_nine_value" value="100" />
@@ -11680,7 +11699,7 @@ visualize what it will look like in chat.
 										<input type="text" name="attr_skill" title="Macro: repeating_ranged_{$1}_skill. $1 = Row number OR the Row ID." />
 									</div>
 									<div class="cell col11">
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Attack}} {{rangedAttack=[[1]]}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{skill} + @{modifier} + @{ranged_roll_modifier}, @{ranged_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_ranged_modifier_tool}]]}} {{maxNine=[[@{ranged_roll_max_nine}]]}} {{rollModifier=[[@{ranged_roll_modifier}]]}} {{rollModifierSummary=@{ranged_roll_modifier_summary}}} {{rollTraitSummary=@{ranged_roll_trait_summary}}} {{hitLocation=@{ranged_roll_hit_location}}} {{maneuver=@{ranged_roll_maneuver}}} {{allOutAttack=@{ranged_roll_allout_attack}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{rof=@{rof}}} {{recoil=@{recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useMalfunction=[[@{use_malfunction}]]}} {{malfunction=[[@{malfunction}]]}} {{verifyMalfunction=[[ @{malfunction_verify} ]]}} {{veryReliable=[[ @{malfunction_very_reliable} ]]}} {{customSuccessNote=@{success_notes}}} {{customCriticalSuccessNote=@{critical_success_notes}}} {{customFailNote=@{fail_notes}}} {{customCriticalFailNote=@{critical_fail_notes}}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_hit_notes}}} {{rawCriticalSuccessNote=@{raw_critical_hit_notes}}} {{rawFailNote=@{raw_miss_notes}}} {{rawCriticalFailNote=@{raw_critical_miss_notes}}}" name="roll_vsSL" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Attack}} {{rangedAttack=[[1]]}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{skill} + @{modifier} + @{ranged_roll_modifier}, @{ranged_roll_max_nine_value} }kl1]]}} {{useModToll=[[1]]}} {{maxNine=[[@{ranged_roll_max_nine}]]}} {{rollModifier=[[@{ranged_roll_modifier}]]}} {{rollModifierSummary=@{ranged_roll_modifier_summary}}} {{rollTraitSummary=@{ranged_roll_trait_summary}}} {{hitLocation=@{ranged_roll_hit_location}}} {{maneuver=@{ranged_roll_maneuver}}} {{allOutAttack=@{ranged_roll_allout_attack}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{rof=@{rof}}} {{recoil=@{recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useMalfunction=[[@{use_malfunction}]]}} {{malfunction=[[@{malfunction}]]}} {{verifyMalfunction=[[ @{malfunction_verify} ]]}} {{veryReliable=[[ @{malfunction_very_reliable} ]]}} {{customSuccessNote=@{success_notes}}} {{customCriticalSuccessNote=@{critical_success_notes}}} {{customFailNote=@{fail_notes}}} {{customCriticalFailNote=@{critical_fail_notes}}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_hit_notes}}} {{rawCriticalSuccessNote=@{raw_critical_hit_notes}}} {{rawFailNote=@{raw_miss_notes}}} {{rawCriticalFailNote=@{raw_critical_miss_notes}}}" name="roll_vsSL" />
 									</div>
 								</div> <!-- .row -->
 								
@@ -11936,7 +11955,7 @@ visualize what it will look like in chat.
 						<div class="table">
 							<div class="header">
 								<div class="cell col0-st">
-									<span data-i18n="abbreviation-thrown-pounds-label">Thrown (lbs)</span>
+									<span data-i18n="abbreviation-thrown-pounds-label">Thrown (<span name="attr_weight_system"></span>)</span>
 								</div>
 								<div class="cell col8">
 									<div class="popup">
@@ -12124,7 +12143,7 @@ visualize what it will look like in chat.
 										</div>
 										<div class="cell col2">
 											<input type="hidden" name="attr_damage_dice_icon" class="range-damage-dice-icon" value="explode" />
-											<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Damage}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} lbs.}} {{damageRoll=[[@{thrown_object_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{thrown_minimum_damage_note}}} {{damageType=@{thrown_object_damage_type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{thrown_object_damage_type_note}}} {{showNotes=[[1]]}} {{notes=@{thrown_object_damage_notes}}}" name="roll_damage" class="roll_damage" />
+											<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Damage}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} @{weight_system}.}} {{damageRoll=[[@{thrown_object_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{thrown_minimum_damage_note}}} {{damageType=@{thrown_object_damage_type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{thrown_object_damage_type_note}}} {{showNotes=[[1]]}} {{notes=@{thrown_object_damage_notes}}}" name="roll_damage" class="roll_damage" />
 										</div>
 										<div class="cell col3">
 											<select name="attr_thrown_object_damage_type" title="Macro name: thrown_object_damage_type">
@@ -12168,7 +12187,7 @@ visualize what it will look like in chat.
 											<input type="text" name="attr_thrown_object_skill" value="10" title="Macro name: thrown_object_skill" />
 										</div>
 										<div class="cell col11">
-											<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} lbs.}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{thrown_object_skill} + @{modifier} + @{ranged_roll_modifier}, @{ranged_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_ranged_modifier_tool}]]}} {{maxNine=[[@{ranged_roll_max_nine}]]}} {{rollModifier=[[@{ranged_roll_modifier}]]}} {{rollModifierSummary=@{ranged_roll_modifier_summary}}} {{rollTraitSummary=@{ranged_roll_trait_summary}}} {{hitLocation=@{ranged_roll_hit_location}}} {{maneuver=@{ranged_roll_maneuver}}} {{allOutAttack=@{ranged_roll_allout_attack}}} {{showNotes=[[1]]}} {{notes=@{thrown_object_notes}}} {{rof=@{thrown_object_rof}}} {{recoil=@{thrown_object_recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
+											<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} @{weight_system}.}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{thrown_object_skill} + @{modifier} + @{ranged_roll_modifier}, @{ranged_roll_max_nine_value} }kl1]]}} {{useModToll=[[1]]}} {{maxNine=[[@{ranged_roll_max_nine}]]}} {{rollModifier=[[@{ranged_roll_modifier}]]}} {{rollModifierSummary=@{ranged_roll_modifier_summary}}} {{rollTraitSummary=@{ranged_roll_trait_summary}}} {{hitLocation=@{ranged_roll_hit_location}}} {{maneuver=@{ranged_roll_maneuver}}} {{allOutAttack=@{ranged_roll_allout_attack}}} {{showNotes=[[1]]}} {{notes=@{thrown_object_notes}}} {{rof=@{thrown_object_rof}}} {{recoil=@{thrown_object_recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
 										</div>
 									</div> <!-- .row -->
 									<div class="row row-details2">
@@ -12295,7 +12314,6 @@ visualize what it will look like in chat.
 								<div class="cell reset">
 									&nbsp;
 								</div>
-								<input type="hidden" name="attr_use_ranged_modifier_tool" value="1">
 								<div class="cell reset apply-button">
 									<div class="popup">
 										<span data-i18n="help-label">Help</span>
@@ -12343,7 +12361,6 @@ visualize what it will look like in chat.
 									<div class="cell reset">
 										<button type="action" name="act_range_calc_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
 									</div>
-									<input type="hidden" name="attr_use_ranged_modifier_tool" value="1">
 									<div class="cell reset apply-button">
 										<button type="action" name="act_apply_firing_modifiers" class="reset"><span data-i18n="apply-label">Apply</span></button>
 									</div>
@@ -12704,10 +12721,10 @@ visualize what it will look like in chat.
 								</div>
 								<div class="cell input">
 									<div class="popup">
-										<span data-i18n="abbreviation-pounds-label">lbs</span>
+										<span name="attr_weight_system"></span>
 									</div>
 									<span class="tooltip">
-										<span data-i18n="demolition-pounds-tooltip">Weight in pounds required by its REF.</span>
+										<span data-i18n="demolition-pounds-tooltip">Weight in <span name="attr_weight_system"></span> required by its REF.</span>
 									</span>
 								</div>
 								<div class="cell input">
@@ -13039,7 +13056,10 @@ visualize what it will look like in chat.
 					</div>
 					<div class="cell col4">#</div>
 					<div class="cell col5">$</div>
-					<div class="cell col6">W</div>
+					<div class="cell col6">
+						<input type="hidden" name="attr_weight_system" value="lbs" />
+						<span name="attr_weight_system"></span>
+					</div>
 					<div class="cell col7">$+</div>
 					<div class="cell col8">W+</div>
 				</div>
@@ -13134,6 +13154,7 @@ visualize what it will look like in chat.
 					<div class="cell col4">
 						<input type="hidden" name="attr_total_weight" value="" />
 						<input type="text" style="font-weight: bold; text-align: center;" name="attr_total_weight_gravity" value="" readonly="readonly" title="Macro: @{NAME|total_weight_gravity}" />
+						<span name="attr_weight_system" class="inline"></span>
 					</div>
 					<div class="cell col5">
 						<div style="text-align: right; font-weight: bold;" class="popup">
@@ -13146,7 +13167,8 @@ visualize what it will look like in chat.
 						</div>
 					</div>
 					<div class="cell col6">
-						<input type="number" style="font-weight: bold; text-align: center;" step=".001" name="attr_grand_total_weight" value="0" readonly="readonly" title="Macro name: grand_total_weight" />
+						<input type="hidden" name="attr_grand_total_weight" />
+						<input type="text" style="font-weight: bold; text-align: center;" name="attr_grand_total_weight_display" value="0" readonly="readonly" title="Macro name: grand_total_weight" />
 
 					</div>					
 				</div> <!-- .row -->
@@ -13639,7 +13661,71 @@ visualize what it will look like in chat.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.7.7 -->
+			<!-- current version notes: 2.7.9 -->
+			<ul>
+				<li>
+					Combat Ranged tab. Updated the <b>Range Calculator</b> tool so you don't have to check the sheet option <b>Use Ranged Attack Modifier Tool</b>. 
+					If you click the <b>Apply</b> button for the Range Calculator tool, it will apply the modifiers and you will see them on the results table.
+				</li>
+				<li>
+					Traits Tab. Increased the size of the notes text boxes for Advantages, Disadvantages, and Racial Traits.
+				</li>
+				<li>
+					Active Defenses. When adding a brand new active defense, the Combat Reflexes bonus is now applied to the final base skill
+					instead of adding a modifier bonus. Missed feature when converting Combat Reflexes in Version 2.7.8.
+				</li>
+				<li>
+					Active Defenses. Added the option to <b>Dodge</b> or <b>Current Dodge</b> as a link type.
+				</li>
+			</ul>
+
+			<h4>Version: 2.7.8</h4>
+
+			<p>Pull Request: 3/1/2022</p>			
+
+			<ul>
+				<li>Updated the text for tooltips, descriptions, and <b>Add to Turn Order</b> result.</li>
+				<li>Added some additional notes to Editable rules for damage types. <b>NOTE:</b> You can only see the new text if you start a new character.</li>
+				<li>Changed a number of labels for <b>Weight</b> to <b>LBS</b> for pounds, this is due to the new <b>Use Metric Weight</b> option.</li>
+				<li>
+					Added new checkbox option for <b>Use Metric Weights</b>. The option can be selected for a specific character sheet 
+					or on the <b>Default Sheet Options</b>. If checked, labels will be changed to show KG and weight formulas updated as necessary.
+					<ul>
+						<li>
+							I did a number of tests and tried to find all the locations for weights/pounds and update corresponding formulas, 
+							but if you find an error please let us know.
+						</li>
+					</ul>
+				</li>
+				<li>
+					Size Modifier Costs for Strength, Hit Points, Lifting ST, and Striking ST was showing the wrong message if you didn't enter 
+					the minimum number of Character Points for the attribute. This has been fixed. Reported Niccy.
+				</li>
+				<li>
+					Combat Reflexes checkbox was updated to be more intuitive when updating the items from the custom Active Defenses table. Requested by Captain Joy.
+					<ul>
+						<li>
+							When Combat Reflexes is checked, it will apply a bonus to the final skill level, 
+							avoiding confusion when updating the mod column and reason for mod description.
+						</li>
+						<li>
+							The first time your character sheet loads with this new version, it should convert
+							custom active defenses to this new method. If you had combat reflexes checked, it will 
+							remove the +1 bonus to the mod column and remove the "+1 from combat reflexes" reason for mod description.
+						</li>
+						<li>
+							I would suggest unchecking/checking Combat Reflexes to make sure the conversion worked. 
+							You may also need to remove the "+1 from combat reflexes" since it does an exact match and if 
+							you modifed the description it might not have gotten removed.
+						</li>
+					</ul> 
+				</li>
+			</ul>
+
+			<h4>Version: 2.7.7</h4>
+
+			<p>Pull Request: 2/18/2022</p>
+			
 			<ul>
 				<li>
 					Removed a modern javascript operator that wasn't supported by Roll20's API. If you had custom API script, you may have noticed this error.
@@ -14590,6 +14676,15 @@ visualize what it will look like in chat.
 								<span data-i18n="use-malfunction-tooltip">If checked, roll results will check for malfunction.</span>
 							</span>
 						</div>
+						<div>
+							<input type="checkbox" name="attr_use_metric" value="1" />
+							<span class="popup">
+								<span data-i18n="use-metric-label">Use Metric Weights</span>
+							</span>
+							<span class="tooltip">
+								<span data-i18n="use-metric-tooltip">If checked, labels will be changed from LBS (pounds) to KG (kiligrams) and encumbrance formula will use metric weights.</span>
+							</span>
+						</div>
 					</div><!-- end malfunction -->
 					
 					<div class="option-container">
@@ -14785,7 +14880,8 @@ visualize what it will look like in chat.
 									<textarea name="attr_damage_type_note_cut">CUTTING
 	Damage x1.5
 	Neck Damage x2
-	Skull Damage x4</textarea>
+	Skull Damage x4
+	Knockback: A cutting attack can cause knockback only if it fails to penerate DR. (B378)</textarea>
 									</td>
 							</tr>
 							<tr>
@@ -14808,7 +14904,8 @@ visualize what it will look like in chat.
 									<textarea name="attr_damage_type_note_cr">CRUSHING
 	Damage x1
 	Neck Damage x1.5
-	Skull Damage x4</textarea>
+	Skull Damage x4
+	Knockback: A crushing attack can cause knockback regardless of whether it penetrates DR. (B378)</textarea>
 								</td>
 							</tr>
 							<tr>
@@ -14917,7 +15014,7 @@ visualize what it will look like in chat.
 										<span data-i18n="knockback-label">Knockback</span>
 									</td>
 									<td>
-										<textarea name="attr_damage_type_note_knockback">Knockback only.</textarea>
+										<textarea name="attr_damage_type_note_knockback">Knockback Only. (B378)</textarea>
 									</td>
 								</tr>
 							</table>
@@ -15047,7 +15144,7 @@ visualize what it will look like in chat.
 	
 		<div class="control">
 			<button type="roll" class="no-decoration" name="roll_blank" value="https://app.roll20.net/forum/post/10667695/gurps-sheet-number-1-thread-2/" title="Show link in chat. NOTE: Right-click to open in new window">
-				<span data-i18n="gurps-sheet-thread-link-button">Roll20 Forum - [GURPS] - Sheet #1 - Thread 1</span>
+				<span data-i18n="gurps-sheet-thread-link-button">Roll20 Forum - [GURPS] - Sheet #1 - Thread 2</span>
 			</button>
 		</div>
 	
@@ -15075,6 +15172,11 @@ visualize what it will look like in chat.
                     <td class="label"><span data-i18n="base-label">BASE</span>:</td>
                     <td>{{basicSpeed}}</td>
                 </tr>
+
+				<tr>
+					<td colspan="2"><span data-i18n="speed-ties-description">DX has been added to Speed to help break ties. (B363)</span></td>
+				</tr>
+
             </table>
         </div>
     </rolltemplate>
@@ -16633,9 +16735,9 @@ visualize what it will look like in chat.
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.7.7";
+	const version = "2.7.9";
 	
-	const latestChangesDate = "2/18/2022";
+	const latestChangesDate = "3/15/2022";
 	
 	let modCascade = true;
 	
@@ -16645,6 +16747,8 @@ visualize what it will look like in chat.
 	let damageTable = [];
 	
 	const decelerationDivisor = 2;
+
+	const metricWeightConversionMultiplier = 2.20462262;
 	
 	// see: https://app.roll20.net/forum/post/7251390/slug%7D
 	const modBySpeedRange = [
@@ -17508,8 +17612,12 @@ visualize what it will look like in chat.
 			setAttrs({ total_value: Number((v * 100) / 100).toFixed(2) }, { silent: true });
 		});
 	
-		getAttrs(['sheet_version', 'mod_cascade', 'modCascade', 'modCascadeAll'], function (v) {
+		getAttrs(['sheet_version', 'mod_cascade', 'modCascade', 'modCascadeAll', 'combat_reflexes', 'reflexes_converted_to_base_skill'], function (v) {
 	
+			const hasCombatReflexes = v.combat_reflexes === "1" ? true : false;
+
+			const hasReflexesBeenConverted = v.reflexes_converted_to_base_skill === "1" ? true : false;
+
 			if (v.modCascade && v.modCascadeAll) {
 				modCascade = v.modCascade;
 				modCascadeAll = v.modCascadeAll;
@@ -17518,22 +17626,23 @@ visualize what it will look like in chat.
 			if (!v.sheet_version || v.sheet_version != version) {
 	
 				let hide = 0;
-	
+					
 				// if this is a brand new sheet. don't show announcements
 				if (!v.sheet_version) {
 					hide = 1;
 				}
 	
-				// Set sheet version:
-				// show announcements div
-				setAttrs({
+				let defaultSettings = {
 					sheet_version: version,
 					announcement_version: version,
 					latest_changes: latestChangesDate,
 					announcements_hide: hide,
 					announcements_show: 0
-				});
-	
+				};
+
+				// Set sheet version:
+				// show announcements div
+				setAttrs(defaultSettings);
 	
 				// initialize any empty fields in repeating sections since the default values were removed.
 				loadRepeating('repeating_languages', 'spoken', 0);
@@ -17544,7 +17653,7 @@ visualize what it will look like in chat.
 				loadRepeating('repeating_spells', 'points', 1);
 	
 				// initialize all calculated stats
-				resetAll(v.mod_cascade);
+				resetAll(v.mod_cascade, !v.sheet_version, hasCombatReflexes, hasReflexesBeenConverted);
 	
 			}
 	
@@ -17556,11 +17665,21 @@ visualize what it will look like in chat.
 	
 	on('change:mod_cascade', function (e) {
 		getAttrs(['mod_cascade'], function (v) {
-			resetAll(v.mod_cascade);
+			resetAll(v.mod_cascade, false, false, false);
 		})
 	});
 	
-	function resetAll(mod_cascade) {
+	/**
+	 * Resets values for the sheet
+	 * 
+	 * @param {string}  mod_cascade              What fields to update based on other attributes
+	 * @param {boolean} isNewSheet               Is this a brand new sheet
+	 * @param {boolean} hasCombatReflexes        Does character sheet have combat reflexes checked
+	 * @param {boolean} hasReflexesBeenConverted Has the character sheet already been converted
+	 * 
+	 */ 
+	function resetAll(mod_cascade, isNewSheet, hasCombatReflexes, hasReflexesBeenConverted) {
+		
 		switch (mod_cascade) {
 			case 'all':
 				modCascade = true;
@@ -17574,6 +17693,7 @@ visualize what it will look like in chat.
 				modCascade = false;
 				modCascadeAll = false;
 		}
+
 		setAttrs({
 			modCascade: modCascade,
 			modCascadeAll: modCascadeAll
@@ -17675,7 +17795,7 @@ visualize what it will look like in chat.
 	
 		updateRepeatingDefenseTypes();
 	
-		updateRepeatingDefenseNotes();
+		updateRepeatingDefenseNotes(isNewSheet, hasCombatReflexes, hasReflexesBeenConverted);
 	
 		syncModsToRepeatingSpells(true, updateRepeatingSkillSpellLevels("repeating_spells"));
 	
@@ -17835,16 +17955,17 @@ visualize what it will look like in chat.
 	
 			let pointsPerLevel = getSizeModifierPointsPerLevel(applySizeModifier, sizeModifier, 10);
 	
-			let strengthModByCharacterPoints = Math.ceil(characterPoints / pointsPerLevel);
+			let strengthModByCharacterPoints = Math.floor(characterPoints / pointsPerLevel);
 	
-			// check for remainder. 
-			let hasRemainder = (characterPoints % pointsPerLevel) >= 1;
+			const calculatedCost = strengthModByCharacterPoints * pointsPerLevel;
+	
+			let isTooLarge = characterPoints - calculatedCost >= 1;
 	
 			let pointsNeededForStrength = 0;
 	
 			let showMessage = 0;
 	
-			if (applySizeModifier && sizeModifier > 0 && hasRemainder) {
+			if (applySizeModifier && sizeModifier > 0 && isTooLarge) {
 	
 				showMessage = 1;
 	
@@ -17977,14 +18098,15 @@ visualize what it will look like in chat.
 	
 			let modByCharacterPoints = Math.floor(characterPoints / pointsPerLevel);
 	
-			// check for remainder. 
-			let hasRemainder = (characterPoints % pointsPerLevel) >= 1;
+			const calculatedCost = modByCharacterPoints * pointsPerLevel;
+	
+			let isTooLarge = characterPoints - calculatedCost >= 1;
 	
 			let pointsNeededForHitPoints = 0;
 	
 			let showMessage = 0;
 	
-			if (applySizeModifier && sizeModifier > 0 && hasRemainder) {
+			if (applySizeModifier && sizeModifier > 0 && isTooLarge) {
 	
 				showMessage = 1;
 	
@@ -18314,7 +18436,7 @@ visualize what it will look like in chat.
 	}
 	
 	// Lifting ST
-	on('change:strength change:lift_st_points change:lift_st_mod change:apply_size_modifier', function (e) {
+	on('change:strength change:lift_st_points change:lift_st_mod change:apply_size_modifier change:use_metric', function (e) {
 		updateLift();
 	});
 	
@@ -18325,7 +18447,7 @@ visualize what it will look like in chat.
 	
 		callback = callback || noop;
 	
-		getAttrs(['strength', 'strength_base', 'lift_st_points', 'lift_st_mod', 'size', 'apply_size_modifier'], function (v) {
+		getAttrs(['strength', 'strength_base', 'lift_st_points', 'lift_st_mod', 'size', 'apply_size_modifier', 'use_metric'], function (v) {
 	
 			let applySizeModifier = (v.apply_size_modifier == "1");
 	
@@ -18336,15 +18458,16 @@ visualize what it will look like in chat.
 			let pointsPerLevel = getSizeModifierPointsPerLevel(applySizeModifier, sizeModifier, 3);
 	
 			let strengthModByCharacterPoints = Math.floor(characterPoints / pointsPerLevel);
+
+			const calculatedCost = strengthModByCharacterPoints * pointsPerLevel;
 	
-			// check for remainder. 
-			let hasRemainder = (characterPoints % pointsPerLevel) >= 1;
+			let isTooLarge = characterPoints - calculatedCost >= 1;
 	
 			let pointsNeededForStrength = 0;
 	
 			let showMessage = 0;
 	
-			if (applySizeModifier && sizeModifier > 0 && hasRemainder) {
+			if (applySizeModifier && sizeModifier > 0 && isTooLarge) {
 	
 				showMessage = 1;
 	
@@ -18358,12 +18481,24 @@ visualize what it will look like in chat.
 	
 			let basicLift = (modded * modded) / 5;
 	
+			let useMetricChecked = Number(v.use_metric);
+
+			if (Number.isNaN(useMetricChecked)) {
+				useMetricChecked = 0;
+			}
+
+			if (useMetricChecked) {
+				// conver to a metric value
+				basicLift = basicLift / metricWeightConversionMultiplier;
+			}
+	
+			// rounding
 			if (basicLift >= 10) {
 	
 				basicLift = Math.round(basicLift);
 	
-			}
-	
+			} 
+			
 			setAttrs({
 				lift_st_base: base,
 				lift_st: modded,
@@ -18398,14 +18533,15 @@ visualize what it will look like in chat.
 	
 			let strengthModByCharacterPoints = Math.floor(characterPoints / pointsPerLevel);
 	
-			// check for remainder. 
-			let hasRemainder = (characterPoints % pointsPerLevel) >= 1;
+			const calculatedCost = strengthModByCharacterPoints * pointsPerLevel;
+	
+			let isTooLarge = characterPoints - calculatedCost >= 1;
 	
 			let pointsNeededForStrength = 0;
 	
 			let showMessage = 0;
 	
-			if (applySizeModifier && sizeModifier > 0 && hasRemainder) {
+			if (applySizeModifier && sizeModifier > 0 && isTooLarge) {
 	
 				showMessage = 1;
 	
@@ -18780,6 +18916,27 @@ visualize what it will look like in chat.
 			setAttrs({ spells_points: v }, { silent: true });
 		});
 	});
+
+	// check for user metric
+	on("change:use_metric", event => {
+
+		let useMetricChecked = Number(event.newValue);
+
+		if (Number.isNaN(useMetricChecked)) {
+			useMetricChecked = 0;
+		}
+
+		let weightSystem = "lbs";
+
+		if (useMetricChecked) {
+			weightSystem = "kg";
+		}
+
+		setAttrs({
+			weight_system: weightSystem
+		});
+		
+	});
 	
 	// Update the line total weight and cost
 	on('change:repeating_item:count change:repeating_item:cost change:repeating_item:carried change:repeating_item:weight', function (e) {
@@ -18825,14 +18982,14 @@ visualize what it will look like in chat.
 	});
 	
 	// Get Encumbrance Level:
-	on('change:total_weight change:weight change:basic_lift change:gravity', function (e) {
+	on('change:total_weight change:weight change:basic_lift change:gravity change:use_metric', function (e) {
 		updateEncLevel();
 	});
 	
 	// factor in gravity difference
 	function updateEncLevel(callback) {
 	
-		getAttrs(['basic_lift', 'total_weight', 'gravity', 'weight'], function (v) {
+		getAttrs(['basic_lift', 'total_weight', 'gravity', 'weight', 'weight_system'], function (v) {
 	
 			callback = callback || noop;
 	
@@ -18847,12 +19004,16 @@ visualize what it will look like in chat.
 			let gravity = Number(v.gravity);
 	
 			let characterWeight = Number(v.weight);
-	
+
+			let weightSystem = String(v.weight_system);
+
 			// don't factor in grand total weight
 			let grandTotalWeight = characterWeight + totalWeight;
 	
 			// round to three decimal places
 			grandTotalWeight = Math.round(grandTotalWeight * 1000) / 1000;
+
+			const grandTotalWeightDisplay = grandTotalWeight.toFixed(2) + " " + weightSystem;
 	
 			if (gravity < 1) {
 	
@@ -18866,7 +19027,7 @@ visualize what it will look like in chat.
 	
 			}
 			
-			totalGravityWeightDisplay = Number(Math.round(totalGravityWeight * 1000) / 1000).toFixed(3);
+			totalGravityWeightDisplay = Number(Math.round(totalGravityWeight * 1000) / 1000).toFixed(2) + " " + weightSystem;
 	
 			let encumbranceLevel = Math.floor(totalGravityWeight / basicLift);
 	
@@ -18885,7 +19046,8 @@ visualize what it will look like in chat.
 			setAttrs({
 				encumbrance_level: encumbranceLevel,
 				total_weight_gravity: totalGravityWeightDisplay,
-				grand_total_weight: grandTotalWeight
+				grand_total_weight: grandTotalWeight,
+				grand_total_weight_display: grandTotalWeightDisplay
 			},
 				null,
 				callback
@@ -19098,7 +19260,7 @@ visualize what it will look like in chat.
 	}
 	
 	// check for combat reflexes toggle box
-	on('change:combat_reflexes change:apply_combat_reflexes_to_mod', function (e) {
+	on('change:combat_reflexes', function (e) {
 	
 		updateActiveDefenses(updateRepeatingDefensesWithCombatReflexes());
 	
@@ -19110,7 +19272,7 @@ visualize what it will look like in chat.
 	function updateActiveDefenses(callback) {
 	
 		// get the defense values
-		getAttrs(['combat_reflexes', 'dodge_mod', 'fear_check_mod', 'apply_combat_reflexes_to_mod'], function (values) {
+		getAttrs(['combat_reflexes', 'dodge_mod', 'fear_check_mod'], function (values) {
 	
 			callback = callback || noop;
 	
@@ -19167,82 +19329,26 @@ visualize what it will look like in chat.
 	
 	function updateRepeatingDefensesWithCombatReflexes() {
 	
-		getAttrs(["combat_reflexes", "apply_combat_reflexes_to_mod_is_new"], values => {
+		getAttrs(["combat_reflexes"], values => {
 	
 			const useCombatReflexes = values.combat_reflexes === "1";
 	
-			// this is needed to check if the sheet has never used the new repeating defenses modifier for combat reflexes
-			// we DON'T want to subtract values if it's new
-			const applyToModifierColumnIsNew = values.apply_combat_reflexes_to_mod_is_new === "1";
-	
-			const combatReflexesDescription = "[+1 from combat reflexes]";
-	
 			getSectionIDs("repeating_defense", ids => {
 	
+				let fields = {};
+
 				ids.forEach(id => {
-	
-					// get the original modifier and modifier description
-					const modifierField = `repeating_defense_${id}_skill_mod`;
-	
-					const modifierDescriptionField = `repeating_defense_${id}_defense_mod_reason`;
-	
-					getAttrs([modifierField, modifierDescriptionField], values => {
-	
-						let currentDefenseModifier = Number(values[modifierField]);
-	
-						if (Number.isNaN(currentDefenseModifier)) {
-							currentDefenseModifier = 0;
-						}
-	
-						let activeDefenseModifier = -1;
-	
-						const currentModifierDescription = String(values[modifierDescriptionField]);
-	
-						let newModifierDescription = "";
-	
-						if (useCombatReflexes) {
-	
-							activeDefenseModifier = 1;
-	
-							// add combat reflexes description
-							newModifierDescription = combatReflexesDescription + " " + currentModifierDescription;
-	
-						} else if (applyToModifierColumnIsNew) {
-	
-							// DON'T change any values. 
-							activeDefenseModifier = 0;
-	
-							newModifierDescription = currentModifierDescription;
-	
-						} else {
-	
-							activeDefenseModifier = -1;
-	
-							// remove combat reflexes description
-							newModifierDescription = currentModifierDescription.replace(combatReflexesDescription, "");
-	
-						}
-	
-						const newFinalDefenseModifier = currentDefenseModifier + activeDefenseModifier;
-	
-						let updatedFields = {};
-	
-						updatedFields[modifierField] = newFinalDefenseModifier;
-	
-						updatedFields[modifierDescriptionField] = newModifierDescription;
-	
-						setAttrs(updatedFields);
-	
-					});
-	
+					
+					// checkbox
+					fields[`repeating_defense_${id}_defense_combat_reflexes`] = useCombatReflexes ? "1" : "";
+
+					// value to use on final defensive skill level. 
+					fields[`repeating_defense_${id}_defense_combat_reflexes_bonus`] = useCombatReflexes ? "1" : "0";
 	
 				});
+
+				setAttrs(fields);
 	
-			});
-	
-			// after everything is done, make sure we set the hidden field to zero.
-			setAttrs({
-				apply_combat_reflexes_to_mod_is_new: 0
 			});
 	
 		});
@@ -21079,7 +21185,7 @@ visualize what it will look like in chat.
 	}
 	
 	// check for changes that affect thrown object stats
-	on('change:thrown_object_weight change:basic_lift change:thrust change:super_throw_level change:thrown_object_strength_mod change:thrown_object_damage_mod change:gravity', function (event) {
+	on('change:thrown_object_weight change:basic_lift change:thrust change:super_throw_level change:thrown_object_strength_mod change:thrown_object_damage_mod change:gravity change:use_metric', function (event) {
 	
 		updateThrownObjectStats();
 	
@@ -21100,7 +21206,8 @@ visualize what it will look like in chat.
 			'thrust',
 			'basic_lift',
 			'thrown_object_damage_mod',
-			'gravity'
+			'gravity',
+			'use_metric'
 		];
 	
 		getAttrs(fields, function (values) {
@@ -22301,8 +22408,13 @@ visualize what it will look like in chat.
 	/**
 	 * If new version, make sure to update the 
 	 * defensive informaton notes and the raw success/fail notes
+	 * Will also handle converting old sheets to new combat reflexes for repeating defense
+	 * 
+	 * @param {boolean} isNewSheet               Is this a brand new sheet
+	 * @param {boolean} hasCombatReflexes        Does character sheet have combat reflexes checked
+	 * @param {boolean} hasReflexesBeenConverted Has the character sheet already been converted
 	 */
-	function updateRepeatingDefenseNotes() {
+	function updateRepeatingDefenseNotes(isNewSheet, hasCombatReflexes, hasReflexesBeenConverted) {
 	
 		getSectionIDs("repeating_defense", function (ids) {
 	
@@ -22324,13 +22436,26 @@ visualize what it will look like in chat.
 				let defenseTypeField = "repeating_defense_" + ids[i] + "_type";
 	
 				getFields.push(defenseTypeField);
+
+				// mod field
+				let defenseMod = "repeating_defense_" + ids[i] + "_skill_mod";
+	
+				getFields.push(defenseMod);
+
+				// reason for modification
+				let defenseReasonMod = "repeating_defense_" + ids[i] + "_defense_mod_reason";
+	
+				getFields.push(defenseReasonMod);
 	
 			}
 	
 			getAttrs(getFields, function (values) {
 	
-				let updateFields = {};
-	
+				// always make sure to mark as converted
+				let updateFields = {
+					reflexes_converted_to_base_skill: 1
+				};
+
 				// loop through the row ids again so we can get the values
 				// and fill array of defense_type id numbers
 				_.each(ids, function (id) {
@@ -22357,15 +22482,89 @@ visualize what it will look like in chat.
 					updateFields["repeating_defense_" + id + "_raw_fail_note"] = rawNotes.fail;
 	
 					updateFields["repeating_defense_" + id + "_raw_critical_fail_note"] = rawNotes.failCritical;
+
+					// see if we need to update combat reflexes
+					const reflexFields = convertCombatReflexesToBaseSkill(values, id, isNewSheet, hasCombatReflexes, hasReflexesBeenConverted);
+
+					// combine the fields
+					updateFields = {...updateFields, ...reflexFields};
 	
 				});
-	
+
 				setAttrs(updateFields);
 	
 			});
 	
 		});
 	
+	}
+
+	/**
+	 * If an old sheet that has combat reflexes but hasn't been converted yet, 
+	 * then convert to the new skill base method. 
+	 * 
+	 * @param {object}  values                   An object values for the current active defense row
+	 * @param {string}  id                       The active defense row id
+	 * @param {boolean} isNewSheet               Is this a brand new sheet
+	 * @param {boolean} hasCombatReflexes        Was combat reflexes checked
+	 * @param {boolean} hasReflexesBeenConverted Was combat reflexes already converted to modify base skill level
+	 * 
+	 * @return {object} 
+	 */
+	const convertCombatReflexesToBaseSkill = (values, id, isNewSheet, hasCombatReflexes, hasReflexesBeenConverted) => {
+
+		let fields = {};
+
+		// only convert old sheetd that haven't been converted
+		if (isNewSheet === false && hasReflexesBeenConverted === false && hasCombatReflexes) {
+
+			// mod field
+			const defenseModField = "repeating_defense_" + id + "_skill_mod";
+
+			// reason for modification
+			const defenseReasonModField = "repeating_defense_" + id + "_defense_mod_reason";
+
+			// checkbox field for line item combat reflexes
+			// NOTE: changing the value should trigger a hook to update the base skill level
+			const reflexCheckboxField = "repeating_defense_" + id + "_defense_combat_reflexes";
+
+			// update the hidden checkbox field
+			const reflexBonusField = "repeating_defense_" + id +"_defense_combat_reflexes_bonus";
+
+			const currentMod = Number(values[defenseModField]);
+
+			const currentReasonMod = String(values[defenseReasonModField]);
+
+			let finalMod = currentMod;
+
+			let finalReasonMod = currentReasonMod;
+
+			// if there's a value for the currentMod, reduce the final mod by one
+			if (currentMod > 0) {
+				finalMod = finalMod - 1;
+			}
+
+			// remove the possible descriptions that could have been added
+			// either programmatically or manually by sheet user
+			finalReasonMod = currentReasonMod.replace("[+1 from combat reflexes]", "");
+			finalReasonMod = currentReasonMod.replace("+1 from combat reflexes.", "");
+			finalReasonMod = currentReasonMod.replace("+1 from combat reflexes,", "");
+			finalReasonMod = currentReasonMod.replace("+1 from combat reflexes", "");
+
+			// set the new field values
+			fields[defenseModField] = finalMod;
+			
+			fields[defenseReasonModField] = finalReasonMod;
+
+			// check mark the reflexes box and apply the bonus
+			fields[reflexCheckboxField] = "1";
+
+			fields[reflexBonusField] = "1";
+
+		}
+
+		return fields;
+
 	}
 	
 	on("change:repeating_item:carried", function (event) {
@@ -23064,9 +23263,28 @@ visualize what it will look like in chat.
 		});
 	
 	});
+
+	// check if combat reflex was applied to active defense.
+	on("change:repeating_defense:defense_combat_reflexes", event => {
+
+		getAttrs(["repeating_defense_defense_combat_reflexes", "repeating_defense_defense_row_type"], values => {
+
+			const isDodge = values.repeating_defense_defense_row_type == "DODGE" || values.repeating_defense_defense_row_type == "CURRENT_DODGE";
+
+			const useReflexes = values.repeating_defense_defense_combat_reflexes === "1" && isDodge === false;
+
+			const reflexBonus = useReflexes ? "1" : "0";
+
+			setAttrs({
+				repeating_defense_defense_combat_reflexes_bonus: reflexBonus
+			});
+
+		});
+
+	});
 	
 	// if linked data for repeating defense is changed, get the new linked skill values
-	on('change:repeating_defense:type change:repeating_defense:defense_row_type change:repeating_defense:defense_talent_level change:repeating_defense:defense_skill_row_id change:repeating_defense:defense_skill_row_id_toggle', function (event) {
+	on('change:repeating_defense:type change:repeating_defense:defense_row_type change:repeating_defense:defense_talent_level change:repeating_defense:defense_skill_row_id change:repeating_defense:repeating_defense_defense_talent_level change:repeating_defense:defense_skill_row_id_toggle', function (event) {
 	
 		// check if this is a valid toggle
 		const isToggled = String(event.sourceAttribute).endsWith("_skill_row_id_toggle");
@@ -23144,11 +23362,12 @@ visualize what it will look like in chat.
 	/**
 	 * Update the melee, ranged, or technique associated with the skill row id
 	 * 
-	 * @param {string}      sectionName Should be either repeating_melee or repeating_ranged
-	 * @param {string}      prefix      Placed before skill attribute names to follow rules for unique names, even inside repeating sections.
-	 * @param {string}      rowType     Where to get the level. Skill | Spell 
-	 * @param {string}      defenseType If there's a defense type (Parry, Dodge, etc.) a formula will be used to calculate the skill level
-	 * @param {number}      talentLevel Used with defense type to calculate skill level
+	 * @param {string}      sectionName  Should be either repeating_melee or repeating_ranged
+	 * @param {string}      prefix       Placed before skill attribute names to follow rules for unique names, even inside repeating sections.
+	 * @param {string}      rowType      Where to get the level. Skill | Spell 
+	 * @param {string}      defenseType  If there's a defense type (Parry, Dodge, etc.) a formula will be used to calculate the skill level
+	 * @param {number}      talentLevel  Used with defense type to calculate skill level
+	 * 
 	 * @param {() => void=} callback    A function to run after everything is done
 	 */
 	function updateLinkedWeaponSkill(sectionName, prefix, rowType, defenseType, talentLevel, callback) {
@@ -23261,6 +23480,10 @@ visualize what it will look like in chat.
 				method = "attribute";
 				break;
 	
+			case "CURRENT_DODGE":
+				method = "attribute";
+				break;
+	
 			case "SPEED":
 				method = "attribute";
 				break;
@@ -23315,6 +23538,7 @@ visualize what it will look like in chat.
 	 * @param {() => void=} callback             Callback function 
 	 */
 	function updateLinkedWeaponSkillByRepeatingRow(sectionName, weaponSkillFieldName, skillMessageFieldName, skillMessageFieldLevel, skillRowIdToggleFieldName, parentFieldName, baseSkillFieldName, repeatingTableToUse, skillRowId, skillMod, defenseType, talentLevel, callback) {
+		
 		// if it's a good row id, let's update stuff
 		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
 	
@@ -23359,7 +23583,7 @@ visualize what it will look like in chat.
 				if (sectionName == "repeating_defense") {
 	
 					let calculatedSkillLevel = getCalculatedSkillByDefenseType(defenseType, talentLevel, skillLevel);
-	
+
 					updateFields["repeating_defense_defense_formula_level"] = calculatedSkillLevel;
 	
 					updateFields["repeating_defense_skill"] = calculatedSkillLevel;
@@ -23398,6 +23622,7 @@ visualize what it will look like in chat.
 	 * @param {() => void=} callback             Callback function 
 	 */
 	function updateLinkWeaponSkillByAttribute(sectionName, skillRowIdFieldName, weaponSkillFieldName, skillMessageFieldName, skillMessageFieldLevel, skillRowIdToggleFieldName, parentFieldName, baseSkillFieldName, rowType, skillMod, defenseType, talentLevel, callback) {
+		
 		let fieldName;
 	
 		switch (rowType) {
@@ -23431,6 +23656,10 @@ visualize what it will look like in chat.
 	
 			case "DODGE":
 				fieldName = "dodge";
+				break;
+	
+			case "CURRENT_DODGE":
+				fieldName = "current_dodge";
 				break;
 	
 			case "10":
@@ -23472,11 +23701,20 @@ visualize what it will look like in chat.
 			if (sectionName == "repeating_defense") {
 	
 				let calculatedSkillLevel = getCalculatedSkillByDefenseType(defenseType, talentLevel, skillLevel);
-	
+
 				updateFields["repeating_defense_defense_formula_level"] = calculatedSkillLevel;
 	
 				updateFields["repeating_defense_skill"] = calculatedSkillLevel;
-	
+
+				// if dodge or current dodge is selected as the skill link make sure to turn OFF combat reflexes
+				if (rowType === "DODGE" || rowType === "CURRENT_DODGE") {
+
+					updateFields["repeating_defense_defense_combat_reflexes"] = "";
+
+					updateFields["repeating_defense_defense_combat_reflexes_bonus"] = "0";
+
+				}
+				
 			}
 	
 			setAttrs(updateFields, { silent: true });
@@ -23912,15 +24150,27 @@ visualize what it will look like in chat.
 	];
 	
 	// check for how much? damage
-	on("change:demo_how_much_ref change:demo_how_much_damage_multiplier change:demo_how_much_base_damage change:demo_how_much_divisor change:demo_how_much_target_distance", function (event) {
+	on("change:demo_how_much_ref change:demo_how_much_damage_multiplier change:demo_how_much_base_damage change:demo_how_much_divisor change:demo_how_much_target_distance change:use_metric", function (event) {
 	
-		getAttrs(["demo_how_much_ref", "demo_how_much_base_damage", "demo_how_much_damage_multiplier", "demo_how_much_divisor", "demo_how_much_target_distance"], function (values) {
+		getAttrs(["demo_how_much_ref", "demo_how_much_base_damage", "demo_how_much_damage_multiplier", "demo_how_much_divisor", "demo_how_much_target_distance", "use_metric"], function (values) {
 	
 			let multiplier = +values.demo_how_much_damage_multiplier;
 	
 			let REF = +values.demo_how_much_ref;
 	
+			// this is in pounds
 			let weight = (multiplier * multiplier) / (4 * REF);
+
+			let useMetricChecked = Number(values.use_metric);
+
+			if (Number.isNaN(useMetricChecked)) {
+				useMetricChecked = 0;
+			}
+
+			// if using metric, convert the weight which is pounds into kiligrams
+			if (useMetricChecked) {
+				weight = weight / metricWeightConversionMultiplier;
+			}
 	
 			let result = weight.toFixed(2);
 	
@@ -23975,15 +24225,27 @@ visualize what it will look like in chat.
 	}
 	
 	// check for how big? damage
-	on("change:demo_how_big_ref chage:demo_how_big_base_damage change:demo_how_big_weight change:demo_how_big_divisor change:demo_how_big_target_distance", function (event) {
+	on("change:demo_how_big_ref chage:demo_how_big_base_damage change:demo_how_big_weight change:demo_how_big_divisor change:demo_how_big_target_distance change:use_metric", function (event) {
 	
-		getAttrs(["demo_how_big_ref", "demo_how_big_base_damage", "demo_how_big_weight", "demo_how_big_divisor", "demo_how_big_target_distance"], function (values) {
+		getAttrs(["demo_how_big_ref", "demo_how_big_base_damage", "demo_how_big_weight", "demo_how_big_divisor", "demo_how_big_target_distance", "use_metric"], function (values) {
 	
 			let multiplier = 0;
 	
 			let REF = +values.demo_how_big_ref;
 	
+			// could be pounds or kg
 			let weight = +values.demo_how_big_weight;
+
+			let useMetricChecked = Number(values.use_metric);
+
+			if (Number.isNaN(useMetricChecked)) {
+				useMetricChecked = 0;
+			}
+
+			// if using metric, convert the weight which is KG into pounds
+			if (useMetricChecked) {
+				weight = weight * metricWeightConversionMultiplier;
+			}
 	
 			if (weight > 0) {
 	
@@ -24209,25 +24471,22 @@ visualize what it will look like in chat.
 	
 			const addCombatReflexes = values.combat_reflexes === "1";
 	
-			const combatReflexesDescription = "[+1 from combat reflexes]";
+			if (isNew) {
 	
-			const currentDescription = String(values.repeating_defense_defense_mod_reason);
-	
-			let currentMod = Number(values.repeating_defense_skill_mod);
-	
-			if (Number.isNaN(currentMod)) {
-				currentMod = 0;
-			}
-	
-			if (isNew && addCombatReflexes) {
-	
-				const newMod = currentMod + 1;
-	
-				const newDescription = `${combatReflexesDescription} ${currentDescription}`;
-	
+				let checked = "";
+
+				let bonus = 0;
+
+				if (addCombatReflexes) {
+					
+					checked = "1";
+
+					bonus = "1";
+				}
+				
 				const fields = {
-					repeating_defense_skill_mod: newMod,
-					repeating_defense_defense_mod_reason: newDescription,
+					repeating_defense_defense_combat_reflexes: checked,
+					repeating_defense_defense_combat_reflexes_bonus: bonus,
 					repeating_defense_new: 0
 				};
 	
@@ -24441,9 +24700,9 @@ visualize what it will look like in chat.
 	
 		const criticalMissNotes = `Roll on the appropriate Critical Miss Table (B556).`;
 	
-		const criticalHitNotes = `Automatic hits – foe does not get an active defense roll! (B381). Roll on appropriate Critical Hits Table (B556). 
-	Rapid-fire attack - The first round is a critical hit; All the others are normal hits, and the target may dodge. Rule verification from Kromm.
-	For liquids, the liquid gets in the victim's eyes and is blinded for 1d seconds (the GM rolls secretly). (B405)
+		const criticalHitNotes = `**The Attack Automatically hits:** Foe does not get an active defense roll! (B381). Roll on appropriate Critical Hits Table (B556). 
+	**For Rapid Fire attacks:** The first round is a critical hit; All the others are normal hits, and the target may dodge. Rule verification from Kromm.
+	**For liquid Attacks:** The liquid gets in the victim's eyes and is blinded for 1d seconds (the GM rolls secretly). (B405)
 	`;
 	
 		const notes = [

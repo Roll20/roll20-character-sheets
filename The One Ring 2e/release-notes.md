@@ -4,6 +4,67 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.10.00 (Build 13)
+
+### Features
+
+- removed parsed rolls buttons from combat proficiencies to improve UI clarity
+
+### CSS
+
+- changed location of virtues und rewards to make it consistent with the heart and wits areas
+
+## 02.09.00 (Build 12)
+
+### Features
+
+- added custom dice roller
+
+### CSS
+
+- added "msg-alt" label for the MSG-custom roll template that will remove the yellow background from inlined rolls. This is usefull when using custom roll tables for events (e.g. hazards)
+
+## 02.08.00 (Build 11)
+
+### Features
+
+- add Close Fitting to other armour slot to allow for a selectable +2 protection bonus (e.g. due to a virtue)
+
+### CSS
+
+- minor layout improvements
+
+## 02.07.00 (Build 10)
+
+### Features
+
+- Added weapons weapon checkboxes to equip/drop (e.g. to reduce load after throwing a spear)
+- Armour checkboxes now also reduce load if unchecked
+- Added two weapon slots
+
+### CSS
+
+- Rolltemplate layout optimization
+- fixed darkmode
+
+### Fixes
+
+- Fixed: global illfavoured in combination with a favoured skill doesn't result in a "normal" roll
+
+## 02.06.00 (Build 9)
+
+### Features
+
+- Parsed rolls: changed feat die rolls from 1d12-1 to 1d12. Implemented correct handling of (11,12) values for pc and lm rolls and for favoured and ill-favoured rolls
+- Parsed rolls: reenabled feat die hover, as the semantics are now better to understand
+
+### Attribute migrations (handle by automatic migration)
+
+- endurance -> endurance_max
+- currentendurace -> endurance
+- hope -> hope_max
+- currenthope -> hope
+
 ## 02.05.00 (Build 8)
 
 ### Sheet fixes
