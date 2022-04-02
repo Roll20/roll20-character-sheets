@@ -73,6 +73,29 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+March 31th 2022 v1.55b
+
+- Corrected UiA critTable not activing in certain situations.
+- Corrected but Encumbrance Max value not displaying, related to new Orge Race.
+- Various fixes and additions to Talent integration (with community support!)
+
+
+March 25th 2022 v1.55a
+
+- Fixed UiA crit tables, some of the Crit Damage was out by 1.
+- Cast and Channel fumbles clarified, added 10s fumble for channelling and casting now shows when a 8 unit die (chaos) is rolled.
+
+
+March 19th 2022 v1.55
+
+- Devmode renamed Talent and Quality Integration
+- Added official Cubicle 7 Up in Arms rule set support
+- Up in Arms - Group Advantage - (select in Advantage Rules in setting) - include the appropriate Talent changes
+- Up in Arms - Critical Damage Tables - (select in Critical Rules in setting)
+- Up in Arms - New Weapon Qualities - Added to Talent and Quailties Integration.
+- Talent and Quailties Integration - Re-ordered Melee Bonus assister, added Called Shot and Strike to Stun
+
+
 March 11th 2022 v1.54
 
 - Added official support for Roll20 Dark Mode

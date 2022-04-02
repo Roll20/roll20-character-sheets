@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="02-08-00" />
+<input type="hidden" name="attr_version" value="02-10-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -234,6 +234,31 @@
             </div>
             <label><span data-i18n="injury">Injury</span><input name="attr_injury" type="text"></label>
             <br />
+            <h3>Custom Dice Roller</h3>
+            <div class="sheet-row">
+                <input class="center" type="text" data-i18n-placeholder="custom-rollname-placeholder"
+                    name="attr_customrollname">
+            </div>
+            <div class="sheet-row">
+                <label><span data-i18n="custom-featdie"></span>
+                    <select name="attr_customfeatdie" class="center">
+                        <option value="-1">None</option>
+                        <option value="1" selected="selected">Normal</option>
+                        <option value="2">Favoured</option>
+                        <option value="0">Ill-favoured</option>
+                    </select>
+                </label>
+            </div>
+            <div class="sheet-row">
+                <label><span data-i18n="custom-successdice"></span>
+                    <input class="center" type="number" value="0" name="attr_customsuccessdice">
+                </label>
+                <label><span data-i18n="custom-tn"></span>
+                    <input class="center" type="number" value="14" name="attr_customtn">
+                </label>
+                <button type="action" style="display: inline-block" class="parsed-rolls" name="act_customroll"
+                    id="roll_custom"></button>
+            </div>
             <br />
             <div class="center">
                 <label data-i18n="parsed-rolls">Parsed rolls</label>
@@ -262,6 +287,7 @@
                 <button type="roll" class="table-rolls" name="roll_axescheck1" value="@{axes_roll1}"></button>
                 <input type="hidden" name="attr_axes_roll2" />
                 <button type="roll" class="table-rolls crosshair" name="roll_axescheck2" value="@{axes_roll2}"></button>
+                <!--
                 <span class="parsed-rolls">
                     <input type='hidden' name='attr_axes_action' value=''>
                     <button type='action' name='act_axes_action' style="display: none;"></button>
@@ -274,6 +300,7 @@
                         value='@{axes_target_action}'
                         title="Use this button when you have an adversary token to target."></button>
                 </span>
+                -->
                 &nbsp;
                 <label data-i18n="axes">Axes</label>
                 <div class="sheet-hover-info" data-i18n="axes-description"></div>
@@ -293,6 +320,7 @@
                 <button type="roll" class="table-rolls" name="roll_bowscheck1" value="@{bows_roll1}"></button>
                 <input type="hidden" name="attr_bows_roll2" />
                 <button type="roll" class="table-rolls crosshair" name="roll_bowscheck2" value="@{bows_roll2}"></button>
+                <!--
                 <span class="parsed-rolls">
                     <input type='hidden' name='attr_bows_action' value=''>
                     <button type='action' name='act_bows_action' style="display: none;"></button>
@@ -305,6 +333,7 @@
                         value='@{bows_target_action}'
                         title="Use this button when you have an adversary token to target."></button>
                 </span>
+                -->
                 &nbsp;
                 <label data-i18n="bows">Bows</label>
                 <div class="sheet-hover-info" data-i18n="bows-description"></div>
@@ -325,6 +354,7 @@
                 <input type="hidden" name="attr_spears_roll2" />
                 <button type="roll" class="table-rolls crosshair" name="roll_spearscheck2"
                     value="@{spears_roll2}"></button>
+                <!--
                 <span class="parsed-rolls">
                     <input type='hidden' name='attr_spears_action' value=''>
                     <button type='action' name='act_spears_action' style="display: none;"></button>
@@ -337,6 +367,7 @@
                         value='@{spears_target_action}'
                         title="Use this button when you have an adversary token to target."></button>
                 </span>
+                -->
                 &nbsp;
                 <label data-i18n="spears">Spears</label>
                 <div class="sheet-hover-info" data-i18n="spears-description"></div>
@@ -357,6 +388,7 @@
                 <input type="hidden" name="attr_swords_roll2" />
                 <button type="roll" class="table-rolls crosshair" name="roll_swordscheck2"
                     value="@{swords_roll2}"></button>
+                <!--
                 <span class="parsed-rolls">
                     <input type='hidden' name='attr_swords_action' value=''>
                     <button type='action' name='act_swords_action' style="display: none;"></button>
@@ -369,6 +401,7 @@
                         value='@{swords_target_action}'
                         title="Use this button when you have an adversary token to target."></button>
                 </span>
+                -->
                 &nbsp;
                 <label data-i18n="swords">Swords</label>
                 <div class="sheet-hover-info" data-i18n="swords-description"></div>
@@ -2128,6 +2161,19 @@
         clog(`Completed first roll: weapon_${index}`);
     });
 
+    // Custom roll
+    on('clicked:customroll', async (ev) => {
+        clog(`Starting first roll`);
+		let data = await asw.getAttrs(['character_name', 'customfeatdie', 'customtn', 'customsuccessdice', 'customrollname', 'favourill_id']),
+			action = `Custom: ${data.customrollname}`,
+            actfeat = int(data.customfeatdie),
+			actdice = int(data.customsuccessdice),
+            acttn = int(data.customtn);
+
+		clog(`First roll: ${JSON.stringify(data)}, Action : ${action}`);
+        await rollFirst(data.character_name, action, actdice, acttn, actfeat, "custom");
+        clog(`Completed first roll`);
+    });
 
     /*==================
       Migration scripts.
@@ -2222,6 +2268,11 @@
             <div class="sheet-main">{{msg}}</div>
         </div>
         {{/msg}}
+        {{#msg-alt}}
+        <div class="sheet-contentmin">
+            <div class="sheet-main-alt">{{msg-alt}}</div>
+        </div>
+        {{/msg-alt}}
     </div>
 </rolltemplate>
 
@@ -2239,24 +2290,25 @@
             </div>
             <div class="sheet-half-col sheet-die-title sheet-feat-label">Feat<br/>Die</div>
             <div class="sheet-half-col sheet-die-title sheet-success-label">Success<br /> Dice</div>
-            {{#rollTotal() computed::feat 12}}
-            <div class="sheet-half-col sheet-die-result sheet-feat-die">
-                <span class="sheet-rotated-box"><span class="sheet-fullcrit">{{computed::feat}}</span><span class="sheet-gandalf"></span></span>
-            </div>
-            {{/rollTotal() computed::feat 12}}
-            {{#rollTotal() computed::feat 11}}
-            <div class="sheet-half-col sheet-die-result sheet-feat-die">
-                <span class="sheet-rotated-box"><span class="sheet-fullfail">{{computed::feat}}</span><span class="sheet-eye"></span></span>
-            </div>
-            {{/rollTotal() computed::feat 11}}
+            {{#rollTotal() computed::feat 0}}
+            <div class="sheet-half-col sheet-die-result sheet-feat-die"><span class="sheet-rotated-box"><span>-</span></span></div>
+            {{/rollTotal() computed::feat 0}}
             {{#rollBetween() computed::feat 1 10}}
             <div class="sheet-half-col sheet-die-result sheet-feat-die">
                 <span class="sheet-rotated-box">{{computed::feat}}</span>
             </div>
             {{/rollBetween() computed::feat 1 10}}
-            {{^feat}}
-            <div class="sheet-half-col sheet-die-result sheet-feat-die"><span class="sheet-rotated-box"><span>-</span></span></div>
-            {{/feat}}
+            {{#rollTotal() computed::feat 11}}
+            <div class="sheet-half-col sheet-die-result sheet-feat-die">
+                <span class="sheet-rotated-box"><span class="sheet-fullfail">{{computed::feat}}</span><span
+                        class="sheet-eye"></span></span>
+            </div>
+            {{/rollTotal() computed::feat 11}}
+            {{#rollTotal() computed::feat 12}}
+            <div class="sheet-half-col sheet-die-result sheet-feat-die">
+                <span class="sheet-rotated-box"><span class="sheet-fullcrit">{{computed::feat}}</span><span class="sheet-gandalf"></span></span>
+            </div>
+            {{/rollTotal() computed::feat 12}}
             <div class="sheet-half-col sheet-die-result sheet-success-die"><span class="sheet-rotated-box">{{r1}}</span></div>
             <div class="sheet-half-col sheet-die-comment sheet-favoured">
                 {{#favoured}}{{favoured}}{{/favoured}}
