@@ -30,6 +30,7 @@ weapons['blowgun (barbed dart)'] = {
     'rof': '2/1',
     'range': '10/20/30',
     'size': 'L',
+    'ammo-size': 'S',
     'type': 'P',
     'speed': 5,
     'small-medium': '1d3',
@@ -43,6 +44,7 @@ weapons['blowgun (needle)'] = {
     'name': 'Blowgun (Needle)',
     'small-medium': '1',
     'large': '1',
+    'knockdown': ''
 };
 weapons['short bow (flight arrow)'] = {
     'name': 'Short bow (Flight arrow)',
@@ -933,6 +935,7 @@ weapons['belaying pin'] = {
     'size': 'S',
     'type': 'B',
     'speed': 4,
+    'reach': '1',
     'small-medium': '1d3',
     'large': '1d3',
     'knockdown': 'd6',
@@ -960,7 +963,7 @@ weapons['bolas'] = {
     'speed': 8,
     'small-medium': '1d3',
     'large': '1d2',
-    'knockdown': 'd8',
+    'knockdown': 'd6',
     'book': 'The Complete Fighter\'s Handbook',
     'category': ['Range']
 };
@@ -1081,9 +1084,11 @@ weapons['lasso'] = {
 };
 weapons['main-gauche'] = {
     'name': 'Main-gauche',
+    'group': 'Dagger',
     'size': 'S',
     'type': 'P/S',
     'speed': 2,
+    'reach': '1',
     'small-medium': '1d4',
     'large': '1d3',
     'knockdown': 'd6',
@@ -1399,7 +1404,7 @@ weapons['parrying dagger'] = {
     'name': 'Parrying dagger',
     'noProf': true,
     'size': 'S',
-    'type': 'B',
+    'type': 'P',
     'speed': 2,
     'small-medium': '1d3',
     'large': '1d3',
@@ -2824,6 +2829,2017 @@ poWeapons['stone axe'] = {
     'book': 'Player\'s Option: Combat & Tactics',
     'category': ['Melee']
 };
+
+poWeapons['hand axe'] = {
+    'name': 'Hand axe',
+    'size': 'M',
+    'type': 'S',
+    'speed': 4,
+    'reach': '1',
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee','Range']
+};
+
+poWeapons['two-handed axe'] = {
+    'name': 'Two-handed axe',
+    'size': 'L',
+    'type': 'S',
+    'speed': 9,
+    'reach': '1',
+    'small-medium': '1d10',
+    'large': '2d8',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['bagh nakh'] = {
+    'name': 'Bagh nakh',
+    'size': 'S',
+    'type': 'S',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d2',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['blowgun (barbed dart)'] = {
+    'name': 'Blowgun (Barbed Dart)',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'rof': '2/1',
+    'range': '2/4/6',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+poWeapons['blowgun (needle)'] = {
+    'name': 'Blowgun (Needle)',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'rof': '2/1',
+    'range': '2/4/6',
+    'small-medium': '1',
+    'large': '1',
+    'knockdown': '',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['bo stick'] = {
+    'name': 'Bo stick',
+    'size': 'L',
+    'type': 'B',
+    'speed': 3,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['bolas'] = {
+    'name': 'Bolas',
+    'size': 'M',
+    'type': 'B',
+    'speed': 8,
+    'rof': '1',
+    'range': '6/12/18',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['boomerang'] = {
+    'name': 'Boomerang',
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'rof': '1',
+    'range': '4/8/12',
+    'strength': true,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['bottle'] = {
+    'name': 'Bottle',
+    'size': 'S',
+    'type': 'B',
+    'speed': 4,
+    'reach': '1',
+    'rof': '1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee','Range']
+};
+
+poWeapons['composite long bow (flight arrow)'] = {
+    'name': 'Composite long bow (Flight arrow)',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '12/24/42',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['composite long bow (pile arrow)'] = {
+    'name': 'Composite long bow (Pile arrow)',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '8/16/34',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['composite long bow (sheaf arrow)'] = {
+    'name': 'Composite long bow (Sheaf arrow)',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '8/16/34',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['composite long bow (stone arrow)'] = {
+    'name': 'Composite long bow (Stone arrow)',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '12/24/42',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['composite short bow (flight arrow)'] = {
+    'name': 'Composite short bow (Flight arrow)',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 6,
+    'rof': '2/1',
+    'range': '10/20/36',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['composite short bow (stone arrow)'] = {
+    'name': 'Composite short bow (Stone arrow)',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 6,
+    'rof': '2/1',
+    'range': '10/20/36',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['long bow (flight arrow)'] = {
+    'name': 'Long bow (Flight arrow)',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '12/24/42',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['long bow (pile arrow)'] = {
+    'name': 'Long bow (Pile arrow)',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '8/16/34',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['long bow (sheaf arrow)'] = {
+    'name': 'Long bow (Sheaf arrow)',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '8/16/34',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['long bow (stone arrow)'] = {
+    'name': 'Long bow (Stone arrow)',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '12/24/42',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['short bow (flight arrow)'] = {
+    'name': 'Short bow (Flight arrow)',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '10/20/30',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['short bow (stone arrow)'] = {
+    'name': 'Short bow (Stone arrow)',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '10/20/30',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['bandistock'] = {
+    'name': 'Bandistock',
+    'size': 'M',
+    'type': 'P',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['caltrop'] = {
+    'name': 'Caltrop',
+    'size': 'S',
+    'type': 'P',
+    'speed': 0,
+    'small-medium': '1',
+    'large': '1d2',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': []
+};
+
+poWeapons['cestus'] = {
+    'name': 'Cestus',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['chain'] = {
+    'name': 'Chain',
+    'size': 'L',
+    'type': 'B',
+    'speed': 5,
+    'reach': '2',
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['chakram'] = {
+    'name': 'Chakram',
+    'size': 'S',
+    'type': 'S',
+    'speed': 4,
+    'rof': '2/1',
+    'range': '4/8/12',
+    'strength': true,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['chijikiri'] = {
+    'name': 'Chijikiri',
+    'size': 'M',
+    'type': 'P/B',
+    'speed': 7,
+    'reach': '1(2)',
+    'small-medium': '1d6',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['club'] = {
+    'name': 'Club',
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'reach': '1',
+    'rof': '1',
+    'range': '2/4/6',
+    'small-medium': '1d6',
+    'strength': true,
+    'large': '1d6',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['great club'] = {
+    'name': 'Great club',
+    'size': 'L',
+    'type': 'B',
+    'speed': 9,
+    'reach': '1',
+    'small-medium': '2d4',
+    'large': '1d6+1',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['war club'] = {
+    'name': 'War club',
+    'size': 'M',
+    'type': 'B/S',
+    'speed': 7,
+    'reach': '1',
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d6+1',
+    'large': '1d4+1',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['axe-pistol (melee)'] = {
+    'name': 'Axe-pistol (Melee)',
+    'group': 'Combined Weapons',
+    'size': 'M',
+    'type': 'S',
+    'speed': 4,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['axe-pistol (ranged)'] = {
+    'name': 'Axe-pistol (Ranged)',
+    'group': 'Combined Weapons',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1/2',
+    'range': '3/6/9',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['dagger-pistol (melee)'] = {
+    'name': 'Dagger-pistol (Melee)',
+    'group': 'Combined Weapons',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['dagger-pistol (ranged)'] = {
+    'name': 'Dagger-pistol (Ranged)',
+    'group': 'Combined Weapons',
+    'size': 'S',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1/2',
+    'range': '3/6/9',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['hammer-pistol (melee)'] = {
+    'name': 'Hammer-pistol (Melee)',
+    'group': 'Combined Weapons',
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'reach': '1',
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['hammer-pistol (ranged)'] = {
+    'name': 'Hammer-pistol (Ranged)',
+    'group': 'Combined Weapons',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1/2',
+    'range': '3/6/9',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['sword-pistol (melee)'] = {
+    'name': 'Sword-pistol (Melee)',
+    'group': 'Combined Weapons',
+    'size': 'M',
+    'type': 'S',
+    'speed': 5,
+    'reach': '1',
+    'small-medium': '2d4',
+    'large': '1d6+1',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['sword-pistol (ranged)'] = {
+    'name': 'Sword-pistol (Ranged)',
+    'group': 'Combined Weapons',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1/2',
+    'range': '3/6/9',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['cho-ku-no'] = {
+    'name': 'cho-ku-no',
+    'group': 'Crossbow',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 6,
+    'rof': '2/1',
+    'range': '10/20/30',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['hand crossbow'] = {
+    'name': 'Hand crossbow',
+    'size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'rof': '1',
+    'range': '4/8/12',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['heavy crossbow'] = {
+    'name': 'Heavy crossbow',
+    'size': 'M',
+    'type': 'P',
+    'speed': 10,
+    'rof': '1/2',
+    'range': '16/32/48',
+    'small-medium': '1d8+1',
+    'large': '1d10+1',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['light crossbow'] = {
+    'name': 'Light crossbow',
+    'size': 'M',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1',
+    'range': '12/24/36',
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['pellet bow'] = {
+    'name': 'Pellet bow',
+    'size': 'M',
+    'type': 'B',
+    'speed': 7,
+    'rof': '1',
+    'range': '8/16/24',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['dagger'] = {
+    'name': 'Dagger',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'reach': '1',
+    'rof': '2/1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['bone dagger'] = {
+    'name': 'Bone dagger',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'reach': '1',
+    'rof': '2/1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d2',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['jambiya'] = {
+    'name': 'Jambiya',
+    'group': 'Dagger',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 3,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['katar'] = {
+    'name': 'Katar',
+    'group': 'Dagger',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d3+1',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['main-gauche'] = {
+    'name': 'Main-gauche',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['parrying dagger'] = {
+    'name': 'Parrying dagger',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['stiletto'] = {
+    'name': 'Stiletto',
+    'group': 'Dagger',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'reach': '1',
+    'rof': '2/1',
+    'range': '2/4/6',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['stone dagger'] = {
+    'name': 'Stone dagger',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'reach': '1',
+    'rof': '2/1',
+    'range': '2/3/4',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['dart'] = {
+    'name': 'Dart',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'rof': '3',
+    'range': '2/4/8',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['footman\'s flail'] = {
+    'name': 'Footman\'s flail',
+    'size': 'L',
+    'type': 'B',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '1d6+1',
+    'large': '2d4',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['grain flail'] = {
+    'name': 'Grain flail',
+    'size': 'M',
+    'type': 'B',
+    'speed': 6,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['horseman\'s flail'] = {
+    'name': 'Horseman\'s flail',
+    'size': 'M',
+    'type': 'B',
+    'speed': 6,
+    'reach': '1',
+    'small-medium': '1d4+1',
+    'large': '1d4+1',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+
+poWeapons['flintlock belt pistol'] = {
+    'name': 'Flintlock Belt Pistol',
+    'size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1/2',
+    'range': '4/8/12',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['flintlock blundbuss pistol'] = {
+    'name': 'Flintlock Blundbuss Pistol',
+    'size': 'S',
+    'type': 'P',
+    'speed': 9,
+    'rof': '1/3',
+    'range': '2/4/8',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['flintlock blunderbuss'] = {
+    'name': 'Flintlock Blunderbuss',
+    'size': 'M',
+    'type': 'P',
+    'speed': 10,
+    'rof': '1/3',
+    'range': '3/6/12',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['flintlock carbine'] = {
+    'name': 'Flintlock Carbine',
+    'size': 'M',
+    'type': 'P',
+    'speed': 8,
+    'rof': '1/2',
+    'range': '10/20/55',
+    'small-medium': '1d10',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['flintlock horse pistol'] = {
+    'name': 'Flintlock Horse Pistol',
+    'size': 'S',
+    'type': 'P',
+    'speed': 8,
+    'rof': '1/2',
+    'range': '5/10/15',
+    'small-medium': '1d10',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['flintlock musket'] = {
+    'name': 'Flintlock Musket',
+    'size': 'M',
+    'type': 'P',
+    'speed': 9,
+    'rof': '1/2',
+    'range': '15/30/80',
+    'small-medium': '1d12',
+    'large': '1d12',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['fork'] = {
+    'name': 'Fork',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d6+1',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['gaff/hook'] = {
+    'name': 'Gaff/hook',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['grapple'] = {
+    'name': 'Grapple',
+    'size': 'S',
+    'type': 'P/B',
+    'speed': 7,
+    'reach': '1',
+    'rof': '1/2',
+    'range': '2/4/6',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['gunsen'] = {
+    'name': 'Gunsen',
+    'size': 'S',
+    'type': 'B/P',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['hammer'] = {
+    'name': 'Hammer',
+    'size': 'S',
+    'type': 'B',
+    'speed': 4,
+    'reach': '1',
+    'rof': '1',
+    'range': '2/4/6',
+    'small-medium': '1d4',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['hand match arquebus'] = {
+    'name': 'Hand Match Arquebus',
+    'size': 'M',
+    'type': 'P',
+    'speed': 15,
+    'rof': '1/3',
+    'range': '10/30/42',
+    'small-medium': '1d10',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['hand match handgunne'] = {
+    'name': 'Hand Match Handgunne',
+    'size': 'L',
+    'type': 'P',
+    'speed': 18,
+    'rof': '1/4',
+    'range': '8/24/34',
+    'small-medium': '1d8+2',
+    'large': '2d6+2',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['harpoon'] = {
+    'name': 'Harpoon',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'reach': '2',
+    'rof': '1',
+    'range': '2/4/6',
+    'small-medium': '2d4',
+    'large': '2d6',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['bone harpoon'] = {
+    'name': 'Bone',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'reach': '2',
+    'rof': '1',
+    'range': '2/3/4',
+    'small-medium': '1d6',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['hatchet'] = {
+    'name': 'Hatchet',
+    'size': 'S',
+    'type': 'S',
+    'speed': 3,
+    'reach': '1',
+    'rof': '1',
+    'range': '2/4/6',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['holy symbol, big'] = {
+    'name': 'Holy symbol, big',
+    'size': 'S',
+    'type': 'B',
+    'speed': 5,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d3',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['javelin'] = {
+    'name': 'Javelin',
+    'size': 'M',
+    'type': 'P',
+    'speed': 4,
+    'reach': '1',
+    'rof': '1',
+    'range': '4/8/12',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['stone javelin'] = {
+    'name': 'Stone javelin',
+    'size': 'M',
+    'type': 'P',
+    'speed': 4,
+    'reach': '1',
+    'rof': '1',
+    'range': '3/6/9',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['jitte'] = {
+    'name': 'Jitte',
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['kama'] = {
+    'name': 'Kama',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 4,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['kau sin ke'] = {
+    'name': 'Kau sin ke',
+    'size': 'M',
+    'type': 'B',
+    'speed': 6,
+    'reach': '1',
+    'small-medium': '1d8',
+    'large': '1d6',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['kawanaga'] = {
+    'name': 'Kawanaga',
+    'size': 'S',
+    'type': 'P/B',
+    'speed': 7,
+    'reach': '2',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['knife'] = {
+    'name': 'Knife',
+    'size': 'S',
+    'type': 'S/P',
+    'speed': 2,
+    'reach': '1',
+    'rof': '2/1',
+    'range': '2/4/6',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['bone knife'] = {
+    'name': 'Bone knife',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 2,
+    'reach': '1',
+    'rof': '2/1',
+    'range': '2/3/4',
+    'small-medium': '1d2',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['stone knife'] = {
+    'name': 'Stone knife',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 2,
+    'reach': '1',
+    'rof': '2/1',
+    'range': '2/3/4',
+    'small-medium': '1d2',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['throwing knife'] = {
+    'name': 'Throwing knife',
+    'size': 'M',
+    'type': 'S/P',
+    'speed': 8,
+    'reach': '1',
+    'rof': '1',
+    'range': '2/4/6',
+    'small-medium': '2d4',
+    'large': '1d6+1',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['kusari-gama'] = {
+    'name': 'Kusari-gama',
+    'size': 'M',
+    'type': 'P/S/B',
+    'speed': 6,
+    'reach': '2',
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['light lance'] = {
+    'name': 'Light lance',
+    'size': 'L',
+    'type': 'P',
+    'speed': 6,
+    'reach': '2',
+    'rof': '1',
+    'range': '2/3/4',
+    'small-medium': '1d6',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['medium lance'] = {
+    'name': 'Medium lance',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'reach': '2',
+    'small-medium': '1d6+1',
+    'large': '2d6',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['heavy lance'] = {
+    'name': 'Heavy lance',
+    'size': 'L',
+    'type': 'P',
+    'speed': 10,
+    'reach': '2',
+    'small-medium': '1d8+1',
+    'large': '3d6',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['jousting lance'] = {
+    'name': 'Jousting lance',
+    'size': 'L',
+    'type': 'B',
+    'speed': 10,
+    'reach': '2',
+    'small-medium': '1d3–1',
+    'large': '1d2–1',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['footman\'s mace'] = {
+    'name': 'Footman\'s mace',
+    'size': 'M',
+    'type': 'B',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '1d6+1',
+    'large': '1d6',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['horseman\'s mace'] = {
+    'name': 'Horseman\'s mace',
+    'size': 'M',
+    'type': 'B',
+    'speed': 6,
+    'reach': '1',
+    'rof': '1',
+    'range': '2/3/4',
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['mace-axe'] = {
+    'name': 'Mace-axe',
+    'size': 'L',
+    'type': 'B/S',
+    'speed': 8,
+    'reach': '1',
+    'small-medium': '2d4',
+    'large': '1d6+1',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['machete'] = {
+    'name': 'Machete',
+    'size': 'M',
+    'type': 'S',
+    'speed': 6,
+    'reach': '1',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['mancatcher'] = {
+    'name': 'Mancatcher',
+    'size': 'L',
+    'type': '—',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '—',
+    'large': '—',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['matchlock arquebus'] = {
+    'name': 'Matchlock Arquebus',
+    'size': 'M',
+    'type': 'P',
+    'speed': 10,
+    'rof': '1/2',
+    'range': '10/20/60',
+    'small-medium': '1d10',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['matchlock caliver'] = {
+    'name': 'Matchlock Caliver',
+    'size': 'M',
+    'type': 'P',
+    'speed': 9,
+    'rof': '1/2',
+    'range': '8/16/48',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['matchlock musket w/rest'] = {
+    'name': 'Matchlock Musket w/rest',
+    'size': 'L',
+    'type': 'P',
+    'speed': 12,
+    'rof': '1/2',
+    'range': '12/24/72',
+    'small-medium': '1d12',
+    'large': '1d12',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['maul'] = {
+    'name': 'Maul',
+    'size': 'L',
+    'type': 'B',
+    'speed': 8,
+    'reach': '1',
+    'small-medium': '2d4',
+    'large': '1d10',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['morningstar'] = {
+    'name': 'Morningstar',
+    'size': 'M',
+    'type': 'B/P',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '2d4',
+    'large': '1d6+1',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['net'] = {
+    'name': 'Net',
+    'size': 'M',
+    'type': '—',
+    'speed': 10,
+    'reach': '1',
+    'rof': '1/2',
+    'range': '2/3/4',
+    'small-medium': '—',
+    'large': '—',
+    'knockdown': '—',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['nunchaku'] = {
+    'name': 'Nunchaku',
+    'size': 'M',
+    'type': 'B',
+    'speed': 3,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['oil flask'] = {
+    'name': 'Oil flask',
+    'size': 'S',
+    'type': '',
+    'speed': 15,
+    'rof': '1/2',
+    'range': '2/3/4',
+    'small-medium': '',
+    'large': '',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['parang'] = {
+    'name': 'Parang',
+    'size': 'M',
+    'type': 'S',
+    'speed': 6,
+    'reach': '1',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['farming pick'] = {
+    'name': 'Farming pick',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d6+1',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['footman\'s pick'] = {
+    'name': 'Footman\'s pick',
+    'size': 'M',
+    'type': 'P',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '1d6+1',
+    'large': '2d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['horseman\'s pick'] = {
+    'name': 'Horseman\'s pick',
+    'size': 'M',
+    'type': 'P',
+    'speed': 5,
+    'reach': '1',
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['pike'] = {
+    'name': 'Pike',
+    'size': 'L',
+    'type': 'P',
+    'speed': 13,
+    'reach': '3',
+    'small-medium': '1d6',
+    'large': '1d12',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['pilum'] = {
+    'name': 'Pilum',
+    'size': 'M',
+    'type': 'P',
+    'speed': 5,
+    'reach': '1',
+    'rof': '1',
+    'range': '3/6/9',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['awl pike'] = {
+    'name': 'Awl Pike',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P',
+    'speed': 13,
+    'reach': '3',
+    'small-medium': '1d6',
+    'large': '1d12',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['bardiche'] = {
+    'name': 'Bardiche',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S',
+    'speed': 9,
+    'reach': '2',
+    'small-medium': '2d4',
+    'large': '2d6',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['bec de corbin'] = {
+    'name': 'Bec de Corbin',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P/B',
+    'speed': 9,
+    'reach': '2',
+    'small-medium': '1d8',
+    'large': '1d6',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['bill-guisarme'] = {
+    'name': 'Bill-Guisarme',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P/S',
+    'speed': 10,
+    'reach': '2',
+    'small-medium': '2d4',
+    'large': '1d10',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['bill'] = {
+    'name': 'Bill',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P/S',
+    'speed': 10,
+    'reach': '2',
+    'small-medium': '2d4',
+    'large': '1d10',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['fauchard'] = {
+    'name': 'Fauchard',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S',
+    'speed': 8,
+    'reach': '2',
+    'small-medium': '1d6',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['glaive'] = {
+    'name': 'Glaive',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S',
+    'speed': 8,
+    'reach': '2',
+    'small-medium': '1d6',
+    'large': '1d10',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['glaive-guisarme'] = {
+    'name': 'Glaive-Guisarme',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P/S',
+    'speed': 9,
+    'reach': '2',
+    'small-medium': '2d4',
+    'large': '2d6',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['guisarme'] = {
+    'name': 'Guisarme',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S',
+    'speed': 8,
+    'reach': '2',
+    'small-medium': '2d4',
+    'large': '1d8',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['halberd'] = {
+    'name': 'Halberd',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P/S',
+    'speed': 9,
+    'reach': '2',
+    'small-medium': '1d10',
+    'large': '2d6',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['lajatan'] = {
+    'name': 'Lajatan',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S',
+    'speed': 6,
+    'reach': '1',
+    'small-medium': '1d10',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['lucern hammer'] = {
+    'name': 'Lucern hammer',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P/B',
+    'speed': 9,
+    'reach': '2',
+    'small-medium': '2d4',
+    'large': '1d6',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['military fork'] = {
+    'name': 'Military fork',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'reach': '2',
+    'small-medium': '1d8',
+    'large': '2d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['nagimaki'] = {
+    'name': 'Nagimaki',
+    'group': 'Polearm',
+    'size': 'M',
+    'type': 'S',
+    'speed': 6,
+    'reach': '2',
+    'small-medium': '1d6',
+    'large': '1d8',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['naginata'] = {
+    'name': 'Naginata',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S',
+    'speed': 7,
+    'reach': '2',
+    'small-medium': '1d8',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['partisan'] = {
+    'name': 'Partisan',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P',
+    'speed': 9,
+    'reach': '2',
+    'small-medium': '1d6',
+    'large': '1d6+1',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['ranseur'] = {
+    'name': 'Ranseur',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'reach': '2',
+    'small-medium': '2d4',
+    'large': '2d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['spetum'] = {
+    'name': 'Spetum',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'reach': '2',
+    'small-medium': '1d6+1',
+    'large': '2d6',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['tetsubo'] = {
+    'name': 'Tetsubo',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'B',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['voulge'] = {
+    'name': 'Voulge',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S',
+    'speed': 10,
+    'reach': '2',
+    'small-medium': '2d4',
+    'large': '2d4',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['pry bar'] = {
+    'name': 'Pry bar',
+    'size': 'M',
+    'type': 'B',
+    'speed': 5,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d3',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['quarterstaff'] = {
+    'name': 'Quarterstaff',
+    'size': 'L',
+    'type': 'B',
+    'speed': 4,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd10',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['rock'] = {
+    'name': 'Rock',
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'reach': '1',
+    'rof': '2/1',
+    'range': '2/4/6',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee', 'Range']
+};
+
+poWeapons['sai'] = {
+    'name': 'Sai',
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['sang kauw'] = {
+    'name': 'Sang kauw',
+    'size': 'L',
+    'type': 'P/S',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '1d8',
+    'large': '1d6',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['sap'] = {
+    'name': 'Sap',
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d2',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['scourge'] = {
+    'name': 'Scourge',
+    'size': 'S',
+    'type': '—',
+    'speed': 5,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d2',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['scythe'] = {
+    'name': 'Scythe',
+    'size': 'L',
+    'type': 'P/S',
+    'speed': 8,
+    'reach': '1',
+    'small-medium': '1d6+1',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['shuriken'] = {
+    'name': 'Shuriken',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'rof': '2/1',
+    'range': '3/6/9',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['sickle'] = {
+    'name': 'Sickle',
+    'size': 'S',
+    'type': 'S',
+    'speed': 4,
+    'reach': '1',
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['sledge hammer'] = {
+    'name': 'Sledge hammer',
+    'size': 'M',
+    'type': 'B',
+    'speed': 8,
+    'reach': '1',
+    'small-medium': '1d6+1',
+    'large': '1d4+1',
+    'knockdown': 'd12',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
+poWeapons['sling (bullet)'] = {
+    'name': 'Sling (Bullet)',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'rof': '1',
+    'range': '10/20/40',
+    'small-medium': '1d4+1',
+    'large': '1d6+1',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['sling (stone)'] = {
+    'name': 'Sling (Stone)',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'rof': '1',
+    'range': '8/16/24',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd4',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['snaplock belt pistol'] = {
+    'name': 'Snaplock Belt Pistol',
+    'size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1/2',
+    'range': '3/6/9',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['snaplock horse pistol'] = {
+    'name': 'Snaplock Horse Pistol',
+    'size': 'S',
+    'type': 'P',
+    'speed': 8,
+    'rof': '1/2',
+    'range': '4/8/12',
+    'small-medium': '1d10',
+    'large': '1d10',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['snaplock musket'] = {
+    'name': 'Snaplock Musket',
+    'size': 'M',
+    'type': 'P',
+    'speed': 9,
+    'rof': '1/2',
+    'range': '14/26/78',
+    'small-medium': '1d12',
+    'large': '1d12',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['spade'] = {
+    'name': 'Spade',
+    'size': 'M',
+    'type': 'S/B',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Melee']
+};
+
 
 //#endregion
 module.exports = weapons;
