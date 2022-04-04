@@ -534,10 +534,10 @@
     on("change:motivation_name change:motivation_target change:motivation_bonus", function(){
         rebuildMods();
     });
-    on("change:repeating_armorsets change:repeating_effects change:repeating_powers change:repeating_hunterpowers", function(){
+    on("change:repeating_equipment change:repeating_armorsets change:repeating_effects change:repeating_powers change:repeating_hunterpowers", function(){
         rebuildMods();
     });
-    on("remove:repeating_armorsets remove:repeating_effects remove:repeating_powers remove:repeating_hunterpowers", function(eventInfo){   
+    on("remove:repeating_equipment remove:repeating_armorsets remove:repeating_effects remove:repeating_powers remove:repeating_hunterpowers", function(eventInfo){   
         rebuildMods();
     });
 
@@ -547,11 +547,13 @@
         clearMods(mods);
         crawlInfluences(mods, function(mods) {
             crawlSingleEffect("motivation", mods, function(mods) {
-                crawlEffects("repeating_armorsets", mods, function(mods) {
-                    crawlEffects("repeating_powers", mods, function(mods) {
-                        crawlEffects("repeating_hunterpowers", mods, function(mods) {
-                            crawlEffects("repeating_effects", mods, function(mods) {
-                                finishRebuildMods(mods);
+                crawlEffects("repeating_equipment", mods, function(mods) {
+                    crawlEffects("repeating_armorsets", mods, function(mods) {
+                        crawlEffects("repeating_powers", mods, function(mods) {
+                            crawlEffects("repeating_hunterpowers", mods, function(mods) {
+                                crawlEffects("repeating_effects", mods, function(mods) {
+                                    finishRebuildMods(mods);
+                                });
                             });
                         });
                     });
