@@ -8385,23 +8385,29 @@
 		}
 		
 		function setAttrGroupPoolSpentByActivation(debug, timer, isActive, attrIDs, value, rowID, setObj) {
-			const groupid = getGroupID(value, 'attr');
+			const groupid = parseInt(value[`repeating_attr_${rowID}_group`]); //getGroupID(value, 'attr');
+			clog(debug, timer, 'groupid =', groupid, 'setAttrGroupPoolSpentByActivation()');
 			const groupType = 
 				value[`static_attrgroup_${groupid}_type`] || 'Standard';
+			clog(debug, timer, 'groupType =', groupType);
 			const isPowerFlux = 
 				groupType.toLowerCase().indexOf('flux') !== -1 ? 
 					true : false;
+			clog(debug, timer, 'isPowerFlux =', isPowerFlux);
 			const isPowerVariation = 
 				groupType.toLowerCase().indexOf('variation') !== -1 ? 
 					true : false;
+			clog(debug, timer, 'isPowerVariation =', isPowerVariation);
 			if (isPowerFlux || isPowerVariation) {
 				const poolmax = parseInt(value[`static_attrgroup_${groupid}_groupmax`]);
+				clog(debug, timer, 'poolmax =', poolmax);
 				const poolspent = 
 					isPowerFlux ?
 						getPowerFluxPoolSpent(debug, timer, isActive, attrIDs, value, rowID, groupid, setObj) :
 					isPowerVariation ?
 						getPowerVariationPoolCost(debug, timer, isActive, attrIDs, value, rowID, groupid, setObj) :
 					0;
+				clog(debug, timer, 'poolspent =', poolspent);
 				setObj[`static_attrgroup_${groupid}_spent`] = poolmax - poolspent;
 			}
 		}
@@ -8446,6 +8452,7 @@
 		}
 		
 		function getPowerFluxPoolSpent(debug, timer, isActive, attrIDs, value, rowID, groupid, setObj) {
+			clog(debug, timer, 'groupid =', groupid, 'getPowerFluxPoolSpent()');
 			const groupSourceID = value[`static_attrgroup_${groupid}_source`];
 			const groupIsActive = parseInt(value[`repeating_attr_${groupSourceID}_activate`]);
 			const result = !groupIsActive ? 0 :
@@ -8472,10 +8479,13 @@
 					if (isDefect) return 0;
 		
 					const isCurrAttr = id === rowID;
-					const isActivated = isCurrAttr ? isActive :
-						parseInt(value[`repeating_attr_${id}_activate`]) > 0 ? 
-							true : false;
-					clog(debug, timer, 'isActive =', isActive);
+					const isActivated = 
+						isCurrAttr ? 
+							isActive :
+							isNaN(parseInt(setObj[`repeating_attr_${id}_activate`])) ?
+								parseInt(value[`repeating_attr_${id}_activate`]) > 0 ? true : false :
+								parseInt(setObj[`repeating_attr_${id}_activate`]) > 0 ?	true : false;
+					clog(debug, timer, 'isActivated =', isActivated);
 					if (!isActivated) return 0;
 		
 					const attrcost = parseInt(value[`repeating_attr_${id}_totalcost`]) * isAltmunition;
@@ -8484,7 +8494,7 @@
 				})
 				.reduce((memo, num)=>{ return memo + num; }, 0)
 				.value();
-			clog(debug, timer, 'groupid =', groupid, 'getPowerFluxPoolSpent()');
+			//clog(debug, timer, 'groupid =', groupid, 'getPowerFluxPoolSpent()');
 			clog(debug, timer, 'result =', result);
 			return result;
 		}
@@ -8492,7 +8502,7 @@
 		function getPowerVariationPoolCost(debug, timer, isActive, attrIDs, value, rowID, groupid, setObj) {
 			const groupSourceID = value[`static_attrgroup_${groupid}_source`];
 			const groupIsActive = parseInt(value[`repeating_attr_${groupSourceID}_activate`]);
-			clog(debug, timer, 'groupIsActive =', groupIsActive, 'getPowerVariationPoolCost(TEST)');
+			clog(debug, timer, 'groupid =', groupid, 'getPowerVariationPoolCost()');
 			const result = !groupIsActive ? 0 :
 				_.chain(attrIDs)
 				.map(id=>{
@@ -8517,9 +8527,12 @@
 					if (isDefect) return 0;
 		
 					const isCurrAttr = id === rowID;
-					const isActivated = isCurrAttr ? isActive :
-						parseInt(value[`repeating_attr_${id}_activate`]) > 0 ? 
-							true : false;
+					const isActivated = 
+						isCurrAttr ? 
+							isActive :
+							isNaN(parseInt(setObj[`repeating_attr_${id}_activate`])) ?
+								parseInt(value[`repeating_attr_${id}_activate`]) > 0 ? true : false :
+								parseInt(setObj[`repeating_attr_${id}_activate`]) > 0 ?	true : false;
 					clog(debug, timer, 'isActive =', isActive);
 					if (!isActivated) return 0;
 		
@@ -8529,25 +8542,11 @@
 				})
 				.reduce((memo, num)=>{ return memo + num; }, 0)
 				.value();
-			clog(debug, timer, 'groupid =', groupid, 'getPowerVariationPoolCost()');
+			//clog(debug, timer, 'groupid =', groupid, 'getPowerVariationPoolCost()');
 			clog(debug, timer, 'result =', result);
 			return result;
 		}
-		/*
-		function getPowerVariationPoolCost(debug, timer, value, standardgroupcost, groupSourceID, groupid, setObj) {
-			clog(debug, timer, 'standardgroupcost =', standardgroupcost, 'getPowerVariationPoolCost()');
-			clog(debug, timer, 'groupSourceID =', groupSourceID);
-			const groupsourcecost = 
-				parseInt(setObj[`repeating_attr_${groupSourceID}_totalcost`]) ||
-				parseInt(value[`repeating_attr_${groupSourceID}_totalcost`]);
-			clog(debug, timer, 'groupsourcecost =', groupsourcecost);
-			const pooltotal = parseInt(value[`static_attrgroup_${groupid}_groupmax`]);
-			clog(debug, timer, 'pooltotal =', pooltotal);
-			const result = pooltotal - (standardgroupcost - groupsourcecost);
-			clog(debug, timer, 'result =', result);
-			return result;
-		}
-		*/
+		
 		function cleanupSkillCosts(debug, timer, skillIDs, value, rowID, setObj){
 			const groupid = getGroupID(value, 'skill');
 			const aggregateSkillCost = getAggregateSkillGroupCost(debug, timer, skillIDs, value, rowID, groupid, setObj);
@@ -11317,15 +11316,20 @@
 				setObj[`${handsource}_name`] = name;
 				writeValues(debug, timer, value, `${handsource}_source`, rowID, setObj);
 				if (source === undefined || source === '') {
-					setObj[`repeating_attr_${rowID}_source`] = hand;
+					//setObj[`repeating_attr_${rowID}_source`] = hand;
+					writeValues(debug, timer, value, `repeating_attr_${rowID}_source`, hand, setObj);
 				} else {
 					const twohanded = `${source},${hand}`;
-					setObj[`repeating_attr_${rowID}_source`] = twohanded;
+					//setObj[`repeating_attr_${rowID}_source`] = twohanded;
+					writeValues(debug, timer, value, `repeating_attr_${rowID}_source`, twohanded, setObj);
 				}
 			} else {
-				setObj[`${handsource}_name`] = '';
-				setObj[`${handsource}_source`] = '';
-				setObj[`repeating_attr_${rowID}_source`] = '';
+				//setObj[`${handsource}_name`] = '';
+				//setObj[`${handsource}_source`] = '';
+				//setObj[`repeating_attr_${rowID}_source`] = '';
+				writeValues(debug, timer, value, `${handsource}_name`, '', setObj);
+				writeValues(debug, timer, value, `${handsource}_source`, '', setObj);
+				writeValues(debug, timer, value, `repeating_attr_${rowID}_source`, '', setObj);
 			}
 			clog(debug, timer, 'handsource =', handsource, 'setArms()');
 		}
@@ -11341,7 +11345,7 @@
 			}
 		}
 		
-		function setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute) {
+		function setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute) {
 			const name = value[`repeating_attr_${rowID}_name`] || "";
 			const hands = 
 				attribute === 'telekinesis' || attribute === 'swarm' ? 0 :
@@ -11414,7 +11418,7 @@
 							updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, id, sourceAttr, setObj);
 						} else if (mainsource == offsource) {
 							//determine if two-handed and arm mainhand, unarm two-handed or offhand
-							disableWeapon(debug, timer, mainsource, attrdb, setObj);
+							disableWeapon(debug, timer, attrIDs, value, mainsource, attrdb, setObj);
 							if (attribute == `shield`) {
 								setArms(debug, timer, value, rowID, setObj, name, false, "mainhand");
 								setArms(debug, timer, value, rowID, setObj, name, true, "offhand");
@@ -11427,11 +11431,11 @@
 						} else {
 							//arm mainhand
 							if (attribute == `shield`) {
-								disableWeapon(debug, timer, offsource, attrdb, setObj);
+								disableWeapon(debug, timer, attrIDs, value, offsource, attrdb, setObj);
 								setArms(debug, timer, value, rowID, setObj, name, true, "offhand");
 								updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, "offhand", sourceAttr, setObj);
 							} else {
-								disableWeapon(debug, timer, mainsource, attrdb, setObj);
+								disableWeapon(debug, timer, attrIDs, value, mainsource, attrdb, setObj);
 								setArms(debug, timer, value, rowID, setObj, name, true, "mainhand");
 								updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, "mainhand", sourceAttr, setObj);
 							}
@@ -11484,14 +11488,14 @@
 							});
 						} else if (mainsource == offsource) {
 							//already using two-handed weapon
-							disableWeapon(debug, timer, mainsource, attrdb, setObj);
+							disableWeapon(debug, timer, attrIDs, value, mainsource, attrdb, setObj);
 							setArms(debug, timer, value, rowID, setObj, name, true, "mainhand");
 							setArms(debug, timer, value, rowID, setObj, name, true, "offhand");
 							updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, "mainhand", sourceAttr, setObj);
 						} else {
 							//arm main&off hands, unarm main&off hands
-							if (mainsource != "") disableWeapon(debug, timer, mainsource, attrdb, setObj);
-							if (offsource != "") disableWeapon(debug, timer, offsource, attrdb, setObj);
+							if (mainsource != "") disableWeapon(debug, timer, attrIDs, value, mainsource, attrdb, setObj);
+							if (offsource != "") disableWeapon(debug, timer, attrIDs, value, offsource, attrdb, setObj);
 							setArms(debug, timer, value, rowID, setObj, name, true, "mainhand");
 							setArms(debug, timer, value, rowID, setObj, name, true, "offhand");
 							updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, "mainhand", sourceAttr, setObj);
@@ -11519,7 +11523,8 @@
 			clog(debug, timer, 'sourceAttr =', sourceAttr, 'setWeapon()');
 		}
 		
-		function disableWeapon(debug, timer, source, attrdb, setObj) {
+		function disableWeapon(debug, timer, attrIDs, value, source, attrdb, setObj) {
+			setAttrGroupPoolSpentByActivation(debug, timer, false, attrIDs, value, source, setObj);
 			setObj[`repeating_attr_${source}_activate`] = 0;
 			attrdb.weapon.find((attr, i) => {
 				if (attr.source == source) { delete attrdb.weapon[i]; return true; }
@@ -11663,7 +11668,7 @@
 				case "powerflux":
 				case "powervariation":
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-					setPoolMax(isActive, value, attrIDs, sectionName, rowID, setObj);
+					setPoolMax(isActive, debug, timer, value, attrIDs, sectionName, rowID, setObj);
 					convertAttrGroupCost(isActive, debug, timer, value, sectionName, attrIDs, rowID, setObj);
 					setPoolActive(isActive, value, sectionName, setObj);
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
@@ -11672,7 +11677,7 @@
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setProtection(isActive, debug, timer, value, rowID, sourceAttr, attribute, setObj);
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-					setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+					setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 				break;
 				case "skill": 
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
@@ -11696,14 +11701,14 @@
 				case "swarm":
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setSwarmCritters(isActive, debug, timer, value, attrdb, rowID, setObj);
-					setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+					setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "telekinesis":
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					if (level > 1) {
 						//setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-						setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+						setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 					}
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
@@ -11717,7 +11722,7 @@
 				break;
 				case "weapon":
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-					setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+					setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 				break;
 				default:
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);	
@@ -11796,7 +11801,7 @@
 			setObj[`static_${sectionName}group_${groupid}_active`] = isActive;
 		}
 		
-		function setPoolMax(isActive, value, attrIDs, sectionName, rowID, setObj){
+		function setPoolMax(isActive, debug, timer, value, attrIDs, sectionName, rowID, setObj){
 			const groupid = getGroupID(value, sectionName);
 			const groupType = value[`static_${sectionName}group_${groupid}_type`];
 			const groupCost = _.chain(attrIDs)
@@ -11826,7 +11831,8 @@
 				///variation/i.test(groupType) ? groupCost : 0 : 0;
 				isActive && groupType.toLowerCase().indexOf('variation') !== -1 ?
 					groupCost : 0;
-			setObj[`static_${sectionName}group_${groupid}_groupmax`] = max;
+			//setObj[`static_${sectionName}group_${groupid}_groupmax`] = max;
+			writeValues(debug, timer, value, `static_${sectionName}group_${groupid}_groupmax`, max, setObj);
 		}
 		
 		function convertAttrGroupCost(isActive, debug, timer, value, sectionName, attrIDs, rowID, setObj){
@@ -12137,8 +12143,10 @@
 			const state = parseInt(setObj[`${rowID}_state`]) || 0;
 			const result = state > 0 ? value[`${rowID}_source`] : '';
 			if (result !== undefined) {
-				setObj.previous_weapon = setObj.active_weapon || value.active_weapon;
-				setObj.active_weapon = result;
+				//setObj.previous_weapon = setObj.active_weapon || value.active_weapon;
+				//setObj.active_weapon = result;
+				writeValues(debug, timer, value, previous_weapon, setObj.active_weapon || value.active_weapon, setObj);
+				writeValues(debug, timer, value, active_weapon, result, setObj);
 			}
 			clog(debug, timer, 'source =', result, 'setActiveWeapon()');
 		}
@@ -13235,7 +13243,8 @@
 				});
 			clog(debug, timer, 'handsStateArray:', handsStateArray, 'setWeaponStates()');
 			_.each(handsArray, (hand, i) => {
-				setObj[`${hand}_state`] = handsStateArray[i];
+				//setObj[`${hand}_state`] = handsStateArray[i];
+				writeValues(debug, timer, value, `${hand}_state`, handsStateArray[i], setObj);
 			});
 		}
 		
