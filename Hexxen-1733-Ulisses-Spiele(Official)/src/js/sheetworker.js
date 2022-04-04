@@ -1,10 +1,66 @@
 
     const logEvents = true;
 
-    // map charachter sheet terms to compendium terms
+    // map character sheet terms to compendium terms
     const categoryMap = {
         'motivation': 'motivation',
-        'hunterpowers': 'hunter-ability'
+        'roles': 'role',
+        'professions': 'profession',
+        'equipment': 'item',
+        'armorsets': 'clothing-set',
+        'hunterpowers': 'hunter-ability',
+        'powers': 'hunter-ability',
+        'effects': 'effect'
+    }
+    const repeatingSections = [
+        'roles', 'professions', 'equipment', 'armorsets', 'hunterpowers', 'powers', 'effects', 
+        'npcattacks', 'npcpowers', 'npc-narrative-abilities'
+    ];
+
+    // map character sheet terms to compendium terms
+    const attributesMap = {
+        'str': 'attribute_strength',
+        'ath': 'attribute_athletic',
+        'dex': 'attribute_dexterity',
+        'per': 'attribute_senses', // perception
+        'kno': 'attribute_knowledge',
+        'wil': 'attribute_willpower'
+    };
+    const abilitiesMap = {
+        'acrobatics': 'skill_acrobatics',
+        'awareness': 'skill_alertness',
+        'detection': 'skill_perception',
+        'first-aid': 'skill_firstaid',
+        'sleight-of-hand': 'skill_sleightofhand',
+        'mental-fortitude': 'skill_mentalpower',
+        'craft': 'skill_crafting',
+        'stealth': 'skill_stealth',
+        'country-and-people': 'skill_countryandpeople',
+        'feat-of-strength': 'skill_flexing',
+        'oratory': 'skill_rhetoric',
+        'reflexes': 'skill_reflexes',
+        'riding': 'skill_riding',
+        'resilience': 'skill_insensibility',
+        'education': 'skill_fieldsofknowledge',
+        'witchcraft': 'skill_witchcraft',
+        'brawl': 'weapon_punch',
+        'dagger-and-knives': 'weapon_dagger',
+        'fencing-weapons': 'weapon_fencing',
+        'swords': 'weapon_swords',
+        'sabers': 'weapon_scimitar',
+        'impact-weapons': 'weapon_impact',
+        'polearms': 'weapon_polearm',
+        'lances': 'weapon_lance',
+        'slings': 'weapon_sling',
+        'pistols': 'weapon_pistol',
+        'crossbows': 'weapon_crossbow',
+        'muskets': 'weapon_musket',
+        'dodge': 'weapon_dodge',
+        'shield-proficiency': 'weapon_shield'
+    }
+    
+    const COMPENDIUM_CATEGORY_MAP = {
+        // FIXME 
     }
 
     // Roll20 API helpers
@@ -29,6 +85,7 @@
     }
 
     rh.sendChatCard = (data) => {
+        // FIXME: kein name, keine description?
         const query = Object.keys(data).reduce((out, key) => {
             out.push(`{{${key}=${data[key] ?? ''}}}`);
             return out;
@@ -44,28 +101,98 @@
     const dh = {};
     dh.triggerName = 'drop-data';
     dh.dropKeys = Object.freeze(['drop-data', 'drop-name', 'drop-uniquename', 'drop-content', 'drop-category']);
+    dh.dropHandler = {};
 
     dh.clearDropFields = (updates) => {
         rh.clearAttrs(dh.dropKeys, updates);
+    };
+
+    dh.processDropAttr = (data, updates, compendiumName, sheetName=compendiumName, fallback='') => {
+        const attrData = data[`data-${compendiumName}`];
+        console.log(compendiumName, attrData);
+        updates[sheetName] = attrData || fallback;
+    };
+    dh.parseJSON = (json) => {
+        let out = undefined;
+        if (json) {
+            out = JSON.parse(json);
+        }
+        return out;
+    };
+    dh.EXCLUDE_FROM_CONVERT = ['data-List'];
+    dh.convertDropData = (data) => {
+        Object.keys(data).forEach((key) => {
+            if (key.startsWith('data-') && !dh.EXCLUDE_FROM_CONVERT.includes(key)) {
+                data[key] = dh.parseJSON(data[key]);
+            }
+        })
+        return data;
+    }
+    dh.prepareLookup = (lookups) => {
+
+    };
+    dh.handleLookups = (lookups, data, updates, callback) => {
+        // FIXME lookups übergeben und in prepareLookups aufbauen
+        lookups = lookups.concat([
+            { name: 'Gelehrtenkleidung', category: 'item', handler: null, extras: null },
+            { name: 'Totstellen', category: 'hunter-ability', handler: dh.handleHunterAbilityDrop, extras: null },
+            { name: 'Fortgeschrittene Kriegstaktik', category: 'hunter-ability', handler: null, extras: {} }
+        ]);
+        const lang = 'de'; // FIXME dynamisch ermitteln
+        const pageNames = lookups.map(l => {
+            // FIXME fully-qualified names verwenden <category>:<name>
+            // const cat = COMPENDIUM_CATEGORY_MAP[l.category]?.[lang];
+            // return cat ? `${cat}:${l.name}` : l.name;
+            return l.name;
+        });
+        getCompendiumPage(pageNames, (pages) => {
+            console.log(pages);
+            pages.forEach(p => {
+                if (p.id) {
+                    p.data['Name'] = p.name;
+                    p.data['Content'] = p.content?.trim();
+                    // FIXME extras einschleifen
+                    const l = lookups.find(l => l.name === p.name);
+                    l?.handler?.(p.data, updates); // no callback, not async
+                }
+                else {
+                    // FIXME kein Treffer
+                }
+            });
+            callback(updates);
+        });
     };
 
     dh.handleCompendiumDrop = (event) => {
         if (logEvents) console.log('handleCompendiumDrop', event);
         // filter events caused by clearing the drop attributes
         if (event.sourceType === 'sheetworker' && event.newValue === undefined) {
-            if (logEvents) console.log('skipped clear event');
+            if (logEvents) console.log('skipping event caused by clearing the drop attributes');
             return;
         }
 
         getAttrs(dh.dropKeys, (attrs) => {
+            if (logEvents) console.log('drop attributes', attrs);
             const drop = attrs['drop-data'];
             // avoid processing empty string
             if (!drop) {
-                console.log('bad attributes data');
+                console.warn('bad attributes data');
                 dh.clearDropFields();
                 return;
             }
-            const data = JSON.parse(drop);
+            let data;
+            try {
+                data = JSON.parse(drop) ?? {};
+                data = dh.convertDropData(data);
+                if (logEvents) console.log('drop data', data);
+            }
+            catch (error) {
+                // FIXME Fehlermeldung im Charakterbogen
+                console.error('Failed to process drop data!');
+                console.error(error);
+                return;
+            }
+
             data['Name'] = attrs['drop-name'];
             data['UniqueName'] = attrs['drop-uniquename'];
             data['Content'] = attrs['drop-content']?.trim();
@@ -73,14 +200,131 @@
             // update object for collecting all modifications
             const updates = {}; 
             // do something with data
-
-            // append entries for clearing the drop fields to updates object
-            dh.clearDropFields(updates);
-            // 
-            setAttrs(updates);
+            const category = data['data-category'];
+            const handler = dh.dropHandler[category];
+            if (handler) {
+                handler(data, updates, dh._finishCompendiumDrop); // maybe async
+            }
+            else {
+                console.log(`unknown category: ${category}`);
+                dh.clearDropFields();
+                return;
+            }
+            // no more code here as handler might be async (in case of a monster drop)
         });
     };
+    dh._finishCompendiumDrop = (updates) => {
+        // append entries for clearing the drop fields to updates object
+        dh.clearDropFields(updates);
+        // apply changes (incl. drop field clearing)
+        if (logEvents) console.log('updates', updates);
+        setAttrs(updates);
+    };
 
+    dh.handleMotivationDrop = (data, updates, callback) => {
+        updates['motivation_name'] = data['Name'];
+        updates['motivation_perk'] = data['data-perk'] ?? '';
+        // updates['motivation_upkeep'] = data['data-upkeep'] ?? 0;
+        callback?.(updates);
+    };
+    dh.dropHandler['motivation'] = dh.handleMotivationDrop;
+    
+    dh.handleRoleDrop = (data, updates, callback) => {
+        const rowId = generateRowID();
+        // const prefix = `repeating_hunterpowers_${rowId}`;
+        // updates[`${prefix}_name`] = 'neue JK';
+        // updates[`${prefix}_description`] = 'neue JK Beschreibung';
+        callback?.(updates);
+    };
+    dh.dropHandler['role'] = dh.handleRoleDrop;
+
+    dh.handleHunterAbilityDrop = (data, updates, callback) => {
+        console.log('handleHunterAbilityDrop', data);
+        const rowId = generateRowID();
+        const prefix = `repeating_hunterpowers_${rowId}`;
+        updates[`${prefix}_name`] = data['Name'];
+        updates[`${prefix}_description`] = data['Content'];
+        updates[`${prefix}_details-flag`] = 0;
+        callback?.(updates);
+    };
+    dh.dropHandler['hunter-ability'] = dh.handleHunterAbilityDrop;
+
+    /*
+     * Monster category handlers
+     */
+
+    dh.handleHunterDrop = (data, updates, callback) => {
+        console.log('handleHunterDrop', data);
+        const lookups = [];
+        let attrData; // attr is a character sheet attribute in general not a special attribute
+
+        // finish drop without tutorial or editmode active
+        ch.disableTutorial(updates);
+        
+        // level (rank)
+        dh.processDropAttr(data, updates, 'level', 'rank', 1);
+        // attributes
+        attrData = data['data-attributes'];
+        console.log('attributes', attrData);
+        if (Array.isArray(attrData)) {
+            attrData.forEach(a => {
+                const key = attributesMap[a.key];
+                if (key) updates[key] = a.value;
+                else console.warn(`unknown attribute key "${a.key}"`);
+            });
+        }
+        else {
+            console.warn('bad attributes data');
+        }
+        // abilities
+        attrData = data['data-abilities'];
+        console.log('abilities', attrData);
+        if (Array.isArray(attrData)) {
+            attrData.forEach(a => {
+                const key = abilitiesMap[a.key];
+                if (key) updates[key] = a.value;
+                else console.warn(`unknown ability key "${a.key}"`);
+            });
+        }
+        else {
+            console.warn('bad abilities data');
+        }
+
+        // corruption
+        dh.processDropAttr(data, updates, 'corruption', 'corruption', 0);
+        // starting money (wealth) and upkeep
+        dh.processDropAttr(data, updates, 'starting-money', 'wealth', 0);
+        dh.processDropAttr(data, updates, 'upkeep', 'upkeep', 50); // TODO Konstante definieren
+        // motivation (prepare, requires extra data from other compendium pages)
+        dh.prepareLookup(lookups, data, 'motivation', dh.handleMotivationDrop);
+        // FIXME roles
+        // FIXME professions
+        // FIXME hunter-abilities
+        // FIXME items und clothing-sets
+        
+        // process lookups
+        dh.handleLookups(lookups, data, updates, callback);
+        
+        // no more code after this point! lookup is async!
+
+        // TODO teilweise im sheet:open?
+        // TODO Panzerwert
+        // TODO aktuelle Lep
+        // TODO Aktionspunkte
+    };
+    dh.dropHandler['hunter'] = dh.handleHunterDrop;
+
+    // character sheet helper
+    const ch = {};
+    ch.disableTutorial = (updates) => {
+        // TODO auch direkte Ausführung ermögichen (siehe clearDropFields)
+        updates['tutorial_step'] = 5;
+        updates['tutorial_done'] = 1;
+        updates['editmode'] = 0;
+        updates['sheetTab'] = "character";
+    };
+    
+    
 
 
     on('clicked:motivation_chat clicked:repeating_hunterpowers:chat', (event) => {
