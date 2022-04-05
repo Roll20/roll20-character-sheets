@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.5.0] - 2022-03-13
+
+### Added
+
+- `Level Acquired` for Skills, Hand to Hand, and Weapon Proficiencies. Current level calculation is done based on that value and the current character level.
+
+### Changed
+
+- Fix for a change in dark mode.
+- Fix `Migrate` button.
+- Fix issue where adding custom Weapon Proficiencies would break the process that runs when the Character Level is changed, and prevent Skills/Abilities/etc. from updating.
+- Fix issue where sometimes Skills/Weapon Proficiencies would auto-adjust their level when opening the sheet.
+- Improve alignment between headings and values in Weapon Proficiencies, Abilities, Magic, and Psionics.
+- Add `from Active Profile` to reset ISP/PPE buttons.
+- Fix issue with broken roll templates on certain checks (Despair, Mind Control, etc.).
+
 ## [1.4.0] - 2022-03-02
 
 ### Added
@@ -13,11 +29,13 @@
 ### Changed
 
 - Fix issue where adding a modifier duplicated it in the Modifier Picker.
+- Fix issue where remaining armor output was displaying the pre-damage amount.
+- Fix issue where activating/deactivating a top-level Armor wasn't always modifying the Active Armor section.
+- Fix issue where clicking Reset MDC on a top-level Armor didn't update the Active Armor.
 
 ### Removed
 
 - Remove extraneous Break Fall in a couple of places.
-- Fix issue where remaining armor output was displaying the pre-damage amount.
 
 ## [1.3.0] - 2022-01-11
 
