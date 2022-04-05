@@ -4,6 +4,42 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.11.00 (Build 14)
+
+### Features
+
+- added tabs for notes area
+
+## 02.10.00 (Build 13)
+
+### Features
+
+- removed parsed rolls buttons from combat proficiencies to improve UI clarity
+
+### CSS
+
+- changed location of virtues und rewards to make it consistent with the heart and wits areas
+
+## 02.09.00 (Build 12)
+
+### Features
+
+- added custom dice roller
+
+### CSS
+
+- added "msg-alt" label for the MSG-custom roll template that will remove the yellow background from inlined rolls. This is usefull when using custom roll tables for events (e.g. hazards)
+
+## 02.08.00 (Build 11)
+
+### Features
+
+- add Close Fitting to other armour slot to allow for a selectable +2 protection bonus (e.g. due to a virtue)
+
+### CSS
+
+- minor layout improvements
+
 ## 02.07.00 (Build 10)
 
 ### Features

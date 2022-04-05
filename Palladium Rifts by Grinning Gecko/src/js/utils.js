@@ -315,3 +315,42 @@ async function palladiumAddToTurnTracker(initKey, attacksKey) {
   const dupeTracker = await startRoll(`!dup-turn ${attacks}`);
   finishRoll(dupeTracker.rollId);
 }
+
+/**
+ * Determines if a repeating section change event is a new row.
+ * Requires the repeating section to have a `rowid` attribute.
+ * Note that when a new row is added the
+ *
+ * @param {*} e Roll20 change event object.
+ * @returns bool
+ */
+async function isNewRow(e) {
+  const [r, section, rowId, attr] = e.sourceAttribute.split("_");
+  const rowPrefix = `${r}_${section}_${rowId}`;
+  const a = await getAttrsAsync([`${rowPrefix}_rowid`]);
+  if (a[`${rowPrefix}_rowid`].length === 0) {
+    await setAttrsAsync(
+      { [`${rowPrefix}_rowid`]: `${r}_${section}_${rowId}` },
+      { silent: true }
+    );
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Sets generic defaults when a new row is created.
+ *
+ * @param {*} e Roll20 change event object.
+ */
+async function setRowDefaults(e, setAttrsOptions) {
+  const [r, section, rowId, attr] = e.sourceAttribute.split("_");
+  const rowPrefix = `${r}_${section}_${rowId}`;
+  const a = await getAttrsAsync(["character_level"]);
+  const attrs = {
+    [`${rowPrefix}_levelacquired`]: a["character_level"],
+    [`${rowPrefix}_level`]: 1,
+  };
+  console.log(attrs);
+  await setAttrsAsync(attrs, setAttrsOptions);
+}

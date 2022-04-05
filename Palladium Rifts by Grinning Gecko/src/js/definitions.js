@@ -857,6 +857,7 @@ const H2H = {
 
 const H2H_KEYS = [
   "name",
+  "levelacquired",
   "level",
   "attacks",
   "pull",
@@ -1342,6 +1343,7 @@ const WP = {
 const WP_KEYS = {
   wp: [
     "name",
+    "levelacquired",
     "level",
     "strike",
     "parry",
@@ -1352,6 +1354,7 @@ const WP_KEYS = {
   ],
   wpmodern: [
     "name",
+    "levelacquired",
     "level",
     "strike_range_single",
     "disarm",
@@ -1505,6 +1508,7 @@ const SKILL_KEYS = [
   "base",
   "bonus",
   "perlevel",
+  "levelacquired",
   "level",
   "total",
   "description",
