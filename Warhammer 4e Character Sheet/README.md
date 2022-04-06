@@ -77,8 +77,10 @@ April 6th 2022 v1.55c
 
 - Improved Armor Qualities, now displays selected options at top of attack rolls. New checkboxes in the Armor Tab.
 - Added Magical Quality to Melee/Ranged Weapon settings, allows custom text in same format as normal qualities.
-- Added Pummel to Ranged Weapons, as Sling ammo can have pummel.
 - Added Talent integration logic for Second Sight/Strider/Stout-hearted/Tinker/Trapper/Trick Riding/Tunnel Rat.
+- Added Pummel to Ranged Weapons, as Sling ammo can have pummel.
+- Added Called Shot to Ranged Assister, and changed Cover to a drop down to conserve space.
+- Fixed Called Shot Melee, it now works with Off hand Attack rolls too and clears selection after rolling.
 - Various localization fixes and additions to Talent integration (with community support!)
 
 
