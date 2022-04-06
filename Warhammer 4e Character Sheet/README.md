@@ -73,6 +73,15 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+April 6th 2022 v1.55c
+
+- Improved Armor Qualities, now displays selected options at top of attack rolls. New checkboxes in the Armor Tab.
+- Added Magical Quality to Melee/Ranged Weapon settings, allows custom text in same format as normal qualities.
+- Added Pummel to Ranged Weapons, as Sling ammo can have pummel.
+- Added Talent integration logic for Second Sight/Strider/Stout-hearted/Tinker/Trapper/Trick Riding/Tunnel Rat.
+- Various localization fixes and additions to Talent integration (with community support!)
+
+
 March 31th 2022 v1.55b
 
 - Corrected UiA critTable not activing in certain situations.
