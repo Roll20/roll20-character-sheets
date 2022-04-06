@@ -1129,16 +1129,21 @@
 							<span class="sheet-spacer"></span>
 							
 				<div class="sheet-row" style="letter-spacing: normal;">
-				<div class="sheet-col-1-3 sheet-center">
+				<div class="sheet-col-1-2 sheet-center" style="letter-spacing: normal; padding-left: 2px">
+				<span data-i18n="CALLED-SHOT">Called Shot</span>
+				<input type="checkbox" name="attr_RangedMode_Called" value="1"/>
+				</div>
+				<div class="sheet-col-1-2 sheet-left">
+				<div class="sheet-col-1-3 sheet-left">
 				<span data-i18n="COVER">Cover</span>:
 				</div>
-				<div class="sheet-col-1-3 sheet-left">
-				<span data-i18n="SOFT">Soft</span>
-				<input type="checkbox" name="attr_RangedMode_Cover" value="1"/>
+				<div class="sheet-col-2-3 sheet-center">
+						<select class="sheet-select-no-arrow-center2-w" name="attr_RangedMode_Cover"  >
+							<option value="0" selected="selected">None</option>	
+							<option value="1" >Soft</option>
+							<option value="2" >Hard</option>
+						</select>
 				</div>
-				<div class="sheet-col-1-3 sheet-left">
-				<span data-i18n="HARD">Hard</span>
-				<input type="checkbox" name="attr_RangedMode_Cover" value="2"/>
 				</div>
 				</div>	
 				
@@ -49215,9 +49220,16 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
 
 		if (v.MeleeMode_Charging  == 1) {setAttrs({
 			"Used_MeleeBonus": v.Used_MeleeBonus - 10,
-			"Used_MeleeBonus": v.Used_DefenseBonus - 10
+			"Used_DefenseBonus": v.Used_DefenseBonus - 10
 	    }, {silent: true});}			
 			
+		if (v.MeleeMode_STS  == 0) {
+		if (v.MeleeMode_Aimed  == 1) {setAttrs({
+			"Used_MeleeBonus": v.Used_MeleeBonus + 20,
+			"Used_DefenseBonus": v.Used_DefenseBonus + 20
+	    }, {silent: true});}
+		}
+		
 		setAttrs({
             "LastRollMain": test,
             "LastCritRoll": 0,	
@@ -49225,6 +49237,8 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
 			"MeleeMode_Disarm": 0,	
 			"MeleeMode_Feint": 0,
 			"MeleeMode_Charging": 0,
+			"MeleeMode_Aimed": 0,
+			"MeleeMode_STS": 0,
             "LastUnitDieMain": computed2
 	    }, {silent: true});				
 			
@@ -49424,7 +49438,7 @@ on('clicked:ripostedmgmain', (eventInfo) => {
 on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clicked:dualwieldoff', (eventInfo) => {
 
 	if (eventInfo.sourceType === 'sheetworker') return;
-			getAttrs(["Used_DefenseWeaponSkill", "Talent_AmbidextrousLvl","Used_MeleeTwohanded","Advantageinput","LastRollMain","LastCritRoll", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_BNE", "MeleeMode_Infight", "MeleeMode_Drilled", "MeleeMode_Charging", "Used_MeleeBonus", "Used_DefenseBonus", "MeleeMode_STS", "GroupAdv", "CritTable"], function(values) {	
+			getAttrs(["Used_DefenseWeaponSkill", "Talent_AmbidextrousLvl","Used_MeleeTwohanded","Advantageinput","LastRollMain","LastCritRoll", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_BNE", "MeleeMode_Infight", "MeleeMode_Drilled", "MeleeMode_Charging", "Used_MeleeBonus", "Used_DefenseBonus", "MeleeMode_STS", "MeleeMode_Aimed", "GroupAdv", "CritTable"], function(values) {	
 			
 
 	 		prevcrit = JSON.stringify(values["LastCritRoll"])||0;
@@ -49452,7 +49466,7 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 			if (values.Talent_AmbidextrousLvl == 2) {ambipen = 0;}
 			if (values.Used_MeleeTwohanded == 1) {ambipen = 0;}
 
-   let roll = '{{test=[[>test<]]}} {{sl=[[0]]}} {{slbonus=[[@{Used_DefensePrecise}+@{Used_DefensePractical}>addsl< [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusAtkOff}>addsl<]]}} {{sladd=[[0]]}} {{csloc=[[0>csloc<]]}} {{cscount=[[0>cscount<]]}} {{modvalue=[[?{Opposed Attack Modifier|@{Used_DefenseBonus}}]]}} {{title=@{Used_DefenseWeapon}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{ATTACK}}} {{target=[[>target<]]}} {{offpen=[[>ambi<]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0}]]}} {{hitlocation=true}} {{reach=@{Used_DefenseReach}}} {{damaging=[[@{Used_DefenseDamaging}]]}} {{rolltype=[[@{Used_DefenseImpale}]]}} {{qualities=@{Used_DefenseQualities}}} {{sitmod=[[0]]}} {{damage=[[@{Used_DefenseStrengthBonus}+@{Used_DefenseDamageBonus}+@{Talent_StrikeMightyBlowLvl}>adddmg<-{[[@{Used_DefenseDmgTaken}-@{Used_DefenseDurable}]],[[0]]}kh1]]}} {{NPC=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{fast=[[@{Used_DefenseFast}]]}} {{slow=[[@{Used_DefenseSlow}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{tiring=[[@{Used_DefenseTiring}]]}} {{penetrating=[[@{Used_DefensePenetrating}]]}} {{pummel=[[@{Used_DefensePummel}]]}} {{hack=[[@{Used_DefenseHack}]]}} {{precise=[[@{Used_DefensePrecise}]]}} {{impact=[[@{Used_DefenseImpact}]]}} {{practical=[[@{Used_DefensePractical}]]}} {{wrap=[[@{Used_DefenseWrap}]]}} {{trip=[[@{Used_DefenseTrip}]]}} {{slash=[[@{Used_DefenseSlash}*@{Used_DefenseSlashRating}]]}} {{distract=[[@{Used_DefenseDistract}]]}} {{undamaging=[[@{Used_DefenseUndamaging}]]}} {{mod1type=[[@{Used_Defense_att_modtype1}]]}} {{mod1=@{Used_Defense_att_mod1}}} {{mod2type=[[@{Used_Defense_att_modtype2}]]}} {{mod2=@{Used_Defense_att_mod2}}} {{mod3type=[[@{Used_Defense_att_modtype3}]]}} {{mod3=@{Used_Defense_att_mod3}}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}} {{carefulstrike=[[@{Talent_CarefulStrikeLvl}]]}} {{bne=[[@{MeleeMode_BNE}]]}} {{inf=[[@{MeleeMode_Infight}]]}} {{usedmagic=[[@{Used_DefenseMagic}]]}}  {{usedmagiceffect=@{Used_DefenseMagicEffect}}}';
+   let roll = '{{test=[[>test<]]}} {{sl=[[0]]}} {{slbonus=[[@{Used_DefensePrecise}+@{Used_DefensePractical}>addsl< [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusAtkOff}>addsl<]]}} {{sladd=[[0]]}} {{csloc=[[0>csloc<]]}} {{cscount=[[0>cscount<]]}} {{modvalue=[[?{Opposed Attack Modifier|@{Used_DefenseBonus}}]]}} {{title=@{Used_DefenseWeapon}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{ATTACK}}} {{target=[[>target<]]}} {{offpen=[[>ambi<]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0}]]}} >hitloc< {{reach=@{Used_DefenseReach}}} {{damaging=[[@{Used_DefenseDamaging}]]}} {{rolltype=[[@{Used_DefenseImpale}]]}} {{qualities=@{Used_DefenseQualities}}} {{sitmod=[[0]]}} {{damage=[[@{Used_DefenseStrengthBonus}+@{Used_DefenseDamageBonus}+@{Talent_StrikeMightyBlowLvl}>adddmg<-{[[@{Used_DefenseDmgTaken}-@{Used_DefenseDurable}]],[[0]]}kh1]]}} {{NPC=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{fast=[[@{Used_DefenseFast}]]}} {{slow=[[@{Used_DefenseSlow}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{tiring=[[@{Used_DefenseTiring}]]}} {{penetrating=[[@{Used_DefensePenetrating}]]}} {{pummel=[[@{Used_DefensePummel}]]}} {{hack=[[@{Used_DefenseHack}]]}} {{precise=[[@{Used_DefensePrecise}]]}} {{impact=[[@{Used_DefenseImpact}]]}} {{practical=[[@{Used_DefensePractical}]]}} {{wrap=[[@{Used_DefenseWrap}]]}} {{trip=[[@{Used_DefenseTrip}]]}} {{slash=[[@{Used_DefenseSlash}*@{Used_DefenseSlashRating}]]}} {{distract=[[@{Used_DefenseDistract}]]}} {{undamaging=[[@{Used_DefenseUndamaging}]]}} {{mod1type=[[@{Used_Defense_att_modtype1}]]}} {{mod1=@{Used_Defense_att_mod1}}} {{mod2type=[[@{Used_Defense_att_modtype2}]]}} {{mod2=@{Used_Defense_att_mod2}}} {{mod3type=[[@{Used_Defense_att_modtype3}]]}} {{mod3=@{Used_Defense_att_mod3}}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}} {{carefulstrike=[[@{Talent_CarefulStrikeLvl}]]}} {{bne=[[@{MeleeMode_BNE}]]}} {{inf=[[@{MeleeMode_Infight}]]}} {{usedmagic=[[@{Used_DefenseMagic}]]}}  {{usedmagiceffect=@{Used_DefenseMagicEffect}}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e} ';
@@ -49508,7 +49522,9 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 	if (values.GroupAdv  == 1) {rollPart4 += " {{grpadv=[[@{GroupAdv}]]}}";}
 	if (values.CritTable  == 1) {rollPart4 += " {{crittable=[[@{CritTable}]]}}";}
  
-   let rollPart = rollPart4.replaceAll('>ambi<', ambipen).replaceAll('>addsldf<', addsldf).replaceAll('>adddmg<', adddmg);
+     if (values.MeleeMode_Aimed == 1) {hitloc = "{{hitlocation=?{Choose a Hit Location|Head,Head|Right Arm,Right Arm|Left Arm,Left Arm|Body,Body|Right Leg,Right Leg|Left Leg,Left Leg}}}"; rollPart4 += " {{aimed=[[@{MeleeMode_Aimed}]]}}";} else {hitloc = "{{hitlocation=true}}";}
+ 
+   let rollPart = rollPart4.replaceAll('>ambi<', ambipen).replaceAll('>addsldf<', addsldf).replaceAll('>adddmg<', adddmg).replaceAll('>hitloc<', hitloc);
    
                console.log(rollPart);
                console.log(battlefrenzy);
@@ -49603,6 +49619,12 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 			"Used_MeleeBonus": values.Used_DefenseBonus - 10
 	    }, {silent: true});}				
 			
+		if (values.MeleeMode_STS  == 0) {
+		if (values.MeleeMode_Aimed  == 1) {setAttrs({
+			"Used_MeleeBonus": values.Used_MeleeBonus + 20,
+			"Used_DefenseBonus": values.Used_DefenseBonus + 20
+	    }, {silent: true});}
+		}	
 		setAttrs({
             "LastRollMain": test,
             "LastCritRoll": 0,	
@@ -49610,6 +49632,8 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 			"MeleeMode_Disarm": 0,	
 			"MeleeMode_Feint": 0,
 			"MeleeMode_Charging": 0,
+			"MeleeMode_Aimed": 0,
+			"MeleeMode_STS": 0,
             "LastUnitDieMain": computed2
 	    }, {silent: true});					   
 			
@@ -49825,14 +49849,14 @@ on('clicked:ripostedmgoff clicked:shieldbash', (eventInfo) => {
 	
 	
 on('clicked:rangedatk clicked:rangedatkreroll', (eventInfo) => {
-	getAttrs(["Used_RangedAmmo","AutoAmmo","RangedMode_Engaged","RangedMode_Moved","Used_RangedBonus","RangedMode_Aim","RangedMode_Range", "GroupAdv"], function(v) {	
+	getAttrs(["Used_RangedAmmo","AutoAmmo","RangedMode_Engaged","RangedMode_Moved","Used_RangedBonus","RangedMode_Aim","RangedMode_Range", "RangedMode_Called", "GroupAdv"], function(v) {	
 	
-   let roll = '{{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Used_RangedPrecise}+@{Used_RangedPractical}-@{Used_RangedImprecise}+@{RangedMode_FastShot} [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusRgd}+@{RangedMode_FastShot}]]}} {{sladd=[[0]]}} {{test=[[@{roll_rule}]]}} {{rangedeng=[[@{RangedMode_Engaged}]]}} {{modvalue=[[?{Ranged Attack Modifier|@{Used_RangedBonus}}]]}} {{ammo=[[@{Used_RangedAmmo}]]}} {{title=@{Used_RangedWeaponName}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{RANGED}}} {{target=[[ [[@{condgen_see_move}*-1]] [COND] + [[@{Used_RangedBalisticSkill}]] [SKILL] + [[10*@{Used_RangedAccurate}]] [TALENTS] + [[@{Advantage}*10]] [ADV] +?{Ranged Attack Modifier|0} [MOD] ]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0} [SL Mod]]]}} {{hitlocation=true}} {{damaging=[[@{Used_RangedDamaging}]]}} {{reach=@{Used_WeaponRange}}} {{rolltype=[[@{Used_RangedImpale}]]}} {{pummel=[[@{Used_RangedPummel}]]}} {{qualities=@{Used_RangedQualities}}} {{damage=[[@{Used_RangedStrengthBonus}+@{Used_RangedDamage}+@{Talent_AccurateShotLvl}]]}} {{ammotype=@{Used_RangedAmmoType}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Ranged_modtype1}]]}} {{mod1=@{Used_Ranged_mod1}}} {{mod2type=[[@{Used_Ranged_modtype2}]]}} {{mod2=@{Used_Ranged_mod2}}} {{mod3type=[[@{Used_Ranged_modtype3}]]}} {{mod3=@{Used_Ranged_mod3}}} {{NPC=[[0]]}} {{reroll=@{RT-reroll}RangedAtkreroll)}} {{sitmod=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{precise=[[@{Used_RangedPrecise}]]}} {{imprecise=[[@{Used_RangedImprecise}]]}} {{blast=[[@{Used_RangedBlast}*@{Used_RangedBlastRating}]]}} {{repeater=[[@{Used_RangedRepeater}*@{Used_RangedRepeaterRating}]]}} {{entangle=[[@{Used_RangedEntangle}]]}} {{penetrating=[[@{Used_RangedPenetrating}]]}} {{tiring=[[0]]}} {{blackpowder=[[@{Used_RangedBlackpowder}]]}} {{practical=[[@{Used_RangedPractical}]]}} {{accurate=[[@{Used_RangedAccurate}*10]]}} {{hack=[[@{Used_RangedHack}]]}} {{dangerous=[[@{Used_RangedDangerous}]]}} {{impact=[[@{Used_RangedImpact}]]}} {{deadeyeshot=[[@{Talent_DeadeyeShotLvl}]]}} {{fastshot=[[@{RangedMode_FastShot}]]}} {{autoammo=[[@{AutoAmmo}]]}} {{sniper=[[@{Talent_SniperLvl}]]}} {{targetrange=[[@{RangedMode_Range}]]}} {{sureshot=[[@{Talent_SureShotLvl}]]}} {{usedmagic=[[@{Used_RangedMagic}]]}}  {{usedmagiceffect=@{Used_RangedMagicEffect}}}';
+   let roll = '{{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Used_RangedPrecise}+@{Used_RangedPractical}-@{Used_RangedImprecise}+@{RangedMode_FastShot} [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusRgd}+@{RangedMode_FastShot}]]}} {{sladd=[[0]]}} {{test=[[@{roll_rule}]]}} {{rangedeng=[[@{RangedMode_Engaged}]]}} {{modvalue=[[?{Ranged Attack Modifier|@{Used_RangedBonus}}]]}} {{ammo=[[@{Used_RangedAmmo}]]}} {{title=@{Used_RangedWeaponName}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{RANGED}}} {{target=[[ [[@{condgen_see_move}*-1]] [COND] + [[@{Used_RangedBalisticSkill}]] [SKILL] + [[10*@{Used_RangedAccurate}]] [TALENTS] + [[@{Advantage}*10]] [ADV] +?{Ranged Attack Modifier|0} [MOD] ]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0} [SL Mod]]]}} >hitloc< {{damaging=[[@{Used_RangedDamaging}]]}} {{reach=@{Used_WeaponRange}}} {{rolltype=[[@{Used_RangedImpale}]]}} {{pummel=[[@{Used_RangedPummel}]]}} {{qualities=@{Used_RangedQualities}}} {{damage=[[@{Used_RangedStrengthBonus}+@{Used_RangedDamage}+@{Talent_AccurateShotLvl}]]}} {{ammotype=@{Used_RangedAmmoType}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Ranged_modtype1}]]}} {{mod1=@{Used_Ranged_mod1}}} {{mod2type=[[@{Used_Ranged_modtype2}]]}} {{mod2=@{Used_Ranged_mod2}}} {{mod3type=[[@{Used_Ranged_modtype3}]]}} {{mod3=@{Used_Ranged_mod3}}} {{NPC=[[0]]}} {{reroll=@{RT-reroll}RangedAtkreroll)}} {{sitmod=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{precise=[[@{Used_RangedPrecise}]]}} {{imprecise=[[@{Used_RangedImprecise}]]}} {{blast=[[@{Used_RangedBlast}*@{Used_RangedBlastRating}]]}} {{repeater=[[@{Used_RangedRepeater}*@{Used_RangedRepeaterRating}]]}} {{entangle=[[@{Used_RangedEntangle}]]}} {{penetrating=[[@{Used_RangedPenetrating}]]}} {{tiring=[[0]]}} {{blackpowder=[[@{Used_RangedBlackpowder}]]}} {{practical=[[@{Used_RangedPractical}]]}} {{accurate=[[@{Used_RangedAccurate}*10]]}} {{hack=[[@{Used_RangedHack}]]}} {{dangerous=[[@{Used_RangedDangerous}]]}} {{impact=[[@{Used_RangedImpact}]]}} {{deadeyeshot=[[@{Talent_DeadeyeShotLvl}]]}} {{fastshot=[[@{RangedMode_FastShot}]]}} {{autoammo=[[@{AutoAmmo}]]}} {{sniper=[[@{Talent_SniperLvl}]]}} {{targetrange=[[@{RangedMode_Range}]]}} {{sureshot=[[@{Talent_SureShotLvl}]]}} {{usedmagic=[[@{Used_RangedMagic}]]}}  {{usedmagiceffect=@{Used_RangedMagicEffect}}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
    if (v.GroupAdv  == 1) {roll += " {{grpadv=[[@{GroupAdv}]]}}";}  
-   let rollPart = roll;
+   let rollPart2 = roll;
 	ammopre = v.Used_RangedAmmo;	 
 
    if (v.AutoAmmo == 1) {
@@ -49856,7 +49880,9 @@ on('clicked:rangedatk clicked:rangedatkreroll', (eventInfo) => {
 	});		  
    }
    }
-               console.log(trigger);	
+      if (v.RangedMode_Called == 1) {hitloc = "{{hitlocation=?{Choose a Hit Location|Head,Head|Right Arm,Right Arm|Left Arm,Left Arm|Body,Body|Right Leg,Right Leg|Left Leg,Left Leg}}}"; rollPart2 += " {{aimed=[[@{RangedMode_Called}]]}}";} else {hitloc = "{{hitlocation=true}}";}  
+ 
+   let rollPart = rollPart2.replaceAll('>hitloc<', hitloc);
 				
         startRoll(rollBegins + rollPart, (results) => {
 			const target = results.results.target.result
@@ -49904,8 +49930,9 @@ on('clicked:rangedatk clicked:rangedatkreroll', (eventInfo) => {
 	
 	modchange = v.Used_RangedBonus;
 	
-	if (v.RangedMode_Moved == 1) {modchange += 10;} else {modchange = 0;}
-	if (v.RangedMode_Aim == 1) {modchange -= 20;} else {modchange = 0;}
+	if (v.RangedMode_Moved == 1) {modchange += 10;} else {modchange += 0;}
+	if (v.RangedMode_Aim == 1) {modchange -= 20;} else {modchange += 0;}
+	if (v.RangedMode_Called == 1) {modchange += 20;} else {modchange += 0;}
 	
 	setAttrs(
 	{
@@ -49913,6 +49940,7 @@ on('clicked:rangedatk clicked:rangedatkreroll', (eventInfo) => {
 		"RangedMode_FastShot": 0,
 		"RangedMode_Moved": 0,
 		"RangedMode_Aim": 0,
+		"RangedMode_Called": 0,
 		"Used_RangedBonus": modchange,
 	}, {silent: true});			
 
@@ -51537,8 +51565,8 @@ on('change:repeating_melee:usedtwohanded', function(event){
 });	
 
 
-on('change:RangedMode_Engaged change:RangedMode_Range change:RangedMode_Size change:RangedMode_Moved change:RangedMode_Cover change:RangedMode_Aim', function(event){
-	getAttrs(["Used_RangedBonus", "RangedMode_Engaged", "RangedMode_Range", "RangedMode_Size", "RangedMode_Moved", "RangedMode_Cover", "RangedMode_Aim", "Talent_SniperLvl", "Talent_SharpshooterLvl"], function(v) {
+on('change:RangedMode_Engaged change:RangedMode_Range change:RangedMode_Size change:RangedMode_Moved change:RangedMode_Cover change:RangedMode_Aim change:RangedMode_Called', function(event){
+	getAttrs(["Used_RangedBonus", "RangedMode_Engaged", "RangedMode_Range", "RangedMode_Size", "RangedMode_Moved", "RangedMode_Cover", "RangedMode_Called","RangedMode_Aim", "Talent_SniperLvl", "Talent_SharpshooterLvl"], function(v) {
 
 	mod = 0;
 
@@ -51564,7 +51592,9 @@ on('change:RangedMode_Engaged change:RangedMode_Range change:RangedMode_Size cha
 	
 	if (v.RangedMode_Aim == 1) {mod += 20} else {mod += 0}
 	
-
+	if (v.RangedMode_Called == 1) {mod += -20} else {mod += 0}
+	
+			   
     if (mod > 60) {mod = 60}
     if (mod < -30) {mod = -30}			 
 			 
@@ -51593,7 +51623,7 @@ on('change:RangedMode_Engaged change:RangedMode_Range change:RangedMode_Size cha
 
 on('clicked:resetRangedMode', function(event){
         if (event.sourceType === 'sheetworker') return;
-	getAttrs(["Used_RangedBonus", "RangedMode_Engaged", "RangedMode_Range", "RangedMode_Size", "RangedMode_Moved"], function(v) {
+	getAttrs(["Used_RangedBonus", "RangedMode_Engaged", "RangedMode_Range", "RangedMode_Size", "RangedMode_Moved", "RangedMode_Called"], function(v) {
 
 	setAttrs(
 	{
@@ -51603,7 +51633,8 @@ on('clicked:resetRangedMode', function(event){
 		"RangedMode_Range": 0,
 		"RangedMode_Size": 0,
 		"RangedMode_Moved": 0,
-		"RangedMode_Cover": 0
+		"RangedMode_Cover": 0,
+		"RangedMode_Called": 0
 	}, {silent: true});			   
 			   
 	});
@@ -51776,7 +51807,7 @@ on('clicked:resetMeleeMode clicked:resetDefenseMode', function(event){
 
 on('sheet:opened', function(event){
         if (event.sourceType === 'sheetworker') return;
-	getAttrs(["Used_RangedBonus", "RangedMode_Engaged", "RangedMode_Range", "RangedMode_Size", "RangedMode_Moved", "MeleeMode_BNE"], function(v) {
+	getAttrs(["Used_RangedBonus", "RangedMode_Engaged", "RangedMode_Range", "RangedMode_Size", "RangedMode_Moved", "MeleeMode_BNE", "RangedMode_Called"], function(v) {
 
 	setAttrs(
 	{
@@ -51799,7 +51830,8 @@ on('sheet:opened', function(event){
 		"RangedMode_Range": 0,
 		"RangedMode_Size": 0,
 		"RangedMode_Moved": 0,
-		"RangedMode_Cover": 0
+		"RangedMode_Cover": 0,
+		"RangedMode_Called": 0,
 	}, {silent: true});			   
 			   
 	});
