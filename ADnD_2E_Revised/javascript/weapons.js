@@ -3150,7 +3150,7 @@ poWeapons['bandistock'] = {
     'large': '1d6',
     'knockdown': 'd8',
     'book': 'Player\'s Option: Combat & Tactics',
-    'category': ['Range']
+    'category': ['Melee']
 };
 
 poWeapons['caltrop'] = {
@@ -3457,7 +3457,6 @@ poWeapons['pellet bow'] = {
 
 poWeapons['dagger'] = {
     'name': 'Dagger',
-    'noProf': true,
     'size': 'S',
     'type': 'P',
     'speed': 2,
@@ -3474,6 +3473,7 @@ poWeapons['dagger'] = {
 
 poWeapons['bone dagger'] = {
     'name': 'Bone dagger',
+    'noProf': true,
     'size': 'S',
     'type': 'P',
     'speed': 2,
@@ -3551,6 +3551,7 @@ poWeapons['stiletto'] = {
     'reach': '1',
     'rof': '2/1',
     'range': '2/4/6',
+    'strength': true,
     'small-medium': '1d3',
     'large': '1d2',
     'knockdown': 'd4',
@@ -3560,12 +3561,14 @@ poWeapons['stiletto'] = {
 
 poWeapons['stone dagger'] = {
     'name': 'Stone dagger',
+    'noProf': true,
     'size': 'S',
     'type': 'P',
     'speed': 2,
     'reach': '1',
     'rof': '2/1',
     'range': '2/3/4',
+    'strength': true,
     'small-medium': '1d3',
     'large': '1d2',
     'knockdown': 'd6',
@@ -3580,6 +3583,7 @@ poWeapons['dart'] = {
     'speed': 2,
     'rof': '3',
     'range': '2/4/8',
+    'strength': true,
     'small-medium': '1d3',
     'large': '1d2',
     'knockdown': 'd4',
@@ -3641,8 +3645,8 @@ poWeapons['flintlock belt pistol'] = {
     'category': ['Range']
 };
 
-poWeapons['flintlock blundbuss pistol'] = {
-    'name': 'Flintlock Blundbuss Pistol',
+poWeapons['flintlock blunderbuss pistol'] = {
+    'name': 'Flintlock Blunderbuss Pistol',
     'size': 'S',
     'type': 'P',
     'speed': 9,
@@ -3745,6 +3749,7 @@ poWeapons['grapple'] = {
     'reach': '1',
     'rof': '1/2',
     'range': '2/4/6',
+    'strength': true,
     'small-medium': '1d4',
     'large': '1d4',
     'knockdown': 'd6',
@@ -3773,6 +3778,7 @@ poWeapons['hammer'] = {
     'reach': '1',
     'rof': '1',
     'range': '2/4/6',
+    'strength': true,
     'small-medium': '1d4',
     'large': '1d3',
     'knockdown': 'd6',
@@ -3816,6 +3822,7 @@ poWeapons['harpoon'] = {
     'reach': '2',
     'rof': '1',
     'range': '2/4/6',
+    'strength': true,
     'small-medium': '2d4',
     'large': '2d6',
     'knockdown': 'd8',
@@ -3825,12 +3832,14 @@ poWeapons['harpoon'] = {
 
 poWeapons['bone harpoon'] = {
     'name': 'Bone',
+    'noProf': true,
     'size': 'L',
     'type': 'P',
     'speed': 7,
     'reach': '2',
     'rof': '1',
     'range': '2/3/4',
+    'strength': true,
     'small-medium': '1d6',
     'large': '1d10',
     'knockdown': 'd8',
@@ -3846,6 +3855,7 @@ poWeapons['hatchet'] = {
     'reach': '1',
     'rof': '1',
     'range': '2/4/6',
+    'strength': true,
     'small-medium': '1d4',
     'large': '1d4',
     'knockdown': 'd6',
@@ -3875,6 +3885,7 @@ poWeapons['javelin'] = {
     'rof': '1',
     'range': '4/8/12',
     'small-medium': '1d6',
+    'strength': true,
     'large': '1d6',
     'knockdown': 'd6',
     'book': 'Player\'s Option: Combat & Tactics',
@@ -3883,12 +3894,14 @@ poWeapons['javelin'] = {
 
 poWeapons['stone javelin'] = {
     'name': 'Stone javelin',
+    'noProf': true,
     'size': 'M',
     'type': 'P',
     'speed': 4,
     'reach': '1',
     'rof': '1',
     'range': '3/6/9',
+    'strength': true,
     'small-medium': '1d4',
     'large': '1d4',
     'knockdown': 'd6',
@@ -3956,6 +3969,7 @@ poWeapons['knife'] = {
     'reach': '1',
     'rof': '2/1',
     'range': '2/4/6',
+    'strength': true,
     'small-medium': '1d3',
     'large': '1d2',
     'knockdown': 'd4',
@@ -3965,12 +3979,14 @@ poWeapons['knife'] = {
 
 poWeapons['bone knife'] = {
     'name': 'Bone knife',
+    'noProf': true,
     'size': 'S',
     'type': 'P/S',
     'speed': 2,
     'reach': '1',
     'rof': '2/1',
     'range': '2/3/4',
+    'strength': true,
     'small-medium': '1d2',
     'large': '1d2',
     'knockdown': 'd4',
@@ -3980,12 +3996,14 @@ poWeapons['bone knife'] = {
 
 poWeapons['stone knife'] = {
     'name': 'Stone knife',
+    'noProf': true,
     'size': 'S',
     'type': 'P/S',
     'speed': 2,
     'reach': '1',
     'rof': '2/1',
     'range': '2/3/4',
+    'strength': true,
     'small-medium': '1d2',
     'large': '1d2',
     'knockdown': 'd4',
@@ -3995,12 +4013,14 @@ poWeapons['stone knife'] = {
 
 poWeapons['throwing knife'] = {
     'name': 'Throwing knife',
+    'noProf': true,
     'size': 'M',
     'type': 'S/P',
     'speed': 8,
     'reach': '1',
     'rof': '1',
     'range': '2/4/6',
+    'strength': true,
     'small-medium': '2d4',
     'large': '1d6+1',
     'knockdown': 'd8',
@@ -4029,6 +4049,7 @@ poWeapons['light lance'] = {
     'reach': '2',
     'rof': '1',
     'range': '2/3/4',
+    'strength': true,
     'small-medium': '1d6',
     'large': '1d8',
     'knockdown': 'd8',
@@ -4096,6 +4117,7 @@ poWeapons['horseman\'s mace'] = {
     'reach': '1',
     'rof': '1',
     'range': '2/3/4',
+    'strength': true,
     'small-medium': '1d6',
     'large': '1d4',
     'knockdown': 'd8',
@@ -4218,6 +4240,7 @@ poWeapons['net'] = {
     'reach': '1',
     'rof': '1/2',
     'range': '2/3/4',
+    'strength': true,
     'small-medium': '—',
     'large': '—',
     'knockdown': '—',
@@ -4240,11 +4263,13 @@ poWeapons['nunchaku'] = {
 
 poWeapons['oil flask'] = {
     'name': 'Oil flask',
+    'noProf': true,
     'size': 'S',
     'type': '',
     'speed': 15,
     'rof': '1/2',
     'range': '2/3/4',
+    'strength': true,
     'small-medium': '',
     'large': '',
     'book': 'Player\'s Option: Combat & Tactics',
@@ -4324,6 +4349,7 @@ poWeapons['pilum'] = {
     'reach': '1',
     'rof': '1',
     'range': '3/6/9',
+    'strength': true,
     'small-medium': '1d6',
     'large': '1d6',
     'knockdown': 'd6',
@@ -4639,12 +4665,14 @@ poWeapons['quarterstaff'] = {
 
 poWeapons['rock'] = {
     'name': 'Rock',
+    'noProf': true,
     'size': 'S',
     'type': 'B',
     'speed': 2,
     'reach': '1',
     'rof': '2/1',
     'range': '2/4/6',
+    'strength': true,
     'small-medium': '1d3',
     'large': '1d2',
     'knockdown': 'd6',
@@ -4724,6 +4752,7 @@ poWeapons['shuriken'] = {
     'speed': 2,
     'rof': '2/1',
     'range': '3/6/9',
+    'strength': true,
     'small-medium': '1d4',
     'large': '1d4',
     'knockdown': 'd4',
@@ -4764,6 +4793,7 @@ poWeapons['sling (bullet)'] = {
     'speed': 6,
     'rof': '1',
     'range': '10/20/40',
+    'strength': true,
     'small-medium': '1d4+1',
     'large': '1d6+1',
     'knockdown': 'd4',
@@ -4778,6 +4808,7 @@ poWeapons['sling (stone)'] = {
     'speed': 6,
     'rof': '1',
     'range': '8/16/24',
+    'strength': true,
     'small-medium': '1d4',
     'large': '1d4',
     'knockdown': 'd4',
@@ -4848,6 +4879,7 @@ poWeapons['spear (one-handed)'] = {
     'reach': '1',
     'rof': '1',
     'range': '2/4/6',
+    'strength': true,
     'small-medium': '1d6',
     'large': '1d8',
     'knockdown': 'd6',
@@ -4883,12 +4915,14 @@ poWeapons['long spear'] = {
 
 poWeapons['stone spear (one-handed)'] = {
     'name': 'Stone spear (One-handed)',
+    'noProf': true,
     'size': 'M',
     'type': 'P',
     'speed': 6,
     'reach': '1',
     'rof': '1',
     'range': '2/3/4',
+    'strength': true,
     'small-medium': '1d4',
     'large': '1d6',
     'knockdown': 'd6',
@@ -4898,6 +4932,7 @@ poWeapons['stone spear (one-handed)'] = {
 
 poWeapons['stone spear (two-handed)'] = {
     'name': 'Stone spear (Two-handed)',
+    'noProf': true,
     'size': 'M',
     'type': 'P',
     'speed': 6,
@@ -4907,6 +4942,38 @@ poWeapons['stone spear (two-handed)'] = {
     'knockdown': 'd8',
     'book': 'Player\'s Option: Combat & Tactics',
     'category': ['Melee']
+};
+
+poWeapons['staff sling (stinkpot)'] = {
+    'name': 'Staff sling (Stinkpot)',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'B',
+    'speed': 11,
+    'rof': '1',
+    'range': '—/6-12/18',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
+};
+
+poWeapons['staff sling (stone)'] = {
+    'name': 'Staff sling (Stone)',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'B',
+    'speed': 11,
+    'rof': '1',
+    'range': '—/6-12/18',
+    'strength': true,
+    'small-medium': '1d4+1',
+    'large': '1d6+1',
+    'knockdown': 'd6',
+    'book': 'Player\'s Option: Combat & Tactics',
+    'category': ['Range']
 };
 
 poWeapons['bastard sword (one-handed)'] = {
@@ -5281,12 +5348,14 @@ poWeapons['three-piece rod'] = {
 
 poWeapons['torch'] = {
     'name': 'Torch',
+    'noProf': true,
     'size': 'M',
     'type': 'Bd',
     'speed': 4,
     'reach': '1',
     'rof': '1',
     'range': '2/3/4',
+    'strength': true,
     'small-medium': '1d4',
     'large': '1d3',
     'knockdown': 'd6',
@@ -5296,13 +5365,15 @@ poWeapons['torch'] = {
 
 poWeapons['vial'] = {
     'name': 'Vial',
+    'noProf': true,
     'size': 'S',
-    'type': 'd',
+    'type': '',
     'speed': 2,
     'rof': '1',
     'range': '2/3/4',
-    'small-medium': 'd',
-    'large': 'd',
+    'strength': true,
+    'small-medium': '',
+    'large': '',
     'knockdown': '—',
     'book': 'Player\'s Option: Combat & Tactics',
     'category': ['Range']
@@ -5316,6 +5387,7 @@ poWeapons['warhammer'] = {
     'reach': '1',
     'rof': '1',
     'range': '2/4/6',
+    'strength': true,
     'small-medium': '1d4+1',
     'large': '1d4',
     'knockdown': 'd8',
@@ -5365,8 +5437,8 @@ poWeapons['wheellock horse pistol'] = {
     'category': ['Range']
 };
 
-poWeapons['whip 11'] = {
-    'name': 'Whip 11',
+poWeapons['whip'] = {
+    'name': 'Whip',
     'size': 'M',
     'type': '—',
     'speed': 8,
