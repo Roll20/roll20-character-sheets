@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.7.4" readonly />
+													<input type="text" class="center" name="attr_version" value="1.7.5" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -8840,13 +8840,25 @@
 		}
 		
 		function writeValues(debug, timer, value, key, result, setObj) {
-			const isUndefined = 
+			const isKeyUndefined = 
 				key === undefined ? true :
 				key === "" ? true :
 				key.indexOf('undefined') !== -1 ? true :
 				false;
-			if (isUndefined) {
-				clog(debug, timer, 'key is undefined, write cancelled:', key, 'writeValues()');
+			const isResultUndefined =
+				result === undefined ? true :
+				//result === "" ? true :
+				false;
+			if (isKeyUndefined || isResultUndefined) {
+				const getUndefinedString = 
+					isKeyUndefined ? 'key' :
+					isResultUndefined ? 'result' :
+					'';
+				const getValueUndefined = 
+					isKeyUndefined ? key :
+					isResultUndefined ? result :
+					'';
+				clog(debug, timer, `${getUndefinedString} is undefined, write cancelled:`, getValueUndefined, 'writeValues()');
 				return;
 			}
 			clog(debug, timer, `setObj.${key} =`, result, 'writeValues()');
@@ -12141,14 +12153,14 @@
 		
 		function setActiveWeapon(debug, timer, value, rowID, setObj) {
 			const state = parseInt(setObj[`${rowID}_state`]) || 0;
-			const result = state > 0 ? value[`${rowID}_source`] : '';
-			if (result !== undefined) {
+			const source = state > 0 ? value[`${rowID}_source`] : '';
+			clog(debug, timer, 'source =', source, 'setActiveWeapon()');
+			if (source !== undefined) {
 				//setObj.previous_weapon = setObj.active_weapon || value.active_weapon;
 				//setObj.active_weapon = result;
-				writeValues(debug, timer, value, previous_weapon, setObj.active_weapon || value.active_weapon, setObj);
-				writeValues(debug, timer, value, active_weapon, result, setObj);
+				writeValues(debug, timer, value, 'previous_weapon', setObj.active_weapon || value.active_weapon, setObj);
+				writeValues(debug, timer, value, 'active_weapon', source, setObj);
 			}
-			clog(debug, timer, 'source =', result, 'setActiveWeapon()');
 		}
 		
 		function getIsGrappling(maneuver) {
@@ -12270,14 +12282,16 @@
 			const type = value[`repeating_attr_${rowID}_attribute`];
 			const ammostate = parseInt(value.weapon_ammo_reloads);
 			const capacitystate = parseInt(value.weapon_ammo_capacity);
-			if (rowID !== setObj.previous_weapon) {
+			clog(debug, timer, 'ammostate =', ammostate, 'setWeaponAmmo()');
+			clog(debug, timer, 'capacitystate =', capacitystate);
+			if (rowID !== setObj.previous_weapon && _.isString(setObj.previous_weapon)) {
+				clog(debug, timer, 'weapon change, save ammo state', '');
 				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_ammostate`, ammostate, setObj);
-				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_capacitystate`, capacitystate, setObj);
-				clog(debug, timer, 'ammostate =', ammostate, 'setWeaponAmmo()');
-				clog(debug, timer, 'capacitystate =', capacitystate);
+				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_capacitystate`, capacitystate, setObj);	
 			}
 			if (type === 'telekinesis' || type === 'swarm') return;
 			if (state) {//weapon armed, load ammo state
+				clog(debug, timer, 'weapon armed, load ammo state', '');
 				const weapon = _.find(attrdb[`${type}`], w => {
 					if (w.source == rowID) return true;
 				});
@@ -12296,13 +12310,12 @@
 				writeValues(debug, timer, value, 'weapon_ammo_capacity', capacity, setObj);
 				clog(debug, timer, 'ammo =', ammo, 'setWeaponAmmo()');
 				clog(debug, timer, 'capacity =', capacity);
-			} else {//weapon unarmed, save ammo state
+			} else if (rowID.length === 20) {//weapon unarmed, save ammo state
 				//const ammostate = parseInt(value.weapon_ammo_reloads);
 				//const capacitystate = parseInt(value.weapon_ammo_capacity);
+				clog(debug, timer, 'weapon unarmed, save ammo state', handsource);
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_ammostate`, ammostate, setObj);
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_capacitystate`, capacitystate, setObj);
-				clog(debug, timer, 'ammostate =', ammostate, 'setWeaponAmmo()');
-				clog(debug, timer, 'capacitystate =', capacitystate);
 			}	
 		}
 		
@@ -12319,7 +12332,7 @@
 			const weapondb = attrdb[`${type}`].find(o => {
 				if (o.source == weapon) return true;
 			});
-			const customizations = weapondb.customizations;	
+			//const customizations = weapondb.customizations;	
 			//set default overrides
 			_.each(weapondb.customizations, customization => {
 				switch(customization.name){
