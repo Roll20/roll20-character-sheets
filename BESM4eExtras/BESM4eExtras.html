@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.7.3" readonly />
+													<input type="text" class="center" name="attr_version" value="1.7.4" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -6442,6 +6442,10 @@
 																	</div>
 																	<div class="tab-content limitertab35"><!-- Weapons -->
 																		<div class="row">
+																			<div class="col-1-2 padr fontsize-12px"><input type="text" value="Alt-Munition" disabled /></div>
+																			<div class="col-1-2 padr fontsize-12px"><select name="attr_limiteraltmunition"><option value=0>False</option><option value=1>True</option></select></div>
+																		</div>
+																		<div class="row">
 																			<div class="col-1-2 padr fontsize-12px"><input type="text" value="Ammo" disabled /></div>
 																			<div class="col-1-2 padr fontsize-12px"><select name="attr_limiterammo"><option value=0>False</option><option value=1>6 reloads</option><option value=2>3 reloads</option><option value=3>1 reload</option><option value=4>Single use</option></select></div>
 																		</div>
@@ -8322,15 +8326,22 @@
 		}
 		
 		function setAttrCost(debug, timer, value, rowID, setObj) {
+			const isWeapon = value[`repeating_attr_${rowID}_attribute`] === 'weapon' ?
+				true : false;
+			const isAltmunition = isWeapon && 
+				getCustomizationExists('altmunition', value[`repeating_attr_${rowID}_customizations`]) ?
+				2 : 1;
 			const result = 
-				getAttrCostPerLevel(debug, timer, value, rowID) *
-				parseInt(value[`repeating_attr_${rowID}_level`]);
+				Math.round((getAttrCostPerLevel(debug, timer, value, rowID) *
+				parseInt(value[`repeating_attr_${rowID}_level`])) / isAltmunition);
 			clog(debug, timer, `repeating_attr_${rowID}_totalcost =`, result, 'setAttrCost()');
+			clog(debug, timer, `isWeapon =`, isWeapon);
+			clog(debug, timer, `isAltmunition =`, isAltmunition);
 			setObj[`repeating_attr_${rowID}_totalcost`] = result;
 		}
 		
-		function setAttrGroupCost(debug, timer, attrIDs, attrdb, value, rowID, sourceAttr, setObj) {
-			const isLevelChange = sourceAttr === 'level';
+		function setAttrGroupCost(debug, timer, attrIDs, attrdb, value, rowID, sourceAttr, setObj, isRankChange = false) {
+			const isLevelChange = sourceAttr === 'level' || isRankChange;
 			const groupid = getGroupID(value, 'attr');
 			const groupType = 
 				value[`static_attrgroup_${groupid}_type`] || 'Standard';
@@ -8345,7 +8356,8 @@
 			const groupIsActive = groupSourceID !== false ? 
 				parseInt(value[`repeating_attr_${groupSourceID}_activate`]) :
 				false;
-			const standardgroupcost = getStandardGroupCost(debug, timer, attrIDs, value, rowID, isLevelChange, groupid, setObj);
+			const isVariationPool = isPowerVariation && groupIsActive ? true : false;
+			const standardgroupcost = getStandardGroupCost(debug, timer, attrIDs, value, rowID, isLevelChange, groupid, setObj, isVariationPool);
 			const groupcost = 
 				isPowerFlux && groupIsActive ? 
 					getPowerFluxGroupCost(debug, timer, value, groupSourceID) :
@@ -8373,21 +8385,34 @@
 		}
 		
 		function setAttrGroupPoolSpentByActivation(debug, timer, isActive, attrIDs, value, rowID, setObj) {
-			const groupid = getGroupID(value, 'attr');
+			const groupid = parseInt(value[`repeating_attr_${rowID}_group`]); //getGroupID(value, 'attr');
+			clog(debug, timer, 'groupid =', groupid, 'setAttrGroupPoolSpentByActivation()');
 			const groupType = 
 				value[`static_attrgroup_${groupid}_type`] || 'Standard';
+			clog(debug, timer, 'groupType =', groupType);
 			const isPowerFlux = 
 				groupType.toLowerCase().indexOf('flux') !== -1 ? 
 					true : false;
-			if (isPowerFlux) {
+			clog(debug, timer, 'isPowerFlux =', isPowerFlux);
+			const isPowerVariation = 
+				groupType.toLowerCase().indexOf('variation') !== -1 ? 
+					true : false;
+			clog(debug, timer, 'isPowerVariation =', isPowerVariation);
+			if (isPowerFlux || isPowerVariation) {
 				const poolmax = parseInt(value[`static_attrgroup_${groupid}_groupmax`]);
+				clog(debug, timer, 'poolmax =', poolmax);
 				const poolspent = 
-					getPowerFluxPoolSpent(debug, timer, isActive, attrIDs, value, rowID, groupid, setObj);
+					isPowerFlux ?
+						getPowerFluxPoolSpent(debug, timer, isActive, attrIDs, value, rowID, groupid, setObj) :
+					isPowerVariation ?
+						getPowerVariationPoolCost(debug, timer, isActive, attrIDs, value, rowID, groupid, setObj) :
+					0;
+				clog(debug, timer, 'poolspent =', poolspent);
 				setObj[`static_attrgroup_${groupid}_spent`] = poolmax - poolspent;
 			}
 		}
 		
-		function getStandardGroupCost(debug, timer, attrIDs, value, rowID, isLevelChange, groupid, setObj) {
+		function getStandardGroupCost(debug, timer, attrIDs, value, rowID, isLevelChange, groupid, setObj, isVariationPool = false) {
 			const result = 
 				_.chain(attrIDs)
 				.map(id=>{
@@ -8397,10 +8422,14 @@
 					if (!isGroupMember) return 0;
 					const isDefect = attribute === 'defect' ? true : false;
 					if (isDefect) return 0;
+					const isWeapon = attribute === 'weapon' ? true : false;
+					const isAltmunition = isWeapon && isVariationPool &&
+						getCustomizationExists('altmunition', value[`repeating_attr_${id}_customizations`]) ?
+						2 : 1;
 					const isCurrAttr = id === rowID ? true : false;
 					const attrcost = isCurrAttr && isLevelChange ?
-						parseInt(setObj[`repeating_attr_${id}_totalcost`]) :
-						parseInt(value[`repeating_attr_${id}_totalcost`]);
+						parseInt(setObj[`repeating_attr_${id}_totalcost`]) * isAltmunition :
+						parseInt(value[`repeating_attr_${id}_totalcost`]) * isAltmunition;
 					return attrcost;
 				})
 				.reduce((memo, num)=>{ return memo + num; }, 0)
@@ -8423,6 +8452,7 @@
 		}
 		
 		function getPowerFluxPoolSpent(debug, timer, isActive, attrIDs, value, rowID, groupid, setObj) {
+			clog(debug, timer, 'groupid =', groupid, 'getPowerFluxPoolSpent()');
 			const groupSourceID = value[`static_attrgroup_${groupid}_source`];
 			const groupIsActive = parseInt(value[`repeating_attr_${groupSourceID}_activate`]);
 			const result = !groupIsActive ? 0 :
@@ -8435,6 +8465,11 @@
 					const attribute = value[`repeating_attr_${id}_attribute`];
 					clog(debug, timer, 'attribute =', attribute);
 					
+					const isWeapon = attribute === 'weapon' ? true : false;
+					const isAltmunition = isWeapon && 
+						getCustomizationExists('altmunition', value[`repeating_attr_${id}_customizations`]) ?
+						2 : 1;
+					
 					const isGroupSource = groupSourceID === id ? true : false;
 					clog(debug, timer, 'isGroupSource =', isGroupSource);
 					if (isGroupSource) return 0;
@@ -8444,33 +8479,70 @@
 					if (isDefect) return 0;
 		
 					const isCurrAttr = id === rowID;
-					const isActivated = isCurrAttr ? isActive :
-						parseInt(value[`repeating_attr_${id}_activate`]) > 0 ? 
-							true : false;
-					clog(debug, timer, 'isActive =', isActive);
+					const isActivated = 
+						isCurrAttr ? 
+							isActive :
+							isNaN(parseInt(setObj[`repeating_attr_${id}_activate`])) ?
+								parseInt(value[`repeating_attr_${id}_activate`]) > 0 ? true : false :
+								parseInt(setObj[`repeating_attr_${id}_activate`]) > 0 ?	true : false;
+					clog(debug, timer, 'isActivated =', isActivated);
 					if (!isActivated) return 0;
 		
-					const attrcost = parseInt(value[`repeating_attr_${id}_totalcost`]);
+					const attrcost = parseInt(value[`repeating_attr_${id}_totalcost`]) * isAltmunition;
 					clog(debug, timer, 'attrcost =', attrcost);
 					return attrcost;
 				})
 				.reduce((memo, num)=>{ return memo + num; }, 0)
 				.value();
-			clog(debug, timer, 'groupid =', groupid, 'getPowerFluxPoolSpent()');
+			//clog(debug, timer, 'groupid =', groupid, 'getPowerFluxPoolSpent()');
 			clog(debug, timer, 'result =', result);
 			return result;
 		}
 		
-		function getPowerVariationPoolCost(debug, timer, value, standardgroupcost, groupSourceID, groupid, setObj) {
-			clog(debug, timer, 'standardgroupcost =', standardgroupcost, 'getPowerVariationPoolCost()');
-			clog(debug, timer, 'groupSourceID =', groupSourceID);
-			const groupsourcecost = 
-				parseInt(setObj[`repeating_attr_${groupSourceID}_totalcost`]) ||
-				parseInt(value[`repeating_attr_${groupSourceID}_totalcost`]);
-			clog(debug, timer, 'groupsourcecost =', groupsourcecost);
-			const pooltotal = parseInt(value[`static_attrgroup_${groupid}_groupmax`]);
-			clog(debug, timer, 'pooltotal =', pooltotal);
-			const result = pooltotal - (standardgroupcost - groupsourcecost);
+		function getPowerVariationPoolCost(debug, timer, isActive, attrIDs, value, rowID, groupid, setObj) {
+			const groupSourceID = value[`static_attrgroup_${groupid}_source`];
+			const groupIsActive = parseInt(value[`repeating_attr_${groupSourceID}_activate`]);
+			clog(debug, timer, 'groupid =', groupid, 'getPowerVariationPoolCost()');
+			const result = !groupIsActive ? 0 :
+				_.chain(attrIDs)
+				.map(id=>{
+					const group = parseInt(value[`repeating_attr_${id}_group`]);
+					const isGroupMember = group === groupid;
+					if (!isGroupMember) return 0;
+		
+					const attribute = value[`repeating_attr_${id}_attribute`];
+					clog(debug, timer, 'attribute =', attribute);
+					
+					const isWeapon = attribute === 'weapon' ? true : false;
+					const isAltmunition = isWeapon && 
+						getCustomizationExists('altmunition', value[`repeating_attr_${id}_customizations`]) ?
+						2 : 1;
+					
+					const isGroupSource = groupSourceID === id ? true : false;
+					clog(debug, timer, 'isGroupSource =', isGroupSource);
+					if (isGroupSource) return 0;
+					
+					const isDefect = attribute === 'defect' ? true : false;
+					clog(debug, timer, 'isDefect =', isDefect);
+					if (isDefect) return 0;
+		
+					const isCurrAttr = id === rowID;
+					const isActivated = 
+						isCurrAttr ? 
+							isActive :
+							isNaN(parseInt(setObj[`repeating_attr_${id}_activate`])) ?
+								parseInt(value[`repeating_attr_${id}_activate`]) > 0 ? true : false :
+								parseInt(setObj[`repeating_attr_${id}_activate`]) > 0 ?	true : false;
+					clog(debug, timer, 'isActive =', isActive);
+					if (!isActivated) return 0;
+		
+					const attrcost = parseInt(value[`repeating_attr_${id}_totalcost`]) * isAltmunition;
+					clog(debug, timer, 'attrcost =', attrcost);
+					return attrcost;
+				})
+				.reduce((memo, num)=>{ return memo + num; }, 0)
+				.value();
+			//clog(debug, timer, 'groupid =', groupid, 'getPowerVariationPoolCost()');
 			clog(debug, timer, 'result =', result);
 			return result;
 		}
@@ -10682,8 +10754,8 @@
 			if (!isWeapon) return;
 			const customizations = setObj[`repeating_attr_${rowID}_customizations`] || 
 				value[`repeating_attr_${rowID}_customizations`] || [];
-			const isInsidious = getIsObject(getCustomizationExists('insidious', customizations));
-			const isPsychic = getIsObject(getCustomizationExists('psychic', customizations));
+			const isInsidious = getCustomizationExists('insidious', customizations);
+			const isPsychic = getCustomizationExists('psychic', customizations);
 			setObj[`repeating_attr_${rowID}_normaldamage`] = 0;
 			setObj[`repeating_attr_${rowID}_insidiousdamage`] = 0;
 			setObj[`repeating_attr_${rowID}_psychicdamage`] = 0;
@@ -11244,15 +11316,20 @@
 				setObj[`${handsource}_name`] = name;
 				writeValues(debug, timer, value, `${handsource}_source`, rowID, setObj);
 				if (source === undefined || source === '') {
-					setObj[`repeating_attr_${rowID}_source`] = hand;
+					//setObj[`repeating_attr_${rowID}_source`] = hand;
+					writeValues(debug, timer, value, `repeating_attr_${rowID}_source`, hand, setObj);
 				} else {
 					const twohanded = `${source},${hand}`;
-					setObj[`repeating_attr_${rowID}_source`] = twohanded;
+					//setObj[`repeating_attr_${rowID}_source`] = twohanded;
+					writeValues(debug, timer, value, `repeating_attr_${rowID}_source`, twohanded, setObj);
 				}
 			} else {
-				setObj[`${handsource}_name`] = '';
-				setObj[`${handsource}_source`] = '';
-				setObj[`repeating_attr_${rowID}_source`] = '';
+				//setObj[`${handsource}_name`] = '';
+				//setObj[`${handsource}_source`] = '';
+				//setObj[`repeating_attr_${rowID}_source`] = '';
+				writeValues(debug, timer, value, `${handsource}_name`, '', setObj);
+				writeValues(debug, timer, value, `${handsource}_source`, '', setObj);
+				writeValues(debug, timer, value, `repeating_attr_${rowID}_source`, '', setObj);
 			}
 			clog(debug, timer, 'handsource =', handsource, 'setArms()');
 		}
@@ -11268,7 +11345,7 @@
 			}
 		}
 		
-		function setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute) {
+		function setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute) {
 			const name = value[`repeating_attr_${rowID}_name`] || "";
 			const hands = 
 				attribute === 'telekinesis' || attribute === 'swarm' ? 0 :
@@ -11341,7 +11418,7 @@
 							updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, id, sourceAttr, setObj);
 						} else if (mainsource == offsource) {
 							//determine if two-handed and arm mainhand, unarm two-handed or offhand
-							disableWeapon(debug, timer, mainsource, attrdb, setObj);
+							disableWeapon(debug, timer, attrIDs, value, mainsource, attrdb, setObj);
 							if (attribute == `shield`) {
 								setArms(debug, timer, value, rowID, setObj, name, false, "mainhand");
 								setArms(debug, timer, value, rowID, setObj, name, true, "offhand");
@@ -11354,11 +11431,11 @@
 						} else {
 							//arm mainhand
 							if (attribute == `shield`) {
-								disableWeapon(debug, timer, offsource, attrdb, setObj);
+								disableWeapon(debug, timer, attrIDs, value, offsource, attrdb, setObj);
 								setArms(debug, timer, value, rowID, setObj, name, true, "offhand");
 								updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, "offhand", sourceAttr, setObj);
 							} else {
-								disableWeapon(debug, timer, mainsource, attrdb, setObj);
+								disableWeapon(debug, timer, attrIDs, value, mainsource, attrdb, setObj);
 								setArms(debug, timer, value, rowID, setObj, name, true, "mainhand");
 								updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, "mainhand", sourceAttr, setObj);
 							}
@@ -11411,14 +11488,14 @@
 							});
 						} else if (mainsource == offsource) {
 							//already using two-handed weapon
-							disableWeapon(debug, timer, mainsource, attrdb, setObj);
+							disableWeapon(debug, timer, attrIDs, value, mainsource, attrdb, setObj);
 							setArms(debug, timer, value, rowID, setObj, name, true, "mainhand");
 							setArms(debug, timer, value, rowID, setObj, name, true, "offhand");
 							updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, "mainhand", sourceAttr, setObj);
 						} else {
 							//arm main&off hands, unarm main&off hands
-							if (mainsource != "") disableWeapon(debug, timer, mainsource, attrdb, setObj);
-							if (offsource != "") disableWeapon(debug, timer, offsource, attrdb, setObj);
+							if (mainsource != "") disableWeapon(debug, timer, attrIDs, value, mainsource, attrdb, setObj);
+							if (offsource != "") disableWeapon(debug, timer, attrIDs, value, offsource, attrdb, setObj);
 							setArms(debug, timer, value, rowID, setObj, name, true, "mainhand");
 							setArms(debug, timer, value, rowID, setObj, name, true, "offhand");
 							updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, "mainhand", sourceAttr, setObj);
@@ -11446,7 +11523,8 @@
 			clog(debug, timer, 'sourceAttr =', sourceAttr, 'setWeapon()');
 		}
 		
-		function disableWeapon(debug, timer, source, attrdb, setObj) {
+		function disableWeapon(debug, timer, attrIDs, value, source, attrdb, setObj) {
+			setAttrGroupPoolSpentByActivation(debug, timer, false, attrIDs, value, source, setObj);
 			setObj[`repeating_attr_${source}_activate`] = 0;
 			attrdb.weapon.find((attr, i) => {
 				if (attr.source == source) { delete attrdb.weapon[i]; return true; }
@@ -11590,7 +11668,7 @@
 				case "powerflux":
 				case "powervariation":
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-					setPoolMax(isActive, value, attrIDs, sectionName, rowID, setObj);
+					setPoolMax(isActive, debug, timer, value, attrIDs, sectionName, rowID, setObj);
 					convertAttrGroupCost(isActive, debug, timer, value, sectionName, attrIDs, rowID, setObj);
 					setPoolActive(isActive, value, sectionName, setObj);
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
@@ -11599,7 +11677,7 @@
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setProtection(isActive, debug, timer, value, rowID, sourceAttr, attribute, setObj);
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-					setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+					setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 				break;
 				case "skill": 
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
@@ -11623,14 +11701,14 @@
 				case "swarm":
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					setSwarmCritters(isActive, debug, timer, value, attrdb, rowID, setObj);
-					setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+					setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
 				case "telekinesis":
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
 					if (level > 1) {
 						//setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-						setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+						setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 					}
 					setActiveAttribute(isActive, debug, timer, value, rowID, attrdb, setObj, attribute, level);
 				break;
@@ -11644,7 +11722,7 @@
 				break;
 				case "weapon":
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
-					setWeapon(isActive, debug, timer, value, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
+					setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute);
 				break;
 				default:
 					setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);	
@@ -11723,7 +11801,7 @@
 			setObj[`static_${sectionName}group_${groupid}_active`] = isActive;
 		}
 		
-		function setPoolMax(isActive, value, attrIDs, sectionName, rowID, setObj){
+		function setPoolMax(isActive, debug, timer, value, attrIDs, sectionName, rowID, setObj){
 			const groupid = getGroupID(value, sectionName);
 			const groupType = value[`static_${sectionName}group_${groupid}_type`];
 			const groupCost = _.chain(attrIDs)
@@ -11732,7 +11810,12 @@
 					const group = parseInt(value[`repeating_attr_${id}_group`]);
 					const activated = parseInt(setObj[`repeating_attr_${id}_activate`]) ||
 						parseInt(value[`repeating_attr_${id}_activate`]);
-					const totalcost = parseInt(value[`repeating_attr_${id}_totalcost`]);
+					const attribute = value[`repeating_attr_${id}_attribute`];
+					const isWeapon = attribute === 'weapon' ? true : false;
+					const isAltmunition = isWeapon && 
+						getCustomizationExists('altmunition', value[`repeating_attr_${id}_customizations`]) ?
+						2 : 1;
+					const totalcost = parseInt(value[`repeating_attr_${id}_totalcost`]) * isAltmunition;
 					const appliedCost = group == groupid ? 
 						id == rowID ? 0 : 
 						///flux/i.test(groupType) ? activated ? totalcost : 0 :
@@ -11748,7 +11831,8 @@
 				///variation/i.test(groupType) ? groupCost : 0 : 0;
 				isActive && groupType.toLowerCase().indexOf('variation') !== -1 ?
 					groupCost : 0;
-			setObj[`static_${sectionName}group_${groupid}_groupmax`] = max;
+			//setObj[`static_${sectionName}group_${groupid}_groupmax`] = max;
+			writeValues(debug, timer, value, `static_${sectionName}group_${groupid}_groupmax`, max, setObj);
 		}
 		
 		function convertAttrGroupCost(isActive, debug, timer, value, sectionName, attrIDs, rowID, setObj){
@@ -11782,7 +11866,12 @@
 					groupType.toLowerCase().indexOf('variation') !== -1 ?
 					///variation/i.test(groupType) ? 
 						aggregateAttrCost : 0;
-				const spent = aggregateAttrCost - dynamicGroupCost;
+				const spent = 
+					groupType.toLowerCase().indexOf('flux') !== -1 ?	
+						aggregateAttrCost - dynamicGroupCost :
+					groupType.toLowerCase().indexOf('variation') !== -1 ?
+						getPowerVariationPoolCost(debug, timer, isActive, attrIDs, value, rowID, groupid, setObj) :
+					0;
 				clog(debug, timer, 'spent =', spent);
 				clog(debug, timer, 'groupcost =', groupcost);
 				setObj[`static_${sectionName}group_${groupid}_spent`] = spent;
@@ -11877,7 +11966,10 @@
 		}
 		*/
 		function getCustomizationExists(customization, customizations) {
-			return customizations.find(o => o.name === customization);
+			const result = _.isArray(customizations) ?
+				getIsObject(customizations.find(o => o.name === customization)) :
+				false;
+			return result;
 		}
 		
 		function getCustomizationValue(debug, timer, value, rowID, type, customization) {
@@ -11918,7 +12010,8 @@
 				}
 			}
 			clog(debug, timer, 'customizations:', customizations, 'setCustomization()');
-			setObj[`repeating_attr_${rowID}_customizations`] = customizations;
+			writeValues(debug, timer, value, `repeating_attr_${rowID}_customizations`, customizations, setObj);
+			//setObj[`repeating_attr_${rowID}_customizations`] = customizations;
 		}
 		
 		function setUnaffectedWeapons(debug, timer, eventInfo, value, rowID, customization, setObj) {
@@ -11953,6 +12046,12 @@
 				false;
 			clog(debug, timer, 'unaffectedattributes:', unaffectedattributes, 'setUnaffectedAttributes()');
 			setObj[`repeating_attr_${rowID}_unaffectedattributes`] = unaffectedattributes;
+		}
+		
+		function setAltmunitionCost(debug, timer, customization, attrIDs, attrdb, value, rowID, sourceAttr, setObj) {
+			if (customization.name !== 'altmunition') return;
+			setAttrCost(debug, timer, value, rowID, setObj);
+			setAttrGroupCost(debug, timer, attrIDs, attrdb, value, rowID, sourceAttr, setObj, true);
 		}
 		
 		function getCustomizationTypeTotal(debug, timer, customizations, type) {
@@ -12044,8 +12143,10 @@
 			const state = parseInt(setObj[`${rowID}_state`]) || 0;
 			const result = state > 0 ? value[`${rowID}_source`] : '';
 			if (result !== undefined) {
-				setObj.previous_weapon = setObj.active_weapon || value.active_weapon;
-				setObj.active_weapon = result;
+				//setObj.previous_weapon = setObj.active_weapon || value.active_weapon;
+				//setObj.active_weapon = result;
+				writeValues(debug, timer, value, previous_weapon, setObj.active_weapon || value.active_weapon, setObj);
+				writeValues(debug, timer, value, active_weapon, result, setObj);
 			}
 			clog(debug, timer, 'source =', result, 'setActiveWeapon()');
 		}
@@ -13093,7 +13194,8 @@
 				rowID=='personal' ? 'movement': 
 				rowID=='movement' ? 'personal': 
 				'';
-			setObj[`${source}_${attribute}`] = state;
+			//setObj[`${source}_${attribute}`] = state;
+			writeValues(debug, timer, value, `${source}_${attribute}`, state, setObj)
 			setObj[`${source}_activatetheme`] = theme;
 			clog(debug, timer, 'state =', state, 'setButtonState()');
 			if(counterdefense.length>0) {
@@ -13141,7 +13243,8 @@
 				});
 			clog(debug, timer, 'handsStateArray:', handsStateArray, 'setWeaponStates()');
 			_.each(handsArray, (hand, i) => {
-				setObj[`${hand}_state`] = handsStateArray[i];
+				//setObj[`${hand}_state`] = handsStateArray[i];
+				writeValues(debug, timer, value, `${hand}_state`, handsStateArray[i], setObj);
 			});
 		}
 		
@@ -13877,6 +13980,12 @@
 										setAttrCharacteristic(debug, timer, value, rowID, setObj);
 										setAvailableDamageTypes(debug, timer, value, rowID, setObj);
 										setUnaffectedWeapons(debug, timer, eventInfo, value, rowID, customization, setObj);
+										setAltmunitionCost(debug, timer, customization, attrIDs, attrdb, value, rowID, sourceAttr, setObj);
+										/*
+										customization.name === 'altmunition' ? 
+											setAttrCost(debug, timer, value, rowID, setObj) :
+											false;
+										*/
 									break;
 									case 'unaffected':
 										setStatButtonStatsAndRolls(debug, timer, eventInfo, value, rowID, sourceAttr, setObj);
