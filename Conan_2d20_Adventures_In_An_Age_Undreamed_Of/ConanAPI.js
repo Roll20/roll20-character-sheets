@@ -2,7 +2,7 @@ var ConanAPI = ConanAPI || (function()
 {
 	'use strict';
 
-    let version = '2.1',
+    let version = '2.2',
         DeadTokenImgSrc = 'https://s3.amazonaws.com/files.d20.io/images/120063604/QZmTLXMVBSqFoqENP6LTkA/thumb.png?15864718355',
 		WoundMarkers = ['Wounds1::1402922', 'Wounds2::1402925', 'Wounds3::1402927','Wounds4::1644476','Wounds5::1644475'],
 		TraumaMarkers = ['Trauma1::1644483', 'Trauma2::1644484', 'Trauma3::1644485','Trauma4::1644486','Trauma5::1644482'],
@@ -224,6 +224,28 @@ var ConanAPI = ConanAPI || (function()
 		}
     },
 
+
+    /**
+	 * Get value on right side of '=' in
+	 * found array element.
+	 *
+	 * a: array
+	 * v: search value
+	 * d: default retun value when not found
+	 */
+    findInArray = function(a, v, d)
+    {
+        let r =  a.find(function(e){return e.indexOf(v+'=')>-1 ? true:false;});
+        //sendChat("findInArray"," "+r+"\na:"+a+"\nv:"+v+"\nd:"+d);
+        if(r==undefined)
+            return d;
+            
+        //if value is an inlineroll (starts with $[[) pick out the index value. Ie successes1=$[[0]]; return 0
+        
+        return r.split("=")[1].replace("$[[","").replace("]]","");
+    },
+    
+    
 	/**
 	 * Handle chat events
 	 *
@@ -263,46 +285,96 @@ var ConanAPI = ConanAPI || (function()
 		}
 		else {
 		    if(msg.rolltemplate == "skill" && msg.inlinerolls) {
-				//1 is skilled roll; 2 is unskilled roll
-				var ninteens = 0;
-				var ninteens1 = -1;
-				var ninteens2 = 0;
-                var twenties = 0;
-				var twenties1 = -1;
-				var twenties2 = 0;
-				var inlinerolls = msg.inlinerolls;
-                inlinerolls.forEach(function(inlineObj){
-                    if (inlineObj.results.resultType == "success") {
-						ninteens = 0;
-						twenties = 0;
-                        var rolls = inlineObj.results.rolls;
-                        for(var r = 0; r < rolls.length; r++) {
-                            for(var v = 0; v < rolls[r].results.length; v++) {
-								if (rolls[r].results[v].v == 19)
-									ninteens++;
-                                if (rolls[r].results[v].v == 20)
-                                    twenties++;
-                            }
-						}
-						if (ninteens1 == -1)
-							ninteens1 = ninteens;
-						else
-							ninteens2 = ninteens
-						if (twenties1 == -1)
-							twenties1 = twenties;
-						else
-							twenties2 = twenties
-                    }
-                });
-                if((content.indexOf("{{expertise=0}}") == -1 && twenties1 > 1) ||
-					(content.indexOf("{{expertise=0}}") !== -1 && (ninteens2 + twenties2) > 1)) {
-                    sendChat("Conan","&{template:conan-default} {{title=DOUBLE TROUBLE !!!}} {{subtitle1="+msg.who+" rolled MULTIPLE complications!!!}}")					
-                }
+
+				/*
+				If using the API script, this will capture the skill roll and resend it using the
+				skillapi role-template. This will break out the success/complications.
+				*/
+
+				//decode the roll into its actual values; snippet from The Arron
+				var cmsg = _.clone(msg);
+				if(_.has(cmsg,'inlinerolls')){
+        			cmsg.content = _.chain(cmsg.inlinerolls)
+        				.reduce(function(m,v,k){
+        					m['$[['+k+']]']=v.results.total || 0;
+        					return m;
+        				},{})
+        				.reduce(function(m,v,k){
+        					return m.replace(k,v);
+        				},cmsg.content)
+        				.value();
+        		}
+
+        		let a = content.replace(/{{/g,"").replace(/}} /g,"}}").split("}}");
+        		let aclone = cmsg.content.replace(/{{/g,"").replace(/}} /g,"}}").split("}}");
+        		//sendChat("aclone", "aclone"+aclone);
+
+                //get these values from content
+				let skill_name =  findInArray(a,"skill_name","");
+				let character_name =  findInArray(a,"character_name","");
+				let wounds =  findInArray(a,"wounds",0);
+				let wounds_treated =  findInArray(a,"wounds_treated",0);
+				let trauma =  findInArray(a,"trauma",0);
+				let trauma_treated =  findInArray(a,"trauma_treated",0);
+				let expertise =  findInArray(a,"expertise",0);
+				let skilled_roll_index = findInArray(a,"successes1",0);
+				let unskilled_roll_index = findInArray(a,"successes2",0);
+				let show_tn =  findInArray(aclone,"show_tn",0);
+				
+				//get these actual roll values from the converted clone
+				let expertise_chk =  findInArray(aclone,"expertise_chk",0);
+				let wounds_chk =  findInArray(aclone,"wounds_chk",0);
+				let trauma_chk =  findInArray(aclone,"trauma_chk",-1);  //use this to determine if physical of mental skill
+				let encumbered_chk =  findInArray(aclone,"encumbered",0);
+				let num_dice =  findInArray(aclone,"num_dice",0);
+				let target_number =  findInArray(aclone,"target_number",0);
+				let bk_nbr =  findInArray(aclone,"bk_nbr",3);
+				let api_chk =  findInArray(aclone,"api_chk",1);
+
+				let fail_count = libInline.getDice(msg.inlinerolls[0], 'fumble').length;
+				let crit_count = libInline.getDice(msg.inlinerolls[0], 'crit').length;
+				let total_successes = getInteger(findInArray(aclone,"successes1",0));
+
+				if(expertise_chk == 0){
+					//use unskilled roll (successes2)
+				    total_successes = getInteger(findInArray(aclone,"successes2",0));
+				    fail_count = 0 + libInline.getDice(msg.inlinerolls[1], 'fumble').length;
+				    crit_count = 0 + libInline.getDice(msg.inlinerolls[1], 'crit').length;
+				}
+				
+				total_successes += crit_count;
+
+                let roll_msg = "&{template:skillapi} {{skill_name="+skill_name+"}} {{character_name="+character_name+"}} {{successes1="+libInline.getRollTip(msg.inlinerolls[skilled_roll_index])+"}}{{successes2="+libInline.getRollTip(msg.inlinerolls[unskilled_roll_index])+"}}{{num_dice="+num_dice+"}} {{target_number="+target_number+"}}{{expertise_chk=[["+expertise_chk+"]]}}{{expertise="+expertise+"}}{{crit_chk=[["+crit_count+"]]}}{{fail_chk=[["+fail_count+"]]}}{{crit_count="+crit_count+"}}{{fail_count="+fail_count+"}}{{total_successes="+total_successes+"}}{{api_chk=[[1]]}}{{bk_nbr=[["+bk_nbr+"]]}}";    
+
+				if (show_tn > 0)
+					roll_msg += "{{show_tn="+show_tn+"}}";
+
+                if (trauma_chk > -1)
+                    //tramuma based roll
+                    roll_msg += "{{trauma_chk=[["+trauma_chk+"]]}}{{trauma="+trauma+"}}{{trauma_treated="+trauma_treated+"}}";
+                else
+                    //physcical based roll
+                    roll_msg += "{{wounds_chk=[["+wounds_chk+"]]}}{{wounds="+wounds+"}}{{wounds_treated="+wounds_treated+"}}{{encumbered=[["+encumbered_chk+"]]}}";
+
+				if (api_chk > 0)	//only sending to skillapi template if chk value greater than zero
+                	sendChat(msg.who, roll_msg);
+
             }
                 
 			if (msg.rolltemplate == "skill" && content.indexOf("skill_name=Melee") > -1) {
 				startCombatToken(msg.who);
 			}
+
+			//Checking the skillapi call to see if there were multiple complications.
+            //Doing a sendChat based on skillapi and not skill will enforce that the conan double trouble chat display 
+            //follows the initial roll display.
+            if(msg.rolltemplate == "skillapi" && msg.inlinerolls) {
+                let a = content.replace(/{{/g,"").replace(/}} /g,"}}").split("}}");
+                let fail_count =  findInArray(a,"fail_count",0);
+                if(fail_count > 1)
+                    sendChat("Conan","&{template:conan-default} {{title=DOUBLE TROUBLE !!!}} {{subtitle1="+msg.who+" rolled MULTIPLE complications!!!}}");
+            }
+
 		}
 	},
 

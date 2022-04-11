@@ -3,7 +3,7 @@ Character sheet for the 2D20 version of the game by Modiphius.
 
 [Modiphius](https://www.modiphius.net/collections/conan)
 
-Sheet construction and coding by Eric Carmody. Original art work by Robert Waker.
+Sheet construction and coding by Eric Carmody (https://app.roll20.net/users/110971/eric). Original art work by Robert Waker (https://app.roll20.net/users/109877/rob-w).
 
 ## Features
 - Primary attack weapons list with damage roll
@@ -70,3 +70,10 @@ First release.
 - Reduced Belongings Description field height.
 - Removed Attribute roll button.
 - Added complication roll of 19 & 20 when skill expertise is zero.
+### 1.4 (2022-04-03)
+- Added translation support to the character sheet.
+- Added translation sorting for the Skills.
+- Added translation sorting for the Talents Base dropdown and the Talents Skill dropdown.
+- Added alternate Skill roll chat output format with extended information when using the ConanAPI.js api script.
+- Added support for macro roll features; see the Info option on the sheet for more details.
+- Added new chat template background colors to use with macros.
