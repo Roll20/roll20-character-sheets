@@ -73,6 +73,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+April 13th 2022 v1.55d
+
+- Adds Drunk as a condition effecting all rolls.
+- Fixed Carouser RT results not displaying properly
+
+
 April 6th 2022 v1.55c
 
 - Improved Armor Qualities, now displays selected options at top of attack rolls. New checkboxes in the Armor Tab.
