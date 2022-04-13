@@ -12601,7 +12601,8 @@
 						</div>
 						<div class="sheet-col-1-12 sheet-center sheet-pad-r-sm">
 							<input class="sheet-center" type="hidden" name="attr_Agility" value="0" readonly />
-							<input class="sheet-center" type="number" name="attr_AgilityD" value="@{Agility}+(@{condgen_see_move}*-1)" disabled />
+							<input class="sheet-center" type="hidden" name="attr_AgilityFix" value="0" readonly />
+							<input class="sheet-center" type="number" name="attr_AgilityD" value="@{AgilityFix}+(@{condgen_see_move}*-1)" disabled />
 						</div>
 						<div class="sheet-col-1-12 sheet-center sheet-pad-r-sm">
 							<input class="sheet-center" type="hidden" name="attr_Dexterity" value="0" readonly />
@@ -45007,42 +45008,41 @@
 		stats.forEach(stat => {
 
 		on(`sheet:opened change:MeleeMode_Frenzy change:race change:encpenalty change:${stat.toLowerCase()}start change:${stat.toLowerCase()}talents change:${stat.toLowerCase()}talentsD change:${stat.toLowerCase()}adv change:${stat.toLowerCase()}mod change:${stat.toLowerCase()}bonusmod`, function () {
-		getAttrs([`${stat}Start`, `${stat}Talents`, `${stat}TalentsD`, `${stat}Adv`, `${stat}Mod`, `${stat}BonusMod`, 'Agility', 'encpenalty', 'devmode', 'MeleeMode_Frenzy'], function (v) {
+		getAttrs([`${stat}Start`, `${stat}Talents`, `${stat}TalentsD`, `${stat}Adv`, `${stat}Mod`, `${stat}BonusMod`, 'encpenalty', 'devmode', 'MeleeMode_Frenzy'], function (v) {
 		const charStart   = +v[`${stat}Start`] || 0;
 		
 		if (v.devmode == 1) {charTalents = 0;} else {charTalents = +v[`${stat}Talents`] || 0;}
 		
 		if (v.devmode == 1) {charTalentsD = +v[`${stat}TalentsD`] || 0 * v.devmode;} else {charTalentsD = 0;}
-		console.log(v.devmode);
-		console.log(v[`${stat}TalentsD`]);
-		console.log(v[`${stat}Talents`]);
-		console.log(charTalents);
-		console.log(charTalentsD);
-		
 		const charAdv     = +v[`${stat}Adv`] || 0;	
 		const charMod     = +v[`${stat}Mod`] || 0;	
-		console.log(charMod + ' test');
-		const pen = +v.encpenalty || 0;	
+		const pen = +v.encpenalty*1 || 0;	
 		
 		if ( `${stat}` == 'Agility' ) {
-		var charScorePre   = charStart + charTalents + charAdv + charMod;
+		var charScorePre   = charStart + charTalents + charTalentsD + charAdv + charMod;
 		var penmod = charScorePre - pen*10;
-        if (penmod < 10) { var charScore = 10; }
-        if (penmod > 10) { var charScore = penmod }
-		if (charScorePre < 10) { var charScore = charScorePre; }			
+        if (penmod < 10) { charScore = 10; }
+        if (penmod > 9) { charScore = penmod; }
+		if (charScorePre < 10) { charScore = charScorePre; }
+		setAttrs({
+		"Agility": charScore,
+		"AgilityFix": charScore,
+		});		
 		} else {
-		var charScore   = charStart + charTalents + charTalentsD + charAdv + charMod;	
+		charScore   = charStart + charTalents + charTalentsD + charAdv + charMod;	
+		setAttrs({
+		[stat]: charScore,
+		});
 		}
-		console.log(charScore);
 				
 		if (v.MeleeMode_Frenzy == 1) { 
 		{if ( `${stat}` == 'Strength' ) {frenzyadd = 1;} else {frenzyadd = 0;}}} else {frenzyadd = 0;}
 		
 		const bonusStart  = Math.floor(charScore / 10);
 		setAttrs({
-		[stat]: charScore,
 		[`${stat}BonusStart`]: bonusStart
 		});
+		console.log(stat + ' Set to ' + charScore);
 		
 		const bonusMod = +v[`${stat}BonusMod`] || 0;
 		const bonus    = bonusStart + bonusMod + frenzyadd;
@@ -45068,7 +45068,6 @@
 		});
 		
 		});
-		console.log(stat + ' change');
 		});
 		});
 		
