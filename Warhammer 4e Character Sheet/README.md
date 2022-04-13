@@ -79,7 +79,8 @@ April 13th 2022 v1.55d
 - Fixed Carouser RT results not displaying properly
 - Fixed issue with Encumbrance Penalty when Agility was exactly 30 it would result in frozen target display.
 - Added talents Beneath Notice & Suffused with Uglu to talent integration
-
+- Added new Psychology record section in Core Stats tab under Injuries (with community support!)
+ 
 
 April 6th 2022 v1.55c
 
