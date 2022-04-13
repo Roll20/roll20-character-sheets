@@ -1143,8 +1143,8 @@ WEAPONS_TABLE['composite short bow, stone flight arrow'].push({
     'speed': 6,
     'rof': '2/1',
     'range': '50/100/180',
-    'small-medium': '1d6',
-    'large': '1d6',
+    'small-medium': '1d4',
+    'large': '1d4',
     'book': ['The Complete Fighter\'s Handbook', 'Arms and Equipment Guide'],
     'category': ['Range']
 });
@@ -1158,8 +1158,8 @@ WEAPONS_TABLE['composite long bow, stone flight arrow'].push({
     'speed': 7,
     'rof': '2/1',
     'range': '60/120/210',
-    'small-medium': '1d6',
-    'large': '1d6',
+    'small-medium': '1d4',
+    'large': '1d4',
     'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
     'category': ['Range']
 });
@@ -5084,8 +5084,8 @@ WEAPONS_TABLE['jousting lance'].push({
     'type': 'B',
     'speed': 10,
     'reach': '2',
-    'small-medium': '1d3–1',
-    'large': '1d2–1',
+    'small-medium': '1d3-1',
+    'large': '1d2-1',
     'knockdown': 'd12',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Melee']
