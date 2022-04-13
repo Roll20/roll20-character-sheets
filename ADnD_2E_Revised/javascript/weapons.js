@@ -177,7 +177,7 @@ WEAPONS_TABLE['hand crossbow, hand quarrel'].push({
 });
 
 WEAPONS_TABLE['light crossbow, light quarrel'] = [];
-WEAPONS_TABLE['light crossbow, Light quarrel'].push({
+WEAPONS_TABLE['light crossbow, light quarrel'].push({
     'name': 'Light crossbow, Light quarrel',
     'size': 'M',
     'ammo-size': 'S',
@@ -192,7 +192,7 @@ WEAPONS_TABLE['light crossbow, Light quarrel'].push({
 });
 
 WEAPONS_TABLE['heavy crossbow, heavy quarrel'] = [];
-WEAPONS_TABLE['heavy crossbow, Heavy quarrel'].push({
+WEAPONS_TABLE['heavy crossbow, heavy quarrel'].push({
     'name': 'Heavy crossbow, Heavy quarrel',
     'size': 'M',
     'ammo-size': 'S',
@@ -1247,7 +1247,7 @@ WEAPONS_TABLE['gaff/hook'].push({
     'small-medium': '1d4',
     'large': '1d3',
     'book': ['The Complete Fighter\'s Handbook', 'Arms and Equipment Guide'],
-    'category': ['Melee','Range']
+    'category': ['Melee']
 });
 
 WEAPONS_TABLE['harpoon, one-handed'] = [];
@@ -1317,6 +1317,7 @@ WEAPONS_TABLE['stone javelin, one-handed'].push({
     'small-medium': '1d4',
     'large': '1d4',
     'book': ['The Complete Fighter\'s Handbook'],
+    'category': ['Melee','Range']
 });
 
 WEAPONS_TABLE['stone javelin, two-handed'] = [];
@@ -1874,6 +1875,7 @@ WEAPONS_TABLE['stone javelin, one-handed'].push({
     'small-medium': '1d4',
     'large': '1d4',
     'book': ['Arms and Equipment Guide'],
+    'category': ['Melee','Range']
 });
 
 WEAPONS_TABLE['stone javelin, two-handed'].push({
@@ -1884,19 +1886,6 @@ WEAPONS_TABLE['stone javelin, two-handed'].push({
     'speed': 4,
     'small-medium': '1d4+1',
     'large': '1d6',
-    'book': ['Arms and Equipment Guide'],
-    'category': ['Melee']
-});
-
-WEAPONS_TABLE['renseur'] = [];
-WEAPONS_TABLE['renseur'].push({
-    'name': 'Renseur',
-    'group': 'Polearm',
-    'size': 'L',
-    'type': 'P',
-    'speed': 8,
-    'small-medium': '2d4',
-    'large': '2d4',
     'book': ['Arms and Equipment Guide'],
     'category': ['Melee']
 });
@@ -1920,8 +1909,8 @@ WEAPONS_TABLE['staff sling, stinkpot'].push({
     'ammo-size': 'S',
     'type': 'B',
     'speed': 11,
-    'rof': '2/1',
-    'range': '—/30-60/90',
+    'rof': '',
+    'range': '—/20’-40’/60’',
     'strength': true,
     'small-medium': '1d3',
     'large': '1d3',
@@ -3351,7 +3340,7 @@ WEAPONS_TABLE['staff sling, stone'].push({
     'ammo-size': 'S',
     'type': 'B',
     'speed': 11,
-    'rof': '1',
+    'rof': '1/2',
     'range': '—/30-60/200',
     'strength': true,
     'small-medium': '1d8',
@@ -3665,7 +3654,7 @@ WEAPONS_TABLE['tetsu-bo (iron staff)'].push({
     'speed': 7,
     'small-medium': '1d8',
     'large': '1d8',
-    'book': ['The Complete Fighter\'s Handbook','The Complete Book of Humanoids'],
+    'book': ['The Complete Ninja\'s Handbook'],
     'category': ['Melee']
 });
 
@@ -4115,6 +4104,7 @@ WEAPONS_TABLE['bandistock'].push({
     'category': ['Melee']
 });
 
+WEAPONS_TABLE['caltrop'] = [];
 WEAPONS_TABLE['caltrop'].push({
     'name': 'Caltrop',
     'size': 'S',
@@ -4174,7 +4164,7 @@ WEAPONS_TABLE['chijikiri'].push({
     'size': 'M',
     'type': 'P/B',
     'speed': 7,
-    'reach': '1(2',
+    'reach': '1(2)',
     'small-medium': '1d6',
     'large': '1d8',
     'knockdown': 'd6',
@@ -4228,6 +4218,7 @@ WEAPONS_TABLE['war club'].push({
     'category': ['Melee', 'Range']
 });
 
+WEAPONS_TABLE['axe-pistol, melee'] = [];
 WEAPONS_TABLE['axe-pistol, melee'].push({
     'name': 'Axe-pistol, Melee',
     'group': 'Combined Weapons',
@@ -4242,6 +4233,7 @@ WEAPONS_TABLE['axe-pistol, melee'].push({
     'category': ['Melee']
 });
 
+WEAPONS_TABLE['axe-pistol, ranged'] = [];
 WEAPONS_TABLE['axe-pistol, ranged'].push({
     'name': 'Axe-pistol, Ranged',
     'group': 'Combined Weapons',
@@ -4258,6 +4250,7 @@ WEAPONS_TABLE['axe-pistol, ranged'].push({
     'category': ['Range']
 });
 
+WEAPONS_TABLE['dagger-pistol, melee'] = [];
 WEAPONS_TABLE['dagger-pistol, melee'].push({
     'name': 'Dagger-pistol, Melee',
     'group': 'Combined Weapons',
@@ -4272,6 +4265,7 @@ WEAPONS_TABLE['dagger-pistol, melee'].push({
     'category': ['Melee']
 });
 
+WEAPONS_TABLE['dagger-pistol, ranged'] = [];
 WEAPONS_TABLE['dagger-pistol, ranged'].push({
     'name': 'Dagger-pistol, Ranged',
     'group': 'Combined Weapons',
@@ -4288,6 +4282,7 @@ WEAPONS_TABLE['dagger-pistol, ranged'].push({
     'category': ['Range']
 });
 
+WEAPONS_TABLE['hammer-pistol, melee'] = [];
 WEAPONS_TABLE['hammer-pistol, melee'].push({
     'name': 'Hammer-pistol, Melee',
     'group': 'Combined Weapons',
@@ -4302,6 +4297,7 @@ WEAPONS_TABLE['hammer-pistol, melee'].push({
     'category': ['Melee']
 });
 
+WEAPONS_TABLE['hammer-pistol, ranged'] = [];
 WEAPONS_TABLE['hammer-pistol, ranged'].push({
     'name': 'Hammer-pistol, Ranged',
     'group': 'Combined Weapons',
@@ -4318,6 +4314,7 @@ WEAPONS_TABLE['hammer-pistol, ranged'].push({
     'category': ['Range']
 });
 
+WEAPONS_TABLE['sword-pistol, melee'] = [];
 WEAPONS_TABLE['sword-pistol, melee'].push({
     'name': 'Sword-pistol, Melee',
     'group': 'Combined Weapons',
@@ -4332,6 +4329,7 @@ WEAPONS_TABLE['sword-pistol, melee'].push({
     'category': ['Melee']
 });
 
+WEAPONS_TABLE['sword-pistol, ranged'] = [];
 WEAPONS_TABLE['sword-pistol, ranged'].push({
     'name': 'Sword-pistol, Ranged',
     'group': 'Combined Weapons',
@@ -4348,14 +4346,15 @@ WEAPONS_TABLE['sword-pistol, ranged'].push({
     'category': ['Range']
 });
 
-WEAPONS_TABLE['cho-ku-no, light quarrel'] = WEAPONS_TABLE['chu-ko-nu (repeater)'];
+WEAPONS_TABLE['cho-ku-no, light quarrel'] = WEAPONS_TABLE['chu-ko-nu, light quarrel (repeater)'];
 WEAPONS_TABLE['cho-ku-no, light quarrel'].push({
-    'name': 'cho-ku-no, light quarrel',
+    'name': 'Cho-ku-no, Light quarrel',
     'group': 'Crossbow',
     'size': 'M',
     'ammo-size': 'S',
     'type': 'P',
     'speed': 6,
+    'rof': '2/1',
     'range': '10/20/30',
     'small-medium': '1d6+1',
     'large': '1d8+1',
@@ -4367,6 +4366,7 @@ WEAPONS_TABLE['cho-ku-no, light quarrel'].push({
 WEAPONS_TABLE['hand crossbow, hand quarrel'].push({
     'name': 'Hand crossbow, Hand quarrel',
     'size': 'S',
+    'ammo-size': 'S',
     'type': 'P',
     'speed': 5,
     'rof': '1',
@@ -4381,6 +4381,7 @@ WEAPONS_TABLE['hand crossbow, hand quarrel'].push({
 WEAPONS_TABLE['heavy crossbow, heavy quarrel'].push({
     'name': 'Heavy crossbow, Heavy quarrel',
     'size': 'M',
+    'ammo-size': 'S',
     'type': 'P',
     'speed': 10,
     'rof': '1/2',
@@ -4395,6 +4396,7 @@ WEAPONS_TABLE['heavy crossbow, heavy quarrel'].push({
 WEAPONS_TABLE['light crossbow, light quarrel'].push({
     'name': 'Light crossbow, Light quarrel',
     'size': 'M',
+    'ammo-size': 'S',
     'type': 'P',
     'speed': 7,
     'rof': '1',
@@ -4469,7 +4471,7 @@ WEAPONS_TABLE['jambiya'].push({
     'category': ['Melee']
 });
 
-WEAPONS_TABLE['katar'] = ['katar']
+WEAPONS_TABLE['katar'] = [];
 WEAPONS_TABLE['katar'].push({
     'name': 'Katar',
     'group': 'Dagger',
@@ -4500,6 +4502,7 @@ WEAPONS_TABLE['main-gauche'].push({
 
 WEAPONS_TABLE['parrying dagger'].push({
     'name': 'Parrying dagger',
+    'noProf': true,
     'size': 'S',
     'type': 'P',
     'speed': 2,
@@ -4550,7 +4553,7 @@ WEAPONS_TABLE['dart'].push({
     'size': 'S',
     'type': 'P',
     'speed': 2,
-    'rof': '3',
+    'rof': '3/1',
     'range': '2/4/8',
     'strength': true,
     'small-medium': '1d3',
@@ -4813,7 +4816,7 @@ WEAPONS_TABLE['harpoon'].push({
 
 WEAPONS_TABLE['bone harpoon'] = [];
 WEAPONS_TABLE['bone harpoon'].push({
-    'name': 'Bone',
+    'name': 'Bone harpoon',
     'noProf': true,
     'size': 'L',
     'type': 'P',
@@ -5088,6 +5091,38 @@ WEAPONS_TABLE['jousting lance'].push({
     'category': ['Melee']
 });
 
+WEAPONS_TABLE['lantern'] = [];
+WEAPONS_TABLE['lantern'].push({
+    'name': 'Lantern',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'reach': '1',
+    'rof': '1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Melee']
+});
+
+WEAPONS_TABLE['lasso'].push({
+    'name': 'Lasso',
+    'size': 'L',
+    'type': '—',
+    'speed': 10,
+    'rof': '1/2',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '',
+    'large': '',
+    'knockdown': '',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Range']
+});
+
 WEAPONS_TABLE['footman\'s mace'].push({
     'name': 'Footman\'s mace',
     'size': 'M',
@@ -5117,6 +5152,7 @@ WEAPONS_TABLE['horseman\'s mace'].push({
     'category': ['Melee', 'Range']
 });
 
+WEAPONS_TABLE['mace-axe'] = [];
 WEAPONS_TABLE['mace-axe'].push({
     'name': 'Mace-axe',
     'size': 'L',
@@ -5156,6 +5192,7 @@ WEAPONS_TABLE['mancatcher'].push({
     'category': ['Melee']
 });
 
+WEAPONS_TABLE['matchlock arquebus'] = [];
 WEAPONS_TABLE['matchlock arquebus'].push({
     'name': 'Matchlock Arquebus',
     'size': 'M',
@@ -5170,6 +5207,7 @@ WEAPONS_TABLE['matchlock arquebus'].push({
     'category': ['Range']
 });
 
+WEAPONS_TABLE['matchlock caliver'] = [];
 WEAPONS_TABLE['matchlock caliver'].push({
     'name': 'Matchlock Caliver',
     'size': 'M',
@@ -5184,6 +5222,7 @@ WEAPONS_TABLE['matchlock caliver'].push({
     'category': ['Range']
 });
 
+WEAPONS_TABLE['matchlock musket w/rest'] = [];
 WEAPONS_TABLE['matchlock musket w/rest'].push({
     'name': 'Matchlock Musket w/rest',
     'size': 'L',
@@ -5234,9 +5273,9 @@ WEAPONS_TABLE['net'].push({
     'rof': '1/2',
     'range': '2/3/4',
     'strength': true,
-    'small-medium': '—',
-    'large': '—',
-    'knockdown': '—',
+    'small-medium': '',
+    'large': '',
+    'knockdown': '',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Melee', 'Range']
 });
@@ -5254,6 +5293,7 @@ WEAPONS_TABLE['nunchaku'].push({
     'category': ['Melee']
 });
 
+WEAPONS_TABLE['oil flask'] = [];
 WEAPONS_TABLE['oil flask'].push({
     'name': 'Oil flask',
     'noProf': true,
@@ -5269,7 +5309,7 @@ WEAPONS_TABLE['oil flask'].push({
     'category': ['Range']
 });
 
-WEAPONS_TABLE['parang (chopping blade)'] = WEAPONS_TABLE['parang'];
+WEAPONS_TABLE['parang'] = WEAPONS_TABLE['parang (chopping blade)'];
 WEAPONS_TABLE['parang'].push({
     'name': 'Parang',
     'size': 'M',
@@ -6380,6 +6420,33 @@ WEAPONS_TABLE['torch'].push({
     'knockdown': 'd6',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Melee', 'Range']
+});
+
+WEAPONS_TABLE['trident, one-handed'].push({
+    'name': 'Trident, One-handed',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'reach': '1',
+    'rof': '1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d6+1',
+    'large': '2d4',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Melee','Range']
+});
+
+WEAPONS_TABLE['trident, two-handed'].push({
+    'name': 'Trident, Two-handed',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'reach': '1',
+    'small-medium': '1d8+1',
+    'large': '3d4',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Melee']
 });
 
 WEAPONS_TABLE['vial'] = [];

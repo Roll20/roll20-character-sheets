@@ -1,9 +1,11 @@
 ﻿const pug = require('pug');
 const fs = require('fs');
 const path = require('path');
-const jsFolder = path.join(__dirname, '..', 'javascript');
-const pugFolder = path.join(__dirname, '..', 'pug');
-const htmlFolder = path.join(__dirname, '..', 'html', 'components');
+const sourceFolder = path.join(__dirname, '..');
+const jsFolder = path.join(sourceFolder, 'javascript');
+const pugFolder = path.join(sourceFolder, 'pug');
+const htmlFolder = path.join(sourceFolder, 'html', 'components');
+const miscFolder = path.join(sourceFolder, 'misc');
 
 console.log('---- Generating dynamicDatalists ----');
 const spellsJs = ['wizardSpells.js', 'priestSpells.js'];
@@ -18,7 +20,10 @@ spellsJs.forEach(jsFile => {
 console.log('weapons.js')
 const weapons = require(path.join(jsFolder, 'weapons.js'));
 const weaponsProficiencies = require(path.join(jsFolder, 'weaponProficiencies.js'));
-html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weapons, proficiencies: weaponsProficiencies});
+//html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weapons, proficiencies: weaponsProficiencies});
+
+let weaponTable = pug.renderFile(path.join(pugFolder, 'weaponsTable.pug'), {pretty: true, data: weapons});
+fs.writeFileSync(path.join(miscFolder, 'weapons-overview.html'), weaponTable);
 
 console.log('nonweaponProficiencies.js')
 const nonweaponProficiencies = require(path.join(jsFolder, 'nonweaponProficiencies.js'));
