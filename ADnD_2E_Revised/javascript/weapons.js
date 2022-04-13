@@ -161,9 +161,9 @@ WEAPONS_TABLE['club'].push({
     'category': ['Melee','Range']
 });
 
-WEAPONS_TABLE['hand crossbow'] = [];
-WEAPONS_TABLE['hand crossbow'].push({
-    'name': 'Hand crossbow',
+WEAPONS_TABLE['hand crossbow, hand quarrel'] = [];
+WEAPONS_TABLE['hand crossbow, hand quarrel'].push({
+    'name': 'Hand crossbow, Hand quarrel',
     'size': 'S',
     'ammo-size': 'S',
     'type': 'P',
@@ -176,9 +176,9 @@ WEAPONS_TABLE['hand crossbow'].push({
     'category': ['Range']
 });
 
-WEAPONS_TABLE['light crossbow'] = [];
-WEAPONS_TABLE['light crossbow'].push({
-    'name': 'Light crossbow',
+WEAPONS_TABLE['light crossbow, light quarrel'] = [];
+WEAPONS_TABLE['light crossbow, Light quarrel'].push({
+    'name': 'Light crossbow, Light quarrel',
     'size': 'M',
     'ammo-size': 'S',
     'type': 'P',
@@ -191,9 +191,9 @@ WEAPONS_TABLE['light crossbow'].push({
     'category': ['Range']
 });
 
-WEAPONS_TABLE['heavy crossbow'] = [];
-WEAPONS_TABLE['heavy crossbow'].push({
-    'name': 'Heavy crossbow',
+WEAPONS_TABLE['heavy crossbow, heavy quarrel'] = [];
+WEAPONS_TABLE['heavy crossbow, Heavy quarrel'].push({
+    'name': 'Heavy crossbow, Heavy quarrel',
     'size': 'M',
     'ammo-size': 'S',
     'type': 'P',
@@ -2898,9 +2898,9 @@ WEAPONS_TABLE['chopsticks'].push({
     'category': ['Melee']
 });
 
-WEAPONS_TABLE['chu-ko-nu (repeater)'] = [];
-WEAPONS_TABLE['chu-ko-nu (repeater)'].push({
-    'name': 'Chu-ko-nu (repeater)',
+WEAPONS_TABLE['chu-ko-nu, light quarrel (repeater)'] = [];
+WEAPONS_TABLE['chu-ko-nu, light quarrel (repeater)'].push({
+    'name': 'Chu-ko-nu, Light quarrel (repeater)',
     'group': 'Crossbow',
     'size': 'M',
     'ammo-size': 'S',
@@ -3578,7 +3578,7 @@ WEAPONS_TABLE['ninja-to (ninja sword)'].push({
     'category': ['Melee']
 });
 
-WEAPONS_TABLE['no-daichi (two-handed sword)'] = WEAPONS_TABLE['two-handed sword'];
+WEAPONS_TABLE['no-daichi (two-handed sword)'] = [];
 WEAPONS_TABLE['no-daichi (two-handed sword)'].push({
     'name': 'No-daichi (two-handed sword)',
     'size': 'L',
@@ -3725,8 +3725,8 @@ WEAPONS_TABLE['yoroi-toshi'].push({
 //#endregion
 
 //#region Player's Option: Combat & Tactics
-const poWeapons = {});
-poWeapons['adze'] = {
+WEAPONS_TABLE['adze'] = [];
+WEAPONS_TABLE['adze'].push({
     'name': 'Adze',
     'size': 'S',
     'type': 'S/P',
@@ -3739,7 +3739,8 @@ poWeapons['adze'] = {
     'category': ['Melee']
 });
 
-poWeapons['ankus'] = {
+WEAPONS_TABLE['ankus'] = [];
+WEAPONS_TABLE['ankus'].push({
     'name': 'Ankus',
     'size': 'M',
     'type': 'P/B',
@@ -3752,20 +3753,20 @@ poWeapons['ankus'] = {
     'category': ['Melee']
 });
 
-poWeapons['stone axe'] = {
-    'name': 'Stone axe',
+WEAPONS_TABLE['battle axe'].push({
+    'name': 'Battle axe',
     'size': 'M',
-    'type': 'B/S',
-    'speed': 6,
+    'type': 'S',
+    'speed': 7,
     'reach': '1',
-    'small-medium': '1d6',
-    'large': '1d4',
-    'knockdown': 'd8',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'knockdown': 'd10',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Melee']
 });
 
-poWeapons['hand axe'] = {
+WEAPONS_TABLE['hand axe'].push({
     'name': 'Hand axe',
     'size': 'M',
     'type': 'S',
@@ -3781,7 +3782,22 @@ poWeapons['hand axe'] = {
     'category': ['Melee','Range']
 });
 
-poWeapons['two-handed axe'] = {
+WEAPONS_TABLE['stone axe'] = [];
+WEAPONS_TABLE['stone axe'].push({
+    'name': 'Stone axe',
+    'size': 'M',
+    'type': 'B/S',
+    'speed': 6,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Melee']
+});
+
+WEAPONS_TABLE['two-handed axe'] = WEAPONS_TABLE['two-handed battle axe']
+WEAPONS_TABLE['two-handed axe'].push({
     'name': 'Two-handed axe',
     'size': 'L',
     'type': 'S',
@@ -3794,7 +3810,8 @@ poWeapons['two-handed axe'] = {
     'category': ['Melee']
 });
 
-poWeapons['bagh nakh'] = {
+WEAPONS_TABLE['bagh nakh'] = [];
+WEAPONS_TABLE['bagh nakh'].push({
     'name': 'Bagh nakh',
     'size': 'S',
     'type': 'S',
@@ -3807,7 +3824,7 @@ poWeapons['bagh nakh'] = {
     'category': ['Melee']
 });
 
-poWeapons['blowgun, barbed dart'] = {
+WEAPONS_TABLE['blowgun, barbed dart'].push({
     'name': 'Blowgun, Barbed Dart',
     'size': 'L',
     'ammo-size': 'S',
@@ -3821,7 +3838,8 @@ poWeapons['blowgun, barbed dart'] = {
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
-poWeapons['blowgun, needle'] = {
+
+WEAPONS_TABLE['blowgun, needle'].push({
     'name': 'Blowgun, Needle',
     'size': 'L',
     'ammo-size': 'S',
@@ -3836,7 +3854,7 @@ poWeapons['blowgun, needle'] = {
     'category': ['Range']
 });
 
-poWeapons['bo stick'] = {
+WEAPONS_TABLE['bo stick'].push({
     'name': 'Bo stick',
     'size': 'L',
     'type': 'B',
@@ -3849,7 +3867,7 @@ poWeapons['bo stick'] = {
     'category': ['Melee']
 });
 
-poWeapons['bolas'] = {
+WEAPONS_TABLE['bolas'].push({
     'name': 'Bolas',
     'size': 'M',
     'type': 'B',
@@ -3864,7 +3882,8 @@ poWeapons['bolas'] = {
     'category': ['Range']
 });
 
-poWeapons['boomerang'] = {
+WEAPONS_TABLE['boomerang'] = [];
+WEAPONS_TABLE['boomerang'].push({
     'name': 'Boomerang',
     'size': 'M',
     'type': 'B',
@@ -3879,7 +3898,8 @@ poWeapons['boomerang'] = {
     'category': ['Range']
 });
 
-poWeapons['bottle'] = {
+WEAPONS_TABLE['bottle'] = [];
+WEAPONS_TABLE['bottle'].push({
     'name': 'Bottle',
     'size': 'S',
     'type': 'B',
@@ -3895,7 +3915,7 @@ poWeapons['bottle'] = {
     'category': ['Melee','Range']
 });
 
-poWeapons['composite long bow, flight arrow'] = {
+WEAPONS_TABLE['composite long bow, flight arrow'].push({
     'name': 'Composite long bow, Flight arrow',
     'size': 'L',
     'ammo-size': 'S',
@@ -3910,7 +3930,8 @@ poWeapons['composite long bow, flight arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['composite long bow, pile arrow'] = {
+WEAPONS_TABLE['composite long bow, pile arrow'] = [];
+WEAPONS_TABLE['composite long bow, pile arrow'].push({
     'name': 'Composite long bow, Pile arrow',
     'size': 'L',
     'ammo-size': 'S',
@@ -3925,7 +3946,7 @@ poWeapons['composite long bow, pile arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['composite long bow, sheaf arrow'] = {
+WEAPONS_TABLE['composite long bow, sheaf arrow'].push({
     'name': 'Composite long bow, Sheaf arrow',
     'size': 'L',
     'ammo-size': 'S',
@@ -3940,7 +3961,8 @@ poWeapons['composite long bow, sheaf arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['composite long bow, stone arrow'] = {
+WEAPONS_TABLE['composite long bow, stone arrow'] = WEAPONS_TABLE['composite long bow, stone flight arrow']
+WEAPONS_TABLE['composite long bow, stone arrow'].push({
     'name': 'Composite long bow, Stone arrow',
     'size': 'L',
     'ammo-size': 'S',
@@ -3955,7 +3977,7 @@ poWeapons['composite long bow, stone arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['composite short bow, flight arrow'] = {
+WEAPONS_TABLE['composite short bow, flight arrow'].push({
     'name': 'Composite short bow, Flight arrow',
     'size': 'M',
     'ammo-size': 'S',
@@ -3970,7 +3992,8 @@ poWeapons['composite short bow, flight arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['composite short bow, stone arrow'] = {
+WEAPONS_TABLE['composite short bow, stone arrow'] = WEAPONS_TABLE['composite short bow, stone flight arrow']
+WEAPONS_TABLE['composite short bow, stone arrow'].push({
     'name': 'Composite short bow, Stone arrow',
     'size': 'M',
     'ammo-size': 'S',
@@ -3985,7 +4008,7 @@ poWeapons['composite short bow, stone arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['long bow, flight arrow'] = {
+WEAPONS_TABLE['long bow, flight arrow'].push({
     'name': 'Long bow, Flight arrow',
     'size': 'L',
     'ammo-size': 'S',
@@ -4000,7 +4023,8 @@ poWeapons['long bow, flight arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['long bow, pile arrow'] = {
+WEAPONS_TABLE['long bow, pile arrow'] = [];
+WEAPONS_TABLE['long bow, pile arrow'].push({
     'name': 'Long bow, Pile arrow',
     'size': 'L',
     'ammo-size': 'S',
@@ -4015,7 +4039,7 @@ poWeapons['long bow, pile arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['long bow, sheaf arrow'] = {
+WEAPONS_TABLE['long bow, sheaf arrow'].push({
     'name': 'Long bow, Sheaf arrow',
     'size': 'L',
     'ammo-size': 'S',
@@ -4030,7 +4054,8 @@ poWeapons['long bow, sheaf arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['long bow, stone arrow'] = {
+WEAPONS_TABLE['long bow, stone arrow'] = WEAPONS_TABLE['long bow, stone flight arrow']
+WEAPONS_TABLE['long bow, stone arrow'].push({
     'name': 'Long bow, Stone arrow',
     'size': 'L',
     'ammo-size': 'S',
@@ -4045,7 +4070,7 @@ poWeapons['long bow, stone arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['short bow, flight arrow'] = {
+WEAPONS_TABLE['short bow, flight arrow'].push({
     'name': 'Short bow, Flight arrow',
     'size': 'M',
     'ammo-size': 'S',
@@ -4060,7 +4085,8 @@ poWeapons['short bow, flight arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['short bow, stone arrow'] = {
+WEAPONS_TABLE['short bow, stone arrow'] = WEAPONS_TABLE['short bow, stone flight arrow']
+WEAPONS_TABLE['short bow, stone arrow'].push({
     'name': 'Short bow, Stone arrow',
     'size': 'M',
     'ammo-size': 'S',
@@ -4075,7 +4101,8 @@ poWeapons['short bow, stone arrow'] = {
     'category': ['Range']
 });
 
-poWeapons['bandistock'] = {
+WEAPONS_TABLE['bandistock'] = [];
+WEAPONS_TABLE['bandistock'].push({
     'name': 'Bandistock',
     'size': 'M',
     'type': 'P',
@@ -4088,7 +4115,7 @@ poWeapons['bandistock'] = {
     'category': ['Melee']
 });
 
-poWeapons['caltrop'] = {
+WEAPONS_TABLE['caltrop'].push({
     'name': 'Caltrop',
     'size': 'S',
     'type': 'P',
@@ -4099,10 +4126,10 @@ poWeapons['caltrop'] = {
     'category': []
 });
 
-poWeapons['cestus'] = {
+WEAPONS_TABLE['cestus'].push({
     'name': 'Cestus',
     'size': 'S',
-    'type': 'P',
+    'type': 'B',
     'speed': 2,
     'reach': '1',
     'small-medium': '1d4',
@@ -4112,7 +4139,7 @@ poWeapons['cestus'] = {
     'category': ['Melee']
 });
 
-poWeapons['chain'] = {
+WEAPONS_TABLE['chain'].push({
     'name': 'Chain',
     'size': 'L',
     'type': 'B',
@@ -4125,7 +4152,8 @@ poWeapons['chain'] = {
     'category': ['Melee']
 });
 
-poWeapons['chakram'] = {
+WEAPONS_TABLE['chakram'] = [];
+WEAPONS_TABLE['chakram'].push({
     'name': 'Chakram',
     'size': 'S',
     'type': 'S',
@@ -4140,7 +4168,8 @@ poWeapons['chakram'] = {
     'category': ['Range']
 });
 
-poWeapons['chijikiri'] = {
+WEAPONS_TABLE['chijikiri'] = [];
+WEAPONS_TABLE['chijikiri'].push({
     'name': 'Chijikiri',
     'size': 'M',
     'type': 'P/B',
@@ -4153,7 +4182,7 @@ poWeapons['chijikiri'] = {
     'category': ['Melee']
 });
 
-poWeapons['club'] = {
+WEAPONS_TABLE['club'].push({
     'name': 'Club',
     'size': 'M',
     'type': 'B',
@@ -4169,7 +4198,7 @@ poWeapons['club'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['great club'] = {
+WEAPONS_TABLE['great club'].push({
     'name': 'Great club',
     'size': 'L',
     'type': 'B',
@@ -4182,7 +4211,8 @@ poWeapons['great club'] = {
     'category': ['Melee']
 });
 
-poWeapons['war club'] = {
+WEAPONS_TABLE['war club'] = [];
+WEAPONS_TABLE['war club'].push({
     'name': 'War club',
     'size': 'M',
     'type': 'B/S',
@@ -4198,7 +4228,7 @@ poWeapons['war club'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['axe-pistol, melee'] = {
+WEAPONS_TABLE['axe-pistol, melee'].push({
     'name': 'Axe-pistol, Melee',
     'group': 'Combined Weapons',
     'size': 'M',
@@ -4212,7 +4242,7 @@ poWeapons['axe-pistol, melee'] = {
     'category': ['Melee']
 });
 
-poWeapons['axe-pistol, ranged'] = {
+WEAPONS_TABLE['axe-pistol, ranged'].push({
     'name': 'Axe-pistol, Ranged',
     'group': 'Combined Weapons',
     'size': 'M',
@@ -4228,7 +4258,7 @@ poWeapons['axe-pistol, ranged'] = {
     'category': ['Range']
 });
 
-poWeapons['dagger-pistol, melee'] = {
+WEAPONS_TABLE['dagger-pistol, melee'].push({
     'name': 'Dagger-pistol, Melee',
     'group': 'Combined Weapons',
     'size': 'S',
@@ -4242,7 +4272,7 @@ poWeapons['dagger-pistol, melee'] = {
     'category': ['Melee']
 });
 
-poWeapons['dagger-pistol, ranged'] = {
+WEAPONS_TABLE['dagger-pistol, ranged'].push({
     'name': 'Dagger-pistol, Ranged',
     'group': 'Combined Weapons',
     'size': 'S',
@@ -4258,7 +4288,7 @@ poWeapons['dagger-pistol, ranged'] = {
     'category': ['Range']
 });
 
-poWeapons['hammer-pistol, melee'] = {
+WEAPONS_TABLE['hammer-pistol, melee'].push({
     'name': 'Hammer-pistol, Melee',
     'group': 'Combined Weapons',
     'size': 'M',
@@ -4272,7 +4302,7 @@ poWeapons['hammer-pistol, melee'] = {
     'category': ['Melee']
 });
 
-poWeapons['hammer-pistol, ranged'] = {
+WEAPONS_TABLE['hammer-pistol, ranged'].push({
     'name': 'Hammer-pistol, Ranged',
     'group': 'Combined Weapons',
     'size': 'M',
@@ -4288,7 +4318,7 @@ poWeapons['hammer-pistol, ranged'] = {
     'category': ['Range']
 });
 
-poWeapons['sword-pistol, melee'] = {
+WEAPONS_TABLE['sword-pistol, melee'].push({
     'name': 'Sword-pistol, Melee',
     'group': 'Combined Weapons',
     'size': 'M',
@@ -4302,7 +4332,7 @@ poWeapons['sword-pistol, melee'] = {
     'category': ['Melee']
 });
 
-poWeapons['sword-pistol, ranged'] = {
+WEAPONS_TABLE['sword-pistol, ranged'].push({
     'name': 'Sword-pistol, Ranged',
     'group': 'Combined Weapons',
     'size': 'M',
@@ -4318,24 +4348,24 @@ poWeapons['sword-pistol, ranged'] = {
     'category': ['Range']
 });
 
-poWeapons['cho-ku-no'] = {
-    'name': 'cho-ku-no',
+WEAPONS_TABLE['cho-ku-no, light quarrel'] = WEAPONS_TABLE['chu-ko-nu (repeater)'];
+WEAPONS_TABLE['cho-ku-no, light quarrel'].push({
+    'name': 'cho-ku-no, light quarrel',
     'group': 'Crossbow',
     'size': 'M',
     'ammo-size': 'S',
     'type': 'P',
     'speed': 6,
-    'rof': '2/1',
     'range': '10/20/30',
-    'small-medium': '1d3',
-    'large': '1d2',
-    'knockdown': 'd4',
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'knockdown': 'd6',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
 
-poWeapons['hand crossbow'] = {
-    'name': 'Hand crossbow',
+WEAPONS_TABLE['hand crossbow, hand quarrel'].push({
+    'name': 'Hand crossbow, Hand quarrel',
     'size': 'S',
     'type': 'P',
     'speed': 5,
@@ -4348,8 +4378,8 @@ poWeapons['hand crossbow'] = {
     'category': ['Range']
 });
 
-poWeapons['heavy crossbow'] = {
-    'name': 'Heavy crossbow',
+WEAPONS_TABLE['heavy crossbow, heavy quarrel'].push({
+    'name': 'Heavy crossbow, Heavy quarrel',
     'size': 'M',
     'type': 'P',
     'speed': 10,
@@ -4362,8 +4392,8 @@ poWeapons['heavy crossbow'] = {
     'category': ['Range']
 });
 
-poWeapons['light crossbow'] = {
-    'name': 'Light crossbow',
+WEAPONS_TABLE['light crossbow, light quarrel'].push({
+    'name': 'Light crossbow, Light quarrel',
     'size': 'M',
     'type': 'P',
     'speed': 7,
@@ -4376,8 +4406,9 @@ poWeapons['light crossbow'] = {
     'category': ['Range']
 });
 
-poWeapons['pellet bow'] = {
-    'name': 'Pellet bow',
+WEAPONS_TABLE['pellet bow, pellet'] = [];
+WEAPONS_TABLE['pellet bow, pellet'].push({
+    'name': 'Pellet bow, Pellet',
     'size': 'M',
     'type': 'B',
     'speed': 7,
@@ -4390,7 +4421,7 @@ poWeapons['pellet bow'] = {
     'category': ['Range']
 });
 
-poWeapons['dagger'] = {
+WEAPONS_TABLE['dagger'].push({
     'name': 'Dagger',
     'size': 'S',
     'type': 'P',
@@ -4406,7 +4437,7 @@ poWeapons['dagger'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['bone dagger'] = {
+WEAPONS_TABLE['bone dagger'].push({
     'name': 'Bone dagger',
     'noProf': true,
     'size': 'S',
@@ -4423,7 +4454,8 @@ poWeapons['bone dagger'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['jambiya'] = {
+WEAPONS_TABLE['jambiya'] = [];
+WEAPONS_TABLE['jambiya'].push({
     'name': 'Jambiya',
     'group': 'Dagger',
     'size': 'S',
@@ -4437,7 +4469,8 @@ poWeapons['jambiya'] = {
     'category': ['Melee']
 });
 
-poWeapons['katar'] = {
+WEAPONS_TABLE['katar'] = ['katar']
+WEAPONS_TABLE['katar'].push({
     'name': 'Katar',
     'group': 'Dagger',
     'size': 'S',
@@ -4451,8 +4484,9 @@ poWeapons['katar'] = {
     'category': ['Melee']
 });
 
-poWeapons['main-gauche'] = {
+WEAPONS_TABLE['main-gauche'].push({
     'name': 'Main-gauche',
+    'group': 'Dagger',
     'size': 'S',
     'type': 'P/S',
     'speed': 2,
@@ -4464,7 +4498,7 @@ poWeapons['main-gauche'] = {
     'category': ['Melee']
 });
 
-poWeapons['parrying dagger'] = {
+WEAPONS_TABLE['parrying dagger'].push({
     'name': 'Parrying dagger',
     'size': 'S',
     'type': 'P',
@@ -4477,7 +4511,7 @@ poWeapons['parrying dagger'] = {
     'category': ['Melee']
 });
 
-poWeapons['stiletto'] = {
+WEAPONS_TABLE['stiletto'].push({
     'name': 'Stiletto',
     'group': 'Dagger',
     'size': 'S',
@@ -4494,7 +4528,7 @@ poWeapons['stiletto'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['stone dagger'] = {
+WEAPONS_TABLE['stone dagger'].push({
     'name': 'Stone dagger',
     'noProf': true,
     'size': 'S',
@@ -4511,7 +4545,7 @@ poWeapons['stone dagger'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['dart'] = {
+WEAPONS_TABLE['dart'].push({
     'name': 'Dart',
     'size': 'S',
     'type': 'P',
@@ -4526,7 +4560,7 @@ poWeapons['dart'] = {
     'category': ['Range']
 });
 
-poWeapons['footman\'s flail'] = {
+WEAPONS_TABLE['footman\'s flail'].push({
     'name': 'Footman\'s flail',
     'size': 'L',
     'type': 'B',
@@ -4539,7 +4573,7 @@ poWeapons['footman\'s flail'] = {
     'category': ['Melee']
 });
 
-poWeapons['grain flail'] = {
+WEAPONS_TABLE['grain flail'].push({
     'name': 'Grain flail',
     'size': 'M',
     'type': 'B',
@@ -4552,7 +4586,7 @@ poWeapons['grain flail'] = {
     'category': ['Melee']
 });
 
-poWeapons['horseman\'s flail'] = {
+WEAPONS_TABLE['horseman\'s flail'].push({
     'name': 'Horseman\'s flail',
     'size': 'M',
     'type': 'B',
@@ -4566,7 +4600,8 @@ poWeapons['horseman\'s flail'] = {
 });
 
 
-poWeapons['flintlock belt pistol'] = {
+WEAPONS_TABLE['flintlock belt pistol'] = [];
+WEAPONS_TABLE['flintlock belt pistol'].push({
     'name': 'Flintlock Belt Pistol',
     'size': 'S',
     'type': 'P',
@@ -4580,7 +4615,8 @@ poWeapons['flintlock belt pistol'] = {
     'category': ['Range']
 });
 
-poWeapons['flintlock blunderbuss pistol'] = {
+WEAPONS_TABLE['flintlock blunderbuss pistol'] = [];
+WEAPONS_TABLE['flintlock blunderbuss pistol'].push({
     'name': 'Flintlock Blunderbuss Pistol',
     'size': 'S',
     'type': 'P',
@@ -4594,7 +4630,8 @@ poWeapons['flintlock blunderbuss pistol'] = {
     'category': ['Range']
 });
 
-poWeapons['flintlock blunderbuss'] = {
+WEAPONS_TABLE['flintlock blunderbuss'] = [];
+WEAPONS_TABLE['flintlock blunderbuss'].push({
     'name': 'Flintlock Blunderbuss',
     'size': 'M',
     'type': 'P',
@@ -4608,7 +4645,8 @@ poWeapons['flintlock blunderbuss'] = {
     'category': ['Range']
 });
 
-poWeapons['flintlock carbine'] = {
+WEAPONS_TABLE['flintlock carbine'] = [];
+WEAPONS_TABLE['flintlock carbine'].push({
     'name': 'Flintlock Carbine',
     'size': 'M',
     'type': 'P',
@@ -4622,7 +4660,8 @@ poWeapons['flintlock carbine'] = {
     'category': ['Range']
 });
 
-poWeapons['flintlock horse pistol'] = {
+WEAPONS_TABLE['flintlock horse pistol'] = [];
+WEAPONS_TABLE['flintlock horse pistol'].push({
     'name': 'Flintlock Horse Pistol',
     'size': 'S',
     'type': 'P',
@@ -4636,7 +4675,8 @@ poWeapons['flintlock horse pistol'] = {
     'category': ['Range']
 });
 
-poWeapons['flintlock musket'] = {
+WEAPONS_TABLE['flintlock musket'] = [];
+WEAPONS_TABLE['flintlock musket'].push({
     'name': 'Flintlock Musket',
     'size': 'M',
     'type': 'P',
@@ -4650,7 +4690,8 @@ poWeapons['flintlock musket'] = {
     'category': ['Range']
 });
 
-poWeapons['fork'] = {
+WEAPONS_TABLE['fork'] = [];
+WEAPONS_TABLE['fork'].push({
     'name': 'Fork',
     'size': 'L',
     'type': 'P',
@@ -4663,7 +4704,7 @@ poWeapons['fork'] = {
     'category': ['Melee']
 });
 
-poWeapons['gaff/hook'] = {
+WEAPONS_TABLE['gaff/hook'].push({
     'name': 'Gaff/hook',
     'size': 'S',
     'type': 'P',
@@ -4676,7 +4717,8 @@ poWeapons['gaff/hook'] = {
     'category': ['Melee']
 });
 
-poWeapons['grapple'] = {
+WEAPONS_TABLE['grapple'] = [];
+WEAPONS_TABLE['grapple'].push({
     'name': 'Grapple',
     'size': 'S',
     'type': 'P/B',
@@ -4692,7 +4734,8 @@ poWeapons['grapple'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['gunsen'] = {
+WEAPONS_TABLE['gunsen'] = WEAPONS_TABLE['gunsen (war fan)'];
+WEAPONS_TABLE['gunsen'].push({
     'name': 'Gunsen',
     'size': 'S',
     'type': 'B/P',
@@ -4705,7 +4748,8 @@ poWeapons['gunsen'] = {
     'category': ['Melee']
 });
 
-poWeapons['hammer'] = {
+WEAPONS_TABLE['hammer'] = [];
+WEAPONS_TABLE['hammer'].push({
     'name': 'Hammer',
     'size': 'S',
     'type': 'B',
@@ -4721,7 +4765,8 @@ poWeapons['hammer'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['hand match arquebus'] = {
+WEAPONS_TABLE['hand match arquebus'] = [];
+WEAPONS_TABLE['hand match arquebus'].push({
     'name': 'Hand Match Arquebus',
     'size': 'M',
     'type': 'P',
@@ -4735,7 +4780,8 @@ poWeapons['hand match arquebus'] = {
     'category': ['Range']
 });
 
-poWeapons['hand match handgunne'] = {
+WEAPONS_TABLE['hand match handgunne'] = [];
+WEAPONS_TABLE['hand match handgunne'].push({
     'name': 'Hand Match Handgunne',
     'size': 'L',
     'type': 'P',
@@ -4749,7 +4795,7 @@ poWeapons['hand match handgunne'] = {
     'category': ['Range']
 });
 
-poWeapons['harpoon'] = {
+WEAPONS_TABLE['harpoon'].push({
     'name': 'Harpoon',
     'size': 'L',
     'type': 'P',
@@ -4765,7 +4811,8 @@ poWeapons['harpoon'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['bone harpoon'] = {
+WEAPONS_TABLE['bone harpoon'] = [];
+WEAPONS_TABLE['bone harpoon'].push({
     'name': 'Bone',
     'noProf': true,
     'size': 'L',
@@ -4782,7 +4829,7 @@ poWeapons['bone harpoon'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['hatchet'] = {
+WEAPONS_TABLE['hatchet'].push({
     'name': 'Hatchet',
     'size': 'S',
     'type': 'S',
@@ -4798,8 +4845,9 @@ poWeapons['hatchet'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['holy symbol, big'] = {
-    'name': 'Holy symbol, big',
+WEAPONS_TABLE['big holy symbol'] = [];
+WEAPONS_TABLE['big holy symbol'].push({
+    'name': 'Big holy symbol',
     'size': 'S',
     'type': 'B',
     'speed': 5,
@@ -4811,7 +4859,7 @@ poWeapons['holy symbol, big'] = {
     'category': ['Melee']
 });
 
-poWeapons['javelin'] = {
+WEAPONS_TABLE['javelin'].push({
     'name': 'Javelin',
     'size': 'M',
     'type': 'P',
@@ -4827,7 +4875,8 @@ poWeapons['javelin'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['stone javelin'] = {
+WEAPONS_TABLE['stone javelin'] = [];
+WEAPONS_TABLE['stone javelin'].push({
     'name': 'Stone javelin',
     'noProf': true,
     'size': 'M',
@@ -4844,7 +4893,7 @@ poWeapons['stone javelin'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['jitte'] = {
+WEAPONS_TABLE['jitte'].push({
     'name': 'Jitte',
     'size': 'S',
     'type': 'B',
@@ -4857,7 +4906,8 @@ poWeapons['jitte'] = {
     'category': ['Melee']
 });
 
-poWeapons['kama'] = {
+WEAPONS_TABLE['kama'] = WEAPONS_TABLE['kama (sickle)'];
+WEAPONS_TABLE['kama'].push({
     'name': 'Kama',
     'size': 'S',
     'type': 'P/S',
@@ -4870,7 +4920,8 @@ poWeapons['kama'] = {
     'category': ['Melee']
 });
 
-poWeapons['kau sin ke'] = {
+WEAPONS_TABLE['kau sin ke'] = WEAPONS_TABLE['kau sin ke (whipping chain)'];
+WEAPONS_TABLE['kau sin ke'].push({
     'name': 'Kau sin ke',
     'size': 'M',
     'type': 'B',
@@ -4883,7 +4934,8 @@ poWeapons['kau sin ke'] = {
     'category': ['Melee']
 });
 
-poWeapons['kawanaga'] = {
+WEAPONS_TABLE['kawanaga'] = WEAPONS_TABLE['kawanaga (grapnel)'];
+WEAPONS_TABLE['kawanaga'].push({
     'name': 'Kawanaga',
     'size': 'S',
     'type': 'P/B',
@@ -4896,7 +4948,7 @@ poWeapons['kawanaga'] = {
     'category': ['Melee']
 });
 
-poWeapons['knife'] = {
+WEAPONS_TABLE['knife'].push({
     'name': 'Knife',
     'size': 'S',
     'type': 'S/P',
@@ -4912,7 +4964,7 @@ poWeapons['knife'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['bone knife'] = {
+WEAPONS_TABLE['bone knife'].push({
     'name': 'Bone knife',
     'noProf': true,
     'size': 'S',
@@ -4929,7 +4981,7 @@ poWeapons['bone knife'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['stone knife'] = {
+WEAPONS_TABLE['stone knife'].push({
     'name': 'Stone knife',
     'noProf': true,
     'size': 'S',
@@ -4946,7 +4998,8 @@ poWeapons['stone knife'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['throwing knife'] = {
+WEAPONS_TABLE['throwing knife'] = [];
+WEAPONS_TABLE['throwing knife'].push({
     'name': 'Throwing knife',
     'noProf': true,
     'size': 'M',
@@ -4963,7 +5016,8 @@ poWeapons['throwing knife'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['kusari-gama'] = {
+WEAPONS_TABLE['kusari-gama'] = WEAPONS_TABLE['kusari-gama (chain-sickle)'];
+WEAPONS_TABLE['kusari-gama'].push({
     'name': 'Kusari-gama',
     'size': 'M',
     'type': 'P/S/B',
@@ -4976,7 +5030,8 @@ poWeapons['kusari-gama'] = {
     'category': ['Melee']
 });
 
-poWeapons['light lance'] = {
+WEAPONS_TABLE['light lance'] = WEAPONS_TABLE['light horse lance'];
+WEAPONS_TABLE['light lance'].push({
     'name': 'Light lance',
     'size': 'L',
     'type': 'P',
@@ -4992,7 +5047,8 @@ poWeapons['light lance'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['medium lance'] = {
+WEAPONS_TABLE['medium lance'] = WEAPONS_TABLE['medium horse lance'];
+WEAPONS_TABLE['medium lance'].push({
     'name': 'Medium lance',
     'size': 'L',
     'type': 'P',
@@ -5005,7 +5061,8 @@ poWeapons['medium lance'] = {
     'category': ['Melee']
 });
 
-poWeapons['heavy lance'] = {
+WEAPONS_TABLE['heavy lance'] = WEAPONS_TABLE['heavy horse lance'];
+WEAPONS_TABLE['heavy lance'].push({
     'name': 'Heavy lance',
     'size': 'L',
     'type': 'P',
@@ -5018,7 +5075,7 @@ poWeapons['heavy lance'] = {
     'category': ['Melee']
 });
 
-poWeapons['jousting lance'] = {
+WEAPONS_TABLE['jousting lance'].push({
     'name': 'Jousting lance',
     'size': 'L',
     'type': 'B',
@@ -5031,7 +5088,7 @@ poWeapons['jousting lance'] = {
     'category': ['Melee']
 });
 
-poWeapons['footman\'s mace'] = {
+WEAPONS_TABLE['footman\'s mace'].push({
     'name': 'Footman\'s mace',
     'size': 'M',
     'type': 'B',
@@ -5044,7 +5101,7 @@ poWeapons['footman\'s mace'] = {
     'category': ['Melee']
 });
 
-poWeapons['horseman\'s mace'] = {
+WEAPONS_TABLE['horseman\'s mace'].push({
     'name': 'Horseman\'s mace',
     'size': 'M',
     'type': 'B',
@@ -5060,7 +5117,7 @@ poWeapons['horseman\'s mace'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['mace-axe'] = {
+WEAPONS_TABLE['mace-axe'].push({
     'name': 'Mace-axe',
     'size': 'L',
     'type': 'B/S',
@@ -5073,7 +5130,7 @@ poWeapons['mace-axe'] = {
     'category': ['Melee']
 });
 
-poWeapons['machete'] = {
+WEAPONS_TABLE['machete'].push({
     'name': 'Machete',
     'size': 'M',
     'type': 'S',
@@ -5086,7 +5143,7 @@ poWeapons['machete'] = {
     'category': ['Melee']
 });
 
-poWeapons['mancatcher'] = {
+WEAPONS_TABLE['mancatcher'].push({
     'name': 'Mancatcher',
     'size': 'L',
     'type': '—',
@@ -5099,7 +5156,7 @@ poWeapons['mancatcher'] = {
     'category': ['Melee']
 });
 
-poWeapons['matchlock arquebus'] = {
+WEAPONS_TABLE['matchlock arquebus'].push({
     'name': 'Matchlock Arquebus',
     'size': 'M',
     'type': 'P',
@@ -5113,7 +5170,7 @@ poWeapons['matchlock arquebus'] = {
     'category': ['Range']
 });
 
-poWeapons['matchlock caliver'] = {
+WEAPONS_TABLE['matchlock caliver'].push({
     'name': 'Matchlock Caliver',
     'size': 'M',
     'type': 'P',
@@ -5127,7 +5184,7 @@ poWeapons['matchlock caliver'] = {
     'category': ['Range']
 });
 
-poWeapons['matchlock musket w/rest'] = {
+WEAPONS_TABLE['matchlock musket w/rest'].push({
     'name': 'Matchlock Musket w/rest',
     'size': 'L',
     'type': 'P',
@@ -5141,7 +5198,7 @@ poWeapons['matchlock musket w/rest'] = {
     'category': ['Range']
 });
 
-poWeapons['maul'] = {
+WEAPONS_TABLE['maul'].push({
     'name': 'Maul',
     'size': 'L',
     'type': 'B',
@@ -5154,7 +5211,8 @@ poWeapons['maul'] = {
     'category': ['Melee']
 });
 
-poWeapons['morningstar'] = {
+WEAPONS_TABLE['morningstar'] = WEAPONS_TABLE['morning star'];
+WEAPONS_TABLE['morningstar'].push({
     'name': 'Morningstar',
     'size': 'M',
     'type': 'B/P',
@@ -5167,7 +5225,7 @@ poWeapons['morningstar'] = {
     'category': ['Melee']
 });
 
-poWeapons['net'] = {
+WEAPONS_TABLE['net'].push({
     'name': 'Net',
     'size': 'M',
     'type': '—',
@@ -5183,7 +5241,7 @@ poWeapons['net'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['nunchaku'] = {
+WEAPONS_TABLE['nunchaku'].push({
     'name': 'Nunchaku',
     'size': 'M',
     'type': 'B',
@@ -5196,7 +5254,7 @@ poWeapons['nunchaku'] = {
     'category': ['Melee']
 });
 
-poWeapons['oil flask'] = {
+WEAPONS_TABLE['oil flask'].push({
     'name': 'Oil flask',
     'noProf': true,
     'size': 'S',
@@ -5211,7 +5269,8 @@ poWeapons['oil flask'] = {
     'category': ['Range']
 });
 
-poWeapons['parang'] = {
+WEAPONS_TABLE['parang (chopping blade)'] = WEAPONS_TABLE['parang'];
+WEAPONS_TABLE['parang'].push({
     'name': 'Parang',
     'size': 'M',
     'type': 'S',
@@ -5224,7 +5283,8 @@ poWeapons['parang'] = {
     'category': ['Melee']
 });
 
-poWeapons['farming pick'] = {
+WEAPONS_TABLE['farming pick'] = [];
+WEAPONS_TABLE['farming pick'].push({
     'name': 'Farming pick',
     'size': 'L',
     'type': 'P',
@@ -5237,7 +5297,7 @@ poWeapons['farming pick'] = {
     'category': ['Melee']
 });
 
-poWeapons['footman\'s pick'] = {
+WEAPONS_TABLE['footman\'s pick'].push({
     'name': 'Footman\'s pick',
     'size': 'M',
     'type': 'P',
@@ -5250,7 +5310,7 @@ poWeapons['footman\'s pick'] = {
     'category': ['Melee']
 });
 
-poWeapons['horseman\'s pick'] = {
+WEAPONS_TABLE['horseman\'s pick'].push({
     'name': 'Horseman\'s pick',
     'size': 'M',
     'type': 'P',
@@ -5263,7 +5323,8 @@ poWeapons['horseman\'s pick'] = {
     'category': ['Melee']
 });
 
-poWeapons['pike'] = {
+WEAPONS_TABLE['pike'] = [];
+WEAPONS_TABLE['pike'].push({
     'name': 'Pike',
     'size': 'L',
     'type': 'P',
@@ -5276,7 +5337,8 @@ poWeapons['pike'] = {
     'category': ['Melee']
 });
 
-poWeapons['pilum'] = {
+WEAPONS_TABLE['pilum'] = [];
+WEAPONS_TABLE['pilum'].push({
     'name': 'Pilum',
     'size': 'M',
     'type': 'P',
@@ -5292,7 +5354,7 @@ poWeapons['pilum'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['awl pike'] = {
+WEAPONS_TABLE['awl pike'].push({
     'name': 'Awl Pike',
     'group': 'Polearm',
     'size': 'L',
@@ -5306,7 +5368,7 @@ poWeapons['awl pike'] = {
     'category': ['Melee']
 });
 
-poWeapons['bardiche'] = {
+WEAPONS_TABLE['bardiche'].push({
     'name': 'Bardiche',
     'group': 'Polearm',
     'size': 'L',
@@ -5320,7 +5382,7 @@ poWeapons['bardiche'] = {
     'category': ['Melee']
 });
 
-poWeapons['bec de corbin'] = {
+WEAPONS_TABLE['bec de corbin'].push({
     'name': 'Bec de Corbin',
     'group': 'Polearm',
     'size': 'L',
@@ -5334,7 +5396,7 @@ poWeapons['bec de corbin'] = {
     'category': ['Melee']
 });
 
-poWeapons['bill-guisarme'] = {
+WEAPONS_TABLE['bill-guisarme'].push({
     'name': 'Bill-Guisarme',
     'group': 'Polearm',
     'size': 'L',
@@ -5348,7 +5410,7 @@ poWeapons['bill-guisarme'] = {
     'category': ['Melee']
 });
 
-poWeapons['bill'] = {
+WEAPONS_TABLE['bill'].push({
     'name': 'Bill',
     'group': 'Polearm',
     'size': 'L',
@@ -5362,7 +5424,7 @@ poWeapons['bill'] = {
     'category': ['Melee']
 });
 
-poWeapons['fauchard'] = {
+WEAPONS_TABLE['fauchard'].push({
     'name': 'Fauchard',
     'group': 'Polearm',
     'size': 'L',
@@ -5376,7 +5438,7 @@ poWeapons['fauchard'] = {
     'category': ['Melee']
 });
 
-poWeapons['glaive'] = {
+WEAPONS_TABLE['glaive'].push({
     'name': 'Glaive',
     'group': 'Polearm',
     'size': 'L',
@@ -5390,7 +5452,7 @@ poWeapons['glaive'] = {
     'category': ['Melee']
 });
 
-poWeapons['glaive-guisarme'] = {
+WEAPONS_TABLE['glaive-guisarme'].push({
     'name': 'Glaive-Guisarme',
     'group': 'Polearm',
     'size': 'L',
@@ -5404,7 +5466,7 @@ poWeapons['glaive-guisarme'] = {
     'category': ['Melee']
 });
 
-poWeapons['guisarme'] = {
+WEAPONS_TABLE['guisarme'].push({
     'name': 'Guisarme',
     'group': 'Polearm',
     'size': 'L',
@@ -5418,7 +5480,7 @@ poWeapons['guisarme'] = {
     'category': ['Melee']
 });
 
-poWeapons['halberd'] = {
+WEAPONS_TABLE['halberd'].push({
     'name': 'Halberd',
     'group': 'Polearm',
     'size': 'L',
@@ -5432,8 +5494,8 @@ poWeapons['halberd'] = {
     'category': ['Melee']
 });
 
-poWeapons['lajatan'] = {
-    'name': 'Lajatan',
+WEAPONS_TABLE['lajatang'].push({
+    'name': 'Lajatang',
     'group': 'Polearm',
     'size': 'L',
     'type': 'S',
@@ -5446,7 +5508,7 @@ poWeapons['lajatan'] = {
     'category': ['Melee']
 });
 
-poWeapons['lucern hammer'] = {
+WEAPONS_TABLE['lucern hammer'].push({
     'name': 'Lucern hammer',
     'group': 'Polearm',
     'size': 'L',
@@ -5460,7 +5522,7 @@ poWeapons['lucern hammer'] = {
     'category': ['Melee']
 });
 
-poWeapons['military fork'] = {
+WEAPONS_TABLE['military fork'].push({
     'name': 'Military fork',
     'group': 'Polearm',
     'size': 'L',
@@ -5474,7 +5536,8 @@ poWeapons['military fork'] = {
     'category': ['Melee']
 });
 
-poWeapons['nagimaki'] = {
+WEAPONS_TABLE['nagimaki'] = WEAPONS_TABLE['nagimaki (horseman\'s halberd)'];
+WEAPONS_TABLE['nagimaki'].push({
     'name': 'Nagimaki',
     'group': 'Polearm',
     'size': 'M',
@@ -5488,7 +5551,7 @@ poWeapons['nagimaki'] = {
     'category': ['Melee']
 });
 
-poWeapons['naginata'] = {
+WEAPONS_TABLE['naginata'].push({
     'name': 'Naginata',
     'group': 'Polearm',
     'size': 'L',
@@ -5502,7 +5565,7 @@ poWeapons['naginata'] = {
     'category': ['Melee']
 });
 
-poWeapons['partisan'] = {
+WEAPONS_TABLE['partisan'].push({
     'name': 'Partisan',
     'group': 'Polearm',
     'size': 'L',
@@ -5516,7 +5579,7 @@ poWeapons['partisan'] = {
     'category': ['Melee']
 });
 
-poWeapons['ranseur'] = {
+WEAPONS_TABLE['ranseur'].push({
     'name': 'Ranseur',
     'group': 'Polearm',
     'size': 'L',
@@ -5530,7 +5593,7 @@ poWeapons['ranseur'] = {
     'category': ['Melee']
 });
 
-poWeapons['spetum'] = {
+WEAPONS_TABLE['spetum'].push({
     'name': 'Spetum',
     'group': 'Polearm',
     'size': 'L',
@@ -5544,7 +5607,7 @@ poWeapons['spetum'] = {
     'category': ['Melee']
 });
 
-poWeapons['tetsubo'] = {
+WEAPONS_TABLE['tetsubo'].push({
     'name': 'Tetsubo',
     'group': 'Polearm',
     'size': 'L',
@@ -5558,7 +5621,7 @@ poWeapons['tetsubo'] = {
     'category': ['Melee']
 });
 
-poWeapons['voulge'] = {
+WEAPONS_TABLE['voulge'].push({
     'name': 'Voulge',
     'group': 'Polearm',
     'size': 'L',
@@ -5572,7 +5635,8 @@ poWeapons['voulge'] = {
     'category': ['Melee']
 });
 
-poWeapons['pry bar'] = {
+WEAPONS_TABLE['pry bar'] = [];
+WEAPONS_TABLE['pry bar'].push({
     'name': 'Pry bar',
     'size': 'M',
     'type': 'B',
@@ -5585,7 +5649,7 @@ poWeapons['pry bar'] = {
     'category': ['Melee']
 });
 
-poWeapons['quarterstaff'] = {
+WEAPONS_TABLE['quarterstaff'].push({
     'name': 'Quarterstaff',
     'size': 'L',
     'type': 'B',
@@ -5598,7 +5662,8 @@ poWeapons['quarterstaff'] = {
     'category': ['Melee']
 });
 
-poWeapons['rock'] = {
+WEAPONS_TABLE['rock'] = [];
+WEAPONS_TABLE['rock'].push({
     'name': 'Rock',
     'noProf': true,
     'size': 'S',
@@ -5615,7 +5680,7 @@ poWeapons['rock'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['sai'] = {
+WEAPONS_TABLE['sai'].push({
     'name': 'Sai',
     'size': 'S',
     'type': 'B',
@@ -5628,7 +5693,8 @@ poWeapons['sai'] = {
     'category': ['Melee']
 });
 
-poWeapons['sang kauw'] = {
+WEAPONS_TABLE['sang kauw'] = [];
+WEAPONS_TABLE['sang kauw'].push({
     'name': 'Sang kauw',
     'size': 'L',
     'type': 'P/S',
@@ -5641,7 +5707,7 @@ poWeapons['sang kauw'] = {
     'category': ['Melee']
 });
 
-poWeapons['sap'] = {
+WEAPONS_TABLE['sap'].push({
     'name': 'Sap',
     'size': 'S',
     'type': 'B',
@@ -5654,7 +5720,7 @@ poWeapons['sap'] = {
     'category': ['Melee']
 });
 
-poWeapons['scourge'] = {
+WEAPONS_TABLE['scourge'].push({
     'name': 'Scourge',
     'size': 'S',
     'type': '—',
@@ -5667,7 +5733,7 @@ poWeapons['scourge'] = {
     'category': ['Melee']
 });
 
-poWeapons['scythe'] = {
+WEAPONS_TABLE['scythe'].push({
     'name': 'Scythe',
     'size': 'L',
     'type': 'P/S',
@@ -5680,7 +5746,7 @@ poWeapons['scythe'] = {
     'category': ['Melee']
 });
 
-poWeapons['shuriken'] = {
+WEAPONS_TABLE['shuriken'].push({
     'name': 'Shuriken',
     'size': 'S',
     'type': 'P',
@@ -5695,7 +5761,7 @@ poWeapons['shuriken'] = {
     'category': ['Range']
 });
 
-poWeapons['sickle'] = {
+WEAPONS_TABLE['sickle'].push({
     'name': 'Sickle',
     'size': 'S',
     'type': 'S',
@@ -5708,7 +5774,8 @@ poWeapons['sickle'] = {
     'category': ['Melee']
 });
 
-poWeapons['sledge hammer'] = {
+WEAPONS_TABLE['sledge hammer'] = [];
+WEAPONS_TABLE['sledge hammer'].push({
     'name': 'Sledge hammer',
     'size': 'M',
     'type': 'B',
@@ -5721,7 +5788,7 @@ poWeapons['sledge hammer'] = {
     'category': ['Melee']
 });
 
-poWeapons['sling, bullet'] = {
+WEAPONS_TABLE['sling, bullet'].push({
     'name': 'Sling, Bullet',
     'size': 'S',
     'type': 'B',
@@ -5736,7 +5803,7 @@ poWeapons['sling, bullet'] = {
     'category': ['Range']
 });
 
-poWeapons['sling, stone'] = {
+WEAPONS_TABLE['sling, stone'].push({
     'name': 'Sling, Stone',
     'size': 'S',
     'type': 'B',
@@ -5751,7 +5818,8 @@ poWeapons['sling, stone'] = {
     'category': ['Range']
 });
 
-poWeapons['snaplock belt pistol'] = {
+WEAPONS_TABLE['snaplock belt pistol'] = [];
+WEAPONS_TABLE['snaplock belt pistol'].push({
     'name': 'Snaplock Belt Pistol',
     'size': 'S',
     'type': 'P',
@@ -5765,7 +5833,8 @@ poWeapons['snaplock belt pistol'] = {
     'category': ['Range']
 });
 
-poWeapons['snaplock horse pistol'] = {
+WEAPONS_TABLE['snaplock horse pistol'] = [];
+WEAPONS_TABLE['snaplock horse pistol'].push({
     'name': 'Snaplock Horse Pistol',
     'size': 'S',
     'type': 'P',
@@ -5779,7 +5848,8 @@ poWeapons['snaplock horse pistol'] = {
     'category': ['Range']
 });
 
-poWeapons['snaplock musket'] = {
+WEAPONS_TABLE['snaplock musket'] = [];
+WEAPONS_TABLE['snaplock musket'].push({
     'name': 'Snaplock Musket',
     'size': 'M',
     'type': 'P',
@@ -5793,7 +5863,8 @@ poWeapons['snaplock musket'] = {
     'category': ['Range']
 });
 
-poWeapons['spade'] = {
+WEAPONS_TABLE['spade'] = [];
+WEAPONS_TABLE['spade'].push({
     'name': 'Spade',
     'size': 'M',
     'type': 'S/B',
@@ -5806,7 +5877,7 @@ poWeapons['spade'] = {
     'category': ['Melee']
 });
 
-poWeapons['spear, one-handed'] = {
+WEAPONS_TABLE['spear, one-handed'].push({
     'name': 'Spear, One-handed',
     'size': 'M',
     'type': 'P',
@@ -5822,7 +5893,7 @@ poWeapons['spear, one-handed'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['spear, two-handed'] = {
+WEAPONS_TABLE['spear, two-handed'].push({
     'name': 'Spear, Two-handed',
     'size': 'M',
     'type': 'P',
@@ -5835,7 +5906,8 @@ poWeapons['spear, two-handed'] = {
     'category': ['Melee']
 });
 
-poWeapons['long spear'] = {
+WEAPONS_TABLE['long spear'] = [];
+WEAPONS_TABLE['long spear'].push({
     'name': 'Long spear',
     'size': 'L',
     'type': 'P',
@@ -5848,7 +5920,7 @@ poWeapons['long spear'] = {
     'category': ['Melee']
 });
 
-poWeapons['stone spear, one-handed'] = {
+WEAPONS_TABLE['stone spear, one-handed'].push({
     'name': 'Stone spear, One-handed',
     'noProf': true,
     'size': 'M',
@@ -5865,7 +5937,7 @@ poWeapons['stone spear, one-handed'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['stone spear, two-handed'] = {
+WEAPONS_TABLE['stone spear, two-handed'].push({
     'name': 'Stone spear, Two-handed',
     'noProf': true,
     'size': 'M',
@@ -5879,7 +5951,7 @@ poWeapons['stone spear, two-handed'] = {
     'category': ['Melee']
 });
 
-poWeapons['staff sling, stinkpot'] = {
+WEAPONS_TABLE['staff sling, stinkpot'].push({
     'name': 'Staff sling, Stinkpot',
     'size': 'M',
     'ammo-size': 'S',
@@ -5895,7 +5967,7 @@ poWeapons['staff sling, stinkpot'] = {
     'category': ['Range']
 });
 
-poWeapons['staff sling, stone'] = {
+WEAPONS_TABLE['staff sling, stone'].push({
     'name': 'Staff sling, Stone',
     'size': 'M',
     'ammo-size': 'S',
@@ -5911,7 +5983,7 @@ poWeapons['staff sling, stone'] = {
     'category': ['Range']
 });
 
-poWeapons['bastard sword, one-handed'] = {
+WEAPONS_TABLE['bastard sword, one-handed'].push({
     'name': 'Bastard sword, One-handed',
     'size': 'M',
     'type': 'S',
@@ -5924,7 +5996,7 @@ poWeapons['bastard sword, one-handed'] = {
     'category': ['Melee']
 });
 
-poWeapons['bastard sword, two-handed'] = {
+WEAPONS_TABLE['bastard sword, two-handed'].push({
     'name': 'Bastard sword, Two-handed',
     'size': 'M',
     'type': 'S',
@@ -5937,7 +6009,7 @@ poWeapons['bastard sword, two-handed'] = {
     'category': ['Melee']
 });
 
-poWeapons['broad sword'] = {
+WEAPONS_TABLE['broad sword'].push({
     'name': 'Broad sword',
     'size': 'M',
     'type': 'S',
@@ -5950,7 +6022,7 @@ poWeapons['broad sword'] = {
     'category': ['Melee']
 });
 
-poWeapons['claymore'] = {
+WEAPONS_TABLE['claymore'].push({
     'name': 'Claymore',
     'group': 'Sword',
     'size': 'M',
@@ -5964,7 +6036,7 @@ poWeapons['claymore'] = {
     'category': ['Melee']
 });
 
-poWeapons['cutlass'] = {
+WEAPONS_TABLE['cutlass'].push({
     'name': 'Cutlass',
     'group': 'Sword',
     'size': 'M',
@@ -5978,7 +6050,7 @@ poWeapons['cutlass'] = {
     'category': ['Melee']
 });
 
-poWeapons['drusus'] = {
+WEAPONS_TABLE['drusus'].push({
     'name': 'Drusus',
     'group': 'Sword',
     'size': 'M',
@@ -5992,7 +6064,8 @@ poWeapons['drusus'] = {
     'category': ['Melee']
 });
 
-poWeapons['estoc'] = {
+WEAPONS_TABLE['estoc'] = [];
+WEAPONS_TABLE['estoc'].push({
     'name': 'Estoc',
     'group': 'Sword',
     'size': 'M',
@@ -6006,7 +6079,7 @@ poWeapons['estoc'] = {
     'category': ['Melee']
 });
 
-poWeapons['falchion'] = {
+WEAPONS_TABLE['falchion'].push({
     'name': 'Falchion',
     'group': 'Sword',
     'size': 'M',
@@ -6020,7 +6093,8 @@ poWeapons['falchion'] = {
     'category': ['Melee']
 });
 
-poWeapons['gladius'] = {
+WEAPONS_TABLE['gladius'] = [];
+WEAPONS_TABLE['gladius'].push({
     'name': 'Gladius',
     'group': 'Sword',
     'size': 'S',
@@ -6034,7 +6108,7 @@ poWeapons['gladius'] = {
     'category': ['Melee']
 });
 
-poWeapons['katana, one-handed'] = {
+WEAPONS_TABLE['katana, one-handed'].push({
     'name': 'Katana, One-handed',
     'group': 'Sword',
     'size': 'M',
@@ -6048,7 +6122,7 @@ poWeapons['katana, one-handed'] = {
     'category': ['Melee']
 });
 
-poWeapons['katana, two-handed'] = {
+WEAPONS_TABLE['katana, two-handed'].push({
     'name': 'Katana, Two-handed',
     'group': 'Sword',
     'size': 'M',
@@ -6062,7 +6136,7 @@ poWeapons['katana, two-handed'] = {
     'category': ['Melee']
 });
 
-poWeapons['khopesh'] = {
+WEAPONS_TABLE['khopesh'].push({
     'name': 'Khopesh',
     'group': 'Sword',
     'size': 'M',
@@ -6076,7 +6150,7 @@ poWeapons['khopesh'] = {
     'category': ['Melee']
 });
 
-poWeapons['long sword'] = {
+WEAPONS_TABLE['long sword'].push({
     'name': 'Long sword',
     'size': 'M',
     'type': 'S',
@@ -6089,7 +6163,9 @@ poWeapons['long sword'] = {
     'category': ['Melee']
 });
 
-poWeapons['ninja-to'] = {
+
+WEAPONS_TABLE['ninja-to'] = WEAPONS_TABLE['ninja-to (ninja sword)'];
+WEAPONS_TABLE['ninja-to'].push({
     'name': 'Ninja-to',
     'group': 'Sword',
     'size': 'M',
@@ -6103,7 +6179,8 @@ poWeapons['ninja-to'] = {
     'category': ['Melee']
 });
 
-poWeapons['no-dachi'] = {
+WEAPONS_TABLE['no-dachi'] = WEAPONS_TABLE['no-daichi (two-handed sword)'];
+WEAPONS_TABLE['no-dachi'].push({
     'name': 'No-dachi',
     'group': 'Sword',
     'size': 'L',
@@ -6117,7 +6194,7 @@ poWeapons['no-dachi'] = {
     'category': ['Melee']
 });
 
-poWeapons['rapier'] = {
+WEAPONS_TABLE['rapier'].push({
     'name': 'Rapier',
     'group': 'Sword',
     'size': 'M',
@@ -6131,7 +6208,7 @@ poWeapons['rapier'] = {
     'category': ['Melee']
 });
 
-poWeapons['sabre'] = {
+WEAPONS_TABLE['sabre'].push({
     'name': 'Sabre',
     'group': 'Sword',
     'size': 'M',
@@ -6145,7 +6222,8 @@ poWeapons['sabre'] = {
     'category': ['Melee']
 });
 
-poWeapons['sapara'] = {
+WEAPONS_TABLE['sapara'] = [];
+WEAPONS_TABLE['sapara'].push({
     'name': 'Sapara',
     'group': 'Sword',
     'size': 'S',
@@ -6159,7 +6237,7 @@ poWeapons['sapara'] = {
     'category': ['Melee']
 });
 
-poWeapons['scimitar'] = {
+WEAPONS_TABLE['scimitar'].push({
     'name': 'Scimitar',
     'group': 'Sword',
     'size': 'M',
@@ -6173,7 +6251,8 @@ poWeapons['scimitar'] = {
     'category': ['Melee']
 });
 
-poWeapons['great scimitar'] = {
+WEAPONS_TABLE['great scimitar'] = [];
+WEAPONS_TABLE['great scimitar'].push({
     'name': 'Great scimitar',
     'group': 'Sword',
     'size': 'L',
@@ -6187,7 +6266,7 @@ poWeapons['great scimitar'] = {
     'category': ['Melee']
 });
 
-poWeapons['short sword'] = {
+WEAPONS_TABLE['short sword'].push({
     'name': 'Short sword',
     'size': 'S',
     'type': 'P',
@@ -6200,7 +6279,8 @@ poWeapons['short sword'] = {
     'category': ['Melee']
 });
 
-poWeapons['spatha'] = {
+WEAPONS_TABLE['spatha'] = [];
+WEAPONS_TABLE['spatha'].push({
     'name': 'Spatha',
     'group': 'Sword',
     'size': 'M',
@@ -6214,7 +6294,8 @@ poWeapons['spatha'] = {
     'category': ['Melee']
 });
 
-poWeapons['sword-axe'] = {
+WEAPONS_TABLE['sword-axe'] = [];
+WEAPONS_TABLE['sword-axe'].push({
     'name': 'Sword-axe',
     'size': 'L',
     'type': 'S',
@@ -6227,7 +6308,8 @@ poWeapons['sword-axe'] = {
     'category': ['Melee']
 });
 
-poWeapons['tulwar'] = {
+WEAPONS_TABLE['tulwar'] = [];
+WEAPONS_TABLE['tulwar'].push({
     'name': 'Tulwar',
     'group': 'Sword',
     'size': 'M',
@@ -6241,7 +6323,7 @@ poWeapons['tulwar'] = {
     'category': ['Melee']
 });
 
-poWeapons['two-handed sword'] = {
+WEAPONS_TABLE['two-handed sword'].push({
     'name': 'Two-handed sword',
     'size': 'L',
     'type': 'S',
@@ -6254,7 +6336,7 @@ poWeapons['two-handed sword'] = {
     'category': ['Melee']
 });
 
-poWeapons['wakizashi'] = {
+WEAPONS_TABLE['wakizashi'].push({
     'name': 'Wakizashi',
     'group': 'Sword',
     'size': 'M',
@@ -6268,7 +6350,8 @@ poWeapons['wakizashi'] = {
     'category': ['Melee']
 });
 
-poWeapons['three-piece rod'] = {
+WEAPONS_TABLE['three-piece rod'] = WEAPONS_TABLE['three-section staff'];
+WEAPONS_TABLE['three-piece rod'].push({
     'name': 'Three-piece rod',
     'size': 'L',
     'type': 'B',
@@ -6281,7 +6364,8 @@ poWeapons['three-piece rod'] = {
     'category': ['Melee']
 });
 
-poWeapons['torch'] = {
+WEAPONS_TABLE['torch'] = [];
+WEAPONS_TABLE['torch'].push({
     'name': 'Torch',
     'noProf': true,
     'size': 'M',
@@ -6298,7 +6382,8 @@ poWeapons['torch'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['vial'] = {
+WEAPONS_TABLE['vial'] = [];
+WEAPONS_TABLE['vial'].push({
     'name': 'Vial',
     'noProf': true,
     'size': 'S',
@@ -6314,7 +6399,7 @@ poWeapons['vial'] = {
     'category': ['Range']
 });
 
-poWeapons['warhammer'] = {
+WEAPONS_TABLE['warhammer'].push({
     'name': 'Warhammer',
     'size': 'M',
     'type': 'B',
@@ -6330,7 +6415,8 @@ poWeapons['warhammer'] = {
     'category': ['Melee', 'Range']
 });
 
-poWeapons['wheellock arquebus'] = {
+WEAPONS_TABLE['wheellock arquebus'] = [];
+WEAPONS_TABLE['wheellock arquebus'].push({
     'name': 'Wheellock Arquebus',
     'size': 'M',
     'type': 'P',
@@ -6344,7 +6430,8 @@ poWeapons['wheellock arquebus'] = {
     'category': ['Range']
 });
 
-poWeapons['wheellock belt pistol'] = {
+WEAPONS_TABLE['wheellock belt pistol'] = [];
+WEAPONS_TABLE['wheellock belt pistol'].push({
     'name': 'Wheellock Belt pistol',
     'size': 'S',
     'type': 'P',
@@ -6358,7 +6445,8 @@ poWeapons['wheellock belt pistol'] = {
     'category': ['Range']
 });
 
-poWeapons['wheellock horse pistol'] = {
+WEAPONS_TABLE['wheellock horse pistol'] = [];
+WEAPONS_TABLE['wheellock horse pistol'].push({
     'name': 'Wheellock Horse pistol',
     'size': 'S',
     'type': 'P',
@@ -6372,7 +6460,7 @@ poWeapons['wheellock horse pistol'] = {
     'category': ['Range']
 });
 
-poWeapons['whip'] = {
+WEAPONS_TABLE['whip'].push({
     'name': 'Whip',
     'size': 'M',
     'type': '—',
