@@ -77,6 +77,8 @@ April 13th 2022 v1.55d
 
 - Improved Conditions calculation, they now cap at -30 modifier
 - Fixed Carouser RT results not displaying properly
+- Fixed issue with Encumbrance Penalty when Agility was exactly 30 it would result in frozen target display.
+- Added talents Beneath Notice & Suffused with Uglu to talent integration
 
 
 April 6th 2022 v1.55c
