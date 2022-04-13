@@ -75,10 +75,8 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
 April 13th 2022 v1.55d
 
-- Improved conditions calculation when Prone is selected and added Drunk as a condition effecting all rolls.
-- All Conditions now cap at -30 modifier
-- Fixed Carouser talent RT results not displaying properly
-- Separate Psychology section added to Core Stats tab
+- Improved Conditions calculation, they now cap at -30 modifier
+- Fixed Carouser RT results not displaying properly
 
 
 April 6th 2022 v1.55c
