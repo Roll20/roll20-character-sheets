@@ -78,9 +78,10 @@ April 13th 2022 v1.55d
 - Improved Conditions calculation, they now cap at -30 modifier
 - Fixed Carouser RT results not displaying properly
 - Fixed Distract RT text not displaying properly
-- Fixed issue with Encumbrance Penalty when Agility was exactly 30 it would result in frozen target display.
-- Added talents Beneath Notice, Suffused with Uglu, Super Numerate & Supportive to talent integration
-- Activating Stun to Strike will now with also activate Melee Called Shot.
+- Fixed issue with Encumbrance Penalty when Agility was exactly 30 it would result in frozen target display
+- Added talents Beat Blade, Beneath Notice, Suffused with Uglu, Super Numerate & Supportive to talent integration
+- Added Beat Blade to melee assist actions, and reordered them so the layout cascade better on sheet
+- Activating Stun to Strike will now with also activate Melee Called Shot
 - Added new Psychology record section in Core Stats tab under Injuries (with community support!)
  
 
