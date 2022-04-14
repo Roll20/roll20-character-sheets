@@ -40236,13 +40236,29 @@
 										{{#aimed}}
 										<div class="sheet-row">
 											<div class="sheet-col-11-24 sheet-pad-l-md sheet-pad-r-md sheet-rt-key" data-i18n="CALLED-SHOT">Called Shot</div>
-											<div class="sheet-col-13-24 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" >{{hitlocation}}</div>
-										{{#rollGreater() pummel 0}}	
-											<div class="sheet-col-100-100 sheet-pad-l-md sheet-pad-r-md sheet-rt-key-wide"><span style="margin-right: 3px; color: #858585" data-i18n="PUMMEL-EFFECT">Head hits stun (Opposed Str/End)</span></div>
-										{{/rollGreater() pummel 0}}
+											{{#rollTotal() hitlocation 1}}
+											<div class="sheet-col-13-24 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="HEAD">Head</div>
+												{{#rollGreater() pummel 0}}	
+													<div class="sheet-col-100-100 sheet-pad-l-md sheet-pad-r-md sheet-rt-key-wide"><span style="margin-right: 3px; color: #858585" data-i18n="PUMMEL-EFFECT">Head hits stun (Opposed Str/End)</span></div>
+												{{/rollGreater() pummel 0}}
+											{{/rollTotal() hitlocation 1}}
+											{{#rollTotal() hitlocation 2}}
+											<div class="sheet-col-13-24 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="RIGHT-ARM">Right Arm</div>
+											{{/rollTotal() hitlocation 2}}
+											{{#rollTotal() hitlocation 3}}
+											<div class="sheet-col-13-24 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="LEFT-ARM">Left Arm</div>
+											{{/rollTotal() hitlocation 3}}
+											{{#rollTotal() hitlocation 4}}
+											<div class="sheet-col-13-24 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="BODY">Body</div>
+											{{/rollTotal() hitlocation 4}}
+											{{#rollTotal() hitlocation 5}}
+											<div class="sheet-col-13-24 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="RIGHT-LEG">Right Leg</div>
+											{{/rollTotal() hitlocation 5}}
+											{{#rollTotal() hitlocation 6}}
+											<div class="sheet-col-13-24 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="LEFT-LEG">Left Leg</div>
+											{{/rollTotal() hitlocation 6}}
 										</div>
 										{{/aimed}}
-
 
 										{{#damage}}
 										<div class="sheet-row">
@@ -49356,7 +49372,11 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
 	if (v.CritTable  == 1) {rollPart4 += " {{crittable=[[@{CritTable}]]}}";}
 	if (v.GroupAdv  == 1) {rollPart4 += " {{grpadv=[[@{GroupAdv}]]}}";}
  
-     if (v.MeleeMode_Aimed == 1) {hitloc = "{{hitlocation=?{Choose a Hit Location|Head,Head|Right Arm,Right Arm|Left Arm,Left Arm|Body,Body|Right Leg,Right Leg|Left Leg,Left Leg}}}"; rollPart4 += " {{aimed=[[@{MeleeMode_Aimed}]]}}";} else {hitloc = "{{hitlocation=true}}";}
+	if (v.MeleeMode_STS  == 1) {
+    if (v.MeleeMode_Aimed == 1) {hitloc = "{{hitlocation=[[1]]}}"; rollPart4 += " {{aimed=[[@{MeleeMode_Aimed}]]}}";} else {hitloc = "{{hitlocation=true}}";}
+	} else {
+    if (v.MeleeMode_Aimed == 1) {hitloc = "{{hitlocation=[[?{Choose a Hit Location|Head,1|Right Arm,2|Left Arm,3|Body,4|Right Leg,5|Left Leg,6}]]}}"; rollPart4 += " {{aimed=[[@{MeleeMode_Aimed}]]}}";} else {hitloc = "{{hitlocation=true}}";}
+	}
 			
                console.log(hitloc);
 	rollPart = rollPart4.replaceAll('>addsldf<', addsldf).replaceAll('>adddmg<', adddmg).replaceAll('>hitloc<', hitloc);
@@ -49751,7 +49771,11 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 	if (values.GroupAdv  == 1) {rollPart4 += " {{grpadv=[[@{GroupAdv}]]}}";}
 	if (values.CritTable  == 1) {rollPart4 += " {{crittable=[[@{CritTable}]]}}";}
  
-     if (values.MeleeMode_Aimed == 1) {hitloc = "{{hitlocation=?{Choose a Hit Location|Head,Head|Right Arm,Right Arm|Left Arm,Left Arm|Body,Body|Right Leg,Right Leg|Left Leg,Left Leg}}}"; rollPart4 += " {{aimed=[[@{MeleeMode_Aimed}]]}}";} else {hitloc = "{{hitlocation=true}}";}
+	if (values.MeleeMode_STS  == 1) {
+    if (values.MeleeMode_Aimed == 1) {hitloc = "{{hitlocation=[[1]]}}"; rollPart4 += " {{aimed=[[@{MeleeMode_Aimed}]]}}";} else {hitloc = "{{hitlocation=true}}";}
+	} else {
+    if (values.MeleeMode_Aimed == 1) {hitloc = "{{hitlocation=[[?{Choose a Hit Location|Head,1|Right Arm,2|Left Arm,3|Body,4|Right Leg,5|Left Leg,6}]]}}"; rollPart4 += " {{aimed=[[@{MeleeMode_Aimed}]]}}";} else {hitloc = "{{hitlocation=true}}";}
+	}
  
    let rollPart = rollPart4.replaceAll('>ambi<', ambipen).replaceAll('>addsldf<', addsldf).replaceAll('>adddmg<', adddmg).replaceAll('>hitloc<', hitloc);
    
@@ -50109,7 +50133,7 @@ on('clicked:rangedatk clicked:rangedatkreroll', (eventInfo) => {
 	});		  
    }
    }
-      if (v.RangedMode_Called == 1) {hitloc = "{{hitlocation=?{Choose a Hit Location|Head,Head|Right Arm,Right Arm|Left Arm,Left Arm|Body,Body|Right Leg,Right Leg|Left Leg,Left Leg}}}"; rollPart2 += " {{aimed=[[@{RangedMode_Called}]]}}";} else {hitloc = "{{hitlocation=true}}";}  
+      if (v.RangedMode_Called == 1) {hitloc = "{{hitlocation=[[?{Choose a Hit Location|Head,1|Right Arm,2|Left Arm,3|Body,4|Right Leg,5|Left Leg,6}]]}}"; rollPart2 += " {{aimed=[[@{RangedMode_Called}]]}}";} else {hitloc = "{{hitlocation=true}}";}  
  
    let rollPart = rollPart2.replaceAll('>hitloc<', hitloc);
 				
@@ -51889,11 +51913,14 @@ on('change:MeleeMode_Outnumbered change:DefenseMode_Defensive change:MeleeMode_P
 	getAttrs(["Used_MeleeBonus", "Used_DefenseBonus", "MeleeMode_Outnumbered", "DefenseMode_Defensive", "MeleeMode_Prone", "MeleeMode_Charging", "MeleeMode_Aimed", "MeleeMode_STS"], function(v) {
 		
    var trigger = event.triggerName.slice(0, -10);
+   var trigger2 = event.triggerName;
 
                console.log(trigger);		
 	melmod = 0;
 	defmod = 0;
 	      
+
+	
 	if (trigger == "defensemode") {
 	
 	setAttrs(
@@ -51945,12 +51972,28 @@ on('change:MeleeMode_Outnumbered change:DefenseMode_Defensive change:MeleeMode_P
 	if (v.MeleeMode_Outnumbered == 3) {melmod += 40}
 	if (v.MeleeMode_Prone == 1) {melmod += 20}
 	if (v.MeleeMode_Charging == 1) {melmod += 10}
+	
+
+	if (trigger2 == "meleemode_sts") {	
+	if (v.MeleeMode_STS == 0) {
+	setAttrs(
+	{
+		"MeleeMode_Aimed": 0,
+	}, {silent: true});		
+	} else {
+	setAttrs(
+	{
+		"MeleeMode_Aimed": 1,
+	}, {silent: true});		
+	}
+	} else {
 	if (v.MeleeMode_STS == 0) {if (v.MeleeMode_Aimed == 1) {melmod -= 20};}		
 	if (v.MeleeMode_STS == 1) {
 	setAttrs(
 	{
 		"MeleeMode_Aimed": 1,
 	}, {silent: true});		
+	}
 	}
 
     if (melmod > 60) {melmod = 60}
