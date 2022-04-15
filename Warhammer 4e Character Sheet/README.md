@@ -75,11 +75,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
 April 13th 2022 v1.55d
 
+- New integrated Size system - Size is selectable in Background tab, and Vs Size in the Melee Assister. Applyies Size Combat Modifiers rules from the core book, effects sheet Wounds/Carry weight and modifies melee combat rolls. Showing larger/smaller bonuses as appropriate. Only works with talent integration.
 - Improved Conditions calculation, they now cap at -30 modifier
 - Fixed Carouser RT results not displaying properly
 - Fixed Distract RT text not displaying properly
 - Fixed issue with Encumbrance Penalty when Agility was exactly 30 it would result in frozen target display
-- Added talents Beat Blade, Beneath Notice, Suffused with Uglu, Super Numerate & Supportive to talent integration
+- Added talents Beat Blade, Beneath Notice, Large/Small, Suffused with Uglu, Super Numerate & Supportive to talent integration
 - Added Beat Blade to melee assist actions, and reordered them so the layout cascade better on sheet
 - Activating Stun to Strike will now with also activate Melee Called Shot
 - Added new Psychology record section in Core Stats tab under Injuries (with community support!)
