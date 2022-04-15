@@ -45397,6 +45397,48 @@ on("change:strengthbonus change:toughnessbonus change:willpowerbonus change:race
 
 	//<!-- CONDITION SCRIPTS -->
 
+	on("sheet:opened change:drunk", function (v) {
+    if (v.sourceType === 'sheetworker') return;
+		getAttrs(['Blinded', 'Broken', 'Deafened', 'Drunk', 'Entangled', 'Fatigued', 'Poisoned', 'Stuned', 'Prone', 'ConditionModEnable'], function (v) {
+		let toggle = v.ConditionModEnable;
+		let mod = v.Drunk * toggle;
+		let cond = Math.max(v.Fatigued, v.Poisoned, v.Stuned, v.Broken);
+		let condsee = Math.max(v.Blinded, v.Fatigued, v.Poisoned, v.Stuned, v.Broken);
+		let condhear = Math.max(v.Deafened, v.Fatigued, v.Poisoned, v.Stuned, v.Broken);
+		let condmove = Math.max(v.Entangled, v.Fatigued, v.Poisoned, v.Stuned, v.Prone*2, v.Broken);
+		let condseehear = Math.max(v.Deafened, v.Blinded, v.Fatigued, v.Poisoned, v.Stuned, v.Broken);
+		let condseemove = Math.max(v.Blinded, v.Entangled, v.Fatigued, v.Poisoned, v.Stuned, v.Prone*2, v.Broken);
+		let conda = Math.max(v.Blinded, v.Deafened, v.Entangled, v.Fatigued, v.Poisoned, v.Stuned, v.Prone*2, v.Broken);
+
+	if (v.Drunk > 0) {
+	
+	
+	
+	
+	} else {
+	if (mod > 3) {mod = 3;}
+	if (cond > 3) {cond = 3;}
+	if (condsee > 3) {condsee = 3;}
+	if (condhear > 3) {condhear = 3;}
+	if (condmove > 3) {condmove = 3;}
+	if (condseehear > 3) {condseehear = 3;}
+	if (condseemove > 3) {condseemove = 3;}
+	if (conda > 3) {conda = 3;}
+	}
+		setAttrs({
+		"DrunkMod" : mod,
+		"condgen" : cond * 10,
+		"condgen_see" : condsee * 10,
+		"condgen_hear" : condhear * 10,
+		"condgen_move" : condmove * 10,
+		"condgen_see_hear" : condseehear * 10,
+		"condgen_see_move" : condseemove * 10,
+		"condall" : conda * 10
+		});			
+		});
+		console.log("Broken Cond change");
+	});
+	
 	on("sheet:opened change:blinded", function (v) {
     if (v.sourceType === 'sheetworker') return;
 		getAttrs(['Blinded', 'Broken', 'Deafened', 'Entangled', 'Fatigued', 'Poisoned', 'Stuned', 'Prone', 'ConditionModEnable'], function (v) {
@@ -52104,15 +52146,7 @@ on('change:MeleeMode_Outnumbered change:DefenseMode_Defensive change:MeleeMode_P
 	oppdefmod = 0;
 	      
 	if (trigger == "defensemode") {
-	
-	setAttrs(
-	{
-		"MeleeMode_Outnumbered": '0',
-		"MeleeMode_Prone": '0',		
-		"MeleeMode_Charging": '0',	
-		"MeleeMode_Aimed": '0',	
-		"MeleeMode_STS": '0',		
-	}, {silent: true});		
+		
 
 	if (v.DefenseMode_Defensive == 1) {defmod += 20}
     if (defmod > 60) {defmod = 60}
@@ -52146,11 +52180,7 @@ on('change:MeleeMode_Outnumbered change:DefenseMode_Defensive change:MeleeMode_P
 		});	
 	
 	} else {
-
-	setAttrs(
-	{
-		"DefenseMode_Defensive": '0',
-	}, {silent: true});		
+	
 	
 	if (v.MeleeMode_Outnumbered == 2) {melmod += 20;}
 	if (v.MeleeMode_Outnumbered == 3) {melmod += 40;}
