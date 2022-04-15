@@ -10,7 +10,7 @@ WEAPONS_TABLE['arquebus'].push({
     'range': '50/150/210',
     'small-medium': '1d10!',
     'large': '1d10!',
-    'book': ['PHB', 'Arms & Equipment'],
+    'book': ['PHB', 'Arms and Equipment Guide'],
     'category': ['Range']
 });
 
@@ -22,7 +22,7 @@ WEAPONS_TABLE['battle axe'].push({
     'speed': 7,
     'small-medium': '1d8',
     'large': '1d8',
-    'book': ['PHB', 'Arms & Equipment','The Complete Ninja\'s Handbook'],
+    'book': ['PHB', 'Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
     'category': ['Melee']
 });
 
@@ -37,7 +37,7 @@ WEAPONS_TABLE['blowgun, barbed dart'].push({
     'range': '10/20/30',
     'small-medium': '1d3',
     'large': '1d2',
-    'book': ['PHB','Arms & Equipment','The Complete Ninja\'s Handbook'],
+    'book': ['PHB','Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
     'category': ['Range']
 });
 
@@ -52,7 +52,7 @@ WEAPONS_TABLE['blowgun, needle'].push({
     'range': '10/20/30',
     'small-medium': '1',
     'large': '1',
-    'book': ['PHB', 'Arms & Equipment','The Complete Ninja\'s Handbook'],
+    'book': ['PHB', 'Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
     'category': ['Range']
 });
 
@@ -187,7 +187,7 @@ WEAPONS_TABLE['light crossbow, light quarrel'].push({
     'range': '60/120/180',
     'small-medium': '1d4',
     'large': '1d4',
-    'book': ['PHB','Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
+    'book': ['PHB','The Complete Ninja\'s Handbook'],
     'category': ['Range']
 });
 
@@ -1850,6 +1850,20 @@ WEAPONS_TABLE['composite long bow, sheaf arrow'].push({
     'category': ['Range']
 });
 
+WEAPONS_TABLE['light crossbow, light quarrel'].push({
+    'name': 'Light crossbow, Light quarrel',
+    'size': 'S',
+    'ammo-size': 'M',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1',
+    'range': '60/120/180',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Arms and Equipment Guide'],
+    'category': ['Range']
+});
+
 WEAPONS_TABLE['parrying dagger'] = [];
 WEAPONS_TABLE['parrying dagger'].push({
     'name': 'Parrying dagger',
@@ -2478,7 +2492,7 @@ WEAPONS_TABLE['gaff/hook'].push({
 });
 //#endregion
 
-//#region The Complete Barbarians Handbook
+//#region The Complete Barbarian's Handbook
 WEAPONS_TABLE['atlatl'] = [];
 WEAPONS_TABLE['atlatl'].push({
     'name': 'Atlatl',

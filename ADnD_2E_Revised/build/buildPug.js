@@ -20,7 +20,7 @@ spellsJs.forEach(jsFile => {
 console.log('weapons.js')
 const weapons = require(path.join(jsFolder, 'weapons.js'));
 const weaponsProficiencies = require(path.join(jsFolder, 'weaponProficiencies.js'));
-//html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weapons, proficiencies: weaponsProficiencies});
+html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weapons, proficiencies: weaponsProficiencies});
 
 let weaponTable = pug.renderFile(path.join(pugFolder, 'weaponsTable.pug'), {pretty: true, data: weapons});
 fs.writeFileSync(path.join(miscFolder, 'weapons-overview.html'), weaponTable);
