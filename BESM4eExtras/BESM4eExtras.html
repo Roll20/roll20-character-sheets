@@ -10634,6 +10634,7 @@
 		
 		function setDynamicRollValue(debug, timer, eventInfo, value, attrdb, rowID, sourceAttr, setObj) {
 			const rolltype = value.static_roll_type_selection;
+			clog(debug, timer, 'rolltype =', rolltype, 'setDynamicRollValue()');
 			let cv = 0;
 			let rollmod = 0;
 			let type = '';
@@ -10648,7 +10649,7 @@
 					title = '{{title=Roll 2d6}}';
 					break;
 				case 'acv':
-					cv = getCV(debug, timer, value, attrdb, setObj, sourceAttr, 'acv', '', true);
+					cv = getCV(debug, timer, value, attrdb, setObj, 'acv', '');
 					type = '{{acvroll=1}}';
 					title = '{{title=Roll ACV}}';
 					stat = `{{acv=${cv}}}`;
@@ -10665,10 +10666,8 @@
 						parseInt(value.static_button_personal_defense) ?
 						'personal' :
 						'';
-					const bonus = defensetype != '' ? 
-						getSumOfActiveAttrLevels(attrdb, 'rangeddefense', defensetype) * 2 :
-						0;
-					cv = getCV(debug, timer, value, attrdb, setObj, sourceAttr, 'dcv', '', true)  + bonus;
+					clog(debug, timer, 'defensetype =', defensetype);
+					cv = getCV(debug, timer, value, attrdb, setObj, 'dcv', defensetype);
 					type = '{{dcvroll=1}}';
 					title = '{{title=Roll DCV}}';
 					stat = `{{dcv=${cv}}}`;
@@ -10676,7 +10675,7 @@
 					result = `${result} ${buildProtectionsString(debug, timer, value)}`;
 					break;
 				case 'initiative':
-					cv = getCV(debug, timer, value, attrdb, setObj, sourceAttr, 'acv', '');
+					cv = getCV(debug, timer, value, attrdb, setObj, 'acv', '');
 					rollmod = getSumOfActiveSubAttrRanks(attrdb, 'combattechnique', 'lightningreflexes') || 0;
 					type = '{{initiative=1}}';
 					title = '{{title=Roll Initiative}}';
@@ -10707,6 +10706,7 @@
 				`|Minor Edge, ${setDice(rollmod, 1)}|Minor Obstacle, ${setDice(rollmod, -1)}` +
 				`|Major Edge, ${setDice(rollmod, 2)}|Major Obstacle, ${setDice(rollmod, -2)}}]]` +
 				`+[[${base}]] ${turntracker}]]}} {{roll=$[[0]]}}`;
+			clog(debug, timer, 'result =', result);
 			setObj.dynamic_roll_value = result;
 			setObj.dynamic_roll_base = base;
 		}
@@ -12258,19 +12258,23 @@
 			clog(debug, timer, 'setDamageType', setDamageType,'setDamageType()');
 		}
 		
-		function getCV(debug, timer, value, attrdb, setObj, sourceAttr, type, focus = 'unarmed', invertState = false) {
+		function getCV(debug, timer, value, attrdb, setObj, type, focus = 'unarmed') {
+			clog(debug, timer, 'focus =', focus, 'getCV()');
 			const mastery = 
 				(type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'attackmastery') :
 				(type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'defensemastery') : 
 				0;
+			clog(debug, timer, 'mastery =', mastery);
 			const isMelee = 
 				getIsMelee(debug, timer, focus);
+			clog(debug, timer, 'isMelee =', isMelee);
 			const specialty = 
 				(isMelee && type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'meleeattack', focus) * 2 :
 				(isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'meleedefense', focus) * 2 :
 				(!isMelee && type == 'acv') ? getSumOfActiveAttrLevels(attrdb, 'rangedattack', focus) * 2 :
 				(!isMelee && type == 'dcv') ? getSumOfActiveAttrLevels(attrdb, 'rangeddefense', focus) * 2 : 
 				0;
+			clog(debug, timer, 'specialty =', specialty);
 			const state = 
 				(type == 'acv') ? 
 				isNaN(parseInt(setObj.static_button_targeted_attack)) ?
@@ -12281,25 +12285,36 @@
 				parseInt(value.static_button_targeted_defense) :
 				parseInt(setObj.static_button_targeted_defense) :
 				0;
+			clog(debug, timer, 'state =', state);
 			const enemy = 
-				(type == 'acv') ? getTargetedLevel(attrdb, 'enemyattack') * 2 :
-				(type == 'dcv') ? getTargetedLevel(attrdb, 'enemydefense') * 2 : 
+				(type == 'acv' && state) ? 
+					getTargetedLevel(attrdb, 'enemyattack') * 2 :
+				(type == 'dcv' && state) ? 
+					getTargetedLevel(attrdb, 'enemydefense') * 2 : 
 				0;
+			clog(debug, timer, 'enemy =', enemy);
+			/*
 			const targeted = 
-				(type == 'acv') ? (invertState && sourceAttr == 'attack') ? (state > 0) ? 
-					0 : enemy : (state > 0) ? enemy : 0 :
+				(type == 'acv') ? 
+					(invertState && sourceAttr == 'attack') ? 
+						(state > 0) ? 
+							0 : enemy : 
+						(state > 0) ? 
+							enemy : 0 :
 				(type == 'dcv') ? (invertState && sourceAttr == 'defense') ? (state > 0) ? 
 					0 : enemy : (state > 0) ? enemy : 0 : 
 				0;
+			*/
 			const cv = 
 				Math.round((parseInt(setObj.stat_total_body) + parseInt(setObj.stat_total_mind) +
 					parseInt(setObj.stat_total_soul)) / 3) || 
 				Math.round((parseInt(value.stat_total_body) + parseInt(value.stat_total_mind) + 
 					parseInt(value.stat_total_soul)) / 3) || 
 				0;
+			clog(debug, timer, 'cv =', cv);
 			const result = 
-				cv + targeted + specialty + mastery;
-			clog(debug, timer, 'result =', result, 'getCV()');
+				cv + enemy + specialty + mastery;
+			clog(debug, timer, 'result =', result);
 			return result;
 		}
 		
@@ -13033,9 +13048,9 @@
 			const targetedmdLevel = 
 				getTargetedLevel(attrdb, 'massivedamage') || 0;
 			const targetedmd = 
-				invertState && sourceAttr == 'damage' ?
-				targetedmdState > 0 ? 0 : targetedmdLevel :
-				targetedmdState > 0 ? targetedmdLevel : 0;
+				//invertState && sourceAttr == 'damage' ?
+				//targetedmdState > 0 ? 0 : targetedmdLevel :
+				targetedmdState ? targetedmdLevel : 0;
 			const rushattackState =
 				isNaN(parseInt(setObj.static_button_targeted_rushdamage)) ?
 				parseInt(value.static_button_targeted_rushdamage) :
@@ -13071,11 +13086,11 @@
 			const acv = 
 				attack_maneuvers_regex.test(maneuver) ? 
 				isSwarm ?  parseInt(weapon.level) + 4 :
-				getCV(debug, timer, value, attrdb, setObj, sourceAttr, 'acv', weaponclass) : 0;
+				getCV(debug, timer, value, attrdb, setObj, 'acv', weaponclass) : 0;
 			const dcv = 
 				defense_maneuvers_regex.test(maneuver) ? 
 				isSwarm ? 0 :
-				getCV(debug, timer, value, attrdb, setObj, sourceAttr, 'dcv', weaponclass) : 0;
+				getCV(debug, timer, value, attrdb, setObj, 'dcv', weaponclass) : 0;
 			let damage = isSwarm ?
 				Math.round(weapon.critters/10) :
 				isTelekinesis ?
@@ -14311,12 +14326,14 @@
 							break;
 							case `button`:
 								if (rowID == 'targeted') {
-									const rolltype = selection => 
-										selection == 'acv' || selection == 'dcv' ?
-										setDynamicRollValue(debug, timer, eventInfo, value, attrdb, rowID, sourceAttr, setObj) :
-										false;
-									rolltype(value.static_roll_type_selection);
 									setButtonState(debug, timer, value, source, rowID, sourceAttr, setObj);
+									if (sourceAttr === "attack" || sourceAttr === 'defense') {
+										const rolltype = selection => 
+											selection == 'acv' || selection == 'dcv' ?
+											setDynamicRollValue(debug, timer, eventInfo, value, attrdb, rowID, sourceAttr, setObj) :
+											false;
+										rolltype(value.static_roll_type_selection);
+									}
 									setCombatRoll(debug, timer, value, attrdb, undefined, sourceAttr, setObj, true);
 								}
 								if (rowID == 'personal' || rowID == 'movement') {
