@@ -7888,10 +7888,10 @@
 			if (isLesserThan172) {
 				upgradeTo_1_7_2(attrIDs, setObj);
 			}
-			const isLesserThan177 = major_global_version <= 1 && minor_global_version < 7.7 ?
+			const isLesserThan180 = major_global_version <= 1 && minor_global_version < 8.0 ?
 				true : false;
-			if (isLesserThan177) {
-				upgradeTo_1_7_7(sizetemplateIDs, value, sheetdb, setObj);
+			if (isLesserThan180) {
+				upgradeTo_1_8_0(sizetemplateIDs, value, sheetdb, setObj);
 			}
 			setObj.global_version = sheet_version;
 		}
@@ -7968,15 +7968,16 @@
 			clog(2, {}, 'upgraded to 1.7.2');
 		}
 		
-		function upgradeTo_1_7_7(sizetemplateIDs, value, sheetdb, setObj) {
+		function upgradeTo_1_8_0(sizetemplateIDs, value, sheetdb, setObj) {
 			const currSize = value.static_template_size_name || 'medium';
 			setDefaultSize(sheetdb, setObj, currSize);
+			setTotalLift(0, {}, {}, value, setObj);
 			if (sizetemplateIDs.length !== undefined) {
 				_.each(sizetemplateIDs, id => {
 					removeRepeatingRow(`repeating_sizetemplate_${id}`);
 				});
 			}
-			clog(2, {}, 'upgraded to 1.7.7');
+			clog(2, {}, 'upgraded to 1.8.0');
 		}
 		
 		/** Build UI Functions **/
@@ -7991,8 +7992,10 @@
 		
 		function setTotalLift(debug, timer, attrdb, value, setObj) {
 			const size = value.static_template_size_name;
+			const rank = parseInt(value.static_template_size_rank);
 			clog(debug, timer, 'size =', size, 'setTotalLift()');
 			const liftMultiplier = size === 'Medium' ? 1 :
+				rank < 0 ? parseFloat(value.static_template_size_lift) :
 				parseInt(value.static_template_size_lift);
 			clog(debug, timer, 'liftMultiplier =', liftMultiplier);
 			const ssdb = attrdb.superstrength;
