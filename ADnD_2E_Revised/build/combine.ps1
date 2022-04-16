@@ -66,8 +66,19 @@ function CombineRecursive([String[]] $inputContent) {
    return $content
 }
 
-$inputContent = Get-Content -Path $baseFile
-$outputContent = CombineRecursive -inputContent $inputContent
-$outputContent | Set-Content -Path $outputFile
+function Combine([String] $baseFile, [String] $outputFile) {
+   Write-Host "---- Combining $baseFile ----"
+   $baseFilePath = Get-ChildItem -Path $sourceFolder -Filter $baseFile -Recurse
+   $outputFilePath = Get-ChildItem -Path $sourceFolder -Filter $outputFile -Recurse
+
+   $inputContent = Get-Content -Path $baseFilePath
+   $outputContent = CombineRecursive -inputContent $inputContent
+   $outputContent | Set-Content -Path $outputFilePath
+   Write-Host ""
+}
+
+Combine "2ESheet-base.html" "2ESheet.html"
+Combine "2EStyle-base.css" "2EStyle.css"
+
 $time = Get-Date -Format "HH:mm:ss";
 Write-Host "Combine complete $time"
