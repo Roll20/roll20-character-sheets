@@ -8,11 +8,12 @@ const BOOK_FIELDS = [
     'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
     'book-tom', 'book-aaeg',
     'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
-    'book-paladins', 'book-druids', 'book-barbarians', 'book-necromancers', 'book-ninjas'
+    'book-paladins', 'book-druids', 'book-barbarians', 'book-necromancers', 'book-ninjas',
+    'book-combat-and-tacticss',
 ];
 
-const SCHOOL_FIELDS = ['school-spells&magic'];
-const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', 'sphere-spells&magic'];
+const SCHOOL_FIELDS = ['school-spells-and-magic'];
+const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', 'sphere-spells-and-magic'];
 
 //#region Helper function
 function capitalizeFirst(s) {
@@ -28,17 +29,17 @@ const displaySize = function(size) {
 
     size = size.toLowerCase();
     switch (size) {
-        case 't': return 'Tiny';
+        case 't':
         case 'tiny': return 'Tiny';
-        case 's': return 'Small';
+        case 's':
         case 'small': return 'Small';
-        case 'm': return 'Medium';
+        case 'm':
         case 'medium': return 'Medium';
-        case 'l': return 'Large';
+        case 'l':
         case 'large': return 'Large';
-        case 'h': return 'Huge';
+        case 'h':
         case 'huge': return 'Huge';
-        case 'g': return 'Gargantuan';
+        case 'g':
         case 'gargantuan': return 'Gargantuan';
         default: capitalizeFirst(size);
     }
@@ -161,20 +162,30 @@ const showToast = function(type, title, message) {
 }
 
 const getActiveSettings = function (settingFields, values) {
-    return settingFields.map(bField => values[bField])
+    let settings = settingFields.map(bField => values[bField])
         .filter(Boolean)
-        .filter(book => book !== '0')
+        .filter(book => book !== '0');
+    return new Set(settings);
 }
 
 const isBookInactive = function (books, obj) {
     let activeBooks = getActiveSettings(BOOK_FIELDS, books);
-    return !activeBooks.includes(obj['book']);
+    if (Array.isArray(obj['book']))
+        return !obj['book'].some(b => activeBooks.has(b));
+    else
+        return !activeBooks.has(obj['book']);
 }
 
 const bookInactiveShowToast = function(books, obj) {
     let bookInactive = isBookInactive(books, obj);
-    if (bookInactive)
-        showToast(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
+    if (bookInactive) {
+        if (Array.isArray(obj['book'])) {
+            let booksString = obj['book'].map(b => '\n* ' + b).join('') + '\n'
+            showToast(ERROR, 'Missing Book(s)', `The book(s) ${booksString} are currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
+        } else {
+            showToast(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
+        }
+    }
     return bookInactive;
 };
 
@@ -789,7 +800,7 @@ const getSpellSpheres = function (spell, sphereRules) {
 }
 
 function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, activeBooks, optionalSpheres) {
-    if (!activeBooks.includes(spell['book']))
+    if (!activeBooks.has(spell['book']))
         return false;
 
     let spheres = getSpellSpheres(spell, optionalSpheres);
@@ -1204,40 +1215,12 @@ on('change:thac0-base-calc', function(eventInfo) {
 });
 
 //#region Weapons autofill
-function getBaseWeapon(weaponName, books) {
+function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field) {
     if (!weaponName)
         return;
 
     weaponName = weaponName.toLowerCase();
-    let baseWeapon = weapons[weaponName]
-    if (baseWeapon) {
-        if (bookInactiveShowToast(books, baseWeapon))
-            return;
-
-        return baseWeapon
-    }
-
-    let match = weaponName.match(/\s*\+([0-9]+)\s*/);
-    if (!match)
-        return;
-
-    let baseWeaponName = weaponName.replace(match[0], ' ').trim();
-    baseWeapon = weapons[baseWeaponName];
-    if (!baseWeapon)
-        return;
-
-    if (bookInactiveShowToast(books, baseWeapon))
-        return;
-
-    return baseWeapon;
-}
-
-function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
-    if (!weaponName)
-        return;
-
-    weaponName = weaponName.toLowerCase();
-    let fields = [...BOOK_FIELDS, thac0Field].filter(x => x !== undefined);
+    let fields = [...BOOK_FIELDS, thac0Field].filter(Boolean);
     getAttrs(fields, function(values) {
         let thac0 = parseInt(values[thac0Field]);
         thac0 = isNaN(thac0) ? 20 : thac0;
@@ -1276,7 +1259,8 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
             setWeaponFunc({
                 ...baseWeapon,
                 'thac0' : thac0,
-                'bonus' : '0'
+                'bonus' : '0',
+                'bonusInt': 0
             });
             return;
         }
@@ -1285,25 +1269,26 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
             ...baseWeapon,
             'thac0' : thac0,
             'speed' : Math.max(baseWeapon['speed'] - bonus, 0),
-            'bonus' : `+${bonus}`
+            'bonus' : `+${bonus}`,
+            'bonusInt': bonus
         }
-        if (isMonster) {
-            weaponWithBonus['small-medium'] += `+${bonus}`;
-            weaponWithBonus['large'] += `+${bonus}`;
-            weaponWithBonus['thac0'] = thac0 - bonus;
-        }
-
         setWeaponFunc(weaponWithBonus);
     });
 }
 
 //melee hit autofill
 on('change:repeating_weapons:weaponname', function(eventInfo) {
+    let comparer = function (weapon1, weapon2, isPo) {
+        if (isPo) {
+            let reach = 'reach';
+        }
+        return ['size','speed','type'].every(f => weapon1[f] === weapon2[f])
+    }
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {
             'repeating_weapons_attackadj'      : weapon['bonus'],
             'repeating_weapons_ThAC0'          : weapon['thac0'],
-            'repeating_weapons_range'          : 'Melee',
+            'repeating_weapons_range'          : weapon['reach'] || 'Melee',
             'repeating_weapons_size'           : weapon['size'],
             'repeating_weapons_weapspeed'      : weapon['speed'],
             'repeating_weapons_weaptype-slash' : weapon['type'].includes('S') ? 1 : 0,
@@ -1313,16 +1298,27 @@ on('change:repeating_weapons:weaponname', function(eventInfo) {
 
         setAttrs(weaponInfo);
     };
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
+    setWeaponWithBonus(eventInfo.newValue, comparer, setWeaponFunc, 'thac0-base-calc');
 });
 
 //melee damage autofill
-on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
+on('change:repeating_weapons-damage:weaponname1', function(eventInfo) {
+    let comparer = function (weapon1, weapon2) {
+        let fisk = ['small-medium','large'];
+        if (isPo) {
+            fisk.push('size');
+            fisk.push('type')
+            fisk.push('knockdown');
+        }
+        return fisk.every(f => weapon1[f] === weapon2[f])
+    }
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {
             'repeating_weapons-damage_damadj'     : weapon['bonus'],
             'repeating_weapons-damage_damsm'      : weapon['small-medium'],
             'repeating_weapons-damage_daml'       : weapon['large'],
+            'repeating_weapons-damage_damsize'    : weapon['size'],
+            'repeating_weapons-damage_damtype'    : weapon['type'],
             'repeating_weapons-damage_knockdown1' : weapon['knockdown'] || ''
         };
 
@@ -1333,7 +1329,10 @@ on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
 });
 
 //range hit autofill
-on('change:repeating_weapons2:weaponname2', function(eventInfo){
+on('change:repeating_weapons2:weaponname2', function(eventInfo) {
+    let comparer = function (weapon1, weapon2) {
+        return ['strength','rof','range','size','speed','type'].every(f => weapon1[f] === weapon2[f])
+    }
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {
             'repeating_weapons2_strbonus2'        : weapon['strength'] ? 1 : 0,
@@ -1355,7 +1354,10 @@ on('change:repeating_weapons2:weaponname2', function(eventInfo){
 });
 
 //range damage autofill
-on('change:repeating_ammo:ammoname', function(eventInfo){
+on('change:repeating_ammo:ammoname', function(eventInfo) {
+    let comparer = function (weapon1, weapon2) {
+        return ['strength','small-medium','large','size'].every(f => weapon1[f] === weapon2[f])
+    }
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {
             'repeating_weapons2_strbonus3'        : weapon['strength'] ? 1 : 0,
@@ -1388,7 +1390,7 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
                     [`${prefix}damadjhench${section}`]: weapon['bonus'],
                     [`${prefix}damsmhench${section}`]: weapon['small-medium'],
                     [`${prefix}damlhench${section}`]: weapon['large'],
-                    [`${prefix}rangehench${section}`]: weapon['range'] || 'Melee',
+                    [`${prefix}rangehench${section}`]: weapon['range'] || weapon['reach'] || 'Melee',
                     [`${prefix}weaptypehench${section}`]: weapon['type'],
                     [`${prefix}weapspeedhench${section}`]: weapon['speed'],
                 };
@@ -1422,6 +1424,11 @@ followerWeapons.forEach(fw => {
 // Monster weapons
 on('change:repeating_monsterweapons:weaponname', function(eventInfo){
     let setWeaponFunc = function (weapon) {
+        if (weapon.bonusInt > 1) {
+            weapon['small-medium'] += `+${bonus}`;
+            weapon['large'] += `+${bonus}`;
+            weapon['thac0'] = thac0 - bonus;
+        }
         let weaponInfo = {
             [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
             [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'],
@@ -1433,7 +1440,7 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo){
         setAttrs(weaponInfo);
     };
 
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'monsterthac0', true);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'monsterthac0');
 });
 //#endregion
 
