@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.8.0" readonly />
+													<input type="text" class="center" name="attr_version" value="1.8.1" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -8002,8 +8002,10 @@
 			const hasSuperStrength = ssdb === undefined ? false : 
 				_.chain(ssdb).pluck('level').reduce((p,c) => { return p + c; }, 0).value();
 			clog(debug, timer, 'hasSuperStrength =', hasSuperStrength);
+			const strValue = isNaN(parseInt(setObj.stat_total_str)) ?
+				parseInt(value.stat_total_str) : parseInt(setObj.stat_total_str);
 			const lift = hasSuperStrength ? parseInt(getSuperStrengthLift(debug, timer, hasSuperStrength)) : 
-				parseInt(value.stat_total_str) * 25;
+				strValue * 25;
 			clog(debug, timer, 'lift =', lift);
 			const totalLift = lift * liftMultiplier;
 			clog(debug, timer, 'totalLift =', totalLift);
@@ -8324,7 +8326,7 @@
 		}
 		
 		function getDefectPointsByCategory(value, rowID, defect){
-			const aspect = value[`repeating_attr_${rowID}_defectaspect`];
+			const aspect = value[`repeating_attr_${rowID}_defectaspect`] || [];
 			const result = defect == 'shortcoming' ? aspect.length > 3 ? -4 : -1 :
 				lesser_defects_regex.test(defect) ? -1 :
 				serious_defects_regex.test(defect) ? -2 :
@@ -9110,8 +9112,8 @@
 			const showMajorAspectStats = majorAspectInUse ? 1 : 0;
 			setObj.showallaspectsstats = showAllAspectsStats;
 			setObj.showmajoraspectstats = showMajorAspectStats;
-			clog(debug, timer, 'showallaspectsstats =', showallaspectsstats, 'setStatAspectView()');
-			clog(debug, timer, 'showmajoraspectstats =', showmajoraspectstats);
+			clog(debug, timer, 'showallaspectsstats =', showAllAspectsStats, 'setStatAspectView()');
+			clog(debug, timer, 'showmajoraspectstats =', showMajorAspectStats);
 		}
 		
 		function setDamageLevelByDamageTaken(debug, timer, value, setObj, sourceAttr) {
@@ -10789,7 +10791,8 @@
 			_.each(all_defects_array, defectmatch => {
 				defectmatch = removeWhiteSpace(defectmatch);
 				const exposesetting = defectmatch == defect ? 1 : 0;
-				setObj[`repeating_attr_${rowID}_show${defectmatch}`] = exposesetting;
+				//setObj[`repeating_attr_${rowID}_show${defectmatch}`] = exposesetting;
+				writeValues(debug, timer, value, `repeating_attr_${rowID}_show${defectmatch}`, exposesetting, setObj);
 				exposesetting ? exposed_settings.push(`show${defectmatch}`) : false;
 			});
 			clog(debug, timer, 'exposed_settings:', exposed_settings, 'exposeDefectSettingsOnDefectChange()');
@@ -14162,6 +14165,7 @@
 										}
 										setGroupDefectPointsOnActivation(debug, timer, attrIDs, attrdb, value, sectionName, rowID, setObj);
 										setDepleteResurvation(debug, timer, attrdb, value, rowID, setObj);
+										setTotalLift(debug, timer, attrdb, value, setObj);
 									break;
 									case `lock`:
 										if (resetOnActive(debug, timer, eventInfo, value, match, rowID, setObj)) return;
