@@ -4,6 +4,12 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.12.00 (Build 15)
+
+### Features
+
+- changed keen, grievieous, fell weapon spec from checkbox into selectable valued options
+
 ## 02.11.00 (Build 14)
 
 ### Features
