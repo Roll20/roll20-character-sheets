@@ -21628,7 +21628,7 @@
 										<input class="sheet-center" type="number" name="attr_SecretSigns" value="(@{SecretSignsChar}+@{SecretSignsAdv}+@{SecretSignsMisc}+(@{condgen_see}*-1))*@{SecretSignsTaken}" disabled="true" />
 									</div>
 									<div class="sheet-col-7-100 sheet-center sheet-pad-r-sm sheet-vert-middle">
-										<button type="roll" class="sheet-roll" name="roll_SecretSigns" value="@{Whisper} &{template:whfrp2e} {{modvalue=[[?{@{translation_modifier}|0}]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see}-@{DrunkMod}]]}} {{drunk=[[@{DrunkMod}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[0]]}} {{entangled=[[0]]}} {{blinded=[[0]]}} {{deafened=[[0]]}} {{title=@{SecretSignsSpecialization}}} {{skill=^{SECRET-SIGNS}}}} {{character_name=@{character_name}}} {{target=[[ [[@{condgen_see}*-1]] [COND] + [[(@{SecretSignsChar}+@{SecretSignsAdv}+@{SecretSignsMisc})*@{SecretSignsTaken}]] [SKILL] + ?{@{translation_modifier}|0} [MOD] ]]}} {{skilltest=true}} {{SLmod=[[?{SL Modifier|0}]]}} {{test=[[@{roll_rule}]]}} {{mod1type=[[@{SecretSigns_modtype1}]]}} {{mod1=@{SecretSigns_mod1}}} {{mod2type=[[@{SecretSigns_modtype2}]]}} {{mod2=@{SecretSigns_mod2}}} {{mod3type=[[@{SecretSigns_modtype3}]]}} {{mod3=@{SecretSigns_mod3}}} {{reroll=@{RT-rep}SecretSigns)}}"></button>
+										<button type="roll" class="sheet-roll" name="roll_SecretSigns" value="@{Whisper} &{template:whfrp2e} {{modvalue=[[?{@{translation_modifier}|0}]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see}-@{DrunkMod}]]}} {{drunk=[[@{DrunkMod}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[0]]}} {{entangled=[[0]]}} {{blinded=[[0]]}} {{deafened=[[0]]}} {{title=@{SecretSignsSpecialization}}} {{skill=^{SECRETSIGNS}}}} {{character_name=@{character_name}}} {{target=[[ [[@{condgen_see}*-1]] [COND] + [[(@{SecretSignsChar}+@{SecretSignsAdv}+@{SecretSignsMisc})*@{SecretSignsTaken}]] [SKILL] + ?{@{translation_modifier}|0} [MOD] ]]}} {{skilltest=true}} {{SLmod=[[?{SL Modifier|0}]]}} {{test=[[@{roll_rule}]]}} {{mod1type=[[@{SecretSigns_modtype1}]]}} {{mod1=@{SecretSigns_mod1}}} {{mod2type=[[@{SecretSigns_modtype2}]]}} {{mod2=@{SecretSigns_mod2}}} {{mod3type=[[@{SecretSigns_modtype3}]]}} {{mod3=@{SecretSigns_mod3}}} {{reroll=@{RT-rep}SecretSigns)}}"></button>
 						</div>
 						<div class="sheet-col-1-20 sheet-center sheet-pad-r-sm sheet-vert-middle">
 							<input type="checkbox" name="attr_SecretSignsTaken" value="1" />
@@ -40556,7 +40556,7 @@
 										{{/grpadv}}	
 										
 										{{#rollGreater() usedmagic 0}}{{#usedmagiceffect}}
-											<div class="sheet-col-100-100 sheet-pad-l-md sheet-pad-r-md sheet-no-yellow-bg" style="margin-left: 4px; color: #858585; font-weight: bold">{{usedmagiceffect}}</div>
+											<div class="sheet-col-100-100 sheet-pad-l-md sheet-pad-r-md sheet-no-yellow-bg" style="margin-left: 4px; color: #858585; font-weight: bold">{{usedmagiceffect}}</div>{{cond}}{{drunk}}
 										{{/usedmagiceffect}}{{/rollGreater() usedmagic 0}}										
 										
 										{{#rollGreater() disarm 0}}			
@@ -46750,8 +46750,8 @@ on('sheet:opened change:armorplatelegspenalty change:armorplatepenalty', functio
 		if (v.Talent_AmbidextrousLvl == 0) {ambipen = 2;}
 		if (v.Talent_AmbidextrousLvl == 1) {ambipen = 1;}
 		if (v.Talent_AmbidextrousLvl == 2) {ambipen = 0;}
-		var offpen = Math.min(parrypen, ambipen);
-		if (v.Used_MeleeTwohanded == 1) {offpen = 0; offpen2 = 0;} else {offpen2 = offpen;}	
+		var offpen = ambipen;
+		if (v.Used_MeleeTwohanded == 1) {offpen = 0; offpen2 = 0;} else {offpen2 = Math.min(ambipen, parrypen);}	
 		
 		let toggle = v.ConditionModEnable;
 		let dmod = v.Drunk * toggle;
@@ -46793,7 +46793,6 @@ on('sheet:opened change:armorplatelegspenalty change:armorplatepenalty', functio
 	let condseemoveatkoff = condseemoveatk;
 	let condseemovedefoff = condseemovedef;
 		console.log(condseemoveatkoff);
-		console.log(condseemovedefoff);
 		
 	if (condseemoveatkoff > 0) {apen3 = offpen + condseemoveatkoff - 3; if (apen3 < 0) {apen3 = 0;}; condseemoveatkoff -= apen3;} else {apen3 = 0;}
 	if (apen3 < 0) {apen3 = 0;}
@@ -46802,28 +46801,31 @@ on('sheet:opened change:armorplatelegspenalty change:armorplatepenalty', functio
 	
 	let dmodpout = dmodout - ((v.armorcoifpenalty*1 + v.armorhelmpenalty*1)/10 + dmodout -3);
 	let dmodsout = dmodout - ((v.armormailpenalty*1 + v.armorplatepenalty*1 + v.armorplatelegspenalty*1)/10 + dmodout -3);
+	
 	let dmodatkout = dmodout - (offpen + dmodout - 3);
 	let dmoddefout = dmodout - (offpen2 + dmodout - 3);
 	if (dmodout == 0) {dmodpout = 0;}
 	if (dmodout == 0) {dmodsout = 0;}
 	if (dmodout == 0) {dmodatkout = 0;}
+	if (dmodout < dmodatkout) {dmodatkout = dmodout;}
 	if (dmodout == 0) {dmoddefout = 0;}
+	if (dmodout < dmoddefout) {dmoddefout = dmodout;}
 	
-	if (v.Blinded > 3) {modbl = 3;} else {modbl = v.Blinded;}
-	if (v.Broken > 3) {modbr = 3;} else {modbr = v.Broken;}
-	if (v.Deafened > 3) {modd = 3;} else {modd = v.Deafened;}
-	if (v.Entangled > 3) {mode = 3;} else {mode = v.Entangled;}
-	if (v.Fatigued > 3) {modf = 3;} else {modf = v.Fatigued;}
-	if (v.Poisoned > 3) {modpi = 3;} else {modpi = v.Poisoned;}
-	if (v.Stuned > 3) {mods = 3;} else {mods = v.Stuned;}
+	if (v.Blinded > 3) {modbl = 3;} else {modbl = v.Blinded*1;}
+	if (v.Broken > 3) {modbr = 3;} else {modbr = v.Broken*1;}
+	if (v.Deafened > 3) {modd = 3;} else {modd = v.Deafened*1;}
+	if (v.Entangled > 3) {mode = 3;} else {mode = v.Entangled*1;}
+	if (v.Fatigued > 3) {modf = 3;} else {modf = v.Fatigued*1;}
+	if (v.Poisoned > 3) {modpi = 3;} else {modpi = v.Poisoned*1;}
+	if (v.Stuned > 3) {mods = 3;} else {mods = v.Stuned*1;}
 	let modpr = v.Prone*2;
 	
 		setAttrs({
 		"DrunkMod" : dmodout * 10,
 		"DrunkPercMod" : (dmodout - dmodpout) * 10,
 		"DrunkStealthMod" : (dmodout - dmodsout) * 10,
-		"DrunkAtkMod" : (dmodout - dmodatkout) * 10,
-		"DrunkDefMod" : (dmodout - dmoddefout) * 10,
+		"DrunkAtkMod" : dmodatkout * 10,
+		"DrunkDefMod" : dmoddefout * 10,
 		"BlindedMod" : modbl * toggle * 10,
 		"BlindedPercMod" : apen * 10,
 		"BlindedStealthMod" : apen2 * 10,
@@ -47514,7 +47516,7 @@ on('sheet:opened change:repeating_secretsigns:secretsignsspecialization change:r
 
 				var xpout = xptotal;
 				var disp = v[`repeating_secretsigns_${id}_SecretSignsSpecialization`];
-				var dispout = '#' + '(' + getTranslationByKey('SECRET-SIGNS') + ') ' + disp + ' -' + ' ' + getTranslationByKey('ABBREVIATE-ADVANCE') + ': ' + artxp + ' -'  + ' ' + getTranslationByKey('XP') + ': ' + xptotal  + '  ✥  ' + '#' ;
+				var dispout = '#' + '(' + getTranslationByKey('SECRETSIGNS') + ') ' + disp + ' -' + ' ' + getTranslationByKey('ABBREVIATE-ADVANCE') + ': ' + artxp + ' -'  + ' ' + getTranslationByKey('XP') + ': ' + xptotal  + '  ✥  ' + '#' ;
 				
 						output[`repeating_secretsigns_${id}_SecretSignsSpecializationXP`] = xpout, setAttrs(output, {silent: true})
 						output[`repeating_secretsigns_${id}_SecretSignsSpecializationDis`] = dispout, setAttrs(output, {silent: true})
@@ -49858,13 +49860,12 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 			if (values.Talent_AmbidextrousLvl == 2) {ambipen = 0;}
 			if (values.Used_MeleeTwohanded == 1) {ambipen = 0;}
 
-   let roll = '{{test=[[>test<]]}} {{sl=[[0]]}} {{slbonus=[[@{Used_DefensePrecise}+@{Used_DefensePractical}>addsl< [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusAtkOff}>addsl<]]}} {{sladd=[[0]]}} {{csloc=[[0>csloc<]]}} {{cscount=[[0>cscount<]]}} {{modvalue=[[?{Opposed Attack Modifier|@{Used_DefenseBonus}}]]}} {{title=@{Used_DefenseWeapon}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{ATTACK}}} {{target=[[>target<]]}} {{offpen=[[>ambi<]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0}]]}} >hitloc< {{reach=@{Used_DefenseReach}}} {{damaging=[[@{Used_DefenseDamaging}]]}} {{rolltype=[[@{Used_DefenseImpale}]]}} {{qualities=@{Used_DefenseQualities}}} {{sitmod=[[0]]}} {{damage=[[@{Used_DefenseStrengthBonus}+@{Used_DefenseDamageBonus}+@{Talent_StrikeMightyBlowLvl}>adddmg<-{[[@{Used_DefenseDmgTaken}-@{Used_DefenseDurable}]],[[0]]}kh1]]}} {{NPC=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move_atkoff}-@{DrunkAtkMod}]]}} {{drunk=[[@{DrunkMod} - @{DrunkAtkMod}]]}} {{fatigued=[[@{FatiguedMod} - @{FatiguedAtkMod}]]}} {{broken=[[@{BrokenMod} - @{BrokenAtkMod}]]}} {{stuned=[[@{StunedMod} - @{StunedAtkMod}]]}} {{poisoned=[[@{PoisonedMod} - @{PoisonedAtkMod}]]}} {{prone=[[@{ProneMod} - @{ProneAtkMod}]]}} {{fast=[[@{Used_DefenseFast}]]}} {{slow=[[@{Used_DefenseSlow}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod} - @{BlindedMod}]]}} {{deafened=[[0]]}} {{tiring=[[@{Used_DefenseTiring}]]}} {{penetrating=[[@{Used_DefensePenetrating}]]}} {{pummel=[[@{Used_DefensePummel}]]}} {{hack=[[@{Used_DefenseHack}]]}} {{precise=[[@{Used_DefensePrecise}]]}} {{impact=[[@{Used_DefenseImpact}]]}} {{practical=[[@{Used_DefensePractical}]]}} {{wrap=[[@{Used_DefenseWrap}]]}} {{trip=[[@{Used_DefenseTrip}]]}} {{slash=[[@{Used_DefenseSlash}*@{Used_DefenseSlashRating}]]}} {{distract=[[@{Used_DefenseDistract}]]}} {{undamaging=[[@{Used_DefenseUndamaging}]]}} {{mod1type=[[@{Used_Defense_att_modtype1}]]}} {{mod1=@{Used_Defense_att_mod1}}} {{mod2type=[[@{Used_Defense_att_modtype2}]]}} {{mod2=@{Used_Defense_att_mod2}}} {{mod3type=[[@{Used_Defense_att_modtype3}]]}} {{mod3=@{Used_Defense_att_mod3}}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}} {{carefulstrike=[[@{Talent_CarefulStrikeLvl}]]}} {{bne=[[@{MeleeMode_BNE}]]}} {{inf=[[@{MeleeMode_Infight}]]}} {{usedmagic=[[@{Used_DefenseMagic}]]}}  {{usedmagiceffect=@{Used_DefenseMagicEffect}}}';
+   let roll = '{{test=[[>test<]]}} {{sl=[[0]]}} {{slbonus=[[@{Used_DefensePrecise}+@{Used_DefensePractical}>addsl< [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusAtkOff}>addsl<]]}} {{sladd=[[0]]}} {{csloc=[[0>csloc<]]}} {{cscount=[[0>cscount<]]}} {{modvalue=[[?{Opposed Attack Modifier|@{Used_DefenseBonus}}]]}} {{title=@{Used_DefenseWeapon}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{ATTACK}}} {{target=[[>target<]]}} {{offpen=[[>ambi<]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0}]]}} >hitloc< {{reach=@{Used_DefenseReach}}} {{damaging=[[@{Used_DefenseDamaging}]]}} {{rolltype=[[@{Used_DefenseImpale}]]}} {{qualities=@{Used_DefenseQualities}}} {{sitmod=[[0]]}} {{damage=[[@{Used_DefenseStrengthBonus}+@{Used_DefenseDamageBonus}+@{Talent_StrikeMightyBlowLvl}>adddmg<-{[[@{Used_DefenseDmgTaken}-@{Used_DefenseDurable}]],[[0]]}kh1]]}} {{NPC=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move_atkoff}-@{DrunkAtkMod}]]}} {{drunk=[[@{DrunkAtkMod}]]}} {{fatigued=[[@{FatiguedMod} - @{FatiguedAtkMod}]]}} {{broken=[[@{BrokenMod} - @{BrokenAtkMod}]]}} {{stuned=[[@{StunedMod} - @{StunedAtkMod}]]}} {{poisoned=[[@{PoisonedMod} - @{PoisonedAtkMod}]]}} {{prone=[[@{ProneMod} - @{ProneAtkMod}]]}} {{fast=[[@{Used_DefenseFast}]]}} {{slow=[[@{Used_DefenseSlow}]]}} {{entangled=[[@{EntangledMod} - @{EntangledAtkMod}]]}} {{blinded=[[@{BlindedMod} - @{BlindedAtkMod}]]}} {{deafened=[[0]]}} {{tiring=[[@{Used_DefenseTiring}]]}} {{penetrating=[[@{Used_DefensePenetrating}]]}} {{pummel=[[@{Used_DefensePummel}]]}} {{hack=[[@{Used_DefenseHack}]]}} {{precise=[[@{Used_DefensePrecise}]]}} {{impact=[[@{Used_DefenseImpact}]]}} {{practical=[[@{Used_DefensePractical}]]}} {{wrap=[[@{Used_DefenseWrap}]]}} {{trip=[[@{Used_DefenseTrip}]]}} {{slash=[[@{Used_DefenseSlash}*@{Used_DefenseSlashRating}]]}} {{distract=[[@{Used_DefenseDistract}]]}} {{undamaging=[[@{Used_DefenseUndamaging}]]}} {{mod1type=[[@{Used_Defense_att_modtype1}]]}} {{mod1=@{Used_Defense_att_mod1}}} {{mod2type=[[@{Used_Defense_att_modtype2}]]}} {{mod2=@{Used_Defense_att_mod2}}} {{mod3type=[[@{Used_Defense_att_modtype3}]]}} {{mod3=@{Used_Defense_att_mod3}}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}} {{carefulstrike=[[@{Talent_CarefulStrikeLvl}]]}} {{bne=[[@{MeleeMode_BNE}]]}} {{inf=[[@{MeleeMode_Infight}]]}} {{usedmagic=[[@{Used_DefenseMagic}]]}}  {{usedmagiceffect=@{Used_DefenseMagicEffect}}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e} ';
 
 	adddmg = '';
-	
 	
 	if (trigger == "meleeattackoff") {rollEnd = ' {{berserkcharge=[[0]]}} {{RTfuriousassault=@{RT-furiousassaultoff}}} {{furiousassault=[[@{Talent_FuriousAssaultLvl}]]}} {{reroll=@{RT-reroll}MeleeAttackOff)}} {{RTdualwield=@{RT-dualwieldmain}}} {{dualwield=[[@{Talent_DualWielderLvl}]]}}';
 	rollPart2 = roll.replaceAll('>addsl<', '>addsldf<');
@@ -49926,7 +49927,6 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
                console.log(battlefrenzy);
 				
         startRoll(rollBegins + rollPart + rollEnd + rollBrawl, (results) => {	
-               console.log(results);
             const target = results.results.target.result
             const test = results.results.test.result
             const sl = results.results.sl.result
@@ -50007,8 +50007,6 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 
 			if (breakenter > 0) {if (values.MeleeMode_BNE  == 1) {bneadd = breakenter;} else {bneadd = 0;}} else {bneadd = 0;}
 			if (values.MeleeMode_Infight > 0) {if (values.MeleeMode_Infight  == 1) {infadd = infight;} else {infadd = 0;}} else {infadd = 0;}
-			
-               console.log(infadd);
 			   
 		if (values.MeleeMode_Charging  == 1) {setAttrs({
 			"Used_MeleeBonus": values.Used_MeleeBonus - 10,
@@ -50083,7 +50081,7 @@ on('clicked:meleeopposedoff', (eventInfo) => {
 			var offpen = Math.min(parrypen, ambipen) * -1;
 			if (values.Used_MeleeTwohanded == 1) {offpen = 0;}
 	
-   let roll = '{{test=[[@{roll_rule}]]}} {{sl=[[0]]}} {{sladd=[[0]]}} {{slbonus=[[@{DefensiveTotal}+@{Used_DefensePractical}+@{Talent_RiposteLvl}+@{Talent_ReversalLvl}+(@{Used_DefenseShield}*@{Talent_ShieldsmanLvl})>addsl<]]}} {{slbonusdef=[[@{slbonusDefOff}>addsl<]]}} {{sitmod=[[0]]}} {{modvalue=[[?{Opposed Defense Modifier|@{Used_DefenseBonusDef}}]]}} {{title=@{Used_DefenseWeapon}}} {{character_name=@{character_name}}} {{advantage=[[@{AdvantageDisplay}]]}} {{target=[[ [[@{condgen_see_move_defoff}*-1]] [COND] + [[>offpen<]] [PEN] + [[@{Used_DefenseWeaponSkill}]] [SKILL] + ?{Opposed Defense Modifier|@{Used_DefenseBonusDef}} [MOD] + [[@{Advantage}*10]] [ADV] ]]}} {{attacktest=true}} {{SLmod=[[?{SL Modifier|0}]]}} {{reach=@{Used_DefenseReach}}} {{damaging=[[@{Used_DefenseDamaging}]]}} {{rolltype=[[@{Used_DefenseImpale}]]}} {{offpen=[[>offpen<]]}} {{qualities=@{Used_DefenseQualities}}} {{showdmg=[[@{Used_DefenseOpposedDmg}]]}} {{hitlocation=true}} {{fast=[[@{Used_DefenseFast}]]}} {{damage=[[@{Used_DefenseStrengthBonus}+@{Used_DefenseDamageBonus}+@{Talent_StrikeMightyBlowLvl}-{[[@{Used_DefenseDmgTaken}-@{Used_DefenseDurable}]],[[0]]}kh1]]}} {{armorqualities=[[@{armorqualities}]]}} {{aq1=[[@{armorimpenetrable}]]}} {{aq2=[[@{armorweakpoints}]]}} {{aq3=[[@{armorpartial}]]}} {{aq4=[[@{armorcustom}]]}} {{aqtxt=@{armorQuality}}} {{attacktype=^{PARRY}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move_defoff}-@{DrunkDefMod}]]}} {{drunk=[[@{DrunkMod} - @{DrunkDefMod}]]}} {{fatigued=[[@{FatiguedMod} - @{FatiguedDefMod}]]}} {{broken=[[@{BrokenMod} - @{BrokenDefMod}]]}} {{stuned=[[@{StunedMod} - @{StunedDefMod}]]}} {{poisoned=[[@{PoisonedMod} - @{PoisonedDefMod}]]}} {{prone=[[0]]}} {{entangled=[[@{EntangledMod} - @{EntangledDefMod}]]}} {{blinded=[[@{BlindedMod} - @{BlindedDefMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Defense_modtype1}]]}} {{mod1=@{Used_Defense_mod1}}} {{mod2type=[[@{Used_Defense_modtype2}]]}} {{mod2=@{Used_Defense_mod2}}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{RTriposte=@{RT-ripostedmgoff}}} {{reroll=@{RT-reroll}MeleeOpposedOff)}} {{mod3type=[[@{Used_Defense_modtype3}]]}} {{mod3=@{Used_Defense_mod3}}} {{fast=[[@{Used_DefenseFast}]]}} {{slow=[[@{Used_DefenseSlow}]]}} {{hack=[[@{Used_DefenseHack}]]}} {{shieldsman=[[@{Used_DefenseShield}*@{Talent_ShieldsmanLvl}]]}} {{practical=[[@{Used_DefensePractical}]]}} {{impact=[[@{Used_DefenseImpact}]]}} {{tiring=[[@{Used_DefenseTiring}]]}} {{penetrating=[[@{Used_DefensePenetrating}]]}} {{pummel=[[@{Used_DefensePummel}]]}} {{defensive=[[@{DefensiveTotal}]]}} {{riposte=[[@{Talent_RiposteLvl}]]}} {{reversal=[[@{Talent_ReversalLvl}]]}} {{trapblade=[[@{Used_DefenseTrapBlade}]]}} {{unbalanced=[[@{Used_DefenseUnbalanced}]]}} {{RTtrapblade=@{RT-trapblade}}} {{RTshieldbash=@{RT-shieldbash}}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}} {{carefulstrike=[[@{Talent_CarefulStrikeLvl}]]}} {{usedmagic=[[@{Used_DefenseMagic}]]}}  {{usedmagiceffect=@{Used_DefenseMagicEffect}}}';
+   let roll = '{{test=[[@{roll_rule}]]}} {{sl=[[0]]}} {{sladd=[[0]]}} {{slbonus=[[@{DefensiveTotal}+@{Used_DefensePractical}+@{Talent_RiposteLvl}+@{Talent_ReversalLvl}+(@{Used_DefenseShield}*@{Talent_ShieldsmanLvl})>addsl<]]}} {{slbonusdef=[[@{slbonusDefOff}>addsl<]]}} {{sitmod=[[0]]}} {{modvalue=[[?{Opposed Defense Modifier|@{Used_DefenseBonusDef}}]]}} {{title=@{Used_DefenseWeapon}}} {{character_name=@{character_name}}} {{advantage=[[@{AdvantageDisplay}]]}} {{target=[[ [[@{condgen_see_move_defoff}*-1]] [COND] + [[>offpen<]] [PEN] + [[@{Used_DefenseWeaponSkill}]] [SKILL] + ?{Opposed Defense Modifier|@{Used_DefenseBonusDef}} [MOD] + [[@{Advantage}*10]] [ADV] ]]}} {{attacktest=true}} {{SLmod=[[?{SL Modifier|0}]]}} {{reach=@{Used_DefenseReach}}} {{damaging=[[@{Used_DefenseDamaging}]]}} {{rolltype=[[@{Used_DefenseImpale}]]}} {{offpen=[[>offpen<]]}} {{qualities=@{Used_DefenseQualities}}} {{showdmg=[[@{Used_DefenseOpposedDmg}]]}} {{hitlocation=true}} {{fast=[[@{Used_DefenseFast}]]}} {{damage=[[@{Used_DefenseStrengthBonus}+@{Used_DefenseDamageBonus}+@{Talent_StrikeMightyBlowLvl}-{[[@{Used_DefenseDmgTaken}-@{Used_DefenseDurable}]],[[0]]}kh1]]}} {{armorqualities=[[@{armorqualities}]]}} {{aq1=[[@{armorimpenetrable}]]}} {{aq2=[[@{armorweakpoints}]]}} {{aq3=[[@{armorpartial}]]}} {{aq4=[[@{armorcustom}]]}} {{aqtxt=@{armorQuality}}} {{attacktype=^{PARRY}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move_defoff}-@{DrunkDefMod}]]}} {{drunk=[[@{DrunkDefMod}]]}} {{fatigued=[[@{FatiguedMod} - @{FatiguedDefMod}]]}} {{broken=[[@{BrokenMod} - @{BrokenDefMod}]]}} {{stuned=[[@{StunedMod} - @{StunedDefMod}]]}} {{poisoned=[[@{PoisonedMod} - @{PoisonedDefMod}]]}} {{prone=[[0]]}} {{entangled=[[@{EntangledMod} - @{EntangledDefMod}]]}} {{blinded=[[@{BlindedMod} - @{BlindedDefMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Defense_modtype1}]]}} {{mod1=@{Used_Defense_mod1}}} {{mod2type=[[@{Used_Defense_modtype2}]]}} {{mod2=@{Used_Defense_mod2}}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{RTriposte=@{RT-ripostedmgoff}}} {{reroll=@{RT-reroll}MeleeOpposedOff)}} {{mod3type=[[@{Used_Defense_modtype3}]]}} {{mod3=@{Used_Defense_mod3}}} {{fast=[[@{Used_DefenseFast}]]}} {{slow=[[@{Used_DefenseSlow}]]}} {{hack=[[@{Used_DefenseHack}]]}} {{shieldsman=[[@{Used_DefenseShield}*@{Talent_ShieldsmanLvl}]]}} {{practical=[[@{Used_DefensePractical}]]}} {{impact=[[@{Used_DefenseImpact}]]}} {{tiring=[[@{Used_DefenseTiring}]]}} {{penetrating=[[@{Used_DefensePenetrating}]]}} {{pummel=[[@{Used_DefensePummel}]]}} {{defensive=[[@{DefensiveTotal}]]}} {{riposte=[[@{Talent_RiposteLvl}]]}} {{reversal=[[@{Talent_ReversalLvl}]]}} {{trapblade=[[@{Used_DefenseTrapBlade}]]}} {{unbalanced=[[@{Used_DefenseUnbalanced}]]}} {{RTtrapblade=@{RT-trapblade}}} {{RTshieldbash=@{RT-shieldbash}}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}} {{carefulstrike=[[@{Talent_CarefulStrikeLvl}]]}} {{usedmagic=[[@{Used_DefenseMagic}]]}}  {{usedmagiceffect=@{Used_DefenseMagicEffect}}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
@@ -50129,8 +50127,6 @@ on('clicked:meleeopposedoff', (eventInfo) => {
 			if (infight > 0) {if (values.MeleeMode_Infight  == 1) {infadd = infight;} else {infadd = 0;}} else {infadd = 0;}
             if (values.MeleeMode_Drilled  == 1) {drilled = results.results.drilled.result} else {drilled = 0;}
 			
-            console.log(values.MeleeMode_Infight);
-            console.log(infadd);
 			   
 			bfrenzy = battlerage * frenzy;
 
