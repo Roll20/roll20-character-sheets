@@ -194,7 +194,8 @@
                                 checked="checked">Shield</label>
                     </div>
                     <span class="diamond-small">
-                        <span><input name="attr_shieldparry" value="0" type="number"></span></span>
+                        <span><input name="attr_shieldparry_total" value="0" type="number"
+                                readonly="readonly"></span></span>
                     <div class="center">
                         <span class="diamond-small">
                             <span><input name="attr_otherparry" value="0" type="number"></span></span>
@@ -783,9 +784,7 @@
                 <input type="hidden" value="1" name="attr_weapon_fell_1">
                 <select name="attr_weapon_fell_val_1">
                     <option value="0" selected default></option>
-                    <option value="1">+1</option>
                     <option value="2">+2</option>
-                    <option value="3">+3</option>
                     <option value="4">+4</option>
                 </select>
                 <input type="hidden" value="1" name="attr_weapon_grievous_1">
@@ -831,9 +830,7 @@
                 <input type="hidden" value="1" name="attr_weapon_fell_2">
                 <select name="attr_weapon_fell_val_2">
                     <option value="0" selected default></option>
-                    <option value="1">+1</option>
                     <option value="2">+2</option>
-                    <option value="3">+3</option>
                     <option value="4">+4</option>
                 </select>
                 <input type="hidden" value="1" name="attr_weapon_grievous_2">
@@ -879,9 +876,7 @@
                 <input type="hidden" value="1" name="attr_weapon_fell_3">
                 <select name="attr_weapon_fell_val_3">
                     <option value="0" selected default></option>
-                    <option value="1">+1</option>
                     <option value="2">+2</option>
-                    <option value="3">+3</option>
                     <option value="4">+4</option>
                 </select>
                 <input type="hidden" value="1" name="attr_weapon_grievous_3">
@@ -927,9 +922,7 @@
                 <input type="hidden" value="1" name="attr_weapon_fell_4">
                 <select name="attr_weapon_fell_val_4">
                     <option value="0" selected default></option>
-                    <option value="1">+1</option>
                     <option value="2">+2</option>
-                    <option value="3">+3</option>
                     <option value="4">+4</option>
                 </select>
                 <input type="hidden" value="1" name="attr_weapon_grievous_4">
@@ -975,9 +968,7 @@
                 <input type="hidden" value="1" name="attr_weapon_fell_5">
                 <select name="attr_weapon_fell_val_5">
                     <option value="0" selected default></option>
-                    <option value="1">+1</option>
                     <option value="2">+2</option>
-                    <option value="3">+3</option>
                     <option value="4">+4</option>
                 </select>
                 <input type="hidden" value="1" name="attr_weapon_grievous_5">
@@ -1023,9 +1014,7 @@
                 <input type="hidden" value="1" name="attr_weapon_fell_6">
                 <select name="attr_weapon_fell_val_6">
                     <option value="0" selected default></option>
-                    <option value="1">+1</option>
                     <option value="2">+2</option>
-                    <option value="3">+3</option>
                     <option value="4">+4</option>
                 </select>
                 <input type="hidden" value="1" name="attr_weapon_grievous_6">
@@ -1126,8 +1115,8 @@
                 <input type="hidden" class="center gridcol4" value="1" name="attr_shieldreinf"></checkbox>
                 <select name="attr_shieldreinf_val" class="center gridcol4">
                     <option value="0" selected default></option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
+                    <option value="1">+1</option>
+                    <option value="2">+2</option>
                 </select>
                 <input type="hidden" class="center gridcol5" value="1" name="attr_shieldcm"></checkbox>
                 <select name="attr_shieldcm_val" class="center gridcol5">
@@ -2001,11 +1990,13 @@
     // calc total load on change events for weapons, armour and treasure
     on( "change:weapon_load_1 change:weapon_load_2 change:weapon_load_3 change:weapon_load_4 change:weapon_load_5 change:weapon_load_6 " + 
         "change:armourload change:helmload change:shieldload change:otherload change:treasureload " + 
+        "change:armourcm_val change:helmetcm_val change:othercm_val change:shieldcm_val " + 
         "change:armourprot_active change:shieldparry_active change:helmprot_active change:otherprot_active " + 
         "change:weapon_active_1 change:weapon_active_2 change:weapon_active_3 change:weapon_active_4 change:weapon_active_5 change:weapon_active_6 " + 
         "change:fatigue change:load sheet:opened", function() {
         getAttrs(["weapon_load_1","weapon_load_2","weapon_load_3","weapon_load_4","weapon_load_5","weapon_load_6",
-                  "armourload","shieldload","helmload", "otherload", "fatigue","treasureload",
+                  "armourload","shieldload","helmload","otherload","fatigue","treasureload",
+                  "armourcm_val","shieldcm_val","helmetcm_val","othercm_val", 
                   "armourprot_active", "helmprot_active", "shieldparry_active", "otherprot_active", 
                   "weapon_active_1", "weapon_active_2", "weapon_active_3", "weapon_active_4", "weapon_active_5", "weapon_active_6"], function(values) {
             const 	weaponload1 = (int(values.weapon_active_1) == 1) ? int(values.weapon_load_1) : 0,
@@ -2014,12 +2005,13 @@
                     weaponload4 = (int(values.weapon_active_4) == 1) ? int(values.weapon_load_4) : 0,
                     weaponload5 = (int(values.weapon_active_5) == 1) ? int(values.weapon_load_5) : 0,
                     weaponload6 = (int(values.weapon_active_6) == 1) ? int(values.weapon_load_6) : 0,
-                    armourload = (int(values.armourprot_active) == 1) ? int(values.armourload) : 0,
-                    shieldload = (int(values.shieldparry_active) == 1) ? int(values.shieldload) : 0,
-                    helmload = (int(values.helmprot_active) == 1) ? int(values.helmload) : 0,
-                    otherload = (int(values.otherprot_active) == 1) ? int(values.otherload) : 0,
+                    armourload = (int(values.armourprot_active) == 1) ? int(values.armourload) + int(values.armourcm_val) : 0,
+                    shieldload = (int(values.shieldparry_active) == 1) ? int(values.shieldload) + int(values.shieldcm_val) : 0,
+                    helmload = (int(values.helmprot_active) == 1) ? int(values.helmload) + int(values.helmetcm_val) : 0,
+                    otherload = (int(values.otherprot_active) == 1) ? int(values.otherload) + int(values.othercm_val) : 0,
                     treasureload = int(values.treasureload),
                     load = armourload + shieldload + helmload + otherload + weaponload1 + weaponload2 + weaponload3 + weaponload4 + weaponload5 + weaponload6 + treasureload; // Removed Fatigue, used to calculate vs Current Endurance and Weary condition below. 
+            clog(`Shieldparry_active: ${values.shieldparry_active}`);
             setAttrs({
                 load: load,
             });
@@ -2079,17 +2071,18 @@
 
     // calc total parry on change events for the check boxes and values
     on( "change:shieldparry_active change:otherparry_active change:stanceparry_active " +
-        "change:parry change:shieldparry change:otherparry change:stanceparry " +
+        "change:parry change:shieldparry change:otherparry change:stanceparry change:shieldreinf_val " +
         "change:totalparry sheet:opened", function() {
-        getAttrs(["parry", "shieldparry", "stanceparry", "otherparry",
-                    "shieldparry_active", "stanceparry_active", "otherparry_active"], function(values) {
+        getAttrs(["parry", "shieldparry", "stanceparry", "otherparry", "shieldreinf_val",
+                  "shieldparry_active", "stanceparry_active", "otherparry_active"], function(values) {
             let parry = int(values.parry);
-            let shieldparry = (values.shieldparry_active == 1) ? int(values.shieldparry) : 0;	
+            let shieldparry = (values.shieldparry_active == 1) ? int(values.shieldparry) + int(values.shieldreinf_val) : 0;	
             let stanceparry = (values.stanceparry_active == 1) ? int(values.stanceparry) : 0;	
             let otherparry = (values.otherparry_active == 1) ? int(values.otherparry) : 0;
             let parrytotal = parry + shieldparry + stanceparry + otherparry;
             setAttrs({
                 totalparry: parrytotal,
+                shieldparry_total: int(values.shieldparry) + int(values.shieldreinf_val),
             });
             console.log("Updated total parry to " + parrytotal 
                 + " - parry: " + parry + " - shieldparry: " + shieldparry 
@@ -2110,12 +2103,12 @@
             actfav = data.protection_favoured,
             lm = data.sheetTab ==="isAdversary" ? true : false;
         let additionalStr = "";
-        additionalStr = additionalStr + ((data.armourcf_val != "0" && data.armourprot_active) ? "Close fitting armour, " : "");
-        additionalStr = additionalStr + ((data.helmetcf_val != "0" && data.helmprot_active) ? "Close fitting helm, " : "");
-        additionalStr = additionalStr + ((data.othercf_val != "0" && data.otherprot_active) ? "Close fitting other, " : "");
-        additionalStr = additionalStr + ((data.armourcm_val != "0" && data.armourprot_active) ? "Cunning made armour, " : "");
-        additionalStr = additionalStr + ((data.helmetcm_val != "0" && data.helmprot_active) ? "Cunning made helm, " : "");
-        additionalStr = additionalStr + ((data.helmetcm_val != "0" && data.otherprot_active) ? "Other Cunning made, " : "");
+        additionalStr = additionalStr + ((data.armourcf_val != "0" && data.armourprot_active === "1") ? "Close fit armour, " : "");
+        additionalStr = additionalStr + ((data.helmetcf_val != "0" && data.helmprot_active === "1") ? "Close fit helm, " : "");
+        additionalStr = additionalStr + ((data.othercf_val != "0" && data.otherprot_active === "1") ? "Close fit other, " : "");
+        additionalStr = additionalStr + ((data.armourcm_val != "0" && data.armourprot_active === "1") ? "Cunning armour, " : "");
+        additionalStr = additionalStr + ((data.helmetcm_val != "0" && data.helmprot_active === "1") ? "Cunning helm, " : "");
+        additionalStr = additionalStr + ((data.othercm_val != "0" && data.otherprot_active === "1") ? "Cunning other, " : "");
         additionalStr = additionalStr.slice(0,-2);
         let closefit = 
               int(data.armourprot_active) * int(data.armourcf_val) 
