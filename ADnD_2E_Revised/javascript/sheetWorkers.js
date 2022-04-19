@@ -1597,13 +1597,13 @@ on('clicked:repeating_weapons-damage:crit2-melee', function(eventInfo) {
 
         finalRollText += `{{Location roll=[[${locationRoll}]]}} `;
         if (locationObject)
-            finalRollText += `{{Location hit=${locationObject['hitLocation']}}} `;
+            finalRollText += `{{Location hit=${locationObject['specific']}}} `;
 
         let critEffect;
         if (severityRoll < 4) {
             critEffect = 'No unusual effect'
         } else if (CRIT_EFFECT_TABLE[weaponType]) {
-            critEffect = CRIT_EFFECT_TABLE[weaponType][targetType][locationObject['location']][severityRoll]];
+            critEffect = CRIT_EFFECT_TABLE[weaponType][targetType][locationObject['general']][severityRoll];
         } else {
             critEffect = 'No unusual effect';
         }
