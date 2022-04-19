@@ -1603,7 +1603,7 @@ on('clicked:repeating_weapons-damage:crit2-melee', function(eventInfo) {
         if (severityRoll < 4) {
             critEffect = 'No unusual effect'
         } else if (CRIT_EFFECT_TABLE[weaponType]) {
-            critEffect = CRIT_EFFECT_TABLE[weaponType][targetType][locationObject['location'][severityRoll]];
+            critEffect = CRIT_EFFECT_TABLE[weaponType][targetType][locationObject['location']][severityRoll]];
         } else {
             critEffect = 'No unusual effect';
         }
