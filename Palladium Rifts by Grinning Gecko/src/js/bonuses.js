@@ -305,6 +305,59 @@ async function combineBonuses(rowIds, destinationPrefix) {
       );
     }
   );
+
+  await updateMovement(destinationPrefix);
+}
+
+async function updateMovement(destinationPrefix) {
+  console.log("updateMovement", destinationPrefix);
+  const {
+    [`${destinationPrefix}_mod_spd`]: spd,
+    [`${destinationPrefix}_mod_spdfly`]: spdfly,
+    [`${destinationPrefix}_attacks`]: attacks,
+  } = await getAttrsAsync([
+    `${destinationPrefix}_mod_spd`,
+    `${destinationPrefix}_mod_spdfly`,
+    `${destinationPrefix}_attacks`,
+  ]);
+  console.log(spd, spdfly, attacks);
+  const run_ft_second = +spd;
+  const fly_ft_second = +spdfly;
+  const apm = +attacks;
+  const run_m_second = run_ft_second / 3.28084;
+  const fly_m_second = fly_ft_second / 3.28084;
+  const attrs = {
+    [`${destinationPrefix}_run_mph`]: Math.round(
+      (run_ft_second * 60 * 60) / 5280
+    ),
+    [`${destinationPrefix}_run_ft_melee`]: run_ft_second * 15,
+    [`${destinationPrefix}_run_ft_action`]: Math.round(
+      (run_ft_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_run_m_melee`]: Math.round(run_m_second * 15),
+    [`${destinationPrefix}_run_m_action`]: Math.round(
+      (run_m_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_run_kmh`]: Math.round(
+      (run_m_second * 60 * 60) / 1000
+    ),
+    [`${destinationPrefix}_fly_mph`]: Math.round(
+      (fly_ft_second * 60 * 60) / 5280
+    ),
+    [`${destinationPrefix}_fly_ft_melee`]: fly_ft_second * 15,
+    [`${destinationPrefix}_fly_ft_action`]: Math.round(
+      (fly_ft_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_fly_m_melee`]: Math.round(fly_m_second * 15),
+    [`${destinationPrefix}_fly_m_action`]: Math.round(
+      (fly_m_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_fly_kmh`]: Math.round(
+      (fly_m_second * 60 * 60) / 1000
+    ),
+  };
+  console.log(attrs);
+  await setAttrsAsync(attrs);
 }
 
 async function removeBonusSelectionsRowAsync(bonusRowId) {
