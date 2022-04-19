@@ -37808,12 +37808,6 @@
 					{{/^rollWasFumble() test}} 
 					
 					</div>	
-				{{#rollGreater() computed::rangedsize 0}}
-						<div class="sheet-row">
-							<div class="sheet-col-11-24 sheet-pad-l-md sheet-pad-r-md sheet-rt-key" data-i18n="RANGED-SIZE-MOD">Size Mod:</div>
-							<div class="sheet-col-13-24 sheet-pad-r-sm sheet-no-yellow-bg2 sheet-rt-key">-{{computed::sl}}SL</div>
-						</div>	
-				{{/rollGreater() computed::rangedsize 0}}	
 				</div>	
 				{{/rollGreater() computed::sl 0}}	
 				{{#^rollGreater() computed::sl 0}}	
@@ -38115,8 +38109,11 @@
 				<div class="sheet-col-100-100" style="color: black; font-size: 9px; padding-left: 3px; line-height: 10px" data-i18n="SL-MODIFIERS">SL Modifiers</div>
 				{{/rollGreater() imprecise 0}}{{/rollBetween() computed::sladd 0 0}}
 
+				{{#rollGreater() computed::rangedsize 0}}{{#rollGreater() computed::sl 0}}
+					<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: red">-{{computed::sl}}SL <span data-i18n="RANGED-SIZE-MOD"></span></div>
+				{{/rollGreater() computed::sl 0}}{{/rollGreater() computed::rangedsize 0}}
 				{{#rollGreater() SLmod 0}}
-					<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: #55B800">+{{SLmod}}SL <span data-i18n="MODIFIER"></span></div>
+					<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: red">+{{SLmod}}SL <span data-i18n="MODIFIER"></span></div>
 				{{/rollGreater() SLmod 0}}
 				{{#rollLess() SLmod 0}}
 					<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: red">{{SLmod}}SL <span data-i18n="MODIFIER"></span></div>
@@ -46502,7 +46499,6 @@ on("change:repeating_ranged:UsedRanged", function (event) {
 						"Used_RangedDurable": '',
 						"Used_WeaponRange": '',
 						"Used_RangedQualities": '',
-						"Used_RangedDamaging": '0',
 						"Used_RangedImpale": '0',
 						"Used_RangedAccurate": '0',
 						"Used_RangedPrecise": '0',
@@ -50127,7 +50123,6 @@ on('clicked:meleeopposedoff', (eventInfo) => {
 			if (infight > 0) {if (values.MeleeMode_Infight  == 1) {infadd = infight;} else {infadd = 0;}} else {infadd = 0;}
             if (values.MeleeMode_Drilled  == 1) {drilled = results.results.drilled.result} else {drilled = 0;}
 			
-			   
 			bfrenzy = battlerage * frenzy;
 
 			if ( test <= target ) { var computed3 = computed + drilled + infadd + dirtyfighting + bfrenzy + reversal + riposte + defensive + shieldsman + SLmod - unbalanced - smod  ;} else  { var computed3 = computed + practical + defensive + SLmod - unbalanced - smod ;}
@@ -50246,7 +50241,7 @@ on('clicked:ripostedmgoff clicked:shieldbash', (eventInfo) => {
 on('clicked:rangedatk clicked:rangedatkreroll', (eventInfo) => {
 	getAttrs(["Used_RangedAmmo","AutoAmmo","RangedMode_Engaged","RangedMode_Moved","Used_RangedBonus","RangedMode_Aim","RangedMode_Range", "RangedMode_Called", "RangedMode_Size", "GroupAdv"], function(v) {	
 	
-   let roll = '{{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Used_RangedPrecise}+@{Used_RangedPractical}-@{Used_RangedImprecise}+@{RangedMode_FastShot} [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusRgd}+@{RangedMode_FastShot}]]}} {{sladd=[[0]]}} {{test=[[@{roll_rule}]]}} {{rangedeng=[[@{RangedMode_Engaged}]]}} {{rangedsize=[[@{RangedMode_Size}]]}} {{modvalue=[[?{Ranged Attack Modifier|@{Used_RangedBonus}}]]}} {{ammo=[[@{Used_RangedAmmo}]]}} {{title=@{Used_RangedWeaponName}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{RANGED}}} {{target=[[ [[@{condgen_see_move}*-1]] [COND] + [[@{Used_RangedBalisticSkill}]] [SKILL] + [[10*@{Used_RangedAccurate}]] [TALENTS] + [[@{Advantage}*10]] [ADV] +?{Ranged Attack Modifier|0} [MOD] ]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0} [SL Mod]]]}} >hitloc< {{damaging=[[@{Used_RangedDamaging}]]}} {{reach=@{Used_WeaponRange}}} {{rolltype=[[@{Used_RangedImpale}]]}} {{pummel=[[@{Used_RangedPummel}]]}} {{qualities=@{Used_RangedQualities}}} {{damage=[[@{Used_RangedStrengthBonus}+@{Used_RangedDamage}+@{Talent_AccurateShotLvl}]]}} {{ammotype=@{Used_RangedAmmoType}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}-@{DrunkMod}]]}} {{drunk=[[@{DrunkMod}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Ranged_modtype1}]]}} {{mod1=@{Used_Ranged_mod1}}} {{mod2type=[[@{Used_Ranged_modtype2}]]}} {{mod2=@{Used_Ranged_mod2}}} {{mod3type=[[@{Used_Ranged_modtype3}]]}} {{mod3=@{Used_Ranged_mod3}}} {{NPC=[[0]]}} {{reroll=@{RT-reroll}RangedAtkreroll)}} {{sitmod=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{precise=[[@{Used_RangedPrecise}]]}} {{imprecise=[[@{Used_RangedImprecise}]]}} {{blast=[[@{Used_RangedBlast}*@{Used_RangedBlastRating}]]}} {{repeater=[[@{Used_RangedRepeater}*@{Used_RangedRepeaterRating}]]}} {{entangle=[[@{Used_RangedEntangle}]]}} {{penetrating=[[@{Used_RangedPenetrating}]]}} {{tiring=[[0]]}} {{blackpowder=[[@{Used_RangedBlackpowder}]]}} {{practical=[[@{Used_RangedPractical}]]}} {{accurate=[[@{Used_RangedAccurate}*10]]}} {{hack=[[@{Used_RangedHack}]]}} {{dangerous=[[@{Used_RangedDangerous}]]}} {{impact=[[@{Used_RangedImpact}]]}} {{deadeyeshot=[[@{Talent_DeadeyeShotLvl}]]}} {{fastshot=[[@{RangedMode_FastShot}]]}} {{autoammo=[[@{AutoAmmo}]]}} {{sniper=[[@{Talent_SniperLvl}]]}} {{targetrange=[[@{RangedMode_Range}]]}} {{sureshot=[[@{Talent_SureShotLvl}]]}} {{usedmagic=[[@{Used_RangedMagic}]]}}  {{usedmagiceffect=@{Used_RangedMagicEffect}}}';
+   let roll = '{{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Used_RangedPrecise}+@{Used_RangedPractical}-@{Used_RangedImprecise}+@{RangedMode_FastShot} [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusRgd}+@{RangedMode_FastShot}]]}} {{sladd=[[0]]}} {{test=[[@{roll_rule}]]}} {{rangedeng=[[@{RangedMode_Engaged}]]}} {{rangedsize=[[>size<]]}} {{modvalue=[[?{Ranged Attack Modifier|@{Used_RangedBonus}}]]}} {{ammo=[[@{Used_RangedAmmo}]]}} {{title=@{Used_RangedWeaponName}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{RANGED}}} {{target=[[ [[@{condgen_see_move}*-1]] [COND] + [[@{Used_RangedBalisticSkill}]] [SKILL] + [[10*@{Used_RangedAccurate}]] [TALENTS] + [[@{Advantage}*10]] [ADV] +?{Ranged Attack Modifier|0} [MOD] ]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0} [SL Mod]]]}} >hitloc< {{damaging=[[@{Used_RangedDamaging}]]}} {{reach=@{Used_WeaponRange}}} {{rolltype=[[@{Used_RangedImpale}]]}} {{pummel=[[@{Used_RangedPummel}]]}} {{qualities=@{Used_RangedQualities}}} {{damage=[[@{Used_RangedStrengthBonus}+@{Used_RangedDamage}+@{Talent_AccurateShotLvl}]]}} {{ammotype=@{Used_RangedAmmoType}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}-@{DrunkMod}]]}} {{drunk=[[@{DrunkMod}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Ranged_modtype1}]]}} {{mod1=@{Used_Ranged_mod1}}} {{mod2type=[[@{Used_Ranged_modtype2}]]}} {{mod2=@{Used_Ranged_mod2}}} {{mod3type=[[@{Used_Ranged_modtype3}]]}} {{mod3=@{Used_Ranged_mod3}}} {{NPC=[[0]]}} {{reroll=@{RT-reroll}RangedAtkreroll)}} {{sitmod=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{precise=[[@{Used_RangedPrecise}]]}} {{imprecise=[[@{Used_RangedImprecise}]]}} {{blast=[[@{Used_RangedBlast}*@{Used_RangedBlastRating}]]}} {{repeater=[[@{Used_RangedRepeater}*@{Used_RangedRepeaterRating}]]}} {{entangle=[[@{Used_RangedEntangle}]]}} {{penetrating=[[@{Used_RangedPenetrating}]]}} {{tiring=[[0]]}} {{blackpowder=[[@{Used_RangedBlackpowder}]]}} {{practical=[[@{Used_RangedPractical}]]}} {{accurate=[[@{Used_RangedAccurate}*10]]}} {{hack=[[@{Used_RangedHack}]]}} {{dangerous=[[@{Used_RangedDangerous}]]}} {{impact=[[@{Used_RangedImpact}]]}} {{deadeyeshot=[[@{Talent_DeadeyeShotLvl}]]}} {{fastshot=[[@{RangedMode_FastShot}]]}} {{autoammo=[[@{AutoAmmo}]]}} {{sniper=[[@{Talent_SniperLvl}]]}} {{targetrange=[[@{RangedMode_Range}]]}} {{sureshot=[[@{Talent_SureShotLvl}]]}} {{usedmagic=[[@{Used_RangedMagic}]]}}  {{usedmagiceffect=@{Used_RangedMagicEffect}}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
@@ -50276,14 +50271,17 @@ on('clicked:rangedatk clicked:rangedatkreroll', (eventInfo) => {
    }
    }
       if (v.RangedMode_Called == 1) {hitloc = "{{hitlocation=[[?{Choose a Hit Location|Head,1|Right Arm,2|Left Arm,3|Body,4|Right Leg,5|Left Leg,6}]]}}"; rollPart2 += " {{aimed=[[@{RangedMode_Called}]]}}";} else {hitloc = "{{hitlocation=true}}";}  
- 
+
  			let mod = 0;
-			if (v.RangedMode_Size == 1) {mod += 60} else {mod += 0}
-			if (v.RangedMode_Size == 2) {mod += 40} else {mod += 0}
-			if (v.RangedMode_Size == 3) {mod += 20} else {mod += 0}
+ 			var size = 0;
+			if (v.RangedMode_Size == 1) {mod += 60; size = 1;}
+			if (v.RangedMode_Size == 2) {mod += 40; size = 2;}
+			if (v.RangedMode_Size == 3) {mod += 20; size = 3;}
  
-   let rollPart = rollPart2.replaceAll('>hitloc<', hitloc);
+   let rollPart = rollPart2.replaceAll('>hitloc<', hitloc).replaceAll('>size<', size);
 				
+               console.log(rollPart);	
+			   
         startRoll(rollBegins + rollPart, (results) => {
 			const target = results.results.target.result
             const test = results.results.test.result
@@ -50296,16 +50294,15 @@ on('clicked:rangedatk clicked:rangedatkreroll', (eventInfo) => {
             const slbonus = results.results.slbonus.result
             const SLmod = results.results.SLmod.result
             const slbonusatk = results.results.slbonusatk.result
+            const rangedsize = results.results.rangedsize.result
             const computed = (Math.floor(target / 10) - Math.floor(test / 10)) ;
             const computed2 = (((test-1)%10)+1) ;	
 			const target20 = target + 20;
 			const targetmod = target - mod;
 			if (v.RangedMode_Range  >= 3 && v.RangedMode_Range  <= 4) {sniperadd = sniper;} else {sniperadd = 0;}
-               console.log(sniperadd);	
 			
 			if (v.RangedMode_Engaged == 1) {if (test >= target && test <= target20) {computed6 = 1;} else {computed6 = 0;}} else {computed6 = 0;}
-			if (v.RangedMode_Size >= 1 && v.RangedMode_Size <= 3) {if (test >= targetmod && test <= target) {computed7 = mod/10;} else {computed7 = 0;}} else {computed7 = 0;}
-
+			if (v.RangedMode_Size >= 1 && v.RangedMode_Size <= 3) {if (test >= targetmod && test <= target) {computed7 = mod/10; sizemod = computed;} else {computed7 = 0; sizemod = 0;}} else {computed7 = 0; sizemod = 0;}
 					
                console.log(test);	
                console.log(target);	
@@ -50313,10 +50310,11 @@ on('clicked:rangedatk clicked:rangedatkreroll', (eventInfo) => {
                console.log(targetmod);	
                console.log(computed6);
                console.log(computed7);
+               console.log(sizemod);
 			
-			if ( test <= target ) { var computed3 = computed + sniperadd + precise + SLmod - imprecise ;} else  { var computed3 = computed + practical + SLmod - imprecise  ;}
-			if ( test <= target ) { var computed4 = slbonusatk + sniperadd - practical  ;} else  { var computed4 = practical - imprecise ;}
-			if ( test <= target ) { var computed5 = slbonusatk + sniperadd - practical + SLmod ;} else  { var computed5 = practical + SLmod - imprecise ;}
+			if ( test <= target ) { var computed3 = computed + sniperadd + precise + SLmod - imprecise - sizemod ;} else  { var computed3 = computed + practical + SLmod - imprecise  ;}
+			if ( test <= target ) { var computed4 = slbonusatk + sniperadd - practical - sizemod  ;} else  { var computed4 = practical - imprecise ;}
+			if ( test <= target ) { var computed5 = slbonusatk + sniperadd - practical - sizemod + SLmod ;} else  { var computed5 = practical + SLmod - imprecise ;}
 						
             finishRoll(
                 results.rollId,
