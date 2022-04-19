@@ -9,7 +9,7 @@ const BOOK_FIELDS = [
     'book-tom', 'book-aaeg',
     'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
     'book-paladins', 'book-druids', 'book-barbarians', 'book-necromancers', 'book-ninjas',
-    'book-combat-and-tacticss',
+    'book-combat-and-tactics',
 ];
 
 const SCHOOL_FIELDS = ['school-spells-and-magic'];
@@ -70,6 +70,10 @@ const displayWeaponType = function (type) {
     }
 }
 
+const getRowId = function (triggerName) {
+    return triggerName.match(/repeating_[^_]+_([^_]+)_[^_]+/)[1];
+}
+
 const conditionalLog = function (bool, msg) {
     if (bool)
         console.log(msg);
@@ -78,12 +82,14 @@ const conditionalLog = function (bool, msg) {
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
     let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
     finishRoll(queryRoll.rollId);
+    console.log(queryRoll);
     return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
 };
 
 const extractRoll = async function(rollExpression) {
     let queryRoll = await startRoll(`!{{roll=[[${rollExpression}]]}}`);
     finishRoll(queryRoll.rollId);
+    console.log(queryRoll);
     return queryRoll.results.roll;
 };
 
@@ -170,8 +176,8 @@ const getActiveSettings = function (settingFields, values) {
 
 const isBookInactive = function (books, obj) {
     let activeBooks = getActiveSettings(BOOK_FIELDS, books);
-    if (Array.isArray(obj['book']))
-        return !obj['book'].some(b => activeBooks.has(b));
+    if (Array.isArray(obj))
+        return obj.every(b => !activeBooks.has(b));
     else
         return !activeBooks.has(obj['book']);
 }
@@ -179,9 +185,9 @@ const isBookInactive = function (books, obj) {
 const bookInactiveShowToast = function(books, obj) {
     let bookInactive = isBookInactive(books, obj);
     if (bookInactive) {
-        if (Array.isArray(obj['book'])) {
-            let booksString = obj['book'].map(b => '\n* ' + b).join('') + '\n'
-            showToast(ERROR, 'Missing Book(s)', `The book(s) ${booksString} are currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
+        if (Array.isArray(obj)) {
+            let booksString = obj.map(b => '\n* ' + b).join('')
+            showToast(ERROR, 'Missing Book(s)', `The book(s):${booksString}\nAre currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
         } else {
             showToast(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
         }
@@ -1215,189 +1221,212 @@ on('change:thac0-base-calc', function(eventInfo) {
 });
 
 //#region Weapons autofill
-function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field) {
+const PLAYERS_OPTIONS_FIELD = 'tab81';
+function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, category) {
     if (!weaponName)
         return;
 
     weaponName = weaponName.toLowerCase();
-    let fields = [...BOOK_FIELDS, thac0Field].filter(Boolean);
-    getAttrs(fields, function(values) {
+    let fields = [...BOOK_FIELDS, PLAYERS_OPTIONS_FIELD, thac0Field].filter(Boolean);
+    getAttrs(fields, async function (values) {
+        let bonus = 0;
+        let baseWeapons = WEAPONS_TABLE[weaponName]
+        if (!baseWeapons) {
+            let match = weaponName.match(/\s*\+([0-9]+)\s*/);
+            if (!match)
+                return;
+
+            let baseWeaponName = weaponName.replace(match[0], ' ').trim();
+            baseWeapons = WEAPONS_TABLE[baseWeaponName];
+            if (!baseWeapons)
+                return;
+
+            bonus = parseInt(match[1]);
+            if (isNaN(bonus))
+                return;
+        }
+        if (category)
+            baseWeapons = baseWeapons.filter(w => w['category'].includes(category));
+
+        let activeBooks = getActiveSettings(BOOK_FIELDS, values);
+        let activeWeapons = baseWeapons.filter(w => w['book'].some(b => activeBooks.has(b)));
+
+
+        if (activeWeapons.length === 0) {
+            let booksString = baseWeapons.flatMap(w => w['book']).map(b => '\n* ' + b).join('')
+            showToast(ERROR, 'Missing Book(s)', `The book(s):${booksString}\nAre currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
+            return;
+        }
+
+        let baseWeapon;
+        let isPlayersOptions = values[PLAYERS_OPTIONS_FIELD] === '2';
+        let isAllEqual = activeWeapons.every(w => comparer(w, activeWeapons[0], isPlayersOptions));
+        if (isAllEqual) {
+            baseWeapon = activeWeapons[0];
+        } else {
+            let options = activeWeapons
+                .map((w, i) => `${w.book.join('/')},${i}`)
+                .join('|');
+            let answer = await extractRollResult(`?{Multiple versions of this weapon exists. Please select a version|${options}}`);
+            baseWeapon = activeWeapons[answer];
+        }
+
         let thac0 = parseInt(values[thac0Field]);
         thac0 = isNaN(thac0) ? 20 : thac0;
 
-        let baseWeapon = weapons[weaponName]
-        if (baseWeapon) {
-            if (bookInactiveShowToast(values, baseWeapon))
-                return;
-
-            setWeaponFunc({
-                ...baseWeapon,
-                'thac0' : thac0,
-                'bonus' : '0'
-            });
-            return;
-        }
-
-        let match = weaponName.match(/\s*\+([0-9]+)\s*/);
-        if (!match)
-            return;
-
-        let baseWeaponName = weaponName.replace(match[0], ' ').trim();
-        baseWeapon = weapons[baseWeaponName];
-        if (!baseWeapon)
-            return;
-
-        if (bookInactiveShowToast(values, baseWeapon))
-            return;
-
-        let bonusString = match[1];
-        let bonus = parseInt(bonusString)
-        if (isNaN(bonus))
-            return;
-
-        if (bonus < 1) {
-            setWeaponFunc({
-                ...baseWeapon,
-                'thac0' : thac0,
-                'bonus' : '0',
-                'bonusInt': 0
-            });
-            return;
-        }
-
-        let weaponWithBonus = {
+        let weapon = {
             ...baseWeapon,
             'thac0' : thac0,
-            'speed' : Math.max(baseWeapon['speed'] - bonus, 0),
-            'bonus' : `+${bonus}`,
-            'bonusInt': bonus
+        };
+        if (bonus < 1) {
+            weapon['bonus'] = '0';
+            weapon['bonusInt'] = 0;
+        } else {
+            weapon['bonus'] = `+${bonus}`;
+            weapon['bonusInt'] = bonus;
+            weapon['speed'] = Math.max(weapon['speed'] - bonus, 0)
         }
-        setWeaponFunc(weaponWithBonus);
+        setWeaponFunc(weapon);
     });
 }
 
 //melee hit autofill
 on('change:repeating_weapons:weaponname', function(eventInfo) {
-    let comparer = function (weapon1, weapon2, isPo) {
-        if (isPo) {
-            let reach = 'reach';
-        }
-        return ['size','speed','type'].every(f => weapon1[f] === weapon2[f])
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
+        let compareFields = ['size','speed','type'];
+        if (isPlayersOption)
+            compareFields.push('reach');
+        return compareFields.every(f => weapon1[f] === weapon2[f])
     }
+    let rowId = getRowId(eventInfo.triggerName);
     let setWeaponFunc = function (weapon) {
-        let weaponInfo = {
-            'repeating_weapons_attackadj'      : weapon['bonus'],
-            'repeating_weapons_ThAC0'          : weapon['thac0'],
-            'repeating_weapons_range'          : weapon['reach'] || 'Melee',
-            'repeating_weapons_size'           : weapon['size'],
-            'repeating_weapons_weapspeed'      : weapon['speed'],
-            'repeating_weapons_weaptype-slash' : weapon['type'].includes('S') ? 1 : 0,
-            'repeating_weapons_weaptype-pierce': weapon['type'].includes('P') ? 1 : 0,
-            'repeating_weapons_weaptype-blunt' : weapon['type'].includes('B') ? 1 : 0,
-        };
+        let weaponInfo = {};
+        weaponInfo[`repeating_weapons_${rowId}_attackadj`]       = weapon['bonus'];
+        weaponInfo[`repeating_weapons_${rowId}_ThAC0`]           = weapon['thac0'];
+        weaponInfo[`repeating_weapons_${rowId}_range`]           = weapon['reach'] || 'Melee';
+        weaponInfo[`repeating_weapons_${rowId}_size`]            = weapon['size'];
+        weaponInfo[`repeating_weapons_${rowId}_weapspeed`]       = weapon['speed'];
+        weaponInfo[`repeating_weapons_${rowId}_weaptype-slash`]  = weapon['type'].includes('S') ? 1 : 0;
+        weaponInfo[`repeating_weapons_${rowId}_weaptype-pierce`] = weapon['type'].includes('P') ? 1 : 0;
+        weaponInfo[`repeating_weapons_${rowId}_weaptype-blunt`]  = weapon['type'].includes('B') ? 1 : 0;
 
         setAttrs(weaponInfo);
     };
-    setWeaponWithBonus(eventInfo.newValue, comparer, setWeaponFunc, 'thac0-base-calc');
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer, 'thac0-base-calc', 'Melee');
 });
 
 //melee damage autofill
 on('change:repeating_weapons-damage:weaponname1', function(eventInfo) {
-    let comparer = function (weapon1, weapon2) {
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
         let fisk = ['small-medium','large'];
-        if (isPo) {
+        if (isPlayersOption) {
             fisk.push('size');
-            fisk.push('type')
+            fisk.push('type');
             fisk.push('knockdown');
         }
         return fisk.every(f => weapon1[f] === weapon2[f])
     }
+    let rowId = getRowId(eventInfo.triggerName);
     let setWeaponFunc = function (weapon) {
-        let weaponInfo = {
-            'repeating_weapons-damage_damadj'     : weapon['bonus'],
-            'repeating_weapons-damage_damsm'      : weapon['small-medium'],
-            'repeating_weapons-damage_daml'       : weapon['large'],
-            'repeating_weapons-damage_damsize'    : weapon['size'],
-            'repeating_weapons-damage_damtype'    : weapon['type'],
-            'repeating_weapons-damage_knockdown1' : weapon['knockdown'] || ''
-        };
+        let weaponInfo = {};
+        weaponInfo[`repeating_weapons-damage_${rowId}_damadj`]     = weapon['bonus'];
+        weaponInfo[`repeating_weapons-damage_${rowId}_damsm`]      = weapon['small-medium'];
+        weaponInfo[`repeating_weapons-damage_${rowId}_daml`]       = weapon['large'];
+        weaponInfo[`repeating_weapons-damage_${rowId}_knockdown1`] = weapon['knockdown'] || '';
+        weaponInfo[`repeating_weapons-damage_${rowId}_size`]       = weapon['size'];
+        weaponInfo[`repeating_weapons-damage_${rowId}_type`]       = weapon['type'];
 
         setAttrs(weaponInfo);
     };
 
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer, '', 'Melee');
 });
 
 //range hit autofill
 on('change:repeating_weapons2:weaponname2', function(eventInfo) {
-    let comparer = function (weapon1, weapon2) {
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
         return ['strength','rof','range','size','speed','type'].every(f => weapon1[f] === weapon2[f])
     }
+    let rowId = getRowId(eventInfo.triggerName);
     let setWeaponFunc = function (weapon) {
-        let weaponInfo = {
-            'repeating_weapons2_strbonus2'        : weapon['strength'] ? 1 : 0,
-            'repeating_weapons2_attacknum2'       : weapon['rof'] || '',
-            'repeating_weapons2_attackadj2'       : weapon['bonus'],
-            'repeating_weapons2_ThAC02'           : weapon['thac0'],
-            'repeating_weapons2_range2'           : weapon['range'] || '',
-            'repeating_weapons2_size2'            : weapon['size'],
-            'repeating_weapons2_weapspeed2'       : weapon['speed'],
-            'repeating_weapons2_weaptype-slash2'  : weapon['type'].includes('S') ? 1 : 0,
-            'repeating_weapons2_weaptype-pierce2' : weapon['type'].includes('P') ? 1 : 0,
-            'repeating_weapons2_weaptype-blunt2'  : weapon['type'].includes('B') ? 1 : 0,
-        };
+        let weaponInfo = {};
+        weaponInfo[`repeating_weapons2_${rowId}_strbonus2`]        = weapon['strength'] ? 1 : 0;
+        weaponInfo[`repeating_weapons2_${rowId}_attacknum2`]       = weapon['rof'] || '';
+        weaponInfo[`repeating_weapons2_${rowId}_attackadj2`]       = weapon['bonus'];
+        weaponInfo[`repeating_weapons2_${rowId}_ThAC02`]           = weapon['thac0'];
+        weaponInfo[`repeating_weapons2_${rowId}_range2`]           = weapon['range'] || '';
+        weaponInfo[`repeating_weapons2_${rowId}_size2`]            = weapon['size'];
+        weaponInfo[`repeating_weapons2_${rowId}_weapspeed2`]       = weapon['speed'];
+        weaponInfo[`repeating_weapons2_${rowId}_weaptype-slash2`]  = weapon['type'].includes('S') ? 1 : 0;
+        weaponInfo[`repeating_weapons2_${rowId}_weaptype-pierce2`] = weapon['type'].includes('P') ? 1 : 0;
+        weaponInfo[`repeating_weapons2_${rowId}_weaptype-blunt2`]  = weapon['type'].includes('B') ? 1 : 0;
 
         setAttrs(weaponInfo);
     };
 
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer, 'thac0-base-calc', 'Range');
 });
 
 //range damage autofill
 on('change:repeating_ammo:ammoname', function(eventInfo) {
-    let comparer = function (weapon1, weapon2) {
-        return ['strength','small-medium','large','size'].every(f => weapon1[f] === weapon2[f])
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
+        let comparerFields = ['strength','small-medium','large'];
+        if (isPlayersOption) {
+            comparerFields.push('knockdown');
+            comparerFields.push('size');
+            comparerFields.push('ammo-size');
+            comparerFields.push('type');
+        }
+        return comparerFields.every(f => weapon1[f] === weapon2[f])
     }
+    let rowId = getRowId(eventInfo.triggerName);
     let setWeaponFunc = function (weapon) {
-        let weaponInfo = {
-            'repeating_weapons2_strbonus3'        : weapon['strength'] ? 1 : 0,
-            'repeating_ammo_damadj2'              : weapon['bonus'],
-            'repeating_ammo_damsm2'               : weapon['small-medium'],
-            'repeating_ammo_daml2'                : weapon['large'],
-            'repeating_weapons-damage_knockdown2' : weapon['knockdown'] || ''
-        };
+        let weaponInfo = {};
+        weaponInfo[`repeating_ammo_${rowId}_strbonus3`]  = weapon['strength'] ? 1 : 0;
+        weaponInfo[`repeating_ammo_${rowId}_damadj2`]    = weapon['bonus'];
+        weaponInfo[`repeating_ammo_${rowId}_damsm2`]     = weapon['small-medium'];
+        weaponInfo[`repeating_ammo_${rowId}_daml2`]      = weapon['large'];
+        weaponInfo[`repeating_ammo_${rowId}_knockdown2`] = weapon['knockdown'] || '';
+        weaponInfo[`repeating_ammo_${rowId}_size`]       = weapon['ammo-size'] || weapon['size'];
+        weaponInfo[`repeating_ammo_${rowId}_type`]       = weapon['type'];
 
         setAttrs(weaponInfo);
     }
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer, '', 'Range');
 });
 
 //Follower weapons
 function setupFollowerWeaponsAutoFill(repeating, sections) {
     let prefix = '';
-    let onChange = '';
     if (repeating !== '') {
-        prefix = `repeating_${repeating}_`
-        onChange = `repeating_${repeating}:`
+        prefix = `repeating_${repeating}`
     }
 
     sections.forEach(section => {
-        on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
+        on(`change:${prefix}:weaponnamehench${section}`, function(eventInfo) {
+            let comparer = function (weapon1, weapon2, isPlayersOption) {
+                let comparerFields = ['rof','small-medium','large','range','type','speed'];
+                if (isPlayersOption) {
+                    comparerFields.push('reach');
+                    comparerFields.push('knockdown');
+                }
+                return comparerFields.every(f => weapon1[f] === weapon2[f])
+            }
+            let rowId = getRowId(eventInfo.triggerName);
             let setWeaponFunc = function (weapon) {
-                let weaponInfo = {
-                    [`${prefix}attacknumhench${section}`]: weapon['rof'] || '1',
-                    [`${prefix}attackadjhench${section}`]: weapon['bonus'],
-                    [`${prefix}damadjhench${section}`]: weapon['bonus'],
-                    [`${prefix}damsmhench${section}`]: weapon['small-medium'],
-                    [`${prefix}damlhench${section}`]: weapon['large'],
-                    [`${prefix}rangehench${section}`]: weapon['range'] || weapon['reach'] || 'Melee',
-                    [`${prefix}weaptypehench${section}`]: weapon['type'],
-                    [`${prefix}weapspeedhench${section}`]: weapon['speed'],
-                };
+                let weaponInfo = {};
+                weaponInfo[`${prefix}_${rowId}_attacknumhench${section}`] = weapon['rof'] || '1';
+                weaponInfo[`${prefix}_${rowId}_attackadjhench${section}`] = weapon['bonus'];
+                weaponInfo[`${prefix}_${rowId}_damadjhench${section}`]    = weapon['bonus'];
+                weaponInfo[`${prefix}_${rowId}_damsmhench${section}`]     = weapon['small-medium'];
+                weaponInfo[`${prefix}_${rowId}_damlhench${section}`]      = weapon['large'];
+                weaponInfo[`${prefix}_${rowId}_rangehench${section}`]     = weapon['range'] || weapon['reach'] || 'Melee';
+                weaponInfo[`${prefix}_${rowId}_weaptypehench${section}`]  = weapon['type'];
+                weaponInfo[`${prefix}_${rowId}_weapspeedhench${section}`] = weapon['speed'];
 
                 setAttrs(weaponInfo);
             };
-            setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+            setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer);
         });
     });
 }
@@ -1497,105 +1526,97 @@ on('clicked:grenade-miss', async function (eventInfo) {
     });
 });
 
-on('clicked:crit-melee', function(eventInfo) {
-    TAS.repeating('weapons-damage')
-        .attrs(['strengthdmg', 'dexmissile', 'temp-damadj', 'misc-mod', ...BOOK_FIELDS])
-        .fields('strbonus1', 'dexbonus1', 'weaponname1', 'specialist-damage', 'mastery-damage', 'damadj', 'damsm', 'daml')
-        .map(function (row){
-            return row;
-        }, async function (rows, _, attrSet){
-            let weaponSelect = rows.map(r => `${r['weaponname1']},${r.id}`)
+on('clicked:repeating_weapons-damage:crit2-melee', function(eventInfo) {
+    console.log(eventInfo);
+    let fields = [
+        'strengthdmg', 'dexmissile', 'temp-damadj', 'misc-mod',
+        'repeating_weapons-damage_strbonus1','repeating_weapons-damage_dexbonus1','repeating_weapons-damage_weaponname1',
+        'repeating_weapons-damage_specialist-damage','repeating_weapons-damage_mastery-damage','repeating_weapons-damage_damadj',
+        'repeating_weapons-damage_damsm','repeating_weapons-damage_daml','repeating_weapons-damage_size','repeating_weapons-damage_type'];
+    getAttrs(fields, async function (values) {
+        let finalRollText = `&{template:2Edefault} {{name=Test Critical hit}} {{Weapon name=${values['repeating_weapons-damage_weaponname1']}}} `;
+
+        let attackType = await extractQueryResult('?{How are you attacking?|Regular Attack|Low Attack|High Attack}');
+        let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
+        let targetSize = await extractQueryResult('?{Target size?|Tiny|Small|Medium|Large|Huge|Gargantuan}');
+
+        let weaponSize = displaySize(values['repeating_weapons-damage_size']);
+        let weaponType = values['repeating_weapons-damage_type'];
+        if (weaponType.includes('/')) {
+            let displayTypes = weaponType.split('/')
+                .map(s => displayWeaponType(s))
                 .join('|');
-            let rowId = await extractQueryResult(`?{What weapon did you use?|${weaponSelect}}`);
-            let row = rows.find(row => row.id === rowId);
 
-            let finalRollText = '&{template:2Edefault} {{name=Test Critical hit}}';
+            weaponType = await extractQueryResult(`?{How are your attack with your weapon?|${displayTypes}}`)
+        } else {
+            weaponType = displayWeaponType(weaponType);
+        }
 
-            let attackType = await extractQueryResult('?{How are you attacking?|Regular Attack|Low Attack|High Attack}');
-            let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
-            let targetSize = await extractQueryResult('?{Target size?|Tiny|Small|Medium|Large|Huge|Gargantuan}');
+        finalRollText += `{{Weapon type=${attackType}}} `;
+        finalRollText += `{{Weapon size=${weaponSize}}} `;
+        finalRollText += `{{Target type=${targetType}}} `;
+        finalRollText += `{{Target size=${targetSize}}} `;
 
-            let baseWeapon = getBaseWeapon(row['weaponname1'], attrSet);
-            let weaponSize;
-            let weaponType;
-            if (baseWeapon) {
-                weaponSize = displaySize(baseWeapon['size']);
-                weaponType = baseWeapon['type'];
-                if (weaponType.includes('/')) {
-                    let displayTypes = weaponType.split('/')
-                        .map(s => displayWeaponType(s))
-                        .join('|');
+        let locationDice;
+        switch (attackType) {
+            case 'Regular Attack': locationDice = '1d10'; break;
+            case 'Low Attack': locationDice = '1d6'; break;
+            case 'High Attack': locationDice = '1d6+4'; break;
+        }
+        let locationRoll = await extractRollResult(locationDice);
+        let locationObject = LOCATION_TABLE[targetType][locationRoll];
 
-                    weaponType = await extractQueryResult(`?{How are your attack with your weapon?|${displayTypes}}`)
-                } else {
-                    weaponType = displayWeaponType(weaponType);
-                }
-            } else {
-                weaponSize = await extractQueryResult('?{Weapon size?|Small|Medium|Large}');
-                weaponType = await extractQueryResult('?{Weapon type?|Slashing|Piercing|Bludgeoning}')
-            }
+        let severityEffect;
+        let severityRoll;
+        const sizeDiff = sizeToInt(weaponSize) - sizeToInt(targetSize);
+        if (sizeDiff < 0) {
+            severityEffect = 'Minor';
+            severityRoll = await extractRollResult('1d6');
+        } else if (sizeDiff === 0) {
+            severityEffect = 'Major';
+            severityRoll = await extractRollResult('2d4');
+        } else if (sizeDiff === 1) {
+            severityEffect = 'Severe';
+            severityRoll = await extractRollResult('2d6');
+        } else if (sizeDiff > 1) {
+            severityEffect = 'Mortal';
+            severityRoll = await extractRollResult('2d8');
+        }
 
-            finalRollText += `{{Weapon name=${row['weaponname1']}}} `;
-            finalRollText += `{{Weapon type=${attackType}}} `;
-            finalRollText += `{{Weapon size=${weaponSize}}} `;
-            finalRollText += `{{Target type=${targetType}}} `;
-            finalRollText += `{{Target size=${targetSize}}} `;
+        finalRollText += `{{Severity effect=${severityEffect}}} `;
+        finalRollText += `{{Severity roll=${severityRoll}}} `;
 
-            let locationDice;
-            switch (attackType) {
-                case 'Regular Attack': locationDice = '1d10'; break;
-                case 'Low Attack': locationDice = '1d6'; break;
-                case 'High Attack': locationDice = '1d6+4'; break;
-            }
-            let locationResult = await extractRollResult(locationDice);
-            let location = LOCATION_TABLE[targetType][locationResult];
+        let weaponDamage = sizeToInt(targetSize) < 3 ? values['repeating_weapons-damage_damsm'] : values['repeating_weapons-damage_daml'];
+        if (weaponDamage.match('/\d/'))
+        if (severityRoll > 12) {
+            finalRollText += `{{Critical damage=[[(${weaponDamage})*3]]}} `;
+            severityRoll = 12;
+        } else {
+            finalRollText += `{{Critical damage=[[(${weaponDamage})*2]]}} `;
+        }
 
+        finalRollText += `{{Location roll=[[${locationRoll}]]}} `;
+        if (locationObject)
+            finalRollText += `{{Location hit=${locationObject['hitLocation']}}} `;
 
-            const sizeDiff = sizeToInt(weaponSize) - sizeToInt(targetSize);
-            let severityEffect;
-            let severityResult;
-            if (sizeDiff < 0) {
-                severityEffect = 'Minor';
-                severityResult = await extractRollResult('1d6');
-            } else if (sizeDiff === 0) {
-                severityEffect = 'Major';
-                severityResult = await extractRollResult('2d4');
-            } else if (sizeDiff === 1) {
-                severityEffect = 'Severe';
-                severityResult = await extractRollResult('2d6');
-            } else if (sizeDiff > 1) {
-                severityEffect = 'Mortal';
-                severityResult = await extractRollResult('2d8');
-            }
+        let critEffect;
+        if (severityRoll < 4) {
+            critEffect = 'No unusual effect'
+        } else if (CRIT_EFFECT_TABLE[weaponType]) {
+            critEffect = CRIT_EFFECT_TABLE[weaponType][targetType][locationObject['location'][severityRoll]];
+        } else {
+            critEffect = 'No unusual effect';
+        }
 
-            finalRollText += `{{Severity effect=${severityEffect}}} `;
-            finalRollText += `{{Severity roll=${severityResult}}} `;
+        finalRollText += `{{Critical effect=${critEffect}}}`;
+        console.log(finalRollText);
 
-            let weaponDamage = sizeToInt(targetSize) < 3 ? row['damsm'] : row['daml'];
-            if (severityResult > 12) {
-                finalRollText += `{{Critical damage=[[(${weaponDamage})*3]]}} `;
-                severityResult = 12;
-            } else {
-                finalRollText += `{{Critical damage=[[(${weaponDamage})*2]]}} `;
-            }
-
-            finalRollText += `{{Location roll=[[${locationResult}]]}} `;
-            finalRollText += `{{Location hit=${location['hitLocation']}}} `;
-
-            let critEffect = severityResult < 4
-                ? 'No unusual effect'
-                : CRIT_EFFECT_TABLE[weaponType][targetType][location['location']][severityResult];
-            finalRollText += `{{Critical effect=${critEffect}}}`;
-            console.log(finalRollText)
-
-            startRoll(finalRollText, function (roll) {
-                console.log(roll);
-                let computedRolls = {};
-                finishRoll(roll.rollId, computedRolls);
-            });
-
-        })
-        .execute();
+        startRoll(finalRollText, function (roll) {
+            console.log(roll);
+            let computedRolls = {};
+            finishRoll(roll.rollId, computedRolls);
+        });
+    });
 });
 //#endregion
 
