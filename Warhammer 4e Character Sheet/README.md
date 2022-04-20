@@ -73,6 +73,20 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+April 13th 2022 v1.55d
+
+- New integrated Size system - Size is selectable in Background tab, and Vs Size in the Melee Assister. Applyies Size Combat Modifiers rules from the core book, effects sheet Wounds/Carry weight and modifies melee combat rolls. Showing larger/smaller bonuses as appropriate. Only works with talent integration.
+- Separated Mele Attack and Opposed modifier, only Attack modifier is shown in Melee Assist window. So Opposed Parry rolls do not apply Attack only modifiers, and vice versa.
+- Improved Conditions calculation, they now cap at -30 modifier. Add Drunk as a special condition which can stack with other condition modifiers upto max -30. Penalties like Offhand and Armor are now considered in the cap.
+- Fixed Carouser RT results not displaying properly
+- Fixed Distract RT text not displaying properly
+- Fixed issue with Encumbrance Penalty when Agility was exactly 30 it would result in frozen target display
+- Added talents Beat Blade, Beneath Notice, Large/Small, Suffused with Uglu, Super Numerate & Supportive to talent integration
+- Added Beat Blade to melee assist actions, and reordered them so the layout cascade better on sheet
+- Activating Stun to Strike will now with also activate Melee Called Shot
+- Added new Psychology record section in Core Stats tab under Injuries (with community support!)
+ 
+
 April 6th 2022 v1.55c
 
 - Improved Armor Qualities, now displays selected options at top of attack rolls. New checkboxes in the Armor Tab.
