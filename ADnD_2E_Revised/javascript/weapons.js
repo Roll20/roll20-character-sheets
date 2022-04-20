@@ -3802,6 +3802,7 @@ WEAPONS_TABLE['stone axe'].push({
 WEAPONS_TABLE['two-handed axe'] = WEAPONS_TABLE['two-handed battle axe']
 WEAPONS_TABLE['two-handed axe'].push({
     'name': 'Two-handed axe',
+    'noProf': true,
     'size': 'L',
     'type': 'S',
     'speed': 9,
@@ -5050,6 +5051,7 @@ WEAPONS_TABLE['kusari-gama'].push({
 WEAPONS_TABLE['light lance'] = WEAPONS_TABLE['light horse lance'];
 WEAPONS_TABLE['light lance'].push({
     'name': 'Light lance',
+    'noProf': true,
     'size': 'L',
     'type': 'P',
     'speed': 6,
@@ -5067,6 +5069,7 @@ WEAPONS_TABLE['light lance'].push({
 WEAPONS_TABLE['medium lance'] = WEAPONS_TABLE['medium horse lance'];
 WEAPONS_TABLE['medium lance'].push({
     'name': 'Medium lance',
+    'noProf': true,
     'size': 'L',
     'type': 'P',
     'speed': 7,
@@ -5081,6 +5084,7 @@ WEAPONS_TABLE['medium lance'].push({
 WEAPONS_TABLE['heavy lance'] = WEAPONS_TABLE['heavy horse lance'];
 WEAPONS_TABLE['heavy lance'].push({
     'name': 'Heavy lance',
+    'noProf': true,
     'size': 'L',
     'type': 'P',
     'speed': 10,
@@ -5267,6 +5271,7 @@ WEAPONS_TABLE['maul'].push({
 WEAPONS_TABLE['morningstar'] = WEAPONS_TABLE['morning star'];
 WEAPONS_TABLE['morningstar'].push({
     'name': 'Morningstar',
+    'noProf': true,
     'size': 'M',
     'type': 'B/P',
     'speed': 7,
