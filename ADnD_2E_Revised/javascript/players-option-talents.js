@@ -1,137 +1,176 @@
-//#region Player's Options: Combat & Tactics
-const talents = {};
-talents['Alertness'] = {
+const TALENTS = {};
+TALENTS['Alertness'] = {
     'slots': 1,
-    'abilityScore': '@{Wisdom}/@{Intuition}',
+    'points': 6,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Intuition}',
     'modifier': +1,
     'classes': 'Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Ambidexterity'] = {
+TALENTS['Ambidexterity'] = {
     'slots': 1,
-    'abilityScore': '@{Dexterity}/@{Aim}',
+    'points': 4,
+    'abilityScore': '@{Dexterity}',
+    'subAbilityScore': '@{Aim}',
     'modifier': 0,
     'classes': 'Warrior/Rogue, Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Ambush'] = {
+TALENTS['Ambush'] = {
     'slots': 1,
-    'abilityScore': '@{Intelligence}/@{Reason}',
+    'points': 4,
+    'abilityScore': '@{Intelligence}',
+    'subAbilityScore': '@{Reason}',
     'modifier': 0,
+    'initialRating': '5',
     'classes': 'Warrior/Rogue, Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Camouflage'] = {
+TALENTS['Camouflage'] = {
     'slots': 1,
-    'abilityScore': '@{Intelligence}/@{Learning}',
+    'points': 4,
+    'abilityScore': '@{Intelligence}',
+    'subAbilityScore': '@{Knowledge}',
     'modifier': 0,
+    'initialRating': '5',
     'classes': 'Warrior/Rogue, Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Dirty Fighting'] = {
+TALENTS['Dirty Fighting'] = {
     'slots': 1,
-    'abilityScore': '@{Intelligence}/@{Learning}',
-    'modifier': +1,
+    'points': 3,
+    'abilityScore': '@{Intelligence}',
+    'subAbilityScore': '@{Knowledge}',
+    'modifier': 0,
+    'initialRating': '5',
     'classes': 'Warrior/Rogue, Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Endurance'] = {
+TALENTS['Endurance'] = {
     'slots': 2,
-    'abilityScore': '@{Constitution}/@{Toughness}',
+    'points': 4,
+    'abilityScore': '@{Constitution}',
+    'subAbilityScore': '@{Fitness}',
     'modifier': 0,
+    'initialRating': '3',
     'classes': 'Warrior, Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Fine Balance'] = {
+TALENTS['Fine Balance'] = {
     'slots': 2,
-    'abilityScore': '@{Dexterity}/@{Agility}',
+    'points': 5,
+    'abilityScore': '@{Dexterity}',
+    'subAbilityScore': '@{Balance}',
     'modifier': 0,
+    'initialRating': '7',
     'classes': 'Warrior/Rogue, Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Iron Will'] = {
+TALENTS['Iron Will'] = {
     'slots': 2,
-    'abilityScore': '@{Wisdom}/@{Will}',
+    'points': 6,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Will}',
     'modifier': -2,
+    'initialRating': '3',
     'classes': 'Warrior/Priest, Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Leadership'] = {
+TALENTS['Leadership'] = {
     'slots': 1,
-    'abilityScore': '@{Charisma}/@{Leadership}',
+    'points': 3,
+    'abilityScore': '@{Charisma}',
+    'subAbilityScore': '@{Leadership}',
     'modifier': -1,
+    'initialRating': '5',
     'classes': 'Warrior, Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Quickness'] = {
+TALENTS['Quickness'] = {
     'slots': 2,
-    'abilityScore': '@{Dexterity}/@{Aim}',
+    'points': 6,
+    'abilityScore': '@{Dexterity}',
+    'subAbilityScore': '@{Aim}',
+    'modifier': 0,
+    'initialRating': '3',
+    'classes': 'Warrior/Rogue, Special Talent',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+TALENTS['Steady Hand'] = {
+    'slots': 1,
+    'points': 5,
+    'abilityScore': '@{Dexterity}',
+    'subAbilityScore': '@{Aim}',
     'modifier': 0,
     'classes': 'Warrior/Rogue, Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Steady Hand'] = {
+TALENTS['Trouble Sense'] = {
     'slots': 1,
-    'abilityScore': '@{Dexterity}/@{Aim}',
+    'points': 4,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Intuition}',
     'modifier': 0,
-    'classes': 'Rogue, Special Talent',
-    'book': 'Player\'s Options: Combat & Tactics'
-};
-talents['Trouble Sense'] = {
-    'slots': 1,
-    'abilityScore': '@{Wisdom}/@{Intuition}',
-    'modifier': 0,
+    'initialRating': '3',
     'classes': 'Special Talent',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Flying Kick'] = {
+TALENTS['Flying Kick'] = {
     'slots': 1,
-    'abilityScore': '@{Strength}/@{Power}',
+    'points': 3,
+    'abilityScore': '@{Strength}',
+    'subAbilityScore': '@{Muscle}',
     'modifier': 0,
+    'initialRating': '5',
     'classes': 'Warrior, Martial Arts Talents',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Flying Kick'] = {
+TALENTS['Backward Kick'] = {
     'slots': 1,
-    'abilityScore': '@{Strength}/@{Power}',
-    'modifier': 0,
-    'classes': 'Warrior, Martial Arts Talents',
-    'book': 'Player\'s Options: Combat & Tactics'
-};
-talents['Backward Kick'] = {
-    'slots': 1,
+    'points': 3,
     'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'modifier': 0,
     'classes': 'Warrior/Priest/Rogue, Martial Arts Talents',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Spring'] = {
+TALENTS['Spring'] = {
     'slots': 1,
-    'abilityScore': '@{Dexterity}/@{Agility}',
+    'points': 3,
+    'abilityScore': '@{Dexterity}',
+    'subAbilityScore': '@{Balance}',
     'modifier': 0,
+    'initialRating': '5',
     'classes': 'Warrior/Rogue, Martial Arts Talents',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Crushing Blow'] = {
+TALENTS['Crushing Blow'] = {
     'slots': 1,
+    'points': 3,
     'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'modifier': 0,
     'classes': 'Warrior/Priest/Rogue, Martial Arts Talents',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Instant Stand'] = {
+TALENTS['Instant Stand'] = {
     'slots': 1,
-    'abilityScore': '@{Dexterity}/@{Agility}',
+    'points': 3,
+    'abilityScore': '@{Dexterity}',
+    'subAbilityScore': '@{Balance}',
     'modifier': 0,
+    'initialRating': '7',
     'classes': 'Warrior/Priest/Rogue, Martial Arts Talents',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-talents['Missile Deflection'] = {
+TALENTS['Missile Deflection'] = {
     'slots': 1,
+    'points': 3,
     'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'modifier': 0,
     'classes': 'Warrior/Priest/Rogue, Martial Arts Talents',
     'book': 'Player\'s Options: Combat & Tactics'
 };
-//#endregion
-
+module.exports = TALENTS;
