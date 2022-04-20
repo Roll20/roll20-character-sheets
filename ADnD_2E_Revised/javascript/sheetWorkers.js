@@ -82,14 +82,12 @@ const conditionalLog = function (bool, msg) {
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
     let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
     finishRoll(queryRoll.rollId);
-    console.log(queryRoll);
     return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
 };
 
 const extractRoll = async function(rollExpression) {
     let queryRoll = await startRoll(`!{{roll=[[${rollExpression}]]}}`);
     finishRoll(queryRoll.rollId);
-    console.log(queryRoll);
     return queryRoll.results.roll;
 };
 
@@ -1221,13 +1219,13 @@ on('change:thac0-base-calc', function(eventInfo) {
 });
 
 //#region Weapons autofill
-const PLAYERS_OPTIONS_FIELD = 'tab81';
+const PLAYERS_OPTION_FIELD = 'tab81';
 function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, category) {
     if (!weaponName)
         return;
 
     weaponName = weaponName.toLowerCase();
-    let fields = [...BOOK_FIELDS, PLAYERS_OPTIONS_FIELD, thac0Field].filter(Boolean);
+    let fields = [...BOOK_FIELDS, PLAYERS_OPTION_FIELD, thac0Field].filter(Boolean);
     getAttrs(fields, async function (values) {
         let bonus = 0;
         let baseWeapons = WEAPONS_TABLE[weaponName]
@@ -1245,23 +1243,28 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
             if (isNaN(bonus))
                 return;
         }
+        // Copying fields from base weapon to avoid side effects being saved permanently
+        let foundWeapons = baseWeapons.map(e => {
+            return {...e}
+        });
         if (category)
-            baseWeapons = baseWeapons.filter(w => w['category'].includes(category));
+            foundWeapons = foundWeapons.filter(w => w['category'].includes(category));
 
         let activeBooks = getActiveSettings(BOOK_FIELDS, values);
-        let activeWeapons = baseWeapons.filter(w => w['book'].some(b => activeBooks.has(b)));
+        let activeWeapons = foundWeapons.filter(w => w['book'].some(b => activeBooks.has(b)));
         if (activeWeapons.length === 0) {
-            let booksString = baseWeapons.flatMap(w => w['book']).map(b => '\n* ' + b).join('')
+            let booksString = foundWeapons.flatMap(w => w['book']).map(b => '\n* ' + b).join('')
             showToast(ERROR, 'Missing Book(s)', `The book(s):${booksString}\nAre currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
             return;
         }
 
         let baseWeapon;
-        let isPlayersOptions = values[PLAYERS_OPTIONS_FIELD] === '2';
-        let isAllEqual = activeWeapons.every(w => comparer(w, activeWeapons[0], isPlayersOptions));
+        let isPlayersOption = values[PLAYERS_OPTION_FIELD] === '2';
+        let isAllEqual = activeWeapons.every(w => comparer(w, activeWeapons[0], isPlayersOption));
         if (isAllEqual) {
             baseWeapon = activeWeapons[0];
         } else {
+            activeWeapons = combineBooks(activeWeapons, comparer, isPlayersOption);
             let options = activeWeapons
                 .map((w, i) => `${w.book.join('/')},${i}`)
                 .join('|');
@@ -1286,6 +1289,26 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
         }
         setWeaponFunc(weapon);
     });
+}
+
+function combineBooks(activeWeapons, comparer, isPlayersOptions) {
+    let copyArray = [...activeWeapons];
+
+    activeWeapons.forEach( weapon => {
+        copyArray.forEach( (copyWeapon, i) => {
+            if (weapon === copyWeapon) {
+                delete copyArray[i];
+                return;
+            }
+            if (!comparer(weapon, copyWeapon, isPlayersOptions))
+                return;
+
+            weapon['book'] = weapon['book'].concat(copyWeapon['book']);
+            delete activeWeapons[i];
+        });
+    });
+
+    return activeWeapons.filter(Boolean);
 }
 
 //melee hit autofill
