@@ -120,7 +120,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Legs/Wings'] = {
 CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Tail'] = {
     4:  'No unusual effect',
     5:  'No unusual effect',
-    6:  'Tip of tail struck; if prehensile, any items car- ried are dropped, -2 penalty to tail attacks due to pain',
+    6:  'Tip of tail struck; if prehensile, any items carried are dropped, -2 penalty to tail attacks due to pain',
     7:  'Tail injured, normal animals must save vs. death or retreat in pain; lose any tail attacks',
     8:  'Tail injured, normal animals must save vs. death or retreat in pain; lose any tail attacks',
     9:  'Tail broken, lose any tail attacks, 1/2 move if animal uses tail for movement',

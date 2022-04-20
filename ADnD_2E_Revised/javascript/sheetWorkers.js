@@ -1250,8 +1250,6 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
 
         let activeBooks = getActiveSettings(BOOK_FIELDS, values);
         let activeWeapons = baseWeapons.filter(w => w['book'].some(b => activeBooks.has(b)));
-
-
         if (activeWeapons.length === 0) {
             let booksString = baseWeapons.flatMap(w => w['book']).map(b => '\n* ' + b).join('')
             showToast(ERROR, 'Missing Book(s)', `The book(s):${booksString}\nAre currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
@@ -1453,10 +1451,10 @@ followerWeapons.forEach(fw => {
 // Monster weapons
 on('change:repeating_monsterweapons:weaponname', function(eventInfo){
     let setWeaponFunc = function (weapon) {
-        if (weapon.bonusInt > 1) {
-            weapon['small-medium'] += `+${bonus}`;
-            weapon['large'] += `+${bonus}`;
-            weapon['thac0'] = thac0 - bonus;
+        if (weapon['bonusInt'] > 1) {
+            weapon['small-medium'] += weapon['bonus'];
+            weapon['large'] += weapon['bonus'];
+            weapon['thac0'] = weapon['thac0'] - weapon['bonusInt'];
         }
         let weaponInfo = {
             [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
