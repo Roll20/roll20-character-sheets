@@ -1,7 +1,15 @@
 Change Log
 ==============================================
-**2022-02-15 ** v.9 Paul V
+**2022-03-07 ** v.11 Paul V
+	Split the Archtypes so only the selected class's archtypes will appear in the list 
+	Fixed bug in NPC Sheet
+**2022-02-31 ** v.10 Paul V
 	---Split the Archtypes so only the selected class's archtypes will appear in the list -- can't get this working at the moment
+	Improved the readability of TextBoxes, increase the text size and darkened the colour a little
+	Added Vehicle skill for the initiative
+	Got Vehicle Initiative working
+	Improved coding of the CSS 
+**2022-02-15 ** v.9 Paul V
 	Added Marshal into the Class list, removed the no longer used Warlord
 	Added a check box to each spell list allowing spell notes to be added to each spell
 	Added Notes Tab to Character sheet

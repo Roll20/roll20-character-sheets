@@ -127,3 +127,17 @@ on("clicked:migrate", async (e) => {
   console.log("clicked:migrate", e);
   await migrateAttributes();
 });
+
+// $20("button.test").on("mouseenter", (e) => {
+//   console.log(e);
+// });
+
+// on("clicked:test", async (e) => {
+//   console.log("test");
+//   const acid = getActiveCharacterId();
+//   const attrs = findObjs({
+//     _type: "attribute",
+//     _characterid: acid,
+//   });
+//   console.log(acid, attrs);
+// });
