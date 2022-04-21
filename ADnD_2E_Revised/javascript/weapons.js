@@ -6545,7 +6545,6 @@ WEAPONS_TABLE['wheellock horse pistol'].push({
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
-
 WEAPONS_TABLE['whip'].push({
     'name': 'Whip',
     'size': 'M',
@@ -6558,6 +6557,89 @@ WEAPONS_TABLE['whip'].push({
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Melee']
 });
-
+WEAPONS_TABLE['shield-punch, small shield'] = [];
+WEAPONS_TABLE['shield-punch, small shield'].push({
+    'name': 'Shield-Punch, Small shield',
+    'noProf': true,
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'reach': '1',
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': 'd6',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['shield-punch, medium shield'] = [];
+WEAPONS_TABLE['shield-punch, medium shield'].push({
+    'name': 'Shield-Punch, Medium shield',
+    'noProf': true,
+    'size': 'M',
+    'type': 'B',
+    'speed': 6,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': 'd8',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['shield-punch, large shield'] = [];
+WEAPONS_TABLE['shield-punch, large shield'].push({
+    'name': 'Shield-Punch, Large shield',
+    'noProf': true,
+    'size': 'L',
+    'type': 'B',
+    'speed': 8,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': 'd10',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['shield-rush, small shield'] = [];
+WEAPONS_TABLE['shield-rush, small shield'].push({
+    'name': 'Shield-Rush, Small shield',
+    'noProf': true,
+    'size': 'S',
+    'type': 'B',
+    'speed': 0,
+    'reach': '1',
+    'small-medium': '1d3',
+    'large': '1d3',
+    'knockdown': '0',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['shield-rush, medium shield'] = [];
+WEAPONS_TABLE['shield-rush, medium shield'].push({
+    'name': 'Shield-Rush, Medium shield',
+    'noProf': true,
+    'size': 'M',
+    'type': 'B',
+    'speed': 0,
+    'reach': '1',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'knockdown': '+1',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['shield-rush, large shield'] = [];
+WEAPONS_TABLE['shield-rush, large shield'].push({
+    'name': 'Shield-Rush, Large shield',
+    'noProf': true,
+    'size': 'L',
+    'type': 'B',
+    'speed': 0,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'knockdown': '+3',
+    'book': ['Player\'s Option: Combat & Tactics'],
+    'category': ['Melee']
+});
 //#endregion
 module.exports = WEAPONS_TABLE;
