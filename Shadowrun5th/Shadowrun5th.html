@@ -14942,13 +14942,13 @@ async function importEquipmentTab(experimental, chummerfile) {
     }
 
     if(chummerfile.characters.character.cyberwares != null){
-            console.log("Importing Cyberware Armor");
-            if(chummerfile.characters.character.cyberwares.cyberware.length > 1){
-                chummerfile.characters.character.cyberwares.cyberware.forEach(cyberware =>  importCyberwareArmor(cyberware, attributes));
-            }else{
-                importCyberwareArmor(chummerfile.characters.character.cyberwares.cyberware, attributes)
-            }
+        console.log("Importing Cyberware Armor");
+        if(chummerfile.characters.character.cyberwares.cyberware.length > 1){
+            chummerfile.characters.character.cyberwares.cyberware.forEach(cyberware =>  importCyberwareArmor(cyberware, attributes));
+        }else{
+            importCyberwareArmor(chummerfile.characters.character.cyberwares.cyberware, attributes);
         }
+    }
 
     if(chummerfile.characters.character.weapons != null){
         console.log("Importing weapons");
@@ -15350,9 +15350,9 @@ function importRepeatingAmmo(ammunition, number, attributes) {
         attributes["repeating_ammotype"+number+"_"+newrowid+"_ammoap"] = ammo.weaponbonusap != null? ammo.weaponbonusap : 0;
     }
 
-    if(ammo.name_english === "Arrow: Stick-n-Shock w/Static Shaft") {
-        attributes["repeating_ammotype"+number+"_"+newrowid+"_ammoap"] = -5 - attributes["weaponap"+number]
-        attributes["repeating_ammotype"+number+"_"+newrowid+"_ammodv"] = ammo.weaponbonusdamage_english.substring(0,2) - attributes["weapondv"+number]
+    if(ammo.name_english === "Arrow: Stick-n-Shock w/Static Shaft" || ammo.name_english === "Arrow: Stick-n-Shock") {
+        attributes["repeating_ammotype"+number+"_"+newrowid+"_ammoap"] = -5 - attributes["weaponap"+number];
+        attributes["repeating_ammotype"+number+"_"+newrowid+"_ammodv"] = ammo.weaponbonusdamage_english.substring(0,2) - attributes["weapondv"+number];
     }
 
     attributes["repeating_ammotype"+number+"_"+newrowid+"_ammoacc"] = ammo.weaponbonusacc != null ? ammo.weaponbonusacc : 0;
@@ -15511,7 +15511,7 @@ function importRepeatingWeaponAmmo(row, ammunition, number, attributes) {
         attributes[row + "ammoap" + number] = ammo.weaponbonusap != null? ammo.weaponbonusap : 0;
     }
 
-    if(ammo.name_english === "Arrow: Stick-n-Shock w/Static Shaft" || ammo.name_english === Arrow: Stick-n-Shock) {
+    if(ammo.name_english === "Arrow: Stick-n-Shock w/Static Shaft" || ammo.name_english === "Arrow: Stick-n-Shock") {
         attributes[row + "ammoap" + number] = -5 -  attributes[row + "weaponap"]
         attributes[row + "ammodv" + number] = ammo.weaponbonusdamage_english.substring(0,2) - attributes[row + "weapondv"]
     }
@@ -16786,7 +16786,6 @@ on('clicked:repeating_ammotype1:roll clicked:repeating_ammotype2:roll clicked:re
         }
     }
 
-
     await rollDogableAttack(rollPart, dmgType);
 
 });
@@ -16809,9 +16808,11 @@ const rollDogableAttack = async (rollPart, dmgType) => {
     let attrs = await asw.getAttrs(['character_name']);
     // Storing all the passthrough data required for the next roll in an Object helps for larger rolls
     let attackDmgType = dmgType[Object.keys(dmgType)[0]]
+
     if(!attackDmgType) {
         attackDmgType = 'P';
     }
+
     let rollData = {
         attacker: attrs.character_name,
         attackHits: attackRoll.results.result.result,
