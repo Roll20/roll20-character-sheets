@@ -73,6 +73,14 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+April 22th 2022 v1.55d
+
+- Spell Tab changes: Spell name selection improved custom name field is now hidden if not being used. Added Memorized checkbox and XP Cost field for spells. Arcane spells which are not Memorized double the CN on rolling as per Core rules.
+- Drunk now applies to WS/BS/Agi/Dex/Int skills only.
+- Fixed Conditions not working with no offhand weapon equiped. This stoped a few rolls from functioning.
+- Ranged Accurate has been merged into the Ranged modifier changing defautl mod to 10 rather then add during the roll to any other modifier value.
+ 
+
 April 13th 2022 v1.55d
 
 - New integrated Size system - Size is selectable in Background tab, and Vs Size in the Melee Assister. Applyies Size Combat Modifiers rules from the core book, effects sheet Wounds/Carry weight and modifies melee combat rolls. Showing larger/smaller bonuses as appropriate. Only works with talent integration.
