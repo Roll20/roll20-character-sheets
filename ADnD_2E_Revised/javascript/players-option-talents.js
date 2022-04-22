@@ -5,7 +5,7 @@ TALENTS['Alertness'] = {
     'abilityScore': '@{Wisdom}',
     'subAbilityScore': '@{Intuition}',
     'modifier': +1,
-    'classes': 'Special Talent',
+    'classes': '',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Ambidexterity'] = {
@@ -14,7 +14,7 @@ TALENTS['Ambidexterity'] = {
     'abilityScore': '@{Dexterity}',
     'subAbilityScore': '@{Aim}',
     'modifier': 0,
-    'classes': 'Warrior/Rogue, Special Talent',
+    'classes': 'Warrior/Rogue',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Ambush'] = {
@@ -23,8 +23,8 @@ TALENTS['Ambush'] = {
     'abilityScore': '@{Intelligence}',
     'subAbilityScore': '@{Reason}',
     'modifier': 0,
-    'initialRating': '5',
-    'classes': 'Warrior/Rogue, Special Talent',
+    'rating': '5',
+    'classes': 'Warrior/Rogue',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Camouflage'] = {
@@ -33,8 +33,8 @@ TALENTS['Camouflage'] = {
     'abilityScore': '@{Intelligence}',
     'subAbilityScore': '@{Knowledge}',
     'modifier': 0,
-    'initialRating': '5',
-    'classes': 'Warrior/Rogue, Special Talent',
+    'rating': '5',
+    'classes': 'Warrior/Rogue',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Dirty Fighting'] = {
@@ -43,8 +43,8 @@ TALENTS['Dirty Fighting'] = {
     'abilityScore': '@{Intelligence}',
     'subAbilityScore': '@{Knowledge}',
     'modifier': 0,
-    'initialRating': '5',
-    'classes': 'Warrior/Rogue, Special Talent',
+    'rating': '5',
+    'classes': 'Warrior/Rogue',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Endurance'] = {
@@ -53,8 +53,8 @@ TALENTS['Endurance'] = {
     'abilityScore': '@{Constitution}',
     'subAbilityScore': '@{Fitness}',
     'modifier': 0,
-    'initialRating': '3',
-    'classes': 'Warrior, Special Talent',
+    'rating': '3',
+    'classes': 'Warrior',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Fine Balance'] = {
@@ -63,8 +63,8 @@ TALENTS['Fine Balance'] = {
     'abilityScore': '@{Dexterity}',
     'subAbilityScore': '@{Balance}',
     'modifier': 0,
-    'initialRating': '7',
-    'classes': 'Warrior/Rogue, Special Talent',
+    'rating': '7',
+    'classes': 'Warrior/Rogue',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Iron Will'] = {
@@ -73,8 +73,8 @@ TALENTS['Iron Will'] = {
     'abilityScore': '@{Wisdom}',
     'subAbilityScore': '@{Will}',
     'modifier': -2,
-    'initialRating': '3',
-    'classes': 'Warrior/Priest, Special Talent',
+    'rating': '3',
+    'classes': 'Warrior/Priest',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Leadership'] = {
@@ -83,8 +83,8 @@ TALENTS['Leadership'] = {
     'abilityScore': '@{Charisma}',
     'subAbilityScore': '@{Leadership}',
     'modifier': -1,
-    'initialRating': '5',
-    'classes': 'Warrior, Special Talent',
+    'rating': '5',
+    'classes': 'Warrior',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Quickness'] = {
@@ -93,8 +93,8 @@ TALENTS['Quickness'] = {
     'abilityScore': '@{Dexterity}',
     'subAbilityScore': '@{Aim}',
     'modifier': 0,
-    'initialRating': '3',
-    'classes': 'Warrior/Rogue, Special Talent',
+    'rating': '3',
+    'classes': 'Warrior/Rogue',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Steady Hand'] = {
@@ -103,7 +103,7 @@ TALENTS['Steady Hand'] = {
     'abilityScore': '@{Dexterity}',
     'subAbilityScore': '@{Aim}',
     'modifier': 0,
-    'classes': 'Warrior/Rogue, Special Talent',
+    'classes': 'Warrior/Rogue',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Trouble Sense'] = {
@@ -112,8 +112,8 @@ TALENTS['Trouble Sense'] = {
     'abilityScore': '@{Wisdom}',
     'subAbilityScore': '@{Intuition}',
     'modifier': 0,
-    'initialRating': '3',
-    'classes': 'Special Talent',
+    'rating': '3',
+    'classes': '',
     'book': 'Player\'s Options: Combat & Tactics'
 };
 TALENTS['Flying Kick'] = {
@@ -122,7 +122,7 @@ TALENTS['Flying Kick'] = {
     'abilityScore': '@{Strength}',
     'subAbilityScore': '@{Muscle}',
     'modifier': 0,
-    'initialRating': '5',
+    'rating': '5',
     'classes': 'Warrior, Martial Arts Talents',
     'book': 'Player\'s Options: Combat & Tactics'
 };
@@ -141,7 +141,7 @@ TALENTS['Spring'] = {
     'abilityScore': '@{Dexterity}',
     'subAbilityScore': '@{Balance}',
     'modifier': 0,
-    'initialRating': '5',
+    'rating': '5',
     'classes': 'Warrior/Rogue, Martial Arts Talents',
     'book': 'Player\'s Options: Combat & Tactics'
 };
@@ -160,7 +160,7 @@ TALENTS['Instant Stand'] = {
     'abilityScore': '@{Dexterity}',
     'subAbilityScore': '@{Balance}',
     'modifier': 0,
-    'initialRating': '7',
+    'rating': '7',
     'classes': 'Warrior/Priest/Rogue, Martial Arts Talents',
     'book': 'Player\'s Options: Combat & Tactics'
 };

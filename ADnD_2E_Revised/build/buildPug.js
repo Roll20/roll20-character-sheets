@@ -17,7 +17,8 @@ spellsJs.forEach(jsFile => {
     html += pug.renderFile(path.join(pugFolder, 'spellsDatalists.pug'), {pretty: true, data: spells});
 });
 
-console.log('weapons.js')
+console.log('weapons.js');
+console.log('weaponProficiencies.js');
 const weapons = require(path.join(jsFolder, 'weapons.js'));
 const weaponsProficiencies = require(path.join(jsFolder, 'weaponProficiencies.js'));
 html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weapons, proficiencies: weaponsProficiencies});
@@ -25,9 +26,17 @@ html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: tr
 let weaponTable = pug.renderFile(path.join(pugFolder, 'weaponsTable.pug'), {pretty: true, data: weapons});
 fs.writeFileSync(path.join(miscFolder, 'weapons-overview.html'), weaponTable);
 
-console.log('nonweaponProficiencies.js')
-const nonweaponProficiencies = require(path.join(jsFolder, 'nonweaponProficiencies.js'));
-html += pug.renderFile(path.join(pugFolder, 'nonweaponProficienciesDatalists.pug'), {pretty: true, data: nonweaponProficiencies});
+const simpleDatalists = [
+    ['nonweaponProficiencies.js','nonweapon-proficiencies'],
+    ['players-option-talents.js','talents'],
+    ['players-option-traits.js','traits'],
+    ['players-option-disadvantages.js','disadvantages']
+];
+simpleDatalists.forEach(simpleDatalist => {
+   console.log(simpleDatalist[0]);
+   const data = require(path.join(jsFolder, simpleDatalist[0]));
+   html += pug.renderFile(path.join(pugFolder, 'simpleDatalists.pug'), {pretty: true, data: data, id:simpleDatalist[1]})
+});
 
 fs.writeFileSync(path.join(htmlFolder, 'dynamicDatalists.html'), html);
 console.log('');
