@@ -6,6 +6,15 @@ Feuille de Personnage pour L'Anneau Unique, traduction de la [feuille VO de Mich
 
 ## Notes de version
 
+### Version 1.2 (2017-03-20)
+
+* Correction du jet de Sagesse
+
+### Version 1.1 (2017-02-22)
+
+* Retrait des demandes de Seuil de Réussite sur les jets (qui n'étaient pas utilisés)
+* Ajout de la saisie de Dés de Maîtrise sur les jets
+
 ### Version 1.0 (2015-05-10)
 
 Cr&eacute;ation.

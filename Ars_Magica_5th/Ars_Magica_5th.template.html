@@ -1,0 +1,2329 @@
+
+$$html_header$$
+<!-- The file template.html includes python integration. See Readme.md for details -->
+
+<!--
+    Do not remove older alerts, the id system will break and hide new alerts on old sheets
+    Add new alerts *after* the old ones, otherwise you will change the automatic ID of old alerts
+    and the new alert will be assigned an old ID (and be hidden on many older characters)
+-->
+$$alert(
+    "February 2021 v1.6.1 update - ERROR: Spell's arts conversion",
+    """The conversion script that updates your spell's arts to the new format failed to run. This means you need to setup the arts of your spells again.
+    
+    <b>Note:</b> The script is run each time you open your character sheet, as long as this banner is visible. If it completes normally, it will hide this banner before you can see it.""",
+    ID="161-spell-update"
+)$$
+$$alert(
+    "February 2021 v1.6 Update",
+    "In the 'Ability' tab, the characteristic of each ability must be selected again.",
+    level="warning",
+    ID="alert-update-v1_6-dataloss"
+)$$
+$$alert(
+    "January 2022 - v1.7 - Armory Update",
+    "The armory and Combat modifiers list replace the old armor and combat modifier text areas. "
+    "The old entries and data can be found in the 'Sheet' tab, under 'Legacy'.",
+    ID="alert-update-v1-7-armorylegacy"
+)
+$$
+<!-- Alerts are now generated in python from the changelog.md file -->
+$$update_alerts$$
+
+<div class="top_bar">
+    <div>
+        <div class='3colrow'>
+            <div class='col'>
+                <table class="table_1">
+                    <tr>
+                        <th data-i18n="character" >Character</th>
+                        <td><input type="text" class="heading_1" name="attr_character_name"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="player" >Player</th>
+                        <td><input type="text" class="heading_3" name="attr_player_name"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="unspent-xp" >Unspent XP</th>
+                        <td><input type="text" class="heading_3" name="attr_unspent_xp"/></td>
+                    </tr>
+                </table>
+            </div>
+            <div class='col'>
+                <div class="banner">
+                    <div class="banner-content"></div>
+                </div>
+            </div>
+            <div class='col'>
+                <table class="table_1">
+                    <tr>
+                        <th data-i18n="saga" >Saga</th>
+                        <td colspan="3"><input type="text" class="heading_2" name="attr_saga"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="current-year" >Current Year</th>
+                        <td colspan="3"><input type="text" class="heading_2" name="attr_year"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="confidence" >Confidence</th>
+                        <td><input type="text" data-i18n-placeholder="score" placeholder="Score" class="heading_2" style="width:50px;" name="attr_Confidence"/></td>
+                        <th data-i18n="pool" >Pool</th>
+                        <td style="text-align:right;"><input data-i18n-placeholder="points" placeholder="Points" type="text" class="heading_2" style="width:50px;" name="attr_ConfidencePoints"/></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tab-br"></div>
+<input type="hidden" class="tabstoggle" name="attr_sheetTab" value="sheet"/>
+<input type="hidden" name="attr_simple-die" value="(1d10cs0cf0) [@{simple-die_i18n}]"/>
+<input type="hidden" name="attr_stress-die" value="ceil(((((1d10cs1cf10 %9) -1)+9) %9) *1.1) [@{stress-die_i18n}]"/>
+<input type="hidden" class="dtype-selector" name="attr_die-type-selection-proxy" value="toggle"/>
+<input type="hidden" class="selected-die" name="attr_selected-die" value="simple"/>
+<input type="hidden" class="toggle-magi" name="attr_isMagi" value="yes" />
+<div class="buttonbar">
+    <div class="navbuttons">
+        <button type="action" name="act_character" class="tabbutton" data-i18n="character" >Character</button>
+        <button type="action" name="act_abilities" class="tabbutton" data-i18n="abilities" >Abilities</button>
+        <button type="action" name="act_magic" class="tabbutton magi-only" data-i18n="magic" >Magic</button>
+        <button type="action" name="act_combat" class="tabbutton" data-i18n="combat" >Combat</button>
+        <button type="action" name="act_spells" class="tabbutton magi-only" data-i18n="spells" >Spells</button>
+        <button type="action" name="act_sheet" class="tabbutton" data-i18n="sheet" style="margin-left: 10px;">Sheet</button>
+    </div>
+    <div class="tabblank"></div>
+    <div class="functions">
+        <button type="action" name="act_die-toggle-simple" class="die-toggle-simple" data-i18n="simple">Simple</button>
+        <button type="action" name="act_die-toggle-stress" class="die-toggle-stress" data-i18n="stress">Stress</button>
+        <button type="roll" class="reroll" name="roll_reroll" title="Reroll" value="&{template:reroll} {{roll= [[1d10cs0cf0]]}}" data-i18n="roll">Roll</button>
+        <button type="roll" class="botch" name="roll_botch" title="Botch" value="@{botch_formula}" data-i18n="botch" >Botch</button>
+        <button type="roll" class="critical" name="roll_critical" title="Critical" value="&{template:critical} {{roll=[[?{@{total_i18n}|0} [@{total_i18n}] + (2*2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die]]]}}" data-i18n="critical">Critical</button>
+        <!-- Invisible critical button with a divide by 2, for spontaneous criticals -->
+        <button type="roll" class="critical" name="roll_critical-spontaneous" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0} [@{total_i18n}] + (2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die]]]}} {{type=@{spontaneous_i18n}}}" />
+        <!-- Invisible critical button for initiative critical that adds to turn tracker -->
+        <button type="roll" class="critical" name="roll_critical-init" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0} [@{total_i18n}] + (2*2**({1d10cs1cf0!1}=1)) [number of 1s] * [[1d9+1]] [last die] &{tracker}]]}} {{type=@{initiative_i18n}}}" />
+    </div>
+</div>
+<div class="tab-br"></div> 
+
+<!-- 1 Details -->
+<div class="tab-content tab1">
+    <div>
+        <!-- Genera Information -->
+        <div class='2colrow'>
+        <div class='col'>
+                <div>
+                    <div class='col'>
+                        <table class="table_1">
+                            <tr>
+                                <th data-i18n="age" >Age</th>
+                                <td><input type="text" class="heading_2" style="width:70px;" name="attr_Age"/></td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <select class="select_2" name="attr_MightType">
+                                        <option class="italic" value="NoMight"><span style="text-align:center;" data-i18n="no-might" >No Might</span></option>
+                                        <option value="DivineMight" data-i18n="divine-might" >Divine Might</option>
+                                        <option value="FaerieMight" data-i18n="faerie-might" >Faerie Might</option>
+                                        <option value="InfernalMight" data-i18n="infernal-might" >Infernal Might</option>
+                                        <option value="MagicMight" data-i18n="magic-might" >Magic Might</option>
+                                    </select>
+                                </th>
+                                <td><input data-i18n-placeholder="score" placeholder="Score" type="text" class="heading_2" style="width:70px;" name="attr_MightScore" /></td>
+                            </tr>
+                            <tr>
+                                <th data-i18n="warp-score" >Warp Score</th>
+                                <td><input type="text" class="heading_2" style="width:70px;" name="attr_Warping"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class='col'>
+                        <table class="table_1" style="margin-bottom:16px;">
+                            <tr>
+                                <th data-i18n="apparent-age" >Apparent Age</th>
+                                <td><input type="text" class="heading_2" style="width:70px;" name="attr_ApparentAge"/></td>
+                            </tr>
+                            
+                            <tr>
+                                <th data-i18n="pool" >Pool</th>
+                                <td><input data-i18n-placeholder="points" placeholder="Points" type="text" class="heading_2" style="width:70px;" name="attr_CurrentMagicMight"/></td>
+                            </tr>
+                            <tr>
+                                <th data-i18n="warp-points" >Warp Points</th>
+                                <td><input type="text" class="heading_2" style="width:70px;" name="attr_WarpPoints"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <div class='row'>
+                        <h4 class="heading_label" style="margin-bottom:0px;" data-i18n="warping-scars" >Warping Scars</h4>
+                        <textarea class="textarea_4" name="attr_Warping_effects"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class='col'>
+                <table class="table_2" style="width:400px">
+                    <tr>
+                        <th colspan="2" data-i18n="birth-name" >Birth Name</th>
+                        <td colspan="2"><input type="text" class="heading_3" name="attr_Birth_Name"/></td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" data-i18n="year-born" >Year Born</th>
+                        <td colspan="2"><input type="text" class="heading_3" name="attr_Year_Born"/></td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" data-i18n="gender" >Gender</th>
+                        <td colspan="2"><input type="text" class="heading_3" name="attr_Gender"/></td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" data-i18n="race-nationality" >Race/Nationality</th>
+                        <td colspan="2"><input type="text" class="heading_3" name="attr_Race_Nationality"/></td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" data-i18n="place-of-origin" >Place of Origin</th>
+                        <td colspan="2"><input type="text" class="heading_3" name="attr_Place_of_Origin"/></td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" data-i18n="religion" >Religion</th>
+                        <td colspan="2"><input type="text" class="heading_3" name="attr_Religion"/></td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" data-i18n="title-profession" >Title/Profession</th>
+                        <td colspan="2"><input type="text" class="heading_3" name="attr_Title_Profession"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="height" >Height</th>
+                        <td><input type="text" class="heading_3" style="width:70px;" name="attr_Height"/></td>
+                        <th data-i18n="weight" >Weight</th>
+                        <td><input type="text" class="heading_3" style="width:70px;" name="attr_Weight"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="size" >Size</th>
+                        <td><input type="number" class="heading_3" style="width:70px;" name="attr_Size"/></td>
+                        <th data-i18n="handedness" >Handedness</th>
+                        <td><input type="text" class="heading_3" style="width:70px;" name="attr_Handedness"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="hair" >Hair</th>
+                        <td><input type="text" class="heading_3" style="width:70px;" name="attr_Hair"/></td>
+                        <th data-i18n="eyes" >Eyes</th>
+                        <td><input type="text" class="heading_3" style="width:70px;" name="attr_Eyes"/></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Magus background -->
+    <div class="magi-only">
+        <h4 class="heading_label" style="margin-bottom:0px;" data-i18n="magus-background" >Magus Background</h4>
+        <div class='2colrow' style="border:1px solid black;">
+            <div class='col'>
+                <table class="table_1">
+                    <tr>
+                        <th data-i18n="house" >House</th>
+                        <td><input type="text" class="heading_2" name="attr_House"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="covenant" >Covenant</th>
+                        <td><input type="text" class="heading_2" name="attr_Covenant"/></td>
+                    </tr>
+                    <tr>
+                        <td><h4 class="heading_label" style="margin-bottom: 0px;" data-i18n="wizard-s-sigil" >Wizard's Sigil</h4></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" colspan="2"><textarea class="textarea_4" name="attr_sigil"></textarea></th>
+                    </tr>
+                </table>
+            </div>
+            <div class='col'>
+                <table class="table_1" style="text-align:right;">
+                    <tr>
+                        <th data-i18n="domus-magna" >Domus Magna</th>
+                        <td><input type="text" class="heading_2" name="attr_DomusMagna"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="primus" >Primus</th>
+                        <td><input type="text" class="heading_2" name="attr_Primus"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="parens" >Parens</th>
+                        <td><input type="text" class="heading_2" name="attr_Parens"/></td>
+                    </tr>
+                    <tr>
+                        <th data-i18n="covenant-of-apprenticeship" >Covenant of Apprenticeship</th>
+                        <td><input type="text" class="heading_2" name="attr_CovenantofApprenticeship"/></td>
+                    </tr>
+               </table>
+            </div>
+        </div>
+    </div>
+    <br>
+    <!-- Virtues & Flaws -->
+    <div>
+        <div class='2colrow'>
+            <div class='col'>
+                <h4 class="heading_label" data-i18n="virtues" >Virtues</h4>
+                <fieldset class="repeating_virtue">
+                    <table class="table_2" style="width:400px">
+                        <tr>
+                            <td><input type="text" class="heading_2 " name="attr_Virtue" style="width:245px"/>
+                                <select name="attr_VirtueType" class="dropdown"/>
+                                    <option name="attr_VirtueType" value="Vminor" data-i18n="minor" >Minor</option>
+                                    <option name="attr_VirtueType" value="Vmajor" data-i18n="major" >Major</option>
+                                    <option name="attr_VirtueType" value="Vfree" data-i18n="free" >Free</option>
+                                </select>
+                            </td>
+                            <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_virtue_show" value="1" checked/><span></span></div></th>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <input type="checkbox" class="hider hidden" name="attr_virtue_show" value="1" checked/>
+                                <div class="hide">
+                                    <textarea class="textarea_1" style="width:300px;" name="attr_virtue_text"></textarea>
+                                        
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+            <div class='col'>
+                <h4 class="heading_label" data-i18n="flaws" >Flaws</h4>
+                <fieldset class="repeating_flaw">
+                    <table class="table_2" style="width:400px">
+                        <tr>
+                            <td><input type="text" class="heading_2" name="attr_flaw" style="width:245px"/>
+                                <select name="attr_VirtueType" class="dropdown"/>
+                                    <option name="attr_VirtueType" value="Vminor" data-i18n="minor" >Minor</option>
+                                    <option name="attr_VirtueType" value="Vmajor" data-i18n="major" >Major</option>
+                                    <option name="attr_VirtueType" value="Vfree" data-i18n="free" >Free</option>
+                                </select>
+                            
+                            </td>
+                            <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_flaw_show" value="1" checked/><span></span></div></th>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <input type="checkbox" class="hider hidden" name="attr_flaw_show" value="1" checked/>
+                                <div class="hide">
+                                    <textarea class="textarea_1" style="width:300px;" name="attr_flaw_text"></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <br>
+    <!-- Personnality traits & Reputations -->
+    <div>
+        <div class='2colrow'>
+            <div class='col'>
+                <h4 class="heading_label" data-i18n="personality-traits" >Personality Traits</h4>
+                <table class="table_2" style="width:400px">
+                    <tr>
+                        <td data-i18n="trait" >Trait</td>
+                        <td data-i18n="score" >Score</td>
+                        <td></td>
+                    </tr>
+                    $$personality_trait_rows$$
+                </table>
+            </div>
+            <div class='col'>
+                <h4 class="heading_label" data-i18n="reputations" >Reputations</h4>
+                <table class="table_2" style="width:400px">
+                    <tr>
+                        <th></th>
+                        <td data-i18n="type" >Type</td>
+                        <td data-i18n="score" >Score</td>
+                    </tr>
+                    $$reputation_rows$$
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Inventory -->
+    <div>
+        <h4 class="heading_label" data-i18n="inventory" >Inventory</h4>
+        <table class="table_2" style="width:830px">
+            <tr>
+                <td style="width:400px;" data-i18n="item" >Item</td>
+                <td style="width:400px;" data-i18n="number" >Number</td>
+                <th></th>
+            </tr>
+        </table>
+        <fieldset class="repeating_item">
+            <table class="table_2" style="width:830px">
+                <tr>
+                    <td style="width:450px;"><input type="text" class="heading_2" style="width:400px" name="attr_item_name" data-i18n-placeholder="item-name" placeholder="Item Name"/></td>
+                    <td style="width:350px;"><input type="number" class="number_1" name="attr_item_number" value="0"/></td>
+                    <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_item_show" value="1" checked/><span></span></div></th>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <input type="checkbox" class="hider hidden" name="attr_item_show" value="1" checked/><span></span>
+                        <div class="hide">
+                            <textarea class="textarea_2" style="width:800px" name="attr_item_description" data-i18n-placeholder="description" placeholder="Description"></textarea>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+    </div>
+</div>
+
+<!-- 2 Characteristics & Abilities -->
+<div class="tab-content tab2">
+    <div>
+        <div class='2colrow' style="margin-top:10px;">
+            <div class='col'>
+                <!-- Characteristics -->
+                <div>
+                    <h4 class="heading_label" data-i18n="characteristics" >Characteristics</h4>
+                    <table class="table_2" style="border:0px">
+                        <tr>
+                            <td><div class="heading"></div></td>
+                            <td data-i18n="description" >Description</td>
+                            <td data-i18n="score" >Score</td>
+                            <td data-i18n="aging" >Aging</td>
+                            <td data-i18n="bonus" >Bonus</td>
+                        </tr>
+                        $$mental_characteristic_rows$$
+                        <tr><td colspan="5" style="padding-top: 15px ;margin-bottom: 5px;border-bottom: black 1px solid;"></td></tr>
+                        <tr><td colspan="5" style="padding-bottom: 13px"></td></tr>
+                        $$physical_characteristic_rows$$
+                    </table>
+                </div>
+                <!-- Aging -->
+                <div>
+                    <table class="table_2" style="border-width: 0px;">
+                        <tr>
+                            <th><h4 class="heading_label" data-i18n="decrepitude-aging" >Decrepitude/Aging</h4></th>
+                            <td><input type="text" class="number_1" name="attr_Decrepitude" value="0"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><textarea class="textarea_2" name="attr_Decrepitude_effects"></textarea></td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- Effects -->
+                <div>
+                    <h4 class="heading_label" style="margin-bottom: 0px;" data-i18n="ongoing-effects" >Ongoing Effects</h4>
+                    <textarea class="textarea_2" name="attr_Longevity_Scars"></textarea>
+                </div>
+            </div>
+            <!-- Abilities -->
+            <div class='col'>
+                <h4 class="heading_label" data-i18n="abilities" style="margin-bottom: 15px;">Abilities</h4>
+                <div>
+                    <span class="has-tooltip">
+                        <span data-i18n="characteristic" style="font-family: 'Macondo', cursive; color: #663333; font-size: 1.3em;">Characteristic</span>
+                        <span class="tooltip" data-i18n="tooltip-default-characteristic">Default characteristic to use. Can be overriden per ability.</span>
+                    </span>
+                    <select class="select_1" name="attr_global_Ability_CharacName">
+                        $$characteristic_name_options$$
+                    </select>
+                </div>
+                <table class="table_2" style="width:400px;">
+                    <tr>
+                        <td><div style="width:40px;"></div></td>
+                        <td><div style="width:210px;" data-i18n="ability" >Ability</div></td>
+                        <td><div style="width:60px;" data-i18n="score" >Score</div></td>
+                        <td><div style="width:40px;">*</div></td>
+                    </tr>
+                </table>
+                <fieldset class="repeating_ability">
+                    <table class="table_2" style="width:400px;">
+                        <tr>
+                            <td width="30px"><div class="flex-container-center">
+                                <button type="roll" class="button simple-roll" name="roll_ability_simple" value="$$ability_roll_simple$$"></button>
+                                <button type="roll" class="button stress-roll" name="roll_ability_stress" value="$$ability_roll_stress$$"></button>
+                            </div></td>
+                            <td width="240px"><input type="text" style="width:220px;" class="heading_4" name="attr_Ability_name"/></td>
+                            <td><input type="number" class="number_2" name="attr_Ability_TotalScore" value="[[(@{Ability_Score}) + (@{Ability_Puissant})]]" disabled="true" /></td>
+                            <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_Ability_show" value="1" checked/><span></span></div></th>
+                        </tr>
+                    </table>
+                    <input type="checkbox" class="hider hidden" value="1" name="attr_Ability_show" checked/>
+                    <div class="hide" style="margin-bottom: 15px;">
+                        <table class="table_2" style="width:400px">
+                            <tr>
+                                <th style="padding-bottom: 2px;">
+                                    <span class="has-tooltip">
+                                        <span data-i18n="characteristic">Characteristic</span>
+                                        <span class="tooltip" data-i18n="tooltip-ability-characteristic">Select the caracteristic to use. Overrides the gobal selector.<br>"-Characteristic-" uses the global selector, "-Ask-" triggers a roll query (pop-up) for each roll.</span>
+                                    </span>
+                                </th>
+                                <th data-i18n="speciality" >Speciality</th>
+                                <th data-i18n="score" >Score</th>
+                                <th data-i18n="bonus" >Bonus</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <select class="select_1" name="attr_Ability_CharacName">
+                                        <option class="italic" value="global_char" data-i18n="characteristic-choice" >-Characteristic-</option>
+                                        <option class="italic" value="ask" data-i18n="ask" >-Ask-</option>
+                                        $$characteristic_name_options$$
+                                    </select>
+                                </td>
+                                <td><input type="text" class="heading_4" name="attr_Ability_Speciality" data-i18n-placeholder="speciality" placeholder="Speciality" /></td>
+                                <td><input type="number" class="number_2" name="attr_Ability_Score" value="0"/></td>
+                                <td><input type="text" class="number_2" name="attr_Ability_Puissant" value="0"/><span></span></td>
+                            </tr>
+                            <tr>
+                                <th colspan="2"><span class="flex-container-left">XP $$xp("Ability", factor="(5 - ((@{AcceleratedCheck}) * 4))")$$</span></th>
+                                <td colspan="2">
+                                    <span data-i18n="accelerated-">Accelerated</span>
+                                    <input type="checkbox" class="check" value="1" name="attr_AcceleratedCheck">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3 Magic -->
+<div class="tab-content tab3">
+    <!-- Techniques & Forms -->
+    <div>
+        <div class="3colrow" style="margin-top:10px;">
+            <div class='col' style="margin-right: 20px">
+                <h4 class="heading_label" data-i18n="techniques" >Techniques</h4>
+                <table class="table_3" style="width:270px;margin-bottom:16px;">
+                    <tr>
+                        <th><div style="width:35px;" data-i18n="score" >Score</div></th>
+                        <th><div style="width:55px;" data-i18n="art" >Art</div></th>
+                        <th><div style="width:110px;" data-i18n="exp" >Exp.</div></th>
+                        <th><div style="width:45px;" data-i18n="bonus" >Bonus</div></th>
+                    </tr>
+                    $$technique_definitions$$
+                </table>
+            </div>
+            <div class='col' style="margin-right: 20px">
+                <h4 class="heading_label" data-i18n="forms" >Forms</h4>
+                <table class="table_3" style="width:260px;">
+                    <tr>
+                        <th><div style="width:35px;" data-i18n="score" >Score</div></th>
+                        <th><div style="width:55px;" data-i18n="art" >Art</div></th>
+                        <th><div style="width:110px;" data-i18n="exp" >Exp.</div></th>
+                        <th><div style="width:45px;" data-i18n="bonus" >Bonus</div></th>
+                    </tr>
+                    $$form_definitions_1$$
+                </table>
+            </div>
+            <div class='col' style="margin-right: 20px">
+                <div style="height:16px"></div>
+                <table class="table_3" style="width:260px;">
+                    <tr>
+                        <th><div style="width:35px;" data-i18n="score" >Score</div></th>
+                        <th><div style="width:55px;" data-i18n="art" >Art</div></th>
+                        <th><div style="width:110px;" data-i18n="exp" >Exp.</div></th>
+                        <th><div style="width:45px;" data-i18n="bonus" >Bonus</div></th>
+                    </tr>
+                    $$form_definitions_2$$
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="divider" style="height:15px;"><span>&nbsp;</span></div>
+    <!-- Casting totals -->
+    <div>
+        <h4 class="heading_label" data-i18n="base-casting-totals" >Base Casting Totals</h4>
+        <table class="table_3" style="width:100%;">
+            <tr>
+                <th data-i18n="spontaneous-spells" >Spontaneous Spells</th>
+                <th style="width:30px;text-align:center;padding-left:0px;" data-i18n="roll" >Roll</th>
+                <th data-i18n="total" >Total</th>
+                <th data-i18n="technique" >Technique</th>
+                <th data-i18n="form" >Form</th>
+                <th data-i18n="focus" >Focus</th>
+                <th data-i18n="deficiency" >Deficiency</th>
+                <th data-i18n="sta" >Sta</th>
+                <th data-i18n="aura" >Aura</th>
+                <th data-i18n="artes-lib-" >Artes Lib.</th>
+                <th data-i18n="philos-" >Philos.</th>
+            </tr>
+            <!-- Fatiguing Spontaneous -->
+            <tr>
+                <td data-i18n="fatiguing" >Fatiguing</td>
+                <td><div class="flex-container-center">
+                    <!-- <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Spontaneous1_simple" value="$spontaneous_roll_simple$"></button> -->
+                    <button style="margin: 0px auto;" type="roll" class="button stress-roll single-roll" name="roll_Spontaneous1_stress" value="$$spontaneous_roll_stress$$"></button>
+                </div></td>
+                <td><input type="number" class="number_2" name="attr_Spontaneous1" value="((@{Spontaneous1_Technique} + @{Spontaneous1_Form} + (@{Spontaneous1_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura})/2) / (1 + (@{Spontaneous1_Deficiency}))" disabled="true"/></td>
+                <td>
+                    <select class="select_1" name="attr_Spontaneous1_Technique">
+                        <option class="italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
+                        $$technique_score_options$$
+                    </select>
+                </td>
+                <td>
+                    <select class="select_1" name="attr_Spontaneous1_Form">
+                        <option class="italic" value="0 [@{form_i18n}]" data-i18n="form" >Form</option>
+                        $$form_score_options$$
+                    </select>
+                </td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Spontaneous1_Focus" value="((@{Spontaneous1_Technique} + @{Spontaneous1_Form} - abs(@{Spontaneous1_Technique} - @{Spontaneous1_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Spontaneous1_Deficiency" value="1"></input></td>
+                <td><input type="number" class="number_2" name="attr_Spontaneous1_Sta" value="@{Stamina_Score}" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Spontaneous1_aura" value="@{aura}" disabled="true"/></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <!-- Ceremonial Spontaneous -->
+            <tr>
+                <td data-i18n="ceremonial" >Ceremonial</td>
+                <td><div class="flex-container-center">
+                    <!-- <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Ceremonial_simple" value="$ceremonial_roll_simple$"></button> -->
+                    <button style="margin: 0px auto;" type="roll" class="button stress-roll single-roll" name="roll_Ceremonial_stress" value="$$ceremonial_roll_stress$$"></button>
+                </div></td>
+                <td><input type="number" class="number_2" name="attr_Ceremonial" value="((@{Ceremonial_Technique} + @{Ceremonial_Form} + (@{Ceremonial_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura} + @{Ceremonial_Artes_Lib} + @{Ceremonial_Philos})/2 ) / (1 + (@{Ceremonial_Deficiency}))" disabled="true"/></td>
+                <td>
+                    <select class="select_1" name="attr_Ceremonial_Technique">
+                        <option class="italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
+                        $$technique_score_options$$
+                    </select>
+                </td>
+                <td>
+                    <select class="select_1" name="attr_Ceremonial_Form">
+                        <option class="italic" value="0 [@{form_i18n}]" data-i18n="form" >Form</option>
+                        $$form_score_options$$
+                    </select>
+                </td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Ceremonial_Focus" value="((@{Ceremonial_Technique} + @{Ceremonial_Form} - abs(@{Ceremonial_Technique} - @{Ceremonial_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Ceremonial_Deficiency" value="1"></input></td>
+                <td><input type="number" class="number_2" name="attr_Ceremonial_Sta" value="@{Stamina_Score}" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Ceremonial_aura" value="@{aura}" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Ceremonial_Artes_Lib" value="0"/></td>
+                <td><input type="number" class="number_2" name="attr_Ceremonial_Philos" value="0"/></td>
+
+            </tr>
+            <!-- Non Fatiguing Spontaneous -->
+            <tr>
+                <td data-i18n="non-fatiguing" >Non-Fatiguing</td>
+                <td><div class="flex-container-center">
+                    <button style="margin: 0px auto;" type="roll" class="button simple-roll single-roll" name="roll_Spontaneous2_nodice" value="$$spontaneous_nodice$$"></button>
+                </div></td>
+                <td><input type="number" class="number_2" name="attr_Spontaneous2" value="((@{Spontaneous2_Technique} + @{Spontaneous2_Form} + (@{Spontaneous2_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura})/5) / (1 + (@{Spontaneous2_Deficiency}))" disabled="true"/></td>
+                <td>
+                    <select class="select_1" name="attr_Spontaneous2_Technique">
+                        <option class="italic" value="0" data-i18n="technique" >Technique</option>
+                        $$technique_score_options$$
+                    </select>
+                </td>
+                <td>
+                    <select class="select_1" name="attr_Spontaneous2_Form">
+                        <option class="italic" value="0" data-i18n="form" >Form</option>
+                        $$form_score_options$$
+                    </select>
+                </td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Spontaneous2_Focus" value="((@{Spontaneous2_Technique} + @{Spontaneous2_Form} - abs(@{Spontaneous2_Technique} - @{Spontaneous2_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Spontaneous2_Deficiency" value="1"></input></td>
+                <td><input type="number" class="number_2" name="attr_Spontaneous2_Sta" value="@{Stamina_Score}" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Spontaneous2_aura" value="@{aura}" disabled="true"/></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th data-i18n="designed-spells" >Designed Spells</th>
+                <td colspan="9"></td>
+            </tr>
+            <!-- Formulaic -->
+            <tr>
+                <td data-i18n="formulaic" >Formulaic</td>
+                <td><div class="flex-container-center">
+                    <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Formulaic_simple" value="$$formulaic_roll_simple$$"></button>
+                    <button style="margin: 0px auto;" type="roll" class="button stress-roll" name="roll_Formulaic_stress" value="$$formulaic_roll_stress$$"></button>
+                </div></td>
+                <td><input type="number" class="number_2" name="attr_Formulaic" value="(@{Formulaic_Technique} + @{Formulaic_Form} + (@{Formulaic_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura}) / (1 + (@{Formulaic_Deficiency}))" disabled="true"/></td>
+                <td>
+                    <select class="select_1" name="attr_Formulaic_Technique">
+                        <option class="italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
+                        $$technique_score_options$$
+                    </select>
+                </td>
+                <td>
+                    <select class="select_1" name="attr_Formulaic_Form">
+                        <option class="italic" value="0 [@{form_i18n}]" data-i18n="form" >Form</option>
+                        $$form_score_options$$
+                    </select>
+                </td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Formulaic_Focus" value="((@{Formulaic_Technique} + @{Formulaic_Form} - abs(@{Formulaic_Technique} - @{Formulaic_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Formulaic_Deficiency" value="1"></input></td>
+                <td><input type="number" class="number_2" name="attr_Formulaic_Sta" value="@{Stamina_Score}" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Formulaic_aura" value="@{aura}" disabled="true"/></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <!-- Ritual -->
+            <tr>
+                <td data-i18n="ritual" >Ritual</td>
+                <td><div class="flex-container-center">
+                    <button style="margin: 0px auto;" type="roll" class="button simple-roll" name="roll_Ritual_simple" value="$$ritual_roll_simple$$"></button>
+                    <button style="margin: 0px auto;" type="roll" class="button stress-roll" name="roll_Ritual_stress" value="$$ritual_roll_stress$$"></button>
+                </div></td>
+                <td><input type="number" class="number_2" name="attr_Ritual" value="(@{Ritual_Technique} + @{Ritual_Form} + (@{Ritual_Focus}) + @{Stamina_Score} + @{aura} + @{Ritual_Artes_Lib} + @{Ritual_Philos}) / (1 + (@{Ritual_Deficiency}))" disabled="true"/></td>
+                <td>
+                    <select class="select_1" name="attr_Ritual_Technique">
+                        <option class="italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
+                        $$technique_score_options$$
+                    </select>
+                </td>
+                <td>
+                    <select class="select_1" name="attr_Ritual_Form">
+                        <option class="italic" value="0 [@{form_i18n}]" data-i18n="form" >Form</option>
+                        $$form_score_options$$
+                    </select>
+                </td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Ritual_Focus" value="((@{Ritual_Technique} + @{Ritual_Form} - abs(@{Ritual_Technique} - @{Ritual_Form}))/2)"></input></td>
+                <td style="text-align: center;"><input type="checkbox" class="check" name="attr_Ritual_Deficiency" value="1"></input></td>
+                <td><input type="number" class="number_2" name="attr_Ritual_Sta" value="@{Stamina_Score}" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Ritual_aura" value="@{aura}" disabled="true"/></td>
+                <td><input type="number" class="number_2" name="attr_Ritual_Artes_Lib" value="0"/></td>
+                <td><input type="number" class="number_2" name="attr_Ritual_Philos" value="0"/></td>
+            </tr>
+            <tr></tr>
+            <tr>
+                <th data-i18n="bonus" >Bonus</th>
+                <td colspan="9"></td>
+            </tr>
+            <tr>
+                <td style="text-align:right;"><span style="font-size:1.4em;" data-i18n="aura" >Aura</span></td>
+                <td><input type="number" class="number_1" name="attr_aura" value="3"/></td>
+                <td style="text-align:right;" colspan="2"><span style="font-size:1.2em; margin-right:15px" data-i18n="gestures" >Gestures</span></td>
+                <td>
+                    <select class="select_1" name="attr_gestures">
+                        <option class="italic" value="1 [@{gestures_i18n}: @{exaggerated_i18n}]" data-i18n="gestures-exaggerated" >Exaggerated</option>
+                        <option class="italic" selected value="0 [@{gestures_i18n}: @{bold_i18n}]" data-i18n="gestures-bold" >Bold</option>
+                        <option class="italic" value="(-2) [@{gestures_i18n}: @{subtle_i18n}]" data-i18n="gestures-subtle" >Subtle</option>
+                        <option class="italic" value="(-5) [@{gestures_i18n}: @{gest-none_i18n}]" data-i18n="gestures-none" >None</option>
+                    </select>
+                </td>
+                <td style="text-align:right;" colspan="2"><span style="font-size:1.2em; margin-right:15px" data-i18n="words" >Words</span></td>
+                <td colspan="2">
+                    <select class="select_1" name="attr_words">
+                        <option class="italic" value="1 [@{words_i18n}: @{loud_i18n}]" data-i18n="words-loud" >Loud</option>
+                        <option class="italic" selected value="0 [@{words_i18n}: @{firm_i18n}]" data-i18n="words-firm" >Firm</option>
+                        <option class="italic" value="(-5) [@{words_i18n}: @{quiet_i18n}]" data-i18n="words-quiet" >Quiet</option>
+                        <option class="italic" value="(-10) [@{words_i18n}: @{words-none_i18n}]" data-i18n="words-none" >None</option>
+                    </select>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    <br>
+    <div class="divider" style="height:15px;"><span>&nbsp;</span></div>
+    <!-- Laboratory -->
+    <div>
+        <div class='2colrow'>
+            <div class='col'>
+                <div>
+                    <h4 class="heading_label" data-i18n="lab-characteristics" >Lab Characteristics</h4>
+                    <div class="col">
+                    <table class="table_3" style="width:195px;">
+                        <tr>
+                            <th style="width:140px;"></th>
+                            <th data-i18n="score" >Score</th>
+                        </tr>
+                        <tr>
+                            <td data-i18n="size" >Size</td>
+                            <td><input type="text" class="number_1" name="attr_LabSize_Score" value="0"/></td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="refinement" >Refinement</td>
+                            <td><input type="text" class="number_1" name="attr_LabRefinement_Score" value="0"/></td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="general-quality" >General Quality</td>
+                            <td><input type="text" class="number_1" name="attr_LabGeneralQuality_Score" value="0"/></td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="upkeep" >Upkeep</td>
+                            <td><input type="text" class="number_1" name="attr_LabUpkeep_Score" value="0"/></td>
+                        </tr>
+                    </table>
+                    </div>
+                    <div class="col">
+                    <table class="table_3" style="width:195px">
+                        <th style="width:140px;"></th>
+                        <th data-i18n="score" >Score</th>
+                        <tr>
+                            <td data-i18n="safety" >Safety</td>
+                            <td><input type="text" class="number_1" name="attr_LabSafety_Score" value="0"/></td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="warping" >Warping</td>
+                            <td><input type="text" class="number_1" name="attr_LabWarping_Score" value="0"/></td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="health" >Health</td>
+                            <td><input type="text" class="number_1" name="attr_LabHealth_Score" value="0"/></td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="aesthetics" >Aesthetics</td>
+                            <td><input type="text" class="number_1" name="attr_LabAesthetics_Score" value="0"/></td>
+                        </tr>
+                    </table>
+                    </div>
+                </div>
+            <div>
+                <div style="margin-top:10px;">
+                    <h4 class="heading_label" data-i18n="lab-virtues" >Lab Virtues</h4>
+                    <fieldset class="repeating_labVirtue">
+                        <table class="table_2" style="width:400px">
+                            <tr>
+                                <td><input type="text" class="heading_2" name="attr_LabVirtue" style="width:300px"/></td>
+                                <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_labVirtue_show" value="1" checked/><span></span></div></th>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <input type="checkbox" class="hider hidden" name="attr_labVirtue_show" value="1" checked/>
+                                    <div class="hide">
+                                        <textarea class="textarea_1" style="width:380px;" name="attr_labvirtue_text"></textarea>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                </div>
+                <div>
+                    <h4 class="heading_label" data-i18n="flaws" >Flaws</h4>
+                    <fieldset class="repeating_labFlaw">
+                        <table class="table_2" style="width:400px">
+                            <tr>
+                                <td><input type="text" class="heading_2" name="attr_labFlaw" style="width:300px"/></td>
+                                <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_labFlaw_show" value="1" checked/><span></span></div></th>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <input type="checkbox" class="hider hidden" name="attr_labFlaw_show" value="1" checked/>
+                                    <div class="hide">
+                                        <textarea class="textarea_1" style="width:380px;" name="attr_labflaw_text"></textarea>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                </div>
+            </div>
+                <div>
+                    <h4 class="heading_label" style="margin-bottom:0px;" data-i18n="sanctum-marker" >Sanctum Marker</h4>
+                    <textarea class="textarea_4" name="attr_SanctumMarker"></textarea>
+                </div>
+                <div>
+                    <h4 class="heading_label" style="margin-bottom:0px;" data-i18n="description" >Description</h4>
+                    <textarea class="textarea_4" name="attr_LabDescription"></textarea>
+                </div>
+            </div>
+            <div class='col'>
+                <div>
+                    <h4 class="heading_label" data-i18n="lab-totals" >Lab Totals</h4>
+                    <table class="table_2" style="width:400px;">
+                        <tr>
+                            <th colspan="2" data-i18n="basic-lab-total" >Basic Lab Total</th>
+                            <td><div style="width:60px;"><input type="number" class="number_2" name="attr_Lab" value="@{Intelligence_Score} + @{Lab_Theory} + @{aura} + @{lab_Technique} + @{lab_Form} + (@{Lab_Focus}) + @{LabModifiers} + @{labbonus_total} + @{LabGeneralQuality_Score}" disabled="true"/></div></td>
+                            <td colspan="2">
+                                <div class="flex-container-between">
+                                    <span>
+                                        <input type="checkbox" class="check" name="attr_Lab_Focus" value="((@{lab_Technique} + @{lab_Form} - abs((@{lab_Technique}) - (@{lab_Form}))) /2)"/>
+                                        <span data-i18n="focus">Focus</span>
+                                    </span>
+                                    <span style="text-align: right;">
+                                        <span data-i18n="modifiers" >Modifiers</span>
+                                        <input type="number" class="number_1" name="attr_LabModifiers" value="0" />
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td><div style="width:50px;"><input type="number" class="number_2" name="attr_Lab_Int" value="@{Intelligence_Score}" disabled="true"/></div></td>
+                            <td><div style="width:50px;"><input type="number" class="number_2" name="attr_Lab_Theory" value="0" /></div></td>
+                            <td><div style="width:50px;"><input type="number" class="number_2" name="attr_Lab_Aura" value="@{aura}" disabled="true"/></div></td>
+                            <td>
+                                <select class="select_1" name="attr_lab_Technique">
+                                    <option class="italic" value="0" data-i18n="none" >None</option>
+                                    $$technique_score_options_unlabeled$$
+                                </select>
+                            </td>
+                            <td>
+                                <select class="select_1" name="attr_lab_Form">
+                                    <option class="italic" value="0" data-i18n="none" >None</option>
+                                    $$form_score_options_unlabeled$$
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="int" >Int</td>
+                            <td data-i18n="theory" >Theory</td>
+                            <td data-i18n="aura" >Aura</td>
+                            <td data-i18n="technique" >Technique</td>
+                            <td data-i18n="form" >Form</td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <h4 class="heading_label" data-i18n="lab-bonuses" >Lab Bonuses</h4>
+                    <table class="table_2" style="width:400px;margin-top:10px;">
+                        <tr>
+                            <th><div style="width:300px;padding-left:10px;" data-i18n="specializations-bonuses" >Specializations & Bonuses</div></th>
+                            <th><div style="width:40px;" data-i18n="score" >Score</div></th>
+                            <th><div style="width:40px;"><span class="has-tooltip"><span data-i18n="inc-">Inc.</span><span class="tooltip" data-i18n="tooltip-inc-">Included<br>Check if the item is active. Unchecked items are not used in the computation</span></span></div></th>
+                        </tr>
+                    </table>
+                    <fieldset class="repeating_labSpecializations">
+                        <table class="table_2" style="width:400px">
+                            <tr>
+                                <td><input type="text" class="heading_2" name="attr_LabSpecialization" style="width:300px"/></td>
+                                <td><input type="text" class="number_2" name="attr_LabBonus" value="0" style="width:50px" /></td>
+                                <td><div style="width:40px;padding-left:15px;"><input type="checkbox" name="attr_sactive" value="1" /></div></th>
+                            </tr>
+                        </table>
+                    </fieldset>
+                    <table class="table_2" style="width:400px;">
+                        <tr>
+                            <td style="width:300px;text-align:right;" data-i18n="total-specialization-modifier" >Total Specialization Modifier</td>
+                            <td> <div style="width:50px;"><input type="number" class="number_2" name="attr_labbonus_total" value="0" readonly/></div></td>
+                        </tr>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4 Combat -->
+<div class="tab-content tab4" >
+    <div style="margin-top:10px;">
+        <!-- Fatigue -->
+        <div class='col'>
+            <h4 class="heading_label" style="margin-bottom:15px" data-i18n="fatigue-levels" >Fatigue Levels <input type="number" class="counter" style="width:50px" name="attr_Fatigue_total" value="@{Fatigue}" disabled="true"/></h4>
+            <table class="table_2" style="width:300px;">
+                <tr>
+                    <td><span style="font-size:1.2em;" data_i18n="additional-fatigue-levels">Additional fatigue levels</span></td>
+                    <td>
+                        <select class="select_1" style="width: 60px" name="attr_additionalFatigue">
+                            $$fatigue_levels_options$$
+                        </select>
+                    </td>
+                <tr/>
+            </table>
+            <input type="hidden" class="fatigue-proxy" name="attr_additionalFatigueProxy" value="0"/>
+            <table class="table_3" style="width:300px" >
+                <tr>
+                    <th style="width:60px;" data-i18n="current" >Current</th>
+                    <th style="text-align:center;" data-i18n="penalty" >Penalty</th>
+                    <th data-i18n="recovery" >Recovery</th>
+                    <th data-i18n="level" >Level</th>
+                </tr>
+                <tr>
+                    <td><input type="radio" class="radio_1" name="attr_Fatigue" value="0" checked><span></span></td>
+                    <td></td>
+                    <td></td>
+                    <td data-i18n="fresh" >Fresh</td>
+                </tr>
+                <tr>
+                    <td><input type="radio" class="radio_1" name="attr_Fatigue" value="0.1"><span></span></td>
+                    <td style="text-align:center;">0</td>
+                    <td>2 min.</td>
+                    <td data-i18n="winded" >Winded</td>
+                </tr>
+                $$additional_fatigue_levels$$
+                <tr>
+                    <td><input type="radio" class="radio_1" name="attr_Fatigue" value="-1"><span></span></td>
+                    <td style="text-align:center;">-1</td>
+                    <td>10 min.</td>
+                    <td data-i18n="weary" >Weary</td>
+                </tr>
+                <tr>
+                    <td><input type="radio" class="radio_1" name="attr_Fatigue" value="-3"><span></span></td>
+                    <td style="text-align:center;">-3</td>
+                    <td>30 min.</th>
+                    <td data-i18n="tired" >Tired</td>
+                </tr>
+                <tr>
+                    <td><input type="radio" class="radio_1" name="attr_Fatigue" value="-5"><span></span></td>
+                    <td style="text-align:center;">-5</td>
+                    <td>1 hr.</td>
+                    <td data-i18n="dazed" >Dazed</td>
+                </tr>
+                <tr>
+                    <td><input type="radio" class="radio_1" name="attr_Fatigue" value="-99"><span></span></td>
+                    <td></td>
+                    <td>2 hr.</td>
+                    <td data-i18n="unconscious" >Unconscious</td>
+                </tr>
+            </table>
+        </div>
+        <!-- Wounds -->
+        <div class='col'>
+            <h4 class="heading_label" data-i18n="wounds" >Wounds <input type="number" class="counter" name="attr_wound_total" value="0" /></h4>
+            <table class="table_3" style="width:500px;" >
+                <tr>
+                    <th></th>
+                    <th data-i18n="range" >Range</th>
+                    <th style="text-align:center; width: 100px" data-i18n="number" >Number</th>
+                    <th data-i18n="penalty" >Penalty</th>
+                </tr>
+                <tr>
+                    <td data-i18n="light-wounds" >Light Wounds</td>
+                    <td><input type="text" class="heading_3" name="attr_Wounds_Light_range"/></td>
+                    <td><div class="flex-container-center">
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light1" value="-1"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light2" value="-1"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light3" value="-1"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light4" value="-1"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Light5" value="-1"><span></span>
+                    </div></td>
+                    <td style="text-align:center;">-1</td>
+                </tr>
+                <tr>
+                    <td data-i18n="medium-wounds" >Medium Wounds</td>
+                    <td><input type="text" class="heading_3" name="attr_Wounds_Medium_range"/></td>
+                    <td><div class="flex-container-center">
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium1" value="-3"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium2" value="-3"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium3" value="-3"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium4" value="-3"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Medium5" value="-3"><span></span>
+                    </div></td>
+                    <td style="text-align:center;">-3</th>
+                </tr>
+                <tr>
+                    <td data-i18n="heavy-wounds" >Heavy Wounds</td>
+                    <td><input type="text" class="heading_3" name="attr_Wounds_Heavy_range"/></td>
+                    <td><div class="flex-container-center">
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy1" value="-5"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy2" value="-5"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy3" value="-5"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy4" value="-5"><span></span>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Heavy5" value="-5"><span></span>
+                    </div></td>
+                    <td style="text-align:center;">-5</th>
+                </tr>
+                <tr>
+                    <td data-i18n="incapacitated" >Incapacitated</td>
+                    <td><input type="text" class="heading_3" name="attr_Wounds_Incapacitated_range"/></td>
+                    <td>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Incapacitated" value="-99"><span></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td data-i18n="dead" >Dead</td>
+                    <td><input type="text" class="heading_3" name="attr_Wounds_Dead_range"/></td>
+                    <td>
+                        <input type="checkbox" class="checkbox_wound" name="attr_Wounds_Dead" value="-1000"><span></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div class="2colgrid">
+        <!-- Armor -->
+        <div class='col' style="width:415px; padding-right: 2px; border-right: 1px solid #663333; margin-right: 2px;">
+            <h4 class="heading_label" data-i18n="armor" >Armor</h4>
+            <div style="width: 100%;">
+                <table class="table_2" style="margin-top:10px;">
+                    <tr>
+                        <th style="width: 240px;"></th>
+                        <th style="width:  80px; text-align: right;"><span data-i18n="protection">Protection</span></th>
+                        <th style="width:  60px; text-align: center;"><span data-i18n="load">Load</span></th>
+                        <th style="width:  30px; text-align: center;"></th>
+                    </tr>
+                    <tr>
+                        <th style="width: 240px;"><span data-i18n="armor">Armor</span></th>
+                        <td style="width:  75px; text-align: right; padding-right: 5px;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_armors_total_prot" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_armors_total_prot_detailed" value=" "/>
+                        </td>
+                        <td style="width:  60px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_armors_total_load" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_armors_total_load_detailed" value=" "/>
+                        </td>
+                        <td style="width:  30px;"><span class="has-tooltip"><span data-i18n="inc-">Inc.</span><span class="tooltip" data-i18n="tooltip-inc-">"Included<br>Check if the item is active. Unchecked items are not used in the computation"</span></span></td>
+                    </tr>
+                </table>
+                <fieldset class="repeating_armors">
+                    <table class="table_2">
+                        <tr>
+                            <td style="width: 240px;"><input type="text" class="heading_2" name="attr_armors_name" style="width: 235px;"/></td>
+                            <td style="width:  75px; text-align: right; padding-right: 5px;"><input type="text" class="number_2" name="attr_armors_prot" value="0" /></td>
+                            <td style="width:  60px; text-align: center;"><input type="text" class="number_2" name="attr_armors_load" value="0" /></td>
+                            <td style="width:  30px;"><div class="flex-container-center"><input type="checkbox" name="attr_isactive" value="1" checked/></div></td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+
+        <!-- Bonuses -->
+        <div class='col' style="width:100%; padding-right: 5px;">
+            <h4 class="heading_label" data-i18n="combat-modifiers">Combat Modifiers</h4>
+            <div style="width: 100%;">
+                <table class="table_2" style="margin-top:10px;">
+                    <tr>
+                        <th style="width: 170px;"></th>
+                        <th style="width:  40px; text-align: center;"><span data-i18n="init">Init</span></th>
+                        <th style="width:  40px; text-align: center;"><span data-i18n="atk">Atk</span></th>
+                        <th style="width:  40px; text-align: center;"><span data-i18n="dfn">Dfn</span></th>
+                        <th style="width:  40px; text-align: center;"><span data-i18n="dam">Dam</span></th>
+                        <th style="width:  40px; text-align: center;"><span data-i18n="soak">Soak</span></th>
+                        <th style="width:  30px; text-align: center;"></th>
+                    </tr>
+                    <tr>
+                        <th style="width: 160px;"><span data-i18n="bonus">Bonus</span></th>
+                        <td style="width:  40px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_combat-mods_total_init" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_combat-mods_total_init_detailed" value=" "/>
+                        </td>
+                        <td style="width:  40px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_combat-mods_total_atk" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_combat-mods_total_atk_detailed" value=" "/>
+                        </td>
+                        <td style="width:  40px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_combat-mods_total_dfn" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_combat-mods_total_dfn_detailed" value=" "/>
+                        </td>
+                        <td style="width:  40px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_combat-mods_total_dam" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_combat-mods_total_dam_detailed" value=" "/>
+                        </td>
+                        <td style="width:  40px; text-align: center;">
+                            <span class="has-tooltip"><input type="number" class="number_2" name="attr_combat-mods_total_soak" value="0" readonly/><span class="tooltip" data-i18n="total">Total</span></span>
+                            <input type="hidden" class="number_2" name="attr_combat-mods_total_soak_detailed" value=" "/>
+                        </td>
+                        <td style="width:  30px;"><span class="has-tooltip"><span data-i18n="inc-">Inc.</span><span class="tooltip" data-i18n="tooltip-inc-">"Included<br>Check if the item is active. Unchecked items are not used in the computation"</span></span></td>
+                    </tr>
+                </table>
+                <fieldset class="repeating_combat-mods">
+                    <table class="table_2">
+                        <tr>
+                            <td style="width: 170px;"><input type="text" class="heading_2" name="attr_combat-mods_name" style="width: 170px;"/></td>
+                            <td style="width:  40px; text-align: center;"><input type="text" class="number_2" name="attr_combat-mods_init" value="0"/></td>
+                            <td style="width:  40px; text-align: center;"><input type="text" class="number_2" name="attr_combat-mods_atk" value="0"/></td>
+                            <td style="width:  40px; text-align: center;"><input type="text" class="number_2" name="attr_combat-mods_dfn" value="0"/></td>
+                            <td style="width:  40px; text-align: center;"><input type="text" class="number_2" name="attr_combat-mods_dam" value="0"/></td>
+                            <td style="width:  40px; text-align: center;"><input type="text" class="number_2" name="attr_combat-mods_soak" value="0"/></td>
+                            <td style="width:  30px;"><div class="flex-container-center"><input type="checkbox" name="attr_isactive" value="1" checked/></div></td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <!-- Soak -->
+    <div style="padding-bottom: 15px;" >
+        <h4 class="heading_label" data-i18n="soak" >Soak</h4>
+        <table class="table_2" style="width:380px">
+            <tr>
+                <td></td>
+                <th data-i18n="soak" style="text-align: center;">Soak</th>
+                <th data-i18n="sta" style="text-align: center;">sta</th>
+                <th data-i18n="armor" style="text-align: center;">Armor</th>
+                <th data-i18n="bonus" style="text-align: center;">Bonus</th>
+                <th data-i18n="bonus" style="text-align: center;">Bonus</th>
+                <th data-i18n="load" style="text-align: center;">Load</th>
+            </tr>
+            <tr>
+                <td style="width:30px;">
+                    <button type="roll" class="button stress-roll single-roll" name="roll_soak" value="$$soak_roll_stress$$"></button>
+                </td>
+                <td style="text-align: center;"><input type="number" class="number_1" name="attr_Soak" value="($$soak_total$$)" disabled="true"/></td>
+                <td style="text-align: center;"><input type="number" class="number_1" name="attr_soak_stamina" disabled="true" value="(@{Stamina_Score})"></td>
+                <td style="text-align: center;"><input type="number" class="number_2" name="attr_armors_total_prot" value="0" readonly/></td>
+                <td style="text-align: center;"><input type="number" class="number_2" name="attr_soak_bonus" value="0"/></td>
+                <td style="text-align: center;"><input type="number" class="number_2" name="attr_combat-mods_total_soak" value="0" readonly/></td>
+                <th style="text-align: center;"><input type="number" class="number_2" name="attr_armors_total_load" value="0" readonly/></th>
+            </tr>
+        </table>
+        <div class="magi-only">
+            <h4 class="heading_label" style="margin-bottom:0px;" data-i18n="soak-forms" >Soak by Forms</h4>
+            <div class='artgrid' style="border:1px solid black">
+                $$soak_by_forms$$
+            </div>
+        </div>
+    </div>
+    <!--    Weapons -->
+    <div>
+        <h4 class="heading_label" data-i18n="weapons" >Weapons</h4>
+        <table class="table_2" style="width:800px">
+            <tr>
+                <th><div style="width:190px" data-i18n="weapon-name" >Weapon Name</div></th>
+                <td><div style="width:100px"></div></td>
+                <th><div style="width:60px" data-i18n="init" >Init</div></th>
+                <td><div style="width:25px"></div></td>
+                <th><div style="width:60px" data-i18n="atk" >Atk</div></th>
+                <td><div style="width:30px"></div></td>
+                <th><div style="width:45px" data-i18n="dfn" >Dfn</div></th>
+                <td><div style="width:18px;"></div></td>
+                <th><div style="width:45px" data-i18n="dam" >Dam</div></th>
+                <th><div style="width:50px" data-i18n="ability" >Ability</div></th>
+                <th><div style="width:50px" data-i18n="load" >Load</div></th>
+                <th><div style="width:40px" data-i18n="range" >Range</div></th>
+                <th><div style="width:60px"></div></th>
+            </tr>
+        </table>
+        <fieldset class="repeating_weapons">
+            <table class="table_2" style="width:800px">
+                <tr>
+                    <th><input type="text" class="heading_3" name="attr_Weapon_name"/></th>
+
+                    <td><button type="roll" class="button stress-roll single-roll" name="roll_weapon_Init" value="$$init_roll$$" data-i18n="init" >Init</button></td>
+                    <td><input type="text" class="number_1" name="attr_Init" value="$$init_total$$" disabled="true"/></td>
+
+                    <td><button type="roll" class="button stress-roll single-roll" name="roll_weapon_Atk" value="$$atk_roll$$" data-i18n="atk" >Atk</button></td>
+                    <td><input type="text" class="number_1" name="attr_Atk" value="$$atk_total$$" disabled="true"/></td>
+
+                    <td><button type="roll" class="button stress-roll single-roll" name="roll_weapon_Dfn" value="$$dfn_roll$$" data-i18n="dfn" >Dfn</button></td>
+                    <td><input type="text" class="number_1" name="attr_Dfn" value="$$dfn_total$$" disabled="true"/></td>
+                    
+                    <td><div style="width:10px;"></div></td>
+                    <td><input type="number" class="number_1" name="attr_Dam" value="((@{Strength_Score}) + (@{combat-mods_total_dam}) + (@{Dam_Weap}))" disabled="true"/></td>
+                    <td><input type="number" class="number_1" name="attr_WeaponAbility" value="0"/></td>
+                    <td><input type="number" class="number_1" name="attr_Weapon_Load" value="0"/></td>
+                    <td><input type="text" class="number_1" name="attr_Weapon_Range"/></td>
+                    <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_Weapon_show" value="1" checked/><span></span></div></th>
+                </tr>
+            </table>
+            <input type="checkbox" class="hider hidden" name="attr_Weapon_show" value="1" checked/><span></span>
+            <div class="hide" style="border-color:#e6dbc6; border-style: inset;">
+                <table class="table_3 table_center" style="display:inline; margin-right:10px;">
+                    <tr >
+                        <th colspan="7"><div style="width:200px;text-align:center;" data-i18n="initiative" >Initiative</div></th>
+                    </tr>
+                    <tr>
+                        <td data-i18n="qik" >Qik</td>
+                        <td></td>
+                        <td data-i18n="weap" >Weap.</td>
+                        <td></td>
+                        <td data-i18n="bonus" >Bonus</td>
+                        <td></td>
+                        <td data-i18n="enc-" >Enc.</td>
+                    </tr>
+                    <tr>
+                        <td><input type="number" class="number_2" name="attr_Init_Qik" value="(@{Quickness_Score})" disabled='true'/></td>
+                        <td>+</td>
+                        <td><input type="number" class="number_2" name="attr_Init_Weap" value="0"/></td>
+                        <td>+</td>
+                        <td><input type="number" class="number_2" name="attr_combat-mods_total_init" value="0" readonly/></td>
+                        <td>-</td>
+                        <td>
+                            <input type="hidden" class="number_2" name="attr_Init_Burden" value="floor((((8*((@{Weapon_Load}) + (@{armors_total_load})) + 1) ** (1/2)) - 1) / 2)" disabled="true"/>
+                            <!-- The formula are equivalent to max(0, burden - max(0, strength)), written using max(a,0) = (a + abs(a)) / 2 -->
+                            <input type="hidden" class="number_2" name="attr_Init_Relative_Encumbrance" value="((@{Init_Burden}) - (((@{Strength_Score}) + abs((@{Strength_Score}))) / 2))" disabled="true" />
+                            <input type="number" class="number_2" name="attr_Init_Encumbrance" value="((@{Init_Relative_Encumbrance}) + abs((@{Init_Relative_Encumbrance}))) / 2" disabled="true" />
+                        </td>
+                    </tr>
+                </table>
+                <table class="table_3 table_center" style="display:inline; margin-right:10px;">
+                    <tr>
+                        <th colspan="7"><div style="width:200px;text-align:center;" data-i18n="attack" >Attack</div></th>
+                    </tr>
+                    <tr>
+                        <td data-i18n="dex" >Dex</td>
+                        <td></td>
+                        <td data-i18n="ability" >Ability</td>
+                        <td></td>
+                        <td data-i18n="bonus" >Bonus</td>
+                        <td></td>
+                        <td data-i18n="weap" >Weap</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="number_2" name="attr_Atk_Dex"  value="(@{Dexterity_Score})" disabled='true'/></td>
+                        <td>+</td>
+                        <td><input type="text" class="number_2" name="attr_Atk_Ability" value="(@{WeaponAbility})" disabled="true"/></td>
+                        <td>+</td>
+                        <td><input type="number" class="number_2" name="attr_combat-mods_total_atk" value="0" readonly/></td>
+                        <td>+</td>
+                        <td><input type="text" class="number_2" name="attr_Atk_Weap" value="0"/></td>
+                    </tr>
+                </table>
+                <table class="table_3 table_center" style="display:inline; margin-right:10px;">
+                    <tr>
+                        <th colspan="7"><div style="width:200px;text-align:center;" data-i18n="defense" >Defense</div></th>
+                    </tr>
+                    <tr>
+                        <td data-i18n="qik" >Qik</td>
+                        <td></td>
+                        <td data-i18n="ability" >Ability</td>
+                        <td></td>
+                        <td data-i18n="bonus" >Bonus</td>
+                        <td></td>
+                        <td data-i18n="weapon" >Weapon</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="number_2" name="attr_Dfn_Qik" value="(@{Quickness_Score})" disabled='true'/></td>
+                        <td>+</td>
+                        <td><input type="text" class="number_2" name="attr_Dfn_Ability" value="(@{WeaponAbility})" disabled="true"/></td>
+                        <td>+</td>
+                        <td><input type="number" class="number_2" name="attr_combat-mods_total_dfn" value="0" readonly/></td>
+                        <td>+</td>
+                        <td><input type="text" class="number_2" name="attr_Dfn_Weap" value="0"/></td>
+                    </tr>
+                </table>
+                <table class="table_3 table_center" style="display:inline;">
+                    <tr>
+                        <th colspan="5"><div style="width:150px;text-align:center;" data-i18n="damage" >Damage</div></th>
+                    </tr>
+                    <tr>
+                        <td data-i18n="strength" >Strength</td>
+                        <td></td>
+                        <td data-i18n="bonus" >Bonus</td>
+                        <td></td>
+                        <td data-i18n="weapon" >Weapon</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="number_2" name="attr_Dam_Str" value="@{Strength_Score}" disabled='true'/></td>
+                        <td>+</td>
+                        <td><input type="number" class="number_2" name="attr_combat-mods_total_dam" value="0" readonly/></td>
+                        <td>+</td>
+                        <td><input type="text" class="number_2" name="attr_Dam_Weap" value="0"/></td>
+                    </tr>
+                </table>
+            </div>
+        </fieldset>
+    </div>
+</div>
+
+<!-- 5  Spells -->
+<div class="tab-content tab5">
+    <!-- Bonuses -->
+    <h4 class="heading_label" style="margin-top:10px;" data-i18n="bonus" >Bonus</h4>
+    <table class="table_3" style="width:400px;">
+        <tr></tr>
+        <tr>
+            <td style="text-align:right;"><span style="font-size:1.4em; margin-left: 15px;" data-i18n="aura" >Aura</span></td>
+            <td><input type="number" class="number_1" name="attr_aura" value="3"/></td>
+            <td style="text-align:right;" colspan="2"><span style="font-size:1.2em; margin-right:15px" data-i18n="gestures" >Gestures</span></td>
+            <td>
+                <select class="select_1" name="attr_gestures">
+                    <option class="italic" value="1 [@{gestures_i18n}: @{exaggerated_i18n}]" data-i18n="gestures-exaggerated" >Exaggerated</option>
+                    <option class="italic" selected value="0 [@{gestures_i18n}: @{bold_i18n}]" data-i18n="gestures-bold" >Bold</option>
+                    <option class="italic" value="(-2) [@{gestures_i18n}: @{subtle_i18n}]" data-i18n="gestures-subtle" >Subtle</option>
+                    <option class="italic" value="(-5) [@{gestures_i18n}: @{gest-none_i18n}]" data-i18n="gestures-none" >None</option>
+                </select>
+            </td>
+            <td style="text-align:right;" colspan="2"><span style="font-size:1.2em; margin-right:15px" data-i18n="words" >Words</span></td>
+            <td colspan="2">
+                <select class="select_1" name="attr_words">
+                    <option class="italic" value="1 [@{words_i18n}: @{loud_i18n}]" data-i18n="words-loud" >Loud</option>
+                    <option class="italic" selected value="0 [@{words_i18n}: @{firm_i18n}]" data-i18n="words-firm" >Firm</option>
+                    <option class="italic" value="(-5) [@{words_i18n}: @{quiet_i18n}]" data-i18n="words-quiet" >Quiet</option>
+                    <option class="italic" value="(-10) [@{words_i18n}: @{words-none_i18n}]" data-i18n="words-none" >None</option>
+                </select>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+    <!-- Formulaic spells -->
+    <h4 class="heading_label" style="margin-top:10px;" data-i18n="formulaic-spells" >Formulaic spells</h4>
+    <fieldset class="repeating_spell">
+        <table style="margin-top:10px;">
+            <tr>
+                <th style="padding-left:10px;"><div class="flex-container-center">
+                    <button type="roll" class="button simple-roll" name="roll_spell_simple" value="$$spell_roll_simple$$"></button>
+                    <button type="roll" class="button stress-roll" name="roll_spell_stress" value="$$spell_roll_stress$$"></button>
+                </div></th>
+                <th style="padding-left:10px;"><input style="width:645px;" type="text" class="heading_2" name="attr_spell_name" placeholder="Spell Name" data-i18n-placeholder="spell-name" /></th>
+                <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_Spell_show" value="1" checked/><span></span></div></th>
+            </tr>
+        </table>
+        <input type="checkbox" class="hider hidden" value="1" name="attr_Spell_show" checked/>
+        <div class="hide">
+            <table class="table_2" >
+                <tr>
+                    <td data-i18n="technique">Technique</td>
+                    <td>
+                        <!--
+                        This select tag is left in comment for reference purposes. A worker will translate from that old select
+                        to the new format below
+                        -->
+                        <!--
+                        <select class="select_1" name="attr_Technique_select">
+                            <option class="italic" value="0" data-i18n="technique" >Technique</option>
+                            $$technique_enumerated_options$$
+                        </select>
+                        -->
+                        <select class="select_1" name="attr_spell_tech_name">
+                            <option class="italic" value="unselected" data-i18n="technique" >Technique</option>
+                            $$technique_name_options$$
+                        </select>
+                    </td>
+                    <td data-i18n="form" >Form</td>
+                    <td>
+                        <!--
+                        This select tag is left in comment for reference purposes. A worker will translate from that old select
+                        to the new format below
+                        -->
+                        <!--
+                        <select class="select_1" name="attr_Form_select">
+                            <option class="italic" value="0" data-i18n="form" >Form</option>
+                            $$form_enumerated_options$$
+                        </select>
+                        -->
+                        <select class="select_1" name="attr_spell_form_name">
+                            <option class="italic" value="unselected" data-i18n="form" >Form</option>
+                            $$form_name_options$$
+                        </select>
+                    </td>
+                    <td colspan="4">
+                        <div class="flex-container-between">
+                            <span class="vcenter">
+                                <span data-i18n="focus" style="padding-right: 5px;">Focus</span>
+                                <input type="checkbox" class="check" name="attr_spell_Focus" value="[[{($$spell_tech_value$$), ($$spell_form_value$$)}kl1]] [@{focus_i18n}]"></input>
+                            </span>
+                            <span class="vcenter">
+                                <span data-i18n="deficiency" style="padding-right: 5px;">Deficiency</span>
+                                <input type="checkbox" class="check" name="attr_spell_Deficiency" value="1"></input>
+                            </span>
+                            <span class="vcenter">
+                                <span data-i18n="level" >Level</span>
+                                <input type="number" class="number_2" name="attr_spell_level" value="0"/>
+                            </span>
+                            <span class="vcenter">
+                                <span data-i18n="bonus" >Bonus</span>
+                                <input type="number" class="number_2" name="attr_spell_bonus" value="0"/>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                <!--
+                <tr>
+                    <td></td>
+                    <td><input type="text" class="hidden" name="attr_Technique_name" value="Technique"/></td>
+                    <td><input type="number" class="hidden" name="attr_spell_Technique" value="0"/></td></td>
+                    <td><input type="text" class="hidden" name="attr_Form_name" value="Form"/></td>
+                    <td><input type="number" class="hidden" name="attr_spell_Form" value="0"/></td></td>
+                    <td></td>
+                </tr>
+                -->
+                <tr>
+                    <td data-i18n="range" >Range</td>
+                    <td><input type="text" class="heading_2" name="attr_spell_range" value=""/></td>
+                    <td data-i18n="duration" > Duration</td>
+                    <td><input type="text" class="heading_2" name="attr_spell_duration" value=""/></td>
+                    <td data-i18n="target" >Target</td>
+                    <td><input type="text" class="heading_2" name="attr_spell_target" value="" /></td>
+                    <td data-i18n="exp">Exp</td>
+                    <td>
+                        [<input type="number" class="number_2" name="attr_spell_exp" value="0"/>/<input type="number" class="number_2" name="attr_spell_exp-2" value="0"/>]
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8"><textarea class="textarea_2" style="width:815px;" name="attr_spell_note" placeholder="Spell Description" data-i18n-placeholder="spell-description"></textarea></td>
+                </tr>
+                <tr>
+                    <td colspan="8"><textarea class="textarea_2" style="width:815px;height:36px" name="attr_spell_note-2" data-i18n-placeholder="spell-mastery" placeholder="Spell Mastery "></textarea></td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
+
+    <!-- Spontaneous Spells -->
+    <h4 class="heading_label" style="margin-top:10px;" data-i18n="spontaneous-spells" >Spontaneous spells</h4>
+    <fieldset class="repeating_spontaneous">
+        <table style="margin-top:10px;">
+            <tr>
+                <th style="padding-left:10px;"><div class="flex-container-center">
+                    <button style="margin: 0px auto;" type="roll" class="button stress-roll single-roll" name="roll_saved_spontaneous_stress" value="$$saved_spontaneous_roll_stress$$"></button>
+                </div></th>
+                <th style="padding-left:10px;"><input style="width:645px;" type="text" class="heading_2" name="attr_spell_name" placeholder="Spell Name" data-i18n-placeholder="spell-name" /></th>
+                <th><div style="width:40px;"><input type="checkbox" class="hider checkbox_1" name="attr_Spell_show" value="1" checked/><span></span></div></th>
+            </tr>
+        </table>
+        <input type="checkbox" class="hider hidden" value="1" name="attr_Spell_show" checked/>
+        <div class="hide">
+            <table class="table_2" >
+                <tr>
+                    <td data-i18n="technique">Technique</td>
+                    <td>
+                        <select class="select_1" name="attr_spell_tech_name">
+                            <option class="italic" value="unselected" data-i18n="technique" >Technique</option>
+                            $$technique_name_options$$
+                        </select>
+                    </td>
+                    <td data-i18n="form" >Form</td>
+                    <td>
+                        <select class="select_1" name="attr_spell_form_name">
+                            <option class="italic" value="unselected" data-i18n="form" >Form</option>
+                            $$form_name_options$$
+                        </select>
+                    </td>
+                    <td><span class="vcenter">
+                        <span data-i18n="focus" style="padding-right: 5px;" >Focus</span>
+                        <input type="checkbox" class="check" name="attr_spell_Focus" value="[[{($$spell_tech_value$$), ($$spell_form_value$$)}kl1]] [@{focus_i18n}]"></input>
+                    </span></td>
+                    <td><span class="vcenter">
+                        <span data-i18n="deficiency" style="padding-right: 5px;" >Deficiency</span>
+                        <input type="checkbox" class="check" name="attr_spell_Deficiency" value="1"></input>
+                    </span></td>
+                    <td data-i18n="level" >Level</td>
+                    <td><input type="number" class="number_2" name="attr_spell_level" value="0"/></td>
+                </tr>
+                <!--
+                <tr>
+                    <td></td>
+                    <td><input type="text" class="hidden" name="attr_Technique_name" value="Technique"/></td>
+                    <td><input type="number" class="hidden" name="attr_spell_Technique" value="0"/></td></td>
+                    <td><input type="text" class="hidden" name="attr_Form_name" value="Form"/></td>
+                    <td><input type="number" class="hidden" name="attr_spell_Form" value="0"/></td></td>
+                    <td></td>
+                </tr>
+                -->
+                <tr>
+                    <td data-i18n="range" >Range</td>
+                    <td><input type="text" class="heading_2" name="attr_spell_range" value=""/></td>
+                    <td data-i18n="duration" > Duration</td>
+                    <td><input type="text" class="heading_2" name="attr_spell_duration" value=""/></td>
+                    <td data-i18n="target" >Target</td>
+                    <td><input type="text" class="heading_2" name="attr_spell_target" value="" /></td>
+                    <td data-i18n="bonus" >Bonus</td>
+                    <td><input type="number" class="number_2" name="attr_spell_bonus" value="0"/></td>
+                </tr>
+                <tr>
+                    <td colspan="8"><textarea class="textarea_2" style="width:815px;" name="attr_spell_note" placeholder="Spell Description" data-i18n-placeholder="spell-description"></textarea></td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
+</div>
+
+<!-- 6 Sheet -->
+<div class="tab-content tab6">
+    <!-- Welcome message -->
+    <div class="welcome">
+        <h3 class="heading_label" style="margin-bottom: 5px;">Ars Magica 5th Edition Sheet - v1.7</h3>
+        <div data-i18n="welcome-title">
+            Welcome to the Ars Magica 5th Edition Sheet !
+        </div>
+        <br>
+        <div data-i18n="welcome-0">
+            Those are a few important notes you'll need to read before using the sheet.
+        A more complete documentation can be found below.
+        </div>
+        <br>
+        <div data-i18n="welcome-1">
+            First, this sheet features some configuration options, found below. Be sure to
+        review those. Configure is your character is a Magi, how you want botches to be
+        rolled and display in chat, and how you want to chose between simple and stress
+        rolls (when applicable).
+        </div>
+        <br>
+        <div data-i18n="welcome-2">
+            Second, you might want to read a bit the section on the documentation
+        on how rolls works. The stress dice of Ars Magica 5th edition are quite
+        complicated, and this sheet isn't <i>quite</i> able to handle them completely
+        automatically. You'll need to copy the result before the critical roll,
+        for instance.
+        </div>
+        <br>
+        <div>
+            <span data-i18n="welcome-3a">Third, some element of the sheet are</span> 
+            <span class="has-tooltip">
+                <span data-i18n="welcome-3b">underlined</span>
+                <span class="tooltip" data-i18n="tooltip-welcome">Underlined text features tooltip with additional informations</span>
+            </span>: <span data-i18n="welcome-3c">this means they have a tooltip that shows additional info about them.</span>
+        </div>
+    </div>
+
+    <!-- Configuration -->
+    <div>
+        <h3 class="heading_label" style="margin-top: 15px;" data-i18n="config-configuration">Configuration</h3>
+        <div class="config">
+            <span data-i18n="config-botch">Botch formula</span>
+            <select class="select_1" name="attr_botch_formula">
+                <option value="&{template:botch} {{roll= [[{[[?{@{botch_num_i18n}|1}]]d10cs0cf10}=10]] }} {{type=Grouped}}" data-i18n="config-botch-grouped">Grouped rolls</option>
+                <option value="$$botch_separate$$" data-i18n="config-botch-separate">Separate rolls</option>
+            </select>
+
+            <span data-i18n="config-dice">Dice type</span>
+            <select class="select_1" name="attr_die-type-selection">
+                <option value="toggle" data-i18n="config-dice-toggle">Toggle</option>
+                <option value="both" data-i18n="config-dice-both">Both</option>
+            </select>
+
+            <span data-i18n="config-magi">Magi character</span>
+            <select class="select_1" name="attr_isMagi">
+                <option value="yes" data-i18n="config-magi-yes">Yes</option>
+                <option value="no" data-i18n="config-magi-no">No</option>
+            </select>
+        </div>
+    </div>
+    <!-- Legacy -->
+    <div>
+        <h3 class="heading_label" style="margin-top: 15px; margin-bottom: 10px;" data-i18n="legacy-title">Legacy</h3>
+        <div class="welcome" data-i18n="legacy-content">
+            This section contains part of the sheet that are no longer used, but cannot be removed because
+            they contain character data.
+        </div>
+        <div style="margin-top: 15px;">
+            <h4 class="heading_label" data-i18n="armor" >Armor</h4>
+            <table class="table_2" style="width:800px;">
+                <tr>
+                    <th colspan="2" data-i18n="armor-worn" >Armor Worn</th>
+                    <th colspan="2" data-i18n="combat-modifiers" >Combat Modifiers</th>
+                </tr>
+                <tr>
+                    <th colspan="2"><textarea class="textarea_2" name="attr_ArmorWorn"></textarea></th>
+                    <th colspan="2"><textarea class="textarea_2" name="attr_ArmorModifiers"></textarea></th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Embedded documentation -->
+    <div class="divider" style="height:15px;"><span>&nbsp;</span></div>
+    <div class="documentation" style="margin-top:5px">
+        $$documentation$$
+    </div>
+    <div class="documentation" style="margin-top:5px">
+        $$changelog$$
+    </div>
+    
+</div>
+
+<!-- Roll Templates -->
+<div class="hidden">
+    <!-- melee -->
+    <rolltemplate class="sheet-rolltemplate-spell">
+        <table class="sheet-rolltemplate-all">
+            <tr>
+                <td class="spellsubheader" colspan="3"><i><b>{{character}}</b> <div data-i18n="casts-rt" style="padding-left: 112px;">casts</div></i></td>
+            </tr>
+            <tr>
+                <th colspan="3">{{spell}}</th>
+            </tr>
+            {{#sigil}}
+            <tr>
+                <td colspan="3"><i class="spelldescription" style="margin-left:5px;">{{sigil}}</i></td>
+            </tr>
+            {{/sigil}}
+            <tr>
+                <td class="top_bottom" style="padding-left:5px;padding-right:5px;"><i>{{Technique}}</i></td>
+                <td class="top_bottom" style="padding-left:5px;padding-right:5px;"><i>{{Form}}</i></td>
+                <td class="top_bottom" style="padding-left:5px;padding-right:5px;"><i>{{Level}}</i></td>
+            </tr>
+            <tr>
+                
+                <td><div style="padding-left:5px;padding-right:5px;">R</div></td>
+                <td><div style="padding-left:5px;padding-right:5px;">D</div></td>
+                <td><div style="padding-left:5px;padding-right:5px;">T</div></td>
+            </tr>
+            <tr>
+                <td><div style="padding-left:5px;padding-right:5px;" class="spelllabel">{{range}}</div></td>
+                <td><div style="padding-left:5px;padding-right:5px;" class="spelllabel">{{duration}}</div></td>
+                <td><div style="padding-left:5px;padding-right:5px;" class="spelllabel">{{target}}</div></td>
+            </tr>
+            <tr>
+                <td><div style="padding-left:5px;padding-right:5px;"><b data-i18n="roll">Roll:</b></div></td>
+                {{^stress}}
+                <td class="display-simple"><span class="tcat"></span>{{roll}}</td>
+                {{/stress}}
+                {{#stress}}
+                <td class="display-stress">
+                    <span class="tcat"></span>
+                    {{roll}}
+
+                    {{#rollWasFumble() roll}}
+                    <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                    {{/rollWasFumble() roll}}
+
+                    {{#rollWasCrit() roll}}
+                    <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                    {{/rollWasCrit() roll}}
+                </td>
+                {{/stress}}
+                <td></td>
+            </tr>
+            {{#effect}}
+            <tr>
+                <td colspan="3"><div style="padding-left:5px;padding-right:5px;"><b data-i18n="effect" >Effect</b></div></td>
+            </tr>
+            <tr>
+                <td colspan="3"><div style="padding-left:5px;padding-right:5px;" class="spelldescription">{{effect}}</div></td>
+            </tr>
+            {{/effect}}
+            {{#mastery}}
+            <tr>
+                <td colspan="3"><div style="padding-left:5px;padding-right:5px;"><b data-i18n="mastery">Mastery</b></div> </td>
+            </tr>
+            <tr>
+                <td colspan="3"><div style="padding-left:5px;padding-right:5px;" class="spelldescription">{{mastery}}</div></td>
+            </tr>
+            {{/mastery}}
+        </table>
+    </rolltemplate>
+    
+    <rolltemplate class="sheet-rolltemplate-botch">
+        <table class="sheet-rolltemplate-all">
+            <tr>
+                <th colspan="3">
+                    <span data-i18n="botch">Botch</span>
+                    {{#type}}
+                    <span> ({{type}})</span>
+                    {{/type}}
+                </th>
+            </tr>
+            <tr>
+                <td colspan="3">{{roll}}</td>
+            </tr>
+        </table>
+    </rolltemplate>
+	
+	<rolltemplate class="sheet-rolltemplate-reroll">
+        <table class="sheet-rolltemplate-all">
+            <tr>
+                <th colspan="3" data-i18n="roll">Roll</th>
+            </tr>
+            <tr>
+                <td colspan="3">{{roll}}</td>
+            </tr>
+        </table>
+    </rolltemplate>
+
+    <rolltemplate class="sheet-rolltemplate-critical">
+        <table class="sheet-rolltemplate-all">
+            <tr>
+                <th colspan="3">
+                    <span data-i18n="critical">Critical</span>
+                    {{#type}}
+                    <span> ({{type}})</span>
+                    {{/type}}
+                </th>
+            </tr>
+            <tr>
+                <td colspan="3">{{roll}}</td>
+            </tr>
+        </table>
+    </rolltemplate>
+    
+    <rolltemplate class="sheet-rolltemplate-attack">
+        <table class="combatroller sheet-rolltemplate-all">
+            <tr>
+                <th colspan="2">{{name}}</th>
+            </tr>
+            {{#weapon}}
+            <tr>
+                <td colspan="2" style="text-align: center;">{{weapon}}</td>
+            </tr>
+            {{/weapon}}
+            <tr>
+                <td><div style="text-align:center;" data-i18n="attack">Attack</div></td>
+                {{^stress}}
+                <td class="display-simple-light"><div style="text-align:center;">{{attack}}</div></td>
+                {{/stress}}
+                {{#stress}}
+                <td class="display-stress-light">
+                    <div style="text-align:center;">{{attack}}</div>
+
+                    {{#rollWasFumble() attack}}
+                    <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                    {{/rollWasFumble() attack}}
+
+                    {{#rollWasCrit() attack}}
+                    <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                    {{/rollWasCrit() attack}}
+                </td>
+                {{/stress}}
+            </tr>
+            <tr>
+                <td><div style="text-align:center;" data-i18n="damage">Damage</div></td>
+                <td class="display-default"><div style="text-align:center;">{{#^rollLess() damage 0}}<span class="inlinerollresult" style="min-width:0; margin-right: -15px">+</span>{{/^rollLess() damage 0}}{{damage}}</div></td>
+            </tr>
+        </table>
+    </rolltemplate>
+	
+	<rolltemplate class="sheet-rolltemplate-defend">
+        <div class="combatroller sheet-rolltemplate-all">
+            <table>
+                <tr>
+                    <th colspan="2">{{name}}</th>
+                </tr>
+                {{#weapon}}
+                <tr>
+                    <td colspan="2" style="text-align: center;">{{weapon}}</td>
+                </tr>
+                {{/weapon}}
+                <tr>
+                    <td data-i18n="defend-rt">Defend</td>
+                    {{^stress}}
+                    <td class="display-simple-light">{{defend}}</td>
+                    {{/stress}}
+                    {{#stress}}
+                    <td class="display-stress-light">
+                        {{defend}}
+
+                        {{#rollWasFumble() defend}}
+                        <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                        {{/rollWasFumble() defend}}
+
+                        {{#rollWasCrit() defend}}
+                        <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                        {{/rollWasCrit() defend}}
+                    </td>
+                    {{/stress}}
+                </tr>
+            </table>
+        </div>
+    </rolltemplate>
+	
+	<rolltemplate class="sheet-rolltemplate-soak">
+        <table class="combatroller sheet-rolltemplate-all">
+			<tr>
+                <th colspan="2">{{name}}</th>
+            </tr>
+			<tr>
+                <td><div style="text-align:center;" data-i18n="soak">Soak</div></td>
+                {{^stress}}
+                <td class="display-simple-light"><div style="text-align:center;">{{rollsoak}}</div></td>
+                {{/stress}}
+                {{#stress}}
+                <td class="display-stress-light">
+                    <div style="text-align:center;">{{rollsoak}}</div>
+
+                    {{#rollWasFumble() rollsoak}}
+                    <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                    {{/rollWasFumble() rollsoak}}
+
+                    {{#rollWasCrit() rollsoak}}
+                    <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                    {{/rollWasCrit() rollsoak}}
+                </td>
+                {{/stress}}
+            </tr>
+            <tr>
+                <td><div style="text-align:center;" data-i18n="armor-protection">Armor Protection</div></td>
+                <td class="display-default"><div style="text-align:center;">{{armorsoak}}</div></td>
+            </tr>
+            {{#soakbonus}}
+            <tr>
+                <td><div style="text-align:center;" data-i18n="bonus">Bonus</div></td>
+                <td class="display-default"><div style="text-align:center;">{{soakbonus}}</div></td>
+            </tr>
+            {{/soakbonus}}
+            {{#formlabel}}
+            <tr>
+                <td><div style="text-align:center;">{{formlabel}}</div></td>
+                <td class="display-default"><div style="text-align:center;">{{formbonus}}</div></td>
+            </tr>
+            {{/formlabel}}
+        </table>
+    </rolltemplate>
+    
+    <rolltemplate class="sheet-rolltemplate-initiative">
+        <table class="combatroller sheet-rolltemplate-all">
+            <tr>
+                <th>{{name}}</th>
+            </tr>
+            <tr>
+                {{^stress}}
+                <td class="display-simple-light">
+                    <div style="text-align:center;">
+                        <div data-i18n="initiative">Initiative</div>
+                        {{roll}}
+                        <div data-i18n="with-rt">with</div>
+                        {{weapon}}
+                    </div>
+                </td>
+                {{/stress}}
+                {{#stress}}
+                <td class="display-stress-light">
+                    <div style="text-align:center;">
+                        <div>
+                            <div data-i18n="initiative">Initiative</div>
+                            {{roll}}
+
+                            {{#rollWasFumble() roll}}
+                            <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                            {{/rollWasFumble() roll}}
+
+                            {{#rollWasCrit() roll}}
+                            <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                            {{/rollWasCrit() roll}}
+                        </div>
+                        <div data-i18n="with-rt">with</div>
+                        {{weapon}}
+                    </div>
+                </td>
+                {{/stress}}
+            </tr>
+        </table>
+    </rolltemplate>
+    
+    <rolltemplate class="sheet-rolltemplate-ability">
+        <table class="sheet-rolltemplate-all">
+            <tr>
+                <th colspan="2"><b>{{name}}</b> <div data-i18n="leverages-rt" style="font-size:24px; padding-left:95px;">leverages</div></th>
+            </tr>
+            <tr class="subheader">
+                <td class="label" colspan="2" style="width:100%">
+                    <div class="define">{{label0}}</div>
+                    <div class="flex_item" data-i18n="attaining-rt">Attaining</div>
+                </td>
+            </tr>
+            <tr class="subheader">
+                <td class="label" colspan="2">
+                    {{^stress}}
+                        <div class="display-simple bigresult">{{result0}}</div>
+                    {{/stress}}
+
+                    {{#stress}}
+                    <div class="display-stress bigresult">{{result0}}
+
+                        {{#rollWasFumble() result0}}
+                        <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                        {{/rollWasFumble() result0}}
+                        
+                        {{#rollWasCrit() result0}}
+                        <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                        {{/rollWasCrit() result0}}
+                    </div>
+                    {{/stress}}
+                </td>
+            </tr>
+            <tr>
+                <td class="banner" colspan="2">{{banner}}</td>
+            </tr>
+            <tr>
+                <td class="label">{{label1}}</td>
+                <td class="result">{{result1}}</td>
+            </tr>
+            <tr>
+                <td class="label">{{label2}}</td>
+                <td class="result">{{result2}}</td>
+            </tr>
+            <tr>
+                <td class="label">{{label3}}</td>
+                <td class="result">{{result3}}</td>
+            </tr>
+            <tr>
+                <td class="label">{{label4}}</td>
+                <td class="result">{{result4}}</td>
+            </tr>
+        </table>
+    </rolltemplate>
+    
+    <rolltemplate class="sheet-rolltemplate-generic">
+        <table class="sheet-rolltemplate-all">
+            <tr>
+                <th colspan=2><span style="position:relative;bottom:5px;">{{Banner}}</span></th>
+            </tr>
+            <tr>
+                <td class="Label">{{Label}}</td>
+                {{^stress}}
+                <td class="Result display-simple">{{Result}}</td>
+                {{/stress}}
+                {{#stress}}
+                <td class="Result display-stress">
+                    {{Result}}
+
+                    {{#rollWasFumble() Result}}
+                    <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                    {{/rollWasFumble() Result}}
+
+                    {{#rollWasCrit() Result}}
+                    <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                    {{/rollWasCrit() Result}}
+                </td>
+                {{/stress}}
+            </tr>
+        </table>
+    </rolltemplate>
+ 
+    <rolltemplate class="sheet-rolltemplate-arcane">
+        <div style="background-image:url(https://i.imgur.com/gIacv0f.jpg);box-shadow: 0px 0px 4px black;">
+        <div style="background-image:url(https://i.imgur.com/q9tcTtR.jpg);width:235px;height:125px"></div>
+        <table class="sheet-rolltemplate-all">
+            <tr>
+                {{^stress}}
+                <td class="bigresult display-simple-light" colspan="2">{{result0}}</td>
+                {{/stress}}
+                {{#stress}}
+                <td class="bigresult display-stress-light" colspan="2">{{result0}}</td>
+                {{/stress}}
+            </tr>
+            {{#rollWasFumble() result0}}
+            <tr style="text-align: center;"><td colspan="2"><span class="sheet-rolltemplate-botchbt">{{botch-button}}</span></td></tr>
+            {{/rollWasFumble() result0}}
+
+            {{#rollWasCrit() result0}}
+            <tr style="text-align: center;"><td colspan="2"><span class="sheet-rolltemplate-critbt">{{crit-button}}</span></td></tr>
+            {{/rollWasCrit() result0}}
+            <tr>
+                <th colspan="2"><span>{{label0}}</span></th>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            {{#label1}}
+            <tr>
+                <td class="label">{{label1}}</td>
+                <td class="result">{{result1}}</td>
+            </tr>
+            {{/label1}}
+            {{#label2}}
+            <tr>
+                <td class="label">{{label2}}</td>
+                <td class="result">{{result2}}</td>
+            </tr>
+            {{/label2}}
+            {{#label3}}
+            <tr>
+                <td class="label">{{label3}}</td>
+                <td class="result">{{result3}}</td>
+            </tr>
+            {{/label3}}
+            {{#label4}}
+            <tr>
+                <td class="label">{{label4}}</td>
+                <td class="result">{{result4}}</td>
+            </tr>
+            {{/label4}}
+            {{#label5}}
+            <tr>
+                <td class="label">{{label5}}</td>
+                <td class="result">{{result5}}</td>
+            </tr>
+            {{/label5}}
+            {{#label6}}
+            <tr>
+                <td class="label">{{label6}}</td>
+                <td class="result">{{result6}}</td>
+            </tr>
+            {{/label6}}
+            {{#textlabel}}
+            <!--<tr name="divider">
+                <td colspan="2"><hr style="margin-bottom:0px;"></td>
+            </tr>-->
+            <tr>
+                <td class="label" colspan="2" style="padding-top: 20px;">{{textlabel}}</td>
+            </tr>
+            {{/textlabel}}
+            {{#textsublabel}}
+            <tr>
+                <td class="textfield" colspan="2" style="text-align: center;">{{textsublabel}}</td>
+            </tr>
+            {{/textsublabel}}
+            {{#textfield}}
+            <tr>
+                <td class="textfield" colspan="2">{{textfield}}</td>
+            </tr>
+            {{/textfield}}
+        </table>
+        </div>
+        <div style="background-image:url(https://i.imgur.com/DdTHJT1.jpg); width:235px; height:125px; position:relative; top:-50px;"></div>
+    
+    </rolltemplate>
+
+    <rolltemplate class="sheet-rolltemplate-custom">
+        <div class="sheet-crt-container sheet-crt-color-{{color}} sheet-crt-rlcolor-{{roll-color}} sheet-crt-btcolor-{{button-color}}">
+            <div class="sheet-crt-header">
+              {{#title}}<div class="sheet-crt-title"><b>{{title}}</b></div>{{/title}}
+              {{#subtitle}}<div class="sheet-crt-subtitle">{{subtitle}}</div>{{/subtitle}}
+            </div>
+            <div class="sheet-crt-content">
+              {{#allprops() title subtitle desc color roll-color button-color left-align right-align}}
+              <div class="sheet-crt-key sheet-crt-lalign-{{left-align}}">{{key}}</div>
+              <div class="sheet-crt-value sheet-crt-ralign-{{right-align}}">{{value}}</div>
+              {{/allprops() title subtitle desc color roll-color button-color left-align right-align}}
+              {{#desc}}<div class="sheet-crt-desc">{{desc}}</div>{{/desc}}
+            </div>
+          </div>
+    </rolltemplate>
+</div>
+    
+
+<!-- Translation keys -->
+$$translation_attrs$$
+<!-- Attributes used for the defered attribute access system -->
+<!-- See Readme.md for explanation of how it works -->
+<input name="attr_Unselected_Score" type="hidden" value="0" />
+<input name="attr_Unselected_Puissant" type="hidden" value="0" />
+<input name="attr_ask_Score" type="hidden" value="$$characteristic_name_ask_attr$$" />
+<!-- Those two attribute delegates to the global selector using another deferred attribute -->
+<input name="attr_global_char_Score" type="hidden" value="@{sys_at}@{character_name}@{sys_pipe}@{global_Ability_CharacName}_Score@{sys_rbk}" />
+<input name="attr_global_char_i18n" type="hidden" value="@{sys_at}@{character_name}@{sys_pipe}@{global_Ability_CharacName}_i18n@{sys_rbk}" />
+<input name ="attr_sys_at" type="hidden" value="@{" />
+<input name ="attr_sys_pipe" type="hidden" value="|" />
+<input name ="attr_sys_rbk" type="hidden" value="}" />
+<!-- Used by the alert system to hide old alerts on new sheets -->
+<input name="attr_notNew" type="hidden" value="0" />
+
+<!-- Sheet Worker Scripts -->
+<script type="text/worker">
+["character","abilities","magic","combat","spells","sheet"].forEach(function (button) {
+    on("clicked:" + button, function() {
+        setAttrs({
+            "sheetTab": button
+        });
+    });
+});
+
+// Die configuration and toggle
+on("change:die-type-selection", function() {
+    getAttrs(["die-type-selection"], function(values) {
+        setAttrs({
+            "die-type-selection-proxy": values["die-type-selection"]
+        });
+    });
+});
+
+on("clicked:die-toggle-simple", function() {
+    setAttrs({
+        "selected-die": "stress"
+    });
+});
+
+on("clicked:die-toggle-stress", function() {
+    setAttrs({
+        "selected-die": "simple"
+    });
+});
+
+// Additional fatigue levels
+on("change:additionalFatigue", function() {
+    getAttrs(["additionalFatigue"], function(values) {
+        setAttrs({
+            "additionalFatigueProxy": values.additionalFatigue
+        });
+    });
+});
+
+// Laboratory Adding
+
+on("change:repeating_labspecializations:labbonus remove:repeating_labspecializations change:repeating_labspecializations:sactive", function() {
+    getSectionIDs("repeating_labspecializations", function(IDArray) {
+        var fieldNames = [];
+        for (var i=0; i < IDArray.length; i++) {
+            fieldNames.push("repeating_labspecializations_" + IDArray[i] + "_labbonus");
+            fieldNames.push("repeating_labspecializations_" + IDArray[i] + "_sactive");
+        }
+
+        var total = 0;
+        getAttrs(fieldNames, function(values) {
+            for (var i=0; i < IDArray.length; i++) {
+                total += (parseInt(values["repeating_labspecializations_" + IDArray[i] + "_labbonus"])||0) * ( parseInt(values["repeating_labspecializations_" + IDArray[i] + "_sactive"])|| 0 );
+            }
+            setAttrs({
+                "labbonus_total": total
+            });
+        });
+    });
+});
+
+//Wounds
+on("change:Wounds_Light1 change:Wounds_Light2 change:Wounds_Light3 change:Wounds_Light4 change:Wounds_Light5 change:Wounds_Medium1 change:Wounds_Medium2 change:Wounds_Medium3 change:Wounds_Medium4 change:Wounds_Medium5 change:Wounds_Heavy1 change:Wounds_Heavy2 change:Wounds_Heavy3 change:Wounds_Heavy4 change:Wounds_Heavy5 change:Wounds_Incapacitated change:Wounds_Dead sheet:opened", function() {
+    getAttrs(["Wounds_Light1", "Wounds_Light2", "Wounds_Light3", "Wounds_Light4", "Wounds_Light5", "Wounds_Medium1", "Wounds_Medium2", "Wounds_Medium3", "Wounds_Medium4", "Wounds_Medium5", "Wounds_Heavy1", "Wounds_Heavy2", "Wounds_Heavy3", "Wounds_Heavy4", "Wounds_Heavy5", "Wounds_Incapacitated", "Wounds_Dead"], function(values) {
+        setAttrs({
+            wound_total: (+values.Wounds_Light1 + +values.Wounds_Light2 + +values.Wounds_Light3 + +values.Wounds_Light4 + +values.Wounds_Light5 + +values.Wounds_Medium1 + +values.Wounds_Medium2 + +values.Wounds_Medium3 + +values.Wounds_Medium4 + +values.Wounds_Medium5 + +values.Wounds_Heavy1 + +values.Wounds_Heavy2 + +values.Wounds_Heavy3 + +values.Wounds_Heavy4 + +values.Wounds_Heavy5 + +values.Wounds_Incapacitated + +values.Wounds_Dead)
+        });
+    });
+});
+
+// Function to create a sheet-worker that updates totals computed from repeating sections
+// The sections must follow some naming conventions, see code
+
+function register_repeated_section_totals(section, properties) {
+    var events = (
+        "sheet:opened"
+        + " remove:repeating_" + section
+        + " change:repeating_" + section + ":isactive"
+        + " change:repeating_" + section + ":" + section + "_name"
+    );
+    properties.forEach(function(prop, index, array) {
+        events += " change:repeating_" + section + ":" + section + "_" + prop;
+    });
+
+    console.log("Registering events for section: " + section + " -> " + events);
+
+    on(events, function() {
+        getSectionIDs("repeating_" + section, function(id_array) {
+
+            var attr_names = [];
+            for (var i=0; i < id_array.length; i++) {
+                attr_names.push("repeating_" + section + "_" + id_array[i] + "_" + section + "_name");
+                attr_names.push("repeating_" + section + "_" + id_array[i] + "_isactive");
+                properties.forEach(function(prop, index, array) {
+                    attr_names.push("repeating_" + section + "_" + id_array[i] + "_" + section + "_" + prop);
+                });
+            }
+            console.log("Attributes to get: " + attr_names.toString());
+
+            var totals = {};
+            properties.forEach(function(prop, index, array) {
+                totals[section + "_total_" + prop] = 0
+                totals[section + "_total_" + prop + "_detailed"] = "0";
+            });
+            console.log("Totals to compute: " + JSON.stringify(totals, null, 1));
+
+            getAttrs(attr_names, function(attrs){
+                var prefix = "";
+                var value = 0;
+                console.log("Got attributes: " + JSON.stringify(attrs, null, 1));
+
+                for (var i=0; i < id_array.length; i++) {
+                    console.log("Handling item #" + i);
+                    prefix = "repeating_" + section + "_" + id_array[i] + "_";
+
+                    properties.forEach(function(prop, index, array) {
+                        if ((parseInt(attrs[prefix + "isactive"]) || 0) === 1) {
+                            value = (parseFloat(attrs[prefix + section + "_" + prop]) || 0);
+                            if (value != 0) {
+                                totals[section + "_total_" + prop] += value;
+                                totals[section + "_total_" + prop + "_detailed"] += (
+                                    " + " + value.toString() + " [" + attrs[prefix + section + "_name"] + "]"
+                                );
+                            }
+                        }
+                    });
+                }
+                console.log("Computed totals: " + JSON.stringify(totals, null, 1));
+
+                properties.forEach(function(prop, index, array) {
+                    totals[section + "_total_" + prop] = Math.ceil(totals[section + "_total_" + prop]);
+                    totals[section + "_total_" + prop + "_detailed"] = "ceil(" + totals[section + "_total_" + prop + "_detailed"] + ")";
+                });
+    
+                console.log("computed totals: " + JSON.stringify(totals, null, 1));
+                setAttrs(totals);
+            });
+        });
+    });
+}
+
+register_repeated_section_totals("armors", ["prot", "load"]);
+register_repeated_section_totals("combat-mods", ["init", "atk", "dfn", "dam", "soak"]);
+
+// Fix weapon attributes
+
+on("sheet:opened", function() {
+    const fixes = {
+        "_Wounds_Load": "_Weapon_Load",
+        "_Wounds_Range": "_Weapon_Range",
+    };
+    const keys = Object.keys(fixes);
+    getSectionIDs("repeating_weapons", function(id_array) {
+        var attr_names = [];
+        id_array.forEach( (id_) => (keys.forEach((key) => attr_names.push("repeating_weapons_" + id_ + key))));
+
+        getAttrs(attr_names, function(attrs) {
+            var value = 0;
+            var updates = {};
+            id_array.forEach( (id_) => (keys.forEach(function(key) {
+                if (attrs["repeating_weapons_" + id_ + key]) {
+                    console.log(attrs["repeating_weapons_" + id_ + key]);
+                    console.log("Fixing " + "repeating_weapons_" + id_ + key + " to " + "repeating_weapons_" + id_ + fixes[key]);
+                    updates["repeating_weapons_" + id_ + fixes[key]] = parseInt(attrs["repeating_weapons_" + id_ + key]) || 0;
+                    updates["repeating_weapons_" + id_ + key] = "";
+                }
+            })));
+            console.log("All fixes :" + JSON.stringify(updates, null, 1));
+            setAttrs(updates);
+        });
+    });
+});
+
+// Duplicate the global bonuses inside the weapons repeating section for display
+// From https://app.roll20.net/forum/post/10297616/how-do-i-reference-a-global-attribute-in-a-span-in-a-repeating-section
+
+const section = "weapons";
+const repeating_stats = ["init", "atk", "dfn", "dam", "soak"].map(prop => `combat-mods_total_${prop}`);
+const changes = repeating_stats.reduce((str, stat) => `${str} change:${stat.toLowerCase()}`, 'sheet:opened');
+on(changes, () => {
+    getSectionIDs(`repeating_${section}`, idarray => {
+        const fieldnames = idarray.reduce((rows,id) => [...rows, ...repeating_stats.map(stat => `repeating_${section}_${id}_${stat}`)], []);
+        getAttrs([...repeating_stats, ...fieldnames], v => {
+            const output = {};
+            idarray.forEach(id => {
+                repeating_stats.forEach(stat => {
+                    output[`repeating_${section}_${id}_${stat}`] = v[stat];
+                });
+            });
+            setAttrs(output);
+        });
+    });
+});
+
+
+// Translation key replacement
+on("sheet:opened", function(eventInfo){
+    $$translation_attrs_setup$$
+
+    getAttrs(["notNew"], function (values) {
+        if (values.notNew == 0) {
+            $$disable_old_alerts("notNew")$$
+        }
+    });
+
+    // Update old spell art selection to new format
+    // Skip it if the Warning banner for that update is closed
+    getAttrs(["alert-161-spell-update"], function(values) {
+        if (values["alert-161-spell-update"] == 0) {
+            getSectionIDs("spell", function(idarray) {
+                const tech_translation = {
+                    0: "unselected",
+                    1: "Creo",
+                    2: "Intellego",
+                    3: "Muto",
+                    4: "Perdo",
+                    5: "Rego"
+                };
+                const form_translation = {
+                    0: "unselected",
+                    1: "Animal",
+                    2: "Aquam",
+                    3: "Auram",
+                    4: "Corpus",
+                    5: "Herbam",
+                    6: "Ignem",
+                    7: "Imaginem",
+                    8: "Mentem",
+                    9: "Terram",
+                    10: "Vim"
+                };
+                for (var i=0; i < idarray.length; i++) {
+                    const spellid = idarray[i];
+                    console.log("Update 1.6.1 - Spell arts updater script - scheduling update for spell ID:" + spellid);
+                    getAttrs(
+                        [   
+                            "repeating_spell_" + spellid + "_spell_name",
+                            "repeating_spell_" + spellid + "_Technique_select",
+                            "repeating_spell_" + spellid + "_Form_select"
+                        ],
+                        function (values) {
+                            attr_updates = {
+                                ["repeating_spell_" + spellid + "_spell_tech_name"]: tech_translation[values["repeating_spell_" + spellid + "_Technique_select"]] || "unselected",
+                                ["repeating_spell_" + spellid + "_spell_form_name"]: form_translation[values["repeating_spell_" + spellid + "_Form_select"]] || "unselected"
+                            };
+                            console.log("Update 1.6.1 - Spell arts updater script - " + values["repeating_spell_" + spellid + "_spell_name"] + " (ID " + spellid + ")");
+                            console.log(attr_updates);
+                            console.log("Update 1.6.1 - Spell arts updater script - spell " + spellid + " END");
+                            setAttrs(attr_updates);
+                        }
+                    );
+                }
+                console.log("Update 1.6.1 - Spell arts updater script - all spell scheduled for update");
+                setAttrs({"alert-161-spell-update": 1});
+            });
+        }
+    });
+    
+});
+
+</script>
+
+<!--
+------------- i18n-tags generated with ACSI V0.50 (Automated Character Sheet Internationalizer)-------------
+	ACSI author: https://github.com/Anduh
+	ACSI Sourcecode: https://github.com/Anduh/acsi
+-->

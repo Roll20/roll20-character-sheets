@@ -1,0 +1,1 @@
+This is a simple adaptation ot the PDF Dreamchaser character sheet. It uses simple roll buttons and roll queries.

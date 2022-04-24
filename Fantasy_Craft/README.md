@@ -5,6 +5,17 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
+#### Bug Fix Update - December 2018
+* Fixed width issues with Combat and Non-Combat areas for both static and repeated elements (I hope - works for me)
+* Fixed shadowing of Charisma modifier in Spell area so formula should calculate correctly now
+* Fixed typo on Weapons 2, 3, and 4 areas preventing attributes from being used in calculation.
+
+#### Bug Fix Update - March 2016
+* Changed Armor Qualitiese and Upgrades fields from number type to text type and widened them
+
+#### Bug Fix Update - February 2016
+* Added attribute names (or used unique names) to various attributes so they would work properly, such as drag-n-drop of initiative onto desktop
+
 #### Major update - May 2015
 * Added sheet config controls to remove background image and control Logos (thanks to Rich Finder)
 * Added Initiative roll button which auto-populates Turn Tracker

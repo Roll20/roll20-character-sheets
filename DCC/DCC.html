@@ -1,3 +1,57 @@
+<script type="text/worker">
+  abilityScores = [
+    'Strength',
+    'Agility',
+    'Stamina',
+    'Personality',
+    'Intelligence',
+    'Luck'
+  ];
+
+  /*
+   * Given an ability score number, return the corresponding modifier
+   */
+  function calculateModifier(value) {
+    return Math.floor( (0.0009 * value * value * value) + (-0.029 * value * value) + (0.6 * value) + 0.41) -4
+  }
+
+  /*
+   * Take an ability score from a change event and recalculate its modifier
+   */
+  function abilityScoreChanged(event) {
+    var ability = event.sourceAttribute;
+    saveAbilityScoreModifier(ability);
+  }
+
+  /*
+   * Recalculate and save an ability score's modifier based on its currently
+   * set value.
+   */
+  function saveAbilityScoreModifier(ability) {
+    getAttrs([ability], function(values) {
+      var params = {};
+      params[ability+"_mod"] = calculateModifier(parseInt(values[ability], 10));
+      setAttrs(params);
+    });
+  }
+
+  on("sheet:opened", function() {
+    /*
+     * Whenever an ability score is changed, we update its modifier
+     */
+    _.each(abilityScores, function(ability) {
+      on("change:"+ability, abilityScoreChanged);
+    });
+
+    /*
+     * Ensure that there is an initial value set
+     */
+    _.each(abilityScores, function(ability) {
+      saveAbilityScoreModifier(ability);
+    });
+  });
+</script>
+
 <div class="sheet-wrapper">	
 	<label class="sheet-center sheet-logo"><img src="http://i.imgur.com/HBgERqb.png" alt="Dungeon Crawl Classics Character Record Sheet" height="38" width="769"/></label>
 	<div class="sheet-2colrow">
@@ -170,7 +224,7 @@
 								</select>
 							</div>
 							<div class="sheet-item sheet-small">
-									<button class="sheet-square" type="roll" value="@{character_name} rolls a critical hit. [[@{CritDie}+@{LCK}]] on Table @{CritDie_max}" name="roll_CritDie">
+									<button class="sheet-square" type="roll" value="@{character_name} rolls a critical hit. [[@{CritDie}+@{Luck_mod}]] on Table @{CritDie_max}" name="roll_CritDie">
 							</div>
 						</div>
 						<div class="sheet-row">
@@ -219,8 +273,8 @@
 						<input type="number" class="sheet-square" name="attr_Strength_max" value="10"/>
 					</div>
 					<div class="sheet-item sheet-tiny">
-						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Strength roll: [[1d20+@{STR}]]" name="roll_STR">
-							<input type="number" class="sheet-square" name="attr_STR" value="floor( (0.0009 * @{Strength} * @{Strength} * @{Strength}) + (-0.029 * @{Strength} * @{Strength}) + (0.6 * @{Strength}) +0.41) -4" disabled="true"/>
+						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Strength roll: [[1d20+@{Strength_mod}]]" name="roll_STR">
+							<input type="number" class="sheet-square" name="attr_Strength_mod" value="0"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-small sheet-header"> </div>
@@ -243,8 +297,8 @@
 						<input type="number" class="sheet-square" name="attr_Agility_max" value="10"/>
 					</div>
 					<div class="sheet-item sheet-tiny">
-						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes an Agility roll: [[1d20+@{AGI}]]" name="roll_AGI">
-							<input type="number" class="sheet-square" name="attr_AGI" value="floor( (0.0009 * @{Agility} * @{Agility} * @{Agility}) + (-0.029 * @{Agility} * @{Agility}) + (0.6 * @{Agility}) +0.41) -4" disabled="true"/>
+						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes an Agility roll: [[1d20+@{Agility_mod}]]" name="roll_AGI">
+							<input type="number" class="sheet-square" name="attr_Agility_mod" value="0"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-small">
@@ -255,7 +309,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Reflex save: [[1d20+@{REFCheck}]]" name="roll_REF">
-							<input type="number" class="sheet-square" name="attr_REFCheck" value="@{REF}+@{AGI}" disabled="true"/>
+							<input type="number" class="sheet-square" name="attr_REFCheck" value="@{REF}+@{Agility_mod}" disabled="true"/>
 						</button>
 					</div>
 				</div>
@@ -271,8 +325,8 @@
 						<input type="number" class="sheet-square" name="attr_Stamina_max" value="10"/>
 					</div>
 					<div class="sheet-item sheet-tiny">
-						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Stamina roll: [[1d20+@{STA}]]" name="roll_STA">
-							<input type="number" class="sheet-square" name="attr_STA" value="floor( (0.0009 * @{Stamina} * @{Stamina} * @{Stamina}) + (-0.029 * @{Stamina} * @{Stamina}) + (0.6 * @{Stamina}) +0.41) -4" disabled="true"/>
+						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Stamina roll: [[1d20+@{Stamina_mod}]]" name="roll_STA">
+							<input type="number" class="sheet-square" name="attr_Stamina_mod" value="0"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-small">
@@ -283,7 +337,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Fortitude save: [[1d20+@{FORTCheck}]]" name="roll_FORT">
-							<input type="number" class="sheet-square" name="attr_FORTCheck" value="@{FORT}+@{STA}" disabled="true"/>
+							<input type="number" class="sheet-square" name="attr_FORTCheck" value="@{FORT}+@{Stamina_mod}" disabled="true"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-tiny">
@@ -302,8 +356,8 @@
 						<input type="number" class="sheet-square" name="attr_Personality_max" value="10"/>
 					</div>
 					<div class="sheet-item sheet-tiny">
-						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Personality roll: [[1d20+@{PER}]]" name="roll_PER">
-							<input type="number" class="sheet-square" name="attr_PER" value="floor( (0.0009 * @{Personality} * @{Personality} * @{Personality}) + (-0.029 * @{Personality} * @{Personality}) + (0.6 * @{Personality}) +0.41) -4" disabled="true"/>
+						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Personality roll: [[1d20+@{Personality_mod}]]" name="roll_PER">
+							<input type="number" class="sheet-square" name="attr_Personality_mod" value="0"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-small">
@@ -314,7 +368,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Will save: [[1d20+@{WILLCheck}]]" name="roll_WILL">
-							<input type="number" class="sheet-square" name="attr_WILLCheck"/ value="@{WILL}+@{PER}" disabled="true"/>
+							<input type="number" class="sheet-square" name="attr_WILLCheck"/ value="@{WILL}+@{Personality_mod}" disabled="true"/>
 						</button>
 					</div>
 				</div>
@@ -330,8 +384,8 @@
 						<input type="number" class="sheet-square" name="attr_Intelligence_max" value="10"/>
 					</div>
 					<div class="sheet-item sheet-tiny">
-						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes an Intelligence roll: [[1d20+@{INT}]]" name="roll_INT">
-							<input type="number" class="sheet-square" name="attr_INT" value="floor( (0.0009 * @{Intelligence} * @{Intelligence} * @{Intelligence}) + (-0.029 * @{Intelligence} * @{Intelligence}) + (0.6 * @{Intelligence}) +0.41) -4" disabled="true"/>
+						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes an Intelligence roll: [[1d20+@{Intelligence_mod}]]" name="roll_INT">
+							<input type="number" class="sheet-square" name="attr_Intelligence_mod" value="0"/>
 						</button>
 					</div>
 				</div>
@@ -347,8 +401,8 @@
 						<input type="number" class="sheet-square" name="attr_Luck_max" value="10"/>
 					</div>
 					<div class="sheet-item sheet-tiny">
-						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Luck roll: [[1d20+@{LCK}]]" name="roll_LCK">
-							<input type="number" class="sheet-square" name="attr_LCK" value="floor( (0.0009 * @{Luck} * @{Luck} * @{Luck}) + (-0.029 * @{Luck} * @{Luck}) + (0.6 * @{Luck}) +0.41) -4" disabled="true"/>
+						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Luck roll: [[1d20+@{Luck_mod}]]" name="roll_LCK">
+							<input type="number" class="sheet-square" name="attr_Luck_mod" value="0"/>
 						</button>
 					</div>
 				</div>
@@ -426,13 +480,13 @@
 					<input type="text" name="attr_WeaponSpecial"/>
 				</div>
 				<div class="sheet-item sheet-square">
-					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} attacks with @{WeaponName}! [[@{ActionDie}+@{WeaponAtk}+@{ATK}+@{STR}]] to hit and [[@{WeaponDmg}+@{STR}]] damage!" name="roll_MeleeAttack">
-						<input type="number" name="attr_MeleeAttackCheck" value="@{WeaponAtk}+@{ATK}+@{STR}" disabled="true"/>
+					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} attacks with @{WeaponName}! [[@{ActionDie}+@{WeaponAtk}+@{ATK}+@{Strength_mod}]] to hit and [[@{WeaponDmg}+@{Strength_mod}]] damage!" name="roll_MeleeAttack">
+						<input type="number" name="attr_MeleeAttackCheck" value="@{WeaponAtk}+@{ATK}+@{Strength_mod}" disabled="true"/>
 					</button>
 				</div>
 				<div class="sheet-item sheet-square">
-					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} attacks with @{WeaponName}! [[@{ActionDie}+@{WeaponAtk}+@{ATK}+@{AGI}]] to hit and [[@{WeaponDmg}]] damage!" name="roll_RangedAttack">
-						<input type="number" name="attr_MeleeAttackCheck" value="@{WeaponAtk}+@{ATK}+@{AGI}" disabled="true"/>
+					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} attacks with @{WeaponName}! [[@{ActionDie}+@{WeaponAtk}+@{ATK}+@{Agility_mod}]] to hit and [[@{WeaponDmg}]] damage!" name="roll_RangedAttack">
+						<input type="number" name="attr_MeleeAttackCheck" value="@{WeaponAtk}+@{ATK}+@{Agility_mod}" disabled="true"/>
 					</button>
 				</div>
 			</div>
@@ -484,7 +538,7 @@
 					</div>
 					<div class="sheet-item sheet-square">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} fumbles! [[@{ArmorFumbleDie}+@{FumbleCheck}]]" name="roll_Fumble">
-							<input type="number" name="attr_FumbleCheck" value="@{LCK}*-1" disabled="true"/>
+							<input type="number" name="attr_FumbleCheck" value="@{Luck_mod}*-1" disabled="true"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-med">
@@ -567,6 +621,7 @@
 	<input type="radio" class="isGnome" value="9" name="attr_Class" checked><label class="sheet-tab">Gnome</label>
 	<input type="radio" class="isPaladin" value="10" name="attr_Class" checked><label class="sheet-tab">Paladin</label>
 	<input type="radio" class="isRanger" value="11" name="attr_Class" checked><label class="sheet-tab">Ranger</label>
+	<input type="radio" class="isKith" value="12" name="attr_Class" checked><label class="sheet-tab">Kith</label>
 	<!-- warrior -->
 	<div class="sheet-warrior">
 		<h2>Warrior Abilities</h2>
@@ -717,7 +772,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts @{WizardSpell}: [[@{ActionDie}+@{WizardSpellCheck}]]" name="roll_WizardSpell">
-							<input type="number" name="attr_WizardSpellCheck" value="@{Level}+@{INT}+@{WizardSpellCheckMisc}" disabled="true"/>
+							<input type="number" name="attr_WizardSpellCheck" value="@{Level}+@{Intelligence_mod}+@{WizardSpellCheckMisc}" disabled="true"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-med">
@@ -861,7 +916,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts Divine Aid: [[@{ActionDie}+@{DivineAidCheck}]]" name="roll_DivineAid">
-						<input type="number" name="attr_DivineAidCheck" value="@{Level}+@{PER}+@{DivineAidCheckMisc}" disabled="true"/>
+						<input type="number" name="attr_DivineAidCheck" value="@{Level}+@{Personality_mod}+@{DivineAidCheckMisc}" disabled="true"/>
 					</button>
 				</div>
 				<div class="sheet-item sheet-med">
@@ -880,7 +935,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts Turn Unholy: [[@{ActionDie}+@{TurnUnholyCheck}]]" name="roll_TurnUnholy">
-						<input type="number" name="attr_TurnUnholyCheck" value="@{Level}+@{PER}+@{TurnUnholyCheckMisc}" disabled="true"/>
+						<input type="number" name="attr_TurnUnholyCheck" value="@{Level}+@{Personality_mod}+@{TurnUnholyCheckMisc}" disabled="true"/>
 					</button>
 				</div>
 				<div class="sheet-item sheet-med">
@@ -899,7 +954,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts Lay On Hands: [[@{ActionDie}+@{LayOnHandsCheck}]]" name="roll_LayOnHands">
-						<input type="number" name="attr_LayOnHandsCheck" value="@{Level}+@{PER}+@{LayOnHandsCheckMisc}" disabled="true"/>
+						<input type="number" name="attr_LayOnHandsCheck" value="@{Level}+@{Personality_mod}+@{LayOnHandsCheckMisc}" disabled="true"/>
 					</button>
 				</div>
 				<div class="sheet-item sheet-med">
@@ -920,7 +975,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts @{ClericSpell}: [[@{ActionDie}+@{ClericSpellCheck}]]" name="roll_ClericSpell">
-							<input type="number" name="attr_ClericSpellCheck" value="@{Level}+@{PER}+@{ClericSpellCheckMisc}" disabled="true"/>
+							<input type="number" name="attr_ClericSpellCheck" value="@{Level}+@{Personality_mod}+@{ClericSpellCheckMisc}" disabled="true"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-med">
@@ -985,7 +1040,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} sneaks silently: [[@{ActionDie}+@{ThiefSneakCheck}]]" name="roll_ThiefSneak">
-						<input type="number" class="sheet-square" name="attr_ThiefSneakCheck" value="@{ThiefSneak}+@{AGI}" disabled="true"/>
+						<input type="number" class="sheet-square" name="attr_ThiefSneakCheck" value="@{ThiefSneak}+@{Agility_mod}" disabled="true"/>
 					</button>
 				</div>
 			</div>
@@ -998,7 +1053,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} hides in shadows: [[@{ActionDie}+@{ThiefHideCheck}]]" name="roll_ThiefHide">
-						<input type="number" class="sheet-square" name="attr_ThiefHideCheck" value="@{ThiefHide}+@{AGI}" disabled="true"/>
+						<input type="number" class="sheet-square" name="attr_ThiefHideCheck" value="@{ThiefHide}+@{Agility_mod}" disabled="true"/>
 					</button>
 				</div>
 			</div>
@@ -1011,7 +1066,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} picks pockets: [[@{ActionDie}+@{ThiefPickPocketsCheck}]]" name="roll_ThiefPickPockets">
-						<input type="number" class="sheet-square" name="attr_ThiefPickPocketsCheck" value="@{ThiefPickPockets}+@{AGI}" disabled="true"/>
+						<input type="number" class="sheet-square" name="attr_ThiefPickPocketsCheck" value="@{ThiefPickPockets}+@{Agility_mod}" disabled="true"/>
 					</input>
 				</div>
 			</div>
@@ -1020,11 +1075,11 @@
 					<label>Climb sheer surfaces</label>
 				</div>
 				<div class="sheet-item sheet-tiny">
-					<input type="text" class="sheet-square"  name="attr_ThiefCimb" value="0"/>
+					<input type="text" class="sheet-square"  name="attr_ThiefClimb" value="0"/>
 				</div>
 				<div class="sheet-item sheet-tiny">
-					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} sneaks silently: [[@{ActionDie}+@{ThiefCimbCheck}]]" name="roll_ThiefCimb"/>
-						<input type="number" class="sheet-square" name="attr_ThiefCimbCheck" value="@{ThiefCimb}+@{AGI}" disabled="true">
+					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} climbs sheer surfaces: [[@{ActionDie}+@{ThiefClimbCheck}]]" name="roll_ThiefClimb"/>
+						<input type="number" class="sheet-square" name="attr_ThiefClimbCheck" value="@{ThiefClimb}+@{Agility_mod}" disabled="true">
 					</button>
 				</div>
 			</div>
@@ -1037,7 +1092,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} picks locks: [[@{ActionDie}+@{ThiefPickLocksCheck}]]" name="roll_ThiefPickLocks">
-						<input type="number" class="sheet-square" name="attr_ThiefPickLocksCheck" value="@{ThiefPickLocks}+@{AGI}" disabled="true"/>
+						<input type="number" class="sheet-square" name="attr_ThiefPickLocksCheck" value="@{ThiefPickLocks}+@{Agility_mod}" disabled="true"/>
 					</button>
 				</div>
 			</div>
@@ -1050,7 +1105,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} finds traps: [[@{ActionDie}+@{ThiefFindTrapsCheck}]]" name="roll_ThiefFindTraps">
-						<input type="number" class="sheet-square" name="attr_ThiefFindTrapsCheck" value="@{ThiefFindTraps}+@{INT}" disabled="true"/>
+						<input type="number" class="sheet-square" name="attr_ThiefFindTrapsCheck" value="@{ThiefFindTraps}+@{Intelligence_mod}" disabled="true"/>
 					</button>
 				</div>
 			</div>
@@ -1063,7 +1118,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} disables traps: [[@{ActionDie}+@{ThiefDisableTrapsCheck}]]" name="roll_ThiefDisableTraps">
-						<input type="number" class="sheet-square" name="attr_ThiefDisableTrapsCheck" value="@{ThiefDisableTraps}+@{AGI}" disabled="true"/>
+						<input type="number" class="sheet-square" name="attr_ThiefDisableTrapsCheck" value="@{ThiefDisableTraps}+@{Agility_mod}" disabled="true"/>
 					</button>
 				</div>
 			</div>
@@ -1076,7 +1131,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} forges documents: [[@{ActionDie}+@{ThiefForgeDocumentsCheck}]]" name="roll_ThiefForgeDocuments">
-						<input type="number" class="sheet-square" name="attr_ThiefForgeDocumentsCheck" value="@{ThiefForgeDocuments}+@{AGI}" disabled="true"/>
+						<input type="number" class="sheet-square" name="attr_ThiefForgeDocumentsCheck" value="@{ThiefForgeDocuments}+@{Agility_mod}" disabled="true"/>
 					</button>
 				</div>
 			</div>
@@ -1089,7 +1144,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} disguises: [[@{ActionDie}+@{ThiefDisguiseCheck}]]" name="roll_ThiefDisguise">
-						<input type="number" class="sheet-square" name="attr_ThiefDisguiseCheck" value="@{ThiefDisguise}+@{PER}" disabled="true"/>
+						<input type="number" class="sheet-square" name="attr_ThiefDisguiseCheck" value="@{ThiefDisguise}+@{Personality_mod}" disabled="true"/>
 					</button>
 				</div>
 			</div>
@@ -1102,7 +1157,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} reads languages: [[@{ActionDie}+@{ThiefReadCheck}]]" name="roll_ThiefRead">
-						<input type="number" class="sheet-square" name="attr_ThiefReadCheck" value="@{ThiefRead}+@{INT}" disabled="true"/>
+						<input type="number" class="sheet-square" name="attr_ThiefReadCheck" value="@{ThiefRead}+@{Intelligence_mod}" disabled="true"/>
 					</button>
 				</div>
 			</div>
@@ -1128,7 +1183,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts a spell from a scroll: [[@{ActionDie}+@{ThiefCastScrollCheck}]]" name="roll_ThiefCastScroll">
-						<input type="number" class="sheet-square" name="attr_ThiefCastScrollCheck" value="@{ThiefCastScroll}+@{INT}" disabled="true"/>
+						<input type="number" class="sheet-square" name="attr_ThiefCastScrollCheck" value="@{ThiefCastScroll}+@{Intelligence_mod}" disabled="true"/>
 					</button>
 				</div>
 			</div>
@@ -1145,8 +1200,8 @@
 				<input type="text" class="sheet-square" name="attr_HalflingStealth" value="0"/>
 			</div>
 			<div class="sheet-item sheet-tiny">
-				<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} Sneaks: [[@{ActionDie}+@{HalflingStealth}+@{AGI}]]" name="roll_ThiefHide">
-					<input type="number" class="sheet-square" name="attr_ThiefCastScrollCheck" value="@{HalflingStealth}+@{AGI}" disabled="true"/>
+				<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} Sneaks: [[@{ActionDie}+@{HalflingStealth}+@{Agility_mod}]]" name="roll_ThiefHide">
+					<input type="number" class="sheet-square" name="attr_ThiefCastScrollCheck" value="@{HalflingStealth}+@{Agility_mod}" disabled="true"/>
 				</button>
 			</div>
 		</div>
@@ -1211,7 +1266,7 @@
 					<label>Shield bash (d14)</label>
 				</div>
 				<div class="sheet-item sheet-tiny">
-					<button class="sheet-square" type="roll" value="@{character_name} does a shield bash. Attack roll: [[d14+@{STR}]] plus Might Deed. Damage roll: [[1d4+@{STR}]] plus Mighty Deed." name="roll_dwarfShieldBash"/>
+					<button class="sheet-square" type="roll" value="@{character_name} does a shield bash. Attack roll: [[d14+@{Strength_mod}]] plus Mighty Deed. Damage roll: [[1d4+@{Strength_mod}]] plus Mighty Deed." name="roll_dwarfShieldBash"/>
 				</div>
 			</div>
 			<div>
@@ -1322,7 +1377,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts Patron Bond: [[@{ActionDie}+@{ElfPatronBondCheck}]]" name="roll_elfPatronBond">
-						<input type="number" name="attr_ElfPatronBondCheck" value="@{Level}+@{ElfPatronBondMisc}+@{INT}" disabled="true"/>
+						<input type="number" name="attr_ElfPatronBondCheck" value="@{Level}+@{ElfPatronBondMisc}+@{Intelligence_mod}" disabled="true"/>
 					</button>
 				</div>
 				<div class="sheet-item sheet-med">
@@ -1341,7 +1396,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts Invoke Patron: [[@{ActionDie}+@{ElfInvokePatronCheck}]]" name="roll_ElfInvokePatron">
-						<input type="number" name="attr_ElfInvokePatronCheck" value="@{INT}+@{Level}+@{ElfInvokePatronMisc}" disabled="true"/>
+						<input type="number" name="attr_ElfInvokePatronCheck" value="@{Intelligence_mod}+@{Level}+@{ElfInvokePatronMisc}" disabled="true"/>
 					</button>
 				</div>
 				<div class="sheet-item sheet-med">
@@ -1361,7 +1416,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts @{ElfSpell}: [[@{ActionDie}+@{ElfSpellCheck}]]" name="roll_ElfSpell">
-							<input type="number" name="attr_ElfSpellCheck" value="@{Level}+@{ElfSpellCheckMisc}+@{INT}" disabled="true"/>
+							<input type="number" name="attr_ElfSpellCheck" value="@{Level}+@{ElfSpellCheckMisc}+@{Intelligence_mod}" disabled="true"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-med">
@@ -1403,7 +1458,7 @@
 			</div>
 			<div class="sheet-item sheet-tiny">
 				<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} makes a Call to Arms: [[@{TalentDie}+@{BardCalltoArmsCheck}]]" name="roll_TalentDie">
-					<input type="number" class="sheet-square" name="attr_BardCalltoArmsCheck" value="@{PER}+@{BardCalltoArms}" disabled="true"/>
+					<input type="number" class="sheet-square" name="attr_BardCalltoArmsCheck" value="@{Personality_mod}+@{BardCalltoArms}" disabled="true"/>
 				</button>
 			</div>
 		</div>
@@ -1416,7 +1471,7 @@
 			</div>
 			<div class="sheet-item sheet-tiny">
 				<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} performs a Challenge: [[@{TalentDie}+@{BardChallengeCheck}]]" name="roll_TalentDie">
-					<input type="number" class="sheet-square" name="attr_BardChallengeCheck" value="@{PER}+@{BardChallenge}" disabled="true"/>
+					<input type="number" class="sheet-square" name="attr_BardChallengeCheck" value="@{Personality_mod}+@{BardChallenge}" disabled="true"/>
 				</button>
 			</div>
 		</div><div>
@@ -1428,7 +1483,7 @@
 			</div>
 			<div class="sheet-item sheet-tiny">
 				<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} performs Calm: [[@{TalentDie}+@{BardCalmCheck}]]" name="roll_TalentDie">
-					<input type="number" class="sheet-square" name="attr_BardCalmCheck" value="@{PER}+@{BardCalm}" disabled="true"/>
+					<input type="number" class="sheet-square" name="attr_BardCalmCheck" value="@{Personality_mod}+@{BardCalm}" disabled="true"/>
 				</button>
 			</div>
 		</div><div>
@@ -1440,7 +1495,7 @@
 			</div>
 			<div class="sheet-item sheet-tiny">
 				<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} uses Lore: [[@{TalentDie}+@{BardLoreCheck}]]" name="roll_TalentDie">
-					<input type="number" class="sheet-square" name="attr_BardLoreCheck" value="@{INT}+@{BardLore}" disabled="true"/>
+					<input type="number" class="sheet-square" name="attr_BardLoreCheck" value="@{Intelligence_mod}+@{BardLore}" disabled="true"/>
 				</button>
 			</div>
 		</div>
@@ -1524,7 +1579,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts @{BardSpell}: [[@{ActionDie}+@{BardSpellCheck}]]" name="roll_BardSpell">
-							<input type="number" name="attr_BardSpellCheck" value="@{Level}+@{INT}+@{BardSpellCheckMisc}" readonly="true"/>
+							<input type="number" name="attr_BardSpellCheck" value="@{Level}+@{Intelligence_mod}+@{BardSpellCheckMisc}" readonly="true"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-med">
@@ -1684,7 +1739,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts @{GnomeSpell}: [[@{ActionDie}+@{GnomeSpellCheck}]]" name="roll_GnomeSpell">
-							<input type="number" name="attr_GnomeSpellCheck" value="@{INT}+@{GnomeSpellCheckMisc}" disabled="true"/>
+							<input type="number" name="attr_GnomeSpellCheck" value="@{Intelligence_mod}+@{GnomeSpellCheckMisc}" disabled="true"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-med">
@@ -1903,7 +1958,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts Instill Bravery: [[@{ActionDie}+@{InstillBraveryCheck}]]" name="roll_InstillBravery">
-						<input type="number" name="attr_InstillBraveryCheck" value="@{Level}+@{PER}+@{InstillBraveryCheckMisc}" disabled="true"/>
+						<input type="number" name="attr_InstillBraveryCheck" value="@{Level}+@{Personality_mod}+@{InstillBraveryCheckMisc}" disabled="true"/>
 					</button>
 				</div>
 				<div class="sheet-item sheet-med">
@@ -1922,7 +1977,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts Cause Fear: [[@{ActionDie}+@{CauseFearCheck}]]" name="roll_CauseFear">
-						<input type="number" name="attr_CauseFearCheck" value="@{Level}+@{PER}+@{CauseFearCheckMisc}" disabled="true"/>
+						<input type="number" name="attr_CauseFearCheck" value="@{Level}+@{Personality_mod}+@{CauseFearCheckMisc}" disabled="true"/>
 					</button>
 				</div>
 				<div class="sheet-item sheet-med">
@@ -1941,7 +1996,7 @@
 				</div>
 				<div class="sheet-item sheet-tiny">
 					<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts Lay on Hands: [[@{ActionDie}+@{LayOnHandsCheck}]]" name="roll_LayOnHands">
-						<input type="number" name="attr_LayOnHandsCheck" value="@{Level}+@{PER}+@{LayOnHandsCheckMisc}" disabled="true"/>
+						<input type="number" name="attr_LayOnHandsCheck" value="@{Level}+@{Personality_mod}+@{LayOnHandsCheckMisc}" disabled="true"/>
 					</button>
 				</div>
 				<div class="sheet-item sheet-med">
@@ -1962,7 +2017,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} casts @{PaladinSpell}: [[@{ActionDie}+@{PaladinSpellCheck}]]" name="roll_PaladinSpell">
-							<input type="number" name="attr_PaladinSpellCheck" value="@{Level}+@{PER}+@{PaladinSpellCheckMisc}" disabled="true"/>
+							<input type="number" name="attr_PaladinSpellCheck" value="@{Level}+@{Personality_mod}+@{PaladinSpellCheckMisc}" disabled="true"/>
 						</button>
 					</div>
 					<div class="sheet-item sheet-med">
@@ -2039,7 +2094,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} climbs: [[@{ActionDie}+@{RangerClimbheck}]]" name="roll_RangerClimb">
-							<input type="number" class="sheet-square" name="attr_RangerClimbCheck" value="@{RangerClimb}+@{AGI}+@{Level}" disabled="true"/>
+							<input type="number" class="sheet-square" name="attr_RangerClimbCheck" value="@{RangerClimb}+@{Agility_mod}+@{Level}" disabled="true"/>
 						</button>
 					</div>
 				</div>
@@ -2052,7 +2107,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} finds and/or neutralizes a trap: [[@{ActionDie}+@{RangerTrapsCheck}]]" name="roll_RangerTraps">
-							<input type="number" class="sheet-square" name="attr_RangerTrapsCheck" value="@{RangerTraps}+@{AGI}+@{Level}" disabled="true"/>
+							<input type="number" class="sheet-square" name="attr_RangerTrapsCheck" value="@{RangerTraps}+@{Agility_mod}+@{Level}" disabled="true"/>
 						</button>
 					</div>
 				</div>
@@ -2065,7 +2120,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} sneaks silently and hides: [[@{ActionDie}+@{RangerSneakCheck}]]" name="roll_RangerSneak">
-							<input type="number" class="sheet-square" name="attr_RangerSneakCheck" value="@{RangerSneak}+@{AGI}+@{Level}" disabled="true"/>
+							<input type="number" class="sheet-square" name="attr_RangerSneakCheck" value="@{RangerSneak}+@{Agility_mod}+@{Level}" disabled="true"/>
 						</button>
 					</div>
 				</div>
@@ -2078,7 +2133,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} walks or even runs without leaving tracks or being hampered by difficult terrain: [[@{ActionDie}+@{RangerStriderCheck}]]" name="roll_RangerStrider">
-							<input type="number" class="sheet-square" name="attr_RangerStriderCheck" value="@{RangerStrider}+@{AGI}+@{Level}" disabled="true"/>
+							<input type="number" class="sheet-square" name="attr_RangerStriderCheck" value="@{RangerStrider}+@{Agility_mod}+@{Level}" disabled="true"/>
 						</button>
 					</div>
 				</div>
@@ -2091,7 +2146,7 @@
 					</div>
 					<div class="sheet-item sheet-tiny">
 						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} uses wilderness skills: [[@{ActionDie}+@{RangerSurvivalCheck}]]" name="roll_RangerSurvival">
-							<input type="number" class="sheet-square" name="attr_RangerSurvivalCheck" value="@{RangerSurvival}+@{PER}+@{Level}" disabled="true"/>
+							<input type="number" class="sheet-square" name="attr_RangerSurvivalCheck" value="@{RangerSurvival}+@{Personality_mod}+@{Level}" disabled="true"/>
 						</button>
 					</div>
 				</div>
@@ -2101,6 +2156,69 @@
 			</div>
 		</div>
 	</div>
-	
+
+	<div class="sheet-kith">
+	<!-- kith -->
+	<h2>Kith Abilities</h2>
+	<div>
+		<div class="sheet-statblock">
+			<div class="sheet-item sheet-med">
+				<label>Personality Burn Die:</label>
+			</div>
+			<div class="sheet-item sheet-tiny">
+				<select name="attr_PersonalityBurnDie">
+						<option value="d0" selected="selected">--</option>
+						<option value="d2">d2</option>
+						<option value="d3">d3</option>
+						<option value="d4">d4</option>
+						<option value="d5">d5</option>
+						<option value="d6">d6</option>
+						<option value="d7">d7</option>
+						<option value="d8">d8</option>
+						<option value="d10">d10</option>
+				</select>
+			</div>
+			<div class="sheet-item sheet-tiny">
+				<button class="sheet-square" type="roll" value="@{character_name} burns Personality: [[@{PersonalityBurnDie}]]" name="roll_PersonalityBurnDie"/>
+			</div>
+			<div class="sheet-header">
+				Outdoor Survival Skills
+			</div>
+			<div class="sheet-statblock">
+				<div class="sheet-header">
+					<div class="sheet-item sheet-med">
+						<label>Ability</label>
+					</div>
+					<div class="sheet-item sheet-tiny">
+						<label>Level + Int Mod</label>
+					</div>
+				</div>
+				<div>
+					<div class="sheet-item sheet-med">
+						<label>Tracking</label>
+					</div>
+					<div class="sheet-item sheet-tiny">
+						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} tracks: [[@{ActionDie}+@{KithTrackingCheck}]]" name="roll_KithClimb">
+							<input type="number" class="sheet-square" name="attr_KithTrackingCheck" value="@{Level}+@{Intelligence_mod}" disabled="true"/>
+						</button>
+					</div>
+				</div>
+				<div>
+					<div class="sheet-item sheet-med">
+						<label>Detect Traps/Hidden Foes</label>
+					</div>
+					<div class="sheet-item sheet-tiny">
+						<button class="sheet-hidden-roll sheet-square" type="roll" value="@{character_name} checks for hidden traps or foes: [[@{ActionDie}+@{KithDetectCheck}]]" name="roll_KithDetect">
+							<input type="number" class="sheet-square" name="attr_KithDetectCheck" value="@{Level}+@{Intelligence_mod}" disabled="true"/>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="sheet-tiny">
+			The Kith class is introduced in Peril on the Purple Planet, Author's Edition
+		</div>
+	</div>
+	</div>
 	
 </div>

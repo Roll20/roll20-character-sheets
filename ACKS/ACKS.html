@@ -1,0 +1,1800 @@
+<rolltemplate class="sheet-rolltemplate-save">
+    {{#^rollLess() roll target}}
+    <table cellpadding="10" style="border-radius: 25px;background: #ABEBC6;padding: 10px;width: 100%;height: 100%;">
+    {{/^rollLess() roll target}}
+    {{#rollLess() roll target}}
+    <table cellpadding="10" style="border-radius: 25px;background: #E6B0AA;padding: 10px;width: 100%;height: 100%;">
+    {{/rollLess() roll target}}
+        <tr><td>
+        {{name}} 
+        {{#^rollLess() roll target}}
+            <span style="color:green;font-weight:bold;">
+                {{#rollWasCrit() roll}}
+                    critical
+                {{/rollWasCrit() roll}}
+                saves 
+            </span>
+        {{/^rollLess() roll target}}
+        {{#rollLess() roll target}}
+            <span style="color:red;font-weight:bold;">
+                {{#rollWasFumble() roll}}
+                    critical
+                {{/rollWasFumble() roll}}
+                fails
+            </span> to save 
+        {{/rollLess() roll target}}
+        on {{action}} 
+        </td></tr>
+        <tr><td>
+        {{roll}} vs {{target}}+
+        </td></tr>
+    </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-attack">
+    {{#^rollLess() attack throw}}
+    <table cellpadding="10" style="border-radius: 25px;background: #ABEBC6;padding: 10px;width: 100%;height: 100%;">
+    {{/^rollLess() attack throw}}
+    {{#rollLess() attack throw}}
+    <table cellpadding="10" style="border-radius: 25px;background: #E6B0AA;padding: 10px;width: 100%;height: 100%;">
+    {{/rollLess() attack throw}}
+        <tr><td>
+        {{name}} {{verb}} 
+        {{#weapon}}
+            {{weapon}} 
+        {{/weapon}}
+        to attack 
+        {{#target}}
+            {{target}} 
+        {{/target}}
+        and 
+        {{#^rollLess() attack throw}}
+            <span style="color:green;font-weight:bold;">hits </span>
+            {{#damage}}
+                Dealing {{damage}} damage
+            {{/damage}}
+        {{/^rollLess() attack throw}}
+        {{#rollLess() attack throw}}
+            <span style="color:red;font-weight:bold;">misses</span>
+        {{/rollLess() attack throw}}
+        </td></tr>
+        <tr><td>
+        {{attack}} vs {{throw}}+
+        </td></tr>
+    </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-action">
+    {{#^rollLess() roll target}}
+    <table cellpadding="10" style="border-radius: 25px;background: #ABEBC6;padding: 10px;width: 100%;height: 100%;">
+    {{/^rollLess() roll target}}
+    {{#rollLess() roll target}}
+    <table cellpadding="10" style="border-radius: 25px;background: #E6B0AA;padding: 10px;width: 100%;height: 100%;">
+    {{/rollLess() roll target}}
+        <tr><td>
+        {{name}} 
+        {{#^rollLess() roll target}}
+            <span style="color:green;font-weight:bold;">
+                {{#rollWasCrit() roll}}
+                    critically 
+                {{/rollWasCrit() roll}}
+                succeeds 
+            </span>
+        {{/^rollLess() roll target}}
+        {{#rollLess() roll target}}
+            <span style="color:red;font-weight:bold;">
+                {{#rollWasFumble() roll}}
+                    critically 
+                {{/rollWasFumble() roll}}
+                fails 
+            </span>
+        {{/rollLess() roll target}}
+        to {{action}} 
+        </td></tr>
+        <tr><td>
+        {{roll}} vs {{target}}+
+        </td></tr>
+    </table>
+</rolltemplate>
+
+<script type="text/worker">
+
+var modVal = function(val) {
+    if(val < 4) {
+        return -3;
+    } else if(val < 6) {
+        return -2;
+    } else if(val < 9) {
+        return -1;
+    } else if(val < 13) {
+        return 0;
+    } else if(val < 16) {
+        return 1;
+    } else if(val < 18) {
+        return 2;
+    } else {
+        return 3;
+    }
+}
+
+on("change:armor_ac", function() {
+    getAttrs(["armor_ac","dex_mod"], function(values) {
+        setAttrs({ ac: Math.floor(values.dex_mod)+Math.floor(values.armor_ac)});
+    });
+});
+
+on("change:str", function() {
+    getAttrs(["str"], function(values) {
+        setAttrs({ str_mod: modVal(values.str)});
+        setAttrs({ carrying_capacity: 20+modVal(values.str)});
+    });
+});
+
+on("change:int", function() {
+  getAttrs(["int"], function(values) {
+    setAttrs({ int_mod: modVal(values.int)});
+  });
+});
+
+on("change:wis", function() {
+  getAttrs(["wis"], function(values) {
+    setAttrs({ wis_mod: modVal(values.wis)});
+  });
+});
+
+on("change:dex", function() {
+  getAttrs(["dex"], function(values) {
+    setAttrs({ dex_mod: modVal(values.dex)});
+  });
+  updateAC();
+});
+
+on("change:con", function() {
+  getAttrs(["con"], function(values) {
+    setAttrs({ con_mod: modVal(values.con)});
+  });
+});
+
+on("change:chr", function() {
+  getAttrs(["chr"], function(values) {
+    setAttrs({ chr_mod: modVal(values.chr)});
+  });
+});
+
+on("change:total_encumberence change:carrying_capacity", function() {
+  getAttrs(["total_encumberence","carrying_capacity"], function(values) {
+    if(values.total_encumberence > values.carrying_capacity) {
+        setAttrs({ ex_mvmt: 0});
+        setAttrs({ com_mvmt: 0});
+        setAttrs({ run_mvmt: 0});
+    } else if(values.total_encumberence > 10) {
+        setAttrs({ ex_mvmt: 30});
+        setAttrs({ com_mvmt: 10});
+        setAttrs({ run_mvmt: 30});
+    } else if(values.total_encumberence > 7) {
+        setAttrs({ ex_mvmt: 60});
+        setAttrs({ com_mvmt: 20});
+        setAttrs({ run_mvmt: 60});
+    } else if(values.total_encumberence > 5) {
+        setAttrs({ ex_mvmt: 90});
+        setAttrs({ com_mvmt: 30});
+        setAttrs({ run_mvmt: 90});
+    } else {
+        setAttrs({ ex_mvmt: 120});
+        setAttrs({ com_mvmt: 40});
+        setAttrs({ run_mvmt: 120});
+    }
+  });
+});
+
+var progression = function(values,rate) {
+    var att = 10;
+    var pet = 10;
+    var poi = 10;
+    var bla = 10;
+    var sta = 10;
+    var spl = 10;
+    var adg = Math.floor((values.level-1)*rate);
+    if(values.class == 1) {
+        if(values.level < 2) {
+            adg = 0;
+        } else if(values.level < 4) {
+            adg = 1;
+        } else if(values.level < 5) {
+            adg = 2;
+        } else if(values.level < 7) {
+            adg = 3;
+        } else if(values.level < 8) {
+            adg = 4;
+        } else if(values.level < 10) {
+            adg = 5;
+        } else if(values.level < 11) {
+            adg = 6;
+        } else if(values.level < 13) {
+            adg = 7;
+        } else if(values.level < 14) {
+            adg = 8;
+        } else {
+            adg = 9;
+        }
+    }
+    if(values.class == 1 || values.class == 5 || values.class == 8 || values.class == 13 || values.class == 14 || values.class == 21 || values.class == 22 || values.class == 24 || values.class == 27 || values.class == 33) {
+        pet = 15;
+        poi = 14;
+        bla = 16;
+        sta = 16;
+        spl = 17;
+        att = 10;
+    } else if(values.class == 2 || values.class == 29 || values.class == 32) {
+        pet = 13;
+        poi = 13;
+        bla = 15;
+        sta = 11;
+        spl = 12;
+        att = 10;
+    } else if(values.class == 3 || values.class == 7 || values.class == 25 || values.class == 26 || values.class == 30) {
+        pet = 13;
+        poi = 10;
+        bla = 16;
+        sta = 13;
+        spl = 15;
+        att = 10;
+    } else if(values.class == 4 || values.class == 6 || values.class == 28) {
+        pet = 13;
+        poi = 13;
+        bla = 16;
+        sta = 14;
+        spl = 15;
+        att = 10;
+    } else if(values.class == 9) {
+        pet = 11;
+        poi = 10;
+        bla = 13;
+        sta = 12;
+        spl = 13;
+        att = 10;
+    } else if(values.class == 10) {
+        pet = 9;
+        poi = 6;
+        bla = 13;
+        sta = 9;
+        spl = 11;
+        att = 10;
+    } else if(values.class == 11 || values.class == 20) {
+        pet = 14;
+        poi = 14;
+        bla = 16;
+        sta = 16;
+        spl = 16;
+        att = 10;
+    } else if(values.class == 12 || values.class == 18) {
+        pet = 12;
+        poi = 13;
+        bla = 16;
+        sta = 14;
+        spl = 14;
+        att = 10;
+    } else if(values.class == 15 || values.class == 17) {
+        pet = 9;
+        poi = 9;
+        bla = 13;
+        sta = 10;
+        spl = 11;
+        att = 10;
+    } else if(values.class == 16) {
+        pet = 11;
+        poi = 12;
+        bla = 13;
+        sta = 12;
+        spl = 13;
+        att = 10;
+    } else if(values.class == 19) {
+        pet = 12;
+        poi = 13;
+        bla = 15;
+        sta = 11;
+        spl = 11;
+        att = 10;
+    } else if(values.class == 23) {
+        pet = 11;
+        poi = 11;
+        bla = 13;
+        sta = 19;
+        spl = 10;
+        att = 10;
+    } else if(values.class == 31) {
+        pet = 13;
+        poi = 14;
+        bla = 14;
+        sta = 14;
+        spl = 15;
+        att = 10;
+    } else {
+        return 0;
+    }
+    att -= adg;
+    pet -= adg;
+    poi -= adg;
+    bla -= adg;
+    sta -= adg;
+    spl -= adg;
+    if(values.class == 21) {
+        att = 10 - Math.floor((values.level-1)*(2/4));
+    }
+    if(values.class == 27) {
+        att = 10 - Math.floor(values.level-1);
+        if(values.level > 9) {
+            att = 2;
+        }
+    }
+    if(values.class == 30 || values.class == 32) {
+        att = 10 - Math.floor((values.level-1)*(2/6));
+    }
+    if(values.class == 33) {
+        att = 10 - Math.floor(values.level-1);
+    }
+    setAttrs({ pet_par: pet});
+    setAttrs({ psn_dth: poi});
+    setAttrs({ blst_brth: bla});
+    setAttrs({ stvs_wnds: sta});
+    setAttrs({ spells: spl});
+    setAttrs({ melee_throw: att});
+    setAttrs({ ranged_throw: att});
+    return 0;
+}
+
+var updateClass = function(values) {
+    var rate = 0;
+    if(values.class == 1) {
+        rate = 2/3;
+        if(values.xp < 2000) {
+            setAttrs({ level: 1});
+            setAttrs({ class_title: "Man-At-Arms"});
+        } else if(values.xp < 4000) {
+            setAttrs({ level: 2});
+            setAttrs({ class_title: "Warrior"});
+        } else if(values.xp < 8000) {
+            setAttrs({ level: 3});
+            setAttrs({ class_title: "Swordmaster"});
+        } else if(values.xp < 16000) {
+            setAttrs({ level: 4});
+            setAttrs({ class_title: "Hero"});
+        } else if(values.xp < 32000) {
+            setAttrs({ level: 5});
+            setAttrs({ class_title: "Exemplar"});
+        } else if(values.xp < 65000) {
+            setAttrs({ level: 6});
+            setAttrs({ class_title: "Myrmidon"});
+        } else if(values.xp < 130000) {
+            setAttrs({ level: 7});
+            setAttrs({ class_title: "Champion"});
+        } else if(values.xp < 250000) {
+            setAttrs({ level: 8});
+            setAttrs({ class_title: "Epic Hero"});
+        } else if(values.xp < 370000) {
+            setAttrs({ level: 9});
+            setAttrs({ class_title: "Warlord"});
+        } else if(values.xp < 490000) {
+            setAttrs({ level: 10});
+            setAttrs({ class_title: "Warlord 10th Level"});
+        } else if(values.xp < 610000) {
+            setAttrs({ level: 11});
+            setAttrs({ class_title: "Warlord 11th Level"});
+        } else if(values.xp < 730000) {
+            setAttrs({ level: 12});
+            setAttrs({ class_title: "Warlord 12th Level"});
+        } else if(values.xp < 850000) {
+            setAttrs({ level: 13});
+            setAttrs({ class_title: "Warlord 13th Level"});
+        } else {
+            setAttrs({ level: 14});
+            setAttrs({ class_title: "Overlord"});
+        }
+    } else if(values.class == 2) {
+        rate = 2/6;
+        if(values.xp < 2500) {
+            setAttrs({ level: 1});
+            setAttrs({ class_title: "Arcanist"});
+        } else if(values.xp < 5000) {
+            setAttrs({ level: 2});
+            setAttrs({ class_title: "Seer"});
+        } else if(values.xp < 10000) {
+            setAttrs({ level: 3});
+            setAttrs({ class_title: "Theurgist"});
+        } else if(values.xp < 20000) {
+            setAttrs({ level: 4});
+            setAttrs({ class_title: "Magician"});
+        } else if(values.xp < 40000) {
+            setAttrs({ level: 5});
+            setAttrs({ class_title: "Thaumaturge"});
+        } else if(values.xp < 80000) {
+            setAttrs({ level: 6});
+            setAttrs({ class_title: "Enchanter"});
+        } else if(values.xp < 160000) {
+            setAttrs({ level: 7});
+            setAttrs({ class_title: "Sorcerer"});
+        } else if(values.xp < 310000) {
+            setAttrs({ level: 8});
+            setAttrs({ class_title: "Mage"});
+        } else if(values.xp < 460000) {
+            setAttrs({ level: 9});
+            setAttrs({ class_title: "Wizard"});
+        } else if(values.xp < 610000) {
+            setAttrs({ level: 10});
+            setAttrs({ class_title: "Wizard 10th Level"});
+        } else if(values.xp < 760000) {
+            setAttrs({ level: 11});
+            setAttrs({ class_title: "Wizard 11th Level"});
+        } else if(values.xp < 910000) {
+            setAttrs({ level: 12});
+            setAttrs({ class_title: "Wizard 12th Level"});
+        } else if(values.xp < 1060000) {
+            setAttrs({ level: 13});
+            setAttrs({ class_title: "Wizard 13th Level"});
+        } else {
+            setAttrs({ level: 14});
+            setAttrs({ class_title: "Archmage"});
+        }
+    } else if(values.class == 3) {
+        rate = 2/4;
+        if(values.xp < 1500) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 3000) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 6000) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 12000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 24000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 50000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 100000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 200000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 300000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 400000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 500000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 600000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 700000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 4) {
+        rate = 2/4;
+        if(values.xp < 1250) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 2500) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 5000) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 10000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 2000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 40000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 80000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 180000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 280000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 380000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 480000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 580000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 680000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 5) {
+        rate = 2/3;
+        if(values.xp < 1700) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 3400) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 6800) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 14000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 28000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 55000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 110000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 230000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 350000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 470000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 590000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 710000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 830000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 6) {
+        rate = 2/4;
+        if(values.xp < 1400) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 2800) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 5600) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 11200) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 22400) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 45000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 90000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 190000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 290000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 390000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 490000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 590000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 690000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 7) {
+        rate = 2/4;
+        if(values.xp < 1500) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 3000) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 6000) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 12000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 24000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 50000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 100000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 200000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 300000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 400000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 500000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 600000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 700000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 8) {
+        rate = 2/3;
+        if(values.xp < 2000) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4000) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 8000) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 16000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 32000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 65000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 130000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 250000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 370000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 490000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 610000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 730000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 850000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 9) {
+        rate = 2/3;
+        if(values.xp < 2200) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4400) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 8800) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 17500) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 35000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 70000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 140000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 270000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 400000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 530000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 660000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 790000) {
+            setAttrs({ level: 12});
+        } else {
+            setAttrs({ level: 13});
+        }
+    } else if(values.class == 10) {
+        rate = 2/4;
+        if(values.xp < 2400) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4800) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 9600) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 19200) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 38400) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 75000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 150000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 280000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 410000) {
+            setAttrs({ level: 9});
+        } else {
+            setAttrs({ level: 10});
+        }
+    } else if(values.class == 11) {
+        rate = 2/3;
+        if(values.xp < 4000) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 8000) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 16000) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 32000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 64000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 130000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 260000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 430000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 600000) {
+            setAttrs({ level: 9});
+        } else {
+            setAttrs({ level: 10});
+        }
+    } else if(values.class == 12) {
+        rate = 2/4;
+        if(values.xp < 2775) {
+            setAttrs({ level: 1});
+            setAttrs({ class_title: "Arcanist-Avenger"});
+        } else if(values.xp < 5550) {
+            setAttrs({ level: 2});
+            setAttrs({ class_title: "Seer-Enforcer"});
+        } else if(values.xp < 11100) {
+            setAttrs({ level: 3});
+            setAttrs({ class_title: "Theurgist-Torturer"});
+        } else if(values.xp < 22200) {
+            setAttrs({ level: 4});
+            setAttrs({ class_title: "Magician-Slayer"});
+        } else if(values.xp < 45000) {
+            setAttrs({ level: 5});
+            setAttrs({ class_title: "Thaumaturge-Destroyer"});
+        } else if(values.xp < 90000) {
+            setAttrs({ level: 6});
+            setAttrs({ class_title: "Enchanter-Executioner"});
+        } else if(values.xp < 180000) {
+            setAttrs({ level: 7});
+            setAttrs({ class_title: "Sorcerer-Blackguard"});
+        } else if(values.xp < 330000) {
+            setAttrs({ level: 8});
+            setAttrs({ class_title: "Mage-Assassin"});
+        } else if(values.xp < 480000) {
+            setAttrs({ level: 9});
+            setAttrs({ class_title: "Nightblade"});
+        } else if(values.xp < 630000) {
+            setAttrs({ level: 10});
+            setAttrs({ class_title: "Nightblade 10th Level"});
+        } else {
+            setAttrs({ level: 11});
+            setAttrs({ class_title: "Nightblade 11th Level"});
+        }
+    } else if(values.class == 13) {
+        rate = 2/3;
+        if(values.xp < 1850) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 3700) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 7400) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 14800) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 29600) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 60000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 120000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 240000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 360000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 480000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 700000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 720000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 840000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 14) {
+        rate = 2/3;
+        if(values.xp < 2600) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 5200) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 10400) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 20800) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 41600) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 85000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 170000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 290000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 410000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 530000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 650000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 770000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 890000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 15) {
+        rate = 2/4;
+        if(values.xp < 2000) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4000) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 8000) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 16000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 32000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 65000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 130000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 260000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 390000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 520000) {
+            setAttrs({ level: 10});
+        } else {
+            setAttrs({ level: 11});
+        }
+    } else if(values.class == 16) {
+        rate = 2/3;
+        if(values.xp < 3100) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 6200) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 12400) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 24800) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 49600) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 100000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 200000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 330000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 460000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 590000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 720000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 850000) {
+            setAttrs({ level: 12});
+        } else {
+            setAttrs({ level: 13});
+        }
+    } else if(values.class == 17) {
+        rate = 2/4;
+        if(values.xp < 2300) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4600) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 9200) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 18400) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 36800) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 75000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 150000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 280000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 410000) {
+            setAttrs({ level: 9});
+        } else {
+            setAttrs({ level: 10});
+        }
+    } else if(values.class == 18) {
+        rate = 2/4;
+        if(values.xp < 2600) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 5200) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 10400) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 20800) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 41600) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 85000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 170000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 370000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 520000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 670000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 820000) {
+            setAttrs({ level: 11});
+        } else {
+            setAttrs({ level: 12});
+        }
+    } else if(values.class == 19) {
+        rate = 2/6;
+        if(values.xp < 2700) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 5400) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 10800) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 21600) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 43200) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 85000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 170000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 370000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 570000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 770000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 970000) {
+            setAttrs({ level: 11});
+        } else {
+            setAttrs({ level: 12});
+        }
+    } else if(values.class == 20) {
+        rate = 2/3;
+        if(values.xp < 2275) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4550) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 9100) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 18200) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 36400) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 75000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 150000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 300000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 450000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 600000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 750000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 900000) {
+            setAttrs({ level: 12});
+        } else {
+            setAttrs({ level: 13});
+        }
+    } else if(values.class == 21) {
+        rate = 2/3;
+        if(values.xp < 2475) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4950) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 9900) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 19800) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 39600) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 80000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 160000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 310000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 460000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 610000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 760000) {
+            setAttrs({ level: 11});
+        } else {
+            setAttrs({ level: 12});
+        }
+    } else if(values.class == 22) {
+        rate = 2/3;
+        if(values.xp < 2450) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4900) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 9800) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 19600) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 39200) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 80000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 160000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 280000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 400000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 520000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 640000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 760000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 880000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 23) {
+        rate = 2/6;
+        if(values.xp < 3125) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 6250) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 12500) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 25000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 50000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 100000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 200000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 390000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 580000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 870000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 1060000) {
+            setAttrs({ level: 11});
+        } else {
+            setAttrs({ level: 12});
+        }
+    } else if(values.class == 24) {
+        rate = 2/3;
+        if(values.xp < 1850) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 3700) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 7400) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 14800) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 29600) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 60000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 120000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 240000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 360000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 480000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 600000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 720000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 840000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 25) {
+        rate = 2/6;
+        if(values.xp < 2000) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4000) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 8000) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 16000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 32000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 65000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 130000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 230000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 330000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 430000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 530000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 630000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 730000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 26) {
+        rate = 2/4;
+        if(values.xp < 1500) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 3000) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 6000) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 12000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 24000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 50000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 100000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 200000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 300000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 400000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 500000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 600000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 700000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 27) {
+        rate = 2/3;
+        if(values.xp < 3000) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 6000) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 12000) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 24000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 48000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 100000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 200000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 400000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 800000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 1600000) {
+            setAttrs({ level: 10});
+        } else {
+            setAttrs({ level: 11});
+        }
+    } else if(values.class == 28) {
+        rate = 2/4;
+        if(values.xp < 1525) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 3050) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 6100) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 12200) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 24400) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 50000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 100000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 200000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 300000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 400000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 500000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 600000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 700000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 29) {
+        rate = 2/6;
+        if(values.xp < 2075) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4150) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 8300) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 16600) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 33200) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 65000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 130000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 280000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 430000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 580000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 730000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 880000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 1030000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 30) {
+        rate = 2/4;
+        if(values.xp < 2000) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 4000) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 8000) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 16000) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 32000) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 65000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 130000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 230000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 330000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 430000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 530000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 630000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 730000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 31) {
+        rate = 2/3;
+        if(values.xp < 3850) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 7700) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 15400) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 30800) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 61600) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 125000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 250000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 425000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 600000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 775000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 950000) {
+            setAttrs({ level: 11});
+        } else {
+            setAttrs({ level: 12});
+        }
+    } else if(values.class == 32) {
+        rate = 2/4;
+        if(values.xp < 1100) {
+            setAttrs({ level: 1});
+        } else if(values.xp < 2200) {
+            setAttrs({ level: 2});
+        } else if(values.xp < 4400) {
+            setAttrs({ level: 3});
+        } else if(values.xp < 8800) {
+            setAttrs({ level: 4});
+        } else if(values.xp < 17600) {
+            setAttrs({ level: 5});
+        } else if(values.xp < 35000) {
+            setAttrs({ level: 6});
+        } else if(values.xp < 70000) {
+            setAttrs({ level: 7});
+        } else if(values.xp < 140000) {
+            setAttrs({ level: 8});
+        } else if(values.xp < 240000) {
+            setAttrs({ level: 9});
+        } else if(values.xp < 340000) {
+            setAttrs({ level: 10});
+        } else if(values.xp < 440000) {
+            setAttrs({ level: 11});
+        } else if(values.xp < 540000) {
+            setAttrs({ level: 12});
+        } else if(values.xp < 640000) {
+            setAttrs({ level: 13});
+        } else {
+            setAttrs({ level: 14});
+        }
+    } else if(values.class == 33) {
+        rate = 2/3;
+    }
+    getAttrs(["class","level"], function(values) {
+        progression(values,rate);
+    });
+}
+
+on("change:class", function() {
+    getAttrs(["class","xp","level"], function(values) {
+        updateClass(values);
+    });
+});
+
+on("change:level", function() {
+    getAttrs(["class","xp","level"], function(values) {
+        updateClass(values);
+    });
+});
+
+on("change:xp", function() {
+    getAttrs(["class","xp","level"], function(values) {
+        updateClass(values);
+    });
+});
+
+on("change:repeating_items", function(eventInfo) {
+   getSectionIDs("repeating_items", function(idarray) {
+      var enc_id = "";
+      var cnt_id = "";
+      var t_enc = 0;
+      for(var i=0; i < idarray.length; i++) {
+         var id = idarray[i];
+         enc_id = "repeating_items_" + id + "_item_enc";
+         cnt_id = "repeating_items_" + id + "_item_count";
+         getAttrs([enc_id,cnt_id], function(values) {
+           var adg = 0;
+           var num = 0;
+           for(val in values) {
+              if( values.hasOwnProperty( val ) ) {
+                 var value = parseFloat( values[val] );
+                 if(adg == 0) {
+                    adg += value;
+                 } else {
+                    adg *= value;
+                 }
+                 num++;
+              }
+            }
+            if(num == 2) {
+                t_enc += adg;
+                setAttrs({ total_encumberence: t_enc});
+            }
+         });
+      }
+   });
+});
+
+</script>
+
+<h3>Character Info</h3>
+<div class="sheet-1colrow">
+    <div style="width: 100%" class="sheet-col">
+        <table align="left">
+            <tbody>
+                <tr><td>Name:</td>      <td><input type="text" name="attr_name" placeholder="Character Name"></td></tr>
+                <tr>
+                    <td>Class:</td>
+                    <td>
+                        <select name="attr_class">
+                            <option value="1">Fighter</option>
+                            <option value="2">Mage</option>
+                            <option value="3">Cleric</option>
+                            <option value="4">Thief</option>
+                            <option value="5">Assassin</option>
+                            <option value="6">Bard</option>
+                            <option value="7">Bladedancer</option>
+                            <option value="8">Explorer</option>
+                            <option value="9">Dwarven Vaultguard</option>
+                            <option value="10">Dwarven Craftpriest</option>
+                            <option value="11">Elven Spellsword</option>
+                            <option value="12">Elven Nightblade</option>
+                            <option value="13">Anti-Palidin</option>
+                            <option value="14">Barbarian</option>
+                            <option value="15">Dwarven Delver</option>
+                            <option value="16">Dwarven Fury</option>
+                            <option value="17">Dwarven Machinist</option>
+                            <option value="18">Elven Courier</option>
+                            <option value="19">Elven Enchanter</option>
+                            <option value="20">Elven Ranger</option>
+                            <option value="21">Gnomish Trickster</option>
+                            <option value="22">Mystic</option>
+                            <option value="23">Nobrian Wonderworker</option>
+                            <option value="24">Paladin</option>
+                            <option value="25">Priestess</option>
+                            <option value="26">Shaman</option>
+                            <option value="27">Thrassian Gladiator</option>
+                            <option value="28">Venturer</option>
+                            <option value="29">Warlock</option>
+                            <option value="30">Witch</option>
+                            <option value="31">Zaharan Ruinguard</option>
+                            <option value="33">Monster</option>
+                            <option value="32">Custom: Bureaucrat</option>
+                            <option value="34">Custom Class</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr><td>Title:</td>     <td><input type="text" name="attr_class_title" placeholder="Class Title"></td></tr>
+                <tr><td>Alignment:</td> <td><input type="text" name="attr_alignment" placeholder="Character Alignment"></td></tr>
+                <tr><td>Age:</td>       <td><input type="number" name="attr_age" value="0"></td></tr>
+                <tr><td>Level:</td>     <td><input type="number" name="attr_level" value="1"></td></tr>
+                <tr><td>XP:</td>        <td><input type="number" name="attr_xp" value="0" style="width: 7em"></td></tr>
+                <tr><td>Gold:</td>      <td><input type="number" name="attr_gp" value="0" style="width: 7em"></td></tr>
+                <tr><td>HP:</td>        <td>
+                    <div class="sheet-1colrow">
+                        <div style="width: 100%" class="sheet-col">
+                            <table align="left">
+                                <tbody>
+                                    <tr>
+                                        <td><input type="number" name="attr_hp" value="0"></td>
+                                        <td>/</td>
+                                        <td><input type="number" name="attr_hp_max" value="0"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr>
+<h3>Initiative</h3>
+<button type='roll' value="/me rolls Initiative [[1d6+@{selected|dex_mod}+@{selected|init_bns}&{tracker}]] for @{selected|name}" name='roll_initiative'></button>
+Initiative: 1d6 + Dex Mod + <input type="number" name="attr_init_bns" value="0">
+<br>
+Current Initiative: 
+<input type="number" name="attr_curr_init" value="0" title="Manually Enter for Player Tracking">
+<hr>
+<h3>Attributes</h3>
+<div class="sheet-1colrow">
+    <div style="width: 100%" class="sheet-col">
+        <table align="left">
+            <tbody>
+                <tr>
+                    <td>Strength:</td>
+                    <td><input type="number" name="attr_str" value="9"></td>
+                    <td>Modifier:</td>
+                    <td><input type="number" name="attr_str_mod" value="0"></td>
+                </tr>
+                <tr>
+                    <td>Intelligence:</td>
+                    <td><input type="number" name="attr_int" value="9"></td>
+                    <td>Modifier:</td>
+                    <td><input type="number" name="attr_int_mod" value="0"></td>
+                </tr>
+                <tr>
+                    <td>Wisdom:</td>
+                    <td><input type="number" name="attr_wis" value="9"></td>
+                    <td>Modifier:</td>
+                    <td><input type="number" name="attr_wis_mod" value="0"></td>
+                </tr>
+                <tr>
+                    <td>Dexterity:</td>
+                    <td><input type="number" name="attr_dex" value="9"></td>
+                    <td>Modifier:</td>
+                    <td><input type="number" name="attr_dex_mod" value="0"></td>
+                </tr>
+                <tr>
+                    <td>Constitution:</td>
+                    <td><input type="number" name="attr_con" value="9"></td>
+                    <td>Modifier:</td>
+                    <td><input type="number" name="attr_con_mod" value="0"></td>
+                </tr>
+                <tr>
+                    <td>Charisma:</td>
+                    <td><input type="number" name="attr_chr" value="9"></td>
+                    <td>Modifier:</td>
+                    <td><input type="number" name="attr_chr_mod" value="0"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr>
+<h3>Saving Thows</h3>
+<div class="sheet-1colrow">
+    <div style="width: 100%" class="sheet-col">
+        <table align="left">
+            <tbody>
+                <tr>
+                    <td><button type='roll' value='&{template:save} {{name=@{name}}} {{action=Petrification & Paralysis}} {{roll=[[1d20+@{pet_par_bns}]]}} {{target=[[@{pet_par}]]}}' name='roll_pet_par_save'></button></td>
+                    <td>Petrification & Paralysis:</td>
+                    <td><input type="number" name="attr_pet_par" value="10"></td>
+                    <td>+</td>
+                    <td><input type="number" name="attr_pet_par_bns" value="0"></td>
+                </tr>
+                <tr>
+                    <td><button type='roll' value='&{template:save} {{name=@{name}}} {{action=Poison & Death}} {{roll=[[1d20+@{psn_dth_bns}]]}} {{target=[[@{psn_dth}]]}}' name='roll_psn_dth_save'></button></td>
+                    <td>Poison & Death:</td>
+                    <td><input type="number" name="attr_psn_dth" value="10"></td>
+                    <td>+</td>
+                    <td><input type="number" name="attr_psn_dth_bns" value="0"></td>
+                </tr>
+                <tr>
+                    <td><button type='roll' value='&{template:save} {{name=@{name}}} {{action=Blast & Breath}} {{roll=[[1d20+@{blst_brth_bns}+@{wis_mod}]]}} {{target=[[@{blst_brth}]]}}'  name='roll_blst_brth_save'></button></td>
+                    <td>Blast & Breath:</td>
+                    <td><input type="number" name="attr_blst_brth" value="10"></td>
+                    <td>+</td>
+                    <td><input type="number" name="attr_blst_brth_bns" value="0"></td>
+                </tr>
+                <tr>
+                    <td><button type='roll' value='&{template:save} {{name=@{name}}} {{action=Staves and Wands}} {{roll=[[1d20+@{stvs_wnds_bns}+@{wis_mod}]]}} {{target=[[@{stvs_wnds}]]}}' name='roll_stvs_wnds_save'></button></td>
+                    <td>Staffs & Wands:</td>
+                    <td><input type="number" name="attr_stvs_wnds" value="10"></td>
+                    <td>+</td>
+                    <td><input type="number" name="attr_stvs_wnds_bns" value="0"></td>
+                </tr>
+                <tr>
+                    <td><button type='roll' value='&{template:save} {{name=@{name}}} {{action=Spells}} {{roll=[[1d20+@{spells_bns}+@{wis_mod}]]}} {{target=[[@{spells}]]}}' name='roll_spells_save'></button></td>
+                    <td>Spells:</td>
+                    <td><input type="number" name="attr_spells" value="10"></td>
+                    <td>+</td>
+                    <td><input type="number" name="attr_spells_bns" value="0"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr>
+<h3>Combat</h3>
+<div class="sheet-1colrow">
+    <div style="width: 100%" class="sheet-col">
+        <table align="left">
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td>General Attack Bonus:</td>
+                    <td><input type="number" name="attr_gen_att_bns" value="0"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>General Damage Bonus:</td>
+                    <td><input type="number" name="attr_gen_dmg_bns" value="0"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><button type='roll' value='&{template:attack} {{name=@{name}}} {{verb=swings}} {{target=@{target|character_name}}} {{attack=[[1d20+@{melee_bns}+@{gen_att_bns}+@{str_mod}-@{target|ac}]]}} {{throw=[[@{melee_throw}]]}}' name='roll_basic_melee_attack'></button></td>
+                    <td>Basic Melee Attack:</td>
+                    <td><input type="number" name="attr_melee_throw" value="10"></td>
+                    <td>+</td>
+                    <td><input type="number" name="attr_melee_bns" value="0"></td>
+                </tr>
+                <tr>
+                    <td><button type='roll' value='&{template:attack} {{name=@{name}}} {{verb=fires}} {{target=@{target|character_name}}} {{attack=[[1d20+@{ranged_bns}+@{gen_att_bns}+@{dex_mod}-@{target|ac}]]}} {{throw=[[@{ranged_throw}]]}}' name='roll_basic_ranged_attack'></button></td>
+                    <td>Basic Ranged Attack:</td>
+                    <td><input type="number" name="attr_ranged_throw" value="10"></td>
+                    <td>+</td>
+                    <td><input type="number" name="attr_ranged_bns" value="0"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="sheet-1colrow">
+    <div style="width: 100%" class="sheet-col">
+        <table align="left">
+            <tbody>
+                <tr>
+                    <td>Armor:</td>
+                    <td><input type="text" name="attr_armor" value="None"></td>
+                    <td><input type="number" name="attr_armor_ac" value="0"></td>
+                </tr>
+                <tr>
+                    <td>AC:</td>
+                    <td><input type="number" name="attr_ac" value="0"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<h4>Weapons</h4>
+<h5>Melee Weapons</h5>
+<fieldset class="repeating_meleeweapons">
+    <button type='roll' value='&{template:attack} {{name=@{name}}} {{weapon=@{mweapon_name}}} {{verb=swings}} {{target=@{target|character_name}}} {{attack=[[1d20+@{melee_bns}+@{matt_mod}+@{gen_att_bns}+@{str_mod}-@{target|ac}]]}} {{throw=[[@{melee_throw}]]}} {{damage=[[((@{mnumd}@{mdtype})*@{md_mult})+@{md_bns}+@{str_mod}+@{gen_dmg_bns}]]}}' name='roll_weapon_melee_attack'></button>
+    <input type="text" name="attr_mweapon_name" placeholder="Weapon Name" />
+    <br>
+    Attack Throw Modifier:
+    <input type="number" name="attr_matt_mod" value=0 />
+    <br>
+    Damage: (
+    <input type="number" name="attr_mnumd" value=1 />
+    <select name="attr_mdtype" class="dtype">
+        <option value="d2">d2</option>
+        <option value="d3">d3</option>
+        <option value="d4">d4</option>
+        <option value="d6">d6</option>
+        <option value="d8">d8</option>
+        <option value="d10">d10</option>
+        <option value="d12">d12</option>
+        <option value="d20">d20</option>
+    </select>
+    ) X
+    <input type="number" name="attr_md_mult" value=1 />
+    +
+    <input type="number" name="attr_md_bns" value=0 />
+    <br>
+    <textarea name="attr_mweapon_notes" rows="1" cols="5" placeholder="Weapon Notes"></textarea>
+    <br>
+</fieldset>
+<h5>Ranged Weapons</h5>
+<fieldset class="repeating_rangedweapons">
+    <button type='roll' value='&{template:attack} {{name=@{name}}} {{weapon=@{rweapon_name}}} {{verb=fires}} {{target=@{target|character_name}}} {{attack=[[1d20+@{ranged_bns}+@{ratt_mod}+@{gen_att_bns}+@{dex_mod}-@{target|ac}]]}} {{throw=[[@{ranged_throw}]]}} {{damage=[[((@{rnumd}@{rdtype})*@{rd_mult})+@{rd_bns}+@{gen_dmg_bns}]]}}' name='roll_weapon_ranged_attack'></button>
+    <input type="text" name="attr_rweapon_name" placeholder="Weapon Name" />
+    <br>
+    Attack Throw Modifier:
+    <input type="number" name="attr_ratt_mod" value=0 />
+    <br>
+    Damage: (
+    <input type="number" name="attr_rnumd" value=1 />
+    <select name="attr_rdtype" class="dtype">
+        <option value="d2">d2</option>
+        <option value="d3">d3</option>
+        <option value="d4">d4</option>
+        <option value="d6">d6</option>
+        <option value="d8">d8</option>
+        <option value="d10">d10</option>
+        <option value="d12">d12</option>
+        <option value="d20">d20</option>
+    </select>
+    ) X
+    <input type="number" name="attr_rd_mult" value=1 />
+    +
+    <input type="number" name="attr_rd_bns" value=0 />
+    <br>
+    <textarea name="attr_rweapon_notes" rows="1" cols="5" placeholder="Weapon Notes"></textarea>
+    <br>
+</fieldset>
+<hr>
+<h3>Actions, Skills, Spells, & Abilities</h3>
+<fieldset class="repeating_actions">
+    <select name="attr_action_type">
+        <option value="1">Action</option>
+        <option value="1">Skill</option>
+        <option value="1">Class Ability</option>
+        <option value="1">Racial Ability</option>
+        <option value="1">Spell</option>
+        <option value="1">Proficiency</option>
+    </select>
+    <button type='roll' value='&{template:action} {{name=@{name}}} {{action=@{action_name}}} {{roll=[[1d20+@{action_bonus}]]}} {{target=[[@{action_target}]]}}' name='roll_action'></button>
+    <input type="text" name="attr_action_name" placeholder="Action Name" />
+    Target Number:
+    <input type="number" name="attr_action_target" value=18 />
+    Bonus:
+    <input type="number" name="attr_action_bonus" value=0 />
+    <br>
+    <textarea name="attr_action_notes" rows="1" cols="5" placeholder="Action Notes"></textarea>
+</fieldset>
+<hr>
+<h3>Spells</h3>
+<div class="sheet-1colrow">
+    <div style="width: 100%" class="sheet-col">
+        <table align="left">
+            <tbody>
+                <tr>
+                    <td>Spell Level</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                </tr>
+                <tr>
+                    <td>Daily Spells</td>
+                    <td><input type="number" name="attr_spell_level_1_max" value=0 /></td>
+                    <td><input type="number" name="attr_spell_level_2_max" value=0 /></td>
+                    <td><input type="number" name="attr_spell_level_3_max" value=0 /></td>
+                    <td><input type="number" name="attr_spell_level_4_max" value=0 /></td>
+                    <td><input type="number" name="attr_spell_level_5_max" value=0 /></td>
+                    <td><input type="number" name="attr_spell_level_6_max" value=0 /></td>
+                </tr>
+                <tr>
+                    <td>Used Spells</td>
+                    <td><input type="number" name="attr_spell_level_1" value=0 /></td>
+                    <td><input type="number" name="attr_spell_level_2" value=0 /></td>
+                    <td><input type="number" name="attr_spell_level_3" value=0 /></td>
+                    <td><input type="number" name="attr_spell_level_4" value=0 /></td>
+                    <td><input type="number" name="attr_spell_level_5" value=0 /></td>
+                    <td><input type="number" name="attr_spell_level_6" value=0 /></td>
+                </tr>
+                <tr>
+                    <td>Spellbook</td>
+                    <td>
+                        <fieldset class="repeating_spellslevel1">
+                            <input type="text" name="attr_level_1_spell_name" placeholder="Spell Name" style="max-width: 100px;" />
+                        </fieldset>
+                    </td>
+                    <td>
+                        <fieldset class="repeating_spellslevel2">
+                            <input type="text" name="attr_level_2_spell_name" placeholder="Spell Name" style="max-width: 100px;" />
+                        </fieldset>
+                    </td>
+                    <td>
+                        <fieldset class="repeating_spellslevel3">
+                            <input type="text" name="attr_level_3_spell_name" placeholder="Spell Name" style="max-width: 100px;" />
+                        </fieldset>
+                    </td>
+                    <td>
+                        <fieldset class="repeating_spellslevel4">
+                            <input type="text" name="attr_level_4_spell_name" placeholder="Spell Name" style="max-width: 100px;" />
+                        </fieldset>
+                    </td>
+                    <td>
+                        <fieldset class="repeating_spellslevel5">
+                            <input type="text" name="attr_level_5_spell_name" placeholder="Spell Name" style="max-width: 100px;" />
+                        </fieldset>
+                    </td>
+                    <td>
+                        <fieldset class="repeating_spellslevel6">
+                            <input type="text" name="attr_level_6_spell_name" placeholder="Spell Name" style="max-width: 100px;" />
+                        </fieldset>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr>
+<h3>Items</h3>
+<fieldset class="repeating_items">
+    <input type="number" name="attr_item_count" placeholder="#" />
+    <input type="text" name="attr_item" placeholder="Item" style="width: 10em" />
+    <input type="number" step=any name="attr_item_enc" placeholder="Enc" style="width: 6em" /> stone
+    <input type="number" step=any name="attr_item_value" placeholder="Value" style="width: 6em" /> gp
+    <input type="text" name="attr_item_notes" placeholder="Item Notes" />
+</fieldset>
+<hr>
+<h3>Movement</h3>
+<div class="sheet-1colrow">
+    <div style="width: 100%" class="sheet-col">
+        <table align="left">
+            <tbody>
+                <tr>
+                    <td>Total Encumberence</td>
+                    <td><input type="number" step=any name="attr_total_encumberence"  style="width: 6em" value="0"/></td>
+                    <td>Stone</td>
+                </tr>
+                <tr>
+                    <td>Carrying Capacity</td>
+                    <td><input type="number" name="attr_carrying_capacity"  style="width: 6em" value="20"/></td>
+                    <td>Stone</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="sheet-1colrow">
+    <div style="width: 100%" class="sheet-col">
+        <table align="left">
+            <tbody>
+                <tr>
+                    <td>Exploration Movement</td>
+                    <td><input type="number" name="attr_ex_mvmt" value="120"/></td>
+                    <td>feet per turn</td>
+                </tr>
+                <tr>
+                    <td>Combat Movement</td>
+                    <td><input type="number" name="attr_com_mvmt" value="40"/></td>
+                    <td>feet per round</td>
+                </tr>
+                <tr>
+                    <td>Running Movement</td>
+                    <td><input type="number" name="attr_run_mvmt" value="120"/></td>
+                    <td>feet per round</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr>
+<h4>Notes</h4>
+<fieldset class="repeating_skills">
+    <textarea name="attr_character_notes" rows="4" cols="10" placeholder="Notes" style="max-height: 10em;"></textarea>
+</fieldset>
+<hr>
