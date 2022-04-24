@@ -6,7 +6,7 @@ TALENTS['Alertness'] = {
     'subAbilityScore': '@{Intuition}',
     'modifier': +1,
     'classes': '',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Ambidexterity'] = {
     'slots': 1,
@@ -15,7 +15,7 @@ TALENTS['Ambidexterity'] = {
     'subAbilityScore': '@{Aim}',
     'modifier': 0,
     'classes': 'Warrior/Rogue',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Ambush'] = {
     'slots': 1,
@@ -25,7 +25,7 @@ TALENTS['Ambush'] = {
     'modifier': 0,
     'rating': '5',
     'classes': 'Warrior/Rogue',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Camouflage'] = {
     'slots': 1,
@@ -35,7 +35,7 @@ TALENTS['Camouflage'] = {
     'modifier': 0,
     'rating': '5',
     'classes': 'Warrior/Rogue',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Dirty Fighting'] = {
     'slots': 1,
@@ -45,7 +45,7 @@ TALENTS['Dirty Fighting'] = {
     'modifier': 0,
     'rating': '5',
     'classes': 'Warrior/Rogue',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Endurance'] = {
     'slots': 2,
@@ -55,7 +55,7 @@ TALENTS['Endurance'] = {
     'modifier': 0,
     'rating': '3',
     'classes': 'Warrior',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Fine Balance'] = {
     'slots': 2,
@@ -65,7 +65,7 @@ TALENTS['Fine Balance'] = {
     'modifier': 0,
     'rating': '7',
     'classes': 'Warrior/Rogue',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Iron Will'] = {
     'slots': 2,
@@ -75,7 +75,7 @@ TALENTS['Iron Will'] = {
     'modifier': -2,
     'rating': '3',
     'classes': 'Warrior/Priest',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Leadership'] = {
     'slots': 1,
@@ -85,7 +85,7 @@ TALENTS['Leadership'] = {
     'modifier': -1,
     'rating': '5',
     'classes': 'Warrior',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Quickness'] = {
     'slots': 2,
@@ -95,7 +95,7 @@ TALENTS['Quickness'] = {
     'modifier': 0,
     'rating': '3',
     'classes': 'Warrior/Rogue',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Steady Hand'] = {
     'slots': 1,
@@ -104,7 +104,7 @@ TALENTS['Steady Hand'] = {
     'subAbilityScore': '@{Aim}',
     'modifier': 0,
     'classes': 'Warrior/Rogue',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Trouble Sense'] = {
     'slots': 1,
@@ -114,7 +114,7 @@ TALENTS['Trouble Sense'] = {
     'modifier': 0,
     'rating': '3',
     'classes': '',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Flying Kick'] = {
     'slots': 1,
@@ -124,7 +124,7 @@ TALENTS['Flying Kick'] = {
     'modifier': 0,
     'rating': '5',
     'classes': 'Warrior, Martial Arts Talents',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Backward Kick'] = {
     'slots': 1,
@@ -133,7 +133,7 @@ TALENTS['Backward Kick'] = {
     'subAbilityScore': '',
     'modifier': 0,
     'classes': 'Warrior/Priest/Rogue, Martial Arts Talents',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Spring'] = {
     'slots': 1,
@@ -143,7 +143,7 @@ TALENTS['Spring'] = {
     'modifier': 0,
     'rating': '5',
     'classes': 'Warrior/Rogue, Martial Arts Talents',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Crushing Blow'] = {
     'slots': 1,
@@ -152,7 +152,7 @@ TALENTS['Crushing Blow'] = {
     'subAbilityScore': '',
     'modifier': 0,
     'classes': 'Warrior/Priest/Rogue, Martial Arts Talents',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Instant Stand'] = {
     'slots': 1,
@@ -162,7 +162,7 @@ TALENTS['Instant Stand'] = {
     'modifier': 0,
     'rating': '7',
     'classes': 'Warrior/Priest/Rogue, Martial Arts Talents',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 TALENTS['Missile Deflection'] = {
     'slots': 1,
@@ -171,6 +171,6 @@ TALENTS['Missile Deflection'] = {
     'subAbilityScore': '',
     'modifier': 0,
     'classes': 'Warrior/Priest/Rogue, Martial Arts Talents',
-    'book': 'Player\'s Options: Combat & Tactics'
+    'book': 'Player\'s Option: Combat & Tactics'
 };
 module.exports = TALENTS;

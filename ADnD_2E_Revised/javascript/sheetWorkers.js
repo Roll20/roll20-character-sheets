@@ -1,15 +1,18 @@
 // --- ALL SHEET WORKERS START --- //
+const PLAYER = 'player';
+const SHEET_WORKER = 'sheetworker';
+
 const SUCCESS = 'success';
 const INFO = 'info';
 const WARNING = 'warning';
 const ERROR = 'error';
 
 const BOOK_FIELDS = [
-    'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
-    'book-tom', 'book-aaeg',
-    'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
-    'book-paladins', 'book-druids', 'book-barbarians', 'book-necromancers', 'book-ninjas',
-    'book-combat-and-tactics',
+    'book-phb','book-tcfhb','book-tcthb','book-tcprhb','book-tcwhb',
+    'book-tom','book-aaeg',
+    'book-dwarves','book-bards','book-elves','book-humanoids','book-rangers',
+    'book-paladins','book-druids','book-barbarians','book-necromancers','book-ninjas',
+    'book-combat-and-tactics','book-skills-and-powers'
 ];
 
 const SCHOOL_FIELDS = ['school-spells-and-magic'];
@@ -239,7 +242,7 @@ const repeatingCalculateRemaining = function(repeatingName, repeatingFieldsToSum
 //#endregion
 
 //#region Generic Setup functions
-function setupCalculateTotal(totalField, fieldsToSum, maxValue) {
+function setupStaticCalculateTotal(totalField, fieldsToSum, maxValue) {
     let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
     on(onChange, function () {
         getAttrs(fieldsToSum, function (values) {
@@ -1057,7 +1060,7 @@ function priestDisplayLevel(s) {
 // --- Start setup Spell Slots --- //
 wizardSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
-    setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
+    setupStaticCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
@@ -1073,7 +1076,7 @@ setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel, []);
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
-    setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
+    setupStaticCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
@@ -1092,7 +1095,7 @@ setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel, SPHERE_FI
 let wizardSpellPoints = 'spell-points';
 let arc = 'total-arc';
 let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
-setupCalculateTotal(`${wizardSpellPoints}-total`, [`${wizardSpellPoints}-lvl`, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
+setupStaticCalculateTotal(`${wizardSpellPoints}-total`, [`${wizardSpellPoints}-lvl`, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
 setupRepeatingSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`, true);
 setupRepeatingSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`, true);
 setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
@@ -1101,7 +1104,7 @@ setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
 let priestSpellPoints = 'spell-points-priest';
 let wind = 'total-wind';
 let allPriestSpellSections = priestSpellLevelsSections.flatMap(sl => sl.sections);
-setupCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
+setupStaticCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
 setupRepeatingSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`, true);
 setupRepeatingSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`, true);
 setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
@@ -1131,10 +1134,10 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
 let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
 rogueStandardSkills.forEach(skill => {
-    setupCalculateTotal(`${skill}t-hidden`, rogueStandardColumns.map(column => `${skill}${column}`));
-    setupCalculateTotal(`${skill}t`, [`${skill}t-hidden`], 95);
-    setupCalculateTotal(`${skill}noarmort`, [`${skill}t-hidden`, `${skill}noarmorb`], 95);
-    setupCalculateTotal(`${skill}armort`, [`${skill}t-hidden`, `${skill}armorp`], 95);
+    setupStaticCalculateTotal(`${skill}t-hidden`, rogueStandardColumns.map(column => `${skill}${column}`));
+    setupStaticCalculateTotal(`${skill}t`, [`${skill}t-hidden`], 95);
+    setupStaticCalculateTotal(`${skill}noarmort`, [`${skill}t-hidden`, `${skill}noarmorb`], 95);
+    setupStaticCalculateTotal(`${skill}armort`, [`${skill}t-hidden`, `${skill}armorp`], 95);
 });
 
 // Setup custom rogue skills total
@@ -1699,6 +1702,80 @@ on('change:repeating_profs:profname', function (eventInfo) {
         });
     });
 });
+
+//#region Special Talents
+on('change:repeating_talents:talentname', function (eventInfo) {
+    let talent = TALENTS[eventInfo.newValue];
+    if (!talent)
+        return;
+    let abilityField = talent['abilityScore'].replace(/[@{}]|N\/A/g, '').toLowerCase();
+    let subAbilityField = talent['subAbilityScore'].replace(/[@{}]/g, '').toLowerCase();
+    let fields = [abilityField, subAbilityField, ...BOOK_FIELDS].filter(Boolean);
+    getAttrs(fields, function (values) {
+        if (bookInactiveShowToast(values, talent))
+            return;
+        let abilityScore;
+        let abilityScoreString;
+        if (values[subAbilityField]) {
+            abilityScore = parseInt(values[subAbilityField]) || 0;
+            abilityScoreString = talent['subAbilityScore'];
+        } else {
+            abilityScore = parseInt(values[abilityField]) || 0;
+            abilityScoreString = talent['abilityScore'];
+        }
+
+        let newValue = {};
+        newValue['repeating_talents_talentslots'] = talent['slots'];
+        newValue['repeating_talents_talentpoints'] = talent['points'];
+        newValue['repeating_talents_talentability'] = abilityScoreString;
+        newValue['repeating_talents_talentrating'] = talent['rating'] || '';
+        newValue['repeating_talents_talentmod'] = talent['modifier'] + ABILITY_MODIFIERS[abilityScore];
+        setAttrs(newValue);
+    });
+});
+
+on('change:repeating_talents:talentslots change:repeating_talents:talentpoints remove:repeating_talents', function (eventInfo) {
+    if (doEarlyReturn(eventInfo, ['talentslots']) && doEarlyReturn(eventInfo, ['talentpoints']))
+        return;
+    if (eventInfo.sourceType === SHEET_WORKER && eventInfo.triggerName.includes('talentpoints'))
+        return;
+
+    TAS.repeating('talents')
+        .attrs('talent-slots-spent','talent-spent')
+        .fields('talentslots','talentpoints')
+        .reduce(function(m,r){
+            m.slots+=(r.I['talentslots']);
+            m.points+=(r.I['talentpoints']);
+            return m;
+
+        },{slots:0,points:0},function(m,r,a){
+            a.I['talent-slots-spent']=m.slots;
+            a.I['talent-spent']=m.points;
+        })
+        .execute();
+});
+//#endregion
+
+//#region Traits
+on('change:repeating_traits:traitname', function (eventInfo) {
+    let trait = TRAITS[eventInfo.newValue];
+    if (!trait)
+        return;
+    let subAbilityField = trait['subAbilityScore'].replace(/[@{}]|N\/A/g, '').toLowerCase();
+    let fields = [subAbilityField, ...BOOK_FIELDS].filter(Boolean);
+    getAttrs(fields, function (values) {
+        if (bookInactiveShowToast(values, trait))
+            return;
+        let abilityScoreString = values[subAbilityField]
+            ? trait['subAbilityScore']
+            : trait['abilityScore'];
+
+        let newValue = {};
+        newValue['repeating_traits_traitpoints'] = trait['points'];
+        newValue['repeating_traits_traitstatsnum'] = abilityScoreString;
+        setAttrs(newValue);
+    });
+});
 //#endregion
 
 //#region Equipment
@@ -1722,7 +1799,7 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
             m.mountgearweight+=(r.F['gear-stored-weight'] * r.I['gear-stored-qty'] * r.I['on-mount']);
             return m;
 
-        },{allgearweight:0,mountgearweight:0, desc: []},function(m,r,a){
+        },{allgearweight:0,mountgearweight:0},function(m,r,a){
             a.D[2]['mount-gear-weight-total']=m.mountgearweight;
             a.D[2]['stored-gear-weight-total']=(m.allgearweight-m.mountgearweight);
         })
