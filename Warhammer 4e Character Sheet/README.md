@@ -75,7 +75,8 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
 April 22th 2022 v1.55d
 
-- Spell Tab changes: Spell name selection improved custom name field is now hidden if not being used. Added Memorized checkbox and XP Cost field for spells. Arcane spells which are not Memorized double the CN on rolling as per Core rules.
+- Spell Tab changes: Spell name selection improved custom name field is now hidden if not being used. Added Memorized checkbox and XP Cost field for spells. Arcane spells which are not Memorized double the CN on rolling as per Core rules. 
+- Accumulated Ext SL when channelling now automatically increments with each channel roll, channel crit will fill AccuExtSL to CN number if not already above. Casting will reset AccuExtSL back to 0. Rerolling from the reroll button will use the Previous casts AccuExtSL. AccuExtSL needs to be adjusted manually if special bonus are given, like spend Fortune for +1 SL.
 - Unequipping Weapons Main/Off will now result in a Unarmed default condition with normal stats.
 - Drunk now applies to WS/BS/Agi/Dex/Int skills only.
 - Ranged Accurate has been merged into the Ranged modifier changing defautl mod to 10 rather then add during the roll to any other modifier value.
