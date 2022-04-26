@@ -73,8 +73,17 @@ const displayWeaponType = function (type) {
     }
 }
 
-const getRowId = function (triggerName) {
-    return triggerName.match(/repeating_[^_]+_([^_]+)_[^_]+/)[1];
+const parseSourceAttribute = function (eventInfo) {
+    let parse = {};
+    if (eventInfo.sourceAttribute.startsWith('repeating')) {
+        let match = eventInfo.sourceAttribute.split('_');
+        parse['section'] = match[1];
+        parse['rowId'] = match[2];
+        parse['attribute'] = match[3];
+    } else {
+        parse['attribute'] = eventInfo.sourceAttribute;
+    }
+    return parse;
 }
 
 const conditionalLog = function (bool, msg) {
@@ -210,6 +219,14 @@ const doEarlyReturn = function(eventInfo, fieldNames) {
         : isOverwriting0(eventInfo);
 };
 
+const isSheetWorkerUpdate = function (eventInfo) {
+    return eventInfo.sourceType === SHEET_WORKER;
+}
+
+const isPlayerUpdate = function (eventInfo) {
+    return eventInfo.sourceType === PLAYER;
+}
+
 const repeatingMultiplySum = function(section, valueField, multiplierField, destination, decimals) {
     TAS.repeating(section)
         .attr(destination)
@@ -272,7 +289,7 @@ function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToS
         TAS.repeating(repeatingName)
             .fields(allFields)
             .tap(function(rowSet) {
-                let rowId = eventInfo.sourceAttribute.split('_')[2];
+                let rowId = parseSourceAttribute(eventInfo).rowId;
                 let row = rowSet[rowId];
                 let total = 0;
                 repeatingFieldsToSum.forEach(column => {
@@ -1322,7 +1339,7 @@ on('change:repeating_weapons:weaponname', function(eventInfo) {
             compareFields.push('reach');
         return compareFields.every(f => weapon1[f] === weapon2[f])
     }
-    let rowId = getRowId(eventInfo.triggerName);
+    let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {};
         weaponInfo[`repeating_weapons_${rowId}_attackadj`]       = weapon['bonus'];
@@ -1350,7 +1367,7 @@ on('change:repeating_weapons-damage:weaponname1', function(eventInfo) {
         }
         return fisk.every(f => weapon1[f] === weapon2[f])
     }
-    let rowId = getRowId(eventInfo.triggerName);
+    let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {};
         weaponInfo[`repeating_weapons-damage_${rowId}_damadj`]     = weapon['bonus'];
@@ -1371,7 +1388,7 @@ on('change:repeating_weapons2:weaponname2', function(eventInfo) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
         return ['strength','rof','range','size','speed','type'].every(f => weapon1[f] === weapon2[f])
     }
-    let rowId = getRowId(eventInfo.triggerName);
+    let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {};
         weaponInfo[`repeating_weapons2_${rowId}_strbonus2`]        = weapon['strength'] ? 1 : 0;
@@ -1403,7 +1420,7 @@ on('change:repeating_ammo:ammoname', function(eventInfo) {
         }
         return comparerFields.every(f => weapon1[f] === weapon2[f])
     }
-    let rowId = getRowId(eventInfo.triggerName);
+    let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
         let weaponInfo = {};
         weaponInfo[`repeating_ammo_${rowId}_strbonus3`]  = weapon['strength'] ? 1 : 0;
@@ -1436,7 +1453,7 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
                 }
                 return comparerFields.every(f => weapon1[f] === weapon2[f])
             }
-            let rowId = getRowId(eventInfo.triggerName);
+            let rowId = parseSourceAttribute(eventInfo).rowId;
             let setWeaponFunc = function (weapon) {
                 let weaponInfo = {};
                 weaponInfo[`${prefix}_${rowId}_attacknumhench${section}`] = weapon['rof'] || '1';
@@ -1727,9 +1744,10 @@ on('change:repeating_talents:talentname', function (eventInfo) {
         let newValue = {};
         newValue['repeating_talents_talentslots'] = talent['slots'];
         newValue['repeating_talents_talentpoints'] = talent['points'];
-        newValue['repeating_talents_talentability'] = abilityScoreString;
+        newValue['repeating_talents_talentstatnum'] = abilityScoreString;
+        newValue['repeating_talents_talentmod'] = talent['modifier'];
         newValue['repeating_talents_talentrating'] = talent['rating'] || '';
-        newValue['repeating_talents_talentmod'] = talent['modifier'] + ABILITY_MODIFIERS[abilityScore];
+        newValue['repeating_talents_talentratingmod'] = ABILITY_MODIFIERS[abilityScore] || 0;
         setAttrs(newValue);
     });
 });
@@ -1737,7 +1755,7 @@ on('change:repeating_talents:talentname', function (eventInfo) {
 on('change:repeating_talents:talentslots change:repeating_talents:talentpoints remove:repeating_talents', function (eventInfo) {
     if (doEarlyReturn(eventInfo, ['talentslots']) && doEarlyReturn(eventInfo, ['talentpoints']))
         return;
-    if (eventInfo.sourceType === SHEET_WORKER && eventInfo.triggerName.includes('talentpoints'))
+    if (isSheetWorkerUpdate(eventInfo) && eventInfo.triggerName.includes('talentpoints'))
         return;
 
     TAS.repeating('talents')
@@ -1753,6 +1771,21 @@ on('change:repeating_talents:talentslots change:repeating_talents:talentpoints r
             a.I['talent-spent']=m.points;
         })
         .execute();
+});
+
+on('change:repeating_talents:talentstatnum', async function (eventInfo) {
+    if (isSheetWorkerUpdate(eventInfo))
+        return;
+
+    let parse = parseSourceAttribute(eventInfo);
+    getAttrs(['repeating_talents_talentstatnum'], async function (values) {
+        let abilityScore = values['repeating_talents_talentstatnum'];
+        let abilityScoreValue = await extractRollResult(abilityScore);
+
+        let newValue = {};
+        newValue[`repeating_talents_${parse.rowId}_talentratingmod`] = ABILITY_MODIFIERS[abilityScoreValue] || 0;
+        setAttrs(newValue);
+    });
 });
 //#endregion
 
