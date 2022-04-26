@@ -1,5 +1,14 @@
+<input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab"  value="character"  />
+<div>
+    <button type="action" name="act_character" >Character</button>
+    <button type="action" name="act_crew" >Crew</button>
+    <button type="action" name="act_mods" >Mods</button>
+</div>
+
 <h1>Liminal</h1>
 <h3>A RPG about those caught between the ordinary and extraordinary.</h3>
+
+<div class="sheet-character">
 <div class="sheet-2colrow sheet-basicinfo">
     <div class="sheet-col">
     	<label>Name:</label><input type="text" name="attr_character_name" /><br />
@@ -189,7 +198,56 @@
 	</div>
 </div>
 <hr />
+</div>
+
+<!-- CREW SHEET -->
+<div class="sheet-crew">
+	<h2>Crew Information</h2>
+    <label>Crew Name:</label><textarea name="attr_crew_name" /><br />
+	<label>Concept:</label><textarea name="attr_crew_concept" /><br />
+	<label>Goal:</label><textarea name="attr_crew_goal" /><br />
+	<label>Assets:</label>	
+	<fieldset class="repeating_assets">
+		<div class="sheet-crew-asset">
+			<input type="text" name="attr_assetname" />
+			<textarea name="attr_assetdescription" />
+		</div>
+	</fieldset>
+	
+	<div class="sheet-crew-relationships">
+		<label>Relationships</label>
+		<h3 class="sheet-factionname">Faction</h3><h3 class="sheet-factionmodifiers">Modifiers</h3><h3 class="sheet-factiontotal">Total</h3>
+        <fieldset class="repeating_relationships">
+            <textarea name="attr_faction_name" />
+            <textarea name="attr_faction_modifiers" />
+            <input type="number" name="attr_faction_relationship_total" min="-3" max="3" />
+        </fieldset>
+	</div>
+	
+</div>
+<!-- END CREW SHEET -->
+
+<!-- MODS SHEET -->
+<div class="sheet-mods">
+	<h2>Modifications</h2>
+	<p>Need to make some tweaks?  Modify things here.
+    <label>Modify skill points:</label><input type="number" name="attr_extraskills" /><br />
+	<label>Modify endurance:</label><input type="number" name="attr_extraendurance" /><br />
+	<label>Modify will:</label><input type="number" name="attr_extrawill" /><br />
+</div>
+<!-- END CREW SHEET -->
+
 <script type="text/worker">
+
+// Deal with the tabs
+const buttonlist = ["character","crew","mods"];
+buttonlist.forEach(button => {
+	on(`clicked:${button}`, function() {
+		setAttrs({
+			sheetTab: button
+		});
+	});
+});
 
 // Initialise skills and other numbered attributes
 on("change:athletics change:awareness change:melee change:shoot change:stealth change:survival change:vehicles change:art change:business change:education change:lore change:medicine change:science change:technology change:charm change:conviction change:empathy change:highsociety change:rhetoric change:streetwise change:taunt sheet:opened", function() {  
@@ -253,14 +311,15 @@ on("change:athletics change:awareness change:melee change:shoot change:stealth c
 });
 
 // Set endurance maximum
-on("change:athletics change:focus sheet:opened", function() {  
-  getAttrs(["athletics","focus"], function(values) {
+on("change:athletics change:extraendurance change:focus sheet:opened", function() {  
+  getAttrs(["athletics","focus","extraendurance"], function(values) {
     let athletics = parseInt(values.athletics)||0;
+    let extraendurance = parseInt(values.extraendurance)||0;	
     let focus = values.focus;
-	let endurance = athletics + 8
+	let endurance = athletics + 8 + extraendurance;
 	if (focus === "Tough")
 	{
-		endurance = athletics + 12
+		endurance = athletics + 12 + extraendurance;
 	}
     setAttrs({                            
       "endurance_max": endurance
@@ -269,14 +328,15 @@ on("change:athletics change:focus sheet:opened", function() {
 });
 
 // Set will maximum
-on("change:conviction change:focus sheet:opened", function() {  
-  getAttrs(["conviction","focus"], function(values) {
+on("change:conviction change:extrawill change:focus sheet:opened", function() {  
+  getAttrs(["conviction","focus","extrawill"], function(values) {
     let conviction = parseInt(values.conviction)||0;
+    let extrawill = parseInt(values.extrawill)||0;
     let focus = values.focus;
-	let will = conviction + 8
+	let will = conviction + 8 + extrawill;
 	if (focus === "Determined")
 	{
-		will = conviction + 10
+		will = conviction + 10 + extrawill;
 	}
     setAttrs({                            
       "will_max": will
@@ -285,10 +345,11 @@ on("change:conviction change:focus sheet:opened", function() {
 });
 
 // Set total skill points and advancements
-on("change:experience sheet:opened", function() {  
-  getAttrs(["experience"], function(values) {
+on("change:experience change:extraskills sheet:opened", function() {  
+  getAttrs(["experience", "extraskills"], function(values) {
     let experience = parseInt(values.experience)||0;
-	let totalskillpoints = Math.floor(experience/5) + 17;
+	let extraskills = parseInt(values.extraskills)||0;
+	let totalskillpoints = Math.floor(experience/5) + 17 + extraskills;
 	let totaladvancements = Math.floor(experience/15);
     setAttrs({                            
       "totalskillpoints": totalskillpoints,
