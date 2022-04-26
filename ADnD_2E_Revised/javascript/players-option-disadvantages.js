@@ -1,127 +1,231 @@
 const DISADVANTAGES = {};
 DISADVANTAGES['Allergies'] = {
-    'moderate': 3,
-    'servere': 8,
+    'points': 3,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Allergies'] = {
+    'points': 8,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Bad Tempered'] = {
-    'moderate': 6,
-    'servere': 0,
+    'points': 6,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Bruise Easily'] = {
-    'moderate': 8,
-    'servere': 0,
+    'points': 8,
+    'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Clumsy'] = {
-    'moderate': 4,
-    'servere': 8,
+    'points': 4,
+    'abilityScore': '@{Dexterity}',
+    'subAbilityScore': '',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Clumsy'] = {
+    'points': 8,
+    'abilityScore': 'ceil(@{Dexterity}/2)',
+    'subAbilityScore': '',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Colorblind'] = {
-    'moderate': 3,
-    'servere': 0,
+    'points': 3,
+    'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Compulsive Honesty'] = {
-    'moderate': 8,
-    'servere': 0,
+    'points': 8,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Cowardice'] = {
-    'moderate': 7,
-    'servere': 15,
+    'points': 7,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Cowardice'] = {
+    'points': 15,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Deep Sleeper'] = {
-    'moderate': 7,
-    'servere': 0,
+    'points': 7,
+    'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Fanaticism'] = {
-    'moderate': 8,
-    'servere': 0,
+    'points': 8,
+    'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Greed'] = {
-    'moderate': 7,
-    'servere': 0,
+    'points': 7,
+    'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Irritating Personality'] = {
-    'moderate': 6,
-    'servere': 0,
+    'points': 6,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Lazy'] = {
-    'moderate': 7,
-    'servere': 0,
+    'points': 7,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'modifier': -4,
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Powerful Enemy'] = {
-    'moderate': 10,
-    'servere': 0,
+    'points': 10,
+    'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Phobia: Crowds'] = {
-    'moderate': 4,
-    'servere': 10,
+    'points': 4,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Phobia: Crowds'] = {
+    'points': 10,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Phobia: Darkness'] = {
-    'moderate': 5,
-    'servere': 11,
+    'points': 5,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Phobia: Darkness'] = {
+    'points': 11,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Phobia: Enclosed Spaces'] = {
-    'moderate': 5,
-    'servere': 11,
+    'points': 5,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Phobia: Enclosed Spaces'] = {
+    'points': 11,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Phobia: Heights'] = {
-    'moderate': 5,
-    'servere': 10,
+    'points': 5,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Phobia: Heights'] = {
+    'points': 10,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Phobia: Magic'] = {
-    'moderate': 8,
-    'servere': 14,
+    'points': 8,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Phobia: Magic'] = {
+    'points': 14,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Phobia: Monster (specific)'] = {
-    'moderate': 4,
-    'servere': 9,
+    'points': 4,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Phobia: Monster (specific)'] = {
+    'points': 9,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Phobia: Snakes'] = {
-    'moderate': 5,
-    'servere': 10,
+    'points': 5,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Phobia: Snakes'] = {
+    'points': 10,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Phobia: Spiders'] = {
-    'moderate': 5,
-    'servere': 10,
+    'points': 5,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Phobia: Spiders'] = {
+    'points': 10,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Phobia: Undead'] = {
-    'moderate': 8,
-    'servere': 14,
+    'points': 8,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Servere Phobia: Undead'] = {
+    'points': 14,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Phobia: Water'] = {
-    'moderate': 6,
-    'servere': 12,
+    'points': 6,
+    'abilityScore': '@{Wisdom}',
+    'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Tongue-tied'] = {
-    'moderate': 6,
-    'servere': 0,
+DISADVANTAGES['Servere Phobia: Water'] = {
+    'points': 12,
+    'abilityScore': 'ceil(@{Wisdom}/2)',
+    'subAbilityScore': 'ceil(@{Willpower}/2)',
+    'book': 'Player\'s Option: Skills & Powers'
+};
+DISADVANTAGES['Tongue-Tied'] = {
+    'points': 6,
+    'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'book': 'Player\'s Option: Skills & Powers'
 };
 DISADVANTAGES['Unlucky'] = {
-    'moderate': 8,
-    'servere': 0,
+    'points': 8,
+    'abilityScore': 'N/A',
+    'subAbilityScore': '',
     'book': 'Player\'s Option: Skills & Powers'
 };
 module.exports = DISADVANTAGES;

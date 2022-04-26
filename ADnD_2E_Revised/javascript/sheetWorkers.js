@@ -1780,6 +1780,9 @@ on('change:repeating_talents:talentstatnum', async function (eventInfo) {
     let parse = parseSourceAttribute(eventInfo);
     getAttrs(['repeating_talents_talentstatnum'], async function (values) {
         let abilityScore = values['repeating_talents_talentstatnum'];
+        if (!abilityScore.startsWith('@') && isNaN(parseInt(abilityScore)))
+            return;
+
         let abilityScoreValue = await extractRollResult(abilityScore);
 
         let newValue = {};
@@ -1808,6 +1811,39 @@ on('change:repeating_traits:traitname', function (eventInfo) {
         newValue['repeating_traits_traitstatnum'] = abilityScoreString;
         setAttrs(newValue);
     });
+});
+
+on('change:repeating_traits:traitpoints remove:repeating_traits', function (eventInfo) {
+    if (doEarlyReturn(eventInfo, ['traitpoints']))
+        return;
+    TAS.repeatingSimpleSum('traits', 'traitpoints', 'trait-spent');
+});
+//#endregion
+
+//#region Disadvantages
+on('change:repeating_disads:disadname', function (eventInfo) {
+    let disadvantage = DISADVANTAGES[eventInfo.newValue];
+    if (!disadvantage)
+        return;
+    let subAbilityField = disadvantage['subAbilityScore'].replace(/(ceil)?[\(\)@{}/2]/g, '').toLowerCase();
+    let fields = [subAbilityField, ...BOOK_FIELDS].filter(Boolean);
+    getAttrs(fields, async function (values) {
+        if (bookInactiveShowToast(values, disadvantage))
+            return;
+        let abilityScoreString = values[subAbilityField]
+            ? disadvantage['subAbilityScore']
+            : disadvantage['abilityScore'];
+
+        let newValue = {};
+        newValue[`repeating_disads_disadpoints`] = disadvantage['points'];
+        newValue[`repeating_disads_disadstatnum`] = abilityScoreString;
+        setAttrs(newValue);
+    });
+});
+on('change:repeating_disads:disadpoints remove:repeating_disads', function (eventInfo) {
+    if (doEarlyReturn(eventInfo, ['disadpoints']))
+        return;
+    TAS.repeatingSimpleSum('disads', 'disadpoints', 'disadvantage-gained');
 });
 //#endregion
 
