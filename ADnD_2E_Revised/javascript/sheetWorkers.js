@@ -915,7 +915,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 if (!level)
                     return;
 
-                let spellLevel = spellLevels.spellLevel(sl => sl.level === level);
+                let spellLevel = spellLevels.find(spellLevel => spellLevel.level === level);
                 if (!spellLevel)
                     return;
 
