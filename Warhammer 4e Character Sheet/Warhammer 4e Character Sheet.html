@@ -31929,9 +31929,9 @@
 								<div class="sheet-center sheet-small-label sheet-pad-b-sm">
 									<span data-i18n="SPELL-NAME">Spell Name</span>
 								</div>
-								<select class="sheet-center sheet-spell-name" name="attr_spellname">
+								<select class="sheet-center sheet-spell-name" name="attr_spellname" style="border: 1px solid #c0c0c0; border-radius: 2px">
                                     <option value="" data-i18n="SPELL-SELECT">Select Spell</option>
-                                    <option value="@{customarcaname}" data-i18n="SPELL-CUSTOM">Custom Spell Name -- Use field to the right ></option>
+                                    <option value="@{customarcname}" data-i18n="SPELL-CUSTOM">Custom Spell Name -- Use field to the right ></option>
 									<optgroup label="Arcane" data-i18n-label="ARCANE-LORE">
                                         <option value="Aethyric Armour" data-i18n="SPELL-AETHYRIC-ARMOUR">Aethyric Armour</option>
                                         <option value="Aethyric Arms" data-i18n="SPELL-AETHYRIC-ARMS">Aethyric Arms</option>
@@ -48635,11 +48635,15 @@ on('change:repeating_spellbookarcane:ExtChannellingLore', function(event) {
 	});
 });
 
-on('change:repeating_divineblessings', function(event) {
+on('change:repeating_divineblessings change:repeating_divineblessings:spellname', function(event) {
                 // makes sure the sheet worker doesnt trigger itself
         if (event.sourceType === 'sheetworker') return;
                 // get the row id that the player clicked. the id is always between the second and third '_'
 			const playerclickedid = event.sourceAttribute.split('_')[2] || '';				
+	
+			getAttrs(["repeating_divineblessings_spellname"], function(v) {
+		
+				if (v.repeating_divineblessings_spellname == "@{customblessname}") {cust = 1;} else {cust = 0;} 
 				
 				getSectionIDs("repeating_divineblessings", function (ids) {
                 if (playerclickedid == ids.toLowerCase) return;
@@ -48651,11 +48655,37 @@ on('change:repeating_divineblessings', function(event) {
                         let playerId = playerclickedid.toLowerCase();
 						if(playerId == id.toLowerCase()) {
 						output[`repeating_divineblessings_${id}_rep_ID`]  = playerId;
+						output[`repeating_divineblessings_${id}_custname`]  = cust;
 						}
                     });
                     setAttrs(output, {silent: true});
-				});
+	});
 });
+});
+on('clicked:repeating_divineblessings:custname', function(event) {
+                // makes sure the sheet worker doesnt trigger itself
+                if (event.sourceType === 'sheetworker') return;
+                // get the row id that the player clicked. the id is always between the second and third '_'
+				const playerclickedid = event.sourceAttribute.split('_')[2] || '';				
+
+				getSectionIDs("repeating_divineblessings", function (ids) {
+                if (playerclickedid == ids.toLowerCase) return;
+                    // create an object to hold all the attributes we are bout to change
+                    const output = {};
+                    const output2 = {};
+                    // loop through the row ids
+                    ids.forEach(id => {
+                        // check if the id is the one the player clicked; if not, set to 0, if it is, set to 1.
+                        let playerId = playerclickedid.toLowerCase();
+						if(playerId == id.toLowerCase()) {
+						output[`repeating_divineblessings_${id}_spellname`]  = "";
+						output2[`repeating_divineblessings_${id}_custname`]  = 0;
+						}
+                    });
+                    setAttrs(output, {silent: true});
+                    setAttrs(output2, {silent: true});
+	});
+	});
 
 on('change:repeating_divinemiracles change:repeating_divinemiracles:spellname', function(event) {
                 // makes sure the sheet worker doesnt trigger itself
@@ -48683,6 +48713,7 @@ on('change:repeating_divinemiracles change:repeating_divinemiracles:spellname', 
                     setAttrs(output, {silent: true});
 	});
 });
+});
 on('clicked:repeating_divinemiracles:custname', function(event) {
                 // makes sure the sheet worker doesnt trigger itself
                 if (event.sourceType === 'sheetworker') return;
@@ -48707,7 +48738,6 @@ on('clicked:repeating_divinemiracles:custname', function(event) {
                     setAttrs(output2, {silent: true});
 	});
 	});
-});
 
 
 on('change:repeating_inventory', function(event) {
