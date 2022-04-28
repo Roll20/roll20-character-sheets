@@ -13,7 +13,7 @@ on("clicked:repeating_magic:usespell", async (e) => {
   const outputUsage = Boolean(Number(a.outputusage));
   if (outputUsage) {
     const chat = await startRoll(
-      `&{template:castspell} {{character_name=${
+      `@{opt_whisper}&{template:castspell} {{character_name=${
         a["character_name"]
       }}} {{spent=${a["repeating_magic_ppecost"]}}} {{name=${
         a[`repeating_magic_name`]
@@ -43,7 +43,7 @@ on("clicked:repeating_psionics:usepsionic", async (e) => {
   const outputUsage = Boolean(Number(a.outputusage));
   if (outputUsage) {
     const chat = await startRoll(
-      `&{template:usepsionic} {{character_name=${
+      `@{opt_whisper}&{template:usepsionic} {{character_name=${
         a["character_name"]
       }}} {{spent=${a["repeating_psionics_ispcost"]}}} {{name=${
         a[`repeating_psionics_name`]
@@ -103,7 +103,6 @@ async function calculateDamage(row) {
     }
     damage += `+${perLevel}`.repeat(a.character_level - 1);
   }
-  damage += ` ${unit}`;
   await setAttrsAsync({ [row]: damage });
 }
 

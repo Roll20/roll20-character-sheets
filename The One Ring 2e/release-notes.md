@@ -4,6 +4,12 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.11.00 (Build 14)
+
+### Features
+
+- added tabs for notes area
+
 ## 02.10.00 (Build 13)
 
 ### Features
