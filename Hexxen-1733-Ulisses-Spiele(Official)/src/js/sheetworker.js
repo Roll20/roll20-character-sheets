@@ -67,6 +67,16 @@
         'adept': 'experteffect', 
         'master': 'mastereffect'
     };
+
+    const NPC_STRATEGY_KEYS = {
+        'guileless': 'npc_strategy_simple',
+        'offensive': 'npc_strategy_offensive',
+        'mighty-offensive': 'npc_strategy_mighty_offensive',
+        'protective': 'npc_strategy_protective',
+        'defensive': 'npc_strategy_defensive',
+        'allrounder': 'npc_strategy_allrounder',
+        'mighty-allrounder': 'npc_strategy_mighty_allrounder'
+    }
     
     // - for compendium lookups
     const COMPENDIUM_CATEGORY_KEYS = {
@@ -137,7 +147,7 @@
     dh.processDropAttr = (data, updates, compendiumName, sheetName=compendiumName, fallback='') => {
         const attrData = data[`data-${compendiumName}`];
         console.log(compendiumName, attrData);
-        updates[sheetName] = attrData || fallback;
+        updates[sheetName] = attrData ?? fallback;
     };
 
     dh.parseJSON = (json) => {
@@ -446,13 +456,20 @@
      * Monster category handlers
      */
 
+    /**
+     * Handler function for "hunter" drops.
+     * 
+     * @param {Object} data Compendium attributes data object
+     * @param {Object} updates Object (map) that receives all made changes.
+     * @param {Function} [callback] Optional callback function
+     */
     dh.handleHunterDrop = (data, updates, callback) => {
         console.log('handle hunter', data);
         const lookups = [];
         let attrData; // attr is a character sheet attribute in general not a special attribute
 
         // finish drop without tutorial or editmode active
-        ch.disableTutorial(updates);
+        sh.disableTutorial(updates, 'hunter');
         
         // character type (can be used to identify hunter drop)
         updates['npc'] = 0;
@@ -503,23 +520,117 @@
         // process lookups (incl. extra data)
         // this is asynchronious, pass finalizing callback
         dh.processLookups(lookups, data, updates, callback);
-        
         // no more code after this point! lookup is async!
-
-        // TODO teilweise im sheet:open?
-        // TODO Panzerwert
-        // TODO Aktionspunkte
     };
     dh.dropHandler['hunter'] = dh.handleHunterDrop;
 
-    // character sheet helper
-    const ch = {};
-    ch.disableTutorial = (updates) => {
+    /**
+     * Handler function for "npc" drops.
+     * 
+     * @param {Object} data Compendium attributes data object
+     * @param {Object} updates Object (map) that receives all made changes.
+     * @param {Function} [callback] Optional callback function
+     */
+     dh.handleNpcDrop = (data, updates, callback) => {
+        console.log('handle npc', data);
+        const lookups = [];
+        let attrData; // attr is a character sheet attribute in general not a special attribute
+
+        // finish drop without tutorial or editmode active
+        sh.disableTutorial(updates, 'npc');
+        
+        // character type (can be used to identify hunter drop)
+        updates['npc'] = 1;
+        // npc subtype (npc_type_leader, npc_type_gang)
+        attrData = data['data-npc-class'] ?? 'mob';
+        const isLeader = attrData === 'leader';
+        attrData = isLeader ? 'npc_type_leader' : 'npc_type_gang';
+        updates['npc_type'] = attrData;
+        // unnatural
+        attrData = data['data-unnatural'] ?? false;
+        attrData = attrData === true ? 1 : 0;
+        updates['unnatural'] = attrData;
+        // level (rank)
+        dh.processDropAttr(data, updates, 'level', 'rank', 1);
+        // attributes (leader only)
+        if (isLeader) {
+            attrData = data['data-attributes'];
+            console.log('attributes', attrData);
+            if (Array.isArray(attrData)) {
+                attrData.forEach(a => {
+                    const key = ATTRIBUTE_KEYS[a.key];
+                    if (key) updates[key] = a.value;
+                    else console.warn(`unknown attribute key "${a.key}"`); // TODO Fehlermeldung
+                });
+            }
+            else {
+                console.warn('bad attributes data');
+            }
+        }
+        // LEP + Formel
+        attrData = data['data-hp'] || 0;
+        if (attrData) {
+            updates['npc_hitpoints'] = attrData;
+        }
+        attrData = data['data-hp-formula'];
+        if (attrData) {
+            updates['npc_hitpoints_formula'] = attrData;
+        }
+        // FIXME ini (berechnet?)
+        // dh.processDropAttr(data, updates, 'ini', 'ini', 0);
+        // armor
+        dh.processDropAttr(data, updates, 'armor-value', 'armor', 0);
+        // strategy
+        attrData = data['data-strategy'] ?? 'guileless';
+        if (attrData) {
+            updates['npc_strategy'] = NPC_STRATEGY_KEYS[attrData];
+        }
+        // FIXME attacks
+        // narrative
+        attrData = data['data-narrative-abilities'];
+        if (attrData) {
+            attrData = attrData.join?.(', ');
+            updates['npc_narrative_ability'] = attrData;
+        }
+        // loot
+        dh.processDropAttr(data, updates, 'loot', 'loot', '');
+
+
+        // FIXME npc abilities
+        dh.prepareLookup(lookups, data, 'npc-abilities','npc-ability');
+        
+        // process lookups (incl. extra data)
+        // this is asynchronious, pass finalizing callback
+        dh.processLookups(lookups, data, updates, callback);
+        
+        // no more code after this point! lookup is async!
+
+        // TODO im sheet
+        // TODO widernatürlich
+        // TODO erzählkräfte (npc_narrative_ability)
+        // TODO beute
+    };
+    dh.dropHandler['npc'] = dh.handleNpcDrop;
+
+
+    /**
+     *  character sheet helper
+     */
+    const sh = {};
+
+    /**
+     * Helper function that makes all changes required to disable the tutorial.
+     * The changes are written into updates object and not directly stored in DB.
+     * 
+     * @param {Object} updates Object (map) that receives all made changes.
+     * @param {String} [characterType="hunter"] (optional) Character sheet type.
+     */
+    sh.disableTutorial = (updates, characterType='hunter') => {
         // TODO auch direkte Ausführung ermöglichen (siehe clearDropFields)
         updates['tutorial_step'] = 5;
         updates['tutorial_done'] = 1;
         updates['editmode'] = 0;
-        updates['sheetTab'] = "character";
+        updates['sheetTab'] = characterType === 'npc' ? 'npc' : 'character';
     };
     
     
@@ -950,6 +1061,7 @@
         getAttrs(["attribute_senses", "attribute_dexterity", "skill_reflexes", "ini_mod"], function(values) {
             let sen = parseInt(values.attribute_senses,10)||0;
             let dex = parseInt(values.attribute_dexterity,10)||0;
+            // TODO reflexes und ini_mod sind SC Werte! Bei NSC nicht berücksichtigen
             let reflexes = parseInt(values.skill_reflexes,10)||0;
             let ini_mod = parseInt(values.ini_mod, 10)||0;
             let ini = sen + dex + reflexes + ini_mod;
