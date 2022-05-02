@@ -1372,4 +1372,161 @@ nonweaponProficiencies['Water Walking'] = {
     'book': 'The Complete Ninja\'s Handbook'
 };
 //#endregion
+
+//#region Player's Option: Spells & Magic
+nonweaponProficiencies['Alchemy'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -3,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Arcanology'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -3,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Bookbinding'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Priest/Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Concentration'] = {
+    'slots': 2,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -2,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Dowsing'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -3,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Glassblowing'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Hypnotism'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': -2,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Mental Resistance'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -1,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Omen Reading'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -2,
+    'classes': 'Priest/Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Papermaking'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Priest/Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Prestidigitation'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': -1,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Research'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': 0,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Sage Knowledge'] = {
+    'slots': 2,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Priest/Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Scribe'] = {
+    'slots': 1,
+    'abilityScore': '@{Dexterity}',
+    'modifier': +1,
+    'classes': 'Priest/Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Tactics of Magic'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Thaumaturgy'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Wizard',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Administration'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': +1,
+    'classes': 'Priest',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Alms'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': 0,
+    'classes': 'Priest',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Ceremony'] = {
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': 0,
+    'classes': 'Priest',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Diplomacy'] = {
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': -1,
+    'classes': 'Priest',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Investigation'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
+    'classes': 'Priest',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+nonweaponProficiencies['Undead Lore'] = {
+    'slots': 1,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -1,
+    'classes': 'Priest',
+    'book': 'Player\'s Option: Spells & Magic'
+};
+//#endregion
 module.exports = nonweaponProficiencies;
