@@ -6,6 +6,10 @@ Official feedback hub for the roll 20 ulisses TDE character sheet & future compe
 
 
 ### Changelog
+# 1.2.1 (02.5.2022)
+* Workaround for token image not changeable bug
+* Minor layout fix
+
 # 1.2.0 (28.3.2022)
 * Changed botch descriptions from name to actual description
 * Reworked offhand/mainhand switching and depiction
