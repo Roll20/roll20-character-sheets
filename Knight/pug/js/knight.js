@@ -235,6 +235,7 @@ on('change:armure', async (newArmure) => {
     MALWarmasterImpGPersonnel: 0,
     MALRogueGhost: 0,
     rogueGhost: 0,
+    bardChangeling: 0,
     MALBarbarianGoliath: 0,
     slotTeteMax: sTete,
     slotTorseMax: sTorse,
