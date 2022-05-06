@@ -594,7 +594,6 @@ CRIT_EFFECT_TABLE['Slashing']['Monster']['Head'] = {
 //#endregion
 
 //#region Spell Crits
-const CRIT_EFFECT_TABLE = {};
 CRIT_EFFECT_TABLE['Acid'] = {};
 CRIT_EFFECT_TABLE['Cold'] = {};
 CRIT_EFFECT_TABLE['Constriction'] = {};

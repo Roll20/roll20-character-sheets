@@ -12,7 +12,7 @@ const BOOK_FIELDS = [
     'book-tom','book-aaeg',
     'book-dwarves','book-bards','book-elves','book-humanoids','book-rangers',
     'book-paladins','book-druids','book-barbarians','book-necromancers','book-ninjas',
-    'book-combat-and-tactics','book-skills-and-powers'
+    'book-combat-and-tactics','book-skills-and-powers','book-spells-and-magic'
 ];
 
 const SCHOOL_FIELDS = ['school-spells-and-magic'];
