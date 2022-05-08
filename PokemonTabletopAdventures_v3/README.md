@@ -24,6 +24,14 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### May 7, 2022
+- Add support for importing character sheets by using the VTTES tool
+  - Community member used this to create every Pokemon, so this lets others take advantage of that work even if they can't use that tool
+
+### Apr 10, 2022
+- Ensures inline roll results embedded within notes fields do not have any border or padding, so text around them is not covered by their border
+- Adjusts inline roll results styling to ensure the text matches the rest of the notes fields
+
 ### Mar 27, 2022
 - Reworked dark mode colors
   - First dark mode attempt was pretty awful in terms of color theory and not being painful to look at over time.
