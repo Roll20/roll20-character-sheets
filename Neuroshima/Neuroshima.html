@@ -1,4 +1,4 @@
-<img src="https://i.imgur.com/9rilIHq.png"/><div class="sheet-full-page"><div class="main"><input class="sheet-tabstoggle" type="hidden" name="attr_sheetTab" value="wspolczynniki"/><div class="header"><button type="action" name="act_wspolczynniki">Współczynniki</button><button type="action" name="act_umiejetnosci">Umiejętności</button><button type="action" name="act_inwentarz">Inwentarz</button></div><div class="page-wspolczynniki">
+<input class="sheet-version" type="hidden" name="attr_version" value="1.1"/><img src="https://i.imgur.com/9rilIHq.png"/><div class="sheet-full-page"><div class="main"><input class="sheet-tabstoggle" type="hidden" name="attr_sheetTab" value="wspolczynniki"/><div class="navigation-header"><button class="button-wspolczynniki" type="action" name="act_wspolczynniki">Współczynniki</button><button class="button-umiejetnosci" type="action" name="act_umiejetnosci">Umiejętności</button><button class="button-inwentarz" type="action" name="act_inwentarz">Inwentarz</button></div><div class="page-wspolczynniki">
     <div class="umiejetnosci-holder">
         <table class="charinfo">
             <tbody>
@@ -538,6 +538,12 @@
             <button type="action" name="act_level_6" class="sheet-radio sheet-radio-selected sheet-radio-6">
                 <span class="sheet-checked">Fart</span>
             </button>
+            <button type="action" name="act_level_7" class="sheet-radio sheet-radio-selected sheet-radio-7">
+                <span class="sheet-checked">Mistrzowski</span>
+            </button>
+            <button type="action" name="act_level_8" class="sheet-radio sheet-radio-selected sheet-radio-8">
+                <span class="sheet-checked">Arcymistrzowski</span>
+            </button>
         </div>
         <div class="param-page">
             <div class="param-row">
@@ -882,7 +888,7 @@
             </td>
             <td class="umj-skill-cell">
                 <input type="number" name="attr_materialy_wybuchowe" value="0">
-                <button type="action" class="skill_test_button" name="act_test_materialy_wybuchowe">Materiały wybuchowe</button>
+                <button type="action" class="skill_test_button" name="act_test_materialy_wybuchowe">Mat. wybuchowe</button>
             </td>
         </tr>
     </tbody></table>
@@ -909,7 +915,7 @@
             </td>
             <td class="umj-skill-cell">
                 <input type="number" name="attr_kondycja" value="0">
-                <button type="action" class="skill_test_button" name="act_kondycja">Kondycja</button>
+                <button type="action" class="skill_test_button" name="act_test_kondycja">Kondycja</button>
             </td>
         </tr>
         <tr>
@@ -1221,10 +1227,10 @@ on("change:zrecznosc_base change:mod_zrecznosc change:percepcja_base change:mod_
 /******************************************************************/
 /******************************************************************/
 /************************** ROLL PARAMETERS ***********************/
-const startingPercent = [-20, 0, 11, 31, 61, 91, 121]
-const lastPassingPercent = [-1,10,30,60,90,120,0xFFFFFF];
-const levelRadioValues = ["0","1","2","3","4","5","6"];
-const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Bardzo Trudny", "Cholernie Trudny", "Fart"];
+const startingPercent = [-20, 0, 11, 31, 61, 91, 121, 201, 241];
+const lastPassingPercent = [-1,10,30,60,90,120,200, 240, 0xFFFFFF];
+const levelRadioValues = ["0","1","2","3","4","5","6","7","8"];
+const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Bardzo Trudny", "Cholernie Trudny", "Fart", "Mistrzowski", "Arcymistrzowski"];
   levelRadioValues.forEach(function(value) {
     on(`clicked:level_${value}`, function() {
       setAttrs({
@@ -1290,14 +1296,6 @@ const wsp2accusative = {
     "spryt":"spryt",
     "budowa":"budowę"
 };
-
-const wsp2genitive = {
-    "zrecznosc":"zręczności",
-    "percepcja":"percepcji",
-    "charakter":"charakteru",
-    "spryt":"sprytu",
-    "budowa":"budowy"
-}
 
 const statslist = [
     "bijatyka",                         "bron_reczna",                  "rzucanie", 
@@ -1389,7 +1387,7 @@ statslist.forEach((attribute) => {
         let genitive = stats2genitive[attribute];
         let skill_wsp_name = stats2wsp[attribute];
         let wsp_name = wsp2accusative[skill_wsp_name]
-        startRoll(`&{template:test} {{base_wsp_name=${wsp_name}}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=${genitive}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
+        startRoll(`&{template:test} {{base_wsp_name=${wsp_name}}} {{open=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=${genitive}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
             let base_wsp = stats2wsp[attribute];
             
             getAttrs(["final_test_level", "modi_battle", "modi_open", base_wsp, attribute], function(values) {
@@ -1423,7 +1421,7 @@ statslist.forEach((attribute) => {
                 }
                 
                 // Constrain
-                final_test_level = final_test_level < 0 ? 0 : (final_test_level > 6 ? 6 : final_test_level);
+                final_test_level = final_test_level < 0 ? 0 : (final_test_level > 8 ? 8 : final_test_level);
 
                 // Successes and failures
                 
@@ -1432,24 +1430,24 @@ statslist.forEach((attribute) => {
                 const difficulties = [-2,0,2,5,8,11,15];
                 let statreq = statbase - difficulties[final_test_level];
                 let succ = 0;
-                let bumped = 0;
                 if (modi_open) {
                     let vals_sc = vals_s.concat();
                     while ( skill_remaining > 0 ) {
-                        if (vals_sc[0] == vals_sc[1]) {
+                        if (vals_sc[0] > vals_sc[1]) {
                             vals_sc[0] -= 1;
-                            bumped = 1;
+                            dice_style[0] = 1;
                         } else {
                             vals_sc[1] -= 1;
-                            if (bumped) {
-                                dice_style[0] = 1;
-                            }
                         }
                         skill_remaining -= 1;
                     }
-                    dice_style[1] = 0;
                     vals_sc[1] = vals_sc[1] < 1 ? 1 : vals_sc[1];
                     succ = statreq - vals_sc[1];
+                    if( succ>=0 ) {
+                        dice_style[1] = 0;
+                    } else {
+                        dice_style[1] = 2;
+                    }
                 } else {
                     for (x=0; x<3; ++x) {
                         if(vals_s[x] <= statreq) {
@@ -1488,6 +1486,7 @@ statslist.forEach((attribute) => {
                         roll3: dice_unsort[2] ,
                         finaldifficulty: final_test_level,
                         successes : succ,
+                        open : modi_open,
                     }
                 );
             });
@@ -1499,8 +1498,8 @@ statslist.forEach((attribute) => {
 
 wsplist.forEach((wspolczyn) => {
     on(`clicked:test_${wspolczyn}`, (info) => {
-        let genitive = wsp2genitive[wspolczyn];
-        startRoll(`&{template:test-wsp} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{wsp-name=${genitive}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
+        let wsp_name = wsp2accusative[wspolczyn]
+        startRoll(`&{template:test} {{open=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{base_wsp_name=${wsp_name}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
             getAttrs(["final_test_level", "modi_battle", "modi_open", wspolczyn], function(values) {
                 let statbase = parseInt(values[wspolczyn]);
                 let modi_battle = (parseInt(values.modi_battle)||0);
@@ -1524,7 +1523,7 @@ wsplist.forEach((wspolczyn) => {
                 }
                 
                 // Constrain
-                final_test_level = final_test_level < 0 ? 0 : (final_test_level > 6 ? 6 : final_test_level);
+                final_test_level = final_test_level < 0 ? 0 : (final_test_level > 8 ? 8 : final_test_level);
 
                 // Successes and failures
                 
@@ -1535,7 +1534,11 @@ wsplist.forEach((wspolczyn) => {
                 let succ = 0;
                 if (modi_open) {
                     succ = statreq - vals_s[1];
-                    dice_style[1] = 0;
+                    if( succ>=0 ) {
+                        dice_style[1] = 0;
+                    } else {
+                        dice_style[1] = 2;
+                    }
                 } else {
                     for (x=0; x<3; ++x) {
                         if(vals_s[x] <= statreq) {
@@ -1568,6 +1571,7 @@ wsplist.forEach((wspolczyn) => {
                         roll3: dice_unsort[2] ,
                         finaldifficulty: final_test_level,
                         successes : succ,
+                        open: modi_open,
                     }
                 );
             });
@@ -1579,29 +1583,39 @@ wsplist.forEach((wspolczyn) => {
 /******************************************************************/</script><rolltemplate class="sheet-rolltemplate-test">
     <div class="sheet-template-container">
         <div class="sheet-results">
-        
+            <h1>
                 {{#rollTotal() computed::finaldifficulty 0}}
-                    <h1>Łatwy 
+                    Łatwy 
                 {{/rollTotal() computed::finaldifficulty 0}}
                 {{#rollTotal() computed::finaldifficulty 1}}
-                    <h1>Przeciętny
+                    Przeciętny
                 {{/rollTotal() computed::finaldifficulty 1}}
                 {{#rollTotal() computed::finaldifficulty 2}}
-                    <h1>Problematyczny
+                    Problematyczny
                 {{/rollTotal() computed::finaldifficulty 2}}
                 {{#rollTotal() computed::finaldifficulty 3}}
-                    <h1>Trudny
+                    Trudny
                 {{/rollTotal() computed::finaldifficulty 3}}
                 {{#rollTotal() computed::finaldifficulty 4}}
-                    <h1>Bardzo Trudny
+                    Bardzo Trudny
                 {{/rollTotal() computed::finaldifficulty 4}}
                 {{#rollTotal() computed::finaldifficulty 5}}
-                    <h1>Cholernie Trudny
+                    Cholernie Trudny
                 {{/rollTotal() computed::finaldifficulty 5}}
                 {{#rollTotal() computed::finaldifficulty 6}}
-                    <h1>Fartowny
+                    Fartowny
                 {{/rollTotal() computed::finaldifficulty 6}}
-            test {{skill-name}} na {{base_wsp_name}}</h1>
+                {{#rollTotal() computed::finaldifficulty 7}}
+                    Mistrzowski
+                {{/rollTotal() computed::finaldifficulty 7}}
+                {{#rollTotal() computed::finaldifficulty 8}}
+                    Arcymistrzowski
+                {{/rollTotal() computed::finaldifficulty 8}}
+            test
+            {{#rollTotal() computed::open 0}}zamknięty{{/rollTotal() computed::open 0}}
+            {{#rollTotal() computed::open 1}}otwarty{{/rollTotal() computed::open 1}}
+            {{skill-name}} na {{base_wsp_name}}
+        </h1>
 
             
             {{#rollTotal() computed::roll1 0}}<div style="background-color:rgba(0, 255, 0, 0.3);">{{/rollTotal() computed::roll1 0}}
@@ -1627,63 +1641,15 @@ wsplist.forEach((wspolczyn) => {
                 <h4>D3 = {{roll3}}</h4>
             </div>
 
-            <h4>Sukcesy = {{computed::successes}}</h4>
-        </div>
-    </div>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-test-wsp">
-    <div class="sheet-template-container">
-        <div class="sheet-results">
-        
-                {{#rollTotal() computed::finaldifficulty 0}}
-                    <h1>Łatwy 
-                {{/rollTotal() computed::finaldifficulty 0}}
-                {{#rollTotal() computed::finaldifficulty 1}}
-                    <h1>Przeciętny
-                {{/rollTotal() computed::finaldifficulty 1}}
-                {{#rollTotal() computed::finaldifficulty 2}}
-                    <h1>Problematyczny
-                {{/rollTotal() computed::finaldifficulty 2}}
-                {{#rollTotal() computed::finaldifficulty 3}}
-                    <h1>Trudny
-                {{/rollTotal() computed::finaldifficulty 3}}
-                {{#rollTotal() computed::finaldifficulty 4}}
-                    <h1>Bardzo Trudny
-                {{/rollTotal() computed::finaldifficulty 4}}
-                {{#rollTotal() computed::finaldifficulty 5}}
-                    <h1>Cholernie Trudny
-                {{/rollTotal() computed::finaldifficulty 5}}
-                {{#rollTotal() computed::finaldifficulty 6}}
-                    <h1>Fartowny
-                {{/rollTotal() computed::finaldifficulty 6}}
-            test {{wsp-name}}</h1>
-
-            
-            {{#rollTotal() computed::roll1 0}}<div style="background-color:rgba(0, 255, 0, 0.3);">{{/rollTotal() computed::roll1 0}}
-            {{#rollTotal() computed::roll1 1}}<div style="background-color:rgba(100, 30, 220, 0.4);">{{/rollTotal() computed::roll1 1}}
-            {{#rollTotal() computed::roll1 2}}<div style="background-color:rgba(255, 68, 0, 0.6);">{{/rollTotal() computed::roll1 2}}
-            {{#rollTotal() computed::roll1 3}}<div style="background-color: rgba(0, 0, 0, 0.4);">{{/rollTotal() computed::roll1 3}}
-                <h4>D1 = {{roll1}}</h4>
-            </div>
-
-            
-            {{#rollTotal() computed::roll2 0}}<div style="background-color:rgba(0, 255, 0, 0.3);">{{/rollTotal() computed::roll2 0}}
-            {{#rollTotal() computed::roll2 1}}<div style="background-color:rgba(100, 30, 220, 0.4);">{{/rollTotal() computed::roll2 1}}
-            {{#rollTotal() computed::roll2 2}}<div style="background-color:rgba(255, 68, 0, 0.6);">{{/rollTotal() computed::roll2 2}}
-            {{#rollTotal() computed::roll2 3}}<div style="background-color: rgba(0, 0, 0, 0.4);">{{/rollTotal() computed::roll2 3}}
-                <h4>D2 = {{roll2}}</h4>
-            </div>
-
-            
-            {{#rollTotal() computed::roll3 0}}<div style="background-color:rgba(0, 255, 0, 0.3);">{{/rollTotal() computed::roll3 0}}
-            {{#rollTotal() computed::roll3 1}}<div style="background-color:rgba(100, 30, 220, 0.4);">{{/rollTotal() computed::roll3 1}}
-            {{#rollTotal() computed::roll3 2}}<div style="background-color:rgba(255, 68, 0, 0.6);">{{/rollTotal() computed::roll3 2}}
-            {{#rollTotal() computed::roll3 3}}<div style="background-color: rgba(0, 0, 0, 0.4);">{{/rollTotal() computed::roll3 3}}
-                <h4>D3 = {{roll3}}</h4>
-            </div>
-
-            <h4>Sukcesy = {{computed::successes}}</h4>
+            <h4>
+                {{#rollTotal() computed::open 0}}
+                Zdany na kościach: {{computed::successes}}
+                {{/rollTotal() computed::open 0}}
+                {{#rollTotal() computed::open 1}}
+                Punktów przewagi: {{computed::successes}}
+                {{/rollTotal() computed::open 1}}
+                
+            </h4>
         </div>
     </div>
 </rolltemplate>
