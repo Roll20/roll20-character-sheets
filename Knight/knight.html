@@ -7782,7 +7782,7 @@ on('change:shamanNbreTotem', async () => {
 
 // GESTION DES ASPECTS ET CARACTERISTIQUES
 // Chair
-on('change:deplacement change:force change:endurance change:santeModif change:santeODBonus', async () => {
+on('change:deplacement change:force change:endurance change:santeModif change:santeODBonus sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'chair', 'deplacement', 'force', 'endurance', 'santeModif', 'santeODBonus']);
 
   const fiche = +attrs.fichePNJ;
@@ -7807,7 +7807,7 @@ on('change:deplacement change:force change:endurance change:santeModif change:sa
   await setAttrsAsync({ santepj_max: total });
 });
 // Bête
-on('change:fichePNJ change:armure change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns', async () => {
+on('change:fichePNJ change:armure change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'armure', 'bete', 'hargne', 'combat', 'instinct', 'calODHar', 'calODCom', 'calODIns']);
 
   const fiche = +attrs.fichePNJ;
@@ -7846,7 +7846,7 @@ on('change:fichePNJ change:armure change:hargne change:combat change:instinct ch
   await setAttrsAsync({ defense: total });
 });
 // Machine
-on('change:fichePNJ change:armure change:tir change:savoir change:technique change:calODTir change:calODSav change:calODTec', async () => {
+on('change:fichePNJ change:armure change:tir change:savoir change:technique change:calODTir change:calODSav change:calODTec sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'armure', 'machine', 'tir', 'savoir', 'technique', 'calODTir', 'calODSav', 'calODTec']);
 
   const fiche = +attrs.fichePNJ;
@@ -19519,6 +19519,10 @@ monkCeaRoll.forEach((button) => {
     let isConditionnelD = false;
     let isConditionnelV = false;
 
+    const attaquesSurprises = [];
+    const attaquesSurprisesValue = [];
+    let attaquesSurprisesCondition = '';
+
     const mod = +attrs.jetModifDes;
     const hasBonus = +attrs.bonusCarac;
 
@@ -19544,12 +19548,9 @@ monkCeaRoll.forEach((button) => {
     let OD = 0;
 
     let ODMALBarbarian = [];
+    let ODMALRogue = [];
     let ODMALShaman = [];
     const ODMALWarrior = [];
-
-    let attaquesSurprises = [];
-    let attaquesSurprisesValue = [];
-    let attaquesSurprisesCondition = '';
 
     let capaDgts = 0;
     let capaViolence = 0;
@@ -19577,7 +19578,7 @@ monkCeaRoll.forEach((button) => {
     let isMeurtrier = false;
     let isUltraviolence = false;
 
-    const autresEffets = [];
+    let autresEffets = [];
 
     exec.push(roll);
     exec.push('{{OD=true}}');
@@ -19630,26 +19631,20 @@ monkCeaRoll.forEach((button) => {
       if (hasArmure) { OD += C4OD; }
     }
 
-    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
-
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
 
     diceDegats += Number(MALBonus.diceDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // GESTION DES EFFETS DES DIFFERENTES ATTAQUES
 
@@ -19835,6 +19830,7 @@ monkCeaRoll.forEach((button) => {
     bonus = bonus.concat(OD);
 
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODMALWarrior);
 
@@ -20059,6 +20055,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let isConditionnelD = true;
   let isConditionnelV = true;
 
+  const attaquesSurprises = [];
+  const attaquesSurprisesValue = [];
+  let attaquesSurprisesCondition = '';
+
   const PG50_3 = attrs.ranger50PG3;
   const PG50_2 = attrs.ranger50PG2;
   const PG100 = attrs.ranger100PG;
@@ -20071,16 +20071,12 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let violence = [];
   const bonusViolence = [];
 
-  let attaquesSurprises = [];
-  let attaquesSurprisesValue = [];
-  let attaquesSurprisesCondition = '';
-
   const devaste = +attrs.devasterAnatheme;
   const bourreau = +attrs.bourreauTenebres;
   const equilibre = +attrs.equilibreBalance;
 
   const portee = attrs.rangerArmePortee;
-  const autresEffets = [];
+  let autresEffets = [];
   const autresAmeliorations = [];
   const autresSpecial = [];
 
@@ -20150,6 +20146,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let OD = 0;
 
   const ODMALWarrior = [];
+  let ODMALRogue = [];
   let ODMALShaman = [];
   let ODMALBarbarian = [];
 
@@ -20265,11 +20262,23 @@ on('clicked:distanceRangerLongbow', async (info) => {
   }
 
   if (eSilencieux !== '0') {
+    const MALghost = +attrs.MALRogueGhost;
+    const MALchangeling = +attrs.MALBardChangeling;
     const totalSilencieux = vDiscretion + oDiscretion;
 
-    attaquesSurprises.push(i18n_silencieux);
-    attaquesSurprisesValue.push(totalSilencieux);
-    attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`;
+    if (MALghost !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bonusDegats.push(totalSilencieux);
+    } else if (MALchangeling !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bonusDegats.push(totalSilencieux);
+    } else {
+      isConditionnelD = true;
+      attaquesSurprises.push(i18n_silencieux);
+      attaquesSurprisesValue.push(totalSilencieux);
+
+      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+    }
 
     energieDepense += E1;
   }
@@ -20464,12 +20473,23 @@ on('clicked:distanceRangerLongbow', async (info) => {
 
   if (aMSubsoniques !== '0') {
     if (eSilencieux !== '0') { autresAmeliorations.push(i18n_munitionsSubsoniques); } else if (eSilencieux === '0') {
+      const MALghost = +attrs.MALRogueGhost;
+      const MALchangeling = +attrs.MALBardChangeling;
       const totalSubsonique = vDiscretion + oDiscretion;
 
-      attaquesSurprises.push(i18n_munitionsSubsoniques);
-      attaquesSurprisesValue.push(totalSubsonique);
+      if (MALghost !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bonusDegats.push(totalSubsonique);
+      } else if (MALchangeling !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bonusDegats.push(totalSubsonique);
+      } else {
+        isConditionnelD = true;
+        attaquesSurprises.push(i18n_munitionsSubsoniques);
+        attaquesSurprisesValue.push(totalSubsonique);
 
-      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+        if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      }
     }
   }
 
@@ -20517,26 +20537,20 @@ on('clicked:distanceRangerLongbow', async (info) => {
   }
   // FIN DE GESTION DES BONUS SPECIAUX
 
-  const MALBonus = getMALBonus(attrs, armureL, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = getMALBonus(attrs, armureL, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
-
-  if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-  if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-  attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-  attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-  if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
 
   diceDegats += Number(MALBonus.diceDegats);
   diceViolence += Number(MALBonus.diceViolence);
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
   ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+  autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -20660,6 +20674,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
   bonus.push(OD);
 
   bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALRogue);
   bonus = bonus.concat(ODMALShaman);
   bonus = bonus.concat(ODMALWarrior);
 
@@ -23008,7 +23023,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
   const armureL = attrs.armureLegende;
 
   let exec = [];
-  let isConditionnel = false;
+  let autresEffets = [];
 
   const typeAttaque = attrs.wizardBTypeAttaque;
 
@@ -23046,6 +23061,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
   const equilibre = +attrs.equilibreBalance;
 
   let ODMALBarbarian = [];
+  let ODMALRogue = [];
   const ODMALWarrior = [];
   let ODMALShaman = [];
 
@@ -23101,16 +23117,17 @@ on('clicked:distanceWizardBorealis', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
 
-  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
-
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
   ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+  autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -23214,6 +23231,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
   bonus.push(OD);
 
   bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALRogue);
   bonus = bonus.concat(ODMALWarrior);
   bonus = bonus.concat(ODMALShaman);
 
@@ -23240,8 +23258,6 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
     exec.push(`{{herauts=${herauts.join(' / ')}}}`);
   }
-
-  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
   // ROLL
   const finalRoll = await startRoll(exec.join(' '));
@@ -23296,6 +23312,7 @@ on('clicked:distanceWizardOriflamme', async (info) => {
     'equilibreBalance',
   ];
 
+  attributs = attributs.concat(listBase);
   attributs = attributs.concat(listArmureLegende);
 
   const attrs = await getAttrsAsync(attributs);
@@ -23306,6 +23323,7 @@ on('clicked:distanceWizardOriflamme', async (info) => {
   const autresEffets = [];
 
   let MALGoliath;
+  let MALChangeling;
   let MALGhost;
   let MALTypeSoldier;
   let MALTypeHunter;
@@ -23328,6 +23346,14 @@ on('clicked:distanceWizardOriflamme', async (info) => {
       MALGoliath = +attrs.MALBarbarianGoliath;
 
       if (MALGoliath !== 0) { exec.push(`{{MALGoliath=[[${MALGoliath}]]}}`); }
+      break;
+
+    case 'bard':
+      MALChangeling = +attrs.MALBardChangeling;
+
+      if (MALChangeling !== 0) {
+        exec.push(`{{MALspecial2=${i18n_changelingActive}}}`);
+      }
       break;
 
     case 'rogue':
@@ -23357,6 +23383,7 @@ on('clicked:distanceWizardOriflamme', async (info) => {
     default:
       MALGoliath = 0;
       MALGhost = '';
+      MALChangeling = '';
       MALTypeSoldier = '';
       MALTypeHunter = '';
       MALTypeHerald = '';
@@ -23442,6 +23469,7 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
   const autresEffets = [];
 
   let MALGoliath;
+  let MALChangeling;
   let MALGhost;
   let MALTypeSoldier;
   let MALTypeHunter;
@@ -23456,6 +23484,14 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
       MALGoliath = +attrs.MALBarbarianGoliath;
 
       if (MALGoliath !== 0) { exec.push(`{{MALGoliath=[[${MALGoliath}]]}}`); }
+      break;
+
+    case 'bard':
+      MALChangeling = +attrs.MALBardChangeling;
+
+      if (MALChangeling !== 0) {
+        exec.push(`{{MALspecial2=${i18n_changelingActive}}}`);
+      }
       break;
 
     case 'rogue':
@@ -23485,6 +23521,7 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
     default:
       MALGoliath = 0;
       MALGhost = '';
+      MALChangeling = '';
       MALTypeSoldier = '';
       MALTypeHunter = '';
       MALTypeHerald = '';

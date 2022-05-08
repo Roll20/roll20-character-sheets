@@ -843,7 +843,7 @@ on('change:shamanNbreTotem', async () => {
 
 // GESTION DES ASPECTS ET CARACTERISTIQUES
 // Chair
-on('change:deplacement change:force change:endurance change:santeModif change:santeODBonus', async () => {
+on('change:deplacement change:force change:endurance change:santeModif change:santeODBonus sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'chair', 'deplacement', 'force', 'endurance', 'santeModif', 'santeODBonus']);
 
   const fiche = +attrs.fichePNJ;
@@ -868,7 +868,7 @@ on('change:deplacement change:force change:endurance change:santeModif change:sa
   await setAttrsAsync({ santepj_max: total });
 });
 // Bête
-on('change:fichePNJ change:armure change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns', async () => {
+on('change:fichePNJ change:armure change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'armure', 'bete', 'hargne', 'combat', 'instinct', 'calODHar', 'calODCom', 'calODIns']);
 
   const fiche = +attrs.fichePNJ;
@@ -907,7 +907,7 @@ on('change:fichePNJ change:armure change:hargne change:combat change:instinct ch
   await setAttrsAsync({ defense: total });
 });
 // Machine
-on('change:fichePNJ change:armure change:tir change:savoir change:technique change:calODTir change:calODSav change:calODTec', async () => {
+on('change:fichePNJ change:armure change:tir change:savoir change:technique change:calODTir change:calODSav change:calODTec sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'armure', 'machine', 'tir', 'savoir', 'technique', 'calODTir', 'calODSav', 'calODTec']);
 
   const fiche = +attrs.fichePNJ;
