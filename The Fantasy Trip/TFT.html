@@ -1,154 +1,1717 @@
 <!DOCTYPE html>
 
-<div>
-	<button type="action" name="act_character" >Character</button>
-	<button type="action" name="act_journal" >Journal</button>
-</div>
-<input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab'  value='character'  />
-
+<input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab'  value='character'/>
 <div class='sheet-character'>
-	<h2>Character</h2>
-	<span><div class="block">
-		<label>Name:</label>
-		<input type=text  style='width: 30em;' name="attr_cname"/>
+	<button type="action" class=sheet-stub-tab>CharacterJournal</button>
+	<div class=sheet-tabrow>
+		<button type="action" class=sheet-selected-tab name="act_character">Character</button>
+		<button type="action" class=sheet-unselected-tab name="act_journal">Journal</button>
 	</div>
+	<div class="sheet-grid-section">
+		<div class="sheet-namelvl sheet-block">
+			<div class=sheet-label>
+				<div> <!-- Always break -->
+					<span class=sheet-first-word>Name</span>
+					<input type=text style='width: 22em;' name="attr_cname"/>
+					<span class=sheet-nowrap>
+						&nbsp;Age <input type=text style='width: 3em;'name="attr_age"/>
+					</span>
+				</div>
+				<span class=sheet-nowrap>
+					&nbsp;Title/Rank <input type=text style='width: 7em;' name="attr_title"/>
+				</span>
+				<span class=sheet-nowrap>
+					&nbsp;Race <input type=text style='width: 8em;'name="attr_race"/>
+				</span>
+				<span class=sheet-nowrap>
+					&nbsp;Gender <input type=text style='width: 5em;' name="attr_gender"/>
+				</span>
+			</div>
+		</div>
+		<div class="sheet-stats sheet-block">
+			<div> <!-- To prevent them from vertically spreading out -->
+				<div class=sheet-flex-centered>
+					<span>
+						<span  title="Base Strength">
+							<span class=sheet-stat-label>ST</span>
+							<input class=sheet-tiny-input type=text name="attr_ST_max" value="8"/>
+						</span>
+						<span class=sheet-stat-plus>+</span>
+						<input class=sheet-small-input type=number title="Temporary adjustment to Strength, not counting Wounds or Fatigue." name="attr_ST_adj" value="0"/>
+						<span class=sheet-stat-equals>=</span>
+						<span class=sheet-computed-value title="Final Strength.  Base plus Adjustments, not counting Wounds or Fatigue." name="attr_ST"/>
+					</span>
+					<span>
+						<button class=sheet-dice-button type="action" title="3d6 Strength Check" name="act_st_check3">3</button>
+						<button class=sheet-dice-button type="action" title="4d6 Strength Check" name="act_st_check4">4</button>
+					</span>
+				</div>
+				<div class=sheet-flex-centered>
+					<span>
+						<span title="Base Dexterity">
+							<span class=sheet-stat-label>DX</span>
+							<input class=sheet-tiny-input type=text name="attr_DX_max" value="8"/>
+						</span>
+						<span class=sheet-stat-plus>+</span>
+						<input class=sheet-small-input type=number title="Temporary adjustment to Dexterity." name="attr_DX_adj" value="0"/>
+						<span class=sheet-stat-equals>=</span>
+						<span class=sheet-computed-value title="Final Dexterity.  Base plus Adjustments minus Armor Penalties." name="attr_DX"/>
+					</span>
+					<span>
+						<button class=sheet-dice-button type="action" title="3d6 Dexterity Check" name="act_dx_check3">3</button>
+						<button class=sheet-dice-button type="action" title="4d6 Strength Check" name="act_dx_check4">4</button>
+					</span>
+				</div>
+				<div class=sheet-flex-centered>
+					<span>
+						<span title="Base IQ">
+							<span class=sheet-stat-label >IQ</span>
+							<input class=sheet-tiny-input type=text name="attr_IQ_max" value="8"/>
+						</span>
+						<span class=sheet-stat-plus>+</span>
+						<input class=sheet-small-input type=number title="Temporary adjustment to IQ." name="attr_IQ_adj" value="0"/>
+						<span class=sheet-stat-equals>=</span>
+						<span class=sheet-computed-value title="Final IQ.  Base plus Adjustments." name="attr_IQ"/>
+					</span>
+					<span>
+						<button class=sheet-dice-button type="action" title="3d6 IQ Check" name="act_iq_check3">3</button>
+						<button class=sheet-dice-button type="action" title="4d6 IQ Check" name="act_iq_check4">4</button>
+					</span>
+				</div>
+				<div class=sheet-flex-centered>
+					<span>
+						<span title="Movement Allowance.">
+							<span class=sheet-stat-label>MA</span>
+							<input class=sheet-tiny-input type=text name="attr_MA_max" value="10"/>
+						</span>
+						<span class=sheet-stat-plus>+</span>
+						<input class=sheet-small-input type=number title="Temporary adjustment to Movement Allowance, excluding caused by weight." name="attr_MA_adj" value="0"/>
+						<span class=sheet-stat-equals>=</span>
+						<span class=sheet-computed-value title="Final Movement Allowance.  Base plus Adjustments." name="attr_MA"/>
+					</span>
+					<span>
+						<span title="Total weight carried.">
+							<span class=sheet-label>Carry</span>
+							<span class=sheet-computed-value name="attr_weightcarried"></span>
+						</span>
+					</span>
+				</div>
+				<div class=sheet-flex-centered>
+					<span>&nbsp;</span>
+					<span class='sheet-label sheet-nowrap' title="Weight penalties, automatically applied." name="attr_mapenalty"></span>
+				</div>
+				<div class=sheet-flex-centered>
+					<span>
+						<span title="Max Staff Mana.">
+							<span class=sheet-stat-label>Mana</span>
+							<input class=sheet-tiny-input type=text name="attr_mana_max" value="0"/>
+						</span>
+						<span class=sheet-stat-plus title="How much Mana spent.">-</span>
+						<input class=sheet-small-input title="How much Mana spent." type=number name="attr_mana_adj" value="0"/>
+						<span class=sheet-stat-equals>=</span>
+						<span class=sheet-computed-value title="Remaining Mana." type=number name="attr_mana"></span>
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="sheet-combat sheet-block">
+			<div> <!-- stops from stretching -->
+				<div class=sheet-flex-centered style='margin-bottom: .5rem'>
+					<button class=sheet-dice-button type="action" title="Add yourself to Turn Order, select your Token first." name="act_turnorder">Turn Order</button>
+					<span>
+						<button class=sheet-dice-button type="action" title="Roll team Initiative." name="act_initiative">Initiative</button>
+						<input class=sheet-onechar-input type=text title="Bonus to Initiative, as for Tactics or Strategist." name="attr_initiative_adj"/>
+					</span>
 
-	<br>
-
-	<div class="block">
-		<label>Attributes</label>
-		<b>ST</b>
-		<input type=number width=5 style='width: 5em;' name="attr_ST_max" value="8"/>
-		<b>Adj</b>
-		<input type=number width=5 style='width: 5em;' name="attr_ST" value="8"/>
-		<button type=roll value="/roll 3d6"></button>
-		<b>Fatigue</b>
-		<input type=number width=5 style='width: 5em;' name="attr_Fatigue" value="0"/>
-		<b>Hits</b>
-		<input type=number width=5 style='width: 5em;' name="attr_Hits" value="0"/>
-	</div>
-
-	<br>
-
-	<div class="block">
-		<b>DX</b>
-		<input type=number width=5 style='width: 5em;' name="attr_DX_max" value="8"/>
-		<b>Adj</b>
-		<input type=number width=5 style='width: 5em;' name="attr_DX" value="8"/>
-		<button type=roll value="/roll 3d6"></button>
-	</div>
-
-	<br>
-
-	<div class="block">
-		<b>IQ</b>
-		<input type=number width=5 style='width: 5em;' name="attr_IQ_max" value="8"/>
-		<b>Adj</b>
-		<input type=number width=5 style='width: 5em;' name="attr_IQ" value="8"/>
-		<button type=roll value="/roll 3d6"></button>
-	</div>
-
-	<br>
-
-	<div class="block">
-		<b>MA</b>
-		<input type=number width=5 style='width: 5em;' name="attr_MA_max" value="10"/>
-		<b>Adj</b>
-		<input type=number width=5 style='width: 5em;' name="attr_MA" value="10"/>
-	</div>
-
-	<br>
-
-	<div class="block">
-		<label>Weapons</label>
-		<b style='display: inline-block; width: 10em;'>Name</b>
-		<b style='display: inline-block; width: 5em;'>Damage</b>
-		<b style='display: inline-block; width: 10em;'>Notes</b>
-		<br>
-		<fieldset class=repeating_weapons>
-			<input type=text name=attr_weaponname style='width: 10em;'>
-			<input type=text name=attr_weapondamage value="1d6" style='width: 5em;'>
-			<input type=text name=attr_weaponnotes style='width: 30em;'>
-			<button type=roll value="@{character_name} Attacks with their @{weaponname}! Roll [[3d6]] vs [[@{DX}]]; Damage [[@{weapondamage}]]"></button>
-		</fieldset>
-	</div>
-
-	<br>
-
-	<div class="block">
-		<label>Armor and Shields</label>
-		<b style='display: inline-block; width: 10em;'>Name</b>
-		<b style='display: inline-block; width: 10em;'>Hits Blocked</b>
-		<b style='display: inline-block; width: 10em;'>Notes</b>
-		<br>
-		<fieldset class=repeating_armor>
-			<input type=text name=attr_defensename value="" style='width: 10em;'>
-			<input type=text name=attr_hitsblocked value="0" style='width: 10em;'>
-			<input type=text name=attr_defensenotes style='width: 30em;'>
-			</fieldset>
-	</div>
-	<div class="block">
-		<b style='display: inline-block; width: 5em;'>Total Hits Blocked </b>
-		<input type=text name=attr_totalblock value="0" />
-
-	<br><br>
-
-	<div class="block">
-		<label>Spells</label>
-		<b style='display: inline-block; width: 10em;'>Name</b>
-		<b style='display: inline-block; width: 5em;'>Damage</b>
-		<b style='display: inline-block; width: 10em;'>Notes</b>
-		<br>
-		<fieldset class=repeating_spells>
-			<input type=text name=attr_spellname style='width: 10em;'>
-			<input type=text name=attr_spelldamage style='width: 5em;'>
-			<input type=text name=attr_spellnotes style='width: 30em;'>
-			<button type=roll value="@{character_name} casts @{spellname}! Roll [[3d6]] vs [[@{DX}]]; Damage [[@{spelldamage}]]"></button>
-		</fieldset>
-	</div>
-		<br><br>
-			
-	<div class="block">
-			<label>Talents</label>
-			<b style='display: inline-block; width: 10em;'>Name</b>
-			<b style='display: inline-block; width: 5em;'>Cost</b>
-			<b style='display: inline-block; width: 5em;'>IQ Req</b>
-			<br>
-			<fieldset class=repeating_talents>
-				<input type=text name=attr_talentname style='width: 10em;'>
-				<input type=text name=attr_talentcost value="0" style='width: 5em;'>
-				<input type=text name=attr_talentiq value="8" style='width: 5em;'>
-				<button type=roll value="@{character_name} uses @{talentname}! Roll [[3d6]]"></button>
+				</div>
+				<div class=sheet-flex-centered>
+					<span title="Wounded ST, current Strength reduced by Wounds and Fatigue.">
+						<span class='sheet-label sheet-first-word' style='width: 5rem'>Health </span>
+						<span class=sheet-computed-value name="attr_stcurrent"/>
+					</span>
+					<span>
+						<button class=sheet-dice-button type="action" title="3d6 Health Check" name="act_health_check3">3</button>
+						<button class=sheet-dice-button type="action" title="4d6 Health Check" name="act_health_check4">4</button>
+					</span>
+				</div>
+				<div class=sheet-flex-centered>
+					<span title="Damage done to your Health, must be healed.">
+						<span class=sheet-label style='width: 5rem;'>Wounds </span>
+						<input type=number class=sheet-small-input name="attr_Hits" value="0"/>
+					</span>
+				</div>
+				<div class=sheet-flex-centered>
+					<span title="Temporary damage done to your Health as for spellcasting.">
+						<span class=sheet-label style='width: 5rem'>Fatigue </span>
+						<input type=number class=sheet-small-input name="attr_Fatigue" value="0"/>
+					</span>
+					<button class=sheet-dice-button type="action" title="Reaction to attacker initiating Hand to Hand Combat." style='width: 4.6rem' name="act_hthreaction">HTH</button>
+				</div>
+				<div class=sheet-flex-centered>
+					<span title="Subtract from enemy DX when attacking you.">
+						<span class=sheet-label style='width: 8rem' >Minus to Hit </span>
+						<span class=sheet-computed-value name="attr_minustohit"/>
+					</span>
+					<button class=sheet-dice-button type="action" title="Shield Rush Save vs equal or stronger (unwounded strength) rusher." style='width: 4.6rem' name="act_shieldrushstronger">SRS</button>
+				</div>
+				<div class=sheet-flex-centered>
+					<span title="Hits blocked per attack by your armor/shields/abilities.">
+						<span class=sheet-label style='width: 8rem'>Hits Blocked</span>
+						<span class=sheet-computed-value name="attr_totalblock"/>
+					</span>
+					<button class=sheet-dice-button type="action" title="Shield Rush Save vs weaker (unwounded strength) rusher." style='width: 4.6rem' name="act_shieldrushweaker">SRW</button>
+				</div>
+			</div>
+		</div>
+		<div class="sheet-talents sheet-block">
+			<div> <!-- to keep it all together, not spread out vertically -->
+				<div class='sheet-fieldset-header sheet-flex-section' style='line-height: 3rem;'>
+					<span class='sheet-first-word sheet-flex'>Talent</span>
+					<span title="IQ available to buy new Talents or Spells." class=sheet-nowrap>
+						<span>Available IQ</span>
+						<span class=sheet-computed-value name="attr_iqunspent"/>
+					</span>
+				</div>
+				<fieldset class=repeating_talents>
+					<div class=sheet-flex-section>
+						<input type=text name=attr_talentname class=sheet-flex placeholder="Talent Name">
+						&nbsp;
+						<button class="sheet-describe-button" title="Describe the talent." type="action" name="act_describe"/>
+						<button class="sheet-expand-button" title="Expand and edit more fields." type="action" name="act_expand"/>
+					</div>
+					<input type="checkbox" name="attr_options-flag" hidden class="sheet-toggle">
+					<div class="sheet-toggle-checked" style='margin-left: 1em; width: 90%'>
+						<div>
+							<span class=sheet-nowrap>
+								<span title="IQ points you spent, if any, for this talent. Subtracts from Available IQ.">IQ Spent: </span>
+								<input type=text class=sheet-tiny-input name="attr_talentcost">
+							</span>
+							&nbsp;
+							<span class=sheet-nowrap>
+								<span title="XP you spent, if any, for this talent. Subtracts from XP Available.">XP Spent: </span>
+								<input type=text class=sheet-small-input name="attr_expspent">
+							</span>
+						</div>
+						<div class=sheet-nowrap>
+							<span title="IQ required to use this talent.">IQ Required: </span>
+							<input type=text class=sheet-tiny-input name=attr_talentiq>
+						</div>
+						<span title="Description that shows when you click the Describe button.">Description:</span>
+						<textarea class=sheet-text-area spellcheck="false" name="attr_description"></textarea>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+		<div class="sheet-attack sheet-block">
+			<div class=sheet-flex-centered style='flex-flow: row wrap;'>
+				<span class="sheet-label sheet-first-word" title="Roll to attack with selected Weapon or cast selected Spell at different to hit DX adjustments.">Attack!</span>
+				<span class=sheet-nowrap>
+					<button class=sheet-attack-button title="Vs. Invisible or in total darkness/blind" type="action" name="act_attack-6">-6</button>
+					<button class=sheet-attack-button type="action" name="act_attack-5">-5</button>
+					<button class=sheet-attack-button title="Missile/Thrown against Prone behind cover or only head and shoulders visible, or vs. Flying" type="action" name="act_attack-4">-4</button>
+					<button class=sheet-attack-button title="Health at 3 or less" type="action" name="act_attack-3">-3</button>
+					<button class=sheet-attack-button title="Missile at 5+6 MH, Severely Wounded (-5 or more) last turn, standing on a body, vertical cover, melee from > half yard below" type="action" name="act_attack-2">-2</button>
+					<button class=sheet-attack-button title="Missile at 3+4 MH, Thrown per hex, Molotail per MH, or Projectile per 10 vertical feet" type="action" name="act_attack-1">-1</button>
+					<button class=sheet-attack-button type="action" name="act_attack0">0</button>
+					<button class=sheet-attack-button title="Missile per attackable extra hex of a multi hex creature" type="action" name="act_attack1">+1</button>
+					<button class=sheet-attack-button title="Melee/Thrown against Flank, or pole set against charger, Melee from > half yard above" type="action" name="act_attack2">+2</button>
+					<button class=sheet-attack-button type="action" name="act_attack3">+3</button>
+					<button class=sheet-attack-button title="Melee/Thrown against Rear, Prone, or in HTH" type="action" name="act_attack4">+4</button>
+					<button class=sheet-attack-button type="action" name="act_attack5">+5</button>
+					<button class=sheet-attack-button type="action" name="act_attack6">+6</button>
+				</span>
+				<button class=sheet-attack-button title="Automatic attack/cast success, use for HTH Reaction=6, bound victims, etc." type="action" name="act_attacka">A</button>
+				<span title="Roll 4d6, use vs. Defending/Dodging or Unskilled Attack, deselects after each attack">
+					<span class=sheet-label>4d6</span>
+					<input type=checkbox name=attr_defending>
+				</span>
+			</div>
+		</div>
+		<div class="sheet-weapons sheet-block">
+			<div class='sheet-fieldset-header sheet-flex-section'>
+				<span class=sheet-first-word style='position:absolute;'>Weapon</span>
+				<button class=sheet-select-button style='visibility:hidden' type="action"/>
+				<span class=sheet-first-word style='width: 13rem; visibility:hidden'>Weapon</span>
+				<span style='width: 6rem;' title="Damage per attack, e.g. 1d6+1" >Damage</span>
+				<span style='width: 4rem;' title="DX adjustment to hit an enemy, automatically applied.">To Hit</span>
+				<span class=sheet-flex>Notes</span>
+				<span style='width: 5rem;' title="Current projectile or weapon count.">Count</span>
+				<span style='width: 4rem;' title="Weapon or projectile weight per item.">Lbs</span>
+				<span style='position: relative;' title="Not carried, won't count as weight.">
+					<span style='position: absolute;'>NC</span>
+					<input type="checkbox" class=sheet-flex-checkbox style='visibility:hidden;'>
+				</span>
+				&nbsp;
+				<button class=sheet-describe-button style='visibility:hidden' type="action"/>
+				<button class=sheet-expand-button style='visibility:hidden' type="action"/>
+			</div>
+			<fieldset class=repeating_weapons>
+				<div class=sheet-flex-section>
+					<input type="checkbox" class="sheet-select-radio" name="attr_selection-flag" hidden>
+					<button type="action" class=sheet-select-button title="Select this Weapon for Attack!" name="act_select"/>
+					<input type=text name=attr_weaponname style='width: 13rem;' placeholder="Weapon Name">
+					<input type=text name=attr_weapondamage style='width: 6rem;'>
+					<input type=text name=attr_tohit style='width: 4rem;'>
+					<input type=text name=attr_weaponnotes class=sheet-flex>
+					<input type=number name=attr_count value="1" style='width: 5rem;'>
+					<input type=text name=attr_weight style='width: 4rem;'>
+					<input type="checkbox" name="attr_notcarried" value="1" class=sheet-flex-checkbox>
+					&nbsp;
+					<button class=sheet-describe-button title="Describe the weapon." type="action" name="act_describe"/>
+					<button class=sheet-expand-button title="Expand and edit more fields in the selected weapon." type="action" name="act_expand"/>
+				</div>
+				<input type="checkbox" name="attr_options-flag" class="sheet-toggle" hidden>
+				<div class="sheet-toggle-checked sheet-expanded">
+					<span title="Text shown following the character name when attacking, optional.">Attack Flavor Text:</span>
+					<input type=text name="attr_attackflavor" style='display: block; width:100%' placeholder="swings his mighty war axe.">
+					<span title="Text shown when the attack hits, optional.">Success Flavor Text:</span>
+					<input type=text name="attr_successflavor" style='display: block; width:100%' placeholder="The axe hits with a sickening crunch!">
+					<span title="Text shown when the attack misses, optional.">Failure Flavor Text:</span>
+					<input type=text name="attr_failureflavor" style='display: block; width:100%' placeholder="The axe swooshes air!">
+					<span title="Details about the weapon, quoted with the Describe button.">Description:</span>
+					<textarea class=sheet-text-area spellcheck="false" name="attr_description"></textarea>
+				</div>
 			</fieldset>
 		</div>
-
-	<br>
-	
-	<span class="sheet-spacer"></span>
-		
-		</span>
+		<div class="sheet-spells sheet-block">
+			<div class='sheet-fieldset-header sheet-flex-section'>
+				<span class=sheet-first-word style='position:absolute;'>Spell</span>
+				<button class=sheet-select-button style='visibility:hidden' type="action"/>
+				<span class=sheet-first-word style='width: 13rem; visibility:hidden'>Spell</span>
+				<span style='width: 6rem;' title="Damage done per spell, if any, e.g. 1d6+1">Damage</span>
+				<span style='width: 4rem;' title="DX adjustment to hit an enemy, automatic on Cast.">To Hit</span>
+				<span style='width: 7rem;' title="Strength cost when casting and after, e.g. 1 + 1/turn.">ST Cost</span>
+				<span style='width: 7rem;' title="Duration in turns, minutes, e.g. 10 turns.">Duration</span>
+				<span class=sheet-flex>Notes</span>
+				&nbsp;
+				<button class=sheet-describe-button style='visibility:hidden' type="action"/>
+				<button class=sheet-expand-button style='visibility:hidden' type="action"/>
+			</div>
+			<fieldset class=repeating_spells>
+				<div class=sheet-flex-section>
+					<input type="checkbox" class="sheet-select-radio" name="attr_selection-flag" hidden>
+					<button title="Select this Spell for casting." class=sheet-select-button type="action" name="act_select"/>
+					<input type=text name=attr_spellname style='width: 13rem;' placeholder="Spell Name">
+					<input type=text name=attr_spelldamage style='width: 6rem;'>
+					<input type=text name=attr_tohit style='width: 4rem;'>
+					<input type=text name=attr_stcost style='width: 7rem;'>
+					<input type=text name=attr_duration style='width: 7rem;'>
+					<input type=text name=attr_spellnotes class=sheet-flex>
+					&nbsp;
+					<button class=sheet-describe-button title="Describe the spell." type="action" name="act_describe"/>
+					<button class=sheet-expand-button title="Expand and edit more fields." type="action" name="act_expand"/>
+				</div>
+				<input type="checkbox" name="attr_options-flag" hidden class="sheet-toggle">
+				<div class="sheet-toggle-checked sheet-expanded">
+					<div>
+						<span>
+							<span title="IQ points you spent, if any, for this spell. Subtracts from Available IQ.">IQ Spent: </span>
+							<input type=text class=sheet-tiny-input name="attr_spellcost">
+						</span>
+						&nbsp;
+						<span>
+							<span title="XP you spent, if any, for this spell. Subtracts from XP Available.">XP Spent: </span>
+							<input type=text class=sheet-small-input name="attr_expspent">
+						</span>
+					</div>
+					<div>
+						<span title="IQ required to get and cast this Spell.">IQ Required: </span>
+						<input type=text class=sheet-tiny-input name=attr_iqrequired>
+					</div>
+					<div>
+						<span title="Text that displays when the spell succeeds, optional.">Success Flavor Text:</span>
+						<input type=text name="attr_successflavor" style='display: block; width:100%' placeholder="A giant wolf appears.">
+					</div>
+					<div>
+						<span title="Text that displays when the spell fails, optional.">Failure Flavor Text:</span>
+						<input type=text name="attr_failureflavor" style='display: block; width:100%' placeholder="A whisker falls to the ground.">
+					</div>
+					<div title="Description that shows when you click the Describe button.">Description:</div>
+					<textarea class=sheet-text-area spellcheck="false" name="attr_description"></textarea>
+				</div>
+			</fieldset>
+		</div>
+		<div class="sheet-armor sheet-block">
+			<div class='sheet-fieldset-header sheet-flex-section'>
+				<span class=sheet-first-word style='width: 13rem;' title="Put armor, shields, and Toughness here.">Armor/Shield</span>
+				<span style='width: 5rem;' title="Damage absorbed per attack.">Hits Blocked</span>
+				<span style='width: 5rem;' title="Subtracted from opponent's DX when they attack.">Minus to Hit</span>
+				<span style='width: 5rem;' title="Subtracted from your Dexterity.">DX Penalty</span>
+				<span class=sheet-flex>Notes</span>
+				<span style='width: 4rem;' title="Armor/shield weight.">Lbs</span>
+				<span style='position: relative;' title="Not carried, won't count towards Weight, Hits Blocked, Minus to Hit, or DX penalty.">
+					<span style='position: absolute;'>NC</span>
+					<input type="checkbox" class=sheet-flex-checkbox style='visibility:hidden;'>
+				</span>
+				&nbsp;
+				<button class=sheet-describe-button style='visibility:hidden' type="action"/>
+				<button class=sheet-expand-button style='visibility:hidden' type="action"/>
+			</div>
+			<fieldset class=repeating_armor>
+				<div class=sheet-flex-section>
+					<input type=text name=attr_defensename value="" style='width: 13rem;' placeholder="Armor/Shield Type">
+					<input type=text name=attr_hitsblocked value="0" style='width: 5rem;'>
+					<input type=text name=attr_minustohit value="0" style='width: 5rem;'>
+					<input type=text name=attr_dexpenalty value="0" style='width: 5rem;'>
+					<input type=text name=attr_defensenotes class=sheet-flex>
+					<input type=text name=attr_weight value="" style='width: 4rem;'>
+					<input type="checkbox" name="attr_notcarried" value="1" class=sheet-flex-checkbox>
+					&nbsp;
+					<button class=sheet-describe-button title="Describe the Armor/Shield." type="action" name="act_describe"/>
+					<button class=sheet-expand-button title="Expand and edit more fields." type="action" name="act_expand"/>
+				</div>
+				<input type="checkbox" name="attr_options-flag" hidden class="sheet-toggle">
+				<div class="sheet-toggle-checked sheet-expanded">
+					<div title="Description that shows when you click the Describe button.">Description:</div>
+					<textarea class=sheet-text-area spellcheck="false" name="attr_description"></textarea>
+				</div>
+			</fieldset>
+		</div>
+		<div class="sheet-equip sheet-block">
+			<div class='sheet-fieldset-header sheet-flex-section'>
+				<span class=sheet-first-word style='width: 13rem'>Equipment</span>
+				<span style='width: 8rem;'>Count</span>
+				<span class=sheet-flex>Notes</span>
+				<span style='width: 4rem;' title="Weight per item.">Lbs</span>
+				<span style='position: relative;' title="Not carried, won't count as weight.">
+					<span style='position: absolute;'>NC</span>
+					<input type="checkbox" class=sheet-flex-checkbox style='visibility:hidden;'>
+				</span>
+				&nbsp;
+				<button class=sheet-describe-button style='visibility:hidden' type="action"/>
+				<button class=sheet-expand-button style='visibility:hidden' type="action"/>
+			</div>
+			<fieldset class=repeating_equipment>
+				<div class=sheet-flex-section>
+					<input type=text name=attr_name style='width: 13rem;' placeholder="Equipment Name">
+					<input type=number name=attr_count value="1" style='width: 8rem;'>
+					<input type=text name=attr_notes class=sheet-flex>
+					<input type=text name=attr_weight value="" style='width: 4rem;'>
+					<input type=checkbox name=attr_notcarried value="1" class=sheet-flex-checkbox>
+					&nbsp;
+					<button class=sheet-describe-button title="Describe the Equipment." type="action" name="act_describe"/>
+					<button class=sheet-expand-button title="Expand and edit more fields." type="action" name="act_expand"/>
+				</div>
+				<input type="checkbox" name="attr_options-flag" hidden class="sheet-toggle">
+				<div class="sheet-toggle-checked sheet-expanded">
+					<div title="Description that shows when you click the Describe button.">Description:</div>
+					<textarea class=sheet-text-area spellcheck="false" name="attr_description"></textarea>
+				</div>
+			</fieldset>
+		</div>
+	</div>
 </div>
 <div class='sheet-journal'>
-	<h2>Journal</h2>
-	<span><span class="sheet-spacer"></span>
-			<h4 class="sheet-center">Other Spells and Talents</h4>
-			<textarea name="attr_spells" title="Spells"></textarea>
-
-		<br>
-
-		<span class="sheet-spacer"></span>
-			<h4 class="sheet-center">Inventory</h4>
-			<textarea name="attr_inventory" title="Inventory"></textarea>
+	<button type="action" class=sheet-stub-tab>CharacterJournal</button>
+	<div class=sheet-tabrow>
+		<button type="action" class=sheet-unselected-tab name="act_character">Character</button>
+		<button type="action" class=sheet-selected-tab name="act_journal">Journal</button>
+	</div>
+	<div class="sheet-grid-section-journal">
+		<div class="sheet-pointhistory sheet-block">
+			<label>Experience Points</label>
+			<span class=sheet-label>
+				<div style='margin-bottom: .5em'>
+					<span title="Total amount of Experience Points the character has ever gained.">
+						<span>Total XP</span>
+						<input type=number style='width: 6em;' name="attr_experiencetotal" value="0"/>
+					</span>
+					&nbsp
+					<span title="XP available to spend on new Attributes, Talents, or Spells.">Available XP <span class=sheet-computed-value name="attr_experienceunspent"/></span>
+					&nbsp
+					<span title="Total XP spent on Attributes, Talents, and Spells.">Spent XP <span class=sheet-computed-value name="attr_experiencespent"/></span>
+				</div>
+				<div style='margin-bottom: .5em'>
+					<span title="Sum of all Attributes.">
+						Attribute Point Total <span class=sheet-computed-value name="attr_totalattrpoints"/>
+					</span>
+					&nbsp
+					<span title="XP cost to get your next attribute point.">
+						Next Attribute Point Cost <span class=sheet-computed-value name="attr_nextattrcost"/> XP
+					</span>
+				</div>
 			</span>
-			<span class="sheet-spacer"></span>
-				<h4 class="sheet-center">Notes</h4>
-				<textarea name="attr_inventory" title="Inventory"></textarea>
-				</span>
-			</span> 
+			<br>
+			<div class='sheet-fieldset-header sheet-flex-section'>
+				<span style='width: 12rem;' title="Attribute points you bought with XP, to track available XP.">Attribute Acquired</span>
+				<span title='Experience Points you spent on this attribute' style='width: 8rem;'>XP Spent</span>
+				<span class=sheet-flex>Notes</span>
+			</div>
+			<fieldset class=repeating_exphistory>
+				<div class=sheet-flex-section>
+					<input type=text name=attr_expability style='width: 12rem;' placeholder='<Attribute name>'>
+					<input type=text name=attr_expspent style='width: 8rem;'>
+					<input type=text name=attr_expnotes class=sheet-flex>
+				</div>
+			</fieldset>
+		</div>
+		<div class="sheet-notes sheet-block">
+			<label>Notes</label>
+			<textarea class=sheet-text-area spellcheck="false" name="attr_inventory" title="Notes"></textarea>
+		</div>
+		</div>
+		<div class="sheet-otherspells sheet-block">
+			<label>Other Spells and Talents</label>
+			<textarea class=sheet-text-area spellcheck="false" name="attr_spells" title="Spells"></textarea>
+		</div>
+	</div>
 </div>
 
 
+<rolltemplate class="sheet-rolltemplate-stat-check">
+	<div class=container>
+		<div><h1>{{character_name}} makes {{stat_a}}
+			<span class=capitalize>{{stat_name}}</span>
+			check.
+		</h1></div>
+		<div class=arrow-container><div class=arrow-right></div></div>
+		<div>
+			<span class=template-dice>{{computed::roll1}}</span>
+			= {{roll1}} vs {{stat}}
+		</div>
+		<!-- Success! -->
+		{{#rollGreater() computed::success 0}}
+			{{#rollTotal() computed::success 3}}
+				<div class=success>Critical Success!</div>
+			{{/rollTotal() computed::success 3}}
+			{{#rollTotal() computed::success 2}}
+				<div class=success>Automatic Success!</div>
+			{{/rollTotal() computed::success 2}}
+			{{#rollTotal() computed::success 1}}
+				<div class=success>Success!</div>
+			{{/rollTotal() computed::success 1}}
+		{{/rollGreater() computed::success 0}}
+		<!-- Failure -->
+		{{#rollLess() computed::success 0}}
+			{{#rollTotal() computed::success -3}}
+				<div class=failure>Critical Failure!</div>
+			{{/rollTotal() computed::success -3}}
+			{{#rollTotal() computed::success -2}}
+				<div class=failure>Automatic Failure!</div>
+			{{/rollTotal() computed::success -2}}
+			{{#rollTotal() computed::success -1}}
+				<div class=failure>Failure!</div>
+			{{/rollTotal() computed::success -1}}
+		{{/rollLess() computed::success 0}}
+	</div>
+</rolltemplate>
+
+<!-- For an attack -->
+<rolltemplate class="sheet-rolltemplate-attack">
+	<div class=container>
+		<div><h1>
+			{{#attackflavor}}
+				{{character_name}} {{attackflavor}}
+			{{/attackflavor}}
+			{{^attackflavor}}
+				{{#weaponname}}
+					{{character_name}} attacks with {{pronoun}} <span class=capitalize>{{weaponname}}</span>!
+				{{/weaponname}}
+				{{^weaponname}}
+					{{character_name}} Attacks!</span>
+				{{/weaponname}}
+			{{/attackflavor}}
+		</h1></div>
+		{{#defending}}
+			<div><h2>Opponent is defending/dodging</h2></div>
+		{{/defending}}
+		{{^roll1}}
+			<div><h2>Automatic Hit</h2></div>
+		{{/roll1}}
+		<div class=arrow-container><div class="arrow-right"></div></div>
+		{{#roll1}}
+			<div>
+				<div>
+					<span class=template-dice>{{computed::roll1}}</span>
+					<span>= {{roll1}} vs </span>
+					{{#simpletohit}}
+						{{tohit}}
+					{{/simpletohit}}
+				</div>
+				{{^simpletohit}}
+					<div>
+						{{dx}}
+						{{#weaponadj}}
+						<span> + <span class=template-weaponadj>{{weaponadj}}</span></span>
+						{{/weaponadj}}
+						{{#tohitadj}}
+						<span> + {{tohitadj}}</span>
+						{{/tohitadj}}
+						<span> = {{tohit}}</span>
+					</div>
+				{{/simpletohit}}
+			</div>
+		{{/roll1}}
+		<!-- Success! -->
+		{{#rollGreater() computed::success 0}}
+			{{#successflavor}}
+				<div class=flavor-success>{{successflavor}}</div>
+			{{/successflavor}}
+			{{^successflavor}}
+				<div class=success>Hit!</div>
+			{{/successflavor}}
+			{{#rollTotal() computed::success 4}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}} &times 3 = {{computed::damage}}</div>
+				{{/damage}}
+				<div class=success>Critical: Triple Damage!</div>
+			{{/rollTotal() computed::success 4}}
+			{{#rollTotal() computed::success 3}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}} &times 2 = {{computed::damage}}</div>
+				{{/damage}}
+				<div class=success>Critical: Double Damage!</div>
+			{{/rollTotal() computed::success 3}}
+			{{#rollLess() computed::success 3}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+				{{/damage}}
+				{{#rollTotal() computed::success 2}}
+					<div class=success>Automatic hit.</div>
+				{{/rollTotal() computed::success 2}}
+			{{/rollLess() computed::success 3}}
+		{{/rollGreater() computed::success 0}}
+		<!-- Failure -->
+		{{#rollLess() computed::success 0}}
+			{{#failureflavor}}
+				<div class=flavor-failure>{{failureflavor}}</div>
+			{{/failureflavor}}
+			{{^failureflavor}}
+				<div class=failure>Miss!</div>
+			{{/failureflavor}}
+			{{#rollTotal() computed::success -4}}
+				<div class=failure>Critical: Weapon breaks or 1d6 damage!</div>
+			{{/rollTotal() computed::success -4}}
+			{{#rollTotal() computed::success -3}}
+				<div class=failure>Critical: Drops weapon or 1d6 damage!</div>
+			{{/rollTotal() computed::success -3}}
+			{{#rollTotal() computed::success -2}}
+				<div class=failure>Automatic miss.</div>
+			{{/rollTotal() computed::success -2}}
+		{{/rollLess() computed::success 0}}
+	</div>
+</rolltemplate>
+
+<!-- For casting a spell -->
+<rolltemplate class="sheet-rolltemplate-cast-spell">
+	<div class=container>
+		<div><h1>{{character_name}} casts <span class=capitalize>{{spellname}}</span>.</h1></div>
+		{{#defending}}
+			<div><h2>Opponent is defending/dodging</h2></div>
+		{{/defending}}
+		{{^roll1}}
+			<div><h2>Automatic Success</h2></div>
+		{{/roll1}}
+		<div class=arrow-container><div class=arrow-right></div></div>
+		{{#roll1}}
+			<div>
+				<div>
+					<span class=template-dice>{{computed::roll1}}</span>
+					<span>= {{roll1}} vs </span>
+					{{#simpletohit}}
+						{{tohit}}
+					{{/simpletohit}}
+				</div>
+				{{^simpletohit}}
+					<div>
+						{{dx}}
+						{{#spelladj}}
+						<span> + <span class=template-weaponadj>{{spelladj}}</span></span>
+						{{/spelladj}}
+						{{#tohitadj}}
+						<span> + {{tohitadj}}</span>
+						{{/tohitadj}}
+						<span> = {{tohit}}</span>
+					</div>
+				{{/simpletohit}}
+			</div>
+		{{/roll1}}
+		<!-- Success -->
+		{{#rollGreater() computed::success 0}}
+			{{#successflavor}}
+				<div class=flavor-success>{{successflavor}}</div>
+			{{/successflavor}}
+			{{^successflavor}}
+				<div class=success>Success!</div>
+			{{/successflavor}}
+			{{#rollTotal() computed::success 4}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}} &times 3 = {{computed::damage}}</div>
+				{{/damage}}
+				<div class=success>Critical: Triple Damage or Effect!</div>
+			{{/rollTotal() computed::success 4}}
+			{{#rollTotal() computed::success 3}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}} &times 2 = {{computed::damage}}</div>
+				{{/damage}}
+				<div class=success>Critical: Double Damage or Effect!</div>
+			{{/rollTotal() computed::success 3}}
+			{{#rollLess() computed::success 3}}
+				{{#damage}}
+					<div class=keyvalue><span>Damage: </span>{{damage}}</div>
+				{{/damage}}
+				{{#rollTotal() computed::success 2}}
+					<div class=success>Automatic success.</div>
+				{{/rollTotal() computed::success 2}}
+			{{/rollLess() computed::success 3}}
+		{{/rollGreater() computed::success 0}}
+		<!-- Failure -->
+		{{#rollLess() computed::success 0}}
+			{{#failureflavor}}
+				<div class=flavor-failure>{{failureflavor}}</div>
+			{{/failureflavor}}
+			{{^failureflavor}}
+				<div class=failure>Failure!</div>
+			{{/failureflavor}}
+			{{#rollTotal() computed::success -4}}
+				<div class=failure>Critical: Staff breaks!</div>
+			{{/rollTotal() computed::success -4}}
+			{{#rollTotal() computed::success -3}}
+				<div class=failure>Critical: Lose ST, drop staff!</div>
+			{{/rollTotal() computed::success -3}}
+			{{#rollTotal() computed::success -2}}
+				<div class=failure>Automatic fail.</div>
+			{{/rollTotal() computed::success -2}}
+		{{/rollLess() computed::success 0}}
+	</div>
+</rolltemplate>
+
+<!-- For Initiative order -->
+<rolltemplate class="sheet-rolltemplate-initiative">
+	<div class=container>
+		<div><h1>
+			{{character_name}} takes initiative!
+		</h1></div>
+		<div class=arrow-container><div class=arrow-right></div></div>
+		<div>
+			<div>
+				{{#initiativeadj}}
+					<span class=template-dice>{{computed::roll1}}</span> + {{initiativeadj}} = {{roll1}}
+				{{/initiativeadj}}
+				{{^initiativeadj}}
+					<span class=template-dice>{{computed::roll1}}</span> = {{roll1}}
+				{{/initiativeadj}}
+			</div>
+		</div>
+	</div>
+</rolltemplate>
+
+<!-- For turn order -->
+<rolltemplate class="sheet-rolltemplate-turnorder">
+	<div class=container>
+		<div><h1>
+			{{character_name}}'s Turn Order
+		</h1></div>
+		<div class=arrow-container><div class=arrow-right></div></div>
+		<div class=keyvalue>
+			<span>Dexterity: </span><span>{{turnorder}}</span>
+		</div>
+	</div>
+</rolltemplate>
+
+<!-- Shield Rush -->
+<rolltemplate class="sheet-rolltemplate-shield-rush">
+	<div class=container>
+		<div><h1>{{character_name}} makes a Shield Rush save.</h1></div>
+		{{#weaker}}
+			<div><h2>Rusher is weaker</h2></div>
+		{{/weaker}}
+		{{^weaker}}
+			<div><h2>Rusher is equal or stronger</h2></div>
+		{{/weaker}}
+		<div class=arrow-container><div class=arrow-right></div></div>
+		<div>
+			<span class=template-dice>{{computed::roll1}}</span>
+			= {{roll1}} vs {{stat}}
+		</div>
+		<!-- Success! -->
+		{{#rollGreater() computed::success 0}}
+			<div class=success>Remains standing!<div>
+		{{/rollGreater() computed::success 0}}
+		<!-- Failure -->
+		{{#rollLess() computed::success 0}}
+			<div class=failure>Falls prone!<div>
+			{{#rollTotal() computed::success -2}}
+				<div class=failure>Automatic Failure.</div>
+			{{/rollTotal() computed::success -2}}
+		{{/rollLess() computed::success 0}}
+	</div>
+</rolltemplate>
+
+<!-- HTH Reaction -->
+<rolltemplate class="sheet-rolltemplate-hth-reaction">
+	<div class=container>
+		<div><h1>{{character_name}} reacts to Hand to Hand Combat.</h1></div>
+		<div class=arrow-container><div class=arrow-right></div></div>
+		<div>
+			<span class=template-dice>{{computed::roll1}}</span>
+		</div>
+		{{#rollBetween() roll1 1 2}}
+			<div class=description>
+				<div>Drops weapon and shield unless main-gouche or dagger.</div>
+				<div>Must fight bare handed this turn.</div>
+				<div>Drops prone with attacker.</div>
+			<div>
+		{{/rollBetween() roll1 1 2}}
+		{{#rollBetween() roll1 3 4}}
+			<div class=description>
+				<div>Drops weapon and shield unless main-gouche or dagger.</div>
+				<div>Readies dagger and can use it this turn.</div>
+				<div>Drops prone with attacker.</div>
+			<div>
+		{{/rollBetween() roll1 3 4}}
+		{{#rollTotal() roll1 5}}
+			<div class=description>
+				<div>Keeps weapon and shield!</div>
+				<div>Attacker backs up to adjacent hex in the direction they came from.</div>
+				<div>No Hand to Hand combat.</div>
+		{{/rollTotal() roll1 5}}
+		{{#rollTotal() roll1 6}}
+			<div class=description>
+				<div>Keeps weapon and shield!</div>
+				<div>Automatically hits the attacker RIGHT NOW.</div>
+				<div>Attacker backs up to adjacent hex in the direction they came from.</div>
+				<div>No Hand to Hand combat.</div>
+				<div class=keyvalue>
+					<span>Note: </span>
+					<span>
+						If attacked from behind or has no weapon and no unarmed-combat skill, re-roll this.
+					</span>
+				</div>
+			<div>
+		{{/rollTotal() roll1 6}}
+	</div>
+</rolltemplate>
+
+<!-- For Descriptions -->
+<rolltemplate class="sheet-rolltemplate-description">
+	<div class=container>
+		<div><h1>
+			<span class=capitalize>{{item_name}}</span>
+		</h1></div>
+		<div class=arrow-container><div class=arrow-right></div></div>
+		{{#stat0}}
+			<div class=keyvalue><span>{{name0}}: </span><span>{{stat0}}</span></div>
+		{{/stat0}}
+		{{#stat1}}
+			<div class=keyvalue><span>{{name1}}: </span><span>{{stat1}}</span></div>
+		{{/stat1}}
+		{{#stat2}}
+			<div class=keyvalue><span>{{name2}}: </span><span>{{stat2}}</span></div>
+		{{/stat2}}
+		{{#stat3}}
+			<div class=keyvalue><span>{{name3}}: </span><span>{{stat3}}</span></div>
+		{{/stat3}}
+		{{#stat4}}
+			<div class=keyvalue><span>{{name4}}: </span><span>{{stat4}}</span></div>
+		{{/stat4}}
+		{{#stat5}}
+			<div class=keyvalue><span>{{name5}}: </span>{{stat5}}</div>
+		{{/stat5}}
+			<div class=description><span>{{description}}</span></div>
+		</div>
+	</div>
+</rolltemplate>
+
 <script type="text/worker">
+
+	// just concats to make a property name.
+	const repeatingPropertyName = function(repName, id, itemName) {
+		return `repeating_${repName}_${id}_${itemName}`;
+	}
+
+	// Safe method to get a repeating property.
+	const getFloatProperty = function(v, repName, id, itemName) {
+		let property = repeatingPropertyName(repName, id, itemName);
+		let val = parseFloat(v[property]);
+		return isNaN(val) ? 0 : val;
+	}
+
+	// to compute the total we need the object,
+	// the ids, the repName, and various itemnames.
+	const computeRepeatingTotal = function(v, idarray, repName, weightName, countName, notCarriedName) {
+		 let total = 0
+		for(var i=0; i < idarray.length; i++) {
+			let id = idarray[i]
+			let value = getFloatProperty(v, repName, id, weightName);
+			if (countName) {
+				value *= getFloatProperty(v, repName, id, countName);
+			}
+			if (notCarriedName) {
+				let notCarried = getFloatProperty(v, repName, id, notCarriedName);
+				value *= (1.0 - notCarried);
+			}
+			total += value;
+		}
+		return total;
+	}
+
+	//e.g: "weapons" and "weaponwt"
+	// postcallback takes attrs, idarray, repName, weightName, countName, notCarriedName
+	const grabIds = function(idarray, repName, weightName, countName, notCarriedName, postcallback) {
+		let attrs = [];
+		for(var i=0; i < idarray.length; i++) {
+			let id = idarray[i];
+			attrs.push(repeatingPropertyName(repName, id, weightName));
+			if (countName) {
+				attrs.push(repeatingPropertyName(repName, id, countName));
+			}
+			if (notCarriedName) {
+				let propertyName = repeatingPropertyName(repName, id, notCarriedName);
+				attrs.push(propertyName);
+			}
+		}
+		getAttrs(attrs, function(v) {
+			postcallback(v, idarray, repName, weightName, countName, notCarriedName);
+		});
+	}
+
+	const diceArrayToString = function(rolls) {
+		let diceString = '';
+		if (rolls) {
+			for (i = 0; i < rolls.length; ++i) {
+				let roll = rolls[i];
+				if (roll == 1) diceString += 'a';
+				else if (roll == 2) diceString += 'b';
+				else if (roll == 3) diceString += 'c';
+				else if (roll == 4) diceString += 'd';
+				else if (roll == 5) diceString += 'e';
+				else diceString += 'f';
+				if (i < rolls.length -1)
+					diceString +=   '&#8239;' // '&thinsp;'
+			}
+		}
+		return diceString;
+	}
+
+	// do the roll check and compute the dice string.
+	const doRollWithDiceString = function(macro) {
+		const finishRollWithDiceString = function(rollId, rolls) {
+			let diceString = diceArrayToString(rolls);
+			finishRoll(
+				rollId,
+				{
+					roll1: diceString
+				}
+			);
+		}
+		macro += ' {{character_name=@{cname}}}';
+		startRoll(macro, (results) => {
+			if ('roll1' in results.results) {
+				finishRollWithDiceString(results.rollId, results.results.roll1.dice);
+			}
+			else {
+				finishRollWithDiceString(results.rollId);
+			}
+		});
+	}
+
+	// calls back on this selected weapon or fails.
+	// callback takes the id of the selected one, and all the ids.
+	// calls with all empty and null if nothing found.
+	const onSelectedWeaponOrSpell = function(callback) {
+		// find selected weapon, if any.
+		getSectionIDs("weapons", function(sectionIds) {
+			let selectedIds = [];
+			for (var i = 0; i < sectionIds.length; ++i) {
+				selectedIds.push(repeatingPropertyName('weapons', sectionIds[i], 'selection-flag'));
+			}
+			getAttrs(selectedIds, function(values) {
+				for (var i = 0; i < sectionIds.length; ++i) {
+					let id = sectionIds[i];
+					let selectedName  = repeatingPropertyName('weapons', id, 'selection-flag');
+					if (values[selectedName] == 'on') {
+						callback(id, sectionIds, 'weapon');
+						return;
+					}
+				}
+				// must be a spell, not a weapon.
+				getSectionIDs("spells", function(sectionIds) {
+					let selectedIds = [];
+					for (var i = 0; i < sectionIds.length; ++i) {
+						selectedIds.push(repeatingPropertyName('spells', sectionIds[i], 'selection-flag'));
+					}
+					getAttrs(selectedIds, function(values) {
+						for (var i = 0; i < sectionIds.length; ++i) {
+							let id = sectionIds[i];
+							let selectedName  = repeatingPropertyName('spells', id, 'selection-flag');
+							if (values[selectedName] == 'on') {
+								callback(id, sectionIds, 'spell');
+								return;
+							}
+						}
+						// Nothing was found, pass in empty for the type.
+						callback('', null, '');
+					});
+				});
+			});
+		});
+	}
+
+	// Describes an item, give it name, description attributes.
+	// and a linear array of [name, attribute, ..] pairs.
+	const describeItem = function(nameAttr, descriptionAttr, statArray) {
+		let macro = '&{template:description}'
+		+ ` {{item_name=@{${nameAttr}}}}`
+		+ ` {{description=@{${descriptionAttr}}}}`;
+
+		if (statArray) {
+			for (var i = 0; i*2 < statArray.length; ++i) {
+				let name = statArray[i*2];
+				let attr = statArray[i*2 + 1];
+				macro += ` {{name${i}=${name}}} {{stat${i}=@{${attr}}}}`;
+			}
+		}
+		startRoll(macro, (results) => {
+			finishRoll( results.rollId, {} );
+		});
+	}
+
+	// select this weapon or spell, id starts with repeating_[weapon][spell]
+	const selectWeaponOrSpell = function(id) {
+		// get them all, and de check any not me...
+		let selected = (id + "_selection-flag").toLowerCase();
+		getSectionIDs("weapons", function(weaponIds) {
+			getSectionIDs("spells", function(spellIds) {
+				getAttrs([selected], function(values) {
+					let oldValue = values[selected];
+					let newValue = (oldValue == 'on' ? 0 : 'on');
+					let valueMap = {};
+					// toggle this one, turn off the rest.
+					valueMap[selected]  = newValue;
+
+					// Radio button the rest.
+					if (newValue == 'on') {
+						for (var i = 0; i < weaponIds.length; ++i) {
+							let propertyName = repeatingPropertyName('weapons', weaponIds[i], 'selection-flag');
+							if (propertyName != selected) {
+								valueMap[propertyName] = 0;
+							}
+						}
+						for (var i = 0; i < spellIds.length; ++i) {
+							let propertyName = repeatingPropertyName('spells', spellIds[i], 'selection-flag');
+							if (propertyName != selected) {
+								valueMap[propertyName] = 0;
+							}
+						}
+					}
+					setAttrs(valueMap, {silent: true});
+				});
+			});
+		});
+	}
+
+	// Toggles the expansion of an item.  you need to give it repeating_X-Y for id.
+	const toggleItem = function(id) {
+		let optionsName = id + '_options-flag';
+		getAttrs([optionsName], function(v) {
+			let attrMap = {};
+			attrMap[optionsName] = v[optionsName] == 0 ? 'on' : 0;
+			setAttrs(attrMap, {silent: true});
+		});
+	}
+
+	// a const value, not an attribute, no @ in front.  Optionally as roll.
+	const rollTemplateValue = function(templateName, attrName, asRoll) {
+		return asRoll ? ` {{${templateName}=[[${attrName}]]}}` : ` {{${templateName}=${attrName}}}`;
+	}
+
+	// Return a template string if attrs contains attrName
+	const rollTemplateProperty = function(templateName, attrName, attrs, asRoll) {
+		if (asRoll) {
+			if ( !attrs || (attrs[attrName] != '' && attrs[attrName] != '0')) {
+				return rollTemplateValue(templateName, `@{${attrName}}`, true);
+			}
+		} else {
+			if (!attrs || (attrs[attrName] != '')) {
+				return rollTemplateValue(templateName, `@{${attrName}}`);
+			}
+		}
+		return '';
+	}
+
+	// Update Str
+	on('sheet:opened change:st_max change:st_adj', function() {
+		getAttrs(['st_max', 'st_adj'], function(v) {
+			let finalStr = (parseInt(v.st_max)||0) + (parseInt(v.st_adj)||0);
+			setAttrs({
+				st: finalStr
+			});
+		});
+	});
+
+	// Update IQ
+	on('sheet:opened change:iq_max change:iq_adj', function() {
+		getAttrs(['iq_max', 'iq_adj'], function(v) {
+			let finalIQ = (parseInt(v.iq_max)||0) + (parseInt(v.iq_adj)||0);
+			setAttrs({
+				iq: finalIQ
+			});
+		});
+	});
+
+
+	// Do a roll with stats.
+	const doSaveRoll = function(macro) {
+		// returns success level.  positive is success.
+		// negative is failure.
+		const successLevel = function(results) {
+			let roll = results.roll1.result;
+			let stat = results.stat.result;
+
+			// Check all the crits first.
+			if (results.roll1.dice.length == 3) {
+				// 3d6
+				if (roll < 5) return 3; // crit success
+				if (roll == 5) return 2; // auto success
+				if (roll > 16) return -3; // crit fail
+				if (roll == 16) return -2; // auto fail
+			}
+			else {
+				// 4d6
+				if (roll < 8) return -3;
+				if (roll == 8) return -2;
+				if (roll > 20)  return 3;
+				if (roll == 20) return 2;
+			}
+			// Normal to-hit check.
+			return (roll <= stat) ? 1 : -1;
+		}
+
+		macro += ' {{character_name=@{cname}}}';
+		macro += rollTemplateValue('success', 0, true); // level of success, crits, etc.
+		startRoll(macro, (results) => {
+			let level = successLevel(results.results);
+			let diceString = diceArrayToString(results.results.roll1.dice);
+			finishRoll( results.rollId, {
+				'roll1': diceString,
+				'success': level
+			});
+		});
+	}
+
+	on('clicked:st_check3', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}[STR]]]}} {{roll1=[[3d6]]}}");
+	});
+	on('clicked:st_check4', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=strength}} {{stat=[[@{st}[STR]]]}} {{roll1=[[4d6]]}}");
+	});
+	on('clicked:dx_check3', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=dexterity}} {{stat=[[@{dx}[DEX]]]}} {{roll1=[[3d6]]}}");
+	});
+	on('clicked:dx_check4', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=dexterity}} {{stat=[[@{dx}[DEX]]]}} {{roll1=[[4d6]]}}");
+	});
+	on('clicked:iq_check3', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[3d6]]}}");
+	});
+	on('clicked:iq_check4', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[4d6]]}}");
+	});
+	on('clicked:health_check3', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=health}} {{stat=[[@{stcurrent}[HEALTH]]]}} {{roll1=[[3d6]]}}");
+	});
+	on('clicked:health_check4', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=health}} {{stat=[[@{stcurrent}[HEALTH]]]}} {{roll1=[[4d6]]}}");
+	});
+
+	on('clicked:initiative', (info) => {
+		let initiativeAdjName = 'initiative_adj';
+		let attrNames = [initiativeAdjName];
+		getAttrs(attrNames, function(v) {
+			let mstring = "&{template:initiative}"
+			let initiativeRoll = '1d6';
+			// provisionally add initiative adjustment
+			if (parseInt(v[initiativeAdjName])||0) {
+				let initiativeAdj = `@{${initiativeAdjName}}[INITIATIVE_ADJ]`;
+				initiativeRoll += ` + ${initiativeAdj}`;
+				mstring += rollTemplateValue('initiativeadj', initiativeAdj, true);
+			}
+			mstring += rollTemplateValue('roll1', initiativeRoll, true);
+			doRollWithDiceString(mstring);
+		});
+	});
+
+	on('clicked:turnorder', (info) => {
+		doRollWithDiceString("&{template:turnorder} {{turnorder=[[@{DX}[DEX] &{tracker}]]}}");
+	});
+
+	on('clicked:hthreaction', (info) => {
+		doRollWithDiceString("&{template:hth-reaction} {{roll1=[[1d6]]}}");
+	});
+
+	// Do a roll with stats.
+	const doShieldRush = function(macro) {
+		// returns success level.  positive is success.
+		// negative is failure.
+		const successLevel = function(results) {
+			let roll = results.roll1.result;
+			let stat = results.stat.result;
+
+			// Check all the crits first.
+			if (results.roll1.dice.length == 3) {
+				// 3d6
+				if (roll >= 16) return -2; // auto fail
+			}
+			else {
+				// 2d6
+				if (roll == 12) return -2;
+			}
+			// Normal to-hit check.
+			return (roll <= stat) ? 1 : -1;
+		}
+
+		macro += ' {{character_name=@{cname}}}';
+		macro += rollTemplateValue('success', 0, true); // level of success, crits, etc.
+		startRoll(macro, (results) => {
+			let level = successLevel(results.results);
+			let diceString = diceArrayToString(results.results.roll1.dice);
+			finishRoll( results.rollId, {
+				'roll1': diceString,
+				'success': level
+			});
+		});
+	}
+
+	on('clicked:shieldrushweaker', (info) => {
+		doShieldRush("&{template:shield-rush} {{weaker=1}} {{stat=[[@{DX}[DEX]]]}} {{roll1=[[2d6]]}}");
+	});
+	on('clicked:shieldrushstronger', (info) => {
+		doShieldRush("&{template:shield-rush} {{stat=[[@{DX}[DEX]]]}} {{roll1=[[3d6]]}}");
+	});
+
+	/* TALENT HANDLERS */
+
+	// Expand or describe a talent.
+	on('clicked:repeating_talents', (info) => {
+		let id = info.sourceAttribute;
+		let name = info.htmlAttributes.name;
+		if (name == 'act_describe') {
+			describeItem(id + '_talentname', id + '_description', ['IQ Required', id + '_talentiq']);
+		}
+		else if (name == 'act_expand') {
+			toggleItem(id);
+		}
+	});
+
+	/* WEAPON HANDLERS */
+
+	// Weapon Attack Buttons.
+	on('clicked:attack-6'
+	+ ' clicked:attack-5'
+	+ ' clicked:attack-4'
+	+ ' clicked:attack-3'
+	+ ' clicked:attack-2'
+	+ ' clicked:attack-1'
+	+ ' clicked:attack0'
+	+ ' clicked:attack1'
+	+ ' clicked:attack2'
+	+ ' clicked:attack3'
+	+ ' clicked:attack4'
+	+ ' clicked:attack5'
+	+ ' clicked:attack6'
+	+ ' clicked:attacka', (info) => {
+		let toHitCharacter = info.triggerName.substring(14);
+		let toHit = parseInt(toHitCharacter)||0;
+
+		onSelectedWeaponOrSpell(function(id, selectedIds, type) {
+
+			// return the string depending on whether we are defending or not.
+			const diceProperties = function (attrs) {
+				// we are defending, so need 4d6, arg.
+				if (attrs.defending == 'on') {
+					return rollTemplateValue('defending', '1') + rollTemplateValue('roll1', '4d6', true);
+				} else {
+					return rollTemplateValue('roll1', '3d6', true);
+				}
+			}
+
+			// returns success level.  positive is success.
+			// negative is failure.
+			const successLevel = function(results) {
+				// if no roll, normal success.
+				if (!('roll1' in results)) {
+					return 1;
+				}
+				let roll = results.roll1.result;
+				let tohit = results.tohit.result;
+				// Check all the crits first.
+				if (results.roll1.dice.length == 3) {
+					// 3d6
+					if (roll == 3) return 4;
+					if (roll == 4) return 3;
+					if (roll == 5) return 2;
+					if (roll == 18) return -4;
+					if (roll == 17) return -3;
+					if (roll == 16) return -2;
+				}
+				else {
+					// 4d6
+					/* Page 9 clearly states the rules for critical success and failure on 4 die,
+						However, page 117 mentions dodging and describes
+						automatic misses consistent with critical misses, but weirdly only mentions
+						4 and 5 as the two critical hits (doing triple and double damage) and doesn't mention an
+						automatic hit at 6, much less 7 or 8.  Typo? Brain fart?
+						it *is* true that 4d6 <= 8 is probability of .054 and 3d6 <= 5 is .046
+						so rolling 4d6 has a slightly greater chance of an automatic or critical hit.
+						So I don't know, could go either way. But why remove an automatic hit at 6 or 7
+						that would still be lower odds of automatic hit (.012 and .027 respectively)
+						I'm going to assume it's intentional, ie dodging makes it MUCH harder to get crits or auto-hits.
+					*/
+					if (roll == 4) return 4;
+					if (roll == 5) return 3;
+					if (roll >= 23 && roll <= 24) return -4;
+					if (roll >= 21 && roll <= 22) return -3;
+					if (roll == 20) return -2;
+				}
+				// Normal to-hit check.
+				return (roll <= tohit) ? 1 : -1;
+			}
+
+			// Do the Attack roll with success level.
+			const doAttackRoll = function(macro) {
+				macro += ' {{character_name=@{cname}}}';
+				macro += rollTemplateValue('success', 0, true); // level of success, crits, etc.
+				startRoll(macro, (results) => {
+					let level = successLevel(results.results)
+					let computed = {'success': level};
+					if (('damage' in results.results) && level > 2) {
+						computed['damage'] = results.results.damage.result * (level - 1);
+					}
+					if ('roll1' in results.results) {
+						computed['roll1'] = diceArrayToString(results.results.roll1.dice);
+					}
+					finishRoll( results.rollId, computed );
+				});
+			}
+
+			// Nothing selected, do a generic roll.
+			if (type == '') {
+				getAttrs(['defending'], function(v) {
+					let mstring  = `&{template:attack}`;
+					// append total and separate to hits, if present.
+					if (toHitCharacter != 'a') {
+						mstring += diceProperties(v);
+						let dxAdj = `@{DX}[DEX]`;
+						let toHitString = ` {{tohit=[[${dxAdj}`;
+						let oldHitLength = toHitString.length;
+						mstring += rollTemplateValue('dx', dxAdj, true);
+
+						// and to hit adjustment
+						if (toHit != 0) {
+							let toHitAdj = `${toHit}[TO_HIT]`
+							toHitString += ` + ${toHitAdj}`;
+							mstring += rollTemplateValue('tohitadj', toHitAdj, true);
+						}
+						if (oldHitLength == toHitString.length) {
+							mstring += rollTemplateValue('simpletohit', '1');
+						}
+						// and finish.
+						toHitString += ']]}}';
+						mstring += toHitString;
+					}
+					doAttackRoll(mstring);
+				});
+			} else if (type == 'weapon') {
+				let attackFlavorName = repeatingPropertyName('weapons', id, 'attackflavor');
+				let successFlavorName = repeatingPropertyName('weapons', id, 'successflavor');
+				let failureFlavorName = repeatingPropertyName('weapons', id, 'failureflavor');
+				let weaponDamageName = repeatingPropertyName('weapons', id, 'weapondamage');
+				let attrNames = ['gender', attackFlavorName, successFlavorName, failureFlavorName, weaponDamageName, 'defending'];
+				let weaponToHitName  = repeatingPropertyName('weapons', id, 'tohit');
+				if (toHitCharacter != 'a') {
+					attrNames.push(weaponToHitName);
+				}
+				getAttrs(attrNames, function(v) {
+					let mstring  = `&{template:attack}`
+						+ rollTemplateProperty('weaponname', repeatingPropertyName('weapons', id, 'weaponname'));
+
+					// append total and separate to hits, if present.
+					if (weaponToHitName in v) {
+						mstring += diceProperties(v);
+						let dxAdj = `@{DX}[DEX]`;
+						let toHitString = ` {{tohit=[[${dxAdj}`;
+						let oldHitLength = toHitString.length;
+						mstring += rollTemplateValue('dx', dxAdj, true);
+
+						// provisionally add weapon toHit.
+						if (parseInt(v[weaponToHitName])||0) {
+							let weaponAdj = `@{${weaponToHitName}}[WPN_ADJ]`;
+							toHitString += ` + ${weaponAdj}`;
+							mstring += rollTemplateValue('weaponadj', weaponAdj, true);
+						}
+						// and to hit adjustment
+						if (toHit != 0) {
+							let toHitAdj = `${toHit}[TO_HIT]`
+							toHitString += ` + ${toHitAdj}`;
+							mstring += rollTemplateValue('tohitadj', toHitAdj, true);
+						}
+						if (oldHitLength == toHitString.length) {
+							mstring += rollTemplateValue('simpletohit', '1');
+						}
+						// and finish.
+						toHitString += ']]}}';
+						mstring += toHitString;
+					}
+
+					// conditionally add damage as roll.
+					mstring += rollTemplateProperty('damage', weaponDamageName, v, true);
+
+					{ // add pronoun.
+						let gender = v.gender.toLowerCase();
+						let pronoun = 'their';
+						if (gender == 'male') pronoun = 'his';
+						else if (gender == 'female') pronoun = 'her'
+						mstring += rollTemplateValue('pronoun', pronoun);
+					}
+					mstring += rollTemplateProperty('attackflavor', attackFlavorName, v);
+					mstring += rollTemplateProperty('successflavor', successFlavorName, v);
+					mstring += rollTemplateProperty('failureflavor', failureFlavorName, v);
+					doAttackRoll(mstring);
+				});
+			}
+			else if (type == 'spell') {
+				let damageName = repeatingPropertyName('spells', id, 'spelldamage');
+				let successFlavorName = repeatingPropertyName('spells', id, 'successflavor');
+				let failureFlavorName = repeatingPropertyName('spells', id, 'failureflavor');
+				let attrNames = [successFlavorName, failureFlavorName, damageName, 'defending'];
+				let spellToHitName  = repeatingPropertyName('spells', id, 'tohit');
+				if (toHitCharacter != 'a') {
+					attrNames.push(spellToHitName);
+				}
+				getAttrs(attrNames, function(v) {
+					let mstring  = `&{template:cast-spell}`
+						+ rollTemplateProperty('spellname', repeatingPropertyName('spells', id, 'spellname'));
+
+					// append to hit values if present.
+					if (spellToHitName in v) {
+						mstring += diceProperties(v);
+						let dxAdj = `@{DX}[DEX]`;
+						let toHitString = ` {{tohit=[[${dxAdj}`;
+						let oldHitLength = toHitString.length;
+						mstring += rollTemplateValue('dx', dxAdj, true);
+
+						// provisionally add spell toHit.
+						if (parseInt(v[spellToHitName])||0) {
+							let spellAdj = `@{${spellToHitName}}[SPELL_ADJ]`;
+							toHitString += ` + ${spellAdj}`;
+							mstring += rollTemplateValue('spelladj', spellAdj, true);
+						}
+						// and rolled to hit.
+						if (toHit != 0) {
+							let toHitAdj = `${toHit}[TO_HIT]`;
+							toHitString += ` + ${toHitAdj}`;
+							mstring += rollTemplateValue('tohitadj', toHitAdj, true);
+						}
+
+						// just dex.
+						if (toHitString.length == oldHitLength) {
+							mstring += rollTemplateValue('simpletohit', '1');
+						}
+						// and finish.
+						toHitString += ']]}}';
+						mstring += toHitString;
+					}
+					mstring += rollTemplateProperty('damage', damageName, v, true);
+					mstring += rollTemplateProperty('successflavor', successFlavorName, v);
+					mstring += rollTemplateProperty('failureflavor', failureFlavorName, v);
+					doAttackRoll(mstring);
+				});
+			}
+			// Deselect defending checkbox.
+			// since it can easily just stay on by mistake.
+			setAttrs({
+				defending: 0
+			});
+		});
+	});
+
+	// Weapons Select/Expand/Describe
+	on('clicked:repeating_weapons', (info) => {
+		let name = info.htmlAttributes.name;
+		let id = info.sourceAttribute;
+		if (name == 'act_select') {
+			selectWeaponOrSpell(id);
+		}
+		if (name == 'act_describe') {
+			describeItem(id + '_weaponname', id + '_description',
+				['To Hit', id + '_tohit'
+				, 'Damage', id + '_weapondamage'
+				, 'Weight', id + '_weight'
+				, 'Note', id + '_weaponnotes']);
+		}
+		else if (name == 'act_expand') {
+			toggleItem(id);
+		}
+	});
+
+
+	/* Spell Handlers */
+
+	// Update Mana
+	on('sheet:opened change:mana_max change:mana_adj', function() {
+		getAttrs(['mana_max', 'mana_adj'], function(v) {
+			let finalMana = (parseInt(v.mana_max)||0) - (parseInt(v.mana_adj)||0);
+			setAttrs({
+				mana: finalMana
+			});
+		});
+	});
+
+
+	// Spell Cast Select/Expand/Describe
+	on('clicked:repeating_spells', (info) => {
+		let name = info.htmlAttributes.name;
+		let id = info.sourceAttribute;
+		if (name == 'act_select') {
+			selectWeaponOrSpell(id);
+		}
+		if (name == 'act_describe') {
+			describeItem(id + '_spellname', id + '_description',
+				['To Hit', id + '_tohit',
+				'Damage', id + '_spelldamage',
+				'ST Cost', id + '_stcost',
+				'Duration', id + '_duration',
+				'Note', id + '_spellnotes'
+				]);
+		}
+		else if (name == 'act_expand') {
+			toggleItem(id);
+		}
+	});
+
+	/* Armor Handlers */
+	// Expand or describe a talent.
+	on('clicked:repeating_armor', (info) => {
+		let id = info.sourceAttribute;
+		let name = info.htmlAttributes.name;
+		if (name == 'act_describe') {
+			describeItem(id + '_defensename', id + '_description',
+				['Hits Blocked', id + '_hitsblocked',
+				'Minus to Hit', id + '_minustohit',
+				'DX Penalty', id + '_dexpenalty',
+				'Weight', id + '_weight',
+				'Note', id + '_defensenotes']);
+		}
+		else if (name == 'act_expand') {
+			toggleItem(id);
+		}
+	});
+
+	/* Equipment Handlers */
+	// Expand or describe a talent.
+	on('clicked:repeating_equipment', (info) => {
+		let id = info.sourceAttribute;
+		let name = info.htmlAttributes.name;
+		if (name == 'act_describe') {
+			describeItem(id + '_name', id + '_description',
+				['Count', id + '_count',
+				'Weight', id + '_weight',
+				'Note', id + '_notes'
+				]);
+		}
+		else if (name == 'act_expand') {
+			toggleItem(id);
+		}
+	});
+
+
+	/* Experience Handlers */
+
+	// Update experience spent and unspent.
+	// need to sum from three sources.
+	on('sheet:opened change:experiencetotal'
+	+ ' change:repeating_exphistory remove:repeating_exphistory'
+	+ ' change:repeating_spells remove:repeating_spells'
+	+ ' change:repeating_talents remove:repeating_talents', function() {
+		let totalSpent = 0;
+		let totalCallbacks = 0;
+
+		let idCallback = function(attrs, idarray, repName, spentName) {
+			totalSpent += computeRepeatingTotal(attrs, idarray, repName, spentName);
+			if (++totalCallbacks == 3) {
+				getAttrs(["experiencetotal"], function(v) {
+					let total = parseInt(v.experiencetotal)||0;
+					setAttrs({
+						experienceunspent: (total - totalSpent),
+						experiencespent: totalSpent
+					})
+				});
+			}
+		}
+		getSectionIDs("exphistory", function(v) {grabIds(v, 'exphistory', 'expspent', '', '', idCallback);});
+		getSectionIDs("talents", function(v) {grabIds(v, 'talents', 'expspent', '', '', idCallback);});
+		getSectionIDs("spells", function(v) {grabIds(v, 'spells', 'expspent', '', '', idCallback);});
+	});
+
+	/* Armor Handlers */
+
+	// Update Hits Blocked
+	on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
+		let idCallback = function(attrs, idarray, repName, blockedName, countName, notCarriedName) {
+			let totalBlocked = computeRepeatingTotal(attrs, idarray, repName, blockedName, countName, notCarriedName);
+			setAttrs({
+				totalblock: totalBlocked
+			});
+		}
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'hitsblocked', '', 'notcarried', idCallback);});
+	});
+
+	// Update Minus to Hit
+	on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
+		let idCallback = function(attrs, idarray, repName, minusToHitName, countName, notCarriedName) {
+			let totalMinus = computeRepeatingTotal(attrs, idarray, repName, minusToHitName, countName, notCarriedName);
+			setAttrs({
+				minustohit: totalMinus
+			});
+		}
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'minustohit', '', 'notcarried', idCallback);});
+	});
+
+
+	on('sheet:opened change:st change:hits change:fatigue', function() {
+		getAttrs(['st', 'hits', 'fatigue'], function(v) {
+			let hitpoints = v.st - v.hits - v.fatigue;
+			setAttrs({
+				stcurrent: hitpoints
+			});
+		});
+	});
+
+	// Update weight carried and penalty, and MA
+	on('sheet:opened'
+		+ ' change:race '
+		+ ' change:ma_max change:ma_adj'
+		+ ' change:repeating_weapons remove:repeating_weapons'
+		+ ' change:repeating_armor remove:repeating_armor'
+		+ ' change:repeating_equipment remove:repeating_equipment'
+		+ ' change:dx_max change:dx_adj', function() {
+		let totalWeight = 0;
+		let totalCallbacks = 0; // how many times called back.
+		let dexPenalty = 0;
+
+		let computeAll = function() {
+			getAttrs(['st', 'race', 'ma_max', 'ma_adj', 'dx_max', 'dx_adj'], function(v) {
+				let strength = parseInt(v.st)||0;
+				if (v.race) {
+					let race = v.race.toLowerCase();
+					if (race.includes('dwarf') || race.includes('dwarven')) {
+						strength *= 2;
+					}
+				}
+
+				// Round to the nearest tenth.
+				totalWeight = Math.floor(totalWeight * 10 + .5) / 10;
+
+				let finalDex = (parseInt(v.dx_max)||0) + (parseInt(v.dx_adj)||0) - dexPenalty;
+				let penalty = '';
+				let finalMA = (parseInt(v.ma_max)||0) + (parseInt(v.ma_adj)||0);
+				if (totalWeight <= 2 * strength) {
+					penalty += 'No movement penalty';
+				} else if (totalWeight <= 3 * strength) {
+					penalty += 'Swim at DX -2';
+				} else if (totalWeight <= 4 * strength) {
+					penalty += 'Swim at DX -5';
+				} else if (totalWeight <= 6 * strength) {
+					penalty += "No swim, MA = 8";
+					finalMA = Math.min(8, finalMA);
+				} else if (totalWeight < 8 * strength) {
+					penalty += 'MA = 6, DX -1';
+					finalMA = Math.min(6, finalMA);
+					finalDex -= 1;
+				} else if (totalWeight < 10 * strength) {
+					penalty += 'MA = 4, DX -2';
+					finalMA = Math.min(4, finalMA);
+					finalDex -= 2;
+				} else {
+					penalty += "MA = 4, DX -2, can't move.  See manual."
+					finalMA = Math.min(4, finalMA);
+					finalDex -= 2;
+				}
+				setAttrs({
+					weightcarried: totalWeight,
+					ma: finalMA,
+					mapenalty: penalty,
+					dx: finalDex
+				});
+			});
+		};
+
+		let dexCallback = function(attrs, idarray, repName, dexPenaltyName, countName, notCarriedName) {
+			dexPenalty = computeRepeatingTotal(attrs, idarray, repName, dexPenaltyName, countName, notCarriedName);
+			if (++totalCallbacks == 4) {
+				computeAll();
+			}
+		}
+
+		let idCallback = function(attrs, idarray, repName, weightName, countName, notCarriedName) {
+			totalWeight += computeRepeatingTotal(attrs, idarray, repName, weightName, countName, notCarriedName);
+
+			if (++totalCallbacks == 4) {
+				computeAll();
+			}
+		}
+
+		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weight', 'count', 'notcarried', idCallback);});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'weight', '', 'notcarried', idCallback);});
+		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'weight', 'count', 'notcarried', idCallback);});
+
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'dexpenalty', '', 'notcarried', dexCallback);});
+	});
+
+	// Attribute points and next attribute cost.
+	on('sheet:opened '
+	+ 'change:st_max '
+	+ 'change:dx_max '
+	+ 'change:iq_max ', function() {
+		getAttrs(['st_max', 'dx_max', 'iq_max'], function(v) {
+			let total = (parseInt(v.st_max)||0) + (parseInt(v.dx_max)||0) + (parseInt(v.iq_max)||0);
+			let nextCost = 0; // just a table based on total
+			let added = total + 1; // since next..
+			if (added <= 34)
+				nextCost = 100;
+			else if (added == 35)
+				nextCost = 200;
+			else if (added == 36)
+				nextCost = 300;
+			else if (added == 37)
+				nextCost = 600;
+			else
+				nextCost = 1000 << (added - 38);
+
+			setAttrs({
+				totalattrpoints: total,
+				nextattrcost: nextCost
+			});
+		});
+	});
+
+	// Update unspent iq points.
+	on('sheet:opened '
+	+ 'change:repeating_talents remove:repeating_talents '
+	+ 'change:repeating_spells remove:repeating_spells '
+	+ 'change:iq_max ', function() {
+		let totalSpent = 0;
+		let totalCallbacks = 0; // number of times called back.
+
+		let idCallback = function(attrs, idarray, repName, costName) {
+			totalSpent += computeRepeatingTotal(attrs, idarray, repName, costName);
+			if (++totalCallbacks == 2) {
+				getAttrs(['iq_max'], function(v) {
+					let unspent = (parseInt(v.iq_max)||0) - totalSpent;
+					setAttrs({
+						iqunspent: unspent
+					});
+				});
+			}
+		}
+
+		getSectionIDs("talents", function(v) {grabIds(v, 'talents', 'talentcost', '', '', idCallback);});
+		getSectionIDs("spells", function(v) {grabIds(v, 'spells', 'spellcost', '', '', idCallback);});
+	});
+
+
+	/* Funny stuff with journals */
 	const buttonlist = ["character","journal"];
 	buttonlist.forEach(button => {
 		on(`clicked:${button}`, function() {
@@ -158,9 +1721,3 @@
 		});
 	});
 </script>
-
-
-
-
-
-

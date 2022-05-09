@@ -1,8 +1,26 @@
 on("clicked:repeating_magic:usespell", async (e) => {
   console.log(e);
-  const a = await getAttrsAsync(["repeating_magic_ppecost", "currentppe"]);
+  const a = await getAttrsAsync([
+    "repeating_magic_ppecost",
+    "currentppe",
+    "repeating_magic_name",
+    "character_name",
+    "outputusage",
+  ]);
   console.log(a);
-  await setAttrsAsync({ currentppe: a.currentppe - a.repeating_magic_ppecost });
+  const newppe = a.currentppe - a.repeating_magic_ppecost;
+  await setAttrsAsync({ currentppe: newppe });
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    const chat = await startRoll(
+      `@{opt_whisper}&{template:castspell} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["repeating_magic_ppecost"]}}} {{name=${
+        a[`repeating_magic_name`]
+      }}} {{remaining=${newppe}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:resetppe", async (e) => {
@@ -12,11 +30,27 @@ on("clicked:resetppe", async (e) => {
 
 on("clicked:repeating_psionics:usepsionic", async (e) => {
   console.log(e);
-  const a = await getAttrsAsync(["repeating_psionics_ispcost", "currentisp"]);
+  const a = await getAttrsAsync([
+    "repeating_psionics_ispcost",
+    "repeating_psionics_name",
+    "currentisp",
+    "character_name",
+    "outputusage",
+  ]);
   console.log(a);
-  await setAttrsAsync({
-    currentisp: a.currentisp - a.repeating_psionics_ispcost,
-  });
+  const newisp = a.currentisp - a.repeating_psionics_ispcost;
+  await setAttrsAsync({ currentisp: newisp });
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    const chat = await startRoll(
+      `@{opt_whisper}&{template:usepsionic} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["repeating_psionics_ispcost"]}}} {{name=${
+        a[`repeating_psionics_name`]
+      }}} {{remaining=${newisp}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:resetisp", async (e) => {
@@ -69,7 +103,6 @@ async function calculateDamage(row) {
     }
     damage += `+${perLevel}`.repeat(a.character_level - 1);
   }
-  damage += ` ${unit}`;
   await setAttrsAsync({ [row]: damage });
 }
 

@@ -2,6 +2,10 @@
 
 $picker-color: #3781bd;
 
+@mixin danger {
+  background-color: rgb(220, 53, 69) !important;
+  color: white !important;
+}
 @mixin center {
   display: flex;
   align-items: center;
@@ -16,6 +20,9 @@ $picker-color: #3781bd;
   font-weight: normal;
   padding-left: 0.5rem;
   overflow-y: auto;
+}
+@mixin readonly-light {
+  @include readonly;
 }
 @mixin section {
   border: 1px solid #ccc;
@@ -79,12 +86,39 @@ a {
   display: block;
 }
 
+.sheet-rolltemplate-damage,
+.sheet-rolltemplate-castspell,
+.sheet-rolltemplate-usepsionic {
+  margin-left: -7px;
+
+  .sheet-character_name {
+    font-weight: bold;
+  }
+
+  .sheet-name {
+    font-weight: bold;
+  }
+
+  .sheet-spent,
+  .sheet-remaining {
+    display: inline-block;
+    border: 1px solid black;
+    padding: 0 0.3rem;
+    background-color: orange;
+  }
+
+  .sheet-remaining {
+    @include danger();
+  }
+}
+
 .withoutavatars {
   .sheet-rolltemplate-strike,
   .sheet-rolltemplate-goe,
   .sheet-rolltemplate-skill,
   .sheet-rolltemplate-initiative,
-  .sheet-rolltemplate-custom {
+  .sheet-rolltemplate-custom,
+  .sheet-rolltemplate-damage {
     margin-left: -7px;
   }
 }
@@ -163,11 +197,14 @@ a {
     padding: 5px;
     text-align: center;
   }
+
+  .sheet-template-row {
+    grid-column: 1 / -1;
+  }
 }
 
 .danger {
-  background-color: rgb(220, 53, 69) !important;
-  color: white !important;
+  @include danger;
 }
 
 .charsheet {
@@ -212,6 +249,10 @@ a {
       @include readonly;
     }
 
+    .readonly-light {
+      @include readonly-light;
+    }
+
     textarea[readonly] {
       @include readonly;
     }
@@ -230,6 +271,10 @@ a {
 
         & > summary {
           display: block;
+
+          // Switch to caret
+          // display: revert;
+          // cursor: pointer;
         }
       }
 
@@ -387,7 +432,14 @@ a {
     .bonus-thing-heading {
       display: grid;
       gap: 1rem;
-      grid-template-columns: 2.5rem 1fr min-content;
+      grid-template-columns: 2.5rem 1fr min-content min-content;
+      // Accommodate caret
+      // float: right;
+      // width: 95%;
+
+      span.readonly {
+        @include readonly;
+      }
 
       label {
         align-items: center;
@@ -403,7 +455,10 @@ a {
         input[name="attr_name"] {
           width: auto;
         }
-        input[name="attr_level"] {
+        input[name="attr_levelacquired"] {
+          width: 5rem;
+        }
+        span[name="attr_level"] {
           width: 5rem;
         }
       }
@@ -546,6 +601,7 @@ a {
       background-color: #e9e9ed;
       font-size: 1.6rem;
       width: 2rem;
+      cursor: pointer;
 
       &:hover {
         background-color: #d0d0d6;
@@ -574,8 +630,7 @@ a {
         }
 
         &:checked + span::before {
-          content: "+";
-          opacity: 50%;
+          content: "=";
         }
       }
     }
@@ -592,13 +647,35 @@ a {
       .heading {
         display: grid;
         gap: 0.5rem;
-        grid-template-columns: 2.5rem 1fr 10rem 5rem 5rem 5rem 5rem 4rem 4rem;
+        grid-template-columns: 2.5rem 1fr 10rem 5rem 5rem 5rem 5rem 5rem 4rem 4rem;
       }
 
       .values {
         display: grid;
         gap: 0.5rem;
-        grid-template-columns: 2.5rem 1fr 10rem 5rem 5rem 5rem 5rem 4rem 4rem;
+        grid-template-columns: 2.5rem 1fr 10rem 5rem 5rem 5rem 5rem 5rem 4rem 4rem;
+      }
+    }
+
+    .wp-container {
+      .heading,
+      .values {
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .wp {
+        .heading,
+        .values {
+          grid-template-columns: minmax(16rem, 1fr) 5rem 5rem 5rem 5rem 5rem 5rem 5rem 5rem 1fr;
+        }
+      }
+
+      .wpmodern {
+        .heading,
+        .values {
+          grid-template-columns: minmax(16rem, 1fr) 5rem 5rem 5rem 5rem 1fr;
+        }
       }
     }
 
@@ -694,6 +771,19 @@ a {
             }
           }
 
+          &.movement {
+            > label {
+              display: grid;
+              gap: 0.5rem;
+              grid-template-columns: 1fr 1fr 1fr;
+
+              span {
+                justify-content: start;
+                padding-left: 0.1rem;
+              }
+            }
+          }
+
           label {
             grid-template-columns: 1fr 5rem 4rem;
 
@@ -747,7 +837,7 @@ a {
       .abilities-list {
         display: grid;
         gap: 0.5rem;
-        grid-template-columns: 2.5rem 1fr 6rem 8rem 10rem 8rem 4rem 8rem 4rem 4rem;
+        grid-template-columns: 2.5rem minmax(16rem, 1fr) 6rem 8rem 10rem 5rem 4rem 4rem 6rem 4rem 4rem;
       }
     }
 
@@ -756,7 +846,7 @@ a {
       .spells-list {
         display: grid;
         gap: 0.5rem;
-        grid-template-columns: 2.5rem 1fr 5rem 6rem 8rem 8rem 4rem 8rem 4rem 4rem 6rem 4rem;
+        grid-template-columns: 2.5rem minmax(16rem, 1fr) 5rem 6rem 8rem 5rem 4rem 4rem 6rem 4rem 4rem 6rem 4rem;
       }
     }
 
@@ -765,7 +855,7 @@ a {
       .psionics-list {
         display: grid;
         gap: 0.5rem;
-        grid-template-columns: 2.5rem 1fr 6rem 8rem 8rem 4rem 8rem 4rem 4rem 5rem 4rem;
+        grid-template-columns: 2.5rem minmax(16rem, 1fr) 6rem 8rem 5rem 4rem 4rem 6rem 4rem 4rem 5rem 4rem;
       }
     }
 
@@ -900,7 +990,7 @@ img.logo {
 .charsheet .wp-container .repcontainer[data-groupname="repeating_wp"] .repitem {
   display: grid;
   gap: 0.5rem;
-  grid-template-columns: 1fr 5rem 5rem 5rem 5rem 5rem 5rem 5rem 24rem;
+  grid-template-columns: 1fr;
 }
 
 .charsheet
@@ -909,7 +999,7 @@ img.logo {
   .repitem {
   display: grid;
   gap: 0.5rem;
-  grid-template-columns: 1fr 5rem 5rem 5rem 29rem;
+  grid-template-columns: 1fr;
 }
 
 .charsheet .repeating-movement .repcontainer .repitem:not(:first-of-type) h5,
@@ -1000,10 +1090,214 @@ img.logo {
   height: 600px;
 }
 
-/*****************/
-/* Metal Buttons */
-/*****************/
-
 .dialog.characterviewer {
   background-color: #dcdcdc;
+}
+
+.sheet-rolltemplate-darkmode {
+  color: var(--dark-secondarytext);
+
+  .sheet-container {
+    color: var(--dark-secondarytext);
+
+    .sheet-content {
+      background-color: #343434;
+
+      :nth-child(4n + 3),
+      :nth-child(4n) {
+        background-color: #444;
+      }
+
+      // .sheet-key {
+      //   color: var(--dark-secondarytext)
+      // }
+    }
+
+    .inlinerollresult,
+    .sheet-spent {
+      background-color: var(--dark-primary);
+      border-color: var(--dark-primary);
+      color: var(--dark-primarytext);
+
+      &.fullcrit {
+        border: 2px solid #3fb315;
+      }
+      &.fullfail {
+        border: 2px solid #b31515;
+      }
+    }
+  }
+}
+
+body.sheet-darkmode {
+  color: var(--dark-secondarytext);
+
+  .sheetform {
+    background-color: #343434;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--dark-secondarytext);
+  }
+
+  .dialog {
+    &.characterviewer {
+      background-color: #343434;
+    }
+  }
+
+  .charsheet {
+    main#megaverse {
+      hr {
+        border-color: #444;
+      }
+
+      button,
+      button.btn {
+        background-color: var(--dark-primary);
+        color: var(--dark-primarytext);
+        border: none;
+        border-radius: 4px;
+        background-image: none;
+        text-shadow: none;
+        line-height: normal;
+        padding: 2px 5px;
+        margin: 1px;
+
+        &:hover {
+          background-color: var(--dark-primary-highlight);
+          border: none;
+        }
+      }
+
+      input,
+      select,
+      textarea {
+        background-color: #000;
+        border-color: #333;
+        color: #bbb;
+      }
+
+      input,
+      textarea {
+        &:read-only {
+          background-color: #444;
+          border-color: #555;
+        }
+      }
+
+      label {
+        &.abs {
+          background-color: var(--dark-primary);
+          border: none;
+
+          &:hover {
+            background-color: var(--dark-primary-highlight);
+          }
+        }
+      }
+
+      .ss-2c {
+        border-color: #444;
+      }
+
+      .ss-2a {
+        border-color: #444;
+        span {
+          background-color: #444;
+          border-color: #555;
+        }
+      }
+
+      .movement-container {
+        span {
+          &:not(.not-readonly) {
+            background-color: #444;
+            border-color: #555;
+          }
+        }
+      }
+
+      .bonus-type-container,
+      .bonus-ps-container {
+        border-color: #444;
+        hr {
+          border-color: #444;
+          background-color: #444;
+        }
+
+        label {
+          span[name^="attr_"] {
+            background-color: #444;
+            border-color: #555;
+          }
+        }
+      }
+
+      .psionics-list,
+      .spells-list,
+      .abilities-list {
+        span[name]:not(.not-readonly) {
+          background-color: #000;
+          border-color: #333;
+        }
+      }
+
+      .readonly {
+        background-color: #000;
+        border-color: #333;
+      }
+
+      .readonly-light {
+        background-color: #444;
+        border-color: #555;
+      }
+
+      .heading {
+        background-color: #333;
+      }
+
+      .active-container {
+        background-color: #222;
+      }
+
+      .r-tabbed {
+        & > [type="radio"] {
+          &:nth-of-type(1):checked ~ .r-tabs .r-tab:nth-of-type(1) > label,
+          &:nth-of-type(2):checked ~ .r-tabs .r-tab:nth-of-type(2) > label,
+          &:nth-of-type(3):checked ~ .r-tabs .r-tab:nth-of-type(3) > label,
+          &:nth-of-type(4):checked ~ .r-tabs .r-tab:nth-of-type(4) > label,
+          &:nth-of-type(5):checked ~ .r-tabs .r-tab:nth-of-type(5) > label,
+          &:nth-of-type(6):checked ~ .r-tabs .r-tab:nth-of-type(6) > label,
+          &:nth-of-type(7):checked ~ .r-tabs .r-tab:nth-of-type(7) > label,
+          &:nth-of-type(8):checked ~ .r-tabs .r-tab:nth-of-type(8) > label,
+          &:nth-of-type(9):checked ~ .r-tabs .r-tab:nth-of-type(9) > label,
+          &:nth-of-type(10):checked ~ .r-tabs .r-tab:nth-of-type(10) > label {
+            background-color: var(--dark-primary);
+            color: var(--dark-primarytext);
+          }
+        }
+
+        ul.r-tabs {
+          .r-tab {
+            & > label {
+              background-color: #222;
+              border-color: #444;
+            }
+
+            &:hover {
+              & > label {
+                color: #999;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

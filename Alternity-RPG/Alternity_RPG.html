@@ -1,5 +1,38 @@
 <div class="sheet-overall-wrapper">
 
+<script type="text/worker">
+/* ===== PARAMETERS ==========
+destinations = the name of the attribute that stores the total quantity
+        can be a single attribute, or an array: ['total_cost', 'total_weight']
+        If more than one, the matching fields must be in the same order.
+    section = name of repeating fieldset, without the repeating_
+    fields = the name of the attribute field to be summed
+          destination and fields both can be a single attribute: 'weight'
+          or an array of attributes: ['weight','number','equipped']
+*/
+const repeatingSum = (destinations, section, fields) => {
+    if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
+    if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
+    getSectionIDs(`repeating_${section}`, idArray => {
+        const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))], []);
+        getAttrs([...attrArray], v => {
+            const getValue = (section, id, field) => v[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : parseFloat(v[`repeating_${section}_${id}_${field}`]) || 0;
+            const commonMultipliers = (fields.length <= destinations.length) ? [] : fields.splice(destinations.length, fields.length - destinations.length);
+            const output = {};
+            destinations.forEach((destination, index) => {
+                output[destination] = (idArray.reduce((total, id) => total + getValue(section, id, fields[index]) * commonMultipliers.reduce((subtotal, mult) => subtotal * getValue(section, id, mult), 1), 0)).toFixed(2);
+            });
+            setAttrs(output);
+        });
+    });
+};
+
+on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty change:repeating_equipment:ItemIsWorn remove:repeating_equipment', function() {
+	repeatingSum("EquipmentTotal", "equipment", ["ItemMass", "ItemQty", "ItemIsWorn"]);
+});
+
+</script>
+
 <img src="http://i.imgur.com/Qw48Upj.png" title="Alternity Science Fiction Roleplaying Game"/>
 <input type="radio" name="attr_mode" class="sheet-tab sheet-tab21" value="21" title="Character" checked="checked" />
 <span class="sheet-tab sheet-tab21">Character</span>
@@ -23,15 +56,15 @@
 		<td><P class="sheet-broadskill">Career </P></td>
 		<td><input type="text" name="attr_career"></td>
 		<td><P class="sheet-broadskill">Character Trait</P></td>
-		<td><input type="text" name="attr_attributestrait1"></td>		
+		<td><input type="text" name="attr_attributestrait1"></td>
 	</tr>
 	<tr>
 		<td><P class="sheet-broadskill">Motivation</P></td>
-		<td><input type="text" name="attr_attributesmotivation"></td>		
+		<td><input type="text" name="attr_attributesmotivation"></td>
 		<td><P class="sheet-broadskill">Moral Attitude</P></td>
-		<td><input type="text" name="attr_attributesmoral"></td>		
+		<td><input type="text" name="attr_attributesmoral"></td>
 		<td><P class="sheet-broadskill">Character Trait</P></td>
-		<td><input type="text" name="attr_attributestrait2"></td>		
+		<td><input type="text" name="attr_attributestrait2"></td>
 	</tr>
 	<tr>
 		<td><P class="sheet-broadskill">Hero Level </P></td>
@@ -215,7 +248,7 @@
 			</div>
 			<div class="sheet-col">
 				<div class="sheet-skilltitle sheet-row">PERSONAL DATA</div>
-				
+
 				<div class="sheet-col">
 					<div class="sheet-8emwidth sheet-broadskill">Age</div><input type="text" name="attr_age" class="sheet-range">
 					<div class="sheet-8emwidth sheet-broadskill">Hair</div><input type="text" name="attr_hair" class="sheet-range">
@@ -223,15 +256,15 @@
 				<div class="sheet-col">
 					<div class="sheet-8emwidth sheet-broadskill">Height</div><input type="text" name="attr_height" class="sheet-range">
 					<div class="sheet-8emwidth sheet-broadskill">Eyes</div><input type="text" name="attr_eyes" class="sheet-range">
-				</div>				
+				</div>
 				<div class="sheet-col">
 					<div class="sheet-8emwidth sheet-broadskill">Weight</div><input type="text" name="attr_weight" class="sheet-range">
 					<div class="sheet-8emwidth sheet-broadskill">Skintone</div><input type="text" name="attr_skintone" class="sheet-range">
 				</div>
-					
+
 				<div class="sheet-broadskill sheet-row">Appearance</div>
 				<div class="sheet-row"><textarea name="attr_appearance"></textarea></div>
-					
+
 				<div class="sheet-broadskill sheet-row">Contacts</div>
 				<div class="sheet-row"><textarea name="attr_contacts"></textarea></div>
 				<div class="sheet-broadskill sheet-row">Enemies</div>
@@ -305,8 +338,53 @@
 			<TD><input type="text" name="attr_form5range" class="sheet-range"></TD>
 			<TD><input type="text" name="attr_form5damageordinary" class="sheet-dicetype"><input type="text" name="attr_form5damageordinarytype" class="sheet-dmgtype">/<input type="text" name="attr_form5damagegood" class="sheet-dicetype"><input type="text" name="attr_form5damagegoodtype" class="sheet-dmgtype">/<input type="text" name="attr_form5damageamazing" class="sheet-dicetype"><input type="text" name="attr_form5damageamazingtype" class="sheet-dmgtype"></TD>
 		</TR>
+		<TR>
+			<TD><button type="roll" name="roll_weapon_6" value="&{template:default} {{name= @{character_name} - @{form6}}} {{score= [[@{form6score}]]/[[@{form6scoregood}]]/[[@{form6scoreamazing}]]}} {{type= @{form6type}}} {{range= @{form6range}}} {{damage= [[@{form6damageordinary}]]@{form6damageordinarytype}/[[@{form6damagegood}]]@{form6damagegoodtype}/[[@{form6damageamazing}]]@{form6damageamazingtype}}} {{results= [[?{Situation Modifier|None, 1d20cs<1cf>20|-6 Steps (-d20), 1d20cs<1cf>20-1d20cs<0cf<0|-4 Steps (-d12), 1d20cs<1cf>20-1d12cs<0cf<0|-3 Steps (-d8), 1d20cs<1cf>20-1d8cs<0cf<0|-2 Steps (-d6), 1d20cs<1cf>20-1d6cs<0cf<0|-1 Steps (-d4), 1d20cs<1cf>20-1d4cs<0cf<0|+1 Steps (+d4), 1d20cs<1cf>20+1d4cs<0cf<0|+2 Steps (+d6), 1d20cs<1cf>20+1d6cs<0cf<0|+3 Steps (+d8), 1d20cs<1cf>20+1d8cs<0cf<0|+4 Steps (+d12), 1d20cs<1cf>20+1d12cs<0cf<0|+6 Steps (+d20), 1d20cs<1cf>20+1d20cs<0cf<0|+6 Steps (+2d20), 1d20cs<1cf>20+2d20cs<0cf<0|+7 Steps (+3d20), 1d20cs<1cf>20+3d20cs<0cf<0}]]}}"></button><input type="text" name="attr_form6" placeholder="Enter Weapon Name"></TD>
+			<TD><input type="number" name="attr_form6score" class="sheet-score" value="0">/<input type="text" name="attr_form6scoregood" class="sheet-scoredisabled" disabled="true" value="(floor(@{form6score}/2))">/<input type="text" name="attr_form6scoreamazing" class="sheet-scoredisabled" disabled="true" value="(floor(@{form6score}/4))"></TD>
+			<TD><input type="text" name="attr_form6die" class="sheet-dicetype" value="+d4"></TD>
+			<TD><input type="text" name="attr_form6accuracy" class="sheet-dicetype" value="0"></TD>
+			<TD><input type="text" name="attr_form6type" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_form6range" class="sheet-range"></TD>
+			<TD><input type="text" name="attr_form6damageordinary" class="sheet-dicetype"><input type="text" name="attr_form6damageordinarytype" class="sheet-dmgtype">/<input type="text" name="attr_form6damagegood" class="sheet-dicetype"><input type="text" name="attr_form6damagegoodtype" class="sheet-dmgtype">/<input type="text" name="attr_form6damageamazing" class="sheet-dicetype"><input type="text" name="attr_form6damageamazingtype" class="sheet-dmgtype"></TD>
+		</TR>
+		<TR>
+			<TD><button type="roll" name="roll_weapon_7" value="&{template:default} {{name= @{character_name} - @{form7}}} {{score= [[@{form7score}]]/[[@{form7scoregood}]]/[[@{form7scoreamazing}]]}} {{type= @{form7type}}} {{range= @{form7range}}} {{damage= [[@{form7damageordinary}]]@{form7damageordinarytype}/[[@{form7damagegood}]]@{form7damagegoodtype}/[[@{form7damageamazing}]]@{form7damageamazingtype}}} {{results= [[?{Situation Modifier|None, 1d20cs<1cf>20|-7 Steps (-d20), 1d20cs<1cf>20-1d20cs<0cf<0|-4 Steps (-d12), 1d20cs<1cf>20-1d12cs<0cf<0|-3 Steps (-d8), 1d20cs<1cf>20-1d8cs<0cf<0|-2 Steps (-d6), 1d20cs<1cf>20-1d6cs<0cf<0|-1 Steps (-d4), 1d20cs<1cf>20-1d4cs<0cf<0|+1 Steps (+d4), 1d20cs<1cf>20+1d4cs<0cf<0|+2 Steps (+d6), 1d20cs<1cf>20+1d6cs<0cf<0|+3 Steps (+d8), 1d20cs<1cf>20+1d8cs<0cf<0|+4 Steps (+d12), 1d20cs<1cf>20+1d12cs<0cf<0|+7 Steps (+d20), 1d20cs<1cf>20+1d20cs<0cf<0|+6 Steps (+2d20), 1d20cs<1cf>20+2d20cs<0cf<0|+7 Steps (+3d20), 1d20cs<1cf>20+3d20cs<0cf<0}]]}}"></button><input type="text" name="attr_form7" placeholder="Enter Weapon Name"></TD>
+			<TD><input type="number" name="attr_form7score" class="sheet-score" value="0">/<input type="text" name="attr_form7scoregood" class="sheet-scoredisabled" disabled="true" value="(floor(@{form7score}/2))">/<input type="text" name="attr_form7scoreamazing" class="sheet-scoredisabled" disabled="true" value="(floor(@{form7score}/4))"></TD>
+			<TD><input type="text" name="attr_form7die" class="sheet-dicetype" value="+d4"></TD>
+			<TD><input type="text" name="attr_form7accuracy" class="sheet-dicetype" value="0"></TD>
+			<TD><input type="text" name="attr_form7type" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_form7range" class="sheet-range"></TD>
+			<TD><input type="text" name="attr_form7damageordinary" class="sheet-dicetype"><input type="text" name="attr_form7damageordinarytype" class="sheet-dmgtype">/<input type="text" name="attr_form7damagegood" class="sheet-dicetype"><input type="text" name="attr_form7damagegoodtype" class="sheet-dmgtype">/<input type="text" name="attr_form7damageamazing" class="sheet-dicetype"><input type="text" name="attr_form7damageamazingtype" class="sheet-dmgtype"></TD>
+		</TR>
+		<TR>
+			<TD><button type="roll" name="roll_weapon_8" value="&{template:default} {{name= @{character_name} - @{form8}}} {{score= [[@{form8score}]]/[[@{form8scoregood}]]/[[@{form8scoreamazing}]]}} {{type= @{form8type}}} {{range= @{form8range}}} {{damage= [[@{form8damageordinary}]]@{form8damageordinarytype}/[[@{form8damagegood}]]@{form8damagegoodtype}/[[@{form8damageamazing}]]@{form8damageamazingtype}}} {{results= [[?{Situation Modifier|None, 1d20cs<1cf>20|-8 Steps (-d20), 1d20cs<1cf>20-1d20cs<0cf<0|-4 Steps (-d12), 1d20cs<1cf>20-1d12cs<0cf<0|-3 Steps (-d8), 1d20cs<1cf>20-1d8cs<0cf<0|-2 Steps (-d6), 1d20cs<1cf>20-1d6cs<0cf<0|-1 Steps (-d4), 1d20cs<1cf>20-1d4cs<0cf<0|+1 Steps (+d4), 1d20cs<1cf>20+1d4cs<0cf<0|+2 Steps (+d6), 1d20cs<1cf>20+1d6cs<0cf<0|+3 Steps (+d8), 1d20cs<1cf>20+1d8cs<0cf<0|+4 Steps (+d12), 1d20cs<1cf>20+1d12cs<0cf<0|+8 Steps (+d20), 1d20cs<1cf>20+1d20cs<0cf<0|+6 Steps (+2d20), 1d20cs<1cf>20+2d20cs<0cf<0|+7 Steps (+3d20), 1d20cs<1cf>20+3d20cs<0cf<0}]]}}"></button><input type="text" name="attr_form8" placeholder="Enter Weapon Name"></TD>
+			<TD><input type="number" name="attr_form8score" class="sheet-score" value="0">/<input type="text" name="attr_form8scoregood" class="sheet-scoredisabled" disabled="true" value="(floor(@{form8score}/2))">/<input type="text" name="attr_form8scoreamazing" class="sheet-scoredisabled" disabled="true" value="(floor(@{form8score}/4))"></TD>
+			<TD><input type="text" name="attr_form8die" class="sheet-dicetype" value="+d4"></TD>
+			<TD><input type="text" name="attr_form8accuracy" class="sheet-dicetype" value="0"></TD>
+			<TD><input type="text" name="attr_form8type" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_form8range" class="sheet-range"></TD>
+			<TD><input type="text" name="attr_form8damageordinary" class="sheet-dicetype"><input type="text" name="attr_form8damageordinarytype" class="sheet-dmgtype">/<input type="text" name="attr_form8damagegood" class="sheet-dicetype"><input type="text" name="attr_form8damagegoodtype" class="sheet-dmgtype">/<input type="text" name="attr_form8damageamazing" class="sheet-dicetype"><input type="text" name="attr_form8damageamazingtype" class="sheet-dmgtype"></TD>
+		</TR>
+		<TR>
+			<TD><button type="roll" name="roll_weapon_9" value="&{template:default} {{name= @{character_name} - @{form9}}} {{score= [[@{form9score}]]/[[@{form9scoregood}]]/[[@{form9scoreamazing}]]}} {{type= @{form9type}}} {{range= @{form9range}}} {{damage= [[@{form9damageordinary}]]@{form9damageordinarytype}/[[@{form9damagegood}]]@{form9damagegoodtype}/[[@{form9damageamazing}]]@{form9damageamazingtype}}} {{results= [[?{Situation Modifier|None, 1d20cs<1cf>20|-9 Steps (-d20), 1d20cs<1cf>20-1d20cs<0cf<0|-4 Steps (-d12), 1d20cs<1cf>20-1d12cs<0cf<0|-3 Steps (-d8), 1d20cs<1cf>20-1d8cs<0cf<0|-2 Steps (-d6), 1d20cs<1cf>20-1d6cs<0cf<0|-1 Steps (-d4), 1d20cs<1cf>20-1d4cs<0cf<0|+1 Steps (+d4), 1d20cs<1cf>20+1d4cs<0cf<0|+2 Steps (+d6), 1d20cs<1cf>20+1d6cs<0cf<0|+3 Steps (+d8), 1d20cs<1cf>20+1d8cs<0cf<0|+4 Steps (+d12), 1d20cs<1cf>20+1d12cs<0cf<0|+9 Steps (+d20), 1d20cs<1cf>20+1d20cs<0cf<0|+6 Steps (+2d20), 1d20cs<1cf>20+2d20cs<0cf<0|+7 Steps (+3d20), 1d20cs<1cf>20+3d20cs<0cf<0}]]}}"></button><input type="text" name="attr_form9" placeholder="Enter Weapon Name"></TD>
+			<TD><input type="number" name="attr_form9score" class="sheet-score" value="0">/<input type="text" name="attr_form9scoregood" class="sheet-scoredisabled" disabled="true" value="(floor(@{form9score}/2))">/<input type="text" name="attr_form9scoreamazing" class="sheet-scoredisabled" disabled="true" value="(floor(@{form9score}/4))"></TD>
+			<TD><input type="text" name="attr_form9die" class="sheet-dicetype" value="+d4"></TD>
+			<TD><input type="text" name="attr_form9accuracy" class="sheet-dicetype" value="0"></TD>
+			<TD><input type="text" name="attr_form9type" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_form9range" class="sheet-range"></TD>
+			<TD><input type="text" name="attr_form9damageordinary" class="sheet-dicetype"><input type="text" name="attr_form9damageordinarytype" class="sheet-dmgtype">/<input type="text" name="attr_form9damagegood" class="sheet-dicetype"><input type="text" name="attr_form9damagegoodtype" class="sheet-dmgtype">/<input type="text" name="attr_form9damageamazing" class="sheet-dicetype"><input type="text" name="attr_form9damageamazingtype" class="sheet-dmgtype"></TD>
+		</TR>
+		<TR>
+			<TD><button type="roll" name="roll_weapon_10" value="&{template:default} {{name= @{character_name} - @{form10}}} {{score= [[@{form10score}]]/[[@{form10scoregood}]]/[[@{form10scoreamazing}]]}} {{type= @{form10type}}} {{range= @{form10range}}} {{damage= [[@{form10damageordinary}]]@{form10damageordinarytype}/[[@{form10damagegood}]]@{form10damagegoodtype}/[[@{form10damageamazing}]]@{form10damageamazingtype}}} {{results= [[?{Situation Modifier|None, 1d20cs<1cf>20|-10 Steps (-d20), 1d20cs<1cf>20-1d20cs<0cf<0|-4 Steps (-d12), 1d20cs<1cf>20-1d12cs<0cf<0|-3 Steps (-d8), 1d20cs<1cf>20-1d8cs<0cf<0|-2 Steps (-d6), 1d20cs<1cf>20-1d6cs<0cf<0|-1 Steps (-d4), 1d20cs<1cf>20-1d4cs<0cf<0|+1 Steps (+d4), 1d20cs<1cf>20+1d4cs<0cf<0|+2 Steps (+d6), 1d20cs<1cf>20+1d6cs<0cf<0|+3 Steps (+d8), 1d20cs<1cf>20+1d8cs<0cf<0|+4 Steps (+d12), 1d20cs<1cf>20+1d12cs<0cf<0|+10 Steps (+d20), 1d20cs<1cf>20+1d20cs<0cf<0|+6 Steps (+2d20), 1d20cs<1cf>20+2d20cs<0cf<0|+7 Steps (+3d20), 1d20cs<1cf>20+3d20cs<0cf<0}]]}}"></button><input type="text" name="attr_form10" placeholder="Enter Weapon Name"></TD>
+			<TD><input type="number" name="attr_form10score" class="sheet-score" value="0">/<input type="text" name="attr_form10scoregood" class="sheet-scoredisabled" disabled="true" value="(floor(@{form10score}/2))">/<input type="text" name="attr_form10scoreamazing" class="sheet-scoredisabled" disabled="true" value="(floor(@{form10score}/4))"></TD>
+			<TD><input type="text" name="attr_form10die" class="sheet-dicetype" value="+d4"></TD>
+			<TD><input type="text" name="attr_form10accuracy" class="sheet-dicetype" value="0"></TD>
+			<TD><input type="text" name="attr_form10type" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_form10range" class="sheet-range"></TD>
+			<TD><input type="text" name="attr_form10damageordinary" class="sheet-dicetype"><input type="text" name="attr_form10damageordinarytype" class="sheet-dmgtype">/<input type="text" name="attr_form10damagegood" class="sheet-dicetype"><input type="text" name="attr_form10damagegoodtype" class="sheet-dmgtype">/<input type="text" name="attr_form10damageamazing" class="sheet-dicetype"><input type="text" name="attr_form10damageamazingtype" class="sheet-dmgtype"></TD>
+		</TR>
 		</TABLE>
-		
+
 		<table>
 		<tr>
 			<th><P class="sheet-skilltitle">WEAPON DATA</p></th>
@@ -1697,20 +1775,28 @@
 			<div class="sheet-col sheet-16emwidth">Item Name</div>
 			<div class="sheet-col" style="width:24em;">Item Description</div>
 			<div class="sheet-col sheet-10emwidth">Location</div>
+			<div class="sheet-col" style="width:3em;">Equipped?</div>
 			<div class="sheet-col" style="width:3em;">Mass</div>
-			<div class="sheet-col">Total Mass</div>
+			<div class="sheet-col">Total</div>
 		</div>
-	
+
 	<fieldset class="repeating_equipment">
 		<div class="sheet-row">
 			<div class="sheet-col"><input type="text" name="attr_ItemQty" class="sheet-score" value="0"></div>
 			<div class="sheet-col"><input type="text" name="attr_ItemName" class="sheet-16emwidth" placeholder="Enter Item"></div>
 			<div class="sheet-col"><input type="text" name="attr_ItemDescription" style="width:24em;" placeholder="Enter Description"></div>
 			<div class="sheet-col"><input type="text" name="attr_ItemLocation" class="sheet-12emwidth" placeholder="Item Location"></div>
+			<div class="sheet-col"><input type="checkbox" name="attr_ItemIsWorn" style="width:3em;" placeholder="Item Is Worn" value="1"></div>
 			<div class="sheet-col"><input type="text" name="attr_ItemMass" class="sheet-score" value="0"></div>
 			<div class="sheet-col"><input type="text" name="attr_ItemTotalMass" class="sheet-score" disabled="true" value="@{ItemMass}*@{ItemQty}"></div>
 		</div>
 	</fieldset>
+
+	<div class="sheet-row">
+		<div class="sheet-broadskill sheet-col" style="width: 8em">Total equipped mass: </div>
+		<span name="attr_EquipmentTotal"></span>
+	</div>
+
 </div>
 
 <div class="sheet-section-customskills">
@@ -1869,13 +1955,13 @@
 	<div class="sheet-row">
 		<div class="sheet-20emwidth sheet-col"></div>
 		<div class="sheet-col"><h3 class="sheet-row sheet-skilltitle">Starship Weapons</h3></div>
-	</div>	
+	</div>
 	<div class="sheet-row">
 		<div class="sheet-col" style="width:2em;"></div>
 		<div class="sheet-col sheet-broadskill sheet-16emwidth">Weapon Name</div>
 		<div class="sheet-col sheet-broadskill" style="width:3em;">Acc</div>
 		<div class="sheet-col sheet-8emwidth sheet-broadskill">Range</div>
-		<div class="sheet-col sheet-4emwidth sheet-broadskill">Type</div> 
+		<div class="sheet-col sheet-4emwidth sheet-broadskill">Type</div>
 		<div class="sheet-col sheet-20emwidth sheet-broadskill">Damage</div>
 		<div class="sheet-col sheet-broadskill">Actions</div>
 	</div>
@@ -1889,11 +1975,11 @@
 			<div class="sheet-col"><input type="text" name="attr_StarshipWeaponActions" class="sheet-dmgtype"></div>
 		</div>
 	</fieldset>
-	
+
 	<div class="sheet-row">
 		<div class="sheet-20emwidth sheet-col"></div>
 		<div class="sheet-col"><h3 class="sheet-row sheet-skilltitle">Starship Equipment</h3></div>
-	</div>	
+	</div>
 	<div class="sheet-row">
 		<div class="sheet-col sheet-broadskill sheet-10emwidth">Equipment Name</div>
 		<div class="sheet-col sheet-broadskill sheet-8emwidth">Type</div>
@@ -1904,7 +1990,7 @@
 	<fieldset class="repeating_starshipEquipment">
 		<div class="sheet-row">
 			<div class="sheet-col"><input type="text" name="attr_StarshipEquipmentName" class="sheet-12emwidth" placeholder="Enter Equipment Name"></div>
-			<div class="sheet-col" style="height: 2em;"><select name="attr_StarshipEquipmentType" class="sheet-8emwidth">                
+			<div class="sheet-col" style="height: 2em;"><select name="attr_StarshipEquipmentType" class="sheet-8emwidth">
 					<option value="Power">Power</option>
 					<option value="Engines">Engines</option>
 					<option value="Drive">Drive</option>
@@ -1922,7 +2008,7 @@
 			<div class="sheet-col"><input type="text" name="attr_StarshipEquipmentDescription" style="width:30em;"></div>
 		</div>
 	</fieldset>
-	
+
 	<div class="sheet-row">
 		<div class="sheet-20emwidth sheet-col"></div>
 		<div class="sheet-col"><h2 class="sheet-row sheet-skilltitle">Starship Compartments</h2></div>

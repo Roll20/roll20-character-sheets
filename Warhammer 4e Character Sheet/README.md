@@ -73,6 +73,86 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+April 22th 2022 v1.55e
+
+- Spell Tab changes: Spell name selection improved custom name field is now hidden if not being used. Added Memorized checkbox and XP Cost field for spells. Arcane spells which are not Memorized double the CN on rolling as per Core rules. 
+- Accumulated Ext SL when channelling now automatically increments with each channel roll, channel crit will fill AccuExtSL to CN number if not already above. This effects all spells of the same Lore. Casting will reset AccuExtSL back to 0. Rerolling from the reroll button will use the Previous casts AccuExtSL. AccuExtSL needs to be adjusted manually if special bonus are given, like spend Fortune for +1 SL.
+- Add Vs Reach (VsRch) tick on Melee assister, this ass Vs Larger Reach -10 to Attack modifier, to be used against a enemy with larger Weapon then you.
+- Unequipping Weapons Main/Off will now result in a Unarmed default condition with normal stats.
+- Drunk now applies to WS/BS/Agi/Dex/Int skills only.
+- Ranged Accurate has been merged into the Ranged modifier changing defautl mod to 10 rather then add during the roll to any other modifier value.
+- Inventory now has Worn? option instead of carrier option. Selecting Wron reduces total enc of the item by -1.
+- Fixed Fastshot not adding to SL outcome calculation.
+- Fixed Conditions not working with no offhand weapon equiped. This stoped a few rolls from functioning.
+
+
+April 13th 2022 v1.55d
+
+- New integrated Size system - Size is selectable in Background tab, and Vs Size in the Melee Assister. Applyies Size Combat Modifiers rules from the core book, effects sheet Wounds/Carry weight and modifies melee combat rolls. Showing larger/smaller bonuses as appropriate. Only works with talent integration.
+- Separated Mele Attack and Opposed modifier, only Attack modifier is shown in Melee Assist window. So Opposed Parry rolls do not apply Attack only modifiers, and vice versa.
+- Improved Conditions calculation, they now cap at -30 modifier. Add Drunk as a special condition which can stack with other condition modifiers upto max -30. Penalties like Offhand and Armor are now considered in the cap.
+- Fixed Carouser RT results not displaying properly
+- Fixed Distract RT text not displaying properly
+- Fixed issue with Encumbrance Penalty when Agility was exactly 30 it would result in frozen target display
+- Added talents Beat Blade, Beneath Notice, Large/Small, Suffused with Uglu, Super Numerate & Supportive to talent integration
+- Added Beat Blade to melee assist actions, and reordered them so the layout cascade better on sheet
+- Activating Stun to Strike will now with also activate Melee Called Shot
+- Added new Psychology record section in Core Stats tab under Injuries (with community support!)
+ 
+
+April 6th 2022 v1.55c
+
+- Improved Armor Qualities, now displays selected options at top of attack rolls. New checkboxes in the Armor Tab.
+- Added Magical Quality to Melee/Ranged Weapon settings, allows custom text in same format as normal qualities.
+- Added Talent integration logic for Second Sight/Strider/Stout-hearted/Tinker/Trapper/Trick Riding/Tunnel Rat.
+- Added Pummel to Ranged Weapons, as Sling ammo can have pummel.
+- Added Called Shot to Ranged Assister, and changed Cover to a drop down to conserve space.
+- Fixed Called Shot Melee, it now works with Off hand Attack rolls too and clears selection after rolling.
+- Various localization fixes and additions to Talent integration (with community support!)
+
+
+March 31th 2022 v1.55b
+
+- Corrected UiA critTable not activing in certain situations.
+- Corrected but Encumbrance Max value not displaying, related to new Orge Race.
+- Various fixes and additions to Talent integration (with community support!)
+
+
+March 25th 2022 v1.55a
+
+- Fixed UiA crit tables, some of the Crit Damage was out by 1.
+- Cast and Channel fumbles clarified, added 10s fumble for channelling and casting now shows when a 8 unit die (chaos) is rolled.
+
+
+March 19th 2022 v1.55
+
+- Devmode renamed Talent and Quality Integration
+- Added official Cubicle 7 Up in Arms rule set support
+- Up in Arms - Group Advantage - (select in Advantage Rules in setting) - include the appropriate Talent changes
+- Up in Arms - Critical Damage Tables - (select in Critical Rules in setting)
+- Up in Arms - New Weapon Qualities - Added to Talent and Quailties Integration.
+- Talent and Quailties Integration - Re-ordered Melee Bonus assister, added Called Shot and Strike to Stun
+
+
+March 11th 2022 v1.54
+
+- Added official support for Roll20 Dark Mode
+- Added Hypnotism to Advanced Skills (Power behind the Throne, EiS vol3)
+
+
+February 25th 2022 v1.53.3
+
+- Added Ogre to the race list race with stats (Archives of the Empire vol 2)
+- Fix for melee weapons list target display for any weapon except 2H
+
+
+January 3rd 2022 v1.53.2
+
+- Fixed issue where Twohanded weapons when selected would show offhand penality added to the target value of the specific weapon. This did not effect the Roll itself.
+- Fix for Characteristics modifier which was adding twice on the skill target display in rolls.
+- Resolved issue with Custom Spell Advantage rule (which basic removed advantage modifier from casting), this will now also disable Advantage for Langange Magick skill roll aswell as spellbook rolls. And removes the gold star indicator when disabled too.
+
+
 December 6th 2021 v1.53.1
 
 - Completed experimental talent list (all 166 talents) in the Dev mode, nearly all are implemented at this time. This causes talent bonuses to show when rolling skills and weapons, to allow superior flow of game and especially combat. Includes advanced combat actions, like Charge/Furious Assault/Feint/DW/Fast Shot etc rules which are implemented directly into the sheet so they show when rolling ( i.e. you don't have to remember at the +SL or complex rule). Also includes a new SL system which adds together the total SL bonus each roll. Enable Dev mode to test this feature.

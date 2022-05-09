@@ -1,5 +1,76 @@
 # Changelog
 
+## [1.6.0] - 2020-04-18
+
+### Added
+
+- Add calculated Movement section to profiles.
+- Add option to whisper rolls to GM.
+- Add WP Paired to ancient and modern.
+- Add Drunken Style Kung Fu and Mystic Drunken Style.
+- Add 'actions' to duration/frequency units.
+- Add whitespace to the bottom of the sheet to make it easier to add rows.
+
+### Changed
+
+- Fix issue where PS Type wasn't showing up in Active Profile.
+- Fix issue where 'Giant Robotic' displays for PS Type when it should be 'Robotic'.
+- Roll template fixes for dark mode.
+- Layout fixes.
+- Make Modern WP level read-only.
+- Separate dice and unit on ability/magic/psionic damage summary row.
+
+## [1.5.0] - 2022-03-13
+
+### Added
+
+- `Level Acquired` for Skills, Hand to Hand, and Weapon Proficiencies. Current level calculation is done based on that value and the current character level.
+
+### Changed
+
+- Fix for a change in dark mode.
+- Fix `Migrate` button.
+- Fix issue where adding custom Weapon Proficiencies would break the process that runs when the Character Level is changed, and prevent Skills/Abilities/etc. from updating.
+- Fix issue where sometimes Skills/Weapon Proficiencies would auto-adjust their level when opening the sheet.
+- Improve alignment between headings and values in Weapon Proficiencies, Abilities, Magic, and Psionics.
+- Add `from Active Profile` to reset ISP/PPE buttons.
+- Fix issue with broken roll templates on certain checks (Despair, Mind Control, etc.).
+
+## [1.4.0] - 2022-03-02
+
+### Added
+
+- Add "Output ISP/PPE/Damage usage to chat" option.
+- Display level alongside modifier name in Modifier Picker list.
+- Add Battleram, Bombard, and Space Fighter combats to the Hand to Hand & RPA Combat selector.
+- Add styles for dark mode.
+- Add "Show Armor warnings when damage is taken on last layer" option.
+
+### Changed
+
+- Fix issue where adding a modifier duplicated it in the Modifier Picker.
+- Fix issue where remaining armor output was displaying the pre-damage amount.
+- Fix issue where activating/deactivating a top-level Armor wasn't always modifying the Active Armor section.
+- Fix issue where clicking Reset MDC on a top-level Armor didn't update the Active Armor.
+
+### Removed
+
+- Remove extraneous Break Fall in a couple of places.
+
+## [1.3.0] - 2022-01-11
+
+### Added
+
+- Add roll templates for damage, casting spell, and using psionic.
+- Add optional `successtext` to skill roll template.
+- Add Break Fall to bonuses.
+
+### Changed
+
+- Move Modern Strike: Pulse to Strike: Single bonus.
+- Added Migrate button instead of auto-migrating on sheet load.
+- Output PPE/ISP/MDC to chat when an amount is deducted from the sheet using the action buttons.
+
 ## [1.2.0] - 2021-10-15
 
 ### Added
