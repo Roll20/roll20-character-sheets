@@ -227,6 +227,7 @@ on("change:zrecznosc_base change:mod_zrecznosc change:percepcja_base change:mod_
 /******************************************************************/
 /******************************************************************/
 /************************** ROLL PARAMETERS ***********************/
+const difficulties = [-2,0,2,5,8,11,15, 20, 24];
 const startingPercent = [-20, 0, 11, 31, 61, 91, 121, 201, 241];
 const lastPassingPercent = [-1,10,30,60,90,120,200, 240, 0xFFFFFF];
 const levelRadioValues = ["0","1","2","3","4","5","6","7","8"];
@@ -317,6 +318,8 @@ const statslist = [
     "mechanika",                        "elektronika",                  "komputery",
     "maszyny_ciezkie",                  "wozy_bojowe",                  "kutry",
     "rusznikarstwo",                    "wyrzutnie",                    "materialy_wybuchowe",
+    "wogl0",                            "wogl1",                        "wogl2",
+    "wogl3",                            "wogl4",                        "wogl5",
     
     "plywanie",                         "wspinaczka",                   "kondycja",
     "jazda_konna",                      "powozenie",                    "ujezdzanie"
@@ -342,12 +345,14 @@ const stats2wsp = {
     "mechanika":W_SP,                   "elektronika":W_SP,             "komputery":W_SP,
     "maszyny_ciezkie":W_SP,             "wozy_bojowe":W_SP,             "kutry":W_SP,
     "rusznikarstwo":W_SP,               "wyrzutnie":W_SP,               "materialy_wybuchowe":W_SP,
+    "wogl0":W_SP,                       "wogl1":W_SP,                   "wogl2":W_SP,   
+    "wogl3":W_SP,                       "wogl4":W_SP,                   "wogl5":W_SP,   
     
     "plywanie":W_BD,                    "wspinaczka":W_BD,              "kondycja":W_BD,
     "jazda_konna":W_BD,                 "powozenie":W_BD,               "ujezdzanie":W_BD
 };
 
-const stats2genitive = {
+stats2genitive = {
     "bijatyka":"bijatyki",                              "bron_reczna":"walki bronią białą",                 "rzucanie":"rzucania",
     "pistolety":"strzelania z broni krótkiej",          "karabiny":"strzelania z broni długiej",            "bron_maszynowa":"strzelania z broni maszynowej",
     "luk":"łucznictwa",                                 "kusza":"kusznictwa",                               "proca":"procarstwa",
@@ -367,10 +372,26 @@ const stats2genitive = {
     "mechanika":"mechaniki",                            "elektronika":"elektroniki",                        "komputery":"komputerów",
     "maszyny_ciezkie":"znajomości maszyn ciężkich",     "wozy_bojowe":"prowadzenia wozów bojowych",         "kutry":"sterowania kutrem",
     "rusznikarstwo":"rusznikarstwa",                    "wyrzutnie":"obsługi wyrzutni",                     "materialy_wybuchowe":"znajomości materiałów wybuchowych",
+    "wogl0":"UNSET",                                    "wogl1":"UNSET",                                    "wogl2":"UNSET",
+    "wogl3":"UNSET",                                    "wogl4":"UNSET",                                    "wogl5":"UNSET",
 
     "plywanie":"pływania",                              "wspinaczka":"wspinaczki",                          "kondycja":"kondycji",
     "jazda_konna":"jeździectwa",                        "powozenie":"powożenia",                            "ujezdzanie":"ujeżdżania",
 }
+
+const wogl_labels = [
+    "wogl0_label", "wogl1_label", "wogl2_label", "wogl3_label", "wogl4_label", "wogl5_label"
+];
+wogl_labels.forEach((label) => {
+    on(`change:${label} remove:${label} sheet:opened`, () => {
+        getAttrs([label], (values) => {
+            let skillid = label.split("_")[0];
+            let skillname = String(values[label]);
+            skillname = skillname.length > 0 ? skillname : "niewiedzy";
+            stats2genitive[skillid] = `wiedzy ogólnej (${skillname})`;
+        });
+    });
+});
 
 statslist.forEach((attribute) => {
     on(`change:${attribute}`, () => {
@@ -427,7 +448,6 @@ statslist.forEach((attribute) => {
                 
                 let dice_style = [3,3,3];
                 let vals_s = vals.concat().sort(function(a, b){return a-b});;
-                const difficulties = [-2,0,2,5,8,11,15];
                 let statreq = statbase - difficulties[final_test_level];
                 let succ = 0;
                 if (modi_open) {
@@ -529,7 +549,6 @@ wsplist.forEach((wspolczyn) => {
                 
                 let dice_style = [3,3,3];
                 let vals_s = vals.concat().sort(function(a, b){return a-b});;
-                const difficulties = [-2,0,2,5,8,11,15];
                 let statreq = statbase - difficulties[final_test_level];
                 let succ = 0;
                 if (modi_open) {
