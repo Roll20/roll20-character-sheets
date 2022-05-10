@@ -1291,7 +1291,7 @@
         <p class="sheet-dark-text">
           Warning! This feature should only be used on blank character sheets.<br />
           Enter data for a PTA3 character to automatically fill this character sheet.
-          Currently supported formats: roll20, Pokelicious Google Sheets (minimum version Saffron)
+          Currently supported formats: roll20, Pokelicious Google Sheets, VTTES by Justas Dabrilla.
         </p>
       </div>
       <div class="sheet-json-import sheet-show-on-mobile">
@@ -2941,8 +2941,9 @@
 
   function parseCharacterData(characterData) {
     const source = characterData["Source"];
-    if(!source) return { ["json_import_response"]: "Error - Unable to identify source of JSON data" };
-    if(source.startsWith("Pokelicious")) {
+    const vttes_version = characterData["schema_version"];
+    if(!source && !vttes_version) return { ["json_import_response"]: "Error - Unable to identify source of JSON data" };
+    if(source && source.startsWith("Pokelicious")) {
       // Identify as a Pokelicious sheet
       let response = { ["json_import_response"]: "Error - Unable to parse all attributes" }
       const innerData = characterData["Attributes"];
@@ -2994,23 +2995,46 @@
       response["json_import_response"] = "Pokemon data successfully imported from " + source + "!";
       return response;
 
-    } else if (source.startsWith("roll20")) {
+    } else if (source && source.startsWith("roll20")) {
       // Identify as a roll20 sheet
-      let response = includeOnlyKeysInArray(characterData, r20export_attrs);
-      response["json_import_response"] = "Error - Unable to parse all attributes";
-      characterData["exportmoves"].forEach(function(move) {
-        const id = generateRowID();
-        Object.entries(move).forEach(([key, value]) => response[`repeating_moves_${id}_${key}`] = value);
-      });
-      characterData["exportfeatures"].forEach(function(feature) {
-        const id = generateRowID();
-        Object.entries(feature).forEach(([key, value]) => response[`repeating_features_${id}_${key}`] = value);
-      });
+      let response = parseCharacterDataOriginatingFromRoll20(characterData);
       response["json_import_response"] = "Character sheet data successfully imported from " + source + "!";
+      return response;
+    } else if (vttes_version) {
+      // VTTES by Justas Dabrilla - DocSigmaBot created exports for all Pokemon
+      let flattenedAttributes = { };
+      let repeatingMoveKeys = [];
+      characterData["character"]["attribs"].forEach(function(attribute) {
+        const name = attribute["name"];
+        if(name.startsWith('repeating_moves_')){
+          repeatingMoveKeys.push(name);
+        }
+        flattenedAttributes[name] = attribute["current"];
+      });
+      let nonRepeatResponse = includeOnlyKeysInArray(flattenedAttributes, r20export_attrs);
+      let repeatResponse = includeOnlyKeysInArray(flattenedAttributes, repeatingMoveKeys);
+      let response = {...nonRepeatResponse, ...repeatResponse};
+      response["HP_max"] = response["HP"];
+      response["character_name"] = characterData["character"]["name"];
+      response["json_import_response"] = "Character sheet data successfully imported from VTTES by Justas Dabrilla, version " + vttes_version + "!";
       return response;
     } else {
       return { ["json_import_response"]: "Error - " + source + " is not a supported data source" };
     }
+  }
+
+  function parseCharacterDataOriginatingFromRoll20(characterData) {
+    let response = includeOnlyKeysInArray(characterData, r20export_attrs);
+    response["json_import_response"] = "Error - Unable to parse all attributes";
+    characterData["exportmoves"].forEach(function(move) {
+      const id = generateRowID();
+      Object.entries(move).forEach(([key, value]) => response[`repeating_moves_${id}_${key}`] = value);
+    });
+    characterData["exportfeatures"].forEach(function(feature) {
+      const id = generateRowID();
+      Object.entries(feature).forEach(([key, value]) => response[`repeating_features_${id}_${key}`] = value);
+    });
+    return response;
   }
 
   function remapIfExists(inputData, responseData, inputKey, responseKey) {
