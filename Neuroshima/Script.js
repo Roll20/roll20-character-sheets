@@ -453,7 +453,7 @@ statslist.forEach((attribute) => {
                 if (modi_open) {
                     let vals_sc = vals_s.concat();
                     while ( skill_remaining > 0 ) {
-                        if (vals_sc[0] > vals_sc[1]) {
+                        if (vals_sc[0] == vals_sc[1]) {
                             vals_sc[0] -= 1;
                             dice_style[0] = 1;
                         } else {
@@ -598,5 +598,41 @@ wsplist.forEach((wspolczyn) => {
     });
 });
 
+// Register the click handler to all specified buttons.
+const toggleList = [
+    "grp_walka_wrecz", 
+    "grp_bron_strzelecka",
+    "grp_bron-dystansowa",
+    "grp_prowadzenie-pojazdow",
+    "grp_zdolnosci-manualne",
+    "grp_orientacja-w-terenie",
+    "grp_spostrzegawczosc",
+    "grp_kamuflaz",
+    "grp_przetrwanie",
+    "grp_negocjacje",
+    "grp_empatia",
+    "grp_sila-woli",
+    "grp_medycyna",
+    "grp_technika",
+    "grp_sprzet",
+    "grp_pirotechnika",
+    "grp_wiedza-ogolna-1",
+    "grp_wiedza-ogolna-2",
+    "grp_sprawnosc",
+    "grp_jezdziectwo",
+];
+
+toggleList.forEach(function(button) {
+  on(`clicked:${button}`, function() {
+    const flag = `${button}_flag`;
+    // Check the current value of the hidden flag.
+    getAttrs([flag], function(v) {
+      // Update the value of the hidden flag to "1" for checked or "0" for unchecked.
+      setAttrs({
+        [flag]: v[flag] !== "1" ? "1" : "0"
+      });
+    });
+  });
+});
 /*************************** ROLL HANDLERS ************************/
 /******************************************************************/
