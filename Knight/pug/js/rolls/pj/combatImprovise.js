@@ -91,7 +91,6 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     let exec = [];
     exec.push(roll);
 
-    let isConditionnelA = false;
     let isConditionnelD = false;
     let isConditionnelV = false;
 
@@ -108,7 +107,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     let diceDegats = baseDegats;
     let diceViolence = baseDegats;
 
-    const bDegats = [];
+    let bDegats = [];
     const bViolence = [];
 
     let degats = [];
@@ -137,6 +136,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     listAttrs = listAttrs.concat(listBase);
     listAttrs = listAttrs.concat(listArmure);
     listAttrs = listAttrs.concat(listArmureLegende);
+    listAttrs = listAttrs.concat(listStyle);
 
     const attrs = await getAttrsAsync(listAttrs);
 
@@ -165,6 +165,8 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
 
     let ODBarbarian = [];
     let ODMALBarbarian = [];
+    let ODRogue = [];
+    let ODMALRogue = [];
     let ODShaman = [];
     let ODMALShaman = [];
     const ODWarrior = [];
@@ -180,8 +182,8 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     let isSurprise = false;
     let isTenebricide = false;
 
-    let attaquesSurprises = [];
-    let attaquesSurprisesValue = [];
+    const attaquesSurprises = [];
+    const attaquesSurprisesValue = [];
     let attaquesSurprisesCondition = '';
 
     const devaste = +attrs.devasterAnatheme;
@@ -265,10 +267,10 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     // GESTION DU STYLE
     let getStyle;
 
-    if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
+    if (type.includes('&{template:combat} {{portee=^{portee-contact}}}')) {
       getStyle = getStyleContactMod(attrs, [], baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false);
     } else {
-      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, hasArmure, oTir, false, false, false, false);
+      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, 0, hasArmure, oTir, false, false, false, false);
     }
 
     exec = exec.concat(getStyle.exec);
@@ -285,19 +287,12 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = armorBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = armorBonus.isConditionnelD; }
-
-    attaquesSurprises = armorBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = armorBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = armorBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(armorBonus.diceDegats);
+    bDegats = bDegats.concat(armorBonus.bDegats);
     diceViolence += Number(armorBonus.diceViolence);
 
     ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
+    ODRogue = ODRogue.concat(armorBonus.ODRogue);
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
     ODWarrior.push(armorBonus.ODWarrior);
 
@@ -306,19 +301,12 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(MALBonus.diceDegats);
+    bDegats = bDegats.concat(MALBonus.bDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
 
@@ -335,6 +323,8 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     bonus = bonus.concat(OD);
     bonus = bonus.concat(ODBarbarian);
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODRogue);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODShaman);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODWarrior);
@@ -403,8 +393,6 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
       autresEffets.sort();
       exec.push(`{{effets=${autresEffets.join(' / ')}}}`);
     }
-
-    if (isConditionnelA) { exec.push('{{succesConditionnel=true}}'); }
 
     if (isConditionnelD) { exec.push('{{degatsConditionnel=true}}'); }
 

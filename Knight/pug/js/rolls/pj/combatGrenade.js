@@ -37,7 +37,7 @@ rollCombatGrenade.forEach((button) => {
     let diceDegats = 3;
     let diceViolence = 3;
 
-    const bDegats = [];
+    let bDegats = [];
     const bViolence = [];
 
     let degats = [];
@@ -80,6 +80,8 @@ rollCombatGrenade.forEach((button) => {
 
     let ODBarbarian = [];
     let ODMALBarbarian = [];
+    let ODRogue = [];
+    let ODMALRogue = [];
     let ODShaman = [];
     let ODMALShaman = [];
     const ODWarrior = [];
@@ -89,8 +91,8 @@ rollCombatGrenade.forEach((button) => {
     const oDiscretion = +attrs[`${ODValue.discretion}`];
     const oTir = +attrs.tir;
 
-    let attaquesSurprises = [];
-    let attaquesSurprisesValue = [];
+    const attaquesSurprises = [];
+    const attaquesSurprisesValue = [];
     let attaquesSurprisesCondition = '';
 
     let isTenebricide = false;
@@ -246,7 +248,7 @@ rollCombatGrenade.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, '', hasArmure, oTir, false, false, false, false);
+    const getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, '', '', hasArmure, oTir, false, false, false, false);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);
@@ -262,19 +264,12 @@ rollCombatGrenade.forEach((button) => {
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = armorBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = armorBonus.isConditionnelD; }
-
-    attaquesSurprises = armorBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = armorBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = armorBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(armorBonus.diceDegats);
+    bDegats = bDegats.concat(armorBonus.bDegats);
     diceViolence += Number(armorBonus.diceViolence);
 
     ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
+    ODRogue = ODRogue.concat(armorBonus.ODRogue);
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
     ODWarrior.push(armorBonus.ODWarrior);
 
@@ -291,19 +286,12 @@ rollCombatGrenade.forEach((button) => {
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(MALBonus.diceDegats);
+    bDegats = bDegats.concat(MALBonus.bDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
 
@@ -320,6 +308,8 @@ rollCombatGrenade.forEach((button) => {
     bonus = bonus.concat(OD);
     bonus = bonus.concat(ODBarbarian);
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODRogue);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODShaman);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODWarrior);

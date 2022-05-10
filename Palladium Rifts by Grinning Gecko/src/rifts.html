@@ -188,8 +188,13 @@
                   <input type="text" list="hand-to-hand" name="attr_name" />
                 </label>
                 <label
+                  ><span>Level Acquired</span>
+                  <input type="number" value="1" name="attr_levelacquired" />
+                </label>
+                <label
                   ><span>Level</span>
-                  <input type="number" value="1" name="attr_level" />
+                  <span class="readonly" name="attr_level"></span>
+                  <input type="hidden" value="1" name="attr_level" />
                 </label>
               </div>
             </summary>
@@ -230,6 +235,7 @@
             <h5>Duration</h5>
             <h5>Frequency</h5>
             <h5>Damage</h5>
+            <h5></h5>
             <h5></h5>
             <h5 title="Damage Capacity">D.C.</h5>
             <h5>Skill</h5>
@@ -273,12 +279,8 @@
         <label
           ><span>Current P.P.E.</span>
           <input type="number" name="attr_currentppe" value="0" />
-          <button
-            type="action"
-            name="act_resetppe"
-            title="Reset P.P.E. from Default Profile"
-          >
-            Reset P.P.E.
+          <button type="action" name="act_resetppe">
+            Reset P.P.E. from Active Profile
           </button>
         </label>
         <label>
@@ -292,6 +294,7 @@
           <h5>Range</h5>
           <h5>Duration</h5>
           <h5>Damage</h5>
+          <h5></h5>
           <h5></h5>
           <h5 title="Damage Capacity">D.C.</h5>
           <h5>Skill</h5>
@@ -335,12 +338,8 @@
         <label
           ><span>Current I.S.P.</span>
           <input type="number" name="attr_currentisp" value="0" />
-          <button
-            type="action"
-            name="act_resetisp"
-            title="Reset I.S.P. from Default Profile"
-          >
-            Reset I.S.P.
+          <button type="action" name="act_resetisp">
+            Reset I.S.P. from Active Profile
           </button>
         </label>
         <label>
@@ -358,6 +357,7 @@
           <h5>Range</h5>
           <h5>Duration</h5>
           <h5>Damage</h5>
+          <h5></h5>
           <h5></h5>
           <h5 title="Damage Capacity">D.C.</h5>
           <h5>Skill</h5>
@@ -636,6 +636,7 @@
     <!-- inject:partials/options.html -->
     <!-- endinject -->
   </div>
+  <br /><br /><br /><br /><br />
 
   <!-- .r-tabbed -->
   <input type="hidden" name="attr_prefix" value="@{" />
@@ -689,10 +690,14 @@
   /* endinject */
 
   /**
-   * [] Include non-zero modifier in roll template (ex -10 should appear as a line item to indicate it was factored in)
+   * [] When adding damage type to calculated damage on psionics, it adds the type to the Damage field in Modifiers as well, which will break rolls
+   * [] Migrate attributes from existing Rifts sheet
+   * [] Add repeating modifiers to Skills and allow them to be added to Profiles
    * [] Represent Critical/Knockout from behind
    * [] Add skills (WP Paired) from h2h
    * [] Define "combat moves" somewhere - stuff from H2H with damage and penalties (loses initiave and one attack), etc.
+   * [] Add a non-repeating section for Default Profile so that profile attributes can be set on the token
+   * [] Include non-zero modifier in roll template (ex -10 should appear as a line item to indicate it was factored in)
    * [] Refactor to get rid of the Bonuses repeating section and instead go straight from Modifiers to Picked Modifiers. I think the Bonuses section causes weird issues related to network/multiple updates at the same time.
    * [] Add range to modifiers (guns)
    * [] Factor in "Aimed Attack/Called Shot" (/disarm) from WP Targeting (RUE p328)
@@ -887,10 +892,10 @@
       e.previousValue = "1";
     }
     // Update WPs
-    await updateHandToHands("h2h", e.newValue);
+    await updateHandToHands("h2h");
     await updateWeaponProficiencies("wp", e.newValue, e.previousValue);
     await updateWeaponProficiencies("wpmodern", e.newValue, e.previousValue);
-    await updateSkillLevels(+e.newValue, +e.previousValue);
+    await updateSkillLevels();
     await updateMagicPsionicsLevels();
   });
 </script>

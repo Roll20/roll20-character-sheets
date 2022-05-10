@@ -1,5 +1,35 @@
 Change Log
 ==============================================
+**2022-05-04 ** v.12 Paul V
+	Major changes to the Skills rolls added a skill settings window for each skill. moved Expertise dice on to that window
+	Added a whole swave of modifiers to the rolls 
+	Moved Jack of all trades into the Global skill settings window
+	Moves all Expertise Dice and Proficient into the skill specific setting windows
+	Added Standard / Advantage / Disadvantage buttons on to the sheet allowing to rolls with advantage or disadvantage
+**2022-03-07 ** v.11 Paul V
+	Split the Archtypes so only the selected class's archtypes will appear in the list 
+	Fixed bug in NPC Sheet
+**2022-02-31 ** v.10 Paul V
+	---Split the Archtypes so only the selected class's archtypes will appear in the list -- can't get this working at the moment
+	Improved the readability of TextBoxes, increase the text size and darkened the colour a little
+	Added Vehicle skill for the initiative
+	Got Vehicle Initiative working
+	Improved coding of the CSS 
+**2022-02-15 ** v.9 Paul V
+	Added Marshal into the Class list, removed the no longer used Warlord
+	Added a check box to each spell list allowing spell notes to be added to each spell
+	Added Notes Tab to Character sheet
+	Added a check box to equipment allowing notes to be added to each equipment item
+	Added a check box to maneuver allowing notes to be added to each maneuver item
+**2021-12-16 ** v.8 Paul V
+	Increased size of HitDice and Speed on the NPC Sheet
+	Increased size of the Challenge rating section
+	Fixed the formatting of the Damage Vulnerabilities/Resistances/Immunities/Conditional sections so they are left formatted and fit on the same line
+	Left Align Senses and languages on NPC Sheet
+**2021-12-15 ** v.7 Paul V
+	Fixed NPC CR current using the incorrect attribute --Reset to using attr_CR
+**2021-12-15 ** v.6 Paul V
+	Fixed formatting on Reaction Names and Notes on the NPC Sheet
 **2021-12-05 ** v.5 Paul V
 	Attribute changes to enable importing of characters
 	attr_strengthmod to attr_strength_mod

@@ -133,7 +133,11 @@ def main(
                     module = importlib.import_module(module_name)
                     ns.update(getattr(module, attr_name))
             except Exception as err:
-                print(f"error: Could not load {name}: {err}", end="")
+                print(
+                    f"error: Could not load {name} due to "
+                    f"{err.__class__.__name__}: {err}",
+                    end="",
+                )
                 if verbose < 1:
                     print(" (use -v to display detailed traceback)")
                 else:

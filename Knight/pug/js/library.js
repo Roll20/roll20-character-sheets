@@ -693,6 +693,7 @@ const i18n_deplacement = getTranslationByKey("deplacement"),
     i18n_typeScout = getTranslationByKey("warrior-type-scout"),
     i18n_ghost = getTranslationByKey("mode-ghost"),
     i18n_ghostActive = getTranslationByKey("mode-ghost-active"),
+    i18n_changelingActive = getTranslationByKey("mode-changeling-active"),
     i18n_impregnation = getTranslationByKey("shaman-impregnation"),
     i18n_portee = getTranslationByKey("portee"),
     i18n_chocAutomatique = getTranslationByKey("choc-automatique-si-chair"),     
@@ -1244,6 +1245,7 @@ const listBase = [
 
 const listArmure = [
     `barbarianGoliath`,
+    `bardChangeling`,
     `rogueGhost`,
     `shamanNbreTotem`,
     `caracteristiqueTotem1`,
@@ -1259,6 +1261,7 @@ const listArmure = [
 
 const listArmureLegende = [
     `MALBarbarianGoliath`,
+    `MALBardChangeling`,
     `MALRogueGhost`,
     `MALShamanNbreTotem`,
     `MALCaracteristiqueTotem1`,
@@ -1278,6 +1281,8 @@ const listStyle = [
     `atkAmbidextre`,
     `atkDefensif`,
     `atkPilonnage`,
+    `stylePuissantType`,
+    `stylePuissantBonus`,
     `styleSuppressionD`,
     `styleSuppressionV`,
 ];
