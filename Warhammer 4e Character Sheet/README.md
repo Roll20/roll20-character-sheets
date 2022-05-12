@@ -73,6 +73,14 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+May 12th 2022 v1.55f
+
+- Implemented Unshakable Talent, which adds conditional bonus to Cool tests.
+- Fixed Briber Talent naming, it was incorrectly named Bribery.
+- Fixed Channelling test miscast inidcator on Unit die 0, now occur only when roll is above the target number.
+- Button Hover style no longer inverts text color, text remains white with black shadow.
+
+
 April 22th 2022 v1.55e
 
 - Spell Tab changes: Spell name selection improved custom name field is now hidden if not being used. Added Memorized checkbox and XP Cost field for spells. Arcane spells which are not Memorized double the CN on rolling as per Core rules. 
