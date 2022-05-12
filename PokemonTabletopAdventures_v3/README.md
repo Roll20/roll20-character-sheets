@@ -24,6 +24,12 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### May 12, 2022
+- Fixed a bug where the pokemon and hybrid character pages would default to the normal type selection rather than typeless if this value isn't modified
+  - Also sets the default type for a newly created move to typeless rather than normal
+- Updated the default values so that a new character opens to the configuration page with the character type set as pokemon
+- Updated the default initiative tie breaker to allow a full range of decimal values
+
 ### May 7, 2022
 - Add support for importing character sheets by using the VTTES tool
   - Community member used this to create every Pokemon, so this lets others take advantage of that work even if they can't use that tool
