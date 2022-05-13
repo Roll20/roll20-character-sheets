@@ -5,6 +5,7 @@ const wiz1 = {};
 wiz1['Affect Normal Fires'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Elemental Fire, Alchemy',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': '10-foot radius',
@@ -23,6 +24,7 @@ wiz1['Affect Normal Fires'] = {
 wiz1['Alarm'] = {
     'level': '1',
     'school': 'Abjuration, Evocation',
+    'school-spells-and-magic': 'Abjuration, Invocation/Evocation, Geometry',
     'range': '10 yards',
     'duration': '[[4+(0.5*[[@{level-wizard}]])]] hours',
     'aoe': 'Up tp 20-foot cube',
@@ -41,6 +43,7 @@ wiz1['Alarm'] = {
 wiz1['Armor'] = {
     'level': '1',
     'school': 'Conjuration',
+    'school-spells-and-magic': 'Conjuration/Summoning, Force',
     'range': 'Touch',
     'duration': 'Special',
     'aoe': '1 creature',
@@ -59,6 +62,7 @@ wiz1['Armor'] = {
 wiz1['Audible Glamer'] = {
     'level': '1',
     'school': 'Illusion/Phantasm',
+    'school-spells-and-magic': 'Illusion/Phantasm, Song',
     'range': '[[60+(10*[[@{level-wizard}]])]] yards',
     'duration': '[[3*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Hearing range',
@@ -76,6 +80,7 @@ wiz1['Audible Glamer'] = {
 wiz1['Burning Hands'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Elemental Fire',
     'range': '0',
     'duration': 'Instantaneous',
     'aoe': 'The caster',
@@ -93,6 +98,7 @@ wiz1['Burning Hands'] = {
 wiz1['Cantrip'] = {
     'level': '1',
     'school': 'All Schools',
+    'school-spells-and-magic': 'Universal Magic',
     'range': '10 feet',
     'duration': '[[@{level-wizard}]] hours',
     'aoe': 'Special',
@@ -128,6 +134,7 @@ wiz1['Change Self'] = {
 wiz1['Charm Person'] = {
     'level': '1',
     'school': 'Enchantment/Charm',
+    'school-spells-and-magic': 'Enchantment/Charm, Mentalism, Song',
     'range': '120 yards',
     'duration': 'Special',
     'aoe': '1 person',
@@ -146,6 +153,7 @@ wiz1['Charm Person'] = {
 wiz1['Chill Touch'] = {
     'level': '1',
     'school': 'Necromancy',
+    'school-spells-and-magic': 'Necromancy, Shadow',
     'range': '0',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
     'aoe': 'The caster',
@@ -182,6 +190,7 @@ wiz1['Color Spray'] = {
 wiz1['Comprehend Languages'] = {
     'level': '1',
     'school': 'Alteration (Reversible)',
+    'school-spells-and-magic': 'Universal Magic (Reversible)',
     'range': 'Touch',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': '1 speaking creature or written text',
@@ -200,6 +209,7 @@ wiz1['Comprehend Languages'] = {
 wiz1['Dancing Lights'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Elemental Fire',
     'range': '[[40+(10*[[@{level-wizard}]])]]',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Special',
@@ -218,6 +228,7 @@ wiz1['Dancing Lights'] = {
 wiz1['Detect Magic'] = {
     'level': '1',
     'school': 'Divination',
+    'school-spells-and-magic': 'Universal Magic',
     'range': '0',
     'duration': '[[2*[[@{level-wizard}]] ]]',
     'aoe': '10 x 60 feet',
@@ -254,6 +265,7 @@ wiz1['Detect Undead'] = {
 wiz1['Enlarge'] = {
     'level': '1',
     'school': 'Alteration (Reversible)',
+    'school-spells-and-magic': 'Alteration, Dimension (Reversible)',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': '1 creature or object',
@@ -272,6 +284,7 @@ wiz1['Enlarge'] = {
 wiz1['Erase'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Geometry',
     'range': '30 yards',
     'duration': 'Permanent',
     'aoe': '1 scroll or 2 pages',
@@ -290,6 +303,7 @@ wiz1['Erase'] = {
 wiz1['Feather Fall'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Elemental Air',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'Special',
@@ -308,6 +322,7 @@ wiz1['Feather Fall'] = {
 wiz1['Find Familiar'] = {
     'level': '1',
     'school': 'Conjuration/Summoning',
+    'school-spells-and-magic': 'Conjuration/Summoning, Song',
     'range': '[[@{level-wizard}]] miles',
     'duration': 'Special',
     'aoe': '1 familiar',
@@ -326,6 +341,7 @@ wiz1['Find Familiar'] = {
 wiz1['Friends'] = {
     'level': '1',
     'school': 'Enchantment/Charm',
+    'school-spells-and-magic': 'Enchantment/Charm, Song',
     'range': '0',
     'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
     'aoe': '60-foot radius',
@@ -344,6 +360,7 @@ wiz1['Friends'] = {
 wiz1['Gaze Reflection'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Dimension',
     'range': '0',
     'duration': '[[2+[[@{level-wizard}]] ]] rounds',
     'aoe': 'Special',
@@ -362,6 +379,7 @@ wiz1['Gaze Reflection'] = {
 wiz1['Grease'] = {
     'level': '1',
     'school': 'Conjuration',
+    'school-spells-and-magic': 'Conjuration/Summoning, Alchemy',
     'range': '10 yards',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
     'aoe': '10 x 10 feet',
@@ -380,6 +398,7 @@ wiz1['Grease'] = {
 wiz1['Hold Portal'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Universal Magic',
     'range': '[[20*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '[[20*[[@{level-wizard}]] ]] square feet',
@@ -398,6 +417,7 @@ wiz1['Hold Portal'] = {
 wiz1['Hypnotism'] = {
     'level': '1',
     'school': 'Enchantment/Charm',
+    'school-spells-and-magic': 'Enchantment/Charm, Mentalism',
     'range': '5 yards',
     'duration': '[[1+[[@{level-wizard}]] ]] rounds',
     'aoe': '30 foot cube',
@@ -416,6 +436,7 @@ wiz1['Hypnotism'] = {
 wiz1['Identify'] = {
     'level': '1',
     'school': 'Divination',
+    'school-spells-and-magic': 'Universal Magic',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '[[@{level-wizard}]] items',
@@ -470,6 +491,7 @@ wiz1['Light'] = {
 wiz1['Magic Missile'] = {
     'level': '1',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Invocation/Evocation, Force',
     'range': '[[60+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Instantaneous',
     'aoe': '1-5 targets',
@@ -488,6 +510,7 @@ wiz1['Magic Missile'] = {
 wiz1['Mending'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Artifice',
     'range': '30 yards',
     'duration': 'Permanent',
     'aoe': '1 object',
@@ -539,7 +562,7 @@ wiz1['Mount'] = {
     'effect': 'By means of this spell, the caster conjures a normal animal to serve him as a mount. The animal serves willingly and well, but at the expiration of the spell duration it disappears, returning to its own place. The type of mount gained by this spell depends on the level of the caster; of course, a caster can choose a lesser mount if desired. Available mounts include the following:}}{{style=center1}}{{c1-1=**Caster Level**}}{{c2-1=1–3}}{{c3-1=4–7}}{{c4-1=8–12}}{{c5-1=13–14}}{{c6-1=15+}}{{c1-2=**Mount**}}{{c2-2=Mule or light horse}}{{c3-2=Draft horse or war horse}}{{c4-2=Camel}}{{c5-2=Elephant}}{{c6-2=Griffon}}{{effects2=&emsp;The mount does not come with any riding gear, unless it is of a class lower than the caster would normally be entitled to; thus, a 4th-level wizard can gain a war horse without saddle and harness, or a light horse with saddle and harness. Elephants comes with howdah at 18th level. Griffon comes with saddle at 18th level. The statistics of the animal gained are typical of all creatures of the same class. The mount disappears when slain.',
 };
 
-wiz1['Nystu\'s Magical Aura'] = {
+wiz1['Nystul\'s Magical Aura'] = {
     'level': '1',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
@@ -578,6 +601,7 @@ wiz1['Phantasmal Force'] = {
 wiz1['Protection From Evil'] = {
     'level': '1',
     'school': 'Abjuration (Reversible)',
+    'school-spells-and-magic': 'Abjuration, Alchemy (Reversible)',
     'range': 'Touch',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Creature touched',
@@ -596,6 +620,7 @@ wiz1['Protection From Evil'] = {
 wiz1['Read Magic'] = {
     'level': '1',
     'school': 'Divination',
+    'school-spells-and-magic': 'Universal Magic',
     'range': '0',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Special',
@@ -614,6 +639,7 @@ wiz1['Read Magic'] = {
 wiz1['Shield'] = {
     'level': '1',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Invocation/Evocation, Force, Geometry',
     'range': '0',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Special',
@@ -650,6 +676,7 @@ wiz1['Shocking Grasp'] = {
 wiz1['Sleep'] = {
     'level': '1',
     'school': 'Enchantment/Charm',
+    'school-spells-and-magic': 'Enchantment/Charm, Shadow, Song',
     'range': '30 yards',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Special',
@@ -686,6 +713,7 @@ wiz1['Spider Climb'] = {
 wiz1['Spook'] = {
     'level': '1',
     'school': 'Illusion/Phantasm',
+    'school-spells-and-magic': 'Illusion/Phantasm, Mentalism, Shadow',
     'range': '30 feet',
     'duration': 'Special',
     'aoe': '1 creature',
@@ -704,6 +732,7 @@ wiz1['Spook'] = {
 wiz1['Taunt'] = {
     'level': '1',
     'school': 'Enchantment',
+    'school-spells-and-magic': 'Enchantment/Charm, Song',
     'range': '60 yards',
     'duration': '1 round',
     'aoe': '30 foot radius',
@@ -722,6 +751,7 @@ wiz1['Taunt'] = {
 wiz1['Tenser\'s Floating Disc'] = {
     'level': '1',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Invocation/Evocation, Force',
     'range': '20 yards',
     'duration': '[[3+[[@{level-wizard}]] ]] turns',
     'aoe': 'Special',
@@ -776,6 +806,7 @@ wiz1['Ventriloquism'] = {
 wiz1['Wall of Fog'] = {
     'level': '1',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Invocation/Evocation, Elemental Air',
     'range': '30 yards',
     'duration': '[[2d4+[[@{level-wizard}]] ]] rounds',
     'aoe': '[[20+(10*[[@{level-wizard}]])]] foot cube',
@@ -784,7 +815,7 @@ wiz1['Wall of Fog'] = {
     'saving-throw': 'None',
     'materials': 'A pinch of split dried peas.',
     'reference': 'p. 180',
- 'book': 'PHB',
+    'book': 'PHB',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -794,6 +825,7 @@ wiz1['Wall of Fog'] = {
 wiz1['Wizard Mark'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Universal Magic',
     'range': 'Touch',
     'duration': 'Permanent',
     'aoe': 'Up to 1 square foot',
@@ -831,6 +863,7 @@ wiz2['Alter Self'] = {
 wiz2['Bind'] = {
     'level': '2',
     'school': 'Enchantment',
+    'school-spells-and-magic': 'Enchantment/Charm, Artifice',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '[[50+(5*[[@{level-wizard}]])]] feet',
@@ -867,6 +900,7 @@ wiz2['Blindness'] = {
 wiz2['Blur'] = {
     'level': '2',
     'school': 'Illusion/Phantasm',
+    'school-spells-and-magic': 'Illusion/Phantasm, Shadow',
     'range': '0',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
     'aoe': 'The caster',
@@ -885,6 +919,7 @@ wiz2['Blur'] = {
 wiz2['Continual Light'] = {
     'level': '2',
     'school': 'Alteration (Reversible)',
+    'school-spells-and-magic': 'Alteration/Shadow (Reversible)',
     'range': '60 yards',
     'duration': 'Permanent',
     'aoe': '60-foot radius',
@@ -903,6 +938,7 @@ wiz2['Continual Light'] = {
 wiz2['Darkness, 15\' Radius'] = {
     'level': '2',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Shadow',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '1 turn + [[@{level-wizard}]] rounds',
     'aoe': '15-foot radius',
@@ -939,6 +975,7 @@ wiz2['Deafness'] = {
 wiz2['Deeppockets'] = {
     'level': '2',
     'school': 'Alteration, Enchantment',
+    'school-spells-and-magic': 'Alteration, Enchantment/Charm, Dimension',
     'range': 'Touch',
     'duration': '[[12+[[@{level-wizard}]] ]] hours',
     'aoe': '1 garment',
@@ -1011,6 +1048,7 @@ wiz2['ESP'] = {
 wiz2['Flaming Sphere'] = {
     'level': '2',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Invocation/Evocation, Elemental Fire',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '3-foot radius',
@@ -1029,6 +1067,7 @@ wiz2['Flaming Sphere'] = {
 wiz2['Fog Cloud'] = {
     'level': '2',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Elemental Air',
     'range': '10 yards',
     'duration': '[[4+[[@{level-wizard}]] ]] rounds',
     'aoe': 'Special',
@@ -1046,7 +1085,8 @@ wiz2['Fog Cloud'] = {
 
 wiz2['Fools\' Gold'] = {
     'level': '2',
-    'school': 'Alteration',
+    'school': 'Alteration, Illusion',
+    'school-spells-and-magic': 'Alteration, Illusion/Phantasm, Elemental Earth, Alchemy',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] hours',
     'aoe': '[[10*[[@{level-wizard}]] ]] cubic inches',
@@ -1055,7 +1095,7 @@ wiz2['Fools\' Gold'] = {
     'saving-throw': 'Special',
     'materials': 'Copper coins or brass items.',
     'reference': 'p. 183',
- 'book': 'PHB',
+    'book': 'PHB',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1065,6 +1105,7 @@ wiz2['Fools\' Gold'] = {
 wiz2['Forget'] = {
     'level': '2',
     'school': 'Enchantment/Charm',
+    'school-spells-and-magic': 'Enchantment/Charm, Mentalism, Song',
     'range': '30 yards',
     'duration': 'Permanent',
     'aoe': '1-4 creatures in a 20-foot cube',
@@ -1083,6 +1124,7 @@ wiz2['Forget'] = {
 wiz2['Glitterdust'] = {
     'level': '2',
     'school': 'Conjuration/Summoning',
+    'school-spells-and-magic': 'Conjuration/Summoning, Alchemy',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
     'aoe': '20 foot cube',
@@ -1101,6 +1143,7 @@ wiz2['Glitterdust'] = {
 wiz2['Hypnotic Pattern'] = {
     'level': '2',
     'school': 'Illusion/Phantasm',
+    'school-spells-and-magic': 'Illusion/Phantasm, Geometry',
     'range': '30 yards',
     'duration': 'Special',
     'aoe': '30-foot cube',
@@ -1173,6 +1216,7 @@ wiz2['Irritation'] = {
 wiz2['Knock'] = {
     'level': '2',
     'school': 'Alteration (Reversible)',
+    'school-spells-and-magic': 'Universal Magic (Reversible)',
     'range': '60 yards',
     'duration': 'Special',
     'aoe': '[[10*[[@{level-wizard}]] ]] feet',
@@ -1209,6 +1253,7 @@ wiz2['Know Alignment'] = {
 wiz2['Leomund\'s Trap'] = {
     'level': '2',
     'school': 'Illusion/Phantasm',
+    'school-spells-and-magic': 'Illusion/Phantasm, Artifice',
     'range': 'Touch',
     'duration': 'Permanent',
     'aoe': 'Object touched',
@@ -1227,6 +1272,7 @@ wiz2['Leomund\'s Trap'] = {
 wiz2['Levitate'] = {
     'level': '2',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Force',
     'range': '[[20*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] turns',
     'aoe': '1 creature or object',
@@ -1281,6 +1327,7 @@ wiz2['Magic Mouth'] = {
 wiz2['Melf\'s Acid Arrow'] = {
     'level': '2',
     'school': 'Conjuration',
+    'school-spells-and-magic': 'Conjuration/Summoning, Alchemy',
     'range': '180 yards',
     'duration': 'Special',
     'aoe': '1 target',
@@ -1335,6 +1382,7 @@ wiz2['Misdirection'] = {
 wiz2['Protection From Cantrips'] = {
     'level': '2',
     'school': 'Abjuration',
+    'school-spells-and-magic': 'Universal Magic, Abjuration',
     'range': 'Touch',
     'duration': '[[5+[[@{level-wizard}]] ]] hours',
     'aoe': 'Creature or object touched',
@@ -1353,6 +1401,7 @@ wiz2['Protection From Cantrips'] = {
 wiz2['Pyrotechnics'] = {
     'level': '2',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Elemental Fire, Alchemy',
     'range': '120 yards',
     'duration': 'Special',
     'aoe': '1 fire source',
@@ -1371,6 +1420,7 @@ wiz2['Pyrotechnics'] = {
 wiz2['Ray of Enfeeblement'] = {
     'level': '2',
     'school': 'Enchantment/Charm',
+    'school-spells-and-magic': 'Enchantment/Charm, Shadow',
     'range': '[[10+(5*[[@{level-wizard}]])]] yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '1 creature',
@@ -1389,6 +1439,7 @@ wiz2['Ray of Enfeeblement'] = {
 wiz2['Rope Tricks'] = {
     'level': '2',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Dimension',
     'range': 'Touch',
     'duration': '[[2*[[@{level-wizard}]] ]] turns',
     'aoe': 'Special',
@@ -1407,6 +1458,7 @@ wiz2['Rope Tricks'] = {
 wiz2['Scare'] = {
     'level': '2',
     'school': 'Enchantment/Charm',
+    'school-spells-and-magic': 'Enchantment/Charm, Shadow',
     'range': '[[30+(10*[[@{level-wizard}]])]] yards',
     'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
     'aoe': '15-foot radius',
@@ -1443,6 +1495,7 @@ wiz2['Shatter'] = {
 wiz2['Spectral Hand'] = {
     'level': '2',
     'school': 'Necromancy',
+    'school-spells-and-magic': 'Necromancy, Shadow',
     'range': '[[30+(5*[[@{level-wizard}]])]] yards',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': '1 opponent',
@@ -1461,6 +1514,7 @@ wiz2['Spectral Hand'] = {
 wiz2['Stinking Cloud'] = {
     'level': '2',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Invocation/Evocation, Elemental Air, Alchemy',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '20-foot cube',
@@ -1497,6 +1551,7 @@ wiz2['Strength'] = {
 wiz2['Summon Swarm'] = {
     'level': '2',
     'school': 'Conjuration/Summoning',
+    'school-spells-and-magic': 'Conjuration/Summoning, Song',
     'range': '60 yards',
     'duration': 'Special',
     'aoe': '10-foot cube',
@@ -1515,6 +1570,7 @@ wiz2['Summon Swarm'] = {
 wiz2['Tasha\'s Uncontrollable Hideous Laughter'] = {
     'level': '2',
     'school': 'Enchantment/Charm',
+    'school-spells-and-magic': 'Enchantment/Charm, Song',
     'range': '60 yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '1 or more creatures in a 30-foot cube',
@@ -1533,6 +1589,7 @@ wiz2['Tasha\'s Uncontrollable Hideous Laughter'] = {
 wiz2['Web'] = {
     'level': '2',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Invocation/Evocation',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[2*[[@{level-wizard}]] ]] turns',
     'aoe': '8000 cubic feet',
@@ -1551,6 +1608,7 @@ wiz2['Web'] = {
 wiz2['Whispering Wind'] = {
     'level': '2',
     'school': 'Alteration, Phantasm',
+    'school-spells-and-magic': 'Alteration, Illusion/Phantasm, Elemental Air, Song',
     'range': '[[@{level-wizard}]] miles',
     'duration': 'Special',
     'aoe': '2-foot radius',
@@ -1569,6 +1627,7 @@ wiz2['Whispering Wind'] = {
 wiz2['Wizard Lock'] = {
     'level': '2',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Universal Magic',
     'range': 'Touch',
     'duration': 'Permanent',
     'aoe': '[[30*[[@{level-wizard}]] ]] square feet',
@@ -5631,6 +5690,7 @@ wiz9['Wish'] = {
 wiz1['Copy'] = {
     'level': '1',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Invocation/Evocation, Geometry',
     'range': 'Special',
     'duration': 'Instantaneous',
     'aoe': 'One object',
@@ -5649,6 +5709,7 @@ wiz1['Copy'] = {
 wiz1['Chromatic Orb'] = {
     'level': '1',
     'school': 'Alteration, Evocation',
+    'school-spells-and-magic': 'Alteration, Invocation/Evocation, Artifice',
     'range': '0',
     'duration': 'Special',
     'aoe': 'One object',
@@ -5667,6 +5728,7 @@ wiz1['Chromatic Orb'] = {
 wiz1['Corpse Visage'] = {
     'level': '1',
     'school': 'Illusion, Necromancy',
+    'school-spells-and-magic': 'Illusion/Phantasm, Necromancy',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'Creature touched',
@@ -5684,7 +5746,7 @@ wiz1['Corpse Visage'] = {
 
 wiz1['Detect Disease'] = {
     'level': '1',
-    'school': 'Divination)',
+    'school': 'Divination',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '1 creature or object',
@@ -5703,6 +5765,7 @@ wiz1['Detect Disease'] = {
 wiz1['Divining Rod'] = {
     'level': '1',
     'school': 'Divination, Enchantment',
+    'school-spells-and-magic': 'Divination, Enchantment/Charm, Artifice',
     'range': '60 yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'Special',
@@ -5829,6 +5892,7 @@ wiz2['Ghoul Touch'] = {
 wiz2['Ice Knife'] = {
     'level': '2',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Invocation/Evocation, Artifice',
     'range': 'Special',
     'duration': 'Instantaneous',
     'aoe': 'Special',
@@ -6408,6 +6472,7 @@ wiz1['Conjure Spell Component'] = {
 wiz1['Fire Burst'] = {
     'level': '1',
     'school': 'Alteration, Evocation',
+    'school-spells-and-magic': 'Alteration, Invocation/Evocation, Elemental Fire, Alchemy',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Instantaneous',
     'aoe': 'One 10’-radius circle',
@@ -6426,6 +6491,7 @@ wiz1['Fire Burst'] = {
 wiz1['Fist of Stone'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Elemental Earth',
     'range': '0',
     'duration': '[[@{level-wizard}]] round(s)',
     'aoe': 'The caster’s hand',
@@ -6445,6 +6511,7 @@ wiz1['Hornung\'s Guess'] = {
     'category': 'Wild Magic',
     'level': '1',
     'school': 'Divination',
+    'school-spells-and-magic': 'Wild Magic',
     'range': '300 yards',
     'duration': 'Instantaneous',
     'aoe': 'Special',
@@ -6463,6 +6530,7 @@ wiz1['Hornung\'s Guess'] = {
 wiz1['Lasting Breath'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Elemental Air',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '1d4+[[@{level-wizard}]] rounds',
     'aoe': '[[@{level-wizard}]] creature(s)',
@@ -6481,6 +6549,7 @@ wiz1['Lasting Breath'] = {
 wiz1['Metamorphose Liquids'] = {
     'level': '1',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Elemental Water, Alchemy',
     'range': 'Touch',
     'duration': 'Permanent',
     'aoe': '[[@{level-wizard}]]’-cube',
@@ -6518,6 +6587,7 @@ wiz1['Nahal\'s Reckless Dweomer'] = {
     'category': 'Wild Magic',
     'level': '1',
     'school': 'Invocation/Evocation',
+    'school-spells-and-magic': 'Wild Magic',
     'range': 'Special',
     'duration': 'Special',
     'aoe': 'Special',
@@ -6537,6 +6607,7 @@ wiz1['Patternweave'] = {
     'category': 'Wild Magic',
     'level': '1',
     'school': 'Divination',
+    'school-spells-and-magic': 'Alchemy, Wild Magic',
     'range': '10 yards',
     'duration': '1 round',
     'aoe': '10-foot square',
@@ -6556,6 +6627,7 @@ wiz2['Chaos Shield'] = {
     'category': 'Wild Magic',
     'level': '2',
     'school': 'Abjuration',
+    'school-spells-and-magic': 'Wild Magic',
     'range': '0',
     'duration': '[[1d10+2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'The caster',
@@ -6575,6 +6647,7 @@ wiz2['Hornung\'s Baneful Deflector'] = {
     'category': 'Wild Magic',
     'level': '2',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Geometry, Wild Magic',
     'range': 'Touch',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'One creature',
@@ -6593,6 +6666,7 @@ wiz2['Hornung\'s Baneful Deflector'] = {
 wiz2['Insatiable Thirst'] = {
     'level': '2',
     'school': 'Enchantment/Charm',
+    'school-spells-and-magic': 'Enchantment/Charm, Elemental Water',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'One creature',
@@ -6611,6 +6685,7 @@ wiz2['Insatiable Thirst'] = {
 wiz2['Maximilian\'s Earthen Grasp'] = {
     'level': '2',
     'school': 'Evocation',
+    'school-spells-and-magic': 'Alteration, Elemental Earth',
     'range': '[[10+10*[[@{level-wizard}]] ]] yards',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
     'aoe': 'One creature',
@@ -6630,6 +6705,7 @@ wiz2['Nahal\'s Nonsensical Nullifier'] = {
     'category': 'Wild Magic',
     'level': '2',
     'school': 'Abjuration',
+    'school-spells-and-magic': 'Wild Magic',
     'range': 'Touch',
     'duration': '[[1d6+[[@{level-wizard}]] ]] rounds',
     'aoe': 'Creature touched',
@@ -6684,6 +6760,7 @@ wiz2['Protection From Paralysis'] = {
 wiz2['Ride the Wind'] = {
     'level': '2',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Elemental Air',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] turns',
     'aoe': '[[@{level-wizard}]] creatures',
@@ -6702,6 +6779,7 @@ wiz2['Ride the Wind'] = {
 wiz2['Sense Shifting'] = {
     'level': '2',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Alchemy',
     'range': '0',
     'duration': '3 turns',
     'aoe': 'The caster',
@@ -8813,24 +8891,6 @@ wiz6['Sense Treason'] = {
 //#endregion
 
 //#region Player's Option: Spells & Magic
-wiz1['Cantrip']['school-spells&magic']                  = "Universal Magic"
-wiz1['Comprehend Languages']['school-spells&magic']     = "Universal Magic"
-wiz1['Detect Magic']['school-spells&magic']             = "Universal Magic"
-wiz1['Hold Portal']['school-spells&magic']              = "Universal Magic"
-wiz1['Identify']['school-spells&magic']                 = "Universal Magic"
-wiz1['Read Magic']['school-spells&magic']               = "Universal Magic"
-wiz1['Wizard Mark']['school-spells&magic']              = "Universal Magic"
-wiz2['Knock']['school-spells&magic']                    = "Universal Magic"
-wiz2['Protection From Cantrips']['school-spells&magic'] = "Universal Magic"
-wiz2['Wizard Lock']['school-spells&magic']              = "Universal Magic"
-wiz3['Dispel Magic']['school-spells&magic']             = "Universal Magic"
-wiz4['Remove Curse']['school-spells&magic']             = "Universal Magic"
-wiz5['Teleport']['school-spells&magic']                 = "Universal Magic"
-wiz6['Enchant an Item']['school-spells&magic']          = "Universal Magic"
-wiz7['Teleport Without Error']['school-spells&magic']   = "Universal Magic"
-wiz8['Permanency']['school-spells&magic']               = "Universal Magic"
-wiz9['Astral Spell']['school-spells&magic']             = "Universal Magic"
-
 wiz1['Detect Phase'] = {
     'level': '1',
     'school': 'Divination, Dimension',
