@@ -1765,6 +1765,58 @@ WEAPONS_TABLE['scythe'].push({
 });
 //endregion
 
+//#region The Complete Wizard's Handbook
+WEAPONS_TABLE['bo stick'].push({
+    'name': 'Bo stick',
+    'size': 'L',
+    'type': 'B',
+    'speed': 3,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': ['The Complete Wizard\'s Handbook'],
+    'category': ['Melee']
+});
+
+WEAPONS_TABLE['boku-toh'] = [];
+WEAPONS_TABLE['boku-toh'].push({
+    'name': 'Boku-toh',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'book': ['The Complete Wizard\'s Handbook'],
+    'category': ['Melee']
+});
+
+WEAPONS_TABLE['jitte'] = [];
+WEAPONS_TABLE['jitte'].push({
+    'name': 'Jitte',
+    'size': 'M',
+    'type': 'B',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'book': ['The Complete Wizard\'s Handbook'],
+    'category': ['Melee']
+});
+
+WEAPONS_TABLE['shuriken'].push({
+    'name': 'Shuriken',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'rof': '3/1',
+    'range': '5/10/20',
+    'strength': true,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': ['The Complete Wizard\'s Handbook'],
+    'category': ['Range']
+});
+//#endregion
+
 //#region Arms and Equipment
 WEAPONS_TABLE['short bow, flight arrow'].push({
     'name': 'Short bow, Flight arrow',
@@ -2967,7 +3019,6 @@ WEAPONS_TABLE['hanbo (half staff)'].push({
     'category': ['Melee']
 });
 
-WEAPONS_TABLE['jitte'] = [];
 WEAPONS_TABLE['jitte'].push({
     'name': 'Jitte',
     'size': 'S',
