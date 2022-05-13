@@ -15,6 +15,11 @@ spellsJs.forEach(jsFile => {
     console.log(jsFile);
     const spells = require(path.join(jsFolder, jsFile));
     html += pug.renderFile(path.join(pugFolder, 'spellsDatalists.pug'), {pretty: true, data: spells});
+
+    if (jsFile === 'priestSpells.js') {
+        let sphereTable = pug.renderFile(path.join(pugFolder, 'sphereOverview.pug'), {pretty: true, data: spells});
+        fs.writeFileSync(path.join(miscFolder, 'sphere-overview.html'), sphereTable);
+    }
 });
 
 console.log('weapons.js');
@@ -23,7 +28,7 @@ const weapons = require(path.join(jsFolder, 'weapons.js'));
 const weaponsProficiencies = require(path.join(jsFolder, 'weaponProficiencies.js'));
 html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weapons, proficiencies: weaponsProficiencies});
 
-let weaponTable = pug.renderFile(path.join(pugFolder, 'weaponsTable.pug'), {pretty: true, data: weapons});
+let weaponTable = pug.renderFile(path.join(pugFolder, 'weaponsOverview.pug'), {pretty: true, data: weapons});
 fs.writeFileSync(path.join(miscFolder, 'weapons-overview.html'), weaponTable);
 
 const simpleDatalists = [
