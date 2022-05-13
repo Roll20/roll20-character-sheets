@@ -8135,7 +8135,7 @@ pri3['Dictate'] = {
 pri3['Etherealness'] = {
     'level': '3',
     'school': 'Alteration',
-    'sphere': 'Numbers',
+    'sphere': 'Astral, Numbers',
     'range': '0',
     'duration': '1 turn + [[@{level-priest}]] rounds',
     'aoe': 'The caster',
@@ -8597,7 +8597,7 @@ pri5['Produce Ice'] = {
 pri5['Righteous Wrath of the Faithful'] = {
     'level': '5',
     'school': 'Enchantment/Charm',
-    'sphere': 'War',
+    'sphere': 'Combat, War',
     'range': '0',
     'duration': '[[@{level-priest}]] rounds',
     'aoe': '30-foot radius',
