@@ -2308,6 +2308,7 @@ WEAPONS_TABLE['daikyu, leaf head arrow'] = [];
 WEAPONS_TABLE['daikyu, leaf head arrow'].push({
     'name': 'Daikyu, Leaf head arrow',
     'size': 'L',
+    'ammo-size': 'L',
     'type': 'P',
     'speed': 7,
     'rof': '2/1',
@@ -2781,9 +2782,9 @@ WEAPONS_TABLE['daikyu (great bow), armor piercer arrow'].push({
     'category': ['Range']
 });
 
-WEAPONS_TABLE['daikyu (great bow), flight arrow)'] = [];
-WEAPONS_TABLE['daikyu (great bow), flight arrow)'].push({
-    'name': 'Daikyu (great bow), Flight arrow)',
+WEAPONS_TABLE['daikyu (great bow), flight arrow'] = [];
+WEAPONS_TABLE['daikyu (great bow), flight arrow'].push({
+    'name': 'Daikyu (great bow), Flight arrow',
     'size': 'L',
     'ammo-size': 'M',
     'type': 'P',
