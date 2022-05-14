@@ -2239,9 +2239,9 @@ WEAPONS_TABLE['punch-cutter'].push({
     'category': ['Melee']
 });
 
-WEAPONS_TABLE['giant-kin long bow, (voadkyn)'] = [];
-WEAPONS_TABLE['giant-kin long bow, (voadkyn)'].push({
-    'name': 'Giant-kin Long bow, (Voadkyn)',
+WEAPONS_TABLE['giant-kin long bow (voadkyn)'] = [];
+WEAPONS_TABLE['giant-kin long bow (voadkyn)'].push({
+    'name': 'Giant-kin Long bow (Voadkyn)',
     'size': 'G',
     'type': 'P',
     'speed': 10,
