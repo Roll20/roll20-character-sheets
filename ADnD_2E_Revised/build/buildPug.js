@@ -16,6 +16,10 @@ spellsJs.forEach(jsFile => {
     const spells = require(path.join(jsFolder, jsFile));
     html += pug.renderFile(path.join(pugFolder, 'spellsDatalists.pug'), {pretty: true, data: spells});
 
+    if (jsFile === 'wizardSpells.js') {
+        let schoolTable = pug.renderFile(path.join(pugFolder, 'schoolOverview.pug'), {pretty: true, data: spells});
+        fs.writeFileSync(path.join(miscFolder, 'school-overview.html'), schoolTable);
+    }
     if (jsFile === 'priestSpells.js') {
         let sphereTable = pug.renderFile(path.join(pugFolder, 'sphereOverview.pug'), {pretty: true, data: spells});
         fs.writeFileSync(path.join(miscFolder, 'sphere-overview.html'), sphereTable);
