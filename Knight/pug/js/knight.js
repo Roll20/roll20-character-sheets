@@ -3326,7 +3326,9 @@ on('clicked:importKNPCG', () => {
         const name = effects[cle].name.split(' ', length).join(' ').toLowerCase();
         const value2 = eff[length] || 0;
 
-        switch (name) {
+        const uEff = name === 'ignore' || name === 'perce' || name === 'dégâts' ? `${name} ${eff[1]}` : name;
+
+        switch (uEff) {
           case 'anathème':
             newrowattrsW[`${path + newrowidW}_anatheme`] = '{{anatheme=Anathème}}';
             break;
@@ -3419,7 +3421,7 @@ on('clicked:importKNPCG', () => {
             newrowattrsW[`${path + newrowidW}_ignoreArmure`] = '{{ignoreArmure=Ignore Armure}}';
             break;
 
-          case 'ignore champ de force':
+          case 'ignore CdF':
             newrowattrsW[`${path + newrowidW}_ignoreCdF`] = '{{ignoreCdF=Ignore Champs de Force}}';
             break;
 
