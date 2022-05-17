@@ -2954,9 +2954,9 @@ WEAPONS_TABLE['chopsticks'].push({
     'category': ['Melee']
 });
 
-WEAPONS_TABLE['chu-ko-nu, light quarrel (repeater)'] = [];
-WEAPONS_TABLE['chu-ko-nu, light quarrel (repeater)'].push({
-    'name': 'Chu-ko-nu, Light quarrel (repeater)',
+WEAPONS_TABLE['chu-ko-nu (repeater), light quarrel'] = [];
+WEAPONS_TABLE['chu-ko-nu (repeater), light quarrel'].push({
+    'name': 'Chu-ko-nu (repeater), Light quarrel',
     'group': 'Crossbow',
     'size': 'M',
     'ammo-size': 'S',
@@ -4312,7 +4312,7 @@ WEAPONS_TABLE['axe-pistol, ranged'].push({
     'range': '3/6/9',
     'small-medium': '1d8',
     'large': '1d8',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -4344,7 +4344,7 @@ WEAPONS_TABLE['dagger-pistol, ranged'].push({
     'range': '3/6/9',
     'small-medium': '1d8',
     'large': '1d8',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -4376,7 +4376,7 @@ WEAPONS_TABLE['hammer-pistol, ranged'].push({
     'range': '3/6/9',
     'small-medium': '1d8',
     'large': '1d8',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -4408,12 +4408,12 @@ WEAPONS_TABLE['sword-pistol, ranged'].push({
     'range': '3/6/9',
     'small-medium': '1d8',
     'large': '1d8',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
 
-WEAPONS_TABLE['cho-ku-no, light quarrel'] = WEAPONS_TABLE['chu-ko-nu, light quarrel (repeater)'];
+WEAPONS_TABLE['cho-ku-no, light quarrel'] = WEAPONS_TABLE['chu-ko-nu (repeater), light quarrel'];
 WEAPONS_TABLE['cho-ku-no, light quarrel'].push({
     'name': 'Cho-ku-no, Light quarrel',
     'group': 'Crossbow',
@@ -4680,7 +4680,7 @@ WEAPONS_TABLE['flintlock belt pistol'].push({
     'range': '4/8/12',
     'small-medium': '1d8',
     'large': '1d8',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -4725,7 +4725,7 @@ WEAPONS_TABLE['flintlock carbine'].push({
     'range': '10/20/55',
     'small-medium': '1d10',
     'large': '1d10',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -4740,7 +4740,7 @@ WEAPONS_TABLE['flintlock horse pistol'].push({
     'range': '5/10/15',
     'small-medium': '1d10',
     'large': '1d10',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -4755,7 +4755,7 @@ WEAPONS_TABLE['flintlock musket'].push({
     'range': '15/30/80',
     'small-medium': '1d12',
     'large': '1d12',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -4845,7 +4845,7 @@ WEAPONS_TABLE['hand match arquebus'].push({
     'range': '10/30/42',
     'small-medium': '1d10',
     'large': '1d10',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -5272,7 +5272,7 @@ WEAPONS_TABLE['matchlock arquebus'].push({
     'range': '10/20/60',
     'small-medium': '1d10',
     'large': '1d10',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -5287,7 +5287,7 @@ WEAPONS_TABLE['matchlock caliver'].push({
     'range': '8/16/48',
     'small-medium': '1d8',
     'large': '1d8',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -5302,7 +5302,7 @@ WEAPONS_TABLE['matchlock musket w/rest'].push({
     'range': '12/24/72',
     'small-medium': '1d12',
     'large': '1d12',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -5939,7 +5939,7 @@ WEAPONS_TABLE['snaplock belt pistol'].push({
     'range': '3/6/9',
     'small-medium': '1d8',
     'large': '1d8',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -5954,7 +5954,7 @@ WEAPONS_TABLE['snaplock horse pistol'].push({
     'range': '4/8/12',
     'small-medium': '1d10',
     'large': '1d10',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -5969,7 +5969,7 @@ WEAPONS_TABLE['snaplock musket'].push({
     'range': '14/26/78',
     'small-medium': '1d12',
     'large': '1d12',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -6563,7 +6563,7 @@ WEAPONS_TABLE['wheellock arquebus'].push({
     'range': '10/20/60',
     'small-medium': '1d10',
     'large': '1d10',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -6578,7 +6578,7 @@ WEAPONS_TABLE['wheellock belt pistol'].push({
     'range': '3/6/9',
     'small-medium': '1d8',
     'large': '1d8',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -6593,7 +6593,7 @@ WEAPONS_TABLE['wheellock horse pistol'].push({
     'range': '4/8/12',
     'small-medium': '1d10',
     'large': '1d10',
-    'knockdown': 'd8',
+    'knockdown': 'd8cs>7!>7',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
