@@ -15,8 +15,11 @@ const BOOK_FIELDS = [
     'book-combat-and-tactics','book-skills-and-powers','book-spells-and-magic'
 ];
 
-const SCHOOL_FIELDS = ['school-spells-and-magic'];
-const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', 'sphere-spells-and-magic'];
+const SCHOOL_SPELLS_AND_MAGIC = 'school-spells-and-magic';
+const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
+
+const SPHERE_SPELLS_AND_MAGIC = 'sphere-spells-and-magic';
+const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', SPHERE_SPELLS_AND_MAGIC];
 
 //#region Helper function
 function capitalizeFirst(s) {
@@ -818,6 +821,9 @@ function parseSpheres(spheresStrings, regex) {
 }
 
 const getSpellSpheres = function (spell, sphereRules) {
+    if (sphereRules.has(SPHERE_SPELLS_AND_MAGIC))
+        return spell[SPHERE_SPELLS_AND_MAGIC] || spell['sphere'];
+
     let sphere = spell['sphere'];
     sphereRules.forEach(rule => sphere += spell[rule] || '');
     return sphere;
@@ -1027,6 +1033,12 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
                 [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
+            if (section.startsWith('wiz')) {
+                let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
+                spellInfo[`repeating_spells-${section}_spell-school`] = schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
+                    ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
+                    : spell['school'];
+            }
             if (section.startsWith('pri')) {
                 let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
                 spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
@@ -1086,10 +1098,10 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel, []);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel, SCHOOL_FIELDS);
     }
 });
-setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel, []);
+setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel, SCHOOL_FIELDS);
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
