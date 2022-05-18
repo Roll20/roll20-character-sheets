@@ -5,7 +5,7 @@ DISADVANTAGES['Allergies'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Allergies'] = {
+DISADVANTAGES['Severe Allergies'] = {
     'points': 8,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -29,7 +29,7 @@ DISADVANTAGES['Clumsy'] = {
     'subAbilityScore': '',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Clumsy'] = {
+DISADVANTAGES['Severe Clumsy'] = {
     'points': 8,
     'abilityScore': 'ceil(@{Dexterity}/2)',
     'subAbilityScore': '',
@@ -53,7 +53,7 @@ DISADVANTAGES['Cowardice'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Cowardice'] = {
+DISADVANTAGES['Severe Cowardice'] = {
     'points': 15,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -102,7 +102,7 @@ DISADVANTAGES['Phobia: Crowds'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Phobia: Crowds'] = {
+DISADVANTAGES['Severe Phobia: Crowds'] = {
     'points': 10,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -114,7 +114,7 @@ DISADVANTAGES['Phobia: Darkness'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Phobia: Darkness'] = {
+DISADVANTAGES['Severe Phobia: Darkness'] = {
     'points': 11,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -126,7 +126,7 @@ DISADVANTAGES['Phobia: Enclosed Spaces'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Phobia: Enclosed Spaces'] = {
+DISADVANTAGES['Severe Phobia: Enclosed Spaces'] = {
     'points': 11,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -138,7 +138,7 @@ DISADVANTAGES['Phobia: Heights'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Phobia: Heights'] = {
+DISADVANTAGES['Severe Phobia: Heights'] = {
     'points': 10,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -150,7 +150,7 @@ DISADVANTAGES['Phobia: Magic'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Phobia: Magic'] = {
+DISADVANTAGES['Severe Phobia: Magic'] = {
     'points': 14,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -162,7 +162,7 @@ DISADVANTAGES['Phobia: Monster (specific)'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Phobia: Monster (specific)'] = {
+DISADVANTAGES['Severe Phobia: Monster (specific)'] = {
     'points': 9,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -174,7 +174,7 @@ DISADVANTAGES['Phobia: Snakes'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Phobia: Snakes'] = {
+DISADVANTAGES['Severe Phobia: Snakes'] = {
     'points': 10,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -186,7 +186,7 @@ DISADVANTAGES['Phobia: Spiders'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Phobia: Spiders'] = {
+DISADVANTAGES['Severe Phobia: Spiders'] = {
     'points': 10,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -198,7 +198,7 @@ DISADVANTAGES['Phobia: Undead'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Phobia: Undead'] = {
+DISADVANTAGES['Severe Phobia: Undead'] = {
     'points': 14,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',
@@ -210,7 +210,7 @@ DISADVANTAGES['Phobia: Water'] = {
     'subAbilityScore': '@{Willpower}',
     'book': 'Player\'s Option: Skills & Powers'
 };
-DISADVANTAGES['Servere Phobia: Water'] = {
+DISADVANTAGES['Severe Phobia: Water'] = {
     'points': 12,
     'abilityScore': 'ceil(@{Wisdom}/2)',
     'subAbilityScore': 'ceil(@{Willpower}/2)',

@@ -130,7 +130,6 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Tail'] = {
     12: 'Tail crushed, pain reduces creature to 1/2 move and -2 penalty on any attack, minor bleeding; no move or attack if animal uses tail for movement',
 };
 
-
 CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Abdomen'] = {
     4:  'Victim stunned [[1d6]] rounds',
     5:  'Abdomen struck, victim stunned 1 round and reduced to 1/2 move',
