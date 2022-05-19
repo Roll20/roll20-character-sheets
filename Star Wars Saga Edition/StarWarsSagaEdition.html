@@ -1620,17 +1620,19 @@
 					<div class="table-row">	
 						<span class="table-data">	<input type="text" name="attr_TotalEquipmentWt" value="0" readonly="readonly" style="width:95%" title="Total Equipment Weight @{TotalEquipmentWt}" />	</span>
 						<span class="table-data" style="width:20px">	&nbsp;/&nbsp;	</span>
-						<span class="table-data">	<input type="number" name="attr_EquipmentCapacity" value="(@{Str}/2)*(@{Str}/2)*@{CarryingCapacitySize}" disabled="true" style="width:95%" title="Equipment Weight Capacity @{EquipmentCapacity}" />	</span>
+						<span class="table-data">	<input type="number" name="attr_EquipmentCapacity" value="(@{Str}/2)*(@{Str}/2)*@{CarryingCapacitySize}*@{DoubleEquipmentLoad}" disabled="true" style="width:95%" title="Equipment Weight Capacity @{EquipmentCapacity}" />	</span>
 					</div>					
 					<div class="table-row">				
 						<span class="table-header">Heavy Load </span>
-						<span class="table-data">	<input type="checkbox" value="-10" name="attr_EquipmentLoad" title="Equipment Load Penalty @{EquipmentLoad}" />	</span>						
+						<span class="table-data">	<input type="checkbox" value="-10" name="attr_EquipmentLoad" title="Equipment Load Penalty @{EquipmentLoad}" />	</span>
+						<span class="table-header">Double Carry Capacity </span>
+						<span class="table-data">	<input type="checkbox" value="2" name="attr_DoubleEquipmentLoad" title="Equipment Load Bonus @{DoubleEquipmentLoad}" />	</span>
 					</div>
 				</div>					
 			</div>	
 			<div class="table-row">
 				<span class="table-data col1">	Carrying Capacity (lift)	</span>					
-				<span class="table-data">	<input type="number" name="attr_CarryingCapacity" value="@{Str}*@{Str}/2*@{CarryingCapacitySize}" style="width:90%" disabled="true" title="Carrying Capacity (Lift) @{CarryingCapacity}" />	<input type="number" value="1" name="attr_CarryingCapacitySize" class="hidden" />	</span>					
+				<span class="table-data">	<input type="number" name="attr_CarryingCapacity" value="@{Str}*@{Str}/2*@{CarryingCapacitySize}*@{DoubleEquipmentLoad}" style="width:90%" disabled="true" title="Carrying Capacity (Lift) @{CarryingCapacity}" />	<input type="number" value="1" name="attr_CarryingCapacitySize" class="hidden" />	</span>
 			</div>
 		</div>
 	</div>
@@ -3596,8 +3598,8 @@ on("change:repeating_equipment remove:repeating_equipment",function(){
 });
 
 on("change:equipmentwtrunningtotal change:armorwt change:armorcarry change:size change:str",function(){	
-	getAttrs(["ArmorWt","EquipmentWtRunningTotal", "STR", "ArmorCarry", "CarryingCapacitySize"], function(v) {
-		EquipmentCapacity = parseFloat(v["STR"]/2)*(v["STR"]/2).toFixed(1) * v["CarryingCapacitySize"];
+	getAttrs(["ArmorWt","EquipmentWtRunningTotal", "STR", "ArmorCarry", "CarryingCapacitySize", "DoubleEquipmentLoad"], function(v) {
+		EquipmentCapacity = parseFloat(v["STR"]/2)*(v["STR"]/2).toFixed(1) * v["CarryingCapacitySize"] * v["DoubleEquipmentLoad"];
 		if(v["ArmorCarry"] == 1) {TotalWeight = parseFloat(v["ArmorWt"]) + parseFloat(v["EquipmentWtRunningTotal"]); console.log("=== Armor is Carried ===");}
 		else {TotalWeight = parseFloat(v["EquipmentWtRunningTotal"]); console.log("=== Armor is NOT Carried ===");}
 		TotalWeight = parseFloat(TotalWeight).toFixed(1)
