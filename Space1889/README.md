@@ -2,7 +2,7 @@
 
 Bei diesem Community-Bogen handelt es sich um ein rein privates Fan-Projekt.
 
-## 2022-05-19 V1.0.2
+## 2022-05-21 V1.1
 Community-Bogen für Space 1889 (Ubiquity)
 
 Github - https://github.com/Gorthian/Roll20_Space1889_CharacterSheet
