@@ -73,6 +73,17 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+May 20th 2022 v1.56
+
+Winds of Magic update
+- Various minor Magic rule changes as per Winds of Magic rule book, including Miscast Table changes.
+- Ritauls Tab added to Spellbook, functions similarly to Arcane Spells.
+- New Skills: Augury & Psychometry
+- New Talents: Suffuse With (Wind) & Magical Assistant
+- Added Orge - Lore Great Maw as a static Magic Lore option.
+- Channeling roll which rolls in +0 SL outcome now adds +1 to the Accu Ext SL pool.
+
+
 May 12th 2022 v1.55f
 
 - Implemented Unshakable Talent, which adds conditional bonus to Cool tests.
