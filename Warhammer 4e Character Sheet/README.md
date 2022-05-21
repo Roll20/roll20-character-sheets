@@ -80,8 +80,11 @@ Winds of Magic update
 - Ritauls Tab added to Spellbook, functions similarly to Arcane Spells.
 - New Skills: Augury & Psychometry
 - New Talents: Suffuse With (Wind) & Magical Assistant
-- Added Orge - Lore Great Maw as a static Magic Lore option.
+- Magical Robes & Enchanted Staff's selector in the spellbook tab, bonus add automatically. Added Spellbook settings tab for old options.
+- Added Orge - Lore Great Maw as a static Magic Lore option, incl. Casting/Channelling/Effects.
 - Channeling roll which rolls in +0 SL outcome now adds +1 to the Accu Ext SL pool.
+- Casting Success/Failure is now based on achiving +SL not roll vs target success.
+- Various Talent fixes to make them visable in talents Tab and add custom situation SL in RT. Add Orge Talent - Vice, no intergration.
 
 
 May 12th 2022 v1.55f
