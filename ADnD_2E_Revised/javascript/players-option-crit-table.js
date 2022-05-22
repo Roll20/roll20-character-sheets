@@ -29,24 +29,24 @@ LOCATION_TABLE['Monster'][8] = LOCATION_TABLE['Monster'][9] = {'general': 'Torso
 LOCATION_TABLE['Monster'][10] = { 'general': 'Head', 'specific': 'Head'};
 
 //#region Weapon Crits
-const CRIT_EFFECT_TABLE = {};
-CRIT_EFFECT_TABLE['Bludgeoning'] = {};
-CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid'] = {};
-CRIT_EFFECT_TABLE['Bludgeoning']['Animal'] = {};
-CRIT_EFFECT_TABLE['Bludgeoning']['Monster'] = {};
+const WEAPON_CRIT_EFFECT_TABLE = {};
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Animal'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Monster'] = {};
 
-CRIT_EFFECT_TABLE['Piercing'] = {};
-CRIT_EFFECT_TABLE['Piercing']['Humanoid'] = {};
-CRIT_EFFECT_TABLE['Piercing']['Animal'] = {};
-CRIT_EFFECT_TABLE['Piercing']['Monster'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Piercing'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Humanoid'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Animal'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Monster'] = {};
 
-CRIT_EFFECT_TABLE['Slashing'] = {};
-CRIT_EFFECT_TABLE['Slashing']['Humanoid'] = {};
-CRIT_EFFECT_TABLE['Slashing']['Animal'] = {};
-CRIT_EFFECT_TABLE['Slashing']['Monster'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Slashing'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Humanoid'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Animal'] = {};
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Monster'] = {};
 
 //#region Bludgeoning
-CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Legs'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Legs'] = {
     4: 'Victim knocked down',
     5: 'Knee struck, knockdown, 1/2 move',
     6: 'Foot broken, 1/2 move',
@@ -58,7 +58,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Legs'] = {
     12: 'Leg shattered, no move or attack, major bleeding from compound fractures',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Abdomen'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Abdomen'] = {
     4: 'Victim stunned [[1d6]] rounds',
     5: 'Abdomen struck, victim stunned 1 round and reduced to 1/2 move',
     6: 'Armor damaged, victim stunned [[1d6]] rounds, triple damage if no armor',
@@ -70,7 +70,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Abdomen'] = {
     12: 'Abdomen crushed, victim reduced to 0 hit points with severe internal bleeding',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Torso'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Torso'] = {
     4: 'Knockdown, stunned [[1d4]] rounds',
     5: 'Torso struck, victim stunned 1 round and reduced to 1/2 move',
     6: 'Shield damage, torso struck, 1/2 move',
@@ -82,7 +82,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Torso'] = {
     12: 'Torso crushed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Arms'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Arms'] = {
     4:  'Hand struck, weapon/shield dropped',
     5:  'Arm struck, shield damage/weapon dropped',
     6:  'Hand broken, -2 penalty to attacks/shield dropped',
@@ -94,7 +94,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Arms'] = {
     12: 'Shoulder shattered, no move or attacks, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Head'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Head'] = {
     4:  'Victim stunned [[1d6]] rounds',
     5:  'Head struck, helm removed, victim stunned 1 round; -2 penalty to attack rolls if victim had no helm',
     6:  'Head struck, -2 penalty to attacks',
@@ -106,7 +106,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Humanoid']['Head'] = {
     12: 'Skull crushed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Legs'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Legs'] = {
     4:  'Victim knocked down',
     5:  'Knee struck, victim reduced to 2/3 move',
     6:  'Foot/wrist broken, 2/3 move',
@@ -118,7 +118,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Legs'] = {
     12: 'Leg/wing shattered, no move or attack, major bleeding from compound fractures',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Tail'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Tail'] = {
     4:  'No unusual effect',
     5:  'No unusual effect',
     6:  'Tip of tail struck; if prehensile, any items carried are dropped, -2 penalty to tail attacks due to pain',
@@ -130,7 +130,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Tail'] = {
     12: 'Tail crushed, pain reduces creature to 1/2 move and -2 penalty on any attack, minor bleeding; no move or attack if animal uses tail for movement',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Abdomen'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Abdomen'] = {
     4:  'Victim stunned [[1d6]] rounds',
     5:  'Abdomen struck, victim stunned 1 round and reduced to 1/2 move',
     6:  'Abdomen struck, victim stunned [[1d6]] rounds, reduced to 1/2 move',
@@ -142,7 +142,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Abdomen'] = {
     12: 'Abdomen crushed, victim reduced to 0 hit points with severe internal bleeding',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Torso'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Torso'] = {
     4:  'Knockdown, stunned [[1d4]] rounds',
     5:  'Torso struck, victim stunned 1 round and reduced to 1/2 move',
     6:  'Torso struck, stunned [[1d6]] rounds, 1/2 move',
@@ -154,7 +154,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Torso'] = {
     12: 'Torso crushed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Head'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Head'] = {
     4:  'Victim stunned [[1d6]] rounds',
     5:  'Snout struck, animal must save vs. death or retreat in pain for [[1d10]] rounds',
     6:  'Head struck, –2 penalty to attacks',
@@ -166,7 +166,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Animal']['Head'] = {
     12: 'Skull crushed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Legs'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Legs'] = {
     4:  'Victim knocked down',
     5:  'Knee struck, victim reduced to 2/3 move, –2 penalty to attacks with tha appendage',
     6:  'Foot/wrist broken, 2/3 move, –4 penalty to attacks with that appendage',
@@ -178,7 +178,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Legs'] = {
     12: 'Leg/wing shattered, no move, –4 penalty to all attacks, major bleeding from compound fractures',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Tail'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Tail'] = {
     4:  'No unusual effect',
     5:  'No unusual effect',
     6:  'Tip of tail struck; if prehensile, any items carried are dropped, –2 penalty to tail attacks due to pain',
@@ -190,7 +190,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Tail'] = {
     12: 'Tail crushed, pain reduces creature to 1/2 move and –2 penalty on any attack, minor bleeding; if animal uses tail for movement, no move or attack',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Abdomen'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Abdomen'] = {
     4:  'Victim stunned [[1d4]] rounds',
     5:  'Abdomen struck, victim stunned 1 round and reduced to 2/3 move',
     6:  'Abdomen struck, victim stunned [[1d6]] rounds, reduced to 2/3 move',
@@ -202,7 +202,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Abdomen'] = {
     12: 'Abdomen crushed, victim reduced to 0 hit points with severe internal bleeding',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Torso'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Torso'] = {
     4:  'Knockdown, stunned [[1d4]] rounds',
     5:  'Torso struck, victim stunned 1 round and reduced to 2/3 move',
     6:  'Torso struck, stunned [[1d6]] rounds, 2/3 move',
@@ -214,7 +214,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Torso'] = {
     12: 'Torso crushed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Head'] = {
+WEAPON_CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Head'] = {
     4:  'Victim stunned [[1d4]] rounds',
     5:  'Jaw struck, –2 penalty to any bite attacks',
     6:  'Head struck, stunned 1 round, –2 penalty to attacks',
@@ -228,7 +228,7 @@ CRIT_EFFECT_TABLE['Bludgeoning']['Monster']['Head'] = {
 //#endregion
 
 //#region Piercing
-CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Legs'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Legs'] = {
     4:  'Leg grazed, victim knocked down',
     5:  'Leg struck, minor bleeding',
     6:  'Leg injured, minor bleeding, 2/3 move',
@@ -240,7 +240,7 @@ CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Legs'] = {
     12: 'Leg destroyed, no move or attack, severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Abdomen'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Abdomen'] = {
     4:  'Abdomen grazed, minor bleeding',
     5:  'Abdomen struck, victim stunned 1 round and reduced to 2/3 move with minor bleeding',
     6:  'Armor damaged; victim stunned [[1d4]] rounds, minor bleeding, 2/3 move if no armor',
@@ -252,7 +252,7 @@ CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Abdomen'] = {
     12: 'Abdomen destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Torso'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Torso'] = {
     4:  'Torso grazed, minor bleeding',
     5:  'Torso struck, 2/3 move with minor bleeding',
     6:  'Shield damage, torso struck, 2/3 move & minor bleeding',
@@ -264,7 +264,7 @@ CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Torso'] = {
     12: 'Torso destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Arms'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Arms'] = {
     4:  'Hand struck, weapon dropped, minor bleeding; no effect on shield arm',
     5:  'Arm struck, shield damage/weapon dropped, minor bleeding',
     6:  'Hand injured, –2 penalty to attacks/shield dropped',
@@ -276,7 +276,7 @@ CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Arms'] = {
     12: 'Arm destroyed, no move/attack, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Head'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Head'] = {
     4:  'Head grazed, stunned [[1d3]] rounds, minor bleeding',
     5:  'Head struck, helm removed, victim stunned 1 round; –2 penalty to attack rolls, minor bleeding if victim had no helm',
     6:  'Eye injured, –4 penalty to all attacks; if helmed, victim is only stunned 1 round instead',
@@ -288,7 +288,7 @@ CRIT_EFFECT_TABLE['Piercing']['Humanoid']['Head'] = {
     12: 'Head destroyed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Animal']['Legs'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Animal']['Legs'] = {
     4:  'Leg struck, minor bleeding',
     5:  'Knee struck, 2/3 move, minor bleeding',
     6:  'Leg injured, minor bleeding, 2/3 move',
@@ -300,7 +300,7 @@ CRIT_EFFECT_TABLE['Piercing']['Animal']['Legs'] = {
     12: 'Leg/wing destroyed, no move or attack, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Animal']['Tail'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Animal']['Tail'] = {
     4:  'No unusual effect',
     5:  'No unusual effect',
     6:  'Tip of tail struck; if prehensile, any items carried are dropped, minor bleeding, –2 penalty to tail attacks',
@@ -312,7 +312,7 @@ CRIT_EFFECT_TABLE['Piercing']['Animal']['Tail'] = {
     12: 'Tail destroyed, stunned [[1d2]] rounds, major bleeding, 1/2 move and –2 penalty on attacks; if animal uses tail for movement, no move or attack',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Animal']['Abdomen'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Animal']['Abdomen'] = {
     4:  'Abdomen grazed, minor bleeding',
     5:  'Abdomen struck, victim stunned 1 round and reduced to 2/3 move, minor bleeding',
     6:  'Abdomen struck, victim stunned [[1d4]] rounds, reduced to 2/3 move, minor bleeding',
@@ -324,7 +324,7 @@ CRIT_EFFECT_TABLE['Piercing']['Animal']['Abdomen'] = {
     12: 'Abdomen destroyed, victim reduced to 0 hit points with severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Animal']['Torso'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Animal']['Torso'] = {
     4:  'Torso grazed, minor bleeding',
     5:  'Torso struck, victim stunned 1 round and reduced to 2/3 move, minor bleeding',
     6:  'Torso struck, stunned [[1d4]] rounds, minor bleeding',
@@ -336,7 +336,7 @@ CRIT_EFFECT_TABLE['Piercing']['Animal']['Torso'] = {
     12: 'Torso destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Animal']['Head'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Animal']['Head'] = {
     4:  'Head grazed, stunned 1 round, minor bleeding',
     5:  'Snout struck, minor bleeding, animal must save vs. death or retreat for [[1d10]] rounds',
     6:  'Eye injured, stunned [[1d3]] rounds, –2 penalty to attacks',
@@ -348,7 +348,7 @@ CRIT_EFFECT_TABLE['Piercing']['Animal']['Head'] = {
     12: 'Head severed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Monster']['Legs'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Monster']['Legs'] = {
     4:  'Leg grazed, minor bleeding',
     5:  'Knee struck, 2/3 move',
     6:  'Leg struck, minor bleeding, 2/3 move',
@@ -360,7 +360,7 @@ CRIT_EFFECT_TABLE['Piercing']['Monster']['Legs'] = {
     12: 'Leg/wing destroyed, no move or attack, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Monster']['Tail'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Monster']['Tail'] = {
     4:  'No unusual effect',
     5:  'No unusual effect',
     6:  'Tip of tail struck; if prehensile, any items carried are dropped, minor bleeding, –2 penalty to tail attacks',
@@ -372,7 +372,7 @@ CRIT_EFFECT_TABLE['Piercing']['Monster']['Tail'] = {
     12: 'Tail destroyed, stunned [[1d3]] rounds, major bleeding, 1/2 move and –2 penalty on any attack; if monster uses tail for movement, no move/attack',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Monster']['Abdomen'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Monster']['Abdomen'] = {
     4:  'Abdomen grazed, minor bleeding',
     5:  'Abdomen struck, victim stunned 1 round, minor bleeding',
     6:  'Abdomen struck, victim stunned [[1d3]] rounds, minor bleeding',
@@ -384,7 +384,7 @@ CRIT_EFFECT_TABLE['Piercing']['Monster']['Abdomen'] = {
     12: 'Abdomen destroyed, victim reduced to 0 hit points with major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Monster']['Torso'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Monster']['Torso'] = {
     4:  'Torso grazed, minor bleeding',
     5:  'Torso struck, victim stunned 1 round, minor bleeding',
     6:  'Torso struck, stunned [[1d3]] rounds, minor bleeding',
@@ -396,7 +396,7 @@ CRIT_EFFECT_TABLE['Piercing']['Monster']['Torso'] = {
     12: 'Torso destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Piercing']['Monster']['Head'] = {
+WEAPON_CRIT_EFFECT_TABLE['Piercing']['Monster']['Head'] = {
     4:  'Head grazed, minor bleeding',
     5:  'Snout struck, minor bleeding, monster must save vs. death or retreat for 1 round',
     6:  'Eye injured, stunned 1 round, –2 penalty to attacks',
@@ -410,7 +410,7 @@ CRIT_EFFECT_TABLE['Piercing']['Monster']['Head'] = {
 //#endregion
 
 //#region Slashing
-CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Legs'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Legs'] = {
     4:  'Leg struck, minor bleeding',
     5:  'Leg struck, minor bleeding; 1/2 move',
     6:  'Leg injured, major bleeding, 1/2 move',
@@ -422,7 +422,7 @@ CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Legs'] = {
     12: 'Leg severed at thigh, no move or attack, victim reduced to 0 hit points with severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Abdomen'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Abdomen'] = {
     4:  'Abdomen grazed, minor bleeding',
     5:  'Abdomen struck, victim stunned 1 round and reduced to 1/2 move with minor bleeding',
     6:  'Armor damaged; victim stunned [[1d6]] rounds, major bleeding, 1/2 move if no armor',
@@ -434,7 +434,7 @@ CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Abdomen'] = {
     12: 'Abdomen destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Torso'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Torso'] = {
     4:  'Torso grazed, minor bleeding',
     5:  'Torso struck, victim stunned 1 round, reduced to 1/2 move with minor bleeding',
     6:  'Shield damage, torso struck, 1/2 move & minor bleeding',
@@ -446,7 +446,7 @@ CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Torso'] = {
     12: 'Torso destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Arms'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Arms'] = {
     4:  'Hand struck, weapon dropped, minor bleeding; no effect on shield arm',
     5:  'Arm struck, shield damage/weapon dropped, minor bleeding',
     6:  'Hand injured, –2 penalty to attacks/shield dropped',
@@ -458,7 +458,7 @@ CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Arms'] = {
     12: 'Arm severed, no move or attacks, severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Head'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Head'] = {
     4:  'Head grazed, stunned [[1d3]] rounds, minor bleeding',
     5:  'Head struck, helm removed, victim stunned 1 round; –2 penalty to attack rolls, minor bleeding if victim had no helm',
     6:  'Head struck, minor bleeding, victim blinded for [[2d4]] rounds by blood in eyes',
@@ -470,7 +470,7 @@ CRIT_EFFECT_TABLE['Slashing']['Humanoid']['Head'] = {
     12: 'Head severed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Animal']['Legs'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Animal']['Legs'] = {
     4:  'Leg struck, minor bleeding',
     5:  'Knee struck, 2/3 move, minor bleeding',
     6:  'Leg injured, major bleeding, 2/3 move',
@@ -482,7 +482,7 @@ CRIT_EFFECT_TABLE['Slashing']['Animal']['Legs'] = {
     12: 'Leg/wing severed at mid-thigh, no move or attack, severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Animal']['Tail'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Animal']['Tail'] = {
     4:  'No unusual effect',
     5:  'No unusual effect',
     6:  'Tip of tail struck; if prehensile, any items carried are dropped, minor bleeding, –2 penalty to tail attacks',
@@ -494,7 +494,7 @@ CRIT_EFFECT_TABLE['Slashing']['Animal']['Tail'] = {
     12: 'Tail severed, stunned 1–3 rounds, major bleeding, 1/2 move and –2 penalty on any attack; if animal uses tail for movement, no move or attack',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Animal']['Abdomen'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Animal']['Abdomen'] = {
     4:  'Abdomen grazed, minor bleeding',
     5:  'Abdomen struck, victim stunned 1 round and reduced to 2/3 move, minor bleeding',
     6:  'Abdomen struck, victim stunned [[1d6]] rounds, reduced to 2/3 move, minor bleeding',
@@ -506,7 +506,7 @@ CRIT_EFFECT_TABLE['Slashing']['Animal']['Abdomen'] = {
     12: 'Abdomen destroyed, victim reduced to 0 hit points with severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Animal']['Torso'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Animal']['Torso'] = {
     4:  'Torso grazed, minor bleeding',
     5:  'Torso struck, victim stunned 1 round and reduced to 2/3 move, minor bleeding',
     6:  'Torso struck, stunned [[1d6]] rounds, minor bleeding',
@@ -518,7 +518,7 @@ CRIT_EFFECT_TABLE['Slashing']['Animal']['Torso'] = {
     12: 'Torso destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Animal']['Head'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Animal']['Head'] = {
     4:  'Head grazed, stunned 1 round, minor bleeding',
     5:  'Snout struck, minor bleeding, animal must save vs. death or retreat for [[1d10]] rounds',
     6:  'Head struck, minor bleeding, –2 penalty to attacks',
@@ -530,7 +530,7 @@ CRIT_EFFECT_TABLE['Slashing']['Animal']['Head'] = {
     12: 'Head severed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Monster']['Legs'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Monster']['Legs'] = {
     4:  'Leg grazed, minor bleeding',
     5:  'Knee struck, 2/3 move, minor bleeding',
     6:  'Leg struck, minor bleeding, 2/3 move',
@@ -542,7 +542,7 @@ CRIT_EFFECT_TABLE['Slashing']['Monster']['Legs'] = {
     12: 'Leg/wing severed at mid-thigh, no move or attack, severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Monster']['Tail'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Monster']['Tail'] = {
     4:  'No unusual effect',
     5:  'No unusual effect',
     6:  'Tip of tail struck; if prehensile, any items carried are dropped, minor bleeding, –2 penalty to tail attacks',
@@ -554,7 +554,7 @@ CRIT_EFFECT_TABLE['Slashing']['Monster']['Tail'] = {
     12: 'Tail severed, stunned 1 round, major bleeding, 1/2 move and –2 penalty on any attack; if animal uses tail for movement, no move or attack',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Monster']['Abdomen'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Monster']['Abdomen'] = {
     4:  'Abdomen grazed, minor bleeding',
     5:  'Abdomen struck, victim stunned 1 round, minor bleeding',
     6:  'Abdomen struck, victim stunned [[1d3]] rounds, reduced to 2/3 move, minor bleeding',
@@ -566,7 +566,7 @@ CRIT_EFFECT_TABLE['Slashing']['Monster']['Abdomen'] = {
     12: 'Abdomen destroyed, victim reduced to 0 hit points with severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Monster']['Torso'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Monster']['Torso'] = {
     4:  'Torso grazed, minor bleeding',
     5:  'Torso struck, victim stunned 1 round, minor bleeding',
     6:  'Torso struck, stunned [[1d3]] rounds, minor bleeding',
@@ -578,7 +578,7 @@ CRIT_EFFECT_TABLE['Slashing']['Monster']['Torso'] = {
     12: 'Torso destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Monster']['Head'] = {
+WEAPON_CRIT_EFFECT_TABLE['Slashing']['Monster']['Head'] = {
     4:  'Head grazed, minor bleeding',
     5:  'Snout struck, minor bleeding, monster must save vs. death or retreat for 1 round',
     6:  'Head struck, minor bleeding, –2 penalty to attacks',
@@ -593,19 +593,20 @@ CRIT_EFFECT_TABLE['Slashing']['Monster']['Head'] = {
 //#endregion
 
 //#region Spell Crits
-CRIT_EFFECT_TABLE['Acid'] = {};
-CRIT_EFFECT_TABLE['Cold'] = {};
-CRIT_EFFECT_TABLE['Constriction'] = {};
-CRIT_EFFECT_TABLE['Crushing'] = {};
-CRIT_EFFECT_TABLE['Electricity'] = {};
-CRIT_EFFECT_TABLE['Fire'] = {};
-CRIT_EFFECT_TABLE['Impact'] = {};
-CRIT_EFFECT_TABLE['Slashing'] = {};
-CRIT_EFFECT_TABLE['Vibration'] = {};
-CRIT_EFFECT_TABLE['Wounding'] = {};
+SPELL_CRIT_EFFECT_TABLE = {};
+SPELL_CRIT_EFFECT_TABLE['Acid'] = {};
+SPELL_CRIT_EFFECT_TABLE['Cold'] = {};
+SPELL_CRIT_EFFECT_TABLE['Constriction'] = {};
+SPELL_CRIT_EFFECT_TABLE['Crushing'] = {};
+SPELL_CRIT_EFFECT_TABLE['Electricity'] = {};
+SPELL_CRIT_EFFECT_TABLE['Fire'] = {};
+SPELL_CRIT_EFFECT_TABLE['Impact'] = {};
+SPELL_CRIT_EFFECT_TABLE['Slashing'] = {};
+SPELL_CRIT_EFFECT_TABLE['Vibration'] = {};
+SPELL_CRIT_EFFECT_TABLE['Wounding'] = {};
 
 //#region Acid
-CRIT_EFFECT_TABLE['Acid']['Legs'] = {
+SPELL_CRIT_EFFECT_TABLE['Acid']['Legs'] = {
     4: 'Acid splash grazes victim; pain distracts character for [[1d4]] rounds causing a -2 penalty to attack rolls',
     5: 'Leg struck, 1/2 move; pain distracts character for [[1d6]] rounds, as above and causes knockdown',
     6: 'Foot burned, 1/2 move, pain distracts character for [[1d6]] rounds',
@@ -617,7 +618,7 @@ CRIT_EFFECT_TABLE['Acid']['Legs'] = {
     12: 'Leg dissolved at hip, no move or attack, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Acid']['Abdomen'] = {
+SPELL_CRIT_EFFECT_TABLE['Acid']['Abdomen'] = {
     4: 'Acid splash grazes victim, –2 to attack rolls for [[1d6]] rounds',
     5: 'Abdomen struck, –2 to attack rolls, victim reduced to 1/2 move',
     6: 'Armor destroyed, acid splash as 4 above; if target has no armor, abdomen burned, 1/2 move, minor bleeding, –2 to attack rolls',
@@ -629,7 +630,7 @@ CRIT_EFFECT_TABLE['Acid']['Abdomen'] = {
     12: 'Abdomen dissolved, victim reduced to 0 hp, severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Acid']['Torso'] = {
+SPELL_CRIT_EFFECT_TABLE['Acid']['Torso'] = {
     4: 'Acid splash grazes victim, –2 to attack rolls for [[1d6]] rounds',
     5: 'Torso struck; 1/2 move, –2 to attack rolls, victim stunned 1 round',
     6: 'Shield destroyed, acid splash as 4 above; if target has no armor, torso burned, 1/2 move, minor bleeding, –2 to attack rolls',
@@ -641,7 +642,7 @@ CRIT_EFFECT_TABLE['Acid']['Torso'] = {
     12: 'Torso dissolved, victim killed instantly',
 };
 
-CRIT_EFFECT_TABLE['Acid']['Arms'] = {
+SPELL_CRIT_EFFECT_TABLE['Acid']['Arms'] = {
     4: 'Hand grazed by acid splash, weapon or shield dropped',
     5: 'Arm struck, victim distracted by pain (–2 penalty to attack rolls) for [[1d4]] rounds, shield or weapon damaged by acid',
     6: 'Hand burned, –2 to attacks with that hand (or no shield use if shield arm is burned), victim stunned [[1d3]] rounds by pain',
@@ -653,7 +654,7 @@ CRIT_EFFECT_TABLE['Acid']['Arms'] = {
     12: 'Arm dissolved at shoulder, stunned [[1d6]] rounds, 1/2 move, no attacks, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Acid']['Head'] = {
+SPELL_CRIT_EFFECT_TABLE['Acid']['Head'] = {
     4: 'Acid splash distracts victim for [[2d4]] rounds, –2 penalty to all attacks',
     5: 'Head struck, helm damaged, victim stunned [[1d3]] rounds; –2 to all attack rolls if victim had no helm',
     6: 'Head struck, –2 to attacks, stunned [[1d4]] rounds by pain',
@@ -665,7 +666,7 @@ CRIT_EFFECT_TABLE['Acid']['Head'] = {
     12: 'Skull dissolved, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Acid']['Tail'] = {
+SPELL_CRIT_EFFECT_TABLE['Acid']['Tail'] = {
     4: 'No unusual effect',
     5: 'No unusual effect',
     6: 'Tip of tail burned; if prehensile, any items carried are dropped, –2 penalty to all tail attacks due to pain',
@@ -679,7 +680,7 @@ CRIT_EFFECT_TABLE['Acid']['Tail'] = {
 //#endregion
 
 //#region Cold
-CRIT_EFFECT_TABLE['Cold']['Legs'] = {
+SPELL_CRIT_EFFECT_TABLE['Cold']['Legs'] = {
     4: 'Victim chilled; 1/2 move and –2 penalty to attacks for [[1d6]] hours',
     5: 'Leg struck, 1/2 move; victim knocked down and chilled as above',
     6: 'Foot frostbitten, 1/2 move',
@@ -691,7 +692,7 @@ CRIT_EFFECT_TABLE['Cold']['Legs'] = {
     12: 'Leg frozen at hip, no movement or attacks possible',
 };
 
-CRIT_EFFECT_TABLE['Cold']['Abdomen'] = {
+SPELL_CRIT_EFFECT_TABLE['Cold']['Abdomen'] = {
     4: 'Victim chilled, –2 to attack rolls for [[1d6]] hours',
     5: 'Abdomen struck, victim reduced to 1/2 move, chilled [[1d6]] hours',
     6: 'Armor shattered, victim chilled as 4 above; if target has no armor, abdomen frostbitten, 1/4 move, –2 to attack rolls',
@@ -703,7 +704,7 @@ CRIT_EFFECT_TABLE['Cold']['Abdomen'] = {
     12: 'Abdomen frozen, victim reduced to 0 hp and succumbs in [[1d6]] rounds without magical healing',
 };
 
-CRIT_EFFECT_TABLE['Cold']['Torso'] = {
+SPELL_CRIT_EFFECT_TABLE['Cold']['Torso'] = {
     4: 'Victim chilled, –2 to attack rolls for [[1d6]] rounds',
     5: 'Torso struck; 1/2 move, –2 to attack rolls, victim chilled [[1d6]] hours',
     6: 'Shield shattered, victim chilled as 4 above; if target has no shield, torso frostbitten, slowed [[1d6]] rounds, 1/4 move, –2 to attack rolls',
@@ -715,7 +716,7 @@ CRIT_EFFECT_TABLE['Cold']['Torso'] = {
     12: 'Torso frozen, victim dies immediately',
 };
 
-CRIT_EFFECT_TABLE['Cold']['Arms'] = {
+SPELL_CRIT_EFFECT_TABLE['Cold']['Arms'] = {
     4: 'Hand chilled, weapon or shield dropped',
     5: 'Arm struck, shield or weapon dropped, –2 penalty to attacks with that hand until victim recovers',
     6: 'Hand frostbitten, –4 to attacks with that hand (or no shield use if shield arm is struck)',
@@ -727,7 +728,7 @@ CRIT_EFFECT_TABLE['Cold']['Arms'] = {
     12: 'Arm frozen from shoulder down, stunned [[1d6]] rounds, 1/4 move, no attacks, slowed [[1d6]] hours',
 };
 
-CRIT_EFFECT_TABLE['Cold']['Head'] = {
+SPELL_CRIT_EFFECT_TABLE['Cold']['Head'] = {
     4: 'Frost disorients victim for [[2d4]] rounds, –2 penalty to all attacks',
     5: 'Head struck, helm damaged, victim slowed [[1d6]] rounds; –2 to all attack rolls if victim had no helm',
     6: 'Head struck, –2 to attacks, slowed [[1d6]] hours',
@@ -739,7 +740,7 @@ CRIT_EFFECT_TABLE['Cold']['Head'] = {
     12: 'Skull frozen through, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Cold']['Tail'] = {
+SPELL_CRIT_EFFECT_TABLE['Cold']['Tail'] = {
     4: 'No unusual effect',
     5: 'No unusual effect',
     6: 'Tip of tail frostbitten; if prehensile, any items carried are dropped, –2 penalty to all tail attacks',
@@ -753,7 +754,7 @@ CRIT_EFFECT_TABLE['Cold']['Tail'] = {
 //#endregion
 
 //#region Constriction
-CRIT_EFFECT_TABLE['Constriction']['Legs'] = {
+SPELL_CRIT_EFFECT_TABLE['Constriction']['Legs'] = {
     4: 'Victim knocked down',
     5: 'Knee twisted (struck), knockdown, 1/2 move',
     6: 'Foot dislocated (broken), knockdown, 1/2 move',
@@ -765,7 +766,7 @@ CRIT_EFFECT_TABLE['Constriction']['Legs'] = {
     12: 'Leg crushed, no move or attack, major bleeding from compound fractures',
 };
 
-CRIT_EFFECT_TABLE['Constriction']['Abdomen'] = {
+SPELL_CRIT_EFFECT_TABLE['Constriction']['Abdomen'] = {
     4: 'Victim stunned [[1d4]] rounds',
     5: 'Abdomen struck, victim stunned 1 round and reduced to 1/2 move',
     6: 'Armor damaged, victim stunned [[1d6]] rounds; if victim has no plate armor, abdomen injured, stunned [[1d6]] rounds, 1/2 move, –2 penalty to all attacks',
@@ -777,7 +778,7 @@ CRIT_EFFECT_TABLE['Constriction']['Abdomen'] = {
     12: 'Abdomen crushed, victim reduced to 0 hit points with severe internal bleeding',
 };
 
-CRIT_EFFECT_TABLE['Constriction']['Torso'] = {
+SPELL_CRIT_EFFECT_TABLE['Constriction']['Torso'] = {
     4: 'Knockdown, stunned [[1d4]] rounds',
     5: 'Torso struck, victim stunned 1 round and reduced to 1/2 move',
     6: 'Shield damaged, torso struck, 1/2 move',
@@ -789,7 +790,7 @@ CRIT_EFFECT_TABLE['Constriction']['Torso'] = {
     12: 'Torso crushed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Constriction']['Arms'] = {
+SPELL_CRIT_EFFECT_TABLE['Constriction']['Arms'] = {
     4: 'Hand twisted, weapon/shield dropped',
     5: 'Arm twisted, weapon/shield dropped, –2 to attacks',
     6: 'Hand broken, –2 to attacks/shield dropped',
@@ -801,7 +802,7 @@ CRIT_EFFECT_TABLE['Constriction']['Arms'] = {
     12: 'Shoulder crushed, no move or attacks, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Constriction']['Head'] = {
+SPELL_CRIT_EFFECT_TABLE['Constriction']['Head'] = {
     4: 'Victim stunned [[1d6]] rounds',
     5: 'Head twisted (struck), helm removed, victim stunned 1 round; –2 to attack rolls due to pinched nerves in neck',
     6: 'Head struck, 1/2 move, –2 to attacks',
@@ -813,7 +814,7 @@ CRIT_EFFECT_TABLE['Constriction']['Head'] = {
     12: 'Skull crushed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Constriction']['Tail'] = {
+SPELL_CRIT_EFFECT_TABLE['Constriction']['Tail'] = {
     4: 'No unusual effect',
     5: 'No unusual effect',
     6: 'Tip of tail struck; if prehensile, any items carried are dropped, –2 penalty to all tail attacks due to pain',
@@ -827,7 +828,7 @@ CRIT_EFFECT_TABLE['Constriction']['Tail'] = {
 //#endregion
 
 //#region Crushing
-CRIT_EFFECT_TABLE['Crushing']['Legs'] = {
+SPELL_CRIT_EFFECT_TABLE['Crushing']['Legs'] = {
     4: 'Victim knocked down',
     5: 'Leg struck, knockdown, 1/2 move',
     6: 'Foot broken, 1/2 move',
@@ -839,7 +840,7 @@ CRIT_EFFECT_TABLE['Crushing']['Legs'] = {
     12: 'Leg crushed, no move or attack, major bleeding from compound fractures',
 };
 
-CRIT_EFFECT_TABLE['Crushing']['Abdomen'] = {
+SPELL_CRIT_EFFECT_TABLE['Crushing']['Abdomen'] = {
     4: 'Victim stunned [[1d6]] rounds',
     5: 'Abdomen struck, victim stunned 1 round and reduced to 1/2 move',
     6: 'Armor damaged, victim stunned [[1d6]] rounds; if target has no armor, abdomen injured, stunned [[1d6]] rounds, 1/2 move, –2 penalty to attacks',
@@ -851,7 +852,7 @@ CRIT_EFFECT_TABLE['Crushing']['Abdomen'] = {
     12: 'Abdomen crushed, victim reduced to 0 hit points with severe internal bleeding',
 };
 
-CRIT_EFFECT_TABLE['Crushing']['Torso'] = {
+SPELL_CRIT_EFFECT_TABLE['Crushing']['Torso'] = {
     4: 'Knockdown, stunned [[1d4]] rounds',
     5: 'Torso struck, victim stunned 1 round and reduced to 1/2 move',
     6: 'Shield destroyed, torso struck, 1/4 move, stunned [[1d6]] rounds',
@@ -863,7 +864,7 @@ CRIT_EFFECT_TABLE['Crushing']['Torso'] = {
     12: 'Torso crushed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Crushing']['Arms'] = {
+SPELL_CRIT_EFFECT_TABLE['Crushing']['Arms'] = {
     4: 'Hand struck, weapon/shield dropped',
     5: 'Arm struck, –2 to attacks with that arm',
     6: 'Hand broken, –2 to all attacks, weapon or shield dropped',
@@ -875,7 +876,7 @@ CRIT_EFFECT_TABLE['Crushing']['Arms'] = {
     12: 'Arm crushed to shoulder, no move or attacks, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Crushing']['Head'] = {
+SPELL_CRIT_EFFECT_TABLE['Crushing']['Head'] = {
     4: 'Victim stunned [[1d6]] rounds',
     5: 'Head struck, helm removed, victim stunned [[1d6]] rounds; head injured, –2 to attack rolls if victim had no helm',
     6: 'Head injured, stunned [[2d6]] rounds, 1/4 move, –2 to all attacks',
@@ -887,7 +888,7 @@ CRIT_EFFECT_TABLE['Crushing']['Head'] = {
     12: 'Skull crushed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Crushing']['Tail'] = {
+SPELL_CRIT_EFFECT_TABLE['Crushing']['Tail'] = {
     4: 'No unusual effect',
     5: 'No unusual effect',
     6: 'Tip of tail struck; if prehensile, any items carried are dropped, –2 penalty to all tail attacks due to pain',
@@ -901,7 +902,7 @@ CRIT_EFFECT_TABLE['Crushing']['Tail'] = {
 //#endregion
 
 //#region Electricity
-CRIT_EFFECT_TABLE['Electricity']['Legs'] = {
+SPELL_CRIT_EFFECT_TABLE['Electricity']['Legs'] = {
     4: 'Victim shocked and knocked down; spasms distract character for [[1d4]] rounds causing a –2 penalty to attack rolls',
     5: 'Leg struck, 1/2 move; victim knocked down and shocked for [[1d6]] rounds',
     6: 'Foot burned, 1/2 move, victim knocked down, spasms last [[1d6]] rounds',
@@ -913,7 +914,7 @@ CRIT_EFFECT_TABLE['Electricity']['Legs'] = {
     12: 'Leg incinerated at hip, no move or attack, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Electricity']['Abdomen'] = {
+SPELL_CRIT_EFFECT_TABLE['Electricity']['Abdomen'] = {
     4: 'Victim shocked and knocked down, –2 to attack rolls for [[1d6]] rounds',
     5: 'Abdomen struck, –2 to attack rolls, 1/2 move, victim knocked down',
     6: 'Armor destroyed, abdomen burned, 1/2 move, –2 to attack rolls, victim stunned [[1d6]] rounds',
@@ -925,7 +926,7 @@ CRIT_EFFECT_TABLE['Electricity']['Abdomen'] = {
     12: 'Abdomen incinerated, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Electricity']['Torso'] = {
+SPELL_CRIT_EFFECT_TABLE['Electricity']['Torso'] = {
     4: 'Victim shocked and knocked down, –2 to attack rolls for [[1d6]] rounds',
     5: 'Torso struck; 1/2 move, –2 to attack rolls, victim knocked down',
     6: 'Shield destroyed, torso burned, victim knocked down, 1/2 move, –2 to attack rolls',
@@ -937,7 +938,7 @@ CRIT_EFFECT_TABLE['Electricity']['Torso'] = {
     12: 'Torso incinerated, victim killed instantly',
 };
 
-CRIT_EFFECT_TABLE['Electricity']['Arms'] = {
+SPELL_CRIT_EFFECT_TABLE['Electricity']['Arms'] = {
     4: 'Hand shocked, weapon or shield dropped',
     5: 'Arm struck, victim knocked down, –2 to attacks for [[1d6]] rounds due to muscle spasms',
     6: 'Hand burned, –2 to attacks with that hand (or no shield use if shield arm is burned)',
@@ -949,7 +950,7 @@ CRIT_EFFECT_TABLE['Electricity']['Arms'] = {
     12: 'Arm incinerated at shoulder, stunned [[2d8]] rounds, 1/2 move, no attacks',
 };
 
-CRIT_EFFECT_TABLE['Electricity']['Head'] = {
+SPELL_CRIT_EFFECT_TABLE['Electricity']['Head'] = {
     4: 'Victim shocked, knocked down, –2 penalty to attacks for [[1d6]] rounds',
     5: 'Head struck, helm destroyed, victim stunned [[1d6]] rounds, –2 to all attack rolls',
     6: 'Head struck, –2 to attacks, stunned [[2d8]] rounds, victim deafened',
@@ -961,7 +962,7 @@ CRIT_EFFECT_TABLE['Electricity']['Head'] = {
     12: 'Skull incinerated, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Electricity']['Tail'] = {
+SPELL_CRIT_EFFECT_TABLE['Electricity']['Tail'] = {
     4: 'No unusual effect',
     5: 'No unusual effect',
     6: 'Tip of tail shocked; if prehensile, any items carried are dropped, –2 penalty to all tail attacks',
@@ -975,7 +976,7 @@ CRIT_EFFECT_TABLE['Electricity']['Tail'] = {
 //#endregion
 
 //#region Fire
-CRIT_EFFECT_TABLE['Fire']['Legs'] = {
+SPELL_CRIT_EFFECT_TABLE['Fire']['Legs'] = {
     4: 'Victim singed, –1 penalty to attack rolls',
     5: 'Leg scorched, 1/2 move, –1 penalty to attack rolls',
     6: 'Foot burned, 1/2 move, –1 penalty to attack rolls',
@@ -987,7 +988,7 @@ CRIT_EFFECT_TABLE['Fire']['Legs'] = {
     12: 'Leg incinerated at hip, no move or attack, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Fire']['Abdomen'] = {
+SPELL_CRIT_EFFECT_TABLE['Fire']['Abdomen'] = {
     4: 'Victim singed, –1 to attack rolls',
     5: 'Abdomen scorched, –1 to attack rolls, 1/2 move',
     6: 'Abdomen burned, 1/2 move, –2 to attack rolls; if victim wears metal armor, he is seared as described in 7 for the previous chart',
@@ -999,7 +1000,7 @@ CRIT_EFFECT_TABLE['Fire']['Abdomen'] = {
     12: 'Abdomen incinerated, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Fire']['Torso'] = {
+SPELL_CRIT_EFFECT_TABLE['Fire']['Torso'] = {
     4: 'Victim singed, –1 to attack rolls, stunned 1 round',
     5: 'Torso scorched; 1/2 move, –2 to attack rolls',
     6: 'Torso burned, 1/2 move, –2 to attack rolls; if victim carries shield, shield destroyed, causing searing damage as described above',
@@ -1011,7 +1012,7 @@ CRIT_EFFECT_TABLE['Fire']['Torso'] = {
     12: 'Torso incinerated, victim killed instantly',
 };
 
-CRIT_EFFECT_TABLE['Fire']['Arms'] = {
+SPELL_CRIT_EFFECT_TABLE['Fire']['Arms'] = {
     4: 'Hand singed, weapon or shield dropped',
     5: 'Arm scorched, –2 to attacks',
     6: 'Hand burned, –2 to attacks with that hand (or no shield use if shield arm is burned)',
@@ -1023,7 +1024,7 @@ CRIT_EFFECT_TABLE['Fire']['Arms'] = {
     12: 'Arm incinerated at shoulder, stunned [[1d6]] rounds, 1/2 move, no attacks',
 };
 
-CRIT_EFFECT_TABLE['Fire']['Head'] = {
+SPELL_CRIT_EFFECT_TABLE['Fire']['Head'] = {
     4: 'Victim singed, –1 penalty to attacks',
     5: 'Head scorched, –2 to all attack rolls, if victim wears metal helm, hot metal sears him for [[2d4]] damage next round, [[1d4]] more the round after',
     6: 'Head scorched, –2 to attacks, victim must roll saving throw vs. death magic or catch fire (see page 122)',
@@ -1035,7 +1036,7 @@ CRIT_EFFECT_TABLE['Fire']['Head'] = {
     12: 'Skull incinerated, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Fire']['Tail'] = {
+SPELL_CRIT_EFFECT_TABLE['Fire']['Tail'] = {
     4: 'No unusual effect',
     5: 'No unusual effect',
     6: 'Tip of tail singed; if prehensile, any items carried are dropped, –2 penalty to all tail attacks',
@@ -1049,7 +1050,7 @@ CRIT_EFFECT_TABLE['Fire']['Tail'] = {
 //#endregion
 
 //#region Impact
-CRIT_EFFECT_TABLE['Impact']['Legs'] = {
+SPELL_CRIT_EFFECT_TABLE['Impact']['Legs'] = {
     4: 'Victim knocked down',
     5: 'Knee struck, victim knocked down, 1/2 move',
     6: 'Foot broken, 1/2 move, minor bleeding',
@@ -1061,7 +1062,7 @@ CRIT_EFFECT_TABLE['Impact']['Legs'] = {
     12: 'Leg shattered, stunned [[2d6]] rounds, no move or attack, major bleeding from compound fractures',
 };
 
-CRIT_EFFECT_TABLE['Impact']['Abdomen'] = {
+SPELL_CRIT_EFFECT_TABLE['Impact']['Abdomen'] = {
     4: 'Victim stunned [[1d6]] rounds',
     5: 'Abdomen struck, victim stunned 1 round, reduced to 1/2 move',
     6: 'Abdomen struck, 1/2 move, –2 to all attacks; if victim wears no armor, bleeding',
@@ -1073,7 +1074,7 @@ CRIT_EFFECT_TABLE['Impact']['Abdomen'] = {
     12: 'Abdomen destroyed, victim reduced to 0 hp, severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Impact']['Torso'] = {
+SPELL_CRIT_EFFECT_TABLE['Impact']['Torso'] = {
     4: 'Knockdown, stunned [[1d4]] rounds',
     5: 'Torso struck, victim stunned 1 round, 1/2 move',
     6: 'Torso struck, 1/2 move, shield damaged; if victim has no shield, stunned [[1d6]] rounds, 1/2 move, –2 to attacks, minor bleeding',
@@ -1085,7 +1086,7 @@ CRIT_EFFECT_TABLE['Impact']['Torso'] = {
     12: 'Torso destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Impact']['Arms'] = {
+SPELL_CRIT_EFFECT_TABLE['Impact']['Arms'] = {
     4: 'Hand struck, weapon/shield dropped',
     5: 'Arm struck, –2 to attacks with that arm',
     6: 'Hand broken, minor bleeding, –2 to all attacks',
@@ -1097,7 +1098,7 @@ CRIT_EFFECT_TABLE['Impact']['Arms'] = {
     12: 'Shoulder shattered, stunned [[2d6]] rounds, no move or attacks, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Impact']['Head'] = {
+SPELL_CRIT_EFFECT_TABLE['Impact']['Head'] = {
     4: 'Victim stunned [[1d6]] rounds',
     5: 'Head struck, helm removed, victim stunned 1 round, –2 to attack rolls; if victim has no helm, stunned [[1d6]] rounds, –2 to attacks',
     6: 'Head injured, victim stunned [[1d6]] rounds, –2 to attacks, minor bleeding',
@@ -1109,7 +1110,7 @@ CRIT_EFFECT_TABLE['Impact']['Head'] = {
     12: 'Skull destroyed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Impact']['Tail'] = {
+SPELL_CRIT_EFFECT_TABLE['Impact']['Tail'] = {
     4: 'No unusual effect',
     5: 'No unusual effect',
     6: 'Tip of tail struck; if prehensile, any items carried are dropped, –2 penalty to all tail attacks due to pain',
@@ -1123,7 +1124,7 @@ CRIT_EFFECT_TABLE['Impact']['Tail'] = {
 //#endregion
 
 //#region Slashing
-CRIT_EFFECT_TABLE['Slashing']['Legs'] = {
+SPELL_CRIT_EFFECT_TABLE['Slashing']['Legs'] = {
     4: 'Leg struck, minor bleeding, victim knocked down',
     5: 'Knee struck, knockdown, minor bleeding, 1/2 move',
     6: 'Leg injured, 1/2 move, minor bleeding',
@@ -1135,7 +1136,7 @@ CRIT_EFFECT_TABLE['Slashing']['Legs'] = {
     12: 'Leg severed at thigh, stunned [[2d6]] rounds, no move or attack, severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Abdomen'] = {
+SPELL_CRIT_EFFECT_TABLE['Slashing']['Abdomen'] = {
     4: 'Abdomen grazed, minor bleeding',
     5: 'Abdomen struck, victim stunned 1 round, 1/2 move, minor bleeding',
     6: 'Abdomen struck, armor damaged, stunned [[1d3]] rounds, 1/2 move, minor bleeding; if victim wears no armor, abdomen injured, stunned [[1d6]] rounds, 1/2 move, –2 penalty to all attacks, minor bleeding',
@@ -1147,7 +1148,7 @@ CRIT_EFFECT_TABLE['Slashing']['Abdomen'] = {
     12: 'Abdomen destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Torso'] = {
+SPELL_CRIT_EFFECT_TABLE['Slashing']['Torso'] = {
     4: 'Torso grazed, minor bleeding',
     5: 'Torso struck, stunned 1 round, 1/2 move, minor bleeding',
     6: 'Shield damaged, torso struck, 1/2 move, minor bleeding',
@@ -1159,7 +1160,7 @@ CRIT_EFFECT_TABLE['Slashing']['Torso'] = {
     12: 'Torso destroyed, victim killed',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Arms'] = {
+SPELL_CRIT_EFFECT_TABLE['Slashing']['Arms'] = {
     4: 'Hand struck, weapon or shield dropped',
     5: 'Arm struck, minor bleeding, shield damage or weapon dropped',
     6: 'Hand injured, minor bleeding, –2 to attacks or no shield use',
@@ -1171,7 +1172,7 @@ CRIT_EFFECT_TABLE['Slashing']['Arms'] = {
     12: 'Arm severed at shoulder, no move or attacks, severe bleeding',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Head'] = {
+SPELL_CRIT_EFFECT_TABLE['Slashing']['Head'] = {
     4: 'Head grazed, minor bleeding, victim stunned [[1d6]] rounds',
     5: 'Head struck, helm removed, victim stunned 1 round, –2 to attack rolls; if to all attack rolls',
     6: 'Eye destroyed, stunned [[2d6]] rounds, –2 to all attacks',
@@ -1183,7 +1184,7 @@ CRIT_EFFECT_TABLE['Slashing']['Head'] = {
     12: 'Skull destroyed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Slashing']['Tail'] = {
+SPELL_CRIT_EFFECT_TABLE['Slashing']['Tail'] = {
     4: 'No unusual effect',
     5: 'No unusual effect',
     6: 'Tip of tail struck; if prehensile, any items carried are dropped, –2 penalty to tail attacks, minor bleeding',
@@ -1197,7 +1198,7 @@ CRIT_EFFECT_TABLE['Slashing']['Tail'] = {
 //#endregion
 
 //#region Vibration
-CRIT_EFFECT_TABLE['Vibration']['Legs'] = {
+SPELL_CRIT_EFFECT_TABLE['Vibration']['Legs'] = {
     4: 'Victim grazed and knocked down',
     5: 'Leg struck, 1/2 move; victim knocked down, stunned [[1d4]] rounds',
     6: 'Foot injured, 1/2 move, victim knocked down, stunned [[1d4]] rounds',
@@ -1209,7 +1210,7 @@ CRIT_EFFECT_TABLE['Vibration']['Legs'] = {
     12: 'Leg disintegrated at hip, no move or attack, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Vibration']['Abdomen'] = {
+SPELL_CRIT_EFFECT_TABLE['Vibration']['Abdomen'] = {
     4: 'Victim grazed and stunned 1 round',
     5: 'Abdomen struck, –2 to attack rolls, 1/2 move, stunned [[1d4]] rounds',
     6: 'Armor destroyed, abdomen injured, 1/2 move, –2 to attack rolls, victim stunned [[1d4]] rounds',
@@ -1221,7 +1222,7 @@ CRIT_EFFECT_TABLE['Vibration']['Abdomen'] = {
     12: 'Abdomen disintegrated, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Vibration']['Torso'] = {
+SPELL_CRIT_EFFECT_TABLE['Vibration']['Torso'] = {
     4: 'Victim grazed, stunned 1 round',
     5: 'Torso struck; 1/2 move, –2 to attack rolls, stunned [[1d4]] rounds',
     6: 'Shield destroyed, torso injured, stunned [[1d4]] rounds, 1/2 move, –2 to attack rolls',
@@ -1233,7 +1234,7 @@ CRIT_EFFECT_TABLE['Vibration']['Torso'] = {
     12: 'Torso disintegrated, victim killed instantly',
 };
 
-CRIT_EFFECT_TABLE['Vibration']['Arms'] = {
+SPELL_CRIT_EFFECT_TABLE['Vibration']['Arms'] = {
     4: 'Hand grazed, weapon or shield dropped',
     5: 'Arm struck, stunned [[1d4]] rounds, –2 to attacks with that hand',
     6: 'Hand injured, –2 to attacks with that hand (or no shield use if shield arm is burned), minor bleeding',
@@ -1245,7 +1246,7 @@ CRIT_EFFECT_TABLE['Vibration']['Arms'] = {
     12: 'Arm disintegrated at shoulder, stunned [[2d4]] rounds, 1/2 move, no attacks, major bleeding',
 };
 
-CRIT_EFFECT_TABLE['Vibration']['Head'] = {
+SPELL_CRIT_EFFECT_TABLE['Vibration']['Head'] = {
     4: 'Victim stunned 1 round',
     5: 'Head struck, helm destroyed, victim stunned [[1d4]] rounds, –2 to all attack rolls',
     6: 'Head struck, –2 to attacks, stunned [[2d4]] rounds, victim deafened',
@@ -1257,7 +1258,7 @@ CRIT_EFFECT_TABLE['Vibration']['Head'] = {
     12: 'Skull disintegrated, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Vibration']['Tail'] = {
+SPELL_CRIT_EFFECT_TABLE['Vibration']['Tail'] = {
     4: 'No unusual effect',
     5: 'No unusual effect',
     6: 'Tip of tail grazed; if prehensile, any items carried are dropped, –2 penalty to all tail attacks',
@@ -1271,7 +1272,7 @@ CRIT_EFFECT_TABLE['Vibration']['Tail'] = {
 //#endregion
 
 //#region Wounding
-CRIT_EFFECT_TABLE['Wounding']['Legs'] = {
+SPELL_CRIT_EFFECT_TABLE['Wounding']['Legs'] = {
     4: 'Victim grazed, –1 penalty to attack rolls',
     5: 'Leg struck, 1/2 move, –1 penalty to attack rolls',
     6: 'Foot injured, 1/2 move, –1 penalty to attack rolls',
@@ -1283,7 +1284,7 @@ CRIT_EFFECT_TABLE['Wounding']['Legs'] = {
     12: 'Leg withered at hip, no move or attack, minor bleeding',
 };
 
-CRIT_EFFECT_TABLE['Wounding']['Abdomen'] = {
+SPELL_CRIT_EFFECT_TABLE['Wounding']['Abdomen'] = {
     4: 'Victim grazed, –1 to attack rolls',
     5: 'Abdomen struck, –1 to attack rolls, 1/2 move',
     6: 'Abdomen injured, 1/2 move, –2 to attack rolls, minor bleeding',
@@ -1295,7 +1296,7 @@ CRIT_EFFECT_TABLE['Wounding']['Abdomen'] = {
     12: 'Abdomen destroyed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Wounding']['Torso'] = {
+SPELL_CRIT_EFFECT_TABLE['Wounding']['Torso'] = {
     4: 'Victim grazed, –1 to attack rolls, stunned 1 round',
     5: 'Torso struck; 1/2 move, –2 to attack rolls',
     6: 'Torso injured, 1/2 move, –2 to attack rolls',
@@ -1307,7 +1308,7 @@ CRIT_EFFECT_TABLE['Wounding']['Torso'] = {
     12: 'Torso destroyed, victim killed instantly',
 };
 
-CRIT_EFFECT_TABLE['Wounding']['Arms'] = {
+SPELL_CRIT_EFFECT_TABLE['Wounding']['Arms'] = {
     4: 'Hand grazed, weapon or shield dropped',
     5: 'Arm struck, –2 to attacks with that hand',
     6: 'Hand injured, –2 to attacks with that hand (or no shield use if shield hand is injured)',
@@ -1319,7 +1320,7 @@ CRIT_EFFECT_TABLE['Wounding']['Arms'] = {
     12: 'Arm withered at shoulder, stunned [[1d6]] rounds, 1/2 move, no attacks',
 };
 
-CRIT_EFFECT_TABLE['Wounding']['Head'] = {
+SPELL_CRIT_EFFECT_TABLE['Wounding']['Head'] = {
     4: 'Victim grazed, –1 penalty to attacks',
     5: 'Head struck, –2 to all attack rolls',
     6: 'Head injured, –2 to attacks, stunned [[1d6]] rounds',
@@ -1331,7 +1332,7 @@ CRIT_EFFECT_TABLE['Wounding']['Head'] = {
     12: 'Skull destroyed, immediate death',
 };
 
-CRIT_EFFECT_TABLE['Wounding']['Tail'] = {
+SPELL_CRIT_EFFECT_TABLE['Wounding']['Tail'] = {
     4: 'No unusual effect',
     5: 'No unusual effect',
     6: 'Tip of tail struck; if prehensile, any items carried are dropped, –2 penalty to all tail attacks',
@@ -1344,3 +1345,4 @@ CRIT_EFFECT_TABLE['Wounding']['Tail'] = {
 };
 //#endregion
 //#endregion
+

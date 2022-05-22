@@ -1589,8 +1589,8 @@ on('clicked:repeating_weapons-damage:crit2-melee', function(eventInfo) {
     getAttrs(fields, async function (values) {
         let finalRollText = `&{template:2Edefault} {{name=Test Critical hit}} {{Weapon name=${values['repeating_weapons-damage_weaponname1']}}} `;
 
-        let attackType = await extractQueryResult('?{How are you attacking?|Regular Attack|Low Attack|High Attack}');
         let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
+        let attackType = await extractQueryResult('?{How are you attacking?|Regular Attack|Low Attack|High Attack|Called Shot}');
         let targetSize = await extractQueryResult('?{Target size?|Tiny|Small|Medium|Large|Huge|Gargantuan}');
 
         let weaponSize = displaySize(values['repeating_weapons-damage_size']);
@@ -1618,6 +1618,11 @@ on('clicked:repeating_weapons-damage:crit2-melee', function(eventInfo) {
         }
         let locationRoll = await extractRollResult(locationDice);
         let locationObject = LOCATION_TABLE[targetType][locationRoll];
+        if (locationRoll < 5 && targetType !== 'Humanoid') {
+            let isSnakeLike = await extractQueryResult('?{Is the target snakelike or fishlike?|No|Yes}');
+            if (isSnakeLike === "Yes")
+                locationObject = LOCATION_TABLE[targetType][5];
+        }
 
         let severityEffect;
         let severityRoll;
@@ -1640,12 +1645,13 @@ on('clicked:repeating_weapons-damage:crit2-melee', function(eventInfo) {
         finalRollText += `{{Severity roll=${severityRoll}}} `;
 
         let weaponDamage = sizeToInt(targetSize) < 3 ? values['repeating_weapons-damage_damsm'] : values['repeating_weapons-damage_daml'];
-        if (weaponDamage.match('/\d/'))
-        if (severityRoll > 12) {
-            finalRollText += `{{Critical damage=[[(${weaponDamage})*3]]}} `;
-            severityRoll = 12;
-        } else {
-            finalRollText += `{{Critical damage=[[(${weaponDamage})*2]]}} `;
+        if (weaponDamage.match(/\d/)) {
+            if (severityRoll > 12) {
+                finalRollText += `{{Critical damage=[[(${weaponDamage})*3]]}} `;
+                severityRoll = 12;
+            } else {
+                finalRollText += `{{Critical damage=[[(${weaponDamage})*2]]}} `;
+            }
         }
 
         finalRollText += `{{Location roll=[[${locationRoll}]]}} `;
@@ -1655,8 +1661,8 @@ on('clicked:repeating_weapons-damage:crit2-melee', function(eventInfo) {
         let critEffect;
         if (severityRoll < 4) {
             critEffect = 'No unusual effect'
-        } else if (CRIT_EFFECT_TABLE[weaponType]) {
-            critEffect = CRIT_EFFECT_TABLE[weaponType][targetType][locationObject['general']][severityRoll];
+        } else if (WEAPON_CRIT_EFFECT_TABLE[weaponType]) {
+            critEffect = WEAPON_CRIT_EFFECT_TABLE[weaponType][targetType][locationObject['general']][severityRoll];
         } else {
             critEffect = 'No unusual effect';
         }
