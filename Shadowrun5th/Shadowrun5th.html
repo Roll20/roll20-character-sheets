@@ -14627,14 +14627,13 @@ async function importEnhancementTab(text, chummerfile) {
         if(chummerfile.characters.character.cyberwares != null){
             console.log("Importing Cyberware");
             if(chummerfile.characters.character.cyberwares.cyberware.length > 1){
-                for(var i=0; i<chummerfile.characters.character.cyberwares.cyberware.length; i++){
+                for(var i=0; i< chummerfile.characters.character.cyberwares.cyberware.length; i++){
                     var newrowid=generateRowID();
                     attributes["repeating_ware_"+newrowid+"_warename"]=chummerfile.characters.character.cyberwares.cyberware[i].name;
                     attributes["repeating_ware_"+newrowid+"_waredescription"]=chummerfile.characters.character.cyberwares.cyberware[i].rating;
                     attributes["repeating_ware_"+newrowid+"_waregrade"]=chummerfile.characters.character.cyberwares.cyberware[i].grade;
                     attributes["repeating_ware_"+newrowid+"_warekarma"]=chummerfile.characters.character.cyberwares.cyberware[i].ess;
                     essence += Number(chummerfile.characters.character.cyberwares.cyberware[i].ess.replace(",","."));
-                    importCyberwareArmor(chummerfile.characters.character.cyberwares.cyberware[i], attributes)
                 }
             }else{
                 var newrowid=generateRowID();
@@ -14939,6 +14938,24 @@ async function importEquipmentTab(experimental, chummerfile) {
                 goodcode = false;
                 error= error + "\n" + "Error with Armor " + chummerfile.characters.character.armors.armor.name + ": " + err
             }
+        }
+    }
+
+    if(chummerfile.characters.character.cyberwares != null){
+        console.log("Importing Cyberware Armor");
+        if(chummerfile.characters.character.cyberwares.cyberware.length > 1){
+            chummerfile.characters.character.cyberwares.cyberware.forEach(cyberware =>  importCyberwareArmor(cyberware, attributes));
+        }else{
+            importCyberwareArmor(chummerfile.characters.character.cyberwares.cyberware, attributes);
+        }
+    }
+
+    if(chummerfile.characters.character.otherarmors != null){
+        console.log("Importing Other Armors");
+        if(chummerfile.characters.character.otherarmors.otherarmor.length > 1){
+            chummerfile.characters.character.otherarmors.otherarmor.forEach(armor =>  importOtherArmor(armor, attributes));
+        }else{
+            importOtherArmor(chummerfile.characters.character.otherarmors.otherarmor, attributes);
         }
     }
 
@@ -15341,6 +15358,12 @@ function importRepeatingAmmo(ammunition, number, attributes) {
     else {
         attributes["repeating_ammotype"+number+"_"+newrowid+"_ammoap"] = ammo.weaponbonusap != null? ammo.weaponbonusap : 0;
     }
+
+    if(ammo.name_english === "Arrow: Stick-n-Shock w/Static Shaft" || ammo.name_english === "Arrow: Stick-n-Shock") {
+        attributes["repeating_ammotype"+number+"_"+newrowid+"_ammoap"] = -5 - attributes["weaponap"+number];
+        attributes["repeating_ammotype"+number+"_"+newrowid+"_ammodv"] = ammo.weaponbonusdamage_english.substring(0,2) - attributes["weapondv"+number];
+    }
+
     attributes["repeating_ammotype"+number+"_"+newrowid+"_ammoacc"] = ammo.weaponbonusacc != null ? ammo.weaponbonusacc : 0;
 }
 
@@ -15496,6 +15519,12 @@ function importRepeatingWeaponAmmo(row, ammunition, number, attributes) {
     else {
         attributes[row + "ammoap" + number] = ammo.weaponbonusap != null? ammo.weaponbonusap : 0;
     }
+
+    if(ammo.name_english === "Arrow: Stick-n-Shock w/Static Shaft" || ammo.name_english === "Arrow: Stick-n-Shock") {
+        attributes[row + "ammoap" + number] = -5 -  attributes[row + "weaponap"]
+        attributes[row + "ammodv" + number] = ammo.weaponbonusdamage_english.substring(0,2) - attributes[row + "weapondv"]
+    }
+
     attributes[row + "ammoacc" + number] = ammo.weaponbonusacc != null ? ammo.weaponbonusacc : 0;
 }
 
@@ -15565,6 +15594,14 @@ function importSingleCyberwareArmor(parentname, cyberware, attributes) {
         attributes["repeating_armors_"+newrowid+"_armorrating"] = cyberware.rating;
         attributes["repeating_armors_"+newrowid+"_armornotes"] = "";
     }
+}
+
+function importOtherArmor(armor, attributes) {
+    var newrowid = generateRowID()
+    attributes["repeating_armors_"+newrowid+"_armorname"] = armor.objectname;
+    attributes["repeating_armors_"+newrowid+"_armorworn"] = "on";
+    attributes["repeating_armors_"+newrowid+"_armorrating"] = armor.armor;
+    attributes["repeating_armors_"+newrowid+"_armornotes"] = armor.improvesource;
 }
 
 async function importSingleSpell(spell, attributes, spellcasting, ritual, alchemy) {
@@ -16766,7 +16803,6 @@ on('clicked:repeating_ammotype1:roll clicked:repeating_ammotype2:roll clicked:re
         }
     }
 
-
     await rollDogableAttack(rollPart, dmgType);
 
 });
@@ -16781,7 +16817,7 @@ const rollDogableAttack = async (rollPart, dmgType) => {
     if(amount > attackRoll.results.result.dice.length/2) {
         glitchComputed = 1;
 
-        if(attackRoll.results.result.dice.filter(x => x >= 6).length == 0) {
+        if(attackRoll.results.result.result == 0) {
             glitchComputed = 2;
         }
     }
@@ -16789,9 +16825,11 @@ const rollDogableAttack = async (rollPart, dmgType) => {
     let attrs = await asw.getAttrs(['character_name']);
     // Storing all the passthrough data required for the next roll in an Object helps for larger rolls
     let attackDmgType = dmgType[Object.keys(dmgType)[0]]
+
     if(!attackDmgType) {
         attackDmgType = 'P';
     }
+
     let rollData = {
         attacker: attrs.character_name,
         attackHits: attackRoll.results.result.result,
@@ -16862,6 +16900,7 @@ const rollReactSoak = async (ev) => {
 
     if(dmgType.includes('P')) {
      dmgType = dmgRoll.attackDamage > (attrs.armor_total + armorPenetration + soakRoll.results.mod.result) ? dmgRoll.attackDmgType : 'S';
+     console.log("resulting dmgType: "+dmgType+ " dmg: "+dmgRoll.attackDamage+" armorResult: "+ (attrs.armor_total + armorPenetration + soakRoll.results.mod.result));
     }
 
     finishRoll(soakRoll.rollId, {

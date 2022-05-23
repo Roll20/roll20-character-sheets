@@ -235,6 +235,7 @@ on('change:armure', async (newArmure) => {
     MALWarmasterImpGPersonnel: 0,
     MALRogueGhost: 0,
     rogueGhost: 0,
+    bardChangeling: 0,
     MALBarbarianGoliath: 0,
     slotTeteMax: sTete,
     slotTorseMax: sTorse,
@@ -842,7 +843,7 @@ on('change:shamanNbreTotem', async () => {
 
 // GESTION DES ASPECTS ET CARACTERISTIQUES
 // Chair
-on('change:deplacement change:force change:endurance change:santeModif change:santeODBonus', async () => {
+on('change:deplacement change:force change:endurance change:santeModif change:santeODBonus sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'chair', 'deplacement', 'force', 'endurance', 'santeModif', 'santeODBonus']);
 
   const fiche = +attrs.fichePNJ;
@@ -867,7 +868,7 @@ on('change:deplacement change:force change:endurance change:santeModif change:sa
   await setAttrsAsync({ santepj_max: total });
 });
 // Bête
-on('change:fichePNJ change:armure change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns', async () => {
+on('change:fichePNJ change:armure change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'armure', 'bete', 'hargne', 'combat', 'instinct', 'calODHar', 'calODCom', 'calODIns']);
 
   const fiche = +attrs.fichePNJ;
@@ -906,7 +907,7 @@ on('change:fichePNJ change:armure change:hargne change:combat change:instinct ch
   await setAttrsAsync({ defense: total });
 });
 // Machine
-on('change:fichePNJ change:armure change:tir change:savoir change:technique change:calODTir change:calODSav change:calODTec', async () => {
+on('change:fichePNJ change:armure change:tir change:savoir change:technique change:calODTir change:calODSav change:calODTec sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'armure', 'machine', 'tir', 'savoir', 'technique', 'calODTir', 'calODSav', 'calODTec']);
 
   const fiche = +attrs.fichePNJ;
@@ -3325,7 +3326,9 @@ on('clicked:importKNPCG', () => {
         const name = effects[cle].name.split(' ', length).join(' ').toLowerCase();
         const value2 = eff[length] || 0;
 
-        switch (name) {
+        const uEff = name === 'ignore' || name === 'perce' || name === 'dégâts' ? `${name} ${eff[1]}` : name;
+
+        switch (uEff) {
           case 'anathème':
             newrowattrsW[`${path + newrowidW}_anatheme`] = '{{anatheme=Anathème}}';
             break;
@@ -3418,7 +3421,7 @@ on('clicked:importKNPCG', () => {
             newrowattrsW[`${path + newrowidW}_ignoreArmure`] = '{{ignoreArmure=Ignore Armure}}';
             break;
 
-          case 'ignore champ de force':
+          case 'ignore CdF':
             newrowattrsW[`${path + newrowidW}_ignoreCdF`] = '{{ignoreCdF=Ignore Champs de Force}}';
             break;
 

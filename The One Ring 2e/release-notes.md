@@ -4,6 +4,20 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.12.01 (Build 16)
+### Bugfixes
+- Fixed stance damagebonus should be dependent on the stance damage active checkbox (error was introduced with the grievous selectbox) 
+
+## 02.12.00 (Build 15)
+
+### Features
+
+- changed keen, grievieous, fell weapon spec from checkbox into selectable valued options
+- changed cunning make, close fit, reinforced armour spec from checkbox into selectable valued options
+- added release log to archive data migration messages (button on the bottom of the sheet to toggle)
+
+PLEASE NOTE: due to the changes a data migration will make changes to the values of weapon and armour values. As the new sheet will automatically incorporate all necessary bonus to Damage/Injury/Load/Parry etc. the data migration will automatically correct those values depending on the flags (keen, grievous, fell, cunning make, close fitting, reinforced). You can check everything that happened in the release log (click button to show it). Please inform the players about the new semantics of the sheet to avoid confusion.
+
 ## 02.11.00 (Build 14)
 
 ### Features

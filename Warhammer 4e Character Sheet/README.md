@@ -73,6 +73,41 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+May 12th 2022 v1.55f
+
+- Implemented Unshakable Talent, which adds conditional bonus to Cool tests.
+- Fixed Briber Talent naming, it was incorrectly named Bribery.
+- Fixed Channelling test miscast inidcator on Unit die 0, now occur only when roll is above the target number.
+- Button Hover style no longer inverts text color, text remains white with black shadow.
+
+
+April 22th 2022 v1.55e
+
+- Spell Tab changes: Spell name selection improved custom name field is now hidden if not being used. Added Memorized checkbox and XP Cost field for spells. Arcane spells which are not Memorized double the CN on rolling as per Core rules. 
+- Accumulated Ext SL when channelling now automatically increments with each channel roll, channel crit will fill AccuExtSL to CN number if not already above. This effects all spells of the same Lore. Casting will reset AccuExtSL back to 0. Rerolling from the reroll button will use the Previous casts AccuExtSL. AccuExtSL needs to be adjusted manually if special bonus are given, like spend Fortune for +1 SL.
+- Add Vs Reach (VsRch) tick on Melee assister, this ass Vs Larger Reach -10 to Attack modifier, to be used against a enemy with larger Weapon then you.
+- Unequipping Weapons Main/Off will now result in a Unarmed default condition with normal stats.
+- Drunk now applies to WS/BS/Agi/Dex/Int skills only.
+- Ranged Accurate has been merged into the Ranged modifier changing defautl mod to 10 rather then add during the roll to any other modifier value.
+- Inventory now has Worn? option instead of carrier option. Selecting Wron reduces total enc of the item by -1.
+- Fixed Fastshot not adding to SL outcome calculation.
+- Fixed Conditions not working with no offhand weapon equiped. This stoped a few rolls from functioning.
+
+
+April 13th 2022 v1.55d
+
+- New integrated Size system - Size is selectable in Background tab, and Vs Size in the Melee Assister. Applyies Size Combat Modifiers rules from the core book, effects sheet Wounds/Carry weight and modifies melee combat rolls. Showing larger/smaller bonuses as appropriate. Only works with talent integration.
+- Separated Mele Attack and Opposed modifier, only Attack modifier is shown in Melee Assist window. So Opposed Parry rolls do not apply Attack only modifiers, and vice versa.
+- Improved Conditions calculation, they now cap at -30 modifier. Add Drunk as a special condition which can stack with other condition modifiers upto max -30. Penalties like Offhand and Armor are now considered in the cap.
+- Fixed Carouser RT results not displaying properly
+- Fixed Distract RT text not displaying properly
+- Fixed issue with Encumbrance Penalty when Agility was exactly 30 it would result in frozen target display
+- Added talents Beat Blade, Beneath Notice, Large/Small, Suffused with Uglu, Super Numerate & Supportive to talent integration
+- Added Beat Blade to melee assist actions, and reordered them so the layout cascade better on sheet
+- Activating Stun to Strike will now with also activate Melee Called Shot
+- Added new Psychology record section in Core Stats tab under Injuries (with community support!)
+ 
+
 April 6th 2022 v1.55c
 
 - Improved Armor Qualities, now displays selected options at top of attack rolls. New checkboxes in the Armor Tab.

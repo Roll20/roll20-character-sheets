@@ -111,6 +111,11 @@ const extractRollResult = async function(rollExpression) {
     return roll.result;
 };
 
+const printRoll = async function(rollExpression) {
+    let roll = await startRoll(rollExpression);
+    finishRoll(roll.rollId);
+}
+
 const isRollValid = function (rollExpression, field) {
     let expression = rollExpression.trim();
     if (!expression)
@@ -713,6 +718,22 @@ on('change:charisma change:leadership change:appearance', function() {
         }
     });
 });
+
+on('clicked:opendoor-check', function (eventInfo){
+   getAttrs(['opendoor'], async function (values){
+       let match = values.opendoor.match(/(\d+)\((\d+)\)/);
+       let rollTemplate = "&{template:2Echeck} {{character=@{character_name}}} {{checkroll=[[1d20cs1cf20]]}} {{color=blue}}"
+       if (!match) {
+           return printRoll(rollTemplate + "{{checkvs=Open Doors Check}} {{checktarget=[[@{opendoor}]]}}");
+       }
+       let target = await extractQueryResult(`?{What kind of door?|Normal door,${match[1]}|Locked / Barred / Magical door,${match[2]}}`);
+       rollTemplate += ` {{checktarget=[[${target}]]}}`;
+       rollTemplate += target === match[1]
+           ? ` {{checkvs=Open Normal Doors Check}}`
+           : ` {{checkvs=Open Locked/Barred/Magical Doors Check}}`;
+       return printRoll(rollTemplate);
+   });
+});
 //#endregion
 
 //#region Wizard and Priest Spells slot counting
@@ -956,7 +977,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 if (!level)
                     return;
 
-                let spellLevel = spellLevels.spellLevel(sl => sl.level === level);
+                let spellLevel = spellLevels.find(spellLevel => spellLevel.level === level);
                 if (!spellLevel)
                     return;
 

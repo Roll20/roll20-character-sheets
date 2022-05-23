@@ -6,10 +6,11 @@
     <button class="sheet-page-selection-option" name="act_configuration-page" type="action">Configuration</button>
   </div>
 
-  <input class="sheet-selected-page" name="attr_selected-page" type="hidden" value="character-page" />
+  <input class="sheet-selected-page" name="attr_selected-page" type="hidden" value="configuration-page" />
 
+  <!-- CHARACTER PAGE -->
   <div class="sheet-character-page">
-    <input class="sheet-character-type" name="attr_character-type" type="hidden" value="trainer" />
+    <input class="sheet-character-type" name="attr_character-type" type="hidden" value="pokemon" />
 
     <p class="sheet-logo">
       <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/PokemonTabletopAdventures_v3/images/PTA3SmallLogo.png" />
@@ -76,12 +77,12 @@
               <option value="grass">Grass</option>
               <option value="ground">Ground</option>
               <option value="ice">Ice</option>
-              <option value="normal" selected>Normal</option>
+              <option value="normal">Normal</option>
               <option value="poison">Poison</option>
               <option value="psychic">Psychic</option>
               <option value="rock">Rock</option>
               <option value="steel">Steel</option>
-              <option value="typeless">Typeless</option>
+              <option value="typeless" selected>Typeless</option>
               <option value="water">Water</option>
             </select>
             <select class="sheet-half-text sheet-no-dropdown" name="attr_type2" title="Attribute: type2">
@@ -226,12 +227,12 @@
               <option value="grass">Grass</option>
               <option value="ground">Ground</option>
               <option value="ice">Ice</option>
-              <option value="normal" selected>Normal</option>
+              <option value="normal">Normal</option>
               <option value="poison">Poison</option>
               <option value="psychic">Psychic</option>
               <option value="rock">Rock</option>
               <option value="steel">Steel</option>
-              <option value="typeless">Typeless</option>
+              <option value="typeless" selected>Typeless</option>
               <option value="water">Water</option>
             </select>
             <select class="sheet-half-text sheet-no-dropdown" name="attr_type2" title="type2">
@@ -936,7 +937,7 @@
     <b>Moves</b>
     <fieldset class="repeating_moves">
       <input name="attr_move_category_defense" type="hidden" />
-      <input class="sheet-color-setting-move" name="attr_move_type" type="hidden" value="normal" />
+      <input class="sheet-color-setting-move" name="attr_move_type" type="hidden" value="typeless" />
       <div class="sheet-pokemon-move">
         <input checked class="sheet-options-flag" name="attr_options_flag" type="checkbox" />
         <span name="attr_flag">-</span>
@@ -1016,12 +1017,12 @@
               <option value="grass">Grass</option>
               <option value="ground">Ground</option>
               <option value="ice">Ice</option>
-              <option value="normal" selected>Normal</option>
+              <option value="normal">Normal</option>
               <option value="poison">Poison</option>
               <option value="psychic">Psychic</option>
               <option value="rock">Rock</option>
               <option value="steel">Steel</option>
-              <option value="typeless">Typeless</option>
+              <option value="typeless" selected>Typeless</option>
               <option value="water">Water</option>
             </select>
             <select class="sheet-move-text sheet-no-dropdown" name="attr_move_category" title="Attribute: move_category">
@@ -1171,6 +1172,7 @@
     <textarea name="attr_notes" spellcheck="false" title="Attribute: notes"></textarea>
   </div>
 
+  <!-- CONFIGURATION PAGE -->
   <div class="sheet-configuration-page">
     <h2>Configuration Options</h2>
     <div class="sheet-configuration-grid sheet-text-background">
@@ -1178,8 +1180,8 @@
         <b title="Default value: Trainer">Character Type:</b>
         <b class="sheet-info-tooltip" title="Default value: Trainer"> ℹ </b>
         <select class="sheet-character-type sheet-no-dropdown" name="attr_character-type" title="Attribute: character-type">
-          <option value="trainer" selected>Trainer</option>
-          <option value="pokemon">Pokémon</option>
+          <option value="trainer">Trainer</option>
+          <option value="pokemon" selected>Pokémon</option>
           <option value="hybrid">Pokémon (Character Class)</option>
         </select>
         <p class="sheet-dark-text">
@@ -1232,7 +1234,7 @@
       <div class="sheet-initiative-breaker">
         <b title="Default value: [[d20]]">Initiative Tie Breaker:</b>
         <b class="sheet-info-tooltip" title="Default value: [[d20]]"> ℹ </b>
-        <input name="attr_initiative-tie-breaker" title="Attribute: initiative-tie-breaker" type="text" value="[[d20]]" /><br />
+        <input name="attr_initiative-tie-breaker" title="Attribute: initiative-tie-breaker" type="text" value="[[d100-1]]" /><br />
         <p class="sheet-dark-text">
           This is included so that you can, if you wish, add it to the character's speed when determining their initiative order.
           (Note this isn't an official rule, but it's helpful when characters have the same speed!)
@@ -1291,7 +1293,7 @@
         <p class="sheet-dark-text">
           Warning! This feature should only be used on blank character sheets.<br />
           Enter data for a PTA3 character to automatically fill this character sheet.
-          Currently supported formats: roll20, Pokelicious Google Sheets (minimum version Saffron)
+          Currently supported formats: roll20, Pokelicious Google Sheets, VTTES by Justas Dabrilla.
         </p>
       </div>
       <div class="sheet-json-import sheet-show-on-mobile">
@@ -2941,8 +2943,9 @@
 
   function parseCharacterData(characterData) {
     const source = characterData["Source"];
-    if(!source) return { ["json_import_response"]: "Error - Unable to identify source of JSON data" };
-    if(source.startsWith("Pokelicious")) {
+    const vttes_version = characterData["schema_version"];
+    if(!source && !vttes_version) return { ["json_import_response"]: "Error - Unable to identify source of JSON data" };
+    if(source && source.startsWith("Pokelicious")) {
       // Identify as a Pokelicious sheet
       let response = { ["json_import_response"]: "Error - Unable to parse all attributes" }
       const innerData = characterData["Attributes"];
@@ -2994,23 +2997,46 @@
       response["json_import_response"] = "Pokemon data successfully imported from " + source + "!";
       return response;
 
-    } else if (source.startsWith("roll20")) {
+    } else if (source && source.startsWith("roll20")) {
       // Identify as a roll20 sheet
-      let response = includeOnlyKeysInArray(characterData, r20export_attrs);
-      response["json_import_response"] = "Error - Unable to parse all attributes";
-      characterData["exportmoves"].forEach(function(move) {
-        const id = generateRowID();
-        Object.entries(move).forEach(([key, value]) => response[`repeating_moves_${id}_${key}`] = value);
-      });
-      characterData["exportfeatures"].forEach(function(feature) {
-        const id = generateRowID();
-        Object.entries(feature).forEach(([key, value]) => response[`repeating_features_${id}_${key}`] = value);
-      });
+      let response = parseCharacterDataOriginatingFromRoll20(characterData);
       response["json_import_response"] = "Character sheet data successfully imported from " + source + "!";
+      return response;
+    } else if (vttes_version) {
+      // VTTES by Justas Dabrilla - DocSigmaBot created exports for all Pokemon
+      let flattenedAttributes = { };
+      let repeatingMoveKeys = [];
+      characterData["character"]["attribs"].forEach(function(attribute) {
+        const name = attribute["name"];
+        if(name.startsWith('repeating_moves_')){
+          repeatingMoveKeys.push(name);
+        }
+        flattenedAttributes[name] = attribute["current"];
+      });
+      let nonRepeatResponse = includeOnlyKeysInArray(flattenedAttributes, r20export_attrs);
+      let repeatResponse = includeOnlyKeysInArray(flattenedAttributes, repeatingMoveKeys);
+      let response = {...nonRepeatResponse, ...repeatResponse};
+      response["HP_max"] = response["HP"];
+      response["character_name"] = characterData["character"]["name"];
+      response["json_import_response"] = "Character sheet data successfully imported from VTTES by Justas Dabrilla, version " + vttes_version + "!";
       return response;
     } else {
       return { ["json_import_response"]: "Error - " + source + " is not a supported data source" };
     }
+  }
+
+  function parseCharacterDataOriginatingFromRoll20(characterData) {
+    let response = includeOnlyKeysInArray(characterData, r20export_attrs);
+    response["json_import_response"] = "Error - Unable to parse all attributes";
+    characterData["exportmoves"].forEach(function(move) {
+      const id = generateRowID();
+      Object.entries(move).forEach(([key, value]) => response[`repeating_moves_${id}_${key}`] = value);
+    });
+    characterData["exportfeatures"].forEach(function(feature) {
+      const id = generateRowID();
+      Object.entries(feature).forEach(([key, value]) => response[`repeating_features_${id}_${key}`] = value);
+    });
+    return response;
   }
 
   function remapIfExists(inputData, responseData, inputKey, responseKey) {
