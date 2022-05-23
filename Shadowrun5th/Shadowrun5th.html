@@ -14950,6 +14950,15 @@ async function importEquipmentTab(experimental, chummerfile) {
         }
     }
 
+    if(chummerfile.characters.character.otherarmors != null){
+        console.log("Importing Other Armors");
+        if(chummerfile.characters.character.otherarmors.otherarmor.length > 1){
+            chummerfile.characters.character.otherarmors.otherarmor.forEach(armor =>  importOtherArmor(armor, attributes));
+        }else{
+            importOtherArmor(chummerfile.characters.character.otherarmors.otherarmor, attributes);
+        }
+    }
+
     if(chummerfile.characters.character.weapons != null){
         console.log("Importing weapons");
         for(var i=1; i<9; i++){
@@ -15585,6 +15594,14 @@ function importSingleCyberwareArmor(parentname, cyberware, attributes) {
         attributes["repeating_armors_"+newrowid+"_armorrating"] = cyberware.rating;
         attributes["repeating_armors_"+newrowid+"_armornotes"] = "";
     }
+}
+
+function importOtherArmor(armor, attributes) {
+    var newrowid = generateRowID()
+    attributes["repeating_armors_"+newrowid+"_armorname"] = armor.objectname;
+    attributes["repeating_armors_"+newrowid+"_armorworn"] = "on";
+    attributes["repeating_armors_"+newrowid+"_armorrating"] = armor.armor;
+    attributes["repeating_armors_"+newrowid+"_armornotes"] = armor.improvesource;
 }
 
 async function importSingleSpell(spell, attributes, spellcasting, ritual, alchemy) {
@@ -16800,7 +16817,7 @@ const rollDogableAttack = async (rollPart, dmgType) => {
     if(amount > attackRoll.results.result.dice.length/2) {
         glitchComputed = 1;
 
-        if(attackRoll.results.result.dice.filter(x => x >= 5).length == 0) {
+        if(attackRoll.results.result.result == 0) {
             glitchComputed = 2;
         }
     }
@@ -16883,6 +16900,7 @@ const rollReactSoak = async (ev) => {
 
     if(dmgType.includes('P')) {
      dmgType = dmgRoll.attackDamage > (attrs.armor_total + armorPenetration + soakRoll.results.mod.result) ? dmgRoll.attackDmgType : 'S';
+     console.log("resulting dmgType: "+dmgType+ " dmg: "+dmgRoll.attackDamage+" armorResult: "+ (attrs.armor_total + armorPenetration + soakRoll.results.mod.result));
     }
 
     finishRoll(soakRoll.rollId, {

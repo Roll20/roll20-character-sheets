@@ -200,6 +200,10 @@ monkCeaRoll.forEach((button) => {
     let isConditionnelD = false;
     let isConditionnelV = false;
 
+    const attaquesSurprises = [];
+    const attaquesSurprisesValue = [];
+    let attaquesSurprisesCondition = '';
+
     const mod = +attrs.jetModifDes;
     const hasBonus = +attrs.bonusCarac;
 
@@ -225,12 +229,9 @@ monkCeaRoll.forEach((button) => {
     let OD = 0;
 
     let ODMALBarbarian = [];
+    let ODMALRogue = [];
     let ODMALShaman = [];
     const ODMALWarrior = [];
-
-    let attaquesSurprises = [];
-    let attaquesSurprisesValue = [];
-    let attaquesSurprisesCondition = '';
 
     let capaDgts = 0;
     let capaViolence = 0;
@@ -258,7 +259,7 @@ monkCeaRoll.forEach((button) => {
     let isMeurtrier = false;
     let isUltraviolence = false;
 
-    const autresEffets = [];
+    let autresEffets = [];
 
     exec.push(roll);
     exec.push('{{OD=true}}');
@@ -311,26 +312,20 @@ monkCeaRoll.forEach((button) => {
       if (hasArmure) { OD += C4OD; }
     }
 
-    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
-
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
 
     diceDegats += Number(MALBonus.diceDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // GESTION DES EFFETS DES DIFFERENTES ATTAQUES
 
@@ -516,6 +511,7 @@ monkCeaRoll.forEach((button) => {
     bonus = bonus.concat(OD);
 
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODMALWarrior);
 

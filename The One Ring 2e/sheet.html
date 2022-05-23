@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="02-12-00" />
+<input type="hidden" name="attr_version" value="02-12-01" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -2352,7 +2352,8 @@
             stanceattack_active = int(data['stanceattack_active']),
             stanceattackbonus = int(data['stanceattackbonus']),
             stancedamagebonus = int(data['stancedamagebonus']);
-        damage = (stanceattack_active == 1 || grievous_val > 0) ? `${damage}+${stancedamagebonus + grievous_val}` : damage;
+        damage_bonus = stanceattack_active == 1 ? stancedamagebonus + grievous_val : grievous_val;
+        damage = (damage_bonus > 0) ? `${damage}+${damage_bonus}` : damage;
         injury = (fell_val > 0) ? `${injury}+${fell_val}` : injury;
         clog(`First roll: ${JSON.stringify(data)}, Action: ${action}, Dice: ${actdice}, tn: ${data.strengthtn}`);
         await rollFirst(data.character_name, action, actdice, data.strengthtn, 0, "combat"+target, `weapon='${keen}${fell}${grievous}Damage:${damage}, Injury:${injury}'; additional='Notes: ${note}';keen='${keen_val}';`, false);
@@ -2529,7 +2530,25 @@
                     });
                 }
             }
-
+            if (build < 16) {
+                attrs["build"] = 16;
+                let releaselog = {msg:""};
+                hlog(`Release 02.12.01 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Bugfixes
+- Fixed stance damagebonus should be dependent on the stance damage active checkbox (error was introduced with the grievous selectbox)
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+            
             /*
             if (build === 9) {
                 attrs["build"] = 8;

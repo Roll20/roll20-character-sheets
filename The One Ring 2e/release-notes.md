@@ -4,6 +4,10 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.12.01 (Build 16)
+### Bugfixes
+- Fixed stance damagebonus should be dependent on the stance damage active checkbox (error was introduced with the grievous selectbox) 
+
 ## 02.12.00 (Build 15)
 
 ### Features
