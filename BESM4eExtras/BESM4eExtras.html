@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.8.2" readonly />
+													<input type="text" class="center" name="attr_version" value="1.8.3" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -7893,6 +7893,11 @@
 			if (isLesserThan180) {
 				upgradeTo_1_8_0(sizetemplateIDs, value, sheetdb, setObj);
 			}
+			const isLesserThan183 = major_global_version <= 1 && minor_global_version < 8.3 ?
+				true : false;
+			if (isLesserThan183) {
+				upgradeTo_1_8_3(value, setObj);
+			}
 			setObj.global_version = sheet_version;
 		}
 		
@@ -7978,6 +7983,26 @@
 				});
 			}
 			clog(2, {}, 'upgraded to 1.8.0');
+		}
+		
+		function upgradeTo_1_8_3(value, setObj) {
+			/*
+			const body = parseInt(value.static_stat_base_body);
+			const mind = parseInt(value.static_stat_base_mind);
+			const soul = parseInt(value.static_stat_base_soul);
+			*/
+			const statValues = [
+				parseInt(value.static_stat_base_body),
+				parseInt(value.static_stat_base_mind),
+				parseInt(value.static_stat_base_soul)
+			];
+			clog(2, {}, 'statValues:', statValues, 'upgradeTo_1_8_3()');
+			_.each(statValues, (s, i) => {
+				const cost = getStatCost(2, {}, s);
+				clog(2, {}, 's =', s);
+				setObj[`stat_cost_${allaspects_stats_array[i]}`] = cost;
+			});
+			clog(2, {}, 'upgraded to 1.8.3');
 		}
 		
 		/** Build UI Functions **/
@@ -8307,22 +8332,20 @@
 			return result;
 		}
 		
+		function getStatCost(debug, timer, level) {
+			let cost = 0;
+			for(let i = 1; i <= level; i++) {
+				if(i < 13) { cost += 4 } else { cost += 8 }
+			}
+			clog(debug, timer, 'cost =', cost, 'getStatCost()');
+			return cost;
+		}
+		
 		function setStatCost(debug, timer, eventInfo, value, setObj, sourceAttr) {
-			const newValue = parseInt(eventInfo.newValue) || 0;
-			const previousValue = parseInt(eventInfo.previousValue) || 0;
-			const diffValue = newValue - previousValue;
-			const statCost = 
-				newValue > 12 && previousValue > 12 ? 
-					diffValue * 8 : 
-				newValue <= 12 && previousValue <= 12 ? 
-					diffValue * 4 : 
-				newValue > 12 && previousValue <= 12 ? 
-					(((newValue - 12) * 8) + 48) - (previousValue * 4) : 
-				newValue <= 12 && previousValue > 12 ? 
-					(newValue * 4) - (((previousValue - 12) * 8) + 48) : 0;
-			//setObj[`stat_cost_${sourceAttr}`] = statCost;
+			const level = parseInt(eventInfo.newValue) || 0
+			const statCost = getStatCost(debug, timer, level);
 			writeValues(debug, timer, value, `stat_cost_${sourceAttr}`, statCost, setObj);
-			clog(debug, timer, 'statCost =', statCost, 'setStatCost()');
+			clog(debug, timer, 'sourceAttr =', sourceAttr, 'setStatCost()');
 		}
 		
 		function getDefectPointsByCategory(value, rowID, defect){
@@ -8339,11 +8362,8 @@
 			const groupid = getGroupID(value, 'attr');
 			const groupType = value[`static_attrgroup_${groupid}_type`] || 'Standard';
 			const groupSourceID = value[`static_attrgroup_${groupid}_source`];
-			//const isPowerFlux = /flux/i.test(groupType);
 			const isPowerFlux = groupType.toLowerCase().indexOf('flux') !== -1 ? true : false;
 			const fluxcost = parseInt(value[`repeating_attr_${groupSourceID}_totalcost`]);
-			//const aggregateAttrGroupCost = getAggregateAttrGroupCost(debug, timer, attrIDs, value, sectionName, rowID, setObj);
-			//const aggregateAttrGroupCost = parseInt(value[`static_attrgroup_${groupid}_groupcost`]);
 			const standardgroupcost = getStandardGroupCost(debug, timer, attrIDs, value, rowID, false, groupid, setObj);
 			const groupIsActive = groupSourceID !== false ? 
 				parseInt(value[`repeating_attr_${groupSourceID}_activate`]) :
@@ -8352,7 +8372,6 @@
 				isPowerFlux && groupIsActive ? 
 					getPowerFluxGroupCost(debug, timer, value, groupSourceID) :
 				standardgroupcost;
-			
 			const aggregateDefectPoints = getAggregateGroupDefectPoints(debug, timer, attrdb, value);
 			const groupcost = isPowerFlux ?
 				fluxcost + aggregateDefectPoints :
@@ -9008,7 +9027,6 @@
 			const augmented = getSumOfActiveAttrLevels(attrdb, 'augmented', stat) || 0;
 			const shortcoming = getShortcomingRank(debug, timer, attrdb, value, stat);
 			const result = newValue + augmented - shortcoming;
-			//setObj[`stat_total_${stat}`] = result;
 			writeValues(debug, timer, value, `stat_total_${stat}`, result, setObj);
 			clog(debug, timer, 'result =', result, 'setAllAspectStats()');
 			setStatCost(debug, timer, eventInfo, value, setObj, stat);
