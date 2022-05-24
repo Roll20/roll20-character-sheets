@@ -112,6 +112,10 @@
 					<td>&nbsp;/&nbsp;</td>
 					<td><input type="number" name="attr_HP_max" value="0" title="Max HP @{HP|max}" /></td>
 				</tr>
+				<tr>	<td colspan="4"><div class="textHead"><span data-i18n="second-wind">Second Wind</span></div> </td>			</tr>
+				<tr>	<td><input type="text" name="attr_Second_Wind" value="." readonly="readonly"  style="width:95%" title="Second Wind @{Second_Wind}"/> </td>
+						<td colspan="3"> <button type="action" name="act_SecondWind">Use Second Wind</button></td>
+				</tr>
 				<tr>	<td colspan="4"><div class="textHead"><span data-i18n="threshold">Threshold</span></div> </td>			</tr>
 				<tr>	<th><span data-i18n="total">Total</span></th>	<th></th>	<th><span data-i18n="defense">Defense</span></th> 	<th><span data-i18n="misc">Misc</span></th>		</tr>
 				<tr>	
@@ -3562,6 +3566,36 @@ on("change:armorprof change:armordefense change:imparmordefense change:armorref 
 });
 on("change:armorperception", function() {
 	ArmorPerception();
+});
+on("change:hp_max change:con", function() {
+   //sheetworker triggers on any changes to the "hp_max" or "con" attribute
+	getAttrs(["hp_max","CON"], function(values) {
+    //get the values for the two attributes, so they can used.
+		let hp_max = parseInt(values.hp_max)||0;
+		let con = parseInt(values.CON)||0;
+        //saves the current values of the two attributes on two temporary variables, which then can be used easily in calculations.
+		if(Math.floor((hp_max / 4)) > con) {SecondWindValue = Math.floor((hp_max / 4));} else {SecondWindValue=con}
+        // Selects which is higher con score of 1/4 of health
+		setAttrs({
+			"Second_Wind": SecondWindValue
+            // changes the "Second_Wind" sheet attribute to be the value of our temporary variable "SecondWindValue"
+		});
+	});
+});
+on("clicked:SecondWind", function() {
+  // Check if characters health is below half and if so apply second wind
+      getAttrs(["hp_max","hp", "Second_Wind"], function(values) {
+        // get the hp, hp_max, second wind stat, and coerce into a numerical values.
+        let hp_max = +values.hp_max || 0;
+        let hp = +values.hp || 0;
+        let Second_Wind = +values.Second_Wind || 0;
+        // If the character is equal or less than half health then add the value of second wind to current hit points
+        if (hp <= (hp_max*0.5)) {hp_value =  Second_Wind + hp ;} else {hp_value = hp}
+        // save the updated attribute to the sheet
+        setAttrs({
+           "hp": hp_value
+        });
+   });
 });
 // ====== Vehicle Sheet ====== \\
 
