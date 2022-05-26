@@ -122,8 +122,8 @@
 						<input type="hidden" name="attr_hidden_second_wind" value="1" />
 						<td><button type="action" name="act_SecondWind" >Take</button></td>
 						<td><input type="number" name="attr_Second_Wind" value="@{hidden_second_wind}" disabled="true" title="Second Wind @{Second_Wind}"/> </td>
-						<td><input type="number" name=attr_sw_current" value="1" title="Remaining second wind"></td>
-						<td><input type="number" name=attr_max_sw_current" value="1" title="Maximum second wind"></td>
+						<td><input type="number" name=attr_Second_Wind_Count" value="1" title="Remaining second wind"></td>
+						<td><input type="number" name=attr_Second_Wind_Max" value="1" title="Maximum second wind"></td>
 				</tr>
 				<tr>	<td colspan="4"><div class="textHead"><span data-i18n="threshold">Threshold</span></div> </td>			</tr>
 				<tr>	<th><span data-i18n="total">Total</span></th>	<th></th>	<th><span data-i18n="defense">Defense</span></th> 	<th><span data-i18n="misc">Misc</span></th>		</tr>
@@ -3602,31 +3602,39 @@ on("change:hp_max change:con", function() {
 	});
 });
 on("clicked:SecondWind", function() {
-  // Check if characters health is below half and if so apply second wind
-      getAttrs(["hp_max","hp", "Second_Wind", "sw_current"], function(values) {
+      getAttrs(["hp_max","hp", "Second_Wind", "Second_Wind_Count", "hidden_second_wind"], function(values) {
         // get the hp, hp_max, second wind stat, and coerce into a numerical values.
         let hp_max = +values.hp_max || 0;
         let hp = +values.hp || 0;
-        let sw_current = +values.sw_current || 0;
+        let Second_Wind_Count = +values.Second_Wind_Count || 0;
         let Second_Wind = +values.Second_Wind || 0;
+        let hidden_second_wind = +values.hidden_second_wind || 0;
         // If the character is equal or less than half health then add the value of second wind to current hit points
-        if (hp <= (hp_max*0.5) && sw_current > 0) {hp_value =  Second_Wind + hp ; sw_current_value = sw_current - 1;} else {return}
-        // save the updated attribute to the sheet
-        setAttrs({
-           "hp": hp_value,
-           "sw_current": sw_current_value
-        });
-        startRoll("&{template:second-wind} {{name=Second Wind}} {{roll1=[[1]]}}", (results) => {
-            const total = results.results.roll1.result
-            const computed = Second_Wind;
+        if(Second_Wind_Count > 0) {
+         	// only do anything if SW is over 0 - otherwise second wind isn't applied
+        	if (hp <= (hp_max*0.5)) {
+        		hp = Math.min(hp_max, Second_Wind + hp);
+        		Second_Wind_Count = Second_Wind_Count - 1;
+        		startRoll("&{template:second-wind} {{name=Second Wind}} {{roll1=[[1]]}}", (results) => {
+            	const total = results.results.roll1.result
+            	const computed = Second_Wind;
 
-            finishRoll(
-                results.rollId,
-                {
-                    roll1: computed
-                }
-            );
-        });
+				finishRoll(
+					results.rollId,
+					{
+						roll1: computed
+					}
+				);
+			});
+        	} else {
+        		hp = hp_max;
+        		}
+        	}
+
+			setAttrs({
+				"hp": hp,
+				"Second_Wind_Count": Second_Wind_Count
+        	});
    });
 });
 // ====== Vehicle Sheet ====== \\
