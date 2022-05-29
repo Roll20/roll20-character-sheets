@@ -4,13 +4,23 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
-## 02.13.00 (Build 17)
+## 02.13.01 (Build 18)
+
 ### CSS
+
+- fixed protection roll-button may be not available with minimal width
+
+## 02.13.00 (Build 17)
+
+### CSS
+
 - enhanced contrast of roll buttons
 
 ## 02.12.01 (Build 16)
+
 ### Bugfixes
-- Fixed stance damagebonus should be dependent on the stance damage active checkbox (error was introduced with the grievous selectbox) 
+
+- Fixed stance damagebonus should be dependent on the stance damage active checkbox (error was introduced with the grievous selectbox)
 
 ## 02.12.00 (Build 15)
 
