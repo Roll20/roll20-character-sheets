@@ -10,10 +10,10 @@ LOCATION_TABLE['Humanoid'][10] = {'general': 'Head', 'specific': 'Head'};
 
 LOCATION_TABLE['Animal'] = {};
 LOCATION_TABLE['Animal'][1] = {'general': 'Legs', 'specific': 'Right foreleg/wing'};
-LOCATION_TABLE['Animal'][2] = {'general': 'Legs', 'specific': 'Lef t foreleg/wing'};
+LOCATION_TABLE['Animal'][2] = {'general': 'Legs', 'specific': 'Left foreleg/wing'};
 LOCATION_TABLE['Animal'][3] = {'general': 'Legs', 'specific': 'Right hind leg'};
 LOCATION_TABLE['Animal'][4] = {'general': 'Legs', 'specific': 'Left hind leg'};
-LOCATION_TABLE['Animal'][5] = {'general': 'Tail', 'specific': 'Tail (for snakes or fish, 1-5 is tail hit)'};
+LOCATION_TABLE['Animal'][5] = {'general': 'Tail', 'specific': 'Tail', 'note': ' (for snakes or fish, 1-5 is tail hit)'};
 LOCATION_TABLE['Animal'][6] = LOCATION_TABLE['Animal'][7] = {'general': 'Abdomen', 'specific': 'Abdomen'};
 LOCATION_TABLE['Animal'][8] = LOCATION_TABLE['Animal'][9] = {'general': 'Torso', 'specific': 'Torso/chest'};
 LOCATION_TABLE['Animal'][10] = {'general': 'Head', 'specific': 'Head'};
@@ -23,7 +23,7 @@ LOCATION_TABLE['Monster'][1] = {'general': 'Legs', 'specific': 'Right foreleg/cl
 LOCATION_TABLE['Monster'][2] = {'general': 'Legs', 'specific': 'Left foreleg/claw/wing'};
 LOCATION_TABLE['Monster'][3] = {'general': 'Legs', 'specific': 'Right hind leg'};
 LOCATION_TABLE['Monster'][4] = {'general': 'Legs', 'specific': 'Left hind leg'};
-LOCATION_TABLE['Monster'][5] = {'general': 'Tail', 'specific': 'Tail (for snakelike or fishlike monsters, 1-5 is tail hit)'};
+LOCATION_TABLE['Monster'][5] = {'general': 'Tail', 'specific': 'Tail', 'note': ' (for snakelike or fishlike monsters, 1-5 is tail hit)'};
 LOCATION_TABLE['Monster'][6] = LOCATION_TABLE['Monster'][7] = {'general': 'Abdomen', 'specific': 'Abdomen'};
 LOCATION_TABLE['Monster'][8] = LOCATION_TABLE['Monster'][9] = {'general': 'Torso', 'specific': 'Torso/chest'};
 LOCATION_TABLE['Monster'][10] = { 'general': 'Head', 'specific': 'Head'};
@@ -1304,7 +1304,7 @@ SPELL_CRIT_EFFECT_TABLE['Wounding']['Torso'] = {
     8: 'Torso injured, victim stunned [[1d6]] rounds, 1/4 move, –4 to attack rolls, minor bleeding',
     9: 'Torso injured, no move or attack, major bleeding',
     10: 'Torso withered, no move or attack, major bleeding',
-    11: 'Torso withered, victim reduced to 0 hit points, dies in [[1d3]] turns unless reated by cure critical wounds or more powerful magic',
+    11: 'Torso withered, victim reduced to 0 hit points, dies in [[1d3]] turns unless treated by cure critical wounds or more powerful magic',
     12: 'Torso destroyed, victim killed instantly',
 };
 
@@ -1345,4 +1345,3 @@ SPELL_CRIT_EFFECT_TABLE['Wounding']['Tail'] = {
 };
 //#endregion
 //#endregion
-

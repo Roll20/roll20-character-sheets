@@ -1600,22 +1600,70 @@ on('clicked:grenade-miss', async function (eventInfo) {
     });
 });
 
-on('clicked:repeating_weapons-damage:crit2-melee', function(eventInfo) {
+const INJURY_REGEX = /Graze|Singed|Chilled|Struck|Injured|Burn|Frostbit|Broken|Crushed|Shattered|Frozen|Destroyed|Severed|Dissolved|Incinerated|(Minor|Major|Severe)(?: internal)? Bleeding/gmi
+
+on('clicked:repeating_weapons-damage:crit2', function(eventInfo) {
     console.log(eventInfo);
+    let prefix = 'repeating_weapons-damage_';
     let fields = [
-        'strengthdmg', 'dexmissile', 'temp-damadj', 'misc-mod',
-        'repeating_weapons-damage_strbonus1','repeating_weapons-damage_dexbonus1','repeating_weapons-damage_weaponname1',
-        'repeating_weapons-damage_specialist-damage','repeating_weapons-damage_mastery-damage','repeating_weapons-damage_damadj',
-        'repeating_weapons-damage_damsm','repeating_weapons-damage_daml','repeating_weapons-damage_size','repeating_weapons-damage_type'];
+        'strbonus1','dexbonus1','weaponname1',
+        'specialist-damage','mastery-damage','damadj',
+        'damsm','daml','size','type'
+    ].map(s => prefix+s);
+
+    let nameFunc = (values) => values[prefix+'weaponname1'];
+    let baseDamageFunc = (targetSize, values) => sizeToInt(targetSize) < 3
+        ? values[prefix+'damsm']
+        : values[prefix+'daml'];
+    let damageAdjFunc = (values) => [
+        `(${values[prefix+'damadj']})`,
+        `({${values[prefix+'specialist-damage']},${values[prefix+'mastery-damage']}}kh1)`,
+        `((@{strengthdmg})*${values[prefix+'strbonus1']})`,
+        `((@{dexmissile})*${values[prefix+'dexbonus1']})`,
+        '(@{temp-damadj})',
+        '(@{misc-mod})'
+    ].join('+');
+
+    poCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc)
+});
+
+on('clicked:repeating_ammo:crit2', function (eventInfo) {
+    console.log(eventInfo);
+    let prefix = 'repeating_ammo_';
+    let fields = [
+        `strbonus3`,`dexbonus3`,`ammoname`,
+        'specialist-damage2','mastery-damage2','damadj2',
+        'damsm2','daml2','size','type'
+    ].map(s => prefix+s);
+
+    let nameFunc = (values) => values[prefix+'ammoname'];
+    let baseDamageFunc = (targetSize, values) => sizeToInt(targetSize) < 3
+        ? values[prefix+'damsm2']
+        : values[prefix+'daml2'];
+    let damageAdjFunc = (values) => [
+        `(${values[prefix+'damadj2']})`,
+        `((@{strengthdmg})*${values[prefix+'strbonus3']})`,
+        `((@{dexmissile})*${values[prefix+'dexbonus3']})`,
+        `({${values[prefix+'specialist-damage2']},${values[prefix+'mastery-damage2']}}kh1)`,
+        '(@{temp-damadj})',
+        '(@{misc-mod})'
+    ].join('+');
+
+    poCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc)
+});
+
+function poCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc) {
     getAttrs(fields, async function (values) {
-        let finalRollText = `&{template:2Edefault} {{name=Test Critical hit}} {{Weapon name=${values['repeating_weapons-damage_weaponname1']}}} `;
+        let rollBuilder = ['character=@{character_name}'];
 
-        let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
-        let attackType = await extractQueryResult('?{How are you attacking?|Regular Attack|Low Attack|High Attack|Called Shot}');
-        let targetSize = await extractQueryResult('?{Target size?|Tiny|Small|Medium|Large|Huge|Gargantuan}');
-
-        let weaponSize = displaySize(values['repeating_weapons-damage_size']);
-        let weaponType = values['repeating_weapons-damage_type'];
+        let weaponName = nameFunc(values);
+        let weaponSize = displaySize(values[prefix+'size']);
+        if (weaponName.match(/heavy (crossbow|quarrel|bolt)/i)) {
+            weaponSize = 'Large';
+        } else if (weaponName.match(/arrow|quarrel|bolt|bow|crossbow/i)) {
+            weaponSize = 'Medium';
+        }
+        let weaponType = values[prefix+'type'];
         if (weaponType.includes('/')) {
             let displayTypes = weaponType.split('/')
                 .map(s => displayWeaponType(s))
@@ -1625,70 +1673,153 @@ on('clicked:repeating_weapons-damage:crit2-melee', function(eventInfo) {
         } else {
             weaponType = displayWeaponType(weaponType);
         }
+        rollBuilder.push(`weapon=${weaponName}`);
+        rollBuilder.push(`weaponsize=${weaponSize}`);
+        rollBuilder.push(`weapontype=${weaponType}`);
 
-        finalRollText += `{{Weapon type=${attackType}}} `;
-        finalRollText += `{{Weapon size=${weaponSize}}} `;
-        finalRollText += `{{Target type=${targetType}}} `;
-        finalRollText += `{{Target size=${targetSize}}} `;
+        let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
+        let targetSize = await extractQueryResult('?{Target size?|Tiny|Small|Medium|Large|Huge|Gargantuan}');
+        rollBuilder.push(`target=${targetType}`);
+        rollBuilder.push(`targetsize=${targetSize}`);
+
+        let attackType = await extractQueryResult('?{How are you attacking?|Regular Attack|Low Attack|High Attack|Called Shot}');
 
         let locationDice;
-        switch (attackType) {
-            case 'Regular Attack': locationDice = '1d10'; break;
-            case 'Low Attack': locationDice = '1d6'; break;
-            case 'High Attack': locationDice = '1d6+4'; break;
+        let locationRoll;
+        if (attackType === 'Called Shot') {
+            let set = new Set();
+            let locationList = [];
+            for (const [key, value] of Object.entries(LOCATION_TABLE[targetType])) {
+                let specificLocation = value.specific;
+                if (!set.has(specificLocation)) {
+                    set.add(specificLocation)
+                    locationList.push(`${specificLocation},${key}`)
+                }
+            }
+            locationRoll = await extractQueryResult(`?{Where are you hitting?|${locationList.join('|')}}`);
+        } else {
+            switch (attackType) {
+                case 'Regular Attack': locationDice = '1d10'; break;
+                case 'Low Attack': locationDice = '1d6'; break;
+                case 'High Attack': locationDice = '1d6+4'; break;
+            }
+            locationRoll = await extractRollResult(locationDice);
+            rollBuilder.push(`locationroll=[[${locationRoll}]]`);
+            rollBuilder.push(`locationdice=${locationDice}`)
         }
-        let locationRoll = await extractRollResult(locationDice);
+        rollBuilder.push(`attack=${attackType}`);
+
         let locationObject = LOCATION_TABLE[targetType][locationRoll];
         if (locationRoll < 5 && targetType !== 'Humanoid') {
             let isSnakeLike = await extractQueryResult('?{Is the target snakelike or fishlike?|No|Yes}');
-            if (isSnakeLike === "Yes")
+            if (isSnakeLike === "Yes") {
                 locationObject = LOCATION_TABLE[targetType][5];
+                rollBuilder.push(`locationnote=${locationObject.note}`);
+            }
         }
+        if (locationObject)
+            rollBuilder.push(`location=${locationObject.specific}`);
 
-        let severityEffect;
-        let severityRoll;
+        let severityDice;
         const sizeDiff = sizeToInt(weaponSize) - sizeToInt(targetSize);
         if (sizeDiff < 0) {
-            severityEffect = 'Minor';
-            severityRoll = await extractRollResult('1d6');
+            rollBuilder.push(`severity=Minor`);
+            severityDice = '1d6';
         } else if (sizeDiff === 0) {
-            severityEffect = 'Major';
-            severityRoll = await extractRollResult('2d4');
+            rollBuilder.push(`severity=Major`);
+            severityDice = '2d4';
         } else if (sizeDiff === 1) {
-            severityEffect = 'Severe';
-            severityRoll = await extractRollResult('2d6');
+            rollBuilder.push(`severity=Severe`);
+            severityDice = '2d6';
         } else if (sizeDiff > 1) {
-            severityEffect = 'Mortal';
-            severityRoll = await extractRollResult('2d8');
+            rollBuilder.push(`severity=Mortal`);
+            severityDice = '2d8';
         }
+        let severityRoll = await extractRollResult(severityDice);
 
-        finalRollText += `{{Severity effect=${severityEffect}}} `;
-        finalRollText += `{{Severity roll=${severityRoll}}} `;
-
-        let weaponDamage = sizeToInt(targetSize) < 3 ? values['repeating_weapons-damage_damsm'] : values['repeating_weapons-damage_daml'];
-        if (weaponDamage.match(/\d/)) {
-            if (severityRoll > 12) {
-                finalRollText += `{{Critical damage=[[(${weaponDamage})*3]]}} `;
-                severityRoll = 12;
+        let critEffect = '';
+        let weaponTypeTable = WEAPON_CRIT_EFFECT_TABLE[weaponType];
+        if (weaponTypeTable) {
+            rollBuilder.push(`severitydice=${severityDice}`);
+            rollBuilder.push(`severityroll=[[${severityRoll}]]`);
+            if (severityRoll < 4) {
+                critEffect = 'No unusual effect'
+            } else if (locationObject) {
+                let severityLookup = severityRoll > 12 ? 12 : severityRoll;
+                critEffect = weaponTypeTable[targetType][locationObject.general][severityLookup];
             } else {
-                finalRollText += `{{Critical damage=[[(${weaponDamage})*2]]}} `;
+                critEffect = 'No unusual effect';
+            }
+
+            rollBuilder.push(`effect=${critEffect}`);
+            let injuryMatch = critEffect.match(INJURY_REGEX);
+            if (injuryMatch) {
+                injuryMatch = injuryMatch.map(s => s.toLowerCase().replace('internal ', ''))
+                    .filter((v, i, a) => a.indexOf(v) === i);
+                injuryMatch.forEach(key => {
+                    switch (key) {
+                        case 'graze':
+                        case 'singed':
+                        case 'chilled':
+                            rollBuilder.push('grazed=1');
+                            break;
+                        case 'struck':
+                            rollBuilder.push('struck=1');
+                            break;
+                        case 'injured':
+                        case 'burn':
+                        case 'frostbit':
+                            rollBuilder.push('injured=1');
+                            break;
+                        case 'broken':
+                            rollBuilder.push('broken=1');
+                            break;
+                        case 'crushed':
+                        case 'shattered':
+                        case 'destroyed':
+                        case 'frozen':
+                            rollBuilder.push('crushed=1');
+                            break;
+                        case 'severed':
+                        case 'dissolved':
+                        case 'incinerated':
+                            rollBuilder.push('severed=1');
+                            break;
+                        case 'minor bleeding':
+                            rollBuilder.push('minorbleeding=1');
+                            rollBuilder.push('bleedingnote=1');
+                            break;
+                        case 'major bleeding':
+                            rollBuilder.push('majorbleeding=1');
+                            rollBuilder.push('bleedingnote=1');
+                            break;
+                        case 'severe bleeding':
+                            rollBuilder.push('severebleeding=1');
+                            rollBuilder.push('bleedingnote=1');
+                            break;
+                    }
+                })
             }
         }
 
-        finalRollText += `{{Location roll=[[${locationRoll}]]}} `;
-        if (locationObject)
-            finalRollText += `{{Location hit=${locationObject['specific']}}} `;
-
-        let critEffect;
-        if (severityRoll < 4) {
-            critEffect = 'No unusual effect'
-        } else if (WEAPON_CRIT_EFFECT_TABLE[weaponType]) {
-            critEffect = WEAPON_CRIT_EFFECT_TABLE[weaponType][targetType][locationObject['general']][severityRoll];
-        } else {
-            critEffect = 'No unusual effect';
+        let weaponDamage = baseDamageFunc(targetSize, values);
+        if (weaponDamage.match(/\d/)) {
+            let damage;
+            if (severityRoll > 12) {
+                rollBuilder.push(`multiplier=(Triple)`);
+                damage = `(${weaponDamage})*3`;
+            } else if (critEffect.includes('triple') && await extractQueryResult('?{Is the target wearing armor?|Yes|No}') === 'No') {
+                rollBuilder.push(`multiplier=(Triple)`);
+                damage = `(${weaponDamage})*3`;
+            } else {
+                rollBuilder.push(`multiplier=(Double)`);
+                damage = `(${weaponDamage})*2`;
+            }
+            rollBuilder.push(`damage=[[${damage}+[[${damageAdjFunc(values)}]] ]]`);
         }
 
-        finalRollText += `{{Critical effect=${critEffect}}}`;
+        let finalRollText = '&{template:2Epocrit} ' + rollBuilder.map(s => `{{${s}}}`).join(' ');
+
         console.log(finalRollText);
 
         startRoll(finalRollText, function (roll) {
@@ -1697,7 +1828,7 @@ on('clicked:repeating_weapons-damage:crit2-melee', function(eventInfo) {
             finishRoll(roll.rollId, computedRolls);
         });
     });
-});
+}
 //#endregion
 
 //#region Proficiencies
