@@ -1,0 +1,2314 @@
+<!-- Deprecated Attributes -->
+<input type="hidden" name="attr_thresholdModifierEnabled" value="enabled" />
+
+<!-- Hidden Inputs -->
+<input type="hidden" name="attr_BonusSTR" value="0" />
+<input type="hidden" name="attr_BonusDEX" value="0" />
+<input type="hidden" name="attr_ArmorWeightTotal" value="0" />
+<input type="hidden" name="attr_ItemWeightTotal" value="0" />
+<input type="hidden" name="attr_WeaponWeightTotal" value="0" />
+<input type="hidden" name="attr_sheetTab" value="character" />
+
+<!-- Sheet Selector -->
+<div class="sheet-button-select">
+  <button type="action" name="act_character" data-i18n="character">
+    Character
+  </button>
+  <button type="action" name="act_spells" data-i18n="spells">Spells</button>
+  <button type="action" name="act_retainers" data-i18n="retainers">Retainers</button>
+  <button type="action" name="act_monster" data-i18n="monster">Monster</button>
+  <button type="action" name="act_notes" data-i18n="notes">Notes</button>
+  <button type="action" name="act_settings" data-i18n="settings">
+    Settings
+  </button>
+</div>
+
+<!-- Character Sheet -->
+<div class="sheet-character">
+  <div class="info-grid">
+    <div class="logo">
+      <img
+        src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Old%20School%20Essentials%20-%20AAC/images/logo.png" />
+    </div>
+    <div class="infos">
+      <div class="flex">
+        <label class="inline-flex">
+          <span data-i18n="name-pc-abbr">PC</span>
+          <input type="text" name="attr_character_name" data-i18n-placeholder="character-name"
+            placeholder="Character name" />
+        </label>
+        <label class="inline-flex">
+          <span data-i18n="alignment-abbr">AL</span>
+          <input type="text" name="attr_alignment" data-i18n-placeholder="alignment" placeholder="Alignment" />
+        </label>
+      </div>
+      <div class="flex">
+        <label class="inline-flex">
+          <span data-i18n="class">Class</span>
+          <select name="attr_class">
+            <optgroup label="Classic Fantasy" data-i18n-label="classic-fantasy">
+              <option>Cleric</option>
+              <option>Dwarf</option>
+              <option>Elf</option>
+              <option>Fighter</option>
+              <option>Halfling</option>
+              <option>Magic-User</option>
+              <option>Thief</option>
+            </optgroup>
+            <optgroup label="Advanced Fantasy" data-i18n-label="advanced-fantasy">
+              <option>Acrobat</option>
+              <option>Assassin</option>
+              <option>Barbarian</option>
+              <option>Bard</option>
+              <option>Drow</option>
+              <option>Druid</option>
+              <option>Duergar</option>
+              <option>Gnome</option>
+              <option>Half-Elf</option>
+              <option>Half-Orc</option>
+              <option>Illusionist</option>
+              <option>Knight</option>
+              <option>Paladin</option>
+              <option>Ranger</option>
+              <option>Svirfneblin</option>
+            </optgroup>
+            <optgroup label="Dolmenwood" data-i18n-label="dolmenwood">
+              <option>The Elf</option>
+              <option>Grimalkin</option>
+              <option>Moss Dwarf</option>
+              <option>Woodgrue</option>
+            </optgroup>
+            <option>Monster</option>
+            <option>Normal Human</option>
+            <option>Custom</option>
+          </select>
+        </label>
+        <label class="inline-flex">
+          <span data-i18n="level">Level</span>
+          <input type="number" min="0" name="attr_level" value="1" />
+        </label>
+        <label class="inline-flex">
+          <span data-i18n="title">Title</span>
+          <input type="text" name="attr_title" data-i18n-placeholder="title" placeholder="Title" />
+        </label>
+      </div>
+      <div class="flex roll">
+        <label class="inline-flex">
+          <span data-i18n="experience-abbr">XP</span>
+          <input type="number" min="0" name="attr_XP" value="0" />
+        </label>
+        <label class="inline-flex">
+          <span data-i18n="next">Next</span>
+          <input type="number" min="0" name="attr_Next" data-i18n-title="experience-next"
+            title="Experience to Next Level" value="0" />
+        </label>
+        <label class="inline-flex">
+          <span>+%</span>
+          <input type="number" name="attr_ExpPercentage" value="0" />
+        </label>
+        <label class="inline-flex">
+          <button type="roll" name="hitpointsRoll" data-i18n="hit-dice-abbr" title="Hit Dice" data-i18n-title="hit-dice"
+            value="&{template:simple} {{roll=HP for @{character_name}}} {{result=[[@{hitdice}+[[@{HPConMod}*{@{level}, 9}kl1]]]]}}">
+            HD
+          </button>
+          <input type="text" name="attr_hitdice" value="0" class="input-as-number double" />
+          <span data-i18n="constitution-abbr-mod">± CON</span>
+          <input readonly type="number" name="attr_HPConMod" value="0" />
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h1 data-i18n="ability-scores">Ability Scores</h1>
+    <div class="scores roll flex">
+      <label class="inline-flex inline-flex-wide-label split-value">
+        <button type="roll" name="attr_rollSTR"
+          value="&{template:less} {{roll=@{character_name} rolls ^{strength}}} {{result=[[ [[1d20]]<@{str}+@{optionalModQuery} ]]}} {{check=[[@{str}+@{optionalModQuery}]]}}"
+          data-i18n="strength-abbr">
+          STR
+        </button>
+        <input type="number" name="attr_str" value="10" />
+        <label class="divider" for="ability-strength-modifier">/</label>
+        <input type="number" readonly id="ability-strength-modifier" name="attr_BonusSTR" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label split-value">
+        <button type="roll" name="attr_rollINT"
+          value="&{template:less} {{roll=@{character_name} rolls ^{intelligence}}} {{result=[[ [[1d20]]<@{int}+@{optionalModQuery} ]]}} {{check=[[@{int}+@{optionalModQuery}]]}}"
+          data-i18n="intelligence-abbr">
+          INT
+        </button>
+        <input type="number" name="attr_int" value="10" />
+        <label class="divider" for="ability-intelligence-modifier">/</label>
+        <input type="number" readonly id="ability-intelligence-modifier" name="attr_intMod" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label split-value">
+        <button type="roll" name="attr_rollWIS"
+          value="&{template:less} {{roll=@{character_name} rolls ^{wisdom}}} {{result=[[ [[1d20]]<@{wis}+@{optionalModQuery} ]]}} {{check=[[@{wis}+@{optionalModQuery}]]}}"
+          data-i18n="wisdom-abbr">
+          WIS
+        </button>
+        <input type="number" name="attr_wis" value="10" />
+        <label class="divider" for="ability-wisdom-modifier">/</label>
+        <input type="number" readonly id="ability-wisdom-modifier" name="attr_wisMod" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label split-value">
+        <button type="roll" name="attr_rollDEX"
+          value="&{template:less} {{roll=@{character_name} rolls ^{dexterity}}} {{result=[[ [[1d20]]<@{dex}+@{optionalModQuery} ]]}} {{check=[[@{dex}+@{optionalModQuery}]]}}"
+          data-i18n="dexterity-abbr">
+          DEX
+        </button>
+        <input type="number" name="attr_dex" value="10" />
+        <label class="divider" for="ability-dexterity-modifier">/</label>
+        <input type="number" readonly id="ability-dexterity-modifier" name="attr_BonusDEX" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label split-value">
+        <button type="roll" name="attr_rollCON"
+          value="&{template:less} {{roll=@{character_name} rolls ^{constitution}}} {{result=[[ [[1d20]]<@{con}+@{optionalModQuery} ]]}} {{check=[[@{con}+@{optionalModQuery}]]}}"
+          data-i18n="constitution-abbr">
+          CON
+        </button>
+        <input type="number" name="attr_con" value="10" />
+        <label class="divider" for="ability-constitution-modifier">/</label>
+        <input type="number" readonly id="ability-constitution-modifier" name="attr_HPConMod" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label split-value">
+        <button type="roll" name="attr_rollCHA"
+          value="&{template:less} {{roll=@{character_name} rolls ^{charisma}}} {{result=[[ [[1d20]]<@{cha}+@{optionalModQuery} ]]}} {{check=[[@{cha}+@{optionalModQuery}]]}}"
+          data-i18n="charisma-abbr">
+          CHA
+        </button>
+        <input type="number" name="attr_cha" value="10" />
+        <label class="divider" for="ability-charisma-modifier">/</label>
+        <input type="number" readonly id="ability-charisma-modifier" name="attr_chaMod" value="0" />
+      </label>
+    </div>
+  </div>
+
+  <div>
+    <h1 data-i18n="exploration">Exploration</h1>
+    <div class="exploration roll flex">
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollListenDoor"
+          value="&{template:less} {{roll=@{character_name} checks ^{listen-at-door-full}}} {{result=[[ [[1d6]]<@{ListenDoor}+@{optionalModQuery} ]]}} {{check=[[@{ListenDoor}+@{optionalModQuery}]]}}"
+          data-i18n="listen-at-door">
+          Listen at door
+        </button>
+        <input type="number" min="1" max="6" name="attr_ListenDoor" value="1" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollOpenDoor"
+          value="&{template:less} {{roll=@{character_name} checks ^{open-stuck-door-full}}} {{result=[[ [[1d6]]<@{OpenDoor}+@{optionalModQuery} ]]}} {{check=[[@{OpenDoor}+@{optionalModQuery}]]}}"
+          data-i18n="open-stuck-door">
+          Open stuck door
+        </button>
+        <input type="number" min="1" max="6" name="attr_OpenDoor" value="1" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollFindSecretDoor"
+          value="&{template:less} {{roll=@{character_name} checks ^{find-secret-door-full}}} {{result=[[ [[1d6]]<@{FindSecretDoor}+@{optionalModQuery} ]]}} {{check=[[@{FindSecretDoor}+@{optionalModQuery}]]}}"
+          data-i18n="find-secret-door">
+          Find secret door
+        </button>
+        <input type="number" min="1" max="6" name="attr_FindSecretDoor" value="1" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollFindRoomTrap"
+          value="&{template:less} {{roll=@{character_name} checks ^{find-room-trap-full}}} {{result=[[ [[1d6]]<@{FindRoomTrap}+@{optionalModQuery} ]]}} {{check=[[@{FindRoomTrap}+@{optionalModQuery}]]}}"
+          data-i18n="find-room-trap">
+          Find room trap
+        </button>
+        <input type="number" min="1" max="6" name="attr_FindRoomTrap" value="1" />
+      </label>
+    </div>
+  </div>
+
+  <div class="sheet-saves">
+    <h1 data-i18n="saving-throws">Saving Throws</h1>
+    <div class="saving roll flex">
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollSaveD"
+          value="&{template:greater} {{roll=@{character_name} rolls save against ^{death-poison-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveD} ]]}} {{check=[[@{saveD}]]}}"
+          data-i18n="death-poison">
+          Death, Poison
+        </button>
+        <input type="number" name="attr_saveD" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollSaveW"
+          value="&{template:greater} {{roll=@{character_name} rolls save against ^{magic-wands-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveW} ]]}} {{check=[[@{saveW}]]}}"
+          data-i18n="magic-wands">
+          Magic wands
+        </button>
+        <input type="number" name="attr_saveW" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollSaveP"
+          value="&{template:greater} {{roll=@{character_name} rolls save against ^{paralysis-petrification-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveP} ]]}} {{check=[[@{saveP}]]}}"
+          data-i18n="paralysis-petrification">
+          Paralysis, Petrification
+        </button>
+        <input type="number" name="attr_saveP" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollSaveB"
+          value="&{template:greater} {{roll=@{character_name} rolls save against ^{breath-attacks-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveB} ]]}} {{check=[[@{saveB}]]}}"
+          data-i18n="breath-attacks">
+          Breath attacks
+        </button>
+        <input type="number" name="attr_saveB" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollSaveS"
+          value="&{template:greater} {{roll=@{character_name} rolls save against ^{spells-rods-staves-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveS} ]]}} {{check=[[@{saveS}]]}}"
+          data-i18n="spells-rods-staves">
+          Spells, Rods, Staves
+        </button>
+        <input type="number" name="attr_saveS" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label shrink">
+        <span data-i18n="wisdom-mod-abbr">+WIS</span>
+        <input readonly type="number" name="attr_wisMod" value="0" />
+      </label>
+    </div>
+  </div>
+
+  <div class="sheet-abilities sheet-repeat">
+    <h1 data-i18n="abilities-and-skills">Abilities & Skills</h1>
+    <div class="abilities-grid">
+      <span></span>
+      <span data-i18n="name">Name</span>
+      <span data-i18n="roll">Roll</span>
+      <span data-i18n="abbr-versus">vs</span>
+      <span data-i18n="threshold">Threshold</span>
+      <span data-i18n="description">Description</span>
+    </div>
+    <fieldset class="repeating_abilities">
+      <div class="abilities-grid">
+        <button type="roll" name="abilityRoll"
+          value="&{template:skill} {{name=@{}}} {{symbol=[[@{abilityDirection}]]}} {{roll=@{character_name} rolls @{abilityName}}} {{result=[[@{abilityRoll}]]}} {{check=[[0+@{abilityThreshold}]]}} {{description=@{abilityDescription}}}"></button>
+        <input type="text" name="attr_abilityName" placeholder="Name" data-i18n="name" />
+        <input type="text" class="half-input" name="attr_abilityRoll" value="2d6" />
+        <select name="attr_abilityDirection" class="half-input">
+          <option value="0"></option>
+          <option value="1">&lt;</option>
+          <option value="2">&gt;</option>
+        </select>
+        <input type="number" name="attr_abilityThreshold" value="7" />
+        <input type="text" name="attr_abilityDescription" data-i18n-placeholder="description"
+          placeholder="Description" />
+      </div>
+    </fieldset>
+  </div>
+
+  <div>
+    <h1 data-i18n="combat">Combat</h1>
+    <div class="roll combat">
+      <div>
+        <div class="flex hp">
+          <label class="inline-flex">
+            <span data-i18n="hit-points-abbr">HP</span>
+            <input type="number" name="attr_HP" value="0" />
+          </label>
+          <label class="inline-flex">
+            <span data-i18n="max">Max</span>
+            <input type="number" name="attr_HP_max" value="0" />
+          </label>
+        </div>
+        <!-- Armor Class Fields are dependent on AAC vs DAC -->
+        <input type="hidden" name="attr_armorClassType" value="aac" />
+        <div class="flex armor armor-aac">
+          <label class="inline-flex">
+            <span data-i18n="armor-class-abbr" title="Armor Class" data-i18n-title="armor-class">AC</span>
+            <input readonly type="number" name="attr_aacAc" value="0" />
+          </label>
+          <label class="inline-flex">
+            <span data-i18n="unarmored" class="double">Unarmored</span>
+            <input readonly type="number" name="attr_aacAcUnarmored" />
+          </label>
+          <label class="inline-flex">
+            <span data-i18n="dexterity-abbr-mod">± DEX</span>
+            <input readonly type="number" name="attr_ACDexMod" value="0" />
+          </label>
+          <label class="inline-flex">
+            <span data-i18n="base-attack-bonus-abbr" title="Base Attack Bonus"
+              data-i18n-title="base-attack-bonus">BAB</span>
+            <input type="number" name="attr_bab" value="0" />
+          </label>
+        </div>
+        <div class="flex armor armor-dac">
+          <label class="inline-flex">
+            <span data-i18n="armor-class-abbr" title="Armor Class" data-i18n-title="armor-class">AC</span>
+            <input readonly type="number" name="attr_dacAc" value="0" />
+          </label>
+          <label class="inline-flex">
+            <span data-i18n="unarmored" class="double">Unarmored</span>
+            <input readonly type="number" name="attr_dacAcUnarmored" />
+          </label>
+          <label class="inline-flex">
+            <span data-i18n="dexterity-abbr-mod">± DEX</span>
+            <input readonly type="number" name="attr_ACDexMod" value="0" />
+          </label>
+          <label class="inline-flex">
+            <span data-i18n="thac0" class="double">THAC0</span>
+            <input type="number" name="attr_thac0" value="0" />
+          </label>
+        </div>
+      </div>
+      <div class="sheet-col movement">
+        <table>
+          <caption data-i18n="movement">
+            Movement
+          </caption>
+          <thead>
+            <tr>
+              <th data-i18n="movement-en">Encounter</th>
+              <th data-i18n="movement-ex">Exploration</th>
+              <th data-i18n="movement-ov">Overland</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input readonly type="number" name="attr_movementEncounter" data-i18n-title="movement-encounter"
+                  title="Movement - Encounter" value="" />
+              </td>
+              <td>
+                <input type="number" min="0" name="attr_movementExploration" data-i18n-title="movement-exploration"
+                  title="Movement - Exploration" value="120" />
+              </td>
+              <td>
+                <input readonly type="number" name="attr_movementOverland" data-i18n-title="movement-overland"
+                  title="Movement - Overland" value="" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sheet-col initiative">
+        <label class="inline-flex">
+          <input type="hidden" name="attr_individualInitiative" value="disabled" />
+          <button type="roll" name="attr_rollInit"
+            value="&{template:simple} {{roll=Player's Initiative}} {{result=[[1d6 &{tracker}]]}}"
+            data-i18n="initiative-init">
+            Init.
+          </button>
+          <button type="roll" name="attr_rollInitIndividual"
+            value="&{template:simple} {{roll=Initiative for @{character_name}}} {{result=[[1d6+@{InitDexMod}+@{initiative} &{tracker}]]}}"
+            data-i18n="initiative-init">
+            Init.
+          </button>
+          <input type="number" name="attr_initiative" value="0" />
+        </label>
+        <label class="inline-flex">
+          <span data-i18n="dexterity-abbr-mod">± DEX</span>
+          <input readonly type="number" name="attr_InitDexMod" value="0" />
+        </label>
+      </div>
+    </div>
+    <input type="hidden" name="attr_armorClassType" value="aac" />
+    <div class="matrix">
+      <h2>Attack Value Matrix</h2>
+      <div class="flex grid-spacing">
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 9" data-i18n-title="attack-value-matrix-9">9</span>
+          <input readonly type="number" name="attr_attackMatrix9" value="10" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 8" data-i18n-title="attack-value-matrix-8">8</span>
+          <input readonly type="number" name="attr_attackMatrix8" value="11" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 7" data-i18n-title="attack-value-matrix-7">7</span>
+          <input readonly type="number" name="attr_attackMatrix7" value="12" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 6" data-i18n-title="attack-value-matrix-6">6</span>
+          <input readonly type="number" name="attr_attackMatrix6" value="13" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 5" data-i18n-title="attack-value-matrix-5">5</span>
+          <input readonly type="number" name="attr_attackMatrix5" value="14" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 4" data-i18n-title="attack-value-matrix-4">4</span>
+          <input readonly type="number" name="attr_attackMatrix4" value="15" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 3" data-i18n-title="attack-value-matrix-3">3</span>
+          <input readonly type="number" name="attr_attackMatrix3" value="16" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 2" data-i18n-title="attack-value-matrix-2">2</span>
+          <input readonly type="number" name="attr_attackMatrix2" value="17" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 1" data-i18n-title="attack-value-matrix-1">1</span>
+          <input readonly type="number" name="attr_attackMatrix1" value="18" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 0" data-i18n-title="attack-value-matrix-0">0</span>
+          <input readonly type="number" name="attr_attackMatrix0" value="19" />
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-weapons sheet-repeat">
+    <h1 data-i18n="weapons">Weapons</h1>
+    <div class="weapons-grid">
+      <span></span>
+      <span data-i18n="name">Name</span>
+      <span data-i18n="typeofattack">Type of Attack</span>
+      <span data-i18n="attack-modifier">+Attack</span>
+      <span data-i18n="damage-die">Damage Die</span>
+      <span data-i18n="damage-modifier">+Damage</span>
+      <span data-i18n="weight">Weight</span>
+    </div>
+    <input type="hidden" name="attr_armorClassType" value="aac" />
+    <fieldset class="repeating_weapons">
+      <input type="hidden" name="attr_weaponAttributeBonus" value="@{BonusSTR}" />
+      <input type="hidden" name="attr_weaponAttributeBonusDamage" value="@{BonusSTR}" />
+      <input class="expand" type="checkbox" name="attr_expandWeapon" data-i18n-title="expand-collapse"
+        title="Expand/Collapse" /><span></span>
+      <div class="weapons-grid">
+        <div>
+          <!-- AAC Attack -->
+          <button type="roll" name="aacAttackRoll" class="attack-roll attack-roll-aac"
+            value="&{template:simple} {{roll=@{character_name} attacks with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{bab}+@{optionalModQuery}]]}} {{damage=[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]]}} {{description=@{weaponDescription}}}"></button>
+          <!-- DAC Attack (no BAB added) -->
+          <button type="roll" name="dacAttackRoll" class="attack-roll attack-roll-dac"
+            value="&{template:simple} {{roll=@{character_name} attacks with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{optionalModQuery}]]}} {{damage=[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]]}} {{description=@{weaponDescription}}} {{attackMatrix9=@{attackMatrix9}}} {{attackMatrix8=@{attackMatrix8}}} {{attackMatrix7=@{attackMatrix7}}} {{attackMatrix6=@{attackMatrix6}}} {{attackMatrix5=@{attackMatrix5}}} {{attackMatrix4=@{attackMatrix4}}} {{attackMatrix3=@{attackMatrix3}}} {{attackMatrix2=@{attackMatrix2}}} {{attackMatrix1=@{attackMatrix1}}} {{attackMatrix0=@{attackMatrix0}}}"></button>
+        </div>
+        <input type="text" name="attr_weaponName" placeholder="Weapon Name" />
+        <select name="attr_attackType">
+          <option value="melee">Melee</option>
+          <option value="ranged">Ranged</option>
+        </select>
+        <input type="number" name="attr_weaponAttackBonus" value="0" />
+        <input type="text" name="attr_weaponDamageDie" value="1d6" class="input-as-number" class="input-as-number" />
+        <input type="number" name="attr_weaponDamageBonus" value="0" />
+        <input type="number" min="0" name="attr_weaponWeight" value="0" />
+      </div>
+      <input type="text" name="attr_weaponDescription" class="weapon-description" value="" placeholder="Description"
+        data-i18n-placeholder="description" />
+    </fieldset>
+  </div>
+
+  <div class="sheet-spells sheet-repeat">
+    <h1>Spells</h1>
+    <div class="flex grid-spacing spells-per-level">
+      <label class="inline-flex">
+        <span>1</span>
+        <input type="number" min="0" name="attr_spellsLevel1Available" title="Spells Available"
+          data-i18n-title="spells-available" value="0" />
+        <label class="divider" for="spells-level-1-total">/</label>
+        <input type="number" min="0" id="spells-level-1-total" name="attr_spellsLevel1Total" title="Spells Total"
+          data-i18n-title="spells-total" value="0" />
+      </label>
+      <label class="inline-flex">
+        <span>2</span>
+        <input type="number" min="0" name="attr_spellsLevel2Available" title="Spells Available"
+          data-i18n-title="spells-available" value="0" />
+        <label class="divider" for="spells-level-2-total">/</label>
+        <input type="number" min="0" id="spells-level-2-total" name="attr_spellsLevel2Total" title="Spells Total"
+          data-i18n-title="spells-total" value="0" />
+      </label>
+      <label class="inline-flex">
+        <span>3</span>
+        <input type="number" min="0" name="attr_spellsLevel3Available" title="Spells Available"
+          data-i18n-title="spells-available" value="0" />
+        <label class="divider" for="spells-level-3-total">/</label>
+        <input type="number" min="0" id="spells-level-3-total" name="attr_spellsLevel3Total" title="Spells Total"
+          data-i18n-title="spells-total" value="0" />
+      </label>
+      <label class="inline-flex">
+        <span>4</span>
+        <input type="number" min="0" name="attr_spellsLevel4Available" title="Spells Available"
+          data-i18n-title="spells-available" value="0" />
+        <label class="divider" for="spells-level-4-total">/</label>
+        <input type="number" min="0" id="spells-level-4-total" name="attr_spellsLevel4Total" title="Spells Total"
+          data-i18n-title="spells-total" value="0" />
+      </label>
+      <label class="inline-flex">
+        <span>5</span>
+        <input type="number" min="0" name="attr_spellsLevel5Available" title="Spells Available"
+          data-i18n-title="spells-available" value="0" />
+        <label class="divider" for="spells-level-5-total">/</label>
+        <input type="number" min="0" id="spells-level-5-total" name="attr_spellsLevel5Total" title="Spells Total"
+          data-i18n-title="spells-total" value="0" />
+      </label>
+      <label class="inline-flex">
+        <span>6</span>
+        <input type="number" min="0" name="attr_spellsLevel6Available" title="Spells Available"
+          data-i18n-title="spells-available" value="0" />
+        <label class="divider" for="spells-level-6-total">/</label>
+        <input type="number" min="0" id="spells-level-6-total" name="attr_spellsLevel6Total" title="Spells Total"
+          data-i18n-title="spells-total" value="0" />
+      </label>
+    </div>
+    <div class="spells-grid">
+      <span></span>
+      <span data-i18n-title="memorized" title="Memorized" class="memorized"></span>
+      <span data-i18n="name">Name</span>
+      <span data-i18n="level-abbr">LVL</span>
+      <span data-i18n="duration">Duration</span>
+      <span data-i18n="range">Range</span>
+      <span data-i18n="description">Description</span>
+      <span data-i18n="effect-roll">Effect Roll</span>
+    </div>
+    <fieldset class="repeating_spells">
+      <div class="spells-grid">
+        <div>
+          <input type="hidden" name="attr_spellRollType" value="describe" />
+          <button type="roll" name="spellCast" class="roll"
+            value="&{template:simple} {{roll=@{character_name} casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+          <button type="roll" name="spellDescribe" class="roll-describe"
+            value="&{template:simple} {{roll=@{character_name} casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}}"></button>
+        </div>
+        <input type="number" min="0" name="attr_spellMemorized" checked data-i18n-title="memorized" title="Memorized"
+          value="0" />
+        <input type="text" name="attr_spellName" placeholder="Spell Name"
+          data-i18n-placeholder="spell-name-placeholder" />
+        <input type="number" min="1" name="attr_spellLevel" value="1" />
+        <input type="text" name="attr_spellDuration" />
+        <input type="text" name="attr_spellRange" />
+        <input type="text" name="attr_spellDescription" placeholder="Description" data-i18n-placeholder="description" />
+        <input type="text" class="half-input" name="attr_spellEffect" />
+      </div>
+    </fieldset>
+  </div>
+
+  <div>
+    <h1 data-i18n="items-equipment">Items & Equipment</h1>
+    <div class="equip">
+      <h2>Gear</h2>
+      <div class="items-grid">
+        <span data-i18n="quantity-abbr">Qty</span>
+        <span data-i18n="name">Name</span>
+        <span data-i18n="description">Description</span>
+        <span data-i18n="weight">Weight</span>
+      </div>
+      <div class="sheet-items sheet-repeat">
+        <fieldset class="repeating_items">
+          <div class="items-grid">
+            <input type="number" min="0" name="attr_ItemQuantity" value="1" />
+            <input type="text" name="attr_ItemName" data-i18n-placeholder="name" placeholder="Name" />
+            <input type="text" name="attr_ItemDescription" data-i18n-placeholder="description"
+              placeholder="Description" />
+            <input type="number" min="0" name="attr_ItemWeight" value="0" />
+          </div>
+        </fieldset>
+      </div>
+      <h2>Armor</h2>
+      <div class="armor-grid">
+        <span data-i18n="name">Name</span>
+        <span data-i18n="armor-class-abbr">AC</span>
+        <span data-i18n="armor-weight">Armor Weight</span>
+        <span data-i18n="worn-question">Worn?</span>
+      </div>
+      <div class="sheet-armor sheet-repeat">
+        <fieldset class="repeating_armor">
+          <input type="hidden" name="attr_armorBenefit" />
+          <div class="armor-grid">
+            <input type="text" name="attr_armorName" placeholder="Armor Name"
+              data-i18n-placeholder="armor-name-placeholder" />
+            <input type="text" name="attr_armorValue" value="0" />
+            <input type="number" min="0" name="attr_armorWeight" value="0" />
+            <div class="checkbox">
+              <input type="checkbox" name="attr_armorWorn" checked />
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    <h2>Coins</h2>
+    <div class="coins flex">
+      <label class="inline-flex">
+        <span data-i18n="platinum-piece-abbr">PP</span>
+        <input type="number" min="0" name="attr_PP" title="Platinum" data-i18n-title="platinum" value="0" />
+      </label>
+      <label class="inline-flex">
+        <span data-i18n="gold-piece-abbr">GP</span>
+        <input type="number" min="0" name="attr_GP" title="Gold" data-i18n-title="gold" value="0" />
+      </label>
+      <label class="inline-flex">
+        <span data-i18n="electrum-piece-abbr">EP</span>
+        <input type="number" min="0" name="attr_EP" title="Electrum" data-i18n-title="electrum" value="0" />
+      </label>
+      <label class="inline-flex">
+        <span data-i18n="silver-piece-abbr">SP</span>
+        <input type="number" min="0" name="attr_SP" title="Silver" data-i18n-title="silver" value="0" />
+      </label>
+      <label class="inline-flex">
+        <span data-i18n="copper-piece-abbr">CP</span>
+        <input type="number" min="0" name="attr_CP" title="Copper" data-i18n-title="copper" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label" style="width: 150%;">
+        <span data-i18n="encumbrance">Encumbrance</span>
+        <input readonly type="number" min="0" name="attr_encumbrance" value="0" />
+      </label>
+    </div>
+  </div>
+
+  <div class="sheet-notes-section">
+    <h1 data-i18n="notes">Notes</h1>
+    <textarea name="attr_characterNotes"></textarea>
+  </div>
+</div>
+
+<div class="sheet-spells sheet-repeat">
+  <h1>Spells</h1>
+  <div class="flex grid-spacing spells-per-level">
+    <label class="inline-flex">
+      <span>1</span>
+      <input type="number" min="0" name="attr_spellsLevel1Available" title="Spells Available"
+        data-i18n-title="spells-available" value="0" />
+      <label class="divider" for="spells-level-1-total">/</label>
+      <input type="number" min="0" id="spells-level-1-total" name="attr_spellsLevel1Total" title="Spells Total"
+        data-i18n-title="spells-total" value="0" />
+    </label>
+    <label class="inline-flex">
+      <span>2</span>
+      <input type="number" min="0" name="attr_spellsLevel2Available" title="Spells Available"
+        data-i18n-title="spells-available" value="0" />
+      <label class="divider" for="spells-level-2-total">/</label>
+      <input type="number" min="0" id="spells-level-2-total" name="attr_spellsLevel2Total" title="Spells Total"
+        data-i18n-title="spells-total" value="0" />
+    </label>
+    <label class="inline-flex">
+      <span>3</span>
+      <input type="number" min="0" name="attr_spellsLevel3Available" title="Spells Available"
+        data-i18n-title="spells-available" value="0" />
+      <label class="divider" for="spells-level-3-total">/</label>
+      <input type="number" min="0" id="spells-level-3-total" name="attr_spellsLevel3Total" title="Spells Total"
+        data-i18n-title="spells-total" value="0" />
+    </label>
+    <label class="inline-flex">
+      <span>4</span>
+      <input type="number" min="0" name="attr_spellsLevel4Available" title="Spells Available"
+        data-i18n-title="spells-available" value="0" />
+      <label class="divider" for="spells-level-4-total">/</label>
+      <input type="number" min="0" id="spells-level-4-total" name="attr_spellsLevel4Total" title="Spells Total"
+        data-i18n-title="spells-total" value="0" />
+    </label>
+    <label class="inline-flex">
+      <span>5</span>
+      <input type="number" min="0" name="attr_spellsLevel5Available" title="Spells Available"
+        data-i18n-title="spells-available" value="0" />
+      <label class="divider" for="spells-level-5-total">/</label>
+      <input type="number" min="0" id="spells-level-5-total" name="attr_spellsLevel5Total" title="Spells Total"
+        data-i18n-title="spells-total" value="0" />
+    </label>
+    <label class="inline-flex">
+      <span>6</span>
+      <input type="number" min="0" name="attr_spellsLevel6Available" title="Spells Available"
+        data-i18n-title="spells-available" value="0" />
+      <label class="divider" for="spells-level-6-total">/</label>
+      <input type="number" min="0" id="spells-level-6-total" name="attr_spellsLevel6Total" title="Spells Total"
+        data-i18n-title="spells-total" value="0" />
+    </label>
+  </div>
+  <div class="spells-grid">
+    <span></span>
+    <span data-i18n-title="memorized" title="Memorized" class="memorized"></span>
+    <span data-i18n="name">Name</span>
+    <span data-i18n="level-abbr">LVL</span>
+    <span data-i18n="duration">Duration</span>
+    <span data-i18n="range">Range</span>
+    <span data-i18n="description">Description</span>
+    <span data-i18n="effect-roll">Effect Roll</span>
+  </div>
+  <fieldset class="repeating_spells">
+    <div class="spells-grid">
+      <div>
+        <input type="hidden" name="attr_spellRollType" value="describe" />
+        <button type="roll" name="spellCast" class="roll"
+          value="&{template:simple} {{roll=@{character_name} casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+        <button type="roll" name="spellDescribe" class="roll-describe"
+          value="&{template:simple} {{roll=@{character_name} casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}}"></button>
+      </div>
+      <input type="number" min="0" name="attr_spellMemorized" checked data-i18n-title="memorized" title="Memorized"
+        value="0" />
+      <input type="text" name="attr_spellName" placeholder="Spell Name"
+        data-i18n-placeholder="spell-name-placeholder" />
+      <input type="number" min="1" name="attr_spellLevel" value="1" />
+      <input type="text" name="attr_spellDuration" />
+      <input type="text" name="attr_spellRange" />
+      <input type="text" name="attr_spellDescription" placeholder="Description" data-i18n-placeholder="description" />
+      <input type="text" class="half-input" name="attr_spellEffect" />
+    </div>
+  </fieldset>
+</div>
+
+<div class="sheet-retainers">
+  <div>
+    <h1 data-i18n="retainer-modifiers">Retainer Modifiers</h1>
+    <div class="flex roll">
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollNPCReaction"
+          value="&{template:simple} {{roll=@{character_name} rolls for NPC Reaction}} {{result=[[2d6+@{chaMod}]]}}"
+          data-i18n="npc-reaction">NPC
+          Reaction</button>
+        <input type="number" readOnly name="attr_chaMod" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <span data-i18n="max-retainers">Max Retainers</span>
+        <input type="number" readOnly name="attr_retainersMax" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <span data-i18n="loyalty">Loyalty</span>
+        <input type="number" readOnly name="attr_retainersLoyalty" value="0" />
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Monster Sheet -->
+<div class="sheet-monster">
+  <div class="flex roll">
+    <label class="inline-flex">
+      <span data-i18n="name">Name</span>
+      <input type="text" name="attr_character_name" />
+    </label>
+    <label class="inline-flex">
+      <span class="double" data-i18n="description">Description</span>
+      <input type="text" name="attr_monsterDescription" />
+    </label>
+  </div>
+  <div class="flex roll">
+    <label class="inline-flex">
+      <span class="double" data-i18n="saves-as">Saves As</span>
+      <select name="attr_class">
+        <option>Monster</option>
+        <option>Normal Human</option>
+        <option>Custom</option>
+        <optgroup label="Classic Fantasy" data-i18n-label="classic-fantasy">
+          <option>Cleric</option>
+          <option>Dwarf</option>
+          <option>Elf</option>
+          <option>Fighter</option>
+          <option>Halfling</option>
+          <option>Magic-User</option>
+          <option>Thief</option>
+        </optgroup>
+        <optgroup label="Advanced Fantasy" data-i18n-label="advanced-fantasy">
+          <option>Acrobat</option>
+          <option>Assassin</option>
+          <option>Barbarian</option>
+          <option>Bard</option>
+          <option>Drow</option>
+          <option>Druid</option>
+          <option>Duergar</option>
+          <option>Gnome</option>
+          <option>Half-Elf</option>
+          <option>Half-Orc</option>
+          <option>Illusionist</option>
+          <option>Knight</option>
+          <option>Paladin</option>
+          <option>Ranger</option>
+          <option>Svirfneblin</option>
+        </optgroup>
+        <optgroup label="Dolmenwood" data-i18n-label="dolmenwood">
+          <option>The Elf</option>
+          <option>Grimalkin</option>
+          <option>Moss Dwarf</option>
+          <option>Woodgrue</option>
+        </optgroup>
+      </select>
+      <input type="hidden" name="attr_savesAs" value="character" />
+      <input type="number" min="0" name="attr_level" value="1" />
+    </label>
+    <label class="inline-flex">
+      <button type="roll" name="monsterHpRoll" data-i18n="hit-dice-number-abbr" title="Hit Dice"
+        data-i18n-title="hit-dice-number"
+        value="/w gm &{template:simple} {{roll=HP for @{character_name}}} {{result=[[@{monsterHitDice}d8+@{monsterHitDiceModifier}]]}}">
+        # HD
+      </button>
+      <input type="number" min="0" name="attr_monsterHitDice" value="1" />
+      <span>+</span>
+      <input type="number" name="attr_monsterHitDiceModifier" value="0" />
+    </label>
+    <label class="inline-flex">
+      <span data-i18n="alignment-abbr">AL</span>
+      <input type="text" name="attr_alignment" data-i18n-placeholder="alignment" placeholder="Alignment" />
+    </label>
+  </div>
+  <div class="flex roll">
+    <label class="inline-flex">
+      <button type="roll" name="numberAppearingRoll"
+        value="/w gm &{template:simple} {{roll=Number of @{character_name} appearing}} {{Dungeon-Wandering=[[@{numberAppearingWandering}]]}} {{Dungeon-Lair=[[@{numberAppearingLair}]]}} {{Wilderness-Wandering=[[@{numberAppearingLair}]]}} {{Wilderness-Lair=[[@{numberAppearingLair}*5]]}}">
+        NA
+      </button>
+      <input type="text" class="input-as-number" name="attr_numberAppearingWandering" value="0" placeholder="1d4" />
+      <input type="text" class="input-as-number" name="attr_numberAppearingLair" value="0" placeholder="2d4+2" />
+    </label>
+    <label class="shrink">
+      <button type="roll" name="monsterReactionRoll"
+        value="/w gm &{template:simple} {{roll=Reaction of @{character_name}}} {{result=[[2d6+@{reactionQuery}]]}} {{reaction=0}}"
+        data-i18n="reaction" class="double">
+        Reaction
+      </button>
+    </label>
+    <label class="inline-flex">
+      <button type="roll" name="monsterMoraleRoll"
+        value="/w gm &{template:simple} {{roll=Morale of @{character_name}}} {{morale=[[{2d6+0, 0d0+13}<@{monsterMorale}]]}}"
+        title="Morale" data-i18n-title="morale" data-i18n="morale-abbr">
+        ML
+      </button>
+      <input type="number" min="2" max="12" name="attr_monsterMorale" value="7" />
+    </label>
+    <label class="inline-flex">
+      <span data-i18n="experience-abbr">XP</span>
+      <input type="number" min="0" name="attr_monsterXPValue" />
+    </label>
+    <label class="inline-flex">
+      <span data-i18n="treasure-type-abbr">TT</span>
+      <input type="text" class="input-as-number" name="attr_monsterTreasureTypeGroup" />
+      <input type="text" class="input-as-number" name="attr_monsterTreasureTypeIndividual" />
+    </label>
+  </div>
+
+  <div>
+    <h1 data-i18n="combat">Combat</h1>
+    <div class="roll monster-combat">
+      <div>
+        <div class="flex hp">
+          <label class="inline-flex">
+            <button type="action" name="act_setAverageHP" class="double" data-i18n="hit-points-average">
+              Average HP
+            </button>
+            <input readonly type="number" name="attr_averageHP" value="" />
+          </label>
+          <label class="inline-flex">
+            <span data-i18n="hit-points-abbr">HP</span>
+            <input type="number" name="attr_HP" value="0" />
+          </label>
+          <label class="inline-flex">
+            <span data-i18n="hit-points-max-abbr">Max</span>
+            <input type="number" min="0" name="attr_HP_max" value="0" />
+          </label>
+        </div>
+        <div class="flex">
+          <label class="inline-flex initiative">
+            <input type="hidden" name="attr_individualInitiative" value="disabled" />
+            <button type="roll" name="attr_rollInit"
+              value="&{template:simple} {{roll=Enemy Initiative}} {{result=[[1d6 &{tracker}]]}}"
+              data-i18n="initiative-init">
+              Init.
+            </button>
+            <button type="roll" name="attr_rollInitIndividual"
+              value="&{template:simple} {{roll=Initiative for @{character_name}}} {{result=[[1d6+@{initiative} &{tracker}]]}}"
+              data-i18n="initiative-init">
+              Init.
+            </button>
+            <input type="number" name="attr_initiative" value="0" />
+          </label>
+          <input type="hidden" name="attr_armorClassType" value="aac" />
+          <label class="inline-flex show-aac">
+            <span data-i18n="base-attack-bonus-abbr" title="Base Attack Bonus"
+              data-i18n-title="base-attack-bonus">BAB</span>
+            <input type="number" name="attr_monsterBAB" value="0" />
+          </label>
+          <label class="inline-flex show-dac">
+            <span data-i18n="thac0" class="double">THAC0</span>
+            <input type="number" name="attr_monsterThac0" value="0" />
+          </label>
+          <label class="inline-flex">
+            <span data-i18n="armor-class-abbr" title="Armor Class" data-i18n-title="armor-class">AC</span>
+            <input type="number" name="attr_monsterAc" value="0" />
+          </label>
+        </div>
+      </div>
+      <div class="sheet-col movement">
+        <table>
+          <caption data-i18n="movement">
+            Movement
+          </caption>
+          <thead>
+            <tr>
+              <th data-i18n="movement-encounter">Encounter</th>
+              <th data-i18n="movement-exploration">Exploration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input readonly type="number" name="attr_movementEncounter" value="" />
+              </td>
+              <td>
+                <input type="number" min="0" name="attr_movementExploration" value="120" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <input type="hidden" name="attr_armorClassType" value="aac" />
+    <div class="matrix">
+      <h2>Attack Value Matrix</h2>
+      <div class="flex grid-spacing">
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 9" data-i18n-title="attack-value-matrix-9">9</span>
+          <input readonly type="number" name="attr_monsterAttackMatrix9" value="10" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 8" data-i18n-title="attack-value-matrix-8">8</span>
+          <input readonly type="number" name="attr_monsterAttackMatrix8" value="11" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 7" data-i18n-title="attack-value-matrix-7">7</span>
+          <input readonly type="number" name="attr_monsterAttackMatrix7" value="12" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 6" data-i18n-title="attack-value-matrix-6">6</span>
+          <input readonly type="number" name="attr_monsterAttackMatrix6" value="13" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 5" data-i18n-title="attack-value-matrix-5">5</span>
+          <input readonly type="number" name="attr_monsterAttackMatrix5" value="14" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 4" data-i18n-title="attack-value-matrix-4">4</span>
+          <input readonly type="number" name="attr_monsterAttackMatrix4" value="15" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 3" data-i18n-title="attack-value-matrix-3">3</span>
+          <input readonly type="number" name="attr_monsterAttackMatrix3" value="16" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 2" data-i18n-title="attack-value-matrix-2">2</span>
+          <input readonly type="number" name="attr_monsterAttackMatrix2" value="17" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 1" data-i18n-title="attack-value-matrix-1">1</span>
+          <input readonly type="number" name="attr_monsterAttackMatrix1" value="18" />
+        </label>
+        <label class="inline-flex">
+          <span title="Attack Value Matrix: 0" data-i18n-title="attack-value-matrix-0">0</span>
+          <input readonly type="number" name="attr_monsterAttackMatrix0" value="19" />
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sheet-weapons sheet-repeat">
+    <h1 data-i18n="attacks">Attacks</h1>
+    <div class="weapons-grid">
+      <span></span>
+      <span data-i18n="number-abbr" title="Number" data-i18n-title="number">#</span>
+      <span data-i18n="name">Name</span>
+      <span data-i18n="damage">Damage</span>
+      <span data-i18n="description">Description</span>
+    </div>
+    <input type="hidden" name="attr_armorClassType" value="aac" />
+    <fieldset class="repeating_weapons">
+      <div class="weapons-grid">
+        <!-- AAC Attack -->
+        <button type="roll" name="aacAttackRoll" class="attack-roll attack-roll-aac"
+          value="&{template:simple} {{roll=@{character_name} attacks with @{weaponName}}} {{attack=[[1d20+@{monsterBAB}+@{optionalModQuery}]]}} {{damage=[[@{weaponDamageDie}]]}} {{description=@{weaponDescription}}}"></button>
+        <!-- DAC Attack (no BAB added) -->
+        <button type="roll" name="dacAttackRoll" class="attack-roll attack-roll-dac"
+          value="&{template:simple} {{roll=@{character_name} attacks with @{weaponName}}} {{attack=[[1d20+@{optionalModQuery}]]}} {{damage=[[@{weaponDamageDie}]]}} {{description=@{weaponDescription}}} {{attackMatrix9=@{monsterAttackMatrix9}}} {{attackMatrix8=@{monsterAttackMatrix8}}} {{attackMatrix7=@{monsterAttackMatrix7}}} {{attackMatrix6=@{monsterAttackMatrix6}}} {{attackMatrix5=@{monsterAttackMatrix5}}} {{attackMatrix4=@{monsterAttackMatrix4}}} {{attackMatrix3=@{monsterAttackMatrix3}}} {{attackMatrix2=@{monsterAttackMatrix2}}} {{attackMatrix1=@{monsterAttackMatrix1}}} {{attackMatrix0=@{monsterAttackMatrix0}}}"></button>
+        <input type="number" min="0" name="attr_weaponAttacks" value="1" />
+        <input type="text" name="attr_weaponName" placeholder="Weapon" data-i18n-placeholder="weapon" />
+        <input type="text" name="attr_weaponDamageDie" value="1d6" class="input-as-number" />
+        <input type="text" name="attr_weaponDescription" value="" />
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="sheet-abilities sheet-repeat">
+    <h1 data-i18n="abilities-and-skills">Abilities & Skills</h1>
+    <div class="abilities-grid">
+      <span></span>
+      <span data-i18n="name">Name</span>
+      <span data-i18n="description">Description</span>
+    </div>
+    <fieldset class="repeating_abilities">
+      <div class="abilities-grid">
+        <button type="roll" name="abilityRoll"
+          value="&{template:simple} {{roll=@{abilityName}}} {{description=@{abilityDescription}}}"></button>
+        <input type="text" name="attr_abilityName" placeholder="Name" data-i18n-placeholder="name" />
+        <input type="text" name="attr_abilityDescription" data-i18n-placeholder="description"
+          placeholder="Description" />
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="sheet-spells sheet-repeat">
+    <h1 data-i18n="spells">Spells</h1>
+    <div class="spells-grid">
+      <span></span>
+      <span data-i18n="name">Name</span>
+      <span data-i18n="duration">Duration</span>
+      <span data-i18n="range">Range</span>
+      <span data-i18n="description">Description</span>
+      <span data-i18n="effect-roll">Effect Roll</span>
+    </div>
+    <fieldset class="repeating_spells">
+      <div class="spells-grid">
+        <div>
+          <input type="hidden" name="attr_spellRollType" value="describe" />
+          <button type="roll" name="spellCast" class="roll"
+            value="&{template:simple} {{roll=@{character_name} casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+          <button type="roll" name="spellDescribe" class="roll-describe"
+            value="&{template:simple} {{roll=@{character_name} casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}}"></button>
+        </div>
+        <input type="text" name="attr_spellName" placeholder="Magic Missile"
+          data-i18n-placeholder="spell-name-placeholder" />
+        <input type="text" name="attr_spellDuration" placeholder="1 turn"
+          data-i18n-placeholder="spell-duration-placeholder" />
+        <input type="text" name="attr_spellRange" placeholder="150'" />
+        <input type="text" name="attr_spellDescription"
+          placeholder="This spell conjures a glowing dart of energy that the caster may choose to shoot at a visible target within range."
+          data-i18n-placeholder="spell-description-placeholder" />
+        <input type="text" class="half-input" name="attr_spellEffect" placeholder="1d6+1" />
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="sheet-saves">
+    <h1 data-i18n="saving-throws">Saving Throws</h1>
+    <div class="saving roll flex">
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollSaveD"
+          value="&{template:greater} {{roll=@{character_name} rolls save against ^{death-poison-full}}} {{result=[[ [[1d20]]>@{saveD}+@{modQuery} ]]}} {{check=[[@{saveD}+@{modQuery}]]}}"
+          data-i18n="death-poison">
+          Death, Poison
+        </button>
+        <input type="number" name="attr_saveD" value="0" />
+      </label>
+
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollSaveW"
+          value="&{template:greater} {{roll=@{character_name} rolls save against ^{magic-wands-full}}} {{result=[[ [[1d20]]>@{saveW}+@{modQuery} ]]}} {{check=[[@{saveW}+@{modQuery}]]}}"
+          data-i18n="magic-wands">
+          Magic wands
+        </button>
+        <input type="number" name="attr_saveW" value="0" />
+      </label>
+
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollSaveP"
+          value="&{template:greater} {{roll=@{character_name} rolls save against ^{paralysis-petrification-full}}} {{result=[[ [[1d20]]>@{saveP}+@{modQuery} ]]}} {{check=[[@{saveP}+@{modQuery}]]}}"
+          data-i18n="paralysis-petrification">
+          Paralysis, Petrification
+        </button>
+        <input type="number" name="attr_saveP" value="0" />
+      </label>
+
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollSaveB"
+          value="&{template:greater} {{roll=@{character_name} rolls save against ^{breath-attacks-full}}} {{result=[[ [[1d20]]>@{saveB}+@{modQuery} ]]}} {{check=[[@{saveB}+@{modQuery}]]}}"
+          data-i18n="breath-attacks">
+          Breath attacks
+        </button>
+        <input type="number" name="attr_saveB" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <button type="roll" name="attr_rollSaveS"
+          value="&{template:greater} {{roll=@{character_name} rolls save against ^{spells-rods-staves-full}}} {{result=[[ [[1d20]]>@{saveS}+@{modQuery} ]]}} {{check=[[@{saveS}+@{modQuery}]]}}"
+          data-i18n="spells-rods-staves">
+          Spells, Rods, Staves
+        </button>
+        <input type="number" name="attr_saveS" value="0" />
+      </label>
+    </div>
+  </div>
+
+  <div class="sheet-notes-section">
+    <h1 data-i18n="notes">Notes</h1>
+    <textarea name="attr_monsterNotes"></textarea>
+  </div>
+</div>
+
+<!-- Notes Sheet -->
+<div class="sheet-notes">
+  <div class="sheet-notes-section">
+    <h1 data-i18n="notes">Notes</h1>
+    <textarea name="attr_generalNotes"></textarea>
+  </div>
+</div>
+
+<!-- Settings Sheet -->
+<div class="sheet-settings">
+  <h1 data-i18n="settings">Settings</h1>
+  <label class="setting">
+    <span data-i18n="armor-class-type">Armor Class Type</span>
+    <select name="attr_armorClassType">
+      <option value="aac" data-i18n="ascending-armor-class">Ascending Armor Class</option>
+      <option value="dac" data-i18n="descending-armor-class">Descending Armor Class</option>
+    </select>
+  </label>
+  <label class="setting">
+    <span data-i18n="situational-bonus-enabled">Situational Bonus Enabled?</span>
+    <select name="attr_situationalBonusEnabled">
+      <option value="enabled" selected data-i18n="enabled">Enabled</option>
+      <option value="disabled" data-i18n="disabled">Disabled</option>
+    </select>
+  </label>
+  <label class="setting">
+    <span data-i18n="individual-initiative">Individual Initiative?</span>
+    <select name="attr_individualInitiative">
+      <option value="enabled" data-i18n="enabled">Enabled</option>
+      <option value="disabled" selected data-i18n="disabled">Disabled</option>
+    </select>
+  </label>
+
+  <h1 data-i18n="about">About</h1>
+  <p data-i18n="about-description">
+    If you have any suggestions or problems with the character sheet, please
+    reach out.
+  </p>
+  <ul>
+    <li>
+      <span data-i18n="submit-issue">Submit a feature request or bug</span>:
+      https://github.com/wesbaker/roll20-character-sheets/issues/new
+    </li>
+    <li>
+      <span data-i18n="email-us">Email us with comments or questions</span>:
+      webdev@necroticgnome.com
+    </li>
+  </ul>
+</div>
+
+<!-- Attack roll translation -->
+<span style="display: none;" data-i18n="typeofattack">Type of attack</span>
+<span style="display: none;" data-i18n="modifier">Situational Bonus</span>
+<span style="display: none;" data-i18n="modifier-mod">Modif</span>
+<span style="display: none;" data-i18n="attack">Attack</span>
+<span style="display: none;" data-i18n="attack">Damage</span>
+
+<!-- Other translation -->
+<span style="display: none;" data-i18n="initiative">Initiative</span>
+<span style="display: none;" data-i18n="strength">Strength</span>
+<span style="display: none;" data-i18n="intelligence">Intelligence</span>
+<span style="display: none;" data-i18n="wisdom">Wisdom</span>
+<span style="display: none;" data-i18n="dexterity">Dexterity</span>
+<span style="display: none;" data-i18n="constitution">Constitution</span>
+<span style="display: none;" data-i18n="charisma">Charisma</span>
+<span style="display: none;" data-i18n="morale">Morale</span>
+
+<span style="display: none;" data-i18n="death-poison-full">Death or poison</span>
+<span style="display: none;" data-i18n="magic-wands-full">Magic wands</span>
+<span style="display: none;" data-i18n="paralysis-petrification-full">Paralysis or petrification</span>
+<span style="display: none;" data-i18n="breath-attacks-full">Breath attacks</span>
+<span style="display: none;" data-i18n="spells-rods-staves-full">Spells, rods or staves</span>
+<span style="display: none;" data-i18n="listen-at-door-full">Listen at door</span>
+<span style="display: none;" data-i18n="open-stuck-door-full">Open stuck door</span>
+<span style="display: none;" data-i18n="find-secret-door-full">Find secret door</span>
+<span style="display: none;" data-i18n="find-room-trap-full">Find room trap</span>
+
+<rolltemplate class="sheet-rolltemplate-simple">
+  <div>
+    <h3>{{roll}}</h3>
+    {{#result}}
+    <span class="sheet-template-result-only">{{result}}</span>
+    {{/result}}
+    {{#allprops() roll result description morale reaction attackMatrix9 attackMatrix8 attackMatrix7 attackMatrix6 attackMatrix5 attackMatrix4 attackMatrix3 attackMatrix2 attackMatrix1 attackMatrix0}}
+    <div class="sheet-template-row">
+      <span class="sheet-template-term">{{key}}:</span>
+      <span class="sheet-template-result">{{value}}</span>
+    </div>
+    {{/allprops() roll result description morale reaction attackMatrix9 attackMatrix8 attackMatrix7 attackMatrix6 attackMatrix5 attackMatrix4 attackMatrix3 attackMatrix2 attackMatrix1 attackMatrix0}}
+    {{#description}}
+    <div class="sheet-template-description">{{description}}</div>
+    {{/description}}
+
+    <!-- DAC Attack Specific -->
+    {{#attackMatrix0}}
+    {{#rollBetween() attack 1 19}}
+    <div class="sheet-template-result-only sheet-template-grid">
+      <div class="sheet-grid-headers">
+        <span>9</span>
+        <span>8</span>
+        <span>7</span>
+        <span>6</span>
+        <span>5</span>
+        <span>4</span>
+        <span>3</span>
+        <span>2</span>
+        <span>1</span>
+        <span>0</span>
+      </div>
+      <div class="sheet-grid-values">
+        <span>{{attackMatrix9}}</span>
+        <span>{{attackMatrix8}}</span>
+        <span>{{attackMatrix7}}</span>
+        <span>{{attackMatrix6}}</span>
+        <span>{{attackMatrix5}}</span>
+        <span>{{attackMatrix4}}</span>
+        <span>{{attackMatrix3}}</span>
+        <span>{{attackMatrix2}}</span>
+        <span>{{attackMatrix1}}</span>
+        <span>{{attackMatrix0}}</span>
+      </div>
+    </div>
+    {{/rollBetween() attack 1 19}}
+    {{/attackMatrix0}}
+
+    <!-- Attack Specific -->
+    {{#attack}}
+    {{#rollWasCrit() attack}}
+    <span class="sheet-template-result-only fullcrit" data-i18n="natural-20">Natural 20!</span>
+    {{/rollWasCrit() attack}}
+    {{#rollWasFumble() attack}}
+    <span class="sheet-template-result-only fullfail" data-i18n="natural-1">Natural 1!</span>
+    {{/rollWasFumble() attack}}
+    {{/attack}}
+
+
+    <!-- Morale Specific -->
+    {{#rollGreater() morale 0}}
+    <span class="sheet-template-result-only fullcrit" data-i18n="morale-continue-fighting">Continue Fighting!</span>
+    {{/rollGreater() morale 0}}
+    {{#rollLess() morale 1}}
+    <span class="sheet-template-result-only fullfail" data-i18n="morale-surrender-or-flee">Surrender or Flee!</span>
+    {{/rollLess() morale 1}}
+
+    <!-- Reaction Specific -->
+    {{#reaction}}
+    <div class="sheet-template-description">
+      {{#rollLess() result 3}}
+      <p data-i18n="reaction-hostile">Hostile, attacks</p>
+      {{/rollLess() result 3}}
+      {{#rollBetween() result 3 5}}
+      <p data-i18n="reaction-unfriendly">Unfriendly, may attack</p>
+      {{/rollBetween() result 3 5}}
+      {{#rollBetween() result 6 8}}
+      <p data-i18n="reaction-neutral">Neutral, uncertain</p>
+      {{/rollBetween() result 6 8}}
+      {{#rollBetween() result 9 11}}
+      <p data-i18n="reaction-indifferent">Indifferent, uninterested</p>
+      {{/rollBetween() result 9 11}}
+      {{#rollGreater() result 11}}
+      <p data-i18n="reaction-friendly">Friendly, helpful</p>
+      {{/rollGreater() result 11}}
+    </div>
+    {{/reaction}}
+  </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-greater">
+  <div>
+    <h3>{{roll}}</h3>
+    <span style="background: white; display: none;">{{check}}</span>
+    <span style="background: white;">{{result}}</span>
+    {{#rollLess() result check}}
+    <span class="rollresult rollfail" data-i18n="fail">Fail</span>
+    {{/rollLess() result check}}
+    {{#rollGreater() result check}}
+    <span class="rollresult rollsuccess" data-i18n="success">Success</span>
+    {{/rollGreater() result check}}
+    {{#rollTotal() result check}}
+    <span class="rollresult rollsuccess" data-i18n="success">Success</span>
+    {{/rollTotal() result check}}
+  </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-less">
+  <div>
+    <h3>{{roll}}</h3>
+    <span style="background: white; display: none;">{{check}}</span>
+    <span style="background: white;">{{result}}</span>
+
+    {{#rollTotal() result check}}
+    <span class="rollresult rollsuccess" data-i18n="success">Success</span>
+    {{/rollTotal() result check}}
+    {{#rollLess() result check}}
+    <span class="rollresult rollsuccess" data-i18n="success">Success</span>
+    {{/rollLess() result check}}
+    {{#rollGreater() result check}}
+    <span class="rollresult rollfail" data-i18n="fail">Fail</span>
+    {{/rollGreater() result check}}
+  </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-skill">
+  <div>
+    <h3>{{roll}}</h3>
+    <span style="background: white;">{{result}}</span>
+    {{#rollTotal() symbol 2}}
+    {{#rollLess() result check}}
+    <span class="rollresult rollfail" data-i18n="fail">Fail</span>
+    {{/rollLess() result check}}
+    {{#rollGreater() result check}}
+    <span class="rollresult rollsuccess" data-i18n="success">Success</span>
+    {{/rollGreater() result check}}
+    {{#rollTotal() result check}}
+    <span class="rollresult rollsuccess" data-i18n="success">Success</span>
+    {{/rollTotal() result check}}
+    {{/rollTotal() symbol 2}}
+    {{#rollTotal() symbol 1}}
+    {{#rollTotal() result check}}
+    <span class="rollresult rollsuccess" data-i18n="success">Success</span>
+    {{/rollTotal() result check}}
+    {{#rollLess() result check}}
+    <span class="rollresult rollsuccess" data-i18n="success">Success</span>
+    {{/rollLess() result check}}
+    {{#rollGreater() result check}}
+    <span class="rollresult rollfail" data-i18n="fail">Fail</span>
+    {{/rollGreater() result check}}
+    {{/rollTotal() symbol 1}}
+    {{#description}}
+    <div class="sheet-template-description">
+      {{description}}
+    </div>
+    {{/description}}
+  </div>
+</rolltemplate>
+
+<script type="text/worker">
+  /* ===== PARAMETERS ==========
+  destination = the name of the attribute that stores the total quantity
+  section = name of repeating fieldset, without the repeating_
+  fields = the name of the attribute field to be summed
+      can be a single attribute: 'weight'
+      or an array of attributes: ['weight','number','equipped']
+  multiplier (optional) = a multiplier to the entire fieldset total. For instance, if summing coins of weight 0.02, might want to multiply the final total by 0.02.
+  */
+  const repeatingSum = (
+    destination,
+    section,
+    fields,
+    { multiplier = 1, callback = Function.prototype }
+  ) => {
+    if (!Array.isArray(fields)) fields = [fields];
+    getSectionIDs(`repeating_${section}`, (idArray) => {
+      const attrArray = idArray.reduce(
+        (m, id) => [
+          ...m,
+          ...fields.map((field) => `repeating_${section}_${id}_${field}`),
+        ],
+        []
+      );
+      getAttrs(attrArray, (v) => {
+        console.log("===== values of v: " + JSON.stringify(v) + " =====");
+        // getValue: if not a number, returns 1 if it is 'on' (checkbox), otherwise returns 0..
+        const getValue = (section, id, field) =>
+          parseFloat(v[`repeating_${section}_${id}_${field}`]) ||
+          (v[`repeating_${section}_${id}_${field}`] === "on" ? 1 : 0);
+        const sumTotal = idArray.reduce(
+          (total, id) =>
+            total +
+            fields.reduce(
+              (subtotal, field) => subtotal * getValue(section, id, field),
+              1
+            ),
+          0
+        );
+        setAttrs({ [destination]: sumTotal * multiplier }, callback);
+      });
+    });
+  };
+
+  on("sheet:opened", function () {
+    // Populate new attributes from existing attributes
+    const changedAttributes = [
+      "thresholdModifierEnabled",
+      "situationalBonusEnabled",
+    ];
+    getAttrs(changedAttributes, function (values) {
+      if (!values.situationalBonusEnabled) {
+        setAttrs({
+          situationalBonusEnabled: values.thresholdModifierEnabled,
+        });
+      }
+    });
+
+    // Set attackType based on heuristics of the bonus damage (0 for ranged, otherwise STR bonus)
+    updateWeaponBonuses();
+
+    // Set armorValue per armorBenefit if >= 2
+    getSectionIDs("repeating_armor", function (idArray) {
+      idArray.forEach(function (id) {
+        const attributes = ["armorBenefit", "armorValue"]
+          .map((attr) => `repeating_armor_${id}_${attr}`)
+          .push("armorClassType");
+        getAttrs(attributes, function (values) {
+          const armorValue = values[`repeating_armor_${id}_armorValue`];
+          const armorBenefit = values[`repeating_armor_${id}_armorBenefit`];
+          if (armorValue && armorBenefit >= 2) {
+            setAttrs({
+              [`repeating_armor_${id}_armorValue`]:
+                values.armorClassType === "aac"
+                  ? 10 + armorBenefit
+                  : 9 - armorBenefit,
+              [`repeating_armor_${id}_armorBenefit`]: "",
+            });
+          }
+        });
+      });
+    });
+
+    // Set roll buttons for spells depending on effect having a value
+    getSectionIDs("repeating_spells", function (idArray) {
+      idArray.forEach(function (id) {
+        getAttrs([`repeating_spells_${id}_spellEffect`], function (values) {
+          if (values[`repeating_spells_${id}_spellEffect`] !== "") {
+            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "roll" });
+          } else {
+            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "describe" });
+          }
+        });
+      });
+    });
+
+    // Set attack matrix values
+    getAttrs(["thac0", "monsterThac0"], function (values) {
+      setAttackMatrix(values.thac0);
+      setAttackMatrix(values.monsterThac0, 'monsterAttackMatrix');
+    })
+  });
+
+  on("sheet:opened change:situationalBonusEnabled", function (eventInfo) {
+    // Check for threshold modifier enabled
+    getAttrs(["situationalBonusEnabled"], function (values) {
+      if (values.situationalBonusEnabled.toLowerCase() === "disabled") {
+        setAttrs({ optionalModQuery: "0" });
+      } else {
+        setAttrs({
+          optionalModQuery:
+            "?{" +
+            getTranslationByKey("modifier") +
+            "|0}[" +
+            getTranslationByKey("modifier-mod") +
+            "]",
+        });
+      }
+    });
+
+    setAttrs({
+      modQuery:
+        "?{" +
+        getTranslationByKey("modifier") +
+        "|0}[" +
+        getTranslationByKey("modifier-mod") +
+        "]",
+      reactionQuery:
+        "?{" +
+        getTranslationByKey("charisma-modifier") +
+        "|0}[" +
+        getTranslationByKey("charisma-abbr") +
+        "]"
+    });
+  });
+
+  // Tabs
+  const buttonlist = ["character", "spells", "retainers", "monster", "notes", "settings"];
+  buttonlist.forEach((button) => {
+    on(`clicked:${button}`, function (event) {
+      setAttrs({ sheetTab: button });
+    });
+  });
+
+  // Attribute Changes
+  on("sheet:opened change:dex", function () {
+    updateWeaponBonuses();
+
+    getAttrs(["dex"], function (values) {
+      // dexMod applies both to AC and Missile Attacks
+      const [dexMod, initMod] = getModifiers(values.dex, [
+        [-3, -2],
+        [-2, -1],
+        [-1, -1],
+        [0, 0],
+        [1, 1],
+        [2, 1],
+        [3, 2],
+      ]);
+
+      setAttrs({
+        ACDexMod: dexMod,
+        BonusDEX: dexMod,
+        InitDexMod: initMod,
+        acUnarmored: 10 + dexMod, // todo deprecate
+        aacAcUnarmored: 10 + dexMod,
+        dacAcUnarmored: 9 - dexMod,
+      });
+    });
+  });
+  on("change:str", function () {
+    updateWeaponBonuses();
+
+    getAttrs(["str"], function (values) {
+      const [BonusSTR, OpenDoor] = getModifiers(values.str, [
+        [-3, 1],
+        [-2, 1],
+        [-1, 1],
+        [0, 2],
+        [1, 3],
+        [2, 4],
+        [3, 5],
+      ]);
+
+      setAttrs({ BonusSTR, OpenDoor });
+    });
+  });
+  on("change:con", function () {
+    getAttrs(["HPConMod", "con"], function (values) {
+      setAttrs({ HPConMod: getModifiers(values.con) });
+    });
+  });
+  on("sheet:opened change:int", function () {
+    getAttrs(["int"], function (values) {
+      setAttrs({ intMod: getModifiers(values.int) });
+    });
+  });
+  on("sheet:opened change:wis", function () {
+    getAttrs(["wis"], function (values) {
+      const wisMod = getModifiers(values.wis);
+      setAttrs({
+        wisMod,
+        wisdomSaveQuery: (wisMod === 0)
+          ? 0
+          : "?{" +
+            getTranslationByKey("wisdom-save-apply") +
+            "|" +
+            getTranslationByKey("no") +
+            ",0|" +
+            getTranslationByKey("yes") +
+            ",@{wisMod}}[" +
+            getTranslationByKey("wisdom-abbr") +
+            "]"
+        });
+    });
+  });
+  on("sheet:opened change:cha", function () {
+    getAttrs(["cha"], function (values) {
+      const [chaMod, retainersMax, retainersLoyalty] = getModifiers(values.cha, [
+        [-2, 1, 4],
+        [-1, 2, 5],
+        [-1, 3, 6],
+        [0, 4, 7],
+        [1, 5, 8],
+        [1, 6, 9],
+        [2, 7, 10]
+      ]);
+      setAttrs({ chaMod, retainersMax, retainersLoyalty })
+    })
+  })
+
+  /**
+   * Given a value and set of modifiers, return the correct modifiers
+   * @param {number} value The value to get modifiers for
+   * @param {Array} modifiers Array of arrays or numbers representing modifiers
+   * @returns {number|Array} The modifier(s) associated with the value
+   */
+  function getModifiers(value, modifiers = [-3, -2, -1, 0, 1, 2, 3]) {
+    if (value <= 3) {
+      return modifiers[0];
+    } else if (value >= 4 && value <= 5) {
+      return modifiers[1];
+    } else if (value >= 6 && value <= 8) {
+      return modifiers[2];
+    } else if (value >= 9 && value <= 12) {
+      return modifiers[3];
+    } else if (value >= 13 && value <= 15) {
+      return modifiers[4];
+    } else if (value >= 16 && value <= 17) {
+      return modifiers[5];
+    } else {
+      return modifiers[6];
+    }
+  }
+
+  function updateWeaponBonuses() {
+    getSectionIDs("repeating_weapons", function (idArray) {
+      idArray.forEach(function (id) {
+        const attributes = ["attackType", "weaponAttributeBonusDamage"]
+          .map((name) => `repeating_weapons_${id}_${name}`)
+          .concat(["BonusSTR", "BonusDEX"]);
+        getAttrs(attributes, function (values) {
+          const attackType = values[`repeating_weapons_${id}_attackType`];
+          if (!attackType) {
+            if (
+              values.BonusSTR !== 0 &&
+              values[`repeating_weapons_${id}_weaponAttributeBonusDamage`] === 0
+            ) {
+              setAttrs({
+                [`repeating_weapons_${id}_attackType`]: "Ranged",
+                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: "0",
+              });
+            } else {
+              setAttrs({
+                [`repeating_weapons_${id}_attackType`]: "Melee",
+                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR,
+              });
+            }
+          } else if (attackType.toLowerCase() === 'melee') {
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR,
+            });
+          } else if (attackType.toLowerCase() === 'ranged') {
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: "0",
+            });
+          }
+        });
+      });
+    });
+  }
+
+  // Set speeds based on Exploration Speed
+  on("sheet:opened change:movementExploration", function () {
+    getAttrs(["movementExploration"], function (values) {
+      const explorationSpeed = values.movementExploration;
+      setAttrs({
+        movementEncounter: Math.floor(explorationSpeed / 3),
+        movementOverland: Math.floor(explorationSpeed / 5),
+      });
+    });
+  });
+
+  // Armor Calculation
+  on("sheet:opened change:dex change:repeating_armor remove:repeating_armor",
+    function () {
+      repeatingSum("ArmorWorn", "armor", "armorWorn", {
+        callback: () => {
+          repeatingSum("ArmorTotal", "armor", ["armorValue", "armorWorn"], {
+            callback: () => {
+              getAttrs(["ArmorWorn", "ArmorTotal", "BonusDEX", "aacAcUnarmored", "dacAcUnarmored"], function (values) {
+                const aacAc = values.ArmorWorn > 0 ? values.ArmorTotal + values.BonusDEX : values.aacAcUnarmored;
+                const dacAc = values.ArmorWorn > 0 ? values.ArmorTotal - values.BonusDEX : values.dacAcUnarmored;
+                setAttrs({ aacAc, dacAc });
+              })
+            }
+          });
+        }
+      });
+    }
+  );
+
+  // Recalculate encumbrance
+  on(
+    [
+      "sheet:opened",
+      "change:repeating_armor",
+      "remove:repeating_armor",
+      "change:repeating_items",
+      "remove:repeating_items",
+      "change:repeating_weapons",
+      "remove:repeating_weapons",
+      "change:PP",
+      "change:EP",
+      "change:GP",
+      "change:SP",
+      "change:CP",
+    ].join(" "),
+    function () {
+      repeatingSum("ArmorWeightTotal", "armor", "armorWeight", {
+        callback: () => {
+          repeatingSum("ItemWeightTotal", "items", ["ItemWeight", "ItemQuantity"], {
+            callback: () => {
+              repeatingSum("WeaponWeightTotal", "weapons", "weaponWeight", {
+                callback: () => {
+                  getAttrs(
+                    [
+                      "PP",
+                      "EP",
+                      "GP",
+                      "SP",
+                      "CP",
+                      "ArmorWeightTotal",
+                      "WeaponWeightTotal",
+                      "ItemWeightTotal",
+                    ],
+                    (weights) => {
+                      setAttrs({
+                        Encumbrance: Object.values(weights)
+                          .map((weight) => parseInt(weight, 10))
+                          .reduce((sum, cur) => sum + cur),
+                      });
+                    }
+                  );
+                },
+              });
+            },
+          });
+        },
+      });
+    }
+  );
+
+  // Calculate THAC0 from BAB
+  on("change:bab", function () {
+    getAttrs(["bab"], function (values) {
+      setAttrs({ thac0: 19 - values.bab });
+      setAttackMatrix(19 - values.bab);
+    });
+  });
+  // Calculate BAB from THAC0
+  on("change:thac0", function () {
+    getAttrs(["thac0"], function (values) {
+      setAttrs({ bab: 19 - values.thac0 });
+      setAttackMatrix(values.thac0);
+    });
+  });
+  function setAttackMatrix(thac0) {
+    const matrix = {};
+    for (let ac = 0; ac < 10; ac++) {
+      matrix[`attackMatrix${ac}`] = Math.min(thac0 - ac, 20);
+    }
+    setAttrs(matrix);
+  }
+
+  on("change:monsterBAB", function () {
+    getAttrs(["monsterBAB"], function (values) {
+      setAttrs({ monsterThac0: 19 - values.monsterBAB });
+      setAttackMatrix(19 - values.monsterBAB, 'monsterAttackMatrix');
+    });
+  });
+  // Calculate BAB from THAC0
+  on("change:monsterThac0", function () {
+    getAttrs(["monsterThac0"], function (values) {
+      setAttrs({ monsterBAB: 19 - values.monsterThac0 });
+      setAttackMatrix(values.monsterThac0, 'monsterAttackMatrix');
+    });
+  });
+  function setAttackMatrix(thac0, type = 'attackMatrix') {
+    const matrix = {};
+    for (let ac = 0; ac < 10; ac++) {
+      matrix[`${type}${ac}`] = Math.min(thac0 - ac, 20);
+    }
+    setAttrs(matrix);
+  }
+
+  // Update weaponAttributeBonus and weaponAttributeBonusDamage when STR or DEX changes
+  on("change:repeating_weapons:attackType change:str change:dex", function () {
+    getSectionIDs("repeating_weapons", function (idArray) {
+      idArray.forEach(function (id) {
+        const attributes = ["attackType"]
+          .map((name) => `repeating_weapons_${id}_${name}`)
+          .concat(["BonusSTR", "BonusDEX"]);
+        getAttrs(attributes, function (values) {
+          if (values[`repeating_weapons_${id}_attackType`] === "ranged") {
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: "0",
+            });
+          } else {
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR,
+            });
+          }
+        });
+      });
+    });
+  });
+
+  // Set saving throws, BAB, THAC0, HD, Next Level Experience
+  on(
+    "change:level change:class change:monsterhitdice change:monsterhitdicemodifier",
+    function () {
+      const classData = {
+        cleric: [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 1500, hd: "2d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 3000, hd: "3d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 6000, hd: "4d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 12000, hd: "5d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 25000, hd: "6d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 50000, hd: "7d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 100000, hd: "8d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 200000, hd: "9d6", bab: 5, thac0: 14, saves: [6, 7, 9, 11, 9] },
+          { xp: 300000, hd: "9d6+1", bab: 5, thac0: 14, saves: [6, 7, 9, 11, 9] },
+          { xp: 400000, hd: "9d6+2", bab: 5, thac0: 14, saves: [6, 7, 9, 11, 9] },
+          { xp: 500000, hd: "9d6+3", bab: 5, thac0: 14, saves: [6, 7, 9, 11, 9] },
+          { xp: 600000, hd: "9d6+4", bab: 7, thac0: 12, saves: [3, 5, 7, 8, 7] },
+          { xp: 760000, hd: "9d6+5", bab: 7, thac0: 12, saves: [3, 5, 7, 8, 7] },
+        ],
+        dwarf: [
+          { xp: 0, hd: "1d8", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 2200, hd: "2d8", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 4400, hd: "3d8", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 8800, hd: "4d8", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 17000, hd: "5d8", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 35000, hd: "6d8", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 70000, hd: "7d8", bab: 5, thac0: 14, saves: [4, 5, 6, 7, 8] },
+          { xp: 140000, hd: "8d8", bab: 5, thac0: 14, saves: [4, 5, 6, 7, 8] },
+          { xp: 270000, hd: "9d8", bab: 5, thac0: 14, saves: [4, 5, 6, 7, 8] },
+          { xp: 400000, hd: "9d8+3", bab: 7, thac0: 12, saves: [2, 3, 4, 4, 6] },
+          { xp: 530000, hd: "9d8+6", bab: 7, thac0: 12, saves: [2, 3, 4, 4, 6] },
+          { xp: 660000, hd: "9d8+9", bab: 7, thac0: 12, saves: [2, 3, 4, 4, 6] },
+        ],
+        elf: [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 15] },
+          { xp: 4000, hd: "2d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 15] },
+          { xp: 8000, hd: "3d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 15] },
+          { xp: 16000, hd: "4d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 12] },
+          { xp: 32000, hd: "5d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 12] },
+          { xp: 64000, hd: "6d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 12] },
+          { xp: 120000, hd: "7d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 10] },
+          { xp: 250000, hd: "8d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 10] },
+          { xp: 400000, hd: "9d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 10] },
+          { xp: 600000, hd: "9d6+2", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 8] },
+        ],
+        fighter: [
+          { xp: 0, hd: "1d8", bab: 0, thac0: 19, saves: [12, 13, 14, 15, 16] },
+          { xp: 2000, hd: "2d8", bab: 0, thac0: 19, saves: [12, 13, 14, 15, 16] },
+          { xp: 4000, hd: "3d8", bab: 0, thac0: 19, saves: [12, 13, 14, 15, 16] },
+          { xp: 8000, hd: "4d8", bab: 2, thac0: 17, saves: [10, 11, 12, 13, 14] },
+          { xp: 16000, hd: "5d8", bab: 2, thac0: 17, saves: [10, 11, 12, 13, 14] },
+          { xp: 32000, hd: "6d8", bab: 2, thac0: 17, saves: [10, 11, 12, 13, 14] },
+          { xp: 64000, hd: "7d8", bab: 5, thac0: 14, saves: [8, 9, 10, 10, 12] },
+          { xp: 120000, hd: "8d8", bab: 5, thac0: 14, saves: [8, 9, 10, 10, 12] },
+          { xp: 240000, hd: "9d8", bab: 5, thac0: 14, saves: [8, 9, 10, 10, 12] },
+          { xp: 360000, hd: "9d8+2", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 10] },
+          { xp: 480000, hd: "9d8+4", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 10] },
+          { xp: 600000, hd: "9d8+6", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 10] },
+          { xp: 720000, hd: "9d8+8", bab: 9, thac0: 10, saves: [4, 5, 6, 5, 8] },
+          { xp: 840000, hd: "9d8+10", bab: 9, thac0: 10, saves: [4, 5, 6, 5, 8] },
+        ],
+        halfling: [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 2000, hd: "2d6", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 4000, hd: "3d6", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 8000, hd: "4d6", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 16000, hd: "5d6", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 32000, hd: "6d6", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 64000, hd: "7d6", bab: 5, thac0: 14, saves: [4, 5, 6, 7, 8] },
+          { xp: 120000, hd: "8d6", bab: 5, thac0: 14, saves: [4, 5, 6, 7, 8] },
+        ],
+        "magic-user": [
+          { xp: 0, hd: "1d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 2500, hd: "2d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 5000, hd: "3d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 10000, hd: "4d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 20000, hd: "5d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 40000, hd: "6d4", bab: 2, thac0: 17, saves: [11, 12, 11, 14, 12] },
+          { xp: 80000, hd: "7d4", bab: 2, thac0: 17, saves: [11, 12, 11, 14, 12] },
+          { xp: 150000, hd: "8d4", bab: 2, thac0: 17, saves: [11, 12, 11, 14, 12] },
+          { xp: 300000, hd: "9d4", bab: 2, thac0: 17, saves: [11, 12, 11, 14, 12] },
+          { xp: 450000, hd: "9d4+1", bab: 2, thac0: 17, saves: [11, 12, 11, 14, 12] },
+          { xp: 600000, hd: "9d4+2", bab: 5, thac0: 14, saves: [8, 9, 8, 11, 8] },
+          { xp: 750000, hd: "9d4+3", bab: 5, thac0: 14, saves: [8, 9, 8, 11, 8] },
+          { xp: 900000, hd: "9d4+4", bab: 5, thac0: 14, saves: [8, 9, 8, 11, 8] },
+          { xp: 1050000, hd: "9d4+5", bab: 5, thac0: 14, saves: [8, 9, 8, 11, 8] },
+        ],
+        thief: [
+          { xp: 0, hd: "1d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 1200, hd: "2d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 2400, hd: "3d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 4800, hd: "4d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 9600, hd: "5d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 20000, hd: "6d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 40000, hd: "7d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 80000, hd: "8d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 160000, hd: "9d4", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 280000, hd: "9d4+2", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 400000, hd: "9d4+4", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 520000, hd: "9d4+6", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 640000, hd: "9d4+8", bab: 7, thac0: 12, saves: [8, 9, 7, 10, 8] },
+          { xp: 760000, hd: "9d4+10", bab: 7, thac0: 12, saves: [8, 9, 7, 10, 8] },
+        ],
+        acrobat: [
+          { xp: 0, hd: "1d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 1200, hd: "2d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 2400, hd: "3d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 4800, hd: "4d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 9600, hd: "5d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 20000, hd: "6d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 40000, hd: "7d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 80000, hd: "8d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 160000, hd: "9d4", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 280000, hd: "9d4+2", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 400000, hd: "9d4+4", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 520000, hd: "9d4+6", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 640000, hd: "9d4+8", bab: 7, thac0: 12, saves: [8, 9, 7, 10, 8] },
+          { xp: 760000, hd: "9d4+10", bab: 7, thac0: 12, saves: [8, 9, 7, 10, 8] },
+        ],
+        assassin: [
+          { xp: 0, hd: "1d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 1500, hd: "2d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 3000, hd: "3d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 6000, hd: "4d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 12000, hd: "5d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 25000, hd: "6d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 50000, hd: "7d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 100000, hd: "8d4", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 200000, hd: "9d4", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 300000, hd: "9d4+2", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 425000, hd: "9d4+4", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 575000, hd: "9d4+6", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 750000, hd: "9d4+8", bab: 7, thac0: 12, saves: [8, 9, 7, 10, 8] },
+          { xp: 900000, hd: "9d4+10", bab: 7, thac0: 12, saves: [8, 9, 7, 10, 8] },
+        ],
+        barbarian: [
+          { xp: 0, hd: "1d8", bab: 0, thac0: 19, saves: [10, 13, 12, 15, 16] },
+          { xp: 2500, hd: "2d8", bab: 0, thac0: 19, saves: [10, 13, 12, 15, 16] },
+          { xp: 5000, hd: "3d8", bab: 0, thac0: 19, saves: [10, 13, 12, 15, 16] },
+          { xp: 10000, hd: "4d8", bab: 2, thac0: 17, saves: [8, 11, 10, 13, 13] },
+          { xp: 18500, hd: "5d8", bab: 2, thac0: 17, saves: [8, 11, 10, 13, 13] },
+          { xp: 37000, hd: "6d8", bab: 2, thac0: 17, saves: [8, 11, 10, 13, 13] },
+          { xp: 85000, hd: "7d8", bab: 5, thac0: 14, saves: [6, 9, 8, 10, 10] },
+          { xp: 140000, hd: "8d8", bab: 5, thac0: 14, saves: [6, 9, 8, 10, 10] },
+          { xp: 270000, hd: "9d8", bab: 5, thac0: 14, saves: [6, 9, 8, 10, 10] },
+          { xp: 400000, hd: "9d8+3", bab: 7, thac0: 12, saves: [4, 7, 6, 8, 7] },
+          { xp: 530000, hd: "9d8+6", bab: 7, thac0: 12, saves: [4, 7, 6, 8, 7] },
+          { xp: 660000, hd: "9d8+9", bab: 7, thac0: 12, saves: [4, 7, 6, 8, 7] },
+          { xp: 790000, hd: "9d8+12", bab: 9, thac0: 10, saves: [3, 5, 4, 5, 5] },
+          { xp: 920000, hd: "9d8+15", bab: 9, thac0: 10, saves: [3, 5, 4, 5, 5] },
+        ],
+        bard: [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 2000, hd: "2d6", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 4000, hd: "3d6", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 8000, hd: "4d6", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 16000, hd: "5d6", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 32000, hd: "6d6", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 64000, hd: "7d6", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 120000, hd: "8d6", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 240000, hd: "9d6", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 360000, hd: "9d6+2", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 480000, hd: "9d6+4", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 600000, hd: "9d6+6", bab: 5, thac0: 14, saves: [10, 11, 9, 12, 10] },
+          { xp: 720000, hd: "9d6+8", bab: 7, thac0: 12, saves: [8, 9, 7, 10, 8] },
+          { xp: 840000, hd: "9d6+10", bab: 7, thac0: 12, saves: [8, 9, 7, 10, 8] },
+        ],
+        drow: [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 12] },
+          { xp: 4000, hd: "2d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 12] },
+          { xp: 8000, hd: "3d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 12] },
+          { xp: 16000, hd: "4d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 10] },
+          { xp: 32000, hd: "5d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 10] },
+          { xp: 64000, hd: "6d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 10] },
+          { xp: 120000, hd: "7d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 8] },
+          { xp: 250000, hd: "8d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 8] },
+          { xp: 400000, hd: "9d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 8] },
+          { xp: 600000, hd: "9d6+2", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 6] },
+        ],
+        druid: [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 2000, hd: "2d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 4000, hd: "3d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 7500, hd: "4d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 12500, hd: "5d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 20000, hd: "6d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 35000, hd: "7d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 60000, hd: "8d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 90000, hd: "9d6", bab: 5, thac0: 14, saves: [6, 7, 9, 11, 9] },
+          { xp: 125000, hd: "9d6+2", bab: 5, thac0: 14, saves: [6, 7, 9, 11, 9] },
+          { xp: 200000, hd: "9d6+4", bab: 5, thac0: 14, saves: [6, 7, 9, 11, 9] },
+          { xp: 300000, hd: "9d6+6", bab: 5, thac0: 14, saves: [6, 7, 9, 11, 9] },
+          { xp: 750000, hd: "9d6+8", bab: 7, thac0: 12, saves: [3, 5, 7, 8, 7] },
+          { xp: 1500000, hd: "9d6+10", bab: 7, thac0: 12, saves: [3, 5, 7, 8, 7] },
+        ],
+        duergar: [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 2800, hd: "2d6", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 5600, hd: "3d6", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 11200, hd: "4d6", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 23000, hd: "5d6", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 46000, hd: "6d6", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 100000, hd: "7d6", bab: 5, thac0: 14, saves: [4, 5, 6, 7, 8] },
+          { xp: 200000, hd: "8d6", bab: 5, thac0: 14, saves: [4, 5, 6, 7, 8] },
+          { xp: 300000, hd: "9d6", bab: 5, thac0: 14, saves: [4, 5, 6, 7, 8] },
+          { xp: 400000, hd: "9d6+3", bab: 7, thac0: 12, saves: [2, 3, 4, 4, 6] },
+        ],
+        gnome: [
+          { xp: 0, hd: "1d4", bab: 0, thac0: 19, saves: [8, 9, 10, 14, 11] },
+          { xp: 3000, hd: "2d4", bab: 0, thac0: 19, saves: [8, 9, 10, 14, 11] },
+          { xp: 6000, hd: "3d4", bab: 0, thac0: 19, saves: [8, 9, 10, 14, 11] },
+          { xp: 12000, hd: "4d4", bab: 0, thac0: 19, saves: [8, 9, 10, 14, 11] },
+          { xp: 30000, hd: "5d4", bab: 0, thac0: 19, saves: [8, 9, 10, 14, 11] },
+          { xp: 60000, hd: "6d4", bab: 2, thac0: 17, saves: [6, 7, 8, 11, 9] },
+          { xp: 120000, hd: "7d4", bab: 2, thac0: 17, saves: [6, 7, 8, 11, 9] },
+          { xp: 240000, hd: "8d4", bab: 2, thac0: 17, saves: [6, 7, 8, 11, 9] },
+        ],
+        "half-elf": [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 15] },
+          { xp: 2500, hd: "2d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 15] },
+          { xp: 5000, hd: "3d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 15] },
+          { xp: 10000, hd: "4d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 11] },
+          { xp: 20000, hd: "5d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 11] },
+          { xp: 40000, hd: "6d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 11] },
+          { xp: 80000, hd: "7d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 10] },
+          { xp: 150000, hd: "8d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 10] },
+          { xp: 300000, hd: "9d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 10] },
+          { xp: 450000, hd: "9d6+2", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 8] },
+          { xp: 600000, hd: "9d6+4", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 8] },
+          { xp: 750000, hd: "9d6+6", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 8] },
+        ],
+        "half-orc": [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 1800, hd: "2d6", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 3600, hd: "3d6", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 7000, hd: "4d6", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 14000, hd: "5d6", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 28000, hd: "6d6", bab: 2, thac0: 17, saves: [12, 13, 11, 14, 13] },
+          { xp: 60000, hd: "7d6", bab: 5, thac0: 14, saves: [12, 13, 11, 14, 13] },
+          { xp: 120000, hd: "8d6", bab: 5, thac0: 14, saves: [12, 13, 11, 14, 13] },
+        ],
+        illusionist: [
+          { xp: 0, hd: "1d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 2500, hd: "2d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 5000, hd: "3d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 10000, hd: "4d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 20000, hd: "5d4", bab: 0, thac0: 19, saves: [13, 14, 13, 16, 15] },
+          { xp: 40000, hd: "6d4", bab: 2, thac0: 17, saves: [11, 12, 11, 14, 12] },
+          { xp: 80000, hd: "7d4", bab: 2, thac0: 17, saves: [11, 12, 11, 14, 12] },
+          { xp: 150000, hd: "8d4", bab: 2, thac0: 17, saves: [11, 12, 11, 14, 12] },
+          { xp: 300000, hd: "9d4", bab: 2, thac0: 17, saves: [11, 12, 11, 14, 12] },
+          { xp: 450000, hd: "9d4+1", bab: 2, thac0: 17, saves: [11, 12, 11, 14, 12] },
+          { xp: 600000, hd: "9d4+2", bab: 5, thac0: 14, saves: [8, 9, 8, 11, 8] },
+          { xp: 750000, hd: "9d4+3", bab: 5, thac0: 14, saves: [8, 9, 8, 11, 8] },
+          { xp: 900000, hd: "9d4+4", bab: 5, thac0: 14, saves: [8, 9, 8, 11, 8] },
+          { xp: 1050000, hd: "9d4+5", bab: 5, thac0: 14, saves: [8, 9, 8, 11, 8] },
+        ],
+        knight: [
+          { xp: 0, hd: "1d8", bab: 0, thac0: 19, saves: [12, 13, 14, 15, 16] },
+          { xp: 2500, hd: "2d8", bab: 0, thac0: 19, saves: [12, 13, 14, 15, 16] },
+          { xp: 5000, hd: "3d8", bab: 0, thac0: 19, saves: [12, 13, 14, 15, 16] },
+          { xp: 10000, hd: "4d8", bab: 2, thac0: 17, saves: [10, 11, 12, 13, 14] },
+          { xp: 18500, hd: "5d8", bab: 2, thac0: 17, saves: [10, 11, 12, 13, 14] },
+          { xp: 37000, hd: "6d8", bab: 2, thac0: 17, saves: [10, 11, 12, 13, 14] },
+          { xp: 85000, hd: "7d8", bab: 5, thac0: 14, saves: [8, 9, 10, 10, 12] },
+          { xp: 140000, hd: "8d8", bab: 5, thac0: 14, saves: [8, 9, 10, 10, 12] },
+          { xp: 270000, hd: "9d8", bab: 5, thac0: 14, saves: [8, 9, 10, 10, 12] },
+          { xp: 400000, hd: "9d8+2", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 10] },
+          { xp: 530000, hd: "9d8+4", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 10] },
+          { xp: 660000, hd: "9d8+6", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 10] },
+          { xp: 790000, hd: "9d8+8", bab: 9, thac0: 10, saves: [4, 5, 6, 5, 8] },
+          { xp: 920000, hd: "9d8+10", bab: 9, thac0: 10, saves: [4, 5, 6, 5, 8] },
+        ],
+        paladin: [
+          { xp: 0, hd: "1d8", bab: 0, thac0: 19, saves: [10, 11, 12, 13, 14] },
+          { xp: 2750, hd: "2d8", bab: 0, thac0: 19, saves: [10, 11, 12, 13, 14] },
+          { xp: 5500, hd: "3d8", bab: 0, thac0: 19, saves: [10, 11, 12, 13, 14] },
+          { xp: 12000, hd: "4d8", bab: 2, thac0: 17, saves: [8, 9, 10, 11, 12] },
+          { xp: 24000, hd: "5d8", bab: 2, thac0: 17, saves: [8, 9, 10, 11, 12] },
+          { xp: 45000, hd: "6d8", bab: 2, thac0: 17, saves: [8, 9, 10, 11, 12] },
+          { xp: 95000, hd: "7d8", bab: 5, thac0: 14, saves: [6, 7, 8, 8, 10] },
+          { xp: 175000, hd: "8d8", bab: 5, thac0: 14, saves: [6, 7, 8, 8, 10] },
+          { xp: 350000, hd: "9d8", bab: 5, thac0: 14, saves: [6, 7, 8, 8, 10] },
+          { xp: 500000, hd: "9d8+2", bab: 7, thac0: 12, saves: [4, 5, 6, 6, 8] },
+          { xp: 650000, hd: "9d8+4", bab: 7, thac0: 12, saves: [4, 5, 6, 6, 8] },
+          { xp: 800000, hd: "9d8+6", bab: 7, thac0: 12, saves: [4, 5, 6, 6, 8] },
+          { xp: 950000, hd: "9d8+8", bab: 9, thac0: 10, saves: [2, 3, 4, 3, 6] },
+          { xp: 1100000, hd: "9d8+10", bab: 9, thac0: 10, saves: [2, 3, 4, 3, 6] },
+        ],
+        ranger: [
+          { xp: 0, hd: "1d8", bab: 0, thac0: 19, saves: [12, 13, 14, 15, 16] },
+          { xp: 2250, hd: "2d8", bab: 0, thac0: 19, saves: [12, 13, 14, 15, 16] },
+          { xp: 4500, hd: "3d8", bab: 0, thac0: 19, saves: [12, 13, 14, 15, 16] },
+          { xp: 10000, hd: "4d8", bab: 2, thac0: 17, saves: [10, 11, 12, 13, 14] },
+          { xp: 20000, hd: "5d8", bab: 2, thac0: 17, saves: [10, 11, 12, 13, 14] },
+          { xp: 40000, hd: "6d8", bab: 2, thac0: 17, saves: [10, 11, 12, 13, 14] },
+          { xp: 90000, hd: "7d8", bab: 5, thac0: 14, saves: [8, 9, 10, 10, 12] },
+          { xp: 150000, hd: "8d8", bab: 5, thac0: 14, saves: [8, 9, 10, 10, 12] },
+          { xp: 300000, hd: "9d8", bab: 5, thac0: 14, saves: [8, 9, 10, 10, 12] },
+          { xp: 425000, hd: "9d8+2", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 10] },
+          { xp: 550000, hd: "9d8+4", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 10] },
+          { xp: 675000, hd: "9d8+6", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 10] },
+          { xp: 800000, hd: "9d8+8", bab: 9, thac0: 10, saves: [4, 5, 6, 5, 8] },
+          { xp: 925000, hd: "9d8+10", bab: 9, thac0: 10, saves: [4, 5, 6, 5, 8] },
+        ],
+        svirfneblin: [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [8, 9, 10, 14, 11] },
+          { xp: 2400, hd: "2d6", bab: 0, thac0: 19, saves: [8, 9, 10, 14, 11] },
+          { xp: 4800, hd: "3d6", bab: 0, thac0: 19, saves: [8, 9, 10, 14, 11] },
+          { xp: 10000, hd: "4d6", bab: 2, thac0: 17, saves: [6, 7, 8, 11, 9] },
+          { xp: 20000, hd: "5d6", bab: 2, thac0: 17, saves: [6, 7, 8, 11, 9] },
+          { xp: 40000, hd: "6d6", bab: 2, thac0: 17, saves: [6, 7, 8, 11, 9] },
+          { xp: 80000, hd: "7d6", bab: 5, thac0: 14, saves: [4, 5, 6, 9, 7] },
+          { xp: 160000, hd: "8d6", bab: 5, thac0: 14, saves: [4, 5, 6, 9, 7] },
+        ],
+        "the elf": [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 12] },
+          { xp: 4000, hd: "2d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 12] },
+          { xp: 8000, hd: "3d6", bab: 0, thac0: 19, saves: [12, 13, 13, 15, 12] },
+          { xp: 16000, hd: "4d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 10] },
+          { xp: 32000, hd: "5d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 10] },
+          { xp: 64000, hd: "6d6", bab: 2, thac0: 17, saves: [10, 11, 11, 13, 10] },
+          { xp: 120000, hd: "7d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 8] },
+          { xp: 250000, hd: "8d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 8] },
+          { xp: 400000, hd: "9d6", bab: 5, thac0: 14, saves: [8, 9, 9, 10, 8] },
+          { xp: 600000, hd: "9d6+1", bab: 7, thac0: 12, saves: [6, 7, 8, 8, 6] },
+        ],
+        grimalkin: [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 3125, hd: "2d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 6250, hd: "3d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 12500, hd: "4d6", bab: 0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+          { xp: 25000, hd: "5d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 50000, hd: "6d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 100000, hd: "7d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 200000, hd: "8d6", bab: 2, thac0: 17, saves: [9, 10, 12, 14, 12] },
+          { xp: 300000, hd: "9d6", bab: 5, thac0: 14, saves: [6, 7, 9, 11, 9] },
+          { xp: 400000, hd: "9d6+1", bab: 5, thac0: 14, saves: [6, 7, 9, 11, 9] },
+        ],
+        "moss dwarf": [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 2200, hd: "2d6", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 4400, hd: "3d6", bab: 0, thac0: 19, saves: [8, 9, 10, 13, 12] },
+          { xp: 8800, hd: "4d6", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 17000, hd: "5d6", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 35000, hd: "6d6", bab: 2, thac0: 17, saves: [6, 7, 8, 10, 10] },
+          { xp: 70000, hd: "7d6", bab: 5, thac0: 14, saves: [4, 5, 6, 7, 8] },
+          { xp: 140000, hd: "8d6", bab: 5, thac0: 14, saves: [4, 5, 6, 7, 8] },
+        ],
+        woodgrue: [
+          { xp: 0, hd: "1d6", bab: 0, thac0: 19, saves: [13, 12, 14, 16, 14] },
+          { xp: 2000, hd: "2d6", bab: 0, thac0: 19, saves: [13, 12, 14, 16, 14] },
+          { xp: 4000, hd: "3d6", bab: 0, thac0: 19, saves: [13, 12, 14, 16, 14] },
+          { xp: 8000, hd: "4d6", bab: 0, thac0: 19, saves: [13, 12, 14, 16, 14] },
+          { xp: 16000, hd: "5d6", bab: 2, thac0: 17, saves: [11, 10, 11, 14, 11] },
+          { xp: 32500, hd: "6d6", bab: 2, thac0: 17, saves: [11, 10, 11, 14, 11] },
+          { xp: 65000, hd: "7d6", bab: 2, thac0: 17, saves: [11, 10, 11, 14, 11] },
+          { xp: 130000, hd: "8d6", bab: 2, thac0: 17, saves: [11, 10, 11, 14, 11] },
+          { xp: 250000, hd: "9d6", bab: 5, thac0: 14, saves: [8, 7, 9, 11, 9] },
+          { xp: 400000, hd: "9d6+1", bab: 5, thac0: 14, saves: [8, 7, 9, 11, 9] },
+        ],
+        "normal human": [
+          { xp: 0, hd: "2", bab: -1, thac0: 20, saves: [14, 15, 16, 17, 18] },
+        ],
+        monster: [
+          { bab: 0, thac0: 19, saves: [12, 13, 14, 15, 16], xp: [10, 15] }, // 1
+          { bab: 1, thac0: 18, saves: [12, 13, 14, 15, 16], xp: [20, 25] }, // 2
+          { bab: 2, thac0: 17, saves: [12, 13, 14, 15, 16], xp: [35, 50] }, // 3
+          { bab: 3, thac0: 16, saves: [10, 11, 12, 13, 14], xp: [75, 125] }, // 4
+          { bab: 4, thac0: 15, saves: [10, 11, 12, 13, 14], xp: [175, 225] }, // 5
+          { bab: 5, thac0: 14, saves: [10, 11, 12, 13, 14], xp: [275, 350] }, // 6
+          { bab: 6, thac0: 13, saves: [8, 9, 10, 10, 12], xp: [450, 450] }, // 7
+          { bab: 7, thac0: 12, saves: [8, 9, 10, 10, 12], xp: [650, 650] }, // 8
+          { bab: 7, thac0: 12, saves: [8, 9, 10, 10, 12], xp: [900, 900] }, // 9
+          { bab: 8, thac0: 11, saves: [6, 7, 8, 8, 10], xp: [900, 900] }, // 10
+          { bab: 8, thac0: 11, saves: [6, 7, 8, 8, 10], xp: [1100, 1100] }, // 11
+          { bab: 9, thac0: 10, saves: [6, 7, 8, 8, 10], xp: [1100, 1100] }, // 12
+          { bab: 9, thac0: 10, saves: [4, 5, 6, 5, 8], xp: [1350, 1350] }, // 13
+          { bab: 10, thac0: 9, saves: [4, 5, 6, 5, 8], xp: [1350, 1350] }, // 14
+          { bab: 10, thac0: 9, saves: [4, 5, 6, 5, 8], xp: [1350, 1350] }, // 15
+          { bab: 11, thac0: 8, saves: [2, 3, 4, 3, 6], xp: [1350, 1350] }, // 16
+          { bab: 11, thac0: 8, saves: [2, 3, 4, 3, 6], xp: [2000, 2000] }, // 17
+          { bab: 12, thac0: 7, saves: [2, 3, 4, 3, 6], xp: [2000, 2000] }, // 18
+          { bab: 12, thac0: 7, saves: [2, 2, 2, 2, 4], xp: [2000, 2000] }, // 19
+          { bab: 13, thac0: 6, saves: [2, 2, 2, 2, 4], xp: [2000, 2000] }, // 20
+          { bab: 13, thac0: 6, saves: [2, 2, 2, 2, 4], xp: [2500, 2500] }, // 21
+          { bab: 14, thac0: 5, saves: [2, 2, 2, 2, 2], xp: [2500, 2500] }, // 22+
+        ],
+      };
+
+      getAttrs(
+        ["level", "class", "monsterHitDice", "monsterHitDiceModifier"],
+        function (values) {
+          const charClass = values.class.toLowerCase();
+
+          // Do not modify if using custom class
+          if (charClass === "custom") return;
+
+          const level = parseInt(values.level, 10);
+          const monsterHitDice = Math.ceil(values.monsterHitDice); // Round up
+
+          if (charClass === "monster" && Number.isInteger(monsterHitDice)) {
+            // Ensure we always use the highest saves and such for HD 22+
+            const clampedMonsterHitDice =
+              monsterHitDice > 22 ? 22 : monsterHitDice;
+            const { bab, thac0, saves, xp } = classData["monster"][
+              clampedMonsterHitDice - 1
+            ];
+            const [baseXP, baseXPPlus] = xp;
+            const hitDiceModifier = parseInt(values.monsterHitDiceModifier, 10);
+            setAttrs({
+              monsterBAB: bab,
+              monsterThac0: thac0,
+              saveD: saves[0],
+              saveW: saves[1],
+              saveP: saves[2],
+              saveB: saves[3],
+              saveS: saves[4],
+              monsterXPValue: hitDiceModifier ? baseXPPlus : baseXP,
+            });
+          } else if (charClass === "normal human") {
+            const { hd, bab, thac0, saves } = classData["normal human"][0];
+            setAttrs({
+              hd: hd,
+              bab: bab,
+              thac0: thac0,
+              saveD: saves[0],
+              saveW: saves[1],
+              saveP: saves[2],
+              saveB: saves[3],
+              saveS: saves[4],
+            });
+          } else if (classData[charClass] && classData[charClass][level - 1]) {
+            const nextXp = classData[charClass][level]
+              ? classData[charClass][level].xp
+              : "";
+            const { hd, bab, thac0, saves } = classData[charClass][level - 1];
+            setAttrs({
+              Next: nextXp,
+              hitdice: hd,
+              bab: bab,
+              thac0: thac0,
+              saveD: saves[0],
+              saveW: saves[1],
+              saveP: saves[2],
+              saveB: saves[3],
+              saveS: saves[4],
+            });
+          }
+        }
+      );
+    }
+  );
+
+  // Show/hide Roll/Describe buttons for spells
+  on("change:repeating_spells:spellEffect", function (eventInfo) {
+    if (eventInfo.newValue && eventInfo.newValue !== "") {
+      setAttrs({ repeating_spells_spellRollType: "roll" });
+    } else {
+      setAttrs({ repeating_spells_spellRollType: "describe" });
+    }
+  });
+
+  // Set savesAs to hide/show savesAs level for monsters
+  on("sheet:opened change:class", function () {
+    getAttrs(["class"], function (values) {
+      if (
+        ["monster", "normal human", "custom"].indexOf(
+          values.class.toLowerCase()
+        ) >= 0
+      ) {
+        setAttrs({ savesAs: "monster" });
+      } else {
+        setAttrs({ savesAs: "character" });
+      }
+    });
+  });
+
+  // Set averageHP for monsters automatically
+  on(
+    "sheet:opened change:monsterHitDice change:monsterHitDiceModifier",
+    function () {
+      getAttrs(["monsterHitDice", "monsterHitDiceModifier"], function (values) {
+        setAttrs({
+          averageHP:
+            Math.floor(parseInt(values.monsterHitDice, 10) * 4.5) +
+            parseInt(values.monsterHitDiceModifier, 10),
+        });
+      });
+    }
+  );
+
+  // Monster Average HP Button
+  on("clicked:setAverageHP", function () {
+    getAttrs(["monsterHitDice", "monsterHitDiceModifier"], function (values) {
+      const averageHP = Math.floor(
+        parseInt(values.monsterHitDice, 10) * 4.5 +
+        parseInt(values.monsterHitDiceModifier, 10)
+      );
+      setAttrs({
+        HP: averageHP,
+        HP_max: averageHP,
+      });
+    });
+  });
+</script>

@@ -1,5 +1,24 @@
 module.exports = function(grunt) {
   grunt.initConfig({
+    jshint: {
+      dist: {
+        src: ['js/worker.js']
+      },
+      options: {
+        esversion: 6,
+        globals: {
+          '_': true,
+          'generateRowID': true,
+          'getAttrs': true,
+          'getSectionIDs': true,
+          'on': true,
+          'setAttrs': true
+        },
+        strict: true,
+        sub: true,
+        undef: true
+      }
+    },
     less: {
       default: {
         files: {
@@ -18,7 +37,7 @@ module.exports = function(grunt) {
       }
     },
     'string-replace': {
-      default: {
+      css: {
         files: {
           'sheet.css': 'sheet.css'
         },
@@ -31,11 +50,30 @@ module.exports = function(grunt) {
             {
               pattern: /\.((?!charsheet)[^ .\n]+)(?=.+\{)/g,
               replacement: function(match, p1) {
-                if(p1 === 'itemcontrol' || p1 === 'repcontrol')
+                if(p1 === 'itemcontrol' || p1 === 'repcontainer' || p1 === 'repcontrol' || p1 === 'repitem')
                   return '.' + p1;
                 else
                   return '.sheet-' + p1;
               }
+            },
+            {
+              pattern: /#([^ .\n]+)(?=.+\{)/g,
+              replacement: function(match, p1) {
+                return `#sheet-${p1}`;
+              }
+            }
+          ]
+        }
+      },
+      html: {
+        files: {
+          'sheet.html': 'sheet.html'
+        },
+        options: {
+          replacements: [
+            {
+              pattern: /SCRIPT_VERSION/g,
+              replacement: '1.6'
             }
           ]
         }
@@ -43,9 +81,10 @@ module.exports = function(grunt) {
     }
   });
 
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-pug');
   grunt.loadNpmTasks('grunt-string-replace');
 
-  grunt.registerTask('default', ['less', 'pug', 'string-replace']);
+  grunt.registerTask('default', ['jshint', 'less', 'pug', 'string-replace:css', 'string-replace:html']);
 };

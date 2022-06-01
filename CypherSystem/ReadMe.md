@@ -83,7 +83,7 @@ The optional [API script](https://github.com/Roll20/roll20-api-scripts/blob/mast
 Layout changes: larger stat pools and slightly smaller buttons.
 
 Addition of 2 API buttons: reset Action parameters, and reset/complete rest of the character.
-The optional [API script](https://github.com/Roll20/roll20-api-scripts/blob/master/CypherSystemSheet/cyphersystemsheet.js) must be updated.
+The optional [API script](https://github.com/Roll20/roll20-api-scripts/blob/master/CypherSystemSheet/1.2/cyphersystemsheet.js) must be updated.
 
 ## Release 1.0 (September 2015)
 Creation of the sheet.
