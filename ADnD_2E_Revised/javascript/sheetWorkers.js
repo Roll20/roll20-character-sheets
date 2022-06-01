@@ -1052,6 +1052,11 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
                 [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
                 [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
                 [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
+                [`repeating_spells-${section}_spell-subtlety`]     : spell['subtlety'] || '',
+                [`repeating_spells-${section}_spell-sensory`]      : spell['sensory'] || '',
+                [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
+                [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
+                [`repeating_spells-${section}_spell-crit`]         : spell['crit-size'] || '',
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
             if (section.startsWith('wiz')) {
