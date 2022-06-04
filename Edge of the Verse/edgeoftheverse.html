@@ -35,11 +35,11 @@
         <div class="nav-tabs">
             <label class="nav-button">
                 <input type="radio"  name="attr_page" value="page1" checked="checked">
-                <span>лист 1</span>
+                <span>амплуа</span>
             </label>
             <label class="nav-button">
                 <input type="radio"  name="attr_page" value="page2">
-                <span>лист 2</span>
+                <span>характеристики и снаряжение</span>
             </label>
             <label class="nav-button">
                 <input type="radio"  name="attr_page" value="page3">
@@ -8262,6 +8262,7 @@
     }
 
     on("change:repeating_moves:expanddescriptionval", function() {
+        const opts = ["opt1", "opt2", "opt3", "opt4", "opt5", "opt6"]
         getAttrs([
             "repeating_moves_movetrigger",
             "repeating_moves_move_doroll",
@@ -8270,7 +8271,10 @@
             "repeating_moves_movepartial",
             "repeating_moves_movemiss",
             "repeating_moves_movedetails",
-            "repeating_moves_moveoptional"
+            "repeating_moves_moveoptional",
+            ...opts.map(o => `repeating_moves_${o}`),
+            ...opts.map(o => `repeating_moves_${o}name`),
+            ...opts.map(o => `repeating_moves_${o}details`)
         ], function(v) {
             var text = ''
             if(v.repeating_moves_movetrigger) text += `Когда: ${v.repeating_moves_movetrigger}\r\n` 
@@ -8283,10 +8287,19 @@
                 if(v.repeating_moves_movepartial) text += `При частичном успехе: ${v.repeating_moves_movepartial}\r\n`
                 if(v.repeating_moves_movemiss) text += `При провале: ${v.repeating_moves_movemiss}\r\n`
             }
-            if(v.repeating_moves_movedetails) text += `${v.repeating_moves_movedetails}\r\n\r\n`
-            if(v.repeating_moves_moveoptional) text += `${v.repeating_moves_moveoptional}`
+            if(v.repeating_moves_movedetails) text += `${v.repeating_moves_movedetails}\r\n\r\n`;
+            let moveoptional = ''
+            for(let o of opts)  {
+                if(v[`repeating_moves_${o}`]==="1") {
+                  moveoptional += `• ${v[`repeating_moves_${o}name`]}: ${v[`repeating_moves_${o}details`]}
+
+`
+                }
+            }
+            if(v.repeating_moves_moveoptional) text += `${moveoptional || v.repeating_moves_moveoptional}`
             setAttrs({
-                repeating_moves_movetext: text || ' '
+                repeating_moves_movetext: text || ' ',
+                repeating_moves_moveoptional: moveoptional || v.repeating_moves_moveoptional || ' '
             });
         })
     }) 
@@ -8422,6 +8435,7 @@
 
     /* MOVES-UPGRADE SECTION START */
     on("change:repeating_moves-upgrade:expanddescriptionval", function() {
+        const opts = ["opt1", "opt2", "opt3", "opt4", "opt5", "opt6"]
         getAttrs([
             "repeating_moves-upgrade_movetrigger",
             "repeating_moves-upgrade_move_doroll",
@@ -8430,7 +8444,10 @@
             "repeating_moves-upgrade_movepartial",
             "repeating_moves-upgrade_movemiss",
             "repeating_moves-upgrade_movedetails",
-            "repeating_moves-upgrade_moveoptional"
+            "repeating_moves-upgrade_moveoptional",
+            ...opts.map(o => `repeating_moves-upgrade_${o}`),
+            ...opts.map(o => `repeating_moves-upgrade_${o}name`),
+            ...opts.map(o => `repeating_moves-upgrade_${o}details`)
         ], function(v) {
             var text = ''
             if(v["repeating_moves-upgrade_movetrigger"]) text += `Когда: ${v["repeating_moves-upgrade_movetrigger"]}\r\n` 
@@ -8443,10 +8460,19 @@
                 if(v["repeating_moves-upgrade_movepartial"]) text += `При частичном успехе: ${v["repeating_moves-upgrade_movepartial"]}\r\n`
                 if(v["repeating_moves-upgrade_movemiss"]) text += `При провале: ${v["repeating_moves-upgrade_movemiss"]}\r\n`
             }
-            if(v["repeating_moves-upgrade_movedetails"]) text += `${v["repeating_moves-upgrade_movedetails"]}\r\n\r\n`
-            if(v["repeating_moves-upgrade_moveoptional"]) text += `${v["repeating_moves-upgrade_moveoptional"]}`
+            if(v["repeating_moves-upgrade_movedetails"]) text += `${v["repeating_moves-upgrade_movedetails"]}\r\n\r\n`;
+            let moveoptional = ''
+            for(let o of opts)  {
+                if(v[`repeating_moves-upgrade_${o}`]==="1") {
+                  moveoptional += `• ${v[`repeating_moves-upgrade_${o}name`]}: ${v[`repeating_moves-upgrade_${o}details`]}
+
+`
+                }
+            }
+            if(v["repeating_moves-upgrade_moveoptional"]) text += `${moveoptional || v["repeating_moves-upgrade_moveoptional"]}`
             setAttrs({
-                "repeating_moves-upgrade_movetext": text || ' '
+                "repeating_moves-upgrade_movetext": text || ' ',
+                "repeating_moves-upgrade_moveoptional": moveoptional || v["repeating_moves-upgrade_moveoptional"] || ' '
             });
         })
     }) 
