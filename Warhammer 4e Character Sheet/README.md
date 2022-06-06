@@ -73,6 +73,11 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+June 6th 2022 v1.56.1
+
+- Fixed NPC weapon rolls not working when Talent Integration is disabled.
+
+
 May 20th 2022 v1.56
 
 Winds of Magic update
