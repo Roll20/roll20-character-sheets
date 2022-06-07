@@ -4467,6 +4467,14 @@
 				</label>
 				<h1>Use Hit Location System</h1>
 			</div>
+			
+			<div class="item-options-row">
+				<label class="container-checkbox">
+					<input type="checkbox" name="attr_optionTakesNoSTUN">
+					<span class="checkmark"></span>
+				</label>
+				<h1>Takes No STUN</h1>
+			</div>
 		</div>
 	</div>
 </div>
@@ -4493,6 +4501,9 @@
 	  	<span><input class="tally" type="number" value="0" min="0" name=attr_totalCharacterCost readonly="true" tabindex="-1"/></span>
 	</div>
 </div>
+
+<!-- Hidden variables to protect characteristics during option changes -->
+<input type="hidden" name="attr_hiddenSTUN"  value="20"/>
 
 <!-- Some hidden variables to help simplify skill point calculations -->
 <input type="hidden" name="attr_hiddenSet1SkillsCost"  value="0"/>
@@ -4811,22 +4822,36 @@
 	
 	// Add 1 to currentSTUN
 	on("clicked:currentSTUNplus", function () {
-		getAttrs(["currentSTUN"], function(values) {
-			const currentValue = parseInt(values.currentSTUN)||0;
+		getAttrs(["currentSTUN", "optionTakesNoSTUN"], function(values) {
+			let currentValue = parseInt(values.currentSTUN)||0;
+			const takesNoSTUN = values.optionTakesNoSTUN;
 			
+			if (takesNoSTUN != 0) {
+				currentValue = 0;
+			} else {
+				currentValue = currentValue+1;
+			}
+					
 			setAttrs({
-				"currentSTUN":currentValue+1
+				"currentSTUN":currentValue
 			});
 		});
 	});
 	
 	// Subtract 1 from currentSTUN
 	on("clicked:currentSTUNminus", function () {
-		getAttrs(["currentSTUN"], function(values) {
-			const currentValue = parseInt(values.currentSTUN)||0;
+		getAttrs(["currentSTUN", "optionTakesNoSTUN"], function(values) {
+			let currentValue = parseInt(values.currentSTUN)||0;
+			const takesNoSTUN = values.optionTakesNoSTUN;
 			
+			if (takesNoSTUN != 0) {
+				currentValue = 0;
+			} else {
+				currentValue = currentValue-1;
+			}
+					
 			setAttrs({
-				"currentSTUN":currentValue-1
+				"currentSTUN":currentValue
 			});
 		});
 	});
@@ -4906,22 +4931,36 @@
 	
 	// Add 1 to gearCurrentSTUN
 	on("clicked:gearCurrentSTUNplus", function () {
-		getAttrs(["gearCurrentSTUN"], function(values) {
-			const currentValue = parseInt(values.gearCurrentSTUN)||0;
+		getAttrs(["gearCurrentSTUN", "optionTakesNoSTUN"], function(values) {
+			let currentValue = parseInt(values.gearCurrentSTUN)||0;
+			const takesNoSTUN = values.optionTakesNoSTUN;
+			
+			if (takesNoSTUN != 0) {
+				currentValue = 0;
+			} else {
+				currentValue = currentValue +1;
+			}
 			
 			setAttrs({
-				"gearCurrentSTUN":currentValue+1
+				"gearCurrentSTUN":currentValue
 			});
 		});
 	});
 	
 	// Subtract 1 from gearCurrentSTUN
 	on("clicked:gearCurrentSTUNminus", function () {
-		getAttrs(["gearCurrentSTUN"], function(values) {
-			const currentValue = parseInt(values.gearCurrentSTUN)||0;
+		getAttrs(["gearCurrentSTUN", "optionTakesNoSTUN"], function(values) {
+			let currentValue = parseInt(values.gearCurrentSTUN)||0;
+			const takesNoSTUN = values.optionTakesNoSTUN;
 			
+			if (takesNoSTUN != 0) {
+				currentValue = 0;
+			} else {
+				currentValue = currentValue -1;
+			}
+					
 			setAttrs({
-				"gearCurrentSTUN":currentValue-1
+				"gearCurrentSTUN":currentValue
 			});
 		});
 	});
@@ -5414,18 +5453,24 @@
 	});
 	
 	// Update hidden attribute currentDCV
-	on("change:dcv change:weightDexDCVPenalty change:shieldDCV change:bonusDCVmodifier change:useCharacteristicMaximums", function () {
-		getAttrs(["dcv","useCharacteristicMaximums","currentDCV","weightDexDCVPenalty","shieldDCV","bonusDCVmodifier"], function(values) {
+	on("change:dcv change:weightDexDCVPenalty change:shieldDCV change:bonusDCVmodifier change:useCharacteristicMaximums change:optionTakesNoSTUN", function () {
+		getAttrs(["dcv","useCharacteristicMaximums","currentDCV","weightDexDCVPenalty","shieldDCV","bonusDCVmodifier", "optionTakesNoSTUN"], function(values) {
 		  
 			const statValue = parseInt(values.dcv)||0;
 			const shieldBonus = parseInt(values.shieldDCV)||0;
 			const weightPenalty = parseInt(values.weightDexDCVPenalty)||0;
 			const bonusModifier = parseInt(values.bonusDCVmodifier)||0;
 			const useMaximums = values.useCharacteristicMaximums;
-			const baseStat = 3;
+			const takesNoSTUN = values.optionTakesNoSTUN;
+			let baseStat = 3;
 			const maxStat = 8;
-			const costStat = 5;
+			let costStat = 5;
 			let statCP = 0;
+			
+			// Automaton defenses cost triple.
+			if (takesNoSTUN != 0) {
+				costStat = costStat*3;
+			}
 	
 			if ( (statValue>maxStat) && (useMaximums != 0) ) {
 				statCP=(statValue-maxStat)*costStat+(statValue-baseStat)*costStat;
@@ -5472,15 +5517,21 @@
 	});
 	
 	// Update Mental Defensive Combat Value
-	on("change:dmcv change:useCharacteristicMaximums", function () {
-		getAttrs(["dmcv","useCharacteristicMaximums"], function(values) {
+	on("change:dmcv change:useCharacteristicMaximums change:optionTakesNoSTUN", function () {
+		getAttrs(["dmcv","useCharacteristicMaximums", "optionTakesNoSTUN"], function(values) {
 		  
 			const statValue = parseInt(values.dmcv)||0;
 			const useMaximums = values.useCharacteristicMaximums;
+			const takesNoSTUN = values.optionTakesNoSTUN;
 			const baseStat = 3;
 			const maxStat = 8;
-			const costStat = 3;
+			let costStat = 3;
 			let statCP = 0;
+			
+			// Automaton defenses cost triple.
+			if (takesNoSTUN != 0) {
+				costStat = costStat*3;
+			}
 	
 			if ( (statValue>maxStat) && (useMaximums != 0) ) {
 				statCP=(statValue-maxStat)*costStat+(statValue-baseStat)*costStat;
@@ -5646,15 +5697,22 @@
 	});
 	
 	// Update Physical Defense
-	on("change:pd change:useCharacteristicMaximums", function () {
-		getAttrs(["pd","useCharacteristicMaximums"], function(values) {
+	on("change:pd change:useCharacteristicMaximums change:optionTakesNoSTUN", function () {
+		getAttrs(["pd","useCharacteristicMaximums", "optionTakesNoSTUN"], function(values) {
 		  
 			const statValue = parseInt(values.pd)||0;
 			const useMaximums = values.useCharacteristicMaximums;
-			const baseStat = 2;
+			const takesNoSTUN = values.optionTakesNoSTUN;
+			let baseStat = 2;
 			const maxStat = 8;
-			const costStat = 1;
+			let costStat = 1;
 			let statCP = 0;
+			
+			// Automaton defenses cost triple.
+			if (takesNoSTUN != 0) {
+				costStat = costStat*3;
+				baseState = 1;
+			}
 	
 			if ( (statValue>maxStat) && (useMaximums != 0) ) {
 				statCP=(statValue-maxStat)*costStat+(statValue-baseStat)*costStat;
@@ -5673,15 +5731,22 @@
 	});
 	
 	// Update Energy Defense
-	on("change:ed change:useCharacteristicMaximums", function () {
-		getAttrs(["ed","useCharacteristicMaximums"], function(values) {
+	on("change:ed change:useCharacteristicMaximums change:optionTakesNoSTUN", function () {
+		getAttrs(["ed","useCharacteristicMaximums", "optionTakesNoSTUN"], function(values) {
 		  
 			const statValue = parseInt(values.ed)||0;
 			const useMaximums = values.useCharacteristicMaximums;
-			const baseStat = 2;
+			const takesNoSTUN = values.optionTakesNoSTUN;
+			let baseStat = 2;
 			const maxStat = 8;
-			const costStat = 1;
+			let costStat = 1;
 			let statCP = 0;
+			
+			// Automaton defenses cost triple.
+			if (takesNoSTUN != 0) {
+				costStat = costStat*3;
+				baseState = 1;
+			}
 	
 			if ( (statValue>maxStat) && (useMaximums != 0) ) {
 				statCP=(statValue-maxStat)*costStat+(statValue-baseStat)*costStat;
@@ -5726,27 +5791,69 @@
 		});
 	});
 	
+	// Handle STUN data when optionTakesNoSTUN is checked.
+	on("change:optionTakesNoSTUN", function () {
+		getAttrs(["optionTakesNoSTUN", "stun", "hiddenSTUN"], function(values) {
+		  
+			const takesNoSTUN = values.optionTakesNoSTUN;
+			let statValue = values.stun;
+	
+			// Store STUN in hiddenSTUN and then set it to zero.
+			if (takesNoSTUN != 0) {
+				savedStatValue = statValue;
+				statValue = 0;
+			} else {
+				statValue = savedStatValue;
+			}
+			
+			// Update character. Reset health status.
+			setAttrs({
+				"hiddenSTUN":savedStatValue,
+				"stun":statValue,
+				"currentSTUN":statValue,
+				"gearCurrentSTUN":statValue
+			});
+			
+			// Update characteristics cost
+			sumCharacteristicPoints();
+		});
+	});
+	
 	// Update STUN
-	on("change:stun change:useCharacteristicMaximums", function () {
-		getAttrs(["stun","useCharacteristicMaximums"], function(values) {
+	on("change:stun change:useCharacteristicMaximums change:optionTakesNoSTUN", function () {
+		getAttrs(["stun","useCharacteristicMaximums", "hiddenSTUN", "optionTakesNoSTUN"], function(values) {
 		  
 			const statValue = parseInt(values.stun)||0;
 			const useMaximums = values.useCharacteristicMaximums;
-			const baseStat = 20;
+			const takesNoSTUN = values.optionTakesNoSTUN;
+			let baseStat = 20;
 			const maxStat = 50;
 			const costStat = 0.5;
 			let statCP = 0;
-	
-			if ( (statValue>maxStat) && (useMaximums != 0) ) {
-				statCP=(statValue-maxStat)*costStat+(statValue-baseStat)*costStat;
-			} else {
-				statCP=(statValue-baseStat)*costStat;
-			}	
 			
-			// Update cost	
-			setAttrs({
-				"stunCP":heroRoundLow(statCP)
-			});
+			// If option takesNoSTUN is not checked. Save the new value of STUN.
+			if (takesNoSTUN != 0) {
+				
+				// Reset STUN and cost to zero.
+				setAttrs({
+					"stun":0,
+					"stunCP":0
+				});
+				
+			} else {
+				
+				// Calculate costs, save stun to hiddenSTUN, and calculate cost.
+				if ( (statValue>maxStat) && (useMaximums != 0) ) {
+					statCP=(statValue-maxStat)*costStat+(statValue-baseStat)*costStat;
+				} else {
+					statCP=(statValue-baseStat)*costStat;
+				}
+				
+				setAttrs({
+					"hiddenSTUN":statValue,
+					"stunCP":heroRoundLow(statCP)
+				});
+			}	
 			
 			// Update costs
 			sumCharacteristicPoints();
@@ -5806,6 +5913,7 @@
 			sumCharacteristicPoints();
 		});
 	});
+	
 	
 	// Movement abilities
 	
