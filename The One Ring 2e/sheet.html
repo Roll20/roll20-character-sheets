@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="02-12-01" />
+<input type="hidden" name="attr_version" value="02-13-01" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -2548,7 +2548,25 @@
                     });
                 }
             }
-            
+
+            if (build < 18) {
+                attrs["build"] = 18;
+                let releaselog = {msg:""};
+                hlog(`Release 02.13.01 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### CSS
+- fixed protection roll-button may be not available with minimal width             
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
             /*
             if (build === 9) {
                 attrs["build"] = 8;

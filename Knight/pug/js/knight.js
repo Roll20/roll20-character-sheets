@@ -1959,12 +1959,15 @@ on('clicked:selectionMALWarmasterWarlord', async () => {
 on('clicked:selectionMALPsion', async () => {
   const attrs = await getAttrsAsync([
     'listeModeMALPsion',
+    'listeModeMALPsion2',
   ]);
 
   const choix = parseInt(attrs.listeModeMALPsion, 10) || 0;
+  const choix2 = parseInt(attrs.listeModeMALPsion2, 10) || 0;
 
   await setAttrsAsync({
     malpsionmode: choix,
+    malpsionmode2: choix2,
     popup: 0,
   });
 });
