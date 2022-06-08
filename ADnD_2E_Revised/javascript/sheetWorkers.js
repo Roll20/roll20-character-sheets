@@ -1633,7 +1633,7 @@ on('clicked:repeating_weapons-damage:crit2', function(eventInfo) {
         '(@{misc-mod})'
     ].join('+');
 
-    poCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc)
+    weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc)
 });
 
 on('clicked:repeating_ammo:crit2', function (eventInfo) {
@@ -1658,7 +1658,7 @@ on('clicked:repeating_ammo:crit2', function (eventInfo) {
         '(@{misc-mod})'
     ].join('+');
 
-    poCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc)
+    weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc)
 });
 
 const SPELL_HITS_REGEX = /\((\dd\d\+?\d?|\d) hit/i;
@@ -1869,7 +1869,7 @@ function setupSpellCrit(section) {
             }
 
             rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''}`);
-            let attackType = await extractQueryResult('?{How are you attacking?|Regular Attack|Low Attack|High Attack|Called Shot}');
+            let attackType = await extractQueryResult(`?{How are you attacking?|Regular Attack|Low Attack|High Attack${spellSizeCategory === 2 ? '|Called Shot' : ''}}`);
             rollBuilder.push(`attack=${attackType}`);
 
             let locationDice;
@@ -2003,7 +2003,7 @@ function critEffectExplanations(critEffect, set) {
     })
 }
 
-function poCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc) {
+function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc) {
     getAttrs(fields, async function (values) {
         let rollBuilder = ['character=@{character_name}'];
 
@@ -2011,7 +2011,7 @@ function poCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc)
         let weaponSize = displaySize(values[prefix+'size']);
         if (weaponName.match(/heavy (crossbow|quarrel|bolt)/i)) {
             weaponSize = 'Large';
-        } else if (weaponName.match(/arrow|quarrel|bolt|bow|crossbow/i)) {
+        } else if (weaponName.match(/arrow|quarrel|bolt/i)) {
             weaponSize = 'Medium';
         }
         let weaponType = values[prefix+'type'];
