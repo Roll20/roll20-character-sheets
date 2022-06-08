@@ -1702,7 +1702,7 @@ async function recursiveAdditionalHit(additionalLocations, iteration, additional
     let additionalLocation = additionalLocations.find(l => additionalLocationRoll <= l.chance);
     let displayAdditionalLocationRoll = additionalLocations.length === 1
         ? ''
-        :` (1d100:${additionalLocationRoll})`;
+        :`(1d100:${additionalLocationRoll})`;
     let severityRoll = await debugSeverity(severityDice);
     let generalLocation = additionalLocation.general;
     let specificLocation = additionalLocation.specific;
@@ -1716,7 +1716,7 @@ async function recursiveAdditionalHit(additionalLocations, iteration, additional
         locationNote = SPELL_CRIT_13_EFFECT_TABLE[targetType]['Tail'].note;
     }
     let effectObj = lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set);
-    let displayAdditionalEffect = `Location ${iteration}, ${additionalString} hit, hitting **${specificLocation}**${locationNote}${displayAdditionalLocationRoll}=${effectObj.effect}`;
+    let displayAdditionalEffect = `Location ${iteration}, ${additionalString} hit, hitting **${specificLocation}** ${locationNote} ${displayAdditionalLocationRoll}=${effectObj.effect}`;
     rollBuilder.push(displayAdditionalEffect);
 
     return await recursiveAdditionalHit(effectObj.additionalLocations, iteration, additionalString+' additional', severityDice, boolObj, spellTypeTable, targetType, rollBuilder, set);
@@ -1868,7 +1868,6 @@ function setupSpellCrit(section) {
                 return;
             }
 
-            rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''}`);
             let attackType = await extractQueryResult(`?{How are you attacking?|Regular Attack|Low Attack|High Attack${spellSizeCategory === 2 ? '|Called Shot' : ''}}`);
             rollBuilder.push(`attack=${attackType}`);
 
@@ -1909,6 +1908,8 @@ function setupSpellCrit(section) {
                 case '2d8': rollBuilder.push(`severity=Mortal`); break;
             }
 
+            rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''} and rolling ${severityDice} for effect`);
+
             let boolObj = {};
             for (let i = 0; i < locationRolls.length; i++) {
                 let locationRoll = locationRolls[i];
@@ -1925,9 +1926,9 @@ function setupSpellCrit(section) {
                 let severityRoll = await debugSeverity(severityDice);
                 let displayLocationRoll = attackType === 'Called Shot'
                     ? ''
-                    : ` (${locationDice}:${locationRoll})`;
+                    : `(${locationDice}:${locationRoll})`;
                 let {effect, additionalLocations} = lookupEffect(severityRoll, spellTypeTable, locationObject.general, targetType, set);
-                let displayEffect = `Location ${i+1} hitting the **${locationObject.specific}**${locationNote}${displayLocationRoll}=${effect}`;
+                let displayEffect = `Location ${i+1} hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll}=${effect}`;
                 rollBuilder.push(displayEffect);
 
                 await recursiveAdditionalHit(additionalLocations, i+1, 'additional', severityDice, boolObj, spellTypeTable, targetType, rollBuilder, set);
@@ -2000,7 +2001,7 @@ function critEffectExplanations(critEffect, set) {
                 set.add('bleedingnote=1');
                 break;
         }
-    })
+    });
 }
 
 function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc) {
@@ -2034,11 +2035,12 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
         rollBuilder.push(`targetsize=${targetSize}`);
 
         let attackType = await extractQueryResult('?{How are you attacking?|Regular Attack|Low Attack|High Attack|Called Shot}');
+        rollBuilder.push(`attack=${attackType}`);
 
-        let locationDice;
+        let locationDice = '';
         let locationRoll;
+        let set = new Set();
         if (attackType === 'Called Shot') {
-            let set = new Set();
             let locationList = [];
             for (const [key, value] of Object.entries(LOCATION_TABLE[targetType])) {
                 let specificLocation = value.specific;
@@ -2047,6 +2049,7 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
                     locationList.push(`${specificLocation},${key}`)
                 }
             }
+            set.clear();
             locationRoll = await extractQueryResult(`?{Where are you hitting?|${locationList.join('|')}}`);
         } else {
             switch (attackType) {
@@ -2055,21 +2058,17 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
                 case 'High Attack': locationDice = '1d6+4'; break;
             }
             locationRoll = await extractRollResult(locationDice);
-            rollBuilder.push(`locationroll=[[${locationRoll}]]`);
-            rollBuilder.push(`locationdice=${locationDice}`)
         }
-        rollBuilder.push(`attack=${attackType}`);
 
         let locationObject = LOCATION_TABLE[targetType][locationRoll];
+        let locationNote = '';
         if (locationRoll < 5 && targetType !== 'Humanoid') {
             let isSnakeLike = await extractQueryResult('?{Is the target snakelike or fishlike?|No|Yes}');
             if (isSnakeLike === "Yes") {
                 locationObject = LOCATION_TABLE[targetType][5];
-                rollBuilder.push(`locationnote=${locationObject.note}`);
+                locationNote = locationObject.note;
             }
         }
-        if (locationObject)
-            rollBuilder.push(`location=${locationObject.specific}`);
 
         let severityDice;
         const sizeDiff = sizeToInt(weaponSize) - sizeToInt(targetSize);
@@ -2091,8 +2090,6 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
         let critEffect = '';
         let weaponTypeTable = WEAPON_CRIT_EFFECT_TABLE[weaponType];
         if (weaponTypeTable) {
-            rollBuilder.push(`severitydice=${severityDice}`);
-            rollBuilder.push(`severityroll=[[${severityRoll}]]`);
             if (severityRoll < 4) {
                 critEffect = 'No unusual effect'
             } else if (locationObject) {
@@ -2102,8 +2099,11 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
                 critEffect = 'No unusual effect';
             }
 
-            rollBuilder.push(`effect=${critEffect}`);
-            critEffectExplanations(critEffect, rollBuilder);
+            let displayLocationRoll = attackType === 'Called Shot'
+                ? ''
+                : `(${locationDice}:${locationRoll})`;
+            rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll}=[[${severityRoll}]]: ${critEffect}`)
+            critEffectExplanations(critEffect, set);
         }
 
         let weaponDamage = baseDamageFunc(targetSize, values);
@@ -2122,7 +2122,9 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
             rollBuilder.push(`damage=[[${damage}+[[${damageAdjFunc(values)}]] ]]`);
         }
 
-        let finalRollText = '&{template:2Epocrit} ' + rollBuilder.map(s => `{{${s}}}`).join(' ');
+        let displayHits = rollBuilder.map(s => `{{${s}}}`).join(' ');
+        let displayInjuries = Array.from(set).map(s => `{{${s}}}`).join(' ');
+        let finalRollText = `&{template:2Epocrit} ${displayHits} ${displayInjuries}`;
 
         console.log(finalRollText);
 
