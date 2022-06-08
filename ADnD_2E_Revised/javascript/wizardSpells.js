@@ -9410,7 +9410,7 @@ wiz3['Lesser Sign of Sealing'] = {
     'subtlety': '+2',
     'sensory': 'Medium visual',
     'knockdown': '[[d8]]',
-    'crit-size': 'Medium',
+    'crit-size': 'Medium (1 hit)',
     'materials': 'Can be a pinch of either powdered diamond (cold), ruby (fire), emerald (acid), pearl (sonic disruption), or sapphire (electricity), depending on the type of energy the wizard wishes the sign to employ. The value of the gemstone must be at least 100 gold pieces.',
     'reference': 'p. 144',
     'book': 'Player\'s Option: Spells & Magic',
