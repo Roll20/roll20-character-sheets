@@ -11537,10 +11537,11 @@
 			const state = parseInt(value[`${handsource}_state`]) || 0;
 			clog(debug, timer, 'state =', state);
 			if(state > 0) {
-				setWeaponStates(debug, timer, extraarmIDs, value, handsource, setObj);
+				//setWeaponStates(debug, timer, extraarmIDs, value, handsource, setObj);	
 				setActiveWeapon(debug, timer, value, handsource, setObj);
 				setCombatRoll(debug, timer, value, attrdb, value[`${source}_source`], sourceAttr, setObj);
 			}
+			clearWeaponStates(debug, timer, extraarmIDs, value, setObj);
 		}
 		
 		function setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute) {
@@ -13448,17 +13449,24 @@
 			return result;
 		}
 		
+		function clearWeaponStates(debug, timer, extraarmIDs, value, setObj) {
+			const handsArray = buildHandsArray(debug, timer, extraarmIDs);
+			_.each(handsArray, hand => {
+				writeValues(debug, timer, value, `${hand}_state`, 0, setObj);
+			});
+		}
+		
 		function setWeaponStates(debug, timer, extraarmIDs, value, handsource, setObj) {
 			clog(debug, timer, 'handsource =', handsource, 'setWeaponStates()');
 			const armedID = 
 				setObj[`${handsource}_source`] ||
 				value[`${handsource}_source`];
 			clog(debug, timer, 'armedID =', armedID);
-			const handSources = value[`repeating_attr_${armedID}_source`] !== undefined ?
-				value[`repeating_attr_${armedID}_source`].indexOf(',') !== -1 ?
-					value[`repeating_attr_${armedID}_source`].split(',') :
-					value[`repeating_attr_${armedID}_source`] : '';
-			const isTwoHanded = _.isArray(handSources);
+			//const handSources = value[`repeating_attr_${armedID}_source`] !== undefined ?
+			//	value[`repeating_attr_${armedID}_source`].indexOf(',') !== -1 ?
+			//		value[`repeating_attr_${armedID}_source`].split(',') :
+			//		value[`repeating_attr_${armedID}_source`] : '';
+			//const isTwoHanded = _.isArray(handSources);
 			const handsArray = buildHandsArray(debug, timer, extraarmIDs);
 			clog(debug, timer, 'handsArray =', handsArray);
 			const handsStateArray = 
@@ -13467,17 +13475,17 @@
 					clog(debug, timer, 'hand[source] =', `${hand}[${source}]`);
 					const state = parseInt(setObj[`${hand}_state`]) || parseInt(value[`${hand}_state`]) || 0;
 					clog(debug, timer, 'state =', state);
-					const isActive = //isNaN(parseInt(setObj[`repeating_attr_${source}_activate`])) ?
+					//const isActive = //isNaN(parseInt(setObj[`repeating_attr_${source}_activate`])) ?
 						//parseInt(value[`repeating_attr_${source}_activate`]) || 0 :
-						parseInt(setObj[`repeating_attr_${source}_activate`]) || 0;
-					clog(debug, timer, 'isActive =', isActive);
+					//	parseInt(setObj[`repeating_attr_${source}_activate`]) || 0;
+					//clog(debug, timer, 'isActive =', isActive);
 					//const sourceHandPosition = handSources.indexOf(hand);
 					const isExtraArm = extraarmIDs.indexOf(hand) !== -1 ? true : false;
 					const extraArmType = parseInt(value[`${hand}_type`]) || false;
 					const isWeaponMount = isExtraArm && extraArmType === 0 ? true : false;
 					const handstate = source == armedID ?
-						isTwoHanded ?
-							parseInt(setObj[`${handSources[0]}_state`]) || parseInt(value[`${handSources[0]}_state`]) === 0 ? 1 : 0 :
+						//isTwoHanded ?
+						//	parseInt(setObj[`${handSources[0]}_state`]) || parseInt(value[`${handSources[0]}_state`]) === 0 ? 1 : 0 :
 						state === 0 ? 1 : 0 : 0;
 					return handstate;
 				});
