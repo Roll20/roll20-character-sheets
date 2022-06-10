@@ -11533,8 +11533,9 @@
 		
 		function updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, source, sourceAttr, setObj){
 			const handsource = getHandSource(debug, timer, extraarmIDs, source);
+			clog(debug, timer, 'handsource =', handsource, 'updateWeaponStates()');
 			const state = parseInt(value[`${handsource}_state`]) || 0;
-			clog(debug, timer, 'state =', state, 'updateWeaponStates()');
+			clog(debug, timer, 'state =', state);
 			if(state > 0) {
 				setWeaponStates(debug, timer, extraarmIDs, value, handsource, setObj);
 				setActiveWeapon(debug, timer, value, handsource, setObj);
@@ -11706,7 +11707,7 @@
 							setArms(debug, timer, value, rowID, setObj, name, false, "offhand");
 							updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, "mainhand", sourceAttr, setObj);
 						} else {
-							if (source.indexOf(',') > 1) source = source.split(',');
+							if (source.indexOf(',') !== -1) source = source.split(',');
 							_.each(source, (extraarm, i) => {
 								if (extraarm === source[i]) {
 									setArms(debug, timer, value, rowID, setObj, name, false, extraarm);
@@ -12355,9 +12356,9 @@
 			return result;
 		}
 		
-		function setActiveWeapon(debug, timer, value, rowID, setObj) {
-			const state = parseInt(setObj[`${rowID}_state`]) || 0;
-			const source = state > 0 ? value[`${rowID}_source`] : '';
+		function setActiveWeapon(debug, timer, value, handsource, setObj) {
+			const state = parseInt(setObj[`${handsource}_state`]) || 0;
+			const source = state !== 0 ? value[`${handsource}_source`] : '';
 			clog(debug, timer, 'source =', source, 'setActiveWeapon()');
 			if (source !== undefined) {
 				//setObj.previous_weapon = setObj.active_weapon || value.active_weapon;
@@ -12488,8 +12489,10 @@
 			const capacitystate = parseInt(value.weapon_ammo_capacity) || 0;
 			clog(debug, timer, 'ammostate =', ammostate, 'setWeaponAmmo()');
 			clog(debug, timer, 'capacitystate =', capacitystate);
-			if (rowID !== setObj.previous_weapon && _.isString(setObj.previous_weapon)) {
+			if (rowID !== setObj.previous_weapon && !isFalsey(setObj.previous_weapon)) {
 				clog(debug, timer, 'weapon change, save ammo state', '');
+				clog(debug, timer, 'setObj.previous_weapon', setObj.previous_weapon);
+				clog(debug, timer, 'setObj.previous_weapon', setObj.previous_weapon);
 				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_ammostate`, ammostate, setObj);
 				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_capacitystate`, capacitystate, setObj);	
 			}
@@ -13376,25 +13379,27 @@
 		}
 		
 		function recordAmmoState(debug, timer, value, setObj) {
+			clog(debug, timer, '', '', 'recordAmmoState()');
 			writeValues(debug, timer, value, `repeating_attr_${value.active_weapon}_ammostate`, value.weapon_ammo_reloads, setObj);
 			writeValues(debug, timer, value, `repeating_attr_${value.active_weapon}_capacitystate`, value.weapon_ammo_capacity, setObj);
 		}
 		
 		function disableActiveWeapon(debug, timer, value, rowID, setObj) {
+			clog(debug, timer, '', '', 'disableActiveWeapon()');
 			const attribute = value[`repeating_attr_${rowID}_attribute`];
 			if (attribute !== 'weapon') return;
-			const activeweapon = value.active_weapon || 'empty';
-			if (activeweapon.length === 20) recordAmmoState(debug, timer, value, setObj);
+			const activeweapon = value.active_weapon || '';
+			if (activeweapon.length !== 0) recordAmmoState(debug, timer, value, setObj);
 			setObj.weapon_range = 0;
 			setObj.weapon_ammo_autofire = 0;
 			setObj.weapon_ammo = 0;
 			setObj.weapon_autofire = 0;
 			const state = parseInt(setObj[`repeating_attr_${rowID}_activate`]) || 
 				parseInt(value[`repeating_attr_${rowID}_activate`]) || 0;
-			clog(debug, timer, 'state =', state, 'disableActiveWeapon()');
+			clog(debug, timer, 'state =', state);
 			clog(debug, timer, 'activeweapon =', activeweapon);
 			if (!state) return;
-			if (activeweapon == rowID) {
+			if (activeweapon === rowID) {
 				setObj.active_weapon = '';
 			}
 		}
@@ -13443,24 +13448,42 @@
 			return result;
 		}
 		
-		function setWeaponStates(debug, timer, extraarmIDs, value, rowID, setObj) {
+		function setWeaponStates(debug, timer, extraarmIDs, value, handsource, setObj) {
+			clog(debug, timer, 'handsource =', handsource, 'setWeaponStates()');
 			const armedID = 
-				setObj[`${rowID}_source`] ||
-				value[`${rowID}_source`];
+				setObj[`${handsource}_source`] ||
+				value[`${handsource}_source`];
+			clog(debug, timer, 'armedID =', armedID);
+			const handSources = value[`repeating_attr_${armedID}_source`] !== undefined ?
+				value[`repeating_attr_${armedID}_source`].indexOf(',') !== -1 ?
+					value[`repeating_attr_${armedID}_source`].split(',') :
+					value[`repeating_attr_${armedID}_source`] : '';
+			const isTwoHanded = _.isArray(handSources);
 			const handsArray = buildHandsArray(debug, timer, extraarmIDs);
+			clog(debug, timer, 'handsArray =', handsArray);
 			const handsStateArray = 
 				_.map(handsArray, hand => {
 					const source = setObj[`${hand}_source`] || value[`${hand}_source`];
+					clog(debug, timer, 'hand[source] =', `${hand}[${source}]`);
 					const state = parseInt(setObj[`${hand}_state`]) || parseInt(value[`${hand}_state`]) || 0;
+					clog(debug, timer, 'state =', state);
+					const isActive = //isNaN(parseInt(setObj[`repeating_attr_${source}_activate`])) ?
+						//parseInt(value[`repeating_attr_${source}_activate`]) || 0 :
+						parseInt(setObj[`repeating_attr_${source}_activate`]) || 0;
+					clog(debug, timer, 'isActive =', isActive);
+					//const sourceHandPosition = handSources.indexOf(hand);
 					const isExtraArm = extraarmIDs.indexOf(hand) !== -1 ? true : false;
 					const extraArmType = parseInt(value[`${hand}_type`]) || false;
 					const isWeaponMount = isExtraArm && extraArmType === 0 ? true : false;
 					const handstate = source == armedID ?
-							state == 0 ? 1 : 0 : 0;
+						isTwoHanded ?
+							parseInt(setObj[`${handSources[0]}_state`]) || parseInt(value[`${handSources[0]}_state`]) === 0 ? 1 : 0 :
+						state === 0 ? 1 : 0 : 0;
 					return handstate;
 				});
-			clog(debug, timer, 'handsStateArray:', handsStateArray, 'setWeaponStates()');
+			clog(debug, timer, 'handsStateArray:', handsStateArray);
 			_.each(handsArray, (hand, i) => {
+				clog(debug, timer, 'hand[state]', `${hand}[${handsStateArray[i]}]`);
 				//setObj[`${hand}_state`] = handsStateArray[i];
 				writeValues(debug, timer, value, `${hand}_state`, handsStateArray[i], setObj);
 			});
@@ -14174,6 +14197,7 @@
 										const isActive = setButtonState(debug, timer, value, source, rowID, sourceAttr, setObj);
 										const handsource = getHandSource(debug, timer, extraarmIDs, value[`repeating_attr_${rowID}_source`]);
 										const handstate = handsource !== false ? parseInt(value[`${handsource}_state`]) || 0 : false;
+										clog(debug, timer, 'handstate =', handstate, 'TEST');
 										setAttrEffects(debug, timer, isActive, value, attrdb, extraarmIDs, attrIDs, skillIDs, sectionName, rowID, sourceAttr, setObj);
 										//setPoolCostIfGroupIsFlux(debug, timer, attrIDs, value, rowID, setObj);
 										setAttrGroupPoolSpentByActivation(debug, timer, isActive, attrIDs, value, rowID, setObj);
@@ -14181,6 +14205,13 @@
 										disableActiveWeapon(debug, timer, value, rowID, setObj);
 										if (handstate) {
 											setWeaponAmmo(debug, timer, attrdb, value, handsource, setObj);
+		
+											//const handsource = getHandSource(debug, timer, extraarmIDs, rowID);
+											//setWeaponStates(debug, timer, extraarmIDs, value, rowID, setObj);
+											//setActiveWeapon(debug, timer, value, handsource, setObj);
+											//setActiveWeaponUI(debug, timer, attrdb, value, setObj);
+											//setWeaponAmmo(debug, timer, attrdb, value, handsource, setObj);
+											//setCombatRoll(debug, timer, value, attrdb, value[`${handsource}_source`], sourceAttr, setObj);
 										}
 										setGroupDefectPointsOnActivation(debug, timer, attrIDs, attrdb, value, sectionName, rowID, setObj);
 										setDepleteResurvation(debug, timer, attrdb, value, rowID, setObj);
@@ -14369,8 +14400,9 @@
 								setStatButtonStatsAndRolls(debug, timer, eventInfo, value, rowID, sourceAttr, setObj);
 								switch (`${sourceAttr}`) {
 									case `armedstate`:
+										const handsource = getHandSource(debug, timer, extraarmIDs, rowID);
 										setWeaponStates(debug, timer, extraarmIDs, value, rowID, setObj);
-										setActiveWeapon(debug, timer, value, rowID, setObj);
+										setActiveWeapon(debug, timer, value, handsource, setObj);
 										setActiveWeaponUI(debug, timer, attrdb, value, setObj);
 										setWeaponAmmo(debug, timer, attrdb, value, rowID, setObj);
 										setCombatRoll(debug, timer, value, attrdb, value[`${rowID}_source`], sourceAttr, setObj);
