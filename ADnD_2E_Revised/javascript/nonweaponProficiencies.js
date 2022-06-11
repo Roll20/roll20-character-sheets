@@ -1588,7 +1588,7 @@ nonweaponProficiencies['Anatomy'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
-    'classes': '',
+    'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
 nonweaponProficiencies['Arcanology'] = [];
