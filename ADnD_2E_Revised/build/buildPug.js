@@ -17,12 +17,12 @@ spellsJs.forEach(jsFile => {
     html += pug.renderFile(path.join(pugFolder, 'spellsDatalists.pug'), {pretty: true, data: spells});
 
     if (jsFile === 'wizardSpells.js') {
-        let schoolTable = pug.renderFile(path.join(pugFolder, 'schoolOverview.pug'), {pretty: true, data: spells});
-        fs.writeFileSync(path.join(miscFolder, 'school-overview.html'), schoolTable);
+        let schoolTable = pug.renderFile(path.join(pugFolder, 'schoolsOverview.pug'), {pretty: true, data: spells});
+        fs.writeFileSync(path.join(miscFolder, 'schools-overview.html'), schoolTable);
     }
     if (jsFile === 'priestSpells.js') {
-        let sphereTable = pug.renderFile(path.join(pugFolder, 'sphereOverview.pug'), {pretty: true, data: spells});
-        fs.writeFileSync(path.join(miscFolder, 'sphere-overview.html'), sphereTable);
+        let sphereTable = pug.renderFile(path.join(pugFolder, 'spheresOverview.pug'), {pretty: true, data: spells});
+        fs.writeFileSync(path.join(miscFolder, 'spheres-overview.html'), sphereTable);
     }
 });
 
@@ -32,11 +32,14 @@ const weapons = require(path.join(jsFolder, 'weapons.js'));
 const weaponsProficiencies = require(path.join(jsFolder, 'weaponProficiencies.js'));
 html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weapons, proficiencies: weaponsProficiencies});
 
+const nonWeaponProfs = require(path.join(jsFolder, 'nonweaponProficiencies.js'));
+const nonWeaponProfTable = pug.renderFile(path.join(pugFolder, 'nonweaponProficienciesOverview.pug'), {pretty: true, data: nonWeaponProfs});
+fs.writeFileSync(path.join(miscFolder, 'nonweapon-proficiencies-overview.html'), nonWeaponProfTable);
+
 let weaponTable = pug.renderFile(path.join(pugFolder, 'weaponsOverview.pug'), {pretty: true, data: weapons});
 fs.writeFileSync(path.join(miscFolder, 'weapons-overview.html'), weaponTable);
 
 const simpleDatalists = [
-    ['nonweaponProficiencies.js','nonweapon-proficiencies'],
     ['players-option-talents.js','talents'],
     ['players-option-traits.js','traits'],
     ['players-option-disadvantages.js','disadvantages']
