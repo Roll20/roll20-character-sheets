@@ -12483,22 +12483,35 @@
 		}
 		
 		function setWeaponAmmo(debug, timer, attrdb, value, handsource, setObj) {
+			clog(debug, timer, '', '', 'setWeaponAmmo(TEST)');
+			const activeHasAmmo = getCustomizationValue(debug, timer, value, setObj.active_weapon, 'rank', 'ammo') ? true : false;
+			const previousHasAmmo = getCustomizationValue(debug, timer, value, value.previous_weapon, 'rank', 'ammo') ? true : false;
+			clog(debug, timer, 'activeHasAmmo =', activeHasAmmo);
+			clog(debug, timer, 'previousHasAmmo =', previousHasAmmo);
+			if (!activeHasAmmo && !previousHasAmmo) return;
 			const state = setObj[`${handsource}_state`];
+			clog(debug, timer, 'state =', state);
 			const rowID = value[`${handsource}_source`];
+			clog(debug, timer, 'rowID =', rowID);
+			clog(debug, timer, 'value.active_weapon =', value.active_weapon);
+			clog(debug, timer, 'value.previous_weapon =', value.previous_weapon);
+			clog(debug, timer, 'value.active_weapon =', value.active_weapon);
+			clog(debug, timer, 'value.previous_weapon =', value.previous_weapon);
 			const type = value[`repeating_attr_${rowID}_attribute`];
 			const ammostate = parseInt(value.weapon_ammo_reloads) || 0;
 			const capacitystate = parseInt(value.weapon_ammo_capacity) || 0;
 			clog(debug, timer, 'ammostate =', ammostate, 'setWeaponAmmo()');
 			clog(debug, timer, 'capacitystate =', capacitystate);
-			if (rowID !== setObj.previous_weapon && !isFalsey(setObj.previous_weapon)) {
+			if (previousHasAmmo && rowID !== value.previous_weapon && !isFalsey(value.previous_weapon)) {
 				clog(debug, timer, 'weapon change, save ammo state', '');
-				clog(debug, timer, 'setObj.previous_weapon', setObj.previous_weapon);
-				clog(debug, timer, 'setObj.previous_weapon', setObj.previous_weapon);
-				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_ammostate`, ammostate, setObj);
-				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_capacitystate`, capacitystate, setObj);	
+				clog(debug, timer, 'value.previous_weapon', value.previous_weapon);
+				clog(debug, timer, 'value.previous_weapon', value.previous_weapon);
+				writeValues(debug, timer, value, `repeating_attr_${value.previous_weapon}_ammostate`, ammostate, setObj);
+				writeValues(debug, timer, value, `repeating_attr_${value.previous_weapon}_capacitystate`, capacitystate, setObj);	
 			}
+			//if (isFalsey(rowID)) return;
 			if (type === 'telekinesis' || type === 'swarm') return;
-			if (state) {//weapon armed, load ammo state
+			if (activeHasAmmo && state) {//weapon armed, load ammo state
 				clog(debug, timer, 'weapon armed, load ammo state', '');
 				const weapon = _.find(attrdb[`${type}`], w => {
 					if (w.source == rowID) return true;
@@ -12516,9 +12529,9 @@
 					parseInt(value[`repeating_attr_${rowID}_capacitystate`]) || 0;
 				writeValues(debug, timer, value, 'weapon_ammo_reloads', ammo, setObj);
 				writeValues(debug, timer, value, 'weapon_ammo_capacity', capacity, setObj);
-				clog(debug, timer, 'ammo =', ammo, 'setWeaponAmmo()');
+				clog(debug, timer, 'ammo =', ammo);
 				clog(debug, timer, 'capacity =', capacity);
-			} else if (rowID.length === 20) {//weapon unarmed, save ammo state
+			} else if (previousHasAmmo && !state && rowID === value.previous_weapon) {//} if (rowID.length === 20 && !state) {//weapon unarmed, save ammo state
 				clog(debug, timer, 'weapon unarmed, save ammo state', '');
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_ammostate`, ammostate, setObj);
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_capacitystate`, capacitystate, setObj);
