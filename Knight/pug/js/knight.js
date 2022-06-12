@@ -1959,12 +1959,15 @@ on('clicked:selectionMALWarmasterWarlord', async () => {
 on('clicked:selectionMALPsion', async () => {
   const attrs = await getAttrsAsync([
     'listeModeMALPsion',
+    'listeModeMALPsion2',
   ]);
 
   const choix = parseInt(attrs.listeModeMALPsion, 10) || 0;
+  const choix2 = parseInt(attrs.listeModeMALPsion2, 10) || 0;
 
   await setAttrsAsync({
     malpsionmode: choix,
+    malpsionmode2: choix2,
     popup: 0,
   });
 });
@@ -3326,7 +3329,9 @@ on('clicked:importKNPCG', () => {
         const name = effects[cle].name.split(' ', length).join(' ').toLowerCase();
         const value2 = eff[length] || 0;
 
-        switch (name) {
+        const uEff = name === 'ignore' || name === 'perce' || name === 'dégâts' ? `${name} ${eff[1]}` : name;
+
+        switch (uEff) {
           case 'anathème':
             newrowattrsW[`${path + newrowidW}_anatheme`] = '{{anatheme=Anathème}}';
             break;
@@ -3419,7 +3424,7 @@ on('clicked:importKNPCG', () => {
             newrowattrsW[`${path + newrowidW}_ignoreArmure`] = '{{ignoreArmure=Ignore Armure}}';
             break;
 
-          case 'ignore champ de force':
+          case 'ignore CdF':
             newrowattrsW[`${path + newrowidW}_ignoreCdF`] = '{{ignoreCdF=Ignore Champs de Force}}';
             break;
 

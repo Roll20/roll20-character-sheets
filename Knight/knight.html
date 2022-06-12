@@ -8898,12 +8898,15 @@ on('clicked:selectionMALWarmasterWarlord', async () => {
 on('clicked:selectionMALPsion', async () => {
   const attrs = await getAttrsAsync([
     'listeModeMALPsion',
+    'listeModeMALPsion2',
   ]);
 
   const choix = parseInt(attrs.listeModeMALPsion, 10) || 0;
+  const choix2 = parseInt(attrs.listeModeMALPsion2, 10) || 0;
 
   await setAttrsAsync({
     malpsionmode: choix,
+    malpsionmode2: choix2,
     popup: 0,
   });
 });
@@ -10265,7 +10268,9 @@ on('clicked:importKNPCG', () => {
         const name = effects[cle].name.split(' ', length).join(' ').toLowerCase();
         const value2 = eff[length] || 0;
 
-        switch (name) {
+        const uEff = name === 'ignore' || name === 'perce' || name === 'dégâts' ? `${name} ${eff[1]}` : name;
+
+        switch (uEff) {
           case 'anathème':
             newrowattrsW[`${path + newrowidW}_anatheme`] = '{{anatheme=Anathème}}';
             break;
@@ -10358,7 +10363,7 @@ on('clicked:importKNPCG', () => {
             newrowattrsW[`${path + newrowidW}_ignoreArmure`] = '{{ignoreArmure=Ignore Armure}}';
             break;
 
-          case 'ignore champ de force':
+          case 'ignore CdF':
             newrowattrsW[`${path + newrowidW}_ignoreCdF`] = '{{ignoreCdF=Ignore Champs de Force}}';
             break;
 
@@ -17681,6 +17686,7 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
       'devasterAnatheme',
       'bourreauTenebres',
       'equilibreBalance',
+      'MADDjinnWraithActive',
     ];
 
     const arme = [];
@@ -17703,6 +17709,8 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     const bonus = [];
 
     let OD = 0;
+
+    const wraith = attrs.MADDjinnWraithActive;
 
     const type = attrs.MAUtilisationArmeAI;
     const mod = +attrs.jetModifDes;
@@ -17808,6 +17816,14 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     diceViolence += getStyle.diceViolence;
 
     // FIN GESTION DU STYLE
+
+    if (wraith !== '0') {
+      cRoll.push(+attrs.discretion);
+      cBonus.push(+attrs[ODValue.discretion]);
+      bDegats.push(+attrs.discretion);
+      bDegats.push(+attrs[ODValue.discretion]);
+      exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+    }
 
     if (cRoll.length === 0) { cRoll.push(0); }
 
@@ -18709,6 +18725,8 @@ rollDemon.forEach((button) => {
 
     const base = roll[0];
 
+    let wraith;
+
     let degats;
     let violence;
     let bDegats = 0;
@@ -18725,13 +18743,24 @@ rollDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ]);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         degats = attrs[roll[1]];
         violence = attrs[roll[2]];
 
         bDegats = +degats.split('+')[1];
         bViolence = +violence.split('+')[1];
+
+        if (wraith !== '0') {
+          degats += `+${+attrs.discretion + +attrs[ODValue.discretion]}`;
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
 
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}} {{effets=^{CDF-desactive-pendant} [[1D3]] ^{tours}}}`);
         break;
@@ -18743,13 +18772,28 @@ rollDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ]);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         degats = attrs[roll[1]];
         violence = attrs[roll[2]];
 
+        if (wraith !== '0') {
+          degats += `+${+attrs.discretion + +attrs[ODValue.discretion]}`;
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}} {{degatsConditionnel=true}} {{violenceConditionnel=true}} {{antiAnatheme=${i18n_antiAnatheme}}} {{antiAnathemeCondition=${i18n_antiAnathemeCondition}}} {{effets=${i18n_antiVehicule}}}`);
         break;
+    }
+
+    if (wraith !== '0') {
+      exec.push('{{special2=^{module-wraith} ^{active}}}');
     }
 
     const devaste = +attrs.devasterAnatheme;
@@ -18815,6 +18859,8 @@ rollCombatDemon.forEach((button) => {
     const cBonus = [];
     let cOD = 0;
 
+    let wraith;
+
     let degats;
     let bDegats;
     let violence;
@@ -18823,8 +18869,6 @@ rollCombatDemon.forEach((button) => {
     let getStyle;
 
     let autresEffets;
-
-    let active;
 
     exec.push(base);
 
@@ -18843,11 +18887,16 @@ rollCombatDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
 
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -18913,6 +18962,14 @@ rollCombatDemon.forEach((button) => {
         degats += getStyle.diceDegats;
         violence += getStyle.diceViolence;
 
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
 
         exec.push(jet);
@@ -18959,7 +19016,7 @@ rollCombatDemon.forEach((button) => {
 
         attrs = await getAttrsAsync(listAttrs);
 
-        active = attrs.MADDjinnWraithActive;
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -18968,8 +19025,6 @@ rollCombatDemon.forEach((button) => {
         C2 = attrs.caracteristiqueWraith2;
         C3 = attrs.caracteristiqueWraith3;
         C4 = attrs.caracteristiqueWraith4;
-
-        if (active !== '0') { exec.push('{{special2=^{module-wraith} ^{active}}}'); }
 
         attrsCarac = await getCarac(bCarac, C1, C2, C3, C4);
 
@@ -19043,11 +19098,16 @@ rollCombatDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
 
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -19113,6 +19173,14 @@ rollCombatDemon.forEach((button) => {
         degats += getStyle.diceDegats;
         violence += getStyle.diceViolence;
 
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
 
         exec.push(jet);
@@ -19154,10 +19222,15 @@ rollCombatDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -19228,6 +19301,14 @@ rollCombatDemon.forEach((button) => {
           exec.push(`{{mod=${mod}}}`);
         }
 
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
 
         exec.push(jet);
@@ -19273,6 +19354,10 @@ rollCombatDemon.forEach((button) => {
 
         exec.push(`{{herauts=${herauts.join(' / ')}}}`);
       }
+    }
+
+    if (wraith !== '0') {
+      exec.push('{{special2=^{module-wraith} ^{active}}}');
     }
 
     const finalRoll = await startRoll(exec.join(' '));
@@ -23158,7 +23243,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
 
     case 'agressif':
@@ -23167,7 +23252,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_agressif}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
 
     case 'akimbo':
@@ -23189,7 +23274,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
         cRoll.push(-1);
       } else {
         exec.push(`{{vMStyleA=${modA}D}}`);
-        cRoll.push(modA);
+        cRoll.push(Number(modA));
       }
 
       break;
@@ -23208,7 +23293,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
         cRoll.push(-1);
       } else {
         exec.push(`{{vMStyleA=${modA}D}}`);
-        cRoll.push(modA);
+        cRoll.push(Number(modA));
       }
       break;
 
@@ -23218,7 +23303,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_defensif}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
   }
 
@@ -25985,6 +26070,12 @@ on('clicked:rollVehicule', async (info) => {
 	<div class="popupPsion">
 		<h1 class="titre" data-i18n="mode">Mode</h1>
 		<select name="attr_listeModeMALPsion">
+			<option value=""></option>
+			<option value="1" data-i18n="mode-puppet-master">Mode Puppet Master</option>
+			<option value="2" data-i18n="mode-discord">Mode Discord</option>
+			<option value="3" data-i18n="mode-windtalker">Mode Windtalker</option>
+		</select>
+		<select name="attr_listeModeMALPsion2">
 			<option value=""></option>
 			<option value="1" data-i18n="mode-puppet-master">Mode Puppet Master</option>
 			<option value="2" data-i18n="mode-discord">Mode Discord</option>
@@ -30355,6 +30446,7 @@ on('clicked:rollVehicule', async (info) => {
             
             <div class="MALPsion">
                 <input class="legendeChoisie" type="hidden" name="attr_malpsionmode" value="0" />
+                <input class="legendeChoisie2" type="hidden" name="attr_malpsionmode2" value="0" />
 
                 <div class="psionPuppetMaster">
                     <input class="bonusCarac" type="hidden" name="attr_bonusCarac" value="0" />
@@ -39939,6 +40031,188 @@ on('clicked:rollVehicule', async (info) => {
                             <button class="lion" type="action" name="act_MALChoixCompanons_lion" data-i18n="druid-companion-lion">Lion</button>
                             <button class="wolf" type="action" name="act_MALChoixCompanons_wolf" data-i18n="druid-companion-wolf">Wolf</button>
                             <button class="crow" type="action" name="act_MALChoixCompanons_crow" data-i18n="druid-companion-crow">Crow</button>
+                        </div>
+                    </div>
+
+                    <div class="MALPsion">
+                        <input class="legendeChoisie2" type="hidden" name="attr_malpsionmode2" value="0" />
+        
+                        <div class="psionPuppetMaster">
+                            <input class="bonusCarac" type="hidden" name="attr_bonusCarac" value="0" />
+        
+                            <div class="titre">
+                                <button type="action" class="fichePJ bonusCaracL1" name="act_bonusCarac_1" data-i18n-title="+1 Caractéristique" title="+1 Caractéristique" >+1</button>
+                                <button type="action" class="fichePJ bonusCaracL2" name="act_bonusCarac_2" data-i18n-title="+2 Caractéristique" title="+2 Caractéristique" >+2</button>
+                                
+                                <h1 class="titre" data-i18n="mode-puppet-master">Mode Puppet Master</h1>
+                                <button class="rollDice" type="action" name="act_simplePsionPuppet" value="@{jetGM} &{template:simple} {{Nom=@{name}}}"></button>
+                            </div>
+                            <div class="rollPJ">
+                                <select name="attr_caracteristique1Psion">
+                                    <option value="@{aura}" data-i18n="aura" selected>Aura</option>
+                                </select>
+                                <select name="attr_caracteristique2">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                            </div>
+                            <div class="bonusCarac">
+                                <select name="attr_caracteristique3">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                                <select name="attr_caracteristique4">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                            </div>
+                            <h1 class="titre" data-i18n="ordre-donne">Ordre Donné</h1>
+                            <div class="autoex autoex28">
+                                <span name="attr_psionPuppetOrdre"></span>
+                                <textarea name="attr_psionPuppetOrdre"></textarea>
+                            </div>
+                        </div>
+                        <div class="psionDiscord">
+                            <input class="active" type="hidden" name="attr_MALPsionDiscord" />
+                            <input class="bonusCarac" type="hidden" name="attr_bonusCarac" value="0" />
+        
+                            <div class="titre">
+                                <button type="action" class="fichePJ bonusCaracL1" name="act_bonusCarac_1" data-i18n-title="+1 Caractéristique" title="+1 Caractéristique" >+1</button>
+                                <button type="action" class="fichePJ bonusCaracL2" name="act_bonusCarac_2" data-i18n-title="+2 Caractéristique" title="+2 Caractéristique" >+2</button>
+        
+                                <h1 class="titre" data-i18n="psion-mode-discord">Mode Discord</h1>
+        
+                                <button class="active" type="action" name="act_MALPsionDiscord" data-i18n="activer">Activer</button>
+                            </div>
+                            <label class="ligne2">
+                                <span data-i18n="bonus/malus-jets">Bonus/Malus aux Jets</span>
+                                <input type="number" name="attr_jetModifDes" value="0" />
+                            </label>
+                            <div class="rollPJ">
+                                <select name="attr_caracteristique1Psion">
+                                    <option value="@{aura}" data-i18n="aura" selected>Aura</option>
+                                </select>
+                                <select name="attr_caracteristique2">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                                <button class="rollDice" type="action" name="act_simplePsionDiscord" value="@{jetGM} &{template:simple} {{Nom=@{name}}}"></button>
+                            </div>
+        
+                            <div class="bonusCarac">
+                                <select name="attr_caracteristique3">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                                <select name="attr_caracteristique4">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                            </div>
+                            <label class="col3">
+                                <span data-i18n="malus-action">Malus Actions</span>
+                                <input type="text" name="attr_psionMalusA" value="2D" readonly />
+                            </label>
+                            <label class="col3BL">
+                                <span data-i18n="malus-reaction">Malus Réaction</span>
+                                <input type="text" name="attr_psionMalus" value="2" readonly />
+                            </label>
+                            <label class="col3BL">
+                                <span data-i18n="malus-defense">Malus Défense</span>
+                                <input type="text" name="attr_psionMalus" value="2" readonly />
+                            </label>
+                        </div>
+                        <div class="psionWindtalker">
+                            <h1 class="titre" data-i18n="psion-mode-windtalker">Mode Windtalker</h1>
+                            <h2 class="titreBis" data-i18n="actions-creatures">Actions des Créatures</h2>
+                            <div class="autoex autoex28">
+                                <span name="attr_psionWindtalkerActions"></span>
+                                <textarea name="attr_psionWindtalkerActions"></textarea>
+                            </div>
                         </div>
                     </div>
 
@@ -54501,7 +54775,7 @@ on('clicked:rollVehicule', async (info) => {
 				<span class="full"><span data-i18n="sournoise-inclus">Bonus sournoise inclus</span> ({{vSournoise}})</span>
 			{{/vSournoise}}
 			{{#vSubsoniqueD}}
-				<span class="full"><span data-i18n="subsonique-inclus">Subsonique inclus</span> ({{vSubsoniqueD}})</span>
+				<span class="full"><span data-i18n="munitions-subsoniques-inclus">Subsonique inclus</span> ({{vSubsoniqueD}})</span>
 			{{/vSubsoniqueD}}
 			{{#vSurMesure}}
 				<span class="full"><span data-i18n="sur-mesure-inclus">Sur mesure inclus</span> ({{vSurMesure}})</span>
@@ -55044,6 +55318,9 @@ on('clicked:rollVehicule', async (info) => {
 			{{#vSystemes}}
 				<span class="full"><span data-i18n="systemes-inclus">Systemes inclus</span> ({{vSystemes}})</span>
 			{{/vSystemes}}
+			{{#vWraithA}}
+				<span class="full"><span data-i18n="wraith-inclus">Bonus du mode wraith inclus</span> ({{vWraithA}})</span>
+			{{/vWraithA}}
 		</div>
 	{{/jet}}
 
@@ -55074,6 +55351,10 @@ on('clicked:rollVehicule', async (info) => {
 			{{#vMStyleD}}
 				<span class="full"><span data-i18n="style-inclus">Style inclus</span> ({{vMStyleD}})</span>
 			{{/vMStyleD}}
+
+			{{#vWraithD}}
+				<span class="full"><span data-i18n="wraith-inclus">Bonus du mode wraith inclus</span> ({{vWraithD}})</span>
+			{{/vWraithD}}
 		</div>
 	{{/degats}}
 	{{#degatsConditionnel}}

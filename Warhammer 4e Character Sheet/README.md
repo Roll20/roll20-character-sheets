@@ -73,6 +73,26 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+June 6th 2022 v1.56.1
+
+- Fixed NPC weapon rolls not working when Talent Integration is disabled.
+- NPC Crit roll button will now follow UiA rules if then are active/selected.
+
+
+May 20th 2022 v1.56
+
+Winds of Magic update
+- Various minor Magic rule changes as per Winds of Magic rule book, including Miscast Table changes.
+- Ritauls Tab added to Spellbook, functions similarly to Arcane Spells.
+- New Skills: Augury & Psychometry
+- New Talents: Suffuse With (Wind) & Magical Assistant
+- Magical Robes & Enchanted Staff's selector in the spellbook tab, bonus add automatically. Added Spellbook settings tab for old options.
+- Added Orge - Lore Great Maw as a static Magic Lore option, incl. Casting/Channelling/Effects.
+- Channeling roll which rolls in +0 SL outcome now adds +1 to the Accu Ext SL pool.
+- Casting Success/Failure is now based on achiving +SL not roll vs target success.
+- Various Talent fixes to make them visable in talents Tab and add custom situation SL in RT. Add Orge Talent - Vice, no intergration.
+
+
 May 12th 2022 v1.55f
 
 - Implemented Unshakable Talent, which adds conditional bonus to Cool tests.
