@@ -507,9 +507,6 @@ const upgradeSheet = function (
       stepwiseFaux('weapons', 'weaponskill');
       stepwiseFaux('spells', 'spellskill');
       setattrvals['newcontent'] = 'unread';
-    }
-    if (versionthree < 0.26) {
-      setattrvals['newcontent'] = 'unread';
     } else {
       log('Upgrade', `Sheet already updgraded (${characterName})`, 'lime');
     }
@@ -521,10 +518,9 @@ const upgradeSheet = function (
 
 // Adjust CSS for long Character Names
 on(
-  'sheet:opened change:character_name change:character_avatar change:character_token change:show_token',
+  'sheet:opened change:character_name change:character_avatar change:character_token',
   function () {
     log('Name Change', 'Name was changed', r20color);
-    let setValues = {};
     getAttrs(
       ['character_name', 'character_avatar', 'character_token'],
       function (v) {
@@ -536,34 +532,13 @@ on(
           ? (nameclass = 'smallHeader')
           : (nameclass = 'normalHeader');
         log('Name Class', nameclass, r20color);
-        setValues['namelength'] = nameclass;
-        let avatarURL = v.character_avatar;
-        let tokenURL = v.character_token;
-        setValues['avatar'] = avatarURL;
-        setValues['ctoken'] = tokenURL;
-        if (avatarURL.length < 1 && tokenURL.length < 1) {
-          //Avatar and Token is empty, so make sure show_token is set to 0
-          setValues['show_token'] = '0';
-        } else if (tokenURL.length > 0) {
-          tokenURL.substring(tokenURL.length - 4, tokenURL.length - 3) !== '.'
-            ? (tokenURL += '.png')
-            : log('URL Has Extension', tokenURL, r20color);
-          //use the token image for the rolltemplate
-          setValues['roll_template_token'] = '{{token=[x](' + tokenURL + ')}}';
-        } else {
-          avatarURL.substring(avatarURL.length - 4, avatarURL.length - 3) !==
-          '.'
-            ? (avatarURL += '.png')
-            : log('URL Has Extension', avatarURL, r20color);
-          setValues['roll_template_token'] = '{{token=[x](' + avatarURL + ')}}';
-        }
-        /*setAttrs({
+        log('Character Token', v.character_token, r20color);
+        setAttrs({
           namelength: nameclass,
           avatar: v.character_avatar,
           ctoken: v.character_token,
           roll_template_token: '{{token=[x](' + v.character_token + '.png)}}',
-        });*/
-        setAttrs(setValues);
+        });
       }
     );
   }
@@ -2130,19 +2105,13 @@ const compendiumLookup = function({queue, callback}) {
  */
 const getProductLines = function(queue,callback){
     const curr = queue.shift();
-    debug({curr});
     getCompendiumPage(`Introduction:${curr}`,(data)=>{
-        debug({data});
         if(data.data.blobs.IDPathways){
             try{
-                debug({IDPathways:data.data.blobs.IDPathways});
                 const IDPathways = JSON.parse(data.data.blobs.IDPathways['data-IDPathways']);
-                debug({IDPathways})
                 callback(IDPathways);
             }catch(err){
                 debug('No IDPathways found, exiting drag and drop');
-                debug(err.stack);
-                debug({data});
                 return null;
             }
         }else if(!queue.length){
@@ -2821,10 +2790,9 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
     'shipweapons':dropShipweapons,
     'paweapons':dropArmorweapons,
     'raweapons':dropArmorweapons,
-    races:dropCharacterType,
+    race:dropCharacterType,
     iconic_framework:dropCharacterType
   };
-  debug(`dropInfo repSection:${repSection}`);
   [repSection,fields] = dropSwitch.hasOwnProperty(repSection) ?
     dropSwitch[repSection]({repSection,targetObj,jsonObj,attributes,fields,repSectionID}) :
     [null,[]];
@@ -2908,7 +2876,6 @@ const prepVehicles = function({attributes,setObj,jsonObj}){
   if (jsonObj['data-Weapons']) {
     //if this is a vehicle with weapons, then need to add more stuff to the JSON
     log('Vehicle Weapons Array', 'Found', r20color);
-    debug({ 'weapon array': jsonObj['data-Weapons'] });
     jsonObj['data-Weapons'].forEach(weapon => {
       let source = subCat || jsonObj.Category;
       let dropType = getDropInfoCommand('Weapons', source);
@@ -2993,7 +2960,6 @@ const compendiumDrop = function (category) {
             dropSwitch[jsonObj.Category]({attributes:v,setObj:setattrvalues,jsonObj}) :
             undefined;
           //If an invalid item was dropped, delete the compendium drop data and stop import.
-          debug({compendiumDroprepSection:repSection});
           if(repSection === undefined){
             debug('Invalid drop category, no drop performed.');
             setAttrs(setattrvalues,{silent:true});
@@ -3002,7 +2968,6 @@ const compendiumDrop = function (category) {
           setattrvalues = getDropInfo(jsonObj, setattrvalues, repSection, v);
           setattrvalues = processAdditionalPHEGs(jsonObj,setattrvalues,v);
           log('setattrvalues', '', r20color);
-          debug({ setattrvalues });
           setAttrs(setattrvalues);
           log('Values', 'Set...character sheet is updated', r20color);
         },
@@ -6529,7 +6494,7 @@ on(
 </script>
 <!-- Necessary Mixins-->
 <!-- Hidden inputs for character sheet versioning, etc-->
-<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.26"/>
+<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.25"/>
 <input type="hidden" name="attr_firstInit" value="0"/>
 <input type="hidden" name="attr_namelength" value="0"/>
 <input type="hidden" name="attr_wdNum" value="1"/>
@@ -6860,10 +6825,6 @@ on(
               </div>
               <div class="skillsCondensed"> 
                 <h3 class="groupHeading" data-i18n="skills">Skills</h3>&nbsp; &nbsp;
-                <!--Unskilled-->
-                <!--Button for Statblock view--><span class="unskilled condensedSkill">
-                  <button class="traitbutton miniButton" type="roll" name="roll_tUnskilledRoll" title="@{tUnskilledRoll}" value="@{unskilledRollValue} {{skill_roll=[[ @{unskilledSkillRollFormula} ]]}} {{wild_die=[[ @{unskilledWildDieFormula} ]]}}"> <span data-i18n="unskilled-d4-2">Unskilled (d4-2)</span>
-                  </button></span>
                 <!--static skill list-->
                 <!--do stuff-->
                 <input class="hiddenInput staticacademics" type="checkbox" name="attr_staticacademics"/>
@@ -8190,7 +8151,7 @@ on(
           </fieldset>
         </div>
         <div class="logoBlock"> 
-          <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PEG_LOGO_White.png"/><img class="logo Deadlands" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Deadlands.png"/><img class="logo SWADE" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/>
+          <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/finderski/SWT/master/PEG_LOGO_White.png"/><img class="logo Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png"/><img class="logo SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/finderski/SWT/master/SWAD%20Update%20Images/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/>
         </div>
       </div>
       <div class="character">
@@ -8632,8 +8593,7 @@ on(
               <div class="selected-skills" data-i18n-list="character-skills">
                 <!-- unskilled-->
                 <div class="basetrait" data-i18n-list-item="unskilled">
-                  <!-- button(type="roll", class="unskilledbutton traitflexattbutton", name="roll_tUnskilledRoll", title="@{tUnskilledRoll}", value="@{whisperunskilled} &{template:roll} {{namelength=@{namelength}}} @{rolltUnskilled} {{skill_roll=[[ @{unskilledSkillRollFormula} ]]}} {{wild_die=[[ @{unskilledWildDieFormula} ]]}} @{unskilledencumbrancebutton} @{showtraitmods} {{conviction=[[ [[@{conviction}]]d6! ]] }} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~tUnskilledRoll)}} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}") -->
-                  <button class="unskilledbutton traitflexattbutton" type="roll" name="roll_tUnskilledRoll" title="@{tUnskilledRoll}" value="@{unskilledRollValue} {{skill_roll=[[ @{unskilledSkillRollFormula} ]]}} {{wild_die=[[ @{unskilledWildDieFormula} ]]}}"> <span data-i18n="unskilled-d4-2">Unskilled (d4-2)</span></button><span class="unskilledOptions">
+                  <button class="unskilledbutton traitflexattbutton" type="roll" name="roll_tUnskilledRoll" title="@{tUnskilledRoll}" value="@{whisperunskilled} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltUnskilled} {{skill_roll=[[ @{unskilledSkillRollFormula} ]]}} {{wild_die=[[ @{unskilledWildDieFormula} ]]}} @{unskilledencumbrancebutton} @{showtraitmods} {{conviction=[[ [[@{conviction}]]d6! ]] }} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~tUnskilledRoll)}} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"> <span data-i18n="unskilled-d4-2">Unskilled (d4-2)</span></button><span class="unskilledOptions">
                     <label class="traitlabel" data-i18n-title="apply-encumbrance">
                       <input class="traitradio" type="checkbox" name="attr_unskilledencumbrance" title="@{unskilledencumbrance}" value="1"/><span class="joat">O</span>
                     </label></span>
@@ -8652,7 +8612,6 @@ on(
                       <input class="wildDieDesc" type="text" name="attr_unskilledwilddieinfo" placeholder="Standard Wild Die die type" data-i18n-placeholder="no-modifying-edges"/>
                     </div>
                   </details>
-                  <input type="hidden" name="attr_unskilledRollValue" value="@{whisperunskilled} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltUnskilled} @{unskilledencumbrancebutton} @{showtraitmods} {{conviction=[[ [[@{conviction}]]d6! ]] }} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~tUnskilledRoll)}} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                   <input type="hidden" name="attr_unskilled_rank" value="1d4! -2"/>
                   <input type="hidden" name="attr_unskilled_display" value="1d4-2"/>
                   <input type="hidden" name="attr_unskilledSkillRollFormula" value="@{unskilled_rank} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} + [[@{UnskilledEncumbrance}*@{encumbrance}]][Encumbrance Penalty]"/>
@@ -12921,7 +12880,7 @@ on(
             img(class="logo Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png")
             img(class="logo SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png")
             -->
-            <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PEG_LOGO_White.png"/><img class="logo Deadlands" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Deadlands.png"/><img class="logo SWADE" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/>
+            <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/finderski/SWT/master/PEG_LOGO_White.png"/><img class="logo Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png"/><img class="logo SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/finderski/SWT/master/SWAD%20Update%20Images/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/>
             <!--Right Column (Hindrances, Ancestry Abilities, Special Abilties, Edges/Advances)-->
             <input class="showconditions hiddenInput" type="checkbox" name="attr_showconditions" checked="checked"/>
             <div class="conditions">
@@ -15623,22 +15582,6 @@ on(
       </div>
       <div class="releasenotesTab">
         <h1 class="groupHeader documentationHeader" data-i18n="release-notes">Release Notes</h1>
-        <!-- Release 1.00.26-->
-        <label class="rowlabel">
-          <input class="releasenotes" type="checkbox" name="attr_releasenotes10026" value="1"/><span class="releasenotesVersion">
-            <h4 class="rnversion"><span data-i18n="version"></span>1.00.26</h4></span>
-        </label>
-        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10026" value="1"/>
-        <div class="releasenotes"> 
-          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
-          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
-          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
-          <ul class="releaseNotesList"> 
-            <li> <span class="black" data-i18n="statblock-view-skill-spillover">Fixed an issue where the if one had a lot of custom skills, it would not wrap properly and the skills (and potentially Hindrances and Special Abilities) would flow off the character sheet.</span></li>
-            <li> <span class="black" data-i18n="unskilled-button-on-statblock-view">Fixed an issue where the Unskilled roll button was not present on the Statblock (locked) view of the character sheet.</span></li>
-            <li><span class="black" data-i18n="token-in-rolltemplate-not-showing">Fixed an issue where if the character sheet didn't have a token assigned, the roll template would still attempt to show the image. Now, if a token is not assigned, the sheet will look to see if an Avatar is assigned for the character and if so, it will use that; if neither a token nor an avatar are assigned, the sheet will uncheck the setting to display the token on the roll template.</span></li>
-          </ul>
-        </div>
         <!-- Release 1.00.25-->
         <label class="rowlabel">
           <input class="releasenotes" type="checkbox" name="attr_releasenotes10025" value="1"/><span class="releasenotesVersion">
