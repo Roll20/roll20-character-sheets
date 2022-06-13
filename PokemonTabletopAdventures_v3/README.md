@@ -24,6 +24,13 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### May 25, 2022
+- Added some explanation text to the Configuration page to give some background on what's going on there and how to use the sheet
+
+### May 24, 2022
+- Added Roll to GM functionality!
+  - New button added next to the Configuration button to toggle between the ability to send rolls to the public chat or to whisper them to the GM
+
 ### May 12, 2022
 - Fixed a bug where the pokemon and hybrid character pages would default to the normal type selection rather than typeless if this value isn't modified
   - Also sets the default type for a newly created move to typeless rather than normal

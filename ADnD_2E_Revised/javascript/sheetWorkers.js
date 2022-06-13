@@ -22,7 +22,15 @@ const SPHERE_SPELLS_AND_MAGIC = 'sphere-spells-and-magic';
 const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', SPHERE_SPELLS_AND_MAGIC];
 
 //#region Helper function
-function capitalizeFirst(s) {
+const isSheetWorkerUpdate = function (eventInfo) {
+    return eventInfo.sourceType === SHEET_WORKER;
+}
+
+const isPlayerUpdate = function (eventInfo) {
+    return eventInfo.sourceType === PLAYER;
+}
+
+const capitalizeFirst = function (s) {
     if (typeof s !== 'string')
         return '';
 
@@ -232,14 +240,6 @@ const doEarlyReturn = function(eventInfo, fieldNames) {
         ? isRemoving0(eventInfo, fieldNames)
         : isOverwriting0(eventInfo);
 };
-
-const isSheetWorkerUpdate = function (eventInfo) {
-    return eventInfo.sourceType === SHEET_WORKER;
-}
-
-const isPlayerUpdate = function (eventInfo) {
-    return eventInfo.sourceType === PLAYER;
-}
 
 const repeatingMultiplySum = function(section, valueField, multiplierField, destination, decimals) {
     TAS.repeating(section)
@@ -1150,6 +1150,9 @@ priestSpellLevelsSections.forEach(spellLevel => {
     if (isNewSpellSection(lastSection)) {
         setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel, SPHERE_FIELDS);
         setupSpellCrit(lastSection);
+        if (lastSection !== 'priq') {
+            setupAddPriestSpell(lastSection);
+        }
     }
 });
 setupAutoFillSpellInfo('primonster', priestSpells, priestDisplayLevel, SPHERE_FIELDS);

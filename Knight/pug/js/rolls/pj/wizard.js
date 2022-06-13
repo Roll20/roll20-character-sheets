@@ -167,7 +167,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
 
     case 'agressif':
@@ -176,7 +176,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_agressif}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
 
     case 'akimbo':
@@ -198,7 +198,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
         cRoll.push(-1);
       } else {
         exec.push(`{{vMStyleA=${modA}D}}`);
-        cRoll.push(modA);
+        cRoll.push(Number(modA));
       }
 
       break;
@@ -217,7 +217,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
         cRoll.push(-1);
       } else {
         exec.push(`{{vMStyleA=${modA}D}}`);
-        cRoll.push(modA);
+        cRoll.push(Number(modA));
       }
       break;
 
@@ -227,7 +227,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_defensif}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
   }
 
