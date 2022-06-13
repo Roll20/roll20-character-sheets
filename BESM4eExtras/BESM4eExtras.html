@@ -11546,22 +11546,29 @@
 		
 		function setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute) {
 			const name = value[`repeating_attr_${rowID}_name`] || "";
+			clog(debug, timer, 'name =', name, 'setWeapon(TEST)');
 			const hands = 
 				attribute === 'telekinesis' || attribute === 'swarm' ? 0 :
 				getCustomizationValue(debug, timer, value, rowID, 'rank', 'hands') ? 2 :
 				getCustomizationValue(debug, timer, value, rowID, 'rank', 'nohands') ? 0 : 1;
+			clog(debug, timer, 'hands =', hands);
 			const mainsource = value.mainhand_source || "";
 			const offsource = value.offhand_source || "";
+			clog(debug, timer, 'mainsource =', mainsource);
+			clog(debug, timer, 'offsource =', offsource);
 			switch (hands) {
 				case 0: //no hands
 					if (isActive) {
 						const extraarmID = generateRowID();
 						setArms(debug, timer, value, rowID, setObj, name, true, extraarmID);
 						extraarmIDs.push(extraarmID.toLowerCase());
+						
 						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_state`, 0, setObj);
 						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_type`, 0, setObj);
+						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_source`, rowID, setObj);
 						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_name`, name, setObj);
 						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_label`, capital(attribute), setObj);
+						updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, extraarmID, sourceAttr, setObj);
 					} else {
 						let source = 
 							setObj[`repeating_attr_${rowID}_source`] || 
@@ -11654,6 +11661,7 @@
 					}
 				break;
 				case 2: //two-handed
+					clog(debug, timer, 'two-handed', '');
 					if (isActive) {
 						const extrahands = _.chain(extraarmIDs)
 							/*
@@ -11667,7 +11675,7 @@
 							.map(id => {
 								const availableHand =
 									parseInt(value[`repeating_extraarm_${id}_type`]) === 0 ? '' :
-									value[`repeating_extraarm_${id}_source`].length > 0 ? '' :
+									!isFalsey(value[`repeating_extraarm_${id}_source`]) ? '' :
 									id;
 								return availableHand;
 							})
@@ -13451,14 +13459,19 @@
 		}
 		
 		function getHandSource(debug, timer, extraarmIDs, rowID){
+			clog(debug, timer, 'extraarmIDs:', extraarmIDs, 'getHandSource(TEST)');
+			rowID = rowID.toLowerCase();
+			clog(debug, timer, 'rowID =', rowID);
 			const handsource = /(mainhand|offhand)/i.test(rowID) ? rowID : 
 				extraarmIDs !== undefined ? extraarmIDs.indexOf(rowID) !== -1 ?
 					`repeating_extraarm_${rowID}` : '' : '';
+			clog(debug, timer, 'handsource =', handsource, 'getHandSource()');
 			const handscheck = handsource !== '' ? handsource.indexOf(',') > 0 ? 
 				handsource.split(',') : handsource : false;
+			clog(debug, timer, 'handscheck =', handscheck);
 			const result = handscheck !== false ? _.isArray(handscheck) ? 
 				handscheck[0] : handscheck : false;
-			clog(debug, timer, 'result =', result, 'getHandSource()');
+			clog(debug, timer, 'result =', result);
 			return result;
 		}
 		
@@ -14216,10 +14229,11 @@
 										if (!getIsLocked(debug, timer, value, rowID, sourceAttr)) return;
 										if (getFluxGroupIsNotActive(debug, timer, value, rowID)) return;
 										const isActive = setButtonState(debug, timer, value, source, rowID, sourceAttr, setObj);
+										setAttrEffects(debug, timer, isActive, value, attrdb, extraarmIDs, attrIDs, skillIDs, sectionName, rowID, sourceAttr, setObj);
 										const handsource = getHandSource(debug, timer, extraarmIDs, value[`repeating_attr_${rowID}_source`]);
 										const handstate = handsource !== false ? parseInt(value[`${handsource}_state`]) || 0 : false;
 										clog(debug, timer, 'handstate =', handstate, 'TEST');
-										setAttrEffects(debug, timer, isActive, value, attrdb, extraarmIDs, attrIDs, skillIDs, sectionName, rowID, sourceAttr, setObj);
+										
 										//setPoolCostIfGroupIsFlux(debug, timer, attrIDs, value, rowID, setObj);
 										setAttrGroupPoolSpentByActivation(debug, timer, isActive, attrIDs, value, rowID, setObj);
 										//setPoolCostIfGroupIsVariation(debug, timer, isActive, attrIDs, value, rowID, setObj);
