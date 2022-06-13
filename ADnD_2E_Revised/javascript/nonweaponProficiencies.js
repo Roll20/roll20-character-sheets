@@ -1,7 +1,7 @@
-const nonweaponProficiencies = {};
+const NONWEAPON_PROFICIENCIES_TABLE = {};
 //#region Player's Handbook
-nonweaponProficiencies['Agriculture'] = [];
-nonweaponProficiencies['Agriculture'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Agriculture'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Agriculture'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
@@ -9,8 +9,8 @@ nonweaponProficiencies['Agriculture'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Animal Handling'] = [];
-nonweaponProficiencies['Animal Handling'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Animal Handling'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Animal Handling'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
@@ -18,8 +18,8 @@ nonweaponProficiencies['Animal Handling'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Animal Training'] = [];
-nonweaponProficiencies['Animal Training'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Animal Training'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Animal Training'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
@@ -27,8 +27,8 @@ nonweaponProficiencies['Animal Training'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Artistic Ability'] = [];
-nonweaponProficiencies['Artistic Ability'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Artistic Ability'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Artistic Ability'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
@@ -36,8 +36,8 @@ nonweaponProficiencies['Artistic Ability'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Blacksmithing'] = [];
-nonweaponProficiencies['Blacksmithing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Blacksmithing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Blacksmithing'].push({
     'slots': 1,
     'abilityScore': '@{Strength}',
     'modifier': 0,
@@ -45,8 +45,8 @@ nonweaponProficiencies['Blacksmithing'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Brewing'] = [];
-nonweaponProficiencies['Brewing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Brewing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Brewing'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
@@ -54,8 +54,8 @@ nonweaponProficiencies['Brewing'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Carpentry'] = [];
-nonweaponProficiencies['Carpentry'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Carpentry'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Carpentry'].push({
     'slots': 1,
     'abilityScore': '@{Strength}',
     'modifier': 0,
@@ -63,8 +63,8 @@ nonweaponProficiencies['Carpentry'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Cobbling'] = [];
-nonweaponProficiencies['Cobbling'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Cobbling'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Cobbling'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
@@ -72,8 +72,8 @@ nonweaponProficiencies['Cobbling'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Cooking'] = [];
-nonweaponProficiencies['Cooking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Cooking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Cooking'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
@@ -81,8 +81,8 @@ nonweaponProficiencies['Cooking'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Dancing'] = [];
-nonweaponProficiencies['Dancing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Dancing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Dancing'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
@@ -90,8 +90,8 @@ nonweaponProficiencies['Dancing'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Direction Sense'] = [];
-nonweaponProficiencies['Direction Sense'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Direction Sense'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Direction Sense'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': +1,
@@ -99,8 +99,8 @@ nonweaponProficiencies['Direction Sense'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Etiquette'] = [];
-nonweaponProficiencies['Etiquette'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Etiquette'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Etiquette'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
@@ -108,8 +108,8 @@ nonweaponProficiencies['Etiquette'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Fire-building'] = [];
-nonweaponProficiencies['Fire-building'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Fire-building'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Fire-building'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
@@ -117,8 +117,8 @@ nonweaponProficiencies['Fire-building'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Fishing'] = [];
-nonweaponProficiencies['Fishing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Fishing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Fishing'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
@@ -126,8 +126,8 @@ nonweaponProficiencies['Fishing'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Heraldry'] = [];
-nonweaponProficiencies['Heraldry'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Heraldry'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Heraldry'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
@@ -135,8 +135,8 @@ nonweaponProficiencies['Heraldry'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Languages, Modern'] = [];
-nonweaponProficiencies['Languages, Modern'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Languages, Modern'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Languages, Modern'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
@@ -144,8 +144,8 @@ nonweaponProficiencies['Languages, Modern'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Leatherworking'] = [];
-nonweaponProficiencies['Leatherworking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Leatherworking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Leatherworking'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
@@ -153,8 +153,8 @@ nonweaponProficiencies['Leatherworking'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Mining'] = [];
-nonweaponProficiencies['Mining'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Mining'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Mining'].push({
     'slots': 2,
     'abilityScore': '@{Wisdom}',
     'modifier': -3,
@@ -162,8 +162,8 @@ nonweaponProficiencies['Mining'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Pottery'] = [];
-nonweaponProficiencies['Pottery'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Pottery'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Pottery'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -2,
@@ -171,8 +171,8 @@ nonweaponProficiencies['Pottery'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Riding, Airborne'] = [];
-nonweaponProficiencies['Riding, Airborne'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Riding, Airborne'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Riding, Airborne'].push({
     'slots': 2,
     'abilityScore': '@{Wisdom}',
     'modifier': -2,
@@ -180,8 +180,8 @@ nonweaponProficiencies['Riding, Airborne'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Riding, Land-based'] = [];
-nonweaponProficiencies['Riding, Land-based'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Riding, Land-based'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Riding, Land-based'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': +3,
@@ -189,8 +189,8 @@ nonweaponProficiencies['Riding, Land-based'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Rope Use'] = [];
-nonweaponProficiencies['Rope Use'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Rope Use'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Rope Use'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
@@ -198,8 +198,8 @@ nonweaponProficiencies['Rope Use'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Seamanship'] = [];
-nonweaponProficiencies['Seamanship'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Seamanship'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Seamanship'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': +1,
@@ -207,8 +207,8 @@ nonweaponProficiencies['Seamanship'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Seamstress/Tailor'] = [];
-nonweaponProficiencies['Seamstress/Tailor'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Seamstress/Tailor'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Seamstress/Tailor'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -1,
@@ -216,8 +216,8 @@ nonweaponProficiencies['Seamstress/Tailor'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Singing'] = [];
-nonweaponProficiencies['Singing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Singing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Singing'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
@@ -225,8 +225,8 @@ nonweaponProficiencies['Singing'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Stonemasonry'] = [];
-nonweaponProficiencies['Stonemasonry'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Stonemasonry'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Stonemasonry'].push({
     'slots': 1,
     'abilityScore': '@{Strength}',
     'modifier': -2,
@@ -234,8 +234,8 @@ nonweaponProficiencies['Stonemasonry'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Swimming'] = [];
-nonweaponProficiencies['Swimming'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Swimming'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Swimming'].push({
     'slots': 1,
     'abilityScore': '@{Strength}',
     'modifier': 0,
@@ -243,8 +243,8 @@ nonweaponProficiencies['Swimming'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Weather Sense'] = [];
-nonweaponProficiencies['Weather Sense'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Weather Sense'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Weather Sense'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
@@ -252,296 +252,296 @@ nonweaponProficiencies['Weather Sense'].push({
     'book': ['PHB']
 });
 
-nonweaponProficiencies['Weaving'] = [];
-nonweaponProficiencies['Weaving'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Weaving'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Weaving'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
     'classes': '',
     'book': ['PHB']
 });
-nonweaponProficiencies['Ancient History'] = [];
-nonweaponProficiencies['Ancient History'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Ancient History'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Ancient History'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
     'classes': 'Priest/Rogue/Wizard',
     'book': ['PHB']
 });
-nonweaponProficiencies['Animal Lore'] = [];
-nonweaponProficiencies['Animal Lore'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Animal Lore'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Animal Lore'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Appraising'] = [];
-nonweaponProficiencies['Appraising'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Appraising'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Appraising'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Armorer'] = [];
-nonweaponProficiencies['Armorer'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Armorer'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Armorer'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Astrology'] = [];
-nonweaponProficiencies['Astrology'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Astrology'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Astrology'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Priest/Wizard',
     'book': ['PHB']
 });
-nonweaponProficiencies['Blind-fighting'] = [];
-nonweaponProficiencies['Blind-fighting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Blind-fighting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Blind-fighting'].push({
     'slots': 2,
     'abilityScore': '@{NA}',
     'modifier': 'NA',
     'classes': 'Rogue/Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Bowyer/Fletcher'] = [];
-nonweaponProficiencies['Bowyer/Fletcher'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Bowyer/Fletcher'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Bowyer/Fletcher'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -1,
     'classes': 'Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Charioteering'] = [];
-nonweaponProficiencies['Charioteering'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Charioteering'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Charioteering'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': +2,
     'classes': 'Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Disguise'] = [];
-nonweaponProficiencies['Disguise'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Disguise'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Disguise'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': -1,
     'classes': 'Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Endurance'] = [];
-nonweaponProficiencies['Endurance'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Endurance'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Endurance'].push({
     'slots': 2,
     'abilityScore': '@{Constitution}',
     'modifier': 0,
     'classes': 'Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Engineering'] = [];
-nonweaponProficiencies['Engineering'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Engineering'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Engineering'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': -3,
     'classes': 'Priest/Wizard',
     'book': ['PHB']
 });
-nonweaponProficiencies['Forgery'] = [];
-nonweaponProficiencies['Forgery'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Forgery'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Forgery'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -1,
     'classes': 'Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Gaming'] = [];
-nonweaponProficiencies['Gaming'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Gaming'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Gaming'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
     'classes': 'Rogue/Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Gem-Cutting'] = [];
-nonweaponProficiencies['Gem-Cutting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Gem-Cutting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Gem-Cutting'].push({
     'slots': 2,
     'abilityScore': '@{Dexterity}',
     'modifier': -2,
     'classes': 'Rogue/Wizard',
     'book': ['PHB']
 });
-nonweaponProficiencies['Healing'] = [];
-nonweaponProficiencies['Healing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Healing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Healing'].push({
     'slots': 2,
     'abilityScore': '@{Wisdom}',
     'modifier': -2,
     'classes': 'Priest',
     'book': ['PHB']
 });
-nonweaponProficiencies['Herbalism'] = [];
-nonweaponProficiencies['Herbalism'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Herbalism'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Herbalism'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Priest/Wizard',
     'book': ['PHB']
 });
-nonweaponProficiencies['Hunting'] = [];
-nonweaponProficiencies['Hunting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Hunting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Hunting'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
     'classes': 'Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Juggling'] = [];
-nonweaponProficiencies['Juggling'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Juggling'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Juggling'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -1,
     'classes': 'Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Jumping'] = [];
-nonweaponProficiencies['Jumping'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Jumping'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Jumping'].push({
     'slots': 1,
     'abilityScore': '@{Strength}',
     'modifier': 0,
     'classes': 'Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Languages, Ancient'] = [];
-nonweaponProficiencies['Languages, Ancient'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Languages, Ancient'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Languages, Ancient'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Priest/Wizard',
     'book': ['PHB']
 });
-nonweaponProficiencies['Local History'] = [];
-nonweaponProficiencies['Local History'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Local History'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Local History'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
     'classes': 'Priest/Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Mountaineering'] = [];
-nonweaponProficiencies['Mountaineering'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Mountaineering'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Mountaineering'].push({
     'slots': 1,
     'abilityScore': 'NA',
     'modifier': 'NA',
     'classes': 'Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Musical Instrument'] = [];
-nonweaponProficiencies['Musical Instrument'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Musical Instrument'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Musical Instrument'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -1,
     'classes': 'Priest/Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Navigation'] = [];
-nonweaponProficiencies['Navigation'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Navigation'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Navigation'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Priest/Warrior/Wizard',
     'book': ['PHB']
 });
-nonweaponProficiencies['Reading Lips'] = [];
-nonweaponProficiencies['Reading Lips'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Reading Lips'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Reading Lips'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Reading/Writing'] = [];
-nonweaponProficiencies['Reading/Writing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Reading/Writing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Reading/Writing'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +1,
     'classes': 'Priest/Wizard',
     'book': ['PHB']
 });
-nonweaponProficiencies['Religion'] = [];
-nonweaponProficiencies['Religion'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Religion'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Religion'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': 'Priest/Wizard',
     'book': ['PHB']
 });
-nonweaponProficiencies['Running'] = [];
-nonweaponProficiencies['Running'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Running'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Running'].push({
     'slots': 1,
     'abilityScore': '@{Constitution}',
     'modifier': -6,
     'classes': 'Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Set Snares'] = [];
-nonweaponProficiencies['Set Snares'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Set Snares'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Set Snares'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -1,
     'classes': 'Rogue/Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Spellcraft'] = [];
-nonweaponProficiencies['Spellcraft'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Spellcraft'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Spellcraft'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Priest/Wizard',
     'book': ['PHB']
 });
-nonweaponProficiencies['Survival'] = [];
-nonweaponProficiencies['Survival'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Survival'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Survival'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Tightrope Walking'] = [];
-nonweaponProficiencies['Tightrope Walking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Tightrope Walking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Tightrope Walking'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': 'Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Tracking'] = [];
-nonweaponProficiencies['Tracking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Tracking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Tracking'].push({
     'slots': 2,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': 'Warrior',
     'book': ['PHB']
 });
-nonweaponProficiencies['Tumbling'] = [];
-nonweaponProficiencies['Tumbling'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Tumbling'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Tumbling'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': 'Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Ventriloquism'] = [];
-nonweaponProficiencies['Ventriloquism'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Ventriloquism'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Ventriloquism'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Rogue',
     'book': ['PHB']
 });
-nonweaponProficiencies['Weaponsmithing'] = [];
-nonweaponProficiencies['Weaponsmithing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Weaponsmithing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Weaponsmithing'].push({
     'slots': 3,
     'abilityScore': '@{Intelligence}',
     'modifier': -3,
@@ -551,104 +551,104 @@ nonweaponProficiencies['Weaponsmithing'].push({
 //#endregion
 
 //#region The Complete Thief's Handbook
-nonweaponProficiencies['Alertness'] = [];
-nonweaponProficiencies['Alertness'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Alertness'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Alertness'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': +1,
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids','The Complete Ranger\'s Handbook','The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Animal Noise'] = [];
-nonweaponProficiencies['Animal Noise'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Animal Noise'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Animal Noise'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Begging'] = [];
-nonweaponProficiencies['Begging'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Begging'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Begging'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': '?{Current Locale?|Uninhabited/Wilderness,-99|Countryside,-7|Hamlet/Village,-5|Town,-0,City,0}',
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Boating'] = [];
-nonweaponProficiencies['Boating'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Boating'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Boating'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': +1,
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Ranger\'s Handbook','The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Fast-Talking'] = [];
-nonweaponProficiencies['Fast-Talking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Fast-Talking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Fast-Talking'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': '',
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Fortune Telling'] = [];
-nonweaponProficiencies['Fortune Telling'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Fortune Telling'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Fortune Telling'].push({
     'slots': 2,
     'abilityScore': '@{Charisma}',
     'modifier': +2,
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Information Gathering'] = [];
-nonweaponProficiencies['Information Gathering'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Information Gathering'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Information Gathering'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': '',
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids','The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Intimidation'] = [];
-nonweaponProficiencies['Intimidation'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Intimidation'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Intimidation'].push({
     'slots': 1,
     'abilityScore': '?{Intimidation with?|@{Strength}|@{Charisma}}',
     'modifier': '',
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Dwarves','The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Locksmithing'] = [];
-nonweaponProficiencies['Locksmithing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Locksmithing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Locksmithing'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Thief\'s Handbook']
 });
-nonweaponProficiencies['Looting'] = [];
-nonweaponProficiencies['Looting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Looting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Looting'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Observation'] = [];
-nonweaponProficiencies['Observation'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Observation'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Observation'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids','The Complete Ninja\'s Handbook','Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Trailing'] = [];
-nonweaponProficiencies['Trailing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Trailing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Trailing'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': '',
     'classes': '',
     'book': ['The Complete Thief\'s Handbook']
 });
-nonweaponProficiencies['Voice Mimicry'] = [];
-nonweaponProficiencies['Voice Mimicry'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Voice Mimicry'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Voice Mimicry'].push({
     'slots': 2,
     'abilityScore': '@{Charisma}',
     'modifier': '',
@@ -658,384 +658,384 @@ nonweaponProficiencies['Voice Mimicry'].push({
 //#endregion
 
 //#region The Complete Book of Dwarves
-nonweaponProficiencies['Appraising (Dwarf)'] = [];
-nonweaponProficiencies['Appraising (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Appraising (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Appraising (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +3,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Dwarf Runes'] = [];
-nonweaponProficiencies['Dwarf Runes'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Dwarf Runes'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Dwarf Runes'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +2,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Dwarf Runes (Dwarf)'] = [];
-nonweaponProficiencies['Dwarf Runes (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Dwarf Runes (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Dwarf Runes (Dwarf)'].push({
     'slots': 0,
     'abilityScore': '@{Intelligence}',
     'modifier': +2,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Endurance (Dwarf)'] = [];
-nonweaponProficiencies['Endurance (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Endurance (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Endurance (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Constitution}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Fungi Recognition'] = [];
-nonweaponProficiencies['Fungi Recognition'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Fungi Recognition'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Fungi Recognition'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +3,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Local Dwarf History'] = [];
-nonweaponProficiencies['Local Dwarf History'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Local Dwarf History'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Local Dwarf History'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': +2,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Navigation, Underground'] = [];
-nonweaponProficiencies['Navigation, Underground'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Navigation, Underground'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Navigation, Underground'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Riding, Land-Based (Dwarf)'] = [];
-nonweaponProficiencies['Riding, Land-Based (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Riding, Land-Based (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Riding, Land-Based (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -2,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Sign Language'] = [];
-nonweaponProficiencies['Sign Language'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Sign Language'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Sign Language'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +2,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Signalling'] = [];
-nonweaponProficiencies['Signalling'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Signalling'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Signalling'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +2,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Singing (Dwarf)'] = [];
-nonweaponProficiencies['Singing (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Singing (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Singing (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': +2,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Slow Respiration'] = [];
-nonweaponProficiencies['Slow Respiration'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Slow Respiration'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Slow Respiration'].push({
     'slots': 1,
     'abilityScore': '@{NA}',
     'modifier': 'NA',
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Sound Analysis'] = [];
-nonweaponProficiencies['Sound Analysis'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Sound Analysis'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Sound Analysis'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Survival, Underground'] = [];
-nonweaponProficiencies['Survival, Underground'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Survival, Underground'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Survival, Underground'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Armorer (Dwarf)'] = [];
-nonweaponProficiencies['Armorer (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Armorer (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Armorer (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Blacksmithing (Dwarf)'] = [];
-nonweaponProficiencies['Blacksmithing (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Blacksmithing (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Blacksmithing (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Strength}',
     'modifier': +1,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Bowyer/Fletcher (Dwarf)'] = [];
-nonweaponProficiencies['Bowyer/Fletcher (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Bowyer/Fletcher (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Bowyer/Fletcher (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Brewing (Dwarf)'] = [];
-nonweaponProficiencies['Brewing (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Brewing (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Brewing (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +1,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Engineering (Dwarf)'] = [];
-nonweaponProficiencies['Engineering (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Engineering (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Engineering (Dwarf)'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Gem Cutting (Dwarf)'] = [];
-nonweaponProficiencies['Gem Cutting (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Gem Cutting (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Gem Cutting (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Herbalism (Dwarf)'] = [];
-nonweaponProficiencies['Herbalism (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Herbalism (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Herbalism (Dwarf)'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Locksmithing (Dwarf)'] = [];
-nonweaponProficiencies['Locksmithing (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Locksmithing (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Locksmithing (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': +1,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Mining (Dwarf)'] = [];
-nonweaponProficiencies['Mining (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Mining (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Mining (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Pottery (Dwarf)'] = [];
-nonweaponProficiencies['Pottery (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Pottery (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Pottery (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -3,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Seamstress/Tailor (Dwarf)'] = [];
-nonweaponProficiencies['Seamstress/Tailor (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Seamstress/Tailor (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Seamstress/Tailor (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -2,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Smelting'] = [];
-nonweaponProficiencies['Smelting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Smelting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Smelting'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Stonemasonry (Dwarf)'] = [];
-nonweaponProficiencies['Stonemasonry (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Stonemasonry (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Stonemasonry (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Strength}',
     'modifier': 0,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Weaponsmithing (Dwarf)'] = [];
-nonweaponProficiencies['Weaponsmithing (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Weaponsmithing (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Weaponsmithing (Dwarf)'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Weaving (Dwarf)'] = [];
-nonweaponProficiencies['Weaving (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Weaving (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Weaving (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Crafts',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Ancient History (Dwarf)'] = [];
-nonweaponProficiencies['Ancient History (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Ancient History (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Ancient History (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Priest',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Blind-fighting (Dwarf)'] = [];
-nonweaponProficiencies['Blind-fighting (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Blind-fighting (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Blind-fighting (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{NA}',
     'modifier': 'NA',
     'classes': 'Warrior/Thief',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Disguise (Dwarf)'] = [];
-nonweaponProficiencies['Disguise (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Disguise (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Disguise (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': -2,
     'classes': 'Thief',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Forgery (Dwarf)'] = [];
-nonweaponProficiencies['Forgery (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Forgery (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Forgery (Dwarf)'].push({
     'slots': 2,
     'abilityScore': '@{Dexterity}',
     'modifier': -1,
     'classes': 'Thief',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Hunting (Dwarf)'] = [];
-nonweaponProficiencies['Hunting (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Hunting (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Hunting (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': '-2',
     'classes': 'Warrior',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Juggling (Dwarf)'] = [];
-nonweaponProficiencies['Juggling (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Juggling (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Juggling (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -2,
     'classes': 'Thief',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Lip Reading (Dwarf)'] = [];
-nonweaponProficiencies['Lip Reading (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Lip Reading (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Lip Reading (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Thief',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Musical Instrument (Dwarf)'] = [];
-nonweaponProficiencies['Musical Instrument (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Musical Instrument (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Musical Instrument (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -2,
     'classes': 'Thief/Priest',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Pest Control'] = [];
-nonweaponProficiencies['Pest Control'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Pest Control'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Pest Control'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': 'Thief',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Survival (Hill, Mountain)'] = [];
-nonweaponProficiencies['Survival (Hill, Mountain)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Survival (Hill, Mountain)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Survival (Hill, Mountain)'].push({
     'slots': 1,
     'abilityScore': '@{NA}',
     'modifier': 'NA',
     'classes': 'Warrior',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Boating (Dwarf)'] = [];
-nonweaponProficiencies['Boating (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Boating (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Boating (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': 'Special Background',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Boatwright'] = [];
-nonweaponProficiencies['Boatwright'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Boatwright'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Boatwright'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Special Background',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Navigation (Dwarf)'] = [];
-nonweaponProficiencies['Navigation (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Navigation (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Navigation (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -3,
     'classes': 'Special Background',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Swimming (Dwarf)'] = [];
-nonweaponProficiencies['Swimming (Dwarf)'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Swimming (Dwarf)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Swimming (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Strength}',
     'modifier': -1,
     'classes': 'Special Background',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Grade or Slope in Passage'] = [];
-nonweaponProficiencies['Grade or Slope in Passage'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Grade or Slope in Passage'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Grade or Slope in Passage'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': +4,
     'classes': '(Optional) Dwarven Detection',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['New Tunnel/Passage Construction'] = [];
-nonweaponProficiencies['New Tunnel/Passage Construction'].push({
+NONWEAPON_PROFICIENCIES_TABLE['New Tunnel/Passage Construction'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['New Tunnel/Passage Construction'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': +4,
     'classes': '(Optional) Dwarven Detection',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Sliding/Shifting Walls or Rooms'] = [];
-nonweaponProficiencies['Sliding/Shifting Walls or Rooms'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Sliding/Shifting Walls or Rooms'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Sliding/Shifting Walls or Rooms'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': +2,
     'classes': '(Optional) Dwarven Detection',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Stonework Traps, Pits, and Deadfalls'] = [];
-nonweaponProficiencies['Stonework Traps, Pits, and Deadfalls'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Stonework Traps, Pits, and Deadfalls'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Stonework Traps, Pits, and Deadfalls'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': '(Optional) Dwarven Detection',
     'book': ['The Complete Book of Dwarves']
 });
-nonweaponProficiencies['Approximate Depth Underground'] = [];
-nonweaponProficiencies['Approximate Depth Underground'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Approximate Depth Underground'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Approximate Depth Underground'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
@@ -1045,48 +1045,48 @@ nonweaponProficiencies['Approximate Depth Underground'].push({
 //#endregion
 
 //#region The Complete Bard's Handbook
-nonweaponProficiencies['Acting'] = [];
-nonweaponProficiencies['Acting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Acting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Acting'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': -1,
     'classes': '',
     'book': ['The Complete Bard\'s Handbook','The Complete Book of Humanoids','The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Chanting'] = [];
-nonweaponProficiencies['Chanting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Chanting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Chanting'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': +2,
     'classes': '',
     'book': ['The Complete Bard\'s Handbook','The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Craft Instrument'] = [];
-nonweaponProficiencies['Craft Instrument'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Craft Instrument'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Craft Instrument'].push({
     'slots': 2,
     'abilityScore': '@{Dexterity}',
     'modifier': -2,
     'classes': '',
     'book': ['The Complete Bard\'s Handbook','The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Crowd Working'] = [];
-nonweaponProficiencies['Crowd Working'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Crowd Working'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Crowd Working'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Bard\'s Handbook']
 });
-nonweaponProficiencies['Poetry'] = [];
-nonweaponProficiencies['Poetry'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Poetry'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Poetry'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': '',
     'book': ['The Complete Bard\'s Handbook','The Complete Book of Humanoids','The Complete Paladin\'s Handbook']
 });
-nonweaponProficiencies['Whistling/Humming'] = [];
-nonweaponProficiencies['Whistling/Humming'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Whistling/Humming'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Whistling/Humming'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': +2,
@@ -1096,72 +1096,72 @@ nonweaponProficiencies['Whistling/Humming'].push({
 //#endregion
 
 //#region The Complete Book of Humanoids
-nonweaponProficiencies['Cheesemaking'] = [];
-nonweaponProficiencies['Cheesemaking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Cheesemaking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Cheesemaking'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Danger Sense'] = [];
-nonweaponProficiencies['Danger Sense'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Danger Sense'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Danger Sense'].push({
     'slots': 2,
     'abilityScore': '@{Wisdom}',
     'modifier': +1,
     'classes': '',
     'book': ['The Complete Book of Humanoids','The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Drinking'] = [];
-nonweaponProficiencies['Drinking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Drinking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Drinking'].push({
     'slots': 1,
     'abilityScore': '@{Constitution}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Eating'] = [];
-nonweaponProficiencies['Eating'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Eating'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Eating'].push({
     'slots': 1,
     'abilityScore': '@{Constitution}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Hiding'] = [];
-nonweaponProficiencies['Hiding'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Hiding'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Hiding'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
     'classes': '',
     'book': ['The Complete Book of Humanoids','The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Winemaking'] = [];
-nonweaponProficiencies['Winemaking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Winemaking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Winemaking'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Close-quarter Fighting'] = [];
-nonweaponProficiencies['Close-quarter Fighting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Close-quarter Fighting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Close-quarter Fighting'].push({
     'slots': 2,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': 'Warrior/Rogue',
     'book': ['The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Natural Fighting'] = [];
-nonweaponProficiencies['Natural Fighting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Natural Fighting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Natural Fighting'].push({
     'slots': 2,
     'abilityScore': '@{Strength}',
     'modifier': +1,
     'classes': 'Warrior',
     'book': ['The Complete Book of Humanoids']
 });
-nonweaponProficiencies['Wild Fighting'] = [];
-nonweaponProficiencies['Wild Fighting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Wild Fighting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Wild Fighting'].push({
     'slots': 2,
     'abilityScore': '@{Constitution}',
     'modifier': 0,
@@ -1171,104 +1171,104 @@ nonweaponProficiencies['Wild Fighting'].push({
 //#endregion
 
 //#region The Complete Ranger's Handbook
-nonweaponProficiencies['Cartography'] = [];
-nonweaponProficiencies['Cartography'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Cartography'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Cartography'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Ranger\'s Handbook']
 });
-nonweaponProficiencies['Distance Sense'] = [];
-nonweaponProficiencies['Distance Sense'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Distance Sense'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Distance Sense'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Ranger\'s Handbook']
 });
-nonweaponProficiencies['Falconry'] = [];
-nonweaponProficiencies['Falconry'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Falconry'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Falconry'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
     'classes': '',
     'book': ['The Complete Ranger\'s Handbook']
 });
-nonweaponProficiencies['Persuasion'] = [];
-nonweaponProficiencies['Persuasion'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Persuasion'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Persuasion'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Ranger\'s Handbook']
 });
-nonweaponProficiencies['Riding, Sea-based'] = [];
-nonweaponProficiencies['Riding, Sea-based'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Riding, Sea-based'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Riding, Sea-based'].push({
     'slots': 2,
     'abilityScore': '@{Dexterity}',
     'modifier': -2,
     'classes': '',
     'book': ['The Complete Ranger\'s Handbook']
 });
-nonweaponProficiencies['Signaling'] = [];
-nonweaponProficiencies['Signaling'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Signaling'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Signaling'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': '',
     'book': ['The Complete Ranger\'s Handbook','The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Camouflage'] = [];
-nonweaponProficiencies['Camouflage'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Camouflage'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Camouflage'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': 'Fighter/Rogue',
     'book': ['The Complete Ranger\'s Handbook']
 });
-nonweaponProficiencies['Foraging'] = [];
-nonweaponProficiencies['Foraging'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Foraging'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Foraging'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Warrior/Rogue',
     'book': ['The Complete Ranger\'s Handbook','The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Spelunking'] = [];
-nonweaponProficiencies['Spelunking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Spelunking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Spelunking'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Warrior',
     'book': ['The Complete Ranger\'s Handbook']
 });
-nonweaponProficiencies['Trail Marking'] = [];
-nonweaponProficiencies['Trail Marking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Trail Marking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Trail Marking'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': 'Warrior',
     'book': ['The Complete Ranger\'s Handbook']
 });
-nonweaponProficiencies['Trail Signs'] = [];
-nonweaponProficiencies['Trail Signs'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Trail Signs'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Trail Signs'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
     'classes': 'Warrior/Rogue',
     'book': ['The Complete Ranger\'s Handbook']
 });
-nonweaponProficiencies['Veterinary Healing'] = [];
-nonweaponProficiencies['Veterinary Healing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Veterinary Healing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Veterinary Healing'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -3,
     'classes': 'Priest',
     'book': ['The Complete Ranger\'s Handbook']
 });
-nonweaponProficiencies['Weaponsmithing, Crude'] = [];
-nonweaponProficiencies['Weaponsmithing, Crude'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Weaponsmithing, Crude'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Weaponsmithing, Crude'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -3,
@@ -1278,40 +1278,40 @@ nonweaponProficiencies['Weaponsmithing, Crude'].push({
 //#endregion
 
 //#region The Complete Paladin's Handbook
-nonweaponProficiencies['Bureaucracy'] = [];
-nonweaponProficiencies['Bureaucracy'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Bureaucracy'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Bureaucracy'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Priest/Rogue',
     'book': ['The Complete Paladin\'s Handbook','Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Diagnostics'] = [];
-nonweaponProficiencies['Diagnostics'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Diagnostics'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Diagnostics'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
     'classes': 'Priest',
     'book': ['The Complete Paladin\'s Handbook']
 });
-nonweaponProficiencies['Jousting'] = [];
-nonweaponProficiencies['Jousting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Jousting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Jousting'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': +2,
     'classes': 'Warrior',
     'book': ['The Complete Paladin\'s Handbook']
 });
-nonweaponProficiencies['Law'] = [];
-nonweaponProficiencies['Law'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Law'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Law'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': 'Warrior/Priest',
     'book': ['The Complete Paladin\'s Handbook']
 });
-nonweaponProficiencies['Oratory'] = [];
-nonweaponProficiencies['Oratory'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Oratory'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Oratory'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
@@ -1321,94 +1321,94 @@ nonweaponProficiencies['Oratory'].push({
 //#endregion
 
 //#region The Complete Barbarian's Handbook
-nonweaponProficiencies['Clothesmaking, Crude'] = [];
-nonweaponProficiencies['Clothesmaking, Crude'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Clothesmaking, Crude'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Clothesmaking, Crude'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
     'classes': '',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Animal Rending'] = [];
-nonweaponProficiencies['Animal Rending'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Animal Rending'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Animal Rending'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': +2,
     'classes': 'Warrior',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Armorer, Crude'] = [];
-nonweaponProficiencies['Armorer, Crude'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Armorer, Crude'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Armorer, Crude'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
     'classes': 'Warrior',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Bartering'] = [];
-nonweaponProficiencies['Bartering'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Bartering'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Bartering'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Rogue',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Bowyer/Fletcher, Crude'] = [];
-nonweaponProficiencies['Bowyer/Fletcher, Crude'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Bowyer/Fletcher, Crude'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Bowyer/Fletcher, Crude'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': 'Warrior',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Horde Summoning'] = [];
-nonweaponProficiencies['Horde Summoning'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Horde Summoning'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Horde Summoning'].push({
     'slots': 2,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
     'classes': 'Warrior',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Leadership'] = [];
-nonweaponProficiencies['Leadership'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Leadership'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Leadership'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
     'classes': 'Warrior',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Light Sleeping'] = [];
-nonweaponProficiencies['Light Sleeping'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Light Sleeping'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Light Sleeping'].push({
     'slots': 1,
     'abilityScore': '@{Constitution}',
     'modifier': -1,
     'classes': 'Warrior',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Sign Language'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Sign Language'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Set Snares'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Set Snares'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
     'classes': 'Fighter',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Soothsaying'] = [];
-nonweaponProficiencies['Soothsaying'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Soothsaying'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Soothsaying'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Priest',
     'book': ['The Complete Barbarian\'s Handbook']
 });
-nonweaponProficiencies['Weapon Improvisation'] = [];
-nonweaponProficiencies['Weapon Improvisation'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Weapon Improvisation'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Weapon Improvisation'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
@@ -1418,40 +1418,40 @@ nonweaponProficiencies['Weapon Improvisation'].push({
 //#endregion
 
 //#region The Complete Book of Necromancers
-nonweaponProficiencies['Anatomy'] = [];
-nonweaponProficiencies['Anatomy'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Anatomy'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Anatomy'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Book of Necromancers']
 });
-nonweaponProficiencies['Necrology'] = [];
-nonweaponProficiencies['Necrology'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Necrology'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Necrology'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Book of Necromancers']
 });
-nonweaponProficiencies['Netherworld Knowledge'] = [];
-nonweaponProficiencies['Netherworld Knowledge'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Netherworld Knowledge'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Netherworld Knowledge'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -3,
     'classes': '',
     'book': ['The Complete Book of Necromancers']
 });
-nonweaponProficiencies['Spirit Lore'] = [];
-nonweaponProficiencies['Spirit Lore'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Spirit Lore'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Spirit Lore'].push({
     'slots': 2,
     'abilityScore': '@{Charisma}',
     'modifier': -4,
     'classes': '',
     'book': ['The Complete Book of Necromancers']
 });
-nonweaponProficiencies['Venom Handling'] = [];
-nonweaponProficiencies['Venom Handling'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Venom Handling'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Venom Handling'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -2,
@@ -1461,112 +1461,112 @@ nonweaponProficiencies['Venom Handling'].push({
 //#endregion
 
 //#region The Complete Ninja's Handbook
-nonweaponProficiencies['City Familiarity'] = [];
-nonweaponProficiencies['City Familiarity'].push({
+NONWEAPON_PROFICIENCIES_TABLE['City Familiarity'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['City Familiarity'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Style Analysis'] = [];
-nonweaponProficiencies['Style Analysis'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Style Analysis'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Style Analysis'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
     'classes': 'Warrior',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Assimilation'] = [];
-nonweaponProficiencies['Assimilation'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Assimilation'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Assimilation'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Detect Signing'] = [];
-nonweaponProficiencies['Detect Signing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Detect Signing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Detect Signing'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +1,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Enamor'] = [];
-nonweaponProficiencies['Enamor'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Enamor'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Enamor'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': -2,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Escape'] = [];
-nonweaponProficiencies['Escape'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Escape'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Escape'].push({
     'slots': 2,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Feign/Detect Sleep'] = [];
-nonweaponProficiencies['Feign/Detect Sleep'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Feign/Detect Sleep'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Feign/Detect Sleep'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Giant Kite Flying'] = [];
-nonweaponProficiencies['Giant Kite Flying'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Giant Kite Flying'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Giant Kite Flying'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -3,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Hold Breath'] = [];
-nonweaponProficiencies['Hold Breath'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Hold Breath'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Hold Breath'].push({
     'slots': 1,
     'abilityScore': '@{Constitution}',
     'modifier': 0,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Night Vision'] = [];
-nonweaponProficiencies['Night Vision'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Night Vision'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Night Vision'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -2,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Toxicology'] = [];
-nonweaponProficiencies['Toxicology'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Toxicology'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Toxicology'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Quick Study'] = [];
-nonweaponProficiencies['Quick Study'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Quick Study'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Quick Study'].push({
     'slots': 2,
     'abilityScore': '',
     'modifier': -3,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Underclass'] = [];
-nonweaponProficiencies['Underclass'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Underclass'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Underclass'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': 'Rogue',
     'book': ['The Complete Ninja\'s Handbook']
 });
-nonweaponProficiencies['Water Walking'] = [];
-nonweaponProficiencies['Water Walking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Water Walking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Water Walking'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -1,
@@ -1576,204 +1576,204 @@ nonweaponProficiencies['Water Walking'].push({
 //#endregion
 
 //#region Player's Option: Spells & Magic
-nonweaponProficiencies['Alchemy'] = [];
-nonweaponProficiencies['Alchemy'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Alchemy'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Alchemy'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': -3,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Anatomy'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Anatomy'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Arcanology'] = [];
-nonweaponProficiencies['Arcanology'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Arcanology'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Arcanology'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -3,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Bookbinding'] = [];
-nonweaponProficiencies['Bookbinding'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Bookbinding'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Bookbinding'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Priest/Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Concentration'] = [];
-nonweaponProficiencies['Concentration'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Concentration'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Concentration'].push({
     'slots': 2,
     'abilityScore': '@{Wisdom}',
     'modifier': -2,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Dowsing'] = [];
-nonweaponProficiencies['Dowsing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Dowsing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Dowsing'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -3,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Glassblowing'] = [];
-nonweaponProficiencies['Glassblowing'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Glassblowing'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Glassblowing'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Hypnotism'] = [];
-nonweaponProficiencies['Hypnotism'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Hypnotism'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Hypnotism'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': -2,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Mental Resistance'] = [];
-nonweaponProficiencies['Mental Resistance'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Mental Resistance'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Mental Resistance'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -1,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Omen Reading'] = [];
-nonweaponProficiencies['Omen Reading'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Omen Reading'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Omen Reading'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': -2,
     'classes': 'Priest/Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Papermaking'] = [];
-nonweaponProficiencies['Papermaking'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Papermaking'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Papermaking'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Priest/Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Prestidigitation'] = [];
-nonweaponProficiencies['Prestidigitation'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Prestidigitation'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Prestidigitation'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -1,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Research'] = [];
-nonweaponProficiencies['Research'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Research'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Research'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Sage Knowledge'] = [];
-nonweaponProficiencies['Sage Knowledge'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Sage Knowledge'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Sage Knowledge'].push({
     'slots': 2,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Priest/Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Scribe'] = [];
-nonweaponProficiencies['Scribe'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Scribe'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Scribe'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': +1,
     'classes': 'Priest/Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Tactics of Magic'] = [];
-nonweaponProficiencies['Tactics of Magic'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Tactics of Magic'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Tactics of Magic'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Thaumaturgy'] = [];
-nonweaponProficiencies['Thaumaturgy'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Thaumaturgy'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Thaumaturgy'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Wizard',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Administration'] = [];
-nonweaponProficiencies['Administration'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Administration'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Administration'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +1,
     'classes': 'Priest',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Alms'] = [];
-nonweaponProficiencies['Alms'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Alms'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Alms'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': 0,
     'classes': 'Priest',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Ceremony'] = [];
-nonweaponProficiencies['Ceremony'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Ceremony'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Ceremony'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
     'classes': 'Priest',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Diplomacy'] = [];
-nonweaponProficiencies['Diplomacy'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Diplomacy'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Diplomacy'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': -1,
     'classes': 'Priest',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Investigation'] = [];
-nonweaponProficiencies['Investigation'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Investigation'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Investigation'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -2,
     'classes': 'Priest',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Law'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Law'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': 0,
     'classes': 'Priest',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Oratory'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Oratory'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': -1,
     'classes': 'Priest',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Persuasion'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Persuasion'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
     'modifier': -2,
     'classes': 'Priest',
     'book': ['Player\'s Option: Spells & Magic']
 });
-nonweaponProficiencies['Undead Lore'] = [];
-nonweaponProficiencies['Undead Lore'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Undead Lore'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Undead Lore'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': -1,
@@ -1781,4 +1781,4 @@ nonweaponProficiencies['Undead Lore'].push({
     'book': ['Player\'s Option: Spells & Magic']
 });
 //#endregion
-module.exports = nonweaponProficiencies;
+module.exports = NONWEAPON_PROFICIENCIES_TABLE;

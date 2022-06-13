@@ -80,11 +80,11 @@ const parseSourceAttribute = function (eventInfo) {
     let parse = {};
     if (eventInfo.sourceAttribute.startsWith('repeating')) {
         let match = eventInfo.sourceAttribute.split('_');
-        parse['section'] = match[1];
-        parse['rowId'] = match[2];
-        parse['attribute'] = match[3];
+        parse.section = match[1];
+        parse.rowId = match[2];
+        parse.attribute = match[3];
     } else {
-        parse['attribute'] = eventInfo.sourceAttribute;
+        parse.attribute = eventInfo.sourceAttribute;
     }
     return parse;
 }
@@ -110,6 +110,12 @@ const extractRollResult = async function(rollExpression) {
     let roll = await extractRoll(rollExpression);
     return roll.result;
 };
+
+// Call this when an async function does not call the CRP to keep the reference to the character sheet.
+const keepContextRoll = async function () {
+    let dummyRoll = await startRoll('!{{roll=}}');
+    finishRoll(dummyRoll.rollId);
+}
 
 const printRoll = async function(rollExpression) {
     let roll = await startRoll(rollExpression);
@@ -1280,6 +1286,55 @@ on('change:thac0-base-calc', function(eventInfo) {
         .execute();
 });
 
+async function selectVersion(foundObjects, values, comparer, objectName) {
+    let activeBooks = getActiveSettings(BOOK_FIELDS, values);
+    let activeObjects = foundObjects.filter(w => w['book'].some(b => activeBooks.has(b)));
+    if (activeObjects.length === 0) {
+        await keepContextRoll();
+        let booksString = foundObjects.flatMap(w => w['book']).map(b => '\n* ' + b).join('');
+        showToast(ERROR, 'Missing Book(s)', `The book(s):${booksString}\nAre currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
+        return;
+    }
+
+    let isPlayersOption = values[PLAYERS_OPTION_FIELD] === '2';
+    let isAllEqual = activeObjects.every(o => comparer(o, activeObjects[0], isPlayersOption));
+    if (isAllEqual) {
+        await keepContextRoll();
+        return activeObjects[0];
+    } else {
+        activeObjects = combineBooks(activeObjects, comparer, isPlayersOption);
+        let options = activeObjects
+            .map((o, i) => `${o.book.join('/')},${i}`)
+            .join('|');
+        let answer = await extractRollResult(`?{Multiple versions of this ${objectName} exists. Please select a version|${options}}`);
+        return activeObjects[answer];
+    }
+}
+
+function combineBooks(activeObjects, comparer, isPlayersOptions) {
+    // Copying fields from active object to avoid side effects being saved permanently
+    let copyActiveObjects = activeObjects.map(e => {
+        return {...e}
+    });
+    let copyArray = [...copyActiveObjects];
+
+    copyActiveObjects.forEach(activeObject => {
+        copyArray.forEach((copyObject, i) => {
+            if (activeObject === copyObject) {
+                delete copyArray[i];
+                return;
+            }
+            if (!comparer(activeObject, copyObject, isPlayersOptions))
+                return;
+
+            activeObject['book'] = activeObject['book'].concat(copyObject['book']);
+            delete copyActiveObjects[i];
+        });
+    });
+
+    return copyActiveObjects.filter(Boolean);
+}
+
 //#region Weapons autofill
 const PLAYERS_OPTION_FIELD = 'tab81';
 function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, category) {
@@ -1305,34 +1360,14 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
             if (isNaN(bonus))
                 return;
         }
-        // Copying fields from base weapon to avoid side effects being saved permanently
-        let foundWeapons = baseWeapons.map(e => {
-            return {...e}
-        });
+        let weaponsInCategory;
         if (category)
-            foundWeapons = foundWeapons.filter(w => w['category'].includes(category));
+            weaponsInCategory = baseWeapons.filter(w => w['category'].includes(category));
 
-        let activeBooks = getActiveSettings(BOOK_FIELDS, values);
-        let activeWeapons = foundWeapons.filter(w => w['book'].some(b => activeBooks.has(b)));
-        if (activeWeapons.length === 0) {
-            let booksString = foundWeapons.flatMap(w => w['book']).map(b => '\n* ' + b).join('')
-            showToast(ERROR, 'Missing Book(s)', `The book(s):${booksString}\nAre currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
+        let baseWeapon = await selectVersion(weaponsInCategory, values, comparer, 'weapon');
+        console.log(baseWeapon);
+        if (!baseWeapon)
             return;
-        }
-
-        let baseWeapon;
-        let isPlayersOption = values[PLAYERS_OPTION_FIELD] === '2';
-        let isAllEqual = activeWeapons.every(w => comparer(w, activeWeapons[0], isPlayersOption));
-        if (isAllEqual) {
-            baseWeapon = activeWeapons[0];
-        } else {
-            activeWeapons = combineBooks(activeWeapons, comparer, isPlayersOption);
-            let options = activeWeapons
-                .map((w, i) => `${w.book.join('/')},${i}`)
-                .join('|');
-            let answer = await extractRollResult(`?{Multiple versions of this weapon exists. Please select a version|${options}}`);
-            baseWeapon = activeWeapons[answer];
-        }
 
         let thac0 = parseInt(values[thac0Field]);
         thac0 = isNaN(thac0) ? 20 : thac0;
@@ -1351,26 +1386,6 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
         }
         setWeaponFunc(weapon);
     });
-}
-
-function combineBooks(activeWeapons, comparer, isPlayersOptions) {
-    let copyArray = [...activeWeapons];
-
-    activeWeapons.forEach( weapon => {
-        copyArray.forEach( (copyWeapon, i) => {
-            if (weapon === copyWeapon) {
-                delete copyArray[i];
-                return;
-            }
-            if (!comparer(weapon, copyWeapon, isPlayersOptions))
-                return;
-
-            weapon['book'] = weapon['book'].concat(copyWeapon['book']);
-            delete activeWeapons[i];
-        });
-    });
-
-    return activeWeapons.filter(Boolean);
 }
 
 //melee hit autofill
@@ -2180,19 +2195,27 @@ on('change:repeating_profs:profslots remove:repeating_profs change:prof-slots-to
 });
 //Nonweapon proficiency autofill
 on('change:repeating_profs:profname', function (eventInfo) {
-    let nonweaponProficiency = nonweaponProficiencies[eventInfo.newValue];
-    if (!nonweaponProficiency)
+    let nonweaponProficiencies = NONWEAPON_PROFICIENCIES_TABLE[eventInfo.newValue];
+    if (!nonweaponProficiencies)
         return;
 
-    getAttrs(BOOK_FIELDS, function (books) {
-        if (bookInactiveShowToast(books, nonweaponProficiency))
+    let comparer = function (nonweaponProf1, nonweaponProf2, isPlayersOption) {
+        return ['slots','abilityScore','modifier'].every(f => nonweaponProf1[f] === nonweaponProf2[f])
+    }
+
+    getAttrs(BOOK_FIELDS, async function (books) {
+        let nonweaponProficiency = await selectVersion(nonweaponProficiencies, books, comparer, 'nonweapon proficiency');
+        console.log(nonweaponProficiency);
+        if (!nonweaponProficiency)
             return;
 
-        setAttrs({
-            'repeating_profs_profslots'  : nonweaponProficiency['slots'],
-            'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
-            'repeating_profs_profmod'    : nonweaponProficiency['modifier'],
-        });
+        let rowId = parseSourceAttribute(eventInfo).rowId;
+
+        let nonweaponProfInfo = {};
+        nonweaponProfInfo[`repeating_profs_${rowId}_profslots`]   = nonweaponProficiency['slots'];
+        nonweaponProfInfo[`repeating_profs_${rowId}_profstatnum`] = nonweaponProficiency['abilityScore'];
+        nonweaponProfInfo[`repeating_profs_${rowId}_profmod`]     = nonweaponProficiency['modifier'];
+        setAttrs(nonweaponProfInfo);
     });
 });
 
