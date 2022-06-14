@@ -1,14 +1,3 @@
-// See http://wiki.roll20.net/Sheet_Worker_Scripts
-//
-// change:<attribute> - Attribut wurde geändert.
-// change:repeating_<section> - Repeating Section wurde geändert.
-// change:repeating_<section>:<attribute> - Bestimmtes Attribut einer Repeating Section wurde geändert.
-// change:_reporder_repeating_<section> - Repeating Section wurde verschoben.
-// remove:repeating_<section> - Repeating Section wurde gelöscht.
-// remove:repeating_<section>:-<row_id> - Bestimmte Repeating Section wurde gelöscht.
-// sheet:opened - Charakterbogen wurde im Browser geöffnet.
-// clicked:<button> - Ein Knopf mit `name="act_<button>` wurde gedrückt.
-
 'use strict'
 
 var SHEET_VERSION = 3
@@ -755,16 +744,18 @@ on('clicked:add_natural_weapons', function() {
     createWeapon(values, {
         name: getTranslationByKey('weapon-bite'),
         attribute: 'body',
-        skill: 'melee',
+        skill: 'brawl',
         handling: -3,
+        damage_type: 'flesh_wounds',
         damage_base: 0,
         damage_force_factor: '0.333'
     })
     createWeapon(values, {
         name: getTranslationByKey('weapon-kick'),
         attribute: 'body',
-        skill: 'melee',
+        skill: 'brawl',
         handling: 1,
+        damage_type: 'ego',
         damage_base: 0,
         damage_force_factor: '0.5',
         description: getTranslationByKey('weapon-quality-dazed')
@@ -772,8 +763,9 @@ on('clicked:add_natural_weapons', function() {
     createWeapon(values, {
         name: getTranslationByKey('weapon-blow'),
         attribute: 'body',
-        skill: 'melee',
+        skill: 'brawl',
         handling: 2,
+        damage_type: 'ego',
         damage_base: 0,
         damage_force_factor: '0.333',
         description: getTranslationByKey('weapon-quality-dazed')+
@@ -1236,21 +1228,17 @@ on(effectChangeEvents.join(' '), function(e) {
 calculateAttribute('mental_defense_preview',
                    ['psyche',
                     'willpower',
-                    'faith',
-                    'action_modifier'],
+                    'faith'],
                    ['psyche_effect_modifiers',
                     'willpower_effect_modifiers',
                     'faith_effect_modifiers',
-                    'mental_defense_effect_modifiers',
-                    'action_modifier_effect_modifiers'],
+                    'mental_defense_effect_modifiers'],
                    v => v.psyche +
                         getConstantPartOfEffectModifier(v.psyche_effect_modifiers) +
                         v.willpower +
                         getConstantPartOfEffectModifier(v.willpower_effect_modifiers) +
                         v.faith +
                         getConstantPartOfEffectModifier(v.faith_effect_modifiers) +
-                        v.action_modifier +
-                        getConstantPartOfEffectModifier(v.action_modifier_effect_modifiers)+
                         getConstantPartOfEffectModifier(v.mental_defense_effect_modifiers))
 calculateEffectModifierPreview('mental_defense')
 

@@ -1,0 +1,97 @@
+mixin oracleRoll(id, table, row, index)
+  - var initChance
+  if index === 0
+    - initChance = row.Chance - (row.Chance - 1)
+  else
+    - initChance = table[index - 1].Chance + 1
+  -
+    //- appends any Assets or Details info to the row
+    var finalChance = row.Chance;
+    let detailsKeys = ["Assets", "Details"];
+    let detailsStrings = [];
+    detailsKeys.forEach(key => {
+      if (row[key]) {
+        if (key === "Assets") {
+          row[key] = row[key].map(item => item.toUpperCase());
+        }
+        detailsStrings.push(row[key])
+      };
+    });
+    let detailString;
+    if (detailsStrings.length > 0) {
+      detailsStrings = detailsStrings.flat(2);
+      detailString = `(${detailsStrings.join(", ")})`;
+    }
+    const result = `${row.Description}${detailString ? " " + detailString : ""}`
+  if initChance === finalChance
+    | {{#rollTotal() #{id} #{finalChance}}}
+    |
+    span!=result
+    |
+    | {{/rollTotal() #{id} #{finalChance}}}
+  else
+    |
+    | {{#rollBetween() #{id} #{initChance} #{finalChance}}}
+    |
+    span!=result
+    |
+    | {{/rollBetween() #{id} #{initChance} #{finalChance}}}
+
+mixin oracleTemplate(oracle)
+  - const id = oracle.id;
+  |
+  | {{##{id}}}
+  .sheet-result-row
+    .sheet-oracle-dice
+      span {{#{id}}}
+    .sheet-oracle-table-text
+      if oracle.Table
+        each row, index in oracle.Table
+          +oracleRoll(id, oracle.Table, row, index)
+      else if oracle.Tables
+        each subtable, index in oracle.Tables
+          |
+          | {{#rollTotal() tableChoice #{index}}}
+          each row, index in subtable.Table
+            +oracleRoll(id, subtable.Table, row, index)
+            |
+          | {{/rollTotal() tableChoice #{index}}}
+      else if oracle.Oracles
+        - let counter = 0;
+        //- uses a counter instead of index to better handle any nested subtables
+        each subCatOracle in oracle.Oracles
+          if subCatOracle.Table
+            |
+            | {{#rollTotal() tableChoice #{counter}}}
+            each row, index in subCatOracle.Table
+              +oracleRoll(id, subCatOracle.Table, row, index)
+              |
+            | {{/rollTotal() tableChoice #{counter}}}
+            - counter++
+          else if subCatOracle.Tables
+            each subCatOracleSubTable in subCatOracle.Tables
+              |
+              | {{#rollTotal() tableChoice #{counter}}}
+              each row, index in subCatOracleSubTable.Table
+                +oracleRoll(id, subCatOracleSubTable.Table, row, index)
+                |
+              | {{/rollTotal() tableChoice #{counter}}}
+              - counter++
+
+  |
+  | {{/#{id}}}
+
+rolltemplate(class=`sheet-rolltemplate-starforged_oracles`)
+  .sheet-roll-container
+    .sheet-subheader {{header}}
+    | {{#custom-oracle}}
+    .sheet-result-row
+      .sheet-oracle-table-text {{custom-oracle}}
+    | {{/custom-oracle}}
+
+    each category in oracles
+      each oracle in category.Oracles
+        +oracleTemplate(oracle)
+      if category.Subcategories
+        each subCategory in category.Subcategories
+          +oracleTemplate(subCategory)

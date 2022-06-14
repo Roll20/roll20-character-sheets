@@ -1,3 +1,44 @@
+## 1.2.7
+ - 12.04.2020
+  - Berechnung von KE und AE umgestellt (analog wie LE), von autocalc auf sheetworker
+	- In der Konfiguration des Sheet (Anzeige) kann man einstellen, ob die LE/AE/KE Grundwerte automatisch als Maximalwert für LE, AE, KE im Token übernommen werden sollen.
+	- Wenn ja, wir automatisch der aktuelle Grundwert im Token nachgetragen. Dadurch sind auch die Balken auf dem Token stets sichtbar.
+	- Wenn nein, kann der Maximalwert aus dem Token gelöscht werden. Der Wert wird nicht mehr gesetzt oder nachgeführt, bis man die Option in der Konfiguration wieder umstellt. Dadurch kann der Balken auf dem Token ausgeblendet werden.
+  - Wenn "Gegner-Sheet" aktiviert wird in der Konfiguration, werden die automatischen Berechnungen für Schmerz/AE/LE/KE nicht mehr durchgeführt. Der user kann/muss dann alles manuell eingeben.
+	- Der Modifikator für Status Schmerz ist in diesem Fall auch unwirksam, der user wählt den Status über den Button.
+
+## 1.2.6
+ - 08.04.2020
+  - Leiteigenschaft und Schadensschwelle für Nebenhand wird nun korrekt berücksichtigt
+	- Bonus-Schaden wird im Schadenswurf für die Nebenhand berücksichtigt.
+
+## 1.2.5
+ - 01.04.2020 (by Marc Ehrenmann / mckee14)
+  - Schmerzstufen werden automatisch berechnet und eingetragen!
+	- Vor/Nachteil Zäher Hund und Zerbrechlich werden berücksichtigt
+	- Spieler können im neuen Modifikator-Feld die automatisch berechnete Stufe verschieben, um z.B. Gift oder "Schmerzen unterdrücken" abzubilden.
+	- Ein Balken kann an "Schmerz" gebunden werden, so sind die Schmerzstufen 0 bis 4 immer direkt zu sehen für den Spieler.
+  - Lebenspunkteberechnung automatisiert
+	- Änderungen an Werten, Vor/Nachteilen, Rasse, KOnstitution und zugekauften Lebenspunkten aktualisiert automatisch die berechneten Lebenspunkte
+	- Die berechneten LE Punkte werden zusätzlich in das Feld LE_Wert_max geladen - ein damit verbundener Lebensbalken skaliert also automatisch korrekt mit
+  - Schilde berücksichtigen nun die Leiteigenschaft (KK) korrekt, der Bonusschaden wird im Schadenswurf berücksichtigt.
+  - Traditionen von Geweihten 
+    - Erweitert auf alle 12 Götter aus dem GRW.
+    - Eigenschaften für die Traditionen erweitert auf 4 (KK, KL, IN, CH)
+    - Berechnung von KarmaEnergie geschieht nun automatisch nach der Änderung von KK, KL, IN oder CH.
+
+
+## 1.2.4
+- 30.03.2020 (by Marc Ehrenmann / mckee14)
+  - Nahkampfwaffen 1-4 berücksichtigen nun die Leiteigenschaft und Schadensschwelle. Berechnung findet automatisch statt, sobald ein Waffenwert, die Leiteigenschaft, der GE Wert oder der KK Wert geändert wird.
+  - Änderungen am Schadensbonus durch die Leiteigenschaft bei Nahkampfwaffen werden (für die aktuell ausgewählte Waffe) direkt an das entsprechende Feld im Nahkampf-Tab geschickt. Die Waffe muss nicht mehr erneut ausgewählt werden.
+  - Placeholder Hinweis am unteren Rand des Charakterbogens entfernt
+  - Versionsnummer angepasst
+  - Versionsbutton verlinkt nun auf das offizielle R20 Repository damit der Changelog zentral gepflegt werden kann.
+  - (Alter) Hinweis auf regelmässige Updates im Kopfbereich des Charbogens entfernt.
+  - Footer Information leicht angepasst
+
+
 ## 1.2.3
  - 09.10.2018
 

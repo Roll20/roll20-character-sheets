@@ -1,0 +1,61 @@
+//- MULTIPLE STYLED CHECKBOXES
+mixin multiCheckbox(attr, num)
+	- let i = 0;
+	while i < num
+		label.styled-checkbox(data-i18n-title=attr + ' ' + ++i title=attr + ' ' + i)
+			input(name='attr_' + attr + '_' + i title='@{repeating_bonds_${x}_' + attr + '}' type='checkbox' value=i)
+
+//- SKILL ROWS
+mixin skill(val, key)
+	- const attr = key.replace(' ', '_');
+	- const array = ['art', 'craft', 'military science', 'pilot', 'science'];
+	- const caps = (key === 'humint' || key === 'sigint') ? key.toUpperCase() : key;
+	//- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
+	// without modifier - const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{rating=[[@{${attr}}]]}}  {{dice=[[1d100]]}}`;
+	- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{rating=[[@{${attr}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{dice=[[1d100]]}}`;
+
+	label.styled-checkbox(data-i18n-title=caps + ' fail checkbox' title=caps + ' fail checkbox')
+		input(name='attr_' + attr + '_fail' title='@{' + attr + '_fail}' type='checkbox')
+	button(data-i18n-title=caps + ' roll' name=key title=caps + ' roll' type='roll' value=skillRollValue)
+		h3(data-i18n=caps title=caps)= caps
+		span(data-i18n='(' + val + '%)')= '(' + val + '%)'
+	.vert-line
+	label(data-i18n-title=caps + ' rank' title=caps + ' rank')
+		input(data-i18n-placeholder='0' name='attr_' + attr title='@{' + attr + '}' placeholder='0' type='number' value=val)
+	- if (array.includes(key))
+		label.custom-label(data-i18n-title=key + ' name' title=key + ' name')
+			textarea(data-i18n-placeholder='skill name' name='attr_' + attr +'_name' placeholder='skill name' title='@{' + attr + '_name}' value='')
+	.horz-line
+// SKILL FOR UNNATURAL
+mixin skillunnatural(val, key)
+	- const attr = key.replace(' ', '_');
+	- const array = ['art', 'craft', 'military science', 'pilot', 'science'];
+	- const caps = (key === 'humint' || key === 'sigint') ? key.toUpperCase() : key;
+	//- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
+	- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{dice=[[1d100]]}}`;
+	label
+	button(data-i18n-title=caps + ' roll' name=key title=caps + ' roll' type='roll' value=skillRollValue)
+		h3(data-i18n=caps title=caps)= caps
+		span(data-i18n='(' + val + '%)')= '(' + val + '%)'
+	.vert-line
+	label(data-i18n-title=caps + ' rank' title=caps + ' rank')
+		input(data-i18n-placeholder='0' name='attr_' + attr title='@{' + attr + '}' placeholder='0' type='number' value=val)
+	- if (array.includes(key))
+		label.custom-label(data-i18n-title=key + ' name' title=key + ' name')
+			textarea(data-i18n-placeholder='skill name' name='attr_' + attr +'_name' placeholder='skill name' title='@{' + attr + '_name}' value='')
+	.horz-line
+//-	DERIVED ATTRIBUTE INPUT OR SPAN
+mixin derived(val, attrName)
+	if val === 'SAN'
+		input(name='attr_' + attrName + '_max' placeholder='50' title='@{' + attrName + '_max}' type='number' value=presetValue)
+	else
+		span(class='center' name='attr_' + attrName + '_max' title='@{' + attrName + '_max' + '}')
+
+
+//- TRANSLATIONS
+mixin personal(val, key)
+	//- const transKey = val.replace(/\(/g, '').replace(/\)/g, '').replace(/\./g, '').replace(/\,/g, '').replace(/ /g, '-');
+	h2.aligned-left(data-i18n=val data-i18-title=val title=val)=val
+	label(data-i18-title=val title=val)
+		input(data-i18-placeholder=key name='attr_' + key placeholder=key title='${' + key + '}' type='text')
+		

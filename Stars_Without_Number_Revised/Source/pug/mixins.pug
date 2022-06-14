@@ -2,13 +2,13 @@ mixin sectionheader(name, label)
 	//- Creates one of the toggleable headers
 		Parameters
 			name: underlying attribute name (without "attr_")
-			label: i18n code for the text appearing on the header
-				(block is inserted if no label is specified)
+			label: i18n code for the text appearing on the header. Block is inserted as placeholder.
 	.section-toggle-header
 		input(type="checkbox", name=`attr_${name}`, value="1", data-i18n-title="SHOW_HIDE", checked)
 		h1
 			if (label)
 				span(data-i18n=label)
+					block
 			else
 				block
 	input.hider(type="hidden", name=`attr_${name}`, value="1")
@@ -16,9 +16,10 @@ mixin sectionheader(name, label)
 mixin text-input(name, label, extraclass)
 	//- Creates one of the standard underlined text inputs
 		Defaults to a input of type text
+		Always passes block to the label, since new keys take days/weeks to propagate through Roll20
 		Parameters
 			name: underlying attribute name (without "attr_")
-			label: i18n code for the label (block is inserted if no label is specified)
+			label: i18n code for the label
 			extraclass: if present, will be the class of the input
 		Attributes
 			All attributes except class are passed on to the input. class is passed on
@@ -29,42 +30,104 @@ mixin text-input(name, label, extraclass)
 		input(type="text", name=`attr_${name}`, class=extraclass)&attributes(attributes)
 		if (label)
 			.label(data-i18n=label)
+				block
 		else
 			.label
 				block
 
-mixin text-input-duo(name1, name2, label, attributes2)
-	//- Creates a pair of underlined inputs with a slash inbetween
+mixin text-input-duo(name1, name2, label, attributes2, prefix, infix, suffix)
+	//- Creates a pair of underlined inputs
 		Defaults to number inputs
 		Parameters
 			name1: underlying attribute name of first input (without "attr_")
 			name2: underlying attribute name of second input (without "attr_")
-			label: i18n code for the label (block is inserted if no label is specified)
+			label: i18n code for the label. Block is inserted as placeholder.
 			attributes2: will be passed on as the attributes of the second input
+			infix: will be placed between the inputs, defaults to /
+			prefix: placed before inputs, if present
+			suffix: placed after inputs if present
 		Attributes
 			All attributes except class are passed on to the first input.
 			class is passed on to the containing label.
 	- classes = attributes.class;
 	- delete attributes.class;
 	.text-input.duo(class=classes)
+		if (prefix)
+			span= prefix
+		else
+			span
 		input(type="number", name=`attr_${name1}`)&attributes(attributes)
-		span /
+		if (infix)
+			span= infix
+		else
+			span /
 		input(type="number", name=`attr_${name2}`)&attributes(attributes2)
+		if (suffix)
+			span= suffix
+		else
+			span
 		if (label)
 			.label(data-i18n=label)
+				block
 		else
 			block
 
-mixin fake-text-input(label)
+mixin text-input-trio(name1, name2, name3, label, attributes2, attributes3, prefix, infix1, infix2, suffix)
+	//- Creates a pair of underlined inputs
+		Defaults to number inputs
+		Parameters
+			name1: underlying attribute name of first input (without "attr_")
+			name2: underlying attribute name of second input (without "attr_")
+			name3: underlying attribute name of third input (without "attr_")
+			label: i18n code for the label. Block is inserted as placeholder.
+			attributes2: will be passed on as the attributes of the second input
+			attributes3: will be passed on as the attributes of the third input
+			infix1, infix2: will be placed between the inputs, defaults to /
+			prefix: placed before inputs, if present
+			suffix: placed after inputs if present
+		Attributes
+			All attributes except class are passed on to the first input.
+			class is passed on to the containing label.
+	- classes = attributes.class;
+	- delete attributes.class;
+	.text-input.trio(class=classes)
+		if (prefix)
+			span= prefix
+		else
+			span
+		input(type="number", name=`attr_${name1}`)&attributes(attributes)
+		if (infix1)
+			span= infix1
+		else
+			span /
+		input(type="number", name=`attr_${name2}`)&attributes(attributes2)
+		if (infix2)
+			span= infix2
+		else
+			span /
+		input(type="number", name=`attr_${name3}`)&attributes(attributes3)
+		if (suffix)
+			span= suffix
+		else
+			span
+		if (label)
+			.label(data-i18n=label)
+				block
+		else
+			block
+
+mixin fake-text-input(label, labeltext)
 	//- Creates a label container that looks like one of the underlined text inputs.
 		block is inserted where the input would normally be
 		Parameters
 			label: i18n code for the text appearing underneath
+			labeltext: Placeholder for the label, due to translation propagation delay.
 		Attributes
 			class is passed on to the containing label
 	label(class=["text-input", attributes.class])
 		block
 		.label(data-i18n=label)
+			=labeltext
 
 mixin makeSave(name)
 	//- Creates a saving throw button
@@ -73,7 +136,7 @@ mixin makeSave(name)
 				button name, and for translation keys.
 	.blue-button
 		input(type="hidden", name=`attr_save_${name}`, value="15")
-		button(name=`roll_save_${name}`, type="roll", value!=`&{template:swn-save} {{charname=@{name}}} {{title=^{${name.toUpperCase()}_SAVE}}} {{dice=[[1d20]]}} {{save=[[@{save_${name}}]]}}`)
+		button(name=`roll_save_${name}`, type="roll", value!=`&{template:swn-save} {{charname=@{character_name}}} {{title=^{${name.toUpperCase()}_SAVE}}} {{dice=[[1d20]]}} {{save=[[@{save_${name}}]]}}`)
 			| v#[span(name=`attr_save_${name}`)]
 		div(data-i18n=name.toUpperCase())
 
@@ -91,7 +154,7 @@ mixin makeSkill(skillName, custom, label)
 	else
 		- skillPrefix = skillName ? `skill_${skillName}` : "skill";
 		.skill(data-i18n-list-item=skillName)
-			button(type="roll", name=`roll_${skillPrefix}`, value!=`&{template:swn-skill} {{title=${custom ? `@{${skillPrefix}_name}` : `^{${skillName.toUpperCase()}}`}}} {{charname=@{name}}} {{mod=[[0 @{modifier_query}]]}} {{dice=[[@{${skillPrefix}_specialist} + @{${skillPrefix}}[Skill] @{modifier_query} @{${skillPrefix}_query}`).invisible-button.display
+			button(type="roll", name=`roll_${skillPrefix}`, value!=`&{template:swn-skill} {{title=${custom ? `@{${skillPrefix}_name}` : `^{${skillName.toUpperCase()}}`}}} {{charname=@{character_name}}} {{mod=[[0 @{modifier_query}]]}} {{dice=[[@{${skillPrefix}_specialist} + @{${skillPrefix}}[Skill] @{modifier_query} @{${skillPrefix}_query}`).invisible-button.display
 			.display.flex-center
 				input(type="hidden", name=`attr_${skillPrefix}_specialist`, value="2d6").dice
 				if (custom)
