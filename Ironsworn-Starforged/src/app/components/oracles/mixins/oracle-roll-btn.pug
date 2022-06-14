@@ -1,0 +1,79 @@
+//- mixin oracleRollButton()
+//-   - console.log("Processing oracle", oracle.Name)
+//-   if rollButton === true && oracle.Tables
+//-     +oracleMultiBtn(oracle)
+//-   else if rollButton === true && oracle.Table
+//-     +oracleSingleButton(oracle)
+
+mixin oracleListGroupItem(id, buttonLabel)
+  +oracleRollBtn(id, buttonLabel)
+
+mixin oracleSubtablesListGroupItem(id, buttonLabel, tables)
+  -
+    let counter = 0;Label
+    let options = [];
+    tables.forEach((oracle) => {
+      if (oracle.Tables) {
+        oracle.Tables.forEach(subtable => {
+          let tableLabel = subtable['Display name']||subtable['Name'];
+          options.push(`${tableLabel},${counter}`);
+          counter++;
+        })
+      }
+      else {
+        let tableLabel = oracle['Display name']||oracle['Name'];
+        options.push(`${tableLabel},${counter}`);
+        counter++;
+      }
+    })
+  - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}}`
+  +oracleRollBtn(id, buttonLabel, rollQuery)
+
+mixin oracleRollBtn(id, buttonLabel, rollQuery="")
+  //- generates CSS
+  //- - console.log(`input[type=radio].${id}:checked ~ div.${id},`)
+  -
+    let valueString = `&{template:starforged_oracles} ${rollQuery} {{${id}=[[d100]]}}`;
+    if (!rollQuery.match(/header=/i)) {
+      valueString = valueString + " " +  `{{header=${buttonLabel}}}`
+    }
+  .button-container
+    button(
+      type='roll'
+      class='roll-show btn ui-draggable'
+      title=`@{roll_${id}}`
+      name=`roll_${id}`
+      value=valueString
+    )
+  label.toggle-btn.oracle-btn
+    input.hide-element.btn-input(
+      type='radio'
+      title=`@{selected_oracle}`
+      name=`attr_selected_oracle`
+      value=id
+    )
+    .btn-content.oracle-name=buttonLabel.replace(/ - /i, ": ")
+
+mixin oracleMultiBtn(oracle, btnText, indexOffset=0)
+  - const labelText = oracle['Display name']||oracle['Name']
+  - const options = oracle.Tables.map((table, index) => { return `${table['Display name']||table['Name']},${index+indexOffset}` })
+  - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}} {{header=${labelText}}}`
+  - const id = oracle.id
+  label.roll-label.embedded-btn=btnText||labelText
+    button.hide-element(
+      type='roll'
+      title=`@{roll_${id}}`
+      name=`roll_${id}`
+      value=`&{template:starforged_oracles} ${rollQuery}  {{${id}=[[d100]]}}`
+    )
+
+mixin oracleSingleButton(oracle, btnText)
+  - const labelText=oracle['Display name']||oracle.Name
+  - const id = oracle.id
+  label.roll-label.surface-2.embedded-btn=btnText||labelText
+    button.hide-element(
+      type='roll'
+      title=`@{roll_${id}}`
+      name=`roll_${id}`
+      value=`&{template:starforged_oracles} {{header=${labelText}}} {{${id}=[[d100]]}}`
+    )

@@ -4,11 +4,11 @@ input(type="hidden", name="attr_setting_individual_hidden", value="1").input-ind
 .menus.col-3.core-box.flex-between
 	h3(data-i18n="QUICK_MENUS")
 	input(type="hidden", name="attr_macro_statblock", value="")
-	button(type="roll", name="roll_Statblock_macro", data-i18n="STATBLOCK", value!=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{npc_name}}} {{title=[**^{HD}** @{npc_hd}](~npc_hp), ^{AC} @{AC}}} {{buttons=@{macro_statblock}}}`).unstyled-button
+	button(type="roll", name="roll_Statblock_macro", data-i18n="STATBLOCK", value=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{npc_name}}} {{title=[**^{HD}** @{npc_hd}](~npc_hp), ^{AC} @{AC}}} {{buttons=@{macro_statblock}}}`).unstyled-button
 	input(type="hidden", name="attr_macro_npc_attacks", value="")
-	button(type="roll", name="roll_NPC_Attack_macro", data-i18n="ATTACKS", value!=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{npc_name}}} {{title=^{ATTACKS}}} {{buttons=@{macro_npc_attacks}}}`).unstyled-button
+	button(type="roll", name="roll_NPC_Attack_macro", data-i18n="ATTACKS", value=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{npc_name}}} {{title=^{ATTACKS}}} {{buttons=@{macro_npc_attacks}}}`).unstyled-button
 	input(type="hidden", name="attr_macro_npc_abilities", value="")
-	button(type="roll", name="roll_NPC_Abilities_macro", data-i18n="ABILITIES", value!=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{npc_name}}} {{title=^{ABILITIES}}}  {{buttons=@{macro_npc_abilities}}}`).unstyled-button
+	button(type="roll", name="roll_NPC_Abilities_macro", data-i18n="ABILITIES", value=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{npc_name}}} {{title=^{ABILITIES}}}  {{buttons=@{macro_npc_abilities}}}`).unstyled-button
 
 //- Name etc
 .core-box-text.info
@@ -63,8 +63,8 @@ input(type="hidden", name="attr_setting_individual_hidden", value="1").input-ind
 
 //- HP and AC
 .core-box-text.npc-hp
-	+text-input-duo("HP", "HP_MAX", "HIT_POINTS").cols-2.important
-	+text-input("AC", "AC")(type="number", value="10").center
+	+text-input-duo("npc_hp", "npc_hp_max", "HIT_POINTS").cols-2.important
+	+text-input("npc_ac", "AC")(type="number", value="10").center
 	+fake-text-input("TYPE").center
 		select(name="attr_npc_armor_type")
 			option(value="", data-i18n="NONE")
@@ -89,8 +89,8 @@ input(type="hidden", name="attr_setting_individual_hidden", value="1").input-ind
 				input(type="checkbox", name="attr_npc_hp_hidden", value="/w GM")
 				span(data-i18n="HIDE")
 		.blue-button
-			button(type="roll", name="roll_NPC_Initiative", value!="@{npc_initiative_hidden} &{template:swn-default} {{charname=@{npc_name}}} {{title=^{INITIATIVE}}} {{ =[[1d8 &{tracker}]]}}") d8
-			div(data-i18n="INITIATIVE")
+			button(type="roll", name="roll_NPC_Initiative", value!="@{npc_initiative_hidden} &{template:swn-default} {{charname=@{npc_name}}} {{title=^{INITIATIVE_FIXED}}} {{ =[[1d8 &{tracker}]]}}") d8
+			div(data-i18n="INITIATIVE_FIXED")
 			label.individual-hide
 				input(type="checkbox", name="attr_npc_initiative_hidden", value="/w GM")
 				span(data-i18n="HIDE")
@@ -136,12 +136,14 @@ input(type="hidden", name="attr_setting_individual_hidden", value="1").input-ind
 				input(type="checkbox", name="attr_npc_attacks_hidden" value="/w GM")
 		fieldset.repeating_npc-attacks
 			input(type="hidden", name="attr_attack_extra_macro", value="")
-			button(type="roll", name="roll_Attack", value!="@{npc_attacks_hidden} &{template:swn-attack} {{charname=@{npc_name}}} {{title=@{attack_name}}} {{attack=[[1d20 + @{attack_ab} @{attack_burst} @{modifier_query}]]}} {{damage=[[@{attack_damage} @{attack_burst}]]}} {{burst=[[0@{attack_burst}]]}} @{attack_extra_macro}").invisible-button.display
+			button(type="roll", name="roll_Attack", value!="@{npc_attacks_hidden} &{template:swn-attack} {{charname=@{npc_name}}} {{title=@{attack_name}}} {{attack=[[1d20 + @{attack_ab} @{attack_burst} @{modifier_query}]]}} {{damage=[[@{attack_damage} @{attack_burst}]]}} {{burst=[[0@{attack_burst}]]}} {{range=@{attack_range}}} @{attack_shock} @{attack_extra_macro}").invisible-button.display
 			.display.flex-between.grey-box-bordered
 				span.name
 					span(name="attr_attack_name").space-after
 					input(type="hidden", name="attr_attack_ab", value="0").add-plus
 					span(name="attr_attack_ab").space-after
+					input(type="hidden", name="attr_attack_range", value="0").range
+					span.range #[span(data-i18n="RANGE")]: #[span(name="attr_attack_range")]
 					input(type="hidden", name="attr_attack_number", value="1").attacks
 					span.attacks (#[span(name="attr_attack_number")] #[span(data-i18n="ATTACKS")])
 				span.damage
@@ -149,6 +151,7 @@ input(type="hidden", name="attr_setting_individual_hidden", value="1").input-ind
 					span(name="attr_attack_damage")
 			.edit.flex.grey-box-bordered
 				+text-input("attack_name", "NAME").name
+				+text-input("attack_range", "RANGE").range.center
 				+text-input("attack_ab", "ATTACK_BONUS_SHORT")(type="number", value="0").ab.center
 				+text-input("attack_damage", "DAMAGE")(value="0").damage.center
 				+fake-text-input("BURST").burst.center
@@ -157,6 +160,12 @@ input(type="hidden", name="attr_setting_individual_hidden", value="1").input-ind
 						option(value="@{burst_query}", data-i18n="ASK")
 						option(value="+ 2[Burst]", data-i18n="ALWAYS")
 				+text-input("attack_number", "NUM_ATTACKS")(type="number", value="1").attacks.center
+				.text-input.shock-damage.center
+					input(type="text", name="attr_attack_shock_damage", value="0")
+					label.label
+						input(type="checkbox", name="attr_attack_shock", value!="{{shock=[[@{attack_shock_damage}]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{attack_shock_ac}!}}")
+						span(data-i18n="SHOCK")
+				+text-input("attack_shock_ac", "SHOCK_AC")(type="number", value="10").shock-ac.center
 
 //- Abilities
 .section.cols-2
