@@ -12501,8 +12501,8 @@
 			clog(debug, timer, 'state =', state);
 			const rowID = value[`${handsource}_source`];
 			clog(debug, timer, 'rowID =', rowID);
-			clog(debug, timer, 'value.active_weapon =', value.active_weapon);
-			clog(debug, timer, 'value.previous_weapon =', value.previous_weapon);
+			clog(debug, timer, 'setObj.active_weapon =', setObj.active_weapon);
+			clog(debug, timer, 'setObj.previous_weapon =', setObj.previous_weapon);
 			clog(debug, timer, 'value.active_weapon =', value.active_weapon);
 			clog(debug, timer, 'value.previous_weapon =', value.previous_weapon);
 			const type = value[`repeating_attr_${rowID}_attribute`];
@@ -12522,19 +12522,24 @@
 			if (activeHasAmmo && state) {//weapon armed, load ammo state
 				clog(debug, timer, 'weapon armed, load ammo state', '');
 				const weapon = _.find(attrdb[`${type}`], w => {
+					clog(debug, timer, 'w.source =', w.source);
 					if (w.source == rowID) return true;
 				});
+				clog(debug, timer, 'weapon:', weapon);
 				if (!getIsObject(weapon)) return;
 				const customization = _.find(weapon.customizations, c => {
 					if (c.name == 'ammo') return true;
 				});
+				clog(debug, timer, 'customization:', customization);
 				if (!getIsObject(customization)) return;
-				const ammo = isNaN(parseInt(value[`repeating_attr_${rowID}_ammostate`])) ?
+				const ammo = parseInt(customization.rank) !== 4 ?//isNaN(parseInt(value[`repeating_attr_${rowID}_ammostate`])) ?
 					getAmmoMax(debug, timer, customization.rank) : 
 					parseInt(value[`repeating_attr_${rowID}_ammostate`]) || 0;
-				const capacity = isNaN(parseInt(value[`repeating_attr_${rowID}_capacitystate`])) ?
-					0 :
+				clog(debug, timer, `repeating_attr_${rowID}_ammostate =`, value[`repeating_attr_${rowID}_ammostate`]);
+				const capacity = parseInt(customization.rank) === 4 ?//isNaN(parseInt(value[`repeating_attr_${rowID}_capacitystate`])) ?
+					parseInt(value[`repeating_attr_${rowID}_capacity`]) || 0 ://0 :
 					parseInt(value[`repeating_attr_${rowID}_capacitystate`]) || 0;
+				clog(debug, timer, `repeating_attr_${rowID}_capacitystate =`, value[`repeating_attr_${rowID}_capacitystate`]);
 				writeValues(debug, timer, value, 'weapon_ammo_reloads', ammo, setObj);
 				writeValues(debug, timer, value, 'weapon_ammo_capacity', capacity, setObj);
 				clog(debug, timer, 'ammo =', ammo);
