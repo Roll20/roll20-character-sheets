@@ -1,0 +1,47 @@
+include ./mixins/oracle-table
+include ./mixins/oracle-roll-btn
+
+mixin oraclePreviewToggle(type, name, id)
+  label.toggle-btn.oracle-btn
+    input.hide-element.btn-input(
+      type='radio'
+      title=`@{oracle_${type}_button}`
+      name=`attr_oracle_${type}_button`
+      value=id
+    )
+    .btn-content.oracle-name=header.replace(/ - /i, ": ")
+
+mixin oracleRollGroup(group)
+  .oracle-box.surface
+    .oracle-title=group['Display name']||group.Name
+    each oracle in group.Oracles
+      - const header = `${group['Display name']||group.Name} - ${oracle.Name}`
+      .oracle
+        if (oracle.Tables)
+          - let buttonLabel = oracle['Display name']||oracle.Name
+          +oracleSubtablesListGroupItem(oracle.id, buttonLabel, oracle.Tables)
+        else
+          +oracleRollBtn(oracle.id, oracle['Display name']||oracle.Name)
+    if group.Subcategories
+      each subCategory in group.Subcategories
+        - const buttonLabel = subCategory['Display name']||subCategory.Name
+        .oracle.oracle-subcategory
+          +oracleSubtablesListGroupItem(subCategory.id, buttonLabel, subCategory.Oracles)
+
+mixin oraclePreview(oracle, groupName)
+  input(class=`${oracle.id} hide-element` type='radio' name=`attr_oracle_preview` value=oracle.id)
+  div(class=`${oracle.id} showhide oracle-table-preview surface` id=oracle.id)
+    - let nameString = oracle['Display name'] && oracle['Display name'].match(/ - /i) ? oracle['Display name'].replace(/ - /i, ": ") : `${groupName}: ${oracle['Display name']||oracle.Name}`
+    .oracle-title=nameString
+    if oracle.Table
+      +oracleTable(oracle)
+    else if oracle.Tables
+      +oracleMultiSubTable(oracle)
+    else if oracle.Oracles
+      if (oracle.Description)
+        .oracle-description!=oracle.Description
+      each subCatOracle, index in oracle.Oracles
+        if subCatOracle.Table
+          +oracleSubTable(subCatOracle)
+        else if subCatOracle.Tables
+          +oracleMultiSubTable(subCatOracle, true)
