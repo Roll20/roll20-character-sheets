@@ -1,3 +1,18 @@
+### Version 2.01(2021-8-14):
+
+- updated wounds counter from text to drop down to reflect weaver dice types of damage and effects
+
+- used emojis for interchangeable hearts for health, damaged health, armor, and damaged armor on wounds
+
+- changed sheet version to SV for cleaner look
+
+### Version 2.00(2019-10-15):
+
+- sheet code refactored to use CSS Flexbox and CSS Grid(previously the sheet used >
+`<table>` for layout)
+
+- adjusted layout to more closely resemble latest Gdocs version of the character sheet
+
 ### Version 1.41(2018-9-25):
 
 - crit fails/successes add back to skill rolls(roll of highest/lowest shows red/green)

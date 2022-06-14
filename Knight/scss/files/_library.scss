@@ -1,0 +1,1203 @@
+@use "sass:string";
+@use "sass:map";
+
+@mixin col($widthMain, $widthCol, $class:col) {
+    justify-content: space-between;
+    align-items:flex-start;
+    align-content:flex-start;
+    width:$widthMain;
+    
+    div.#{$class} {
+        display:flex;
+        justify-content: space-between;
+        align-items:flex-start;
+        align-content:flex-start;
+        width:$widthCol;
+        flex-wrap:wrap;
+        position:relative;
+    }
+}
+
+@mixin buttonOptions() {
+    label.bOptions {
+        width:15px;
+        height:15px;
+        margin-left:-15px;
+
+        input[type="checkbox"]
+        {
+            width:15px;
+            height:15px;
+            position:absolute;
+            opacity:0;
+            z-index:99;
+
+            & ~ span
+            {
+                width:100%;
+                height:15px;
+
+                &::before
+                {
+                    display: flex;
+                    width: 100%;
+                    height: 15px;
+                    font-family: pictos;
+                    content: "y";
+                    opacity: 0.5;
+                    color: $clair;
+                    font-size: 15px;
+                    line-height: 15px;
+                }
+            }
+
+            &:checked ~ span::before
+            {
+                opacity:1;
+            }
+        }
+    }
+
+    div.Options {
+        display:none;
+    }
+
+    input[type="hidden"][value="1"] ~ div.Options
+    {
+        display:flex;
+        height:min-content;
+
+        @content;
+    }
+}
+
+@mixin buttonRoll {
+    button[type="roll"].rollDice,
+    button[type="action"].rollDice {
+        background:$dice;
+        background-color:white;
+        background-size:contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 28px;
+        height: 28px;
+        padding: 0px;
+        margin: 0px;
+        border: 0px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+        z-index: 50;
+        margin-left: auto;
+        box-shadow:none;
+
+        &::before {
+            content:"";
+        }
+
+        &:hover {
+            box-shadow: inset 0px 0px 5px;
+        }
+
+        @content;
+    }
+}
+
+@mixin options($color, $background) {
+
+    label.config {
+        position:absolute;
+        width:23px;
+        height:23px;
+        right:0;
+
+        span {
+            width:23px;
+            height:23px;
+
+            &::before {
+                content: "y";
+                color:$color;
+                font-family: "pictos";
+                font-variant: initial;
+                font-size: 26px;
+                line-height: 23px;
+                height: 23px;
+                width: 23px;
+                display: block;
+                text-align: center;
+                opacity:0.5;
+            }
+        }
+
+        input[type="checkbox"] {
+            position:absolute;
+            width:23px;
+            height:23px;
+            opacity: 0;
+            z-index:999;
+            
+            &:checked ~ span::before {
+                opacity: 1;
+            }
+        }
+    }
+
+    input[type="hidden"][value="1"] ~ div.config {
+        display:flex;
+    }
+
+    div.config {
+        display:none;
+        position:absolute;
+
+        justify-content: space-between;
+        flex-wrap: wrap;
+        width: 400px;
+        padding: 5px;
+        background: $background;
+        border: 1px solid $black;
+        border-radius: 5px;
+        right: 0px;
+        z-index:9999;
+        margin-right:13px;
+        margin-top:13px;
+
+        div.full {
+            width:100%;
+        }
+
+        div.half {
+            width: calc(50% - 4px);
+        }
+
+        div {
+            flex-grow: 1;
+            align-items: center;
+            padding: 2px;
+            font-size: 10px;
+            min-height: 24px;
+            line-height: 20px;
+            border-bottom: 1px solid $sombre;
+
+            label {
+                display:flex;
+                margin: 0;
+                padding: 0;
+                width: auto;
+                font: inherit;
+                justify-content: space-between;
+
+                span {
+                    font:inherit;
+                }
+
+                select {
+                    width: 80px;
+                    margin: 0 0 0 0;
+                    padding: 0;
+                    height: 20px;
+                }
+
+                input[type="checkbox"] {
+                    margin-right:5px;
+                    width:20px;
+                    height:20px;
+                }
+
+                &.plainText {
+                    span {
+                        width: 100%;
+                        font-weight: bold;
+                        justify-content: center;
+
+                        &:nth-of-type(2) {
+                            font-variant: small-caps;
+                        }
+                    }
+
+                    textarea {
+                        height: 50px;
+                        border-top: 1px solid $black;
+                        border-left: 1px solid $black;
+                        border-right: 1px solid $black;
+                    }
+
+                    button[type="action"] {
+                        width: 100%;
+                        padding: 0px;
+                        justify-content: center;
+                        font-variant: small-caps;
+                        border: 1px solid $black;
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+
+        div.textarea {
+            width:100%;
+            flex-wrap: wrap;
+
+            label {
+                display:flex;
+                flex-wrap: wrap;
+                width:100%;
+
+                span {
+                    display:flex;
+                    width: 100%;
+                    
+                    justify-content: center;
+
+                    &:first-of-type {
+                        font-weight: bold;
+                    }
+
+                    &:last-of-type {
+                        font-weight: normal;
+                        font-variant: small-caps;
+                    }
+                }
+
+                textarea {
+                    height: 50px;
+                    border-top: 1px solid black;
+                    border-right: 1px solid black;
+                    border-left: 1px solid black;
+                    border-bottom: 0px;
+                }
+            }
+
+            button[type="action"] {
+                width: 100%;
+                padding: 0px;
+                justify-content: center;
+                font-variant: small-caps;
+                border: 1px solid black;
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+@mixin ficheSelector($color, $background) {
+    label.selector {
+        position:relative;
+        width: 130px;
+        height: 22px;
+        margin-right: auto;
+
+        input[type="radio"] {
+            display:none;
+            width: 100%;
+            height: 22px;
+            position: absolute;
+            z-index: 99;
+            opacity: 0;
+        }
+
+        span {
+            display:none;
+            width:100%;
+
+            &::before {
+                display: flex;
+                width: 100%;
+                content: attr(title);
+                font-size: 14px;
+                font-weight: bold;
+                border: 1px solid black;
+                background: $background;
+                color: $color;
+                justify-content: center;
+                line-height: 20px;
+            }
+        }
+
+        input[type="hidden"] {
+            &[value="0"] ~ .fichePJ,
+            &[value="1"] ~ .fichePNJ,
+            &[value="2"] ~ .ficheCreature,
+            &[value="3"] ~ .ficheBande,
+            &[value="4"] ~ .ficheVehicule {
+                display:block;
+            }
+        }
+    }
+}
+
+@mixin menu($color, $background) {
+    div.menu {
+        display:flex;
+        width:100%;
+        min-width: 127px;
+        flex-wrap: wrap;
+        
+        margin-top: 10px;
+
+        justify-content: flex-end;
+        align-items: flex-end;
+        align-content: flex-end;
+
+        button[type="action"] {
+            padding: 0px;
+            width: 126px;
+            height: 26px;
+            margin-left: 4px;
+            margin-bottom: 2px;
+
+            justify-content: center;
+            height: 24px;
+            line-height: 24px;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            border: 1px solid $black;
+            background: $background;
+            color: $color;
+        }
+
+        input[type="hidden"] {
+            &.heroisme[value="1"],
+            &.heroisme[value="2"] {
+
+                & ~ div button[type="action"].heroisme {
+                    display:flex;
+                }
+            }
+
+            &.ia[value="1"] {
+                & ~ div button[type="action"].ia {
+                    display:flex;
+                }
+            }
+
+            &.ia-incarnee[value="1"] {
+                & ~ div button[type="action"].ia-incarnee {
+                    display:flex;
+                }
+            }
+
+            &.vehicule[value="1"] {
+                & ~ div button[type="action"].vehicule {
+                    display:flex;
+                }
+            }
+
+            &.art[value="1"] {
+                & ~ div button[type="action"].art {
+                    display:flex;
+                }
+            }
+
+            &.modulePNJ[value="1"] {
+                & ~ div button[type="action"].modulePNJ {
+                    display:flex;
+                }
+            }
+
+            &.mechaArmures[value="1"] {
+                & ~ div button[type="action"].mechaArmures {
+                    display:flex;
+                }
+            }
+        }
+
+        button[type="action"] {
+            &.heroisme,
+            &.ia,
+            &.ia-incarnee,
+            &.vehicule,
+            &.art,
+            &.modulePNJ,
+            &.mechaArmures {
+                display:none;
+            }
+        }
+
+        & > div {
+            width:100%;
+            flex-wrap: wrap;
+
+            justify-content: flex-end;
+            align-items: flex-end;
+            align-content: flex-end;
+        }
+    }
+}
+
+@mixin titre($color, $background:transparent, $params:false) {
+    /*
+    ///PARAMETRES EXISTANTS\\\
+    - titre : Pour tous les paramètres concernant le titre principal
+        - hasButton : Pour dire qu'il y a des boutons. (true / false)
+        - hasRollSpecial : S'il y a un bouton "Jet spécial". (true / false)
+        - hasBonusCarac : s'il s'agit de boutons de caracs (true / false)
+        - hasButtonActivate : s'il s'agit de boutons "Activé" (true / false)
+        - hasButtonPersonnel : s'il s'agit d'un bouton "Personnel" (true / false)
+        - hasActionSpecial : s'il s'agit d'un bouton "action spécial" (true / false)
+        - hasSelect : s'il s'agit d'un select (true / false)
+
+    - secondTitre : S'il y a un second titre (avec la classe titreBis
+        - actif : Pour dire qu'il est actif. (true / false)
+        - background : pour définir le background (transparent par défaut)
+        - color : pour définir la couleur du texte (white par défaut)
+        - hasButton : s'il a un bouton (true/false).
+        - hasBonusCarac : s'il s'agit de boutons de caracs (true / false)
+
+    - titreInverse : Si les boutons du titre sont inversés par rapport à d'habitude.
+        - actif : Pour dire qu'il est actif. (true / false)
+        - hasButton : s'il a un bouton (true/false).
+        - hasButtonActivate : s'il s'agit de boutons "Activé" (true / false)
+    */
+    @if $params == false {
+        $params:();
+    }
+
+    h1.titre {
+        width: 100%;
+        align-content: baseline;
+        background: $background;
+        color: $color;
+        line-height: 28px;
+        min-height: 28px;
+        justify-content: center;
+        font-size: 14px; 
+    }
+
+    
+
+    @if map.get($params, "secondTitre", "actif") {
+        h2.titreBis {
+            width: 100%;
+            align-content: baseline;
+
+            @if map.get($params, "secondTitre","background") != null {
+                background: map.get($params, "secondTitre","background");
+            } @else {
+                background:transparent;
+            }
+
+            @if map.get($params, "secondTitre", "color") != null {
+                color:map.get($params, "secondTitre","color");
+            } @else {
+                color:$white;
+            }
+
+            line-height: 28px;
+            min-height: 28px;
+            justify-content: center;
+            font-size: 14px; 
+        }
+
+        @if map.get($params, "secondTitre", "hasButton") {
+            div.titreBis {
+                align-content:center;
+                align-items:center;
+                position:relative;
+        
+                width:100%;
+                min-height: 28px;
+        
+                border-bottom:1px solid $sombre;
+
+                h2.titreBis {
+                    position:absolute;
+                }
+
+                @if map.get($params, "secondTitre", "hasBonusCarac") {
+                    button[type="action"].bonusCaracL1,
+                    button[type="action"].bonusCaracL2 {
+                        width: 26px;
+                        height:26px;
+
+                        justify-content: center;
+
+                        font-size: 14px;
+                        font-weight: bold;
+                        border: 1px solid black;
+                        background: $sombre;
+                        color: $white;
+                        line-height: 25px;
+                        padding:0px;
+
+                        z-index:9;
+                    }
+
+                    button[type="action"].bonusCaracL2 {
+                        margin-right:auto;
+                        margin-left:3px;
+                    }
+                }
+            }
+        }
+    }
+
+    @if map.get($params, "titreInverse", "actif") {
+        div.titreInverse {
+            align-content:center;
+            align-items:center;
+            position:relative;
+    
+            width:100%;
+            min-height: 28px;
+    
+            border-bottom:1px solid $sombre;
+
+            @if map.get($params, "titreInverse", "hasButton") {
+                h1.titre {
+                    position:absolute;
+                }
+            }
+
+            @if map.get($params, "titreInverse", "hasButtonActivate") {
+                button[type="action"].active {
+                    width: 100px;
+                    height:26px;
+
+                    margin-right:auto;
+
+                    justify-content: center;
+
+                    font-size: 14px;
+                    font-weight: bold;
+                    border: 1px solid $black;
+                    background: $sombre;
+                    color: $white;
+                    line-height: 25px;
+                    padding:0px;
+
+                    z-index:9;
+                }
+            }
+        }
+    }
+
+    div.titre {
+        align-content:center;
+        align-items:center;
+        position:relative;
+
+        width:100%;
+        min-height: 28px;
+
+        border-bottom:1px solid $sombre;
+        
+        @if map.get($params, "titre", "hasButton") {
+            h1.titre {
+                position:absolute;
+            }
+
+            @if map.get($params, "titre", "hasRollSpecial") {
+                button[type="action"].rollSpecial {
+                    width: 98px;
+                    height: 23px;
+                    color: $black;
+                    padding: 0px;
+    
+                    margin-top: auto;
+                    margin-right: 0px;
+                    margin-bottom: auto;
+                    margin-left: auto;
+    
+                    justify-content: center;
+                    align-items: center;
+                    background: $clair;
+                    border: 1px solid $sombre;
+                    font-size: 12px;
+                    font-variant: small-caps;
+                    font-weight: bold;
+                    
+                    z-index: 50;
+    
+                    &::before {
+                        content:"";
+                    }
+    
+                    &:hover {
+                        box-shadow: inset 1px 1px 2px 2px $black;
+                    }
+                }
+            }
+            
+            @if map.get($params, "titre", "hasBonusCarac") {
+                button[type="action"].bonusCaracL1,
+                button[type="action"].bonusCaracL2 {
+                    width: 26px;
+                    height:26px;
+
+                    justify-content: center;
+
+                    font-size: 14px;
+                    font-weight: bold;
+                    border: 1px solid black;
+                    background: $sombre;
+                    color: $white;
+                    line-height: 25px;
+                    padding:0px;
+
+                    z-index:9;
+                }
+
+                button[type="action"].bonusCaracL2 {
+                    margin-right:auto;
+                    margin-left:3px;
+                }
+            }
+            
+            @if map.get($params, "titre", "hasButtonActivate") {
+                button[type="action"].active {
+                    width: 100px;
+                    height:26px;
+
+                    margin-left:auto;
+
+                    justify-content: center;
+
+                    font-size: 14px;
+                    font-weight: bold;
+                    border: 1px solid $black;
+                    background: $sombre;
+                    color: $white;
+                    line-height: 25px;
+                    padding:0px;
+
+                    z-index:9;
+                }
+            }
+            
+            @if map.get($params, "titre", "hasButtonPersonnel") {
+                button[type="action"].personnel {
+                    width: 100px;
+                    height:26px;
+
+                    margin-right:auto;
+
+                    justify-content: center;
+
+                    font-size: 14px;
+                    font-weight: bold;
+                    border: 1px solid $black;
+                    background: $sombre;
+                    color: $white;
+                    line-height: 25px;
+                    padding:0px;
+
+                    z-index:9;
+                }
+            }
+            
+            @if map.get($params, "titre", "hasActionSpecial") {
+                button[type="action"].actionSpecial {
+                    width: 98px;
+                    height: 23px;
+                    color: $black;
+                    padding: 0px;
+
+                    margin-top: auto;
+                    margin-right: 0px;
+                    margin-bottom: auto;
+                    margin-left: auto;              
+    
+                    justify-content: center;
+                    align-items: center;
+                    background: $clair;
+                    border: 1px solid $sombre;
+                    font-size: 12px;
+                    font-variant: small-caps;
+                    font-weight: bold;
+                    
+                    z-index: 50;
+    
+                    &::before {
+                        content:"";
+                    }
+    
+                    &:hover {
+                        box-shadow: inset 1px 1px 2px 2px $black;
+                    }
+                }
+            }
+
+            @if map.get($params, "titre", "hasSelect") {
+                select.liste {
+                    width: 70px;
+                    text-align: center;
+                    padding: 0px;
+                    border: 0px;
+                    height: 27px;
+                    margin-left: auto;
+                    z-index: 99;
+                }
+            }
+        }
+    }
+}
+
+@mixin oneLineIS($background, $color, $position:0px, $select:false, $input:false) {
+    background: $background;
+    align-content:center;
+    align-items:center;
+    position:relative;
+
+    width:100%;
+    min-height: 28px;
+
+    h1 {
+        position:absolute;
+        width: calc(100% - 2px);
+        align-content: baseline;
+        background: transparent;
+        color: $color;
+        line-height: 28px;
+        min-height: 28px;
+        justify-content: left;
+        font-size: 14px; 
+        padding-left:2px;
+    }
+
+    @if $select {
+        select {
+            position:absolute;
+            width: calc(50% - 28px);
+            text-align: center;
+            border-top: 0px;
+            border-bottom: 0px;
+            border-right: 0px;
+            padding: 0px;
+            right:$position;
+        }
+    }
+
+    @if $input {
+        input[type="text"],
+        input[type="number"] {
+            position:absolute;
+            width: 30%;
+            height:28px;
+            text-align: center;
+            border-top: 0px;
+            border-bottom: 0px;
+            border-right: 0px;
+            border-left:1px solid $sombre;
+            padding: 0px;
+            right:$position;
+        }
+    }    
+}
+
+@mixin fakeButton($params) {
+    /*
+    ///PARAMETRES EXISTANTS\\\
+    - label
+        - width : Width du label
+        - height : height du label
+
+    - span 
+        - color : La color
+        - background : Le background
+        - border : S'il y a une bordure (true/false)
+        - width : Width du span
+        - height : height du height
+
+    - shadow : s'il y a une ombre (true/false)
+    */
+
+    label.fakeButton {
+        position:relative;
+        width: map.get($params, "label","width");
+        height: map.get($params, "label","height");
+        font-size: 14px;
+        align-self:center;
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            position:absolute;
+            width: 100%;
+            height: map.get($params, "label","height");
+            opacity: 0;
+            z-index:9;
+
+            @if map.get($params, "shadow") == null {
+                &:checked ~ span::before {
+                    box-shadow: 0px 0px 7px 0px $black inset;
+                }
+            } @else if map.get($params, "shadow") {
+                &:checked ~ span::before {
+                    box-shadow: 0px 0px 7px 0px $black inset;
+                }
+            }
+        }
+
+        span {
+            display:flex;
+            height:map.get($params, "span","height");
+
+            &::before {
+                display: flex;
+                @if map.get($params, "span","width") {
+                    width: map.get($params, "span","width");
+                } @else {
+                    width:calc(100% - 2px);
+                }
+                
+                line-height: map.get($params, "span","height");
+                content: attr(title);
+
+                @if map.get($params, "span","border") == null {
+                    border: 0px;
+                } @else if map.get($params, "span","border") == true {
+                    border: 1px solid $black;
+                }
+                
+                background: map.get($params, "span","background");
+                color:map.get($params, "span","color");;
+                justify-content: center;
+            }
+        }
+
+        @content;
+    }
+}
+
+@mixin buttonSelect($width:100px, $marginTop:1px, $marginBottom:1px) {
+    div.button {
+        display:flex;
+        width:100%;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
+        background:$clair;
+
+        button[type="action"] {
+            display:flex;
+            width: $width;
+            height:26px;
+
+            justify-content: center;
+
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid $black;
+            background: $sombre;
+            color: $white;
+            line-height: 25px;
+            padding:0px;
+
+            z-index:9;
+
+            margin-top:$marginTop;
+            margin-bottom:$marginBottom;
+
+            @content;
+        }
+    }
+}
+
+@mixin block($background, $borderColor:$sombre, $noBorder:false) {
+    flex-wrap: wrap;
+    width: 100%;
+    align-content: baseline;
+    background-color: $background;
+    @if $noBorder {
+        border:0px;
+    } @else {
+        border: 1px solid $borderColor;
+    }
+    
+}
+
+@mixin extend {
+    details {
+        &[open] {
+            summary {
+                &::before {
+                    content:"-";
+                }
+            }
+        }
+
+        summary {
+            &::before {
+                display:flex;
+                content: "+";
+                width: 25px;
+                height: 27px;
+                background-color: $sombre;
+                justify-content: center;
+                line-height:21px;
+                font-size:25px;
+                color:$white;
+                cursor:pointer;
+                border-top:1px solid $clair;
+            }
+        }
+    }
+}
+
+@mixin extendModules($wButtonArrow:true) {
+    button[type="action"].buttonPlus {
+        display: flex;
+        background:$sombre;
+        color:$white;
+        width: 27px;
+        font-size: 25px;
+        height: 28px;
+        line-height: 21px;
+        justify-content: center;
+        border-top:0px;
+        border-left:0px;
+        border-bottom:0px;
+        border-right:1px solid $clair;
+        padding:0px;
+
+        span {
+            display:none;
+            width:100%;
+            font-size:25px;
+            justify-content: center;
+            line-height:23px;
+            font-weight:bold;
+        }
+    }
+
+    @if($wButtonArrow) {
+        button[type="action"].buttonArrow {
+            content: "]";
+            width:17px;
+            color: $white;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: pictos;
+            line-height: 18px;
+            transform: rotate(90deg);
+            padding:0px;
+            background:transparent;
+            border:0px;
+            transition: transform 2s;
+        }
+    }
+}
+
+@mixin subMenu($classMenu, $params) {
+     /*
+    ///PARAMETRES EXISTANTS\\\
+    - justifyContent : règle la façon dont le contenu est justifié.
+    - width : width du div.
+    - color : Couleur du texte.
+    - background : Background des boutons
+    - borderColor : couleur de la bordure
+    - fontSize : font size du texte.
+    - fontBold : Si le font est Bold ou non (true/false)
+    - button 
+        - width : width du bouton
+        - widthBL : width des boutons ayant une bordure à gauche.
+        - widthBLR : width des boutons ayant une bordure à gauche et à droite.
+        - height : height des boutons.
+        - lastLine : indique qu'il y a un bouton sur une seconde ligne (true / false)
+    */
+
+    >div.#{$classMenu} {
+        display:flex;
+
+        @if map.get($params, "width") {
+            width:map.get($params, "width");
+        } @else {
+            width:100%;
+        }
+
+        
+        flex-wrap: wrap;
+
+        @if map.get($params, "justifyContent") {
+            justify-content: map.get($params, "justifyContent");
+        } @else {
+            justify-content: space-between;
+        }
+        
+        align-items: flex-end;
+        align-content: flex-end;
+
+        button[type="action"] {
+            display:flex;
+            padding: 0px;
+            width: map.get($params, "button","width");
+            height: map.get($params, "button","height");
+
+            justify-content: center;
+            line-height: map.get($params, "button","height");
+
+            font-size: map.get($params, "fontSize");
+
+            @if map.get($params, "fontBold") {
+                font-weight: bold;
+            }
+            
+            border-top:1px solid map.get($params, "borderColor");
+            border-bottom:1px solid map.get($params, "borderColor");
+            border-left:0px;
+            border-right:0px;
+
+            background: map.get($params, "background");
+            color: map.get($params, "color");
+        }
+
+        button[type="action"].BL {
+            width: map.get($params, "button", "widthBL");
+            border-left:1px solid map.get($params, "borderColor");
+        }
+
+        button[type="action"].BR {
+            width: map.get($params, "button", "widthBL");
+            border-right:1px solid map.get($params, "borderColor");
+        }
+
+        button[type="action"].BLR {
+            width: map.get($params, "button", "widthBLR");
+            border-right:1px solid map.get($params, "borderColor");
+            border-left:1px solid map.get($params, "borderColor");
+        }
+
+        @if map.get($params, "button", "lastLine") {
+            button[type="action"].BLRWLL {
+                width: map.get($params, "button", "widthBLR");
+                border-right:1px solid map.get($params, "borderColor");
+                border-left:1px solid map.get($params, "borderColor");
+                margin-left:1px;
+            }
+        }        
+
+        button[type="action"].NBT {
+            border-top:0px;
+        }
+    }
+}
+
+//POUR LES TEMPLATES
+@mixin titreTemplate($color, $background:transparent, $params:false) {
+    /*
+    ///PARAMETRES EXISTANTS\\\
+    - titre2 : S'il y a un second titre
+        - actif : Pour dire qu'il est actif. (true / false)
+        - background : pour définir le background (transparent par défaut)
+        - color : pour définir la couleur du texte (white par défaut)
+        - borderBottom : S'il y a une bordure en bas, et ses paramètres
+
+    - titre3 : S'il y a un troisième titre
+        - actif : Pour dire qu'il est actif. (true / false)
+        - background : pour définir le background (transparent par défaut)
+        - color : pour définir la couleur du texte (white par défaut)
+        - borderBottom : S'il y a une bordure en bas, et ses paramètres
+
+    - sousTitre : S'il y a un sous-titre
+        - actif : Pour dire qu'il est actif. (true / false)
+        - background : pour définir le background (transparent par défaut)
+        - color : pour définir la couleur du texte (white par défaut)
+        - borderBottom : S'il y a une bordure en bas, et ses paramètres
+    */
+    @if $params == false {
+        $params:();
+    }
+
+    h1.sheet-titre {
+        display:flex;
+        width: 100%;
+        align-content: baseline;
+        align-items:center;
+        background: $background;
+        color: $color;
+        line-height: 20px;
+        min-height: 28px;
+        justify-content: center;
+        font-size: 14px; 
+    }
+
+    @if map.get($params, "titre2", "actif") {
+        h2.sheet-titre2 {
+            display:flex;
+            width: 100%;
+            align-content: baseline;
+
+            @if map.get($params, "titre2","background") != null {
+                background: map.get($params, "titre2","background");
+            } @else {
+                background:transparent;
+            }
+
+            @if map.get($params, "titre2", "color") != null {
+                color:map.get($params, "titre2","color");
+            } @else {
+                color:$white;
+            }
+
+            line-height: 20px;
+            min-height: 28px;
+            justify-content: center;
+            font-size: 14px; 
+            align-items:center;
+
+            @if map.get($params, "titre2", "borderBottom") != null {
+                border-bottom:map.get($params, "titre2","borderBottom");
+            }
+        }
+    }
+
+    @if map.get($params, "titre3", "actif") {
+        h3.sheet-titre3 {
+            display:flex;
+            width: 100%;
+            align-content: baseline;
+
+            @if map.get($params, "titre3","background") != null {
+                background: map.get($params, "titre3","background");
+            } @else {
+                background:transparent;
+            }
+
+            @if map.get($params, "titre3", "color") != null {
+                color:map.get($params, "titre3","color");
+            } @else {
+                color:$white;
+            }
+
+            line-height: 28px;
+            min-height: 28px;
+            justify-content: center;
+            font-size: 12px; 
+
+            @if map.get($params, "titre3", "borderBottom") != null {
+                border-bottom:map.get($params, "titre3","borderBottom");
+            }
+        }
+    }
+
+    @if map.get($params, "sousTitre", "actif") {
+        h4.sheet-sousTitre {
+            display:flex;
+            width: 100%;
+            align-content: baseline;
+
+            @if map.get($params, "sousTitre","background") != null {
+                background: map.get($params, "sousTitre","background");
+            } @else {
+                background:transparent;
+            }
+
+            @if map.get($params, "sousTitre", "color") != null {
+                color:map.get($params, "sousTitre","color");
+            } @else {
+                color:$white;
+            }
+
+            line-height: 16px;
+            min-height: 16px;
+            justify-content: center;
+            font-size: 13px; 
+
+            @if map.get($params, "sousTitre", "borderBottom") != null {
+                border-bottom:map.get($params, "sousTitre","borderBottom");
+            }
+        }
+    }
+}
