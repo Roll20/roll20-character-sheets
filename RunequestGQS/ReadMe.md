@@ -35,7 +35,130 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
 
+## 25.10.2021
 
+	Fixed Strike issues with DEX 19+.  DEX will have to be changed for this to be triggered.
+	Added headers to Parry & Attack Rolls
+	Added delimiters to clarigy the start and end of attacks and parries.
+
+## 06.10.2021
+
+	To account for damage reduction in the attack results tables
+	Added display of special damage and normal damage to critical attack results
+	Added display of normal damage to critical attack results
+
+## 23.08.2021
+
+	Added inputs for final attack and parry values
+	
+	Added input for magical damage bonus
+
+	Added support for minimum chance of  success of 5%
+
+	Increased the size of the modifier inputs in the weapons to allow for calculations instead of fixed value e.g. 10-25 as possible clarification for reducing skills to 100 for opposed rolls.  
+	
+	Added Other Notes section  
+
+
+
+## 09.08.2021
+
+	Added missing translation tags 
+
+	Added missing weapon types for datalists
+
+	Added spirit combat and spirit combat damage for npcs.
+
+	Added magic tab with expanded areas for spells including a new area to include a description  of spell effects and turn order buttons
+
+	Added self to range options for spells
+	
+	Added Spcl  (Special) to duration
+
+	Added parry button and parry modifiers to cover different modifiers for attack and parry
+
+	Added support for penalties for multiple parry and dodges. The modifier should be reset at the start of each turn.
+
+	Added resistance button for characteristics.  POW resistance button is repeated in the magic tab
+
+	Fixed Magic skills with base of 0 and 0 experience should have a skill total of 0 no matter the category bonus.
+
+	Changed spell characteristic defaults for new spells.   
+
+
+## 14.7.2021
+
+
+	Added draggable button support
+	
+	Added roll template for spirit combat damage
+	
+	Added roll template for turn order
+	
+	Support for critical and special damage for Allies and Otherworld Creatures
+	
+	Added translation for labels in skill roll template
+	
+	Fixed issue with damage for Otherworld creature 1
+	
+	Fixed formatting issue with fumble  87-89 in English translation file.
+
+	NPC Sheet
+	
+	Added support for critical and special damage
+	
+	Flipped current and maximum hp and mp
+	
+	Fixed hit location selection
+	
+	QUICKSTART Sheet
+	Added deprecation message 
+	
+	Translation 
+	Changed fumble8 and fumble to reomve references to previous fumble.  This will translators to strange translation. 
+
+
+## 06.06.2021 
+       Added translation tags for buff spells and hit point labels
+       Fixed issues with a number of translation tags.
+
+## 31.05.2021
+	Changes to sheet so that layout does not break when legacy sheet toggle is switched off
+	
+	HTML datalists added to provide a dropdown for weapons. Note that datalist do not behave as comboboxes the list limited based on the content of the input.
+	
+	Fixed. Hit Locations table 1-4 should be the right leg but is the left, 5-8 should be the left leg but is the right
+	
+	Fixed Improvement rolls which roll exactly the threshold to increase. 
+	
+	Removed yellow box around roll results for improvement rolls
+	
+	The skill value for a weapon skill name that does not exist or is spelt incorrectly will be set to 0
+	
+	Added ability to translate rune affinity labels
+	
+	Fixed wrapping of attribute text labels on Firefox
+	
+	Fixed issues with buff spells
+	
+	Fixed fumble breakpoints for Honor, Passions and Spirit Combat
+	
+	Added Ritual to spell duration for Spirit Magic.
+	
+	Fixed 2nd Button under Spirit Magic to behave correctly.
+	
+	Added Cast label to clarify buttons under Spirit Magic.
+	
+	Fixed criticals < 10%
+	
+	Added input for bonuses to spirit combat damage
+	
+	Changed critical crush  damage from full weapon damage + max damage bonus + rolled damage bonus to weapon damage + max damage bonus + max damage bonus
+	
+
+
+## 14.12.2019
+	Mobility and Coordination now reducing SR for Melee Weapons
 
 ## 17.07.2019
 	fixed bug adding more than 1 magic point storag item. Another mp storage section was added. New characters created will only show the new section.  Existing characters will have red notice for the user to copy item and direct them to a configuration section to hide the old section.
@@ -161,4 +284,3 @@ Fixed crush damage on special
 Removed border highlighting on damage
 
 Fixed some of the fumble calculations (characteristc rolls and weapons).
-
