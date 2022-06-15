@@ -19,7 +19,7 @@
       <div>
 
         <details open>
-          <summary style="font-weight:bold; " data-i18n="hero-info">Hero Info</summary>
+          <summary data-i18n="hero-info">Hero Info</summary>
           <div class="hero-info">
             <div>
               <label data-i18n="hero-name">Name <input type="text" name="attr_character_name"
@@ -44,24 +44,19 @@
 
     <div class="hero-stats-details">
       <details open>
-        <summary style="font-weight:bold; " data-i18n="hero-stats">Hero Stats</summary>
+        <summary data-i18n="hero-stats">Hero Stats</summary>
         <div class="hero-stats">
 
           <div class="hero-skill">
 
-            <div class="hero-roll">
-              <label data-i18n="skill">
-                Skill </label>
-
-              <button type="roll" class="skill-roll-btn" name="skillroll" value="[[2d6+@{characterskill}]]"> </button>
+            <label data-i18n="skill">
+              Skill </label>
+            <input type="text" name="attr_characterskill" maxlength="2" />
+            <div class="skill-button-wrapper">
+              <button type="action" class="skill-button" name="act_skillroll"> <span>f </span></button>
             </div>
 
-
-
-
-            <input type="text" name="attr_characterskill" maxlength="2" />
           </div>
-
 
           <div class="hero-stamina">
             <label data-i18n="stamina">Stamina </label>
@@ -71,6 +66,10 @@
           <div class="hero-luck">
             <label data-i18n="luck">Luck </label>
             <input type="text" name="attr_characterluck" maxlength="2" />
+            <div class="luck-button-wrapper">
+              <button type="action" name="act_test" class="luck-button"><span>a</span></button>
+            </div>
+
           </div>
 
         </div>
@@ -144,7 +143,7 @@
       <div>
 
         <details open>
-          <summary style="font-weight:bold; " data-i18n="hero-notes">Hero Notes</summary>
+          <summary data-i18n="hero-notes">Hero Notes</summary>
           <textarea spellcheck="false" name="attr_notes"></textarea>
 
         </details>
@@ -155,7 +154,7 @@
 
       <div class="monster-ecounters-details">
         <details open>
-          <summary style="font-weight:bold; " data-i18n="monster-encounters">Encounters</summary>
+          <summary data-i18n="monster-encounters">Encounters</summary>
 
           <fieldset class="repeating_encounters">
 
@@ -165,17 +164,17 @@
               <div class="monster-stats">
                 <div class="monster-stats-div">
                   <label data-i18n="skill">Skill</label>
-                  <input type="text" maxlength="2" style="width: 60px; text-align:center">
+                  <input type="text" maxlength="2">
                 </div>
 
                 <div class="monster-stats-div">
                   <label data-i18n="stamina">Stamina</label>
-                  <input type="text" maxlength="2" style="width: 60px; text-align:center">
+                  <input type="text" maxlength="2">
                 </div>
 
                 <div class="monster-stats-div">
                   <label data-i18n="attacks">Attacks</label>
-                  <input type="text" maxlength="2" style="width: 60px; text-align:center">
+                  <input type="text" maxlength="2">
                 </div>
               </div>
 
@@ -197,14 +196,95 @@
 
 </div>
 
+<rolltemplate class="sheet-rolltemplate-skill">
+  <div class="rolltemplate-wrapper">
+    <div class="rolltemplate-testname">
+      <div>
+        <h2> <span>&#9876; </span>Skill Test <span style="font-family:'Pictos Three'">b</span>
+        </h2>
+      </div>
+      <div class="rolltemplate-result">
+        <h4>Result
+        </h4>
+        <div>{{roll1}}</div>
+      </div>
+
+    </div>
+
+
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-luckyTest">
+  <div class="rolltemplate-wrapper">
+    <div class="rolltemplate-testname">
+
+      <h2>{{name}}</h2>
+      <div>
+        <div class="rolltemplate-result">
+          <h4>Result</h4>
+          {{roll1}}
+        </div>
+        <div class="rolltemplate-result">
+          <h4> &#9752; Lucky &#9752;</h4>
+          {{computed::roll1}}
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+
+</rolltemplate>
+
+
 <script type="text/worker">
-  const buttonlist = ["hero","notesAndMonsters"];
-  buttonlist.forEach(button => {
-      on(`clicked:${button}`, function() {
-          setAttrs({
-              sheetTab: button
-          });
-      });
+  const buttonlist = ["hero", "notesAndMonsters"];
+buttonlist.forEach(button => {
+  on(`clicked:${button}`, function () {
+    setAttrs({
+      sheetTab: button
+    });
   });
-  
+});
+
+on('clicked:test', (info) => {
+  getAttrs(['characterluck'], (v) => {
+    startRoll("&{template:luckyTest} {{name=Lucky Test}} {{roll1=[[2d6]]}}", (results) => {
+      const total = results.results.roll1.result
+      const lucky = 'Yes, you were lucky';
+      const unlucky = 'Oh no, you were unlucky';
+      if (total < v.characterluck) {
+        finishRoll(
+          results.rollId,
+          {
+            roll1: lucky,
+          }
+        );
+      } else {
+        finishRoll(
+          results.rollId,
+          {
+            roll1: unlucky,
+          }
+        )
+      }
+
+    });
+  })
+
+});
+
+
+on('clicked:skillroll', () => {
+  getAttrs(['characterskill'], (v) => {
+    startRoll("&{template:skill} {{name=Skill Test}} {{roll1=[[2d6 + @{characterskill}]]}}", (results) => {
+      const total = results.results.roll1.result
+      finishRoll(results.rollId, {
+        roll1: total
+      });
+    })
+
+  })
+})
 </script>
