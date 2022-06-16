@@ -66,12 +66,12 @@ console.log('weapons.js');
 console.log('weaponProficiencies.js');
 const weapons = require(path.join(jsFolder, 'weapons.js'));
 const weaponsProficiencies = require(path.join(jsFolder, 'weaponProficiencies.js'));
-html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weapons, proficiencies: weaponsProficiencies, booksPriority: booksPriority, bookShorthand: bookShorthand});
-let weaponTable = pug.renderFile(path.join(pugFolder, 'weaponsOverview.pug'), {pretty: true, data: weapons});
+html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weapons, proficiencies: weaponsProficiencies, booksPriority, bookShorthand});
+let weaponTable = pug.renderFile(path.join(pugFolder, 'weaponsOverview.pug'), {pretty: true, data: weapons, booksPriority});
 fs.writeFileSync(path.join(miscFolder, 'weapons-overview.html'), weaponTable);
 
 const nonWeaponProfs = require(path.join(jsFolder, 'nonweaponProficiencies.js'));
-html += pug.renderFile(path.join(pugFolder, 'nonweaponProficienciesDatalist.pug'), {pretty: true, data: nonWeaponProfs, booksPriority: booksPriority, bookShorthand: bookShorthand})
+html += pug.renderFile(path.join(pugFolder, 'nonweaponProficienciesDatalist.pug'), {pretty: true, data: nonWeaponProfs, booksPriority, bookShorthand})
 const nonWeaponProfTable = pug.renderFile(path.join(pugFolder, 'nonweaponProficienciesOverview.pug'), {pretty: true, data: nonWeaponProfs});
 fs.writeFileSync(path.join(miscFolder, 'nonweapon-proficiencies-overview.html'), nonWeaponProfTable);
 
