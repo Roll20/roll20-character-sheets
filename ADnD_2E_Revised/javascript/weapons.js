@@ -271,7 +271,7 @@ WEAPONS_TABLE['footman\'s mace'].push({
     'speed': 7,
     'small-medium': '1d6+1',
     'large': '1d6',
-    'book': ['PHB'],
+    'book': ['PHB','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -283,7 +283,7 @@ WEAPONS_TABLE['footman\'s pick'].push({
     'speed': 7,
     'small-medium': '1d6+1',
     'large': '2d4',
-    'book': ['PHB'],
+    'book': ['PHB','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -325,7 +325,7 @@ WEAPONS_TABLE['horseman\'s flail'].push({
     'speed': 6,
     'small-medium': '1d4+1',
     'large': '1d4+1',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -349,7 +349,7 @@ WEAPONS_TABLE['horseman\'s pick'].push({
     'speed': 5,
     'small-medium': '1d4+1',
     'large': '1d4',
-    'book': ['PHB'],
+    'book': ['PHB','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -439,7 +439,7 @@ WEAPONS_TABLE['mancatcher'].push({
     'speed': 7,
     'small-medium': '—',
     'large': '—',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -477,7 +477,7 @@ WEAPONS_TABLE['bardiche'].push({
     'speed': 9,
     'small-medium': '2d4',
     'large': '2d6',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -542,7 +542,7 @@ WEAPONS_TABLE['glaive'].push({
     'speed': 8,
     'small-medium': '1d6',
     'large': '1d10',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -568,7 +568,7 @@ WEAPONS_TABLE['guisarme'].push({
     'speed': 8,
     'small-medium': '2d4',
     'large': '1d8',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -594,7 +594,7 @@ WEAPONS_TABLE['halberd'].push({
     'speed': 9,
     'small-medium': '1d10',
     'large': '2d6',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -620,7 +620,7 @@ WEAPONS_TABLE['lucern hammer'].push({
     'speed': 9,
     'small-medium': '2d4',
     'large': '1d6',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -633,7 +633,7 @@ WEAPONS_TABLE['military fork'].push({
     'speed': 7,
     'small-medium': '1d8',
     'large': '2d4',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -646,7 +646,7 @@ WEAPONS_TABLE['partisan'].push({
     'speed': 9,
     'small-medium': '1d6',
     'large': '1d6+1',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -659,7 +659,7 @@ WEAPONS_TABLE['ranseur'].push({
     'speed': 8,
     'small-medium': '2d4',
     'large': '2d4',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -672,7 +672,7 @@ WEAPONS_TABLE['spetum'].push({
     'speed': 8,
     'small-medium': '1d6+1',
     'large': '2d6',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -685,7 +685,7 @@ WEAPONS_TABLE['voulge'].push({
     'speed': 10,
     'small-medium': '2d4',
     'large': '2d4',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -697,7 +697,7 @@ WEAPONS_TABLE['quarterstaff'].push({
     'speed': 4,
     'small-medium': '1d6',
     'large': '1d6',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -810,7 +810,7 @@ WEAPONS_TABLE['bastard sword, one-handed'].push({
     'speed': 6,
     'small-medium': '1d8',
     'large': '1d12',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -834,7 +834,7 @@ WEAPONS_TABLE['broad sword'].push({
     'speed': 5,
     'small-medium': '2d4',
     'large': '1d6+1',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -847,7 +847,7 @@ WEAPONS_TABLE['khopesh'].push({
     'speed': 9,
     'small-medium': '2d4',
     'large': '1d6',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -859,7 +859,7 @@ WEAPONS_TABLE['long sword'].push({
     'speed': 5,
     'small-medium': '1d8',
     'large': '1d12',
-    'book': ['PHB','Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
+    'book': ['PHB','Arms and Equipment Guide','The Complete Ninja\'s Handbook','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -872,7 +872,7 @@ WEAPONS_TABLE['scimitar'].push({
     'speed': 5,
     'small-medium': '1d8',
     'large': '1d8',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -884,7 +884,7 @@ WEAPONS_TABLE['short sword'].push({
     'speed': 3,
     'small-medium': '1d6',
     'large': '1d8',
-    'book': ['PHB'],
+    'book': ['PHB','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1403,7 +1403,7 @@ WEAPONS_TABLE['net'].push({
     'strength': true,
     'small-medium': '',
     'large': '',
-    'book': ['The Complete Fighter\'s Handbook', 'The Complete Priest\'s Handbook','Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook','The Complete Priest\'s Handbook','Arms and Equipment Guide'],
     'category': ['Range']
 });
 
@@ -1415,7 +1415,7 @@ WEAPONS_TABLE['nunchaku'].push({
     'speed': 3,
     'small-medium': '1d6',
     'large': '1d6',
-    'book': ['The Complete Fighter\'s Handbook','The Complete Priest\'s Handbook'],
+    'book': ['The Complete Fighter\'s Handbook','The Complete Priest\'s Handbook','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1441,7 +1441,7 @@ WEAPONS_TABLE['tetsubo'].push({
     'speed': 7,
     'small-medium': '1d8',
     'large': '1d8',
-    'book': ['The Complete Fighter\'s Handbook','The Complete Book of Humanoids'],
+    'book': ['The Complete Fighter\'s Handbook','The Complete Book of Humanoids','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1495,7 +1495,7 @@ WEAPONS_TABLE['spear, two-handed'].push({
     'speed': 6,
     'small-medium': '1d8+1',
     'large': '2d6',
-    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1524,7 +1524,7 @@ WEAPONS_TABLE['stone spear, two-handed'].push({
     'speed': 6,
     'small-medium': '1d6',
     'large': '2d4',
-    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1589,7 +1589,7 @@ WEAPONS_TABLE['drusus'].push({
     'speed': 3,
     'small-medium': '1d6+1',
     'large': '1d8+1',
-    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1602,7 +1602,7 @@ WEAPONS_TABLE['katana, one-handed'].push({
     'speed': 4,
     'small-medium': '1d10',
     'large': '1d12',
-    'book': ['The Complete Fighter\'s Handbook'],
+    'book': ['The Complete Fighter\'s Handbook','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1615,7 +1615,7 @@ WEAPONS_TABLE['katana, two-handed'].push({
     'speed': 4,
     'small-medium': '2d6',
     'large': '2d6',
-    'book': ['The Complete Fighter\'s Handbook'],
+    'book': ['The Complete Fighter\'s Handbook','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1654,7 +1654,7 @@ WEAPONS_TABLE['wakizashi'].push({
     'speed': 3,
     'small-medium': '1d8',
     'large': '1d8',
-    'book': ['The Complete Fighter\'s Handbook'],
+    'book': ['The Complete Fighter\'s Handbook','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1681,7 +1681,7 @@ WEAPONS_TABLE['trident, two-handed'].push({
     'speed': 7,
     'small-medium': '1d8+1',
     'large': '3d4',
-    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1773,7 +1773,7 @@ WEAPONS_TABLE['bo stick'].push({
     'speed': 3,
     'small-medium': '1d6',
     'large': '1d4',
-    'book': ['The Complete Wizard\'s Handbook'],
+    'book': ['The Complete Wizard\'s Handbook','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -1925,7 +1925,7 @@ WEAPONS_TABLE['parrying dagger'].push({
     'speed': 2,
     'small-medium': '1d3',
     'large': '1d3',
-    'book': ['Arms and Equipment Guide'],
+    'book': ['Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -2600,7 +2600,7 @@ WEAPONS_TABLE['boomerang, nonreturning'].push({
     'small-medium': '1d3+1',
     'large': '1d4+1',
     'book': ['The Complete Barbarian\'s Handbook'],
-    'category': ['Range']
+    'category': ['Melee','Range']
 });
 
 WEAPONS_TABLE['boomerang, returning'] = [];
@@ -2615,7 +2615,7 @@ WEAPONS_TABLE['boomerang, returning'].push({
     'small-medium': '1d3+1',
     'large': '1d4+1',
     'book': ['The Complete Barbarian\'s Handbook'],
-    'category': ['Range']
+    'category': ['Melee','Range']
 });
 
 WEAPONS_TABLE['celt'] = [];
@@ -2914,7 +2914,7 @@ WEAPONS_TABLE['hankyu (half bow), sheaf arrow (leaf-head)'].push({
 
 WEAPONS_TABLE['pellet bow, bullet'] = [];
 WEAPONS_TABLE['pellet bow, bullet'].push({
-    'name': 'Pellet bow, Vullet',
+    'name': 'Pellet bow, Bullet',
     'size': 'M',
     'ammo-size': 'S',
     'type': 'P',
@@ -3941,9 +3941,10 @@ WEAPONS_TABLE['bolas'].push({
 WEAPONS_TABLE['boomerang'] = [];
 WEAPONS_TABLE['boomerang'].push({
     'name': 'Boomerang',
-    'size': 'M',
+    'size': 'S',
     'type': 'B',
     'speed': 4,
+    'reach': '1',
     'rof': '1',
     'range': '4/8/12',
     'strength': true,
@@ -3951,7 +3952,7 @@ WEAPONS_TABLE['boomerang'].push({
     'large': '1d4',
     'knockdown': 'd8',
     'book': ['Player\'s Option: Combat & Tactics'],
-    'category': ['Range']
+    'category': ['Melee','Range']
 });
 
 WEAPONS_TABLE['bottle'] = [];
@@ -4007,6 +4008,7 @@ WEAPONS_TABLE['composite long bow, sheaf arrow'].push({
     'size': 'L',
     'ammo-size': 'S',
     'type': 'P',
+    'type': 'P',
     'speed': 7,
     'rof': '2/1',
     'range': '8/16/34',
@@ -4048,7 +4050,7 @@ WEAPONS_TABLE['composite short bow, flight arrow'].push({
     'category': ['Range']
 });
 
-WEAPONS_TABLE['composite short bow, stone arrow'] = WEAPONS_TABLE['composite short bow, stone flight arrow']
+WEAPONS_TABLE['composite short bow, stone arrow'] = WEAPONS_TABLE['composite short bow, stone flight arrow'];
 WEAPONS_TABLE['composite short bow, stone arrow'].push({
     'name': 'Composite short bow, Stone arrow',
     'size': 'M',
@@ -4157,9 +4159,9 @@ WEAPONS_TABLE['short bow, stone arrow'].push({
     'category': ['Range']
 });
 
-WEAPONS_TABLE['bandistock'] = [];
-WEAPONS_TABLE['bandistock'].push({
-    'name': 'Bandistock',
+WEAPONS_TABLE['brandistock'] = [];
+WEAPONS_TABLE['brandistock'].push({
+    'name': 'Brandistock',
     'size': 'M',
     'type': 'P',
     'speed': 7,
@@ -4179,7 +4181,7 @@ WEAPONS_TABLE['caltrop'].push({
     'speed': 0,
     'small-medium': '1',
     'large': '1d2',
-    'book': ['Player\'s Option: Combat & Tactics'],
+    'book': ['Player\'s Option: Combat & Tactics','Player\'s Option: Skills & Powers'],
     'category': []
 });
 
@@ -4247,8 +4249,8 @@ WEAPONS_TABLE['club'].push({
     'reach': '1',
     'rof': '1',
     'range': '2/4/6',
-    'small-medium': '1d6',
     'strength': true,
+    'small-medium': '1d6',
     'large': '1d6',
     'knockdown': 'd8',
     'book': ['Player\'s Option: Combat & Tactics'],
@@ -4478,6 +4480,7 @@ WEAPONS_TABLE['light crossbow, light quarrel'].push({
 WEAPONS_TABLE['pellet bow, pellet'] = [];
 WEAPONS_TABLE['pellet bow, pellet'].push({
     'name': 'Pellet bow, Pellet',
+    'group': 'Crossbow',
     'size': 'M',
     'type': 'B',
     'speed': 7,
@@ -4937,8 +4940,8 @@ WEAPONS_TABLE['javelin'].push({
     'reach': '1',
     'rof': '1',
     'range': '4/8/12',
-    'small-medium': '1d6',
     'strength': true,
+    'small-medium': '1d6',
     'large': '1d6',
     'knockdown': 'd6',
     'book': ['Player\'s Option: Combat & Tactics'],
@@ -6504,6 +6507,7 @@ WEAPONS_TABLE['trident, one-handed'].push({
     'strength': true,
     'small-medium': '1d6+1',
     'large': '2d4',
+    'knockdown': 'd6',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Melee','Range']
 });
@@ -6516,6 +6520,7 @@ WEAPONS_TABLE['trident, two-handed'].push({
     'reach': '1',
     'small-medium': '1d8+1',
     'large': '3d4',
+    'knockdown': 'd8',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Melee']
 });
@@ -6692,6 +6697,1307 @@ WEAPONS_TABLE['shield-rush, large shield'].push({
     'knockdown': '+3',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Melee']
+});
+//#endregion
+
+//#region Player's Option: Skills & Powers
+WEAPONS_TABLE['adze'].push({
+    'name': 'Adze',
+    'size': 'S',
+    'type': 'S/P',
+    'speed': 4,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['ankus'].push({
+    'name': 'Ankus',
+    'size': 'M',
+    'type': 'P/B',
+    'speed': 6,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['stone axe'].push({
+    'name': 'Stone axe',
+    'size': 'M',
+    'type': 'B/S',
+    'speed': 6,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['bagh nakh'].push({
+    'name': 'Bagh nakh',
+    'size': 'S',
+    'type': 'S',
+    'speed': 2,
+    'small-medium': '?',
+    'large': '?',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['battle axe'].push({
+    'name': 'Battle axe',
+    'size': 'M',
+    'type': 'S',
+    'speed': 7,
+    'small-medium': '1d8',
+    'large': '1d10',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['blowgun, barbed dart'].push({
+    'name': 'Blowgun, Barbed Dart',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'rof': '2/1',
+    'range': '2/4/6',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['blowgun, needle'].push({
+    'name': 'Blowgun, Needle',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'rof': '2/1',
+    'range': '2/4/6',
+    'small-medium': '1',
+    'large': '—',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['bolas'].push({
+    'name': 'Bolas',
+    'size': 'M',
+    'type': 'B',
+    'speed': 8,
+    'rof': '1',
+    'range': '6/12/18',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['boomerang'].push({
+    'name': 'Boomerang',
+    'size': 'S',
+    'type': 'B',
+    'speed': 4,
+    'rof': '1',
+    'range': '4/8/12',
+    'strength': true,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee','Range']
+});
+WEAPONS_TABLE['composite long bow, flight arrow'].push({
+    'name': 'Composite long bow, Flight arrow',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '8/16/34',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['composite long bow, sheaf arrow'].push({
+    'name': 'Composite long bow, Sheaf arrow',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '8/16/34',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['composite long bow, pile arrow'].push({
+    'name': 'Composite long bow, Pile arrow',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '8/16/34',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['composite long bow, stone arrow'].push({
+    'name': 'Composite long bow, Stone arrow',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '8/16/34',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['composite short bow, flight arrow'].push({
+    'name': 'Composite short bow, Flight arrow',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 6,
+    'rof': '2/1',
+    'range': '10/20/36',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['composite short bow, stone arrow'].push({
+    'name': 'Composite short bow, Stone arrow',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 6,
+    'rof': '2/1',
+    'range': '10/20/36',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['long bow, flight arrow'].push({
+    'name': 'Long bow, Flight arrow',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '14/28/42',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['long bow, sheaf arrow'].push({
+    'name': 'Long bow, Sheaf arrow',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '10/20/34',
+    'small-medium': '1d8',
+    'large': '1d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['long bow, pile arrow'].push({
+    'name': 'Long bow, Pile arrow',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '10/20/34',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['long bow, stone arrow'].push({
+    'name': 'Long bow, Stone arrow',
+    'size': 'L',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '14/28/42',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['short bow, flight arrow'].push({
+    'name': 'Short bow, Flight arrow',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '10/20/30',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['short bow, stone arrow'].push({
+    'name': 'Short bow, Stone arrow',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '2/1',
+    'range': '8/16/24',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['brandistock'].push({
+    'name': 'Brandistock',
+    'size': 'M',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['cestus'].push({
+    'name': 'Cestus',
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['chain'].push({
+    'name': 'Chain',
+    'size': 'L',
+    'type': 'B',
+    'speed': 5,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['chakram'].push({
+    'name': 'Chakram',
+    'size': 'S',
+    'type': 'S',
+    'speed': 4,
+    'rof': '2/1',
+    'range': '4/8/12',
+    'strength': true,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['chijikiri'].push({
+    'name': 'Chijikiri',
+    'size': 'M',
+    'type': 'P/B',
+    'speed': 7,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['club'].push({
+    'name': 'Club',
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['cho-ku-no, light quarrel'].push({
+    'name': 'Cho-ku-no, Light quarrel',
+    'group': 'Crossbow',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 6,
+    'rof': '2/1',
+    'range': '10/20/30',
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['hand crossbow, hand quarrel'].push({
+    'name': 'Hand crossbow, Hand quarrel',
+    'size': 'S',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 5,
+    'rof': '1',
+    'range': '4/8/12',
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['heavy crossbow, heavy quarrel'].push({
+    'name': 'Heavy crossbow, Heavy quarrel',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 10,
+    'rof': '1/2',
+    'range': '16/32/48',
+    'small-medium': '1d8+1',
+    'large': '1d10+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['light crossbow, light quarrel'].push({
+    'name': 'Light crossbow, Light quarrel',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1',
+    'range': '12/24/36',
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['pellet bow, pellet'].push({
+    'name': 'Pellet bow, Pellet',
+    'group': 'Crossbow',
+    'size': 'M',
+    'type': 'B',
+    'speed': 7,
+    'rof': '1',
+    'range': '8/16/24',
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['dagger'].push({
+    'name': 'Dagger',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'rof': '2/1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['bone dagger'].push({
+    'name': 'Bone dagger',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'rof': '2/1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d2',
+    'large': '1d2',
+    'knockdown': 'd6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['jambiya'].push({
+    'name': 'Jambiya',
+    'group': 'Dagger',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 3,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['katar'].push({
+    'name': 'Katar',
+    'group': 'Dagger',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d3+1',
+    'large': '1d3',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['main-gauche'].push({
+    'name': 'Main-gauche',
+    'group': 'Dagger',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d3',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['stiletto'].push({
+    'name': 'Stiletto',
+    'group': 'Dagger',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'rof': '2/1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['stone dagger'].push({
+    'name': 'Stone dagger',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'rof': '2/1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['dart'].push({
+    'name': 'Dart',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'rof': '3/1',
+    'range': '2/4/8',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['footman\'s flail'].push({
+    'name': 'Footman\'s flail',
+    'size': 'L',
+    'type': 'B',
+    'speed': 7,
+    'small-medium': '1d6+1',
+    'large': '2d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['gunsen'].push({
+    'name': 'Gunsen',
+    'size': 'S',
+    'type': 'B/P',
+    'speed': 2,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['hand axe'].push({
+    'name': 'Hand axe',
+    'size': 'M',
+    'type': 'S',
+    'speed': 4,
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee','Range']
+});
+WEAPONS_TABLE['harpoon'].push({
+    'name': 'Harpoon',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '2d4',
+    'large': '2d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['bone harpoon'].push({
+    'name': 'Bone harpoon',
+    'noProf': true,
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d6',
+    'large': '1d10',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['javelin'].push({
+    'name': 'Javelin',
+    'size': 'M',
+    'type': 'P',
+    'speed': 4,
+    'rof': '1',
+    'range': '4/8/12',
+    'strength': true,
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+
+WEAPONS_TABLE['stone javelin'].push({
+    'name': 'Stone javelin',
+    'noProf': true,
+    'size': 'M',
+    'type': 'P',
+    'speed': 4,
+    'rof': '1',
+    'range': '3/6/9',
+    'strength': true,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['jitte'].push({
+    'name': 'Jitte',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['kama'].push({
+    'name': 'Kama',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 4,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['kau sin ke'].push({
+    'name': 'Kau sin ke',
+    'size': 'M',
+    'type': 'B',
+    'speed': 6,
+    'small-medium': '1d8',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['kawanaga'].push({
+    'name': 'Kawanaga',
+    'size': 'S',
+    'type': 'P/B',
+    'speed': 7,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['knife'].push({
+    'name': 'Knife',
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 2,
+    'rof': '2/1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['bone knife'].push({
+    'name': 'Bone knife',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 2,
+    'rof': '2/1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d2',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+
+WEAPONS_TABLE['stone knife'].push({
+    'name': 'Stone knife',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P/S',
+    'speed': 2,
+    'rof': '2/1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d2',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+
+WEAPONS_TABLE['throwing knife'].push({
+    'name': 'Throwing knife',
+    'noProf': true,
+    'size': 'M',
+    'type': 'P/S',
+    'speed': 8,
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '2d4',
+    'large': '1d6+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['kusari-gama'].push({
+    'name': 'Kusari-gama',
+    'size': 'M',
+    'type': 'S/P/B',
+    'speed': 6,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['light lance'].push({
+    'name': 'Light lance',
+    'noProf': true,
+    'size': 'L',
+    'type': 'P',
+    'speed': 6,
+    'rof': '1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['medium lance'].push({
+    'name': 'Medium lance',
+    'noProf': true,
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'small-medium': '1d6+1',
+    'large': '2d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['heavy lance'].push({
+    'name': 'Heavy lance',
+    'noProf': true,
+    'size': 'L',
+    'type': 'P',
+    'speed': 10,
+    'small-medium': '1d8+1',
+    'large': '3d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['jousting lance'].push({
+    'name': 'Jousting lance',
+    'size': 'L',
+    'type': 'B',
+    'speed': 10,
+    'small-medium': '1d3-1',
+    'large': '1d2-1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['lasso'].push({
+    'name': 'Lasso',
+    'size': 'M',
+    'type': '—',
+    'speed': 10,
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '',
+    'large': '',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['horseman\'s mace'].push({
+    'name': 'Horseman\'s mace',
+    'size': 'M',
+    'type': 'B',
+    'speed': 6,
+    'rof': '1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['mace-axe'].push({
+    'name': 'Mace-axe',
+    'size': 'M',
+    'type': 'B/S',
+    'speed': 8,
+    'small-medium': '2d4',
+    'large': '1d6+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['machete'].push({
+    'name': 'Machete',
+    'size': 'M',
+    'type': 'S',
+    'speed': 6,
+    'small-medium': '1d8',
+    'large': '1d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['maul'].push({
+    'name': 'Maul',
+    'size': 'L',
+    'type': 'B',
+    'speed': 8,
+    'small-medium': '2d4',
+    'large': '1d10',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['morningstar'].push({
+    'name': 'Morningstar',
+    'noProf': true,
+    'size': 'M',
+    'type': 'B/P',
+    'speed': 7,
+    'small-medium': '2d4',
+    'large': '1d6+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['net'].push({
+    'name': 'Net',
+    'size': 'M',
+    'type': '—',
+    'speed': 10,
+    'rof': '1/2',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '',
+    'large': '',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee','Range']
+});
+WEAPONS_TABLE['pilum'].push({
+    'name': 'Pilum',
+    'size': 'M',
+    'type': 'P',
+    'speed': 5,
+    'reach': '1',
+    'small-medium': '1d6',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['pike'].push({
+    'name': 'Pike',
+    'size': 'L',
+    'type': 'P',
+    'speed': 13,
+    'small-medium': '1d6',
+    'large': '1d12',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['awl pike'].push({
+    'name': 'Awl Pike',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P',
+    'speed': 13,
+    'small-medium': '1d6',
+    'large': '1d12',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['bec de corbin'].push({
+    'name': 'Bec de Corbin',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P/B',
+    'speed': 9,
+    'small-medium': '1d8',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['bill'].push({
+    'name': 'Bill',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P/S',
+    'speed': 10,
+    'small-medium': '2d4',
+    'large': '1d10',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['bill-guisarme'].push({
+    'name': 'Bill-Guisarme',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P/S',
+    'speed': 10,
+    'small-medium': '2d4',
+    'large': '1d10',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['fauchard'].push({
+    'name': 'Fauchard',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S',
+    'speed': 8,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['glaive-guisarme'].push({
+    'name': 'Glaive-Guisarme',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'P/S',
+    'speed': 9,
+    'small-medium': '2d4',
+    'large': '2d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['lajatang'].push({
+    'name': 'Lajatang',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S',
+    'speed': 6,
+    'small-medium': '1d10',
+    'large': '1d10',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['nagimaki'].push({
+    'name': 'Nagimaki',
+    'group': 'Polearm',
+    'size': 'M',
+    'type': 'S',
+    'speed': 6,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['naginata'].push({
+    'name': 'Naginata',
+    'group': 'Polearm',
+    'size': 'L',
+    'type': 'S',
+    'speed': 7,
+    'small-medium': '1d8',
+    'large': '1d10',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['rock'].push({
+    'name': 'Rock',
+    'noProf': true,
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'rof': '2/1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['sai'].push({
+    'name': 'Sai',
+    'size': 'S',
+    'type': 'B',
+    'speed': 2,
+    'small-medium': '1d4',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['sang kauw'].push({
+    'name': 'Sang Kauw',
+    'size': 'L',
+    'type': 'P/S',
+    'speed': 7,
+    'small-medium': '1d8',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['shuriken'].push({
+    'name': 'Shuriken',
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'rof': '2/1',
+    'range': '3/6/9',
+    'strength': true,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['sling, bullet'].push({
+    'name': 'Sling, Bullet',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'rof': '1',
+    'range': '10/20/30',
+    'strength': true,
+    'small-medium': '1d4+1',
+    'large': '1d6+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+
+WEAPONS_TABLE['sling, stone'].push({
+    'name': 'Sling, Stone',
+    'size': 'S',
+    'type': 'B',
+    'speed': 6,
+    'rof': '1',
+    'range': '8/16/24',
+    'strength': true,
+    'small-medium': '1d4',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['spear, one-handed'].push({
+    'name': 'Spear, One-handed',
+    'size': 'M',
+    'type': 'P',
+    'speed': 6,
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['long spear'].push({
+    'name': 'Long spear',
+    'size': 'L',
+    'type': 'P',
+    'speed': 8,
+    'small-medium': '2d6',
+    'large': '3d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['stone spear, one-handed'].push({
+    'name': 'Stone spear, One-handed',
+    'noProf': true,
+    'size': 'M',
+    'type': 'P',
+    'speed': 6,
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d4',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee','Range']
+});
+WEAPONS_TABLE['staff sling, stinkpot'].push({
+    'name': 'Staff sling, Stinkpot',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'B',
+    'speed': 11,
+    'rof': '1',
+    'range': '6/12/18',
+    'strength': true,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['staff sling, stone'].push({
+    'name': 'Staff sling, Stone',
+    'size': 'M',
+    'ammo-size': 'S',
+    'type': 'B',
+    'speed': 11,
+    'rof': '1',
+    'range': '6/12/18',
+    'strength': true,
+    'small-medium': '1d4+1',
+    'large': '1d6+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Range']
+});
+WEAPONS_TABLE['bastard sword, two-handed'].push({
+    'name': 'Bastard sword, Two-handed',
+    'size': 'M',
+    'type': 'S',
+    'speed': 6,
+    'small-medium': '2d4',
+    'large': '2d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['claymore'].push({
+    'name': 'Claymore',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 7,
+    'small-medium': '2d4',
+    'large': '2d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['cutlass'].push({
+    'name': 'Cutlass',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 5,
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['falchion'].push({
+    'name': 'Falchion',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 5,
+    'small-medium': '1d6+1',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['gladius'].push({
+    'name': 'Gladius',
+    'group': 'Sword',
+    'size': 'S',
+    'type': 'P',
+    'speed': 3,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['great scimitar'].push({
+    'name': 'Great scimitar',
+    'group': 'Sword',
+    'size': 'L',
+    'type': 'S',
+    'speed': 9,
+    'small-medium': '2d6',
+    'large': '4d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['ninja-to'].push({
+    'name': 'Ninja-to',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S/P',
+    'speed': 3,
+    'small-medium': '1d8',
+    'large': '1d6',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['no-dachi'].push({
+    'name': 'No-dachi',
+    'group': 'Sword',
+    'size': 'L',
+    'type': 'S/P',
+    'speed': 8,
+    'small-medium': '1d10',
+    'large': '1d20',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['rapier'].push({
+    'name': 'Rapier',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'P',
+    'speed': 4,
+    'small-medium': '1d6',
+    'large': '1d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['sabre'].push({
+    'name': 'Sabre',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 5,
+    'small-medium': '1d6+1',
+    'large': '1d8+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['sapara'].push({
+    'name': 'Sapara',
+    'group': 'Sword',
+    'size': 'S',
+    'type': 'S',
+    'speed': 5,
+    'small-medium': '1d6+1',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['spatha'].push({
+    'name': 'Spatha',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 5,
+    'small-medium': '1d8',
+    'large': '1d12',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['sword-axe'].push({
+    'name': 'Sword-axe',
+    'size': 'L',
+    'type': 'S',
+    'speed': 10,
+    'small-medium': '1d8+1',
+    'large': '1d12+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['tulwar'].push({
+    'name': 'Tulwar',
+    'group': 'Sword',
+    'size': 'M',
+    'type': 'S',
+    'speed': 5,
+    'small-medium': '1d6+1',
+    'large': '2d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['three-piece rod'].push({
+    'name': 'Three-piece rod',
+    'size': 'M',
+    'type': 'B',
+    'speed': 7,
+    'small-medium': '1d6',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['trident, one-handed'].push({
+    'name': 'Trident, One-handed',
+    'size': 'L',
+    'type': 'P',
+    'speed': 7,
+    'rof': '1',
+    'range': '2/3/4',
+    'strength': true,
+    'small-medium': '1d6+1',
+    'large': '2d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee','Range']
+});
+WEAPONS_TABLE['two-handed axe'].push({
+    'name': 'Two-handed axe',
+    'noProf': true,
+    'size': 'L',
+    'type': 'S',
+    'speed': 9,
+    'small-medium': '1d10',
+    'large': '2d8',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['warhammer'].push({
+    'name': 'Warhammer',
+    'size': 'M',
+    'type': 'B',
+    'speed': 4,
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d4+1',
+    'large': '1d4',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
+});
+WEAPONS_TABLE['war club'].push({
+    'name': 'War club',
+    'size': 'M',
+    'type': 'B/S',
+    'speed': 7,
+    'rof': '1',
+    'range': '2/4/6',
+    'strength': true,
+    'small-medium': '1d6+1',
+    'large': '1d4+1',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': ['Melee', 'Range']
 });
 //#endregion
 module.exports = WEAPONS_TABLE;
