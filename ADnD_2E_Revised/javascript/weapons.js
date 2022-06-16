@@ -4181,7 +4181,8 @@ WEAPONS_TABLE['caltrop'].push({
     'speed': 0,
     'small-medium': '1',
     'large': '1d2',
-    'book': ['Player\'s Option: Combat & Tactics','Player\'s Option: Skills & Powers'],
+    'knockdown': '—',
+    'book': ['Player\'s Option: Combat & Tactics'],
     'category': []
 });
 
@@ -5379,6 +5380,7 @@ WEAPONS_TABLE['oil flask'].push({
     'strength': true,
     'small-medium': '',
     'large': '',
+    'knockdown': '—',
     'book': ['Player\'s Option: Combat & Tactics'],
     'category': ['Range']
 });
@@ -6980,6 +6982,16 @@ WEAPONS_TABLE['brandistock'].push({
     'book': ['Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
+WEAPONS_TABLE['caltrop'].push({
+    'name': 'Caltrop',
+    'size': 'S',
+    'type': 'P',
+    'speed': 0,
+    'small-medium': '1',
+    'large': '1d2',
+    'book': ['Player\'s Option: Skills & Powers'],
+    'category': []
+});
 WEAPONS_TABLE['cestus'].push({
     'name': 'Cestus',
     'size': 'S',
@@ -7129,7 +7141,6 @@ WEAPONS_TABLE['bone dagger'].push({
     'strength': true,
     'small-medium': '1d2',
     'large': '1d2',
-    'knockdown': 'd6',
     'book': ['Player\'s Option: Skills & Powers'],
     'category': ['Melee', 'Range']
 });
@@ -7533,7 +7544,6 @@ WEAPONS_TABLE['pilum'].push({
     'size': 'M',
     'type': 'P',
     'speed': 5,
-    'reach': '1',
     'small-medium': '1d6',
     'large': '1d6',
     'book': ['Player\'s Option: Skills & Powers'],
