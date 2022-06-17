@@ -30,6 +30,16 @@ const isPlayerUpdate = function (eventInfo) {
     return eventInfo.sourceType === PLAYER;
 }
 
+const eqSet = function(as, bs) {
+    if (as.size !== bs.size)
+        return false;
+    for (let a of as) {
+        if (!bs.has(a))
+            return false;
+    }
+    return true;
+}
+
 const capitalizeFirst = function (s) {
     if (typeof s !== 'string')
         return '';
@@ -1394,10 +1404,10 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
 //melee hit autofill
 on('change:repeating_weapons:weaponname', function(eventInfo) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
-        let compareFields = ['size','speed','type'];
+        let compareFields = ['size','speed'];
         if (isPlayersOption)
             compareFields.push('reach');
-        return compareFields.every(f => weapon1[f] === weapon2[f])
+        return compareFields.every(f => weapon1[f] === weapon2[f]) && eqSet(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
     }
     let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
@@ -1446,7 +1456,7 @@ on('change:repeating_weapons-damage:weaponname1', function(eventInfo) {
 //range hit autofill
 on('change:repeating_weapons2:weaponname2', function(eventInfo) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
-        return ['strength','rof','range','size','speed','type'].every(f => weapon1[f] === weapon2[f])
+        return ['strength','rof','range','size','speed'].every(f => weapon1[f] === weapon2[f]) && eqSet(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
     }
     let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
