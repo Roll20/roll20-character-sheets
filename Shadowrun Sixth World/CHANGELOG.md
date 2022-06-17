@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2022-06-08 ** v.52 Chuz (James Culp)
+	Bugfix - The query for the reason the D6 is being rollw wasn't showing in the roll template.
+	New Feature - Added an Effects tab in the Attributes Pane.  This is where a runner can track what effects they commonly have, handy for mages that always cast Increase Attribute, or drug using street sams for example.  This also includes the Modifications advanced feature (**USE AT YOUR OWN RISK**) that turns on and off with the toggles.
 **2022-03-15 ** v.51 Chuz (James Culp)
 	Bugfix - Sprites -> update power/skills now updated when sprite type or level are changed.
 	Bugfix - NPCs had a maximum essence of 6, HMHVV victims can have >6 essence.
