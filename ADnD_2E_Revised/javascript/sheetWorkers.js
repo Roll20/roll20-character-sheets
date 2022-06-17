@@ -1482,13 +1482,14 @@ on('change:repeating_weapons2:weaponname2', function(eventInfo) {
 on('change:repeating_ammo:ammoname', function(eventInfo) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
         let comparerFields = ['strength','small-medium','large'];
+        let equalSets = true;
         if (isPlayersOption) {
             comparerFields.push('knockdown');
             comparerFields.push('size');
             comparerFields.push('ammo-size');
-            comparerFields.push('type');
+            equalSets = eqSet(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
         }
-        return comparerFields.every(f => weapon1[f] === weapon2[f])
+        return comparerFields.every(f => weapon1[f] === weapon2[f]) && equalSets;
     }
     let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
@@ -1516,12 +1517,12 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
     sections.forEach(section => {
         on(`change:${prefix}:weaponnamehench${section}`, function(eventInfo) {
             let comparer = function (weapon1, weapon2, isPlayersOption) {
-                let comparerFields = ['rof','small-medium','large','range','type','speed'];
+                let comparerFields = ['rof','small-medium','large','range','speed'];
                 if (isPlayersOption) {
                     comparerFields.push('reach');
                     comparerFields.push('knockdown');
                 }
-                return comparerFields.every(f => weapon1[f] === weapon2[f])
+                return comparerFields.every(f => weapon1[f] === weapon2[f]) && eqSet(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
             }
             let rowId = parseSourceAttribute(eventInfo).rowId;
             let setWeaponFunc = function (weapon) {
