@@ -30,16 +30,6 @@ const isPlayerUpdate = function (eventInfo) {
     return eventInfo.sourceType === PLAYER;
 }
 
-const eqSet = function(as, bs) {
-    if (as.size !== bs.size)
-        return false;
-    for (let a of as) {
-        if (!bs.has(a))
-            return false;
-    }
-    return true;
-}
-
 const capitalizeFirst = function (s) {
     if (typeof s !== 'string')
         return '';
@@ -1407,7 +1397,7 @@ on('change:repeating_weapons:weaponname', function(eventInfo) {
         let compareFields = ['size','speed'];
         if (isPlayersOption)
             compareFields.push('reach');
-        return compareFields.every(f => weapon1[f] === weapon2[f]) && eqSet(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
+        return compareFields.every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
     }
     let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
@@ -1456,7 +1446,7 @@ on('change:repeating_weapons-damage:weaponname1', function(eventInfo) {
 //range hit autofill
 on('change:repeating_weapons2:weaponname2', function(eventInfo) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
-        return ['strength','rof','range','size','speed'].every(f => weapon1[f] === weapon2[f]) && eqSet(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
+        return ['strength','rof','range','size','speed'].every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
     }
     let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
@@ -1487,7 +1477,7 @@ on('change:repeating_ammo:ammoname', function(eventInfo) {
             comparerFields.push('knockdown');
             comparerFields.push('size');
             comparerFields.push('ammo-size');
-            equalSets = eqSet(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
+            equalSets = _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
         }
         return comparerFields.every(f => weapon1[f] === weapon2[f]) && equalSets;
     }
@@ -1522,7 +1512,7 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
                     comparerFields.push('reach');
                     comparerFields.push('knockdown');
                 }
-                return comparerFields.every(f => weapon1[f] === weapon2[f]) && eqSet(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
+                return comparerFields.every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
             }
             let rowId = parseSourceAttribute(eventInfo).rowId;
             let setWeaponFunc = function (weapon) {
