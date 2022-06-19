@@ -18063,16 +18063,18 @@ Relevant character sheet versions
 * 20220604: Visibili Vanitar spelling fixes
 */
 function migrationCheck() {
-    safeGetAttrs(["character_sheet_version", "data_version"], function(v) {
-    	var caller = "migrationCheck";
+    safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
+        var caller = "migrationCheck";
+        debugLog(caller, "Sheet Initialization Status:", v["sheet_initialized"]);
         debugLog(caller, "Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
 
+        let initialized = v["sheet_initialized"];
         let dataVersion = parseInt(v["data_version"]);
         let sheetVersion = parseInt(v["character_sheet_version"]);
 
         /*
         If the character is new, data_version (the attribute) is just an empty string and dataVersion (the variable declared in this function) is NaN.
-        Since new characters do not need any migration, we just set the data_version to the current sheet version.
+        New characters do not need any migration, but sheet initialization to set up the sheet including setting data_version to the current sheet version.
 
         Why this is necessary
         * Sheet-defined attributes such as data_version will change automatically if they are different in a new sheet version.
@@ -18082,9 +18084,21 @@ function migrationCheck() {
         * On the other hand data_version could be left at its initial value, but that would mean that every new character would get all migrations unnecessarily!
         */
 
-        if (isNaN(dataVersion)) {
-            setCurrentVersion();
-            return;
+        // Initialization First Safeguard Check (function not called based on one attribute)
+        if (
+            initialized === 0
+            ||
+            initialized === "0"
+            ||
+            initialized === "false"
+            ||
+            initialized === false
+        ) {
+            debugLog(caller, "initialized is false.");
+            initialized = false;
+        } else {
+            debugLog(caller, "initialized is true. Skipping initialization.");
+            initialized = true;
         }
 
         let functionsToCall = [];
@@ -18111,6 +18125,7 @@ function migrationCheck() {
         } else {
 			firstFunction = "initializeSheet";
         }
+
         // if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
         // then we call the function with name "firstFunction"
         if (firstFunction) {
@@ -18232,7 +18247,7 @@ function initializeSheet(migrationChain) {
 			var attrs = { "sheet_initialized": false };
 			var dataVersionSet = true;
 
-			if ( isNaN(v["data_version"])  || v["data_version"] === "")
+			if ( isNaN(v["data_version"]) || v["data_version"] === "")
 			{
 				debugLog(caller, "'data_version' not set, so we can proceed.");
 				dataVersionSet = false;
@@ -18283,6 +18298,9 @@ function initializeSheet(migrationChain) {
 					}
 					debugLog(caller, "Attributes after initialization: ", attrs);
 				}
+			} else {
+				debugLog(caller, "'data_version' set, safety stopping initialization and preventing future initialization attempts ...");
+				attrs["sheet_initialized"] = true;
 			}
 			safeSetAttrs(attrs, {}, function() {
 					callNextMigration(migrationChain);
