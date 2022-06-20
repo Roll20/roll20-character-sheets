@@ -736,7 +736,7 @@ on('clicked:opendoor-check', function (eventInfo){
        rollTemplate += ` {{checktarget=[[${target}]]}}`;
        rollTemplate += target === match[1]
            ? ` {{checkvs=Open Normal Doors Check}}`
-           : ` {{checkvs=Open Locked/Barred/Magical Doors Check}}`;
+           : ` {{checkvs=Open Locked/Barred/Magically Held Doors Check}}`;
        return printRoll(rollTemplate);
    });
 });
