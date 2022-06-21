@@ -1522,9 +1522,9 @@ on("change:encounter_generator_json", function() {
                     skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
                 } else if (skillKey.toLowerCase() == "survival") {
                     skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
-                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - pow - cha;
+                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - pow - con;
                     skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{pow}";
-                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
+                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{con}";
                     skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
                 } else if (skillKey.toLowerCase() == "teach") {
                     skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;

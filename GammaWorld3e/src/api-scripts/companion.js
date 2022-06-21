@@ -48,8 +48,7 @@ function empty(mixedVar) {
   return false;
 }
 
-// @license: GammaWorld compendium not included for licensing reasons, but you can create your own, contact me for advice on how
-// import compendium from './compendium'
+import compendium from "./compendium";
 
 var GW3Companion =
   GW3Companion ||
@@ -63,10 +62,12 @@ var GW3Companion =
     // Styling for the chat responses.
     const styles = {
         reset: "padding: 0; margin: 0;",
+        menuborder:
+        "border: 0px solid transparent; border-radius: 4px; padding: 6px; background: red;",
         menu:
-          "background-color: #fff; border: 1px dashed #ae2400; padding: 5px 5px 10px 5px; border-radius: 5px;",
+          "background-color: #f1f1f1; border: 5px solid transparent; padding: 6px 5px 10px 5px; border-radius: 4px;",
         button:
-          "background-color: #000; border: 1px solid #292929; border-radius: 3px; padding: 5px; color: #fff; text-align: center;",
+          "background-color: #000; border: 1px solid #292929; border-radius: 3px; padding: 5px; color: #f1f1f1; text-align: center;",
         list: "list-style: none;",
         float: {
           right: "float: right;",
@@ -83,6 +84,10 @@ var GW3Companion =
         fullWidth: "width: 100%;",
         underline: "text-decoration: underline;",
         strikethrough: "text-decoration: strikethrough",
+        border:
+          "margin-top: 1rem; border: 1px solid #aaa; padding: 1rem; border-radius: 5px;",
+        description:
+          "font-weight: normal; margin-top: 5px; border: 1px solid grey; padding: 1rem; border-radius: 5px; background-color: #aaa; color: white;",
         effect:
           "font-weight: bold; margin-top: 5px; border: 1px solid grey; padding: 1rem; border-radius: 5px; background-color: #aaa; color: white;",
       },
@@ -217,6 +222,7 @@ var GW3Companion =
         log(msg);
         log("GM issued " + script_name + " msg: " + msg.content);
         log("GM issued " + script_name + " command: " + command);
+        log("state config", state[state_name].config.command);
         if (command == state[state_name].config.command) {
           switch (extracommand) {
             case "reset":
@@ -294,10 +300,14 @@ var GW3Companion =
             case "act":
               log("ACT roll");
               if (args.length > 0) {
+                log("args obj...");
                 log(args);
                 // Get main settings
                 let rankSetting = args.shift().split("|");
+                log("rankSetting...");
+                log(rankSetting);
                 let rank = rankSetting.shift();
+                log("rank: ", rank);
                 let roll1 = rankSetting[0];
                 let roll2 = rankSetting[1];
 
@@ -306,6 +316,7 @@ var GW3Companion =
                 log("parameters: ");
                 log(parameters);
                 log("act passed rank: " + rank);
+                log("roll1 & roll2...");
                 log(roll1);
                 log(roll2);
                 // log(value);
@@ -326,14 +337,21 @@ var GW3Companion =
               break;
             case "category":
               log("category");
+              log("args length:" + args.length);
               if (args.length > 0) {
                 let category = args.shift();
+                log("category: " + category);
                 let cost = 0;
                 data = getData();
+                if (!data) {
+                  return;
+                }
+                log("got data");
                 listItems = [];
                 let items = Object.keys(data[category]);
                 let subcat = {};
                 let header = "";
+                log("got items");
                 _.each(items, (item) => {
                   // render type headers
                   if (data[category][item].type) {
@@ -394,8 +412,18 @@ var GW3Companion =
             case "compendium":
               log("compendium");
               data = getData();
+              if (!data) {
+                return;
+              }
               listItems = [];
-              let categories = ["armour", "attacks", "gear", "mutations"];
+              let categories = [
+                "armour",
+                "attacks",
+                "gear",
+                "mutations",
+                "skills",
+                "talents",
+              ];
               _.each(categories, (category) => {
                 button = makeButton(
                   ucFirst(category),
@@ -484,10 +512,20 @@ var GW3Companion =
         }
         return { colour, RF, background };
       },
+      /**
+       * @param {object} msg the msg object from chat window
+       * @param {string} rank the rank column to roll against
+       * @param {object} parameters the message content parsed as key, value pairs
+       * @param {Number} roll1 the ability ACT roll (i.e. number from 1 - 100)
+       * @param {Number} roll2 the save ACT roll (i.e. number from 1 - 100)
+       */
       rollAct = (msg, rank, parameters = {}, roll1, roll2) => {
         const self = this;
         log("rollACT: " + rank);
         const data = getData();
+        if (!data) {
+          return;
+        }
         let save,
           rankHTML = "",
           effectType = "effect",
@@ -497,7 +535,8 @@ var GW3Companion =
           colorResult = {},
           effectName = "",
           category = parameters["category"],
-          dmgTotalString = "";
+          dmgTotalString = "",
+          orig_rank = parseInt(rank);
         rank = parseInt(rank);
         rankHTML = `<span style="${styles.rank}" title="Score: ${rank}">${rank}</span>`;
         sendChat(msg.playerid, "/roll 2d100", function (ops) {
@@ -517,9 +556,9 @@ var GW3Companion =
           log("roll1: " + roll1);
           log("roll2: " + roll2);
           if (parameters["mod"]) {
-            // log('calculating rank based on mod');
+            // log('calculating rank based on modifier');
             // log(parameters['character']);
-            // log(`${parameters['mod']}_mod`);
+            // log(`${parameters['modifier']}_mod`);
             // log(getAttrByName(parameters['character'], 'PS_modifier'));
 
             const mod = parseInt(
@@ -532,9 +571,9 @@ var GW3Companion =
             rank += mod;
           }
           if (parameters["character"]) {
+            character = getObj("character", parameters["character"]);
             log("character: ");
             log(character);
-            character = getObj("character", parameters["character"]);
           }
           if (parameters["CS"]) {
             log("calculating rank based on CS: " + parseInt(parameters["CS"]));
@@ -585,18 +624,92 @@ var GW3Companion =
               //   log(attribute);
               // });
             }
+
             // minus target's DX mod for melee attacks
-            if (
-              parameters["category"] === "attacks" &&
-              parameters["type"] === "melee"
-            ) {
-              let targetDXmod = getAttrByName(
-                targetCharacter.id,
-                "DX_modifier"
+            if (parameters["category"] === "attacks") {
+              let character_rank = parseInt(
+                getAttrByName(character.id, "character_rank")
               );
-              log("targetDXmod: " + targetDXmod);
-              rankHTML += ` - <span style="${styles.rank}" title="Melee target DX mod">${targetDXmod}</span>`;
-              rank -= parseInt(targetDXmod);
+              log("character");
+              log(character);
+              log("talents");
+
+              rank += character_rank;
+              rankHTML += ` + <span style="${styles.rank}" title="Character rank">${character_rank}</span>`;
+              if (parameters["type"] === "melee") {
+                let targetDXmod = getAttrByName(
+                  targetCharacter.id,
+                  "DX_modifier"
+                );
+                log("targetDXmod: " + targetDXmod);
+                rankHTML += ` - <span style="${styles.rank}" title="Melee target DX mod">${targetDXmod}</span>`;
+                rank -= parseInt(targetDXmod);
+              }
+              if (parameters["type"] === "throwing") {
+                let throwingTalent = filterObjs(
+                  (a) =>
+                    a.get("type") === "attribute" &&
+                    a.get("characterid") === character.id &&
+                    /^repeating_talents_[^_]*_ref$/.test(a.get("name")) &&
+                    a.get("current") === "throwing"
+                );
+                if (throwingTalent.length) {
+                  rankHTML += ` + <span style="${styles.rank}" title="Throwing talent">${character_rank}</span>`;
+                  rank += character_rank;
+                }
+              }
+              if (parameters["type"] === "shooting") {
+                let shootingTalent = filterObjs(
+                  (a) =>
+                    a.get("type") === "attribute" &&
+                    a.get("characterid") === character.id &&
+                    /^repeating_talents_[^_]*_ref$/.test(a.get("name")) &&
+                    a.get("current") === "shooting"
+                );
+                if (shootingTalent.length) {
+                  rankHTML += ` + <span style="${styles.rank}" title="Shooting talent">${character_rank}</span>`;
+                  rank += character_rank;
+                }
+              }
+              if (parameters["type"] === "grappling") {
+                let grapplingTalent = filterObjs(
+                  (a) =>
+                    a.get("type") === "attribute" &&
+                    a.get("characterid") === character.id &&
+                    /^repeating_talents_[^_]*_ref$/.test(a.get("name")) &&
+                    a.get("current") === "grappling"
+                );
+                if (grapplingTalent.length) {
+                  rankHTML += ` + <span style="${styles.rank}" title="Wrestling talent">${character_rank}</span>`;
+                  rank += character_rank;
+                }
+              }
+              if (parameters["type"] === "martialarts") {
+                let martialartsTalent = filterObjs(
+                  (a) =>
+                    a.get("type") === "attribute" &&
+                    a.get("characterid") === character.id &&
+                    /^repeating_talents_[^_]*_ref$/.test(a.get("name")) &&
+                    a.get("current") === "martialarts"
+                );
+                if (martialartsTalent.length) {
+                  rankHTML += ` + <span style="${styles.rank}" title="Martialarts talent">${character_rank}</span>`;
+                  rank += character_rank;
+                }
+              }
+              if (parameters["type"] === "brawling") {
+                let brawlingTalent = filterObjs(
+                  (a) =>
+                    a.get("type") === "attribute" &&
+                    a.get("characterid") === character.id &&
+                    /^repeating_talents_[^_]*_ref$/.test(a.get("name")) &&
+                    a.get("current") === "brawling"
+                );
+                if (brawlingTalent.length) {
+                  rankHTML += ` + <span style="${styles.rank}" title="Brawling talent">${character_rank}</span>`;
+                  rank += character_rank;
+                }
+              }
             }
           }
 
@@ -617,7 +730,7 @@ var GW3Companion =
           }
 
           colorResult = getRollColour(roll1, row);
-          // log('color: ' + colour);
+          log("colorResult: " + colorResult);
           // log('background: ' + background);
           // log('RC: ' + background);
           // log('RF: ' + RF);
@@ -643,36 +756,53 @@ var GW3Companion =
               "damage parameter: " +
                 parameters["dmg"] +
                 " - " +
-                parameters["damage_type"]
+                parameters["dmg_type"]
             );
-            let baseDmg,
+            let baseDmg = 0,
               DR = 0,
-              soaked;
-            if (parameters["dmg"] === "mutation") {
-              baseDmg = parseInt(rank) / 2;
+              dmgAfterDRsoak = 0;
+            if (parameters["dmg"] === "mutation" || parameters["dmg"] === "M") {
+              baseDmg = parseInt(orig_rank) / 2;
             } else if (parameters["dmg"].includes("/")) {
+              //- cater for damage ratings for different sizes
               let dmg = parameters["dmg"].split("/");
               log("dmg: ");
               log(dmg);
               let size =
                 getAttrByName(targetCharacter.id, "character_size") || 3;
               log("size: " + size);
-              baseDmg = parseInt(size) < 4 ? dmg[0] : dmg[1];
+              baseDmg =
+                parseInt(size) < 4 ? parseInt(dmg[0]) : parseInt(dmg[1]);
+              log("baseDmg after size: " + baseDmg);
+              if (_.isNaN(baseDmg)) baseDmg = 0;
             } else {
               baseDmg = parseInt(parameters["dmg"]);
+              if (_.isNaN(baseDmg)) baseDmg = 0;
             }
+
+            if (parameters["category"] === "attacks") {
+              if (parameters["skilldmg"]) {
+                log("baseDmg orig_rank: " + orig_rank);
+                log("baseDmg before skilldmg: " + baseDmg);
+                baseDmg += parseInt(orig_rank);
+                log("baseDmg after skilldmg: " + baseDmg);
+              }
+            }
+
             log("baseDMG: " + baseDmg);
             log("RF: " + colorResult.RF);
             DR = getAttrByName(targetCharacter.id, "DR_physical") || 0;
             log("DR: " + DR);
+            log("DR in: " + parseInt(DR));
 
             let dmgTotal = parseInt(colorResult.RF) * parseInt(baseDmg);
-            if (DR) {
-              soaked = dmgTotal + parseInt(DR);
-            }
-            soaked = soaked < 1 ? 0 : soaked;
+            if (_.isNaN(dmgTotal)) dmgTotal = 0;
+            dmgAfterDRsoak = dmgTotal;
+            dmgAfterDRsoak += parseInt(DR);
+            dmgAfterDRsoak = dmgAfterDRsoak < 1 ? 0 : dmgAfterDRsoak;
             log("dmgTotal: " + dmgTotal);
-            dmgTotalString = `Physical Damage: <span title="Base: ${baseDmg}, Dmg: ${dmgTotal} DR: ${DR}">${soaked}</span>`;
+            log("dmgAfterDRsoak: " + dmgAfterDRsoak);
+            dmgTotalString = `Physical Damage: <span title="Base: ${baseDmg}, Dmg: ${dmgTotal} DR: ${DR}">${dmgAfterDRsoak}</span>`;
           }
 
           content += makeResult(
@@ -698,35 +828,70 @@ var GW3Companion =
             }
           };
 
-          // check save from item or from damage type
-          if (parameters["damage_type"]) {
-            if (data["damage_types"][parameters["damage_type"]]) {
-              if (data["damage_types"][parameters["damage_type"]]["save"]) {
-                save = data["damage_types"][parameters["damage_type"]].save;
+          // show ability description
+          if (parameters["describe"] === "on") {
+            const description = _.defaults(
+              data[parameters["category"]][parameters["id"]],
+              { description: false }
+            ).description;
+            if (description) {
+              content += `<div style="${styles.description};">${description}</div>`;
+            }
+          }
+
+          if (parameters["save"]) {
+            save = parameters["save"];
+          }
+          let effectsContent = "";
+          // override save type from damage type
+          if (parameters["dmg_type"]) {
+            log(
+              "Damage Type: " +
+                data["damage_types"][parameters["dmg_type"]].name
+            );
+            if (data["damage_types"][parameters["dmg_type"]]) {
+              if (data["damage_types"][parameters["dmg_type"]].save) {
+                save = data["damage_types"][parameters["dmg_type"]].save;
+              }
+              if (data["damage_types"][parameters["dmg_type"]].effect_crit) {
+                parameters["effect_crit"] =
+                  data["damage_types"][parameters["dmg_type"]].effect_crit;
+              }
+              if (data["damage_types"][parameters["dmg_type"]].effect) {
+                parameters["effect"] =
+                  data["damage_types"][parameters["dmg_type"]].effect;
+              }
+              if (data["damage_types"][parameters["dmg_type"]].description) {
+                content += `<div style="${
+                  styles.description
+                };"><b style="${row}">Damage Type: ${
+                  data["damage_types"][parameters["dmg_type"]].name
+                }</b><p>${
+                  data["damage_types"][parameters["dmg_type"]].description
+                }</p></div>`;
               }
             }
           }
 
           if (parameters["effect"]) {
             effectName = parameters["effect"];
+            log("effect name: " + effectName);
             if (
               !empty(data.effects) &&
               !empty(data.effects[parameters["effect"]])
             ) {
-              effectName = data.effects[parameters["effect"]].name;
+              effectDisplayName = data.effects[parameters["effect"]].name;
+              log("effect name: " + effectDisplayName);
               // let result = getEffectResult(parameters['effect'], colorResult.background);
-              content += `<div style="font-weight: bold">Effect: </div><div>${effectName}</div>`;
+              content += `<div style="font-weight: bold">Effect: </div><div>${effectDisplayName}</div>`;
             } else if (
               !empty(data.damage_types) &&
               data.damage_types[parameters["effect"]]
             ) {
-              log(
-                "damage_type based on effect: " +
-                  parameters["effect"] +
-                  ", " +
-                  data.damage_types[parameters["effect"]]
-              );
-              content += `<div style="${
+              log("damage_type based on effect: " + effectName);
+              log(data.damage_types[parameters["effect"]]);
+
+              effectsContent += `<div style="${
                 styles.effect
               }">Effect: <span style="font-weight: normal" title="${
                 data.damage_types[parameters["effect"]].description
@@ -736,60 +901,105 @@ var GW3Companion =
           }
 
           if (parameters["effect_crit"]) {
+            effectName = "(Critical)";
             log("effect_crit: " + parameters["effect_crit"]);
             log("background: " + colorResult.background);
             log(
               !empty(data.effects) && data.effects[parameters["effect_crit"]]
             );
             if (colorResult.background === "red") {
+              log("RED show save");
               if (data.effects[parameters["effect_crit"]]) {
+                log("Crit effect according to Ability setting");
                 effectType = "effect_crit";
-                content += `<div style="${
+                effectsContent += `<div style="${
                   styles.effect
                 }">Critical Effect: <span style="font-weight: normal">${
                   data.effects[parameters["effect_crit"]].name
                 }</span></div>`;
-              } else if (data.damage_types[parameters["effect_crit"]]) {
-                log(data.damage_types);
-                log(parameters["effect_crit"]);
-                log(data.damage_types[parameters["effect_crit"]]);
-                content += `<div style="${
-                  styles.effect
-                }">Critical Effect: <span style="font-weight: normal" title="${
-                  data.damage_types[parameters["effect_crit"]].description
-                }">${
-                  data.damage_types[parameters["effect_crit"]].name
-                }</span></div>`;
-                save = data.damage_types[parameters["effect_crit"]].save;
               }
+              // else if (data.damage_types[parameters["effect_crit"]]) {
+              //   log("Crit effect according to Damage Type");
+              //   log(data.damage_types);
+              //   log(parameters["effect_crit"]);
+              //   log(data.damage_types[parameters["effect_crit"]]);
+              //   content += `<div style="${
+              //     styles.effect
+              //   }">Critical Effect: <span style="font-weight: normal" title="${
+              //     data.damage_types[parameters["effect_crit"]].description
+              //   }">${
+              //     data.damage_types[parameters["effect_crit"]].name
+              //   }</span></div>`;
+              //   save = data.damage_types[parameters["effect_crit"]].save;
+              //   content += renderSaveRoll(
+              //     save,
+              //     targetCharacter,
+              //     roll2,
+              //     parameters,
+              //     effectType,
+              //     colorResult,
+              //     effectName
+              //   );
+              // }
             }
           }
-
-          if (parameters["save"]) {
-            save = save || parameters["save"];
-            let saveScore = getAttrByName(targetCharacter.id, `${save}`);
-            let effectsActRow = getActRow(saveScore);
-            let effectsColorResult = getRollColour(roll2, effectsActRow);
-            let effectsResult = { result: effectsColorResult.background };
-            let result = "";
-            log("effectType: " + effectType);
-            log(parameters[effectType]);
-            if (!empty(data.effects) && data.effects[parameters[effectType]]) {
-              effectsResult = getEffectResult(
-                parameters[effectType],
-                effectsColorResult.background
-              );
-            }
-            result = effectsResult.result;
-            let success =
-              parseInt(effectsColorResult.RF) >= parseInt(colorResult.RF);
-            let successMessage = success
-              ? `<span style="${styles.success}">success</span>`
-              : `<span style="${styles.fail}">fail</span>`;
-            content += `<div style="font-weight: bold; margin-top: 1rem; border: 1px solid #aaa; padding: 1rem; border-radius: 5px; background-color: ${effectsColorResult.background}; color: ${effectsColorResult.colour};">Save (${effectName}): <span style="font-weight: normal; font-variant:small-caps;">${result} ${successMessage}</span></div>`;
+          if (!empty(save)) {
+            content += renderSaveRoll(
+              save,
+              targetCharacter,
+              roll2,
+              parameters,
+              effectType,
+              colorResult,
+              effectsContent
+            );
+          } else {
+            log('Will not render Save as the "save" parameter was not set.');
           }
           send(msg, parameters, title, content);
         });
+      },
+      renderSaveRoll = (
+        save,
+        targetCharacter,
+        roll2,
+        parameters,
+        effectType,
+        colorResult,
+        effectsContent
+      ) => {
+        const data = getData();
+        if (!data) {
+          return;
+        }
+        log("START renderSaveRoll");
+        let saveScore = getAttrByName(targetCharacter.id, `${save}`);
+        log("saveScore: " + saveScore);
+        let effectsActRow = getActRow(saveScore);
+        log("effectsActRow");
+        log(effectsActRow);
+        let effectsColorResult = getRollColour(roll2, effectsActRow);
+        let effectsResult = { result: effectsColorResult.background };
+        let result = "";
+        if (!empty(data.effects) && data.effects[parameters[effectType]]) {
+          effectsResult = getEffectResult(
+            parameters[effectType],
+            effectsColorResult.background
+          );
+        }
+        result = effectsResult.result;
+        let success =
+          parseInt(effectsColorResult.RF) >= parseInt(colorResult.RF);
+        let successMessage = success
+          ? `<span style="${styles.success}">success</span>`
+          : `<span style="${styles.fail}">fail</span>`;
+
+        log("END renderSaveRoll");
+        let content = `<div style="${styles.border} font-weight: bold; background-color: ${effectsColorResult.background}; color: ${effectsColorResult.colour};">Save vs. ${save}: <span style="font-weight: normal; font-variant:small-caps;">${result} ${successMessage}</span></div>`;
+        if (!success) {
+          content += effectsContent;
+        }
+        return content;
       },
       getActRow = (rank) => {
         log("getActRow");
@@ -799,27 +1009,27 @@ var GW3Companion =
           A: [18, 74, 99, null, null, 100],
           B: [17, 73, 98, 99, null, 100],
           C: [16, 72, 97, 99, null, 100],
-          "1": [15, 71, 96, 98, 99, 100],
-          "2": [14, 69, 94, 97, 99, 100],
-          "3": [13, 68, 93, 97, 97, 100],
-          "4": [12, 66, 91, 96, 97, 100],
-          "5": [11, 62, 87, 93, 97, 99],
-          "6": [10, 60, 85, 92, 96, 99],
-          "7": [9, 58, 83, 91, 96, 99],
-          "8": [8, 56, 80, 89, 95, 99],
-          "9": [7, 54, 78, 88, 93, 99],
-          "10": [6, 52, 75, 86, 92, 99],
-          "11": [5, 49, 71, 83, 91, 98],
-          "12": [5, 47, 68, 81, 90, 98],
-          "13": [4, 44, 65, 79, 89, 98],
-          "14": [4, 42, 62, 77, 88, 98],
-          "15": [4, 40, 58, 75, 87, 98],
-          "16": [3, 37, 53, 72, 86, 97],
-          "17": [3, 35, 49, 70, 85, 97],
-          "18": [3, 33, 45, 68, 84, 97],
-          "19": [3, 30, 41, 66, 83, 97],
-          "20": [2, 26, 36, 63, 82, 96],
-          "21": [2, 23, 32, 61, 81, 96],
+          1: [15, 71, 96, 98, 99, 100],
+          2: [14, 69, 94, 97, 99, 100],
+          3: [13, 68, 93, 97, 97, 100],
+          4: [12, 66, 91, 96, 97, 100],
+          5: [11, 62, 87, 93, 97, 99],
+          6: [10, 60, 85, 92, 96, 99],
+          7: [9, 58, 83, 91, 96, 99],
+          8: [8, 56, 80, 89, 95, 99],
+          9: [7, 54, 78, 88, 93, 99],
+          10: [6, 52, 75, 86, 92, 99],
+          11: [5, 49, 71, 83, 91, 98],
+          12: [5, 47, 68, 81, 90, 98],
+          13: [4, 44, 65, 79, 89, 98],
+          14: [4, 42, 62, 77, 88, 98],
+          15: [4, 40, 58, 75, 87, 98],
+          16: [3, 37, 53, 72, 86, 97],
+          17: [3, 35, 49, 70, 85, 97],
+          18: [3, 33, 45, 68, 84, 97],
+          19: [3, 30, 41, 66, 83, 97],
+          20: [2, 26, 36, 63, 82, 96],
+          21: [2, 23, 32, 61, 81, 96],
           X: [2, 20, 27, 59, 80, 96],
           Y: [2, 17, 22, 56, 78, 95],
           Z: [2, 13, 16, 51, 76, 94],
@@ -973,21 +1183,23 @@ var GW3Companion =
             }
             if (category === "attacks" || category === "ammo") {
               if (category === "attacks") {
-                let character_rank = parseInt(
-                  getAttrByName(character.id, "character_rank")
-                );
-                log("character rank:" + character_rank);
-                if (character_rank === NaN) {
-                  log(
-                    "character rank was not found and thus the attack rank could not be accurately determined and will default to 1"
-                  );
-                  character_rank = 1;
-                }
-                let obj = Object.assign(objTemplate, {
-                  name: `repeating_${category}_${rowId}_rank`,
-                  current: character_rank,
-                });
-                createObj("attribute", obj);
+                //@deprecated: Attack ranks are distinct from Character ranks
+                // log("import attack");
+                // let character_rank = parseInt(
+                //   getAttrByName(character.id, "character_rank")
+                // );
+                // log("character rank:" + character_rank);
+                // if (_.isNaN(character_rank)) {
+                //   log(
+                //     "character rank was not found and thus the attack rank could not be accurately determined and will default to 1"
+                //   );
+                //   character_rank = 1;
+                // }
+                // let obj = Object.assign(objTemplate, {
+                //   name: `repeating_${category}_${rowId}_rank`,
+                //   current: character_rank,
+                // });
+                // createObj("attribute", obj);
               }
               // also add it to gear
               _.each(itemAttributes, (attributeValue, attributeName) => {
@@ -1138,13 +1350,13 @@ var GW3Companion =
         sendChat(
           script_name,
           whisper +
-            '<div style="' +
+            '<div style="'+styles.menuborder+'"><div style="' +
             styles.menu +
             styles.overflow +
             '">' +
             title +
             contents +
-            "</div>",
+            "</div></div>",
           null,
           {
             noarchive: true,
@@ -1160,13 +1372,13 @@ var GW3Companion =
         sendChat(
           `${type}|${id}`,
           whisper +
-            '<div style="' +
+            '<div style="'+styles.menuborder+'"><div style="' +
             styles.menu +
             styles.overflow +
             '">' +
             title +
             contents +
-            "</div>",
+            "</div></div>",
           null,
           {
             noarchive: true,
@@ -1261,6 +1473,10 @@ var GW3Companion =
         }
       },
       getData = () => {
+        if (typeof compendium === "undefined") {
+          log("The compendium is not installed");
+          return false;
+        }
         return compendium;
         // return {}
       };
