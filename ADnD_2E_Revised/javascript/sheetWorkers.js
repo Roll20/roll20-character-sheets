@@ -80,7 +80,7 @@ const displayWeaponType = function (type) {
         case 's': return 'Slashing';
         case 'p': return 'Piercing';
         case 'b': return 'Bludgeoning';
-        default: capitalizeFirst(type);
+        default: return capitalizeFirst(type);
     }
 }
 
@@ -1810,7 +1810,7 @@ function setupSpellCrit(section) {
             rollBuilder.push(`type=${displayType.trim()}`);
 
             let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
-            let targetSize = await extractQueryResult('?{Target size?|Tiny|Small|Medium|Large|Huge|Gargantuan}');
+            let targetSize = await extractQueryResult('?{Target size?|Medium|Tiny|Small|Medium|Large|Huge|Gargantuan}');
             rollBuilder.push(`target=${targetType}`);
             rollBuilder.push(`targetsize=${targetSize}`);
 
@@ -2046,7 +2046,7 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
                 .map(s => displayWeaponType(s))
                 .join('|');
 
-            weaponType = await extractQueryResult(`?{How are your attack with your weapon?|${displayTypes}}`)
+            weaponType = await extractQueryResult(`?{How are your attack with your weapon?|${displayTypes}}`);
         } else {
             weaponType = displayWeaponType(weaponType);
         }
@@ -2055,7 +2055,7 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
         rollBuilder.push(`type=${weaponType}`);
 
         let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
-        let targetSize = await extractQueryResult('?{Target size?|Tiny|Small|Medium|Large|Huge|Gargantuan}');
+        let targetSize = await extractQueryResult('?{Target size?|Medium|Tiny|Small|Medium|Large|Huge|Gargantuan}');
         rollBuilder.push(`target=${targetType}`);
         rollBuilder.push(`targetsize=${targetSize}`);
 
@@ -2127,7 +2127,7 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
             let displayLocationRoll = attackType === 'Called Shot'
                 ? ''
                 : `(${locationDice}:${locationRoll})`;
-            rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll}=[[${severityRoll}]]: ${critEffect}`)
+            rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll} and rolling ${severityDice} for effect=[[${severityRoll}]]: ${critEffect}`);
             critEffectExplanations(critEffect, set);
         } else {
             errors.push('weapon type');
