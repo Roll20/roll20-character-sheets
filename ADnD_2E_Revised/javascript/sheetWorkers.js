@@ -1628,7 +1628,7 @@ on('clicked:grenade-miss', async function (eventInfo) {
     });
 });
 
-const INJURY_REGEX = /Graze|Singed|Chilled|Struck|Injured|Burn|Frostbit|Broken|Crushed|Shattered|Frozen|Destroyed|Severed|Dissolved|Incinerated|(Minor|Major|Severe)(?: internal)? Bleeding/gmi
+const INJURY_REGEX = /Graze|Singed|Chilled|Struck|Injured|Burn|Frostbit|Broken|Crushed|Shattered|Frozen|(?<!Armor|Shield|Helm|is) Destroyed|Severed|Dissolved|Incinerated|(Minor|Major|Severe)(?: internal)? Bleeding/gmi
 
 on('clicked:repeating_weapons-damage:crit2', function(eventInfo) {
     console.log(eventInfo);
@@ -1978,7 +1978,7 @@ function critEffectExplanations(critEffect, set) {
     if (!injuryMatch)
         return;
 
-    injuryMatch = injuryMatch.map(s => s.toLowerCase().replace('internal ', ''))
+    injuryMatch = injuryMatch.map(s => s.toLowerCase().replace('internal ', '').trim())
         .filter((v, i, a) => a.indexOf(v) === i);
     injuryMatch.forEach(key => {
         switch (key) {

@@ -1401,7 +1401,7 @@ SPELL_CRIT_EFFECT_TABLE['Slashing']['Tail'] = {
     10: 'Tail broken, lose any tail attacks, 1/2 move if animal uses tail for movement, minor bleeding',
     11: 'Tail destroyed, stunned [[1d3]] rounds, major bleeding, lose any tail attacks, no move or attack if creature uses tail for movement',
     12: 'Tail severed, stunned [[1d6]] rounds, 1/2 move, –2 penalty on all attacks, major bleeding; no move or attack if creature uses tail for movement',
-    13: '. And doubled damage dice'
+    13: '.\nAnd doubled damage dice'
 };
 //#endregion
 
