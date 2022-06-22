@@ -1750,11 +1750,10 @@ function setupSpellCrit(section) {
         console.log(eventInfo);
         let attrFields = fields.map(s => prefix+s);
         getAttrs(attrFields, async function (values) {
-            let rollBuilder = ['character=@{character_name}']
-
+            let rollBuilder = ['character=@{character_name}'];
             rollBuilder.push(`name=${values[prefix+'spell-name']}`);
-            let size = values[prefix+'spell-crit-size'];
-            rollBuilder.push(`size=${size}`);
+
+            let errors = [];
 
             let lookupType;
             let displayType = values[prefix+'spell-damage-type'];
@@ -1791,7 +1790,7 @@ function setupSpellCrit(section) {
                     lookupType = 'Wounding';
                     break;
                 default:
-                    lookupType = await extractQueryResult('?{What damage type does the magic inflict?' +
+                    lookupType = displayType = await extractQueryResult('?{What damage type does the magic inflict?' +
                         '|Acid' +
                         '|Cold' +
                         '|Crushing' +
@@ -1806,16 +1805,16 @@ function setupSpellCrit(section) {
             }
 
             let spellTypeTable = SPELL_CRIT_EFFECT_TABLE[lookupType];
-            if (!spellTypeTable) {
-                console.log("spell effect table could not be found for type "+lookupType);
-                return;
-            }
+            if (!spellTypeTable)
+                errors.push('damage type');
             rollBuilder.push(`type=${displayType.trim()}`);
 
             let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
             let targetSize = await extractQueryResult('?{Target size?|Tiny|Small|Medium|Large|Huge|Gargantuan}');
             rollBuilder.push(`target=${targetType}`);
             rollBuilder.push(`targetsize=${targetSize}`);
+
+            let size = values[prefix+'spell-crit-size'];
 
             let spellSizeCategory;
             switch (size.split(' (')[0]) {
@@ -1832,9 +1831,12 @@ function setupSpellCrit(section) {
                 case 'Gargantuan':
                     spellSizeCategory = 5;
                     break;
+                case '':
                 case 'None':
-                    console.log("spell size category could not be found for size "+size);
-                    return;
+                    spellSizeCategory = 0;
+                    size = 'None';
+                    errors.push('size');
+                    break;
                 default:
                     let sizeString = await extractQueryResult('?{What size is the spell?' +
                         '|1 Target or 5´ sq. or 2´ rad = Medium (1 hit),2' +
@@ -1843,12 +1845,16 @@ function setupSpellCrit(section) {
                         '|40+ Targets or 100´ sq. or 40´ rad = Gargantuan (1d6+1 hits),5}');
                     spellSizeCategory = parseInt(sizeString);
             }
+            rollBuilder.push(`size=${size}`);
 
-            let hits;
+            let hits = 0;
             let hitDice = '';
             let rollMatch = size.match(SPELL_HITS_REGEX); // roll
             let rangeMatch = size.match(/\((\d)-(\d) hit/i); // range
-            let rollMatch2 = SPELL_SIZE_MAP[spellSizeCategory].match(SPELL_HITS_REGEX); // roll
+            let rollMatch2;
+            if (SPELL_SIZE_MAP[spellSizeCategory])
+                rollMatch2 = SPELL_SIZE_MAP[spellSizeCategory].match(SPELL_HITS_REGEX);
+
             async function sizeReduction(rollMatch) {
                 if (targetSize === 'Huge') {
                     rollMatch = SPELL_SIZE_MAP[Math.max(spellSizeCategory - 1, 2)].match(SPELL_HITS_REGEX);
@@ -1874,17 +1880,11 @@ function setupSpellCrit(section) {
                 hits = parseInt(hitsString);
             } else if (rollMatch2) {
                 hits = await sizeReduction(rollMatch2)
-            } else if (size !== 'None') {
+            } else if (!size || size === 'None') {
+                hits = 0;
+            } else {
                 let hitsString = await extractQueryResult(`?{How many hits?|1}`);
                 hits = await extractRollResult(hitsString);
-            } else {
-                console.log("could not match location rolls "+size);
-                return;
-            }
-
-            if (hits < 1) {
-                console.log("number of hits was less than 1"+hits);
-                return;
             }
 
             let attackType = await extractQueryResult(`?{How are you attacking?|Regular Attack|Low Attack|High Attack${spellSizeCategory === 2 ? '|Called Shot' : ''}}`);
@@ -1927,30 +1927,35 @@ function setupSpellCrit(section) {
                 case '2d8': rollBuilder.push(`severity=Mortal`); break;
             }
 
-            rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''} and rolling ${severityDice} for effect`);
+            if (hits > 0 && errors.length === 0)
+                rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''} and rolling ${severityDice} for effect`);
+            else
+                rollBuilder.push(`hits=Cannot show effects due to missing fields: ${errors.join(', ')}`);
 
             let boolObj = {};
-            for (let i = 0; i < locationRolls.length; i++) {
-                let locationRoll = locationRolls[i];
-                let locationObject = LOCATION_TABLE[targetType][locationRoll];
-                let locationNote = '';
-                if (targetType !== 'Humanoid' && locationObject.general === 'Legs' && !boolObj.isSnakeLike) {
-                    boolObj.isSnakeLike = await extractQueryResult('?{Is the target snake-like or fish-like?|No|Yes}');
-                }
-                if (targetType !== 'Humanoid' && locationObject.general === 'Legs' && boolObj.isSnakeLike === 'Yes') {
-                    locationObject = LOCATION_TABLE[targetType][5];
-                    locationNote = locationObject.note;
-                }
+            if (spellTypeTable) {
+                for (let i = 0; i < locationRolls.length; i++) {
+                    let locationRoll = locationRolls[i];
+                    let locationObject = LOCATION_TABLE[targetType][locationRoll];
+                    let locationNote = '';
+                    if (targetType !== 'Humanoid' && locationObject.general === 'Legs' && !boolObj.isSnakeLike) {
+                        boolObj.isSnakeLike = await extractQueryResult('?{Is the target snake-like or fish-like?|No|Yes}');
+                    }
+                    if (targetType !== 'Humanoid' && locationObject.general === 'Legs' && boolObj.isSnakeLike === 'Yes') {
+                        locationObject = LOCATION_TABLE[targetType][5];
+                        locationNote = locationObject.note;
+                    }
 
-                let severityRoll = await debugSeverity(severityDice);
-                let displayLocationRoll = attackType === 'Called Shot'
-                    ? ''
-                    : `(${locationDice}:${locationRoll})`;
-                let {effect, additionalLocations} = lookupEffect(severityRoll, spellTypeTable, locationObject.general, targetType, set);
-                let displayEffect = `Location ${i+1} hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll}=${effect}`;
-                rollBuilder.push(displayEffect);
+                    let severityRoll = await debugSeverity(severityDice);
+                    let displayLocationRoll = attackType === 'Called Shot'
+                        ? ''
+                        : `(${locationDice}:${locationRoll})`;
+                    let {effect, additionalLocations} = lookupEffect(severityRoll, spellTypeTable, locationObject.general, targetType, set);
+                    let displayEffect = `Location ${i+1} hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll}=${effect}`;
+                    rollBuilder.push(displayEffect);
 
-                await recursiveAdditionalHit(additionalLocations, i+1, 'additional', severityDice, boolObj, spellTypeTable, targetType, rollBuilder, set);
+                    await recursiveAdditionalHit(additionalLocations, i+1, 'additional', severityDice, boolObj, spellTypeTable, targetType, rollBuilder, set);
+                }
             }
 
             let displayHits = rollBuilder.map(s => `{{${s}}}`).join(' ');
@@ -2026,6 +2031,7 @@ function critEffectExplanations(critEffect, set) {
 function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc) {
     getAttrs(fields, async function (values) {
         let rollBuilder = ['character=@{character_name}'];
+        let errors = [];
 
         let weaponName = nameFunc(values);
         let weaponSize = displaySize(values[prefix+'size']);
@@ -2123,6 +2129,8 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
                 : `(${locationDice}:${locationRoll})`;
             rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll}=[[${severityRoll}]]: ${critEffect}`)
             critEffectExplanations(critEffect, set);
+        } else {
+            errors.push('weapon type');
         }
 
         let weaponDamage = baseDamageFunc(targetSize, values);
@@ -2140,6 +2148,9 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
             }
             rollBuilder.push(`damage=[[${damage}+[[${damageAdjFunc(values)}]] ]]`);
         }
+
+        if (errors.length > 0)
+            rollBuilder.push(`hits=Cannot show effects due to missing fields: ${errors.join(', ')}`);
 
         let displayHits = rollBuilder.map(s => `{{${s}}}`).join(' ');
         let displayInjuries = Array.from(set).map(s => `{{${s}}}`).join(' ');
