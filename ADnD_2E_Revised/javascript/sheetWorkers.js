@@ -55,7 +55,7 @@ const displaySize = function(size) {
         case 'huge': return 'Huge';
         case 'g':
         case 'gargantuan': return 'Gargantuan';
-        default: capitalizeFirst(size);
+        default: return capitalizeFirst(size);
     }
 }
 
