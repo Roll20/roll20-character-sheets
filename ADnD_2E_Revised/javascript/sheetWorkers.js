@@ -1363,9 +1363,9 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
             if (isNaN(bonus))
                 return;
         }
-        let weaponsInCategory;
+        let weaponsInCategory = baseWeapons;
         if (category)
-            weaponsInCategory = baseWeapons.filter(w => w['category'].includes(category));
+            weaponsInCategory = weaponsInCategory.filter(w => w['category'].includes(category));
 
         let baseWeapon = await selectVersion(weaponsInCategory, values, comparer, 'weapon');
         console.log(baseWeapon);
@@ -1499,32 +1499,28 @@ on('change:repeating_ammo:ammoname', function(eventInfo) {
 
 //Follower weapons
 function setupFollowerWeaponsAutoFill(repeating, sections) {
-    let prefix = '';
-    if (repeating !== '') {
-        prefix = `repeating_${repeating}`
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
+        let comparerFields = ['rof','small-medium','large','range','speed'];
+        if (isPlayersOption) {
+            comparerFields.push('reach');
+        }
+        return comparerFields.every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
     }
 
     sections.forEach(section => {
-        on(`change:${prefix}:weaponnamehench${section}`, function(eventInfo) {
-            let comparer = function (weapon1, weapon2, isPlayersOption) {
-                let comparerFields = ['rof','small-medium','large','range','speed'];
-                if (isPlayersOption) {
-                    comparerFields.push('reach');
-                    comparerFields.push('knockdown');
-                }
-                return comparerFields.every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
-            }
-            let rowId = parseSourceAttribute(eventInfo).rowId;
+        let changePrefix = repeating ? `repeating_${repeating}:` : '';
+        on(`change:${changePrefix}weaponnamehench${section}`, function(eventInfo) {
+            let repeatingRowPrefix = repeating ? `repeating_${repeating}_${parseSourceAttribute(eventInfo).rowId}_` : '';
             let setWeaponFunc = function (weapon) {
                 let weaponInfo = {};
-                weaponInfo[`${prefix}_${rowId}_attacknumhench${section}`] = weapon['rof'] || '1';
-                weaponInfo[`${prefix}_${rowId}_attackadjhench${section}`] = weapon['bonus'];
-                weaponInfo[`${prefix}_${rowId}_damadjhench${section}`]    = weapon['bonus'];
-                weaponInfo[`${prefix}_${rowId}_damsmhench${section}`]     = weapon['small-medium'];
-                weaponInfo[`${prefix}_${rowId}_damlhench${section}`]      = weapon['large'];
-                weaponInfo[`${prefix}_${rowId}_rangehench${section}`]     = weapon['range'] || weapon['reach'] || 'Melee';
-                weaponInfo[`${prefix}_${rowId}_weaptypehench${section}`]  = weapon['type'];
-                weaponInfo[`${prefix}_${rowId}_weapspeedhench${section}`] = weapon['speed'];
+                weaponInfo[`${repeatingRowPrefix}attacknumhench${section}`] = weapon['rof'] || '1';
+                weaponInfo[`${repeatingRowPrefix}attackadjhench${section}`] = weapon['bonus'];
+                weaponInfo[`${repeatingRowPrefix}damadjhench${section}`]    = weapon['bonus'];
+                weaponInfo[`${repeatingRowPrefix}damsmhench${section}`]     = weapon['small-medium'];
+                weaponInfo[`${repeatingRowPrefix}damlhench${section}`]      = weapon['large'];
+                weaponInfo[`${repeatingRowPrefix}rangehench${section}`]     = weapon['range'] || weapon['reach'] || 'Melee';
+                weaponInfo[`${repeatingRowPrefix}weaptypehench${section}`]  = weapon['type'];
+                weaponInfo[`${repeatingRowPrefix}weapspeedhench${section}`] = weapon['speed'];
 
                 setAttrs(weaponInfo);
             };
@@ -1549,11 +1545,16 @@ const followerWeapons = [
 ];
 
 followerWeapons.forEach(fw => {
-    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections)
+    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections);
 });
 
 // Monster weapons
-on('change:repeating_monsterweapons:weaponname', function(eventInfo){
+on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
+    let rowId = parseSourceAttribute(eventInfo).rowId;
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
+        let comparerFields = ['rof','small-medium','large','speed'];
+        return comparerFields.every(f => weapon1[f] === weapon2[f]);
+    }
     let setWeaponFunc = function (weapon) {
         if (weapon['bonusInt'] > 1) {
             weapon['small-medium'] += weapon['bonus'];
@@ -1561,17 +1562,17 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo){
             weapon['thac0'] = weapon['thac0'] - weapon['bonusInt'];
         }
         let weaponInfo = {
-            [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
-            [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'],
-            [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
-            [`repeating_monsterweapons_daml`]      : weapon['large'],
-            [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
+            [`repeating_monsterweapons_${rowId}_attacknum`] : weapon['rof'] || '1',
+            [`repeating_monsterweapons_${rowId}_ThAC0`]     : weapon['thac0'],
+            [`repeating_monsterweapons_${rowId}_damsm`]     : weapon['small-medium'],
+            [`repeating_monsterweapons_${rowId}_daml`]      : weapon['large'],
+            [`repeating_monsterweapons_${rowId}_weapspeed`] : weapon['speed'],
         };
 
         setAttrs(weaponInfo);
     };
 
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'monsterthac0');
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer,'monsterthac0');
 });
 //#endregion
 
