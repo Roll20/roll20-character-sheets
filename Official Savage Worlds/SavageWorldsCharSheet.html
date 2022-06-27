@@ -1,7 +1,7 @@
 
 <script type="text/worker">
   const sheetVersionPrefix = 'Official Savage Worlds v';
-const sheetVersion = '1.00.27';
+const sheetVersion = '1.00.28';
 
 // Define colors for Logs
 const r20color = '#E948C9';
@@ -201,6 +201,7 @@ function fauxChange(field, fauxvalue) {
   log("FauxChange Reached: Field",field,r20color);
   log('Setting faux value(s) for', field, 'orangered');
   if (field.indexOf(':') > -1) {
+    log("fauxChange","repeating section","#CCCCFF")
     //console.log("Need to update values in a repeating section");
     let getfields = field.split(':');
     let repeatingSection = getfields[0];
@@ -219,26 +220,29 @@ function fauxChange(field, fauxvalue) {
         getAttrs(fieldArray, function (v) {
           for (let b = 0; b < idArray.length; b++) {
             oldValues[oldValues.length] = v[fieldArray[b]];
+            log(`Setting Faux Value (${fieldArray[b]})`, fauxvalue,r20color);
             sattrs[fieldArray[b]] = fauxvalue;
           }
           log('Step', '!!! Setting Fake Value !!!', 'orangered');
-          setAttrs(sattrs);
-          // I think I need to move all this stuff inside the setAttrs above...
-          for (let c = 0; c < idArray.length; c++) {
-            log(
-              'Added Field',
-              fieldArray[c] + ' = ' + oldValues[c],
-              'orangered'
-            );
-            sattrs[fieldArray[c]] = oldValues[c];
-          }
-          log('Step', '!!! Setting Real Values !!!', 'orangered');
-          setAttrs(sattrs);
+          setAttrs(sattrs,null, () => {
+            for (let c = 0; c < idArray.length; c++) {
+              log(
+                'Added Field',
+                fieldArray[c] + ' = ' + oldValues[c],
+                'orangered'
+              );
+              log(`Setting Previous Value (${fieldArray[c]})`, oldValues[c], r20color);
+              sattrs[fieldArray[c]] = oldValues[c];
+            }
+            log('Step', '!!! Setting Real Values !!!', 'orangered');
+            setAttrs(sattrs);
+          });
         });
       }
     });
   } else {
     //console.log("Updating values in a Non-Repeating Section");
+    log("fauxChange","Not Repeating Section","#CCCCFF")
     getAttrs([field], function (v) {
       let prevValue = v[field];
       let sattrs = {};
@@ -263,7 +267,7 @@ const stepwiseFaux = function (section, field) {
   //field = the field within the section to fauxily change
   //example call: stepwiseFaux("weapons","dmgbonusnum");
   //will do a faux change during each for loop
-
+  log("stepWiseFaux", "Entered this thing", "#CCCCFF");
   let repeatingSection = `repeating_${section}`;
   getSectionIDs(repeatingSection, function (idArray) {
     if (idArray.length > 0) {
@@ -521,7 +525,13 @@ const upgradeSheet = function (
       });
       setattrvals['newcontent'] = 'unread';
       setattrvals['newdocumentation'] = 'unread';
-    } else {
+    }
+    if (versionthree < 0.28) {
+      log("Sheet Version", "Upgrading to version 0.0.28", "#CCCCFF");
+      fauxChange(`repeating_weapons:weaponskill`, "fakeWeapon");
+      //stepwiseFaux("weapons", "weaponbutton");
+      setattrvals['newcontent'] = 'unread';
+    }  else {
       log('Upgrade', `Sheet already updgraded (${characterName})`, 'lime');
     }
     setAttrs(setattrvals);
@@ -3329,7 +3339,8 @@ weaponlist.forEach(weapon => {
   on(
     `change:${weapon}:weaponbutton change:${weapon}:weaponskill change:${weapon}:weaponAttackBonus`,
     function (eventInfo) {
-      console.log(eventInfo.sourceAttribute);
+      log("Weapon Button Config Triggered",eventInfo.sourceAttribute, "#CCCCFF");
+      //console.log(eventInfo.sourceAttribute);
       let pa = '';
       let wbutton = 'repeating_weapons_weaponbutton';
       let wskill = 'repeating_weapons_weaponskill';
@@ -3349,9 +3360,9 @@ weaponlist.forEach(weapon => {
 
       const skillAt = `${templateCommon} {{trait=@{athleticsname}}} @{rolltAthletics} {{skill_roll=&{noerror} [[ @{weaponAthleticsFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponAthleticsWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
 
-      const skillSh = `${templateCommon} {{trait=@{shootingname}}} @{rolltShooting} {{skill_roll=&{noerror} [[ @{weaponShootingFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponShootingWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}`;
+      const skillSh = `${templateCommon} {{trait=@{shootingname}}} @{rolltShooting} {{skill_roll=&{noerror} [[ @{weaponShootingFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponShootingWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
 
-      const skillWS = `${templateCommon} {{trait=@{weirdsciencename}}} @{rolltWeirdScience} {{skill_roll=&{noerror} [[ @{weaponWeirdScienceFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponWeirdScienceWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}`;
+      const skillWS = `${templateCommon} {{trait=@{weirdsciencename}}} @{rolltWeirdScience} {{skill_roll=&{noerror} [[ @{weaponWeirdScienceFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponWeirdScienceWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
       // faith
       const skillFa = `${templateCommon} {{trait=@{faithname}}} @{rolltFaith} {{skill_roll=&{noerror} [[ @{weaponfaithFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponfaithWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
       // Focus
@@ -6568,7 +6579,7 @@ on(
 </script>
 <!-- Necessary Mixins-->
 <!-- Hidden inputs for character sheet versioning, etc-->
-<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.27"/>
+<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.28"/>
 <input type="hidden" name="attr_firstInit" value="0"/>
 <input type="hidden" name="attr_namelength" value="0"/>
 <input type="hidden" name="attr_wdNum" value="1"/>
@@ -15838,6 +15849,20 @@ on(
       </div>
       <div class="releasenotesTab">
         <h1 class="groupHeader documentationHeader" data-i18n="release-notes">Release Notes</h1>
+        <!-- Release 1.00.28-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10028" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.28</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10028" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
+          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="weapon-shooting-not-rolling-wild-die">Fixed an issue where rolling Shooting (or Weird Science) from a weapon was not including the Wild Die roll. This fix should automatically fix any broken skills on the sheet, but if for some reason it doesn't, simply change the skill to a different one and then switch it back.</span></li>
+          </ul>
+        </div>
         <!-- Release 1.00.27-->
         <label class="rowlabel">
           <input class="releasenotes" type="checkbox" name="attr_releasenotes10027" value="1"/><span class="releasenotesVersion">
