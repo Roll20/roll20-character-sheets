@@ -1,55 +1,71 @@
+- let processedWeapons = new Set()
 datalist(id='melee-weapons')
-    each weapon in data
-        if (!weapon.category.includes('Melee'))
-            - continue;
-        - let group = weapon.group || ''
-        if (weapon.book !== 'PHB')
-            - group += (group ? ', ' : '') + weapon.book 
-        option(value=weapon.name)= group
-            
-datalist(id='ranged-weapons')
-    each weapon in data
-        if (!weapon.category.includes('Range'))
-            - continue;
-        - let group = weapon.group || ''
-        if (weapon.book !== 'PHB')
-            - group += (group ? ', ' : '') + weapon.book
-        option(value=weapon.name)= group
-
-datalist(id='all-weapons')
-    each weapon in data
-        - let group = weapon.group || ''
-        if (weapon.book !== 'PHB')
-            - group += (group ? ', ' : '') + weapon.book
-        option(value=weapon.name)= group
-
-- let usedWeapons = new Set();
-datalist(id='weapon-proficiencies')
-    - let book = 'PHB'
-    - let weaponProfsAdded = false
-    each weapon in data
-        - weaponProfsAdded = false
-        if (weapon.book !== book)
-            each prof, profName in proficiencies
-                if prof.book !== book
+    each book in booksPriority
+        each weaponList in data
+            each weapon in weaponList
+                if (!weapon.book.includes(book))
+                    - continue;
+                if (!weapon.category.includes('Melee'))
+                    - continue;
+                if processedWeapons.has(weapon.name.toLowerCase())
                     - continue
-                - category = prof.category || ''
-                if (prof.book !== 'PHB')
-                    - category += (category ? ', ' : '') + prof.book
-                option(value=profName)= category
-            - book = weapon.book
-            - weaponProfsAdded = true
-        if (weapon.noProf)
-            - continue
-        - let weaponName = weapon.name.split(/\s\(|,/)[0]
-        if (usedWeapons.has(weaponName))
-            - continue
-        - usedWeapons.add(weaponName);
-        - let group = weapon.group || ''
-        if (weapon.book !== 'PHB')
-            - group += (group ? ', ' : '') + weapon.book
-        option(value=weaponName)= group
-    if (!weaponProfsAdded)
+                - processedWeapons.add(weapon.name.toLowerCase())
+                - books = 'Books: ' + bookShorthand(weaponList.filter(w => w['category'].includes('Melee')).flatMap(w => w.book))
+                - let group = weapon.group || ''
+                - group += (group ? ', ' : '') + books
+                option(value=weapon.name)= group
+
+- processedWeapons.clear()
+datalist(id='ranged-weapons')
+    each book in booksPriority
+        each weaponList in data
+            each weapon in weaponList
+                if (!weapon.book.includes(book))
+                    - continue;
+                if (!weapon.category.includes('Range'))
+                    - continue;
+                if processedWeapons.has(weapon.name.toLowerCase())
+                    - continue
+                - books = 'Books: ' + bookShorthand(weaponList.filter(w => w['category'].includes('Range')).flatMap(w => w.book))
+                - processedWeapons.add(weapon.name.toLowerCase())
+                - let group = weapon.group || ''
+                - group += (group ? ', ' : '') + books
+                option(value=weapon.name)= group
+
+- processedWeapons.clear()
+datalist(id='all-weapons')
+    each book in booksPriority
+        each weaponList in data
+            each weapon in weaponList
+                if (!weapon.book.includes(book))
+                    - continue;
+                if processedWeapons.has(weapon.name.toLowerCase())
+                    - continue
+                - processedWeapons.add(weapon.name.toLowerCase())
+                - books = 'Books: ' + bookShorthand(weaponList.flatMap(w => w.book))
+                - let group = weapon.group || ''
+                - group += (group ? ', ' : '') + books
+                option(value=weapon.name)= group
+
+- processedWeapons.clear();
+datalist(id='weapon-proficiencies')
+    - let weaponProfsAdded = false
+    each book in booksPriority
+        each weaponList in data
+            - let group = weaponList.map(w => w.group).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join(', ')
+            each weapon in weaponList
+                if (!weapon.book.includes(book))
+                    - continue
+                if (weapon.noProf)
+                    - continue
+                - let weaponName = weapon.name.split(/\s\(|,/)[0]
+                if (processedWeapons.has(weaponName.toLowerCase()))
+                    - continue
+                - processedWeapons.add(weaponName.toLowerCase());
+                if (!weapon.book.includes('PHB'))
+                    - books = 'Books: ' + bookShorthand(weaponList.flatMap(w => w.book))
+                    - group += (group ? ', ' : '') + books
+                option(value=weaponName)= group
         each prof, profName in proficiencies
             if prof.book !== book
                 - continue

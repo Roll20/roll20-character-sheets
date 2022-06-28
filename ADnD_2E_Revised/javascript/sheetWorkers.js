@@ -1,21 +1,36 @@
 // --- ALL SHEET WORKERS START --- //
+const PLAYER = 'player';
+const SHEET_WORKER = 'sheetworker';
+
 const SUCCESS = 'success';
 const INFO = 'info';
 const WARNING = 'warning';
 const ERROR = 'error';
 
 const BOOK_FIELDS = [
-    'book-phb', 'book-tcfhb', 'book-tcthb', 'book-tcprhb', 'book-tcwhb',
-    'book-tom', 'book-aaeg',
-    'book-dwarves', 'book-bards', 'book-elves', 'book-humanoids', 'book-rangers',
-    'book-paladins', 'book-druids', 'book-barbarians', 'book-necromancers', 'book-ninjas'
+    'book-phb','book-tcfhb','book-tcthb','book-tcprhb','book-tcwhb',
+    'book-tom','book-aaeg',
+    'book-dwarves','book-bards','book-elves','book-humanoids','book-rangers',
+    'book-paladins','book-druids','book-barbarians','book-necromancers','book-ninjas',
+    'book-combat-and-tactics','book-skills-and-powers','book-spells-and-magic'
 ];
 
-const SCHOOL_FIELDS = ['school-spells&magic'];
-const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', 'sphere-spells&magic'];
+const SCHOOL_SPELLS_AND_MAGIC = 'school-spells-and-magic';
+const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
+
+const SPHERE_SPELLS_AND_MAGIC = 'sphere-spells-and-magic';
+const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', SPHERE_SPELLS_AND_MAGIC];
 
 //#region Helper function
-function capitalizeFirst(s) {
+const isSheetWorkerUpdate = function (eventInfo) {
+    return eventInfo.sourceType === SHEET_WORKER;
+}
+
+const isPlayerUpdate = function (eventInfo) {
+    return eventInfo.sourceType === PLAYER;
+}
+
+const capitalizeFirst = function (s) {
     if (typeof s !== 'string')
         return '';
 
@@ -28,19 +43,19 @@ const displaySize = function(size) {
 
     size = size.toLowerCase();
     switch (size) {
-        case 't': return 'Tiny';
+        case 't':
         case 'tiny': return 'Tiny';
-        case 's': return 'Small';
+        case 's':
         case 'small': return 'Small';
-        case 'm': return 'Medium';
+        case 'm':
         case 'medium': return 'Medium';
-        case 'l': return 'Large';
+        case 'l':
         case 'large': return 'Large';
-        case 'h': return 'Huge';
+        case 'h':
         case 'huge': return 'Huge';
-        case 'g': return 'Gargantuan';
+        case 'g':
         case 'gargantuan': return 'Gargantuan';
-        default: capitalizeFirst(size);
+        default: return capitalizeFirst(size);
     }
 }
 
@@ -65,8 +80,21 @@ const displayWeaponType = function (type) {
         case 's': return 'Slashing';
         case 'p': return 'Piercing';
         case 'b': return 'Bludgeoning';
-        default: capitalizeFirst(type);
+        default: return capitalizeFirst(type);
     }
+}
+
+const parseSourceAttribute = function (eventInfo) {
+    let parse = {};
+    if (eventInfo.sourceAttribute.startsWith('repeating')) {
+        let match = eventInfo.sourceAttribute.split('_');
+        parse.section = match[1];
+        parse.rowId = match[2];
+        parse.attribute = match[3];
+    } else {
+        parse.attribute = eventInfo.sourceAttribute;
+    }
+    return parse;
 }
 
 const conditionalLog = function (bool, msg) {
@@ -90,6 +118,12 @@ const extractRollResult = async function(rollExpression) {
     let roll = await extractRoll(rollExpression);
     return roll.result;
 };
+
+// Call this when an async function does not call the CRP to keep the reference to the character sheet.
+const keepContextRoll = async function () {
+    let dummyRoll = await startRoll('!{{roll=}}');
+    finishRoll(dummyRoll.rollId);
+}
 
 const printRoll = async function(rollExpression) {
     let roll = await startRoll(rollExpression);
@@ -166,20 +200,30 @@ const showToast = function(type, title, message) {
 }
 
 const getActiveSettings = function (settingFields, values) {
-    return settingFields.map(bField => values[bField])
+    let settings = settingFields.map(bField => values[bField])
         .filter(Boolean)
-        .filter(book => book !== '0')
+        .filter(book => book !== '0');
+    return new Set(settings);
 }
 
 const isBookInactive = function (books, obj) {
     let activeBooks = getActiveSettings(BOOK_FIELDS, books);
-    return !activeBooks.includes(obj['book']);
+    if (Array.isArray(obj))
+        return obj.every(b => !activeBooks.has(b));
+    else
+        return !activeBooks.has(obj['book']);
 }
 
 const bookInactiveShowToast = function(books, obj) {
     let bookInactive = isBookInactive(books, obj);
-    if (bookInactive)
-        showToast(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
+    if (bookInactive) {
+        if (Array.isArray(obj)) {
+            let booksString = obj.map(b => '\n* ' + b).join('')
+            showToast(ERROR, 'Missing Book(s)', `The book(s):${booksString}\nAre currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
+        } else {
+            showToast(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
+        }
+    }
     return bookInactive;
 };
 
@@ -229,7 +273,7 @@ const repeatingCalculateRemaining = function(repeatingName, repeatingFieldsToSum
 //#endregion
 
 //#region Generic Setup functions
-function setupCalculateTotal(totalField, fieldsToSum, maxValue) {
+function setupStaticCalculateTotal(totalField, fieldsToSum, maxValue) {
     let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
     on(onChange, function () {
         getAttrs(fieldsToSum, function (values) {
@@ -259,7 +303,7 @@ function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToS
         TAS.repeating(repeatingName)
             .fields(allFields)
             .tap(function(rowSet) {
-                let rowId = eventInfo.sourceAttribute.split('_')[2];
+                let rowId = parseSourceAttribute(eventInfo).rowId;
                 let row = rowSet[rowId];
                 let total = 0;
                 repeatingFieldsToSum.forEach(column => {
@@ -692,7 +736,7 @@ on('clicked:opendoor-check', function (eventInfo){
        rollTemplate += ` {{checktarget=[[${target}]]}}`;
        rollTemplate += target === match[1]
            ? ` {{checkvs=Open Normal Doors Check}}`
-           : ` {{checkvs=Open Locked/Barred/Magical Doors Check}}`;
+           : ` {{checkvs=Open Locked/Barred/Magically Held Doors Check}}`;
        return printRoll(rollTemplate);
    });
 });
@@ -804,13 +848,16 @@ function parseSpheres(spheresStrings, regex) {
 }
 
 const getSpellSpheres = function (spell, sphereRules) {
+    if (sphereRules.has(SPHERE_SPELLS_AND_MAGIC))
+        return spell[SPHERE_SPELLS_AND_MAGIC] || spell['sphere'];
+
     let sphere = spell['sphere'];
     sphereRules.forEach(rule => sphere += spell[rule] || '');
     return sphere;
 }
 
 function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, activeBooks, optionalSpheres) {
-    if (!activeBooks.includes(spell['book']))
+    if (!activeBooks.has(spell['book']))
         return false;
 
     let spheres = getSpellSpheres(spell, optionalSpheres);
@@ -1011,8 +1058,19 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
                 [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
                 [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
                 [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
+                [`repeating_spells-${section}_spell-subtlety`]     : spell['subtlety'] || '',
+                [`repeating_spells-${section}_spell-sensory`]      : spell['sensory'] || '',
+                [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
+                [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
+                [`repeating_spells-${section}_spell-crit-size`]    : spell['crit-size'] || '',
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
+            if (section.startsWith('wiz')) {
+                let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
+                spellInfo[`repeating_spells-${section}_spell-school`] = schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
+                    ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
+                    : spell['school'];
+            }
             if (section.startsWith('pri')) {
                 let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
                 spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
@@ -1063,7 +1121,7 @@ function priestDisplayLevel(s) {
 // --- Start setup Spell Slots --- //
 wizardSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
-    setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
+    setupStaticCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
@@ -1072,14 +1130,16 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel, []);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel, SCHOOL_FIELDS);
+        setupSpellCrit(lastSection);
     }
 });
-setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel, []);
+setupAutoFillSpellInfo('wizmonster', wizardSpells, wizardDisplayLevel, SCHOOL_FIELDS);
+setupSpellCrit('wizmonster');
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
-    setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
+    setupStaticCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
@@ -1089,19 +1149,21 @@ priestSpellLevelsSections.forEach(spellLevel => {
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
         setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel, SPHERE_FIELDS);
+        setupSpellCrit(lastSection);
         if (lastSection !== 'priq') {
             setupAddPriestSpell(lastSection);
         }
     }
 });
-setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel, SPHERE_FIELDS);
+setupAutoFillSpellInfo('primonster', priestSpells, priestDisplayLevel, SPHERE_FIELDS);
+setupSpellCrit('primonster');
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
 let wizardSpellPoints = 'spell-points';
 let arc = 'total-arc';
 let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
-setupCalculateTotal(`${wizardSpellPoints}-total`, [`${wizardSpellPoints}-lvl`, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
+setupStaticCalculateTotal(`${wizardSpellPoints}-total`, [`${wizardSpellPoints}-lvl`, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
 setupRepeatingSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`, true);
 setupRepeatingSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`, true);
 setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
@@ -1110,7 +1172,7 @@ setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
 let priestSpellPoints = 'spell-points-priest';
 let wind = 'total-wind';
 let allPriestSpellSections = priestSpellLevelsSections.flatMap(sl => sl.sections);
-setupCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
+setupStaticCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
 setupRepeatingSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`, true);
 setupRepeatingSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`, true);
 setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
@@ -1140,10 +1202,10 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
 let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
 rogueStandardSkills.forEach(skill => {
-    setupCalculateTotal(`${skill}t-hidden`, rogueStandardColumns.map(column => `${skill}${column}`));
-    setupCalculateTotal(`${skill}t`, [`${skill}t-hidden`], 95);
-    setupCalculateTotal(`${skill}noarmort`, [`${skill}t-hidden`, `${skill}noarmorb`], 95);
-    setupCalculateTotal(`${skill}armort`, [`${skill}t-hidden`, `${skill}armorp`], 95);
+    setupStaticCalculateTotal(`${skill}t-hidden`, rogueStandardColumns.map(column => `${skill}${column}`));
+    setupStaticCalculateTotal(`${skill}t`, [`${skill}t-hidden`], 95);
+    setupStaticCalculateTotal(`${skill}noarmort`, [`${skill}t-hidden`, `${skill}noarmorb`], 95);
+    setupStaticCalculateTotal(`${skill}armort`, [`${skill}t-hidden`, `${skill}armorp`], 95);
 });
 
 // Setup custom rogue skills total
@@ -1227,171 +1289,242 @@ on('change:thac0-base-calc', function(eventInfo) {
         .execute();
 });
 
+async function selectVersion(foundObjects, values, comparer, objectName) {
+    let activeBooks = getActiveSettings(BOOK_FIELDS, values);
+    let activeObjects = foundObjects.filter(w => w['book'].some(b => activeBooks.has(b)));
+    if (activeObjects.length === 0) {
+        await keepContextRoll();
+        let booksString = foundObjects.flatMap(w => w['book']).map(b => '\n* ' + b).join('');
+        showToast(ERROR, 'Missing Book(s)', `The book(s):${booksString}\nAre currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
+        return;
+    }
+
+    let isPlayersOption = values[PLAYERS_OPTION_FIELD] === '2';
+    let isAllEqual = activeObjects.every(o => comparer(o, activeObjects[0], isPlayersOption));
+    if (isAllEqual) {
+        await keepContextRoll();
+        return activeObjects[0];
+    } else {
+        activeObjects = combineBooks(activeObjects, comparer, isPlayersOption);
+        let options = activeObjects
+            .map((o, i) => `${o.book.join('/')},${i}`)
+            .join('|');
+        let answer = await extractRollResult(`?{Multiple versions of this ${objectName} exists. Please select a version|${options}}`);
+        return activeObjects[answer];
+    }
+}
+
+function combineBooks(activeObjects, comparer, isPlayersOptions) {
+    // Copying fields from active object to avoid side effects being saved permanently
+    let copyActiveObjects = activeObjects.map(e => {
+        return {...e}
+    });
+    let copyArray = [...copyActiveObjects];
+
+    copyActiveObjects.forEach(activeObject => {
+        copyArray.forEach((copyObject, i) => {
+            if (activeObject === copyObject) {
+                delete copyArray[i];
+                return;
+            }
+            if (!comparer(activeObject, copyObject, isPlayersOptions))
+                return;
+
+            activeObject['book'] = activeObject['book'].concat(copyObject['book']);
+            delete copyActiveObjects[i];
+        });
+    });
+
+    return copyActiveObjects.filter(Boolean);
+}
+
 //#region Weapons autofill
-function setWeaponWithBonus(weaponName, setWeaponFunc, thac0Field, isMonster) {
+const PLAYERS_OPTION_FIELD = 'tab81';
+function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, category) {
     if (!weaponName)
         return;
 
     weaponName = weaponName.toLowerCase();
-    let fields = [...BOOK_FIELDS, thac0Field].filter(x => x !== undefined);
-    getAttrs(fields, function(values) {
-        let thac0 = parseInt(values[thac0Field]);
-        thac0 = isNaN(thac0) ? 20 : thac0;
-
-        let baseWeapon = weapons[weaponName]
-        if (baseWeapon) {
-            if (bookInactiveShowToast(values, baseWeapon))
+    let fields = [...BOOK_FIELDS, PLAYERS_OPTION_FIELD, thac0Field].filter(Boolean);
+    getAttrs(fields, async function (values) {
+        let bonus = 0;
+        let baseWeapons = WEAPONS_TABLE[weaponName]
+        if (!baseWeapons) {
+            let match = weaponName.match(/\s*\+([0-9]+)\s*/);
+            if (!match)
                 return;
 
-            setWeaponFunc({
-                ...baseWeapon,
-                'thac0' : thac0,
-                'bonus' : '0'
-            });
-            return;
+            let baseWeaponName = weaponName.replace(match[0], ' ').trim();
+            baseWeapons = WEAPONS_TABLE[baseWeaponName];
+            if (!baseWeapons)
+                return;
+
+            bonus = parseInt(match[1]);
+            if (isNaN(bonus))
+                return;
         }
+        let weaponsInCategory = baseWeapons;
+        if (category)
+            weaponsInCategory = weaponsInCategory.filter(w => w['category'].includes(category));
 
-        let match = weaponName.match(/\s*\+([0-9]+)\s*/);
-        if (!match)
-            return;
-
-        let baseWeaponName = weaponName.replace(match[0], ' ').trim();
-        baseWeapon = weapons[baseWeaponName];
+        let baseWeapon = await selectVersion(weaponsInCategory, values, comparer, 'weapon');
+        console.log(baseWeapon);
         if (!baseWeapon)
             return;
 
-        if (bookInactiveShowToast(values, baseWeapon))
-            return;
+        let thac0 = parseInt(values[thac0Field]);
+        thac0 = isNaN(thac0) ? 20 : thac0;
 
-        let bonusString = match[1];
-        let bonus = parseInt(bonusString)
-        if (isNaN(bonus))
-            return;
-
-        if (bonus < 1) {
-            setWeaponFunc({
-                ...baseWeapon,
-                'thac0' : thac0,
-                'bonus' : '0'
-            });
-            return;
-        }
-
-        let weaponWithBonus = {
+        let weapon = {
             ...baseWeapon,
             'thac0' : thac0,
-            'speed' : Math.max(baseWeapon['speed'] - bonus, 0),
-            'bonus' : `+${bonus}`
+        };
+        if (bonus < 1) {
+            weapon['bonus'] = '0';
+            weapon['bonusInt'] = 0;
+        } else {
+            weapon['bonus'] = `+${bonus}`;
+            weapon['bonusInt'] = bonus;
+            weapon['speed'] = Math.max(weapon['speed'] - bonus, 0)
         }
-        if (isMonster) {
-            weaponWithBonus['small-medium'] += `+${bonus}`;
-            weaponWithBonus['large'] += `+${bonus}`;
-            weaponWithBonus['thac0'] = thac0 - bonus;
-        }
-
-        setWeaponFunc(weaponWithBonus);
+        setWeaponFunc(weapon);
     });
 }
 
 //melee hit autofill
 on('change:repeating_weapons:weaponname', function(eventInfo) {
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
+        let compareFields = ['size','speed'];
+        if (isPlayersOption)
+            compareFields.push('reach');
+        return compareFields.every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
+    }
+    let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
-        let weaponInfo = {
-            'repeating_weapons_attackadj'      : weapon['bonus'],
-            'repeating_weapons_ThAC0'          : weapon['thac0'],
-            'repeating_weapons_range'          : 'Melee',
-            'repeating_weapons_size'           : weapon['size'],
-            'repeating_weapons_weapspeed'      : weapon['speed'],
-            'repeating_weapons_weaptype-slash' : weapon['type'].includes('S') ? 1 : 0,
-            'repeating_weapons_weaptype-pierce': weapon['type'].includes('P') ? 1 : 0,
-            'repeating_weapons_weaptype-blunt' : weapon['type'].includes('B') ? 1 : 0,
-        };
+        let weaponInfo = {};
+        weaponInfo[`repeating_weapons_${rowId}_attackadj`]       = weapon['bonus'];
+        weaponInfo[`repeating_weapons_${rowId}_ThAC0`]           = weapon['thac0'];
+        weaponInfo[`repeating_weapons_${rowId}_range`]           = weapon['reach'] || 'Melee';
+        weaponInfo[`repeating_weapons_${rowId}_size`]            = weapon['size'];
+        weaponInfo[`repeating_weapons_${rowId}_weapspeed`]       = weapon['speed'];
+        weaponInfo[`repeating_weapons_${rowId}_weaptype-slash`]  = weapon['type'].includes('S') ? 1 : 0;
+        weaponInfo[`repeating_weapons_${rowId}_weaptype-pierce`] = weapon['type'].includes('P') ? 1 : 0;
+        weaponInfo[`repeating_weapons_${rowId}_weaptype-blunt`]  = weapon['type'].includes('B') ? 1 : 0;
 
         setAttrs(weaponInfo);
     };
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer, 'thac0-base-calc', 'Melee');
 });
 
 //melee damage autofill
-on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
+on('change:repeating_weapons-damage:weaponname1', function(eventInfo) {
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
+        let fisk = ['small-medium','large'];
+        if (isPlayersOption) {
+            fisk.push('size');
+            fisk.push('type');
+            fisk.push('knockdown');
+        }
+        return fisk.every(f => weapon1[f] === weapon2[f])
+    }
+    let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
-        let weaponInfo = {
-            'repeating_weapons-damage_damadj'     : weapon['bonus'],
-            'repeating_weapons-damage_damsm'      : weapon['small-medium'],
-            'repeating_weapons-damage_daml'       : weapon['large'],
-            'repeating_weapons-damage_knockdown1' : weapon['knockdown'] || ''
-        };
+        let weaponInfo = {};
+        weaponInfo[`repeating_weapons-damage_${rowId}_damadj`]     = weapon['bonus'];
+        weaponInfo[`repeating_weapons-damage_${rowId}_damsm`]      = weapon['small-medium'];
+        weaponInfo[`repeating_weapons-damage_${rowId}_daml`]       = weapon['large'];
+        weaponInfo[`repeating_weapons-damage_${rowId}_knockdown1`] = weapon['knockdown'] || '';
+        weaponInfo[`repeating_weapons-damage_${rowId}_size`]       = weapon['size'];
+        weaponInfo[`repeating_weapons-damage_${rowId}_type`]       = weapon['type'];
 
         setAttrs(weaponInfo);
     };
 
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer, '', 'Melee');
 });
 
 //range hit autofill
-on('change:repeating_weapons2:weaponname2', function(eventInfo){
+on('change:repeating_weapons2:weaponname2', function(eventInfo) {
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
+        return ['strength','rof','range','size','speed'].every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
+    }
+    let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
-        let weaponInfo = {
-            'repeating_weapons2_strbonus2'        : weapon['strength'] ? 1 : 0,
-            'repeating_weapons2_attacknum2'       : weapon['rof'] || '',
-            'repeating_weapons2_attackadj2'       : weapon['bonus'],
-            'repeating_weapons2_ThAC02'           : weapon['thac0'],
-            'repeating_weapons2_range2'           : weapon['range'] || '',
-            'repeating_weapons2_size2'            : weapon['size'],
-            'repeating_weapons2_weapspeed2'       : weapon['speed'],
-            'repeating_weapons2_weaptype-slash2'  : weapon['type'].includes('S') ? 1 : 0,
-            'repeating_weapons2_weaptype-pierce2' : weapon['type'].includes('P') ? 1 : 0,
-            'repeating_weapons2_weaptype-blunt2'  : weapon['type'].includes('B') ? 1 : 0,
-        };
+        let weaponInfo = {};
+        weaponInfo[`repeating_weapons2_${rowId}_strbonus2`]        = weapon['strength'] ? 1 : 0;
+        weaponInfo[`repeating_weapons2_${rowId}_attacknum2`]       = weapon['rof'] || '';
+        weaponInfo[`repeating_weapons2_${rowId}_attackadj2`]       = weapon['bonus'];
+        weaponInfo[`repeating_weapons2_${rowId}_ThAC02`]           = weapon['thac0'];
+        weaponInfo[`repeating_weapons2_${rowId}_range2`]           = weapon['range'] || '';
+        weaponInfo[`repeating_weapons2_${rowId}_size2`]            = weapon['size'];
+        weaponInfo[`repeating_weapons2_${rowId}_weapspeed2`]       = weapon['speed'];
+        weaponInfo[`repeating_weapons2_${rowId}_weaptype-slash2`]  = weapon['type'].includes('S') ? 1 : 0;
+        weaponInfo[`repeating_weapons2_${rowId}_weaptype-pierce2`] = weapon['type'].includes('P') ? 1 : 0;
+        weaponInfo[`repeating_weapons2_${rowId}_weaptype-blunt2`]  = weapon['type'].includes('B') ? 1 : 0;
 
         setAttrs(weaponInfo);
     };
 
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'thac0-base-calc');
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer, 'thac0-base-calc', 'Range');
 });
 
 //range damage autofill
-on('change:repeating_ammo:ammoname', function(eventInfo){
+on('change:repeating_ammo:ammoname', function(eventInfo) {
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
+        let comparerFields = ['strength','small-medium','large'];
+        let equalSets = true;
+        if (isPlayersOption) {
+            comparerFields.push('knockdown');
+            comparerFields.push('size');
+            comparerFields.push('ammo-size');
+            equalSets = _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
+        }
+        return comparerFields.every(f => weapon1[f] === weapon2[f]) && equalSets;
+    }
+    let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
-        let weaponInfo = {
-            'repeating_weapons2_strbonus3'        : weapon['strength'] ? 1 : 0,
-            'repeating_ammo_damadj2'              : weapon['bonus'],
-            'repeating_ammo_damsm2'               : weapon['small-medium'],
-            'repeating_ammo_daml2'                : weapon['large'],
-            'repeating_weapons-damage_knockdown2' : weapon['knockdown'] || ''
-        };
+        let weaponInfo = {};
+        weaponInfo[`repeating_ammo_${rowId}_strbonus3`]  = weapon['strength'] ? 1 : 0;
+        weaponInfo[`repeating_ammo_${rowId}_damadj2`]    = weapon['bonus'];
+        weaponInfo[`repeating_ammo_${rowId}_damsm2`]     = weapon['small-medium'];
+        weaponInfo[`repeating_ammo_${rowId}_daml2`]      = weapon['large'];
+        weaponInfo[`repeating_ammo_${rowId}_knockdown2`] = weapon['knockdown'] || '';
+        weaponInfo[`repeating_ammo_${rowId}_size`]       = weapon['ammo-size'] || weapon['size'];
+        weaponInfo[`repeating_ammo_${rowId}_type`]       = weapon['type'];
 
         setAttrs(weaponInfo);
     }
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer, '', 'Range');
 });
 
 //Follower weapons
 function setupFollowerWeaponsAutoFill(repeating, sections) {
-    let prefix = '';
-    let onChange = '';
-    if (repeating !== '') {
-        prefix = `repeating_${repeating}_`
-        onChange = `repeating_${repeating}:`
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
+        let comparerFields = ['rof','small-medium','large','range','speed'];
+        if (isPlayersOption) {
+            comparerFields.push('reach');
+        }
+        return comparerFields.every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
     }
 
     sections.forEach(section => {
-        on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
+        let changePrefix = repeating ? `repeating_${repeating}:` : '';
+        on(`change:${changePrefix}weaponnamehench${section}`, function(eventInfo) {
+            let repeatingRowPrefix = repeating ? `repeating_${repeating}_${parseSourceAttribute(eventInfo).rowId}_` : '';
             let setWeaponFunc = function (weapon) {
-                let weaponInfo = {
-                    [`${prefix}attacknumhench${section}`]: weapon['rof'] || '1',
-                    [`${prefix}attackadjhench${section}`]: weapon['bonus'],
-                    [`${prefix}damadjhench${section}`]: weapon['bonus'],
-                    [`${prefix}damsmhench${section}`]: weapon['small-medium'],
-                    [`${prefix}damlhench${section}`]: weapon['large'],
-                    [`${prefix}rangehench${section}`]: weapon['range'] || 'Melee',
-                    [`${prefix}weaptypehench${section}`]: weapon['type'],
-                    [`${prefix}weapspeedhench${section}`]: weapon['speed'],
-                };
+                let weaponInfo = {};
+                weaponInfo[`${repeatingRowPrefix}attacknumhench${section}`] = weapon['rof'] || '1';
+                weaponInfo[`${repeatingRowPrefix}attackadjhench${section}`] = weapon['bonus'];
+                weaponInfo[`${repeatingRowPrefix}damadjhench${section}`]    = weapon['bonus'];
+                weaponInfo[`${repeatingRowPrefix}damsmhench${section}`]     = weapon['small-medium'];
+                weaponInfo[`${repeatingRowPrefix}damlhench${section}`]      = weapon['large'];
+                weaponInfo[`${repeatingRowPrefix}rangehench${section}`]     = weapon['range'] || weapon['reach'] || 'Melee';
+                weaponInfo[`${repeatingRowPrefix}weaptypehench${section}`]  = weapon['type'];
+                weaponInfo[`${repeatingRowPrefix}weapspeedhench${section}`] = weapon['speed'];
 
                 setAttrs(weaponInfo);
             };
-            setWeaponWithBonus(eventInfo.newValue, setWeaponFunc);
+            setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer);
         });
     });
 }
@@ -1412,24 +1545,34 @@ const followerWeapons = [
 ];
 
 followerWeapons.forEach(fw => {
-    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections)
+    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections);
 });
 
 // Monster weapons
-on('change:repeating_monsterweapons:weaponname', function(eventInfo){
+on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
+    let rowId = parseSourceAttribute(eventInfo).rowId;
+    let comparer = function (weapon1, weapon2, isPlayersOption) {
+        let comparerFields = ['rof','small-medium','large','speed'];
+        return comparerFields.every(f => weapon1[f] === weapon2[f]);
+    }
     let setWeaponFunc = function (weapon) {
+        if (weapon['bonusInt'] > 1) {
+            weapon['small-medium'] += weapon['bonus'];
+            weapon['large'] += weapon['bonus'];
+            weapon['thac0'] = weapon['thac0'] - weapon['bonusInt'];
+        }
         let weaponInfo = {
-            [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
-            [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'],
-            [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
-            [`repeating_monsterweapons_daml`]      : weapon['large'],
-            [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
+            [`repeating_monsterweapons_${rowId}_attacknum`] : weapon['rof'] || '1',
+            [`repeating_monsterweapons_${rowId}_ThAC0`]     : weapon['thac0'],
+            [`repeating_monsterweapons_${rowId}_damsm`]     : weapon['small-medium'],
+            [`repeating_monsterweapons_${rowId}_daml`]      : weapon['large'],
+            [`repeating_monsterweapons_${rowId}_weapspeed`] : weapon['speed'],
         };
 
         setAttrs(weaponInfo);
     };
 
-    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, 'monsterthac0', true);
+    setWeaponWithBonus(eventInfo.newValue, setWeaponFunc, comparer,'monsterthac0');
 });
 //#endregion
 
@@ -1485,6 +1628,544 @@ on('clicked:grenade-miss', async function (eventInfo) {
         });
     });
 });
+
+const INJURY_REGEX = /Graze|Singed|Chilled|Struck|Injured|Burn|Frostbit|Broken|Crushed|Shattered|Frozen|(?<!Armor|Shield|Helm|is) Destroyed|Severed|Dissolved|Incinerated|(Minor|Major|Severe)(?: internal)? Bleeding/gmi
+
+on('clicked:repeating_weapons-damage:crit2', function(eventInfo) {
+    console.log(eventInfo);
+    let prefix = 'repeating_weapons-damage_';
+    let fields = [
+        'strbonus1','dexbonus1','weaponname1',
+        'specialist-damage','mastery-damage','damadj',
+        'damsm','daml','size','type'
+    ].map(s => prefix+s);
+
+    let nameFunc = (values) => values[prefix+'weaponname1'];
+    let baseDamageFunc = (targetSize, values) => sizeToInt(targetSize) < 3
+        ? values[prefix+'damsm']
+        : values[prefix+'daml'];
+    let damageAdjFunc = (values) => [
+        `(${values[prefix+'damadj']})`,
+        `({${values[prefix+'specialist-damage']},${values[prefix+'mastery-damage']}}kh1)`,
+        `((@{strengthdmg})*${values[prefix+'strbonus1']})`,
+        `((@{dexmissile})*${values[prefix+'dexbonus1']})`,
+        '(@{temp-damadj})',
+        '(@{misc-mod})'
+    ].join('+');
+
+    weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc)
+});
+
+on('clicked:repeating_ammo:crit2', function (eventInfo) {
+    console.log(eventInfo);
+    let prefix = 'repeating_ammo_';
+    let fields = [
+        `strbonus3`,`dexbonus3`,`ammoname`,
+        'specialist-damage2','mastery-damage2','damadj2',
+        'damsm2','daml2','size','type'
+    ].map(s => prefix+s);
+
+    let nameFunc = (values) => values[prefix+'ammoname'];
+    let baseDamageFunc = (targetSize, values) => sizeToInt(targetSize) < 3
+        ? values[prefix+'damsm2']
+        : values[prefix+'daml2'];
+    let damageAdjFunc = (values) => [
+        `(${values[prefix+'damadj2']})`,
+        `((@{strengthdmg})*${values[prefix+'strbonus3']})`,
+        `((@{dexmissile})*${values[prefix+'dexbonus3']})`,
+        `({${values[prefix+'specialist-damage2']},${values[prefix+'mastery-damage2']}}kh1)`,
+        '(@{temp-damadj})',
+        '(@{misc-mod})'
+    ].join('+');
+
+    weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc)
+});
+
+const SPELL_HITS_REGEX = /\((\dd\d\+?\d?|\d) hit/i;
+
+async function debugSeverity(severityDice) {
+    return false
+        ? parseInt(await extractQueryResult('?{Debug severity|1}'))
+        : await extractRollResult(severityDice);
+}
+
+function lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set) {
+    let effect;
+    let additionalHit = {};
+    if (severityRoll < 4) {
+        effect = 'No unusual effect';
+    } else if (severityRoll < 13) {
+        effect = spellTypeTable[generalLocation][severityRoll];
+    } else {
+        effect = spellTypeTable[generalLocation][12];
+        if (spellTypeTable[generalLocation][13]) {
+            effect += spellTypeTable[generalLocation][13];
+        } else {
+            additionalHit = SPELL_CRIT_13_EFFECT_TABLE[targetType][generalLocation];
+            effect += additionalHit.description;
+        }
+    }
+
+    critEffectExplanations(effect, set);
+    effect = `[[${severityRoll}]]: ${effect}`;
+    return {
+        effect: effect,
+        additionalLocations: additionalHit.locations
+    };
+}
+
+async function recursiveAdditionalHit(additionalLocations, iteration, additionalString, severityDice, boolObj, spellTypeTable, targetType, rollBuilder, set) {
+    if (!additionalLocations)
+        return;
+
+    let additionalLocationRoll = await extractRollResult('1d100');
+    let additionalLocation = additionalLocations.find(l => additionalLocationRoll <= l.chance);
+    let displayAdditionalLocationRoll = additionalLocations.length === 1
+        ? ''
+        :`(1d100:${additionalLocationRoll})`;
+    let severityRoll = await debugSeverity(severityDice);
+    let generalLocation = additionalLocation.general;
+    let specificLocation = additionalLocation.specific;
+    let locationNote = '';
+    if (targetType !== 'Humanoid' && generalLocation === 'Legs' && !boolObj.isSnakeLike) {
+        boolObj.isSnakeLike = await extractQueryResult('?{Is the target snake-like or fish-like?|No|Yes}');
+    }
+    if (targetType !== 'Humanoid' && generalLocation === 'Legs' && boolObj.isSnakeLike === 'Yes') {
+        generalLocation = 'Tail';
+        specificLocation = 'Tail';
+        locationNote = SPELL_CRIT_13_EFFECT_TABLE[targetType]['Tail'].note;
+    }
+    let effectObj = lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set);
+    let displayAdditionalEffect = `Location ${iteration}, ${additionalString} hit, hitting **${specificLocation}** ${locationNote} ${displayAdditionalLocationRoll}=${effectObj.effect}`;
+    rollBuilder.push(displayAdditionalEffect);
+
+    return await recursiveAdditionalHit(effectObj.additionalLocations, iteration, additionalString+' additional', severityDice, boolObj, spellTypeTable, targetType, rollBuilder, set);
+}
+
+function setupSpellCrit(section) {
+    let prefix = `repeating_spells-${section}_`;
+    let fields = [
+        'spell-name','spell-damage-type','spell-crit-size'
+    ];
+    on(`clicked:repeating_spells-${section}:spell-crit2`, function (eventInfo) {
+        console.log(eventInfo);
+        let attrFields = fields.map(s => prefix+s);
+        getAttrs(attrFields, async function (values) {
+            let rollBuilder = ['character=@{character_name}'];
+            rollBuilder.push(`name=${values[prefix+'spell-name']}`);
+
+            let errors = [];
+
+            let lookupType;
+            let displayType = values[prefix+'spell-damage-type'];
+            switch (displayType.toLowerCase().trim()) {
+                case 'acid':
+                    lookupType = 'Acid';
+                    break;
+                case 'cold':
+                    lookupType = 'Cold';
+                    break;
+                case 'construction':
+                    lookupType = 'Constriction';
+                    break;
+                case 'crushing':
+                    lookupType = 'Crushing';
+                    break;
+                case 'electricity':
+                case 'lightning':
+                    lookupType = 'Electricity';
+                    break;
+                case 'fire':
+                    lookupType = 'Fire';
+                    break;
+                case 'impact':
+                    lookupType = 'Impact';
+                    break;
+                case 'slashing':
+                    lookupType = 'Slashing';
+                    break;
+                case 'vibration':
+                    lookupType = 'Vibration';
+                    break;
+                case 'wounding':
+                    lookupType = 'Wounding';
+                    break;
+                default:
+                    lookupType = displayType = await extractQueryResult('?{What damage type does the magic inflict?' +
+                        '|Acid' +
+                        '|Cold' +
+                        '|Crushing' +
+                        '|Electricity/Lightning,Electricity' +
+                        '|Fire' +
+                        '|Impact' +
+                        '|Slashing' +
+                        '|Vibration' +
+                        '|Wounding' +
+                        '|Not viable}');
+                    break;
+            }
+
+            let spellTypeTable = SPELL_CRIT_EFFECT_TABLE[lookupType];
+            if (!spellTypeTable)
+                errors.push('damage type');
+            rollBuilder.push(`type=${displayType.trim()}`);
+
+            let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
+            let targetSize = await extractQueryResult('?{Target size?|Medium|Tiny|Small|Medium|Large|Huge|Gargantuan}');
+            rollBuilder.push(`target=${targetType}`);
+            rollBuilder.push(`targetsize=${targetSize}`);
+
+            let size = values[prefix+'spell-crit-size'];
+
+            let spellSizeCategory;
+            switch (size.split(' (')[0]) {
+                case 'Medium':
+                case 'Moderate':
+                    spellSizeCategory = 2;
+                    break;
+                case 'Large':
+                    spellSizeCategory = 3;
+                    break;
+                case 'Huge':
+                    spellSizeCategory = 4;
+                    break;
+                case 'Gargantuan':
+                    spellSizeCategory = 5;
+                    break;
+                case '':
+                case 'None':
+                    spellSizeCategory = 0;
+                    size = 'None';
+                    errors.push('size');
+                    break;
+                default:
+                    let sizeString = await extractQueryResult('?{What size is the spell?' +
+                        '|1 Target or 5´ sq. or 2´ rad = Medium (1 hit),2' +
+                        '|2-9 Targets or 30´ sq. or 15´ rad = Large (1d3 hits),3' +
+                        '|10+ Targets or 40´ sq. or 20´ rad = Huge (1d4 hits),4' +
+                        '|40+ Targets or 100´ sq. or 40´ rad = Gargantuan (1d6+1 hits),5}');
+                    spellSizeCategory = parseInt(sizeString);
+            }
+            rollBuilder.push(`size=${size}`);
+
+            let hits = 0;
+            let hitDice = '';
+            let rollMatch = size.match(SPELL_HITS_REGEX); // roll
+            let rangeMatch = size.match(/\((\d)-(\d) hit/i); // range
+            let rollMatch2;
+            if (SPELL_SIZE_MAP[spellSizeCategory])
+                rollMatch2 = SPELL_SIZE_MAP[spellSizeCategory].match(SPELL_HITS_REGEX);
+
+            async function sizeReduction(rollMatch) {
+                if (targetSize === 'Huge') {
+                    rollMatch = SPELL_SIZE_MAP[Math.max(spellSizeCategory - 1, 2)].match(SPELL_HITS_REGEX);
+                    hitDice = `(${rollMatch[1]}) `;
+                }
+                if (targetSize === 'Gargantuan') {
+                    rollMatch = SPELL_SIZE_MAP[Math.max(spellSizeCategory - 2, 2)].match(SPELL_HITS_REGEX);
+                    hitDice = `(${rollMatch[1]}) `;
+                }
+                return await extractRollResult(rollMatch[1]);
+            }
+
+            if (rollMatch) {
+                hits = await sizeReduction(rollMatch);
+            } else if (rangeMatch) {
+                let lower = parseInt(rangeMatch[1]);
+                let higher = parseInt(rangeMatch[2]);
+                let hitQuery = '';
+                for (let i = lower; i <= higher; i++) {
+                    hitQuery += `|${i}`
+                }
+                let hitsString = await extractQueryResult(`?{How many hits?${hitQuery}}`);
+                hits = parseInt(hitsString);
+            } else if (rollMatch2) {
+                hits = await sizeReduction(rollMatch2)
+            } else if (!size || size === 'None') {
+                hits = 0;
+            } else {
+                let hitsString = await extractQueryResult(`?{How many hits?|1}`);
+                hits = await extractRollResult(hitsString);
+            }
+
+            let attackType = await extractQueryResult(`?{How are you attacking?|Regular Attack|Low Attack|High Attack${spellSizeCategory === 2 ? '|Called Shot' : ''}}`);
+            rollBuilder.push(`attack=${attackType}`);
+
+            let locationDice;
+            let locationRolls = [];
+            let set = new Set();
+            if (attackType === 'Called Shot' && hits === 1) {
+                let locationList = [];
+                for (const [key, value] of Object.entries(LOCATION_TABLE[targetType])) {
+                    let specificLocation = value.specific;
+                    if (!set.has(specificLocation)) {
+                        set.add(specificLocation)
+                        locationList.push(`${specificLocation},${key}`)
+                    }
+                }
+                set.clear();
+                locationRolls.push(await extractQueryResult(`?{Where are you hitting?|${locationList.join('|')}}`));
+            } else {
+                switch (attackType) {
+                    case 'Regular Attack': locationDice = '1d10'; break;
+                    case 'Low Attack': locationDice = '1d6'; break;
+                    case 'High Attack': locationDice = '1d6+4'; break;
+                }
+                for (let i = 0; i < hits; i++) {
+                    locationRolls.push(await extractRollResult(locationDice));
+                }
+            }
+
+            let severityDice = await extractQueryResult('?{How severe is the effect?' +
+                '|Minor 1d6 (Max. potential damage is less than ½ target max hp),1d6' +
+                '|Major 2d4 (Max. potential damage is less than target max hp),2d4' +
+                '|Severe 2d6 (Max. potential damage is less than twice target max hp),2d6' +
+                '|Mortal 2d8 (Max. potential damage is twice or more target max hp),2d8}');
+            switch (severityDice) { // optional to add this
+                case '1d6': rollBuilder.push(`severity=Minor`); break;
+                case '2d4': rollBuilder.push(`severity=Major`); break;
+                case '2d6': rollBuilder.push(`severity=Severe`); break;
+                case '2d8': rollBuilder.push(`severity=Mortal`); break;
+            }
+
+            if (hits > 0 && errors.length === 0)
+                rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''} and rolling ${severityDice} for effect`);
+            else
+                rollBuilder.push(`hits=Cannot show effects due to missing fields: ${errors.join(', ')}`);
+
+            let boolObj = {};
+            if (spellTypeTable) {
+                for (let i = 0; i < locationRolls.length; i++) {
+                    let locationRoll = locationRolls[i];
+                    let locationObject = LOCATION_TABLE[targetType][locationRoll];
+                    let locationNote = '';
+                    if (targetType !== 'Humanoid' && locationObject.general === 'Legs' && !boolObj.isSnakeLike) {
+                        boolObj.isSnakeLike = await extractQueryResult('?{Is the target snake-like or fish-like?|No|Yes}');
+                    }
+                    if (targetType !== 'Humanoid' && locationObject.general === 'Legs' && boolObj.isSnakeLike === 'Yes') {
+                        locationObject = LOCATION_TABLE[targetType][5];
+                        locationNote = locationObject.note;
+                    }
+
+                    let severityRoll = await debugSeverity(severityDice);
+                    let displayLocationRoll = attackType === 'Called Shot'
+                        ? ''
+                        : `(${locationDice}:${locationRoll})`;
+                    let {effect, additionalLocations} = lookupEffect(severityRoll, spellTypeTable, locationObject.general, targetType, set);
+                    let displayEffect = `Location ${i+1} hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll}=${effect}`;
+                    rollBuilder.push(displayEffect);
+
+                    await recursiveAdditionalHit(additionalLocations, i+1, 'additional', severityDice, boolObj, spellTypeTable, targetType, rollBuilder, set);
+                }
+            }
+
+            let displayHits = rollBuilder.map(s => `{{${s}}}`).join(' ');
+            let displayInjuries = Array.from(set).map(s => `{{${s}}}`).join(' ');
+            let finalRollText = `&{template:2Epocrit} ${displayHits} ${displayInjuries}`;
+
+            console.log(finalRollText);
+
+            startRoll(finalRollText, function (roll) {
+                console.log(roll);
+                let computedRolls = {};
+                finishRoll(roll.rollId, computedRolls);
+            });
+        });
+    });
+}
+
+function critEffectExplanations(critEffect, set) {
+    let injuryMatch = critEffect.match(INJURY_REGEX);
+    if (!injuryMatch)
+        return;
+
+    injuryMatch = injuryMatch.map(s => s.toLowerCase().replace('internal ', '').trim())
+        .filter((v, i, a) => a.indexOf(v) === i);
+    injuryMatch.forEach(key => {
+        switch (key) {
+            case 'graze':
+            case 'singed':
+            case 'chilled':
+                set.add('grazed=1');
+                break;
+            case 'struck':
+                set.add('struck=1');
+                break;
+            case 'injured':
+            case 'burn':
+            case 'frostbit':
+                set.add('injured=1');
+                break;
+            case 'broken':
+                set.add('broken=1');
+                break;
+            case 'crushed':
+            case 'shattered':
+            case 'destroyed':
+                set.add('crushed=1');
+                break;
+            case 'frozen':
+                set.add('crushed=1');
+                set.add('frozen=1');
+                break;
+            case 'severed':
+            case 'dissolved':
+            case 'incinerated':
+                set.add('severed=1');
+                break;
+            case 'minor bleeding':
+                set.add('minorbleeding=1');
+                set.add('bleedingnote=1');
+                break;
+            case 'major bleeding':
+                set.add('majorbleeding=1');
+                set.add('bleedingnote=1');
+                break;
+            case 'severe bleeding':
+                set.add('severebleeding=1');
+                set.add('bleedingnote=1');
+                break;
+        }
+    });
+}
+
+function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc) {
+    getAttrs(fields, async function (values) {
+        let rollBuilder = ['character=@{character_name}'];
+        let errors = [];
+
+        let weaponName = nameFunc(values);
+        let weaponSize = displaySize(values[prefix+'size']);
+        if (weaponName.match(/heavy (crossbow|quarrel|bolt)/i)) {
+            weaponSize = 'Large';
+        } else if (weaponName.match(/arrow|quarrel|bolt/i)) {
+            weaponSize = 'Medium';
+        }
+        let weaponType = values[prefix+'type'];
+        if (weaponType.includes('/')) {
+            let displayTypes = weaponType.split('/')
+                .map(s => displayWeaponType(s))
+                .join('|');
+
+            weaponType = await extractQueryResult(`?{How are your attack with your weapon?|${displayTypes}}`);
+        } else {
+            weaponType = displayWeaponType(weaponType);
+        }
+        rollBuilder.push(`name=${weaponName}`);
+        rollBuilder.push(`size=${weaponSize}`);
+        rollBuilder.push(`type=${weaponType}`);
+
+        let targetType = await extractQueryResult('?{What are you attacking?|Humanoid|Animal|Monster}');
+        let targetSize = await extractQueryResult('?{Target size?|Medium|Tiny|Small|Medium|Large|Huge|Gargantuan}');
+        rollBuilder.push(`target=${targetType}`);
+        rollBuilder.push(`targetsize=${targetSize}`);
+
+        let attackType = await extractQueryResult('?{How are you attacking?|Regular Attack|Low Attack|High Attack|Called Shot}');
+        rollBuilder.push(`attack=${attackType}`);
+
+        let locationDice = '';
+        let locationRoll;
+        let set = new Set();
+        if (attackType === 'Called Shot') {
+            let locationList = [];
+            for (const [key, value] of Object.entries(LOCATION_TABLE[targetType])) {
+                let specificLocation = value.specific;
+                if (!set.has(specificLocation)) {
+                    set.add(specificLocation)
+                    locationList.push(`${specificLocation},${key}`)
+                }
+            }
+            set.clear();
+            locationRoll = await extractQueryResult(`?{Where are you hitting?|${locationList.join('|')}}`);
+        } else {
+            switch (attackType) {
+                case 'Regular Attack': locationDice = '1d10'; break;
+                case 'Low Attack': locationDice = '1d6'; break;
+                case 'High Attack': locationDice = '1d6+4'; break;
+            }
+            locationRoll = await extractRollResult(locationDice);
+        }
+
+        let locationObject = LOCATION_TABLE[targetType][locationRoll];
+        let locationNote = '';
+        if (locationRoll < 5 && targetType !== 'Humanoid') {
+            let isSnakeLike = await extractQueryResult('?{Is the target snakelike or fishlike?|No|Yes}');
+            if (isSnakeLike === "Yes") {
+                locationObject = LOCATION_TABLE[targetType][5];
+                locationNote = locationObject.note;
+            }
+        }
+
+        let severityDice;
+        const sizeDiff = sizeToInt(weaponSize) - sizeToInt(targetSize);
+        if (sizeDiff < 0) {
+            rollBuilder.push(`severity=Minor`);
+            severityDice = '1d6';
+        } else if (sizeDiff === 0) {
+            rollBuilder.push(`severity=Major`);
+            severityDice = '2d4';
+        } else if (sizeDiff === 1) {
+            rollBuilder.push(`severity=Severe`);
+            severityDice = '2d6';
+        } else if (sizeDiff > 1) {
+            rollBuilder.push(`severity=Mortal`);
+            severityDice = '2d8';
+        }
+        let severityRoll = await extractRollResult(severityDice);
+
+        let critEffect = '';
+        let weaponTypeTable = WEAPON_CRIT_EFFECT_TABLE[weaponType];
+        if (weaponTypeTable) {
+            if (severityRoll < 4) {
+                critEffect = 'No unusual effect'
+            } else if (locationObject) {
+                let severityLookup = severityRoll > 12 ? 12 : severityRoll;
+                critEffect = weaponTypeTable[targetType][locationObject.general][severityLookup];
+            } else {
+                critEffect = 'No unusual effect';
+            }
+
+            let displayLocationRoll = attackType === 'Called Shot'
+                ? ''
+                : `(${locationDice}:${locationRoll})`;
+            rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll} and rolling ${severityDice} for effect=[[${severityRoll}]]: ${critEffect}`);
+            critEffectExplanations(critEffect, set);
+        } else {
+            errors.push('weapon type');
+        }
+
+        let weaponDamage = baseDamageFunc(targetSize, values);
+        if (weaponDamage.match(/\d/)) {
+            let damage;
+            if (severityRoll > 12) {
+                rollBuilder.push(`multiplier=(Triple)`);
+                damage = `(${weaponDamage})*3`;
+            } else if (critEffect.includes('triple') && await extractQueryResult('?{Is the target wearing armor?|Yes|No}') === 'No') {
+                rollBuilder.push(`multiplier=(Triple)`);
+                damage = `(${weaponDamage})*3`;
+            } else {
+                rollBuilder.push(`multiplier=(Double)`);
+                damage = `(${weaponDamage})*2`;
+            }
+            rollBuilder.push(`damage=[[${damage}+[[${damageAdjFunc(values)}]] ]]`);
+        }
+
+        if (errors.length > 0)
+            rollBuilder.push(`hits=Cannot show effects due to missing fields: ${errors.join(', ')}`);
+
+        let displayHits = rollBuilder.map(s => `{{${s}}}`).join(' ');
+        let displayInjuries = Array.from(set).map(s => `{{${s}}}`).join(' ');
+        let finalRollText = `&{template:2Epocrit} ${displayHits} ${displayInjuries}`;
+
+        console.log(finalRollText);
+
+        startRoll(finalRollText, function (roll) {
+            console.log(roll);
+            let computedRolls = {};
+            finishRoll(roll.rollId, computedRolls);
+        });
+    });
+}
 //#endregion
 
 //#region Proficiencies
@@ -1530,20 +2211,154 @@ on('change:repeating_profs:profslots remove:repeating_profs change:prof-slots-to
 });
 //Nonweapon proficiency autofill
 on('change:repeating_profs:profname', function (eventInfo) {
-    let nonweaponProficiency = nonweaponProficiencies[eventInfo.newValue];
-    if (!nonweaponProficiency)
+    let nonweaponProficiencies = NONWEAPON_PROFICIENCIES_TABLE[eventInfo.newValue];
+    if (!nonweaponProficiencies)
         return;
 
-    getAttrs(BOOK_FIELDS, function (books) {
-        if (bookInactiveShowToast(books, nonweaponProficiency))
+    let comparer = function (nonweaponProf1, nonweaponProf2, isPlayersOption) {
+        return ['slots','abilityScore','modifier'].every(f => nonweaponProf1[f] === nonweaponProf2[f])
+    }
+
+    getAttrs(BOOK_FIELDS, async function (books) {
+        let nonweaponProficiency = await selectVersion(nonweaponProficiencies, books, comparer, 'nonweapon proficiency');
+        console.log(nonweaponProficiency);
+        if (!nonweaponProficiency)
             return;
 
-        setAttrs({
-            'repeating_profs_profslots'  : nonweaponProficiency['slots'],
-            'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
-            'repeating_profs_profmod'    : nonweaponProficiency['modifier'],
-        });
+        let rowId = parseSourceAttribute(eventInfo).rowId;
+
+        let nonweaponProfInfo = {};
+        nonweaponProfInfo[`repeating_profs_${rowId}_profslots`]   = nonweaponProficiency['slots'];
+        nonweaponProfInfo[`repeating_profs_${rowId}_profstatnum`] = nonweaponProficiency['abilityScore'];
+        nonweaponProfInfo[`repeating_profs_${rowId}_profmod`]     = nonweaponProficiency['modifier'];
+        setAttrs(nonweaponProfInfo);
     });
+});
+
+//#region Special Talents
+on('change:repeating_talents:talentname', function (eventInfo) {
+    let talent = TALENTS[eventInfo.newValue];
+    if (!talent)
+        return;
+    let abilityField = talent['abilityScore'].replace(/[@{}]|N\/A/g, '').toLowerCase();
+    let subAbilityField = talent['subAbilityScore'].replace(/[@{}]/g, '').toLowerCase();
+    let fields = [abilityField, subAbilityField, ...BOOK_FIELDS].filter(Boolean);
+    getAttrs(fields, function (values) {
+        if (bookInactiveShowToast(values, talent))
+            return;
+        let abilityScore;
+        let abilityScoreString;
+        if (values[subAbilityField]) {
+            abilityScore = parseInt(values[subAbilityField]) || 0;
+            abilityScoreString = talent['subAbilityScore'];
+        } else {
+            abilityScore = parseInt(values[abilityField]) || 0;
+            abilityScoreString = talent['abilityScore'];
+        }
+
+        let newValue = {};
+        newValue['repeating_talents_talentslots'] = talent['slots'];
+        newValue['repeating_talents_talentpoints'] = talent['points'];
+        newValue['repeating_talents_talentstatnum'] = abilityScoreString;
+        newValue['repeating_talents_talentmod'] = talent['modifier'];
+        newValue['repeating_talents_talentrating'] = talent['rating'] || '';
+        newValue['repeating_talents_talentratingmod'] = ABILITY_MODIFIERS[abilityScore] || 0;
+        setAttrs(newValue);
+    });
+});
+
+on('change:repeating_talents:talentslots change:repeating_talents:talentpoints remove:repeating_talents', function (eventInfo) {
+    if (doEarlyReturn(eventInfo, ['talentslots']) && doEarlyReturn(eventInfo, ['talentpoints']))
+        return;
+    if (isSheetWorkerUpdate(eventInfo) && eventInfo.triggerName.includes('talentpoints'))
+        return;
+
+    TAS.repeating('talents')
+        .attrs('talent-slots-spent','talent-spent')
+        .fields('talentslots','talentpoints')
+        .reduce(function(m,r){
+            m.slots+=(r.I['talentslots']);
+            m.points+=(r.I['talentpoints']);
+            return m;
+
+        },{slots:0,points:0},function(m,r,a){
+            a.I['talent-slots-spent']=m.slots;
+            a.I['talent-spent']=m.points;
+        })
+        .execute();
+});
+
+on('change:repeating_talents:talentstatnum', async function (eventInfo) {
+    if (isSheetWorkerUpdate(eventInfo))
+        return;
+
+    let parse = parseSourceAttribute(eventInfo);
+    getAttrs(['repeating_talents_talentstatnum'], async function (values) {
+        let abilityScore = values['repeating_talents_talentstatnum'];
+        if (!abilityScore.startsWith('@') && isNaN(parseInt(abilityScore)))
+            return;
+
+        let abilityScoreValue = await extractRollResult(abilityScore);
+
+        let newValue = {};
+        newValue[`repeating_talents_${parse.rowId}_talentratingmod`] = ABILITY_MODIFIERS[abilityScoreValue] || 0;
+        setAttrs(newValue);
+    });
+});
+//#endregion
+
+//#region Traits
+on('change:repeating_traits:traitname', function (eventInfo) {
+    let trait = TRAITS[eventInfo.newValue];
+    if (!trait)
+        return;
+    let subAbilityField = trait['subAbilityScore'].replace(/[@{}]|N\/A/g, '').toLowerCase();
+    let fields = [subAbilityField, ...BOOK_FIELDS].filter(Boolean);
+    getAttrs(fields, function (values) {
+        if (bookInactiveShowToast(values, trait))
+            return;
+        let abilityScoreString = values[subAbilityField]
+            ? trait['subAbilityScore']
+            : trait['abilityScore'];
+
+        let newValue = {};
+        newValue['repeating_traits_traitpoints'] = trait['points'];
+        newValue['repeating_traits_traitstatnum'] = abilityScoreString;
+        setAttrs(newValue);
+    });
+});
+
+on('change:repeating_traits:traitpoints remove:repeating_traits', function (eventInfo) {
+    if (doEarlyReturn(eventInfo, ['traitpoints']))
+        return;
+    TAS.repeatingSimpleSum('traits', 'traitpoints', 'trait-spent');
+});
+//#endregion
+
+//#region Disadvantages
+on('change:repeating_disads:disadname', function (eventInfo) {
+    let disadvantage = DISADVANTAGES[eventInfo.newValue];
+    if (!disadvantage)
+        return;
+    let subAbilityField = disadvantage['subAbilityScore'].replace(/(ceil)?[\(\)@{}/2]/g, '').toLowerCase();
+    let fields = [subAbilityField, ...BOOK_FIELDS].filter(Boolean);
+    getAttrs(fields, async function (values) {
+        if (bookInactiveShowToast(values, disadvantage))
+            return;
+        let abilityScoreString = values[subAbilityField]
+            ? disadvantage['subAbilityScore']
+            : disadvantage['abilityScore'];
+
+        let newValue = {};
+        newValue[`repeating_disads_disadpoints`] = disadvantage['points'];
+        newValue[`repeating_disads_disadstatnum`] = abilityScoreString;
+        setAttrs(newValue);
+    });
+});
+on('change:repeating_disads:disadpoints remove:repeating_disads', function (eventInfo) {
+    if (doEarlyReturn(eventInfo, ['disadpoints']))
+        return;
+    TAS.repeatingSimpleSum('disads', 'disadpoints', 'disadvantage-gained');
 });
 //#endregion
 
@@ -1568,7 +2383,7 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
             m.mountgearweight+=(r.F['gear-stored-weight'] * r.I['gear-stored-qty'] * r.I['on-mount']);
             return m;
 
-        },{allgearweight:0,mountgearweight:0, desc: []},function(m,r,a){
+        },{allgearweight:0,mountgearweight:0},function(m,r,a){
             a.D[2]['mount-gear-weight-total']=m.mountgearweight;
             a.D[2]['stored-gear-weight-total']=(m.allgearweight-m.mountgearweight);
         })

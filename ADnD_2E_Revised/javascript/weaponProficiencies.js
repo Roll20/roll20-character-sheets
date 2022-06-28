@@ -174,7 +174,7 @@ weaponProficiencies['Broad Group, Arrow-Firing Missile Weapons'] = {
     'slots': 3,
     'book': 'The Complete Ninja\'s Handbook'
 };
-weaponProficiencies['Broad Group, Chan/Rope Weapons'] = {
+weaponProficiencies['Broad Group, Chain/Rope Weapons'] = {
     'slots': 3,
     'book': 'The Complete Ninja\'s Handbook'
 };
@@ -412,4 +412,250 @@ weaponProficiencies['Special Maneuver: Levitation (7)'] = {
 };
 //#endregion
 
+//#region Player's Options: Combat & Tactics
+weaponProficiencies['Tight Group, Hammers'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Maces'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Daggers & Knives'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Spear-like polearms'] = {
+    'slots': 2,
+    'category': 'Polearms',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Poleaxes'] = {
+    'slots': 2,
+    'category': 'Polearms',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Bills'] = {
+    'slots': 2,
+    'category': 'Polearms',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Glaives'] = {
+    'slots': 2,
+    'category': 'Polearms',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Beaked'] = {
+    'slots': 2,
+    'category': 'Polearms',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Javelins'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Ancient Swords'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Roman Swords'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Middle Eastern Swords'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Oriental Swords'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Short Swords'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Medium Swords'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Large Swords'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Chain & Rope Weapons'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Martial Arts Weapons'] = {
+    'slots': 2,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Hand match weapons'] = {
+    'slots': 2,
+    'category': 'Firearms',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Matchlocks'] = {
+    'slots': 2,
+    'category': 'Firearms',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Wheellocks'] = {
+    'slots': 2,
+    'category': 'Firearms',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Tight Group, Snaplocks and Flintlocks'] = {
+    'slots': 2,
+    'category': 'Firearms',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Broad Group, Axes, Picks, and Hammers'] = {
+    'slots': 3,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Broad Group, Clubs, Maces, and Flails'] = {
+    'slots': 3,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Broad Group, Axes, Picks, and Hammers'] = {
+    'slots': 3,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Broad Group, Polearms'] = {
+    'slots': 3,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Broad Group, Spears & Javelins'] = {
+    'slots': 3,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Broad Group, Swords'] = {
+    'slots': 3,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Broad Group, Firearms'] = {
+    'slots': 3,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Missile or Thrown Weapon Style Specialization'] = {
+    'slots': 1,
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Buckler'] = {
+    'slots': 1,
+    'category': 'Shield Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Small shield'] = {
+    'slots': 1,
+    'category': 'Shield Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Medium shield'] = {
+    'slots': 1,
+    'category': 'Shield Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Body shield'] = {
+    'slots': 1,
+    'category': 'Shield Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Banded mail'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Brigandine'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Bronze plate'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Chain mail'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Cord armor'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Field plate'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Full plate'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Hide armor'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Improved mail'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Leather armor'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Light scale'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Metal lamellar'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Padded armor'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Plate mail'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Ring mail'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Scale armor'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Splint mail'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Studded leather'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+weaponProficiencies['Wood/bone armor'] = {
+    'slots': 1,
+    'category': 'Armor Proficiency',
+    'book': 'Player\'s Options: Combat & Tactics'
+};
+//#endregion
 module.exports = weaponProficiencies;

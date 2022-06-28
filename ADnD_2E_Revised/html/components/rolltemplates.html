@@ -1,4 +1,4 @@
-﻿<rolltemplate class="sheet-rolltemplate-2Edefault">
+<rolltemplate class="sheet-rolltemplate-2Edefault">
     <div class="sheet-template-container">
         <div class="sheet-template-head {{color}}">
             <table>
@@ -58,9 +58,9 @@
                     <td colspan="3"><span class="weapon-used">{{weapon_used}}</span></td>
                 </tr>
                 <tr>
-                    <td class="attack-c1"><b>S/M</b></td>
+                    <td><b>S/M</b></td>
                     <td class="sheet-template-attack-image sheet-template-attack-ac" rowspan="2">{{ac_hit}}</td>
-                    <td class="attack-c1"><b>L</b></td>
+                    <td><b>L</b></td>
                 </tr>
                 <tr>
                     <td class="sheet-template-attack-image sheet-template-attack-dmg" rowspan="2">
@@ -136,13 +136,57 @@
                     <td class="sheet-spell-c1"><span class="sheet-spell-prop">Components</span><br>{{components}}</td>
                 </tr>
                 <tr>
-                    <td class="spell-c1"><span class="sheet-spell-prop">Duration</span><br>{{duration}}</td>
-                    <td class="spell-c1"><span class="sheet-spell-prop">Casting Time</span><br>{{time}}</td>
+                    <td class="sheet-spell-c1"><span class="sheet-spell-prop">Duration</span><br>{{duration}}</td>
+                    <td class="sheet-spell-c1"><span class="sheet-spell-prop">Casting Time</span><br>{{time}}</td>
                 </tr>
                 <tr>
                     <td class="sheet-spell-c1"><span class="sheet-spell-prop">Area of Effect</span><br>{{aoe}}</td>
-                    <td class="spell-c1"><span class="sheet-spell-prop">Saving Throw</span><br>{{save}}</td>
+                    <td class="sheet-spell-c1"><span class="sheet-spell-prop">Saving Throw</span><br>{{save}}</td>
                 </tr>
+                {{#subtlety}}
+                {{#sensory}}
+                <tr>
+                    <td class="sheet-spell-c1"><span class="sheet-spell-prop">Casting Subtlety</span><br>{{subtlety}}</td>
+                    <td class="sheet-spell-c1"><span class="sheet-spell-prop">Sensory Signature</span><br>{{sensory}}</td>
+                </tr>
+                {{/sensory}}
+                {{/subtlety}}
+                {{#subtlety}}
+                {{^sensory}}
+                <tr>
+                    <td class="sheet-spell-c1" colspan="2"><span class="sheet-spell-prop">Casting Subtlety</span><br>{{subtlety}}</td>
+                </tr>
+                {{/sensory}}
+                {{/subtlety}}
+                {{^subtlety}}
+                {{#sensory}}
+                <tr>
+                    <td class="sheet-spell-c1" colspan="2"><span class="sheet-spell-prop">Sensory Signature</span><br>{{sensory}}</td>
+                </tr>
+                {{/sensory}}
+                {{/subtlety}}
+                {{#knockdown}}
+                {{#crit}}
+                <tr>
+                    <td class="sheet-spell-c1"><span class="sheet-spell-prop">Knockdown</span><br>{{knockdown}}</td>
+                    <td class="sheet-spell-c1"><span class="sheet-spell-prop">Critical Strikes</span><br>{{crit}}</td>
+                </tr>
+                {{/crit}}
+                {{/knockdown}}
+                {{#knockdown}}
+                {{^crit}}
+                <tr>
+                    <td class="sheet-spell-c1" colspan="2"><span class="sheet-spell-prop">Knockdown</span><br>{{knockdown}}</td>
+                </tr>
+                {{/crit}}
+                {{/knockdown}}
+                {{^knockdown}}
+                {{#crit}}
+                <tr>
+                    <td class="sheet-spell-c1" colspan="2"><span class="sheet-spell-prop">Critical Strikes</span><br>{{crit}}</td>
+                </tr>
+                {{/crit}}
+                {{/knockdown}}
                 {{#damage}}
                 <tr>
                     <td colspan="2" class="sheet-spell-c1"><span class="sheet-spell-prop">Damage: </span>
@@ -951,6 +995,194 @@
                         <td class="sheet-template-result sheet-template-failure sheet-ignore-inlineroll">Miss!<br><span class="sheet-miss-text">{{splashdmg}}</span></td>
                         {{/rollBetween() computed::splash 0 0}}
                     {{/rollBetween() computed::hit 0 0}}
+                </tr>
+            </table>
+        </div>
+    </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-2Epocrit">
+    <div class="sheet-template-container">
+        <div class="sheet-template-head {{color}}">
+            <table>
+                <tr>
+                    <th style="width: 50%">{{name}}</th>
+                    <th rowspan="2">vs</th>
+                    <th style="width: 50%">{{target}}</th>
+                </tr>
+                <tr>
+                    <th>({{size}}{{#type}}, {{type}}{{/type}})</th>
+                    <th>({{targetsize}})</th>
+                </tr>
+            </table>
+        </div>
+        <div class="sheet-template-body">
+            <table>
+                <tr>
+                    <td>{{character}} lands a <strong>{{severity}}</strong> <em>{{attack}}</em></td>
+                </tr>
+                {{#damage}}
+                <tr>
+                    <td>Dealing {{multiplier}}: {{damage}} damage</td>
+                </tr>
+                {{/damage}}
+                {{#hits}}
+                <tr>
+                    <td>
+                        {{hits}}
+                    </td>
+                </tr>
+                {{/hits}}
+                {{#allprops() name size type target targetsize character severity attack multiplier damage hits grazed struck injured broken crushed severed minorbleeding majorbleeding severebleeding bleedingnote color}}
+                <tr>
+                    <td>
+                        {{key}}
+                        <br>
+                        <br>
+                        <p>
+                            {{value}}
+                        </p>
+                    </td>
+                </tr>
+                {{/allprops() name size type target targetsize character severity attack multiplier damage hits grazed struck injured broken crushed severed minorbleeding majorbleeding severebleeding bleedingnote color}}
+                <tr>
+                    <td>
+                        {{#grazed}}
+                        <p class="sheet-template-injury">
+                            <strong>Grazed, Singed, Chilled, Bruised</strong>
+                            <br>
+                            <span><u>Magical healing:</u> Cure light wounds</span>
+                            <br>
+                            <span>- Any magical healing capable of 4+ (fix and hp gained)</span>
+                            <br>
+                            <span><u>Natural healing:</u> As if 1d6 damage</span>
+                        </p>
+                        {{/grazed}}
+                        {{#struck}}
+                        <p class="sheet-template-injury">
+                            <strong>Struck, Blistered</strong>
+                            <br>
+                            <span><u>Magical healing:</u> Cure light wounds</span>
+                            <br>
+                            <span>- Any magical healing capable of 5+ (fix and hp gained)</span>
+                            <br>
+                            <span><u>Natural healing:</u> As if 2d6 damage</span>
+                        </p>
+                        {{/struck}}
+                        {{#injured}}
+                        <p class="sheet-template-injury">
+                            <strong>Injured, Burned, Frostbitten</strong>
+                            <br>
+                            <span><u>Magical healing:</u> Cure serious wounds</span>
+                            <br>
+                            <span>- Any magical healing capable of 10+ (fix and hp gained)</span>
+                            <br>
+                            <span><u>Natural healing:</u> As if 10d6 damage</span>
+                        </p>
+                        {{/injured}}
+                        {{#broken}}
+                        <p class="sheet-template-injury">
+                            <strong>Broken</strong>
+                            <br>
+                            <span><u>Magical healing:</u> Cure serious wounds (fix only)</span>
+                            <br>
+                            <span><u>Natural healing:</u> As if 20d6 damage</span>
+                            <br>
+                            <span><u>Max hp reduction:</u> Arms 25%.</span>
+                            <br>
+                            <span>- Ribs, legs 50%.</span>
+                            <br>
+                            <span>- Other 75%</span>
+                        </p>
+                        {{/broken}}
+                        {{#crushed}}
+                        <p class="sheet-template-injury">
+                            <strong>Crushed, Shattered, Frozen, Destroyed</strong>
+                            <br>
+                            <span><u>Magical healing:</u> Cure critical wounds</span>
+                            <br>
+                            <span>- Any magical healing capable of 20+ (fix only)</span>
+                            <br>
+                            <span><u>Natural healing:</u> Never</span>
+                            <br>
+                            <span><u>Max hp reduction:</u> Shoulders, hips, limbs 50%.</span>
+                            <br>
+                            <span>- Other 75%</span>
+                            <br>
+                            <span><u>Note:</u> Bones (if any) are considered Broken</span>
+                        </p>
+                        {{/crushed}}
+                        {{#frozen}}
+                        <p class="sheet-template-injury">
+                            <u>Note:</u> A frozen result kills the affected tissue; without access to powerful healing magic, the victim must have a frozen limb removed within Id3 days to prevent lethal infection or gangrene.
+                        </p>
+                        {{/frozen}}
+                        {{#severed}}
+                        <p class="sheet-template-injury">
+                            <strong>Severed, Dissolved, Incinerated</strong>
+                            <br>
+                            <span><u>Magical healing:</u> Regeneration spell</span>
+                            <br>
+                            <span><u>Natural healing:</u> Never</span>
+                            <br>
+                            <span><u>Max hp reduction:</u> Partial limb 25%.</span>
+                            <br>
+                            <span>- Complete limb 50%</span>
+                            <br>
+                            <span>
+                                <u>Note:</u> Cannot independently move or attack for 2d10 weeks. At the DM's discretion, if "only" a hand or foot, limited actions can be performed after 1d6 rounds of being stunned, by passing a System Shock roll creatures with more than four libs (insects or octopus-like) are slightly more resistant to this sort of trauma and may fight after one or two rounds of being stunned.
+                                <br>
+                                If compensated with a wooden leg or hook, the hit point loss may be reduced by one step
+                            </span>
+                        </p>
+                        {{/severed}}
+                        {{#minorbleeding}}
+                        <p class="sheet-template-injury">
+                            <strong>Minor Bleeding</strong>
+                            <br>
+                            <span><u>Damage</u> 1d2 per full turn</span>
+                            <br>
+                            <span><u>Stop bleeding:</u> Any magical healing</span>
+                            <br>
+                            <span>- Save vs Death after every bleeding damage to naturally stop</span>
+                            <br>
+                            <span>- Bandages from any character (including the injured), 1d6 combat rounds or 1 one-minute round</span>
+                        </p>
+                        {{/minorbleeding}}
+                        {{#majorbleeding}}
+                        <p class="sheet-template-injury">
+                            <strong>Major Bleeding</strong>
+                            <br>
+                            <span><u>Damage</u> 1d2 per combat round</span>
+                            <br>
+                            <span><u>Stop bleeding:</u> Cure light wounds</span>
+                            <br>
+                            <span>- Any 5+ magical healing (fix and hp gained)</span>
+                        </p>
+                        {{/majorbleeding}}
+                        {{#severebleeding}}
+                        <p class="sheet-template-injury">
+                            <strong>Severe Bleeding</strong>
+                            <br>
+                            <span><u>Damage</u> 10-60% (1d6*10%) max hp per combat round</span>
+                            <br>
+                            <span><u>Stop bleeding:</u> Cure critical wounds stops the bleeding</span>
+                            <br>
+                            <span>- Cure serious wounds or any 10+ magical healing reduces bleeding to minor</span>
+                            <br>
+                            <span>- Cure light wound or any 5+ magical healing reduces bleeding to major</span>
+                            <br>
+                            <span>- Successful Healing proficiency check -4 reduces to major</span>
+                        </p>
+                        {{/severebleeding}}
+                        {{#bleedingnote}}
+                        <p class="sheet-template-injury">
+                            Bleeding from several wounds is cumulative
+                            <br>
+                            All bleeding "stops" and becomes 1 hp per round once character hits 0 or less hp
+                        </p>
+                        {{/bleedingnote}}
+                    </td>
                 </tr>
             </table>
         </div>
