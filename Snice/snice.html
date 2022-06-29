@@ -1,0 +1,374 @@
+<rolltemplate class="sheet-rolltemplate-snice">
+    <div class="sheet-template-container">
+	    <div class="sheet-template-row rt-result">
+	        {{#result}}{{result}}{{/result}}
+	        {{#result2}}<div class="sheet-template-row rt-advantage">{{result2}}</div>{{/result2}}
+	        
+	        {{#cost}}<div class="sheet-template-row rt-cost" title="Skill / Ability Cost (Endurance)">{{cost}}</div>{{/cost}}
+	        <div class="sheet-template-header">{{name}}
+	        {{#description}}<div class="sheet-template-row rt-description">{{description}}</div>{{/description}}
+	        </div>
+	    </div>
+    </div>
+</rolltemplate>
+
+
+
+
+<div class="left-container">
+<div class="head">
+<input type="hidden" name="attr_used_skill_points_total" value="0" />
+<input type="hidden" name="attr_Skill_Points_Bonus" value="0" />
+<input type="hidden" name="attr_Attribute_Points_Bonus" value="0" />
+<input type="hidden" name="attr_Life_Points_Bonus" value="0" />
+<div class="character-name">
+    <img src="https://raw.githubusercontent.com/Parou/Snice-Roll20/main/Snice.png" class="snice-logo" />
+    <input type="text" class="input giant" name="attr_character_name" />
+    <div class="level-exp">    
+        <div class="ring-input">
+            <div class="point-circle"><input type="number" class="point" name="attr_Exp" value="0" /></div>
+            <span class="small-text">Exp</span>
+        </div>
+        <div class="ring-input">
+            <div class="point-circle"><input type="number" class="point" name="attr_Level" value="1" /></div>
+            <span class="small-text">Level</span>
+        </div>
+    </div>
+    
+    <div class="gender line-value text">
+        <input type="text" placeholder="Gender" name="attr_Gender" class="line-input" />    
+    </div>
+</div>
+
+<div class="data">
+    <div class="data-input"><span class="data-name">Player:</span><input type="text" class="data-input-field" name="attr_Player_Name" value="" /></div>
+    <div class="data-input"><span class="data-name">Species:</span><input type="text" class="data-input-field" name="attr_Species" value="" /></div>
+    <div class="data-input"><span class="data-name">Class:</span><input type="text" class="data-input-field" name="attr_Class" value="" /></div>
+</div>
+</div>
+
+<div class="line-value">
+    <span class="small-text">Skill Points:</span><input type="number" class="line-input" name="attr_Total_Skill_Points" value="(2*@{Level}+@{Skill_Points_Bonus}-@{used_skill_points_total})" disabled />
+    <span class="smallest-text">(+2 every level)</span>
+</div>
+
+<div class="line-value">
+    <span class="small-text">Attribute Points:</span><input type="number" class="line-input" name="attr_Total_Points" value="((@{Level})+9+24+@{Attribute_Points_Bonus}-@{Attack}-@{Constitution}-@{Dexterity}-@{Magic}-@{Perception}-@{Intelligence}-@{Custom_1}-@{Custom_2}-@{Custom_3})" disabled />
+    <span class="smallest-text">(+1 every level)</span>
+</div>
+
+<div class="line-value">
+    <span class="small-text">Life Points:</span><input type="number" class="line-input" name="attr_Life_Points" value="16" /> / <input type="number" class="line-input" name="attr_Life_Points_max" value="((@{Constitution}+@{Dexterity}+@{Constitution_Bonus}+@{Dexterity_Bonus})*2+@{Life_Points_Bonus})" disabled />
+    <span class="smallest-text">(Constitution + Dexterity + Bonus) x 2</span>
+</div>
+
+<script type="text/worker">
+on("change:Magic change:Constitution change:Dexterity", function() {
+   getAttrs(["Magic", "Constitution", "Dexterity"], function(values) {
+      let Magic = parseInt(values.Magic)||0;
+      let Constitution = parseInt(values.Constitution)||0;
+      let Dexterity = parseInt(values.Dexterity)||0;
+      
+      let LP = ((Constitution + Dexterity)*2);
+      let baseEndurance = Math.floor(LP/2);
+      
+      let newEndurance;
+      
+      if(Magic > 4) { newEndurance = ((Magic - 4) + baseEndurance); }
+      else { newEndurance = baseEndurance; }
+      
+      setAttrs({
+          Endurance_max: newEndurance
+      });
+   });
+});
+</script>
+<div class="line-value">
+    <span class="small-text">Endurance:</span><input type="number" class="line-input" name="attr_Endurance" value="8" /> / <input type="number" class="line-input" name="attr_Endurance_max" readonly />
+    <span class="smallest-text">(Constitution + Dexterity + Magic above 4)</span>
+</div>
+
+<h2 class="h2">Attributes:
+<button type="roll" class="action-roll" value="@{Type}&{template:default} {{name=(Dexterity) @{Dexterity_Name}}} {{initiative=[[?{Modifier|Default, 1d20!!|Advantage, 2d20!!kh1|Disadvantage, 2d20!!kl1} + [[@{Dexterity_Modifier}]] &{tracker} ]] }} {{modifier=[[@{Dexterity_Modifier}]] }}" name="roll_InitiativeRoll">Initiative</button>
+</h2>
+
+<div class="attribute">
+    <span class="attribute-default-name">(Attack)</span>
+    <input type="text" class="input attribute-name" name="attr_Attack_Name" placeholder="Attack" value="" />
+    <button type="roll" class="checkroll" value="&{template:snice} {{name=Attack}} {{description=@{Attack_Name}}} {{result=[[1d20cs>20!! + [[@{Attack_Modifier}]] ]]}} {{result2=[[1d20cs>20!! + [[@{Attack_Modifier}]] ]]}} {{modifier=[[@{Attack_Modifier}]] }}" name="roll_AttackCheck"></button>
+    <span class="small-text">Points:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Attack" value="4" max="15" /></div>
+    <span class="small-text">Bonus:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Attack_Bonus" value="0" /></div>
+    <span class="small-text">Modifier:</span>
+    <div class="point-circle thick"><input type="number" class="point" name="attr_Attack_Modifier" value="(@{Attack}+@{Attack_Bonus}-5)" disabled /></div>
+</div>
+
+<div class="attribute">
+    <span class="attribute-default-name">(Constitution)</span>
+    <input type="text" class="input attribute-name" name="attr_Constitution_Name" placeholder="Constitution" value="" />
+    <button type="roll" class="checkroll" value="@{Type}&{template:snice} {{name=Constitution}} {{description=@{Constitution_Name}}} {{result=[[1d20cs>20!! + [[@{Constitution_Modifier}]] ]]}} {{result2=[[1d20cs>20!! + [[@{Constitution_Modifier}]] ]]}} {{modifier=[[@{Constitution_Modifier}]] }}" name="roll_ConstitutionCheck"></button>
+    <span class="small-text">Points:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Constitution" value="4" max="15" /></div>
+    <span class="small-text">Bonus:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Constitution_Bonus" value="0" /></div>
+    <span class="small-text">Modifier:</span>
+    <div class="point-circle thick"><input type="number" class="point" name="attr_Constitution_Modifier" value="(@{Constitution}+@{Constitution_Bonus}-5)" disabled /></div>
+</div>
+
+<div class="attribute">
+    <span class="attribute-default-name">(Dexterity)</span>
+    <input type="text" class="input attribute-name" name="attr_Dexterity_Name" placeholder="Dexterity" value="" />
+    <button type="roll" class="checkroll" value="@{Type}&{template:snice} {{name=Dexterity}} {{description=@{Dexterity_Name}}} {{result=[[1d20cs>20!! + [[@{Dexterity_Modifier}]] ]]}} {{result2=[[1d20cs>20!! + [[@{Dexterity_Modifier}]] ]]}} {{modifier=[[@{Dexterity_Modifier}]] }}" name="roll_DexterityCheck"></button>
+    <span class="small-text">Points:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Dexterity" value="4" max="15" /></div>
+    <span class="small-text">Bonus:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Dexterity_Bonus" value="0" /></div>
+    <span class="small-text">Modifier:</span>
+    <div class="point-circle thick"><input type="number" class="point" name="attr_Dexterity_Modifier" value="(@{Dexterity}+@{Dexterity_Bonus}-5)" disabled /></div>
+</div>
+
+<div class="attribute">
+    <span class="attribute-default-name">(Magic)</span>
+    <input type="text" class="input attribute-name" name="attr_Magic_Name" placeholder="Magic" value="" />
+    <button type="roll" class="checkroll" value="@{Type}&{template:snice} {{name=Magic}} {{description=@{Magic_Name}}} {{result=[[1d20cs>20!! + [[@{Magic_Modifier}]] ]]}} {{result2=[[1d20cs>20!! + [[@{Magic_Modifier}]] ]]}} {{modifier=[[@{Magic_Modifier}]] }}" name="roll_MagicCheck"></button>
+    <span class="small-text">Points:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Magic" value="4" max="15" /></div>
+    <span class="small-text">Bonus:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Magic_Bonus" value="0" /></div>
+    <span class="small-text">Modifier:</span>
+    <div class="point-circle thick"><input type="number" class="point" name="attr_Magic_Modifier" value="(@{Magic}+@{Magic_Bonus}-5)" disabled /></div>
+</div>
+
+<div class="attribute">
+    <span class="attribute-default-name">(Perception)</span>
+    <input type="text" class="input attribute-name" name="attr_Perception_Name" placeholder="Perception" value="" />
+    <button type="roll" class="checkroll" value="@{Type}&{template:snice} {{name=Perception}} {{description=@{Perception_Name}}} {{result=[[1d20cs>20!! + [[@{Perception_Modifier}]] ]]}} {{result2=[[1d20cs>20!! + [[@{Perception_Modifier}]] ]]}} {{modifier=[[@{Perception_Modifier}]] }}" name="roll_PerceptionCheck"></button>
+    <span class="small-text">Points:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Perception" value="4" max="15" /></div>
+    <span class="small-text">Bonus:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Perception_Bonus" value="0" /></div>
+    <span class="small-text">Modifier:</span>
+    <div class="point-circle thick"><input type="number" class="point" name="attr_Perception_Modifier" value="(@{Perception}+@{Perception_Bonus}-5)" disabled /></div>
+</div>
+
+<div class="attribute">
+    <span class="attribute-default-name">(Intelligence)</span>
+    <input type="text" class="input attribute-name" name="attr_Intelligence_Name" placeholder="Intelligence" value="" />
+    <button type="roll" class="checkroll" value="@{Type}&{template:snice} {{name=Intelligence}} {{description=@{Intelligence_Name}}} {{result=[[1d20cs>20!! + [[@{Intelligence_Modifier}]] ]]}} {{result2=[[1d20cs>20!! + [[@{Intelligence_Modifier}]] ]]}} {{modifier=[[@{Intelligence_Modifier}]] }}" name="roll_IntelligenceCheck"></button>
+    <span class="small-text">Points:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Intelligence" value="4" max="15" /></div>
+    <span class="small-text">Bonus:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Intelligence_Bonus" value="0" /></div>
+    <span class="small-text">Modifier:</span>
+    <div class="point-circle thick"><input type="number" class="point" name="attr_Intelligence_Modifier" value="(@{Intelligence}+@{Intelligence_Bonus}-5)" disabled /></div>
+</div>
+
+<div class="attribute">
+    <span class="attribute-default-name"></span>
+    <input type="text" class="input attribute-name" name="attr_Custom_1_Name" value="" />
+    <button type="roll" class="checkroll" value="@{Type}&{template:snice} {{name=@{Custom_1_Name}}} {{result=[[1d20cs>20!! + [[@{Custom_1_Modifier}]] ]]}} {{result2=[[1d20cs>20!! + [[@{Custom_1_Modifier}]] ]]}} {{modifier=[[@{Custom_1_Modifier}]] }}" name="roll_Custom_1Check"></button>
+    <span class="small-text">Points:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Custom_1" value="0" max="15" /></div>
+    <span class="small-text">Bonus:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Custom_1_Bonus" value="0" /></div>
+    <span class="small-text">Modifier:</span>
+    <div class="point-circle thick"><input type="number" class="point" name="attr_Custom_1_Modifier" value="(@{Custom_1}+@{Custom_1_Bonus}-5)" disabled /></div>
+</div>
+
+<div class="attribute">
+    <span class="attribute-default-name"></span>
+    <input type="text" class="input attribute-name" name="attr_Custom_2_Name" value="" />
+    <button type="roll" class="checkroll" value="@{Type}&{template:snice} {{name=@{Custom_2_Name}}} {{result=[[1d20cs>20!! + [[@{Custom_2_Modifier}]] ]]}} {{result2=[[1d20cs>20!! + [[@{Custom_2_Modifier}]] ]]}} {{modifier=[[@{Custom_2_Modifier}]] }}" name="roll_Custom_2Check"></button>
+    <span class="small-text">Points:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Custom_2" value="0" max="15" /></div>
+    <span class="small-text">Bonus:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Custom_2_Bonus" value="0" /></div>
+    <span class="small-text">Modifier:</span>
+    <div class="point-circle thick"><input type="number" class="point" name="attr_Custom_2_Modifier" value="(@{Custom_2}+@{Custom_2_Bonus}-5)" disabled /></div>
+</div>
+
+<div class="attribute">
+    <span class="attribute-default-name"></span>
+    <input type="text" class="input attribute-name" name="attr_Custom_3_Name" value="" />
+    <button type="roll" class="checkroll" value="@{Type}&{template:snice} {{name=@{Custom_3_Name}}} {{result=[[1d20cs>20!! + [[@{Custom_3_Modifier}]] ]]}} {{result2=[[1d20cs>20!! + [[@{Custom_3_Modifier}]] ]]}} {{modifier=[[@{Custom_3_Modifier}]] }}" name="roll_Custom_3Check"></button>
+    <span class="small-text">Points:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Custom_3" value="0" max="15" /></div>
+    <span class="small-text">Bonus:</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_Custom_3_Bonus" value="0" /></div>
+    <span class="small-text">Modifier:</span>
+    <div class="point-circle thick"><input type="number" class="point" name="attr_Custom_3_Modifier" value="(@{Custom_3}+@{Custom_3_Bonus}-5)" disabled /></div>
+</div>
+
+<div class="ring-input social-status">
+    <span class="small-text">Social<br />Status</span>
+    <div class="point-circle"><input type="number" class="point" name="attr_social_status" value="5" min="1" max="10" /></div>
+</div>
+
+<div class="line-value text">
+    <span class="small-text">Strengths:</span>
+    <input type="text" class="line-input" name="attr_Strength_1" value="" />
+    <input type="text" class="line-input" name="attr_Strength_2" value="" />
+    <input type="text" class="line-input" name="attr_Strength_3" value="" />
+</div>
+
+<div class="line-value text">
+    <span class="small-text">Weaknesses:</span>
+    <input type="text" class="line-input" name="attr_Weakness_1" value="" />
+    <input type="text" class="line-input" name="attr_Weakness_2" value="" />
+    <input type="text" class="line-input" name="attr_Weakness_3" value="" />
+</div>
+</div>
+
+<div class="right-container">
+    
+<h2 class="h2">Action Roll / Damage Roll:</h2>
+
+<div class="action-roll-manual">
+<button type="roll" name="roll_action" class="action-roll" value="@{Type}&{template:snice} {{name=Action / Damage Roll}} {{result=[[ [[ @{modifier_action} ]] + @{die1}@{explode_action} @{die2}@{explode_action}]] }} {{result2=[[ [[ @{modifier_action} ]] + @{die1}@{explode_action} @{die2}@{explode_action} ]] }}"></button>
+  
+  <select name="attr_die1" class="d1"> 
+    <option value="1d4cs>4">d4</option>
+    <option value="1d6cs>6">d6</option>
+    <option value="1d8cs>8">d8</option>
+    <option value="1d10cs>10">d10</option>
+    <option value="1d12cs>12">d12</option>
+    <option value="1d20cs>20">d20</option>
+    <option value="1d100cs>100">d100</option>
+  </select>
+  <select name="attr_die2" class="d2">
+    <option value=" "> </option> 
+    <option value="+ 1d4cs>4">d4</option>
+    <option value="+ 1d6cs>6">d6</option>
+    <option value="+ 1d8cs>8">d8</option>
+    <option value="+ 1d10cs>10">d10</option>
+    <option value="+ 1d12cs>12">d12</option>
+    <option value="+ 1d20cs>20">d20</option>
+    <option value="+ 1d100cs>100">d100</option>
+  </select>
+  
+  <select name="attr_modifier_action" class="modifier"> 
+    <option value="@{Attack_Modifier}">Attack</option>
+    <option value="@{Constitution_Modifier}">Constitution</option>
+    <option value="@{Dexterity_Modifier}">Dexterity</option>
+    <option value="@{Magic_Modifier}">Magic</option>
+    <option value="@{Perception_Modifier}">Perception</option>
+    <option value="@{Intelligence_Modifier}">Intelligence</option>
+    <option value="@{Custom_1_Modifier}">Custom Attribute 1</option>
+    <option value="@{Custom_2_Modifier}">Custom Attribute 2</option>
+    <option value="@{Custom_3_Modifier}">Custom Attribute 3</option>
+    <option value="0">No Modifier</option>
+  </select>
+  
+  <label class="label"><input type="radio" name="attr_explode_action" value="!!" checked /> Exploding</label>
+  <label class="label"><input type="radio" name="attr_explode_action" value=" " /> Flat</label>
+</div>
+
+
+
+<h2 class="h2">Skills / Abilities:</h2>
+
+<fieldset class="repeating_shortcuts">
+  <button type="roll" name="roll_skill" value="@{Type}&{template:snice} {{name=@{skillname}}} {{result=[[ [[ @{modifier} ]] + @{d1}@{exploding} @{d2}@{exploding} ]] }} {{result2=[[ [[ @{modifier} ]] + @{d1}@{exploding} @{d2}@{exploding} ]] }} {{cost=@{cost}}} {{description=@{description}}}"></button>
+  <input type="text" name="attr_skillname" class="skillname" value="" placeholder="Shortcut Name" />
+    <div class="ring-input point-cost">
+        <span class="small-text">Point Cost</span>
+        <div class="point-circle"><input type="number" class="point" name="attr_point_cost" value="0" /></div>
+    </div>
+    <div class="ring-input endurance-cost">
+        <div class="point-circle"><input type="number" class="point" name="attr_cost" value="0" /></div>
+        <span class="small-text">Endurance</span>
+    </div>
+  <textarea name="attr_description" class="skill-description"></textarea>
+  
+  <div class="dice-select">
+    <select name="attr_d1" class="d1"> 
+        <option value="1d4cs>4">d4</option>
+        <option value="1d6cs>6">d6</option>
+        <option value="1d8cs>8">d8</option>
+        <option value="1d10cs>10">d10</option>
+        <option value="1d12cs>12">d12</option>
+        <option value="1d20cs>20">d20</option>
+        <option value="1d100cs>100">d100</option>
+    </select>
+    <select name="attr_d2" class="d2">
+        <option value=" "> </option> 
+        <option value="+ 1d4cs>4">d4</option>
+        <option value="+ 1d6cs>6">d6</option>
+        <option value="+ 1d8cs>8">d8</option>
+        <option value="+ 1d10cs>10">d10</option>
+        <option value="+ 1d12cs>12">d12</option>
+        <option value="+ 1d20cs>20">d20</option>
+        <option value="+ 1d100cs>100">d100</option>
+    </select>
+  </div>
+  
+  <select name="attr_modifier" class="modifier"> 
+    <option value="@{Attack_Modifier}">Attack</option>
+    <option value="@{Constitution_Modifier}">Constitution</option>
+    <option value="@{Dexterity_Modifier}">Dexterity</option>
+    <option value="@{Magic_Modifier}">Magic</option>
+    <option value="@{Perception_Modifier}">Perception</option>
+    <option value="@{Intelligence_Modifier}">Intelligence</option>
+    <option value="@{Custom_1_Modifier}">Custom Attribute 1</option>
+    <option value="@{Custom_2_Modifier}">Custom Attribute 2</option>
+    <option value="@{Custom_3_Modifier}">Custom Attribute 3</option>
+    <option value="0">No Modifier</option>
+  </select>
+  
+  <label class="label"><input type="radio" name="attr_exploding" value="!!" checked /> Exploding</label>
+  <label class="label"><input type="radio" name="attr_exploding" value=" " /> Flat</label>
+</fieldset>
+</div>
+
+<script type="text/worker">
+/* ===== PARAMETERS ==========
+destinations = the name of the attribute that stores the total quantity
+        can be a single attribute, or an array: ['total_cost', 'total_weight']
+        If more than one, the matching fields must be in the same order. 
+    section = name of repeating fieldset, without the repeating_
+    fields = the name of the attribute field to be summed
+          destination and fields both can be a single attribute: 'weight'
+          or an array of attributes: ['weight','number','equipped']
+*/
+const repeatingSum = (destinations, section, fields) => {
+    if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
+    if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
+    getSectionIDs(`repeating_${section}`, idArray => {
+        const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))], []);
+        getAttrs([...attrArray], v => {
+            const getValue = (section, id, field) => v[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : parseFloat(v[`repeating_${section}_${id}_${field}`]) || 0;
+            const commonMultipliers = (fields.length <= destinations.length) ? [] : fields.splice(destinations.length, fields.length - destinations.length);
+            const output = {};
+            destinations.forEach((destination, index) => {
+                output[destination] = idArray.reduce((total, id) => total + getValue(section, id, fields[index]) * commonMultipliers.reduce((subtotal, mult) => subtotal * getValue(section, id, mult), 1), 0);
+            });
+            setAttrs(output);
+        }); 
+    }); 
+};
+
+on('change:repeating_shortcuts:point_cost remove:repeating_shortcuts', function() {
+	repeatingSum("used_skill_points_total","shortcuts","point_cost");
+});
+</script>
+
+
+
+<div class="inventory-container">
+<h2 class="h2">Inventory:</h2>
+
+<fieldset class="repeating_inventory">
+  <input type="text" name="attr_itemname" class="itemname" value="" placeholder="Item name" />
+  <span class="small-text">Amount:</span> <input type="number" class="itemcount" name="attr_itemcount" value="1" />
+  <textarea name="attr_description" class="item-description"></textarea>
+</fieldset>
+</div>
+
+
+
+
+<div class="character-type">
+    <label class="label"><input type="radio" value="" name="attr_Type" checked /> Player</label>
+    <label class="label"><input type="radio" value="/w GM " name="attr_Type" /> NPC</label>
+</div>

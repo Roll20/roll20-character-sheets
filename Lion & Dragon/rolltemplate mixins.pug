@@ -1,0 +1,67 @@
+mixin pseudoControl(name)
+	.pseudo-control
+		button(type='action' class='repcontrol_add' name=`act_add_${name}`)
+//- End Mixin
+//-Roll Template Mixins to be included in Sheet files
+mixin rolltemplate(name)
+	- name = name.replace(/\s+/g,'_');
+	rolltemplate(class=`sheet-rolltemplate-${name}`)
+		div(class=`sheet-header`)
+			+templateConditionalDisplay('title')
+				h3.sheet-title {{title}}
+			+templateConditionalDisplay('character_name')
+				+templateConditionalDisplay('character_id')
+					h4.character_name [{{character_name}}](http://journal.roll20.net/character/{{character_id}})
+				+templateConditionalDisplay('character_id',true)
+					h4.character_name {{character_name}}
+		block
+//-End mixin
+mixin templateConditionalDisplay(fieldBool,invert)
+	!=`{{${invert ? '^' : '#'}${fieldBool}}}`
+	-format;
+	block
+	!=`{{/${fieldBool}}}`
+	- format;
+//- End mixin
+mixin rollTemplateHelperFunction(helperObj)
+	!=`{{${helperObj.positive ? '#' : '#^'}${helperObj.func ? `${helperObj.func}() `:''}${helperObj.field}${helperObj.values ? ` ${helperObj.values}` : ''}}}`
+	-format;
+	block
+	!=`{{/${(helperObj.positive || !helperObj.func) ? '' : '^'}${helperObj.func ? `${helperObj.func}() `:''}${helperObj.field}${helperObj.values ? ` ${helperObj.values}` : ''}}}`
+	- format;
+//- End Mixin
+mixin rollWasCrit(obj)
+	- obj.func = 'rollWasCrit';
+	+rollTemplateHelperFunction(obj)
+		block
+//- End Mixin
+mixin rollWasFumble(obj)
+	- obj.func = 'rollWasFumble';
+	+rollTemplateHelperFunction(obj)
+		block
+//- End Mixin
+mixin rollTotal(obj)
+	- obj.func = 'rollTotal';
+	+rollTemplateHelperFunction(obj)
+		block
+//- End Mixin
+mixin rollGreater(obj)
+	- obj.func = 'rollGreater';
+	+rollTemplateHelperFunction(obj)
+		block
+//- End Mixin
+mixin rollLess(obj)
+	- obj.func = 'rollLess';
+	+rollTemplateHelperFunction(obj)
+		block
+//- End Mixin
+mixin rollBetween(obj)
+	- obj.func = 'rollBetween';
+	+rollTemplateHelperFunction(obj)
+		block
+//- End Mixin
+mixin allProps(obj)
+	- obj.func = 'allprops';
+	+rollTemplateHelperFunction(obj)
+		block
+//- End Mixin

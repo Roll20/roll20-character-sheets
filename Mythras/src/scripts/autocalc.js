@@ -485,7 +485,7 @@ var calc_movement = function() {
             var step3_fly_movement = 0;
         }
 
-        var run = ((step3_land_movement+(Math.floor((athletics_no_penalty/25)*.5)))*3)+armor_penalty;
+        var run = Math.ceil((step3_land_movement+(Math.floor((athletics_no_penalty/25))*.5))*3)+armor_penalty;
         if (run < step3_land_movement) {
             run = step3_land_movement;
         }
