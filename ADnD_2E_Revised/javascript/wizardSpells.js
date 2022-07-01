@@ -1059,7 +1059,7 @@ wiz2['Flaming Sphere'] = {
     'materials': 'A bit of tallow, a pinch of sulphur, and a dusting of powdered iron.',
     'reference': 'p. 182',
     'book': 'PHB',
-    'damage': 'Direct contact: 2d4 Fire. 5 feet proximity: 1d4',
+    'damage': '*Direct contact:* 2d4 Fire.\n*5 feet proximity:* 1d4',
     'damage-type': 'Heat',
     'healing': '',
     'effect': 'A *flaming sphere* spell creates a burning globe of fire within 10 yards of the caster. This sphere rolls in whichever direction the wizard points, at a rate of 30 feet per round. It rolls over barriers less than 4 feet tall, such as furniture, low walls, etc. Flammable substances are set afire by contact with the sphere. Creatures in contact with the globe must successfully save vs. spell or suffer 2d4 points of fire damage. Those within 5 feet of the sphere’s surface must also save or suffer 1d4 points of heat damage. A successful saving throw means no damage is suffered. The DM may adjust the saving throws if there is little or no room to dodge the sphere.\n&emsp;The sphere moves as long as the spellcaster actively directs it; otherwise, it merely stays at rest and burns. It can be extinguished by the same means as any normal fire of its size. The surface of the sphere has a spongy, yielding consistency and so does not cause damage except by its flame. It cannot push unwilling creatures aside or batter down large obstacles.'
@@ -1338,7 +1338,7 @@ wiz2['Melf\'s Acid Arrow'] = {
     'materials': 'A dart, powdered rhubarb leaf, and an adder’s stomach.',
     'reference': 'p. 186',
     'book': 'PHB',
-    'damage': '[[2d4]] + 2d4 for [[floor([[@{level-wizard}]]/3)]] additional rounds of',
+    'damage': '2d4 for [[1+floor([[@{level-wizard}]]/3)]] rounds of',
     'damage-type': 'Acid',
     'healing': '',
     'effect': 'By means of this spell, the wizard creates a magical arrow that speeds to its target as if fired from the bow of a fighter of the same level as the wizard (THAC0 [[21-[[@{level-wizard}]] ]]). No modifiers for range, nonproficiency, or specialization are used. The arrow has no attack or damage bonus, but it inflicts 2d4 points of acid damage (with saving throws for items on the target); there is no splash damage. For every three levels that the caster has achieved, the acid, unless somehow neutralized, lasts for another round, inflicting another 2d4 points of damage each round. So at 3rd–5th level, the acid lasts two rounds; at 6th–8th level, the acid lasts for three rounds, etc. Currently [[1+floor([[@{level-wizard}]]/3)]] total rounds.'
@@ -1562,7 +1562,7 @@ wiz2['Summon Swarm'] = {
     'materials': 'A square of red cloth.',
     'reference': 'p. 188',
     'book': 'PHB',
-    'damage': '1 damage per round defending else 1d4+[[@{level-wizard}]] ',
+    'damage': '*Defending:* 1 damage per round\n*Other actions:* 1d4+[[@{level-wizard}]]',
     'damage-type': '',
     'healing': '',
     'effect': 'The swarm of small animals (roll on following table to determine type, or the DM can assign an appropriate creature) drawn by the *summon swarm* spell will viciously attack all creatures in the area chosen by the caster. Creatures actively defending against the swarm to the exclusion of other activities suffer 1 point of damage for each round spent in the swarm. Those taking other actions, including leaving the swarm, receive damage equal to 1d4 points + 1 point per three levels of the caster each round. Note that spellcasting within the swarm is impossible.}}{{style=center1}}{{c1-1=**Dice Roll**}}{{c2-1=01–40}}{{c3-1=41–70}}{{c4-1=71–80}}{{c5-1=81–90}}{{c6-1=91–100}}{{c1-2=**Swarm Type**}}{{c2-2=Rats}}{{c3-2=Bats}}{{c4-2=Spiders}}{{c5-2=Centipedes/beetles}}{{c6-2=Flying insects}}{{effects2=&emsp;The swarm cannot be fought effectively with weapons, but fire and area effects can force it to disperse by inflicting damage. The swarm disperses when it has taken a total of 2 hit points per caster level from these attacks. Currently [[2*[[@{level-wizard}]] ]] damage to disperse. A *protection from evil* spell keeps the swarm at bay, and certain area-effect spells, such as *gust of wind* and *stinking cloud*, disperse a swarm immediately, if appropriate to the swarm summoned (for example, only flyers are affected by a *gust of wind*). The caster must remain stationary and undisturbed to control the swarm; if his concentration lapses or is broken, the swarm disperses in two rounds. The swarm is stationary once conjured.'
@@ -1808,8 +1808,8 @@ wiz3['Flame Arrow'] = {
     'materials': ' A drop of oil and a small piece of flint',
     'reference': 'p. 192',
     'book': 'PHB',
-    'damage': '1 Fire damage or 1d6 Piercing + 4d6 Fire damage per bolt',
-    'damage-type': 'piercing and fire',
+    'damage': '*First version:* Normal arrow damage + 1 Fire\n*Second version:* 1d6 piercing + 4d6',
+    'damage-type': 'Fire',
     'healing': '',
     'effect': 'This spell has two effects. First, the wizard can cause normal arrows or crossbow bolts to become magical flaming missiles for one round. The missiles must be nocked and drawn (or cocked) at the completion of the spell. If they are not loosed within one round, they are consumed by the magic. For every five levels the caster has achieved, up to 10 arrows or bolts can be affected. (Currently [[floor([[@{level-wizard}]]/5)*10]] arrows or bolts). The arrows inflict normal damage, plus 1 point of fire damage to any target struck. They may also cause incendiary damage. This version of the spell is used most often in large battles.\n&emsp;The second version of this spell enables the caster to hurl fiery bolts at opponents within range. Each bolt inflicts 1d6 points of piercing damage, plus 4d6 points of fire damage. Only half the fire damage is inflicted if the creature struck successfully saves vs. spell. The caster receives one bolt for every five experience levels (two bolts at 10th level, three at 15th level, etc.)(Currently [[floor([[@{level-wizard}]]/5)]] bolts). Bolts must be used on creatures within 20 yards of each other and in front of the wizard.'
 };
@@ -2029,7 +2029,7 @@ wiz3['Melf\'s Minute Meteors'] = {
     'materials': 'Nitre and sulphur formed into a bead by the addition of pine tar. The caster must also have a small hollow tube of minute proportion, fashioned from gold. The tube costs no less than 1,000 gp to construct, so fine is its workmahship and magical engraving, and it can be reused.',
     'reference': 'p. 194',
     'book': 'PHB',
-    'damage': '1d4 per meteor + 1 splash within 3 feet',
+    'damage': '*Hit:* 1-foot-diameter, 1d4 Fire\n*Splash:* Within 3 feet, 1',
     'damage-type': 'Fire',
     'healing': '',
     'effect': 'This spell enables the wizard to cast small globes of fire (one for each experience level he has attained. Currently [[@{level-wizard}]] meteors), each of which bursts into a 1-foot-diameter sphere upon impact, inflicting 1d4 points of damage to the creature struck. It can also ignite combustible materials (even solid planks). The meteors are treated as missiles hurled by the wizard with a +2 bonus to the attack rolls and with no penalty for range. Misses are treated as grenadelike missiles that inflict 1 point of damage to creatures within 3 feet.\n&emsp;The spell can be cast in either of two ways:\n&emsp;A) The wizard discharges five meteors every round (see the “Multiple Attacks and Initiative” section in Chapter 9: Combat). Note that this carries over into at least the following round.\n&emsp;B) The wizard discharges only one meteor per round. In addition to releasing the missile, the caster can perform other actions in the round, including spellcasting, melee, or device use. Spells requiring concentration force the wizard to forgo the rest of the missiles to maintain concentration. Also, if the wizard fails to maintain an exact mental count of the number of missiles he has remaining, he has involuntarily lost the remaining portion of the spell.\n&emsp;The spell ends when the caster has fired off as many meteors as he has experience levels, when he forgoes casting any still remaining, or when a successful *dispel magic* spell is thrown upon the caster.'
@@ -2498,10 +2498,10 @@ wiz4['Evard\'s Black Tentacles'] = {
     'materials': 'A piece of tentacle from a giant octopus or giant squid',
     'reference': 'p. 200',
     'book': 'PHB',
-    'damage': '1d4 / 2d4 / 3d4',
+    'damage': '*Saving throw success:* 1d4\n*Saving throw failure, first round:* 2d4\n*Saving throw failure, all succeeding rounds:* 3d4',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates many rubbery, black tentacles in the area of effect. These waving members seem to spring forth from the earth, floor, or whatever surface is underfoot—including water. Each tentacle is 10 feet long, AC 4, and requires [[@{level-wizard}]] points of damage to destroy. There are [[1d4+[[@{level-wizard}]] ]] such tentacles.\n&emsp;Any creature within range of the writhing tentacles is subject to attack as determined by the DM. The target of a tentacle attack must roll a saving throw vs. spell. If this succeeds, the subject suffers 1d4 points of damage from contact with the tentacle; the tentacle is then destroyed. Failure to save indicates that the damage inflicted is 2d4 points, the ebon member is wrapped around its subject, and damage will be 3d4 points on the second and all succeeding rounds. Since these tentacles have no intelligence to guide them, there is the possibility that they entwine any object—a tree, post, pillar, even the wizard himself—or continue to squeeze a dead opponent. A grasping hold established by a tentacle remains until the tentacle is destroyed by some form of attack or until it disappears at the end of the spell’s duration.'
+    'effect': 'This spell creates many rubbery, black tentacles in the area of effect. These waving members seem to spring forth from the earth, floor, or whatever surface is underfoot—including water. Each tentacle is 10 feet long, AC 4, and requires as many points of damage to destroy as the level of the wizard who cast the spell. Currently [[@{level-wizard}]] points of damage. There are 1d4 such tentacles, plus one per experience level of the spellcaster. Currently [[1d4+[[@{level-wizard}]] ]] tentacles.\n&emsp;Any creature within range of the writhing tentacles is subject to attack as determined by the DM. The target of a tentacle attack must roll a saving throw vs. spell. If this succeeds, the subject suffers 1d4 points of damage from contact with the tentacle; the tentacle is then destroyed. Failure to save indicates that the damage inflicted is 2d4 points, the ebon member is wrapped around its subject, and damage will be 3d4 points on the second and all succeeding rounds. Since these tentacles have no intelligence to guide them, there is the possibility that they entwine any object—a tree, post, pillar, even the wizard himself—or continue to squeeze a dead opponent. A grasping hold established by a tentacle remains until the tentacle is destroyed by some form of attack or until it disappears at the end of the spell’s duration.'
 };
 
 wiz4['Extension I'] = {
@@ -2593,7 +2593,7 @@ wiz4['Fire Trap'] = {
     'reference': 'p. 201',
     'book': 'PHB',
     'damage': '1d4+[[@{level-wizard}]]',
-    'damage-type': 'fire',
+    'damage-type': 'Fire',
     'healing': '',
     'effect': 'Any closeable item (book, box, bottle, chest, coffer, coffin, door, drawer, and so forth) can be warded by a *fire trap* spell. The spell is centered on a point selected by the spellcaster. The item so trapped cannot have a second closure or warding spell placed upon it (if such is attempted, the chance is 25% that the first spell fails, 25% that the second spell fails, or 50% that both spells fail). A *knock* spell does not affect a fire trap in any way—as soon as the offending party enters or touches the item, the trap discharges. Thieves and others have only half their normal chance to detect a fire trap (by noticing the characteristic markings required to cast the spell). They have only half their normal chance to remove the trap (failure detonates the trap immediately). An unsuccessful dispel does not detonate the spell. The caster can use the trapped object without discharging it, as can any individual to whom the spell was specifically attuned when cast (the exact method usually involves a keyword). When the trap is discharged, there is an explosion of 5-foot radius from the spell’s center; all creatures within this area must roll saving throws vs. spell. Damage is 1d4 points plus 1 point per level of the caster, or half (round up) for creatures successfully saving. (Under water, this ward inflicts half damage and creates a large cloud of steam.) The item trapped is not harmed by this explosion.'
 };
@@ -2647,10 +2647,10 @@ wiz4['Ice Storm'] = {
     'materials': 'A pinch of dust and a few drops of water',
     'reference': 'p. 202',
     'book': 'PHB',
-    'damage': '[[3d10]] or none',
+    'damage': '*First effect, great hail stones:* 3d10',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell can have one of two effects, at the caster’s option: Either great hail stones pound down for one round in a 40-foot-diameter area and inflict 3d10 points of damage to any creatures within the area of effect, or driving sleet falls in an 80-foot-diameter area for [[@{level-wizard}]] rounds. The sleet blinds creatures within its area for the duration of the spell and causes the ground in the area to be icy, slowing movement by 50% and making it 50% probable that a creature trying to move in the area slips and falls. The sleet also extinguishes torches and small fires.\n&emsp;Note that this spell will negate a *heat metal* spell.'
+    'effect': 'This spell can have one of two effects, at the caster’s option: Either great hail stones pound down for one round in a 40-foot-diameter area and inflict 3d10 points of damage to any creatures within the area of effect, or driving sleet falls in an 80-foot-diameter area for one round per caster level. Currently [[@{level-wizard}]] rounds. The sleet blinds creatures within its area for the duration of the spell and causes the ground in the area to be icy, slowing movement by 50% and making it 50% probable that a creature trying to move in the area slips and falls. The sleet also extinguishes torches and small fires.\n&emsp;Note that this spell will negate a *heat metal* spell.'
 };
 
 wiz4['Illusionary Wall'] = {
@@ -3058,10 +3058,10 @@ wiz4['Wall of Fire'] = {
     'materials': 'Phosphorus',
     'reference': 'p. 208',
     'book': 'PHB',
-    'damage': '2d4 / 1d4 heat damage or 2d6+[[@{level-wizard}]]',
-    'damage-type': 'fire damage',
+    'damage': '*Within 10 feet:* 2d4 Heat\n*Within 20 feet:* 1d4 Heat\n*Pass through wall:* 2d6+[[@{level-wizard}]]',
+    'damage-type': 'Fire',
     'healing': '',
-    'effect': 'The *wall of fire* spell brings forth an immobile, blazing curtain of magical fire of shimmering color—violet or reddish blue. The spell creates either an opaque sheet of flame up to one 20-foot square per level of the spellcaster ([[20*[[@{level-wizard}]] ]]-foot square), or a ring with a radius of up to 10 feet + 5 feet per two levels of experience of the wizard ([[10+5*floor([[@{level-wizard}]]/2)]] feet). In either form, the wall of fire is 20 feet high.\n&emsp;The wall of fire must be cast so that it is vertical with respect to the caster. One side of the wall, selected by the caster, sends forth waves of heat, inflicting [[2d4]] points of damage upon creatures within 10 feet and [[1d4]] points of damage upon those within 20 feet. In addition, the wall inflicts [[2d6+[[@{level-wizard}]] ]] points of damage upon any creature passing through it. Creatures especially subject to fire may take additional damage, and undead always take twice normal damage. Note that attempting to catch a moving creature with a newly-created wall of fire is difficult; a successful saving throw enables the creature to avoid the wall, while its rate and direction of movement determine which side of the created wall it is on. The wall of fire lasts as long as the wizard concentrates on maintaining it, or [[@{level-wizard}]] rounds, in the event he does not wish to concentrate upon it.'
+    'effect': 'The *wall of fire* spell brings forth an immobile, blazing curtain of magical fire of shimmering color—violet or reddish blue. The spell creates either an opaque sheet of flame up to one 20-foot square per level of the spellcaster ([[20*[[@{level-wizard}]] ]]-foot square), or a ring with a radius of up to 10 feet + 5 feet per two levels of experience of the wizard ([[10+5*floor([[@{level-wizard}]]/2)]] foot radius). In either form, the wall of fire is 20 feet high.\n&emsp;The wall of fire must be cast so that it is vertical with respect to the caster. One side of the wall, selected by the caster, sends forth waves of heat, inflicting 2d4 points of damage upon creatures within 10 feet and 1d4 points of damage upon those within 20 feet. In addition, the wall inflicts 2d6, plus 1 point of damage per level of the spellcaster, upon any creature passing through it. Creatures especially subject to fire may take additional damage, and undead always take twice normal damage. Note that attempting to catch a moving creature with a newly-created wall of fire is difficult; a successful saving throw enables the creature to avoid the wall, while its rate and direction of movement determine which side of the created wall it is on. The wall of fire lasts as long as the wizard concentrates on maintaining it, or one round per level of experience of the wizard, in the event he does not wish to concentrate upon it. Currently [[@{level-wizard}]] rounds'
 };
 
 wiz4['Wall of Ice'] = {
