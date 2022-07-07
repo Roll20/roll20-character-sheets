@@ -194,15 +194,15 @@
       /></label>
       <label
         ><span>Alignment</span>
-        <select class="select" name="attr_alignment" value="0">
-          <option value="0"></option>
+        <select class="select" name="attr_alignment" value="">
+          <option value=""></option>
           <option value="Principled">Principled</option>
           <option value="Scrupulous">Scrupulous</option>
           <option value="Taoist">Taoist</option>
           <option value="Unprincipled">Unprincipled</option>
           <option value="Anarchist">Anarchist</option>
           <option value="Miscreant">Miscreant</option>
-          <option value="Abberant">Aberrant</option>
+          <option value="Aberrant">Aberrant</option>
           <option value="Diabolic">Diabolic</option>
         </select></label
       >
@@ -9449,6 +9449,511 @@ function getSingleAttrAsync(prop) {
 
   /* endinject */
 
+  /* inject:js/sheet_attributes.js */
+  function getKeysFromKeysDefaults(keysDefaultsArray) {
+  return keysDefaultsArray.map((keyDefault) => keyDefault.key);
+}
+
+// if (Array.isArray(keysDefaultsProp)) {
+//     return keysDefaultsProp.map((keyDefault) => keyDefault.key);
+//   } else {
+//     return Object.entries(keysDefaultsProp).reduce((acc, [subProp, subVal]) => {
+//         acc[subProp] =
+//     }, {})
+
+//     return Object.keys(KEYS_DEFAULTS[prop]).map((subKey) => ({
+//       [subKey]: KEYS_DEFAULTS[prop][subKey].map((keyDefault) => keyDefault.key),
+//     }));
+//   }
+// }
+
+function keysToKeysDefaults(keys) {
+  return keys.map((key) => ({ key: key, default: 0 }));
+}
+
+const KEYS_DEFAULTS = {
+  H2H: [
+    { key: "name", default: "" },
+    { key: "levelacquired", default: 1 },
+    { key: "level", default: 1 },
+    { key: "attacks", default: 2 },
+    { key: "pull", default: 0 },
+    { key: "roll", default: 0 },
+    { key: "breakfall", default: 0 },
+    { key: "parry", default: 0 },
+    { key: "dodge", default: 0 },
+    { key: "description", default: "" },
+    { key: "strike", default: 0 },
+    { key: "disarm", default: 0 },
+    { key: "critical", default: 0 },
+    { key: "damage", default: "" },
+    { key: "knockout", default: 0 },
+    { key: "deathblow", default: 0 },
+    { key: "initiative", default: 0 },
+    { key: "entangle", default: 0 },
+    { key: "throw", default: 0 },
+    { key: "strike_range", default: 0 },
+    { key: "horrorfactor", default: 0 },
+    { key: "dodge_auto", default: 0 },
+    { key: "flipthrow", default: 0 },
+    { key: "tackle", default: 0 },
+    { key: "leghook", default: 0 },
+    { key: "backwardsweepkick", default: 0 },
+    { key: "maintainbalance", default: 0 },
+    { key: "dodge_flight", default: 0 },
+    { key: "dodge_teleport", default: 0 },
+    { key: "dodge_motion", default: 0 },
+    { key: "mod_spellstrength", default: 0 },
+    { key: "mod_me", default: 0 },
+    { key: "mod_ma", default: 0 },
+    { key: "mod_ps", default: 0 },
+    { key: "mod_pp", default: 0 },
+    { key: "mod_pe", default: 0 },
+    { key: "mod_spd", default: 0 },
+  ],
+  WP: {
+    wp: [
+      { key: "name", default: "" },
+      { key: "levelacquired", default: 1 },
+      { key: "level", default: 1 },
+      { key: "strike", default: 0 },
+      { key: "parry", default: 0 },
+      { key: "disarm", default: 0 },
+      { key: "rof", default: 0 },
+      { key: "throw", default: 0 },
+      { key: "entangle", default: 0 },
+    ],
+    wpmodern: [
+      { key: "name", default: "" },
+      { key: "levelacquired", default: 1 },
+      { key: "level", default: 1 },
+      { key: "strike_range_single", default: 0 },
+      { key: "disarm", default: 0 },
+      { key: "strike_range_burst", default: 0 },
+    ],
+  },
+  ATTRIBUTE: [
+    { key: "mod_iq", default: 0 },
+    { key: "iq_abs", default: 0 },
+    { key: "mod_iq_bonus", default: 0 },
+    { key: "mod_perception_bonus", default: 0 },
+    { key: "mod_me", default: 0 },
+    { key: "mod_me_bonus", default: 0 },
+    { key: "me_abs", default: 0 },
+    { key: "mod_ma", default: 0 },
+    { key: "mod_ma_bonus", default: 0 },
+    { key: "ma_abs", default: 0 },
+    { key: "mod_ps", default: 0 },
+    { key: "mod_ps_bonus", default: 0 },
+    { key: "ps_abs", default: 0 },
+    { key: "mod_pp", default: 0 },
+    { key: "mod_pp_bonus", default: 0 },
+    { key: "pp_abs", default: 0 },
+    { key: "mod_pe", default: 0 },
+    { key: "mod_pe_bonus", default: 0 },
+    { key: "mod_pe_coma_bonus", default: 0 },
+    { key: "pe_abs", default: 0 },
+    { key: "mod_pb", default: 0 },
+    { key: "mod_pb_bonus", default: 0 },
+    { key: "pb_abs", default: 0 },
+    { key: "mod_spd", default: 0 },
+    { key: "spd_abs", default: 0 },
+    { key: "mod_spdfly", default: 0 },
+    { key: "spdfly_abs", default: 0 },
+    { key: "mod_character_ps_type", default: 1 },
+    { key: "mod_character_ps_type_name", default: "Normal" },
+    { key: "mod_restrained_punch", default: 0 },
+    { key: "mod_restrained_punch_unit", default: "sdc" },
+    { key: "mod_punch", default: 0 },
+    { key: "mod_punch_unit", default: "sdc" },
+    { key: "mod_power_punch", default: 0 },
+    { key: "mod_power_punch_unit", default: "sdc" },
+    { key: "mod_kick", default: 0 },
+    { key: "mod_kick_unit", default: "sdc" },
+    { key: "mod_leap_kick", default: 0 },
+    { key: "mod_leap_kick_unit", default: "sdc" },
+    { key: "mod_liftcarry_weight_multiplier", default: 0 },
+    { key: "mod_liftcarry_duration_multiplier", default: 0 },
+    { key: "mod_lift", default: 0 },
+    { key: "mod_carry", default: 0 },
+    { key: "mod_throw_distance", default: 0 },
+    { key: "mod_carry_max", default: 0 },
+    { key: "mod_carry_running", default: 0 },
+    { key: "mod_hold_max", default: 0 },
+    { key: "hp", default: 0 },
+    { key: "sdc", default: 0 },
+    { key: "ar", default: 0 },
+    { key: "mdc", default: 0 },
+    { key: "ps_type", default: 1 },
+    { key: "ppe", default: 0 },
+    { key: "isp", default: 0 },
+    { key: "mod_hf", default: 0 },
+    { key: "hf_abs", default: 0 },
+    { key: "mod_spellstrength", default: 0 },
+    { key: "spellstrength_abs", default: 0 },
+    { key: "mod_trust", default: 0 },
+    { key: "trust_abs", default: 0 },
+    { key: "mod_intimidate", default: 0 },
+    { key: "intimidate_abs", default: 0 },
+    { key: "mod_charmimpress", default: 0 },
+    { key: "charmimpress_abs", default: 0 },
+    { key: "mod_skillbonus", default: 0 },
+  ],
+  COMBAT: [
+    { key: "name", default: "" },
+    { key: "level", default: 0 },
+    { key: "attacks", default: 0 },
+    { key: "sdc", default: 0 },
+    { key: "mdc", default: 0 },
+    { key: "initiative", default: 0 },
+    { key: "strike", default: 0 },
+    { key: "parry", default: 0 },
+    { key: "dodge", default: 0 },
+    { key: "throw", default: 0 },
+    { key: "disarm", default: 0 },
+    { key: "entangle", default: 0 },
+    { key: "pull", default: 0 },
+    { key: "roll", default: 0 },
+    { key: "breakfall", default: 0 },
+    { key: "damage", default: "" },
+    { key: "damage_paired", default: "" },
+    { key: "damage_mainhand", default: "" },
+    { key: "damage_offhand", default: "" },
+    { key: "dodge_flight", default: 0 },
+    { key: "dodge_auto", default: 0 },
+    { key: "dodge_teleport", default: 0 },
+    { key: "dodge_motion", default: 0 },
+    { key: "dodge_underwater", default: 0 },
+    { key: "strike_range", default: 0 },
+    { key: "strike_range_single", default: 0 },
+    { key: "strike_range_burst", default: 0 },
+    { key: "strike_range_aimed", default: 0 },
+    { key: "strike_range_aimed_single", default: 0 },
+    { key: "strike_range_aimed_pulse", default: 0 },
+    { key: "strike_range_called", default: 0 },
+    { key: "strike_range_called_single", default: 0 },
+    { key: "strike_range_called_pulse", default: 0 },
+    { key: "strike_range_aimed_called_single", default: 0 },
+    { key: "strike_range_aimed_called_pulse", default: 0 },
+    { key: "disarm_range", default: 0 },
+    { key: "damage_range", default: "" },
+    { key: "damage_range_single", default: "" },
+    { key: "damage_range_burst", default: "" },
+    { key: "critical", default: 0 },
+    { key: "knockout", default: 0 },
+    { key: "deathblow", default: 0 },
+    { key: "flipthrow", default: 0 },
+    { key: "tackle", default: 0 },
+    { key: "leghook", default: 0 },
+    { key: "backwardsweepkick", default: 0 },
+    { key: "description", default: "" },
+  ],
+  SAVE: [
+    { key: "psionics", default: 0 },
+    { key: "insanity", default: 0 },
+    { key: "magic", default: 0 },
+    { key: "lethalpoison", default: 0 },
+    { key: "nonlethalpoison", default: 0 },
+    { key: "disease", default: 0 },
+    { key: "drugs", default: 0 },
+    { key: "comadeath", default: 0 },
+    { key: "perceptioncheck", default: 0 },
+    { key: "pain", default: 0 },
+    { key: "horrorfactor", default: 0 },
+    { key: "mindcontrol", default: 0 },
+    { key: "illusions", default: 0 },
+    { key: "possession", default: 0 },
+    { key: "curses", default: 0 },
+    { key: "maintainbalance", default: 0 },
+    { key: "fatigue", default: 0 },
+    { key: "despair", default: 0 },
+    { key: "telepathicprobes", default: 0 },
+  ],
+  REPEATING_MOVEMENT: [
+    { key: "run_mph", default: 0 },
+    { key: "run_kmh", default: 0 },
+    { key: "fly_mph", default: 0 },
+    { key: "fly_kmh", default: 0 },
+    { key: "run_ft_melee", default: 0 },
+    { key: "run_m_melee", default: 0 },
+    { key: "fly_ft_melee", default: 0 },
+    { key: "fly_m_melee", default: 0 },
+    { key: "run_ft_action", default: 0 },
+    { key: "run_m_action", default: 0 },
+    { key: "fly_ft_action", default: 0 },
+    { key: "fly_m_action", default: 0 },
+  ],
+  SKILL: [
+    { key: "name", default: "" },
+    { key: "category", default: "occ" },
+    { key: "base", default: 0 },
+    { key: "bonus", default: 0 },
+    { key: "perlevel", default: 0 },
+    { key: "levelacquired", default: 1 },
+    { key: "level", default: 1 },
+    { key: "total", default: 0 },
+    { key: "description", default: "" },
+  ],
+  MAGIC_BASE: [
+    { key: "name", default: "" },
+    { key: "school", default: "" },
+    { key: "spell_level", default: 1 },
+    { key: "range", default: "" },
+    { key: "damage", default: "" },
+    { key: "duration", default: 0 },
+    { key: "percentage", default: 0 },
+    { key: "ppecost", default: 0 },
+    { key: "range_starting", default: 0 },
+    { key: "range_per_level", default: 0 },
+    { key: "range_unit", default: "" },
+    { key: "damage_starting", default: "" },
+    { key: "damage_per_level", default: "" },
+    { key: "damage_unit", default: "" },
+    { key: "dc_starting", default: 0 },
+    { key: "dc_per_level", default: 0 },
+    { key: "dc_unit", default: "" },
+    { key: "duration_starting", default: 0 },
+    { key: "duration_per_level", default: 0 },
+    { key: "duration_unit", default: "" },
+    { key: "percentage_starting", default: 0 },
+    { key: "percentage_per_level", default: 0 },
+    { key: "addtobonuses", default: 1 },
+    { key: "description", default: "" },
+  ],
+  PSIONICS_BASE: [
+    { key: "name", default: "" },
+    { key: "range", default: "" },
+    { key: "damage", default: "" },
+    { key: "duration", default: 0 },
+    { key: "percentage", default: 0 },
+    { key: "ispcost", default: 0 },
+    { key: "range_starting", default: 0 },
+    { key: "range_per_level", default: 0 },
+    { key: "range_unit", default: "" },
+    { key: "damage_starting", default: "" },
+    { key: "damage_per_level", default: "" },
+    { key: "damage_unit", default: "" },
+    { key: "dc_starting", default: 0 },
+    { key: "dc_per_level", default: 0 },
+    { key: "dc_unit", default: "" },
+    { key: "duration_starting", default: 0 },
+    { key: "duration_per_level", default: 0 },
+    { key: "duration_unit", default: "" },
+    { key: "percentage_starting", default: 0 },
+    { key: "percentage_per_level", default: 0 },
+    { key: "addtobonuses", default: 1 },
+    { key: "description", default: "" },
+  ],
+  ABILITIES_BASE: [
+    { key: "name", default: "" },
+    { key: "range", default: "" },
+    { key: "damage", default: "" },
+    { key: "duration", default: 0 },
+    { key: "percentage", default: 0 },
+    { key: "range_starting", default: 0 },
+    { key: "range_per_level", default: 0 },
+    { key: "range_unit", default: "" },
+    { key: "damage_starting", default: "" },
+    { key: "damage_per_level", default: "" },
+    { key: "damage_unit", default: "" },
+    { key: "dc_starting", default: 0 },
+    { key: "dc_per_level", default: 0 },
+    { key: "dc_unit", default: "" },
+    { key: "duration_starting", default: 0 },
+    { key: "duration_per_level", default: 0 },
+    { key: "duration_unit", default: "" },
+    { key: "frequency_starting", default: 0 },
+    { key: "frequency_per_level", default: 0 },
+    { key: "frequency_unit", default: "" },
+    { key: "percentage_starting", default: 0 },
+    { key: "percentage_per_level", default: 0 },
+    { key: "addtobonuses", default: 1 },
+    { key: "description", default: "" },
+  ],
+  PROFILES_BASE: [
+    { key: "bonus_ids", default: "" },
+    { key: "bonus_names", default: "" },
+  ],
+  CORE: [
+    { key: "character_name", default: "" },
+    { key: "truename_name", default: "" },
+    { key: "character_race", default: "" },
+    { key: "occ", default: "" },
+    { key: "character_ps_type", default: 1 },
+    { key: "character_level", default: 1 },
+    { key: "experience", default: 0 },
+    { key: "alignment", default: "" },
+    { key: "character_age", default: "" },
+    { key: "character_gender", default: "" },
+    { key: "character_height", default: "" },
+    { key: "character_weight", default: "" },
+    { key: "character_familyorigin", default: "" },
+    { key: "character_environment", default: "" },
+    { key: "character_languages", default: "" },
+    { key: "character_insanity", default: "" },
+    { key: "character_disposition", default: "" },
+    { key: "iq", default: 0 },
+    { key: "iq_bonus", default: 0 },
+    { key: "perception_bonus", default: 0 },
+    { key: "me", default: 0 },
+    { key: "me_bonus", default: 0 },
+    { key: "ma", default: 0 },
+    { key: "ma_bonus", default: 0 },
+    { key: "ps", default: 0 },
+    { key: "ps_bonus", default: 0 },
+    { key: "pp", default: 0 },
+    { key: "pp_bonus", default: 0 },
+    { key: "pe", default: 0 },
+    { key: "pe_bonus", default: 0 },
+    { key: "pe_coma_bonus", default: 0 },
+    { key: "pb", default: 0 },
+    { key: "pb_bonus", default: 0 },
+    { key: "spd", default: 0 },
+    { key: "spdfly", default: 0 },
+    { key: "charmimpress", default: 0 },
+    { key: "character_hp", default: 0 },
+    { key: "character_sdc", default: 0 },
+    { key: "character_ar", default: 0 },
+    { key: "character_mdc", default: 0 },
+    { key: "character_ppe", default: 0 },
+    { key: "character_isp", default: 0 },
+    { key: "hf", default: 0 },
+    { key: "spellstrength", default: 0 },
+    { key: "perception", default: 0 },
+    { key: "run_mph", default: 0 },
+    { key: "run_ft_melee", default: 0 },
+    { key: "run_ft_attack", default: 0 },
+    { key: "run_cruising", default: 0 },
+    { key: "run_at_max", default: 0 },
+    { key: "leapup", default: 0 },
+    { key: "leapout", default: 0 },
+    { key: "equipment", default: "" },
+    { key: "psionic_ability", default: 15 },
+    { key: "credits_universal_bearer", default: "" },
+    { key: "credits_universal_marked", default: "" },
+    { key: "credits_blackmarket", default: "" },
+    { key: "credits_ngmi", default: "" },
+    { key: "credits_phaseworld", default: "" },
+    { key: "credits_splugorth", default: "" },
+    { key: "credits_gems", default: "" },
+    { key: "credits_blackmarketmerchandise", default: "" },
+  ],
+  ARMOR: [
+    { key: "is_active", default: 1 },
+    { key: "name", default: "" },
+    { key: "movementpenalty", default: 0 },
+    { key: "mdc", default: 0 },
+    { key: "mdc_max", default: 0 },
+  ],
+  MOVEMENT: [
+    { key: "name", default: "" },
+    { key: "mph", default: 0 },
+    { key: "ft_melee", default: 0 },
+    { key: "cruising", default: 0 },
+    { key: "dur_at_max", default: 0 },
+  ],
+  EQUIPMENT: [{ key: "equipment", default: "" }],
+};
+
+KEYS_DEFAULTS.MODIFIERS = KEYS_DEFAULTS.COMBAT.concat(
+  KEYS_DEFAULTS.SAVE,
+  KEYS_DEFAULTS.ATTRIBUTE,
+  KEYS_DEFAULTS.REPEATING_MOVEMENT
+);
+
+KEYS_DEFAULTS.MAGIC = KEYS_DEFAULTS.MAGIC_BASE.concat(KEYS_DEFAULTS.MODIFIERS);
+KEYS_DEFAULTS.PSIONICS = KEYS_DEFAULTS.PSIONICS_BASE.concat(
+  KEYS_DEFAULTS.MODIFIERS
+);
+KEYS_DEFAULTS.ABILITIES = KEYS_DEFAULTS.ABILITIES_BASE.concat(
+  KEYS_DEFAULTS.MODIFIERS
+);
+KEYS_DEFAULTS.PROFILES = KEYS_DEFAULTS.PROFILES_BASE.concat(
+  KEYS_DEFAULTS.MODIFIERS
+);
+
+const H2H_KEYS = getKeysFromKeysDefaults(KEYS_DEFAULTS.H2H);
+const WP_KEYS = {
+  wp: getKeysFromKeysDefaults(KEYS_DEFAULTS.WP.wp),
+  wpmodern: getKeysFromKeysDefaults(KEYS_DEFAULTS.WP.wpmodern),
+};
+console.log(WP_KEYS);
+const ATTRIBUTE_KEYS = getKeysFromKeysDefaults(KEYS_DEFAULTS.ATTRIBUTE);
+const COMBAT_KEYS = getKeysFromKeysDefaults(KEYS_DEFAULTS.COMBAT);
+const SAVE_KEYS = getKeysFromKeysDefaults(KEYS_DEFAULTS.SAVE);
+const REPEATING_MOVEMENT_KEYS = getKeysFromKeysDefaults(
+  KEYS_DEFAULTS.REPEATING_MOVEMENT
+);
+const SKILL_KEYS = getKeysFromKeysDefaults(KEYS_DEFAULTS.SKILL);
+const CORE_KEYS = getKeysFromKeysDefaults(KEYS_DEFAULTS.CORE);
+const ARMOR_KEYS = getKeysFromKeysDefaults(KEYS_DEFAULTS.ARMOR);
+const MOVEMENT_KEYS = getKeysFromKeysDefaults(KEYS_DEFAULTS.MOVEMENT);
+const EQUIPMENT_KEYS = getKeysFromKeysDefaults(KEYS_DEFAULTS.EQUIPMENT);
+
+const SAVE_KEYS_ATTRIBUTE_BONUSES = {
+  me_bonus: ["psionics", "insanity"],
+  pe_bonus: ["magic", "lethalpoison", "nonlethalpoison", "disease", "drugs"],
+  pe_coma_bonus: ["comadeath"],
+  perception_bonus: ["perceptioncheck"],
+  none: [
+    "pain",
+    "horrorfactor",
+    "mindcontrol",
+    "illusions",
+    "possession",
+    "curses",
+    "maintainbalance",
+    "fatigue",
+    "despair",
+    "telepathicprobes",
+  ],
+};
+
+const REPEATING_BONUS_KEYS = COMBAT_KEYS.concat(
+  SAVE_KEYS,
+  ATTRIBUTE_KEYS,
+  REPEATING_MOVEMENT_KEYS
+);
+
+const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities"];
+
+/**
+ * @todo
+ * `name` is duplicated between MAGIC_BASE_KEYS and COMBAT_KEYS.
+ * Do a unique array somehow.
+ */
+const MAGIC_KEYS = REPEATING_BONUS_KEYS.concat(
+  getKeysFromKeysDefaults(KEYS_DEFAULTS.MAGIC_BASE)
+);
+const PSIONICS_KEYS = REPEATING_BONUS_KEYS.concat(
+  getKeysFromKeysDefaults(KEYS_DEFAULTS.PSIONICS_BASE)
+);
+const ABILITIES_KEYS = REPEATING_BONUS_KEYS.concat(
+  getKeysFromKeysDefaults(KEYS_DEFAULTS.ABILITIES_BASE)
+);
+const PROFILES_KEYS = REPEATING_BONUS_KEYS.concat(
+  getKeysFromKeysDefaults(KEYS_DEFAULTS.PROFILES_BASE)
+);
+
+const SECTIONS = {
+  h2h: H2H_KEYS,
+  wp: WP_KEYS.wp,
+  wpmodern: WP_KEYS.wpmodern,
+  skills: SKILL_KEYS,
+  modifiers: REPEATING_BONUS_KEYS,
+  magic: MAGIC_KEYS,
+  psionics: PSIONICS_KEYS,
+  movement: MOVEMENT_KEYS,
+  powersabilities: ABILITIES_KEYS,
+  armor: ARMOR_KEYS,
+  // profiles: PROFILES_KEYS, // Tricky to export because IDs that they refer to won't line up
+  equipment: EQUIPMENT_KEYS,
+};
+
+// console.log(keysToKeysDefaults(CORE_KEYS));
+
+  /* endinject */
+
   /* inject:js/definitions.js */
   /**
  * Run this function in the console, and modify as needed
@@ -10335,46 +10840,6 @@ const H2H = {
   ],
 };
 
-const H2H_KEYS = [
-  "name",
-  "levelacquired",
-  "level",
-  "attacks",
-  "pull",
-  "roll",
-  "breakfall",
-  "parry",
-  "dodge",
-  "description",
-  "strike",
-  "disarm",
-  "critical",
-  "damage",
-  "knockout",
-  "deathblow",
-  "initiative",
-  "entangle",
-  "throw",
-  "strike_range",
-  "horrorfactor",
-  "dodge_auto",
-  "flipthrow",
-  "tackle",
-  "leghook",
-  "backwardsweepkick",
-  "maintainbalance",
-  "dodge_flight",
-  "dodge_teleport",
-  "dodge_motion",
-  "mod_spellstrength",
-  "mod_me",
-  "mod_ma",
-  "mod_ps",
-  "mod_pp",
-  "mod_pe",
-  "mod_spd",
-];
-
 const WP = {
   "w.p. archery": [
     { strike: 1, parry: 1, rof: 2 },
@@ -10818,368 +11283,6 @@ const WP = {
     {},
     { strike_range_single: 1, strike_range_burst: 1 },
   ],
-};
-
-const WP_KEYS = {
-  wp: [
-    "name",
-    "levelacquired",
-    "level",
-    "strike",
-    "parry",
-    "disarm",
-    "rof",
-    "throw",
-    "entangle",
-  ],
-  wpmodern: [
-    "name",
-    "levelacquired",
-    "level",
-    "strike_range_single",
-    "disarm",
-    "strike_range_burst",
-  ],
-};
-
-const ATTRIBUTE_KEYS = [
-  "mod_iq",
-  "iq_abs",
-  "mod_iq_bonus",
-  "mod_perception_bonus",
-  "mod_me",
-  "mod_me_bonus",
-  "me_abs",
-  "mod_ma",
-  "mod_ma_bonus",
-  "ma_abs",
-  "mod_ps",
-  "mod_ps_bonus",
-  "ps_abs",
-  "mod_pp",
-  "mod_pp_bonus",
-  "pp_abs",
-  "mod_pe",
-  "mod_pe_bonus",
-  "mod_pe_coma_bonus",
-  "pe_abs",
-  "mod_pb",
-  "mod_pb_bonus",
-  "pb_abs",
-  "mod_spd",
-  "spd_abs",
-  "mod_spdfly",
-  "spdfly_abs",
-  "mod_character_ps_type",
-  "mod_character_ps_type_name",
-  "mod_restrained_punch",
-  "mod_restrained_punch_unit",
-  "mod_punch",
-  "mod_punch_unit",
-  "mod_power_punch",
-  "mod_power_punch_unit",
-  "mod_kick",
-  "mod_kick_unit",
-  "mod_leap_kick",
-  "mod_leap_kick_unit",
-  "mod_liftcarry_weight_multiplier",
-  "mod_liftcarry_duration_multiplier",
-  "mod_lift",
-  "mod_carry",
-  "mod_throw_distance",
-  "mod_carry_max",
-  "mod_carry_running",
-  "mod_hold_max",
-  "hp",
-  "sdc",
-  "ar",
-  "mdc",
-  "ps_type",
-  "ppe",
-  "isp",
-  "mod_hf",
-  "hf_abs",
-  "mod_spellstrength",
-  "spellstrength_abs",
-  "mod_trust",
-  "trust_abs",
-  "mod_intimidate",
-  "intimidate_abs",
-  "mod_charmimpress",
-  "charmimpress_abs",
-  "mod_skillbonus",
-];
-
-const COMBAT_KEYS = [
-  // "selection_id",
-  "name",
-  "level",
-  "attacks",
-  "sdc",
-  "mdc",
-  "initiative",
-  "strike",
-  "parry",
-  "dodge",
-  "throw",
-  "disarm",
-  "entangle",
-  "pull",
-  "roll",
-  "breakfall",
-  "damage",
-  "damage_paired",
-  "damage_mainhand",
-  "damage_offhand",
-  "dodge_flight",
-  "dodge_auto",
-  "dodge_teleport",
-  "dodge_motion",
-  "dodge_underwater",
-  "strike_range",
-  "strike_range_single",
-  "strike_range_burst",
-  "strike_range_aimed",
-  "strike_range_aimed_single",
-  "strike_range_aimed_pulse",
-  "strike_range_called",
-  "strike_range_called_single",
-  "strike_range_called_pulse",
-  "strike_range_aimed_called_single",
-  "strike_range_aimed_called_pulse",
-  "disarm_range",
-  "damage_range",
-  "damage_range_single",
-  "damage_range_burst",
-  "critical",
-  "knockout",
-  "deathblow",
-  "flipthrow",
-  "tackle",
-  "leghook",
-  "backwardsweepkick",
-  "description",
-];
-const SAVE_KEYS_ATTRIBUTE_BONUSES = {
-  me_bonus: ["psionics", "insanity"],
-  pe_bonus: ["magic", "lethalpoison", "nonlethalpoison", "disease", "drugs"],
-  pe_coma_bonus: ["comadeath"],
-  perception_bonus: ["perceptioncheck"],
-  none: [
-    "pain",
-    "horrorfactor",
-    "mindcontrol",
-    "illusions",
-    "possession",
-    "curses",
-    "maintainbalance",
-    "fatigue",
-    "despair",
-    "telepathicprobes",
-  ],
-};
-const SAVE_KEYS = Object.values(SAVE_KEYS_ATTRIBUTE_BONUSES).reduce(
-  (acc, cur) => acc.concat(cur),
-  []
-);
-const REPEATING_MOVEMENT_KEYS = [
-  "run_mph",
-  "run_kmh",
-  "fly_mph",
-  "fly_kmh",
-  "run_ft_melee",
-  "run_m_melee",
-  "fly_ft_melee",
-  "fly_m_melee",
-  "run_ft_action",
-  "run_m_action",
-  "fly_ft_action",
-  "fly_m_action",
-];
-const REPEATING_BONUS_KEYS = COMBAT_KEYS.concat(
-  SAVE_KEYS,
-  ATTRIBUTE_KEYS,
-  REPEATING_MOVEMENT_KEYS
-);
-const SKILL_KEYS = [
-  "name",
-  "category",
-  "base",
-  "bonus",
-  "perlevel",
-  "levelacquired",
-  "level",
-  "total",
-  "description",
-];
-
-const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities"];
-
-const MAGIC_KEYS = REPEATING_BONUS_KEYS.concat([
-  "name",
-  "school",
-  "spell_level",
-  "range",
-  "damage",
-  "duration",
-  "percentage",
-  "ppecost",
-  "range_starting",
-  "range_per_level",
-  "range_unit",
-  "damage_starting",
-  "damage_per_level",
-  "damage_unit",
-  "dc_starting",
-  "dc_per_level",
-  "dc_unit",
-  "duration_starting",
-  "duration_per_level",
-  "duration_unit",
-  "percentage_starting",
-  "percentage_per_level",
-  "addtobonuses",
-  "description",
-]);
-
-const PSIONICS_KEYS = REPEATING_BONUS_KEYS.concat([
-  "name",
-  "range",
-  "damage",
-  "duration",
-  "percentage",
-  "ispcost",
-  "range_starting",
-  "range_per_level",
-  "range_unit",
-  "damage_starting",
-  "damage_per_level",
-  "damage_unit",
-  "dc_starting",
-  "dc_per_level",
-  "dc_unit",
-  "duration_starting",
-  "duration_per_level",
-  "duration_unit",
-  "percentage_starting",
-  "percentage_per_level",
-  "addtobonuses",
-  "description",
-]);
-
-const ABILITIES_KEYS = REPEATING_BONUS_KEYS.concat([
-  "name",
-  "range",
-  "damage",
-  "duration",
-  "percentage",
-  "range_starting",
-  "range_per_level",
-  "range_unit",
-  "damage_starting",
-  "damage_per_level",
-  "damage_unit",
-  "dc_starting",
-  "dc_per_level",
-  "dc_unit",
-  "duration_starting",
-  "duration_per_level",
-  "duration_unit",
-  "frequency_starting",
-  "frequency_per_level",
-  "frequency_unit",
-  "percentage_starting",
-  "percentage_per_level",
-  "addtobonuses",
-  "description",
-]);
-
-const PROFILES_KEYS = REPEATING_BONUS_KEYS.concat(["bonus_ids", "bonus_names"]);
-
-const CORE_KEYS = [
-  "character_name",
-  "truename_name",
-  "character_race",
-  "occ",
-  "character_ps_type",
-  "character_level",
-  "experience",
-  "alignment",
-  "character_age",
-  "character_gender",
-  "character_height",
-  "character_weight",
-  "character_familyorigin",
-  "character_environment",
-  "character_languages",
-  "character_insanity",
-  "character_disposition",
-  "iq",
-  "iq_bonus",
-  "perception_bonus",
-  "me",
-  "me_bonus",
-  "ma",
-  "ma_bonus",
-  "ps",
-  "ps_bonus",
-  "pp",
-  "pp_bonus",
-  "pe",
-  "pe_bonus",
-  "pe_coma_bonus",
-  "pb",
-  "pb_bonus",
-  "spd",
-  "spdfly",
-  "charmimpress",
-  "character_hp",
-  "character_sdc",
-  "character_ar",
-  "character_mdc",
-  "character_ppe",
-  "character_isp",
-  "hf",
-  "spellstrength",
-  "perception",
-  "run_mph",
-  "run_ft_melee",
-  "run_ft_attack",
-  "run_cruising",
-  "run_at_max",
-  "leapup",
-  "leapout",
-  "equipment",
-  "psionic_ability",
-  "credits_universal_bearer",
-  "credits_universal_marked",
-  "credits_blackmarket",
-  "credits_ngmi",
-  "credits_phaseworld",
-  "credits_splugorth",
-  "credits_gems",
-  "credits_blackmarketmerchandise",
-];
-
-const ARMOR_KEYS = ["is_active", "name", "movementpenalty", "mdc", "mdc_max"];
-
-const MOVEMENT_KEYS = ["name", "mph", "ft_melee", "cruising", "dur_at_max"];
-
-const EQUIPMENT_KEYS = ["equipment"];
-
-const SECTIONS = {
-  h2h: H2H_KEYS,
-  wp: WP_KEYS.wp,
-  wpmodern: WP_KEYS.wpmodern,
-  skills: SKILL_KEYS,
-  modifiers: REPEATING_BONUS_KEYS,
-  magic: MAGIC_KEYS,
-  psionics: PSIONICS_KEYS,
-  movement: MOVEMENT_KEYS,
-  powersabilities: ABILITIES_KEYS,
-  armor: ARMOR_KEYS,
-  // profiles: PROFILES_KEYS, // Tricky to export because IDs that they refer to won't line up
-  equipment: EQUIPMENT_KEYS,
 };
 
   /* endinject */
@@ -13869,26 +13972,114 @@ async function recalculateMovement(manualFeetPerMelee) {
     });
   }
 
+  /**
+   * Imports an object, ignoring values that haven't changed from their defaults.
+   *
+   * @param {string} keysDefaultsProp The KEYS_DEFAULTS property to compare to.
+   * @param {object} objectToImport An object of key/value pairs to import.
+   */
+  function getSmartImportObject(
+    keysDefaultsArray,
+    objectToImport,
+    prefix = ""
+  ) {
+    console.log("getSmartImportObject", keysDefaultsArray, objectToImport);
+    if (!objectToImport) return {};
+    const reducedImportObject = Object.entries(objectToImport).reduce(
+      (acc, [importKey, rawImportValue]) => {
+        const defaultValue = keysDefaultsArray.find(
+          (obj) => obj.key === importKey
+        ).default;
+        const attributeType = typeof defaultValue;
+        let importValue;
+        switch (attributeType) {
+          case "number":
+            importValue = +rawImportValue;
+            break;
+          case "string":
+            importValue = rawImportValue.toString();
+            break;
+        }
+        if (defaultValue !== importValue) {
+          console.log(importKey, defaultValue, importValue);
+          acc[prefix + importKey] = importValue;
+        }
+        return acc;
+      },
+      {}
+    );
+    console.log("getSmartImportObject", reducedImportObject);
+    return reducedImportObject;
+  }
+
+  async function smartImportArray(keysDefaultsArray, section, arrayOfObjects) {
+    await setAttrsAsync({ importexportstatus: `Importing ${section}...` });
+    console.log("smartImportArray", keysDefaultsArray, section, arrayOfObjects);
+    if (!arrayOfObjects) return;
+    const attrs = arrayOfObjects.reduce((acc, row) => {
+      const rowId = generateRowID();
+      const prefix = `repeating_${section}_${rowId}_`;
+      const reducedRowImportObject = getSmartImportObject(
+        keysDefaultsArray,
+        row,
+        prefix
+      );
+      acc = Object.assign(acc, reducedRowImportObject);
+      return acc;
+    }, {});
+    attrs.importexportstatus = `Done importing ${section}...`;
+    await setAttrsAsync(attrs);
+  }
+
   on("clicked:import", async (e) => {
     console.log("import", e);
     await setAttrsAsync({ importexportstatus: "Importing core..." });
     const a = await getAttrsAsync(["importexport"]);
     const data = JSON.parse(a.importexport);
-    console.log(data);
-    // importAll(data);
-    // return;
-    await setAttrsAsync(data.core);
-    await setRepeatingRowsAsync("h2h", data.h2h);
-    await setRepeatingRowsAsync("wp", data.wp);
-    await setRepeatingRowsAsync("wpmodern", data.wpmodern);
-    await setRepeatingRowsAsync("skills", data.skills);
-    await setRepeatingRowsAsync("magic", data.magic);
-    await setRepeatingRowsAsync("psionics", data.psionics);
-    await setRepeatingRowsAsync("movement", data.movement);
-    await setRepeatingRowsAsync("powersabilities", data.powersabilities);
-    await setRepeatingRowsAsync("modifiers", data.modifiers);
-    await setRepeatingRowsAsync("armor", data.armor);
-    await setRepeatingRowsAsync("equipment", data.equipment);
+    console.log(data, KEYS_DEFAULTS.MODIFIERS);
+
+    await smartImportArray(
+      KEYS_DEFAULTS.MODIFIERS,
+      "modifiers",
+      data.modifiers
+    );
+
+    await setAttrsAsync(getSmartImportObject(KEYS_DEFAULTS.CORE, data.core));
+
+    await smartImportArray(KEYS_DEFAULTS.H2H, "h2h", data.h2h);
+    await smartImportArray(KEYS_DEFAULTS.SKILL, "skills", data.skills);
+    await smartImportArray(KEYS_DEFAULTS.WP.wp, "wp", data.wp);
+    await smartImportArray(
+      KEYS_DEFAULTS.WP.wpmodern,
+      "wpmodern",
+      data.wpmodern
+    );
+    await smartImportArray(KEYS_DEFAULTS.MAGIC, "magic", data.magic);
+    await smartImportArray(KEYS_DEFAULTS.PSIONICS, "psionics", data.psionics);
+    await smartImportArray(
+      KEYS_DEFAULTS.ABILITIES,
+      "powersabilities",
+      data.powersabilities
+    );
+    await smartImportArray(KEYS_DEFAULTS.MOVEMENT, "movement", data.movement);
+    await smartImportArray(KEYS_DEFAULTS.ARMOR, "armor", data.armor);
+    await smartImportArray(
+      KEYS_DEFAULTS.EQUIPMENT,
+      "equipment",
+      data.equipment
+    );
+
+    // await setRepeatingRowsAsync("h2h", data.h2h);
+    // await setRepeatingRowsAsync("wp", data.wp);
+    // await setRepeatingRowsAsync("wpmodern", data.wpmodern);
+    // await setRepeatingRowsAsync("skills", data.skills);
+    // await setRepeatingRowsAsync("magic", data.magic);
+    // await setRepeatingRowsAsync("psionics", data.psionics);
+    // await setRepeatingRowsAsync("movement", data.movement);
+    // await setRepeatingRowsAsync("powersabilities", data.powersabilities);
+    // await setRepeatingRowsAsync("modifiers", data.modifiers);
+    // await setRepeatingRowsAsync("armor", data.armor);
+    // await setRepeatingRowsAsync("equipment", data.equipment);
     await setAttrsAsync({
       importexportstatus:
         "Done importing, but triggered events are probably still running. To be sure open your browser console and when the logging stops, the import is really done.",
