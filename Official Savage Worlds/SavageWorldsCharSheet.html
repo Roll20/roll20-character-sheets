@@ -2137,20 +2137,37 @@ const requiredAttrLookup = new Proxy(requiredAttrLookupBase, genericLookupHandle
 //statblock (object): base object dropped from the compendium
 //callback (function): A function that will use the parsed compendium lookup data to finish the drag and drop of the item
 //The callback function receives the parsed statblock as an argument
+const independentProducts = ['Savage Worlds Adventure Edition','Pathfinder for Savage Worlds'];
 const compendiumLookup = function({queue, callback}) {
-    getCompendiumPage(`Introduction:BookIndex`,(data)=>{
-        if(data.data['data-IDPathways']){
-            try{
-                const IDPathways = JSON.parse(data.data['data-IDPathways']);
-                compendiumDataLookup({queue,callback,IDPathways});
-            }catch(err){
-                debug('No IDPathways found, exiting drag and drop');
-            }
-        }else{
-            debug(`!!! No product index page found. No valid base compendiums present !!!`);
-        }
+    getProductLines([...independentProducts],(IDPathways)=>{
+        compendiumDataLookup({queue,callback,IDPathways});
     });
 };
+
+/**
+ * 
+ * @param {array} queue - Array of product index pages to work through
+ * @param {function} callback - The function to call when a valid product index page is found.
+ * @returns {void}
+ */
+const getProductLines = function(queue,callback){
+    const curr = queue.shift();
+    getCompendiumPage(`Introduction:${curr}`,(data)=>{
+        if(data.data.blobs.IDPathways){
+            try{
+                const IDPathways = JSON.parse(data.data.blobs.IDPathways['data-IDPathways']);
+                callback(IDPathways);
+            }catch(err){
+                debug('No IDPathways found, exiting drag and drop');
+                return null;
+            }
+        }else if(!queue.length){
+            debug(`!!! No product index page found. No valid base compendiums present !!!`);
+        }else{
+            getProductLines(queue,callback);
+        }
+    });
+}
 
 const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
     origBlock = origBlock || queue[0];
