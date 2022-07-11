@@ -1,11 +1,29 @@
 (function () {
-  async function getRepeatingSectionArrayAsync(section, rowIds, attrNames) {
+  async function getRepeatingSectionArrayAsync(
+    keynamesDefaultsArray,
+    section,
+    rowIds,
+    attrNames
+  ) {
     let sectionArray = [];
     const attrs = await getAttrsAsync(attrNames);
     rowIds.forEach((rowId) => {
       const wpObj = Object.keys(attrs).reduce((acc, attr) => {
-        if (attr.includes(rowId)) {
-          acc[attr.replace(`repeating_${section}_${rowId}_`, "")] = attrs[attr];
+        const newAttrName = attr.replace(`repeating_${section}_${rowId}_`, "");
+        const defaultValue = keynamesDefaultsArray[newAttrName];
+        const rawImportValue = attrs[attr];
+        const attributeType = typeof defaultValue;
+        let importValue;
+        switch (attributeType) {
+          case "number":
+            importValue = +rawImportValue;
+            break;
+          case "string":
+            importValue = rawImportValue.toString();
+            break;
+        }
+        if (attr.includes(rowId) && defaultValue !== importValue) {
+          acc[newAttrName] = importValue;
         }
         return acc;
       }, {});
@@ -14,7 +32,7 @@
     return sectionArray;
   }
 
-  async function getRepeatingRowsAsync(section) {
+  async function getRepeatingRowsAsync(keysDefaultsArray, section) {
     const ids = await getSectionIDsOrderedAsync(section);
     const attrNames = ids.reduce((acc, id) => {
       SECTIONS[section].forEach((key) => {
@@ -23,6 +41,7 @@
       return acc;
     }, []);
     const repeatingSectionArray = await getRepeatingSectionArrayAsync(
+      keysDefaultsToKeynamesDefaults(keysDefaultsArray),
       section,
       ids,
       attrNames
@@ -95,6 +114,7 @@
    *
    * @param {string} keysDefaultsProp The KEYS_DEFAULTS property to compare to.
    * @param {object} objectToImport An object of key/value pairs to import.
+   * @param {string} prefix The row ID prefix.
    */
   function getSmartImportObject(
     keysDefaultsArray,
@@ -187,17 +207,6 @@
       data.equipment
     );
 
-    // await setRepeatingRowsAsync("h2h", data.h2h);
-    // await setRepeatingRowsAsync("wp", data.wp);
-    // await setRepeatingRowsAsync("wpmodern", data.wpmodern);
-    // await setRepeatingRowsAsync("skills", data.skills);
-    // await setRepeatingRowsAsync("magic", data.magic);
-    // await setRepeatingRowsAsync("psionics", data.psionics);
-    // await setRepeatingRowsAsync("movement", data.movement);
-    // await setRepeatingRowsAsync("powersabilities", data.powersabilities);
-    // await setRepeatingRowsAsync("modifiers", data.modifiers);
-    // await setRepeatingRowsAsync("armor", data.armor);
-    // await setRepeatingRowsAsync("equipment", data.equipment);
     await setAttrsAsync({
       importexportstatus:
         "Done importing, but triggered events are probably still running. To be sure open your browser console and when the logging stops, the import is really done.",

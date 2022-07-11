@@ -19,6 +19,12 @@ function keysToKeysDefaults(keys) {
   return keys.map((key) => ({ key: key, default: 0 }));
 }
 
+function keysDefaultsToKeynamesDefaults(keysDefaultsArray) {
+  return keysDefaultsArray.map((keyDefault) => ({
+    [keyDefault.key]: keyDefault.default,
+  }));
+}
+
 const KEYS_DEFAULTS = {
   H2H: [
     { key: "name", default: "" },
