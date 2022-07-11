@@ -1,0 +1,1228 @@
+// Game: ACKS
+// Adds item packs to character sheets, by name
+// Select PC tokens tokens, enter !AddItems [ClassName]
+// Do NOT include race name (Dwarven, Elven, etc.) in the ClassName parameter.
+
+var generateUUID = (function() {
+    "use strict";
+
+    var a = 0, b = [];
+    return function() {
+        var c = (new Date()).getTime() + 0, d = c === a;
+        a = c;
+        for (var e = new Array(8), f = 7; 0 <= f; f--) {
+            e[f] = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz".charAt(c % 64);
+            c = Math.floor(c / 64);
+        }
+        c = e.join("");
+        if (d) {
+            for (f = 11; 0 <= f && 63 === b[f]; f--) {
+                b[f] = 0;
+            }
+            b[f]++;
+        } else {
+            for (f = 0; 12 > f; f++) {
+                b[f] = Math.floor(64 * Math.random());
+            }
+        }
+        for (f = 0; 12 > f; f++){
+            c += "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz".charAt(b[f]);
+        }
+        return c;
+    };
+}()),
+
+generateRowID = function () {
+    "use strict";
+    return generateUUID().replace(/_/g, "Z");
+};
+
+on("ready", function() {
+
+    on("chat:message", function (msg) {
+        if (msg.type === "api" && playerIsGM(msg.playerid) &&  msg.content.split(" ",1) == "!AddItems")  
+        {
+            addItems(msg);
+        }
+    });
+});
+
+// const sc = str => sendChat("", `${str}`) // Needed if not declared elsewhere
+
+const addItems = msg =>
+{
+    if(!msg.selected) 
+    {
+        sc("Select one or more representative tokens before running the api command.") 
+        return
+    }
+    
+    const itemList = msg.content.split(" ",2)[1];
+    log('itemList: ' + itemList);
+    if (itemList == undefined) {
+        sc("No list property found.");
+        return;
+    }
+
+    msg.selected.forEach((token, index) =>
+    {
+        if(!getObj(msg.selected[index]._type,msg.selected[index]._id).get('represents'))
+        {
+            sc(`${getObj(msg.selected[index]._type,msg.selected[index]._id).get('name')} is not representative`);
+            return;
+        }
+        else
+        {
+            let reps = getObj(msg.selected[index]._type,msg.selected[index]._id).get('represents');
+            if (itemList == 'Assassin') generateListAssassin(reps)
+            else if (itemList == 'Bard') generateListBard(reps)
+            else if (itemList == 'Bladedancer') generateListBladedancer(reps)
+            else if (itemList == 'Cleric') generateListCleric(reps)
+            else if (itemList == 'Craftpriest') generateListCraftpriest(reps)
+            else if (itemList == 'Explorer') generateListExplorer(reps)
+            else if (itemList == 'Fighter') generateListFighter(reps)
+            else if (itemList == 'Mage') generateListMage(reps)
+            else if (itemList == 'Nightblade') generateListNightblade(reps)
+            else if (itemList == 'Spellsword') generateListSpellsword(reps)
+            else if (itemList == 'Thief') generateListThief(reps)
+            else if (itemList == 'Vaultguard') generateListVaultguard(reps)
+            else sc("Invalid list '" + itemList + "'.");
+        }
+    })
+}
+
+const generateListAssassin = reps =>
+{
+    itemsAssassin.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListBard = reps =>
+{
+    itemsBard.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListBladedancer = reps =>
+{
+    itemsBladedancer.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListCleric = reps =>
+{
+    itemsCleric.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListCraftpriest = reps =>
+{
+    itemsCraftpriest.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListExplorer = reps =>
+{
+    itemsExplorer.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListFighter = reps =>
+{
+    itemsFighter.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListMage = reps =>
+{
+    itemsMage.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListNightblade = reps =>
+{
+    itemsNightblade.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListSpellsword = reps =>
+{
+    itemsSpellsword.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListThief = reps =>
+{
+    itemsThief.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateListVaultguard = reps =>
+{
+    itemsVaultguard.forEach(item =>
+    {
+        const data = {};
+        const repString = `repeating_items_${generateRowID()}`;
+        Object.keys(item).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = item[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const itemsAssassin =
+[
+        {
+            item_name: "Sword",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Dagger",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "3"
+        },
+        {
+            item_name: "Leather Armor",
+            item_weight: "2",
+            item_count: "1",
+            item_value: "20"
+        },
+        {
+            item_name: "Tunic and Pants",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "4"
+        },
+        {
+            item_name: "Cloak",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "1"
+        },
+        {
+            item_name: "Boots",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".6"
+        },
+        {
+            item_name: "Belt Pouch",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".5"
+        },
+        {
+            item_name: "Dice",
+            item_weight: ".01",
+            item_count: "2",
+            item_value: ""
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Torch",
+            item_weight: "0.17",
+            item_count: "8",
+            item_value: ""
+        }
+]
+
+const itemsBard =
+[,
+        {
+            item_name: "Crossbow",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "30"
+        },
+        {
+            item_name: "Quarrel",
+            item_weight: ".01",
+            item_count: "20"
+        },
+        {
+            item_name: "Short Sword",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "7"
+        },        
+        {
+            item_name: "Dagger",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "3"
+        },
+        {
+            item_name: "Leather Armor",
+            item_weight: "2",
+            item_count: "1",
+            item_value: "20"
+        },
+        {
+            item_name: "Tunic and Pants",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "4"
+        },
+        {
+            item_name: "Boots",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".6"
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Musical Instrument",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "25"
+        },
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Torch",
+            item_weight: "0.17",
+            item_count: "8",
+            item_value: ""
+        }
+]
+
+const itemsBladedancer =
+[,
+        {
+            item_name: "Sword",
+            item_weight: "0.17",
+            item_count: "2",
+            item_value: "10"
+        },
+        {
+            item_name: "Leather Armor",
+            item_weight: "2",
+            item_count: "1",
+            item_value: "20"
+        },
+        {
+            item_name: "Cloak, Silk",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "15"
+        },
+        {
+            item_name: "Bladedancer's Head Dress",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "20"
+        },
+        {
+            item_name: "Holy Symbol",
+            item_weight: "0",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Torch",
+            item_weight: "0.17",
+            item_count: "8",
+            item_value: ""
+        }
+]
+
+const itemsCleric =
+[
+        {
+            item_name: "Mace",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "5"
+        },
+        {
+            item_name: "Shield",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Banded Plate Armor",
+            item_weight: "5",
+            item_count: "1",
+            item_value: "50"
+        },
+        {
+            item_name: "Priest's Cassock",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "7"
+        },
+        {
+            item_name: "Shoes",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".4"
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Holy Symbol",
+            item_weight: "0",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Holy Book",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },,
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Torch",
+            item_weight: "0.17",
+            item_count: "8",
+            item_value: ""
+        }
+]
+
+const itemsCraftpriest =
+[,
+        {
+            item_name: "War Hammer",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "5"
+        },
+        {
+            item_name: "Banded Plate Armor",
+            item_weight: "5",
+            item_count: "1",
+            item_value: "50"
+        },
+        {
+            item_name: "Shield",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Holy Symbol",
+            item_weight: "0",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Craftman's Tools",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "25"
+        },,
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Torch",
+            item_weight: "0.17",
+            item_count: "8",
+            item_value: ""
+        }
+]
+
+const itemsExplorer =
+[
+        {
+            item_name: "Longbow",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "7"
+        },
+        {
+            item_name: "Arrows",
+            item_weight: ".01",
+            item_count: "20"
+        },
+        {
+            item_name: "Spear",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "3"
+        },
+        {
+            item_name: "Short Sword",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "7"
+        },
+        {
+            item_name: "Dagger",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "3"
+        },
+        {
+            item_name: "Chainmail Armor",
+            item_weight: "4",
+            item_count: "1",
+            item_value: "40"
+        },
+        {
+            item_name: "Cloak",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "1"
+        },
+        {
+            item_name: "Boots",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".6"
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Lantern",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Tinderbox",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".8"
+        },
+        {
+            item_name: "Oil, Common",
+            item_weight: "0.17",
+            item_count: "2",
+            item_value: ".3"
+        },
+        {
+            item_name: "Blanket",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Rope, 50'",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "1"
+        },
+        {
+            item_name: "Iron Spikes",
+            item_weight: ".01",
+            item_count: "12",
+            item_value: ""
+        },
+        {
+            item_name: "Small Hammer",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        }
+]
+
+const itemsFighter =
+[
+        {
+            item_name: "Sword",
+            item_weight: "0.16",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Shield",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Chainmal Armor",
+            item_weight: "4",
+            item_count: "1",
+            item_value: "40"
+        },
+        {
+            item_name: "Crossbow",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "30"
+        },
+        {
+            item_name: "Quarrel",
+            item_weight: ".01",
+            item_count: "20"
+        },
+        {
+            item_name: "Tunic and Pants",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "4"
+        },
+        {
+            item_name: "Boots",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".3"
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Torch",
+            item_weight: "0.17",
+            item_count: "8",
+            item_value: ""
+        }
+]
+
+const itemsMage =
+[
+        {
+            item_name: "Quarterstaff",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "1"
+        },
+        {
+            item_name: "Mage's Cassock",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "7"
+        },
+        {
+            item_name: "Shoes",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".4"
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Spell Book",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Torch",
+            item_weight: "0.17",
+            item_count: "8",
+            item_value: ""
+        }
+]
+
+const itemsNightblade =
+[
+        {
+            item_name: "Crossbow",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "30"
+        },
+        {
+            item_name: "Quarrel",
+            item_weight: ".01",
+            item_count: "20",
+            item_value: ""
+        },
+        {
+            item_name: "Sword",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Dagger",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "3"
+        },
+        {
+            item_name: "Leather Armor",
+            item_weight: "2",
+            item_count: "1",
+            item_value: "20"
+        },
+        {
+            item_name: "Cloak",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "1"
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Grappling Hook",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "25"
+        },
+        {
+            item_name: "Rope, 50'",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "1"
+        },
+        {
+            item_name: "Crowbar",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "1"
+        },
+        {
+            item_name: "Oil, Military",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Tinderbox",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".8"
+        },,
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Torch",
+            item_weight: "0.17",
+            item_count: "8",
+            item_value: ""
+        }
+]
+
+const itemsSpellsword =
+[,
+        {
+            item_name: "Sword",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Dagger",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "3"
+        },
+        {
+            item_name: "Composite Bow",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Arrow",
+            item_weight: ".01",
+            item_count: "20",
+            item_value: ""
+        },
+        {
+            item_name: "Chainmail Armor",
+            item_weight: "4",
+            item_count: "1",
+            item_value: "40"
+        },
+        {
+            item_name: "Cloak",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "1"
+        },
+        {
+            item_name: "Boots",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".6"
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Spell Book",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ""
+        },,
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        },
+        {
+            item_name: "Torch",
+            item_weight: "0.17",
+            item_count: "8",
+            item_value: ""
+        }
+]
+
+const itemsThief =
+[
+        {
+            item_name: "Pole, 10'",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ".1"
+        },
+        {
+            item_name: "Short Sword",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "7"
+        },
+        {
+            item_name: "Dagger",
+            item_weight: "0.17",
+            item_count: "2",
+            item_value: "3"
+        },
+        {
+            item_name: "Crossbow",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "30"
+        },
+        {
+            item_name: "Quarrel",
+            item_weight: ".01",
+            item_count: "20"
+        },
+        {
+            item_name: "Leather Armor",
+            item_weight: "2",
+            item_count: "1",
+            item_value: "20"
+        },
+        {
+            item_name: "Cloak",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "1"
+        },
+        {
+            item_name: "Tunic and Pants",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "4"
+        },
+        {
+            item_name: "Boots",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".6"
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Sack, Large",
+            item_weight: "0.17",
+            item_count: "2",
+            item_value: ".8"
+        },
+        {
+            item_name: "Thieves' Tools",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "25"
+        },
+        {
+            item_name: "Rope, 50'",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "1"
+        },
+        {
+            item_name: "Tinderbox",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".8"
+        },
+        {
+            item_name: "Lantern",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Hammer",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Iron Spike",
+            item_weight: ".01",
+            item_count: "12",
+            item_value: ""
+        },
+        {
+            item_name: "Oil, Military",
+            item_weight: "0.17",
+            item_count: "2",
+            item_value: "2"
+        },,
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ".6"
+        }
+]
+
+const itemsVaultguard =
+[,
+        {
+            item_name: "Battle Axe",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "7"
+        },
+        {
+            item_name: "Hand Axe",
+            item_weight: "0.17",
+            item_count: "3",
+            item_value: "4"
+        },
+        {
+            item_name: "Banded Plate Armor",
+            item_weight: "5",
+            item_count: "1",
+            item_value: "50"
+        },
+        {
+            item_name: "Shield",
+            item_weight: "1",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Backpack",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "2"
+        },
+        {
+            item_name: "Lantern",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: "10"
+        },
+        {
+            item_name: "Oil (Military)",
+            item_weight: "0.17",
+            item_count: "2",
+            item_value: "2"
+        },
+        {
+            item_name: "Oil (Common)",
+            item_weight: "0.17",
+            item_count: "3",
+            item_value: ".3"
+        },
+        {
+            item_name: "Tinderbox",
+            item_weight: "0.17",
+            item_count: "1",
+            item_value: ".8"
+        },,
+        {
+            item_name: "Rations (1 Day)",
+            item_weight: "0.17",
+            item_count: "14",
+            item_value: ".2"
+        },
+        {
+            item_name: "Waterskin",
+            item_weight: "1",
+            item_count: "1",
+            item_value: ""
+        }
+]

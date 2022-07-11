@@ -1,0 +1,141 @@
+// Game: ACKS
+// Adds common universal melee and missile attacks
+// Select PC tokens tokens, enter !AddAttacks
+
+var generateUUID = (function() {
+    "use strict";
+
+    var a = 0, b = [];
+    return function() {
+        var c = (new Date()).getTime() + 0, d = c === a;
+        a = c;
+        for (var e = new Array(8), f = 7; 0 <= f; f--) {
+            e[f] = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz".charAt(c % 64);
+            c = Math.floor(c / 64);
+        }
+        c = e.join("");
+        if (d) {
+            for (f = 11; 0 <= f && 63 === b[f]; f--) {
+                b[f] = 0;
+            }
+            b[f]++;
+        } else {
+            for (f = 0; 12 > f; f++) {
+                b[f] = Math.floor(64 * Math.random());
+            }
+        }
+        for (f = 0; 12 > f; f++){
+            c += "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz".charAt(b[f]);
+        }
+        return c;
+    };
+}()),
+
+generateRowID = function () {
+    "use strict";
+    return generateUUID().replace(/_/g, "Z");
+};
+
+on("ready", function() {
+
+    on("chat:message", function (msg) {
+        if (msg.type === "api" && playerIsGM(msg.playerid) &&  msg.content === "!AddAttacks")  
+        {
+            meleeAttackAdd(msg);
+        }
+    });
+});
+
+const sc = str => sendChat("", `${str}`)
+
+const meleeAttackAdd = msg =>
+{
+    if(!msg.selected) 
+    {
+        sc("Please select one or more representative tokens before running the api command") 
+        return
+    }
+    
+    msg.selected.forEach((token, index) =>
+    {
+        if(!getObj(msg.selected[index]._type,msg.selected[index]._id).get('represents'))
+        {
+            sc(`${getObj(msg.selected[index]._type,msg.selected[index]._id).get('name')} is not representative`)
+            return
+        }
+        else
+        {
+            let reps = getObj(msg.selected[index]._type,msg.selected[index]._id).get('represents')
+            generateMeleeAttacks(reps)
+	    generateMissileAttacks(reps)
+        }
+    })
+}
+
+const generateMeleeAttacks = reps =>
+{
+    meleeAttacks.forEach(atk =>
+    {
+        const data = {};
+        const repString = `repeating_melee_${generateRowID()}`;
+        Object.keys(atk).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = atk[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const generateMissileAttacks = reps =>
+{
+    missileAttacks.forEach(atk =>
+    {
+        const data = {};
+        const repString = `repeating_missile_${generateRowID()}`;
+        Object.keys(atk).forEach(field => {
+            log(`field: ${field}`)
+            data[`${repString}_${field}`] = atk[field];
+        });
+
+        // set attributes
+        setAttrs(reps, data);
+        
+    })
+}
+
+const meleeAttacks =
+[
+        {
+            melee_name: "Punch",
+            melee_damage: "1d3",
+            melee_bonus: "0"
+        },
+        {
+            melee_name: "Kick",
+            melee_damage: "1d4",
+            melee_bonus: "-2"
+        },
+        {
+            melee_name: "Torch",
+            melee_damage: "1d3",
+            melee_bonus: "0"
+        },
+        {
+            melee_name: "Improvised",
+            melee_damage: "1d3",
+            melee_bonus: "0"
+        }
+]
+
+const missileAttacks =
+[
+        {
+            missile_name: "Improvised",
+            missile_range: "10/20/30",
+            missile_damage: "1d3",
+            melee_bonus: "0"
+        }
+]
