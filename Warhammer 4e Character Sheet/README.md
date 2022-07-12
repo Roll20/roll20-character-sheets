@@ -86,11 +86,11 @@ July 11th 2022 v1.6
 
 UI & Code consolidation Update
 - Major clean up of sheet code (-25%), removed much of the pre-devmode code for the old SL system. This improves overall sheet performance and load times.
-- New SL system (formely Devmode/Talent integration only) is now fully integrated as default and used for all rolls. 
+- New SL system (formerly Devmode/Talent integration only) is now fully integrated as default and used for all rolls. 
 - SL RT result line cleaned up, roll SL outcome clearly outlined, with bonus SL (colored), and final SL outlined.
-- Desmirched added to conditions list, it is currently not yet intergrated into Fellowship rolls. (TBD)
-- Talent Integration XP now fully integrated. Sheets that where using Auto XP custom talent entries will need to delete them and transfer them to the new integrated talents. Custom Talents can still be added manually.
-- NPC's will remember equiped weapon types we closing and reopening a sheet.
+- Besmirched added to conditions list, it is currently not yet integrated into Fellowship rolls. (TBD)
+- Talent Integration XP now fully integrated. Sheets that where using Custom talents will need to delete them and transfer them to the new integrated talents for this to work as intended. Custom Talents can still be added manually.
+- NPC's will remember equipped weapon types when closing and reopening a sheet.
 
 
 June 6th 2022 v1.56a
