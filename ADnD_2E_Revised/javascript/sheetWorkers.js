@@ -1367,6 +1367,9 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
         if (category)
             weaponsInCategory = weaponsInCategory.filter(w => w['category'].includes(category));
 
+        if (weaponsInCategory.length === 0)
+            return;
+
         let baseWeapon = await selectVersion(weaponsInCategory, values, comparer, 'weapon');
         console.log(baseWeapon);
         if (!baseWeapon)
