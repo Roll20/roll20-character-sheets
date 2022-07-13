@@ -1965,6 +1965,8 @@ function setupSpellCrit(section) {
             let displayHits = rollBuilder.map(s => `{{${s}}}`).join(' ');
             let displayInjuries = Array.from(set).map(s => `{{${s}}}`).join(' ');
             let finalRollText = `&{template:2Epocrit} ${displayHits} ${displayInjuries}`;
+            if (section.includes('monster'))
+                finalRollText = `@{wtype}${finalRollText}`;
 
             console.log(finalRollText);
 
