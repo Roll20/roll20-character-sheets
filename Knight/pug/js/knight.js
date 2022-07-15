@@ -449,7 +449,7 @@ on('change:fichePNJ change:armure change:berserkNiveaux change:berserkRageN1Egid
 });
 
 // DEFENSE
-on('change:fichePNJ change:armure change:armureLegende change:defense change:defBM change:bonusDefense change:defenseODBonus change:defenseModifPerso change:barbarianDef change:berserkRageA change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALWarmasterImpEsquive change:MALBarbarianDef change:MasquePNJAE change:MasquePNJAEMaj change:defensePNJ change:MADDjinnNanobrumeActive', async () => {
+on('change:fichePNJ change:armure change:armureLegende change:defense change:defBM change:bonusDefense change:defenseODBonus change:defenseModifPerso change:barbarianDef change:berserkRageA change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALWarmasterImpEsquive change:MALBarbarianDef change:MasquePNJAE change:MasquePNJAEMaj change:defensePNJ change:tabSectionKraken change:MADDjinnNanobrumeActive', async () => {
   const attrs = await getAttrsAsync(['defense', 'defensePNJ', 'defBM', 'bonusDefense', 'defenseModifPerso', 'defenseODBonus',
     'fichePNJ', 'armure', 'armureLegende',
     'barbarianDef',
@@ -459,7 +459,8 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
     'warmasterImpEsquive', 'warmasterImpEPersonnel',
     'MALWarmasterImpEsquive', 'MALWarmasterImpEPersonnel',
     'MasquePNJAE', 'MasquePNJAEMaj',
-    'MADDjinnNanobrumeActive']);
+    'MADDjinnNanobrumeActive',
+    'tabSectionKraken']);
 
   const fiche = +attrs.fichePNJ;
 
@@ -498,6 +499,8 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
   const masqueAEMaj = +attrs.MasquePNJAEMaj;
 
   const mechaArmureNanoBrume = attrs.MADDjinnNanobrumeActive;
+
+  const kraken = +attrs.tabSectionKraken;
 
   let base = 0;
   let modif = 0;
@@ -549,6 +552,8 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
       if (armureL === 'barbarian') { modif -= MALGoliath; }
 
       if (mechaArmureNanoBrume === 1) { totalMecha += 3; }
+
+      if (kraken === 1) { modif += 1; }
       break;
     case 1:
     case 2:
@@ -574,7 +579,7 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
 });
 
 // REACTION
-on('change:fichePNJ change:armure change:armureLegende change:reaction change:rctBM change:bonusReaction change:reactionODBonus change:reactionModifPerso change:barbarianRea change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:paladinWatchtower change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALBarbarianRea change:MachinePNJAE change:MachinePNJAEMaj change:reactionPNJ change:MADDjinnNanobrumeActive', async () => {
+on('change:fichePNJ change:armure change:armureLegende change:reaction change:rctBM change:bonusReaction change:reactionODBonus change:reactionModifPerso change:barbarianRea change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:paladinWatchtower change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALBarbarianRea change:MachinePNJAE change:MachinePNJAEMaj change:reactionPNJ change:tabSectionKraken change:MADDjinnNanobrumeActive', async () => {
   const attrs = await getAttrsAsync(['reaction', 'reactionPNJ', 'rctBM', 'bonusReaction', 'reactionModifPerso', 'reactionODBonus',
     'fichePNJ', 'armure', 'armureLegende',
     'barbarianRea',
@@ -585,7 +590,8 @@ on('change:fichePNJ change:armure change:armureLegende change:reaction change:rc
     'warmasterImpEsquive', 'warmasterImpEPersonnel',
     'MALWarmasterImpEsquive', 'MALWarmasterImpEPersonnel',
     'MachinePNJAE', 'MachinePNJAEMaj',
-    'MADDjinnNanobrumeActive']);
+    'MADDjinnNanobrumeActive',
+    'tabSectionKraken']);
 
   const fiche = +attrs.fichePNJ;
 
@@ -626,6 +632,8 @@ on('change:fichePNJ change:armure change:armureLegende change:reaction change:rc
   const machineAEMaj = +attrs.MachinePNJAEMaj;
 
   const mechaArmureNanoBrume = attrs.MADDjinnNanobrumeActive;
+
+  const kraken = +attrs.tabSectionKraken;
 
   let base = 0;
   let modif = 0;
@@ -683,6 +691,8 @@ on('change:fichePNJ change:armure change:armureLegende change:reaction change:rc
       }
 
       if (mechaArmureNanoBrume === 1) { totalMecha += 3; }
+
+      if (kraken === 1) { modif += 1; }
       break;
     case 1:
     case 2:
@@ -843,8 +853,8 @@ on('change:shamanNbreTotem', async () => {
 
 // GESTION DES ASPECTS ET CARACTERISTIQUES
 // Chair
-on('change:deplacement change:force change:endurance change:santeModif change:santeODBonus sheet:opened', async () => {
-  const attrs = await getAttrsAsync(['fichePNJ', 'chair', 'deplacement', 'force', 'endurance', 'santeModif', 'santeODBonus']);
+on('change:deplacement change:force change:endurance change:santeModif change:santeODBonus change:tabSectionKraken sheet:opened', async () => {
+  const attrs = await getAttrsAsync(['fichePNJ', 'chair', 'deplacement', 'force', 'endurance', 'santeModif', 'santeODBonus', 'tabSectionKraken']);
 
   const fiche = +attrs.fichePNJ;
 
@@ -852,6 +862,7 @@ on('change:deplacement change:force change:endurance change:santeModif change:sa
 
   const chair = +attrs.chair;
 
+  const kraken = +attrs.tabSectionKraken;
   const deplacement = +attrs.deplacement;
   const force = +attrs.force;
   const endurance = +attrs.endurance;
@@ -859,14 +870,19 @@ on('change:deplacement change:force change:endurance change:santeModif change:sa
   const modif = +attrs.santeModif;
   const OD = +attrs.santeODBonus;
 
+  let multiplicateur = 6;
+
   maxCar('deplacement', deplacement, chair);
   maxCar('force', force, chair);
   maxCar('endurance', endurance, chair);
 
-  const total = 10 + (Math.max(deplacement, force, endurance) * 6) + modif + OD;
+  if (kraken === 1) { multiplicateur = 8; }
+
+  const total = 10 + (Math.max(deplacement, force, endurance) * multiplicateur) + modif + OD;
 
   await setAttrsAsync({ santepj_max: total });
 });
+
 // Bête
 on('change:fichePNJ change:armure change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'armure', 'bete', 'hargne', 'combat', 'instinct', 'calODHar', 'calODCom', 'calODIns']);
@@ -875,7 +891,7 @@ on('change:fichePNJ change:armure change:hargne change:combat change:instinct ch
 
   if (fiche !== 0) { return; }
 
-  const armure = +attrs.armure;
+  const armure = attrs.armure;
 
   const aspect = +attrs.bete;
 
@@ -3050,7 +3066,7 @@ on('change:mechaArmure change:mechaArmureArchangelConfiguration change:mechaArmu
 // FIN MECHAARMURE
 
 // LONGBOW
-on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceEvol change:rangerArmeViolence change:rangerArmePortee change:rangerChoc change:rangerDegatContinue change:rangerDesignation change:rangerSilencieux change:rangerPerceArmure change:rangerUltraViolence change:rangerAntiVehicule change:rangerArtillerie change:rangerDispersion change:rangerLumiere change:rangerPenetrant change:rangerPerceArmure60 change:rangerAntiAnatheme change:rangerDemoralisant change:rangerEnChaine change:rangerFureur change:rangerIgnoreArmure change:rangerPenetrant10 change:ranger100PG change:ranger50PG2 sheet:opened', async () => {
+on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceEvol change:rangerArmeViolence change:rangerArmePortee change:rangerChoc change:rangerDegatContinue change:rangerDesignation change:rangerSilencieux change:rangerPerceArmure change:rangerUltraViolence change:rangerAntiVehicule change:rangerArtillerie change:rangerDispersion change:rangerLumiere change:rangerPenetrant change:rangerPerceArmure60 change:rangerAntiAnatheme change:rangerDemoralisant change:rangerEnChaine change:rangerFureur change:rangerIgnoreArmure change:rangerPenetrant10 change:ranger100PG change:ranger50PG2 change:ranger50PG sheet:opened', async () => {
   const attrs = await getAttrsAsync([
     'rangerArmeDegatEvol',
     'rangerArmeDegat',
@@ -3077,9 +3093,11 @@ on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceE
     'rangerPenetrant10',
     'ranger100PG',
     'ranger50PG2',
+    'ranger50PG',
   ]);
 
   const PG50 = attrs.ranger50PG2;
+  const PG501 = attrs.ranger50PG;
   const PG100 = attrs.ranger100PG;
 
   let baseD = 3;
@@ -3152,13 +3170,13 @@ on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceE
 
   if (eArtillerie !== '0') { energieDepense += E2; }
 
-  if (eAntiAnatheme !== '0') { energieDepense += E3; }
+  if (eAntiAnatheme !== '0' && PG501 === 'on') { energieDepense += E3; }
 
-  if (eDemoralisant !== '0') { energieDepense += E3; }
+  if (eDemoralisant !== '0' && PG501 === 'on') { energieDepense += E3; }
 
-  if (eEnChaine !== '0') { energieDepense += E3; }
+  if (eEnChaine !== '0' && PG501 === 'on') { energieDepense += E3; }
 
-  if (eFureur !== '0') { energieDepense += E3; }
+  if (eFureur !== '0' && PG501 === 'on') { energieDepense += E3; }
 
   if (eAntiVehicule !== '0') { energieDepense += E2; }
 
@@ -3176,9 +3194,9 @@ on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceE
 
   if (ePerceArmure60 !== '0') { energieDepense += E2; }
 
-  if (eIgnoreArmure !== '0') { energieDepense += E3; }
+  if (eIgnoreArmure !== '0' && PG501 === 'on') { energieDepense += E3; }
 
-  if (ePenetrant10 !== '0') { energieDepense += E3; }
+  if (ePenetrant10 !== '0' && PG501 === 'on') { energieDepense += E3; }
 
   energie += energieDepense;
 
