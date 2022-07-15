@@ -1966,7 +1966,7 @@ function setupSpellCrit(section) {
             let displayInjuries = Array.from(set).map(s => `{{${s}}}`).join(' ');
             let finalRollText = `&{template:2Epocrit} ${displayHits} ${displayInjuries}`;
             if (section.includes('monster'))
-                finalRollText = `@{wtype}${finalRollText}`;
+                finalRollText = `@{wtype} ${finalRollText}`;
 
             console.log(finalRollText);
 
