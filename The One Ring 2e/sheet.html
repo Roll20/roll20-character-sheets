@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="02-14-00" />
+<input type="hidden" name="attr_version" value="03-00-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -2379,6 +2379,71 @@
         clog(`Completed first roll`);
     });
 
+    on(`change:notes sheet:opened`, function() {
+        getAttrs(["notes", "sheetTab"], function(values) {
+            if (values.sheetTab ==="isAdversary"){
+                let importerror = false;
+                try{
+                    var characterData = JSON.parse(values.notes);
+                } catch(err){
+                    importerror = true;
+                }
+                if (!importerror && values.notes != "") {
+                    clearSheet();
+                    writeToSheet(characterData);
+                } else {
+                    if (importerror && values.notes != "") {
+                        clog('Adversary import skipped. Notes field is no valid JSON.')   
+                    }
+                }
+            }
+        });
+    });
+    function writeToSheet (characterData) {
+        let character = {};
+        character["name"] = characterData["name"] || "";
+        character["attribute-level"] = parseInt(characterData["attributeLevel"]);
+        character["distinctive-features"] = characterData["distinctiveFeatures"] || "";
+        character["endurance"] = parseInt(characterData["endurance"]);
+        character["might"] = parseInt(characterData["might"]);
+        character["hate"] = parseInt(characterData["hateresolve"]);
+        character["parry"] = parseInt(characterData["parry"]);
+        character["armourprot"] = parseInt(characterData["armour"]);
+        let weapon1 = characterData["weaponProficiencies"][0] || false;
+        let weapon2 = characterData["weaponProficiencies"][1] || false;
+        if (weapon1) {
+            character["weapon_skill_name_1"] = weapon1["weaponname"] || "";
+            character["weapon_rating_1"] = parseInt(weapon1["rating"]);
+            character["weapon_damage_1"] = parseInt(weapon1["damage"]);
+            character["weapon_injury_1"] = parseInt(weapon1["injury"]);
+            character["weapon_special_damage_1"] = weapon1["special"] || "";
+        }
+        if (weapon2){
+            character["weapon_skill_name_2"] = weapon2["weaponname"] || "";
+            character["weapon_rating_2"] = parseInt(weapon2["rating"]);
+            character["weapon_damage_2"] = parseInt(weapon2["damage"]);
+            character["weapon_injury_2"] = parseInt(weapon2["injury"]);
+            character["weapon_special_damage_2"] = weapon2["special"] || "";
+        }
+        // repeating_fell_abilities
+        // fell_ability
+        // fell_ability_desc
+        setAttrs(character);
+        setAttrs({['notes']: "Adversary json import successful."});
+    };
+
+    function clearSheet() {
+        setAttrs({
+            ["name"]: "",
+            ["distinctive-features"]: "",
+        });
+        getSectionIDs("repeating_fell-abilities", function(idarray) {
+            for(var i=0; i < idarray.length; i++) {
+                removeRepeatingRow("repeating_fell-abilities_" + idarray[i]);
+            }
+        });
+    };
+
     /*==================
       Migration scripts.
     ====================*/
@@ -2584,6 +2649,25 @@
 - added "fellowship focus" to pc sheet
 ### Translation
 - fixed some missing support for translations on the pc sheet (thanks to iosu Li for the spanish translation)
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+
+            if (build < 19) {
+                attrs["build"] = 20;
+                let releaselog = {msg:""};
+                hlog(`Release 03.0.0 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Features
+- added adversary json import
                         `, releaselog);
                         hlog("==============", releaselog);
                         attrs['releaselog'] =  releaselog.msg + values['releaselog'];
