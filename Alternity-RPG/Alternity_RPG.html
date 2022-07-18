@@ -31,6 +31,30 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 	repeatingSum("EquipmentTotal", "equipment", ["ItemMass", "ItemQty", "ItemIsWorn"]);
 });
 
+on('sheet:opened', function() {
+	getAttrs(['wealth', 'socialstatus', 'LongNotes'], function(values) {
+		// If the user has an wealth value we need to add a new currency row with our old value and remove the old one 
+		if (!!values.wealth) {
+			console.log(`Found old Currency data (${values.wealth}), migrating to new Currency fields`);
+			setAttrs({
+				['repeating_currency_' + generateRowID() + '_wealth']: values.wealth,
+				wealth: ''
+			});
+		}
+		
+		// If the user has an socialstatus value we can add it to their Extended Notes field so at least it's not lost and remove the old one
+		if (!!values.socialstatus) {
+			console.log(`Found old Social Status data (${values.socialstatus}), appending to Extended Notes field`);
+			setAttrs({
+				LongNotes: values.LongNotes + `
+
+Old Social Status: ${values.socialstatus}`,
+				socialstatus: ''
+			});
+		}
+	});
+});
+
 </script>
 
 <img src="http://i.imgur.com/Qw48Upj.png" title="Alternity Science Fiction Roleplaying Game"/>
@@ -1801,21 +1825,23 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 				<div class="sheet-col"><input type="text" name="attr_allegiance" class="sheet-16emwidth"></div>
 			</div>
 			<div class="sheet-row">
-				<div class="sheet-broadskill sheet-col" style="width:8em">Social Status</div>
+				<div class="sheet-broadskill sheet-col" style="width:8em">
+					Social Status 
+					<span title="Missing data? We've moved it to the bottom of your Extended Notes below as we could not automatically migrate it for you" style="cursor: help;">?</span>
+				</div>
 				<table class="sheet-bordersolid">
 					<thead>
 					<tr>
 						<th colspan="2" style="border-right: 1px solid black;">Authority</th>
-						<th colspan="3" style="border-right: 1px solid black;">Wealth</th>
+						<th colspan="2" style="border-right: 1px solid black;">Wealth</th>
 						<th colspan="2">Fame</th>
 					</tr>
 					<tr>
 						<!-- Authority -->
 						<td>Rank</td>
 						<td style="border-right: 1px solid black;">Steps</td>
-						<!-- Wealtd -->
+						<!-- Wealth -->
 						<td>Rank</td>
-						<td>Steps</td>
 						<td style="border-right: 1px solid black;">Income</td>
 						<!-- Fame -->
 						<td>Rank</td>
@@ -1831,7 +1857,6 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 						</td>
 						<!-- Wealth -->
 						<td><input type="number" name="attr_WealthRank" class="sheet-score" value="0"></td>
-						<td><input type="text" name="attr_WealthSteps" class="sheet-score" value="+0"></td>
 						<td style="border-right: 1px solid black;">
 							<input type="number" name="attr_WealthIncome" class="sheet-ability" value="0" placeholder="/month" title="Income /month">
 						</td>
@@ -1857,7 +1882,7 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 			</fieldset>
 		</div>
 	</div>
-	<div class="sheet-row sheet-broadskill">Extended Notes:</div>
+	<div class="sheet-row sheet-broadskill" style="padding-top: 1em;">Extended Notes:</div>
 	<div class="sheet-row">
 		<textarea name="attr_LongNotes" class="sheet-fullbox"></textarea>
 	</div>
