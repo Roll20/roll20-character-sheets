@@ -1367,6 +1367,9 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
         if (category)
             weaponsInCategory = weaponsInCategory.filter(w => w['category'].includes(category));
 
+        if (weaponsInCategory.length === 0)
+            return;
+
         let baseWeapon = await selectVersion(weaponsInCategory, values, comparer, 'weapon');
         console.log(baseWeapon);
         if (!baseWeapon)
@@ -1962,6 +1965,8 @@ function setupSpellCrit(section) {
             let displayHits = rollBuilder.map(s => `{{${s}}}`).join(' ');
             let displayInjuries = Array.from(set).map(s => `{{${s}}}`).join(' ');
             let finalRollText = `&{template:2Epocrit} ${displayHits} ${displayInjuries}`;
+            if (section.includes('monster'))
+                finalRollText = `@{wtype} ${finalRollText}`;
 
             console.log(finalRollText);
 
