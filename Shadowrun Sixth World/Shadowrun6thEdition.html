@@ -4657,7 +4657,7 @@
 				<input name="attr_IC" type="hidden" value=""/>
 				<input class="toggle" name="attr_powered_on_IC" type="checkbox" value='1'/>
 				<span class="pictos">Q</span>
-				<button name="roll_IC" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{ic}: @{IC_name}}}{{dice=[[(@{IC_dice}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=vs. @{IC_attribute}+@{IC_matrix}\n@{IC_note}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_IC_name"></span></button>
+				<button name="roll_IC" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{ic}: @{IC_name}}}{{dice=[[(@{IC_dice}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=vs. @{IC_attribute}+@{IC_matrix}\n@{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_IC_name"></span></button>
 				<span class="center" name="attr_IC_dice"></span>
 				<span class="center" name="attr_IC_ar"></span>
 				<label data-i18n-title="cm" title="Condition Monitor">
@@ -4669,7 +4669,7 @@
 				<span class="pictos">i</span>
 				<input class="settings-toggle" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked" />
 				<span class="pictos">x</span>
-				<div class="collapse"><span name="attr_IC_note"></span></div>
+				<div class="collapse"><span name="attr_notes"></span></div>
 
 				<div class="settings">
 					<span>&nbsp;</span>
@@ -4715,7 +4715,7 @@
 					<span>&nbsp;</span>
 
 					<label data-i18n-title="notes" title="Notes">
-						<textarea name="attr_IC_note" placeholder="deploy the ic"></textarea>
+						<textarea name="attr_notes" placeholder="deploy the ic"></textarea>
 					</label>
 				</div>
 			</fieldset>
@@ -5547,7 +5547,7 @@
 <input type="hidden" name="attr_resist_pain" value="0" />
 <input type="hidden" name="attr_damage_compensator" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.53">
+<input type="hidden" name="attr_sheet_version" value="0.54">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 
@@ -5562,9 +5562,9 @@ on("sheet:opened", function() {
 		console.log(`%c Data Version: v${v['data_version']}`, "color: black; font-weight:bold");
 
 		if(v.sheet_version != v.data_version) {
-			console.log("Sheet and Data version mismatch, updating...");
-			switch(v.data_version) {
-				case '0':
+			console.log("Sheet ("+v.sheet_version+") and Data ("+v.data_version+") version mismatch, updating...");
+			switch(true) {
+				case (v.data_version == 0):
 					// fixed broken soak values
 					update_common_rolls(["body", "soak_modifier", "soak_temp", `soak_temp_flag`]);
 
@@ -5579,18 +5579,21 @@ on("sheet:opened", function() {
 					update_matrix_initiative();
 					sprite_update();
 
-				case '0.37':
+				case (v.data_version < 0.37):
 					_pre_v37_update();
 					console.log("Data now fits v.37");
-				case '0.38':
+				case (v.data_version < 0.38):
 					_v38_update();
 					console.log("Data now fits v.38");
-				case '0.39':
+				case (v.data_version < 0.39):
 					_v39_update();
 					console.log("Data now fits v.39");
-				case '0.41':
+				case (v.data_version < 0.41):
 					_v41_update();
 					console.log("Data now fits v.42");
+				case (v.data_version < 0.54):
+					_v53_update();
+					console.log("Data now fits v.54");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -5604,6 +5607,20 @@ on("sheet:opened", function() {
 	});
 });
 
+
+var _v53_update = () => {
+	// Update repeating_IC_IC_note to be repeating_IC_notes
+	getSectionIDs('repeating_IC', (ICRows) => {
+		ICRows.forEach((row) => {
+			getAttrs([`repeating_IC_${row}_IC_note`], (v) => {
+				setAttrs({
+					[`repeating_IC_${row}_notes`]: v[`repeating_IC_${row}_IC_note`],
+					[`repeating_IC_${row}_IC_note`]: ''
+				});
+			});
+		});
+	});
+};
 
 var _v41_update = () => {
 	// Update repeating_skills_${x}_attribute and _display_attribute
@@ -5744,28 +5761,42 @@ var _pre_v37_update = () => {
 
 }
 
+/******************************************************************/
+/*  Notes Imports                                                 */
+/*  Allows changes to "notes" fields to act as a pseudo-importer  */
+/******************************************************************/
+const repeating_sections = ['spell', 'npcspell', 'augmentations',
+'quality', 'IC', 'range', 'melee',
+'grenade', 'contacts', 'vehicle',
+'devices', 'programs', 'preparations',
+'ritual', 'spirits', 'powers',
+'metamagic', 'forms', 'echoes', 'sprites',
+'items', 'armor', 'skills', 'knowledges', 'effects'];
 
-// Allows changes to "notes" fields to act as a pseudo-importer
-on("change:repeating_spell:notes change:repeating_npcspell:notes change:repeating_augmentations:notes change:repeating_quality:notes change:repeating_IC:IC_note change:repeating_range:notes change:repeating_melee:notes", (eventInfo) => {
-	if(eventInfo.sourceType != 'player') {
-		return;
-	}
+repeating_sections.forEach((section) => {
+console.log(section);
+	on(`change:repeating_${section}:notes`, (eventInfo) => {
+console.log(eventInfo);
+		if(eventInfo.sourceType != 'player') {
+			return;
+		}
 
-	var rep_row = eventInfo.sourceAttribute.match(/(repeating_[^_]+?)_([^_]+?)_(.+)/);
-	var note = eventInfo.newValue;
-	var dat = {};
+		var rep_row = eventInfo.sourceAttribute.match(/(repeating_[^_]+?)_([^_]+?)_(.+)/);
+		var note = eventInfo.newValue;
+		var dat = {};
 
-	if(note.search("JSON=") == 0) {
-		note = note.slice(5);
-		dat = JSON.parse(note);
+		if(typeof(note) !== 'undefined' && note.search("JSON=") == 0) {
+			note = note.slice(5);
+			dat = JSON.parse(note);
 
-		toSave = {};
-		Object.keys(dat).forEach(k => {
-			toSave[`${rep_row[1]}_${rep_row[2]}_${k}`] = dat[k];
-		});
+			toSave = {};
+			Object.keys(dat).forEach(k => {
+				toSave[`${rep_row[1]}_${rep_row[2]}_${k}`] = dat[k];
+			});
 
-		setAttrs(toSave);
-	}
+			setAttrs(toSave);
+		}
+	});
 });
 
 
@@ -7664,13 +7695,13 @@ on("change:repeating_NPCspell", () => {
 
 //IC displays are set into an Array
 on("change:repeating_IC", () => {
-	 getAttrs(["host_rating", "attack", "data_processing", "repeating_IC_IC_attribute", "repeating_IC_IC_matrix", "repeating_IC_IC_note"], (v) =>{
+	 getAttrs(["host_rating", "attack", "data_processing", "repeating_IC_IC_attribute", "repeating_IC_IC_matrix", "repeating_IC_notes"], (v) =>{
 		const host = v.host_rating;
 		const att = parseInt(v.attack) || 0;
 		const data = parseInt(v.data_processing) || 0;
 		const attr = v.repeating_IC_IC_attribute;
 		const mat = v.repeating_IC_IC_matrix;
-		const not = v.repeating_IC_IC_note;
+		const not = v.repeating_IC_notes;
 
 		var def = 'None';
 		if(attr == 'None' && mat == 'None') {
@@ -9291,9 +9322,9 @@ console.log(content);
 
 
 
-/************/
-/* IMPORTER */
-/************/
+/********************/
+/* GENESIS IMPORTER */
+/********************/
 on("clicked:import", (eventInfo) => {
 	let setText = {};
 	let applyEnabled = true;
