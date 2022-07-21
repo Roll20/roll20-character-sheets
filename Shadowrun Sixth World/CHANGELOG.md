@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2022-07-26 ** v.54 Chuz (James Culp)
+	New Feature - Added Notes imports to all repeating sections with a notes field except Sprites and Spirits (players should really be using separate character sheets for these)
 **2022-07-20 ** v.53 Chuz (James Culp)
 	New Feature - Quality of life addition, newlines and spacing put in notes fields should be preserved when displaying the notes.
 	New Feature - Added Resist Toxin button to the Core Combat Info Pane
