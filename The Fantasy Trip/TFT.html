@@ -139,27 +139,37 @@
 						<span class=sheet-label style='width: 5rem;'>Wounds </span>
 						<input type=number class=sheet-small-input name="attr_Hits" value="0"/>
 					</span>
+					<button class=sheet-dice-button type="action" title="Reaction to attacker initiating Hand to Hand Combat." style='width: 4.6rem' name="act_hthreaction">HTH</button>
 				</div>
 				<div class=sheet-flex-centered>
 					<span title="Temporary damage done to your Health as for spellcasting.">
 						<span class=sheet-label style='width: 5rem'>Fatigue </span>
 						<input type=number class=sheet-small-input name="attr_Fatigue" value="0"/>
 					</span>
-					<button class=sheet-dice-button type="action" title="Reaction to attacker initiating Hand to Hand Combat." style='width: 4.6rem' name="act_hthreaction">HTH</button>
+					<span>
+						<button class=sheet-dice-button type="action" title="Shield Rush Save vs weaker (unwounded strength) rusher." style='width: 4.6rem' name="act_shieldrushweaker">SRW</button>
+						<button class=sheet-dice-button type="action" title="Shield Rush Save vs equal or stronger (unwounded strength) rusher." style='width: 4.6rem' name="act_shieldrushstronger">SRS</button>
+					</span>
 				</div>
 				<div class=sheet-flex-centered>
 					<span title="Subtract from enemy DX when attacking you.">
 						<span class=sheet-label style='width: 8rem' >Minus to Hit </span>
+						<span class=sheet-computed-value name="attr_minustohit_max"/>
+					</span>
+					<span title="Subtract from enemy DX when being attacked from flank or rear.">
+						<span class=sheet-label>MtH Flank </span>
 						<span class=sheet-computed-value name="attr_minustohit"/>
 					</span>
-					<button class=sheet-dice-button type="action" title="Shield Rush Save vs equal or stronger (unwounded strength) rusher." style='width: 4.6rem' name="act_shieldrushstronger">SRS</button>
 				</div>
 				<div class=sheet-flex-centered>
 					<span title="Hits blocked per attack by your armor/shields/abilities.">
-						<span class=sheet-label style='width: 8rem'>Hits Blocked</span>
+						<span class=sheet-label>Hits Blocked</span>
 						<span class=sheet-computed-value name="attr_hitsblocked_max"/>
 					</span>
-					<button class=sheet-dice-button type="action" title="Shield Rush Save vs weaker (unwounded strength) rusher." style='width: 4.6rem' name="act_shieldrushweaker">SRW</button>
+					<span title="Hits blocked per flank or rear attack by your armor and abilities.">
+						<span class=sheet-label>HB Flank</span>
+						<span class=sheet-computed-value name="attr_hitsblocked"/>
+					</span>
 				</div>
 			</div>
 		</div>
@@ -339,6 +349,10 @@
 				<span style='width: 5rem;' title="Subtracted from your Dexterity.">DX Penalty</span>
 				<span class=sheet-flex>Notes</span>
 				<span style='width: 4rem;' title="Armor/shield weight.">Lbs</span>
+				<span style='position: relative;' title="Non-Flanking, won't block hits or give minus to hit on flanking attacks. Should be set on shields and main gauche.">
+					<span style='position: absolute;'>NF</span>
+					<input type="checkbox" class=sheet-flex-checkbox style='visibility:hidden;'>
+				</span>
 				<span style='position: relative;' title="Not carried, won't count towards Weight, Hits Blocked, Minus to Hit, or DX penalty.">
 					<span style='position: absolute;'>NC</span>
 					<input type="checkbox" class=sheet-flex-checkbox style='visibility:hidden;'>
@@ -355,6 +369,7 @@
 					<input type=text name=attr_dexpenalty value="0" style='width: 5rem;'>
 					<input type=text name=attr_defensenotes class=sheet-flex>
 					<input type=text name=attr_weight value="" style='width: 4rem;'>
+					<input type="checkbox" name="attr_nonflanking" value="1" class=sheet-flex-checkbox>
 					<input type="checkbox" name="attr_notcarried" value="1" class=sheet-flex-checkbox>
 					&nbsp;
 					<button class=sheet-describe-button title="Describe the Armor/Shield." type="action" name="act_describe"/>
@@ -829,7 +844,7 @@
 
 	// to compute the total we need the object,
 	// the ids, the repName, and various itemnames.
-	const computeRepeatingTotal = function(v, idarray, repName, weightName, countName, notCarriedName) {
+	const computeRepeatingTotal = function(v, idarray, repName, weightName, countName, notCarriedName, nonFlankingName) {
 		 let total = 0
 		for(var i=0; i < idarray.length; i++) {
 			let id = idarray[i]
@@ -841,14 +856,18 @@
 				let notCarried = getFloatProperty(v, repName, id, notCarriedName);
 				value *= (1.0 - notCarried);
 			}
+			if (nonFlankingName) {
+				let nonFlanking = getFloatProperty(v, repName, id, nonFlankingName);
+				value *= (1.0 - nonFlanking);
+			}
 			total += value;
 		}
 		return total;
 	}
 
 	//e.g: "weapons" and "weaponwt"
-	// postcallback takes attrs, idarray, repName, weightName, countName, notCarriedName
-	const grabIds = function(idarray, repName, weightName, countName, notCarriedName, postcallback) {
+	// postcallback takes attrs, idarray, repName, weightName, countName, notCarriedName, nonFlankingName
+	const grabIds = function(idarray, repName, weightName, countName, notCarriedName, nonFlankingName, postcallback) {
 		let attrs = [];
 		for(var i=0; i < idarray.length; i++) {
 			let id = idarray[i];
@@ -860,9 +879,13 @@
 				let propertyName = repeatingPropertyName(repName, id, notCarriedName);
 				attrs.push(propertyName);
 			}
+			if (nonFlankingName) {
+				let propertyName = repeatingPropertyName(repName, id, nonFlankingName);
+				attrs.push(propertyName);
+			}
 		}
 		getAttrs(attrs, function(v) {
-			postcallback(v, idarray, repName, weightName, countName, notCarriedName);
+			postcallback(v, idarray, repName, weightName, countName, notCarriedName, nonFlankingName);
 		});
 	}
 
@@ -1493,6 +1516,7 @@
 				'Minus to Hit', id + '_minustohit',
 				'DX Penalty', id + '_dexpenalty',
 				'Weight', id + '_weight',
+				'Non-flanking', id + '_nonflanking',
 				'Note', id + '_defensenotes']);
 		}
 		else if (name == 'act_expand') {
@@ -1541,33 +1565,37 @@
 				});
 			}
 		}
-		getSectionIDs("exphistory", function(v) {grabIds(v, 'exphistory', 'expspent', '', '', idCallback);});
-		getSectionIDs("talents", function(v) {grabIds(v, 'talents', 'expspent', '', '', idCallback);});
-		getSectionIDs("spells", function(v) {grabIds(v, 'spells', 'expspent', '', '', idCallback);});
+		getSectionIDs("exphistory", function(v) {grabIds(v, 'exphistory', 'expspent', '', '', '', idCallback);});
+		getSectionIDs("talents", function(v) {grabIds(v, 'talents', 'expspent', '', '', '', idCallback);});
+		getSectionIDs("spells", function(v) {grabIds(v, 'spells', 'expspent', '', '', '', idCallback);});
 	});
 
 	/* Armor Handlers */
 
 	// Update Hits Blocked
 	on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
-		let idCallback = function(attrs, idarray, repName, blockedName, countName, notCarriedName) {
+		let idCallback = function(attrs, idarray, repName, blockedName, countName, notCarriedName, nonFlankingName) {
 			let totalBlocked = computeRepeatingTotal(attrs, idarray, repName, blockedName, countName, notCarriedName);
+			let totalBlockedFlanking = computeRepeatingTotal(attrs, idarray, repName, blockedName, countName, notCarriedName, nonFlankingName);
 			setAttrs({
-				hitsblocked_max: totalBlocked
+				hitsblocked_max: totalBlocked,
+				hitsblocked: totalBlockedFlanking
 			});
 		}
-		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'hitsblocked', '', 'notcarried', idCallback);});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'hitsblocked', '', 'notcarried', 'nonflanking', idCallback);});
 	});
 
 	// Update Minus to Hit
 	on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
-		let idCallback = function(attrs, idarray, repName, minusToHitName, countName, notCarriedName) {
+		let idCallback = function(attrs, idarray, repName, minusToHitName, countName, notCarriedName, nonFlankingName) {
 			let totalMinus = computeRepeatingTotal(attrs, idarray, repName, minusToHitName, countName, notCarriedName);
+			let totalMinusFlanking = computeRepeatingTotal(attrs, idarray, repName, minusToHitName, countName, notCarriedName, nonFlankingName);
 			setAttrs({
-				minustohit: totalMinus
+				minustohit_max: totalMinus,
+				minustohit: totalMinusFlanking
 			});
 		}
-		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'minustohit', '', 'notcarried', idCallback);});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'minustohit', '', 'notcarried', 'nonflanking', idCallback);});
 	});
 
 
@@ -1655,11 +1683,11 @@
 			}
 		}
 
-		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weight', 'count', 'notcarried', idCallback);});
-		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'weight', '', 'notcarried', idCallback);});
-		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'weight', 'count', 'notcarried', idCallback);});
+		getSectionIDs("weapons", function(v) {grabIds(v, 'weapons', 'weight', 'count', 'notcarried', '', idCallback);});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'weight', '', 'notcarried', '', idCallback);});
+		getSectionIDs("equipment", function(v) {grabIds(v, 'equipment', 'weight', 'count', 'notcarried', '', idCallback);});
 
-		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'dexpenalty', '', 'notcarried', dexCallback);});
+		getSectionIDs("armor", function(v) {grabIds(v, 'armor', 'dexpenalty', '', 'notcarried', '', dexCallback);});
 	});
 
 	// Attribute points and next attribute cost.
@@ -1709,8 +1737,8 @@
 			}
 		}
 
-		getSectionIDs("talents", function(v) {grabIds(v, 'talents', 'talentcost', '', '', idCallback);});
-		getSectionIDs("spells", function(v) {grabIds(v, 'spells', 'spellcost', '', '', idCallback);});
+		getSectionIDs("talents", function(v) {grabIds(v, 'talents', 'talentcost', '', '', '', idCallback);});
+		getSectionIDs("spells", function(v) {grabIds(v, 'spells', 'spellcost', '', '', '', idCallback);});
 	});
 
 
