@@ -127,7 +127,7 @@
 				<div class=sheet-flex-centered>
 					<span title="Wounded ST, current Strength reduced by Wounds and Fatigue.">
 						<span class='sheet-label sheet-first-word' style='width: 5rem'>Health </span>
-						<span class=sheet-computed-value name="attr_stcurrent"/>
+						<span class=sheet-computed-value name="attr_health"/>
 					</span>
 					<span>
 						<button class=sheet-dice-button type="action" title="3d6 Health Check" name="act_health_check3">3</button>
@@ -501,7 +501,7 @@
 	<div class=container>
 		<div><h1>
 			{{#attackflavor}}
-				{{character_name}} {{attackflavor}}
+				{{character_name}}<br>{{attackflavor}}
 			{{/attackflavor}}
 			{{^attackflavor}}
 				{{#weaponname}}
@@ -1109,10 +1109,10 @@
 		doSaveRoll("&{template:stat-check} {{stat_a=an}} {{stat_name=IQ}} {{stat=[[@{iq}[IQ]]]}} {{roll1=[[4d6]]}}");
 	});
 	on('clicked:health_check3', (info) => {
-		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=health}} {{stat=[[@{stcurrent}[HEALTH]]]}} {{roll1=[[3d6]]}}");
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=health}} {{stat=[[@{health}[HEALTH]]]}} {{roll1=[[3d6]]}}");
 	});
 	on('clicked:health_check4', (info) => {
-		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=health}} {{stat=[[@{stcurrent}[HEALTH]]]}} {{roll1=[[4d6]]}}");
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=health}} {{stat=[[@{health}[HEALTH]]]}} {{roll1=[[4d6]]}}");
 	});
 
 	on('clicked:initiative', (info) => {
@@ -1241,28 +1241,30 @@
 					if (roll == 3) return 4;
 					if (roll == 4) return 3;
 					if (roll == 5) return 2;
-					if (roll == 18) return -4;
-					if (roll == 17) return -3;
 					if (roll == 16) return -2;
+					if (roll == 17) return -3;
+					if (roll == 18) return -4;
 				}
-				else {
-					// 4d6
-					/* Page 9 clearly states the rules for critical success and failure on 4 die,
-						However, page 117 mentions dodging and describes
-						automatic misses consistent with critical misses, but weirdly only mentions
-						4 and 5 as the two critical hits (doing triple and double damage) and doesn't mention an
-						automatic hit at 6, much less 7 or 8.  Typo? Brain fart?
-						it *is* true that 4d6 <= 8 is probability of .054 and 3d6 <= 5 is .046
-						so rolling 4d6 has a slightly greater chance of an automatic or critical hit.
-						So I don't know, could go either way. But why remove an automatic hit at 6 or 7
-						that would still be lower odds of automatic hit (.012 and .027 respectively)
-						I'm going to assume it's intentional, ie dodging makes it MUCH harder to get crits or auto-hits.
-					*/
-					if (roll == 4) return 4;
-					if (roll == 5) return 3;
-					if (roll >= 23 && roll <= 24) return -4;
-					if (roll >= 21 && roll <= 22) return -3;
+				/* I took some liberties with the 4d6 and 5d6 dodging crits.
+				5d6 crits didn't even exist, and the 4d6 ones were overly punitive.
+				See this doc:
+				https://drive.google.com/file/d/1XHh8qUuFnZo0qG89klxAw7i4XNNGYiPd/view?usp=sharing
+			*/
+				else if (results.roll1.dice.length == 4) {
+					if (roll <= 5) return 4;
+					if (roll == 6) return 3;
+					if (roll == 7) return 2;
 					if (roll == 20) return -2;
+					if (roll == 21 || roll == 22) return -3;
+					if (roll >= 23) return -4;
+				}
+				else { /* 5d6 */
+					if (roll <= 7) return 4;
+					if (roll == 8) return 3;
+					if (roll == 9) return 2;
+					if (roll == 24) return -2;
+					if (roll == 25 || roll == 26) return -3;
+					if (roll >= 27) return -4;
 				}
 				// Normal to-hit check.
 				return (roll <= tohit) ? 1 : -1;
@@ -1573,7 +1575,8 @@
 		getAttrs(['st', 'hits', 'fatigue'], function(v) {
 			let hitpoints = v.st - v.hits - v.fatigue;
 			setAttrs({
-				stcurrent: hitpoints
+				health: hitpoints,
+				health_max: v.st
 			});
 		});
 	});
