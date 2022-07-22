@@ -214,7 +214,7 @@
 		</div>
 		<div class="sheet-attack sheet-block">
 			<div class=sheet-flex-centered style='flex-flow: row wrap;'>
-				<span class="sheet-label sheet-first-word" title="Roll to attack with selected Weapon or cast selected Spell at different to hit DX adjustments.">Attack!</span>
+				<span class="sheet-label sheet-first-word" title="Roll to attack with selected Weapon or cast selected Spell at different to hit DX adjustments.">Attack</span>
 				<span class=sheet-nowrap>
 					<button class=sheet-attack-button title="Vs. Invisible or in total darkness/blind" type="action" name="act_attack-6">-6</button>
 					<button class=sheet-attack-button type="action" name="act_attack-5">-5</button>
@@ -232,8 +232,12 @@
 				</span>
 				<button class=sheet-attack-button title="Automatic attack/cast success, use for HTH Reaction=6, bound victims, etc." type="action" name="act_attacka">A</button>
 				<span title="Roll 4d6, use vs. Defending/Dodging or Unskilled Attack, deselects after each attack">
-					<span class=sheet-label>4d6</span>
+					<span class=sheet-label>4d</span>
 					<input type=checkbox name=attr_defending>
+				</span>
+				<span title="Roll 5d6, use vs. Weapon Mastery Defending/Dodging, deselects after each attack">
+					<span class=sheet-label>5d</span>
+					<input type=checkbox name=attr_defending2>
 				</span>
 			</div>
 		</div>
@@ -1241,8 +1245,11 @@
 
 			// return the string depending on whether we are defending or not.
 			const diceProperties = function (attrs) {
-				// we are defending, so need 4d6, arg.
-				if (attrs.defending == 'on') {
+				// we are weapon mastery defending, so need 5d6
+				if (attrs.defending2 == 'on') {
+					return rollTemplateValue('defending', '1') + rollTemplateValue('roll1', '5d6', true);
+				// we are defending, so need 4d6
+				} else if (attrs.defending == 'on') {
 					return rollTemplateValue('defending', '1') + rollTemplateValue('roll1', '4d6', true);
 				} else {
 					return rollTemplateValue('roll1', '3d6', true);
@@ -1312,7 +1319,7 @@
 
 			// Nothing selected, do a generic roll.
 			if (type == '') {
-				getAttrs(['defending'], function(v) {
+				getAttrs(['defending', 'defending2'], function(v) {
 					let mstring  = `&{template:attack}`;
 					// append total and separate to hits, if present.
 					if (toHitCharacter != 'a') {
@@ -1342,7 +1349,7 @@
 				let successFlavorName = repeatingPropertyName('weapons', id, 'successflavor');
 				let failureFlavorName = repeatingPropertyName('weapons', id, 'failureflavor');
 				let weaponDamageName = repeatingPropertyName('weapons', id, 'weapondamage');
-				let attrNames = ['gender', attackFlavorName, successFlavorName, failureFlavorName, weaponDamageName, 'defending'];
+				let attrNames = ['gender', attackFlavorName, successFlavorName, failureFlavorName, weaponDamageName, 'defending', 'defending2'];
 				let weaponToHitName  = repeatingPropertyName('weapons', id, 'tohit');
 				if (toHitCharacter != 'a') {
 					attrNames.push(weaponToHitName);
@@ -1399,7 +1406,7 @@
 				let damageName = repeatingPropertyName('spells', id, 'spelldamage');
 				let successFlavorName = repeatingPropertyName('spells', id, 'successflavor');
 				let failureFlavorName = repeatingPropertyName('spells', id, 'failureflavor');
-				let attrNames = [successFlavorName, failureFlavorName, damageName, 'defending'];
+				let attrNames = [successFlavorName, failureFlavorName, damageName, 'defending', 'defending2'];
 				let spellToHitName  = repeatingPropertyName('spells', id, 'tohit');
 				if (toHitCharacter != 'a') {
 					attrNames.push(spellToHitName);
@@ -1443,10 +1450,11 @@
 					doAttackRoll(mstring);
 				});
 			}
-			// Deselect defending checkbox.
+			// Deselect defending checkboxes.
 			// since it can easily just stay on by mistake.
 			setAttrs({
-				defending: 0
+				defending: 0,
+				defending2: 0
 			});
 		});
 	});
