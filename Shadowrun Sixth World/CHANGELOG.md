@@ -1,6 +1,12 @@
 Change Log
 ==============================================
-**2022-07-26 ** v.54 Chuz (James Culp)
+**2022-07-26 ** v.55 Chuz (James Culp)
+	Bugfix - Imports choked if the character in Genesis has a lifestyle that is not associated with a specific SIN, the code is more forgiving for this now.
+	New Feature - Added Edge Roll buttons to most PC sheet roll buttons on the sheet.  These can be toggled on/off via the check box in the Options Pane if you don't want them for your character/campaign.
+	Bugfix - There was an extraneous } character on the D6 roll button, it has been nullified.
+	Bugfix - Minor style changes to Options Pane and main rolls-computed roll template.
+	Bugfix - fixed css on PC matrix devices so the notes expand the full width when displayed.
+**2022-07-22 ** v.54 Chuz (James Culp)
 	New Feature - Added Notes imports to all repeating sections with a notes field except Sprites and Spirits (players should really be using separate character sheets for these)
 **2022-07-20 ** v.53 Chuz (James Culp)
 	New Feature - Quality of life addition, newlines and spacing put in notes fields should be preserved when displaying the notes.
