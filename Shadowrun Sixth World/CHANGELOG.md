@@ -7,6 +7,9 @@ Change Log
 	Bugfix - Minor style changes to Options Pane and main rolls-computed roll template.
 	Bugfix - fixed css on PC matrix devices so the notes expand the full width when displayed.
 	Update - Due to changes in the latest CRB printing, matrix device initiative bonuses have been verified to be a dice bonus, updated initiatives to reflect that.
+	Bugfix - Found an error condition where an item (program for example) with an on/off switch that was using modifications when deleted, even when turned off reversed the modifications causing data issues.
+	Bugfix - Fixed mistyped attribute names in the modifications whitelist astral_initiative_dice_mod, matrix_initiative_dice_mod, cold_sim_initiative_dice_mod and hot_sim_initiative_dice_mod modifiers should now work in modifications boxes.  The mouseover titles have been fixed as well.
+	Bugfix - NPC Wound modifiers are now correctly applying per TWO boxes of damage, per CRB pg.203.
 **2022-07-22 ** v.54 Chuz (James Culp)
 	New Feature - Added Notes imports to all repeating sections with a notes field except Sprites and Spirits (players should really be using separate character sheets for these)
 **2022-07-20 ** v.53 Chuz (James Culp)
