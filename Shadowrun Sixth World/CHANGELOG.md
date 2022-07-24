@@ -6,6 +6,7 @@ Change Log
 	Bugfix - There was an extraneous } character on the D6 roll button, it has been nullified.
 	Bugfix - Minor style changes to Options Pane and main rolls-computed roll template.
 	Bugfix - fixed css on PC matrix devices so the notes expand the full width when displayed.
+	Update - Due to changes in the latest CRB printing, matrix device initiative bonuses have been verified to be a dice bonus, updated initiatives to reflect that.
 **2022-07-22 ** v.54 Chuz (James Culp)
 	New Feature - Added Notes imports to all repeating sections with a notes field except Sprites and Spirits (players should really be using separate character sheets for these)
 **2022-07-20 ** v.53 Chuz (James Culp)
