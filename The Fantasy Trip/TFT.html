@@ -112,6 +112,18 @@
 						<span class=sheet-computed-value title="Remaining Mana." type=number name="attr_mana"></span>
 					</span>
 				</div>
+				<div class=sheet-flex-centered>
+					<span title="Other saving throw dice numbers. Provided for the criticals.">
+						<span class=sheet-stat-label>Other Saves</span>
+					</span>
+					<span>
+						<button class=sheet-dice-button type="action" title="2d6 Save" name="act_save2">2</button>
+						<button class=sheet-dice-button type="action" title="5d6 Save" name="act_save5">5</button>
+						<button class=sheet-dice-button type="action" title="6d6 Save" name="act_save6">6</button>
+						<button class=sheet-dice-button type="action" title="7d6 Save" name="act_save7">7</button>
+						<button class=sheet-dice-button type="action" title="8d6 Save" name="act_save8">8</button>
+					</span>
+				</div>
 			</div>
 		</div>
 		<div class="sheet-combat sheet-block">
@@ -1085,7 +1097,6 @@
 		// negative is failure.
 		const successLevel = function(results) {
 			let roll = results.roll1.result;
-			let stat = results.stat.result;
 
 			// Check all the crits first.
 			if (results.roll1.dice.length == 2) {
@@ -1102,41 +1113,46 @@
 			}
 			else if (results.roll1.dice.length == 4) {
 				// 4d6
-				if (roll < 8) return -3;
-				if (roll == 8) return -2;
-				if (roll > 20) return 3;
-				if (roll == 20) return 2;
+				if (roll < 8) return 3;
+				if (roll == 8) return 2;
+				if (roll > 20) return -3;
+				if (roll == 20) return -2;
 			}
 			else if (results.roll1.dice.length == 5) {
 				// 5d6
-				if (roll < 11) return -3;
-				if (roll == 11) return -2;
-				if (roll > 22) return 3;
-				if (roll == 22) return 2;
+				if (roll < 11) return 3;
+				if (roll == 11) return 2;
+				if (roll > 22) return -3;
+				if (roll == 22) return -2;
 			}
 			else if (results.roll1.dice.length == 6) {
 				// 6d6
-				if (roll < 14) return -3;
-				if (roll == 14) return -2;
-				if (roll > 24) return 3;
-				if (roll == 24) return 2;
+				if (roll < 14) return 3;
+				if (roll == 14) return 2;
+				if (roll > 24) return -3;
+				if (roll == 24) return -2;
 			}
 			else if (results.roll1.dice.length == 7) {
 				// 7d6
-				if (roll < 17) return -3;
-				if (roll == 17) return -2;
-				if (roll > 26) return 3;
-				if (roll == 26) return 2;
+				if (roll < 17) return 3;
+				if (roll == 17) return 2;
+				if (roll > 26) return -3;
+				if (roll == 26) return -2;
 			}
 			else {
 				// 8d6
-				if (roll < 20) return -3;
-				if (roll == 20) return -2;
-				if (roll > 28) return 3;
-				if (roll == 28) return 2;
+				if (roll < 20) return 3;
+				if (roll == 20) return 2;
+				if (roll > 28) return -3;
+				if (roll == 28) return -2;
 			}
 			// Normal to-hit check.
-			return (roll <= stat) ? 1 : -1;
+			if (results.stat)
+			{
+				return (roll <= results.stat.result) ? 1 : -1;
+			}
+			// unstatted version.
+			return 0;
 		}
 
 		macro += ' {{character_name=@{cname}}}';
@@ -1175,6 +1191,22 @@
 	on('clicked:health_check4', (info) => {
 		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=health}} {{stat=[[@{health}[HEALTH]]]}} {{roll1=[[4d6]]}}");
 	});
+	on('clicked:save2', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=}} {{stat=...}} {{roll1=[[2d6]]}}");
+	});
+	on('clicked:save5', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=}} {{stat=...}} {{roll1=[[5d6]]}}");
+	});
+	on('clicked:save6', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=}} {{stat=...}} {{roll1=[[6d6]]}}");
+	});
+	on('clicked:save7', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=}} {{stat=...}} {{roll1=[[7d6]]}}");
+	});
+	on('clicked:save8', (info) => {
+		doSaveRoll("&{template:stat-check} {{stat_a=a}} {{stat_name=}} {{stat=...}} {{roll1=[[8d6]]}}");
+	});
+
 
 	on('clicked:initiative', (info) => {
 		let initiativeAdjName = 'initiative_adj';
