@@ -9,9 +9,9 @@ mixin ressourcestack(res_type)
             span
     span(class="singlechip "+res_type+"chip")          
     div(class="chipnumber")
-        button(type="action" name="act_add"+res_type) +
-        span(name="attr_"+res_type)
         button(type="action" name="act_rem"+res_type) -
+        span(name="attr_"+res_type)
+        button(type="action" name="act_add"+res_type) +
     div(class="tooltiptext")
         span(data-i18n="ressource_"+res_type)=res_type 
         input(class="hideempty_toggle" type="hidden" name="attr_"+res_type+"_max")
@@ -36,13 +36,17 @@ input(type="hidden" class="tutorialstep0" name="attr_tutorial_step")
 </div>
 <div class="col" style="min-width:380px">
     <input type="hidden" class="editmode_toggle" name="attr_editmode" value="1" checked=true/>
-    <div>
+    <div class="left">
         <div class="npc_only">
             <button type="action" name="act_converttopc" data-i18n="button_contert_to_pc">Convert to PC</button>
             <div class="npc_only">       
-                label(data-i18n="label_hitpoints") Lebenspunkte: 
-                input(class="number" type="number" name="attr_npc_hitpoints" value="1")
-                input(class="number" type="number" name="attr_npc_hitpoints_max" value="1")              
+                <label data-i18n="label_hitpoints">Lebenspunkte:</label>  
+                <input class='number' type="number" name="attr_npc_hitpoints" value="1" />    
+                <span>(max. <input class='number' type="number" name="attr_npc_hitpoints_max" value="1" />)</span>
+            </div>
+            <div class="npc_leader_only">       
+                <label data-i18n="label_hitpoints_formula">LeP-Formel:</label>  
+                <input class='textline' type="text" name="attr_npc_hitpoints_formula" />
             </div>
         </div>
         <div class="pc_only">
@@ -50,20 +54,16 @@ input(type="hidden" class="tutorialstep0" name="attr_tutorial_step")
             <br>
             <button type="action" name="act_resettutorial" data-i18n="button_reset_tutorial">Restart Tutorial</button>
             <br>
-            <input type="checkbox" class="normal" name="attr_displayrage" value="1" checked=true/>
-            <span></span>
+            <input type="checkbox" class="normal" name="attr_displayrage" value="1" checked=true/><span></span>
             <label data-i18n="label_option_display_rage">Display Rage</label>
             <br>
-            <input type="checkbox" class="normal" name="attr_displayambition" value="1" checked=true/>
-            <span></span>
+            <input type="checkbox" class="normal" name="attr_displayambition" value="1" checked=true/><span></span>
             <label data-i18n="label_option_display_ambition">Display Ambition</label>
             <br>
-            <input type="checkbox" class="normal" name="attr_displayquintessence" value="1" checked=true/>
-            <span></span>
+            <input type="checkbox" class="normal" name="attr_displayquintessence" value="1" checked=true/><span></span>
             <label data-i18n="label_option_display_quintessence">Display Quintessence</label>
             <br>
-            <input type="checkbox" class="normal" name="attr_displaychipstacks" value="1" checked=true/>
-            <span></span>
+            <input type="checkbox" class="normal" name="attr_displaychipstacks" value="1" checked=true/><span></span>
             <label data-i18n="label_option_display_chipstacks">Display Chipstacks</label>
         </div>
     </div>
@@ -79,9 +79,9 @@ input(type="hidden" class="tutorialstep0" name="attr_tutorial_step")
                             input(type="radio" class="chipstack "+res_type+"chip chip"+val name="attr_"+res_type value=val)
                             span
                     div(class="chipnumber")
-                        button(type="action" name="act_add"+res_type) +
-                        span(name="attr_"+res_type)
                         button(type="action" name="act_rem"+res_type) -
+                        span(name="attr_"+res_type)
+                        button(type="action" name="act_add"+res_type) +
                     div(class="tooltiptext")
                         span(data-i18n="ressource_"+res_type)=res_type 
                         input(class="hideempty_toggle" type="hidden" name="attr_"+res_type+"_max")
@@ -107,6 +107,9 @@ input(type="hidden" class="tutorialstep0" name="attr_tutorial_step")
 
         <div class="rolltestdice">
             <button type='roll' name='roll_testattack' value='@{rollquery}' data-i18n="button_roll">Roll</button>
+        </div>
+        <div class="resettestdice">
+            <button type="action" name="act_resetroll" data-i18n="button_reset">Reset</button>
         </div>
         <br>
         <input type="hidden" min="-5" max="5" name="attr_janus" />
@@ -135,9 +138,6 @@ input(type="hidden" class="tutorialstep0" name="attr_tutorial_step")
         <button type='roll' class="directdieroller blessingdie" name='roll_blessingdie' title="Segnung" value='"&{template:check} {{name=@{character_name}}} {{attr=Segnung}} {{blessing1=[[d6cs>4cf1cf2]]}}"'></button>
         <button type='roll' class="directdieroller blooddie" name='roll_blooddie' title="Blutwürfel" value='"&{template:blood} {{name=@{character_name}}} {{attr=Blutwürfel}} {{blood1=[[d6cs>5cf1]]}}"'></button>
         <button type='roll' class="directdieroller elixirdie" name='roll_elixirdie' title="Elixierwürfel" value='"&{template:elixir} {{name=@{character_name}}} {{attr=Elixierwürfel}} {{elixir1=[[d6cs5]]}}"'></button>
-        <div class="resettestdice">
-            <button type="action" name="act_resetroll" data-i18n="button_reset">Reset</button>
-        </div>
         <hr class="stickydivider">
         <div class="pc_only stickygrid">
             <label data-i18n="label_actionpoints">Aktionspunkte:</label>
@@ -148,24 +148,21 @@ input(type="hidden" class="tutorialstep0" name="attr_tutorial_step")
             <label data-i18n="label_hitpoints">Lebenspunkte:</label>  
             <div>      
                 <div class="tooltip inline">
-                    <input class='number' type="number" name="attr_bufferhitpoints" /> 
-                    <label class="tooltiptext" data-i18n="label_buffer_hp">Puffer-[Lep]</label>
-                </div>
-                <span class="label">+</span>
-                <div class="tooltip inline">
                     <input class='number' type="number" name="attr_hitpoints" />    
                     <label class="tooltiptext" data-i18n="tooltip_hp">Aktuelle Basis-[Lep].<br>Bei Basis-[Lep]≤-1 der Verlust alle Coups/Ideen, deren Benutzung unmöglich. Puffer-[Lep]=0</label>
                     <span>(max. <span class="label" name="attr_hitpoints_max" ></span>)</span>
                 </div>
+                <span class="label">+</span>
+                <div class="tooltip inline">
+                    <input class='number' type="number" name="attr_bufferhitpoints" /> 
+                    <label class="tooltiptext" data-i18n="label_buffer_hp">Puffer-[Lep]</label>
+                </div>
             </div>
         </div>
         <div class="npc_only">       
-            label(data-i18n="label_hitpoints") Lebenspunkte: 
-            input(class="number" type="number" name="attr_npc_hitpoints" value="1")
-            span
-                | (max. 
-                span(name="attr_npc_hitpoints_max")
-                | )
+            <label data-i18n="label_hitpoints">Lebenspunkte:</label>  
+            <input class='number' type="number" name="attr_npc_hitpoints" value="1" />    
+            <span>(max. <span class="label" name="attr_npc_hitpoints_max" ></span><span class="npc_leader_only"> / <span class="label" name="attr_npc_hitpoints_formula" ></span></span>)</span>
         </div>
         
     </div>

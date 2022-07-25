@@ -1,0 +1,15 @@
+- let processedNonweaponProficiencies = new Set()
+datalist(id='nonweapon-proficiencies')
+    each book in booksPriority
+        each nonweaponProficiencyList, name in data
+            - let classes = nonweaponProficiencyList.map(n => n.classes).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join('/')
+            each nonweaponProficiency in nonweaponProficiencyList
+                if (!nonweaponProficiency.book.includes(book))
+                    - continue;
+                if processedNonweaponProficiencies.has(name.toLowerCase())
+                    - continue
+                - processedNonweaponProficiencies.add(name.toLowerCase())
+                if (!nonweaponProficiency.book.includes('PHB'))
+                    - books = 'Books: ' + bookShorthand(nonweaponProficiencyList.flatMap(w => w.book))
+                    - classes += (classes ? ', ' : '') + books
+                option(value=name)= classes

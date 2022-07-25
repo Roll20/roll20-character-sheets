@@ -305,6 +305,59 @@ async function combineBonuses(rowIds, destinationPrefix) {
       );
     }
   );
+
+  await updateMovement(destinationPrefix);
+}
+
+async function updateMovement(destinationPrefix) {
+  console.log("updateMovement", destinationPrefix);
+  const {
+    [`${destinationPrefix}_mod_spd`]: spd,
+    [`${destinationPrefix}_mod_spdfly`]: spdfly,
+    [`${destinationPrefix}_attacks`]: attacks,
+  } = await getAttrsAsync([
+    `${destinationPrefix}_mod_spd`,
+    `${destinationPrefix}_mod_spdfly`,
+    `${destinationPrefix}_attacks`,
+  ]);
+  console.log(spd, spdfly, attacks);
+  const run_ft_second = +spd;
+  const fly_ft_second = +spdfly;
+  const apm = +attacks;
+  const run_m_second = run_ft_second / 3.28084;
+  const fly_m_second = fly_ft_second / 3.28084;
+  const attrs = {
+    [`${destinationPrefix}_run_mph`]: Math.round(
+      (run_ft_second * 60 * 60) / 5280
+    ),
+    [`${destinationPrefix}_run_ft_melee`]: run_ft_second * 15,
+    [`${destinationPrefix}_run_ft_action`]: Math.round(
+      (run_ft_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_run_m_melee`]: Math.round(run_m_second * 15),
+    [`${destinationPrefix}_run_m_action`]: Math.round(
+      (run_m_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_run_kmh`]: Math.round(
+      (run_m_second * 60 * 60) / 1000
+    ),
+    [`${destinationPrefix}_fly_mph`]: Math.round(
+      (fly_ft_second * 60 * 60) / 5280
+    ),
+    [`${destinationPrefix}_fly_ft_melee`]: fly_ft_second * 15,
+    [`${destinationPrefix}_fly_ft_action`]: Math.round(
+      (fly_ft_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_fly_m_melee`]: Math.round(fly_m_second * 15),
+    [`${destinationPrefix}_fly_m_action`]: Math.round(
+      (fly_m_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_fly_kmh`]: Math.round(
+      (fly_m_second * 60 * 60) / 1000
+    ),
+  };
+  console.log(attrs);
+  await setAttrsAsync(attrs);
 }
 
 async function removeBonusSelectionsRowAsync(bonusRowId) {
@@ -355,36 +408,52 @@ on("change:repeating_bonusselections:enabled", async (e) => {
   await outputSelectedBonusIds();
 });
 
-async function insertSelection(name, bonusRowId) {
-  console.log("insertSelection", name, bonusRowId);
+const insertedBonuses = [];
+async function insertSelection(name, bonusRowId, level) {
+  console.log("insertSelection", name, bonusRowId, level);
+  if (insertedBonuses.includes(bonusRowId)) {
+    return;
+  } else {
+    insertedBonuses.push(bonusRowId);
+  }
   const selectionRowId = generateRowID();
   const attrs = {};
   attrs[`repeating_bonusselections_${selectionRowId}_bonus_id`] = bonusRowId;
-  attrs[`repeating_bonusselections_${selectionRowId}_name`] = name;
+  attrs[
+    `repeating_bonusselections_${selectionRowId}_name`
+  ] = `${name} (${level})`;
   attrs[`repeating_bonuses_${bonusRowId}_selection_id`] = selectionRowId;
   console.log(attrs);
   await setAttrsAsync(attrs);
 }
 
-async function updateSelection(name, selectionRowId) {
-  console.log("updateSelection", name, selectionRowId);
+async function updateSelection(name, selectionRowId, level) {
+  console.log("updateSelection", name, selectionRowId, level);
   const attrs = {};
-  attrs[`repeating_bonusselections_${selectionRowId}_name`] = name;
+  attrs[
+    `repeating_bonusselections_${selectionRowId}_name`
+  ] = `${name} (${level})`;
   await setAttrsAsync(attrs);
 }
 
-on("change:repeating_bonuses:name", async (e) => {
-  console.log("change:repeating_bonuses:name", e);
-  const [r, section, rowId] = e.sourceAttribute.split("_");
-  const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
-  const a = await getAttrsAsync([selectionIdKey]);
-  console.log(a);
-  if (a[selectionIdKey]) {
-    await updateSelection(e.newValue, a[selectionIdKey]);
-  } else {
-    await insertSelection(e.newValue, rowId);
+on(
+  "change:repeating_bonuses:name \
+  change:repeating_bonuses:level",
+  async (e) => {
+    console.log("change:repeating_bonuses:name", e);
+    const [r, section, rowId] = e.sourceAttribute.split("_");
+    const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
+    const levelKey = `repeating_bonuses_${rowId}_level`;
+    const nameKey = `repeating_bonuses_${rowId}_name`;
+    const a = await getAttrsAsync([selectionIdKey, levelKey, nameKey]);
+    console.log(a);
+    if (a[selectionIdKey]) {
+      await updateSelection(a[nameKey], a[selectionIdKey], a[levelKey]);
+    } else {
+      await insertSelection(a[nameKey], rowId, a[levelKey]);
+    }
   }
-});
+);
 
 on("change:repeating_profiles:name", async (e) => {
   console.log("change:repeating_profiles:name", e);

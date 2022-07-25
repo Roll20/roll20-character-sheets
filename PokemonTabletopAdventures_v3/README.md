@@ -10,26 +10,62 @@ https://discord.gg/F24Ka8E
 
 Things we want to add to the character sheet, presented in no particular order of priority:
 
+- [X] Mobile support!
+  - [X] Set legacy to false
+  - [X] Refactor sheets to minimize overhead
+  - [X] Reasonable user experience on the Companion App
+  - [ ] Full "optimized for use" support for Companion App
+- [X] Support Dark Mode sheet
+- [X] Support Dark Mode roll templates
 - [ ] Allow a second ability score to apply to skill checks
 - [ ] Allow formula calculations for the extra damage fields
 - [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
-- [ ] Add Struggle to the move lists automatically
-- [X] ~~Somehow make it easier to get tokens into initiative. No idea how to accomplish this.~~
-- [x] ~~Display the full bonus to skill checks~~
-- [x] ~~Handle temporary stat changes somehow, this may be a lot of work~~
-- [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
-- [x] ~~Add a Settings page~~
-- [X] ~~Display the adjusted stat score when temporary stat changes are provided~~
-- [X] ~~Display the skills section for Pokémon characters~~
-- [X] ~~Moves deserve a section for "bonuses that apply to all moves." Things that should go here include:~~
-  - [X] ~~A spot for Attack and Special Attack bonuses, for things like Ace Trainer~~
-  - [X] ~~The critical hit range for the moves, as this is used for passives, items, etc.~~
-- [X] ~~Allow modifications to movement (maybe just an extra box)~~
-- [X] ~~Add status effects that you can click~~
-  - [X] ~~Burn, Poison/Toxified, and Paralyzed should modify stats automatically~~
-- [X] ~~JSON import and export of sheet data, to support the Pokelicious Sheets and also migrating/copying characters~~
+
 
 ## Changelog
+
+### May 25, 2022
+- Added some explanation text to the Configuration page to give some background on what's going on there and how to use the sheet
+
+### May 24, 2022
+- Added Roll to GM functionality!
+  - New button added next to the Configuration button to toggle between the ability to send rolls to the public chat or to whisper them to the GM
+
+### May 12, 2022
+- Fixed a bug where the pokemon and hybrid character pages would default to the normal type selection rather than typeless if this value isn't modified
+  - Also sets the default type for a newly created move to typeless rather than normal
+- Updated the default values so that a new character opens to the configuration page with the character type set as pokemon
+- Updated the default initiative tie breaker to allow a full range of decimal values
+
+### May 7, 2022
+- Add support for importing character sheets by using the VTTES tool
+  - Community member used this to create every Pokemon, so this lets others take advantage of that work even if they can't use that tool
+
+### Apr 10, 2022
+- Ensures inline roll results embedded within notes fields do not have any border or padding, so text around them is not covered by their border
+- Adjusts inline roll results styling to ensure the text matches the rest of the notes fields
+
+### Mar 27, 2022
+- Reworked dark mode colors
+  - First dark mode attempt was pretty awful in terms of color theory and not being painful to look at over time.
+  - This time, took a totally different approach based on community feedback
+- Roll templates now work in dark mode thanks to sheet-rolltemplate-darkmode existing now
+- Buttons restyled and are no longer jarringly out of place
+
+### Mar 24, 2022
+- Water type background is always light - fixed
+- Electric type text background in light mode is weird - fixed
+
+### Mar 12th, 2022
+- Removed some old legacy load-time backwards compatibility scripts. Nobody needs this anymore and it slows down the sheet.
+- Set legacy to false, and updated things to make sure that the sheets still work the same way.
+- Mobile support! Not perfect, but useable.
+- Dark mode support for the sheet (roll templates will be a future project)
+
+Current mobile bugs that I'm pretty sure are roll20 bugs:
+- HP updates seem to clear out the _max value sometimes?
+- Stat in parenthesis for skill checks doesn't populate
+- The roll20 dice font is not available
 
 ### Jul 17th, 2021
 - Added a level field to the `hybrid` _(or Pokémon (Character Class))_ character type.

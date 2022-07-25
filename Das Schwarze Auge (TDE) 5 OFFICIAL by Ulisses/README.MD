@@ -5,6 +5,40 @@
 
 
 ### Changelog
+# 1.2.1 (02.5.2022)
+* Workaround for token image not changeable bug
+* Minor layout fix
+
+# 1.2.0 (28.3.2022)
+* Changed botch descriptions from name to actual description
+* Reworked offhand/mainhand switching and depiction
+* Rolls now show a botch button in the rolltemplate if botched
+* Critical attacks now show a reminder to half the parry check
+* Meleeatacks show attack range (for the defender to setup the roll more easily)
+* Combat special abilities can now be selected per level
+* Talent sheet shows now all modifiers
+* Special abilities can now be enabled to be shown on the talents tab
+* Different rule elements and items can now be posted to the chat
+* Some textarea fields should now extend their height automatically
+* Post defense malus (e.g. Finte) to the chat
+* Base/special maneuver icons for combat special abilities
+* Multiply bonus/malus of special abilities with their level
+* States and conditions now have a description
+* Fixed inured to encumbrance caluclation
+  
+1.1.2
+* Fixed "Entrückung" combat modifier
+* Fixed critical success and botch inversion
+
+1.1.1
+* Advancement cost caluclation and payment of skills and attributes
+* Improved rolltemplates for 3d20 checks
+* QS/QL and FP/SP modifiers for effects
+* Offhand botch table fixed
+* Custom condition modifier fixed
+* Compendium abilities adventure points are now payable
+* Rolltemplate damage buttons
+
 1.0.7
 * Modifier "Wound Threshold" added
 * Compendium now includes spell extensions
