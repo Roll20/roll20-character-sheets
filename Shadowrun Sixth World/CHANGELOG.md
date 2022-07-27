@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2022-07-28 ** v.56 Chuz (James Culp)
+	Bugfix: There were 10 repeating sections that didn't use "name" for the name field.  Fixed this to make other automated tasks easier to achieve in the future.
 **2022-07-26 ** v.55 Chuz (James Culp)
 	Bugfix - Imports choked if the character in Genesis has a lifestyle that is not associated with a specific SIN, the code is more forgiving for this now.
 	New Feature - Added Edge Roll buttons to most PC sheet roll buttons on the sheet.  These can be toggled on/off via the check box in the Options Pane if you don't want them for your character/campaign.
