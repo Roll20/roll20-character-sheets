@@ -370,7 +370,7 @@
 				<span style='width: 4rem;' title="Armor/shield weight.">Lbs</span>
 				<span style='position: relative;' title="Non-Flank, won't block hits or give minus to hit on flanking attacks. Should be set on shields and main gauche.">
 					<span style='position: absolute;'>NF</span>
-					<input type="checkbox" class=sheet-flex-checkbox style='visibility:hidden;'>
+					<button type="action" class=sheet-checkbox-button name="act_none" style='visibility:hidden;'>
 				</span>
 				<span style='position: relative;' title="Not carried, won't count towards Weight, Hits Blocked, Minus to Hit, or DX penalty.">
 					<span style='position: absolute;'>NC</span>
@@ -388,7 +388,8 @@
 					<input type=text name=attr_dexpenalty value="0" style='width: 5rem;'>
 					<input type=text name=attr_defensenotes class=sheet-flex>
 					<input type=text name=attr_weight value="" style='width: 4rem;'>
-					<input type="checkbox" name="attr_nonflanking" value="1" class=sheet-flex-checkbox>
+					<input type="checkbox" name="attr_nonflanking" class=sheet-checkbox-checkbox hidden>
+					<button type="action" class=sheet-checkbox-button name="act_check_nonflanking" />
 					<input type="checkbox" name="attr_notcarried" class=sheet-checkbox-checkbox hidden>
 					<button type="action" class=sheet-checkbox-button name="act_check_notcarried" />
 					&nbsp;
@@ -1016,14 +1017,15 @@
 	}
 
 	// toggle this not carried.  id starts with repeating_[weapon][spell] or any of them, really.
-	const toggleNotCarried = function(id) {
-		let selected = (id + "_notcarried").toLowerCase();
+	// attrName is "notcarried" or "nonflanking"
+	const toggleCheckbox = function(id, attrName) {
+		let selected = (id + '_' + attrName).toLowerCase();
 		getAttrs([selected], function(values) {
 			let oldValue = values[selected];
 			let newValue = (oldValue == 'on' ? 0 : 'on');
 			let valueMap = {};
 			// toggle this one, turn off the rest.
-			valueMap[selected]  = newValue;
+			valueMap[selected] = newValue;
 			// Can't be silent, has to tell them.
 			setAttrs(valueMap);
 		});
@@ -1562,7 +1564,7 @@
 			selectWeaponOrSpell(id);
 		}
 		else if (name == 'act_check_notcarried') {
-			toggleNotCarried(id);
+			toggleCheckbox(id, 'notcarried');
 		}
 		else if (name == 'act_describe') {
 			describeItem(id + '_weaponname', id + '_description',
@@ -1616,8 +1618,10 @@
 	on('clicked:repeating_armor', (info) => {
 		let id = info.sourceAttribute;
 		let name = info.htmlAttributes.name;
-		if (name == 'act_check_notcarried') {
-			toggleNotCarried(id);
+		if (name == 'act_check_nonflanking') {
+			toggleCheckbox(id, 'nonflanking');
+		} else if (name == 'act_check_notcarried') {
+			toggleCheckbox(id, 'notcarried');
 		} else if (name == 'act_describe') {
 			describeItem(id + '_defensename', id + '_description',
 				['Hits Blocked', id + '_hitsblocked',
@@ -1638,7 +1642,7 @@
 		let id = info.sourceAttribute;
 		let name = info.htmlAttributes.name;
 		if (name == 'act_check_notcarried') {
-			toggleNotCarried(id);
+			toggleCheckbox(id, 'notcarried');
 		} else if (name == 'act_describe') {
 			describeItem(id + '_name', id + '_description',
 				['Count', id + '_count',
