@@ -4373,6 +4373,9 @@
 					<li>
 						Combat Tab. Melee sub-tab. Add Slam calculator tool, taylored to the slam tools, instead of using the generic collision/falling damage tool.
 					</li>
+					<li>
+						Combat Tab. Defense sub-tab. Removed misleading success notes for Dodge & Retreat rolls. Reported by Uncle Mojo.
+					</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -11392,6 +11395,7 @@ visualize what it will look like in chat.
 					<!-- _____ _____ Slam Attack _____ _____ -->
 					<div class="box slam-attack-tool">
 
+						<input type="hidden" name="attr_is_slam_attack_new" value="1" />
 						<div class="slam-attack-table">
 							<!-- title row -->
 							<div class="item title">
@@ -11437,15 +11441,24 @@ visualize what it will look like in chat.
 							<div class="item">
 								<input type="checkbox" name="attr_toggle_slam_options" class="arrow-toggle margin-left-sm" title="View slam options." />
 							</div>
-							<div class="item subtitle">Slam</div>
-							<div class="item">
-								<input type="number" value="1" min="0" step="1" name="attr_slam_velocity" title="Macro: @{NAME|slam_velocity}" />
+							<div class="item subtitle">
+								<div class="popup">
+									<span data-i18n="slam-label">Slam</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="slam-attack-tooltip">
+Slam requires an Attack, All-out Attack, or Move and Attack maneuver. Your foe may block, dodge, or parry (but your body counts as a heavy weapon; see Parrying Heavy Weapons B376). If your foe dodges, you must move at least two yards past him if you have enough movement. If you would hit someone else, see Hitting the Wrong Target (B389). You can use All-Out Attack (Strong), +2 to Damage (B365), to increase your damage! (B371)
+									</span>
+								</span>
 							</div>
 							<div class="item">
-								<input type="number" step="1" value="10" min="1" name="attr_slam_hit_points" title="Macro: @{NAME|slam_hit_points}" />
+								<input type="number" value="1" min="1" step="1" name="attr_slam_velocity" title="Macro: @{NAME|slam_velocity}" />
 							</div>
 							<div class="item">
-								<input type="text" value="1d6" name="attr_slam_damage" title="Macro: @{NAME|slam_damage}" />
+								<input type="number" step="1" value="" min="1" name="attr_slam_hit_points" title="Macro: @{NAME|slam_hit_points}" />
+							</div>
+							<div class="item">
+								<input type="text" value="1d6" name="attr_slam_damage" readonly title="Macro: @{NAME|slam_damage}" />
 							</div>
 							<div class="item">
 								<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
@@ -11455,7 +11468,7 @@ visualize what it will look like in chat.
 								<select name="attr_slam_damage_type" title="Macro: @{NAME|slam_damage_type}">
 									<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
 									<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
-									<option value="Crushing (cr)" selected><span data-i18n="abbreviation-option-crushing">cr</span></option>
+									<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
 									<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
 									<option value="Piercing (pi)"><span data-i18n="abbreviation-option-piercing">pi</span></option>
 									<option value="Large Piercing (pi+)"><span data-i18n="abbreviation-option-piercing-plus">pi+</span></option>
@@ -11478,7 +11491,9 @@ visualize what it will look like in chat.
 								<input type="text" value="10" name="attr_slam_skill_level" title="Macro: @{NAME|slam_skill_level}" />
 							</div>
 							<div class="item">
-								<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Slam Attack}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{slam_skill_level}]]}} {{notes=@{raw_slam_attack_notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" />
+								<input type="hidden" name="attr_slam_option_modifier_value" value="0" />
+								<input type="hidden" name="attr_slam_option_modifier_description" value="" />
+								<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Slam Attack}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{slam_skill_level} + @{slam_option_modifier_value}]]}} {{notes=@{raw_slam_attack_notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{slam_success_notes}}} {{customCriticalSuccessNote=@{slam_critical_success_notes}}} {{customFailNote=@{slam_fail_notes}}} {{customCriticalFailNote=@{slam_critical_fail_notes}}} {{useModToll=[[1]]}} {{rollModifier=@{slam_option_modifier_value}}} {{rollModifierSummary=@{slam_option_modifier_description}}}" />
 							</div>
 							
 							<!-- slam options row -->
@@ -11489,12 +11504,19 @@ visualize what it will look like in chat.
 									<!-- hidden input is used to show/hide Row ID: based on selection -->
 									<input type="hidden" name="attr_slam_link_type" value="DX" />
 									<div class="cell margin-right">
-										<label><span data-i18n="link-to-label">Link To</span>:</label>
+										<div class="popup">
+											<span data-i18n="link-to-label">Link To</span>:
+										</div>
+										<span class="tooltip">
+											<span data-i18n="slam-link-to-note">
+Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and effective skill cap of 9 for a Move and Attack do not apply to slams. (B371)
+											</span>
+										</span>
 									</div>
 									<div class="cell margin-right">
 										<select name="attr_slam_link_type" title="Macro: @{NAME|slam_link_type}">
 											<option value="nothing" data-i18n="option-nothing">Nothing</option>
-											<option value="DX" data-i18n="option-dexterity">DX</option>
+											<option value="DX" selected data-i18n="option-dexterity">DX</option>
 											<option value="Skill" data-i18n="option-skill">Skill</option>
 											<option value="Technique" data-i18n="option-technique">Technique</option>
 										</select>
@@ -11519,7 +11541,7 @@ visualize what it will look like in chat.
 									</div>
 
 									<div class="cell col-wide">
-										<input type="hidden" name="attr_slam_skill_row_id_message" value="" />
+										<input type="hidden" name="attr_slam_skill_row_id_message" value="DX" />
 										<b><span data-i18n="name-label">Name:</span></b>
 										<span name="attr_slam_skill_row_id_message"></span>
 										<input type="hidden" name="attr_slam_skill_row_id_level" value="" />
@@ -11548,6 +11570,85 @@ visualize what it will look like in chat.
 										<input type="text" name="attr_slam_reason_for_mod" class="align-left" title="Macro: @{NAME|slam_reason_for_mod}" />
 									</div>
 
+								</div><!-- .row -->
+
+								<div class="row">
+									<div class="cell label" style="width: 85px">
+										<div class="popup">
+											<span data-i18n="slam-flying-tackle-label">Flying Tackle</span>:
+										</div>
+										<span class="tooltip">
+											<span data-i18n="slam-flying-tackle-tooltip">+4 to hit and +1 to Reach, may use Jumping Skill for attack. You end up lying prone in the same hex as target. B372</span>
+										</span>
+									</div>
+								
+									<div class="cell roll-modifiers">
+										<input type="hidden" name="attr_slam_flying_tackle_modifier" value="0" />
+										<input type="checkbox" name="attr_slam_flying_tackle" value="1" />
+									</div>
+
+								</div><!-- .row -->
+
+								<div class="row">
+									<div class="cell label" style="width: 85px">
+										<div class="popup">
+											<span data-i18n="slam-pounce-label">Pounce</span>:
+										</div>
+										<span class="tooltip">
+											<span data-i18n="slam-pounce-tooltip">If you have four or more legs, you may pounce. After you attack, make a DX, Acrobatics, or Jumping roll. On a success, you stay on your feet! If a mount tries this, the rider must roll vs. Riding-4 or fall off! B372</span>
+										</span>
+									</div>
+								
+									<div class="cell roll-modifiers">
+										<input type="hidden" name="attr_slam_pounce_modifier" value="0" />
+										<input type="checkbox" name="attr_slam_pounce" value="1" />
+									</div>
+
+								</div><!-- .row -->
+
+								<div class="row">
+									<div class="cell label" style="width: 85px">
+										<div class="popup">
+											<span data-i18n="slam-shield-rush-label">Shield Rush</span>:
+										</div>
+										<span class="tooltip">
+											<span data-i18n="slam-shield-rush-tooltip">Roll against Shield skill to hit, and add your shield's Defense Bonus to your damage roll. Your shield takes damage instead of you. B372</span>
+										</span>
+									</div>
+								
+									<div class="cell roll-modifiers">
+										<input type="number" value="0" min="0" step="1" name="attr_slam_shield_db" class="slam-db-width inline" /> 
+										<span data-i18n="slam-shield-rush-db-label">DB (added to damage!)</span>
+									</div>
+								</div><!-- .row -->
+
+								<div class="row">
+									<div class="cell label" style="width: 85px">
+										<div class="popup">
+											<span data-i18n="slam-overrun-label">Overrun</span>:
+										</div>
+										<span class="tooltip">
+											<span data-i18n="slam-overrun-tooltip">If your SM is 2 or more than the target, apply overrun damage. This inflicts additional crushing damage based on ST = Your HP/2. B432</span>
+										</span>
+									</div>
+								
+									<div class="cell roll-modifiers">
+										<input type="checkbox" name="attr_slam_overrun" value="1" />
+										
+									</div>
+
+									<div class="cell roll-modifiers" style="margin-left: 4px;">
+										Effective ST: <input type="number" name="attr_slam_overrun_st" class="slam-db-width inline" readonly value="" />
+									</div>
+
+									<div class="cell roll-modifiers" style="margin-left: 4px;">
+										Damage: <input type="text" name="attr_slam_overrun_damage" class="slam-damage-width inline" readonly value="" />
+									</div>
+
+									<div class="cell roll-modifiers" style="margin-left: 4px;">
+										<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Overrun Damage}} {{damageRoll=[[@{slam_overrun_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{slam_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{slam_damage_type_note}}} {{showNotes=[[1]]}}" name="roll_dmgOverrun" class="roll_damage" />
+									</div>
 								</div><!-- .row -->
 
 								<div class="row">
@@ -11588,7 +11689,7 @@ visualize what it will look like in chat.
 		Example: Select Location: ?{Location|Head|Torso}
 											</span>
 										</span>
-										<textarea class="text-left chat-size" name="attr_fail_notes" title="Macro table name: repeating_melee. Field name: fail_notes"></textarea>
+										<textarea class="text-left chat-size" name="attr_slam_fail_notes" title="Macro: @{NAME|slam_fail_notes}"></textarea>
 									</div>
 									<div class="cell">
 										<div class="popup">
@@ -11600,7 +11701,7 @@ visualize what it will look like in chat.
 		Example: Does an additional [[1d6]] fire damage.
 											</span>
 										</span>
-										<textarea class="text-left chat-size" name="attr_critical_fail_notes" title="Macro table name: repeating_melee. Field name: critical_fail_notes"></textarea>
+										<textarea class="text-left chat-size" name="attr_slam_critical_fail_notes" title="Macro: @{NAME|slam_critical_fail_notes}"></textarea>
 									</div>
 								</div> <!-- .row -->
 								
@@ -13913,6 +14014,9 @@ visualize what it will look like in chat.
 				<li>
 					Combat Tab. Melee sub-tab. Add Slam calculator tool, taylored to the slam tools, instead of using the generic collision/falling damage tool.
 				</li>
+				<li>
+					Combat Tab. Defense sub-tab. Removed misleading success notes for Dodge & Retreat rolls. Reported by Uncle Mojo.
+				</li>
 			</ul>
 
 			<h4>Version: 2.7.9</h4>
@@ -14991,10 +15095,10 @@ visualize what it will look like in chat.
 				
 			<div class="options rule-options">
 				
-				<input type="hidden" name="attr_raw_slam_attack_notes" value="test" />
+				<input type="hidden" name="attr_raw_slam_attack_notes" value="" />
 				<span style="display:none;" data-i18n="raw_slam_attack_notes">slam attack notes</span>
 
-				<input type="hidden" name="attr_raw_slam_damage_notes" value="test" />
+				<input type="hidden" name="attr_raw_slam_damage_notes" value="" />
 				<span style="display:none;" data-i18n="raw_slam_damage_notes">slam attack damage notes</span>
 		
 				<div class="option-column">
@@ -17870,6 +17974,8 @@ visualize what it will look like in chat.
 		syncModifierPromptOptions();
 	
 		updateStaticNotes();
+
+		checkUpdateDefaultSlamValues();
 	
 		setAttrs({ inventory_fixed_digits: 1 });
 	
@@ -22121,11 +22227,13 @@ visualize what it will look like in chat.
 	
 	});
 	
-	function getCollisionDamage(velocity, hit_points) {
+	function getCollisionDamage(velocity, hit_points, customDamageModifier = 0) {
 	
 		let strDmg = "1d6-3";
 	
 		let remainder = 0;
+
+		let dieModifier = customDamageModifier;
 	
 		velocity = +velocity;
 	
@@ -22143,15 +22251,21 @@ visualize what it will look like in chat.
 	
 		if (ratio <= .25) {
 	
-			strDmg = "1d6-3";
+			strDmg = "1d6";
+
+			dieModifier = dieModifier - 3;
 	
 		} else if (ratio <= .5) {
 	
-			strDmg = "1d6-2";
+			strDmg = "1d6";
+
+			dieModifier = dieModifier - 2;
 	
 		} else if (ratio < 1) {
 	
-			strDmg = "1d6-1";
+			strDmg = "1d6";
+
+			dieModifier = dieModifier - 1;
 	
 		} else {
 	
@@ -22163,6 +22277,12 @@ visualize what it will look like in chat.
 				strDmg = Math.ceil(ratio) + "d6";
 			}
 	
+		}
+
+		if (dieModifier > 0) {
+			strDmg = `${strDmg}+${dieModifier}`;
+		} else if (dieModifier < 0) {
+			strDmg = `${strDmg}${dieModifier}`
 		}
 	
 		return strDmg;
@@ -22184,8 +22304,8 @@ visualize what it will look like in chat.
 	on("clicked:collision_reset", function () {
 	
 		setAttrs({
-			"collision_velocity": 1,
-			"collision_hit_points": 10,
+			collision_velocity: 1,
+			collision_hit_points: 10,
 			collision_hard_object: 0,
 		});
 	
@@ -22743,8 +22863,8 @@ visualize what it will look like in chat.
 			"raw_dodge_critical_success_notes": getNotesByCode("dodge_critical_success_notes"),
 			"raw_dodge_fail_notes": getNotesByCode("dodge_fail_notes"),
 			"raw_dodge_critical_fail_notes": getNotesByCode("dodge_critical_failure_notes"),
-			"raw_dodge_retreat_success_notes": getNotesByCode("dodge_success_notes"),
-			"raw_dodge_retreat_critical_success_notes": getNotesByCode("dodge_critical_success_notes"),
+			"raw_dodge_retreat_success_notes": getNotesByCode("dodge_retreat_success_notes"),
+			"raw_dodge_retreat_critical_success_notes": getNotesByCode("dodge_retreat_critical_success_notes"),
 			"raw_dodge_retreat_fail_notes": getNotesByCode("dodge_fail_notes"),
 			"raw_dodge_retreat_critical_fail_notes": getNotesByCode("dodge_critical_failure_notes"),
 			"raw_dodge_drop_success_notes": getNotesByCode("dodge_success_notes"),
@@ -22761,6 +22881,38 @@ visualize what it will look like in chat.
 	
 	}
 	
+	function checkUpdateDefaultSlamValues() {
+
+		getAttrs(["is_slam_attack_new", "hit_points_max"], (values) => {
+
+			// if new, set the hit points and default link to DX
+			if (values.is_slam_attack_new === "1") {
+
+				let hitPoints = Number(values.hit_points_max);
+
+				if (Number.isNaN(hitPoints)) {
+					hitPoints = 10;
+				}
+
+				const slamST = Math.floor(hitPoints/2);
+
+				// get the damageType object (strength, thrust, swing)
+				let damageType = getDamageType(slamST);
+
+				setAttrs({
+					slam_hit_points: hitPoints,
+					slam_damage_type: "Crushing (cr)",
+					slam_link_type: "DX",
+					is_slam_attack_new: 0,
+					slam_overrun_st: slamST,
+					slam_overrun_damage: damageType.thrust
+				});
+			}
+
+		});
+
+	}
+
 	/**
 	 * If new version, make sure to update the 
 	 * defensive informaton notes and the raw success/fail notes
@@ -25027,6 +25179,10 @@ visualize what it will look like in chat.
 	
 	If a single rapid-fire attack, dodge <i>all</i> hits. See B375.`;
 	
+		const dodgeRetreatSuccessNotes = ``;
+	
+		const dodgeRetreatCriticalSuccessNotes = `If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381.`;
+
 		const dodgeFailNotes = "";
 	
 		const dodgeCriticalFailureNotes = `You lose your footing and fall prone (no effect if already prone). See B382`;
@@ -25075,6 +25231,8 @@ visualize what it will look like in chat.
 	    const notes = [
 			{ code: "dodge_success_notes", value: dodgeSuccessNotes },
 			{ code: "dodge_critical_success_notes", value: dodgeCriticalSuccessNotes },
+			{ code: "dodge_retreat_success_notes", value: dodgeRetreatSuccessNotes },
+			{ code: "dodge_retreat_critical_success_notes", value: dodgeRetreatCriticalSuccessNotes },
 			{ code: "dodge_fail_notes", value: dodgeFailNotes },
 			{ code: "dodge_critical_failure_notes", value: dodgeCriticalFailureNotes },
 			{ code: "parry_success_notes", value: parrySuccessNotes },
@@ -32725,6 +32883,40 @@ visualize what it will look like in chat.
 	
 	}
 
+	// check to see if we need to update slam hit points
+	on("change:hit_points_max", (event) => {
+
+		updateSlamHitPoints();
+
+	});
+
+	function updateSlamHitPoints() {
+
+		getAttrs(["hit_points_max"], values => {
+
+			let hitPoints = Number(values.hit_points_max);
+
+			if (Number.isNaN(hitPoints)) {
+				hitPoints = 10;
+			}
+
+			const slamST = Math.floor(hitPoints/2);
+
+			// get the damageType object (strength, thrust, swing)
+			let damageType = getDamageType(slamST);
+	
+			setAttrs({
+				slam_hit_points: hitPoints,
+				falling_hit_points: hitPoints,
+				collision_hit_points: hitPoints,
+				slam_overrun_st: slamST,
+				slam_overrun_damage: damageType.thrust
+			});
+
+		});
+
+	}
+
 	// update damage notes for thrown object
 	on('change:slam_damage_type', function (event) {
 	
@@ -32995,5 +33187,70 @@ visualize what it will look like in chat.
 		});
 
 	}
+
+	// handle slam damage
+	on("change:slam_velocity change:slam_hit_points change:slam_shield_db", function (event) {
+	
+		let strDmg = "";
+	
+		getAttrs(["slam_velocity", "slam_hit_points", "slam_shield_db"], function (values) {
+	
+			const hitPoints = Number(values.slam_hit_points);
+
+			const shieldDamageBonus = Number(values.slam_shield_db);
+
+			const customDamageModifier = shieldDamageBonus;
+	
+			const isHardObject = false;
+	
+			strDmg = getCollisionDamage(values.slam_velocity, hitPoints, customDamageModifier);
+	
+			setAttrs({
+				slam_damage: strDmg
+			});
+	
+		});
+	
+	});
+
+	on("change:slam_flying_tackle change:slam_pounce", (event) => {
+
+		const triggerName = event.triggerName;
+
+		getAttrs(["slam_flying_tackle", "slam_pounce"], values => {
+
+			let modifier = 0;
+
+			if (values.slam_flying_tackle === "1" || values.slam_pounce === "1") {
+				modifier = 4;
+			}
+
+			let modifierDescription = "";
+
+			let flyingTackleChecked = "0";
+
+			let pounceChecked = "0";
+
+			// TODO: Convert to use translation code
+			if (triggerName == "slam_flying_tackle" && values.slam_flying_tackle === "1") {
+				flyingTackleChecked = "1";
+				pounceChecked = "0";
+				modifierDescription = "+4 to hit from flying tackle. Fall prone next to target.";
+			} else if (triggerName == "slam_pounce" && values.slam_pounce === "1") {
+				flyingTackleChecked = "0";
+				pounceChecked = "1";
+				modifierDescription = "+4 to hit from pounce. Make a DX, Acrobatics, or Jumping roll to stay on feet.";
+			}
+
+			setAttrs({
+				slam_option_modifier_value: modifier,
+				slam_option_modifier_description: modifierDescription,
+				slam_flying_tackle: flyingTackleChecked,
+				slam_pounce: pounceChecked
+			}, { silent: true });
+
+		});
+
+	});
 
 </script>
