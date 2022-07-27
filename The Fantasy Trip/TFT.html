@@ -245,14 +245,10 @@
 					<button class=sheet-attack-button type="action" name="act_attack6">+6</button>
 				</span>
 				<button class=sheet-attack-button title="Automatic attack/cast success, use for HTH Reaction=6, bound victims, etc." type="action" name="act_attacka">A</button>
-				<span title="Roll 4d6, use vs. Defending/Dodging or Unskilled Attack, deselects after each attack">
-					<span class=sheet-label>4d</span>
-					<input type=checkbox name=attr_defending>
-				</span>
-				<span title="Roll 5d6, use vs. Weapon Mastery Defending/Dodging, deselects after each attack">
-					<span class=sheet-label>5d</span>
-					<input type=checkbox name=attr_defending2>
-				</span>
+				<input type=checkbox name=attr_defending class=sheet-caption-checkbox hidden>
+				<button class=sheet-caption-button title="Roll 4d6, use vs. Defending/Dodging or Unskilled Attack, deselects after each attack" type="action" name="act_attack4d">4d</button>
+				<input type=checkbox name=attr_defending2 class=sheet-caption-checkbox hidden>
+				<button class=sheet-caption-button title="Roll 5d6, use vs. Weapon Mastery Defending/Dodging, deselects after each attack" type="action" name="act_attack5d">5d</button>
 			</div>
 		</div>
 		<div class="sheet-weapons sheet-block">
@@ -1019,10 +1015,20 @@
 	// toggle this not carried.  id starts with repeating_[weapon][spell] or any of them, really.
 	// attrName is "notcarried" or "nonflanking"
 	const toggleCheckbox = function(id, attrName) {
-		let selected = (id + '_' + attrName).toLowerCase();
+
+		let selected = id ? (id + '_' + attrName).toLowerCase() : attrName;
+
+		console.log('toggling', selected)
+
 		getAttrs([selected], function(values) {
 			let oldValue = values[selected];
+
+			console.log('old value is', oldValue)
+
 			let newValue = (oldValue == 'on' ? 0 : 'on');
+
+			console.log('new value is', oldValue)
+
 			let valueMap = {};
 			// toggle this one, turn off the rest.
 			valueMap[selected] = newValue;
@@ -1030,6 +1036,14 @@
 			setAttrs(valueMap);
 		});
 	}
+
+	const clearCheckbox = function(attrName) {
+		let valueMap = {};
+		// toggle this one, turn off the rest.
+		valueMap[attrName] = 0;
+		setAttrs(valueMap);
+	};
+
 
 	// select this weapon or spell, id starts with repeating_[weapon][spell]
 	const selectWeaponOrSpell = function(id) {
@@ -1555,6 +1569,17 @@
 			});
 		});
 	});
+
+	// Toggleable attack buttons.
+	on(' clicked:attack5d', (info) => {
+		toggleCheckbox('', 'defending2');
+		clearCheckbox('defending');
+	});
+	on(' clicked:attack4d', (info) => {
+		toggleCheckbox('', 'defending');
+		clearCheckbox('defending2');
+	});
+
 
 	// Weapons Select/Expand/Describe/NC
 	on('clicked:repeating_weapons', (info) => {
