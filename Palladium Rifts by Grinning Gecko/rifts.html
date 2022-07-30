@@ -582,7 +582,7 @@
           <span class="readonly" name="attr_total"></span>
           <button
             type="roll"
-            value="@{opt_whisper}&{template:skill} {{title=@{character_name} uses @{name}}} {{target=[[{@{total}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
+            value="@{opt_whisper}&{template:skill} [[ [[{@{total}+?{Modifier?|0},98}kl1]] + [[1d100]] ]] {{title=@{character_name} uses @{name}}} {{target=$[[0]]}} {{roll=$[[1]]}} {{total=$[[2]]}} {{add_skill=[[@{opt_add_skill}]]}}"
             name="roll_skill"
           ></button>
         </div>
@@ -1578,7 +1578,7 @@
     <span name="attr_percentage"></span>
     <button
       type="roll"
-      value="@{opt_whisper}&{template:skill} {{title=@{character_name} uses @{name}}} {{target=[[{@{percentage} + [[ {{ @{opt_iq_bonus},0 }dl1 } * @{active_profile_mod_iq_bonus} ]] +?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
+      value="@{opt_whisper}&{template:skill} [[ [[{@{percentage} + [[ {{ @{opt_iq_bonus},0 }dl1 } * @{active_profile_mod_iq_bonus} ]] +?{Modifier?|0},98}kl1]] + [[1d100]] ]] {{title=@{character_name} uses @{name}}} {{target=$[[1]]}} {{roll=$[[2]]}} {{total=$[[3]]}} {{add_skill=[[@{opt_add_skill}]]}}"
       name="roll_powerability_skill"
     ></button>
   </div>
@@ -2426,7 +2426,7 @@
     <span name="attr_percentage"></span>
     <button
       type="roll"
-      value="@{opt_whisper}&{template:skill} {{title=@{character_name} uses @{name}}} {{target=[[{@{percentage} + [[ {{ @{opt_iq_bonus},0 }dl1 } * @{active_profile_mod_iq_bonus} ]] +?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
+      value="@{opt_whisper}&{template:skill} [[ [[{@{percentage} + [[ {{ @{opt_iq_bonus},0 }dl1 } * @{active_profile_mod_iq_bonus} ]] +?{Modifier?|0},98}kl1]] + [[1d100]] ]] {{title=@{character_name} uses @{name}}} {{target=$[[1]]}} {{roll=$[[2]]}} {{total=$[[3]]}} {{add_skill=[[@{opt_add_skill}]]}}"
       name="roll_spell_skill"
     ></button>
     <input type="number" value="0" name="attr_ppecost" />
@@ -3264,7 +3264,7 @@
     <span name="attr_percentage"></span>
     <button
       type="roll"
-      value="@{opt_whisper}&{template:skill} {{title=@{character_name} uses @{name}}} {{target=[[ {@{percentage} + [[ {{ @{opt_iq_bonus},0 }dl1 } * @{active_profile_mod_iq_bonus} ]] + ?{Modifier?|0},98}kl1 ]]}} {{roll=[[d100]]}}"
+      value="@{opt_whisper}&{template:skill} [[ [[{@{percentage} + [[ {{ @{opt_iq_bonus},0 }dl1 } * @{active_profile_mod_iq_bonus} ]] +?{Modifier?|0},98}kl1]] + [[1d100]] ]] {{title=@{character_name} uses @{name}}} {{target=$[[1]]}} {{roll=$[[2]]}} {{total=$[[3]]}} {{add_skill=[[@{opt_add_skill}]]}}"
       name="roll_psionic_skill"
     ></button>
     <input type="number" value="0" name="attr_ispcost" />
@@ -9306,6 +9306,14 @@
       percentage. Some examples include, but are not limited to, Telemechanics,
       Object Read, Locate, etc.
     </p>
+    <label
+      ><input type="checkbox" name="attr_opt_add_skill" value="1" /> Skill
+      Rolls: Add roll to skill %.</label
+    >
+    <p>
+      Instead of trying to roll <b>under</b> your skill %, add your roll to your
+      skill % where a success is > 100.
+    </p>
     <hr />
     <h3>Import/Export</h3>
     <details>
@@ -14138,15 +14146,47 @@ on("clicked:migrate", async (e) => {
       {{/subtitle}}
     </div>
     <div class="sheet-content">
-      <div class="sheet-key">Target</div>
+      <div class="sheet-key">Skill %</div>
       <div class="sheet-value">{{target}}</div>
       <div class="sheet-key">Roll</div>
       <div class="sheet-value">{{roll}}</div>
+      <!-- -->
+      {{#rollLess() add_skill 1}}
+      <!-- -->
       {{#rollGreater() roll target }}
+      <!-- -->
       <div class="sheet-template-row">Failure!</div>
+      <!-- -->
       {{/rollGreater() roll target }}
       <!-- -->
       {{#^rollGreater() roll target }}
+      <!-- -->
+      {{#successtext}}
+      <!-- -->
+      <div class="sheet-template-row">{{successtext}}</div>
+      <!-- -->
+      {{/successtext}}
+      <!-- -->
+      {{^successtext}}
+      <!-- -->
+      <div class="sheet-template-row">Success!</div>
+      <!-- -->
+      {{/successtext}}
+      <!-- -->
+      {{/^rollGreater() roll target }}
+      <!-- -->
+      {{/rollLess() add_skill 1}}
+      <!-- -->
+      {{#^rollLess() add_skill 1}}
+      <!-- -->
+      <div class="sheet-key">Total</div>
+      <div class="sheet-value">{{total}}</div>
+      <!-- -->
+      {{#rollLess() total 101 }}
+      <div class="sheet-template-row">Failure!</div>
+      {{/rollLess() total 101 }}
+      <!-- -->
+      {{#^rollLess() total 101 }}
       <!-- -->
       {{#successtext}}
       <div class="sheet-template-row">{{successtext}}</div>
@@ -14156,7 +14196,9 @@ on("clicked:migrate", async (e) => {
       <div class="sheet-template-row">Success!</div>
       {{/successtext}}
       <!-- -->
-      {{/^rollGreater() roll target }}
+      {{/^rollLess() total 101 }}
+      <!-- -->
+      {{/^rollLess() add_skill 1}}
     </div>
   </div>
 </rolltemplate>
