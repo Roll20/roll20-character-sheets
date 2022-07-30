@@ -49,12 +49,12 @@ strengthTable['strnotes']['18[76-90]'] = '';
 strengthTable['strnotes']['18[91-99]'] = '';
 strengthTable['strnotes']['18[00]']    = '';
 
-strengthTable['str2notes'] = ['INVALID STRENGTH','','','','','','','','','','','','','','','','','','','(8) Locked, barred, or magical door. Only one attempt','(10) Locked, barred, or magical door. Only one attempt','(12) Locked, barred, or magical door. Only one attempt','(14) Locked, barred, or magical door. Only one attempt','(16) Locked, barred, or magical door. Only one attempt','(17) Locked, barred, or magical door. Only one attempt','(18) Locked, barred, or magical door. Only one attempt'];
+strengthTable['str2notes'] = ['INVALID STRENGTH','','','','','','','','','','','','','','','','','','','(8) Locked, barred, or magically held door. Only one attempt','(10) Locked, barred, or magically held door. Only one attempt','(12) Locked, barred, or magically held door. Only one attempt','(14) Locked, barred, or magically held door. Only one attempt','(16) Locked, barred, or magically held door. Only one attempt','(17) Locked, barred, or magically held door. Only one attempt','(18) Locked, barred, or magically held door. Only one attempt'];
 strengthTable['str2notes']['18[01-50]'] = '';
 strengthTable['str2notes']['18[51-75]'] = '';
 strengthTable['str2notes']['18[76-90]'] = '';
-strengthTable['str2notes']['18[91-99]'] = '(3) Locked, barred, or magical door. Only one attempt';
-strengthTable['str2notes']['18[00]']    = '(6) Locked, barred, or magical door. Only one attempt';
+strengthTable['str2notes']['18[91-99]'] = '(3) Locked, barred, or magically held door. Only one attempt';
+strengthTable['str2notes']['18[00]']    = '(6) Locked, barred, or magically held door. Only one attempt';
 
 const dexterityTable = {};
 dexterityTable['dexreact'] = ['Error','-6','-4','-3','-2','-1','0','0','0','0','0','0','0','0','0','0','+1','+2','+2','+3','+3','+4','+4','+4','+5','+5'];
@@ -115,4 +115,6 @@ charismaTable['chamax'] = ['Error','0','1','1','1','2','2','3','3','4','4','4','
 charismaTable['chaloy'] = ['Error','-8','-7','-6','-5','-4','-3','-2','-1','0','0','0','0','0','+1','+3','+4','+6','+8','+10','+12','+14','+16','+18','+20','+20'];
 charismaTable['chareact'] = ['Error','-7','-6','-5','-4','-3','-2','-1','0','0','0','0','0','+1','+2','+3','+5','+6','+7','+8','+9','+10','+11','+12','+13','+14'];
 charismaTable['chanotes'] = ['INVALID CHARISMA','','','','','','','','','','','','','','','','','','','','','','','','','',''];
+
+const ABILITY_MODIFIERS = [0,0,0,-5,-4,-3,-2,-1,0,0,0,0,0,0,1,2,3,4,5,5,5,5,5,5,5,5];
 /* ---- Attributes tables end ---- */

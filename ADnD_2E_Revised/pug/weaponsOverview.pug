@@ -1,0 +1,78 @@
+style("text/css").
+    table {
+        border-collapse: collapse;
+        position: relative;
+        text-align: left;
+        width: 100%;
+    }
+    tr.gray th {
+        background: lightgray;
+    }
+    th, td {
+        padding: 2px;
+    }
+    th {
+        position: sticky;
+        top: 0;
+    }
+
+table
+    tr(class="gray")
+        th Name
+        th Group
+        th NoProf
+        th Size
+        th Ammo<br>size
+        th Type
+        th Speed
+        th Reach
+        th Rof
+        th Range
+        th Strength
+        th Small<br>Medium
+        th Large
+        th Knockdown
+        th Category
+        th Book
+    - let processedWeapons = new Set()
+    - let keys = Object.keys(data).sort()
+    each key in keys
+        - let weaponList = data[key]
+        if processedWeapons.has(weaponList)
+            - continue
+        - processedWeapons.add(weaponList)
+        - let nameColor      = weaponList.every( (ele,i,arr) => ele.name === arr[0].name) ? "white" : "orange"
+        - let groupColor     = weaponList.every( (ele,i,arr) => ele.group === arr[0].group) ? "white" : "orange"
+        - let noProfColor    = weaponList.every( (ele,i,arr) => ele.noProf === arr[0].noProf) ? "white" : "orange"
+        - let sizeColor      = weaponList.every( (ele,i,arr) => ele.size === arr[0].size) ? "white" : "orange"
+        - let ammoColor      = weaponList.every( (ele,i,arr) => ele['ammo-size'] === arr[0]['ammo-size']) ? "white" : "orange"
+        - let typeColor      = weaponList.every( (ele,i,arr) => ele.type === arr[0].type) ? "white" : "orange"
+        - let speedColor     = weaponList.every( (ele,i,arr) => ele.speed === arr[0].speed) ? "white" : "orange"
+        - let rofColor       = weaponList.every( (ele,i,arr) => ele.rof === arr[0].rof) ? "white" : "orange"
+        - let strengthColor  = weaponList.every( (ele,i,arr) => ele.strength === arr[0].strength) ? "white" : "orange"
+        - let smallColor     = weaponList.every( (ele,i,arr) => ele['small-medium'] === arr[0]['small-medium']) ? "white" : "orange"
+        - let largeColor     = weaponList.every( (ele,i,arr) => ele.large === arr[0].large) ? "white" : "orange"
+        - let categoryColor  = weaponList.every( (ele,i,arr) => ele.category.join() === arr[0].category.join() ) ? "white" : "orange"
+        each book in booksPriority
+            - let weapon = weaponList.find(w => w.book.includes(book))
+            if !weapon
+                - continue
+            tr
+                td(style=`background-color:${nameColor}`) #{weapon.name}
+                td(style=`background-color:${groupColor}`) #{weapon.group}
+                td(style=`background-color:${noProfColor}`) #{weapon.noProf}
+                td(style=`background-color:${sizeColor}`) #{weapon.size}
+                td(style=`background-color:${ammoColor}`) #{weapon['ammo-size']}
+                td(style=`background-color:${typeColor}`) #{weapon.type}
+                td(style=`background-color:${speedColor}`) #{weapon.speed}
+                td #{weapon.reach}
+                td(style=`background-color:${rofColor}`) #{weapon.rof}
+                td #{weapon.range}
+                td(style=`background-color:${strengthColor}`) #{weapon.strength}
+                td(style=`background-color:${smallColor}`) #{weapon['small-medium']}
+                td(style=`background-color:${largeColor}`) #{weapon.large}
+                td #{weapon.knockdown}
+                td(style=`background-color:${categoryColor}`) #{weapon.category.join(', ')}
+                td #{book}
+        tr
+            td &nbsp;

@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable default-case */
 /* eslint-disable camelcase */
 /* eslint-disable max-len */
@@ -324,16 +325,35 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   }
 
   if (eSilencieux || prefix === 'pS' || prefix === 'pSC') {
+    const ghost = +effet.rogueGhost;
+    const MALghost = +effet.MALRogueGhost;
+    const changeling = +effet.bardChangeling;
+    const MALchangeling = +effet.MALBardChangeling;
     let totalSilencieux = vDiscretion;
-    isConditionnelD = true;
 
     if (hasArmure) { totalSilencieux += oDiscretion; }
 
-    attaquesSurprises.push(i18n_silencieux);
-    attaquesSurprisesValue.push(totalSilencieux);
-    isSilencieux = true;
+    if (hasArmure && ghost !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bDegats.push(totalSilencieux);
+    } else if (hasArmure && MALghost !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bDegats.push(totalSilencieux);
+    } else if (hasArmure && changeling !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bDegats.push(totalSilencieux);
+    } else if (hasArmure && MALchangeling !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bDegats.push(totalSilencieux);
+    } else {
+      isConditionnelD = true;
+      attaquesSurprises.push(i18n_silencieux);
+      attaquesSurprisesValue.push(totalSilencieux);
 
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+    }
+
+    isSilencieux = true;
   }
 
   if (eSoumission) {
@@ -1623,15 +1643,34 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
 
   if (aAssassine) {
     if (isSilencieux) { autresAmeliorations.push(i18n_assassine); } else {
+      const ghost = +AS.rogueGhost;
+      const MALghost = +AS.MALRogueGhost;
+      const changeling = +AS.bardChangeling;
+      const MALchangeling = +AS.MALBardChangeling;
+
       let totalAssassine = vDiscretion;
 
       if (hasArmure) { totalAssassine += oDiscretion; }
 
-      isConditionnelD = true;
-      attaquesSurprises.push(i18n_assassine);
-      attaquesSurprisesValue.push(totalAssassine);
+      if (hasArmure && ghost !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else if (hasArmure && MALghost !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else if (hasArmure && changeling !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else if (hasArmure && MALchangeling !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else {
+        isConditionnelD = true;
+        attaquesSurprises.push(i18n_assassine);
+        attaquesSurprisesValue.push(totalAssassine);
 
-      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+        if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      }
     }
   }
 
@@ -2272,6 +2311,9 @@ function getWeaponsContactAOPNJ(prefix, data, isCadence, vCadence, isObliteratio
 function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceAttaque, eASAssassinValue, isCadence, vCadence, eSilencieux, eTirRafale, isObliteration, isAntiAnatheme) {
   const result = {};
   const exec = [];
+  const armure = AA.armure;
+
+  let hasArmure = true;
 
   let isConditionnelA = false;
   let isConditionnelD = false;
@@ -2318,6 +2360,8 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
   const aRevetementOmega = isApplied(AA[`${prefix}revetementOmega`]);
   const aStructureElement = isApplied(AA[`${prefix}structureElement`]);
   const aSystemeRefroidissement = isApplied(AA[`${prefix}systemeRefroidissement`]);
+
+  if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
 
   if (aChargeurGrappes) {
     diceDegats -= 1;
@@ -2400,12 +2444,33 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
 
   if (aMunitionsSubsoniques) {
     if (eSilencieux) { autresAmeliorations.push(i18n_munitionsSubsoniques); } else {
-      const totalSubsonique = vDiscretion + oDiscretion;
+      const ghost = +AA.rogueGhost;
+      const MALghost = +AA.MALRogueGhost;
+      const changeling = +AA.bardChangeling;
+      const MALchangeling = +AA.MALBardChangeling;
+      let totalSubsonique = vDiscretion;
 
-      attaquesSurprises.push(i18n_munitionsSubsoniques);
-      attaquesSurprisesValue.push(totalSubsonique);
+      if (hasArmure) { totalSubsonique += oDiscretion; }
 
-      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      if (hasArmure && ghost !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else if (hasArmure && MALghost !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else if (hasArmure && changeling !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else if (hasArmure && MALchangeling !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else {
+        isConditionnelD = true;
+        attaquesSurprises.push(i18n_munitionsSubsoniques);
+        attaquesSurprisesValue.push(totalSubsonique);
+
+        if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      }
     }
   }
 
@@ -2825,25 +2890,22 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
   return result;
 }
 
-function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom) {
+function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
-
-  let isConditionnelA = false;
-  let isConditionnelD = false;
-
-  const attaquesSurprises = [];
-  const attaquesSurprisesValue = [];
-  let attaquesSurprisesCondition = '';
+  const bDegats = [];
 
   let diceDegats = 0;
   let diceViolence = 0;
 
   const ODBarbarian = [];
+  const ODRogue = [];
   const ODShaman = [];
+  const autresEffets = [];
 
   let goliath = 0;
+  let changeling = '';
   let ghost = '';
 
   let shaman = 0;
@@ -2864,6 +2926,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   let typeScout = '';
 
   let bonusWarrior = 0;
+  let isConditionnelA = false;
 
   switch (armure) {
     case 'barbarian':
@@ -2891,6 +2954,18 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
 
         exec.push(`{{vBarbarianD=+${goliath}D6}}`);
         exec.push(`{{vBarbarianV=+${goliath}D6}}`);
+
+        if (goliath >= 4 && !aEffets.includes(i18n_antiVehicule)) {
+          autresEffets.push(i18n_antiVehicule);
+        }
+      }
+      break;
+
+    case 'bard':
+      changeling = +value.bardChangeling;
+
+      if (changeling !== 0) {
+        exec.push(`{{special2=${i18n_changelingActive}}}`);
       }
       break;
 
@@ -2900,20 +2975,18 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       if (ghost !== 0) {
         exec.push(`{{special2=${i18n_ghostActive}}}`);
 
-        if (isELumiere === false && isASLumiere === false) {
+        if (simpleRoll) {
+          exec.push(`{{vODGhostA=${i18n_ghost}}} {{vODGhostAValue=${3}}}`);
+          isConditionnelA = true;
+        } else if (isELumiere === false && isASLumiere === false) {
           const totalGhost = vDiscretion + oDiscretion;
 
           isConditionnelA = true;
-          isConditionnelD = true;
-
-          exec.push(`{{vODGhostA=${i18n_ghost}}}`);
-          exec.push(`{{vODGhostAValue=[[{${vDiscretion}D6cs2cs4cs6cf1cf3cf5s%2}=0+${oDiscretion}]]}}`);
-          exec.push(`{{vODGhostCondition=${i18n_attaqueSurpriseCondition}}}`);
-
-          attaquesSurprises.unshift(i18n_ghost);
-          attaquesSurprisesValue.unshift(totalGhost);
-
-          if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+          exec.push(`{{vGhostA=${vDiscretion}D6+${oDiscretion}}}`);
+          exec.push(`{{vGhostD=${totalGhost}}}`);
+          cRoll.push(vDiscretion);
+          ODRogue.push(oDiscretion);
+          bDegats.push(totalGhost);
         }
       }
 
@@ -3056,38 +3129,33 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
 
   result.exec = exec;
   result.cRoll = cRoll;
-  result.isConditionnelA = isConditionnelA;
-  result.isConditionnelD = isConditionnelD;
-  result.attaquesSurprises = attaquesSurprises;
-  result.attaquesSurprisesValue = attaquesSurprisesValue;
-  result.attaquesSurprisesCondition = attaquesSurprisesCondition;
   result.diceDegats = diceDegats;
+  result.bDegats = bDegats;
   result.diceViolence = diceViolence;
   result.ODBarbarian = ODBarbarian;
+  result.ODRogue = ODRogue;
   result.ODShaman = ODShaman;
   result.ODWarrior = ODWarrior;
+  result.autresEffets = autresEffets;
+  result.isConditionnelA = isConditionnelA;
 
   return result;
 }
 
-function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom) {
+function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
-
-  let isConditionnelA = false;
-  let isConditionnelD = false;
-
-  const attaquesSurprises = [];
-  const attaquesSurprisesValue = [];
-  let attaquesSurprisesCondition = '';
+  const bDegats = [];
 
   let diceDegats = 0;
   let diceViolence = 0;
 
   const ODMALBarbarian = [];
+  const ODMALRogue = [];
   const ODMALShaman = [];
   const bonusWarrior = 1;
+  const autresEffets = [];
 
   let MALGoliath = 0;
   let MALGhost = '';
@@ -3099,6 +3167,8 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
   let C6Nom = '';
 
   let ODMALWarrior = 0;
+
+  let isConditionnelA = false;
 
   switch (armureL) {
     case 'barbarian':
@@ -3124,8 +3194,20 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
         diceDegats += MALGoliath;
         diceViolence += MALGoliath;
 
-        exec.push(`{{vBarbarianD=+${MALGoliath}D6}}`);
-        exec.push(`{{vBarbarianV=+${MALGoliath}D6}}`);
+        exec.push(`{{vMALBarbarianD=+${MALGoliath}D6}}`);
+        exec.push(`{{vMALBarbarianV=+${MALGoliath}D6}}`);
+
+        if (MALGoliath >= 4 && !aEffets.includes(i18n_antiVehicule)) {
+          autresEffets.push(i18n_antiVehicule);
+        }
+      }
+      break;
+
+    case 'bard':
+      MALchangeling = +value.MALBardChangeling;
+
+      if (MALchangeling !== 0) {
+        exec.push(`{{MALspecial2=${i18n_changelingActive}}}`);
       }
       break;
 
@@ -3135,20 +3217,18 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
       if (MALGhost !== '') {
         exec.push(`{{MALspecial2=${i18n_ghostActive}}}`);
 
-        if (isELumiere === false && isASLumiere === false) {
+        if (simpleRoll) {
+          exec.push(`{{vODMALGhostA=${i18n_ghost}}} {{vODMALGhostAValue=3}}`);
+          isConditionnelA = true;
+        } else if (isELumiere === false && isASLumiere === false) {
           const totalMALGhost = vDiscretion + oDiscretion;
 
+          exec.push(`{{vMALGhostA=${vDiscretion}D6+${oDiscretion}}}`);
+          exec.push(`{{vMALGhostD=${totalMALGhost}}}`);
           isConditionnelA = true;
-          isConditionnelD = true;
-
-          exec.push(`{{vODGhostA=${i18n_ghost}}}`);
-          exec.push(`{{vODGhostAValue=[[{${vDiscretion}D6cs2cs4cs6cf1cf3cf5s%2}=0+${oDiscretion}]]}}`);
-          exec.push(`{{vODGhostCondition=${i18n_attaqueSurpriseCondition}}}`);
-
-          attaquesSurprises.unshift(i18n_ghost);
-          attaquesSurprisesValue.unshift(totalMALGhost);
-
-          if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+          cRoll.push(vDiscretion);
+          ODMALRogue.push(oDiscretion);
+          bDegats.push(totalMALGhost);
         }
       }
       break;
@@ -3283,16 +3363,15 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
 
   result.exec = exec;
   result.cRoll = cRoll;
-  result.isConditionnelA = isConditionnelA;
-  result.isConditionnelD = isConditionnelD;
-  result.attaquesSurprises = attaquesSurprises;
-  result.attaquesSurprisesValue = attaquesSurprisesValue;
-  result.attaquesSurprisesCondition = attaquesSurprisesCondition;
   result.diceDegats = diceDegats;
   result.diceViolence = diceViolence;
+  result.bDegats = bDegats;
   result.ODMALBarbarian = ODMALBarbarian;
+  result.ODMALRogue = ODMALRogue;
   result.ODMALShaman = ODMALShaman;
   result.ODMALWarrior = ODMALWarrior;
+  result.autresEffets = autresEffets;
+  result.isConditionnelA = isConditionnelA;
 
   return result;
 }
@@ -3598,7 +3677,7 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonna
           if (bPilonnage < 0) { bPilonnage = 0; }
 
           exec.push(`{{vMStyleV=+${bPilonnage}D6}}`);
-          bViolence += Number(bPilonnage);
+          dViolence += Number(bPilonnage);
         }
       }
       break;
@@ -4027,8 +4106,6 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
       vTUltraviolence = diceUltraviolence;
     }
   }
-
-  log(vTDestructeur);
 
   const computed = {
     degats: tDegats,

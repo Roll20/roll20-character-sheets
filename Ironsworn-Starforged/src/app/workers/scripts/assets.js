@@ -75,6 +75,80 @@ on('change:repeating_assets:track-dropdown', function(values) {
   });
 });
 
+// Custom Ship Assets
+
+on('change:repeating_support-vehicle-assets:builder-titles', function(values) {
+  setAttrs({
+    ['repeating_support-vehicle-assets_builder-titles-' + values.previousValue]: 'off',
+    ['repeating_support-vehicle-assets_builder-titles-' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_support-vehicle-assets:builder-ability-1', function(values) {
+  setAttrs({
+    ['repeating_support-vehicle-assets_builder-ability-1-' + values.previousValue]: 'off',
+    ['repeating_support-vehicle-assets_builder-ability-1-' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_support-vehicle-assets:builder-ability-2', function(values) {
+  setAttrs({
+    ['repeating_support-vehicle-assets_builder-ability-2-' + values.previousValue]: 'off',
+    ['repeating_support-vehicle-assets_builder-ability-2-' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_support-vehicle-assets:builder-ability-3', function(values) {
+  setAttrs({
+    ['repeating_support-vehicle-assets_builder-ability-3-' + values.previousValue]: 'off',
+    ['repeating_support-vehicle-assets_builder-ability-3-' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_support-vehicle-assets:track-dropdown', function(values) {
+  setAttrs({
+    ['repeating_support-vehicle-assets_track-dropdown-' + values.previousValue]: 'off',
+    ['repeating_support-vehicle-assets_track-dropdown-' + values.newValue]: 'on'
+  });
+});
+
+// Custom Module Assets
+
+on('change:repeating_module-assets:builder-titles', function(values) {
+  setAttrs({
+    ['repeating_module-assets_builder-titles-' + values.previousValue]: 'off',
+    ['repeating_module-assets_builder-titles-' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_module-assets:builder-ability-1', function(values) {
+  setAttrs({
+    ['repeating_module-assets_builder-ability-1-' + values.previousValue]: 'off',
+    ['repeating_module-assets_builder-ability-1-' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_module-assets:builder-ability-2', function(values) {
+  setAttrs({
+    ['repeating_module-assets_builder-ability-2-' + values.previousValue]: 'off',
+    ['repeating_module-assets_builder-ability-2-' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_module-assets:builder-ability-3', function(values) {
+  setAttrs({
+    ['repeating_module-assets_builder-ability-3-' + values.previousValue]: 'off',
+    ['repeating_module-assets_builder-ability-3-' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_module-assets:track-dropdown', function(values) {
+  setAttrs({
+    ['repeating_module-assets_track-dropdown-' + values.previousValue]: 'off',
+    ['repeating_module-assets_track-dropdown-' + values.newValue]: 'on'
+  });
+});
+
 const assets = [
   'ace-ability-1',
   'ace-ability-2',        
