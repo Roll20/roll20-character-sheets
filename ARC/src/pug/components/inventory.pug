@@ -1,0 +1,114 @@
+
+mixin inventory
+  article.inventory
+    datalist(id="datalist__inventory")
+      each item in data.inventory.items
+        option(value=item, data-i18n=item)
+    .inventory__header
+      +span({ data_i18n: "inventory" }).inventory__header--span
+      +help("inventory")
+    .inventory__type
+      +span({ data_i18n: "item_type" }).inventory__type--span
+    .inventory__qty
+      +span({ data_i18n: "item_quantity" }).inventory__qty--span
+    .inventory__edit
+    .inventory__items
+      fieldset.repeating_inventory
+        +item
+    +popup({ name: "inventory", title: "inventory" })
+      +span({ data_i18n: "inventory_description" })
+
+mixin item
+  .item__wrapper
+    +hidden({ name: "item_expand", value: "0" })
+    +hidden({ name: "type" }).item__block--toggle
+    section.item
+      - let universals = Object.assign([], data.inventory.inputs.universal);
+      - universals = universals.sort((x, y) => { return x.sort - y.sort });
+      section.item__block.item__universal
+        each field in universals
+          +item-input(field)
+        .item__expand
+          +action({ name: "item-expand-toggle" }).item__expand--btn
+            +img({ src: "edit" }).item__expand--img
+            +img({ src: "close" }).item__close--img
+    +item-details
+
+mixin item-details
+  section.item--details
+    each itemType in data.inventory.types
+      - let fields = [...data.inventory.inputs[itemType]];
+      - fields = fields.sort((x, y) => { return x.sort - y.sort });
+      +section({ class: `item__${itemType}` }).item__block
+        each field in fields
+          +item-input(field)
+
+mixin item-input(obj)
+  - const field = Object.assign({}, obj);
+  - field.sort = null;
+  - field.id = `id_item_${field.name}`;
+  +div({ class: `item--${field.name}` })
+    if field.type === "select"
+      +field-select-block(field)
+    else
+      +field-block(field)
+
+mixin field-block(obj)
+  - const data_i18n = obj.label || null;
+  - const data_i18n_title = obj.label_title || null;
+  .field
+    if data_i18n
+      +label({ data_i18n_title, for: obj.id }).field__label
+        +span({ data_i18n }).field__label--span
+    - obj.label = null;
+    - obj.label_title = null;
+    - obj.class = `field--${obj.type}`;
+
+    if (obj.type === "radios")
+      +fill-in-radios(obj)
+    else if (obj.type === "textarea")
+      - obj.type = null;
+      +textarea(obj)
+    else
+      +input(obj)
+
+mixin field-select-block(obj)
+  - const data_i18n = obj.label || null;
+  .field
+    if data_i18n
+      +label({ data_i18n_title, for: obj.id }).field__label
+        +span({ data_i18n }).field__label--span
+    - const options = obj.options;
+    - obj.options = null;
+    +select(obj).field--select
+      each opt in options
+        +option(opt)
+
+
+
+//- not used
+mixin inventory-totals
+  footer.inventory__totals
+    .inventory__totals--empty
+    .inventory__totals--empty
+    .inventory__totals--pool
+      +number({ name: "inventory_points_max", min: 0 })
+    .inventory__totals--spent
+      +number({ name: "inventory_points", min: 0 })
+    .inventory__totals--empty
+    .inventory__totals--pool
+      +span({ data_i18n: "item_pool" })
+    .inventory__totals--spent
+      +span({ data_i18n: "item_pool" })
+
+//- not used
+mixin type-checkboxes
+  +label({ for: "supplies" }).item__is-supplies
+    +radio({ name: "type", value: "supplies", id: "supplies" }).item__type--radio
+    .item__type--square
+  +label({ for: "damage-defense" }).item__is-damage-defense
+    +radio({ name: "type", value: "damage", id: "damage-defense" }).item__type--radio
+    .item__type--square
+  +label({ for: "spell-technique" }).item__is-spell-technique
+    +radio({ name: "type", value: "spell", id: "spell-technique" }).item__type--radio
+    .item__type--square

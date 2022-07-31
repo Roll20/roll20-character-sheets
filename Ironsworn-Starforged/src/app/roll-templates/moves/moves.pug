@@ -1,0 +1,42 @@
+include ../mixins/negations
+include ../mixins/headers
+include ../mixins/body
+include ../mixins/actions
+
+-
+  var momentumNeg = [
+    { momentum: '-1', die: '1' },
+    { momentum: '-2', die: '2' },
+    { momentum: '-3', die: '3' },
+    { momentum: '-4', die: '4' },
+    { momentum: '-5', die: '5' },
+    { momentum: '-6', die: '6' }
+  ]
+
+rolltemplate.sheet-rolltemplate-starforged_moves
+  .sheet-roll-container
+    | {{#action}}
+    +actionHeader
+    | {{#rollLess() momentum 0}}
+    each momentum in momentumNeg
+      +negationRoll(momentum, 'action')
+    | {{/rollLess() momentum 0}}
+    | {{#^rollLess() momentum 0}}
+    +actionBody('action')
+    +standardActionWithMomentum('action')
+    | {{/^rollLess() momentum 0}}
+    | {{/action}}
+
+    | {{#custom}}
+    | {{#header}}
+    .sheet-result-body.sheet-result-row
+      .sheet-subheader {{header}}
+    | {{/header}}
+    .sheet-result-body.sheet-result-row
+      div {{name}}
+    | {{#allprops() custom name header}}
+    .sheet-result-body.sheet-result-row
+      div {{key}}
+      div {{value}}
+    | {{/allprops() custom name header}}
+    | {{/custom}}

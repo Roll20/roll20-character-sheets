@@ -1,0 +1,88 @@
+mixin ability(asset, ability, number, name)
+  - var abilityId = `${name}_${number}`
+  .flex-container
+    if ability.Enabled
+      input.asset-ability(
+        type='checkbox'
+        name=`attr_ability_checkbox_${abilityId}`
+        checked
+      )
+    else
+      input.asset-ability(
+        type='checkbox'
+        name=`attr_assetcheckbox_${abilityId}${number}`
+      )
+    - var translationAbility = `asset-${name}-ability-${number}`
+    - var assetBodyPlaceholder=translation[translationAbility]
+    .asset-ability
+      div.i18n-text(data-i18n=translationAbility) !{assetBodyPlaceholder}
+      if ability.Input
+        each field in ability.Input
+          - var translationAbilityField = `asset-${name}-ability-${number}-textinput-${_.kebabCase(field)}`
+          span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField) !{translation[translationAbilityField]}
+          input.border-bottom.no-border(type='text' name=`attr_ability_field${field}` value='')
+
+mixin description(asset, key)
+  .asset-description
+    - var translationDesc = `asset-${key}-description`
+    .asset-description-text(data-i18n=translationDesc) !{translation[translationDesc]}
+
+mixin field(field, assetName)
+  .write-in-container
+    .i18n-text.asset-write-in.asset-name(
+      data-i18n=`asset-${assetName}-textinput-${_.kebabCase(field)}`
+    )=translation[`asset-${assetName}-textinput-${_.kebabCase(field)}`]
+    input.border-bottom.no-border(type='text' name=`attr_field-${field}` value='')
+
+mixin track(track, assetName)
+  .asset-track-wrapper
+    - var currentTrack = 0
+    while currentTrack <= track.Max
+      .asset-track-box
+        if currentTrack == 0
+          .asset-track-box-display=0
+        else
+          .asset-track-box-display=`+ ${currentTrack}`
+        input(type='radio' name=`attr_assettrack_${assetName}` value=`${currentTrack}`)
+        - currentTrack++
+
+mixin assetTemplate(asset, options)
+  - let id = asset.id
+  - let name = `${id.replace(/asset-/i, "")}`
+  - let category = _.kebabCase(asset["Asset Type"])
+  if options.visiblityToggle === true
+    input(class=`${options.classes} asset-${name} asset-toggle` type='checkbox' name=`attr_${name}`)
+  div(class=`${options.classes} asset-card asset-${name} category-${category}`)
+    .asset-content-header
+      .asset-details
+        .category=asset["Asset Type"]
+        span.asset-name=asset.Name
+      .background-svg
+    if asset.Description
+      +description(asset, name)
+    if asset.Input
+      each field in asset.Input
+        +field(field, name)
+    .flex-wrapper
+      each ability, index in asset.Abilities
+        - var abilityNumber = index + 1
+        +ability(asset, ability, abilityNumber, name)
+    if asset['Condition Meter'] && options.standalone === false
+      +track(asset['Condition Meter'], name)
+
+mixin genericAssetBuilder(assetsArray, listId)
+  //- Asset Datalist
+  input.asset-options-header(type='text' list=listId name='attr_asset' placeholder=translation["type-asset-name"])
+  datalist(id=listId)
+    - console.log("Generating", assetsArray.length, "assets")
+    each asset in assetsArray
+      - let assetNameClass = asset.id.replace(/asset-/i, "")
+      - console.log("Generating", asset.id)
+      //- generates classes and outputs to stdout
+      //- - console.log(`input[type=checkbox].${assetNameClass}:checked ~ div.${assetNameClass},`)
+      option.i18n-text(data-i18n=`${asset.id}-name` value=assetNameClass) !{translation[`${asset.id}-name`]}
+    option.i18n-text(data-i18n=`asset-custom-name` value='custom') !{translation["asset-custom-name"]}
+
+  //- Asset Content
+  each asset in assetsArray
+    +assetTemplate(asset, { classes: 'hide-element', visiblityToggle: true, standalone: false })

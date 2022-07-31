@@ -1,0 +1,117 @@
+mixin oracleTable(oracle, rollButton=false)
+  table.oracle-table
+    if (oracle.Description)
+      caption.oracle-description!=oracle.Description
+    each row, index in oracle.Table
+      +oracleTableRow(oracle.Table, row, index)
+
+mixin oracleMultiSubTable(oracle, header=false)
+  //-  builds tables with multiple Roll columns, e.g. regional tables
+  -
+    let mergedRows = [];
+    //- if all subtables have the same number of rows
+    if (oracle.Tables.every(subtable =>
+      subtable.Table.length == oracle.Tables[0].Table.length
+      //- && subtable.Table.map(row => row.Description) == oracle.Tables[0].Table.map(row => row.Description)
+    )) {
+      oracle.Tables[0].Table.forEach((row, index) => {
+        let newRow = _.clone(row);
+        newRow.Chance = [];
+        oracle.Tables.forEach(subOracle => newRow.Chance.push(subOracle.Table[index].Chance));
+        mergedRows.push(newRow);
+      })
+    } else {
+      let tables = oracle.Tables.map(subtable => subtable.Table);
+      let baseTable = _.clone(tables.reduce((a, b) => a.length > b.length ? a : b));
+      // selects longest as starting point
+      baseTable.forEach((row) => {
+        let newRow = _.clone(row);
+        newRow.Chance = [];
+        tables.forEach(tbl => {
+          if (!_.isUndefined(tbl.find(tblRow => tblRow.Description === row.Description)))
+          {
+            matchingRow = _.clone(tbl.find(
+                tblRow => tblRow.Description === row.Description
+              ));
+
+            newRow.Chance.push(matchingRow.Chance);
+          }
+          else {
+            newRow.Chance.push(0);
+          }
+        })
+        mergedRows.push(newRow);
+      })
+    }
+  if oracle.Description
+    .oracle-description!=oracle.Description
+  table.oracle-table.oracle-subtable.oracle-subtable-multi
+    thead
+      if (header===true)
+        tr
+          th.oracle-subtitle(colspan=(oracle.Tables.length+1))=oracle['Display name']||oracle.Name
+      tr
+        each subOracle in oracle.Tables
+          th.oracle-column-head.oracle-roll=subOracle.Name||subOracle['Display name'].replace(/^.* - /g, "")
+        th.oracle-column-head.oracle-roll=`Result`
+    each row, index in mergedRows
+      +oracleTableRow(mergedRows, row, index)
+
+
+mixin oracleSubTable(subOracle, header=true)
+  table.oracle-table.oracle-subtable(id=subOracle.id)
+    if (subOracle.Description)
+      caption.oracle-description!=subOracle.Description
+    if (header===true)
+      thead
+        th.oracle-subtitle(colspan=2)=subOracle.Name
+    each row, index in subOracle.Table
+      +oracleTableRow(subOracle.Table, row, index)
+
+
+mixin oracleTableRow(table, row, index)
+  -
+    function rangeString(initChance, finalChance) {
+      return (initChance === finalChance) ? finalChance : `${initChance}-${finalChance}`;
+    };
+    function resultString(row) {
+      let detailsKeys = ["Assets", "Details"];
+      let detailsStrings = [];
+      detailsKeys.forEach(key => {
+        if (row[key]) {
+          if (key === "Assets") {
+            row[key] = row[key].map(item => item.toUpperCase());
+          }
+          detailsStrings.push(row[key])
+        };
+      });
+      let detailString;
+      if (detailsStrings.length > 0) {
+        detailsStrings = detailsStrings.flat(2);
+        detailString = `(${detailsStrings.join(", ")})`;
+      };
+      const result = `${row.Description}${detailString ? " " + detailString : ""}`;
+      return result;
+    }
+      let ranges = [];
+    if (Array.isArray(row.Chance)) {
+      row.Chance.forEach((chance, chanceIndex) => {
+        if (chance === 0) {
+          ranges.push(`&mdash;`)
+        }
+        else
+        {const initChance = (index === 0) ? chance - (chance - 1) : table[index - 1].Chance[chanceIndex] + 1;
+        const finalChance = chance;
+        ranges.push(rangeString(initChance, finalChance));}
+      })
+    }
+    else {
+      const initChance = (index === 0) ? row.Chance - (row.Chance - 1) : table[index - 1].Chance + 1;
+      const finalChance = row.Chance;
+      ranges.push(rangeString(initChance, finalChance));
+    }
+  tr.oracle-row
+    each range in ranges
+      td.oracle-roll!=range
+    td.oracle-result!=resultString(row)
+

@@ -1,0 +1,45 @@
+include ../progress/mixins/box
+
+- var legacies = [ 'quests', 'bonds', 'discoveries' ]
+
+//-
+  @mixin
+  @outputs html
+
+  @memberof components/legacies
+
+mixin legacies()
+  .legacies
+    for legacy in legacies
+      div(class=`${legacy} legacy surface`)
+        .legacy-row-1
+          .title=translation[`legacy-${legacy}-title`]
+        .legacy-row-2
+          .progress-boxes
+            .cmd-buttons
+              +btn({type: 'checkbox', text: 'CLEAR', translationId: 'clear-btn', attribute: `clear_legacy_${legacy}`, action: 'static', classes: 'surface-2'})
+              +btn({type: 'checkbox', text: 'MARK', translationId: 'progress-mark', attribute: `mark_legacy_${legacy}`, action: 'static', classes: 'surface-2'})
+            each index in track
+              .progress-box
+                +largeProgressBoxComplex(`attr_legacy_progress_${legacy}_${index}`)
+                .experience-boxes
+                  each box in [ 1, 2 ]
+                    label.experience-box
+                      input.experience-box.hide-element(type='checkbox' name=`attr_${legacy}_experience_${index}_${box}`)
+                      .experience-fill
+            div
+              +btn({
+                type: 'checkbox',
+                text: '+10',
+                attribute: `legacy_${legacy}_plus_ten`,
+                classes: 'ten-marker surface-2'
+              })
+              label.btn.legacy-roll.surface-2 Roll
+                button(
+                  type="roll"
+                  class='hide-element'
+                  name="rollProgress"
+                  value=`&{template:starforged_progress} {{progress_name=Legacy ${legacy} Progress}} {{progress=[[@{legacy_progress_${legacy}-filled}]]}} {{challenge1=[[d10]]}} {{challenge2=[[d10]]}}`
+                )
+              input.hide-element(type='text' name=`attr_legacy_progress_${legacy}-filled` value=`floor((@{legacy_progress_${legacy}_1}+@{legacy_progress_${legacy}_2}+@{legacy_progress_${legacy}_3}+@{legacy_progress_${legacy}_4}+@{legacy_progress_${legacy}_5}+@{legacy_progress_${legacy}_6}+@{legacy_progress_${legacy}_7}+@{legacy_progress_${legacy}_8}+@{legacy_progress_${legacy}_9}+@{legacy_progress_${legacy}_10})/4)` disabled='true')
+

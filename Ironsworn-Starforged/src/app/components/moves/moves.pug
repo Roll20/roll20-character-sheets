@@ -1,0 +1,43 @@
+include ./mixins/move-builder
+include ../generic/listGroup
+
+mixin moveGroup(moveCategory)
+  - var title_i18n = `move-group-title-${moveCategory}`
+  - var moveList = moves.Moves.filter(obj => { return obj["Category"] === translation[title_i18n] })
+  +listGroup(title_i18n)
+    each move in moveList
+      +listGroupItem()
+        +moveListButton(move)
+        label.move.toggle-btn
+          input(type='radio' class=`hide-element selected-move ${move.id}` name='attr_selected_move' value=move.Name)
+          - const shortId = move.id.replace(/move-/i, "")
+          - const moveKey = `move-title-${shortId}`
+          span.move-name.btn-content.i18n-text(data-i18n=moveKey) !{translation[moveKey]}
+
+input(type='radio' class='hide-element full-move-list' name='attr_move_view' value='1' checked)
+.full-move-list.showhide
+  //- List of Moves
+  .list-group-container
+    input(type='radio' class='hide-element' name='attr_selected_move')
+    each group in movegroups
+      +moveGroup(group)
+
+      //- Stupid way for me to generate orcale ccs
+      //- - console.log(`input[type=radio].${move.id}:checked ~ div.${move.id},`)
+
+//- Move Details
+input(type='radio' class='hide-element move-preview' name='attr_move_view' value='2')
+.move-preview.showhide
+  .preview-bar
+    .close-bar
+      label.close-preview.surface
+        span.i18n-text(data-i18n='close-preview')=translation['close-preview']
+        input(type='checkbox' class='hide-element' name='attr_close_move_preview')
+  .preview-container
+    .scrollable-list-groups.list-group-container
+      each group in movegroups
+        +moveGroup(group)
+    //- Move Previews
+    .move-preview-container
+      each move in moves.Moves
+        +movePreviewFactory(move)

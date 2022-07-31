@@ -10,9 +10,79 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.6 [Screenshot](coc_v2.png)
+v3.11.0 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.11.0 (2022-01-16)
+
+Nouvelles fonctionnalités
+
+- Possibilité de sélectionner le mod de test (mod carac + buff/debuff) dans les bonus aux DM des attaques
+- Possibilité d'afficher le token du personnage dans les jets de dés de la fiche
+
+## v3.10.1 (2021-12-18)
+
+Corrections de bugs
+
+- Dysfonctionnement des boutons d'états préjudiciables
+- Libellé du modificateur d'attaque persistant après avoir été annulé
+- Meilleur support des modificateurs de DM sous formes de jets de dés
+- Mauvais affichage en cas de sélection du setting Surhumains
+- Affichage de la version de la fiche sur l'onglet Configuration
+
+## v3.10.0 (2021-11-12)
+
+- Ajout du token par défaut sur la fiche de personnage
+
+## v3.9.2 (2021-04-27)
+
+- Correction d'un bug sur le titre de la capacité de rang 2 de la voie n°4
+- Correction du calcul du rang dans une voie : la case doit être cochée et soit le titre soit le texte de la capacité doit être renseigné
+
+## v3.9.1 (2021-04-25)
+
+- Correction d'un bug sur le titre de la capacité de rang 3 de la voie n°3 dupliquée dans la voie n°8
+
+## v3.9.0 (2021-03-30)
+
+- Ajout d'un champ titre pour chaque capacité (attributs @{voieN-tR} où N = no de voie et R = rang)
+  - Migration automatique d'une version antérieure : la première ligne de la capacité est considérée comme titre
+  - Prise en compte dans les autres fonctions (liaison d'un jet de capacité à une voie+rang, import de données de profil JSON)
+- Correction d'un bug après suppression du seul modificateur d'attaque ou de DM de la liste (le modificateur n'est plus pris en compte dans les jets d'attaque)
+
+## v3.8.1 (2021-03-01)
+
+Suppression du code de remise en forme des textes de capacités par élimination des retours à la ligne
+
+## v3.8 (2021-02-22)
+
+_Fiche de PJ_
+
+- Déplacement de l'initiative sur la 1ère ligne de la section combat
+- Amélioration de la reconnaissance des propriétés d'équipement
+  - **DEF : x** pour indiquer le bonus de DEFense d'une armure
+  - **DEF- : x** pour indiquer le malus d'encombrement d'une armure
+  - **RD : x** pour indiquer la réduction des DM d'une armure
+  - **DM : dm type** pour indiquer les dés et le type de DM
+    - Où _dm_ est {nombre}d{faces}
+    - Suffixer _dm_ avec + ou ! pour des DM explosifs
+  - **DM2 : dm2 type2** pour indiquer un second type et dés de DM
+
+_Fiche de Véhicule_
+
+- Ajout d'un type de véhicule et d'un bouton sur l'onglet Configuration
+- Cliquer sur le bouton permet de générer une liste par défaut des jets de véhicule
+
+## v3.7 (2020-12-21)
+
+- Ajout d'un compteur optionnel sur l'onglet Caractéristiques sous les états préjudiciables
+  - comporte un intitulé et une valeur (pas de valeur max.)
+  - l'activation du compteur et son intitulé sont déterminés par le setting choisi sur l'onglet Configuration
+  - permet de comptabiliser les Points de Folie (Cthulhu), Tension (Menace-X), Pulsion (Monstres), Ame/Rage/Sang (Surhumains Démons/Loups-garous/Vampires), etc...
+- Ajout d'un champ Origine sous les champs Profil et Famille dans l'entête de la fiche. Les intitulés 'Profil', 'Famille' et 'Origine' sont modifiés en fonction du setting
+- Pour le setting Monstres, remplacement de l'état Affaibli par la Poisse (moins bon de deux d20) pour tous les états préjudiciables utilisant le d12.
+- Sur une fiche de véhicule, la section des traits physiques (sexe, âge, taille, poids) n'est pas affichée
 
 ## v3.6 (2020-09-04)
 

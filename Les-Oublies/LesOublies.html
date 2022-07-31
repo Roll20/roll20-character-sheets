@@ -4,6 +4,62 @@
                 Sheet version: 1.0
 -->
 
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- --------------------- SCRIPT PATCH FOR ATTRIBUTES --------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<script type="text/worker">
+	const fillCompRow = (sectionName, data) => {
+		let id = generateRowID();
+		let attr = {};
+		for(let key in data) {
+			attr[`repeating_${sectionName}_${id}_${key}`] = data[key];
+		}
+		setAttrs(attr);
+	};
+
+	const replaceRepeatingComp = (compName) => {
+		for (let i = 1; i <= 3; ++i) {
+			getAttrs([`${compName}${i}`, `${compName}${i}_nom`, `${compName}${i}_bonus_dice`], function(values) {
+				if (values[`${compName}${i}_nom`]) {
+					let data = {};
+					data[`${compName}`] = values[`${compName}${i}`];
+					data[`${compName}_nom`] = values[`${compName}${i}_nom`];
+					data[`${compName}_bonus_dice`] = values[`${compName}${i}_bonus_dice`];
+					fillCompRow(compName, data);
+					values[`${compName}${i}`] = "";
+					values[`${compName}${i}_nom`] = "";
+					values[`${compName}${i}_bonus_dice`] = "";
+					setAttrs(values);
+				}
+			});
+		}
+	};
+
+	on("sheet:opened", function() {
+		// amure_penalite --> armure_penalite (type mistake)
+		getAttrs(['amure_penalite', 'armure_penalite'], function(values) {
+			if((values.amure_penalite) && !(values.armure_penalite)) {
+				setAttrs({armure_penalite: values.amure_penalite});
+			}
+		});
+
+		// add repeating section for [art], [artisanat], [erudition] and [langues]
+		replaceRepeatingComp("art");
+		replaceRepeatingComp("artisanat");
+		replaceRepeatingComp("erudition");
+		replaceRepeatingComp("langues");
+
+		// strategie1/2/3 --> strategie
+		getAttrs(["strategie1"], function(values) {
+			setAttrs({
+				strategie: values.strategie1
+			})
+		});
+	});
+</script>
+
 <div class="outline"> 
 
 <!-- ----------------------------------------------------------------------- -->
@@ -106,8 +162,9 @@
 					<td class="center-content">
 						<input type="number" min="0" value="0" name="attr_taille"/>
 					</td> 
-					<td class="center-content"> 
-						<input type="number" min="0" value="0" name="attr_pdv"/>
+					<td class="center-content">
+						<input type="number" min="0" value="0" class="number-with-max" name="attr_pdv"/> /
+						<input type="number" min="0" value="0" class="number-with-max" name="attr_pdv_max"/>
 					</td>
 				</tr>
 				
@@ -159,10 +216,12 @@
 				
 				<tr>
 					<td>
-						<input type="number" value="0" min="0" name="attr_pds"/>
+						<input type="number" value="0" min="0" class="number-with-max" name="attr_pds"/> /
+						<input type="number" value="0" min="0" class="number-with-max" name="attr_pds_max"/>
 					</td>
 					<td>
-						<input type="number" value="0" min="0" name="attr_pdc"/>
+						<input type="number" value="0" min="0" class="number-with-max" name="attr_pdc"/> /
+						<input type="number" value="0" min="0" class="number-with-max" name="attr_pdc_max"/>
 					</td>
 				</tr>
 				
@@ -215,7 +274,35 @@
 <!-- ------------------------ PROFILS ET COMPETENCES  ---------------------- -->
 <!-- ----------------------------------------------------------------------- -->
 
+
 <div class="sheet-skills">
+
+	<table class="center-content pds-et-pdc">
+		<colgroup>
+			<col style="width: 50%;">
+			<col style="width: 50%;">
+		</colgroup>
+		
+		<tr>
+			<td>
+				Points de songes
+			</td>
+			<td>
+				Points de cauchemar
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<input type="number" value="0" min="0" class="number-with-max" name="attr_pds"/> /
+				<input type="number" value="0" min="0" class="number-with-max" name="attr_pds_max"/>
+			</td>
+			<td>
+				<input type="number" value="0" min="0" class="number-with-max" name="attr_pdc"/> /
+				<input type="number" value="0" min="0" class="number-with-max" name="attr_pdc_max"/>
+			</td>
+		</tr>
+	</table>
     
 	<div class="sheet-2colrow small-outline section-competences">  <!-- Section Profils et Competences -->
 		
@@ -232,69 +319,17 @@
 					</td>
 				</tr>
 				<tr>
-					<td>
-					    <div>
-                            <span>Art</span>
-                            <input type="text" name="attr_art1_nom"/>
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_art1"/>
-					</td>
-					<td>
-						<button type="roll"  name="art1_test"
-								value="&{template:classic-roll} {{name=Art: @{art1_nom}}} {{whiteroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{art1}[@{art1_nom}]]]}} {{blackroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{art1}[@{art1_nom}]]]}} {{bonusdice=[[@{art1_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_art1_bonus_dice"/>
-					</td>
-					<td>
-					    +1D12
-					</td>
-				</tr>
-				<tr>
-					<td>
-					    <div>
-                            <span>Art</span>
-							<input type="text" name="attr_art2_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_art2"/>
-					</td>
-					<td>
-						<button type="roll"  name="art2_test"
-								value="&{template:classic-roll} {{name=Art: @{art2_nom}}} {{whiteroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{art2}[@{art2_nom}]]]}} {{blackroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{art2}[@{art2_nom}]]]}} {{bonusdice=[[@{art2_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_art2_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
-					</td>
-				</tr>
-				<tr>
-					<td>
-					    <div>
-                            <span>Art</span>
-							<input type="text" name="attr_art3_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_art3"/>
-					</td>
-					<td>
-						<button type="roll"  name="art3_test"
-								value="&{template:classic-roll} {{name=Art: @{art3_nom}}} {{whiteroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{art3}[@{art3_nom}]]]}} {{blackroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{art3}[@{art3_nom}]]]}} {{bonusdice=[[@{art3_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_art3_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
+					<td colspan="5">
+						Art
+						<fieldset class="repeating_art">
+							<input type="text" name="attr_art_nom"/>
+							<input type="number" value="0" min="0" name="attr_art"/>
+							<button type="roll"  name="art_test"
+									value="&{template:classic-roll} {{name=Art: @{art_nom}}} {{whiteroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{art}[@{art_nom}]]]}} {{blackroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{art}[@{art_nom}]]]}} {{bonusdice=[[@{art_bonus_dice}d12 + @{domaine_artiste}[Dom. Artiste] + @{art}[@{art_nom}]]]}} {{bonusused=[[@{art_bonus_dice}]]}}">
+							</button>
+							<input type="checkbox" value="1" name="attr_art_bonus_dice"/>
+							+1D12
+						</fieldset>
 					</td>
 				</tr>
 				<tr>
@@ -304,7 +339,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="empathie_test"
-								value="&{template:classic-roll} {{name=Empathie}} {{whiteroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{empathie}[Empathie]]]}} {{blackroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{empathie}[Empathie]]]}} {{bonusdice=[[@{empathie_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Empathie}} {{whiteroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{empathie}[Empathie]]]}} {{blackroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{empathie}[Empathie]]]}} {{bonusdice=[[@{empathie_bonus_dice}d12 + @{domaine_artiste}[Dom. Artiste] + @{empathie}[Empathie]]]}} {{bonusused=[[@{empathie_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -321,7 +356,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="seduction_test"
-								value="&{template:classic-roll} {{name=Séduction}} {{whiteroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{seduction}[Seduction]]]}} {{blackroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{seduction}[Seduction]]]}} {{bonusdice=[[@{seduction_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Séduction}} {{whiteroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{seduction}[Seduction]]]}} {{blackroll=[[1d12 + @{domaine_artiste}[Dom. Artiste] + @{seduction}[Seduction]]]}} {{bonusdice=[[@{seduction_bonus_dice}d12 + @{domaine_artiste}[Dom. Artiste] + @{seduction}[Seduction]]]}} {{bonusused=[[@{seduction_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -347,7 +382,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="athletisme_test"
-								value="&{template:classic-roll} {{name=Athlétisme}} {{whiteroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{athletisme}[Athletisme]]]}} {{blackroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{athletisme}[Athletisme]]]}} {{bonusdice=[[@{athletisme_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Athlétisme}} {{whiteroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{athletisme}[Athletisme]]]}} {{blackroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{athletisme}[Athletisme]]]}} {{bonusdice=[[@{athletisme_bonus_dice}d12 + @{domaine_athlete}[Dom. Athlete] + @{athletisme}[Athletisme]]]}} {{bonusused=[[@{athletisme_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -364,7 +399,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="rapidite_test"
-								value="&{template:classic-roll} {{name=Rapidité}} {{whiteroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{rapidite}[Rapidite]]]}} {{blackroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{rapidite}[Rapidite]]]}} {{bonusdice=[[@{rapidite_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Rapidité}} {{whiteroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{rapidite}[Rapidite]]]}} {{blackroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{rapidite}[Rapidite]]]}} {{bonusdice=[[@{rapidite_bonus_dice}d12 + @{domaine_athlete}[Dom. Athlete] + @{rapidite}[Rapidite]]]}} {{bonusused=[[@{rapidite_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -381,7 +416,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="volonte_test"
-								value="&{template:classic-roll} {{name=Volonté}} {{whiteroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{volonte}[Volonte]]]}} {{blackroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{volonte}[Volonte]]]}} {{bonusdice=[[@{volonte_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Volonté}} {{whiteroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{volonte}[Volonte]]]}} {{blackroll=[[1d12 + @{domaine_athlete}[Dom. Athlete] + @{volonte}[Volonte]]]}} {{bonusdice=[[@{volonte_bonus_dice}d12 + @{domaine_athlete}[Dom. Athlete] + @{volonte}[Volonte]]]}} {{bonusused=[[@{volonte_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -407,7 +442,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="sens_test"
-								value="&{template:classic-roll} {{name=Sens}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{sens}[Sens]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{sens}[Sens]]]}} {{bonusdice=[[@{sens_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Sens}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{sens}[Sens]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{sens}[Sens]]]}} {{bonusdice=[[@{sens_bonus_dice}d12 + @{domaine_chasseur}[Dom. Chasseur] + @{sens}[Sens]]]}} {{bonusused=[[@{sens_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -424,7 +459,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="survie_test"
-								value="&{template:classic-roll} {{name=Survie}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{survie}[Survie]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{survie}[Survie]]]}} {{bonusdice=[[@{survie_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Survie}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{survie}[Survie]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{survie}[Survie]]]}} {{bonusdice=[[@{survie_bonus_dice}d12 + @{domaine_chasseur}[Dom. Chasseur] + @{survie}[Survie]]]}} {{bonusused=[[@{survie_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -441,7 +476,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="tir_test"
-								value="&{template:classic-roll} {{name=Tir}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{tir}[Tir]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{tir}[Tir]]]}} {{bonusdice=[[@{tir_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Tir}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{tir}[Tir]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Dom. Chasseur] + @{tir}[Tir]]]}} {{bonusdice=[[@{tir_bonus_dice}d12 + @{domaine_chasseur}[Dom. Chasseur] + @{tir}[Tir]]]}} {{bonusused=[[@{tir_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -461,69 +496,17 @@
 					</td>
 				</tr>
 				<tr>
-					<td>
-					    <div>
-                            <span>Artisanat</span>
-							<input type="text" name="attr_artisanat1_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_artisanat1"/>
-					</td>
-					<td>
-						<button type="roll"  name="artisanat1_test"
-								value="&{template:classic-roll} {{name=Artisanat : @{artisanat1_nom}}} {{whiteroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{artisanat1}[@{artisanat1_nom}]]]}}  {{blackroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{artisanat1}[@{artisanat1_nom}]]]}} {{bonusdice=[[@{artisanat1_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_artisanat1_bonus_dice"/>    
-					</td>
-					<td>
-					    +1D12
-					</td>
-				</tr>
-				<tr>
-					<td>
-					    <div>
-                            <span>Artisanat</span>
-							<input type="text" name="attr_artisanat2_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_artisanat2"/>
-					</td>
-					<td>
-						<button type="roll"  name="artisanat2_test"
-								value="&{template:classic-roll} {{name=Artisanat : @{artisanat2_nom}}} {{whiteroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{artisanat2}[@{artisanat2_nom}]]]}} {{blackroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{artisanat2}[@{artisanat2_nom}]]]}} {{bonusdice=[[@{artisanat2_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_artisanat2_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
-					</td>
-				</tr>
-				<tr>
-					<td>
-					    <div>
-                            <span>Artisanat</span>
-							<input type="text" name="attr_artisanat3_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_artisanat3"/>
-					</td>
-					<td>
-						<button type="roll"  name="artisanat3_test"
-								value="&{template:classic-roll} {{name=Artisanat : @{artisanat3_nom}}} {{whiteroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{artisanat3}[@{artisanat3_nom}]]]}}  {{blackroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{artisanat3}[@{artisanat3_nom}]]]}} {{bonusdice=[[@{artisanat3_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_artisanat3_bonus_dice"/>
-					</td>
-					<td>
-					    +1D12
+					<td colspan="5">
+						Artisanat
+						<fieldset class="repeating_artisanat">
+							<input type="text" name="attr_artisanat_nom"/>
+							<input type="number" value="0" min="0" name="attr_artisanat"/>
+							<button type="roll"  name="artisanat_test"
+									value="&{template:classic-roll} {{name=Artisanat : @{artisanat_nom}}} {{whiteroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{artisanat}[@{artisanat_nom}]]]}} {{blackroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{artisanat}[@{artisanat_nom}]]]}} {{bonusdice=[[@{artisanat_bonus_dice}d12 + @{domaine_faiseur}[Dom. Faiseur] + @{artisanat}[@{artisanat_nom}]]]}} {{bonusused=[[@{artisanat_bonus_dice}]]}}">
+							</button>
+							<input type="checkbox" value="1" name="attr_artisanat_bonus_dice"/>
+							+1D12
+						</fieldset>
 					</td>
 				</tr>
 				<tr>
@@ -533,7 +516,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="intellect_test"
-								value="&{template:classic-roll} {{name=Intellect}} {{whiteroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{intellect}[Intellect]]]}} {{blackroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{intellect}[Intellect]]]}} {{bonusdice=[[@{intellect_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Intellect}} {{whiteroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{intellect}[Intellect]]]}} {{blackroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{intellect}[Intellect]]]}} {{bonusdice=[[@{intellect_bonus_dice}d12 + @{domaine_faiseur}[Dom. Faiseur] + @{intellect}[Intellect]]]}} {{bonusused=[[@{intellect_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -550,7 +533,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="soins_test"
-								value="&{template:classic-roll} {{name=Soins}} {{whiteroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{soins}[Soins]]]}} {{blackroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{soins}[Soins]]]}} {{bonusdice=[[@{soins_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Soins}} {{whiteroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{soins}[Soins]]]}} {{blackroll=[[1d12 + @{domaine_faiseur}[Dom. Faiseur] + @{soins}[Soins]]]}} {{bonusdice=[[@{soins_bonus_dice}d12 + @{domaine_faiseur}[Dom. Faiseur] + @{soins}[Soins]]]}} {{bonusused=[[@{soins_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -576,7 +559,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="commandement_test"
-								value="&{template:classic-roll} {{name=Commandement}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{commandement}[Commandement]]]}}  {{blackroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{commandement}[Commandement]]]}} {{bonusdice=[[@{commandement_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Commandement}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{commandement}[Commandement]]]}}  {{blackroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{commandement}[Commandement]]]}} {{bonusdice=[[@{commandement_bonus_dice}d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{commandement}[Commandement]]]}} {{bonusused=[[@{commandement_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -593,7 +576,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="endurance_test"
-								value="&{template:classic-roll} {{name=Endurance}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{endurance}[Endurance]]]}} {{blackroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{endurance}[Endurance]]]}} {{bonusdice=[[@{endurance_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Endurance}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{endurance}[Endurance]]]}} {{blackroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{endurance}[Endurance]]]}} {{bonusdice=[[@{endurance_bonus_dice}d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{endurance}[Endurance]]]}} {{bonusused=[[@{endurance_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -610,7 +593,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="force_test"
-								value="&{template:classic-roll} {{name=Force}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{force}[Force]]]}} {{blackroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{force}[Force]]]}} {{bonusdice=[[@{force_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Force}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{force}[Force]]]}} {{blackroll=[[1d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{force}[Force]]]}} {{bonusdice=[[@{force_bonus_dice}d12 + @{domaine_force_de_la_nature}[Dom. Force de la nature] + @{force}[Force]]]}} {{bonusused=[[@{force_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -640,7 +623,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="cac_test"
-								value="&{template:classic-roll} {{name=Corps à corps}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{cac}[CaC]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{cac}[CaC]]]}} {{bonusdice=[[@{cac_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Corps à corps}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{cac}[CaC]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{cac}[CaC]]]}} {{bonusdice=[[@{cac_bonus_dice}d12 + @{domaine_guerrier}[Dom. Guerrier] + @{cac}[CaC]]]}} {{bonusused=[[@{cac_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -657,7 +640,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="melee_test"
-								value="&{template:classic-roll} {{name=Mêlée}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{melee}[Melee]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{melee}[Melee]]]}} {{bonusdice=[[@{melee_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Mêlée}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{melee}[Melee]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{melee}[Melee]]]}} {{bonusdice=[[@{melee_bonus_dice}d12 + @{domaine_guerrier}[Dom. Guerrier] + @{melee}[Melee]]]}} {{bonusused=[[@{melee_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -674,7 +657,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="montures_test"
-								value="&{template:classic-roll} {{name=Montures}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{montures}[Montures]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{montures}[Montures]]]}} {{bonusdice=[[@{montures_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Montures}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{montures}[Montures]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Dom. Guerrier] + @{montures}[Montures]]]}} {{bonusdice=[[@{montures_bonus_dice}d12 + @{domaine_guerrier}[Dom. Guerrier] + @{montures}[Montures]]]}} {{bonusused=[[@{montures_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -700,7 +683,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="chimerisme_test"
-								value="&{template:classic-roll} {{name=Chimérisme}} {{whiteroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{chimerisme}[Chimerisme]]]}} {{blackroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{chimerisme}[Chimerisme]]]}} {{bonusdice=[[@{chimerisme_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Chimérisme}} {{whiteroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{chimerisme}[Chimerisme]]]}} {{blackroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{chimerisme}[Chimerisme]]]}} {{bonusdice=[[@{chimerisme_bonus_dice}d12 + @{domaine_mystique}[Dom. Mystique] + @{chimerisme}[Chimerisme]]]}} {{bonusused=[[@{chimerisme_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -717,7 +700,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="magie_test"
-								value="&{template:classic-roll} {{name=Magie}} {{whiteroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{magie}[Magie]]]}} {{blackroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{magie}[Magie]]]}} {{bonusdice=[[@{magie_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Magie}} {{whiteroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{magie}[Magie]]]}} {{blackroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{magie}[Magie]]]}} {{bonusdice=[[@{magie_bonus_dice}d12 + @{domaine_mystique}[Dom. Mystique] + @{magie}[Magie]]]}} {{bonusused=[[@{magie_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -734,7 +717,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="onirologie_test"
-								value="&{template:classic-roll} {{name=Onirologie}} {{whiteroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{onirologie}[Onirologie]]]}} {{blackroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{onirologie}[Onirologie]]]}} {{bonusdice=[[@{onirologie_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Onirologie}} {{whiteroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{onirologie}[Onirologie]]]}} {{blackroll=[[1d12 + @{domaine_mystique}[Dom. Mystique] + @{onirologie}[Onirologie]]]}} {{bonusdice=[[@{onirologie_bonus_dice}d12 + @{domaine_mystique}[Dom. Mystique] + @{onirologie}[Onirologie]]]}} {{bonusused=[[@{onirologie_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -760,7 +743,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="discretion_test"
-								value="&{template:classic-roll} {{name=Discrétion}} {{whiteroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{discretion}[Discretion]]]}} {{blackroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{discretion}[Discretion]]]}} {{bonusdice=[[@{discretion_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Discrétion}} {{whiteroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{discretion}[Discretion]]]}} {{blackroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{discretion}[Discretion]]]}} {{bonusdice=[[@{discretion_bonus_dice}d12 + @{domaine_ombre}[Dom. Ombre] + @{discretion}[Discretion]]]}} {{bonusused=[[@{discretion_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -777,7 +760,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="esquive_test"
-								value="&{template:classic-roll} {{name=Esquive}} {{whiteroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{esquive}[Esquive]]]}} {{blackroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{esquive}[Esquive]]]}} {{bonusdice=[[@{esquive_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Esquive}} {{whiteroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{esquive}[Esquive]]]}} {{blackroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{esquive}[Esquive]]]}} {{bonusdice=[[@{esquive_bonus_dice}d12 + @{domaine_ombre}[Dom. Ombre] + @{esquive}[Esquive]]]}} {{bonusused=[[@{esquive_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -794,7 +777,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="subterfuge_test"
-								value="&{template:classic-roll} {{name=Subterfuge}} {{whiteroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{subterfuge}[Subterfuge]]]}} {{blackroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{subterfuge}[Subterfuge]]]}} {{bonusdice=[[@{subterfuge_bonus_dice}d12]]}}">
+								value="&{template:classic-roll} {{name=Subterfuge}} {{whiteroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{subterfuge}[Subterfuge]]]}} {{blackroll=[[1d12 + @{domaine_ombre}[Dom. Ombre] + @{subterfuge}[Subterfuge]]]}} {{bonusdice=[[@{subterfuge_bonus_dice}d12 + @{domaine_ombre}[Dom. Ombre] + @{subterfuge}[Subterfuge]]]}} {{bonusused=[[@{subterfuge_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
@@ -814,198 +797,45 @@
 					</td>
 				</tr>
 				<tr>
-					<td>
-					    <div>
-                            <span>Erudition</span>
-							<input type="text" name="attr_erudition1_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_erudition1"/>
-					</td>
-					<td>
-						<button type="roll"  name="erudition1_test"
-								value="&{template:classic-roll} {{name=Erudition : @{erudition1_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{erudition1}[@{erudition1_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{erudition1}[@{erudition1_nom}]]]}} {{bonusdice=[[@{erudition1_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_erudition1_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
+					<td colspan="5">
+						Erudition
+						<fieldset class="repeating_erudition">
+							<input type="text" name="attr_erudition_nom"/>
+							<input type="number" value="0" min="0" name="attr_erudition"/>
+							<button type="roll"  name="erudition_test"
+									value="&{template:classic-roll} {{name=erudition : @{erudition_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{erudition}[@{erudition_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{erudition}[@{erudition_nom}]]]}} {{bonusdice=[[@{erudition_bonus_dice}d12 + @{domaine_savant}[Dom. Savant] + @{erudition}[@{erudition_nom}]]]}} {{bonusused=[[@{erudition_bonus_dice}]]}}">
+							</button>
+							<input type="checkbox" value="1" name="attr_erudition_bonus_dice"/>
+							+1D12
+						</fieldset>
 					</td>
 				</tr>
 				<tr>
-					<td>
-					    <div>
-                            <span>Erudition</span>
-							<input type="text" name="attr_erudition2_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_erudition2"/>
-					</td>
-					<td>
-						<button type="roll"  name="erudition2_test"
-								value="&{template:classic-roll} {{name=Erudition : @{erudition2_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{erudition2}[@{erudition2_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{erudition2}[@{erudition2_nom}]]]}} {{bonusdice=[[@{erudition2_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_erudition2_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
+					<td colspan="5">
+						Langues
+						<fieldset class="repeating_langues">
+							<input type="text" name="attr_langues_nom"/>
+							<input type="number" value="0" min="0" name="attr_langues"/>
+							<button type="roll"  name="langues_test"
+									value="&{template:classic-roll} {{name=langues : @{langues_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{langues}[@{langues_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{langues}[@{langues_nom}]]]}} {{bonusdice=[[@{langues_bonus_dice}d12 + @{domaine_savant}[Dom. Savant] + @{langues}[@{langues_nom}]]]}} {{bonusused=[[@{langues_bonus_dice}]]}}">
+							</button>
+							<input type="checkbox" value="1" name="attr_langues_bonus_dice"/>
+							+1D12
+						</fieldset>
 					</td>
 				</tr>
 				<tr>
+					<td>Stratégie</td>
 					<td>
-					    <div>
-                            <span>Erudition</span>
-							<input type="text" name="attr_erudition3_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_erudition3"/>
+						<input type="number" value="0" min="0" name="attr_strategie"/>
 					</td>
 					<td>
-						<button type="roll"  name="erudition3_test"
-								value="&{template:classic-roll} {{name=Erudition : @{erudition3_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{erudition3}[@{erudition3_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{erudition3}[@{erudition3_nom}]]]}} {{bonusdice=[[@{erudition3_bonus_dice}d12]]}}">
+						<button type="roll"  name="strategie_test"
+								value="&{template:classic-roll} {{name=Stratégie}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{strategie}[@{strategie_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{strategie}[@{strategie_nom}]]]}} {{bonusdice=[[@{strategie_bonus_dice}d12 + @{domaine_savant}[Dom. Savant] + @{strategie}[@{strategie_nom}]]]}} {{bonusused=[[@{strategie_bonus_dice}]]}}">
 						</button>
 					</td>
 					<td>
-						<input type="checkbox" value="1" name="attr_erudition3_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
-					</td>
-				</tr>
-				<tr>
-					<td>
-					    <div>
-                            <span>Langues</span>
-							<input type="text" name="attr_langues1_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_langues1"/>
-					</td>
-					<td>
-						<button type="roll"  name="langues1_test"
-								value="&{template:classic-roll} {{name=Langues : @{langues1_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{langues1}[@{langues1_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{langues1}[@{langues1_nom}]]]}} {{bonusdice=[[@{langues1_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_langues1_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
-					</td>
-				</tr>
-				<tr>
-					<td>
-					    <div>
-                            <span>Langues</span>
-							<input type="text" name="attr_langues2_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_langues2"/>
-					</td>
-					<td>
-						<button type="roll"  name="langues2_test"
-								value="&{template:classic-roll} {{name=Langues : @{langues2_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{langues2}[@{langues2_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{langues2}[@{langues2_nom}]]]}} {{bonusdice=[[@{langues2_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_langues2_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
-					</td>
-				</tr>
-				<tr>
-					<td>
-					    <div>
-                            <span>Langues</span>
-							<input type="text" name="attr_langues3_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_langues3"/>
-					</td>
-					<td>
-						<button type="roll"  name="langues3_test"
-								value="&{template:classic-roll} {{name=Langues : @{langues3_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{langues3}[@{langues3_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{langues3}[@{langues3_nom}]]]}} {{bonusdice=[[@{langues3_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_langues3_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
-					</td>
-				</tr>
-				<tr>
-					<td>
-					    <div>
-                            <span>Stratégie</span>
-							<input type="text" name="attr_strategie1_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_strategie1"/>
-					</td>
-					<td>
-						<button type="roll"  name="strategie1_test"
-								value="&{template:classic-roll} {{name=Stratégie : @{strategie1_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{strategie1}[@{strategie1_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{strategie1}[@{strategie1_nom}]]]}} {{bonusdice=[[@{strategie1_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_strategie1_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
-					</td>
-				</tr>
-				<tr>
-					<td>
-					    <div>
-                            <span>Stratégie</span>
-							<input type="text" name="attr_strategie2_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_strategie2"/>
-					</td>
-					<td>
-						<button type="roll"  name="strategie2_test"
-								value="&{template:classic-roll} {{name=Stratégie : @{strategie2_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{strategie2}[@{strategie2_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{strategie2}[@{strategie2_nom}]]]}} {{bonusdice=[[@{strategie2_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_strategie2_bonus_dice"/> 
-					</td>
-					<td>
-					    +1D12
-					</td>
-				</tr>
-				<tr>
-					<td>
-					    <div>
-                            <span>Stratégie</span>
-							<input type="text" name="attr_strategie3_nom">
-                        </div>
-                    </td>
-					<td>
-						<input type="number" value="0" min="0" name="attr_strategie3"/>
-					</td>
-					<td>
-						<button type="roll"  name="strategie3_test"
-								value="&{template:classic-roll} {{name=Stratégie : @{strategie3_nom}}} {{whiteroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{strategie3}[@{strategie3_nom}]]]}} {{blackroll=[[1d12 + @{domaine_savant}[Dom. Savant] + @{strategie3}[@{strategie3_nom}]]]}} {{bonusdice=[[@{strategie3_bonus_dice}d12]]}}">
-						</button>
-					</td>
-					<td>
-						<input type="checkbox" value="1" name="attr_strategie3_bonus_dice"/> 
+						<input type="checkbox" value="1" name="attr_strategie_bonus_dice"/> 
 					</td>
 					<td>
 					    +1D12
@@ -1024,14 +854,27 @@
 <!-- ------------------------------ INITIATIVE ----------------------------- -->
 <!-- ----------------------------------------------------------------------- -->
 
-	<div class="sheet-row"> <!-- Initiative -->
+	<div class="sheet-row init-fullsheet"> <!-- Initiative -->
 		<div class="sheet-col section-initiative">
 			<button type="roll" class="init-roll" name="initiative"
-					value="&{template:initiative-roll} {{roll=[[ceil((@{rapidite}[Rapidite] + 1d12) / 2) - @{amure_penalite}[Penalite armure] &{tracker}]]}} {{prime=@{prime_init}}} {{penalite=@{penalite_init}}}"
+					value="&{template:initiative-roll} {{roll=[[ceil((@{domaine_athlete}[Athlete] + @{rapidite}[Rapidite] + 1d12) / 2) + @{armure_penalite}[Penalite armure] &{tracker}]]}} {{prime=@{prime_init}}} {{penalite=@{penalite_init}}}">
 				<span class="small-text">Initiative</span>
 			</button>
 		</div>
-	</div> <!-- END Section Initiative -->
+	</div>
+	<div class="sheet-2colrow init-combatsheet"> <!-- Initiative -->
+		<div class="sheet-col" style="text-align: center; vertical-align: middle;">
+			Points de vie : 
+			<input type="number" min="0" value="0" class="number-with-max" name="attr_pdv"/> /
+			<input type="number" min="0" value="0" class="number-with-max" name="attr_pdv_max"/>
+		</div>
+		<div class="sheet-col section-initiative" style="vertical-align: middle;">
+			<button type="roll" class="init-roll" name="initiative"
+					value="&{template:initiative-roll} {{roll=[[ceil((@{domaine_athlete}[Athlete] + @{rapidite}[Rapidite] + 1d12) / 2) + @{armure_penalite}[Penalite armure] &{tracker}]]}} {{prime=@{prime_init}}} {{penalite=@{penalite_init}}}">
+				<span class="small-text">Initiative</span>
+			</button>
+		</div>
+	</div>	<!-- END Section Initiative -->
 	
 <!-- ----------------------------------------------------------------------- -->
 <!-- --------------------------------- ARMES ------------------------------- -->
@@ -1051,17 +894,19 @@
 			<fieldset class="repeating_armes">
 			    <div class="repeating-section">
     				<input type="text" class="input-name" name="attr_arme_nom"/>
-    				<input type="number" class="input-number" name="attr_arme_taille"/>
-    				<input type="number" class="input-number" name="attr_arme_degats"/>
+    				<input type="number" class="input-number" value="0" name="attr_arme_taille"/>
+    				<input type="number" class="input-number" value="0" name="attr_arme_degats"/>
     				<input type="text" class="input-particularites" name="attr_arme_particularites"/>
     				<button type="roll" class="input-roll" name="attaque_melee"
-    						value="&{template:attack-roll} {{name=Attaque @{arme_nom} (mêlée)}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{melee_bonus_dice}d12]]}} {{degats=[[ceil((@{taille} + @{arme_degats}) * @{facteur_prime_degats} * @{facteur_penalite_degats})]]}} {{particularites=@{arme_particularites}}} {{threshold=[[12+?{Modificateur|0}]]}} {{prime=@{prime}}} {{prime_descr=@{prime_short_descr}}} {{penalite=@{penalite}}} {{penalite_descr=@{penalite_short_descr}}}">
+    						value="&{template:attack-roll} {{name=Attaque @{arme_nom} (mêlée)}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{arme_bonus_dice}d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusused=[[@{arme_bonus_dice}]]}} {{degats=[[ceil((@{arme_taille} + @{arme_degats}) * @{facteur_prime_degats} * @{facteur_penalite_degats})]]}} {{particularites=@{arme_particularites}}} {{threshold=[[12+?{Modificateur|0}]]}} {{prime=@{prime}}} {{prime_descr=@{prime_short_descr}}} {{penalite=@{penalite}}} {{penalite_descr=@{penalite_short_descr}}}">
     				    <span class="small-text">Mêlée</span>
     				</button>
     				<button type="roll" class="input-roll" name="attaque_tir"
-    						value="&{template:attack-roll} {{name=Attaque @{arme_nom} (tir)}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{tir_bonus_dice}d12]]}} {{degats=[[ceil((@{taille} + @{arme_degats}) * @{facteur_prime_degats} * @{facteur_penalite_degats})]]}} {{particularites=@{arme_particularites}}} {{prime=@{prime}}} {{prime_descr=@{prime_short_descr}}} {{penalite=@{penalite}}} {{penalite_descr=@{penalite_short_descr}}}">
+    						value="&{template:attack-roll} {{name=Attaque @{arme_nom} (tir)}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{arme_bonus_dice}d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusused=[[@{arme_bonus_dice}]]}} {{degats=[[ceil((@{arme_taille} + @{arme_degats}) * @{facteur_prime_degats} * @{facteur_penalite_degats})]]}} {{particularites=@{arme_particularites}}} {{prime=@{prime}}} {{prime_descr=@{prime_short_descr}}} {{penalite=@{penalite}}} {{penalite_descr=@{penalite_short_descr}}}">
     				    <span class="small-text">Tir</span>
     				</button>
+					<input type="checkbox" value="1" name="attr_arme_bonus_dice"/>
+					+1D12
     			</div>
 			</fieldset>
 		</div>
@@ -1199,14 +1044,13 @@
             			        "prime_reaction": "Prudence"
             			    })
             			}
-            			console.log("descr");
             			setAttrs({
             				"prime_descr": descr,
             				"prime_short_descr": shortDescr
             			});
                     });
                 });
-                on("ready change:penalite", function() {
+                on("sheet:opened change:penalite", function() {
                     getAttrs(["penalite"], function(values) {
             			var penalite = values["penalite"];
             			var descr = "";
@@ -1295,12 +1139,12 @@
 					</td>
 					<td>
 						<button type="roll"  name="force_test_action" class="action_roll"
-								value="&{template:classic-roll} {{name=Force}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature}[Force de la nature] + @{force}[Force] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_force_de_la_nature}[Force de la nature] + @{force}[Force] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{force_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+								value="&{template:classic-roll} {{name=Force}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature}[Force de la nature] + @{force}[Force] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_force_de_la_nature}[Force de la nature] + @{force}[Force] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{force_bonus_dice}d12]]}} {{bonusused=[[@{force_bonus_dice}]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
 						</button>
 					</td>
 					<td>
 						<button type="roll"  name="force_test_reaction" class="reaction_roll"
-								value="&{template:classic-roll} {{name=Force}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature}[Force de la nature] + @{force}[Force] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_force_de_la_nature}[Force de la nature] + @{force}[Force] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{bonusdice=[[@{force_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+								value="&{template:classic-roll} {{name=Force}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature}[Force de la nature] + @{force}[Force] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_force_de_la_nature}[Force de la nature] + @{force}[Force] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{bonusdice=[[@{force_bonus_dice}d12]]}} {{bonusused=[[@{force_bonus_dice}]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
 						</button>
 					</td>
 					<td>
@@ -1315,12 +1159,12 @@
 					</td>
 					<td>
 						<button type="roll"  name="cac_test_action" class="action_roll"
-								value="&{template:classic-roll} {{name=Corps à corps}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{cac}[CaC] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{cac}[CaC] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{cac_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+								value="&{template:classic-roll} {{name=Corps à corps}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{cac}[CaC] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{cac}[CaC] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{cac_bonus_dice}d12]]}} {{bonusused=[[@{cac_bonus_dice}]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
 						</button>
 					</td>
 					<td>
 						<button type="roll"  name="cac_test_reaction" class="reaction_roll"
-								value="&{template:classic-roll} {{name=Corps à corps}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{cac}[CaC] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{cac}[CaC] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{bonusdice=[[@{cac_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+								value="&{template:classic-roll} {{name=Corps à corps}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{cac}[CaC] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{cac}[CaC] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{bonusdice=[[@{cac_bonus_dice}d12]]}} {{bonusused=[[@{cac_bonus_dice}]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
 						</button>
 					</td>
 					<td>
@@ -1335,12 +1179,12 @@
 					</td>
 					<td>
 						<button type="roll"  name="melee_test_action" class="action_roll"
-								value="&{template:classic-roll} {{name=Mêlée}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{melee_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+								value="&{template:classic-roll} {{name=Mêlée}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{melee_bonus_dice}d12]]}} {{bonusused=[[@{melee_bonus_dice}]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
 						</button>
 					</td>
 					<td>
 						<button type="roll"  name="melee_test_reaction" class="reaction_roll"
-								value="&{template:classic-roll} {{name=Mêlée}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{bonusdice=[[@{melee_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+								value="&{template:classic-roll} {{name=Mêlée}} {{whiteroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_guerrier}[Guerrier] + @{melee}[Melee] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{bonusdice=[[@{melee_bonus_dice}d12]]}} {{bonusused=[[@{melee_bonus_dice}]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
 						</button>
 					</td>
 					<td>
@@ -1355,12 +1199,12 @@
 					</td>
 					<td>
 						<button type="roll"  name="tir_test_action" class="action_roll"
-								value="&{template:classic-roll} {{name=Tir}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{tir_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+								value="&{template:classic-roll} {{name=Tir}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_action}[Prime] + @{malus_action}[Penalite]]]}} {{bonusdice=[[@{tir_bonus_dice}d12]]}} {{bonusused=[[@{tir_bonus_dice}]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
 						</button>
 					</td>
 					<td>
 						<button type="roll"  name="tir_test_reaction" class="reaction_roll"
-								value="&{template:classic-roll} {{name=Tir}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{bonusdice=[[@{tir_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+								value="&{template:classic-roll} {{name=Tir}} {{whiteroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_chasseur}[Chasseur] + @{tir}[Tir] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{bonusdice=[[@{tir_bonus_dice}d12]]}} {{bonusused=[[@{tir_bonus_dice}]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
 						</button>
 					</td>
 					<td>
@@ -1377,7 +1221,7 @@
 					</td>
 					<td>
 						<button type="roll"  name="esquive_test_reaction" class="reaction_roll"
-								value="&{template:classic-roll} {{name=Esquive}} {{whiteroll=[[1d12 + @{domaine_ombre}[Ombre] + @{esquive}[Esquive] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_ombre}[Ombre] + @{esquive}[Esquive] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{bonusdice=[[@{esquive_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+								value="&{template:classic-roll} {{name=Esquive}} {{whiteroll=[[1d12 + @{domaine_ombre}[Ombre] + @{esquive}[Esquive] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{blackroll=[[1d12 + @{domaine_ombre}[Ombre] + @{esquive}[Esquive] + @{bonus_reaction}[Prime] + @{malus_reaction}[Penalite]]]}} {{bonusdice=[[@{esquive_bonus_dice}d12]]}} {{bonusused=[[@{esquive_bonus_dice}]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
 						</button>
 					</td>
 					<td>
@@ -1446,7 +1290,7 @@
 			</fieldset>
 			
 			<div class="armure-penalite">
-			    Pénalité totale de l'armure : <input type="number" class="input-type" name="attr_amure_penalite" readonly>
+			    Pénalité totale de l'armure : <input type="number" class="input-type" name="attr_armure_penalite" readonly>
 			</div>
 		</div>
 		
@@ -1469,7 +1313,7 @@
         			    }
         			}
         			setAttrs({
-        				"amure_penalite": total
+        				"armure_penalite": total
         			});
                 });
         	});
@@ -1559,12 +1403,14 @@
 				</td>
 				<td>{{blackroll}}</td>
 			</tr>
+			{{#rollGreater() bonusused 0}}
 			<tr class="sheet-template-bonus">
 				<td class="sheet-template-first-col">
 					<span class="sheet-template-weak">Dé bonus :</span>
 				</td>
 				<td>{{bonusdice}}</td>
 			</tr>
+			{{/rollGreater() bonusused 0}}
 			
 			{{#prime}}
 			<tr class="sheet-template-primes-penalites sheet-template-weak">
@@ -1590,14 +1436,18 @@
 			<tr>
 				<th class="sheet-template-white">Songes</th>
 				<th class="sheet-template-black">Cauch.</th>
+				{{#rollGreater() bonusused 0}}
 				<th class="sheet-template-bonus">Bonus</th>
+				{{/rollGreater() bonusused 0}}
 				<th class="sheet-template-difficulte">Seuil</th>
 			</tr>
 			
 			<tr class="sheet-template-row-rolls">
 				<td class="sheet-template-white">{{whiteroll}}</td>
 				<td class="sheet-template-black">{{blackroll}}</td>
+				{{#rollGreater() bonusused 0}}
 				<td class="sheet-template-bonus">{{bonusdice}}</td>
+				{{/rollGreater() bonusused 0}}
 				<td class="sheet-template-difficulte">{{threshold}}</td>
 			</tr>
 			

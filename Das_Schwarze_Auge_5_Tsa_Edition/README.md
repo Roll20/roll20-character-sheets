@@ -1,6 +1,9 @@
 # Das Schwarze Auge 5 - Tsa Edition
 
 ## Änderungen
+2021-02-13:
+- Als Leiteigenschaft für AE/KE ist jetzt auch "keine" auswählbar. Damit wird der Grundwert für AE/KE fix auf 20 gesetzt.
+
 2020-05-04: 
 - Als neues Feature wurde ein Import von NSC/Monster-Wertekästen auf dem Optionen-Tab eingefügt. Diese Funktion ist noch im Beta-Status und befüllt erst mal nur die wesentlichen Grundwerte. 
 - Auf dem Fernkampfbögen sind jetzt auch die entsprechenden Felder und Würfel für Ausweichen vorhanden

@@ -21,10 +21,10 @@ const helpers = {
     translationKeys.forEach(key => translations[`${key}`] = getTranslationByKey(key))
     return translations
   },
-  parseInteger: string => parseInt(string) || 0,
+  parseInteger: string => parseFloat(string) || 0,
   parseIntegers: numbers => {
     for (let [key, value] of Object.entries(numbers)) {
-        numbers[key] = parseInt(value) || 0;
+        numbers[key] = parseFloat(value) || 0;
     }
     return numbers  
   },

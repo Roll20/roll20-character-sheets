@@ -1,0 +1,176 @@
+<div class="holder">
+    <span class="title">RATTEN!</span>
+    <span class="author">Charakterbogen &copy; Loki</span>
+    <div class="basics curved-border">
+      <span>Name:</span> <input type="text" name="attr_character_name" class="header-input" placeholder="Name">
+      <span>Rotte:</span> <input type="text" name="attr_rotte" class="header-input" placeholder="Rotte">
+      <span>Ich:</span> <input type="text" name="attr_rotte" class="header-input" placeholder="Ich">
+    </div>
+    <div class="small-title">
+      <span class="big-font">EIGENSCHAFTEN</span>
+    </div>
+    <div class="clever">
+       <span>Clever</span> <input type="number" name="attr_clever" value=1> <button type="action" name="act_clever" title="Clever-Wert zum Würfelpool hinzufügen">+</button>
+    </div>
+    <div class="sozial">
+       <span>Sozial</span> <input type="number" name="attr_sozial" value=1> <button type="action" name="act_sozial" title="Sozial-Wert zum Würfelpool hinzufügen">+</button>
+    </div>
+    <div class="stark">
+       <span>Stark</span> <input type="number" name="attr_stark" value=1> <button type="action" name="act_stark" title="Stark-Wert zum Würfelpool hinzufügen">+</button>
+    </div>
+    <div class="schnell">
+       <span>Schnell</span> <input type="number" name="attr_schnell" value=1> <button type="action" name="act_schnell" title="Schnell-Wert zum Würfelpool hinzufügen">+</button>
+    </div>
+    <div class="zaeh">
+       <span>Z&auml;h</span> <input type="number" name="attr_zaeh" value=1> <button type="action" name="act_zaeh" title="Zäh-Wert zum Würfelpool hinzufügen">+</button>
+    </div>
+    <div class="wuerfelpool curved-border">
+      <span class="middle-font">W&uuml;rfelpool:</span> <input type="text" name="attr_wuerfelpool" placeholder="0"> <button type="action" name="act_delete" class="delete" title="Würfelpool zurücksetzen">X</button> <button type="action" name="act_rolldice" class="sheet-d6-dice"></button> <!--<button type="roll" title="Würfeln" value="&{template:standard} {{name=Prüfung: @{character_name}}} {{Probe=[[@{wuerfelpool}d6k2cs>6cf<1]]}} {{Schwierigkeit=?{Schwierigkeit|4}}}" class="sheet-d6-dice" name="roll_pruefung" ></button> -->
+    </div>
+    <div class="talente-schrift">
+      <span class="big-font">TALENTE</span>
+    </div>
+    <div class="talente">
+      <fieldset class="repeating_talente">
+        <input type="text" placeholder="Talentname"></input>
+      </fieldset>
+    </div>
+    <div class="tricks-schrift">
+      <span class="big-font">TRICKS</span>
+    </div>
+    <div class="tricks">
+      <fieldset class="repeating_tricks">
+        <input type="text" placeholder="Trick"></input>
+      </fieldset>
+    </div>
+    <div class="lieder-schrift">
+      <span class="big-font">LIEDER</span>
+    </div>
+    <div class="lieder">
+      <fieldset class="repeating_lieder">
+        <input type="text" class="sechzig" placeholder="Lied"></input>
+        <select name="attr_kategorie" class="dreissig">
+          <option value="fang">Fang</option>
+          <option value="auge">Auge</option>
+          <option value="herz">Herz</option>
+        </select>
+      </fieldset>
+    </div>
+    <div class="rotten-schrift">
+      <span class="big-font">ROTTENVOR- UND NACHTEILE</span>
+    </div>
+    <div class="rotten">
+      <fieldset class="repeating_rottenvorundnachteile">
+        <input type="text" placeholder="Rottenvor-/Nachteil"></input>
+      </fieldset>
+    </div>
+    <div class="copyright">
+      <span class="author">RATTEN! &copy; Prometheus Verlag</span>
+    </div>
+  </div>
+
+  <!-- Rolltemplates -->
+
+<rolltemplate class="sheet-rolltemplate-standard">
+  <div class="sheet-template-container">
+	  <div class="sheet-template-header">{{name}}</div>
+    <div class="spacer">&nbsp;</div>
+    <div class="sheet-template-row">
+      <div class="sheet-rolltemplate-item-left">Probe:</div>
+      <div class="sheet-rolltemplate-item-right">{{Probe}}</div>
+    </div>
+    <div class="sheet-template-row">
+      <div class="sheet-rolltemplate-item-left">Schwierigkeit:</div>
+      <div class="sheet-rolltemplate-item-right">{{Schwierigkeit}}</div>
+    </div>
+    {{#rollBetween() computed::Gluecksgriff 1 1}}
+        <div class="spacer">&nbsp;</div>
+        <div class="sheet-template-row">
+            <div class="sheet-rolltemplate-item-centered green">Gl&uuml;cksgriff!</div>
+        </div>
+    {{/rollBetween() computed::Gluecksgriff 1 1}}
+    {{#rollBetween() computed::Patzer 1 1}}
+        <div class="spacer">&nbsp;</div>
+        <div class="sheet-template-row">
+            <div class="sheet-rolltemplate-item-centered red">Patzer!</div>
+        </div>
+    {{/rollBetween() computed::Patzer 1 1}}
+  </div>
+</rolltemplate>
+
+  <!-- Sheetworker scripts -->
+
+<script type="text/worker">
+
+    on('clicked:rolldice', (info) => {
+        startRoll("&{template:standard} {{name=Prüfung: @{character_name}}} {{Probe=[[@{wuerfelpool}d6k2]]}} {{Gluecksgriff=[[0]]}} {{Patzer=[[0]]}} {{Schwierigkeit=?{Schwierigkeit|4}}}", (results) => {
+            let total = results.results.Probe.result;
+            let dice = results.results.Probe.dice;
+            let computed_g = 0;
+            let computed_p = 0;
+            let einsen = dice.filter(die => die == 1);
+            let sechsen = dice.filter(die => die == 6);
+            
+            if (einsen.length >= Math.ceil(dice.length / 2)) {
+                computed_p = 1;
+            }
+            
+            if (sechsen.length >= 2) {
+                computed_g = 1;
+            }
+            
+            finishRoll(
+                results.rollId,
+                {
+                    Gluecksgriff: computed_g,
+                    Patzer: computed_p,
+                }
+            );
+        });
+    });
+
+    on("clicked:clever", function() {
+      getAttrs(["clever"], function(values) {
+          calculateDicepool(values.clever);
+       });
+    });
+
+    on("clicked:sozial", function() {
+      getAttrs(["sozial"], function(values) {
+          calculateDicepool(values.sozial);
+       });
+    });
+
+    on("clicked:stark", function() {
+      getAttrs(["stark"], function(values) {
+          calculateDicepool(values.stark);
+       });
+    });
+
+    on("clicked:schnell", function() {
+      getAttrs(["schnell"], function(values) {
+          calculateDicepool(values.schnell);
+       });
+    });
+
+    on("clicked:zaeh", function() {
+      getAttrs(["zaeh"], function(values) {
+          calculateDicepool(values.zaeh);
+       });
+    });
+
+    on("clicked:delete", function() {
+      setAttrs({
+          wuerfelpool: 0
+      });
+    });
+
+    function calculateDicepool(value) {
+        getAttrs(["wuerfelpool"], function(values) {
+          setAttrs({
+              wuerfelpool: (+values.wuerfelpool + +value)
+          });
+        });
+
+    }
+</script>

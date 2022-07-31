@@ -1,0 +1,34 @@
+include ../../components/oracles/oracle-preview
+
+mixin oraclesPage
+  div.page-container
+    input(type='radio' name='attr_character_page' class='oracles hide-element' value='7')
+    div.oracles.showhide
+      input(type='radio' class='hide-element oracle-overview' name='attr_oracle_view' value='1' checked)
+      .oracle-overview.showhide
+        .oracle-overview-container
+          each group in oracles
+            if group.Name !== 'Move'
+              +oracleRollGroup(group)
+
+      input(type='radio' class='hide-element oracle-preview' name='attr_oracle_view' value='2')
+      .oracle-container.showhide.oracle-preview
+        .preview-bar
+          .close-bar
+            label.close-preview
+              span.i18n-text(data-i18n='close-preview')=translation['close-preview']
+              input(type='checkbox' class='hide-element' name='attr_close_oracle_preview')
+        .oracle-preview-container
+          .oracle-column.table-list
+            each group in oracles
+              if group.Name !== 'Move'
+                +oracleRollGroup(group)
+
+          .oracle-column.table-main
+            each group in oracles
+              if group.Name !== 'Move'
+                each oracle in group.Oracles
+                  +oraclePreview(oracle, group['Display name']||group.Name)
+                if group.Subcategories
+                  each subcategory in group.Subcategories
+                    +oraclePreview(subcategory, group['Display name']||group.Name)

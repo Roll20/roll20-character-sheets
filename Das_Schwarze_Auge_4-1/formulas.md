@@ -30,6 +30,8 @@ No temporary stat modifiers or wounds are applied.
 Wound effects are honoured for Attack/Parry/Long Range base values. No temporary stat modifiers are applied.
 
 ## 3d20 Checks
+In most cases (talents, spells), Custom Roll Parsing is used, so that all rolls are accurately evaluated according to the rules. Currently, gifts, meta-talents and liturgies still use the old way, which is described in detail in the following paragraphs.
+
 Four cases have to be distinguished in order to determine the result of a roll:
 
 * Automatic Success: At least two dice show a 1.
@@ -39,7 +41,7 @@ Four cases have to be distinguished in order to determine the result of a roll:
 
 Three 1s or three 20s do not per se have any further influence on the roll, it is up to the GM to decide the effects in such cases.
 
-The complete algorithm to determine the exact result of a roll cannot be adequately implemented using Roll20 rolls. Also, certain special skills affect the outcome as well such as Misfortune Magnet (Pechmagnet) or Fixed Matrix (Feste Matrix). Therefore, the currently used formula has some limitations.
+The complete algorithm to determine the exact result of a roll cannot be adequately implemented using just Roll20 rolls. Also, certain advantages/disadvantages may influence the roll evaluation. Therefore, the currently used formula has some limitations.
 
 `[[ { [[{0d1 + @{skill} - (?{mod|0}), 0d1}kh1]] - {1d20cs1cf20 + [[{0d1 + (?{mod|0}) - @{skill}, 0d1}kh1]] - @{stat1}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{mod|0}) - @{skill}, 0d1}kh1]] - @{stat2}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{mod|0}) - @{skill}, 0d1}kh1]] - @{stat3}, 0d1}kh1, 0d1 + @{skill}}dh1]]`
 
@@ -71,63 +73,6 @@ Number-to-roll conversion to cap the check result at the skill level.
 
 ### Specializations
 For specializations, whenever `@{skill}` is mentioned, a ` + 2` was added, because the effective skill value is higher when using the specialization.
-
-### Automatic Failure and Automatic Success
-These two conditions cannot be caught with Roll20 rolls at present. Roll templates check for `WasCrit` and `WasFumble`, but this is just a boolean and does not give the number of 1s and 20s. Therefore, an info is printed in rolls with at least one 1 or one 20.
-
-## Bonus Damage from High Strength (TP/KK)
-Weapons come with a pair of values for the calculation of increased/decreased damage based on your strength. The first value is the threshold, which describes the strength needed to use the weapon in a balanced way. The second is the strength step needed to determine at which strength values more/less damage can be dealt.
-
-The calculation is not simple, therefore I want to start with pre-calculated values from WdS, p. 82:
-
-* TP/KK = 12/2 (threshold: 12, step: 2)
-* Strength 12 - 2 * 2 = 8: Damage - 2
-* Strength 12 - 1 * 2 = 10: Damage - 1
-* Strength 12 ± 0 * 2 = 12: Damage ± 0 
-* Strength 12 + 1 * 2 = 14: Damage + 1
-* Strength 12 + 2 * 2 = 16: Damage + 2
-* Strength 12 + 3 * 2 = 18: Damage + 3
-
-While this may look pretty straightforward at first sight, the problem lies within the interval sizes:
-
-* Damage - 2: 7 and 8
-* Damage - 1: 9 and 10
-* Damage ± 0: 11, 12 and 13
-* Damage + 1: 14 and 15
-* Damage + 2: 16 and 17
-* Damage + 3: 18 and 19
-
-The ± 0 interval has `2 * step - 1` values, while all others have `step` values. Therefore, the formula looks like this:
-
-`floor((abs(@{STR} - @{threshold}))/@{step})*((@{KK} - @{threshold} + 0.01)/abs(@{STR} - @{threshold} + 0.01))`
-
-The first part `floor((abs(@{STR} - @{threshold}))/@{step})` is necessary to get the magnitude of the damage increase/decrease:
-
-* Strength 8: floor(abs(8 - 12)/2) = 2
-* Strength 9: floor(abs(9 - 12)/2) = 1
-* Strength 10: floor(abs(10 - 12)/2) = 1
-* Strength 11: floor(abs(11 - 12)/2) = 0
-* Strength 12: floor(abs(12 - 12)/2) = 0
-* Strength 13: floor(abs(13 - 12)/2) = 0
-* Strength 14: floor(abs(14 - 12)/2) = 1
-* Strength 15: floor(abs(15 - 12)/2) = 1
-* Strength 16: floor(abs(16 - 12)/2) = 2
-
-The second part `((@{KK} - @{threshold} + 0.01)/abs(@{STR} - @{threshold} + 0.01))` has the task to give the correct sign which is the reason why the same terms are in the numerator and denominator, just once without `abs(...)` and once with. The results are:
-
-* Strength 8: (8 - 12 + 0.01) / abs(8 - 12 + 0.01) = -1
-* Strength 9: (9 - 12 + 0.01) / abs(9 - 12 + 0.01) = -1
-* Strength 10: (10 - 12 + 0.01) / abs(10 - 12 + 0.01) = -1
-* Strength 11: (11 - 12 + 0.01) / abs(11 - 12 + 0.01) = -1
-* Strength 12: (12 - 12 + 0.01) / abs(12 - 12 + 0.01) = 1
-* Strength 13: (13 - 12 + 0.01) / abs(13 - 12 + 0.01) = 1
-* Strength 14: (14 - 12 + 0.01) / abs(14 - 12 + 0.01) = 1
-* Strength 15: (15 - 12 + 0.01) / abs(15 - 12 + 0.01) = 1
-* Strength 16: (16 - 12 + 0.01) / abs(16 - 12 + 0.01) = 1
-
-As can be seen for Strength 12, without the `+ 0.01` the denominator would become 0 causing a division by 0 error. Therefore, it's important to keep this.
-
-NB: In the term "TP/KK", "TP" does not stand for "Threshold" (or anything close) and "KK" does not stand for "Step" (or anything close). "TP" stands for "Trefferpunkte" and roughly means "Damage points before armour". "KK" stands for "Körperkraft" and is the complete German name of for the strength stat.
 
 ## Sources
 WdS: Wege des Schwerts

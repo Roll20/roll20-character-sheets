@@ -1,5 +1,8 @@
 # Release notes
 
+## 1.2.1
+- Fixed auto-height of description boxes of perks/capabilities/items/etc, which were sometimes not high enough thus requiring a vertical scroll.
+
 ## 1.2.0
 - Now differentiating current + max values for Revivals Number, Surge Number, e-Shield charges
 - Improved behavior when editing repeating sections
