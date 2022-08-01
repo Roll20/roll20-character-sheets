@@ -4361,8 +4361,14 @@
 				<!-- current version notes: 2.8.1 -->				
 				<ul>
 					<li>Skills Tab. Add a collapsible notes area.</li>
+					<li>Skills Tab. Added an indicator to show a skill has <b>Conditional notes</b></li>
 					<li>Combat Tab. Add a collapsible notes area.</li>
 					<li>Combat Tab. Defense sub-tab. Increased the height of the <b>DEFENSE BONUS (DB) NOTES</b> box.</li>
+					<li>New Slam Tool. Moved to Tools sub-tab.</li>
+					<li>Editable Wound Modifier Notes: Updated initial default notes to include <b>Injury to Unliving, Homegenous, and Diffuse Targets. B380</b>. 
+						Requested and notes provided by kawaishi. 
+						<b>NOTE:</b> If you made changes to one or more wound modifier notes, you will not see the most recent rule updates. However, you can use the new <b>reset</b> button to get them.
+					</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -8219,9 +8225,13 @@ PU2:126 = Power-Ups 2. Page 126
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
-							<input type="text" name="attr_name" title="Macro table name: repeating_skills. Field name: name" />
+							<input type="hidden" name="attr_skill_conditional_notes" value="" />
+							<input type="text" name="attr_name" title="Macro: @{NAME|repeating_skills_$[row #]_name}" />
 							<input type="hidden" name="attr_sync" value="0" />
 							<input type="hidden" name="attr_idkey" />
+							<span class="wrapper-conditional-marker">
+								<span class="conditional-marker" title="Has Conditional notes">i</span>
+							</span>
 						</div>
 						<div class="cell col1">
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{isRepeatingSkill=[[1]]}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{skill_roll_modifier}, @{skill_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_skill_modifier_tool}]]}} {{maxNine=[[@{skill_roll_max_nine}]]}} {{rollModifier=[[@{skill_roll_modifier}]]}} {{rollModifierSummary=@{skill_roll_modifier_summary}}} {{rollTraitSummary=@{skill_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}} {{noteBoxOneShow=[[@{show_skill_mod_notes}]]}} {{noteBoxOneLabel=Skill Modifiers}} {{noteBoxOneContent=@{skill_mod_description_notes}}} {{noteBoxTwoShow=[[@{show_skill_conditionals}]]}} {{noteBoxTwoLabel=Conditionals}} {{noteBoxTwoContent=@{skill_conditional_notes}}}" name="roll_vsSL" />
@@ -11416,325 +11426,6 @@ visualize what it will look like in chat.
 						</div> <!-- .table -->
 					</div> <!-- .box .melee-attacks -->
 
-					<!-- _____ _____ Slam Attack _____ _____ -->
-					<div class="box slam-attack-tool">
-
-						<input type="hidden" name="attr_is_slam_attack_new" value="1" />
-						<div class="slam-attack-table">
-							<!-- title row -->
-							<div class="item title">
-								<span data-i18n="slam-attack-label">Slam Attack</span>
-							</div>
-
-							<!-- header row -->
-							<div class="item slam-toggle">&nbsp;</div>
-							<div class="item slam-name">&nbsp;</div>
-							<div class="item header">
-								<div class="popup">
-									<span data-i18n="velocity-label">Velocity</span>
-								</div>
-								<span class="tooltip">
-									<span data-i18n="slam-velocity-tooltip">Your movement rate (yards/meters/hexes per second) for the current round.</span>
-								</span>
-							</div>
-							<div class="item header">
-								<div class="popup">
-									<span data-i18n="abbreviation-hit-points-label">HP</span>
-								</div>
-								<div class="tooltip">
-									<span data-i18n="slam-hit-points-tooltip">Your Hit Points</span>
-								</div>
-							</div>
-							<div class="item header">
-								<span data-i18n="damage-label">Damage</span>
-							</div>
-							<div class="item"><!-- damage die --></div>
-							<div class="item header">
-								<span data-i18n="type-label">Type</span>
-							</div>
-							<div class="item header">
-								<span data-i18n="abbreviation-modifier-label">Mod</span>
-							</div>
-							<div class="item header skill-level">
-								<span data-i18n="skill-label">Skill</span>
-							</div>
-							<div class="item"><!-- skill die --></div>
-
-							<!-- slam data row -->
-							<input type="hidden" name="attr_toggle_slam_options" />
-							<div class="item">
-								<input type="checkbox" name="attr_toggle_slam_options" class="arrow-toggle margin-left-sm" title="View slam options." />
-							</div>
-							<div class="item subtitle">
-								<div class="popup">
-									<span data-i18n="slam-label">Slam</span>
-								</div>
-								<span class="tooltip">
-									<span data-i18n="slam-attack-tooltip">
-Slam requires an Attack, All-out Attack, or Move and Attack maneuver. Your foe may block, dodge, or parry (but your body counts as a heavy weapon; see Parrying Heavy Weapons B376). If your foe dodges, you must move at least two yards past him if you have enough movement. If you would hit someone else, see Hitting the Wrong Target (B389). You can use All-Out Attack (Strong), +2 to Damage (B365), to increase your damage! (B371)
-									</span>
-								</span>
-							</div>
-							<div class="item">
-								<input type="number" value="1" min="1" step="1" name="attr_slam_velocity" title="Macro: @{NAME|slam_velocity}" />
-							</div>
-							<div class="item">
-								<input type="number" step="1" value="" min="1" name="attr_slam_hit_points" title="Macro: @{NAME|slam_hit_points}" />
-							</div>
-							<div class="item">
-								<input type="text" value="1d6" name="attr_slam_damage" readonly title="Macro: @{NAME|slam_damage}" />
-							</div>
-							<div class="item">
-								<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-								<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Slam Damage}} {{damageRoll=[[@{slam_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{slam_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{slam_damage_type_note}}} {{showNotes=[[1]]}} {{notes=@{raw_slam_damage_notes}}}" name="roll_dmgSlam" class="roll_damage" />
-							</div>
-							<div class="item">
-								<select name="attr_slam_damage_type" title="Macro: @{NAME|slam_damage_type}">
-									<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
-									<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
-									<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
-									<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
-									<option value="Piercing (pi)"><span data-i18n="abbreviation-option-piercing">pi</span></option>
-									<option value="Large Piercing (pi+)"><span data-i18n="abbreviation-option-piercing-plus">pi+</span></option>
-									<option value="Huge Piercing (pi++)"><span data-i18n="abbreviation-option-piercing-plus-plus">pi++</span></option>
-									<option value="Affliction (aff)"><span data-i18n="abbreviation-option-affliction">aff</span></option>
-									<option value="Burning (burn)"><span data-i18n="abbreviation-option-burning">burn</span></option>
-									<option value="Corrosion (cor)"><span data-i18n="abbreviation-option-corrosion">cor</span></option>
-									<option value="Fatigue (fat)"><span data-i18n="abbreviation-option-fatigue">fat</span></option>
-									<option value="Toxic (tox)"><span data-i18n="abbreviation-option-toxic">tox</span></option>
-									<option value="Knockback (knock)"><span data-i18n="abbreviation-option-knockback">knock</span></option>
-									<option value="Special (spec)"><span data-i18n="abbreviation-option-special">spec</span></option>
-								</select>
-								<input type="hidden" name="attr_slam_damage_type_note" value="@{damage_type_note_cr}" />
-								<input type="hidden" name="attr_slam_minimum_damage_note" value="Min 1" />
-							</div>
-							<div class="item">
-								<input type="number" step="1" value="0" name="attr_slam_skill_modifier" title="Macro: @{NAME|skill_modifier}" />
-							</div>
-							<div class="item">
-								<input type="text" value="10" name="attr_slam_skill_level" title="Macro: @{NAME|slam_skill_level}" />
-							</div>
-							<div class="item">
-								<input type="hidden" name="attr_slam_option_modifier_value" value="0" />
-								<input type="hidden" name="attr_slam_option_modifier_description" value="" />
-								<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Slam Attack}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{slam_skill_level} + @{slam_option_modifier_value}]]}} {{notes=@{raw_slam_attack_notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{slam_success_notes}}} {{customCriticalSuccessNote=@{slam_critical_success_notes}}} {{customFailNote=@{slam_fail_notes}}} {{customCriticalFailNote=@{slam_critical_fail_notes}}} {{useModToll=[[1]]}} {{rollModifier=@{slam_option_modifier_value}}} {{rollModifierSummary=@{slam_option_modifier_description}}}" />
-							</div>
-							
-							<!-- slam options row -->
-							<div class="item slam-options-box melee-notebox">
-								
-								<div class="row">
-
-									<!-- hidden input is used to show/hide Row ID: based on selection -->
-									<input type="hidden" name="attr_slam_link_type" value="DX" />
-									<div class="cell margin-right">
-										<div class="popup">
-											<span data-i18n="link-to-label">Link To</span>:
-										</div>
-										<span class="tooltip">
-											<span data-i18n="slam-link-to-note">
-Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and effective skill cap of 9 for a Move and Attack do not apply to slams. (B371)
-											</span>
-										</span>
-									</div>
-									<div class="cell margin-right">
-										<select name="attr_slam_link_type" title="Macro: @{NAME|slam_link_type}">
-											<option value="nothing" data-i18n="option-nothing">Nothing</option>
-											<option value="DX" selected data-i18n="option-dexterity">DX</option>
-											<option value="Skill" data-i18n="option-skill">Skill</option>
-											<option value="Technique" data-i18n="option-technique">Technique</option>
-										</select>
-									</div>
-									<div class="cell col-row-id label show-hide-row-id">
-										<div class="popup">
-											<span data-i18n="row-id-label">Row ID:</span>
-										</div>
-										<span class="tooltip">
-											<span data-i18n="copy-paste-row-id-tooltip">
-		Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
-		When the skill/spell is updated, the technique's parent name and base skill level<br />
-		will be updated.<br />
-		Once entered, this will change the Skill/Spell for this particular attack to match<br />
-		the skill/spell level of the Base Skill. Do not change this skill Level number manually.
-											</span>
-										</span>	
-									</div>
-									<div class="cell col-input-medium show-hide-row-id">
-										<input type="hidden" name="attr_slam_skill_row_id_toggle" value="0" />
-										<input type="text" name="attr_slam_skill_row_id" class="align-left" title="Macro: @{NAME|slam_skill_row_id}" />
-									</div>
-
-									<div class="cell col-wide">
-										<input type="hidden" name="attr_slam_skill_row_id_message" value="DX" />
-										<b><span data-i18n="name-label">Name:</span></b>
-										<span name="attr_slam_skill_row_id_message"></span>
-										<input type="hidden" name="attr_slam_skill_row_id_level" value="" />
-										<b><span data-i18n="skill-level-label">Level</span>:</b>
-										<span name="attr_slam_skill_row_id_level"></span>
-									</div>
-
-								</div> <!-- .row -->
-
-								<div class="row">
-									<div class="cell label">
-										<div class="popup">
-											<span data-i18n="reason-for-modifier-label">Reason for MOD (Modifier):</span>
-										</div>
-										<span class="tooltip">
-											<span data-i18n="reason-for-modifiers-skills-tooltip">
-		Examples:<br />
-		+1 from Talent...<br />
-		+1 from Default Skill...<br />
-		+1 from Enchanted Item with...
-											</span>
-										</span>
-									</div>
-								
-									<div class="cell reason-for-mod">
-										<input type="text" name="attr_slam_reason_for_mod" class="align-left" title="Macro: @{NAME|slam_reason_for_mod}" />
-									</div>
-
-								</div><!-- .row -->
-
-								<div class="row">
-									<div class="cell label" style="width: 85px">
-										<div class="popup">
-											<span data-i18n="slam-flying-tackle-label">Flying Tackle</span>:
-										</div>
-										<span class="tooltip">
-											<span data-i18n="slam-flying-tackle-tooltip">+4 to hit and +1 to Reach, may use Jumping Skill for attack. You end up lying prone in the same hex as target. B372</span>
-										</span>
-									</div>
-								
-									<div class="cell roll-modifiers">
-										<input type="hidden" name="attr_slam_flying_tackle_modifier" value="0" />
-										<input type="checkbox" name="attr_slam_flying_tackle" value="1" />
-									</div>
-
-								</div><!-- .row -->
-
-								<div class="row">
-									<div class="cell label" style="width: 85px">
-										<div class="popup">
-											<span data-i18n="slam-pounce-label">Pounce</span>:
-										</div>
-										<span class="tooltip">
-											<span data-i18n="slam-pounce-tooltip">If you have four or more legs, you may pounce. After you attack, make a DX, Acrobatics, or Jumping roll. On a success, you stay on your feet! If a mount tries this, the rider must roll vs. Riding-4 or fall off! B372</span>
-										</span>
-									</div>
-								
-									<div class="cell roll-modifiers">
-										<input type="hidden" name="attr_slam_pounce_modifier" value="0" />
-										<input type="checkbox" name="attr_slam_pounce" value="1" />
-									</div>
-
-								</div><!-- .row -->
-
-								<div class="row">
-									<div class="cell label" style="width: 85px">
-										<div class="popup">
-											<span data-i18n="slam-shield-rush-label">Shield Rush</span>:
-										</div>
-										<span class="tooltip">
-											<span data-i18n="slam-shield-rush-tooltip">Roll against Shield skill to hit, and add your shield's Defense Bonus to your damage roll. Your shield takes damage instead of you. B372</span>
-										</span>
-									</div>
-								
-									<div class="cell roll-modifiers">
-										<input type="number" value="0" min="0" step="1" name="attr_slam_shield_db" class="slam-db-width inline" /> 
-										<span data-i18n="slam-shield-rush-db-label">DB (added to damage!)</span>
-									</div>
-								</div><!-- .row -->
-
-								<div class="row">
-									<div class="cell label" style="width: 85px">
-										<div class="popup">
-											<span data-i18n="slam-overrun-label">Overrun</span>:
-										</div>
-										<span class="tooltip">
-											<span data-i18n="slam-overrun-tooltip">If your SM is 2 or more than the target, apply overrun damage. This inflicts additional crushing damage based on ST = Your HP/2. B432</span>
-										</span>
-									</div>
-								
-									<div class="cell roll-modifiers">
-										<input type="checkbox" name="attr_slam_overrun" value="1" />
-										
-									</div>
-
-									<div class="cell roll-modifiers" style="margin-left: 4px;">
-										Effective ST: <input type="number" name="attr_slam_overrun_st" class="slam-db-width inline" readonly value="" />
-									</div>
-
-									<div class="cell roll-modifiers" style="margin-left: 4px;">
-										Damage: <input type="text" name="attr_slam_overrun_damage" class="slam-damage-width inline" readonly value="" />
-									</div>
-
-									<div class="cell roll-modifiers" style="margin-left: 4px;">
-										<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Overrun Damage}} {{damageRoll=[[@{slam_overrun_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{slam_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{slam_damage_type_note}}} {{showNotes=[[1]]}}" name="roll_dmgOverrun" class="roll_damage" />
-									</div>
-								</div><!-- .row -->
-
-								<div class="row">
-									<div class="cell">
-										<div class="popup">
-											<span data-i18n="success-note-label">Success Note</span>
-										</div>
-										<span class="tooltip">
-											<span data-i18n="melee-success-notes-tooltip">
-		<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
-		Example: Select Location: ?{Location|Head|Torso}
-											</span>
-										</span>
-										<textarea class="text-left chat-size" name="attr_slam_success_notes" title="Macro: @{NAME|slam_success_notes}"></textarea>
-									</div>
-									<div class="cell">
-										<div class="popup">
-											<span data-i18n="critical-success-note-label">Critical Success Notes</span>
-										</div>
-										<span class="tooltip">
-											<span data-i18n="melee-critical-success-notes-tooltip">
-		<strong>Hint:</strong> Enter inline rolls for additional results.<br />
-		Example: Does an additional [[1d6]] fire damage.
-											</span>
-										</span>
-										<textarea class="text-left chat-size" name="attr_slam_critical_success_notes" title="Macro: @{NAME|slam_critical_success_notes}"></textarea>
-									</div>
-								</div> <!-- .row -->
-
-								<div class="row">
-									<div class="cell">
-										<div class="popup">
-											<span data-i18n="fail-note-label">Fail Note</span>
-										</div>
-										<span class="tooltip">
-											<span data-i18n="melee-fail-notes-tooltip">
-		<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
-		Example: Select Location: ?{Location|Head|Torso}
-											</span>
-										</span>
-										<textarea class="text-left chat-size" name="attr_slam_fail_notes" title="Macro: @{NAME|slam_fail_notes}"></textarea>
-									</div>
-									<div class="cell">
-										<div class="popup">
-											<span data-i18n="critical-fail-note-label">Critical Fail Notes</span>
-										</div>
-										<span class="tooltip">
-											<span data-i18n="melee-critical-fail-notes-tooltip">
-		<strong>Hint:</strong> Enter inline rolls for additional results.<br />
-		Example: Does an additional [[1d6]] fire damage.
-											</span>
-										</span>
-										<textarea class="text-left chat-size" name="attr_slam_critical_fail_notes" title="Macro: @{NAME|slam_critical_fail_notes}"></textarea>
-									</div>
-								</div> <!-- .row -->
-								
-							</div>
-
-						</div>
-
-					</div>
-
 				</div><!-- end melee -->
 
 				<div class="ranged">
@@ -12868,6 +12559,325 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 				</div>
 
 				<div class="tools">
+
+					<!-- _____ _____ Slam Attack _____ _____ -->
+					<div class="box slam-attack-tool">
+
+						<input type="hidden" name="attr_is_slam_attack_new" value="1" />
+						<div class="slam-attack-table">
+							<!-- title row -->
+							<div class="item title">
+								<span data-i18n="slam-attack-label">Slam Attack</span>
+							</div>
+
+							<!-- header row -->
+							<div class="item slam-toggle">&nbsp;</div>
+							<div class="item slam-name">&nbsp;</div>
+							<div class="item header">
+								<div class="popup">
+									<span data-i18n="velocity-label">Velocity</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="slam-velocity-tooltip">Your movement rate (yards/meters/hexes per second) for the current round.</span>
+								</span>
+							</div>
+							<div class="item header">
+								<div class="popup">
+									<span data-i18n="abbreviation-hit-points-label">HP</span>
+								</div>
+								<div class="tooltip">
+									<span data-i18n="slam-hit-points-tooltip">Your Hit Points</span>
+								</div>
+							</div>
+							<div class="item header">
+								<span data-i18n="damage-label">Damage</span>
+							</div>
+							<div class="item"><!-- damage die --></div>
+							<div class="item header">
+								<span data-i18n="type-label">Type</span>
+							</div>
+							<div class="item header">
+								<span data-i18n="abbreviation-modifier-label">Mod</span>
+							</div>
+							<div class="item header skill-level">
+								<span data-i18n="skill-label">Skill</span>
+							</div>
+							<div class="item"><!-- skill die --></div>
+
+							<!-- slam data row -->
+							<input type="hidden" name="attr_toggle_slam_options" />
+							<div class="item">
+								<input type="checkbox" name="attr_toggle_slam_options" class="arrow-toggle margin-left-sm" title="View slam options." />
+							</div>
+							<div class="item subtitle">
+								<div class="popup">
+									<span data-i18n="slam-label">Slam</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="slam-attack-tooltip">
+Slam requires an Attack, All-out Attack, or Move and Attack maneuver. Your foe may block, dodge, or parry (but your body counts as a heavy weapon; see Parrying Heavy Weapons B376). If your foe dodges, you must move at least two yards past him if you have enough movement. If you would hit someone else, see Hitting the Wrong Target (B389). You can use All-Out Attack (Strong), +2 to Damage (B365), to increase your damage! (B371)
+									</span>
+								</span>
+							</div>
+							<div class="item">
+								<input type="number" value="1" min="1" step="1" name="attr_slam_velocity" title="Macro: @{NAME|slam_velocity}" />
+							</div>
+							<div class="item">
+								<input type="number" step="1" value="" min="1" name="attr_slam_hit_points" title="Macro: @{NAME|slam_hit_points}" />
+							</div>
+							<div class="item">
+								<input type="text" value="1d6" name="attr_slam_damage" readonly title="Macro: @{NAME|slam_damage}" />
+							</div>
+							<div class="item">
+								<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
+								<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Slam Damage}} {{damageRoll=[[@{slam_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{slam_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{slam_damage_type_note}}} {{showNotes=[[1]]}} {{notes=@{raw_slam_damage_notes}}}" name="roll_dmgSlam" class="roll_damage" />
+							</div>
+							<div class="item">
+								<select name="attr_slam_damage_type" title="Macro: @{NAME|slam_damage_type}">
+									<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
+									<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
+									<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
+									<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
+									<option value="Piercing (pi)"><span data-i18n="abbreviation-option-piercing">pi</span></option>
+									<option value="Large Piercing (pi+)"><span data-i18n="abbreviation-option-piercing-plus">pi+</span></option>
+									<option value="Huge Piercing (pi++)"><span data-i18n="abbreviation-option-piercing-plus-plus">pi++</span></option>
+									<option value="Affliction (aff)"><span data-i18n="abbreviation-option-affliction">aff</span></option>
+									<option value="Burning (burn)"><span data-i18n="abbreviation-option-burning">burn</span></option>
+									<option value="Corrosion (cor)"><span data-i18n="abbreviation-option-corrosion">cor</span></option>
+									<option value="Fatigue (fat)"><span data-i18n="abbreviation-option-fatigue">fat</span></option>
+									<option value="Toxic (tox)"><span data-i18n="abbreviation-option-toxic">tox</span></option>
+									<option value="Knockback (knock)"><span data-i18n="abbreviation-option-knockback">knock</span></option>
+									<option value="Special (spec)"><span data-i18n="abbreviation-option-special">spec</span></option>
+								</select>
+								<input type="hidden" name="attr_slam_damage_type_note" value="@{damage_type_note_cr}" />
+								<input type="hidden" name="attr_slam_minimum_damage_note" value="Min 1" />
+							</div>
+							<div class="item">
+								<input type="number" step="1" value="0" name="attr_slam_skill_modifier" title="Macro: @{NAME|skill_modifier}" />
+							</div>
+							<div class="item">
+								<input type="text" value="10" name="attr_slam_skill_level" title="Macro: @{NAME|slam_skill_level}" />
+							</div>
+							<div class="item">
+								<input type="hidden" name="attr_slam_option_modifier_value" value="0" />
+								<input type="hidden" name="attr_slam_option_modifier_description" value="" />
+								<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Slam Attack}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{slam_skill_level} + @{slam_option_modifier_value}]]}} {{notes=@{raw_slam_attack_notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{slam_success_notes}}} {{customCriticalSuccessNote=@{slam_critical_success_notes}}} {{customFailNote=@{slam_fail_notes}}} {{customCriticalFailNote=@{slam_critical_fail_notes}}} {{useModToll=[[1]]}} {{rollModifier=@{slam_option_modifier_value}}} {{rollModifierSummary=@{slam_option_modifier_description}}}" />
+							</div>
+							
+							<!-- slam options row -->
+							<div class="item slam-options-box melee-notebox">
+								
+								<div class="row">
+
+									<!-- hidden input is used to show/hide Row ID: based on selection -->
+									<input type="hidden" name="attr_slam_link_type" value="DX" />
+									<div class="cell margin-right">
+										<div class="popup">
+											<span data-i18n="link-to-label">Link To</span>:
+										</div>
+										<span class="tooltip">
+											<span data-i18n="slam-link-to-note">
+Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and effective skill cap of 9 for a Move and Attack do not apply to slams. (B371)
+											</span>
+										</span>
+									</div>
+									<div class="cell margin-right">
+										<select name="attr_slam_link_type" title="Macro: @{NAME|slam_link_type}">
+											<option value="nothing" data-i18n="option-nothing">Nothing</option>
+											<option value="DX" selected data-i18n="option-dexterity">DX</option>
+											<option value="Skill" data-i18n="option-skill">Skill</option>
+											<option value="Technique" data-i18n="option-technique">Technique</option>
+										</select>
+									</div>
+									<div class="cell col-row-id label show-hide-row-id">
+										<div class="popup">
+											<span data-i18n="row-id-label">Row ID:</span>
+										</div>
+										<span class="tooltip">
+											<span data-i18n="copy-paste-row-id-tooltip">
+		Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
+		When the skill/spell is updated, the technique's parent name and base skill level<br />
+		will be updated.<br />
+		Once entered, this will change the Skill/Spell for this particular attack to match<br />
+		the skill/spell level of the Base Skill. Do not change this skill Level number manually.
+											</span>
+										</span>	
+									</div>
+									<div class="cell col-input-medium show-hide-row-id">
+										<input type="hidden" name="attr_slam_skill_row_id_toggle" value="0" />
+										<input type="text" name="attr_slam_skill_row_id" class="align-left" title="Macro: @{NAME|slam_skill_row_id}" />
+									</div>
+
+									<div class="cell col-wide">
+										<input type="hidden" name="attr_slam_skill_row_id_message" value="DX" />
+										<b><span data-i18n="name-label">Name:</span></b>
+										<span name="attr_slam_skill_row_id_message"></span>
+										<input type="hidden" name="attr_slam_skill_row_id_level" value="" />
+										<b><span data-i18n="skill-level-label">Level</span>:</b>
+										<span name="attr_slam_skill_row_id_level"></span>
+									</div>
+
+								</div> <!-- .row -->
+
+								<div class="row">
+									<div class="cell label">
+										<div class="popup">
+											<span data-i18n="reason-for-modifier-label">Reason for MOD (Modifier):</span>
+										</div>
+										<span class="tooltip">
+											<span data-i18n="reason-for-modifiers-skills-tooltip">
+		Examples:<br />
+		+1 from Talent...<br />
+		+1 from Default Skill...<br />
+		+1 from Enchanted Item with...
+											</span>
+										</span>
+									</div>
+								
+									<div class="cell reason-for-mod">
+										<input type="text" name="attr_slam_reason_for_mod" class="align-left" title="Macro: @{NAME|slam_reason_for_mod}" />
+									</div>
+
+								</div><!-- .row -->
+
+								<div class="row">
+									<div class="cell label" style="width: 85px">
+										<div class="popup">
+											<span data-i18n="slam-flying-tackle-label">Flying Tackle</span>:
+										</div>
+										<span class="tooltip">
+											<span data-i18n="slam-flying-tackle-tooltip">+4 to hit and +1 to Reach, may use Jumping Skill for attack. You end up lying prone in the same hex as target. B372</span>
+										</span>
+									</div>
+								
+									<div class="cell roll-modifiers">
+										<input type="hidden" name="attr_slam_flying_tackle_modifier" value="0" />
+										<input type="checkbox" name="attr_slam_flying_tackle" value="1" />
+									</div>
+
+								</div><!-- .row -->
+
+								<div class="row">
+									<div class="cell label" style="width: 85px">
+										<div class="popup">
+											<span data-i18n="slam-pounce-label">Pounce</span>:
+										</div>
+										<span class="tooltip">
+											<span data-i18n="slam-pounce-tooltip">If you have four or more legs, you may pounce. After you attack, make a DX, Acrobatics, or Jumping roll. On a success, you stay on your feet! If a mount tries this, the rider must roll vs. Riding-4 or fall off! B372</span>
+										</span>
+									</div>
+								
+									<div class="cell roll-modifiers">
+										<input type="hidden" name="attr_slam_pounce_modifier" value="0" />
+										<input type="checkbox" name="attr_slam_pounce" value="1" />
+									</div>
+
+								</div><!-- .row -->
+
+								<div class="row">
+									<div class="cell label" style="width: 85px">
+										<div class="popup">
+											<span data-i18n="slam-shield-rush-label">Shield Rush</span>:
+										</div>
+										<span class="tooltip">
+											<span data-i18n="slam-shield-rush-tooltip">Roll against Shield skill to hit, and add your shield's Defense Bonus to your damage roll. Your shield takes damage instead of you. B372</span>
+										</span>
+									</div>
+								
+									<div class="cell roll-modifiers">
+										<input type="number" value="0" min="0" step="1" name="attr_slam_shield_db" class="slam-db-width inline" /> 
+										<span data-i18n="slam-shield-rush-db-label">DB (added to damage!)</span>
+									</div>
+								</div><!-- .row -->
+
+								<div class="row">
+									<div class="cell label" style="width: 85px">
+										<div class="popup">
+											<span data-i18n="slam-overrun-label">Overrun</span>:
+										</div>
+										<span class="tooltip">
+											<span data-i18n="slam-overrun-tooltip">If your SM is 2 or more than the target, apply overrun damage. This inflicts additional crushing damage based on ST = Your HP/2. B432</span>
+										</span>
+									</div>
+								
+									<div class="cell roll-modifiers">
+										<input type="checkbox" name="attr_slam_overrun" value="1" />
+										
+									</div>
+
+									<div class="cell roll-modifiers" style="margin-left: 4px;">
+										Effective ST: <input type="number" name="attr_slam_overrun_st" class="slam-db-width inline" readonly value="" />
+									</div>
+
+									<div class="cell roll-modifiers" style="margin-left: 4px;">
+										Damage: <input type="text" name="attr_slam_overrun_damage" class="slam-damage-width inline" readonly value="" />
+									</div>
+
+									<div class="cell roll-modifiers" style="margin-left: 4px;">
+										<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Overrun Damage}} {{damageRoll=[[@{slam_overrun_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{slam_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{slam_damage_type_note}}} {{showNotes=[[1]]}}" name="roll_dmgOverrun" class="roll_damage" />
+									</div>
+								</div><!-- .row -->
+
+								<div class="row">
+									<div class="cell">
+										<div class="popup">
+											<span data-i18n="success-note-label">Success Note</span>
+										</div>
+										<span class="tooltip">
+											<span data-i18n="melee-success-notes-tooltip">
+		<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+		Example: Select Location: ?{Location|Head|Torso}
+											</span>
+										</span>
+										<textarea class="text-left chat-size" name="attr_slam_success_notes" title="Macro: @{NAME|slam_success_notes}"></textarea>
+									</div>
+									<div class="cell">
+										<div class="popup">
+											<span data-i18n="critical-success-note-label">Critical Success Notes</span>
+										</div>
+										<span class="tooltip">
+											<span data-i18n="melee-critical-success-notes-tooltip">
+		<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+		Example: Does an additional [[1d6]] fire damage.
+											</span>
+										</span>
+										<textarea class="text-left chat-size" name="attr_slam_critical_success_notes" title="Macro: @{NAME|slam_critical_success_notes}"></textarea>
+									</div>
+								</div> <!-- .row -->
+
+								<div class="row">
+									<div class="cell">
+										<div class="popup">
+											<span data-i18n="fail-note-label">Fail Note</span>
+										</div>
+										<span class="tooltip">
+											<span data-i18n="melee-fail-notes-tooltip">
+		<strong>Hint:</strong> Enter inline rolls for additional results. To show the selected arrow.<br />
+		Example: Select Location: ?{Location|Head|Torso}
+											</span>
+										</span>
+										<textarea class="text-left chat-size" name="attr_slam_fail_notes" title="Macro: @{NAME|slam_fail_notes}"></textarea>
+									</div>
+									<div class="cell">
+										<div class="popup">
+											<span data-i18n="critical-fail-note-label">Critical Fail Notes</span>
+										</div>
+										<span class="tooltip">
+											<span data-i18n="melee-critical-fail-notes-tooltip">
+		<strong>Hint:</strong> Enter inline rolls for additional results.<br />
+		Example: Does an additional [[1d6]] fire damage.
+											</span>
+										</span>
+										<textarea class="text-left chat-size" name="attr_slam_critical_fail_notes" title="Macro: @{NAME|slam_critical_fail_notes}"></textarea>
+									</div>
+								</div> <!-- .row -->
+								
+							</div>
+
+						</div>
+
+					</div>
 					
 					<!-- _____ _____ Falling and Collision _____ _____ -->
 					<div class="box falling-collision">
@@ -14026,8 +14036,14 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 			<!-- current version notes: 2.8.1 -->
 			<ul>
 				<li>Skills Tab. Add a collapsible notes area.</li>
+				<li>Skills Tab. Added an indicator to show a skill has <b>Conditional notes</b></li>
 				<li>Combat Tab. Add a collapsible notes area.</li>
 				<li>Combat Tab. Defense sub-tab. Increased the height of the <b>DEFENSE BONUS (DB) NOTES</b> box.</li>
+				<li>New Slam Tool. Moved to Tools sub-tab.</li>
+				<li>Editable Wound Modifier Notes: Updated initial default notes to include <b>Injury to Unliving, Homegenous, and Diffuse Targets. B380</b>. 
+					Requested and notes provided by kawaishi. 
+					<b>NOTE:</b> If you made changes to one or more wound modifier notes, you will not see the most recent rule updates. However, you can use the new <b>reset</b> button to get them.
+				</li>
 			</ul>
 
 			<h4>Version: 2.8.0</h4>
@@ -15263,6 +15279,11 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 							<input type="checkbox" name="attr_use_damage_type_notes" value="1" checked="checked" />
 							<span data-i18n="show-notes-in-roll-template-label">Show notes in roll template</span>
 						</div>
+
+						<div style="margin-bottom: 15px;">
+							<button type="action" name="act_wound_notes_reset" class="btn">Reset</button><br />
+							<span data-i18n="wound-notes-button-description">If you modified a note, you will not see the most recent rule updates. Press the button to get the recent rules. <b>NOTE:</b> this will replace any notes you made.</span>
+						</div>
 					
 						<table>
 							<tr>
@@ -15278,11 +15299,16 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<span data-i18n="cutting-label">Cutting</span>
 								</td>
 								<td>
-									<textarea name="attr_damage_type_note_cut">CUTTING
-	Damage x1.5
-	Neck Damage x2
-	Skull Damage x4
-	Knockback: A cutting attack can cause knockback only if it fails to penerate DR. (B378)</textarea>
+									<textarea name="attr_damage_type_note_cut">CUTTING (Always round down)
+Damage: x1.5
+Neck Damage: x2
+Skull Damage: x4
+Knockback: A cutting attack can cause knockback only if it fails to penetrate DR. (B378)
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 									</td>
 							</tr>
 							<tr>
@@ -15290,11 +15316,16 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<span data-i18n="impaling-label">Impaling</span>
 								</td>
 								<td>
-									<textarea name="attr_damage_type_note_imp">IMPALING
-	Damage x2
-	Arm, Leg, Foot, or Hand x1 (B399)
-	Vitals Damage x3
-	Skull Damage x4</textarea>
+									<textarea name="attr_damage_type_note_imp">IMPALING (Always round down)
+Damage: x2
+Arm, Leg, Foot, or Hand: x1 (B399)
+Vitals Damage: x3
+Skull Damage: x4
+----
+B380
+Unliving: x1 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+Homogenous: x0.5
+Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 								</td>
 							</tr>
 							<tr>
@@ -15302,11 +15333,16 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<span data-i18n="crushing-label">Crushing</span>
 								</td>
 								<td>
-									<textarea name="attr_damage_type_note_cr">CRUSHING
-	Damage x1
-	Neck Damage x1.5
-	Skull Damage x4
-	Knockback: A crushing attack can cause knockback regardless of whether it penetrates DR. (B378)</textarea>
+									<textarea name="attr_damage_type_note_cr">CRUSHING (Always round down)
+Damage: x1
+Neck Damage: x1.5
+Skull Damage: x4
+Knockback: A crushing attack can cause knockback regardless of whether it penetrates DR. (B378)
+---
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 								</td>
 							</tr>
 							<tr>
@@ -15314,10 +15350,15 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<span data-i18n="abbreviation-piercing-label">PI</span>-
 								</td>
 								<td>
-									<textarea name="attr_damage_type_note_pi_minus">PIERCING-
-	Damage x .5
-	Vitals Damage x3
-	Skull Damage x4</textarea>
+									<textarea name="attr_damage_type_note_pi_minus">PIERCING- (Always round down)
+Damage: x.5
+Vitals Damage: x3
+Skull Damage: x4
+----
+B380
+Unliving: x1/5 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+Homogenous: x1/10
+Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 								</td>
 							</tr>
 							<tr>
@@ -15325,10 +15366,15 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<span data-i18n="abbreviation-piercing-label">PI</span>
 								</td>
 								<td>
-									<textarea name="attr_damage_type_note_pi">PIERCING
-	Damage x1
-	Vitals Damage x3
-	Skull Damage x4</textarea>
+									<textarea name="attr_damage_type_note_pi">PIERCING (Always round down)
+Damage: x1
+Vitals Damage: x3
+Skull Damage: x4
+----
+B380
+Unliving: x1/3 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+Homogenous: x1/5
+Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 								</td>
 							</tr>
 							<tr>
@@ -15336,11 +15382,16 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<span data-i18n="abbreviation-piercing-label">PI</span>+
 								</td>
 								<td>
-									<textarea name="attr_damage_type_note_pi_plus">PIERCING+
-	Damage x1.5
-	Arm, Leg, Foot, or Hand x1 (B399)
-	Vitals Damage x3
-	Skull Damage x4</textarea>
+									<textarea name="attr_damage_type_note_pi_plus">PIERCING+ (Always round down)
+Damage: x1.5
+Arm, Leg, Foot, or Hand: x1 (B399)
+Vitals Damage: x3
+Skull Damage: x4
+----
+B380
+Unliving: x0.5 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+Homogenous: x1/3
+Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 								</td>
 							</tr>
 							<tr>
@@ -15348,11 +15399,16 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<span data-i18n="abbreviation-piercing-label">PI</span>++
 								</td>
 								<td>
-									<textarea name="attr_damage_type_note_pi_plus_plus">PIERCING++
-	Damage x2
-	Arm, Leg, Foot, or Hand x1 (B399)
-	Vitals Damage x3
-	Skull Damage x4</textarea>
+									<textarea name="attr_damage_type_note_pi_plus_plus">PIERCING++ (Always round down)
+Damage: x2
+Arm, Leg, Foot, or Hand: x1 (B399)
+Vitals Damage: x3
+Skull Damage: x4
+----
+B380
+Unliving: x1 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+Homogenous: x0.5
+Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 								</td>
 							</tr>
 							<tr>
@@ -15360,27 +15416,41 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<span data-i18n="afflication-label">Affliction</span>
 								</td>
 								<td>
-									<textarea name="attr_damage_type_note_aff">AFFLICTION
-	Special damage and affects based on affliction description</textarea>
+									<textarea name="attr_damage_type_note_aff">AFFLICTION (Always round down)
+Special damage and affects based on affliction description
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1</textarea>
 								</td>
 							</tr>
 							<tr>
 								<td><span data-i18n="burn-label">Burn</span></td>
 								<td>
-									<textarea name="attr_damage_type_note_burn">BURN 
-	Damage x1
-	Skull Damage x4</textarea>
+									<textarea name="attr_damage_type_note_burn">BURN (Always round down)
+Damage: x1
+Skull Damage x4
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 								</td>
 							</tr>
 							<tr>
 								<td><span data-i18n="corrosion-label">Corrosion</span></td>
 								<td>
-									<textarea name="attr_damage_type_note_cor">CORRROSION 
-	Damage x1
-	Face Damage x1.5, blind eye if major wound, both eyes if full HP
-	Neck Damage x1.5
-	Skull Damage x4
-	-1 DR per 5 points damage</textarea>
+									<textarea name="attr_damage_type_note_cor">CORRROSION (Always round down)
+Damage: x1
+Face Damage x1.5, blind eye if major wound, both eyes if full HP
+Neck Damage x1.5
+Skull Damage x4
+-1 DR per 5 points damage
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 									</td>
 								</tr>
 								<tr>
@@ -15388,8 +15458,13 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 										<span data-i18n="fatigue-label">Fatigue</span>
 									</td>
 									<td>
-										<textarea name="attr_damage_type_note_fat">FATIGUE 
-	Damage x1</textarea>
+										<textarea name="attr_damage_type_note_fat">FATIGUE (Always round down)
+Damage: x1
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 									</td>
 								</tr>
 								<tr>
@@ -15397,8 +15472,13 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 										<span data-i18n="toxic-label">Toxic</span>
 									</td>
 									<td>
-										<textarea name="attr_damage_type_note_tox">TOXIC 
-	Damage x1</textarea>
+										<textarea name="attr_damage_type_note_tox">TOXIC (Always round down)
+Damage x1
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 									</td>
 								</tr>
 								<tr>
@@ -15406,8 +15486,13 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 										<span data-i18n="special-label">Special</span>
 									</td>
 									<td>
-										<textarea name="attr_damage_type_note_spec">SPECIAL 
-	See notes for weapon.</textarea>
+										<textarea name="attr_damage_type_note_spec">SPECIAL (Always round down)
+See notes for weapon.
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 									</td>
 								</tr>
 								<tr>
@@ -15415,7 +15500,12 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 										<span data-i18n="knockback-label">Knockback</span>
 									</td>
 									<td>
-										<textarea name="attr_damage_type_note_knockback">Knockback Only. (B378)</textarea>
+										<textarea name="attr_damage_type_note_knockback">Knockback Only. (B378) (Always round down)
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)</textarea>
 									</td>
 								</tr>
 							</table>
@@ -25210,8 +25300,8 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 		const dodgeSuccessNotes = `If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.`;
 	
 		const dodgeCriticalSuccessNotes = `If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-	
-	If a single rapid-fire attack, dodge <i>all</i> hits. See B375.`;
+
+If a single rapid-fire attack, dodge <i>all</i> hits. See B375.`;
 	
 		const dodgeRetreatSuccessNotes = ``;
 	
@@ -25224,8 +25314,8 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 		const parrySuccessNotes = `If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.`;
 	
 		const parryCriticalSuccessNotes = `If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-	
-	If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.`;
+
+If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.`;
 	
 		const parryFailNotes = ``;
 	
@@ -25234,14 +25324,14 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 		const unarmedParrySuccessNotes = "";
 	
 		const unarmedParryCriticalSuccessNotes = `If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-	
-	If attack is a thrown weapon, a bare handed parry lets you <i>catch</i> the incoming weapon without hurting yourself. See B381.`;
+
+If attack is a thrown weapon, a bare handed parry lets you <i>catch</i> the incoming weapon without hurting yourself. See B381.`;
 	
 		const unarmedParryFailNotes = `The attacker may choose to hit the original target or the limb you used to parry with. See B376.`;
 	
 		const unarmedParryCriticalFailureNotes = `Roll on the appropriate <i>Critical Miss Table</i> B556. See B382.
 	
-	The attacker may choose to hit the original target or the limb you used to parry with. See B376.`;
+The attacker may choose to hit the original target or the limb you used to parry with. See B376.`;
 	
 		const blockSuccessNotes = ``;
 	
@@ -25261,6 +25351,140 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 		const slamAttackNotes = getTranslationByKey("slam-attack-notes");
 
 		const slamDamageNotes = getTranslationByKey("slam-damage-notes");
+
+		const woundNotesCutting = `CUTTING (Always round down)
+Damage: x1.5
+Neck Damage: x2
+Skull Damage: x4
+Knockback: A cutting attack can cause knockback only if it fails to penetrate DR. (B378)
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesImpaling = `IMPALING (Always round down)
+Damage: x2
+Arm, Leg, Foot, or Hand: x1 (B399)
+Vitals Damage: x3
+Skull Damage: x4
+----
+B380
+Unliving: x1 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+Homogenous: x0.5
+Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesCrushing = `CRUSHING (Always round down)
+Damage: x1
+Neck Damage: x1.5
+Skull Damage: x4
+Knockback: A crushing attack can cause knockback regardless of whether it penetrates DR. (B378)
+---
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesPiercingMinus = `PIERCING- (Always round down)
+Damage: x.5
+Vitals Damage: x3
+Skull Damage: x4
+----
+B380
+Unliving: x1/5 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+Homogenous: x1/10
+Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesPiercing = `PIERCING (Always round down)
+Damage: x1
+Vitals Damage: x3
+Skull Damage: x4
+----
+B380
+Unliving: x1/3 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+Homogenous: x1/5
+Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesPiercingPlus = `PIERCING+ (Always round down)
+Damage: x1.5
+Arm, Leg, Foot, or Hand: x1 (B399)
+Vitals Damage: x3
+Skull Damage: x4
+----
+B380
+Unliving: x0.5 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+Homogenous: x1/3
+Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesPiercingPlusPlus = `PIERCING++ (Always round down)
+Damage: x2
+Arm, Leg, Foot, or Hand: x1 (B399)
+Vitals Damage: x3
+Skull Damage: x4
+----
+B380
+Unliving: x1 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+Homogenous: x0.5
+Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesAffliction = `AFFLICTION (Always round down)
+Special damage and affects based on affliction description
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1`;
+
+		const woundNotesBurn = `BURN (Always round down)
+Damage: x1
+Skull Damage x4
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesCorrosion = `CORRROSION (Always round down)
+Damage: x1
+Face Damage x1.5, blind eye if major wound, both eyes if full HP
+Neck Damage x1.5
+Skull Damage x4
+-1 DR per 5 points damage
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesFatigue = `FATIGUE (Always round down)
+Damage: x1
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Normal Fatigue Damage, but apply HP modifier if applicable. Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesToxic = `TOXIC (Always round down)
+Damage x1
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesSpecial = `SPECIAL (Always round down)
+See notes for weapon.
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+
+		const woundNotesKnockback = `Knockback Only. (B378) (Always round down)
+----
+B380
+Unliving: Hit location has its usual effect
+Homogenous: x1
+Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
 
 	    const notes = [
 			{ code: "dodge_success_notes", value: dodgeSuccessNotes },
@@ -25285,6 +25509,20 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 			{ code: "critical_hit_notes", value: criticalHitNotes },
 			{ code: "slam_attack_notes", value: slamAttackNotes },
 			{ code: "slam_damage_notes", value: slamDamageNotes },
+			{ code: "wound_notes_cutting", value: woundNotesCutting},
+			{ code: "wound_notes_impaling", value: woundNotesImpaling},
+			{ code: "wound_notes_crushing", value: woundNotesCrushing },
+			{ code: "wound_notes_piercing_minus", value: woundNotesPiercingMinus },
+			{ code: "wound_notes_piercing", value: woundNotesPiercing },
+			{ code: "wound_notes_piercing_plus", value: woundNotesPiercingPlus }, 
+			{ code: "wound_notes_piercing_plus_plus", value: woundNotesPiercingPlusPlus },
+			{ code: "wound_notes_affliction", value: woundNotesAffliction }, 
+			{ code: "wound_notes_burn", value: woundNotesBurn },
+			{ code: "wound_notes_corrosion", value: woundNotesCorrosion }, 
+			{ code: "wound_notes_fatigue", value: woundNotesFatigue },
+			{ code: "wound_notes_toxic", value: woundNotesToxic },
+			{ code: "wound_notes_special", value: woundNotesSpecial }, 
+			{ code: "wound_notes_knockback", value: woundNotesKnockback }
 		];
 	
 		return notes;
@@ -33286,5 +33524,50 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 		});
 
 	});
+
+	// when button is clicked, show the updates tab
+	on("clicked:wound_notes_reset", event => {
+
+		resetWoundModifierNotes();
+
+	});
+
+	function resetWoundModifierNotes() {
+
+		const woundNotesCutting = getNotesByCode("wound_notes_cutting");
+		const woundNotesImpaling = getNotesByCode("wound_notes_impaling");
+		const woundNotesCrushing = getNotesByCode("wound_notes_crushing");
+		const woundNotesPiercingMinus = getNotesByCode("wound_notes_piercing_minus");
+		const woundNotesPiercing = getNotesByCode("wound_notes_piercing");
+		const woundNotesPiercingPlus = getNotesByCode("wound_notes_piercing_plus");
+		const woundNotesPiercingPlusPlus = getNotesByCode("wound_notes_piercing_plus_plus");
+		const woundNotesAffliction = getNotesByCode("wound_notes_affliction");
+		const woundNotesBurn = getNotesByCode("wound_notes_burn");
+		const woundNotesCorrosion = getNotesByCode("wound_notes_corrosion");
+		const woundNotesFatigue = getNotesByCode("wound_notes_fatigue");
+		const woundNotesToxic = getNotesByCode("wound_notes_toxic");
+		const woundNotesSpecial = getNotesByCode("wound_notes_special");
+		const woundNotesKnockback = getNotesByCode("wound_notes_knockback");
+
+		const attribs = {
+			damage_type_note_cut: woundNotesCutting,
+			damage_type_note_imp: woundNotesImpaling,
+			damage_type_note_cr: woundNotesCrushing,
+			damage_type_note_pi_minus: woundNotesPiercingMinus,
+			damage_type_note_pi: woundNotesPiercing,
+			damage_type_note_pi_plus: woundNotesPiercingPlus,
+			damage_type_note_pi_plus_plus: woundNotesPiercingPlusPlus,
+			damage_type_note_aff: woundNotesAffliction,
+			damage_type_note_burn: woundNotesBurn,
+			damage_type_note_cor: woundNotesCorrosion,
+			damage_type_note_fat: woundNotesFatigue,
+			damage_type_note_tox: woundNotesToxic,
+			damage_type_note_spec: woundNotesSpecial,
+			damage_type_note_knockback: woundNotesKnockback
+		};
+
+		setAttrs(attribs);
+
+	}
 
 </script>
