@@ -4331,8 +4331,6 @@ on('clicked:primaryweapon clicked:secondaryweapon clicked:thirdweapon clicked:fo
 		calculateTemplateButtons(rollBase)
 	);
 
-	console.log(computedValues);
-
 	finishRoll(
 			rollResult.rollId,
 			computedValues
@@ -4340,6 +4338,10 @@ on('clicked:primaryweapon clicked:secondaryweapon clicked:thirdweapon clicked:fo
 });
 
 const calculateTemplateButtons = async (rollBase) => {
+
+	if(!rollBase.includes("skill=")){
+		return {}
+	}
 
 	var weaponskill = rollBase.substring(rollBase.indexOf("skill="), rollBase.indexOf("weapon_skill")+13).replace("skill=@{", "").replace("}","");
 	let attrs = await asw.getAttrs([weaponskill]);
@@ -4715,7 +4717,9 @@ const asw = (() => {
     <table>
         <tr><th style='text-transform: uppercase;'>{{title}}</th></tr>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
+		{{#description}}
         <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">DESCRIPTION: </strong> {{description}}</td></tr>
+		{{/description}}
         <tr><td><strong class="template-title">SKILL ROLL: </strong> {{computed::roll}}</td></tr>
 		{{#rollWasFumble() roll}}
 		{{#^rollWasCrit() roll}}
@@ -4733,7 +4737,9 @@ const asw = (() => {
     <table>
         <tr><th style='text-transform: uppercase;'>{{title}}</th></tr>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
-        <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">DESCRIPTION: </strong> {{description}}</td></tr>
+		{{#description}}
+		<tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">DESCRIPTION: </strong> {{description}}</td></tr>
+		{{/description}}
         <tr><td><strong class="template-title">SKILL ROLL: </strong> {{computed::roll}}</td></tr>
 		{{#rollWasFumble() roll}}
 		{{#^rollWasCrit() roll}}
@@ -4751,7 +4757,9 @@ const asw = (() => {
     <table>
         <tr><th style='text-transform: uppercase;'>{{title}}</th></tr>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
-        <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">DESCRIPTION: </strong> {{description}}</td></tr>
+		{{#description}}
+		<tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">DESCRIPTION: </strong> {{description}}</td></tr>
+		{{/description}}
         <tr><td><strong class="template-title">SKILL ROLL: </strong> {{computed::roll}}</td></tr>
 		{{#rollWasFumble() roll}}
 		{{#^rollWasCrit() roll}}
@@ -4770,12 +4778,18 @@ const asw = (() => {
 <rolltemplate class="sheet-rolltemplate-weapon">
     <table>
         <tr><th style='text-transform: uppercase;'>{{weapon-name}}</th></tr>
+		{{#name}}
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
-        <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">HELD: </strong> {{type1}} <br /><strong class="template-title">TYPE: </strong> {{type2}}</td></tr>
-        <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">MAX RANGE: </strong> {{range}} &#160;| <strong class="template-title"> ACCURACY: </strong> {{accuracy}}</td></tr>
+		{{/name}}
+		{{#type1}}<tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">HELD: </strong> {{type1}}{{/type1}} {{#type2}}<br /><strong class="template-title">TYPE: </strong> {{type2}}</td></tr>{{/type2}}
+		<tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">MAX RANGE: </strong> {{range}} &#160;| <strong class="template-title"> ACCURACY: </strong> {{accuracy}}</td></tr>
         <tr><td><strong class="template-title">DMG: </strong> {{damage}} &#160;| <strong class="template-title"> RELIABILITY: </strong> {{reliability}}</td></tr>
+		{{#effect}}
         <tr><td style='font-size: 12px;'><strong class="template-title">EFFECT: </strong> {{effect}}</td></tr>
+		{{/effect}}
+		{{#enhancement}}
         <tr><td style='font-size: 12px;'><strong class="template-title">ENH: </strong> {{enhancement}}</td></tr>
+		{{/enhancement}}
     </table>
 	{{#skill}}
 	<div class="sheet-rolltemplate-button-row">
@@ -4808,8 +4822,12 @@ const asw = (() => {
         <tr><th style='text-transform: uppercase;'>{{shield-name}}</th></tr>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
         <tr><td><strong class="template-title">DMG: </strong> {{damage}} &#160;| <strong class="template-title"> RELIABILITY: </strong> {{reliability}}</td></tr>
+		{{#effect}}
         <tr><td style='font-size: 12px;'><strong class="template-title">EFFECT: </strong> {{effect}}</td></tr>
+		{{/effect}}
+		{{#enhancement}}
         <tr><td style='font-size: 12px;'><strong class="template-title">ENH: </strong> {{enhancement}}</td></tr>
+		{{/enhancement}}
     </table>
 </rolltemplate>
 
@@ -4825,7 +4843,9 @@ const asw = (() => {
     <table>
         <tr><th style='text-transform: uppercase;'>{{weapon-name}}</th></tr>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
+		{{#effect}}
         <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">EFFECT: </strong> {{effect}}</td></tr>
+		{{/effect}}
         <tr><td><strong class="template-title">DAMAGE: </strong> {{damage}}</td></tr>
     </table>
 </rolltemplate>
@@ -4837,10 +4857,16 @@ const asw = (() => {
         <tr><th style='text-transform: uppercase;'>{{spell-name}}</th></tr>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
         <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">TYPE: </strong> {{type}} <br /><strong class="template-title">STA COST: </strong> {{cost}}</td></tr>
+		{{#description}}
         <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">DESCRIPTION:</strong> {{description}}</td></tr>
+		{{/description}}
+		{{#duration}}
         <tr><td style='font-size: 12px;'><strong class="template-title">DURATION: </strong> {{duration}}</td></tr>
-        <tr><td><strong class="template-title">DMG: </strong> {{damage}} &#160;| <strong class="template-title" style='text-align: justify; font-size: 12px;'> RANGE: </strong> {{range}}</td></tr>
+		{{/duration}}
+        <tr><td><strong class="template-title">DMG: </strong> {{damage}} {{#range}}&#160;| <strong class="template-title" style='text-align: justify; font-size: 12px;'> RANGE: </strong> {{range}}</td></tr>{{/range}}
+		{{#defense}}
         <tr><td style='font-size: 12px;'><strong class="template-title">DEFENSE: </strong> {{defense}}</td></tr>
+		{{/defense}}
     </table>
 	<div class="sheet-rolltemplate-button-row">
 		<div class="sheet-rolltemplate-button">
