@@ -13,7 +13,7 @@ npm run build:pug:win
 
 npm run build:css
 ```
-These will then generate a dist folder that will have the finished code. From their you can upload them into the custom sheet sandbox for testing.
+These will then generate a `dist` folder that will have the finished code. From there you can upload them into the custom sheet sandbox for testing.
 ## Pushing Changes
 Roll20 does not build our pug/stylus code for when we merge. This needs to be done locally by running `npm run gulp:build` in the Ironsworn/src directory.
 ## Translations
