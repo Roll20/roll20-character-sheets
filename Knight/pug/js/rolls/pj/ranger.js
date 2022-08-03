@@ -11,10 +11,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let attributs = [
     'pilonnageRanger',
     'energiePJ',
-    'caracteristique1',
-    'caracteristique2',
-    'caracteristique3',
-    'caracteristique4',
+    'caracteristique1Ranger',
+    'caracteristique2Ranger',
+    'caracteristique3Ranger',
+    'caracteristique4Ranger',
     'discretion',
     ODValue.discretion,
     ODValue.tir,
@@ -168,10 +168,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
   const mod = +attrs.jetModifDes;
   const hasBonus = +attrs.bonusCarac;
 
-  const C1 = attrs.caracteristique1;
-  const C2 = attrs.caracteristique2;
-  const C3 = attrs.caracteristique3;
-  const C4 = attrs.caracteristique4;
+  const C1 = attrs.caracteristique1Ranger;
+  const C2 = attrs.caracteristique2Ranger;
+  const C3 = attrs.caracteristique3Ranger;
+  const C4 = attrs.caracteristique4Ranger;
 
   const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 

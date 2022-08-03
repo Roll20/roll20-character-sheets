@@ -4,6 +4,16 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 02.14.00 (Build 19)
+
+### Features
+
+- added "fellowship focus" to pc sheet
+
+### Translation
+
+- fixed some missing support for translations on the pc sheet (thanks to iosu Li for the spanish translation)
+
 ## 02.13.01 (Build 18)
 
 ### CSS

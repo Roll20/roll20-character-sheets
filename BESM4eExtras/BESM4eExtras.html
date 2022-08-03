@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.8.4" readonly />
+													<input type="text" class="center" name="attr_version" value="1.8.6" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -7908,6 +7908,11 @@
 			if (isLesserThan183) {
 				upgradeTo_1_8_3(value, setObj);
 			}
+			const isLesserThan186 = major_global_version <= 1 && minor_global_version < 8.6 ?
+				true : false;
+			if (isLesserThan186) {
+				upgradeTo_1_8_6(value, setObj);
+			}
 			setObj.global_version = sheet_version;
 		}
 		
@@ -8008,6 +8013,21 @@
 				setObj[`stat_cost_${allaspects_stats_array[i]}`] = cost;
 			});
 			clog(2, {}, 'upgraded to 1.8.3');
+		}
+		
+		function upgradeTo_1_8_6(value, setObj) {
+			const statValues = [
+				parseInt(value.static_stat_base_body) || 0,
+				parseInt(value.static_stat_base_mind) || 0,
+				parseInt(value.static_stat_base_soul) || 0
+			];
+			clog(2, {}, 'statValues:', statValues, 'upgradeTo_1_8_6()');
+			_.each(statValues, (s, i) => {
+				const cost = getStatCost(2, {}, s);
+				clog(2, {}, 's =', s);
+				setObj[`stat_cost_${allaspects_stats_array[i]}`] = cost;
+			});
+			clog(2, {}, 'upgraded to 1.8.6');
 		}
 		
 		/** Build UI Functions **/
@@ -8340,7 +8360,7 @@
 		function getStatCost(debug, timer, level) {
 			let cost = 0;
 			for(let i = 1; i <= level; i++) {
-				if(i < 13) { cost += 4 } else { cost += 8 }
+				if(i < 13) { cost += 2 } else { cost += 4 }
 			}
 			clog(debug, timer, 'cost =', cost, 'getStatCost()');
 			return cost;
@@ -11347,8 +11367,6 @@
 		}
 		*/
 		function setAttrdb(isActive, debug, timer, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj) {
-			clog(debug, timer, 'isActive =', isActive, 'setAttrdb(TEST)');
-			clog(debug, timer, 'attribute =', attribute);
 			const name = value[`repeating_attr_${rowID}_name`] || "";
 			const level = parseInt(value[`repeating_attr_${rowID}_effectivelevel`]) || 0;
 			const customizations = value[`repeating_attr_${rowID}_customizations`] || [];
@@ -11460,7 +11478,6 @@
 				*/
 			} else {
 				attrdb[`${attribute}`].find((attr, i) => {
-					//console.log(`attr.source = ${attr.source}`); console.log(`rowID = ${rowID}`);
 					if (attr.source == rowID) {
 						delete attrdb[`${attribute}`][i]; return true;
 					}
@@ -11507,47 +11524,46 @@
 		
 		function setArms(debug, timer, value, rowID, setObj, name, isActive, hand) {
 			const extraarmIDs = value.extraarmIDs;
+			clog(debug, timer, 'hand =', hand, 'setArms()');
 			const handsource = getHandSource(debug, timer, extraarmIDs, hand);
 			const source = setObj[`repeating_attr_${rowID}_source`];
 			if (isActive) {
 				setObj[`${handsource}_name`] = name;
 				writeValues(debug, timer, value, `${handsource}_source`, rowID, setObj);
 				if (source === undefined || source === '') {
-					//setObj[`repeating_attr_${rowID}_source`] = hand;
 					writeValues(debug, timer, value, `repeating_attr_${rowID}_source`, hand, setObj);
 				} else {
 					const twohanded = `${source},${hand}`;
-					//setObj[`repeating_attr_${rowID}_source`] = twohanded;
 					writeValues(debug, timer, value, `repeating_attr_${rowID}_source`, twohanded, setObj);
 				}
 			} else {
-				//setObj[`${handsource}_name`] = '';
-				//setObj[`${handsource}_source`] = '';
-				//setObj[`repeating_attr_${rowID}_source`] = '';
 				writeValues(debug, timer, value, `${handsource}_name`, '', setObj);
 				writeValues(debug, timer, value, `${handsource}_source`, '', setObj);
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_source`, '', setObj);
 			}
-			clog(debug, timer, 'handsource =', handsource, 'setArms()');
 		}
 		
 		function updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, source, sourceAttr, setObj){
+			clog(debug, timer, 'source =', source, 'updateWeaponStates()');
 			const handsource = getHandSource(debug, timer, extraarmIDs, source);
 			const state = parseInt(value[`${handsource}_state`]) || 0;
-			clog(debug, timer, 'state =', state, 'updateWeaponStates()');
+			clog(debug, timer, 'state =', state);
 			if(state > 0) {
-				setWeaponStates(debug, timer, extraarmIDs, value, handsource, setObj);
+				//setWeaponStates(debug, timer, extraarmIDs, value, handsource, setObj);	
 				setActiveWeapon(debug, timer, value, handsource, setObj);
 				setCombatRoll(debug, timer, value, attrdb, value[`${source}_source`], sourceAttr, setObj);
 			}
+			clearWeaponStates(debug, timer, extraarmIDs, value, setObj);
 		}
 		
 		function setWeapon(isActive, debug, timer, value, attrIDs, extraarmIDs, rowID, sourceAttr, setObj, attrdb, attribute) {
 			const name = value[`repeating_attr_${rowID}_name`] || "";
+			clog(debug, timer, 'name =', name, 'setWeapon()');
 			const hands = 
 				attribute === 'telekinesis' || attribute === 'swarm' ? 0 :
 				getCustomizationValue(debug, timer, value, rowID, 'rank', 'hands') ? 2 :
 				getCustomizationValue(debug, timer, value, rowID, 'rank', 'nohands') ? 0 : 1;
+			clog(debug, timer, 'hands =', hands);
 			const mainsource = value.mainhand_source || "";
 			const offsource = value.offhand_source || "";
 			switch (hands) {
@@ -11558,8 +11574,10 @@
 						extraarmIDs.push(extraarmID.toLowerCase());
 						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_state`, 0, setObj);
 						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_type`, 0, setObj);
+						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_source`, rowID, setObj);
 						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_name`, name, setObj);
 						writeValues(debug, timer, value, `repeating_extraarm_${extraarmID}_label`, capital(attribute), setObj);
+						updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, extraarmID, sourceAttr, setObj);
 					} else {
 						let source = 
 							setObj[`repeating_attr_${rowID}_source`] || 
@@ -11582,14 +11600,6 @@
 				case 1: //single handed
 					if (isActive) {
 						const extrahands = _.chain(extraarmIDs)
-							/*	
-							.each((id, i) => {
-								if (parseInt(value[`repeating_extraarm_${id}_type`]) == 0 || 
-									value[`repeating_extraarm_${id}_source`].length > 0) {
-										delete id[i];
-								}
-							})
-							*/
 							.map(id => {
 								const availableHand =
 									parseInt(value[`repeating_extraarm_${id}_type`]) === 0 ? '' :
@@ -11652,20 +11662,13 @@
 					}
 				break;
 				case 2: //two-handed
+					clog(debug, timer, 'two-handed', '');
 					if (isActive) {
 						const extrahands = _.chain(extraarmIDs)
-							/*
-							.each((handID, i) => {
-								if (parseInt(value[`repeating_extraarm_${handID}_type`]) == 0 || 
-									value[`repeating_extraarm_${handID}_source`].length > 0) {
-										delete handID[i];
-								}
-							})
-							*/
 							.map(id => {
 								const availableHand =
 									parseInt(value[`repeating_extraarm_${id}_type`]) === 0 ? '' :
-									value[`repeating_extraarm_${id}_source`].length > 0 ? '' :
+									!isFalsey(value[`repeating_extraarm_${id}_source`]) ? '' :
 									id;
 								return availableHand;
 							})
@@ -11700,13 +11703,12 @@
 					} else {
 						let source = setObj[`repeating_attr_${rowID}_source`] || 
 							value[`repeating_attr_${rowID}_source`] || '';
-						//if (/(mainhand|offhand)/i.test(source)) {
 						if (hands_array.indexOf(source) !== -1) {
 							setArms(debug, timer, value, rowID, setObj, name, false, "mainhand");
 							setArms(debug, timer, value, rowID, setObj, name, false, "offhand");
 							updateWeaponStates(debug, timer, attrdb, extraarmIDs, value, "mainhand", sourceAttr, setObj);
 						} else {
-							if (source.indexOf(',') > 1) source = source.split(',');
+							if (source.indexOf(',') !== -1) source = source.split(',');
 							_.each(source, (extraarm, i) => {
 								if (extraarm === source[i]) {
 									setArms(debug, timer, value, rowID, setObj, name, false, extraarm);
@@ -11717,7 +11719,6 @@
 					}
 				break;
 			}
-			clog(debug, timer, 'sourceAttr =', sourceAttr, 'setWeapon()');
 		}
 		
 		function disableWeapon(debug, timer, attrIDs, value, source, attrdb, setObj) {
@@ -12355,9 +12356,9 @@
 			return result;
 		}
 		
-		function setActiveWeapon(debug, timer, value, rowID, setObj) {
-			const state = parseInt(setObj[`${rowID}_state`]) || 0;
-			const source = state > 0 ? value[`${rowID}_source`] : '';
+		function setActiveWeapon(debug, timer, value, handsource, setObj) {
+			const state = parseInt(setObj[`${handsource}_state`]) || 0;
+			const source = state !== 0 ? value[`${handsource}_source`] : '';
 			clog(debug, timer, 'source =', source, 'setActiveWeapon()');
 			if (source !== undefined) {
 				//setObj.previous_weapon = setObj.active_weapon || value.active_weapon;
@@ -12474,13 +12475,15 @@
 			let ammostate = parseInt(value.weapon_ammo_reloads) || 0;
 			const reloadcapacity = ammostate > 0 ? capacity : 0;
 			const reloadammo = ammostate > 0 ? ammostate -= 1 : 0;
+			clog(debug, timer, 'active_weapon =', rowID, 'setWeaponReload()');
 			writeValues(debug, timer, value, 'weapon_ammo_reloads', reloadammo, setObj);
 			writeValues(debug, timer, value, 'weapon_ammo_capacity', reloadcapacity, setObj);
-			clog(debug, timer, 'reloads =', setObj.weapon_ammo_reloads, 'setWeaponReload()');
-			clog(debug, timer, 'capacity =', setObj.weapon_ammo_capacity);
 		}
 		
 		function setWeaponAmmo(debug, timer, attrdb, value, handsource, setObj) {
+			const activeHasAmmo = getCustomizationValue(debug, timer, value, setObj.active_weapon, 'rank', 'ammo') ? true : false;
+			const previousHasAmmo = getCustomizationValue(debug, timer, value, value.previous_weapon, 'rank', 'ammo') ? true : false;
+			if (!activeHasAmmo && !previousHasAmmo) return;
 			const state = setObj[`${handsource}_state`];
 			const rowID = value[`${handsource}_source`];
 			const type = value[`repeating_attr_${rowID}_attribute`];
@@ -12488,13 +12491,13 @@
 			const capacitystate = parseInt(value.weapon_ammo_capacity) || 0;
 			clog(debug, timer, 'ammostate =', ammostate, 'setWeaponAmmo()');
 			clog(debug, timer, 'capacitystate =', capacitystate);
-			if (rowID !== setObj.previous_weapon && _.isString(setObj.previous_weapon)) {
+			if (previousHasAmmo && rowID !== value.previous_weapon && !isFalsey(value.previous_weapon)) {
 				clog(debug, timer, 'weapon change, save ammo state', '');
-				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_ammostate`, ammostate, setObj);
-				writeValues(debug, timer, value, `repeating_attr_${setObj.previous_weapon}_capacitystate`, capacitystate, setObj);	
+				writeValues(debug, timer, value, `repeating_attr_${value.previous_weapon}_ammostate`, ammostate, setObj);
+				writeValues(debug, timer, value, `repeating_attr_${value.previous_weapon}_capacitystate`, capacitystate, setObj);	
 			}
 			if (type === 'telekinesis' || type === 'swarm') return;
-			if (state) {//weapon armed, load ammo state
+			if (activeHasAmmo && state) {//weapon armed, load ammo state
 				clog(debug, timer, 'weapon armed, load ammo state', '');
 				const weapon = _.find(attrdb[`${type}`], w => {
 					if (w.source == rowID) return true;
@@ -12504,17 +12507,17 @@
 					if (c.name == 'ammo') return true;
 				});
 				if (!getIsObject(customization)) return;
-				const ammo = isNaN(parseInt(value[`repeating_attr_${rowID}_ammostate`])) ?
-					getAmmoMax(debug, timer, customization.rank) : 
-					parseInt(value[`repeating_attr_${rowID}_ammostate`]) || 0;
-				const capacity = isNaN(parseInt(value[`repeating_attr_${rowID}_capacitystate`])) ?
-					0 :
-					parseInt(value[`repeating_attr_${rowID}_capacitystate`]) || 0;
+				const ammo = parseInt(customization.rank) === 4 ? 0 :
+					isNaN(parseInt(value[`repeating_attr_${rowID}_ammostate`])) ?
+						getAmmoMax(debug, timer, customization.rank) : 
+						parseInt(value[`repeating_attr_${rowID}_ammostate`]) || 0;
+				const capacity = isNaN(parseInt(value[`repeating_attr_${rowID}_capacitystate`])) ? 
+					parseInt(customization.rank) === 4 ?
+						parseInt(value[`repeating_attr_${rowID}_capacity`]) || 0 :
+						0 : parseInt(value[`repeating_attr_${rowID}_capacitystate`]) || 0;
 				writeValues(debug, timer, value, 'weapon_ammo_reloads', ammo, setObj);
 				writeValues(debug, timer, value, 'weapon_ammo_capacity', capacity, setObj);
-				clog(debug, timer, 'ammo =', ammo, 'setWeaponAmmo()');
-				clog(debug, timer, 'capacity =', capacity);
-			} else if (rowID.length === 20) {//weapon unarmed, save ammo state
+			} else if (previousHasAmmo && !state && rowID === value.previous_weapon) {//} if (rowID.length === 20 && !state) {//weapon unarmed, save ammo state
 				clog(debug, timer, 'weapon unarmed, save ammo state', '');
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_ammostate`, ammostate, setObj);
 				writeValues(debug, timer, value, `repeating_attr_${rowID}_capacitystate`, capacitystate, setObj);
@@ -12534,7 +12537,6 @@
 			const weapondb = attrdb[`${type}`].find(o => {
 				if (o.source == weapon) return true;
 			});
-			//const customizations = weapondb.customizations;	
 			//set default overrides
 			_.each(weapondb.customizations, customization => {
 				switch(customization.name){
@@ -12548,7 +12550,6 @@
 					break;
 					case 'range':
 						const selection = customization.rank > 2 ?
-							//parseInt(setObj.static_weapon_range_selection) || 
 							parseInt(value.static_weapon_range_selection) ||
 							1 :
 							1;
@@ -13376,25 +13377,27 @@
 		}
 		
 		function recordAmmoState(debug, timer, value, setObj) {
+			clog(debug, timer, '', '', 'recordAmmoState()');
 			writeValues(debug, timer, value, `repeating_attr_${value.active_weapon}_ammostate`, value.weapon_ammo_reloads, setObj);
 			writeValues(debug, timer, value, `repeating_attr_${value.active_weapon}_capacitystate`, value.weapon_ammo_capacity, setObj);
 		}
 		
 		function disableActiveWeapon(debug, timer, value, rowID, setObj) {
+			clog(debug, timer, '', '', 'disableActiveWeapon()');
 			const attribute = value[`repeating_attr_${rowID}_attribute`];
 			if (attribute !== 'weapon') return;
-			const activeweapon = value.active_weapon || 'empty';
-			if (activeweapon.length === 20) recordAmmoState(debug, timer, value, setObj);
+			const activeweapon = value.active_weapon || '';
+			if (activeweapon.length !== 0) recordAmmoState(debug, timer, value, setObj);
 			setObj.weapon_range = 0;
 			setObj.weapon_ammo_autofire = 0;
 			setObj.weapon_ammo = 0;
 			setObj.weapon_autofire = 0;
 			const state = parseInt(setObj[`repeating_attr_${rowID}_activate`]) || 
 				parseInt(value[`repeating_attr_${rowID}_activate`]) || 0;
-			clog(debug, timer, 'state =', state, 'disableActiveWeapon()');
+			clog(debug, timer, 'state =', state);
 			clog(debug, timer, 'activeweapon =', activeweapon);
 			if (!state) return;
-			if (activeweapon == rowID) {
+			if (activeweapon === rowID) {
 				setObj.active_weapon = '';
 			}
 		}
@@ -13432,35 +13435,63 @@
 		}
 		
 		function getHandSource(debug, timer, extraarmIDs, rowID){
+			rowID = rowID.toLowerCase();
 			const handsource = /(mainhand|offhand)/i.test(rowID) ? rowID : 
 				extraarmIDs !== undefined ? extraarmIDs.indexOf(rowID) !== -1 ?
 					`repeating_extraarm_${rowID}` : '' : '';
+			clog(debug, timer, 'handsource =', handsource, 'getHandSource()');
 			const handscheck = handsource !== '' ? handsource.indexOf(',') > 0 ? 
 				handsource.split(',') : handsource : false;
+			clog(debug, timer, 'handscheck =', handscheck);
 			const result = handscheck !== false ? _.isArray(handscheck) ? 
 				handscheck[0] : handscheck : false;
-			clog(debug, timer, 'result =', result, 'getHandSource()');
+			clog(debug, timer, 'result =', result);
 			return result;
 		}
 		
-		function setWeaponStates(debug, timer, extraarmIDs, value, rowID, setObj) {
-			const armedID = 
-				setObj[`${rowID}_source`] ||
-				value[`${rowID}_source`];
+		function clearWeaponStates(debug, timer, extraarmIDs, value, setObj) {
 			const handsArray = buildHandsArray(debug, timer, extraarmIDs);
+			_.each(handsArray, hand => {
+				writeValues(debug, timer, value, `${hand}_state`, 0, setObj);
+			});
+		}
+		
+		function setWeaponStates(debug, timer, extraarmIDs, value, handsource, setObj) {
+			clog(debug, timer, 'handsource =', handsource, 'setWeaponStates()');
+			const armedID = 
+				setObj[`${handsource}_source`] ||
+				value[`${handsource}_source`];
+			clog(debug, timer, 'armedID =', armedID);
+			//const handSources = value[`repeating_attr_${armedID}_source`] !== undefined ?
+			//	value[`repeating_attr_${armedID}_source`].indexOf(',') !== -1 ?
+			//		value[`repeating_attr_${armedID}_source`].split(',') :
+			//		value[`repeating_attr_${armedID}_source`] : '';
+			//const isTwoHanded = _.isArray(handSources);
+			const handsArray = buildHandsArray(debug, timer, extraarmIDs);
+			clog(debug, timer, 'handsArray =', handsArray);
 			const handsStateArray = 
 				_.map(handsArray, hand => {
 					const source = setObj[`${hand}_source`] || value[`${hand}_source`];
+					clog(debug, timer, 'hand[source] =', `${hand}[${source}]`);
 					const state = parseInt(setObj[`${hand}_state`]) || parseInt(value[`${hand}_state`]) || 0;
+					clog(debug, timer, 'state =', state);
+					//const isActive = //isNaN(parseInt(setObj[`repeating_attr_${source}_activate`])) ?
+						//parseInt(value[`repeating_attr_${source}_activate`]) || 0 :
+					//	parseInt(setObj[`repeating_attr_${source}_activate`]) || 0;
+					//clog(debug, timer, 'isActive =', isActive);
+					//const sourceHandPosition = handSources.indexOf(hand);
 					const isExtraArm = extraarmIDs.indexOf(hand) !== -1 ? true : false;
 					const extraArmType = parseInt(value[`${hand}_type`]) || false;
 					const isWeaponMount = isExtraArm && extraArmType === 0 ? true : false;
 					const handstate = source == armedID ?
-							state == 0 ? 1 : 0 : 0;
+						//isTwoHanded ?
+						//	parseInt(setObj[`${handSources[0]}_state`]) || parseInt(value[`${handSources[0]}_state`]) === 0 ? 1 : 0 :
+						state === 0 ? 1 : 0 : 0;
 					return handstate;
 				});
-			clog(debug, timer, 'handsStateArray:', handsStateArray, 'setWeaponStates()');
+			clog(debug, timer, 'handsStateArray:', handsStateArray);
 			_.each(handsArray, (hand, i) => {
+				clog(debug, timer, 'hand[state]', `${hand}[${handsStateArray[i]}]`);
 				//setObj[`${hand}_state`] = handsStateArray[i];
 				writeValues(debug, timer, value, `${hand}_state`, handsStateArray[i], setObj);
 			});
@@ -14172,15 +14203,24 @@
 										if (!getIsLocked(debug, timer, value, rowID, sourceAttr)) return;
 										if (getFluxGroupIsNotActive(debug, timer, value, rowID)) return;
 										const isActive = setButtonState(debug, timer, value, source, rowID, sourceAttr, setObj);
+										setAttrEffects(debug, timer, isActive, value, attrdb, extraarmIDs, attrIDs, skillIDs, sectionName, rowID, sourceAttr, setObj);
 										const handsource = getHandSource(debug, timer, extraarmIDs, value[`repeating_attr_${rowID}_source`]);
 										const handstate = handsource !== false ? parseInt(value[`${handsource}_state`]) || 0 : false;
-										setAttrEffects(debug, timer, isActive, value, attrdb, extraarmIDs, attrIDs, skillIDs, sectionName, rowID, sourceAttr, setObj);
+										clog(debug, timer, 'handstate =', handstate, 'TEST');
+										
 										//setPoolCostIfGroupIsFlux(debug, timer, attrIDs, value, rowID, setObj);
 										setAttrGroupPoolSpentByActivation(debug, timer, isActive, attrIDs, value, rowID, setObj);
 										//setPoolCostIfGroupIsVariation(debug, timer, isActive, attrIDs, value, rowID, setObj);
 										disableActiveWeapon(debug, timer, value, rowID, setObj);
 										if (handstate) {
 											setWeaponAmmo(debug, timer, attrdb, value, handsource, setObj);
+		
+											//const handsource = getHandSource(debug, timer, extraarmIDs, rowID);
+											//setWeaponStates(debug, timer, extraarmIDs, value, rowID, setObj);
+											//setActiveWeapon(debug, timer, value, handsource, setObj);
+											//setActiveWeaponUI(debug, timer, attrdb, value, setObj);
+											//setWeaponAmmo(debug, timer, attrdb, value, handsource, setObj);
+											//setCombatRoll(debug, timer, value, attrdb, value[`${handsource}_source`], sourceAttr, setObj);
 										}
 										setGroupDefectPointsOnActivation(debug, timer, attrIDs, attrdb, value, sectionName, rowID, setObj);
 										setDepleteResurvation(debug, timer, attrdb, value, rowID, setObj);
@@ -14369,8 +14409,9 @@
 								setStatButtonStatsAndRolls(debug, timer, eventInfo, value, rowID, sourceAttr, setObj);
 								switch (`${sourceAttr}`) {
 									case `armedstate`:
+										const handsource = getHandSource(debug, timer, extraarmIDs, rowID);
 										setWeaponStates(debug, timer, extraarmIDs, value, rowID, setObj);
-										setActiveWeapon(debug, timer, value, rowID, setObj);
+										setActiveWeapon(debug, timer, value, handsource, setObj);
 										setActiveWeaponUI(debug, timer, attrdb, value, setObj);
 										setWeaponAmmo(debug, timer, attrdb, value, rowID, setObj);
 										setCombatRoll(debug, timer, value, attrdb, value[`${rowID}_source`], sourceAttr, setObj);

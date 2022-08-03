@@ -150,7 +150,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   const eDegatsContinus = isApplied(effet[`${prefix}degatContinue`]);
   const eDegatsContinusV = effet[`${prefix}degatContinueValue`] || 0;
   const eDeuxMains = isApplied(effet[`${prefix}deuxMains`]);
-  const eDemoralisant = isApplied(effet[`${prefix}eDemoralisant`]);
+  const eDemoralisant = isApplied(effet[`${prefix}demoralisant`]);
   const eDesignation = isApplied(effet[`${prefix}designation`]);
   const eDestructeur = isApplied(effet[`${prefix}destructeur`]);
   const eDestructeurV = 2;
@@ -2890,7 +2890,7 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
   return result;
 }
 
-function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = []) {
+function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
@@ -2926,6 +2926,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   let typeScout = '';
 
   let bonusWarrior = 0;
+  let isConditionnelA = false;
 
   switch (armure) {
     case 'barbarian':
@@ -2948,11 +2949,13 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
 
         if (ODBarbarian.length === 0) { exec.push('{{vODBarbarian=[[0]]}}'); } else { exec.push(`{{vODBarbarian=[[${ODBarbarian.join('+')}]]}}`); }
 
-        diceDegats += goliath;
-        diceViolence += goliath;
+        if (!distance) {
+          diceDegats += goliath;
+          diceViolence += goliath;
 
-        exec.push(`{{vBarbarianD=+${goliath}D6}}`);
-        exec.push(`{{vBarbarianV=+${goliath}D6}}`);
+          exec.push(`{{vBarbarianD=+${goliath}D6}}`);
+          exec.push(`{{vBarbarianV=+${goliath}D6}}`);
+        }
 
         if (goliath >= 4 && !aEffets.includes(i18n_antiVehicule)) {
           autresEffets.push(i18n_antiVehicule);
@@ -2974,9 +2977,13 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       if (ghost !== 0) {
         exec.push(`{{special2=${i18n_ghostActive}}}`);
 
-        if (isELumiere === false && isASLumiere === false) {
+        if (simpleRoll) {
+          exec.push(`{{vODGhostA=${i18n_ghost}}} {{vODGhostAValue=${3}}}`);
+          isConditionnelA = true;
+        } else if (isELumiere === false && isASLumiere === false) {
           const totalGhost = vDiscretion + oDiscretion;
 
+          isConditionnelA = true;
           exec.push(`{{vGhostA=${vDiscretion}D6+${oDiscretion}}}`);
           exec.push(`{{vGhostD=${totalGhost}}}`);
           cRoll.push(vDiscretion);
@@ -3132,11 +3139,12 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   result.ODShaman = ODShaman;
   result.ODWarrior = ODWarrior;
   result.autresEffets = autresEffets;
+  result.isConditionnelA = isConditionnelA;
 
   return result;
 }
 
-function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = []) {
+function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
@@ -3162,6 +3170,8 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
 
   let ODMALWarrior = 0;
 
+  let isConditionnelA = false;
+
   switch (armureL) {
     case 'barbarian':
       MALGoliath = Number(value.MALBarbarianGoliath);
@@ -3183,11 +3193,13 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
 
         if (ODMALBarbarian.length === 0) { exec.push('{{vODMALBarbarian=[[0]]}}'); } else { exec.push(`{{vODMALBarbarian=[[${ODMALBarbarian.join('+')}]]}}`); }
 
-        diceDegats += MALGoliath;
-        diceViolence += MALGoliath;
+        if (!distance) {
+          diceDegats += MALGoliath;
+          diceViolence += MALGoliath;
 
-        exec.push(`{{vMALBarbarianD=+${MALGoliath}D6}}`);
-        exec.push(`{{vMALBarbarianV=+${MALGoliath}D6}}`);
+          exec.push(`{{vMALBarbarianD=+${MALGoliath}D6}}`);
+          exec.push(`{{vMALBarbarianV=+${MALGoliath}D6}}`);
+        }
 
         if (MALGoliath >= 4 && !aEffets.includes(i18n_antiVehicule)) {
           autresEffets.push(i18n_antiVehicule);
@@ -3209,11 +3221,15 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
       if (MALGhost !== '') {
         exec.push(`{{MALspecial2=${i18n_ghostActive}}}`);
 
-        if (isELumiere === false && isASLumiere === false) {
+        if (simpleRoll) {
+          exec.push(`{{vODMALGhostA=${i18n_ghost}}} {{vODMALGhostAValue=3}}`);
+          isConditionnelA = true;
+        } else if (isELumiere === false && isASLumiere === false) {
           const totalMALGhost = vDiscretion + oDiscretion;
 
           exec.push(`{{vMALGhostA=${vDiscretion}D6+${oDiscretion}}}`);
           exec.push(`{{vMALGhostD=${totalMALGhost}}}`);
+          isConditionnelA = true;
           cRoll.push(vDiscretion);
           ODMALRogue.push(oDiscretion);
           bDegats.push(totalMALGhost);
@@ -3359,6 +3375,7 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
   result.ODMALShaman = ODMALShaman;
   result.ODMALWarrior = ODMALWarrior;
   result.autresEffets = autresEffets;
+  result.isConditionnelA = isConditionnelA;
 
   return result;
 }
