@@ -1,6 +1,8 @@
 Change Log
 ==============================================
-**2022-07-28 ** v.56 Chuz (James Culp)
+**2022-08-08 ** v.57 Chuz (James Culp)
+
+**2022-08-04 ** v.56 Chuz (James Culp)
 	Bugfix - There were 10 repeating sections that didn't use "name" for the name field.  Fixed this to make other automated tasks easier to achieve in the future.
 	New Feature - added Composure roll button to Grunts
 	Bugfix - Cleaned up non-PC sheets to show condition monitors better (including the max)
