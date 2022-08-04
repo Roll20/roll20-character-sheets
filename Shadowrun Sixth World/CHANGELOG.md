@@ -6,6 +6,7 @@ Change Log
 	Bugfix - Cleaned up non-PC sheets to show condition monitors better (including the max)
 	Bugfix - Fixed how display of matrix device and matrix roll buttons work.
 	New Feature - normalized the styling on non-PC sheets a little bit to help mark separate sections better.
+	New Feature - Added Logs section under the Notes Pane for keeping track of missions and rewards.  This is purely for note taking purposes and isn't automated anywhere.
 **2022-07-26 ** v.55 Chuz (James Culp)
 	Bugfix - Imports choked if the character in Genesis has a lifestyle that is not associated with a specific SIN, the code is more forgiving for this now.
 	New Feature - Added Edge Roll buttons to most PC sheet roll buttons on the sheet.  These can be toggled on/off via the check box in the Options Pane if you don't want them for your character/campaign.
