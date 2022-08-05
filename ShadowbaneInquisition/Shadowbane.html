@@ -1087,6 +1087,13 @@
 					value="!weapon-arc --clear"
 				>	Clear Arcs
 				</button>
+				<!-- 
+					!weapon-arc {{
+						--add   0|90 ?{Range|30}m #0F05 #000 2
+						--add -90|90 ?{Range|30}m #FF05 #000 2
+						--add  90|90 ?{Range|30}m #FF05 #000 2
+						--add 180|90 ?{Range|30}m #F005 #000 2
+					}}-->
 			</div>
 
 		</div>
@@ -1242,13 +1249,18 @@
 					</div>
 
 					<div class='sheet-minimisable_infographic_field2x3 sheet-radius_border'>
-						<button 
+						<!-- <button 
 							title='Roll to see if you keep the Fate Point, If you are from a Shrine World activate that option in the settings'
 							name='fate_roll'
 							type='roll'
 							 class='sheet-minimisable_infographic_g1 sheet-clear sheet-radius_border_top'
 							value='@{to-gm}&{template:mythic} {{character= @{character_name}}}{{fate= [[1d10cs10@{settings_fate}]]}}'
 						>
+							Fate Pts
+						</button> -->
+						<button
+							title='Roll to see if you keep the Fate Point, If you are from a Shrine World activate that option in the settings'
+							name='act_fate_roll' type='action' class='sheet-minimisable_infographic_g1 sheet-clear sheet-radius_border_top'>
 							Fate Pts
 						</button>
 						<p class='sheet-minimisable_infographic_g2'>
@@ -4393,6 +4405,85 @@ NOTE: replace worker by javascript for IDE functionality
 <script type='text/worker'>
 // <script>
 
+	 on('clicked:fate_roll', () => {
+		getAttrs(['fate'], (v) => {
+			startRoll("@{to-gm}&{template:mythic} {{character= @{character_name}}}{{fate= [[1d10cs10@{settings_fate}]]}}", (results) => {
+				const total = results.results.fate.result
+				const computed = (total == 10) ? "Success" : "Failure"
+
+				finishRoll(
+					results.rollId,
+					{
+						fate: computed
+					}
+				);
+				if (computed == "Failure") {
+					const fate = parseInt(v.fate) - 1
+					setAttrs({fate: fate})
+				}
+			});
+		});
+    });
+
+	const HIT_LOCATIONS = {
+		'Head': ['Head', 'Head', 'Arm ', 'Body', 'Arm', 'Body'],
+		'Right_Arm' : ['Right Arm', 'Arm', 'Body', 'Head', 'Body', 'Arm'],
+		'Left_Arm' : ['Left Arm', 'Arm', 'Body', 'Head', 'Body', 'Arm'],
+		'Body': ['Body', 'Body', 'Arm', 'Head', 'Arm', 'Body'],
+		'Right_Leg' : ['Right Leg', 'Leg', 'Body', 'Arm', 'Head', 'Body'],
+		'Left_Leg' : ['Left Leg', 'Leg', 'Body', 'Arm', 'Head', 'Body']
+	}
+	
+	function determineHitsLocations(roll) {
+		if (roll <= 10) return HIT_LOCATIONS.Head
+		if (roll <= 20) return HIT_LOCATIONS.Right_Arm
+		if (roll <= 30) return HIT_LOCATIONS.Left_Arm
+		if (roll <= 70) return HIT_LOCATIONS.Body
+		if (roll <= 85) return HIT_LOCATIONS.Right_Leg
+		return HIT_LOCATIONS.Left_Leg
+	}
+
+	function reverseRoll(roll) {
+		let result = roll.toString()
+		if (result.length == 1) result = "0" + result
+		result = result.split("").reverse().join("")
+		return parseInt(result)
+	}
+
+	on('clicked:repeating_rangedweapons:hit', () => {
+		getAttrs(['repeating_rangedweapons_id'], (v) => {
+			let id = `repeating_rangedweapons_${v.repeating_rangedweapons_id}`
+			console.log(id)
+			startRoll(`@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{${id}_R_weapon_name}}}{{dos=[[[[1+ floor(abs([[{{ {@{${id}_R_weapon_target}+@{inlinemod-toggle}},{@{bsTotal}-@{limiter}}}kh1,{@{bsTotal}+@{limiter}}}kl1]]-[[1d100@{${id}_R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll}{{aim= [[@{${id}_R_weapon_aim}]]}}{{${id}_R_type= [[@{${id}_R_weapon_attack}]]}}{{range= [[@{${id}_R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{${id}_R_weapon_mod1}]]}}{{trained= [[@{${id}_R_weapon_trained}]]}}{{burst=@{${id}_R_weapon_burst}}}{{auto=@{${id}_R_weapon_auto}}}`, (results) => {
+				console.log(results)
+				let roll = results.results.roll.result
+				let hitRoll = reverseRoll(roll)
+				console.log(hitRoll)
+
+				console.log(determineHitsLocations(hitRoll))
+
+				console.log(roll)
+				finishRoll(
+					results.rollId,
+					{
+						dos: results.results.dos.result,
+						target: results.results.target.result,
+						roll: results.results.roll.result,
+						dof: results.results.dof.result,
+						aim: results.results.aim.result,
+						range: results.results.range.result,
+						modifier: results.results.modifier.result,
+						skill: results.results.skill.result,
+						advancement: results.results.advancement.result,
+						weaponmod: results.results.weaponmod.result,
+						trained: results.results.trained.result,
+						loc: determineHitsLocations(hitRoll)[0]
+					}
+				);
+			});
+		});
+	});
+
 	// repeating sections data array
     const BUFF = {
         active: 'active_r',
@@ -5141,23 +5232,25 @@ NOTE: replace worker by javascript for IDE functionality
 					if (firstAptitude || secondAptitude)   return 800
 					if (!firstAptitude && !secondAptitude) return 1200
 				}
-				if (t4Talent) {
-					var firstAptitude  = aptitudes.includes(t3Talent.aptitudes[0].toLowerCase())
-					var secondAptitude = aptitudes.includes(t3Talent.aptitudes[1].toLowerCase())
-					
-					if (firstAptitude && secondAptitude)   return 800
-					if (firstAptitude || secondAptitude)   return 1200
-					if (!firstAptitude && !secondAptitude) return 1700
-				}
+				//if (t4Talent) {
+				//	var firstAptitude  = aptitudes.includes(t3Talent.aptitudes[0].toLowerCase())
+				//	var secondAptitude = aptitudes.includes(t3Talent.aptitudes[1].toLowerCase())
+				//	
+				//	if (firstAptitude && secondAptitude)   return 800
+				//	if (firstAptitude || secondAptitude)   return 1200
+				//	if (!firstAptitude && !secondAptitude) return 1700
+				//}
 			}
 
-			var costL = xpCalc(values['repeating_advancements_advancement_nameL_r'])
-			var costR = xpCalc(values['repeating_advancements_advancement_nameR_r'])
+			var costL = xpCalc(values['repeating_advancements_advancement_nameL_r']) || 0
+			var costR = xpCalc(values['repeating_advancements_advancement_nameR_r']) || 0
 
 			var attr = {}
 
 			if (costL) attr['repeating_advancements_advancement_costL_r'] = costL
 			if (costR) attr['repeating_advancements_advancement_costR_r'] = costR
+
+			console.log(attr)
 
 			setAttrs(attr,true)
 		})
@@ -7084,11 +7177,13 @@ NOTE: replace worker by javascript for IDE functionality
 				{{#^rollWasCrit() fate }}
 					<div class="sheet-template-center sheet-failure">
 						{{fate}}: Fate Point Lost
+						{{computed::fate}}: Fate Point Lost
 					</div>
 				{{/^rollWasCrit() fate }}
 				{{#rollWasCrit() fate }}
 					<div class="sheet-template-center sheet-success">
 						{{fate}}: Fate Point Saved
+						{{computed::fate}}: Fate Point Saved
 					</div>
 				{{/rollWasCrit() fate }}
 			</div>
@@ -7366,7 +7461,7 @@ NOTE: replace worker by javascript for IDE functionality
 					{{#attack}}
 						<div class="sheet-template-content">
 					{{/attack}}
-					<div class="sheet-template-row sheet-template-center sheet-template-break">Hit Location {{loc}}</div>
+					<div class="sheet-template-row sheet-template-center sheet-template-break">Hit Location {{computed::loc}}</div>
 					<div class="sheet-template-row sheet-template-center">
 						{{#rollBetween() loc 1 10}} HEAD {{/rollBetween() loc 1 10}}
 						{{#rollBetween() loc 11 20}} RIGHT ARM {{/rollBetween() loc 11 20}}
