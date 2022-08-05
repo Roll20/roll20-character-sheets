@@ -5,6 +5,8 @@ const REPEATING_PREFIX = 'repeating_';
 const eventHandlers = {};
 
 window.on = (eventNames, fn) => eventNames.split(' ').forEach(eventName => {
+  eventName = eventName.toLowerCase();
+
   let handlers;
   if (!eventHandlers.hasOwnProperty(eventName)) {
     handlers = [];
@@ -19,13 +21,47 @@ window.on = (eventNames, fn) => eventNames.split(' ').forEach(eventName => {
 });
 
 $(document).ready(() => {
+  const inputSelector = `input[name^='${ATTR_PREFIX}'], select[name^='${ATTR_PREFIX}']`;
+
+  // rename items that are in a fieldset (repeating section)
+  function isSharedSheetItem(item) {
+    // determines if an item belongs to the shared sheet,
+    // i.e. it has a parent with an input marking a shared page
+    if (item.siblings(`input[name='${ATTR_PREFIX}shared_page']`).length > 0) {
+      return true;
+    }
+
+    const parent = item.parent();
+    if (parent.length > 0) {
+      return isSharedSheetItem(parent);
+    }
+
+    return false;
+  }
+
+  $('fieldset').each(function () {
+    const fieldset = $(this);
+    const fieldsetId = fieldset.attr('class').split(' ').find(_ => _.startsWith(REPEATING_PREFIX));
+
+    // exclude fieldsets that are for the shared sheet, because they have the same name as in the character sheet and it fucks up the system
+    // (having the same name is not supposed to be supported in roll20 either)
+    if (!isSharedSheetItem(fieldset)) {
+      fieldset.find(`${inputSelector}, span[name^='${ATTR_PREFIX}']`).each(function () {
+        const input = $(this);
+        const attributeName = `${fieldsetId}_${input.attr('name').substring(ATTR_PREFIX.length)}`;
+        input.attr('name', `${ATTR_PREFIX}${attributeName}`);
+      });
+    }
+  });
+
+  // handle changes for input and select
   $(`input[name^='${ATTR_PREFIX}'], select[name^='${ATTR_PREFIX}']`).each(function () {
     const input = $(this);
 
-
-
     input.change(event => {
       const inputName = input.attr('name');
+
+      // get the value
       let value;
       if (input.attr('type') === 'checkbox') {
         value = event.target.checked ? 'on' : 'off';
@@ -35,19 +71,17 @@ $(document).ready(() => {
 
       console.log(`New value for input ${inputName}: ${value}`);
 
+      // set the attribute value
       let attributeName = inputName.substring(ATTR_PREFIX.length);
-      const fieldset = input.closest('fieldset'); // names of attributes in a fieldset are prefixed by its class
-      if (fieldset.length > 0) {
-        attributeName = `${fieldset.attr('class')}_${attributeName}`;
-      }
       setAttrs({ [`${attributeName}`]: value });
     });
   });
 
+  // handle rolls
   $("button[type='roll']").each(function () {
     const button = $(this);
     button.click(() => {
-      console.log(button.val());
+      window.alert(button.val());
     });
   });
 });
@@ -73,57 +107,51 @@ window.getAttrs = (attributeNames, fn) => {
 }
 
 window.setAttrs = attributes => {
-  const oldValues = {};
+  const previousValues = {};
   for (const attributeName in attributes) {
-    oldValues[attributeName] = getAttributeValue(attributeName);
+    previousValues[attributeName] = getAttributeValue(attributeName);
   }
 
   Object.assign(attributeStore, attributes);
 
   console.log('Stored attributes: ' + JSON.stringify(attributes));
 
-  for (const storedAttributeName in attributes) {
-    const attributeValue = attributes[storedAttributeName];
+  for (const attributeName in attributes) {
+    const attributeValue = attributes[attributeName];
 
-    // handle the attribute in a repeating section: its actual name is after the 2nd underscore
-    const fieldsetId = storedAttributeName.startsWith(REPEATING_PREFIX) ? storedAttributeName.substring(0, storedAttributeName.indexOf('_', REPEATING_PREFIX.length)) : null;
-
-    let attributeName = storedAttributeName;
-    if (fieldsetId) {
-      attributeName = storedAttributeName.substring(fieldsetId.length + 1);
-    }
+    const fieldsetId = attributeName.startsWith(REPEATING_PREFIX)
+      ? attributeName.substring(0, attributeName.indexOf('_', REPEATING_PREFIX.length))
+      : null;
 
     // set input value
-    const inputName = ATTR_PREFIX + attributeName;
-    const inputSelector = `input[name='${inputName}'], select[name='${inputName}']`;
-    let input;
-    if (fieldsetId) {
-      input = $(`fieldset[class='${fieldsetId}']`).children(inputSelector);
-    } else {
-      input = $(inputSelector);
-    }
+    const inputName = ATTR_PREFIX + attributeName.toLowerCase();
+    let input = $(`input[name='${inputName}'], select[name='${inputName}']`);
+
     console.log(`Updating input ${inputName} with value ${attributeValue}`);
 
     input.val([attributeValue]);
 
     // set span text
-    const span = $(`span[name='${ATTR_PREFIX}${attributeName}']`);
+    const span = $(`span[name='${ATTR_PREFIX}${attributeName.toLowerCase()}']`);
     span.text(attributeValue);
 
     // invoke event handlers
     let eventName;
-    if (storedAttributeName.startsWith(REPEATING_PREFIX)) {
-      eventName = `change:${fieldsetId}:${attributeName}`;
+    if (fieldsetId) {
+      const eventAttributeName = attributeName.substring(fieldsetId.length + 1);
+      eventName = `change:${fieldsetId}:${eventAttributeName}`;
     } else {
       eventName = `change:${attributeName}`;
     }
+    eventName = eventName.toLowerCase();
+
     if (eventHandlers.hasOwnProperty(eventName)) {
       console.log('Invoking handlers for event: ' + eventName);
 
       eventHandlers[eventName].forEach(handler => handler({
-        oldValue: oldValues[storedAttributeName],
+        previousValue: previousValues[attributeName],
         newValue: attributeValue,
-        sourceAttribute: storedAttributeName
+        sourceAttribute: attributeName
       }));
     }
   }

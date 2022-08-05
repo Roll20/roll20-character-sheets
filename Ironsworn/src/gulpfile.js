@@ -35,5 +35,5 @@ gulp.task('test-html', () => {
 
 gulp.task('test-watch', gulp.series(['css', 'test-html'], () => {
   gulp.watch('./app/**/*.styl', gulp.series(['css']))
-  gulp.watch(['./app/**/*.pug', './app/**/*.js', './test/**/*.pug', './test/**/*.js'], gulp.series(['test-html']))
+  gulp.watch(['./app/**/*.pug', './app/**/*.js', './test/**/*.pug', './test/**/*.js', '../translation.json'], gulp.series(['test-html']))
 }))

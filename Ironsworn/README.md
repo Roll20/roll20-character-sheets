@@ -37,11 +37,16 @@ It may be an empty object if you do not want to initialize some values.
 For instance:
 ``` js
 const attributeStore = {
+  close_changelog: 'on',
+  modes_choice: 'off',
+  mode: '0',
   edge: '1',
   heart: '2',
   iron: '3',
   shadow: '4',
-  wits: '5'
+  wits: '5',
+  momentum_max: 10,
+  momentum_reset: 2
 }; // don't forget the semi-colon
 ```
 
@@ -56,7 +61,9 @@ You **MUST** exclude these 2 files **locally** from git: in `.git/info/exclude` 
 ```
 
 ### Limitations
-Inputs in repeating sections (fieldset) are not handled properly.
+- Inputs in repeating sections (fieldset) may not be handled properly
+- Shared sheet repeating sections are not handled at all
+- Rolls are not interpreted
 
 ## Compatibility
 The sheet has been tested across multiple browsers and devices, show below in the compatibility matrix:
