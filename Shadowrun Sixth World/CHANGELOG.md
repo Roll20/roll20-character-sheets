@@ -1,7 +1,10 @@
 Change Log
 ==============================================
 **2022-08-08 ** v.57 Chuz (James Culp)
-
+	Bugfix - Updated mouseover text for Metamagics to indicate they are repeating metamagic not repeating powers
+	Bugfix - Updated Non-PC sheets to have Matrix AR, Matrix DR, Matrix Soak and Biofeedback Soak buttons as appropriate in the Defenses Pane
+	New Feature - Some updates to the Magic->Meta tab to clean up the layout and put a Magic AR button there as well.
+	Bugfix - Fixed some weirdness with Social->Contacts pane styles.
 **2022-08-04 ** v.56 Chuz (James Culp)
 	Bugfix - There were 10 repeating sections that didn't use "name" for the name field.  Fixed this to make other automated tasks easier to achieve in the future.
 	New Feature - added Composure roll button to Grunts
