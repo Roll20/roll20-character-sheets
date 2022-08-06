@@ -23,7 +23,6 @@ window.on = (eventNames, fn) => eventNames.split(' ').forEach(eventName => {
 $(document).ready(() => {
   const inputSelector = `input[name^='${ATTR_PREFIX}'], select[name^='${ATTR_PREFIX}']`;
 
-  // rename items that are in a fieldset (repeating section)
   function isSharedSheetItem(item) {
     // determines if an item belongs to the shared sheet,
     // i.e. it has a parent with an input marking a shared page
@@ -39,6 +38,8 @@ $(document).ready(() => {
     return false;
   }
 
+  // rename items that are in a fieldset (repeating section)
+  // attr_my_attr_name in section repeating_mysection => attr_repeating_mysection_my_attr_name
   $('fieldset').each(function () {
     const fieldset = $(this);
     const fieldsetId = fieldset.attr('class').split(' ').find(_ => _.startsWith(REPEATING_PREFIX));
@@ -81,7 +82,10 @@ $(document).ready(() => {
   $("button[type='roll']").each(function () {
     const button = $(this);
     button.click(() => {
-      window.alert(button.val());
+      const firstSpaceIndex = button.val().indexOf(' ');
+      let result = button.val().substring(2, firstSpaceIndex) + '\n';
+      result += (button.val().substring(firstSpaceIndex) + ' ').match(/\{\{(.+?)\}\} /g).map(_ => _.substring(2, _.length - 3)).join('\n');
+      window.alert(result + '\n\n' + button.val());
     });
   });
 });
@@ -106,58 +110,79 @@ window.getAttrs = (attributeNames, fn) => {
   fn(values);
 }
 
-window.setAttrs = attributes => {
+window.setAttrs = (attributes, isInit) => {
+  // cache previous values
   const previousValues = {};
   for (const attributeName in attributes) {
     previousValues[attributeName] = getAttributeValue(attributeName);
   }
 
+  // store new values
   Object.assign(attributeStore, attributes);
 
   console.log('Stored attributes: ' + JSON.stringify(attributes));
 
+  // react to value changes
   for (const attributeName in attributes) {
     const attributeValue = attributes[attributeName];
-
-    const fieldsetId = attributeName.startsWith(REPEATING_PREFIX)
-      ? attributeName.substring(0, attributeName.indexOf('_', REPEATING_PREFIX.length))
-      : null;
-
-    // set input value
-    const inputName = ATTR_PREFIX + attributeName.toLowerCase();
-    let input = $(`input[name='${inputName}'], select[name='${inputName}']`);
-
-    console.log(`Updating input ${inputName} with value ${attributeValue}`);
-
-    input.val([attributeValue]);
-
-    // set span text
-    const span = $(`span[name='${ATTR_PREFIX}${attributeName.toLowerCase()}']`);
-    span.text(attributeValue);
-
-    // invoke event handlers
-    let eventName;
-    if (fieldsetId) {
-      const eventAttributeName = attributeName.substring(fieldsetId.length + 1);
-      eventName = `change:${fieldsetId}:${eventAttributeName}`;
-    } else {
-      eventName = `change:${attributeName}`;
+    const eventInfo = {
+      previousValue: previousValues[attributeName],
+      newValue: attributeValue,
+      sourceAttribute: attributeName
     }
-    eventName = eventName.toLowerCase();
 
-    if (eventHandlers.hasOwnProperty(eventName)) {
-      console.log('Invoking handlers for event: ' + eventName);
+    // if the value changed
+    if (eventInfo.previousValue !== eventInfo.newValue || isInit) {
+      const fieldsetId = attributeName.startsWith(REPEATING_PREFIX)
+        ? attributeName.substring(0, attributeName.indexOf('_', REPEATING_PREFIX.length))
+        : null;
 
-      eventHandlers[eventName].forEach(handler => handler({
-        previousValue: previousValues[attributeName],
-        newValue: attributeValue,
-        sourceAttribute: attributeName
-      }));
+      // set the value of the input matching the attribute, which may be in a fieldset
+      if (fieldsetId) {
+        const fieldsets = $(`fieldset.${fieldsetId}`);
+        for (let i = 0; i < fieldsets.length; i++) {
+          const fieldset = fieldsets['' + i];
+
+          setValue($(fieldset));
+        }
+      } else {
+        setValue($('body'));
+      }
+
+      function setValue(inputParent) {
+        // set input value
+        const inputName = ATTR_PREFIX + attributeName.toLowerCase();
+
+        console.log(`Updating input ${inputName} with value ${attributeValue}`);
+
+        let input = inputParent.find(`input[name='${inputName}'], select[name='${inputName}']`);
+        input.val([attributeValue]);
+
+        // set span text
+        let span = inputParent.find(`span[name='${ATTR_PREFIX}${attributeName.toLowerCase()}']`);
+        span.text(attributeValue);
+      }
+
+      // invoke event handlers
+      let eventName;
+      if (fieldsetId) {
+        const eventAttributeName = attributeName.substring(fieldsetId.length + 1);
+        eventName = `change:${fieldsetId}:${eventAttributeName}`;
+      } else {
+        eventName = `change:${attributeName}`;
+      }
+      eventName = eventName.toLowerCase();
+
+      if (eventHandlers.hasOwnProperty(eventName)) {
+        console.log('Invoking handlers for event: ' + eventName);
+
+        eventHandlers[eventName].forEach(handler => handler(eventInfo));
+      }
     }
   }
 };
 
 // initialize attributes
 $(document).ready(() => {
-  setAttrs(attributeStore);
+  setAttrs(attributeStore, true);
 });

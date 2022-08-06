@@ -27,6 +27,11 @@ You can handle a new version in:
 - `src/app/workers/scripts/pages.js`: change the value of `changelog_X.Y.Z` to match
 - `src/app/pages/index.pug`: change the value of `attr_changelog_X.Y.Z` to match and add a new changelog entry
 
+## Tools
+- [Visual Studio Code](https://code.visualstudio.com/download)
+  - [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
+  - [stylus](https://marketplace.visualstudio.com/items?itemName=sysoev.language-stylus)
+
 ## Local testing
 A minimal framework for testing locally is present in `src/test`.
 It allows to generate an html page that almost renders and behaves as on the Sheet sandbox.
@@ -45,6 +50,9 @@ const attributeStore = {
   iron: '3',
   shadow: '4',
   wits: '5',
+  health: '5',
+  spirit: '5',
+  supply: '5',
   momentum_max: 10,
   momentum_reset: 2
 }; // don't forget the semi-colon
