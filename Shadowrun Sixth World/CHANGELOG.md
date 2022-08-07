@@ -7,6 +7,8 @@ Change Log
 	Bugfix - Fixed some weirdness with Social->Sins and Social->Contacts pane styles.
 	Bugfix - (not really a bug) updated the color for the Edge and Matrix Condition Monitor hexes to be the purple everything else is.	
 	New Feature - Added Matrix Soak and Biofeedback Soak buttons to Core Pane and Matrix Pane
+	New Feature - Added Damage Type to Combat spells in Magic->Spells pane, the Damage Type selector will disappear for non-combat spells.
+	New Feature - Updated Effect Type to hide values that make no sense (i.e. Single Sense / Multi Sense for anything but Illusion spells and The 4 combat options for any non-combat spells)
 	New Feature - Updated Spells to make it so the pop-up prompts for Amp-Up and Increase Area ONLY pop up when the spell is of the right type.  Only Combat spells get "Amp Up" prompts, Only "LOS (A)" spells get "Increase Area" prompts.  The "Agony" spell is by definition LOS but acts like LOS (A) in that it can be extended to multiple targets, you will want to enter it as LOS (A) there may be other similar spells.
 **2022-08-04 ** v.56 Chuz (James Culp)
 	Bugfix - There were 10 repeating sections that didn't use "name" for the name field.  Fixed this to make other automated tasks easier to achieve in the future.
