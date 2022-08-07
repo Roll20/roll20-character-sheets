@@ -83,7 +83,7 @@ $(document).ready(() => {
     const button = $(this);
     button.click(() => {
       const firstSpaceIndex = button.val().indexOf(' ');
-      let result = button.val().substring(2, firstSpaceIndex) + '\n';
+      let result = button.val().substring(2, firstSpaceIndex - 1) + '\n';
       result += (button.val().substring(firstSpaceIndex) + ' ').match(/\{\{(.+?)\}\} /g).map(_ => _.substring(2, _.length - 3)).join('\n');
       window.alert(result + '\n\n' + button.val());
     });
