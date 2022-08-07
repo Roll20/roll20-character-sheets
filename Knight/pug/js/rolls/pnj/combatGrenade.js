@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable camelcase */
 /* eslint-disable no-undef */
@@ -27,6 +28,10 @@ rollCombatGrenadePNJ.forEach((button) => {
     let AE = 0;
 
     let ameliorations = false;
+    let isSurprise = false;
+    let isDestructeur = false;
+    let isMeurtrier = false;
+    let isUltraviolence = false;
 
     let diceDegats = 3;
     let diceViolence = 3;
@@ -109,6 +114,9 @@ rollCombatGrenadePNJ.forEach((button) => {
 
         exec.push(`{{ultraviolence=${i18n_ultraviolence}}} {{ultraviolenceCondition=${i18n_ultraviolenceCondition}}} {{meurtrier=${i18n_meurtrier}}} {{meurtrierCondition=${i18n_meurtrierCondition}}}`);
         autresEffets.push(`${i18n_dispersion} 6`);
+
+        isUltraviolence = true;
+        isMeurtrier = true;
         break;
       case 'grenade2PNJ':
         isConditionnelA = true;
@@ -127,6 +135,8 @@ rollCombatGrenadePNJ.forEach((button) => {
         autresEffets.push(`${i18n_perceArmure} 20`);
         autresEffets.push(`${i18n_penetrant} 6`);
         autresEffets.push(`${i18n_dispersion} 6`);
+
+        isDestructeur = true;
         break;
       case 'grenade4PNJ':
         isConditionnelA = true;
@@ -185,6 +195,8 @@ rollCombatGrenadePNJ.forEach((button) => {
       exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
       exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
       exec.push(`${attaquesSurprisesCondition}`);
+
+      isSurprise = true;
     }
 
     if (autresEffets.length > 0) {
@@ -200,50 +212,44 @@ rollCombatGrenadePNJ.forEach((button) => {
 
     exec = firstExec.concat(exec);
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    // ROLL
+    const finalRoll = await startRoll(exec.join(' '));
+    const tJet = finalRoll.results.jet.result;
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    const finalComputed = {
+      jet: tJet + tBonus,
+    };
 
-      const tMeurtrier = results.results.meurtrierValue;
-      let vTMeurtrier = 0;
+    if (hasDgts) {
+      const rDegats = finalRoll.results.degats.dice;
+      const rViolence = finalRoll.results.violence.dice;
 
-      if (tMeurtrier !== undefined) { vTMeurtrier = tMeurtrier.dice[0]; }
+      const tDegats = finalRoll.results.degats.result;
+      const tViolence = finalRoll.results.violence.result;
 
-      const tDestructeur = results.results.destructeurValue;
-      let vTDestructeur = 0;
+      const conditions = {
+        isSurprise,
+        isDestructeur,
+        isMeurtrier,
+        isUltraviolence,
+      };
 
-      if (tDestructeur !== undefined) { vTDestructeur = tDestructeur.dice[0]; }
+      const computed = updateRoll(finalRoll, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
+      Object.assign(finalComputed, computed);
+    }
 
-      const tUltraviolence = results.results.ultraviolenceValue;
+    finishRoll(finalRoll.rollId, finalComputed);
 
-      let vTUltraviolence = 0;
+    if (tJet !== 0 && tJet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+      const tRExploit = exploitRoll.results.jet.result;
+      const exploitComputed = {
+        jet: tRExploit,
+      };
 
-      if (tUltraviolence !== undefined) { vTUltraviolence = tUltraviolence.dice[0]; }
-
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-          meurtrierValue: vTMeurtrier,
-          destructeurValue: vTDestructeur,
-          ultraviolenceValue: vTUltraviolence,
-        },
-      );
-
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
-
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });

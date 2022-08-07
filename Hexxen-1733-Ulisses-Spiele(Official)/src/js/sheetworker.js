@@ -1,4 +1,7 @@
-const buttonlist = ["character","combat","npc","configuration"];
+
+    const debug = false;
+
+    const buttonlist = ["character","combat","npc","configuration"];
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
             getAttrs(["npc"], function(values) {
@@ -72,17 +75,20 @@ const buttonlist = ["character","combat","npc","configuration"];
         });
     });
 
-    const resourcebuttonlist = ["addcoup","remcoup",
-    "addidea","remidea",
-    "addblessing","remblessing",
-    "addrage","remrage",
-    "addambition","remambition",
-    "addhex","remhex",
-    "addquintessence","remquintessence"];
+    const resourcebuttonlist = [
+        "addcoup","remcoup",
+        "addidea","remidea",
+        "addblessing","remblessing",
+        "addrage","remrage",
+        "addambition","remambition",
+        "addhex","remhex",
+        "addquintessence","remquintessence"
+    ];
     resourcebuttonlist.forEach(button => {
-        on(`clicked:${button}`, function() {
-            var action = button.substr(0,3);
-            var ressource = button.substr(3);
+        on(`clicked:${button}`, function(event) {
+            if (debug) console.log("add/remove resource:", event);
+            const action = button.substr(0,3);
+            const ressource = button.substr(3);
             getAttrs([ressource], function(values) {
                 let resourceValue = parseInt(values[ressource],10)||0;
                 if(action == "add")
@@ -91,21 +97,33 @@ const buttonlist = ["character","combat","npc","configuration"];
                     resourceValue = resourceValue -1;
                 resourceValue =  Math.min(Math.max(resourceValue, 0), 20);
 
-                var update = {};
-
-                if(resourceValue > 0)
-                {
-                    if(ressource == "rage")
-                        update["ambition"] = 0;
-                    else if(ressource == "ambition")
-                        update["rage"] = 0;
-                }
-
-
-                
+                const update = {};
                 update[ressource] = resourceValue;
                 setAttrs(update);
             });
+        });
+    });
+
+    on("change:blessing change:rage", (event) => {
+        if (debug) console.log("change resource:", event);
+        
+        // blessing vs. rage (Hjd p.102)
+        getAttrs(['blessing','rage'], (values) => {
+            const blessing = parseInt(values.blessing) || 0;
+            const rage = parseInt(values.rage) || 0;
+            if(blessing > 0 && rage > 0)
+            {
+                const update = {};
+                if(blessing > rage) {
+                    update["blessing"] = blessing - rage;
+                    update["rage"] = 0;
+                }
+                else {
+                    update["rage"] = rage - blessing;
+                    update["blessing"] = 0;
+                }
+                setAttrs(update);
+            }
         });
     });
     

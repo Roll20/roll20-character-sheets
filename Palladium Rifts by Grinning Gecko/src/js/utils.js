@@ -299,7 +299,7 @@ async function palladiumAddToTurnTracker(initKey, attacksKey) {
   ]);
   const initString = init > 0 ? `+${init}` : `${init}`;
   const roll = await startRoll(
-    `&{template:initiative} {{title=@{selected|character_name} rolls initiative!}} {{diceroll=[[1d20]]}} {{modifier=${initString}}}`
+    `@{opt_whisper}&{template:initiative} {{title=@{selected|character_name} rolls initiative!}} {{diceroll=[[1d20]]}} {{modifier=${initString}}}`
   );
   console.log(roll);
   const computed = roll.results.diceroll.result + init;
@@ -308,10 +308,49 @@ async function palladiumAddToTurnTracker(initKey, attacksKey) {
     diceroll: computed,
   });
   const addToTracker = await startRoll(
-    `Setting @{selected|character_name}'s initiative to [[[[${computed}]] &{tracker}]] in the Turn Tracker.`
+    `@{opt_whisper}&{template:custom} {{title=@{selected|character_name} added to Turn Tracker}} {{Initiative=[[[[${computed}]] &{tracker}]]}}`
   );
   finishRoll(addToTracker.rollId);
   // https://app.roll20.net/forum/post/6817409/multiple-initiative-values-for-a-single-character/?pageforid=6817748#post-6817748
   const dupeTracker = await startRoll(`!dup-turn ${attacks}`);
   finishRoll(dupeTracker.rollId);
+}
+
+/**
+ * Determines if a repeating section change event is a new row.
+ * Requires the repeating section to have a `rowid` attribute.
+ * Note that when a new row is added the
+ *
+ * @param {*} e Roll20 change event object.
+ * @returns bool
+ */
+async function isNewRow(e) {
+  const [r, section, rowId, attr] = e.sourceAttribute.split("_");
+  const rowPrefix = `${r}_${section}_${rowId}`;
+  const a = await getAttrsAsync([`${rowPrefix}_rowid`]);
+  if (a[`${rowPrefix}_rowid`].length === 0) {
+    await setAttrsAsync(
+      { [`${rowPrefix}_rowid`]: `${r}_${section}_${rowId}` },
+      { silent: true }
+    );
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Sets generic defaults when a new row is created.
+ *
+ * @param {*} e Roll20 change event object.
+ */
+async function setRowDefaults(e, setAttrsOptions) {
+  const [r, section, rowId, attr] = e.sourceAttribute.split("_");
+  const rowPrefix = `${r}_${section}_${rowId}`;
+  const a = await getAttrsAsync(["character_level"]);
+  const attrs = {
+    [`${rowPrefix}_levelacquired`]: a["character_level"],
+    [`${rowPrefix}_level`]: 1,
+  };
+  console.log(attrs);
+  await setAttrsAsync(attrs, setAttrsOptions);
 }
