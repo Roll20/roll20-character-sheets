@@ -81,6 +81,11 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+August 8th 2022 v1.6a
+
+- Fixed Enchanted Staff CN mod when casting. Should now add -1 appropriatly for all Lore's.
+- Fixed used with Characteristics Mod add reseting undere certain circumstances.
+
 
 July 11th 2022 v1.6
 
