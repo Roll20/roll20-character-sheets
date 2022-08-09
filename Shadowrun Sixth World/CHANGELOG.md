@@ -1,6 +1,19 @@
 Change Log
 ==============================================
-**2022-07-28 ** v.56 Chuz (James Culp)
+**2022-08-08 ** v.57 Chuz (James Culp)
+	Bugfix - Updated mouseover text for Metamagics to indicate they are repeating metamagic not repeating powers
+	Bugfix - Updated Non-PC sheets to have Matrix AR, Matrix DR, Matrix Soak and Biofeedback Soak buttons as appropriate in the Defenses Pane
+	New Feature - Some updates to the Magic->Meta tab to clean up the layout and put a Magic AR button there as well.
+	Bugfix - Fixed some weirdness with Social->Sins and Social->Contacts pane styles.
+	Bugfix - (not really a bug) updated the color for the Edge and Matrix Condition Monitor hexes to be the purple everything else is.	
+	New Feature - Added Matrix Soak and Biofeedback Soak buttons to Core Pane and Matrix Pane
+	New Feature - Added Damage Type to Combat spells in Magic->Spells pane, the Damage Type selector will disappear for non-combat spells.
+	New Feature - Updated Effect Type to hide values that make no sense (i.e. Single Sense / Multi Sense for anything but Illusion spells and The 4 combat options for any non-combat spells)
+	New Feature - Updated Spells to make it so the pop-up prompts for Amp-Up and Increase Area ONLY pop up when the spell is of the right type.  Only Combat spells get "Amp Up" prompts, Only "LOS (A)" spells get "Increase Area" prompts.  The "Agony" spell is by definition LOS but acts like LOS (A) in that it can be extended to multiple targets, you will want to enter it as LOS (A) there may be other similar spells.
+	New Feature - Added Notes->Updates Pane to display most recent changes.  The sheet will automatically open to this page if changes are made to functionality that need to be highlighted.
+	New Feature - Added the Primary button to Arms->Melee weapons with the same functionality as the Arms->Ranged weapons have.
+	New Feature - Arms->Ranged now have a Default Firing mode selection.  This will be the selected firing mode when you initially set this weapon to primary, or if you change this while it's the primary weapon it will set the firing mode on the primary weapon as well.
+**2022-08-04 ** v.56 Chuz (James Culp)
 	Bugfix - There were 10 repeating sections that didn't use "name" for the name field.  Fixed this to make other automated tasks easier to achieve in the future.
 	New Feature - added Composure roll button to Grunts
 	Bugfix - Cleaned up non-PC sheets to show condition monitors better (including the max)
@@ -204,7 +217,6 @@ Change Log
 	PC-Matrix-Technomancer (formerly PC-Matrix-Complex Forms) created
 	New section now holds Complex Forms tab and submersion tab
 	Added Submersion tab with Resist Fade button (for compiling), submersion level, echoes and sprites
-
 **2021-03-29** v.25 Chuz (James Culp)
 	Fixed Matrix ASDF indicator bubbles so 0 doesn't light up all 10 indicators
 	Started changes for NPC sheets.
@@ -221,7 +233,6 @@ Change Log
 	DR, I/ID, AC, CM and Move (from npc stat blocks) are now represented along with common rolls (DR, Defense and Soak)	
 	Some more style updates to npc sheets
 	Updated some of the variables and layouts of the areas below Bonuses, Modifier and Options (still not ready for use really)
-
 **2021-03-22** v.24 Chuz (James Culp)
 	Beginning v.24
 	Rearranged player/character names, toggles and navigation buttons in header - still tweaking layout
@@ -243,7 +254,6 @@ Change Log
 	Started in on Complex Forms
 	Updated Matrix -> Complex Forms section
 	When selecting a skill, have the correct default attribute auto-selected
-
 **2021-03-15** v.23 Chuz (James Culp)
 	Made sheet work with current roll20 "enhanced" code that has been partially rolled back Changed 
 	Condition Monitors -> Settings -> Pain Tolerance to a select so it's obvious whether pc is selecting Low, High or none 
@@ -251,7 +261,6 @@ Change Log
 	Added Mod field for skills to allow skill rolls to have bonuses added. Does not add to the actual skill dicepool just affects the skill roller. 
 	Fixed Initiatives (Meat, Astral, Matrix x3) to now apply mods, dice mods and Config->Temp mods correctly. 
 	Added Magic AR that auto calculates when logic/charisma, tradition or magic change to the Magic -> Meta box
-
 **2021-03-08** v.22 Chuz (James Culp)
 	Add Defense roll-button and DR roll-button to Core->Combat Info tab
 	Updated Skills to split Skills and Knowledge/Languages into separate tabs
@@ -262,32 +271,25 @@ Change Log
 	Bugfix Essence Mod not allowing a zero value
 	Bugfix Removed roll query from flat attribute rolls
 	Bugfix Added Athletics skill to ranged weapons
-	
+
 **2021-03-03** Chuz (James Culp)
 	Included in roll20 repository for one-click access
-
 **2021-02-28** Chuz (James Culp)
 	Updated Social Tab, Contacts and SINs
 	Changed the header Shadowrun logo to a smaller version, this may change again depending on feedback.
-
 **2021-02-27** Chuz (James Culp)
 	Updated Vehicle tab, players can document the basic stats for their vehicles here, no roll buttons included yet.
-
 **2021-02-24** Chuz (James Culp)
 	Tuned Magic->Spells display and dice roller
-
 **2021-02-21** Chuz (James Culp)
 	Added automated DR and resistance updates to Core Combat Info from Arms->Armor tab
-
 **2021-02-15** Chuz (James Culp)
 	Updated Core Combat Info->Primary Ranged Weapon section to display the new weapon data better
 	Updated Core Combat Info->Armor section, now it's a soak damage button (body), Defense Rating box and Resists.  Still need to make the info update as armor is added in Arms->Armor
-
 **2021-02-08 - 2021-02-14** Chuz (James Culp)
 	Updated Arms->Armor
 	Added "Modifications" text area to Augs and Gear for future functionality.
 	Updated Core Combat Info->Primary Melee Weapon section to display the new data
-
 **2021-01-16 - 2021-02-07** Chuz (James Culp)
 	Revamped Weapons->Melee to remove unused fields (Reach, AP, etc) and add range blocks and Specialization and Expertise checkboxes.
 	Added functionality so if Close Combat skill rating is changed it updates the dice roller for melee weapons that use that skill.
@@ -295,23 +297,18 @@ Change Log
 	Revamped Weapons->Range to remove unused fields
 	Added functionality so if Firearms skill rating is changed it updates the dice roller for ranged weapons that use that skill.
 	Added dicepool to Weapons->Range display
-
 **2021-01-11 - 2021-01-15** Chuz (James Culp)
 	Updated repeating items formatting
 	Updated repeating items to make specialization and expertise buttons 15 characters if the actual display name is greater than 15
-
 **2021-01-09 - 2021-01-10** Chuz (James Culp)
 	Updated how Essence is displayed (breaks down aug cost and allows for manual modifications (critter effects that drain essence for example))
 	Updated how movement was being displayed, rules are now 10m base and sprint is 15m + results of an Athletics+Agility check)
 	Added Expertise to the skills section, having problems figuring out how to make the specialization and expertise roll buttons hide when there isn't a value for them.
-
 **2021-01-07** Chuz (James Culp)
 	Fixed Augmentations section and made it automatically update essence when augs are added/removed
 	Removed some (but not all) mentions of limits since they don't exist in 6th world.
-
 **2021-01-06** Chuz (James Culp)
 	Fixed Skills section to work properly now
-
 **2020-11-11** Chuz (James Culp)
     Pulled the branch sr6v2 previously worked on by clevett
 	Created this CHANGELOG

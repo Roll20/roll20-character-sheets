@@ -144,7 +144,7 @@
 			<div class="row-long pd-rep">
 				<h2 data-i18n="reputation">Reputation</h2><input type="number" name="attr_reputation" placeholder="#" title="@{reputation}" />
 				<h2 data-i18n="heat">Heat</h2><input type="number" name="attr_heat" placeholder="#" title="@{heat}" />
-				<h2>¥</h2><input type="number" name="attr_nuyen" placeholder="0" title="@{nuyen}" />
+				<h2 class="nuyen">¥</h2><input type="number" name="attr_nuyen" placeholder="0" title="@{nuyen}" />
 			</div>
 			<div class="row-long pd-kar">
 				<h2 data-i18n="karma">Karma</h2><input style="width: 2em;" type="number" name="attr_karma" placeholder="#" title="@{karma}" />
@@ -174,7 +174,7 @@
 		</div>
 	</div>
 	<div class="border-box">
-		<input class="attributes-toggle" name="attr_attributes_toggle" title="@{attributes_toggle}" type="hidden" value="attributes"/>
+		<input class="attributes-toggle" name="attr_attributes_toggle" title="@{attributes_toggle}" type="hidden" value="attributes" />
 		<div class="attributes-active">
 			<div class="pc-box medium-box attr-box">
 				<input type="checkbox" class="settings-toggle" name="attr_flag_attribute" checked="checked" title="Settings toggle" /><span>x</span>
@@ -835,7 +835,7 @@
 				</div>
 				<div class="magic-defense">
 					<div>&nbsp;</div>
-					<button type="action" name="act_magic_ar" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{magic} ^{attack} ^{rating}}}{{rating=@{magic_ar}}}">
+					<button type="action" name="act_magic_ar" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{magic} ^{attack} ^{rating}}}{{rating=@{magic_ar}}}{{desc=Magic + @{tradition_attribute}}}">
 						<span class="center"><span data-i18n="magicar">Magic AR</span> <span name="attr_magic_ar"></span></span>
 					</button>
 					<div>&nbsp;</div>
@@ -848,6 +848,27 @@
 					</button>
 					<div>&nbsp;</div>
 				</div>
+
+				<div class="matrix-defense">
+					<div>&nbsp;</div>
+               <button name="act_matrix_attack_rating" type="action" value="&{template:rolls}{{header=@{character_name}}}{{base=Matrix Attack Rating}}{{rating=[[(@{attack}+@{sleaze})]]}}{{desc=Attack + Sleaze}}" title="Matrix Attack Rating">
+               	<span><span data-i18n="matrix_ar">Matrix AR</span><span name='attr_matrix_attack_rating'></span></span>
+               </button>
+					<div>&nbsp;</div>
+               <button name="act_matrix_defense_rating" type="action" value="&{template:rolls}{{header=@{character_name}}}{{base=Matrix Defense Rating}}{{rating=[[@{matrix_defense_rating}]]}}{{desc=Data Processing + Firewall}}" title="Matrix Defense Rating">
+               	<span><span data-i18n="matrix_dr">Matrix DR</span><span name='attr_matrix_defense_rating'></span></span>
+               </button>
+					<div>&nbsp;</div>
+					<button name="act_soak_matrix" type="action" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{matrix} ^{soak} = ^{firewall}}}{{dice=[[(@{firewall}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">
+						<span class="center" title="Firewall"><span class="center" data-i18n="matrixsoak">Matrix Soak</span></span>
+					</button>
+					<div>&nbsp;</div>
+					<button name="act_soak_biofeedback" type="action" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{biofeedback} ^{soak} = ^{willpower}}}{{dice=[[(@{willpower}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">
+						<span class="center" title="Willpower"><span class="center" data-i18n="biofeedbacksoak">Biofeedback Soak</span></span>
+					</button>
+					<div>&nbsp;</div>
+				</div>
+
 				<div class="armor-resists">
 					<h2 data-i18n="resists">Resists</h2>
 					<span class="armor-resist" title="@{resist_chem_total}"><span class="pictos3 chem">d</span><span class="chem"> Chem </span><span class="armor-resist-value" name="attr_resist_chem_total"></span></span>
@@ -885,32 +906,35 @@
 				<input type="hidden" name="attr_primary_range_weapon_mode_singleshot" value="0" />
 				<input type="hidden" name="attr_primary_range_weapon_mode_semiauto" value="0" />
 				<input type="hidden" name="attr_primary_range_weapon_mode_burst" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_mode_burstwide" value="0" />
 				<input type="hidden" name="attr_primary_range_weapon_mode_fullauto" value="0" />
 				<input type="hidden" name="attr_primary_range_weapon_mode_other" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_default_mode" value="" />
 				<input type="hidden" name="attr_primary_range_weapon_base_damage" value="0" />
 				<input type="hidden" name="attr_primary_range_weapon_base_close" value="0" />
 				<input type="hidden" name="attr_primary_range_weapon_base_near" value="0" />
 				<input type="hidden" name="attr_primary_range_weapon_base_medium" value="0" />
 				<input type="hidden" name="attr_primary_range_weapon_base_far" value="0" />
 				<input type="hidden" name="attr_primary_range_weapon_base_extreme" value="0" />
-				<select name="attr_primary_range_weapon_mode" title="@{primary_range_weapon_mode}">
-					<option data-i18n="singleshot" value="Single Shot" selected="selected">Single Shot</option>
+				<select id="attr_primary_range_weapon_mode" name="attr_primary_range_weapon_mode" title="@{primary_range_weapon_mode}">
+					<option data-i18n="singleshot" value="Single Shot">Single Shot</option>
 					<option data-i18n="semiauto" value="Semi Auto">Semi-Auto</option>
 					<option data-i18n="burstfire" value="Burst Fire">Burst Fire</option>
+					<option data-i18n="burstwide" value="Burst Fire Wide">Burst Fire Wide</option>
 					<option data-i18n="fullauto" value="Full Auto">Full Auto</option>
 					<option data-i18n="other" value="Other">Other</option>
 				</select>
 				<span>&nbsp;</span>
 				<!-- Ammo removal button -->
-				<button class="shots" name="act_shots_remove" type="action">4</button>
+				<button class="shots" name="act_shots_remove" type="action" data-i18n-title="fewershots">4</button>
 				<button class="shots" type="action" name="act_primary_ammo" title="Shots Fired">
 					<img alt="small handgun icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/images/gun.png" /><span name="attr_shots_fired"></span>
 				</button>
-				<button class="shots" name="act_shots_add" type="action">4</button>
+				<button class="shots" name="act_shots_add" type="action" data-i18n-title="moreshots">4</button>
 				<span>&nbsp;</span>
 				<span name="attr_primary_range_weapon_ammo" title="@{primary_range_weapon_ammo}"></span>
 				<span name="attr_primary_range_weapon_ammo_max" title="@{primary_range_weapon_ammo_max}"></span>
-				<button class="pictos shots" name="act_reload" type="action">0</button>
+				<button class="pictos shots" name="act_reload" type="action" data-i18n-title="reload">0</button>
 			</div>
 			<div>
 				<span>&nbsp;</span>
@@ -1121,7 +1145,6 @@
       </div>
       <div class="header right-header">
         <div class="header htab">
-          <div class="triangle"></div>
           <input class="tab-switch" name="attr_weapon_type_toggle" type="radio" value="range" checked="checked"/>
           <h1 data-i18n="ranged">Ranged</h1>
           <div class="right-tri"></div>
@@ -1163,7 +1186,7 @@
               <input name="attr_updateme" type="hidden" value="0"/>
               <input class="flag-primary" name="attr_primary" type="hidden" value=""/>
               <input class="flag-primary" name="attr_additional" type="hidden" value=""/>
-		        <input class="toggle" name="attr_primary" value="primary" type="checkbox" checked="checked"/>
+		        <input class="toggle" name="attr_primary" value="primary" type="checkbox" />
 		        <span class="pictos powerbutton">2</span>
               <button name="act_rangeweapon" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{weapon}\n@{skill} + @{attribute}}}{{dice=[[(@{rating}+@{attr_rating}+@{spec}+@{expert}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode: SS, Damage @{damage}, Skill: @{skill}, Attribute: @{attribute}, Notes @{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
               <span class="center" name="attr_dicepool"></span>
@@ -1211,18 +1234,29 @@
                 <div class="row">
                   <h3 data-i18n="firingmodes">Firing Modes</h3>
                   <label data-i18n-title="modeoptions" title="Mode Options">
-                    <input name="attr_firing_modes" placeholder="SA/BF/FA" type="text" title="@{repeating_range_${x}_firing_modes}}"/>
+                    <input name="attr_firing_modes" placeholder="SS/SA/BF/BW/FA" type="text" title="@{repeating_range_${x}_firing_modes}}"/>
                   </label>
-<!--
-                  <h3 data-i18n="primary">primary</h3>
-                  <label data-i18n-title="primary" title="Primary">
-                    <input name="attr_primary" type="checkbox" title="@{repeating_range_${x}_primary}" value="primary"/>
-                  </label>
--->
                   <h3 data-i18n="modifier">modifier</h3>
                   <label data-i18n-title="modifier" title="modifier">
                     <input name="attr_dicepool_modifier" title="@{repeating_range_${x}_dicepool_modifier}" value='0' type="number"/>
                   </label>
+                </div>
+                <div class="row">
+				  <input type="hidden" name="attr_singleshot" value="0" />
+				  <input type="hidden" name="attr_semiauto" value="0" />
+				  <input type="hidden" name="attr_burst" value="0" />
+				  <input type="hidden" name="attr_burstwide" value="0" />
+				  <input type="hidden" name="attr_fullauto" value="0" />
+				  <input type="hidden" name="attr_other" value="0" />
+                  <h3 data-i18n="defaultfiringmode">Default Firing Mode</h3>
+						<select name="attr_default_mode" title="@{default_mode}">
+							<option data-i18n="singleshot" value="Single Shot" selected="selected">Single Shot</option>
+							<option data-i18n="semiauto" value="Semi Auto">Semi-Auto</option>
+							<option data-i18n="burstfire" value="Burst Fire">Burst Fire</option>
+							<option data-i18n="burstwide" value="Burst Fire">Burst Fire Wide</option>
+							<option data-i18n="fullauto" value="Full Auto">Full Auto</option>
+							<option data-i18n="other" value="Other">Other</option>
+						</select>
                 </div>
                 <div class="row">
                   <h3 data-i18n="skill">skill</h3>
@@ -1256,6 +1290,7 @@
 
           <div class="rows repeating-container weapon-melee">
             <div class="row-long headers">
+              <span></span>
               <h2 data-i18n="weapon">Weapon</h2>
               <h2 data-i18n="pool">Pool</h2>
               <h2 data-i18n="dam">Dam</h2>
@@ -1273,6 +1308,10 @@
               <input name="attr_updateme" type="hidden" value="0"/>
               <input class="flag-primary" name="attr_primary" type="hidden" value=""/>
               <input class="flag-primary" name="attr_additional" type="hidden" value=""/>
+
+		        <input class="toggle" name="attr_primary" value="primary" type="checkbox" />
+		        <span class="pictos powerbutton">2</span>
+
               <button name="act_meleeweapon" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name}}}{{dice=[[(@{rating}+@{attr_rating}+@{spec}+@{expert}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Damage @{damage}, Skill: @{skill}, Attribute: @{attribute}, Notes: @{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
               <span class="center" name="attr_dicepool"></span>
               <span class="center" name="attr_damage"></span>
@@ -1285,6 +1324,7 @@
               <input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
               <div class="collapse"><span name="attr_notes"></span></div>
               <div class="settings">
+                <span></span>
                 <label data-i18n-title="name" title="name">
                   <input name="attr_name" placeholder="Katana" title="@{repeating_melee_${x}_name}" type="text" value=""/>
                 </label>
@@ -1328,10 +1368,6 @@
                   <div class="exotic-warning"><i data-i18n="exoticnote">Exotic weapons are not linked to a skill. Use Modifier input to set dicepool.</i></div>
                 </div>
                 <div class="row">
-                  <h3 data-i18n="primary">primary</h3>
-                  <label data-i18n-title="primary" title="Primary">
-                    <input name="attr_primary" type="checkbox" title="@{repeating_melee_${x}_primary}" value="primary"/>
-                  </label>
                   <h3 data-i18n="modifier">modifier</h3>
                   <label data-i18n-title="modifier" title="modifier">
                     <input name="attr_dicepool_modifier" title="@{repeating_melee_${x}_dicepool_modifier}" value='0' type="number"/>
@@ -1676,8 +1712,13 @@
 					  <h2 data-i18n="drain">Drain</h2>
 				  </div>
               <fieldset class="repeating_spell">
-                <input name="attr_dicepool" type="hidden" value="0"/>
+                <input name="attr_dicepool" type="hidden" value="0" />
+                <input name="attr_category" type="hidden" value="" />
+                <input name="attr_range" type="hidden" value="" />
                 <button name="act_spell" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{ampup=[[?{Amp Up|0|1|2|3|4|5|6|7|8|9|10}]]}}{{increasearea=[[?{Increase Area|0m,0|2m,1|4m,2|6m,3|8m,4|10m,5|12m,5|14m,6|16m,8|18m,9|20m,10}*2]]}}{{drain=[[?{Amp Up}*2+?{Increase Area}+(@{drain})]]}}{{desc=@{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
+                <button name="act_spellaoe" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{ampup=[[?{Amp Up|0|1|2|3|4|5|6|7|8|9|10}]]}}{{increasearea=[[?{Increase Area|0m,0|2m,1|4m,2|6m,3|8m,4|10m,5|12m,5|14m,6|16m,8|18m,9|20m,10}*2]]}}{{drain=[[?{Amp Up}*2+?{Increase Area}+(@{drain})]]}}{{desc=@{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
+                <button name="act_noncombatspell" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{increasearea=[[?{Increase Area|0m,0|2m,1|4m,2|6m,3|8m,4|10m,5|12m,5|14m,6|16m,8|18m,9|20m,10}*2]]}}{{drain=[[?{Increase Area}+(@{drain})]]}}{{desc=@{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
+                <button name="act_noncombatspellaoe" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{increasearea=[[?{Increase Area|0m,0|2m,1|4m,2|6m,3|8m,4|10m,5|12m,5|14m,6|16m,8|18m,9|20m,10}*2]]}}{{drain=[[?{Increase Area}+(@{drain})]]}}{{desc=@{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
                 <span class="center" name="attr_type"></span>
                 <span class="center" name="attr_range"></span>
                 <span class="center" name="attr_duration"></span>
@@ -1731,8 +1772,8 @@
                   <div class="row">
                     <h3 data-i18n="skill">Skill</h3>
                     <select name="attr_skill" title="@{repeating_spell_${x}_skill}">
-                      <option data-i18n="sorcery" value="@{sorcery}">Sorcery</option>
-                      <option data-i18n="conjuring" value="@{conjuring}" selected="selected">Conjuring</option>
+                      <option data-i18n="sorcery" value="@{sorcery}" selected="selected">Sorcery</option>
+                      <option data-i18n="conjuring" value="@{conjuring}">Conjuring</option>
                       <option data-i18n="enchanting" value="@{enchanting}">Enchanting</option>
                     </select>
                     <h3 data-i18n="specialization">Specialization</h3>
@@ -1749,6 +1790,13 @@
                     <label data-i18n-title="modifierdice" title="modifier dice">
                       <input name="attr_dicepool_modifier" placeholder="0" title="@{repeating_spell_${x}_dicepool_modifier}" type="text" value="0" />
                     </label>
+                    <h3 data-i18n="damage_type">Damage Type</h3>
+						  <select name="attr_damage" title="@{repeating_spell_${x}_damage}">
+							 <option data-i18n="unset" value="" selected="selected">Unset</option>
+							 <option data-i18n="stun" value="Stun">Stun</option>
+							 <option data-i18n="physical" value="Physical">Physical</option>
+							 <option data-i18n="physical_special" value="Physical, Special">Physical, Special</option>
+						  </select>
                   </div>
                   <h3 data-i18n="notes">notes</h3>
                   <label data-i18n-title="notes" title="notes">
@@ -2207,38 +2255,47 @@
 
 			<div class="powers-meta">
           <div class="row-long mage-setup">
-            <select class='mage-type' name='attr_mage_type' title='@{mage_type}'>
-              <option data-i18n="mage" value="Mage" selected="selected">Mage</option>
-              <option data-i18n="adept" value="Adept">Adept</option>
-              <option data-i18n="mysticadept" value="Mystic Adept">Mystic Adept</option>
-            </select>
-				<h3 data-i18n="initiategrade">Initiate Grade</h3>
-				<label data-i18n-title="initiategrade" title="initiategrade">
-					<input name="attr_initiate_grade" placeholder="-" title="@{initiate_grade}" type="number" min="0" step="1" value="">
-				</label>
-				<h2 class="magic-aspect" data-i18n-title="aspect" title="aspect">Aspect</h2>
-				<select class="magic-aspect" name='attr_aspect' title='@{aspect}'>
-					<option data-i18n="non-aspected" value="Non-Aspected">Non-Aspected</option>
-					<option data-i18n="sorcery" value="Sorcery">Sorcery</option>
-					<option data-i18n="conjuring" value="Conjuring">Conjuring</option>
-					<option data-i18n="enchanting" value="Enchanting">Enchanting</option>
-				</select>
-            <br>
-            <h2 data-i18n="tradition">Tradition</h2>
-            <label data-i18n-title="tradition" title="tradition">
-            	<select name='attr_tradition' title='@{tradition}'>
-            		<option data-i18n="hermeticism" value="Hermeticism">Hermeticism</option>
-            		<option data-i18n="hermeticism-intuition" value="Hermeticism (Intuition)">Hermeticism (Intuition)</option>
-            		<option data-i18n="hermeticism-charisma" value="Hermeticism (Charisma)">Hermeticism (Charisma)</option>
-            		<option data-i18n="shamanism" value="Shamanism">Shamanism</option>
-            		<option data-i18n="shamanism-logic" value="Shamanism (Logic)">Shamanism (Logic)</option>
-            		<option data-i18n="shamanism-intuition" value="Shamanism (Intuition)">Shamanism (Intuition)</option>
-            	</select>
-            </label>
-            <h2 data-i18n="magicar">Magic AR</h2>
-            <input type="hidden" name="attr_magic_ar" value="0">
-            <span name="attr_magic_ar"></span>
-          </div>
+            <div class="row1">
+	            <span></span>
+	            <select class='mage-type' name='attr_mage_type' title='@{mage_type}'>
+	              <option data-i18n="mage" value="Mage" selected="selected">Mage</option>
+	              <option data-i18n="adept" value="Adept">Adept</option>
+	              <option data-i18n="mysticadept" value="Mystic Adept">Mystic Adept</option>
+	            </select>
+	            <span></span>
+						<h3 data-i18n="initiategrade">Initiate Grade</h3>
+					<label data-i18n-title="initiategrade" title="initiategrade">
+						<input name="attr_initiate_grade" placeholder="0" title="@{initiate_grade}" type="number" min="0" step="1" value="">
+					</label>
+	            <span></span>
+	            <input type="hidden" name="attr_magic_ar" value="0">
+	            <label><button name="act_magic_ar" type="action" value="&{template:rolls-computed}{{header=@{character_name}}}{{base=^{magic} ^{attack} ^{rating}}}{{rating=[[@{magic_ar}]]}}{{desc=Magic + @{tradition_attribute}}}" title="Magic Attack Rating"><span class="red"><span data-i18n="magicar">Magic AR</span> <span name='attr_magic_ar'></span></span></button></label>
+				</div>
+
+            <div class="row2">
+	            <span></span>
+	            <h2 data-i18n="tradition">Tradition</h2>
+	            <label data-i18n-title="tradition" title="tradition">
+	            	<select name='attr_tradition' title='@{tradition}'>
+	            		<option data-i18n="hermeticism" value="Hermeticism">Hermeticism</option>
+	            		<option data-i18n="hermeticism-intuition" value="Hermeticism (Intuition)">Hermeticism (Intuition)</option>
+	            		<option data-i18n="hermeticism-charisma" value="Hermeticism (Charisma)">Hermeticism (Charisma)</option>
+	            		<option data-i18n="shamanism" value="Shamanism">Shamanism</option>
+	            		<option data-i18n="shamanism-logic" value="Shamanism (Logic)">Shamanism (Logic)</option>
+	            		<option data-i18n="shamanism-intuition" value="Shamanism (Intuition)">Shamanism (Intuition)</option>
+	            	</select>
+	            </label>
+	            <span></span>
+					<h2 class="magic-aspect" data-i18n-title="aspect" title="aspect">Aspect</h2>
+					<select class="magic-aspect" name='attr_aspect' title='@{aspect}'>
+						<option data-i18n="non-aspected" value="Non-Aspected">Non-Aspected</option>
+						<option data-i18n="sorcery" value="Sorcery">Sorcery</option>
+						<option data-i18n="conjuring" value="Conjuring">Conjuring</option>
+						<option data-i18n="enchanting" value="Enchanting">Enchanting</option>
+					</select>
+	          </div>
+			 </div>
+
           <div class="row-long headers">
             <h2 data-i18n="metamagic">Metamagic</h2>
             <h2 class="center" data-i18n="level">Level</h2>
@@ -2252,14 +2309,14 @@
               <div class="collapse"><span name="attr_notes"></span></div>
               <div class="settings">
                 <label data-i18n-title="name" title="name">
-                  <input name="attr_name" placeholder="name" title="@{repeating_powers_${x}_name}" type="text" value=""/>
+                  <input name="attr_name" placeholder="name" title="@{repeating_metamagic_${x}_name}" type="text" value=""/>
                 </label>
                 <label data-i18n-title="rating" title="rating">
-                  <input name="attr_rating" placeholder="rating" title="@{repeating_powers_${x}_rating}" type="number" value=""/>
+                  <input name="attr_rating" placeholder="rating" title="@{repeating_metamagic_${x}_rating}" type="number" value=""/>
                 </label>
                 <h3 data-i18n="notes">notes</h3>
                 <label data-i18n-title="notes" title="notes">
-                  <textarea name="attr_notes" placeholder="Notes" title="@{repeating_powers_${x}_notes}"></textarea>
+                  <textarea name="attr_notes" placeholder="Notes" title="@{repeating_metamagic_${x}_notes}"></textarea>
                 </label>
 					 <h3 data-i18n="modifications">modifications</h3>
 					 <label data-i18n-title="modifications" title="modifications">
@@ -2287,7 +2344,7 @@
       <div class="border-box">
         <div class="pc-box medium-box">
           <div class="cyberdeck">
-            <div class="row-long row-matrix-combat-stats">
+            <div class="row-matrix-combat-stats">
             	<input type="hidden" name="attr_matrix_device_rating" value="0">
             	<input type="hidden" name="attr_matrix_defense_rating" value="0">
             	<input type="hidden" name="attr_matrix_defense_rating_modifier" value="0">
@@ -2302,6 +2359,17 @@
                <label><button name="act_matrix_defense_rating" type="action" value="&{template:rolls}{{header=@{character_name}}}{{base=Matrix Defense Rating}}{{rating=[[@{matrix_defense_rating}]]}}{{desc=Data Processing + Firewall}}" title="Matrix Defense Rating"><span data-i18n="defenserating">Defense Rating</span><span name='attr_matrix_defense_rating'></span></button></label>
                <span>&nbsp;</span>
             </div>
+				<div class="row-long row-matrix-soak">
+					<div>&nbsp;</div>
+					<button name="act_soak_matrix" type="action" value="@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{matrix} ^{soak} = ^{firewall}}}{{dice=[[((@{firewall})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">
+						<span class="center" title="Firewall"><span class="center" data-i18n="matrixsoak">Matrix Soak</span></span>
+					</button>
+					<div>&nbsp;</div>
+					<button name="act_soak_biofeedback" type="action" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{biofeedback} ^{soak} = ^{willpower}}}{{dice=[[(@{willpower}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=Willpower + Intuition}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">
+						<span class="center" title="Willpower"><span class="center" data-i18n="biofeedbacksoak">Biofeedback Soak</span></span>
+					</button>
+					<div>&nbsp;</div>
+				</div>
             <div class="row-long technomancer-attributes techno-see">
               <span>&nbsp;</span>
               <label data-i18n="attributearray">Attribute Array</label>
@@ -2811,7 +2879,7 @@
 		<div class="border-box repeat-box lifestyle">
 			<div class="pc-box small-box social-box">
 				<div class="row-long">
-					<h3>¥</h3>
+					<h3 class="nuyen">¥</h3>
 					<input type="text" name="attr_nuyen" placeholder="-" title="@{nuyen}" />
 					<h3 data-i18n="birthname">Birth Name</h3>
 					<input type="text" name="attr_birth_name" placeholder="John Q Public" title="@{birth_name}" />
@@ -2823,36 +2891,39 @@
 					<h3 data-i18n="sinname">SIN Name</h3>
 					<h3 data-i18n="rtg">RTG</h3>
 					<h3 data-i18n="lifestylelicensesnotes" class="center">Lifestyle / Licenses / Notes</h3>
+					<span></span>
 				</div>
 				<fieldset class="repeating_lifestyle">
 					<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
+					<input class="display-flag" type="checkbox" name="attr_display_flag" />
+					<span name="attr_name"></span>
+					<span class="center" name="attr_rating"></span>
+               <span class="collapsible">
+						<span class="desc-lifestyle" name="attr_lifestyle"></span>
+						<span class="desc-lifestyle" name="attr_licenses"></span>
+						<span class="desc-lifestyle" name="attr_notes"></span>
+					</span>
+               <input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
+
+
 					<div class="settings">
-						<div>
-							<h3 data-i18n="fakeid">Fake ID</h3>
-							<input type="text" name="attr_name" placeholder="SIN Name" title="SIN Name">
-							<h3 data-i18n="rating">Rating</h3>
-							<input type="number" name="attr_rating" placeholder="1" title="Rating">
-							<h3 data-i18n="relatedlifestyle">Related Lifestyle</h3>
-							<textarea name="attr_lifestyle" placeholder="Middle" title="Related lifestyle"></textarea>
-							<h3 data-i18n="licenses">Licenses</h3>
-							<textarea name="attr_licenses" placeholder="Technomancer, Pistols" title="Licenses"></textarea>
-							<h3 data-i18n="notes">Notes</h3>
-							<textarea name="attr_notes" placeholder="Notes" title="Notes"></textarea>
-						</div>
+						<label data-i18n-title="fakeid" title="Fake ID">
+							<span data-i18n="fakeid">Fake ID</span>
+							<input type="text" name="attr_name" placeholder="SIN Name" title="SIN Name" />
+						</label>
+						<span></span>
+						<label data-i18n-title="rating" title="Rating">
+							<span data-i18n="rating">Rating</span>
+							<input type="number" name="attr_rating" placeholder="1" title="Rating" />
+						</label>
+
+						<h3 data-i18n="relatedlifestyle">Related Lifestyle</h3>
+						<textarea name="attr_lifestyle" placeholder="Middle" title="Related lifestyle"></textarea>
+						<h3 data-i18n="licenses">Licenses</h3>
+						<textarea name="attr_licenses" placeholder="Technomancer, Pistols" title="Licenses"></textarea>
+						<h3 data-i18n="notes">Notes</h3>
+						<textarea name="attr_notes" placeholder="Notes" title="Notes"></textarea>
 					</div>
-					<div class="display">
-						<input class="display-flag" type="checkbox" name="attr_display_flag" />
-						<div class="display-row" title="SIN Name">
-							<span name="attr_name"></span>
-							<span class="center" name="attr_rating"></span>
-						</div>
-						<div class="collapsible">
-							<span class="desc-lifestyle" name="attr_lifestyle"></span>
-							<span class="desc-lifestyle" name="attr_licenses"></span>
-							<span class="desc-lifestyle" name="attr_notes"></span>
-						</div>
-					</div>
-					<button class="pictos settings-button" name="act_lifestyle" type="action">x</button>
 				</fieldset>
 			</div>
 		</div>
@@ -2897,34 +2968,26 @@
 				</div>
 				<fieldset class="repeating_contacts">
 					<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
-					<div class="settings">
-						<div>
-							<input type="text" name="attr_name" placeholder="Contact Name" title="Contact name" />
-							<input type="number" name="attr_loyalty" min="1" placeholder="1" title="Loyalty" />
-							<input type="number" name="attr_influence" min="1" placeholder="1" title="Influence" />
-							<input type="number" name="attr_favors" placeholder="-" title="Favors" />
-							<span>&nbsp;</span>
-							<span>&nbsp;</span>
-						</div>
-						<div>
-							<h3 data-i18n="notes">Notes</h3>
-							<textarea name="attr_notes" placeholder="Notes"></textarea>
-						</div>
-					</div>
-					<div class="display">
-						<input class="display-flag" type="checkbox" name="attr_display_flag" />
-						<label title="Contact name"><span name="attr_display"></span></label>
-						<label title="Loyalty"><span name="attr_loyalty"></span></label>
-						<label title="Influence"><span name="attr_influence"></span></label>
-						<label title="Favors"><span name="attr_favors"></span></label>
-						<span>&nbsp;</span>
-						<span>&nbsp;</span>
-						<div class="collapsible">
-							<div class="desc" title="Notes"><span name="attr_notes"></span></div>
-						</div>
-					</div>
+					<input class="display-flag" type="checkbox" name="attr_display_flag" />
+					<label title="Contact name"><span name="attr_display"></span></label>
+					<label title="Loyalty"><span name="attr_loyalty"></span></label>
+					<label title="Influence"><span name="attr_influence"></span></label>
+					<label title="Favors"><span name="attr_favors"></span></label>
 					<button class="pictos" name="contact_chat" type="roll" value="@{gm_toggle} &{template:contact}{{header=@{character_name}}}{{name=@{name}}}{{loyalty=@{loyalty}}}{{connection=@{influence}}}{{favor=@{favors}}}{{desc=@{notes}}}">w</button>
-					<button class="pictos settings-button" name="act_contacts" type="action">x</button>
+               <input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
+					<div class="collapsible">
+						<div class="desc" title="Notes"><span name="attr_notes"></span></div>
+					</div>
+					<div class="settings">
+						<input type="text" name="attr_name" placeholder="Contact Name" title="Contact name" />
+						<input type="number" name="attr_loyalty" min="1" placeholder="1" title="Loyalty" />
+						<input type="number" name="attr_influence" min="1" placeholder="1" title="Influence" />
+						<input type="number" name="attr_favors" placeholder="-" title="Favors" />
+						<span>&nbsp;</span>
+						<span>&nbsp;</span>
+						<h3 data-i18n="notes">Notes</h3>
+						<textarea name="attr_notes" placeholder="Notes"></textarea>
+					</div>
 				</fieldset>
 			</div>
 		</div>
@@ -3235,6 +3298,13 @@
 					<div class="right-tri"></div>
 				</div>
 			</div>
+			<div class="header">
+				<div class="header htab">
+					<div class="triangle"></div>
+					<input class="tab-switch" name="attr_notes_toggle" type="radio" value="changelog"/>
+					<h1 data-i18n="updates">Updates</h1>
+				</div>
+			</div>
 
 			<div class="border-box">
 				<div class="pc-box">
@@ -3248,68 +3318,122 @@
 			         <input class="tab-switch" name="attr_notes_toggle" type="hidden" value="logs"/>
 						<div class="notes-logs">
 							<h2 data-i18n="session_logs">Session Logs</h2>
-<div class="rows repeating-container">
-	<div class="row-long headers">
-		<span></span>
-		<h2 data-i18n="date">Date</h2>
-		<h2 data-i18n="session_name">Session Name</h2>
-		<h2 data-i18n="agent/gm">Agent/GM</h2>
-		</span></span>
-	</div>
-	<div class="row-long headers2">
-		<span></span>
-		<h2 data-i18n="karma">Karma</h2>
-		<h2>Nuyen</h2>
-		<h2 data-i18n="reputation">Reputation</h2>
-		<h2 data-i18n="heat">Heat</h2>
-		</span></span>
-	</div>
+							<div class="rows repeating-container">
+								<div class="row-long headers">
+									<span></span>
+									<h2 data-i18n="date">Date</h2>
+									<h2 data-i18n="session_name">Session Name</h2>
+									<h2 data-i18n="agent/gm">Agent/GM</h2>
+									</span></span>
+								</div>
+								<div class="row-long headers2">
+									<span></span>
+									<h2 data-i18n="karma">Karma</h2>
+									<h2>Nuyen</h2>
+									<h2 data-i18n="reputation">Reputation</h2>
+									<h2 data-i18n="heat">Heat</h2>
+									</span></span>
+								</div>
 
-	<fieldset class="repeating_sessions">
-		<input style="display: none;" class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/>
-		<input style="display: none;" class="collapse-flag" name="attr_display_flag" title="Collapse toggle" type="checkbox" checked="checked"/>
-		<div class="sess-info">
-			<span>&nbsp;</span>
-			<span name="attr_date" title="@{repeating_sessions_${x}_date}"></span>
-			<span name="attr_name" title="@{repeating_sessions_${x}_name}"></span>
-			<span name="attr_gm" title="@{repeating_sessions_${x}_gm}"></span>
-			<input class="collapse-flag" name="attr_display_flag" type="checkbox"/><span class="pictos">i</span>
-			<input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
-		</div>
-		<div class="sess-awards">
-			<span>&nbsp;</span>
-			<span name="attr_karma" title="@{repeating_sessions_${x}_karma}"></span>
-			<span name="attr_nuyen" title="@{repeating_sessions_${x}_nuyen}"></span>
-			<span name="attr_reputation" title="@{repeating_sessions_${x}_reputation}"></span>
-			<span name="attr_heat" title="@{repeating_sessions_${x}_heat}"></span>
-			<span>&nbsp;</span>
-		</div>
-		<div class="collapse"><span name="attr_notes"></span></div>
+								<fieldset class="repeating_sessions">
+									<input style="display: none;" class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/>
+									<input style="display: none;" class="collapse-flag" name="attr_display_flag" title="Collapse toggle" type="checkbox" checked="checked"/>
+									<div class="sess-info">
+										<span>&nbsp;</span>
+										<span name="attr_date" title="@{repeating_sessions_${x}_date}"></span>
+										<span name="attr_name" title="@{repeating_sessions_${x}_name}"></span>
+										<span name="attr_gm" title="@{repeating_sessions_${x}_gm}"></span>
+										<input class="collapse-flag" name="attr_display_flag" type="checkbox"/><span class="pictos">i</span>
+										<input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
+									</div>
+									<div class="sess-awards">
+										<span>&nbsp;</span>
+										<span name="attr_karma" title="@{repeating_sessions_${x}_karma}"></span>
+										<span name="attr_nuyen" title="@{repeating_sessions_${x}_nuyen}"></span>
+										<span name="attr_reputation" title="@{repeating_sessions_${x}_reputation}"></span>
+										<span name="attr_heat" title="@{repeating_sessions_${x}_heat}"></span>
+										<span>&nbsp;</span>
+									</div>
+									<div class="collapse"><span name="attr_notes"></span></div>
 
-		<div class="settings">
-			<div class="sess-info">
-				</span>&nbsp;</span>
-				<input type="text" name="attr_date" value="" placeholder="Date Played" title="Date Played" />
-				<input type="text" name="attr_name" value="" placeholder="Session Name" title="Session Name" />
-				<input type="text" name="attr_gm" value="" placeholder="Agent/GM" title="Agent/GM" />
-				</span>&nbsp;</span>
-			</div>
-			<div class="sess-awards">
-				<span>&nbsp;</span>
-				<input type="text" name="attr_karma" value="" placeholder="Karma" title="Karma" />
-				<input type="text" name="attr_nuyen" value="" placeholder="Nuyen" title="Nuyen" />
-				<input type="text" name="attr_reputation" value="" placeholder="Reputation" title="Reputation" />
-				<input type="text" name="attr_heat" value="" placeholder="Heat" title="Heat" />
-				</span>&nbsp;</span>
-			</div>
-			<label data-i18n-title="notes" title="notes"><span data-i18n="notes">Notes</span>
-				<textarea name="attr_notes" placeholder="Notes" title="{repeating_effects_${x}_notes}"></textarea>
-			</label>
-		</div>
+									<div class="settings">
+										<div class="sess-info">
+											</span>&nbsp;</span>
+											<input type="text" name="attr_date" value="" placeholder="Date Played" title="Date Played" />
+											<input type="text" name="attr_name" value="" placeholder="Session Name" title="Session Name" />
+											<input type="text" name="attr_gm" value="" placeholder="Agent/GM" title="Agent/GM" />
+											</span>&nbsp;</span>
+										</div>
+										<div class="sess-awards">
+											<span>&nbsp;</span>
+											<input type="text" name="attr_karma" value="" placeholder="Karma" title="Karma" />
+											<input type="text" name="attr_nuyen" value="" placeholder="Nuyen" title="Nuyen" />
+											<input type="text" name="attr_reputation" value="" placeholder="Reputation" title="Reputation" />
+											<input type="text" name="attr_heat" value="" placeholder="Heat" title="Heat" />
+											</span>&nbsp;</span>
+										</div>
+										<label data-i18n-title="notes" title="notes"><span data-i18n="notes">Notes</span>
+											<textarea name="attr_notes" placeholder="Notes" title="{repeating_effects_${x}_notes}"></textarea>
+										</label>
+									</div>
 
-	</fieldset>
+								</fieldset>
 
-</div>
+							</div>
+						</div>
+
+			         <input class="tab-switch" name="attr_notes_toggle" type="hidden" value="changelog"/>
+						<div class="notes-changelog">
+							<div name="changelog" class="changelog">
+								<h1 class="changelog-header">Most Recent Updates</h1>
+								<span class="changelog-entry">2022-08-08 - v.57 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - Updated mouseover text for Metamagics to indicate they are repeating metamagic not repeating powers
+									<li><span class="bullet">A</span><b>Bugfix</b> - Updated Non-PC sheets to have Matrix AR, Matrix DR, Matrix Soak and Biofeedback Soak buttons as appropriate in the Defenses Pane
+									<li><span class="bullet">F</span><b>New Feature</b> - Some updates to the Magic->Meta tab to clean up the layout and put a Magic AR button there as well.
+									<li><span class="bullet">A</span><b>Bugfix</b> - Fixed some weirdness with Social->Sins and Social->Contacts pane styles.
+									<li><span class="bullet">A</span><b>Bugfix</b> - (not really a bug) updated the color for the Edge and Matrix Condition Monitor hexes to be the purple everything else is.
+									<li><span class="bullet">F</span><b>New Feature</b> - Added Matrix Soak and Biofeedback Soak buttons to Core Pane and Matrix Pane
+									<li><span class="bullet">F</span><b>New Feature</b> - Added Damage Type to Combat spells in Magic->Spells pane, the Damage Type selector will disappear for non-combat spells.
+									<li><span class="bullet">F</span><b>New Feature</b> - Updated Effect Type to hide values that make no sense (i.e. Single Sense / Multi Sense for anything but Illusion spells and The 4 combat options for any non-combat spells)
+									<li><span class="bullet">F</span><b>New Feature</b> - Updated Spells to make it so the pop-up prompts for Amp-Up and Increase Area ONLY pop up when the spell is of the right type.  Only Combat spells get "Amp Up" prompts, Only "LOS (A)" spells get "Increase Area" prompts.  The "Agony" spell is by definition LOS but acts like LOS (A) in that it can be extended to multiple targets, you will want to enter it as LOS (A) there may be other similar spells.
+									<li><span class="bullet">F</span><b>New Feature</b> - Added Notes->Updates Pane to display most recent changes.  The sheet will automatically open to this page if changes are made to functionality that need to be highlighted.
+									<li><span class="bullet">F</span><b>New Feature</b> - Added the Primary button to Arms->Melee weapons with the same functionality as the Arms->Ranged weapons have.
+									<li><span class="bullet">F</span><b>New Feature</b> - Arms->Ranged now have a Default Firing mode selection.  This will be the selected firing mode when you initially set this weapon to primary, or if you change this while it's the primary weapon it will set the firing mode on the primary weapon as well.
+								</ul>
+								<span class="changelog-entry">2022-08-04 - v.56 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - There were 10 repeating sections that didn't use "name" for the name field.  Fixed this to make other automated tasks easier to achieve in the future.
+									<li><span class="bullet">F</span><b>New Feature</b> - added Composure roll button to Grunts
+									<li><span class="bullet">A</span><b>Bugfix</b> - Cleaned up non-PC sheets to show condition monitors better (including the max)
+									<li><span class="bullet">A</span><b>Bugfix</b> - Fixed how display of matrix device and matrix roll buttons work.
+									<li><span class="bullet">F</span><b>New Feature</b> - normalized the styling on non-PC sheets a little bit to help mark separate sections better.
+									<li><span class="bullet">F</span><b>New Feature</b> - Added Logs section under the Notes Pane for keeping track of missions and rewards.  This is purely for note taking purposes and isn't automated anywhere.
+								</ul>
+								<span class="changelog-entry">2022-07-26 - v.55 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - Imports choked if the character in Genesis has a lifestyle that is not associated with a specific SIN, the code is more forgiving for this now.
+									<li><span class="bullet">F</span><b>New Feature</b> - Added Edge Roll buttons to most PC sheet roll buttons on the sheet.  These can be toggled on/off via the check box in the Options Pane if you don't want them for your character/campaign.
+									<li><span class="bullet">A</span><b>Bugfix</b> - There was an extraneous } character on the D6 roll button, it has been nullified.
+									<li><span class="bullet">A</span><b>Bugfix</b> - Minor style changes to Options Pane and main rolls-computed roll template.
+									<li><span class="bullet">A</span><b>Bugfix</b> - fixed css on PC matrix devices so the notes expand the full width when displayed.
+									<li><span class="bullet">E</span><b>Update</b> - Due to changes in the latest CRB printing, matrix device initiative bonuses have been verified to be a dice bonus, updated initiatives to reflect that.
+									<li><span class="bullet">A</span><b>Bugfix</b> - Found an error condition where an item (program for example) with an on/off switch that was using modifications when deleted, even when turned off reversed the modifications causing data issues.
+									<li><span class="bullet">A</span><b>Bugfix</b> - Fixed mistyped attribute names in the modifications whitelist astral_initiative_dice_mod, matrix_initiative_dice_mod, cold_sim_initiative_dice_mod and hot_sim_initiative_dice_mod modifiers should now work in modifications boxes.  The mouseover titles have been fixed as well.
+									<li><span class="bullet">A</span><b>Bugfix</b> - NPC Wound modifiers are now correctly applying per TWO boxes of damage, per CRB pg.203.
+								</ul>
+								<span class="changelog-entry">2022-07-22 - v.54 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">F</span><b>New Feature</b> - Added Notes imports to all repeating sections with a notes field except Sprites and Spirits (players should really be using separate character sheets for these)
+								</ul>
+								<span class="changelog-entry">2022-07-20 - v.53 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">F</span><b>New Feature</b> - Quality of life addition, newlines and spacing put in notes fields should be preserved when displaying the notes.
+									<li><span class="bullet">F</span><b>New Feature</b> - Added Resist Toxin button to the Core Combat Info Pane
+									<li><span class="bullet">A</span><b>Bugfix</b> - Fixed the annoying bug that caused the Initiative roll button to not display properly
+									<li><span class="bullet">F</span><b>New Feature</b> - Added Matrix Noise field on the PC Rolls Pane that is included as a negative modifier in the roll buttons found there
+								</ul>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -3982,18 +4106,50 @@
 			  </label>
 			  <span class="toggle-display"> <span class="tiny">+</span><span name="attr_soak_modifier"></span></span>
 			</div>
-			<div class="rows grunt">
-			  <button data-i18n="soakmatrix" name="roll_soak" type="roll" title="Firewall" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{soak} ^{matrix} ^{damage} = ^{firewall}}}{{dice=[[(@{firewall}+@{soak_matrix_modifier}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">soak matrix</button>
-			  <label class="settings" data-i18n-title="soakmatrix" title="soak">
-				 <input name="attr_soak_matrix_modifier" placeholder="0" title="@{soak_matrix_modifier}" type="number" value="0"/>
-			  </label>
-			  <span class="toggle-display"> <span class="tiny">+</span><span name="attr_soak_matrix_modifier"></span></span>
-			  <button data-i18n="soakbiofeedback" name="roll_soak" type="roll" title="Willpower" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{soak} ^{biofeedback} ^{damage} = ^{willpower}}}{{dice=[[(@{willpower}+@{soak_biofeedback_modifier}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">soak biofeedback</button>
-			  <label class="settings" data-i18n-title="soakbiofeedback" title="soak">
-				 <input name="attr_soak_biofeedback_modifier" placeholder="0" title="@{soak_biofeedback_modifier}" type="number" value="0"/>
-			  </label>
-			  <span class="toggle-display"> <span class="tiny">+</span><span name="attr_soak_biofeedback_modifier"></span></span>
+
+			<div class="rows grunt vehicle sprite host">
+			  <input name="attr_flag_matrix" type="hidden" value=""/>
+			  <div class="matrix">
+				  <button name="roll_matrix_ar" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{matrix} ^{attackrating}}}{{rating=@{matrix_attack_rating}}}">
+					 <span class="center"><span data-i18n="matrix_ar">Matrix AR</span> <span name="attr_matrix_attack_rating"></span></span>
+				  </button>
+				  <label class="settings" data-i18n-title="matrix_ar" title="matrix_ar">
+					 <input name="attr_matrix_attack_rating" placeholder="9" title="@{matrix_attack_rating}" type="number" value="0"/>
+				  </label>
+				  <button name="roll_matrix_dr" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{matrix} ^{defenserating}}}{{rating=@{matrix_defense_rating}}}">
+					 <span class="center"><span data-i18n="matrix_dr" title="@{matrix_defense_rating">DR</span> <span name="attr_matrix_defense_rating"></span></span>
+				  </button>
+				  <label class="settings" data-i18n-title="matrix_dr" title="matrix_dr">
+					 <input name="attr_matrix_defense_rating" placeholder="9" title="@{matrix_defense_rating}" type="number" value="0"/>
+				  </label>
+				</div>
 			</div>
+			<div class="rows grunt">
+			  <input name="attr_flag_matrix" type="hidden" value=""/>
+			  <div class="matrix">
+				  <button data-i18n="soakmatrix" name="roll_soak" type="roll" title="Firewall" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{soak} ^{matrix} ^{damage} = ^{firewall}}}{{dice=[[(@{firewall}+@{soak_matrix_modifier}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">soak matrix</button>
+				  <label class="settings" data-i18n-title="soakmatrix" title="soak">
+					 <input name="attr_soak_matrix_modifier" placeholder="0" title="@{soak_matrix_modifier}" type="number" value="0"/>
+				  </label>
+				  <span class="toggle-display"> <span class="tiny">+</span><span name="attr_soak_matrix_modifier"></span></span>
+				  <button data-i18n="soakbiofeedback" name="roll_soak" type="roll" title="Willpower" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{soak} ^{biofeedback} ^{damage} = ^{willpower}}}{{dice=[[(@{willpower}+@{soak_biofeedback_modifier}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">soak biofeedback</button>
+				  <label class="settings" data-i18n-title="soakbiofeedback" title="soak">
+					 <input name="attr_soak_biofeedback_modifier" placeholder="0" title="@{soak_biofeedback_modifier}" type="number" value="0"/>
+				  </label>
+				  <span class="toggle-display"> <span class="tiny">+</span><span name="attr_soak_biofeedback_modifier"></span></span>
+				</div>
+			</div>
+			<div class="rows vehicle sprite host">
+			  <input name="attr_flag_matrix" type="hidden" value=""/>
+			  <div class="matrix">
+				  <button data-i18n="soakmatrix" name="roll_soak" type="roll" title="Firewall" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{soak} ^{matrix} ^{damage} = ^{firewall}}}{{dice=[[(@{firewall}+@{soak_matrix_modifier}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">soak matrix</button>
+				  <label class="settings" data-i18n-title="soakmatrix" title="soak">
+					 <input name="attr_soak_matrix_modifier" placeholder="0" title="@{soak_matrix_modifier}" type="number" value="0"/>
+				  </label>
+				  <span class="toggle-display"> <span class="tiny">+</span><span name="attr_soak_matrix_modifier"></span></span>
+				</div>
+			</div>
+
 			<div class="rows grunt">
 			  <span class="pictos3 chem">d</span><span class="chem"> Chem </span> <span name="attr_chem_total"></span>
 			  <label class="settings" data-i18n-title="chemprotection" title="chemprotection">
@@ -4038,19 +4194,6 @@
 				 <input name="attr_soak_modifier" placeholder="0" title="@{soak_modifier}" type="number" value="0"/>
 			  </label>
 			  <span class="toggle-display"> <span class="tiny">+</span><span name="attr_soak_modifier"></span></span>
-			</div>
-			<div class="rows vehicle">
-			  <button data-i18n="soakmatrix" name="roll_soak" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{soak} ^{matrix} ^{damage} = ^{firewall}}}{{dice=[[(@{firewall}+@{soak_matrix_modifier}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">soak matrix</button>
-			  <label class="settings" data-i18n-title="soakmatrix" title="soak">
-				 <input name="attr_soak_matrix_modifier" placeholder="0" title="@{soak_matrix_modifier}" type="number" value="0"/>
-			  </label>
-			  <span class="toggle-display"> <span class="tiny">+</span><span name="attr_soak_matrix_modifier"></span></span>
-			</div>
-			<div class="rows sprite host">
-			  <button data-i18n="attackrating" name="roll_ar" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{attackrating} = ^{attack} + ^{sleaze}}}{{rating=[[@{attack}+@{sleaze}]]}}">attackrating</button> <span name="attr_matrix_attack_rating"></span>
-			</div>
-			<div class="rows sprite host">
-			  <button data-i18n="defenserating" name="roll_dr" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{defenserating} = ^{data_processing} + ^{firewall}}}{{rating=[[@{data_processing}+@{firewall}]]}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">defenserating</button> <span name="attr_matrix_defense_rating"></span>
 			</div>
 		 </div>
 
@@ -4502,7 +4645,7 @@
 					<div class="row">
 						<h3 data-i18n="firingmodes">Firing Modes</h3>
 						<label data-i18n-title="modeoptions" title="Mode Options">
-							<input name="attr_firing_modes" placeholder="SA/BF/FA" type="text" title="@{repeating_range_${x}_firing_modes}}"/>
+							<input name="attr_firing_modes" placeholder="SS/SA/BF/BW/FA" type="text" title="@{repeating_range_${x}_firing_modes}}"/>
 						</label>
 						<h3 data-i18n="modifier">modifier</h3>
 						<label data-i18n-title="modifier" title="modifier">
@@ -5489,6 +5632,11 @@
 			<span class="sheet-template-desc">Increase Area: {{increasearea}}m</span>
 		</div>
 		{{/rollGreater() increasearea 0}}{{/increasearea}}
+		{{#damagetype}}
+		<div class="sheet-template-row">
+			<span class="sheet-template-desc">Damage Type: {{damagetype}}</span>
+		</div>
+		{{/damagetype}}
 		{{#fade}}{{#rollGreater() fade 0}}
 		<div class="sheet-template-row">
 			<span class="sheet-template-desc">Fade: {{fade}}</span>
@@ -5652,8 +5800,9 @@
 <input type="hidden" name="attr_resist_pain" value="0" />
 <input type="hidden" name="attr_damage_compensator" value="0" />
 <input type="hidden" name="attr_rerolls" value="1" />
+<input type="hidden" name="attr_tradition_attribute" value="" />
 
-<input type="hidden" name="attr_sheet_version" value="0.56">
+<input type="hidden" name="attr_sheet_version" value="0.57">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 
@@ -5703,6 +5852,10 @@ on("sheet:opened", function() {
 				case (v.data_version < 0.56):
 					_v56_update();
 					console.log("Data now fits v.56");
+				case (v.data_version < 0.57):
+					_v57_update();
+					console.log("Data now fits v.57");
+					show_changelog();
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -5716,6 +5869,54 @@ on("sheet:opened", function() {
 	});
 });
 
+var show_changelog = () => {
+	// Force the PC sheets to the changelog section to see the latest updates
+	setAttrs({
+		'tab': 'notes',
+		'notes_toggle': 'changelog'
+	});
+};
+
+
+var _v57_update = () => {
+	// Update the tradition_attribute if they're awakened and it hasn't been set.  Also update Magic AR as well.
+	getAttrs(['flag_special', 'tradition_attribute', 'tradition', 'magic', 'magic_ar', 'logic', 'intuition', 'charisma'], (v) => {
+		if(v.flag_special == 'magic' && ! v.tradition_attribute) {
+			var magic_ar = v.magic || 0;
+
+			// make a default tradition attribute (Shaman of course!)
+			tradition_attribute = 'Charisma';
+			switch(v.tradition) {
+				case "Hermeticism":
+				case "Hermeticism (Logic)":
+				case "Shamanism (Logic)":
+					magic_ar += v.logic;
+					tradition_attribute = 'Logic';
+					break;
+				case "Hermeticism (Intuition)":
+				case "Shamanism (Intuition)":
+					magic_ar += v.intuition;
+					tradition_attribute = 'Intuition';
+					break;
+				case "Hermeticism (Charisma)":
+				case "Shamanism (Charisma)":
+				case "Shamanism":
+					magic_ar += v.charisma;
+					tradition_attribute = 'Charisma';
+					break;
+				default:
+					magic_ar = 0;
+					break;
+			}
+
+			setAttrs({
+				'magic_ar': magic_ar,
+				'tradition_attribute': tradition_attribute
+			});
+		}
+	});
+
+};
 
 var _v56_update = () => {
 	// Update repeating_augmentations_augmentation to be repeating_augmentations_name
@@ -5859,7 +6060,6 @@ var _v56_update = () => {
 			});
 		});
 	});
-
 };
 
 var _v53_update = () => {
@@ -6061,7 +6261,6 @@ console.log(eventInfo);
 // Roll Button Definitions
 const rollButtons = {
 	d6: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=?{Roll Reason?|d6}}}{{dice=[[(?{d6s|0}d6>5cs>5cf<[[(1+@{bad_luck})]]?{Exploding 6's?|N, |Y,!})]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=@{rerolls}}}{{header=@{character_name}}}",
-//	d6: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=?{Roll Reason?|d6}}}{{dice=[[(?{d6s|0}d6>5cs>5cf<[[(1+@{bad_luck})]]?{Exploding 6's?|N, |Y,!})]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
 	bump_fours: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{bump4s}}}{{desc=Bumping ?{How many?|-#-} fours to fives.\n+?{How many?} hits,\n-[[?{How many?} * 2]] Edge}}",
 	reroll: "@{gm_toggle} &{template:rolls-computed}{{dice=[[(?{Reroll how many?|-#-}d6>5cs>5cf<[[(1+@{bad_luck})]])]]}}{{dicepool=[[0]]}}{{header=@{character_name}}}{{base=^{rerolling} ?{Reroll how many?|-#-} ^{dice}}}",
 
@@ -6093,9 +6292,11 @@ const rollButtons = {
 	defense: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{defense} = ^{reaction} + ^{intuition}}}{{dice=[[((@{defense})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	toxin_resist: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{toxin_resistance} = ^{body} + ^{willpower}}}{{dice=[[((@{body}+@{willpower}+?{Toxin Resistance Gear?|0})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	soak: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{soak} ^{damage}}}{{dice=[[((@{soak})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
-	magic_ar: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{magic} ^{attack} ^{rating}}}{{rating=@{magic_ar}}}",
+	magic_ar: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{magic} ^{attack} ^{rating}}}{{rating=@{magic_ar}}}{{desc=^{magic} + @{tradition_attribute}}}",
 	direct_magic_defense: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{direct} ^{magic} ^{defense}}}{{dice=[[((@{willpower}+@{intuition})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=Willpower + Intuition}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	indirect_magic_defense: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{indirect} ^{magic} ^{defense}}}{{dice=[[((@{reaction}+@{willpower})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=Reaction + Willpower}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
+	soak_matrix: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{matrix} ^{soak} = ^{firewall}}}{{dice=[[((@{firewall})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
+	soak_biofeedback: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{biofeedback} ^{soak} = ^{willpower}}}{{dice=[[((@{willpower})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 
 	primary_melee_weapon: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{primary_melee_weapon_name}}}{{dice=[[(@{primary_melee_weapon_rating}+@{primary_melee_weapon_attr_rating}+@{primary_melee_weapon_spec}+@{primary_melee_weapon_expert}+@{primary_melee_weapon_dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Damage @{primary_melee_weapon_damage}, Skill: @{primary_melee_weapon_skill}, Attribute: @{primary_melee_weapon_attribute}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	primary_range_weapon: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{primary_range_weapon}}}{{dice=[[(@{primary_range_weapon_rating}+@{primary_range_weapon_attr_rating}+@{primary_range_weapon_spec}+@{primary_range_weapon_expert}+@{primary_range_weapon_dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Mode @{primary_range_weapon_mode}, Damage @{primary_range_weapon_damage}, Skill @{primary_range_weapon_skill}, Attribute: @{primary_range_weapon_attribute}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
@@ -6109,7 +6310,10 @@ const rollButtons = {
 	grenadeweapon: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name}}}{{dice=[[(@{type}+@{spec}+@{expert}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=DV @{ground_zero}/@{close}/@{near}, Blast Area: @{blast}, Notes: @{notes} [GM Roll Scatter](~@{character_name}|GrenadeScatterAndDistance)}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	GrenadeScatterAndDistance: "/w GM &{template:multirow}{{header=Grenade}}{{base=Bounce & Scatter}}{{desc=Scatter Direction [[2d6]]}}{{desc2=Bounce Distance [[{[[2d6]]-(?{Hits?|0}?{Range?|Close,+4|Near,+2|Medium,+0|Far,-2|Extreme,-4}),0}kh1]]m}}",
 
-	spell: "@{gm_toggle} &{template:rolls-computed}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{ampup=[[?{Amp Up|0|1|2|3|4|5|6|7|8|9|10}]]}}{{increasearea=[[?{Increase Area|0m,0|2m,1|4m,2|6m,3|8m,4|10m,5|12m,5|14m,6|16m,8|18m,9|20m,10}*2]]}}{{drain=[[?{Amp Up}*2+?{Increase Area}+(@{drain})]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{desc=@{notes}}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
+	spell: "@{gm_toggle} &{template:rolls-computed}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{ampup=[[?{Amp Up|0|1|2|3|4|5|6|7|8|9|10}]]}}{{drain=[[?{Amp Up}*2+(@{drain})]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{damagetype=@{damage}}}{{desc=@{notes}}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
+	spellaoe: "@{gm_toggle} &{template:rolls-computed}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{ampup=[[?{Amp Up|0|1|2|3|4|5|6|7|8|9|10}]]}}{{increasearea=[[?{Increase Area|0m,0|2m,1|4m,2|6m,3|8m,4|10m,5|12m,5|14m,6|16m,8|18m,9|20m,10}*2]]}}{{drain=[[?{Amp Up}*2+?{Increase Area}+(@{drain})]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{damagetype=@{damage}}}{{desc=@{notes}}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
+	noncombatspell: "@{gm_toggle} &{template:rolls-computed}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{drain=[[@{drain}]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{damagetype=@{damage}}}{{desc=@{notes}}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
+	noncombatspellaoe: "@{gm_toggle} &{template:rolls-computed}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{increasearea=[[?{Increase Area|0m,0|2m,1|4m,2|6m,3|8m,4|10m,5|12m,5|14m,6|16m,8|18m,9|20m,10}*2]]}}{{drain=[[?{Increase Area}+(@{drain})]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{damagetype=@{damage}}}{{desc=@{notes}}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	preparation: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name}}}{{dice=[[((@{magic}+@{potency}+@{expert}+@{spec})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=@{notes}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	ritual: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (Sorcery + Magic + Teamwork Hits)}}{{dice=[[((@{skill}+@{magic}+@{spec}+@{expert}+@{dicepool_modifier}+?{Teamwork test hits?|0})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc= Threshold:@{threshold}\nTeamwork Test Hits: ?{Teamwork test hits?|}\nNotes:@{notes}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 
@@ -6310,7 +6514,7 @@ Object.keys(initiatives).forEach((ini) => {
 'body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge',
 'composure', 'judge_intentions', 'memory', 'social_rating', 'lift_carry', 'sprint',
 'default',
-'dr', 'defense', 'toxin_resist', 'soak', 'magic_ar', 'direct_magic_defense', 'indirect_magic_defense', 'primary_range_weapon', 'primary_melee_weapon',
+'dr', 'defense', 'toxin_resist', 'soak', 'magic_ar', 'direct_magic_defense', 'indirect_magic_defense', 'soak_matrix', 'soak_biofeedback', 'primary_range_weapon', 'primary_melee_weapon',
 'natural_healing_physical', 'natural_healing_stun',
 'spell_drain', 'preparation_drain', 'ritual_drain', 'adept_drain', 'conjuring_drain',
 'conjuring', 'SpiritResistForce1', 'SpiritResistForce2', 'SpiritResistForce3', 'SpiritResistForce4', 'SpiritResistForce5', 'SpiritResistForce6', 'SpiritResistForce7', 'SpiritResistForce8', 'SpiritResistForce9', 'SpiritResistForce10',
@@ -6392,12 +6596,12 @@ console.log(rollButton);
 });
 
 // Repeating Spell/Preparation/Ritual Rolls
-['repeating_spell:spell', 'repeating_preparations:preparation', 'repeating_ritual:ritual'].forEach((button) => {
+['repeating_spell:spell', 'repeating_spell:spellaoe', 'repeating_spell:noncombatspell', 'repeating_spell:noncombatspellaoe', 'repeating_preparations:preparation', 'repeating_ritual:ritual'].forEach((button) => {
 	on(`clicked:${button}`, (eventInfo) => {
 		var buttonType = eventInfo.triggerName.split('_')[eventInfo.triggerName.split('_').length - 1];
 		var rollButton = rollButtons[buttonType];
 
-		['name', 'category', 'effect_type', 'skill', 'dicepool_modifier', 'specialization', 'expertise', 'drain', 'spec', 'expert', 'threshold', 'potency', 'notes'].forEach((field) => {
+		['name', 'category', 'effect_type', 'skill', 'dicepool_modifier', 'specialization', 'expertise', 'drain', 'spec', 'expert', 'threshold', 'potency', 'notes', 'damage'].forEach((field) => {
 			var replacement = eventInfo.triggerName.slice(8);
 
 			var re = RegExp(buttonType+'$', "g");
@@ -7092,8 +7296,8 @@ on("change:essence_mod remove:repeating_augmentations change:repeating_augmentat
 });
 
 
-// Catch changes to magic, tradition, logic or charisma to update magic AR
-on("change:magic change:tradition change:logic change: charisma change:spell_drain_attribute_1 change:spell_drain_attribute_2", (eventInfo) => {
+// Catch changes to magic, tradition, logic, intuition or charisma to update magic AR
+on("change:magic change:tradition change:logic change:intuition change:charisma change:spell_drain_attribute_1 change:spell_drain_attribute_2", (eventInfo) => {
 	getAttrs(["sheet_type", "magic", "tradition", "logic", "intuition", "charisma", "spell_drain_attribute_1", "spell_drain_attribute_2"], (v) => {
 		var magic_ar = v.magic;
 
@@ -7111,26 +7315,24 @@ on("change:magic change:tradition change:logic change: charisma change:spell_dra
 			return;
 		}
 
+		tradition_attribute = 'Charisma';
 		switch(v.tradition) {
-			case "Hermeticism (Logic)":
 			case "Hermeticism":
-				magic_ar += v.logic;
-				break;
-			case "Hermeticism (Intuition)":
-				magic_ar += v.intuition;
-				break;
-			case "Hermeticism (Charisma)":
-				magic_ar += v.charisma;
-				break;
-			case "Shamanism (Charisma)":
-			case "Shamanism":
-				magic_ar += v.charisma;
-				break;
+			case "Hermeticism (Logic)":
 			case "Shamanism (Logic)":
 				magic_ar += v.logic;
+				tradition_attribute = 'Logic';
 				break;
+			case "Hermeticism (Intuition)":
 			case "Shamanism (Intuition)":
 				magic_ar += v.intuition;
+				tradition_attribute = 'Intuition';
+				break;
+			case "Shamanism":
+			case "Shamanism (Charisma)":
+			case "Hermeticism (Charisma)":
+				magic_ar += v.charisma;
+				tradition_attribute = 'Charisma';
 				break;
 			default:
 				magic_ar = 0;
@@ -7138,7 +7340,8 @@ on("change:magic change:tradition change:logic change: charisma change:spell_dra
 		}
 
 		setAttrs({
-			'magic_ar': magic_ar
+			'magic_ar': magic_ar,
+			'tradition_attribute': tradition_attribute
 		});
 	});
 });
@@ -8216,7 +8419,7 @@ var update_skill_attribute = (prefix, skill) => {
 		const newV   = eventInfo.newValue;
 		const type   = weap.slice(-5);
 
-		getAttrs([`${weap}_name`, `${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `${weap}_attribute`, `${weap}_attr_rating`, `${weap}_primary`, `${weap}_firing_modes`, `${weap}_damage`, `${weap}_close`, `${weap}_near`, `${weap}_medium`, `${weap}_far`, `${weap}_extreme`, `sheet_type`], (v) => {
+		getAttrs([`${weap}_name`, `${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `${weap}_attribute`, `${weap}_attr_rating`, `${weap}_primary`, `${weap}_firing_modes`, `${weap}_default_mode`, `${weap}_damage`, `${weap}_close`, `${weap}_near`, `${weap}_medium`, `${weap}_far`, `${weap}_extreme`, `sheet_type`], (v) => {
 			if(v.sheet_type != 'pc') {
 				return;
 			}
@@ -8258,7 +8461,7 @@ var update_skill_attribute = (prefix, skill) => {
 			/* if it's the primary weapon any update needs to be reflected on Core->Arms */
 			if (v[`${weap}_primary`] === "primary") {
 				//Shared attributes names.
-				let array = ["dicepool", "dicepool_modifier", "name", "damage", "skill", "rating", "close", "near", "medium", "far", "extreme", "spec", "expert", "attribute", "attr_rating"];
+				let array = ["dicepool", "dicepool_modifier", "name", "damage", "skill", "rating", "close", "near", "medium", "far", "extreme", "spec", "expert", "attribute", "attr_rating", "default_mode"];
 
 				//Add the range or melee specific ones
 				if(type === "range") {
@@ -8268,30 +8471,47 @@ var update_skill_attribute = (prefix, skill) => {
 					var modes = v[`repeating_range_firing_modes`].split(/\s*\/\s*/i);
 					var toEnable = {
 						primary_range_weapon_mode_singleshot: 0,
+						[`${weap}_singleshot`]: 0,
 						primary_range_weapon_mode_semiauto: 0,
+						[`${weap}_semiauto`]: 0,
 						primary_range_weapon_mode_burst: 0,
+						[`${weap}_burst`]: 0,
+						primary_range_weapon_mode_burstwide: 0,
+						[`${weap}_burstwide`]: 0,
 						primary_range_weapon_mode_fullauto: 0,
+						[`${weap}_fullauto`]: 0,
 						primary_range_weapon_mode_other: 0,
+						[`${weap}_other`]: 0,
 					};
 					modes.forEach(mode => {
 						switch(mode.toUpperCase()) {
 							case 'SS':
 								toEnable.primary_range_weapon_mode_singleshot = 1;
+								toEnable[`${weap}_singleshot`] = 1;
 								break;
 							case 'SA':
 								toEnable.primary_range_weapon_mode_semiauto = 1;
+								toEnable[`${weap}_semiauto`] = 1;
 								break;
 							case 'BF':
 								toEnable.primary_range_weapon_mode_burst = 1;
+								toEnable[`${weap}_burst`] = 1;
+								break;
+							case 'BW':
+								toEnable.primary_range_weapon_mode_burstwide = 1;
+								toEnable[`${weap}_burstwide`] = 1;
 								break;
 							case 'FA':
 								toEnable.primary_range_weapon_mode_fullauto = 1;
+								toEnable[`${weap}_fullauto`] = 1;
 								break;
 							default:
 								toEnable.primary_range_weapon_mode_other = 1;
+								toEnable[`${weap}_other`] = 1;
 								break;
 						};
 					});
+
 
 					// save the weapon's damage and ARs to the primary base for use in the firing mode calculator
 					toEnable.primary_range_weapon_base_damage = v[`${weap}_damage`];
@@ -8315,6 +8535,7 @@ var update_skill_attribute = (prefix, skill) => {
 				for(var i=0; i < array.length; i++) {
 					attrs.push(`${weap}_` + array[i]);
 				};
+				attrs.push(`primary_${type}_weapon_mode`);
 
 				getAttrs(attrs, (v) => {
 					let update = {};
@@ -8326,6 +8547,13 @@ var update_skill_attribute = (prefix, skill) => {
 							update[`primary_${type}_weapon_${value}`] = (value === "ammo_max") ? v[`${weap}_ammo`] : v[`${weap}_${value}`];
 						};
 					});
+
+					// Update the selected firing mode to the default (if that or primary was the change)
+					if(source.includes('default_mode') || (source.includes('range') && source.includes('primary'))) {
+							update[`primary_${type}_weapon_mode`] = v[`${weap}_default_mode`];
+					} else {
+							update[`primary_${type}_weapon_mode`] = v[`primary_${type}_weapon_mode`];
+					}
 
 					setAttrs(update);
 				});
