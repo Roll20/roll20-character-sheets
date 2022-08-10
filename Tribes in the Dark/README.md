@@ -4,8 +4,12 @@ This sheet is for Tribes in the Dark, a reboot of the Tribe 8 roleplaying game f
 
 Any questions or issues with this sheet can be directed to @rivetgeek on Twitter, rivetgeek#3424 on Discord, or by joining the official Tribes in the Dark Discord channel (https://discord.gg/qfGk4aR8S2).
 ## Changelog
-#### July 25, 2022
-Fixes and changes made for v1.2 playtest.
-### January 16, 2021
 
-Initial commit
+### January 16, 2021
+* Initial commit
+### August, 2022
+* v1.2
+* Error fixes
+### August, 2022
+* v1.3
+* Error fixes

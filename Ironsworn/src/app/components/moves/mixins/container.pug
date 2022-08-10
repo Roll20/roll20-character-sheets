@@ -1,3 +1,6 @@
+include ../../../data/stats
+include ./roll-stat
+
 mixin progressRoll(opts, visibility)
   button(
     type="roll"
@@ -124,9 +127,17 @@ mixin container(opts, misc)
         block
   else
     input(type='radio' name='attr_move_preview' class=`${opts.class} hide-element` value=opts.radio)
-    div(class=`${opts.class} showhide`)
-      +preview(opts, misc)
-        block
+    div(class=`${opts.class} showhide move-preview-withroll-container`)
+      - var moveStats = opts.class == 'companion-endure-harm' || opts.class == 'swear-an-iron-vow' ? "@{heart}" : opts.stat
+      if moveStats && opts.roll
+        div.move-roll-stats-container
+          - var rollableStats = [...stats, {lower: 'health'}, {lower: 'spirit'}, {lower: 'supply'}]
+          each stat in rollableStats
+            if moveStats.includes(`@{${stat.lower}}`)
+              +rollStat(opts, stat)
+      div
+        +preview(opts, misc)
+          block
 
 mixin listButton(opts)
   if opts.no_quick_roll

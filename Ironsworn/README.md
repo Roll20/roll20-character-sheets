@@ -14,10 +14,65 @@ npm run build:pug:win
 npm run build:css
 ```
 These will then generate a `dist` folder that will have the finished code. From there you can upload them into the custom sheet sandbox for testing.
+
 ## Pushing Changes
 Roll20 does not build our pug/stylus code for when we merge. This needs to be done locally by running `npm run gulp:build` in the Ironsworn/src directory.
+
 ## Translations
 To keep our translation and fallback html content consistent. We are loading the translations into pug under the `locals` global variable. This allows us to call `locals.translations[<translation-key>]` to get our content. This way we can propagate changes and avoid hardcoding content.
+
+## Changelog
+You can handle a new version in:
+- `src/package.json`: edit the `version` property
+- `src/app/workers/scripts/pages.js`: change the value of `changelog_X.Y.Z` to match
+- `src/app/pages/index.pug`: change the value of `attr_changelog_X.Y.Z` to match and add a new changelog entry
+
+## Tools
+- [Visual Studio Code](https://code.visualstudio.com/download)
+  - [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
+  - [stylus](https://marketplace.visualstudio.com/items?itemName=sysoev.language-stylus)
+
+## Local testing
+A minimal framework for testing locally is present in `src/test`.
+It allows to generate an html page that almost renders and behaves as on the Sheet sandbox.
+It is not meant to replace a validation on the Sheet sandbox but it may be useful for rapid testing or for those without access to the sandbox.
+
+You must create a file `test/attributes.js` that contains the initial values of your attributes.
+It may be an empty object if you do not want to initialize some values.
+For instance:
+``` js
+const attributeStore = {
+  close_changelog: 'on',
+  modes_choice: 'off',
+  mode: '0',
+  edge: '1',
+  heart: '2',
+  iron: '3',
+  shadow: '4',
+  wits: '5',
+  health: '5',
+  spirit: '5',
+  supply: '5',
+  momentum_max: 10,
+  momentum_reset: 2
+}; // don't forget the semi-colon
+```
+
+To build for testing, use `npm run gulp:test-watch`.
+This compiles `test/Ironsworn.html` and `Ironsworn.css`.
+You can open `test/Ironsworn.html` in your browser.
+
+You **MUST** exclude these 2 files **locally** from git: in `.git/info/exclude` add
+```
+/Ironsworn/src/test/Ironsworn.html
+/Ironsworn/src/test/attributes.js
+```
+
+### Limitations
+- Inputs in repeating sections (fieldset) may not be handled properly
+- Shared sheet repeating sections are not handled at all
+- Rolls are not interpreted
+
 ## Compatibility
 The sheet has been tested across multiple browsers and devices, show below in the compatibility matrix:
 |Browser|Windows|MacOs|Android|iOS|
