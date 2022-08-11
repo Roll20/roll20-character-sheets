@@ -536,6 +536,8 @@ rollCombatContact.forEach((button) => {
       isAJumelle = ameliorationsS.isJumelle;
       isAAllegee = ameliorationsS.isAllegee;
 
+      if (!isMeurtrier) { isMeurtrier = ameliorationsS.isBarbelee; }
+
       if (lumiereValue >= ameliorationsS.aLumiereValue) { autresAmeliorationsS.push(ameliorationsS.aLumiere); } else if (ameliorationsS.aLumiereValue > 0) {
         lumiere = `${ameliorationsS.aLumiere} (${i18n_lumiere} ${ameliorationsS.aLumiereValue})`;
         lumiereValue = ameliorationsS.aLumiereValue;
