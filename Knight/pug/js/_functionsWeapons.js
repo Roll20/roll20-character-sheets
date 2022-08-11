@@ -150,7 +150,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   const eDegatsContinus = isApplied(effet[`${prefix}degatContinue`]);
   const eDegatsContinusV = effet[`${prefix}degatContinueValue`] || 0;
   const eDeuxMains = isApplied(effet[`${prefix}deuxMains`]);
-  const eDemoralisant = isApplied(effet[`${prefix}eDemoralisant`]);
+  const eDemoralisant = isApplied(effet[`${prefix}demoralisant`]);
   const eDesignation = isApplied(effet[`${prefix}designation`]);
   const eDestructeur = isApplied(effet[`${prefix}destructeur`]);
   const eDestructeurV = 2;
@@ -2890,7 +2890,7 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
   return result;
 }
 
-function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false) {
+function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
@@ -2949,11 +2949,13 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
 
         if (ODBarbarian.length === 0) { exec.push('{{vODBarbarian=[[0]]}}'); } else { exec.push(`{{vODBarbarian=[[${ODBarbarian.join('+')}]]}}`); }
 
-        diceDegats += goliath;
-        diceViolence += goliath;
+        if (!distance) {
+          diceDegats += goliath;
+          diceViolence += goliath;
 
-        exec.push(`{{vBarbarianD=+${goliath}D6}}`);
-        exec.push(`{{vBarbarianV=+${goliath}D6}}`);
+          exec.push(`{{vBarbarianD=+${goliath}D6}}`);
+          exec.push(`{{vBarbarianV=+${goliath}D6}}`);
+        }
 
         if (goliath >= 4 && !aEffets.includes(i18n_antiVehicule)) {
           autresEffets.push(i18n_antiVehicule);
@@ -3142,7 +3144,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   return result;
 }
 
-function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false) {
+function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
@@ -3191,11 +3193,13 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
 
         if (ODMALBarbarian.length === 0) { exec.push('{{vODMALBarbarian=[[0]]}}'); } else { exec.push(`{{vODMALBarbarian=[[${ODMALBarbarian.join('+')}]]}}`); }
 
-        diceDegats += MALGoliath;
-        diceViolence += MALGoliath;
+        if (!distance) {
+          diceDegats += MALGoliath;
+          diceViolence += MALGoliath;
 
-        exec.push(`{{vMALBarbarianD=+${MALGoliath}D6}}`);
-        exec.push(`{{vMALBarbarianV=+${MALGoliath}D6}}`);
+          exec.push(`{{vMALBarbarianD=+${MALGoliath}D6}}`);
+          exec.push(`{{vMALBarbarianV=+${MALGoliath}D6}}`);
+        }
 
         if (MALGoliath >= 4 && !aEffets.includes(i18n_antiVehicule)) {
           autresEffets.push(i18n_antiVehicule);
