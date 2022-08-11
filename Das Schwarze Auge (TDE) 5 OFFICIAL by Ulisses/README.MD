@@ -6,7 +6,7 @@ Official feedback hub for the roll 20 ulisses TDE character sheet & future compe
 
 
 ### Changelog
-# 1.2.2 (11.8.2022)
+# 1.2.3 (11.8.2022)
 * Movement speed should now be properly affected by conditions
 * Ranged combat should not be affected by encumbrance anymore
 * Off-hand modifiers should now work properly
