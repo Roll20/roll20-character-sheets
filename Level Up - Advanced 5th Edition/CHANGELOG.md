@@ -1,7 +1,5 @@
 Change Log
 ==============================================
-**2022-08-?? ** v.14 Paul V
-	Split out Features and Traits into their own individual lines, allowing more flexibility
 **2022-08-14 ** v.13 Paul V
 	Added new Dex(Basic) initiative option
 	Added Bloodied HP on to the NPC sheet 
