@@ -2383,8 +2383,12 @@
         getAttrs(["notes", "sheetTab"], function(values) {
             if (values.sheetTab ==="isAdversary"){
                 let importerror = false;
+                let json = values.notes;
+                json = json.substring(json.indexOf('{'));
+                json = json.substring(0,json.lastIndexOf("}") + 1);
+                clog(json);
                 try{
-                    var characterData = JSON.parse(values.notes);
+                    var characterData = JSON.parse(json);
                 } catch(err){
                     importerror = true;
                 }
@@ -2392,7 +2396,7 @@
                     clearSheet();
                     writeToSheet(characterData);
                 } else {
-                    if (importerror && values.notes != "") {
+                    if (importerror && values.notes != "Adversary json import successful.") {
                         clog('Adversary import skipped. Notes field is no valid JSON.')   
                     }
                 }
@@ -2402,32 +2406,41 @@
     function writeToSheet (characterData) {
         let character = {};
         character["name"] = characterData["name"] || "";
-        character["attribute-level"] = parseInt(characterData["attributeLevel"]);
+        character["attribute-level"] = int(characterData["attributeLevel"]);
         character["distinctive-features"] = characterData["distinctiveFeatures"] || "";
-        character["endurance"] = parseInt(characterData["endurance"]);
-        character["might"] = parseInt(characterData["might"]);
-        character["hate"] = parseInt(characterData["hateresolve"]);
-        character["parry"] = parseInt(characterData["parry"]);
-        character["armourprot"] = parseInt(characterData["armour"]);
+        character["endurance"] = int(characterData["endurance"]);
+        character["might"] = int(characterData["might"]);
+        let resolve = int(characterData["resolve"]);
+        let hate = int(characterData["hate"]);
+        clog("Hate: " + hate + " Resolve: " + resolve);
+        character["hate"] = Math.max(resolve, hate);
+        character["hateresolve"] = hate > resolve ? 1 : 2;
+        character["parry"] = int(characterData["parry"]);
+        character["armourprot"] = int(characterData["armour"]);
         let weapon1 = characterData["weaponProficiencies"][0] || false;
         let weapon2 = characterData["weaponProficiencies"][1] || false;
         if (weapon1) {
             character["weapon_skill_name_1"] = weapon1["weaponname"] || "";
-            character["weapon_rating_1"] = parseInt(weapon1["rating"]);
-            character["weapon_damage_1"] = parseInt(weapon1["damage"]);
-            character["weapon_injury_1"] = parseInt(weapon1["injury"]);
+            character["weapon_rating_1"] = int(weapon1["rating"]);
+            character["weapon_damage_1"] = int(weapon1["damage"]);
+            character["weapon_injury_1"] = int(weapon1["injury"]);
             character["weapon_special_damage_1"] = weapon1["special"] || "";
         }
         if (weapon2){
             character["weapon_skill_name_2"] = weapon2["weaponname"] || "";
-            character["weapon_rating_2"] = parseInt(weapon2["rating"]);
-            character["weapon_damage_2"] = parseInt(weapon2["damage"]);
-            character["weapon_injury_2"] = parseInt(weapon2["injury"]);
+            character["weapon_rating_2"] = int(weapon2["rating"]);
+            character["weapon_damage_2"] = int(weapon2["damage"]);
+            character["weapon_injury_2"] = int(weapon2["injury"]);
             character["weapon_special_damage_2"] = weapon2["special"] || "";
         }
-        // repeating_fell_abilities
-        // fell_ability
-        // fell_ability_desc
+
+        let newrowid = 0;
+        for (var i = 0; i < characterData["fellAbilities"].length; i++) {
+            newrowid = generateRowID();
+            character["repeating_fell-abilities_" + newrowid + "_fell_ability"] = characterData["fellAbilities"][i]["abilityname"];
+            character["repeating_fell-abilities_" + newrowid + "_fell_ability_desc"] = characterData["fellAbilities"][i]["description"];
+        }
+
         setAttrs(character);
         setAttrs({['notes']: "Adversary json import successful."});
     };
@@ -2436,6 +2449,16 @@
         setAttrs({
             ["name"]: "",
             ["distinctive-features"]: "",
+            ["weapon_skill_name_1"]: "",
+            ["weapon_rating_1"] : 0,
+            ["weapon_damage_1"] : 0,
+            ["weapon_injury_1"] : 0,
+            ["weapon_special_damage_1"] : "",
+            ["weapon_skill_name_2"] : "",
+            ["weapon_rating_2"] : 0,
+            ["weapon_damage_2"] : 0,
+            ["weapon_injury_2"] : 0,
+            ["weapon_special_damage_2"] : ""
         });
         getSectionIDs("repeating_fell-abilities", function(idarray) {
             for(var i=0; i < idarray.length; i++) {
