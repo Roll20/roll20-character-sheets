@@ -11,7 +11,7 @@ gulp.task('css', () => {
 gulp.task('html', () => {
   return gulp.src('./app/Ironsworn.pug')
     .pipe(pug({
-      pretty: true,
+      pretty: false,
       locals: { translations: require('../translation.json'), fs: require('fs') }
     }))
     .pipe(gulp.dest('../'))
@@ -35,5 +35,19 @@ gulp.task('test-html', () => {
 
 gulp.task('test-watch', gulp.series(['css', 'test-html'], () => {
   gulp.watch('./app/**/*.styl', gulp.series(['css']))
-  gulp.watch(['./app/**/*.pug', './app/**/*.js', './test/**/*.pug', './test/**/*.js', '../translation.json'], gulp.series(['test-html']))
+  gulp.watch(['./app/**/*.pug', './app/**/*.js', './test/**/*.pug', './test/**/*.js'], gulp.series(['test-html']))
+}))
+
+gulp.task('test-rt', () => {
+  return gulp.src('./test/test-roll-templates.pug')
+    .pipe(pug({
+      pretty: true,
+      locals: { translations: require('../translation.json'), fs: require('fs') }
+    }))
+    .pipe(gulp.dest('./test'))
+})
+
+gulp.task('test-rt-watch', gulp.series(['css', 'test-rt'], () => {
+  gulp.watch('./app/**/*.styl', gulp.series(['css']))
+  gulp.watch(['./app/**/*.pug', './app/**/*.js', './test/**/*.pug', './test/**/*.js'], gulp.series(['test-rt']))
 }))

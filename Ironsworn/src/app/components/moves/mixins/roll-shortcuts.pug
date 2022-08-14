@@ -1,0 +1,66 @@
+include ../../../data/move-list
+include ./rolls
+
+mixin rollStat(move, stat)
+  .move-roll-shortcut-container
+    h3.move-roll-shortcut-title(data-l10n=stat.translationId)=locals.translations[stat.translationId]
+    +rollStatModifier(0, move, stat)
+    +rollStatModifier(1, move, stat)
+    +rollStatModifier(2, move, stat)
+
+mixin rollStatModifier(modifier, move, stat)
+  label(class=`move-roll-stat-modifier move-roll-stat-modifier${modifier}`)
+    if modifier == 0
+      span(name=`attr_${stat.lower}`)
+    else
+      div= `+${modifier}`
+    button(
+      type='roll'
+      class='hide-element'
+      title=`Roll +${locals.translations[stat.translationId]}`
+      name=`roll${stat.capital}`
+      value=`&{template:ironsworn_moves} {{header=${locals.translations[move.title]}}} {{name=@{character_name}}} {{action=[[{d6+@{${stat.lower}}+${modifier},{10}}kl1]]}} {{negate1=[[1+@{${stat.lower}}+${modifier}]]}} {{negate2=[[2+@{${stat.lower}}+${modifier}]]}} {{negate3=[[3+@{${stat.lower}}+${modifier}]]}} {{negate4=[[4+@{${stat.lower}}+${modifier}]]}} {{negate5=[[5+@{${stat.lower}}+${modifier}]]}} {{negate6=[[6+@{${stat.lower}}+${modifier}]]}} {{challenge1=[[d10]]}} {{challenge2=[[d10]]}} {{momentum=[[@{momentum}]]}} {{modifiers=[[@{${stat.lower}}+${modifier}]]}} {{add=[[${modifier}]]}} {{stat=[[@{${stat.lower}}]]}}`
+    )
+
+mixin rollPayThePrice()
+  .move-roll-shortcut-container
+    -
+      var move = moveList.pay_the_price
+      move.type = 'moves_oracles'
+    h3.move-roll-shortcut-title(data-l10n='move-roll-shortcut-pay-the-price')=locals.translations['move-roll-shortcut-pay-the-price']
+    label.move-roll-shortcut-pay-the-price
+      +oracleRoll(move, 'roll-show')
+
+mixin rollAskTheOracle()
+  .move-roll-shortcut-container
+    h3.move-roll-shortcut-title(data-l10n='move-roll-shortcut-ask-the-oracle')=locals.translations['move-roll-shortcut-ask-the-oracle']
+    label.move-roll-shortcut-ask-the-oracle-almostcertain ++
+      button.hide-element(
+        type='roll' 
+        title='@{rollalmostcertain}' 
+        name='rollalmostcertain' 
+        value='&{template:ironsworn_oracles} {{header=^{ask-the-oracle-almost-certain-result}}} {{almostCertain=[[d100]]}}')
+    label.move-roll-shortcut-ask-the-oracle-likely +
+      button.hide-element(
+        type='roll' 
+        title='@{rolllikely}' 
+        name='rolllikely' 
+        value='&{template:ironsworn_oracles} {{header=^{ask-the-oracle-likely-result}}} {{likely=[[d100]]}}')
+    label.move-roll-shortcut-ask-the-oracle-fiftyfifty 50/50
+      button.hide-element(
+        type='roll'
+        title='@{rollfiftyfifty}'
+        name='rollfiftyfifty'
+        value='&{template:ironsworn_oracles} {{header=50/50}} {{fiftyFifty=[[d100]]}}')
+    label.move-roll-shortcut-ask-the-oracle-unlikely -
+      button.hide-element(
+        type='roll'
+        title='@{rollunlikely}' 
+        name='rollunlikely' 
+        value='&{template:ironsworn_oracles} {{header=^{ask-the-oracle-unlikely-result}}} {{unlikely=[[d100]]}}')
+    label.move-roll-shortcut-ask-the-oracle-small-chance --
+      button.hide-element(
+        type='roll' 
+        title='@{rollsmallchance}' 
+        name='rollsmallchance' 
+        value='&{template:ironsworn_oracles} {{header=^{ask-the-oracle-small-chance-result}}} {{smallChance=[[d100]]}}')
