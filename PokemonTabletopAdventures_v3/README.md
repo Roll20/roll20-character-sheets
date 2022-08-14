@@ -24,6 +24,27 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### May 25, 2022
+- Added some explanation text to the Configuration page to give some background on what's going on there and how to use the sheet
+
+### May 24, 2022
+- Added Roll to GM functionality!
+  - New button added next to the Configuration button to toggle between the ability to send rolls to the public chat or to whisper them to the GM
+
+### May 12, 2022
+- Fixed a bug where the pokemon and hybrid character pages would default to the normal type selection rather than typeless if this value isn't modified
+  - Also sets the default type for a newly created move to typeless rather than normal
+- Updated the default values so that a new character opens to the configuration page with the character type set as pokemon
+- Updated the default initiative tie breaker to allow a full range of decimal values
+
+### May 7, 2022
+- Add support for importing character sheets by using the VTTES tool
+  - Community member used this to create every Pokemon, so this lets others take advantage of that work even if they can't use that tool
+
+### Apr 10, 2022
+- Ensures inline roll results embedded within notes fields do not have any border or padding, so text around them is not covered by their border
+- Adjusts inline roll results styling to ensure the text matches the rest of the notes fields
+
 ### Mar 27, 2022
 - Reworked dark mode colors
   - First dark mode attempt was pretty awful in terms of color theory and not being painful to look at over time.

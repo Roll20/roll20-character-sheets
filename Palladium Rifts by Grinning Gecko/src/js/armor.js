@@ -97,9 +97,11 @@ on("clicked:armorapplydamage", async (e) => {
   if (outputUsage) {
     // const b = await getAttrsAsync([`active_armor_mdc`, `active_armor_name`]);
     const chat = await startRoll(
-      `&{template:damage} {{character_name=${a["character_name"]}}} {{spent=${
-        a["armordamage"]
-      }}} {{name=${a[`active_armor_name`]}}} {{remaining=${currentMdc}}}`
+      `@{opt_whisper}&{template:damage} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["armordamage"]}}} {{name=${
+        a[`active_armor_name`]
+      }}} {{remaining=${currentMdc}}}`
     );
     finishRoll(chat.rollId);
   }
