@@ -4,6 +4,10 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.00.00 (Build 20)
+
+- added adversary json importer
+
 ## 02.14.00 (Build 19)
 
 ### Features
