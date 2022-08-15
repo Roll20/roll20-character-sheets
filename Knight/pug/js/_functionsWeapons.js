@@ -1609,6 +1609,7 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
   let nowSoeur = false;
   let nowJumelle = false;
   let nowAllegee = false;
+  let nowBarbelee = false;
 
   const bAttaque = [];
   let diceDegats = 0;
@@ -1677,6 +1678,7 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
   if (aBarbelee) {
     if (isMeurtrier) { autresAmeliorations.push(i18n_barbelee); } else {
       isConditionnelD = true;
+      nowBarbelee = true;
 
       exec.push(`{{meurtrier=${i18n_barbelee}}} {{meurtrierValue=[[${aBarbeleeV}D6]]}} {{meurtrierCondition=${i18n_meurtrierCondition}}}`);
     }
@@ -1757,6 +1759,7 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
   result.isJumelle = nowJumelle;
   result.isProtectrice = nowProtectrice;
   result.isAllegee = nowAllegee;
+  result.isBarbelee = nowBarbelee;
 
   result.aLumiere = aLumiere;
   result.aLumiereValue = aLumiereValue;
@@ -1791,6 +1794,8 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   let diceDegats = 0;
   let bDegats = 0;
   const autresAmeliorations = [];
+
+  let nowBarbelee = false;
 
   const aAgressive = isApplied(data[`${prefix}agressive`]);
   const aAllegee = isApplied(data[`${prefix}allegee`]);
@@ -1828,6 +1833,7 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   if (aBarbelee) {
     if (isMeurtrier) { autresAmeliorations.push(i18n_barbelee); } else {
       isConditionnelD = true;
+      nowBarbelee = true;
 
       exec.push(`{{meurtrier=${i18n_barbelee}}} {{meurtrierValue=[[${aBarbeleeV}D6]]}} {{meurtrierCondition=${i18n_meurtrierCondition}}}`);
     }
@@ -1896,6 +1902,7 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   result.bAttaque = bAttaque;
   result.diceDegats = diceDegats;
   result.bDegats = bDegats;
+  result.isBarbelee = nowBarbelee;
 
   result.exec = exec;
   result.autresAmeliorations = autresAmeliorations;
