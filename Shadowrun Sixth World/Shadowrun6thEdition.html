@@ -892,7 +892,9 @@
             <h2 class="center" data-i18n="e" title="Extreme 500+">E</h2>
 			</div>
 			<div class="cc-row primary-range">
+				<input type="hidden" name="attr_primary_range_weapon_split_dicepool" value="0" />
 				<button name="act_primary_range_weapon" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{primary_range_weapon}}}{{dice=[[(@{primary_range_weapon_rating}+@{primary_range_weapon_attr_rating}+@{primary_range_weapon_spec}+@{primary_range_weapon_expert}+@{primary_range_weapon_dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode @{primary_range_weapon_mode}, Damage @{primary_range_weapon_damage}, Skill @{primary_range_weapon_skill}, Attribute: @{primary_range_weapon_attribute}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_primary_range_weapon" title="@{primary_range_weapon}"></span></button>
+				<button name="act_primary_range_weapon_split_pool_2" type="action" value=""><span name="attr_primary_range_weapon" title="@{primary_range_weapon}"></span></button>
 				<span>&nbsp;</span>
 				<span class="center" name="attr_primary_range_weapon_dicepool"></span>
 				<span class="center" name="attr_primary_range_weapon_damage"></span>
@@ -924,14 +926,26 @@
 					<option data-i18n="fullauto" value="Full Auto">Full Auto</option>
 					<option data-i18n="other" value="Other">Other</option>
 				</select>
-				<span>&nbsp;</span>
+				<span></span>
+				<select id="attr_primary_range_weapon_ammo_type" name="attr_primary_range_weapon_ammo_type" title="@{primary_range_weapon_ammo_type}">
+					<option data-i18n="regular" value="Regular">Regular</option>
+					<option data-i18n="apds" value="APDS">APDS</option>
+					<option data-i18n="explosive" value="Explosive">Explosive</option>
+					<option data-i18n="flechette" value="Flechette">Flechette</option>
+					<option data-i18n="gel" value="Gel">Gel</option>
+					<option data-i18n="handloaded" value="Handloaded">Handloaded</option>
+					<option data-i18n="matchgrade" value="Match-Grade">Match-Grade</option>
+					<option data-i18n="revo" value="rEVO">rEVO</option>
+					<option data-i18n="sticknshock" value="Stick-n-Shock">Stick-n-Shock</option>
+					<option data-i18n="other" value="Other">Other</option>
+				</select>
+				<span></span>
 				<!-- Ammo removal button -->
 				<button class="shots" name="act_shots_remove" type="action" data-i18n-title="fewershots">4</button>
 				<button class="shots" type="action" name="act_primary_ammo" title="Shots Fired">
 					<img alt="small handgun icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/images/gun.png" /><span name="attr_shots_fired"></span>
 				</button>
 				<button class="shots" name="act_shots_add" type="action" data-i18n-title="moreshots">4</button>
-				<span>&nbsp;</span>
 				<span name="attr_primary_range_weapon_ammo" title="@{primary_range_weapon_ammo}"></span>
 				<span name="attr_primary_range_weapon_ammo_max" title="@{primary_range_weapon_ammo_max}"></span>
 				<button class="pictos shots" name="act_reload" type="action" data-i18n-title="reload">0</button>
@@ -3386,6 +3400,12 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
+
+								<span class="changelog-entry">**2022-08-16 ** v.58 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">F</span><b>New Feature</b> - Added the ability to change the ammo type in use on Core->Primary Ranged with the AR and DV changes applied.  Default will be Standard.
+									<li><span class="bullet">F</span><b>New Feature</b> - Added split rolls for Burst Fire Wide firing mode on the Core->Primary Ranged weapons.  This splits the dicepool (on odd pools the left roll Atk 1 gets the extra die).  If Wild Dice are toggled on a prompt will appear for each attack.  Glitches are calculated for each attack separately.
+								</ul>
 								<span class="changelog-entry">2022-08-08 - v.57 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">A</span><b>Bugfix</b> - Updated mouseover text for Metamagics to indicate they are repeating metamagic not repeating powers
@@ -3425,13 +3445,6 @@
 								<span class="changelog-entry">2022-07-22 - v.54 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">F</span><b>New Feature</b> - Added Notes imports to all repeating sections with a notes field except Sprites and Spirits (players should really be using separate character sheets for these)
-								</ul>
-								<span class="changelog-entry">2022-07-20 - v.53 Chuz (James Culp)</span>
-								<ul>
-									<li><span class="bullet">F</span><b>New Feature</b> - Quality of life addition, newlines and spacing put in notes fields should be preserved when displaying the notes.
-									<li><span class="bullet">F</span><b>New Feature</b> - Added Resist Toxin button to the Core Combat Info Pane
-									<li><span class="bullet">A</span><b>Bugfix</b> - Fixed the annoying bug that caused the Initiative roll button to not display properly
-									<li><span class="bullet">F</span><b>New Feature</b> - Added Matrix Noise field on the PC Rolls Pane that is included as a negative modifier in the roll buttons found there
 								</ul>
 							</div>
 						</div>
@@ -5588,15 +5601,54 @@
 			{{#rollGreater() combat_paralysis 0}}<span>|</span><span data-i18n="combat_paralysis">Combat Paralysis</span><span>|</span>{{/rollGreater() combat_paralysis 0}}
 		</div>
 		{{#rollGreater() computed::glitch 0}}
-		{{#rollLess() computed::glitch 2}}<div class="sheet-template-row red"><span class="sheet-red">GLITCH!</span></div>{{/rollLess() computed::glitch 2}}
-		{{#rollGreater() computed::glitch 1}}<div class="sheet-template-row red"><span class="sheet-red">CRITICAL GLITCH!</span></div>{{/rollGreater() computed::glitch 1}}
+		{{#rollLess() computed::glitch 2}}<div class="sheet-template-row red glitch"><span class="sheet-red">GLITCH!</span></div>{{/rollLess() computed::glitch 2}}
+		{{#rollGreater() computed::glitch 1}}<div class="sheet-template-row red glitch critglitch"><span class="sheet-red">CRITICAL GLITCH!</span></div>{{/rollGreater() computed::glitch 1}}
 		{{/rollGreater() computed::glitch 0}}
 
+		{{^split_pool}}
 		{{#dice}}
 		<div class="sheet-template-row">
 			<span style="width: 70%">Hits: <!-- {{dice}} => -->{{computed::dice}}</span>
 		</div>
 		{{/dice}}
+		{{/split_pool}}
+
+		{{#split_pool}}
+		<div class="sheet-template-row sheet-split">
+			<span class="glitchspan">
+				{{#rollGreater() computed::glitch1 0}}
+				{{#rollLess() computed::glitch1 2}}<div class="sheet-template-row red glitch"><span class="sheet-red">GLITCH!</span></div>{{/rollLess() computed::glitch1 2}}
+				{{#rollGreater() computed::glitch1 1}}<div class="sheet-template-row red glitch critglitch"><span class="sheet-red">CRITICAL GLITCH!</span></div>{{/rollGreater() computed::glitch1 1}}
+				{{/rollGreater() computed::glitch1 0}}
+			</span>
+			<span class="glitchspan">
+				{{#rollGreater() computed::glitch2 0}}
+				{{#rollLess() computed::glitch2 2}}<div class="sheet-template-row red glitch"><span class="sheet-red">GLITCH!</span></div>{{/rollLess() computed::glitch2 2}}
+				{{#rollGreater() computed::glitch2 1}}<div class="sheet-template-row red glitch critglitch"><span class="sheet-red">CRITICAL GLITCH!</span></div>{{/rollGreater() computed::glitch2 1}}
+				{{/rollGreater() computed::glitch2 0}}
+			</span>
+			<span style="width: 95%">
+
+				<span class="split_pool_dicepool">Dicepool {{computed::split_pool_dicepool_1}}</span><br>
+				<span class="split_pool_results">Atk 1: {{computed::roll1}}</span>
+
+				{{#rollGreater() wilddie1 0}}
+				<div class="sheet-template-row wilddice">{{wilddie1}} Wild Dice!<br>[{{computed::wilddie1_dice}}]</div>
+				{{/rollGreater() wilddie1 0}}
+
+			</span>
+			<span style="width: 95%">
+
+				<span class="split_pool_dicepool">Dicepool {{computed::split_pool_dicepool_2}}</span><br>
+				<span class="split_pool_results">Atk 1: {{computed::roll2}}</span>
+
+				{{#rollGreater() wilddie2 0}}
+				<div class="sheet-template-row wilddice">{{wilddie2}} Wild Dice!<br>[{{computed::wilddie2_dice}}]</div>
+				{{/rollGreater() wilddie2 0}}
+
+			</span>
+		</div>
+		{{/split_pool}}
 
 		{{#rollGreater() rerolls 0}}
 		<div class="sheet-template-row">
@@ -5613,7 +5665,7 @@
 		{{#initiative}}<div class="sheet-template-row">Initiative: <!-- {{initiative}} => --> {{computed::initiative}}</div>{{/initiative}}
 
 		{{#rollGreater() wilddie 0}}
-			<div class="sheet-template-row">{{wilddie}} Wild Dice!<br>[{{computed::wilddie_dice}}]</div>
+			<div class="sheet-template-row wilddice">{{wilddie}} Wild Dice!<br>[{{computed::wilddie_dice}}]</div>
 		{{/rollGreater() wilddie 0}}
 
 		{{#rating}}<div class="sheet-template-row">{{rating}}</div>{{/rating}}
@@ -5801,8 +5853,10 @@
 <input type="hidden" name="attr_damage_compensator" value="0" />
 <input type="hidden" name="attr_rerolls" value="1" />
 <input type="hidden" name="attr_tradition_attribute" value="" />
+<input type="hidden" name="attr_wild_die1" value="0" />
+<input type="hidden" name="attr_wild_die2" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.57">
+<input type="hidden" name="attr_sheet_version" value="0.58">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 
@@ -5856,6 +5910,9 @@ on("sheet:opened", function() {
 					_v57_update();
 					console.log("Data now fits v.57");
 					show_changelog();
+				case (v.data_version < 0.58):
+					_v57_update();
+					console.log("Data now fits v.58");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -5877,6 +5934,22 @@ var show_changelog = () => {
 	});
 };
 
+
+var _v58_update = () => {
+	getAttrs(['wild_die'], (v) => {
+		if(v.wild_die == 0) {
+			setAttrs({
+				wild_die1: eventInfo.newValue,
+				wild_die2: eventInfo.newValue
+			});
+		} else {
+			setAttrs({
+				wild_die1: "?{Wild Dice for First Roll?|0}",
+				wild_die2: "?{Wild Dice for Second Roll?|0}"
+			});
+		}
+	});
+};
 
 var _v57_update = () => {
 	// Update the tradition_attribute if they're awakened and it hasn't been set.  Also update Magic AR as well.
@@ -6299,7 +6372,8 @@ const rollButtons = {
 	soak_biofeedback: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{biofeedback} ^{soak} = ^{willpower}}}{{dice=[[((@{willpower})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 
 	primary_melee_weapon: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{primary_melee_weapon_name}}}{{dice=[[(@{primary_melee_weapon_rating}+@{primary_melee_weapon_attr_rating}+@{primary_melee_weapon_spec}+@{primary_melee_weapon_expert}+@{primary_melee_weapon_dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Damage @{primary_melee_weapon_damage}, Skill: @{primary_melee_weapon_skill}, Attribute: @{primary_melee_weapon_attribute}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
-	primary_range_weapon: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{primary_range_weapon}}}{{dice=[[(@{primary_range_weapon_rating}+@{primary_range_weapon_attr_rating}+@{primary_range_weapon_spec}+@{primary_range_weapon_expert}+@{primary_range_weapon_dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Mode @{primary_range_weapon_mode}, Damage @{primary_range_weapon_damage}, Skill @{primary_range_weapon_skill}, Attribute: @{primary_range_weapon_attribute}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
+	primary_range_weapon: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{primary_range_weapon}}}{{dice=[[(@{primary_range_weapon_rating}+@{primary_range_weapon_attr_rating}+@{primary_range_weapon_spec}+@{primary_range_weapon_expert}+@{primary_range_weapon_dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Mode: @{primary_range_weapon_mode}, Damage: @{primary_range_weapon_damage}, Ammo: @{primary_range_weapon_ammo_type}, Skill: @{primary_range_weapon_skill}, Attribute: @{primary_range_weapon_attribute}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
+	primary_range_weapon_split_pool_2: "@{gm_toggle} &{template:rolls-computed}{{roll1=[[[[ceil((@{primary_range_weapon_rating}+@{primary_range_weapon_attr_rating}+@{primary_range_weapon_spec}+@{primary_range_weapon_expert}+@{primary_range_weapon_dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})/@{primary_range_weapon_split_dicepool})]]d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{roll2=[[[[floor((@{primary_range_weapon_rating}+@{primary_range_weapon_attr_rating}+@{primary_range_weapon_spec}+@{primary_range_weapon_expert}+@{primary_range_weapon_dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})/@{primary_range_weapon_split_dicepool})]]d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{dice=[[(@{primary_range_weapon_rating}+@{primary_range_weapon_attr_rating}+@{primary_range_weapon_spec}+@{primary_range_weapon_expert}+@{primary_range_weapon_dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6]]}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{primary_range_weapon}}}{{split_pool=[[@{primary_range_weapon_split_dicepool}]]}}{{desc=Damage: @{primary_range_weapon_damage}\nMode: @{primary_range_weapon_mode}\nAmmo: @{primary_range_weapon_ammo_type}\nSkill: @{primary_range_weapon_skill}, Attribute: @{primary_range_weapon_attribute}}}{{wilddie1=[[@{wild_die1}]]}}{{wilddie2=[[@{wild_die2}]]}}{{glitch1=[[0]]}}{{glitch2=[[0]]}}{{wilddie1_dice=[[0]]}}{{wilddie2_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{total_hits1=[[0]]}}{{total_hits2=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{split_pool_dicepool_1=[[0]]}}{{split_pool_dicepool_2=[[0]]}}",
 
 	natural_healing_physical: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{natural} ^{healing} ^{physical}\n^{body} + ^{body}}}{{dice=[[(@{body}+@{body}+?{Medical Care?|No,0|Yes,2})d6>5cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Natural Healing (Physical), This test can be performed once per 24 hours of rest to recover Overflow/Physical damage.\n\n&star; Duration is halved with the Quick Healer quality.}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	natural_healing_stun: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{natural} ^{healing} ^{stun}\n^{body} + ^{willpower}}}{{dice=[[(@{body}+@{willpower}+?{Medical Care?|No,0|Yes,2})d6>5cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Natural Healing (Stun), This test can be performed once per hour of rest to recover stun damage.  &star;Duration is halved with the Quick Healer quality}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
@@ -6514,7 +6588,7 @@ Object.keys(initiatives).forEach((ini) => {
 'body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge',
 'composure', 'judge_intentions', 'memory', 'social_rating', 'lift_carry', 'sprint',
 'default',
-'dr', 'defense', 'toxin_resist', 'soak', 'magic_ar', 'direct_magic_defense', 'indirect_magic_defense', 'soak_matrix', 'soak_biofeedback', 'primary_range_weapon', 'primary_melee_weapon',
+'dr', 'defense', 'toxin_resist', 'soak', 'magic_ar', 'direct_magic_defense', 'indirect_magic_defense', 'soak_matrix', 'soak_biofeedback', 'primary_range_weapon', 'primary_range_weapon_split_pool_2', 'primary_melee_weapon',
 'natural_healing_physical', 'natural_healing_stun',
 'spell_drain', 'preparation_drain', 'ritual_drain', 'adept_drain', 'conjuring_drain',
 'conjuring', 'SpiritResistForce1', 'SpiritResistForce2', 'SpiritResistForce3', 'SpiritResistForce4', 'SpiritResistForce5', 'SpiritResistForce6', 'SpiritResistForce7', 'SpiritResistForce8', 'SpiritResistForce9', 'SpiritResistForce10',
@@ -6668,26 +6742,115 @@ console.log(results.results);
 				results.results.wilddie = {dice: []}
 			}
 
+
+			var split_pool_dicepool_1 = 0;
+			var split_pool_dicepool_2 = 0;
+			// If they are splitting their pool we need to fudge the results.results.dice object
+			//    to be roll1 and roll2 objects combined.
+			if(results.results.split_pool && results.results.split_pool.result && results.results.roll1 && results.results.roll2) {
+				split_pool_dicepool_1 = results.results.roll1.dice.length;
+				split_pool_dicepool_2 = results.results.roll2.dice.length;
+
+				results.results.dice.dice = results.results.roll1.dice.concat(results.results.roll2.dice);
+				results.results.dice.result = results.results.roll1.result + results.results.roll2.result;
+			} else {
+				results.results.roll1 = [];
+				results.results.roll2 = [];
+			}
+
 			var rolled = results.results.dice.dice;
-console.log("Dicepool: "+rolled.length);
-console.log("Rolled: ");
-console.log(rolled);
 
 			var fours = rolled.reduce((a, v) => (v == 4 ? a + 1 : a), 0);
-console.log("Rolled "+fours+" fours");
 
+
+			// deal with wild dice on normal rolls else split rolls
+			if(! results.results.split_pool) {
+				wd_out = process_wild_dice(results.results.wilddie.result, rolled);
+				hits = wd_out.hits;
+				total_hits = wd_out.total_hits;
+				wd_results = wd_out.wd_results;
+
+				hits1 = 0;
+				total_hits1 = 0;
+				roll1_wd_results = 0;
+				results.results.wilddie1 = [];
+				hits2 = 0;
+				total_hits2 = 0;
+				roll2_wd_results = 0;
+				results.results.wilddie2 = [];
+			} else {
+				wd_out = process_wild_dice(results.results.wilddie1.result, results.results.roll1.dice);
+				hits1 = wd_out.hits;
+				total_hits1 = wd_out.total_hits;
+				roll1_wd_results = wd_out.wd_results;
+
+				wd_out = process_wild_dice(results.results.wilddie2.result, results.results.roll2.dice);
+				hits2 = wd_out.hits;
+				total_hits2 = wd_out.total_hits;
+				roll2_wd_results = wd_out.wd_results;
+
+				hits = hits1 + hits2;
+ 				total_hits = total_hits1 + total_hits2;
+				wd_results = roll1_wd_results + roll2_wd_results;
+			}
+
+
+			// Check for glitches on normal rolls else split rolls
+			if(! results.results.split_pool) {
+				glitch = check_glitches(v, rolled, hits);
+				glitch1 = 0;
+				glitch2 = 0;
+			} else {
+				glitch = 0;
+				glitch1 = check_glitches(v, results.results.roll1.dice, hits);
+				glitch2 = check_glitches(v, results.results.roll2.dice, hits);
+			}
+
+
+			if(results.results.sprint) {
+				dice = results.results.dice.results;
+			}
+
+			var misses = results.results.dice.dice.length - hits;
+
+			finishRoll(
+				results.rollId, {
+					dice: total_hits,
+					roll1: total_hits1,
+					roll2: total_hits2,
+					glitch: glitch,
+					glitch1: glitch1,
+					glitch2: glitch2,
+					wilddie_dice: wd_results,
+					wilddie1_dice: roll1_wd_results,
+					wilddie2_dice: roll2_wd_results,
+					wilddie: results.results.wilddie.result,
+					wilddie1: results.results.wilddie1.result,
+					wilddie2: results.results.wilddie2.result,
+					dicepool: results.results.dice.dice.length,
+					split_pool_dicepool_1: split_pool_dicepool_1,
+					split_pool_dicepool_2: split_pool_dicepool_2,
+					misses: misses,
+					hits: hits,
+					hits1: hits1,
+					hits2: hits2,
+					fours: fours,
+				}
+			);
+		});
+	});
+};
+
+var process_wild_dice = (wd_result, rolled) => {
 			var wild_die_results = [];
 			var wilddie_dice = [];
-			if(results.results.wilddie.result) {
-console.log("# Wild Dice: "+results.results.wilddie.result);
-				wild_die_results = rolled.slice(0, results.results.wilddie.result);
+			if(wd_result) {
+				wild_die_results = rolled.slice(0, wd_result);
 				wilddie_dice = wild_die_results.join(', ');
 			} else {
-				results.results.wilddie.result = 0;
+				wd_result = 0;
 			}
 			wd_results = wild_die_results.join(', ');
-console.log("Wild Die Results");
-console.log(wd_results);
 
 			var wild_die_hits = 0;
 			var hits_threshold = 5;
@@ -6697,70 +6860,44 @@ console.log(wd_results);
 			// deal with (potentially) multiple wild dice
 			// we sort these in ascending order because glitches impact other stuff
 			wild_die_results.sort(function(a, b){return a-b}).forEach((die) => {
-console.log("Die: "+die);
 				if(die < 2) {
-console.log("Wild Die Rolled 1!");
-				hits_threshold = 6;
-				wd_glitch++;
+					hits_threshold = 6;
+					wd_glitch++;
 				}
 
 				if(die >= hits_threshold) {
-console.log("Wild Die Rolled High!");
 					wd_hits += 2;
 				}
 			});
 
-console.log("Hit Threshold: "+hits_threshold);
 			var hits = rolled.reduce((a, v) => (v >= hits_threshold ? a + 1 : a), 0);
 			var total_hits = hits + wd_hits;
 
-			var glitch_threshold = 1;
-			if(parseInt(v.bad_luck) > 0) {
-				glitch_threshold = 2;
-			}
-			var glitches_ones = rolled.reduce((a, v) => (v == 1 ? a + 1 : a), 0);
-			var glitches = rolled.reduce((a, v) => (v <= glitch_threshold ? a + 1 : a), 0);
-console.log("Glitch Threshold: "+glitch_threshold);
+			return {hits: hits, total_hits: total_hits, wd_results: wd_results};
+};
 
-			// bad luck will not cause critical glitches so if it would have been a critical glitch counting 2s it is just a glitch
-			var glitch = 0;
-			if(glitches > rolled.length / 2) {
-				if(hits) {
-					glitch = 1;
-				} else if(glitches_ones <= rolled.length / 2) {
-					// without bad luck it would not have been a glitch so critical glitch just becomes a glitch.
-					glitch = 1;
-				} else {
-					glitch = 2;
-				}
-			}
-console.log("Original Hits: "+hits+" Hits: "+total_hits+" Glitches: "+glitches+" Glitch: "+glitch);
-console.log("Dicepool: "+results.results.dice.dice.length);
-console.log("Wild Dice Results: "+wd_results);
+var check_glitches = (v, rolled, hits) => {
+	var glitch_threshold = 1;
+	if(parseInt(v.bad_luck) > 0) {
+		glitch_threshold = 2;
+	}
+	var glitches_ones = rolled.reduce((a, v) => (v == 1 ? a + 1 : a), 0);
+	var glitches = rolled.reduce((a, v) => (v <= glitch_threshold ? a + 1 : a), 0);
 
-			if(results.results.sprint) {
-				dice = results.results.dice.results;
-			}
+	// bad luck will not cause critical glitches so if it would have been a critical glitch counting 2s it is just a glitch
+	var glitch = 0;
+	if(glitches > rolled.length / 2) {
+		if(hits) {
+			glitch = 1;
+		} else if(glitches_ones <= rolled.length / 2) {
+			// without bad luck it would not have been a glitch so critical glitch just becomes a glitch.
+			glitch = 1;
+		} else {
+			glitch = 2;
+		}
+	}
 
-			var misses = results.results.dice.dice.length - hits;
-console.log("hits: "+hits);
-console.log("wd_hits: "+wd_hits);
-console.log("total_hits: "+total_hits);
-console.log("misses: "+misses);
-			finishRoll(
-				results.rollId, {
-					dice: total_hits,
-					glitch: glitch,
-					wilddie_dice: wd_results,
-					wilddie: results.results.wilddie.result,
-					dicepool: results.results.dice.dice.length,
-					misses: misses,
-					hits: hits,
-					fours: fours,
-				}
-			);
-		});
-	});
+	return glitch;
 };
 
 
@@ -6897,6 +7034,21 @@ console.log(v);
 });
 
 
+// Wild Die toggle changed
+on("change:wild_die", (eventInfo) => {
+console.log(eventInfo);
+	if(eventInfo.newValue == 0) {
+		setAttrs({
+			wild_die1: eventInfo.newValue,
+			wild_die2: eventInfo.newValue
+		});
+	} else {
+		setAttrs({
+			wild_die1: "?{Wild Dice for First Roll?|0}",
+			wild_die2: "?{Wild Dice for Second Roll?|0}"
+		});
+	}
+});
 
 
 var update_attribute = (attr) => {
@@ -6969,8 +7121,6 @@ var modify_value = (params) => {
 	return diff;
 };
 
-
-
 on("clicked:shots_remove clicked:shots_add", (eventInfo) => {
 	getAttrs([`shots_fired`], (v) => {
 		let shots = parseInt(v[`shots_fired`]) || 0;
@@ -6991,70 +7141,175 @@ on("clicked:primary_ammo", (eventInfo) => {
 	});
 });
 
-on("change:primary_range_weapon_mode", (eventInfo) => {
-	var mode = eventInfo.newValue;
+on("change:primary_range_weapon_mode change:primary_range_weapon_ammo_type", (eventInfo) => {
 	var rounds = 1;
+	var split_dicepool = 0;
 
-	getAttrs(['primary_range_weapon_base_damage', 'primary_range_weapon_base_close', 'primary_range_weapon_base_near', 'primary_range_weapon_base_medium', 'primary_range_weapon_base_far', 'primary_range_weapon_base_extreme'], (v) => {
+	getAttrs(['primary_range_weapon_mode', 'primary_range_weapon_ammo_type', 'primary_range_weapon_base_damage', 'primary_range_weapon_base_close', 'primary_range_weapon_base_near', 'primary_range_weapon_base_medium', 'primary_range_weapon_base_far', 'primary_range_weapon_base_extreme', 'primary_range_weapon_split_dicepool'], (v) => {
 		var toSet = {
 			primary_range_weapon_damage: v.primary_range_weapon_base_damage,
 			primary_range_weapon_close: v.primary_range_weapon_base_close,
 			primary_range_weapon_near: v.primary_range_weapon_base_near,
 			primary_range_weapon_medium: v.primary_range_weapon_base_medium,
 			primary_range_weapon_far: v.primary_range_weapon_base_far,
-			primary_range_weapon_extreme: v.primary_range_weapon_base_extreme,
+			primary_range_weapon_extreme: v.primary_range_weapon_base_extreme
 		};
 
-		switch(mode) {
+		var mods = {
+			arMod: 0,
+			arModC: 0,
+			arModN: 0,
+			arModM: 0,
+			arModF: 0,
+			arModE: 0,
+			dvMod: 0,
+			dv_type: ''
+		};
+
+
+		// Setup mods for firing mode
+		switch(v.primary_range_weapon_mode) {
 			case "Full Auto":
-				// 10 rounds, AR -6, split dice pool... how do I split the dice pool for this without an api
+				// 10 rounds, AR -6
 				rounds = 10;
-				toSet = adjAttrs({
-					attrs: toSet,
-					arMod: -6,
-					dvMod: 0
-				});
+				mods.arMod += -6;
 				break;
 			case "Burst Fire":
 				// 4 rounds, AR -4, DV +2
 				rounds = 4;
-				toSet = adjAttrs({
-					attrs: toSet,
-					arMod: -4,
-					dvMod: 2
-				});
+				mods.arMod += -4;
+				mods.dvMod += 2;
+				break;
+			case "Burst Fire Wide":
+				// 4 rounds, AR -4, split dice pool 2 parts
+				rounds = 4;
+				mods.arMod += -4;
+				mods.dvMod += 0;
+				split_dicepool = 2;
 				break;
 			case "Semi Auto":
 				// 2 rounds, AR -2, DV +1
 				rounds = 2;
-				toSet = adjAttrs({
-					attrs: toSet,
-					arMod: -2,
-					dvMod: 1
-				});
+				mods.arMod += -2;
+				mods.dvMod += 1;
 				break;
 			case "Single Shot":
 			default:
 				// 1 round, No changes
 				rounds = 1;
-				toSet = adjAttrs({
-					attrs: toSet,
-					arMod: 0,
-					dvMod: 0
-				});
+				mods.arMod += 0;
+				mods.dvMod += 0;
 		}
 
-		toSet.shots_fired = rounds;
-		setAttrs(toSet);
 
+		// Setup mods for ammo type
+		switch(v.primary_range_weapon_ammo_type) {
+			case "APDS":
+				// AR +2, DV -1
+				mods.arMod += +2;
+				mods.dvMod += -1;
+				break;
+			case "Explosive":
+				// AR +0, DV +1
+				mods.arMod += 0;
+				mods.dvMod += +1;
+				break;
+			case "Flechette":
+				// AR +1, DV -1
+				mods.arMod += +1;
+				mods.dvMod += -1;
+				break;
+			case "Gel":
+				// AR +0, DV +0, Damage Type: S
+				mods.arMod += 0;
+				mods.dvMod += 0;
+				mods.dv_type = 'S';
+				break;
+			case "Handloaded":
+				// AR +1, DV +0
+				mods.arMod += +1;
+				mods.dvMod += 0;
+				break;
+			case "Match-Grade":
+				// AR +0, DV -1, C +1, N +2, M +3, F +3, E +2
+				mods.arMod += 0;
+				mods.dvMod += -1;
+				mods.arModC += +1;
+				mods.arModN += +2;
+				mods.arModM += +3;
+				mods.arModF += +3;
+				mods.arModE += +2;
+				break;
+			case "rEVO":
+				// AR +0, DV +1, C +1, N -1, M -1, F -2, E -2
+				mods.arMod += 0;
+				mods.dvMod += +1;
+				mods.arModC += +1;
+				mods.arModN += -1;
+				mods.arModM += -1;
+				mods.arModF += -2;
+				mods.arModE += -2;
+				break;
+			case "Stick-n-Shock":
+				// AR +1, DV -1, Damage Type: S(e)
+				mods.arMod += +1;
+				mods.dvMod += -1;
+				mods.dv_type = 'S(e)';
+				break;
+			case "Regular":
+				// AR +0, DV +0
+				mods.arMod += 0;
+				mods.dvMod += 0;
+				break;
+			default:
+				// No changes
+				mods.arMod += 0;
+				mods.dvMod += 0;
+		}
+
+
+		toSet = adjAttrs({
+			attrs: toSet,
+			arMod: mods.arMod,
+			arModC: mods.arModC,
+			arModN: mods.arModN,
+			arModM: mods.arModM,
+			arModF: mods.arModF,
+			arModE: mods.arModE,
+			dvMod: mods.dvMod,
+			dv_type: mods.dv_type,
+		});
+
+		toSet.shots_fired = rounds;
+		toSet.primary_range_weapon_split_dicepool = split_dicepool;
+
+		setAttrs(toSet);
 	});
 });
 
 var adjAttrs = (p) => {
 	Object.keys(p.attrs).forEach(a => {
 		mod = p.arMod;
+		mod_extra = 0;
+
 		if(a.endsWith("_damage")) {
 			mod = p.dvMod;
+		}
+
+		if(a.includes('close') && p.arModC) {
+			mod_extra = p.arModC;
+		}
+		if(a.includes('near') && p.arModN) {
+			mod_extra = p.arModN;
+		}
+		if(a.includes('medium') && p.arModM) {
+			mod_extra = p.arModM;
+		}
+		if(a.includes('far') && p.arModF) {
+			mod_extra = p.arModF;
+		}
+		if(a.includes('extreme') && p.arModE) {
+			mod_extra = p.arModE;
 		}
 
 		pieces = /(\d+)(.*)/.exec(p.attrs[`${a}`]);
@@ -7062,10 +7317,16 @@ var adjAttrs = (p) => {
 		var tot = p.attrs[`${a}`];
 		if(pieces) {
 			if(pieces[1] && pieces[1] > 0) {
-				tot = parseInt(pieces[1]) + parseInt(mod);
+				tot = parseInt(pieces[1]) + parseInt(mod) + parseInt(mod_extra);
 				if(tot < 0) {
 					tot = 0;
 				}
+			}
+
+			// if this was damage then there is a second piece (the damage type P, S, S(e), etc)
+			// if p.dv_type exists the firing mode or ammo type change the damage type
+			if(pieces[2] && p.dv_type) {
+				pieces[2] = p.dv_type;
 			}
 
 			p.attrs[`${a}`] = tot + pieces[2];
