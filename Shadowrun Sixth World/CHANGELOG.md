@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2022-08-16 ** v.58 Chuz (James Culp)
+	New Feature - Added the ability to change the ammo type in use on Core->Primary Ranged with the AR and DV changes applied.  Default will be Standard.
+	New Feature - Added split rolls for Burst Fire Wide firing mode on the Core->Primary Ranged weapons.  This splits the dicepool (on odd pools the left roll Atk 1 gets the extra die).  If Wild Dice are toggled on a prompt will appear for each attack.  Glitches are calculated for each attack separately.
 **2022-08-08 ** v.57 Chuz (James Culp)
 	Bugfix - Updated mouseover text for Metamagics to indicate they are repeating metamagic not repeating powers
 	Bugfix - Updated Non-PC sheets to have Matrix AR, Matrix DR, Matrix Soak and Biofeedback Soak buttons as appropriate in the Defenses Pane
