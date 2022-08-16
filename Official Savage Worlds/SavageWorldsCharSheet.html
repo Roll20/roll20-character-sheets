@@ -2145,6 +2145,7 @@ const compendiumLookup = function({queue, callback}) {
                 compendiumDataLookup({queue,callback,IDPathways});
             }catch(err){
                 debug('No IDPathways found, exiting drag and drop');
+                console.error(err);
             }
         }else{
             debug(`!!! No product index page found. No valid base compendiums present !!!`);
@@ -2166,6 +2167,7 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
     }) || 'SWADE';
     const productArray = IDPathways[productLine].splice(productIndex);//extract those products that the item might depend on.
     let searchArray = [];
+    debugger;
     queue.forEach((statblock)=>{
         searchArray = PHEGCategories.reduce((m, type) => {//Construct an array of items to search for.
             if (statblock[`data-${type}`]){
@@ -2753,12 +2755,17 @@ const dropShields = function({repSectionID,repSection,targetObj,jsonObj}){
 
 const dropVehicle = function({jsonObj}){
   log('Vehicle Info', 'Made it to getting Vehicle Fields', r20color);
-  const fields = [
-    ...(jsonObj.subcategory ? powerRobotArmorFields : vehiclefields),
-  ];
+  let prefix = '';
   if (jsonObj.subcategory) {
     prefix = jsonObj.subcategory === 'Power Armor' ? 'pa_' : 'ra_';
   }
+  const fields = (jsonObj.subcategory ? powerRobotArmorFields : vehiclefields)
+    .map(f => {
+      if(jsonObj.hasOwnProperty(f)){
+        jsonObj[`${prefix}${f}`] = jsonObj[f];
+      }
+      return `${prefix}${f}`
+    });
   return [false,fields];
 };
 
@@ -2801,7 +2808,6 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
   debug('Entering getDropInfo');
   let repSectionID;
   let fields;
-  let prefix = '';
   repSection ? 
     (repSectionID = generateRowID()) :
     log('Repeating Section', 'Not Found', r20color);
@@ -2825,7 +2831,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
   };
   [repSection,fields] = dropSwitch.hasOwnProperty(repSection) ?
     dropSwitch[repSection]({repSection,targetObj,jsonObj,attributes,fields,repSectionID}) :
-    [null,[]];
+    [null,[],''];
   if(repSection){
     applyGeneralEffects({
       targetObj,
@@ -2841,7 +2847,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
       fields.forEach(field => {
         jsonObj[`${field}`] !== undefined
           ? (targetObj[
-              `repeating_${repSection}_${repSectionID}_${prefix}${field}`
+              `repeating_${repSection}_${repSectionID}_${field}`
             ] = jsonObj[`${field}`])
           : log(`${field}`, 'Not Found', r20color);
       });
@@ -2849,7 +2855,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
       log('Non-Repeating Fields', 'Fields Found', r20color);
       fields.forEach(field => {
         jsonObj[`${field}`] !== undefined
-          ? (targetObj[`${prefix}${field}`] = jsonObj[`${field}`])
+          ? (targetObj[`${field}`] = jsonObj[`${field}`])
           : log(`${field}`, 'Not Found', r20color);
       });
     }
@@ -3232,20 +3238,27 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
       powerCount: obj => obj['data-Powers'].length,
     },
     Vehicle: {
-      vehicle: obj =>
-        obj['data-Vehicle'].some(o => !o.data.subcategory) ? 'on' : 0,
-      power_armor: obj =>
-        obj['data-Vehicle'].some(
+      vehicle: (obj) =>{
+        return obj['data-Vehicle'].some(o => !o.data.subcategory) ? 
+          'on' :
+          0;
+      },
+      power_armor: (obj) =>{
+        return obj['data-Vehicle'].some(
           o => o.data.subcategory === 'Power Armor'
         )
-          ? 1
-          : 0,
-      robot_armor: obj =>
-        obj['data-Vehicle'].some(
+          ? 
+            1 :
+            0;
+      },
+      robot_armor: (obj) =>{
+        return obj['data-Vehicle'].some(
           o => o.data.subcategory === 'Robot Armor'
         )
-          ? 1
-          : 0,
+          ? 
+          1 :
+          0;
+      },
     },
     SpecialAbilities: {
       showspecabilities: obj => 1,
@@ -3274,6 +3287,7 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
         log(`Import ${singular}`, phegObj.name, r20color);
         log(`Monster`, singular, r20color);
         let source = phegObj.datasource;
+
         let dropType = getDropInfoCommand(type, source);
         finalCharacterDetails = getDropInfo(
           phegObj.data,
