@@ -83,7 +83,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
 August 16th 2022 v1.6b
 
-- Adds conditional check when peforming Dual Wield attack, if the Player has just rolled a crit, they now will chose if they want to use main hand or crit result for the DW attack.
+- Adds conditional check when peforming Dual Wield attack, if the Player has just rolled a crit, they now will chose if they want to use main hand or crit result for the DW attack. Crit result DW hits will now remove any modifier on crit roll before reversal, so result stays within 1d100 range.
 
 
 August 8th 2022 v1.6a
