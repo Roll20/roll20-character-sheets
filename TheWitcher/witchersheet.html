@@ -3358,7 +3358,7 @@
     				                <option value='@{cra_npc}' data-i18n="cra-u" >CRA</option>
     				                <option value='@{will_npc}' data-i18n="will-u" >WILL</option>
         					        </select>
-        					        <input class='repeating_npcskill_score' name='attr_npcskill_score' type='text' placeholder='0'>
+        					        <input class='repeating_npcskill_score' name='attr_npcskill_score' type='text' value='0'>
         					        <button type='action' name='act_roll' style='margin-top: -4px;' class='repeating_npc_skill_roll' value='@{whisper}&{template:singleroll} {{title=@{prefix-npcskill_name}}} {{name=@{character_name}}} {{roll=[[1d10!+@{prefix-npcskill_stat}[STAT]+@{prefix-npcskill_score}[SKILL]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}'></button>
         					    </span>
         					</fieldset>
@@ -3491,7 +3491,7 @@
         					    <span class='repeating_npcskill_container'>
         					        <input class='repeating_npcskill_name' name='attr_npcskill_name' type='text' placeholder='Name Here...'>
 									<span class="spacer"></span>
-        					        <input class='repeating_npcskill_score' name='attr_npcskill_score' type='text' placeholder='0'>
+        					        <input class='repeating_npcskill_score' name='attr_npcskill_score' type='text' value='0'>
         					        <button type='action' name='act_roll' style='margin-top: -4px;' class='repeating_npc_skill_roll' value='@{whisper}&{template:singleroll} {{title=@{prefix-npcskill_name}}} {{name=@{character_name}}} {{roll=[[1d10!+@{prefix-npcskill_score}[SKILL]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}'></button>
         					    </span>
 							</fieldset>
@@ -4271,6 +4271,8 @@ on('clicked:roll', async (event) => {
 	let rollBase = event.htmlAttributes.value + "{{fumble=[[1d10!]]}}{{fumble2=[[1d10!]]}}{{rolllocation=[[0]]}}";
 	let rollResult = await startRoll(rollBase);
 
+	console.log(rollResult);
+
 	let computedValues = await resolveChecks(
 		checkFumble(rollResult),
 		checkLocation(rollResult)
@@ -4305,12 +4307,11 @@ on('clicked:repeating_finearts:roll clicked:repeating_performance:roll clicked:r
 	var trigger = event.triggerName.slice(8); // this always starts with 'clicked:'
 	var prefix = trigger.split('_').slice(0,3).join('_') + '_'
 
-	let rollBase = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
+	let rollBase = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`) + "{{fumble=[[1d10!]]}}{{fumble2=[[1d10!]]}}";
 	let rollResult = await startRoll(rollBase);
 
 	let computedValues = await resolveChecks(
-		checkFumble(rollResult),
-		checkLocation(rollResult)
+		checkFumble(rollResult)
 	);
 
 	finishRoll(
