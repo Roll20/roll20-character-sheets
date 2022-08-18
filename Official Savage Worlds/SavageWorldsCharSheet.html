@@ -2137,37 +2137,21 @@ const requiredAttrLookup = new Proxy(requiredAttrLookupBase, genericLookupHandle
 //statblock (object): base object dropped from the compendium
 //callback (function): A function that will use the parsed compendium lookup data to finish the drag and drop of the item
 //The callback function receives the parsed statblock as an argument
-const independentProducts = ['Savage Worlds Adventure Edition','Pathfinder for Savage Worlds'];
 const compendiumLookup = function({queue, callback}) {
-    getProductLines([...independentProducts],(IDPathways)=>{
-        compendiumDataLookup({queue,callback,IDPathways});
-    });
-};
-
-/**
- * 
- * @param {array} queue - Array of product index pages to work through
- * @param {function} callback - The function to call when a valid product index page is found.
- * @returns {void}
- */
-const getProductLines = function(queue,callback){
-    const curr = queue.shift();
-    getCompendiumPage(`Introduction:${curr}`,(data)=>{
-        if(data.data.blobs.IDPathways){
+    getCompendiumPage(`Introduction:BookIndex`,(data)=>{
+        if(data.data['data-IDPathways']){
             try{
-                const IDPathways = JSON.parse(data.data.blobs.IDPathways['data-IDPathways']);
-                callback(IDPathways);
+                const IDPathways = JSON.parse(data.data['data-IDPathways']);
+                compendiumDataLookup({queue,callback,IDPathways});
             }catch(err){
                 debug('No IDPathways found, exiting drag and drop');
-                return null;
+                console.error(err);
             }
-        }else if(!queue.length){
-            debug(`!!! No product index page found. No valid base compendiums present !!!`);
         }else{
-            getProductLines(queue,callback);
+            debug(`!!! No product index page found. No valid base compendiums present !!!`);
         }
     });
-}
+};
 
 const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
     origBlock = origBlock || queue[0];
@@ -2183,6 +2167,7 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
     }) || 'SWADE';
     const productArray = IDPathways[productLine].splice(productIndex);//extract those products that the item might depend on.
     let searchArray = [];
+    debugger;
     queue.forEach((statblock)=>{
         searchArray = PHEGCategories.reduce((m, type) => {//Construct an array of items to search for.
             if (statblock[`data-${type}`]){
@@ -2770,12 +2755,17 @@ const dropShields = function({repSectionID,repSection,targetObj,jsonObj}){
 
 const dropVehicle = function({jsonObj}){
   log('Vehicle Info', 'Made it to getting Vehicle Fields', r20color);
-  const fields = [
-    ...(jsonObj.subcategory ? powerRobotArmorFields : vehiclefields),
-  ];
+  let prefix = '';
   if (jsonObj.subcategory) {
     prefix = jsonObj.subcategory === 'Power Armor' ? 'pa_' : 'ra_';
   }
+  const fields = (jsonObj.subcategory ? powerRobotArmorFields : vehiclefields)
+    .map(f => {
+      if(jsonObj.hasOwnProperty(f)){
+        jsonObj[`${prefix}${f}`] = jsonObj[f];
+      }
+      return `${prefix}${f}`
+    });
   return [false,fields];
 };
 
@@ -2818,7 +2808,6 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
   debug('Entering getDropInfo');
   let repSectionID;
   let fields;
-  let prefix = '';
   repSection ? 
     (repSectionID = generateRowID()) :
     log('Repeating Section', 'Not Found', r20color);
@@ -2842,7 +2831,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
   };
   [repSection,fields] = dropSwitch.hasOwnProperty(repSection) ?
     dropSwitch[repSection]({repSection,targetObj,jsonObj,attributes,fields,repSectionID}) :
-    [null,[]];
+    [null,[],''];
   if(repSection){
     applyGeneralEffects({
       targetObj,
@@ -2858,7 +2847,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
       fields.forEach(field => {
         jsonObj[`${field}`] !== undefined
           ? (targetObj[
-              `repeating_${repSection}_${repSectionID}_${prefix}${field}`
+              `repeating_${repSection}_${repSectionID}_${field}`
             ] = jsonObj[`${field}`])
           : log(`${field}`, 'Not Found', r20color);
       });
@@ -2866,7 +2855,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
       log('Non-Repeating Fields', 'Fields Found', r20color);
       fields.forEach(field => {
         jsonObj[`${field}`] !== undefined
-          ? (targetObj[`${prefix}${field}`] = jsonObj[`${field}`])
+          ? (targetObj[`${field}`] = jsonObj[`${field}`])
           : log(`${field}`, 'Not Found', r20color);
       });
     }
@@ -3215,6 +3204,8 @@ const compendiumBestiary = function () {
             lookupObj.display_name
               ? (finalCharacterDetails.character_name = lookupObj.display_name)
               : log('Character Name', 'Using compendium default', r20color);
+            finalCharacterDetails.sheet_theme = lookupObj['data-sheet_theme'] || 0;
+            finalCharacterDetails.rolltemplate_theme = lookupObj['data-rolltemplate_theme'] || 'default';
             //switch character sheet view to mini-view
             //run dice handling
             finalCharacterDetails = processAdditionalPHEGs(lookupObj,finalCharacterDetails,monster);
@@ -3247,20 +3238,27 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
       powerCount: obj => obj['data-Powers'].length,
     },
     Vehicle: {
-      vehicle: obj =>
-        obj['data-Vehicle'].some(o => !o.data.subcategory) ? 'on' : 0,
-      power_armor: obj =>
-        obj['data-Vehicle'].some(
+      vehicle: (obj) =>{
+        return obj['data-Vehicle'].some(o => !o.data.subcategory) ? 
+          'on' :
+          0;
+      },
+      power_armor: (obj) =>{
+        return obj['data-Vehicle'].some(
           o => o.data.subcategory === 'Power Armor'
         )
-          ? 1
-          : 0,
-      robot_armor: obj =>
-        obj['data-Vehicle'].some(
+          ? 
+            1 :
+            0;
+      },
+      robot_armor: (obj) =>{
+        return obj['data-Vehicle'].some(
           o => o.data.subcategory === 'Robot Armor'
         )
-          ? 1
-          : 0,
+          ? 
+          1 :
+          0;
+      },
     },
     SpecialAbilities: {
       showspecabilities: obj => 1,
@@ -3289,6 +3287,7 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
         log(`Import ${singular}`, phegObj.name, r20color);
         log(`Monster`, singular, r20color);
         let source = phegObj.datasource;
+
         let dropType = getDropInfoCommand(type, source);
         finalCharacterDetails = getDropInfo(
           phegObj.data,
@@ -3311,10 +3310,11 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
 on('change:CompendiumCategory', function (eventInfo) {
   log('Compendium Drop', eventInfo.newValue, '#E948C9');
   log('Compendium Change Source', eventInfo.sourceType, r20color);
+  debug(eventInfo);
   if (eventInfo.newValue !== '') {
     let cCategory = eventInfo.newValue;
     let resetFields;
-    if(cCategory === 'Bestiary'){
+    if(cCategory === 'Bestiary' ||cCategory === 'Archetypes' || cCategory === 'SWADE Archetypes'){
       compendiumBestiary();
     }else{
       compendiumDrop(cCategory);
