@@ -1052,6 +1052,8 @@
 
 
 	// select this weapon or spell, id starts with repeating_[weapon][spell]
+	// it will set attributes ready_name, damage, to_hit, attack, success, failure
+	// so macros can get at them.
 	const selectWeaponOrSpell = function(id) {
 		// get them all, and de check any not me...
 		let selected = (id + "_selection-flag").toLowerCase();
@@ -1061,6 +1063,7 @@
 					let oldValue = values[selected];
 					let newValue = (oldValue == 'on' ? 0 : 'on');
 					let valueMap = {};
+					let readyAttributes = [];
 					// toggle this one, turn off the rest
 					valueMap[selected]  = newValue;
 
@@ -1070,16 +1073,50 @@
 							let propertyName = repeatingPropertyName('weapons', weaponIds[i], 'selection-flag');
 							if (propertyName != selected) {
 								valueMap[propertyName] = 0;
+							} else {
+								let id = weaponIds[i];
+								readyAttributes = [repeatingPropertyName('weapons', id, 'weaponname'),
+									repeatingPropertyName('weapons', id, 'weapondamage'),
+									repeatingPropertyName('weapons', id, 'tohit'),
+									repeatingPropertyName('weapons', id, 'attackflavor'),
+									repeatingPropertyName('weapons', id, 'successflavor'),
+									repeatingPropertyName('weapons', id, 'failureflavor')];
 							}
 						}
 						for (var i = 0; i < spellIds.length; ++i) {
 							let propertyName = repeatingPropertyName('spells', spellIds[i], 'selection-flag');
 							if (propertyName != selected) {
 								valueMap[propertyName] = 0;
+							} else {
+								let id = spellIds[i];
+								readyAttributes = [repeatingPropertyName('spells', id, 'spellname'),
+								repeatingPropertyName('spells', id, 'spelldamage'),
+								repeatingPropertyName('spells', id, 'tohit'),
+								repeatingPropertyName('spells', id, 'attackflavor'),
+								repeatingPropertyName('spells', id, 'successflavor'),
+								repeatingPropertyName('spells', id, 'failureflavor')];
 							}
 						}
 					}
-					setAttrs(valueMap, {silent: true});
+					getAttrs(readyAttributes, function(readyValues) {
+						// convert into ready_ attributes.
+						for (const [key, value] of Object.entries(readyValues)) {
+							if (key.endsWith('name')) {
+								valueMap['ready_name'] = value
+							} else if (key.endsWith('damage')) {
+								valueMap['ready_damage'] = value
+							} else if (key.endsWith('tohit')) {
+								valueMap['ready_tohit'] = value
+							} else if (key.endsWith('attackflavor')) {
+								valueMap['ready_attackflavor'] = value
+							} else if (key.endsWith('successflavor')) {
+								valueMap['ready_successflavor'] = value
+							} else if (key.endsWith('failureflavor')) {
+								valueMap['ready_failureflavor'] = value
+							}
+						}
+						setAttrs(valueMap, {silent: true});
+					})
 				});
 			});
 		});
