@@ -2404,7 +2404,7 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
 
 // Psionic tabs, control hidden or visible options
 const setPsionicDisciplineVisibility = function(newValue) {
-    let elements = $20('.sheet-section-psionics .sheet-hidden');
+    let elements = $20('.sheet-section-psionics option.sheet-hidden');
     if (newValue === "1") {
         elements.addClass('sheet-show');
     } else {
@@ -2454,6 +2454,16 @@ on('clicked:repeating_psion-telepathy:action', function (eventInfo) {
 
         finishRoll(roll.rollId, computedRolls);
     });
+});
+
+// Show / Hide buttons for various repeating sections
+const REPEATING_SECTIONS = ['psion-telepathy'];
+REPEATING_SECTIONS.forEach(section => {
+   on(`clicked:repeating_${section}:show clicked:repeating_${section}:hide`, function (eventInfo) {
+       console.log(eventInfo);
+       let parse = parseSourceAttribute(eventInfo);
+       $20(`div[data-reprowid=${parse.rowId}] .sheet-hidden`).toggleClass('sheet-show');
+   });
 });
 
 // Fix for Roll20 not handling quotes correctly from sheet.json
