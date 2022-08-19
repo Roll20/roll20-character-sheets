@@ -2420,6 +2420,42 @@ on('sheet:opened', function () {
     })
 });
 
+on('change:repeating_psion-telepathy:psiontelepathic', function (eventInfo) {
+    console.log(eventInfo);
+    let parse = parseSourceAttribute(eventInfo);
+    getAttrs(['character_name'], function (values) {
+        setAttrs({'repeating_psion-telepathy_action': `%{${values.character_name}|repeating_psion-telepathy_${parse.rowId}_action}`})
+    });
+});
+
+on('clicked:repeating_psion-telepathy:action', function (eventInfo) {
+    console.log(eventInfo);
+    getAttrs(['repeating_psion-telepathy_psiontelepathic-macro'], async function (value) {
+        let macro = value['repeating_psion-telepathy_psiontelepathic-macro'];
+        let roll = await startRoll(macro);
+        if (!macro.includes('2Epsionic')) {
+            finishRoll(roll.rollId);
+            return;
+        }
+
+        let computedRolls = {};
+        let powerscore = roll.results.powerscore;
+        console.log(roll);
+        console.log(powerscore);
+        if (powerscore) {
+            computedRolls.powerscore = Math.min(powerscore.result, 19)
+        }
+
+        let powerscoreenhanced = roll.results.powerscoreenhanced;
+        if (powerscoreenhanced) {
+            computedRolls.powerscoreenhanced = Math.min(powerscoreenhanced.result, 19)
+            // do the stuff with range here.
+        }
+
+        finishRoll(roll.rollId, computedRolls);
+    });
+});
+
 // Fix for Roll20 not handling quotes correctly from sheet.json
 const fixQuotes = function (currentValue, attribute, event) {
     if (currentValue.includes('’')) {
