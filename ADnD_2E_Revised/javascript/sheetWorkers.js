@@ -2421,8 +2421,8 @@ on('sheet:opened', function () {
 });
 
 const PSIONIC_CORE_SECTIONS = [
-    { section: 'psion-telepathy', name: 'psiontelepathic', macro: 'psiontelepathic-macro', number: '', cost_number: '20' },
-    { section: 'psion-telepathic-science', name: 'telepathic-science', macro: 'psiontelepathic-science-macro', number: '1', cost_number: '21' },
+    { discipline: 'Clairsentient', section: 'psion-telepathy', name: 'psiontelepathic', macro: 'psiontelepathic-macro', number: '', cost_number: '20' },
+    { discipline: 'Clairsentient', section: 'psion-telepathic-science', name: 'telepathic-science', macro: 'psiontelepathic-science-macro', number: '1', cost_number: '21' },
 ];
 on('sheet:opened change:character_name', function (eventInfo) {
     console.log(eventInfo);
@@ -2438,27 +2438,64 @@ on('sheet:opened change:character_name', function (eventInfo) {
             .execute();
     });
 });
-PSIONIC_CORE_SECTIONS.forEach(({section, name, macro}) => {
+PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, discipline}) => {
     on(`change:repeating_${section}:${name} change:repeating_${section}:${macro}`, function (eventInfo) {
         console.log(eventInfo);
         let parse = parseSourceAttribute(eventInfo);
         getAttrs(['character_name'], function (values) {
-            let newValue = {};
-            newValue[`repeating_${section}_action`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action}`;
-            if (parse.attribute === name) {
-                
+            let powerInfo = {};
+            powerInfo[`repeating_${section}_action`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action}`;
+            if (parse.attribute === name && eventInfo.newValue) {
+                let tier = name.includes('science') ? 'Science' : 'Devotion';
+                let power = PSIONIC_POWERS[discipline][tier][eventInfo.newValue];
+                console.log(power);
+                if (power) {
+                    powerInfo[`repeating_${section}_powerscore-nomod${number}`] = power['attribute'];
+                    powerInfo[`repeating_${section}_powerscore-mod${number}`]   = power['modifier'];
+                    powerInfo[`repeating_${section}_PSP-cost${cost_number}`]    = power['initial-cost'];
+                    powerInfo[`repeating_${section}_PSP-cost-maintenance`]      = power['maintenance-cost'];
+
+                    let macroBuilder = [];
+                    macroBuilder.push(`title=@{${name}}`);
+                    macroBuilder.push(`discipline=${discipline}`);
+                    macroBuilder.push(`tier=${tier}`);
+                    macroBuilder.push(`initial=@{PSP-cost${cost_number}}`);
+                    macroBuilder.push(`maintenance=@{PSP-cost-maintenance}`);
+                    macroBuilder.push(`range=${power['range']}`);
+                    macroBuilder.push(`aoe=${power['aoe']}`);
+                    macroBuilder.push(`prep=${power['prep']}`);
+                    macroBuilder.push(`prereq=${power['prereqs']}`);
+                    macroBuilder.push(`powerroll=[[1d20+(@{psionic-mod${number}})]]`);
+                    macroBuilder.push(`powerscore=[[@{powerscore-nomod${number}}+(powerscore-mod${number})]]`);
+                    macroBuilder.push(`powerscoreeffect=${power['power-score']}`);
+                    macroBuilder.push(`20effect=${power['20']}`);
+                    macroBuilder.push(`effects=${power['effect']}`);
+
+                    powerInfo[`repeating_${section}_${macro}`] = `&{template:2Epsionic} ${macroBuilder.map(s => `{{${s}}}`)}`;
+                }
             }
 
-            setAttrs(newValue);
+            setAttrs(powerInfo,{silent:true});
         });
     });
 
     on(`clicked:repeating_${section}:action`, function (eventInfo) {
         console.log(eventInfo);
-        getAttrs([`repeating_${section}_${macro}`], async function (value) {
+        let parse = parseSourceAttribute(eventInfo);
+        getAttrs([`repeating_${section}_${macro}`,'character_name'], async function (value) {
             let macroValue = value[`repeating_${section}_${macro}`];
+
+            let repeating = `repeating_${section}_${parse.rowId}`;
+            macroValue = macroValue.replace(`${name}`,`${repeating}_${name}`)
+                .replace(`psionic-mod${number}`,`${repeating}_psionic-mod${number}`)
+                .replace(`powerscore-nomod${number}`,`${repeating}_powerscore-nomod${number}`)
+                .replace(`powerscore-mod${number}`,`${repeating}_powerscore-mod${number}`)
+                .replace(`powerscore-enhanced`,`${repeating}_powerscore-enhanced`)
+                .replace(`PSP-cost${cost_number}`,`${repeating}_PSP-cost${cost_number}`)
+                .replace(`PSP-cost-maintenance`,`${repeating}_PSP-cost-maintenance`);
+
             let roll = await startRoll(macroValue);
-            if (!macroValue.includes('2Epsionic')) {
+            if (!macroValue.includes('&{template:2Epsionic}')) {
                 finishRoll(roll.rollId);
                 return;
             }
