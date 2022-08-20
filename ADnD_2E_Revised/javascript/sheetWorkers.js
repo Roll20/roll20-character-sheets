@@ -2420,47 +2420,74 @@ on('sheet:opened', function () {
     })
 });
 
-on('change:repeating_psion-telepathy:psiontelepathic', function (eventInfo) {
+const PSIONIC_CORE_SECTIONS = [
+    { section: 'psion-telepathy', name: 'psiontelepathic', macro: 'psiontelepathic-macro', number: '', cost_number: '20' },
+    { section: 'psion-telepathic-science', name: 'telepathic-science', macro: 'psiontelepathic-science-macro', number: '1', cost_number: '21' },
+];
+on('sheet:opened change:character_name', function (eventInfo) {
     console.log(eventInfo);
     let parse = parseSourceAttribute(eventInfo);
-    getAttrs(['character_name'], function (values) {
-        setAttrs({'repeating_psion-telepathy_action': `%{${values.character_name}|repeating_psion-telepathy_${parse.rowId}_action}`})
+    console.log(parse);
+    PSIONIC_CORE_SECTIONS.forEach(({section, name, macro}) => {
+        TAS.repeating(section)
+            .attr('character_name')
+            .field('action')
+            .each(function (row, attrSet, id, rowSet) {
+                row.action = `%{${attrSet.character_name}|repeating_${section}_${id}_action}`;
+            })
+            .execute();
     });
 });
+PSIONIC_CORE_SECTIONS.forEach(({section, name, macro}) => {
+    on(`change:repeating_${section}:${name} change:repeating_${section}:${macro}`, function (eventInfo) {
+        console.log(eventInfo);
+        let parse = parseSourceAttribute(eventInfo);
+        getAttrs(['character_name'], function (values) {
+            let newValue = {};
+            newValue[`repeating_${section}_action`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action}`;
+            if (parse.attribute === name) {
+                
+            }
 
-on('clicked:repeating_psion-telepathy:action', function (eventInfo) {
-    console.log(eventInfo);
-    getAttrs(['repeating_psion-telepathy_psiontelepathic-macro'], async function (value) {
-        let macro = value['repeating_psion-telepathy_psiontelepathic-macro'];
-        let roll = await startRoll(macro);
-        if (!macro.includes('2Epsionic')) {
-            finishRoll(roll.rollId);
-            return;
-        }
+            setAttrs(newValue);
+        });
+    });
 
-        let computedRolls = {};
-        let powerscore = roll.results.powerscore;
-        console.log(roll);
-        console.log(powerscore);
-        if (powerscore) {
-            computedRolls.powerscore = Math.min(powerscore.result, 19)
-        }
+    on(`clicked:repeating_${section}:action`, function (eventInfo) {
+        console.log(eventInfo);
+        getAttrs([`repeating_${section}_${macro}`], async function (value) {
+            let macroValue = value[`repeating_${section}_${macro}`];
+            let roll = await startRoll(macroValue);
+            if (!macroValue.includes('2Epsionic')) {
+                finishRoll(roll.rollId);
+                return;
+            }
 
-        let powerscoreenhanced = roll.results.powerscoreenhanced;
-        if (powerscoreenhanced) {
-            computedRolls.powerscoreenhanced = Math.min(powerscoreenhanced.result, 19)
-            // do the stuff with range here.
-        }
+            let computedRolls = {};
+            let powerscore = roll.results.powerscore;
+            console.log(roll);
+            console.log(powerscore);
+            if (powerscore) {
+                computedRolls.powerscore = Math.min(powerscore.result, 19)
+            }
 
-        finishRoll(roll.rollId, computedRolls);
+            let powerscoreenhanced = roll.results.powerscoreenhanced;
+            if (powerscoreenhanced) {
+                computedRolls.powerscoreenhanced = Math.min(powerscoreenhanced.result, 19)
+                // do the stuff with range here.
+            }
+
+            finishRoll(roll.rollId, computedRolls);
+        });
     });
 });
 
 // Show / Hide buttons for various repeating sections
-const REPEATING_SECTIONS = ['psion-telepathy'];
+const REPEATING_SECTIONS = [
+    ...PSIONIC_CORE_SECTIONS.map(e => e.section),
+];
 REPEATING_SECTIONS.forEach(section => {
    on(`clicked:repeating_${section}:show clicked:repeating_${section}:hide`, function (eventInfo) {
-       console.log(eventInfo);
        let parse = parseSourceAttribute(eventInfo);
        $20(`div[data-reprowid=${parse.rowId}] .sheet-hidden`).toggleClass('sheet-show');
    });
