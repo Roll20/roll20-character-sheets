@@ -2701,6 +2701,25 @@
                 }
             }
 
+            if (build < 20) {
+                attrs["build"] = 21;
+                let releaselog = {msg:""};
+                hlog(`Release 03.01.00 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Features
+- msg custom rolltemplate: added header-alt, sub1-alt, sub2-alt and fixe horizontal line hides correctly
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+
             /*
             if (build === 9) {
                 attrs["build"] = 8;
@@ -2732,9 +2751,18 @@
     <div class="sheet-container">
         <div class="sheet-header">
             {{#header}}<div class="sheet-title sheet-text-center">{{header}}</div>{{/header}}
+            {{#header-alt}}<div class="sheet-title-alt sheet-text-center">{{header-alt}}</div>{{/header-alt}}
             {{#sub1}}<div class="sheet-subtitle sheet-text-center">{{sub1}}</div>{{/sub1}}
+            {{#sub1-alt}}<div class="sheet-subtitle-alt sheet-text-center">{{sub1-alt}}</div>{{/sub1-alt}}
             {{#sub2}}<div class="sheet-subtitle sheet-text-center">{{sub2}}</div>{{/sub2}}
+            {{#sub2-alt}}<div class="sheet-subtitle-alt sheet-text-center">{{sub2-alt}}</div>{{/sub2-alt}}
         </div>
+        {{#header}}{{^sub1}}{{^sub2}}{{#msg}}<div class="sheet-header-sep"/>{{/msg}}{{/sub2}}{{/sub1}}{{/header}}
+        {{#sub1}}{{^sub2}}{{#msg}}<div class="sheet-header-sep"/>{{/msg}}{{/sub2}}{{/sub1}}
+        {{#sub2}}{{#msg}}<div class="sheet-header-sep"/>{{/msg}}{{/sub2}}
+        {{#header-alt}}{{^sub1-alt}}{{^sub2-alt}}{{#msg-alt}}<div class="sheet-header-sep"/>{{/msg-alt}}{{/sub2-alt}}{{/sub1-alt}}{{/header-alt}}
+        {{#sub1-alt}}{{^sub2-alt}}{{#msg-alt}}<div class="sheet-header-sep"/>{{/msg-alt}}{{/sub2-alt}}{{/sub1-alt}}
+        {{#sub2-alt}}{{#msg-alt}}<div class="sheet-header-sep"/>{{/msg-alt}}{{/sub2-alt}}
         {{#msg}}
         <div class="sheet-contentmin">
             <div class="sheet-main">{{msg}}</div>
