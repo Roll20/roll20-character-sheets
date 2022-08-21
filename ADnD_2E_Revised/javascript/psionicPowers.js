@@ -93,14 +93,20 @@ CLAIRSENTIENT['Science']['Clairaudience'] = {
     'effect': 'Clairaudience allows the user to hear sounds from a distant area. The psionicist picks a spot anywhere within range. He then can hear everything that he would be able to hear normally if he were standing in that spot. If the psionicist has enhanced senses, the senses apply to clairaudience as well.\n&emsp;The farther the “listening spot” is from the psionicist, the more difficult it is to use this power. The table below gives specifics.}}{{style=center2}}{{cc1-1=bottom}}{{c1-1=**Range**}}{{c2-1=100 yards}}{{c3-1=1,000 yards}}{{c4-1=10 miles}}{{c5-1=100 miles}}{{c6-1=1,000 miles}}{{c7-1=10,000 miles}}{{c8-1=Interplanetary&ast;}}{{c1-2=**Power Score Modifier**}}{{c2-2=0}}{{c3-2=-2}}{{c4-2=-4}}{{c5-2=-6}}{{c6-2=-8}}{{c7-2=-10}}{{c8-2=-12}}{{effect2=\n&emsp;&ast; Players with the SPELLJAMMER boxed set should note that clairaudience works only within a given crystal sphere or plane.\n&emsp;Using clairaudience does not screen out background noise around the psionicist. If something in his own neighborhood is raising a racket, he may have trouble hearing what is happening somewhere else. Clairaudience also does not give the psionicist the ability to understand a foreign or alien language, nor does it help him interpret sounds. For example, if the psionicist hears furniture scraping across the floor, he can only guess whether it’s a chair or something else - just as if he heard it while blindfolded.\n&emsp;*Power Score*—The psionicist automatically gains clairvoyance of the area as well.\n&emsp;*20*—The psionicist is deaf for 1d12 hours.'
 };
 
+const TELEPATHIC = {Devotion: {}, Science: {}};
+const PSYCHOKINETIC = {Devotion: {}, Science: {}};
+const PSYCHOPORTIVE = {Devotion: {}, Science: {}};
+const PSYCHOMETABOLIC = {Devotion: {}, Science: {}};
+const METAPSIONIC = {Devotion: {}, Science: {}};
+const ATTACK = {Devotion: {}, Science: {}};
+const DEFENSE = {Devotion: {}, Science: {}};
 
 const PSIONIC_POWERS = {};
 PSIONIC_POWERS['Clairsentient'] = CLAIRSENTIENT;
-PSIONIC_POWERS['wiz2'] = wiz2;
-PSIONIC_POWERS['wiz3'] = wiz3;
-PSIONIC_POWERS['wiz4'] = wiz4;
-PSIONIC_POWERS['wiz5'] = wiz5;
-PSIONIC_POWERS['wiz6'] = wiz6;
-PSIONIC_POWERS['wiz7'] = wiz7;
-PSIONIC_POWERS['wiz8'] = wiz8;
-PSIONIC_POWERS['wiz9'] = wiz9;
+PSIONIC_POWERS['Telepathic'] = TELEPATHIC;
+PSIONIC_POWERS['Psychokinetic'] = PSYCHOKINETIC;
+PSIONIC_POWERS['Psychoportive'] = PSYCHOPORTIVE;
+PSIONIC_POWERS['Psychometabolic'] = PSYCHOMETABOLIC;
+PSIONIC_POWERS['Metapsionic'] = METAPSIONIC;
+PSIONIC_POWERS['Attack'] = ATTACK;
+PSIONIC_POWERS['Defense'] = DEFENSE;
