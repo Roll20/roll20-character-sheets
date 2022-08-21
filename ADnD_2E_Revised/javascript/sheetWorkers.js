@@ -2421,13 +2421,10 @@ on('sheet:opened', function () {
 });
 
 const PSIONIC_CORE_SECTIONS = [
-    { discipline: 'Clairsentient', section: 'psion-telepathy', name: 'psiontelepathic', macro: 'psiontelepathic-macro', number: '', cost_number: '20' },
-    { discipline: 'Clairsentient', section: 'psion-telepathic-science', name: 'telepathic-science', macro: 'psiontelepathic-science-macro', number: '1', cost_number: '21' },
+    { discipline: 'Telepathic', section: 'psion-telepathy', name: 'psiontelepathic', macro: 'psiontelepathic-macro', number: '', cost_number: '20' },
+    { discipline: 'Telepathic', section: 'psion-telepathic-science', name: 'telepathic-science', macro: 'psiontelepathic-science-macro', number: '1', cost_number: '21' },
 ];
 on('sheet:opened change:character_name', function (eventInfo) {
-    console.log(eventInfo);
-    let parse = parseSourceAttribute(eventInfo);
-    console.log(parse);
     PSIONIC_CORE_SECTIONS.forEach(({section, name, macro}) => {
         TAS.repeating(section)
             .attr('character_name')
@@ -2486,13 +2483,13 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             let macroValue = value[`repeating_${section}_${macro}`];
 
             let repeating = `repeating_${section}_${parse.rowId}`;
-            macroValue = macroValue.replace(`${name}`,`${repeating}_${name}`)
-                .replace(`psionic-mod${number}`,`${repeating}_psionic-mod${number}`)
-                .replace(`powerscore-nomod${number}`,`${repeating}_powerscore-nomod${number}`)
-                .replace(`powerscore-mod${number}`,`${repeating}_powerscore-mod${number}`)
-                .replace(`powerscore-enhanced`,`${repeating}_powerscore-enhanced`)
-                .replace(`PSP-cost${cost_number}`,`${repeating}_PSP-cost${cost_number}`)
-                .replace(`PSP-cost-maintenance`,`${repeating}_PSP-cost-maintenance`);
+            macroValue = macroValue.replaceAll(`${name}`,`${repeating}_${name}`)
+                .replaceAll(`psionic-mod${number}`,`${repeating}_psionic-mod${number}`)
+                .replaceAll(`powerscore-nomod${number}`,`${repeating}_powerscore-nomod${number}`)
+                .replaceAll(`powerscore-mod${number}`,`${repeating}_powerscore-mod${number}`)
+                .replaceAll(`powerscore-enhanced`,`${repeating}_powerscore-enhanced`)
+                .replaceAll(`PSP-cost${cost_number}`,`${repeating}_PSP-cost${cost_number}`)
+                .replaceAll(`PSP-cost-maintenance`,`${repeating}_PSP-cost-maintenance`);
 
             let roll = await startRoll(macroValue);
             if (!macroValue.includes('&{template:2Epsionic}')) {
