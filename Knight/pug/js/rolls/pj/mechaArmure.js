@@ -304,6 +304,7 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
       'devasterAnatheme',
       'bourreauTenebres',
       'equilibreBalance',
+      'MADDjinnWraithActive',
     ];
 
     const arme = [];
@@ -326,6 +327,8 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     const bonus = [];
 
     let OD = 0;
+
+    const wraith = attrs.MADDjinnWraithActive;
 
     const type = attrs.MAUtilisationArmeAI;
     const mod = +attrs.jetModifDes;
@@ -431,6 +434,14 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     diceViolence += getStyle.diceViolence;
 
     // FIN GESTION DU STYLE
+
+    if (wraith !== '0') {
+      cRoll.push(+attrs.discretion);
+      cBonus.push(+attrs[ODValue.discretion]);
+      bDegats.push(+attrs.discretion);
+      bDegats.push(+attrs[ODValue.discretion]);
+      exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+    }
 
     if (cRoll.length === 0) { cRoll.push(0); }
 
@@ -1332,6 +1343,8 @@ rollDemon.forEach((button) => {
 
     const base = roll[0];
 
+    let wraith;
+
     let degats;
     let violence;
     let bDegats = 0;
@@ -1348,13 +1361,24 @@ rollDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ]);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         degats = attrs[roll[1]];
         violence = attrs[roll[2]];
 
         bDegats = +degats.split('+')[1];
         bViolence = +violence.split('+')[1];
+
+        if (wraith !== '0') {
+          degats += `+${+attrs.discretion + +attrs[ODValue.discretion]}`;
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
 
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}} {{effets=^{CDF-desactive-pendant} [[1D3]] ^{tours}}}`);
         break;
@@ -1366,13 +1390,28 @@ rollDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ]);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         degats = attrs[roll[1]];
         violence = attrs[roll[2]];
 
+        if (wraith !== '0') {
+          degats += `+${+attrs.discretion + +attrs[ODValue.discretion]}`;
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}} {{degatsConditionnel=true}} {{violenceConditionnel=true}} {{antiAnatheme=${i18n_antiAnatheme}}} {{antiAnathemeCondition=${i18n_antiAnathemeCondition}}} {{effets=${i18n_antiVehicule}}}`);
         break;
+    }
+
+    if (wraith !== '0') {
+      exec.push('{{special2=^{module-wraith} ^{active}}}');
     }
 
     const devaste = +attrs.devasterAnatheme;
@@ -1438,6 +1477,8 @@ rollCombatDemon.forEach((button) => {
     const cBonus = [];
     let cOD = 0;
 
+    let wraith;
+
     let degats;
     let bDegats;
     let violence;
@@ -1446,8 +1487,6 @@ rollCombatDemon.forEach((button) => {
     let getStyle;
 
     let autresEffets;
-
-    let active;
 
     exec.push(base);
 
@@ -1466,11 +1505,16 @@ rollCombatDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
 
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -1536,6 +1580,14 @@ rollCombatDemon.forEach((button) => {
         degats += getStyle.diceDegats;
         violence += getStyle.diceViolence;
 
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
 
         exec.push(jet);
@@ -1582,7 +1634,7 @@ rollCombatDemon.forEach((button) => {
 
         attrs = await getAttrsAsync(listAttrs);
 
-        active = attrs.MADDjinnWraithActive;
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -1591,8 +1643,6 @@ rollCombatDemon.forEach((button) => {
         C2 = attrs.caracteristiqueWraith2;
         C3 = attrs.caracteristiqueWraith3;
         C4 = attrs.caracteristiqueWraith4;
-
-        if (active !== '0') { exec.push('{{special2=^{module-wraith} ^{active}}}'); }
 
         attrsCarac = await getCarac(bCarac, C1, C2, C3, C4);
 
@@ -1666,11 +1716,16 @@ rollCombatDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
 
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -1736,6 +1791,14 @@ rollCombatDemon.forEach((button) => {
         degats += getStyle.diceDegats;
         violence += getStyle.diceViolence;
 
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
 
         exec.push(jet);
@@ -1777,10 +1840,15 @@ rollCombatDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -1851,6 +1919,14 @@ rollCombatDemon.forEach((button) => {
           exec.push(`{{mod=${mod}}}`);
         }
 
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
 
         exec.push(jet);
@@ -1896,6 +1972,10 @@ rollCombatDemon.forEach((button) => {
 
         exec.push(`{{herauts=${herauts.join(' / ')}}}`);
       }
+    }
+
+    if (wraith !== '0') {
+      exec.push('{{special2=^{module-wraith} ^{active}}}');
     }
 
     const finalRoll = await startRoll(exec.join(' '));

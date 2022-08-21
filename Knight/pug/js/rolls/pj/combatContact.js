@@ -536,6 +536,8 @@ rollCombatContact.forEach((button) => {
       isAJumelle = ameliorationsS.isJumelle;
       isAAllegee = ameliorationsS.isAllegee;
 
+      if (!isMeurtrier) { isMeurtrier = ameliorationsS.isBarbelee; }
+
       if (lumiereValue >= ameliorationsS.aLumiereValue) { autresAmeliorationsS.push(ameliorationsS.aLumiere); } else if (ameliorationsS.aLumiereValue > 0) {
         lumiere = `${ameliorationsS.aLumiere} (${i18n_lumiere} ${ameliorationsS.aLumiereValue})`;
         lumiereValue = ameliorationsS.aLumiereValue;
@@ -695,7 +697,7 @@ rollCombatContact.forEach((button) => {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = getArmorBonus(attrs, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
@@ -709,7 +711,9 @@ rollCombatContact.forEach((button) => {
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
     ODWarrior.push(armorBonus.ODWarrior);
 
-    const MALBonus = getMALBonus(attrs, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
+
+    const MALBonus = getMALBonus(attrs, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
@@ -722,6 +726,8 @@ rollCombatContact.forEach((button) => {
     ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
