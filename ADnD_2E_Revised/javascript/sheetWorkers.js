@@ -2474,7 +2474,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
                     macroBuilder.push(`aoe=${power['aoe']}`);
                     macroBuilder.push(`prep=${power['prep']}`);
                     macroBuilder.push(`prereq=${power['prereq']}`);
-                    macroBuilder.push(`powerroll=[[1d20+(@{psionic-mod${number}})]]`);
+                    macroBuilder.push(`powerroll=[[1d20cf20+(@{psionic-mod${number}})]]`);
                     macroBuilder.push(`powerscore=[[@{powerscore-nomod${number}}+(powerscore-mod${number})]]`);
                     macroBuilder.push(`powerscoreeffect=${power['power-score']}`);
                     macroBuilder.push(`20effect=${power['20']}`);
