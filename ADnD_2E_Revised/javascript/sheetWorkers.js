@@ -2421,8 +2421,20 @@ on('sheet:opened', function () {
 });
 
 const PSIONIC_CORE_SECTIONS = [
-    { discipline: 'Telepathic', section: 'psion-telepathy', name: 'psiontelepathic', macro: 'psiontelepathic-macro', number: '', cost_number: '20' },
-    { discipline: 'Telepathic', section: 'psion-telepathic-science', name: 'telepathic-science', macro: 'psiontelepathic-science-macro', number: '1', cost_number: '21' },
+    { discipline: 'Telepathic',      section: 'psion-telepathy',            name: 'psiontelepathic',    macro: 'psiontelepathic-macro',         number: '',   cost_number: '20' },
+    { discipline: 'Telepathic',      section: 'psion-telepathic-science',   name: 'telepathic-science', macro: 'psiontelepathic-science-macro', number: '1',  cost_number: '21' },
+    { discipline: 'Psychokinetic',   section: 'psion-psychokinesis',        name: 'psionkinetic',       macro: 'psionkinetic-macro',            number: '2',  cost_number: '22' },
+    { discipline: 'Psychokinetic',   section: 'psion-kinetic-science',      name: 'kinetic-science',    macro: 'psionkinetic-science-macro',    number: '3',  cost_number: '23' },
+    { discipline: 'Psychoportive',   section: 'psion-portation',            name: 'psionportation',     macro: 'psionportation-macro',          number: '4',  cost_number: '24' },
+    { discipline: 'Psychoportive',   section: 'psion-portation-science',    name: 'portation-science',  macro: 'psionportation-science-macro',  number: '5',  cost_number: '25' },
+    { discipline: 'Psychometabolic', section: 'psion-metabolic',            name: 'psionmetabolic',     macro: 'psionmetabolic-macro',          number: '6',  cost_number: '26' },
+    { discipline: 'Psychometabolic', section: 'psion-metabolic-science',    name: 'metabolic-science',  macro: 'psionmetabolic-science-macro',  number: '7',  cost_number: '27' },
+    { discipline: 'Clairsentient',   section: 'psion-clairvoyance',         name: 'psionclair',         macro: 'psionclair-macro',              number: '8',  cost_number: '28' },
+    { discipline: 'Clairsentient',   section: 'psion-clairvoyance-science', name: 'clair-science',      macro: 'psionclair-science-macro',      number: '9',  cost_number: '29' },
+    { discipline: 'Metapsionic',     section: 'psion-metapsionics',         name: 'psionmeta',          macro: 'psionmeta-macro',               number: '12', cost_number: '32' },
+    { discipline: 'Metapsionic',     section: 'psion-metapsionic-science',  name: 'meta-science',       macro: 'psionmeta-science-macro',       number: '13', cost_number: '33' },
+    { discipline: 'Attack',          section: 'psion-attack5',              name: 'psionattacking',     macro: 'psionattacking-macro',          number: '10', cost_number: '30' },
+    { discipline: 'Defense',         section: 'psion-defense5',             name: 'psiondefending',     macro: 'psiondefending-macro',          number: '11', cost_number: '31' },
 ];
 on('sheet:opened change:character_name', function (eventInfo) {
     PSIONIC_CORE_SECTIONS.forEach(({section, name, macro}) => {
