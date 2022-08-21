@@ -2810,7 +2810,8 @@ on("sheet:opened",function()
             });
         }
     });
-});/* eslint-disable default-case */
+});/* eslint-disable prefer-destructuring */
+/* eslint-disable default-case */
 /* eslint-disable camelcase */
 /* eslint-disable max-len */
 /* eslint-disable no-undef */
@@ -2961,7 +2962,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   const eDegatsContinus = isApplied(effet[`${prefix}degatContinue`]);
   const eDegatsContinusV = effet[`${prefix}degatContinueValue`] || 0;
   const eDeuxMains = isApplied(effet[`${prefix}deuxMains`]);
-  const eDemoralisant = isApplied(effet[`${prefix}eDemoralisant`]);
+  const eDemoralisant = isApplied(effet[`${prefix}demoralisant`]);
   const eDesignation = isApplied(effet[`${prefix}designation`]);
   const eDestructeur = isApplied(effet[`${prefix}destructeur`]);
   const eDestructeurV = 2;
@@ -4420,6 +4421,7 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
   let nowSoeur = false;
   let nowJumelle = false;
   let nowAllegee = false;
+  let nowBarbelee = false;
 
   const bAttaque = [];
   let diceDegats = 0;
@@ -4454,21 +4456,41 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
 
   if (aAssassine) {
     if (isSilencieux) { autresAmeliorations.push(i18n_assassine); } else {
+      const ghost = +AS.rogueGhost;
+      const MALghost = +AS.MALRogueGhost;
+      const changeling = +AS.bardChangeling;
+      const MALchangeling = +AS.MALBardChangeling;
+
       let totalAssassine = vDiscretion;
 
       if (hasArmure) { totalAssassine += oDiscretion; }
 
-      isConditionnelD = true;
-      attaquesSurprises.push(i18n_assassine);
-      attaquesSurprisesValue.push(totalAssassine);
+      if (hasArmure && ghost !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else if (hasArmure && MALghost !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else if (hasArmure && changeling !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else if (hasArmure && MALchangeling !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else {
+        isConditionnelD = true;
+        attaquesSurprises.push(i18n_assassine);
+        attaquesSurprisesValue.push(totalAssassine);
 
-      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+        if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      }
     }
   }
 
   if (aBarbelee) {
     if (isMeurtrier) { autresAmeliorations.push(i18n_barbelee); } else {
       isConditionnelD = true;
+      nowBarbelee = true;
 
       exec.push(`{{meurtrier=${i18n_barbelee}}} {{meurtrierValue=[[${aBarbeleeV}D6]]}} {{meurtrierCondition=${i18n_meurtrierCondition}}}`);
     }
@@ -4549,6 +4571,7 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
   result.isJumelle = nowJumelle;
   result.isProtectrice = nowProtectrice;
   result.isAllegee = nowAllegee;
+  result.isBarbelee = nowBarbelee;
 
   result.aLumiere = aLumiere;
   result.aLumiereValue = aLumiereValue;
@@ -4583,6 +4606,8 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   let diceDegats = 0;
   let bDegats = 0;
   const autresAmeliorations = [];
+
+  let nowBarbelee = false;
 
   const aAgressive = isApplied(data[`${prefix}agressive`]);
   const aAllegee = isApplied(data[`${prefix}allegee`]);
@@ -4620,6 +4645,7 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   if (aBarbelee) {
     if (isMeurtrier) { autresAmeliorations.push(i18n_barbelee); } else {
       isConditionnelD = true;
+      nowBarbelee = true;
 
       exec.push(`{{meurtrier=${i18n_barbelee}}} {{meurtrierValue=[[${aBarbeleeV}D6]]}} {{meurtrierCondition=${i18n_meurtrierCondition}}}`);
     }
@@ -4688,6 +4714,7 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   result.bAttaque = bAttaque;
   result.diceDegats = diceDegats;
   result.bDegats = bDegats;
+  result.isBarbelee = nowBarbelee;
 
   result.exec = exec;
   result.autresAmeliorations = autresAmeliorations;
@@ -5103,6 +5130,9 @@ function getWeaponsContactAOPNJ(prefix, data, isCadence, vCadence, isObliteratio
 function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceAttaque, eASAssassinValue, isCadence, vCadence, eSilencieux, eTirRafale, isObliteration, isAntiAnatheme) {
   const result = {};
   const exec = [];
+  const armure = AA.armure;
+
+  let hasArmure = true;
 
   let isConditionnelA = false;
   let isConditionnelD = false;
@@ -5149,6 +5179,8 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
   const aRevetementOmega = isApplied(AA[`${prefix}revetementOmega`]);
   const aStructureElement = isApplied(AA[`${prefix}structureElement`]);
   const aSystemeRefroidissement = isApplied(AA[`${prefix}systemeRefroidissement`]);
+
+  if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
 
   if (aChargeurGrappes) {
     diceDegats -= 1;
@@ -5231,12 +5263,33 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
 
   if (aMunitionsSubsoniques) {
     if (eSilencieux) { autresAmeliorations.push(i18n_munitionsSubsoniques); } else {
-      const totalSubsonique = vDiscretion + oDiscretion;
+      const ghost = +AA.rogueGhost;
+      const MALghost = +AA.MALRogueGhost;
+      const changeling = +AA.bardChangeling;
+      const MALchangeling = +AA.MALBardChangeling;
+      let totalSubsonique = vDiscretion;
 
-      attaquesSurprises.push(i18n_munitionsSubsoniques);
-      attaquesSurprisesValue.push(totalSubsonique);
+      if (hasArmure) { totalSubsonique += oDiscretion; }
 
-      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      if (hasArmure && ghost !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else if (hasArmure && MALghost !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else if (hasArmure && changeling !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else if (hasArmure && MALchangeling !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else {
+        isConditionnelD = true;
+        attaquesSurprises.push(i18n_munitionsSubsoniques);
+        attaquesSurprisesValue.push(totalSubsonique);
+
+        if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      }
     }
   }
 
@@ -5656,7 +5709,7 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
   return result;
 }
 
-function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom) {
+function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
@@ -5668,6 +5721,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   const ODBarbarian = [];
   const ODRogue = [];
   const ODShaman = [];
+  const autresEffets = [];
 
   let goliath = 0;
   let changeling = '';
@@ -5691,6 +5745,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   let typeScout = '';
 
   let bonusWarrior = 0;
+  let isConditionnelA = false;
 
   switch (armure) {
     case 'barbarian':
@@ -5713,11 +5768,17 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
 
         if (ODBarbarian.length === 0) { exec.push('{{vODBarbarian=[[0]]}}'); } else { exec.push(`{{vODBarbarian=[[${ODBarbarian.join('+')}]]}}`); }
 
-        diceDegats += goliath;
-        diceViolence += goliath;
+        if (!distance) {
+          diceDegats += goliath;
+          diceViolence += goliath;
 
-        exec.push(`{{vBarbarianD=+${goliath}D6}}`);
-        exec.push(`{{vBarbarianV=+${goliath}D6}}`);
+          exec.push(`{{vBarbarianD=+${goliath}D6}}`);
+          exec.push(`{{vBarbarianV=+${goliath}D6}}`);
+        }
+
+        if (goliath >= 4 && !aEffets.includes(i18n_antiVehicule)) {
+          autresEffets.push(i18n_antiVehicule);
+        }
       }
       break;
 
@@ -5735,9 +5796,13 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       if (ghost !== 0) {
         exec.push(`{{special2=${i18n_ghostActive}}}`);
 
-        if (isELumiere === false && isASLumiere === false) {
+        if (simpleRoll) {
+          exec.push(`{{vODGhostA=${i18n_ghost}}} {{vODGhostAValue=${3}}}`);
+          isConditionnelA = true;
+        } else if (isELumiere === false && isASLumiere === false) {
           const totalGhost = vDiscretion + oDiscretion;
 
+          isConditionnelA = true;
           exec.push(`{{vGhostA=${vDiscretion}D6+${oDiscretion}}}`);
           exec.push(`{{vGhostD=${totalGhost}}}`);
           cRoll.push(vDiscretion);
@@ -5892,11 +5957,13 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   result.ODRogue = ODRogue;
   result.ODShaman = ODShaman;
   result.ODWarrior = ODWarrior;
+  result.autresEffets = autresEffets;
+  result.isConditionnelA = isConditionnelA;
 
   return result;
 }
 
-function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom) {
+function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
@@ -5909,6 +5976,7 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
   const ODMALRogue = [];
   const ODMALShaman = [];
   const bonusWarrior = 1;
+  const autresEffets = [];
 
   let MALGoliath = 0;
   let MALGhost = '';
@@ -5920,6 +5988,8 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
   let C6Nom = '';
 
   let ODMALWarrior = 0;
+
+  let isConditionnelA = false;
 
   switch (armureL) {
     case 'barbarian':
@@ -5942,11 +6012,17 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
 
         if (ODMALBarbarian.length === 0) { exec.push('{{vODMALBarbarian=[[0]]}}'); } else { exec.push(`{{vODMALBarbarian=[[${ODMALBarbarian.join('+')}]]}}`); }
 
-        diceDegats += MALGoliath;
-        diceViolence += MALGoliath;
+        if (!distance) {
+          diceDegats += MALGoliath;
+          diceViolence += MALGoliath;
 
-        exec.push(`{{vMALBarbarianD=+${MALGoliath}D6}}`);
-        exec.push(`{{vMALBarbarianV=+${MALGoliath}D6}}`);
+          exec.push(`{{vMALBarbarianD=+${MALGoliath}D6}}`);
+          exec.push(`{{vMALBarbarianV=+${MALGoliath}D6}}`);
+        }
+
+        if (MALGoliath >= 4 && !aEffets.includes(i18n_antiVehicule)) {
+          autresEffets.push(i18n_antiVehicule);
+        }
       }
       break;
 
@@ -5964,11 +6040,15 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
       if (MALGhost !== '') {
         exec.push(`{{MALspecial2=${i18n_ghostActive}}}`);
 
-        if (isELumiere === false && isASLumiere === false) {
+        if (simpleRoll) {
+          exec.push(`{{vODMALGhostA=${i18n_ghost}}} {{vODMALGhostAValue=3}}`);
+          isConditionnelA = true;
+        } else if (isELumiere === false && isASLumiere === false) {
           const totalMALGhost = vDiscretion + oDiscretion;
 
           exec.push(`{{vMALGhostA=${vDiscretion}D6+${oDiscretion}}}`);
           exec.push(`{{vMALGhostD=${totalMALGhost}}}`);
+          isConditionnelA = true;
           cRoll.push(vDiscretion);
           ODMALRogue.push(oDiscretion);
           bDegats.push(totalMALGhost);
@@ -6113,6 +6193,8 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
   result.ODMALRogue = ODMALRogue;
   result.ODMALShaman = ODMALShaman;
   result.ODMALWarrior = ODMALWarrior;
+  result.autresEffets = autresEffets;
+  result.isConditionnelA = isConditionnelA;
 
   return result;
 }
@@ -7330,7 +7412,7 @@ on('change:fichePNJ change:armure change:berserkNiveaux change:berserkRageN1Egid
 });
 
 // DEFENSE
-on('change:fichePNJ change:armure change:armureLegende change:defense change:defBM change:bonusDefense change:defenseODBonus change:defenseModifPerso change:barbarianDef change:berserkRageA change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALWarmasterImpEsquive change:MALBarbarianDef change:MasquePNJAE change:MasquePNJAEMaj change:defensePNJ change:MADDjinnNanobrumeActive', async () => {
+on('change:fichePNJ change:armure change:armureLegende change:defense change:defBM change:bonusDefense change:defenseODBonus change:defenseModifPerso change:barbarianDef change:berserkRageA change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALWarmasterImpEsquive change:MALBarbarianDef change:MasquePNJAE change:MasquePNJAEMaj change:defensePNJ change:tabSectionKraken change:MADDjinnNanobrumeActive', async () => {
   const attrs = await getAttrsAsync(['defense', 'defensePNJ', 'defBM', 'bonusDefense', 'defenseModifPerso', 'defenseODBonus',
     'fichePNJ', 'armure', 'armureLegende',
     'barbarianDef',
@@ -7340,7 +7422,8 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
     'warmasterImpEsquive', 'warmasterImpEPersonnel',
     'MALWarmasterImpEsquive', 'MALWarmasterImpEPersonnel',
     'MasquePNJAE', 'MasquePNJAEMaj',
-    'MADDjinnNanobrumeActive']);
+    'MADDjinnNanobrumeActive',
+    'tabSectionKraken']);
 
   const fiche = +attrs.fichePNJ;
 
@@ -7379,6 +7462,8 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
   const masqueAEMaj = +attrs.MasquePNJAEMaj;
 
   const mechaArmureNanoBrume = attrs.MADDjinnNanobrumeActive;
+
+  const kraken = +attrs.tabSectionKraken;
 
   let base = 0;
   let modif = 0;
@@ -7430,6 +7515,8 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
       if (armureL === 'barbarian') { modif -= MALGoliath; }
 
       if (mechaArmureNanoBrume === 1) { totalMecha += 3; }
+
+      if (kraken === 1) { modif += 1; }
       break;
     case 1:
     case 2:
@@ -7455,7 +7542,7 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
 });
 
 // REACTION
-on('change:fichePNJ change:armure change:armureLegende change:reaction change:rctBM change:bonusReaction change:reactionODBonus change:reactionModifPerso change:barbarianRea change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:paladinWatchtower change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALBarbarianRea change:MachinePNJAE change:MachinePNJAEMaj change:reactionPNJ change:MADDjinnNanobrumeActive', async () => {
+on('change:fichePNJ change:armure change:armureLegende change:reaction change:rctBM change:bonusReaction change:reactionODBonus change:reactionModifPerso change:barbarianRea change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:paladinWatchtower change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALBarbarianRea change:MachinePNJAE change:MachinePNJAEMaj change:reactionPNJ change:tabSectionKraken change:MADDjinnNanobrumeActive', async () => {
   const attrs = await getAttrsAsync(['reaction', 'reactionPNJ', 'rctBM', 'bonusReaction', 'reactionModifPerso', 'reactionODBonus',
     'fichePNJ', 'armure', 'armureLegende',
     'barbarianRea',
@@ -7466,7 +7553,8 @@ on('change:fichePNJ change:armure change:armureLegende change:reaction change:rc
     'warmasterImpEsquive', 'warmasterImpEPersonnel',
     'MALWarmasterImpEsquive', 'MALWarmasterImpEPersonnel',
     'MachinePNJAE', 'MachinePNJAEMaj',
-    'MADDjinnNanobrumeActive']);
+    'MADDjinnNanobrumeActive',
+    'tabSectionKraken']);
 
   const fiche = +attrs.fichePNJ;
 
@@ -7507,6 +7595,8 @@ on('change:fichePNJ change:armure change:armureLegende change:reaction change:rc
   const machineAEMaj = +attrs.MachinePNJAEMaj;
 
   const mechaArmureNanoBrume = attrs.MADDjinnNanobrumeActive;
+
+  const kraken = +attrs.tabSectionKraken;
 
   let base = 0;
   let modif = 0;
@@ -7564,6 +7654,8 @@ on('change:fichePNJ change:armure change:armureLegende change:reaction change:rc
       }
 
       if (mechaArmureNanoBrume === 1) { totalMecha += 3; }
+
+      if (kraken === 1) { modif += 1; }
       break;
     case 1:
     case 2:
@@ -7724,8 +7816,8 @@ on('change:shamanNbreTotem', async () => {
 
 // GESTION DES ASPECTS ET CARACTERISTIQUES
 // Chair
-on('change:deplacement change:force change:endurance change:santeModif change:santeODBonus', async () => {
-  const attrs = await getAttrsAsync(['fichePNJ', 'chair', 'deplacement', 'force', 'endurance', 'santeModif', 'santeODBonus']);
+on('change:deplacement change:force change:endurance change:santeModif change:santeODBonus change:tabSectionKraken sheet:opened', async () => {
+  const attrs = await getAttrsAsync(['fichePNJ', 'chair', 'deplacement', 'force', 'endurance', 'santeModif', 'santeODBonus', 'tabSectionKraken']);
 
   const fiche = +attrs.fichePNJ;
 
@@ -7733,6 +7825,7 @@ on('change:deplacement change:force change:endurance change:santeModif change:sa
 
   const chair = +attrs.chair;
 
+  const kraken = +attrs.tabSectionKraken;
   const deplacement = +attrs.deplacement;
   const force = +attrs.force;
   const endurance = +attrs.endurance;
@@ -7740,23 +7833,28 @@ on('change:deplacement change:force change:endurance change:santeModif change:sa
   const modif = +attrs.santeModif;
   const OD = +attrs.santeODBonus;
 
+  let multiplicateur = 6;
+
   maxCar('deplacement', deplacement, chair);
   maxCar('force', force, chair);
   maxCar('endurance', endurance, chair);
 
-  const total = 10 + (Math.max(deplacement, force, endurance) * 6) + modif + OD;
+  if (kraken === 1) { multiplicateur = 8; }
+
+  const total = 10 + (Math.max(deplacement, force, endurance) * multiplicateur) + modif + OD;
 
   await setAttrsAsync({ santepj_max: total });
 });
+
 // Bête
-on('change:fichePNJ change:armure change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns', async () => {
+on('change:fichePNJ change:armure change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'armure', 'bete', 'hargne', 'combat', 'instinct', 'calODHar', 'calODCom', 'calODIns']);
 
   const fiche = +attrs.fichePNJ;
 
   if (fiche !== 0) { return; }
 
-  const armure = +attrs.armure;
+  const armure = attrs.armure;
 
   const aspect = +attrs.bete;
 
@@ -7788,7 +7886,7 @@ on('change:fichePNJ change:armure change:hargne change:combat change:instinct ch
   await setAttrsAsync({ defense: total });
 });
 // Machine
-on('change:fichePNJ change:armure change:tir change:savoir change:technique change:calODTir change:calODSav change:calODTec', async () => {
+on('change:fichePNJ change:armure change:tir change:savoir change:technique change:calODTir change:calODSav change:calODTec sheet:opened', async () => {
   const attrs = await getAttrsAsync(['fichePNJ', 'armure', 'machine', 'tir', 'savoir', 'technique', 'calODTir', 'calODSav', 'calODTec']);
 
   const fiche = +attrs.fichePNJ;
@@ -7994,7 +8092,7 @@ on('change:psion200PG', async () => {
 on('change:wizard150PG sheet:opened', async () => {
   const attrs = await getAttrsAsync(['wizard150PG']);
 
-  const PG200 = +attrs.wizard150PG;
+  const PG200 = attrs.wizard150PG;
 
   let portee = i18n_porteeCourte;
 
@@ -8840,12 +8938,15 @@ on('clicked:selectionMALWarmasterWarlord', async () => {
 on('clicked:selectionMALPsion', async () => {
   const attrs = await getAttrsAsync([
     'listeModeMALPsion',
+    'listeModeMALPsion2',
   ]);
 
   const choix = parseInt(attrs.listeModeMALPsion, 10) || 0;
+  const choix2 = parseInt(attrs.listeModeMALPsion2, 10) || 0;
 
   await setAttrsAsync({
     malpsionmode: choix,
+    malpsionmode2: choix2,
     popup: 0,
   });
 });
@@ -9928,7 +10029,7 @@ on('change:mechaArmure change:mechaArmureArchangelConfiguration change:mechaArmu
 // FIN MECHAARMURE
 
 // LONGBOW
-on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceEvol change:rangerArmeViolence change:rangerArmePortee change:rangerChoc change:rangerDegatContinue change:rangerDesignation change:rangerSilencieux change:rangerPerceArmure change:rangerUltraViolence change:rangerAntiVehicule change:rangerArtillerie change:rangerDispersion change:rangerLumiere change:rangerPenetrant change:rangerPerceArmure60 change:rangerAntiAnatheme change:rangerDemoralisant change:rangerEnChaine change:rangerFureur change:rangerIgnoreArmure change:rangerPenetrant10 change:ranger100PG change:ranger50PG2 sheet:opened', async () => {
+on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceEvol change:rangerArmeViolence change:rangerArmePortee change:rangerChoc change:rangerDegatContinue change:rangerDesignation change:rangerSilencieux change:rangerPerceArmure change:rangerUltraViolence change:rangerAntiVehicule change:rangerArtillerie change:rangerDispersion change:rangerLumiere change:rangerPenetrant change:rangerPerceArmure60 change:rangerAntiAnatheme change:rangerDemoralisant change:rangerEnChaine change:rangerFureur change:rangerIgnoreArmure change:rangerPenetrant10 change:ranger100PG change:ranger50PG2 change:ranger50PG sheet:opened', async () => {
   const attrs = await getAttrsAsync([
     'rangerArmeDegatEvol',
     'rangerArmeDegat',
@@ -9955,9 +10056,11 @@ on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceE
     'rangerPenetrant10',
     'ranger100PG',
     'ranger50PG2',
+    'ranger50PG',
   ]);
 
   const PG50 = attrs.ranger50PG2;
+  const PG501 = attrs.ranger50PG;
   const PG100 = attrs.ranger100PG;
 
   let baseD = 3;
@@ -10030,13 +10133,13 @@ on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceE
 
   if (eArtillerie !== '0') { energieDepense += E2; }
 
-  if (eAntiAnatheme !== '0') { energieDepense += E3; }
+  if (eAntiAnatheme !== '0' && PG501 === 'on') { energieDepense += E3; }
 
-  if (eDemoralisant !== '0') { energieDepense += E3; }
+  if (eDemoralisant !== '0' && PG501 === 'on') { energieDepense += E3; }
 
-  if (eEnChaine !== '0') { energieDepense += E3; }
+  if (eEnChaine !== '0' && PG501 === 'on') { energieDepense += E3; }
 
-  if (eFureur !== '0') { energieDepense += E3; }
+  if (eFureur !== '0' && PG501 === 'on') { energieDepense += E3; }
 
   if (eAntiVehicule !== '0') { energieDepense += E2; }
 
@@ -10054,9 +10157,9 @@ on('change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceE
 
   if (ePerceArmure60 !== '0') { energieDepense += E2; }
 
-  if (eIgnoreArmure !== '0') { energieDepense += E3; }
+  if (eIgnoreArmure !== '0' && PG501 === 'on') { energieDepense += E3; }
 
-  if (ePenetrant10 !== '0') { energieDepense += E3; }
+  if (ePenetrant10 !== '0' && PG501 === 'on') { energieDepense += E3; }
 
   energie += energieDepense;
 
@@ -10207,7 +10310,9 @@ on('clicked:importKNPCG', () => {
         const name = effects[cle].name.split(' ', length).join(' ').toLowerCase();
         const value2 = eff[length] || 0;
 
-        switch (name) {
+        const uEff = name === 'ignore' || name === 'perce' || name === 'dégâts' ? `${name} ${eff[1]}` : name;
+
+        switch (uEff) {
           case 'anathème':
             newrowattrsW[`${path + newrowidW}_anatheme`] = '{{anatheme=Anathème}}';
             break;
@@ -10300,7 +10405,7 @@ on('clicked:importKNPCG', () => {
             newrowattrsW[`${path + newrowidW}_ignoreArmure`] = '{{ignoreArmure=Ignore Armure}}';
             break;
 
-          case 'ignore champ de force':
+          case 'ignore CdF':
             newrowattrsW[`${path + newrowidW}_ignoreCdF`] = '{{ignoreCdF=Ignore Champs de Force}}';
             break;
 
@@ -12698,6 +12803,8 @@ rollCombatContact.forEach((button) => {
       isAJumelle = ameliorationsS.isJumelle;
       isAAllegee = ameliorationsS.isAllegee;
 
+      if (!isMeurtrier) { isMeurtrier = ameliorationsS.isBarbelee; }
+
       if (lumiereValue >= ameliorationsS.aLumiereValue) { autresAmeliorationsS.push(ameliorationsS.aLumiere); } else if (ameliorationsS.aLumiereValue > 0) {
         lumiere = `${ameliorationsS.aLumiere} (${i18n_lumiere} ${ameliorationsS.aLumiereValue})`;
         lumiereValue = ameliorationsS.aLumiereValue;
@@ -12857,7 +12964,7 @@ rollCombatContact.forEach((button) => {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = getArmorBonus(attrs, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
@@ -12871,7 +12978,9 @@ rollCombatContact.forEach((button) => {
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
     ODWarrior.push(armorBonus.ODWarrior);
 
-    const MALBonus = getMALBonus(attrs, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
+
+    const MALBonus = getMALBonus(attrs, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
@@ -12884,6 +12993,8 @@ rollCombatContact.forEach((button) => {
     ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
@@ -13713,7 +13824,7 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = getArmorBonus(attrs, armure, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets, false, true);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
@@ -13727,7 +13838,9 @@ rollCombatDistance.forEach((button) => {
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
     ODWarrior.push(armorBonus.ODWarrior);
 
-    const MALBonus = getMALBonus(attrs, armureL, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
+
+    const MALBonus = getMALBonus(attrs, armureL, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets, false, true);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
@@ -13740,6 +13853,8 @@ rollCombatDistance.forEach((button) => {
     ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
@@ -14079,7 +14194,7 @@ rollCombatGrenade.forEach((button) => {
     const bourreau = +attrs.bourreauTenebres;
     const equilibre = +attrs.equilibreBalance;
 
-    const autresEffets = [];
+    let autresEffets = [];
 
     if (hasArmure) { exec.push('{{OD=true}}'); }
 
@@ -14233,7 +14348,7 @@ rollCombatGrenade.forEach((button) => {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = getArmorBonus(attrs, armure, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
@@ -14247,6 +14362,8 @@ rollCombatGrenade.forEach((button) => {
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
     ODWarrior.push(armorBonus.ODWarrior);
 
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
+
     if (armure === 'berserk') {
       isTenebricide = true;
       isConditionnelD = true;
@@ -14255,7 +14372,7 @@ rollCombatGrenade.forEach((button) => {
       exec.push(`{{antiAnatheme=${i18n_antiAnatheme}}} {{antiAnathemeCondition=${i18n_antiAnathemeCondition}}}`);
     }
 
-    const MALBonus = getMALBonus(attrs, armureL, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const MALBonus = getMALBonus(attrs, armureL, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
@@ -14268,6 +14385,8 @@ rollCombatGrenade.forEach((button) => {
     ODMALRogue = ODRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
@@ -14592,7 +14711,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     const bourreau = +attrs.bourreauTenebres;
     const equilibre = +attrs.equilibreBalance;
 
-    const autresEffets = [];
+    let autresEffets = [];
     if (hasArmure) { exec.push('{{OD=true}}'); }
 
     const C1Value = +attrs[C1Nom];
@@ -14684,7 +14803,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
@@ -14698,7 +14817,9 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
     ODWarrior.push(armorBonus.ODWarrior);
 
-    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
+
+    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
@@ -14711,6 +14832,8 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
@@ -17607,6 +17730,7 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
       'devasterAnatheme',
       'bourreauTenebres',
       'equilibreBalance',
+      'MADDjinnWraithActive',
     ];
 
     const arme = [];
@@ -17629,6 +17753,8 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     const bonus = [];
 
     let OD = 0;
+
+    const wraith = attrs.MADDjinnWraithActive;
 
     const type = attrs.MAUtilisationArmeAI;
     const mod = +attrs.jetModifDes;
@@ -17734,6 +17860,14 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     diceViolence += getStyle.diceViolence;
 
     // FIN GESTION DU STYLE
+
+    if (wraith !== '0') {
+      cRoll.push(+attrs.discretion);
+      cBonus.push(+attrs[ODValue.discretion]);
+      bDegats.push(+attrs.discretion);
+      bDegats.push(+attrs[ODValue.discretion]);
+      exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+    }
 
     if (cRoll.length === 0) { cRoll.push(0); }
 
@@ -18635,6 +18769,8 @@ rollDemon.forEach((button) => {
 
     const base = roll[0];
 
+    let wraith;
+
     let degats;
     let violence;
     let bDegats = 0;
@@ -18651,13 +18787,24 @@ rollDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ]);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         degats = attrs[roll[1]];
         violence = attrs[roll[2]];
 
         bDegats = +degats.split('+')[1];
         bViolence = +violence.split('+')[1];
+
+        if (wraith !== '0') {
+          degats += `+${+attrs.discretion + +attrs[ODValue.discretion]}`;
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
 
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}} {{effets=^{CDF-desactive-pendant} [[1D3]] ^{tours}}}`);
         break;
@@ -18669,13 +18816,28 @@ rollDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ]);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         degats = attrs[roll[1]];
         violence = attrs[roll[2]];
 
+        if (wraith !== '0') {
+          degats += `+${+attrs.discretion + +attrs[ODValue.discretion]}`;
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}} {{degatsConditionnel=true}} {{violenceConditionnel=true}} {{antiAnatheme=${i18n_antiAnatheme}}} {{antiAnathemeCondition=${i18n_antiAnathemeCondition}}} {{effets=${i18n_antiVehicule}}}`);
         break;
+    }
+
+    if (wraith !== '0') {
+      exec.push('{{special2=^{module-wraith} ^{active}}}');
     }
 
     const devaste = +attrs.devasterAnatheme;
@@ -18741,6 +18903,8 @@ rollCombatDemon.forEach((button) => {
     const cBonus = [];
     let cOD = 0;
 
+    let wraith;
+
     let degats;
     let bDegats;
     let violence;
@@ -18749,8 +18913,6 @@ rollCombatDemon.forEach((button) => {
     let getStyle;
 
     let autresEffets;
-
-    let active;
 
     exec.push(base);
 
@@ -18769,11 +18931,16 @@ rollCombatDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
 
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -18839,6 +19006,14 @@ rollCombatDemon.forEach((button) => {
         degats += getStyle.diceDegats;
         violence += getStyle.diceViolence;
 
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
 
         exec.push(jet);
@@ -18885,7 +19060,7 @@ rollCombatDemon.forEach((button) => {
 
         attrs = await getAttrsAsync(listAttrs);
 
-        active = attrs.MADDjinnWraithActive;
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -18894,8 +19069,6 @@ rollCombatDemon.forEach((button) => {
         C2 = attrs.caracteristiqueWraith2;
         C3 = attrs.caracteristiqueWraith3;
         C4 = attrs.caracteristiqueWraith4;
-
-        if (active !== '0') { exec.push('{{special2=^{module-wraith} ^{active}}}'); }
 
         attrsCarac = await getCarac(bCarac, C1, C2, C3, C4);
 
@@ -18969,11 +19142,16 @@ rollCombatDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
 
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -19039,6 +19217,14 @@ rollCombatDemon.forEach((button) => {
         degats += getStyle.diceDegats;
         violence += getStyle.diceViolence;
 
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
 
         exec.push(jet);
@@ -19080,10 +19266,15 @@ rollCombatDemon.forEach((button) => {
           'devasterAnatheme',
           'bourreauTenebres',
           'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -19154,6 +19345,14 @@ rollCombatDemon.forEach((button) => {
           exec.push(`{{mod=${mod}}}`);
         }
 
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
         jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
 
         exec.push(jet);
@@ -19199,6 +19398,10 @@ rollCombatDemon.forEach((button) => {
 
         exec.push(`{{herauts=${herauts.join(' / ')}}}`);
       }
+    }
+
+    if (wraith !== '0') {
+      exec.push('{{special2=^{module-wraith} ^{active}}}');
     }
 
     const finalRoll = await startRoll(exec.join(' '));
@@ -19445,6 +19648,10 @@ monkCeaRoll.forEach((button) => {
     let isConditionnelD = false;
     let isConditionnelV = false;
 
+    const attaquesSurprises = [];
+    const attaquesSurprisesValue = [];
+    let attaquesSurprisesCondition = '';
+
     const mod = +attrs.jetModifDes;
     const hasBonus = +attrs.bonusCarac;
 
@@ -19470,12 +19677,9 @@ monkCeaRoll.forEach((button) => {
     let OD = 0;
 
     let ODMALBarbarian = [];
+    let ODMALRogue = [];
     let ODMALShaman = [];
     const ODMALWarrior = [];
-
-    let attaquesSurprises = [];
-    let attaquesSurprisesValue = [];
-    let attaquesSurprisesCondition = '';
 
     let capaDgts = 0;
     let capaViolence = 0;
@@ -19503,7 +19707,7 @@ monkCeaRoll.forEach((button) => {
     let isMeurtrier = false;
     let isUltraviolence = false;
 
-    const autresEffets = [];
+    let autresEffets = [];
 
     exec.push(roll);
     exec.push('{{OD=true}}');
@@ -19556,26 +19760,20 @@ monkCeaRoll.forEach((button) => {
       if (hasArmure) { OD += C4OD; }
     }
 
-    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
-
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
 
     diceDegats += Number(MALBonus.diceDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // GESTION DES EFFETS DES DIFFERENTES ATTAQUES
 
@@ -19761,6 +19959,7 @@ monkCeaRoll.forEach((button) => {
     bonus = bonus.concat(OD);
 
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODMALWarrior);
 
@@ -19891,10 +20090,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let attributs = [
     'pilonnageRanger',
     'energiePJ',
-    'caracteristique1',
-    'caracteristique2',
-    'caracteristique3',
-    'caracteristique4',
+    'caracteristique1Ranger',
+    'caracteristique2Ranger',
+    'caracteristique3Ranger',
+    'caracteristique4Ranger',
     'discretion',
     ODValue.discretion,
     ODValue.tir,
@@ -19985,6 +20184,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let isConditionnelD = true;
   let isConditionnelV = true;
 
+  const attaquesSurprises = [];
+  const attaquesSurprisesValue = [];
+  let attaquesSurprisesCondition = '';
+
   const PG50_3 = attrs.ranger50PG3;
   const PG50_2 = attrs.ranger50PG2;
   const PG100 = attrs.ranger100PG;
@@ -19997,16 +20200,12 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let violence = [];
   const bonusViolence = [];
 
-  let attaquesSurprises = [];
-  let attaquesSurprisesValue = [];
-  let attaquesSurprisesCondition = '';
-
   const devaste = +attrs.devasterAnatheme;
   const bourreau = +attrs.bourreauTenebres;
   const equilibre = +attrs.equilibreBalance;
 
   const portee = attrs.rangerArmePortee;
-  const autresEffets = [];
+  let autresEffets = [];
   const autresAmeliorations = [];
   const autresSpecial = [];
 
@@ -20048,10 +20247,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
   const mod = +attrs.jetModifDes;
   const hasBonus = +attrs.bonusCarac;
 
-  const C1 = attrs.caracteristique1;
-  const C2 = attrs.caracteristique2;
-  const C3 = attrs.caracteristique3;
-  const C4 = attrs.caracteristique4;
+  const C1 = attrs.caracteristique1Ranger;
+  const C2 = attrs.caracteristique2Ranger;
+  const C3 = attrs.caracteristique3Ranger;
+  const C4 = attrs.caracteristique4Ranger;
 
   const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
@@ -20076,6 +20275,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let OD = 0;
 
   const ODMALWarrior = [];
+  let ODMALRogue = [];
   let ODMALShaman = [];
   let ODMALBarbarian = [];
 
@@ -20191,11 +20391,23 @@ on('clicked:distanceRangerLongbow', async (info) => {
   }
 
   if (eSilencieux !== '0') {
+    const MALghost = +attrs.MALRogueGhost;
+    const MALchangeling = +attrs.MALBardChangeling;
     const totalSilencieux = vDiscretion + oDiscretion;
 
-    attaquesSurprises.push(i18n_silencieux);
-    attaquesSurprisesValue.push(totalSilencieux);
-    attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`;
+    if (MALghost !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bonusDegats.push(totalSilencieux);
+    } else if (MALchangeling !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bonusDegats.push(totalSilencieux);
+    } else {
+      isConditionnelD = true;
+      attaquesSurprises.push(i18n_silencieux);
+      attaquesSurprisesValue.push(totalSilencieux);
+
+      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+    }
 
     energieDepense += E1;
   }
@@ -20390,12 +20602,23 @@ on('clicked:distanceRangerLongbow', async (info) => {
 
   if (aMSubsoniques !== '0') {
     if (eSilencieux !== '0') { autresAmeliorations.push(i18n_munitionsSubsoniques); } else if (eSilencieux === '0') {
+      const MALghost = +attrs.MALRogueGhost;
+      const MALchangeling = +attrs.MALBardChangeling;
       const totalSubsonique = vDiscretion + oDiscretion;
 
-      attaquesSurprises.push(i18n_munitionsSubsoniques);
-      attaquesSurprisesValue.push(totalSubsonique);
+      if (MALghost !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bonusDegats.push(totalSubsonique);
+      } else if (MALchangeling !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bonusDegats.push(totalSubsonique);
+      } else {
+        isConditionnelD = true;
+        attaquesSurprises.push(i18n_munitionsSubsoniques);
+        attaquesSurprisesValue.push(totalSubsonique);
 
-      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+        if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      }
     }
   }
 
@@ -20443,26 +20666,20 @@ on('clicked:distanceRangerLongbow', async (info) => {
   }
   // FIN DE GESTION DES BONUS SPECIAUX
 
-  const MALBonus = getMALBonus(attrs, armureL, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = getMALBonus(attrs, armureL, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
-
-  if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-  if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-  attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-  attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-  if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
 
   diceDegats += Number(MALBonus.diceDegats);
   diceViolence += Number(MALBonus.diceViolence);
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
   ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+  autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -20586,6 +20803,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
   bonus.push(OD);
 
   bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALRogue);
   bonus = bonus.concat(ODMALShaman);
   bonus = bonus.concat(ODMALWarrior);
 
@@ -20841,7 +21059,7 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, [], true);
 
   exec = exec.concat(armorBonus.exec);
   cRoll = cRoll.concat(armorBonus.cRoll);
@@ -20852,7 +21070,7 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
   ODShaman = ODShaman.concat(armorBonus.ODShaman);
   ODWarrior.push(armorBonus.ODWarrior);
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, [], true);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -22934,7 +23152,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
   const armureL = attrs.armureLegende;
 
   let exec = [];
-  let isConditionnel = false;
+  let autresEffets = [];
 
   const typeAttaque = attrs.wizardBTypeAttaque;
 
@@ -22972,6 +23190,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
   const equilibre = +attrs.equilibreBalance;
 
   let ODMALBarbarian = [];
+  let ODMALRogue = [];
   const ODMALWarrior = [];
   let ODMALShaman = [];
 
@@ -23027,16 +23246,17 @@ on('clicked:distanceWizardBorealis', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
 
-  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
-
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
   ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+  autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -23067,7 +23287,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
 
     case 'agressif':
@@ -23076,7 +23296,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_agressif}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
 
     case 'akimbo':
@@ -23098,7 +23318,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
         cRoll.push(-1);
       } else {
         exec.push(`{{vMStyleA=${modA}D}}`);
-        cRoll.push(modA);
+        cRoll.push(Number(modA));
       }
 
       break;
@@ -23117,7 +23337,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
         cRoll.push(-1);
       } else {
         exec.push(`{{vMStyleA=${modA}D}}`);
-        cRoll.push(modA);
+        cRoll.push(Number(modA));
       }
       break;
 
@@ -23127,7 +23347,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_defensif}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
   }
 
@@ -23140,6 +23360,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
   bonus.push(OD);
 
   bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALRogue);
   bonus = bonus.concat(ODMALWarrior);
   bonus = bonus.concat(ODMALShaman);
 
@@ -23166,8 +23387,6 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
     exec.push(`{{herauts=${herauts.join(' / ')}}}`);
   }
-
-  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
   // ROLL
   const finalRoll = await startRoll(exec.join(' '));
@@ -23222,6 +23441,7 @@ on('clicked:distanceWizardOriflamme', async (info) => {
     'equilibreBalance',
   ];
 
+  attributs = attributs.concat(listBase);
   attributs = attributs.concat(listArmureLegende);
 
   const attrs = await getAttrsAsync(attributs);
@@ -23232,6 +23452,7 @@ on('clicked:distanceWizardOriflamme', async (info) => {
   const autresEffets = [];
 
   let MALGoliath;
+  let MALChangeling;
   let MALGhost;
   let MALTypeSoldier;
   let MALTypeHunter;
@@ -23254,6 +23475,14 @@ on('clicked:distanceWizardOriflamme', async (info) => {
       MALGoliath = +attrs.MALBarbarianGoliath;
 
       if (MALGoliath !== 0) { exec.push(`{{MALGoliath=[[${MALGoliath}]]}}`); }
+      break;
+
+    case 'bard':
+      MALChangeling = +attrs.MALBardChangeling;
+
+      if (MALChangeling !== 0) {
+        exec.push(`{{MALspecial2=${i18n_changelingActive}}}`);
+      }
       break;
 
     case 'rogue':
@@ -23283,6 +23512,7 @@ on('clicked:distanceWizardOriflamme', async (info) => {
     default:
       MALGoliath = 0;
       MALGhost = '';
+      MALChangeling = '';
       MALTypeSoldier = '';
       MALTypeHunter = '';
       MALTypeHerald = '';
@@ -23368,6 +23598,7 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
   const autresEffets = [];
 
   let MALGoliath;
+  let MALChangeling;
   let MALGhost;
   let MALTypeSoldier;
   let MALTypeHunter;
@@ -23382,6 +23613,14 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
       MALGoliath = +attrs.MALBarbarianGoliath;
 
       if (MALGoliath !== 0) { exec.push(`{{MALGoliath=[[${MALGoliath}]]}}`); }
+      break;
+
+    case 'bard':
+      MALChangeling = +attrs.MALBardChangeling;
+
+      if (MALChangeling !== 0) {
+        exec.push(`{{MALspecial2=${i18n_changelingActive}}}`);
+      }
       break;
 
     case 'rogue':
@@ -23411,6 +23650,7 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
     default:
       MALGoliath = 0;
       MALGhost = '';
+      MALChangeling = '';
       MALTypeSoldier = '';
       MALTypeHunter = '';
       MALTypeHerald = '';
@@ -23924,6 +24164,8 @@ rollCombatPNJContact.forEach((button) => {
     if (rAS.isConditionnelD) { isConditionnelD = true; }
 
     if (rAS.isConditionnelV) { isConditionnelV = true; }
+
+    if (!isMeurtrier) { isMeurtrier = rAS.isBarbelee; }
 
     // FIN GESTION DES AMELIORATIONS STRUCTURELLES
 
@@ -25879,6 +26121,12 @@ on('clicked:rollVehicule', async (info) => {
 			<option value="2" data-i18n="mode-discord">Mode Discord</option>
 			<option value="3" data-i18n="mode-windtalker">Mode Windtalker</option>
 		</select>
+		<select name="attr_listeModeMALPsion2">
+			<option value=""></option>
+			<option value="1" data-i18n="mode-puppet-master">Mode Puppet Master</option>
+			<option value="2" data-i18n="mode-discord">Mode Discord</option>
+			<option value="3" data-i18n="mode-windtalker">Mode Windtalker</option>
+		</select>
 		<button type="action" name="act_selectionMALPsion" data-i18n="selectionner">Sélectionner</button>
 	</div>
 	<div class="popupWarlock">
@@ -26188,6 +26436,12 @@ on('clicked:rollVehicule', async (info) => {
                     <label>
                         <input type="checkbox" name="attr_tabMechaArmure" value="1">
                         <span data-i18n="acces-mecha-armures">Accès aux mécha-armures.</span> 
+                    </label>
+                </div>
+                <div class="half fichePJ">
+                    <label>
+                        <input type="checkbox" name="attr_tabSectionKraken" value="1">
+                        <span data-i18n="membre-section-kraken">Membre de la section Kraken.</span> 
                     </label>
                 </div>
                 <div class="textarea fichePNJ ficheCreature ficheBande">
@@ -30244,6 +30498,7 @@ on('clicked:rollVehicule', async (info) => {
             
             <div class="MALPsion">
                 <input class="legendeChoisie" type="hidden" name="attr_malpsionmode" value="0" />
+                <input class="legendeChoisie2" type="hidden" name="attr_malpsionmode2" value="0" />
 
                 <div class="psionPuppetMaster">
                     <input class="bonusCarac" type="hidden" name="attr_bonusCarac" value="0" />
@@ -32816,7 +33071,7 @@ on('clicked:rollVehicule', async (info) => {
         </div>
         <div class="col5LargeBL rangerJet">            
             <span data-i18n="jet">Jet</span>
-            <select name="attr_caracteristique1">
+            <select name="attr_caracteristique1Ranger">
                 <option value="0" selected></option>
                 <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
                 <option value="@{force}" data-i18n="force">Force</option>
@@ -32834,7 +33089,7 @@ on('clicked:rollVehicule', async (info) => {
                 <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
                 <option value="@{perception}" data-i18n="perception">Perception</option>
             </select>
-            <select name="attr_caracteristique2">
+            <select name="attr_caracteristique2Ranger">
                 <option value="0" selected></option>
                 <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
                 <option value="@{force}" data-i18n="force">Force</option>
@@ -32867,7 +33122,7 @@ on('clicked:rollVehicule', async (info) => {
                 </select>
             </label>
             <div class="bonusCarac">
-                <select name="attr_caracteristique3">
+                <select name="attr_caracteristique3Ranger">
                     <option value="0" selected></option>
                     <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
                     <option value="@{force}" data-i18n="force">Force</option>
@@ -32885,7 +33140,7 @@ on('clicked:rollVehicule', async (info) => {
                     <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
                     <option value="@{perception}" data-i18n="perception">Perception</option>
                 </select>
-                <select name="attr_caracteristique4">
+                <select name="attr_caracteristique4Ranger">
                     <option value="0" selected></option>
                     <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
                     <option value="@{force}" data-i18n="force">Force</option>
@@ -38688,7 +38943,7 @@ on('clicked:rollVehicule', async (info) => {
                 </div>
                 <div class="col5LargeBL rangerJet">            
                     <span data-i18n="jet">Jet</span>
-                    <select name="attr_caracteristique1">
+                    <select name="attr_caracteristique1Ranger">
                         <option value="0" selected></option>
                         <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
                         <option value="@{force}" data-i18n="force">Force</option>
@@ -38706,7 +38961,7 @@ on('clicked:rollVehicule', async (info) => {
                         <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
                         <option value="@{perception}" data-i18n="perception">Perception</option>
                     </select>
-                    <select name="attr_caracteristique2">
+                    <select name="attr_caracteristique2Ranger">
                         <option value="0" selected></option>
                         <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
                         <option value="@{force}" data-i18n="force">Force</option>
@@ -38732,7 +38987,7 @@ on('clicked:rollVehicule', async (info) => {
                         <input type="number" name="attr_pilonnageRanger" value="1" min="1" max="7" />
                     </label>
                     <div class="bonusCarac">
-                        <select name="attr_caracteristique3">
+                        <select name="attr_caracteristique3Ranger">
                             <option value="0" selected></option>
                             <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
                             <option value="@{force}" data-i18n="force">Force</option>
@@ -38750,7 +39005,7 @@ on('clicked:rollVehicule', async (info) => {
                             <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
                             <option value="@{perception}" data-i18n="perception">Perception</option>
                         </select>
-                        <select name="attr_caracteristique4">
+                        <select name="attr_caracteristique4Ranger">
                             <option value="0" selected></option>
                             <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
                             <option value="@{force}" data-i18n="force">Force</option>
@@ -39828,6 +40083,188 @@ on('clicked:rollVehicule', async (info) => {
                             <button class="lion" type="action" name="act_MALChoixCompanons_lion" data-i18n="druid-companion-lion">Lion</button>
                             <button class="wolf" type="action" name="act_MALChoixCompanons_wolf" data-i18n="druid-companion-wolf">Wolf</button>
                             <button class="crow" type="action" name="act_MALChoixCompanons_crow" data-i18n="druid-companion-crow">Crow</button>
+                        </div>
+                    </div>
+
+                    <div class="MALPsion">
+                        <input class="legendeChoisie2" type="hidden" name="attr_malpsionmode2" value="0" />
+        
+                        <div class="psionPuppetMaster">
+                            <input class="bonusCarac" type="hidden" name="attr_bonusCarac" value="0" />
+        
+                            <div class="titre">
+                                <button type="action" class="fichePJ bonusCaracL1" name="act_bonusCarac_1" data-i18n-title="+1 Caractéristique" title="+1 Caractéristique" >+1</button>
+                                <button type="action" class="fichePJ bonusCaracL2" name="act_bonusCarac_2" data-i18n-title="+2 Caractéristique" title="+2 Caractéristique" >+2</button>
+                                
+                                <h1 class="titre" data-i18n="mode-puppet-master">Mode Puppet Master</h1>
+                                <button class="rollDice" type="action" name="act_simplePsionPuppet" value="@{jetGM} &{template:simple} {{Nom=@{name}}}"></button>
+                            </div>
+                            <div class="rollPJ">
+                                <select name="attr_caracteristique1Psion">
+                                    <option value="@{aura}" data-i18n="aura" selected>Aura</option>
+                                </select>
+                                <select name="attr_caracteristique2">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                            </div>
+                            <div class="bonusCarac">
+                                <select name="attr_caracteristique3">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                                <select name="attr_caracteristique4">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                            </div>
+                            <h1 class="titre" data-i18n="ordre-donne">Ordre Donné</h1>
+                            <div class="autoex autoex28">
+                                <span name="attr_psionPuppetOrdre"></span>
+                                <textarea name="attr_psionPuppetOrdre"></textarea>
+                            </div>
+                        </div>
+                        <div class="psionDiscord">
+                            <input class="active" type="hidden" name="attr_MALPsionDiscord" />
+                            <input class="bonusCarac" type="hidden" name="attr_bonusCarac" value="0" />
+        
+                            <div class="titre">
+                                <button type="action" class="fichePJ bonusCaracL1" name="act_bonusCarac_1" data-i18n-title="+1 Caractéristique" title="+1 Caractéristique" >+1</button>
+                                <button type="action" class="fichePJ bonusCaracL2" name="act_bonusCarac_2" data-i18n-title="+2 Caractéristique" title="+2 Caractéristique" >+2</button>
+        
+                                <h1 class="titre" data-i18n="psion-mode-discord">Mode Discord</h1>
+        
+                                <button class="active" type="action" name="act_MALPsionDiscord" data-i18n="activer">Activer</button>
+                            </div>
+                            <label class="ligne2">
+                                <span data-i18n="bonus/malus-jets">Bonus/Malus aux Jets</span>
+                                <input type="number" name="attr_jetModifDes" value="0" />
+                            </label>
+                            <div class="rollPJ">
+                                <select name="attr_caracteristique1Psion">
+                                    <option value="@{aura}" data-i18n="aura" selected>Aura</option>
+                                </select>
+                                <select name="attr_caracteristique2">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                                <button class="rollDice" type="action" name="act_simplePsionDiscord" value="@{jetGM} &{template:simple} {{Nom=@{name}}}"></button>
+                            </div>
+        
+                            <div class="bonusCarac">
+                                <select name="attr_caracteristique3">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                                <select name="attr_caracteristique4">
+                                    <option value="0" selected></option>
+                                    <option value="@{deplacement}" data-i18n="deplacement">Déplacement</option>
+                                    <option value="@{force}" data-i18n="force">Force</option>
+                                    <option value="@{endurance}" data-i18n="endurance">Endurance</option>
+                                    <option value="@{hargne}" data-i18n="hargne">Hargne</option>
+                                    <option value="@{combat}" data-i18n="combat">Combat</option>
+                                    <option value="@{instinct}" data-i18n="instinct">Instinct</option>
+                                    <option value="@{tir}" data-i18n="tir">Tir</option>
+                                    <option value="@{savoir}" data-i18n="savoir">Savoir</option>
+                                    <option value="@{technique}" data-i18n="technique">Technique</option>
+                                    <option value="@{aura}" data-i18n="aura">Aura</option>
+                                    <option value="@{parole}" data-i18n="parole">Parole</option>
+                                    <option value="@{sf}" data-i18n="sang-froid">Sang-Froid</option>
+                                    <option value="@{discretion}" data-i18n="discretion">Discrétion</option>
+                                    <option value="@{dexterite}" data-i18n="dexterite">Dextérité</option>
+                                    <option value="@{perception}" data-i18n="perception">Perception</option>
+                                </select>
+                            </div>
+                            <label class="col3">
+                                <span data-i18n="malus-action">Malus Actions</span>
+                                <input type="text" name="attr_psionMalusA" value="2D" readonly />
+                            </label>
+                            <label class="col3BL">
+                                <span data-i18n="malus-reaction">Malus Réaction</span>
+                                <input type="text" name="attr_psionMalus" value="2" readonly />
+                            </label>
+                            <label class="col3BL">
+                                <span data-i18n="malus-defense">Malus Défense</span>
+                                <input type="text" name="attr_psionMalus" value="2" readonly />
+                            </label>
+                        </div>
+                        <div class="psionWindtalker">
+                            <h1 class="titre" data-i18n="psion-mode-windtalker">Mode Windtalker</h1>
+                            <h2 class="titreBis" data-i18n="actions-creatures">Actions des Créatures</h2>
+                            <div class="autoex autoex28">
+                                <span name="attr_psionWindtalkerActions"></span>
+                                <textarea name="attr_psionWindtalkerActions"></textarea>
+                            </div>
                         </div>
                     </div>
 
@@ -54374,6 +54811,9 @@ on('clicked:rollVehicule', async (info) => {
 			{{#vAllegee}}
 				<span class="full"><span data-i18n="allegee-inclus">Allégée inclus</span> ({{vAllegee}})</span>
 			{{/vAllegee}}
+			{{#vAssassineD}}
+				<span class="full"><span data-i18n="assassine-inclus">Assassine inclus</span> ({{vAssassineD}})</span>
+			{{/vAssassineD}}
 			{{#vLeste}}
 				<span class="full"><span data-i18n="leste-inclus">Bonus lesté inclus</span> ({{vLeste}})</span>
 			{{/vLeste}}			
@@ -54386,6 +54826,9 @@ on('clicked:rollVehicule', async (info) => {
 			{{#vSournoise}}
 				<span class="full"><span data-i18n="sournoise-inclus">Bonus sournoise inclus</span> ({{vSournoise}})</span>
 			{{/vSournoise}}
+			{{#vSubsoniqueD}}
+				<span class="full"><span data-i18n="munitions-subsoniques-inclus">Subsonique inclus</span> ({{vSubsoniqueD}})</span>
+			{{/vSubsoniqueD}}
 			{{#vSurMesure}}
 				<span class="full"><span data-i18n="sur-mesure-inclus">Sur mesure inclus</span> ({{vSurMesure}})</span>
 			{{/vSurMesure}}
@@ -54927,6 +55370,9 @@ on('clicked:rollVehicule', async (info) => {
 			{{#vSystemes}}
 				<span class="full"><span data-i18n="systemes-inclus">Systemes inclus</span> ({{vSystemes}})</span>
 			{{/vSystemes}}
+			{{#vWraithA}}
+				<span class="full"><span data-i18n="wraith-inclus">Bonus du mode wraith inclus</span> ({{vWraithA}})</span>
+			{{/vWraithA}}
 		</div>
 	{{/jet}}
 
@@ -54957,6 +55403,10 @@ on('clicked:rollVehicule', async (info) => {
 			{{#vMStyleD}}
 				<span class="full"><span data-i18n="style-inclus">Style inclus</span> ({{vMStyleD}})</span>
 			{{/vMStyleD}}
+
+			{{#vWraithD}}
+				<span class="full"><span data-i18n="wraith-inclus">Bonus du mode wraith inclus</span> ({{vWraithD}})</span>
+			{{/vWraithD}}
 		</div>
 	{{/degats}}
 	{{#degatsConditionnel}}

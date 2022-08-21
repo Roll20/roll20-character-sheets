@@ -105,7 +105,7 @@ rollCombatGrenade.forEach((button) => {
     const bourreau = +attrs.bourreauTenebres;
     const equilibre = +attrs.equilibreBalance;
 
-    const autresEffets = [];
+    let autresEffets = [];
 
     if (hasArmure) { exec.push('{{OD=true}}'); }
 
@@ -259,7 +259,7 @@ rollCombatGrenade.forEach((button) => {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = getArmorBonus(attrs, armure, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
@@ -273,6 +273,8 @@ rollCombatGrenade.forEach((button) => {
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
     ODWarrior.push(armorBonus.ODWarrior);
 
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
+
     if (armure === 'berserk') {
       isTenebricide = true;
       isConditionnelD = true;
@@ -281,7 +283,7 @@ rollCombatGrenade.forEach((button) => {
       exec.push(`{{antiAnatheme=${i18n_antiAnatheme}}} {{antiAnathemeCondition=${i18n_antiAnathemeCondition}}}`);
     }
 
-    const MALBonus = getMALBonus(attrs, armureL, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const MALBonus = getMALBonus(attrs, armureL, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
@@ -294,6 +296,8 @@ rollCombatGrenade.forEach((button) => {
     ODMALRogue = ODRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;

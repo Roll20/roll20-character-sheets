@@ -1,0 +1,153 @@
+//- The .pug file type is not required when including pug files, but I find that it makes reading the code easier if I can see at a glance what the file type is
+include scaffold/_kpug.pug
+include mixins/_sheetmixins.pug
+-
+  const basicMoves = {
+    'see into their heart':{
+      stat:'heart',
+      success:'see into their heart success result',
+      mixed:'see into their heart mixed result',
+      failure:'see into their heart failure result'
+    },
+    'help somebody':{
+      stat:'heart',
+      success:'help somebody success result',
+      mixed:'help somebody mixed result',
+      failure:'help somebody failure result'
+    },
+    'touch the other side':{
+      stat:'books',
+      success:'touch the other side success result',
+      mixed:'touch the other side mixed result',
+      failure:'touch the other side failure result'
+    },
+    'understand':{
+      stat:'books',
+      success:'understand success result',
+      mixed:'understand mixed result',
+      failure:'understand failure result'
+    },
+    'take a swing':{
+      stat:'fierce',
+      success:'take a swing success result',
+      mixed:'take a swing mixed result',
+      failure:'take a swing failure result'
+    },
+    'take action':{
+      stat:'fierce',
+      success:'take action success result',
+      mixed:'take action mixed result',
+      failure:'take action failure result'
+    },
+    'sneak':{
+      stat:'slick',
+      success:'sneak success result',
+      mixed:'sneak mixed result',
+      failure:'sneak failure result'
+    },
+    'keep your cool':{
+      stat:'slick',
+      success:'keep your cool success result',
+      mixed:'keep your cool mixed result',
+      failure:'keep your cool failure result'
+    },
+    'convince somebody':{
+      stat:null,
+      success:'convince somebody success result',
+      mixed:'convince somebody mixed result',
+      failure:'convince somebody failure result'
+    },
+    'another move':{
+      stat:null,
+      critical:`basic critical result`,
+      success:`basic success result`,
+      mixed:`basic mixed result`,
+      failure:`basic failure result`,
+      fumble:`basic fumble result`
+    }
+  };
+-
+  varObjects.basicMoves = {
+    ...basicMoves,
+  };
+-
+  const advantageTypes = {
+    advantage:'[[3+@{double}]]d6kh2',
+    normal:'2d6',
+    disadvantage:'[[3+@{double}]]d6kl2',
+    query:'?{Roll with|Double Advantage,4d6kh2|Advantage,3d6kh2|Normal,2d6|Disadvantage,3d6kl2|Double Disadvantage,4d6kl2}'
+  };
+-
+  varObjects.advantageTypes = {
+    'double advantage':'4d6kh2',
+    advantage:'3d6kh2',
+    normal:'2d6',
+    disadvantage:'3d6kl2',
+    'double disadvantage':'4d6kl2'
+  };
+- const meterValues = [1,2,3,4,5,6,7,8,9,10];
+- varObjects.meterValues = [0,...meterValues];
+//- We define our rolltemplate name here so that we can use it as a variable elsewhere. We'll be using a single template for the entire system
+- const templateName = 'utn';
+//- 
+  template_start will allow us to include repetitive message information without needing to type it all out every time. The parts of the template included here are:
+  - @{whisper}: An attribute that we will create in the settings page of the sheet to allow users to set their rolls to always whisper to the gm or not.
+  - &{template:${templateName}}: The template declaration that we'll use in our macros
+  - @{character_name}: the character's name. We'll combine it with the character id so that a link to open the character sheet is output with every macro
+  - @{character_id}: the character's Roll20 ID. Combined with the character name, this allows the template to output a link to open the character from chat.
++hidden({name:'template start',value:`@{whisper}&{template:${templateName}} {{character_name=@{character_name}}} {{character_id=@{character_id}}}`})
+//- sheet_state will contain which display of the sheet is currently enabled
++hidden({name:'sheet version',value:0})
++hidden({name:'sheet state',value:'settings'})
+//- collapsed will contain the sections that are currently collapsed as a space separated list
++hidden({name:'collapsed',value:''})
+//- Now, for our actual sheet. We'll wrap this in a main element and give it an ID of main.
+main#main
+  //- Because this is going to be a tabbed sheet, we'll need to have a navigation section. We will use a nav element so that our html will be semantic html. This will help us make our sheet more accessible to those using assistive technologies like screen readers.
+  nav#main-nav.sheet-nav
+    .basic-moves.span-all.character-type.character-type--character.character-type--mon
+      each content,name in basicMoves 
+        +roller({name,'data-i18n':name,class:'styled-button basic-roll',trigger:{triggeredFuncs:['rollBasicMove']}})
+      +roller({name:'initiative','data-i18n':'initiative',class:'styled-button basic-roll initiative',trigger:{triggeredFuncs:['rollInitiative']}})
+    .roll-options.character-type.character-type--character.character-type--mon
+      label.input-label.double-label
+        +checkbox({name:'double',hidden:'',value:1,class:'styled-button-control'})
+        span(data-i18n='double').styled-button.styled-button--controlled
+      each value,name in advantageTypes
+        - const checkObj = {name:'advantage',hidden:'',type:'radio',value,class:'styled-button-control'};
+        if name === 'normal'
+          - checkObj.checked = ''
+        label.input-label
+          +radio(checkObj)
+          span(data-i18n=name).styled-button.styled-button--controlled
+      +hidden({name:'generic bonus',value:'',class:'styled-button-control',trigger:{defaultValue:0}}).styled-button-control
+      +input-label({
+        inputObj:{name:'generic bonus',type:'number'},
+        spanObj:{'data-i18n':'bonus'},
+        divObj:{class:'styled-button styled-button--controlled'}
+      })
+    //- Our nav section is going to contain a series of action buttons that will eventually trigger our navigation javascript function. We'll create the buttons now, but write their functions at a later point.
+    //- This will be our button to access the settings page. it's written separately because it has some different requirements
+    +action({name:'nav settings',class:'pictos active sheet-nav__tab settings','data-i18n-title':'open the settings page',role:'heading','aria-level':5,trigger:{triggeredFuncs:['navigateSheet']}})
+      |y
+    +action({name:'nav character',class:'pictos sheet-nav__tab character character-type character-type--character character-type--mon','data-i18n-title':'open the character sheet',role:'heading','aria-level':5,trigger:{triggeredFuncs:['navigateSheet']}})
+      |N
+    +action({name:'nav gamescreen',class:'pictos sheet-nav__tab gamescreen character-type character-type--gamescreen','data-i18n-title':'open the confrontation sheet',role:'heading','aria-level':5,trigger:{triggeredFuncs:['navigateSheet']}})
+      |N
+  //- Includes all the code for the PC character sheet
+  - let headerType = 'character';
+  include articles/_character.pug
+  //- Includes all the code for the game screen sheet
+  - headerType = 'screen';
+  include articles/_game_screen.pug
+  //- This will eventually expand to become our settings page for the sheet, but we'll start with the PC sheet
+  include articles/_settings.pug
+//- This will eventually become our roll template. It is empty for now
+include rolltemplates/_utntemplate.pug
++kscript
+  //- All additional javascript files should start here
+  include javascript/variables.js
+  include javascript/setupfunctions.js
+  include javascript/calculators.js
+  include javascript/triggeredfunctions.js
+  include javascript/rollfunctions.js

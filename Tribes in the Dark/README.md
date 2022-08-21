@@ -6,5 +6,10 @@ Any questions or issues with this sheet can be directed to @rivetgeek on Twitter
 ## Changelog
 
 ### January 16, 2021
-
-Initial commit
+* Initial commit
+### August, 2022
+* v1.2
+* Error fixes
+### August, 2022
+* v1.3
+* Error fixes

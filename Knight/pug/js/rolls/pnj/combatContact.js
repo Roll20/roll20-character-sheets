@@ -372,6 +372,8 @@ rollCombatPNJContact.forEach((button) => {
 
     if (rAS.isConditionnelV) { isConditionnelV = true; }
 
+    if (!isMeurtrier) { isMeurtrier = rAS.isBarbelee; }
+
     // FIN GESTION DES AMELIORATIONS STRUCTURELLES
 
     // GESTION DES AMELIORATIONS ORNEMENTALLES

@@ -1,5 +1,10 @@
 Change Log
 ==============================================
+**2022-08-14 ** v.13 Paul V
+	Added new Dex(Basic) initiative option
+	Added Bloodied HP on to the NPC sheet 
+	Added all the missing words into the translate
+	Added Standard / Advantage / Disadvantage logic for initiative, saves, stat rolls
 **2022-05-04 ** v.12 Paul V
 	Major changes to the Skills rolls added a skill settings window for each skill. moved Expertise dice on to that window
 	Added a whole swave of modifiers to the rolls 
