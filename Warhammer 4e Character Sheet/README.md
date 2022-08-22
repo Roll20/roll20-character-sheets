@@ -81,9 +81,10 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
-August 16th 2022 v1.6b
+August 22th 2022 v1.6b
 
 - Adds conditional check when peforming Dual Wield attack, if the Player has just rolled a crit, they now will chose if they want to use main hand or crit result for the DW attack. Crit result DW hits will now remove any modifier on crit roll before reversal, so result stays within 1d100 range.
+- Fixed recent issue with Darkmode on Chrome based browsers, white text was showing in much of the chat log RT output while in darkmode.
 
 
 August 8th 2022 v1.6a
