@@ -59,12 +59,13 @@ const CLAIRSENTIENT = {Devotion: {}, Science: {}};
 CLAIRSENTIENT['Science']['Aura Sight'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-5',
+    'context-modifier': '',
     'initial-cost': '9',
     'maintenance-cost': '9/round',
     'range': '50 yards',
     'prep': '0',
     'aoe': 'personal',
-    'prereq': 'none',
+    'prerequisites': 'none',
     'reference': 'p. 28',
     'book': 'The Complete Psionics Handbook',
     'damage': '',
@@ -78,12 +79,13 @@ CLAIRSENTIENT['Science']['Aura Sight'] = {
 CLAIRSENTIENT['Science']['Clairaudience'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-3',
+    'context-modifier': '?{How far await is the listening spot?|100 yards (0),0|1000 yards (-2),-2|10 miles (-4),-4|100 miles (-6),-6|1000 miles (-8),-8|10000 miles (-10),-10|Interplanetary (-12),-12}',
     'initial-cost': '6',
     'maintenance-cost': '4/round',
     'range': 'unlimited',
     'prep': '0',
     'aoe': 'special',
-    'prereq': 'none',
+    'prerequisites': 'none',
     'reference': 'p. 28',
     'book': 'The Complete Psionics Handbook',
     'damage': '',
@@ -91,6 +93,7 @@ CLAIRSENTIENT['Science']['Clairaudience'] = {
     'healing': '',
     'power-score': 'The psionicist automatically gains clairvoyance of the area as well.',
     '20': 'The psionicist is deaf for [[1d12]] hours.',
+    '1': '',
     'effect': 'Clairaudience allows the user to hear sounds from a distant area. The psionicist picks a spot anywhere within range. He then can hear everything that he would be able to hear normally if he were standing in that spot. If the psionicist has enhanced senses, the senses apply to clairaudience as well.\n&emsp;The farther the “listening spot” is from the psionicist, the more difficult it is to use this power. The table below gives specifics.}}{{style=center2}}{{cc1-1=bottom}}{{c1-1=**Range**}}{{c2-1=100 yards}}{{c3-1=1,000 yards}}{{c4-1=10 miles}}{{c5-1=100 miles}}{{c6-1=1,000 miles}}{{c7-1=10,000 miles}}{{c8-1=Interplanetary&ast;}}{{c1-2=**Power Score Modifier**}}{{c2-2=0}}{{c3-2=-2}}{{c4-2=-4}}{{c5-2=-6}}{{c6-2=-8}}{{c7-2=-10}}{{c8-2=-12}}{{effects2=&emsp;&ast; Players with the SPELLJAMMER boxed set should note that clairaudience works only within a given crystal sphere or plane.\n\n&emsp;Using clairaudience does not screen out background noise around the psionicist. If something in his own neighborhood is raising a racket, he may have trouble hearing what is happening somewhere else. Clairaudience also does not give the psionicist the ability to understand a foreign or alien language, nor does it help him interpret sounds. For example, if the psionicist hears furniture scraping across the floor, he can only guess whether it’s a chair or something else - just as if he heard it while blindfolded.\n&emsp;*Power Score*—The psionicist automatically gains clairvoyance of the area as well.\n&emsp;*20*—The psionicist is deaf for 1d12 hours.'
 };
 
