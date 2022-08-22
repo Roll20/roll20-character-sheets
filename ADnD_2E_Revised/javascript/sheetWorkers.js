@@ -2486,6 +2486,13 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
                     if (power['1']) {
                         macroBuilder.push(`1effect=${power['1']}`);
                     }
+                    if (power['damage']) {
+                        macroBuilder.push(`damage=${power['damage']}`);
+                        macroBuilder.push(`damage-type=${power['damage-type']}`);
+                    }
+                    if (power['healing']) {
+                        macroBuilder.push(`healing=${power['healing']}`);
+                    }
                     macroBuilder.push(`effects=${power['effect']}`);
 
                     let macroValue = macroBuilder.map(s => `{{${s}}}`).join(' ');
