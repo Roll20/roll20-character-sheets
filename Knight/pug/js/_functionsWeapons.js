@@ -3968,7 +3968,7 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonna
   return result;
 }
 
-function updateRoll(roll, diceJet, bonusJet, totalDegats, diceDegats, bonusDegats, totalViolence, diceViolence, bonusViolence, conditions, conditionsValues) {
+function updateRoll(roll, diceJet, bonusJet, totalDegats, diceDegats, bonusDegats, totalViolence, diceViolence, bonusViolence, conditions, conditionsValues = {}) {
   const tSurprise = roll.results.attaqueSurpriseValue || {};
   const tDestructeur = roll.results.destructeurValue || {};
   const tFureur = roll.results.fureurValue || {};
