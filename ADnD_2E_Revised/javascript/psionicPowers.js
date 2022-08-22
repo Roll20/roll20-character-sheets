@@ -96,6 +96,26 @@ CLAIRSENTIENT['Science']['Clairaudience'] = {
     '1': '',
     'effect': 'Clairaudience allows the user to hear sounds from a distant area. The psionicist picks a spot anywhere within range. He then can hear everything that he would be able to hear normally if he were standing in that spot. If the psionicist has enhanced senses, the senses apply to clairaudience as well.\n&emsp;The farther the “listening spot” is from the psionicist, the more difficult it is to use this power. The table below gives specifics.}}{{style=center2}}{{cc1-1=bottom}}{{c1-1=**Range**}}{{c2-1=100 yards}}{{c3-1=1,000 yards}}{{c4-1=10 miles}}{{c5-1=100 miles}}{{c6-1=1,000 miles}}{{c7-1=10,000 miles}}{{c8-1=Interplanetary&ast;}}{{c1-2=**Power Score Modifier**}}{{c2-2=0}}{{c3-2=-2}}{{c4-2=-4}}{{c5-2=-6}}{{c6-2=-8}}{{c7-2=-10}}{{c8-2=-12}}{{effects2=&emsp;&ast; Players with the SPELLJAMMER boxed set should note that clairaudience works only within a given crystal sphere or plane.\n\n&emsp;Using clairaudience does not screen out background noise around the psionicist. If something in his own neighborhood is raising a racket, he may have trouble hearing what is happening somewhere else. Clairaudience also does not give the psionicist the ability to understand a foreign or alien language, nor does it help him interpret sounds. For example, if the psionicist hears furniture scraping across the floor, he can only guess whether it’s a chair or something else - just as if he heard it while blindfolded.\n&emsp;*Power Score*—The psionicist automatically gains clairvoyance of the area as well.\n&emsp;*20*—The psionicist is deaf for 1d12 hours.'
 };
+CLAIRSENTIENT['Science']['Clairvoyance'] = {
+    'attribute': '@{Wisdom}',
+    'modifier': '-4',
+    'context-modifier': '?{How far await is the viewing spot?|100 yards (0),0|1000 yards (-2),-2|10 miles (-4),-4|100 miles (-6),-6|1000 miles (-8),-8|10000 miles (-10),-10|interplanetary (-12),-12}',
+    'initial-cost': '7',
+    'maintenance-cost': '4/round',
+    'range': 'unlimited',
+    'prep': '0',
+    'aoe': 'special',
+    'prerequisites': 'none',
+    'reference': 'p. 28',
+    'book': 'The Complete Psionics Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'power-score': 'The psionicist automatically gains clairaudience, too, for the duration of the clairvoyant vision.',
+    '20': 'The psionicist is blind for [[1d4]] hours.',
+    '1': '',
+    'effect': 'Clairvoyance allows the user to see images from a distant area. The psionicist picks a viewing spot anywhere within range. He can then see anything that he could normally see if he were standing in that spot. His field of vision is no wider than usual, but he can scan the area by turning his head.\n&emsp;Clairvoyance does not replace the character’s normal eyesight. The psionicist can still “see” what is actually before him, but the distant scene is superimposed. For this reason, most clairvoyants close their eyes to avoid the confusion of images.\n&emsp;The more distant the viewed area is, the more difficult it is to use clairvoyance. The table below shows how the range to a viewed area can diminish the psionicist’s power score.}}{{style=center2}}{{cc1-1=bottom}}{{c1-1=**Range**}}{{c2-1=100 yards}}{{c3-1=1,000 yards}}{{c4-1=10 miles}}{{c5-1=100 miles}}{{c6-1=1,000 miles}}{{c7-1=10,000 miles}}{{c8-1=interplanetary&ast;}}{{c1-2=**Power Score Modifier**}}{{c2-2=0}}{{c3-2=-2}}{{c4-2=-4}} {{c5-2=-6}}{{c6-2=-8}} {{c7-2=-10}} {{c8-2=-12}}{{effects2=&emsp;&ast; Players with the SPELLJAMMER boxed set should note that clairvoyance works only within a given crystal sphere or plane.\n\n&emsp;Clairvoyance does nothing to enhance the character’s vision. Unless some other power or magic is at work, he still cannot see objects that are invisible, hidden in shadow, or behind other objects. This power also provides no sound, so the character actually sees a kind of silent movie (without subtitles, of course).\n&emsp;Once the viewing spot is chosen, it is fixed in space. To enjoy the view\n&emsp;from another location, the psionicist must use this power another time, and make a new power check.\n&emsp;The psionicist’s clairvoyant presence is undetectable by normal means. It cannot be dispelled, repelled, or kept away by any form of magic.\n&emsp;*Power Score*—The psionicist automatically gains clairaudience, too, for the duration of the clairvoyant vision.\n&emsp;*20*—The psionicist is blind for 1d4 hours.'
+};
 
 const TELEPATHIC = {Devotion: {}, Science: {}};
 const PSYCHOKINETIC = {Devotion: {}, Science: {}};
@@ -114,3 +134,4 @@ PSIONIC_POWERS['Psychometabolic'] = PSYCHOMETABOLIC;
 PSIONIC_POWERS['Metapsionic'] = METAPSIONIC;
 PSIONIC_POWERS['Attack'] = ATTACK;
 PSIONIC_POWERS['Defense'] = DEFENSE;
+module.exports = PSIONIC_POWERS;

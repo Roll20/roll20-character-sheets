@@ -62,6 +62,9 @@ spellsJs.forEach(jsFile => {
     }
 });
 
+const psionicCorePowers = require(path.join(jsFolder, 'psionicPowers.js'));
+html += pug.renderFile(path.join(pugFolder, 'psionicCorePowerDatalists.pug'), {pretty: true, data: psionicCorePowers});
+
 console.log('weapons.js');
 console.log('weaponProficiencies.js');
 const weapons = require(path.join(jsFolder, 'weapons.js'));
