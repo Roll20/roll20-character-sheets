@@ -2478,9 +2478,13 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
                     macroBuilder.push(`powerscore=[[@{powerscore-nomod${number}}+(powerscore-mod${number})]]`);
                     macroBuilder.push(`powerscoreeffect=${power['power-score']}`);
                     macroBuilder.push(`20effect=${power['20']}`);
+                    if (power['1']) {
+                        macroBuilder.push(`1effect=${power['1']}`);
+                    }
                     macroBuilder.push(`effects=${power['effect']}`);
 
-                    powerInfo[`repeating_${section}_${macro}`] = `&{template:2Epsionic} ${macroBuilder.map(s => `{{${s}}}`)}`;
+                    let macroValue = macroBuilder.map(s => `{{${s}}}`).join(' ');
+                    powerInfo[`repeating_${section}_${macro}`] = `&{template:2Epsionic} ${macroValue}`;
                 }
             }
 
