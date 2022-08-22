@@ -4,10 +4,6 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
-## 03.01.00 (Build 21)
-- added header-alt, sub1-alt, sub2-alt to custom roll template msg
-- added button to post adversary fell ability into chat
-
 ## 03.00.00 (Build 20)
 
 - added adversary json importer
