@@ -41,6 +41,10 @@
             <input type="number" class="number-20" id="attr_leben_max" name="attr_leben_max" style="cursor: not-allowed" readonly />
           </div>
         </div>
+        <div class="formular">
+          <label for="attr_ruestung">Rüstung</label>
+          <input type="number" class="number-20" id="attr_ruestung" name="attr_ruestung" value="4" />
+        </div>
         <div class="formular ressourcen">
           <label for="attr_ressourcen">Ressourcen</label>
           <div>
@@ -168,13 +172,13 @@
               type="roll"
               class="norollmod"
               name="roll_skill"
-              value="@{abilityroll} &{template:butterfly} {{name=@{skillname}}} {{rolling=[[(@{skill} + @{skill_mod})d10!k@{attribut}]]}}"
+              value="@{abilityroll} &{template:butterfly} {{name=@{skillname}}} {{rolling=[[{@{skill}d10! + @{skill_mod}d10}k@{attribut}]]}}"
             ></button>
             <button
               type="roll"
               class="rollmod"
               name="roll_skill"
-              value="@{abilityroll} &{template:butterfly} {{name=@{skillname}}} {{rolling=[[(@{skill} + @{skill_mod} + ?{Modifier?|0})d10!k@{attribut}]]}}"
+              value="@{abilityroll} &{template:butterfly} {{name=@{skillname}}} {{rolling=[[{@{skill}d10! + (@{skill_mod} + ?{Modifier?|0})d10}k@{attribut}]]}}"
             ></button>
           </div>
         </div>
@@ -193,7 +197,7 @@
       <div>Waffe</div>
       <div>Attr.</div>
       <div>Wert</div>
-      <div>MOD</div>
+      <div>Schaden</div>
       <div>Roll</div>
     </div>
     <div class="gridplace">
@@ -210,13 +214,19 @@
             </select>
           </div>
           <div><input type="number" name="attr_weaponskill" value="0" /></div>
-          <div><input type="number" name="attr_weaponskill_mod" value="0" /></div>
+          <div><input type="number" name="attr_weapondamage" value="0" /></div>
           <div>
             <button
               type="roll"
-              class=""
-              name="roll_skill"
-              value="@{abilityroll} &{template:butterfly} {{name=@{weaponname}}} [[floor([[((@{weaponskill} + @{weaponskill_mod} + ?{Würfel Modifier?|0})d10!k@{attribut})]] / 5)]] {{rolling=$[[0]]}} {{damage=$[[1]]}} {{desc=@{weaponeffekt}}}"
+              class="norollmod"
+              name="roll_weapon"
+              value="@{abilityroll} &{template:butterfly} {{name=@{weaponname}}} [[{@{weaponskill}d10!}k@{attribut}]] {{rolling=$[[0]]}} {{damage=[[1d10 + @{weapondamage}]]}} {{desc=@{weaponeffekt}}}"
+            ></button>
+            <button
+              type="roll"
+              class="rollmod"
+              name="roll_weapon"
+              value="@{abilityroll} &{template:butterfly} {{name=@{weaponname}}} [[{@{weaponskill}d10! + ?{Modifier?|0})d10}k@{attribut}]] {{rolling=$[[0]]}} {{damage=[[1d10 + @{weapondamage}]]}} {{desc=@{weaponeffekt}}}"
             ></button>
           </div>
           <input class="liketextarea hiddenBox" type="text" name="attr_weaponeffekt" placeholder="Spezialeffekt" />
@@ -272,7 +282,7 @@
               type="roll"
               class=""
               name="roll_spell"
-              value="@{abilityroll} &{template:butterfly} {{name=@{spellname}}} [[({floor(([[(@{spellskill} + ?{Würfel Modifier?|0})d10!k@{in}]] - [[@{spellwiderstand} + @{extradamage} + (?{Gegnerische Intelligenz?|0} + ?{Aufrechterhaltene Zauber?|0}) * 2]]) / 5),1}kh1) * @{spellreinigung}]] {{rolling=$[[0]]}} {{widerstand=$[[1]]}} {{damage=@{damage}}} {{healing=@{healing}}} {{desc=@{spelleffekt}}}"
+              value="@{abilityroll} &{template:butterfly} {{name=@{spellname}}} [[({floor(([[{@{spellskill}d10! + ?{Modifier?|0}d10}k@{in}]] - [[@{spellwiderstand} + (?{Gegnerische Intelligenz?|0} + ?{Aufrechterhaltene Zauber?|0}) * 2]]) / 5),1}kh1) * @{spellreinigung}]] {{rolling=$[[0]]}} {{widerstand=$[[1]]}} {{damage=@{damage}}} {{healing=@{healing}}} {{desc=@{spelleffekt}}}"
             >
               <input
                 type="number"
@@ -332,15 +342,8 @@
             <div id="damage">
               <select name="attr_damage">
                 <option value="0" selected disabled>Schaden</option>
-                <option value="[[floor((@{spellwiderstand} + @{extradamage} ) / 5)]]">aktiv</option>
+                <option value="[[1d10]]">aktiv</option>
                 <option value="">inaktiv</option>
-              </select>
-            </div>
-            <div id="extradamage">
-              <select name="attr_extradamage">
-                <option value="0" selected disabled>Extraschaden</option>
-                <option value="?{Zusatzschaden|+0 Schaden (+5 Wiederstand), 0|+1 Schaden (+5 Wiederstand), 5|+2 Schaden (+10 Wiederstand), 10|+3 Schaden (+15 Wiederstand), 15|+4 Schaden (+20 Wiederstand), 20|+5 Schaden (+25 Wiederstand), 25}">aktiv</option>
-                <option value="0">inaktiv</option>
               </select>
             </div>
             <div id="healing">
@@ -465,7 +468,7 @@
 
   <div class="break"></div>
 
-  <div class="float full version">v22.03.1</div>
+  <div class="float full version">v22.08</div>
 </div>
 
 <!-- rolltemplate -->

@@ -1129,7 +1129,7 @@ on('change:psion200PG', async () => {
 on('change:wizard150PG sheet:opened', async () => {
   const attrs = await getAttrsAsync(['wizard150PG']);
 
-  const PG200 = +attrs.wizard150PG;
+  const PG200 = attrs.wizard150PG;
 
   let portee = i18n_porteeCourte;
 

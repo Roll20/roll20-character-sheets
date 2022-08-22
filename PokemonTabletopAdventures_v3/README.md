@@ -24,6 +24,9 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Aug 11, 2022
+- Implemented the ability to change the background and roll template colours for class and origin features, accessible to Trainer and Hybrid character types
+
 ### May 25, 2022
 - Added some explanation text to the Configuration page to give some background on what's going on there and how to use the sheet
 
