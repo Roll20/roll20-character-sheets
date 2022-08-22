@@ -3371,7 +3371,11 @@
 								<span data-i18n="show-magic-and-spells">Show Magic & Spells tab</span>
 								<input id="magic-and-spells" name="attr_isSpellcaster" type="checkbox" checked/>
 							</label>
-							<label for="pc-defense-bases" class="settings-checkbox" title='Show magic and spell tab'>
+							<label for="pc-attack-defense-chain" class="settings-checkbox" >
+								<span data-i18n="use-pc-attack-defense-chain">Use PC attack-defense chain</span>
+								<input id="pc-attack-defense-chain" name="attr_useAttackDefenseChain" type="checkbox"/>
+							</label>
+							<label for="pc-defense-bases" class="settings-checkbox" >
 								<span data-i18n="use-pc-defense-bases">Use defense bases for this character</span>
 								<input id="pc-defense-bases" name="attr_pcDefenseBases" type="checkbox"/>
 							</label>
@@ -3757,6 +3761,12 @@
 		<button type="action" name="act_templatestrongattack"></button>
 		<button type="action" name="act_templatejointmeleeattack"></button>
 		<button type="action" name="act_templatejointrangedattack"></button>
+
+		<button type="action" name="act_reactdodge"></button>
+		<button type="action" name="act_reactreposition"></button>
+		<button type="action" name="act_reactblock"></button>
+		<button type="action" name="act_monsterlocation"></button>
+		<button type="action" name="act_humanlocation"></button>
 	</div>
 </div>
 
@@ -4527,18 +4537,201 @@ on('clicked:dodge_base clicked:reposition_base clicked:block_base', async (event
 		);
 });
 
+on('clicked:reactdodge', async (ev) => {
+	let passin = rollEscape.unescape(ev.originalRollId);
+
+	let rollBase = "@{whisper}&{template:npcdefense} {{title=DODGE}} {{name=@{character_name}}} {{roll=[[1d10!+@{dodge_base}[SKILL BASE]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}";
+	doDefense(passin, rollBase);
+});
+
+on('clicked:reactreposition', async (ev) => {
+	let passin = rollEscape.unescape(ev.originalRollId);
+
+	let rollBase = "@{whisper}&{template:npcdefense} {{title=REPOSITION}} {{name=@{character_name}}} {{roll=[[1d10!+@{reposition_base}[SKILL BASE]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}";
+	doDefense(passin, rollBase);
+});
+
+on('clicked:reactblock', async (ev) => {
+	let passin = rollEscape.unescape(ev.originalRollId);
+
+	let rollBase = "@{whisper}&{template:npcdefense} {{title=BLOCK}} {{name=@{character_name}}} {{roll=[[1d10!+@{block_base}[SKILL BASE]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}";
+	doDefense(passin, rollBase);
+});
+
+const doDefense = async (passin, rollBase) => {
+    let rollResult = await startRoll(rollBase+'{{fumble=[[1d10!]]}}{{rolllocation=[[0]]}}{{attackerRoll=[[0]]}}{{hit=[[0]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}{{passthrough=[[0]]}}');
+
+	let computedValues = await resolveChecks(
+		checkFumble(rollResult),
+	);
+
+	computedValues.rolllocation = passin.rolllocation;
+	computedValues.weaponname = passin.weapon_name;
+	computedValues.attackerRoll = passin.roll;
+
+	let defense = computedValues.roll;
+	let hit = parseInt(passin.roll) - parseInt(defense);
+	computedValues.hit = hit;
+
+	let damageObject = await calculateDamage(passin, hit);
+
+	computedValues = Object.assign(computedValues, damageObject);
+	computedValues.passthrough = rollEscape.escape(damageObject);
+	console.log(computedValues);
+
+
+	finishRoll(
+			rollResult.rollId,
+			computedValues
+		);
+}
+
+const calculateDamage = async (passin, hit) => {
+
+	if(hit < 0) {
+		return undefined
+	}
+
+	let attrs = await asw.getAttrs(['npc_armor']);
+	let attackmultiplier = passin.attackmultiplier;
+	let locationmultiplier = passin.locationmultiplier;
+	let weapondmg = passin.weapon_dmg;
+	let armor = attrs['npc_armor'];
+
+	let critdmg = 0;
+	//crit dmg
+	if(hit >= 15) {
+		critdmg = 10;
+	}
+	else if(hit >= 13) {
+		critdmg = 8;
+	}
+	else if(hit >= 10) {
+		critdmg = 5;
+	}
+	else if(hit >= 7) {
+		critdmg = 3;
+	}
+
+	//(attack multiplicator x rolled dmg - SP) * location * resistance + bonus crit damage
+	let afterArmor = Math.max((attackmultiplier * weapondmg - armor), 0);
+	let damage = afterArmor * locationmultiplier + critdmg;
+
+	return {
+		attackmultiplier: attackmultiplier,
+		locationmultiplier: locationmultiplier,
+		weapondmg: weapondmg,
+		critdmg: critdmg,
+		armor: armor,
+		afterArmor: afterArmor,
+		damage: damage
+	}
+
+}
+
+on('clicked:monsterlocation', async (ev) => {
+	let passin = rollEscape.unescape(ev.originalRollId);
+	console.log(passin);
+
+	let rollBase = "@{whisper}&{template:monsterlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}"
+	let rollResult = await startRoll(rollBase);
+
+	console.log(rollResult);
+	var location = rollResult.results.roll.result;
+
+	let locationmultiplier = 1;
+	if(location === 1) {
+		locationmultiplier = 3;
+	}
+	else if(location > 1 && location < 6) {
+		locationmultiplier = 1;
+	}
+	else if(location > 5) {
+		locationmultiplier = 0.5;
+	}
+
+
+	//(attack multiplicator x rolled dmg - SP) * location * resistance + bonus crit damage
+	let damage = passin.afterArmor * locationmultiplier + passin.critdmg;
+
+		finishRoll(
+			rollResult.rollId,
+			{
+				attackmultiplier: passin.attackmultiplier,
+				locationmultiplier: locationmultiplier,
+				weapondmg: passin.weapondmg,
+				critdmg: passin.critdmg,
+				armor: passin.armor,
+				afterArmor: passin.afterArmor,
+				damage: damage
+			}
+		);
+
+});
+
+on('clicked:humanlocation', async (ev) => {
+	let passin = rollEscape.unescape(ev.originalRollId);
+	console.log(passin);
+
+	let rollBase = "@{whisper}&{template:humanlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}"
+	let rollResult = await startRoll(rollBase);
+
+	console.log(rollResult);
+	var location = rollResult.results.roll.result;
+
+	let locationmultiplier = 1;
+	if(location === 1) {
+		locationmultiplier = 3;
+	}
+	else if(location > 1 && location < 5) {
+		locationmultiplier = 1;
+	}
+	else if(location > 4) {
+		locationmultiplier = 0.5;
+	}
+
+
+	//(attack multiplicator x rolled dmg - SP) * location * resistance + bonus crit damage
+	let damage = passin.afterArmor * locationmultiplier + passin.critdmg;
+
+		finishRoll(
+			rollResult.rollId,
+			{
+				attackmultiplier: passin.attackmultiplier,
+				locationmultiplier: locationmultiplier,
+				weapondmg: passin.weapondmg,
+				critdmg: passin.critdmg,
+				armor: passin.armor,
+				afterArmor: passin.afterArmor,
+				damage: damage
+			}
+		);
+
+});
+
+
 //////////////////////////////
 // Weapon Template Attacks  //
 //////////////////////////////
 
 on('clicked:primaryweapon clicked:secondaryweapon clicked:thirdweapon clicked:fourthweapon clicked:fifthweapon clicked:sixthweapon clicked:shield', async (event) => {
 
-	let rollBase = event.htmlAttributes.value + "{{singlestrike=[[0]]}}{{faststrike=[[0]]}}{{strongstrike=[[0]]}}{{jointmeleeattack=[[0]]}}{{jointrangedattack=[[0]]}}";
+	let rollBase = event.htmlAttributes.value + "{{singlestrike=[[0]]}}{{faststrike=[[0]]}}{{strongstrike=[[0]]}}{{jointmeleeattack=[[0]]}}{{jointrangedattack=[[0]]}}{{passthrough=[[0]]}}";
 	let rollResult = await startRoll(rollBase);
 
 	let computedValues = await resolveChecks(
 		calculateTemplateButtons(rollBase)
 	);
+
+	// Storing all the passthrough data required for the next roll in an Object helps for larger rolls
+    computedValues.passthrough = rollEscape.escape({
+    	skill: rollBase.substring(rollBase.indexOf("skill="), rollBase.indexOf("weapon_skill")+13).replace("skill=@{", "").replace("}",""),
+        weapon_name: rollBase.substring(rollBase.indexOf("weapon-name="), rollBase.indexOf("weapon_name")+12).replace("weapon-name=@{", "").replace("}",""),
+        weapon_wa: rollBase.substring(rollBase.indexOf("accuracy="), rollBase.indexOf("wa")+2).replace("accuracy=@{", "").replace("}",""),
+        weapon_dmg: rollResult.results.damage.result,
+        weapon_dmg2: rollBase.substring(rollBase.indexOf("damage="), rollBase.indexOf("weapon_bonus}")+13).replace("damage=[[", ""),
+        weapon_effect: rollBase.substring(rollBase.indexOf("effect="), rollBase.indexOf("weapon_effect")+13).replace("effect=@{", "").replace("}","")
+    })
 
 	finishRoll(
 			rollResult.rollId,
@@ -4622,71 +4815,59 @@ const calculateTemplateButtons = async (rollBase) => {
 
 on('clicked:templatesinglestrike', async (ev) => {
     // The data we passed into the button will be stored in the originalRollId key
-    let skill = ev.originalRollId;
+    let passin = rollEscape.unescape(ev.originalRollId);
+	let skill_attribute = passin.skill;
+    let weaponname = passin.weapon_name;
+    let weaponwa = passin.weapon_wa;
 
-    let attrs = await asw.getAttrs([skill]);
+	let skill = (await asw.getAttrs([skill_attribute]))[skill_attribute];
+	let attrs = await asw.getAttrs([weaponname, weaponwa, skill]);
 
-	let rollBase = `@{whisper}&{template:singleroll} {{title=WEAPON ATTACK}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]+0[SINGLE STRIKE]+?{WEAPON SELECTION|@{primary_weapon_name},@{primary_wa}|@{secondary_weapon_name},@{secondary_wa}|@{third_weapon_name},@{third_wa}|@{fourth_weapon_name},@{fourth_wa}|@{fifth_weapon_name},@{fifth_wa}|@{sixth_weapon_name},@{sixth_wa}}[WEAP. ACC]?{FIRING RANGE|Point Blank (Touch Range),+5|Close (1/4 Listed Range),+0|Medium (1/2 Listed Range),-2|Long (Listed Range),-4|Extreme (2x Listed Range),-6}[RANGE]?{TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{rolllocation=[[0]]}}`
-    let rollResult = await startRoll(rollBase);
-
-	let computedValues = await resolveChecks(
-		checkFumble(rollResult),
-		checkLocation(rollResult)
-	);
-
-	finishRoll(
-			rollResult.rollId,
-			computedValues
-		);
+	let rollBase = `@{whisper}&{template:weaponattack} {{title=${attrs[weaponname]}}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]+0[SINGLE STRIKE]+${attrs[weaponwa]}[WEAP. ACC]?{FIRING RANGE|Point Blank (Touch Range),+5|Close (1/4 Listed Range),+0|Medium (1/2 Listed Range),-2|Long (Listed Range),-4|Extreme (2x Listed Range),-6}[RANGE]?{TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}`
+	doTemplateAttack(passin, rollBase);
 });
 
 on('clicked:templatefastattack', async (ev) => {
     // The data we passed into the button will be stored in the originalRollId key
-    let skill = ev.originalRollId;
+    let passin = rollEscape.unescape(ev.originalRollId);
+	let skill_attribute = passin.skill;
+    let weaponname = passin.weapon_name;
+    let weaponwa = passin.weapon_wa;
 
-    let attrs = await asw.getAttrs([skill]);
+	let skill = (await asw.getAttrs([skill_attribute]))[skill_attribute];
+	let attrs = await asw.getAttrs([weaponname, weaponwa, skill]);
 
-	let rollBase = `@{whisper}&{template:doubleroll} {{title=WEAPON ATTACK}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]+0[FAST STRIKES]+?{WEAPON SELECTION|@{primary_weapon_name},@{primary_wa}|@{secondary_weapon_name},@{secondary_wa}|@{third_weapon_name},@{third_wa}|@{fourth_weapon_name},@{fourth_wa}|@{fifth_weapon_name},@{fifth_wa}|@{sixth_weapon_name},@{sixth_wa}}[WEAP. ACC]?{1ST ATTACK LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{1ST ATTACK MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}} {{roll2=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]+0[FAST STRIKES]+?{WEAPON SELECTION|@{primary_weapon_name},@{primary_wa}|@{secondary_weapon_name},@{secondary_wa}|@{third_weapon_name},@{third_wa}|@{fourth_weapon_name},@{fourth_wa}|@{fifth_weapon_name},@{fifth_wa}|@{sixth_weapon_name},@{sixth_wa}}[WEAP. ACC]?{2ND ATTACK LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{2ND ATTACK MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{fumble=[[1d10!]]}}{{fumble2=[[1d10!]]}}{{rolllocation=[[0]]}}`
-    let rollResult = await startRoll(rollBase);
-
-	let computedValues = await resolveChecks(
-		checkFumble(rollResult),
-		checkLocation(rollResult)
-	);
-
-	finishRoll(
-			rollResult.rollId,
-			computedValues
-		);
+	let rollBase = `@{whisper}&{template:weaponattack} {{title=${attrs[weaponname]}}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]+0[FAST STRIKES]+${attrs[weaponwa]}[WEAP. ACC]?{1ST ATTACK LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{1ST ATTACK MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}} {{roll2=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]+0[FAST STRIKES]+${attrs[weaponwa]}[WEAP. ACC]?{2ND ATTACK LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{2ND ATTACK MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{fumble=[[1d10!]]}}{{fumble2=[[1d10!]]}}{{damage2=[[${passin.weapon_dmg2}]]}}`
+    doTemplateAttack(passin, rollBase);
 });
 
 on('clicked:templatestrongattack', async (ev) => {
     // The data we passed into the button will be stored in the originalRollId key
-    let skill = ev.originalRollId;
+    let passin = rollEscape.unescape(ev.originalRollId);
+	let skill_attribute = passin.skill;
+    let weaponname = passin.weapon_name;
+    let weaponwa = passin.weapon_wa;
 
-    let attrs = await asw.getAttrs([skill]);
+	let skill = (await asw.getAttrs([skill_attribute]))[skill_attribute];
+	let attrs = await asw.getAttrs([weaponname, weaponwa, skill]);
 
-	let rollBase = `@{whisper}&{template:singleroll} {{title=WEAPON ATTACK}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]-3[STRONG STRIKE]+?{WEAPON SELECTION|@{primary_weapon_name},@{primary_wa}|@{secondary_weapon_name},@{secondary_wa}|@{third_weapon_name},@{third_wa}|@{fourth_weapon_name},@{fourth_wa}|@{fifth_weapon_name},@{fifth_wa}|@{sixth_weapon_name},@{sixth_wa}}[WEAP. ACC]?{TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{fumble=[[1d10!]]}}{{rolllocation=[[0]]}}`
-	let rollResult = await startRoll(rollBase);
+	passin.attackmultiplier = 2;
 
-	let computedValues = await resolveChecks(
-		checkFumble(rollResult),
-		checkLocation(rollResult)
-	);
-
-	finishRoll(
-			rollResult.rollId,
-			computedValues
-		);
+	let rollBase = `@{whisper}&{template:weaponattack} {{title=${attrs[weaponname]}}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]-3[STRONG STRIKE]+${attrs[weaponwa]}[WEAP. ACC]?{TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{fumble=[[1d10!]]}}`
+	doTemplateAttack(passin, rollBase);
 });
 
 on('clicked:templatejointmeleeattack', async (ev) => {
     // The data we passed into the button will be stored in the originalRollId key
-    let skill = ev.originalRollId;
+    let passin = rollEscape.unescape(ev.originalRollId);
+    let skill_attribute = passin.skill;
+    let weaponname = passin.weapon_name;
+    let weaponwa = passin.weapon_wa;
 
-    let attrs = await asw.getAttrs([skill]);
+	let skill = (await asw.getAttrs([skill_attribute]))[skill_attribute];
+    let attrs = await asw.getAttrs([weaponname, weaponwa, skill]);
 
-	let rollBase = `@{whisper}&{template:doubleroll} {{title=WEAPON ATTACK}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]-3[JOINT]+?{WEAPON SELECTION|@{primary_weapon_name},@{primary_wa}|@{secondary_weapon_name},@{secondary_wa}|@{third_weapon_name},@{third_wa}|@{fourth_weapon_name},@{fourth_wa}|@{fifth_weapon_name},@{fifth_wa}|@{sixth_weapon_name},@{sixth_wa}}[WEAP. ACC]?{TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}} {{roll2=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]-3[JOINT]+?{SECOND WEAPON SELECTION|@{primary_weapon_name},@{primary_wa}|@{secondary_weapon_name},@{secondary_wa}|@{third_weapon_name},@{third_wa}|@{fourth_weapon_name},@{fourth_wa}|@{fifth_weapon_name},@{fifth_wa}|@{sixth_weapon_name},@{sixth_wa}}[WEAP. ACC]?{SECOND TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{SECOND ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{rolllocation=[[0]]}}`
+	let rollBase = `@{whisper}&{template:weaponattack} {{title=${attrs[weaponname]}}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]-3[JOINT]+${attrs[weaponwa]}[WEAP. ACC]?{TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}} {{roll2=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]-3[JOINT]+?{SECOND WEAPON SELECTION|@{primary_weapon_name},@{primary_wa}|@{secondary_weapon_name},@{secondary_wa}|@{third_weapon_name},@{third_wa}|@{fourth_weapon_name},@{fourth_wa}|@{fifth_weapon_name},@{fifth_wa}|@{sixth_weapon_name},@{sixth_wa}}[WEAP. ACC]?{SECOND TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{SECOND ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{rolllocation=[[0]]}}`
 	let rollResult = await startRoll(rollBase);
 
 	let computedValues = await resolveChecks(
@@ -4702,11 +4883,15 @@ on('clicked:templatejointmeleeattack', async (ev) => {
 
 on('clicked:templatejointrangedattack', async (ev) => {
     // The data we passed into the button will be stored in the originalRollId key
-    let skill = ev.originalRollId;
+    let passin = rollEscape.unescape(ev.originalRollId);
+    let skill_attribute = passin.skill;
+    let weaponname = passin.weapon_name;
+    let weaponwa = passin.weapon_wa;
 
-    let attrs = await asw.getAttrs([skill]);
+	let skill = (await asw.getAttrs([skill_attribute]))[skill_attribute];
+    let attrs = await asw.getAttrs([weaponname, weaponwa, skill]);
 
-	let rollBase = `@{whisper}&{template:doubleroll} {{title=WEAPON ATTACK}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]-3[JOINT]+?{WEAPON SELECTION|@{primary_weapon_name},@{primary_wa}|@{secondary_weapon_name},@{secondary_wa}|@{third_weapon_name},@{third_wa}|@{fourth_weapon_name},@{fourth_wa}|@{fifth_weapon_name},@{fifth_wa}|@{sixth_weapon_name},@{sixth_wa}}[WEAP. ACC]?{FIRING RANGE|Point Blank (Touch Range),+5|Close (1/4 Listed Range),+0|Medium (1/2 Listed Range),-2|Long (Listed Range),-4|Extreme (2x Listed Range),-6}[RANGE]?{TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}} {{roll2=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]-3[JOINT]+?{SECOND WEAPON SELECTION|@{primary_weapon_name},@{primary_wa}|@{secondary_weapon_name},@{secondary_wa}|@{third_weapon_name},@{third_wa}|@{fourth_weapon_name},@{fourth_wa}|@{fifth_weapon_name},@{fifth_wa}|@{sixth_weapon_name},@{sixth_wa}}[WEAP. ACC]?{FIRING RANGE|Point Blank (Touch Range),+5|Close (1/4 Listed Range),+0|Medium (1/2 Listed Range),-2|Long (Listed Range),-4|Extreme (2x Listed Range),-6}[RANGE]?{SECOND TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{SECOND ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{rolllocation=[[0]]}}`
+	let rollBase = `@{whisper}&{template:weaponattack} {{title=${attrs[weaponname]}}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]-3[JOINT]+${attrs[weaponwa]}[WEAP. ACC]?{FIRING RANGE|Point Blank (Touch Range),+5|Close (1/4 Listed Range),+0|Medium (1/2 Listed Range),-2|Long (Listed Range),-4|Extreme (2x Listed Range),-6}[RANGE]?{TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}} {{roll2=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]-3[JOINT]+?{SECOND WEAPON SELECTION|@{primary_weapon_name},@{primary_wa}|@{secondary_weapon_name},@{secondary_wa}|@{third_weapon_name},@{third_wa}|@{fourth_weapon_name},@{fourth_wa}|@{fifth_weapon_name},@{fifth_wa}|@{sixth_weapon_name},@{sixth_wa}}[WEAP. ACC]?{FIRING RANGE|Point Blank (Touch Range),+5|Close (1/4 Listed Range),+0|Medium (1/2 Listed Range),-2|Long (Listed Range),-4|Extreme (2x Listed Range),-6}[RANGE]?{SECOND TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{SECOND ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{rolllocation=[[0]]}}`
 	let rollResult = await startRoll(rollBase);
 
 	let computedValues = await resolveChecks(
@@ -4720,6 +4905,43 @@ on('clicked:templatejointrangedattack', async (ev) => {
 		);
 });
 
+const doTemplateAttack = async (passin, rollBase) => {
+	let attrs = await asw.getAttrs([passin.weapon_name, "useAttackDefenseChain"]);
+
+    let rollResult = await startRoll(rollBase+'{{rolllocation=[[0]]}}{{passthrough=[[0]]}}{{passthrough2=[[0]]}}{{useAttackDefenseChain=[[0]]}}');
+
+	let computedValues = await resolveChecks(
+		checkFumble(rollResult),
+		checkLocation(rollResult)
+	);
+
+	computedValues.useAttackDefenseChain = attrs["useAttackDefenseChain"];
+
+	// Storing all the passthrough data required for the next roll in an Object helps for larger rolls
+    computedValues.passthrough = rollEscape.escape({
+        weapon_name: attrs[passin.weapon_name],
+       	roll: computedValues.roll,
+		weapon_dmg: passin.weapon_dmg,
+		attackmultiplier: !!passin.attackmultiplier ? passin.attackmultiplier : 1,
+		rolllocation: computedValues.rolllocation,
+		locationmultiplier: computedValues.locationmultiplier
+    })
+
+	computedValues.passthrough2 = rollEscape.escape({
+		weapon_name: attrs[passin.weapon_name],
+       	roll: computedValues.roll2,
+		weapon_dmg: rollResult.results.damage2?.result,
+		attackmultiplier: !!passin.attackmultiplier ? passin.attackmultiplier : 1,
+		rolllocation: computedValues.rolllocation2,
+		locationmultiplier: computedValues.locationmultiplier2
+    })
+
+	finishRoll(
+			rollResult.rollId,
+			computedValues
+		);
+}
+
 //////////////////////////////
 //  Helper Functions  //
 //////////////////////////////
@@ -4727,8 +4949,7 @@ on('clicked:templatejointrangedattack', async (ev) => {
 const checkFumble = async (rollResult) => {
 
     var rollComputed = rollResult.results.roll.result;
-	var roll2Computed = 0;
-	var rolllocation = 0;
+	var roll2Computed = undefined;
 
 	if(rollResult.results.roll.dice[0] == 1) // We check if the first die is a fumble.
 	{
@@ -4743,30 +4964,82 @@ const checkFumble = async (rollResult) => {
 		{
 			roll2Computed = rollResult.results.roll2.result - rollResult.results.fumble2.result-1;
 		}
-
-		if(rollResult.results.roll2.expression.includes("0[LOCATION]")) {
-			rolllocation = 1
-		}
 	}
 
 	let results = {
 				roll: rollComputed,
 				roll2: roll2Computed,
-				rolllocation: rolllocation
 			};
     return results;
 }
 
 const checkLocation = async (rollResult) => {
 
+	var firstRollExpression = rollResult.results.roll.expression;
 	var rolllocation = 0;
+	var locationmultiplier = undefined;
 
-	if(rollResult.results.roll.expression.includes("0[LOCATION]")) {
-		rolllocation = 1
+	//RANDOM
+	if(firstRollExpression.includes("0[LOCATION]")) {
+		rolllocation = 1;
+	}
+
+	//HEAD
+	if(firstRollExpression.includes("6[LOCATION]")) {
+		rolllocation = 0;
+		locationmultiplier = 3;
+	}
+
+	//TORSO
+	if(firstRollExpression.includes("1[LOCATION]")) {
+		rolllocation = 0;
+		locationmultiplier = 1;
+	}
+
+	//ARM+LIMB || LEG + TAIL + WING
+	if(
+		firstRollExpression.includes("3[LOCATION]") ||
+		firstRollExpression.includes("2[LOCATION]")
+	) {
+		rolllocation = 0;
+		locationmultiplier = 0.5;
+	}
+
+	var secondRollExpression = rollResult.results.roll2?.expression;
+	var rolllocation2 = undefined;
+	var locationmultiplier2 = undefined;
+
+	//RANDOM
+	if(secondRollExpression?.includes("0[LOCATION]")) {
+		rolllocation2 = 1;
+	}
+
+	//HEAD
+	if(secondRollExpression?.includes("6[LOCATION]")) {
+		rolllocation2 = 0;
+		locationmultiplier2 = 3;
+	}
+
+	//TORSO
+	if(secondRollExpression?.includes("1[LOCATION]")) {
+		rolllocation2 = 0;
+		locationmultiplier2 = 1;
+	}
+
+	//ARM+LIMB || LEG + TAIL + WING
+	if(
+		secondRollExpression?.includes("3[LOCATION]") ||
+		secondRollExpression?.includes("2[LOCATION]")
+	) {
+		rolllocation2 = 0;
+		locationmultiplier2 = 0.5;
 	}
 
 	let results = {
-				rolllocation: rolllocation
+				rolllocation: rolllocation,
+				locationmultiplier: locationmultiplier,
+				rolllocation2: rolllocation2,
+				locationmultiplier2: locationmultiplier2
 			};
     return results;
 }
@@ -4774,6 +5047,26 @@ const checkLocation = async (rollResult) => {
 const resolveChecks = async (...checks) => {
  	let results = await Promise.all(checks);
 	return results.reduce((r, o) => Object.assign(r, o), {});
+}
+
+const rollEscape = {
+    chars: {
+        '"': '%quot;',
+        ',': '%comma;',
+        ':': '%colon;',
+        '}': '%rcub;',
+        '{': '%lcub;',
+        ')': '%rbrac;',
+        '(': '%lbrac;',
+    },
+    escape(str) {
+        str = (typeof(str) === 'object') ? JSON.stringify(str) : (typeof(str) === 'string') ? str : null;
+        return (str) ? `${str}`.replace(new RegExp(`[${Object.keys(this.chars)}]`, 'g'), (r) => this.chars[r]) : null;
+    },
+    unescape(str) {
+        str = `${str}`.replace(new RegExp(`(${Object.values(this.chars).join('|')})`, 'g'), (r) => Object.entries(this.chars).find(e=>e[1]===r)[0]);
+        return JSON.parse(str);
+    }
 }
 
 const asw = (() => {
@@ -5035,31 +5328,106 @@ const asw = (() => {
 	<div class="sheet-rolltemplate-button-row">
 		{{#rollTotal() computed::singlestrike 1}}
 		<div class="sheet-rolltemplate-button">
-			[Single Strike](~{{name}}|templatesinglestrike||{{skill}})
+			[Single Strike](~{{name}}|templatesinglestrike||{{computed::passthrough}})
 		</div>
 		{{/rollTotal() computed::singlestrike 1}}
 		{{#rollTotal() computed::faststrike 1}}
 		<div class="sheet-rolltemplate-button">
-			[Fast Strike](~{{name}}|templatefastattack||{{skill}})
+			[Fast Strike](~{{name}}|templatefastattack||{{computed::passthrough}})
 		</div>
 		{{/rollTotal() computed::faststrike 1}}
 		{{#rollTotal() computed::strongstrike 1}}
 		<div class="sheet-rolltemplate-button">
-			[Strong Strike](~{{name}}|templatestrongattack||{{skill}})
+			[Strong Strike](~{{name}}|templatestrongattack||{{computed::passthrough}})
 		</div>
 		{{/rollTotal() computed::strongstrike 1}}
 		{{#rollTotal() computed::jointmeleeattack 1}}
 		<div class="sheet-rolltemplate-button">
-			[Joint Attack](~{{name}}|templatejointmeleeattack||{{skill}})
+			[Joint Attack](~{{name}}|templatejointmeleeattack||{{computed::passthrough}})
 		</div>
 		{{/rollTotal() computed::jointmeleeattack 1}}
 		{{#rollTotal() computed::jointrangedattack 1}}
 		<div class="sheet-rolltemplate-button">
-			[Joint Attack](~{{name}}|templatejointrangedattack||{{skill}})
+			[Joint Attack](~{{name}}|templatejointrangedattack||{{computed::passthrough}})
 		</div>
 		{{/rollTotal() computed::jointrangedattack 1}}
 	</div>
 	{{/skill}}
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-weaponattack">
+	<table>
+		<tr><th  style='text-transform: uppercase;'>{{title}}</th></tr>
+		<tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
+		<tr><td><strong class="template-title">1ST ATTACK: </strong> {{computed::roll}}</td></tr>
+		{{#rollWasFumble() roll}}
+		{{#^rollWasCrit() roll}}
+		<tr style='text-align: justify; font-size: 12px;'>
+			<td>
+				<strong class="template-title">FUMBLED BY:</strong> {{fumble}}
+			</td>
+		</tr>
+		{{/^rollWasCrit() roll}}
+		{{/rollWasFumble() roll}}
+	</table>
+	{{#rollTotal() computed::useAttackDefenseChain 0}}
+		{{#^rollTotal() computed::rolllocation 0}}
+		<div class="sheet-rolltemplate-button-row">
+			<div class="sheet-rolltemplate-button">
+				[Location](~{{name}}|location)
+			</div>
+		</div>
+		{{/^rollTotal() computed::rolllocation 0}}
+	{{/rollTotal() computed::useAttackDefenseChain 0}}
+	{{#^rollTotal() computed::useAttackDefenseChain 0}}
+		<div class="sheet-rolltemplate-button-row">
+			<div class="sheet-rolltemplate-button">
+				[Dodge](~selected|reactdodge||{{computed::passthrough}})
+			</div>
+			<div class="sheet-rolltemplate-button">
+				[Reposition](~selected|reactreposition||{{computed::passthrough}})
+			</div>
+			<div class="sheet-rolltemplate-button">
+				[Block](~selected|reactblock||{{computed::passthrough}})
+			</div>
+		</div>
+	{{/^rollTotal() computed::useAttackDefenseChain 0}}
+	{{#computed::roll2}}
+		<table>
+			<tr><td><strong class="template-title">2ND ATTACK: </strong> {{computed::roll2}}</td></tr>
+			{{#rollWasFumble() roll2}}
+			{{#^rollWasCrit() roll2}}
+			<tr style='text-align: justify; font-size: 12px;'>
+				<td>
+					<strong class="template-title">FUMBLED BY:</strong> {{fumble2}}
+				</td>
+			</tr>
+			{{/^rollWasCrit() roll2}}
+			{{/rollWasFumble() roll2}}
+		</table>
+		{{#rollTotal() computed::useAttackDefenseChain 0}}
+		{{#^rollTotal() computed::rolllocation 0}}
+		<div class="sheet-rolltemplate-button-row">
+			<div class="sheet-rolltemplate-button">
+				[Location](~{{name}}|location)
+			</div>
+		</div>
+		{{/^rollTotal() computed::rolllocation 0}}
+		{{/rollTotal() computed::useAttackDefenseChain 0}}
+		{{#^rollTotal() computed::useAttackDefenseChain 0}}
+			<div class="sheet-rolltemplate-button-row">
+				<div class="sheet-rolltemplate-button">
+					[Dodge](~selected|reactdodge||{{computed::passthrough2}})
+				</div>
+				<div class="sheet-rolltemplate-button">
+					[Reposition](~selected|reactreposition||{{computed::passthrough2}})
+				</div>
+				<div class="sheet-rolltemplate-button">
+					[Block](~selected|reactblock||{{computed::passthrough2}})
+				</div>
+			</div>
+		{{/^rollTotal() computed::useAttackDefenseChain 0}}
+	{{/computed::roll2}}
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-shield">
@@ -5109,19 +5477,88 @@ const asw = (() => {
 		</tr>
 		{{/^rollWasCrit() roll}}
 		{{/rollWasFumble() roll}}
+		{{#hit}}
+			<tr class="sheet-rolltemplate-calculation" style='text-align: justify; font-size: 12px;'>
+				<td>
+					<strong class="template-title">RESULT:</strong> {{computed::attackerRoll}} - {{computed::roll}} = {{computed::hit}}
+				</td>
+			</tr>
+		{{/hit}}
+		{{#rollGreater() computed::hit 0}}
+			{{#rollTotal() computed::rolllocation 0}}
+				<tr class="sheet-rolltemplate-calculation">
+					<td>
+						<strong class="template-title">DAMAGE:</strong> ({{#^rollTotal() computed::attackmultiplier 1}}{{computed::attackmultiplier}} x {{/^rollTotal() computed::attackmultiplier 1}}{{computed::weapondmg}} - {{computed::armor}}) = {{computed::afterArmor}} x {{computed::locationmultiplier}} + {{computed::critdmg}} ={{computed::damage}}
+					</td>
+				</tr>
+			{{/rollTotal() computed::rolllocation 0}}
+		{{/rollGreater() computed::hit 0}}
 	</table>
-	<div class="sheet-rolltemplate-button-row">
-		{{#^rollTotal() computed::rolllocation 0}}
-			<div class="sheet-rolltemplate-button">
-				[Location](~{{attacker}}|location)
-			</div>
-		{{/^rollTotal() computed::rolllocation 0}}
-		{{#rollTotal() computed::rolllocation 0}}
-			<div class="sheet-rolltemplate-button">
-				[Damage](~{{attacker}}|location)
-			</div>
-		{{/rollTotal() computed::rolllocation 0}}
-	</div>
+	{{#rollGreater() computed::hit 0}}
+		<div class="sheet-rolltemplate-button-row">
+			{{#^rollTotal() computed::rolllocation 0}}
+				<div class="sheet-rolltemplate-button">
+					[Location(Monster)](~{{name}}|monsterlocation||{{computed::passthrough}})
+				</div>
+				<div class="sheet-rolltemplate-button">
+					[Location(Humanoid)](~{{name}}|humanlocation||{{computed::passthrough}})
+				</div>
+			{{/^rollTotal() computed::rolllocation 0}}
+		</div>
+	{{/rollGreater() computed::hit 0}}
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-monsterlocation">
+	<table>
+		<tr>
+			<th>{{title}}</th>
+		</tr>
+		<tr>
+			<td><strong class="template-title">NAME: </strong> {{name}}</td>
+		</tr>
+		{{#rollTotal() roll 1}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">HEAD:</strong> If successful, your attack will deal x3 damage.</td></tr>{{/rollTotal() roll 1}}
+		{{#rollBetween() roll 2 5}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">TORSO (MONSTER):</strong> If successful, your attack will deal standard damage.</td></tr>{{/rollBetween() roll 2 5}}
+		{{#rollBetween() roll 6 7}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">RIGHT LIMB (MONSTER):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 6 7}}
+		{{#rollBetween() roll 8 9}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">LEFT LIMB (MONSTER):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 8 9}}
+		{{#rollTotal() roll 10}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">WING/TAIL (MONSTER):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollTotal() roll 10}}
+		<tr>
+			<td><strong class="template-title">TARGET LOCATION: </strong> {{roll}}</td>
+		</tr>
+		{{#computed::damage}}
+		<tr class="sheet-rolltemplate-calculation">
+			<td>
+				<strong class="template-title">DAMAGE:</strong> ({{#^rollTotal() computed::attackmultiplier 1}}{{computed::attackmultiplier}} x {{/^rollTotal() computed::attackmultiplier 1}}{{computed::weapondmg}} - {{computed::armor}}) = {{computed::afterArmor}} x {{computed::locationmultiplier}} + {{computed::critdmg}} ={{computed::damage}}
+			</td>
+		</tr>
+		{{/computed::damage}}
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-humanlocation">
+	<table>
+		<tr>
+			<th>{{title}}</th>
+		</tr>
+		<tr>
+			<td><strong class="template-title">NAME: </strong> {{name}}</td>
+		</tr>
+		{{#rollTotal() roll 1}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">HEAD:</strong> If successful, your attack will deal x3 damage.</td></tr>{{/rollTotal() roll 1}}
+		{{#rollBetween() roll 2 4}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">TORSO (HUMANOID):</strong> If successful, your attack will deal standard damage.</td></tr>{{/rollBetween() roll 2 4}}
+		{{#rollTotal() roll 5}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">RIGHT ARM (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollTotal() roll 5}}
+		{{#rollTotal() roll 6}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">LEFT ARM (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollTotal() roll 6}}
+		{{#rollBetween() roll 7 8}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">RIGHT LEG (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 7 8}}
+		{{#rollBetween() roll 9 10}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">LEFT LEG (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 9 10}}
+		<tr>
+			<td><strong class="template-title">TARGET LOCATION: </strong> {{roll}}</td>
+		</tr>
+		{{#computed::damage}}
+		<tr class="sheet-rolltemplate-calculation">
+			<td>
+				<strong class="template-title">DAMAGE:</strong> ({{#^rollTotal() computed::attackmultiplier 1}}{{computed::attackmultiplier}} x {{/^rollTotal() computed::attackmultiplier 1}}{{computed::weapondmg}} - {{computed::armor}}) = {{computed::afterArmor}} x {{computed::locationmultiplier}} + {{computed::critdmg}} ={{computed::damage}}
+			</td>
+		</tr>
+		{{/computed::damage}}
+	</table>
 </rolltemplate>
 
 <!-- ---- Casting Templates ---- -->
