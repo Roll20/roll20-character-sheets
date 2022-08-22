@@ -83,6 +83,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
 August 22th 2022 v1.6b
 
+- Removed critical rt display for Prayer spells, as they are not get dubs random criticals.
 - Adds conditional check when peforming Dual Wield attack, if the Player has just rolled a crit, they now will chose if they want to use main hand or crit result for the DW attack. Crit result DW hits will now remove any modifier on crit roll before reversal, so result stays within 1d100 range.
 - Fixed recent issue with Darkmode on Chrome based browsers, white text was showing in much of the chat log RT output while in darkmode.
 - Custom WFRP4e token marker set 4.0 released includes UiA edition with no Advantage markers. Splits Fear into 1/2/3 markers. And a number of usefull custom markers. Url:
