@@ -773,7 +773,7 @@ PSYCHOKINETIC['Devotion']['Molecular Agitation'] = {
     'prerequisites': 'none',
     'reference': 'p. 48',
     'book': 'The Complete Psionics Handbook',
-    'damage': '2 rounds: 1 damage}}{{d2t=1}}{{d2=\n3+ rounds: Metal scorches (1d4). Skin burns away (1d6)',
+    'damage': '2 rounds: 1 damage.\n3+ rounds: Metal scorches (1d4). Skin burns away (1d6)',
     'damage-type': '',
     'healing': '',
     'power-score': 'After round one, the rate of agitation doubles (3 rounds of damage occurs in just 2, 5 rounds of damage occurs in 3).',
@@ -822,8 +822,109 @@ PSYCHOKINETIC['Devotion']['Soften'] = {
     'effect': 'This power resembles molecular manipulation, except that it weakens the entire object instead of small area across a single plane. The object softens overall, losing its rigidity and strength. Specific effects vary, depending on the material.\n&emsp;*Metal:* For each round of softening, weapons incur a -1 penalty to attack rolls and cause one less point of damage, cumulatively. The armor class of metal armor increases one point per round of softening. After 10 rounds, any metal becomes soft and rubbery, but retains its shape.\n&emsp;*Wood:* Like metal, weapons with wooden shafts or handles suffer a -1 penalty to attack rolls and damage per round of softening. After six rounds, wood becomes stringy and rubbery but retains its shape. After 10 rounds, the grain can be split easily and a punch can break through even the hardest and thickest doors or chests.\n&emsp;*Stone:* After two rounds, stone becomes noticeably soft to the touch. After five rounds, it can be worked like stiff clay, but this is as soft as it gets.\n&emsp;*Magical Items:* Save vs. crushing blow to escape the effect entirely.\n&emsp;*Living Tissue:* No effect.\n\n&emsp;DMs can use their own judgement and the examples above to handle other materials.\n&emsp;*Power Score*—All effects are doubled.\n&emsp;*20*—The item is strengthened, and can’t be affected again until the psionicist gains one level.'
 };
 
-const PSYCHOPORTIVE = {Devotion: {}, Science: {}};
 const PSYCHOMETABOLIC = {Devotion: {}, Science: {}};
+PSYCHOMETABOLIC['Science']['Animal Affinity'] = {
+    'attribute': '@{Constitution}',
+    'modifier': '-4',
+    'context-modifier': '',
+    'initial-cost': '15',
+    'maintenance-cost': '4/round',
+    'range': '0',
+    'prep': '0',
+    'aoe': 'personal',
+    'prerequisites': 'none',
+    'reference': 'p. 50',
+    'book': 'The Complete Psionics Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'power-score': 'The character gains two abilities instead of one.',
+    '20': 'The character’s skin takes on the appearance of the animal’s skin until the power is used again successfully (no change in AC).',
+    '1': '',
+    'effect': 'When the psionicist first learns this power, he develops an affinity for a particular type of animal. He cannot choose the animal; the affinity is dictated by his aura. To determine the nature of the affinity, the psionicist’s player rolls 1d20 and consults the table below. From that point on, when the character invokes this power, he can claim one of the animal’s attributes as his own—temporarily. He can gain the animal’s armor class, movement rate and mode, attacks and damage, THAC0, hit points, or any other special ability. Only one of these can be used at a time, however.\n&emsp;The effect lasts as long as the psionicist maintains the power. Switching to a different ability means paying the initial cost of the power again, and making a new power check.\n&emsp;The character does undergo a physical change when this power is invoked. The extent of the change depends on the animal and the ability. For example, adopting a hawk’s movement obviously requires wings, while attacking like a tiger calls for fangs and claws.}}{{style=gray-pair3}}{{c1-1=1}}{{c2-1=2}}{{c3-1=3}}{{c4-1=4}}{{c5-1=5}}{{c6-1=6}}{{c7-1=7}}{{c8-1=8}}{{c9-1=9}}{{c10-1=10}}{{c11-1=11}}{{c12-1=12}}{{c13-1=13}}{{c14-1=14}}{{c15-1=15}}{{c16-1=16}}{{c17-1=17}}{{c18-1=18}}{{c19-1=19}}{{c20-1=20}}{{c1-2=Ape}}{{c2-2=Barracuda}}{{c3-2=Boar}}{{c4-2=Bull}}{{c5-2=Crocodile}}{{c6-2=Eagle, giant}}{{c7-2=Elephant}}{{c8-2=Falcon}}{{c9-2=Griffon}}{{c10-2=Grizzly bear}}{{c11-2=Lion}}{{c12-2=Panther (black leopard)}}{{c13-2=Percheron (draft horse)}}{{c14-2=Peregrine falcon (hawk)}}{{c15-2=Rattlesnake}}{{c16-2=Scorpion, giant}}{{c17-2=Shark}}{{c18-2=Stag}}{{c19-2=Tiger}}{{c20-2=Wolf}}{{effects2=&emsp;*Power Score*—The character gains two abilities instead of one.\n&emsp;*20*—The character’s skin takes on the appearance of the animal’s skin until the power is used again successfully (no change in AC).'
+};
+PSYCHOMETABOLIC['Science']['Complete Healing'] = {
+    'attribute': '@{Constitution}',
+    'modifier': '0',
+    'context-modifier': '',
+    'initial-cost': '30',
+    'maintenance-cost': 'na',
+    'range': '0',
+    'prep': '24 hours',
+    'aoe': 'personal',
+    'prerequisites': 'none',
+    'reference': 'p. 50',
+    'book': 'The Complete Psionics Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': 'All ailments, wounds, and normal diseases',
+    'power-score': 'The healing occurs in just one hour.',
+    '20': 'The psionicist awakes after the full 24 hours to discover that the attempt failed. He has expended 5 PSPs.',
+    '1': '',
+    'effect': 'The psionicist who has mastered this power can heal himself completely of all ailments, wounds, and normal diseases. He places himself in a trance for 24 hours to accomplish the healing. The trance is deep, and cannot be broken unless the character loses 5 or more hit points. As he uses this power, the psionicist’s body is repairing itself at an incredible rate. At the end of the 24—hour period, the character awakes, restored to complete health in every regard except for the 30 PSPs he expended to use complete healing.\n&emsp;If the character’s power check fails, he breaks his trance after only one hour, having realized that the power was not working. Only 5 PSPs have been expended.\n&emsp;*Power Score*—The healing occurs in just one hour.\n&emsp;*20*—The psionicist awakes after the full 24 hours to discover that the attempt failed. He has expended 5 PSPs.'
+};
+PSYCHOMETABOLIC['Science']['Death Field'] = {
+    'attribute': '@{Constitution}',
+    'modifier': '-8',
+    'context-modifier': '',
+    'initial-cost': '40',
+    'maintenance-cost': 'na',
+    'range': '0',
+    'prep': '3',
+    'aoe': '20 yard radius',
+    'prerequisites': 'none',
+    'reference': 'p. 52',
+    'book': 'The Complete Psionics Handbook',
+    'damage': '?{How many hit points sacrificed?|0} damage to self.\n?{How many hit points sacrificed?|0} damage to all who fail a save vs death',
+    'damage-type': '',
+    'healing': '',
+    'power-score': 'The psionicist loses only half the number of hit points he specifies ([[?{How many hit points sacrificed?|0}/2]] hp); victims who fail their saving throws lose the full amount (?{How many hit points sacrificed?|0} hp).',
+    '20': 'The power fails, but the psionicist loses the hit points anyway.',
+    '1': '',
+    'effect': 'A death field is a life-sapping region of negative energy. Only psionicists of evil alignment can learn this power without suffering side effects. If any other psionicist tries to learn the death field, his alignment will gradually be twisted toward evil as he explores this very dark portion of his psyche.\n&emsp;A successful death field takes it toll on everyone inside it, including the psionicist. Before he initiates this power, he must decide how many hit points he will sacrifice. If the power works, the loss is inevitable; he gets no saving throw. Every other living thing within the death field must make a saving throw vs. death. Those who succeed escape damage.\n&emsp;Those who fail lose the same number of hit points as the psionicist. For the weak, that can mean death.\n&emsp;*Power Score*—The psionicist loses only half the number of hit points he specifies; victims who fail their saving throws lose the full amount.\n&emsp;*20*—The power fails, but the psionicist loses the hit points anyway.'
+};
+PSYCHOMETABOLIC['Science']['Energy Containment'] = {
+    'attribute': '@{Constitution}',
+    'modifier': '-2',
+    'context-modifier': '',
+    'initial-cost': '10',
+    'maintenance-cost': 'na',
+    'range': '0',
+    'prep': '0',
+    'aoe': 'personal',
+    'prerequisites': 'none',
+    'reference': 'p. 52',
+    'book': 'The Complete Psionics Handbook',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'power-score': 'All saves against energy attacks automatically succeed during the round in which the power is in effect.',
+    '20': 'The psionicist becomes an energy attractor for 1 turn. All saves vs. energy attacks fail, causing full standard damage.',
+    '1': '',
+    'effect': 'A psionicist with this power has trained himself to safely absorb and assimilate energy from electricity, fire, cold, heat, and sound energy that would fry, freeze, or otherwise harm a normal character. Any physical assault based on these energy types can be drawn into the psionicist’s body. The character transforms the energy, and safely releases it as visible radiance (light).\n&emsp;In effect, this protects the psionicist against energy attacks. If the psionicist makes a successful power check, he can double the result of his die roll when saving against an energy attack. If the character makes a successful saving throw, he suffers no damage from the attack. If he fails, he suffers only half damage, regardless of what the spell description (if applicable) states.\n&emsp;When the character absorbs energy, he radiates visible light for a number of rounds equal to the points of damage he absorbed. If he suffered half damage, he radiates for that many rounds. If he suffered no damage, roll for damage anyway to see how long he glows.\n&emsp;This glow is definitely noticeable, but it is soft, and illuminates no more than an area with a 2—yard radius.\n&emsp;*Power Score*—All saves against energy attacks automatically succeed during the round in which the power is in effect.\n&emsp;*20*—The psionicist becomes an energy attractor for 1 turn. All saves vs. energy attacks fail, causing full standard damage.'
+};
+PSYCHOMETABOLIC['Science']['Life Draining'] = {
+    'attribute': '@{Constitution}',
+    'modifier': '-3',
+    'context-modifier': '',
+    'initial-cost': '11',
+    'maintenance-cost': '5/round',
+    'range': 'touch',
+    'prep': '0',
+    'aoe': 'individual',
+    'prerequisites': 'none',
+    'reference': 'p. 52',
+    'book': 'The Complete Psionics Handbook',
+    'damage': '1d6',
+    'damage-type': '',
+    'healing': 'Same as damage',
+    'power-score': 'Rate of drain increases to 1d20 points per round.',
+    '20': 'Backfire! Half of the psionicist’s remaining hit points ([[@{HP}/2]]) are absorbed by the target, reversing the power’s effects.',
+    '1': '',
+    'effect': 'With this devotion, a psionicist can drain hit points from another character and use them to recover his own. This transfer occurs at the rate of 1d6 points per round.\n&emsp;The character can absorb up to 10 more hit points than his healthy total, but these bonus points last only one hour. After that, if the psionicist still has more hit points than he should, the excess points vanish.\n&emsp;*Power Score*—Rate of drain increases to 1d20 points per round.\n&emsp;*20*—Backfire! Half of the psionicist’s remaining hit points are absorbed by the target, reversing the power’s effects.'
+};
+
+const PSYCHOPORTIVE = {Devotion: {}, Science: {}};
 const TELEPATHIC = {Devotion: {}, Science: {}};
 const METAPSIONIC = {Devotion: {}, Science: {}};
 const ATTACK = {Devotion: {}, Science: {}};
