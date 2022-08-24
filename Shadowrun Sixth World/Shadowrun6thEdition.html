@@ -5914,8 +5914,12 @@ on("sheet:opened", function() {
 					console.log("Data now fits v.57");
 					show_changelog();
 				case (v.data_version < 0.58):
-					_v57_update();
+					_v58_update();
 					console.log("Data now fits v.58");
+				case (v.data_version < 0.59):
+					_v58_update();
+					_v59_update();
+					console.log("Data now fits v.59");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -5938,19 +5942,17 @@ var show_changelog = () => {
 };
 
 
+var _v59_update = () => {
+	getAttrs(['character_name'], (v) => {
+console.log(v);
+		set_display_name(v.character_name);
+	});
+};
+
 var _v58_update = () => {
-	getAttrs(['wild_die'], (v) => {
-		if(v.wild_die == 0) {
-			setAttrs({
-				wild_die1: eventInfo.newValue,
-				wild_die2: eventInfo.newValue
-			});
-		} else {
-			setAttrs({
-				wild_die1: "?{Wild Dice for First Roll?|0}",
-				wild_die2: "?{Wild Dice for Second Roll?|0}"
-			});
-		}
+	setAttrs({
+		wild_die1: "?{Wild Dice for First Roll?|0}",
+		wild_die2: "?{Wild Dice for Second Roll?|0}"
 	});
 };
 
@@ -7053,6 +7055,17 @@ console.log(eventInfo);
 	}
 });
 
+
+on("change:character_name", (eventInfo) => {
+	set_display_name(eventInfo.newValue);
+});
+
+var set_display_name = (name) => {
+	character_name = name.replace(/[\}\)\|]/g, '*');
+	setAttrs({
+		character_name: character_name
+	});
+};
 
 var update_attribute = (attr) => {
 	getAttrs([`${attr.key}`], (v) => {
