@@ -859,7 +859,15 @@ const i18n_deplacement = getTranslationByKey("deplacement"),
     i18n_porteeCourte = getTranslationByKey("portee-courte"),
     i18n_devasterAnatheme = getTranslationByKey("devaster-anatheme"),
     i18n_bourreauTenebres = getTranslationByKey("bourreau-tenebres"),
-    i18n_equilibrerBalance = getTranslationByKey("equilibrer-balance")
+    i18n_equilibrerBalance = getTranslationByKey("equilibrer-balance"),
+    i18n_bourreau = getTranslationByKey("bourreau"),
+    i18n_conviction = getTranslationByKey("conviction"),
+    i18n_devastation = getTranslationByKey("devastation"),
+    i18n_excellence = getTranslationByKey("excellence"),
+    i18n_excellenceCondition = getTranslationByKey("excellence-condition"),
+    i18n_guidage = getTranslationByKey("guidage"),
+    i18n_guidageInclus = getTranslationByKey("guidage-inclus"),
+    i18n_regularite = getTranslationByKey("regularite")
     ;
 
 function maxCar(carac, score, aspect)

@@ -4,9 +4,7 @@ This is an UNOFFICIAL charactersheet for playing "The One Ring" second Ed. from 
 There is no game content or images in this system.
 Should you wish to populate the system with game content for your own use please purchase the rules.
 
-**Important:** For the rolls to work properly, follow the instructions on [The One Ring wiki page](https://wiki.roll20.net/The_One_Ring#Rollable_Tables) to set up custom rollable tables for your game.
-
-More info: [Readme](https://github.com/Roll20/roll20-character-sheets/blob/master/The%20One%20Ring/README.md) and [wiki page](https://wiki.roll20.net/The_One_Ring).
+More info: [Readme](https://github.com/Roll20/roll20-character-sheets/blob/master/The%20One%20Ring%202e/readme.md) and [wiki page](https://wiki.roll20.net/The_One_Ring_2e).
 
 ## Core Features ##
 
@@ -24,6 +22,7 @@ More info: [Readme](https://github.com/Roll20/roll20-character-sheets/blob/maste
 - General attributes, combat and fell abilities
 - Rolls for attack and protection
 - Attacks with optionally selecting target and integrating target's parry
+- Import Adversary from json
 
 ## Upgrade from 2e (basic) version ##
 

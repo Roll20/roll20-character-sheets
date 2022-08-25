@@ -3400,7 +3400,11 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
-
+								<span class="changelog-entry">**2022-08-30 ** v.59 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - Non-PC sheets were broken anywhere that a textarea (notes style) entry existed you couldn't display it to add or edit the values.
+									<li><span class="bullet">F</span><b>New Feature</b> - New Feature - character_name sanitization.  Sometimes we want to use names with characters that will break roll buttons and other parts of the sheet.  This replaces the bad characters with an asterisk *
+								</ul>
 								<span class="changelog-entry">**2022-08-16 ** v.58 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">F</span><b>New Feature</b> - Added the ability to change the ammo type in use on Core->Primary Ranged with the AR and DV changes applied.  Default will be Standard.
@@ -5856,7 +5860,7 @@
 <input type="hidden" name="attr_wild_die1" value="0" />
 <input type="hidden" name="attr_wild_die2" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.58">
+<input type="hidden" name="attr_sheet_version" value="0.59">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 
@@ -5911,8 +5915,12 @@ on("sheet:opened", function() {
 					console.log("Data now fits v.57");
 					show_changelog();
 				case (v.data_version < 0.58):
-					_v57_update();
+					_v58_update();
 					console.log("Data now fits v.58");
+				case (v.data_version < 0.59):
+					_v58_update();
+					_v59_update();
+					console.log("Data now fits v.59");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -5935,19 +5943,17 @@ var show_changelog = () => {
 };
 
 
+var _v59_update = () => {
+	getAttrs(['character_name'], (v) => {
+console.log(v);
+		set_display_name(v.character_name);
+	});
+};
+
 var _v58_update = () => {
-	getAttrs(['wild_die'], (v) => {
-		if(v.wild_die == 0) {
-			setAttrs({
-				wild_die1: eventInfo.newValue,
-				wild_die2: eventInfo.newValue
-			});
-		} else {
-			setAttrs({
-				wild_die1: "?{Wild Dice for First Roll?|0}",
-				wild_die2: "?{Wild Dice for Second Roll?|0}"
-			});
-		}
+	setAttrs({
+		wild_die1: "?{Wild Dice for First Roll?|0}",
+		wild_die2: "?{Wild Dice for Second Roll?|0}"
 	});
 };
 
@@ -7050,6 +7056,17 @@ console.log(eventInfo);
 	}
 });
 
+
+on("change:character_name", (eventInfo) => {
+	set_display_name(eventInfo.newValue);
+});
+
+var set_display_name = (name) => {
+	character_name = name.replace(/[\}\)\|]/g, '*');
+	setAttrs({
+		character_name: character_name
+	});
+};
 
 var update_attribute = (attr) => {
 	getAttrs([`${attr.key}`], (v) => {
