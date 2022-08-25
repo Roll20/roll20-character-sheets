@@ -2475,7 +2475,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
                     macroBuilder.push(`prep=${power['prep']}`);
                     macroBuilder.push(`prereq=${power['prerequisites']}`);
                     macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
-                    let powerRoll = power['roll-overriede'] || `[[1d20cf20+(@{psionic-mod${number}})]]`;
+                    let powerRoll = power['roll-override'] || `[[1d20cf20+(@{psionic-mod${number}})]]`;
                     macroBuilder.push(`powerroll=${powerRoll}`);
                     let powerScoreValue = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})`;
                     if (power['context-modifier']) {
