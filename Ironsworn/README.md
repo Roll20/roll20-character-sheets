@@ -19,7 +19,12 @@ These will then generate a `dist` folder that will have the finished code. From 
 Roll20 does not build our pug/stylus code for when we merge. This needs to be done locally by running `npm run gulp:build` in the Ironsworn/src directory.
 
 ## Translations
-To keep our translation and fallback html content consistent. We are loading the translations into pug under the `locals` global variable. This allows us to call `locals.translations[<translation-key>]` to get our content. This way we can propagate changes and avoid hardcoding content.
+To keep our translation and fallback html content consistent. We are loading the translations into pug under the `locals` global variable.
+This allows us to call `locals.translations[<translation-key>]` to get our content.
+This way we can propagate changes and avoid hardcoding content.
+
+Beware when using `data-i18n`: it must not be used on elements that contain other elements, because the i18n framework will overwrite the text inside the localized element.
+This is typically relevant for labels enclosing hidden inputs: use a span inside the label to enclose the text and support data-i18n.
 
 ## Changelog
 You can handle a new version in:
@@ -63,6 +68,8 @@ To build for testing, use `npm run gulp:test-watch`.
 This compiles `test/Ironsworn.html` and `Ironsworn.css`.
 You can open `test/Ironsworn.html` in your browser.
 
+You can enable i18n by running the script specifying a language, which will be retrieved from the `translations` folder, e.g. `npm run gulp:test-watch --lang=fr`.
+
 ### Test the roll templates
 You must create a file `test/roll-template-specs.js` that contains the list of template variations you want to display at the same time (to test different input values at the same time).
 It contains a list of specs containing the template ID, whether to display the template (so that you can easily toggle the display), and the values that are the inputs of the template.
@@ -95,7 +102,7 @@ The roll values must be enclosed in brackets (`[[5]]`): the system checks that y
 To build this list you should click on a roll button in the character sheet and copy/paste the resulting popup value (which is also output on the console), and replace the roll specs with the numeric values you want to test.
 If an attribute value `@{myattribute}` appears as `@myattribute`, it means this attribute was not set by interacting with the sheet and may imply it does not exist all in the sheet (i.e. you made a mistake typing its name in the roll button).
 Otherwise the attribute's value is used.  
-The roll macro with replaced attributes is also output to the console: you can test it in the site's chat, but it does not seem to work well.
+The roll macro with replaced attributes is also output to the console: you can test it in the site's chat.
 
 To build for testing, use `npm run gulp:test-rt-watch`.
 This compiles `test/test-roll-templates.html` and `Ironsworn.css`.
@@ -108,7 +115,6 @@ You can copy/paste them to `roll-template-specs.js` if you make changes to one o
 - Inputs in repeating sections (fieldsets) may not be handled properly
 - The repeating sections of the Shared sheet are not handled at all
 - Rolls are not interpreted, you can check your macros on the site in the chat
-- No i18n
 
 ## Compatibility
 The sheet has been tested across multiple browsers and devices, show below in the compatibility matrix:

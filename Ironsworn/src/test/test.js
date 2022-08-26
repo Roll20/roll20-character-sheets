@@ -127,6 +127,8 @@ $(document).ready(() => {
       console.log(`&\{${templateDef}\}${rollSpec}`);
     });
   });
+
+  $('.charsheet').localize();
 });
 
 // attributes handling
