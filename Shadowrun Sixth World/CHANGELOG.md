@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2022-08-30 ** v.59 Chuz (James Culp)
+	Bugfix - Non-PC sheets were broken anywhere that a textarea (notes style) entry existed you couldn't display it to add or edit the values.
+	New Feature - character_name sanitization.  Sometimes we want to use names with characters that will break roll buttons and other parts of the sheet.  This replaces the bad characters with an asterisk *
 **2022-08-16 ** v.58 Chuz (James Culp)
 	New Feature - Added the ability to change the ammo type in use on Core->Primary Ranged with the AR and DV changes applied.  Default will be Standard.
 	New Feature - Added split rolls for Burst Fire Wide firing mode on the Core->Primary Ranged weapons.  This splits the dicepool (on odd pools the left roll Atk 1 gets the extra die).  If Wild Dice are toggled on a prompt will appear for each attack.  Glitches are calculated for each attack separately.
