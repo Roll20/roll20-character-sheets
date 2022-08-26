@@ -3382,6 +3382,10 @@
 					<details>
 						<summary class="settings-caption" data-i18n="weapon-template-u">Weapon Templates</summary>
 						<div>
+							<label for="showSingleStrike" class="settings-checkbox">
+								<span data-i18n="show-singlestrike">Show Single Strike</span>
+								<input id="showSingleStrike" name="attr_showSingleStrike" type="checkbox" checked/>
+							</label>
 							<label for="showFastAttacks" class="settings-checkbox">
 								<span data-i18n="show-fastattacks-u">Show Fast Attacks</span>
 								<input id="showFastAttacks" name="attr_showFastAttacks" type="checkbox" checked/>
@@ -4474,7 +4478,7 @@ const calculateTemplateButtons = async (rollBase) => {
 	}
 
 	var weaponskill = rollBase.substring(rollBase.indexOf("skill="), rollBase.indexOf("weapon_skill")+13).replace("skill=@{", "").replace("}","");
-	let attrs = await asw.getAttrs([weaponskill, 'showStrongAttacks', 'showFastAttacks', 'showJointAttacks']);
+	let attrs = await asw.getAttrs([weaponskill, 'showSingleStrike', 'showFastAttacks', 'showStrongAttacks', 'showJointAttacks']);
 
 	let skill = attrs[weaponskill];
 
@@ -4484,10 +4488,13 @@ const calculateTemplateButtons = async (rollBase) => {
 	var jointmeleeattack = 0;
 	var jointrangedattack = 0;
 
+
+
 	if(
-		skill.includes("archery") ||
+		(skill.includes("archery") ||
 		skill.includes("crossbow") ||
-		skill.includes("athletics")
+		skill.includes("athletics"))
+		&& attrs['showSingleStrike'] != 0
 	) {
 		singlestrike = 1
 	}
