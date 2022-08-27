@@ -2,7 +2,7 @@ const ATTR_PREFIX = 'attr_';
 const REPEATING_PREFIX = 'repeating_';
 
 // events handling
-const eventHandlers = {};
+const eventHandlers = {}; // stores the handlers for each sheet event: event_name => [handler]
 
 window.on = (eventNames, fn) => eventNames.split(' ').forEach(eventName => {
   eventName = eventName.toLowerCase();
@@ -19,6 +19,8 @@ window.on = (eventNames, fn) => eventNames.split(' ').forEach(eventName => {
 
   handlers.push(fn);
 });
+
+const attributeStore = {}; // stores the attribute values, backend for getAttrs/setAttrs
 
 $(document).ready(() => {
   const inputSelector = `input[name^='${ATTR_PREFIX}'], select[name^='${ATTR_PREFIX}']`;
@@ -55,8 +57,25 @@ $(document).ready(() => {
     }
   });
 
+  // init the attributes values in the store
+  const inputsSelector = `input[name^='${ATTR_PREFIX}'], select[name^='${ATTR_PREFIX}']`;
+  $(inputsSelector).each(function () {
+    const input = $(this);
+
+    let attributeName = input.attr('name').substring(ATTR_PREFIX.length);
+    if (input.attr('type') == 'radio' || input.attr('type') == 'checkbox') {
+      if (input.prop('checked')) {
+        attributeStore[attributeName] = input.val();
+      }
+    } else {
+      if (input.val() != '') {
+        attributeStore[attributeName] = input.val();
+      }
+    }
+  });
+
   // handle changes for input and select
-  $(`input[name^='${ATTR_PREFIX}'], select[name^='${ATTR_PREFIX}']`).each(function () {
+  $(inputsSelector).each(function () {
     const input = $(this);
 
     input.change(event => {
@@ -83,11 +102,33 @@ $(document).ready(() => {
     const button = $(this);
     button.click(() => {
       const firstSpaceIndex = button.val().indexOf(' ');
-      let result = button.val().substring(2, firstSpaceIndex - 1) + '\n';
-      result += (button.val().substring(firstSpaceIndex) + ' ').match(/\{\{(.+?)\}\} /g).map(_ => _.substring(2, _.length - 3)).join('\n');
-      window.alert(result + '\n\n' + button.val());
+      let templateDef = button.val().substring(2, firstSpaceIndex - 1);
+      const templateId = templateDef.split(':')[1];
+
+      // replace attributes
+      let rollSpec = button.val().substring(firstSpaceIndex);
+      for (const group of rollSpec.matchAll(/@\{(\w+)\}/g)) {
+        rollSpec = rollSpec.replace(group[0], attributeStore[group[1]] ?? '@' + group[1]);
+      }
+
+      // show result
+      const templateSpec = {
+        templateId,
+        display: true,
+        values: {}
+      };
+      (rollSpec + ' ').match(/\{\{(.+?)\}\}\s/g).map(_ => _.substring(2, _.length - 3)).forEach(_ => {
+        const parts = _.split('=');
+        templateSpec.values[parts[0]] = parts[1];
+      });
+
+      window.alert(JSON.stringify(templateSpec, undefined, 2));
+      console.log(JSON.stringify(templateSpec, undefined, 2));
+      console.log(`&\{${templateDef}\}${rollSpec}`);
     });
   });
+
+  $('.charsheet').localize();
 });
 
 // attributes handling
@@ -184,5 +225,5 @@ window.setAttrs = (attributes, isInit) => {
 
 // initialize attributes
 $(document).ready(() => {
-  setAttrs(attributeStore, true);
+  setAttrs(initAttributes, true);
 });
