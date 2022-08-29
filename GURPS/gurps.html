@@ -4358,16 +4358,12 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.8.1 -->				
+				<!-- current version notes: 2.8.2 -->				
 				<ul>
-					<li>Skills Tab. Add a collapsible notes area.</li>
-					<li>Skills Tab. Added an indicator to show a skill has <b>Conditional notes</b></li>
-					<li>Combat Tab. Add a collapsible notes area.</li>
-					<li>Combat Tab. Defense sub-tab. Increased the height of the <b>DEFENSE BONUS (DB) NOTES</b> box.</li>
-					<li>New Slam Tool. Moved to Tools sub-tab.</li>
-					<li>Editable Wound Modifier Notes: Updated initial default notes to include <b>Injury to Unliving, Homegenous, and Diffuse Targets. B380</b>. 
-						Requested and notes provided by kawaishi. 
-						<b>NOTE:</b> If you made changes to one or more wound modifier notes, you will not see the most recent rule updates. However, you can use the new <b>reset</b> button to get them.
+					<li>
+						Options. Sheet-options tab. Added initial <b>Resync</b> button. 
+						First iteration resyncs Skills, Techniques, and spells, along with items linked to them.
+						Followed by resyncing the weight and cost of items in the inventory.
 					</li>
 				</ul>
 				
@@ -10698,7 +10694,7 @@ visualize what it will look like in chat.
 												<span data-i18n="formula-base-dodge-description">Base Dodge attribute.</span>
 											</div>
 											<div class="formula formula-current-dodge">
-												<span data-i18n="formula-current-dodge-description">Current Dodge affected by HP, FP, and Encumbrance.</span>
+												<span data-i18n="formula-current-dodge-description">Current Dodge affected by current conditions. Combat Reflexes checkbox to the right is not used.</span>
 											</div>
 										</div>
 										<div class="cell formula-combat-reflexes">
@@ -14033,7 +14029,19 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.8.1 -->
+			<!-- current version notes: 2.8.2 -->
+			<ul>
+				<li>
+					Options. Sheet-options tab. Added initial <b>Resync</b> button. 
+					First iteration resyncs Skills, Techniques, and spells, along with items linked to them.
+					Followed by resyncing the weight and cost of items in the inventory.
+				</li>
+			</ul>
+
+			<h4>Version: 2.8.1</h4>
+
+			<p>Pull Request: 7/31/2022</p>	
+
 			<ul>
 				<li>Skills Tab. Add a collapsible notes area.</li>
 				<li>Skills Tab. Added an indicator to show a skill has <b>Conditional notes</b></li>
@@ -15053,6 +15061,24 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 				</div><!-- end option-column -->
 				
 				<div class="option-column">
+
+					<div class="option-container">
+						<h4>
+							<span data-i18n="resync-character-label">Resync Character Sheet</span>
+						</h4>
+						<div class="reset resync">
+							<button type="action" name="act_resync" class="reset">
+								<span data-i18n="resync-label">Resync</span>
+							</button>
+						</div>
+						<div>
+							<ul>
+								<li>Resync repeating Skills and items linked them.</li>
+								<li>Resync repeating Techniques and items linked them.</li>
+								<li>Resync repeating Inventory cost and weight.</li>
+							</ul>
+						</div>
+					</div>
 					
 					<div class="option-container damage-dice">
 						<h4>
@@ -17229,9 +17255,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.8.1";
+	const version = "2.8.2";
 	
-	const latestChangesDate = "7/31/2022";
+	const latestChangesDate = "8/29/2022";
 	
 	let modCascade = true;
 	
@@ -23918,7 +23944,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	});
 	
 	// if linked data for repeating defense is changed, get the new linked skill values
-	on('change:repeating_defense:type change:repeating_defense:defense_row_type change:repeating_defense:defense_talent_level change:repeating_defense:defense_skill_row_id change:repeating_defense:repeating_defense_defense_talent_level change:repeating_defense:defense_skill_row_id_toggle', function (event) {
+	on('change:repeating_defense:type change:repeating_defense:defense_row_type change:repeating_defense:defense_talent_level change:repeating_defense:defense_skill_row_id change:repeating_defense:repeating_defense_defense_talent_level change:repeating_defense:defense_skill_row_id_toggle change:repeating_defense:defense_combat_reflexes', function (event) {
 	
 		// check if this is a valid toggle
 		const isToggled = String(event.sourceAttribute).endsWith("_skill_row_id_toggle");
@@ -33567,6 +33593,167 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		};
 
 		setAttrs(attribs);
+
+	}
+
+	// resync character sheet
+	on("clicked:resync", event => {
+	
+		resyncRepeatingSkills();
+
+		resyncRepeatingTechniques();
+
+		resyncRepeatingItems();
+
+		resyncRepeatingSpells();
+
+	});
+
+	/**
+	 * Loop through each skill, set sync field = 1 (true)
+	 * this forces the skill to recalculate the value.
+	 */ 
+	resyncRepeatingSkills = () => {
+
+		getSectionIDs("repeating_skills", ids => {
+
+			console.groupCollapsed("--resyncRepeatingSkills--");
+		
+			ids.forEach(rowId => {
+				
+				const syncFieldName = `repeating_skills_${rowId}_sync`;
+
+				// force the value to 1, to resync the skill
+				let attribs = {};
+
+				attribs[syncFieldName] = 1;
+
+				console.info(`update linked items for rowId: ${rowId}`);
+
+				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
+
+			});
+
+			
+			console.groupEnd();
+
+		});
+
+	}
+
+	/**
+	 * Loop through each technique, set sync field = 1 (true)
+	 * this forces the technique to recalculate the value.
+	 */ 
+	resyncRepeatingTechniques = () => {
+
+		getSectionIDs("repeating_techniquesrevised", ids => {
+
+			console.groupCollapsed("--resyncRepeatingTechniques--");
+
+			ids.forEach(rowId => {
+				
+				const syncFieldName = `repeating_techniquesrevised_${rowId}_skill_row_id_toggle`;
+
+				// force the value to 1, to resync the technique
+				let attribs = {};
+
+				attribs[syncFieldName] = 1;
+
+				console.info(`update linked items for rowId: ${rowId}`);
+				
+				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
+
+			});
+
+			console.groupEnd();
+		
+		});
+
+	}
+
+	/**
+	 * Recalculate the weight and value of all items. 
+	 * Should NOT be run silent, so the totals can be calculated
+	 */ 
+	resyncRepeatingItems = () => {
+
+		getSectionIDs("repeating_item", ids => {
+
+			console.info("--resyncRepeatingItems--");
+
+			ids.forEach(rowId => {
+
+				const countField = `repeating_item_${rowId}_count`;
+
+				const costField = `repeating_item_${rowId}_cost`;
+
+				const weightField = `repeating_item_${rowId}_weight`;
+
+				const carriedField = `repeating_item_${rowId}_carried`;
+
+				const totalWeightField = `repeating_item_${rowId}_weighttotal`;
+
+				const totalCostField = `repeating_item_${rowId}_costtotal`; 
+
+				const values = [
+					countField,
+					costField,
+					weightField,
+					carriedField
+				];
+
+				getAttrs(values, values => {
+
+					const totalWeight = Number(Math.round(values[countField] * values[weightField] * values[carriedField] * 1000) / 1000).toFixed(3);
+
+					const totalCost = Number(Math.round(values[countField] * values[costField] * 100) / 100).toFixed(2);
+
+					let attribs = {};
+
+					attribs[totalWeightField] = totalWeight;
+
+					attribs[totalCostField] = totalCost;
+
+					setAttrs(attribs);
+
+				});
+
+			});
+
+		});
+
+	}
+
+	/**
+	 * Loop through each spell, set sync field = 1 (true)
+	 * this forces the spell to recalculate the value.
+	 */ 
+	resyncRepeatingSpells = () => {
+
+		getSectionIDs("repeating_spells", ids => {
+
+			console.groupCollapsed("--resyncRepeatingSpells--");
+
+			ids.forEach(rowId => {
+				
+				const syncFieldName = `repeating_spells_${rowId}_sync`;
+
+				// force the value to 1, to resync the skill
+				let attribs = {};
+
+				attribs[syncFieldName] = 1;
+
+				console.info(`update linked items for rowId: ${rowId}`);
+
+				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
+
+			});
+
+			
+			console.groupEnd();
+
+		});
 
 	}
 
