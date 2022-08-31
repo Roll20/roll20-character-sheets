@@ -2455,8 +2455,15 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             let powerInfo = {};
             powerInfo[`repeating_${section}_action`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action}`;
             if (parse.attribute === name && eventInfo.newValue) {
+                let displayDiscipline = discipline;
                 let tier = name.includes('science') ? 'Science' : 'Devotion';
-                let power = PSIONIC_POWERS[discipline][tier][eventInfo.newValue];
+                let powerTable = PSIONIC_POWERS[discipline];
+                let power = powerTable[tier][eventInfo.newValue];
+                if (discipline === 'Attack' || discipline === 'Defense') {
+                    displayDiscipline = 'Telepathic';
+                    tier = power ? tier : 'Science';
+                    power = power || powerTable[tier][eventInfo.newValue];
+                }
                 console.log(power);
                 if (power) {
                     powerInfo[`repeating_${section}_powerscore-nomod${number}`] = power['attribute'];
@@ -2466,7 +2473,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
                     let macroBuilder = [];
                     macroBuilder.push(`title=@{${name}}`);
-                    macroBuilder.push(`discipline=${discipline}`);
+                    macroBuilder.push(`discipline=${displayDiscipline}`);
                     macroBuilder.push(`tier=${tier}`);
                     macroBuilder.push(`initial=@{PSP-cost${cost_number}}`);
                     macroBuilder.push(`maintenance=@{PSP-cost-maintenance}`);
