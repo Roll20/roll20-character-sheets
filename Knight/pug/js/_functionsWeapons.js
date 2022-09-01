@@ -3136,7 +3136,7 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
   return result;
 }
 
-function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
+async function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
@@ -3158,9 +3158,6 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   let C5 = '';
   let C6 = '';
   let C7 = '';
-  let C5Nom = '';
-  let C6Nom = '';
-  let C7Nom = '';
 
   let ODWarrior = 0;
   let warrior250PG = 0;
@@ -3173,6 +3170,8 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
 
   let bonusWarrior = 0;
   let isConditionnelA = false;
+
+  let attrsCarac;
 
   switch (armure) {
     case 'barbarian':
@@ -3246,31 +3245,29 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       C6 = value.caracteristiqueTotem2;
       C7 = value.caracteristiqueTotem3;
 
-      C5Nom = C5.slice(2, -1);
-      C6Nom = C6.slice(2, -1);
-      C7Nom = C7.slice(2, -1);
+      attrsCarac = await getCarac(1, C5, C6, C7, '0');
 
       if (shaman === 1 || shaman === 2 || shaman === 3) {
-        if (C5 !== '0') {
-          exec.push(`{{totem1=${CaracNom[C5Nom]}}}`);
-          cRoll.push(C5);
-          ODShaman.push(`@{${ODValue[C5Nom]}}`);
+        if (attrsCarac.C1) {
+          exec.push(`{{totem1=${attrsCarac.C1Nom}}}`);
+          cRoll.push(attrsCarac.C1Base);
+          ODShaman.push(`${attrsCarac.C1OD}`);
         }
       }
 
       if (shaman === 2 || shaman === 3) {
-        if (C6 !== '0') {
-          exec.push(`{{totem2=${CaracNom[C6Nom]}}}`);
-          cRoll.push(C6);
-          ODShaman.push(`@{${ODValue[C6Nom]}}`);
+        if (attrsCarac.C2) {
+          exec.push(`{{totem2=${attrsCarac.C2Nom}}}`);
+          cRoll.push(attrsCarac.C2Base);
+          ODShaman.push(`${attrsCarac.C2OD}`);
         }
       }
 
       if (shaman === 3) {
-        if (C7 !== '0') {
-          exec.push(`{{totem3=${CaracNom[C7Nom]}}}`);
-          cRoll.push(C7);
-          ODShaman.push(`@{${ODValue[C7Nom]}}`);
+        if (attrsCarac.C3) {
+          exec.push(`{{totem3=${attrsCarac.C3Nom}}}`);
+          cRoll.push(attrsCarac.C3Base);
+          ODShaman.push(`${attrsCarac.C3OD}`);
         }
       }
 
@@ -3390,7 +3387,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   return result;
 }
 
-function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
+async function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
@@ -3411,8 +3408,8 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
   let MALShaman = 0;
   let C5 = '';
   let C6 = '';
-  let C5Nom = '';
-  let C6Nom = '';
+
+  let attrsCarac;
 
   let ODMALWarrior = 0;
 
@@ -3488,22 +3485,21 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
       C5 = value.MALCaracteristiqueTotem1;
       C6 = value.MALCaracteristiqueTotem2;
 
-      C5Nom = C5.slice(2, -1);
-      C6Nom = C6.slice(2, -1);
+      attrsCarac = await getCarac(0, C5, C6, '0', '0');
 
       if (MALShaman === 1 || MALShaman === 2) {
-        if (C5 !== '0') {
-          exec.push(`{{MALTotem1=${CaracNom[C5Nom]}}}`);
-          cRoll.push(C5);
-          ODMALShaman.push(`@{${ODNom[C5Nom]}}`);
+        if (attrsCarac.C1) {
+          exec.push(`{{MALTotem1=${attrsCarac.C1Nom}}}`);
+          cRoll.push(attrsCarac.C1Base);
+          ODMALShaman.push(`${attrsCarac.C1OD}`);
         }
       }
 
       if (MALShaman === 2) {
-        if (C6 !== '0') {
-          exec.push(`{{MALTotem2=${CaracNom[C6Nom]}}}`);
-          cRoll.push(C6);
-          ODMALShaman.push(`@{${ODNom[C6Nom]}}`);
+        if (attrsCarac.C2) {
+          exec.push(`{{MALTotem2=${attrsCarac.C2Nom}}}`);
+          cRoll.push(attrsCarac.C2Base);
+          ODMALShaman.push(`${attrsCarac.C2OD}`);
         }
       }
 
