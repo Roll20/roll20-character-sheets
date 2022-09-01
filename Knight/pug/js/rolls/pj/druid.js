@@ -227,7 +227,16 @@ on('clicked:druidLionArmeBase', async (info) => {
 
   bonus = bonus.concat(AE);
 
-  exec.push(`{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`);
+  const pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+  const malusRoll = 0;
+  const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+  const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+  const baseJet = '{{basejet=[[0]]}}';
+
+  exec.push(jet);
+  exec.push(baseJet);
   exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
   exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
@@ -260,6 +269,7 @@ on('clicked:druidLionArmeBase', async (info) => {
   const finalRoll = await startRoll(exec.join(' '));
 
   const tJet = finalRoll.results.jet.result;
+  const rJet = finalRoll.results.jet.dice;
 
   const tBonus = finalRoll.results.bonus.result;
   const tExploit = finalRoll.results.Exploit.result;
@@ -276,22 +286,28 @@ on('clicked:druidLionArmeBase', async (info) => {
     equilibre,
   };
 
-  const computed = updateRoll(finalRoll, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
+  const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
 
-  const finalComputed = {
-    jet: tJet + tBonus,
-  };
+  finishRoll(finalRoll.rollId, computed);
 
-  Object.assign(finalComputed, computed);
-
-  finishRoll(finalRoll.rollId, finalComputed);
-
-  if (tJet !== 0 && tJet === tExploit) {
+  if (tJet !== 0 && computed.basejet === tExploit) {
     const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
-    const tRExploit = exploitRoll.results.jet.result;
+    const rExploit = exploitRoll.results.jet.dice;
+    const exploitPairOrImpair = 0;
+
+    const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+      const vC = valeurCourante;
+      let nV = 0;
+
+      if (vC % 2 === exploitPairOrImpair) {
+        nV = 1;
+      }
+
+      return accumulateur + nV;
+    }, 0);
 
     const exploitComputed = {
-      jet: tRExploit,
+      jet: jetExploit,
     };
 
     finishRoll(exploitRoll.rollId, exploitComputed);
@@ -1473,7 +1489,16 @@ on('clicked:MALDruidLionArmeBase', async (info) => {
 
   bonus = bonus.concat(AE);
 
-  exec.push(`{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`);
+  const pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+  const malusRoll = 0;
+  const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+  const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+  const baseJet = '{{basejet=[[0]]}}';
+
+  exec.push(jet);
+  exec.push(baseJet);
   exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
   exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
@@ -1506,6 +1531,7 @@ on('clicked:MALDruidLionArmeBase', async (info) => {
   const finalRoll = await startRoll(exec.join(' '));
 
   const tJet = finalRoll.results.jet.result;
+  const rJet = finalRoll.results.jet.dice;
 
   const tBonus = finalRoll.results.bonus.result;
   const tExploit = finalRoll.results.Exploit.result;
@@ -1522,22 +1548,28 @@ on('clicked:MALDruidLionArmeBase', async (info) => {
     equilibre,
   };
 
-  const computed = updateRoll(finalRoll, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
+  const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
 
-  const finalComputed = {
-    jet: tJet + tBonus,
-  };
+  finishRoll(finalRoll.rollId, computed);
 
-  Object.assign(finalComputed, computed);
-
-  finishRoll(finalRoll.rollId, finalComputed);
-
-  if (tJet !== 0 && tJet === tExploit) {
+  if (tJet !== 0 && computed.basejet === tExploit) {
     const exploitRoll = await startRoll(`$${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
-    const tRExploit = exploitRoll.results.jet.result;
+    const rExploit = exploitRoll.results.jet.dice;
+    const exploitPairOrImpair = 0;
+
+    const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+      const vC = valeurCourante;
+      let nV = 0;
+
+      if (vC % 2 === exploitPairOrImpair) {
+        nV = 1;
+      }
+
+      return accumulateur + nV;
+    }, 0);
 
     const exploitComputed = {
-      jet: tRExploit,
+      jet: jetExploit,
     };
 
     finishRoll(exploitRoll.rollId, exploitComputed);
@@ -2596,7 +2628,7 @@ druidRollFighter.forEach((button) => {
       equilibre,
     };
 
-    const computed = updateRoll(finalRoll, tDegats, rDegats, [], tViolence, rViolence, [], conditions);
+    const computed = updateRoll(finalRoll, [], 0, tDegats, rDegats, [], tViolence, rViolence, [], conditions);
 
     finishRoll(finalRoll.rollId, computed);
   });

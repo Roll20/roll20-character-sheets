@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="03-00-00" />
+<input type="hidden" name="attr_version" value="03-02-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -1327,7 +1327,7 @@
     </div>
     <div class="adversary-fell-abilities">
         <h1 data-i18n="fell-ability">Fell Ability</h1>
-        <span/>
+        <span />
         <label class="empf-black left" data-i18n="description">Description</label>
     </div>
     <fieldset class="repeating_fell-abilities">
@@ -1555,7 +1555,7 @@
             target, 
             closefit="",
             closefitStr="",
-            keen="",
+            keen=10,
             match=[];
 
         act = capitalize(act); 
@@ -1742,10 +1742,10 @@
 
         // GREATNESS & FEAT DIE 
         // Test for piercing blow on crit success
-        outcome = rolltype === "combat" && (outcome === 2) ? 3 : outcome; 
+        outcome = rolltype.startsWith("combat") && (outcome === 2) ? 3 : outcome; 
         clog(`Outcome after Crit: ${outcome}`);
         // Piercing blow also at 10 or 8/9 if the used weapon is keen 
-        outcome = rolltype === "combat" && (outcome === 1) && (rollFeat >= keen && rollFeat <= 10) ? 3 : outcome; 
+        outcome = rolltype.startsWith("combat") && (outcome === 1) && (rollFeat >= keen && rollFeat <= 10) ? 3 : outcome; 
         clog(`Outcome after Piercing or Keen: ${outcome}`);
         // count number of 6s in success, great or extraordinary success
         // Count the number of sixes rolled, to report degree of success
@@ -2722,7 +2722,7 @@
                 }
             }
 
-            if (build < 19) {
+            if (build < 20) {
                 attrs["build"] = 20;
                 let releaselog = {msg:""};
                 hlog(`Release 03.0.0 - ${new Date().toLocaleString()}`, releaselog);
@@ -2741,7 +2741,7 @@
                 }
             }
 
-            if (build < 20) {
+            if (build < 21) {
                 attrs["build"] = 21;
                 let releaselog = {msg:""};
                 hlog(`Release 03.01.00 - ${new Date().toLocaleString()}`, releaselog);
@@ -2751,6 +2751,24 @@
 ### Features
 - msg custom rolltemplate: added header-alt, sub1-alt, sub2-alt and fixe horizontal line hides correctly
 - added button to post fell abilities of adversaries to chat
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+            if (build < 22) {
+                attrs["build"] = 22;
+                let releaselog = {msg:""};
+                hlog(`Release 03.02.00 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Fixed
+- Target attacks calculated "piercing blow" correctly
                         `, releaselog);
                         hlog("==============", releaselog);
                         attrs['releaselog'] =  releaselog.msg + values['releaselog'];

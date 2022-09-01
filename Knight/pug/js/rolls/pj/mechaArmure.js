@@ -462,9 +462,16 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     cRoll.push(Number(attrs.mechaArmurePuissance));
     exec.push(`{{vPuissance=+${Number(attrs.mechaArmurePuissance)}D}}`);
 
-    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+    const pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+    const malusRoll = 0;
+    const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+    const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+    const baseJet = '{{basejet=[[0]]}}';
 
     exec.push(jet);
+    exec.push(baseJet);
     exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
     exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
@@ -502,6 +509,7 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     const finalRoll = await startRoll(exec.join(' '));
 
     const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
 
     const tBonus = finalRoll.results.bonus.result;
     const tExploit = finalRoll.results.Exploit.result;
@@ -519,21 +527,28 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
       isSurprise,
     };
 
-    const computed = updateRoll(finalRoll, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
 
-    const finalComputed = {
-      jet: tJet + tBonus,
-    };
+    finishRoll(finalRoll.rollId, computed);
 
-    Object.assign(finalComputed, computed);
-
-    finishRoll(finalRoll.rollId, finalComputed);
-
-    if (tJet !== 0 && tJet === tExploit) {
+    if (tJet !== 0 && computed.basejet === tExploit) {
       const exploitRoll = await startRoll(`@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
-      const tRExploit = exploitRoll.results.jet.result;
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
       const exploitComputed = {
-        jet: tRExploit,
+        jet: jetExploit,
       };
 
       finishRoll(exploitRoll.rollId, exploitComputed);
@@ -657,7 +672,14 @@ rollCombatArchangel.forEach((button) => {
 
     let bCarac;
 
+    let pairOrImpair;
+
+    let malusRoll;
+    let total;
+
     let jet;
+    let baseJet;
+
     let cRoll = [];
     const rollBonus = [];
     const cBase = [];
@@ -768,9 +790,16 @@ rollCombatArchangel.forEach((button) => {
           exec.push(`{{mod=${mod}}}`);
         }
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -816,6 +845,7 @@ rollCombatArchangel.forEach((button) => {
     const finalRoll = await startRoll(exec.join(' '));
 
     const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
 
     const tBonus = finalRoll.results.bonus.result;
     const tExploit = finalRoll.results.Exploit.result;
@@ -832,21 +862,28 @@ rollCombatArchangel.forEach((button) => {
       equilibre,
     };
 
-    const computed = updateRoll(finalRoll, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
 
-    const finalComputed = {
-      jet: tJet + tBonus,
-    };
+    finishRoll(finalRoll.rollId, computed);
 
-    Object.assign(finalComputed, computed);
-
-    finishRoll(finalRoll.rollId, finalComputed);
-
-    if (tJet !== 0 && tJet === tExploit) {
+    if (tJet !== 0 && computed.basejet === tExploit) {
       const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
-      const tRExploit = exploitRoll.results.jet.result;
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
       const exploitComputed = {
-        jet: tRExploit,
+        jet: jetExploit,
       };
 
       finishRoll(exploitRoll.rollId, exploitComputed);
@@ -1017,7 +1054,13 @@ rollCombatNephilim.forEach((button) => {
 
     let bCarac;
 
+    let pairOrImpair;
+
+    let malusRoll;
+    let total;
+
     let jet;
+    let baseJet;
     let cRoll = [];
     const rollBonus = [];
     const cBase = [];
@@ -1124,9 +1167,16 @@ rollCombatNephilim.forEach((button) => {
         degats += getStyle.diceDegats;
         violence += getStyle.diceViolence;
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -1245,9 +1295,16 @@ rollCombatNephilim.forEach((button) => {
           exec.push(`{{mod=${mod}}}`);
         }
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -1292,6 +1349,7 @@ rollCombatNephilim.forEach((button) => {
     const finalRoll = await startRoll(exec.join(' '));
 
     const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
 
     const tBonus = finalRoll.results.bonus.result;
     const tExploit = finalRoll.results.Exploit.result;
@@ -1310,21 +1368,28 @@ rollCombatNephilim.forEach((button) => {
       isUltraviolence,
     };
 
-    const computed = updateRoll(finalRoll, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
 
-    const finalComputed = {
-      jet: tJet + tBonus,
-    };
+    finishRoll(finalRoll.rollId, computed);
 
-    Object.assign(finalComputed, computed);
-
-    finishRoll(finalRoll.rollId, finalComputed);
-
-    if (tJet !== 0 && tJet === tExploit) {
+    if (tJet !== 0 && computed.basejet === tExploit) {
       const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
-      const tRExploit = exploitRoll.results.jet.result;
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
       const exploitComputed = {
-        jet: tRExploit,
+        jet: jetExploit,
       };
 
       finishRoll(exploitRoll.rollId, exploitComputed);
@@ -1442,7 +1507,7 @@ rollDemon.forEach((button) => {
       equilibre,
     };
 
-    const computed = updateRoll(finalRoll, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+    const computed = updateRoll(finalRoll, [], 0, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
 
     finishRoll(finalRoll.rollId, computed);
   });
@@ -1470,7 +1535,14 @@ rollCombatDemon.forEach((button) => {
     let attrs = [];
     let attrsCarac = [];
 
+    let pairOrImpair;
+
+    let malusRoll;
+    let total;
+
     let jet;
+    let baseJet;
+
     let cRoll = [];
     const rollBonus = [];
     const cBase = [];
@@ -1588,9 +1660,16 @@ rollCombatDemon.forEach((button) => {
           exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
         }
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -1687,9 +1766,16 @@ rollCombatDemon.forEach((button) => {
 
         rollBonus.push(cOD);
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -1799,9 +1885,16 @@ rollCombatDemon.forEach((button) => {
           exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
         }
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -1927,9 +2020,16 @@ rollCombatDemon.forEach((button) => {
           exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
         }
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (cOD.length === 0) { cOD.push(0); }
@@ -1981,39 +2081,55 @@ rollCombatDemon.forEach((button) => {
     const finalRoll = await startRoll(exec.join(' '));
 
     const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
 
     const tBonus = finalRoll.results.bonus.result;
     const tExploit = finalRoll.results.Exploit.result;
 
-    const finalComputed = {
-      jet: tJet + tBonus,
-    };
+    let rDegats = [];
+    let tDegats = 0;
+
+    let rViolence = [];
+    let tViolence = 0;
+
+    let conditions = {};
 
     if (button !== 'MADjinnWraith') {
-      const rDegats = finalRoll.results.degats.dice;
-      const rViolence = finalRoll.results.violence.dice;
+      rDegats = finalRoll.results.degats.dice;
+      rViolence = finalRoll.results.violence.dice;
 
-      const tDegats = finalRoll.results.degats.result;
-      const tViolence = finalRoll.results.violence.result;
+      tDegats = finalRoll.results.degats.result;
+      tViolence = finalRoll.results.violence.result;
 
-      const conditions = {
+      conditions = {
         bourreau,
         devaste,
         equilibre,
       };
-
-      const computed = updateRoll(finalRoll, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
-
-      Object.assign(finalComputed, computed);
     }
 
-    finishRoll(finalRoll.rollId, finalComputed);
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
 
-    if (tJet !== 0 && tJet === tExploit) {
+    finishRoll(finalRoll.rollId, computed);
+
+    if (tJet !== 0 && computed.basejet === tExploit) {
       const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
-      const tRExploit = exploitRoll.results.jet.result;
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
       const exploitComputed = {
-        jet: tRExploit,
+        jet: jetExploit,
       };
 
       finishRoll(exploitRoll.rollId, exploitComputed);
