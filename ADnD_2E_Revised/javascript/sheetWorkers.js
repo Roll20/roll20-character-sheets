@@ -15,6 +15,9 @@ const BOOK_FIELDS = [
     'book-combat-and-tactics','book-skills-and-powers','book-spells-and-magic'
 ];
 
+const LEVEL_FIELDS = ['class1','class2','class3','class4','class5',
+    'level-class1','level-class2','level-class3','level-class4','level-class5',]
+
 const SCHOOL_SPELLS_AND_MAGIC = 'school-spells-and-magic';
 const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
 
@@ -166,12 +169,16 @@ const isRollValid = function (rollExpression, field) {
     return true;
 }
 
-const calculateFormula = async function(formulaField, calculatedField, silent = false) {
-    getAttrs([formulaField], async function (values) {
+const LEVEL_REGEX = /@\{level-class[1-5]}/;
+const calculateFormula = function(formulaField, calculatedField, silent = false) {
+    getAttrs([formulaField, ...LEVEL_FIELDS], async function (values) {
         let rollExpression = values[formulaField];
         let valid = isRollValid(rollExpression, formulaField);
         if (!valid)
             return;
+
+        let match = rollExpression.match(LEVEL_REGEX);
+        console.log(match);
 
         setAttrs({
             [calculatedField]: await extractRollResult(rollExpression, formulaField)
@@ -742,6 +749,24 @@ on('clicked:opendoor-check', function (eventInfo){
 });
 //#endregion
 
+const CALCULATION_FIELDS = [
+    { formulaField: 'thac0-base',            calculatedField: 'thac0-base-calc' },
+    // Proficiencies
+    { formulaField: 'weapprof-slots-total',  calculatedField: 'weapprof-slots-total-calc' },
+    { formulaField: 'prof-slots-total',      calculatedField: 'prof-slots-total-calc' },
+    // Psionics
+    { formulaField: 'discipline-progress',   calculatedField: 'discipline-slots' },
+    { formulaField: 'science-progress',      calculatedField: 'science-slots' },
+    { formulaField: 'devotion-progress',     calculatedField: 'devotion-slots' },
+    { formulaField: 'defense-mode-progress', calculatedField: 'defense-mode-slots' },
+    { formulaField: 'psp-progress',          calculatedField: 'PSP_max' },
+];
+CALCULATION_FIELDS.forEach(({formulaField, calculatedField}) => {
+    on(`change:${formulaField}`, function (eventInfo) {
+        calculateFormula(formulaField, calculatedField);
+    });
+});
+
 //#region Wizard and Priest Spells slot counting
 function isNewSpellSection(section) {
     return section.startsWith('wiz') || section.startsWith('pri');
@@ -1263,12 +1288,6 @@ const updateNonprofPenalty = function () {
 }
 on('change:nonprof-penalty', function (eventInfo){
     updateNonprofPenalty();
-});
-
-//Used in version.js
-const updateThac0 = (silent) => calculateFormula('thac0-base', 'thac0-base-calc', silent);
-on('change:thac0-base', function(eventInfo) {
-    updateThac0(false);
 });
 
 on('change:thac0-base-calc', function(eventInfo) {
@@ -2175,11 +2194,6 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
 
 //#region Proficiencies
 //Weapon proficiency slots
-//Used in version.js
-const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc');
-on('change:weapprof-slots-total', function (eventInfo) {
-    updateWeaponProfsTotal();
-});
 const updateWeaponProfsRemaining = () => repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprof-slots-total-calc', function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['weapprofnum']))
@@ -2203,11 +2217,6 @@ on('change:repeating_weaponprofs:weapprofname', function(eventInfo) {
 });
 
 //Nonweapon proficiency slots
-//Used in version.js
-const updateNonWeaponProfsTotal = () => calculateFormula('prof-slots-total', 'prof-slots-total-calc');
-on('change:prof-slots-total', function (eventInfo) {
-    updateNonWeaponProfsTotal();
-});
 const updateNonWeaponProfsRemaining = () => repeatingCalculateRemaining('profs', ['profslots'], 'prof-slots-total-calc', 'prof-slots-remain');
 on('change:repeating_profs:profslots remove:repeating_profs change:prof-slots-total-calc', function(eventInfo){
     if (doEarlyReturn(eventInfo, ['profslots']))
@@ -2239,6 +2248,7 @@ on('change:repeating_profs:profname', function (eventInfo) {
         setAttrs(nonweaponProfInfo);
     });
 });
+//#endregion
 
 //#region Special Talents
 on('change:repeating_talents:talentname', function (eventInfo) {
@@ -2402,6 +2412,7 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
     repeatingMultiplySum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
 })
 
+//#region Psionic stuff
 // Psionic tabs, control hidden or visible options
 const setPsionicDisciplineVisibility = function(newValue) {
     let elements = $20('.sheet-section-psionics option.sheet-hidden');
@@ -2551,6 +2562,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
         });
     });
 });
+//#endregion
 
 // Show / Hide buttons for various repeating sections
 const REPEATING_SECTIONS = [
