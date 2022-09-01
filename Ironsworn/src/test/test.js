@@ -91,18 +91,19 @@ window.setAttrs = (attributeValues, isInit) => {
 
       function setValue(inputParent) {
         // set input value
-        const shortName = attribute.shortName.toLowerCase();
+        const shortName = attribute.shortName;
         const inputName = ATTR_PREFIX + shortName;
 
         console.log(`Updating input ${inputName}${attribute.sectionName ? ' in ' + attribute.sectionName + '_' + attribute.rowId : ''} with value ${attribute.newValue}`);
 
-        let input = inputParent.find(`input[name='${inputName}'], input[data-attrname='${shortName}'], select[name='${inputName}'], textarea[name='${inputName}']`);
+        let input = inputParent.find(`input[name='${inputName}'], input[data-attrname='${shortName}'], select[name='${inputName}'], textarea[name='${inputName}'],
+          input[name='${inputName.toLowerCase()}'], input[data-attrname='${shortName.toLowerCase()}'], select[name='${inputName.toLowerCase()}'], textarea[name='${inputName.toLowerCase()}']`);
         if (!input.prop('disabled')) { // it seems roll20 explicitly does not update values of disabled inputs (perhaps linked to autocalc inputs needing to be disabled)
           input.val([attribute.newValue]);
         }
 
         // set span text
-        let span = inputParent.find(`span[name='${inputName}']`);
+        let span = inputParent.find(`span[name='${inputName}'], span[name='${inputName.toLowerCase()}']`);
         span.text(attribute.newValue);
       }
 
@@ -269,11 +270,13 @@ $(document).ready(function () {
     });
 
     addButton.click(e => {
-      const button = $(e.target);
-
-      // add a new rep item
-      const repContainer = button.parent().prev();
-      createSectionRow(repContainer, generateRowID());
+      // add new rep items
+      const repContainers = $(`.repcontainer[data-groupname="${sectionName}"]`);
+      const rowId = generateRowID();
+      repContainers.each(function () { // loop on all matching containers to support fieldsets with same name
+        const repContainer = $(this);
+        createSectionRow(repContainer, rowId);
+      });
     });
   });
 
@@ -305,7 +308,6 @@ function instrumentInputs(root) {
       const rowId = repItem.attr('data-reprowid');
       attributeName = `${sectionName}_${rowId}_${attributeName}`;
     }
-    attributeName = attributeName.toLowerCase();
 
     if (input.attr('type') == 'radio' || input.attr('type') == 'checkbox') {
       if (input.prop('checked')) {
