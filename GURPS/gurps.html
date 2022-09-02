@@ -4358,12 +4358,10 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.8.2 -->				
+				<!-- current version notes: 2.8.3 -->			
 				<ul>
 					<li>
-						Options. Sheet-options tab. Added initial <b>Resync</b> button. 
-						First iteration resyncs Skills, Techniques, and spells, along with items linked to them.
-						Followed by resyncing the weight and cost of items in the inventory.
+						Options Tab. Sheet Options sub-tab. Resync button - made some improvements with data syncing for skills and spells.
 					</li>
 				</ul>
 				
@@ -14029,7 +14027,19 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.8.2 -->
+			<!-- current version notes: 2.8.3 -->
+			<ul>
+				<li>
+					Options Tab. Sheet Options sub-tab. Resync button - when resyncing skills and and spells, it now pulls the latest attribure value. 
+					Depending on the size of character sheet and other performance issues, sometimes updating an attribute like Dexterity doesn't 
+					update all the related skills that use that attribute.
+				</li>
+			</ul>
+			
+			<h4>Version: 2.8.2</h4>
+
+			<p>Pull Request: 8/29/2022</p>	
+
 			<ul>
 				<li>
 					Options. Sheet-options tab. Added initial <b>Resync</b> button. 
@@ -15067,6 +15077,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 							<span data-i18n="resync-character-label">Resync Character Sheet</span>
 						</h4>
 						<div class="reset resync">
+							<input type="hidden" name="attr_resync_state" value="normal" />
 							<button type="action" name="act_resync" class="reset">
 								<span data-i18n="resync-label">Resync</span>
 							</button>
@@ -17255,9 +17266,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.8.2";
+	const version = "2.8.3";
 	
-	const latestChangesDate = "8/29/2022";
+	const latestChangesDate = "9/1/2022";
 	
 	let modCascade = true;
 	
@@ -18132,6 +18143,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		sumRepeating('repeating_item', 'weighttotal', function (v) {
 			setAttrs({ total_weight: Number(Math.round(v * 1000) / 1000).toFixed(3) });
 		});
+
 		sumRepeating('repeating_item', 'costtotal', function (v) {
 			setAttrs({ total_value: Number((v * 100) / 100).toFixed(2) }, { silent: true });
 		});
@@ -19196,14 +19208,32 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	on('change:repeating_skills:base change:repeating_skills:difficulty change:repeating_skills:bonus change:repeating_skills:points change:repeating_skills:sync', (event) => {
 	
 		// check if this is a valid sync
-		let isSync = String(event.sourceAttribute).endsWith("sync");
+		const isSync = String(event.sourceAttribute).endsWith("sync");
 	
-		let syncValue = Number(event.newValue);
-	
-		if (isSync && syncValue !== 1) {
-			return;
+		if (isSync) {
+
+			const attributeName = event.sourceAttribute;
+
+			// if this a sync, then we need to check it's value. If it's 1 then we want to resync all the data
+			getAttrs([attributeName], values => {
+
+				const syncValue = Number(values[attributeName]);
+
+				if (syncValue === 1) {
+					updateRepeatingSkillValues();
+				}
+
+			});
+			
+		} else {
+
+			updateRepeatingSkillValues();
 		}
 	
+	});
+
+	updateRepeatingSkillValues = () => {
+
 		let fieldValues = [
 			"repeating_skills_base",
 			"repeating_skills_difficulty",
@@ -19286,8 +19316,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			);
 	
 		});
-	
-	});
+
+	}
 	
 	on("change:repeating_skills:level", (event) => {
 	
@@ -19312,12 +19342,30 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		// check if this is a valid sync
 		const isSync = String(event.sourceAttribute).endsWith("sync");
 	
-		const syncValue = Number(event.newValue);
-	
-		if (isSync && syncValue !== 1) {
-			return;
+		if (isSync) {
+
+			const attributeName = event.sourceAttribute;
+
+			// if this a sync, then we need to check it's value. If it's 1 then we want to resync all the data
+			getAttrs([attributeName], values => {
+
+				const syncValue = Number(values[attributeName]);
+
+				if (syncValue === 1) {
+					updateRepeatingSpellValues();
+				}
+
+			});
+
+		} else {
+
+			updateRepeatingSpellValues();
 		}
 	
+	});
+
+	updateRepeatingSpellValues = () => {
+
 		let fieldValues = [
 			"repeating_spells_base",
 			"repeating_spells_bonus",
@@ -19368,8 +19416,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			);
 	
 		});
-	
-	});
+
+	}
 	
 	// if toggle is clicked, update the display id.
 	// event = {sourceAttribute, sourceType, triggerName, sourceAttribute, previousValue, newValue}
@@ -24591,7 +24639,21 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		// by setting sync to 1, this trigger the change event on("change:repeating_skills:sync") OR on("change:repeating_spells:sync")
 		// which updates the skill level
-		setAttrs(fieldsToUpdate);
+		setAttrs(fieldsToUpdate, null, () => {
+
+			let fieldsToZero = {};
+	
+			ids.forEach(id => {
+	
+				const syncFieldName = `${sectionName}_${id}_sync`;
+
+				fieldsToZero[syncFieldName] = 0;
+
+			});
+
+			setAttrs(fieldsToZero);
+
+		});
 	
 	}
 	
@@ -33599,15 +33661,25 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	// resync character sheet
 	on("clicked:resync", event => {
 	
-		resyncRepeatingSkills();
+		setAttrs({resync_state: "clicked"}, () => {
 
-		resyncRepeatingTechniques();
+			resyncRepeatingSkills();
 
-		resyncRepeatingItems();
+			resyncRepeatingTechniques();
 
-		resyncRepeatingSpells();
+			resyncRepeatingItems();
+
+			resyncRepeatingSpells();
+
+		});
 
 	});
+
+	resetResyncButtonSate = () => {
+
+		setAttrs({resync_state: "normal"});
+
+	}
 
 	/**
 	 * Loop through each skill, set sync field = 1 (true)
@@ -33629,6 +33701,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				attribs[syncFieldName] = 1;
 
 				console.info(`update linked items for rowId: ${rowId}`);
+				console.info(attribs);
 
 				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
 

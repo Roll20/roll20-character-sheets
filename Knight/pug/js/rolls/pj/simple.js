@@ -113,7 +113,7 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, [], true);
+  const armorBonus = await getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, [], true);
 
   exec = exec.concat(armorBonus.exec);
   cRoll = cRoll.concat(armorBonus.cRoll);
@@ -124,7 +124,7 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
   ODShaman = ODShaman.concat(armorBonus.ODShaman);
   ODWarrior.push(armorBonus.ODWarrior);
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, [], true);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, [], true);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);

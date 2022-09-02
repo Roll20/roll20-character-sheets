@@ -4532,7 +4532,8 @@ on('clicked:roll_spellcasting_detailed', async (event) => {
 	let rollResult = await startRoll(rollBase);
 
 	let computedValues = await resolveChecks(
-		checkFumble(rollResult)
+		checkFumble(rollResult),
+		checkLocation(rollResult)
 	);
 
 	finishRoll(
@@ -4581,7 +4582,7 @@ on('clicked:reactblock', async (ev) => {
 });
 
 const doDefense = async (passin, rollBase) => {
-    let rollResult = await startRoll(rollBase+'{{fumble=[[1d10!]]}}{{rolllocation=[[0]]}}{{attackerRoll=[[0]]}}{{hit=[[0]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}{{passthrough=[[0]]}}');
+    let rollResult = await startRoll(rollBase+`{{fumble=[[1d10!]]}}{{rolllocation=[[0]]}}{{attackerRoll=[[0]]}}{{hit=[[0]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}{{weapon_effect=${passin.weapon_effect}}}{{passthrough=[[0]]}}`);
 
 	let computedValues = await resolveChecks(
 		checkFumble(rollResult),
@@ -4596,6 +4597,9 @@ const doDefense = async (passin, rollBase) => {
 	computedValues.hit = hit;
 
 	let damageObject = await calculateDamage(passin, hit);
+	if(!!damageObject) {
+		damageObject.weapon_effect = passin.weapon_effect;
+	}
 
 	computedValues = Object.assign(computedValues, damageObject);
 	computedValues.passthrough = rollEscape.escape(damageObject);
@@ -4655,7 +4659,7 @@ on('clicked:monsterlocation', async (ev) => {
 	let passin = rollEscape.unescape(ev.originalRollId);
 	console.log(passin);
 
-	let rollBase = "@{whisper}&{template:monsterlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}"
+	let rollBase = `@{whisper}&{template:monsterlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}{{weapon_effect=${passin.weapon_effect}}}`
 	let rollResult = await startRoll(rollBase);
 
 	console.log(rollResult);
@@ -4695,7 +4699,7 @@ on('clicked:humanlocation', async (ev) => {
 	let passin = rollEscape.unescape(ev.originalRollId);
 	console.log(passin);
 
-	let rollBase = "@{whisper}&{template:humanlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}"
+	let rollBase = `@{whisper}&{template:humanlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}{{weapon_effect=${passin.weapon_effect}}}`
 	let rollResult = await startRoll(rollBase);
 
 	console.log(rollResult);
@@ -4931,7 +4935,7 @@ on('clicked:templatejointrangedattack', async (ev) => {
 });
 
 const doTemplateAttack = async (passin, rollBase) => {
-	let attrs = await asw.getAttrs([passin.weapon_name, "useAttackDefenseChain"]);
+	let attrs = await asw.getAttrs([passin.weapon_name, passin.weapon_effect, "useAttackDefenseChain"]);
 
     let rollResult = await startRoll(rollBase+'{{rolllocation=[[0]]}}{{passthrough=[[0]]}}{{passthrough2=[[0]]}}{{useAttackDefenseChain=[[0]]}}');
 
@@ -4947,6 +4951,7 @@ const doTemplateAttack = async (passin, rollBase) => {
         weapon_name: attrs[passin.weapon_name],
        	roll: computedValues.roll,
 		weapon_dmg: passin.weapon_dmg,
+		weapon_effect: attrs[passin.weapon_effect],
 		attackmultiplier: !!passin.attackmultiplier ? passin.attackmultiplier : 1,
 		rolllocation: computedValues.rolllocation,
 		locationmultiplier: computedValues.locationmultiplier
@@ -4956,6 +4961,7 @@ const doTemplateAttack = async (passin, rollBase) => {
 		weapon_name: attrs[passin.weapon_name],
        	roll: computedValues.roll2,
 		weapon_dmg: rollResult.results.damage2?.result,
+		weapon_effect: attrs[passin.weapon_effect],
 		attackmultiplier: !!passin.attackmultiplier ? passin.attackmultiplier : 1,
 		rolllocation: computedValues.rolllocation2,
 		locationmultiplier: computedValues.locationmultiplier2
@@ -5517,6 +5523,13 @@ const asw = (() => {
 					</td>
 				</tr>
 			{{/rollTotal() computed::rolllocation 0}}
+			{{#weapon_effect}}
+			<tr class="sheet-rolltemplate-calculation">
+				<td>
+					<strong class="template-title">EFFECT:</strong> {{weapon_effect}}
+				</td>
+			</tr>
+			{{/weapon_effect}}
 		{{/rollGreater() computed::hit 0}}
 	</table>
 	{{#rollGreater() computed::hit 0}}
@@ -5556,6 +5569,13 @@ const asw = (() => {
 			</td>
 		</tr>
 		{{/computed::damage}}
+		{{#weapon_effect}}
+		<tr class="sheet-rolltemplate-calculation">
+			<td>
+				<strong class="template-title">EFFECT:</strong> {{weapon_effect}}
+			</td>
+		</tr>
+		{{/weapon_effect}}
 	</table>
 </rolltemplate>
 
@@ -5583,6 +5603,13 @@ const asw = (() => {
 			</td>
 		</tr>
 		{{/computed::damage}}
+		{{#weapon_effect}}
+		<tr class="sheet-rolltemplate-calculation">
+			<td>
+				<strong class="template-title">EFFECT:</strong> {{weapon_effect}}
+			</td>
+		</tr>
+		{{/weapon_effect}}
 	</table>
 </rolltemplate>
 
