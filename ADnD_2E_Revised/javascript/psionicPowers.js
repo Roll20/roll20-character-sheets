@@ -22,7 +22,7 @@ CLAIRSENTIENT['Science']['Aura Sight'] = {
 CLAIRSENTIENT['Science']['Clairaudience'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-3',
-    'context-modifier': '?{How far await is the listening spot?|100 yards (0),0|1000 yards (-2),-2|10 miles (-4),-4|100 miles (-6),-6|1000 miles (-8),-8|10000 miles (-10),-10|Interplanetary (-12),-12}',
+    'context-modifier': '?{Listening spot distance modifier?|0 [100 yards]|-2 [1.000 yards]|-4 [10 miles]|-6 [100 miles]|-8 [1.000 miles]|-10 [10.000 miles]|-12 [Interplanetary]}',
     'initial-cost': '6',
     'maintenance-cost': '4/round',
     'range': 'unlimited',
@@ -42,7 +42,7 @@ CLAIRSENTIENT['Science']['Clairaudience'] = {
 CLAIRSENTIENT['Science']['Clairvoyance'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-4',
-    'context-modifier': '?{How far await is the viewing spot?|100 yards (0),0|1000 yards (-2),-2|10 miles (-4),-4|100 miles (-6),-6|1000 miles (-8),-8|10000 miles (-10),-10|interplanetary (-12),-12}',
+    'context-modifier': '?{Viewing spot distance modifier?|0 [100 yards]|-2 [1.000 yards]|-4 [10 miles]|-6 [100 miles]|-8 [1.000 miles]|-10 [10.000 miles]|-12 [interplanetary]}',
     'initial-cost': '7',
     'maintenance-cost': '4/round',
     'range': 'unlimited',
@@ -467,7 +467,7 @@ PSYCHOKINETIC['Science']['Project Force'] = {
 PSYCHOKINETIC['Science']['Telekinesis'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-3',
-    'context-modifier': '-1*floor(?{Object’s weight in pounds|0}/3)',
+    'context-modifier': '[[ceil(?{Object’s weight in pounds|0}/-3)]] [?{Object’s weight in pounds|0} pounds]',
     'initial-cost': '[[{3,?{Object’s weight in pounds|0}}kh1]]',
     'maintenance-cost': '[[{1,floor(?{Object’s weight in pounds|0}/2)}kh1]]/round',
     'range': '30 yards',
@@ -482,12 +482,12 @@ PSYCHOKINETIC['Science']['Telekinesis'] = {
     'power-score': 'The character can lift a second item of equal or lesser weight simultaneously for the same cost.',
     '20': 'The psionicist “fumbles” the item, knocking it over, etc.',
     '1': '',
-    'effect': 'Telekinesis, or “TK” for short, is the ability to move objects through space without touching them. All telekinetic efforts tend to be physically taxing, because they involve real work. Moving small, light objects is relatively easy. As the objects become more massive, the task becomes significantly more difficult.\n&emsp;The costs above (3 PSPs initially and 1 per round of maintenance) assume that the object being moved weighs 3 pounds or less. For heavier objects, these rules apply:}}{{style=min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c1-2=The initial cost equals the object’s weight in pounds.}}{{c2-2=The maintenance cost is half the initial cost, rounded down.}}{{c3-2=The character’s power score is decreased by one—third of the object’s weight in pounds, rounded down.}}{{effects2=&emsp;For example, to telekinetically snatch a 15-pound battle axe from a rack, a psionicist must pay 15 PSPs and make a power check with a -5 modifier to his score.\n&emsp;A psionicist using TK can move an object up to 60 feet per round. The object can serve as a weapon. In this case, the character attacks using his own THACO score, with a penalty equaling the objects weight modifier (one—third its weight, rounded down).\n&emsp;*Power Score*—The character can lift a second item of equal or lesser weight simultaneously for the same cost.\n&emsp;*20*—The psionicist “fumbles” the item, knocking it over, etc.'
+    'effect': 'Telekinesis, or “TK” for short, is the ability to move objects through space without touching them. All telekinetic efforts tend to be physically taxing, because they involve real work. Moving small, light objects is relatively easy. As the objects become more massive, the task becomes significantly more difficult.\n&emsp;The costs above (3 PSPs initially and 1 per round of maintenance) assume that the object being moved weighs 3 pounds or less. For heavier objects, these rules apply:}}{{style=min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c1-2=The initial cost equals the object’s weight in pounds.}}{{c2-2=The maintenance cost is half the initial cost, rounded down.}}{{c3-2=The character’s power score is decreased by one-third of the object’s weight in pounds, rounded down.}}{{effects2=&emsp;For example, to telekinetically snatch a 15-pound battle axe from a rack, a psionicist must pay 15 PSPs and make a power check with a -5 modifier to his score.\n&emsp;A psionicist using TK can move an object up to 60 feet per round. The object can serve as a weapon. In this case, the character attacks using his own THACO score, with a penalty equaling the objects weight modifier (one—third its weight, rounded down).\n&emsp;*Power Score*—The character can lift a second item of equal or lesser weight simultaneously for the same cost.\n&emsp;*20*—The psionicist “fumbles” the item, knocking it over, etc.'
 };
 PSYCHOKINETIC['Devotion']['Animate Object'] = {
     'attribute': '@{Intelligence}',
     'modifier': '-3',
-    'context-modifier': '?{Material animated?|Cloth / paper (0),0|Live wood / dead animal (-1),-1|Dead wood (-2),-2|Water (-3),-3|Thin metal (-4),-4|Thick metal (-5),-5|Stone (-6),-6}',
+    'context-modifier': '?{Material animated modifier?|0 [Cloth / paper]|-1 [Live wood / dead animal]|-2 [Dead wood]|-3 [Water]|-4 [Thin metal]|-5 [Thick metal]|-6 [Stone]}',
     'initial-cost': '8',
     'maintenance-cost': '3/round',
     'range': '50 yards',
@@ -687,7 +687,7 @@ PSYCHOKINETIC['Devotion']['Inertial Barrier'] = {
 PSYCHOKINETIC['Devotion']['Levitation'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-3',
-    'context-modifier': 'ceil(?{Additional weight (equipment / passengers) in pounds?|0}/-25)',
+    'context-modifier': '[[ceil(?{Additional weight (equipment / passengers) in pounds?|0}/-25)]] [?{Additional weight (equipment / passengers) in pounds?|0} pounds]',
     'initial-cost': '12',
     'maintenance-cost': '2/round',
     'range': '0',
@@ -1491,7 +1491,7 @@ PSYCHOPORTIVE['Science']['Summon Planar Creature'] = {
 PSYCHOPORTIVE['Science']['Teleport'] = {
     'attribute': '@{Intelligence}',
     'modifier': '0',
-    'context-modifier': '?{Distance teleported?|10 yards (+1),1|100 yards (0),0|1000 yards (-1),-1|10 miles (-2),-2|100 miles (-3),-3|1000 miles (-4),-4|10000 miles (-5),-5|planet to planet (-6),-6}',
+    'context-modifier': '?{Distance modifier?|1 [10 yards]|0 [100 yards]|-1 [1.000 yards]|-2 [10 miles]|-3 [100 miles]|-4 [1.000 miles]|-5 [10.000 miles]|-6 [planet to planet]}',
     'initial-cost': '10 +',
     'maintenance-cost': 'na',
     'range': 'infinite',
@@ -1511,7 +1511,7 @@ PSYCHOPORTIVE['Science']['Teleport'] = {
 PSYCHOPORTIVE['Science']['Teleport Other'] = {
     'attribute': '@{Intelligence}',
     'modifier': '-2',
-    'context-modifier': '?{Distance teleported?|10 yards (+1),1|100 yards (0),0|1000 yards (-1),-1|10 miles (-2),-2|100 miles (-3),-3|1000 miles (-4),-4|10000 miles (-5),-5|planet to planet (-6),-6}',
+    'context-modifier': '?{Distance modifier?|1 [10 yards]|0 [100 yards]|-1 [1.000 yards]|-2 [10 miles]|-3 [100 miles]|-4 [1.000 miles]|-5 [10.000 miles]|-6 [planet to planet]}',
     'initial-cost': '20 +',
     'maintenance-cost': 'na',
     'range': '10 yards',
@@ -1551,7 +1551,7 @@ PSYCHOPORTIVE['Devotion']['Astral Projection'] = {
 PSYCHOPORTIVE['Devotion']['Dimensional Door'] = {
     'attribute': '@{Constitution}',
     'modifier': '-1',
-    'context-modifier': '?{Distance between doors?|50 yards (0),0|75 yards (-2),-2|100 yards (-5),-5|150 yards (-8),-8|200 yards (-12),-12}',
+    'context-modifier': '?{Distance between doors modifier?|0 [50 yards]|-2 [75 yards]|-5 [100 yards]|-8 [150 yards]|-12 [200 yards]}',
     'initial-cost': '4',
     'maintenance-cost': '2/round',
     'range': '50 yards +',
@@ -1592,7 +1592,7 @@ PSYCHOPORTIVE['Devotion']['Dream Travel'] = {
     'roll-override': 'Secret by DM',
     'attribute': '@{Wisdom}',
     'modifier': '-4',
-    'context-modifier': '-?{How many passengers? (Excluding the psionist)|0}',
+    'context-modifier': '-?{How many passengers? (Excluding the psionist)|0} [passengers]',
     'initial-cost': '1/25 miles',
     'maintenance-cost': 'na',
     'range': '500 miles',
@@ -1632,7 +1632,7 @@ PSYCHOPORTIVE['Devotion']['Teleport Trigger'] = {
 PSYCHOPORTIVE['Devotion']['Time Shift'] = {
     'attribute': '@{Intelligence}',
     'modifier': '0',
-    'context-modifier': '?{Rounds traveled into the future?|1 round (0),0|2 rounds (-2),-2|3 rounds (-6),-6}',
+    'context-modifier': '?{Rounds traveled into the future modifier?|0 [1 round]|-2 [2 rounds]|-6 [3 rounds]}',
     'initial-cost': '16',
     'maintenance-cost': 'na',
     'range': '0',
@@ -1816,7 +1816,7 @@ TELEPATHIC['Science']['Probe'] = {
 TELEPATHIC['Science']['Psionic Blast'] = ATTACK['Science']['Psionic Blast'] = {
     'attribute': '@{Wisdom}',
     'modifier': '–5',
-    'context-modifier': '?{Range to target?|20 yards (0),0|40 yards (-2),-2|60 yards (-5),-5}',
+    'context-modifier': '?{Range to target modifier?|0 [20 yards]|-2 [40 yards]|-5 [60 yards]}',
     'initial-cost': '10 (both attacks)',
     'maintenance-cost': 'na',
     'range': '20/40/60 yards',
@@ -1976,7 +1976,7 @@ TELEPATHIC['Devotion']['Conceal Thoughts'] = {
 TELEPATHIC['Devotion']['Contact'] = {
     'attribute': '@{Wisdom}',
     'modifier': '0',
-    'context-modifier': '',
+    'context-modifier': '?{Distance modifier?|0 [Line-of-sight]|-1 [1 mile]|-3 [10 miles]|-5 [100 miles]|-7 [1.000 miles]|-9 [10.000 miles]})+(?{Life Order modifier?|0 [Humanoid]|-1 [Mammal (except marsupial)]|-2 [Marsupial]|-3 [Bird]|-4 [Reptile / amphibian]|-5 [Fish]|-6 [Arachnid / insect]|-7 [Monster]|-8 [Plant]}',
     'initial-cost': 'varies',
     'maintenance-cost': '1/round',
     'range': 'special',
@@ -1991,7 +1991,7 @@ TELEPATHIC['Devotion']['Contact'] = {
     'power-score': 'The contact is maintained for four rounds for free.',
     '20': 'Further contact with this mind is impossible at this experience level.',
     '1': '',
-    'effect': 'Contact must be established before virtually any telepathic power can be used on another character or creature. It is just what its name implies—contact between the minds of the telepath and another character or creature. Contact does not allow communication by itself; it is merely the conduit for other telepathic exchanges.\n&emsp;Many telepathic powers list “contact” as their initial cost. That means contact must be established in a previous round before those powers can be used. As long as contact is maintained, the psionicist can use other powers which require it, and can even switch (using attraction and then mindlink on the same subject after contact was established, for example).\n&emsp;A psionicist can maintain contact with more than one subject at a time, but he must contact each one individually, and pay a maintenance cost for each use of the power. For example, if a psionicist wishes to inspire awe in two subjects, he must establish and maintain contact with each one separately.\n&emsp;Once contact is established, it costs 1 PSP per round to maintain. The psionicist can perform any other action while maintaining contact. *If he uses another telepathic power on the same subject while maintaining contact, the contact power is “free”* (the cost of maintaining contact is covered by the other power’s cost).\n&emsp;**Establishing Contact:** The initial cost of contact is based on the target’s level or hit dice, as shown below.}}{{style=bottom2}}{{cs1-1=2}}{{cs2-1=2}}{{cs3-1=2}}{{cs4-1=2}}{{c1-1=1-5 levels or hit dice}}{{c2-1=6-10 levels or hit dice}}{{c3-1=11-15 levels or hit dice}}{{c4-1=16-20 levels or hit dice}}{{c1-2=3 PSPs/round}}{{c2-2=8 PSPs/round}}{{c3-2=13 PSPs/round}}{{c4-2=18 PSPs/round}}{{cc5-1=justify}}{{cs5-1=3}}{{c5-1=\n&emsp;A psionicist cannot contact a subject that he knows nothing about. In other words, he can’t use this power to scan around and “see what’s out there.” He must either have his subject in sight or know specifically who or what he is looking for. He cannot, for example, try to contact any random orc which may or may not be standing behind a closed door. However, he can try to contact a particular orc which he has seen before.\n&emsp;If a psionicist fails to establish contact, he can try again the next round. Failure doesn’t necessarily mean the target’s mind cannot be contacted. Rather, it means the target has not been found yet. The psionicist can continue searching.\n&emsp;Several factors can make telepathic contact difficult to establish:\n\n}}{{cc6-1=min}}{{c6-1=•}}{{cc7-1=min}}{{c7-1=•}}{{cc8-1=min}}{{c8-1=•}}{{cs6-2=2}}{{c6-2=how far the target is (distance)}}{{cs7-2=2}}{{c7-2=resistance by the target—especially if the target is a psionicist}}{{cs8-2=2}}{{c8-2=whether or not the target is an intelligent mammal}} {{cc9-1=justify}}{{cs9-1=3}}{{c9-1=\n&emsp;Each factor is described below.\n\n&emsp;**Distance:** The greater the distance between the two minds, the more difficult it usually becomes to make contact. If the psionicist can see the target—either with normal vision or by using psionic powers—distance is not a factor. If the psionicist cannot see his target, normal range modifiers apply. Simply knowing where to look does not constitute seeing the target.\n\n}}{{cs10-1=2}}{{cs11-1=2}}{{cs12-1=2}}{{cs13-1=2}}{{cs14-1=2}}{{cs15-1=2}}{{cs16-1=2}}{{cc10-1=bottom}}{{c10-1=**Separation**\n**Distance**}}{{c11-1=Line-of-sight}}{{c12-1=1 mile}}{{c13-1=10 miles}}{{c14-1=100 miles}}{{c15-1=1,000 miles}}{{c16-1=10,000 miles}}{{cc10-2=center}}{{cc11-2=center}}{{cc12-2=center}}{{cc13-2=center}}{{cc14-2=center}}{{cc15-2=center}}{{cc16-2=center}}{{c10-2=**Power Score**\n**Modifier**}}{{c11-2=0}}{{c12-2=-1}}{{c13-2=-3}}{{c14-2=-5}}{{c15-2=-7}}{{c16-2=-9}}{{cc17-1=justify}}{{cs17-1=4}}{{c17-1=\n&emsp;The maximum range for establishing contact is 10,000 miles when a psionicist cannot view his subject. Contact can be maintained across any distance, however; it is not broken if a contacted subject moves out of range. There is one exception: contact cannot be extended beyond a crystal sphere.\n&emsp;**Resistance:** An untrained character—i.e., a nonpsionicist—can actively resist intrusion, resulting in a -2 modifier to the psionicist’s power score. To resist, the character fills his mind with a barrage of thoughts and emotions—much as a child avoids a lecture by plugging his ears and yelling. For example, a character might repeat a poem ad nauseam, or scream battle cries. However, even these efforts won’t work unless 1) the character is specifically resisting psychic intrusion, and 2) resisting intrusion is his sole activity. If the character tries to fight or cast a spell, for example, his psychic defense has too many “holes” to be useful. Unless a wild talent knows a telepathic defense mode, he is as vulnerable to contact as any nonpsionicist.\n&emsp;Psionicists (and psionic creatures) are much better at resisting contact. In fact, this power won’t work against them unless they intentionally drop their natural defenses. They must *allow* another psionicist to use contact on them, and can exclude some contacts while remaining open to others. If a psionicist resists, contact can only be established through mental attacks: psychic crush, ego whip, id insinuation, mind thrust, or psionic blast. See Chapter 2, “Psionic Combat” for more information.\n&emsp;**Unusual Subjects:** Contact can also be established with nonhuman minds, even plants. The further the subject is removed from mammals, the more difficult it becomes to establish contact. Modifiers that affect power scores are listed on the following page.\n\n}}{{cs18-1=2}}{{cs19-1=2}}{{cs20-1=2}}{{cs21-1=2}}{{cs22-1=2}}{{cs23-1=2}}{{cs24-1=2}}{{cs25-1=2}}{{cs26-1=2}}{{cc18-1=bottom}}{{c18-1=**Life Order**}}{{c19-1=Mammal (except marsupial)}}{{c20-1=Marsupial}}{{c21-1=Bird}}{{c22-1=Reptile, amphibian}}{{c23-1=Fish}}{{c24-1=Arachnid, insect}}{{c25-1=Monster}}{{c26-1=Plant}}{{cc18-2=center}}{{cc19-2=center}}{{cc20-2=center}}{{cc21-2=center}}{{cc22-2=center}}{{cc23-2=center}}{{cc24-2=center}}{{cc25-2=center}}{{cc26-2=center}}{{c18-2=**Contact**\n**Score**\n**Modifier**}}{{c19-2=-1}}{{c20-2=-2}}{{c21-2=-3}}{{c22-2=-4}}{{c23-2=-5}}{{c24-2=-6}}{{c25-2=-7}}{{c26-2=-8}}{{effects2=These modifiers are in addition to any distance modifiers that may apply. That means contacting a distant plant or monster is an uncertain proposition at best.\n&emsp;Breaking Contact: Contact is not severed until the psionicist breaks it off\n&emsp;(fails to maintain it). If the person contacted is a psionicist, he may also do something to sever it. A psionicist often can eject an unwanted intruder (see “ejection”).\n&emsp;Optional Rule: The minds of very intelligent beings are more difficult to latch onto. Increase the cost of contact by adding the creature’s “# of Languages” minus two, as shown on Table 4 in Chapter 1 of the Player’s Handbook. For example, a creature with intelligence 17 knows six languages. The cost of contacting this creature’s mind is increased by four.\n&emsp;*Power Score*—The contact is maintained for four rounds for free.\n&emsp;*20*—Further contact with this mind is impossible at this experience level.'
+    'effect': 'Contact must be established before virtually any telepathic power can be used on another character or creature. It is just what its name implies—contact between the minds of the telepath and another character or creature. Contact does not allow communication by itself; it is merely the conduit for other telepathic exchanges.\n&emsp;Many telepathic powers list “contact” as their initial cost. That means contact must be established in a previous round before those powers can be used. As long as contact is maintained, the psionicist can use other powers which require it, and can even switch (using attraction and then mindlink on the same subject after contact was established, for example).\n&emsp;A psionicist can maintain contact with more than one subject at a time, but he must contact each one individually, and pay a maintenance cost for each use of the power. For example, if a psionicist wishes to inspire awe in two subjects, he must establish and maintain contact with each one separately.\n&emsp;Once contact is established, it costs 1 PSP per round to maintain. The psionicist can perform any other action while maintaining contact. *If he uses another telepathic power on the same subject while maintaining contact, the contact power is “free”* (the cost of maintaining contact is covered by the other power’s cost).\n&emsp;**Establishing Contact:** The initial cost of contact is based on the target’s level or hit dice, as shown below.}}{{style=bottom2}}{{cs1-1=2}}{{cs2-1=2}}{{cs3-1=2}}{{cs4-1=2}}{{c1-1=1-5 levels or hit dice}}{{c2-1=6-10 levels or hit dice}}{{c3-1=11-15 levels or hit dice}}{{c4-1=16-20 levels or hit dice}}{{c1-2=3 PSPs/round}}{{c2-2=8 PSPs/round}}{{cc3-2=min sheet-spell-fixed}}{{c3-2=13 PSPs/round}}{{c4-2=18 PSPs/round}}{{cc5-1=justify}}{{cs5-1=3}}{{c5-1=\n&emsp;A psionicist cannot contact a subject that he knows nothing about. In other words, he can’t use this power to scan around and “see what’s out there.” He must either have his subject in sight or know specifically who or what he is looking for. He cannot, for example, try to contact any random orc which may or may not be standing behind a closed door. However, he can try to contact a particular orc which he has seen before.\n&emsp;If a psionicist fails to establish contact, he can try again the next round. Failure doesn’t necessarily mean the target’s mind cannot be contacted. Rather, it means the target has not been found yet. The psionicist can continue searching.\n&emsp;Several factors can make telepathic contact difficult to establish:\n\n}}{{cc6-1=min}}{{c6-1=•}}{{cc7-1=min}}{{c7-1=•}}{{cc8-1=min}}{{c8-1=•}}{{cs6-2=2}}{{c6-2=how far the target is (distance)}}{{cs7-2=2}}{{c7-2=resistance by the target—especially if the target is a psionicist}}{{cs8-2=2}}{{c8-2=whether or not the target is an intelligent mammal}} {{cc9-1=justify}}{{cs9-1=3}}{{c9-1=&emsp;Each factor is described below.\n\n&emsp;**Distance:** The greater the distance between the two minds, the more difficult it usually becomes to make contact. If the psionicist can see the target—either with normal vision or by using psionic powers—distance is not a factor. If the psionicist cannot see his target, normal range modifiers apply. Simply knowing where to look does not constitute seeing the target.\n\n}}{{cs10-1=2}}{{cs11-1=2}}{{cs12-1=2}}{{cs13-1=2}}{{cs14-1=2}}{{cs15-1=2}}{{cs16-1=2}}{{cc10-1=bottom}}{{c10-1=**Separation**\n**Distance**}}{{c11-1=Line-of-sight}}{{c12-1=1 mile}}{{c13-1=10 miles}}{{c14-1=100 miles}}{{c15-1=1,000 miles}}{{c16-1=10,000 miles}}{{cc10-2=center}}{{cc11-2=center}}{{cc12-2=center}}{{cc13-2=center}}{{cc14-2=center}}{{cc15-2=center}}{{cc16-2=center}}{{c10-2=**Power Score**\n**Modifier**}}{{c11-2=0}}{{c12-2=-1}}{{c13-2=-3}}{{c14-2=-5}}{{c15-2=-7}}{{c16-2=-9}}{{cc17-1=justify}}{{cs17-1=4}}{{c17-1=\n&emsp;The maximum range for establishing contact is 10,000 miles when a psionicist cannot view his subject. Contact can be maintained across any distance, however; it is not broken if a contacted subject moves out of range. There is one exception: contact cannot be extended beyond a crystal sphere.\n&emsp;**Resistance:** An untrained character—i.e., a nonpsionicist—can actively resist intrusion, resulting in a -2 modifier to the psionicist’s power score. To resist, the character fills his mind with a barrage of thoughts and emotions—much as a child avoids a lecture by plugging his ears and yelling. For example, a character might repeat a poem ad nauseam, or scream battle cries. However, even these efforts won’t work unless 1) the character is specifically resisting psychic intrusion, and 2) resisting intrusion is his sole activity. If the character tries to fight or cast a spell, for example, his psychic defense has too many “holes” to be useful. Unless a wild talent knows a telepathic defense mode, he is as vulnerable to contact as any nonpsionicist.\n&emsp;Psionicists (and psionic creatures) are much better at resisting contact. In fact, this power won’t work against them unless they intentionally drop their natural defenses. They must *allow* another psionicist to use contact on them, and can exclude some contacts while remaining open to others. If a psionicist resists, contact can only be established through mental attacks: psychic crush, ego whip, id insinuation, mind thrust, or psionic blast. See Chapter 2, “Psionic Combat” for more information.\n&emsp;**Unusual Subjects:** Contact can also be established with nonhuman minds, even plants. The further the subject is removed from mammals, the more difficult it becomes to establish contact. Modifiers that affect power scores are listed on the following page.\n\n}}{{cs18-1=2}}{{cs19-1=2}}{{cs20-1=2}}{{cs21-1=2}}{{cs22-1=2}}{{cs23-1=2}}{{cs24-1=2}}{{cs25-1=2}}{{cs26-1=2}}{{cc18-1=bottom}}{{c18-1=**Life Order**}}{{c19-1=Mammal (except marsupial)}}{{c20-1=Marsupial}}{{c21-1=Bird}}{{c22-1=Reptile, amphibian}}{{c23-1=Fish}}{{c24-1=Arachnid, insect}}{{c25-1=Monster}}{{c26-1=Plant}}{{cc18-2=center}}{{cc19-2=center}}{{cc20-2=center}}{{cc21-2=center}}{{cc22-2=center}}{{cc23-2=center}}{{cc24-2=center}}{{cc25-2=center}}{{cc26-2=center}}{{c18-2=**Contact**\n**Score**\n**Modifier**}}{{c19-2=-1}}{{c20-2=-2}}{{c21-2=-3}}{{c22-2=-4}}{{c23-2=-5}}{{c24-2=-6}}{{c25-2=-7}}{{c26-2=-8}}{{effects2=These modifiers are in addition to any distance modifiers that may apply. That means contacting a distant plant or monster is an uncertain proposition at best.\n&emsp;Breaking Contact: Contact is not severed until the psionicist breaks it off\n&emsp;(fails to maintain it). If the person contacted is a psionicist, he may also do something to sever it. A psionicist often can eject an unwanted intruder (see “ejection”).\n&emsp;Optional Rule: The minds of very intelligent beings are more difficult to latch onto. Increase the cost of contact by adding the creature’s “# of Languages” minus two, as shown on Table 4 in Chapter 1 of the Player’s Handbook. For example, a creature with intelligence 17 knows six languages. The cost of contacting this creature’s mind is increased by four.\n&emsp;*Power Score*—The contact is maintained for four rounds for free.\n&emsp;*20*—Further contact with this mind is impossible at this experience level.'
 };
 TELEPATHIC['Devotion']['Daydream'] = {
     'attribute': '@{Wisdom}',
@@ -2016,7 +2016,7 @@ TELEPATHIC['Devotion']['Daydream'] = {
 TELEPATHIC['Devotion']['Ego Whip'] = ATTACK['Devotion']['Ego Whip'] = {
     'attribute': '@{Wisdom}',
     'modifier': '–3',
-    'context-modifier': '?{Range to target?|40 yards (0),0|80 yards (-2),-2|120 yards (-5),-5}',
+    'context-modifier': '?{Range to target modifier?|0 [40 yards]|-2 [80 yards]|-5 [120 yards]}',
     'initial-cost': '4 (both attacks)',
     'maintenance-cost': 'na',
     'range': '40/80/120 yards',
@@ -2096,7 +2096,7 @@ TELEPATHIC['Devotion']['False Sensory Input'] = {
 TELEPATHIC['Devotion']['Id Insinuation'] = ATTACK['Devotion']['Id Insinuation'] = {
     'attribute': '@{Wisdom}',
     'modifier': '–4',
-    'context-modifier': '?{Range to target?|60 yards (0),0|120 yards (-2),-2|180 yards (-5),-5}',
+    'context-modifier': '?{Range to target modifier?|0 [60 yards]|-2 [120 yards]|-5 [180 yards]}',
     'initial-cost': '5 (both attacks)',
     'maintenance-cost': 'na',
     'range': '60/120/180 yards',
@@ -2317,7 +2317,7 @@ TELEPATHIC['Devotion']['Mind Blank'] = DEFENSE['Devotion']['Mind Blank'] = {
 TELEPATHIC['Devotion']['Mind Thrust'] = ATTACK['Devotion']['Mind Thrust'] = {
     'attribute': '@{Wisdom}',
     'modifier': '–2',
-    'context-modifier': '?{Range to target?|30 yards (0),0|60 yards (-2),-2|90 yards (-5),-5}',
+    'context-modifier': '?{Range to target modifier?|0 [30 yards]|-2 [60 yards]|-5 [90 yards]}',
     'initial-cost': '2',
     'maintenance-cost': 'na',
     'range': '30/60/90 yards',
@@ -2517,7 +2517,7 @@ TELEPATHIC['Devotion']['Sound Link'] = {
 TELEPATHIC['Devotion']['Synaptic Static'] = {
     'attribute': '@{Intelligence}',
     'modifier': '–4',
-    'context-modifier': '?{Area of effect range?|20 yards (0),0|50 yards (-2),-2|90 yards (-5),-5}',
+    'context-modifier': '?{Area of effect range modifier?|0 [20 yards]|-2 [50 yards]|-5 [90 yards]}',
     'initial-cost': '15',
     'maintenance-cost': '10/round',
     'range': '0',
@@ -2639,7 +2639,7 @@ METAPSIONIC['Science']['Appraise'] = {
 METAPSIONIC['Science']['Aura Alteration'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-4',
-    'context-modifier': '?{Are you trying to remove a curse, geas, or quest?|No (0),0|Yes (-6),-6}',
+    'context-modifier': '?{Are you trying to remove a curse, geas, or quest?|No (0),0|Yes (-6),-6 [Removing curse, geas, or quest]}',
     'initial-cost': '10',
     'maintenance-cost': 'na',
     'range': 'touch',
@@ -2699,7 +2699,7 @@ METAPSIONIC['Science']['Psychic Clone'] = {
 METAPSIONIC['Science']['Psychic Surgery'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-5',
-    'context-modifier': '?{Operating on self?|No (0),0|Yes (-5),-5}',
+    'context-modifier': '?{Operating on self?|No (0),0|Yes (-5),-5 [Operating on self]}',
     'initial-cost': 'contact',
     'maintenance-cost': '10/turn',
     'range': 'touch',
