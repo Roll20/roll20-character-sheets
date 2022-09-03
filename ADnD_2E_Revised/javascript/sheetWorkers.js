@@ -797,10 +797,10 @@ const CALCULATION_FIELDS = [
     { formulaField: 'weapprof-slots-total',  calculatedField: 'weapprof-slots-total-calc' },
     { formulaField: 'prof-slots-total',      calculatedField: 'prof-slots-total-calc' },
     // Psionics
-    { formulaField: 'discipline-progress',   calculatedField: 'discipline-slots' },
-    { formulaField: 'science-progress',      calculatedField: 'science-slots' },
-    { formulaField: 'devotion-progress',     calculatedField: 'devotion-slots' },
-    { formulaField: 'defense-mode-progress', calculatedField: 'defense-mode-slots' },
+    { formulaField: 'discipline-progress',   calculatedField: 'discipline-slots_max' },
+    { formulaField: 'science-progress',      calculatedField: 'science-slots_max' },
+    { formulaField: 'devotion-progress',     calculatedField: 'devotion-slots_max' },
+    { formulaField: 'defense-mode-progress', calculatedField: 'defense-mode-slots_max' },
     { formulaField: 'psp-progress',          calculatedField: 'PSP_max' },
 ];
 CALCULATION_FIELDS.forEach(({formulaField, calculatedField}) => {
@@ -1111,7 +1111,15 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
         if (!spell)
             return;
 
-        getAttrs([...BOOK_FIELDS, ...optionalRulesFields], function(books) {
+        let isWizard = section.startsWith('wiz');
+        let isPriest = section.startsWith('pri');
+        let levelField;
+        if (isWizard)
+            levelField = 'level-wizard';
+        if (isPriest)
+            levelField = 'level-priest';
+
+        getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField], function(books) {
             if (bookInactiveShowToast(books, spell))
                 return;
 
@@ -1136,15 +1144,20 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
                 [`repeating_spells-${section}_spell-crit-size`]    : spell['crit-size'] || '',
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
-            if (section.startsWith('wiz')) {
+            if (isWizard) {
                 let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
                 spellInfo[`repeating_spells-${section}_spell-school`] = schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
                     ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
                     : spell['school'];
             }
-            if (section.startsWith('pri')) {
+            if (isPriest) {
                 let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
                 spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
+            }
+            if (!books[levelField].trim()) {
+                let classLevel = capitalizeFirst(levelField.replace('level-', ''));
+                let toast = getToastObject(INFO, `Set ${classLevel} caster level`, 'Almost every spell requires a caster level to calculate its effect. Without it most spells will fail and show and error in the chat');
+                Object.assign(spellInfo, toast);
             }
 
             setAttrs(spellInfo);
