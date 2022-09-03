@@ -175,39 +175,42 @@ const isRollValid = function (rollExpression, field) {
 }
 
 const LEVEL_CLASS_REGEX = /@\{level-class[1-5]}/g;
-const checkClassLevel = function(values, formulaField) {
-    let rollExpression = values[formulaField];
+const checkClassLevel = async function(values, rollExpression) {
+    await keepContextRoll();
+    let result = {rollExpression: rollExpression};
     let match = rollExpression.match(LEVEL_CLASS_REGEX);
     if (!match)
-        return null; // There is no scaling
+        return result; // There is no scaling
 
-    let levelsInExpression = new Set(match.map(s => s.replace(/@\{}/g, '')));
+    let levelsInExpression = new Set(match);
     if (levelsInExpression.size > 1)
-        return null; // The user presumably knows what he is doing
+        return result; // The user presumably knows what he is doing
 
     let levelsWithValues = Object.keys(LEVEL_FIELDS).filter(level => values[level]);
     if (levelsWithValues.length === 0)
-        return null; // The user has not set levels in any fields
+        return result; // The user has not set levels in any fields
 
     let [levelInExpression] = levelsInExpression;
+    let levelInExpressionNoBrackets = levelInExpression.replace(/[@{}]/g, '');
     if (levelsWithValues.length === 1) {
-        if (levelInExpression === levelsWithValues[0]) {
-            return null;
+        if (levelInExpressionNoBrackets === levelsWithValues[0]) {
+            return result;
         } else {
-            return {
-                rollExpression: rollExpression.replaceAll(levelInExpression, levelsWithValues[0])
-            };
+            result.rollExpression = rollExpression.replaceAll(levelInExpressionNoBrackets, levelsWithValues[0]);
+            return result;
         }
     } else {
-        let suggestedClasses = levelsWithValues.map(l => `* ${l} to use your ${values[LEVEL_FIELDS[l]]}`)
-            .join('\n');
-        let message;
-        if (!values[levelInExpression]) {
-            message = `Your macro, ${formulaField}, is using ${levelInExpression}, which is as empty. Please update all instances of ${levelInExpression} to either:\n${suggestedClasses}`;
-        } else {
-            message = `Your macro, ${formulaField}, is using ${levelInExpression}, which is for you ${values[LEVEL_FIELDS[levelInExpression]]}. If this is correct, then ignore this message. If not, please update all instances of ${levelInExpression} to either:\n${suggestedClasses}`;
-        }
-        return getToastObject(INFO, `Choose class for progression`, message);
+        let suggestedClasses = levelsWithValues.map(l => `${values[LEVEL_FIELDS[l]].replaceAll(',', '')} (${l}),${l}`)
+            .join('|');
+        let query = values[levelInExpressionNoBrackets]
+            ? `?{Please confirm the class to use|${suggestedClasses}}`
+            : `?{${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
+
+        result.func = async function() {
+            let field = await extractQueryResult(query);
+            return rollExpression.replaceAll(levelInExpressionNoBrackets, field);
+        };
+        return result;
     }
 }
 
@@ -220,13 +223,11 @@ const calculateFormula = function(formulaField, calculatedField, doCheckClassLev
 
         let valueToSet = {};
         if (doCheckClassLevel) {
-            let object = checkClassLevel(values, formulaField);
-            if (object && object.rollExpression) {
-                valueToSet[formulaField] = rollExpression = object.rollExpression;
-                console.log(rollExpression);
-            } else if (object) {
-                Object.assign(valueToSet, object);
-            }
+            let result = await checkClassLevel(values, rollExpression);
+            if (result.func)
+                valueToSet[formulaField] = rollExpression = await result.func();
+            else
+                valueToSet[formulaField] = rollExpression = result.rollExpression;
         }
 
         valueToSet[calculatedField] = await extractRollResult(rollExpression);
@@ -238,8 +239,8 @@ const getToastObject = function (type, title, message) {
     return {
         ['toast']: 1,
         ['toast-content']: type,
-        [`toast-title`]: title,
-        [`toast-message`]: message
+        ['toast-title']: title,
+        ['toast-message']: message
     }
 }
 
@@ -804,7 +805,10 @@ const CALCULATION_FIELDS = [
 ];
 CALCULATION_FIELDS.forEach(({formulaField, calculatedField}) => {
     on(`change:${formulaField}`, function (eventInfo) {
-        let doCheckClassLevel = !!eventInfo.newValue; // convertion into a bool
+        if (isSheetWorkerUpdate(eventInfo))
+            return;
+
+        let doCheckClassLevel = !!eventInfo.newValue; // conversion into a bool
         calculateFormula(formulaField, calculatedField, doCheckClassLevel);
     });
 });
