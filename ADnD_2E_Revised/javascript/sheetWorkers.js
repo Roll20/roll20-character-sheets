@@ -2,10 +2,10 @@
 const PLAYER = 'player';
 const SHEET_WORKER = 'sheetworker';
 
-const SUCCESS = 'success';
-const INFO = 'info';
-const WARNING = 'warning';
-const ERROR = 'error';
+const SUCCESS = 1;
+const INFO = 2;
+const WARNING = 3;
+const ERROR = 4;
 
 const BOOK_FIELDS = [
     'book-phb','book-tcfhb','book-tcthb','book-tcprhb','book-tcwhb',
@@ -15,8 +15,13 @@ const BOOK_FIELDS = [
     'book-combat-and-tactics','book-skills-and-powers','book-spells-and-magic'
 ];
 
-const LEVEL_FIELDS = ['class1','class2','class3','class4','class5',
-    'level-class1','level-class2','level-class3','level-class4','level-class5',]
+const LEVEL_FIELDS = {
+    'level-class1': 'class1',
+    'level-class2': 'class2',
+    'level-class3': 'class3',
+    'level-class4': 'class4',
+    'level-class5': 'class5',
+};
 
 const SCHOOL_SPELLS_AND_MAGIC = 'school-spells-and-magic';
 const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
@@ -169,36 +174,72 @@ const isRollValid = function (rollExpression, field) {
     return true;
 }
 
-const LEVEL_REGEX = /@\{level-class[1-5]}/;
-const calculateFormula = function(formulaField, calculatedField, silent = false) {
-    getAttrs([formulaField, ...LEVEL_FIELDS], async function (values) {
+const LEVEL_CLASS_REGEX = /@\{level-class[1-5]}/g;
+const checkClassLevel = function(values, formulaField) {
+    let rollExpression = values[formulaField];
+    let match = rollExpression.match(LEVEL_CLASS_REGEX);
+    if (!match)
+        return null; // There is no scaling
+
+    let levelsInExpression = new Set(match.map(s => s.replace(/@\{}/g, '')));
+    if (levelsInExpression.size > 1)
+        return null; // The user presumably knows what he is doing
+
+    let levelsWithValues = Object.keys(LEVEL_FIELDS).filter(level => values[level]);
+    if (levelsWithValues.length === 0)
+        return null; // The user has not set levels in any fields
+
+    let [levelInExpression] = levelsInExpression;
+    if (levelsWithValues.length === 1) {
+        if (levelInExpression === levelsWithValues[0]) {
+            return null;
+        } else {
+            return {
+                rollExpression: rollExpression.replaceAll(levelInExpression, levelsWithValues[0])
+            };
+        }
+    } else {
+        let suggestedClasses = levelsWithValues.map(l => `* ${l} to use your ${values[LEVEL_FIELDS[l]]}`)
+            .join('\n');
+        let message;
+        if (!values[levelInExpression]) {
+            message = `Your macro, ${formulaField}, is using ${levelInExpression}, which is as empty. Please update all instances of ${levelInExpression} to either:\n${suggestedClasses}`;
+        } else {
+            message = `Your macro, ${formulaField}, is using ${levelInExpression}, which is for you ${values[LEVEL_FIELDS[levelInExpression]]}. If this is correct, then ignore this message. If not, please update all instances of ${levelInExpression} to either:\n${suggestedClasses}`;
+        }
+        return getToastObject(INFO, `Choose class for progression`, message);
+    }
+}
+
+const calculateFormula = function(formulaField, calculatedField, doCheckClassLevel) {
+    getAttrs([formulaField, ...Object.entries(LEVEL_FIELDS).flat()], async function (values) {
         let rollExpression = values[formulaField];
         let valid = isRollValid(rollExpression, formulaField);
         if (!valid)
             return;
 
-        let match = rollExpression.match(LEVEL_REGEX);
-        console.log(match);
+        let valueToSet = {};
+        if (doCheckClassLevel) {
+            let object = checkClassLevel(values, formulaField);
+            if (object && object.rollExpression) {
+                valueToSet[formulaField] = rollExpression = object.rollExpression;
+                console.log(rollExpression);
+            } else if (object) {
+                Object.assign(valueToSet, object);
+            }
+        }
 
-        setAttrs({
-            [calculatedField]: await extractRollResult(rollExpression, formulaField)
-        },{silent:silent});
+        valueToSet[calculatedField] = await extractRollResult(rollExpression);
+        setAttrs(valueToSet);
     });
 }
 
 const getToastObject = function (type, title, message) {
-    let content
-    switch (type) {
-        case SUCCESS: content = 1; break;
-        case INFO:    content = 2; break;
-        case WARNING: content = 3; break;
-        case ERROR:   content = 4; break;
-    }
     return {
         ['toast']: 1,
-        ['toast-content']: content,
-        [`toast-title-${type}`]: title,
-        [`toast-message-${type}`]: message
+        ['toast-content']: type,
+        [`toast-title`]: title,
+        [`toast-message`]: message
     }
 }
 
@@ -763,7 +804,8 @@ const CALCULATION_FIELDS = [
 ];
 CALCULATION_FIELDS.forEach(({formulaField, calculatedField}) => {
     on(`change:${formulaField}`, function (eventInfo) {
-        calculateFormula(formulaField, calculatedField);
+        let doCheckClassLevel = !!eventInfo.newValue; // convertion into a bool
+        calculateFormula(formulaField, calculatedField, doCheckClassLevel);
     });
 });
 
