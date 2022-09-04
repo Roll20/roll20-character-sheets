@@ -263,6 +263,20 @@ const isBookInactive = function (books, obj) {
         return !activeBooks.has(obj['book']);
 }
 
+const bookInactiveGetToastObject = function (books, obj) {
+    let bookInactive = isBookInactive(books, obj);
+    let result = null;
+    if (bookInactive) {
+        if (Array.isArray(obj)) {
+            let booksString = obj.map(b => '\n* ' + b).join('')
+            result = getToastObject(ERROR, 'Missing Book(s)', `The book(s):${booksString}\nAre currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
+        } else {
+            result = getToastObject(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
+        }
+    }
+    return result;
+}
+
 const bookInactiveShowToast = function(books, obj) {
     let bookInactive = isBookInactive(books, obj);
     if (bookInactive) {
@@ -2471,7 +2485,7 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
     repeatingMultiplySum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
 })
 
-//#region Psionic stuff
+//#region Psionic
 // Psionic tabs, control hidden or visible options
 const setPsionicDisciplineVisibility = function(newValue) {
     let elements = $20('.sheet-section-psionics option.sheet-hidden');
@@ -2481,10 +2495,10 @@ const setPsionicDisciplineVisibility = function(newValue) {
         elements.removeClass('sheet-show');
     }
 }
-on('change:tab8', function (eventInfo) {
-    setPsionicDisciplineVisibility(eventInfo.newValue);
-});
-on('sheet:opened', function () {
+on('change:tab8 sheet:opened', function (eventInfo) {
+    if (eventInfo.newValue)
+        return setPsionicDisciplineVisibility(eventInfo.newValue);
+
     getAttrs(['tab8'], function (values) {
         setPsionicDisciplineVisibility(values['tab8']);
     })
@@ -2521,7 +2535,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
     on(`change:repeating_${section}:${name} change:repeating_${section}:${macro}`, function (eventInfo) {
         console.log(eventInfo);
         let parse = parseSourceAttribute(eventInfo);
-        getAttrs(['character_name'], function (values) {
+        getAttrs(['character_name', ...BOOK_FIELDS], function (values) {
             let powerInfo = {};
             powerInfo[`repeating_${section}_action`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action}`;
             if (parse.attribute === name && eventInfo.newValue) {
@@ -2534,8 +2548,12 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
                     tier = power ? tier : 'Science';
                     power = power || powerTable[tier][eventInfo.newValue];
                 }
-                console.log(power);
                 if (power) {
+                    let toastObject = bookInactiveGetToastObject(values, power);
+                    if (toastObject) {
+                        Object.assign(powerInfo, toastObject)
+                        return setAttrs(toastObject);
+                    }
                     powerInfo[`repeating_${section}_powerscore-nomod${number}`] = power['attribute'];
                     powerInfo[`repeating_${section}_powerscore-mod${number}`]   = power['modifier'];
                     powerInfo[`repeating_${section}_PSP-cost${cost_number}`]    = power['initial-cost'];
