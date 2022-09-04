@@ -1364,7 +1364,7 @@ PSYCHOMETABOLIC['Devotion']['Mind Over Body'] = {
     'power-score': 'The psionicist need not rest after using this power.',
     '20': 'The power fails, but the psionicist collapses with exhaustion and must rest for 24 hours.',
     '1': '',
-    'effect': 'Mind over body allows the user to suppress his body’s need for food, water, and sleep. In exchange for one hour of meditation per day, all of the psionicist’s physical needs are overcome. He does not feel hunger, exhaustion, or thirst, nor does he suffer any ability reductions for privation.\n&emsp;The psionicist can also suppress the basic needs of others while suppressing his own. To do so, he must pay an additional 10 PSPs per person and spend an additional hour of meditation per person. Each person being aided must be in physical contact with the psionicist throughout the entire period of meditation. Usually, all the characters hold hands, forming a continuous line or circle.\n&emsp;The psionicist can survive in this fashion for a number of days equal to his experience level, or five days, whichever is more. Currently [[{[[@{level-psionic}]],5}kh1]] days. At the end of that time, he collapses from exhaustion. He must then rest one day for every two days spent sublimating his body’s needs. Or he can be restored through 24 hours of complete healing. These rules also apply to any characters the psionicist has aided.\n&emsp;*Power Score*—The psionicist need not rest after using this power.\n&emsp;*20*—The power fails, but the psionicist collapses with exhaustion and must rest for 24 hours.'
+    'effect': 'Mind over body allows the user to suppress his body’s need for food, water, and sleep. In exchange for one hour of meditation per day, all of the psionicist’s physical needs are overcome. He does not feel hunger, exhaustion, or thirst, nor does he suffer any ability reductions for privation.\n&emsp;The psionicist can also suppress the basic needs of others while suppressing his own. To do so, he must pay an additional 10 PSPs per person and spend an additional hour of meditation per person. Each person being aided must be in physical contact with the psionicist throughout the entire period of meditation. Usually, all the characters hold hands, forming a continuous line or circle.\n&emsp;The psionicist can survive in this fashion for a number of days equal to his experience level, or five days, whichever is more. At the end of that time, he collapses from exhaustion. He must then rest one day for every two days spent sublimating his body’s needs. Or he can be restored through 24 hours of complete healing. These rules also apply to any characters the psionicist has aided.\n&emsp;*Power Score*—The psionicist need not rest after using this power.\n&emsp;*20*—The power fails, but the psionicist collapses with exhaustion and must rest for 24 hours.'
 };
 PSYCHOMETABOLIC['Devotion']['Reduction'] = {
     'attribute': '@{Constitution}',
@@ -3044,7 +3044,7 @@ METAPSIONIC['Devotion']['Stasis Field'] = {
     'maintenance-cost': '20/round or 1/round',
     'range': '0',
     'prep': '3',
-    'aoe': 'max. [[@{level-psionic}]] yard(s)',
+    'aoe': 'max. 1 yard/level',
     'prerequisites': '8th level',
     'reference': 'p. 104',
     'book': 'The Complete Psionics Handbook',

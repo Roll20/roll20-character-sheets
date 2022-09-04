@@ -2533,7 +2533,6 @@ on('sheet:opened change:character_name', function (eventInfo) {
 });
 PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, discipline}) => {
     on(`change:repeating_${section}:${name} change:repeating_${section}:${macro}`, function (eventInfo) {
-        console.log(eventInfo);
         let parse = parseSourceAttribute(eventInfo);
         getAttrs(['character_name', ...BOOK_FIELDS], function (values) {
             let powerInfo = {};
