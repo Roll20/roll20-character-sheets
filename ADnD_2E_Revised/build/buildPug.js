@@ -12,6 +12,7 @@ const booksPriority = [
     'The Complete Thief\'s Handbook',
     'The Complete Priest\'s Handbook',
     'The Complete Wizard\'s Handbook',
+    'The Complete Psionics Handbook',
     'Tome of Magic',
     'Arms and Equipment Guide',
     'The Complete Book of Dwarves',
