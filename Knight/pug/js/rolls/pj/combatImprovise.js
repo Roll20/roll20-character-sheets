@@ -105,7 +105,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     const baseViolence = dViolence;
 
     let diceDegats = baseDegats;
-    let diceViolence = baseDegats;
+    let diceViolence = baseViolence;
 
     let bDegats = [];
     const bViolence = [];
