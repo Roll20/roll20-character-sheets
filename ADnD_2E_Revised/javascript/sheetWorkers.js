@@ -333,6 +333,23 @@ const repeatingCalculateRemaining = function(repeatingName, repeatingFieldsToSum
             attrSet.I[remainingField] = attrSet.I[totalField] - memo;
         }).execute();
 };
+
+const repeatingCalculateRemainingRecursive = function (tail, accumulator, resultFieldName) {
+    let head = tail.shift();
+    if (!head) {
+        setAttrs({
+            [resultFieldName] : accumulator
+        });
+        return;
+    }
+
+    TAS.repeating(head.section)
+        .fields(head.slotsField)
+        .each(function (r) {
+            accumulator -= r.I[head.slotsField];
+        })
+        .execute(() => repeatingCalculateRemainingRecursive(tail, accumulator, resultFieldName));
+};
 //#endregion
 
 //#region Generic Setup functions
@@ -2290,35 +2307,47 @@ on('change:repeating_weaponprofs:weapprofname', function(eventInfo) {
 });
 
 //Nonweapon proficiency slots
-const updateNonWeaponProfsRemaining = () => repeatingCalculateRemaining('profs', ['profslots'], 'prof-slots-total-calc', 'prof-slots-remain');
-on('change:repeating_profs:profslots remove:repeating_profs change:prof-slots-total-calc', function(eventInfo){
-    if (doEarlyReturn(eventInfo, ['profslots']))
-        return;
-    updateNonWeaponProfsRemaining();
-});
-//Nonweapon proficiency autofill
-on('change:repeating_profs:profname', function (eventInfo) {
-    let nonweaponProficiencies = NONWEAPON_PROFICIENCIES_TABLE[eventInfo.newValue];
-    if (!nonweaponProficiencies)
-        return;
+const NONWEAPON_PROFICIENCY_SECTIONS = [
+    {section:'profs',    nameField:'profname',    slotsField:'profslots',    abilityScoreField:'profstatnum',    modifierField:'profmod', totalField:'prof-slots-total-calc' },
+    {section:'psiprofs', nameField:'psiprofname', slotsField:'psiprofslots', abilityScoreField:'psiprofstatnum', modifierField:'psiprofmod'},
+];
+NONWEAPON_PROFICIENCY_SECTIONS.forEach(({section, nameField, slotsField, abilityScoreField, modifierField, totalField}) => {
+    let changeTotal = totalField ? `change:${totalField}` : '';
+    on(`change:repeating_${section}:${slotsField} remove:repeating_${section} ${changeTotal}`, function(eventInfo){
+        if (doEarlyReturn(eventInfo, [slotsField])) {
+            return;
+        }
 
-    let comparer = function (nonweaponProf1, nonweaponProf2, isPlayersOption) {
-        return ['slots','abilityScore','modifier'].every(f => nonweaponProf1[f] === nonweaponProf2[f])
-    }
-
-    getAttrs(BOOK_FIELDS, async function (books) {
-        let nonweaponProficiency = await selectVersion(nonweaponProficiencies, books, comparer, 'nonweapon proficiency');
-        console.log(nonweaponProficiency);
-        if (!nonweaponProficiency)
+        let sectionsCopy = [...NONWEAPON_PROFICIENCY_SECTIONS];
+        getAttrs(['prof-slots-total-calc'], function (values) {
+            let accumulator = values['prof-slots-total-calc'];
+            repeatingCalculateRemainingRecursive(sectionsCopy, accumulator, 'prof-slots-remain');
+        });
+    });
+    //Nonweapon proficiency autofill
+    on(`change:repeating_${section}:${nameField}`, function (eventInfo) {
+        let nonweaponProficiencies = NONWEAPON_PROFICIENCIES_TABLE[eventInfo.newValue];
+        if (!nonweaponProficiencies)
             return;
 
-        let rowId = parseSourceAttribute(eventInfo).rowId;
+        let comparer = function (nonweaponProf1, nonweaponProf2, isPlayersOption) {
+            return ['slots','abilityScore','modifier'].every(f => nonweaponProf1[f] === nonweaponProf2[f])
+        }
 
-        let nonweaponProfInfo = {};
-        nonweaponProfInfo[`repeating_profs_${rowId}_profslots`]   = nonweaponProficiency['slots'];
-        nonweaponProfInfo[`repeating_profs_${rowId}_profstatnum`] = nonweaponProficiency['abilityScore'];
-        nonweaponProfInfo[`repeating_profs_${rowId}_profmod`]     = nonweaponProficiency['modifier'];
-        setAttrs(nonweaponProfInfo);
+        getAttrs(BOOK_FIELDS, async function (books) {
+            let nonweaponProficiency = await selectVersion(nonweaponProficiencies, books, comparer, 'nonweapon proficiency');
+            console.log(nonweaponProficiency);
+            if (!nonweaponProficiency)
+                return;
+
+            let rowId = parseSourceAttribute(eventInfo).rowId;
+
+            let nonweaponProfInfo = {};
+            nonweaponProfInfo[`repeating_${section}_${rowId}_${slotsField}`]        = nonweaponProficiency['slots'];
+            nonweaponProfInfo[`repeating_${section}_${rowId}_${abilityScoreField}`] = nonweaponProficiency['abilityScore'];
+            nonweaponProfInfo[`repeating_${section}_${rowId}_${modifierField}`]     = nonweaponProficiency['modifier'];
+            setAttrs(nonweaponProfInfo);
+        });
     });
 });
 //#endregion
