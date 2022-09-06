@@ -2600,7 +2600,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
                     macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
                     let powerRoll = power['roll-override'] || `[[1d20cf20+(@{psionic-mod${number}})]]`;
                     macroBuilder.push(`powerroll=${powerRoll}`);
-                    let powerScoreValue = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})`;
+                    let powerScoreValue = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
                     if (power['context-modifier']) {
                         powerScoreValue += `+(${power['context-modifier']})`
                     }
@@ -2629,10 +2629,9 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
     });
 
     on(`clicked:repeating_${section}:action`, function (eventInfo) {
-        console.log(eventInfo);
         let parse = parseSourceAttribute(eventInfo);
-        getAttrs([`repeating_${section}_${macro}`,'character_name'], async function (value) {
-            let macroValue = value[`repeating_${section}_${macro}`];
+        getAttrs([`repeating_${section}_${macro}`,'character_name', 'psion-armor-penalty'], async function (values) {
+            let macroValue = values[`repeating_${section}_${macro}`];
 
             let repeating = `repeating_${section}_${parse.rowId}`;
             macroValue = macroValue.replaceAll(`${name}`,`${repeating}_${name}`)
@@ -2642,6 +2641,10 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
                 .replaceAll(`powerscore-enhanced`,`${repeating}_powerscore-enhanced`)
                 .replaceAll(`PSP-cost${cost_number}`,`${repeating}_PSP-cost${cost_number}`)
                 .replaceAll(`PSP-cost-maintenance`,`${repeating}_PSP-cost-maintenance`);
+
+            if (!values['psion-armor-penalty']) {
+                macroValue = macroValue.replaceAll('+(@{psion-armor-penalty})+', '+');
+            }
 
             let roll = await startRoll(macroValue);
             if (!macroValue.includes('&{template:2Epsionic}')) {
