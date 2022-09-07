@@ -77,7 +77,7 @@ CLAIRSENTIENT['Science']['Object Reading'] = {
     'power-score': 'The psionicist automatically learns all information on the table above.',
     '20': 'The psionicist becomes obsessed with the object; he strives to keep it until he can attempt to read it again.',
     '1': '',
-    'effect': 'Object reading is the ability to detect psychic impressions left on an object by its previous owner, including his race, sex, age, and alignment. The power can also reveal how the owner came to possess the item, as well as how he lost it. The amount of information gained depends on the result of the power check. If the psionicist’s power check is successful, he learns the information listed beside that result in the table below, plus all the information listed above it.}}{{style=center1 sheet-spell-bottom2}}{{c1-1=**Power Check**\n**Result**}}{{c2-1=1—2}}{{c3-1=3}}{{c4-1=4}}{{c5-1=5}}{{c6-1=6—7}}{{c7-1=8+}}{{c1-2=**Information Gained**}}{{c2-2=Last owner’s race}}{{c3-2=Last owner’s sex}}{{c4-2=Last owner’s age}}{{c5-2=Last owner’s alignment}}{{c6-2=How last owner gained and lost item}}{{c7-2=All this information about all owners}}{{effects2=&emsp;An object can be read only once per experience level of the psionicist; additional readings at that level reveal no additional information. When the clairvoyant gains a new experience level, he can try reading the same object again, even if his object reading score has not changed.\n&emsp;*Power Score*—The psionicist automatically learns all information on the table above.\n&emsp;*20*—The psionicist becomes obsessed with the object; he strives to keep it until he can attempt to read it again.'
+    'effect': 'Object reading is the ability to detect psychic impressions left on an object by its previous owner, including his race, sex, age, and alignment. The power can also reveal how the owner came to possess the item, as well as how he lost it. The amount of information gained depends on the result of the power check. If the psionicist’s power check is successful, he learns the information listed beside that result in the table below, plus all the information listed above it.}}{{style=center1 sheet-spell-bottom2}}{{c1-1=**Power Check**\n**Result**}}{{c2-1=1-2}}{{c3-1=3}}{{c4-1=4}}{{c5-1=5}}{{c6-1=6-7}}{{c7-1=8+}}{{c1-2=**Information Gained**}}{{c2-2=Last owner’s race}}{{c3-2=Last owner’s sex}}{{c4-2=Last owner’s age}}{{c5-2=Last owner’s alignment}}{{c6-2=How last owner gained and lost item}}{{c7-2=All this information about all owners}}{{effects2=&emsp;An object can be read only once per experience level of the psionicist; additional readings at that level reveal no additional information. When the clairvoyant gains a new experience level, he can try reading the same object again, even if his object reading score has not changed.\n&emsp;*Power Score*—The psionicist automatically learns all information on the table above.\n&emsp;*20*—The psionicist becomes obsessed with the object; he strives to keep it until he can attempt to read it again.'
 };
 CLAIRSENTIENT['Science']['Precognition'] = {
     'roll-override': 'Secret by DM',
@@ -138,7 +138,7 @@ CLAIRSENTIENT['Devotion']['All-Round Vision'] = {
     'power-score': 'Infravision is also gained.',
     '20': 'The psionicist is blind for [[1d4]] hours.',
     '1': '',
-    'effect': 'This power gives the psionicist “eyes in the back of his head”—and in the sides and top, as well. (Of course, this is figurative; he does not literally\n&emsp;sprout eyeballs.) In effect, the character can see in all directions simultaneously. Besides its obvious application when combined with the clairvoyance power, all—round vision prevents anyone from sneaking up on the character without some sort of concealment. On the down side, the psionicist suffers a —4 penalty against all gaze attacks while using this power.\n&emsp;*Power Score*—Infravision is also gained.\n&emsp;*20*—The psionicist is blind for 1d4 hours.'
+    'effect': 'This power gives the psionicist “eyes in the back of his head”—and in the sides and top, as well. (Of course, this is figurative; he does not literally\n&emsp;sprout eyeballs.) In effect, the character can see in all directions simultaneously. Besides its obvious application when combined with the clairvoyance power, all—round vision prevents anyone from sneaking up on the character without some sort of concealment. On the down side, the psionicist suffers a -4 penalty against all gaze attacks while using this power.\n&emsp;*Power Score*—Infravision is also gained.\n&emsp;*20*—The psionicist is blind for 1d4 hours.'
 };
 CLAIRSENTIENT['Devotion']['Combat Mind'] = {
     'attribute': '@{Intelligence}',
@@ -179,7 +179,7 @@ CLAIRSENTIENT['Devotion']['Danger Sense'] = {
     'power-score': 'The psionicist learns how far away the danger is.',
     '20': 'The psionicist cannot sense danger successfully for [[1d6]] hours.',
     '1': '',
-    'effect': 'When using danger sense, a psionicist will experience a slight tingling\n&emsp;sensation at the back of his neck when a hazard or threat is near. The DM must make a successful power check on the psionicist’s behalf before the character detects the danger. This power does not give the psionicist any specific information about the type of danger. He does not learn how or when it will strike. However, he does learn the general direction of the threat (i.e., to the right, left, ahead, or behind).\n&emsp;The character’s power check results determine how much warning he gets. If the roll is 12 or more, he knows whether danger is lurking anywhere in the immediate area. If the roll is—8 or more, he enjoys a full round of warning before that danger strikes. If the roll is 7 or less, however, the psionicist isn’t alerted until moments before danger strikes. If the roll is 1 exactly, he still has several moments’ warning but the direction is off; e.g., if the attack, is coming from the left, he thinks it is coming from ahead, behind, or the right (DM’s option).\n&emsp;If the psionicist and his companions have enough warning, they can do something to prepare—getting into defensive positions, preparing spells, or running away, for example. If they have less than one round of warning, the DM must decide how much preparation is possible. In any case, they always gain a +2 bonus on their own surprise rolls.\n&emsp;*Power Score*—The psionicist learns how far away the danger is.\n&emsp;*20*—The psionicist cannot sense danger successfully for 1d6 hours.'
+    'effect': 'When using danger sense, a psionicist will experience a slight tingling\n&emsp;sensation at the back of his neck when a hazard or threat is near. The DM must make a successful power check on the psionicist’s behalf before the character detects the danger. This power does not give the psionicist any specific information about the type of danger. He does not learn how or when it will strike. However, he does learn the general direction of the threat (i.e., to the right, left, ahead, or behind).\n&emsp;The character’s power check results determine how much warning he gets. If the roll is 12 or more, he knows whether danger is lurking anywhere in the immediate area. If the roll is 8 or more, he enjoys a full round of warning before that danger strikes. If the roll is 7 or less, however, the psionicist isn’t alerted until moments before danger strikes. If the roll is 1 exactly, he still has several moments’ warning but the direction is off; e.g., if the attack, is coming from the left, he thinks it is coming from ahead, behind, or the right (DM’s option).\n&emsp;If the psionicist and his companions have enough warning, they can do something to prepare—getting into defensive positions, preparing spells, or running away, for example. If they have less than one round of warning, the DM must decide how much preparation is possible. In any case, they always gain a +2 bonus on their own surprise rolls.\n&emsp;*Power Score*—The psionicist learns how far away the danger is.\n&emsp;*20*—The psionicist cannot sense danger successfully for 1d6 hours.'
 };
 CLAIRSENTIENT['Devotion']['Feel Light'] = {
     'attribute': '@{Wisdom}',
@@ -1264,7 +1264,7 @@ PSYCHOMETABOLIC['Devotion']['Flesh Armor'] = {
     'power-score': 'The psionicist gains a +1 bonus to the armor class listed above.',
     '20': 'The power just grows ugly hair over his body, which must be shaved off or he loses 2 points of Charisma.',
     '1': '',
-    'effect': 'The psionicist transforms his own skin into armor. No one can see the change, but it’s as if he had actually acquired some type of armor. The type of armor his body mimics depends on the result of his power check, as shown in the following table:}}{{c1-1=1}}{{c2-1=2}}{{c3-1=3—4}}  {{c4-1=5—6}}  {{c5-1=7—8}}  {{c6-1=9—10}} {{c7-1=11+}}  {{c1-2=left hand functions as a shield, AC 9}}{{c2-2=leather, AC 8}}{{c3-2=ringmail, AC7}}{{c4-2=scalemail, AC6}}{{c5-2=chainmail, AC5}}{{c6-2=banded mail, AC 4}}{{c7-2=platemail, AC3}}{{effects2=&emsp;Because this armor is part of his body, the psionicist can enjoy its benefits without suffering any penalty he might have if he were actually wearing that type of armor. The armor created by this power weighs nothing, has no magnetic properties, and in no way encumbers the psionicist.\n&emsp;*Power Score*—The psionicist gains a +1 bonus to the armor class listed above.\n&emsp;*20*—The power just grows ugly hair over his body, which must be shaved off or he loses 2 points of Charisma.'
+    'effect': 'The psionicist transforms his own skin into armor. No one can see the change, but it’s as if he had actually acquired some type of armor. The type of armor his body mimics depends on the result of his power check, as shown in the following table:}}{{c1-1=1}}{{c2-1=2}}{{c3-1=3-4}}{{c4-1=5-6}}{{c5-1=7-8}}{{c6-1=9-10}} {{c7-1=11+}}{{c1-2=left hand functions as a shield, AC 9}}{{c2-2=leather, AC 8}}{{c3-2=ringmail, AC7}}{{c4-2=scalemail, AC6}}{{c5-2=chainmail, AC5}}{{c6-2=banded mail, AC 4}}{{c7-2=platemail, AC3}}{{effects2=&emsp;Because this armor is part of his body, the psionicist can enjoy its benefits without suffering any penalty he might have if he were actually wearing that type of armor. The armor created by this power weighs nothing, has no magnetic properties, and in no way encumbers the psionicist.\n&emsp;*Power Score*—The psionicist gains a +1 bonus to the armor class listed above.\n&emsp;*20*—The power just grows ugly hair over his body, which must be shaved off or he loses 2 points of Charisma.'
 };
 PSYCHOMETABOLIC['Devotion']['Graft Weapon'] = {
     'attribute': '@{Constitution}',
@@ -1304,7 +1304,7 @@ PSYCHOMETABOLIC['Devotion']['Heightened Senses'] = {
     'power-score': 'One of the heightened senses (chosen randomly) stays with the psionicist for a full day.',
     '20': '0ne of the psionicist’s five senses is lost for [[1d12]] hours.',
     '1': '',
-    'effect': 'By means of this devotion the psionicist sharpens all five of his normal senses: sight, hearing, taste, touch, and smell. This has several effects, which are described below. The DM may allow additional applications as he sees fit.\n&emsp;First, the character has a good chance to notice thieves who are hiding in shadows or moving silently. The thief’s skill chance is halved when someone with heightened senses is observing him. Even if the thief is already hidden, he must roll again when a character with heightened senses enters the picture.\n&emsp;Second, the psionicist can track someone like a bloodhound. He must make an intelligence check every turn to stay on the trail or recover the trail if it is lost. His movement rate when tracking is 6. The trail can be no more than 24 hours old.\n&emsp;Third, the psionicist’s ranges for hearing and seeing are tripled. He can, for example, identify a person (in daylight) at a range of 400 yards.\n&emsp;Fourth, the character can taste poisons or other impurities in quantities that are much too small to cause any harm.\n&emsp;Fifth, the character can identify almost anything by touch. He can, for example, tell two gold pieces from each other after having previously handled just one of them. He can also tell if something has been handled in the last five minutes simply by handling it himself.\n&emsp;*Power Score*—One of the heightened senses (chosen randomly) stays with the psionicist for a full day.\n&emsp;*20*—0ne of the psionicist’s five senses is lost for 1d12 hours.'
+    'effect': 'By means of this devotion the psionicist sharpens all five of his normal senses: sight, hearing, taste, touch, and smell. This has several effects, which are described below. The DM may allow additional applications as he sees fit.\n&emsp;First, the character has a good chance to notice thieves who are hiding in shadows or moving silently. The thief’s skill chance is halved when someone with heightened senses is observing him. Even if the thief is already hidden, he must roll again when a character with heightened senses enters the picture.\n&emsp;Second, the psionicist can track someone like a bloodhound. He must make an intelligence check every turn to stay on the trail or recover the trail if it is lost. His movement rate when tracking is 6. The trail can be no more than 24 hours old.\n&emsp;Third, the psionicist’s ranges for hearing and seeing are tripled. He can, for example, identify a person (in daylight) at a range of 400 yards.\n&emsp;Fourth, the character can taste poisons or other impurities in quantities that are much too small to cause any harm.\n&emsp;Fifth, the character can identify almost anything by touch. He can, for example, tell two gold pieces from each other after having previously handled just one of them. He can also tell if something has been handled in the last five minutes simply by handling it himself.\n&emsp;*Power Score*—One of the heightened senses (chosen randomly) stays with the psionicist for a full day.\n&emsp;*20*—One of the psionicist’s five senses is lost for 1d12 hours.'
 };
 PSYCHOMETABOLIC['Devotion']['Immovability'] = {
     'attribute': '@{Constitution}',
@@ -1470,7 +1470,7 @@ PSYCHOPORTIVE['Science']['Probability Travel'] = {
 };
 PSYCHOPORTIVE['Science']['Summon Planar Creature'] = {
     'attribute': '@{Intelligence}',
-    'modifier': '–4',
+    'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '45/90',
     'maintenance-cost': 'na',
@@ -1586,7 +1586,7 @@ PSYCHOPORTIVE['Devotion']['Dimension Walk'] = {
     'power-score': 'The psionicist receives a +2 bonus when making his Wisdom checks.',
     '20': '0vercome with vertigo, the character can do nothing but retch for three rounds.',
     '1': '',
-    'effect': 'With dimension walk, a psionicist can travel from place to place in his own dimension by piercing other dimensions at right angles. This has two advantages over a dimensional door: 1) a dimension walk is not physically traumatizing and 2) the range of travel is greater. On the other hand, dimension walk only allows the psionicist himself to travel, and he can easily get lost.\n&emsp;The dimension walker opens up a vaguely shimmering portal. Only the psionicist who opened the portal can enter it. As soon as he does, the portal closes behind him. He finds himself engulfed by an inky grayness that is virtually without features. The effect is one of extreme sensory deprivation.\n&emsp;The psionicist can travel through this gray realm at a speed of 7 leagues (21 miles) per turn. He cannot see where he is or where he’s going while in the realm. He has only his instinct to guide him, and must make a Wisdom check every turn. If these checks succeed, he’ll find himself at his chosen destination when he steps out of the realm. If any single Wisdom check fails, however, the character will stray off course by several miles. When the walker steps out of the gray realm, the DM can place him in any location, within the maximum distance from his starting point (e.g., if the psionicist walked for 10 rounds, he must be within 21 miles of his origin). It’s up to the psionicist to figure out his location; this power doesn’t help him gain his bearings.\n&emsp;Aside from getting lost, dimension walking is completely safe. Apparently anything that lives in the other dimensions crossed cannot interact with dimensional travelers (Larue d’jar Azif of Dhaztanar postulated that these other dimensions teem with life just as much as our own, but because the traveler is crossing them “against the grain”, as it were, they do not register on his senses). The character can bring along as much as he can carry, but *bags of holding* and other dimensional storage devices spill their contents immediately if taken into this space.\n&emsp;*Power Score*—The psionicist receives a +2 bonus when making his Wisdom checks.\n&emsp;*20*—0vercome with vertigo, the character can do nothing but retch for three rounds.'
+    'effect': 'With dimension walk, a psionicist can travel from place to place in his own dimension by piercing other dimensions at right angles. This has two advantages over a dimensional door: 1) a dimension walk is not physically traumatizing and 2) the range of travel is greater. On the other hand, dimension walk only allows the psionicist himself to travel, and he can easily get lost.\n&emsp;The dimension walker opens up a vaguely shimmering portal. Only the psionicist who opened the portal can enter it. As soon as he does, the portal closes behind him. He finds himself engulfed by an inky grayness that is virtually without features. The effect is one of extreme sensory deprivation.\n&emsp;The psionicist can travel through this gray realm at a speed of 7 leagues (21 miles) per turn. He cannot see where he is or where he’s going while in the realm. He has only his instinct to guide him, and must make a Wisdom check every turn. If these checks succeed, he’ll find himself at his chosen destination when he steps out of the realm. If any single Wisdom check fails, however, the character will stray off course by several miles. When the walker steps out of the gray realm, the DM can place him in any location, within the maximum distance from his starting point (e.g., if the psionicist walked for 10 rounds, he must be within 21 miles of his origin). It’s up to the psionicist to figure out his location; this power doesn’t help him gain his bearings.\n&emsp;Aside from getting lost, dimension walking is completely safe. Apparently anything that lives in the other dimensions crossed cannot interact with dimensional travelers (Larue d’jar Azif of Dhaztanar postulated that these other dimensions teem with life just as much as our own, but because the traveler is crossing them “against the grain”, as it were, they do not register on his senses). The character can bring along as much as he can carry, but *bags of holding* and other dimensional storage devices spill their contents immediately if taken into this space.\n&emsp;*Power Score*—The psionicist receives a +2 bonus when making his Wisdom checks.\n&emsp;*20*—Overcome with vertigo, the character can do nothing but retch for three rounds.'
 };
 PSYCHOPORTIVE['Devotion']['Dream Travel'] = {
     'roll-override': 'Secret by DM',
@@ -1695,7 +1695,7 @@ TELEPATHIC['Science']['Domination'] = {
 };
 TELEPATHIC['Science']['Ejection'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–4',
+    'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'varies',
     'maintenance-cost': 'na',
@@ -1715,7 +1715,7 @@ TELEPATHIC['Science']['Ejection'] = {
 };
 TELEPATHIC['Science']['Fate Link'] = {
     'attribute': '@{Constitution}',
-    'modifier': '–5',
+    'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '5/turn',
@@ -1735,7 +1735,7 @@ TELEPATHIC['Science']['Fate Link'] = {
 };
 TELEPATHIC['Science']['Mass Domination'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–6',
+    'modifier': '-6',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': 'varies',
@@ -1755,7 +1755,7 @@ TELEPATHIC['Science']['Mass Domination'] = {
 };
 TELEPATHIC['Science']['Mindlink'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–5',
+    'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '8/round',
@@ -1775,7 +1775,7 @@ TELEPATHIC['Science']['Mindlink'] = {
 };
 TELEPATHIC['Science']['Mindwipe'] = {
     'attribute': '@{Intelligence}',
-    'modifier': '–6',
+    'modifier': '-6',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '8/round',
@@ -1795,7 +1795,7 @@ TELEPATHIC['Science']['Mindwipe'] = {
 };
 TELEPATHIC['Science']['Probe'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–5',
+    'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '9/round',
@@ -1815,7 +1815,7 @@ TELEPATHIC['Science']['Probe'] = {
 };
 TELEPATHIC['Science']['Psionic Blast'] = ATTACK['Science']['Psionic Blast'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–5',
+    'modifier': '-5',
     'context-modifier': '?{Range to target modifier?|0 [20 yards]|-2 [40 yards]|-5 [60 yards]}',
     'initial-cost': '10 (both attacks)',
     'maintenance-cost': 'na',
@@ -1835,7 +1835,7 @@ TELEPATHIC['Science']['Psionic Blast'] = ATTACK['Science']['Psionic Blast'] = {
 };
 TELEPATHIC['Science']['Superior Invisibility'] = {
     'attribute': '@{Intelligence}',
-    'modifier': '–5',
+    'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '5/round/creature',
@@ -1855,7 +1855,7 @@ TELEPATHIC['Science']['Superior Invisibility'] = {
 };
 TELEPATHIC['Science']['Switch Personality'] = {
     'attribute': '@{Constitution}',
-    'modifier': '–4',
+    'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact +30',
     'maintenance-cost': 'na',
@@ -1871,11 +1871,11 @@ TELEPATHIC['Science']['Switch Personality'] = {
     'power-score': 'System shock rolls automatically succeed, and the Constitution checks are made only once a week.',
     '20': 'The psionicist lapses into a coma for [[1d100]] hours.',
     '1': '',
-    'effect': 'Some psionicists can literally put themselves in another man’s (or woman’s) shoes. This science allows the psionicist to switch his own mind with someone else’s. In effect, they exchange bodies. The other person’s mind inhabits the psionicist’s body, while the psionicist’s mind inhabits his subject’s body. The switch is permanent, and lasts until the psionicist uses this power to reverse it.\n&emsp;Each character gains the other’s physical attributes. However, both minds retain all their own knowledge and knowledge—based abilities. For example, a telepath who switches minds with a 10th level fighter gains a body with that fighter’s hit points and physical attributes (Strength, Constitution, and Dexterity). However, he retains his own THAC0, proficiencies, and so forth.\n&emsp;The switch takes a turn to complete, and the process is quite traumatic. At the end of the turn, both characters must make system shock saving throws using their new Constitution scores. A character who fails this roll lapses into a coma for 1—100 hours.\n&emsp;Bodies that have undergone a personality switch tend to degenerate. Both characters must make a Constitution ability check every day. If a check fails, the character loses one point of Constitution. If his Constitution drops to zero, he dies.\n&emsp;This Constitution loss is temporary, but it does not reverse itself until\n&emsp;the personalities are restored to their proper bodies. At that point, both bodies recover one point of Constitution per day until they reach their original scores.\n&emsp;The psionicist does not lose his psionic powers if his Constitution drops below 11. However, if a power score is based on Constitution—like this power’s score is—the score drops accordingly.\n&emsp;*Power Score*—System shock rolls automatically succeed, and the Constitution checks are made only once a week.\n&emsp;*20*—The psionicist lapses into a coma for 1d100 hours.'
+    'effect': 'Some psionicists can literally put themselves in another man’s (or woman’s) shoes. This science allows the psionicist to switch his own mind with someone else’s. In effect, they exchange bodies. The other person’s mind inhabits the psionicist’s body, while the psionicist’s mind inhabits his subject’s body. The switch is permanent, and lasts until the psionicist uses this power to reverse it.\n&emsp;Each character gains the other’s physical attributes. However, both minds retain all their own knowledge and knowledge—based abilities. For example, a telepath who switches minds with a 10th level fighter gains a body with that fighter’s hit points and physical attributes (Strength, Constitution, and Dexterity). However, he retains his own THAC0, proficiencies, and so forth.\n&emsp;The switch takes a turn to complete, and the process is quite traumatic. At the end of the turn, both characters must make system shock saving throws using their new Constitution scores. A character who fails this roll lapses into a coma for 1-100 hours.\n&emsp;Bodies that have undergone a personality switch tend to degenerate. Both characters must make a Constitution ability check every day. If a check fails, the character loses one point of Constitution. If his Constitution drops to zero, he dies.\n&emsp;This Constitution loss is temporary, but it does not reverse itself until\n&emsp;the personalities are restored to their proper bodies. At that point, both bodies recover one point of Constitution per day until they reach their original scores.\n&emsp;The psionicist does not lose his psionic powers if his Constitution drops below 11. However, if a power score is based on Constitution—like this power’s score is—the score drops accordingly.\n&emsp;*Power Score*—System shock rolls automatically succeed, and the Constitution checks are made only once a week.\n&emsp;*20*—The psionicist lapses into a coma for 1d100 hours.'
 };
 TELEPATHIC['Science']['Tower of Iron Will'] = DEFENSE['Science']['Tower of Iron Will'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–2',
+    'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '6',
     'maintenance-cost': 'na',
@@ -1895,7 +1895,7 @@ TELEPATHIC['Science']['Tower of Iron Will'] = DEFENSE['Science']['Tower of Iron 
 };
 TELEPATHIC['Devotion']['Attraction'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–4',
+    'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '8/round',
@@ -1914,15 +1914,15 @@ TELEPATHIC['Devotion']['Attraction'] = {
     'effect': 'The opposite of aversion (a telepathic devotion), this power creates an overwhelming attraction to a particular person or thing—be it an item, creature, action, or event. A victim of this power will do whatever seems reasonable to get close to the object of his attraction.\n&emsp;The key word is “reasonable.” The victim is completely fascinated, but he doesn’t suffer from blind obsession. He won’t leap into a fire or over a cliff, for example, or climb into the arms of a tarrasque (a bipedal killing machine). He can still recognize danger, but he will not flee unless the threat is strong and immediate. And if the danger is not apparent, (such as poison in a goblet of wine), the character could easily destroy himself in pursuit of the attraction.\n&emsp;*Power Score*—The effect borders on an obsession; the victim takes serious risks.\n&emsp;*20*—No additional effect.'
 };
 TELEPATHIC['Devotion']['Aversion'] = {
-    'attribute': '8/turn',
-    'modifier': '0',
+    'attribute': '@{Wisdom}',
+    'modifier': '-4',
     'context-modifier': '',
-    'initial-cost': '200 yards',
-    'maintenance-cost': '0',
-    'range': 'Area of Effect: individual',
-    'prep': 'Prerequisite: mindlink, contact',
-    'aoe': 'contact',
-    'prerequisites': 'Wis –4',
+    'initial-cost': 'contact',
+    'maintenance-cost': '8/turn',
+    'range': '200 yards',
+    'prep': '0',
+    'aoe': 'individual',
+    'prerequisites': 'mindlink, contact',
     'reference': 'p. 79',
     'book': 'The Complete Psionics Handbook',
     'damage': '',
@@ -1935,7 +1935,7 @@ TELEPATHIC['Devotion']['Aversion'] = {
 };
 TELEPATHIC['Devotion']['Awe'] = {
     'attribute': '@{Charisma}',
-    'modifier': '–2',
+    'modifier': '-2',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '4/round',
@@ -2015,7 +2015,7 @@ TELEPATHIC['Devotion']['Daydream'] = {
 };
 TELEPATHIC['Devotion']['Ego Whip'] = ATTACK['Devotion']['Ego Whip'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–3',
+    'modifier': '-3',
     'context-modifier': '?{Range to target modifier?|0 [40 yards]|-2 [80 yards]|-5 [120 yards]}',
     'initial-cost': '4 (both attacks)',
     'maintenance-cost': 'na',
@@ -2031,7 +2031,7 @@ TELEPATHIC['Devotion']['Ego Whip'] = ATTACK['Devotion']['Ego Whip'] = {
     'power-score': 'No additional effect.',
     '20': 'No additional effect.',
     '1': '',
-    'effect': 'Ego whip is one of the five telepathic attacks used to establish contact\n&emsp;with another psionicist’s mind. (See Chapter 2.) The power assaults the victim’s ego, leaving him with feelings of inferiority and worthlessness. If used against a contacted mind, the target is dazed for 1—4 rounds, during which all of his die rolls (psionic attacks, melee attacks, saving throws, etc.) are penalized five points (or 25%) and he cannot cast any spells above third level.\n&emsp;This power has three ranges: short, medium, and long. At medium range, the psionicist’s power score is reduced by two. At long range, it is reduced by five.\n&emsp;*Power Score*—No additional effect.\n&emsp;*20*—No additional effect.'
+    'effect': 'Ego whip is one of the five telepathic attacks used to establish contact\n&emsp;with another psionicist’s mind. (See Chapter 2.) The power assaults the victim’s ego, leaving him with feelings of inferiority and worthlessness. If used against a contacted mind, the target is dazed for 1-4 rounds, during which all of his die rolls (psionic attacks, melee attacks, saving throws, etc.) are penalized five points (or 25%) and he cannot cast any spells above third level.\n&emsp;This power has three ranges: short, medium, and long. At medium range, the psionicist’s power score is reduced by two. At long range, it is reduced by five.\n&emsp;*Power Score*—No additional effect.\n&emsp;*20*—No additional effect.'
 };
 TELEPATHIC['Devotion']['Empathy'] = {
     'attribute': '@{Wisdom}',
@@ -2055,7 +2055,7 @@ TELEPATHIC['Devotion']['Empathy'] = {
 };
 TELEPATHIC['Devotion']['ESP'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–4',
+    'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '6/round',
@@ -2075,7 +2075,7 @@ TELEPATHIC['Devotion']['ESP'] = {
 };
 TELEPATHIC['Devotion']['False Sensory Input'] = {
     'attribute': '@{Intelligence}',
-    'modifier': '–3',
+    'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '4/round',
@@ -2095,7 +2095,7 @@ TELEPATHIC['Devotion']['False Sensory Input'] = {
 };
 TELEPATHIC['Devotion']['Id Insinuation'] = ATTACK['Devotion']['Id Insinuation'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–4',
+    'modifier': '-4',
     'context-modifier': '?{Range to target modifier?|0 [60 yards]|-2 [120 yards]|-5 [180 yards]}',
     'initial-cost': '5 (both attacks)',
     'maintenance-cost': 'na',
@@ -2115,7 +2115,7 @@ TELEPATHIC['Devotion']['Id Insinuation'] = ATTACK['Devotion']['Id Insinuation'] 
 };
 TELEPATHIC['Devotion']['Identity Penetration'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–3',
+    'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '6/round',
@@ -2135,7 +2135,7 @@ TELEPATHIC['Devotion']['Identity Penetration'] = {
 };
 TELEPATHIC['Devotion']['Incarnation Awareness'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–4',
+    'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '13/round',
@@ -2155,7 +2155,7 @@ TELEPATHIC['Devotion']['Incarnation Awareness'] = {
 };
 TELEPATHIC['Devotion']['Inflict Pain'] = {
     'attribute': '@{Constitution}',
-    'modifier': '–4',
+    'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '2/round',
@@ -2175,7 +2175,7 @@ TELEPATHIC['Devotion']['Inflict Pain'] = {
 };
 TELEPATHIC['Devotion']['Intellect Fortress'] = DEFENSE['Devotion']['Intellect Fortress'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–3',
+    'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '4',
     'maintenance-cost': 'na',
@@ -2195,7 +2195,7 @@ TELEPATHIC['Devotion']['Intellect Fortress'] = DEFENSE['Devotion']['Intellect Fo
 };
 TELEPATHIC['Devotion']['Invincible Foes'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–3',
+    'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '5/round',
@@ -2215,7 +2215,7 @@ TELEPATHIC['Devotion']['Invincible Foes'] = {
 };
 TELEPATHIC['Devotion']['Invisibility'] = {
     'attribute': '@{Intelligence}',
-    'modifier': '–5',
+    'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '2/round/creature',
@@ -2236,7 +2236,7 @@ TELEPATHIC['Devotion']['Invisibility'] = {
 TELEPATHIC['Devotion']['Life Detection'] = {
     'roll-override': 'Secret By DM',
     'attribute': '@{Intelligence}',
-    'modifier': '–2',
+    'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '3',
     'maintenance-cost': '3/round',
@@ -2256,7 +2256,7 @@ TELEPATHIC['Devotion']['Life Detection'] = {
 };
 TELEPATHIC['Devotion']['Mental Barrier'] = DEFENSE['Devotion']['Mental Barrier'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–2',
+    'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '3',
     'maintenance-cost': 'na',
@@ -2276,7 +2276,7 @@ TELEPATHIC['Devotion']['Mental Barrier'] = DEFENSE['Devotion']['Mental Barrier']
 };
 TELEPATHIC['Devotion']['Mind Bar'] = {
     'attribute': '@{Intelligence}',
-    'modifier': '–2',
+    'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '6',
     'maintenance-cost': '4/round',
@@ -2296,7 +2296,7 @@ TELEPATHIC['Devotion']['Mind Bar'] = {
 };
 TELEPATHIC['Devotion']['Mind Blank'] = DEFENSE['Devotion']['Mind Blank'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–7',
+    'modifier': '-7',
     'context-modifier': '',
     'initial-cost': '0',
     'maintenance-cost': '0',
@@ -2316,7 +2316,7 @@ TELEPATHIC['Devotion']['Mind Blank'] = DEFENSE['Devotion']['Mind Blank'] = {
 };
 TELEPATHIC['Devotion']['Mind Thrust'] = ATTACK['Devotion']['Mind Thrust'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–2',
+    'modifier': '-2',
     'context-modifier': '?{Range to target modifier?|0 [30 yards]|-2 [60 yards]|-5 [90 yards]}',
     'initial-cost': '2',
     'maintenance-cost': 'na',
@@ -2336,7 +2336,7 @@ TELEPATHIC['Devotion']['Mind Thrust'] = ATTACK['Devotion']['Mind Thrust'] = {
 };
 TELEPATHIC['Devotion']['Phobia Amplification'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–2',
+    'modifier': '-2',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '4/round',
@@ -2356,7 +2356,7 @@ TELEPATHIC['Devotion']['Phobia Amplification'] = {
 };
 TELEPATHIC['Devotion']['Post-Hypnotic Suggestion'] = {
     'attribute': '@{Intelligence}',
-    'modifier': '–3',
+    'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '1/level or HD',
@@ -2376,7 +2376,7 @@ TELEPATHIC['Devotion']['Post-Hypnotic Suggestion'] = {
 };
 TELEPATHIC['Devotion']['Psychic Crush'] = ATTACK['Devotion']['Psychic Crush'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–4',
+    'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '7',
     'maintenance-cost': 'na',
@@ -2436,7 +2436,7 @@ TELEPATHIC['Devotion']['Psychic Messenger'] = {
 };
 TELEPATHIC['Devotion']['Repugnance'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–5',
+    'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '8/round',
@@ -2456,7 +2456,7 @@ TELEPATHIC['Devotion']['Repugnance'] = {
 };
 TELEPATHIC['Devotion']['Send Thoughts'] = {
     'attribute': '@{Intelligence}',
-    'modifier': '–1',
+    'modifier': '-1',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '2/round',
@@ -2476,7 +2476,7 @@ TELEPATHIC['Devotion']['Send Thoughts'] = {
 };
 TELEPATHIC['Devotion']['Sight Link'] = {
     'attribute': '@{Constitution}',
-    'modifier': '–3',
+    'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '5/turn',
@@ -2496,7 +2496,7 @@ TELEPATHIC['Devotion']['Sight Link'] = {
 };
 TELEPATHIC['Devotion']['Sound Link'] = {
     'attribute': '@{Constitution}',
-    'modifier': '–2',
+    'modifier': '-2',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '4/turn',
@@ -2516,7 +2516,7 @@ TELEPATHIC['Devotion']['Sound Link'] = {
 };
 TELEPATHIC['Devotion']['Synaptic Static'] = {
     'attribute': '@{Intelligence}',
-    'modifier': '–4',
+    'modifier': '-4',
     'context-modifier': '?{Area of effect range modifier?|0 [20 yards]|-2 [50 yards]|-5 [90 yards]}',
     'initial-cost': '15',
     'maintenance-cost': '10/round',
@@ -2536,7 +2536,7 @@ TELEPATHIC['Devotion']['Synaptic Static'] = {
 };
 TELEPATHIC['Devotion']['Taste Link'] = {
     'attribute': '@{Constitution}',
-    'modifier': '–2',
+    'modifier': '-2',
     'context-modifier': '',
     'initial-cost': 'contact',
     'maintenance-cost': '4/turn',
@@ -2576,7 +2576,7 @@ TELEPATHIC['Devotion']['Telempathic Projection'] = {
 };
 TELEPATHIC['Devotion']['Thought Shield'] = DEFENSE['Devotion']['Thought Shield'] = {
     'attribute': '@{Wisdom}',
-    'modifier': '–3',
+    'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '1',
     'maintenance-cost': 'na',
@@ -2654,7 +2654,7 @@ METAPSIONIC['Science']['Aura Alteration'] = {
     'power-score': 'No other effect.',
     '20': 'The full PSP cost of the power must be paid despite the lack of success, and this psionicist cannot alter this aura until he achieves a higher experience level.',
     '1': 'The psionicist’s patient must make a saving throw vs. spells to avoid losing one experience level (a slip of the psychic scalpel can close off vital parts of the brain).',
-    'effect': 'With aura alteration, a psionicist can temporarily disguise a person’s alignment, disguise his level, or remove aura afflictions like curses, geases, and quests.\n&emsp;Disguising a character’s alignment or level is the easiest to do. The disguise is temporary, lasting only 1—6 hours. It has no effect on the character’s real alignment or class, but a psionicist with aura sight will be fooled by the fake aura.\n&emsp;Because curses, geases, and quests are imprinted on the character’s aura, they can be removed with this power. A psionicist who tries this suffers a -6 penalty to his power score and must expend 20 PSPs instead of 10. If the die roll is 1, the psionicist’s patient must make a saving throw vs. spells to avoid losing one experience level (a slip of the psychic scalpel can close off vital parts of the brain).\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—The full PSP cost of the power must be paid despite the lack of success, and this psionicist cannot alter this aura until he achieves a higher experience level.'
+    'effect': 'With aura alteration, a psionicist can temporarily disguise a person’s alignment, disguise his level, or remove aura afflictions like curses, geases, and quests.\n&emsp;Disguising a character’s alignment or level is the easiest to do. The disguise is temporary, lasting only 1-6 hours. It has no effect on the character’s real alignment or class, but a psionicist with aura sight will be fooled by the fake aura.\n&emsp;Because curses, geases, and quests are imprinted on the character’s aura, they can be removed with this power. A psionicist who tries this suffers a -6 penalty to his power score and must expend 20 PSPs instead of 10. If the die roll is 1, the psionicist’s patient must make a saving throw vs. spells to avoid losing one experience level (a slip of the psychic scalpel can close off vital parts of the brain).\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—The full PSP cost of the power must be paid despite the lack of success, and this psionicist cannot alter this aura until he achieves a higher experience level.'
 };
 METAPSIONIC['Science']['Empower'] = {
     'attribute': '@{Wisdom}',
@@ -2874,7 +2874,7 @@ METAPSIONIC['Devotion']['Magnify'] = {
     'power-score': 'The magnification factor is one greater, with no additional cost.',
     '20': 'The affected power becomes inoperative for a day.',
     '1': '',
-    'effect': 'Magnify allows the psionicist to magnify the effects of another power in all conceivable ways—e.g., double damage, double range, double modifiers, and so on. However, the affected power’s initial cost is proportionately magnified, as is its maintenance cost.\n&emsp;The psionicist initiates the magnify power first. At the same time, he must designate which power he intends to improve. Unless he maintains the magnification, he must immediately use the power he wishes to improve (in the same round). Otherwise he can maintain the magnification until he uses the affected power (a costly endeavor). Once the power has been performed, magnify must be reinitiated to perform again.\n&emsp;The amount of magnification depends upon the psionicist’s level, as follows:}}{{c1-1=Levels 6—10}}{{c2-1=Levels 11—15}}{{c3-1=Levels 16—20}}{{c1-2=x2}}{{c2-2=x3}}{{c3-2=x4}}{{effects2=&emsp;*Power Score*—The magnification factor is one greater, with no additional cost.\n&emsp;*20*—The affected power becomes inoperative for a day.'
+    'effect': 'Magnify allows the psionicist to magnify the effects of another power in all conceivable ways—e.g., double damage, double range, double modifiers, and so on. However, the affected power’s initial cost is proportionately magnified, as is its maintenance cost.\n&emsp;The psionicist initiates the magnify power first. At the same time, he must designate which power he intends to improve. Unless he maintains the magnification, he must immediately use the power he wishes to improve (in the same round). Otherwise he can maintain the magnification until he uses the affected power (a costly endeavor). Once the power has been performed, magnify must be reinitiated to perform again.\n&emsp;The amount of magnification depends upon the psionicist’s level, as follows:}}{{c1-1=Levels 6-10}}{{c2-1=Levels 11-15}}{{c3-1=Levels 16-20}}{{c1-2=x2}}{{c2-2=x3}}{{c3-2=x4}}{{effects2=&emsp;*Power Score*—The magnification factor is one greater, with no additional cost.\n&emsp;*20*—The affected power becomes inoperative for a day.'
 };
 METAPSIONIC['Devotion']['Martial Trance'] = {
     'attribute': '@{Wisdom}',
@@ -2974,7 +2974,7 @@ METAPSIONIC['Devotion']['Psychic Drain'] = {
     'power-score': 'The psionicist does not harm the subject(s) this time, regardless of how much he drains.',
     '20': 'Contact broken',
     '1': '',
-    'effect': 'Psychic drain enables the psionicist to tap into the personal, psychic energy of other people to augment his own psionic strength. Up to six people can be tapped at one time.\n&emsp;Each subject, who is often called a *host*, must first be asleep. Next, the psionicist must make contact with the person’s mind. Then he expends another 10 PSPs and makes a psychic drain power check. If he succeeds, the host falls into a trance, which lasts 4—9 (1d6+3) hours. The character can be awakened with some difficulty before then, but he’ll be groggy and disoriented for another hour.\n&emsp;While the host is in the trance, the psionicist can siphon psychic energy, just as a vampire draws blood to grow strong, the psionicist drains Wisdom, Intelligence, and Constitution points. He can drain as much as he desires. For every ability point the psionicist drains, he gains 10 PSPs.\n&emsp;Any PSPs gained cannot be banked (added to the psionicist’s total). They cannot be siphoned any faster than they are used. In other words, when the psionicist expends PSPs, he automatically draws these points from his host(s)—unless he specifies otherwise. The psionicist must remain within range of the entranced characters in order to draw strength points from them.\n&emsp;If he exercises moderation, the psionicist does not harm his hosts. A host only begins to suffer ill effects when he loses more than 50% of his psionic potential (potential equals Wisdom, Intelligence, and Constitution combined, minus 30 points. See “Psionic Strength Points” in Chapter 1). The table below shows the effects of excessive depletion. Psychic surgery can correct these problems.}}{{style=bottom2}}{{c1-1=**Potential**\n**Lost**}}{{c2-1=51—60%}}{{c3-1=61—70%}}{{c4-1=71—80%}}{{c5-1=81—90%}}{{c6-1=91—100%}}{{c1-2=**Effect on host**}}{{c2-2=Temporary amnesia (2—12 weeks)}}{{c3-2=Permanent amnesia}}{{c4-2=Intelligence reduced to 4}}{{c5-2=Intelligence reduced to 4; put in coma for 1—12 days, must make system shock roll every day or die.}}{{c6-2=Save vs. death or die; if subject lives, Intelligence, Wisdom, and Constitution each reduced to 3, permanently.}}{{effects2=&emsp;*Power Score*—The psionicist does not harm the subject(s) this time, regardless of how much he drains.\n&emsp;*20*—Contact broken'
+    'effect': 'Psychic drain enables the psionicist to tap into the personal, psychic energy of other people to augment his own psionic strength. Up to six people can be tapped at one time.\n&emsp;Each subject, who is often called a *host*, must first be asleep. Next, the psionicist must make contact with the person’s mind. Then he expends another 10 PSPs and makes a psychic drain power check. If he succeeds, the host falls into a trance, which lasts 4-9 (1d6+3) hours. The character can be awakened with some difficulty before then, but he’ll be groggy and disoriented for another hour.\n&emsp;While the host is in the trance, the psionicist can siphon psychic energy, just as a vampire draws blood to grow strong, the psionicist drains Wisdom, Intelligence, and Constitution points. He can drain as much as he desires. For every ability point the psionicist drains, he gains 10 PSPs.\n&emsp;Any PSPs gained cannot be banked (added to the psionicist’s total). They cannot be siphoned any faster than they are used. In other words, when the psionicist expends PSPs, he automatically draws these points from his host(s)—unless he specifies otherwise. The psionicist must remain within range of the entranced characters in order to draw strength points from them.\n&emsp;If he exercises moderation, the psionicist does not harm his hosts. A host only begins to suffer ill effects when he loses more than 50% of his psionic potential (potential equals Wisdom, Intelligence, and Constitution combined, minus 30 points. See “Psionic Strength Points” in Chapter 1). The table below shows the effects of excessive depletion. Psychic surgery can correct these problems.}}{{style=bottom2}}{{c1-1=**Potential**\n**Lost**}}{{c2-1=51-60%}}{{c3-1=61-70%}}{{c4-1=71-80%}}{{c5-1=81-90%}}{{c6-1=91-100%}}{{c1-2=**Effect on host**}}{{c2-2=Temporary amnesia (2-12 weeks)}}{{c3-2=Permanent amnesia}}{{c4-2=Intelligence reduced to 4}}{{c5-2=Intelligence reduced to 4; put in coma for 1-12 days, must make system shock roll every day or die.}}{{c6-2=Save vs. death or die; if subject lives, Intelligence, Wisdom, and Constitution each reduced to 3, permanently.}}{{effects2=&emsp;*Power Score*—The psionicist does not harm the subject(s) this time, regardless of how much he drains.\n&emsp;*20*—Contact broken'
 };
 METAPSIONIC['Devotion']['Receptacle'] = {
     'attribute': '@{Wisdom}',
@@ -3014,7 +3014,7 @@ METAPSIONIC['Devotion']['Retrospection'] = {
     'power-score': 'No other effect.',
     '20': 'No other effect.',
     '1': '',
-    'effect': 'Retrospection is a kind of psionic seance. It allows psionicists to delve into the past and locate memories that have been loosed from other minds. A psionicist must join at least two other psionicists in a convergence before he can use this power. He—or one of the other participants in the convergence—then poses a question regarding a specific event in the past. To find the answer, the psionicist must make a successful power check.\n&emsp;When retrospection succeeds, the characters tap into a universal, pervasive memory. They have access to any information that ever existed in anyone’s memory regarding the incident they are investigating. The amount of detail that comes to mind depends on power check results:}}{{style=center1}}{{c1-1=1}}{{c2-1=2}}{{c3-1=3—5}}{{c4-1=6+}}{{c1-2=extremely vague and fragmentary}}{{c2-2=vague or incomplete}}{{c3-2=complete but not very specific}}{{c4-2=reasonably complete and specific}}{{effects2=&emsp;Memories bear the mark of the personalities who created them. The DM should role-play the memories accordingly, not just recite information. If the psionicists’ alignments differ significantly from the memories’ alignments, reaction rolls are in order. Memories can be polite and helpful, or they can be cantankerous and downright rude. Memories which have lain undisturbed for centuries may be angered by the intrusion, or they may be delighted for the chance to air themselves out and bring the truth to light.\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—No other effect.'
+    'effect': 'Retrospection is a kind of psionic seance. It allows psionicists to delve into the past and locate memories that have been loosed from other minds. A psionicist must join at least two other psionicists in a convergence before he can use this power. He—or one of the other participants in the convergence—then poses a question regarding a specific event in the past. To find the answer, the psionicist must make a successful power check.\n&emsp;When retrospection succeeds, the characters tap into a universal, pervasive memory. They have access to any information that ever existed in anyone’s memory regarding the incident they are investigating. The amount of detail that comes to mind depends on power check results:}}{{style=center1}}{{c1-1=1}}{{c2-1=2}}{{c3-1=3-5}}{{c4-1=6+}}{{c1-2=extremely vague and fragmentary}}{{c2-2=vague or incomplete}}{{c3-2=complete but not very specific}}{{c4-2=reasonably complete and specific}}{{effects2=&emsp;Memories bear the mark of the personalities who created them. The DM should role-play the memories accordingly, not just recite information. If the psionicists’ alignments differ significantly from the memories’ alignments, reaction rolls are in order. Memories can be polite and helpful, or they can be cantankerous and downright rude. Memories which have lain undisturbed for centuries may be angered by the intrusion, or they may be delighted for the chance to air themselves out and bring the truth to light.\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—No other effect.'
 };
 METAPSIONIC['Devotion']['Splice'] = {
     'attribute': '@{Intelligence}',
