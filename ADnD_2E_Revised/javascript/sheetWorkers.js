@@ -2643,7 +2643,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
                 .replaceAll(`PSP-cost-maintenance`,`${repeating}_PSP-cost-maintenance`);
 
             if (!values['psion-armor-penalty']) {
-                macroValue = macroValue.replaceAll('+(@{psion-armor-penalty})+', '+');
+                macroValue = macroValue.replaceAll('+(@{psion-armor-penalty})', '');
             }
 
             let roll = await startRoll(macroValue);
