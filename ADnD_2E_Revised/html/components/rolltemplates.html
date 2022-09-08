@@ -730,13 +730,72 @@
                     <td colspan="2" class="sheet-check-c1">{{powerroll}}</td>
                     <td colspan="2">&le;</td>
                     <td colspan="2" class="sheet-check-c1">
-                        {{computed::powerscore}}{{#rollGreater() powerscore 19}}&ast;{{/rollGreater() powerscore 19}}
+                        {{computed::powerscore}}{{#^rollTotal() powerscore computed::powerscore}}&ast;{{/^rollTotal() powerscore computed::powerscore}}
                         {{#rollGreater() powerscoreenhanced powerscore}}
                         -
-                        {{computed::powerscoreenhanced}}{{#rollGreater() powerscoreenhanced 19}}&ast;{{/rollGreater() powerscoreenhanced 19}}
+                        {{computed::powerscoreenhanced}}{{#^rollTotal() powerscoreenhanced computed::powerscoreenhanced}}&ast;{{/^rollTotal() powerscoreenhanced computed::powerscoreenhanced}}
                         {{/rollGreater() powerscoreenhanced powerscore}}
                     </td>
                 </tr>
+                {{#rollGreater() powerscoreenhanced powerscore}}
+                    {{#rollBetween() powerroll computed::powerscore computed::powerscoreenhanced}}
+                    <tr>
+                        <td colspan="6" class="sheet-template-result sheet-template-success">
+                            Power Score!
+                            <br>
+                            {{#powerscoreeffect}}
+                            <span class='sheet-template-result-description'>{{powerscoreeffect}}</span>
+                            {{/powerscoreeffect}}
+                        </td>
+                    </tr>
+                    {{/rollBetween() powerroll computed::powerscore computed::powerscoreenhanced}}
+
+                    {{#rollGreater() powerroll computed::powerscoreenhanced}}
+                        {{#rollLess() powerscoreenhanced 20}}
+                        {{#^rollTotal() powerroll 20}}
+                        {{#^rollTotal() powerroll 1}}
+                        <tr>
+                            <td colspan="6" class="sheet-template-result sheet-template-failure">Failure!</td>
+                        </tr>
+                        {{/^rollTotal() powerroll 1}}
+                        {{/^rollTotal() powerroll 20}}
+                        {{/rollLess() powerscoreenhanced 20}}
+
+                        {{#rollGreater() powerscoreenhanced 19}}
+                        <tr>
+                            <td colspan="6" class="sheet-template-result sheet-template-failure">Failure!</td>
+                        </tr>
+                        {{/rollGreater() powerscoreenhanced 19}}
+                    {{/rollGreater() powerroll computed::powerscoreenhanced}}
+
+                    {{#rollLess() powerscoreenhanced 20}}
+                    {{#rollTotal() powerroll 20}}
+                    <tr>
+                        <td colspan="6" class="sheet-template-result sheet-template-failure">
+                            20 Negative effect!
+                            <br>
+                            {{#20effect}}
+                            <span class='sheet-template-result-description'>{{20effect}}</span>
+                            {{/20effect}}
+                        </td>
+                    </tr>
+                    {{/rollTotal() powerroll 20}}
+                    {{/rollLess() powerscoreenhanced 20}}
+
+                    {{#rollTotal() powerroll 1}}
+                    {{#rollLess() powerscoreenhanced 1}}
+                    <tr>
+                        <td colspan="6" class="sheet-template-result sheet-template-success">Success!</td>
+                    </tr>
+                    {{/rollLess() powerscoreenhanced 1}}
+                    {{/rollTotal() powerroll 1}}
+
+                    {{#rollLess() powerroll computed::powerscore}}
+                    <tr>
+                        <td colspan="6" class="sheet-template-result sheet-template-success">Success!</td>
+                    </tr>
+                    {{/rollLess() powerroll computed::powerscore}}
+                {{/rollGreater() powerscoreenhanced powerscore}}
 
                 <!--#region Regular Powers-->
                 {{^powerscoreenhanced}}
@@ -753,25 +812,25 @@
                     {{/rollTotal() powerroll computed::powerscore}}
 
                     {{#rollGreater() powerroll computed::powerscore}}
-                    {{#rollLess() powerroll 20}}
-                    {{#^rollTotal() powerroll 1}}
-                    <tr>
-                        <td colspan="6" class="sheet-template-result sheet-template-failure">Failure!</td>
-                    </tr>
-                    {{/^rollTotal() powerroll 1}}
-                    {{/rollLess() powerroll 20}}
+                        {{#rollLess() powerscore 20}}
+                        {{#^rollTotal() powerroll 20}}
+                        {{#^rollTotal() powerroll 1}}
+                        <tr>
+                            <td colspan="6" class="sheet-template-result sheet-template-failure">Failure!</td>
+                        </tr>
+                        {{/^rollTotal() powerroll 1}}
+                        {{/^rollTotal() powerroll 20}}
+                        {{/rollLess() powerscore 20}}
+
+                        {{#rollGreater() powerscore 19}}
+                        <tr>
+                            <td colspan="6" class="sheet-template-result sheet-template-failure">Failure!</td>
+                        </tr>
+                        {{/rollGreater() powerscore 19}}
                     {{/rollGreater() powerroll computed::powerscore}}
 
-                    {{#rollGreater() powerscore 19}}
-                    {{#rollGreater() powerroll computed::powerscore}}
-                    <tr>
-                        <td colspan="6" class="sheet-template-result sheet-template-failure">Failure!</td>
-                    </tr>
-                    {{/rollGreater() powerroll computed::powerscore}}
-                    {{/rollGreater() powerscore 19}}
-
-                    {{#rollLess() powerscore 20}}
                     {{#rollTotal() powerroll 20}}
+                    {{#rollLess() powerscore 20}}
                     <tr>
                         <td colspan="6" class="sheet-template-result sheet-template-failure">
                             20 Negative effect!
@@ -781,11 +840,11 @@
                             {{/20effect}}
                         </td>
                     </tr>
-                    {{/rollTotal() powerroll 20}}
                     {{/rollLess() powerscore 20}}
+                    {{/rollTotal() powerroll 20}}
 
-                    {{#^rollTotal() powerscore 1}}
                     {{#rollTotal() powerroll 1}}
+                    {{#^rollTotal() powerscore 1}}
                     <tr>
                         <td colspan="6" class="sheet-template-result sheet-template-success">
                             Minimum Success!
@@ -795,16 +854,17 @@
                             {{/1effect}}
                         </td>
                     </tr>
-                    {{/rollTotal() powerroll 1}}
                     {{/^rollTotal() powerscore 1}}
+                    {{/rollTotal() powerroll 1}}
 
-                    {{#rollGreater() powerroll 1}}
+
                     {{#rollLess() powerroll computed::powerscore}}
+                    {{#^rollTotal() powerroll 1}}
                     <tr>
                         <td colspan="6" class="sheet-template-result sheet-template-success">Success!</td>
                     </tr>
+                    {{/^rollTotal() powerroll 1}}
                     {{/rollLess() powerroll computed::powerscore}}
-                    {{/rollGreater() powerroll 1}}
                 {{/powerscoreenhanced}}
                 <!--#endregion-->
                 {{#effects}}
