@@ -963,7 +963,7 @@ PSYCHOMETABOLIC['Devotion']['Aging'] = {
     'healing': '',
     'power-score': 'The victim ages 1d20 years.',
     '20': 'The psionicist ages [[1d10]] years.',
-    '1': 'There is a backlash and he, too, ages 1d4 years.',
+    '1': 'There is a backlash and the psionicist, too, ages [[1d4]] years.',
     'effect': 'With this power, an evil psionicist can cause unnatural aging by touch (other psionicists can use this power, too, but their alignment would begin to twist toward evil). The victim ages 1d4 years instantly and must make a saving throw vs. polymorph. Failure means that the change was traumatic, and he ages another year automatically.\n&emsp;If the psionicist’s power check result was a 1, there is a backlash and he, too, ages 1d4 years.\n&emsp;*Power Score*—The victim ages 1d20 years.\n&emsp;*20*—The psionicist ages 1d10 years.'
 };
 PSYCHOMETABOLIC['Devotion']['Biofeedback'] = {
