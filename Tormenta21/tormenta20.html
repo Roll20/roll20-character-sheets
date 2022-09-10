@@ -1499,7 +1499,13 @@
                         <span data-i18n="tibares_ouro">TO:</span>
                         <input name="attr_to" type="text" spellcheck="false" value="0">  
                         <span class="cargaspan" data-i18n="carga" data-i18n="carga">Carga:</span>
-                        <input class="cargainput" name="attr_carga" type="text" spellcheck="false" value="0" readonly="1">            
+                        <input class="cargainput" name="attr_carga" type="text" spellcheck="false" value="0" readonly="1">      
+                    </div>
+                    <div class="container-money">
+                        <span data-i18n="climite">C. Limite:</span>
+                        <input class="cargalimite" name="attr_limite" type="text" spellcheck="false" value="@{limite}" readonly="1">
+                        <span data-i18n="cmaxima">C. Máxima:</span>
+                        <input class="cargamaxima" name="attr_maxima" type="text" spellcheck="false" value="@{maxima}" readonly="1">     
                     </div>
                     <div class="corner top-left"></div>
                     <div class="corner top-right"></div>
@@ -1784,6 +1790,22 @@
                 setAttrs({
                     [`${stat}_mod`]: mod 
                 });
+
+                if(stat == 'for'){                    
+                    let cargalimit = v[stat] > 0 ? 10 + (2 * v[stat]) :  10 + parseInt(v[stat]);
+                    let cargamax = cargalimit * 2;
+
+                    console.log('Status:' + v[stat]);
+                    console.log('Limite:' + cargalimit, 'Máximo:' + cargamax);
+
+                    setAttrs({
+                        "limite": cargalimit
+                    })
+
+                    setAttrs({
+                        "maxima": cargamax
+                    })
+                }
             }); 
         });
     });
@@ -1891,8 +1913,10 @@
                 const getValue = (section, id,field) => parseFloat(v[`repeating_${section}_${id}_${field}`]) || (v[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : 0); 
                 const sumTotal = idArray.reduce((total, id) => total + fields.reduce((subtotal,field) => subtotal * getValue(section, id,field),1),0);
                 
-                let cargalimit = 3 * parseInt(v.for);
-                let cargamax = 10 * parseInt(v.for);
+                let for_mod = parseInt(v.for);
+
+                let cargalimit = for_mod > 0 ? 10 + (2 * for_mod) :  10 + parseInt(for_mod);
+                let cargamax = cargalimit * 2;
 
                 let setObj = {}
 
@@ -1904,8 +1928,11 @@
 
                 setObj[destination] = finalTotal;
 
+                setObj['limite'] = cargalimit;
+                setObj['maxima'] = cargamax;
+                
                 if(sumTotal * multiplier > cargalimit){
-                    setObj['penalidades_armadura_carga'] = 2;
+                    setObj['penalidades_armadura_carga'] = 5;
 
                     setObj[destination] = finalTotal + "!" ;
                 }
@@ -1917,7 +1944,7 @@
 
     //Calculando carga e seus efeitos:
     on('sheet:opened change:repeating_equipment remove:repeating_equipment', function() {
-        repeatingSumModified("carga","equipment",["equipquantity","equipslot"], " kg");        
+        repeatingSumModified("carga","equipment",["equipquantity","equipslot"], "");        
     });
 
     /* // Usar para adicionar uma arma ao criar a ficha
@@ -1932,8 +1959,6 @@
         getAttrs(["defesadestreza", "armaduradefesa1", "armaduradefesa2", "defesaoutros", "des_mod"], function(v){
            
             let total = 10;
-
-            console.error(v);
 
             //Armadura
             if(!isNaN(v.armaduradefesa1)){
@@ -1951,8 +1976,6 @@
             if(!isNaN(v.des_mod) && v.defesadestreza == '1'){
                 total = total + parseInt(v.des_mod);
             }
-
-            console.error("total final", total);
 
             setAttrs({
                 "defesatotal": total
