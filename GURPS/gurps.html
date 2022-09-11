@@ -19409,7 +19409,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	});
 
-	updateRepeatingSkillValues = () => {
+	let updateRepeatingSkillValues = () => {
 
 		let fieldValues = [
 			"repeating_skills_name",	//for debugging
@@ -19542,7 +19542,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	});
 
-	updateRepeatingSpellValues = () => {
+	let updateRepeatingSpellValues = () => {
 
 		let fieldValues = [
 			"repeating_spells_base",
@@ -21681,7 +21681,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * Function to make sure the repeating_ranged_{id}_mal_max_value is set
 	 * during a new version load or possible future reset button
 	 */
-	setRangedMaxMalfunctionValues = () => {
+	let setRangedMaxMalfunctionValues = () => {
 
 		getSectionIDs("repeating_ranged", (ids) => {
 
@@ -33873,7 +33873,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	});
 
-	resetResyncButtonSate = () => {
+	let resetResyncButtonSate = () => {
 
 		setTimeout(() => {
 
@@ -33887,7 +33887,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * Loop through each skill, set sync field = 1 (true)
 	 * this forces the skill to recalculate the value.
 	 */ 
-	resyncRepeatingSkills = () => {
+	let resyncRepeatingSkills = () => {
 
 		getSectionIDs("repeating_skills", ids => {
 
@@ -33920,7 +33920,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * Loop through each technique, set sync field = 1 (true)
 	 * this forces the technique to recalculate the value.
 	 */ 
-	resyncRepeatingTechniques = () => {
+	let resyncRepeatingTechniques = () => {
 
 		getSectionIDs("repeating_techniquesrevised", ids => {
 
@@ -33951,7 +33951,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * Recalculate the weight and value of all items. 
 	 * Should NOT be run silent, so the totals can be calculated
 	 */ 
-	resyncRepeatingItems = () => {
+	let resyncRepeatingItems = () => {
 
 		getSectionIDs("repeating_item", ids => {
 
@@ -34004,7 +34004,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * Loop through each spell, set sync field = 1 (true)
 	 * this forces the spell to recalculate the value.
 	 */ 
-	resyncRepeatingSpells = () => {
+	let resyncRepeatingSpells = () => {
 
 		getSectionIDs("repeating_spells", ids => {
 
@@ -34047,16 +34047,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	});
 
-	resetImportJsonButtonSate = () => {
-
-		setTimeout(() => {
-
-			setAttrs({import_json_state: "normal"});
-
-		}, 2000);
-
-	}
-
 	on("clicked:import_json_reset", (event) => {
 	
 		setAttrs({
@@ -34067,7 +34057,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	});
 
-	importCharacterJson = () => {
+	let importCharacterJson = () => {
 
 		getAttrs(["character_json_data"], values => {
 
@@ -34107,6 +34097,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				let uniqueKeys = getUniqueKeysForCharacter();
 
 				importAttributes(character);
+
+				importRepeatingLanguages(character, uniqueKeys);
 
 				importRepeatingCultures(character, uniqueKeys);
 
@@ -34155,7 +34147,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	getUniqueKeysForCharacter = () => {
+	let getUniqueKeysForCharacter = () => {
 
 		let uniqueKeys = {};
 
@@ -34167,7 +34159,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	getUniqueKeysByTableAsync = (table, uniqueKeys) => {
+	let getUniqueKeysByTableAsync = (table, uniqueKeys) => {
 
 		getSectionIDsAsync(table, ids => {
 
@@ -34218,7 +34210,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importAttributes = character => {
+	let importAttributes = character => {
 
 		const applySizeModifier = character.ApplySizeModifier ? "1" : "0";
 		const flightChecked = character.FlightChecked ? "1" : "0";
@@ -34327,7 +34319,46 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingCultures = (character, uniqueKeys) => {
+	let importRepeatingLanguages = (character, uniqueKeys) => {
+
+		character.RepeatingLanguages.forEach(language => {
+
+			let attributes = {};
+
+			if (language.IsNative) {
+
+				// use the non-repeating native language
+				attributes["native_language_idkey"] = language.Idkey;
+
+				attributes["name_native_language"] = language.Name;
+
+				attributes["native_language_spoken"] = parseInt(language.Spoken);
+
+				attributes["native_language_written"] = parseInt(language.Written);
+
+			} else {
+
+				let rowId = generateOrGetRowId(uniqueKeys, language.Idkey);
+
+				let baseFieldName = `repeating_languages_${rowId}`;
+			
+				attributes[`${baseFieldName}_idkey`] = language.Idkey;
+	
+				attributes[`${baseFieldName}_name`] = language.Name;
+	
+				attributes[`${baseFieldName}_spoken`] = parseInt(language.Spoken);
+
+				attributes[`${baseFieldName}_written`] = parseInt(language.Written);
+
+			}
+			
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	let importRepeatingCultures = (character, uniqueKeys) => {
 
 		character.RepeatingCultures.forEach(culture => {
 
@@ -34349,7 +34380,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingTraits = (character, uniqueKeys) => {
+	let importRepeatingTraits = (character, uniqueKeys) => {
 
 		character.RepeatingTraits.forEach(trait => {
 
@@ -34379,7 +34410,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingPerks = (character, uniqueKeys) => {
+	let importRepeatingPerks = (character, uniqueKeys) => {
 
 		character.RepeatingPerks.forEach(trait => {
 
@@ -34407,7 +34438,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingQuirks = (character, uniqueKeys) => {
+	let importRepeatingQuirks = (character, uniqueKeys) => {
 
 		character.RepeatingQuirks.forEach(trait => {
 
@@ -34435,7 +34466,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingDisadvantages = (character, uniqueKeys) => {
+	let importRepeatingDisadvantages = (character, uniqueKeys) => {
 
 		character.RepeatingDisadvantages.forEach(trait => {
 
@@ -34465,7 +34496,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingRacial = (character, uniqueKeys) => {
+	let importRepeatingRacial = (character, uniqueKeys) => {
 
 		character.RepeatingRacial.forEach(trait => {
 
@@ -34495,8 +34526,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	// TODO: Check for wildcard!
-	importRepeatingSkills = (character, uniqueKeys) => {
+	let importRepeatingSkills = (character, uniqueKeys) => {
 
 		character.RepeatingSkills.forEach(skill => {
 
@@ -34536,7 +34566,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * Converts difficulty name to a number
 	 * TODO: checks for wildcard! 
 	 */
-	getSKillDifficultyValue = difficulty => {
+	let getSKillDifficultyValue = difficulty => {
 
 		let difficultyValue = "-1";
 
@@ -34568,7 +34598,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingTechniquesrevised = (character, uniqueKeys) => {
+	let importRepeatingTechniquesrevised = (character, uniqueKeys) => {
 
 		character.RepeatingTechniquesrevised.forEach(skill => {
 
@@ -34608,7 +34638,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	getTechniqueDifficultyValue = difficulty => {
+	let getTechniqueDifficultyValue = difficulty => {
 
 		let difficultyValue = "Average";
 
@@ -34628,7 +34658,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingDefense = (character, uniqueKeys) => {
+	let importRepeatingDefense = (character, uniqueKeys) => {
 
 		character.RepeatingDefense.forEach(trait => {
 
@@ -34660,7 +34690,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingMelee = (character, uniqueKeys) => {
+	let importRepeatingMelee = (character, uniqueKeys) => {
 
 		character.RepeatingMelee.forEach(trait => {
 
@@ -34692,7 +34722,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingRanged = (character, uniqueKeys) => {
+	let importRepeatingRanged = (character, uniqueKeys) => {
 
 		character.RepeatingRanged.forEach(trait => {
 
@@ -34744,7 +34774,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingItem = (character, uniqueKeys) => {
+	let importRepeatingItem = (character, uniqueKeys) => {
 
 		character.RepeatingItem.forEach(trait => {
 
@@ -34778,7 +34808,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	importRepeatingSpells = (character, uniqueKeys) => {
+	let importRepeatingSpells = (character, uniqueKeys) => {
 
 		character.RepeatingSpells.forEach(skill => {
 
