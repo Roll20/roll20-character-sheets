@@ -34084,8 +34084,38 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			}
 
 			if (success) {
-	
+
+				// TODO: figure out async/await
+				let uniqueKeys = getUniqueKeysForCharacter();
+
 				importAttributes(character);
+
+				importRepeatingCultures(character, uniqueKeys);
+
+				importRepeatingTraits(character, uniqueKeys);
+
+				importRepeatingPerks(character, uniqueKeys);
+
+				importRepeatingQuirks(character, uniqueKeys);
+
+				importRepeatingDisadvantages(character, uniqueKeys);
+
+				// TODO: test
+				importRepeatingRacial(character, uniqueKeys);
+
+				importRepeatingSkills(character, uniqueKeys);
+
+				importRepeatingTechniquesrevised(character, uniqueKeys);
+
+				importRepeatingDefense(character, uniqueKeys);
+
+				importRepeatingMelee(character, uniqueKeys);
+
+				importRepeatingRanged(character, uniqueKeys);
+
+				importRepeatingItem(character, uniqueKeys);
+
+				importRepeatingSpells(character, uniqueKeys);
 
 				// very last attribute to get updated
 				const applyCombatReflexes = character.CombatReflexes ? "1" : "0";
@@ -34097,6 +34127,69 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				setAttrs({ "import_json_message": message });
 
 			}
+
+		});
+
+	}
+
+	getUniqueKeysForCharacter = () => {
+
+		let uniqueKeys = {};
+
+		//getUniqueKeysByTableAsync("repeating_languages", uniqueKeys);
+
+		//getUniqueKeysByTableAsync("repeating_cultures", uniqueKeys);
+
+		return uniqueKeys;
+
+	}
+
+	getUniqueKeysByTableAsync = (table, uniqueKeys) => {
+
+		getSectionIDsAsync(table, ids => {
+
+			if (ids.length === 0) {
+				callback();
+				return;
+			}
+	
+			// get the idkey for each row.
+			let fields = [];
+	
+			for (let i = 0; i < ids.length; i++) {
+	
+				fields.push(`${table}_${ids[i]}_idkey`);
+	
+			}
+
+			getAttrsAsync(fields, values => {
+
+				// loop through each row
+				for (let key in values) {
+	
+					let idkey;
+
+					let rowId;
+
+					if (values.hasOwnProperty(key)) {
+
+						idkey = values[key];
+
+						// get row id from the key name
+						// example: repeating_melee_KEYHERE_idkey
+						rowId = getRowIdFromRowFieldKey(key, table);
+
+						if (idkey && rowId) {
+
+							// add new key/value pair!
+							uniqueKeys[idkey] = rowId;
+
+						}
+
+					}
+
+				}
+			});
 
 		});
 
@@ -34208,6 +34301,508 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		setAttrsAsync(secondaryAttributesPoints);
 
 		setAttrsAsync(secondaryAttributesMods);
+
+	}
+
+	importRepeatingCultures = (character, uniqueKeys) => {
+
+		character.RepeatingCultures.forEach(culture => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, culture.Idkey);
+
+			let baseFieldName = `repeating_cultures_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = culture.Idkey;
+	
+			attributes[`${baseFieldName}_name`] = culture.Name;
+	
+			attributes[`${baseFieldName}_points`] = parseInt(culture.Points);
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	importRepeatingTraits = (character, uniqueKeys) => {
+
+		character.RepeatingTraits.forEach(trait => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
+
+			let baseFieldName = `repeating_traits_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = trait.Idkey;
+
+			attributes[`${baseFieldName}_name`] = trait.Name;
+
+			attributes[`${baseFieldName}_trait_level`] = trait.TraitLevel;
+
+			attributes[`${baseFieldName}_foa`] = trait.Foa;
+
+			attributes[`${baseFieldName}_points`] = parseInt(trait.Points);
+
+			attributes[`${baseFieldName}_ref`] = trait.Ref;
+
+			attributes[`${baseFieldName}_notes`] = trait.Notes;
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	importRepeatingPerks = (character, uniqueKeys) => {
+
+		character.RepeatingPerks.forEach(trait => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
+
+			let baseFieldName = `repeating_perks_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = trait.Idkey;
+
+			attributes[`${baseFieldName}_name`] = trait.Name;
+
+			attributes[`${baseFieldName}_foa`] = trait.Foa;
+
+			attributes[`${baseFieldName}_points`] = parseInt(trait.Points);
+
+			attributes[`${baseFieldName}_ref`] = trait.Ref;
+
+			attributes[`${baseFieldName}_notes`] = trait.Notes;
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	importRepeatingQuirks = (character, uniqueKeys) => {
+
+		character.RepeatingQuirks.forEach(trait => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
+
+			let baseFieldName = `repeating_quirks_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = trait.Idkey;
+
+			attributes[`${baseFieldName}_name`] = trait.Name;
+
+			attributes[`${baseFieldName}_control_rating`] = trait.ControlRating;
+
+			attributes[`${baseFieldName}_points`] = parseInt(trait.Points);
+
+			attributes[`${baseFieldName}_ref`] = trait.Ref;
+
+			attributes[`${baseFieldName}_notes`] = trait.Notes;
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	importRepeatingDisadvantages = (character, uniqueKeys) => {
+
+		character.RepeatingDisadvantages.forEach(trait => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
+
+			let baseFieldName = `repeating_disadvantages_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = trait.Idkey;
+
+			attributes[`${baseFieldName}_name`] = trait.Name;
+
+			attributes[`${baseFieldName}_trait_level`] = trait.TraitLevel;
+
+			attributes[`${baseFieldName}_control_rating`] = trait.ControlRating;
+
+			attributes[`${baseFieldName}_points`] = parseInt(trait.Points);
+
+			attributes[`${baseFieldName}_ref`] = trait.Ref;
+
+			attributes[`${baseFieldName}_notes`] = trait.Notes;
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	// TODO: need test character
+	importRepeatingRacial = (character, uniqueKeys) => {
+
+		character.RepeatingRacial.forEach(trait => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
+
+			let baseFieldName = `repeating_racial_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = trait.Idkey;
+
+			attributes[`${baseFieldName}_name`] = trait.Name;
+
+			attributes[`${baseFieldName}_trait_level`] = trait.TraitLevel;
+
+			attributes[`${baseFieldName}_control_rating`] = trait.ControlRating;
+
+			attributes[`${baseFieldName}_points`] = parseInt(trait.Points);
+
+			attributes[`${baseFieldName}_ref`] = trait.Ref;
+
+			attributes[`${baseFieldName}_notes`] = trait.Notes;
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	// TODO: Check for wildcard!
+	importRepeatingSkills = (character, uniqueKeys) => {
+
+		character.RepeatingSkills.forEach(skill => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, skill.Idkey);
+
+			let baseFieldName = `repeating_skills_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = skill.Idkey;
+
+			attributes[`${baseFieldName}_name`] = skill.Name;
+
+			attributes[`${baseFieldName}_tl`] = skill.Tl;
+
+			attributes[`${baseFieldName}_base`] = skill.Base;
+
+			attributes[`${baseFieldName}_difficulty`] = getSKillDifficultyValue(skill.Difficulty);
+
+			attributes[`${baseFieldName}_bonus`] = parseInt(skill.Bonus);
+
+			attributes[`${baseFieldName}_points`] = parseInt(skill.Points);
+
+			attributes[`${baseFieldName}_ref`] = skill.Ref;
+
+			attributes[`${baseFieldName}_skill_mod_notes`] = skill.SkillModNotes;
+
+			attributes[`${baseFieldName}_notes`] = skill.Notes;
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	/**
+	 * Converts difficulty name to a number
+	 * TODO: checks for wildcard! 
+	 */
+	getSKillDifficultyValue = difficulty => {
+
+		let difficultyValue = "-1";
+
+		switch (difficulty) {
+	
+			case "A":
+				difficultyValue = "-2";
+				break;
+
+			case "H":
+				difficultyValue = "-3";
+				break;
+
+			case "VH":
+				difficultyValue = "-4";
+				break;
+
+			case "WC":
+				difficultyValue = "-5 + 1";
+				break;
+
+			case "E":
+			default:
+				difficultyValue = "-1";
+				break;
+		}
+
+		return difficultyValue;
+
+	}
+
+	importRepeatingTechniquesrevised = (character, uniqueKeys) => {
+
+		character.RepeatingTechniquesrevised.forEach(skill => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, skill.Idkey);
+
+			let baseFieldName = `repeating_techniquesrevised_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = skill.Idkey;
+
+			attributes[`${baseFieldName}_name`] = skill.Name;
+
+			attributes[`${baseFieldName}_parent`] = skill.Parent;
+
+			attributes[`${baseFieldName}_base_level`] = skill.BaseLevel;
+
+			attributes[`${baseFieldName}_default`] = parseInt(skill.Default);
+
+			attributes[`${baseFieldName}_max_modifier`] = parseInt(skill.MaxModifier);
+
+			attributes[`${baseFieldName}_difficulty`] = getTechniqueDifficultyValue(skill.Difficulty);
+
+			attributes[`${baseFieldName}_skill_modifier`] = parseInt(skill.SkillModifier);
+
+			attributes[`${baseFieldName}_points`] = parseInt(skill.Points);
+
+			attributes[`${baseFieldName}_ref`] = skill.Ref;
+
+			attributes[`${baseFieldName}_skill_mod_notes`] = skill.SkillModNotes;
+
+			attributes[`${baseFieldName}_notes`] = skill.Notes;
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	getTechniqueDifficultyValue = difficulty => {
+
+		let difficultyValue = "Average";
+
+		switch (difficulty) {
+	
+			case "H":
+				difficultyValue = "Hard";
+				break;
+
+			case "A":
+			default:
+				difficultyValue = "Average";
+				break;
+		}
+
+		return difficultyValue;
+
+	}
+
+	importRepeatingDefense = (character, uniqueKeys) => {
+
+		character.RepeatingDefense.forEach(trait => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
+
+			let baseFieldName = `repeating_defense_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = trait.Idkey;
+
+			attributes[`${baseFieldName}_name`] = trait.Name;
+
+			attributes[`${baseFieldName}_type`] = trait.Type;
+
+			attributes[`${baseFieldName}_info`] = trait.Info;
+
+			attributes[`${baseFieldName}_skill`] = parseInt(trait.Skill);
+
+			attributes[`${baseFieldName}_skill_mod`] = parseInt(trait.SkillMod);
+
+			attributes[`${baseFieldName}_defense_mod_reason`] = trait.DefenseModReason;
+
+			attributes[`${baseFieldName}_info_description`] = parseInt(trait.InfoDescription);
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	importRepeatingMelee = (character, uniqueKeys) => {
+
+		character.RepeatingMelee.forEach(trait => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
+
+			let baseFieldName = `repeating_melee_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = trait.Idkey;
+
+			attributes[`${baseFieldName}_name`] = trait.Name;
+
+			attributes[`${baseFieldName}_damage`] = trait.Damage;
+
+			attributes[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.Type);
+
+			attributes[`${baseFieldName}_reach`] = trait.Reach;
+
+			attributes[`${baseFieldName}_skill`] = parseInt(trait.Skill);
+
+			attributes[`${baseFieldName}_armor_divisor`] = Number(trait.ArmorDivisor);
+
+			attributes[`${baseFieldName}_notes`] = trait.Notes;
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	importRepeatingRanged = (character, uniqueKeys) => {
+
+		character.RepeatingRanged.forEach(trait => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
+
+			let baseFieldName = `repeating_ranged_${rowId}`;
+
+			const malfunctionVerify = trait.MalfunctionVerify ? "1" : "0";
+
+			const malfunctionVeryReliable = trait.MalfunctionVeryReliable ? "1" : "0";
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = trait.Idkey;
+
+			attributes[`${baseFieldName}_name`] = trait.Name;
+
+			attributes[`${baseFieldName}_damage`] = trait.Damage;
+
+			attributes[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.Type);
+
+			attributes[`${baseFieldName}_acc`] = trait.Acc;
+
+			attributes[`${baseFieldName}_range`] = trait.Range;
+
+			attributes[`${baseFieldName}_rof`] = trait.Rof;
+
+			attributes[`${baseFieldName}_shots`] = trait.Shots;
+
+			attributes[`${baseFieldName}_bulk`] = trait.Bulk;
+
+			attributes[`${baseFieldName}_recoil`] = trait.Recoil;
+
+			attributes[`${baseFieldName}_skill`] = parseInt(trait.Skill);
+
+			attributes[`${baseFieldName}_malfunction`] = trait.Malfunction;
+
+			attributes[`${baseFieldName}_malfunction_verify`] = malfunctionVerify;
+
+			attributes[`${baseFieldName}_malfunction_very_reliable`] = malfunctionVeryReliable;
+
+			attributes[`${baseFieldName}_armor_divisor`] = Number(trait.ArmorDivisor);
+
+			attributes[`${baseFieldName}_notes`] = trait.Notes;
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	importRepeatingItem = (character, uniqueKeys) => {
+
+		character.RepeatingItem.forEach(trait => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
+
+			let baseFieldName = `repeating_item_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = trait.Idkey;
+
+			attributes[`${baseFieldName}_name`] = trait.Name;
+
+			attributes[`${baseFieldName}_tl`] = trait.Tl;
+
+			attributes[`${baseFieldName}_legality_class`] = trait.LegalityClass;
+
+			attributes[`${baseFieldName}_ref`] = trait.Ref;
+
+			attributes[`${baseFieldName}_count`] = parseInt(trait.Count);
+
+			attributes[`${baseFieldName}_cost`] = Number(trait.Cost);
+
+			attributes[`${baseFieldName}_weight`] = Number(trait.Weight);
+
+			attributes[`${baseFieldName}_notes`] = trait.Notes;
+
+			setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	importRepeatingSpells = (character, uniqueKeys) => {
+
+		character.RepeatingSpells.forEach(skill => {
+
+			let rowId = generateOrGetRowId(uniqueKeys, skill.Idkey);
+
+			let baseFieldName = `repeating_spells_${rowId}`;
+
+			let attributes = {};
+
+			attributes[`${baseFieldName}_idkey`] = skill.Idkey;
+
+			attributes[`${baseFieldName}_name`] = skill.Name;
+
+			attributes[`${baseFieldName}_difficulty`] = getSKillDifficultyValue(skill.Difficulty);
+
+			attributes[`${baseFieldName}_spell_modifier`] = parseInt(skill.SpellModifier);
+
+			attributes[`${baseFieldName}_points`] = parseInt(skill.Points);
+
+			attributes[`${baseFieldName}_spell_resisted_by`] = skill.SpellResistedBy;
+
+			attributes[`${baseFieldName}_duration`] = skill.Duration;
+
+			attributes[`${baseFieldName}_cost`] = skill.Cost;
+
+			attributes[`${baseFieldName}_ref`] = skill.Ref;
+
+			attributes[`${baseFieldName}_ref`] = skill.Ref;
+
+			attributes[`${baseFieldName}_casttime`] = skill.Casttime;
+
+			attributes[`${baseFieldName}_maintain`] = skill.Maintain;
+
+			attributes[`${baseFieldName}_spell_class`] = skill.SpellClass;
+
+			attributes[`${baseFieldName}_spell_college`] = skill.SpellCollege;
+
+			attributes[`${baseFieldName}_spell_college_secondary`] = skill.SpellCollegeSecondary;
+
+			attributes[`${baseFieldName}_spell_mod_notes`] = skill.SpellModNotes;
+
+			attributes[`${baseFieldName}_notes`] = skill.SpellNotes;
+
+			setAttrsAsync(attributes);
+
+		});
 
 	}
 
