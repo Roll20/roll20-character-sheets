@@ -14672,7 +14672,11 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 			</label>
 			<label>
 				<input type="radio" name="attr_options_tabs" value="import" class="tab-control" />
-				<span data-i18n="import-label">Import</span>
+				<span data-i18n="import-label">Import GCA4</span>
+			</label>
+			<label>
+				<input type="radio" name="attr_options_tabs" value="import-json" class="tab-control" />
+				<span data-i18n="import-json-label">Import</span>
 			</label>
 
 		</div>
@@ -15657,6 +15661,73 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 								after 20 seconds or so, then something probably broke during the import.
 							</p>
 						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+			<div class="options import">
+
+				<div class="instructions" style="width: 33%; float: left;">
+
+					<h3>Import Tool</h3>
+
+					<p>
+						Imports a file using json data based on a standard for use with GURPS Roll20 Charactersheet. 
+						Exporter tools can be developed for a character generator int this format, instead of
+						creating a special import for each character generator.  
+					</p>
+					<p>
+						Initial version is designed for a one time import. Future iterations will allow re-import.
+					</p>
+	
+					<h4>GCA5</h4>
+	
+					<h5>How to Install</h5>
+
+					<ul>
+						<li>Open GCA5</li>
+						<li>Click on Tools -> Plugins...</li>
+						<li>Find the section titled <b>Export Character to Roll20</b></li>
+						<li><i>Enable this plugin</i></li>
+					</ul>
+
+					<h5>How to export</h5>
+
+					<ul>
+						<li>Open GCA5 and a character</li>
+						<li>Click on File ->harExport...</li>
+						<li>Save the character and note where you saved it.</li>
+						<li>Open the file in a text editor, NOT a web browser.</li>
+						<li>Copy the content and paste it into the box to the right.</li>
+					</ul>
+	
+				</div>
+
+				<div class="importer">
+
+					<div class="json-data">
+						<h4>JSON DATA</h4>
+
+						<textarea name="attr_character_json_data" class="json-data"></textarea>
+					</div>
+
+					<div class="controls">
+
+						<div class="import-reset">
+							<button type="action" name="act_import_json_reset" class="btn">Reset</button>
+						</div>
+
+						<div class="import-button">
+							<button type="action" name="act_import_json" class="btn">Import</button>
+						</div>
+
+						<div class="import-message">
+							<input type="hidden" name="attr_import_json_message" value="Start Import" />
+							<span name="attr_import_json_message"></span>
+						</div>
+
 					</div>
 
 				</div>
@@ -18118,6 +18189,95 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	]);
 	
 	let rawDefenseNotes = {};
+
+	
+	/* -------- async functions -------- */
+	/* see: https://github.com/onyxring/Roll20Async */
+
+	function setActiveCharacterId(charId) {
+        var oldAcid = getActiveCharacterId();
+        var ev = new CustomEvent("message");
+        ev.data = { "id": "0", "type": "setActiveCharacter", "data": charId };
+        self.dispatchEvent(ev);
+        return oldAcid;
+    }
+    var _sIn = setInterval;
+    setInterval = function (callback, timeout) {
+        var acid = getActiveCharacterId();
+        _sIn(
+            function () {
+                var prevAcid = setActiveCharacterId(acid);
+                callback();
+                setActiveCharacterId(prevAcid);
+            }
+            , timeout);
+    }
+    var _sto = setTimeout
+    setTimeout = function (callback, timeout) {
+        var acid = getActiveCharacterId();
+        _sto(
+            function () {
+                var prevAcid = setActiveCharacterId(acid);
+                callback();
+                setActiveCharacterId(prevAcid);
+            }
+            , timeout);
+    }
+    function getAttrsAsync(props) {
+        var acid = getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
+        var prevAcid = null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
+        return new Promise((resolve, reject) => {
+            prevAcid = setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
+            try {
+                getAttrs(props, (values) => { resolve(values); });
+            }
+            catch { reject(); }
+        }).finally(() => {
+            setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
+        });
+    }
+    //use the same pattern for each of the following...
+    function setAttrsAsync(propObj, options) {
+        var acid = getActiveCharacterId();
+        var prevAcid = null;
+        return new Promise((resolve, reject) => {
+            prevAcid = setActiveCharacterId(acid);
+            try {
+                setAttrs(propObj, options, (values) => { resolve(values); });
+            }
+            catch { reject(); }
+        }).finally(() => {
+            setActiveCharacterId(prevAcid);
+        });
+    }
+
+    function getSectionIDsAsync(sectionName) {
+        var acid = getActiveCharacterId();
+        var prevAcid = null;
+        return new Promise((resolve, reject) => {
+            prevAcid = setActiveCharacterId(acid);
+            try {
+                getSectionIDs(sectionName, (values) => { resolve(values); });
+            }
+            catch { reject(); }
+        }).finally(() => {
+            setActiveCharacterId(prevAcid);
+        });
+    }
+    function getSingleAttrAsync(prop) {
+        var acid = getActiveCharacterId();
+        var prevAcid = null;
+        return new Promise((resolve, reject) => {
+            prevAcid = setActiveCharacterId(acid);
+            try {
+                getAttrs([prop], (values) => { resolve(values[prop]); });
+            }
+            catch { reject(); }
+        }).finally(() => {
+            setActiveCharacterId(prevAcid);
+        });
+    }
+	/*------------------*/
 	
 	const styleCount = 9; // THIS NUMBER MUST BE EQUAL TO THE NUMBER OF COLOR SETTINGS
 	on("change:sheetstyle sheet:opened", function (event) {
@@ -33869,91 +34029,186 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	/* async functions                              */
-	/* see: https://github.com/onyxring/Roll20Async */
+	// close roll modifiers, no updates
+	on("clicked:import_json", (event) => {
+	
+		setAttrs({ "import_json_message": "Processing..." }, null, () => {
 
-	function setActiveCharacterId(charId) {
-        var oldAcid = getActiveCharacterId();
-        var ev = new CustomEvent("message");
-        ev.data = { "id": "0", "type": "setActiveCharacter", "data": charId };
-        self.dispatchEvent(ev);
-        return oldAcid;
-    }
-    var _sIn = setInterval;
-    setInterval = function (callback, timeout) {
-        var acid = getActiveCharacterId();
-        _sIn(
-            function () {
-                var prevAcid = setActiveCharacterId(acid);
-                callback();
-                setActiveCharacterId(prevAcid);
-            }
-            , timeout);
-    }
-    var _sto = setTimeout
-    setTimeout = function (callback, timeout) {
-        var acid = getActiveCharacterId();
-        _sto(
-            function () {
-                var prevAcid = setActiveCharacterId(acid);
-                callback();
-                setActiveCharacterId(prevAcid);
-            }
-            , timeout);
-    }
-    function getAttrsAsync(props) {
-        var acid = getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
-        var prevAcid = null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
-        return new Promise((resolve, reject) => {
-            prevAcid = setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
-            try {
-                getAttrs(props, (values) => { resolve(values); });
-            }
-            catch { reject(); }
-        }).finally(() => {
-            setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
-        });
-    }
-    //use the same pattern for each of the following...
-    function setAttrsAsync(propObj, options) {
-        var acid = getActiveCharacterId();
-        var prevAcid = null;
-        return new Promise((resolve, reject) => {
-            prevAcid = setActiveCharacterId(acid);
-            try {
-                setAttrs(propObj, options, (values) => { resolve(values); });
-            }
-            catch { reject(); }
-        }).finally(() => {
-            setActiveCharacterId(prevAcid);
-        });
-    }
+			importCharacterJson();
 
-    function getSectionIDsAsync(sectionName) {
-        var acid = getActiveCharacterId();
-        var prevAcid = null;
-        return new Promise((resolve, reject) => {
-            prevAcid = setActiveCharacterId(acid);
-            try {
-                getSectionIDs(sectionName, (values) => { resolve(values); });
-            }
-            catch { reject(); }
-        }).finally(() => {
-            setActiveCharacterId(prevAcid);
-        });
-    }
-    function getSingleAttrAsync(prop) {
-        var acid = getActiveCharacterId();
-        var prevAcid = null;
-        return new Promise((resolve, reject) => {
-            prevAcid = setActiveCharacterId(acid);
-            try {
-                getAttrs([prop], (values) => { resolve(values[prop]); });
-            }
-            catch { reject(); }
-        }).finally(() => {
-            setActiveCharacterId(prevAcid);
-        });
-    }
+		});
+	
+	});
+
+	on("clicked:import_reset", (event) => {
+	
+		setAttrs({
+			"import_json_message": "Start Import",
+			"character_json_data": ""
+		});
+	
+	});
+
+	importCharacterJson = () => {
+
+		getAttrs(["character_json_data"], values => {
+
+			let data = String(values.character_json_data).trim();
+
+			let success = true;
+	
+			let message = "";
+
+			// schema file
+			let character;
+
+			if (data) {
+
+				try {
+
+					character = JSON.parse(data);
+					
+				} catch (ex) {
+					
+					success = false;
+	
+					message = "Invalid JSON Data. " + ex.message;
+
+				}
+			} else {
+	
+				success = false;
+
+				message = "Please copy/paste JSON Data into text area.";
+
+			}
+
+			if (success) {
+	
+				importAttributes(character);
+
+				// very last attribute to get updated
+				const applyCombatReflexes = character.CombatReflexes ? "1" : "0";
+
+				setAttrsAsync({combat_reflexes: applyCombatReflexes});
+
+			} else {
+
+				setAttrs({ "import_json_message": message });
+
+			}
+
+		});
+
+	}
+
+	importAttributes = character => {
+
+		const applySizeModifier = character.ApplySizeModifier ? "1" : "0";
+		const flightChecked = character.FlightChecked ? "1" : "0";
+		const amphibiousChecked = character.AmphibiousChecked ? "1" : "0";
+		
+		const baseAttributes = {
+			fullname: character.CharacterName,
+			playername: character.Playername,
+			nickname: character.Nickname,
+			race: character.Race,
+			gender: character.Gender,
+			size: parseInt(character.Size),
+			apply_size_modifier: applySizeModifier,
+			reactions: character.Reactions,
+			campaign_tl: parseInt(character.CampaignTl),
+			tl: parseInt(character.Tl),
+			tl_pts: parseInt(character.TlPts),
+			status: character.Status,
+			wealth: character.Wealth,
+			income: character.Income,
+			cost_of_living: character.CostOfLiving,
+			stash: character.Stash,
+			age: character.Age,
+			height: character.Height,
+			weight: parseFloat(character.Weight),
+			appearance: parseInt(character.Appearance),
+			general_appearance: character.GeneralAppearance,
+			strength_points: parseInt(character.StrengthPoints),
+			dexterity_points: parseInt(character.DexterityPoints),
+			intelligence_points: parseInt(character.IntelligencePoints),
+			health_points: parseInt(character.HealthPoints)
+		};
+
+		const baseAttributeMods = {
+			strength_mod: parseInt(character.StrengthMod),
+			dexterity_mod: parseInt(character.DexterityMod),
+			intelligence_mod: parseInt(character.IntelligenceMod),
+			health_mod: parseInt(character.HealthMod),
+		};
+
+		const secondaryAttributesPoints = {
+			perception_points: parseInt(character.PerceptionPoints),
+			vision_points: parseInt(character.VisionPoints),
+			hearing_points: parseInt(character.HearingPoints),
+			taste_smell_points: parseInt(character.TasteSmellPoints),
+			touch_points: parseInt(character.TouchPoints),
+			willpower_points: parseInt(character.WillpowerPoints),
+			fear_check_points: parseInt(character.FearCheckPoints),
+			unconscious_check_points: parseInt(character.UnconsciousCheckPoints),
+			death_check_points: parseInt(character.death_check_points),
+			basic_speed_points: parseInt(character.BasicSpeedPoints),
+			basic_move_points: parseInt(character.BasicMovePoints),
+			enhanced_ground_move_points: parseInt(character.EnhancedGroundMovePoints),
+			lift_st_points: parseInt(character.LiftStPoints),
+			striking_st_points: parseInt(character.StrikingStPoints),
+			hit_points_points: parseInt(character.HitPointsPoints),
+			hit_points: parseInt(character.HitPoints),
+			fatigue_points_points: parseInt(character.FatiguePointsPoints),
+			fatigue_points: parseInt(character.FatiguePoints),
+			flight_checked: flightChecked,
+			flight_points: parseInt(character.FlightPoints),
+			basic_air_move_points: parseInt(character.BasicAirMovePoints),
+			enhanced_air_move_points: parseInt(character.EnhancedAirMovePoints),
+			amphibious_checked: amphibiousChecked,
+			amphibious_points: parseInt(character.AmphibiousPoints),
+			basic_water_move_points: parseInt(character.BasicWaterMovePoints),
+			enhanced_water_move_points: parseInt(character.EnhancedWaterMovePoints),
+			super_jump_points: parseInt(character.SuperJumpPoints)
+		};
+
+		const secondaryAttributesMods = {
+			perception_mod: parseInt(character.PerceptionMod),
+			vision_mod: parseInt(character.VisionMod),
+			hearing_mod: parseInt(character.HearingMod),
+			taste_smell_mod: parseInt(character.TasteSmellMod),
+			touch_mod: parseInt(character.TouchMod),
+			willpower_mod: parseInt(character.WillpowerMod),
+			fear_check_mod: parseInt(character.FearCheckMod),
+			stun_check_mod: parseInt(character.StunCheckMod),
+			knockdown_check_mod: parseInt(character.KnockdownCheckMod),
+			unconscious_check_mod: parseInt(character.UnconsciousCheckMod),
+			death_check_mod: parseInt(character.DeathCheckMod),
+			basic_speed_mod: Number(character.BasicSpeedMod),
+			basic_move_mod: parseInt(character.BasicMoveMod),
+			enhanced_ground_move_mod: Number(character.EnhancedGroundMoveMod),
+			dodge_mod: parseInt(character.DodgeMod),
+			lift_st_mod: parseInt(character.LiftStMod),
+			striking_st_mod: parseInt(character.StrikingStMod),
+			hit_points_mod: parseInt(character.HitPointsMod),
+			fatigue_points_mod: parseInt(character.FatiguePointsMod),
+			basic_air_move_mod: parseInt(character.BasicAirMoveMod),
+			enhanced_air_level: Number(character.EnhancedAirLevel),
+			basic_water_move_mod: parseInt(character.BasicWaterMoveMod),
+			enhanced_water_level: Number(character.EnhancedWaterLevel),
+			super_jump_entered_level: parseInt(character.SuperJumpEnteredLevel),
+			spell_bonus: parseInt(character.SpellBonus)
+		};
+
+		setAttrsAsync(baseAttributes);
+
+		setAttrsAsync(baseAttributeMods);
+
+		setAttrsAsync(secondaryAttributesPoints);
+
+		setAttrsAsync(secondaryAttributesMods);
+
+	}
 
 </script>
