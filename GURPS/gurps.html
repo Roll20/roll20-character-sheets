@@ -15575,10 +15575,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 				<div class="instructions" style="width: 33%; float: left;">
 
-					<h3>Import Tool [BETA]</h3>
+					<h3>Import Tool [DEPRACATED]</h3>
 
 					<p>
-						Initial version is designed for a one time import. Future iterations will allow re-import and adding GURPS Character Sheet (GCS).
+						Initial version is designed for a one time import. 
+						This import is being replaced by a generic json formatted import.
+						See the <b>Import</b> tab.
 					</p>
 	
 					<h4>GCA4 Import</h4>
@@ -15615,7 +15617,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					<div class="controls">
 
 						<div class="import-reset">
-							<button type="action" name="act_import_reset" class="btn">Reset</button>
+							<button type="action" name="act_import_reset" class="btn reset">Reset</button>
 						</div>
 
 						<div class="import-button">
@@ -15719,8 +15721,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 							<button type="action" name="act_import_json_reset" class="btn">Reset</button>
 						</div>
 
-						<div class="import-button">
-							<button type="action" name="act_import_json" class="btn">Import</button>
+						<div class="import-button reset">
+							<input type="hidden" name="attr_import_json_state" value="normal" />
+							<button type="action" name="act_import_json" class="btn reset">Import</button>
 						</div>
 
 						<div class="import-message">
@@ -34032,19 +34035,34 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	// close roll modifiers, no updates
 	on("clicked:import_json", (event) => {
 	
-		setAttrs({ "import_json_message": "Processing..." }, null, () => {
+		let attribs = {
+			import_json_state: "clicked",
+			import_json_message: "Processing..."
+		};
 
-			importCharacterJson();
+		setAttrsAsync(attribs);
 
-		});
+		importCharacterJson();
+
 	
 	});
 
-	on("clicked:import_reset", (event) => {
+	resetImportJsonButtonSate = () => {
+
+		setTimeout(() => {
+
+			setAttrs({import_json_state: "normal"});
+
+		}, 2000);
+
+	}
+
+	on("clicked:import_json_reset", (event) => {
 	
 		setAttrs({
-			"import_json_message": "Start Import",
-			"character_json_data": ""
+			import_json_state: "normal",
+			import_json_message: "Start Import",
+			character_json_data: ""
 		});
 	
 	});
@@ -34120,6 +34138,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				const applyCombatReflexes = character.CombatReflexes ? "1" : "0";
 
 				setAttrsAsync({combat_reflexes: applyCombatReflexes});
+
+				setAttrs({ 
+					import_json_state: "normal",
+					import_json_message: "Import has completed!",
+					character_json_data: ""
+				 });
 
 			} else {
 
