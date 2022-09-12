@@ -4358,16 +4358,12 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.8.1 -->				
+				<!-- current version notes: 2.8.4 -->			
 				<ul>
-					<li>Skills Tab. Add a collapsible notes area.</li>
-					<li>Skills Tab. Added an indicator to show a skill has <b>Conditional notes</b></li>
-					<li>Combat Tab. Add a collapsible notes area.</li>
-					<li>Combat Tab. Defense sub-tab. Increased the height of the <b>DEFENSE BONUS (DB) NOTES</b> box.</li>
-					<li>New Slam Tool. Moved to Tools sub-tab.</li>
-					<li>Editable Wound Modifier Notes: Updated initial default notes to include <b>Injury to Unliving, Homegenous, and Diffuse Targets. B380</b>. 
-						Requested and notes provided by kawaishi. 
-						<b>NOTE:</b> If you made changes to one or more wound modifier notes, you will not see the most recent rule updates. However, you can use the new <b>reset</b> button to get them.
+					<li>Options tab. Sheet Options sub-tab. Updated <b>Resync</b> button to change colors when clicked. Thanks to Onyxring's Roll20Async functions!</li>
+					<li>
+						Repeating Skills, attribute drop-down. The character sheet uses an old method to link skills to an attribute. The old method might not trigger correctly
+						when an attribute like Dexterity is changed. Solved the issue by tricking the system into resyncing skills when an attribute is changed.
 					</li>
 				</ul>
 				
@@ -10698,7 +10694,7 @@ visualize what it will look like in chat.
 												<span data-i18n="formula-base-dodge-description">Base Dodge attribute.</span>
 											</div>
 											<div class="formula formula-current-dodge">
-												<span data-i18n="formula-current-dodge-description">Current Dodge affected by HP, FP, and Encumbrance.</span>
+												<span data-i18n="formula-current-dodge-description">Current Dodge affected by current conditions. Combat Reflexes checkbox to the right is not used.</span>
 											</div>
 										</div>
 										<div class="cell formula-combat-reflexes">
@@ -14032,8 +14028,44 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 			<h4>Version: <span name="attr_announcement_version"></span></h4>
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
+			
+			<!-- current version notes: 2.8.4 -->
+			<ul>
+				<li>Options tab. Sheet Options sub-tab. Updated <b>Resync</b> button to change colors when clicked. Thanks to Onyxring's Roll20Async functions!</li>
+				<li>
+					Repeating Skills, attribute drop-down. The character sheet uses an old method to link skills to an attribute. The old method might not trigger correctly
+					when an attribute like Dexterity is changed. Solved the issue by tricking the system into resyncing skills when an attribute is changed.
+				</li>
+			</ul>
 
-			<!-- current version notes: 2.8.1 -->
+			<h4>Version: 2.8.3</h4>
+
+			<p>Pull Request: 9/1/2022</p>	
+
+			<ul>
+				<li>
+					Options Tab. Sheet Options sub-tab. Resync button - when resyncing skills and and spells, it now pulls the latest attribure value. 
+					Depending on the size of character sheet and other performance issues, sometimes updating an attribute like Dexterity doesn't 
+					update all the related skills that use that attribute.
+				</li>
+			</ul>
+			
+			<h4>Version: 2.8.2</h4>
+
+			<p>Pull Request: 8/29/2022</p>	
+
+			<ul>
+				<li>
+					Options. Sheet-options tab. Added initial <b>Resync</b> button. 
+					First iteration resyncs Skills, Techniques, and spells, along with items linked to them.
+					Followed by resyncing the weight and cost of items in the inventory.
+				</li>
+			</ul>
+
+			<h4>Version: 2.8.1</h4>
+
+			<p>Pull Request: 7/31/2022</p>	
+
 			<ul>
 				<li>Skills Tab. Add a collapsible notes area.</li>
 				<li>Skills Tab. Added an indicator to show a skill has <b>Conditional notes</b></li>
@@ -15053,6 +15085,25 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 				</div><!-- end option-column -->
 				
 				<div class="option-column">
+
+					<div class="option-container">
+						<h4>
+							<span data-i18n="resync-character-label">Resync Character Sheet</span>
+						</h4>
+						<div class="reset resync">
+							<input type="hidden" name="attr_resync_state" value="normal" />
+							<button type="action" name="act_resync" class="reset">
+								<span data-i18n="resync-label">Resync</span>
+							</button>
+						</div>
+						<div>
+							<ul>
+								<li>Resync repeating Skills and items linked them.</li>
+								<li>Resync repeating Techniques and items linked them.</li>
+								<li>Resync repeating Inventory cost and weight.</li>
+							</ul>
+						</div>
+					</div>
 					
 					<div class="option-container damage-dice">
 						<h4>
@@ -17229,9 +17280,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.8.1";
+	const version = "2.8.4";
 	
-	const latestChangesDate = "7/31/2022";
+	const latestChangesDate = "9/6/2022";
 	
 	let modCascade = true;
 	
@@ -18106,6 +18157,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		sumRepeating('repeating_item', 'weighttotal', function (v) {
 			setAttrs({ total_weight: Number(Math.round(v * 1000) / 1000).toFixed(3) });
 		});
+
 		sumRepeating('repeating_item', 'costtotal', function (v) {
 			setAttrs({ total_value: Number((v * 100) / 100).toFixed(2) }, { silent: true });
 		});
@@ -19170,15 +19222,34 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	on('change:repeating_skills:base change:repeating_skills:difficulty change:repeating_skills:bonus change:repeating_skills:points change:repeating_skills:sync', (event) => {
 	
 		// check if this is a valid sync
-		let isSync = String(event.sourceAttribute).endsWith("sync");
+		const isSync = String(event.sourceAttribute).endsWith("sync");
 	
-		let syncValue = Number(event.newValue);
-	
-		if (isSync && syncValue !== 1) {
-			return;
+		if (isSync) {
+
+			const attributeName = event.sourceAttribute;
+
+			// if this a sync, then we need to check it's value. If it's 1 then we want to resync all the data
+			getAttrs([attributeName], values => {
+
+				const syncValue = Number(values[attributeName]);
+
+				if (syncValue === 1) {
+					updateRepeatingSkillValues();
+				}
+
+			});
+			
+		} else {
+
+			updateRepeatingSkillValues();
 		}
 	
+	});
+
+	updateRepeatingSkillValues = () => {
+
 		let fieldValues = [
+			"repeating_skills_name",	//for debugging
 			"repeating_skills_base",
 			"repeating_skills_difficulty",
 			"repeating_skills_bonus",
@@ -19260,8 +19331,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			);
 	
 		});
-	
-	});
+
+	}
 	
 	on("change:repeating_skills:level", (event) => {
 	
@@ -19286,12 +19357,30 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		// check if this is a valid sync
 		const isSync = String(event.sourceAttribute).endsWith("sync");
 	
-		const syncValue = Number(event.newValue);
-	
-		if (isSync && syncValue !== 1) {
-			return;
+		if (isSync) {
+
+			const attributeName = event.sourceAttribute;
+
+			// if this a sync, then we need to check it's value. If it's 1 then we want to resync all the data
+			getAttrs([attributeName], values => {
+
+				const syncValue = Number(values[attributeName]);
+
+				if (syncValue === 1) {
+					updateRepeatingSpellValues();
+				}
+
+			});
+
+		} else {
+
+			updateRepeatingSpellValues();
 		}
 	
+	});
+
+	updateRepeatingSpellValues = () => {
+
 		let fieldValues = [
 			"repeating_spells_base",
 			"repeating_spells_bonus",
@@ -19342,8 +19431,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			);
 	
 		});
-	
-	});
+
+	}
 	
 	// if toggle is clicked, update the display id.
 	// event = {sourceAttribute, sourceType, triggerName, sourceAttribute, previousValue, newValue}
@@ -23540,6 +23629,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	// if an attribute is updated, update linked items
 	on("change:strength_display", event => {
 	
+		resyncRepeatingSkills();
+
 		updateSectionSkillsLinkedToUpdatedRow("ST");
 	
 	});
@@ -23552,24 +23643,40 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	on("change:dexterity", event => {
 	
+		resyncRepeatingSkills();
+
 		updateSectionSkillsLinkedToUpdatedRow("DX");
 	
 	});
 	
 	on("change:intelligence", event => {
 	
+		resyncRepeatingSkills();
+
 		updateSectionSkillsLinkedToUpdatedRow("IQ");
 	
 	});
 	
 	on("change:willpower", event => {
 	
+		resyncRepeatingSkills();
+
 		updateSectionSkillsLinkedToUpdatedRow("WILL");
+	
+	});
+
+	on("change:perception", event => {
+	
+		resyncRepeatingSkills();
+
+		updateSectionSkillsLinkedToUpdatedRow("PER");
 	
 	});
 	
 	on("change:health", event => {
 	
+		resyncRepeatingSkills();
+
 		updateSectionSkillsLinkedToUpdatedRow("HT");
 	
 	});
@@ -23918,7 +24025,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	});
 	
 	// if linked data for repeating defense is changed, get the new linked skill values
-	on('change:repeating_defense:type change:repeating_defense:defense_row_type change:repeating_defense:defense_talent_level change:repeating_defense:defense_skill_row_id change:repeating_defense:repeating_defense_defense_talent_level change:repeating_defense:defense_skill_row_id_toggle', function (event) {
+	on('change:repeating_defense:type change:repeating_defense:defense_row_type change:repeating_defense:defense_talent_level change:repeating_defense:defense_skill_row_id change:repeating_defense:repeating_defense_defense_talent_level change:repeating_defense:defense_skill_row_id_toggle change:repeating_defense:defense_combat_reflexes', function (event) {
 	
 		// check if this is a valid toggle
 		const isToggled = String(event.sourceAttribute).endsWith("_skill_row_id_toggle");
@@ -24565,7 +24672,21 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		// by setting sync to 1, this trigger the change event on("change:repeating_skills:sync") OR on("change:repeating_spells:sync")
 		// which updates the skill level
-		setAttrs(fieldsToUpdate);
+		setAttrs(fieldsToUpdate, null, () => {
+
+			let fieldsToZero = {};
+	
+			ids.forEach(id => {
+	
+				const syncFieldName = `${sectionName}_${id}_sync`;
+
+				fieldsToZero[syncFieldName] = 0;
+
+			});
+
+			setAttrs(fieldsToZero);
+
+		});
 	
 	}
 	
@@ -33569,5 +33690,270 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		setAttrs(attribs);
 
 	}
+
+	// resync character sheet
+	on("clicked:resync", event => {
+	
+		setAttrs({resync_state: "clicked"}, () => {
+
+			resyncRepeatingSkills();
+
+			resyncRepeatingTechniques();
+
+			resyncRepeatingItems();
+
+			resyncRepeatingSpells();
+
+			resetResyncButtonSate();
+
+		});
+
+	});
+
+	resetResyncButtonSate = () => {
+
+		setTimeout(() => {
+
+			setAttrs({resync_state: "normal"});
+
+		}, 1000);
+		
+	}
+
+	/**
+	 * Loop through each skill, set sync field = 1 (true)
+	 * this forces the skill to recalculate the value.
+	 */ 
+	resyncRepeatingSkills = () => {
+
+		getSectionIDs("repeating_skills", ids => {
+
+			console.groupCollapsed("--resyncRepeatingSkills--");
+		
+			ids.forEach(rowId => {
+				
+				const syncFieldName = `repeating_skills_${rowId}_sync`;
+
+				// force the value to 1, to resync the skill
+				let attribs = {};
+
+				attribs[syncFieldName] = 1;
+
+				console.info(`update linked items for rowId: ${rowId}`);
+				console.info(attribs);
+
+				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
+
+			});
+
+			
+			console.groupEnd();
+
+		});
+
+	}
+
+	/**
+	 * Loop through each technique, set sync field = 1 (true)
+	 * this forces the technique to recalculate the value.
+	 */ 
+	resyncRepeatingTechniques = () => {
+
+		getSectionIDs("repeating_techniquesrevised", ids => {
+
+			console.groupCollapsed("--resyncRepeatingTechniques--");
+
+			ids.forEach(rowId => {
+				
+				const syncFieldName = `repeating_techniquesrevised_${rowId}_skill_row_id_toggle`;
+
+				// force the value to 1, to resync the technique
+				let attribs = {};
+
+				attribs[syncFieldName] = 1;
+
+				console.info(`update linked items for rowId: ${rowId}`);
+				
+				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
+
+			});
+
+			console.groupEnd();
+		
+		});
+
+	}
+
+	/**
+	 * Recalculate the weight and value of all items. 
+	 * Should NOT be run silent, so the totals can be calculated
+	 */ 
+	resyncRepeatingItems = () => {
+
+		getSectionIDs("repeating_item", ids => {
+
+			console.info("--resyncRepeatingItems--");
+
+			ids.forEach(rowId => {
+
+				const countField = `repeating_item_${rowId}_count`;
+
+				const costField = `repeating_item_${rowId}_cost`;
+
+				const weightField = `repeating_item_${rowId}_weight`;
+
+				const carriedField = `repeating_item_${rowId}_carried`;
+
+				const totalWeightField = `repeating_item_${rowId}_weighttotal`;
+
+				const totalCostField = `repeating_item_${rowId}_costtotal`; 
+
+				const values = [
+					countField,
+					costField,
+					weightField,
+					carriedField
+				];
+
+				getAttrs(values, values => {
+
+					const totalWeight = Number(Math.round(values[countField] * values[weightField] * values[carriedField] * 1000) / 1000).toFixed(3);
+
+					const totalCost = Number(Math.round(values[countField] * values[costField] * 100) / 100).toFixed(2);
+
+					let attribs = {};
+
+					attribs[totalWeightField] = totalWeight;
+
+					attribs[totalCostField] = totalCost;
+
+					setAttrs(attribs);
+
+				});
+
+			});
+
+		});
+
+	}
+
+	/**
+	 * Loop through each spell, set sync field = 1 (true)
+	 * this forces the spell to recalculate the value.
+	 */ 
+	resyncRepeatingSpells = () => {
+
+		getSectionIDs("repeating_spells", ids => {
+
+			console.groupCollapsed("--resyncRepeatingSpells--");
+
+			ids.forEach(rowId => {
+				
+				const syncFieldName = `repeating_spells_${rowId}_sync`;
+
+				// force the value to 1, to resync the skill
+				let attribs = {};
+
+				attribs[syncFieldName] = 1;
+
+				console.info(`update linked items for rowId: ${rowId}`);
+
+				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
+
+			});
+
+			
+			console.groupEnd();
+
+		});
+
+	}
+
+	/* async functions                              */
+	/* see: https://github.com/onyxring/Roll20Async */
+
+	function setActiveCharacterId(charId) {
+        var oldAcid = getActiveCharacterId();
+        var ev = new CustomEvent("message");
+        ev.data = { "id": "0", "type": "setActiveCharacter", "data": charId };
+        self.dispatchEvent(ev);
+        return oldAcid;
+    }
+    var _sIn = setInterval;
+    setInterval = function (callback, timeout) {
+        var acid = getActiveCharacterId();
+        _sIn(
+            function () {
+                var prevAcid = setActiveCharacterId(acid);
+                callback();
+                setActiveCharacterId(prevAcid);
+            }
+            , timeout);
+    }
+    var _sto = setTimeout
+    setTimeout = function (callback, timeout) {
+        var acid = getActiveCharacterId();
+        _sto(
+            function () {
+                var prevAcid = setActiveCharacterId(acid);
+                callback();
+                setActiveCharacterId(prevAcid);
+            }
+            , timeout);
+    }
+    function getAttrsAsync(props) {
+        var acid = getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
+        var prevAcid = null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
+        return new Promise((resolve, reject) => {
+            prevAcid = setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
+            try {
+                getAttrs(props, (values) => { resolve(values); });
+            }
+            catch { reject(); }
+        }).finally(() => {
+            setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
+        });
+    }
+    //use the same pattern for each of the following...
+    function setAttrsAsync(propObj, options) {
+        var acid = getActiveCharacterId();
+        var prevAcid = null;
+        return new Promise((resolve, reject) => {
+            prevAcid = setActiveCharacterId(acid);
+            try {
+                setAttrs(propObj, options, (values) => { resolve(values); });
+            }
+            catch { reject(); }
+        }).finally(() => {
+            setActiveCharacterId(prevAcid);
+        });
+    }
+
+    function getSectionIDsAsync(sectionName) {
+        var acid = getActiveCharacterId();
+        var prevAcid = null;
+        return new Promise((resolve, reject) => {
+            prevAcid = setActiveCharacterId(acid);
+            try {
+                getSectionIDs(sectionName, (values) => { resolve(values); });
+            }
+            catch { reject(); }
+        }).finally(() => {
+            setActiveCharacterId(prevAcid);
+        });
+    }
+    function getSingleAttrAsync(prop) {
+        var acid = getActiveCharacterId();
+        var prevAcid = null;
+        return new Promise((resolve, reject) => {
+            prevAcid = setActiveCharacterId(acid);
+            try {
+                getAttrs([prop], (values) => { resolve(values[prop]); });
+            }
+            catch { reject(); }
+        }).finally(() => {
+            setActiveCharacterId(prevAcid);
+        });
+    }
 
 </script>

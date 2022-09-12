@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="03-00-00" />
+<input type="hidden" name="attr_version" value="03-02-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -1327,10 +1327,12 @@
     </div>
     <div class="adversary-fell-abilities">
         <h1 data-i18n="fell-ability">Fell Ability</h1>
+        <span />
         <label class="empf-black left" data-i18n="description">Description</label>
     </div>
     <fieldset class="repeating_fell-abilities">
         <div class="adversary-fell-abilities">
+            <button type='action' name='act_adv-fell' class="parsed-rolls chat"></button>
             <input name="attr_fell_ability" type="text" />
             <textarea name="attr_fell_ability_desc" type="text" />
         </div>
@@ -1461,6 +1463,24 @@
         }
     }
 
+    const rollMessage = async ({header, header_alt, sub1, sub1_alt, sub2, sub2_alt, msg, msg_alt} = {}) => {
+        header = header === undefined ? "" : `{{header=${header}}}`;
+        header_alt = header_alt === undefined ? "" : `{{header-alt=${header_alt}}}`;
+        sub1 = sub1 === undefined ? "" : `{{sub1=${sub1}}}`;
+        sub1_alt = sub1_alt === undefined ? "" : `{{sub1-alt=${sub1_alt}}}`;
+        sub2 = sub2 === undefined ? "" : `{{sub2=${sub2}}}`;
+        sub2_alt = sub2_alt === undefined ? "" : `{{sub2-alt=${sub2_alt}}}`;
+        msg = msg === undefined ? "" : `{{msg=${msg}}}`;
+        msg_alt = msg_alt === undefined ? "" : `{{msg-alt=${msg_alt}}}`;
+        let rollBase = `&{template:msg} ${header}${header_alt}${sub1}${sub1_alt}${sub2_alt}${msg}${msg_alt}`;
+
+        let targetRoll = await startRoll(rollBase);
+        clog (`targetRoll: ${JSON.stringify(targetRoll)})`);
+        finishRoll(targetRoll.rollId);
+        clog (`targetRoll: ${JSON.stringify(targetRoll)})`);
+        return;
+    };
+
     // isolated target call
     const getTarget = async () => {
         const rxGrab = /^0\[(.*)\]\s*$/;
@@ -1535,7 +1555,7 @@
             target, 
             closefit="",
             closefitStr="",
-            keen="",
+            keen=10,
             match=[];
 
         act = capitalize(act); 
@@ -1722,10 +1742,10 @@
 
         // GREATNESS & FEAT DIE 
         // Test for piercing blow on crit success
-        outcome = rolltype === "combat" && (outcome === 2) ? 3 : outcome; 
+        outcome = rolltype.startsWith("combat") && (outcome === 2) ? 3 : outcome; 
         clog(`Outcome after Crit: ${outcome}`);
         // Piercing blow also at 10 or 8/9 if the used weapon is keen 
-        outcome = rolltype === "combat" && (outcome === 1) && (rollFeat >= keen && rollFeat <= 10) ? 3 : outcome; 
+        outcome = rolltype.startsWith("combat") && (outcome === 1) && (rollFeat >= keen && rollFeat <= 10) ? 3 : outcome; 
         clog(`Outcome after Piercing or Keen: ${outcome}`);
         // count number of 6s in success, great or extraordinary success
         // Count the number of sixes rolled, to report degree of success
@@ -2365,7 +2385,9 @@
         clog(`Completed first roll: weapon_${index}`);
     });
 
-    // Custom roll
+    /*==================
+      Custom Roll
+    ====================*/
     on('clicked:customroll', async (ev) => {
         clog(`Starting first roll`);
 		let data = await asw.getAttrs(['character_name', 'customfeatdie', 'customtn', 'customsuccessdice', 'customrollname', 'favourill_id']),
@@ -2379,6 +2401,24 @@
         clog(`Completed first roll`);
     });
 
+    /*==================
+      Adversary Fell Abilities
+    ====================*/
+    on('clicked:repeating_fell-abilities:adv-fell', async (ev) => {
+		const source = (ev.sourceAttribute).slice(0, -8);
+        clog(`${source}fell_ability_desc`);
+		let data = await asw.getAttrs([`${source}fell_ability`, `${source}fell_ability_desc`]), 
+            fell_ability = data[`${source}fell_ability`],
+            fell_ability_desc = data[`${source}fell_ability_desc`];
+        
+        // remove last dot from fell_ability if it exists
+        fell_ability = fell_ability.replace(/\.$/, '');
+        clog(`${fell_ability}: ${fell_ability_desc}`);
+        await rollMessage({header:fell_ability, msg:fell_ability_desc});
+	}); 
+    /*==================
+      Adversary Import
+    ====================*/
     on(`change:notes sheet:opened`, function() {
         getAttrs(["notes", "sheetTab"], function(values) {
             if (values.sheetTab ==="isAdversary"){
@@ -2682,7 +2722,7 @@
                 }
             }
 
-            if (build < 19) {
+            if (build < 20) {
                 attrs["build"] = 20;
                 let releaselog = {msg:""};
                 hlog(`Release 03.0.0 - ${new Date().toLocaleString()}`, releaselog);
@@ -2691,6 +2731,44 @@
                         hlog(`
 ### Features
 - added adversary json import
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+
+            if (build < 21) {
+                attrs["build"] = 21;
+                let releaselog = {msg:""};
+                hlog(`Release 03.01.00 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Features
+- msg custom rolltemplate: added header-alt, sub1-alt, sub2-alt and fixe horizontal line hides correctly
+- added button to post fell abilities of adversaries to chat
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+            if (build < 22) {
+                attrs["build"] = 22;
+                let releaselog = {msg:""};
+                hlog(`Release 03.02.00 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Fixed
+- Target attacks calculated "piercing blow" correctly
                         `, releaselog);
                         hlog("==============", releaselog);
                         attrs['releaselog'] =  releaselog.msg + values['releaselog'];
@@ -2732,9 +2810,18 @@
     <div class="sheet-container">
         <div class="sheet-header">
             {{#header}}<div class="sheet-title sheet-text-center">{{header}}</div>{{/header}}
+            {{#header-alt}}<div class="sheet-title-alt sheet-text-center">{{header-alt}}</div>{{/header-alt}}
             {{#sub1}}<div class="sheet-subtitle sheet-text-center">{{sub1}}</div>{{/sub1}}
+            {{#sub1-alt}}<div class="sheet-subtitle-alt sheet-text-center">{{sub1-alt}}</div>{{/sub1-alt}}
             {{#sub2}}<div class="sheet-subtitle sheet-text-center">{{sub2}}</div>{{/sub2}}
+            {{#sub2-alt}}<div class="sheet-subtitle-alt sheet-text-center">{{sub2-alt}}</div>{{/sub2-alt}}
         </div>
+        {{#header}}{{^sub1}}{{^sub2}}{{#msg}}<div class="sheet-header-sep"/>{{/msg}}{{/sub2}}{{/sub1}}{{/header}}
+        {{#sub1}}{{^sub2}}{{#msg}}<div class="sheet-header-sep"/>{{/msg}}{{/sub2}}{{/sub1}}
+        {{#sub2}}{{#msg}}<div class="sheet-header-sep"/>{{/msg}}{{/sub2}}
+        {{#header-alt}}{{^sub1-alt}}{{^sub2-alt}}{{#msg-alt}}<div class="sheet-header-sep"/>{{/msg-alt}}{{/sub2-alt}}{{/sub1-alt}}{{/header-alt}}
+        {{#sub1-alt}}{{^sub2-alt}}{{#msg-alt}}<div class="sheet-header-sep"/>{{/msg-alt}}{{/sub2-alt}}{{/sub1-alt}}
+        {{#sub2-alt}}{{#msg-alt}}<div class="sheet-header-sep"/>{{/msg-alt}}{{/sub2-alt}}
         {{#msg}}
         <div class="sheet-contentmin">
             <div class="sheet-main">{{msg}}</div>
