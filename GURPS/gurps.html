@@ -18280,6 +18280,16 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
             setActiveCharacterId(prevAcid);
         });
     }
+
+	/**
+	 * Async foreach.
+	 * see: https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
+	 */
+	async function asyncForEach(array, callback) {
+		for (let index = 0; index < array.length; index++) {
+			await callback(array[index], index, array);
+		}
+	}	
 	/*------------------*/
 	
 	const styleCount = 9; // THIS NUMBER MUST BE EQUAL TO THE NUMBER OF COLOR SETTINGS
@@ -34033,16 +34043,16 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	}
 
 	// close roll modifiers, no updates
-	on("clicked:import_json", (event) => {
+	on("clicked:import_json", async (event) => {
 	
 		let attribs = {
 			import_json_state: "clicked",
 			import_json_message: "Processing..."
 		};
 
-		setAttrsAsync(attribs);
+		await setAttrsAsync(attribs);
 
-		importCharacterJson();
+		await importCharacterJson();
 
 	
 	});
@@ -34057,160 +34067,178 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	});
 
-	let importCharacterJson = () => {
+	let importCharacterJson = async () => {
 
-		getAttrs(["character_json_data"], values => {
+		let values = await getAttrsAsync(["character_json_data"]);
 
-			let data = String(values.character_json_data).trim();
+		let data = String(values.character_json_data).trim();
 
-			let success = true;
-	
-			let message = "";
+		let success = true;
 
-			// schema file
-			let character;
+		let message = "";
 
-			if (data) {
+		// schema file
+		let character;
 
-				try {
+		if (data) {
 
-					character = JSON.parse(data);
-					
-				} catch (ex) {
-					
-					success = false;
-	
-					message = "Invalid JSON Data. " + ex.message;
+			try {
 
-				}
-			} else {
-	
+				character = JSON.parse(data);
+				
+			} catch (ex) {
+				
 				success = false;
 
-				message = "Please copy/paste JSON Data into text area.";
+				message = "Invalid JSON Data. " + ex.message;
 
 			}
+		} else {
 
-			if (success) {
+			success = false;
 
-				// TODO: figure out async/await
-				let uniqueKeys = getUniqueKeysForCharacter();
+			message = "Please copy/paste JSON Data into text area.";
 
-				importAttributes(character);
+		}
 
-				importRepeatingLanguages(character, uniqueKeys);
+		if (success) {
 
-				importRepeatingCultures(character, uniqueKeys);
+			// TODO: figure out async/await
+			let uniqueKeys = await getUniqueKeysForCharacter();
 
-				importRepeatingTraits(character, uniqueKeys);
+			await importAttributes(character);
 
-				importRepeatingPerks(character, uniqueKeys);
+			await importRepeatingLanguages(character, uniqueKeys);
 
-				importRepeatingQuirks(character, uniqueKeys);
+			await importRepeatingCultures(character, uniqueKeys);
 
-				importRepeatingDisadvantages(character, uniqueKeys);
+			await importRepeatingTraits(character, uniqueKeys);
 
-				importRepeatingRacial(character, uniqueKeys);
+			await importRepeatingPerks(character, uniqueKeys);
 
-				importRepeatingSkills(character, uniqueKeys);
+			await importRepeatingQuirks(character, uniqueKeys);
 
-				importRepeatingTechniquesrevised(character, uniqueKeys);
+			await importRepeatingDisadvantages(character, uniqueKeys);
 
-				importRepeatingDefense(character, uniqueKeys);
+			await importRepeatingRacial(character, uniqueKeys);
 
-				importRepeatingMelee(character, uniqueKeys);
+			await importRepeatingSkills(character, uniqueKeys);
 
-				importRepeatingRanged(character, uniqueKeys);
+			await importRepeatingTechniquesrevised(character, uniqueKeys);
 
-				importRepeatingItem(character, uniqueKeys);
+			await importRepeatingDefense(character, uniqueKeys);
 
-				importRepeatingSpells(character, uniqueKeys);
+			await importRepeatingMelee(character, uniqueKeys);
 
-				// very last attribute to get updated
-				const applyCombatReflexes = character.CombatReflexes ? "1" : "0";
+			await importRepeatingRanged(character, uniqueKeys);
 
-				setAttrsAsync({combat_reflexes: applyCombatReflexes});
+			await importRepeatingItem(character, uniqueKeys);
 
-				setAttrs({ 
-					import_json_state: "normal",
-					import_json_message: "Import has completed!",
-					character_json_data: ""
-				 });
+			await importRepeatingSpells(character, uniqueKeys);
 
-			} else {
+			// very last attribute to get updated
+			const applyCombatReflexes = character.CombatReflexes ? "1" : "0";
 
-				setAttrs({ "import_json_message": message });
+			await setAttrsAsync({combat_reflexes: applyCombatReflexes});
 
-			}
+			setAttrs({ 
+				import_json_state: "normal",
+				import_json_message: "Import has completed!",
+				character_json_data: ""
+				});
 
-		});
+		} else {
+
+			setAttrs({ "import_json_message": message });
+
+		}
 
 	}
 
-	let getUniqueKeysForCharacter = () => {
+	let getUniqueKeysForCharacter = async () => {
 
 		let uniqueKeys = {};
 
-		//getUniqueKeysByTableAsync("repeating_languages", uniqueKeys);
+		await getUniqueKeysByTableAsync("repeating_languages", uniqueKeys);
 
-		//getUniqueKeysByTableAsync("repeating_cultures", uniqueKeys);
+		await getUniqueKeysByTableAsync("repeating_cultures", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_traits", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_perks", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_quirks", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_disadvantages", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_racial", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_skills", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_techniquesrevised", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_defense", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_melee", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_ranged", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_item", uniqueKeys);
+
+		await getUniqueKeysByTableAsync("repeating_spells", uniqueKeys);
 
 		return uniqueKeys;
 
 	}
 
-	let getUniqueKeysByTableAsync = (table, uniqueKeys) => {
+	let getUniqueKeysByTableAsync = async (table, uniqueKeys) => {
 
-		getSectionIDsAsync(table, ids => {
+		let ids = await getSectionIDsAsync(table);
+		
+		if (ids.length === 0) {
+			return;
+		}
 
-			if (ids.length === 0) {
-				callback();
-				return;
-			}
-	
-			// get the idkey for each row.
-			let fields = [];
-	
-			for (let i = 0; i < ids.length; i++) {
-	
-				fields.push(`${table}_${ids[i]}_idkey`);
-	
-			}
+		// get the idkey for each row.
+		let fields = [];
 
-			getAttrsAsync(fields, values => {
+		for (let i = 0; i < ids.length; i++) {
 
-				// loop through each row
-				for (let key in values) {
-	
-					let idkey;
+			fields.push(`${table}_${ids[i]}_idkey`);
 
-					let rowId;
+		}
 
-					if (values.hasOwnProperty(key)) {
+		let values = await getAttrsAsync(fields);
 
-						idkey = values[key];
+		// loop through each row
+		for (let key in values) {
 
-						// get row id from the key name
-						// example: repeating_melee_KEYHERE_idkey
-						rowId = getRowIdFromRowFieldKey(key, table);
+			let idkey;
 
-						if (idkey && rowId) {
+			let rowId;
 
-							// add new key/value pair!
-							uniqueKeys[idkey] = rowId;
+			if (values.hasOwnProperty(key)) {
 
-						}
+				idkey = values[key];
 
-					}
+				// get row id from the key name
+				// example: repeating_melee_KEYHERE_idkey
+				rowId = getRowIdFromRowFieldKey(key, table);
+
+				if (idkey && rowId) {
+
+					// add new key/value pair!
+					uniqueKeys[idkey] = rowId;
 
 				}
-			});
 
-		});
+			}
+
+		}
 
 	}
 
-	let importAttributes = character => {
+	let importAttributes = async (character) => {
 
 		const applySizeModifier = character.ApplySizeModifier ? "1" : "0";
 		const flightChecked = character.FlightChecked ? "1" : "0";
@@ -34309,19 +34337,19 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			spell_bonus: parseInt(character.SpellBonus)
 		};
 
-		setAttrsAsync(baseAttributes);
+		await setAttrsAsync(baseAttributes);
 
-		setAttrsAsync(baseAttributeMods);
+		await setAttrsAsync(baseAttributeMods);
 
-		setAttrsAsync(secondaryAttributesPoints);
+		await setAttrsAsync(secondaryAttributesPoints);
 
-		setAttrsAsync(secondaryAttributesMods);
+		await setAttrsAsync(secondaryAttributesMods);
 
 	}
 
-	let importRepeatingLanguages = (character, uniqueKeys) => {
+	let importRepeatingLanguages = async (character, uniqueKeys) => {
 
-		character.RepeatingLanguages.forEach(language => {
+		await asyncForEach(character.RepeatingLanguages, async (language) => {
 
 			let attributes = {};
 
@@ -34352,16 +34380,16 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			}
 			
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingCultures = (character, uniqueKeys) => {
+	let importRepeatingCultures = async (character, uniqueKeys) => {
 
-		character.RepeatingCultures.forEach(culture => {
-
+		await asyncForEach(character.RepeatingCultures, async (culture) => {
+			
 			let rowId = generateOrGetRowId(uniqueKeys, culture.Idkey);
 
 			let baseFieldName = `repeating_cultures_${rowId}`;
@@ -34374,15 +34402,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 			attributes[`${baseFieldName}_points`] = parseInt(culture.Points);
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingTraits = (character, uniqueKeys) => {
+	let importRepeatingTraits = async (character, uniqueKeys) => {
 
-		character.RepeatingTraits.forEach(trait => {
+		await asyncForEach(character.RepeatingTraits, async (trait) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
 
@@ -34404,15 +34432,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = trait.Notes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingPerks = (character, uniqueKeys) => {
+	let importRepeatingPerks = async (character, uniqueKeys) => {
 
-		character.RepeatingPerks.forEach(trait => {
+		await asyncForEach(character.RepeatingPerks, async (trait) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
 
@@ -34432,15 +34460,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = trait.Notes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingQuirks = (character, uniqueKeys) => {
+	let importRepeatingQuirks = async (character, uniqueKeys) => {
 
-		character.RepeatingQuirks.forEach(trait => {
+		await asyncForEach(character.RepeatingQuirks, async (trait) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
 
@@ -34460,15 +34488,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = trait.Notes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingDisadvantages = (character, uniqueKeys) => {
+	let importRepeatingDisadvantages = async (character, uniqueKeys) => {
 
-		character.RepeatingDisadvantages.forEach(trait => {
+		await asyncForEach(character.RepeatingDisadvantages, async(trait) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
 
@@ -34490,15 +34518,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = trait.Notes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingRacial = (character, uniqueKeys) => {
+	let importRepeatingRacial = async (character, uniqueKeys) => {
 
-		character.RepeatingRacial.forEach(trait => {
+		await asyncForEach(character.RepeatingRacial, async (trait) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
 
@@ -34520,15 +34548,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = trait.Notes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingSkills = (character, uniqueKeys) => {
+	let importRepeatingSkills = async (character, uniqueKeys) => {
 
-		character.RepeatingSkills.forEach(skill => {
+		await asyncForEach(character.RepeatingSkills, async (skill) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, skill.Idkey);
 
@@ -34556,7 +34584,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = skill.Notes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
@@ -34598,9 +34626,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	let importRepeatingTechniquesrevised = (character, uniqueKeys) => {
+	let importRepeatingTechniquesrevised = async (character, uniqueKeys) => {
 
-		character.RepeatingTechniquesrevised.forEach(skill => {
+		await asyncForEach(character.RepeatingTechniquesrevised, async (skill) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, skill.Idkey);
 
@@ -34632,7 +34660,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = skill.Notes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
@@ -34658,9 +34686,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	let importRepeatingDefense = (character, uniqueKeys) => {
+	let importRepeatingDefense = async (character, uniqueKeys) => {
 
-		character.RepeatingDefense.forEach(trait => {
+		await asyncForEach(character.RepeatingDefense, async (trait) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
 
@@ -34682,17 +34710,17 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_defense_mod_reason`] = trait.DefenseModReason;
 
-			attributes[`${baseFieldName}_info_description`] = parseInt(trait.InfoDescription);
+			attributes[`${baseFieldName}_info_description`] = trait.InfoDescription;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingMelee = (character, uniqueKeys) => {
+	let importRepeatingMelee = async (character, uniqueKeys) => {
 
-		character.RepeatingMelee.forEach(trait => {
+		await asyncForEach(character.RepeatingMelee, async (trait) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
 
@@ -34716,15 +34744,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = trait.Notes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingRanged = (character, uniqueKeys) => {
+	let importRepeatingRanged = async (character, uniqueKeys) => {
 
-		character.RepeatingRanged.forEach(trait => {
+		await asyncForEach(character.RepeatingRanged, async (trait) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
 
@@ -34768,15 +34796,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = trait.Notes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingItem = (character, uniqueKeys) => {
+	let importRepeatingItem = async (character, uniqueKeys) => {
 
-		character.RepeatingItem.forEach(trait => {
+		await asyncForEach(character.RepeatingItem, async (trait) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
 
@@ -34802,15 +34830,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = trait.Notes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
 	}
 
-	let importRepeatingSpells = (character, uniqueKeys) => {
+	let importRepeatingSpells = async (character, uniqueKeys) => {
 
-		character.RepeatingSpells.forEach(skill => {
+		await asyncForEach(character.RepeatingSpells, async (skill) => {
 
 			let rowId = generateOrGetRowId(uniqueKeys, skill.Idkey);
 
@@ -34852,7 +34880,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_notes`] = skill.SpellNotes;
 
-			setAttrsAsync(attributes);
+			await setAttrsAsync(attributes);
 
 		});
 
