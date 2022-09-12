@@ -15676,12 +15676,14 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					<h3>Import Tool</h3>
 
 					<p>
-						Imports a file using json data based on a standard for use with GURPS Roll20 Charactersheet. 
-						Exporter tools can be developed for a character generator int this format, instead of
+						Imports a file using data based on a standard json shema for use with the GURPS Roll20 Charactersheet. 
+						Exporter tools can be developed for a character generator in this format, instead of
 						creating a special import for each character generator.  
 					</p>
 					<p>
-						Initial version is designed for a one time import. Future iterations will allow re-import.
+						Initial version is designed to allow you to re-import your character. Be aware, this will overwrite general notes. 
+						Future iterations will check for deleted items and remove them and import notes checkbox. This checkbox will 
+						prevent overwriting any notes you may have written on the character sheet.
 					</p>
 	
 					<h4>GCA5</h4>
@@ -29294,14 +29296,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				let uniqueKeys = {};
 	
 				importCharacterSheetWithGCA(uniqueKeys, jsonData, importNotes);
-	
-				// uniqueKeys is passed by reference. Gets updated while reading each repeating table.
-				// getUniqueKeysForSheet(uniqueKeys, () => {
-				//
-				//     importCharacterSheetWithGCA(uniqueKeys, jsonData, importNotes);
-	
-				// });
-	
+
 	
 			} else {
 	
@@ -29360,144 +29355,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		}
 	
 		return true;
-	}
-	
-	/**
-	 * Get all the unique keys and associated row ids. 
-	 * This allows us to update existing rows instead of inserting new ones
-	 * 
-	 * @param {object}     uniqueKeys Key values pairs for unique idkey and associated row id. Passed by reference
-	 * @param {() => void} callback   Function to run after we're done getting data
-	 */
-	function getUniqueKeysForSheet(uniqueKeys, callback) {
-	
-		// make sure we have a valid function
-		callback = callback || noop;
-	
-		// sorry about this
-		getUniqueKeysForTable("repeating_languages", uniqueKeys, () => {
-	
-			getUniqueKeysForTable("repeating_cultures", uniqueKeys, () => {
-	
-				getUniqueKeysForTable("repeating_traits", uniqueKeys, () => {
-	
-					getUniqueKeysForTable("repeating_perks", uniqueKeys, () => {
-	
-						getUniqueKeysForTable("repeating_quirks", uniqueKeys, () => {
-	
-							getUniqueKeysForTable("repeating_disadvantages", uniqueKeys, () => {
-	
-								getUniqueKeysForTable("repeating_racial", uniqueKeys, () => {
-	
-									getUniqueKeysForTable("repeating_skills", uniqueKeys, () => {
-	
-										getUniqueKeysForTable("repeating_techniquesrevised", uniqueKeys, () => {
-	
-											getUniqueKeysForTable("repeating_defense", uniqueKeys, () => {
-	
-												getUniqueKeysForTable("repeating_melee", uniqueKeys, () => {
-	
-													getUniqueKeysForTable("repeating_ranged", uniqueKeys, () => {
-	
-														getUniqueKeysForTable("repeating_item", uniqueKeys, () => {
-	
-															getUniqueKeysForTable("repeating_spells", uniqueKeys, () => {
-	
-																// finally return! Sorry1
-																callback();
-	
-															});
-	
-														});
-	
-													});
-	
-												});
-	
-											});
-	
-										});
-	
-									});
-	
-								});
-	
-							});
-	
-						});
-	
-					});
-	
-				});
-	
-			});
-	
-		});
-	
-	}
-	
-	/**
-	 * Get unique idkey and associated row id for a table
-	 * 
-	 * @param {string}     table      Name of repeating table
-	 * @param {object}     uniqueKeys Key values pairs for unique idkey and associated row id. Passed by reference
-	 * @param {() => void} callback   Function to run after we're done getting data
-	 */
-	function getUniqueKeysForTable(table, uniqueKeys, callback) {
-	
-		// make sure we have a valid function
-		callback = callback || noop;
-	
-		getSectionIDs(table, (ids) => {
-	
-			if (ids.length === 0) {
-				callback();
-				return;
-			}
-	
-			// get the idkey for each row.
-			let fields = [];
-	
-			for (let i = 0; i < ids.length; i++) {
-	
-				fields.push(`${table}_${ids[i]}_idkey`);
-	
-			}
-	
-			getAttrs(fields, values => {
-	
-				// loop through each row
-				for (let key in values) {
-	
-					let idkey;
-	
-					let rowId;
-	
-					if (values.hasOwnProperty(key)) {
-	
-						idkey = values[key];
-	
-						// get row id from the key name
-						// example: repeating_melee_KEYHERE_idkey
-						rowId = getRowIdFromRowFieldKey(key, table);
-	
-						if (idkey && rowId) {
-	
-							// add new key/value pair!
-							uniqueKeys[idkey] = rowId;
-	
-						}
-	
-					}
-	
-				}
-	
-			});
-	
-		});
-	
-		callback();
-	
 	}
 	
 	/**
@@ -34718,6 +34575,47 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
+	/**
+	 * Will convert variable die rolls to Roll20 macro prompt
+	 * if it starts with ~, then add macro to allow user to enter number of dice to roll
+	 */
+	let getDamageDieMacro = (damageDie) => {
+	
+		let dieRoll = damageDie;
+	
+		if (damageDie && damageDie.includes("~")) {
+	
+			// example: ~1d+1
+			// remove ~
+			damageDie = damageDie.replace("~", "");
+	
+			// array = [1, +1]
+			let arrDamageDie = damageDie.split("d");
+	
+			let baseDie = 1;
+	
+			let dieModifier = "0";
+	
+			if (arrDamageDie.length === 1) {
+	
+				baseDie = arrDamageDie[0];
+	
+			} else if (arrDamageDie.length === 2) {
+	
+				baseDie = arrDamageDie[0];
+	
+				dieModifier = arrDamageDie[0];
+	
+			}
+	
+			dieRoll = getNumberOfDicePrompt(baseDie, Number(dieModifier), 12);
+	
+		}
+	
+		return dieRoll;
+	
+	}
+
 	let importRepeatingMelee = async (character, uniqueKeys) => {
 
 		await asyncForEach(character.RepeatingMelee, async (trait) => {
@@ -34732,7 +34630,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_name`] = trait.Name;
 
-			attributes[`${baseFieldName}_damage`] = trait.Damage;
+			attributes[`${baseFieldName}_damage`] = getDamageDieMacro(trait.Damage);
 
 			attributes[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.Type);
 
@@ -34768,7 +34666,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_name`] = trait.Name;
 
-			attributes[`${baseFieldName}_damage`] = trait.Damage;
+			attributes[`${baseFieldName}_damage`] = getDamageDieMacro(trait.Damage);
 
 			attributes[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.Type);
 
