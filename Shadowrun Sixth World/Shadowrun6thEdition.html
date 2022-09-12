@@ -3400,6 +3400,10 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
+								<span class="changelog-entry">**2022-09-13 ** v.60 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - PC->Rolls->Matrix actions including cracking were not using the Cracking skill rating but whatever the rating of the last updated skill was.  Fixed the bug causing this and loading the sheet the first time should update the attr_cracking value to be correct again.
+								</ul>
 								<span class="changelog-entry">**2022-08-30 ** v.59 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">A</span><b>Bugfix</b> - Non-PC sheets were broken anywhere that a textarea (notes style) entry existed you couldn't display it to add or edit the values.
@@ -5860,7 +5864,7 @@
 <input type="hidden" name="attr_wild_die1" value="0" />
 <input type="hidden" name="attr_wild_die2" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.59">
+<input type="hidden" name="attr_sheet_version" value="0.60">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 
@@ -5921,6 +5925,9 @@ on("sheet:opened", function() {
 					_v58_update();
 					_v59_update();
 					console.log("Data now fits v.59");
+				case (v.data_version < 0.60):
+					_v60_update();
+					console.log("Data now fits v.60");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -5942,6 +5949,22 @@ var show_changelog = () => {
 	});
 };
 
+
+var _v60_update = () => {
+	// Update attr_cracking to reflect the correct value
+	getSectionIDs('repeating_skills', (rows) => {
+		rows.forEach((row) => {
+			getAttrs([`repeating_skills_${row}_name`, `repeating_skills_${row}_rating`], (v) => {
+				if(v[`repeating_skills_${row}_name`] == 'Cracking') {
+					skillName = v[`repeating_skills_${row}_name`];
+					setAttrs({
+						[`${skillName}`]: v[`repeating_skills_${row}_rating`]
+					});
+				}
+			});
+		});
+	});
+};
 
 var _v59_update = () => {
 	getAttrs(['character_name'], (v) => {
@@ -8673,11 +8696,15 @@ var update_skill_attribute = (prefix, skill) => {
 				});
 			});
 		} else if (source.includes("dicepool")) {
-			getAttrs([`${source}`, `${field}_skill`], (v) => {
-				const skill     = v[`${field}_skill`];
+			var rep_row = source.match(/(repeating_[^_]+?)_([^_]+?)_(.+)/);
+			var name = rep_row[1]+'_'+rep_row[2]+'_name';
+
+			getAttrs([`${source}`, `${name}`], (v) => {
+				const skill     = v[`${name}`];
 				let lowercase   = skill.toLowerCase();
 				let removeGroup = (lowercase.includes("group")) ? lowercase.slice(0, -6) : lowercase;
 				let skillSet    = (removeGroup.includes(" ")) ? removeGroup.replace(/ /g,"") : removeGroup;
+
 				setAttrs({
 					[`${skillSet}`]: v[`${source}`]
 				});
