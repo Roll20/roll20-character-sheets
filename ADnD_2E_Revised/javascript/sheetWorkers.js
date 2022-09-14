@@ -95,10 +95,10 @@ const displayWeaponType = function (type) {
 const parseSourceAttribute = function (eventInfo) {
     let parse = {};
     if (eventInfo.sourceAttribute.startsWith('repeating')) {
-        let match = eventInfo.sourceAttribute.split('_');
-        parse.section = match[1];
-        parse.rowId = match[2];
-        parse.attribute = match[3];
+        let split = eventInfo.sourceAttribute.split('_');
+        parse.section = split[1];
+        parse.rowId = split[2];
+        parse.attribute = split[3];
     } else {
         parse.attribute = eventInfo.sourceAttribute;
     }
@@ -2554,30 +2554,31 @@ on('sheet:opened change:character_name', function (eventInfo) {
     PSIONIC_CORE_SECTIONS.forEach(({section, name, macro}) => {
         TAS.repeating(section)
             .attr('character_name')
-            .field('action')
+            .field('action-check', 'action-macro')
             .each(function (row, attrSet, id, rowSet) {
-                row.action = `%{${attrSet.character_name}|repeating_${section}_${id}_action}`;
+                row['action-check'] = `%{${attrSet.character_name}|repeating_${section}_${id}_action-check}`;
+                row['action-macro'] = `%{${attrSet.character_name}|repeating_${section}_${id}_action-macro}`;
             })
             .execute();
     });
 });
-const POWER_SCORE_REGEX = /{{powerscore=\[\[(.*)]]}}/
-const POWER_SCORE_ENHANCED_REGEX = / *{{powerscoreenhanced=\[\[(.*)]]}} */g
 PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, discipline}) => {
     on(`change:repeating_${section}:${macro}`, function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
         getAttrs(['character_name'], function (values) {
             let powerInfo = {};
-            powerInfo[`repeating_${section}_action`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action}`;
+            powerInfo[`repeating_${section}_action-check`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action-check}`;
+            powerInfo[`repeating_${section}_action-macro`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action-macro}`;
             return setAttrs(powerInfo,{silent:true});
         });
     });
 
     on(`change:repeating_${section}:${name}`, function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
-        getAttrs(['character_name', `repeating_${section}_powerscore-enhanced`, ...BOOK_FIELDS], function (values) {
+        getAttrs(['character_name', ...BOOK_FIELDS], function (values) {
             let powerInfo = {};
-            powerInfo[`repeating_${section}_action`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action}`;
+            powerInfo[`repeating_${section}_action-check`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action-check}`;
+            powerInfo[`repeating_${section}_action-macro`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action-macro}`;
             if (!eventInfo.newValue)
                 return setAttrs(powerInfo,{silent:true});
 
@@ -2597,8 +2598,13 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             if (toastObject)
                 return setAttrs(Object.assign(powerInfo, toastObject),{silent:true});
 
+            let powerScoreModifier = power['modifier'];
+            if (power['context-modifier']) {
+                powerScoreModifier += `)+(${power['context-modifier']}`;
+            }
+
             powerInfo[`repeating_${section}_powerscore-nomod${number}`] = power['attribute'];
-            powerInfo[`repeating_${section}_powerscore-mod${number}`]   = power['modifier'];
+            powerInfo[`repeating_${section}_powerscore-mod${number}`]   = powerScoreModifier;
             powerInfo[`repeating_${section}_PSP-cost${cost_number}`]    = power['initial-cost'];
             powerInfo[`repeating_${section}_PSP-cost-maintenance`]      = power['maintenance-cost'];
 
@@ -2613,21 +2619,13 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`prep=${power['prep']}`);
             macroBuilder.push(`prereq=${power['prerequisites']}`);
             macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
-            let powerRoll = power['roll-override'] || `[[1d20cf20+(@{psionic-mod${number}})]]`;
+            let powerRoll = power['roll-override'] || `[[1d20cf20-(@{psionic-mod${number}})]]`;
             macroBuilder.push(`powerroll=${powerRoll}`);
-            let powerScoreValue = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
-            if (power['context-modifier']) {
-                powerScoreValue += `+(${power['context-modifier']})`
-            }
-            macroBuilder.push(`powerscore=[[${powerScoreValue}]]`);
-            if (parseInt(values[`repeating_${section}_powerscore-enhanced`])) {
-                macroBuilder.push(`powerscoreenhanced=[[${powerScoreValue}+(@{powerscore-enhanced})]]`)
-            }
+            macroBuilder.push(`powerscore=[[@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})]]`);
+            macroBuilder.push(`powerscoreenhanced=[[(@{powerscore-nomod${number}})+(@{powerscore-mod${number}})+(@{psion-armor-penalty})+(@{powerscore-enhanced})]]`)
             macroBuilder.push(`powerscoreeffect=${power['power-score']}`);
             macroBuilder.push(`20effect=${power['20']}`);
-            if (power['1']) {
-                macroBuilder.push(`1effect=${power['1']}`);
-            }
+            macroBuilder.push(`1effect=${power['1']}`);
             if (power['damage']) {
                 macroBuilder.push(`damage=${power['damage']}`);
                 macroBuilder.push(`damage-type=${power['damage-type']}`);
@@ -2644,74 +2642,92 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
         });
     });
 
-    on(`change:repeating_${section}:powerscore-enhanced`, function (eventInfo) {
-        getAttrs([`repeating_${section}_${macro}`], function (values) {
-            let macroValue = values[`repeating_${section}_${macro}`];
-            if (!macroValue.includes('&{template:2Epsionic}'))
-                return;
-
-            let powerScoreMatch = macroValue.match(POWER_SCORE_REGEX);
-            if (!powerScoreMatch)
-                return;
-
-            let powerScoreEnhancedMatch = macroValue.match(POWER_SCORE_ENHANCED_REGEX);
-            if (parseInt(eventInfo.newValue) > 0) {
-                if (powerScoreEnhancedMatch)
-                    return;
-
-                let powerScoreEnhancedValue = powerScoreMatch[1] + `+(@{powerscore-enhanced})`;
-                let powerScoreEnhancedAttribute = `${powerScoreMatch[0]} {{powerscoreenhanced=[[${powerScoreEnhancedValue}]]}}`;
-                macroValue = macroValue.replace(powerScoreMatch[0], powerScoreEnhancedAttribute);
-            } else {
-                macroValue = macroValue.replaceAll(POWER_SCORE_ENHANCED_REGEX, ' ');
-            }
-
-            let newMacro = {};
-            newMacro[`repeating_${section}_${macro}`] = macroValue;
-            setAttrs(newMacro,{silent:true})
-        });
-    });
-
-    on(`clicked:repeating_${section}:action`, function (eventInfo) {
+    on(`clicked:repeating_${section}:action-check`, function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
-        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], async function (values) {
-            let macroValue = values[`repeating_${section}_${macro}`];
-
-            let repeating = `repeating_${section}_${parse.rowId}`;
-            macroValue = macroValue.replaceAll(`${name}`,`${repeating}_${name}`)
-                .replaceAll(`psionic-mod${number}`,`${repeating}_psionic-mod${number}`)
-                .replaceAll(`powerscore-nomod${number}`,`${repeating}_powerscore-nomod${number}`)
-                .replaceAll(`powerscore-mod${number}`,`${repeating}_powerscore-mod${number}`)
-                .replaceAll(`powerscore-enhanced`,`${repeating}_powerscore-enhanced`)
-                .replaceAll(`PSP-cost${cost_number}`,`${repeating}_PSP-cost${cost_number}`)
-                .replaceAll(`PSP-cost-maintenance`,`${repeating}_PSP-cost-maintenance`);
-
-            if (!values['psion-armor-penalty']) {
-                macroValue = macroValue.replaceAll('+(@{psion-armor-penalty})', '');
+        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
+            let displayDiscipline = discipline;
+            let tier = name.includes('science') ? 'Science' : 'Devotion';
+            let fullMacro = values[`repeating_${section}_${macro}`];
+            let match;
+            if (discipline === 'Attack' || discipline === 'Defense') {
+                displayDiscipline = 'Telepathic';
+                match = fullMacro.match(/\{\{tier=(\w*)}}/);
+                tier = match ? match[1] : '';
             }
 
-            let roll = await startRoll(macroValue);
-            if (!macroValue.includes('&{template:2Epsionic}')) {
-                return finishRoll(roll.rollId);
-            }
+            let macroBuilder = [];
+            macroBuilder.push(`title=@{${name}}`);
+            macroBuilder.push(`discipline=${displayDiscipline}`);
+            macroBuilder.push(`tier=${tier}`);
+            macroBuilder.push(`powerscore=[[@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})]]`);
+            macroBuilder.push(`powerscoreenhanced=[[(@{powerscore-nomod${number}})+(@{powerscore-mod${number}})+(@{psion-armor-penalty})+(@{powerscore-enhanced})]]`);
 
-            let computedRolls = {};
-            let powerscore = roll.results.powerscore;
-            if (powerscore) {
-                computedRolls.powerscore = Math.min(powerscore.result, 19)
-            }
+            match = fullMacro.match(/\{\{powerroll=(.*)}}/);
+            if (match)
+                macroBuilder.push(`powerroll=${match[1]}`);
+            else
+                macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
 
-            let powerscoreenhanced = roll.results.powerscoreenhanced;
-            if (powerscoreenhanced && powerscoreenhanced.result > powerscore.result) {
-                computedRolls.powerscoreenhanced = Math.min(powerscoreenhanced.result, 19)
-                if (powerscoreenhanced.result > 19) {
-                    computedRolls.powerscore = 19 - (powerscoreenhanced.result - powerscore.result);
-                }
-            }
+            match = fullMacro.match(/\{\{powerscoreeffect=\w*}}/);
+            if (match) macroBuilder.push(match[0]);
 
-            finishRoll(roll.rollId, computedRolls);
+            match = fullMacro.match(/\{\{20effect=\w*}}/);
+            if (match) macroBuilder.push(match[0]);
+
+            fullMacro.match(/\{\{1effect=\w*}}/);
+            if (match) macroBuilder.push(match[0]);
+
+            let macroValue = macroBuilder.map(s => `{{${s}}}`).join(' ');
+            macroValue = `&{template:2Epsionic} ${macroValue}`;
+
+            rollPsionicTemplate(macroValue, parse.rowId, values);
         });
     });
+
+    on(`clicked:repeating_${section}:action-macro`, function (eventInfo) {
+        let parse = parseSourceAttribute(eventInfo);
+        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
+            let macroValue = values[`repeating_${section}_${macro}`];
+
+            rollPsionicTemplate(macroValue, parse.rowId, values);
+        });
+    });
+
+    let rollPsionicTemplate = async function(macroValue, rowId, values) {
+        let repeating = `repeating_${section}_${rowId}`;
+        macroValue = macroValue.replaceAll(`${name}`,`${repeating}_${name}`)
+            .replaceAll(`psionic-mod${number}`,`${repeating}_psionic-mod${number}`)
+            .replaceAll(`powerscore-nomod${number}`,`${repeating}_powerscore-nomod${number}`)
+            .replaceAll(`powerscore-mod${number}`,`${repeating}_powerscore-mod${number}`)
+            .replaceAll(`powerscore-enhanced`,`${repeating}_powerscore-enhanced`)
+            .replaceAll(`PSP-cost${cost_number}`,`${repeating}_PSP-cost${cost_number}`)
+            .replaceAll(`PSP-cost-maintenance`,`${repeating}_PSP-cost-maintenance`);
+
+        if (!values['psion-armor-penalty']) {
+            macroValue = macroValue.replaceAll('+(@{psion-armor-penalty})', '');
+        }
+
+        let roll = await startRoll(macroValue);
+        if (!macroValue.includes('&{template:2Epsionic}')) {
+            return finishRoll(roll.rollId);
+        }
+
+        let computedRolls = {};
+        let powerscore = roll.results.powerscore;
+        if (powerscore) {
+            computedRolls.powerscore = Math.min(powerscore.result, 19)
+        }
+
+        let powerscoreenhanced = roll.results.powerscoreenhanced;
+        if (powerscoreenhanced && powerscoreenhanced.result > powerscore.result) {
+            computedRolls.powerscoreenhanced = Math.min(powerscoreenhanced.result, 19)
+            if (powerscoreenhanced.result > 19) {
+                computedRolls.powerscore = 19 - (powerscoreenhanced.result - powerscore.result);
+            }
+        }
+
+        finishRoll(roll.rollId, computedRolls);
+    };
 });
 //#endregion
 
