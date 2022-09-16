@@ -2598,13 +2598,8 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             if (toastObject)
                 return setAttrs(Object.assign(powerInfo, toastObject),{silent:true});
 
-            let powerScoreModifier = power['modifier'];
-            if (power['context-modifier']) {
-                powerScoreModifier += `)+(${power['context-modifier']}`;
-            }
-
             powerInfo[`repeating_${section}_powerscore-nomod${number}`] = power['attribute'];
-            powerInfo[`repeating_${section}_powerscore-mod${number}`]   = powerScoreModifier;
+            powerInfo[`repeating_${section}_powerscore-mod${number}`]   = power['modifier'];
             powerInfo[`repeating_${section}_PSP-cost${cost_number}`]    = power['initial-cost'];
             powerInfo[`repeating_${section}_PSP-cost-maintenance`]      = power['maintenance-cost'];
 
@@ -2621,8 +2616,12 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
             let powerRoll = power['roll-override'] || `[[1d20cf20-(@{psionic-mod${number}})]]`;
             macroBuilder.push(`powerroll=${powerRoll}`);
-            macroBuilder.push(`powerscore=[[@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})]]`);
-            macroBuilder.push(`powerscoreenhanced=[[(@{powerscore-nomod${number}})+(@{powerscore-mod${number}})+(@{psion-armor-penalty})+(@{powerscore-enhanced})]]`)
+            let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
+            if (power['context-modifier']) {
+                powerScore += `+(${power['context-modifier']})`;
+            }
+            macroBuilder.push(`powerscore=[[${powerScore}]]`);
+            macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})]]`)
             macroBuilder.push(`powerscoreeffect=${power['power-score']}`);
             macroBuilder.push(`20effect=${power['20']}`);
             macroBuilder.push(`1effect=${power['1']}`);
@@ -2651,31 +2650,46 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             let match;
             if (discipline === 'Attack' || discipline === 'Defense') {
                 displayDiscipline = 'Telepathic';
-                match = fullMacro.match(/\{\{tier=(\w*)}}/);
+                match = fullMacro.match(/\{\{tier=(.*?)}} *\{\{/);
                 tier = match ? match[1] : '';
             }
 
             let macroBuilder = [];
-            macroBuilder.push(`title=@{${name}}`);
-            macroBuilder.push(`discipline=${displayDiscipline}`);
-            macroBuilder.push(`tier=${tier}`);
-            macroBuilder.push(`powerscore=[[@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})]]`);
-            macroBuilder.push(`powerscoreenhanced=[[(@{powerscore-nomod${number}})+(@{powerscore-mod${number}})+(@{psion-armor-penalty})+(@{powerscore-enhanced})]]`);
 
-            match = fullMacro.match(/\{\{powerroll=(.*)}}/);
-            if (match)
-                macroBuilder.push(`powerroll=${match[1]}`);
-            else
-                macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
+            match = fullMacro.match(/\{\{(title=.*?)}} *\{\{/);
+            console.log(match);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`title=@{${name}}`);
 
-            match = fullMacro.match(/\{\{powerscoreeffect=\w*}}/);
-            if (match) macroBuilder.push(match[0]);
+            match = fullMacro.match(/\{\{(discipline=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`discipline=${displayDiscipline}`);
 
-            match = fullMacro.match(/\{\{20effect=\w*}}/);
-            if (match) macroBuilder.push(match[0]);
+            match = fullMacro.match(/\{\{(tier=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`tier=${tier}`);
 
-            fullMacro.match(/\{\{1effect=\w*}}/);
-            if (match) macroBuilder.push(match[0]);
+            match = fullMacro.match(/\{\{(powerroll=\[\[.*?]])}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
+
+            let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
+            match = fullMacro.match(/\{\{(powerscore=\[\[.*?]])}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`powerscore=[[${powerScore}]]`);
+
+            match = fullMacro.match(/\{\{(powerscoreenhanced=\[\[.*?]])}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})]]`);
+
+            match = fullMacro.match(/\{\{(powerscoreeffect=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+
+            match = fullMacro.match(/\{\{(20effect=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+
+            match = fullMacro.match(/\{\{(1effect=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
 
             let macroValue = macroBuilder.map(s => `{{${s}}}`).join(' ');
             macroValue = `&{template:2Epsionic} ${macroValue}`;
