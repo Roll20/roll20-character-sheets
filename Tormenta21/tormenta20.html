@@ -1798,6 +1798,14 @@
         });
     });
 
+    //Trigger CalculoPesoMoeda
+    on("sheet:opened change:ts", function(e){
+        repeatingSumModified("carga","equipment",["equipquantity","equipslot"], ""); 
+    });
+    on("sheet:opened change:to", function(e){
+        repeatingSumModified("carga","equipment",["equipquantity","equipslot"], ""); 
+    });
+
     //Bonus em perícia por nível
     on("sheet:opened change:charnivel", function(e){
         getAttrs(["charnivel"], function(v){
@@ -1895,6 +1903,16 @@
         if (!Array.isArray(fields)) fields = [fields];
         getSectionIDs(`repeating_${section}`, idArray => {
             const attrArray = idArray.reduce( (m,id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))],[]);
+
+            let pesoMoeda = 0;
+            getAttrs(["ts", "to"], function(v){
+                let tibar = parseInt(v.ts);
+                let tibouro = parseInt(v.to);
+                pesoMoeda = Math.floor((tibar + tibouro)/1000);                
+            }); 
+
+            console.log('Peso Moeda:' + pesoMoeda);
+
             getAttrs(["for", ...attrArray], v => {
                 console.log("===== values of v: "+ JSON.stringify(v) +" =====");
                      // getValue: if not a number, returns 1 if it is 'on' (checkbox), otherwise returns 0..
@@ -1905,10 +1923,10 @@
 
                 let cargalimit = for_mod > 0 ? 10 + (2 * for_mod) :  10 + parseInt(for_mod);
                 let cargamax = cargalimit * 2;
-
+                                               
                 let setObj = {}
 
-                let finalTotal = sumTotal * multiplier;
+                let finalTotal = (sumTotal * multiplier) + pesoMoeda;
 
                 finalTotal = finalTotal.toString() + appendText;
 
