@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2022-09-13 ** v.60 Chuz (James Culp)
+	Bugfix - PC->Rolls->Matrix actions including cracking were not using the Cracking skill rating but whatever the rating of the last updated skill was.  Fixed the bug causing this and loading the sheet the first time should update the attr_cracking value to be correct again.
 **2022-08-30 ** v.59 Chuz (James Culp)
 	Bugfix - Non-PC sheets were broken anywhere that a textarea (notes style) entry existed you couldn't display it to add or edit the values.
 	New Feature - character_name sanitization.  Sometimes we want to use names with characters that will break roll buttons and other parts of the sheet.  This replaces the bad characters with an asterisk *

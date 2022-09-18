@@ -2336,12 +2336,16 @@
 
         					<div class='unarmed-container'>
         					    <div>
-        					        <button type='action' name='act_roll' data-i18n="punch-u" class='stat-roller2' value= '@{whisper}&{template:punchkick} {{title=PUNCH}} {{name=@{character_name}}} {{roll=[[@{punch}@{bonus_mod}]]}}'>PUNCH</button>
+        					        <button type='action' name='act_punch' data-i18n="punch-u" class='stat-roller2' value= '@{whisper}&{template:weapon} {{name=@{character_name}}} {{weapon-name=@{punch_weapon_name}}} {{accuracy=@{brawling_wa}}} {{damage=[[@{punch}@{punch_weapon_bonus}]]}}{{skill=@{brawling_weapon_skill}}}'>PUNCH</button>
         					        <input name='attr_punch' class='unarmed-dmg-element' type='text' value='1d6'>
-        					        <input name='attr_p_mod' class='unarmed-element' type='text' value='@{bonus_mod}' disabled='true'><br style='margin-bottom:;'>
-        					        <button type='action' name='act_roll' data-i18n="kick-u" class='stat-roller2' value= '@{whisper}&{template:punchkick} {{title=KICK}} {{name=@{character_name}}} {{roll=[[@{kick}@{kick_mod}]]}}'>KICK</button>
+        					        <input name='attr_punch_weapon_name' type='text' value='PUNCH' hidden>
+        					        <input name='attr_punch_weapon_bonus' class='unarmed-element' type='text' value='@{bonus_mod}' disabled='true'><br style='margin-bottom:;'>
+        					        <button type='action' name='act_kick' data-i18n="kick-u" class='stat-roller2' value= '@{whisper}&{template:weapon} {{name=@{character_name}}} {{weapon-name=@{kick_weapon_name}}} {{accuracy=@{brawling_wa}}} {{damage=[[@{kick}@{kick_weapon_bonus}]]}}{{skill=@{brawling_weapon_skill}}}'>KICK</button>
         					        <input name='attr_kick' class='unarmed-dmg-element' type='text' value='1d6'>
-        					        <input name='attr_k_mod' class='unarmed-element' type='text' value='@{kick_mod}' disabled='true'>
+									<input name='attr_kick_weapon_name' type='text' value='KICK' hidden>
+        					        <input name='attr_kick_weapon_bonus' class='unarmed-element' type='text' value='@{kick_mod}' disabled='true'>
+									<input name="attr_brawling_weapon_skill" value="brawling_base" hidden>
+									<input name="attr_brawling_wa" value="0" hidden>
         					    </div>
         					    <div class='toxicity-divider'></div>
         					    <div>
@@ -2971,7 +2975,7 @@
         				</div>
         			</div>
 
-					<!-- -HIDDEN WEIGHTS & SKILL MODS- -->
+					<!-- -HIDDEN WEHIGTS & SKILL MODS- -->
 					<input type="hidden" name="attr_weight_calc"
 						   value='[[round((@{weight_weapons}+@{weight_armor}+@{weight_sub}+@{weight_comp}+@{weight_gear}+@{weight_tools}+@{weight_consumables}+@{weight_currency})*10)]]'
 						   disabled='true'>
@@ -4739,8 +4743,7 @@ on('clicked:humanlocation', async (ev) => {
 //////////////////////////////
 // Weapon Template Attacks  //
 //////////////////////////////
-
-on('clicked:primaryweapon clicked:secondaryweapon clicked:thirdweapon clicked:fourthweapon clicked:fifthweapon clicked:sixthweapon clicked:shield', async (event) => {
+on('clicked:primaryweapon clicked:secondaryweapon clicked:thirdweapon clicked:fourthweapon clicked:fifthweapon clicked:sixthweapon clicked:shield clicked:punch clicked:kick', async (event) => {
 
 	let rollBase = event.htmlAttributes.value + "{{singlestrike=[[0]]}}{{faststrike=[[0]]}}{{strongstrike=[[0]]}}{{jointmeleeattack=[[0]]}}{{jointrangedattack=[[0]]}}{{passthrough=[[0]]}}";
 	let rollResult = await startRoll(rollBase);
@@ -4852,7 +4855,7 @@ on('clicked:templatesinglestrike', async (ev) => {
 	let skill = (await asw.getAttrs([skill_attribute]))[skill_attribute];
 	let attrs = await asw.getAttrs([weaponname, weaponwa, skill]);
 
-	let rollBase = `@{whisper}&{template:weaponattack} {{title=${attrs[weaponname]}}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]+0[SINGLE STRIKE]+${attrs[weaponwa]}[WEAP. ACC]?{FIRING RANGE|Point Blank (Touch Range),+5|Close (1/4 Listed Range),+0|Medium (1/2 Listed Range),-2|Long (Listed Range),-4|Extreme (2x Listed Range),-6}[RANGE]?{TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}`
+	let rollBase = `@{whisper}&{template:weaponattack} {{title=${attrs[weaponname]}}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]+0[SINGLE STRIKE]+${attrs[weaponwa]}[WEAP. ACC]?{FIRING RANGE|Point Blank (Touch Range),+5|Close (1/4 Listed Range),+0|Medium (1/2 Listed Range),-2|Long (Listed Range),-4|Extreme (2x Listed Range),-6}[RANGE]?{TARGET LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{fumble=[[1d10!]]}}`
 	doTemplateAttack(passin, rollBase);
 });
 
@@ -4863,8 +4866,12 @@ on('clicked:templatefastattack', async (ev) => {
     let weaponname = passin.weapon_name;
     let weaponwa = passin.weapon_wa;
 
+    console.log(passin);
+
 	let skill = (await asw.getAttrs([skill_attribute]))[skill_attribute];
 	let attrs = await asw.getAttrs([weaponname, weaponwa, skill]);
+
+	console.log(attrs);
 
 	let rollBase = `@{whisper}&{template:weaponattack} {{title=${attrs[weaponname]}}} {{name=@{character_name}}} {{roll=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]+0[FAST STRIKES]+${attrs[weaponwa]}[WEAP. ACC]?{1ST ATTACK LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{1ST ATTACK MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}} {{roll2=[[1d10!+${attrs[skill]}[SKILLBASE]?{EXTRA ACTION|No,+0|Yes,-3}[EXTRA ACTION]+0[FAST STRIKES]+${attrs[weaponwa]}[WEAP. ACC]?{2ND ATTACK LOCATION|Random,+0|Head,-6|Torso,-1|Arm/Limb,-3|Leg/Tail/Wing,-2}[LOCATION]+?{2ND ATTACK MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}}{{fumble=[[1d10!]]}}{{fumble2=[[1d10!]]}}{{damage2=[[${passin.weapon_dmg2}]]}}`
     doTemplateAttack(passin, rollBase);
