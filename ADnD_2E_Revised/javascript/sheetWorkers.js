@@ -2551,7 +2551,7 @@ const PSIONIC_CORE_SECTIONS = [
 ];
 
 on('sheet:opened change:character_name', function (eventInfo) {
-    PSIONIC_CORE_SECTIONS.forEach(({section, name, macro}) => {
+    PSIONIC_CORE_SECTIONS.forEach(({section}) => {
         TAS.repeating(section)
             .attr('character_name')
             .field('action-check', 'action-macro')
@@ -2611,7 +2611,12 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`maintenance=@{PSP-cost-maintenance}`);
             macroBuilder.push(`range=${power['range']}`);
             macroBuilder.push(`aoe=${power['aoe']}`);
-            macroBuilder.push(`prep=${power['prep']}`);
+            let prep = power['prep'];
+            let prepMatch = prep.match(/^[1-9]\d*$/);
+            if (prepMatch) {
+                prep += parseInt(prepMatch[0]) > 1 ? ' rounds' : 'round';
+            }
+            macroBuilder.push(`prep=${prep}`);
             macroBuilder.push(`prereq=${power['prerequisites']}`);
             macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
             let powerRoll = power['roll-override'] || `[[1d20cf20-(@{psionic-mod${number}})]]`;
