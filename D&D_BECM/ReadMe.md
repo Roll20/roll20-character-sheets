@@ -8,6 +8,8 @@ This version of the sheet incorporates roll templates, autocalculation of AC, mo
 
 ### Changelog
 * May 26 Update	Added basic Warmachine and NPC info
+* Sep 1st 2022
+  - Added Dark Mode support
 
 ### Credit Where Credit is Due
 The CSS and much of the layout is lifted from the excellent work of John Myles ([@Actoba](https://app.roll20.net/users/427494/actoba) on roll20) and the 5e Dungeons and Dragons sheet.

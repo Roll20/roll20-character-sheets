@@ -13,11 +13,109 @@ npm run build:pug:win
 
 npm run build:css
 ```
-These will then generate a dist folder that will have the finished code. From their you can upload them into the custom sheet sandbox for testing.
+These will then generate a `dist` folder that will have the finished code. From there you can upload them into the custom sheet sandbox for testing.
+
 ## Pushing Changes
 Roll20 does not build our pug/stylus code for when we merge. This needs to be done locally by running `npm run gulp:build` in the Ironsworn/src directory.
+
 ## Translations
-To keep our translation and fallback html content consistent. We are loading the translations into pug under the `locals` global variable. This allows us to call `locals.translations[<translation-key>]` to get our content. This way we can propagate changes and avoid hardcoding content.
+To keep our translation and fallback html content consistent. We are loading the translations into pug under the `locals` global variable.
+This allows us to call `locals.translations[<translation-key>]` to get our content.
+This way we can propagate changes and avoid hardcoding content.
+
+Beware when using `data-i18n`: it must not be used on elements that contain other elements, because the i18n framework will overwrite the text inside the localized element.
+This is typically relevant for labels enclosing hidden inputs: use a span inside the label to enclose the text and support data-i18n.
+
+## Changelog
+You can handle a new version in:
+- `src/package.json`: edit the `version` property
+- `src/app/workers/scripts/pages.js`: change the value of `changelog_X.Y.Z` to match
+- `src/app/pages/index.pug`: change the value of `attr_changelog_X.Y.Z` to match and add a new changelog entry
+
+## Tools
+- [Visual Studio Code](https://code.visualstudio.com/download)
+  - [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
+  - [stylus](https://marketplace.visualstudio.com/items?itemName=sysoev.language-stylus)
+
+## Local testing
+A minimal framework for testing locally is present in `src/test`.
+It allows to generate an html page that almost renders and behaves as on the Sheet sandbox.
+It is not meant to replace a validation on the Sheet sandbox but it may be useful for rapid testing or for those without access to the sandbox.
+
+### Test the character sheet
+You must create a file `test/attributes.js` that contains the initial values of your attributes.
+It may be an empty object if you do not want to initialize some values.
+For instance:
+``` js
+const initAttributes = {
+  close_changelog: 'on',
+  modes_choice: 'off',
+  mode: '0',
+  edge: '1',
+  heart: '2',
+  iron: '3',
+  shadow: '4',
+  wits: '5',
+  health: '5',
+  spirit: '5',
+  supply: '5',
+  momentum_max: 10,
+  momentum_reset: 2
+}; // don't forget the semi-colon
+```
+
+To build for testing, use `npm run gulp:test-watch`.
+This compiles `test/Ironsworn.html` and `Ironsworn.css`.
+You can open `test/Ironsworn.html` in your browser.
+
+You can enable i18n by running the script specifying a language, which will be retrieved from the `translations` folder, e.g. `npm run gulp:test-watch -- --lang fr`.
+
+### Test the roll templates
+You must create a file `test/roll-template-specs.js` that contains the list of template variations you want to display at the same time (to test different input values at the same time).
+It contains a list of specs containing the template ID, whether to display the template (so that you can easily toggle the display), and the values that are the inputs of the template.
+For instance:
+```js
+var rollSpecs = [
+  {
+    "templateId": "ironsworn_moves",
+    "display": true,
+    "values": {
+      "header": "@character_name",
+      "name": "roll +spirit",
+      "action": "[[5]]",
+      "negate1": "[[6]]",
+      "negate2": "[[7]]",
+      "negate3": "[[8]]",
+      "negate4": "[[9]]",
+      "negate5": "[[10]]",
+      "negate6": "[[11]]",
+      "challenge1": "[[4]]",
+      "challenge2": "[[5]]",
+      "momentum": "[[9]]",
+      "modifiers": "[[5]]",
+      "add": "[[0]]"
+    }
+  }
+]; // don't forget the semi-colon
+```
+The roll values must be enclosed in brackets (`[[5]]`): the system checks that you use the inline roll values properly in the template and throws an exception otherwise.  
+To build this list you should click on a roll button in the character sheet and copy/paste the resulting popup value (which is also output on the console), and replace the roll specs with the numeric values you want to test.
+If an attribute value `@{myattribute}` appears as `@myattribute`, it means this attribute was not set by interacting with the sheet and may imply it does not exist all in the sheet (i.e. you made a mistake typing its name in the roll button).
+Otherwise the attribute's value is used.  
+The roll macro with replaced attributes is also output to the console: you can test it in the site's chat.
+
+To build for testing, use `npm run gulp:test-rt-watch`.
+This compiles `test/test-roll-templates.html` and `Ironsworn.css`.
+You can open `test/test-roll-templates.html` in your browser and resize it to check with different widths.
+
+There is a `test/test-roll-templates-specs` directory that contains specs for the current templates.
+You can copy/paste them to `roll-template-specs.js` if you make changes to one of the roll template.
+
+### Limitations
+- Inputs in repeating sections (fieldsets) may not be handled properly
+- The repeating sections of the Shared sheet are not handled at all
+- Rolls are not interpreted, you can check your macros on the site in the chat
+
 ## Compatibility
 The sheet has been tested across multiple browsers and devices, show below in the compatibility matrix:
 |Browser|Windows|MacOs|Android|iOS|

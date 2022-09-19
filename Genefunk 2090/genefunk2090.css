@@ -89,6 +89,7 @@
     grid-template-areas:
     "col1 col2 col3";
     grid-gap:1em 1em;
+    align-items:start;
 }
 .sheet-whole > div > div:not(.sheet-name-logo-container){
     align-content:start;
@@ -125,7 +126,7 @@
 .sheet-italics{
     font-style:italic;
 }
-*{
+*:not(input,textarea){
     line-height:normal;
     text-transform:capitalize;
 }
@@ -150,7 +151,7 @@ h5,.sheet-whole .sheet-h5,button[type='roll'].sheet-h5,button[type='action'].she
 }
 .sheet-pictos{
 	font-family:pictos;
-    text-transform:initial;
+    text-transform:none !important;
 }
 input[type=checkbox]{
     border-radius:50%;
@@ -223,6 +224,7 @@ textarea.sheet-fixed{
 .sheet-whole button[type=finish],
 .sheet-whole button[type=back]{
 	text-shadow: 0px 0px 1px #159ccf;
+    transition:color 500ms;
 }
 .sheet-whole button:hover{
 	color:#159ccf !important;
@@ -238,6 +240,7 @@ button[type=roll]::before{
     justify-items:center;
     align-items:center;
     margin:0;
+    box-sizing:border-box;
 }
 .sheet-checkbox-container > input,
 .sheet-bordered-checkbox > input{
@@ -407,7 +410,7 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     display:grid;
     grid-template-columns:1fr;
     grid-template-rows:1fr;
-    grid-areas:"value";
+    grid-template-areas:"value";
     align-items:center;
 }
 .sheet-calc-container > .sheet-base-value,
@@ -426,6 +429,7 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 }
 .sheet-ability-scores-container{
     position:relative;
+    isolation:isolate;
 }
 .sheet-helix-image{
     position:absolute;
@@ -510,8 +514,8 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-plus-control:not(:out-of-range) + .sheet-plus-display:before{
     content:"+";
 }
-.sheet-mod-control[value*='+'] ~ span,
-.sheet-mod-control[value*='-'] ~ span{
+.sheet-mod-control[value^="+"] ~ span,
+.sheet-mod-control[value^="-"] ~ span{
     color:#159ccf;
     font-weight:bold;
 }
@@ -538,6 +542,9 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     grid-area:header;
     place-self:center;
 }
+.sheet-senses-container span{
+    color:black;
+}
 .sheet-hexagon-check-label{
     display: grid;
     grid-template-columns: auto 1fr;
@@ -548,10 +555,11 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     place-self:center stretch;
 }
 .sheet-skills-container{
+    --profSize: 16px;
     display: grid;
     position: relative;
-    grid-template-columns: 13px 2em 1fr;
-    grid-auto-rows:minmax(13px,auto);
+    grid-template-columns: var(--profSize) 2em 1fr;
+    grid-auto-rows:minmax(var(--profSize),auto);
     grid-row-gap:5px;
 }
 .sheet-skills-container > h4{
@@ -568,8 +576,8 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-expertise-check-label{
     display: grid;
     place-items: end;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
+    grid-template-columns: var(--profSize);
+    grid-template-rows: var(--profSize);
     grid-template-areas: "check";
     transform:scale(.7);
 }
@@ -630,7 +638,7 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     position: relative;
     top: -9px;
     left: -4px;
-    transform: rotate(45deg) scale(0.85);
+    transform: rotate(45deg) scale(0.9);
 }
 .sheet-prof-control[value*="proficiency"] ~ .sheet-prof-display:before{
     background-color:transparent;
@@ -815,7 +823,7 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-expand-control:not([value="0"]) ~ .sheet-collapsed-view{
     display:none;
 }
-.sheet-expandable-section:not(:hover) > .sheet-expand-button{
+.sheet-expandable-section:not(:hover):not(:focus-within) > .sheet-expand-button{
     opacity:0;
 }
 .sheet-expand-control:not([value="0"]) ~ .sheet-expanded-view{
@@ -823,11 +831,19 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     border-bottom:1px solid black;
     margin-bottom:0.5em;
 }
+.sheet-expand-control:not([value="0"]) ~ .sheet-expand-button{
+    color:black;
+}
+.sheet-expand-control:not([value="1"]) ~ .sheet-expand-button{
+    color:lightgrey;
+}
 .sheet-expandable-section > .sheet-expand-button{
     display:grid;
     grid-column:1 / 2;
     position:absolute;
-    left:-1em;
+    right:0;
+    padding:0;
+    z-index:100;
     grid-template-columns:auto;
     grid-template-rows:auto;
     grid-template-areas:"button";
@@ -876,7 +892,6 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     min-height:1em;
 }
 .sheet-enable-section > label{
-    margin-left:-0.8em;
     width:auto;
 }
 .sheet-enable-controller[value="0"] + .sheet-enable-section > label{
@@ -902,7 +917,7 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 }
 /*default repeating section styling*/
 .itemcontrol{
-    z-index:10;
+    z-index:1000;
 }
 .repcontrol,
 .sheet-pseudo-control{
@@ -911,11 +926,15 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     width:auto;
     font-size:var(--squaredim);
     min-height: 1em;
-}
-.repcontrol,
-.sheet-pseudo-control{
     grid-area:repcontrol;
+    position:sticky;
+    bottom:0;
+}
+.repcontrol:not([data-groupname="repeating_hack"]){
     width:100%;
+}
+.sheet-pseudo-control{
+    justify-self:start;
 }
 .repcontrol .btn,
 .sheet-whole .sheet-pseudo-control .sheet-repcontrol_add {
@@ -976,9 +995,6 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-pseudo-control .sheet-repcontrol_add:hover{
     background-color: transparent;
 }
-.itemcontrol {
-    z-index: 10;
-}
 .itemcontrol .repcontrol_del,
 .itemcontrol .repcontrol_move{
     font-size: 10px;
@@ -995,11 +1011,14 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 /*End default repeating section styling*/
 .sheet-bordered-checkbox,
 .sheet-bordered-container{
-    display:grid;
     background-color:black;
     clip-path:var(--spanBorderPolygon);
     padding:0.1em 1.1em;
     position:relative;
+}
+.sheet-bordered-checkbox,
+.sheet-bordered-container{
+    display:grid;
     margin-bottom:0.5em;
 }
 .sheet-bordered-checkbox:before,
@@ -1182,7 +1201,12 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-pc > .sheet-hacks{
     display:grid;
     grid-template-columns:repeat(3,1fr);
+    grid-template-rows:auto 1fr;
     grid-gap:1.5em;
+}
+.sheet-pc > .sheet-hacks > .sheet-input-label-container{
+    grid-column:1 / -1;
+    justify-self:start;
 }
 .sheet-hack-container{
     grid-area:container;
@@ -1201,7 +1225,7 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     padding-top: 3px;
 }
 .sheet-hack-container > .repcontrol > .repcontrol_add{
-    display:none;
+    display:none !important;
 }
 .sheet-hack-master-container{
     margin-top:1.5em;
@@ -1272,8 +1296,9 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 }
 .repcontainer[data-groupname="repeating_hack"] .sheet-expand-control[value="1"] ~ .sheet-expanded-view{
     display:grid;
+    padding:0.5em;
     --levelWidth:3em;
-    grid-template-columns:50% calc(50% - var(--levelWidth)) var(--levelWidth);
+    grid-template-columns:2fr 1fr var(--levelWidth);
     grid-template-rows:repeat(7,auto);
     grid-gap:0.25em 0.5em;
     grid-template-areas:
@@ -1284,6 +1309,9 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     "range          properties      properties"
     "description    description     description"
     "id             id              id";
+}
+.sheet-level > input[type="number"]{
+    width:100%;
 }
 .repcontainer[data-groupname="repeating_hack"] .sheet-enabled-section{
     grid-template-columns:repeat(2,1fr);
@@ -1348,6 +1376,15 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 }
 .sheet-collapsed-view > input.sheet-hack-type[value='software'] ~ span.sheet-hack-type{
     background-image:var(--softwareImage);
+}
+.repitem{
+    overflow:hidden;
+}
+.sheet-whole .btn-danger:hover{
+    background-position:initial;
+    background-image:none;
+    background-color:#261e1e;
+    color:#da4f49 !important;
 }
 .sheet-hack-container.sheet-1st-level > .repcontainer > .repitem > .sheet-level-display:not([value="1"]) ~ .sheet-expandable-section{
     display:none;
@@ -1451,7 +1488,8 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-npc-info > div{
     margin-bottom:1em;
 }
-.sheet-npc-info .sheet-row > *{
+.sheet-npc-info .sheet-row > *,
+.sheet-npc-info .sheet-row > button{
     margin-right:1em;
     margin-bottom:1em;
 }
@@ -1520,7 +1558,7 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-statblock-section.sheet-hack-display > .sheet-level5 .sheet-button-control:not([value="5"]) + button{
     display:none;
 }
-.sheet-hack-display-control:not([value='']) ~ .sheet-statblock-section.sheet-hack-display{
+.sheet-hack-display-control[value]:not([value='']) ~ .sheet-statblock-section.sheet-hack-display{
     display:block;
 }
 .sheet-statblock-section.sheet-hack-display .repcontainer[data-groupname="repeating_hack"]{
@@ -1559,14 +1597,28 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     --hexagon:polygon(0% 50%,25% 0%,75% 0%, 100% 50%, 75% 100%,25% 100%);
     margin:0 5px 0px -40px;
 }
+.sheet-rolltemplate-general .sheet-capitalize{
+    text-transform:capitalize;
+}
+.sheet-rolltemplate-general:not(:first-child){
+    margin-top:10px;
+}
+.sheet-rolltemplate-general .sheet-roll-display *{
+    color:black;
+}
 .sheet-rolltemplate-general h4{
-    line-height:normal;
+    line-height:1rem;
     height:auto;
     display:inline;
 }
 .sheet-rolltemplate-general > .sheet-roll-display{
     display:grid;
     position:relative;
+}
+.sheet-rolltemplate-general > .sheet-roll-display.sheet-{
+    grid-template-areas:
+        'header'
+        'description';
 }
 .sheet-rolltemplate-general > .sheet-roll-display > .sheet-bordered-container{
     display:grid;
@@ -1599,6 +1651,19 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     z-index:10;
     white-space: pre-wrap;
 }
+.sheet-rolltemplate-general > .sheet-roll-display > .sheet-character_name > .sheet-header{
+    display:grid;
+    align-content:start;
+    grid-auto-rows:auto;
+}
+.sheet-rolltemplate-general > .sheet-roll-display > .sheet-character_name > .sheet-header h4{
+    justify-self:start;
+    display:grid;
+    padding:0.5rem;
+}
+.sheet-rolltemplate-general > .sheet-roll-display > .sheet-character_name > .sheet-header h5{
+    justify-self:end;
+}
 .sheet-rolltemplate-general > .sheet-roll-display > .sheet-polygon{
     z-index:10;
     grid-template-areas:initial;
@@ -1608,19 +1673,20 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-rolltemplate-general > .sheet-roll-display > .sheet-polygon > span:first-of-type{
     grid-area:result;
 }
-.sheet-rolltemplate-general > .sheet-roll-display > .sheet-polygon > span:last-of-type{
+.sheet-rolltemplate-general > .sheet-roll-display > .sheet-polygon > span:last-child,.sheet-rolltemplate-general > .sheet-roll-display > .sheet-polygon > h4:last-child{
     grid-area:label;
+    text-align:center;
 }
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-1234{
     grid-template-columns: [header-start description-start range-start] minmax(4px,1fr) [hex2-start] 72px [hex1-start hex4-start] 24px [hex2-end] 1px [range-end] 46px [properties-start] 1px [hex3-start] 24px [hex1-end hex4-end] 72px [hex3-end] minmax(4px,1fr) [properties-end header-end description-end];
-    grid-template-rows: [header-start] auto [hex1-start] 41.5692px [hex2-start hex3-start] 1px [header-end] 40.5692px [hex1-end hex4-start] 40.5692px [description-start range-start properties-start] 1px [hex2-end hex3-end] 41.5692px [hex4-end] 4px [range-end properties-end] auto [description-end];
+    grid-template-rows: [header-start] auto [hex1-start] 41.5692px [hex2-start hex3-start] 1px [header-end] 40.5692px [hex1-end hex4-start] 40.5692px [description-start range-start properties-start] 1px [hex2-end hex3-end] 41.5692px [hex4-end] minmax(4px,min-content) [range-end properties-end] auto [description-end];
 }
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-123,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-124,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-134,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-234{
     grid-template-columns: [header-start description-start range-start] minmax(4px,1fr) [hex2-start] 72px [hex1-start hex4-start] 24px [hex2-end] 1px [range-end] 46px [properties-start] 1px [hex3-start] 24px [hex1-end hex4-end] 72px [hex3-end] minmax(4px,1fr) [properties-end header-end description-end];
-    grid-template-rows: [header-start] auto [hex2-start hex3-start] 41.5692px [hex4-start] 1px [header-end] 39.5692px [description-start range-start properties-start] 1px [hex2-end hex3-end] 41.5692px [hex4-end] 4px [range-end properties-end] auto [description-end];
+    grid-template-rows: [header-start] auto [hex2-start hex3-start] 41.5692px [hex4-start] 1px [header-end] 39.5692px [description-start range-start properties-start] 1px [hex2-end hex3-end] 41.5692px [hex4-end] minmax(4px,min-content) [range-end properties-end] auto [description-end];
 }
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-12,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-13,
@@ -1629,14 +1695,14 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-24,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-34{
     grid-template-columns: [header-start description-start range-start] minmax(4px,1fr) [hex2-start] 72px [hex1-start hex4-start] 24px [hex2-end] 1px [range-end] 46px [properties-start] 1px [hex3-start] 24px [hex1-end hex4-end] 72px [hex3-end] minmax(4px,1fr) [properties-end header-end description-end];
-    grid-template-rows: [header-start] auto [hex2-start hex3-start] 41.5692px [hex4-start] 1px [header-end] 39.5692px [description-start range-start properties-start] 1px [hex2-end hex3-end] 41.5692px [hex4-end] 4px [range-end properties-end] auto [description-end];
+    grid-template-rows: [header-start] auto [hex2-start hex3-start] 41.5692px [hex4-start] 1px [header-end] 39.5692px [description-start range-start properties-start] 1px [hex2-end hex3-end] 41.5692px [hex4-end] minmax(4px,min-content) [range-end properties-end] auto [description-end];
 }
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-1,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-2,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-3,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-4{
     grid-template-columns: [header-start description-start range-start] minmax(4px,1fr) [hex2-start] 72px [hex1-start hex4-start] 24px [hex2-end] 1px [range-end] 46px [properties-start] 1px [hex3-start] 24px [hex1-end hex4-end] 72px [hex3-end] minmax(4px,1fr) [properties-end header-end description-end];
-    grid-template-rows: [header-start] auto [hex4-start] 41.0692px [description-start range-start properties-start] 1px [header-end] 41.0692px [hex4-end] 4px [range-end properties-end] auto [description-end];
+    grid-template-rows: [header-start] auto [hex4-start] 41.0692px [description-start range-start properties-start] 1px [header-end] 41.0692px [hex4-end] minmax(4px,min-content) [range-end properties-end] auto [description-end];
 }
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-1234 > .sheet-polygon.sheet-rollValue{
     grid-area:hex1;
@@ -1721,7 +1787,14 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-3 > .sheet-range,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-34 > .sheet-range,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-4 > .sheet-range{
+    height:min-content;
     grid-template-columns: 4px 1fr 24px;
+}
+.sheet-rolltemplate-general .sheet-range span{
+    padding-left:2px;
+}
+.sheet-rolltemplate-general .sheet-properties span{
+    padding-right:2px;
 }
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-1 > .sheet-properties,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-12 > .sheet-properties,
@@ -1738,22 +1811,32 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-3 > .sheet-properties,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-34 > .sheet-properties,
 .sheet-rolltemplate-general > .sheet-roll-display.sheet-4 > .sheet-properties{
+    height:min-content;
     grid-template-columns: 24px 1fr 4px;
 }
 .sheet-rolltemplate-general > .sheet-roll-display > :not(.sheet-character_name) ~ .sheet-description{
-    grid-template-columns: 4px 1fr 4px;
-    grid-template-rows:50.563px auto 4px;
+    grid-template-columns: 4px 1fr 46px 1fr 4px;
+    grid-template-rows: minmax(50.563px,auto) min-content 4px;
     grid-template-areas:
-    ".      .       ."
-    ".      text    ."
-    ".      .       .";
+    "range  range   .      properties    properties"
+    ".      text    text   text          ."
+    ".      .       .      .             .";
 }
 .sheet-rolltemplate-general > .sheet-roll-display > .sheet-properties > *{
     place-self:center right;
 }
-.sheet-rolltemplate-general > .sheet-roll-display > .sheet-range{
+.sheet-rolltemplate-general > .sheet-roll-display .sheet-range{
     grid-area:range;
     z-index:1;
+}
+.sheet-rolltemplate-general .inlinerollresult[title*="[computed value]"],
+.sheet-rolltemplate-general .inlinerollresult[original-title*="[computed value]"] {
+  pointer-events: none !important;
+}
+.sheet-rolltemplate-general > .sheet-roll-display .sheet-description > .sheet-range,
+.sheet-rolltemplate-general > .sheet-roll-display .sheet-description > .sheet-range{
+    visibility:hidden;
+    pointer-events:none;
 }
 .sheet-rolltemplate-general > .sheet-roll-display > .sheet-range > *{
     place-self:center left;
@@ -1768,7 +1851,7 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     place-self:center right;
     text-align:right;
 }
-.sheet-rolltemplate-general > .sheet-roll-display > .sheet-properties{
+.sheet-rolltemplate-general > .sheet-roll-display .sheet-properties{
     grid-area:properties;
     z-index:1;
 }
@@ -1776,22 +1859,22 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     grid-area:description;
 }
 .sheet-rolltemplate-general > .sheet-roll-display > .sheet-description > span{
-    max-height:4em;
+    max-height:20em;
     min-height:1em;
     overflow:auto;
 }
-.sheet-rolltemplate-general .inlinerollresult{
+.sheet-rolltemplate-general .sheet-roll-display .inlinerollresult{
     background-color:transparent;
     border-color:transparent;
     font-size:16px;
     font-weight:700;
 }
-.sheet-rolltemplate-general .inlinerollresult.fullfail{
+.sheet-rolltemplate-general .sheet-roll-display .inlinerollresult.fullfail{
     color:red;
     border-color:transparent;
     filter:brightness(175%);
 }
-.sheet-rolltemplate-general .inlinerollresult.fullcrit{
+.sheet-rolltemplate-general .sheet-roll-display .inlinerollresult.fullcrit{
     color:green;
     border-color:transparent;
     filter:brightness(175%);
