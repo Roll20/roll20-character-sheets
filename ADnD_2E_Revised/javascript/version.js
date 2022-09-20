@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
 const SHEET_NAME = 'AD&D 2E Revised';
-const SHEET_VERSION = '4.12.0';
+const SHEET_VERSION = '4.13.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -33,14 +33,6 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(4, 3, 0))
                 migrate4_3_0();
-
-            if (oldSheetVersion.isBelowMigrate(4,5,0))
-                migrate4_5_0();
-
-            if (oldSheetVersion.isBelowMigrate(4,6,0))
-                migrate4_6_0();
-
-            //#endregion
         }
     });
 });
@@ -85,23 +77,6 @@ function moveStaticToRepeating(section, fieldsToMove) {
             setAttrs(newValue);
         }
     });
-}
-//#endregion
-
-//#region 4.6.0
-function migrate4_6_0() {
-    console.log('Migrating to v4.6.0');
-    updateWeaponProfsRemaining();
-    updateNonWeaponProfsRemaining();
-}
-//#endregion
-
-//#region 4.5.0
-function migrate4_5_0() {
-    console.log('Migrating to v4.5.0');
-    updateThac0(true);
-    updateWeaponProfsTotal();
-    updateNonWeaponProfsTotal();
 }
 //#endregion
 
