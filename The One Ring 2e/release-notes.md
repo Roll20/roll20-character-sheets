@@ -4,6 +4,10 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.03.00 (Build 23)
+
+- added Useful item
+
 ## 03.02.00 (Build 22)
 
 - target attacks calculate priercing blow correctly

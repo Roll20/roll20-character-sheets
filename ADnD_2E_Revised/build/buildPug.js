@@ -12,6 +12,7 @@ const booksPriority = [
     'The Complete Thief\'s Handbook',
     'The Complete Priest\'s Handbook',
     'The Complete Wizard\'s Handbook',
+    'The Complete Psionics Handbook',
     'Tome of Magic',
     'Arms and Equipment Guide',
     'The Complete Book of Dwarves',
@@ -61,6 +62,9 @@ spellsJs.forEach(jsFile => {
         fs.writeFileSync(path.join(miscFolder, 'spheres-overview.html'), sphereTable);
     }
 });
+
+const psionicCorePowers = require(path.join(jsFolder, 'psionicPowers.js'));
+html += pug.renderFile(path.join(pugFolder, 'psionicCorePowerDatalists.pug'), {pretty: true, data: psionicCorePowers});
 
 console.log('weapons.js');
 console.log('weaponProficiencies.js');

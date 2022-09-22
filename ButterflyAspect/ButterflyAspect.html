@@ -189,7 +189,7 @@
   <div class="float full weapons">
     <div class="header">
       <span>Waffen</span>
-      <button type="roll" class="small-button" name="roll_ini" value="Hat eine Initiative von [[@{Ge}d10  &{tracker}]]">Initiative</button>
+      <button type="roll" class="small-button" name="roll_ini" value="/w GM @{character_name} hat eine Initiative von [[@{Ge}d10  &{tracker}]]">Initiative</button>
     </div>
     <div class="grid">
       <div>Waffe</div>
@@ -265,10 +265,10 @@
           </div>
           <div class="select-4">
             <span class="hiddenBox">Zeit</span>
-            <input type="checkbox" name="attr_zeit" value="1" title="eine Stunde" />
-            <input type="checkbox" name="attr_zeit" value="3" title="bis zum nächsten Sonnenaufgang" />
-            <input type="checkbox" name="attr_zeit" value="6" title="eine Woche" />
-            <input type="checkbox" name="attr_zeit" value="10" title="drei Monate" />
+            <input type="checkbox" name="attr_spellzeit" value="1" title="eine Stunde" />
+            <input type="checkbox" name="attr_spellzeit" value="3" title="bis zum nächsten Sonnenaufgang" />
+            <input type="checkbox" name="attr_spellzeit" value="6" title="eine Woche" />
+            <input type="checkbox" name="attr_spellzeit" value="10" title="drei Monate" />
           </div>
           <div class="select-4">
             <span class="hiddenBox">Ziel.</span>
@@ -284,12 +284,12 @@
               type="roll"
               class=""
               name="roll_spell"
-              value="@{abilityroll} &{template:butterfly} {{name=@{spellname}}} [[?{Modifier?|@{spellskill_mod}} ?{Würfel|@{spellskill}}]] [[({floor(([[{?{Würfel}d10! + ?{Modifier?}d10}k@{in}]] - [[@{spellwiderstand} + (?{Gegnerische Intelligenz?|0} + ?{Aufrechterhaltene Zauber?|0}) * 2]]) / 5),1}kh1) * @{spellreinigung}]] {{rolling=$[[1]]}} {{widerstand=$[[2]]}} {{damage=@{damage}}} {{healing=@{healing}}} {{desc=@{spelleffekt}}}"
+              value="@{abilityroll} &{template:butterfly} {{name=@{spellname}}} [[?{Modifier?|@{spellskill_mod}} ?{Würfel|@{spellskill}}]] [[({floor(([[{?{Würfel}d10! + ?{Modifier?}d10}k@{in}]] - [[@{spellwiderstand} + (?{Gegnerische Intelligenz?|0} + ?{Aufrechterhaltene Zauber?|0}) * 2]]) / 5),1}kh1)]] {{rolling=$[[1]]}} {{widerstand=$[[2]]}} {{damage=@{damage}}} {{healing=@{healing}}} {{zeit=@{spellzeit}}} {{reinigung=@{spellreinigung}}} {{desc=@{spelleffekt}}}"
             >
               <input
                 type="number"
                 name="attr_spellwiderstand"
-                value="floor((@{spellbefehligen} + @{spellbewegung} + @{spellelement} + @{spellentfernung} + @{spellgestalt} + @{spellglueck} + @{spellreinigung} + @{spellwissen} + @{ziehlbereich} + @{zeit}) * 2)"
+                value="floor((@{spellbefehligen} + @{spellbewegung} + @{spellelement} + @{spellentfernung} + @{spellgestalt} + @{spellglueck} + @{spellreinigung} + @{spellwissen} + @{ziehlbereich} + @{spellzeit}) * 2)"
                 disabled
               />
             </button>
@@ -351,7 +351,7 @@
             <div id="healing">
               <select name="attr_healing">
                 <option value="0" selected disabled>Heilung</option>
-                <option value="$[[2]]">aktiv</option>
+                <option value="$[[3]]">aktiv</option>
                 <option value="">inaktiv</option>
               </select>
             </div>
@@ -482,22 +482,26 @@
     <div class="content">
       <div><span>Ergebnis:</span>{{rolling}}</div>
       {{#widerstand}}
-      <div><span>Widerstand:</span>{{widerstand}}</div>
+        <div><span>Widerstand:</span>{{widerstand}}</div>
       {{/widerstand}}
       {{#damage}}
-      <div><span>Schaden:</span>{{damage}}</div>
+        <div><span>Schaden:</span>{{damage}}</div>
       {{/damage}}
       {{#healing}}
-      <div><span>Heilung:</span>{{healing}}</div>
+        <div><span>Heilung:</span><span class="fakeroll">{{reinigung}}</span></div>
+        {{#rollTotal() zeit 0}}
+        <div><span>Minuten:</span>{{healing}}</div>
+        {{/rollTotal() zeit 0}}
+        {{#rollGreater() zeit 0}}
+        <div><span>Runden:</span>{{healing}}</div>
+        {{/rollGreater() zeit 0}}
       {{/healing}}
       {{#desc}}
-      <div class="desc">
-        <span>Effekt:</span>
-      </div>
-      {{desc}}
-      {{#randomplayer}}
-      <div><span>Spieler:</span>{{randomplayer}}</div>
-      {{/randomplayer}} {{/desc}}
+        <div class="desc">
+          <span>Effekt:</span>
+        </div>
+        {{desc}}
+      {{/desc}}
     </div>
   </div>
 </rolltemplate>

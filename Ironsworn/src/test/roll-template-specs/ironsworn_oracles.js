@@ -78,5 +78,14 @@ var rollSpecs = [
       "header": "Small Chance",
       "smallChance": "[[90]]"
     }
+  },
+  {
+    "templateId": "ironsworn_oracles",
+    "display": true,
+    "values": {
+      "header": "^{move-title-delve-the-depths}",
+      "delveTheDepthsTableRoll": "[[50]]",
+      "statValue": "[[1]]"
+    }
   }
 ];

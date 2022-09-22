@@ -3,7 +3,7 @@ var rollSpecs = [
     "templateId": "ironsworn_moves",
     "display": true,
     "values": {
-      "header": "Learn From Your Failures",
+      "header": "^{move-title-compel}",
       "name": "Hornst",
       "action": "[[5]]",
       "negate1": "[[4]]",
@@ -24,7 +24,7 @@ var rollSpecs = [
     "templateId": "ironsworn_moves",
     "display": true,
     "values": {
-      "header": "roll +spirit",
+      "header": "^{roll-btn} +^{resource-health}",
       "name": "@character_name",
       "action": "[[5]]",
       "negate1": "[[4]]",
@@ -270,6 +270,38 @@ var rollSpecs = [
       "stat": "[[2]]",
       "modifiers": "[[3]]",
       "add": "[[1]]"
+    }
+  },
+  { // rarity
+    "templateId": "ironsworn_moves",
+    "display": true,
+    "values": {
+      "header": "^{move-title-wield-a-rarity}",
+      "name": "@character_name",
+      "rarityAction": "[[5]]",
+      "negate1": "[[3]]",
+      "negate2": "[[4]]",
+      "negate3": "[[5]]",
+      "negate4": "[[6]]",
+      "negate5": "[[7]]",
+      "negate6": "[[8]]",
+      "challenge1": "[[5]]",
+      "challenge2": "[[7]]",
+      "momentum": "[[2]]",
+      "modifiers": "[[2]]",
+      "add": "[[0]]",
+      "stat": "[[2]]",
+      "rarityDie6": "[[5]]",
+      "rarityDie5": "[[7]]",
+      "rarityDie1": "[[3]]"
+    }
+  },
+  { // discover a site
+    "templateId": "ironsworn_moves",
+    "display": true,
+    "values": {
+      "header": "^{move-title-discover-a-site}",
+      "discoverASite": "[[2d10kl1]]"
     }
   }
 ];

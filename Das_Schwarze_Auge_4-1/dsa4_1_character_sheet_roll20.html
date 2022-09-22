@@ -13778,6 +13778,30 @@
         <p>Zu besonderen Updates&nbsp;&ndash;&nbsp;sprich: alles, was über einfache Fehlerbehebungen und eher kleine kosmetische Veränderungen hinausgeht&nbsp;&ndash;&nbsp;gibt es in der Regel, wenn auch nicht immer pünktlich zum Release einer neuen Charakterbogenversion, Videos mit vielen Details: <br />
             <input type="text" class="sheet-selectable-text" style="width: 52em" value="https://www.youtube.com/watch?v=l2SCwz51T9g&list=PLGBXxa8pcNCqzNe4CrKvy-_QgjfgLDOZ-" />
         </p>
+		<p>Änderungen &bdquo;unter der Haube&ldquo; erspare ich euch an dieser Stelle. Wer Interesse daran hat, findet all die Infos auf GitHub (siehe oben). Bei Bedarf könnt ihr auch gerne fragen: &bdquo;Isurandil&ldquo; auf (in stark fallender Lesehäufigkeit) Orkenspalter, Twitter, YouTube und Roll20.</p>
+
+		<h4>Update auf Version 20220821</h4>
+		<div>
+			<p>Fehlerbehebungen
+				<ul>
+					<li>Initialisierung von Attributen
+						<ul>
+							<li>Frisch in Roll20 erstellte Charaktere werden jetzt unter der Haube initialisiert, was eine Reihe von Problemen behebt, die sich meist durch sowas wie &bdquo;Einfach mal eine Wunde an- und wieder abhaken.&ldquo; und &bdquo;Einfach mal Tollpatsch an- und wieder abhaken.&ldquo; beheben ließen.</li>
+							<li>Zukünftig mache ich davon auch fleißig Gebrauch, damit alle euch angezeigten Funktionen/Würfelknöpfe zumindest immer irgendwie funktionieren. Wenn ein eingetragener PA-Wert fehlt, könnt ihr das selbst sehen, wenn ihr gegen eine Parade von 0 würfelt. Die Problemlösung ist damit für euch deutlich einfacher als bei irgendwelchen kryptischen Fehlermeldungen, für die man Interna des Charakterbogens verstehen muss.</li>
+							<li>Der Vollständigkeit halber hier die komplette Liste der mir bekannten Probleme, die durch diese Version behoben wurden, wobei einige davon auf andere Weise schon früher behoben wurden:
+								<ul>
+									<li>Fernkampfangriffe scheitern nicht mehr an &bdquo;No attribute was found for @{...|FK_Aktiv}&ldquo;. Ursache: Keine Fernkampfwaffe jemals gewählt</li>
+									<li>Paraden scheitern nicht mehr an &bdquo;No attribute was found for @{...|PA_Aktiv}&ldquo;. Ursachen: Noch keine Wunde markiert gehabt; keine PA-Werte bei den Kampftechniken eingetragen.</li>
+									<li>Schildparaden führen nicht mehr zu astronomischen Schildparadewerten. Ursache: Noch keine Wunde markiert gehabt.</li>
+									<li>Initiativewürfe scheitern nicht mehr an &bdquo;No attribute was found for @{...|BE_RG_INI}&ldquo;. Ursache: Rüstungsgewöhnung noch nie eingeschaltet.</li>
+									<li>Würfe scheitern nicht mehr an &bdquo;No attribute was found for @{...|cs_talent}&ldquo; oder &bdquo;No attribute was found for @{...|cf_talent}&ldquo;. Ursache: Tollpatsch oder andere Vor- und Nachteile, die einen Einfluss auf den Wert für kritische Erfolge und Misserfolge haben, nicht ein- und wieder ausgeschaltet.</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</p>
+		</div>
 
 		<h4>Update auf Version 20220604</h4>
 		<div>
@@ -14613,7 +14637,7 @@
     </div>
 
 
-    <b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="sheet-stat-immutable sheet-stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20220604"><input type="hidden" class="sheet-stat-immutable sheet-stat-immutable-version" readonly="readonly" name="attr_data_version" value=""></b>
+    <b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="sheet-stat-immutable sheet-stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20220821"><input type="hidden" class="sheet-stat-immutable sheet-stat-immutable-version" readonly="readonly" name="attr_data_version" value=""></b>
     </table>
 </div>
 <rolltemplate class="sheet-rolltemplate-check">
@@ -18036,20 +18060,6 @@ on("change:ap_gesamt change:ap_ausgegeben", function(eventInfo) {
     });
 });
 
-on("change:wound_kopf1 change:wound_kopf2 change:wound_brust1 change:wound_brust2 change:wound_bauch1 change:wound_bauch2 change:wound_ra1 change:wound_ra2 change:wound_la1 change:wound_la2 change:wound_rb1 change:wound_rb2 change:wound_lb1 change:wound_lb2", function(eventInfo) {
-    safeGetAttrs(["wound_kopf1", "wound_kopf2", "wound_brust1", "wound_brust2", "wound_bauch1", "wound_bauch2", "wound_ra1", "wound_ra2", "wound_la1", "wound_la2", "wound_rb1", "wound_rb2", "wound_lb1", "wound_lb2"], function(v) {
-        safeSetAttrs({
-            wound_kopf: +v.wound_kopf1 + +v.wound_kopf2,
-            wound_brust: +v.wound_brust1 + +v.wound_brust2,
-            wound_bauch: +v.wound_bauch1 + +v.wound_bauch2,
-            wound_ra: +v.wound_ra1 + +v.wound_ra2,
-            wound_la: +v.wound_la1 + +v.wound_la2,
-            wound_rb: +v.wound_rb1 + +v.wound_rb2,
-            wound_lb: +v.wound_lb1 + +v.wound_lb2
-        });
-    });
-});
-
 on("change:kegrundw change:kezugek", function(eventInfo) {
     safeGetAttrs(["kegrundw", "kezugek"], function(v) {
         safeSetAttrs({
@@ -18075,18 +18085,21 @@ Relevant character sheet versions
 * 20211010: Clearer attribute names for life energy, astral energy etc.
 * 20220116: New roll buttons
 * 20220604: Visibili Vanitar spelling fixes
+* 20220821: Sheet Initialization
 */
 function migrationCheck() {
-    safeGetAttrs(["character_sheet_version", "data_version"], function(v) {
-    	var caller = "migrationCheck";
+    safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
+        var caller = "migrationCheck";
+        debugLog(caller, "Sheet Initialization Status:", v["sheet_initialized"]);
         debugLog(caller, "Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
 
+        let initialized = v["sheet_initialized"];
         let dataVersion = parseInt(v["data_version"]);
         let sheetVersion = parseInt(v["character_sheet_version"]);
 
         /*
         If the character is new, data_version (the attribute) is just an empty string and dataVersion (the variable declared in this function) is NaN.
-        Since new characters do not need any migration, we just set the data_version to the current sheet version.
+        New characters do not need any migration, but sheet initialization to set up the sheet including setting data_version to the current sheet version.
 
         Why this is necessary
         * Sheet-defined attributes such as data_version will change automatically if they are different in a new sheet version.
@@ -18096,29 +18109,48 @@ function migrationCheck() {
         * On the other hand data_version could be left at its initial value, but that would mean that every new character would get all migrations unnecessarily!
         */
 
-        if (isNaN(dataVersion)) {
-            setCurrentVersion();
-            return;
+        // Initialization First Safeguard Check (function not called based on one attribute)
+        if (
+            initialized === 0
+            ||
+            initialized === "0"
+            ||
+            initialized === "false"
+            ||
+            initialized === false
+        ) {
+            debugLog(caller, "initialized is false.");
+            initialized = false;
+        } else {
+            debugLog(caller, "initialized is true. Skipping initialization.");
+            initialized = true;
         }
 
         let functionsToCall = [];
         let firstFunction;
-        /*
-            we run over the possible migrations and check if they are already applied.
-            if not and it is the first migration, than the function name is saved as "firstFunction"
-            if it is not the first migration to apply it is added to "functionsToCall" array
-        */
-        for (var i = 0; i < versionsWithMigrations.length; i++) {
-            if (dataVersion < versionsWithMigrations[i]) {
-                var functionName = "migrateTo" + versionsWithMigrations[i];
-                debugLog(caller, "dataVersion " + dataVersion + " is older than version " + versionsWithMigrations[i] + " which needs a migration. Invoking migration function: " + functionName);
-                if (firstFunction) {
-                    functionsToCall.push(functionName);
-                } else {
-                    firstFunction = functionName;
-                }
-            };
+
+		if (initialized)
+		{
+            /*
+                we run over the possible migrations and check if they are already applied.
+                if not and it is the first migration, than the function name is saved as "firstFunction"
+                if it is not the first migration to apply it is added to "functionsToCall" array
+            */
+            for (version of versionsWithMigrations) {
+                if (dataVersion < version) {
+                    var functionName = "migrateTo" + version;
+                    debugLog(caller, "dataVersion " + dataVersion + " is older than version " + version + " which needs a migration. Invoking migration function: " + functionName);
+                    if (firstFunction) {
+                        functionsToCall.push(functionName);
+                    } else {
+                        firstFunction = functionName;
+                    }
+                };
+            }
+        } else {
+			firstFunction = "initializeSheet";
         }
+
         // if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
         // then we call the function with name "firstFunction"
         if (firstFunction) {
@@ -18129,7 +18161,8 @@ function migrationCheck() {
 }
 
 function setCurrentVersion() {
-    safeSetAttrs({ "data_version": versionsWithMigrations.slice(-1).pop() });
+	var currentVersion = versionsWithMigrations.slice(-1).pop();
+	safeSetAttrs({ "data_version": currentVersion });
 }
 
 function callNextMigration(migrationChain) {
@@ -18151,8 +18184,157 @@ var versionsWithMigrations = [
     20210718,
     20211010,
     20220116,
-    20220604
-]
+    20220604,
+    20220821
+];
+
+function initializeSheet(migrationChain) {
+	var caller = "initializeSheet";
+	debugLog(caller, "Initializing sheet ...");
+	var attrsToInit = [
+		// Stats and derived values
+		"MU", "IN", "KL", "CH", "FF", "GE", "KO", "KK", "GS",
+		"legrundw", "LE_max",
+		"AU_max", "ausgrundw", "aus_max",
+		"erschoepfung_basis", "erschoepfung_max",
+		"ueberanstrengung_max",
+		"mrgrundw", "MR", "wundschwelle",
+		"AE_max", "aspgrundw", "asp_max",
+		"KE_max",
+		"ap_verfuegbar",
+
+		// Rolls
+		"cs_kampf_at", "cs_kampf_fk", "cs_kampf_pa", "cs_ritual", "cs_talent", "cs_zauber",
+		"cf_kampf_at", "cf_kampf_fk", "cf_kampf_pa", "cf_ritual", "cf_talent", "cf_zauber",
+
+		// Combat
+		/// Melee AT Values
+		"AT_Aktiv", "atbasis",
+		"AT_Anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter",
+
+		/// Melee PA Values
+		"PA_Aktiv", "pabasis",
+		"PA_Anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
+
+		/// Melee other
+		"NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4",
+		"NKW1_SB", "NKW2_SB", "NKW3_SB", "NKW4_SB",
+
+		/// Ranged Combat
+		"FK_Aktiv", "fkbasis",
+		"AT_Armbrust", "AT_Belagerungswaffen", "AT_Blasrohr", "AT_Bogen", "AT_Diskus", "AT_peitsche", "AT_Schleuder", "AT_Wurfbeile", "AT_Wurfmesser", "AT_Wurfspeere",
+		"FKWFK1", "FKWFK2", "FKWFK3", "FKWFK4",
+		"FKWtyp1", "FKWtyp2", "FKWtyp3", "FKWtyp4",
+
+		/// Ranged Combat Calculator
+		"fkr_aktiv", "fkr_anvisieren_final_dauer", "fkr_anvisieren_final", "fkr_bewegung_final", "fkr_bewegung_raw", "fkr_dauer", "fkr_deckung_final", "fkr_entfernung_final", "fkr_entfernung_final_TP", "fkr_erschwernis_ansage_gesamt", "fkr_erschwernis_ansage_gesamt_anzeige", "fkr_erschwernis_gesamt_anzeige", "fkr_erschwernis_gesamt", "fkr_erschwernis_ohne_kampfgetuemmel", "fkr_erschwernis_ohne_kampfgetuemmel_anzeige", "fkr_helligkeit_final", "fkr_kampfgetuemmel_final", "fkr_kampfgetuemmel_ziele", "fkr_ort_final", "fkr_schussart_final", "fkr_schussart_final_dauer", "fkr_schussart_final_TP", "fkr_schussart_gezielter_schuss_vierbeiner", "fkr_schussart_gezielter_schuss_vierbeiner_variabel", "fkr_schussart_gezielter_schuss_zweibeiner", "fkr_schussart_schussmitansage", "fkr_schussnummer_final", "fkr_sonstiges_final", "fkr_steilschuss_final", "fkr_steilschuss_final_TP", "fkr_tp", "fkr_warnung_kurzsichtig", "fkr_wetterlage_final", "fkr_zielgroesse_final", "fk_tp_roll", "fkw_aktiv_schuetzentyp", "ftp_bonus_aktiv", "ftp_w_aktiv",
+
+		/// Shields and Parry Weapons
+		"parryweapon_pa", "parryweapon_pa_available",
+		"shield_at", "shield_at_available", "shield_at_mod",
+		"shield_bf",
+		"shield_name",
+		"shield_pa", "shield_pa_available",
+		"ShieldParryINI",
+		"shield_tp", "shield_tpkk", "shield_tp_roll",
+
+		/// Encumbrance, Armour, Initiative
+		"BE", "be_at_mod", "be_pa_mod", "BE_RG", "BE_RG_INI",
+		"inibasis2", "inibasis", "INI_dice_count", "INI_mod_hauptwaffe",
+
+		/// Wounds
+		"AT_mod_wounds", "PA_mod_wounds", "FK_mod_wounds",
+		"MU_mod_wounds", "IN_mod_wounds", "KL_mod_wounds", "FF_mod_wounds", "GE_mod_wounds", "KO_mod_wounds", "KK_mod_wounds",
+		"GS_mod_wounds", "IB_mod_wounds",
+		"wound_bauch", "wound_brust", "wound_kopf", "wound_la", "wound_lb", "wound_ra", "wound_rb"
+	];
+	// Initialization Second Safeguard Check (function not called based on sixteen attributes and data_version)
+	// These attributes have been picked, because no character generated according to the official rules will have all their attributes at 8, so comparing these attributes will almost guarantee that old sheets are correctly detected and no initialization will take place.
+	// The mod attributes are also checked in case a player erroneously used the mod attributes to try to change their base values.
+	const attrStems = [ "MU", "KL", "IN", "CH", "FF", "GE", "KO", "KK" ];
+	const attrExtensions = [ "Basis", "Mod" ];
+	defaults = { "Basis": 8, "Mod": 0 };
+
+	safeguardAttrs = [];
+	for ( stem of attrStems )
+	{
+		for ( ext of attrExtensions )
+		{
+			safeguardAttrs.push(stem + "_" + ext);
+		}
+	}
+
+	safeGetAttrs(
+		// .concat() returns a new array. This is important, because "data_version" is not part of the actual safeguard attributes and treated separately.
+		safeguardAttrs.concat(["data_version"]),
+		function(v, missing, badDef)
+		{
+		    debugLog(caller, "Safeguard attributes:", v);
+			var attrs = { "sheet_initialized": false };
+			var dataVersionSet = true;
+
+			if ( isNaN(v["data_version"]) || v["data_version"] === "")
+			{
+				debugLog(caller, "'data_version' not set, so we can proceed.");
+				dataVersionSet = false;
+			}
+			if ( dataVersionSet === false )
+			{
+				for ( attr of safeguardAttrs )
+				{
+					// None of the safeguard attributes should be undefined (missing) or have a bad value (NaN, undefined)
+					if (
+						missing.includes(attr) ||
+						badDef.includes(attr)
+					)
+					{
+						debugLog(caller, "Safeguard attributes are either missing or have bad value. An uninitialized sheet should not have such issues, i.e. we are likely not in an uninitialized sheet anymore. Therefore, stopping initialization to prevent accidental data loss.");
+						attrs["sheet_initialized"] = true;
+					}
+				}
+				if ( attrs["sheet_initialized"] === false )
+				{
+					// The safeguard attributes should all be at their default values
+					debugLog(caller, "Checking safeguard attributes ...");
+					for ( attr of safeguardAttrs )
+					{
+						for ( ext of attrExtensions )
+						{
+							if ( attr.search(ext) > -1 )
+							{
+								if (
+									v[attr] === defaults[ext] ||
+									v[attr] === defaults[ext].toFixed(0)
+								)
+								{
+									break;
+								} else {
+									debugLog(caller, "Value of safeguard attribute '" + attr + "' is '" + v[attr] + "'; differs from uninitialized value ('" + defaults[ext].toFixed(0) + "'). Safety skipping initialization.");
+									attrs["sheet_initialized"] = true;
+								}
+							}
+						}
+					}
+				}
+				if ( attrs["sheet_initialized"] === false )
+				{
+					for ( attr of attrsToInit )
+					{
+						attrs[attr] = defaultValues[attr];
+					}
+					debugLog(caller, "Attributes after initialization: ", attrs);
+				}
+			} else {
+				debugLog(caller, "'data_version' set, safety stopping initialization and preventing future initialization attempts ...");
+				attrs["sheet_initialized"] = true;
+			}
+			safeSetAttrs(attrs, {}, function() {
+					callNextMigration(migrationChain);
+				}
+			);
+		}
+	);
+}
 
 /*
 ## From version 20171014 to 20190427
@@ -18749,6 +18931,20 @@ function migrateTo20220604(migrationChain) {
 		safeSetAttrs(attrsToChange, {}, function(){
 			callNextMigration(migrationChain);
 		});
+	});
+}
+
+/*
+	Migration steps:
+	- Initialize attribute "sheet_initialized"
+*/
+function migrateTo20220821(migrationChain) {
+	var caller = "migrateTo20220821";
+	debugLog(caller, "Invoked.");
+
+	var attrsToChange = { "sheet_initialized": true };
+	safeSetAttrs(attrsToChange, {}, function(){
+		callNextMigration(migrationChain);
 	});
 }
 
@@ -19939,11 +20135,241 @@ Using safe get/setAttrs the default value 0 is assumed, if nothing is in this ob
 Currently, does not handle repeating sections.
 */
 const defaultValues = {
+	// Uninitialized Attributes
+	// These attributes are not created automatically, because there are no <input>s or <span>s using them.
+	// Even if players diligently fill out the sheet, some buttons might not work due to missing attributes.
+	// Initializing these attributes to default values prevents this from happening.
+	// Some attributes might be created automatically, but have been included for the sake of completeness.
+
+	// Stats and derived values
+	"MU": 8,
+	"IN": 8,
+	"KL": 8,
+	"CH": 8,
+	"FF": 8,
+	"GE": 8,
+	"KO": 8,
+	"KK": 8,
+	"GS": 8,
+
+	"legrundw": 12,
+	"LE_max": 12,
+
+	"AU_max": 12,
+	"ausgrundw": 12,
+	"aus_max": 12, // Old attributes kept for compatibility (used in token bars)
+
+	"erschoepfung_basis": 8,
+	"erschoepfung_max": 8,
+
+	"ueberanstrengung_max": 8,
+
+	"mrgrundw": 5,
+	"MR": 5,
+	"wundschwelle": 4,
+
+	"AE_max": 12,
+	"aspgrundw": 12,
+	"asp_max": 12, // Old attributes kept for compatibility (used in token bars)
+
+	"KE_max": 0,
+
+	"ap_verfuegbar": 0,
+
+	// Rolls
+	"cs_kampf_at": 1,
+	"cs_kampf_fk": 1,
+	"cs_kampf_pa": 1,
+	"cs_ritual": 1,
+	"cs_talent": 1,
+	"cs_zauber": 1,
+
+	"cf_kampf_at": 20,
+	"cf_kampf_fk": 20,
+	"cf_kampf_pa": 20,
+	"cf_ritual": 20,
+	"cf_talent": 20,
+	"cf_zauber": 20,
+
+	// Combat
+	/// Melee AT Values
+	"AT_Aktiv": 5,
+	"atbasis": 5,
+
+	"AT_Anderthalbhander": 5,
+	"AT_dolche": 5,
+	"AT_fechtwaffen": 5,
+	"AT_hiebwaffen": 5,
+	"AT_infanteriewaffen": 5,
+	"AT_kettenstabe": 5,
+	"AT_kettenwaffen": 5,
+	"AT_lanzenreiten": 5,
+	"AT_peitsche": 5,
+	"AT_raufen": 5,
+	"AT_ringen": 5,
+	"AT_sabel": 5,
+	"AT_schwerter": 5,
+	"AT_speere": 5,
+	"AT_stabe": 5,
+	"AT_zweihandflegel": 5,
+	"AT_zweihand-hiebwaffen": 5,
+	"AT_zweihandschwerter": 5,
+
+	/// Melee PA Values
+	"PA_Aktiv": 5,
+	"pabasis": 5,
+
+	"PA_Anderthalbhander": 5,
+	"PA_dolche": 5,
+	"PA_fechtwaffen": 5,
+	"PA_hiebwaffen": 5,
+	"PA_infanteriewaffen": 5,
+	"PA_kettenstabe": 5,
+	"PA_kettenwaffen": 5,
+	"PA_lanzenreiten": 5,
+	"PA_peitsche": 5,
+	"PA_raufen": 5,
+	"PA_ringen": 5,
+	"PA_sabel": 5,
+	"PA_schwerter": 5,
+	"PA_speere": 5,
+	"PA_stabe": 5,
+	"PA_zweihandflegel": 5,
+	"PA_zweihand-hiebwaffen": 5,
+	"PA_zweihandschwerter": 5,
+
+	/// Melee other
+	"NKW_Aktiv1": 0,
+	"NKW_Aktiv2": 0,
+	"NKW_Aktiv3": 0,
+	"NKW_Aktiv4": 0,
+	"NKW1_SB": 0,
+	"NKW2_SB": 0,
+	"NKW3_SB": 0,
+	"NKW4_SB": 0,
+
+	/// Ranged Combat
+	"FK_Aktiv": 5,
+	"fkbasis": 5,
+
+	"AT_Armbrust": 5,
+	"AT_Belagerungswaffen": 5,
+	"AT_Blasrohr": 5,
+	"AT_Bogen": 5,
+	"AT_Diskus": 5,
+	"AT_peitsche": 5,
+	"AT_Schleuder": 5,
+	"AT_Wurfbeile": 5,
+	"AT_Wurfmesser": 5,
+	"AT_Wurfspeere": 5,
+
+	"FKWFK1": 5,
+	"FKWFK2": 5,
+	"FKWFK3": 5,
+	"FKWFK4": 5,
+
 	"FKWtyp1": "0",
 	"FKWtyp2": "0",
 	"FKWtyp3": "0",
-	"FKWtyp4": "0"
-	};
+	"FKWtyp4": "0",
+
+	/// Ranged Combat Calculator
+	"fkr_aktiv": "on",
+	"fkr_anvisieren_final_dauer": prettifyMod(0),
+	"fkr_anvisieren_final": prettifyMod(0),
+	"fkr_bewegung_final": prettifyMod(0),
+	"fkr_bewegung_raw": "0",
+	"fkr_dauer": "1 A",
+	"fkr_deckung_final": "-",
+	"fkr_entfernung_final": prettifyMod(0),
+	"fkr_entfernung_final_TP": prettifyMod(0),
+	"fkr_erschwernis_ansage_gesamt": "?{Ansage für Fernkampfangriff|0,0|1,1|2,2|3,3|4,4|5,5|6,6|7,7|8,8|9,9|10,10|11,11|12,12|13,13|14,14|15,15|16,16|17,17|18,18|19,19|20,20|21,21|22,22|23,23|24,24|25,25|26,26|27,27|28,28|29,29|30,30|31,31|32,32}",
+	"fkr_erschwernis_ansage_gesamt_anzeige": " (" + prettifyMod(0) + ")",
+	"fkr_erschwernis_gesamt_anzeige": prettifyMod(0),
+	"fkr_erschwernis_gesamt": "?{Erleichterung (−) oder Erschwernis (+)|0} + ?{Ansage für Fernkampfangriff|0,0|1,1|2,2|3,3|4,4|5,5|6,6|7,7|8,8|9,9|10,10|11,11|12,12|13,13|14,14|15,15|16,16|17,17|18,18|19,19|20,20|21,21|22,22|23,23|24,24|25,25|26,26|27,27|28,28|29,29|30,30|31,31|32,32}",
+	"fkr_erschwernis_ohne_kampfgetuemmel": 0,
+	"fkr_erschwernis_ohne_kampfgetuemmel_anzeige": prettifyMod(0),
+	"fkr_helligkeit_final": "-",
+	"fkr_kampfgetuemmel_final": "-",
+	"fkr_kampfgetuemmel_ziele": 0,
+	"fkr_ort_final": prettifyMod(0),
+	"fkr_schussart_final": "!",
+	"fkr_schussart_final_dauer": "!",
+	"fkr_schussart_final_TP": "!",
+	"fkr_schussart_gezielter_schuss_vierbeiner": "off",
+	"fkr_schussart_gezielter_schuss_vierbeiner_variabel": "off",
+	"fkr_schussart_gezielter_schuss_zweibeiner": "off",
+	"fkr_schussart_schussmitansage": "on",
+	"fkr_schussnummer_final": prettifyMod(0),
+	"fkr_sonstiges_final": "0",
+	"fkr_steilschuss_final": prettifyMod(0),
+	"fkr_steilschuss_final_TP": prettifyMod(0),
+	"fkr_tp": "1W6 + 0",
+	"fkr_warnung_kurzsichtig": "off",
+	"fkr_wetterlage_final": "-",
+	"fkr_zielgroesse_final": "-",
+	"fk_tp_roll": "&{template:DSA-Kampf-Treffer} {{name=Fernkampf}} {{target=[[?{Tabelle für zufällige Trefferzone auswählen|Zweibeiner gegen unbeschwänzten Zweibeiner,0|Zweibeiner gegen beschwänzten Zweibeiner,1|Zweibeiner gegen Vierbeiner,3|Zweibeiner gegen Reiter,4|Reiter gegen Zweibeiner,2}]]}} {{TPArt=[[0]]}} {{zone=[[1d20]]}} {{damage=[[?{Anzahl W6 für Schadenswurf|1,1|2,2|3,3|4,4|5,5}d6 + (?{Bonus (+)/Malus (−) der Trefferpunkte|0})]]}}",
+	"fkw_aktiv_schuetzentyp": "Normalschütze",
+	"ftp_bonus_aktiv": 0,
+	"ftp_w_aktiv": 1,
+
+	/// Shields and Parry Weapons
+	"parryweapon_pa": 0,
+	"parryweapon_pa_available": "0",
+
+	"shield_at": 0,
+	"shield_at_available": "0",
+	"shield_at_mod": 0,
+
+	"shield_bf": 0,
+
+	"shield_name": " ",
+
+	"shield_pa": 0,
+	"shield_pa_available": "0",
+
+	"ShieldParryINI": 0,
+
+	"shield_tp": "1W6 + 1",
+	"shield_tpkk": "13/3",
+	"shield_tp_roll": "1d6 + 1",
+
+	/// Encumbrance, Armour, Initiative
+	"BE": 0,
+	"be_at_mod": 0,
+	"be_pa_mod": 0,
+	"BE_RG": 0,
+	"BE_RG_INI": 0,
+
+	"inibasis2": 6,
+	"inibasis": 6,
+	"INI_dice_count": 1,
+	"INI_mod_hauptwaffe": 0,
+
+	/// Wounds
+	"AT_mod_wounds": 0,
+	"PA_mod_wounds": 0,
+	"FK_mod_wounds": 0,
+
+	"MU_mod_wounds": 0,
+	"IN_mod_wounds": 0,
+	"KL_mod_wounds": 0,
+	"FF_mod_wounds": 0,
+	"GE_mod_wounds": 0,
+	"KO_mod_wounds": 0,
+	"KK_mod_wounds": 0,
+
+	"GS_mod_wounds": 0,
+	"IB_mod_wounds": 0,
+
+	"wound_bauch": 0,
+	"wound_brust": 0,
+	"wound_kopf": 0,
+	"wound_la": 0,
+	"wound_lb": 0,
+	"wound_ra": 0,
+	"wound_rb": 0
+};
 
 /*
 	Debug Log
@@ -20005,7 +20431,7 @@ function safeGetAttrs( attrsToGet, callback ) {
 			if ( errors[1] > 0 ) {
 				debugLog(caller, "Attributes with values 'NaN' or 'undefined' gotten and set to default value:", badDef.join(", "));
 			}
-			callback(attrs);
+			callback(attrs, missing, badDef);
 		}
 	);
 }
