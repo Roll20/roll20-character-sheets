@@ -30002,44 +30002,44 @@
 });
 
 // Main initializing
-on('sheet:opened change:recalcSheet', () => {
-    getAttrs(["recalcSheet", "toggle_npc"], async(values) => {
-        if(values.toggle_npc == "notes") return
+on('sheet:opened change:recalcSheet', async() => {
+    const values = await dsa5helpers.getAttrsAsync(["recalcSheet", "toggle_npc"])
+    
+    if(values.toggle_npc == "notes") return
 
-        const translation = await prepareTranslation()
-        const speed = await dsa5sheetFunctions.calcSpeed()
-        const schips = await dsa5sheetFunctions.calcSchips()
-        const toughness = await dsa5sheetFunctions.calcToughness()
-        const dodge = await dsa5sheetFunctions.calcDodge()
+    const translation = await prepareTranslation()
+    const speed = await dsa5sheetFunctions.calcSpeed()
+    const schips = await dsa5sheetFunctions.calcSchips()
+    const toughness = await dsa5sheetFunctions.calcToughness()
+    const dodge = await dsa5sheetFunctions.calcDodge()
 
-        let update = {...translation, ...speed, ...schips, ...toughness, ...dodge, showAdvancedRoll: 0, migrakelongoing: "off" }
-        if (values.recalcSheet == "on") {
-            console.log("Recalculating entire sheet")
-            const attributes = await dsa5sheetFunctions.attributeChange(Object.values(dsa5Module().dsa5.attributes))
-            const talentmodifiers = await dsa5sheetFunctions.updateTalentModifier(dsa5Module().dsa5.skills, true)
-            const armor = await dsa5sheetFunctions.calcArmor()
+    let update = {...translation, ...speed, ...schips, ...toughness, ...dodge, showAdvancedRoll: 0, migrakelongoing: "off" }
+    if (values.recalcSheet == "on") {
+        console.log("Recalculating entire sheet")
+        const attributes = await dsa5sheetFunctions.attributeChange(Object.values(dsa5Module().dsa5.attributes))
+        const talentmodifiers = await dsa5sheetFunctions.updateTalentModifier(dsa5Module().dsa5.skills, true)
+        const armor = await dsa5sheetFunctions.calcArmor()
 
-            const leitwerte = await dsa5sheetFunctions.meleeweaponLeitwert()
-            const conditions = await dsa5sheetFunctions.changeCondition(dsa5Module().dsa5.conditions)
-            const meleeCombatSkills = await dsa5sheetFunctions.calcCombatskill(dsa5Module().dsa5.combatskills.melee)
-            const range = await dsa5sheetFunctions.prepareRangeCombatskills(dsa5Module().dsa5.combatskills.range)
+        const leitwerte = await dsa5sheetFunctions.meleeweaponLeitwert()
+        const conditions = await dsa5sheetFunctions.changeCondition(dsa5Module().dsa5.conditions)
+        const meleeCombatSkills = await dsa5sheetFunctions.calcCombatskill(dsa5Module().dsa5.combatskills.melee)
+        const range = await dsa5sheetFunctions.prepareRangeCombatskills(dsa5Module().dsa5.combatskills.range)
 
-            const defense = await dsa5sheetFunctions.calcDefense()
-                //const encumbrance = await dsa5sheetFunctions.calcEncumbranceTotal()
-            const soulpower = await dsa5sheetFunctions.calcSoulpower()
-            const distanceMod = await dsa5sheetFunctions.calcDistanzMod()
-            const meleeMod = await dsa5sheetFunctions.calcMeleeMod()
+        const defense = await dsa5sheetFunctions.calcDefense()
+            //const encumbrance = await dsa5sheetFunctions.calcEncumbranceTotal()
+        const soulpower = await dsa5sheetFunctions.calcSoulpower()
+        const distanceMod = await dsa5sheetFunctions.calcDistanzMod()
+        const meleeMod = await dsa5sheetFunctions.calcMeleeMod()
 
-            const rids = await dsa5helpers.getSectionIDsAsync("rangeweapon");
-            const rangeUpdate = await dsa5sheetFunctions.recalcRangeWeapon(rids)
-            const mids = await dsa5helpers.getSectionIDsAsync("meleeweapon");
-            const meleeUpdate = await dsa5sheetFunctions.recalcWeapon(mids)
-            update = {...update,...rangeUpdate, ...meleeUpdate, ...attributes, ...armor, ...defense, ...soulpower, ...meleeMod, ...distanceMod, ...talentmodifiers, ...translation, ...leitwerte, ...conditions, ...range, ...meleeCombatSkills }
-        } else {
-            console.log("Calculating defaults")
-        }
-        setAttrs(update)
-    })
+        const rids = await dsa5helpers.getSectionIDsAsync("rangeweapon");
+        const rangeUpdate = await dsa5sheetFunctions.recalcRangeWeapon(rids)
+        const mids = await dsa5helpers.getSectionIDsAsync("meleeweapon");
+        const meleeUpdate = await dsa5sheetFunctions.recalcWeapon(mids)
+        update = {...update,...rangeUpdate, ...meleeUpdate, ...attributes, ...armor, ...defense, ...soulpower, ...meleeMod, ...distanceMod, ...talentmodifiers, ...translation, ...leitwerte, ...conditions, ...range, ...meleeCombatSkills }
+    } else {
+        console.log("Calculating defaults")
+    }
+    await dsa5helpers.setAttrsAsync(update)
 })
 
 const prepareTranslation = async() => {
