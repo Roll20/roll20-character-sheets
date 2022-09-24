@@ -81,6 +81,11 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+September 24th 2022 v1.61
+
+- Updated Armor Tab - There is now 3 (Light/Medium/Heavy) Equip/unequip buttons at the top of the tab. This allows quicker equiping and unequiping of armor for players. Also all Equip/Unequip and Worn/Unworn actions in this tab now automatally activate or disable the corresponding armor penatlies. 
+
+
 August 22th 2022 v1.6b
 
 - Removed critical rt display for Prayer spells, as they do not get dubs random criticals, only fumbles.
