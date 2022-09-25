@@ -571,7 +571,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Begging'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Begging'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
-    'modifier': '?{Current Locale?|Uninhabited/Wilderness,-99|Countryside,-7|Hamlet/Village,-5|Town,-0,City,0}',
+    'modifier': '?{Locale modifier?|-99 [Uninhabited/Wilderness]|-7 [Countryside]|-5 [Hamlet/Village]|-2 [Town]|0 [City]}',
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids']
 });

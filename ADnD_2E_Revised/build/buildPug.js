@@ -9,7 +9,7 @@ const miscFolder = path.join(sourceFolder, 'misc');
 const booksPriority = [
     {book: 'PHB', print: 'First Printing May 2013'},
     {book: 'The Complete Fighter\'s Handbook', print: '11th Printing, May 1996'},
-    {book: 'The Complete Thief\'s Handbook', print: ''},
+    {book: 'The Complete Thief\'s Handbook', print: 'November 1993'},
     {book: 'The Complete Priest\'s Handbook', print: ''},
     {book: 'The Complete Wizard\'s Handbook', print: ''},
     {book: 'The Complete Psionics Handbook', print: ''},
