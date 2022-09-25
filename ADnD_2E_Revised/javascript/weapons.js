@@ -751,7 +751,7 @@ WEAPONS_TABLE['sling, stone'].push({
     'strength': true,
     'small-medium': '1d4',
     'large': '1d4',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
     'category': ['Range']
 });
 
@@ -3369,20 +3369,6 @@ WEAPONS_TABLE['sling, bullet'].push({
     'category': ['Range']
 });
 
-WEAPONS_TABLE['sling, stone'].push({
-    'name': 'Sling, Stone',
-    'size': 'S',
-    'type': 'B',
-    'speed': 6,
-    'rof': '1',
-    'range': '40/80/1600',
-    'strength': true,
-    'small-medium': '1d4',
-    'large': '1d4',
-    'book': ['The Complete Ninja\'s Handbook'],
-    'category': ['Range']
-});
-
 WEAPONS_TABLE['staff sling, bullet'].push({
     'name': 'Staff sling, Bullet',
     'size': 'M',
@@ -3405,7 +3391,7 @@ WEAPONS_TABLE['staff sling, stone'].push({
     'type': 'B',
     'speed': 11,
     'rof': '1/2',
-    'range': '—/30-60/200',
+    'range': '—/30-60/90',
     'strength': true,
     'small-medium': '1d8',
     'large': '2d4',
