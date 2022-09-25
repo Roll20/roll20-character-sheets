@@ -1793,7 +1793,7 @@ WEAPONS_TABLE['boku-toh'].push({
 WEAPONS_TABLE['jitte'] = [];
 WEAPONS_TABLE['jitte'].push({
     'name': 'Jitte',
-    'size': 'M',
+    'size': 'S',
     'type': 'B',
     'speed': 2,
     'small-medium': '1d4',
@@ -1807,7 +1807,7 @@ WEAPONS_TABLE['shuriken'].push({
     'size': 'S',
     'type': 'P',
     'speed': 2,
-    'rof': '3/1',
+    'rof': '2/1',
     'range': '5/10/20',
     'strength': true,
     'small-medium': '1d6',
