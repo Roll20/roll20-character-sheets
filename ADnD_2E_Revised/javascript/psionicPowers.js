@@ -138,7 +138,7 @@ CLAIRSENTIENT['Devotion']['All-Round Vision'] = {
     'power-score': 'Infravision is also gained.',
     '20': 'The psionicist is blind for [[1d4]] hours.',
     '1': '',
-    'effect': 'This power gives the psionicist “eyes in the back of his head”—and in the sides and top, as well. (Of course, this is figurative; he does not literally\n&emsp;sprout eyeballs.) In effect, the character can see in all directions simultaneously. Besides its obvious application when combined with the clairvoyance power, all—round vision prevents anyone from sneaking up on the character without some sort of concealment. On the down side, the psionicist suffers a -4 penalty against all gaze attacks while using this power.\n&emsp;*Power Score*—Infravision is also gained.\n&emsp;*20*—The psionicist is blind for 1d4 hours.'
+    'effect': 'This power gives the psionicist “eyes in the back of his head”—and in the sides and top, as well. (Of course, this is figurative; he does not literally sprout eyeballs.) In effect, the character can see in all directions simultaneously. Besides its obvious application when combined with the clairvoyance power, all—round vision prevents anyone from sneaking up on the character without some sort of concealment. On the down side, the psionicist suffers a -4 penalty against all gaze attacks while using this power.\n&emsp;*Power Score*—Infravision is also gained.\n&emsp;*20*—The psionicist is blind for 1d4 hours.'
 };
 CLAIRSENTIENT['Devotion']['Combat Mind'] = {
     'attribute': '@{Intelligence}',
@@ -1816,7 +1816,7 @@ TELEPATHIC['Science']['Probe'] = {
 TELEPATHIC['Science']['Psionic Blast'] = ATTACK['Science']['Psionic Blast'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-5',
-    'context-modifier': '?{Range to target modifier?|0 [20 yards]|-2 [40 yards]|-5 [60 yards]}',
+    'context-modifier': '?{Range to target modifier?|0 [20 yards]|-2 [40 yards]|-5 [60 yards]})+(?{Target\'s Defense mode modifier?|No defense mode,0|+2 [Mind Blank]|+3 [Thought Shield]|0 [Mental Barrier]|-1 [Intellect Fortress]|-2 [Tower of Iron Will]}',
     'initial-cost': '10 (both attacks)',
     'maintenance-cost': 'na',
     'range': '20/40/60 yards',
@@ -2016,7 +2016,7 @@ TELEPATHIC['Devotion']['Daydream'] = {
 TELEPATHIC['Devotion']['Ego Whip'] = ATTACK['Devotion']['Ego Whip'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-3',
-    'context-modifier': '?{Range to target modifier?|0 [40 yards]|-2 [80 yards]|-5 [120 yards]}',
+    'context-modifier': '?{Range to target modifier?|0 [40 yards]|-2 [80 yards]|-5 [120 yards]})+(?{Target\'s Defense mode modifier?|No defense mode,0|+5 [Mind Blank]|+0 [Thought Shield]|-3 [Mental Barrier]|-4 [Intellect Fortress]|-3 [Tower of Iron Will]}',
     'initial-cost': '4 (both attacks)',
     'maintenance-cost': 'na',
     'range': '40/80/120 yards',
@@ -2096,7 +2096,7 @@ TELEPATHIC['Devotion']['False Sensory Input'] = {
 TELEPATHIC['Devotion']['Id Insinuation'] = ATTACK['Devotion']['Id Insinuation'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-4',
-    'context-modifier': '?{Range to target modifier?|0 [60 yards]|-2 [120 yards]|-5 [180 yards]}',
+    'context-modifier': '?{Range to target modifier?|0 [60 yards]|-2 [120 yards]|-5 [180 yards]})+(?{Target\'s Defense mode modifier?|No defense mode,0|-3 [Mind Blank]|+2 [Thought Shield]|+4 [Mental Barrier]|-1 [Intellect Fortress]|-3 [Tower of Iron Will]}',
     'initial-cost': '5 (both attacks)',
     'maintenance-cost': 'na',
     'range': '60/120/180 yards',
@@ -2317,7 +2317,7 @@ TELEPATHIC['Devotion']['Mind Blank'] = DEFENSE['Devotion']['Mind Blank'] = {
 TELEPATHIC['Devotion']['Mind Thrust'] = ATTACK['Devotion']['Mind Thrust'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-2',
-    'context-modifier': '?{Range to target modifier?|0 [30 yards]|-2 [60 yards]|-5 [90 yards]}',
+    'context-modifier': '?{Range to target modifier?|0 [30 yards]|-2 [60 yards]|-5 [90 yards]})+(?{Target\'s Defense mode modifier?|No defense mode,0|+5 [Mind Blank]|-2 [Thought Shield]|-4 [Mental Barrier]|-4 [Intellect Fortress]|-5 [Tower of Iron Will]}',
     'initial-cost': '2',
     'maintenance-cost': 'na',
     'range': '30/60/90 yards',
@@ -2377,7 +2377,7 @@ TELEPATHIC['Devotion']['Post-Hypnotic Suggestion'] = {
 TELEPATHIC['Devotion']['Psychic Crush'] = ATTACK['Devotion']['Psychic Crush'] = {
     'attribute': '@{Wisdom}',
     'modifier': '-4',
-    'context-modifier': '',
+    'context-modifier': '?{Target\'s Defense mode modifier?|No defense mode,0|+1 [Mind Blank]|-3 [Thought Shield]|-1 [Mental Barrier]|-3 [Intellect Fortress]|-4 [Tower of Iron Will]}',
     'initial-cost': '7',
     'maintenance-cost': 'na',
     'range': '50 yards',
@@ -2386,7 +2386,7 @@ TELEPATHIC['Devotion']['Psychic Crush'] = ATTACK['Devotion']['Psychic Crush'] = 
     'prerequisites': 'mindlink',
     'reference': 'p. 89',
     'book': 'The Complete Psionics Handbook',
-    'damage': '1d8 against contacted mind',
+    'damage': '*Save vs. Paralyzation* or suffer 1d8 against contacted mind',
     'damage-type': '',
     'healing': '',
     'power-score': 'The save automatically fails.',
