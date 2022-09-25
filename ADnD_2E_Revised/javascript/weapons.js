@@ -157,7 +157,7 @@ WEAPONS_TABLE['club'].push({
     'strength': true,
     'small-medium': '1d6',
     'large': '1d3',
-    'book': ['PHB', 'Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
+    'book': ['PHB','Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
     'category': ['Melee','Range']
 });
 
@@ -247,7 +247,7 @@ WEAPONS_TABLE['dart'].push({
     'strength': true,
     'small-medium': '1d3',
     'large': '1d2',
-    'book': ['PHB', 'Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
+    'book': ['PHB','Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
     'category': ['Range']
 });
 
@@ -1172,7 +1172,7 @@ WEAPONS_TABLE['cestus'].push({
     'speed': 2,
     'small-medium': '1d4',
     'large': '1d3',
-    'book': ['The Complete Fighter\'s Handbook', 'Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
     'category': ['Melee']
 });
 
@@ -1187,7 +1187,7 @@ WEAPONS_TABLE['chain'].push({
     'strength': true,
     'small-medium': '1d4+1',
     'large': '1d4',
-    'book': ['The Complete Fighter\'s Handbook', 'Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
     'category': ['Melee','Range']
 });
 
@@ -1246,7 +1246,7 @@ WEAPONS_TABLE['gaff/hook'].push({
     'speed': 2,
     'small-medium': '1d4',
     'large': '1d3',
-    'book': ['The Complete Fighter\'s Handbook', 'Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
     'category': ['Melee']
 });
 
@@ -1280,7 +1280,7 @@ WEAPONS_TABLE['harpoon, two-handed'].push({
 WEAPONS_TABLE['javelin, one-handed'] = [];
 WEAPONS_TABLE['javelin, one-handed'].push({
     'name': 'Javelin, One-handed',
-    'size': 'L',
+    'size': 'M',
     'type': 'P',
     'speed': 4,
     'rof': '1',
@@ -1288,19 +1288,19 @@ WEAPONS_TABLE['javelin, one-handed'].push({
     'strength': true,
     'small-medium': '1d4',
     'large': '1d4',
-    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook'],
     'category': ['Melee','Range']
 });
 
 WEAPONS_TABLE['javelin, two-handed'] = [];
 WEAPONS_TABLE['javelin, two-handed'].push({
     'name': 'Javelin, Two-handed',
-    'size': 'L',
+    'size': 'M',
     'type': 'P',
     'speed': 4,
     'small-medium': '1d6',
     'large': '1d6',
-    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook'],
     'category': ['Melee']
 });
 
@@ -1308,7 +1308,7 @@ WEAPONS_TABLE['stone javelin, one-handed'] = [];
 WEAPONS_TABLE['stone javelin, one-handed'].push({
     'name': 'Stone javelin, One-handed',
     'noProf': true,
-    'size': 'L',
+    'size': 'M',
     'type': 'P',
     'speed': 4,
     'rof': '1',
@@ -1316,7 +1316,7 @@ WEAPONS_TABLE['stone javelin, one-handed'].push({
     'strength': true,
     'small-medium': '1d4',
     'large': '1d4',
-    'book': ['The Complete Fighter\'s Handbook'],
+    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
     'category': ['Melee','Range']
 });
 
@@ -1324,12 +1324,12 @@ WEAPONS_TABLE['stone javelin, two-handed'] = [];
 WEAPONS_TABLE['stone javelin, two-handed'].push({
     'name': 'Stone javelin, Two-handed',
     'noProf': true,
-    'size': 'L',
+    'size': 'M',
     'type': 'P',
     'speed': 4,
     'small-medium': '1d4+1',
     'large': '1d6',
-    'book': ['The Complete Fighter\'s Handbook'],
+    'book': ['The Complete Fighter\'s Handbook','Arms and Equipment Guide'],
     'category': ['Melee']
 });
 
@@ -1376,7 +1376,7 @@ WEAPONS_TABLE['lasso'].push({
     'strength': true,
     'small-medium': '',
     'large': '',
-    'book': ['The Complete Fighter\'s Handbook', 'The Complete Priest\'s Handbook', 'Arms and Equipment Guide'],
+    'book': ['The Complete Fighter\'s Handbook','The Complete Priest\'s Handbook','Arms and Equipment Guide'],
     'category': ['Range']
 });
 
@@ -1916,23 +1916,9 @@ WEAPONS_TABLE['light crossbow, light quarrel'].push({
     'category': ['Range']
 });
 
-WEAPONS_TABLE['parrying dagger'] = [];
-WEAPONS_TABLE['parrying dagger'].push({
-    'name': 'Parrying dagger',
-    'noProf': true,
-    'size': 'S',
-    'type': 'P',
-    'speed': 2,
-    'small-medium': '1d3',
-    'large': '1d3',
-    'book': ['Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
-    'category': ['Melee']
-});
-
-WEAPONS_TABLE['stone javelin, one-handed'].push({
-    'name': 'Stone javelin, One-handed',
-    'noProf': true,
-    'size': 'M',
+WEAPONS_TABLE['javelin, one-handed'].push({
+    'name': 'Javelin, One-handed',
+    'size': 'L',
     'type': 'P',
     'speed': 4,
     'rof': '1',
@@ -1944,15 +1930,27 @@ WEAPONS_TABLE['stone javelin, one-handed'].push({
     'category': ['Melee','Range']
 });
 
-WEAPONS_TABLE['stone javelin, two-handed'].push({
-    'name': 'Stone javelin, Two-handed',
-    'noProf': true,
-    'size': 'M',
+WEAPONS_TABLE['javelin, two-handed'].push({
+    'name': 'Javelin, Two-handed',
+    'size': 'L',
     'type': 'P',
     'speed': 4,
-    'small-medium': '1d4+1',
+    'small-medium': '1d6',
     'large': '1d6',
     'book': ['Arms and Equipment Guide'],
+    'category': ['Melee']
+});
+
+WEAPONS_TABLE['parrying dagger'] = [];
+WEAPONS_TABLE['parrying dagger'].push({
+    'name': 'Parrying dagger',
+    'noProf': true,
+    'size': 'S',
+    'type': 'P',
+    'speed': 2,
+    'small-medium': '1d3',
+    'large': '1d3',
+    'book': ['Arms and Equipment Guide','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
