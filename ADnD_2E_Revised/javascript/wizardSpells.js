@@ -2570,7 +2570,7 @@ wiz4['Fire Shield'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': '*Warm shield:* A bit of phosphorous\n*Chill shield:*A live firefly or glow worm or the tail portions of four dead ones.',
+    'materials': '*Warm shield:* A bit of phosphorous\n*Chill shield:* A live firefly or glow worm or the tail portions of four dead ones.',
     'reference': 'p. 201',
     'book': 'PHB',
     'damage': '',
