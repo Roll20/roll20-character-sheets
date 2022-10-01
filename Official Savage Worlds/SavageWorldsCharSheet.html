@@ -1,7 +1,7 @@
 
 <script type="text/worker">
   const sheetVersionPrefix = 'Official Savage Worlds v';
-const sheetVersion = '1.00.28';
+const sheetVersion = '1.00.29';
 
 // Define colors for Logs
 const r20color = '#E948C9';
@@ -198,10 +198,10 @@ function repeatingSimpleSumWCheck(
 function fauxChange(field, fauxvalue) {
   //repeating  fields should be passed in the format: repeating_<section>:attributes
   //example: repeating_skills:skillnamerank
-  log("FauxChange Reached: Field",field,r20color);
+  log('FauxChange Reached: Field', field, r20color);
   log('Setting faux value(s) for', field, 'orangered');
   if (field.indexOf(':') > -1) {
-    log("fauxChange","repeating section","#CCCCFF")
+    log('fauxChange', 'repeating section', '#CCCCFF');
     //console.log("Need to update values in a repeating section");
     let getfields = field.split(':');
     let repeatingSection = getfields[0];
@@ -220,18 +220,22 @@ function fauxChange(field, fauxvalue) {
         getAttrs(fieldArray, function (v) {
           for (let b = 0; b < idArray.length; b++) {
             oldValues[oldValues.length] = v[fieldArray[b]];
-            log(`Setting Faux Value (${fieldArray[b]})`, fauxvalue,r20color);
+            log(`Setting Faux Value (${fieldArray[b]})`, fauxvalue, r20color);
             sattrs[fieldArray[b]] = fauxvalue;
           }
           log('Step', '!!! Setting Fake Value !!!', 'orangered');
-          setAttrs(sattrs,null, () => {
+          setAttrs(sattrs, null, () => {
             for (let c = 0; c < idArray.length; c++) {
               log(
                 'Added Field',
                 fieldArray[c] + ' = ' + oldValues[c],
                 'orangered'
               );
-              log(`Setting Previous Value (${fieldArray[c]})`, oldValues[c], r20color);
+              log(
+                `Setting Previous Value (${fieldArray[c]})`,
+                oldValues[c],
+                r20color
+              );
               sattrs[fieldArray[c]] = oldValues[c];
             }
             log('Step', '!!! Setting Real Values !!!', 'orangered');
@@ -242,15 +246,15 @@ function fauxChange(field, fauxvalue) {
     });
   } else {
     //console.log("Updating values in a Non-Repeating Section");
-    log("fauxChange","Not Repeating Section","#CCCCFF")
+    log('fauxChange', 'Not Repeating Section', '#CCCCFF');
     getAttrs([field], function (v) {
       let prevValue = v[field];
       let sattrs = {};
       //console.log(`++++ Setting ${field} to ${fauxvalue} ++++`);
       //console.log("Setting " + field + " to " + fauxvalue);
       sattrs[field] = fauxvalue;
-      log(`Setting Faux Value (${field})`, fauxvalue,r20color);
-      setAttrs(sattrs,null,()=>{
+      log(`Setting Faux Value (${field})`, fauxvalue, r20color);
+      setAttrs(sattrs, null, () => {
         sattrs[field] = prevValue;
         log(`Setting Previous Value (${field})`, prevValue, r20color);
         setAttrs(sattrs);
@@ -267,7 +271,7 @@ const stepwiseFaux = function (section, field) {
   //field = the field within the section to fauxily change
   //example call: stepwiseFaux("weapons","dmgbonusnum");
   //will do a faux change during each for loop
-  log("stepWiseFaux", "Entered this thing", "#CCCCFF");
+  log('stepWiseFaux', 'Entered this thing', '#CCCCFF');
   let repeatingSection = `repeating_${section}`;
   getSectionIDs(repeatingSection, function (idArray) {
     if (idArray.length > 0) {
@@ -362,6 +366,44 @@ const repeatingCount = function (repSection, countField) {
     const setCount = {};
     setCount[`${countField}`] = repCount;
     setAttrs(setCount);
+  });
+};
+
+//Manage Background Image
+const updateBackgroundImage = function (backgroundSelection) {
+  let imageURL = '';
+  getAttrs(['background', 'backgroundurl'], function (bgSelection) {
+    switch (bgSelection.background) {
+      case '1':
+        imageURL =
+          'https://raw.githubusercontent.com/finderski/SWT/master/Parchement_Background2.jpg';
+        break;
+      case '2':
+        imageURL =
+          'https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/backgrounds/swade-parchment-seamless.jpg';
+        break;
+      case '3':
+        imageURL =
+          'https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/backgrounds/r20-rifts-hex-pattern.png';
+        break;
+      case '4':
+        imageURL = bgSelection.backgroundurl;
+        break;
+      default:
+        imageURL = '';
+    }
+    setAttrs({
+      backgroundImage: imageURL,
+    });
+  });
+};
+
+const calcWoundsRemaining = function () {
+  getAttrs(['wounds_max', 'wounds'], function (v) {
+    let maxWounds = parseInt(v.wounds_max) || 0;
+    let totalWounds = parseInt(v.wounds) || 0;
+    let remainingWounds = maxWounds - totalWounds;
+    setAttrs({ woundsRemaining: remainingWounds });
   });
 };
 
@@ -517,9 +559,15 @@ const upgradeSheet = function (
     }
     if (versionthree < 0.26) {
       setattrvals['newcontent'] = 'unread';
-    } 
+    }
     if (versionthree < 0.27) {
-      const nameList = ["faith","focus","performance","psionics","spellcasting"];
+      const nameList = [
+        'faith',
+        'focus',
+        'performance',
+        'psionics',
+        'spellcasting',
+      ];
       nameList.forEach(skillName => {
         fauxChange(`${skillName}name`, `${skillName}_old`);
       });
@@ -527,12 +575,16 @@ const upgradeSheet = function (
       setattrvals['newdocumentation'] = 'unread';
     }
     if (versionthree < 0.28) {
-      log("Sheet Version", "Upgrading to version 0.0.28", "#CCCCFF");
-      fauxChange(`repeating_weapons:weaponskill`, "fakeWeapon");
+      log('Sheet Version', 'Upgrading to version 0.0.28', '#CCCCFF');
+      fauxChange(`repeating_weapons:weaponskill`, 'fakeWeapon');
       //stepwiseFaux("weapons", "weaponbutton");
       setattrvals['newcontent'] = 'unread';
-    }  else {
+    } else {
       log('Upgrade', `Sheet already updgraded (${characterName})`, 'lime');
+    }
+    if (versionthree < 0.29) {
+      updateBackgroundImage();
+      setattrvals['newcontent'] = 'unread';
     }
     setAttrs(setattrvals);
     //setAttrs(setattrvals, { silent: true });
@@ -1056,6 +1108,11 @@ on('change:sheet_theme', function (eventInfo) {
     updatedValues.background = '1';
   }
   setAttrs(updatedValues);
+});
+
+//watch for a change in the background
+on('change:background', function () {
+  updateBackgroundImage();
 });
   //Create Trait values for rank and display hidden fields is in the workers.js file
 //Setting default Skill Names is in the workers.js file (with all the other on:opened stuff)
@@ -2037,18 +2094,23 @@ on('change:burn_points_mod', function (eventInfo) {
 });
   //Wound and Fatigue Configuration Pane buttons are in teh actionButtonScripts.js file
 
-on("change:stunned", function(eventInfo) {
-    if (eventInfo.newValue === "-2") {
-        getAttrs(["distracted"], function(v) {
-            v.distracted === "0" ?
-                setAttrs({ distracted: "-2",
-                           vulnerable: "-2" }) :
-                log("Distracted", "Setting distracted", "darkblue");
-        });
-    } else {
-        log("Distracted", "Don't need to change Distracted", "darkblue");
-    }
-});/*jshint esversion: 11, laxcomma:true, eqeqeq:true*/
+on('change:stunned', function (eventInfo) {
+  if (eventInfo.newValue === '-2') {
+    getAttrs(['distracted'], function (v) {
+      v.distracted === '0'
+        ? setAttrs({ distracted: '-2', vulnerable: '-2' })
+        : log('Distracted', 'Setting distracted', 'darkblue');
+    });
+  } else {
+    log('Distracted', "Don't need to change Distracted", 'darkblue');
+  }
+});
+
+on('change:wounds', function (value) {
+  //call the function
+  calcWoundsRemaining();
+});
+  /*jshint esversion: 11, laxcomma:true, eqeqeq:true*/
 /*jshint -W014,-W084,-W030,-W033*/
 //Initiate a compendium lookup
 /*Expansion IDs:
@@ -2145,7 +2207,6 @@ const compendiumLookup = function({queue, callback}) {
                 compendiumDataLookup({queue,callback,IDPathways});
             }catch(err){
                 debug('No IDPathways found, exiting drag and drop');
-                console.error(err);
             }
         }else{
             debug(`!!! No product index page found. No valid base compendiums present !!!`);
@@ -2754,17 +2815,12 @@ const dropShields = function({repSectionID,repSection,targetObj,jsonObj}){
 
 const dropVehicle = function({jsonObj}){
   log('Vehicle Info', 'Made it to getting Vehicle Fields', r20color);
-  let prefix = '';
+  const fields = [
+    ...(jsonObj.subcategory ? powerRobotArmorFields : vehiclefields),
+  ];
   if (jsonObj.subcategory) {
     prefix = jsonObj.subcategory === 'Power Armor' ? 'pa_' : 'ra_';
   }
-  const fields = (jsonObj.subcategory ? powerRobotArmorFields : vehiclefields)
-    .map(f => {
-      if(jsonObj.hasOwnProperty(f)){
-        jsonObj[`${prefix}${f}`] = jsonObj[f];
-      }
-      return `${prefix}${f}`
-    });
   return [false,fields];
 };
 
@@ -2807,6 +2863,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
   debug('Entering getDropInfo');
   let repSectionID;
   let fields;
+  let prefix = '';
   repSection ? 
     (repSectionID = generateRowID()) :
     log('Repeating Section', 'Not Found', r20color);
@@ -2830,7 +2887,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
   };
   [repSection,fields] = dropSwitch.hasOwnProperty(repSection) ?
     dropSwitch[repSection]({repSection,targetObj,jsonObj,attributes,fields,repSectionID}) :
-    [null,[],''];
+    [null,[]];
   if(repSection){
     applyGeneralEffects({
       targetObj,
@@ -2846,7 +2903,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
       fields.forEach(field => {
         jsonObj[`${field}`] !== undefined
           ? (targetObj[
-              `repeating_${repSection}_${repSectionID}_${field}`
+              `repeating_${repSection}_${repSectionID}_${prefix}${field}`
             ] = jsonObj[`${field}`])
           : log(`${field}`, 'Not Found', r20color);
       });
@@ -2854,7 +2911,7 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
       log('Non-Repeating Fields', 'Fields Found', r20color);
       fields.forEach(field => {
         jsonObj[`${field}`] !== undefined
-          ? (targetObj[`${field}`] = jsonObj[`${field}`])
+          ? (targetObj[`${prefix}${field}`] = jsonObj[`${field}`])
           : log(`${field}`, 'Not Found', r20color);
       });
     }
@@ -3237,27 +3294,20 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
       powerCount: obj => obj['data-Powers'].length,
     },
     Vehicle: {
-      vehicle: (obj) =>{
-        return obj['data-Vehicle'].some(o => !o.data.subcategory) ? 
-          'on' :
-          0;
-      },
-      power_armor: (obj) =>{
-        return obj['data-Vehicle'].some(
+      vehicle: obj =>
+        obj['data-Vehicle'].some(o => !o.data.subcategory) ? 'on' : 0,
+      power_armor: obj =>
+        obj['data-Vehicle'].some(
           o => o.data.subcategory === 'Power Armor'
         )
-          ? 
-            1 :
-            0;
-      },
-      robot_armor: (obj) =>{
-        return obj['data-Vehicle'].some(
+          ? 1
+          : 0,
+      robot_armor: obj =>
+        obj['data-Vehicle'].some(
           o => o.data.subcategory === 'Robot Armor'
         )
-          ? 
-          1 :
-          0;
-      },
+          ? 1
+          : 0,
     },
     SpecialAbilities: {
       showspecabilities: obj => 1,
@@ -3286,7 +3336,6 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
         log(`Import ${singular}`, phegObj.name, r20color);
         log(`Monster`, singular, r20color);
         let source = phegObj.datasource;
-
         let dropType = getDropInfoCommand(type, source);
         finalCharacterDetails = getDropInfo(
           phegObj.data,
@@ -6578,7 +6627,7 @@ on(
 </script>
 <!-- Necessary Mixins-->
 <!-- Hidden inputs for character sheet versioning, etc-->
-<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.28"/>
+<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.29"/>
 <input type="hidden" name="attr_firstInit" value="0"/>
 <input type="hidden" name="attr_namelength" value="0"/>
 <input type="hidden" name="attr_wdNum" value="1"/>
@@ -6638,7 +6687,7 @@ on(
   <input class="useDarkMode" type="hidden" name="attr_dark_mode" value="0"/>
   <input class="useTheme" type="hidden" name="attr_sheet_theme" value="0"/>
   <input class="useBackground hiddenInput" type="hidden" name="attr_background" value="1"/>
-  <div class="background">
+  <div class="background" name="attr_backgroundImage">
     <div class="base"> 
       <!--"sheet of paper" the character sheet is on.-->
       <div class="buttonbar">
@@ -8317,7 +8366,7 @@ on(
           </fieldset>
         </div>
         <div class="logoBlock"> 
-          <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PEG_LOGO_White.png"/><img class="logo Deadlands" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Deadlands.png"/><img class="logo SWADE" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/>
+          <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PEG_LOGO_White.png"/><img class="logo Deadlands" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Deadlands.png"/><img class="logo SWADE" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/><img class="logo Custom" name="attr_logoURL"/>
         </div>
       </div>
       <div class="character">
@@ -13047,7 +13096,7 @@ on(
             img(class="logo Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png")
             img(class="logo SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png")
             -->
-            <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PEG_LOGO_White.png"/><img class="logo Deadlands" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Deadlands.png"/><img class="logo SWADE" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/>
+            <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PEG_LOGO_White.png"/><img class="logo Deadlands" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Deadlands.png"/><img class="logo SWADE" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/><img class="logo Custom" name="attr_logoURL"/>
             <!--Right Column (Hindrances, Ancestry Abilities, Special Abilties, Edges/Advances)-->
             <input class="showconditions hiddenInput" type="checkbox" name="attr_showconditions" checked="checked"/>
             <div class="conditions">
@@ -13068,6 +13117,7 @@ on(
               </div>
             </div><!-- End Conditions -->
             <div class="health"><!-- Wounds -->
+              <input class="hidden" type="number" name="attr_woundsRemaining"/>
               <div class="baseHealthTrait characterWounds">
                 <input class="standardHealth" type="number" name="attr_wounds" title="@{wounds}" value="0"/>||
                 <input class="standardHealth" type="number" name="attr_wounds_max" title="@{wounds_max}" value="3"/>
@@ -15652,7 +15702,12 @@ on(
                 <option value="Deadlands" data-i18n="deadlands">Deadlands</option>
                 <option value="Pathfinder" data-i18n="pathfinder-for-savage-worlds">Pathfinder for Savage Worlds</option>
                 <option value="Rifts" data-i18n="rifts">Rifts</option>
+                <option value="Custom" data-i18n="custom">Custom </option>
               </select>
+            </label>
+            <input class="showCustomLogo" type="hidden" name="attr_logo" value="SavageWorlds"/>
+            <label class="miscItem customLogo"><span data-i18n="logo-url">Logo URL </span>
+              <input type="text" name="attr_logoURL"/>
             </label>
             <label class="miscItem"><span data-i18n="sheet-background">Sheet Background</span>
               <select class="sheet-background" name="attr_background">
@@ -15660,7 +15715,12 @@ on(
                 <option value="1" selected="selected" data-i18n="swade-parchment">SWADE Parchment</option>
                 <option value="2" data-i18n="seamless-parchment">Seamless Parchment</option>
                 <option value="3" data-i18n="gray-hex">Gray Hex </option>
+                <option value="4" data-i18n="custom">Custom</option>
               </select>
+            </label>
+            <input class="showCustomBackground" type="hidden" name="attr_background" value="1"/>
+            <label class="miscItem customBackground"><span data-i18n="background-url">Background URL </span>
+              <input type="text" name="attr_backgroundurl"/>
             </label>
             <label class="miscItem darkMode">
               <input type="checkbox" name="attr_dark_mode" value="1"/>&nbsp; <span data-i18n="dark-mode-invert-colors">Dark Mode</span>
@@ -15848,6 +15908,22 @@ on(
       </div>
       <div class="releasenotesTab">
         <h1 class="groupHeader documentationHeader" data-i18n="release-notes">Release Notes</h1>
+        <!-- Release 1.00.29-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10029" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.29</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10029" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="minor-release">Minor Release</h2>
+          <p data-i18n="minor-release-info">This release focuses on Minor Enhancements and Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="enhancements">Enhancements</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="custom-logo">Added the ability to assign your own custom logo to the sheet </span></li>
+            <li> <span class="black" data-i18n="custom-background">Added the ability to assign your own custom background to the sheet </span></li>
+            <li> <span class="black" data-i18n="wounds-remaining">Added a field that calculates the number of wounds remaining  </span></li>
+          </ul>
+        </div>
         <!-- Release 1.00.28-->
         <label class="rowlabel">
           <input class="releasenotes" type="checkbox" name="attr_releasenotes10028" value="1"/><span class="releasenotesVersion">
