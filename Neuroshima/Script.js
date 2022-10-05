@@ -622,6 +622,46 @@ const toggleList = [
     "grp_jezdziectwo",
 ];
 
+const spec2grp = [
+    // Technik
+    [
+        "grp_prowadzenie-pojazdow",
+        "grp_medycyna",
+        "grp_technika",
+        "grp_wiedza-ogolna-1",
+        "grp_sprzet",
+        "grp_pirotechnika",
+    ],
+    // Wojownik
+    [
+        "grp_walka_wrecz", 
+        "grp_bron_strzelecka",
+        "grp_bron-dystansowa",
+        "grp_sila-woli",
+        "grp_pirotechnika",
+    ],
+    // Ranger
+    [
+        "grp_sprawnosc",
+        "grp_jezdziectwo",
+        "grp_bron-dystansowa",
+        "grp_medycyna",
+        "grp_orientacja-w-terenie",
+        "grp_spostrzegawczosc",
+        "grp_kamuflaz",
+        "grp_przetrwanie",
+    ],
+    // Cwaniak
+    [
+        "grp_zdolnosci-manualne",
+        "grp_negocjacje",
+        "grp_empatia",
+        "grp_kamuflaz",
+    ],
+    // Brak (Hibernatus)
+    []
+];
+
 toggleList.forEach(function(button) {
   on(`clicked:${button}`, function() {
     const flag = `${button}_flag`;
@@ -633,6 +673,27 @@ toggleList.forEach(function(button) {
       });
     });
   });
+});
+
+on("change:specjalizacja", function() {
+    log("Changed!")  
+    getAttrs(["specjalizacja"], function(v) {
+        const grpid = clamp((parseInt(v.specjalizacja)||0), 0, 4);
+        const specgroups = spec2grp[grpid];
+        let dictionary = {};
+        for (const group of toggleList) {
+            const flag = `${group}_flag`;
+            let in_group = "0";
+            for (const sgroup of specgroups) {
+                if(sgroup == group) {
+                    in_group = "1";
+                    break;
+                }
+            }
+            dictionary[flag] = in_group;
+        }
+        setAttrs(dictionary);
+    });
 });
 /*************************** ROLL HANDLERS ************************/
 /******************************************************************/

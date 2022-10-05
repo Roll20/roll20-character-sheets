@@ -2,18 +2,26 @@
 const PLAYER = 'player';
 const SHEET_WORKER = 'sheetworker';
 
-const SUCCESS = 'success';
-const INFO = 'info';
-const WARNING = 'warning';
-const ERROR = 'error';
+const SUCCESS = 1;
+const INFO = 2;
+const WARNING = 3;
+const ERROR = 4;
 
 const BOOK_FIELDS = [
-    'book-phb','book-tcfhb','book-tcthb','book-tcprhb','book-tcwhb',
+    'book-phb','book-tcfhb','book-tcthb','book-tcprhb','book-tcwhb','book-psionics',
     'book-tom','book-aaeg',
     'book-dwarves','book-bards','book-elves','book-humanoids','book-rangers',
     'book-paladins','book-druids','book-barbarians','book-necromancers','book-ninjas',
     'book-combat-and-tactics','book-skills-and-powers','book-spells-and-magic'
 ];
+
+const LEVEL_FIELDS = {
+    'level-class1': 'class1',
+    'level-class2': 'class2',
+    'level-class3': 'class3',
+    'level-class4': 'class4',
+    'level-class5': 'class5',
+};
 
 const SCHOOL_SPELLS_AND_MAGIC = 'school-spells-and-magic';
 const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
@@ -87,10 +95,10 @@ const displayWeaponType = function (type) {
 const parseSourceAttribute = function (eventInfo) {
     let parse = {};
     if (eventInfo.sourceAttribute.startsWith('repeating')) {
-        let match = eventInfo.sourceAttribute.split('_');
-        parse.section = match[1];
-        parse.rowId = match[2];
-        parse.attribute = match[3];
+        let split = eventInfo.sourceAttribute.split('_');
+        parse.section = split[1];
+        parse.rowId = split[2];
+        parse.attribute = split[3];
     } else {
         parse.attribute = eventInfo.sourceAttribute;
     }
@@ -166,32 +174,73 @@ const isRollValid = function (rollExpression, field) {
     return true;
 }
 
-const calculateFormula = async function(formulaField, calculatedField, silent = false) {
-    getAttrs([formulaField], async function (values) {
+const LEVEL_CLASS_REGEX = /@\{level-class[1-5]}/g;
+const checkClassLevel = async function(values, rollExpression) {
+    await keepContextRoll();
+    let result = {rollExpression: rollExpression};
+    let match = rollExpression.match(LEVEL_CLASS_REGEX);
+    if (!match)
+        return result; // There is no scaling
+
+    let levelsInExpression = new Set(match);
+    if (levelsInExpression.size > 1)
+        return result; // The user presumably knows what he is doing
+
+    let levelsWithValues = Object.keys(LEVEL_FIELDS).filter(level => values[level]);
+    if (levelsWithValues.length === 0)
+        return result; // The user has not set levels in any fields
+
+    let [levelInExpression] = levelsInExpression;
+    let levelInExpressionNoBrackets = levelInExpression.replace(/[@{}]/g, '');
+    if (levelsWithValues.length === 1) {
+        if (levelInExpressionNoBrackets === levelsWithValues[0]) {
+            return result;
+        } else {
+            result.rollExpression = rollExpression.replaceAll(levelInExpressionNoBrackets, levelsWithValues[0]);
+            return result;
+        }
+    } else {
+        let suggestedClasses = levelsWithValues.map(l => `${values[LEVEL_FIELDS[l]].replaceAll(',', '')} (${l}),${l}`)
+            .join('|');
+        let query = values[levelInExpressionNoBrackets]
+            ? `?{Please confirm the class to use|${suggestedClasses}}`
+            : `?{${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
+
+        result.func = async function() {
+            let field = await extractQueryResult(query);
+            return rollExpression.replaceAll(levelInExpressionNoBrackets, field);
+        };
+        return result;
+    }
+}
+
+const calculateFormula = function(formulaField, calculatedField, doCheckClassLevel) {
+    getAttrs([formulaField, ...Object.entries(LEVEL_FIELDS).flat()], async function (values) {
         let rollExpression = values[formulaField];
         let valid = isRollValid(rollExpression, formulaField);
         if (!valid)
             return;
 
-        setAttrs({
-            [calculatedField]: await extractRollResult(rollExpression, formulaField)
-        },{silent:silent});
+        let valueToSet = {};
+        if (doCheckClassLevel) {
+            let result = await checkClassLevel(values, rollExpression);
+            if (result.func)
+                valueToSet[formulaField] = rollExpression = await result.func();
+            else
+                valueToSet[formulaField] = rollExpression = result.rollExpression;
+        }
+
+        valueToSet[calculatedField] = await extractRollResult(rollExpression);
+        setAttrs(valueToSet);
     });
 }
 
 const getToastObject = function (type, title, message) {
-    let content
-    switch (type) {
-        case SUCCESS: content = 1; break;
-        case INFO:    content = 2; break;
-        case WARNING: content = 3; break;
-        case ERROR:   content = 4; break;
-    }
     return {
         ['toast']: 1,
-        ['toast-content']: content,
-        [`toast-title-${type}`]: title,
-        [`toast-message-${type}`]: message
+        ['toast-content']: type,
+        ['toast-title']: title,
+        ['toast-message']: message
     }
 }
 
@@ -212,6 +261,20 @@ const isBookInactive = function (books, obj) {
         return obj.every(b => !activeBooks.has(b));
     else
         return !activeBooks.has(obj['book']);
+}
+
+const bookInactiveGetToastObject = function (books, obj) {
+    let bookInactive = isBookInactive(books, obj);
+    let result = null;
+    if (bookInactive) {
+        if (Array.isArray(obj)) {
+            let booksString = obj.map(b => '\n* ' + b).join('')
+            result = getToastObject(ERROR, 'Missing Book(s)', `The book(s):${booksString}\nAre currently not active on your sheet.\nGo to the *Sheet Settings* and activate any of the listed book(s) (if your DM allows for its usage)`);
+        } else {
+            result = getToastObject(ERROR, 'Missing Book', `The book *${obj['book']}* is currently not active on your sheet.\nGo to the *Sheet Settings* and activate the book (if your DM allows for its usage)`);
+        }
+    }
+    return result;
 }
 
 const bookInactiveShowToast = function(books, obj) {
@@ -269,6 +332,23 @@ const repeatingCalculateRemaining = function(repeatingName, repeatingFieldsToSum
         }, 0, function (memo,_,attrSet) {
             attrSet.I[remainingField] = attrSet.I[totalField] - memo;
         }).execute();
+};
+
+const repeatingCalculateRemainingRecursive = function (tail, accumulator, resultFieldName) {
+    let head = tail.shift();
+    if (!head) {
+        setAttrs({
+            [resultFieldName] : accumulator
+        });
+        return;
+    }
+
+    TAS.repeating(head.section)
+        .fields(head.slotsField)
+        .each(function (r) {
+            accumulator -= r.I[head.slotsField];
+        })
+        .execute(() => repeatingCalculateRemainingRecursive(tail, accumulator, resultFieldName));
 };
 //#endregion
 
@@ -742,6 +822,28 @@ on('clicked:opendoor-check', function (eventInfo){
 });
 //#endregion
 
+const CALCULATION_FIELDS = [
+    { formulaField: 'thac0-base',            calculatedField: 'thac0-base-calc' },
+    // Proficiencies
+    { formulaField: 'weapprof-slots-total',  calculatedField: 'weapprof-slots-total-calc' },
+    { formulaField: 'prof-slots-total',      calculatedField: 'prof-slots-total-calc' },
+    // Psionics
+    { formulaField: 'discipline-progress',   calculatedField: 'discipline-slots_max' },
+    { formulaField: 'science-progress',      calculatedField: 'science-slots_max' },
+    { formulaField: 'devotion-progress',     calculatedField: 'devotion-slots_max' },
+    { formulaField: 'defense-mode-progress', calculatedField: 'defense-mode-slots_max' },
+    { formulaField: 'psp-progress',          calculatedField: 'PSP_max' },
+];
+CALCULATION_FIELDS.forEach(({formulaField, calculatedField}) => {
+    on(`change:${formulaField}`, function (eventInfo) {
+        if (isSheetWorkerUpdate(eventInfo))
+            return;
+
+        let doCheckClassLevel = !!eventInfo.newValue; // conversion into a bool
+        calculateFormula(formulaField, calculatedField, doCheckClassLevel);
+    });
+});
+
 //#region Wizard and Priest Spells slot counting
 function isNewSpellSection(section) {
     return section.startsWith('wiz') || section.startsWith('pri');
@@ -1040,7 +1142,15 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
         if (!spell)
             return;
 
-        getAttrs([...BOOK_FIELDS, ...optionalRulesFields], function(books) {
+        let isWizard = section.startsWith('wiz');
+        let isPriest = section.startsWith('pri');
+        let levelField;
+        if (isWizard)
+            levelField = 'level-wizard';
+        if (isPriest)
+            levelField = 'level-priest';
+
+        getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField], function(books) {
             if (bookInactiveShowToast(books, spell))
                 return;
 
@@ -1065,15 +1175,20 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
                 [`repeating_spells-${section}_spell-crit-size`]    : spell['crit-size'] || '',
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
-            if (section.startsWith('wiz')) {
+            if (isWizard) {
                 let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
                 spellInfo[`repeating_spells-${section}_spell-school`] = schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
                     ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
                     : spell['school'];
             }
-            if (section.startsWith('pri')) {
+            if (isPriest) {
                 let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
                 spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
+            }
+            if (!books[levelField].trim()) {
+                let classLevel = capitalizeFirst(levelField.replace('level-', ''));
+                let toast = getToastObject(INFO, `Set ${classLevel} caster level`, 'Almost every spell requires a caster level to calculate its effect. Without it most spells will fail and show and error in the chat');
+                Object.assign(spellInfo, toast);
             }
 
             setAttrs(spellInfo);
@@ -1263,12 +1378,6 @@ const updateNonprofPenalty = function () {
 }
 on('change:nonprof-penalty', function (eventInfo){
     updateNonprofPenalty();
-});
-
-//Used in version.js
-const updateThac0 = (silent) => calculateFormula('thac0-base', 'thac0-base-calc', silent);
-on('change:thac0-base', function(eventInfo) {
-    updateThac0(false);
 });
 
 on('change:thac0-base-calc', function(eventInfo) {
@@ -2175,11 +2284,6 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
 
 //#region Proficiencies
 //Weapon proficiency slots
-//Used in version.js
-const updateWeaponProfsTotal = () => calculateFormula('weapprof-slots-total', 'weapprof-slots-total-calc');
-on('change:weapprof-slots-total', function (eventInfo) {
-    updateWeaponProfsTotal();
-});
 const updateWeaponProfsRemaining = () => repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprof-slots-total-calc', function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['weapprofnum']))
@@ -2203,42 +2307,50 @@ on('change:repeating_weaponprofs:weapprofname', function(eventInfo) {
 });
 
 //Nonweapon proficiency slots
-//Used in version.js
-const updateNonWeaponProfsTotal = () => calculateFormula('prof-slots-total', 'prof-slots-total-calc');
-on('change:prof-slots-total', function (eventInfo) {
-    updateNonWeaponProfsTotal();
-});
-const updateNonWeaponProfsRemaining = () => repeatingCalculateRemaining('profs', ['profslots'], 'prof-slots-total-calc', 'prof-slots-remain');
-on('change:repeating_profs:profslots remove:repeating_profs change:prof-slots-total-calc', function(eventInfo){
-    if (doEarlyReturn(eventInfo, ['profslots']))
-        return;
-    updateNonWeaponProfsRemaining();
-});
-//Nonweapon proficiency autofill
-on('change:repeating_profs:profname', function (eventInfo) {
-    let nonweaponProficiencies = NONWEAPON_PROFICIENCIES_TABLE[eventInfo.newValue];
-    if (!nonweaponProficiencies)
-        return;
+const NONWEAPON_PROFICIENCY_SECTIONS = [
+    {section:'profs',    nameField:'profname',    slotsField:'profslots',    abilityScoreField:'profstatnum',    modifierField:'profmod', totalField:'prof-slots-total-calc' },
+    {section:'psiprofs', nameField:'psiprofname', slotsField:'psiprofslots', abilityScoreField:'psiprofstatnum', modifierField:'psiprofmod'},
+];
+NONWEAPON_PROFICIENCY_SECTIONS.forEach(({section, nameField, slotsField, abilityScoreField, modifierField, totalField}) => {
+    let changeTotal = totalField ? `change:${totalField}` : '';
+    on(`change:repeating_${section}:${slotsField} remove:repeating_${section} ${changeTotal}`, function(eventInfo){
+        if (doEarlyReturn(eventInfo, [slotsField])) {
+            return;
+        }
 
-    let comparer = function (nonweaponProf1, nonweaponProf2, isPlayersOption) {
-        return ['slots','abilityScore','modifier'].every(f => nonweaponProf1[f] === nonweaponProf2[f])
-    }
-
-    getAttrs(BOOK_FIELDS, async function (books) {
-        let nonweaponProficiency = await selectVersion(nonweaponProficiencies, books, comparer, 'nonweapon proficiency');
-        console.log(nonweaponProficiency);
-        if (!nonweaponProficiency)
+        let sectionsCopy = [...NONWEAPON_PROFICIENCY_SECTIONS];
+        getAttrs(['prof-slots-total-calc'], function (values) {
+            let accumulator = values['prof-slots-total-calc'];
+            repeatingCalculateRemainingRecursive(sectionsCopy, accumulator, 'prof-slots-remain');
+        });
+    });
+    //Nonweapon proficiency autofill
+    on(`change:repeating_${section}:${nameField}`, function (eventInfo) {
+        let nonweaponProficiencies = NONWEAPON_PROFICIENCIES_TABLE[eventInfo.newValue];
+        if (!nonweaponProficiencies)
             return;
 
-        let rowId = parseSourceAttribute(eventInfo).rowId;
+        let comparer = function (nonweaponProf1, nonweaponProf2, isPlayersOption) {
+            return ['slots','abilityScore','modifier'].every(f => nonweaponProf1[f] === nonweaponProf2[f])
+        }
 
-        let nonweaponProfInfo = {};
-        nonweaponProfInfo[`repeating_profs_${rowId}_profslots`]   = nonweaponProficiency['slots'];
-        nonweaponProfInfo[`repeating_profs_${rowId}_profstatnum`] = nonweaponProficiency['abilityScore'];
-        nonweaponProfInfo[`repeating_profs_${rowId}_profmod`]     = nonweaponProficiency['modifier'];
-        setAttrs(nonweaponProfInfo);
+        getAttrs(BOOK_FIELDS, async function (books) {
+            let nonweaponProficiency = await selectVersion(nonweaponProficiencies, books, comparer, 'nonweapon proficiency');
+            console.log(nonweaponProficiency);
+            if (!nonweaponProficiency)
+                return;
+
+            let rowId = parseSourceAttribute(eventInfo).rowId;
+
+            let nonweaponProfInfo = {};
+            nonweaponProfInfo[`repeating_${section}_${rowId}_${slotsField}`]        = nonweaponProficiency['slots'];
+            nonweaponProfInfo[`repeating_${section}_${rowId}_${abilityScoreField}`] = nonweaponProficiency['abilityScore'];
+            nonweaponProfInfo[`repeating_${section}_${rowId}_${modifierField}`]     = nonweaponProficiency['modifier'];
+            setAttrs(nonweaponProfInfo);
+        });
     });
 });
+//#endregion
 
 //#region Special Talents
 on('change:repeating_talents:talentname', function (eventInfo) {
@@ -2402,22 +2514,251 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
     repeatingMultiplySum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
 })
 
+//#region Psionic
 // Psionic tabs, control hidden or visible options
 const setPsionicDisciplineVisibility = function(newValue) {
-    let elements = $20('.sheet-section-psionics .sheet-hidden');
+    let elements = $20('.sheet-section-psionics option.sheet-hidden');
     if (newValue === "1") {
         elements.addClass('sheet-show');
     } else {
         elements.removeClass('sheet-show');
     }
 }
-on('change:tab8', function (eventInfo) {
-    setPsionicDisciplineVisibility(eventInfo.newValue);
-});
-on('sheet:opened', function () {
+on('change:tab8 sheet:opened', function (eventInfo) {
+    if (eventInfo.newValue)
+        return setPsionicDisciplineVisibility(eventInfo.newValue);
+
     getAttrs(['tab8'], function (values) {
         setPsionicDisciplineVisibility(values['tab8']);
     })
+});
+
+const PSIONIC_CORE_SECTIONS = [
+    { discipline: 'Telepathic',      section: 'psion-telepathy',            name: 'psiontelepathic',    macro: 'psiontelepathic-macro',         number: '',   cost_number: '20' },
+    { discipline: 'Telepathic',      section: 'psion-telepathic-science',   name: 'telepathic-science', macro: 'psiontelepathic-science-macro', number: '1',  cost_number: '21' },
+    { discipline: 'Psychokinetic',   section: 'psion-psychokinesis',        name: 'psionkinetic',       macro: 'psionkinetic-macro',            number: '2',  cost_number: '22' },
+    { discipline: 'Psychokinetic',   section: 'psion-kinetic-science',      name: 'kinetic-science',    macro: 'psionkinetic-science-macro',    number: '3',  cost_number: '23' },
+    { discipline: 'Psychoportive',   section: 'psion-portation',            name: 'psionportation',     macro: 'psionportation-macro',          number: '4',  cost_number: '24' },
+    { discipline: 'Psychoportive',   section: 'psion-portation-science',    name: 'portation-science',  macro: 'psionportation-science-macro',  number: '5',  cost_number: '25' },
+    { discipline: 'Psychometabolic', section: 'psion-metabolic',            name: 'psionmetabolic',     macro: 'psionmetabolic-macro',          number: '6',  cost_number: '26' },
+    { discipline: 'Psychometabolic', section: 'psion-metabolic-science',    name: 'metabolic-science',  macro: 'psionmetabolic-science-macro',  number: '7',  cost_number: '27' },
+    { discipline: 'Clairsentient',   section: 'psion-clairvoyance',         name: 'psionclair',         macro: 'psionclair-macro',              number: '8',  cost_number: '28' },
+    { discipline: 'Clairsentient',   section: 'psion-clairvoyance-science', name: 'clair-science',      macro: 'psionclair-science-macro',      number: '9',  cost_number: '29' },
+    { discipline: 'Metapsionic',     section: 'psion-metapsionics',         name: 'psionmeta',          macro: 'psionmeta-macro',               number: '12', cost_number: '32' },
+    { discipline: 'Metapsionic',     section: 'psion-metapsionic-science',  name: 'meta-science',       macro: 'psionmeta-science-macro',       number: '13', cost_number: '33' },
+    { discipline: 'Attack',          section: 'psion-attack5',              name: 'psionattacking',     macro: 'psionattacking-macro',          number: '10', cost_number: '30' },
+    { discipline: 'Defense',         section: 'psion-defense5',             name: 'psiondefending',     macro: 'psiondefending-macro',          number: '11', cost_number: '31' },
+];
+
+on('sheet:opened change:character_name', function (eventInfo) {
+    PSIONIC_CORE_SECTIONS.forEach(({section}) => {
+        TAS.repeating(section)
+            .attr('character_name')
+            .field('action-check', 'action-macro')
+            .each(function (row, attrSet, id, rowSet) {
+                row['action-check'] = `%{${attrSet.character_name}|repeating_${section}_${id}_action-check}`;
+                row['action-macro'] = `%{${attrSet.character_name}|repeating_${section}_${id}_action-macro}`;
+            })
+            .execute();
+    });
+});
+PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, discipline}) => {
+    on(`change:repeating_${section}:${macro}`, function (eventInfo) {
+        let parse = parseSourceAttribute(eventInfo);
+        getAttrs(['character_name'], function (values) {
+            let powerInfo = {};
+            powerInfo[`repeating_${section}_action-check`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action-check}`;
+            powerInfo[`repeating_${section}_action-macro`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action-macro}`;
+            return setAttrs(powerInfo,{silent:true});
+        });
+    });
+
+    on(`change:repeating_${section}:${name}`, function (eventInfo) {
+        let parse = parseSourceAttribute(eventInfo);
+        getAttrs(['character_name', ...BOOK_FIELDS], function (values) {
+            let powerInfo = {};
+            powerInfo[`repeating_${section}_action-check`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action-check}`;
+            powerInfo[`repeating_${section}_action-macro`] = `%{${values.character_name}|repeating_${section}_${parse.rowId}_action-macro}`;
+            if (!eventInfo.newValue)
+                return setAttrs(powerInfo,{silent:true});
+
+            let displayDiscipline = discipline;
+            let tier = name.includes('science') ? 'Science' : 'Devotion';
+            let powerTable = PSIONIC_POWERS[discipline];
+            let power = powerTable[tier][eventInfo.newValue];
+            if (discipline === 'Attack' || discipline === 'Defense') {
+                displayDiscipline = 'Telepathic';
+                tier = power ? tier : 'Science';
+                power = power || powerTable[tier][eventInfo.newValue];
+            }
+            if (!power)
+                return setAttrs(powerInfo,{silent:true});
+
+            let toastObject = bookInactiveGetToastObject(values, power);
+            if (toastObject)
+                return setAttrs(Object.assign(powerInfo, toastObject),{silent:true});
+
+            powerInfo[`repeating_${section}_powerscore-nomod${number}`] = power['attribute'];
+            powerInfo[`repeating_${section}_powerscore-mod${number}`]   = power['modifier'];
+            powerInfo[`repeating_${section}_PSP-cost${cost_number}`]    = power['initial-cost'];
+            powerInfo[`repeating_${section}_PSP-cost-maintenance`]      = power['maintenance-cost'];
+
+            let macroBuilder = [];
+            macroBuilder.push(`title=@{${name}}`);
+            macroBuilder.push(`discipline=${displayDiscipline}`);
+            macroBuilder.push(`tier=${tier}`);
+            macroBuilder.push(`initial=@{PSP-cost${cost_number}}`);
+            macroBuilder.push(`maintenance=@{PSP-cost-maintenance}`);
+            macroBuilder.push(`range=${power['range']}`);
+            macroBuilder.push(`aoe=${power['aoe']}`);
+            let prep = power['prep'];
+            let prepMatch = prep.match(/^[1-9]\d*$/);
+            if (prepMatch) {
+                prep += parseInt(prepMatch[0]) > 1 ? ' rounds' : 'round';
+            }
+            macroBuilder.push(`prep=${prep}`);
+            macroBuilder.push(`prereq=${power['prerequisites']}`);
+            macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
+            let powerRoll = power['roll-override'] || `[[1d20cf20-(@{psionic-mod${number}})]]`;
+            macroBuilder.push(`powerroll=${powerRoll}`);
+            let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
+            if (power['context-modifier']) {
+                powerScore += `+(${power['context-modifier']})`;
+            }
+            macroBuilder.push(`powerscore=[[${powerScore}]]`);
+            macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})]]`)
+            macroBuilder.push(`powerscoreeffect=${power['power-score']}`);
+            macroBuilder.push(`20effect=${power['20']}`);
+            macroBuilder.push(`1effect=${power['1']}`);
+            if (power['damage']) {
+                macroBuilder.push(`damage=${power['damage']}`);
+                macroBuilder.push(`damage-type=${power['damage-type']}`);
+            }
+            if (power['healing']) {
+                macroBuilder.push(`healing=${power['healing']}`);
+            }
+            macroBuilder.push(`effects=${power['effect']}`);
+
+            let macroValue = macroBuilder.map(s => `{{${s}}}`).join(' ');
+            powerInfo[`repeating_${section}_${macro}`] = `&{template:2Epsionic} ${macroValue}`;
+
+            setAttrs(powerInfo,{silent:true});
+        });
+    });
+
+    on(`clicked:repeating_${section}:action-check`, function (eventInfo) {
+        let parse = parseSourceAttribute(eventInfo);
+        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
+            let displayDiscipline = discipline;
+            let tier = name.includes('science') ? 'Science' : 'Devotion';
+            let fullMacro = values[`repeating_${section}_${macro}`];
+            let match;
+            if (discipline === 'Attack' || discipline === 'Defense') {
+                displayDiscipline = 'Telepathic';
+                match = fullMacro.match(/\{\{tier=(.*?)}} *\{\{/);
+                tier = match ? match[1] : '';
+            }
+
+            let macroBuilder = [];
+
+            match = fullMacro.match(/\{\{(title=.*?)}} *\{\{/);
+            console.log(match);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`title=@{${name}}`);
+
+            match = fullMacro.match(/\{\{(discipline=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`discipline=${displayDiscipline}`);
+
+            match = fullMacro.match(/\{\{(tier=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`tier=${tier}`);
+
+            match = fullMacro.match(/\{\{(powerroll=\[\[.*?]])}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
+
+            let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
+            match = fullMacro.match(/\{\{(powerscore=\[\[.*?]])}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`powerscore=[[${powerScore}]]`);
+
+            match = fullMacro.match(/\{\{(powerscoreenhanced=\[\[.*?]])}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})]]`);
+
+            match = fullMacro.match(/\{\{(powerscoreeffect=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+
+            match = fullMacro.match(/\{\{(20effect=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+
+            match = fullMacro.match(/\{\{(1effect=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+
+            let macroValue = macroBuilder.map(s => `{{${s}}}`).join(' ');
+            macroValue = `&{template:2Epsionic} ${macroValue}`;
+
+            rollPsionicTemplate(macroValue, parse.rowId, values);
+        });
+    });
+
+    on(`clicked:repeating_${section}:action-macro`, function (eventInfo) {
+        let parse = parseSourceAttribute(eventInfo);
+        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
+            let macroValue = values[`repeating_${section}_${macro}`];
+
+            rollPsionicTemplate(macroValue, parse.rowId, values);
+        });
+    });
+
+    let rollPsionicTemplate = async function(macroValue, rowId, values) {
+        let repeating = `repeating_${section}_${rowId}`;
+        macroValue = macroValue.replaceAll(`${name}`,`${repeating}_${name}`)
+            .replaceAll(`psionic-mod${number}`,`${repeating}_psionic-mod${number}`)
+            .replaceAll(`powerscore-nomod${number}`,`${repeating}_powerscore-nomod${number}`)
+            .replaceAll(`powerscore-mod${number}`,`${repeating}_powerscore-mod${number}`)
+            .replaceAll(`powerscore-enhanced`,`${repeating}_powerscore-enhanced`)
+            .replaceAll(`PSP-cost${cost_number}`,`${repeating}_PSP-cost${cost_number}`)
+            .replaceAll(`PSP-cost-maintenance`,`${repeating}_PSP-cost-maintenance`);
+
+        if (!values['psion-armor-penalty']) {
+            macroValue = macroValue.replaceAll('+(@{psion-armor-penalty})', '');
+        }
+
+        let roll = await startRoll(macroValue);
+        if (!macroValue.includes('&{template:2Epsionic}')) {
+            return finishRoll(roll.rollId);
+        }
+
+        let computedRolls = {};
+        let powerscore = roll.results.powerscore;
+        if (powerscore) {
+            computedRolls.powerscore = Math.min(powerscore.result, 19)
+        }
+
+        let powerscoreenhanced = roll.results.powerscoreenhanced;
+        if (powerscoreenhanced && powerscoreenhanced.result > powerscore.result) {
+            computedRolls.powerscoreenhanced = Math.min(powerscoreenhanced.result, 19)
+            if (powerscoreenhanced.result > 19) {
+                computedRolls.powerscore = 19 - (powerscoreenhanced.result - powerscore.result);
+            }
+        }
+
+        finishRoll(roll.rollId, computedRolls);
+    };
+});
+//#endregion
+
+// Show / Hide buttons for various repeating sections
+const REPEATING_SECTIONS = [
+    ...PSIONIC_CORE_SECTIONS.map(e => e.section),
+];
+REPEATING_SECTIONS.forEach(section => {
+   on(`clicked:repeating_${section}:show clicked:repeating_${section}:hide`, function (eventInfo) {
+       let parse = parseSourceAttribute(eventInfo);
+       $20(`div[data-reprowid=${parse.rowId}] .sheet-hidden`).toggleClass('sheet-show');
+   });
 });
 
 // Fix for Roll20 not handling quotes correctly from sheet.json

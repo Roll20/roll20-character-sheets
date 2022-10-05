@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.8.5" readonly />
+													<input type="text" class="center" name="attr_version" value="1.8.7" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -7908,6 +7908,11 @@
 			if (isLesserThan183) {
 				upgradeTo_1_8_3(value, setObj);
 			}
+			const isLesserThan186 = major_global_version <= 1 && minor_global_version < 8.6 ?
+				true : false;
+			if (isLesserThan186) {
+				upgradeTo_1_8_6(value, setObj);
+			}
 			setObj.global_version = sheet_version;
 		}
 		
@@ -8008,6 +8013,21 @@
 				setObj[`stat_cost_${allaspects_stats_array[i]}`] = cost;
 			});
 			clog(2, {}, 'upgraded to 1.8.3');
+		}
+		
+		function upgradeTo_1_8_6(value, setObj) {
+			const statValues = [
+				parseInt(value.static_stat_base_body) || 0,
+				parseInt(value.static_stat_base_mind) || 0,
+				parseInt(value.static_stat_base_soul) || 0
+			];
+			clog(2, {}, 'statValues:', statValues, 'upgradeTo_1_8_6()');
+			_.each(statValues, (s, i) => {
+				const cost = getStatCost(2, {}, s);
+				clog(2, {}, 's =', s);
+				setObj[`stat_cost_${allaspects_stats_array[i]}`] = cost;
+			});
+			clog(2, {}, 'upgraded to 1.8.6');
 		}
 		
 		/** Build UI Functions **/
@@ -8340,7 +8360,7 @@
 		function getStatCost(debug, timer, level) {
 			let cost = 0;
 			for(let i = 1; i <= level; i++) {
-				if(i < 13) { cost += 4 } else { cost += 8 }
+				if(i < 13) { cost += 2 } else { cost += 4 }
 			}
 			clog(debug, timer, 'cost =', cost, 'getStatCost()');
 			return cost;
@@ -10099,7 +10119,7 @@
 		function setMassiveDamageCharacteristic(debug, timer, value, rowID, level, setObj) {
 			const targeted = getIsTargeted(debug, timer, value, rowID, setObj);
 			const focused = getCustomizationValue(debug, timer, value, rowID, 'rank', 'focuseddamage');
-			const enemy = value[`repeating_attr_${rowID}_enemy`];
+			const enemy = value[`repeating_attr_${rowID}_enemy`] || '<not configured>';
 			const weaponclass = value[`repeating_attr_${rowID}_weaponclass`];
 			let characteristic = `DM +${level}`;
 			if (targeted) characteristic = characteristic + ` vs. ${enemy}`;
@@ -10110,6 +10130,7 @@
 		function getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute) {
 			const obj = {
 				"meleeattack": "weaponclass",
+				"rangedattack": "weaponclass",
 				"meleedefense": "weaponclass",
 				"enemyattack": "enemy",
 				"enemydefense": "enemy",
@@ -10119,11 +10140,12 @@
 				"skill": "skillgroup"
 			};
 			const default_obj = {
-				"meleeattack": "exotic",
-				"meleedefense": "exotic",
-				"enemyattack": "not configured",
-				"enemydefense": "not configured",
-				"immunity": "not configured",
+				"meleeattack": "<select weapon class>",
+				"rangedattack": "<select weapon class>",
+				"meleedefense": "<select weapon class>",
+				"enemyattack": "<not configured>",
+				"enemydefense": "<not configured>",
+				"immunity": "<not configured>",
 				"immutable": "body",
 				"rangeddefense": "personal",
 				"skill": 1
@@ -13089,6 +13111,7 @@
 			const maneuverSelected =_.isString(setObj.static_weapon_maneuver_name) ? 
 				setObj.static_weapon_maneuver_name : 
 				value.static_weapon_maneuver_name;
+			if (maneuverSelected === undefined) return;
 			const maneuverTitleCase = capital(maneuverSelected);
 			const maneuver = removeWhiteSpace(maneuverSelected);
 			const acv = 
@@ -13415,6 +13438,7 @@
 		}
 		
 		function getHandSource(debug, timer, extraarmIDs, rowID){
+			if (rowID === undefined) return false;
 			rowID = rowID.toLowerCase();
 			const handsource = /(mainhand|offhand)/i.test(rowID) ? rowID : 
 				extraarmIDs !== undefined ? extraarmIDs.indexOf(rowID) !== -1 ?
@@ -14236,6 +14260,11 @@
 									case 'unaffected':
 										setStatButtonStatsAndRolls(debug, timer, eventInfo, value, rowID, sourceAttr, setObj);
 										setUnaffectedAttributes(debug, timer, eventInfo, value, rowID, setObj);
+									break;
+									case 'enemy':
+									case 'immunityrole':
+									case 'weaponclass':
+										setAttrCharacteristic(debug, timer, value, rowID, setObj);
 									break;
 									default:
 										const isDefect = value[`${source}_attribute`] == 'defect' ?

@@ -364,12 +364,12 @@ NONWEAPON_PROFICIENCIES_TABLE['Gaming'].push({
     'classes': 'Rogue/Warrior',
     'book': ['PHB']
 });
-NONWEAPON_PROFICIENCIES_TABLE['Gem-Cutting'] = [];
-NONWEAPON_PROFICIENCIES_TABLE['Gem-Cutting'].push({
+NONWEAPON_PROFICIENCIES_TABLE['Gem Cutting'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Gem Cutting'].push({
     'slots': 2,
     'abilityScore': '@{Dexterity}',
     'modifier': -2,
-    'classes': 'Rogue/Wizard',
+    'classes': 'Rogue/Wizard/Psionicist',
     'book': ['PHB']
 });
 NONWEAPON_PROFICIENCIES_TABLE['Healing'] = [];
@@ -441,7 +441,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Musical Instrument'].push({
     'slots': 1,
     'abilityScore': '@{Dexterity}',
     'modifier': -1,
-    'classes': 'Priest/Rogue',
+    'classes': 'Priest/Rogue/Psionicist',
     'book': ['PHB']
 });
 NONWEAPON_PROFICIENCIES_TABLE['Navigation'] = [];
@@ -465,7 +465,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Reading/Writing'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
     'modifier': +1,
-    'classes': 'Priest/Wizard',
+    'classes': 'Priest/Wizard/Psionicist',
     'book': ['PHB']
 });
 NONWEAPON_PROFICIENCIES_TABLE['Religion'] = [];
@@ -473,7 +473,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Religion'].push({
     'slots': 1,
     'abilityScore': '@{Wisdom}',
     'modifier': 0,
-    'classes': 'Priest/Wizard',
+    'classes': 'Priest/Wizard/Psionicist',
     'book': ['PHB']
 });
 NONWEAPON_PROFICIENCIES_TABLE['Running'] = [];
@@ -654,6 +654,41 @@ NONWEAPON_PROFICIENCIES_TABLE['Voice Mimicry'].push({
     'modifier': '',
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids','The Complete Ninja\'s Handbook']
+});
+//#endregion
+
+//#region The Complete Psionics Handbook
+NONWEAPON_PROFICIENCIES_TABLE['Harness Subconscious'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Harness Subconscious'].push({
+    'slots': 2,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -1,
+    'classes': 'Psionicist',
+    'book': ['The Complete Psionics Handbook']
+});
+NONWEAPON_PROFICIENCIES_TABLE['Hypnosis'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Hypnosis'].push({
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': -2,
+    'classes': 'Psionicist',
+    'book': ['The Complete Psionics Handbook']
+});
+NONWEAPON_PROFICIENCIES_TABLE['Rejuvenation'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Rejuvenation'].push({
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': -1,
+    'classes': 'Psionicist',
+    'book': ['The Complete Psionics Handbook']
+});
+NONWEAPON_PROFICIENCIES_TABLE['Meditative Focus'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Meditative Focus'].push({
+    'slots': 1,
+    'abilityScore': '@{Wisdom}',
+    'modifier': +1,
+    'classes': 'Psionicist',
+    'book': ['The Complete Psionics Handbook']
 });
 //#endregion
 
