@@ -12407,6 +12407,9 @@
                     <div class="sheet-grid-melee-actions-label"><span>Attacke</span></div><!-- div needed to make the alignment over 2 columns work -->
                     <div class="sheet-grid-melee-actions-button">
                         <button name="AT" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-AT} {{name=Nahkampfangriff}} {{mod=[[0]]}} {{ansage=[[-1]]}} {{wert=[[@{AT_Aktiv}]]}} {{eff_wert=[[@{AT_Aktiv}]]}} {{wurf=[[1d20cs<@{cs_kampf_at}cf>@{cf_kampf_at}]]}} {{pruefwurf=[[1d20cs<@{cs_kampf_at}cf>@{cf_kampf_at}]]}}"> <span>Attacke</span></button>
+					<button type="action" name="act_k_attacke_waffe-action" class="sheet-default-hide"></button>
+					<input type="hidden" name="attr_k_attacke_waffe_action" value="">
+					<div class="sheet-talent-cell sheet-talent-name"><button type="roll" name="roll_k_attacke_waffe" value="@{k_attacke_waffe_action}"> <span>Attacke</span></button></div>
                     </div>
                     <button class="sheet-grid-melee-actions-button-mod" name="AT+-" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-AT} {{name=Nahkampfangriff}} {{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}]]}} {{ansage=[[-1]]}} {{wert=[[@{AT_Aktiv}]]}} {{eff_wert=[[[[@{AT_Aktiv}]] - (?{Erleichterung (−) oder Erschwernis (+)|0})]]}} {{wurf=[[1d20cs<@{cs_kampf_at}cf>@{cf_kampf_at}]]}} {{pruefwurf=[[1d20cs<@{cs_kampf_at}cf>@{cf_kampf_at}]]}}"> <span>+/−</span></button>
                     <button class="sheet-grid-melee-actions-button" name="Passierschlag" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-AT} {{name=Passierschlag}} {{mod=[[4]]}} {{ansage=[[-1]]}} {{wert=[[@{AT_Aktiv}]]}} {{eff_wert=[[[[@{AT_Aktiv}]] - 4]]}} {{wurf=[[1d20cs<@{cs_kampf_at}cf>@{cf_kampf_at}]]}} {{pruefwurf=[[1d20cs<@{cs_kampf_at}cf>@{cf_kampf_at}]]}}"> <span>Passierschlag</span></button>
@@ -13750,7 +13753,7 @@
 
 		<div class="sheet-hide">
 <button type="action" name="act_test">1W20-Kampfwurf</button>
-<button type="action" name="act_reacttest">Click me 2</button>
+<button type="action" name="act_combat_reaction">Click me 2</button>
 			<!-- Comfort Attributes (= to shorten rolls) -->
 			AT-Wert aus aktiver Waffe (bei Wahl mehrerer aktiver Waffen wird addiert!)
 			<!-- Berechnung AT Wert -->
@@ -14938,7 +14941,7 @@
 			<tr>
 				<td>
 					<div class="sheet-rolltemplate-button-outer">
-						<span class="sheet-rolltemplate-button-inner">[Bestätigungswurf](~{{characterid}}|reacttest||{{computed::passthrough}})</span>
+						<span class="sheet-rolltemplate-button-inner">[Bestätigungswurf](~{{characterid}}|combat_reaction||{{computed::passthrough}})</span>
 					</div>
 				</td>
 			</tr>
@@ -22660,45 +22663,187 @@ on('clicked:eidsegen-action', async (info) => {
 	);
 });
 
-on('clicked:test', (info) => {
-	startRoll(
-		"&{template:test} " +
-		"{{name=Kampfwurf, 1. Wurf}} " +
-		"{{taw=[[@{TaW_akrobatik}]]}} " +
-		"{{roll=[[1d20cs1cf20]]}} " +
-		"{{characterid=@{character_id}}} " +
-		"{{charactername=@{character_name}}} " +
-		"{{passthrough=[[0]]}}",
-		(results) => {
+on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " +
+	"&{template:test} " +
+	"{{name=Nahkampfangriff}} " +
+	"{{mod=[[0]]}} " +
+	"{{ansage=[[0]]}} " +
+	"{{wert=[[@{AT_Aktiv}]]}} " +
+	"{{roll=[[1d20cs<@{cs_kampf_at}cf>@{cf_kampf_at}]]}} " +
+	"{{msg=[[0]]}} " +
+	"{{result=[[0]]}} " +
+	"{{characterid=@{character_id}}} " +
+	"{{charactername=@{character_name}}} " +
+	"{{rollTime=[[0]]}} " +
+	"{{isConfirmationRoll=[[0]]}} " +
+	"{{confirmationRoll=[[0]]}} " +
+	"{{passthrough=[[0]]}}") => {
+	results = await startRoll(rollMacro);
+	var attrsToGet = [
+		'cs_kampf_at',
+		'cf_kampf_at'
+	];
+	var macroVars = {
+		'template': rollMacro.replace(/^.*\&\{template:([^}]+)\}.*$/, '$1'),
+		'name': rollMacro.replace(/^.*\{\{name=([^}]+)\}\}.*$/, '$1'),
+		'mod': parseInt(rollMacro.replace(/^.*\{\{mod=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
+		'ansage': parseInt(rollMacro.replace(/^.*\{\{ansage=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
+		'wert': rollMacro.replace(/^.*\{\{wert=\[\[([^\]]+)\]\]\}\}.*$/, '$1'),
+		'roll': rollMacro.replace(/^.*\{\{roll=\[\[([^\]]+)\]\]\}\}.*$/, '$1'),
+		'msg': parseInt(rollMacro.replace(/^.*\{\{msg=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
+		'result': parseInt(rollMacro.replace(/^.*\{\{result=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
+		'characterid': rollMacro.replace(/^.*\{\{characterid=([^\}]+\})\}\}.*$/, '$1'),
+		'charactername': rollMacro.replace(/^.*\{\{charactername=([^\}]+\})\}\}.*$/, '$1'),
+		'rollTime': rollMacro.replace(/^.*\{\{rollID1=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
+		'isConfirmationRoll': rollMacro.replace(/^.*\{\{isConfirmationRoll=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
+		'confirmationRoll': rollMacro.replace(/^.*\{\{confirmationRoll=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
+		'passthrough': rollMacro.replace(/^.*\{\{passthrough=\[\[([^}]+)\]\]\}\}.*$/, '$1')
+	}
+
+	safeGetAttrs(attrsToGet,
+		function(v, missing, badDef)
+		{
+			debugLog("values/missing/badDef", v, missing, badDef, "macroVars", macroVars);
 			console.log("test: info:", info, "results:", results);
-			rolls = results.results.roll.rolls[0].results;
-			console.log(rolls);
+			var wert = results.results.wert.result;
+			var roll = results.results.roll.rolls[0].results[0];
+			var mod = macroVars["mod"];
+			var ansage = macroVars["ansage"];
+			var msg = macroVars["msg"];
+			var result = macroVars["result"];
+			var confirmationRoll = macroVars["confirmationRoll"];
+			var passthrough = {};
+			var cs = parseInt(v["cs_kampf_at"]);
+			var cf = parseInt(v["cf_kampf_at"]);
+
+			var effWert = wert - mod - ansage;
+			// TODO: Aktive Kampftechnik abfragen/nutzen, um WdS, S. 59 zu erfüllen
+			// komplette _Ansage_ darf nicht höher als Kampftechnik-TaW und AT-Wert der aktiven Waffe (das jeweils niedrigere gilt)
+			if (ansage > 0 && wert < ansage) {
+				msg = 1;
+			}
+
+			// Auswertung des Wurfs
+			if (roll >= cf) {
+				result = -2;
+				confirmationRoll = 1;
+			} else if (roll > effWert) {
+				result = -1;
+			} else if (roll <= cs) {
+				result = 2;
+				confirmationRoll = 1;
+			} else {
+				result = 1;
+			}
+
+			if (confirmationRoll === 1) {
+				passthrough["rollTime"] = Date.now();
+				passthrough["name"] = macroVars["name"];
+				passthrough["wert"] = wert;
+				passthrough["effWert"] = effWert;
+				passthrough["mod"] = mod;
+				passthrough["ansage"] = ansage;
+				passthrough["roll"] = macroVars["roll"];
+				passthrough["result"] = result;
+				passthrough["cs"] = cs;
+				passthrough["cf"] = cf;
+				passthrough["isConfirmationRoll"] = 1;
+				passthrough["rollMacro"] =
+					"@{gm_roll_opt} " +
+					"&{template:test} " +
+					"{{name=Nahkampfangriff}} " +
+					"{{mod=[[" + mod + "]]}} " +
+					"{{ansage=[[" + ansage + "]]}} " +
+					"{{wert=[[" + wert + "]]}} " +
+					"{{roll=[[" + macroVars["roll"] + "]]}} " +
+					"{{msg=[[0]]}} " +
+					"{{result=[[0]]}} " +
+					"{{isConfirmationRoll=[[1]]}} " +
+					"{{rollTime=[[0]]}} " +
+					"{{rollExpired=[[0]]}} " +
+					"{{rollTimeHuman=[[0]]}}";
+				console.log(passthrough);
+			}
 
 			finishRoll(
 				results.rollId,
 				{
-					originator: "Testo"
+					confirmationRoll: confirmationRoll,
+					msg: msg,
+					result: result,
+					rollTime: passthrough["rollTime"],
+					passthrough: packObject(passthrough)
 				}
 			);
 		}
 	);
 });
 
-on('clicked:reacttest', (info) => {
-	startRoll(
-		"&{template:test} " +
-		"{{name=Kampfwurf, 2. Wurf}} " +
-		"{{taw=[[@{TaW_akrobatik}]]}} " +
-		"{{roll=[[1d20cs1cf20]]}} " +
-		"{{characterid=@{character_id}}} " +
-		"{{charactername=@{character_name}}} " +
-		"{{passthrough=[[0]]}}",
-		(results) => {
-			console.log("test: info:", info, "results:", results);
-			roll = results.results.roll.result;
-			taw = results.results.taw.result;
+on('clicked:combat_reaction', async (info) => {
+	var received = unpackObject(info["originalRollId"]);
 
-			finishRoll(results.rollId);
+	/*
+	Timing Check
+	People may try to cheat by reacting to an old roll
+	*/
+	var rollTime = 0;
+	results = await startRoll(received["rollMacro"]);
+	console.log("test: info:", info, "results:", results, "received:", received);
+
+	// Time for triggering reaction before warning appears, in milliseconds
+	var reactionTimeLimit = 15 * 60 * 1000;
+	// One minute consists of 60 seconds of 1000 milliseconds each
+	const minute = 60 * 1000;
+
+	var timeDifference = Date.now() - received["rollTime"];
+
+	if (timeDifference < 0) {
+		console.log("Fishy time difference for roll and reaction roll gotten.", received);
+		rollTime = -1
+	} else if (timeDifference > reactionTimeLimit) {
+		rollTime = 1;
+	}
+
+	var roll = results.results.roll.result;
+	var originalResult = received["result"];
+	var wert = received["wert"];
+	var mod = received["mod"];
+	var ansage = received["ansage"];
+	var effWert = received["effWert"];
+	var msg = 0;
+	var result = 0;
+	var isConfirmationRoll = received["isConfirmationRoll"];
+	var cs = received["cs"];
+	var cf = received["cf"];
+
+	// TODO: Aktive Kampftechnik abfragen/nutzen, um WdS, S. 59 zu erfüllen
+	// komplette _Ansage_ darf nicht höher als Kampftechnik-TaW und AT-Wert der aktiven Waffe (das jeweils niedrigere gilt)
+	if (ansage > 0 && wert < ansage) {
+		msg = 1;
+	}
+
+	// Auswertung des Wurfs
+	if (originalResult === -2) {
+		if (roll >= cf || roll > effWert) {
+			result = -3;
+		} else {
+			result = -2;
+		}
+	} else if (originalResult === 2) {
+		if (roll >= cf || roll > effWert) {
+			result = 2;
+		} else {
+			result = 3;
+		}
+	}
+	finishRoll(
+		results.rollId,
+		{
+			msg: msg,
+			result: result,
+			rollExpired: rollTime,
+			rollTime: received["rollTime"], // original roll's time
+			rollTimeHuman: Math.floor(timeDifference / minute)
 		}
 	);
 });
