@@ -14892,34 +14892,94 @@
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-test">
-    <div class="sheet-template-container">
-        <div class="sheet-results">
-					<table>
-						<tr>
-							<th>{{name}}</th>
-						</tr>
-						<tr>
-							<td>Character ID: {{characterid}}</td>
-						</tr>
-						<tr>
-							<td>Character Name: {{charactername}}</td>
-						</tr>
-						<tr>
-							<td>Wert: {{taw}}</td>
-						</tr>
-						<tr>
-							<td>Wurf: {{roll}}</td>
-						</tr>
-						<tr>
-							<td>
-        				<div class="sheet-rolltemplate-button-outer">
-									<span class="sheet-rolltemplate-button-inner">[ZWEITA BATTEN](~{{characterid}}|reacttest||{{computed::passthrough}})</span>
-								</div>
-							</td>
-						</tr>
-					</table>
-        </div>
-    </div>
+<div class="sheet-template-container">
+	<div class="sheet-results">
+		<table>
+			<tr>
+				<th>{{name}}{{#rollTotal() computed::isConfirmationRoll 1}} (Bestätigungswurf){{/rollTotal() computed::isConfirmationRoll 1}}</th>
+			</tr>
+			<tr>
+				<td>Charakter: {{charactername}}</td>
+			</tr>
+			<tr>
+				<td>Wert: {{wert}}</td>
+			</tr>
+			<tr>
+				<td>Nachricht: {{computed::msg}}</td>
+			</tr>
+			<tr>
+				<td>Ergebnis: {{computed::result}}</td>
+			</tr>
+			<tr>
+				<td>Würfelergebnis: {{roll}}</td>
+			</tr>
+{{#rollTotal() computed::isConfirmationRoll 0}}
+		{{#rollTotal() computed::result -2}}
+			<tr>
+				<td>Ergebnis: Kritisch misslungen! Bestätigungswurf nötig.</td>
+			</tr>
+		{{/rollTotal() computed::result -2}}
+		{{#rollTotal() computed::result -1}}
+			<tr>
+				<td>Ergebnis: Misslungen!</td>
+			</tr>
+		{{/rollTotal() computed::result -1}}
+		{{#rollTotal() computed::result 1}}
+			<tr>
+				<td>Ergebnis: Gelungen!</td>
+			</tr>
+		{{/rollTotal() computed::result 1}}
+		{{#rollTotal() computed::result 2}}
+			<tr>
+				<td>Ergebnis: Kritisch gelungen! Bestätigungswurf nötig.</td>
+			</tr>
+		{{/rollTotal() computed::result 2}}
+		{{#rollGreater() computed::confirmationRoll 0}}
+			<tr>
+				<td>
+					<div class="sheet-rolltemplate-button-outer">
+						<span class="sheet-rolltemplate-button-inner">[Bestätigungswurf](~{{characterid}}|reacttest||{{computed::passthrough}})</span>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>Wurfnummer: {{computed::rollTime}}</td>
+			</tr>
+		{{/rollGreater() computed::confirmationRoll 0}}
+{{/rollTotal() computed::isConfirmationRoll 0}}
+{{#rollTotal() computed::isConfirmationRoll 1}}
+		{{#rollTotal() computed::result -3}}
+			<tr>
+				<td>Ergebnis: Kritisch misslungen und bestätigt!</td>
+			</tr>
+		{{/rollTotal() computed::result -3}}
+		{{#rollTotal() computed::result -2}}
+			<tr>
+				<td>Ergebnis: Kritisch misslungen und nicht bestätigt!</td>
+			</tr>
+		{{/rollTotal() computed::result -2}}
+		{{#rollTotal() computed::result 2}}
+			<tr>
+				<td>Ergebnis: Kritisch gelungen und nicht bestätigt!</td>
+			</tr>
+		{{/rollTotal() computed::result 2}}
+		{{#rollTotal() computed::result 3}}
+			<tr>
+				<td>Ergebnis: Kritisch gelungen und bestätigt!</td>
+			</tr>
+		{{/rollTotal() computed::result 3}}
+		{{#rollGreater() computed::rollExpired 0}}
+			<tr>
+				<td>Zwischen dieser Reaktion und dem Ursprungswurf liegt eine lange Zeit (mindestens {{computed::rollTimeHuman}}&nbsp;min). Bitte sicherstellen, dass der richtige Reaktionsknopf benutzt wurde.</td>
+			</tr>
+		{{/rollGreater() computed::rollExpired 0}}
+			<tr>
+				<td>Wurfnummer des Ursprungswurfs: {{computed::rollTime}}</td>
+			</tr>
+{{/rollTotal() computed::isConfirmationRoll 1}}
+		</table>
+	</div>
+</div>
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-DSA-Talente">
