@@ -13754,6 +13754,7 @@
 		<div class="sheet-hide">
 <button type="action" name="act_test">1W20-Kampfwurf</button>
 <button type="action" name="act_combat_reaction">Click me 2</button>
+<button type="action" name="act_patzer">Click me 3</button>
 			<!-- Comfort Attributes (= to shorten rolls) -->
 			AT-Wert aus aktiver Waffe (bei Wahl mehrerer aktiver Waffen wird addiert!)
 			<!-- Berechnung AT Wert -->
@@ -14953,8 +14954,14 @@
 {{#rollTotal() computed::isConfirmationRoll 1}}
 		{{#rollTotal() computed::result -3}}
 			<tr>
-				<td>Ergebnis: Kritisch misslungen und bestätigt!</td>
+				<td>Ergebnis: Kritisch misslungen und bestätigt! Auswirkung auswürfeln.</td>
 			</tr>
+			<tr>
+				<td>
+					<div class="sheet-rolltemplate-button-outer">
+						<span class="sheet-rolltemplate-button-inner">[Patzer](~{{characterid}}|patzer||{{computed::passthrough}})</span>
+					</div>
+				</td>
 		{{/rollTotal() computed::result -3}}
 		{{#rollTotal() computed::result -2}}
 			<tr>
@@ -22679,10 +22686,6 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 	"{{confirmationRoll=[[0]]}} " +
 	"{{passthrough=[[0]]}}") => {
 	results = await startRoll(rollMacro);
-	var attrsToGet = [
-		'cs_kampf_at',
-		'cf_kampf_at'
-	];
 	var macroVars = {
 		'template': rollMacro.replace(/^.*\&\{template:([^}]+)\}.*$/, '$1'),
 		'name': rollMacro.replace(/^.*\{\{name=([^}]+)\}\}.*$/, '$1'),
@@ -22699,6 +22702,12 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 		'confirmationRoll': rollMacro.replace(/^.*\{\{confirmationRoll=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
 		'passthrough': rollMacro.replace(/^.*\{\{passthrough=\[\[([^}]+)\]\]\}\}.*$/, '$1')
 	}
+	var attrsToGet = [
+		'character_id',
+		'character_name',
+		'cs_kampf_at',
+		'cf_kampf_at'
+	];
 
 	safeGetAttrs(attrsToGet,
 		function(v, missing, badDef)
@@ -22757,11 +22766,14 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 					"{{wert=[[" + wert + "]]}} " +
 					"{{roll=[[" + macroVars["roll"] + "]]}} " +
 					"{{msg=[[0]]}} " +
+					"{{characterid=" + v["character_id"] + "}} " +
+					"{{charactername=" + v["character_name"] + "}} " +
 					"{{result=[[0]]}} " +
 					"{{isConfirmationRoll=[[1]]}} " +
 					"{{rollTime=[[0]]}} " +
 					"{{rollExpired=[[0]]}} " +
-					"{{rollTimeHuman=[[0]]}}";
+					"{{rollTimeHuman=[[0]]}} " +
+					"{{passthrough=[[0]]}}";
 				console.log(passthrough);
 			}
 
@@ -22815,6 +22827,7 @@ on('clicked:combat_reaction', async (info) => {
 	var isConfirmationRoll = received["isConfirmationRoll"];
 	var cs = received["cs"];
 	var cf = received["cf"];
+	var passthrough = {};
 
 	// TODO: Aktive Kampftechnik abfragen/nutzen, um WdS, S. 59 zu erfüllen
 	// komplette _Ansage_ darf nicht höher als Kampftechnik-TaW und AT-Wert der aktiven Waffe (das jeweils niedrigere gilt)
@@ -22826,6 +22839,17 @@ on('clicked:combat_reaction', async (info) => {
 	if (originalResult === -2) {
 		if (roll >= cf || roll > effWert) {
 			result = -3;
+			passthrough["rollTime"] = received["rollTime"];
+			passthrough["rollMacro"] =
+					"@{gm_roll_opt} " +
+					"&{template:DSA-Nahkampf-Patzer} " +
+					"{{name=Nahkampfangriffspatzer}} " +
+					"{{wurf=[[2d6cs1cf6]]}} " +
+					"{{rollTime=[[0]]}} " +
+					"{{rollExpired=[[0]]}} " +
+					"{{rollTimeHuman=[[0]]}} " +
+					"{{passthrough=[[0]]}}";
+			console.log(passthrough);
 		} else {
 			result = -2;
 		}
@@ -22841,6 +22865,42 @@ on('clicked:combat_reaction', async (info) => {
 		{
 			msg: msg,
 			result: result,
+			rollExpired: rollTime,
+			rollTime: received["rollTime"], // original roll's time
+			rollTimeHuman: Math.floor(timeDifference / minute),
+			passthrough: packObject(passthrough)
+		}
+	);
+});
+
+on('clicked:patzer', async (info) => {
+	var received = unpackObject(info["originalRollId"]);
+
+	/*
+	Timing Check
+	People may try to cheat by reacting to an old roll
+	*/
+	var rollTime = 0;
+	results = await startRoll(received["rollMacro"]);
+	console.log("test: info:", info, "results:", results, "received:", received);
+
+	// Time for triggering reaction before warning appears, in milliseconds
+	var reactionTimeLimit = 15 * 60 * 1000;
+	// One minute consists of 60 seconds of 1000 milliseconds each
+	const minute = 60 * 1000;
+
+	var timeDifference = Date.now() - received["rollTime"];
+
+	if (timeDifference < 0) {
+		console.log("Fishy time difference for roll and reaction roll gotten.", received);
+		rollTime = -1
+	} else if (timeDifference > reactionTimeLimit) {
+		rollTime = 1;
+	}
+
+	finishRoll(
+		results.rollId,
+		{
 			rollExpired: rollTime,
 			rollTime: received["rollTime"], // original roll's time
 			rollTimeHuman: Math.floor(timeDifference / minute)
