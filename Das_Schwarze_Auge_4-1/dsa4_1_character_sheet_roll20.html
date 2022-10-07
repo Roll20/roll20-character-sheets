@@ -14947,7 +14947,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Wurfnummer: {{computed::rollTime}}</td>
+				<td>Wurfkennung: {{computed::rollTag}}</td>
 			</tr>
 		{{/rollGreater() computed::confirmationRoll 0}}
 {{/rollTotal() computed::isConfirmationRoll 0}}
@@ -14984,7 +14984,7 @@
 			</tr>
 		{{/rollGreater() computed::rollExpired 0}}
 			<tr>
-				<td>Wurfnummer des Ursprungswurfs: {{computed::rollTime}}</td>
+				<td>Wurfkennung des Ursprungswurfs: {{computed::rollTag}}</td>
 			</tr>
 {{/rollTotal() computed::isConfirmationRoll 1}}
 		</table>
@@ -22839,7 +22839,7 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 	"{{result=[[0]]}} " +
 	"{{characterid=@{character_id}}} " +
 	"{{charactername=@{character_name}}} " +
-	"{{rollTime=[[0]]}} " +
+	"{{rollTag=[[0]]}} " +
 	"{{isConfirmationRoll=[[0]]}} " +
 	"{{confirmationRoll=[[0]]}} " +
 	"{{passthrough=[[0]]}}") => {
@@ -22855,7 +22855,7 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 		'result': parseInt(rollMacro.replace(/^.*\{\{result=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
 		'characterid': rollMacro.replace(/^.*\{\{characterid=([^\}]+\})\}\}.*$/, '$1'),
 		'charactername': rollMacro.replace(/^.*\{\{charactername=([^\}]+\})\}\}.*$/, '$1'),
-		'rollTime': rollMacro.replace(/^.*\{\{rollID1=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
+		'rollTag': rollMacro.replace(/^.*\{\{rollTag=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
 		'isConfirmationRoll': rollMacro.replace(/^.*\{\{isConfirmationRoll=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
 		'confirmationRoll': rollMacro.replace(/^.*\{\{confirmationRoll=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
 		'passthrough': rollMacro.replace(/^.*\{\{passthrough=\[\[([^}]+)\]\]\}\}.*$/, '$1')
@@ -22905,6 +22905,7 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 
 			if (confirmationRoll === 1) {
 				passthrough["rollTime"] = Date.now();
+				passthrough["rollTag"] = generateShortRollTag(passthrough["rollTime"]);
 				passthrough["name"] = macroVars["name"];
 				passthrough["wert"] = wert;
 				passthrough["effWert"] = effWert;
@@ -22928,6 +22929,7 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 					"{{charactername=" + v["character_name"] + "}} " +
 					"{{result=[[0]]}} " +
 					"{{isConfirmationRoll=[[1]]}} " +
+					"{{rollTag=[[0]]}} " +
 					"{{rollTime=[[0]]}} " +
 					"{{rollExpired=[[0]]}} " +
 					"{{rollTimeHuman=[[0]]}} " +
@@ -22941,7 +22943,7 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 					confirmationRoll: confirmationRoll,
 					msg: msg,
 					result: result,
-					rollTime: passthrough["rollTime"],
+					rollTag: passthrough["rollTag"],
 					passthrough: packObject(passthrough)
 				}
 			);
@@ -22998,11 +23000,13 @@ on('clicked:combat_reaction', async (info) => {
 		if (roll >= cf || roll > effWert) {
 			result = -3;
 			passthrough["rollTime"] = received["rollTime"];
+			passthrough["rollTag"] = received["rollTag"];
 			passthrough["rollMacro"] =
 					"@{gm_roll_opt} " +
 					"&{template:DSA-Nahkampf-Patzer} " +
 					"{{name=Nahkampfangriffspatzer}} " +
 					"{{wurf=[[2d6cs1cf6]]}} " +
+					"{{rollTag=[[0]]}} " +
 					"{{rollTime=[[0]]}} " +
 					"{{rollExpired=[[0]]}} " +
 					"{{rollTimeHuman=[[0]]}} " +
@@ -23024,6 +23028,7 @@ on('clicked:combat_reaction', async (info) => {
 			msg: msg,
 			result: result,
 			rollExpired: rollTime,
+			rollTag: received["rollTag"], // original roll's tag
 			rollTime: received["rollTime"], // original roll's time
 			rollTimeHuman: Math.floor(timeDifference / minute),
 			passthrough: packObject(passthrough)
@@ -23060,6 +23065,7 @@ on('clicked:patzer', async (info) => {
 		results.rollId,
 		{
 			rollExpired: rollTime,
+			rollTag: received["rollTag"], // original roll's tag
 			rollTime: received["rollTime"], // original roll's time
 			rollTimeHuman: Math.floor(timeDifference / minute)
 		}
