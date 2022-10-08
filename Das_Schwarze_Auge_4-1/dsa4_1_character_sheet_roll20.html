@@ -19161,7 +19161,9 @@ function calculateCombatValues() {
             // didn't find an active weapon. setting values to 0;
             attrsToChange = {
                 "AT_Aktiv": 0,
+                "AT_Aktiv_typ": "0",
                 "PA_Aktiv": 0,
+                "PA_Aktiv_typ": "0",
                 "shield_pa": 0,
                 "parryweapon_pa": 0,
                 "shield_pa_available": "0",
@@ -19214,19 +19216,17 @@ function calculateCombatValues() {
             let tpkkMod = parseInt(values["NKW" + weapon + "_SB"]);
 
             // Berechne Waffen-AT
-            var attackType = values["NKW_AT_typ" + weapon];
-            // Wir berechnen den AT Wert nur, wenn ein Talenttyp für den AT Wert der Waffe ausgewählt ist
-            if (attackType && attackType !== "0") {
-                var baseAttack = parseInt(values[attackType.match("@{(.*)}")[1]]);
-                // Es gibt einige Attribute wo das Naming unterschiedlich ist, was bei Auto Calculating Fields nicht zu Fehlern führt aber hier. Daher im Zweifelsfall mit Lower-Case Namen nochmal probieren
-                if (!baseAttack) {
-                    var matchResult = attackType.match("@{AT_([A-Za-z])(.*)}");
-                    var attributeName = "AT_" + matchResult[1].toLowerCase() + matchResult[2];
-                    baseAttack = parseInt(values[attributeName]);
-                }
+            var ATkampftechnikRaw = values["NKW_AT_typ" + weapon];
+            // AT-Wert nur berechenbar, wenn dahinterstehende Kampftechnik bekannt
+            if (ATkampftechnikRaw && ATkampftechnikRaw !== "0") {
+				var AT = 0;
+				var ATkampftechnik = ATkampftechnikRaw.match("@{(AT_)(.*)}");
+				ATkampftechnik = ATkampftechnik[1] + ATkampftechnik[2].toLowerCase();
+				AT = parseInt(values[ATkampftechnik]);
+
                 var atMod = parseInt(values["NKW" + weapon +"ATMod"]);
                 var spec = parseInt(values["NKW" + weapon + "_Spez"]);
-                var atValue = baseAttack + atMod + spec + (values.AT_mod_wounds || 0);
+                var atValue = AT + atMod + spec + (values.AT_mod_wounds || 0);
                 // bei aktivem Schild (nicht bei Parierwaffen), wird der AT Wert der Hauptwaffe um den AT-Mod des Schildes verändert
                 if (activeShieldRowId && values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
                     atValue = atValue + parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
@@ -19234,28 +19234,29 @@ function calculateCombatValues() {
                 if (values["be_at_mod"]) {
                     atValue -= parseInt(values["be_at_mod"]);
                 }
+
+				// Negative TP/KK reduziert auch AT
                 if (tpkkMod && tpkkMod < 0) {
                     atValue += tpkkMod;
                 }
                 attrsToChange["AT_Aktiv"] = Math.max(0, atValue);
+                attrsToChange["AT_Aktiv_typ"] = ATkampftechnik;
             }
 
             // Berechne Waffen-PA
-            var paType = values["NKW_PA_typ" + weapon];
+            var PAkampftechnikRaw = values["NKW_PA_typ" + weapon];
             var paValue = 0;
             // Wir berechnen den PA Wert nur, wenn ein Talenttyp für den PA Wert der Waffe ausgewählt ist
-            if (paType && paType !== "0" ) {
-                var basePa = parseInt(values[paType.match("@{(.*)}")[1]]);
-                // Siehe oben
-                if (!basePa) {
-                    var matchResult = paType.match("@{PA_([A-Za-z])(.*)}");
-                    var attributeName = "PA_" + matchResult[1].toLowerCase() + matchResult[2];
-                    basePa = parseInt(values[attributeName]);
-                }
+            if (PAkampftechnikRaw && PAkampftechnikRaw !== "0" ) {
+				var PA = 0;
+				var PAkampftechnik = PAkampftechnikRaw.match("@{(PA_)(.*)}");
+				PAkampftechnik = PAkampftechnik[1] + PAkampftechnik[2].toLowerCase();
+				PA = parseInt(values[PAkampftechnik]);
+
                 var paMod = parseInt(values["NKW" + weapon +"PAMod"]);
                 var spec = parseInt(values["NKW" + weapon + "_Spez"]);
                 var wounds = isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds'];
-                paValue = basePa + paMod + spec + wounds;
+                paValue = PA + paMod + spec + wounds;
 
                 if (values["be_pa_mod"]) {
                     paValue -= parseInt(values["be_pa_mod"]);
@@ -19268,6 +19269,7 @@ function calculateCombatValues() {
                     paValue += tpkkMod;
                 }
                 attrsToChange["PA_Aktiv"] = Math.max(0, paValue);
+                attrsToChange["PA_Aktiv_typ"] = PAkampftechnik;
             }
 
             // Berechne Schild-PA Wert
@@ -20298,6 +20300,7 @@ const defaultValues = {
 	// Combat
 	/// Melee AT Values
 	"AT_Aktiv": 5,
+	"AT_Aktiv_typ": "0",
 	"atbasis": 5,
 
 	"AT_Anderthalbhander": 5,
@@ -20321,6 +20324,7 @@ const defaultValues = {
 
 	/// Melee PA Values
 	"PA_Aktiv": 5,
+	"PA_Aktiv_typ": "0",
 	"pabasis": 5,
 
 	"PA_Anderthalbhander": 5,
