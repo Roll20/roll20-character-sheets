@@ -18190,6 +18190,7 @@ Relevant character sheet versions
 * 20220116: New roll buttons
 * 20220604: Visibili Vanitar spelling fixes
 * 20220821: Sheet Initialization
+* 20229999: Confirmation/Reaction Buttons
 */
 function migrationCheck() {
     safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
@@ -18289,7 +18290,8 @@ var versionsWithMigrations = [
     20211010,
     20220116,
     20220604,
-    20220821
+    20220821,
+    20229999
 ];
 
 function initializeSheet(migrationChain) {
@@ -18313,11 +18315,11 @@ function initializeSheet(migrationChain) {
 
 		// Combat
 		/// Melee AT Values
-		"AT_Aktiv", "atbasis",
+		"AT_Aktiv", "AT_Aktiv_typ", "atbasis",
 		"AT_Anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter",
 
 		/// Melee PA Values
-		"PA_Aktiv", "pabasis",
+		"PA_Aktiv", "PA_Aktiv_typ", "pabasis",
 		"PA_Anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
 
 		/// Melee other
@@ -19047,6 +19049,20 @@ function migrateTo20220821(migrationChain) {
 	debugLog(caller, "Invoked.");
 
 	var attrsToChange = { "sheet_initialized": true };
+	safeSetAttrs(attrsToChange, {}, function(){
+		callNextMigration(migrationChain);
+	});
+}
+
+/*
+	Migration steps:
+	- Initialize attributes "AT_Aktiv_typ", "PA_Aktiv_typ"
+*/
+function migrateTo20229999(migrationChain) {
+	var caller = "migrateTo20229999";
+	debugLog(caller, "Invoked.");
+
+	var attrsToChange =	{ "AT_Aktiv_typ": "0", "PA_Aktiv_typ": "0" };
 	safeSetAttrs(attrsToChange, {}, function(){
 		callNextMigration(migrationChain);
 	});
