@@ -18315,11 +18315,11 @@ function initializeSheet(migrationChain) {
 
 		// Combat
 		/// Melee AT Values
-		"AT_Aktiv", "AT_Aktiv_typ", "atbasis",
+		"AT_Aktiv", "AT_Aktiv_TaW", "atbasis",
 		"AT_Anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter",
 
 		/// Melee PA Values
-		"PA_Aktiv", "PA_Aktiv_typ", "pabasis",
+		"PA_Aktiv", "PA_Aktiv_TaW", "pabasis",
 		"PA_Anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
 
 		/// Melee other
@@ -19056,13 +19056,13 @@ function migrateTo20220821(migrationChain) {
 
 /*
 	Migration steps:
-	- Initialize attributes "AT_Aktiv_typ", "PA_Aktiv_typ"
+	- Initialize attributes "AT_Aktiv_TaW", "PA_Aktiv_TaW"
 */
 function migrateTo20229999(migrationChain) {
 	var caller = "migrateTo20229999";
 	debugLog(caller, "Invoked.");
 
-	var attrsToChange =	{ "AT_Aktiv_typ": "0", "PA_Aktiv_typ": "0" };
+	var attrsToChange =	{ "AT_Aktiv_TaW": "0", "PA_Aktiv_TaW": "0" };
 	safeSetAttrs(attrsToChange, {}, function(){
 		callNextMigration(migrationChain);
 	});
@@ -19147,7 +19147,14 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
 // Berechnet den Gesamt-AT-Wert inklusive Modifikation durch ein eventuell verwendetes Schild
 // sowie den PA Wert sowohl für die aktive Waffe, als auch für die Schildparade
 // Not working: Peitsche
-on("change:pabasis " +
+on(
+"change:taw_anderthalbhander change:taw_dolche change:taw_fechtwaffen " +
+"change:taw_hiebwaffen change:taw_infanteriewaffen change:taw_kettenstabe " +
+"change:taw_kettenwaffen change:taw_lanzenreiten change:taw_peitsche " +
+"change:taw_raufen change:taw_ringen change:taw_sabel change:taw_schwerter " +
+"change:taw_speere change:taw_stabe change:taw_zweihandflegel " +
+"change:taw_zweihand-hiebwaffen change:taw_zweihandschwerter " +
+"change:pabasis " +
 "change:nkw_at_typ1 change:nkw1atmod change:nkw_pa_typ1 change:nkw1pamod change:inimodnkw1 change:nkw1_spez change:nkw_aktiv1 change:nkw1_sb " +
 "change:nkw_at_typ2 change:nkw2atmod change:nkw_pa_typ2 change:nkw2pamod change:inimodnkw2 change:nkw2_spez change:nkw_aktiv2 change:nkw2_sb " +
 "change:nkw_at_typ3 change:nkw3atmod change:nkw_pa_typ3 change:nkw3pamod change:inimodnkw3 change:nkw3_spez change:nkw_aktiv3 change:nkw3_sb " +
@@ -19177,9 +19184,9 @@ function calculateCombatValues() {
             // didn't find an active weapon. setting values to 0;
             attrsToChange = {
                 "AT_Aktiv": 0,
-                "AT_Aktiv_typ": "0",
+                "AT_Aktiv_TaW": "0",
                 "PA_Aktiv": 0,
-                "PA_Aktiv_typ": "0",
+                "PA_Aktiv_TaW": "0",
                 "shield_pa": 0,
                 "parryweapon_pa": 0,
                 "shield_pa_available": "0",
@@ -19194,11 +19201,14 @@ function calculateCombatValues() {
         	"NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod",
         	"INIModNKW" + weapon,
         	"NKW" + weapon + "_Spez", "NKW" + weapon + "_SB",
-            "AT_Anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", 
+            "TaW_anderthalbhander", "TaW_dolche", "TaW_fechtwaffen", "TaW_hiebwaffen",
+            "TaW_infanteriewaffen", "TaW_kettenstabe", "TaW_kettenwaffen", "TaW_lanzenreiten", "TaW_peitsche", "TaW_raufen", "TaW_ringen", "TaW_sabel",
+            "TaW_schwerter", "TaW_speere", "TaW_stabe", "TaW_zweihandflegel", "TaW_zweihand-hiebwaffen", "TaW_zweihandschwerter",
+            "AT_anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen",
             "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", 
             "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter", 
             "AT_mod_wounds",
-            "PA_Anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", 
+            "PA_anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen",
             "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", 
             "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
             "PA_mod_wounds",
@@ -19236,9 +19246,21 @@ function calculateCombatValues() {
             // AT-Wert nur berechenbar, wenn dahinterstehende Kampftechnik bekannt
             if (ATkampftechnikRaw && ATkampftechnikRaw !== "0") {
 				var AT = 0;
-				var ATkampftechnik = ATkampftechnikRaw.match("@{(AT_)(.*)}");
-				ATkampftechnik = ATkampftechnik[1] + ATkampftechnik[2].toLowerCase();
-				AT = parseInt(values[ATkampftechnik]);
+				var taw = 0;
+				var ATkampftechnik = ATkampftechnikRaw.match("@{AT_(.*)}");
+
+				// Suche nach der richtigen Schreibweise des Attributnamens ...
+				// TODO: Attributbenennung vereinheitlichen (und dokumentieren)
+				taw = parseInt(values["TaW_" + ATkampftechnik[1]]);
+				if (isNaN(taw)) {
+					taw = parseInt(values["TaW_" + ATkampftechnik[1].toLowerCase()]);
+				}
+
+				// Das Gleiche nochmal für den AT-Wert ...
+				AT = parseInt(values["AT_" + ATkampftechnik[1]]);
+				if (isNaN(AT)) {
+					AT = parseInt(values["AT_" + ATkampftechnik[1].toLowerCase()]);
+				}
 
                 var atMod = parseInt(values["NKW" + weapon +"ATMod"]);
                 var spec = parseInt(values["NKW" + weapon + "_Spez"]);
@@ -19256,7 +19278,7 @@ function calculateCombatValues() {
                     atValue += tpkkMod;
                 }
                 attrsToChange["AT_Aktiv"] = Math.max(0, atValue);
-                attrsToChange["AT_Aktiv_typ"] = ATkampftechnik;
+                attrsToChange["AT_Aktiv_TaW"] = taw;
             }
 
             // Berechne Waffen-PA
@@ -19265,9 +19287,21 @@ function calculateCombatValues() {
             // Wir berechnen den PA Wert nur, wenn ein Talenttyp für den PA Wert der Waffe ausgewählt ist
             if (PAkampftechnikRaw && PAkampftechnikRaw !== "0" ) {
 				var PA = 0;
-				var PAkampftechnik = PAkampftechnikRaw.match("@{(PA_)(.*)}");
-				PAkampftechnik = PAkampftechnik[1] + PAkampftechnik[2].toLowerCase();
-				PA = parseInt(values[PAkampftechnik]);
+				var taw = 0;
+				var PAkampftechnik = PAkampftechnikRaw.match("@{PA_(.*)}");
+
+				// Suche nach der richtigen Schreibweise des Attributnamens ...
+				// TODO: Attributbenennung vereinheitlichen (und dokumentieren)
+				taw = parseInt(values["TaW_" + PAkampftechnik[1]]);
+				if (isNaN(taw)) {
+					taw = parseInt(values["TaW_" + PAkampftechnik[1].toLowerCase()]);
+				}
+
+				// Das Gleiche nochmal für den AT-Wert ...
+				PA = parseInt(values["PA_" + PAkampftechnik[1]]);
+				if (isNaN(PA)) {
+					PA = parseInt(values["PA_" + PAkampftechnik[1].toLowerCase()]);
+				}
 
                 var paMod = parseInt(values["NKW" + weapon +"PAMod"]);
                 var spec = parseInt(values["NKW" + weapon + "_Spez"]);
@@ -19285,7 +19319,7 @@ function calculateCombatValues() {
                     paValue += tpkkMod;
                 }
                 attrsToChange["PA_Aktiv"] = Math.max(0, paValue);
-                attrsToChange["PA_Aktiv_typ"] = PAkampftechnik;
+                attrsToChange["PA_Aktiv_TaW"] = taw;
             }
 
             // Berechne Schild-PA Wert
@@ -20316,7 +20350,7 @@ const defaultValues = {
 	// Combat
 	/// Melee AT Values
 	"AT_Aktiv": 5,
-	"AT_Aktiv_typ": "0",
+	"AT_Aktiv_TaW": "0",
 	"atbasis": 5,
 
 	"AT_Anderthalbhander": 5,
@@ -20340,7 +20374,7 @@ const defaultValues = {
 
 	/// Melee PA Values
 	"PA_Aktiv": 5,
-	"PA_Aktiv_typ": "0",
+	"PA_Aktiv_TaW": "0",
 	"pabasis": 5,
 
 	"PA_Anderthalbhander": 5,
