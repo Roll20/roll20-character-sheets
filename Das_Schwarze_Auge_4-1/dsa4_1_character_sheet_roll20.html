@@ -22884,21 +22884,23 @@ on('clicked:eidsegen-action', async (info) => {
 	);
 });
 
-on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " +
-	"&{template:test} " +
-	"{{name=Nahkampfangriff}} " +
-	"{{mod=[[0]]}} " +
-	"{{ansage=[[0]]}} " +
-	"{{wert=[[@{AT_Aktiv}]]}} " +
-	"{{roll=[[1d20cs<@{cs_kampf_at}cf>@{cf_kampf_at}]]}} " +
-	"{{msg=[[0]]}} " +
-	"{{result=[[0]]}} " +
-	"{{characterid=@{character_id}}} " +
-	"{{charactername=@{character_name}}} " +
-	"{{rollTag=[[0]]}} " +
-	"{{isConfirmationRoll=[[0]]}} " +
-	"{{confirmationRoll=[[0]]}} " +
-	"{{passthrough=[[0]]}}") => {
+on('clicked:k_attacke_waffe-action', async (info) => {
+	var rollMacro = "@{gm_roll_opt} " +
+		"&{template:test} " +
+		"{{name=Nahkampfangriff}} " +
+		"{{mod=[[0]]}} " +
+		"{{ansage=[[8]]}} " +
+		"{{wert=[[@{AT_Aktiv}]]}} " +
+		"{{taw=[[@{AT_Aktiv_TaW}]]}} " +
+		"{{roll=[[1d20cs<@{cs_kampf_at}cf>@{cf_kampf_at}]]}} " +
+		"{{msg=[[0]]}} " +
+		"{{result=[[0]]}} " +
+		"{{characterid=@{character_id}}} " +
+		"{{charactername=@{character_name}}} " +
+		"{{rollTag=[[0]]}} " +
+		"{{isConfirmationRoll=[[0]]}} " +
+		"{{confirmationRoll=[[0]]}} " +
+		"{{passthrough=[[0]]}}"
 	results = await startRoll(rollMacro);
 	var macroVars = {
 		'template': rollMacro.replace(/^.*\&\{template:([^}]+)\}.*$/, '$1'),
@@ -22906,12 +22908,14 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 		'mod': parseInt(rollMacro.replace(/^.*\{\{mod=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
 		'ansage': parseInt(rollMacro.replace(/^.*\{\{ansage=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
 		'wert': rollMacro.replace(/^.*\{\{wert=\[\[([^\]]+)\]\]\}\}.*$/, '$1'),
+		'taw': rollMacro.replace(/^.*\{\{taw=([^\}]+\})\}\}.*$/, '$1'),
 		'roll': rollMacro.replace(/^.*\{\{roll=\[\[([^\]]+)\]\]\}\}.*$/, '$1'),
 		'msg': parseInt(rollMacro.replace(/^.*\{\{msg=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
 		'result': parseInt(rollMacro.replace(/^.*\{\{result=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
 		'characterid': rollMacro.replace(/^.*\{\{characterid=([^\}]+\})\}\}.*$/, '$1'),
 		'charactername': rollMacro.replace(/^.*\{\{charactername=([^\}]+\})\}\}.*$/, '$1'),
 		'rollTag': rollMacro.replace(/^.*\{\{rollTag=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
+		'rollTime': rollMacro.replace(/^.*\{\{rollTime=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
 		'isConfirmationRoll': rollMacro.replace(/^.*\{\{isConfirmationRoll=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
 		'confirmationRoll': rollMacro.replace(/^.*\{\{confirmationRoll=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
 		'passthrough': rollMacro.replace(/^.*\{\{passthrough=\[\[([^}]+)\]\]\}\}.*$/, '$1')
@@ -22929,6 +22933,7 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 			debugLog("values/missing/badDef", v, missing, badDef, "macroVars", macroVars);
 			console.log("test: info:", info, "results:", results);
 			var wert = results.results.wert.result;
+			var taw = results.results.taw.result;
 			var roll = results.results.roll.rolls[0].results[0];
 			var mod = macroVars["mod"];
 			var ansage = macroVars["ansage"];
@@ -22940,9 +22945,13 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 			var cf = parseInt(v["cf_kampf_at"]);
 
 			var effWert = wert - mod - ansage;
-			// TODO: Aktive Kampftechnik abfragen/nutzen, um WdS, S. 59 zu erfüllen
 			// komplette _Ansage_ darf nicht höher als Kampftechnik-TaW und AT-Wert der aktiven Waffe (das jeweils niedrigere gilt)
-			if (ansage > 0 && wert < ansage) {
+			if (
+				ansage > 0 &&
+				(
+					wert < ansage || taw < ansage
+				)
+			) {
 				msg = 1;
 			}
 
@@ -22964,6 +22973,7 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 				passthrough["rollTag"] = generateShortRollTag(passthrough["rollTime"]);
 				passthrough["name"] = macroVars["name"];
 				passthrough["wert"] = wert;
+				passthrough["taw"] = taw;
 				passthrough["effWert"] = effWert;
 				passthrough["mod"] = mod;
 				passthrough["ansage"] = ansage;
@@ -22979,6 +22989,7 @@ on('clicked:k_attacke_waffe-action', async (info, rollMacro = "@{gm_roll_opt} " 
 					"{{mod=[[" + mod + "]]}} " +
 					"{{ansage=[[" + ansage + "]]}} " +
 					"{{wert=[[" + wert + "]]}} " +
+					"{{taw=[[" + taw + "]]}} " +
 					"{{roll=[[" + macroVars["roll"] + "]]}} " +
 					"{{msg=[[0]]}} " +
 					"{{characterid=" + v["character_id"] + "}} " +
@@ -23035,6 +23046,7 @@ on('clicked:combat_reaction', async (info) => {
 	var roll = results.results.roll.result;
 	var originalResult = received["result"];
 	var wert = received["wert"];
+	var taw = received["taw"];
 	var mod = received["mod"];
 	var ansage = received["ansage"];
 	var effWert = received["effWert"];
@@ -23045,9 +23057,13 @@ on('clicked:combat_reaction', async (info) => {
 	var cf = received["cf"];
 	var passthrough = {};
 
-	// TODO: Aktive Kampftechnik abfragen/nutzen, um WdS, S. 59 zu erfüllen
 	// komplette _Ansage_ darf nicht höher als Kampftechnik-TaW und AT-Wert der aktiven Waffe (das jeweils niedrigere gilt)
-	if (ansage > 0 && wert < ansage) {
+	if (
+		ansage > 0 &&
+		(
+			wert < ansage || taw < ansage
+		)
+	) {
 		msg = 1;
 	}
 
