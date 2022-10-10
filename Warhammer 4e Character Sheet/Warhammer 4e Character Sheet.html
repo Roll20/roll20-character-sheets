@@ -40556,6 +40556,7 @@ on('sheet:opened change:armorplatelegspenalty change:armorplatepenalty', functio
 
 	
 	on("sheet:opened change:drunk change:blinded change:broken change:deafened change:entangled change:fatigued change:poisoned change:stuned change:prone change:armorcoifpenalty change:armorhelmpenalty change:armormailpenalty change:armorplatepenalty change:armorplatelegspenalty change:UsedDefense change:Talent_AmbidextrousLvl change:Used_MeleeTwohanded", function (v) {
+                if (v.sourceType === 'sheetworker') return;		
 		getAttrs(['Blinded', 'Broken', 'Deafened', 'Drunk', 'Entangled', 'Fatigued', 'Poisoned', 'Stuned', 'Prone', 'ConditionModEnable', 'armorcoifpenalty', 'armorhelmpenalty', 'armormailpenalty', 'armorplatepenalty', 'armorplatelegspenalty', 'Used_DefenseWeaponSkill', 'Talent_AmbidextrousLvl', 'Used_MeleeTwohanded'], function (v) {
 		
 		var regex = /PARRY/g;
@@ -41423,6 +41424,7 @@ on('sheet:opened change:repeating_otherxp:otherxp change:repeating_otherxp:other
 	stats.forEach(stat => {
 
 		on(`sheet:opened change:xp change:${stat.toLowerCase()}xp change:${stat.toLowerCase()}adv`, function (eventInfo) {
+                if (eventInfo.sourceType === 'sheetworker') return;	
 			
 		getAttrs(["sheetcheck", 'WeaponSkillAdv', 'WeaponSkillXP', 'BallisticSkillAdv', 'BallisticSkillXP', 'StrengthAdv', 'StrengthXP', 'ToughnessAdv', 'ToughnessXP', 'InitiativeAdv', 'InitiativeXP', 'AgilityAdv', 'AgilityXP', 'DexterityAdv', 'DexterityXP', 'IntelligenceAdv', 'IntelligenceXP', 'WillPowerAdv', 'WillPowerXP', 'FellowshipAdv', 'FellowshipXP'], function (x) {
 			var trigger = eventInfo.triggerName;
@@ -44351,13 +44353,34 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
 			"MeleeMode_STS": 0,
 			"MeleeMode_Beat": 0,
             "LastUnitDieMain": computed2
-	    }, {silent: true});				
-			
-			
+	    }, {silent: true});			
+
+				console.log("Test 1");
+		
+			getSectionIDs("repeating_melee", function (ids) {
+			ids.forEach(id => {
+				const output = {};
+				const output2 = {};
+					getAttrs([`repeating_melee_${id}_MeleeBonus`, `repeating_melee_${id}_UsedWeapon`, `repeating_melee_${id}_UsedDefense`], function(t) {
+						if(t[`repeating_melee_${id}_UsedWeapon`] == 1)
+						{
+				console.log("Test 2");
+						output[`repeating_melee_${id}_MeleeBonus`] = melmod, setAttrs(output, {silent: false})						
+						
+						}	
+						if(t[`repeating_melee_${id}_UsedDefense`] == 1)
+						{
+				console.log("Test 3");
+						output2[`repeating_melee_${id}_MeleeBonus`] = melmod, setAttrs(output2, {silent: false})						
+						
+						}
+					});		
+			});	
+		});			
+		
 			if ( test <= target ) { var computed3 = computed + drilled + furiousassault + infadd + disarm + feint + striketostun + beatblade + bneadd + dirtyfighting + bfrenzy + dualwield + precise + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
 			if ( test <= target ) { var computed4 = slbonusatk - practical ;} else  { var computed4 = practical ;}
 			if ( test <= target ) { var computed5 = slbonusatk - practical + SLmod ;} else  { var computed5 = practical + SLmod ;}
-	
 			   
             finishRoll(
                 results.rollId,
@@ -44757,6 +44780,25 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 			"MeleeMode_STS": 0,
             "LastUnitDieMain": computed2
 	    }, {silent: true});					   
+					
+		getSectionIDs("repeating_melee", function (ids) {
+			ids.forEach(id => {
+				const output = {};
+				const output2 = {};
+					getAttrs([`repeating_melee_${id}_MeleeBonus`, `repeating_melee_${id}_UsedWeapon`, `repeating_melee_${id}_MeleeBonus`, `repeating_melee_${id}_UsedDefense`], function(t) {
+						if(t[`repeating_melee_${id}_UsedWeapon`] == 1)
+						{
+						output[`repeating_melee_${id}_MeleeBonus`] = melmod, setAttrs(output, {silent: false})						
+						
+						}	
+						if(t[`repeating_melee_${id}_UsedDefense`] == 1)
+						{
+						output2[`repeating_melee_${id}_MeleeBonus`] = melmod, setAttrs(output2, {silent: false})						
+						
+						}
+					});		
+			});	
+		});	
 			
 			if ( test <= target ) { var computed3 = computed + drilled + furiousassault + infadd + bneadd + dirtyfighting + striketostun + bfrenzy + precise + dualwield + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
 			if ( test <= target ) { var computed4 = slbonusatk - practical ;} else  { var computed4 = practical ;}
@@ -47625,6 +47667,7 @@ on('clicked:resetRangedMode', function(event){
 
 
 on('change:MeleeMode_Outnumbered change:DefenseMode_Defensive change:MeleeMode_Prone change:MeleeMode_Charging change:MeleeMode_Aimed change:MeleeMode_STS change:MeleeMode_Size change:Size  change:MeleeMode_Size change:MeleeMode_Reach change:MeleeMode_Infight', function(event){
+    console.log("Melee Mode change");	
 	getAttrs(["Used_MeleeBonus", "Used_DefenseBonus", "MeleeMode_Outnumbered", "DefenseMode_Defensive", "MeleeMode_Prone", "MeleeMode_Charging", "MeleeMode_Aimed", "MeleeMode_STS", "MeleeMode_Size", "Size", "MeleeMode_Reach", "MeleeMode_Infight"], function(v) {
 		
    var trigger = event.triggerName.slice(0, -10);
@@ -47691,7 +47734,6 @@ on('change:MeleeMode_Outnumbered change:DefenseMode_Defensive change:MeleeMode_P
 		"MeleeSizeMod": diff,
 	}, {silent: true});		
 
-
 		getSectionIDs("repeating_melee", function (ids) {
 			ids.forEach(id => {
 				const output = {};
@@ -47711,11 +47753,11 @@ on('change:MeleeMode_Outnumbered change:DefenseMode_Defensive change:MeleeMode_P
 			});	
 		});	
 	
-
 	});
 });	
 
 on('clicked:resetMeleeMode clicked:resetDefenseMode', function(event){
+    console.log("Melee Bonus Change 1");	
         if (event.sourceType === 'sheetworker') return;
 	getAttrs(["Used_MeleeBonus", "Used_DefenseBonus", "MeleeMode_Outnumbered", "DefenseMode_Defensive"], function(v) {
 
@@ -47771,6 +47813,7 @@ on('clicked:resetMeleeMode clicked:resetDefenseMode', function(event){
 	});	
 
 on('sheet:opened', function(event){
+    console.log("Melee Bonus Change 2");	
         if (event.sourceType === 'sheetworker') return;
 	getAttrs(["Used_RangedBonus", "RangedMode_Engaged", "RangedMode_Range", "RangedMode_Size", "RangedMode_Moved", "MeleeMode_BNE", "RangedMode_Called"], function(v) {
 
