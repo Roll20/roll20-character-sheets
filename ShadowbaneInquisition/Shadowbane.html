@@ -1283,11 +1283,16 @@
 					</div>
 
 					<div class='sheet-minimisable_infographic_field4x3b sheet-radius_border'>
-						<button 
+						<!-- <button 
 							name='forcefield_roll' 
 							type='roll' class='sheet-minimisable_infographic_g1 sheet-clear sheet-radius_border_top' 
-							value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{forcefield= @{forcefield_name}}} {{roll= [[1d100cs>@{forcefield_protection_plus_one}cf<@{forcefield_overload}]]}}'
+							value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{forcefield= @{forcefield_name}}} {{roll= [[1d100cs>@{forcefield_protection}cf<@{forcefield_overload}]]}}'
 						>	Force Field
+						</button> -->
+						<button
+							title='Roll to see if your Forcefield block the damage'
+							name='act_force_roll' type='action' class='sheet-minimisable_infographic_g1 sheet-clear sheet-radius_border_top'>
+							Force Field
 						</button>
 						<p class='sheet-minimisable_infographic_g2'>
 							Name
@@ -1315,11 +1320,6 @@
 							type='text' 
 							name='attr_forcefield_protection' 
 							value='0' 
-						/>
-						<input 
-							type='hidden' 
-							name='attr_forcefield_protection_plus_one' 
-							value='@{attr_forcefield_protection}+1' 
 						/>
 					</div>
 
@@ -4461,6 +4461,14 @@ NOTE: replace worker by javascript for IDE functionality
 		});
     });
 
+	 on('clicked:force_roll', async () => {
+		const attrs = await asw.getAttrs(['forcefield_name', 'forcefield_overload', 'forcefield_protection'])
+		let forcefield_protection = parseInt(attrs.forcefield_protection) +1
+		startRoll(`@{to-gm}&{template:mythic} {{character= @{character_name}}} {{forcefield= ${attrs.forcefield_name}}} {{roll= [[1d100cs>${forcefield_protection}cf<${attrs.forcefield_overload}]]}}`, (results) => {
+			finishRoll(results.rollId);
+		});
+    });
+
 	const HIT_LOCATIONS = {
 		'Head': ['Head', 'Head', 'Arm ', 'Body', 'Arm', 'Body'],
 		'Right_Arm' : ['Right Arm', 'Arm', 'Body', 'Head', 'Body', 'Arm'],
@@ -5453,10 +5461,12 @@ NOTE: replace worker by javascript for IDE functionality
                     damTotal += '}';
                     if (mod) damTotal += mod;
                     if (set === 2) damTotal += '+1';
-                    if (set === 4 || set === 3) {
+                    if (set === 4) {
                         damTotal += '+2';
                         attr[`${source}weapon_pen2`] = 2;
-                    } else {
+                    } else if (set === 3) {
+                        attr[`${source}weapon_pen2`] = 2;
+					} else {
                         attr[`${source}weapon_pen2`] = 0;
                     }
                     attr[`${source}weapon_real_dmg`] = damTotal;
