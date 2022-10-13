@@ -21776,6 +21776,7 @@ const melee = [
 	'k_meisterparade',
 	'k_niederwerfen_schild',
 	'k_niederwerfen_waffe',
+	'k_parade_parierwaffe',
 	'k_parade_schild',
 	'k_parade_waffe',
 	'k_passierschlag',
@@ -21786,7 +21787,9 @@ const melee = [
 	'k_umreissen',
 	'k_waffe_zerbrechen',
 	'k_windmuehle',
+	'k_wuchtschlag_msf_schild',
 	'k_wuchtschlag_msf_waffe',
+	'k_wuchtschlag_osf_schild',
 	'k_wuchtschlag_osf_waffe'
 ];
 
@@ -22935,6 +22938,977 @@ on('clicked:eidsegen-action', async (info) => {
 		}
 	);
 });
+
+/*
+Erläuterungen zu "meleeData"
+* pro Nahkampfmanöver (im weitesten Sinne) ein Eintrag
+* Einträge bestehen aus
+** ui: Anzeigename
+** typ: Attacke, Parade, Ausweichen, Schildattacke, Schildparade, Parierwaffenattacke, Parierwaffenparade und "Parade und Parierwaffenparade"
+** rollCount: Anzahl maximal benötigter Rolls (1 bis 3)
+** ansagen
+*** manoever: beim Manöver standardmäßig angegebene Ansage(n) in einer Form, die in Würfelmakros genutzt werden kann
+**** fest: feste Vorgabewerte
+**** variabel: Berechnung für variable Werte
+*** wahl: freiwillige Ansage möglich (true/false)
+** attributes: zur Durchführung (NICHT Voraussetzungen!) zusätzlich benötigte Attribute
+*/
+const meleeData = {
+	'k_attacke_parierwaffe': {
+		'ui': 'Nahkampfangriff (Parierwaffe)',
+		'typ': 'at-parierwaffe',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': [
+			'sf_linkhand',
+			'sf_beidhandigerkampfI',
+			'sf_beidhandigerkampfII',
+			'vorteil_beidhaendig'
+		]
+		/*
+		TODO: Kampftechnik für Parierwaffen/Schilde festlegen (Schilde auf "Raufen" fixieren)
+		TODO: AT-Wert für Parierwaffe berechnen
+		*/
+	},
+	'k_attacke_schild': {
+		'ui': 'Raufen (Schildattacke)',
+		'typ': 'at-schild',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': '@{shield_at_mod}',
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': []
+	},
+	'k_attacke_waffe': {
+		'ui': 'Nahkampfangriff',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': []
+	},
+	'k_ausfall': {
+		'ui': 'Ausfall',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 4,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': [
+			'BE',
+			'KO',
+			'sf_finte',
+			'sf_gezielter_stich',
+			'sf_hammerschlag',
+			'sf_niederwerfen',
+			'sf_todesstoss',
+			'sf_wuchtschlag'
+		]
+		// TODO: Attribut, das angibt, ob aktuell ein Schild getragen wird (aktuell nur Attribut, das angibt, ob Schild oder Parierwaffe getragen werden)
+		/* pro KR zwei Attacken + 2 FA Schritt
+		max. eBE 4
+		INI höher als Gegner
+		+2 bei Schildnutzung
+		Wuchtschlag, Finte je bis +4 erlaubt
+		Beenden mit Niederwerfen, Hammerschlag, Gezielter Stich, Todesstoß
+		Anzahl Hiebe = KO/2
+		Ende bei
+			a: AT fail
+			b: PA = gezieltes Ausweichen + DK +2 succ
+			c: PA glücklich
+			d: KO/2-Grenze erreicht
+			e: Zurückdrängung des Verteidigers unmöglich
+			f: Verteidiger bleibt einfach stehen (MU +4 +#Treffer während Ausfall)
+			g: freiwilliger Abbruch
+		Fall a - d: Angreifer - 1W6 INI, Verteidiger Passierschlag
+		Fall e - g: Ausfall endet mit abschließender AT, PA um 4 erschwert
+		*/
+	},
+	'k_ausweichen_gezielt': {
+		'ui': 'Ausweichen (gezielt)',
+		'typ': 'pa-ausweichen',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': [
+			'BE',
+			'sf_ausweichenI',
+			'sf_ausweichenII',
+			'sf_ausweicheniII',
+			'k_ausweichen_akrobatikbonus'
+			]
+		// +DK, +#Gegner, +BE, -Ausweichen 1-3, -Akrobatikbonus, ggf. INI-Verlust
+	},
+	'k_ausweichen_ungezielt': {
+		'ui': 'Ausweichen (ungezielt)',
+		'typ': 'pa-ausweichen',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': [
+			'BE',
+			'sf_ausweichenI',
+			'sf_ausweichenII',
+			'sf_ausweicheniII',
+			'k_ausweichen_akrobatikbonus'
+			]
+		// +DK, +#Gegner, +BE, -Ausweichen 1-3, -Akrobatikbonus, INI-Verlust
+	},
+	'k_befreiungsschlag': {
+		'ui': 'Befreiungsschlag',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': '?{Anzahl zu treffender Gegner|1,4|2,8|3,12}'
+			},
+			'wahl': true
+		},
+		'attributes': []
+		// +4 pro Gegner, bis zu drei Gegner
+		// freiwillige Ansage für Wuchtschlag und/oder Finte nutzbar
+		// TP für jeden Gegner einzeln
+		// Treffer: -1W6 INI, immer auch Niederwerfen, DK +1 (falls nicht möglich TP + 1W6)
+	},
+	'k_betaeubungsschlag': {
+		'ui': 'Betäubungsschlag',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': [
+			'sf_finte',
+			'sf_wuchtschlag'
+		]
+		// +2/+4/+8
+		// freiwillige Ansage für Wuchtschlag und/oder Finte nutzbar
+		// Erschwernis in komplizierter Weise waffenabhängig
+		// erzeugt TP(A)
+		// SP(A) > Wundschwelle: KO-Probe. Fail: 1W6 SR bewusstlos
+		// SP(A) > 2. Wundschwelle: 1W6 SR bewusstlos
+	},
+	'k_binden_hauptwaffe': {
+		'ui': 'Binden (Hauptwaffe)',
+		'typ': 'pa',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 4,
+				'variabel':
+					'?{' +
+						'Ansage der abgewehrten Attacke größer als 4?|' +
+						'ja,' +
+							nestRollMacro('?{Ansage der abgewehrten Attacke|5}|', 1) +
+						'nein,4' +
+					'}'
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_meisterparade' ]
+		/*
+		abgewehrte AT Ansage > 4? Ansage entsprechend höher (Finte +5 wirkt doppelt, sodass insgesamt +10)
+		Hauptwaffe: Wenn Meisterparade verfügbar, dann freiwillige Ansage zusätzlich möglich
+			zusätzliche Ansage erleichtert nächste AT und gegnerische Reaktion
+		*/
+	},
+	'k_binden_parierwaffe': {
+		'ui': 'Binden (Parierwaffe)',
+		'typ': 'pa-parierwaffe',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 4,
+				'variabel':
+					'?{' +
+						'Ansage der abgewehrten Attacke größer als 4?|' +
+						'ja,' +
+							nestRollMacro('?{Ansage der abgewehrten Attacke|5}|', 1) +
+						'nein,4' +
+					'}'
+			},
+			'wahl': false
+		},
+		'attributes': []
+		/*
+		abgewehrte AT Ansage > 4? Ansage entsprechend höher (Finte +5 wirkt doppelt, sodass insgesamt +10)
+		Parierwaffe: Erschwernis konstant (4)
+		*/
+	},
+	'k_binden_hauptwaffe_und_parierwaffe': {
+		'ui': 'Binden (Haupt- und Parierwaffe)',
+		'typ': 'pa+pa-parierwaffe',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 4,
+				'variabel':
+					'?{' +
+						'Ansage der abgewehrten Attacke größer als 4?|' +
+						'ja,' +
+							nestRollMacro('?{Ansage der abgewehrten Attacke|5}|', 1) +
+						'nein,4' +
+					'}'
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_meisterparade' ]
+		/*
+		zusätzlich zu Waffen auch mit Parierwaffen (Parierwaffen I oder Meisterparade nötig)
+		abgewehrte AT Ansage > 4? Ansage entsprechend höher (Finte +5 wirkt doppelt, sodass insgesamt +10)
+		Binden mit beiden Waffen gemeinsam und Meisterparade und Parierwaffen I verfügbar
+			Standarderschwernis UND freiwillige Zusatzansage erleichtern nächste eigene Attacke und erschweren darauf folgende Reaktion des Gegners um Gesamtansage
+		ultrakompliziert
+		*/
+	},
+	'k_doppelangriff': {
+		'ui': 'Doppelangriff',
+		'typ': 'at',
+		'rollCount': 2,
+		'ansagen': {
+			'manoever': {
+				'fest': 2,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': []
+		// benötigt zwei Waffen, die in derselben DK ohne Abzüge verwendbar sind
+		// zwei Attacken, jede um 2 erschwert
+		// wenn Waffen nicht gleich: +4 für Waffe aus falscher Hand (Linkhand gilt, außer bei BHK2, da dieses überwiegt)
+		// Nicht mit umgewandelter Abwehraktion, nicht in KR, in der Zusatzaktion aus BHK2 oder PW2 oder Tod von Links genutzt
+		// ATs sind keine Manöver, einer Patzer = beide fail
+		// zwei Paraden zur Abwehr nötig
+	},
+	'k_entwaffnen_attacke': {
+		'ui': 'Entwaffnen (Attacke)',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel': '@{k_entwaffnen_attacke_waffenmod}'	// TODO
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_finte' ]
+		/*
+		freiwillige Ansage möglich, zählt als Finte und kann eingesetzt werden wie Finte oder zur Erschwerung der KK-Probe
+		PA fail? KK+8, um Verlust der Waffe zu verhindern
+		kein Schaden
+		-2 bei Kampfstab, -4 bei Kettenstab oder Zweililien
+		kein Schild erlaubt
+		keine Entwaffnung zweihändig geführter Waffen (außer Anderthalbhänder ...)
+		*/
+	},
+	'k_entwaffnen_parade_hauptwaffe': {
+		'ui': 'Entwaffnen (Waffenparade)',
+		'typ': 'pa',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel': '@{k_entwaffnen_parade_hauptwaffe_waffenmod}'	// TODO
+			},
+			'wahl': true
+		},
+		'attributes': []
+		/*
+		freiwillige Ansage möglich zur Erschwerung der KK-Probe
+		PA geschafft: KK+8, um Verlust der Waffe zu verhindern
+		kein Schild erlaubt
+		keine Entwaffnung zweihändig geführter Waffen (außer Anderthalbhänder ...)
+		*/
+	},
+	'k_entwaffnen_parade_parierwaffe': {
+		'ui': 'Entwaffnen (Parierwaffenparade)',
+		'typ': 'pa-parierwaffe',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel': '@{k_entwaffnen_parade_parierwaffe_waffenmod}'	// TODO
+			},
+			'wahl': true
+		},
+		'attributes': []
+		/*
+		freiwillige Ansage möglich zur Erschwerung der KK-Probe
+		PA geschafft: KK+8, um Verlust der Waffe zu verhindern
+		möglich mit Bock, Hakendolch, Linkhand, entsprechende Drachenklaue (braucht PW1), -2
+		kein Schild erlaubt
+		keine Entwaffnung zweihändig geführter Waffen (außer Anderthalbhänder ...)
+		*/
+	},
+	'k_festnageln': {
+		'ui': 'Festnageln',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 4,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': []
+		/*
+		nur mit Dreizack, Efferdbart, Elfischer Jagdspieß, Jagdspieß, Korspieß, Partisane, Stoßspeer, Wurmspieß
+		freiwillige Ansage möglich
+		normaler Schaden (nicht durch Ansage erhöhter Waffenschaden)
+		vergleichende GE-Probe mit Verteidiger
+			Verteidiger erfolgreich: Befreiung, +1W6 SP
+			Angreifer erfolgreich: vergleichende KK-Probe (Angreifer kann doppelte Punkte aus freiwilliger Ansage nutzen, um Probenergebnis zu beeinflussen)
+				Verteidiger erfolgreich (auch unentschieden): Angreifer verliert Waffe, Verteidiger darf Passierschlag
+				Angreifer erfolgreich:
+					Opfer am Boden, wird festgehalten
+					folgende KRs
+						Waffenschaden (ohne TP/KK, ohne Ansagen)
+						vergleichen KK-Probe (halten mehrere fest, dann pro Kämpfer -1), für Opfer +2 (Angreifer kann noch unbenutzte Punkte aus obigem Vorrat nutzen)
+		mehrere nageln gleichzeitig ein stehendes Opfer fest: GE/KK-Proben für jeden Kämpfer, dessen AT gelungen ist -2; Vergleiche aber für jeden Kämpfer einzeln
+		Opfer bereits am Boden: GE-Probe entfällt
+		Opfer bereits am Boden und festgenagelt: keine GE/KK-Proben nötig, Festnageln aber ±0
+		verbraucht alle Aktionen des Festhaltenden
+		*/
+	},
+	'k_finte': {
+		'ui': 'Finte',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': '@{k_finte_schildmod}'	//TODO
+			},
+			'wahl': true
+		},
+		'attributes': [
+			'sf_finte',
+			'sf_wuchtschlag'
+		]
+		// Ansage abhängig von AT/TaW -> Auswahl autogenerieren
+		// nur bei BE =< 4
+		// Schildkämpfer: +2, außer bei kleinen Schilden
+		// mit Wuchtschlag kombinierbar
+	},
+	'k_gegenhalten': {
+		'ui': 'Gegenhalten',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 4,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': []
+		/*
+		Parademanöver, wird aber auf AT-Wert gewürfelt
+		AT von Gegner, AT von Verteidiger
+			beide fail: normal weiter
+			nur einer succ: normal weiter
+			beide succ: welche AT besser (weiter unter AT-Wert)?
+				INI-Differenz auf AT-Wert des Kämpfers mit höherer INI addieren
+				AT-Wert des Verteidigers durch Ansage immer -4
+				bessere AT macht vollen Schaden, schlechtere halben Schaden und keine (positive) TP/KK und Ansagen
+		AT DK- konterbar, AT DK+ nicht (wie sonst auch o.O)
+			bessere AT erreicht Ziel (kürzere DK und ggf. halben Schaden oder DK gleich und vollen Schaden)
+		Nutzung "Auflaufen lassen":
+			wenn Gegner anstürmt (Sturmangriff)
+			wenn DK Verteidigerwaffe höher
+				Angreifer-AT +6 aus DK
+				Angreifer-AT schlechter: zusätzliche TP aus Sturmangriff (+4 +GS/2), Verteidiger nur Hälfte davon
+		Nutzung "Lanzenreiter auflaufen lassen":
+			Erschwernisse gleich, aber Lanzenreiten-AT meist höher
+			Verteidigung mit P notwendig
+			sehr kompliziert
+		*/
+	},
+	'k_gezielter_stich': {
+		'ui': 'Gezielter Stich',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 4,
+				'variabel':
+					'[[ ceil(?{' +
+						'Rüstschutz des Ziels|0' +
+					'} / 2 ) + (?{' +
+						'Gegner führt Schild?|' +
+						'ja,' +
+							nestRollMacro('?{Paradewaffenmodifikator des Schildes|3', 1) +
+						'nein,0' +
+					'})]]'
+			},
+			'wahl': true
+		},
+		'attributes': []
+		// Ansage: 4 + RS/2 + freiwillig
+		// Schild? + PA-WM
+		// freiwilige Ansage erschwert gegnerische PA
+		// Treffer ignoriert Rüstung, auch natürliche; Wundschwelle um 2 gesenkt, zusätzliche Wunde
+		// als Ansage zählt nur 4 + freiwillig
+	},
+	'k_hammerschlag': {
+		'ui': 'Hammerschlag',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_finte' ]
+		// Ansage: 8 + freiwillig, verbraucht alle Aktionen der KR
+		// frewillige Ansage erhöht Schaden (wie Wuchtschlag)
+		// Kombination mit Finte möglich
+		// Verteidiger: normale Parade, ab freiwillige Ansage 2+ Bruchtest bei Gelingen
+		// Schaden: 3 * (TP + Bonusschaden), TP/KK aber nur einmal
+		// nicht gegen sehr große Gegner
+		// nicht gegen Gegner mit großem oder sehr großem Schild
+		// AT Fail: Passierschlag erlaubt
+	},
+	'k_klingensturm': {
+		'ui': 'Klingensturm',
+		'typ': 'at',
+		'rollCount': 3,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': [ 'sf_kampfgespur' ]
+		// Angreifer ohne Schild, eBE max. 4, ideale DK
+		// 2 AT: Halber AT-Wert + 2 (bei Kampfgespür: frei verteilbar, Minimum 6)
+		// 3 AT, nur Klingentänzer: AT-Wert + 4 frei verteilbar, Minimum 6
+		// nur in "echten" Angriffsaktionen (nicht umgewandelt, nicht aus zweiter Waffe)
+	},
+	'k_klingenwand_hauptwaffe': {
+		'ui': 'Klingenwand (Hauptwaffe)',
+		'typ': 'pa',
+		'rollCount': 3,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': [ 'sf_kampfgespur' ]
+		// Verteidiger ohne Schild
+		// Ansage zu Beginn der KR (außer bei Klingentänzer)
+		// einsetzbar gegen zwei Gegner oder Doppelangriff
+		// ignoriert Überzahl
+		// 2 PA: Halber PA-Wert + 2 (bei Kampfgespür: frei verteilbar, Minimum 6)
+		// 3 AT, nur Klingentänzer: PA-Wert + 4 frei verteilbar, Minimum 6 (erst wählen, wenn AT gewürfelt!)
+		// nur in "echten" Abwehraktionen (nicht umgewandelt, nicht aus zweiter Waffe/Schild)
+	},
+	'k_klingenwand_schild': {
+		'ui': 'Klingenwand (Schild)',
+		'typ': 'pa-schild',
+		'rollCount': 3,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': [ 'sf_kampfgespur' ]
+		// Verteidiger mit Schild
+		// Ansage zu Beginn der KR (außer bei Klingentänzer)
+		// einsetzbar gegen zwei Gegner oder Doppelangriff
+		// ignoriert Überzahl
+		// 2 PA: Halber PA-Wert + 2 (bei Kampfgespür: frei verteilbar, Minimum 6)
+		// 3 AT, nur Klingentänzer: PA-Wert + 4 frei verteilbar, Minimum 6 (erst wählen, wenn AT gewürfelt!)
+		// nur in "echten" Abwehraktionen (nicht umgewandelt, nicht aus zweiter Waffe/Schild)
+	},
+	'k_meisterliches_entwaffnen_attacke': {
+		'ui': 'Meisterliches Entwaffnen (Attacke)',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel': '@{k_entwaffnen_attacke_waffenmod}'	// TODO
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_finte' ]
+		/*
+		freiwillige Ansage möglich, zählt als Finte und kann eingesetzt werden wie Finte oder zur Erschwerung der KK-Probe
+		PA fail? KK+10, um Verlust der Waffe zu verhindern
+		kein Schaden
+		-2 bei Kampfstab, -4 bei Kettenstab oder Zweililien
+		kein Schild erlaubt
+		Entwaffnung zweihändig geführter Waffen, nicht mit Säbeln
+		*/
+	},
+	'k_meisterliches_entwaffnen_parade_hauptwaffe': {
+		'ui': 'Meisterliches Entwaffnen (Hauptwaffenparade)',
+		'typ': 'pa',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel': '@{k_entwaffnen_parade_waffenmod}'	// TODO
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_finte' ]
+		/*
+		freiwillige Ansage möglich zur Erschwerung der KK-Probe
+		PA geschafft: KK+10, um Verlust der Waffe zu verhindern
+		kein Schild erlaubt
+		Entwaffnung zweihändig geführter Waffen (nicht mit Säbeln; PW nur Bock und Hakendolch)
+		*/
+	},
+	'k_meisterliches_entwaffnen_parade_parierwaffe': {
+		'ui': 'Meisterliches Entwaffnen (Pairerwaffenparade)',
+		'typ': 'pa-parierwaffe',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel': '@{k_entwaffnen_parade_waffenmod}'	// TODO
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_finte' ]
+		/*
+		freiwillige Ansage möglich zur Erschwerung der KK-Probe
+		PA geschafft: KK+10, um Verlust der Waffe zu verhindern
+		möglich mit Bock, Hakendolch, Linkhand, entsprechende Drachenklaue (braucht PW1), -2
+		kein Schild erlaubt
+		Entwaffnung zweihändig geführter Waffen (nicht mit Säbeln; PW nur Bock und Hakendolch)
+		*/
+	},
+	'k_meisterparade_hauptwaffe': {
+		'ui': 'Meisterparade',
+		'typ': 'pa',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': []
+		/*
+		Ansage: max. TaW, max. PA der Waffe
+		eBE <= 4
+		nicht mit Kettenwaffen und Zweihandflegeln; PA muss grundsätzlich erlaubt sein
+		Schild: SK2 nötig
+		*/
+	},
+	'k_meisterparade_schild': {
+		'ui': 'Meisterparade',
+		'typ': 'pa-schild',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': []
+		/*
+		Ansage: max. TaW, max. PA der Waffe
+		eBE <= 4
+		nicht mit Kettenwaffen und Zweihandflegeln; PA muss grundsätzlich erlaubt sein
+		Schild: SK2 nötig
+		*/
+	},
+	'k_niederwerfen_schild': {
+		'ui': 'Niederwerfen (Schild)',
+		'typ': 'at-schild',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_wuchtschlag' ]
+		/*
+		Ansage: wie Wuchtschlag
+		PA fail: KK + freiwillige Ansage + max(0, TP - KK des Verteidigers), erleichtert um -1/-2/-4 für Standfest/Balance/Herausragende Balance
+			KK-Probe gelungen: -1W6 INI
+			KK-Probe misslungen: -2W6 INI, ein Feld weggeschleudert, stürzt/am Boden liegend
+		nur mit Sturmangriff kombinierbar, Meisterparadepunkte nutzbar
+		*/
+	},
+	'k_niederwerfen_hauptwaffe': {
+		'ui': 'Niederwerfen (Hauptwaffe)',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 4,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_wuchtschlag' ]
+		/*
+		Ansage: wie Wuchtschlag
+		nur mit Anderthalbhänder, Hiebwaffen, Infanteriewaffen, Kettenstäbe, Kettenwaffen, Säbel (Arbach, Haumesser, Khunchomer, Sklaventod), Schwerter, Stäbe, Zweihandflegel, Zweihand-Hiebwaffen, Zweihandschwerter/-säbel
+		PA fail: KK + freiwillige Ansage + max(0, TP - KK des Verteidigers), erleichtert um -1/-2/-4 für Standfest/Balance/Herausragende Balance
+			KK-Probe gelungen: -1W6 INI
+			KK-Probe misslungen: -2W6 INI, ein Feld weggeschleudert, stürzt/am Boden liegend
+		nur mit Sturmangriff kombinierbar, Meisterparadepunkte nutzbar
+		*/
+	},
+	'k_parade_parierwaffe': {
+		'ui': 'Parierwaffenparade',
+		'typ': 'pa-parierwaffe',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': []
+	},
+	'k_parade_schild': {
+		'ui': 'Schildparade',
+		'typ': 'pa-schild',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': []
+	},
+	'k_parade_waffe': {
+		'ui': 'Waffenparade',
+		'typ': 'pa',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': []
+	},
+	'k_passierschlag': {
+		'ui': 'Passierschlag',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 4,
+				'variabel':
+					'-(@{INI_mod_hauptwaffe}) + ' +
+					'?{' +
+						'Sonderfertigkeiten des Zieles|' +
+						'keine Aufmerksamkeit und kein Kampfgespür,0|' +
+						'Aufmerksamkeit&#44; aber kein Kampfgespür,4|' +
+						'Aufmerksamkeit und Kampfgespür,6' +
+					'}'
+			},
+			'wahl': false
+		},
+		'attributes': []
+		/*
+		freie Aktion
+		nicht mit Manövern kombinierbar
+		Treffer: TP und 1W6 INI-Verlust
+		*/
+	},
+	'k_schildspalter': {
+		'ui': 'Schildspalter',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel':
+					'-(?{' +
+						'Paradewaffenmodifikator des gegnerischen Schildes|0' +
+					'})'
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_finte' ]
+		/*
+		Ansage - Schild-PA-WM + freiwillige Ansage
+		freiwillige Ansage: PA erschweren (nur, wenn SF Finte vorhanden ._.) oder Bruchtest erschweren (Mischung erlauben)
+		nur mit Hiebwaffen, Kettenwaffen, Zweihandflegeln, Zweihandhiebwaffen, Zweihandschwertern/-säbeln
+		AT gelungen, PA gescheitert
+			Bruchtest 2W6 - 4 - Ansage zur Erschwerung des Bruchtests
+		Bruchtest bestanden: Schild zerstört, kein Schaden
+		Bruchtest nicht bestanden: Schild-BF steigt um 1, kein Bruchtest für Angreifer außer bei Höchstergebnis
+		*/
+	},
+	'k_stumpfer_schlag': {
+		'ui': 'Stumpfer Schlag',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': '@{k_stumpfer_schlag_waffenmod}'	// TODO
+			},
+			'wahl': false
+		},
+		'attributes': []
+		/*
+		nur mit Anderthalbhänder, Hiebwaffen, Kettenstäbe, Raufen (Handgemengewaffe oder Waffenknauf, wenn SF Betäubungsschlag bekannt), Säbel, Schwerter, Stäbe
+		Erschwernis kompliziert:
+			+2 bei Kampfstab und Knüppel
+			+4 bei Hiebwaffe mit flacher Seite
+			+8 sonst
+			halbiert mit Betäubungsschlag
+		TP(A) statt TP
+		kleiner SF-loser Bruder des Betäubungsschlags, daher keine Kombination mit Wuchtschlag möglich und gleiche Waffeneinschränkungen
+		*/
+	},
+	'k_sturmangriff': {
+		'ui': 'Sturmangriff',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 4,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_niederwerfen', 'sf_wuchtschlag' ]
+		/*
+		Ansage: 4 + freiwillige Ansage
+		freiwillige Ansage wie Wuchtschlag
+		verbraucht auch PA der KR
+		nur mit Anderthalbhänder, Hiebwaffen, Infanteriewaffen, Kettenstäbe, Kettenwaffen, Säbel, Schwerter, Speere, Stäbe, Zweihandflegel, Zweihand-Hiebwaffen, Zweihandschwerter/-säbel
+		min. GS 4, min. 4 m Anlauf
+		TP: normal + Wuchtschlag + 4 + halbe GS
+		gelungener Sturmangriff in optimaler Angreifer-DK (vorher ansagen!)
+		misslungen: Passierschlag, DK vom Verteidiger wählbar, nicht näher als optimale Angreifer-DK gewesen wäre
+		mit Niederwerfen kombinierbar, s. o.
+		*/
+	},
+	'k_todesstoss': {
+		'ui': 'Todesstoß',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel':
+					'?{' +
+						'Rüstschutz des Zieles|0' +
+					'} + ' +
+					'?{' +
+						'Ziel verwendet Schild?|' +
+						'ja,' +
+							nestRollMacro('?{Paradewaffenmodifikator des Schildes|3}', 1) +
+						'|' +
+						'nein,0' +
+					'}'
+			},
+			'wahl': true
+		},
+		'attributes': [
+			'sf_finte',
+			'sf_wuchtschlag'
+		]
+		/*
+		Ansage: 8 + halber Ziel-RS + Schild-PA-WM + freiwillige Ansage
+		freiwillige Ansage: Finte und/oder Wuchtschlag (auch bei Waffen, die keinen Wuchtschlag zulassen!)
+		verbraucht auch PA der KR
+		AT unpariert
+			TP ohne Rüstschutz (aber mit natürlichem Rüstschutz) berechnen
+			Wundschwelle -2
+			zwei automatische Wunden
+		AT misslungen
+			Passierschlag
+		nur mit Dolchen, Fechtwaffen, Schwertern (nur mit SF Halbschwert), Speere
+		nur bei Zielgröße kleiner als sehr groß
+		*/
+	},
+	'k_tod_von_links': {
+		'ui': 'Tod von Links',
+		'typ': 'at-parierwaffe',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_finte' ]
+		/*
+		nur mit Parierwaffe in linker Hand, 8 Initiativphasen nach Hauptwaffen-AT
+		zusätzliche AT, daher immer nach Hauptwaffen-AT
+		freiwillige Ansage: Finte
+		max. eBE 4
+		Ansage in Initiativphase der Hauptwaffe
+		*/
+	},
+	'k_umreissen': {
+		'ui': 'Umreißen',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_finte' ]
+		/*
+		Ansage: 8 + freiwillige Ansage
+		freiwillige Ansage: Finte
+		nur mit Infanteriewaffen, Peitschen, Speere, Stäbe, Zweihandschwerter/-säbel (nur mit SF Halbschwert)
+		nur bei zweihändigem Griff um Waffe (keine Schilde/Parierwaffen)
+		AT gelungen
+			kein Schaden, Gegner aus Gleichgewicht bringen
+			PA via
+				gezieltes Ausweichen
+				Waffen-PA +8 (Peitsche nicht parierbar)
+				Raufen-/Ringen-PA mit Beinarbeit
+			PA misslungen
+				GE + TP -2/4/8 für Standfest/Balance/Herausragende Balance
+				bei Misslingen -2W6 INI, am Boden liegend
+		*/
+	},
+	'k_waffe_zerbrechen': {
+		'ui': 'Waffe zerbrechen',
+		'typ': 'pa-parierwaffe',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 8,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': []
+		/*
+		Ansage: 8 + freiwillige Ansage
+		freiwillige Ansage als Erschwernis auf KK-Probe?
+		nur mit Hakendolch, speziell angefertigtem Linkhanddolch, speziell angefertigter Drachenklaue
+		nur gegen Klingenwaffen einsetzbar
+		PA gelungen
+			Gegner fragen, ob er Waffe fallen lassen möchte
+			KK-Probe
+				längere Fechtwaffen (Degen, Florett, etc.): +4
+				andere einhändige Klingenwaffen inkl. Dolche: +6
+				zweihändig geführte Klingenwaffen: +10
+				BF: -BF
+		*/
+	},
+	'k_windmuehle': {
+		'ui': 'Windmühle',
+		'typ': 'pa',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': []
+		/*
+		Ansage: 8 oder mehr
+		nur mit Anderthalbhänder, Hiebwaffen, Infanteriewaffen, Kettenstäbe, Kettenwaffen, Säbel, Schwerter, Stäbe, Zweihandflegel, Zweihandhiebwaffen, Zweihandschwert/-säbel
+		verbraucht eine freie Aktion Schritt
+		max. Schildgröße klein
+		nur bei Angriff mit Wuchtschlag, Sturmangriff, Hammerschlag, Befreiungsschlag
+			Konter mit angesagter Parade in Höhe der Gesamtansage des Gegners, min. 8
+		PA gelungen
+			Wuchtschlag mit Ansage der vollen eigenen Erschwernis
+			Angreifer darf PA machen, erschwert um ursprüngliche Gesamtansage
+		PA misslungen: übliche Folgen misslungener PA
+		*/
+	},
+	'k_wuchtschlag_schild': {
+		'ui': 'Wuchtschlag (Schild)',
+		'typ': 'at-schild',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': true
+		},
+		'attributes': [ 'sf_wuchtschlag' ]
+		/*
+		freiwillige Ansage erhöht Schaden
+		Ansage max. TaW der Waffe, max. AT der Waffe
+		ohne SF halbe Ansage als Bonusschaden
+		mit SF volle Ansage als Bonusschaden
+		*/
+	},
+	'k_wuchtschlag_waffe': {
+		'ui': 'Wuchtschlag (Hauptwaffe)',
+		'typ': 'at',
+		'rollCount': 1,
+		'ansagen': {
+			'manoever': {
+				'fest': 0,
+				'variabel': 0
+			},
+			'wahl': false
+		},
+		'attributes': [ 'sf_wuchtschlag' ]
+	}
+}
 
 on('clicked:k_attacke_waffe-action', async (info) => {
 	var rollMacro = "@{gm_roll_opt} " +
