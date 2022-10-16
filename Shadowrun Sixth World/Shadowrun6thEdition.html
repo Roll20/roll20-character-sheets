@@ -3562,6 +3562,8 @@
 
 	<!-- extended test roll buttons -->
 	<div style="display: none;">
+		<button title="Start Extended Test" class="" name="act_extended_start" type="action" value=""></button>
+		<button title="Next Extended Test" class="" name="act_extended_next" type="action" value=""></button>
 		<button title="Extended Test 25 Dice" class="" name="act_extended_25" type="action" value=""><span data-i18n="extended_test_25"></span></button>
 		<button title="Extended Test 24 Dice" class="" name="act_extended_24" type="action" value=""><span data-i18n="extended_test_24"></span></button>
 		<button title="Extended Test 23 Dice" class="" name="act_extended_23" type="action" value=""><span data-i18n="extended_test_23"></span></button>
@@ -5625,9 +5627,10 @@
 <!--Roll Template New Computed Stuff-->
 <rolltemplate class="sheet-rolltemplate-rolls-computed">
 	<div class="sheet-template-body">
-		<div class="sheet-template-header">
+		<div class="sheet-template-header nott">
 			{{#header}}{{header}}{{/header}}{{#spec}}<span> ({{spec}})</span>{{/spec}}<br />
 			{{#arm}}<span>{{arm}}</span>{{/arm}}
+			{{#reason}}<span>{{reason}}</span><br>{{/reason}}
 			{{#base}}<span>{{base}}</span><br>{{/base}}
 			{{#effecttype}}<span>{{effecttype}}</span><br>{{/effecttype}}
 			{{#computed::dicepool}}<span class="dicepool">Dicepool: {{computed::dicepool}}</span><br>{{/computed::dicepool}}
@@ -5667,24 +5670,18 @@
 				{{/rollGreater() computed::glitch2 0}}
 			</span>
 			<span style="width: 95%">
-
-				<span class="split_pool_dicepool">Dicepool {{computed::split_pool_dicepool_1}}</span><br>
+				<span class="split_pool_dicepool nott">Dicepool {{computed::split_pool_dicepool_1}}</span><br>
 				<span class="split_pool_results">Atk 1: {{computed::roll1}}</span>
-
 				{{#rollGreater() wilddie1 0}}
-				<div class="sheet-template-row wilddice">{{wilddie1}} Wild Dice!<br>[{{computed::wilddie1_dice}}]</div>
+				<div class="sheet-template-row wilddice nott">{{wilddie1}} Wild Dice!<br>[{{computed::wilddie1_dice}}]</div>
 				{{/rollGreater() wilddie1 0}}
-
 			</span>
 			<span style="width: 95%">
-
-				<span class="split_pool_dicepool">Dicepool {{computed::split_pool_dicepool_2}}</span><br>
+				<span class="split_pool_dicepool nott">Dicepool {{computed::split_pool_dicepool_2}}</span><br>
 				<span class="split_pool_results">Atk 1: {{computed::roll2}}</span>
-
 				{{#rollGreater() wilddie2 0}}
-				<div class="sheet-template-row wilddice">{{wilddie2}} Wild Dice!<br>[{{computed::wilddie2_dice}}]</div>
+				<div class="sheet-template-row wilddice nott">{{wilddie2}} Wild Dice!<br>[{{computed::wilddie2_dice}}]</div>
 				{{/rollGreater() wilddie2 0}}
-
 			</span>
 		</div>
 		{{/split_pool}}
@@ -5700,44 +5697,70 @@
 		</div>
 		{{/rollGreater() rerolls 0}}
 
+		{{#extendedtest}}
+		<div class="sheet-template-row intervals-hitstotal">
+			<span style="padding-right: 5% !important" class="dicepool nott">Intervals: {{computed::intervals}}</span>
+			<span style="padding-left: 5% !important" class="nott">Total Hits: {{computed::hitstotal}}</span>
+		</div>
+		{{/extendedtest}}
+
 		{{#sprint}}<div class="sheet-template-row">Sprint: {{dice}} meters</div>{{/sprint}}
+
 		{{#initiative}}<div class="sheet-template-row">Initiative: <!-- {{initiative}} => --> {{computed::initiative}}</div>{{/initiative}}
 
 		{{#rollGreater() wilddie 0}}
-			<div class="sheet-template-row wilddice">{{wilddie}} Wild Dice!<br>[{{computed::wilddie_dice}}]</div>
+			<div class="sheet-template-row wilddice nott">{{wilddie}} Wild Dice!<br>[{{computed::wilddie_dice}}]</div>
 		{{/rollGreater() wilddie 0}}
 
 		{{#rating}}<div class="sheet-template-row">{{rating}}</div>{{/rating}}
+
 		{{#ampup}}{{#rollGreater() ampup 0}}
 		<div class="sheet-template-row">
-			<span class="sheet-template-desc">Amp Up: {{ampup}}</span>
+			<span class="sheet-template-desc nott">Amp Up: {{ampup}}</span>
 		</div>
 		{{/rollGreater() ampup 0}}{{/ampup}}
+
 		{{#drain}}{{#rollGreater() drain 0}}
 		<div class="sheet-template-row">
-			<span class="sheet-template-desc">Drain: {{drain}}</span>
+			<span class="sheet-template-desc nott">Drain: {{drain}}</span>
 		</div>
 		{{/rollGreater() drain 0}}{{/drain}}
+
 		{{#increasearea}}{{#rollGreater() increasearea 0}}
 		<div class="sheet-template-row">
-			<span class="sheet-template-desc">Increase Area: {{increasearea}}m</span>
+			<span class="sheet-template-desc nott">Increase Area: {{increasearea}}m</span>
 		</div>
 		{{/rollGreater() increasearea 0}}{{/increasearea}}
+
 		{{#damagetype}}
 		<div class="sheet-template-row">
 			<span class="sheet-template-desc">Damage Type: {{damagetype}}</span>
 		</div>
 		{{/damagetype}}
+
 		{{#fade}}{{#rollGreater() fade 0}}
 		<div class="sheet-template-row">
-			<span class="sheet-template-desc">Fade: {{fade}}</span>
+			<span class="sheet-template-desc nott">Fade: {{fade}}</span>
 		</div>
 		{{/rollGreater() fade 0}}{{/fade}}
+
 		{{#desc}}
 		<div class="sheet-template-row">
 			<span class="sheet-template-desc">{{desc}}</span>
 		</div>
 		{{/desc}}
+
+		{{#extendedtest}}
+		<div class="sheet-template-row">
+			{{#rollGreater() computed::dicepool 1}}
+			<span class="sheet-template-desc nott">[Next Roll](~{{header}}|extended_next||{{computed::passthrough}},{{reason}}) {{newdicepool}} dice</span>
+			{{/rollGreater() computed::dicepool 1}}
+			{{#rollLess() computed::dicepool 2}}
+			<span class="sheet-template-desc">**Dicepool Exhausted**</span>
+			{{/rollLess() computed::dicepool 2}}
+		</div>
+		{{/extendedtest}}
+
 		{{#opp}}<div class="sheet-template-row">{{opp}}</div>{{/opp}}
 	</div>
 </rolltemplate>
@@ -5895,11 +5918,9 @@
 <input type="hidden" name="attr_wild_die1" value="0" />
 <input type="hidden" name="attr_wild_die2" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.61">
+<input type="hidden" name="attr_sheet_version" value="0.62">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
-
-
 // Sheet workers
 
 // Data conversion for changes between sheet versions
@@ -5959,6 +5980,8 @@ on("sheet:opened", function() {
 				case (v.data_version < 0.60):
 					_v60_update();
 					console.log("Data now fits v.60");
+				case (v.data_version < 0.61):
+					console.log("Data now fits v.61");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -6393,7 +6416,7 @@ console.log(eventInfo);
 *************************************************************/
 // Roll Button Definitions
 const rollButtons = {
-	d6: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=?{Roll Reason?|d6}}}{{dice=[[(?{d6s|0}d6>5cs>5cf<[[(1+@{bad_luck})]]?{Exploding 6's?|N, |Y,!})]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=@{rerolls}}}{{header=@{character_name}}}",
+	d6: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=?{Roll Reason?|d6}}}{{dice=[[(?{d6s|0}d6>5cs>5cf<[[(1+@{bad_luck})]]?{Exploding 6s?|N, |Y,!})]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=@{rerolls}}}{{header=@{character_name}}}",
 	bump_fours: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{bump4s}}}{{desc=Bumping ?{How many?|-#-} fours to fives.\n+?{How many?} hits,\n-[[?{How many?} * 2]] Edge}}",
 	reroll: "@{gm_toggle} &{template:rolls-computed}{{dice=[[(?{Reroll how many?|-#-}d6>5cs>5cf<[[(1+@{bad_luck})]])]]}}{{dicepool=[[0]]}}{{header=@{character_name}}}{{base=^{rerolling} ?{Reroll how many?|-#-} ^{dice}}}",
 
@@ -6553,6 +6576,10 @@ const rollButtons = {
 	matrix_tarpit: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Tar Pit}}{{?{Training Level?|Untrained,-1|Trained,0|Specialized,2|Expertise,3}}}{{dice=[[(@{cracking}+@{logic}+?{Training Level?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle}+(@{matrix_overclock}*2)-@{matrix_noise})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=(Illegal), vs. Data Processing + Firewall}}{{wilddie=[[@{wild_die}+@{matrix_overclock}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{overclock=[[@{matrix_overclock}]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{matrix_noise=[[@{matrix_noise}]]}}",
 	matrix_trace_icon: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Trace Icon}}{{?{Training Level?|Untrained,-1|Trained,0|Specialized,2|Expertise,3}}}{{dice=[[(@{electronics}+@{intuition}+?{Training Level?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle}+(@{matrix_overclock}*2)-@{matrix_noise})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=(Illegal), vs. Willpower + Sleaze |or| Firewall + Sleaze}}{{wilddie=[[@{wild_die}+@{matrix_overclock}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{overclock=[[@{matrix_overclock}]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{matrix_noise=[[@{matrix_noise}]]}}",
 
+//	extended_start: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Begin Extended Test}}{{dice=[[(?{Dicepool?|1}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Extended Test Beginning}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{extendedtest=[[1]]}}{{newdicepool=[[(?{Dicepool?|1}-1)]]}}{{dicepool=[[?{Dicepool?|1}]]}}{{hitstotal=[[0]]}}{{intervals=[[1]]}}{{reason=?{Reason?}}}{{passthrough=[[0]]}}",
+//	extended_next: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Continue Extended Test}}{{dice=[[(%DICEPOOL%+@{modifiers_toggle}+@{wounds_toggle})d6>5cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Extended Test Continuing}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{extendedtest=[[2]]}}{{newdicepool=[[%NEWDICEPOOL%]]}}{{dicepool=[[%DICEPOOL%]]}}{{hitstotal=[[0]]}}{{intervals=[[%INTERVALS%]]}}{{reason=%REASON%}}{{passthrough=[[0]]}}",
+	extended_start: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Begin Extended Test}}{{dice=[[(?{Dicepool?|1}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Extended Test Beginning}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{extendedtest=[[1]]}}{{newdicepool=[[(?{Dicepool?|1}-1)]]}}{{dicepool=[[?{Dicepool?|1}]]}}{{hitstotal=[[0]]}}{{intervals=[[1]]}}{{reason=?{Reason?}}}{{passthrough=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
+	extended_next: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Continue Extended Test}}{{dice=[[(%DICEPOOL%+@{modifiers_toggle}+@{wounds_toggle})d6>5cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Extended Test Continuing}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{extendedtest=[[2]]}}{{newdicepool=[[%NEWDICEPOOL%]]}}{{dicepool=[[%DICEPOOL%]]}}{{hitstotal=[[0]]}}{{intervals=[[%INTERVALS%]]}}{{reason=%REASON%}}{{passthrough=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	extended_1: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Extended Test}}{{dice=[[(1+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Extended Test: ?{Reason?}\n**Dicepool Exhausted**}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
 	extended_2: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Extended Test}}{{dice=[[(2+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Extended Test: ?{Reason?}\n[Next Roll](~@{character_name}|extended_1)}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
 	extended_3: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Extended Test}}{{dice=[[(3+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Extended Test: ?{Reason?}\n[Next Roll](~@{character_name}|extended_2)}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
@@ -6681,8 +6708,7 @@ Object.keys(initiatives).forEach((ini) => {
 'connections1', 'connections2', 'connections3', 'connections4', 'connections5', 'connections6', 'connections7', 'connections8', 'connections9', 'connections10',
 'loyalty1', 'loyalty2', 'loyalty3', 'loyalty4', 'loyalty5', 'loyalty6', 'loyalty7', 'loyalty8', 'loyalty9', 'loyalty10',
 'matrix_backdoor_entry', 'matrix_brute_force', 'matrix_check_os', 'matrix_control_device', 'matrix_crack_file', 'matrix_crash_program', 'matrix_data_spike', 'matrix_disarm_data_bomb', 'matrix_edit_file', 'matrix_encrypt_file', 'matrix_erase_matrix_signature', 'matrix_format_device', 'matrix_hash_check', 'matrix_hide', 'matrix_jackout', 'matrix_jam_signals', 'matrix_jump_into_rigged_device', 'matrix_matrix_perception', 'matrix_matrix_search', 'matrix_probe', 'matrix_reboot_device', 'matrix_set_data_bomb', 'matrix_snoop', 'matrix_spoof_command', 'matrix_tarpit', 'matrix_trace_icon',
-'matrixresist_int_f', 'matrixresist_f_s',
-'extended_1', 'extended_2', 'extended_3', 'extended_4', 'extended_5', 'extended_6', 'extended_7', 'extended_8', 'extended_9', 'extended_10', 'extended_11', 'extended_12', 'extended_13', 'extended_14', 'extended_15', 'extended_16', 'extended_17', 'extended_18', 'extended_19', 'extended_20', 'extended_21', 'extended_22', 'extended_23', 'extended_24', 'extended_25'
+'matrixresist_int_f', 'matrixresist_f_s'
 ].forEach((button) => {
 	on(`clicked:${button}`, (eventInfo) => {
 console.log(eventInfo);
@@ -6812,13 +6838,95 @@ console.log(rollButton);
 });
 
 
+
+// Generic Extended Test Rolls
+['extended_start', 'extended_next'].forEach((button) => {
+	on(`clicked:${button}`, async (eventInfo) => {
+console.log(eventInfo);
+//console.log("Extended Test!");
+		var buttonName = eventInfo.triggerName.slice(17);
+
+		rollButton = rollButtons[eventInfo.triggerName.slice(8)];
+
+		let passthrough = {};
+		if(eventInfo.originalRollId) {
+			let parts = eventInfo.originalRollId.split(',');
+console.log(parts);
+			passthrough = rollEscape.unescape(parts[0]);
+//console.log("Passthrough unescaped.");
+//console.log(passthrough);
+
+			// update the dicepool and new dicepool (-1 each) and update intervals (+1)
+			passthrough.dicepool -= 1;
+			passthrough.newdicepool -= 1;
+			passthrough.intervals++;
+			passthrough.reason = parts[1];
+
+			// replace placeholders in the rollButton string with the passthrough values
+			rollButton = rollButton.replace(/%BASE%/g, passthrough.base);
+			rollButton = rollButton.replace(/%DICEPOOL%/g, passthrough.dicepool);
+			rollButton = rollButton.replace(/%REASON%/g, passthrough.reason);
+			rollButton = rollButton.replace(/%DESC%/g, passthrough.desc);
+			rollButton = rollButton.replace(/%NEWDICEPOOL%/g, passthrough.newdicepool);
+			rollButton = rollButton.replace(/%INTERVALS%/g, passthrough.intervals);
+		}
+
+//console.log("Passthrough parsed.");
+//console.log("rollButton updated.");
+//console.log(rollButton);
+		await rollProcessor(rollButton, eventInfo, passthrough);
+	});
+});
+
+/* Thanks to Oosh on the Roll20 forums for this bit of code
+Helper - the data passed through in an action button needs these characters escaped
+I have used a mongrel escape sequence to avoid triggering anything internal in Roll20
+This may not be a complete list of characters that need escaping! If you have heavily
+punctuated text, it might break the passthrough!
+*/
+const rollEscape = {
+    chars: {
+        '"': '%quot;',
+        ',': '%comma;',
+        ':': '%colon;',
+        '}': '%rcub;',
+        '{': '%lcub;',
+    },
+    escape(str) {
+        str = (typeof(str) === 'object') ? JSON.stringify(str) : (typeof(str) === 'string') ? str : null;
+        return (str) ? `${str}`.replace(new RegExp(`[${Object.keys(this.chars)}]`, 'g'), (r) => this.chars[r]) : null;
+    },
+    unescape(str) {
+        str = `${str}`.replace(new RegExp(`(${Object.values(this.chars).join('|')})`, 'g'), (r) => Object.entries(this.chars).find(e=>e[1]===r)[0]);
+        return JSON.parse(str);
+    }
+};
+
+
 /************************************
 * Roll Processor
 * - This does the heavy lifting
 ************************************/
-var rollProcessor = (rollButton) => {
+var rollProcessor = async (rollButton, ev = {}, passthrough = {}) => {
+console.info(ev);
+console.info(passthrough);
+console.info(rollButton);
 	getAttrs(["bad_luck"], (v) => {
 		startRoll(rollButton, (results) => {
+
+console.log(results.results);
+			// setup our passthrough values
+			if(results.results.extendedtest && results.results.extendedtest.result == 1) {
+console.info("Setting up passthrough for start");
+				passthrough.dicepool = parseInt(results.results.dicepool.result);
+				passthrough.newdicepool = parseInt(results.results.dicepool.result - 1);
+				passthrough.hitstotal = parseInt(0);
+				passthrough.intervals = parseInt(1);
+//				passthrough.reason = results.results.reason.expression;
+console.log(passthrough);
+			}
+
+
 console.log(results.results);
 			if(! results.results.dice) {
 				results.results.dice = {dice: []}
@@ -6898,6 +7006,12 @@ console.log(results.results);
 
 			var misses = results.results.dice.dice.length - hits;
 
+			// handle last second total hits tally for extended tests
+			if(results.results.extendedtest && results.results.extendedtest.result) {
+				passthrough.hitstotal = parseInt(passthrough.hitstotal + total_hits);
+console.log(passthrough);
+			}
+
 			finishRoll(
 				results.rollId, {
 					dice: total_hits,
@@ -6920,11 +7034,14 @@ console.log(results.results);
 					hits1: hits1,
 					hits2: hits2,
 					fours: fours,
+					passthrough: rollEscape.escape(passthrough),
+					hitstotal: passthrough.hitstotal,
 				}
 			);
 		});
 	});
 };
+
 
 var process_wild_dice = (wd_result, rolled) => {
 			var wild_die_results = [];
