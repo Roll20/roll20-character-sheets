@@ -1,7 +1,7 @@
 Change Log
 ==============================================
 **2022-10-24 ** v.62 Chuz (James Culp)
-	New Feature - Added Extended Tests capability
+	New Feature - Added Extended Tests capabilities.
 **2022-09-20 ** v.61 Chuz (James Culp)
 	Bugfix - NPC->Spells were missing the Limited duration, added it.
 	Bugfix - Charactersheet Tab - removed the underline.
