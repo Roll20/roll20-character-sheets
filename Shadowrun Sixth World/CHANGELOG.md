@@ -1,6 +1,9 @@
 Change Log
 ==============================================
 **2022-10-24 ** v.62 Chuz (James Culp)
+	New Feature - PC->Matrix->ASDF Roll buttons now include more options to combine them with.  None, Custom, mind attributes and ASDF.
+	New Feature - NPCs now have updated ASDF roll buttons as well!
+	New Feature - NPCs now have the newer version of the d6's roll button and the new Extended Tests capability.
 	New Feature - Added Extended Tests capabilities.
 **2022-09-20 ** v.61 Chuz (James Culp)
 	Bugfix - NPC->Spells were missing the Limited duration, added it.
