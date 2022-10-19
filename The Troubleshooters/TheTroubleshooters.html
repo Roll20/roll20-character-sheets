@@ -2,7 +2,7 @@
 	CREATED by 			Richard M
 	EDITED by 			Gorthian
 	Version				CF Preview
-	Letzte Änderung		2022-10-11
+	Letzte Änderung		2022-10-19
 	
 	GitHub				https://github.com/Gorthian/Roll20_Troubleshooters_CharacterSheet
 	Wiki				https://github.com/Gorthian/Roll20_Troubleshooters_CharacterSheet/wiki
@@ -152,7 +152,6 @@
 	</div>
 
 	<div class="sheet-skills sheet-npc">
-
 		<div class="sheet-passport">
 			<div class="sheet-passport-page">
 				<div class="sheet-pc-view">
@@ -219,9 +218,9 @@
 							<input type="text" name="attr_npcatktxt" placeholder="Attack" data-i18n-placeholder="attack" style="width:25%"/>
 							<input type="number" name="attr_npcattack" class="sheet-npcskill" value = "15" min="0" title="Attack skill" data-i18n-title="attack-skill"/>
 							<input type="number" name="attr_npcweapondmg" value="0" min="0" title="Damage dice" data-i18n-title="damage-dice"/><span data-i18n="dX">dX</span>
-							<input type="text" name="attr_npcweapontags" placeholder="Tags" data-i18n-placeholder="tags"/>
-							<input type="number" name="attr_npcreloadval" title="Reload: Enter lower tag value OR use 99 for single-shot and melee weapons" data-i18n-title="npc-reload-info" value="99" min="0"/>	
-							<button type="action" class="sheet-npcroll" name="act_atknpc" title="NPC attack" data-i18n-title="npc-attack" data-i18n="roll">Roll</button><br>
+							<button type="action" class="sheet-npcroll" name="act_atknpc" title="NPC attack" data-i18n-title="npc-attack" data-i18n="roll">Roll</button>
+							<br/><span data-i18n="tags">Tags</span> :<input type="text" name="attr_npcweapontags" placeholder="Tags" data-i18n-placeholder="tags"/>
+							<span data-i18n="reload">Reload</span> :<input type="number" name="attr_npcreloadval" title="Reload: Enter lower tag value OR use 99 for single-shot and melee weapons" data-i18n-title="npc-reload-info" value="99" min="0"/>	
 						</fieldset>	
 					</div>
 					<div>		
@@ -233,9 +232,7 @@
 			</div>
 
 			<div class="sheet-passport-page">
-
 				<div class="sheet-2colrow">
-
 					<h3 data-i18n="skills-title">Skills / Competences / Kompetenzen</h3>
 					<br/>
 
@@ -722,8 +719,7 @@
 			</div>
 			{{/pips}}
 		</div>
-		{{#skill}}
-				<div class="sheet-template-info">
+		<div class="sheet-template-info">
 			{{#rollTotal() outcome 1}}
 				{{^type}}<p><span data-i18n="success">Success!</span></p>{{/type}}
 				{{#rollLess() type 2}}<p><span data-i18n="success">Success!</span></p>{{/rollLess() type 2}}
@@ -771,7 +767,6 @@
 			{{#rollBetween() reload 1 1}}<p><span data-i18n="out-of-ammo">Out of ammo!</span></p>{{/rollBetween() reload 1 1}}
 			{{#rollTotal() type 1}}<span data-i18n="reduce-ini">Reduce initiative score by 2</span>{{/rollTotal() type 1}}
 		</div>
-		{{/skill}}
 	</div>
 </rolltemplate>
 
@@ -1019,61 +1014,64 @@ on("sheet:opened", function(eventInfo){
 
 //NPC combat rolls
 	on('clicked:repeating_attacks:atknpc', (event) => {
-	const trigger = event.triggerName.slice(8);  // this always starts with 'clicked:'
+		resetFlipResults();
+
+		const trigger = event.triggerName.slice(8);  // this always starts with 'clicked:'
 		const prefix = trigger.startsWith('repeating_') ? trigger.split('_').slice(0,3).join('_') + '_' : '' // prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes 
 		let dmgVal = "@{npcweapondmg}";
         let dmgPart = dmgVal.replaceAll('@{', `@{${prefix}`);
 		let relVal = "@{npcreloadval}";
-		let relPart = relVal.replaceAll('@{', `@{${prefix}`);
+		let relPart = relVal.replaceAll('@{', `@{${prefix}`);		
 		let tgtVal = "@{npcattack}";
 		let tgtPart = tgtVal.replaceAll('@{', `@{${prefix}`);
 		let txtVal = "@{npcatktxt}";
-		let txtPart = txtVal.replaceAll('@{', `@{${prefix}`);		
-		const rolltext = "&{template:atk} {{char=@{name}}} {{atktxt="+txtPart+"}} {{target=[["+tgtPart+"]]}} {{roll1=[[1d100]]}} {{outcome=[[0]]}} {{pips=[[?{"+getTranslationByKey("total-pips")+"|0}]]}} {{type=[[5]]}} {{reload=[["+relPart+"]]}}"
-		startRoll(rolltext, (results) => {
-			const total = results.results.roll1.result;
-            const tens = Math.floor(total / 10);
-			const ones = total % 10;
+		let txtPart = txtVal.replaceAll('@{', `@{${prefix}`);
+		const mRollParams = new Map([
+			["skill_raw",	txtPart],
+			["target",	"[["+tgtPart+"]]"],
+			["outcome",	"[[0]]"],
+			["karma",	"[[0]]"],
+			["ini",		"[[0]]"],
+			["pips",	"[[?{"+getTranslationByKey("total-pips")+"|0}]]"],
+			["type",	"[[3]]"],	
+			["reload",	"[["+relPart+"]]"],
+		]);
+				
+		//const rolltext = "&{template:atk} {{char=@{name}}} {{atktxt="+txtPart+"}} {{target=[["+tgtPart+"]]}} {{roll1=[[1d100]]}} {{outcome=[[0]]}} {{pips=[[?{"+getTranslationByKey("total-pips")+"|0}]]}} {{type=[[5]]}} {{reload=[["+relPart+"]]}}"
+		startRoll(getRollString("d100",mRollParams), (results) => {
+			const tens = results.results.tens.result;
+			const ones = results.results.ones.result;
 			const target = results.results.target.result;
 			const pips = results.results.pips.result;
-			const invpips = pips * -1;
+			var total = calcTotal(tens,ones,0);
+			var totalfliped = calcTotal(tens,ones,1);
+            var krm = calcKarma(tens,ones);
+			var out = getSuccessOrFailure(tens,ones,pips,target,0);
+			var outfliped = getSuccessOrFailure(tens,ones,pips,target,1);
 			var rld = results.results.reload.result;
-			var tens2 = tens;
-			var out = 0;
-			if (tens == 10) {
-				tens2 = 0;
-			}
-			if (rld < 99 && (rld <= ones || ones == 0)) {
-				rld = 1;
-			}
-			if (pips > 0 && ones > 0 && pips >= ones && tens2 == ones) {
-				out = 3;
-			}
-			else if (pips > 0 && ones > 0 && pips >= ones) {
-				out = 1;
-			}
-			else if (invpips > 0 && ones > 0 && invpips >= ones && tens2 == ones) {
-				out = 4;
-			}
-			else if (invpips > 0 && ones > 0 && invpips >= ones) {
-				out = 2;
-			}
-			else if (total <= target && tens2 == ones) {
-				out = 3;
-				}
-			else if (total > target && tens2 == ones) {
-				out = 4;
-				}
-			else if (total <= target) {
-				out = 1;
-				}
-			else if (total > target) {
-				out = 2;
-			}
+			
+			//Reload
+			if (rld < 99 && rld <= ones) {rld = 1;}
+			if (ones == 0) {rld = 1;}
+
+			mFlipResults = new Map([
+				["last-roll-fliped",	outfliped],
+				["last-roll-skill-raw",	txtPart],
+				["last-roll-pips",		pips],
+				["last-roll-target",	target],
+				["last-roll-outcome",	out],
+				["last-roll-karma",		krm],
+				["damage-dices",		dmgPart],			
+			]);				
+
+			//safe results for a flip
+			safeFlipResults(results,mFlipResults);
+			
             finishRoll(
                 results.rollId,
                 {
 					outcome: out,
+					karma: krm,
 					reload: rld,
                 }
             );
@@ -1146,7 +1144,6 @@ function getRollString(sTemplate,mRollParams) {
 	sRoll = "&{template:"+sTemplate+"} {{name=@{name}}} {{charname=@{character_name}}} {{tens=[[1d10-1]]}} {{ones=[[1d10-1]]}} {{dicetype=d%}} {{dicecount=1}}"
 	//sRoll = "&{template:"+sTemplate+"} {{name=@{name}}} {{charname=@{character_name}}} {{tens=[[7]]}} {{ones=[[7]]}} {{dicetype=d%}} {{dicecount=1}}"
 	mRollParams.forEach((value, key) => sRoll = sRoll + " {{"+key+"="+value+"}}");
-	
 	return sRoll;
 }
 
@@ -1227,7 +1224,7 @@ function getSuccessOrFailure(iTens, iOnes, iPips, iTarget, iFliped) {
 		iOut = 2;
 	}
 	
-	if (iOut == 2 && iFliped == 1) {iOut = ""}
+	//if (iOut == 2 && iFliped == 1) {iOut = ""} //Warum habe ich das gemacht?? Flips bei NPC-Attacken zeigen damit jedenfalls Misserfolge nicht an
 	
 	return iOut;
 }
