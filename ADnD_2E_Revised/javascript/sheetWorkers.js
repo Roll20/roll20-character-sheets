@@ -2607,6 +2607,10 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`title=@{${name}}`);
             macroBuilder.push(`discipline=${displayDiscipline}`);
             macroBuilder.push(`tier=${tier}`);
+            let attribute = power['attribute'];
+            attribute = attribute.startsWith("@") ? attribute.substring(2,attribute.length-1) : 'Affected'
+            let modifier = power['modifier'] === '0' ? '' : power['modifier'];
+            macroBuilder.push(`powerscoretext=${attribute} ${modifier}`.trim());
             macroBuilder.push(`initial=@{PSP-cost${cost_number}}`);
             macroBuilder.push(`maintenance=@{PSP-cost-maintenance}`);
             macroBuilder.push(`range=${power['range']}`);
@@ -2614,7 +2618,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             let prep = power['prep'];
             let prepMatch = prep.match(/^[1-9]\d*$/);
             if (prepMatch) {
-                prep += parseInt(prepMatch[0]) > 1 ? ' rounds' : 'round';
+                prep += parseInt(prepMatch[0]) > 1 ? ' rounds' : ' round';
             }
             macroBuilder.push(`prep=${prep}`);
             macroBuilder.push(`prereq=${power['prerequisites']}`);
