@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable prefer-destructuring */
 /* eslint-disable default-case */
 /* eslint-disable camelcase */
 /* eslint-disable max-len */
@@ -38,16 +40,16 @@ const wpnAutreData = [
 
 const wpnEffects = [
   'akimbo', 'ambidextrie', 'anatheme', 'antiAnatheme', 'antiVehicule', 'artillerie', 'assassin', 'assistanceAttaque',
-  'barrage', 'cadence', 'chargeur', 'choc', 'defense', 'degatContinue', 'deuxMains', 'demoralisant',
-  'designation', 'destructeur', 'dispersion', 'enChaine', 'esperance', 'fureur', 'ignoreArmure',
+  'barrage', 'bourreau', 'cadence', 'chargeur', 'choc', 'conviction', 'defense', 'degatContinue', 'deuxMains', 'demoralisant',
+  'designation', 'destructeur', 'devastation', 'dispersion', 'enChaine', 'esperance', 'excellence', 'fureur', 'guidage', 'ignoreArmure',
   'ignoreCdF', 'leste', 'lestePNJ', 'lourd', 'lumiere', 'meurtrier', 'obliteration',
-  'orfevrerie', 'orfevreriePNJ', 'parasitage', 'penetrant', 'perceArmure', 'precision', 'precisionPNJ', 'reaction', 'silencieux', 'soumission', 'tenebricite',
+  'orfevrerie', 'orfevreriePNJ', 'parasitage', 'penetrant', 'perceArmure', 'precision', 'precisionPNJ', 'reaction', 'regularite', 'silencieux', 'soumission', 'tenebricite',
   'tirRafale', 'tirSecurite', 'ultraViolence',
 ];
 
 const wpnEffectsValue = [
-  'assassinValue', 'barrageValue', 'cadenceValue', 'chargeurValue', 'chocValue',
-  'defenseValue', 'degatContinueValue', 'dispersionValue', 'lumiereValue', 'parasitageValue',
+  'assassinValue', 'barrageValue', 'bourreauValue', 'cadenceValue', 'cadenceactif', 'chargeurValue', 'chocValue',
+  'defenseValue', 'degatContinueValue', 'devastationValue', 'dispersionValue', 'guidageactif', 'lumiereValue', 'parasitageValue',
   'penetrantValue', 'perceArmureValue', 'reactionValue',
 ];
 
@@ -102,20 +104,22 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   const bDegats = [];
   const autresEffets = [];
 
-  let rCadence = 0;
-  let vCadence = 0;
   let eASAssassin = '';
   let eASAssassinValue = 0;
 
+  let vCadence = 0;
   let eLumiereS = '';
   let eLumiereValue = 0;
+
+  let eBourreauValue = 0;
+  let eDevastationValue = 0;
 
   let isAntiAnatheme = false;
   let isAssistantAttaque = false;
   let isAkimbo = false;
   let isAmbidextrie = false;
   let isCadence = false;
-  const isChoc = false;
+  let isChoc = false;
   let isDestructeur = false;
   let isDeuxMains = false;
   let isLeste = false;
@@ -130,6 +134,11 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   let isTirRafale = false;
   let isUltraviolence = false;
 
+  let isBourreau = false;
+  let isDevastation = false;
+  let isGuidage = false;
+  let isRegularite = false;
+
   const eAntiAnatheme = isApplied(effet[`${prefix}antiAnatheme`]);
   const eAntiVehicule = isApplied(effet[`${prefix}antiVehicule`]);
   const eArtillerie = isApplied(effet[`${prefix}artillerie`]);
@@ -138,25 +147,34 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   const eAssistanceAttaque = isApplied(effet[`${prefix}assistanceAttaque`]);
   const eBarrage = isApplied(effet[`${prefix}barrage`]);
   const eBarrageV = effet[`${prefix}barrageValue`] || 0;
+  const eBourreau = isApplied(effet[`${prefix}bourreau`]);
+  const eBourreauV = effet[`${prefix}bourreauValue`] || 0;
   const eCadence = isApplied(effet[`${prefix}cadence`]);
+  const eCadenceA = +effet[`${prefix}cadenceactif`] || 0;
   const eCadenceV = effet[`${prefix}cadenceValue`] || 0;
-  const eChargeur = isApplied(effet[`${prefix}eChargeur`]);
+  const eChargeur = isApplied(effet[`${prefix}chargeur`]);
   const eChargeurV = effet[`${prefix}chargeurValue`] || 0;
   const eChoc = isApplied(effet[`${prefix}choc`]);
   const eChocV = effet[`${prefix}chocValue`] || 0;
-  const eDefense = isApplied(effet[`${prefix}eDefense`]);
+  const eConviction = isApplied(effet[`${prefix}conviction`]);
+  const eDefense = isApplied(effet[`${prefix}defense`]);
   const eDefenseV = effet[`${prefix}defenseValue`] || 0;
   const eDegatsContinus = isApplied(effet[`${prefix}degatContinue`]);
   const eDegatsContinusV = effet[`${prefix}degatContinueValue`] || 0;
   const eDeuxMains = isApplied(effet[`${prefix}deuxMains`]);
-  const eDemoralisant = isApplied(effet[`${prefix}eDemoralisant`]);
+  const eDemoralisant = isApplied(effet[`${prefix}demoralisant`]);
   const eDesignation = isApplied(effet[`${prefix}designation`]);
   const eDestructeur = isApplied(effet[`${prefix}destructeur`]);
   const eDestructeurV = 2;
+  const eDevastation = isApplied(effet[`${prefix}devastation`]);
+  const eDevastationV = effet[`${prefix}devastationValue`] || 0;
   const eDispersion = isApplied(effet[`${prefix}dispersion`]);
   const eDispersionV = effet[`${prefix}dispersionValue`] || 0;
   const eEnChaine = isApplied(effet[`${prefix}enChaine`]);
   const eEsperance = isApplied(effet[`${prefix}esperance`]);
+  const eExcellence = isApplied(effet[`${prefix}excellence`]);
+  const eGuidage = isApplied(effet[`${prefix}guidage`]);
+  const eGuidageV = +effet[`${prefix}guidageactif`] || 0;
   const eFureur = isApplied(effet[`${prefix}fureur`]);
   const eFureurV = 4;
   const eIgnoreArmure = isApplied(effet[`${prefix}ignoreArmure`]);
@@ -180,6 +198,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   const ePrecision = isApplied(effet[`${prefix}precision`]);
   const eReaction = isApplied(effet[`${prefix}reaction`]);
   const eReactionV = effet[`${prefix}reactionValue`] || 0;
+  const eRegularite = isApplied(effet[`${prefix}regularite`]);
   const eSilencieux = isApplied(effet[`${prefix}silencieux`]);
   const eSoumission = isApplied(effet[`${prefix}soumission`]);
   const eTenebricide = isApplied(effet[`${prefix}tenebricite`]);
@@ -221,16 +240,29 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
     if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
   }
 
-  if (eCadence) {
-    rCadence = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
+  if (eBourreau) {
+    isBourreau = true;
+    eBourreauValue = eBourreauV;
+  }
+
+  if (eCadence && eCadenceA === 0) {
+    autresEffets.push(`${i18n_cadence} ${eCadenceV}`);
+    vCadence = eCadenceV;
+  } else if (eCadence && eCadenceA === 1) {
     isCadence = true;
     vCadence = eCadenceV;
+    exec.push(`{{vCadence=${eCadenceV} ${i18n_inclus}}}`);
   }
 
   if (eChoc) {
     isConditionnelA = true;
+    isChoc = true;
 
     exec.push(`{{choc=${i18n_choc} ${eChocV}}} {{chocCondition=${i18n_chocCondition}}}`);
+  }
+
+  if (eConviction) {
+    autresEffets.push(i18n_conviction);
   }
 
   if (eDemoralisant) {
@@ -249,6 +281,11 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
     isDestructeur = true;
   }
 
+  if (eDevastation) {
+    isDevastation = true;
+    eDevastationValue = eDevastationV;
+  }
+
   if (eEnChaine) {
     isConditionnelD = true;
 
@@ -262,6 +299,13 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
     exec.push(`{{esperance=${i18n_esperance}}} {{esperanceConditionD=${i18n_esperanceConditionD}}} {{esperanceConditionV=${i18n_esperanceConditionV}}}`);
   }
 
+  if (eExcellence) {
+    isConditionnelD = true;
+    isConditionnelV = true;
+
+    exec.push(`{{excellence=${i18n_excellence}}} {{excellenceCondition=${i18n_excellenceCondition}}}`);
+  }
+
   if (eFureur) {
     isConditionnelV = true;
     isFureur = true;
@@ -269,6 +313,14 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
     firstExec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
 
     exec.push(`{{fureur=${i18n_fureur}}} {{fureurCondition=${i18n_fureurCondition}}}`);
+  }
+
+  if (eGuidage && eGuidageV !== 0) {
+    isGuidage = true;
+
+    exec.push(`{{vGuidage=${i18n_guidageInclus}}}`);
+  } else if (eGuidage) {
+    autresEffets.push(i18n_guidage);
   }
 
   if (eLeste) {
@@ -323,17 +375,41 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
     exec.push(`{{vPrecision=${vPrecision}}}`);
   }
 
+  if (eRegularite) {
+    isRegularite = true;
+    exec.push('{{vRegularite=[[0]]}}');
+  }
+
   if (eSilencieux || prefix === 'pS' || prefix === 'pSC') {
+    const ghost = +effet.rogueGhost;
+    const MALghost = +effet.MALRogueGhost;
+    const changeling = +effet.bardChangeling;
+    const MALchangeling = +effet.MALBardChangeling;
     let totalSilencieux = vDiscretion;
-    isConditionnelD = true;
 
     if (hasArmure) { totalSilencieux += oDiscretion; }
 
-    attaquesSurprises.push(i18n_silencieux);
-    attaquesSurprisesValue.push(totalSilencieux);
-    isSilencieux = true;
+    if (hasArmure && ghost !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bDegats.push(totalSilencieux);
+    } else if (hasArmure && MALghost !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bDegats.push(totalSilencieux);
+    } else if (hasArmure && changeling !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bDegats.push(totalSilencieux);
+    } else if (hasArmure && MALchangeling !== 0) {
+      exec.push(`{{vSilencieuxD=${totalSilencieux}}}`);
+      bDegats.push(totalSilencieux);
+    } else {
+      isConditionnelD = true;
+      attaquesSurprises.push(i18n_silencieux);
+      attaquesSurprisesValue.push(totalSilencieux);
 
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+    }
+
+    isSilencieux = true;
   }
 
   if (eSoumission) {
@@ -438,7 +514,6 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   result.eASAssassin = eASAssassin;
   result.eASAssassinValue = eASAssassinValue;
   result.isCadence = isCadence;
-  result.sCadence = rCadence;
   result.vCadence = vCadence;
   result.isTenebricide = isTenebricide;
   result.isObliteration = isObliteration;
@@ -455,6 +530,14 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   result.isTirRafale = isTirRafale;
   result.isFureur = isFureur;
   result.isUltraviolence = isUltraviolence;
+
+  result.isBourreau = isBourreau;
+  result.vBourreau = eBourreauValue;
+  result.isDevastation = isDevastation;
+  result.vDevastation = eDevastationValue;
+
+  result.isGuidage = isGuidage;
+  result.isRegularite = isRegularite;
 
   result.eLumiere = eLumiere;
   result.isELumiere = isELumiere;
@@ -498,9 +581,10 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   let bDegats = 0;
   const autresEffets = [];
 
-  const isCadence = false;
-  let rCadence = 0;
   let vCadence = 0;
+
+  let eBourreauValue = 0;
+  let eDevastationValue = 0;
 
   let isObliteration = false;
   let isTenebricide = false;
@@ -508,6 +592,7 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   let isAntiAnatheme = false;
   let isAssistanceAttaque = false;
   let isDestructeur = false;
+  let isCadence = false;
   let isChoc = false;
   let isLeste = false;
   let isMeurtrier = false;
@@ -515,6 +600,11 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   let isSilencieux = false;
   let isFureur = false;
   let isUltraviolence = false;
+
+  let isBourreau = false;
+  let isDevastation = false;
+  let isGuidage = false;
+  let isRegularite = false;
 
   const eAnatheme = isApplied(data[`${prefix}anatheme`]);
   const eAntiAnatheme = isApplied(data[`${prefix}antiAnatheme`]);
@@ -525,12 +615,16 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   const eAssistanceAttaque = isApplied(data[`${prefix}assistanceAttaque`]);
   const eBarrage = isApplied(data[`${prefix}barrage`]);
   const eBarrageV = data[`${prefix}barrageValue`] || 0;
+  const eBourreau = isApplied(data[`${prefix}bourreau`]);
+  const eBourreauV = data[`${prefix}bourreauValue`] || 0;
   const eCadence = isApplied(data[`${prefix}cadence`]);
+  const eCadenceA = +data[`${prefix}cadenceactif`] || 0;
   const eCadenceV = data[`${prefix}cadenceValue`] || 0;
   const eChargeur = isApplied(data[`${prefix}eChargeur`]);
   const eChargeurV = data[`${prefix}chargeurValue`] || 0;
   const eChoc = isApplied(data[`${prefix}choc`]);
   const eChocV = data[`${prefix}chocValue`] || 0;
+  const eConviction = isApplied(data[`${prefix}conviction`]);
   const eDefense = isApplied(data[`${prefix}eDefense`]);
   const eDefenseV = data[`${prefix}defenseValue`] || 0;
   const eDegatsContinus = isApplied(data[`${prefix}degatContinue`]);
@@ -540,12 +634,17 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   const eDesignation = isApplied(data[`${prefix}designation`]);
   const eDestructeur = isApplied(data[`${prefix}destructeur`]);
   const eDestructeurV = 2;
+  const eDevastation = isApplied(data[`${prefix}devastation`]);
+  const eDevastationV = data[`${prefix}devastationValue`] || 0;
   const eDispersion = isApplied(data[`${prefix}dispersion`]);
   const eDispersionV = data[`${prefix}dispersionValue`] || 0;
   const eEnChaine = isApplied(data[`${prefix}enChaine`]);
   const eEsperance = isApplied(data[`${prefix}esperance`]);
+  const eExcellence = isApplied(data[`${prefix}excellence`]);
   const eFureur = isApplied(data[`${prefix}fureur`]);
   const eFureurV = 4;
+  const eGuidage = isApplied(data[`${prefix}guidage`]);
+  const eGuidageV = +data[`${prefix}guidageactif`] || 0;
   const eIgnoreArmure = isApplied(data[`${prefix}ignoreArmure`]);
   const eIgnoreCDF = isApplied(data[`${prefix}ignoreCdF`]);
   const eJAkimbo = isApplied(data[`${prefix}akimbo`]);
@@ -567,6 +666,7 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   const ePrecision = isApplied(data[`${prefix}precisionPNJ`]);
   const eReaction = isApplied(data[`${prefix}reaction`]);
   const eReactionV = data[`${prefix}reactionValue`] || 0;
+  const eRegularite = isApplied(data[`${prefix}regularite`]);
   const eSilencieux = isApplied(data[`${prefix}silencieux`]);
   const eSoumission = isApplied(data[`${prefix}soumission`]);
   const eTenebricide = isApplied(data[`${prefix}tenebricite`]);
@@ -608,9 +708,18 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
     if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
   }
 
-  if (eCadence) {
-    rCadence = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
+  if (eBourreau) {
+    isBourreau = true;
+    eBourreauValue = eBourreauV;
+  }
+
+  if (eCadence && eCadenceA === 0) {
+    autresEffets.push(`${i18n_cadence} ${eCadenceV}`);
     vCadence = eCadenceV;
+  } else if (eCadence && eCadenceA === 1) {
+    isCadence = true;
+    vCadence = eCadenceV;
+    exec.push(`{{vCadence=${eCadenceV} ${i18n_inclus}}}`);
   }
 
   if (eChoc) {
@@ -619,6 +728,10 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
     exec.push(`{{choc=${i18n_choc} ${eChocV}}} {{chocCondition=${i18n_chocCondition}}}`);
 
     isChoc = true;
+  }
+
+  if (eConviction) {
+    autresEffets.push(i18n_conviction);
   }
 
   if (eDemoralisant) {
@@ -637,6 +750,11 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
     isDestructeur = true;
   }
 
+  if (eDevastation) {
+    isDevastation = true;
+    eDevastationValue = eDevastationV;
+  }
+
   if (eEnChaine) {
     isConditionnelD = true;
 
@@ -650,6 +768,13 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
     exec.push(`{{esperance=${i18n_esperance}}} {{esperanceConditionD=${i18n_esperanceConditionD}}} {{esperanceConditionV=${i18n_esperanceConditionV}}}`);
   }
 
+  if (eExcellence) {
+    isConditionnelD = true;
+    isConditionnelV = true;
+
+    exec.push(`{{excellence=${i18n_excellence}}} {{excellenceCondition=${i18n_excellenceCondition}}}`);
+  }
+
   if (eFureur) {
     isConditionnelV = true;
     isFureur = true;
@@ -657,6 +782,14 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
     firstExec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
 
     exec.push(`{{fureur=${i18n_fureur}}} {{fureurCondition=${i18n_fureurCondition}}}`);
+  }
+
+  if (eGuidage && eGuidageV !== 0) {
+    isGuidage = true;
+
+    exec.push(`{{vGuidage=${i18n_guidageInclus}}}`);
+  } else if (eGuidage) {
+    autresEffets.push(i18n_guidage);
   }
 
   if (eLeste) {
@@ -707,6 +840,11 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
 
     bDegats += vPrecision;
     exec.push(`{{vPrecision=${vPrecision}}}`);
+  }
+
+  if (eRegularite) {
+    isRegularite = true;
+    exec.push('{{vRegularite=[[0]]}}');
   }
 
   if (eSilencieux || prefix === 'pS' || prefix === 'pSC') {
@@ -808,7 +946,6 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   result.eASAssassinValue = eASAssassinValue;
 
   result.isCadence = isCadence;
-  result.sCadence = rCadence;
   result.vCadence = vCadence;
   result.isTenebricide = isTenebricide;
   result.isObliteration = isObliteration;
@@ -822,6 +959,14 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   result.isSilencieux = isSilencieux;
   result.isFureur = isFureur;
   result.isUltraviolence = isUltraviolence;
+
+  result.isGuidage = isGuidage;
+  result.isRegularite = isRegularite;
+
+  result.isBourreau = isBourreau;
+  result.vBourreau = eBourreauValue;
+  result.isDevastation = isDevastation;
+  result.vDevastation = eDevastationValue;
 
   result.attaquesSurprises = attaquesSurprises;
   result.attaquesSurprisesValue = attaquesSurprisesValue;
@@ -853,7 +998,6 @@ function getWeaponsEffectsAutre(prefix, effet) {
   const bDegats = [];
   const autresEffets = [];
 
-  let rCadence = 0;
   let vCadence = 0;
   let eASAssassin = '';
   let eASAssassinValue = 0;
@@ -881,6 +1025,11 @@ function getWeaponsEffectsAutre(prefix, effet) {
   let isFureur = false;
   let isUltraviolence = false;
 
+  let isBourreau = false;
+  let isDevastation = false;
+  let isGuidage = false;
+  let isRegularite = false;
+
   const eAntiAnatheme = isApplied(effet[`${prefix}antiAnatheme`]);
   const eAntiVehicule = isApplied(effet[`${prefix}antiVehicule`]);
   const eArtillerie = isApplied(effet[`${prefix}artillerie`]);
@@ -889,12 +1038,16 @@ function getWeaponsEffectsAutre(prefix, effet) {
   const eAssistanceAttaque = isApplied(effet[`${prefix}assistanceAttaque`]);
   const eBarrage = isApplied(effet[`${prefix}barrage`]);
   const eBarrageV = effet[`${prefix}barrageValue`] || 0;
+  const eBourreau = isApplied(effet[`${prefix}bourreau`]);
+  const eBourreauV = effet[`${prefix}bourreauValue`] || 0;
   const eCadence = isApplied(effet[`${prefix}cadence`]);
+  const eCadenceA = +effet[`${prefix}cadenceactif`] || 0;
   const eCadenceV = effet[`${prefix}cadenceValue`] || 0;
   const eChargeur = isApplied(effet[`${prefix}eChargeur`]);
   const eChargeurV = effet[`${prefix}chargeurValue`] || 0;
   const eChoc = isApplied(effet[`${prefix}choc`]);
   const eChocV = effet[`${prefix}chocValue`] || 0;
+  const eConviction = isApplied(effet[`${prefix}conviction`]);
   const eDefense = isApplied(effet[`${prefix}eDefense`]);
   const eDefenseV = effet[`${prefix}defenseValue`] || 0;
   const eDegatsContinus = isApplied(effet[`${prefix}degatContinue`]);
@@ -904,12 +1057,17 @@ function getWeaponsEffectsAutre(prefix, effet) {
   const eDesignation = isApplied(effet[`${prefix}designation`]);
   const eDestructeur = isApplied(effet[`${prefix}destructeur`]);
   const eDestructeurV = 2;
+  const eDevastation = isApplied(effet[`${prefix}devastation`]);
+  const eDevastationV = effet[`${prefix}devastationValue`] || 0;
   const eDispersion = isApplied(effet[`${prefix}dispersion`]);
   const eDispersionV = effet[`${prefix}dispersionValue`] || 0;
   const eEnChaine = isApplied(effet[`${prefix}enChaine`]);
   const eEsperance = isApplied(effet[`${prefix}esperance`]);
+  const eExcellence = isApplied(effet[`${prefix}excellence`]);
   const eFureur = isApplied(effet[`${prefix}fureur`]);
   const eFureurV = 4;
+  const eGuidage = isApplied(effet[`${prefix}guidage`]);
+  const eGuidageV = +effet[`${prefix}guidageactif`] || 0;
   const eIgnoreArmure = isApplied(effet[`${prefix}ignoreArmure`]);
   const eIgnoreCDF = isApplied(effet[`${prefix}ignoreCdF`]);
   const eJAkimbo = isApplied(effet[`${prefix}akimbo`]);
@@ -931,6 +1089,7 @@ function getWeaponsEffectsAutre(prefix, effet) {
   const ePrecision = isApplied(effet[`${prefix}precision`]);
   const eReaction = isApplied(effet[`${prefix}reaction`]);
   const eReactionV = effet[`${prefix}reactionValue`] || 0;
+  const eRegularite = isApplied(effet[`${prefix}regularite`]);
   const eSilencieux = isApplied(effet[`${prefix}silencieux`]);
   const eSoumission = isApplied(effet[`${prefix}soumission`]);
   const eTenebricide = isApplied(effet[`${prefix}tenebricite`]);
@@ -972,16 +1131,28 @@ function getWeaponsEffectsAutre(prefix, effet) {
     if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
   }
 
-  if (eCadence) {
-    rCadence = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
+  if (eBourreau) {
+    isBourreau = true;
+    eBourreauValue = eBourreauV;
+  }
+
+  if (eCadence && eCadenceA === 0) {
+    autresEffets.push(`${i18n_cadence} ${eCadenceV}`);
+    vCadence = eCadenceV;
+  } else if (eCadence && eCadenceA === 1) {
     isCadence = true;
     vCadence = eCadenceV;
+    exec.push(`{{vCadence=${eCadenceV} ${i18n_inclus}}}`);
   }
 
   if (eChoc) {
     isConditionnelA = true;
 
     exec.push(`{{choc=${i18n_choc} ${eChocV}}} {{chocCondition=${i18n_chocCondition}}}`);
+  }
+
+  if (eConviction) {
+    autresEffets.push(i18n_conviction);
   }
 
   if (eDemoralisant) {
@@ -1000,6 +1171,11 @@ function getWeaponsEffectsAutre(prefix, effet) {
     isDestructeur = true;
   }
 
+  if (eDevastation) {
+    isDevastation = true;
+    eDevastationValue = eDevastationV;
+  }
+
   if (eEnChaine) {
     isConditionnelD = true;
 
@@ -1013,6 +1189,13 @@ function getWeaponsEffectsAutre(prefix, effet) {
     exec.push(`{{esperance=${i18n_esperance}}} {{esperanceConditionD=${i18n_esperanceConditionD}}} {{esperanceConditionV=${i18n_esperanceConditionV}}}`);
   }
 
+  if (eExcellence) {
+    isConditionnelD = true;
+    isConditionnelV = true;
+
+    exec.push(`{{excellence=${i18n_excellence}}} {{excellenceCondition=${i18n_excellenceCondition}}}`);
+  }
+
   if (eFureur) {
     isConditionnelV = true;
     isFureur = true;
@@ -1020,6 +1203,14 @@ function getWeaponsEffectsAutre(prefix, effet) {
     firstExec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
 
     exec.push(`{{fureur=${i18n_fureur}}} {{fureurCondition=${i18n_fureurCondition}}}`);
+  }
+
+  if (eGuidage && eGuidageV !== 0) {
+    isGuidage = true;
+
+    exec.push(`{{vGuidage=${i18n_guidageInclus}}}`);
+  } else if (eGuidage) {
+    autresEffets.push(i18n_guidage);
   }
 
   if (eLeste) {
@@ -1061,6 +1252,11 @@ function getWeaponsEffectsAutre(prefix, effet) {
     isConditionnelD = true;
 
     autresEffets.push(i18n_precision);
+  }
+
+  if (eRegularite) {
+    isRegularite = true;
+    exec.push('{{vRegularite=[[0]]}}');
   }
 
   if (eSilencieux) {
@@ -1161,7 +1357,6 @@ function getWeaponsEffectsAutre(prefix, effet) {
   result.eASAssassin = eASAssassin;
   result.eASAssassinValue = eASAssassinValue;
   result.isCadence = isCadence;
-  result.sCadence = rCadence;
   result.vCadence = vCadence;
   result.isTenebricide = isTenebricide;
   result.isObliteration = isObliteration;
@@ -1178,6 +1373,14 @@ function getWeaponsEffectsAutre(prefix, effet) {
   result.isTirRafale = isTirRafale;
   result.isFureur = isFureur;
   result.isUltraviolence = isUltraviolence;
+
+  result.isBourreau = isBourreau;
+  result.vBourreau = eBourreauValue;
+  result.isDevastation = isDevastation;
+  result.vDevastation = eDevastationValue;
+
+  result.isGuidage = isGuidage;
+  result.isRegularite = isRegularite;
 
   result.eLumiere = eLumiere;
   result.isELumiere = isELumiere;
@@ -1218,7 +1421,6 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   const bDegats = [];
   const autresEffets = [];
 
-  let rCadence = 0;
   let vCadence = 0;
   let eASAssassin = '';
   let eASAssassinValue = 0;
@@ -1246,6 +1448,11 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   let isUltraviolence = false;
   let isFureur = false;
 
+  let isBourreau = false;
+  let isDevastation = false;
+  let isGuidage = false;
+  let isRegularite = false;
+
   const eAnatheme = isApplied(effet[`${prefix}anatheme`]);
   const eAntiAnatheme = isApplied(effet[`${prefix}antiAnatheme`]);
   const eAntiVehicule = isApplied(effet[`${prefix}antiVehicule`]);
@@ -1255,12 +1462,16 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   const eAssistanceAttaque = isApplied(effet[`${prefix}assistanceAttaque`]);
   const eBarrage = isApplied(effet[`${prefix}barrage`]);
   const eBarrageV = effet[`${prefix}barrageValue`] || 0;
+  const eBourreau = isApplied(effet[`${prefix}bourreau`]);
+  const eBourreauV = effet[`${prefix}bourreauValue`] || 0;
   const eCadence = isApplied(effet[`${prefix}cadence`]);
+  const eCadenceA = +effet[`${prefix}cadenceactif`] || 0;
   const eCadenceV = effet[`${prefix}cadenceValue`] || 0;
   const eChargeur = isApplied(effet[`${prefix}eChargeur`]);
   const eChargeurV = effet[`${prefix}chargeurValue`] || 0;
   const eChoc = isApplied(effet[`${prefix}choc`]);
   const eChocV = effet[`${prefix}chocValue`] || 0;
+  const eConviction = isApplied(effet[`${prefix}conviction`]);
   const eDefense = isApplied(effet[`${prefix}eDefense`]);
   const eDefenseV = effet[`${prefix}defenseValue`] || 0;
   const eDegatsContinus = isApplied(effet[`${prefix}degatContinue`]);
@@ -1270,12 +1481,17 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   const eDesignation = isApplied(effet[`${prefix}designation`]);
   const eDestructeur = isApplied(effet[`${prefix}destructeur`]);
   const eDestructeurV = 2;
+  const eDevastation = isApplied(effet[`${prefix}devastation`]);
+  const eDevastationV = effet[`${prefix}devastationValue`] || 0;
   const eDispersion = isApplied(effet[`${prefix}dispersion`]);
   const eDispersionV = effet[`${prefix}dispersionValue`] || 0;
   const eEnChaine = isApplied(effet[`${prefix}enChaine`]);
   const eEsperance = isApplied(effet[`${prefix}esperance`]);
+  const eExcellence = isApplied(effet[`${prefix}excellence`]);
   const eFureur = isApplied(effet[`${prefix}fureur`]);
   const eFureurV = 4;
+  const eGuidage = isApplied(effet[`${prefix}guidage`]);
+  const eGuidageV = +effet[`${prefix}guidageactif`] || 0;
   const eIgnoreArmure = isApplied(effet[`${prefix}ignoreArmure`]);
   const eIgnoreCDF = isApplied(effet[`${prefix}ignoreCdF`]);
   const eJAkimbo = isApplied(effet[`${prefix}akimbo`]);
@@ -1297,6 +1513,7 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   const ePrecision = isApplied(effet[`${prefix}precision`]);
   const eReaction = isApplied(effet[`${prefix}reaction`]);
   const eReactionV = effet[`${prefix}reactionValue`] || 0;
+  const eRegularite = isApplied(effet[`${prefix}regularite`]);
   const eSilencieux = isApplied(effet[`${prefix}silencieux`]);
   const eSoumission = isApplied(effet[`${prefix}soumission`]);
   const eTenebricide = isApplied(effet[`${prefix}tenebricite`]);
@@ -1338,16 +1555,28 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
     if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
   }
 
-  if (eCadence) {
-    rCadence = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
+  if (eBourreau) {
+    isBourreau = true;
+    eBourreauValue = eBourreauV;
+  }
+
+  if (eCadence && eCadenceA === 0) {
+    autresEffets.push(`${i18n_cadence} ${eCadenceV}`);
+    vCadence = eCadenceV;
+  } else if (eCadence && eCadenceA === 1) {
     isCadence = true;
     vCadence = eCadenceV;
+    exec.push(`{{vCadence=${eCadenceV} ${i18n_inclus}}}`);
   }
 
   if (eChoc) {
     isConditionnelA = true;
 
     exec.push(`{{choc=${i18n_choc} ${eChocV}}} {{chocCondition=${i18n_chocCondition}}}`);
+  }
+
+  if (eConviction) {
+    autresEffets.push(i18n_conviction);
   }
 
   if (eDemoralisant) {
@@ -1366,6 +1595,11 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
     isDestructeur = true;
   }
 
+  if (eDevastation) {
+    isDevastation = true;
+    eDevastationValue = eDevastationV;
+  }
+
   if (eEnChaine) {
     isConditionnelD = true;
 
@@ -1379,6 +1613,13 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
     exec.push(`{{esperance=${i18n_esperance}}} {{esperanceConditionD=${i18n_esperanceConditionD}}} {{esperanceConditionV=${i18n_esperanceConditionV}}}`);
   }
 
+  if (eExcellence) {
+    isConditionnelD = true;
+    isConditionnelV = true;
+
+    exec.push(`{{excellence=${i18n_excellence}}} {{excellenceCondition=${i18n_excellenceCondition}}}`);
+  }
+
   if (eFureur) {
     isConditionnelV = true;
     isFureur = true;
@@ -1386,6 +1627,14 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
     firstExec.push(`{{fureurValue=[[${eFureurV}D6]]}}`);
 
     exec.push(`{{fureur=${i18n_fureur}}} {{fureurCondition=${i18n_fureurCondition}}}`);
+  }
+
+  if (eGuidage && eGuidageV !== 0) {
+    isGuidage = true;
+
+    exec.push(`{{vGuidage=${i18n_guidageInclus}}}`);
+  } else if (eGuidage) {
+    autresEffets.push(i18n_guidage);
   }
 
   if (eLeste) {
@@ -1427,6 +1676,11 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
     isConditionnelD = true;
 
     autresEffets.push(i18n_precision);
+  }
+
+  if (eRegularite) {
+    isRegularite = true;
+    exec.push('{{vRegularite=[[0]]}}');
   }
 
   if (eSilencieux) {
@@ -1529,7 +1783,6 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   result.eASAssassin = eASAssassin;
   result.eASAssassinValue = eASAssassinValue;
   result.isCadence = isCadence;
-  result.sCadence = rCadence;
   result.vCadence = vCadence;
   result.isTenebricide = isTenebricide;
   result.isObliteration = isObliteration;
@@ -1555,6 +1808,14 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   result.isAmbidextrie = isAmbidextrie;
   result.isDeuxMains = isDeuxMains;
   result.isLourd = isLourd;
+
+  result.isBourreau = isBourreau;
+  result.vBourreau = eBourreauValue;
+  result.isDevastation = isDevastation;
+  result.vDevastation = eDevastationValue;
+
+  result.isGuidage = isGuidage;
+  result.isRegularite = isRegularite;
 
   result.attaquesSurprises = attaquesSurprises;
   result.attaquesSurprisesValue = attaquesSurprisesValue;
@@ -1589,6 +1850,7 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
   let nowSoeur = false;
   let nowJumelle = false;
   let nowAllegee = false;
+  let nowBarbelee = false;
 
   const bAttaque = [];
   let diceDegats = 0;
@@ -1623,21 +1885,41 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
 
   if (aAssassine) {
     if (isSilencieux) { autresAmeliorations.push(i18n_assassine); } else {
+      const ghost = +AS.rogueGhost;
+      const MALghost = +AS.MALRogueGhost;
+      const changeling = +AS.bardChangeling;
+      const MALchangeling = +AS.MALBardChangeling;
+
       let totalAssassine = vDiscretion;
 
       if (hasArmure) { totalAssassine += oDiscretion; }
 
-      isConditionnelD = true;
-      attaquesSurprises.push(i18n_assassine);
-      attaquesSurprisesValue.push(totalAssassine);
+      if (hasArmure && ghost !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else if (hasArmure && MALghost !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else if (hasArmure && changeling !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else if (hasArmure && MALchangeling !== 0) {
+        exec.push(`{{vAssassineD=${totalAssassine}}}`);
+        bDegats.push(totalAssassine);
+      } else {
+        isConditionnelD = true;
+        attaquesSurprises.push(i18n_assassine);
+        attaquesSurprisesValue.push(totalAssassine);
 
-      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+        if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      }
     }
   }
 
   if (aBarbelee) {
     if (isMeurtrier) { autresAmeliorations.push(i18n_barbelee); } else {
       isConditionnelD = true;
+      nowBarbelee = true;
 
       exec.push(`{{meurtrier=${i18n_barbelee}}} {{meurtrierValue=[[${aBarbeleeV}D6]]}} {{meurtrierCondition=${i18n_meurtrierCondition}}}`);
     }
@@ -1718,6 +2000,7 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
   result.isJumelle = nowJumelle;
   result.isProtectrice = nowProtectrice;
   result.isAllegee = nowAllegee;
+  result.isBarbelee = nowBarbelee;
 
   result.aLumiere = aLumiere;
   result.aLumiereValue = aLumiereValue;
@@ -1752,6 +2035,8 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   let diceDegats = 0;
   let bDegats = 0;
   const autresAmeliorations = [];
+
+  let nowBarbelee = false;
 
   const aAgressive = isApplied(data[`${prefix}agressive`]);
   const aAllegee = isApplied(data[`${prefix}allegee`]);
@@ -1789,6 +2074,7 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   if (aBarbelee) {
     if (isMeurtrier) { autresAmeliorations.push(i18n_barbelee); } else {
       isConditionnelD = true;
+      nowBarbelee = true;
 
       exec.push(`{{meurtrier=${i18n_barbelee}}} {{meurtrierValue=[[${aBarbeleeV}D6]]}} {{meurtrierCondition=${i18n_meurtrierCondition}}}`);
     }
@@ -1857,6 +2143,7 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   result.bAttaque = bAttaque;
   result.diceDegats = diceDegats;
   result.bDegats = bDegats;
+  result.isBarbelee = nowBarbelee;
 
   result.exec = exec;
   result.autresAmeliorations = autresAmeliorations;
@@ -1891,7 +2178,6 @@ function getWeaponsContactAO(prefix, AO, isCadence, vCadence, isObliteration, is
   let isRouagesCasses = false;
   let vRouagesCasses = 0;
 
-  let rCadence = '';
   let CadenceValue = 0;
 
   let nowObliteration = false;
@@ -1909,6 +2195,7 @@ function getWeaponsContactAO(prefix, AO, isCadence, vCadence, isObliteration, is
   const aBouclierGrave = isApplied(AO[`${prefix}bouclierGrave`]);
   const aCheneSculpte = isApplied(AO[`${prefix}cheneSculpte`]);
   const aChromeeLignesLC = isApplied(AO[`${prefix}chromeeLignesLC`]);
+  const eCadenceA = +AO[`${prefix}cadenceactif`] || 0;
   const aCodeKnightGrave = isApplied(AO[`${prefix}codeKnightGrave`]);
   const aCraneRieurGrave = isApplied(AO[`${prefix}craneRieurGrave`]);
   const aFaucheuseGravee = isApplied(AO[`${prefix}faucheuseGravee`]);
@@ -1951,13 +2238,13 @@ function getWeaponsContactAO(prefix, AO, isCadence, vCadence, isObliteration, is
     exec.push(`{{cheneSculpte=${i18n_cheneSculpte}}} {{cheneSculpteCondition=${i18n_cheneSculpteCondition}}}`);
   }
 
-  if (aChromeeLignesLC) {
+  if (aChromeeLignesLC && eCadenceA === 1) {
     if (isCadence === true && vCadence >= 2) { autresAmeliorations.push(i18n_chromee); } else {
-      rCadence = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
       isChromee = true;
       CadenceValue = 2;
+      exec.push(`{{vChrome=2) ${i18n_inclus}}}`);
     }
-  }
+  } else if (aChromeeLignesLC && eCadenceA === 0) { autresAmeliorations.push(i18n_chromee); }
 
   if (aCraneRieurGrave) {
     if (isObliteration) { autresAmeliorations.push(i18n_craneRieur); } else {
@@ -2057,7 +2344,6 @@ function getWeaponsContactAO(prefix, AO, isCadence, vCadence, isObliteration, is
   result.aLumiere = aLumiere;
   result.aLumiereValue = aLumiereValue;
 
-  result.rCadence = rCadence;
   result.vCadence = CadenceValue;
 
   result.diceDegats = diceDegats;
@@ -2095,7 +2381,6 @@ function getWeaponsContactAOPNJ(prefix, data, isCadence, vCadence, isObliteratio
   let isRouagesCasses = false;
   let vRouagesCasses = 0;
 
-  let rCadence = '0';
   let CadenceValue = 0;
 
   let nowObliteration = false;
@@ -2113,6 +2398,7 @@ function getWeaponsContactAOPNJ(prefix, data, isCadence, vCadence, isObliteratio
   const aBouclierGrave = isApplied(data[`${prefix}bouclierGrave`]);
   const aCheneSculpte = isApplied(data[`${prefix}cheneSculpte`]);
   const aChromeeLignesLC = isApplied(data[`${prefix}chromeeLignesLC`]);
+  const eCadenceA = +data[`${prefix}cadenceactif`] || 0;
   const aCodeKnightGrave = isApplied(data[`${prefix}codeKnightGrave`]);
   const aCraneRieurGrave = isApplied(data[`${prefix}craneRieurGrave`]);
   const aFaucheuseGravee = isApplied(data[`${prefix}faucheuseGravee`]);
@@ -2150,13 +2436,13 @@ function getWeaponsContactAOPNJ(prefix, data, isCadence, vCadence, isObliteratio
     exec.push(`{{cheneSculpte=${i18n_cheneSculpte}}} {{cheneSculpteCondition=${i18n_cheneSculpteCondition}}}`);
   }
 
-  if (aChromeeLignesLC) {
+  if (aChromeeLignesLC && eCadenceA === 1) {
     if (isCadence === true && vCadence >= 2) { autresAmeliorations.push(i18n_chromee); } else {
-      rCadence = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
       isChromee = true;
       CadenceValue = 2;
+      exec.push(`{{vChrome=2) ${i18n_inclus}}}`);
     }
-  }
+  } else if (aChromeeLignesLC && eCadenceA === 0) { autresAmeliorations.push(i18n_chromee); }
 
   if (aCraneRieurGrave) {
     if (isObliteration) { autresAmeliorations.push(i18n_craneRieur); } else {
@@ -2255,7 +2541,6 @@ function getWeaponsContactAOPNJ(prefix, data, isCadence, vCadence, isObliteratio
   result.isRouagesCasses = isRouagesCasses;
   result.vRouagesCasses = vRouagesCasses;
 
-  result.rCadence = rCadence;
   result.vCadence = CadenceValue;
 
   result.diceDegats = diceDegats;
@@ -2272,13 +2557,15 @@ function getWeaponsContactAOPNJ(prefix, data, isCadence, vCadence, isObliteratio
 function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceAttaque, eASAssassinValue, isCadence, vCadence, eSilencieux, eTirRafale, isObliteration, isAntiAnatheme) {
   const result = {};
   const exec = [];
+  const armure = AA.armure;
+
+  let hasArmure = true;
 
   let isConditionnelA = false;
   let isConditionnelD = false;
   let isConditionnelV = false;
 
   let isChambreDouble = false;
-  let rChambreDouble = '';
 
   let isInterfaceGuidage = false;
 
@@ -2287,6 +2574,8 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
 
   let aASAssassin = '';
   let aASAssassinValue = 0;
+
+  let CadenceValue = 0;
 
   const bonus = [];
   let diceDegats = 0;
@@ -2302,6 +2591,7 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
   const aCanonLong = isApplied(AA[`${prefix}canonLong`]);
   const aCanonRaccourci = isApplied(AA[`${prefix}canonRaccourci`]);
   const aChambreDouble = isApplied(AA[`${prefix}chambreDouble`]);
+  const eCadenceA = +AA[`${prefix}cadenceactif`] || 0;
   const aInterfaceGuidage = isApplied(AA[`${prefix}interfaceGuidage`]);
   const aJumelage = isApplied(AA[`${prefix}jumelage`]);
   const aJumelageV = AA[`${prefix}jumelageValue`];
@@ -2318,6 +2608,8 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
   const aRevetementOmega = isApplied(AA[`${prefix}revetementOmega`]);
   const aStructureElement = isApplied(AA[`${prefix}structureElement`]);
   const aSystemeRefroidissement = isApplied(AA[`${prefix}systemeRefroidissement`]);
+
+  if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
 
   if (aChargeurGrappes) {
     diceDegats -= 1;
@@ -2338,16 +2630,13 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
     exec.push(`{{canonRaccourci=${i18n_canonRaccourci}}} {{canonRaccourciCondition=${i18n_canonRaccourciCondition}}}`);
   }
 
-  if (aChambreDouble) {
-    if (isCadence && vCadence >= 2) { autresAmeliorations.push(i18n_chambreDouble); } else if (isCadence) {
-      autresEffets.push(`${i18n_cadence} ${vCadence}`);
-      rChambreDouble = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
+  if (aChambreDouble && eCadenceA === 1) {
+    if (isCadence === true && vCadence >= 2) { autresAmeliorations.push(i18n_chambreDouble); } else {
       isChambreDouble = true;
-    } else {
-      rChambreDouble = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
-      isChambreDouble = true;
+      CadenceValue = 2;
+      exec.push(`{{vChambreDouble=2) ${i18n_inclus}}}`);
     }
-  }
+  } else if (aChambreDouble && eCadenceA === 0) { autresAmeliorations.push(i18n_chambreDouble); }
 
   if (aInterfaceGuidage) {
     autresAmeliorations.push(i18n_interfaceGuidage);
@@ -2400,12 +2689,33 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
 
   if (aMunitionsSubsoniques) {
     if (eSilencieux) { autresAmeliorations.push(i18n_munitionsSubsoniques); } else {
-      const totalSubsonique = vDiscretion + oDiscretion;
+      const ghost = +AA.rogueGhost;
+      const MALghost = +AA.MALRogueGhost;
+      const changeling = +AA.bardChangeling;
+      const MALchangeling = +AA.MALBardChangeling;
+      let totalSubsonique = vDiscretion;
 
-      attaquesSurprises.push(i18n_munitionsSubsoniques);
-      attaquesSurprisesValue.push(totalSubsonique);
+      if (hasArmure) { totalSubsonique += oDiscretion; }
 
-      if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      if (hasArmure && ghost !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else if (hasArmure && MALghost !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else if (hasArmure && changeling !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else if (hasArmure && MALchangeling !== 0) {
+        exec.push(`{{vSubsoniqueD=${totalSubsonique}}}`);
+        bDegats.push(totalSubsonique);
+      } else {
+        isConditionnelD = true;
+        attaquesSurprises.push(i18n_munitionsSubsoniques);
+        attaquesSurprisesValue.push(totalSubsonique);
+
+        if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+      }
     }
   }
 
@@ -2450,9 +2760,10 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
   result.attaquesSurprisesCondition = attaquesSurprisesCondition;
 
   result.isChambreDouble = isChambreDouble;
-  result.rChambreDouble = rChambreDouble;
   result.isJAmbidextre = isJAmbidextre;
   result.isJAkimbo = isJAkimbo;
+
+  result.vCadence = CadenceValue;
 
   result.exec = exec;
   result.autresAmeliorations = autresAmeliorations;
@@ -2470,12 +2781,13 @@ function getWeaponsDistanceAAPNJ(prefix, attrs, vMasque, vMasqueAE, eAssistanceA
   let isConditionnelV = false;
 
   let isChambreDouble = false;
-  let rChambreDouble = '';
 
   let isInterfaceGuidage = false;
 
   let aASAssassin = '';
   let aASAssassinValue = 0;
+
+  let CadenceValue = 0;
 
   const bonus = [];
   let diceDegats = 0;
@@ -2491,6 +2803,7 @@ function getWeaponsDistanceAAPNJ(prefix, attrs, vMasque, vMasqueAE, eAssistanceA
   const aCanonLong = isApplied(attrs[`${prefix}canonLong`]);
   const aCanonRaccourci = isApplied(attrs[`${prefix}canonRaccourci`]);
   const aChambreDouble = isApplied(attrs[`${prefix}chambreDouble`]);
+  const eCadenceA = +attrs[`${prefix}cadenceactif`] || 0;
   const aInterfaceGuidage = isApplied(attrs[`${prefix}interfaceGuidage`]);
   const aJumelage = isApplied(attrs[`${prefix}jumelage`]);
   const aJumelageV = attrs[`${prefix}jumelageValue`];
@@ -2527,16 +2840,13 @@ function getWeaponsDistanceAAPNJ(prefix, attrs, vMasque, vMasqueAE, eAssistanceA
     exec.push(`{{canonRaccourci=${i18n_canonRaccourci}}} {{canonRaccourciCondition=${i18n_canonRaccourciCondition}}}`);
   }
 
-  if (aChambreDouble) {
-    if (isCadence && vCadence >= 2) { autresAmeliorations.push(i18n_chambreDouble); } else if (isCadence) {
-      autresEffets.push(`${i18n_cadence} ${vCadence}`);
-      rChambreDouble = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
+  if (aChambreDouble && eCadenceA === 1) {
+    if (isCadence === true && vCadence >= 2) { autresAmeliorations.push(i18n_chambreDouble); } else {
       isChambreDouble = true;
-    } else {
-      rChambreDouble = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
-      isChambreDouble = true;
+      CadenceValue = 2;
+      exec.push(`{{vChambreDouble=2) ${i18n_inclus}}}`);
     }
-  }
+  } else if (aChambreDouble && eCadenceA === 0) { autresAmeliorations.push(i18n_chambreDouble); }
 
   if (aInterfaceGuidage) {
     autresAmeliorations.push(i18n_interfaceGuidage);
@@ -2633,7 +2943,8 @@ function getWeaponsDistanceAAPNJ(prefix, attrs, vMasque, vMasqueAE, eAssistanceA
   result.attaquesSurprisesCondition = attaquesSurprisesCondition;
 
   result.isChambreDouble = isChambreDouble;
-  result.rChambreDouble = rChambreDouble;
+
+  result.vCadence = CadenceValue;
 
   result.exec = exec;
   result.autresAmeliorations = autresAmeliorations;
@@ -2651,7 +2962,6 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
   let isConditionnelV = false;
 
   let isChambreDouble = false;
-  let rChambreDouble = '';
 
   let isInterfaceGuidage = false;
 
@@ -2660,6 +2970,8 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
 
   let aASAssassin = '';
   let aASAssassinValue = 0;
+
+  let CadenceValue = 0;
 
   const bonus = [];
   let diceDegats = 0;
@@ -2675,6 +2987,7 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
   const aCanonLong = isApplied(AA[`${prefix}canonLong`]);
   const aCanonRaccourci = isApplied(AA[`${prefix}canonRaccourci`]);
   const aChambreDouble = isApplied(AA[`${prefix}chambreDouble`]);
+  const eCadenceA = +AA[`${prefix}cadenceactif`] || 0;
   const aInterfaceGuidage = isApplied(AA[`${prefix}interfaceGuidage`]);
   const aJumelage = isApplied(AA[`${prefix}jumelage`]);
   const aJumelageV = AA[`${prefix}jumelageValue`];
@@ -2711,16 +3024,13 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
     exec.push(`{{canonRaccourci=${i18n_canonRaccourci}}} {{canonRaccourciCondition=${i18n_canonRaccourciCondition}}}`);
   }
 
-  if (aChambreDouble) {
-    if (isCadence && vCadence >= 2) { autresAmeliorations.push(i18n_chambreDouble); } else if (isCadence) {
-      autresEffets.push(`${i18n_cadence} ${vCadence}`);
-      rChambreDouble = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
+  if (aChambreDouble && eCadenceA === 1) {
+    if (isCadence === true && vCadence >= 2) { autresAmeliorations.push(i18n_chambreDouble); } else {
       isChambreDouble = true;
-    } else {
-      rChambreDouble = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
-      isChambreDouble = true;
+      CadenceValue = 2;
+      exec.push(`{{vChambreDouble=2) ${i18n_inclus}}}`);
     }
-  }
+  } else if (aChambreDouble && eCadenceA === 0) { autresAmeliorations.push(i18n_chambreDouble); }
 
   if (aInterfaceGuidage) {
     autresAmeliorations.push(i18n_interfaceGuidage);
@@ -2814,9 +3124,10 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
   result.attaquesSurprisesCondition = attaquesSurprisesCondition;
 
   result.isChambreDouble = isChambreDouble;
-  result.rChambreDouble = rChambreDouble;
   result.isJAmbidextre = isJAmbidextre;
   result.isJAkimbo = isJAkimbo;
+
+  result.vCadence = CadenceValue;
 
   result.exec = exec;
   result.autresAmeliorations = autresAmeliorations;
@@ -2825,34 +3136,28 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
   return result;
 }
 
-function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom) {
+async function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
-
-  let isConditionnelA = false;
-  let isConditionnelD = false;
-
-  const attaquesSurprises = [];
-  const attaquesSurprisesValue = [];
-  let attaquesSurprisesCondition = '';
+  const bDegats = [];
 
   let diceDegats = 0;
   let diceViolence = 0;
 
   const ODBarbarian = [];
+  const ODRogue = [];
   const ODShaman = [];
+  const autresEffets = [];
 
   let goliath = 0;
+  let changeling = '';
   let ghost = '';
 
   let shaman = 0;
   let C5 = '';
   let C6 = '';
   let C7 = '';
-  let C5Nom = '';
-  let C6Nom = '';
-  let C7Nom = '';
 
   let ODWarrior = 0;
   let warrior250PG = 0;
@@ -2864,6 +3169,9 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
   let typeScout = '';
 
   let bonusWarrior = 0;
+  let isConditionnelA = false;
+
+  let attrsCarac;
 
   switch (armure) {
     case 'barbarian':
@@ -2886,11 +3194,25 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
 
         if (ODBarbarian.length === 0) { exec.push('{{vODBarbarian=[[0]]}}'); } else { exec.push(`{{vODBarbarian=[[${ODBarbarian.join('+')}]]}}`); }
 
-        diceDegats += goliath;
-        diceViolence += goliath;
+        if (!distance) {
+          diceDegats += goliath;
+          diceViolence += goliath;
 
-        exec.push(`{{vBarbarianD=+${goliath}D6}}`);
-        exec.push(`{{vBarbarianV=+${goliath}D6}}`);
+          exec.push(`{{vBarbarianD=+${goliath}D6}}`);
+          exec.push(`{{vBarbarianV=+${goliath}D6}}`);
+        }
+
+        if (goliath >= 4 && !aEffets.includes(i18n_antiVehicule)) {
+          autresEffets.push(i18n_antiVehicule);
+        }
+      }
+      break;
+
+    case 'bard':
+      changeling = +value.bardChangeling;
+
+      if (changeling !== 0) {
+        exec.push(`{{special2=${i18n_changelingActive}}}`);
       }
       break;
 
@@ -2900,20 +3222,18 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       if (ghost !== 0) {
         exec.push(`{{special2=${i18n_ghostActive}}}`);
 
-        if (isELumiere === false && isASLumiere === false) {
+        if (simpleRoll) {
+          exec.push(`{{vODGhostA=${i18n_ghost}}} {{vODGhostAValue=${3}}}`);
+          isConditionnelA = true;
+        } else if (isELumiere === false && isASLumiere === false) {
           const totalGhost = vDiscretion + oDiscretion;
 
           isConditionnelA = true;
-          isConditionnelD = true;
-
-          exec.push(`{{vODGhostA=${i18n_ghost}}}`);
-          exec.push(`{{vODGhostAValue=[[{${vDiscretion}D6cs2cs4cs6cf1cf3cf5s%2}=0+${oDiscretion}]]}}`);
-          exec.push(`{{vODGhostCondition=${i18n_attaqueSurpriseCondition}}}`);
-
-          attaquesSurprises.unshift(i18n_ghost);
-          attaquesSurprisesValue.unshift(totalGhost);
-
-          if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+          exec.push(`{{vGhostA=${vDiscretion}D6+${oDiscretion}}}`);
+          exec.push(`{{vGhostD=${totalGhost}}}`);
+          cRoll.push(vDiscretion);
+          ODRogue.push(oDiscretion);
+          bDegats.push(totalGhost);
         }
       }
 
@@ -2925,31 +3245,29 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       C6 = value.caracteristiqueTotem2;
       C7 = value.caracteristiqueTotem3;
 
-      C5Nom = C5.slice(2, -1);
-      C6Nom = C6.slice(2, -1);
-      C7Nom = C7.slice(2, -1);
+      attrsCarac = await getCarac(1, C5, C6, C7, '0');
 
       if (shaman === 1 || shaman === 2 || shaman === 3) {
-        if (C5 !== '0') {
-          exec.push(`{{totem1=${CaracNom[C5Nom]}}}`);
-          cRoll.push(C5);
-          ODShaman.push(`@{${ODValue[C5Nom]}}`);
+        if (attrsCarac.C1) {
+          exec.push(`{{totem1=${attrsCarac.C1Nom}}}`);
+          cRoll.push(attrsCarac.C1Base);
+          ODShaman.push(`${attrsCarac.C1OD}`);
         }
       }
 
       if (shaman === 2 || shaman === 3) {
-        if (C6 !== '0') {
-          exec.push(`{{totem2=${CaracNom[C6Nom]}}}`);
-          cRoll.push(C6);
-          ODShaman.push(`@{${ODValue[C6Nom]}}`);
+        if (attrsCarac.C2) {
+          exec.push(`{{totem2=${attrsCarac.C2Nom}}}`);
+          cRoll.push(attrsCarac.C2Base);
+          ODShaman.push(`${attrsCarac.C2OD}`);
         }
       }
 
       if (shaman === 3) {
-        if (C7 !== '0') {
-          exec.push(`{{totem3=${CaracNom[C7Nom]}}}`);
-          cRoll.push(C7);
-          ODShaman.push(`@{${ODValue[C7Nom]}}`);
+        if (attrsCarac.C3) {
+          exec.push(`{{totem3=${attrsCarac.C3Nom}}}`);
+          cRoll.push(attrsCarac.C3Base);
+          ODShaman.push(`${attrsCarac.C3OD}`);
         }
       }
 
@@ -3056,38 +3374,33 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
 
   result.exec = exec;
   result.cRoll = cRoll;
-  result.isConditionnelA = isConditionnelA;
-  result.isConditionnelD = isConditionnelD;
-  result.attaquesSurprises = attaquesSurprises;
-  result.attaquesSurprisesValue = attaquesSurprisesValue;
-  result.attaquesSurprisesCondition = attaquesSurprisesCondition;
   result.diceDegats = diceDegats;
+  result.bDegats = bDegats;
   result.diceViolence = diceViolence;
   result.ODBarbarian = ODBarbarian;
+  result.ODRogue = ODRogue;
   result.ODShaman = ODShaman;
   result.ODWarrior = ODWarrior;
+  result.autresEffets = autresEffets;
+  result.isConditionnelA = isConditionnelA;
 
   return result;
 }
 
-function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom) {
+async function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, aEffets = [], simpleRoll = false, distance = false) {
   const result = {};
   const exec = [];
   const cRoll = [];
-
-  let isConditionnelA = false;
-  let isConditionnelD = false;
-
-  const attaquesSurprises = [];
-  const attaquesSurprisesValue = [];
-  let attaquesSurprisesCondition = '';
+  const bDegats = [];
 
   let diceDegats = 0;
   let diceViolence = 0;
 
   const ODMALBarbarian = [];
+  const ODMALRogue = [];
   const ODMALShaman = [];
   const bonusWarrior = 1;
+  const autresEffets = [];
 
   let MALGoliath = 0;
   let MALGhost = '';
@@ -3095,10 +3408,12 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
   let MALShaman = 0;
   let C5 = '';
   let C6 = '';
-  let C5Nom = '';
-  let C6Nom = '';
+
+  let attrsCarac;
 
   let ODMALWarrior = 0;
+
+  let isConditionnelA = false;
 
   switch (armureL) {
     case 'barbarian':
@@ -3121,11 +3436,25 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
 
         if (ODMALBarbarian.length === 0) { exec.push('{{vODMALBarbarian=[[0]]}}'); } else { exec.push(`{{vODMALBarbarian=[[${ODMALBarbarian.join('+')}]]}}`); }
 
-        diceDegats += MALGoliath;
-        diceViolence += MALGoliath;
+        if (!distance) {
+          diceDegats += MALGoliath;
+          diceViolence += MALGoliath;
 
-        exec.push(`{{vBarbarianD=+${MALGoliath}D6}}`);
-        exec.push(`{{vBarbarianV=+${MALGoliath}D6}}`);
+          exec.push(`{{vMALBarbarianD=+${MALGoliath}D6}}`);
+          exec.push(`{{vMALBarbarianV=+${MALGoliath}D6}}`);
+        }
+
+        if (MALGoliath >= 4 && !aEffets.includes(i18n_antiVehicule)) {
+          autresEffets.push(i18n_antiVehicule);
+        }
+      }
+      break;
+
+    case 'bard':
+      MALchangeling = +value.MALBardChangeling;
+
+      if (MALchangeling !== 0) {
+        exec.push(`{{MALspecial2=${i18n_changelingActive}}}`);
       }
       break;
 
@@ -3135,20 +3464,18 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
       if (MALGhost !== '') {
         exec.push(`{{MALspecial2=${i18n_ghostActive}}}`);
 
-        if (isELumiere === false && isASLumiere === false) {
+        if (simpleRoll) {
+          exec.push(`{{vODMALGhostA=${i18n_ghost}}} {{vODMALGhostAValue=3}}`);
+          isConditionnelA = true;
+        } else if (isELumiere === false && isASLumiere === false) {
           const totalMALGhost = vDiscretion + oDiscretion;
 
+          exec.push(`{{vMALGhostA=${vDiscretion}D6+${oDiscretion}}}`);
+          exec.push(`{{vMALGhostD=${totalMALGhost}}}`);
           isConditionnelA = true;
-          isConditionnelD = true;
-
-          exec.push(`{{vODGhostA=${i18n_ghost}}}`);
-          exec.push(`{{vODGhostAValue=[[{${vDiscretion}D6cs2cs4cs6cf1cf3cf5s%2}=0+${oDiscretion}]]}}`);
-          exec.push(`{{vODGhostCondition=${i18n_attaqueSurpriseCondition}}}`);
-
-          attaquesSurprises.unshift(i18n_ghost);
-          attaquesSurprisesValue.unshift(totalMALGhost);
-
-          if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
+          cRoll.push(vDiscretion);
+          ODMALRogue.push(oDiscretion);
+          bDegats.push(totalMALGhost);
         }
       }
       break;
@@ -3158,22 +3485,21 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
       C5 = value.MALCaracteristiqueTotem1;
       C6 = value.MALCaracteristiqueTotem2;
 
-      C5Nom = C5.slice(2, -1);
-      C6Nom = C6.slice(2, -1);
+      attrsCarac = await getCarac(0, C5, C6, '0', '0');
 
       if (MALShaman === 1 || MALShaman === 2) {
-        if (C5 !== '0') {
-          exec.push(`{{MALTotem1=${CaracNom[C5Nom]}}}`);
-          cRoll.push(C5);
-          ODMALShaman.push(`@{${ODNom[C5Nom]}}`);
+        if (attrsCarac.C1) {
+          exec.push(`{{MALTotem1=${attrsCarac.C1Nom}}}`);
+          cRoll.push(attrsCarac.C1Base);
+          ODMALShaman.push(`${attrsCarac.C1OD}`);
         }
       }
 
       if (MALShaman === 2) {
-        if (C6 !== '0') {
-          exec.push(`{{MALTotem2=${CaracNom[C6Nom]}}}`);
-          cRoll.push(C6);
-          ODMALShaman.push(`@{${ODNom[C6Nom]}}`);
+        if (attrsCarac.C2) {
+          exec.push(`{{MALTotem2=${attrsCarac.C2Nom}}}`);
+          cRoll.push(attrsCarac.C2Base);
+          ODMALShaman.push(`${attrsCarac.C2OD}`);
         }
       }
 
@@ -3283,16 +3609,15 @@ function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion, oDisc
 
   result.exec = exec;
   result.cRoll = cRoll;
-  result.isConditionnelA = isConditionnelA;
-  result.isConditionnelD = isConditionnelD;
-  result.attaquesSurprises = attaquesSurprises;
-  result.attaquesSurprisesValue = attaquesSurprisesValue;
-  result.attaquesSurprisesCondition = attaquesSurprisesCondition;
   result.diceDegats = diceDegats;
   result.diceViolence = diceViolence;
+  result.bDegats = bDegats;
   result.ODMALBarbarian = ODMALBarbarian;
+  result.ODMALRogue = ODMALRogue;
   result.ODMALShaman = ODMALShaman;
   result.ODMALWarrior = ODMALWarrior;
+  result.autresEffets = autresEffets;
+  result.isConditionnelA = isConditionnelA;
 
   return result;
 }
@@ -3598,7 +3923,7 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonna
           if (bPilonnage < 0) { bPilonnage = 0; }
 
           exec.push(`{{vMStyleV=+${bPilonnage}D6}}`);
-          bViolence += Number(bPilonnage);
+          dViolence += Number(bPilonnage);
         }
       }
       break;
@@ -3639,7 +3964,7 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonna
   return result;
 }
 
-function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, diceViolence, bonusViolence, conditions) {
+function updateRoll(roll, diceJet, bonusJet, totalDegats, diceDegats, bonusDegats, totalViolence, diceViolence, bonusViolence, conditions, conditionsValues = {}) {
   const tSurprise = roll.results.attaqueSurpriseValue || {};
   const tDestructeur = roll.results.destructeurValue || {};
   const tFureur = roll.results.fureurValue || {};
@@ -3672,6 +3997,20 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
   const isMasqueBrise = conditions.isMasqueBrise || false;
   const isRouagesCasses = conditions.isRouagesCasses || false;
 
+  const isBourreau = conditions.isBourreau || false;
+  const eBourreauValue = conditionsValues.eBourreauValue || 0;
+
+  const isDevastation = conditions.isDevastation || false;
+  const eDevastationValue = conditionsValues.eDevastationValue || 0;
+
+  const isRegularite = conditions.isRegularite || false;
+  const isGuidage = conditions.isGuidage || false;
+
+  const pairOrImpair = isGuidage === true ? 1 : 0;
+
+  let tJet = 0;
+  let baseJet = 0;
+
   let tDegats = totalDegats;
   let tViolence = totalViolence;
 
@@ -3693,6 +4032,20 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
   let hRouagesCassesValueD = 0;
   let hRouagesCassesValueV = 0;
 
+  let regularite = 0;
+
+  baseJet = diceJet.reduce((accumulateur, valeurCourante) => {
+    const vC = valeurCourante;
+    let nV = 0;
+
+    if (vC % 2 === pairOrImpair) {
+      nV = 1;
+    }
+
+    return accumulateur + nV;
+  }, 0);
+  tJet = baseJet + bonusJet;
+
   if (isSurprise) { hSurprise = tSurprise.result; }
   if (isDestructeur) { hDestructeur = tDestructeur.result; }
   if (isFureur) { hFureur = tFureur.result; }
@@ -3703,19 +4056,24 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
     hArmeAzurineValueD = tArmeAzurineValueD.result;
     hArmeAzurineValueV = tArmeAzurineValueV.result;
   }
+
   if (isArmeRougeSang) {
     hArmeRougeSangValueD = tArmeRougeSangValueD.result;
     hArmeRougeSangValueV = tArmeRougeSangValueV.result;
   }
+
   if (isCheneSculpte) { hCheneSculpte = tCheneSculpte.result; }
+
   if (isGriffureGravee) {
     hGriffuresGraveesValueD = tGriffuresGraveesValueD.result;
     hGriffuresGraveesValueV = tGriffuresGraveesValueV.result;
   }
+
   if (isMasqueBrise) {
     hMasqueBriseValueD = tMasqueBriseValueD.result;
     hMasqueBriseValueV = tMasqueBriseValueV.result;
   }
+
   if (isRouagesCasses) {
     hRouagesCassesValueD = tRouagesCassesValueD.result;
     hRouagesCassesValueV = tRouagesCassesValueV.result;
@@ -3738,6 +4096,7 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
 
       return accumulateur + newV;
     }, 0);
+
     if (bonusDegats.length !== 0) { tDegats += bonusDegats.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
 
     if (isDestructeur) {
@@ -3827,6 +4186,103 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
         return accumulateur + newV;
       }, 0);
     }
+  } else if (isBourreau) {
+    tDegats = diceDegats.reduce((accumulateur, valeurCourante) => {
+      let newV = +valeurCourante;
+      if (newV <= eBourreauValue) { newV = 4; }
+
+      return accumulateur + newV;
+    }, 0);
+
+    if (bonusDegats.length !== 0) { tDegats += bonusDegats.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
+
+    if (isDestructeur) {
+      hDestructeur = tDestructeur.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eBourreauValue) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isMeurtrier) {
+      hMeurtrier = tMeurtrier.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eBourreauValue) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isSurprise) {
+      if (tSurprise.dice.length !== 0) {
+        const normalRoll = tSurprise.dice.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante);
+        const bonusSurprise = +tSurprise.result - +normalRoll;
+
+        hSurprise = tSurprise.dice.reduce((accumulateur, valeurCourante) => {
+          let newV = +valeurCourante;
+          if (newV <= eBourreauValue) { newV = 4; }
+
+          return accumulateur + newV;
+        }, 0);
+
+        hSurprise += bonusSurprise;
+      }
+    }
+
+    if (isArmeAzurine) {
+      hArmeAzurineValueD = tArmeAzurineValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eBourreauValue) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isArmeRougeSang) {
+      hArmeRougeSangValueD = tArmeRougeSangValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eBourreauValue) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isCheneSculpte) {
+      hCheneSculpte = tCheneSculpte.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eBourreauValue) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isGriffureGravee) {
+      hGriffuresGraveesValueD = tGriffuresGraveesValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eBourreauValue) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isMasqueBrise) {
+      hMasqueBriseValueD = tMasqueBriseValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eBourreauValue) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isRouagesCasses) {
+      hRouagesCassesValueD = tRouagesCassesValueD.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eBourreauValue) { newV = 4; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
   }
 
   if (conditions.devaste || conditions.equilibre) {
@@ -3901,6 +4357,91 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
         return accumulateur + newV;
       }, 0);
     }
+  } else if (isDevastation) {
+    tViolence = diceViolence.reduce((accumulateur, valeurCourante) => {
+      let newV = valeurCourante;
+      if (newV <= eDevastationValue) { newV = 5; }
+
+      return accumulateur + newV;
+    }, 0);
+
+    if (bonusViolence.length !== 0) { tViolence += bonusViolence.reduce((accumulateur, valeurCourante) => accumulateur + +valeurCourante); }
+
+    if (isFureur) {
+      hFureur = tFureur.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eDevastationValue) { newV = 5; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isUltraviolence) {
+      hUltraviolence = tUltraviolence.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eDevastationValue) { newV = 5; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isArmeAzurine) {
+      hArmeAzurineValueV = tArmeAzurineValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eDevastationValue) { newV = 5; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isArmeRougeSang) {
+      hArmeRougeSangValueV = tArmeRougeSangValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eDevastationValue) { newV = 5; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isGriffureGravee) {
+      hGriffuresGraveesValueV = tGriffuresGraveesValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eDevastationValue) { newV = 5; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isMasqueBrise) {
+      hMasqueBriseValueV = tMasqueBriseValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eDevastationValue) { newV = 5; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+
+    if (isRouagesCasses) {
+      hRouagesCassesValueV = tRouagesCassesValueV.dice.reduce((accumulateur, valeurCourante) => {
+        let newV = +valeurCourante;
+        if (newV <= eDevastationValue) { newV = 5; }
+
+        return accumulateur + newV;
+      }, 0);
+    }
+  }
+
+  if (isRegularite) {
+    regularite = diceJet.reduce((accumulateur, valeurCourante) => {
+      const vC = valeurCourante;
+      let nV = 0;
+
+      if (vC === 6) { nV = 3; }
+
+      return accumulateur + nV;
+    }, 0);
+
+    tDegats += regularite;
   }
 
   if (isTenebricide) {
@@ -4028,9 +4569,9 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
     }
   }
 
-  log(vTDestructeur);
-
   const computed = {
+    jet: tJet,
+    basejet: baseJet,
     degats: tDegats,
     violence: tViolence,
     tenebricideValueD: vTDegats,
@@ -4057,6 +4598,7 @@ function updateRoll(roll, totalDegats, diceDegats, bonusDegats, totalViolence, d
     tMeurtrierValue: vTMeurtrier,
     tUltraviolenceValue: vTUltraviolence,
     tCheneSculpteValue: vTCheneSculpte,
+    vRegularite: regularite,
   };
 
   return computed;

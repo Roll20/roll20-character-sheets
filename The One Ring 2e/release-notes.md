@@ -4,6 +4,66 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.04.00 (Build 24)
+
+- added bonus modifier to useful items
+- added whisper mode pc and npc
+
+## 03.03.00 (Build 23)
+
+- added Useful item
+
+## 03.02.00 (Build 22)
+
+- target attacks calculate priercing blow correctly
+
+## 03.01.00 (Build 21)
+
+- added header-alt, sub1-alt, sub2-alt to custom roll template msg
+- added button to post adversary fell ability into chat
+
+## 03.00.00 (Build 20)
+
+- added adversary json importer
+
+## 02.14.00 (Build 19)
+
+### Features
+
+- added "fellowship focus" to pc sheet
+
+### Translation
+
+- fixed some missing support for translations on the pc sheet (thanks to iosu Li for the spanish translation)
+
+## 02.13.01 (Build 18)
+
+### CSS
+
+- fixed protection roll-button may be not available with minimal width
+
+## 02.13.00 (Build 17)
+
+### CSS
+
+- enhanced contrast of roll buttons
+
+## 02.12.01 (Build 16)
+
+### Bugfixes
+
+- Fixed stance damagebonus should be dependent on the stance damage active checkbox (error was introduced with the grievous selectbox)
+
+## 02.12.00 (Build 15)
+
+### Features
+
+- changed keen, grievieous, fell weapon spec from checkbox into selectable valued options
+- changed cunning make, close fit, reinforced armour spec from checkbox into selectable valued options
+- added release log to archive data migration messages (button on the bottom of the sheet to toggle)
+
+PLEASE NOTE: due to the changes a data migration will make changes to the values of weapon and armour values. As the new sheet will automatically incorporate all necessary bonus to Damage/Injury/Load/Parry etc. the data migration will automatically correct those values depending on the flags (keen, grievous, fell, cunning make, close fitting, reinforced). You can check everything that happened in the release log (click button to show it). Please inform the players about the new semantics of the sheet to avoid confusion.
+
 ## 02.11.00 (Build 14)
 
 ### Features
