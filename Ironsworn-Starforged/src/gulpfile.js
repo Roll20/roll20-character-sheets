@@ -11,9 +11,6 @@ const { starforged } = require('dataforged')
 axios.defaults.baseURL = 'https://raw.githubusercontent.com/rsek/dataforged/main/roll20';
 
 gulp.task('dataforge', async function() {
-
-  // TODO: get missing translation data
-
   const apiData = {
     movegroups: await axios.get('/movegroups.json'),
     rolls: await axios.get('/rolls.json'),
