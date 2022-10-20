@@ -81,6 +81,15 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+October 8th 2022 v1.62
+
+- NPC Tab - Weapon Qualities & Combat Talent support added. Similar to PC weapons, it adds cog setting button next to NPC weapons to configure qualities. A limited set of optional talents have been added and will add SL modifiers. Also adds offhand penalty on the Opp Weapon if it not the same as the Atk Weapon, modified by Melee Parry/Ambidextrous as appropriate. Changes do slow down this Tab a little, recommend configuring NPC then minimize and use minibutton for combat.
+
+- Added mouse over popup Overcast Table in the roll output for Spell cast rolls next the "SL Effect".
+- Fixed Aethyric Attunement and Wizard robes +SL not adding to Channelling roll when rolled from the Skill Tab.
+- Fixed Furious Assault +SL not adding to the final result in the roll outcome when initiated from the Furious Assault roll template mini button.
+
+
 September 24th 2022 v1.61
 
 - Updated Armor Tab - There is now 3 (Light/Medium/Heavy) Equip/unequip buttons at the top of the tab. This allows quicker equiping and unequiping of armor for players. Also all Equip/Unequip and Worn/Unworn actions in this tab now automatally activate or disable the corresponding armor penatlies. 

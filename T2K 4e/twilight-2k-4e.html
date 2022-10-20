@@ -1,4 +1,7 @@
 
+<input type='hidden' class='version' name='attr_version' value='0' />
+<input type='hidden' class='sheetversion' name='attr_sheet_version' value='1.01' />
+<input type='hidden' name='attr_newchar' value='1' />
 <input type='hidden' class='tabstoggle' name='attr_sheetTab'  value='basic'  />
 <div class="tab-buttons-container">
     <button type="action" name="act_basic" class="main-buttons button-basic">Basic</button>
@@ -148,6 +151,8 @@
             <input name="attr_empathydie" type="hidden">
             <input name="attr_commanddie" type="hidden">
             <input name="attr_manipulationdie" type="hidden">
+            <input name="attr_manipulation" type="hidden"> <!-- Kept for worker upgrade script to not throw errors -->
+            <input name="attr_persuasiondie" type="hidden">
             <input name="attr_medicalaiddie" type="hidden">
         </div>
 
@@ -311,16 +316,16 @@
             </select>
             <button class="command-skill attribute-button" type='roll' name='roll_command' value='&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Command}} {{roll-die-one=[[1d@{empathydie}]] }} {{roll-die-two=[[1d@{commanddie}]] }} {{roll-one-type=[[@{empathydie}]]}} {{roll-two-type=[[@{commanddie}]]}}'></button>
     
-            <!-- ROW THREE: MANIPULATION -->
-            <span class="manipulation-skill minor attribute-label">Manipulation</span>
-            <select name='attr_manipulation' class="manipulation-skill short attribute-select">
+            <!-- ROW THREE: PERSUASION -->
+            <span class="persuasion-skill minor attribute-label">Persuasion</span>
+            <select name='attr_persuasion' class="persuasion-skill short attribute-select">
                 <option value='-'> - </option>
                 <option value='A'>A</option>
                 <option value='B'>B</option>
                 <option value='C'>C</option>
                 <option value='D'>D</option>
             </select>
-            <button class="manipulation-skill attribute-button" type='roll' name='roll_manipulation' value='&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Manipulation}} {{roll-die-one=[[1d@{empathydie}]] }} {{roll-die-two=[[1d@{manipulationdie}]] }} {{roll-one-type=[[@{empathydie}]]}} {{roll-two-type=[[@{manipulationdie}]]}}'></button>
+            <button class="persuasion-skill attribute-button" type='roll' name='roll_persuasion' value='&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Persuasion}} {{roll-die-one=[[1d@{empathydie}]] }} {{roll-die-two=[[1d@{persuasiondie}]] }} {{roll-one-type=[[@{empathydie}]]}} {{roll-two-type=[[@{persuasiondie}]]}}'></button>
 
             <!-- ROW TWO: MEDICAL AID -->
             <span class="medical-aid-skill minor attribute-label">Medical Aid</span>
@@ -2296,15 +2301,15 @@ value="&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Coolnes
 		});
 	});
 
-	on("change:manipulation sheet:opened", function() {  
-		getAttrs(["manipulation"], function(values) {
-        		const per = values.manipulation;
+	on("change:persuasion sheet:opened", function() {  
+		getAttrs(["persuasion"], function(values) {
+        	const per = values.persuasion;
 			var perdie = 0;
 			if (per == "A") perdie = 12;
 			if (per == "B") perdie = 10;
 			if (per == "C") perdie = 8;
 			if (per == "D") perdie = 6;
-			setAttrs({manipulationdie: perdie });
+			setAttrs({persuasiondie: perdie });
 		});
 	});
 
@@ -2337,6 +2342,41 @@ value="&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Coolnes
             }
             setAttrs({carry_limit: cl});
             setAttrs({carry_limit_backpack: bpcl });
+        });
+    });
+
+    on("sheet:opened", () => {
+        getAttrs(["character_name", "sheet_version", "version", "newchar", "manipulation", "persuasion"], (values) => {
+            const sheet_version = parseFloat(values.sheet_version) || 0, 
+                version = parseFloat(values.version) || 0,
+                newchar = parseInt(values.newchar) || 0; 
+            switch (true) {
+                // In case a new character: do nothing, set as not new character, 
+                // set version same as sheet, then break all further versioning 
+                case newchar == 1 && version > 1:
+                    setAttrs({newchar: 0, version: sheet_version});
+                    console.log(`New sheet for ${values.character_name}.`);
+                    break;
+                // In case version is lower than 1.01, change manipulation to persuasion, then continue
+                case version < 1.01 :
+                    const per = values.manipulation;
+                    var perdie = 0;
+                    if (per == "A") perdie = 12;
+                    if (per == "B") perdie = 10;
+                    if (per == "C") perdie = 8;
+                    if (per == "D") perdie = 6;
+                    setAttrs({
+                        persuasion: per,
+                        persuasiondie: perdie,
+                        newchar: '0',
+                    });
+                    console.log(`Sheet upgraded for ${values.character_name} to 1.01 version.`);  
+                // When all version processing is done, set version to same as sheet and log it.               
+                default: 
+                    setAttrs({version: sheet_version});
+                    console.log(`Sheet for ${values.character_name} at latest version ${sheet_version}.`);
+                    break;                    
+            }
         });
     });
 

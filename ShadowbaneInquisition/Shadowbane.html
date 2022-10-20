@@ -4406,10 +4406,12 @@ NOTE: replace worker by javascript for IDE functionality
 // <script>
 
 	 on('clicked:fate_roll', () => {
-		getAttrs(['fate'], (v) => {
+		getAttrs(['fate', 'settings_fate'], (v) => {
 			startRoll("@{to-gm}&{template:mythic} {{character= @{character_name}}}{{fate= [[1d10cs10@{settings_fate}]]}}", (results) => {
-				const total = results.results.fate.result
-				const computed = (total == 10) ? "Success" : "Failure"
+				let total = results.results.fate.result
+				let computed = (total == 10) ? "Success" : "Failure"
+				
+				if (v.settings_fate == 'cs1' && total == 1) computed = "Success"
 
 				finishRoll(
 					results.rollId,
@@ -4418,7 +4420,7 @@ NOTE: replace worker by javascript for IDE functionality
 					}
 				);
 				if (computed == "Failure") {
-					const fate = parseInt(v.fate) - 1
+					let fate = parseInt(v.fate) - 1
 					setAttrs({fate: fate})
 				}
 			});
@@ -7177,13 +7179,11 @@ NOTE: replace worker by javascript for IDE functionality
 				{{#^rollWasCrit() fate }}
 					<div class="sheet-template-center sheet-failure">
 						{{fate}}: Fate Point Lost
-						{{computed::fate}}: Fate Point Lost
 					</div>
 				{{/^rollWasCrit() fate }}
 				{{#rollWasCrit() fate }}
 					<div class="sheet-template-center sheet-success">
 						{{fate}}: Fate Point Saved
-						{{computed::fate}}: Fate Point Saved
 					</div>
 				{{/rollWasCrit() fate }}
 			</div>
