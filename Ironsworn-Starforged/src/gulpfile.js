@@ -46,6 +46,7 @@ gulp.task('dataforge', async function() {
   for (let key in translationData) {
     const data = translationData[key].data;
     const fileName = path.join(__dirname, `./app/translations/${key}.json`);
+    console.log(fileName);
     fs.writeFileSync(fileName, JSON.stringify(data, null, 2));
   }
 });
