@@ -16,11 +16,11 @@ mixin ability(asset, ability, number, name)
     - var assetBodyPlaceholder=translation[translationAbility]
     .asset-ability
       div.i18n-text(data-i18n=translationAbility) !{assetBodyPlaceholder}
-      if ability.Input
-        each field in ability.Input
-          - var translationAbilityField = `asset-${name}-ability-${number}-textinput-${_.kebabCase(field)}`
+      if ability.Inputs
+        each field in ability.Inputs
+          - var translationAbilityField = `asset-${name}-ability-${number}-textinput-${_.kebabCase(field.Name)}`
           span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField) !{translation[translationAbilityField]}
-          input.border-bottom.no-border(type='text' name=`attr_ability_field${field}` value='')
+          input.border-bottom.no-border(type='text' name=`attr_ability_field${_.kebabCase(field.Name)}` value='')
 
 mixin description(asset, key)
   .asset-description
@@ -30,9 +30,9 @@ mixin description(asset, key)
 mixin field(field, assetName)
   .write-in-container
     .i18n-text.asset-write-in.asset-name(
-      data-i18n=`asset-${assetName}-textinput-${_.kebabCase(field)}`
-    )=translation[`asset-${assetName}-textinput-${_.kebabCase(field)}`]
-    input.border-bottom.no-border(type='text' name=`attr_field-${field}` value='')
+      data-i18n=`asset-${assetName}-textinput-${_.kebabCase(field.Name)}`
+    )=translation[`asset-${assetName}-textinput-${_.kebabCase(field.Name)}`]
+    input.border-bottom.no-border(type='text' name=`attr_field-${_.kebabCase(field.Name)}` value='')
 
 mixin track(track, assetName)
   .asset-track-wrapper
@@ -47,21 +47,20 @@ mixin track(track, assetName)
         - currentTrack++
 
 mixin assetTemplate(asset, options)
-  - let id = asset.id
-  - let name = `${id.replace(/asset-/i, "")}`
-  - let category = _.kebabCase(asset["Asset Type"])
+  - let name = _.kebabCase(asset.Name)
+  - let category = _.kebabCase(asset["Asset Type"].replace('Starforged/Assets/', '').replace('_', ' '))
   if options.visiblityToggle === true
     input(class=`${options.classes} asset-${name} asset-toggle` type='checkbox' name=`attr_${name}`)
   div(class=`${options.classes} asset-card asset-${name} category-${category}`)
     .asset-content-header
       .asset-details
-        .category=asset["Asset Type"]
+        .category=asset["Asset Type"].replace('Starforged/Assets/', '')
         span.asset-name=asset.Name
       .background-svg
-    if asset.Description
+    if asset.Requirement
       +description(asset, name)
-    if asset.Input
-      each field in asset.Input
+    if asset.Inputs
+      each field in asset.Inputs
         +field(field, name)
     .flex-wrapper
       each ability, index in asset.Abilities
@@ -76,11 +75,11 @@ mixin genericAssetBuilder(assetsArray, listId)
   datalist(id=listId)
     - console.log("Generating", assetsArray.length, "assets")
     each asset in assetsArray
-      - let assetNameClass = asset.id.replace(/asset-/i, "")
-      - console.log("Generating", asset.id)
+      - let assetId = asset.Name.replace(" ", "-").toLowerCase()
+      - console.log("Generating", assetId)
       //- generates classes and outputs to stdout
-      //- - console.log(`input[type=checkbox].${assetNameClass}:checked ~ div.${assetNameClass},`)
-      option.i18n-text(data-i18n=`${asset.id}-name` value=assetNameClass) !{translation[`${asset.id}-name`]}
+      //- - console.log(`input[type=checkbox].${assetId}:checked ~ div.${assetId},`)
+      option.i18n-text(data-i18n=`asset-${assetId}-name` value=assetId) !{translation[`asset-${assetId}-name`]}
     option.i18n-text(data-i18n=`asset-custom-name` value='custom') !{translation["asset-custom-name"]}
 
   //- Asset Content

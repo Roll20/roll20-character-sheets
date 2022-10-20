@@ -6,14 +6,13 @@ mixin assets()
   .assets
     fieldset.repeating_assets.fixed-width
       .asset.surface
-        - let assetsArray = assets.Assets.filter((asset) => onAssetsPage.includes(asset["Asset Type"]))
-        //- - let assetsArray = assets.Assets;
-        +genericAssetBuilder(assetsArray, 'assetList')
+        - let assetsArray = assets.filter((assetGroup) => onAssetsPage.includes(assetGroup["Name"]))
+        - let finalisedAssetList = assetsArray.map((assetGroup) => assetGroup.Assets).flat()
+        +genericAssetBuilder(finalisedAssetList, 'assetList')
         +customAssets
     .hidden-fields.hide-element
-      each asset in assets.Assets
-        - let assetClassName = asset.id.replace(/asset-/i, "")
+      each asset in finalisedAssetList
+        - let assetClassName = asset.Name.replace(" ", "-").toLowerCase()
         each ability, index in asset.Abilities
-          - let assetAbility = `'${asset.id}-ability-${index + 1}',`
-          //- - console.log(asset.id)
+          - let assetAbility = `asset-'${assetClassName}-ability-${index + 1}',`
         input(class=`hide-element` type='checkbox' name=`attr_${assetClassName}`)
