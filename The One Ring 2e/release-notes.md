@@ -4,6 +4,11 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.04.00 (Build 24)
+
+- added bonus modifier to useful items
+- added whisper mode pc and npc
+
 ## 03.03.00 (Build 23)
 
 - added Useful item

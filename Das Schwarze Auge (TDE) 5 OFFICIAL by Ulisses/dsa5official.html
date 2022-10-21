@@ -1,4 +1,3 @@
-
 <div class="dsaWrapper compendium-drop-target Creature Kreatur Akteur Actor creature kreatur akteur actor">
   <input accept="data" name="attr_drop_data" type="hidden"/>
   <input accept="uniqueName" name="attr_drop_uniquename" type="hidden"/>
@@ -30002,15 +30001,14 @@
 });
 
 // Main initializing
-on('sheet:opened change:recalcSheet', () => {
-    getAttrs(["recalcSheet", "toggle_npc"], async(values) => {
+on('sheet:opened change:recalcSheet', async() => {
+    const translation = await prepareTranslation()
+    const speed = await dsa5sheetFunctions.calcSpeed()
+    const schips = await dsa5sheetFunctions.calcSchips()
+    const toughness = await dsa5sheetFunctions.calcToughness()
+    const dodge = await dsa5sheetFunctions.calcDodge()
+    getAttrs(["recalcSheet", "recalcSheet", "toggle_npc"], async(values) => {
         if(values.toggle_npc == "notes") return
-
-        const translation = await prepareTranslation()
-        const speed = await dsa5sheetFunctions.calcSpeed()
-        const schips = await dsa5sheetFunctions.calcSchips()
-        const toughness = await dsa5sheetFunctions.calcToughness()
-        const dodge = await dsa5sheetFunctions.calcDodge()
 
         let update = {...translation, ...speed, ...schips, ...toughness, ...dodge, showAdvancedRoll: 0, migrakelongoing: "off" }
         if (values.recalcSheet == "on") {
@@ -30041,6 +30039,7 @@ on('sheet:opened change:recalcSheet', () => {
         setAttrs(update)
     })
 })
+
 
 const prepareTranslation = async() => {
     return {
