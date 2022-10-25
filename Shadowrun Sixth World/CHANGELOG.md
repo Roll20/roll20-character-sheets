@@ -1,5 +1,19 @@
 Change Log
 ==============================================
+**2022-10-24 ** v.62 Chuz (James Culp)
+	New Feature - PC->Matrix->ASDF Roll buttons now include more options to combine them with.  None, Custom, mind attributes and ASDF.
+	New Feature - NPCs now have updated ASDF roll buttons as well!
+	New Feature - NPCs now have the newer version of the d6's roll button and the new Extended Tests capability.
+	New Feature - Added Extended Tests capabilities.
+**2022-09-20 ** v.61 Chuz (James Culp)
+	Bugfix - NPC->Spells were missing the Limited duration, added it.
+	Bugfix - Charactersheet Tab - removed the underline.
+	Bugfix - Updated Matrix Rolls trained prompt to say "Trained" instead of "No" (which made no sense)
+**2022-09-13 ** v.60 Chuz (James Culp)
+	Bugfix - PC->Rolls->Matrix actions including cracking were not using the Cracking skill rating but whatever the rating of the last updated skill was.  Fixed the bug causing this and loading the sheet the first time should update the attr_cracking value to be correct again.
+**2022-08-30 ** v.59 Chuz (James Culp)
+	Bugfix - Non-PC sheets were broken anywhere that a textarea (notes style) entry existed you couldn't display it to add or edit the values.
+	New Feature - character_name sanitization.  Sometimes we want to use names with characters that will break roll buttons and other parts of the sheet.  This replaces the bad characters with an asterisk *
 **2022-08-16 ** v.58 Chuz (James Culp)
 	New Feature - Added the ability to change the ammo type in use on Core->Primary Ranged with the AR and DV changes applied.  Default will be Standard.
 	New Feature - Added split rolls for Burst Fire Wide firing mode on the Core->Primary Ranged weapons.  This splits the dicepool (on odd pools the left roll Atk 1 gets the extra die).  If Wild Dice are toggled on a prompt will appear for each attack.  Glitches are calculated for each attack separately.
