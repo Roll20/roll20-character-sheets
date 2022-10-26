@@ -1,7 +1,5 @@
 Change Log
 ==============================================
-**2022-09-28 ** v.15 Paul V
-	Split out Features and Traits into their own individual lines, allowing more flexibility
 **2022-09-28 ** v.14 Paul V
 	Added D10 and D12 in to the Expertise dice list for high level Rogues - but this is a static Expertise dice uneffected by Specialty (as that caps at d8)
 	Changed the Expertise to be a dropdown list no data entry allowed
