@@ -1209,8 +1209,8 @@ NONWEAPON_PROFICIENCIES_TABLE['Wild Fighting'].push({
 NONWEAPON_PROFICIENCIES_TABLE['Cartography'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Cartography'].push({
     'slots': 1,
-    'abilityScore': '@{Wisdom}',
-    'modifier': 0,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
     'classes': '',
     'book': ['The Complete Ranger\'s Handbook']
 });
