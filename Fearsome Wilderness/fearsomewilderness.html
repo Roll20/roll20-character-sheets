@@ -128,7 +128,12 @@
 	</div>
 	<div class="sheet-stats">
 		<label data-i18n-title="strength" title="strength">
-			<span data-i18n="strength">strength</span>
+			<!-- The visible and draggable button for the macro bar -->
+			<button type="roll" name="roll_strength" value="@{strength_action}" data-i18n="strength">strength</button>
+			<!-- The invisible button allowing the use of custom roll parsing -->
+			<button type="action" name="act_strength-action" class="hidden"></button>
+			<!-- The invisible field for the attribute which contains the ability call -->
+			<input type="hidden" name="attr_strength_action" value="">
 			<input data-i18n-placeholder="strength" name="attr_strength" placeholder="strength" spellcheck="false" title="@{strength}" type="number" value="" min="1" max="5"/>
 		</label>
 		<label data-i18n-title="aching" title="aching">
@@ -152,7 +157,12 @@
 			<input data-i18n-placeholder="winded" name="attr_winded" placeholder="winded" spellcheck="false" title="@{winded}" type="checkbox" value="1" class="fieldclass"/>
 		</label>
 		<label data-i18n-title="agility" title="agility">
-			<span data-i18n="agility">agility</span>
+			<!-- The visible and draggable button for the macro bar -->
+			<button type="roll" name="roll_agility" value="@{agility_action}" data-i18n="agility">agility</button>
+			<!-- The invisible button allowing the use of custom roll parsing -->
+			<button type="action" name="act_agility-action" class="hidden"></button>
+			<!-- The invisible field for the attribute which contains the ability call -->
+			<input type="hidden" name="attr_agility_action" value="">
 			<input data-i18n-placeholder="agility" name="attr_agility" placeholder="agility" spellcheck="false" title="@{agility}" type="number" value="" min="1" max="5"/>
 		</label>
 		<label data-i18n-title="shaky hands" title="shaky hands">
@@ -176,7 +186,12 @@
 			<input data-i18n-placeholder="maniacal" name="attr_maniacal" placeholder="maniacal" spellcheck="false" title="@{maniacal}" type="checkbox" value="1" class="fieldclass"/>
 		</label>
 		<label data-i18n-title="wits" title="wits">
-			<span data-i18n="wits">wits</span>
+			<!-- The visible and draggable button for the macro bar -->
+			<button type="roll" name="roll_wits" value="@{wits_action}" data-i18n="wits">wits</button>
+			<!-- The invisible button allowing the use of custom roll parsing -->
+			<button type="action" name="act_wits-action" class="hidden"></button>
+			<!-- The invisible field for the attribute which contains the ability call -->
+			<input type="hidden" name="attr_wits_action" value="">
 			<input data-i18n-placeholder="wits" name="attr_wits" placeholder="wits" spellcheck="false" title="@{wits}" type="number" value="" min="1" max="5"/>
 		</label>
 		<label data-i18n-title="forgetful" title="forgetful">
@@ -200,7 +215,12 @@
 			<input data-i18n-placeholder="desperate" name="attr_desperate" placeholder="desperate" spellcheck="false" title="@{desperate}" type="checkbox" value="1" class="fieldclass"/>
 		</label>
 		<label data-i18n-title="empathy" title="empathy">
-			<span data-i18n="empathy">empathy</span>
+			<!-- The visible and draggable button for the macro bar -->
+			<button type="roll" name="roll_empathy" value="@{empathy_action}" data-i18n="empathy">empathy</button>
+			<!-- The invisible button allowing the use of custom roll parsing -->
+			<button type="action" name="act_empathy-action" class="hidden"></button>
+			<!-- The invisible field for the attribute which contains the ability call -->
+			<input type="hidden" name="attr_empathy_action" value="">
 			<input data-i18n-placeholder="empathy" name="attr_empathy" placeholder="empathy" spellcheck="false" title="@{empathy}" type="number" value="" min="1" max="5"/>
 		</label>
 		<label data-i18n-title="distraught" title="distraught">
@@ -1110,7 +1130,14 @@
         </div>
     </div>
 </rolltemplate>
-
+<rolltemplate class="sheet-rolltemplate-fwstat">
+    <div class="sheet-template-container">
+        <h1>{{name}}</h1>
+        <div class="sheet-results">
+            <h2>Successes {{computed::roll1}}</h2>
+        </div>
+    </div>
+</rolltemplate>
 
 <script type="text/worker">
 
@@ -1130,6 +1157,10 @@ on("sheet:opened change:character_name", function(eventInfo) {
 		attrsToChange["manipulate_action"] = "%{" + v["character_name"] + "|manipulate-action}";
 		attrsToChange["senseemotion_action"] = "%{" + v["character_name"] + "|senseemotion-action}";
 		attrsToChange["nightmare_action"] = "%{" + v["character_name"] + "|nightmare-action}";
+		attrsToChange["agility_action"] = "%{" + v["character_name"] + "|agility-action}";
+		attrsToChange["strength_action"] = "%{" + v["character_name"] + "|strength-action}";
+		attrsToChange["wits_action"] = "%{" + v["character_name"] + "|wits-action}";
+		attrsToChange["empathy_action"] = "%{" + v["character_name"] + "|empathy-action}";
 		attrsToChange["armor1_action"] = "%{" + v["character_name"] + "|armor1-action}";
 		attrsToChange["armor2_action"] = "%{" + v["character_name"] + "|armor2-action}";
 		attrsToChange["armor3_action"] = "%{" + v["character_name"] + "|armor3-action}";
@@ -1215,6 +1246,34 @@ on('clicked:nightmare-action', async (info) => {
 	finishRoll(results.rollId);
 });
 
+on('clicked:strength-action', async (info) => {
+	const values = await getAttrsAsync(['strength']);
+	const base = +parseInt(values.strength) || 0;
+	const results = await startRoll("&{template:fwstat} {{name=Strength}} {{roll1=[["+base+"d6>6]]}}");
+	const basesuccesses = results.results.roll1.result;
+	finishRoll(results.rollId);
+});
+on('clicked:agility-action', async (info) => {
+	const values = await getAttrsAsync(['agility']);
+	const base = +parseInt(values.agility) || 0;
+	const results = await startRoll("&{template:fwstat} {{name=agility}} {{roll1=[["+base+"d6>6]]}}");
+	const basesuccesses = results.results.roll1.result;
+	finishRoll(results.rollId);
+});
+on('clicked:wits-action', async (info) => {
+	const values = await getAttrsAsync(['wits']);
+	const base = +parseInt(values.wits) || 0;
+	const results = await startRoll("&{template:fwstat} {{name=wits}} {{roll1=[["+base+"d6>6]]}}");
+	const basesuccesses = results.results.roll1.result;
+	finishRoll(results.rollId);
+});
+on('clicked:empathy-action', async (info) => {
+	const values = await getAttrsAsync(['empathy']);
+	const base = +parseInt(values.empathy) || 0;
+	const results = await startRoll("&{template:fwstat} {{name=empathy}} {{roll1=[["+base+"d6>6]]}}");
+	const basesuccesses = results.results.roll1.result;
+	finishRoll(results.rollId);
+});
 
 on('clicked:endure-action', async (info) => {
 	const values = await getAttrsAsync(['strength','endure','character_name']);
