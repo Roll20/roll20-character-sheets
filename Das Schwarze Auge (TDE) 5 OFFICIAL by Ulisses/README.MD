@@ -5,6 +5,20 @@
 
 
 ## Changelog
+### v1.4.3 (19/21/2022)
+*Added new expansions
+*Fixed a number conversion bug for 3d20 rolls
+
+### v1.4.0 (10/1/2022)
+*Armor zones, including calculation of encumbrance is now available. You can enable this optional rule in the options tab.
+*Adventure points can now be spend to increase levels of special abilities, advantages and disadvantages
+*Crits and botches of single d20 rolls should now show a button to do a confirmation roll. This can be turned off via the options.
+*There is now a third option besides NPC and character for the sheet. The notes sheet only holds information, which can be placed on the map, so the players or gm can get easy information on locations or important places on maps.
+*The modifiers for special abilities have been extended with modifiers for talent groups and modifiers for all talents at once.
+*The implications of some conditions (modifiers) have been improved
+*There is now an advanced roll dialog for 3d20 checks. This dialog provides some more typical modifiers for each roll. It can be disabled via the options.
+*Diseases can now be added to the character sheet (e.g. via drag and drop from the compendium) and be rolled on
+*A sheet can now be automatically updated via the "Migracle". You can find the new section in the options tab. The "Migracle" will compare the name of all available abilities, spells and liturgical chants with those contained in the compendium. If there is a match, it will link the item with the compendium entry and pull all data again on the sheet. Careful as this might overwrite manual data entries made by yourself.
 
 ### v1.3.0 (9/8/2022)
 * Weight of single items can now be ignored (checkbox)

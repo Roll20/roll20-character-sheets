@@ -1309,7 +1309,7 @@ on('clicked:pilotage', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const armorBonus = await getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(armorBonus.exec);
   cRoll = cRoll.concat(armorBonus.cRoll);
