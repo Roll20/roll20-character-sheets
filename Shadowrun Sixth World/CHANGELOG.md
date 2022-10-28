@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2022-10-31 ** v.63 Chuz (James Culp)
+	New Feature - PC Attribute roll buttons now prompt for a second attribute or custom dice modifier for those occasions when the DM says Roll Reaction+Intuition instead of Roll Defense
 **2022-10-24 ** v.62 Chuz (James Culp)
 	New Feature - PC->Matrix->ASDF Roll buttons now include more options to combine them with.  None, Custom, mind attributes and ASDF.
 	New Feature - NPCs now have updated ASDF roll buttons as well!
