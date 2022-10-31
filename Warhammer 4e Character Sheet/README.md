@@ -81,6 +81,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+October 31st 2022 v1.62a
+
+- Fixed Fast Shot not showing in Ranged assist drop-down window when above LVL 1.
+- Fixed XP not adding for Fast Shot Talent.
+
+
 October 8th 2022 v1.62
 
 - NPC Tab - Weapon Qualities & Combat Talent support added. Similar to PC weapons, it adds cog setting button next to NPC weapons to configure qualities. A limited set of optional talents have been added and will add SL modifiers. Also adds offhand penalty on the Opp Weapon if it not the same as the Atk Weapon, modified by Melee Parry/Ambidextrous as appropriate. Changes do slow down this Tab a little, recommend configuring NPC then minimize and use minibutton for combat.
@@ -88,7 +94,7 @@ October 8th 2022 v1.62
 - Added mouse over popup Overcast Table in the roll output for Spell cast rolls next the "SL Effect".
 - Fixed Aethyric Attunement and Wizard robes +SL not adding to Channelling roll when rolled from the Skill Tab.
 - Fixed Furious Assault +SL not adding to the final result in the roll outcome when initiated from the Furious Assault roll template mini button.
-
+- Fixed issue with Melee Bonus re-applying after a hit in certain circumstances. Bonus Value was not being cleared from the Weapons Tab.
 
 September 24th 2022 v1.61
 
