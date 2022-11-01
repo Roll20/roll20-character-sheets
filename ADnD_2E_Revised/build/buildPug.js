@@ -10,7 +10,7 @@ const booksPriority = [
     {book: 'PHB', print: 'First Printing May 2013'},
     {book: 'The Complete Fighter\'s Handbook', print: '11th Printing, May 1996'},
     {book: 'The Complete Thief\'s Handbook', print: 'November 1993'},
-    {book: 'The Complete Priest\'s Handbook', print: 'Sixth printing, January 1995'},
+    {book: 'The Complete Priest\'s Handbook', print: 'Seventh printing, October 1996'},
     {book: 'The Complete Wizard\'s Handbook', print: '10th printing, March 1996'},
     {book: 'The Complete Psionics Handbook', print: 'Ninth printing: October 1996'},
     {book: 'Tome of Magic', print: ''},
