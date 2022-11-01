@@ -2331,12 +2331,13 @@ WEAPONS_TABLE['katana'].push({
 
 WEAPONS_TABLE['naginata'].push({
     'name': 'Naginata',
+    'group': 'Polearm',
     'size': 'L',
     'type': 'S',
     'speed': 7,
-    'small-medium': '1d10',
-    'large': '1d12',
-    'book': ['The Complete Book of Humanoids'],
+    'small-medium': '1d8',
+    'large': '1d10',
+    'book': ['The Complete Book of Humanoids','Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });
 
@@ -2440,6 +2441,18 @@ WEAPONS_TABLE['hornhead staff'].push({
     'speed': 6,
     'small-medium': '2d6',
     'large': '2d6',
+    'book': ['The Complete Book of Humanoids'],
+    'category': ['Melee']
+});
+WEAPONS_TABLE['finhead broadsword'] = [];
+WEAPONS_TABLE['finhead broadsword'].push({
+    'name': 'Finhead broadsword',
+    'group': 'Saurial Weapon',
+    'size': 'M',
+    'type': 'S',
+    'speed': 6,
+    'small-medium': '1d8',
+    'large': '1d10',
     'book': ['The Complete Book of Humanoids'],
     'category': ['Melee']
 });
@@ -7628,17 +7641,6 @@ WEAPONS_TABLE['nagimaki'].push({
     'speed': 6,
     'small-medium': '1d6',
     'large': '1d8',
-    'book': ['Player\'s Option: Skills & Powers'],
-    'category': ['Melee']
-});
-WEAPONS_TABLE['naginata'].push({
-    'name': 'Naginata',
-    'group': 'Polearm',
-    'size': 'L',
-    'type': 'S',
-    'speed': 7,
-    'small-medium': '1d8',
-    'large': '1d10',
     'book': ['Player\'s Option: Skills & Powers'],
     'category': ['Melee']
 });

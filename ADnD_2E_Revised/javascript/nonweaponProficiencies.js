@@ -1139,6 +1139,13 @@ NONWEAPON_PROFICIENCIES_TABLE['Cheesemaking'].push({
     'classes': '',
     'book': ['The Complete Book of Humanoids']
 });
+NONWEAPON_PROFICIENCIES_TABLE['Crowd Working'].push({
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': +2,
+    'classes': '',
+    'book': ['The Complete Book of Humanoids']
+});
 NONWEAPON_PROFICIENCIES_TABLE['Danger Sense'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Danger Sense'].push({
     'slots': 2,
