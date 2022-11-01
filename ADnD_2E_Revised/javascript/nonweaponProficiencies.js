@@ -610,8 +610,8 @@ NONWEAPON_PROFICIENCIES_TABLE['Information Gathering'].push({
 NONWEAPON_PROFICIENCIES_TABLE['Intimidation'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Intimidation'].push({
     'slots': 1,
-    'abilityScore': '?{Intimidation with?|@{Strength}|@{Charisma}}',
-    'modifier': '',
+    'abilityScore': '?{Intimidation with?|Strength,@{Strength}|Charisma,@{Charisma}}',
+    'modifier': 0,
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Dwarves','The Complete Book of Humanoids']
 });
@@ -977,7 +977,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Lip Reading (Dwarf)'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Lip Reading (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
-    'modifier': 0,
+    'modifier': -2,
     'classes': 'Thief',
     'book': ['The Complete Book of Dwarves']
 });
