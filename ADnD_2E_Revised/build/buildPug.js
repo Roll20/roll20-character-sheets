@@ -29,8 +29,10 @@ const booksPriority = [
     {book: 'Player\'s Option: Skills & Powers', print: ''},
     {book: 'Player\'s Option: Spells & Magic', print: ''},
 ];
+let sortOrder = booksPriority.map(bookPriority => bookPriority.book)
 function bookShorthand(books) {
-    return books.map(b => b.replace('The Complete', '')
+    return books.sort((x,y) => sortOrder.indexOf(x) - sortOrder.indexOf(y))
+        .map(b => b.replace('The Complete', '')
         .replace('Book of', '')
         .replace('Handbook', '')
         .replace('Player\'s Option:','')
