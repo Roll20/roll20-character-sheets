@@ -81,7 +81,9 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
-October 31st 2022 v1.62a
+October 31st 2022 v1.63
+
+- New setting switch for Optional Fumble/Oops Rules by FighterChimp on Ratcatcher Guild Discord @ https://discord.com/channels/449845411344154634/449846068356710412/611069939654066177. These are somewhat similar to Core, but with better descriptions which are more adaptable to melee/ranged/magic. Matter of preference for GM.
 
 - Fixed Fast Shot not showing in Ranged assist drop-down window when above LVL 1.
 - Fixed XP not adding for Fast Shot Talent.
