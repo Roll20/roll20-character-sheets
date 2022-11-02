@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="03-04-00" />
+<input type="hidden" name="attr_version" value="03-05-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -223,7 +223,11 @@
                         <span><input class="strong" name="attr_hearttn" value="0" type="number"></span></span>
                     <span></span>
                     <span class="diamond-red">
-                        <span><input class="strong" name="attr_hope" value="1" type="number"></span></span>
+                        <input type="hidden" class="sheet-hopetoggle" name="attr_hopetoggle" />
+                        <span id="hope_readonly" data-i18n-title="daunted-title"><input class="strong" name="attr_hope"
+                                value="1" type="number" readonly="readonly"></span>
+                        <span id="hope"><input class="strong" name="attr_hope" value="1" type="number"></span>
+                    </span>
                     <label data-i18n="current-hope" class="left">Current Hope</label>
                 </div>
 
@@ -307,11 +311,14 @@
                     <span data-i18n="miserable">Miserable</span></label>
                 <label><input name="attr_wounded" type="checkbox" value=1>
                     <span data-i18n="wounded">Wounded</span></label>
+                <div />
+                <label><input name="attr_daunted" type="checkbox" value=1>
+                    <span data-i18n="daunted" data-i18n-title="daunted-title">Daunted</span></label>
+                <div />
             </div>
-            <span>
-                <label data-i18n="injury" />
-                <input name="attr_injury" type="text">
-            </span>
+            <div class="center">
+                <label data-i18n="injury" /><input name="attr_injury" type="text">
+            </div>
             <div id="custom-diceroller">
                 <div class="onecols">
                     <h2 data-i18n="custom-roll">Custom Dice Roller</h3>
@@ -347,7 +354,6 @@
                         id="roll_custom" />
                 </div>
             </div>
-            <br />
             <div class="center">
                 <label data-i18n="parsed-rolls">Parsed rolls</label>
                 <div class="sheet-hover-info" data-i18n="parsedroll-description">When enabled the dice rolls will be
@@ -365,7 +371,6 @@
                     using preconfigured rollable tables according to instructions for The One Ring 1st Edition, with
                     output displayed in a rolltemplate.</div>
             </div>
-            <br />
             <button type="action" name="act_notestoggle" data-i18n="notes">Notes</button>
         </div>
         <div id="combat">
@@ -2154,6 +2159,15 @@
         });
     });
 
+    on("change:daunted sheet:opened", function() {
+        getAttrs(["daunted", "sheetTab"], function(values) {
+            let daunted = values.daunted||0;
+            clog(`Hope toggle: ${daunted}`);
+            setAttrs({
+                hopetoggle: daunted,
+            });
+        });
+    });
 
     /*==================
       Valour & Wisdom
@@ -2931,6 +2945,26 @@
                     });
                 }
             }
+
+            if (build < 25) {
+                attrs["build"] = 25;
+                let releaselog = {msg:""};
+                hlog(`Release 03.05.00 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Added
+- added "Daunted" modifier
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+
 
             /*
             if (build === 9) {
