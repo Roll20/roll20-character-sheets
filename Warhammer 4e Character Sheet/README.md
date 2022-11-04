@@ -84,6 +84,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 November 4th 2022 v1.63a
 
 - Fix for Characteristics Auto XP bug
+- Optimized NPC weapon switch code
 
 
 October 31st 2022 v1.63
