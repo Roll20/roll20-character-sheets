@@ -81,12 +81,15 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
-November 4th 2022 v1.63a
+November 4th 2022 v1.64
+
+- Added Spell/Pray (Magic) Drop-down Assist: this is similar to the Melee/Ranged ones. Its shows all learned spells Petty/Arcance from the spellbook, or blessings/miracles, in a collapsable menu with lore  channeling, Accu SL and Cast buttons for Quick access to those buttons under Combat actions.
 
 - Fix Accurate Mod reset
 - Fix Deadeye shot bonus not applying
 - Fix Characteristics Auto XP bug
 - Optimized NPC weapon switch code
+- Added visable RT Overcast popup info list when casting non-damage spells
 
 
 October 31st 2022 v1.63
