@@ -13377,6 +13377,7 @@ Click again to switch to Manual and Remote">
         <button type="action" name="act_rollextended"></button>
         <button type="action" name="act_reactdodge"></button>
         <button type="action" name="act_reactsoak"></button>
+        <button type="action" name="act_reroll"></button>
     </div>
 
 </div>
@@ -14109,7 +14110,6 @@ async function migrateComplexforms() {
 
 
     attributes["complexformsMigration102022"] = true;
-    console.log(attributes);
     await asw.setAttrs(attributes);
 }
 
@@ -15582,9 +15582,6 @@ async function importSingleRepeatingWeapon(weapon, ammunition, attributes) {
             //make clips unique
             var clips = [...new Map(weapon.clips.clip.slice().reverse().map(v => [v.name, v])).values()].reverse()
 
-            console.log(weapon.name);
-            console.log(clips);
-
             for(var j=0; j < clips.length && amountImported < 4; j++){
 
                 var newrowid=generateRowID();
@@ -16687,7 +16684,7 @@ on('change:repeating_armors remove:repeating_armors', function(){
 ///////////////////////////
 
 on('clicked:roll', async (event) => {
-  	await startRoll( event.htmlAttributes.value + "{{glitch=[[0]]}}", (results) => {
+  	await startRoll( event.htmlAttributes.value + "{{glitch=[[0]]}}{{reroll=[[0]]}}", (results) => {
 
         var glitchComputed = 0;
         var amount = results.results.result.dice.filter(x => x == 1).length;
@@ -16700,11 +16697,17 @@ on('clicked:roll', async (event) => {
             }
         }
 
+        var reroll = {
+            dice: results.results.result.dice.length,
+            successes: results.results.result.result,
+            limit: results.results.limit_num.result + results.results.limit_mod.result
+        }
+
 	  	finishRoll(
 		  	results.rollId,
 		  	{
 			  	glitch: glitchComputed,
-
+			  	reroll:  rollEscape.escape(reroll)
 		  	}
 	  	);
   	  });
@@ -16719,7 +16722,7 @@ on('clicked:repeating_knowledge:roll clicked:repeating_alchemy:roll clicked:repe
 
 	let rollPart = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
 
-  	await startRoll(rollPart + "{{glitch=[[0]]}}", (results) => {
+  	await startRoll(rollPart + "{{glitch=[[0]]}}{{reroll=[[0]]}}", (results) => {
 
         var glitchComputed = 0;
         var amount = results.results.result.dice.filter(x => x == 1).length;
@@ -16732,11 +16735,17 @@ on('clicked:repeating_knowledge:roll clicked:repeating_alchemy:roll clicked:repe
             }
         }
 
+        var reroll = {
+            dice: results.results.result.dice.length,
+            successes: results.results.result.result,
+            limit: results.results.limit_num.result + results.results.limit_mod.result
+        }
+
 	  	finishRoll(
 		  	results.rollId,
 		  	{
 			  	glitch: glitchComputed,
-
+                reroll:  rollEscape.escape(reroll)
 		  	}
 	  	);
   	  });
@@ -16849,6 +16858,35 @@ const rollExtended = async (ev) => {
     });
 }
 
+///////////////////
+//  Edge Reroll  //
+///////////////////
+
+on('clicked:reroll', async (ev) => {
+    await reroll(ev);
+});
+
+const reroll = async (ev) => {
+    // The data we passed into the button will be stored in the originalRollId key
+    let roll = rollEscape.unescape(ev.originalRollId);
+
+    let attrs = await asw.getAttrs(['gmroll','character_name']);
+
+    let rollBase = `${attrs.gmroll}&{template:reroll}{{name=${attrs.character_name}}}{{roll_name=again}}{{dice=[[${roll.dice}]]}}{{prior=[[${roll.successes}]]}}{{limit=Limit}}{{limit_num=[[${roll.limit}]]}}{{result=[[ {[[[[${roll.dice}-${roll.successes}]]d6>5sd+${roll.successes}]], [[{${roll.limit}+0d0}]]}kl1 ]] }}{{passthrough=[[0]]}}`;
+    let reroll = await startRoll(rollBase);
+
+    let passthrough = 0;
+    if( roll.attack != undefined) {
+        let attack = roll.attack;
+        attack.attackHits = reroll.results.result.result;
+        passthrough = rollEscape.escape(attack);
+    }
+
+    finishRoll(reroll.rollId, {
+        passthrough: passthrough,
+    });
+}
+
 
 //////////////////////////////
 //  Dogable weapon attacks  //
@@ -16913,7 +16951,7 @@ on('clicked:repeating_ammotype1:roll clicked:repeating_ammotype2:roll clicked:re
 
 const rollDogableAttack = async (rollPart, dmgType) => {
 
-    let attackRoll = await startRoll( rollPart + " {{passthrough=[[0]]}}{{glitch=[[0]]}} ");
+    let attackRoll = await startRoll( rollPart + " {{passthrough=[[0]]}}{{glitch=[[0]]}}{{reroll=[[0]]}}");
 
     var glitchComputed = 0;
     var amount = attackRoll.results.result.dice.filter(x => x == 1).length;
@@ -16942,12 +16980,19 @@ const rollDogableAttack = async (rollPart, dmgType) => {
         attackDmgType: attackDmgType,
     }
 
+    var reroll = {
+        dice: attackRoll.results.result.dice.length,
+        successes: attackRoll.results.result.result,
+        limit: attackRoll.results.limit_num.result,
+        attack: rollData
+    }
+
     finishRoll(
         attackRoll.rollId,
         {
             glitch: glitchComputed,
             passthrough: rollEscape.escape(rollData),
-
+            reroll:  rollEscape.escape(reroll)
         }
     );
 }
@@ -17008,7 +17053,6 @@ const rollReactSoak = async (ev) => {
 
     if(dmgType.includes('P') && attrs.armor_total > 0) {
      dmgType = dmgRoll.attackDamage > (attrs.armor_total + armorPenetration + soakRoll.results.mod.result) ? dmgRoll.attackDmgType : 'S';
-     console.log("resulting dmgType: "+dmgType+ " dmg: "+dmgRoll.attackDamage+" armorResult: "+ (attrs.armor_total + armorPenetration + soakRoll.results.mod.result));
     }
 
     finishRoll(soakRoll.rollId, {
@@ -17228,17 +17272,17 @@ const asw = (() => {
         </tr>
         {{#rollGreater() result 1}}
         <tr class="sheet-rolltemplate-results-success">
-            <td class="result">{{result}} Successes</td>
+            <td class="result">{{result}} [Successes](~{{name}}|reroll||{{computed::reroll}})</td>
         </tr>
         {{/rollGreater() result 1}}
         {{#rollTotal() result 1}}
         <tr class="sheet-rolltemplate-results-success">
-            <td class="result">{{result}} Success</td>
+            <td class="result">{{result}} [Success](~{{name}}|reroll||{{computed::reroll}})</td>
         </tr>
         {{/rollTotal() result 1}}
         {{#rollTotal() result 0}}
         <tr class="sheet-rolltemplate-results-fail">
-            <td class="result">{{result}} Successes</td>
+            <td class="result">{{result}} [Successes](~{{name}}|reroll||{{computed::reroll}})</td>
         </tr>
         {{/rollTotal() result 0}}
         {{#rollBetween() computed::glitch 1 1}}
@@ -17331,6 +17375,86 @@ const asw = (() => {
     {{/^rollTotal() computed::passthrough 0}}
     {{/rollGreater() result 0}}
 
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-reroll">
+    <table>
+        <tr>
+            <th>
+                {{#name}}{{name}} rolls{{#roll_name}} {{roll_name}}{{/roll_name}}{{/name}}</th>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"> </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-sectionheading">Dicepool</div>
+            </td>
+        </tr>
+        {{#dice}}
+        <tr>
+            <td>> Dice({{dice}})</td>
+        </tr>
+        {{/dice}}
+        {{#prior}}
+        <tr>
+            <td>> Prior successes({{prior}})</td>
+        </tr>
+        {{/prior}}
+        {{#limit}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"> </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-sectionheading">Limit</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-limit">> {{limit}}({{limit_num}})</div>
+            </td>
+        </tr>
+        {{/limit}}
+        {{#result}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"> </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-sectionheading">Result</div>
+            </td>
+        </tr>
+        {{#rollGreater() result 1}}
+        <tr class="sheet-rolltemplate-results-success">
+            <td class="result">{{result}} Successes</td>
+        </tr>
+        {{/rollGreater() result 1}}
+        {{#rollTotal() result 1}}
+        <tr class="sheet-rolltemplate-results-success">
+            <td class="result">{{result}} Success</td>
+        </tr>
+        {{/rollTotal() result 1}}
+        {{#rollTotal() result 0}}
+        <tr class="sheet-rolltemplate-results-fail">
+            <td class="result">{{result}} Successes</td>
+        </tr>
+        {{/rollTotal() result 0}}
+        {{/result}}
+    </table>
+    {{#rollGreater() result 0}}
+    {{#^rollTotal() computed::passthrough 0}}
+    <div class="sheet-rolltemplate-button">
+        [Dodge](~selected|reactdodge||{{computed::passthrough}})
+    </div>
+    {{/^rollTotal() computed::passthrough 0}}
+    {{/rollGreater() result 0}}
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-extendedRoll">

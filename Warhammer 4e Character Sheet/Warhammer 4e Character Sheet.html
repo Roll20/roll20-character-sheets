@@ -525,6 +525,7 @@
 				<button type="action" class="sheet-hidden" name="act_shieldbash" />
 				<button type="action" class="sheet-hidden" name="act_furiousassaultoff" />
 
+			<input type="hidden" name="attr_d100" value="[[1d100]]" disabled />
 			<input type="hidden" name="attr_LastCritRoll" value="0" disabled />
 			<input type="hidden" name="attr_LastRollOff" value="0" disabled />
 			<input type="hidden" name="attr_LastUnitDieOff" value="0" disabled />
@@ -1202,7 +1203,7 @@
 							<span class="sheet-spacer"></span>
 
 
-		<input type="checkbox" name="attr_Talent_FastShotLvl" class="sheet-hidden sheet-hider" value="1" />
+		<input type="checkbox" name="attr_FastShotShow" class="sheet-hidden sheet-hider" value="1" />
 				<div class="sheet-row" style="border-top: 1px solid; letter-spacing: normal; padding-top: 3px">
 				<div class="sheet-col-1-2 sheet-right">
 				<div class="sheet-col-3-4 sheet-right">
@@ -10109,7 +10110,7 @@
 									<button type="roll" class="sheet-combat-actions-rep" style="width:42px" name="roll_Wrath" value="@{Whisper} &{template:whfrp2e} {{title=^{WRATH-OF-THE-GODS}}} {{character_name=@{character_name}}} {{attacktype=^{CRITICAL}}} {{wrathroll= [[[[1d100]] [ROLL] + (@{Sin}*10) [SIN] ]]}}"><span data-i18n="WRATH">Wrath</span></button>
 								</div>
 								<div class="sheet-col-1-13 sheet-center" style="float: right; margin-right: 30px;">
-									<button type="roll" class="sheet-combat-actions-rep" style="width:55px" name="roll_Mutations" value="@{Whisper} &{template:whfrp2e} {{mutation=[[?{Choose a Mutation Type|Physical Mutation, 0|Mental Mutation, 1|Fixation, 2}]]}} {{chaos=[[?{Choose a Chaos God|Any Power, 0|Khorne, 1|Nurgle, 2|Slaanesh, 3|Tzeentch, 4}]]}} {{character_name=@{character_name}}} {{mutationroll=[[1d100]]}} {{mutationroll2=[[1d100]]}} {{mutationroll3=[[2d10]]}}"><span data-i18n="MUTATION">Mutation</span></button>
+									<button type="roll" class="sheet-combat-actions-rep" style="width:55px" name="roll_Mutations" value="@{Whisper} &{template:whfrp2e} {{mutation=[[?{Choose a Mutation Type|Physical Mutation, 0|Mental Mutation, 1|Fixation, 2}]]}} {{chaos=[[?{Choose a Chaos God|Any Power, 0|Khorne, 1|Nurgle, 2|Slaanesh, 3|Tzeentch, 4}]]}} {{character_name=@{character_name}}} {{mutationroll=[[@{d100}]]}} {{mutationroll2=[[@{d100}]]}} {{mutationroll3=[[2d10]]}}"><span data-i18n="MUTATION">Mutation</span></button>
 								</div>
 							</div>
 							<img src="https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/assets/seperator-center.png?raw=true">
@@ -30173,6 +30174,20 @@
 				</div>
 			</div>
 		<hr />
+			<div class="sheet-row sheet-spell-header">
+				<div class="sheet-col-1 sheet-vert-bottom sheet-left sheet-small-label sheet-pad-l-md">
+					<span data-i18n="OOPS-TABLE">Fumble/Oops Table Rules</span>
+				</div>
+			</div>
+			<div class="sheet-row sheet-mar-b-md">
+				<div class="sheet-col-1 sheet-pad-r-md">
+					<select class="sheet-select-no-arrow" name="attr_OopsTable">
+						<option value="0" selected="selected" data-i18n="HOUSERULE1-OOPS-TABLE">Houserule 1: Core Rule Book (Default)</option>
+						<option value="1" data-i18n="HOUSERULE2-OOPS-TABLE">Houserule 2: Extended Rules V1.1 (by FighterChimp on Ratcatcher Guild Discord)</option>
+					</select>
+				</div>
+			</div>
+		<hr />
 		<div class="sheet-row sheet-spell-header">
 			<div class="sheet-col-1 sheet-vert-bottom sheet-left sheet-small-label sheet-pad-l-md">
 				<span data-i18n="HOUSERULE-COND-TRACKER">Condition Tracker roll template integration (As close to rule book as currently possible)</span>
@@ -30280,7 +30295,7 @@
 		<div class="sheet-spacer-xl"></div>
 		<!-- FOOTER -->
 		<div class="sheet-row sheet-footer">
-			<div class="sheet-col-1 sheet-small-label sheet-center">Sheet version 1.62 : October 8th 2022 | by Djjus & Pote</div>
+			<div class="sheet-col-1 sheet-small-label sheet-center">Sheet version 1.63 : October 31st 2022 | by Djjus & Pote</div>
 		</div>
 		</div>
 	</div>
@@ -36814,37 +36829,72 @@
 										</div>
 										{{#rollBetween() fumbleroll 01 20}}
 										<div class="sheet-row">
-											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-20-DESC">You catch a part of your anatomy while making your attack נlose 1 Wound, ignoring Toughness Bonus or Armour Points. </div>
+										{{#rollTotal() fumblerule 0}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-20-DESC"></div>
+										{{/rollTotal() fumblerule 0}}
+										{{#rollTotal() fumblerule 1}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE2-20-DESC"></div>
+										{{/rollTotal() fumblerule 1}}
 										</div>
 										{{/rollBetween() fumbleroll 01 20}}
 										{{#rollBetween() fumbleroll 21 40}}
 										<div class="sheet-row">
-											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-40-DESC">Your melee weapon jars badly, or ranged weapon malfunctions or slightly breaks ֠your weapon suffers 1 Damage. Next round, you will act last regardless of Initiative order, Talents, or special rules as you recover </div>
+										{{#rollTotal() fumblerule 0}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-40-DESC"></div>
+										{{/rollTotal() fumblerule 0}}
+										{{#rollTotal() fumblerule 1}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE2-40-DESC"></div>
+										{{/rollTotal() fumblerule 1}}
 										</div>
 										{{/rollBetween() fumbleroll 21 40}}
 										{{#rollBetween() fumbleroll 41 60}}
 										<div class="sheet-row">
-											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-60-DESC">Your manoeuvre was misjudged, leaving you out of position, or you lose grip of a ranged weapon. Next round, your Action suffers a penalty of ֱ0. </div>
+										{{#rollTotal() fumblerule 0}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-60-DESC"></div>
+										{{/rollTotal() fumblerule 0}}
+										{{#rollTotal() fumblerule 1}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE2-60-DESC"></div>
+										{{/rollTotal() fumblerule 1}}
 										</div>
 										{{/rollBetween() fumbleroll 41 60}}
 										{{#rollBetween() fumbleroll 61 70}}
 										<div class="sheet-row">
-											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-70-DESC">You stumble badly, finding it hard to right yourself. Lose your next Move.</div>
+										{{#rollTotal() fumblerule 0}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-70-DESC"></div>
+										{{/rollTotal() fumblerule 0}}
+										{{#rollTotal() fumblerule 1}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE2-70-DESC"></div>
+										{{/rollTotal() fumblerule 1}}
 										</div>
 										{{/rollBetween() fumbleroll 61 70}}
 										{{#rollBetween() fumbleroll 71 80}}
 										<div class="sheet-row">
-											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-80-DESC">You mishandle your weapon, or you drop your ammunition. Miss your next Action.</div>
+										{{#rollTotal() fumblerule 0}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-80-DESC"></div>
+										{{/rollTotal() fumblerule 0}}
+										{{#rollTotal() fumblerule 1}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE2-80-DESC"></div>
+										{{/rollTotal() fumblerule 1}}
 										</div>
 										{{/rollBetween() fumbleroll 71 80}}
 										{{#rollBetween() fumbleroll 81 90}}
 										<div class="sheet-row">
-											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-90-DESC">You overextend yourself or stumble and twist your ankle. Suffer a Torn Muscle (Minor) injury (see page @@). This counts as a Critical Wound. </div>
+										{{#rollTotal() fumblerule 0}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-90-DESC"></div>
+										{{/rollTotal() fumblerule 0}}
+										{{#rollTotal() fumblerule 1}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE2-90-DESC"></div>
+										{{/rollTotal() fumblerule 1}}
 										</div>
 										{{/rollBetween() fumbleroll 81 90}}
 										{{#rollBetween() fumbleroll 91 100}}
 										<div class="sheet-row">
-											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-100-DESC">You completely mess up your attack, hitting 1 random ally in range using your rolled units die to determine the SL of the hit. If thatӳ not possible, you somehow hit yourself in the face and gain the Stunned Condition </div>
+										{{#rollTotal() fumblerule 0}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE-100-DESC"></div>
+										{{/rollTotal() fumblerule 0}}
+										{{#rollTotal() fumblerule 1}}
+											<div class="sheet-col-1 sheet-pad-l-md sheet-pad-r-md sheet-rt-value" data-i18n="FUMBLE2-100-DESC"></div>
+										{{/rollTotal() fumblerule 1}}
 										</div>
 										{{/rollBetween() fumbleroll 91 100}}
 										{{/fumbleroll}}
@@ -41428,7 +41478,7 @@ on('sheet:opened change:repeating_otherxp:otherxp change:repeating_otherxp:other
 			
 		getAttrs(["sheetcheck", 'WeaponSkillAdv', 'WeaponSkillXP', 'BallisticSkillAdv', 'BallisticSkillXP', 'StrengthAdv', 'StrengthXP', 'ToughnessAdv', 'ToughnessXP', 'InitiativeAdv', 'InitiativeXP', 'AgilityAdv', 'AgilityXP', 'DexterityAdv', 'DexterityXP', 'IntelligenceAdv', 'IntelligenceXP', 'WillPowerAdv', 'WillPowerXP', 'FellowshipAdv', 'FellowshipXP'], function (x) {
 			var trigger = eventInfo.triggerName;
-			if (trigger === "sheet:opened") {if (x.sheetcheck == 6) return;}
+			if (trigger === "sheet:opened") {if (x.sheetcheck == 7) return;}
 			
 	console.log(stat + ' XP change');
 			if (x.WeaponSkillAdv > 0) { var out1 = getTranslationByKey('WEAPONSKILL') + ' -' + ' ' + getTranslationByKey('ABBREVIATE-ADVANCE') + ': ' + x.WeaponSkillAdv + ' -' + ' ' + getTranslationByKey('XP') + ': ' + x.WeaponSkillXP + '  ✥  '; } else { var out1 = '';}
@@ -41461,7 +41511,7 @@ on('sheet:opened change:repeating_otherxp:otherxp change:repeating_otherxp:other
 
 		getAttrs(["sheetcheck", `${skill}Adv`], function (v) {
 			var trigger = eventInfo.triggerName;
-			if (trigger === "sheet:opened") {if (v.sheetcheck == 6) return;}
+			if (trigger === "sheet:opened") {if (v.sheetcheck == 7) return;}
 			
 		const skilladv = +v[`${skill}Adv`] || 0;
 		
@@ -41753,7 +41803,7 @@ on('sheet:opened change:repeating_otherxp:otherxp change:repeating_otherxp:other
 			if (v.Talent_WellpreparedLvl > 0) {out += getTranslationByKey('WELL-PREPARED') + ' -' + ' ' + getTranslationByKey('LVL') + ': ' + v.Talent_WellpreparedLvl + ' -' + ' ' + getTranslationByKey('XP') + ': ' + v.Talent_WellpreparedXP + '  ✥  '; } else {out += '';}
 			if (v.Talent_WitchLvl > 0) {out += getTranslationByKey('WITCH!') + ' -' + ' ' + getTranslationByKey('LVL') + ': ' + v.Talent_WitchLvl + ' -' + ' ' + getTranslationByKey('XP') + ': ' + v.Talent_WitchXP + '  ✥  '; } else {out += '';}
 
-		total = parseInt(v.Talent_AccurateShotXP) + parseInt(v.Talent_AcuteSense1XP) + parseInt(v.Talent_AcuteSense2XP) + parseInt(v.Talent_AethyricAttunementXP) + parseInt(v.Talent_AlleyCatXP) + parseInt(v.Talent_AmbidextrousXP) + parseInt(v.Talent_AnimalAffinityXP) + parseInt(v.Talent_ArcaneMagic1XP) + parseInt(v.Talent_ArcaneMagic2XP) + parseInt(v.Talent_ArcaneMagic3XP) + parseInt(v.Talent_ArcaneMagic4XP) + parseInt(v.Talent_ArgumentativeXP) + parseInt(v.Talent_ArtisticXP) + parseInt(v.Talent_AttractiveXP) + parseInt(v.Talent_BattleRageXP) + parseInt(v.Talent_BeatBladeXP) + parseInt(v.Talent_BeneathNoticeXP) + parseInt(v.Talent_BerserkChargeXP) + parseInt(v.Talent_BreakandEnterXP) + parseInt(v.Talent_BlessXP) + parseInt(v.Talent_BookishXP) + parseInt(v.Talent_BriberXP) + parseInt(v.Talent_CardsharpXP) + parseInt(v.Talent_CarefulStrikeXP) + parseInt(v.Talent_CarouserXP) + parseInt(v.Talent_CatfallXP) + parseInt(v.Talent_CattonguedXP) + parseInt(v.Talent_ChaosMagic1XP) + parseInt(v.Talent_ChaosMagic2XP) + parseInt(v.Talent_ChaosMagic3XP) + parseInt(v.Talent_ChaosMagic4XP) + parseInt(v.Talent_CombatAwareXP) + parseInt(v.Talent_CombatMasterXP) + parseInt(v.Talent_CombatReflexesXP) + parseInt(v.Talent_CommandingPresenceXP) + parseInt(v.Talent_ConcoctXP) + parseInt(v.Talent_ContortionistXP) + parseInt(v.Talent_CoolheadedXP) + parseInt(v.Talent_CracktheWhipXP) + parseInt(v.Talent_Craftsman1XP) + parseInt(v.Talent_Craftsman2XP) + parseInt(v.Talent_CrewCommanderXP) + parseInt(v.Talent_CriminalXP) + parseInt(v.Talent_DeadeyeShotXP) + parseInt(v.Talent_DealmakerXP) + parseInt(v.Talent_DetectArtefactXP) + parseInt(v.Talent_DicemanXP) + parseInt(v.Talent_DirtyFightingXP) + parseInt(v.Talent_DisarmXP) + parseInt(v.Talent_DistractXP) + parseInt(v.Talent_DrilledXP) + parseInt(v.Talent_DualWielderXP) + parseInt(v.Talent_EmbezzleXP) + parseInt(v.Talent_EnclosedFighterXP) + parseInt(v.Talent_Etiquette1XP) + parseInt(v.Talent_Etiquette2XP) + parseInt(v.Talent_Etiquette3XP) + parseInt(v.Talent_Etiquette4XP) + parseInt(v.Talent_Etiquette5XP) + parseInt(v.Talent_Etiquette6XP) + parseInt(v.Talent_FastHandsXP) + parseInt(v.Talent_DrilledXP) + parseInt(v.Talent_Fearless1XP) + parseInt(v.Talent_Fearless2XP) + parseInt(v.Talent_Fearless3XP) + parseInt(v.Talent_Fearless4XP) + parseInt(v.Talent_FeintXP) + parseInt(v.Talent_FieldDressingXP) + parseInt(v.Talent_FishermanXP) + parseInt(v.Talent_FlagellantXP) + parseInt(v.Talent_FleeXP) + parseInt(v.Talent_FleetFootedXP) + parseInt(v.Talent_FrenzyXP) + parseInt(v.Talent_FrighteningXP) + parseInt(v.Talent_FuriousAssaultXP) + parseInt(v.Talent_GregariousXP) + parseInt(v.Talent_GunnerXP) + parseInt(v.Talent_HardyXP) + parseInt(v.Talent_Hatred1XP) + parseInt(v.Talent_Hatred2XP) + parseInt(v.Talent_Hatred3XP) + parseInt(v.Talent_Hatred4XP) + parseInt(v.Talent_HolyHatredXP) + parseInt(v.Talent_HolyVisionsXP) + parseInt(v.Talent_HuntersEyeXP) + parseInt(v.Talent_ImpassionedZealXP) + parseInt(v.Talent_ImplacableXP) + parseInt(v.Talent_InfighterXP) + parseInt(v.Talent_InspiringXP) + parseInt(v.Talent_InstinctiveDictionXP) + parseInt(v.Talent_InvokeXP) + parseInt(v.Talent_InfighterXP) + parseInt(v.Talent_IronJawXP) + parseInt(v.Talent_IronWillXP) + parseInt(v.Talent_JumpUpXP) + parseInt(v.Talent_KingpinXP) + parseInt(v.Talent_LightningReflexesXP) + parseInt(v.Talent_LinguisticsXP) + parseInt(v.Talent_LipReadingXP) + parseInt(v.Talent_LuckXP) + parseInt(v.Talent_MagicalSenseXP) + parseInt(v.Talent_MagicalAssistantXP) + parseInt(v.Talent_MagicResistanceXP) + parseInt(v.Talent_MagnumOpusXP) + parseInt(v.Talent_MarksmanXP) + parseInt(v.Talent_MasterOfDisguiseXP) + parseInt(v.Talent_MasterOratorXP) + parseInt(v.Talent_MasterTradesman1XP) + parseInt(v.Talent_MasterTradesman2XP) + parseInt(v.Talent_MasterTradesman3XP) + parseInt(v.Talent_MenacingXP) + parseInt(v.Talent_MimicXP) + parseInt(v.Talent_NightVisionXP) + parseInt(v.Talent_NimbleFingersXP) + parseInt(v.Talent_NoseForTroubleXP) + parseInt(v.Talent_NumismaticsXP) + parseInt(v.Talent_OldSaltXP) + parseInt(v.Talent_OrientationXP) + parseInt(v.Talent_PanhandleXP) + parseInt(v.Talent_PerfectPitchXP) + parseInt(v.Talent_PettyMagicXP) + parseInt(v.Talent_PharmacistXP) + parseInt(v.Talent_PilotXP) + parseInt(v.Talent_PublicSpeakerXP) + parseInt(v.Talent_PureSoulXP) + parseInt(v.Talent_RapidReloadXP) + parseInt(v.Talent_ReactionStrikeXP) + parseInt(v.Talent_ReadWriteXP) + parseInt(v.Talent_RelentlessXP) + parseInt(v.Talent_Resistance1XP) + parseInt(v.Talent_Resistance2XP) + parseInt(v.Talent_Resistance3XP) + parseInt(v.Talent_ResoluteXP) + parseInt(v.Talent_ReversalXP) + parseInt(v.Talent_RiposteXP) + parseInt(v.Talent_RiverGuideXP) + parseInt(v.Talent_RoughriderXP) + parseInt(v.Talent_RoverXP) + parseInt(v.Talent_SavvyXP) + parseInt(v.Talent_ScaleSheerSurfaceXP) + parseInt(v.Talent_SchemerXP) + parseInt(v.Talent_SeaLegsXP) + parseInt(v.Talent_SeasonedTravellerXP) + parseInt(v.Talent_SecondSightXP) + parseInt(v.Talent_SecretIdentityXP) + parseInt(v.Talent_ShadowXP) + parseInt(v.Talent_SharpXP) + parseInt(v.Talent_SharpshooterXP) + parseInt(v.Talent_ShieldsmanXP) + parseInt(v.Talent_SixthSenseXP) + parseInt(v.Talent_SlayerXP) + parseInt(v.Talent_SniperXP) + parseInt(v.Talent_SpeedreaderXP) + parseInt(v.Talent_SprinterXP) + parseInt(v.Talent_StepAsideXP) + parseInt(v.Talent_StoneSoupXP) + parseInt(v.Talent_StoutHeartedXP) + parseInt(v.Talent_Strider1XP) + parseInt(v.Talent_Strider2XP) + parseInt(v.Talent_Strider3XP) + parseInt(v.Talent_StrikeMightyBlowXP) + parseInt(v.Talent_StriketoInjureXP) + parseInt(v.Talent_StriketoStunXP) + parseInt(v.Talent_StrongBackXP) + parseInt(v.Talent_StrongLegsXP) + parseInt(v.Talent_StrongmindedXP) + parseInt(v.Talent_StrongSwimmerXP) +  parseInt(v.Talent_SturdyXP) +  parseInt(v.Talent_SuaveXP) + parseInt(v.Talent_SuffusedWithAqshyXP) + parseInt(v.Talent_SuffusedWithAzyrXP) + parseInt(v.Talent_SuffusedWithChamonXP) + parseInt(v.Talent_SuffusedWithGhurXP)  + parseInt(v.Talent_SuffusedWithGhyranXP) + parseInt(v.Talent_SuffusedWithHyshXP) + parseInt(v.Talent_SuffusedWithShyishXP) + parseInt(v.Talent_SuffusedWithUgluXP) + parseInt(v.Talent_SuperNumerateXP) + parseInt(v.Talent_SupportiveXP) + parseInt(v.Talent_SureShotXP) + parseInt(v.Talent_TenaciousXP) + parseInt(v.Talent_TinkerXP) + parseInt(v.Talent_TowerOfMemoriesXP) + parseInt(v.Talent_TrapperXP) + parseInt(v.Talent_TrickRidingXP) + parseInt(v.Talent_TunnelRatXP) + parseInt(v.Talent_UnshakableXP) + parseInt(v.Talent_VeryResilientXP) + parseInt(v.Talent_VeryStrongXP) + parseInt(v.Talent_ViceXP) + parseInt(v.Talent_WarLeaderXP) + parseInt(v.Talent_WarWizardXP) + parseInt(v.Talent_WarriorBornXP) + parseInt(v.Talent_WatermanXP) + parseInt(v.Talent_WealthyXP) + parseInt(v.Talent_WellpreparedXP) + parseInt(v.Talent_WitchXP) ;
+		total = parseInt(v.Talent_AccurateShotXP) + parseInt(v.Talent_AcuteSense1XP) + parseInt(v.Talent_AcuteSense2XP) + parseInt(v.Talent_AethyricAttunementXP) + parseInt(v.Talent_AlleyCatXP) + parseInt(v.Talent_AmbidextrousXP) + parseInt(v.Talent_AnimalAffinityXP) + parseInt(v.Talent_ArcaneMagic1XP) + parseInt(v.Talent_ArcaneMagic2XP) + parseInt(v.Talent_ArcaneMagic3XP) + parseInt(v.Talent_ArcaneMagic4XP) + parseInt(v.Talent_ArgumentativeXP) + parseInt(v.Talent_ArtisticXP) + parseInt(v.Talent_AttractiveXP) + parseInt(v.Talent_BattleRageXP) + parseInt(v.Talent_BeatBladeXP) + parseInt(v.Talent_BeneathNoticeXP) + parseInt(v.Talent_BerserkChargeXP) + parseInt(v.Talent_BreakandEnterXP) + parseInt(v.Talent_BlessXP) + parseInt(v.Talent_BookishXP) + parseInt(v.Talent_BriberXP) + parseInt(v.Talent_CardsharpXP) + parseInt(v.Talent_CarefulStrikeXP) + parseInt(v.Talent_CarouserXP) + parseInt(v.Talent_CatfallXP) + parseInt(v.Talent_CattonguedXP) + parseInt(v.Talent_ChaosMagic1XP) + parseInt(v.Talent_ChaosMagic2XP) + parseInt(v.Talent_ChaosMagic3XP) + parseInt(v.Talent_ChaosMagic4XP) + parseInt(v.Talent_CombatAwareXP) + parseInt(v.Talent_CombatMasterXP) + parseInt(v.Talent_CombatReflexesXP) + parseInt(v.Talent_CommandingPresenceXP) + parseInt(v.Talent_ConcoctXP) + parseInt(v.Talent_ContortionistXP) + parseInt(v.Talent_CoolheadedXP) + parseInt(v.Talent_CracktheWhipXP) + parseInt(v.Talent_Craftsman1XP) + parseInt(v.Talent_Craftsman2XP) + parseInt(v.Talent_CrewCommanderXP) + parseInt(v.Talent_CriminalXP) + parseInt(v.Talent_DeadeyeShotXP) + parseInt(v.Talent_DealmakerXP) + parseInt(v.Talent_DetectArtefactXP) + parseInt(v.Talent_DicemanXP) + parseInt(v.Talent_DirtyFightingXP) + parseInt(v.Talent_DisarmXP) + parseInt(v.Talent_DistractXP) + parseInt(v.Talent_DrilledXP) + parseInt(v.Talent_DualWielderXP) + parseInt(v.Talent_EmbezzleXP) + parseInt(v.Talent_EnclosedFighterXP) + parseInt(v.Talent_Etiquette1XP) + parseInt(v.Talent_Etiquette2XP) + parseInt(v.Talent_Etiquette3XP) + parseInt(v.Talent_Etiquette4XP) + parseInt(v.Talent_Etiquette5XP) + parseInt(v.Talent_Etiquette6XP) + parseInt(v.Talent_FastHandsXP) + parseInt(v.Talent_FastShotXP) + parseInt(v.Talent_DrilledXP) + parseInt(v.Talent_Fearless1XP) + parseInt(v.Talent_Fearless2XP) + parseInt(v.Talent_Fearless3XP) + parseInt(v.Talent_Fearless4XP) + parseInt(v.Talent_FeintXP) + parseInt(v.Talent_FieldDressingXP) + parseInt(v.Talent_FishermanXP) + parseInt(v.Talent_FlagellantXP) + parseInt(v.Talent_FleeXP) + parseInt(v.Talent_FleetFootedXP) + parseInt(v.Talent_FrenzyXP) + parseInt(v.Talent_FrighteningXP) + parseInt(v.Talent_FuriousAssaultXP) + parseInt(v.Talent_GregariousXP) + parseInt(v.Talent_GunnerXP) + parseInt(v.Talent_HardyXP) + parseInt(v.Talent_Hatred1XP) + parseInt(v.Talent_Hatred2XP) + parseInt(v.Talent_Hatred3XP) + parseInt(v.Talent_Hatred4XP) + parseInt(v.Talent_HolyHatredXP) + parseInt(v.Talent_HolyVisionsXP) + parseInt(v.Talent_HuntersEyeXP) + parseInt(v.Talent_ImpassionedZealXP) + parseInt(v.Talent_ImplacableXP) + parseInt(v.Talent_InfighterXP) + parseInt(v.Talent_InspiringXP) + parseInt(v.Talent_InstinctiveDictionXP) + parseInt(v.Talent_InvokeXP) + parseInt(v.Talent_IronJawXP) + parseInt(v.Talent_IronWillXP) + parseInt(v.Talent_JumpUpXP) + parseInt(v.Talent_KingpinXP) + parseInt(v.Talent_LightningReflexesXP) + parseInt(v.Talent_LinguisticsXP) + parseInt(v.Talent_LipReadingXP) + parseInt(v.Talent_LuckXP) + parseInt(v.Talent_MagicalSenseXP) + parseInt(v.Talent_MagicalAssistantXP) + parseInt(v.Talent_MagicResistanceXP) + parseInt(v.Talent_MagnumOpusXP) + parseInt(v.Talent_MarksmanXP) + parseInt(v.Talent_MasterOfDisguiseXP) + parseInt(v.Talent_MasterOratorXP) + parseInt(v.Talent_MasterTradesman1XP) + parseInt(v.Talent_MasterTradesman2XP) + parseInt(v.Talent_MasterTradesman3XP) + parseInt(v.Talent_MenacingXP) + parseInt(v.Talent_MimicXP) + parseInt(v.Talent_NightVisionXP) + parseInt(v.Talent_NimbleFingersXP) + parseInt(v.Talent_NoseForTroubleXP) + parseInt(v.Talent_NumismaticsXP) + parseInt(v.Talent_OldSaltXP) + parseInt(v.Talent_OrientationXP) + parseInt(v.Talent_PanhandleXP) + parseInt(v.Talent_PerfectPitchXP) + parseInt(v.Talent_PettyMagicXP) + parseInt(v.Talent_PharmacistXP) + parseInt(v.Talent_PilotXP) + parseInt(v.Talent_PublicSpeakerXP) + parseInt(v.Talent_PureSoulXP) + parseInt(v.Talent_RapidReloadXP) + parseInt(v.Talent_ReactionStrikeXP) + parseInt(v.Talent_ReadWriteXP) + parseInt(v.Talent_RelentlessXP) + parseInt(v.Talent_Resistance1XP) + parseInt(v.Talent_Resistance2XP) + parseInt(v.Talent_Resistance3XP) + parseInt(v.Talent_ResoluteXP) + parseInt(v.Talent_ReversalXP) + parseInt(v.Talent_RiposteXP) + parseInt(v.Talent_RiverGuideXP) + parseInt(v.Talent_RoughriderXP) + parseInt(v.Talent_RoverXP) + parseInt(v.Talent_SavvyXP) + parseInt(v.Talent_ScaleSheerSurfaceXP) + parseInt(v.Talent_SchemerXP) + parseInt(v.Talent_SeaLegsXP) + parseInt(v.Talent_SeasonedTravellerXP) + parseInt(v.Talent_SecondSightXP) + parseInt(v.Talent_SecretIdentityXP) + parseInt(v.Talent_ShadowXP) + parseInt(v.Talent_SharpXP) + parseInt(v.Talent_SharpshooterXP) + parseInt(v.Talent_ShieldsmanXP) + parseInt(v.Talent_SixthSenseXP) + parseInt(v.Talent_SlayerXP) + parseInt(v.Talent_SniperXP) + parseInt(v.Talent_SpeedreaderXP) + parseInt(v.Talent_SprinterXP) + parseInt(v.Talent_StepAsideXP) + parseInt(v.Talent_StoneSoupXP) + parseInt(v.Talent_StoutHeartedXP) + parseInt(v.Talent_Strider1XP) + parseInt(v.Talent_Strider2XP) + parseInt(v.Talent_Strider3XP) + parseInt(v.Talent_StrikeMightyBlowXP) + parseInt(v.Talent_StriketoInjureXP) + parseInt(v.Talent_StriketoStunXP) + parseInt(v.Talent_StrongBackXP) + parseInt(v.Talent_StrongLegsXP) + parseInt(v.Talent_StrongmindedXP) + parseInt(v.Talent_StrongSwimmerXP) +  parseInt(v.Talent_SturdyXP) +  parseInt(v.Talent_SuaveXP) + parseInt(v.Talent_SuffusedWithAqshyXP) + parseInt(v.Talent_SuffusedWithAzyrXP) + parseInt(v.Talent_SuffusedWithChamonXP) + parseInt(v.Talent_SuffusedWithGhurXP)  + parseInt(v.Talent_SuffusedWithGhyranXP) + parseInt(v.Talent_SuffusedWithHyshXP) + parseInt(v.Talent_SuffusedWithShyishXP) + parseInt(v.Talent_SuffusedWithUgluXP) + parseInt(v.Talent_SuperNumerateXP) + parseInt(v.Talent_SupportiveXP) + parseInt(v.Talent_SureShotXP) + parseInt(v.Talent_TenaciousXP) + parseInt(v.Talent_TinkerXP) + parseInt(v.Talent_TowerOfMemoriesXP) + parseInt(v.Talent_TrapperXP) + parseInt(v.Talent_TrickRidingXP) + parseInt(v.Talent_TunnelRatXP) + parseInt(v.Talent_UnshakableXP) + parseInt(v.Talent_VeryResilientXP) + parseInt(v.Talent_VeryStrongXP) + parseInt(v.Talent_ViceXP) + parseInt(v.Talent_WarLeaderXP) + parseInt(v.Talent_WarWizardXP) + parseInt(v.Talent_WarriorBornXP) + parseInt(v.Talent_WatermanXP) + parseInt(v.Talent_WealthyXP) + parseInt(v.Talent_WellpreparedXP) + parseInt(v.Talent_WitchXP) ;
 		
 	console.log(total);
 	if (out === "") {out = " ";}
@@ -43783,7 +43833,7 @@ on('change:talentmode change:Talent_CoolheadedLvl change:Talent_LightningReflexe
 on('sheet:opened', function() {
 			getAttrs(["sheetcheck"], function(c) {
             console.log(c.sheetcheck);
-			if (c.sheetcheck == 6) return;
+			if (c.sheetcheck == 7) return;
 			
 		setAttrs({
 			"Talentmode": 1,
@@ -44047,7 +44097,10 @@ on('sheet:opened', function() {
 					});
 				});
                console.log('Gathering and assigning Repeating section IDs.');	
-				setAttrs({"sheetcheck": 6}, {silent: true});	
+				setAttrs({
+				"sheetcheck": 7,
+				"d100": "[[1d100]]",
+				}, {silent: true});	
 				});	
 				
             });
@@ -46995,7 +47048,7 @@ on('clicked:fumbletest', (eventInfo) => {
 	getAttrs(["initiative_houserule"], function(v) {	
 		
 	
-   let roll = '{{unconscious=[[@{UnconsciousMod}]]}} {{title=^{FUMBLE}}} {{character_name=@{character_name}}} {{attacktype=^{CRITICAL}}} {{fumbleroll=[[1d100]]}}';
+   let roll = '{{unconscious=[[@{UnconsciousMod}]]}} {{title=^{FUMBLE}}} {{character_name=@{character_name}}} {{attacktype=^{CRITICAL}}} {{fumbleroll=[[1d100]]}} {{fumblerule=[[@{OopsTable}]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
@@ -47019,7 +47072,7 @@ on('clicked:repeating_npc-tab-page:fumbletestnpc', (eventInfo) => {
 	getAttrs(["initiative_houserule"], function(v) {	
 		
 	
-   let roll = '{{unconscious=[[@{prefix-UnconsciousNPC}]]}} {{title=^{FUMBLE}}} {{character_name=@{prefix-npc_name}}} {{attacktype=^{CRITICAL}}} {{fumbleroll=[[1d100]]}}';
+   let roll = '{{unconscious=[[@{prefix-UnconsciousNPC}]]}} {{title=^{FUMBLE}}} {{character_name=@{prefix-npc_name}}} {{attacktype=^{CRITICAL}}} {{fumbleroll=[[1d100]]}} {{fumblerule=[[@{OopsTable}]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
@@ -47891,10 +47944,10 @@ on('clicked:advantagereset', function(event){
 });	
 
 
-on('change:Talent_DrilledLvl change:Talent_BreakandEnterLvl change:Talent_DisarmLvl change:Talent_InFighterLvl change:Talent_FrenzyLvl change:Talent_FeintLvl change:Talent_StriketoStunLvl change:Talent_BeatBladeLvl', function(event){
+on('change:Talent_DrilledLvl change:Talent_BreakandEnterLvl change:Talent_DisarmLvl change:Talent_InFighterLvl change:Talent_FrenzyLvl change:Talent_FeintLvl change:Talent_StriketoStunLvl change:Talent_BeatBladeLvl change:Talent_FastShotLvl', function(event){
         if (event.sourceType === 'sheetworker') return;
     console.log("Modifier reset");	
-	getAttrs(["Talent_DrilledLvl", "Talent_BreakandEnterLvl", "Talent_DisarmLvl", "Talent_InFighterLvl", "Talent_FeintLvl", "Talent_FrenzyLvl", "Talent_StriketoStunLvl", "Talent_BeatBladeLvl"], function(v) {	
+	getAttrs(["Talent_DrilledLvl", "Talent_BreakandEnterLvl", "Talent_DisarmLvl", "Talent_InFighterLvl", "Talent_FeintLvl", "Talent_FastShotLvl", "Talent_FrenzyLvl", "Talent_StriketoStunLvl", "Talent_BeatBladeLvl"], function(v) {	
 	
 	bnedis = 0;
 	dnfdis = 0;
@@ -47910,12 +47963,16 @@ on('change:Talent_DrilledLvl change:Talent_BreakandEnterLvl change:Talent_Disarm
 	
 	if (v.Talent_StriketoStunLvl > 0) {sts = 1;} else {sts = 0;}
 	
+	if (v.Talent_FastShotLvl > 0) {fastshot = 1;} else {fastshot = 0;}
+	
+    console.log(fastshot);	
 	setAttrs(
 	{
 		"BeatBladeShow": bblade,
 		"DrilledShow": drill,
 		"FeintShow": feint,
 		"DrillFeintShow": dnfdis,
+		"FastShotShow": fastshot,
 		"DisarmShow": disarm,
 		"BNEShow": bne,
 		"InfightShow": infight,
