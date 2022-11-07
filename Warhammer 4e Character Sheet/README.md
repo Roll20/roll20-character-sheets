@@ -81,6 +81,17 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+November 4th 2022 v1.64
+
+- Added Spell/Pray (Magic) Drop-down Assist: this is similar to the Melee/Ranged ones. Its shows all learned spells Petty/Arcance from the spellbook, or blessings/miracles, in a collapsable menu with lore  channeling, Accu SL and Cast buttons for Quick access to those buttons under Combat actions.
+
+- Fix Accurate Mod reset
+- Fix Deadeye shot bonus not applying
+- Fix Characteristics Auto XP bug
+- Optimized NPC weapon switch code
+- Added visable RT Overcast popup info list when casting non-damage spells
+
+
 October 31st 2022 v1.63
 
 - New setting switch for Optional Fumble/Oops Rules by FighterChimp on Ratcatcher Guild Discord @ https://discord.com/channels/449845411344154634/449846068356710412/611069939654066177. These are somewhat similar to Core, but with better descriptions which are more adaptable to melee/ranged/magic. Matter of preference for GM.
