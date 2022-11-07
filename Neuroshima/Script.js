@@ -227,10 +227,11 @@ on("change:zrecznosc_base change:mod_zrecznosc change:percepcja_base change:mod_
 /******************************************************************/
 /******************************************************************/
 /************************** ROLL PARAMETERS ***********************/
-const startingPercent = [-20, 0, 11, 31, 61, 91, 121]
-const lastPassingPercent = [-1,10,30,60,90,120,0xFFFFFF];
-const levelRadioValues = ["0","1","2","3","4","5","6"];
-const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Bardzo Trudny", "Cholernie Trudny", "Fart"];
+const difficulties = [-2,0,2,5,8,11,15, 20, 24];
+const startingPercent = [-20, 0, 11, 31, 61, 91, 121, 201, 241];
+const lastPassingPercent = [-1,10,30,60,90,120,200, 240, 0xFFFFFF];
+const levelRadioValues = ["0","1","2","3","4","5","6","7","8"];
+const levelLabels = ["Łatwy", "Przeciętny", "Problematyczny", "Trudny", "Bardzo Trudny", "Cholernie Trudny", "Fart", "Mistrzowski", "Arcymistrzowski"];
   levelRadioValues.forEach(function(value) {
     on(`clicked:level_${value}`, function() {
       setAttrs({
@@ -297,14 +298,6 @@ const wsp2accusative = {
     "budowa":"budowę"
 };
 
-const wsp2genitive = {
-    "zrecznosc":"zręczności",
-    "percepcja":"percepcji",
-    "charakter":"charakteru",
-    "spryt":"sprytu",
-    "budowa":"budowy"
-}
-
 const statslist = [
     "bijatyka",                         "bron_reczna",                  "rzucanie", 
     "pistolety",                        "karabiny",                     "bron_maszynowa",
@@ -325,6 +318,8 @@ const statslist = [
     "mechanika",                        "elektronika",                  "komputery",
     "maszyny_ciezkie",                  "wozy_bojowe",                  "kutry",
     "rusznikarstwo",                    "wyrzutnie",                    "materialy_wybuchowe",
+    "wogl0",                            "wogl1",                        "wogl2",
+    "wogl3",                            "wogl4",                        "wogl5",
     
     "plywanie",                         "wspinaczka",                   "kondycja",
     "jazda_konna",                      "powozenie",                    "ujezdzanie"
@@ -350,12 +345,14 @@ const stats2wsp = {
     "mechanika":W_SP,                   "elektronika":W_SP,             "komputery":W_SP,
     "maszyny_ciezkie":W_SP,             "wozy_bojowe":W_SP,             "kutry":W_SP,
     "rusznikarstwo":W_SP,               "wyrzutnie":W_SP,               "materialy_wybuchowe":W_SP,
+    "wogl0":W_SP,                       "wogl1":W_SP,                   "wogl2":W_SP,   
+    "wogl3":W_SP,                       "wogl4":W_SP,                   "wogl5":W_SP,   
     
     "plywanie":W_BD,                    "wspinaczka":W_BD,              "kondycja":W_BD,
     "jazda_konna":W_BD,                 "powozenie":W_BD,               "ujezdzanie":W_BD
 };
 
-const stats2genitive = {
+stats2genitive = {
     "bijatyka":"bijatyki",                              "bron_reczna":"walki bronią białą",                 "rzucanie":"rzucania",
     "pistolety":"strzelania z broni krótkiej",          "karabiny":"strzelania z broni długiej",            "bron_maszynowa":"strzelania z broni maszynowej",
     "luk":"łucznictwa",                                 "kusza":"kusznictwa",                               "proca":"procarstwa",
@@ -375,10 +372,26 @@ const stats2genitive = {
     "mechanika":"mechaniki",                            "elektronika":"elektroniki",                        "komputery":"komputerów",
     "maszyny_ciezkie":"znajomości maszyn ciężkich",     "wozy_bojowe":"prowadzenia wozów bojowych",         "kutry":"sterowania kutrem",
     "rusznikarstwo":"rusznikarstwa",                    "wyrzutnie":"obsługi wyrzutni",                     "materialy_wybuchowe":"znajomości materiałów wybuchowych",
+    "wogl0":"UNSET",                                    "wogl1":"UNSET",                                    "wogl2":"UNSET",
+    "wogl3":"UNSET",                                    "wogl4":"UNSET",                                    "wogl5":"UNSET",
 
     "plywanie":"pływania",                              "wspinaczka":"wspinaczki",                          "kondycja":"kondycji",
     "jazda_konna":"jeździectwa",                        "powozenie":"powożenia",                            "ujezdzanie":"ujeżdżania",
 }
+
+const wogl_labels = [
+    "wogl0_label", "wogl1_label", "wogl2_label", "wogl3_label", "wogl4_label", "wogl5_label"
+];
+wogl_labels.forEach((label) => {
+    on(`change:${label} remove:${label} sheet:opened`, () => {
+        getAttrs([label], (values) => {
+            let skillid = label.split("_")[0];
+            let skillname = String(values[label]);
+            skillname = skillname.length > 0 ? skillname : "niewiedzy";
+            stats2genitive[skillid] = `wiedzy ogólnej (${skillname})`;
+        });
+    });
+});
 
 statslist.forEach((attribute) => {
     on(`change:${attribute}`, () => {
@@ -395,7 +408,7 @@ statslist.forEach((attribute) => {
         let genitive = stats2genitive[attribute];
         let skill_wsp_name = stats2wsp[attribute];
         let wsp_name = wsp2accusative[skill_wsp_name]
-        startRoll(`&{template:test} {{base_wsp_name=${wsp_name}}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=${genitive}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
+        startRoll(`&{template:test} {{base_wsp_name=${wsp_name}}} {{open=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{skill-name=${genitive}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
             let base_wsp = stats2wsp[attribute];
             
             getAttrs(["final_test_level", "modi_battle", "modi_open", base_wsp, attribute], function(values) {
@@ -429,33 +442,32 @@ statslist.forEach((attribute) => {
                 }
                 
                 // Constrain
-                final_test_level = final_test_level < 0 ? 0 : (final_test_level > 6 ? 6 : final_test_level);
+                final_test_level = final_test_level < 0 ? 0 : (final_test_level > 8 ? 8 : final_test_level);
 
                 // Successes and failures
                 
                 let dice_style = [3,3,3];
                 let vals_s = vals.concat().sort(function(a, b){return a-b});;
-                const difficulties = [-2,0,2,5,8,11,15];
                 let statreq = statbase - difficulties[final_test_level];
                 let succ = 0;
-                let bumped = 0;
                 if (modi_open) {
                     let vals_sc = vals_s.concat();
                     while ( skill_remaining > 0 ) {
                         if (vals_sc[0] == vals_sc[1]) {
                             vals_sc[0] -= 1;
-                            bumped = 1;
+                            dice_style[0] = 1;
                         } else {
                             vals_sc[1] -= 1;
-                            if (bumped) {
-                                dice_style[0] = 1;
-                            }
                         }
                         skill_remaining -= 1;
                     }
-                    dice_style[1] = 0;
                     vals_sc[1] = vals_sc[1] < 1 ? 1 : vals_sc[1];
                     succ = statreq - vals_sc[1];
+                    if( succ>=0 ) {
+                        dice_style[1] = 0;
+                    } else {
+                        dice_style[1] = 2;
+                    }
                 } else {
                     for (x=0; x<3; ++x) {
                         if(vals_s[x] <= statreq) {
@@ -494,6 +506,7 @@ statslist.forEach((attribute) => {
                         roll3: dice_unsort[2] ,
                         finaldifficulty: final_test_level,
                         successes : succ,
+                        open : modi_open,
                     }
                 );
             });
@@ -505,8 +518,8 @@ statslist.forEach((attribute) => {
 
 wsplist.forEach((wspolczyn) => {
     on(`clicked:test_${wspolczyn}`, (info) => {
-        let genitive = wsp2genitive[wspolczyn];
-        startRoll(`&{template:test-wsp} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{wsp-name=${genitive}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
+        let wsp_name = wsp2accusative[wspolczyn]
+        startRoll(`&{template:test} {{open=[[0[computed value]]]}} {{successes=[[0[computed value]]]}} {{finaldifficulty=[[0[computed value]]]}} {{base_wsp_name=${wsp_name}}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}}`, (results) => {
             getAttrs(["final_test_level", "modi_battle", "modi_open", wspolczyn], function(values) {
                 let statbase = parseInt(values[wspolczyn]);
                 let modi_battle = (parseInt(values.modi_battle)||0);
@@ -530,18 +543,21 @@ wsplist.forEach((wspolczyn) => {
                 }
                 
                 // Constrain
-                final_test_level = final_test_level < 0 ? 0 : (final_test_level > 6 ? 6 : final_test_level);
+                final_test_level = final_test_level < 0 ? 0 : (final_test_level > 8 ? 8 : final_test_level);
 
                 // Successes and failures
                 
                 let dice_style = [3,3,3];
                 let vals_s = vals.concat().sort(function(a, b){return a-b});;
-                const difficulties = [-2,0,2,5,8,11,15];
                 let statreq = statbase - difficulties[final_test_level];
                 let succ = 0;
                 if (modi_open) {
                     succ = statreq - vals_s[1];
-                    dice_style[1] = 0;
+                    if( succ>=0 ) {
+                        dice_style[1] = 0;
+                    } else {
+                        dice_style[1] = 2;
+                    }
                 } else {
                     for (x=0; x<3; ++x) {
                         if(vals_s[x] <= statreq) {
@@ -574,6 +590,7 @@ wsplist.forEach((wspolczyn) => {
                         roll3: dice_unsort[2] ,
                         finaldifficulty: final_test_level,
                         successes : succ,
+                        open: modi_open,
                     }
                 );
             });
@@ -581,5 +598,102 @@ wsplist.forEach((wspolczyn) => {
     });
 });
 
+// Register the click handler to all specified buttons.
+const toggleList = [
+    "grp_walka_wrecz", 
+    "grp_bron_strzelecka",
+    "grp_bron-dystansowa",
+    "grp_prowadzenie-pojazdow",
+    "grp_zdolnosci-manualne",
+    "grp_orientacja-w-terenie",
+    "grp_spostrzegawczosc",
+    "grp_kamuflaz",
+    "grp_przetrwanie",
+    "grp_negocjacje",
+    "grp_empatia",
+    "grp_sila-woli",
+    "grp_medycyna",
+    "grp_technika",
+    "grp_sprzet",
+    "grp_pirotechnika",
+    "grp_wiedza-ogolna-1",
+    "grp_wiedza-ogolna-2",
+    "grp_sprawnosc",
+    "grp_jezdziectwo",
+];
+
+const spec2grp = [
+    // Technik
+    [
+        "grp_prowadzenie-pojazdow",
+        "grp_medycyna",
+        "grp_technika",
+        "grp_wiedza-ogolna-1",
+        "grp_sprzet",
+        "grp_pirotechnika",
+    ],
+    // Wojownik
+    [
+        "grp_walka_wrecz", 
+        "grp_bron_strzelecka",
+        "grp_bron-dystansowa",
+        "grp_sila-woli",
+        "grp_pirotechnika",
+    ],
+    // Ranger
+    [
+        "grp_sprawnosc",
+        "grp_jezdziectwo",
+        "grp_bron-dystansowa",
+        "grp_medycyna",
+        "grp_orientacja-w-terenie",
+        "grp_spostrzegawczosc",
+        "grp_kamuflaz",
+        "grp_przetrwanie",
+    ],
+    // Cwaniak
+    [
+        "grp_zdolnosci-manualne",
+        "grp_negocjacje",
+        "grp_empatia",
+        "grp_kamuflaz",
+    ],
+    // Brak (Hibernatus)
+    []
+];
+
+toggleList.forEach(function(button) {
+  on(`clicked:${button}`, function() {
+    const flag = `${button}_flag`;
+    // Check the current value of the hidden flag.
+    getAttrs([flag], function(v) {
+      // Update the value of the hidden flag to "1" for checked or "0" for unchecked.
+      setAttrs({
+        [flag]: v[flag] !== "1" ? "1" : "0"
+      });
+    });
+  });
+});
+
+on("change:specjalizacja", function() {
+    log("Changed!")  
+    getAttrs(["specjalizacja"], function(v) {
+        const grpid = clamp((parseInt(v.specjalizacja)||0), 0, 4);
+        const specgroups = spec2grp[grpid];
+        let dictionary = {};
+        for (const group of toggleList) {
+            const flag = `${group}_flag`;
+            let in_group = "0";
+            for (const sgroup of specgroups) {
+                if(sgroup == group) {
+                    in_group = "1";
+                    break;
+                }
+            }
+            dictionary[flag] = in_group;
+        }
+        setAttrs(dictionary);
+    });
+});
 /*************************** ROLL HANDLERS ************************/
 /******************************************************************/

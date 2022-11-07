@@ -1,6 +1,8 @@
 # Classified Character Sheet
 Buttons are indicated by the text changes to read when the mouse cursor is hovered over them.  Other have a white border around them such Attack and Draw and the Pain rolls
 
+On the PC sheet if alt is held while clicking the Sixth Sense roll button it will  whispher the roll to the GM
+
 Skill and Weapons can be edited when the cog to the left are yellow.  When the cog is clicked it will tirn white and becomes a button.
 Wound penalties area  automatically applied to Difficulty Factors when the Wound Track is changed.
 
@@ -29,7 +31,7 @@ The Performance Modifier for the vehicle is automatically added to Maneuver and 
 
 The Performance Modifier for the vehicle weapon  is NOT  automatically added for weapon attacks
 
-Vehicle damage paenalties are automatically added to Maneuvers, Control rolls and Vehicle weapon attacks
+Vehicle damage penalties are automatically added to Maneuvers, Control rolls and Vehicle weapon attacks
 
 # Squad sheet rolls
 

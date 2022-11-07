@@ -60,6 +60,26 @@ async function migrateFromOldSheet() {
   await migrateSkills("SECSK", "secondary");
 }
 
+async function migrateAddRowIds() {
+  // @todo Loop through all h2h,wp,wpmodern,skills IDs and create/populate rowid wherever it's empty.
+  console.log("migrateAddRowIds");
+  const sections = ["skills", "h2h", "wp", "wpmodern"];
+  for (const section of sections) {
+    const ids = await getSectionIDsOrderedAsync(section);
+    const attrKeys = ids.map((id) => `repeating_${section}_${id}_rowid`);
+    const a = await getAttrsAsync(attrKeys);
+    const attrs = ids.reduce((acc, id) => {
+      const key = `repeating_${section}_${id}`;
+      if (!a[`${key}_rowid`]) {
+        acc[`${key}_rowid`] = key;
+      }
+      return acc;
+    }, {});
+    console.log(attrs);
+    await setAttrsAsync(attrs);
+  }
+}
+
 async function migrateAttributes() {
   const lcOpts = [undefined, { numeric: true, sensitivity: "base" }];
 
@@ -138,18 +158,23 @@ async function migrateAttributes() {
     },
     {
       version: "1.3.0",
-      attributes: [],
+    },
+    {
+      version: "1.4.0",
+    },
+    {
+      version: "1.5.0",
+      function: migrateAddRowIds,
     },
   ];
 
-  let latest;
   const { version, migrated } = await getAttrsAsync(["version", "migrated"]);
   console.log(version, migrated);
+  const [latest] = versions.slice(-1);
   if (!version || !Boolean(+migrated)) {
     migrateFromOldSheet();
   } else {
     // https://stackoverflow.com/a/65687141/177943
-    [latest] = versions.slice(-1);
     if (
       latest.version.localeCompare(version, ...lcOpts) < 1 &&
       Boolean(+migrated)
@@ -159,39 +184,44 @@ async function migrateAttributes() {
   }
 
   for (const v of versions) {
-    for (const attribute of v.attributes) {
-      if (attribute.repeating) {
-        for (const section of attribute.repeating) {
-          const ids = await getSectionIDsAsync(section);
-          const attrKeys = ids.map(
-            (id) => `repeating_${section}_${id}_${attribute.from}`
-          );
-          const a = await getAttrsAsync(attrKeys);
-          const attrs = ids.reduce((acc, id) => {
-            for (const to of attribute.to) {
-              const fromKey = `repeating_${section}_${id}_${attribute.from}`;
-              if (a[fromKey]) {
-                acc[`repeating_${section}_${id}_${to}`] = a[fromKey];
+    if (v.attributes) {
+      for (const attribute of v.attributes) {
+        if (attribute.repeating) {
+          for (const section of attribute.repeating) {
+            const ids = await getSectionIDsAsync(section);
+            const attrKeys = ids.map(
+              (id) => `repeating_${section}_${id}_${attribute.from}`
+            );
+            const a = await getAttrsAsync(attrKeys);
+            const attrs = ids.reduce((acc, id) => {
+              for (const to of attribute.to) {
+                const fromKey = `repeating_${section}_${id}_${attribute.from}`;
+                if (a[fromKey]) {
+                  acc[`repeating_${section}_${id}_${to}`] = a[fromKey];
+                }
+                return acc;
+              }
+            }, {});
+            if (Object.keys(attrs).length > 0) {
+              await setAttrsAsync(attrs);
+            }
+          }
+        } else {
+          if (Array.isArray(attribute.from) && Array.isArray(attribute.to)) {
+            const a = await getAttrsAsync(attribute.from);
+            const attrs = attribute.from.reduce((acc, cur, idx) => {
+              if (a[cur]) {
+                acc[attribute.to[idx]] = a[cur];
               }
               return acc;
-            }
-          }, {});
-          if (Object.keys(attrs).length > 0) {
+            }, {});
             await setAttrsAsync(attrs);
           }
         }
-      } else {
-        if (Array.isArray(attribute.from) && Array.isArray(attribute.to)) {
-          const a = await getAttrsAsync(attribute.from);
-          const attrs = attribute.from.reduce((acc, cur, idx) => {
-            if (a[cur]) {
-              acc[attribute.to[idx]] = a[cur];
-            }
-            return acc;
-          }, {});
-          await setAttrsAsync(attrs);
-        }
       }
+    }
+    if (v.function) {
+      v.function();
     }
   }
   await setAttrsAsync({ version: latest.version, migrated: 1 });

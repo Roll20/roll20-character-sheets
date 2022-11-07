@@ -441,6 +441,34 @@ const H2H = {
     { pull: 1, description: "+1 to leap dodge\n" },
     { attacks: 1 },
   ],
+  "hand to hand: drunken style kung fu": [
+    {
+      attacks: 3,
+      roll: 2,
+      knockout: 19,
+      critical: 19,
+      description:
+        "Drunken Style Foot Play\nDrunken Style Controlled Staggering\n+2 to somersault/stagger/roll/backflip\nCritical Strike from behind\n",
+    },
+    {
+      dodge: 2,
+      dodge_auto: 2,
+      pull: 2,
+    },
+    { strike: 1, initiative: 1 },
+    { description: "Faked Alcohol Sickness\n" },
+    { attacks: 1 },
+    { strike: 1 },
+    { disarm: 2, entangle: 2 },
+    { description: "Projectile Vomit\n" },
+    { attacks: 1 },
+    { roll: 2, pull: 1 },
+    { description: "Joint Twisting\n" },
+    { dodge: 1, dodge_auto: 1, strike: 1 },
+    { roll: 2, pull: 1 },
+    { attacks: 1 },
+    { damage: 1, knockout: 17 },
+  ],
   "hand to hand: dragon": [
     {
       attacks: 3,
@@ -857,6 +885,7 @@ const H2H = {
 
 const H2H_KEYS = [
   "name",
+  "levelacquired",
   "level",
   "attacks",
   "pull",
@@ -1342,6 +1371,7 @@ const WP = {
 const WP_KEYS = {
   wp: [
     "name",
+    "levelacquired",
     "level",
     "strike",
     "parry",
@@ -1352,6 +1382,7 @@ const WP_KEYS = {
   ],
   wpmodern: [
     "name",
+    "levelacquired",
     "level",
     "strike_range_single",
     "disarm",
@@ -1388,6 +1419,7 @@ const ATTRIBUTE_KEYS = [
   "mod_spdfly",
   "spdfly_abs",
   "mod_character_ps_type",
+  "mod_character_ps_type_name",
   "mod_restrained_punch",
   "mod_restrained_punch_unit",
   "mod_punch",
@@ -1498,13 +1530,32 @@ const SAVE_KEYS = Object.values(SAVE_KEYS_ATTRIBUTE_BONUSES).reduce(
   (acc, cur) => acc.concat(cur),
   []
 );
-const REPEATING_BONUS_KEYS = COMBAT_KEYS.concat(SAVE_KEYS, ATTRIBUTE_KEYS);
+const REPEATING_MOVEMENT_KEYS = [
+  "run_mph",
+  "run_kmh",
+  "fly_mph",
+  "fly_kmh",
+  "run_ft_melee",
+  "run_m_melee",
+  "fly_ft_melee",
+  "fly_m_melee",
+  "run_ft_action",
+  "run_m_action",
+  "fly_ft_action",
+  "fly_m_action",
+];
+const REPEATING_BONUS_KEYS = COMBAT_KEYS.concat(
+  SAVE_KEYS,
+  ATTRIBUTE_KEYS,
+  REPEATING_MOVEMENT_KEYS
+);
 const SKILL_KEYS = [
   "name",
   "category",
   "base",
   "bonus",
   "perlevel",
+  "levelacquired",
   "level",
   "total",
   "description",
