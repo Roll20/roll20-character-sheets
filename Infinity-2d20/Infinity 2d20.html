@@ -2142,12 +2142,23 @@
 		<div>
 			<img src="https://raw.githubusercontent.com/DrakeRichards/roll20-character-sheets/12-group-momentumheat-tracker/Infinity-2d20/Momentum%20Token.png">
 			<h3>Momentum</h3>
-			<div><input type="number" id="group-momentum" name="attr_group_momentum"></div>
+			<div class="row">
+				<button type="action" name="act_attr-inc" class="hover-blue" value="group_momentum,-1">-1</button>
+				<input type="number" id="group-momentum" name="attr_group_momentum" value="0">
+				<button type="action" name="act_attr-inc" class="hover-blue" value="group_momentum,1">+1</button>
+			</div>
+		</div>
+		<div>
+			<button type="action" name="act_attr-inc" class="hover-blue" value="group_momentum,-1,group_heat,1">>></button>
 		</div>
 		<div>
 			<img src="https://raw.githubusercontent.com/DrakeRichards/roll20-character-sheets/12-group-momentumheat-tracker/Infinity-2d20/Heat%20Token.png">
 			<h3>Heat</h3>
-			<div><input type="number" id="group-heat" name="attr_group_heat"></div>
+			<div class="row">
+				<button type="action" name="act_attr-inc" class="hover-blue" value="group_heat,-1">-1</button>
+				<input type="number" id="group-heat" name="attr_group_heat" value="0">
+				<button type="action" name="act_attr-inc" class="hover-blue" value="group_heat,1">+1</button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -5581,5 +5592,31 @@
 		}
 	
 		openSheet();
+	});
+
+	on('clicked:attr-inc', function(info) {
+		const split = (info.htmlAttributes.value).split(",");
+		let attr = {
+			from: {
+				name: split[0],
+				inc: split[1]
+			},
+			to: {
+				name: (split.length > 2) ? split[2] : "",
+				inc: (split.length > 2) ? split[3] : 0
+			}
+		};
+
+		getAttrs([attr.from.name, attr.to.name], function(values) {
+			let setObj = {};
+			if ((attr.from.inc == '-1') && (values[attr.from.name] == '0')) {
+				return;
+			}
+			setObj[attr.from.name] = Number(values[attr.from.name]) + Number(attr.from.inc);
+			if (attr.to.name !== "") {
+				setObj[attr.to.name] = Number(values[attr.to.name]) + Number(attr.to.inc);
+			}
+			setAttrs(setObj);
+		});
 	});
 </script>
