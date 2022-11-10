@@ -3,6 +3,7 @@
 <input id="type-tab3" type="radio" name="attr_type_tab" class="type-tab" value="3" /><label for="type-tab3">Geist</label>
 <input id="type-tab4" type="radio" name="attr_type_tab" class="type-tab" value="4" /><label for="type-tab4">Shell</label>
 <input id="type-tab5" type="radio" name="attr_type_tab" class="type-tab" value="5" /><label for="type-tab5">Vehc.</label>
+<input id="type-tab-legacy" type="radio"  name="attr_type_tab" value="6"><label for="type-tab-legacy">Legacy</label>
 <div id="type-PC">
 	<input id="tab1" type="radio" name="attr_tab" value="1" checked="checked"/><label for="tab1">MAIN</label>
 	<input id="tab2" type="radio" name="attr_tab" value="2"/><label for="tab2">TALENTS</label>
@@ -37,7 +38,11 @@
 						<td class="StatLabel">Age</td>
 						<td class="StatInput"><input type="text" name="attr_age"></input></td>
 						<td class="StatLabel">Cashflow</td>
-						<td class="StatInput width-small"><input type="number" name="attr_cashflow"></input></td>
+						<td class="StatInput width-small">
+							<input type="number" name="attr_cashflow" value="0"/>
+							<span class="InputText">/</span>
+							<input type="number" name="attr_cashflow_max" value="(@{personality}+@{skill_lifestyle_exp}+@{earnings}+@{cashflow_mod})" disabled="true"/>
+						</td>
 					</tr>
 					<tr>
 						<td class="StatLabel font-small">Soc. Status</td>
@@ -47,7 +52,7 @@
 					</tr>
 				</table>
 				<!-- Trackers -->
-				<div class="stats-center">
+				<div id="trackers-action" class="row">
 					<!-- Infinity Points -->
 					<table id="tracker-infinity-points">
 						<tr>
@@ -73,14 +78,27 @@
 						</tr>
 						<tr>
 							<td class="StatInput number">
-								<input id="input-refresh" type="number" name="attr_refresh"></input>
+								<input type="number" name="attr_refresh" />
+							</td>
+						</tr>
+					</table>
+					<!-- Momentum -->
+					<table id="tracker-momentum">
+						<tr>
+							<td class="StatLabel">
+								momentum
+							</td>
+						</tr>
+						<tr>
+							<td class="StatInput number">
+								<input type="number" name="attr_momentum" />
 							</td>
 						</tr>
 					</table>
 					<!-- Reactions -->
 					<table id="tracker-reactions">
 						<tr>
-							<td class="StatLabel" colspan="7">
+							<td class="StatLabel" colspan="6">
 								Reactions
 							</td>
 						</tr>
@@ -91,7 +109,6 @@
 							<td><input type="radio" id="reactions3" name="attr_reactions" value="3"/><label for="reactions3">3</label></td>
 							<td><input type="radio" id="reactions4" name="attr_reactions" value="4"/><label for="reactions4">4</label></td>
 							<td><input type="radio" id="reactions5" name="attr_reactions" value="5"/><label for="reactions5">5</label></td>
-							<td><input type="radio" id="reactions6" name="attr_reactions" value="6"/><label for="reactions6">6</label></td>
 						</tr>
 					</table>
 				</div>
@@ -109,10 +126,10 @@
 							<td class="StatLabelSub">Ranged</td>
 						</tr>
 						<tr>
-							<td class="StatInput"><span class="InputText">+</span><input type="number" name="attr_damage_bonus_infowar"></input><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg" /></td>
-							<td class="StatInput"><span class="InputText">+</span><input type="number" name="attr_damage_bonus_psywar"></input><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg" /></td>
-							<td class="StatInput"><span class="InputText">+</span><input type="number" name="attr_damage_bonus_melee"></input><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg" /></td>
-							<td class="StatInput"><span class="InputText">+</span><input type="number" name="attr_damage_bonus_ranged"></input><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg" /></td>
+							<td class="StatInput"><input type="number" name="attr_damage_bonus_infowar_static"></input><span class="InputText">+</span><input type="number" name="attr_damage_bonus_infowar"></input><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
+							<td class="StatInput"><input type="number" name="attr_damage_bonus_psywar_static"></input><span class="InputText">+</span><input type="number" name="attr_damage_bonus_psywar"></input><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
+							<td class="StatInput"><input type="number" name="attr_damage_bonus_melee_static"></input><span class="InputText">+</span><input type="number" name="attr_damage_bonus_melee"></input><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
+							<td class="StatInput"><input type="number" name="attr_damage_bonus_ranged_static"></input><span class="InputText">+</span><input type="number" name="attr_damage_bonus_ranged"></input><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
 						</tr>
 					</table>
 					<table id="xp">
@@ -168,7 +185,11 @@
 							<tr>
 								<th colspan="3">Max</th>
 								<td class="StatInput number" colspan="6">
-									<input type="number" name="attr_firewall_max"></input>
+									<input type="number" name="attr_firewall_base" value="(@{intelligence} + @{skill_hacking_exp} + @{intelligence_mod})" disabled="true">
+									<span class="InputText">+</span>
+									<input type="number" name="attr_firewall_mod" value="0">
+									<span class="InputText">=</span>
+									<input type="number" name="attr_firewall_max" value="(@{intelligence} + @{intelligence_mod} + @{skill_hacking_exp} + @{firewall_mod})" disabled="true"></input>
 								</td>
 							</tr>
 							<tr class="tracker-radio">
@@ -211,7 +232,11 @@
 							<tr>
 								<th colspan="3">Max</th>
 								<td class="StatInput number" colspan="6">
-									<input type="number" name="attr_resolve_max"></input>
+									<input type="number" name="attr_resolve_base" value="(@{willpower} + @{skill_discipline_exp} + @{willpower_mod})" disabled="true">
+									<span class="InputText">+</span>
+									<input type="number" name="attr_resolve_mod" value="0">
+									<span class="InputText">=</span>
+									<input type="number" name="attr_resolve_max" value="(@{willpower} + @{willpower_mod} + @{skill_discipline_exp} + @{resolve_mod})" disabled="true"></input>
 								</td>
 							</tr>
 							<tr class="tracker-radio">
@@ -254,7 +279,11 @@
 							<tr>
 								<th class="StatLabelSub" colspan="3">Max</th>
 								<td class="StatInput number" colspan="6">
-									<input type="number" name="attr_vigour_max"></input>
+									<input type="number" name="attr_vigour_base" value="(@{brawn} + @{skill_resistance_exp} + @{brawn_mod})" disabled="true">
+									<span class="InputText">+</span>
+									<input type="number" name="attr_vigour_mod" value="0">
+									<span class="InputText">=</span>
+									<input type="number" name="attr_vigour_max" value="(@{brawn} + @{brawn_mod} + @{skill_resistance_exp} + @{vigour_mod})" disabled="true"></input>
 								</td>
 							</tr>
 							<tr class="tracker-radio">
@@ -305,9 +334,9 @@
 								<td class="StatLabel">BTS</td>
 							</tr>
 							<tr>
-								<td class="StatInput"><input type="number" name="attr_soak_security" /></td>
-								<td class="StatInput"><input type="number" name="attr_soak_morale" /></td>
-								<td class="StatInput"><input type="number" name="attr_soak_bts" /></td>
+								<td class="StatInput"><input type="number" name="attr_soak_security" /><span class="InputText">+</span><input type="number" name="attr_soak_security_dice"><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
+								<td class="StatInput"><input type="number" name="attr_soak_morale" /><span class="InputText">+</span><input type="number" name="attr_soak_morale_dice"><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
+								<td class="StatInput"><input type="number" name="attr_soak_bts" /><span class="InputText">+</span><input type="number" name="attr_soak_bts_dice"><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
 							</tr>
 						</table>
 						<table id="defences-armour-soaks" class="column-triple center">
@@ -423,8 +452,11 @@
 					<!-- Agility -->
 					<tr class="SkillTableHeader">
 						<td colspan="3">AGILITY</td>
-						<td><input type="number" value="7" name="attr_agility" /></td>
-						<td>
+						<td colspan="2">
+							<input type="number" value="7" name="attr_agility" />
+							<span class="InputText">(+</span>
+							<input type="number" value="0" name="attr_agility_mod" />
+							<span class="InputText">)</span>
 							<button type="roll" name="roll_agility" value="&amp;{template:skillroll} {{character_name=@{character_name}}} {{header=Agility Test}} {{subheader=Difficulty ?{Difficulty|1}}} {{attribute=@{agility}}} {{roll=[[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range|1}]]+1e-2)/([[@{agility}]])),{2}}kl1,{0}}kh1]]?{Dice Pool|1d20, |2d20, + [[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{agility}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|3d20, + [[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{agility}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{agility}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|4d20, + [[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{agility}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{agility}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{agility}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|5d20, + [[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{agility}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{agility}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{agility}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{agility}]]-d20cs<[[@{agility}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{agility}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]}}}">
 							</button>
 						</td>
@@ -471,8 +503,11 @@
 					<!-- Awareness -->
 					<tr class="SkillTableHeader">
 						<td colspan="3">AWARENESS</td>
-						<td><input type="number" value="7" name="attr_awareness" /></td>
-						<td>
+						<td colspan="2">
+							<input type="number" value="7" name="attr_awareness" />
+							<span class="InputText">(+</span>
+							<input type="number" value="0" name="attr_awareness_mod" />
+							<span class="InputText">)</span>
 							<button type="roll" name="roll_awareness" value="&amp;{template:skillroll} {{character_name=@{character_name}}} {{header=Awareness Test}} {{subheader=Difficulty ?{Difficulty|1}}} {{attribute=@{awareness}}} {{roll=[[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range|1}]]+1e-2)/([[@{awareness}]])),{2}}kl1,{0}}kh1]]?{Dice Pool|1d20, |2d20, + [[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{awareness}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|3d20, + [[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{awareness}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{awareness}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|4d20, + [[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{awareness}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{awareness}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{awareness}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|5d20, + [[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{awareness}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{awareness}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{awareness}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{awareness}]]-d20cs<[[@{awareness}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{awareness}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]}}}">
 							</button>
 						</td>
@@ -539,8 +574,11 @@
 					<!-- Brawn -->
 					<tr class="SkillTableHeader">
 						<td colspan="3">Brawn</td>
-						<td><input type="number" value="7" name="attr_brawn" /></td>
-						<td>
+						<td colspan="2">
+							<input type="number" value="7" name="attr_brawn" />
+							<span class="InputText">(+</span>
+							<input type="number" value="0" name="attr_brawn_mod" />
+							<span class="InputText">)</span>
 							<button type="roll" name="roll_brawn" value="&amp;{template:skillroll} {{character_name=@{character_name}}} {{header=Brawn Test}} {{subheader=Difficulty ?{Difficulty|1}}} {{attribute=@{brawn}}} {{roll=[[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range|1}]]+1e-2)/([[@{brawn}]])),{2}}kl1,{0}}kh1]]?{Dice Pool|1d20, |2d20, + [[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{brawn}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|3d20, + [[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{brawn}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{brawn}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|4d20, + [[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{brawn}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{brawn}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{brawn}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|5d20, + [[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{brawn}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{brawn}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{brawn}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{brawn}]]-d20cs<[[@{brawn}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{brawn}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]}}}">
 							</button>
 						</td>
@@ -577,8 +615,11 @@
 					<!-- Coordination -->
 					<tr class="SkillTableHeader">
 						<td colspan="3">Coordination</td>
-						<td><input type="number" value="7" name="attr_coordination" /></td>
-						<td>
+						<td colspan="2">
+							<input type="number" value="7" name="attr_coordination" />
+							<span class="InputText">(+</span>
+							<input type="number" value="0" name="attr_coordination_mod" />
+							<span class="InputText">)</span>
 							<button type="roll" name="roll_coordination" value="&amp;{template:skillroll} {{character_name=@{character_name}}} {{header=Coordination Test}} {{subheader=Difficulty ?{Difficulty|1}}} {{attribute=@{coordination}}} {{roll=[[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range|1}]]+1e-2)/([[@{coordination}]])),{2}}kl1,{0}}kh1]]?{Dice Pool|1d20, |2d20, + [[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{coordination}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|3d20, + [[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{coordination}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{coordination}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|4d20, + [[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{coordination}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{coordination}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{coordination}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|5d20, + [[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{coordination}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{coordination}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{coordination}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{coordination}]]-d20cs<[[@{coordination}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{coordination}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]}}}">
 							</button>
 						</td>
@@ -625,8 +666,11 @@
 					<!-- Intelligence -->
 					<tr class="SkillTableHeader">
 						<td colspan="3">Intelligence</td>
-						<td><input type="number" value="7" name="attr_intelligence" /></td>
-						<td>
+						<td colspan="2">
+							<input type="number" value="7" name="attr_intelligence" />
+							<span class="InputText">(+</span>
+							<input type="number" value="0" name="attr_intelligence_mod" />
+							<span class="InputText">)</span>
 							<button type="roll" name="roll_intelligence" value="&amp;{template:skillroll} {{character_name=@{character_name}}} {{header=Intelligence Test}} {{subheader=Difficulty ?{Difficulty|1}}} {{attribute=@{intelligence}}} {{roll=[[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range|1}]]+1e-2)/([[@{intelligence}]])),{2}}kl1,{0}}kh1]]?{Dice Pool|1d20, |2d20, + [[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{intelligence}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|3d20, + [[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{intelligence}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{intelligence}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|4d20, + [[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{intelligence}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{intelligence}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{intelligence}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|5d20, + [[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{intelligence}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{intelligence}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{intelligence}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{intelligence}]]-d20cs<[[@{intelligence}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{intelligence}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]}}}">
 							</button>
 						</td>
@@ -703,8 +747,11 @@
 					<!-- Personality -->
 					<tr class="SkillTableHeader">
 						<td colspan="3">Personality</td>
-						<td><input type="number" value="7" name="attr_personality" /></td>
-						<td>
+						<td colspan="2">
+							<input type="number" value="7" name="attr_personality" />
+							<span class="InputText">(+</span>
+							<input type="number" value="0" name="attr_personality_mod" />
+							<span class="InputText">)</span>
 							<button type="roll" name="roll_personality" value="&amp;{template:skillroll} {{character_name=@{character_name}}} {{header=Personality Test}} {{subheader=Difficulty ?{Difficulty|1}}} {{attribute=@{personality}}} {{roll=[[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range|1}]]+1e-2)/([[@{personality}]])),{2}}kl1,{0}}kh1]]?{Dice Pool|1d20, |2d20, + [[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{personality}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|3d20, + [[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{personality}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{personality}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|4d20, + [[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{personality}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{personality}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{personality}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|5d20, + [[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{personality}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{personality}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{personality}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{personality}]]-d20cs<[[@{personality}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{personality}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]}}}">
 							</button>
 						</td>
@@ -761,8 +808,11 @@
 					<!-- Willpower -->
 					<tr class="SkillTableHeader">
 						<td colspan="3">Willpower</td>
-						<td><input type="number" value="7" name="attr_willpower" /></td>
-						<td>
+						<td colspan="2">
+							<input type="number" value="7" name="attr_willpower" />
+							<span class="InputText">(+</span>
+							<input type="number" value="0" name="attr_willpower_mod" />
+							<span class="InputText">)</span>
 							<button type="roll" name="roll_willpower" value="&amp;{template:skillroll} {{character_name=@{character_name}}} {{header=Willpower Test}} {{subheader=Difficulty ?{Difficulty|1}}} {{attribute=@{willpower}}} {{roll=[[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range|1}]]+1e-2)/([[@{willpower}]])),{2}}kl1,{0}}kh1]]?{Dice Pool|1d20, |2d20, + [[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{willpower}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|3d20, + [[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{willpower}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{willpower}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|4d20, + [[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{willpower}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{willpower}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{willpower}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|5d20, + [[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{willpower}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{willpower}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{willpower}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{willpower}]]-d20cs<[[@{willpower}]]cf<0cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{willpower}]]))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]}}}">
 							</button>
 						</td>
@@ -855,7 +905,7 @@
 							<td class="StatInput"><input type="text" name="attr_weapon_range" /></td>
 							<td class="StatInput"><input type="text" name="attr_weapon_damage_fixed"/></td>
 							<td class="StatInput"><span class="InputText">+</span></td>
-							<td class="StatInput"><input type="text" name="attr_weapon_damage_dice"/><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg"/></td>
+							<td class="StatInput"><input type="text" name="attr_weapon_damage_dice"/><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg"/></td>
 							<td class="StatInput"><input type="text" name="attr_weapon_burst" /></td>
 							<td class="StatInput"><input type="text" name="attr_weapon_size" /></td>
 							<td class="StatInput"><input type="text" name="attr_weapon_ammo" /></td>
@@ -904,7 +954,14 @@
 					<tr>
 						<td class="StatInput"><input type="number" name="attr_assets" /></td>
 						<td class="StatInput"><input type="number" name="attr_earnings" /></td>
-						<td class="StatInput"><input type="number" name="attr_cashflow" /></td>
+						<td class="StatInput">
+							<input type="number" name="attr_cashflow"/>
+							<span class="InputText">/</span>
+							<input type="number" name="attr_cashflow_base" disabled="true" value="(@{Earnings}+@{skill_lifestyle_exp}+@{Personality})"/>
+							<span class="InputText">(+</span>
+							<input type="number" name="attr_cashflow_mod" value="0"/>
+							<span class="InputText">)</span>
+						</td>
 						<td class="StatInput"><input type="number" name="attr_shortfalls" /></td>
 						<td>
 							<button type="roll" value="&amp;{template:skillroll} {{header=?{Item name} Acquisition}} {{character_name=@{character_name}}} {{subheader=Difficulty [[?{Restriction rating|0}+@{shortfalls}+?{Bulk difficulty|0}]]}} {{skill=Lifestyle}} {{skill_exp=@{skill_lifestyle_exp}}} {{skill_foc=@{skill_lifestyle_foc}}} {{attribute=Personality, [[@{personality}]]}} {{roll=[[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range|1}]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc})),{2}}kl1,{0}}kh1]]?{Dice Pool|1d20, |2d20, + [[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|3d20, + [[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|4d20, + [[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|5d20, + [[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_lifestyle_exp}+@{personality}]]-d20cs<[[@{skill_lifestyle_exp}+@{personality}]]cf<@{skill_lifestyle_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_lifestyle_exp}+@{personality}]]-@{skill_lifestyle_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]}}} {{damage_roll=[Roll Cost](!&#13;/em Rolling for item cost. Tariff: ?{Tariff|0} &#13;/r ?{Fixed cost|1}+?{Variable cost|1}t[Combat-Dice])}}" ></button>
@@ -1031,7 +1088,7 @@
 							<td class="StatInput"><input type="text" class="left" name="attr_hacking_program_name" /></td>
 							<td class="StatInput"><input type="text" name="attr_hacking_program_damage_fixed" /></td>
 							<td><span class="InputText">+</span></td>
-							<td class="StatInput"><input type="text" name="attr_hacking_program_damage_dice"/><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg" /></td>
+							<td class="StatInput"><input type="text" name="attr_hacking_program_damage_dice"/><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
 							<td class="StatInput"><input type="text" name="attr_hacking_program_qualities" /></td>
 							<td><button type="roll" name="attr_weapon_infowar_roll" value="&amp;{template:skillroll} {{character_name=@{character_name}}} {{header=@{hacking_program_name} Attack}} {{subheader=Difficulty ?{Difficulty|1}}} {{skill=Hacking}} {{skill_exp=@{skill_hacking_exp}}} {{skill_foc=@{skill_hacking_foc}}} {{attribute=Intelligence, @{intelligence}}} {{qualities=@{hacking_program_qualities}}} {{roll=[[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range|1}]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc})),{2}}kl1,{0}}kh1]]?{Dice Pool|1d20, |2d20, + [[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|3d20, + [[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|4d20, + [[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]|5d20, + [[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]] + [[{{ceil(([[@{skill_hacking_exp}+@{intelligence}]]-d20cs<[[@{skill_hacking_exp}+@{intelligence}]]cf<@{skill_hacking_foc}cf>[[21-?{Complication Range&amp;#125;]]+1e-2)/([[@{skill_hacking_exp}+@{intelligence}]]-@{skill_hacking_foc}))&amp;#44;{2&amp;#125;&amp;#125;kl1&amp;#44;{0&amp;#125;&amp;#125;kh1]]}}} {{damage_roll=[Roll Damage](!&#13;/em rolls damage for @{hacking_program_name} &#13;/r ?{Fixed damage|@{hacking_program_damage_fixed}}+[[?{Variable damage|@{hacking_program_damage_dice}}+@{damage_bonus_infowar}]]t[Combat-Dice])}}"></button></td>
 						</tr>
@@ -1149,6 +1206,10 @@
 						<td colspan="2" class="StatLabel">Lifepath Characteristics</td>
 					</tr>
 					<tr>
+						<td class="StatLabelSub">Homeworld</td>
+						<td class="StatInput"><input type="text" name="attr_homeworld"></td>
+					</tr>
+					<tr>
 						<td class="StatLabelSub">Family <br />Social Status</td>
 						<td class="StatInput"><input type="text" name="attr_family_social_status" /></td>
 					</tr>
@@ -1230,6 +1291,14 @@
 					</tr>
 					<tr>
 						<td class="StatInput"><textarea name="attr_handler_objective"></textarea></td>
+					</tr>
+				</table>
+				<table id="faction-handler-notes">
+					<tr>
+						<td class="StatLabelSub">Faction Handler Notes</td>
+					</tr>
+					<tr>
+						<td class="StatInput"><textarea name="attr_FactionHandler_Name5"></textarea></td>
 					</tr>
 				</table>
 			</div>
@@ -1351,18 +1420,24 @@
 				</fieldset>
 			</div>
 		</div>
+		<div class="column">
+			<h3>More Notes</h3>
+			<div>
+				<textarea name="attr_more_Add_notes" ></textarea>
+			</div>
+		</div>
 	</div>
 </div>
 <div id="type-NPC">
 	<div class="row">
 		<div style="width:60%" class="column">
-			<table style="width:100%">
+			<table>
 				<tr>
 					<td class="StatLabel">Name</td>
 					<td class="StatInput"><input type="text" name="attr_npc_name" /></td>
 				</tr>
 			</table>
-			<table style="width:100%">
+			<table id="npc-attributes">
 				<tr>
 					<td colspan="7" class="StatLabel">Attributes</td>
 				</tr>
@@ -1376,13 +1451,13 @@
 					<td style="width:14%" class="StatLabelSub">WIL</td>
 				</tr>
 				<tr>
-					<td class="StatInput"><input type="text" name="attr_npc_agility" /></td>
-					<td class="StatInput"><input type="text" name="attr_npc_awareness" /></td>
-					<td class="StatInput"><input type="text" name="attr_npc_brawn" /></td>
-					<td class="StatInput"><input type="text" name="attr_npc_coordination" /></td>
-					<td class="StatInput"><input type="text" name="attr_npc_intelligence" /></td>
-					<td class="StatInput"><input type="text" name="attr_npc_personality" /></td>
-					<td class="StatInput"><input type="text" name="attr_npc_willpower" /></td>
+					<td class="StatInput"><input type="text" name="attr_npc_agility" /><span class="InputText">(+</span><input type="number" value="0" name="attr_npc_agility_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_npc_awareness" /><span class="InputText">(+</span><input type="number" value="0" name="attr_npc_awareness_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_npc_brawn" /><span class="InputText">(+</span><input type="number" value="0" name="attr_npc_brawn_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_npc_coordination" /><span class="InputText">(+</span><input type="number" value="0" name="attr_npc_coordination_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_npc_intelligence" /><span class="InputText">(+</span><input type="number" value="0" name="attr_npc_intelligence_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_npc_personality" /><span class="InputText">(+</span><input type="number" value="0" name="attr_npc_personality_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_npc_willpower" /><span class="InputText">(+</span><input type="number" value="0" name="attr_npc_willpower_mod" /><span class="InputText">)</span></td>
 				</tr>
 			</table>
 			<table class="NPC expertise">
@@ -1493,7 +1568,7 @@
 						<td class="StatInput"><input type="text" name="attr_npc_attack_range" /></td>
 						<td class="StatInput"><input type="text" name="attr_npc_attack_damage_fixed" /></td>
 						<td class="StatInput" style="width:1%"><span class="InputText">+</span></td>
-						<td class="StatInput"><input type="text" name="attr_npc_attack_damage_dice" style="width:50%" /><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg" /></td>
+						<td class="StatInput"><input type="text" name="attr_npc_attack_damage_dice" style="width:50%" /><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
 						<td class="StatInput"><input type="text" name="attr_npc_attack_burst" /></td>
 						<td class="StatInput"><input type="text" name="attr_npc_attack_ammo" /></td>
 					</tr>
@@ -1556,7 +1631,7 @@
 					<td class="StatInput"><input type="text" name="attr_geist_name" /></td>
 				</tr>
 			</table>
-			<table style="width:100%">
+			<table id="geist-attributes">
 				<tr>
 					<td colspan="7" class="StatLabel">Attributes</td>
 				</tr>
@@ -1570,13 +1645,13 @@
 					<td style="width:14%" class="StatLabelSub">WIL</td>
 				</tr>
 				<tr>
-					<td class="StatInput"><input type="text" name="attr_geist_agility" /></td>
-					<td class="StatInput"><input type="text" name="attr_geist_awareness" /></td>
-					<td class="StatInput"><input type="text" name="attr_geist_brawn" /></td>
-					<td class="StatInput"><input type="text" name="attr_geist_coordination" /></td>
-					<td class="StatInput"><input type="text" name="attr_geist_intelligence" /></td>
-					<td class="StatInput"><input type="text" name="attr_geist_personality" /></td>
-					<td class="StatInput"><input type="text" name="attr_geist_willpower" /></td>
+					<td class="StatInput"><input type="text" name="attr_geist_agility" /><span class="InputText">(+</span><input type="number" value="0" name="attr_geist_agility_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_geist_awareness" /><span class="InputText">(+</span><input type="number" value="0" name="attr_geist_awareness_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_geist_brawn" /><span class="InputText">(+</span><input type="number" value="0" name="attr_geist_brawn_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_geist_coordination" /><span class="InputText">(+</span><input type="number" value="0" name="attr_geist_coordination_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_geist_intelligence" /><span class="InputText">(+</span><input type="number" value="0" name="attr_geist_intelligence_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_geist_personality" /><span class="InputText">(+</span><input type="number" value="0" name="attr_geist_personality_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_geist_willpower" /><span class="InputText">(+</span><input type="number" value="0" name="attr_geist_willpower_mod" /><span class="InputText">)</span></td>
 				</tr>
 			</table>
 			<table class="NPC defences">
@@ -1732,7 +1807,7 @@
 					<td class="StatInput"><input type="text" name="attr_shell_name" /></td>
 				</tr>
 			</table>
-			<table style="width:100%">
+			<table id="shell-attributes">
 				<tr>
 					<td colspan="7" class="StatLabel">Attributes</td>
 				</tr>
@@ -1746,13 +1821,13 @@
 					<td style="width:14%" class="StatLabelSub">WIL</td>
 				</tr>
 				<tr>
-					<td class="StatInput"><input type="text" name="attr_shell_agility" /></td>
-					<td class="StatInput"><input type="text" name="attr_shell_awareness" /></td>
-					<td class="StatInput"><input type="text" name="attr_shell_brawn" /></td>
-					<td class="StatInput"><input type="text" name="attr_shell_coordination" /></td>
-					<td class="StatInput"><input type="text" name="attr_shell_intelligence" /></td>
-					<td class="StatInput"><input type="text" name="attr_shell_personality" /></td>
-					<td class="StatInput"><input type="text" name="attr_shell_willpower" /></td>
+					<td class="StatInput"><input type="text" name="attr_shell_agility" /><span class="InputText">(+</span><input type="number" value="0" name="attr_shell_agility_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_shell_awareness" /><span class="InputText">(+</span><input type="number" value="0" name="attr_shell_awareness_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_shell_brawn" /><span class="InputText">(+</span><input type="number" value="0" name="attr_shell_brawn_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_shell_coordination" /><span class="InputText">(+</span><input type="number" value="0" name="attr_shell_coordination_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_shell_intelligence" /><span class="InputText">(+</span><input type="number" value="0" name="attr_shell_intelligence_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_shell_personality" /><span class="InputText">(+</span><input type="number" value="0" name="attr_shell_personality_mod" /><span class="InputText">)</span></td>
+					<td class="StatInput"><input type="text" name="attr_shell_willpower" /><span class="InputText">(+</span><input type="number" value="0" name="attr_shell_willpower_mod" /><span class="InputText">)</span></td>
 				</tr>
 			</table>
 			<table class="NPC expertise">
@@ -1863,7 +1938,7 @@
 						<td class="StatInput"><input type="text" name="attr_shell_attack_range" /></td>
 						<td class="StatInput"><input type="text" name="attr_shell_attack_damage_fixed" /></td>
 						<td class="StatInput" style="width:1%"><span class="InputText">+</span></td>
-						<td class="StatInput"><input type="text" name="attr_shell_attack_damage_dice" style="width:50%"/><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg" /></td>
+						<td class="StatInput"><input type="text" name="attr_shell_attack_damage_dice" style="width:50%"/><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
 						<td class="StatInput"><input type="text" name="attr_shell_attack_burst" /></td>
 						<td class="StatInput"><input type="text" name="attr_shell_attack_ammo" /></td>
 					</tr>
@@ -1929,7 +2004,7 @@
 					<th>Type</th>
 					<td class="StatInput"><input type="text" name="attr_vehicle_type" /></td>
 					<th style="width:15%">Cover</th>
-					<td style="width:20%" class="StatInput"><input style="width:20px" type="text" name="attr_vehicle_cover" /><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg" /><button style="margin-left:5px;font-size:20px;" type="roll" name="attr_vehicle_cover" value="/em takes cover in the @{vehicle_name} &#13;&#10;/r @{cover}t[Combat-Dice]&#13;&#10;"></button>
+					<td style="width:20%" class="StatInput"><input style="width:20px" type="text" name="attr_vehicle_cover" /><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /><button style="margin-left:5px;font-size:20px;" type="roll" name="attr_vehicle_cover" value="/em takes cover in the @{vehicle_name} &#13;&#10;/r @{cover}t[Combat-Dice]&#13;&#10;"></button>
 					</td>
 				</tr>
 				<tr>
@@ -1962,7 +2037,7 @@
 				</tr>
 				<tr>
 					<td><input type="number" name="attr_vehicle_passengers_max" value="1" /></td>
-					<td style="text-align:center"><input style="width:20px" type="number" name="attr_vehicle_impact_fixed" value="1" /><span class="InputText">+</span><input style="width:20px" type="number" name="attr_vehicle_impact_dice" value="1" /><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg" /><span class="InputText"> (</span><input style="width:65%" type="text" name="attr_vehicle_impact_type" /><span class="InputText">)</span></td>
+					<td style="text-align:center"><input style="width:20px" type="number" name="attr_vehicle_impact_fixed" value="1" /><span class="InputText">+</span><input style="width:20px" type="number" name="attr_vehicle_impact_dice" value="1" /><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /><span class="InputText"> (</span><input style="width:65%" type="text" name="attr_vehicle_impact_type" /><span class="InputText">)</span></td>
 				</tr>
 			</table>
 			<table class="NPC">
@@ -2014,7 +2089,7 @@
 						<td class="StatInput"><input type="text" name="attr_vehicle_attack_range" /></td>
 						<td class="StatInput"><input type="text" name="attr_vehicle_attack_damage_fixed" /></td>
 						<td class="StatInput" style="width:1%"><span class="InputText">+</span></td>
-						<td class="StatInput"><input type="text" name="attr_vehicle_attack_damage_dice" style="width:50%" /><img class="icon-N-small" src="https://svgshare.com/i/5ZJ.svg" /></td>
+						<td class="StatInput"><input type="text" name="attr_vehicle_attack_damage_dice" style="width:50%" /><img class="icon-N-small" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/841e7acc230c9216b1954c645222fb058a60926b/Infinity-2d20/aleph.svg" /></td>
 						<td class="StatInput"><input type="text" name="attr_vehicle_attack_burst" /></td>
 						<td class="StatInput"><input type="text" name="attr_vehicle_attack_ammo" /></td>
 					</tr>
@@ -2060,6 +2135,2040 @@
 			</table>
 		</div>
 	</div>
+</div>
+<div id="type-Legacy" class="type-legacy">
+	<div class="legacy-section-basic legacy-section">
+		<img class="legacy-logo" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Infinity-2d20/Infinityheader.png"
+			alt="Infinity" />
+	
+		<div class="legacy-break"></div>
+		<div class="legacy-section-skills legacy-section legacy-half">
+			<div class="legacy-header">Character Sheet</div>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Name</label>
+						<input style=width:150px type="text" name="attr_character_name" />
+					</td>
+					<td>
+						<label>Melee</label>
+						<input style=width:40px type="text" name="attr_MDB" />
+					</td>
+					<td>
+						<label>Psych</label>
+						<input style=width:40px type="text" name="attr_PDB" />
+					</td>
+					<td>
+						<label>Xp Total</label>
+						<input style=width:80px type="text" name="attr_XPT" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Faction</label>
+						<input style=width:150px type="text" name="attr_Faction" />
+					</td>
+					<td>
+						<label>Ranged</label>
+						<input style=width:40px type="text" name="attr_RDB" />
+					</td>
+					<td>
+						<label>Infowar</label>
+						<input style=width:40px type="text" name="attr_IWDB" />
+					</td>
+					<td>
+						<label>Xp Spent</label>
+						<input style=width:80px type="text" name="attr_XPS" />
+					</td>
+				</tr>
+			</table>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Heritage</label>
+						<input style=width:130px type="text" name="attr_Heritage" />
+					</td>
+					<td>
+						<label>Homeworld</label>
+						<input style=width:130px type="text" name="attr_Homeworld" />
+					</td>
+					<td>
+						<label>Social Status</label>
+						<input style=width:130px type="text" name="attr_Social_Status" />
+					</td>
+			</table>
+			<div class="legacy-header">Cash Flow</div>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Earnings</label>
+						<input style=width:100px type="text" name="attr_Earnings" />
+					</td>
+					<td>
+						<label>Current Cashflow</label>
+						<input style=width:130px type="text" name="attr_Current_Cashflow" />
+					</td>
+					<td>
+						<label> Cashflow</label>
+	
+						<input style=width:130px type="number" name="attr_cashflow_max" disabled/>
+					</td>
+			</table>
+	
+			<div class="legacy-header">Trackers</div>
+	
+			<table border="1" style="width:100%">
+				<td>
+					<lable>Infinity Points</lable>
+					<td>
+						<lable>Refresh</lable>
+						<td>
+							<lable>Reaction Tracker</lable>
+						</td>
+	
+						</tr>
+						<tr>
+							<td>
+								<input style=width:25px class="legacy-check-off" type="checkbox" name="attr_cp1">
+								<input style=width:25px class="legacy-check-off" type="checkbox" name="attr_cp2">
+								<input style=width:25px class="legacy-check-off" type="checkbox" name="attr_cp3">
+								<input style=width:25px class="legacy-check-off" type="checkbox" name="attr_cp4">
+								<input style=width:25px class="legacy-check-off" type="checkbox" name="attr_cp5">
+							</td>
+	
+							<td>
+								<input style=width:100px type="text" name="attr_Refresh">
+	
+								<td>
+									<input style=width:25px class="legacy-check-off" type="checkbox" name="attr_rt1">
+									<input style=width:25px class="legacy-check-off" type="checkbox" name="attr_rt2">
+									<input style=width:25px class="legacy-check-off" type="checkbox" name="attr_rt3">
+									<input style=width:25px class="legacy-check-off" type="checkbox" name="attr_rt4">
+									<input style=width:25px class="legacy-check-off" type="checkbox" name="attr_rt5">
+								</td>
+						</tr>
+			</table>
+	
+			<div class="legacy-header">Momentum</div>
+			<table border="1" style="width:100%">
+				<tr>
+					<td class="legacy-radio-tracker">
+						<label>
+							<input type="radio" name="attr_Momentum" checked="checked" value="0" />0</label>
+						<label>
+							<input type="radio" name="attr_Momentum" value="1" />1</label>
+						<label>
+							<input type="radio" name="attr_Momentum" value="2" />2</label>
+						<label>
+							<input type="radio" name="attr_Momentum" value="3" />3</label>
+						<label>
+							<input type="radio" name="attr_Momentum" value="4" />4</label>
+						<label>
+							<input type="radio" name="attr_Momentum" value="5" />5</label>
+						<label>
+							<input type="radio" name="attr_Momentum" value="6" />6</label>
+					</td>
+				</tr>
+			</table>
+	
+	
+			<div class="legacy-header">Damage</div>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Morale Soak</label>
+						<input style=width:130px type="text" name="attr_Morale_Soak" />
+					</td>
+					<td>
+						<label>Security Soak</label>
+						<input style=width:130px type="text" name="attr_Security_Soak" />
+					</td>
+					<td>
+						<label>BTS</label>
+						<input style=width:130px type="text" name="attr_BTS" />
+					</td>
+			</table>
+			<div class="legacy-header">Armour Soak Location </div>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>1-2 Head
+						<input style=width:130px type="text" name="attr_Head_Soak" />
+						<td>3-5 Right Arm
+							<input style=width:130px type="text" name="attr_RA_Soak" />
+							<td>6-8 Left Arm
+								<input style=width:130px type="text" name="attr_LA_Soak" />
+				</tr>
+				<tr>
+					<td>9-14 Torso
+						<input style=width:130px type="text" name="attr_Torso_Soak" />
+						<td>15-17 Right Leg
+							<input style=width:130px type="text" name="attr_RL_Soak" />
+							<td>18-20 Left Leg
+								<input style=width:130px type="text" name="attr_LL_Soak" />
+							</td>
+				</tr>
+			</table>
+			<div class="legacy-header">Host Attributes </div>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>AGI
+						<input style=width:50px type="text" name="attr_Host_AGI" />
+						<td>AWA
+							<input style=width:50px type="text" name="attr_Host_AWA" />
+							<td>BRW
+								<input style=width:50px type="text" name="attr_Host_BRW" />
+								<td>COO
+									<input style=width:50px type="text" name="attr_Host_COO" />
+									<td>INT
+										<input style=width:50px type="text" name="attr_Host_INT" />
+										<td>PER
+											<input style=width:50px type="text" name="attr_Host_PER" />
+											<td>WIL
+												<input style=width:50px type="text" name="attr_Host_WIL" />
+				</tr>
+			</table>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>Skills
+						<input style=width:350px type="text" name="attr_Host_Skills" />
+					</td>
+				</tr>
+			</table>
+	
+			<div class="legacy-header">Geist Attributes </div>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>AGI
+						<input style=width:50px type="text" name="attr_Geist_AGI" />
+						<td>AWA
+							<input style=width:50px type="text" name="attr_Geist_AWA" />
+							<td>BRW
+								<input style=width:50px type="text" name="attr_Geist_BRW" />
+								<td>COO
+									<input style=width:50px type="text" name="attr_Geist_COO" />
+									<td>INT
+										<input style=width:50px type="text" name="attr_Geist_INT" />
+										<td>PER
+											<input style=width:50px type="text" name="attr_Geist_PER" />
+											<td>WIL
+												<input style=width:50px type="text" name="attr_Geist_WIL" />
+				</tr>
+			</table>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>Skills
+						<input style=width:350px type="text" name="attr_Geist_Skills" />
+					</td>
+				</tr>
+			</table>
+	
+			<table border="1" style="width:100%">
+				<tr>
+					<td>Vigor
+						<input style=width:51px type="text" name="attr_Geist_Vigor" />
+						<td>Firewall
+							<input style=width:51px type="text" name="attr_Geist_Firewall" />
+							<td>Resolve
+								<input style=width:51px type="text" name="attr_Geist_Resolve" />
+								<td>Soak
+									<input style=width:51px type="text" name="attr_Geist_Soak" />
+				</tr>
+				</td>
+	
+			</table>
+			<br>
+			<div class="legacy-header">Firewall (Infowar)</div>
+			<table border="1" style="width:100%" class="legacy-stress-tracker">
+				<tr>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="0" checked="checked" />
+							<span>0</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="1" />
+							<span>1</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="2" />
+							<span>2</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="3" />
+							<span>3</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="4" />
+							<span>4</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="5" />
+							<span>5</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="6" />
+							<span>6</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="7" />
+							<span>7</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="8" />
+							<span>8</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="9" />
+							<span>9</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="10" />
+							<span>10</span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="11" />
+							<span>11</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="12" />
+							<span>12</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="13" />
+							<span>13</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="14" />
+							<span>14</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="15" />
+							<span>15</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="16" />
+							<span>16</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="17" />
+							<span>17</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="18" />
+							<span>18</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="19" />
+							<span>19</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="20" />
+							<span>20</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_FW" value="21" />
+							<span>21</span>
+						</label>
+					</td>
+				</tr>
+				<tr class="legacy-stress-tracker-harms">
+					<td colspan="2">Breaches:</td>
+					<td>
+						<input type="checkbox" name="attr_FW11b" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_FW12b" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_FW13b" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_FW14b" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_FW15b" />
+					</td>
+					<td colspan="3">Max Firewall:</td>
+					<td colspan="1">
+						<input type="text" name="attr_MaxFirewall" style="width:100%" />
+						<input type="number" style="display:none" name="attr_FW_max" value="attr_MaxFirewall" />
+					</td>
+				</tr>
+			</table>
+			<div>
+				<span>Click here to show the old stress tracker: </span>
+				<input type="checkbox" class="legacy-old-stress" />
+				<div class="legacy-old-stress">
+					<table border="1" style="width:100%">
+						<tr>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW1" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW2" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW3" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW4" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW5" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW6" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW7" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW8" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW9" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW10" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW11" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW12" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW13" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW14" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW15" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW16" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW17" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW18" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW19" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW20" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW21" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW22" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW23" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW24" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW25" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW26" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW27" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW28" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW29" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW30" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW31" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_FW32" />
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="legacy-header">Resolve (Mental)</div>
+			<table border="1" style="width:100%" class="legacy-stress-tracker">
+				<tr>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="0" checked="checked" />
+							<span>0</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="1" />
+							<span>1</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="2" />
+							<span>2</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="3" />
+							<span>3</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="4" />
+							<span>4</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="5" />
+							<span>5</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="6" />
+							<span>6</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="7" />
+							<span>7</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="8" />
+							<span>8</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="9" />
+							<span>9</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="10" />
+							<span>10</span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="11" />
+							<span>11</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="12" />
+							<span>12</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="13" />
+							<span>13</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="14" />
+							<span>14</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="15" />
+							<span>15</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="16" />
+							<span>16</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="17" />
+							<span>17</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="18" />
+							<span>18</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="19" />
+							<span>19</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="20" />
+							<span>20</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_RS" value="21" />
+							<span>21</span>
+						</label>
+					</td>
+				</tr>
+				<tr class="legacy-stress-tracker-harms">
+					<td colspan="2">Metanoia:</td>
+					<td>
+						<input type="checkbox" name="attr_RS11t" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_RS12t" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_RS13t" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_RS14t" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_RS15t" />
+					</td>
+					<td colspan="3">Max Resolve:</td>
+					<td colspan="1">
+						<input type="text" name="attr_MaxResolve" style="width:100%" />
+						<input type="number" style="display:none" name="attr_RS_max" value="attr_MaxResolve" />
+					</td>
+				</tr>
+			</table>
+			<div>
+				<span>Click here to show the old stress tracker: </span>
+				<input type="checkbox" class="legacy-old-stress" />
+				<div class="legacy-old-stress">
+					<table border="1" style="width:100%">
+						<tr>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS1" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS2" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS3" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS4" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS5" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS6" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS7" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS8" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS9" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS10" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS11" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS12" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS13" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS14" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS15" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS16" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS17" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS18" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS19" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS20" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS21" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS22" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS23" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS24" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS25" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS26" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS27" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS28" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS29" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS30" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS31" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RS32" />
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="legacy-header">Physical (Vigour)</div>
+			<table border="1" style="width:100%" class="legacy-stress-tracker">
+				<tr>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="0" checked="checked" />
+							<span>0</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="1" />
+							<span>1</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="2" />
+							<span>2</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="3" />
+							<span>3</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="4" />
+							<span>4</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="5" />
+							<span>5</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="6" />
+							<span>6</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="7" />
+							<span>7</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="8" />
+							<span>8</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="9" />
+							<span>9</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="10" />
+							<span>10</span>
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="11" />
+							<span>11</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="12" />
+							<span>12</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="13" />
+							<span>13</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="14" />
+							<span>14</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="15" />
+							<span>15</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="16" />
+							<span>16</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="17" />
+							<span>17</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="18" />
+							<span>18</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="19" />
+							<span>19</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="20" />
+							<span>20</span>
+						</label>
+					</td>
+					<td>
+						<label>
+							<input type="radio" name="attr_PH" value="21" />
+							<span>21</span>
+						</label>
+					</td>
+				</tr>
+				<tr class="legacy-stress-tracker-harms">
+					<td colspan="2">Wounds:</td>
+					<td>
+						<input type="checkbox" name="attr_PH11w" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_PH12w" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_PH13w" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_PH14w" />
+					</td>
+					<td>
+						<input type="checkbox" name="attr_PH15w" />
+					</td>
+					<td colspan="3">Max Vigour:</td>
+					<td colspan="1">
+						<input type="text" name="attr_MaxVigor" style="width:100%" />
+						<input type="number" style="display:none" name="attr_PH_max" value="attr_MaxVigor" />
+					</td>
+				</tr>
+			</table>
+			<div>
+				<span>Click here to show the old stress tracker: </span>
+				<input type="checkbox" class="legacy-old-stress" />
+				<div class="legacy-old-stress">
+					<table border="1" style="width:100%">
+						<tr>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH1" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH2" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH3" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH4" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH5" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH6" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH7" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH8" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH9" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH10" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH11" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH12" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH13" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH14" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH15" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH16" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH17" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH18" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH19" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH20" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH21" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH22" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH23" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH24" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH25" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH26" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH27" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH28" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH29" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH30" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH31" />
+							</td>
+							<td>
+								<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_PH32" />
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="legacy-header">
+				<span>Harm Effects</span>
+			</div>
+	
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<input type="text" style="width:100%" name="attr_Harm1" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="text" style="width:100%" name="attr_Harm2" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="text" style="width:100%" name="attr_Harm3" />
+					</td>
+				</tr>
+			</table>
+	
+	
+	
+		</div>
+	
+	
+	
+	
+		<div class="legacy-section-consequences legacy-section legacy-half">
+	
+			<div class="legacy-header">Attibutes & Skills</div>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Agility
+							<td>
+								<td>
+									<input style=width:60px type="text" name="attr_Agility" value="0" />
+									<td>Unskilled
+										<td>
+											<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacf19cf20<[[@{Agility}]]]] Success(es) for Unskilled Agility skill.'></button>
+										</td>
+						</label>
+						<tr>
+							<td style=width:120px>Acrobatics
+								<td>
+									<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Acrobatics">
+									<td>Expertise
+										<input style=width:60px type="text" name="attr_Acrobatics_Expertise" value="0" />
+										<td>Focus
+											<input style=width:60px type="text" name="attr_Acrobatics_Focus" value="0">
+											<td>
+												<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Acrobatics_Focus}cf20<[[@{Agility}+@{Acrobatics_Expertise}]]]] Success(es) for Acrobatics skill.'></button>
+											</td>
+											<tr>
+												<td>Close Combat
+													<td>
+														<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Close_Combat">
+														<td>Expertise
+															<input style=width:60px type="text" name="attr_Close_Combat_Expertise"
+																value="0" />
+															<td>Focus
+																<input style=width:60px type="text" name="attr_Close_Combat_Focus"
+																	value="0">
+																<td>
+																	<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Close_Combat_Focus}cf20<[[@{Agility}+@{Close_Combat_Expertise}]]]] Success(es) for Close Combat skill.'></button>
+																</td>
+																<tr>
+																	<td>Stealth
+																		<td>
+																			<input class="legacy-check-off" style=width:15px type="checkbox"
+																				name="attr_Stealth">
+																			<td>Expertise
+																				<input style=width:60px type="text" name="attr_Stealth_Expertise"
+																					value="0" />
+																				<td>Focus
+																					<input style=width:60px type="text" name="attr_Stealth_Focus"
+																						value="0">
+																					<td>
+																						<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Stealth_Focus}cf20<[[@{Agility}+@{Stealth_Expertise}]]]] Success(es) for Stealth skill.'></button>
+																					</td>
+	
+																				</td>
+																</tr>
+			</table>
+	
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Awareness
+							<td>
+								<td>
+									<input style=width:60px type="text" name="attr_Awareness" value="0" />
+									<td>Unskilled
+										<td>
+											<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacf19cf20<[[@{Awareness}]]]] Success(es) for Unskilled Awareness skill.'></button>
+										</td>
+						</label>
+						<tr>
+							<td style=width:120px>Analysis
+								<td>
+									<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Analysis">
+									<td>Expertise
+										<input style=width:60px type="text" name="attr_Analysis_Expertise" value="0" />
+										<td>Focus
+											<input style=width:60px type="text" name="attr_Analysis_Focus" value="0">
+											<td>
+												<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Analysis_Focus}cf20<[[@{Awareness}+@{Analysis_Expertise}]]]] Success(es) for Analysis skill.'></button>
+											</td>
+											<tr>
+												<td>Extraplanetary
+													<td>
+														<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Extraplanetary">
+														<td>Expertise
+															<input style=width:60px type="text" name="attr_Extraplanetary_Expertise"
+																value="0" />
+															<td>Focus
+																<input style=width:60px type="text" name="attr_Extraplanetary_Focus"
+																	value="0">
+																<td>
+																	<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Extraplanetary_Focus}cf20<[[@{Awareness}+@{Extraplanetary_Expertise}]]]] Success(es) for Extraplanetary skill.'></button>
+																</td>
+																<tr>
+																	<td>Observation
+																		<td>
+																			<input class="legacy-check-off" style=width:15px type="checkbox"
+																				name="attr_Observation">
+																			<td>Expertise
+																				<input style=width:60px type="text" name="attr_Observation_Expertise"
+																					value="0" />
+																				<td>Focus
+																					<input style=width:60px type="text" name="attr_Observation_Focus"
+																						value="0">
+																					<td>
+																						<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Observation_Focus}cf20<[[@{Awareness}+@{Observation_Expertise}]]]] Success(es) for Observation skill.'></button>
+																					</td>
+																					<tr>
+																						<td>Survival
+																							<td>
+																								<input class="legacy-check-off" style=width:15px
+																									type="checkbox" name="attr_Survival">
+																								<td>Expertise
+																									<input style=width:60px
+																										type="text" name="attr_Survival_Expertise"
+																										value="0" />
+																									<td>Focus
+																										<input style=width:60px
+																											type="text" name="attr_Survival_Focus"
+																											value="0">
+																										<td>
+																											<button type='roll' name='roll_skill'
+																												value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Survival_Focus}cf20<[[@{Awareness}+@{Survival_Expertise}]]]] Success(es) for Survival skill.'></button>
+																										</td>
+																										<tr>
+																											<td>Thievery
+																												<td>
+																													<input class="legacy-check-off"
+																														style=width:15px
+																														type="checkbox"
+																														name="attr_Thievery">
+																													<td>Expertise
+																														<input
+																															style=width:60px
+																															type="text"
+																															name="attr_Thievery_Expertise"
+																															value="0"
+																														/>
+																														<td>Focus
+																															<input
+																																style=width:60px
+																																type="text"
+																																name="attr_Thievery_Focus"
+																																value="0">
+																																<td>
+																																	<button
+																																		type='roll'
+																																		name='roll_skill'
+																																		value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Thievery_Focus}cf20<[[@{Awareness}+@{Thievery_Expertise}]]]] Success(es) for Thievery skill.'></button>
+																																</td>
+	
+																														</td>
+																										</tr>
+			</table>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Brawn
+							<td>
+								<td>
+									<input style=width:60px type="text" name="attr_Brawn" value="0" />
+									<td>Unskilled
+										<td>
+											<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacf19cf20<[[@{Brawn}]]]] Success(es) for Unskilled Brawn skill.'></button>
+										</td>
+						</label>
+						<tr>
+							<td style=width:120px>Athletics
+								<td>
+									<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Athletics">
+									<td>Expertise
+										<input style=width:60px type="text" name="attr_Athletics_Expertise" value="0" />
+										<td>Focus
+											<input style=width:60px type="text" name="attr_Athletics_Focus" value="0">
+											<td>
+												<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Athletics_Focus}cf20<[[@{Brawn}+@{Athletics_Expertise}]]]] Success(es) for Athletics skill.'></button>
+											</td>
+											<tr>
+												<td>Resistance
+													<td>
+														<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Resistance">
+														<td>Expertise
+															<input style=width:60px type="text" name="attr_Resistance_Expertise"
+																value="0" />
+															<td>Focus
+																<input style=width:60px type="text" name="attr_Resistance_Focus"
+																	value="0">
+																<td>
+																	<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Resistance_Focus}cf20<[[@{Brawn}+@{Resistance_Expertise}]]]] Success(es) for Resistance skill.'></button>
+																</td>
+	
+															</td>
+											</tr>
+			</table>
+	
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Coordination
+							<td>
+								<td>
+									<input style=width:60px type="text" name="attr_Coordination" value="0" />
+									<td>Unskilled
+										<td>
+											<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacf19cf20<[[@{Coordination}]]]] Success(es) for Unskilled Coordination skill.'></button>
+										</td>
+						</label>
+						<tr>
+							<td style=width:120px>Ballistics
+								<td>
+									<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Ballistics">
+									<td>Expertise
+										<input style=width:60px type="text" name="attr_Ballistics_Expertise" value="0" />
+										<td>Focus
+											<input style=width:60px type="text" name="attr_Ballistics_Focus" value="0">
+											<td>
+												<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Ballistics_Focus}cf20<[[@{Coordination}+@{Ballistics_Expertise}]]]] Success(es) for Ballistics skill.'></button>
+											</td>
+											<tr>
+												<td>Pilot
+													<td>
+														<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Pilot">
+														<td>Expertise
+															<input style=width:60px type="text" name="attr_Pilot_Expertise"
+																value="0" />
+															<td>Focus
+																<input style=width:60px type="text" name="attr_Pilot_Focus"
+																	value="0">
+																<td>
+																	<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Pilot_Focus}cf20<[[@{Coordination}+@{Pilot_Expertise}]]]] Success(es) for Pilot skill.'></button>
+																</td>
+																<tr>
+																	<td>Space
+																		<td>
+																			<input class="legacy-check-off" style=width:15px type="checkbox"
+																				name="attr_Space">
+																			<td>Expertise
+																				<input style=width:60px type="text" name="attr_Space_Expertise"
+																					value="0" />
+																				<td>Focus
+																					<input style=width:60px type="text" name="attr_Space_Focus"
+																						value="0">
+																					<td>
+																						<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Space_Focus}cf20<[[@{Coordination}+@{Space_Expertise}]]]] Success(es) for Space skill.'></button>
+																					</td>
+	
+																				</td>
+																</tr>
+			</table>
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Intelligence
+							<td>
+								<td>
+									<input style=width:60px type="text" name="attr_Intelligence" value="0" />
+									<td>Unskilled
+										<td>
+											<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacf19cf20<[[@{Intelligence}]]]] Success(es) for Unskilled Intelligence skill.'></button>
+										</td>
+						</label>
+						<tr>
+							<td style=width:120px>Education
+								<td>
+									<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Education">
+									<td>Expertise
+										<input style=width:60px type="text" name="attr_Education_Expertise" value="0" />
+										<td>Focus
+											<input style=width:60px type="text" name="attr_Education_Focus" value="0">
+											<td>
+												<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Education_Focus}cf20<[[@{Intelligence}+@{Education_Expertise}]]]] Success(es) for Education skill.'></button>
+											</td>
+											<tr>
+												<td>Hacking
+													<td>
+														<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Hacking">
+														<td>Expertise
+															<input style=width:60px type="text" name="attr_Hacking_Expertise"
+																value="0" />
+															<td>Focus
+																<input style=width:60px type="text" name="attr_Hacking_Focus"
+																	value="0">
+																<td>
+																	<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Hacking_Focus}cf20<[[@{Intelligence}+@{Hacking_Expertise}]]]] Success(es) for Hacking skill.'></button>
+																</td>
+																<tr>
+																	<td>Medicine
+																		<td>
+																			<input class="legacy-check-off" style=width:15px type="checkbox"
+																				name="attr_Medicine">
+																			<td>Expertise
+																				<input style=width:60px type="text" name="attr_Medicine_Expertise"
+																					value="0" />
+																				<td>Focus
+																					<input style=width:60px type="text" name="attr_Medicine_Focus"
+																						value="0">
+																					<td>
+																						<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Medicine_Focus}cf20<[[@{Intelligence}+@{Medicine_Expertise}]]]] Success(es) for Medicine skill.'></button>
+																					</td>
+																					<tr>
+																						<td>Psychology
+																							<td>
+																								<input class="legacy-check-off" style=width:15px
+																									type="checkbox" name="attr_Psychology">
+																								<td>Expertise
+																									<input style=width:60px
+																										type="text" name="attr_Psychology_Expertise"
+																										value="0" />
+																									<td>Focus
+																										<input style=width:60px
+																											type="text" name="attr_Psychology_Focus"
+																											value="0">
+																										<td>
+																											<button type='roll' name='roll_skill'
+																												value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Psychology_Focus}cf20<[[@{Intelligence}+@{Psychology_Expertise}]]]] Success(es) for Psychology skill.'></button>
+																										</td>
+																										<tr>
+																											<td>Science
+																												<td>
+																													<input class="legacy-check-off"
+																														style=width:15px
+																														type="checkbox"
+																														name="attr_Science">
+																													<td>Expertise
+																														<input
+																															style=width:60px
+																															type="text"
+																															name="attr_Science_Expertise"
+																															value="0"
+																														/>
+																														<td>Focus
+																															<input
+																																style=width:60px
+																																type="text"
+																																name="attr_Science_Focus"
+																																value="0">
+																																<td>
+																																	<button
+																																		type='roll'
+																																		name='roll_skill'
+																																		value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Science_Focus}cf20<[[@{Intelligence}+@{Science_Expertise}]]]] Success(es) for Science skill.'></button>
+																																</td>
+																																<tr>
+																																	<td>Tech
+																																		<td>
+																																			<input
+																																				class="legacy-check-off"
+																																				style=width:15px
+																																				type="checkbox"
+																																				name="attr_Tech">
+																																				<td>Expertise
+																																					<input
+																																						style=width:60px
+																																						type="text"
+																																						name="attr_Tech_Expertise"
+																																						value="0"
+																																					/>
+																																					<td>Focus
+																																						<input
+																																							style=width:60px
+																																							type="text"
+																																							name="attr_Tech_Focus"
+																																							value="0">
+																																							<td>
+																																								<button
+																																									type='roll'
+																																									name='roll_skill'
+																																									value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Tech_Focus}cf20<[[@{Intelligence}+@{Tech_Expertise}]]]] Success(es) for Tech skill.'></button>
+																																							</td>
+	
+																																					</td>
+																																</tr>
+			</table>
+	
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Personality
+							<td>
+								<td>
+									<input style=width:60px type="text" name="attr_Personality" value="0" />
+									<td>Unskilled
+										<td>
+											<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacf19cf20<[[@{Personality}]]]] Success(es) for Unskilled Personality skill.'></button>
+										</td>
+						</label>
+						<tr>
+							<td style=width:120px>Animal Handling
+								<td>
+									<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Animal_Handling">
+									<td>Expertise
+										<input style=width:60px type="text" name="attr_Animal_Handling_Expertise" value="0"
+										/>
+										<td>Focus
+											<input style=width:60px type="text" name="attr_Animal_Handling_Focus" value="0">
+											<td>
+												<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Animal_Handling_Focus}cf20<[[@{Personality}+@{Animal_Handling_Expertise}]]]] Success(es) for Animal Handling skill.'></button>
+											</td>
+											<tr>
+												<td>Command
+													<td>
+														<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Command">
+														<td>Expertise
+															<input style=width:60px type="text" name="attr_Command_Expertise"
+																value="0" />
+															<td>Focus
+																<input style=width:60px type="text" name="attr_Command_Focus"
+																	value="0">
+																<td>
+																	<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Command_Focus}cf20<[[@{Personality}+@{Command_Expertise}]]]] Success(es) for Command skill.'></button>
+																</td>
+																<tr>
+																	<td>Lifestyle
+																		<td>
+																			<input class="legacy-check-off" style=width:15px type="checkbox"
+																				name="attr_Lifestyle">
+																			<td>Expertise
+																				<input style=width:60px type="text" name="attr_Lifestyle_Expertise"
+																					value="0" />
+																				<td>Focus
+																					<input style=width:60px type="text" name="attr_Lifestyle_Focus"
+																						value="0">
+																					<td>
+																						<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Lifestyle_Focus}cf20<[[@{Personality}+@{Lifestyle_Expertise}]]]] Success(es) for Lifestyle skill.'></button>
+																					</td>
+																					<tr>
+																						<td>Persuade
+																							<td>
+																								<input class="legacy-check-off" style=width:15px
+																									type="checkbox" name="attr_Persuade">
+																								<td>Expertise
+																									<input style=width:60px
+																										type="text" name="attr_Persuade_Expertise"
+																										value="0" />
+																									<td>Focus
+																										<input style=width:60px
+																											type="text" name="attr_Persuade_Focus"
+																											value="0">
+																										<td>
+																											<button type='roll' name='roll_skill'
+																												value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Persuade_Focus}cf20<[[@{Personality}+@{Persuade_Expertise}]]]] Success(es) for Persuade skill.'></button>
+																										</td>
+	
+																									</td>
+																					</tr>
+			</table>
+	
+	
+			<table border="1" style="width:100%">
+				<tr>
+					<td>
+						<label>Willpower
+							<td>
+								<td>
+									<input style=width:60px type="text" name="attr_Willpower" value="0" />
+									<td>Unskilled
+										<td>
+											<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacf19cf20<[[@{Willpower}]]]] Success(es) for Unskilled Willpower skill.'></button>
+										</td>
+						</label>
+						<tr>
+							<td style=width:120px>Discipline
+								<td>
+									<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_Discipline">
+									<td>Expertise
+										<input style=width:60px type="text" name="attr_Discipline_Expertise" value="0" />
+										<td>Focus
+											<input style=width:60px type="text" name="attr_Discipline_Focus" value="0">
+											<td>
+												<button type='roll' name='roll_skill' value='@{character_name} rolls [[ ?{Dice|2}d20sacs<@{Discipline_Focus}cf20<[[@{Willpower}+@{Discipline_Expertise}]]]] Success(es) for Discipline skill.'></button>
+											</td>
+										</td>
+						</tr>
+			</table>
+	
+	
+	
+	
+			<div class="legacy-header">Faction Handler</div>
+			<table border="1" style="width:100%">
+				<tr>
+	
+	
+	
+	
+					<td>Identity
+						<td>
+							<input style=width:270px type="text" name="attr_FactionHandler_Name1" />
+	
+						</td>
+						<tr>
+							<td>Faction
+								<td>
+									<input style=width:270px type="text" name="attr_FactionHandler_Name2" />
+	
+								</td>
+								<tr>
+									<td>Current Faction Goal
+										<td>
+											<input style=width:270px type="text" name="attr_FactionHandler_Name3" />
+	
+										</td>
+										<tr>
+											<td>Contact Protocol
+												<td>
+													<input style=width:270px type="text" name="attr_FactionHandler_Name4" />
+												</td>
+										</tr>
+			</table>
+			<div class="legacy-header">Faction Handler Notes</div>
+	
+	
+			<textarea style="width:100%" type="text" name="attr_FactionHandler_Name5"></textarea>
+	
+			<div class="legacy-header">Traits</div>
+			<table border="1" style="width:100%">
+				<tr>
+	
+					<td>1
+						<input style=width:390px type="text" name="attr_Traits_Name1" />
+	
+					</td>
+					<tr>
+						<td>2
+							<input style=width:390px type="text" name="attr_Traits_Name2" />
+	
+						</td>
+						<tr>
+							<td>3
+								<input style=width:390px type="text" name="attr_Traits_Name3" />
+	
+							</td>
+							<tr>
+								<td>4
+									<input style=width:390px type="text" name="attr_Traits_Name4" />
+	
+								</td>
+								<tr>
+									<td>5
+										<input style=width:390px type="text" name="attr_Traits_Name5" />
+									</td>
+									<tr>
+										<td>6
+											<input style=width:390px type="text" name="attr_Traits_Name6" />
+	
+	
+	
+	
+										</td>
+									</tr>
+			</table>
+		</div>
+	</div>
+	
+	<div class="legacy-break"></div>
+	<div class="legacy-header">Talents</div>
+	<table border="1" style="width:100%">
+		<tr>
+			<td>
+				<label>Name</label>
+				<td>
+					<label>Skill</label>
+					<td>
+						<label>Effect</label>
+						<td>
+							<label>Name</label>
+							<td>
+								<label>Skill</label>
+								<td>
+									<label>Effect</label>
+								</td>
+								<tr>
+									<td>
+										<input style=width:90px type="text" name="attr_ATallent_Name1" />
+										<td>
+											<input style=width:90px type="text" name="attr_ATallent_Skill1" />
+											<td>
+												<input style=width:220px type="text" name="attr_ATallentt_Effect1" />
+	
+												<td>
+													<input style=width:90px type="text" name="attr_ATallent_Name2" />
+													<td>
+														<input style=width:90px type="text" name="attr_ATallent_Skill2" />
+														<td>
+															<input style=width:220px type="text" name="attr_ATallent_Effect2" />
+														</td>
+														<tr>
+															<td>
+																<input style=width:90px type="text" name="attr_ATallent_Name3" />
+																<td>
+																	<input style=width:90px type="text" name="attr_ATallent_Skill3"
+																	/>
+																	<td>
+																		<input style=width:220px type="text" name="attr_ATallent_Effect3"
+																		/>
+	
+																		<td>
+																			<input style=width:90px type="text" name="attr_ATallent_Name4"
+																			/>
+																			<td>
+																				<input style=width:90px type="text" name="attr_ATallent_Skill4"
+																				/>
+																				<td>
+																					<input style=width:220px type="text" name="attr_ATallent_Effect4"
+																					/>
+																				</td>
+																				<tr>
+																					<td>
+																						<input style=width:90px type="text" name="attr_ATallent_Name5"
+																						/>
+																						<td>
+																							<input style=width:90px type="text" name="attr_ATallent_Skill5"
+																							/>
+																							<td>
+																								<input style=width:220px type="text"
+																									name="attr_ATallent_Effect5"
+																								/>
+	
+																								<td>
+																									<input style=width:90px type="text"
+																										name="attr_ATallent_Name6"
+																									/>
+																									<td>
+																										<input style=width:90px type="text"
+																											name="attr_ATallent_Skill6"
+																										/>
+																										<td>
+																											<input style=width:220px
+																												type="text" name="attr_ATallent_Effect6"
+																											/>
+																										</td>
+																										<tr>
+																											<td>
+																												<input style=width:90px
+																													type="text" name="attr_ATallent_Name7"
+																												/>
+																												<td>
+																													<input style=width:90px
+																														type="text"
+																														name="attr_ATallent_Skill7"
+																													/>
+																													<td>
+																														<input style=width:220px
+																															type="text"
+																															name="attr_ATallentt_Effect7"
+																														/>
+	
+																														<td>
+																															<input
+																																style=width:90px
+																																type="text"
+																																name="attr_ATallent_Name8"
+																															/>
+																															<td>
+																																<input
+																																	style=width:90px
+																																	type="text"
+																																	name="attr_ATallent_Skill8"
+																																/>
+																																<td>
+																																	<input
+																																		style=width:220px
+																																		type="text"
+																																		name="attr_ATallent_Effect8"
+																																	/>
+																																</td>
+																																<tr>
+																																	<td>
+																																		<input
+																																			style=width:90px
+																																			type="text"
+																																			name="attr_ATallent_Name9"
+																																		/>
+																																		<td>
+																																			<input
+																																				style=width:90px
+																																				type="text"
+																																				name="attr_ATallent_Skill9"
+																																			/>
+																																			<td>
+																																				<input
+																																					style=width:220px
+																																					type="text"
+																																					name="attr_ATallent_Effect9"
+																																				/>
+	
+																																				<td>
+																																					<input
+																																						style=width:90px
+																																						type="text"
+																																						name="attr_ATallent_Name10"
+																																					/>
+																																					<td>
+																																						<input
+																																							style=width:90px
+																																							type="text"
+																																							name="attr_ATallent_Skill10"
+																																						/>
+																																						<td>
+																																							<input
+																																								style=width:220px
+																																								type="text"
+																																								name="attr_ATallent_Effect10"
+																																							/>
+																																						</td>
+																																						<tr>
+																																							<td>
+																																								<input
+																																									style=width:90px
+																																									type="text"
+																																									name="attr_ATallent_Name11"
+																																								/>
+																																								<td>
+																																									<input
+																																										style=width:90px
+																																										type="text"
+																																										name="attr_ATallent_Skill11"
+																																									/>
+																																									<td>
+																																										<input
+																																											style=width:220px
+																																											type="text"
+																																											name="attr_ATallent_Effect11"
+																																										/>
+	
+																																										<td>
+																																											<input
+																																												style=width:90px
+																																												type="text"
+																																												name="attr_ATallent_Name12"
+																																											/>
+																																											<td>
+																																												<input
+																																													style=width:90px
+																																													type="text"
+																																													name="attr_ATallent_Skill12"
+																																												/>
+																																												<td>
+																																													<input
+																																														style=width:220px
+																																														type="text"
+																																														name="attr_ATallent_Effect12"
+																																													/>
+	
+	
+																																												</td>
+																																						</tr>
+	</table>
+	<div class="legacy-repitem">
+		<fieldset class="repeating_talents">
+			<table border="1" style="width:100%">
+				<td>
+					<input style=width:90px type="text" name="attr_ATallent_Namerep1" />
+					<td>
+						<input style=width:90px type="text" name="attr_ATallent_Skillrep1" />
+						<td>
+							<input style=width:220px type="text" name="attr_ATallent_Effectrep1" />
+	
+							<td>
+								<input style=width:90px type="text" name="attr_ATallent_Namerep2" />
+								<td>
+									<input style=width:90px type="text" name="attr_ATallent_Skillrep2" />
+									<td>
+										<input style=width:220px type="text" name="attr_ATallent_Effectrep2" />
+	
+	
+	
+									</td>
+			</table>
+			</tr>
+		</fieldset>
+	
+	
+		<div class="legacy-header">Weapons</div>
+		<b>you need to create a rollable table called "Combat-Dice" with name values of "1","2","-","-","-","Special Effect"</b>
+	
+	
+		<div class="legacy-repitem">
+			<fieldset class="repeating_Weapons">
+				<table border="1" style="width:100%">
+	
+					<tr>
+						<td>Name
+							<input style=width:140px type="text" name="attr_weapon_Name_rep" />
+							<td>Range
+								<input style=width:60px type="text" name="attr_weapon_Range_rep" />
+								<td>Attribute Bonus Dice
+									<input style=width:30px type="text" name="attr_weapon_Attribute_rep" value='0'
+									/>
+									<td>Base Damage
+										<input style=width:30px type="text" name="attr_weapon_Damagebonus_rep" value='0'>
+										<td>Damage
+											<input style=width:30px type="text" name="attr_weapon_Damage_rep" value='0'>
+											<button type='roll' name="attr_Combat-Dice" value="/me rolls @{weapon_Name_rep} [[(?{Modifier to Damage Dice|0}+@{weapon_Damage_rep}+@{weapon_Attribute_rep})t[Combat-Dice]]]+@{weapon_Damagebonus_rep} Hits , Hover mouse over result to get full result"></button>
+										</td>
+										<td>Mode
+											<input style=width:100px type="text" name="attr_weapon_Mode_rep" />
+										</td>
+				</table>
+				<table border="1" style="width:100%">
+					<tr>
+	
+						<td>Burst
+							<input style=width:80px type="text" name="attr_weapon_Burst_rep" />
+							<td>Size
+								<input style=width:100px type="text" name="attr_weapon_Size_rep" />
+								<td>Qualities
+									<input style=width:380px type="text" name="attr_weapon_Qualities_rep" />
+									<td>Reloads
+										<input class="legacy-check-off" style=width:20px type="checkbox" name="attr_RL1" />
+										<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RL2" />
+										<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RL3" />
+										<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RL4" />
+										<input class="legacy-check-off" style=width:15px type="checkbox" name="attr_RL5" />
+									</td>
+				</table>
+	
+	
+				</tr>
+			</fieldset>
+	
+		</div>
+		</table>
+		<div class="legacy-header">Gear</div>
+	
+	
+	
+		<div class="legacy-repitem">
+			<fieldset class="repeating_Gear">
+				<table border="1" style="width:100%">
+	
+					<tr>
+						<td>Name
+							<input style=width:102px type="text" name="attr_weapon_GearName1_rep" />
+							<td>Effect
+								<input style=width:306px type="text" name="attr_Gear_Effect1_rep" />
+								<td>Name
+									<input style=width:102px type="text" name="attr_weapon_GearName2_rep" />
+									<td>Effect
+										<input style=width:306px type="text" name="attr_Gear_Effect2_rep">
+	
+									</td>
+				</table>
+	
+	
+				</tr>
+			</fieldset>
+	
+		</div>
+		</table>
+	
+	</div>
+	<!-- .section-stress -->
+	<div class="legacy-break"></div>
+	
+	
+	<div class="legacy-header">Lifepath Characteristics</div>
+	<table border="1" style="width:100%">
+		<tr>
+			<td>
+				<label>Age</label>
+	
+				<input style=width:40px type="text" name="attr_Age" />
+	
+			</td>
+			<td>
+				<label>Languages</label>
+				<input style=width:784px type="text" name="attr_Languages_Notes" />
+			</td>
+		</tr>
+	
+	
+	</table>
+	<table border="1" style="width:100%">
+		<tr>
+			<td>
+				<label>Family Social Status</label>
+				<input style=width:204px type="text" name="attr_Family_Social_Status" />
+			</td>
+			<td>
+				<label>Home Enviroment</label>
+				<input style=width:204px type="text" name="attr_Home_Enviroment" />
+			</td>
+			<td>
+				<label>Youth Event</label>
+				<input style=width:204px type="text" name="attr_Youth_Event" />
+			</td>
+			<td>
+				<label>Education</label>
+				<input style=width:204px type="text" name="attr_EducationLP" />
+			</td>
+		</tr>
+	</table>
+	<table border="1" style="width:100%">
+		<tr>
+			<td>
+				<label>Adolesent Event</label>
+				<input style=width:820px type="text" name="attr_Adolesent_Event" />
+			</td>
+		</tr>
+	</table>
+	<table border="1" style="width:100%">
+		<tr>
+			<td>
+				<label>First Career</label>
+				<input style=width:204px type="text" name="attr_First_Career" />
+			</td>
+			<td>
+				<label>Second Career</label>
+				<input style=width:204px type="text" name="attr_Second_Career" />
+			</td>
+			<td>
+				<label>Third Career</label>
+				<input style=width:204px type="text" name="attr_Third_Career" />
+			</td>
+			<td>
+				<label>Fourth Career</label>
+				<input style=width:204px type="text" name="attr_Fourth_Career" />
+			</td>
+	</table>
+	
+	
+	<table border="1" style="width:100%">
+		</td>
+		<td>
+			<label>Earnings</label>
+			<input style=width:102px type="text" name="attr_Earnings" />
+		</td>
+		<td>
+			<label>Assets</label>
+			<input style=width:102px type="text" name="attr_Assets" />
+		</td>
+		<td>
+			<label>Additional Notes</label>
+			<input style=width:612px type="text" name="attr_Additional_Notes" />
+	
+		</td>
+		</tr>
+	</table>
+	
+	
+	<div class="legacy-break"></div>
+	<div class="legacy-header">More Additional Notes</div>
+	<textarea name="attr_More_add_Notes"></textarea>
+	<br>
+	<span class="note">Note: Legacy tab is NOT cross-functional with the rest of the sheet. Any changes made here might not copy to the other tabs. This tab is also not currently maintained; use at your own risk.</span>
+	
+	
+	
+	
+	</div>
+	<!-- .section-stress -->
 </div>
 <input type="hidden" name="attr_sheet_version" value="1.0" />
 
