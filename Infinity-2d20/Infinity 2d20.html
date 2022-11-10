@@ -3,6 +3,7 @@
 <input id="type-tab3" type="radio" name="attr_type_tab" class="type-tab" value="3" /><label for="type-tab3">Geist</label>
 <input id="type-tab4" type="radio" name="attr_type_tab" class="type-tab" value="4" /><label for="type-tab4">Shell</label>
 <input id="type-tab5" type="radio" name="attr_type_tab" class="type-tab" value="5" /><label for="type-tab5">Vehc.</label>
+<input id="type-tab-group" type="radio" name="attr_type_tab" class="type-tab" value="7" /><label for="type-tab-group">Group</label>
 <input id="type-tab-legacy" type="radio"  name="attr_type_tab" value="6"><label for="type-tab-legacy">Legacy</label>
 <div id="type-PC">
 	<input id="tab1" type="radio" name="attr_tab" value="1" checked="checked"/><label for="tab1">MAIN</label>
@@ -2133,6 +2134,31 @@
 					<td style="background-color:white"><textarea rows="5" name="attr_vehicle_abilities"></textarea></td>
 				</tr>
 			</table>
+		</div>
+	</div>
+</div>
+<div id="type-Group">
+	<div class="grid">
+		<div>
+			<img src="https://raw.githubusercontent.com/DrakeRichards/roll20-character-sheets/12-group-momentumheat-tracker/Infinity-2d20/Momentum%20Token.png">
+			<h3>Momentum</h3>
+			<div class="row">
+				<button type="action" name="act_attr-inc" class="hover-blue" value="group_momentum,-1">-1</button>
+				<input type="number" id="group-momentum" name="attr_group_momentum" value="0">
+				<button type="action" name="act_attr-inc" class="hover-blue" value="group_momentum,1">+1</button>
+			</div>
+		</div>
+		<div>
+			<button type="action" name="act_attr-inc" class="hover-blue" value="group_momentum,-1,group_heat,1">>></button>
+		</div>
+		<div>
+			<img src="https://raw.githubusercontent.com/DrakeRichards/roll20-character-sheets/12-group-momentumheat-tracker/Infinity-2d20/Heat%20Token.png">
+			<h3>Heat</h3>
+			<div class="row">
+				<button type="action" name="act_attr-inc" class="hover-blue" value="group_heat,-1">-1</button>
+				<input type="number" id="group-heat" name="attr_group_heat" value="0">
+				<button type="action" name="act_attr-inc" class="hover-blue" value="group_heat,1">+1</button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -5566,5 +5592,31 @@
 		}
 	
 		openSheet();
+	});
+
+	on('clicked:attr-inc', function(info) {
+		const split = (info.htmlAttributes.value).split(",");
+		let attr = {
+			from: {
+				name: split[0],
+				inc: split[1]
+			},
+			to: {
+				name: (split.length > 2) ? split[2] : "",
+				inc: (split.length > 2) ? split[3] : 0
+			}
+		};
+
+		getAttrs([attr.from.name, attr.to.name], function(values) {
+			let setObj = {};
+			if ((attr.from.inc == '-1') && (values[attr.from.name] == '0')) {
+				return;
+			}
+			setObj[attr.from.name] = Number(values[attr.from.name]) + Number(attr.from.inc);
+			if (attr.to.name !== "") {
+				setObj[attr.to.name] = Number(values[attr.to.name]) + Number(attr.to.inc);
+			}
+			setAttrs(setObj);
+		});
 	});
 </script>
