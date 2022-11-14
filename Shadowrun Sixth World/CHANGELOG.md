@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2022-11-14 ** v.64 Chuz (James Culp)
+	Bugfix - PC Judge Intentions wasn't updating on Willpower changes.
 **2022-11-06 ** v.63 Chuz (James Culp)
 	New Feature - PC Attribute roll buttons now prompt for a second attribute or custom dice modifier for those occasions when the DM says Roll Reaction+Intuition instead of Roll Defense
 	Bugfix - PC Defense, Direct Magic Defense and Indirect Magic Defense roll buttons didn't include Wound Penalties (defense pretended to but didn't apply the penalty)
