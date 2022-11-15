@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2022-11-21 ** v.65 Chuz (James Culp)
+	Bugfix - NPC Spell roll template issue where if drain was under 2 it added "Drain: 2" at the bottom of the description.
 **2022-11-14 ** v.64 Chuz (James Culp)
 	Bugfix - PC Judge Intentions wasn't updating on Willpower changes.
 **2022-11-06 ** v.63 Chuz (James Culp)
