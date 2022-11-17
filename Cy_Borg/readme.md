@@ -7,7 +7,7 @@ To the best of my knowledge/ability, the sheet is set up for internationalizatio
 
 ## Thanks / Credit
 
-Several Roll2 players pitched in to offer feedback to the sheet as it was under initial development. Thank you very much:
+Several Roll20 players pitched in to offer feedback to the sheet as it was under initial development. Thank you very much:
 
 * [Blaze](https://app.roll20.net/users/4407184)
 * [John O.](https://app.roll20.net/users/5451119)
