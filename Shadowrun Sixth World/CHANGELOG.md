@@ -1,6 +1,8 @@
 Change Log
 ==============================================
 **2022-11-21 ** v.65 Chuz (James Culp)
+	Bugfix - PC Weapon skills weren't applying the -1 unskilled penalty to some skills, this has been updated however users will need to update the skill to something else and back to trigger the data change.
+	Bugfix - PC Sheet imported from Genesis in a non-English language had many problems mostly related to skills.  I believe I've fixed these issues please report any new ones
 	Bugfix - NPC Spell roll template issue where if drain was under 2 it added "Drain: 2" at the bottom of the description.
 **2022-11-14 ** v.64 Chuz (James Culp)
 	Bugfix - PC Judge Intentions wasn't updating on Willpower changes.

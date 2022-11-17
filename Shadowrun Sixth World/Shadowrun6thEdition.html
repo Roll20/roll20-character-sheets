@@ -543,13 +543,14 @@
               </div>
               <fieldset class="repeating_skills">
                 <input name="attr_display_rating" type="hidden"/>
+                <input name="attr_display_name" type="hidden"/>
                 <input name="attr_display_spec" type="hidden" value=""/>
                 <input name="attr_display_expert" type="hidden" value=""/>
                 <input name="attr_display_attribute" type="hidden" value="Intuition"/>
                 <input name="attr_dicepool" type="hidden" value="0"/>
                 <input class="settings-flag" name="attr_flag" type="hidden" value="settings"/>
                 <div class="buttons">
-                  <button name="act_skill" class="skill" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name}}}{{dice=[[((@{rating}+@{attribute}+@{mod})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=@{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
+                  <button name="act_skill" class="skill" type="action" value=""><span name="attr_display_name"></span></button>
                   <span class="skill-button-hider" name="attr_spec">hideme</span><button name="act_spec" class="skill_spec" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} +2 (Spec: @{display_spec})}}{{dice=[[((@{rating}+@{attribute}+@{mod}+2)+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Spec: @{spec}\n@{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span class="skill_spec" name="attr_display_spec"></span></button>
                   <span class="skill-button-hider" name="attr_expert">hideme</span><button name="act_expert" class="skill_expert" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} +3 (Expert: @{display_expert})}}{{dice=[[((@{rating}+@{attribute}+@{mod}+3)+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Expertise: @{expert}\n@{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span class="skill_expert" name="attr_display_expert"></span></button>
                 </div>
@@ -3346,6 +3347,8 @@
 								<h1 class="changelog-header">Most Recent Updates</h1>
 								<span class="changelog-entry">**2022-11-21 ** v.65 Chuz (James Culp)</span>
 								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - PC Weapon skills weren't applying the -1 unskilled penalty to some skills, this has been updated however users will need to update the skill to something else and back to trigger the data change.
+									<li><span class="bullet">A</span><b>Bugfix</b> - PC Sheet imported from Genesis in a non-English language had many problems mostly related to skills.  I believe I've fixed these issues please report any new ones
 									<li><span class="bullet">A</span><b>Bugfix</b> - NPC Spell roll template issue where if drain was under 2 it added "Drain: 2" at the bottom of the description.
 								</ul>
 								<span class="changelog-entry">**2022-11-14 ** v.64 Chuz (James Culp)</span>
@@ -5980,8 +5983,9 @@ on("sheet:opened", function() {
 				case (v.data_version < 0.60):
 					_v60_update();
 					console.log("Data now fits v.60");
-				case (v.data_version < 0.61):
-					console.log("Data now fits v.61");
+				case (v.data_version < 0.65):
+					_v65_update();
+					console.log("Data now fits v.65");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -6003,6 +6007,22 @@ var show_changelog = () => {
 	});
 };
 
+
+var _v65_update = () => {
+	// Define new field repeating_skills_display_name
+	getSectionIDs('repeating_skills', (rows) => {
+		rows.forEach((row) => {
+			var skillRow = 'repeating_skills_' + row + '_name';
+			getAttrs([skillRow], (v) => {
+				var skill_name_simplified = v[skillRow].toLowerCase().replace(/\s/g, '');
+				var skill_name_translated = getTranslationByKey(skill_name_simplified);
+					setAttrs({
+						[`repeating_skills_${row}_display_name`]: skill_name_translated
+					});
+			});
+		});
+	});
+};
 
 var _v60_update = () => {
 	// Update attr_cracking to reflect the correct value
@@ -8671,10 +8691,14 @@ on("change:level", () => {
 
 
 on("change:repeating_skills:name", (eventInfo) => {
+console.log(eventInfo);
 	update_skill_attribute(eventInfo.triggerName.replace('_name', ''), eventInfo.newValue);
 });
 
 var update_skill_attribute = (prefix, skill) => {
+	var skill_name_simplified = skill.toLowerCase().replace(/\s/g, '');
+	var skill_name_translated = getTranslationByKey(skill_name_simplified);
+
 	switch(skill) {
 		case 'Athletics':
 		case 'Close Combat':
@@ -8682,43 +8706,43 @@ var update_skill_attribute = (prefix, skill) => {
 		case 'Firearms':
 		case 'Stealth':
 			translation = getTranslationByKey("agility");
-			setAttrs({[`${prefix}_attribute`]: '@{agility}', [`${prefix}_display_attribute`]: translation});
+			setAttrs({[`${prefix}_display_name`]: skill_name_translated, [`${prefix}_attribute`]: '@{agility}', [`${prefix}_display_attribute`]: translation});
 			break;
 		case 'Con':
 		case 'Influence':
 			translation = getTranslationByKey("charisma");
-			setAttrs({[`${prefix}_attribute`]: '@{charisma}', [`${prefix}_display_attribute`]: translation});
+			setAttrs({[`${prefix}_display_name`]: skill_name_translated, [`${prefix}_attribute`]: '@{charisma}', [`${prefix}_display_attribute`]: translation});
 			break;
 		case 'Astral':
 		case 'Outdoors':
 		case 'Perception':
 			translation = getTranslationByKey("intuition");
-			setAttrs({[`${prefix}_attribute`]: '@{intuition}', [`${prefix}_display_attribute`]: translation});
+			setAttrs({[`${prefix}_display_name`]: skill_name_translated, [`${prefix}_attribute`]: '@{intuition}', [`${prefix}_display_attribute`]: translation});
 			break;
 		case 'Biotech':
 		case 'Cracking':
 		case 'Electronics':
 		case 'Engineering':
 			translation = getTranslationByKey("logic");
-			setAttrs({[`${prefix}_attribute`]: '@{logic}', [`${prefix}_display_attribute`]: translation});
+			setAttrs({[`${prefix}_display_name`]: skill_name_translated, [`${prefix}_attribute`]: '@{logic}', [`${prefix}_display_attribute`]: translation});
 			break;
 		case 'Conjuring':
 		case 'Enchanting':
 		case 'Sorcery':
 			translation = getTranslationByKey("magic");
-			setAttrs({[`${prefix}_attribute`]: '@{magic}', [`${prefix}_display_attribute`]: translation});
+			setAttrs({[`${prefix}_display_name`]: skill_name_translated, [`${prefix}_attribute`]: '@{magic}', [`${prefix}_display_attribute`]: translation});
 			break;
 		case 'Piloting':
 			translation = getTranslationByKey("reaction");
-			setAttrs({[`${prefix}_attribute`]: '@{reaction}', [`${prefix}_display_attribute`]: translation});
+			setAttrs({[`${prefix}_display_name`]: skill_name_translated, [`${prefix}_attribute`]: '@{reaction}', [`${prefix}_display_attribute`]: translation});
 			break;
 		case 'Tasking':
 			translation = getTranslationByKey("resonance");
-			setAttrs({[`${prefix}_attribute`]: '@{resonance}', [`${prefix}_display_attribute`]: translation});
+			setAttrs({[`${prefix}_display_name`]: skill_name_translated, [`${prefix}_attribute`]: '@{resonance}', [`${prefix}_display_attribute`]: translation});
 			break;
 		default:
 			translation = getTranslationByKey("agility");
-			setAttrs({[`${prefix}_attribute`]: '@{agility}', [`${prefix}_display_attribute`]: translation});
+			setAttrs({[`${prefix}_display_name`]: skill_name_translated, [`${prefix}_attribute`]: '@{agility}', [`${prefix}_display_attribute`]: translation});
 			break;
 	}
 };
@@ -8899,12 +8923,15 @@ var update_skill_attribute = (prefix, skill) => {
 
 			getAttrs([`${skill}`, `${attribute}`], (s) => {
 				rating = s[`${skill}`] || -1;
+				if(rating <= 0) {
+					rating = -1;
+				}
 				attr = s[`${attribute}`] || 1;
 
 				const tot = parseInt(attr) + parseInt(mod) + parseInt(spec) + parseInt(expert) + parseInt(rating);
 
 				setAttrs({
-					[`${weap}_rating`]: s[`${skill}`] || -1,
+					[`${weap}_rating`]: rating,
 					[`${weap}_dicepool`]: tot,
 					[`${weap}_attribute`]: attribute,
 					[`${weap}_attr_rating`]: attr
@@ -8912,7 +8939,7 @@ var update_skill_attribute = (prefix, skill) => {
 			});
 
 
-			/* if it's the primary weapon any update needs to be reflected on Core->Arms */
+			/* if it is the primary weapon any update needs to be reflected on Core->Arms */
 			if (v[`${weap}_primary`] === "primary") {
 				//Shared attributes names.
 				let array = ["dicepool", "dicepool_modifier", "name", "damage", "skill", "rating", "close", "near", "medium", "far", "extreme", "spec", "expert", "attribute", "attr_rating", "default_mode"];
@@ -10449,7 +10476,8 @@ console.log("Character qualities imported.");
 		row_id = generateRowID();
 
 		if(skill.id != "knowledge" && skill.id != "language") {
-			rowattrs["repeating_skills_" + row_id + "_name"] = skill.name;
+			rowattrs["repeating_skills_" + row_id + "_display_name"] = skill.name;
+			rowattrs["repeating_skills_" + row_id + "_name"] = skill.id.charAt(0).toUpperCase() + skill.id.slice(1);
 			rowattrs["repeating_skills_" + row_id + "_display_attribute"] = skill.attribute;
 			rowattrs["repeating_skills_" + row_id + "_attribute"] = skill.attribute;
 			rowattrs["repeating_skills_" + row_id + "_rating"] = skill.rating;
@@ -10457,6 +10485,7 @@ console.log("Character qualities imported.");
 			rowattrs["repeating_skills_" + row_id + "_display_rating"] = skill.rating;
 			rowattrs["repeating_skills_" + row_id + "_flag"] = 'display';
 			rowattrs[skill.name] = skill.rating;
+			rowattrs[skill.id.charAt(0).toUpperCase() + skill.id.slice(1)] = skill.rating;
 
 			if(skill.specializations) {
 				skill.specializations.forEach(spec => {
