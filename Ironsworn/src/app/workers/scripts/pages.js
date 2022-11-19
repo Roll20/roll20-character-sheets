@@ -25,6 +25,9 @@ on('change:stat_mode_button', function (eventinfo) {
 
 on('change:close_changelog', function () {
   setAttrs({
+    'changelog_2.7.0': 'on',
     'changelog_2.6.0': 'on',
+    'changelog_2.5.0': 'on',
+    'changelog_2.4.0': 'on'
   });
 });
