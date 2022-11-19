@@ -8373,6 +8373,7 @@ make sure to enter what the spell is resisted with">
                 </fieldset>
             </div>
             <div class="technobound">
+                <div> Sustained: <input type="number" class="statinput" name="attr_sustainedspells" value="0"></div>
                 <div class="spelllabels">
                     <div class="spellnamewrapper">
                         <label class="spelllabel">Name</label>
@@ -8382,6 +8383,9 @@ make sure to enter what the spell is resisted with">
                     </div>
                     <div class="spellcategorywrapper">
                         <label class="spelllabel">Category</label>
+                    </div>
+                    <div class="spellrangewrapper">
+                        <label class="spelllabel">Range</label>
                     </div>
                     <div class="spelldurationwrapper">
                         <label class="spelllabel">Dur</label>
@@ -8405,7 +8409,7 @@ make sure to enter what the spell is resisted with">
                         <label class="spelllabel">Full</label>
                     </div>
                 </div>
-                <fieldset class="repeating_spells">
+                <fieldset class="repeating_complexforms">
                     <div class="spellrow">
                         <div class="spellnamewrapper">
                             <input type="text" name="attr_spellname" title="Name of the Complex Form">
@@ -8417,6 +8421,9 @@ make sure to enter what the spell is resisted with">
                         </div>
                         <div class="spellcategorywrapper">
                             <input type="text" name="attr_spellcategory" title="(optional) e.g. Combat/Health/...">
+                        </div>
+                        <div class="spellrangewrapper">
+                            <input type="text" name="attr_spellrange" title="(optional) e.g. LOS">
                         </div>
                         <div class="spelldurationwrapper">
                             <input type="text" name="attr_spellduration" title="(optional) e.g. I/S/P">
@@ -13370,6 +13377,7 @@ Click again to switch to Manual and Remote">
         <button type="action" name="act_rollextended"></button>
         <button type="action" name="act_reactdodge"></button>
         <button type="action" name="act_reactsoak"></button>
+        <button type="action" name="act_reroll"></button>
     </div>
 
 </div>
@@ -14065,89 +14073,45 @@ on("sheet:opened", function() {
     setAttrs(values);
     });
 
-    var armors=[];
-    for(var i=1; i <9; i++) {
-        armors.push('armorname'+i);
-        armors.push('armorcapacity'+i);
-        armors.push('armornotes'+i);
-        armors.push('armorrating'+i);
-    }
-    armors.push('armormigration042021');
-    getAttrs(armors, function(values) {
-        var attributes={};
-        keys = Object.keys(values);
-
-        if(values.armormigration042021){
-            return;
-        }
-
-        if(keys.includes('armorname1') && values.armorname1 !== null) {
-            var newrowid=generateRowID()
-            attributes["repeating_armors_"+newrowid+"_armorname"]=values.armorname1;
-            attributes["repeating_armors_"+newrowid+"_armorrating"]=!!values.armorrating1 ? values.armorrating1 : "0";
-            attributes["repeating_armors_"+newrowid+"_armornotes"]=!!values.armornotes1 ? values.armornotes1 : "";
-            attributes["repeating_armors_"+newrowid+"_armorcapacity"]=!!values.armorcapacity1 ? values.armorcapacity1 : "0";
-        }
-
-        if(keys.includes('armorname2') && values.armorname2 !== null) {
-            var newrowid=generateRowID()
-            attributes["repeating_armors_"+newrowid+"_armorname"]=values.armorname2;
-            attributes["repeating_armors_"+newrowid+"_armorrating"]=!!values.armorrating2 ? values.armorrating2 : "0";
-            attributes["repeating_armors_"+newrowid+"_armornotes"]=!!values.armornotes2 ? values.armornotes2 : "";
-            attributes["repeating_armors_"+newrowid+"_armorcapacity"]=!!values.armorcapacity2 ? values.armorcapacity2 : "0";
-        }
-
-        if(keys.includes('armorname3') && values.armorname3 !== null) {
-            var newrowid=generateRowID()
-            attributes["repeating_armors_"+newrowid+"_armorname"]=values.armorname3;
-            attributes["repeating_armors_"+newrowid+"_armorrating"]=!!values.armorrating3 ? values.armorrating3 : "0";
-            attributes["repeating_armors_"+newrowid+"_armornotes"]=!!values.armornotes3 ? values.armornotes3 : "";
-            attributes["repeating_armors_"+newrowid+"_armorcapacity"]=!!values.armorcapacity3 ? values.armorcapacity3 : "0";
-        }
-
-        if(keys.includes('armorname4') && values.armorname4 !== null) {
-            var newrowid=generateRowID()
-            attributes["repeating_armors_"+newrowid+"_armorname"]=values.armorname4;
-            attributes["repeating_armors_"+newrowid+"_armorrating"]=!!values.armorrating4 ? values.armorrating4 : "0";
-            attributes["repeating_armors_"+newrowid+"_armornotes"]=!!values.armornotes4 ? values.armornotes4 : "";
-            attributes["repeating_armors_"+newrowid+"_armorcapacity"]=!!values.armorcapacity4 ? values.armorcapacity4 : "0";
-        }
-
-        if(keys.includes('armorname5') && values.armorname5 !== null) {
-            var newrowid=generateRowID()
-            attributes["repeating_armors_"+newrowid+"_armorname"]=values.armorname5;
-            attributes["repeating_armors_"+newrowid+"_armorrating"]=!!values.armorrating5 ? values.armorrating5 : "0";
-            attributes["repeating_armors_"+newrowid+"_armornotes"]=!!values.armornotes5 ? values.armornotes5 : "";
-            attributes["repeating_armors_"+newrowid+"_armorcapacity"]=!!values.armorcapacity5 ? values.armorcapacity5 : "0";
-        }
-
-        if(keys.includes('armorname6') && values.armorname6 !== null) {
-            var newrowid=generateRowID()
-            attributes["repeating_armors_"+newrowid+"_armorname"]=values.armorname6;
-            attributes["repeating_armors_"+newrowid+"_armorrating"]=!!values.armorrating6 ? values.armorrating6 : "0";
-            attributes["repeating_armors_"+newrowid+"_armornotes"]=!!values.armornotes6 ? values.armornotes6 : "";
-            attributes["repeating_armors_"+newrowid+"_armorcapacity"]=!!values.armorcapacity6 ? values.armorcapacity6 : "0";
-        }
-
-        if(keys.includes('armorname7') && values.armorname7 !== null) {
-            var newrowid=generateRowID()
-            attributes["repeating_armors_"+newrowid+"_armorname"]=values.armorname7;
-            attributes["repeating_armors_"+newrowid+"_armorrating"]=!!values.armorrating7 ? values.armorrating7 : "0";
-            attributes["repeating_armors_"+newrowid+"_armornotes"]=!!values.armornotes7 ? values.armornotes7 : "";
-            attributes["repeating_armors_"+newrowid+"_armorcapacity"]=!!values.armorcapacity7 ? values.armorcapacity7 : "0";
-        }
-
-        if(keys.includes('armorname8') && values.armorname8 !== null) {
-            var newrowid=generateRowID()
-            attributes["repeating_armors_"+newrowid+"_armorname"]=values.armorname8;
-            attributes["repeating_armors_"+newrowid+"_armorrating"]=!!values.armorrating8 ? values.armorrating8 : "0";
-            attributes["repeating_armors_"+newrowid+"_armornotes"]=!!values.armornotes8 ? values.armornotes8 : "";
-            attributes["repeating_armors_"+newrowid+"_armorcapacity"]=!!values.armorcapacity8 ? values.armorcapacity8 : "0";
-        }
-        attributes["armormigration042021"] = true;
-        setAttrs(attributes);
-    });
+    migrateComplexforms();
 });
+
+async function migrateComplexforms() {
+    let migrationDone = await asw.getAttrs(["complexformsMigration102022"]);
+    if(migrationDone.complexformsMigration102022){
+        return;
+    }
+
+    var attributes={};
+    let idarray = await asw.getSectionIDs("spells");
+    for (var i=0; i < idarray.length; i++) {
+        let repeatingValues = await asw.getAttrs([
+            "repeating_spells_" + idarray[i] + "_spellname" ,
+            "repeating_spells_" + idarray[i] + "_spelltype",
+            "repeating_spells_" + idarray[i] + "_spellcategory",
+            "repeating_spells_" + idarray[i] + "_spellrange",
+            "repeating_spells_" + idarray[i] + "_spellduration",
+            "repeating_spells_" + idarray[i] + "_spelldrain",
+            "repeating_spells_" + idarray[i] + "_spelldescription",
+            "repeating_spells_" + idarray[i] + "_spellbonus"]);
+
+        var newrowid = generateRowID();
+        var attributePrefix =  "repeating_spells_" + idarray[i];
+        attributes["repeating_complexforms_"+newrowid+"_spellname"] = repeatingValues[attributePrefix + "_spellname"];
+        attributes["repeating_complexforms_"+newrowid+"_spelltype"] = repeatingValues[attributePrefix + "_spelltype"];
+        attributes["repeating_complexforms_"+newrowid+"_spellschool"] = "@{skilldicepool42}";
+        attributes["repeating_complexforms_"+newrowid+"_spellcategory"] = repeatingValues[attributePrefix + "_spellcategory"];
+        attributes["repeating_complexforms_"+newrowid+"_spellrange"] = repeatingValues[attributePrefix + "_spellrange"];
+        attributes["repeating_complexforms_"+newrowid+"_spellduration"] = repeatingValues[attributePrefix + "_spellduration"];
+        attributes["repeating_complexforms_"+newrowid+"_spelldrain"] = repeatingValues[attributePrefix + "_spelldrain"];
+        attributes["repeating_complexforms_"+newrowid+"_spelldescription"] = repeatingValues[attributePrefix + "_spelldescription"];
+        attributes["repeating_complexforms_"+newrowid+"_spellbonus"] = repeatingValues[attributePrefix + "_spellbonus"];
+    }
+
+
+    attributes["complexformsMigration102022"] = true;
+    await asw.setAttrs(attributes);
+}
 
 on("sheet:opened", (eventInfo) => {
 	getAttrs(['character_name'], (v) => {
@@ -14367,7 +14331,7 @@ async function importSkillsTab(experimental, chummerfile) {
         console.log("Importing Skills");
         for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
             if(chummerfile.characters.character.skills.skill[i].knowledge=="True"){
-                var newrowid=generateRowID();
+                var newrowid = generateRowID();
                 attributes["repeating_knowledge_"+newrowid+"_knowledgename"]=chummerfile.characters.character.skills.skill[i].name;
                 if(chummerfile.characters.character.skills.skill[i].skillcategory_english!=null){
                   attributes["repeating_knowledge_"+newrowid+"_knowledgeattr"]="@{"+chummerfile.characters.character.skills.skill[i].skillcategory_english.toLowerCase();
@@ -14499,26 +14463,26 @@ async function importMagicTab(experimental, chummerfile) {
         if(chummerfile.characters.character.complexforms != null){
             console.log("Importing complexforms");
             if(chummerfile.characters.character.complexforms.complexform.length>1){
-                for(var i=0;i<chummerfile.characters.character.complexforms.complexform.length;i++){
+                for(var i=0; i<chummerfile.characters.character.complexforms.complexform.length; i++){
                     var newrowid=generateRowID();
-                    attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.complexforms.complexform[i].name;
-                    attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skilldicepool42}";
-                    attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.complexforms.complexform[i].duration;
+                    attributes["repeating_complexforms_"+newrowid+"_spellname"]=chummerfile.characters.character.complexforms.complexform[i].name;
+                    attributes["repeating_complexforms_"+newrowid+"_spellschool"]="@{skilldicepool42}";
+                    attributes["repeating_complexforms_"+newrowid+"_spellduration"]=chummerfile.characters.character.complexforms.complexform[i].duration;
                     if(chummerfile.characters.character.complexforms.complexform[i].fv.match(/(\-|\+)\d/)!=null){
-                        attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.complexforms.complexform[i].fv.match(/(\-|\+)\d/);
+                        attributes["repeating_complexforms_"+newrowid+"_spelldrain"]=chummerfile.characters.character.complexforms.complexform[i].fv.match(/(\-|\+)\d/);
                     }else{
-                        attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
+                        attributes["repeating_complexforms_"+newrowid+"_spelldrain"]="-0";
                     }
                 }
             }else{
                 var newrowid=generateRowID();
-                attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.complexforms.complexform.name;
-                attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skilldicepool42}";
-                attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.complexforms.complexform.duration;
+                attributes["repeating_complexforms_"+newrowid+"_spellname"]=chummerfile.characters.character.complexforms.complexform.name;
+                attributes["repeating_complexforms_"+newrowid+"_spellschool"]="@{skilldicepool42}";
+                attributes["repeating_complexforms_"+newrowid+"_spellduration"]=chummerfile.characters.character.complexforms.complexform.duration;
                 if(chummerfile.characters.character.complexforms.complexform.fv.match(/(\-|\+)\d/)!=null)
-                    attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.complexforms.complexform.fv.match(/(\-|\+)\d/);
+                    attributes["repeating_complexforms_"+newrowid+"_spelldrain"]=chummerfile.characters.character.complexforms.complexform.fv.match(/(\-|\+)\d/);
                 else
-                    attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
+                    attributes["repeating_complexforms_"+newrowid+"_spelldrain"]="-0";
             }
         }
     }catch(err){
@@ -14649,6 +14613,12 @@ function clearMagic(experimental) {
     getSectionIDs("repeating_initiation", function(idarray) {
         for(var i=0; i < idarray.length; i++) {
             removeRepeatingRow("repeating_initiation_"+idarray[i]);
+        }
+    });
+
+        getSectionIDs("repeating_complexforms", function(idarray) {
+        for(var i=0; i < idarray.length; i++) {
+            removeRepeatingRow("repeating_complexforms_"+idarray[i]);
         }
     });
 }
@@ -14790,32 +14760,45 @@ async function importEnhancementTab(text, chummerfile) {
             console.log("Importing martialarts");
             if(chummerfile.characters.character.martialarts.martialart.length>1){
                 for(var i=0;i<chummerfile.characters.character.martialarts.martialart.length;i++){
-                    if(chummerfile.characters.character.martialarts.martialart[i].martialarttechniques!=null){
-                        if(chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechniques.length>1){
-                            for(var j=0;j<chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechniques.length;j++){
+                    if(chummerfile.characters.character.martialarts.martialart[i].martialarttechniques != null){
+                        if(chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.length > 1){
+                            for(var j=0; j < chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.length; j++){
                                 var newrowid=generateRowID();
-                                attributes["repeating_martial_"+newrowid+"_martialname"]=chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique[j].name;
-                                attributes["repeating_martial_"+newrowid+"_martialdescription"]=chummerfile.characters.character.martialarts.martialart[i].name;
+                                attributes["repeating_martial_"+newrowid+"_martialname"] = chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique[j].name;
+                                attributes["repeating_martial_"+newrowid+"_martialdescription"] = chummerfile.characters.character.martialarts.martialart[i].name;
+                                if(chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique[j].notes != undefined) {
+                                    attributes["repeating_martial_"+newrowid+"_martialnotes"] = chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique[j].notes;
+                                }
                             }
                         }else{
+                            console.log(chummerfile.characters.character.martialarts.martialart[i]);
                             var newrowid=generateRowID();
                             attributes["repeating_martial_"+newrowid+"_martialname"]=chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique.name;
                             attributes["repeating_martial_"+newrowid+"_martialdescription"]=chummerfile.characters.character.martialarts.martialart[i].name;
+                            if(chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique.notes != undefined) {
+                                attributes["repeating_martial_"+newrowid+"_martialnotes"] = chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique.notes;
+                            }
                         }
                     }
                 }
             }else{
-                if(chummerfile.characters.character.martialarts.martialart.martialarttechniques!=null){
+                if(chummerfile.characters.character.martialarts.martialart.martialarttechniques != null){
                     if(chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique.length>1){
                         for(var j=0;j<chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique.length;j++){
                             var newrowid=generateRowID();
                             attributes["repeating_martial_"+newrowid+"_martialname"]=chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique[j].name;
                             attributes["repeating_martial_"+newrowid+"_martialdescription"]=chummerfile.characters.character.martialarts.martialart.name;
+                            if(chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique[j].notes != undefined) {
+                                attributes["repeating_martial_"+newrowid+"_martialnotes"] = chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique[j].notes;
+                            }
                         }
                     }else{
                         var newrowid=generateRowID();
                         attributes["repeating_martial_"+newrowid+"_martialname"]=chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique.name;
                         attributes["repeating_martial_"+newrowid+"_martialdescription"]=chummerfile.characters.character.martialarts.martialart.name;
+                        if(chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique.notes != undefined) {
+                            attributes["repeating_martial_"+newrowid+"_martialnotes"] = chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique.notes;
+                        }
                     }
                 }
             }
@@ -15611,9 +15594,6 @@ async function importSingleRepeatingWeapon(weapon, ammunition, attributes) {
             let amountImported = 0;
             //make clips unique
             var clips = [...new Map(weapon.clips.clip.slice().reverse().map(v => [v.name, v])).values()].reverse()
-
-            console.log(weapon.name);
-            console.log(clips);
 
             for(var j=0; j < clips.length && amountImported < 4; j++){
 
@@ -16717,7 +16697,7 @@ on('change:repeating_armors remove:repeating_armors', function(){
 ///////////////////////////
 
 on('clicked:roll', async (event) => {
-  	await startRoll( event.htmlAttributes.value + "{{glitch=[[0]]}}", (results) => {
+  	await startRoll( event.htmlAttributes.value + "{{glitch=[[0]]}}{{reroll=[[0]]}}", (results) => {
 
         var glitchComputed = 0;
         var amount = results.results.result.dice.filter(x => x == 1).length;
@@ -16730,17 +16710,23 @@ on('clicked:roll', async (event) => {
             }
         }
 
+        var reroll = {
+            dice: results.results.result.dice.length,
+            successes: results.results.result.result,
+            limit: results.results.limit_num != undefined ? results.results.limit_num.result + results.results.limit_mod.result : 100
+        }
+
 	  	finishRoll(
 		  	results.rollId,
 		  	{
 			  	glitch: glitchComputed,
-
+			  	reroll:  rollEscape.escape(reroll)
 		  	}
 	  	);
   	  });
 });
 
-on('clicked:repeating_knowledge:roll clicked:repeating_alchemy:roll clicked:repeating_critterpowers:roll clicked:repeating_perceptionusage:roll clicked:repeating_spells:roll',
+on('clicked:repeating_knowledge:roll clicked:repeating_alchemy:roll clicked:repeating_critterpowers:roll clicked:repeating_perceptionusage:roll clicked:repeating_spells:roll clicked:repeating_complexforms:roll',
      async (event) => {
 
 	// prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
@@ -16749,7 +16735,7 @@ on('clicked:repeating_knowledge:roll clicked:repeating_alchemy:roll clicked:repe
 
 	let rollPart = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
 
-  	await startRoll(rollPart + "{{glitch=[[0]]}}", (results) => {
+  	await startRoll(rollPart + "{{glitch=[[0]]}}{{reroll=[[0]]}}", (results) => {
 
         var glitchComputed = 0;
         var amount = results.results.result.dice.filter(x => x == 1).length;
@@ -16762,11 +16748,17 @@ on('clicked:repeating_knowledge:roll clicked:repeating_alchemy:roll clicked:repe
             }
         }
 
+        var reroll = {
+            dice: results.results.result.dice.length,
+            successes: results.results.result.result,
+            limit:  results.results.limit_num != undefined ? results.results.limit_num.result + results.results.limit_mod.result : 100
+        }
+
 	  	finishRoll(
 		  	results.rollId,
 		  	{
 			  	glitch: glitchComputed,
-
+                reroll:  rollEscape.escape(reroll)
 		  	}
 	  	);
   	  });
@@ -16879,6 +16871,38 @@ const rollExtended = async (ev) => {
     });
 }
 
+///////////////////
+//  Edge Reroll  //
+///////////////////
+
+on('clicked:reroll', async (ev) => {
+    await reroll(ev);
+});
+
+const reroll = async (ev) => {
+    // The data we passed into the button will be stored in the originalRollId key
+    let roll = rollEscape.unescape(ev.originalRollId);
+
+    let attrs = await asw.getAttrs(['gmroll','character_name']);
+
+    let rollBase = `${attrs.gmroll}&{template:reroll}{{name=${attrs.character_name}}}{{roll_name=again}}{{dice=[[${roll.dice}]]}}{{prior=[[${roll.successes}]]}}{{limit=Limit}}{{limit_num=[[${roll.limit}]]}}{{edgeSuccesses=[[0]]}}{{result=[[ {[[${roll.dice}-${roll.successes}]]d6>5sd+${roll.successes}, ${roll.limit}+0d0>1}kl1 ]] }}{{passthrough=[[0]]}}`;
+    let reroll = await startRoll(rollBase);
+
+    let passthrough = 0;
+    if( roll.attack != undefined) {
+        let attack = roll.attack;
+        attack.attackHits = reroll.results.result.result;
+        passthrough = rollEscape.escape(attack);
+    }
+
+    let edgeSuccesses = reroll.results.result.result - roll.successes;
+
+    finishRoll(reroll.rollId, {
+        passthrough: passthrough,
+        edgeSuccesses: edgeSuccesses
+    });
+}
+
 
 //////////////////////////////
 //  Dogable weapon attacks  //
@@ -16943,7 +16967,7 @@ on('clicked:repeating_ammotype1:roll clicked:repeating_ammotype2:roll clicked:re
 
 const rollDogableAttack = async (rollPart, dmgType) => {
 
-    let attackRoll = await startRoll( rollPart + " {{passthrough=[[0]]}}{{glitch=[[0]]}} ");
+    let attackRoll = await startRoll( rollPart + " {{passthrough=[[0]]}}{{glitch=[[0]]}}{{reroll=[[0]]}}");
 
     var glitchComputed = 0;
     var amount = attackRoll.results.result.dice.filter(x => x == 1).length;
@@ -16972,12 +16996,19 @@ const rollDogableAttack = async (rollPart, dmgType) => {
         attackDmgType: attackDmgType,
     }
 
+    var reroll = {
+        dice: attackRoll.results.result.dice.length,
+        successes: attackRoll.results.result.result,
+        limit: attackRoll.results.limit_num.result,
+        attack: rollData
+    }
+
     finishRoll(
         attackRoll.rollId,
         {
             glitch: glitchComputed,
             passthrough: rollEscape.escape(rollData),
-
+            reroll:  rollEscape.escape(reroll)
         }
     );
 }
@@ -17038,7 +17069,6 @@ const rollReactSoak = async (ev) => {
 
     if(dmgType.includes('P') && attrs.armor_total > 0) {
      dmgType = dmgRoll.attackDamage > (attrs.armor_total + armorPenetration + soakRoll.results.mod.result) ? dmgRoll.attackDmgType : 'S';
-     console.log("resulting dmgType: "+dmgType+ " dmg: "+dmgRoll.attackDamage+" armorResult: "+ (attrs.armor_total + armorPenetration + soakRoll.results.mod.result));
     }
 
     finishRoll(soakRoll.rollId, {
@@ -17258,17 +17288,17 @@ const asw = (() => {
         </tr>
         {{#rollGreater() result 1}}
         <tr class="sheet-rolltemplate-results-success">
-            <td class="result">{{result}} Successes</td>
+            <td class="result">{{result}} [Successes](~{{name}}|reroll||{{computed::reroll}})</td>
         </tr>
         {{/rollGreater() result 1}}
         {{#rollTotal() result 1}}
         <tr class="sheet-rolltemplate-results-success">
-            <td class="result">{{result}} Success</td>
+            <td class="result">{{result}} [Success](~{{name}}|reroll||{{computed::reroll}})</td>
         </tr>
         {{/rollTotal() result 1}}
         {{#rollTotal() result 0}}
         <tr class="sheet-rolltemplate-results-fail">
-            <td class="result">{{result}} Successes</td>
+            <td class="result">{{result}} [Successes](~{{name}}|reroll||{{computed::reroll}})</td>
         </tr>
         {{/rollTotal() result 0}}
         {{#rollBetween() computed::glitch 1 1}}
@@ -17361,6 +17391,86 @@ const asw = (() => {
     {{/^rollTotal() computed::passthrough 0}}
     {{/rollGreater() result 0}}
 
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-reroll">
+    <table>
+        <tr>
+            <th>
+                {{#name}}{{name}} rolls{{#roll_name}} {{roll_name}}{{/roll_name}}{{/name}}</th>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"> </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-sectionheading">Dicepool</div>
+            </td>
+        </tr>
+        {{#dice}}
+        <tr>
+            <td>> Dice({{dice}})</td>
+        </tr>
+        {{/dice}}
+        {{#prior}}
+        <tr>
+            <td>> Prior successes({{prior}})</td>
+        </tr>
+        {{/prior}}
+        {{#limit}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"> </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-sectionheading">Limit</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-limit">> {{limit}}({{limit_num}})</div>
+            </td>
+        </tr>
+        {{/limit}}
+        {{#result}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"> </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-sectionheading">Result</div>
+            </td>
+        </tr>
+        {{#rollGreater() result 1}}
+        <tr class="sheet-rolltemplate-results-success">
+            <td class="result"> {{prior}}+{{computed::edgeSuccesses}} = {{result}} Successes</td>
+        </tr>
+        {{/rollGreater() result 1}}
+        {{#rollTotal() result 1}}
+        <tr class="sheet-rolltemplate-results-success">
+            <td class="result"> {{prior}}+{{computed::edgeSuccesses}} = {{result}} Success</td>
+        </tr>
+        {{/rollTotal() result 1}}
+        {{#rollTotal() result 0}}
+        <tr class="sheet-rolltemplate-results-fail">
+            <td class="result"> {{prior}}+{{computed::edgeSuccesses}} = {{result}} Successes</td>
+        </tr>
+        {{/rollTotal() result 0}}
+        {{/result}}
+    </table>
+    {{#rollGreater() result 0}}
+    {{#^rollTotal() computed::passthrough 0}}
+    <div class="sheet-rolltemplate-button">
+        [Dodge](~selected|reactdodge||{{computed::passthrough}})
+    </div>
+    {{/^rollTotal() computed::passthrough 0}}
+    {{/rollGreater() result 0}}
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-extendedRoll">
