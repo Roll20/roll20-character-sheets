@@ -15361,7 +15361,12 @@ async function importSingleWeapon(weapon, number,  ammunition, attributes) {
         attributes["weaponrc"+number] = weapon.rc.match(/\d+/g).pop()-Math.ceil((parseInt(attributes.str_base) + parseInt(attributes.str_aug))/3)- 1;
 
         if(weapon.rawdamage.match(/\d+/) !== null && !weapon.rawdamage.includes("STR")) {
-            attributes["weapondv"+number] = weapon.rawdamage.match(/\d+/)[0];
+            if(weapon.damage_noammo_english != null) {
+                attributes["weapondv"+number] = weapon.damage_noammo_english.match(/\d+/)[0];
+            }
+            else {
+                attributes["weapondv"+number] = weapon.rawdamage.match(/\d+/)[0];
+            }
         }
         else if(weapon.rawdamage.includes("STR")) {
            attributes["weapondv"+number] = weapon.damage.match(/\d+/)[0];
@@ -15379,13 +15384,25 @@ async function importSingleWeapon(weapon, number,  ammunition, attributes) {
     }
 
     attributes["weaponname"+number] = weapon.name;
-    attributes["weaponaccuracy"+number] = weapon.accuracy.match(/\d+/g).pop();
+    console.log(weapon);
+    if(weapon.accuracy_noammo != null) {
+        attributes["weaponaccuracy"+number] = weapon.accuracy_noammo.match(/\d+/g).pop();
+    }
+    else {
+        attributes["weaponaccuracy"+number] = weapon.accuracy.match(/\d+/g).pop();
+    }
+
     if(isNaN(weapon.ap)){
         attributes["weaponap"+number] = 0;
     }else{
-        attributes["weaponap"+number] = weapon.ap;
-        if(weapon.rawap != null) {
-            attributes["weaponap"+number] = weapon.rawap;
+        if(weapon.ap_noammo != null) {
+         attributes["weaponap"+number] = weapon.ap_noammo;
+        }
+        else {
+            attributes["weaponap"+number] = weapon.ap;
+            if(weapon.rawap != null) {
+                attributes["weaponap"+number] = weapon.rawap;
+            }
         }
     }
     attributes["weaponnotes"+number] = "";
