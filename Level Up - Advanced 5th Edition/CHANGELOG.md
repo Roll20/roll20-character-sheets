@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2022-11-22 ** v.15 Paul V
+	Fixed all the Passive Checks to be 10+modifiers+stat modifier and not +stat
+	Fixed issue where the Skill speciality couldn't be edited on the main screen, it can now be edited on both main screen and popup
 **2022-11-15 ** v.15 Paul V
 	Added new Dice rolling logic, that gathers the components of the dice roll when the button is press this means that the every roll on the sheet doesn't need to be updated everytime standard/Advantage/Disdadvantage is pressed
 	Fixed Wisdom (perception) initiative to use Wisdom
