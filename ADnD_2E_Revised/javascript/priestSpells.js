@@ -6554,7 +6554,7 @@ priq['Undead Plague'] = {
     'sphere': 'Necromantic',
     'range': '1 mile',
     'duration': 'Special',
-    'aoe': '[[100*[[@{level-priest}]] ]]-yard square',
+    'aoe': '100-yard square/level',
     'components': '',
     'cast-time': '2 rounds',
     'saving-throw': 'None',

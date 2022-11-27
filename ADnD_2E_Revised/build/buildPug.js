@@ -56,11 +56,11 @@ spellsJs.forEach(jsFile => {
     html += pug.renderFile(path.join(pugFolder, 'spellsDatalists.pug'), {pretty: true, data: spells});
 
     if (jsFile === 'wizardSpells.js') {
-        let schoolTable = pug.renderFile(path.join(pugFolder, 'schoolsOverview.pug'), {pretty: true, data: spells});
+        let schoolTable = pug.renderFile(path.join(pugFolder, 'schoolsOverview.pug'), {pretty: true, data: spells, booksPriority});
         fs.writeFileSync(path.join(miscFolder, 'schools-overview.html'), schoolTable);
     }
     if (jsFile === 'priestSpells.js') {
-        let sphereTable = pug.renderFile(path.join(pugFolder, 'spheresOverview.pug'), {pretty: true, data: spells});
+        let sphereTable = pug.renderFile(path.join(pugFolder, 'spheresOverview.pug'), {pretty: true, data: spells, booksPriority});
         fs.writeFileSync(path.join(miscFolder, 'spheres-overview.html'), sphereTable);
     }
 });
