@@ -5784,7 +5784,14 @@
 <input type="hidden" name="attr_primary_range_weapon" value="select a Primary in Arms" />
 <input type="hidden" name="attr_primary_range_weapon_skill" />
 <input type="hidden" name="attr_primary_range_weapon_damage" />
+<input type="hidden" name="attr_primary_range_weapon_damage_mod" />
+<input type="hidden" name="attr_primary_range_weapon_near_mod" />
+<input type="hidden" name="attr_primary_range_weapon_close_mod" />
+<input type="hidden" name="attr_primary_range_weapon_medium_mod" />
+<input type="hidden" name="attr_primary_range_weapon_far_mod" />
+<input type="hidden" name="attr_primary_range_weapon_extreme_mod" />
 <input type="hidden" name="attr_primary_range_weapon_dicepool" />
+<input type="hidden" name="attr_primary_range_weapon_dicepool_mod" />
 <input type="hidden" name="attr_primary_range_weapon_spec" />
 <input type="hidden" name="attr_primary_range_weapon_expert" />
 <input type="hidden" name="attr_primary_range_weapon_ammo" />
@@ -6480,7 +6487,6 @@ const rollButtons = {
 
 	natural_healing_physical: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{natural} ^{healing} ^{physical}\n^{body} + ^{body}}}{{dice=[[(@{body}+@{body}+?{Medical Care?|No,0|Yes,2})d6>5cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Natural Healing (Physical), This test can be performed once per 24 hours of rest to recover Overflow/Physical damage.\n\n&star; Duration is halved with the Quick Healer quality.}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	natural_healing_stun: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{natural} ^{healing} ^{stun}\n^{body} + ^{willpower}}}{{dice=[[(@{body}+@{willpower}+?{Medical Care?|No,0|Yes,2})d6>5cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Natural Healing (Stun), This test can be performed once per hour of rest to recover stun damage.  &star;Duration is halved with the Quick Healer quality}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
-
 
 	rangeweapon: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name}}}{{dice=[[(@{rating}+@{attr_rating}+@{spec}+@{expert}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Mode @{mode}, Damage @{damage}, Skill: @{skill}, Attribute: @{attribute}, Notes @{notes}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	meleeweapon: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name}}}{{dice=[[(@{rating}+@{attr_rating}+@{spec}+@{expert}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Damage @{damage}, Skill: @{skill}, Attribute: @{attribute}, Notes: @{notes}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
@@ -7349,11 +7355,12 @@ on("clicked:primary_ammo", (eventInfo) => {
 	});
 });
 
-on("change:primary_range_weapon_mode change:primary_range_weapon_ammo_type", (eventInfo) => {
+on("change:primary_range_weapon_mode change:primary_range_weapon_ammo_type change:primary_range_weapon_dicepool_mod change:primary_range_weapon_damage_mod change:primary_range_weapon_close_mod change:primary_range_weapon_near_mod change:primary_range_weapon_medium_mod change:primary_range_weapon_far_mod change:primary_range_weapon_extreme_mod", (eventInfo) => {
 	var rounds = 1;
 	var split_dicepool = 0;
 
-	getAttrs(['primary_range_weapon_mode', 'primary_range_weapon_ammo_type', 'primary_range_weapon_base_damage', 'primary_range_weapon_base_close', 'primary_range_weapon_base_near', 'primary_range_weapon_base_medium', 'primary_range_weapon_base_far', 'primary_range_weapon_base_extreme', 'primary_range_weapon_split_dicepool'], (v) => {
+	getAttrs(['primary_range_weapon_mode', 'primary_range_weapon_ammo_type', 'primary_range_weapon_base_damage', 'primary_range_weapon_base_close', 'primary_range_weapon_base_near', 'primary_range_weapon_base_medium', 'primary_range_weapon_base_far', 'primary_range_weapon_base_extreme', 'primary_range_weapon_split_dicepool', 'primary_range_weapon_damage_mod', 'primary_range_weapon_dicepool_mod', 'primary_range_weapon_close_mod', 'primary_range_weapon_near_mod', 'primary_range_weapon_medium_mod', 'primary_range_weapon_far_mod', 'primary_range_weapon_extreme_mod'], (v) => {
+console.log(v);
 		var toSet = {
 			primary_range_weapon_damage: v.primary_range_weapon_base_damage,
 			primary_range_weapon_close: v.primary_range_weapon_base_close,
@@ -7365,12 +7372,12 @@ on("change:primary_range_weapon_mode change:primary_range_weapon_ammo_type", (ev
 
 		var mods = {
 			arMod: 0,
-			arModC: 0,
-			arModN: 0,
-			arModM: 0,
-			arModF: 0,
-			arModE: 0,
-			dvMod: 0,
+			arModC: v.primary_range_weapon_close_mod | 0,
+			arModN: v.primary_range_weapon_near_mod | 0,
+			arModM: v.primary_range_weapon_medium_mod | 0,
+			arModF: v.primary_range_weapon_far_mod | 0,
+			arModE: v.primary_range_weapon_extreme_mod | 0,
+			dvMod: v.primary_range_weapon_damage_mod | 0,
 			dv_type: ''
 		};
 
