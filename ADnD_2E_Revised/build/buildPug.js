@@ -24,7 +24,7 @@ const booksPriority = [
     {book: 'The Complete Druid\'s Handbook', print: ''},
     {book: 'The Complete Barbarian\'s Handbook', print: ''},
     {book: 'The Complete Book of Necromancers', print: ''},
-    {book: 'The Complete Ninja\'s Handbook', print: ''},
+    {book: 'The Complete Ninja\'s Handbook', print: '2nd printing, March 1996'},
     {book: 'Player\'s Option: Combat & Tactics', print: ''},
     {book: 'Player\'s Option: Skills & Powers', print: ''},
     {book: 'Player\'s Option: Spells & Magic', print: ''},
