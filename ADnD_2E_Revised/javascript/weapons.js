@@ -1020,7 +1020,7 @@ WEAPONS_TABLE['whip'].push({
     'speed': 8,
     'small-medium': '1d2',
     'large': '1',
-    'book': ['PHB','Arms and Equipment Guide'],
+    'book': ['PHB','Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
     'category': ['Melee']
 });
 
@@ -3142,13 +3142,10 @@ WEAPONS_TABLE['lasso'].push({
     'size': 'L',
     'type': '—',
     'speed': 7,
-    'rof': '',
-    'range': '',
-    'strength': true,
     'small-medium': '',
     'large': '',
     'book': ['The Complete Ninja\'s Handbook'],
-    'category': ['Range']
+    'category': ['Melee']
 });
 
 WEAPONS_TABLE['manriki-gusari (chain)'] = [];
@@ -3163,7 +3160,7 @@ WEAPONS_TABLE['manriki-gusari (chain)'].push({
     'small-medium': '1d4+1',
     'large': '1d4',
     'book': ['The Complete Ninja\'s Handbook'],
-    'category': ['Melee', 'Range']
+    'category': ['Melee','Range']
 });
 
 WEAPONS_TABLE['metsubishi (blinding powders)'] = [];
@@ -3172,7 +3169,7 @@ WEAPONS_TABLE['metsubishi (blinding powders)'].push({
     'size': 'S',
     'type': '—',
     'speed': 3,
-    'rof': '1/2',
+    'rof': '1/3',
     'range': '3’/—/—',
     'small-medium': '—',
     'large': '—',
@@ -3183,7 +3180,7 @@ WEAPONS_TABLE['metsubishi (blinding powders)'].push({
 WEAPONS_TABLE['nage teppo (grenades)'] = [];
 WEAPONS_TABLE['nage teppo (grenades)'].push({
     'name': 'Nage teppo (grenades)',
-    'size': '—',
+    'size': '',
     'type': 'B',
     'speed': 9,
     'rof': '1',
@@ -3576,8 +3573,8 @@ WEAPONS_TABLE['bokken, two-handed (wooden sword)'].push({
     'size': 'M',
     'type': 'B',
     'speed': 4,
-    'small-medium': '2d6',
-    'large': '1d6',
+    'small-medium': '1d6',
+    'large': '1d3',
     'book': ['The Complete Ninja\'s Handbook'],
     'category': ['Melee']
 });
@@ -6484,7 +6481,7 @@ WEAPONS_TABLE['torch'].push({
     'name': 'Torch',
     'noProf': true,
     'size': 'M',
-    'type': 'Bd',
+    'type': 'B',
     'speed': 4,
     'reach': '1',
     'rof': '1',
