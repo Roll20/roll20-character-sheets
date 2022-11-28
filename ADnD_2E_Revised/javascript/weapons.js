@@ -187,7 +187,7 @@ WEAPONS_TABLE['light crossbow, light quarrel'].push({
     'range': '60/120/180',
     'small-medium': '1d4',
     'large': '1d4',
-    'book': ['PHB','The Complete Ninja\'s Handbook'],
+    'book': ['PHB'],
     'category': ['Range']
 });
 
@@ -1912,7 +1912,7 @@ WEAPONS_TABLE['light crossbow, light quarrel'].push({
     'range': '60/120/180',
     'small-medium': '1d4',
     'large': '1d4',
-    'book': ['Arms and Equipment Guide'],
+    'book': ['Arms and Equipment Guide','The Complete Ninja\'s Handbook'],
     'category': ['Range']
 });
 
@@ -2970,7 +2970,7 @@ WEAPONS_TABLE['chu-ko-nu (repeater), light quarrel'].push({
     'name': 'Chu-ko-nu (repeater), Light quarrel',
     'group': 'Crossbow',
     'size': 'M',
-    'ammo-size': 'S',
+    'ammo-size': 'M',
     'type': 'P',
     'speed': 10,
     'rof': '3/2',
@@ -2996,11 +2996,11 @@ WEAPONS_TABLE['fang'].push({
 WEAPONS_TABLE['fukimi-bari (mouth darts)'] = [];
 WEAPONS_TABLE['fukimi-bari (mouth darts)'].push({
     'name': 'Fukimi-bari (mouth darts)',
-    'rof': '1',
-    'range': '3’/—/—',
     'size': 'S',
     'type': 'P',
     'speed': 1,
+    'rof': '1',
+    'range': '3’/—/—',
     'small-medium': '1d2',
     'large': '1d2',
     'book': ['The Complete Ninja\'s Handbook'],
@@ -3072,10 +3072,12 @@ WEAPONS_TABLE['kau sin ke (whipping chain)'].push({
     'size': 'L',
     'type': 'B',
     'speed': 7,
+    'rof': '',
+    'range': '',
     'small-medium': '1d8',
     'large': '1d6',
     'book': ['The Complete Ninja\'s Handbook'],
-    'category': ['Melee']
+    'category': ['Melee','Range']
 });
 
 WEAPONS_TABLE['kawanaga (grapnel)'] = [];
