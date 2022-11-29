@@ -6645,7 +6645,7 @@ wiz1['Fire Burst'] = {
     'school-spells-and-magic': 'Alteration, Invocation/Evocation, Elemental Fire, Alchemy',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Instantaneous',
-    'aoe': 'One 10-foot-radius circle',
+    'aoe': 'One 10’-radius circle',
     'components': 'V, S',
     'cast-time': '1',
     'saving-throw': 'Negate',
@@ -6722,7 +6722,7 @@ wiz1['Metamorphose Liquids'] = {
     'school-spells-and-magic': 'Alteration, Elemental Water, Alchemy',
     'range': 'Touch',
     'duration': 'Permanent',
-    'aoe': '[[@{level-wizard}]]-foot cube',
+    'aoe': '[[@{level-wizard}]]’ cube',
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'Special',
@@ -7400,7 +7400,7 @@ wiz4['There/Not There'] = {
     'school-spells-and-magic': 'Geometry, Wild Magic',
     'range': '30 yards',
     'duration': '1-6 turns',
-    'aoe': '10-foot cube',
+    'aoe': '10’ cube',
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
@@ -8982,10 +8982,10 @@ wiz2['Featherfoot'] = {
     'level': '2',
     'school': 'Alteration (Reversible)',
     'range': 'Touch',
-    'duration': '1 turn',
+    'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': 'One creature',
     'components': 'S',
-    'cast-time': '[[5*[[@{level-wizard}]] ]] rounds',
+    'cast-time': '1 turn',
     'saving-throw': 'None',
     'materials': '',
     'reference': 'p. 19',
@@ -8993,7 +8993,7 @@ wiz2['Featherfoot'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The person affected by this spell gains the magical ability to move quietly and weightlessly at a normal walking pace or slower. If he tries to go any faster, the effect of the spell is lost.\n&emsp;While the spell is in effect, the character gains +30% to his move silently roll. (If he does not possess this skill, for the duration of the spell he performs as though he does possess the skill with a score of 30%.)\n&emsp;The person affected by this spell does not leave any footprints, nor does he set off weight- or pressure-based traps.\n&emsp;The reverse of this spell, *leadfoot*, affects one creature. The victim is allowed a saving throw to avoid being affected by the spell.\n&emsp;The victim of a *leadfoot* spell moves loudly and heavily. He cannot move silently or hide in shadows, and automatically sets off any pressure-based traps he steps on. (No roll is necessary.)\n&emsp;A *leadfooted* character inside the area of a *silence* spell moves normally; he can be heard if he fails to make a move silently roll.'
+    'effect': 'The person affected by this spell gains the magical ability to move quietly and weightlessly at a normal walking pace or slower. If he tries to go any faster, the effect of the spell is lost.\n&emsp;While the spell is in effect, the character gains +30% to his move silently roll. (If he does not possess this skill, for the duration of the spell he performs as though he does possess the skill with a score of 30%.)\n&emsp;The person affected by this spell does not leave any footprints, nor does he set off weight- or pressure-based traps.\n&emsp;The reverse of this spell, *leadfoot*, affects one creature. The victim is allowed a saving throw to avoid being affected by the spell.\n&emsp;The victim of a *leadfoot* spell moves loudly and heavily. He cannot move silently or hide in shadows, and automatically sets off any pressure-based traps he steps on. (No roll is necessary.)\n&emsp;A *leadfooted* character inside the area of a *silence* spell moves normally; he can be heard if he fails to make a move silently roll.\n&emsp;(***Sheet Author’s note:*** Duration and casting time has been swapped from as written in the book, since increasing cast time made no sense and was not consistent with *Improve Featherfoot*.)'
 };
 
 wiz3['Age to Destruction'] = {

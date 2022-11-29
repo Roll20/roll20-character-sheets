@@ -5446,7 +5446,7 @@ pri5['Shrieking Walls'] = {
     'sphere': 'Wards',
     'range': 'Touch',
     'duration': '[[@{level-priest}]] days',
-    'aoe': '20-foot-cube',
+    'aoe': '20’-cube',
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
