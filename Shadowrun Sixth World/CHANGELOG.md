@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2022-12-05 ** v.66 Chuz (James Culp)
+	New Feature - Added modifiers for range_weapon_close_mod, range_weapon_near_mod, range_weapon_medium_mod, range_weapon_far_mod, range_weapon_extreme_mod, range_weapon_damage_mod for changing the ARs at various ranges and the damage for the primary weapon.
+	New Feature - Added modifiers for single_shot_penalty_mod, semi_auto_penalty_mod, burst_fire_penalty_mod, burst_wide_penalty_mod, full_auto_penalty_mod for changing the AR penalties for firing modes.
 **2022-11-21 ** v.65 Chuz (James Culp)
 	Bugfix - PC Weapon skills weren't applying the -1 unskilled penalty to some skills, this has been updated however users will need to update the skill to something else and back to trigger the data change.
 	Bugfix - PC Sheet imported from Genesis in a non-English language had many problems mostly related to skills.  I believe I've fixed these issues please report any new ones

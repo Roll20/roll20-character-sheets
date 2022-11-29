@@ -894,6 +894,8 @@
 				<span name="attr_primary_range_weapon_ammo_max" title="@{primary_range_weapon_ammo_max}"></span>
 				<button class="pictos shots" name="act_reload" type="action" data-i18n-title="reload">0</button>
 			</div>
+
+
 			<div>
 				<span>&nbsp;</span>
 			</div>
@@ -3345,6 +3347,11 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
+								<span class="changelog-entry">**2022-12-05 ** v.66 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">F</span><b>New Feature</b> - Added modifiers for range_weapon_close_mod, range_weapon_near_mod, range_weapon_medium_mod, range_weapon_far_mod, range_weapon_extreme_mod, range_weapon_damage_mod for changing the ARs at various ranges and the damage for the primary weapon.
+									<li><span class="bullet">F</span><b>New Feature</b> - Added modifiers for single_shot_penalty_mod, semi_auto_penalty_mod, burst_fire_penalty_mod, burst_wide_penalty_mod, full_auto_penalty_mod for changing the AR penalties for firing modes.
+								</ul>
 								<span class="changelog-entry">**2022-11-21 ** v.65 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">A</span><b>Bugfix</b> - PC Weapon skills weren't applying the -1 unskilled penalty to some skills, this has been updated however users will need to update the skill to something else and back to trigger the data change.
@@ -6666,7 +6673,7 @@ const initiatives = {
 };
 
 
-// Initiative Rollers
+// Initiative Rollers"
 Object.keys(initiatives).forEach((ini) => {
 	on(`clicked:${ini}`, (eventInfo) => {
 
@@ -7111,12 +7118,41 @@ var check_glitches = (v, rolled, hits) => {
 
 
 
+// Wild Die toggle changed
+on("change:wild_die", (eventInfo) => {
+console.log(eventInfo);
+	if(eventInfo.newValue == 0) {
+		setAttrs({
+			wild_die1: eventInfo.newValue,
+			wild_die2: eventInfo.newValue
+		});
+	} else {
+		setAttrs({
+			wild_die1: "?{Wild Dice for First Roll?|0}",
+			wild_die2: "?{Wild Dice for Second Roll?|0}"
+		});
+	}
+});
+
+
+on("change:character_name", (eventInfo) => {
+	set_display_name(eventInfo.newValue);
+});
+
+var set_display_name = (name) => {
+	character_name = name.replace(/[\}\)\|]/g, '*');
+	setAttrs({
+		character_name: character_name
+	});
+};
+
+
+
 /*******************************************
 * Modifications field processing           *
 * - This allows custom attribute overrides *
 *   via the 'Modifications' inputs         *
 *******************************************/
-//"
 on("change:repeating_quality:modifications remove:repeating_quality change:repeating_augmentations:modifications remove:repeating_augmentations change:repeating_items:modifications remove:repeating_items change:repeating_devices:modifications remove:repeating_devices change:repeating_programs:modifications change:repeating_programs:powered_on remove:repeating_programs change:repeating_echoes:modifications remove:repeating_echoes change:repeating_forms:modifications remove:repeating_forms change:repeating_powers:modifications remove:repeating_powers change:repeating_metamagic remove:repeating_metamagic change:repeating_effects remove:repeating_effects change:repeating_effects:active", (eventInfo) => {
 	var allowed_modifiers = [
 		'body_modifier', 'agility_modifier', 'reaction_modifier', 'strength_modifier', 'willpower_modifier', 'logic_modifier', 'intuition_modifier', 'charisma_modifier',
@@ -7128,7 +7164,6 @@ on("change:repeating_quality:modifications remove:repeating_quality change:repea
 		'combat_paralysis'
 	];
 
-console.log(eventInfo);
 	repName = /(.+-[^_]+)_(.*)$/.exec(eventInfo.triggerName);
 	if(! repName) {
 		repName = eventInfo.triggerName;
@@ -7143,17 +7178,14 @@ console.log(eventInfo);
 			return;
 		}
 
-console.log(v);
 
 		// If we're using either powered_on or active buttons we need to make sure the toggle is on for one of them
 		//		and we only do this if the modifications itself was changed
 		if(eventInfo.sourceAttribute.includes("modifications")) {
 			if(v[`${repName}_powered_on`] && v[`${repName}_powered_on`] !== "on") {
-//console.log("not powered 'on', returning");
 				return;
 			}
 			if(v[`${repName}_active`] && v[`${repName}_active`] !== "on") {
-//console.log("not active 'on', returning");
 				return;
 			}
 		}
@@ -7173,14 +7205,12 @@ console.log(v);
 
 
 
-		// If it's actually a removal of the repeating item we need to make sure if the item has powered_on or active buttons that it's not off (if it's off the mods were already removed)
+		// If it is actually a removal of the repeating item we need to make sure if the item has powered_on or active buttons that it's not off (if it's off the mods were already removed)
 		if(eventInfo.removedInfo) {
 			if(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_powered_on`] && eventInfo.removedInfo[`${eventInfo.sourceAttribute}_powered_on`] !== "on") {
-//console.log("not powered 'on', do nothing");
 				return;
 			}
 			if(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_active`] && eventInfo.removedInfo[`${eventInfo.sourceAttribute}_active`] !== "on") {
-//console.log("not active 'on', do nothing");
 				return;
 			}
 
@@ -7188,7 +7218,7 @@ console.log(v);
 			eventInfo.newValue = '';
 		}
 
-		// if previousValue and newValue are the same and it wasn't removed it was added. Not sure why roll20 gives us the newValue as previousValue when creating an entry
+		// if previousValue and newValue are the same and it was not removed it was added. Not sure why roll20 gives us the newValue as previousValue when creating an entry
 		if(eventInfo.previousValue === eventInfo.newValue) {
 			eventInfo.previousValue = '';
 		}
@@ -7241,35 +7271,6 @@ console.log(v);
 
 	});
 });
-
-
-// Wild Die toggle changed
-on("change:wild_die", (eventInfo) => {
-console.log(eventInfo);
-	if(eventInfo.newValue == 0) {
-		setAttrs({
-			wild_die1: eventInfo.newValue,
-			wild_die2: eventInfo.newValue
-		});
-	} else {
-		setAttrs({
-			wild_die1: "?{Wild Dice for First Roll?|0}",
-			wild_die2: "?{Wild Dice for Second Roll?|0}"
-		});
-	}
-});
-
-
-on("change:character_name", (eventInfo) => {
-	set_display_name(eventInfo.newValue);
-});
-
-var set_display_name = (name) => {
-	character_name = name.replace(/[\}\)\|]/g, '*');
-	setAttrs({
-		character_name: character_name
-	});
-};
 
 var update_attribute = (attr) => {
 	getAttrs([`${attr.key}`], (v) => {
