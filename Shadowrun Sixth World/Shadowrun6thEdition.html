@@ -5795,6 +5795,12 @@
 <input type="hidden" name="attr_primary_range_weapon_spec" />
 <input type="hidden" name="attr_primary_range_weapon_expert" />
 <input type="hidden" name="attr_primary_range_weapon_ammo" />
+
+<input type="hidden" name="attr_full_auto_penalty_mod" />
+<input type="hidden" name="attr_burst_fire_penalty_mod" />
+<input type="hidden" name="attr_burst_wide_penalty_mod" />
+<input type="hidden" name="attr_semi_auto_penalty_mod" />
+<input type="hidden" name="attr_single_shot_penalty_mod" />
 <input type="hidden" name="attr_shots_fired" value="1" />
 
 <input type="hidden" name="attr_primary_melee_weapon" value="select a Primary in Arms" />
@@ -7355,11 +7361,12 @@ on("clicked:primary_ammo", (eventInfo) => {
 	});
 });
 
-on("change:primary_range_weapon_mode change:primary_range_weapon_ammo_type change:primary_range_weapon_dicepool_mod change:primary_range_weapon_damage_mod change:primary_range_weapon_close_mod change:primary_range_weapon_near_mod change:primary_range_weapon_medium_mod change:primary_range_weapon_far_mod change:primary_range_weapon_extreme_mod", (eventInfo) => {
+on("change:primary_range_weapon_mode change:primary_range_weapon_ammo_type change:primary_range_weapon_dicepool_modifier change:primary_range_weapon_damage_mod change:primary_range_weapon_close_mod change:primary_range_weapon_near_mod change:primary_range_weapon_medium_mod change:primary_range_weapon_far_mod change:primary_range_weapon_extreme_mod", (eventInfo) => {
 	var rounds = 1;
 	var split_dicepool = 0;
 
-	getAttrs(['primary_range_weapon_mode', 'primary_range_weapon_ammo_type', 'primary_range_weapon_base_damage', 'primary_range_weapon_base_close', 'primary_range_weapon_base_near', 'primary_range_weapon_base_medium', 'primary_range_weapon_base_far', 'primary_range_weapon_base_extreme', 'primary_range_weapon_split_dicepool', 'primary_range_weapon_damage_mod', 'primary_range_weapon_dicepool_mod', 'primary_range_weapon_close_mod', 'primary_range_weapon_near_mod', 'primary_range_weapon_medium_mod', 'primary_range_weapon_far_mod', 'primary_range_weapon_extreme_mod'], (v) => {
+	getAttrs(['primary_range_weapon_mode', 'primary_range_weapon_ammo_type', 'primary_range_weapon_base_damage', 'primary_range_weapon_base_close', 'primary_range_weapon_base_near', 'primary_range_weapon_base_medium', 'primary_range_weapon_base_far', 'primary_range_weapon_base_extreme', 'primary_range_weapon_split_dicepool', 'primary_range_weapon_damage_mod', 'primary_range_weapon_dicepool_mod', 'primary_range_weapon_close_mod', 'primary_range_weapon_near_mod', 'primary_range_weapon_medium_mod', 'primary_range_weapon_far_mod', 'primary_range_weapon_extreme_mod', 'full_auto_penalty_mod', 'burst_fire_penalty_mod', 'burst_wide_penalty_mod', 'semi_auto_penalty_mod', 'single_shot_penalty_mod'], (v) => {
+
 console.log(v);
 		var toSet = {
 			primary_range_weapon_damage: v.primary_range_weapon_base_damage,
@@ -7387,17 +7394,20 @@ console.log(v);
 			case "Full Auto":
 				// 10 rounds, AR -6
 				rounds = 10;
+				mods.arMod += v.full_auto_penalty_mod | 0;
 				mods.arMod += -6;
 				break;
 			case "Burst Fire":
 				// 4 rounds, AR -4, DV +2
 				rounds = 4;
+				mods.arMod += v.burst_fire_penalty_mod | 0;
 				mods.arMod += -4;
 				mods.dvMod += 2;
 				break;
 			case "Burst Fire Wide":
 				// 4 rounds, AR -4, split dice pool 2 parts
 				rounds = 4;
+				mods.arMod += v.burst_wide_penalty_mod | 0;
 				mods.arMod += -4;
 				mods.dvMod += 0;
 				split_dicepool = 2;
@@ -7405,6 +7415,7 @@ console.log(v);
 			case "Semi Auto":
 				// 2 rounds, AR -2, DV +1
 				rounds = 2;
+				mods.arMod += v.semi_auto_penalty_mod | 0;
 				mods.arMod += -2;
 				mods.dvMod += 1;
 				break;
@@ -7412,6 +7423,7 @@ console.log(v);
 			default:
 				// 1 round, No changes
 				rounds = 1;
+				mods.arMod += v.single_shot_penalty_mod | 0;
 				mods.arMod += 0;
 				mods.dvMod += 0;
 		}
