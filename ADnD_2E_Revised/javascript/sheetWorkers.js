@@ -2625,7 +2625,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             powerInfo[`repeating_${section}_PSP-cost${cost_number}`]    = power['initial-cost'];
             powerInfo[`repeating_${section}_PSP-cost-maintenance`]      = power['maintenance-cost'];
 
-            let macroBuilder = [];
+            let macroBuilder = new RollTemplateBuilder('2Epsionic');
             macroBuilder.push(`title=@{${name}}`);
             macroBuilder.push(`discipline=${displayDiscipline}`);
             macroBuilder.push(`tier=${tier}`);
@@ -2665,8 +2665,8 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             }
             macroBuilder.push(`effects=${power['effect']}`);
 
-            let macroValue = macroBuilder.map(s => `{{${s}}}`).join(' ');
-            powerInfo[`repeating_${section}_${macro}`] = `&{template:2Epsionic} ${macroValue}`;
+            let macroValue = macroBuilder.string();
+            powerInfo[`repeating_${section}_${macro}`] = macroValue;
 
             setAttrs(powerInfo,{silent:true});
         });
@@ -2685,7 +2685,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
                 tier = match ? match[1] : '';
             }
 
-            let macroBuilder = [];
+            let macroBuilder = new RollTemplateBuilder('2Epsionic');
 
             match = fullMacro.match(/\{\{(title=.*?)}} *\{\{/);
             console.log(match);
@@ -2722,8 +2722,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             match = fullMacro.match(/\{\{(1effect=.*?)}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
 
-            let macroValue = macroBuilder.map(s => `{{${s}}}`).join(' ');
-            macroValue = `&{template:2Epsionic} ${macroValue}`;
+            let macroValue = macroBuilder.string();
 
             rollPsionicTemplate(macroValue, parse.rowId, values);
         });
