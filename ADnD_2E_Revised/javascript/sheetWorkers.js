@@ -1885,8 +1885,8 @@ function setupSpellCrit(section) {
         console.log(eventInfo);
         let attrFields = fields.map(s => prefix+s);
         getAttrs(attrFields, async function (values) {
-            let rollBuilder = ['character=@{character_name}'];
-            rollBuilder.push(`name=${values[prefix+'spell-name']}`);
+            let rollBuilder = new RollTemplateBuilder('2Epocrit');
+            rollBuilder.push('character=@{character_name}',`name=${values[prefix+'spell-name']}`);
 
             let errors = [];
 
@@ -2093,9 +2093,8 @@ function setupSpellCrit(section) {
                 }
             }
 
-            let displayHits = rollBuilder.map(s => `{{${s}}}`).join(' ');
-            let displayInjuries = Array.from(set).map(s => `{{${s}}}`).join(' ');
-            let finalRollText = `&{template:2Epocrit} ${displayHits} ${displayInjuries}`;
+            rollBuilder.push(Array.from(set));
+            let finalRollText = rollBuilder.string();
             if (section.includes('monster'))
                 finalRollText = `@{wtype} ${finalRollText}`;
 
@@ -2167,7 +2166,9 @@ function critEffectExplanations(critEffect, set) {
 
 function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAdjFunc) {
     getAttrs(fields, async function (values) {
-        let rollBuilder = ['character=@{character_name}'];
+        let rollBuilder = new RollTemplateBuilder('2Epocrit');
+        rollBuilder.push('character=@{character_name}');
+
         let errors = [];
 
         let weaponName = nameFunc(values);
@@ -2289,9 +2290,8 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
         if (errors.length > 0)
             rollBuilder.push(`hits=Cannot show effects due to missing fields: ${errors.join(', ')}`);
 
-        let displayHits = rollBuilder.map(s => `{{${s}}}`).join(' ');
-        let displayInjuries = Array.from(set).map(s => `{{${s}}}`).join(' ');
-        let finalRollText = `&{template:2Epocrit} ${displayHits} ${displayInjuries}`;
+        rollBuilder.push(Array.from(set));
+        let finalRollText = rollBuilder.string();
 
         console.log(finalRollText);
 
