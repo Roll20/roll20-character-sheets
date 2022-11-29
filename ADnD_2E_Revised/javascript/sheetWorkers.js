@@ -29,6 +29,27 @@ const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
 const SPHERE_SPELLS_AND_MAGIC = 'sphere-spells-and-magic';
 const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', SPHERE_SPELLS_AND_MAGIC];
 
+class RollTemplateBuilder {
+    constructor(template) {
+        this.template = template;
+        this.builder = [];
+    }
+
+    push(args) {
+        if (Array.isArray(args)) {
+            this.builder = this.builder.concat(args);
+        } else {
+            for (let i = 0; i < arguments.length; i++) {
+                this.builder.push(arguments[i]);
+            }
+        }
+    }
+
+    string() {
+        return `&{template:${this.template}} ${this.builder.map(s => `{{${s}}}`).join(' ')}`;
+    }
+}
+
 //#region Helper function
 const isSheetWorkerUpdate = function (eventInfo) {
     return eventInfo.sourceType === SHEET_WORKER;
@@ -1691,36 +1712,37 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
 on('clicked:grenade-miss', async function (eventInfo) {
     getAttrs(['character_name'], async function(values) {
         let characterName = values['character_name'];
-        let finalRollText = '&{template:2Egrenademiss} ';
+        let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
         let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
         switch (grenade) {
-            case 'Acid':       finalRollText += `{{name=Acid}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|acid-hit)}} {{splashdmg=[Damage](~${characterName}|acid-splash)}}`; break;
-            case 'Holy water': finalRollText += `{{name=Holy water}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=[Damage](~${characterName}|holy-water-hit)}} {{splashdmg=[Damage](~${characterName}|holy-water-splash)}}`; break;
-            case 'Oil (lit)':  finalRollText += `{{name=Oil (lit)}} {{aoe=[[3]]}} {{aoesplash=[[3+6]]}} {{hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)}} {{splashdmg=[Damage](~${characterName}|oil-lit-splash)}}`; break;
-            case 'Poison':     finalRollText += `{{name=Poison}} {{aoe=[[1]]}} {{aoesplash=[[1+6]]}} {{hitdmg=Special}} {{splashdmg=Special}}`; break;
+            case 'Acid':       rollBuilder.push('name=Acid','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~${characterName}|acid-hit)`,`splashdmg=[Damage](~${characterName}|acid-splash)`); break;
+            case 'Holy water': rollBuilder.push('name=Holy water','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~${characterName}|holy-water-hit)`,`splashdmg=[Damage](~${characterName}|holy-water-splash)`); break;
+            case 'Oil (lit)':  rollBuilder.push('name=Oil (lit)','aoe=[[3]]','aoesplash=[[3+6]]',`hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)`,`splashdmg=[Damage](~${characterName}|oil-lit-splash)`); break;
+            case 'Poison':     rollBuilder.push('name=Poison','aoe=[[1]]','aoesplash=[[1+6]]','hitdmg=Special','splashdmg=Special'); break;
             case 'Other': {
                 let name   = await extractQueryResult('?{Grenade name}');
                 let aoe    = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
                 let damage = await extractQueryResult('?{Direct damage|1d6}');
                 let splash = await extractQueryResult('?{Splash damage|1d3}');
 
-                var customGrenade = {}
+                let customGrenade = {}
                 customGrenade['custom-grenade-name'] = name;
                 customGrenade['custom-grenade-hit'] = damage;
                 customGrenade['custom-grenade-splash'] = splash;
                 setAttrs(customGrenade);
 
-                finalRollText += `{{name=${name}}} {{aoe=[[${aoe}]]}} {{aoesplash=[[${aoe}+6]]}} {{hitdmg=[Damage](~${characterName}|custom-grenade-hit)}} {{splashdmg=[Damage](~${characterName}|custom-grenade-splash)}}`;
+                rollBuilder.push(`name=${name}`,`aoe=[[${aoe}]]`,`aoesplash=[[${aoe}+6]]`,`hitdmg=[Damage](~${characterName}|custom-grenade-hit)`,`splashdmg=[Damage](~${characterName}|custom-grenade-splash)`);
             }
         }
         let distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
-        finalRollText += `{{direction=[[1d10]]}} {{distancename=${distanceName}}} `;
+        rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
         switch (distanceName) {
-            case 'Short': finalRollText += '{{distance=[[1d6]]}} '; break;
-            case 'Medium': finalRollText += '{{distance=[[1d10]]}} '; break;
-            case 'Long': finalRollText += '{{distance=[[2d10]]}} '; break;
+            case 'Short': rollBuilder.push('distance=[[1d6]]'); break;
+            case 'Medium': rollBuilder.push('distance=[[1d10]]'); break;
+            case 'Long': rollBuilder.push('distance=[[2d10]]'); break;
         }
-        finalRollText += '{{hit=[[0]]}} {{splash=[[0]]}} ';
+        rollBuilder.push('hit=[[0]]','splash=[[0]]');
+        let finalRollText = rollBuilder.string();
         console.log(finalRollText);
         startRoll(finalRollText, function (roll) {
             console.log(roll);
@@ -2757,6 +2779,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 // Show / Hide buttons for various repeating sections
 const REPEATING_SECTIONS = [
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
+    'scrolls',
 ];
 REPEATING_SECTIONS.forEach(section => {
    on(`clicked:repeating_${section}:show clicked:repeating_${section}:hide`, function (eventInfo) {
