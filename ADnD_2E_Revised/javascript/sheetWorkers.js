@@ -829,16 +829,20 @@ on('change:charisma change:leadership change:appearance', function() {
 on('clicked:opendoor-check', function (eventInfo){
    getAttrs(['opendoor'], async function (values){
        let match = values.opendoor.match(/(\d+)\((\d+)\)/);
-       let rollTemplate = "&{template:2Echeck} {{character=@{character_name}}} {{checkroll=[[1d20cs1cf20]]}} {{color=blue}}"
+       let rollBuilder = new RollTemplateBuilder('2Echeck');
+       rollBuilder.push('character=@{character_name}','checkroll=[[1d20cs1cf20]]','color=blue');
        if (!match) {
-           return printRoll(rollTemplate + "{{checkvs=Open Doors Check}} {{checktarget=[[@{opendoor}]]}}");
+           rollBuilder.push('checkvs=Open Doors Check','checktarget=[[@{opendoor}]]');
+           return printRoll(rollBuilder.string());
        }
        let target = await extractQueryResult(`?{What kind of door?|Normal door,${match[1]}|Locked / Barred / Magical door,${match[2]}}`);
-       rollTemplate += ` {{checktarget=[[${target}]]}}`;
-       rollTemplate += target === match[1]
-           ? ` {{checkvs=Open Normal Doors Check}}`
-           : ` {{checkvs=Open Locked/Barred/Magically Held Doors Check}}`;
-       return printRoll(rollTemplate);
+       rollBuilder.push(`checktarget=[[${target}]]`);
+       if (target === match[1]) {
+           rollBuilder.push('checkvs=Open Normal Doors Check');
+       } else {
+           rollBuilder.push('checkvs=Open Locked/Barred/Magically Held Doors Check');
+       }
+       return printRoll(rollBuilder.string());
    });
 });
 //#endregion
