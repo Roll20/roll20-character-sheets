@@ -974,7 +974,8 @@ function parseSpheres(spheresStrings, regex) {
     return spheres;
 }
 
-const getSpellSchools = function (spell, schoolRules) {
+const getSpellSchools = function (spell, books) {
+    let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
     return schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
         ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
         : spell['school'];
@@ -2585,17 +2586,17 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         rollBuilder.push(`damagetype=${spell['damage-type']}`);
         rollBuilder.push(`reference=${spell['reference']}, ${spell['book']}`);
         rollBuilder.push(`materials=${spell['materials'] ? 'Included in the scroll' : ''}`);
-        rollBuilder.push(`effect=${spell['effect']}`);
+        rollBuilder.push(`effects=${spell['effect']}`);
 
         let scrollMacro = rollBuilder.string();
         scrollMacro = scrollMacro.replaceAll('[[@{level-wizard}]]','[[@{scroll-level}]]')
             .replaceAll('[[@{level-priest}]]', '[[@{scroll-level}]]');
 
-        let scribeLevel = ''
+        let scribeLevel = '6';
         if (scrollMacro.includes('[[@{scroll-level}]]')) {
-            let spellLevel = parseInt(spell.level);
-
             let recommendedMinimumLevel;
+
+            let spellLevel = parseInt(spell.level);
             if (spellLevel <= 3) {
                 recommendedMinimumLevel = 6;
             } else if (spellLevel === 4 || spellLevel === 5) {
@@ -2606,7 +2607,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
                 recommendedMinimumLevel = spellLevel*2+1
             }
 
-             scribeLevel = await extractQueryResult(`?{At what level is this scroll scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}`);
+            scribeLevel = await extractQueryResult(`?{At what level is this scroll scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
         }
 
         let scrollInfo = {
@@ -2614,6 +2615,8 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
             [`repeating_scrolls_${parse.rowId}_scroll-level`]: scribeLevel,
             [`repeating_scrolls_${parse.rowId}_scroll-macro`]: scrollMacro,
         }
+
+        setAttrs(scrollInfo);
     });
 });
 //#endregion
