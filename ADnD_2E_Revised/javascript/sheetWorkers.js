@@ -974,6 +974,12 @@ function parseSpheres(spheresStrings, regex) {
     return spheres;
 }
 
+const getSpellSchools = function (spell, schoolRules) {
+    return schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
+        ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
+        : spell['school'];
+}
+
 const getSpellSpheres = function (spell, sphereRules) {
     if (sphereRules.has(SPHERE_SPELLS_AND_MAGIC))
         return spell[SPHERE_SPELLS_AND_MAGIC] || spell['sphere'];
@@ -1182,7 +1188,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
             let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
                 [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
-                [`repeating_spells-${section}_spell-school`]       : spell['school'],
+                [`repeating_spells-${section}_spell-school`]       : getSpellSchools(spell, books),
                 [`repeating_spells-${section}_spell-components`]   : spell['components'],
                 [`repeating_spells-${section}_spell-range`]        : spell['range'],
                 [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
@@ -1200,12 +1206,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
                 [`repeating_spells-${section}_spell-crit-size`]    : spell['crit-size'] || '',
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
-            if (isWizard) {
-                let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
-                spellInfo[`repeating_spells-${section}_spell-school`] = schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
-                    ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
-                    : spell['school'];
-            }
+
             if (isPriest) {
                 let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
                 spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
@@ -2532,6 +2533,89 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
         })
         .execute();
 })
+
+on('change:repeating_scrolls:scroll', async function (eventInfo) {
+    if (!eventInfo.newValue)
+        return;
+
+    let spellName = eventInfo.newValue.replace('Scroll of ', '');
+    let wizardSpell = wizardSpells['wizmonster'][spellName];
+    let priestSpell = priestSpells['primonster'][spellName];
+    if (!wizardSpell && !priestSpell)
+        return
+
+    let spell;
+    let spellClass;
+    if (wizardSpell && priestSpell) {
+        spellClass = await extractQueryResult('?{Is this a Wizard or Priest scroll?|Wizard|Priest}');
+        spell = spellClass === 'Wizard' ? wizardSpell : priestSpell;
+    } else if (wizardSpell) {
+        spell = wizardSpell;
+        spellClass = 'Wizard';
+    } else {
+        spell = priestSpell;
+        spellClass = 'Priest';
+    }
+
+    getAttrs([...BOOK_FIELDS, ...SCHOOL_FIELDS, ...SPHERE_FIELDS], async function(books) {
+        if (bookInactiveShowToast(books, spell))
+            return
+
+        let parse = parseSourceAttribute(eventInfo);
+
+        let rollBuilder = new RollTemplateBuilder('2Espell');
+        rollBuilder.push(`title=@{scroll}`);
+        rollBuilder.push(`splevel=Level ${spell.level} ${spellClass}`);
+        rollBuilder.push(`school=${getSpellSchools(spell, books)}`);
+        if (spellClass === 'Priest') {
+            let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
+            rollBuilder.push(`sphere=${getSpellSpheres(spell, sphereRules)}`);
+        }
+        rollBuilder.push(`range=${spell['range']}`);
+        rollBuilder.push(`components=V`);
+        rollBuilder.push(`duration=${spell['duration']}`);
+        rollBuilder.push(`time=@{scroll-speed}`);
+        rollBuilder.push(`aoe=${spell['aoe']}`);
+        rollBuilder.push(`save=${spell['saving-throw']}`);
+        rollBuilder.push(`subtlety=${spell['subtlety'] || ''}`);
+        rollBuilder.push(`sensory=${spell['sensory'] || ''}`);
+        rollBuilder.push(`knockdown=${spell['knockdown'] || ''}`);
+        rollBuilder.push(`crit=${spell['crit-size'] || ''}`);
+        rollBuilder.push(`damage=${spell['damage']}`);
+        rollBuilder.push(`damagetype=${spell['damage-type']}`);
+        rollBuilder.push(`reference=${spell['reference']}, ${spell['book']}`);
+        rollBuilder.push(`materials=${spell['materials'] ? 'Included in the scroll' : ''}`);
+        rollBuilder.push(`effect=${spell['effect']}`);
+
+        let scrollMacro = rollBuilder.string();
+        scrollMacro = scrollMacro.replaceAll('[[@{level-wizard}]]','[[@{scroll-level}]]')
+            .replaceAll('[[@{level-priest}]]', '[[@{scroll-level}]]');
+
+        let scribeLevel = ''
+        if (scrollMacro.includes('[[@{scroll-level}]]')) {
+            let spellLevel = parseInt(spell.level);
+
+            let recommendedMinimumLevel;
+            if (spellLevel <= 3) {
+                recommendedMinimumLevel = 6;
+            } else if (spellLevel === 4 || spellLevel === 5) {
+                recommendedMinimumLevel = spellLevel*2;
+            } else if (spellLevel === 6 && spellClass === 'Priest') {
+                recommendedMinimumLevel = spellLevel*2;
+            } else if (spellLevel >= 6) {
+                recommendedMinimumLevel = spellLevel*2+1
+            }
+
+             scribeLevel = await extractQueryResult(`?{At what level is this scroll scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}`);
+        }
+
+        let scrollInfo = {
+            [`repeating_scrolls_${parse.rowId}_scroll-speed`]: spell['cast-time'],
+            [`repeating_scrolls_${parse.rowId}_scroll-level`]: scribeLevel,
+            [`repeating_scrolls_${parse.rowId}_scroll-macro`]: scrollMacro,
+        }
+    });
+});
 //#endregion
 
 on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_gem`, function(eventInfo) {
