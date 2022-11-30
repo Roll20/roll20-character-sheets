@@ -65,6 +65,10 @@ spellsJs.forEach(jsFile => {
     }
 });
 
+const wizardSpells = require(path.join(jsFolder, 'wizardSpells.js'));
+const priestSpells = require(path.join(jsFolder, 'priestSpells.js'));
+html += pug.renderFile(path.join(pugFolder, 'spellScrollsDatalists.pug'), {pretty: true, wizardSpells, priestSpells});
+
 const psionicCorePowers = require(path.join(jsFolder, 'psionicPowers.js'));
 html += pug.renderFile(path.join(pugFolder, 'psionicCorePowerDatalists.pug'), {pretty: true, data: psionicCorePowers});
 
