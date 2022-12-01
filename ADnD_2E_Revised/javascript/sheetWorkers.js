@@ -430,8 +430,7 @@ on('clicked:hide-toast', function(eventInfo) {
 
 //#region Ability Scores logic
 // Ability Score Parser function
-const squareBracketsRegex = /18\[([0-9]{1,3})]/; // Ie. 18[65]
-const parenthesisRegex = /18\(([0-9]{1,3})\)/; // Ie. 18(65)
+const EXCEPTIONAL_STRENGHT_REGEX = /18[\[(]([0-9]{1,3})[\])]/; // Ie. 18[65], 18(65)
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     if (abilityScoreString === '') {
         return defaultValue;
@@ -443,7 +442,7 @@ function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     }
 
     if (isStrength) {
-        let exceptionalMatch = abilityScoreString.match(squareBracketsRegex) || abilityScoreString.match(parenthesisRegex);
+        let exceptionalMatch = abilityScoreString.match(EXCEPTIONAL_STRENGHT_REGEX);
         if (exceptionalMatch !== null) {
             let exceptionalStrNumber = parseInt(exceptionalMatch[1]);
             if (1 <= exceptionalStrNumber && exceptionalStrNumber <= 50) {
@@ -722,7 +721,7 @@ on('change:wisdom change:intuition change:willpower', function() {
 
         let bonusSpells;
         if (wisdom === 0) {
-            bonusSpell = parseWisBonus(0);
+            bonusSpells = parseWisBonus(0);
             assignAttributes(0, 0, 0, bonusSpells, wisdomTable['wisimmune'][0], wisdomTable['wisimmune'][0], wisdomTable['wisnotes'][0], wisdomTable['wisnotes'][0]);
             return;
         }
