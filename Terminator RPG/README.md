@@ -1,6 +1,6 @@
 # TerminatorRPGRoll20
 Terminator RPG roll20 sheet
-The huge amout of work on this was initially created by seregrauko and taken from https://github.com/FatPob/roll20-character-sheets/tree/master/SLA%20Industries%202ed
+The huge amout of work on this was initially created by seregrauko and taken from https://github.com/roll20/roll20-character-sheets/tree/master/SLA%20Industries%202ed
 a shamelss amout of copy and paste and reformatting and changing words and terms to get this sheet.
 
 ## A couple of notes
