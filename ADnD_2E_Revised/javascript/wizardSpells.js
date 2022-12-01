@@ -2788,7 +2788,7 @@ wiz4['Monster Summoning II'] = {
     'school': 'Conjuration/Summoning',
     'school-spells-and-magic': 'Conjuration/Summoning, Song',
     'range': 'Special',
-    'duration': '[[3+[[@{[level-wizard}]] ]] rounds',
+    'duration': '[[3+[[@{level-wizard}]] ]] rounds',
     'aoe': '40 yard radius',
     'components': 'V, S, M',
     'cast-time': '4',

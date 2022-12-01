@@ -2565,7 +2565,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
 
         let rollBuilder = new RollTemplateBuilder('2Espell');
-        rollBuilder.push(`title=@{scroll}`);
+        rollBuilder.push(`title=@{scroll}\n(Casting level @{scroll-level})`);
         rollBuilder.push(`splevel=Level ${spell.level} ${spellClass}`);
         rollBuilder.push(`school=${getSpellSchools(spell, books)}`);
         if (spellClass === 'Priest') {
@@ -2585,7 +2585,10 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         rollBuilder.push(`damage=${spell['damage']}`);
         rollBuilder.push(`damagetype=${spell['damage-type']}`);
         rollBuilder.push(`reference=${spell['reference']}, ${spell['book']}`);
-        rollBuilder.push(`materials=${spell['materials'] ? 'Included in the scroll' : ''}`);
+        rollBuilder.push(`materials=${spell['materials'] ? 'Included in the scroll.' : ''}`);
+        rollBuilder.push('checkroll=[[1d100]]%');
+        rollBuilder.push('checktarget=[[@{scroll-failure}]]%');
+        rollBuilder.push('fail=DM roll for Magical Spell Failure');
         rollBuilder.push(`effects=${spell['effect']}`);
 
         let scrollMacro = rollBuilder.string();
