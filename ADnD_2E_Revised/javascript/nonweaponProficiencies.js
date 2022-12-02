@@ -1371,6 +1371,30 @@ NONWEAPON_PROFICIENCIES_TABLE['Clothesmaking, Crude'].push({
     'classes': '',
     'book': ['The Complete Barbarian\'s Handbook']
 });
+NONWEAPON_PROFICIENCIES_TABLE['Jumping (Barbarian)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Jumping (Barbarian)'].push({
+    'slots': "-",
+    'abilityScore': '@{Strength}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': ['PHB']
+});
+NONWEAPON_PROFICIENCIES_TABLE['Tightrope Walking (Barbarian)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Tightrope Walking (Barbarian)'].push({
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': '',
+    'book': ['The Complete Barbarian\'s Handbook']
+});
+NONWEAPON_PROFICIENCIES_TABLE['Tumbling (Barbarian)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Tumbling (Barbarian)'].push({
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': '',
+    'book': ['The Complete Barbarian\'s Handbook']
+});
 NONWEAPON_PROFICIENCIES_TABLE['Animal Rending'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Animal Rending'].push({
     'slots': 1,
@@ -1407,7 +1431,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Horde Summoning'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Horde Summoning'].push({
     'slots': 2,
     'abilityScore': '@{Charisma}',
-    'modifier': 0,
+    'modifier': -2,
     'classes': 'Warrior',
     'book': ['The Complete Barbarian\'s Handbook']
 });
@@ -1429,7 +1453,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Light Sleeping'].push({
 });
 NONWEAPON_PROFICIENCIES_TABLE['Sign Language'].push({
     'slots': 1,
-    'abilityScore': '@{Charisma}',
+    'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Barbarian\'s Handbook']
