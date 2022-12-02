@@ -21,8 +21,8 @@ const booksPriority = [
     {book: 'The Complete Book of Humanoids', print: 'Sixth printing, March 1999'},
     {book: 'The Complete Ranger\'s Handbook', print: 'Fifth printing, July 1995'},
     {book: 'The Complete Paladin\'s Handbook', print: ''}, // checked
-    {book: 'The Complete Druid\'s Handbook', print: ''},
-    {book: 'The Complete Barbarian\'s Handbook', print: ''},
+    {book: 'The Complete Druid\'s Handbook', print: ''}, // checked
+    {book: 'The Complete Barbarian\'s Handbook', print: ''}, // checked
     {book: 'The Complete Book of Necromancers', print: ''},
     {book: 'The Complete Ninja\'s Handbook', print: '2nd printing, March 1996'},
     {book: 'Player\'s Option: Combat & Tactics', print: ''},
