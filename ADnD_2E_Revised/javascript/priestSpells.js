@@ -6851,7 +6851,7 @@ pri1['Beastmask'] = {
     'cast-time': '4',
     'saving-throw': 'Negate',
     'materials': 'A miniature wooden mask carved to look like the animal.',
-    'reference': 'p. 91',
+    'reference': 'p. 86',
     'book': 'The Complete Druid\'s Handbook',
     'damage': '',
     'damage-type': '',
@@ -6906,7 +6906,7 @@ pri2['Animal Spy'] = {
     'aoe': '1 animal',
     'components': 'V, S',
     'cast-time': '5',
-    'saving-throw': 'Negate',
+    'saving-throw': 'Wizard familiars may save vs. spell to negate.',
     'materials': '',
     'reference': 'p. 87',
     'book': 'The Complete Druid\'s Handbook',
@@ -6951,7 +6951,7 @@ pri2['Fortifying Stew'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Any bowl of broth, porridge, or stew the priest has concocted can become subject to *fortifying stew*. A character can enchant one bowl of stew (about 8 ounces) per experience level. Someone must consume the enchanted meal within one turn of the casting.\n&emsp;Anyone partaking of an entire bowlful reaps magical benefits. First, the diner gains nourishment for an entire day from the single meal. In addition, for two hours plus one round per the caster’s level, the character receives [[1d4+1]] temporary hit points. Currently 2 hours and [[@{level-priest}]] rounds. Any damage suffered comes off the extra hit points first. The effects of multiple helpings of *fortifying stew* are not cumulative.\n&emsp;For example, Snapdragon, a 7th-level druid, cooks a meaty broth, casts *fortifying stew* on it, and eats the bowlful. A roll of 2 gives her 3 extra hit points. When the spell’s effects wear off just over three hours, she loses these extra points. If she suffers 5 points of damage in the meantime, she actually loses only 2 hp of her own, since 3 hp came off the extra hit points.'
+    'effect': 'Any bowl of broth, porridge, or stew the priest has concocted can become subject to *fortifying stew*. A character can enchant one bowl of stew (about 8 ounces) per experience level. Currently about [[8*[[@{level-priest}]] ]] ounces. Someone must consume the enchanted meal within one turn of the casting.\n&emsp;Anyone partaking of an entire bowlful reaps magical benefits. First, the diner gains nourishment for an entire day from the single meal. In addition, for two hours plus one round per the caster’s level, the character receives [[1d4+1]] temporary hit points. Currently 2 hours and [[@{level-priest}]] rounds. Any damage suffered comes off the extra hit points first. The effects of multiple helpings of *fortifying stew* are not cumulative.\n&emsp;For example, Snapdragon, a 7th-level druid, cooks a meaty broth, casts *fortifying stew* on it, and eats the bowlful. A roll of 2 gives her 3 extra hit points. When the spell’s effects wear off just over three hours, she loses these extra points. If she suffers 5 points of damage in the meantime, she actually loses only 2 hp of her own, since 3 hp came off the extra hit points.'
 };
 
 pri2['Gift of Speech'] = {

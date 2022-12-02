@@ -20,7 +20,7 @@ const booksPriority = [
     {book: 'The Complete Book of Elves', print: ''}, // checked
     {book: 'The Complete Book of Humanoids', print: 'Sixth printing, March 1999'},
     {book: 'The Complete Ranger\'s Handbook', print: 'Fifth printing, July 1995'},
-    {book: 'The Complete Paladin\'s Handbook', print: ''},
+    {book: 'The Complete Paladin\'s Handbook', print: ''}, // checked
     {book: 'The Complete Druid\'s Handbook', print: ''},
     {book: 'The Complete Barbarian\'s Handbook', print: ''},
     {book: 'The Complete Book of Necromancers', print: ''},
