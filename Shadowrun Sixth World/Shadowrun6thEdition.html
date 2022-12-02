@@ -87,7 +87,7 @@
 			<div class="row-long pd-rep">
 				<h2 data-i18n="reputation">Reputation</h2><input type="number" name="attr_reputation" placeholder="#" title="@{reputation}" />
 				<h2 data-i18n="heat">Heat</h2><input type="number" name="attr_heat" placeholder="#" title="@{heat}" />
-				<h2 class="nuyen">Â¥</h2><input type="number" name="attr_nuyen" placeholder="0" title="@{nuyen}" />
+				<h2 class="nuyen">¥</h2><input type="number" name="attr_nuyen" placeholder="0" title="@{nuyen}" />
 			</div>
 			<div class="row-long pd-kar">
 				<h2 data-i18n="karma">Karma</h2><input style="width: 2em;" type="number" name="attr_karma" placeholder="#" title="@{karma}" />
@@ -1962,7 +1962,7 @@
                 <input name="attr_dicepool" type="hidden" value="0"/>
                 <button name="act_ritual" type="action" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (Sorcery + Magic + Teamwork Hits)}}{{dice=[[((@{skill}+@{magic}+@{spec}+@{expert}+@{dicepool_modifier}+?{Teamwork test hits?|})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Threshold: @{threshold}, Teamwork Test Hits: ?{Teamwork test hits?|}\nNotes:@{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
                 <span class="center" name="attr_threshold"></span>
-                <input class="collapse-flag" name="attr_display_flag" type="checkbox"/><span class="pictos">i</span>
+                <input class="collapse-flag" name="attr_display_flag" type="checkbox" checked="checked"/><span class="pictos">i</span>
                 <input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
                 <div class="collapse"><span name="attr_notes"></span></div>
                 <div class="settings">
@@ -2911,7 +2911,7 @@
 		<div class="border-box repeat-box lifestyle">
 			<div class="pc-box small-box social-box">
 				<div class="row-long">
-					<h3 class="nuyen">Â¥</h3>
+					<h3 class="nuyen">¥</h3>
 					<input type="text" name="attr_nuyen" placeholder="-" title="@{nuyen}" />
 					<h3 data-i18n="birthname">Birth Name</h3>
 					<input type="text" name="attr_birth_name" placeholder="John Q Public" title="@{birth_name}" />
@@ -10671,9 +10671,8 @@ mylog = function(msg) {
 // Compendium Drop workers
 on("change:compendium_drop_data", (eventInfo) => {
 	console.log("Compendium Item Dropped!");
-	console.log(eventInfo.newValue);
+//	console.log(eventInfo);
 
-//	var data = eventInfo.newValue;
 	try{
 		data = JSON.parse(eventInfo.newValue) || false;
 	} catch(e) {
@@ -10684,6 +10683,14 @@ on("change:compendium_drop_data", (eventInfo) => {
 		});
 		return;
 	}
+console.log(data);
+
+	// wipe out compendium_drop_data until the next time
+	// we're doing this here so errors don't leave ghost data
+	setAttrs({
+		'compendium_drop_data': '',
+		'compendium_drop_content': ''
+	});
 
 
 	if(eventInfo.sourceType != 'player' || ! data) {
@@ -10691,42 +10698,187 @@ console.log("not player triggered or compendium data empty");
 		return;
 	}
 
+
+	// if there are blobs, add those and ignore the parent (it should be one of the blobs?)
+	if(data.blobs && Object.keys(data.blobs).length > 0) {
+console.log("blob(s) exist, adding them!");
+		Object.keys(data.blobs).forEach((key) => {
+console.log("adding blob: " + key);
+			blob = data.blobs[key];
+			if(! blob.Category) {
+				if(data.Category == "QSR Tool Cards") {
+					blob.Category = trans["qsr_blob_types"][data["data-type"]];
+				} else {
+					blob.Category = data.Category;
+				}
+			}
+			blob["data-name"] = key;
+			compendium_import(blob);
+		});
+	} else {
+console.log("no blobs :(");
+		compendium_import(data);
+	}
+});
+
+var compendium_import = function(data) {
 	getAttrs(['compendium_drop_content'], (v) => {
 		// process the dropped data
 		switch(data.Category) {
 			case 'Spells':
-				compendiumAddSpell(data, v.compendium_drop_content);
+				compendiumAddSpell(data);
+				break;
+			case 'Rituals':
+				compendiumAddRitual(data);
+				break;
+			case 'Powers':
+				compendiumAddPower(data);
+				break;
+			case 'Metamagic':
+//				compendiumAddMetamagic(data);
+				break;
+			case 'Qualities':
+//				compendiumAddQuality(data);
 				break;
 			default:
 				break;
 		}
 	});
+}
 
-	// wipe out compendium_drop_data until the next time
-	setAttrs({
-		'compendium_drop_data': '',
-		'compendium_drop_content': ''
-	});
-});
-
-
-
-var compendiumAddSpell = function(data, content) {
+var compendiumAddSpell = function(data) {
 		rowattrs = {};
-console.log(data);
-console.log(content);
+console.log("It's a spell! Oooh, MAGIC!");
+//console.log(data);
 		row_id = generateRowID();
 
 		var spell_type = 'spell';
 
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_name"] = data.Name;
+		['data-damage', 'data-duration', 'data-effect_type', 'data-range'].forEach((key) => {
+//console.log(key);
+			if(typeof(data[key]) === 'undefined') {
+//console.log(key + " undefined!");
+				data[key] = '';
+			}
+//console.log(data[key]);
+		});
+//console.log(data);
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_flag"] = false;
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
 		rowattrs["repeating_" + spell_type + "_" + row_id + "_skill"] = '@{sorcery}';
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] = content;
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] = data["data-description"] || '';
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_category"] = ucfirst(data["data-category"]) || '';
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_damage"] = trans.Spells.damage[data["data-damage"].toUpperCase()] || '';
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_drain"] = data["data-drain"] || 0;
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_duration"] = trans.Spells.duration[data["data-duration"].toUpperCase()] || '';
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_effect_type"] = trans.Spells.effect_type[data["data-effect_type"].toUpperCase()] || '';
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_range"] = trans.Spells.range[data["data-range"].toUpperCase()] || '';
+		rowattrs["repeating_" + spell_type + "_" + row_id + "_type"] = ucfirst(data["data-type"]) || '';
 
+console.log(rowattrs);
 		setAttrs(rowattrs);
 
-}
+};
 
+
+var compendiumAddRitual = function(data) {
+		rowattrs = {};
+console.log("It's a ritual! Oooh, slow MAGIC!");
+//console.log(data);
+		row_id = generateRowID();
+
+		var rep_type = 'ritual';
+
+		[].forEach((key) => {
+			if(typeof(data[key]) === 'undefined') {
+				data[key] = '';
+			}
+		});
+
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_threshold"] = data["data-threshold"] || 0;
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-features"] + "\n" + data["data-description"];
+
+console.log(rowattrs);
+		setAttrs(rowattrs);
+
+};
+
+
+var compendiumAddPower = function(data) {
+		rowattrs = {};
+console.log("It's a power! Superman?!");
+//console.log(data);
+		row_id = generateRowID();
+
+		var rep_type = 'powers';
+
+		[].forEach((key) => {
+			if(typeof(data[key]) === 'undefined') {
+				data[key] = '';
+			}
+		});
+
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = 'display';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_activation"] = trans['Powers']['activation'][data["data-activation"].toUpperCase()] || 'Passive';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
+
+console.log(rowattrs);
+		setAttrs(rowattrs);
+
+};
+
+
+const trans = {
+	'Spells': {
+		'range': {
+			'TOUCH': 'T',
+			'LOS': 'LOS',
+			'LOS(A)': 'LOS(A)'
+		},
+		'duration': {
+			'INSTANTANEOUS': 'Instant',
+			'SUSTAINED': 'Sustained',
+			'LIMITED': 'Limited',
+			'PERMANENT': 'Permanent'
+		},
+		'damage': {
+			'STUN': 'Stun',
+			'PHYSICAL': 'Physical',
+			'PHYSICAL_SPECIAL': 'Physical, Special'
+		},
+		'effect_type': {
+			'DIRECT': 'Direct Combat',
+			'DIRECT, AREA': 'Direct Combat, Area',
+			'INDIRECT': 'Indirect Combat',
+			'INDIRECT, AREA': 'Indirect Combat, Area',
+			'SENSE_SINGLE': 'Single-Sense',
+			'SENSE_MULTI': 'Multi-Sense'
+		}
+	},
+	'Powers': {
+		'activation': {
+			'MINOR ACTION': 'Minor',
+			'MAJOR ACTION': 'Major',
+			'PASSIVE': 'Passive'
+		}
+	},
+	'qsr_blob_types': {
+		'weapon-ranged': 'Range',
+		'weapon-melee': 'Melee',
+		'gear-armor': 'Armor',
+		'gear-commlink': 'Devices',
+		'drone': 'Vehicles',
+		'program': 'Programs',
+		'gear-cyberdeck': 'Devices',
+		'spell': 'Spells',
+		'npc': 'NPC'
+	}
+};
 
 
 /********************/
@@ -11615,5 +11767,12 @@ const clean = () => {
 	});
 };
 
+
+/******************
+*    Utilities    *
+******************/
+const ucfirst = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1) || '';
+};
 </script>
 </div>
