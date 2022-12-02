@@ -2190,7 +2190,7 @@ wiz3['Spectral Force'] = {
     'school': 'Illusion/Phantasm',
     'range': '[[60+[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
-    'aoe': '[[40+10*[[@{level-wizard}]]-foot cube',
+    'aoe': '[[40+10*[[@{level-wizard}]] ]]-foot cube',
     'components': 'V, S',
     'cast-time': '3',
     'saving-throw': 'Special',
