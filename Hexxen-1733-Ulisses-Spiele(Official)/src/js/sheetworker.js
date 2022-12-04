@@ -218,6 +218,8 @@
         'skill_insensibility',
         'skill_fieldsofknowledge',
         'skill_witchcraft',
+        'skill_mysticism',
+        'skill_navigation',
         'weapon_punch',
         'weapon_dagger',
         'weapon_fencing',
@@ -607,6 +609,8 @@
         'skill_insensibility':{att: 'attribute_strength'},
         'skill_fieldsofknowledge':{att: 'attribute_knowledge'},
         'skill_witchcraft':{att: 'attribute_knowledge'},
+        'skill_mysticism':{att: 'attribute_knowledge'},
+        'skill_navigation':{att: 'attribute_knowledge'},
 
         'weapon_punch':{att: 'attribute_athletic'},
         'weapon_dagger':{att: 'attribute_dexterity'},

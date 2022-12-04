@@ -894,7 +894,7 @@
 								  <div><input name="attr_weapon_type" class="sheet-text_input sheet-skillName" type="text"></div>
 								  <div><input name="attr_skillName" list="meleeWeapons2" class="sheet-text_input sheet-skillName" type="text"></div>
 								  <div class="sheet-centerIt"><input name="attr_skillDefault" type="checkbox"></div>	
-								 <input name="attr_skillReduct" style="display: none;" type="text" value="1"> 
+								 <input name="attr_skillReduct" type="hidden" value="1"> 
 								<div><input name="attr_wpn_sr" class="sheet-text_input sheet-percentiles" style="margin-left: 1px;" type="text" value="0"></div>
 								  <!--<input type="text" class="sheet-text_input sheet-percentiles"  disabled name="attr_total_wpn_sr" value="[[{@{wpn_sr}+@{melee_srm}]]" />-->
 								  <div><input name="attr_total_wpn_sr" disabled="" class="sheet-text_input sheet-percentiles" type="text" value="[[((((@{wpn_sr}+@{melee_srm}-@{srMod}) + 1) + abs((@{wpn_sr}+@{melee_srm}-@{srMod}) - 1)) / 2)]]"></div>
@@ -916,7 +916,7 @@
 								  </div>
 								  <div>
 									<input name="attr_attackfinal" class="sheet-text_input sheet-percentiles" readonly type="text" value="0">
-									<input name="attr_oppattkmod" value="0" style="display:none">
+									<input name="attr_oppattkmod" value="0" type="hidden">
 								  </div>								  
 								  <!--<div><span><a class="button" href="#popup1">?</a></span></div>
 								  <div><input name="attr_oppattk" type="checkbox"></div>-->						  
@@ -1038,7 +1038,7 @@
 								  <div class="sheet-centerIt">
 									<input name="attr_skillDefault" type="checkbox">
 								</div>	
-								<input name="attr_skillReduct" style="display: none;" type="text" value="1">
+								<input name="attr_skillReduct"  type="hidden" value="1">
 								<div><input name="attr_skillTotal" class="sheet-text_input sheet-percentiles" type="text" readonly=""></div>
 								<div><input name="attr_skillWpnMod" class="sheet-text_input sheet-percentiles" type="text" value="0"></div>
 								<div><input name="attr_attackfinal" class="sheet-text_input sheet-percentiles" readonly type="text" value="0"></div>				  
@@ -5493,7 +5493,7 @@
 
 
 
-		 on("change:repeating_missle2:skilltotal change:repeating_missle2:skillWpnMod  change:repeating_missle2_skillReduct", function(eventInfo) {
+		 on("change:repeating_missle2:skilltotal change:repeating_missle2:skillWpnMod  change:repeating_missle2:skillReduct", function(eventInfo) {
 		   getAttrs(["repeating_missle2_skilltotal","repeating_missle2_skillWpnMod","repeating_missle2_skillReduct","skillMods"], function(values) {
 			
 					
@@ -5507,9 +5507,9 @@
 					
 					let skillTotal = parseInt(values.repeating_missle2_skilltotal);
 					let wpnMod = eval(values.repeating_missle2_skillWpnMod);
-					let skillReduct = Math.ceil(parseInt(values.repeating_missle2_skillReduct));
+					let skillReduct = parseFloat(values.repeating_missle2_skillReduct);
 					let skillMods =  eval(values.skillMods);
-					let tot = Math.max((skillTotal*skillReduct)+skillMods+wpnMod);
+					let tot = Math.max(Math.ceil(skillTotal*skillReduct)+skillMods+wpnMod,5);
 					console.log("tot :"+ tot);
 					
 					/*let oppattkmod=0
@@ -5525,10 +5525,10 @@
 
 		
 	
-		 on("change:repeating_melee2:skilltotal change:repeating_melee2:skillWpnMod  change:repeating_melee2:skillParryMod change:repeating_melee2_skillReduct change:repeating_melee2:oppattk", function(eventInfo) {
-		   getAttrs(["repeating_melee2_skilltotal","repeating_melee2_skillWpnMod","repeating_melee2_skillParryMod","repeating_melee2_skillParryMod","repeating_melee2_skillReduct","skillMods","prevdefends","repeating_melee2_oppattk","prevdefends"], function(values) {
+		 on("change:repeating_melee2:skilltotal change:repeating_melee2:skillWpnMod  change:repeating_melee2:skillParryMod change:repeating_melee2:skillReduct change:repeating_melee2:oppattkmod", function(eventInfo) {
+		   getAttrs(["repeating_melee2_skilltotal","repeating_melee2_skillWpnMod","repeating_melee2_skillParryMod","repeating_melee2_skillParryMod","repeating_melee2_skillReduct","skillMods","prevdefends","repeating_melee2_oppattkmod","prevdefends"], function(values) {
 			
-					
+					 
 					console.log("values  "+JSON.stringify(values));
 
 					console.log("skilltotal: "+values.repeating_melee2_skilltotal);
@@ -5536,18 +5536,18 @@
 					console.log("parry mod: "+values.repeating_melee2_skillParryMod);					
 					console.log("skillReduct:"+values.repeating_melee2_skillReduct);
 					console.log("skillMods:"+values.skillMods);	
-					console.log("oppattk: "+values.repeating_melee2_oppattk);
+					console.log("oppattk: "+values.repeating_melee2_oppattkmod);
 					
 					let skillTotal = parseInt(values.repeating_melee2_skilltotal);
 					/*let wpnMod = parseInt(values.repeating_melee2_skillWpnMod);*/
 					let wpnMod = eval(values.repeating_melee2_skillWpnMod);
-					let skillReduct = Math.ceil(parseInt(values.repeating_melee2_skillReduct));
+					let skillReduct = parseFloat(values.repeating_melee2_skillReduct);
 					/*let skillMods =  parseInt(values.skillMods);*/
 					let skillMods =  eval(values.skillMods);
 					/*let skillParryMod = parseInt(values.repeating_melee2_skillParryMod);*/
 					let skillParryMod = eval(values.repeating_melee2_skillParryMod);
 					
-					let oppattk =  values.repeating_melee2_oppattk;
+					let oppattk =  values.repeating_melee2_oppattkmod;
 					let prevdefends = parseInt(values.prevdefends);
 					let defMod = 0-(prevdefends*20);
 					
@@ -5559,9 +5559,9 @@
 					console.log("oppattk2: "+oppattk);					
 					
 					
-					let tot = Math.max((skillTotal*skillReduct)+skillMods+wpnMod,5);
+					let tot = Math.max(Math.ceil(skillTotal*skillReduct)+skillMods+wpnMod,5);
 					console.log("tot :"+ tot);
-					let tot2 = Math.max((skillTotal*skillReduct)+skillMods+skillParryMod+defMod,5);
+					let tot2 = Math.max(Math.ceil(skillTotal*skillReduct)+skillMods+skillParryMod+defMod,5);
 					console.log("tot2 :"+ tot2);					
 					
 					let oppattkmod=0
@@ -9995,11 +9995,7 @@
 							
 						}
 						
-						console.log("!!!!1 WHAT IS FUCKING VAL "+val);
 						setAttrs({repeating_melee2_skillReduct:val});	
-
-
-
 
 			   });
 			});
@@ -10017,7 +10013,6 @@
 							
 						}
 						
-						console.log("!!!!1 WHAT IS FUCKING VAL "+val);
 						setAttrs({repeating_missle2_skillReduct:val});	
 
 
@@ -10801,7 +10796,7 @@
 			
 
 			<img style="margin-top:3px;border-left:1px solid black;" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/RunequestGQS/banner.jpg" />
-			<div style="border: 1px solid black ">
+			<div style="border: 1px solid black ;width:239px">
 			
 			<div style="background-color:white;color:#b87a38;text-align:center" >{{name}}</div>
 			<!--<div style="background-color:white;color:#b87a38;text-align:center" >Crit {{crit}}</div>-->

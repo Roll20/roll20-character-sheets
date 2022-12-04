@@ -1,5 +1,11 @@
 Change Log
 ==============================================
+**2022-11-21 ** v.65 Chuz (James Culp)
+	Bugfix - PC Weapon skills weren't applying the -1 unskilled penalty to some skills, this has been updated however users will need to update the skill to something else and back to trigger the data change.
+	Bugfix - PC Sheet imported from Genesis in a non-English language had many problems mostly related to skills.  I believe I've fixed these issues please report any new ones
+	Bugfix - NPC Spell roll template issue where if drain was under 2 it added "Drain: 2" at the bottom of the description.
+**2022-11-14 ** v.64 Chuz (James Culp)
+	Bugfix - PC Judge Intentions wasn't updating on Willpower changes.
 **2022-11-06 ** v.63 Chuz (James Culp)
 	New Feature - PC Attribute roll buttons now prompt for a second attribute or custom dice modifier for those occasions when the DM says Roll Reaction+Intuition instead of Roll Defense
 	Bugfix - PC Defense, Direct Magic Defense and Indirect Magic Defense roll buttons didn't include Wound Penalties (defense pretended to but didn't apply the penalty)

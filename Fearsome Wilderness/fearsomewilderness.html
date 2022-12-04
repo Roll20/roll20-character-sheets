@@ -132,8 +132,12 @@
 			<button type="roll" name="roll_strength" value="@{strength_action}" data-i18n="strength">strength</button>
 			<!-- The invisible button allowing the use of custom roll parsing -->
 			<button type="action" name="act_strength-action" class="hidden"></button>
+			<button type="action" name="act_strength-reroll" class="hidden"></button>
 			<!-- The invisible field for the attribute which contains the ability call -->
 			<input type="hidden" name="attr_strength_action" value="">
+			<input type="hidden" name="attr_strength_basesuccesses" value="">
+			<input type="hidden" name="attr_strength_basedicerolled" value="">
+			<input type="hidden" name="attr_strength_baseones" value="">
 			<input data-i18n-placeholder="strength" name="attr_strength" placeholder="strength" spellcheck="false" title="@{strength}" type="number" value="" min="1" max="5"/>
 		</label>
 		<label data-i18n-title="aching" title="aching">
@@ -161,8 +165,12 @@
 			<button type="roll" name="roll_agility" value="@{agility_action}" data-i18n="agility">agility</button>
 			<!-- The invisible button allowing the use of custom roll parsing -->
 			<button type="action" name="act_agility-action" class="hidden"></button>
+			<button type="action" name="act_agility-reroll" class="hidden"></button>
 			<!-- The invisible field for the attribute which contains the ability call -->
 			<input type="hidden" name="attr_agility_action" value="">
+			<input type="hidden" name="attr_agility_basesuccesses" value="">
+			<input type="hidden" name="attr_agility_basedicerolled" value="">
+			<input type="hidden" name="attr_agility_baseones" value="">
 			<input data-i18n-placeholder="agility" name="attr_agility" placeholder="agility" spellcheck="false" title="@{agility}" type="number" value="" min="1" max="5"/>
 		</label>
 		<label data-i18n-title="shaky hands" title="shaky hands">
@@ -190,8 +198,12 @@
 			<button type="roll" name="roll_wits" value="@{wits_action}" data-i18n="wits">wits</button>
 			<!-- The invisible button allowing the use of custom roll parsing -->
 			<button type="action" name="act_wits-action" class="hidden"></button>
+			<button type="action" name="act_wits-reroll" class="hidden"></button>
 			<!-- The invisible field for the attribute which contains the ability call -->
 			<input type="hidden" name="attr_wits_action" value="">
+			<input type="hidden" name="attr_wits_basesuccesses" value="">
+			<input type="hidden" name="attr_wits_basedicerolled" value="">
+			<input type="hidden" name="attr_wits_baseones" value="">
 			<input data-i18n-placeholder="wits" name="attr_wits" placeholder="wits" spellcheck="false" title="@{wits}" type="number" value="" min="1" max="5"/>
 		</label>
 		<label data-i18n-title="forgetful" title="forgetful">
@@ -219,8 +231,12 @@
 			<button type="roll" name="roll_empathy" value="@{empathy_action}" data-i18n="empathy">empathy</button>
 			<!-- The invisible button allowing the use of custom roll parsing -->
 			<button type="action" name="act_empathy-action" class="hidden"></button>
+			<button type="action" name="act_empathy-reroll" class="hidden"></button>
 			<!-- The invisible field for the attribute which contains the ability call -->
 			<input type="hidden" name="attr_empathy_action" value="">
+			<input type="hidden" name="attr_empathy_basesuccesses" value="">
+			<input type="hidden" name="attr_empathy_basedicerolled" value="">
+			<input type="hidden" name="attr_empathy_baseones" value="">
 			<input data-i18n-placeholder="empathy" name="attr_empathy" placeholder="empathy" spellcheck="false" title="@{empathy}" type="number" value="" min="1" max="5"/>
 		</label>
 		<label data-i18n-title="distraught" title="distraught">
@@ -1135,6 +1151,18 @@
         <h1>{{name}}</h1>
         <div class="sheet-results">
             <h2>Successes {{computed::roll1}}</h2>
+            <h4>[Push]({{reroll}})</h4>
+        </div>
+    </div>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-fwstatreroll">
+    <div class="sheet-template-container">
+        <h1>Reroll {{name}}</h1>
+        <div class="sheet-results">
+            <h2>Total Successes = {{computed::roll1}}</h2>
+			<h3>Base:{{computed::rollbase}}</h2>
+			<h3>Other Totals</h3>
+			<h4>Base Ones={{computed::baseones}}</h4>
         </div>
     </div>
 </rolltemplate>
@@ -1247,32 +1275,179 @@ on('clicked:nightmare-action', async (info) => {
 });
 
 on('clicked:strength-action', async (info) => {
-	const values = await getAttrsAsync(['strength']);
+	const values = await getAttrsAsync(['strength','character_name']);
+	const charname = values.character_name || "";
 	const base = +parseInt(values.strength) || 0;
-	const results = await startRoll("&{template:fwstat} {{name=Strength}} {{roll1=[["+base+"d6>6]]}}");
+	const results = await startRoll("&{template:fwstat} {{name=Strength}} {{roll1=[["+base+"d6>6]]}} {{reroll=~"+charname+"|strength-reroll}}");
 	const basesuccesses = results.results.roll1.result;
-	finishRoll(results.rollId);
+	const basedicerolled= results.results.roll1.dice.length;
+	const thebasedice= results.results.roll1.dice;
+	const baseones= thebasedice.filter(element => element < 2);
+	const totalofbaseones = baseones.length;
+	const computed = basesuccesses;
+	var attrsToChange = {};
+	attrsToChange["strength_basesuccesses"] = basesuccesses;
+	attrsToChange["strength_basedicerolled"] = basedicerolled;
+	attrsToChange["strength_baseones"] = totalofbaseones;
+	setAttrs(attrsToChange);
+		finishRoll(
+			results.rollId,
+			{
+				roll1: computed,				
+			}
+		);
 });
+on('clicked:strength-reroll', async (info) => {
+	const values = await getAttrsAsync(['strength_basedicerolled','strength_basesuccesses','strength_baseones']);
+	const priorbasesuccesses = +parseInt(values.strength_basesuccesses) || 0;
+	const basedicerolled = +parseInt(values.strength_basedicerolled) || 0;
+	const priorbaseones = +parseInt(values.strength_baseones) || 0;
+	const results = await startRoll("&{template:fwstatreroll} {{name=Strength}} {{roll1=[[0]]}} {{baseones=[[0]]}} {{rollbase=[["+(basedicerolled-priorbasesuccesses-priorbaseones)+"d6>6]]}}");
+	const basesuccesses = results.results.rollbase.result;
+	const thebasedice= results.results.rollbase.dice;
+	const baseones= thebasedice.filter(element => element < 2);
+	const newbaseones = baseones.length
+	const totalbaseones = newbaseones+priorbaseones;
+	const computed = basesuccesses+priorbasesuccesses;
+	finishRoll(
+		results.rollId,
+		{
+			roll1: computed,				
+			baseones: totalbaseones,				
+		}
+	);
+});
+
 on('clicked:agility-action', async (info) => {
-	const values = await getAttrsAsync(['agility']);
+	const values = await getAttrsAsync(['agility','character_name']);
+	const charname = values.character_name || "";
 	const base = +parseInt(values.agility) || 0;
-	const results = await startRoll("&{template:fwstat} {{name=agility}} {{roll1=[["+base+"d6>6]]}}");
+	const results = await startRoll("&{template:fwstat} {{name=Agility}} {{roll1=[["+base+"d6>6]]}} {{reroll=~"+charname+"|agility-reroll}}");
 	const basesuccesses = results.results.roll1.result;
-	finishRoll(results.rollId);
+	const basedicerolled= results.results.roll1.dice.length;
+	const thebasedice= results.results.roll1.dice;
+	const baseones= thebasedice.filter(element => element < 2);
+	const totalofbaseones = baseones.length;
+	const computed = basesuccesses;
+	var attrsToChange = {};
+	attrsToChange["agility_basesuccesses"] = basesuccesses;
+	attrsToChange["agility_basedicerolled"] = basedicerolled;
+	attrsToChange["agility_baseones"] = totalofbaseones;
+	setAttrs(attrsToChange);
+		finishRoll(
+			results.rollId,
+			{
+				roll1: computed,				
+			}
+		);
 });
+on('clicked:agility-reroll', async (info) => {
+	const values = await getAttrsAsync(['agility_basedicerolled','agility_basesuccesses','agility_baseones']);
+	const priorbasesuccesses = +parseInt(values.agility_basesuccesses) || 0;
+	const basedicerolled = +parseInt(values.agility_basedicerolled) || 0;
+	const priorbaseones = +parseInt(values.agility_baseones) || 0;
+	const results = await startRoll("&{template:fwstatreroll} {{name=Agility}} {{roll1=[[0]]}} {{baseones=[[0]]}} {{rollbase=[["+(basedicerolled-priorbasesuccesses-priorbaseones)+"d6>6]]}}");
+	const basesuccesses = results.results.rollbase.result;
+	const thebasedice= results.results.rollbase.dice;
+	const baseones= thebasedice.filter(element => element < 2);
+	const newbaseones = baseones.length
+	const totalbaseones = newbaseones+priorbaseones;
+	const computed = basesuccesses+priorbasesuccesses;
+	finishRoll(
+		results.rollId,
+		{
+			roll1: computed,				
+			baseones: totalbaseones,				
+		}
+	);
+});
+
 on('clicked:wits-action', async (info) => {
-	const values = await getAttrsAsync(['wits']);
+	const values = await getAttrsAsync(['wits','character_name']);
+	const charname = values.character_name || "";
 	const base = +parseInt(values.wits) || 0;
-	const results = await startRoll("&{template:fwstat} {{name=wits}} {{roll1=[["+base+"d6>6]]}}");
+	const results = await startRoll("&{template:fwstat} {{name=Wits}} {{roll1=[["+base+"d6>6]]}} {{reroll=~"+charname+"|wits-reroll}}");
 	const basesuccesses = results.results.roll1.result;
-	finishRoll(results.rollId);
+	const basedicerolled= results.results.roll1.dice.length;
+	const thebasedice= results.results.roll1.dice;
+	const baseones= thebasedice.filter(element => element < 2);
+	const totalofbaseones = baseones.length;
+	const computed = basesuccesses;
+	var attrsToChange = {};
+	attrsToChange["wits_basesuccesses"] = basesuccesses;
+	attrsToChange["wits_basedicerolled"] = basedicerolled;
+	attrsToChange["wits_baseones"] = totalofbaseones;
+	setAttrs(attrsToChange);
+		finishRoll(
+			results.rollId,
+			{
+				roll1: computed,				
+			}
+		);
 });
+on('clicked:wits-reroll', async (info) => {
+	const values = await getAttrsAsync(['wits_basedicerolled','wits_basesuccesses','wits_baseones']);
+	const priorbasesuccesses = +parseInt(values.wits_basesuccesses) || 0;
+	const basedicerolled = +parseInt(values.wits_basedicerolled) || 0;
+	const priorbaseones = +parseInt(values.wits_baseones) || 0;
+	const results = await startRoll("&{template:fwstatreroll} {{name=Wits}} {{roll1=[[0]]}} {{baseones=[[0]]}} {{rollbase=[["+(basedicerolled-priorbasesuccesses-priorbaseones)+"d6>6]]}}");
+	const basesuccesses = results.results.rollbase.result;
+	const thebasedice= results.results.rollbase.dice;
+	const baseones= thebasedice.filter(element => element < 2);
+	const newbaseones = baseones.length
+	const totalbaseones = newbaseones+priorbaseones;
+	const computed = basesuccesses+priorbasesuccesses;
+	finishRoll(
+		results.rollId,
+		{
+			roll1: computed,				
+			baseones: totalbaseones,				
+		}
+	);
+});
+
 on('clicked:empathy-action', async (info) => {
-	const values = await getAttrsAsync(['empathy']);
+	const values = await getAttrsAsync(['empathy','character_name']);
+	const charname = values.character_name || "";
 	const base = +parseInt(values.empathy) || 0;
-	const results = await startRoll("&{template:fwstat} {{name=empathy}} {{roll1=[["+base+"d6>6]]}}");
+	const results = await startRoll("&{template:fwstat} {{name=Empathy}} {{roll1=[["+base+"d6>6]]}} {{reroll=~"+charname+"|empathy-reroll}}");
 	const basesuccesses = results.results.roll1.result;
-	finishRoll(results.rollId);
+	const basedicerolled= results.results.roll1.dice.length;
+	const thebasedice= results.results.roll1.dice;
+	const baseones= thebasedice.filter(element => element < 2);
+	const totalofbaseones = baseones.length;
+	const computed = basesuccesses;
+	var attrsToChange = {};
+	attrsToChange["empathy_basesuccesses"] = basesuccesses;
+	attrsToChange["empathy_basedicerolled"] = basedicerolled;
+	attrsToChange["empathy_baseones"] = totalofbaseones;
+	setAttrs(attrsToChange);
+		finishRoll(
+			results.rollId,
+			{
+				roll1: computed,				
+			}
+		);
+});
+on('clicked:empathy-reroll', async (info) => {
+	const values = await getAttrsAsync(['empathy_basedicerolled','empathy_basesuccesses','empathy_baseones']);
+	const priorbasesuccesses = +parseInt(values.empathy_basesuccesses) || 0;
+	const basedicerolled = +parseInt(values.empathy_basedicerolled) || 0;
+	const priorbaseones = +parseInt(values.empathy_baseones) || 0;
+	const results = await startRoll("&{template:fwstatreroll} {{name=Empathy}} {{roll1=[[0]]}} {{baseones=[[0]]}} {{rollbase=[["+(basedicerolled-priorbasesuccesses-priorbaseones)+"d6>6]]}}");
+	const basesuccesses = results.results.rollbase.result;
+	const thebasedice= results.results.rollbase.dice;
+	const baseones= thebasedice.filter(element => element < 2);
+	const newbaseones = baseones.length
+	const totalbaseones = newbaseones+priorbaseones;
+	const computed = basesuccesses+priorbasesuccesses;
+	finishRoll(
+		results.rollId,
+		{
+			roll1: computed,				
+			baseones: totalbaseones,				
+		}
+	);
 });
 
 on('clicked:endure-action', async (info) => {

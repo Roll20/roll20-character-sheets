@@ -1283,11 +1283,16 @@
 					</div>
 
 					<div class='sheet-minimisable_infographic_field4x3b sheet-radius_border'>
-						<button 
+						<!-- <button 
 							name='forcefield_roll' 
 							type='roll' class='sheet-minimisable_infographic_g1 sheet-clear sheet-radius_border_top' 
 							value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{forcefield= @{forcefield_name}}} {{roll= [[1d100cs>@{forcefield_protection}cf<@{forcefield_overload}]]}}'
 						>	Force Field
+						</button> -->
+						<button
+							title='Roll to see if your Forcefield block the damage'
+							name='act_force_roll' type='action' class='sheet-minimisable_infographic_g1 sheet-clear sheet-radius_border_top'>
+							Force Field
 						</button>
 						<p class='sheet-minimisable_infographic_g2'>
 							Name
@@ -2373,8 +2378,8 @@
 							<h3 class='sheet-equipment_weapon_rep_h2'><span name='attr_R_weapon_name'></span></h3>
 							<button name='weapon_hit' class='sheet-equipment_weapon_rep_h3 sheet-full_width sheet-clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{R_weapon_name}}} {{dos=[[[[1+ floor(abs([[{{ {@{R_weapon_target}+@{inlinemod-toggle}}, {@{bsTotal}-@{limiter}}}kh1, {@{bsTotal}+@{limiter}}}kl1]]-[[1d100@{R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll}{{aim= [[@{R_weapon_aim}]]}}{{R_type= [[@{R_weapon_attack}]]}}{{range= [[@{R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{R_weapon_mod1}]]}}{{trained= [[@{R_weapon_trained}]]}}{{burst=@{R_weapon_burst}}}{{auto=@{R_weapon_auto}}}
 !wammo @{character_id} repeating_rangedweapons_@{id}_R_weapon_mag [[@{ammo}*@{R_weapon_setting}]]'>Hit
-								|<input name='attr_R_weapon_target' value='@{bsTotal} + @{R_weapon_trained} - 20 + @{R_weapon_mod1} + @{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range}' class='sheet-input_background sheet-input_char_background' disabled ></button>
-							<button name='weapon_dmg' class='sheet-equipment_weapon_rep_h4 sheet-full_width sheet-clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_real_dmg}]] }} {{@{R_weapon_spray}= }} {{pen=[[@{R_weapon_pen}+0@{R_weapon_pen2}]] }} {{@{settings_weapondescription}=@{R_ability_r} }} @{R_weapon_accurate}'>DMG</button>
+								|<input name='attr_R_weapon_target' value='@{bsTotal} + @{R_weapon_trained} - 20 + @{R_weapon_mod1} + @{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range} + @{atk_accurate_aim} + @{atk_scatter_aim}' class='sheet-input_background sheet-input_char_background' disabled ></button>
+							<button name='weapon_dmg' class='sheet-equipment_weapon_rep_h4 sheet-full_width sheet-clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_real_dmg}+@{atk_scatter_dmg}]] }} {{@{R_weapon_spray}= }} {{pen=[[@{R_weapon_pen}+0@{R_weapon_pen2}]] }} {{@{settings_weapondescription}=@{R_ability_r} }} @{atk_accurate_dmg}'>DMG</button>
 						</div>
 						<div class='sheet-equipment_ranged_weapons_grid0 sheet-collapsible_entity_toggle'>
 							<select name='attr_R_weapon_aim' class='sheet-equipment_ranged_weapons_gs01 sheet-full_width sheet-clear sheet-select_corection'>
@@ -2440,14 +2445,20 @@
 						</div>
 						<div class='sheet-equipment_ranged_weapons_grid2a sheet-collapsible_entity_toggle sheet-collapsible_entity_toggle_min sheet-collapsible_entity_toggle_half'>
 							<div class='sheet-equipment_ranged_weapons_gs06'>Primitive</div>
-							<input class='sheet-equipment_ranged_weapons_gs07 sheet-full_width' type='number' value='0' name='attr_R_weapon_max' />
+							<input class='sheet-equipment_ranged_weapons_gs07 sheet-full_width' type='text' value='0' name='attr_R_weapon_max' />
 							<div class='sheet-equipment_ranged_weapons_gs08'>Proven</div>
-							<input class='sheet-equipment_ranged_weapons_gs09 sheet-full_width' type='number' value='0' name='attr_R_weapon_min' />
+							<input class='sheet-equipment_ranged_weapons_gs09 sheet-full_width' type='text' value='0' name='attr_R_weapon_min' />
 							<div class='sheet-equipment_ranged_weapons_gs010'>Vengeful</div>
-							<input class='sheet-equipment_ranged_weapons_gs011 sheet-full_width' type='number' value='0' name='attr_R_weapon_vengeful' />
+							<input class='sheet-equipment_ranged_weapons_gs011 sheet-full_width' type='text' value='0' name='attr_R_weapon_vengeful' />
 							<input type='hidden' value='' name='attr_R_weapon_real_dmg' />
 							<div class='sheet-equipment_ranged_weapons_gs012'>Accurate</div>
-							<input class='sheet-equipment_ranged_weapons_gs013' type='checkbox' value='{{accurate=?{dos |1, [[0]]|2, [[0]]|3, [[1d5]]|4, [[1d5]]|5, [[2d5]]|5+, [[2d5]]}}}' name='attr_R_weapon_accurate' />
+							<input class='sheet-equipment_ranged_weapons_gs013' type='checkbox' value='1' name='attr_R_weapon_accurate' />
+							<input class='hidden' type='number' value='0' name='attr_atk_accurate_aim' readonly />
+							<input class='hidden' type='text' value='0' name='attr_atk_accurate_dmg' readonly />
+							<div class='sheet-equipment_ranged_weapons_gs012b'>Scatter</div>
+							<input class='sheet-equipment_ranged_weapons_gs013b' type='checkbox' value='1' name='attr_R_weapon_scatter' />
+							<input class='hidden' type='number' value='0' name='attr_atk_scatter_aim' readonly />
+							<input class='hidden' type='text' value='0' name='attr_atk_scatter_dmg' readonly />
 						</div>
 						<div class='sheet-equipment_ranged_weapons_grid3 sheet-collapsible_entity_toggle sheet-collapsible_entity_toggle_min'>
 							<div class='sheet-equipment_ranged_weapons_gs13'>RoF</div>
@@ -3470,8 +3481,8 @@
 								<h3 class='sheet-equipment_weapon_rep_h2'><span name='attr_V_R_weapon_name'></span></h3>
 								<button name='weapon_hit' class='sheet-equipment_weapon_rep_h3 sheet-full_width sheet-clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{V_R_weapon_name}}} {{dos=[[[[1+ floor(abs([[{{ {@{V_R_weapon_target}+@{inlinemod-toggle}}, {@{bsTotal}-@{limiter}}}kh1, {@{bsTotal}+@{limiter}}}kl1]]-[[1d100@{V_R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll}{{aim= [[@{V_R_weapon_aim}]]}}{{V_R_type= [[@{V_R_weapon_attack}]]}}{{range= [[@{V_R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{V_R_weapon_mod1}]]}}{{trained= [[@{V_R_weapon_trained}]]}}{{burst=@{V_R_weapon_burst}}}{{auto=@{V_R_weapon_auto}}}
 !wammo @{character_id} repeating_vehiclerangedweapons_@{id}_V_R_weapon_mag [[@{ammo}*@{V_R_weapon_setting}]]'>Hit
-									|<input name='attr_V_R_weapon_target' value='@{bsTotal} + @{V_R_weapon_trained} - 20 + @{V_R_weapon_mod1} + @{V_R_weapon_attack} + @{V_R_weapon_aim} + @{V_R_weapon_attack_range}' class='sheet-input_background sheet-input_char_background' disabled ></button>
-								<button name='weapon_dmg' class='sheet-equipment_weapon_rep_h4 sheet-full_width sheet-clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{V_R_weapon_type}}} {{weapon= @{V_R_weapon_name}}} {{damage=[[@{V_R_weapon_real_dmg}]] }} {{@{V_R_weapon_spray}= }} {{pen=[[@{V_R_weapon_pen}+0@{V_R_weapon_pen2}]] }} {{@{settings_weapondescription}=@{V_R_ability_r} }} @{V_R_weapon_accurate}'>DMG</button>
+									|<input name='attr_V_R_weapon_target' value='@{bsTotal} + @{V_R_weapon_trained} - 20 + @{V_R_weapon_mod1} + @{V_R_weapon_attack} + @{V_R_weapon_aim} + @{V_R_weapon_attack_range} + @{atk_accurate_aim} + @{atk_scatter_aim}' class='sheet-input_background sheet-input_char_background' disabled ></button>
+								<button name='weapon_dmg' class='sheet-equipment_weapon_rep_h4 sheet-full_width sheet-clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{V_R_weapon_type}}} {{weapon= @{V_R_weapon_name}}} {{damage=[[@{V_R_weapon_real_dmg}+@{atk_scatter_dmg}]] }} {{@{V_R_weapon_spray}= }} {{pen=[[@{V_R_weapon_pen}+0@{V_R_weapon_pen2}]] }} {{@{settings_weapondescription}=@{V_R_ability_r} }} @{atk_accurate_dmg}'>DMG</button>
 							</div>
 							<div class='sheet-equipment_ranged_weapons_grid0 sheet-collapsible_entity_toggle'>
 								<select name='attr_V_R_weapon_aim' class='sheet-equipment_ranged_weapons_gs01 sheet-full_width sheet-clear sheet-select_corection'>
@@ -3536,14 +3547,20 @@
 							</div>
 							<div class='sheet-equipment_ranged_weapons_grid2a sheet-collapsible_entity_toggle sheet-collapsible_entity_toggle_min sheet-collapsible_entity_toggle_half'>
 								<div class='sheet-equipment_ranged_weapons_gs06'>Primitive</div>
-								<input class='sheet-equipment_ranged_weapons_gs07 sheet-full_width' type='number' value='0' name='attr_V_R_weapon_max' />
+								<input class='sheet-equipment_ranged_weapons_gs07 sheet-full_width' type='text' value='0' name='attr_V_R_weapon_max' />
 								<div class='sheet-equipment_ranged_weapons_gs08'>Proven</div>
-								<input class='sheet-equipment_ranged_weapons_gs09 sheet-full_width' type='number' value='0' name='attr_V_R_weapon_min' />
+								<input class='sheet-equipment_ranged_weapons_gs09 sheet-full_width' type='text' value='0' name='attr_V_R_weapon_min' />
 								<div class='sheet-equipment_ranged_weapons_gs010'>Vengeful</div>
-								<input class='sheet-equipment_ranged_weapons_gs011 sheet-full_width' type='number' value='0' name='attr_V_R_weapon_vengeful' />
+								<input class='sheet-equipment_ranged_weapons_gs011 sheet-full_width' type='text' value='0' name='attr_V_R_weapon_vengeful' />
 								<input type='hidden' value='' name='attr_V_R_weapon_real_dmg' />
 								<div class='sheet-equipment_ranged_weapons_gs012'>Accurate</div>
-								<input class='sheet-equipment_ranged_weapons_gs013' type='checkbox' value='{{accurate=?{dos |1, [[0]]|2, [[0]]|3, [[1d5]]|4, [[1d5]]|5, [[2d5]]|5+, [[2d5]]}}}' name='attr_V_R_weapon_accurate' />
+								<input class='sheet-equipment_ranged_weapons_gs013' type='checkbox' value='1' name='attr_V_R_weapon_accurate' />
+								<input class='hidden' type='number' value='0' name='attr_atk_accurate_aim' readonly />
+								<input class='hidden' type='text' value='0' name='attr_atk_accurate_dmg' readonly />
+								<div class='sheet-equipment_ranged_weapons_gs012b'>Scatter</div>
+								<input class='sheet-equipment_ranged_weapons_gs013b' type='checkbox' value='1' name='attr_V_R_weapon_scatter' />
+								<input class='hidden' type='number' value='0' name='attr_atk_scatter_aim' readonly />
+								<input class='hidden' type='text' value='0' name='attr_atk_scatter_dmg' readonly />
 							</div>
 							<div class='sheet-equipment_ranged_weapons_grid3 sheet-collapsible_entity_toggle sheet-collapsible_entity_toggle_min'>
 								<div class='sheet-equipment_ranged_weapons_gs13'>RoF</div>
@@ -4405,6 +4422,35 @@ NOTE: replace worker by javascript for IDE functionality
 <script type='text/worker'>
 // <script>
 
+	// Async Await functions
+
+	const asw = (() => {
+		const setActiveCharacterId = function(charId){
+			let oldAcid=getActiveCharacterId();
+			let ev = new CustomEvent("message");
+			ev.data={"id":"0", "type":"setActiveCharacter", "data":charId};
+			self.dispatchEvent(ev);
+			return oldAcid;
+		};
+		const promisifyWorker = (worker, parameters) => {
+			let acid=getActiveCharacterId(); 
+			let prevAcid=null;               
+			return new Promise((res,rej)=>{
+				prevAcid=setActiveCharacterId(acid);  
+				try {if (worker===0) getAttrs(parameters[0]||[],(v)=>res(v));
+					else if (worker===1) setAttrs(parameters[0]||{}, parameters[1]||{},(v)=>res(v));
+					else if (worker===2) getSectionIDs(parameters[0]||'',(v)=>res(v));
+				} catch(err) {rej(console.error(err))}
+			}).finally(()=>setActiveCharacterId(prevAcid));
+		}
+		return {
+			getAttrs(attrArray) {return promisifyWorker(0, [attrArray])},
+			setAttrs(attrObj, options) {return promisifyWorker(1, [attrObj, options])},
+			getSectionIDs(section) {return promisifyWorker(2, [section])},
+			setActiveCharacterId,
+		}
+	})();
+
 	 on('clicked:fate_roll', () => {
 		getAttrs(['fate', 'settings_fate'], (v) => {
 			startRoll("@{to-gm}&{template:mythic} {{character= @{character_name}}}{{fate= [[1d10cs10@{settings_fate}]]}}", (results) => {
@@ -4424,6 +4470,14 @@ NOTE: replace worker by javascript for IDE functionality
 					setAttrs({fate: fate})
 				}
 			});
+		});
+    });
+
+	 on('clicked:force_roll', async () => {
+		const attrs = await asw.getAttrs(['forcefield_name', 'forcefield_overload', 'forcefield_protection'])
+		let forcefield_protection = parseInt(attrs.forcefield_protection) +1
+		startRoll(`@{to-gm}&{template:mythic} {{character= @{character_name}}} {{forcefield= ${attrs.forcefield_name}}} {{roll= [[1d100cs>${forcefield_protection}cf<${attrs.forcefield_overload}]]}}`, (results) => {
+			finishRoll(results.rollId);
 		});
     });
 
@@ -4580,6 +4634,18 @@ NOTE: replace worker by javascript for IDE functionality
 
  // Movement and Weight sheet worker and Fatigue Pts
 
+ 	class Stats {
+		constructor(name) {
+			const stat = asw.getAttrs([`${name}`, `${name}_unnat`, `${name}_advancement`, `${name}_mod`])
+			this.base = parseInt(stat[`${stat}`], 10) || 0
+			this.modifier = parseInt(stat[`${stat}_mod`], 10) || 0
+			this.advancement = parseInt(stat[`${stat}_advancement`], 10) || 0
+			this.unnat = parseInt(stat[`${stat}_unnat`], 10) || 0
+			this.total = () => this.base + this.modifier + this.advancement
+			this.bonus = () => Math.floor(this.total / 10 + this.unnat)
+		}
+	}
+
     let fieldsMWF = [
         'size', 'fatigue', 'carry', 'weight_total',
         'ws', 'ws_unnat', 'ws_advancement', 'ws_mod',
@@ -4595,7 +4661,6 @@ NOTE: replace worker by javascript for IDE functionality
         'fatigue_ignore', 'psykana_class'
     ];
     on('sheet:opened ' + fieldsMWF.map(field => 'change:' + field).join(' '), function(e) {
-        // console.log(e);
         getAttrs(fieldsMWF, function(values) {
             // SIZE
             var size = parseInt(values['size'], 10) || 0;
@@ -5303,6 +5368,144 @@ NOTE: replace worker by javascript for IDE functionality
 
     // Weapons 
 
+	// accurate
+
+	// Normal Weapons Accurate
+	on('sheet:opened change:repeating_rangedweapons:r_weapon_accurate change:repeating_rangedweapons:r_weapon_attack change:repeating_rangedweapons:r_weapon_aim', function() {
+		getSectionIDs('rangedweapons', function(idarray) {
+			// first get the attribute names for all rows in put in one array
+			const fieldnames = [];
+			idarray.forEach(id => fieldnames.push(`repeating_rangedweapons_${id}_R_weapon_accurate`,`repeating_rangedweapons_${id}_R_weapon_attack`,`repeating_rangedweapons_${id}_R_weapon_aim`));
+
+			getAttrs(fieldnames, values => {
+				// create a variable to hold all the attribute values you re going to create.
+				const attr = {};
+				// now loop through the rows again
+				idarray.forEach(id => {
+					let row = 'repeating_rangedweapons_' + id;
+					let r_weapon_accurate = values[`${row}_R_weapon_accurate`] || 0;
+					let r_weapon_attack = values[`${row}_R_weapon_attack`] || 10;
+					let r_weapon_aim = values[`${row}_R_weapon_aim`] || 0;
+					
+					if ((r_weapon_accurate == 1)&&(r_weapon_attack == 10)&&(r_weapon_aim != 0)) {
+						attr[`${row}_atk_accurate_aim`] = 10;
+						attr[`${row}_atk_accurate_dmg`] = `{{accurate=?{dos |1+, [[0]]|3+, [[1d5]]|5+, [[2d5]]}}}`;
+					} else {
+						attr[`${row}_atk_accurate_aim`] = 0;
+						attr[`${row}_atk_accurate_dmg`] = 0;
+					}
+				});
+				console.log(values,attr)
+				setAttrs(attr);
+			});
+		});
+	});
+
+	// Vehicle Weapons Accurate
+	on('sheet:opened change:repeating_vehiclerangedweapons:v_r_weapon_accurate change:repeating_vehiclerangedweapons:v_r_weapon_attack change:repeating_vehiclerangedweapons:v_r_weapon_aim', function() {
+		getSectionIDs('vehiclerangedweapons', function(idarray) {
+			// first get the attribute names for all rows in put in one array
+			const fieldnames = [];
+			idarray.forEach(id => fieldnames.push(`repeating_vehiclerangedweapons_${id}_V_R_weapon_accurate`,`repeating_vehiclerangedweapons_${id}_V_R_weapon_attack`,`repeating_vehiclerangedweapons_${id}_V_R_weapon_aim`));
+
+			getAttrs(fieldnames, values => {
+				// create a variable to hold all the attribute values you re going to create.
+				const attr = {};
+				// now loop through the rows again
+				idarray.forEach(id => {
+					let row = 'repeating_vehiclerangedweapons_' + id;
+					let v_r_weapon_accurate = values[`${row}_V_R_weapon_accurate`] || 0;
+					let v_r_weapon_attack = values[`${row}_V_R_weapon_attack`] || 10;
+					let v_r_weapon_aim = values[`${row}_V_R_weapon_aim`] || 0;
+
+					if ((v_r_weapon_accurate == 1)&&(v_r_weapon_attack == 10)&&(v_r_weapon_aim != 0)) {
+						attr[`${row}_veh_atk_accurate_aim`] = 10;
+						attr[`${row}_veh_atk_accurate_dmg`] = `{{accurate=?{dos |1+, [[0]]|3+, [[1d5]]|5+, [[2d5]]}}}`;
+					} else {
+						attr[`${row}_veh_atk_accurate_aim`] = 0;
+						attr[`${row}_veh_atk_accurate_dmg`] = 0;
+					}
+				});
+				console.log(values,attr)
+				setAttrs(attr);
+			});
+		});
+	});
+
+	// Scatter
+
+	// Normal Weapons Scatter
+	on('sheet:opened change:repeating_rangedweapons:r_weapon_scatter change:repeating_rangedweapons:r_weapon_attack_range', function() {
+		getSectionIDs('rangedweapons', function(idarray) {
+			// first get the attribute names for all rows in put in one array
+			const fieldnames = [];
+			idarray.forEach(id => fieldnames.push(`repeating_rangedweapons_${id}_R_weapon_scatter`,`repeating_rangedweapons_${id}_R_weapon_attack_range`));
+
+			getAttrs(fieldnames, values => {
+				// create a variable to hold all the attribute values you re going to create.
+				const attr = {};
+				// now loop through the rows again
+				idarray.forEach(id => {
+					let row = 'repeating_rangedweapons_' + id;
+					let r_weapon_scatter = values[`${row}_R_weapon_scatter`] || 0;
+					let r_weapon_attack_range = values[`${row}_R_weapon_attack_range`] || 0;
+					
+					if ((r_weapon_scatter == 1)&&(r_weapon_attack_range == 30)) { //point blank
+						attr[`${row}_atk_scatter_aim`] = 10;
+						attr[`${row}_atk_scatter_dmg`] = 3;
+					} else if ((r_weapon_scatter == 1)&&(r_weapon_attack_range == 10)) { //short range
+						attr[`${row}_atk_scatter_aim`] = 10;
+						attr[`${row}_atk_scatter_dmg`] = 0;
+					} else if (r_weapon_scatter == 1) {
+						attr[`${row}_atk_scatter_aim`] = 0;
+						attr[`${row}_atk_scatter_dmg`] = -3;
+					} else {
+						attr[`${row}_atk_scatter_aim`] = 0;
+						attr[`${row}_atk_scatter_dmg`] = 0;
+					}
+				});
+				console.log(values,attr)
+				setAttrs(attr);
+			});
+		});
+	});
+
+	// Vehicle Weapons Scatter
+	on('sheet:opened change:repeating_vehiclerangedweapons:v_r_weapon_scatter change:repeating_vehiclerangedweapons:v_r_weapon_attack_range', function() {
+		getSectionIDs('vehiclerangedweapons', function(idarray) {
+			// first get the attribute names for all rows in put in one array
+			const fieldnames = [];
+			idarray.forEach(id => fieldnames.push(`repeating_vehiclerangedweapons_${id}_V_R_weapon_scatter`,`repeating_vehiclerangedweapons_${id}_V_R_weapon_attack_range`));
+
+			getAttrs(fieldnames, values => {
+				// create a variable to hold all the attribute values you re going to create.
+				const attr = {};
+				// now loop through the rows again
+				idarray.forEach(id => {
+					let row = 'repeating_vehiclerangedweapons_' + id;
+					let v_r_weapon_scatter = values[`${row}_V_R_weapon_scatter`] || 0;
+					let v_r_weapon_attack_range = values[`${row}_V_R_weapon_attack_range`] || 0;
+					
+					if ((v_r_weapon_scatter == 1)&&(v_r_weapon_attack_range == 30)) { //point blank
+						attr[`${row}_atk_scatter_aim`] = 10;
+						attr[`${row}_atk_scatter_dmg`] = 3;
+					} else if ((v_r_weapon_scatter == 1)&&(v_r_weapon_attack_range == 10)) { //short range
+						attr[`${row}_atk_scatter_aim`] = 10;
+						attr[`${row}_atk_scatter_dmg`] = 0;
+					} else if (r_weapon_scatter == 1) {
+						attr[`${row}_atk_scatter_aim`] = 0;
+						attr[`${row}_atk_scatter_dmg`] = -3;
+					} else {
+						attr[`${row}_atk_scatter_aim`] = 0;
+						attr[`${row}_atk_scatter_dmg`] = 0;
+					}
+				});
+				console.log(values,attr)
+				setAttrs(attr);
+			});
+		});
+	});
+
 	// Script for Ammo API
 	
     on("sheet:opened change:repeating_rangedweapons:r_weapon_attack change:repeating_rangedweapons:r_weapon_burst change:repeating_rangedweapons:r_weapon_auto remove:repeating_rangedweapons change:repeating_vehiclerangedweapons:v_r_weapon_attack change:repeating_vehiclerangedweapons:v_r_weapon_burst change:repeating_vehiclerangedweapons:v_r_weapon_auto remove:repeating_vehiclerangedweapons", function() {
@@ -5409,7 +5612,9 @@ NOTE: replace worker by javascript for IDE functionality
                     if (set === 4) {
                         damTotal += '+2';
                         attr[`${source}weapon_pen2`] = 2;
-                    } else {
+                    } else if (set === 3) {
+                        attr[`${source}weapon_pen2`] = 2;
+					} else {
                         attr[`${source}weapon_pen2`] = 0;
                     }
                     attr[`${source}weapon_real_dmg`] = damTotal;
