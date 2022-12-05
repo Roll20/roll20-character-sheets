@@ -2071,7 +2071,7 @@
               <span name="attr_name"></span>
               <span class="center" name="attr_rating"></span>
               <span class="center" name="attr_activation"></span>
-              <input class="collapse-flag" name="attr_display_flag" type="checkbox"/><span class="pictos">i</span>
+              <input class="collapse-flag" name="attr_display_flag" type="checkbox" checked="checked" value="on"/><span class="pictos">i</span>
               <input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
               <div class="collapse"><span name="attr_notes"></span></div>
               <div class="settings">
@@ -2338,7 +2338,7 @@
             <fieldset class="repeating_metamagic">
               <span name="attr_name"></span>
               <span class="center" name="attr_rating"></span>
-              <input class="collapse-flag" name="attr_display_flag" type="checkbox"/><span class="pictos">i</span>
+              <input class="collapse-flag" name="attr_display_flag" type="checkbox" checked="checked" value="on"/><span class="pictos">i</span>
               <input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
               <div class="collapse"><span name="attr_notes"></span></div>
               <div class="settings">
@@ -10802,10 +10802,10 @@ var compendium_import = function(data) {
 				compendiumAddPower(data);
 				break;
 			case 'Metamagic':
-//				compendiumAddMetamagic(data);
+				compendiumAddMetamagic(data);
 				break;
 			case 'Qualities':
-//				compendiumAddQuality(data);
+				compendiumAddQuality(data);
 				break;
 			default:
 				break;
@@ -10815,21 +10815,18 @@ var compendium_import = function(data) {
 
 var compendiumAddSpell = function(data) {
 		rowattrs = {};
-console.log("It's a spell! Oooh, MAGIC!");
+console.log("It's a spell! Ooooh, magic!");
 //console.log(data);
 		row_id = generateRowID();
 
 		var spell_type = 'spell';
 
 		['data-damage', 'data-duration', 'data-effect_type', 'data-range'].forEach((key) => {
-//console.log(key);
 			if(typeof(data[key]) === 'undefined') {
-//console.log(key + " undefined!");
 				data[key] = '';
 			}
-//console.log(data[key]);
 		});
-//console.log(data);
+
 		rowattrs["repeating_" + spell_type + "_" + row_id + "_flag"] = false;
 		rowattrs["repeating_" + spell_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
 		rowattrs["repeating_" + spell_type + "_" + row_id + "_skill"] = '@{sorcery}';
@@ -10842,7 +10839,54 @@ console.log("It's a spell! Oooh, MAGIC!");
 		rowattrs["repeating_" + spell_type + "_" + row_id + "_range"] = trans.Spells.range[data["data-range"].toUpperCase()] || '';
 		rowattrs["repeating_" + spell_type + "_" + row_id + "_type"] = ucfirst(data["data-type"]) || '';
 
-console.log(rowattrs);
+		setAttrs(rowattrs);
+};
+
+
+var compendiumAddQuality = function(data) {
+		rowattrs = {};
+console.log("It's a quality! karma spent or to spend?");
+console.log(data);
+		row_id = generateRowID();
+
+		var rep_type = 'quality';
+
+		[].forEach((key) => {
+			if(typeof(data[key]) === 'undefined') {
+				data[key] = '';
+			}
+		});
+
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = "on";
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_type"] = (data["data-type"] == "TRUE") ? 'p' : 'n';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+
+		setAttrs(rowattrs);
+
+};
+
+
+var compendiumAddMetamagic = function(data) {
+		rowattrs = {};
+console.log("It's a metamagic! More Power!");
+//console.log(data);
+		row_id = generateRowID();
+
+		var rep_type = 'metamagic';
+
+		[].forEach((key) => {
+			if(typeof(data[key]) === 'undefined') {
+				data[key] = '';
+			}
+		});
+
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = "on";
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+
 		setAttrs(rowattrs);
 
 };
@@ -10888,7 +10932,7 @@ console.log("It's a power! Superman?!");
 		});
 
 		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = 'display';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = 'on';
 		rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
 		rowattrs["repeating_" + rep_type + "_" + row_id + "_activation"] = trans['Powers']['activation'][data["data-activation"].toUpperCase()] || 'Passive';
 		rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
