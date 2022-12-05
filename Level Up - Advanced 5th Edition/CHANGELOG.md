@@ -1,6 +1,10 @@
 Change Log
 ==============================================
-**2022-11-22 ** v.15 Paul V
+**2022-12-05 ** v.17 Paul V
+	Fixed issue with NPC Skill and Attack rolls - converted the rolls to use the new Action button tech
+	Added Initative roll to NPC Sheet
+	Fixed issue with Tool rolls
+**2022-11-22 ** v.16 Paul V
 	Fixed all the Passive Checks to be 10+modifiers+stat modifier and not +stat
 	Fixed issue where the Skill speciality couldn't be edited on the main screen, it can now be edited on both main screen and popup
 **2022-11-15 ** v.15 Paul V
