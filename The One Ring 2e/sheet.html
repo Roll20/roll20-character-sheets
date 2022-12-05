@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="03-04-00" />
+<input type="hidden" name="attr_version" value="03-05-01" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -67,13 +67,13 @@
 
         <div id="gear">
             <select id="gearoritems_toggle" name="attr_gearoritems">
-                <option value="1" select="selected">Gear</option>
-                <option value="2">Useful Items</option>
+                <option data-i18n="gear" value="1" select="selected"></option>
+                <option data-i18n="useful-items" value="2"></option>
             </select>
             <input type="hidden" name="attr_gearoritems_toggle" class="gearoritems_toggle" value="1" />
             <div id="items-nested">
                 <div id="items-row">
-                    <label>Name</label>
+                    <label data-i18n="name"></label>
                     <label class="center" data-i18n-title="item-bonus" data-i18n="item-bonus-short"></label>
                     <label class="center" data-i18n-title="blessing1" data-i18n="blessing1-short"></label>
                     <label class="center" data-i18n-title="blessing2" data-i18n="blessing2-short"></label>
@@ -223,7 +223,11 @@
                         <span><input class="strong" name="attr_hearttn" value="0" type="number"></span></span>
                     <span></span>
                     <span class="diamond-red">
-                        <span><input class="strong" name="attr_hope" value="1" type="number"></span></span>
+                        <input type="hidden" class="sheet-hopetoggle" name="attr_hopetoggle" />
+                        <span id="hope_readonly" data-i18n-title="daunted-title"><input class="strong" name="attr_hope"
+                                value="1" type="number" readonly="readonly"></span>
+                        <span id="hope"><input class="strong" name="attr_hope" value="1" type="number"></span>
+                    </span>
                     <label data-i18n="current-hope" class="left">Current Hope</label>
                 </div>
 
@@ -266,7 +270,7 @@
                 <div id="wits-row3" class="attribute-row3">
                     <div class="right">
                         <label data-i18n="shield"><input type="checkbox" name="attr_shieldparry_active" value=1
-                                checked="checked">Shield</label>
+                                checked="checked"></label>
                     </div>
                     <span class="diamond-small">
                         <span><input name="attr_shieldparry_total" value="0" type="number"
@@ -275,13 +279,13 @@
                         <span class="diamond-small">
                             <span><input name="attr_otherparry" value="0" type="number"></span></span>
                         <label data-i18n="other" class="center"><input type="checkbox" name="attr_otherparry_active"
-                                value=1 checked="checked">Other</label>
+                                value=1 checked="checked"></label>
                     </div>
                     <span class="diamond-small">
                         <span><input name="attr_stanceparry" value="0" type="number"></span></span>
                     <div class="left">
                         <label data-i18n="stance"><input type="checkbox" name="attr_stanceparry_active" value=1
-                                checked="checked">Stance</label>
+                                checked="checked"></label>
                     </div>
                 </div>
             </div>
@@ -307,11 +311,14 @@
                     <span data-i18n="miserable">Miserable</span></label>
                 <label><input name="attr_wounded" type="checkbox" value=1>
                     <span data-i18n="wounded">Wounded</span></label>
+                <div />
+                <label><input name="attr_daunted" type="checkbox" value=1>
+                    <span data-i18n="daunted" data-i18n-title="daunted-title">Daunted</span></label>
+                <div />
             </div>
-            <span>
-                <label data-i18n="injury" />
-                <input name="attr_injury" type="text">
-            </span>
+            <div class="center">
+                <label data-i18n="injury" /><input name="attr_injury" type="text">
+            </div>
             <div id="custom-diceroller">
                 <div class="onecols">
                     <h2 data-i18n="custom-roll">Custom Dice Roller</h3>
@@ -347,7 +354,6 @@
                         id="roll_custom" />
                 </div>
             </div>
-            <br />
             <div class="center">
                 <label data-i18n="parsed-rolls">Parsed rolls</label>
                 <div class="sheet-hover-info" data-i18n="parsedroll-description">When enabled the dice rolls will be
@@ -365,7 +371,6 @@
                     using preconfigured rollable tables according to instructions for The One Ring 1st Edition, with
                     output displayed in a rolltemplate.</div>
             </div>
-            <br />
             <button type="action" name="act_notestoggle" data-i18n="notes">Notes</button>
         </div>
         <div id="combat">
@@ -630,7 +635,7 @@
             </div>
         </div>
         <div id="skill-heart">
-            <h1 data-i18n="skills" class="center">Skills</h1>
+            <h1 data-i18n="skills" class="center"></h1>
             <div class=sheet-row>
                 <button type="roll" class="table-rolls" value="@{enhearten_roll}" name="roll_enheartencheck"></button>
                 <button type="action" class="parsed-rolls" name="act_enhearten" id="roll_enhearten"></button>
@@ -2154,6 +2159,15 @@
         });
     });
 
+    on("change:daunted sheet:opened", function() {
+        getAttrs(["daunted", "sheetTab"], function(values) {
+            let daunted = values.daunted||0;
+            clog(`Hope toggle: ${daunted}`);
+            setAttrs({
+                hopetoggle: daunted,
+            });
+        });
+    });
 
     /*==================
       Valour & Wisdom
@@ -2922,6 +2936,44 @@
 ### Added
 - bonus modifier to useful items
 - whisper mode of pc and npc
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+
+            if (build < 25) {
+                attrs["build"] = 25;
+                let releaselog = {msg:""};
+                hlog(`Release 03.05.00 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Added
+- added "Daunted" modifier
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+
+            if (build < 26) {
+                attrs["build"] = 26;
+                let releaselog = {msg:""};
+                hlog(`Release 03.05.01 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Fixed
+- translation bugs
                         `, releaselog);
                         hlog("==============", releaselog);
                         attrs['releaselog'] =  releaselog.msg + values['releaselog'];
