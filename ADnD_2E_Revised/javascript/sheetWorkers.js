@@ -1173,13 +1173,9 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
         if (!spell)
             return;
 
-        let isWizard = section.startsWith('wiz');
         let isPriest = section.startsWith('pri');
-        let levelField;
-        if (isWizard)
-            levelField = 'level-wizard';
-        if (isPriest)
-            levelField = 'level-priest';
+        let levelField = isPriest ? 'level-priest' : 'level-wizard';
+        let className = isPriest ? 'Priest' : 'Wizard';
 
         getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField], function(books) {
             if (bookInactiveShowToast(books, spell))
@@ -1187,7 +1183,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
 
             let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
+                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level'], className),
                 [`repeating_spells-${section}_spell-school`]       : getSpellSchools(spell, books),
                 [`repeating_spells-${section}_spell-components`]   : spell['components'],
                 [`repeating_spells-${section}_spell-range`]        : spell['range'],
@@ -1252,11 +1248,10 @@ let priestSpellLevelsSections = [
     {level: 'q', sections: ['49', '50', '51', 'priq']},
 ];
 
-function wizardDisplayLevel(s) {
-    return `Level ${s} Wizard`;
-}
-function priestDisplayLevel(s) {
-    return s === 'q' ? 'Quest Spell Priest' : `Level ${s} Priest`;
+const displaySpellLevel = function(level, className) {
+    return level === 'q'
+        ? 'Quest Spell Priest'
+        : `Level ${level} ${className}`;
 }
 
 // --- Start setup Spell Slots --- //
@@ -1271,11 +1266,11 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel, SCHOOL_FIELDS);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, displaySpellLevel, SCHOOL_FIELDS);
         setupSpellCrit(lastSection);
     }
 });
-setupAutoFillSpellInfo('wizmonster', wizardSpells, wizardDisplayLevel, SCHOOL_FIELDS);
+setupAutoFillSpellInfo('wizmonster', wizardSpells, displaySpellLevel, SCHOOL_FIELDS);
 setupSpellCrit('wizmonster');
 
 priestSpellLevelsSections.forEach(spellLevel => {
@@ -1289,14 +1284,14 @@ priestSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel, SPHERE_FIELDS);
+        setupAutoFillSpellInfo(lastSection, priestSpells, displaySpellLevel, SPHERE_FIELDS);
         setupSpellCrit(lastSection);
         if (lastSection !== 'priq') {
             setupAddPriestSpell(lastSection);
         }
     }
 });
-setupAutoFillSpellInfo('primonster', priestSpells, priestDisplayLevel, SPHERE_FIELDS);
+setupAutoFillSpellInfo('primonster', priestSpells, displaySpellLevel, SPHERE_FIELDS);
 setupSpellCrit('primonster');
 // --- End setup Spell Slots --- //
 
@@ -2565,7 +2560,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
 
         let rollBuilder = new RollTemplateBuilder('2Espell');
         rollBuilder.push(`title=@{scroll}\n(Casting level @{scroll-level})`);
-        rollBuilder.push(`splevel=Level ${spell.level} ${spellClass}`);
+        rollBuilder.push(`splevel=${displaySpellLevel(spell.level, spellClass)}`);
         rollBuilder.push(`school=${getSpellSchools(spell, books)}`);
         if (spellClass === 'Priest') {
             let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
@@ -2575,6 +2570,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         rollBuilder.push(`components=V`);
         rollBuilder.push(`duration=${spell['duration']}`);
         rollBuilder.push(`time=@{scroll-speed}`);
+        rollBuilder.push('scroll=true');
         rollBuilder.push(`aoe=${spell['aoe']}`);
         rollBuilder.push(`save=${spell['saving-throw']}`);
         rollBuilder.push(`subtlety=${spell['subtlety'] || ''}`);
@@ -2594,27 +2590,29 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         scrollMacro = scrollMacro.replaceAll('[[@{level-wizard}]]','[[@{scroll-level}]]')
             .replaceAll('[[@{level-priest}]]', '[[@{scroll-level}]]');
 
-        let scribeLevel = '6';
-        if (scrollMacro.includes('[[@{scroll-level}]]')) {
-            let recommendedMinimumLevel;
+        let recommendedMinimumLevel;
 
-            let spellLevel = parseInt(spell.level);
-            if (spellLevel <= 3) {
-                recommendedMinimumLevel = 6;
-            } else if (spellLevel === 4 || spellLevel === 5) {
-                recommendedMinimumLevel = spellLevel*2;
-            } else if (spellLevel === 6 && spellClass === 'Priest') {
-                recommendedMinimumLevel = spellLevel*2;
-            } else if (spellLevel >= 6) {
-                recommendedMinimumLevel = spellLevel*2+1
-            }
-
-            scribeLevel = await extractQueryResult(`?{At what level is this scroll scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
+        let spellLevel = parseInt(spell.level);
+        if (isNaN(spellLevel)) {
+            recommendedMinimumLevel = 6;
+        } else if (spellLevel <= 3) {
+            recommendedMinimumLevel = 6;
+        } else if (spellLevel === 4 || spellLevel === 5) {
+            recommendedMinimumLevel = spellLevel*2;
+        } else if (spellLevel === 6 && spellClass === 'Priest') {
+            recommendedMinimumLevel = spellLevel*2;
+        } else if (spellLevel >= 6) {
+            recommendedMinimumLevel = spellLevel*2+1
         }
+
+        let scribeLevel = await extractQueryResult(`?{At what level is this scroll scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
+
+        let spellFailure = await extractQueryResult('?{What is the risk of spell failure for this scroll? (If you do not use this rule, set the value to 0)|0}');
 
         let scrollInfo = {
             [`repeating_scrolls_${parse.rowId}_scroll-speed`]: spell['cast-time'],
             [`repeating_scrolls_${parse.rowId}_scroll-level`]: scribeLevel,
+            [`repeating_scrolls_${parse.rowId}_scroll-failure`]: spellFailure,
             [`repeating_scrolls_${parse.rowId}_scroll-macro`]: scrollMacro,
         }
 
