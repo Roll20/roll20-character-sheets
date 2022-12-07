@@ -2736,7 +2736,10 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`prep=${prep}`);
             macroBuilder.push(`prereq=${power['prerequisites']}`);
             macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
-            let powerRoll = power['roll-override'] || `[[1d20cf20-(@{psionic-mod${number}})]]`;
+            let powerRoll = `[[1d20cf20-(@{psionic-mod${number}})]]`;
+            if (power['roll-override']) {
+                powerRoll = `[${power['roll-override']}](~${values.character_name}|repeating_${section}_${parse.rowId}_action-check-dm)`;
+            }
             macroBuilder.push(`powerroll=${powerRoll}`);
             let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
             if (power['context-modifier']) {
@@ -2763,7 +2766,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
         });
     });
 
-    on(`clicked:repeating_${section}:action-check`, function (eventInfo) {
+    on(`clicked:repeating_${section}:action-check clicked:repeating_${section}:action-check-dm`, function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
         getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
             let displayDiscipline = discipline;
@@ -2779,7 +2782,6 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             let macroBuilder = new RollTemplateBuilder('2Epsionic');
 
             match = fullMacro.match(/\{\{(title=.*?)}} *\{\{/);
-            console.log(match);
             if (match) macroBuilder.push(match[1]);
             else macroBuilder.push(`title=@{${name}}`);
 
@@ -2814,6 +2816,10 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             if (match) macroBuilder.push(match[1]);
 
             let macroValue = macroBuilder.string();
+
+            if (parse.attribute.endsWith('dm')) {
+                macroValue = `/w gm ${macroValue}`;
+            }
 
             rollPsionicTemplate(macroValue, parse.rowId, values);
         });
