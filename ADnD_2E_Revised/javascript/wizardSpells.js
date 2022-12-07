@@ -2283,7 +2283,7 @@ wiz3['Wind Wall'] = {
     'school-spells-and-magic': 'Alteration, Elemental Air',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
-    'aoe': 'wall, [[10*[[@{level-wizard}]] ]] x [[5*[[@{level-wizard}]] ]] feet x 2 feet wide',
+    'aoe': 'wall, [[10*[[@{level-wizard}]] ]] x [[5*[[@{level-wizard}]] ]] feet, 2 feet wide',
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'Special',
