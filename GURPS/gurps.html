@@ -4358,16 +4358,9 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.1 -->			
+				<!-- current version notes: 2.9.2 -->			
 				<ul>
-					<li>Updated all Macro Tooltips to use a standard, more useful naming convention.</li>
-					<li>Several minor updates to tooltips.</li>
-					<li>For new character sheets, there are now default values for a trait's (Advantages/disadvantages) critical success and failure notes.</li>
-					<li>Shotgun Tool. Added roll template note multipliying targets DR.</li>
-					<li>Hit Location - Low Tech. Added new hit locations and notes.</li>
-					<li>Melee and Ranged Attacks. Renamed Success and Fail labels to Hit and Miss. Added reference field and display on roll template.</li>
-					<li>Technique Roll Template. Added parent name below the name of the technique.</li>
-					<li>Combat - Defense tab. Updated tooltip for Dodge and Drop.</li>
+					<li>For Skills, Melee, and Ranged tables, if the <b>Max skill of 9</b> is visible, if it is checked/unchecked the effective skill is now updated to reflect the checkbox.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -14046,8 +14039,16 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.1 -->
+			<!-- current version notes: 2.9.2 -->
 			
+			<ul>
+				<li>For Skills, Melee, and Ranged tables, if the <b>Max skill of 9</b> is visible, if it is checked/unchecked the effective skill is now updated to reflect the checkbox.</li>
+			</ul>
+			
+			<h4>Version: 2.9.1</h4>
+
+			<p>Pull Request: 10/12/2022</p>
+
 			<ul>
 				<li>Updated all Macro Tooltips to use a standard, more useful naming convention.</li>
 				<li>Several minor updates to tooltips.</li>
@@ -17429,9 +17430,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.1";
+	const version = "2.9.2";
 	
-	const latestChangesDate = "12/5/2022";
+	const latestChangesDate = "12/9/2022";
 	
 	let modCascade = true;
 	
@@ -26222,7 +26223,43 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		});
 	
 	}
-	
+
+	/* Individually changed max nine checkboxes on main sheet */
+
+	const maxNineSections = [
+		"skill",
+		"melee",
+		"ranged",
+	];
+
+	maxNineSections.forEach(section => {
+
+		on(`change:${section}_roll_max_nine`, event => {
+
+			// only run if the the actual checkbox was clicked
+			if (event.triggerName === `${section}_roll_max_nine`) {
+
+				const maxNineField = event.triggerName + "_value";
+
+				let newValue = 100;
+
+				if (event.newValue === "1") {
+					newValue = 9;
+				}
+
+				let fields = {
+					[`${maxNineField}`]: newValue
+				};
+
+				setAttrs(fields);
+
+			}
+
+		});
+
+	});
+
+
 	/* ROLL MODIFIERS BOX */
 	
 	// close roll modifiers, no updates
