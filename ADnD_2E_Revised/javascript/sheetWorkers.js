@@ -2757,6 +2757,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             if (power['healing']) {
                 macroBuilder.push(`healing=${power['healing']}`);
             }
+            macroBuilder.push('fail=Half of PSP cost (rounded up) is lost.');
             macroBuilder.push(`effects=${power['effect']}`);
 
             let macroValue = macroBuilder.string();
@@ -2813,6 +2814,12 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             if (match) macroBuilder.push(match[1]);
 
             match = fullMacro.match(/\{\{(1effect=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+
+            match = fullMacro.match(/\{\{(success=.*?)}} *\{\{/)
+            if (match) macroBuilder.push(match[1]);
+
+            match = fullMacro.match(/\{\{(fail=.*?)}} *\{\{/)
             if (match) macroBuilder.push(match[1]);
 
             let macroValue = macroBuilder.string();
