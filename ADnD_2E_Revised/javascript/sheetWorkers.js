@@ -2542,7 +2542,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
     let spell;
     let spellClass;
     if (wizardSpell && priestSpell) {
-        spellClass = await extractQueryResult('?{Is this a Wizard or Priest scroll?|Wizard|Priest}');
+        spellClass = await extractQueryResult(`?{Is ${eventInfo.newValue} a Wizard or Priest scroll?|Wizard|Priest}`);
         spell = spellClass === 'Wizard' ? wizardSpell : priestSpell;
     } else if (wizardSpell) {
         spell = wizardSpell;
@@ -2605,9 +2605,9 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
             recommendedMinimumLevel = spellLevel*2+1
         }
 
-        let scribeLevel = await extractQueryResult(`?{At what level is this scroll scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
+        let scribeLevel = await extractQueryResult(`?{At what level is ${eventInfo.newValue} scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
 
-        let spellFailure = await extractQueryResult('?{What is the risk of spell failure for this scroll? (If you do not use this rule, set the value to 0)|0}');
+        let spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${eventInfo.newValue}? (If you do not use this rule, set the value to 0)|0}`);
 
         let scrollInfo = {
             [`repeating_scrolls_${parse.rowId}_scroll-speed`]: spell['cast-time'],
