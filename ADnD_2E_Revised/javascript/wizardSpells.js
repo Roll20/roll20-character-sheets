@@ -2263,7 +2263,7 @@ wiz3['Water Breathing'] = {
     'school': 'Alteration (Reversible)',
     'school-spells-and-magic': 'Alteration, Elemental (Air, Water) (Reversible)',
     'range': 'Touch',
-    'duration': '[[ [[@level-wizard}]]+1d4]] hours',
+    'duration': '[[ [[@{level-wizard}]]+1d4]] hours',
     'aoe': 'Creature touched',
     'components': 'V, S, M',
     'cast-time': '3',
@@ -2282,7 +2282,7 @@ wiz3['Wind Wall'] = {
     'school': 'Alteration',
     'school-spells-and-magic': 'Alteration, Elemental Air',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
-    'duration': '[[@level-wizard}]] rounds',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'wall, [[10*[[@{level-wizard}]] ]] x [[5*[[@{level-wizard}]] ]] feet x 2 feet wide',
     'components': 'V, S, M',
     'cast-time': '3',
@@ -2301,7 +2301,7 @@ wiz3['Wraithform'] = {
     'school': 'Alteration, Illusion',
     'school-spells-and-magic': 'Alteration, Illusion/Phantasm, Shadow',
     'range': '0',
-    'duration': '[[2*[[@level-wizard}]] ]] rounds',
+    'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'The caster',
     'components': 'S, M',
     'cast-time': '1',
@@ -3633,7 +3633,7 @@ wiz5['Seeming'] = {
     'school': 'Illusion/Phantasm',
     'range': '10-foot radius',
     'duration': '12 hours',
-    'aoe': '[[floor([[@level-wizard}]]/2)]] persons',
+    'aoe': '[[floor([[@{level-wizard}]]/2)]] persons',
     'components': 'V, S',
     'cast-time': '5',
     'saving-throw': 'None',
@@ -3738,7 +3738,7 @@ wiz5['Summon Shadow'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard conjures up one shadow (see the *MONSTROUS MANUAL*) for every three levels of experience he has attained. Currently [[floor([[@level-wizard}]]/3)]] shadows. These monsters are under the control of the spellcaster and attack his enemies on command. The shadows remain until slain, turned, or the spell duration expires.'
+    'effect': 'When this spell is cast, the wizard conjures up one shadow (see the *MONSTROUS MANUAL*) for every three levels of experience he has attained. Currently [[floor([[@{level-wizard}]]/3)]] shadows. These monsters are under the control of the spellcaster and attack his enemies on command. The shadows remain until slain, turned, or the spell duration expires.'
 };
 
 wiz5['Telekinesis'] = {
