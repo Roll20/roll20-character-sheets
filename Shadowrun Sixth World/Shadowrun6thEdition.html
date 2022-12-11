@@ -3432,6 +3432,7 @@
 								<span class="changelog-entry">**2022-12-12 ** v.67 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">E</span><b>Update</b> - Update - PC -> Magic -> Meta Tradition Hermeticism now displays as "Hermeticism (Logic)" and Shamanism now displays as "Shamanism (Charisma)" for clarity
+									<li><span class="bullet">A</span><b>Bugfix</b> - Bugfix - NPC -> Vehicles - fixed vehicle/drone default actions
 								</ul>
 								<span class="changelog-entry">**2022-12-05 ** v.66 Chuz (James Culp)</span>
 								<ul>
@@ -10737,13 +10738,14 @@ mylog = function(msg) {
 /**************/
 /* COMPENDIUM */
 /**************/
+// Compendium Drop workers
 // Compendium Dropped to Canvas
 on("change:canvas_drop_data", (eventInfo) => {
 	console.log("Compendium Item Dropped on Canvas!");
 
 	compendium_drop_handler('canvasdrop', eventInfo);
 });
-// Compendium Drop workers
+// Compendium Dropped to Sheet
 on("change:compendium_drop_data", (eventInfo) => {
 	console.log("Compendium Item Dropped on Sheet!");
 
@@ -10751,8 +10753,8 @@ on("change:compendium_drop_data", (eventInfo) => {
 });
 
 var compendium_drop_handler = ((dropType, eventInfo) => {
-console.log(eventInfo);
-console.log("dropType: "+dropType);
+//console.log(eventInfo);
+//console.log("dropType: "+dropType);
 	try{
 		data = JSON.parse(eventInfo.newValue) || false;
 	} catch(e) {
@@ -10764,7 +10766,7 @@ console.log("dropType: "+dropType);
 		}, {silent: true});
 		return;
 	}
-console.log(data);
+//console.log(data);
 
 	// wipe out compendium_drop_data until the next time
 	// we're doing this here so errors don't leave ghost data
@@ -10783,7 +10785,7 @@ console.log(data);
 
 	// if there are blobs, add those and ignore the parent (it should be one of the blobs?)
 	if(data.blobs && Object.keys(data.blobs).length > 0) {
-console.log("blob(s) exist, adding them!");
+//console.log("blob(s) exist, adding them!");
 
 		if(data.Category == "QSR Tool Cards") {
 			let blob = data.blobs[data["data-name"]];
@@ -10812,7 +10814,7 @@ console.log("blob(s) exist, adding them!");
 			}
 		});
 	} else {
-console.log("no blobs :(");
+//console.log("no blobs :(");
 		if(dropType == 'canvasdrop') {
 		console.log("doing canvas_import outside: " + blob.Category);
 			canvas_import(data);
@@ -10825,10 +10827,10 @@ console.log("no blobs :(");
 });
 
 var canvas_import = function(data) {
-console.log("doing canvas drop stuff");
+//console.log("doing canvas drop stuff");
 	getAttrs(['compendium_drop_content'], (v) => {
 		// process the dropped data
-console.log("compendium item dropped: "+data.Category);
+//console.log("compendium item dropped: "+data.Category);
 		switch(data.Category) {
 			case 'NPCs':
 			case 'Contacts':
@@ -10842,7 +10844,7 @@ console.log("compendium item dropped: "+data.Category);
 				canvasDroppedNPC(data);
 				break;
 			default:
-console.log("Unknown Canvas Drop: "+data.Category+" Sending it to the compendium drop handler.");
+//console.log("Unknown Canvas Drop: "+data.Category+" Sending it to the compendium drop handler.");
 				compendium_import(data);
 				break;
 		}
@@ -10852,7 +10854,7 @@ console.log("Unknown Canvas Drop: "+data.Category+" Sending it to the compendium
 var compendium_import = function(data) {
 	getAttrs(['compendium_drop_content'], (v) => {
 		// process the dropped data
-console.log("compendium item dropped: "+data.Category);
+//console.log("compendium item dropped: "+data.Category);
 		switch(data.Category) {
 //			case 'NPCs':
 //			case 'Contacts':
@@ -10901,7 +10903,7 @@ console.log("compendium item dropped: "+data.Category);
 				compendiumAddWeapon('melee', data);
 				break;
 			case 'Weapon Both':
-console.log("both!");
+//console.log("both!");
 				compendiumAddWeapon('range', data);
 				compendiumAddWeapon('melee', data);
 				break;
@@ -10912,15 +10914,15 @@ console.log("both!");
 				compendiumAddProgram(data);
 				break;
 			default:
-console.log("Unknown Compendium Drop: "+data.Category);
+//console.log("Unknown Compendium Drop: "+data.Category);
 				break;
 		}
 	});
 }
 
 var canvasDroppedNPC = function(data) {
-	console.log("NPC Dropped!");
-	console.log(data);
+//console.log("NPC Dropped!");
+//console.log(data);
 
 	var tokenAttrs = {
 		width: 70,
@@ -10966,41 +10968,41 @@ var setup_token = (tokenAttrs) => {
 *          CANVAS IMPORTERS           *
 **************************************/
 var canvasAddDrone = function(data) {
-		addattrs = {};
-console.log("It's Drone!");
-console.log(data);
+	addattrs = {};
+//console.log("It's Drone!");
+//console.log(data);
 
-		var type = 'vehicle';
+	var type = 'vehicle';
 
-		addattrs.sheet_type = 'vehicle';
-		addattrs["flag"] = false;
-		addattrs["display_flag"] = "on";
+	addattrs.sheet_type = 'vehicle';
+	addattrs["flag"] = false;
+	addattrs["display_flag"] = "on";
 
-		addattrs["handling"] = data["data-handling_onroad"] || 0;
-		addattrs["handling_offroad"] = data["data-handling_offroad"] || 0;
-		addattrs["seating"] = data["data-seats"] || 0;
-		addattrs["acceleration"] = data["data-acceleration"] || 0;
-		addattrs["interval"] = data["data-speed_base"] || 0;
-		addattrs["speed_max"] = data["data-speed_max"] || 0;
-		addattrs["body_base"] = data["data-body_base"] || 0;
-		addattrs["armor"] = data["data-armor_base"] || 0;
-		addattrs["pilot"] = data["data-pilot_base"] || 0;
-		addattrs["sensor"] = data["data-sensor_base"] || 0;
-		addattrs["device_rating"] = data["data-sensor_base"] || 0;
-		addattrs["clearsight"] = data["data-clearsight"] || 0;
-		addattrs["electronicwarfare"] = data["data-electronicwarfare"] || 0;
-		addattrs["evasion"] = data["data-evasion"] || 0;
-		addattrs["maneuvering"] = data["data-maneuvering"] || 0;
-		addattrs["stealth"] = data["data-stealth"] || 0;
-		addattrs["targeting"] = data["data-targeting"] || 0;
+	addattrs["handling"] = data["data-handling_onroad"] || 0;
+	addattrs["handling_offroad"] = data["data-handling_offroad"] || 0;
+	addattrs["seating"] = data["data-seats"] || 0;
+	addattrs["acceleration"] = data["data-acceleration"] || 0;
+	addattrs["interval"] = data["data-speed_base"] || 0;
+	addattrs["speed_max"] = data["data-speed_max"] || 0;
+	addattrs["body_base"] = data["data-body_base"] || 0;
+	addattrs["armor"] = data["data-armor_base"] || 0;
+	addattrs["pilot"] = data["data-pilot_base"] || 0;
+	addattrs["sensor"] = data["data-sensor_base"] || 0;
+	addattrs["device_rating"] = data["data-sensor_base"] || 0;
+	addattrs["clearsight"] = data["data-clearsight"] || 0;
+	addattrs["electronicwarfare"] = data["data-electronicwarfare"] || 0;
+	addattrs["evasion"] = data["data-evasion"] || 0;
+	addattrs["maneuvering"] = data["data-maneuvering"] || 0;
+	addattrs["stealth"] = data["data-stealth"] || 0;
+	addattrs["targeting"] = data["data-targeting"] || 0;
 
-		addattrs["notes"] = data["data-description"] || '';
+	addattrs["notes"] = data["data-description"] || '';
 
-		if(data["data-type"] == 'drone') {
-			addattrs["flag_drone"] = "drone";
-		}
+	if(data["data-type"] == 'drone') {
+		addattrs["flag_drone"] = "drone";
+	}
 
-		setAttrs(addattrs);
+	setAttrs(addattrs);
 };
 
 
@@ -11014,21 +11016,21 @@ console.log(data);
 **************************************/
 /*
 var compendiumAddArmor = function(data) {
-		rowattrs = {};
-console.log("It's X!");
-console.log(data);
-		row_id = generateRowID();
+	rowattrs = {};
+//console.log("It's X!");
+//console.log(data);
+	row_id = generateRowID();
 
-		var type = '';
+	var type = '';
 
-		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
-		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + type + "_" + row_id + "_rating"] = data["data-rating"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + type + "_" + row_id + "_rating"] = data["data-rating"] || 0;
 
-		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
 
-		setAttrs(rowattrs);
+	setAttrs(rowattrs);
 };
 */
 /**************************************
@@ -11037,341 +11039,341 @@ console.log(data);
 
 
 var compendiumAddDrone = function(data) {
-		rowattrs = {};
-console.log("It's Drone!");
-console.log(data);
-		row_id = generateRowID();
+	rowattrs = {};
+//console.log("It's Drone!");
+//console.log(data);
+	row_id = generateRowID();
 
-		var type = 'vehicle';
+	var type = 'vehicle';
 
-		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
-		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + type + "_" + row_id + "_type"] = data["data-drone_type"] || 'Other';
+	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + type + "_" + row_id + "_type"] = data["data-drone_type"] || 'Other';
 
-		rowattrs["repeating_" + type + "_" + row_id + "_handling_onroad"] = data["data-handling_onroad"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_handling_offroad"] = data["data-handling_offroad"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_seats"] = data["data-seats"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_acceleration_base"] = data["data-acceleration"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_speed_base"] = data["data-speed_base"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_speed_max"] = data["data-speed_max"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_body_base"] = data["data-body_base"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_armor_base"] = data["data-armor_base"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_pilot_base"] = data["data-pilot_base"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_sensor_base"] = data["data-sensor_base"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_clearsight"] = data["data-clearsight"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_electronicwarfare"] = data["data-electronicwarfare"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_evasion"] = data["data-evasion"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_maneuvering"] = data["data-maneuvering"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_stealth"] = data["data-stealth"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_targeting"] = data["data-targeting"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_handling_onroad"] = data["data-handling_onroad"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_handling_offroad"] = data["data-handling_offroad"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_seats"] = data["data-seats"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_acceleration_base"] = data["data-acceleration"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_speed_base"] = data["data-speed_base"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_speed_max"] = data["data-speed_max"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_body_base"] = data["data-body_base"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_armor_base"] = data["data-armor_base"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_pilot_base"] = data["data-pilot_base"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_sensor_base"] = data["data-sensor_base"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_clearsight"] = data["data-clearsight"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_electronicwarfare"] = data["data-electronicwarfare"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_evasion"] = data["data-evasion"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_maneuvering"] = data["data-maneuvering"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_stealth"] = data["data-stealth"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_targeting"] = data["data-targeting"] || 0;
 
-		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
-		rowattrs.sheet_type = 'pc';
-		setAttrs(rowattrs);
+	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
+	rowattrs.sheet_type = 'pc';
+	setAttrs(rowattrs);
 };
 
 
 var compendiumAddProgram = function(data) {
-		rowattrs = {};
-console.log("It's a Program... within a program... Error cannot parse existential crisis.");
-console.log(data);
-		row_id = generateRowID();
+	rowattrs = {};
+//console.log("It's a Program... within a program... Error cannot parse existential crisis.");
+//console.log(data);
+	row_id = generateRowID();
 
-		var type = 'programs';
+	var type = 'programs';
 
-		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
-		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
 
-		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = '';
-		if(data["data-rules"]) {
-console.log("data-rules");
-console.log(data["data-rules"]);
-			var rules = [];
-			try{
-				rules = JSON.parse(data["data-rules"]) || false;
-			} catch(e) {
-				// wipe out compendium_drop_data until the next time
-			}
-console.log("Rules");
-console.log(rules);
-			rules.forEach((rule) => {
-				rowattrs["repeating_" + type + "_" + row_id + "_notes"] += rule.rule;
-			});
+	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = '';
+	if(data["data-rules"]) {
+//console.log("data-rules");
+//console.log(data["data-rules"]);
+		var rules = [];
+		try{
+			rules = JSON.parse(data["data-rules"]) || false;
+		} catch(e) {
+			// wipe out compendium_drop_data until the next time
 		}
+//console.log("Rules");
+//console.log(rules);
+		rules.forEach((rule) => {
+			rowattrs["repeating_" + type + "_" + row_id + "_notes"] += rule.rule;
+		});
+	}
 
-		rowattrs["repeating_" + type + "_" + row_id + "_notes"] += data["data-description"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_notes"] += data["data-description"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
 
-		setAttrs(rowattrs);
+	setAttrs(rowattrs);
 };
 
 
 var compendiumAddDevice = function(data) {
-		rowattrs = {};
-console.log("It's a Device, beep boop!");
-console.log(data);
-		row_id = generateRowID();
+	rowattrs = {};
+//console.log("It's a Device, beep boop!");
+//console.log(data);
+	row_id = generateRowID();
 
-		var type = 'devices';
+	var type = 'devices';
 
-		rowattrs["repeating_" + type + "_" + row_id + "_device_rating"] = data["data-device_rating"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
-		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + type + "_" + row_id + "_type"] = data["data-device_type"] || 'Commlink';
+	rowattrs["repeating_" + type + "_" + row_id + "_device_rating"] = data["data-device_rating"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + type + "_" + row_id + "_type"] = data["data-device_type"] || 'Commlink';
 
-		rowattrs["repeating_" + type + "_" + row_id + "_active_program_slots"] = data["data-active_program_slots"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_attack"] = data["data-attack"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_sleaze"] = data["data-sleaze"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_data_processing"] = data["data-data_processing"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_firewall"] = data["data-firewall"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_matrix_initiative_bonus"] = data["data-matrix_initiative_bonus"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_essence_cost"] = data["data-essence_cost"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_active_program_slots"] = data["data-active_program_slots"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_attack"] = data["data-attack"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_sleaze"] = data["data-sleaze"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_data_processing"] = data["data-data_processing"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_firewall"] = data["data-firewall"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_matrix_initiative_bonus"] = data["data-matrix_initiative_bonus"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_essence_cost"] = data["data-essence_cost"] || 0;
 
-		rowattrs["repeating_" + type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
 
-		setAttrs(rowattrs);
+	setAttrs(rowattrs);
 };
 
 
 var compendiumAddWeapon = function(type = 'range', data) {
-		rowattrs = {};
-console.log("It's a Weapon!");
+	rowattrs = {};
+//console.log("It's a Weapon!");
 //console.log(data);
-		row_id = generateRowID();
+	row_id = generateRowID();
 
-		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
-		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + type + "_" + row_id + "_skill"] = data["data-skill"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_damage"] = data["data-dv"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_damage_base"] = data["data-dv"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_close"] = data["data-close"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_close_base"] = data["data-close"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_near"] = data["data-near"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_near_base"] = data["data-near"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_medium"] = data["data-medium"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_medium_base"] = data["data-medium"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_far"] = data["data-far"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_far_base"] = data["data-far"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_extreme"] = data["data-extreme"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_extreme_base"] = data["data-extreme"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_dicepool_modifier"] = data["data-dicepool_modifier"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_has_mods"] = data["data-has_mods"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + type + "_" + row_id + "_skill"] = data["data-skill"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_damage"] = data["data-dv"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_damage_base"] = data["data-dv"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_close"] = data["data-close"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_close_base"] = data["data-close"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_near"] = data["data-near"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_near_base"] = data["data-near"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_medium"] = data["data-medium"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_medium_base"] = data["data-medium"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_far"] = data["data-far"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_far_base"] = data["data-far"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_extreme"] = data["data-extreme"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_extreme_base"] = data["data-extreme"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_dicepool_modifier"] = data["data-dicepool_modifier"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_has_mods"] = data["data-has_mods"] || '';
 
-		data["data-ammo"] = (data["data-ammo"]) ? data["data-ammo"].match(/^(\d+)/)[0] : '';
-		rowattrs["repeating_" + type + "_" + row_id + "_ammo"] = data["data-ammo"];
+	data["data-ammo"] = (data["data-ammo"]) ? data["data-ammo"].match(/^(\d+)/)[0] : '';
+	rowattrs["repeating_" + type + "_" + row_id + "_ammo"] = data["data-ammo"];
 
-		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = (data["data-extras"]) ? data["data-extras"] : '';
-		rowattrs["repeating_" + type + "_" + row_id + "_notes"] += data["data-description"] || '';
-
-
-		if(type == 'range') {
-			// firing modes setup
-			rowattrs["repeating_" + type + "_" + row_id + "_firing_modes"] = data["data-firing_modes"] || 'SS';
-			var modes = rowattrs["repeating_" + type + "_" + row_id + "_firing_modes"].split(/\s*\/\s*/i);
-			modes.forEach(mode => {
-				switch(mode.toUpperCase()) {
-					case 'SS':
-						rowattrs["repeating_" + type + "_" + row_id + "_singleshot"] = 1;
-						break;
-					case 'SA':
-						rowattrs["repeating_" + type + "_" + row_id + "_semiauto"] = 1;
-						break;
-					case 'BF':
-						rowattrs["repeating_" + type + "_" + row_id + "_burstfire"] = 1;
-						break;
-					case 'BW':
-						rowattrs["repeating_" + type + "_" + row_id + "_burstwide"] = 1;
-						break;
-					case 'FA':
-						rowattrs["repeating_" + type + "_" + row_id + "_fullauto"] = 1;
-						break;
-				};
-			});
-		}
+	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = (data["data-extras"]) ? data["data-extras"] : '';
+	rowattrs["repeating_" + type + "_" + row_id + "_notes"] += data["data-description"] || '';
 
 
-		setAttrs(rowattrs);
+	if(type == 'range') {
+		// firing modes setup
+		rowattrs["repeating_" + type + "_" + row_id + "_firing_modes"] = data["data-firing_modes"] || 'SS';
+		var modes = rowattrs["repeating_" + type + "_" + row_id + "_firing_modes"].split(/\s*\/\s*/i);
+		modes.forEach(mode => {
+			switch(mode.toUpperCase()) {
+				case 'SS':
+					rowattrs["repeating_" + type + "_" + row_id + "_singleshot"] = 1;
+					break;
+				case 'SA':
+					rowattrs["repeating_" + type + "_" + row_id + "_semiauto"] = 1;
+					break;
+				case 'BF':
+					rowattrs["repeating_" + type + "_" + row_id + "_burstfire"] = 1;
+					break;
+				case 'BW':
+					rowattrs["repeating_" + type + "_" + row_id + "_burstwide"] = 1;
+					break;
+				case 'FA':
+					rowattrs["repeating_" + type + "_" + row_id + "_fullauto"] = 1;
+					break;
+			};
+		});
+	}
+
+
+	setAttrs(rowattrs);
 };
 
 
 var compendiumAddGear = function(data) {
-		rowattrs = {};
-console.log("It's Gear!");
+	rowattrs = {};
+//console.log("It's Gear!");
 //console.log(data);
-		row_id = generateRowID();
+	row_id = generateRowID();
 
-		var type = 'items';
+	var type = 'items';
 
-		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
-		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + type + "_" + row_id + "_rating"] = data["data-rating"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_quantity"] = data["data-quantity"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_modifications"] = data["data-modifications"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + type + "_" + row_id + "_rating"] = data["data-rating"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_quantity"] = data["data-quantity"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_modifications"] = data["data-modifications"] || 0;
 
-		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
 
-		setAttrs(rowattrs);
+	setAttrs(rowattrs);
 };
 
 
 var compendiumAddArmor = function(data) {
-		rowattrs = {};
-console.log("It's armor!");
+	rowattrs = {};
+//console.log("It's armor!");
 //console.log(data);
-		row_id = generateRowID();
+	row_id = generateRowID();
 
-		var type = 'armor';
+	var type = 'armor';
 
-		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
-		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + type + "_" + row_id + "_rating"] = data["data-rating"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_chem"] = data["data-chem"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_cold"] = data["data-cold"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_elec"] = data["data-elec"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_fire"] = data["data-fire"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_cumulative"] = data["data-cumulative"] || '';
-		rowattrs["repeating_" + type + "_" + row_id + "_social"] = data["data-social"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_capacity"] = data["data-capacity"] || 0;
-		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + type + "_" + row_id + "_rating"] = data["data-rating"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_chem"] = data["data-chem"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_cold"] = data["data-cold"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_elec"] = data["data-elec"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_fire"] = data["data-fire"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_cumulative"] = data["data-cumulative"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_social"] = data["data-social"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_capacity"] = data["data-capacity"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
 
-		setAttrs(rowattrs);
+	setAttrs(rowattrs);
 };
 
 
 var compendiumAddSpell = function(data) {
-		rowattrs = {};
-console.log("It's a spell! Ooooh, magic!");
+	rowattrs = {};
+//console.log("It's a spell! Ooooh, magic!");
 //console.log(data);
-		row_id = generateRowID();
+	row_id = generateRowID();
 
-		var spell_type = 'spell';
+	var spell_type = 'spell';
 
-		['data-damage', 'data-duration', 'data-effect_type', 'data-range'].forEach((key) => {
-			if(typeof(data[key]) === 'undefined') {
-				data[key] = '';
-			}
-		});
+	['data-damage', 'data-duration', 'data-effect_type', 'data-range'].forEach((key) => {
+		if(typeof(data[key]) === 'undefined') {
+			data[key] = '';
+		}
+	});
 
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_skill"] = '@{sorcery}';
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] = data["data-description"] || '';
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_category"] = ucfirst(data["data-category"]) || '';
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_damage"] = trans.Spells.damage[data["data-damage"].toUpperCase()] || '';
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_drain"] = data["data-drain"] || 0;
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_duration"] = trans.Spells.duration[data["data-duration"].toUpperCase()] || '';
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_effect_type"] = trans.Spells.effect_type[data["data-effect_type"].toUpperCase()] || '';
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_range"] = trans.Spells.range[data["data-range"].toUpperCase()] || '';
-		rowattrs["repeating_" + spell_type + "_" + row_id + "_type"] = ucfirst(data["data-type"]) || '';
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_skill"] = '@{sorcery}';
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] = data["data-description"] || '';
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_category"] = ucfirst(data["data-category"]) || '';
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_damage"] = trans.Spells.damage[data["data-damage"].toUpperCase()] || '';
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_drain"] = data["data-drain"] || 0;
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_duration"] = trans.Spells.duration[data["data-duration"].toUpperCase()] || '';
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_effect_type"] = trans.Spells.effect_type[data["data-effect_type"].toUpperCase()] || '';
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_range"] = trans.Spells.range[data["data-range"].toUpperCase()] || '';
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_type"] = ucfirst(data["data-type"]) || '';
 
-		setAttrs(rowattrs);
+	setAttrs(rowattrs);
 };
 
 
 var compendiumAddQuality = function(data) {
-		rowattrs = {};
-console.log("It's a quality! karma spent or to spend?");
+	rowattrs = {};
+//console.log("It's a quality! karma spent or to spend?");
 //console.log(data);
-		row_id = generateRowID();
+	row_id = generateRowID();
 
-		var rep_type = 'quality';
+	var rep_type = 'quality';
 
-		[].forEach((key) => {
-			if(typeof(data[key]) === 'undefined') {
-				data[key] = '';
-			}
-		});
+	[].forEach((key) => {
+		if(typeof(data[key]) === 'undefined') {
+			data[key] = '';
+		}
+	});
 
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = "on";
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_type"] = (data["data-type"] == "TRUE") ? 'p' : 'n';
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = "on";
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_type"] = (data["data-type"] == "TRUE") ? 'p' : 'n';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
 
-		setAttrs(rowattrs);
+	setAttrs(rowattrs);
 
 };
 
 
 var compendiumAddMetamagic = function(data) {
-		rowattrs = {};
-console.log("It's a metamagic! More Power!");
+	rowattrs = {};
+//console.log("It's a metamagic! More Power!");
 //console.log(data);
-		row_id = generateRowID();
+	row_id = generateRowID();
 
-		var rep_type = 'metamagic';
+	var rep_type = 'metamagic';
 
-		[].forEach((key) => {
-			if(typeof(data[key]) === 'undefined') {
-				data[key] = '';
-			}
-		});
+	[].forEach((key) => {
+		if(typeof(data[key]) === 'undefined') {
+			data[key] = '';
+		}
+	});
 
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = "on";
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = "on";
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
 
-		setAttrs(rowattrs);
+	setAttrs(rowattrs);
 
 };
 
 
 var compendiumAddRitual = function(data) {
-		rowattrs = {};
-console.log("It's a ritual! Oooh, slow MAGIC!");
+	rowattrs = {};
+//console.log("It's a ritual! Oooh, slow MAGIC!");
 //console.log(data);
-		row_id = generateRowID();
+	row_id = generateRowID();
 
-		var rep_type = 'ritual';
+	var rep_type = 'ritual';
 
-		[].forEach((key) => {
-			if(typeof(data[key]) === 'undefined') {
-				data[key] = '';
-			}
-		});
+	[].forEach((key) => {
+		if(typeof(data[key]) === 'undefined') {
+			data[key] = '';
+		}
+	});
 
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_threshold"] = data["data-threshold"] || 0;
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-features"] + "\n" + data["data-description"];
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_threshold"] = data["data-threshold"] || 0;
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-features"] + "\n" + data["data-description"];
 
-console.log(rowattrs);
-		setAttrs(rowattrs);
+//console.log(rowattrs);
+	setAttrs(rowattrs);
 
 };
 
 
 var compendiumAddPower = function(data) {
-		rowattrs = {};
-console.log("It's a power! Superman?!");
+	rowattrs = {};
+//console.log("It's a power! Superman?!");
 //console.log(data);
-		row_id = generateRowID();
+	row_id = generateRowID();
 
-		var rep_type = 'powers';
+	var rep_type = 'powers';
 
-		[].forEach((key) => {
-			if(typeof(data[key]) === 'undefined') {
-				data[key] = '';
-			}
-		});
+	[].forEach((key) => {
+		if(typeof(data[key]) === 'undefined') {
+			data[key] = '';
+		}
+	});
 
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = 'on';
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_activation"] = trans['Powers']['activation'][data["data-activation"].toUpperCase()] || 'Passive';
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
-		rowattrs["repeating_" + rep_type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = 'on';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_activation"] = trans['Powers']['activation'][data["data-activation"].toUpperCase()] || 'Passive';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
 
-console.log(rowattrs);
-		setAttrs(rowattrs);
+//console.log(rowattrs);
+	setAttrs(rowattrs);
 
 };
 
