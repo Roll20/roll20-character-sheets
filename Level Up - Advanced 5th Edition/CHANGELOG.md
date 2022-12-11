@@ -1,5 +1,20 @@
 Change Log
 ==============================================
+**2022-12-05 ** v.17 Paul V
+	Fixed issue with NPC Skill and Attack rolls - converted the rolls to use the new Action button tech
+	Added Initative roll to NPC Sheet
+	Fixed issue with Tool rolls
+**2022-11-22 ** v.16 Paul V
+	Fixed all the Passive Checks to be 10+modifiers+stat modifier and not +stat
+	Fixed issue where the Skill speciality couldn't be edited on the main screen, it can now be edited on both main screen and popup
+**2022-11-15 ** v.15 Paul V
+	Added new Dice rolling logic, that gathers the components of the dice roll when the button is press this means that the every roll on the sheet doesn't need to be updated everytime standard/Advantage/Disdadvantage is pressed
+	Fixed Wisdom (perception) initiative to use Wisdom
+	Fixed all the Passive Checks to be 10+modifiers	
+**2022-09-28 ** v.14 Paul V
+	Added D10 and D12 in to the Expertise dice list for high level Rogues - but this is a static Expertise dice uneffected by Specialty (as that caps at d8)
+	Changed the Expertise to be a dropdown list no data entry allowed
+	Added logic to exclude the expertise dice from the crit colour logic of roll20
 **2022-08-14 ** v.13 Paul V
 	Added new Dex(Basic) initiative option
 	Added Bloodied HP on to the NPC sheet 

@@ -1,5 +1,37 @@
 Change Log
 ==============================================
+**2022-12-05 ** v.66 Chuz (James Culp)
+	New Feature - Added modifiers for primary_range_weapon_close_mod, primary_range_weapon_near_mod, primary_range_weapon_medium_mod, primary_range_weapon_far_mod, primary_range_weapon_extreme_mod, primary_range_weapon_damage_mod, primary_range_weapon_dicepool_mod for changing the ARs at various ranges and the damage for the primary weapon.
+	New Feature - Added modifiers for single_shot_penalty_mod, semi_auto_penalty_mod, burst_fire_penalty_mod, burst_wide_penalty_mod, full_auto_penalty_mod for changing the AR penalties for firing modes.
+	New Feature - Primary Weapon Mods section that allows a list of mods to be added and turned on/off to apply bonuses/penalties to ARs, DV, dicepool (not reflected in listed dicepool) and firing mode penalties. Upon changing primary ranged weapon, mods will be disabled, if the weapon has the "Has Mods" checkbox checked the screen will switch to the Mod selection screen.
+	New Feature - Added Blood and the various Insect spirits from Street Wyrd
+	New Feature - Updated spirits to allow my templates to have more than one melee or ranged attack.
+	Update - There are now a maximum of 30 physical and 21 stun condition monitor boxes for PCs, these numbers should exceed the current theoretical maximums.
+	Bugfix - Skill name for multi-word skills wasn't being formatted properly.
+	Bugfix - At some point NPC -> Vehicle DR input and button disappeared, they've been found and replaced
+**2022-11-21 ** v.65 Chuz (James Culp)
+	Bugfix - PC Weapon skills weren't applying the -1 unskilled penalty to some skills, this has been updated however users will need to update the skill to something else and back to trigger the data change.
+	Bugfix - PC Sheet imported from Genesis in a non-English language had many problems mostly related to skills.  I believe I've fixed these issues please report any new ones
+	Bugfix - NPC Spell roll template issue where if drain was under 2 it added "Drain: 2" at the bottom of the description.
+**2022-11-14 ** v.64 Chuz (James Culp)
+	Bugfix - PC Judge Intentions wasn't updating on Willpower changes.
+**2022-11-06 ** v.63 Chuz (James Culp)
+	New Feature - PC Attribute roll buttons now prompt for a second attribute or custom dice modifier for those occasions when the DM says Roll Reaction+Intuition instead of Roll Defense
+	Bugfix - PC Defense, Direct Magic Defense and Indirect Magic Defense roll buttons didn't include Wound Penalties (defense pretended to but didn't apply the penalty)
+**2022-10-24 ** v.62 Chuz (James Culp)
+	New Feature - PC->Matrix->ASDF Roll buttons now include more options to combine them with.  None, Custom, mind attributes and ASDF.
+	New Feature - NPCs now have updated ASDF roll buttons as well!
+	New Feature - NPCs now have the newer version of the d6's roll button and the new Extended Tests capability.
+	New Feature - Added Extended Tests capabilities.
+**2022-09-20 ** v.61 Chuz (James Culp)
+	Bugfix - NPC->Spells were missing the Limited duration, added it.
+	Bugfix - Charactersheet Tab - removed the underline.
+	Bugfix - Updated Matrix Rolls trained prompt to say "Trained" instead of "No" (which made no sense)
+**2022-09-13 ** v.60 Chuz (James Culp)
+	Bugfix - PC->Rolls->Matrix actions including cracking were not using the Cracking skill rating but whatever the rating of the last updated skill was.  Fixed the bug causing this and loading the sheet the first time should update the attr_cracking value to be correct again.
+**2022-08-30 ** v.59 Chuz (James Culp)
+	Bugfix - Non-PC sheets were broken anywhere that a textarea (notes style) entry existed you couldn't display it to add or edit the values.
+	New Feature - character_name sanitization.  Sometimes we want to use names with characters that will break roll buttons and other parts of the sheet.  This replaces the bad characters with an asterisk *
 **2022-08-16 ** v.58 Chuz (James Culp)
 	New Feature - Added the ability to change the ammo type in use on Core->Primary Ranged with the AR and DV changes applied.  Default will be Standard.
 	New Feature - Added split rolls for Burst Fire Wide firing mode on the Core->Primary Ranged weapons.  This splits the dicepool (on odd pools the left roll Atk 1 gets the extra die).  If Wild Dice are toggled on a prompt will appear for each attack.  Glitches are calculated for each attack separately.
