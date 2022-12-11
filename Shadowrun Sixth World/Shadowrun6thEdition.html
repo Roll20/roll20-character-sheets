@@ -1,13 +1,13 @@
-<div id='SR6WE' class="compendium-drop-target">
-<div class="drop-zone">
-	<span>Dragging From Compendium</span>
-</div>
 <div class="compendium-drop-target npcs grunts contacts vehicles drones spirits sprites critters hosts">
 	<input type="hidden" value="" accept="Category" name="attr_compendium_drop_category"/>
 	<input type="hidden" value="" accept="Name" name="attr_compendium_drop_name"/>
-	<input type="hidden" value="" accept="data" name="attr_compendium_drop_data"/>
+	<input type="hidden" value="" accept="data" name="attr_canvas_drop_data"/>
 	<input type="hidden" value="" accept="dropSubhead" name="attr_compendium_drop_header">
 	<input type="hidden" value="" accept="Content" name="attr_compendium_drop_content">
+</div>
+<div id='SR6WE' class="compendium-drop-target">
+<div class="drop-zone">
+	<span>Dragging From Compendium</span>
 </div>
 <input class="sheet_type" name="attr_sheet_type" type="hidden" value="pc"/>
 <input class="character-type" name="attr_flag_special" type="hidden" value="mundane"/>
@@ -2600,6 +2600,7 @@
 										<option data-i18n="cyberdeck" value="Cyberdeck">Cyberdeck</option>
 										<option data-i18n="cyberjack" value="Cyberjack">Cyberjack</option>
 										<option data-i18n="commandconsole" value="Command Console">Command Console</option>
+										<option data-i18n="controlrig" value="Control Rig">Control Rig</option>
 										<option data-i18n="mtoc" value="M-TOC">M-TOC</option>
 									</select>
 								</label>
@@ -4083,7 +4084,7 @@
 				 <input name="attr_pr" title="@{pr}" type="number"/>
 			  </label>
 			</div>
-			<div class="rows grunt spirit vehicle sprite host">
+			<div class="rows grunt spirit sprite host">
 			  <h2 data-i18n="actions">Actions</h2>
 			  <label class="settings" data-i18n-title="majoractions" title="Major Actions">
 				 <span data-i18n="a">A</span><input name="attr_major_actions" placeholder="1" title="@{major_actions}" type="number" value="1"/>
@@ -4091,6 +4092,17 @@
 			  <span class="settings">, </span>
 			  <label class="settings" data-i18n-title="minoractions" title="Minor Actions">
 				 <span data-i18n="i">I</span><input min="0" name="attr_minor_actions" placeholder="2" title="@{minor_actions}" type="number" value="2"/>
+			  </label>
+			  <span class="toggle-display"> <span data-i18n="a">A</span><span name="attr_major_actions"></span><span class="tiny-span">, </span><span data-i18n="i">I</span><span name="attr_minor_actions"></span></span>
+			</div>
+			<div class="rows vehicle">
+			  <h2 data-i18n="actions">Actions</h2>
+			  <label class="settings" data-i18n-title="majoractions" title="Major Actions">
+				 <span data-i18n="a">A</span><input name="attr_major_actions" placeholder="1" title="@{major_actions}" type="number" value="1"/>
+			  </label>
+			  <span class="settings">, </span>
+			  <label class="settings" data-i18n-title="minoractions" title="Minor Actions">
+				 <span data-i18n="i">I</span><input min="0" name="attr_minor_actions" placeholder="2" title="@{minor_actions}" type="number" value="5"/>
 			  </label>
 			  <span class="toggle-display"> <span data-i18n="a">A</span><span name="attr_major_actions"></span><span class="tiny-span">, </span><span data-i18n="i">I</span><span name="attr_minor_actions"></span></span>
 			</div>
@@ -10725,19 +10737,31 @@ mylog = function(msg) {
 /**************/
 /* COMPENDIUM */
 /**************/
+// Compendium Dropped to Canvas
+on("change:canvas_drop_data", (eventInfo) => {
+	console.log("Compendium Item Dropped on Canvas!");
+
+	compendium_drop_handler('canvasdrop', eventInfo);
+});
 // Compendium Drop workers
 on("change:compendium_drop_data", (eventInfo) => {
-	console.log("Compendium Item Dropped!");
-//	console.log(eventInfo);
+	console.log("Compendium Item Dropped on Sheet!");
 
+	compendium_drop_handler('sheetdrop', eventInfo);
+});
+
+var compendium_drop_handler = ((dropType, eventInfo) => {
+console.log(eventInfo);
+console.log("dropType: "+dropType);
 	try{
 		data = JSON.parse(eventInfo.newValue) || false;
 	} catch(e) {
 		// wipe out compendium_drop_data until the next time
 		setAttrs({
+			'canvas_drop_data': '',
 			'compendium_drop_data': '',
 			'compendium_drop_content': ''
-		});
+		}, {silent: true});
 		return;
 	}
 console.log(data);
@@ -10745,13 +10769,14 @@ console.log(data);
 	// wipe out compendium_drop_data until the next time
 	// we're doing this here so errors don't leave ghost data
 	setAttrs({
+		'canvas_drop_data': '',
 		'compendium_drop_data': '',
 		'compendium_drop_content': ''
-	});
+	}, {silent: true});
 
 
 	if(eventInfo.sourceType != 'player' || ! data) {
-console.log("not player triggered or compendium data empty");
+		console.log("not player triggered or compendium data empty");
 		return;
 	}
 
@@ -10759,8 +10784,14 @@ console.log("not player triggered or compendium data empty");
 	// if there are blobs, add those and ignore the parent (it should be one of the blobs?)
 	if(data.blobs && Object.keys(data.blobs).length > 0) {
 console.log("blob(s) exist, adding them!");
+
+		if(data.Category == "QSR Tool Cards") {
+			let blob = data.blobs[data["data-name"]];
+			data.blobs = {};
+			data.blobs[data["data-name"]] = blob;
+		}
+
 		Object.keys(data.blobs).forEach((key) => {
-console.log("adding blob: " + key);
 			blob = data.blobs[key];
 			if(! blob.Category) {
 				if(data.Category == "QSR Tool Cards") {
@@ -10770,15 +10801,31 @@ console.log("adding blob: " + key);
 				}
 			}
 			blob["data-name"] = key;
-			compendium_import(blob);
+
+
+			if(dropType == 'canvasdrop') {
+			console.log("doing canvas_import: " + blob.Category);
+					canvas_import(blob);
+			} else {
+				console.log("sheet drop, continuing");
+				compendium_import(blob);
+			}
 		});
 	} else {
 console.log("no blobs :(");
-		compendium_import(data);
+		if(dropType == 'canvasdrop') {
+		console.log("doing canvas_import outside: " + blob.Category);
+			canvas_import(data);
+			return;
+		} else {
+			console.log("sheet drop, continuing");
+			compendium_import(data);
+		}
 	}
 });
 
-var compendium_import = function(data) {
+var canvas_import = function(data) {
+console.log("doing canvas drop stuff");
 	getAttrs(['compendium_drop_content'], (v) => {
 		// process the dropped data
 console.log("compendium item dropped: "+data.Category);
@@ -10792,9 +10839,36 @@ console.log("compendium item dropped: "+data.Category);
 			case 'Spirits':
 			case 'Hosts':
 			case 'Sprites':
-				// make it use the right character sheet...
-				compendiumDroppedNPC(data);
+				canvasDroppedNPC(data);
 				break;
+			default:
+console.log("Unknown Canvas Drop: "+data.Category+" Sending it to the compendium drop handler.");
+				compendium_import(data);
+				break;
+		}
+	});
+};
+
+var compendium_import = function(data) {
+	getAttrs(['compendium_drop_content'], (v) => {
+		// process the dropped data
+console.log("compendium item dropped: "+data.Category);
+		switch(data.Category) {
+//			case 'NPCs':
+//			case 'Contacts':
+//			case 'Grunts':
+//			case 'Critters':
+//			case 'Spirits':
+//			case 'Hosts':
+//			case 'Sprites':
+//				// make it use the right character sheet...
+//				compendiumDroppedNPC(data);
+//				break;
+			case 'Drones':
+			case 'Vehicles':
+				compendiumAddDrone(data);
+				break;
+			/* sheet drop items below */
 			case 'Spells':
 				compendiumAddSpell(data);
 				break;
@@ -10818,6 +10892,25 @@ console.log("compendium item dropped: "+data.Category);
 			case 'Gear':
 				compendiumAddGear(data);
 				break;
+			case 'Ranged':
+			case 'weapon-ranged':
+				compendiumAddWeapon('range', data);
+				break;
+			case 'Melee':
+			case 'weapon-melee':
+				compendiumAddWeapon('melee', data);
+				break;
+			case 'Weapon Both':
+console.log("both!");
+				compendiumAddWeapon('range', data);
+				compendiumAddWeapon('melee', data);
+				break;
+			case 'Devices':
+				compendiumAddDevice(data);
+				break;
+			case 'Programs':
+				compendiumAddProgram(data);
+				break;
 			default:
 console.log("Unknown Compendium Drop: "+data.Category);
 				break;
@@ -10825,28 +10918,99 @@ console.log("Unknown Compendium Drop: "+data.Category);
 	});
 }
 
-var compendiumDroppedNPC = function(data) {
+var canvasDroppedNPC = function(data) {
 	console.log("NPC Dropped!");
 	console.log(data);
-	setAttrs({
-		sheet_type: data.sheet_type,
-		spirit_type: data.spirit_type || '',
-	});
-	setDefaultToken({
-//		 bar1_value: setObj.sp,
-//		 bar1_max: setObj.sp_max,
-//		 bar3_value: setObj.hp,
-//		 bar3_max: setObj.hp_max,
-//		 bar2_value: setObj.rp*1||'',
-//		 bar2_max: setObj.rp_max*1||'',
-		 showname: true,
-		 width: 70,
-		 height: 70
-	});
+
+	var tokenAttrs = {
+		width: 70,
+		height: 70
+	};
+
+	switch(data.Category) {
+		case 'Spirits':
+			setAttrs({
+				sheet_type: data.sheet_type,
+				spirit_type: data.spirit_type || '',
+			});
+			break;
+		case 'Vehicles':
+			canvasAddDrone(data);
+			break;
+		default:
+			break;
+	}
+
+
+	setup_token(tokenAttrs);
 };
 
+var setup_token = (tokenAttrs) => {
+//	setDefaultToken({
+//		 bar1_value: tokenAttrs.bar1_value,
+//		 bar1_max: tokenAttrs.bar1_value_max,
+//		 bar2_value: tokenAttrs.bar2_value,
+//		 bar2_max: tokenAttrs.bar2_value_max,
+//		 bar3_value: tokenAttrs.bar3_value,
+//		 bar3_max: tokenAttrs.bar3_value_max,
+//		 showname: tokenAttrs.showname,
+//		 width: tokenAttrs.width,
+//		 height: tokenAttrs.height
+//	});
+
+	setDefaultToken(tokenAttrs);
+};
+
+
 /**************************************
-*         Example Add Function        *
+*          CANVAS IMPORTERS           *
+**************************************/
+var canvasAddDrone = function(data) {
+		addattrs = {};
+console.log("It's Drone!");
+console.log(data);
+
+		var type = 'vehicle';
+
+		addattrs.sheet_type = 'vehicle';
+		addattrs["flag"] = false;
+		addattrs["display_flag"] = "on";
+
+		addattrs["handling"] = data["data-handling_onroad"] || 0;
+		addattrs["handling_offroad"] = data["data-handling_offroad"] || 0;
+		addattrs["seating"] = data["data-seats"] || 0;
+		addattrs["acceleration"] = data["data-acceleration"] || 0;
+		addattrs["interval"] = data["data-speed_base"] || 0;
+		addattrs["speed_max"] = data["data-speed_max"] || 0;
+		addattrs["body_base"] = data["data-body_base"] || 0;
+		addattrs["armor"] = data["data-armor_base"] || 0;
+		addattrs["pilot"] = data["data-pilot_base"] || 0;
+		addattrs["sensor"] = data["data-sensor_base"] || 0;
+		addattrs["device_rating"] = data["data-sensor_base"] || 0;
+		addattrs["clearsight"] = data["data-clearsight"] || 0;
+		addattrs["electronicwarfare"] = data["data-electronicwarfare"] || 0;
+		addattrs["evasion"] = data["data-evasion"] || 0;
+		addattrs["maneuvering"] = data["data-maneuvering"] || 0;
+		addattrs["stealth"] = data["data-stealth"] || 0;
+		addattrs["targeting"] = data["data-targeting"] || 0;
+
+		addattrs["notes"] = data["data-description"] || '';
+
+		if(data["data-type"] == 'drone') {
+			addattrs["flag_drone"] = "drone";
+		}
+
+		setAttrs(addattrs);
+};
+
+
+
+
+/**************************************
+*        COMPENDIUM IMPORTERS         *
+**************************************/
+/**************************************
+*   Example Compendium Add Function   *
 **************************************/
 /*
 var compendiumAddArmor = function(data) {
@@ -10870,6 +11034,169 @@ console.log(data);
 /**************************************
 *             End Example             *
 **************************************/
+
+
+var compendiumAddDrone = function(data) {
+		rowattrs = {};
+console.log("It's Drone!");
+console.log(data);
+		row_id = generateRowID();
+
+		var type = 'vehicle';
+
+		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+		rowattrs["repeating_" + type + "_" + row_id + "_type"] = data["data-drone_type"] || 'Other';
+
+		rowattrs["repeating_" + type + "_" + row_id + "_handling_onroad"] = data["data-handling_onroad"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_handling_offroad"] = data["data-handling_offroad"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_seats"] = data["data-seats"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_acceleration_base"] = data["data-acceleration"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_speed_base"] = data["data-speed_base"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_speed_max"] = data["data-speed_max"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_body_base"] = data["data-body_base"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_armor_base"] = data["data-armor_base"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_pilot_base"] = data["data-pilot_base"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_sensor_base"] = data["data-sensor_base"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_clearsight"] = data["data-clearsight"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_electronicwarfare"] = data["data-electronicwarfare"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_evasion"] = data["data-evasion"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_maneuvering"] = data["data-maneuvering"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_stealth"] = data["data-stealth"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_targeting"] = data["data-targeting"] || 0;
+
+		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
+		rowattrs.sheet_type = 'pc';
+		setAttrs(rowattrs);
+};
+
+
+var compendiumAddProgram = function(data) {
+		rowattrs = {};
+console.log("It's a Program... within a program... Error cannot parse existential crisis.");
+console.log(data);
+		row_id = generateRowID();
+
+		var type = 'programs';
+
+		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+
+		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = '';
+		if(data["data-rules"]) {
+console.log("data-rules");
+console.log(data["data-rules"]);
+			var rules = [];
+			try{
+				rules = JSON.parse(data["data-rules"]) || false;
+			} catch(e) {
+				// wipe out compendium_drop_data until the next time
+			}
+console.log("Rules");
+console.log(rules);
+			rules.forEach((rule) => {
+				rowattrs["repeating_" + type + "_" + row_id + "_notes"] += rule.rule;
+			});
+		}
+
+		rowattrs["repeating_" + type + "_" + row_id + "_notes"] += data["data-description"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
+
+		setAttrs(rowattrs);
+};
+
+
+var compendiumAddDevice = function(data) {
+		rowattrs = {};
+console.log("It's a Device, beep boop!");
+console.log(data);
+		row_id = generateRowID();
+
+		var type = 'devices';
+
+		rowattrs["repeating_" + type + "_" + row_id + "_device_rating"] = data["data-device_rating"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+		rowattrs["repeating_" + type + "_" + row_id + "_type"] = data["data-device_type"] || 'Commlink';
+
+		rowattrs["repeating_" + type + "_" + row_id + "_active_program_slots"] = data["data-active_program_slots"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_attack"] = data["data-attack"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_sleaze"] = data["data-sleaze"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_data_processing"] = data["data-data_processing"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_firewall"] = data["data-firewall"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_matrix_initiative_bonus"] = data["data-matrix_initiative_bonus"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_essence_cost"] = data["data-essence_cost"] || 0;
+
+		rowattrs["repeating_" + type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
+
+		setAttrs(rowattrs);
+};
+
+
+var compendiumAddWeapon = function(type = 'range', data) {
+		rowattrs = {};
+console.log("It's a Weapon!");
+//console.log(data);
+		row_id = generateRowID();
+
+		rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
+		rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
+		rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+		rowattrs["repeating_" + type + "_" + row_id + "_skill"] = data["data-skill"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_damage"] = data["data-dv"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_damage_base"] = data["data-dv"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_close"] = data["data-close"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_close_base"] = data["data-close"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_near"] = data["data-near"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_near_base"] = data["data-near"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_medium"] = data["data-medium"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_medium_base"] = data["data-medium"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_far"] = data["data-far"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_far_base"] = data["data-far"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_extreme"] = data["data-extreme"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_extreme_base"] = data["data-extreme"] || '';
+		rowattrs["repeating_" + type + "_" + row_id + "_dicepool_modifier"] = data["data-dicepool_modifier"] || 0;
+		rowattrs["repeating_" + type + "_" + row_id + "_has_mods"] = data["data-has_mods"] || '';
+
+		data["data-ammo"] = (data["data-ammo"]) ? data["data-ammo"].match(/^(\d+)/)[0] : '';
+		rowattrs["repeating_" + type + "_" + row_id + "_ammo"] = data["data-ammo"];
+
+		rowattrs["repeating_" + type + "_" + row_id + "_notes"] = (data["data-extras"]) ? data["data-extras"] : '';
+		rowattrs["repeating_" + type + "_" + row_id + "_notes"] += data["data-description"] || '';
+
+
+		if(type == 'range') {
+			// firing modes setup
+			rowattrs["repeating_" + type + "_" + row_id + "_firing_modes"] = data["data-firing_modes"] || 'SS';
+			var modes = rowattrs["repeating_" + type + "_" + row_id + "_firing_modes"].split(/\s*\/\s*/i);
+			modes.forEach(mode => {
+				switch(mode.toUpperCase()) {
+					case 'SS':
+						rowattrs["repeating_" + type + "_" + row_id + "_singleshot"] = 1;
+						break;
+					case 'SA':
+						rowattrs["repeating_" + type + "_" + row_id + "_semiauto"] = 1;
+						break;
+					case 'BF':
+						rowattrs["repeating_" + type + "_" + row_id + "_burstfire"] = 1;
+						break;
+					case 'BW':
+						rowattrs["repeating_" + type + "_" + row_id + "_burstwide"] = 1;
+						break;
+					case 'FA':
+						rowattrs["repeating_" + type + "_" + row_id + "_fullauto"] = 1;
+						break;
+				};
+			});
+		}
+
+
+		setAttrs(rowattrs);
+};
 
 
 var compendiumAddGear = function(data) {
@@ -11084,15 +11411,16 @@ const trans = {
 		}
 	},
 	'qsr_blob_types': {
-		'weapon-ranged': 'Range',
+		'weapon-ranged': 'Ranged',
 		'weapon-melee': 'Melee',
+		'weapon-both': 'Weapon Both',
+		'spell': 'Spells',
 		'gear-misc': 'Gear',
 		'gear-armor': 'Armor',
 		'gear-commlink': 'Devices',
-		'drone': 'Vehicles',
-		'program': 'Programs',
 		'gear-cyberdeck': 'Devices',
-		'spell': 'Spells',
+		'program': 'Programs',
+		'drone': 'Vehicles',
 		'npc': 'NPC'
 	}
 };
@@ -11912,6 +12240,7 @@ console.log("Character martial arts imported");
 		'CYBERDECK': 'Cyberdeck',
 		'CYBER_HEADWARE': 'Cyberjack',
 		'RIGGER_CONSOLE': 'Command Console',
+		'CONTROL_RIG': 'Control Rig',
 		'TAC_NET': 'M-TOC'
 	}
 	if(json.matrixItems) {
