@@ -1,5 +1,14 @@
 Change Log
 ==============================================
+**2022-12-12 ** v.18 Paul V
+	Added Hit Dice Roller - maxes out the number of dice to roll as the current hit dice and reduces the HD by the number of dice rolled - also adds the result to current HP with a maximum of the HP max
+	Added Generic Initiative Bonus
+	Fixed Hit Point Maximum's attribute label it should have been HP_Max
+	Added Death Save roll button that Automatically checks the Success or Failure boxes.
+	Added Str, Dex, Int, Wis, Con, Cha settings windows to store save prof, indivudial save bonus and global save bonus
+	Recoded the Save buttons to use the new tech and the new global and individual bonuses
+	Added the Ability to whispher the GM rolls
+	Added Maneuver settings to add in Maneuver DC Bonus and Exertion point bonus, also added in current exertion points freely edited field
 **2022-12-05 ** v.17 Paul V
 	Fixed issue with NPC Skill and Attack rolls - converted the rolls to use the new Action button tech
 	Added Initative roll to NPC Sheet
