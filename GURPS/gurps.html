@@ -8140,6 +8140,28 @@ PU2:126 = Power-Ups 2. Page 126
 				<!-- attr_use_skill_modifier_tool is linked to checkbox on options sheet -->
 				<input type="hidden" name="attr_use_skill_modifier_tool" value="0" />
 				<div class="row roll-modifiers">
+					<div class="cell">
+						<button type="action" name="act_show_roll_modifiers_for_skill" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
+					</div>
+					<div class="cell">
+						<div class="summary-group">
+							<div class="icon"><span data-i18n="notes-label">Notes</span></div>
+							<div class="summary" style="width:250px">
+								<div class="roll-traits">
+									<b>Traits:</b>
+									<div>
+										<textarea name="attr_skill_roll_trait_summary" style="width:95%;height:50px;" readonly></textarea>
+									</div>
+								</div>
+								<div class="roll-summary">
+									<b>Summary:</b>
+									<div>
+										<textarea name="attr_skill_roll_modifier_summary" style="width:95%;height:100px" readonly></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="cell label">
 						<div class="popup">
 							<span data-i18n="modifier-label">Modifier:</span>
@@ -8148,16 +8170,30 @@ PU2:126 = Power-Ups 2. Page 126
 							<span data-i18n="modifier-dialog-tooltip">Enter a modifier to apply to any rolls on the this table.<br />Use the pencil/paper icon to select modifiers.<br /><b>NOTE:</b> Changing the modifier or check status of <i>Max skill of 9</i> will clear modifiers used by dialog box.</span>
 						</div>
 					</div>
+					<div  class="cell number-input">
+						<input type="number" value="0" step="1" name="attr_skill_custom_roll_modifier" />
+					</div>
+					<div class="cell">
+						<span>Reason for Mod:</span>
+					</div>
+					<div class="cell">
+						<textarea style="height: 36px;width:150px;" name="attr_skill_custom_roll_modifier_reason"></textarea>
+					</div>
+					<div class="cell">
+						<div class="popup">
+							<span data-i18n="final-modifier-label">Final Modifier</span>:
+						</div>
+						<div class="tooltip">
+							<span data-i18n="final-modifier-dialog-tooltip">The final modifier that will be applied to the effective skill level.</span>
+						</div>
+					</div>
 					<div class="cell number-input">
-						<input type="number" value="0" step="1" name="attr_skill_roll_modifier" />
+						<input type="number" value="0" step="1" name="attr_skill_roll_modifier" readonly />
 						<input type="hidden" value="" name="attr_skill_roll_modifier_summary" />
 						<input type="hidden" value="" name="attr_skill_roll_trait_summary" />
 						<input type="hidden" value="" name="attr_skill_roll_hit_location" />
 						<input type="hidden" value="" name="attr_skill_roll_maneuver" />
 						<input type="hidden" value="" name="attr_skill_roll_allout_attack" />
-					</div>
-					<div class="cell">
-						<button type="action" name="act_show_roll_modifiers_for_skill" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
 					</div>
 					<div class="cell cell-popup">
 						<div>
@@ -8189,25 +8225,6 @@ PU2:126 = Power-Ups 2. Page 126
 					</div>
 					<div class="cell">
 						<button type="action" name="act_skill_roll_reset" class="btn tool-modifier-reset" title="Reset Skill Modifiers"><span data-i18n="reset-label">Reset</span></button>
-					</div>
-					<div class="cell">
-						<div class="summary-group">
-							<div class="icon"><span data-i18n="notes-label">Notes</span></div>
-							<div class="summary">
-								<div class="roll-traits">
-									<b>Traits:</b>
-									<div>
-										<span name="attr_skill_roll_trait_summary"></span>
-									</div>
-								</div>
-								<div class="roll-summary">
-									<b>Summary:</b>
-									<div>
-										<span name="attr_skill_roll_modifier_summary"></span>
-									</div>
-								</div>
-							</div>
-						</div>
 					</div>
 				</div>
 				
@@ -16859,15 +16876,27 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 				{{#rollTraitSummary}}
 				<tr>
-                    <td class="label"><span data-i18n="traits-label">Traits</span>:</td>
-                    <td>{{rollTraitSummary}}</td>
+                    <td colspan="2">
+						<div style="font-weight: bold;">
+							<span data-i18n="traits-label">Traits</span>:
+						</div>
+						<div>
+							{{rollTraitSummary}}
+						</div>
+                    </td>
 				</tr>
 				{{/rollTraitSummary}}
 
 				{{#rollModifierSummary}}
 				<tr>
-                    <td class="label"><span data-i18n="summary-label">Summary</span>:</td>
-                    <td>{{rollModifierSummary}}</td>
+                    <td colspan="2">
+						<div style="font-weight: bold;">
+							<span data-i18n="roll-modifier-summary-label">Modifier Summary</span>:
+						</div>
+						<div>
+							{{rollModifierSummary}}
+						</div>
+                    </td>
 				</tr>
 				{{/rollModifierSummary}}
 
@@ -27000,9 +27029,27 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				totalMod += modifier;
 	
 				// check for special description
-				if (key === "dialog_custom_roll_modifier" && values.dialog_custom_roll_modifier_reason) {
+				if (key === "dialog_custom_roll_modifier") {
 	
-					description = values.dialog_custom_roll_modifier_reason;
+					// split the reason modifiers into seperate lines
+					let modReasons = null;
+
+					if (values.dialog_custom_roll_modifier_reason) {
+						modReasons = values.dialog_custom_roll_modifier_reason.split(/\r?\n/);
+					}
+
+					let displayReasons = "";
+					
+					if (modReasons && modReasons.length > 0) {
+
+						// add two spaces before each reason and combine into single string list
+						displayReasons = modReasons.map(reason => {
+							return `  • ${reason}\n`;
+						});
+
+					}
+					
+					description = `Custom Modifier\n${displayReasons}`;
 	
 				} else if (key === "hit_location_modifier" && values.hit_location) {
 	
@@ -27948,6 +27995,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		on(`change:use_${section}_modifier_tool`, event => {
 	
 			let updateFields = {
+				[`${section}_custom_roll_modifier`]: 0,
+				[`${section}_custom_roll_modifier_summary`]: "",
 				[`${section}_roll_modifier`]: 0,
 				[`${section}_roll_modifier_summary`]: "",
 				[`${section}_roll_trait_summary`]: "",
@@ -29097,6 +29146,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		let updates = {};
 	
+		updates[`${section}_custom_roll_modifier`] = 0;
+		updates[`${section}_custom_roll_modifier_summary`] = "";
 		updates[`${section}_roll_modifier`] = 0;
 		updates[`${section}_roll_modifier_summary`] = "";
 		updates[`${section}_roll_trait_summary`] = "";
