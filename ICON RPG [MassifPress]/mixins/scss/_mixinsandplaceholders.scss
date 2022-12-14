@@ -51,7 +51,27 @@
   font-family: var(--monoFont) !important;
 }
 
+.title {
+  font-family: var(--titleFont) !important;
+}
+
+.bigger {
+  font-size: 1.2rem !important;
+}
+
+.big {
+  font-size: 1.1rem !important;
+}
+
+.normal {
+  font-size: 1.0rem !important;
+}
+
 .small {
+  font-size: 0.9rem !important;
+}
+
+.smaller {
   font-size: 0.8rem !important;
 }
 
@@ -401,6 +421,11 @@
   box-sizing: border-box;
 }
 
+.well-padded {
+  padding: 0.5rem !important;
+  margin: 0.5rem !important;
+}
+
 //- Default styles. This Placeholder gets a little complicated. We're going to define several CSS variables in the first lines that will allow us to easily use the same layout principles across the sheet. Additionally, this placeholder is going to apply several styles to various elements. The reason we do this as a placeholder instead of directly in a class' CSS declaration is so that we can easily apply the same styling to our sheet as a whole and to the rolltemplate (note that many of these class specifications have versions prefixed and unprefixed with `.sheet-`
 %universalVariables {
   @extend %font-vars;
@@ -448,7 +473,7 @@
 
   .capitalize,
   .sheet-capitalize{
-    text-transform:capitalize;
+    text-transform:capitalize !important;
   }
 
   .smallcaps {
@@ -474,36 +499,47 @@
   .sheet-space-around {
     justify-content: space-around;
   }
-
   .space-between,
   .sheet-space-between {
     justify-content: space-between;
   }
-
   .center,
   .sheet-center {
     justify-content: center;
     align-items: center;
     text-align: center;
   }
+  .right {
+    text-align: right;
+  }
+  .left {
+    text-align: left;
+  }
   .justify-left,
   .justify-start{
-    justify-self:start;
+    justify-self: start;
   }
   .justify-right,
   .justify-end{
-    justify-self:end;
+    justify-self: end;
   }
   .align-start{
-    align-self:start;
+    align-self: start;
   }
   .align-end{
-    align-self:end;
+    align-self: end;
   }
   
-  .grid__3col, .grid__2col {
+  .grid__8col, .grid__4col, .grid__3col, .grid__2col {
     display: grid;
+    width: auto;
     gap: var(--half-gap);
+    &.grid__8col {
+      grid-template-columns: auto auto auto auto auto auto auto auto;
+    }
+    &.grid__4col {
+      grid-template-columns: auto auto auto auto;
+    }
     &.grid__3col {
       grid-template-columns: auto auto auto;
     }
@@ -527,12 +563,15 @@
     line-height: 1.25em;
     min-height: 2.5rem;
     white-space: pre-wrap;
+    text-overflow: ellipsis;
 
     &.fixed {
       resize: none;
       overflow: auto;
     }
 
+    &.textarea-1 { height: 1.25em; }
+    &.textarea-2 { height: 2.5em; }
     &.textarea-3 { height: 3.75em; }
     &.textarea-4 { height: 4em; }
     &.textarea-5 { height: 6.25em; }
@@ -549,11 +588,10 @@
       font-size: 1.1rem;
       // font-weight: bold !important;
     }
+  }
 
-    &.wealth {
-      height: 2em;
-      font-weight: bold !important;
-    }
+  .span-3 {
+    grid-column: span 3;
   }
 
   .span-2,
@@ -574,6 +612,7 @@
   .uneditable-input {
     padding: 2px;
     font-size: 1rem;
+    cursor: pointer;
   }
 
   input:is([type="text"], [type="number"]),
@@ -606,7 +645,7 @@
     width: auto;
 
     &:placeholder {
-      color: var(--half-grey);
+      color: var(--grey-dk);
     }
 
     &.plus-control:not([value*="-"])+span:before {
@@ -651,6 +690,9 @@
   h1, .h1-style-input,
   *[aria-level='1'] {
     @extend %h1;
+    &::placeholder {
+      text-shadow: 0 0 2px white, 0 0 2px white;
+    }
   }
 
   .h1-style-input {
@@ -672,6 +714,7 @@
   h3, .h3-style-input,
   *[aria-level='3'] {
     @extend %h3;
+    text-overflow: ellipsis;
   }
 
   h4,
@@ -878,7 +921,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    text-transform: initial;
   }
 
   .roll-container {
@@ -902,9 +944,10 @@
     }
 
     .collapse {
+      -webkit-appearance: none;
       opacity: 0;
       position: absolute;
-      right: -1px;
+      right: 1px;
       top: 0px;
       border: 0px solid black;
       border-radius: 0;
@@ -915,7 +958,7 @@
       -webkit-transform: scale(1.2); /* Chrome, Safari, Opera */
       transform: scale(1.2);
 
-      &:before {
+      &:after {
         content: 'i';
         font-family: pictos;
       }
@@ -1029,6 +1072,7 @@
       background-color:grey;
     }
   }
+
   p {
     font-size: 1.0rem;
     width: 96%;
@@ -1042,5 +1086,33 @@
       position: relative;
       left: 20px;
     }
+  }
+  p.colon {
+    font-family: var(--titleFont);
+    font-size: 1.1rem;
+    font-weight: bold;
+    position: relative;
+    top: 3px;
+    &::after{content: '\003A';} /* CSS colon : entity \003A : html &colon; */
+  }
+
+  .auto-expand {
+    overflow: hidden; /* hides overflow that is caused by the span */
+    position: relative; /* Allows the input's absolute positioning to be relative to this parent div */
+    min-width: 100px; /* Whatever feels good to you, prevents a new span from collapsing to 0. */
+    max-height: 200px;
+    width: fit-content;
+    // height: fit-content; /* Will fit the width to the contents without going outside itself or collapsing smaller than its content, though we will be using min-width in the case where there's no content. */
+    height: 25% !important; /* Prevent the span from defining the height of the input container which can't be multiline */
+  }
+  .auto-expand span {
+    visibility: hidden;
+    height: 0px;
+    position: relative;
+  }
+  .auto-expand input {
+    position: absolute; /* removes the input from the DOM flow, allowing the span to exist in the same space */
+    width: 100%; /* Inputs match the width of the parent element as defined by the spans */
+    font-size: 1em;
   }
 }

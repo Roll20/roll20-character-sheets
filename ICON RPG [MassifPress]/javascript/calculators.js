@@ -61,3 +61,61 @@
     return attributes[`${name}_mod`] + finesse + activeArmorBonus;//Total our defense or reduction score using the miscellaneous modifier and all of our equipped armors/shields.
   };
   k.registerFuncs({calcDefense});//Register the function
+
+  const boundNumber = (value, min, max) => {
+    [ value, min, max ] = [ value, min, max].map(input => parseFloat(input));
+    if (!isNaN(value)) {
+      value = (!isNaN(min)) ? Math.max(value, min) : value;
+      value = (!isNaN(max)) ? Math.min(value, max) : value;
+    }
+    return value;
+  }
+
+  on('change:vigor change:vigor_max change:wounds change:vitality', () => {
+    getAttrs([ 'vigor', 'vigor_max' ], (attributeValues) => {
+      const boundValue = boundNumber(attributeValues.vigor, 0, attributeValues.vigor_max);
+      if (boundValue !== attributeValues.vigor) {
+        setAttrs({ vigor: boundValue });
+      }
+    });
+  });
+
+  on('change:hp change:hp_max change:wounds change:vitality', () => {
+    getAttrs([ 'hp', 'hp_max' ], (attributeValues) => {
+      const boundValue = boundNumber(attributeValues.hp, 0, attributeValues.hp_max);
+      if (boundValue !== attributeValues.hp) {
+        setAttrs({ hp: boundValue });
+      }
+    });
+  });
+
+  const calcHP = function({attributes}){
+    return attributes.vitality * (attributes.ratio_max_hp - attributes.wounds);
+  };
+  k.registerFuncs({calcHP});
+
+  const calcBloodied = function({attributes}){
+    let returnValue;
+    let hp_max = attributes.vitality * attributes.ratio_max_hp;
+    let bloodied_hp = hp_max * attributes.ratio_bloodied;
+    switch(true){ //We're looking for the first expression that returns true;
+      case (attributes.hp <= bloodied_hp):
+        returnValue = 1;
+        break;
+      default:
+        returnValue = 0;
+        break;
+      }
+    return returnValue;
+  }
+  k.registerFuncs({calcBloodied});
+
+  // const calcPlusOne = function({attributes}){
+  //   return attributes.number + 1;
+  // }
+  // k.registerFuncs({calcPlusOne});
+
+  // const calcMultiply = function({attributes}){
+  //   return attributes.mult1 * attributes.mult2;
+  // }
+  // k.registerFuncs({calcMultiply});
