@@ -1,5 +1,14 @@
 Change Log
 ==============================================
+**2022-12-05 ** v.66 Chuz (James Culp)
+	New Feature - Added modifiers for primary_range_weapon_close_mod, primary_range_weapon_near_mod, primary_range_weapon_medium_mod, primary_range_weapon_far_mod, primary_range_weapon_extreme_mod, primary_range_weapon_damage_mod, primary_range_weapon_dicepool_mod for changing the ARs at various ranges and the damage for the primary weapon.
+	New Feature - Added modifiers for single_shot_penalty_mod, semi_auto_penalty_mod, burst_fire_penalty_mod, burst_wide_penalty_mod, full_auto_penalty_mod for changing the AR penalties for firing modes.
+	New Feature - Primary Weapon Mods section that allows a list of mods to be added and turned on/off to apply bonuses/penalties to ARs, DV, dicepool (not reflected in listed dicepool) and firing mode penalties. Upon changing primary ranged weapon, mods will be disabled, if the weapon has the "Has Mods" checkbox checked the screen will switch to the Mod selection screen.
+	New Feature - Added Blood and the various Insect spirits from Street Wyrd
+	New Feature - Updated spirits to allow my templates to have more than one melee or ranged attack.
+	Update - There are now a maximum of 30 physical and 21 stun condition monitor boxes for PCs, these numbers should exceed the current theoretical maximums.
+	Bugfix - Skill name for multi-word skills wasn't being formatted properly.
+	Bugfix - At some point NPC -> Vehicle DR input and button disappeared, they've been found and replaced
 **2022-11-21 ** v.65 Chuz (James Culp)
 	Bugfix - PC Weapon skills weren't applying the -1 unskilled penalty to some skills, this has been updated however users will need to update the skill to something else and back to trigger the data change.
 	Bugfix - PC Sheet imported from Genesis in a non-English language had many problems mostly related to skills.  I believe I've fixed these issues please report any new ones

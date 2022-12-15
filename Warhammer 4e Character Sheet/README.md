@@ -81,6 +81,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+December 12th 2022 v1.64a
+
+- Fixed Blather talent not adding to AutoXP.
+- Fixed VsSize Melee modifier not adding +10 to Melee attack Modifiers when vs larger targets then yourself.
+
+
 November 4th 2022 v1.64
 
 - Added Spell/Pray (Magic) Drop-down Assist: this is similar to the Melee/Ranged ones. Its shows all learned spells Petty/Arcance from the spellbook, or blessings/miracles, in a collapsable menu with lore  channeling, Accu SL and Cast buttons for Quick access to those buttons under Combat actions.
