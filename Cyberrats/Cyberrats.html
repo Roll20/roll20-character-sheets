@@ -226,35 +226,38 @@
 	</fieldset>
 	
 		<h4 class="second">Weapons</h4>
-	<fieldset class="repeating_weapon">
-		<button type="roll" name="roll_weapon" value="&{template:powers} {{title=Weapon}} {{name=@{character_name}}} {{description=@{weapontext}}} {{powerName=@{weaponname}}} {{harm=@{harm}}}"></button>
-		<input class="weapon" spellcheck="false" type="text" name="attr_weaponname" value="Name">
-		<label class="harmlabel">Harm</label>
-		<input class="harmcounter" type="number" name="attr_harm" value="1">
-		<span class="melee flexspan">
-			<label class="narrow">Ammo?</label>
-			<input type="checkbox" value="true" checked name="attr_hasammo"></input>
-		</span>
-		<input class="hasammo" type="hidden" value="true" name="attr_hasammo"></input>
-		<span class="ammo">
-			<label>Ammo:</label>
-			<input type="number" value="1" name="attr_ammo"></input>
-			<p class="slash">/</p>
-			<input type="number"value="1" name="attr_max_ammo"></input>
-			<button type="action" class="btn" name="act_reload">Reload</button>
-		</span>
-		<span class="range flexspan">
-			<label class="narrow">Range:</label>
-			<label class="small narrow">Close:</label>
-			<input type="checkbox" value="true" name="attr_closerange"></input>
-			<label class="small narrow">Near:</label>
-			<input type="checkbox" value="true" name="attr_nearrange"></input>
-			<label class="small narrow">Far:</label>
-			<input type="checkbox" value="true" name="attr_farrange"></input>
-		</span>
+			<fieldset class="repeating_weapon">
+				<div class="weapon">
+					<button type="action" class="btn d6" name="act_rollweapon" value=""></button>
+					<input class="weapon" spellcheck="false" type="text" name="attr_weaponname" value="Name">
+					<label class="harmlabel">Harm</label>
+					<input class="harmcounter" type="number" name="attr_harm" value="1">
+					<span class="melee flexspan">
+						<label class="narrow">Ammo?</label>
+						<input type="checkbox" value="true" checked name="attr_hasammo"></input>
+					</span>
+					<input class="hasammo" type="hidden" value="true" name="attr_hasammo"></input>
+					<span class="ammo">
+						<label>Ammo:</label>
+						<input type="number" value="1" name="attr_ammo"></input>
+						<p class="slash">/</p>
+						<input type="number"value="1" name="attr_max_ammo"></input>
+						<button type="action" class="btn" name="act_reload">Reload</button>
+					</span>
+					<span class="hidden rangetext" name="attr_rangetext" value=""></span>
+					<span class="range flexspan">
+						<label class="narrow">Range:</label>
+						<label class="small narrow">Close:</label>
+						<input type="checkbox" value="true" name="attr_closerange"></input>
+						<label class="small narrow">Near:</label>
+						<input type="checkbox" value="true" name="attr_nearrange"></input>
+						<label class="small narrow">Far:</label>
+						<input type="checkbox" value="true" name="attr_farrange"></input>
+					</span>
 
-		<textarea class="maxwidth" spellcheck="false" name="attr_weapontext">Tags and upgrades</textarea>
-	</fieldset>
+					<textarea class="maxwidth" spellcheck="false" name="attr_weapontext">Tags and upgrades</textarea>
+				</div>
+			</fieldset>
 	
 	</section>
 	
@@ -354,9 +357,6 @@
 			</div>
 
 			<div class="stack header-right">
-				
-
-				
 				<div class="autoExpand">
 				 <input spellcheck="false" class="header-input" name="attr_base_location" type="text">
 				 <span name="attr_base_location"></span>
@@ -1401,11 +1401,6 @@
 				</div>
 			{{/description}}
 			
-			{{#harm}}
-				<div class="sheet-cost">
-					{{harm}} Harm
-				</div>
-			{{/harm}}
 			{{#cost}}
 				<div class="sheet-cost">
 					Biotech Cost: {{cost}}
@@ -1413,6 +1408,79 @@
 			{{/cost}}
 
 </rolltemplate>
+
+
+<rolltemplate class="sheet-rolltemplate-weapon">
+
+			{{#title}}
+				<div class="sheet-title">
+				{{title}}
+				</div>
+			{{/title}}
+			
+			{{#name}}
+				<div class="sheet-name">
+					{{name}}
+				</div>
+			{{/name}}
+				
+			{{#weaponname}}
+				<div class="sheet-weaponname">
+					{{weaponname}}
+				</div>
+			{{/weaponname}}
+			
+			{{#description}}
+				<div class="sheet-description">
+					{{description}}
+				</div>
+			{{/description}}
+			
+			{{#harm}}
+				<div class="sheet-harm">
+					{{harm}} Harm
+				</div>
+			{{/harm}}
+			{{#ammo}}
+				<div class="sheet-ammo">
+					{{#lowAmmo}}
+						After making this attack, {{weaponname}} has <span class="red">{{ammo}}</span> ammo remaining.
+					{{/lowAmmo}}
+				
+					{{^lowAmmo}}
+						After making this attack, {{weaponname}} has {{ammo}} ammo remaining.
+					{{/lowAmmo}}
+
+				</div>
+			{{/ammo}}
+			{{#range}}
+				<div class="sheet-range">
+					 {{range}}
+				</div>
+			{{/range}}
+
+</rolltemplate>
+
+
+
+<rolltemplate class="sheet-rolltemplate-grief">
+	<div class="title">
+		<span>Grief</span>
+	</div>
+	<div class="name">{{name}}</div>
+	{{#roll}}<div class="roll">
+		<div class="main-roll">{{roll}}</div>
+	</div>{{/roll}}
+	<div class="result">
+		{{#rollLess() roll 2}}
+		<span class="grieflength">You will be grieving the loss of your relationship for the next {{roll}} mission.</span>
+		{{/rollLess() roll 2}}
+		{{#rollGreater() roll 1}}
+		<span class="grieflength">You will be grieving the loss of your relationship for the next {{roll}} missions.</span>
+		{{/rollGreater() roll 1}}
+	</div>
+</rolltemplate>
+
 
 
 <rolltemplate class="sheet-rolltemplate-attributeroll">
@@ -1762,6 +1830,39 @@ function getResults(numDice) {
 		: [...Array(numDice)].map((_, i) => `$[[${i}]]`).join(" ");
 }
 
+function getRangeText(close, near, far) {
+	// Not the cleanest but is the fastest.
+	const rangecount = 0 + (close ? 1 : 0)  + (near ? 1 : 0) + (far ? 1 : 0);
+
+	let rangeText = "This weapon operates at ";
+	
+	if(rangecount === 0) { return " "; }
+	if(rangecount === 3) { return rangeText + "Close, Near, and Far ranges."; }
+
+	if(close) {
+		rangeText += "Close";
+		
+		if(rangecount === 2) {
+			rangeText += " and "
+		}
+	}
+	
+	if(near) {
+		rangeText += "Near";
+		
+		if(far) {
+			rangeText += " and "
+		}
+	}
+	
+	if(far) {
+		rangeText += " Far"
+	}
+
+	return rangeText + (rangecount > 1 ? " ranges." : " range.");
+}
+
+
 /* * * * * * * * * * * * * * * 
  *         Listeners         *
  * * * * * * * * * * * * * * */
@@ -1818,12 +1919,68 @@ on("clicked:repeating_weapon:reload", function(eventInfo) {
 	});
 });
 
+on("clicked:repeating_weapon:rollweapon", function(eventInfo) {
+
+		getAttrs([
+      "repeating_weapon_weaponname",
+			"repeating_weapon_rangetext",
+			"repeating_weapon_weapontext",
+			"repeating_weapon_ammo",
+			"repeating_weapon_harm",
+			"repeating_weapon_hasammo"
+    ], function(values) {
+				if(!values.repeating_weapon_rangetext) {
+					values.repeating_weapon_rangetext = "";
+				}
+			
+				const hasAmmo = values.repeating_weapon_hasammo === "true";
+				
+				const lowAmmostr = (hasAmmo && `${values.repeating_weapon_ammo}` < 2) ? "{{lowAmmo=true}}" : "";
+				const ammoStr = hasAmmo ? `{{ammo=${values.repeating_weapon_ammo -1}}}` + lowAmmostr : "";
+			
+			
+				startRoll(`&{template:weapon} {{title=Weapon}} {{name=@{character_name}}} {{description=${values.repeating_weapon_weapontext}}} {{weaponname=${values.repeating_weapon_weaponname}}} {{harm=${values.repeating_weapon_harm}}} {{range=${values.repeating_weapon_rangetext}}} ` + ammoStr, (results) => {
+							finishRoll(
+									results.rollId,
+									{
+									}
+							);
+				});
+						
+				if(hasAmmo) 
+				{
+					setAttrs( {
+						repeating_weapon_ammo: values.repeating_weapon_ammo -1
+					});
+				}
+				
+		});
+
+
+
+});
+
+
+on("change:repeating_weapon:closerange change:repeating_weapon:nearrange change:repeating_weapon:farrange", function(eventInfo) {
+		getAttrs([
+      "repeating_weapon_closerange",
+      "repeating_weapon_nearrange",
+      "repeating_weapon_farrange"
+    ], function(values) {
+			const close = values.repeating_weapon_closerange === "true";
+			const near = values.repeating_weapon_nearrange === "true";
+			const far = values.repeating_weapon_farrange === "true";
+			const rangeText = getRangeText(close, near, far);
+			setAttrs({
+				repeating_weapon_rangetext : rangeText,
+			});
+		});
+});
+
 on("clicked:decay", function(eventInfo) {
-	console.log("clicked decay");
 		getAttrs(["hivedecayroom1", "hivelockedroom1", "max_hivedecayroom1", "hivedecayroom2", "hivelockedroom2", "max_hivedecayroom2", "hivedecayroom3", "hivelockedroom3", "max_hivedecayroom3", "hivedecayroom4", "hivelockedroom4", "max_hivedecayroom4", "hivedecayroom5", "hivelockedroom5", "max_hivedecayroom5", "hivedecayroom6", "hivelockedroom6", "max_hivedecayroom6", "hivedecayroom7", "hivelockedroom7", "max_hivedecayroom7", "hivedecayroom8", "hivelockedroom8", "max_hivedecayroom8", "hivedecayroom9", "hivelockedroom9", "max_hivedecayroom9", "hivedecayroom10", "hivelockedroom10", "max_hivedecayroom10"], (values) => {
 				let rows = {};
 				const maxrooms = 10;
-						console.log(values);
 				for(let i = 1; i <= maxrooms; i++) {
 						//If not locked, AND not at max, increase decay by 1
 						if(values[`hivelockedroom${i}`] != "on" && parseInt(values[`hivedecayroom${i}`]) < parseInt(values[`max_hivedecayroom${i}`])) {
@@ -1839,7 +1996,6 @@ on("change:submarine_source", function(eventInfo) {
       "rsmash"
     ], function(values) {
 			const details = submarineOrigins[eventInfo.newValue] ? submarineOrigins[eventInfo.newValue] : "";
-			console.log(details);
 			setAttrs({
 						subsourcedetails: details
 				});
@@ -1962,12 +2118,10 @@ on("sheet:opened", () => {
 // Reset after each mission
 on("clicked:reset", function() {
   getAttrs(["hp_max", "resetpowers", "biotech_max"], (values) => {
-console.log(values);
 		// Set HP to max HP
 		// Set Biotech to max Biotech
 		const hp = values.hp_max;
 		const bt = values.biotech_max;
-		console.log(bt);
 		setAttrs({
 			"hp" : hp,
 			"biotech" : bt
@@ -2009,8 +2163,8 @@ console.log(values);
 });
 
 on("clicked:griefbtn", function() {
-        startRoll("&{template:rolls} {{name=Grief}} {{grief=[[1d6cf>6cs<1]]}}", (results) => {
-            const total = results.results.grief.result
+        startRoll("&{template:grief} {{name=@{character_name}}} {{roll=[[1d6cf>6cs<1]]}}", (results) => {
+            const total = results.results.roll.result
 
             finishRoll(
                 results.rollId,
