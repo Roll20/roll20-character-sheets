@@ -4845,7 +4845,7 @@
 			  <input name="attr_far" type="hidden" value=""/>
 			  <input name="attr_extreme" type="hidden" value=""/>
 			  <input name="attr_dicepool" type="hidden" value=""/>
-			  <button class="no-dicepool" name="roll_npc_melee_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (Dicepool: ?{Engineering / Autosoft?|1,1|2,2|3,3|4,4|5,5|6,6|7,7|8,8|9,9|10,10} + ?{Logic / Sensor?|1,1|2,2|3,3|4,4|5,5|6,6|7,7|8,8|9,9|10,10})}}{{dice=[[(?{Engineering / Autosoft?}+?{Logic / Sensor?}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=DV @{damage}, Notes: @{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
+			  <button class="no-dicepool" name="roll_npc_melee_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (Dicepool: ?{Skill / Autosoft?|1,1|2,2|3,3|4,4|5,5|6,6|7,7|8,8|9,9|10,10} + ?{Attribute / Sensor?|1,1|2,2|3,3|4,4|5,5|6,6|7,7|8,8|9,9|10,10})}}{{dice=[[(?{Skill / Autosoft?}+?{Attribute / Sensor?}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=DV @{damage}, Notes: @{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
 			  <button class="dicepool" name="roll_npc_melee_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (Dicepool: @{dicepool})}}{{dice=[[(@{dicepool}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=DV @{damage}, Notes: @{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
 			  <span class="center" name="attr_dicepool"></span>
 			  <span class="center" name="attr_damage"></span>
@@ -7023,26 +7023,26 @@ const rollEscape = {
 * - This does the heavy lifting
 ************************************/
 var rollProcessor = async (rollButton, ev = {}, passthrough = {}) => {
-console.info(ev);
-console.info(passthrough);
-console.info(rollButton);
+//console.log(ev);
+//console.log(passthrough);
+//console.log(rollButton);
 	getAttrs(["bad_luck"], (v) => {
 		startRoll(rollButton, (results) => {
 
-console.log(results.results);
+//console.log(results.results);
 			// setup our passthrough values
 			if(results.results.extendedtest && results.results.extendedtest.result == 1) {
-console.info("Setting up passthrough for start");
+//console.log("Setting up passthrough for start");
 				passthrough.dicepool = parseInt(results.results.dicepool.result);
 				passthrough.newdicepool = parseInt(results.results.dicepool.result - 1);
 				passthrough.hitstotal = parseInt(0);
 				passthrough.intervals = parseInt(1);
 //				passthrough.reason = results.results.reason.expression;
-console.log(passthrough);
+//console.log(passthrough);
 			}
 
 
-console.log(results.results);
+//console.log(results.results);
 			if(! results.results.dice) {
 				results.results.dice = {dice: []}
 			}
@@ -7221,7 +7221,7 @@ var check_glitches = (v, rolled, hits) => {
 
 // Wild Die toggle changed
 on("change:wild_die", (eventInfo) => {
-console.log(eventInfo);
+//console.log(eventInfo);
 	if(eventInfo.newValue == 0) {
 		setAttrs({
 			wild_die1: eventInfo.newValue,
@@ -7716,6 +7716,7 @@ const settingsToggle = (eventInfo) => {
 
 on("change:body change:strength change:lift_carry_modifier", (eventInfo) => {
 	const source = eventInfo.sourceAttribute;
+
 	update_common_rolls(["body", "willpower", "lift_carry_modifier"]);
 
 	//ONLY RUN ON BODY CHANGE
@@ -8271,7 +8272,15 @@ const update_common_rolls = (attrs) => {
 const update_track = (track) => {
 	let attrs = [`${track}_modifier`, `${track}_damage`];
 	(track === "stun") ? attrs.push("willpower") : attrs.push("body", "sheet_type", "flag_drone");
+	attrs.push('compendium_drop_in_progress');
 	getAttrs(attrs, (v) =>{
+
+		// If we're in the middle of a compendium drop don't update the tracks, sometimes the compendiums set odd values
+		if(v.compendium_drop_in_progress) {
+			return;
+		}
+
+
 		const attr1 = attrs[2], stat1 = parseInt(v[`${attr1}`]) || 0; //Willpower or Body
 		const mod = parseInt(v[`${track}_modifier`]) || 0;
 		const dam = parseInt(v[`${track}_damage`]) || 0;
@@ -8353,7 +8362,7 @@ const update_wounds = () => {
 				pain_tolerance = parseInt(v.pain_tolerance) || 0,
 				phys_thresh = parseInt(v.phys_wound_threshold) || 3,
 				stun_thresh = parseInt(v.stun_wound_threshold) || 3;
-console.log(v);
+//console.log(v);
 				if(v.sheet_type == 'grunt') {
 					phys_thresh = 2,
 					stun_thresh = 2;
@@ -8818,7 +8827,7 @@ on("change:level", () => {
 
 
 on("change:repeating_skills:name", (eventInfo) => {
-console.log(eventInfo);
+//console.log(eventInfo);
 	update_skill_attribute(eventInfo.triggerName.replace('_name', ''), eventInfo.newValue);
 });
 
@@ -9641,7 +9650,7 @@ on("change:spirit_type change:force", (eventInfo) => {
 var spirit_update = () => {
 	setAttrs({
 		grunt_group_member: 'grunt_group_member'
-	}, {}, () => { console.log("grunt group member set"); });
+	});
 
 	getAttrs(['force', 'spirit_type', 'sheet_type', 'spirit_reset_toggle'], (v) => {
 		if(v.sheet_type != 'spirit') {
@@ -10642,7 +10651,7 @@ var spirit_update = () => {
 
 		setAttrs({
 			grunt_group_member: 0
-		}, {}, () => { console.log("grunt group member updated"); });
+		});
 	});
 };
 
@@ -10739,26 +10748,41 @@ mylog = function(msg) {
 
 
 
-/**************/
-/* COMPENDIUM */
-/**************/
-// Compendium Drop workers
+/*********************
+* COMPENDIUM WORKERS *
+*********************/
+on("sheet:compendium-drop", (eventInfo) => {
+console.info("/*************************************************/");
+console.info("/*                 DROP EVENT                    */");
+console.info("/*************************************************/");
+console.log(eventInfo);
+	compendium_drop_done();
+});
+
 // Compendium Dropped to Canvas
 on("change:canvas_drop_data", (eventInfo) => {
 	console.log("Compendium Item Dropped on Canvas!");
 
+	setAttrs({compendium_drop_in_progress: true}, {silent:true});
 	compendium_drop_handler('canvasdrop', eventInfo);
 });
 // Compendium Dropped to Sheet
 on("change:compendium_drop_data", (eventInfo) => {
 	console.log("Compendium Item Dropped on Sheet!");
 
+	setAttrs({compendium_drop_in_progress: true}, {silent:true});
 	compendium_drop_handler('sheetdrop', eventInfo);
 });
 
+var compendium_drop_done = function() {
+	setAttrs({
+		compendium_drop_in_progress: ''
+	}, {silent:true});
+}
+
 var compendium_drop_handler = ((dropType, eventInfo) => {
 //console.log(eventInfo);
-console.log("dropType: "+dropType);
+//console.log("dropType: "+dropType);
 	try{
 		data = JSON.parse(eventInfo.newValue) || false;
 	} catch(e) {
@@ -10780,17 +10804,13 @@ console.log(data);
 		'compendium_drop_content': ''
 	}, {silent: true});
 
-
 	if(eventInfo.sourceType != 'player' || ! data) {
 		console.log("not player triggered or compendium data empty");
 		return;
 	}
 
-
 	// if there are blobs, add those and ignore the parent (it should be one of the blobs?)
 	if(data.blobs && Object.keys(data.blobs).length > 0) {
-console.log("blob(s) exist, adding them!");
-
 		if(data.Category == "QSR Tool Cards") {
 			let blob = data.blobs[data["data-name"]];
 			data.blobs = {};
@@ -10798,9 +10818,9 @@ console.log("blob(s) exist, adding them!");
 		}
 		Object.keys(data.blobs).forEach((key) => {
 			blob = data.blobs[key];
-
-console.log("Blob Category: "+blob.Category);
-console.log("blob.data-Category: "+blob["data-Category"]);
+//console.log("blob.Cat: "+blob.Category);
+//console.log("data.Cat: "+data.Category);
+//console.log("blob.data-Cat: "+blob["data-Category"]);
 			if(! blob.Category) {
 				if(data.Category == "QSR Tool Cards") {
 					blob.Category = trans["qsr_blob_types"][data["data-type"]];
@@ -10814,21 +10834,16 @@ console.log("blob.data-Category: "+blob["data-Category"]);
 
 
 			if(dropType == 'canvasdrop') {
-			console.log("doing canvas_import: " + blob.Category);
 					canvas_import(blob);
 			} else {
-				console.log("sheet drop, continuing");
 				compendium_import(blob);
 			}
 		});
 	} else {
-console.log("no blobs :(");
 		if(dropType == 'canvasdrop') {
-		console.log("doing canvas_import outside: " + blob.Category);
 			canvas_import(data);
 			return;
 		} else {
-			console.log("sheet drop, continuing");
 			compendium_import(data);
 		}
 	}
@@ -10836,8 +10851,6 @@ console.log("no blobs :(");
 
 var canvas_import = function(data) {
 	// process the dropped data
-console.log("canvas item dropped: "+data.Category);
-console.log(data);
 	switch(data.Category) {
 		case 'NPCs':
 		case 'Contacts':
@@ -10851,7 +10864,7 @@ console.log(data);
 			canvasDroppedNPC(data);
 			break;
 		default:
-console.log("Unknown Canvas Drop: "+data.Category+" Sending it to the compendium drop handler.");
+			console.log("Unknown Canvas Drop: "+data.Category+" Sending it to the compendium drop handler.");
 			compendium_import(data);
 			break;
 	}
@@ -10909,7 +10922,6 @@ console.log(data);
 			compendiumAddWeapon('melee', data);
 			break;
 		case 'Weapon Both':
-//console.log("both!");
 			compendiumAddWeapon('range', data);
 			compendiumAddWeapon('melee', data);
 			break;
@@ -10920,19 +10932,19 @@ console.log(data);
 			compendiumAddProgram(data);
 			break;
 		default:
-console.log("Unknown Compendium Drop: "+data.Category);
+			console.log("Unknown Compendium Drop: "+data.Category);
 			break;
 	}
 }
 
 var canvasDroppedNPC = function(data) {
-//console.log("NPC Dropped!");
-//console.log(data);
-
 	var tokenAttrs = {
 		width: 70,
 		height: 70
 	};
+
+	// default condition monitors for physical and matrix
+	let physical = 0, matrix = 0;
 
 	switch(data.Category) {
 		case 'Spirits':
@@ -10940,18 +10952,69 @@ var canvasDroppedNPC = function(data) {
 				sheet_type: data.sheet_type,
 				spirit_type: data.spirit_type || '',
 			});
+
+			if(typeof data["data-physical"] !== 'undefined') {
+				physical = data["data-physical"];
+			} else if(typeof data["data-body_base"] !== 'undefined') {
+				physical = 8 + Math.ceil(data["data-body_base"] / 2);
+			}
+			tokenAttrs.bar1_value = physical || 0;
+			tokenAttrs.bar1_max = physical || 0;
+			tokenAttrs.bar3_value = data["data-edge"] || 0;
+			tokenAttrs.bar3_max = 7;
 			break;
 		case 'Vehicles':
+		case 'Drones':
 			canvasAddDrone(data);
+
+			if(typeof data["data-physical"] !== 'undefined') {
+				physical = data["data-physical"];
+			} else if(typeof data["data-body_base"] !== 'undefined') {
+				physical = 8 + Math.ceil(data["data-body_base"] / 2);
+			}
+
+			if(typeof data["data-matrix"]) {
+				matrix = data["data-matrix"];
+			} else if(typeof data["data-sensor_base"] !== 'undefined') {
+				matrix = 8 + Math.ceil(data["data-sensor_base"]);
+			}
+
+			tokenAttrs.bar1_value = physical;
+			tokenAttrs.bar1_max = physical;
+			tokenAttrs.bar2_value = matrix;
+			tokenAttrs.bar2_max = matrix;
+			tokenAttrs.bar3_value = 0;
+			tokenAttrs.bar3_max = data["data-speed_max"] || 0;
 			break;
 		case 'NPCs':
 			canvasAddNPC(data);
+
+			if(typeof data["data-physical"] !== 'undefined') {
+				physical = data["data-physical"];
+			} else if(typeof data["data-body_base"] !== 'undefined') {
+				physical = 8 + Math.ceil(data["data-body_base"] / 2);
+			}
+
+			if(typeof data["data-matrix"]) {
+				matrix = data["data-matrix"];
+			} else if(typeof data["data-device_rating"]) {
+				matrix = 8 + Math.ceil(data["data-device_rating"]);
+			}
+
+			tokenAttrs.bar1_value = physical;
+			tokenAttrs.bar1_max = physical;
+			tokenAttrs.bar2_value = matrix;
+			tokenAttrs.bar2_max = matrix;
+			tokenAttrs.bar3_value = data["data-edge"] || 0;
+			tokenAttrs.bar3_max = 7;
+
 			break;
 		default:
 			break;
 	}
 
-
+console.log("tokenAttrs: ");
+console.log(tokenAttrs);
 	setup_token(tokenAttrs);
 };
 
@@ -10977,8 +11040,6 @@ var setup_token = (tokenAttrs) => {
 **************************************/
 var canvasAddNPC = function(data) {
 	addattrs = {};
-console.log("It's an NPC!");
-console.log(data);
 
 	var type = 'vehicle';
 
@@ -10987,12 +11048,30 @@ console.log(data);
 	addattrs["stats_toggle"] = false;
 
 	// attributes that need no translation
-	["body_base", "agility_base", "reaction_base", "strength_base", "willpower_base", "logic_base", "intuition_base", "charisma_base", "edge", "magic", "resonance", "essence", "initiative_base", "initiative_dice", "defense_rating", "physical", "physical_max", "pr", "move_speed", "sprint_speed", "sprint_speed_modifier", "matrix_initiative_base", "matrix_initiative_dice", "cold_sim_initiative_base", "cold_sim_initiative_dice", "hot_sim_initiative_base", "hot_sim_initiative_dice", "qualities", "gear", "augmentations", "pain_tolerance"].forEach((attr) => {
+	["body_base", "agility_base", "reaction_base", "strength_base", "willpower_base", "logic_base", "intuition_base", "charisma_base", "edge", "magic", "resonance", "essence", "initiative_base", "initiative_dice", "defense_rating", "physical", "pr", "move_speed", "sprint_speed", "sprint_speed_modifier", "matrix_initiative_base", "matrix_initiative_dice", "cold_sim_initiative_base", "cold_sim_initiative_dice", "hot_sim_initiative_base", "hot_sim_initiative_dice", "pain_tolerance", "submersion", "initiate", "major_actions", "minor_actions"].forEach((attr) => {
 		if(data[`data-${attr}`]) {
 			addattrs[attr] = data[`data-${attr}`] || '';
 		} else {
 		}
 	});
+	addattrs.physical_max = addattrs['physical'];
+
+	// Attributes that need translation
+	let blocks = {
+		"qualities_text": "quality",
+		"gear_text": "gear",
+		"augmentations_text": "augmentations",
+		"powers_text": "powers",
+		"spells_text": "spells",
+		"metamagics_text": "metamagic",
+		"echoes_text": "echos",
+		"complex_forms_text": "complex_forms"
+	};
+
+	Object.keys(blocks).forEach((key) => {
+		addattrs[blocks[key]] = data[`data-${key}`] || '';
+	});
+
 
 	// Knowledges and Languages
 	if(data["data-knowledges"]) {
@@ -11019,6 +11098,7 @@ console.log(data);
 	// Skills stuff
 	["astral", "athletics", "biotech", "close_combat", "con", "conjuring", "cracking", "electronics", "enchanting", "engineering", "exotic_weapons", "firearms", "influence", "outdoors", "perception", "piloting", "sorcery", "stealth", "tasking"].forEach((skill) => {
 		if(data["data-" + skill + "_rating"]) {
+console.log("Skill: "+skill);
 			let row_id = generateRowID();
 			name = skill.split('_').map(word => ucfirst(word)).join(' ');
 			addattrs["repeating_skills_" + row_id + "_rating"] = data["data-" + skill + "_rating"];
@@ -11034,21 +11114,18 @@ console.log(data);
 	});
 
 	addattrs["notes"] = data["data-description"] || '';
-
-	setAttrs(addattrs);
+console.log(addattrs);
+	setAttrs(addattrs, {silent:true});
 };
 
 
 var canvasAddDrone = function(data) {
 	addattrs = {};
-//console.log("It's Drone!");
-//console.log(data);
 
 	var type = 'vehicle';
 
 	addattrs.sheet_type = 'vehicle';
-	addattrs["flag"] = false;
-	addattrs["display_flag"] = "on";
+	addattrs["stats_toggle"] = false;
 
 	addattrs["handling"] = data["data-handling_onroad"] || 0;
 	addattrs["handling_offroad"] = data["data-handling_offroad"] || 0;
@@ -11089,8 +11166,7 @@ var canvasAddDrone = function(data) {
 /*
 var compendiumAddArmor = function(data) {
 	rowattrs = {};
-//console.log("It's X!");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var type = '';
@@ -11112,8 +11188,7 @@ var compendiumAddArmor = function(data) {
 
 var compendiumAddDrone = function(data) {
 	rowattrs = {};
-//console.log("It's Drone!");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var type = 'vehicle';
@@ -11142,14 +11217,14 @@ var compendiumAddDrone = function(data) {
 
 	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
 	rowattrs.sheet_type = 'pc';
+
 	setAttrs(rowattrs);
 };
 
 
 var compendiumAddProgram = function(data) {
 	rowattrs = {};
-//console.log("It's a Program... within a program... Error cannot parse existential crisis.");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var type = 'programs';
@@ -11160,16 +11235,13 @@ var compendiumAddProgram = function(data) {
 
 	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = '';
 	if(data["data-rules"]) {
-//console.log("data-rules");
-//console.log(data["data-rules"]);
 		var rules = [];
 		try{
 			rules = JSON.parse(data["data-rules"]) || false;
 		} catch(e) {
 			// wipe out compendium_drop_data until the next time
 		}
-//console.log("Rules");
-//console.log(rules);
+
 		rules.forEach((rule) => {
 			rowattrs["repeating_" + type + "_" + row_id + "_notes"] += rule.rule;
 		});
@@ -11184,8 +11256,7 @@ var compendiumAddProgram = function(data) {
 
 var compendiumAddDevice = function(data) {
 	rowattrs = {};
-//console.log("It's a Device, beep boop!");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var type = 'devices';
@@ -11213,8 +11284,7 @@ var compendiumAddDevice = function(data) {
 
 var compendiumAddWeapon = function(type = 'range', data) {
 	rowattrs = {};
-//console.log("It's a Weapon!");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
@@ -11277,8 +11347,7 @@ var compendiumAddWeapon = function(type = 'range', data) {
 
 var compendiumAddGear = function(data) {
 	rowattrs = {};
-//console.log("It's Gear!");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var type = 'items';
@@ -11298,8 +11367,7 @@ var compendiumAddGear = function(data) {
 
 var compendiumAddArmor = function(data) {
 	rowattrs = {};
-//console.log("It's armor!");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var type = 'armor';
@@ -11323,8 +11391,7 @@ var compendiumAddArmor = function(data) {
 
 var compendiumAddSpell = function(data) {
 	rowattrs = {};
-//console.log("It's a spell! Ooooh, magic!");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var spell_type = 'spell';
@@ -11353,8 +11420,7 @@ var compendiumAddSpell = function(data) {
 
 var compendiumAddQuality = function(data) {
 	rowattrs = {};
-//console.log("It's a quality! karma spent or to spend?");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var rep_type = 'quality';
@@ -11372,14 +11438,12 @@ var compendiumAddQuality = function(data) {
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
 
 	setAttrs(rowattrs);
-
 };
 
 
 var compendiumAddMetamagic = function(data) {
 	rowattrs = {};
-//console.log("It's a metamagic! More Power!");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var rep_type = 'metamagic';
@@ -11396,14 +11460,12 @@ var compendiumAddMetamagic = function(data) {
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
 
 	setAttrs(rowattrs);
-
 };
 
 
 var compendiumAddRitual = function(data) {
 	rowattrs = {};
-//console.log("It's a ritual! Oooh, slow MAGIC!");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var rep_type = 'ritual';
@@ -11419,16 +11481,13 @@ var compendiumAddRitual = function(data) {
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_threshold"] = data["data-threshold"] || 0;
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-features"] + "\n" + data["data-description"];
 
-//console.log(rowattrs);
 	setAttrs(rowattrs);
-
 };
 
 
 var compendiumAddPower = function(data) {
 	rowattrs = {};
-//console.log("It's a power! Superman?!");
-//console.log(data);
+
 	row_id = generateRowID();
 
 	var rep_type = 'powers';
@@ -11446,9 +11505,7 @@ var compendiumAddPower = function(data) {
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
 
-//console.log(rowattrs);
 	setAttrs(rowattrs);
-
 };
 
 
