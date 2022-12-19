@@ -13518,26 +13518,28 @@ on("change:chummercheckbox", async function(){
 });
 
 async function importChummerChar(attributes, chummerfile, text) {
-    var maintab = importMainTabChummer(chummerfile);
-    var skilltab = importSkillsTabChummer(text.experimental, chummerfile);
-    var magictab = importMagicTabChummer(text.experimental, chummerfile);
-    var enhancementtab = importEnhancementTabChummer(text, chummerfile);
-    var matrixtab = importMatrixTabChummer(text.experimental, chummerfile);
-    var vehiclestab = importVehiclesTabChummer(text.experimental, chummerfile);
-    var equipmentstab = importEquipmentTabChummer(text.experimental, chummerfile);
-    var socialtab = importSocialTabChummer(chummerfile);
+
+    let character = chummerfile.characters.character;
+    var maintab = importMainTabChummer(character);
+    var skilltab = importSkillsTabChummer(text.experimental, character);
+    var magictab = importMagicTabChummer(text.experimental, character);
+    var enhancementtab = importEnhancementTabChummer(text, character);
+    var matrixtab = importMatrixTabChummer(text.experimental, character);
+    var vehiclestab = importVehiclesTabChummer(text.experimental, character);
+    var equipmentstab = importEquipmentTabChummer(text.experimental, character);
+    var socialtab = importSocialTabChummer(character);
 
     let results = await Promise.all([maintab, skilltab, enhancementtab, socialtab]);
     let dependingResults = await Promise.all([magictab, matrixtab, vehiclestab, equipmentstab]);
 
-    attributes.warningcheckbox="0";
-    attributes.chummercheckbox="0";
-    attributes.chummertext= results.join("") + dependingResults.join("") + "\nREMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING."
+    attributes.warningcheckbox = "0";
+    attributes.chummercheckbox = "0";
+    attributes.chummertext = results.join("") + dependingResults.join("") + "\nREMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING."
 
     return attributes;
 }
 
-async function importMainTabChummer(chummerfile) {
+async function importMainTabChummer(character) {
 
     var goodcode = true;
     var error = "";
@@ -13546,72 +13548,71 @@ async function importMainTabChummer(chummerfile) {
 
     try{
         console.log("Character meta info");
-        if(chummerfile.characters.character.alias != null)
-            attributes.character_name = chummerfile.characters.character.alias;
+        if(character.alias != null)
+            attributes.character_name = character.alias;
 
-        if(chummerfile.characters.character.metatype != null)
-            attributes.metatype=chummerfile.characters.character.metatype;
+        if(character.metatype != null)
+            attributes.metatype=character.metatype;
 
-        if(chummerfile.characters.character.sex != null)
-            attributes.sex=chummerfile.characters.character.sex;
+        if(character.sex != null)
+            attributes.sex=character.sex;
 
-        if(chummerfile.characters.character.age != null)
-            attributes.age=chummerfile.characters.character.age;
+        if(character.age != null)
+            attributes.age=character.age;
 
-        if(chummerfile.characters.character.height != null)
-            attributes.height=chummerfile.characters.character.height;
+        if(character.height != null)
+            attributes.height=character.height;
 
-
-        if(chummerfile.characters.character.weight != null)
-            attributes.weight=chummerfile.characters.character.weight;
-        if(chummerfile.characters.character.playername != null)
-            attributes.player=chummerfile.characters.character.playername;
-        if(chummerfile.characters.character.description != null)
-            attributes.description=chummerfile.characters.character.description;
-        if(chummerfile.characters.character.background != null)
-            attributes.background=chummerfile.characters.character.background;
-        if(chummerfile.characters.character.notes != null)
-            attributes.notes=chummerfile.characters.character.notes;
-        if(chummerfile.characters.character.gamenotes != null)
-            attributes.generalnotes=chummerfile.characters.character.gamenotes;
-        if(chummerfile.characters.character.karma != null)
-            attributes.karma=chummerfile.characters.character.karma;
-        if(chummerfile.characters.character.totalkarma != null)
-            attributes.karmacareer=chummerfile.characters.character.totalkarma;
-        if(chummerfile.characters.character.initbonus != null){
-            attributes.initiativebonus=chummerfile.characters.character.initbonus;
-            attributes.astralinitiativebonus=chummerfile.characters.character.initbonus;
-            attributes.matrixinitiativebonus=chummerfile.characters.character.initbonus;
+        if(character.weight != null)
+            attributes.weight=character.weight;
+        if(character.playername != null)
+            attributes.player=character.playername;
+        if(character.description != null)
+            attributes.description=character.description;
+        if(character.background != null)
+            attributes.background=character.background;
+        if(character.notes != null)
+            attributes.notes=character.notes;
+        if(character.gamenotes != null)
+            attributes.generalnotes=character.gamenotes;
+        if(character.karma != null)
+            attributes.karma=character.karma;
+        if(character.totalkarma != null)
+            attributes.karmacareer=character.totalkarma;
+        if(character.initbonus != null){
+            attributes.initiativebonus = character.initbonus;
+            attributes.astralinitiativebonus = character.initbonus;
+            attributes.matrixinitiativebonus = character.initbonus;
         }
-        if(chummerfile.characters.character.initdice != null)
-            attributes.initiativedice=chummerfile.characters.character.initdice;
-        if(chummerfile.characters.character.astralinitdice != null)
-            attributes.astralinitiativedice=chummerfile.characters.character.astralinitdice;
-        if(chummerfile.characters.character.cmthresholdoffset != null)
-            attributes.woundadditive=chummerfile.characters.character.cmthresholdoffset;
-        if(chummerfile.characters.character.cmthreshold != null)
-            attributes.woundmultiplikative=chummerfile.characters.character.cmthreshold;
-        if(chummerfile.characters.character.cmoverflow != null)
-            attributes.overflowmod=chummerfile.characters.character.cmoverflow-chummerfile.characters.character.attributes[1].attribute[0].total- 1;
-        if(chummerfile.characters.character.physicalcm != null)
-            attributes.physicaltrackmod=chummerfile.characters.character.physicalcm-Math.ceil(chummerfile.characters.character.attributes[1].attribute[0].total/2)- 8;
-        if(chummerfile.characters.character.stuncm != null)
-            attributes.stuntrackmod=chummerfile.characters.character.stuncm-Math.ceil(chummerfile.characters.character.attributes[1].attribute[7].total/2)- 8;
-        if(chummerfile.characters.character.totalstreetcred != null)
-            attributes.streetcred=chummerfile.characters.character.totalstreetcred;
-        if(chummerfile.characters.character.totalnotoriety != null)
-            attributes.notoriety=chummerfile.characters.character.totalnotoriety;
-        if(chummerfile.characters.character.totalpublicawareness != null)
-            attributes.pawareness=chummerfile.characters.character.totalpublicawareness;
-        if(chummerfile.characters.character.nuyen != null)
-            attributes.nuyen_total=chummerfile.characters.character.nuyen;
-        if(chummerfile.characters.character.magician == "True"){
+        if(character.initdice != null)
+            attributes.initiativedice = character.initdice;
+        if(character.astralinitdice != null)
+            attributes.astralinitiativedice = character.astralinitdice;
+        if(character.cmthresholdoffset != null)
+            attributes.woundadditive = character.cmthresholdoffset;
+        if(character.cmthreshold != null)
+            attributes.woundmultiplikative = character.cmthreshold;
+        if(character.cmoverflow != null)
+            attributes.overflowmod = character.cmoverflow-character.attributes[1].attribute[0].total- 1;
+        if(character.physicalcm != null)
+            attributes.physicaltrackmod = character.physicalcm-Math.ceil(character.attributes[1].attribute[0].total/2)- 8;
+        if(character.stuncm != null)
+            attributes.stuntrackmod = character.stuncm-Math.ceil(character.attributes[1].attribute[7].total/2)- 8;
+        if(character.totalstreetcred != null)
+            attributes.streetcred = character.totalstreetcred;
+        if(character.totalnotoriety != null)
+            attributes.notoriety = character.totalnotoriety;
+        if(character.totalpublicawareness != null)
+            attributes.pawareness = character.totalpublicawareness;
+        if(character.nuyen != null)
+            attributes.nuyen_total = character.nuyen;
+        if(character.magician == "True"){
             // HeroLab 'chummer' export uses drainattribute property and a list, this is a workaround for that
             try{
-              attributes.drainattribute="@{"+chummerfile.characters.character.tradition.drainattributes.match(/[A-Z]+/g)[1].toLowerCase()+"_total}";
+              attributes.drainattribute="@{"+character.tradition.drainattributes.match(/[A-Z]+/g)[1].toLowerCase()+"_total}";
             } catch(err)
             {
-              attributes.drainattribute="@{"+chummerfile.characters.character.tradition.drainattribute.attr[1]+"_total}";
+              attributes.drainattribute="@{"+character.tradition.drainattribute.attr[1]+"_total}";
             }
         }
     }catch(err){
@@ -13621,7 +13622,7 @@ async function importMainTabChummer(chummerfile) {
 
     try{
         console.log("Importing Attributes");
-        var attributesChummer = chummerfile.characters.character.attributes[1].attribute;
+        var attributesChummer = character.attributes[1].attribute;
         attributes.bod_base = attributesChummer.find(a => a.name_english === "BOD").base;
         attributes.agi_base = attributesChummer.find(a => a.name_english === "AGI").base;
         attributes.rea_base = attributesChummer.find(a => a.name_english === "REA").base;
@@ -13631,12 +13632,12 @@ async function importMainTabChummer(chummerfile) {
         attributes.log_base = attributesChummer.find(a => a.name_english === "LOG").base;
         attributes.wil_base = attributesChummer.find(a => a.name_english === "WIL").base;
         attributes.edg_total = attributesChummer.find(a => a.name_english === "EDG").base;
-        if(chummerfile.characters.character.technomancer==="True"){
+        if(attributesChummer.find(a => a.name_english === "RES") != null ){
             attributes.mag_base=attributesChummer.find(a => a.name_english === "RES").total;
             attributes.istechnomancer = 1;
         }
-        else if(chummerfile.characters.character.magician==="True" || chummerfile.characters.character.adept==="True"){
-            attributes.mag_base=attributesChummer.find(a => a.name_english === "MAG").total;
+        else if(attributesChummer.find(a => a.name_english === "MAG") != null ){
+            attributes.mag_base = attributesChummer.find(a => a.name_english === "MAG").total;
             attributes.istechnomancer = 0;
         }
         else {
@@ -13668,7 +13669,7 @@ async function importMainTabChummer(chummerfile) {
     }
 }
 
-async function importSkillsTabChummer(experimental, chummerfile) {
+async function importSkillsTabChummer(experimental, character) {
 
     var goodcode = true;
     var error = "";
@@ -13685,40 +13686,40 @@ async function importSkillsTabChummer(experimental, chummerfile) {
     var exotics=73;
     try{
         console.log("Importing Skills");
-        for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
-            if(chummerfile.characters.character.skills.skill[i].knowledge=="True"){
+        for(var i=0;i<character.skills.skill.length;i++){
+            if(character.skills.skill[i].knowledge=="True"){
                 var newrowid = generateRowID();
-                attributes["repeating_knowledge_"+newrowid+"_knowledgename"]=chummerfile.characters.character.skills.skill[i].name;
-                if(chummerfile.characters.character.skills.skill[i].skillcategory_english!=null){
-                  attributes["repeating_knowledge_"+newrowid+"_knowledgeattr"]="@{"+chummerfile.characters.character.skills.skill[i].skillcategory_english.toLowerCase();
+                attributes["repeating_knowledge_"+newrowid+"_knowledgename"]=character.skills.skill[i].name;
+                if(character.skills.skill[i].skillcategory_english!=null){
+                  attributes["repeating_knowledge_"+newrowid+"_knowledgeattr"]="@{"+character.skills.skill[i].skillcategory_english.toLowerCase();
                 }
-                if(chummerfile.characters.character.skills.skill[i].rating > 0){
-                    attributes["repeating_knowledge_"+newrowid+"_knowledgerating"] = chummerfile.characters.character.skills.skill[i].rating;
-                    attributes["repeating_knowledge_"+newrowid+"_knowledgebonus"] = chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
+                if(character.skills.skill[i].rating > 0){
+                    attributes["repeating_knowledge_"+newrowid+"_knowledgerating"] = character.skills.skill[i].rating;
+                    attributes["repeating_knowledge_"+newrowid+"_knowledgebonus"] = character.skills.skill[i].total-character.skills.skill[i].rating-character.skills.skill[i].attributemod;
                 }else{
                     attributes["repeating_knowledge_"+newrowid+"_knowledgerating"] = "-1";
-                    attributes["repeating_knowledge_"+newrowid+"_knowledgebonus"] = chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
+                    attributes["repeating_knowledge_"+newrowid+"_knowledgebonus"] = character.skills.skill[i].total-character.skills.skill[i].rating-character.skills.skill[i].attributemod+1;
                 }
-                if(chummerfile.characters.character.skills.skill[i].spec != null) {
-                    attributes["repeating_knowledge_"+newrowid+"_knowledgespec"] = chummerfile.characters.character.skills.skill[i].spec;
+                if(character.skills.skill[i].spec != null) {
+                    attributes["repeating_knowledge_"+newrowid+"_knowledgespec"] = character.skills.skill[i].spec;
                 }
                 else
                     attributes["repeating_knowledge_"+newrowid+"_knowledgespec"] = "none";
             }
 
-            if(chummerfile.characters.character.skills.skill[i].exotic=="True"){
-                attributes["skillname"+exotics]=chummerfile.characters.character.skills.skill[i].name_english;
-                if(chummerfile.characters.character.skills.skill[i].rating>0){
-                    attributes["skillbonus"+exotics]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
-                    attributes["skillrating"+exotics]=chummerfile.characters.character.skills.skill[i].rating;
+            if(character.skills.skill[i].exotic=="True"){
+                attributes["skillname"+exotics]=character.skills.skill[i].name_english;
+                if(character.skills.skill[i].rating>0){
+                    attributes["skillbonus"+exotics]=character.skills.skill[i].total-character.skills.skill[i].rating-character.skills.skill[i].attributemod;
+                    attributes["skillrating"+exotics]=character.skills.skill[i].rating;
                 }else{
                     attributes["skillrating"+exotics]="-1";
-                    attributes["skillbonus"+exotics]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
+                    attributes["skillbonus"+exotics]=character.skills.skill[i].total-character.skills.skill[i].rating-character.skills.skill[i].attributemod+1;
                 }
-                attributes["skillattr"+exotics]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase();
+                attributes["skillattr"+exotics]="@{"+character.skills.skill[i].attribute.toLowerCase();
 
-                if(chummerfile.characters.character.skills.skill[i].spec != null)
-                    attributes["skillspec"+exotics] = chummerfile.characters.character.skills.skill[i].spec;
+                if(character.skills.skill[i].spec != null)
+                    attributes["skillspec"+exotics] = character.skills.skill[i].spec;
                 else
                     attributes["skillspec"+exotics]="none";
                 exotics++;
@@ -13726,18 +13727,18 @@ async function importSkillsTabChummer(experimental, chummerfile) {
 
             for(var j=1;j<73;j++){
                 var compname='skillname'+j;
-                if((names[compname]==chummerfile.characters.character.skills.skill[i].name_english)||(chummerfile.characters.character.skills.skill[i].name_english=="Locksmith"&&j==29)||(chummerfile.characters.character.skills.skill[i].name_english=="Pilot Ground Craft"&&j==55)){
-                    attributes["skillattr"+j]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase();
-                    if(chummerfile.characters.character.skills.skill[i].rating>0){
-                        attributes["skillrating"+j]=chummerfile.characters.character.skills.skill[i].rating;
-                        attributes["skillbonus"+j]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
+                if((names[compname]==character.skills.skill[i].name_english)||(character.skills.skill[i].name_english=="Locksmith"&&j==29)||(character.skills.skill[i].name_english=="Pilot Ground Craft"&&j==55)){
+                    attributes["skillattr"+j]="@{"+character.skills.skill[i].attribute.toLowerCase();
+                    if(character.skills.skill[i].rating>0){
+                        attributes["skillrating"+j]=character.skills.skill[i].rating;
+                        attributes["skillbonus"+j]=character.skills.skill[i].total-character.skills.skill[i].rating-character.skills.skill[i].attributemod;
                     }else{
                         attributes["skillrating"+j]="-1";
-                        attributes["skillbonus"+j]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
+                        attributes["skillbonus"+j]=character.skills.skill[i].total-character.skills.skill[i].rating-character.skills.skill[i].attributemod+1;
                     }
 
-                    if(chummerfile.characters.character.skills.skill[i].spec != null) {
-                        attributes["skillspec"+j] = chummerfile.characters.character.skills.skill[i].spec;
+                    if(character.skills.skill[i].spec != null) {
+                        attributes["skillspec"+j] = character.skills.skill[i].spec;
                     }
                     else {
                         attributes["skillspec"+j]="none";
@@ -13763,7 +13764,7 @@ async function importSkillsTabChummer(experimental, chummerfile) {
     }
 }
 
-async function importMagicTabChummer(experimental, chummerfile) {
+async function importMagicTabChummer(experimental, character) {
 
     var goodcode = true;
     var error = "";
@@ -13775,30 +13776,30 @@ async function importMagicTabChummer(experimental, chummerfile) {
         var spellcasting = 0;
         var ritual = 0;
 
-         for(var i=0; i <chummerfile.characters.character.skills.skill.length;i++){
-            if(chummerfile.characters.character.skills.skill[i].name_english=="Alchemy"){
+         for(var i=0; i <character.skills.skill.length;i++){
+            if(character.skills.skill[i].name_english=="Alchemy"){
                 alchemy=i;
             }
-            if(chummerfile.characters.character.skills.skill[i].name_english=="Spellcasting"){
+            if(character.skills.skill[i].name_english=="Spellcasting"){
                 spellcasting=i;
             }
-            if(chummerfile.characters.character.skills.skill[i].name_english=="Ritual Spellcasting"){
+            if(character.skills.skill[i].name_english=="Ritual Spellcasting"){
                 ritual=i;
             }
         }
 
-        if(chummerfile.characters.character.spells != null){
+        if(character.spells != null){
             console.log("Importing spells");
-            var spellcastingSkill = chummerfile.characters.character.skills.skill[spellcasting].total;
-            var ritualSkill = chummerfile.characters.character.skills.skill[ritual].total;
-            var alchemySkill = chummerfile.characters.character.skills.skill[alchemy].total;
+            var spellcastingSkill = character.skills.skill[spellcasting].total;
+            var ritualSkill = character.skills.skill[ritual].total;
+            var alchemySkill = character.skills.skill[alchemy].total;
 
-            if(chummerfile.characters.character.spells.spell.length > 1){
-                for(var i=0; i < chummerfile.characters.character.spells.spell.length; i++){
-                    await importSingleSpell(chummerfile.characters.character.spells.spell[i], attributes, spellcastingSkill, ritualSkill, alchemySkill);
+            if(character.spells.spell.length > 1){
+                for(var i=0; i < character.spells.spell.length; i++){
+                    await importSingleSpell(character.spells.spell[i], attributes, spellcastingSkill, ritualSkill, alchemySkill);
                 }
             }else{
-                await importSingleSpell(chummerfile.characters.character.spells.spell, attributes, spellcastingSkill, ritualSkill, alchemySkill);
+                await importSingleSpell(character.spells.spell, attributes, spellcastingSkill, ritualSkill, alchemySkill);
             }
         }
     }catch(err){
@@ -13807,27 +13808,27 @@ async function importMagicTabChummer(experimental, chummerfile) {
     }
 
     try{
-        if(chummerfile.characters.character.complexforms != null){
+        if(character.complexforms != null){
             console.log("Importing complexforms");
-            if(chummerfile.characters.character.complexforms.complexform.length>1){
-                for(var i=0; i<chummerfile.characters.character.complexforms.complexform.length; i++){
+            if(character.complexforms.complexform.length>1){
+                for(var i=0; i<character.complexforms.complexform.length; i++){
                     var newrowid=generateRowID();
-                    attributes["repeating_complexforms_"+newrowid+"_spellname"]=chummerfile.characters.character.complexforms.complexform[i].name;
+                    attributes["repeating_complexforms_"+newrowid+"_spellname"]=character.complexforms.complexform[i].name;
                     attributes["repeating_complexforms_"+newrowid+"_spellschool"]="@{skilldicepool42}";
-                    attributes["repeating_complexforms_"+newrowid+"_spellduration"]=chummerfile.characters.character.complexforms.complexform[i].duration;
-                    if(chummerfile.characters.character.complexforms.complexform[i].fv.match(/(\-|\+)\d/)!=null){
-                        attributes["repeating_complexforms_"+newrowid+"_spelldrain"]=chummerfile.characters.character.complexforms.complexform[i].fv.match(/(\-|\+)\d/);
+                    attributes["repeating_complexforms_"+newrowid+"_spellduration"]=character.complexforms.complexform[i].duration;
+                    if(character.complexforms.complexform[i].fv.match(/(\-|\+)\d/)!=null){
+                        attributes["repeating_complexforms_"+newrowid+"_spelldrain"]=character.complexforms.complexform[i].fv.match(/(\-|\+)\d/);
                     }else{
                         attributes["repeating_complexforms_"+newrowid+"_spelldrain"]="-0";
                     }
                 }
             }else{
                 var newrowid=generateRowID();
-                attributes["repeating_complexforms_"+newrowid+"_spellname"]=chummerfile.characters.character.complexforms.complexform.name;
+                attributes["repeating_complexforms_"+newrowid+"_spellname"]=character.complexforms.complexform.name;
                 attributes["repeating_complexforms_"+newrowid+"_spellschool"]="@{skilldicepool42}";
-                attributes["repeating_complexforms_"+newrowid+"_spellduration"]=chummerfile.characters.character.complexforms.complexform.duration;
-                if(chummerfile.characters.character.complexforms.complexform.fv.match(/(\-|\+)\d/)!=null)
-                    attributes["repeating_complexforms_"+newrowid+"_spelldrain"]=chummerfile.characters.character.complexforms.complexform.fv.match(/(\-|\+)\d/);
+                attributes["repeating_complexforms_"+newrowid+"_spellduration"]=character.complexforms.complexform.duration;
+                if(character.complexforms.complexform.fv.match(/(\-|\+)\d/)!=null)
+                    attributes["repeating_complexforms_"+newrowid+"_spelldrain"]=character.complexforms.complexform.fv.match(/(\-|\+)\d/);
                 else
                     attributes["repeating_complexforms_"+newrowid+"_spelldrain"]="-0";
             }
@@ -13838,29 +13839,29 @@ async function importMagicTabChummer(experimental, chummerfile) {
     }
 
     try{
-        if(chummerfile.characters.character.critterpowers != null){
+        if(character.critterpowers != null){
             console.log("Importing critter powers");
-            if(chummerfile.characters.character.critterpowers.critterpower.length > 1){
-                for(var i=0; i < chummerfile.characters.character.critterpowers.critterpower.length; i++){
+            if(character.critterpowers.critterpower.length > 1){
+                for(var i=0; i < character.critterpowers.critterpower.length; i++){
                     var newrowid=generateRowID();
-                    attributes["repeating_critterpowers_"+newrowid+"_spellname"]=chummerfile.characters.character.critterpowers.critterpower[i].fullname;
-                    attributes["repeating_critterpowers_"+newrowid+"_spelltype"]=chummerfile.characters.character.critterpowers.critterpower[i].type;
-                    if(chummerfile.characters.character.critterpowers.critterpower[i].notes != null){
-                        attributes["repeating_critterpowers_"+newrowid+"_spelldescription"] = chummerfile.characters.character.critterpowers.critterpower[i].notes;
+                    attributes["repeating_critterpowers_"+newrowid+"_spellname"]=character.critterpowers.critterpower[i].fullname;
+                    attributes["repeating_critterpowers_"+newrowid+"_spelltype"]=character.critterpowers.critterpower[i].type;
+                    if(character.critterpowers.critterpower[i].notes != null){
+                        attributes["repeating_critterpowers_"+newrowid+"_spelldescription"] = character.critterpowers.critterpower[i].notes;
                     }
                     attributes["repeating_critterpowers_"+newrowid+"_spelldrain"]="-0";
 
-                    attributes["repeating_critterpowers_"+newrowid+"_spellcategory"] = chummerfile.characters.character.critterpowers.critterpower[i].category;
+                    attributes["repeating_critterpowers_"+newrowid+"_spellcategory"] = character.critterpowers.critterpower[i].category;
                     attributes["repeating_critterpowers_"+newrowid+"_spellbonus"]=0;
 
-                    if(chummerfile.characters.character.critterpowers.critterpower[i].range != null){
-                        attributes["repeating_critterpowers_"+newrowid+"_spellrange"]=chummerfile.characters.character.critterpowers.critterpower[i].range;
+                    if(character.critterpowers.critterpower[i].range != null){
+                        attributes["repeating_critterpowers_"+newrowid+"_spellrange"]=character.critterpowers.critterpower[i].range;
                     } else {
                         attributes["repeating_critterpowers_"+newrowid+"_spellrange"]="N/A";
                     }
 
-                    if(chummerfile.characters.character.critterpowers.critterpower[i].duration != null) {
-                        attributes["repeating_critterpowers_"+newrowid+"_spellduration"] = chummerfile.characters.character.critterpowers.critterpower[i].duration;
+                    if(character.critterpowers.critterpower[i].duration != null) {
+                        attributes["repeating_critterpowers_"+newrowid+"_spellduration"] = character.critterpowers.critterpower[i].duration;
                     } else {
                         attributes["repeating_critterpowers_"+newrowid+"_spellduration"] = "N/A";
                     }
@@ -13868,23 +13869,23 @@ async function importMagicTabChummer(experimental, chummerfile) {
                 }
             }else{
                 var newrowid=generateRowID();
-                attributes["repeating_critterpowers_"+newrowid+"_spellname"]=chummerfile.characters.character.critterpowers.critterpower.fullname;
-                attributes["repeating_critterpowers_"+newrowid+"_spelltype"]=chummerfile.characters.character.critterpowers.critterpower.type;
-                if(chummerfile.characters.character.critterpowers.critterpower.notes!=null){
-                        attributes["repeating_critterpowers_"+newrowid+"_spelldescription"]=chummerfile.characters.character.critterpowers.critterpower.notes;
+                attributes["repeating_critterpowers_"+newrowid+"_spellname"]=character.critterpowers.critterpower.fullname;
+                attributes["repeating_critterpowers_"+newrowid+"_spelltype"]=character.critterpowers.critterpower.type;
+                if(character.critterpowers.critterpower.notes!=null){
+                        attributes["repeating_critterpowers_"+newrowid+"_spelldescription"]=character.critterpowers.critterpower.notes;
                     }
                 attributes["repeating_critterpowers_"+newrowid+"_spelldrain"]="-0";
-                attributes["repeating_critterpowers_"+newrowid+"_spellcategory"]=chummerfile.characters.character.critterpowers.critterpower.category;
+                attributes["repeating_critterpowers_"+newrowid+"_spellcategory"]=character.critterpowers.critterpower.category;
                 attributes["repeating_critterpowers_"+newrowid+"_spellbonus"]=0;
 
-                if(chummerfile.characters.character.critterpowers.critterpower.range != null){
-                    attributes["repeating_critterpowers_"+newrowid+"_spellrange"]=chummerfile.characters.character.critterpowers.critterpower.range;
+                if(character.critterpowers.critterpower.range != null){
+                    attributes["repeating_critterpowers_"+newrowid+"_spellrange"]=character.critterpowers.critterpower.range;
                 } else {
                     attributes["repeating_critterpowers_"+newrowid+"_spellrange"]="N/A";
                 }
 
-                if(chummerfile.characters.character.critterpowers.critterpower.duration != null) {
-                    attributes["repeating_critterpowers_"+newrowid+"_spellduration"]=chummerfile.characters.character.critterpowers.critterpower.duration;
+                if(character.critterpowers.critterpower.duration != null) {
+                    attributes["repeating_critterpowers_"+newrowid+"_spellduration"]=character.critterpowers.critterpower.duration;
                 } else {
                     attributes["repeating_critterpowers_"+newrowid+"_spellduration"]="N/A";
                 }
@@ -13896,23 +13897,23 @@ async function importMagicTabChummer(experimental, chummerfile) {
     }
 
     try{
-        if(chummerfile.characters.character.initiategrade != null && chummerfile.characters.character.initiategrade != 0) {
+        if(character.initiategrade != null && character.initiategrade != 0) {
             console.log("Importing initiategrade and metamagic");
-            attributes.initiationgrade = chummerfile.characters.character.initiategrade;
-            if(chummerfile.characters.character.metamagics != null){
-                if(chummerfile.characters.character.metamagics.metamagic.length>1){
-                    for(var i=0;i<chummerfile.characters.character.metamagics.metamagic.length;i++){
+            attributes.initiationgrade = character.initiategrade;
+            if(character.metamagics != null){
+                if(character.metamagics.metamagic.length>1){
+                    for(var i=0;i<character.metamagics.metamagic.length;i++){
                         var newrowid=generateRowID();
-                        attributes["repeating_initiation_"+newrowid+"_metamagicname"]=chummerfile.characters.character.metamagics.metamagic[i].name;
-                        if(chummerfile.characters.character.metamagics.metamagic[i].notes != null) {
-                            attributes["repeating_initiation_"+newrowid+"_metamagicdescription"]=chummerfile.characters.character.metamagics.metamagic[i].notes
+                        attributes["repeating_initiation_"+newrowid+"_metamagicname"]=character.metamagics.metamagic[i].name;
+                        if(character.metamagics.metamagic[i].notes != null) {
+                            attributes["repeating_initiation_"+newrowid+"_metamagicdescription"]=character.metamagics.metamagic[i].notes
                         }
                     }
                 } else {
                     var newrowid=generateRowID();
-                    attributes["repeating_initiation_"+newrowid+"_metamagicname"]=chummerfile.characters.character.metamagics.metamagic.name;
-                    if(chummerfile.characters.character.metamagics.metamagic.notes != null) {
-                            attributes["repeating_initiation_"+newrowid+"_metamagicdescription"]=chummerfile.characters.character.metamagics.metamagic.notes
+                    attributes["repeating_initiation_"+newrowid+"_metamagicname"]=character.metamagics.metamagic.name;
+                    if(character.metamagics.metamagic.notes != null) {
+                            attributes["repeating_initiation_"+newrowid+"_metamagicdescription"]=character.metamagics.metamagic.notes
                         }
                 }
             }
@@ -13935,30 +13936,30 @@ async function importMagicTabChummer(experimental, chummerfile) {
     }
 }
 
-async function importEnhancementTabChummer(text, chummerfile) {
+async function importEnhancementTabChummer(text, character) {
 
     var goodcode = true;
     var error = "";
     var attributes = {};
 
     try{
-        if(chummerfile.characters.character.qualities != null){
+        if(character.qualities != null){
             console.log("Importing qualities");
-            if(chummerfile.characters.character.qualities.quality.length>1){
-                for(var i=0;i<chummerfile.characters.character.qualities.quality.length;i++){
+            if(character.qualities.quality.length>1){
+                for(var i=0;i<character.qualities.quality.length;i++){
                     var newrowid=generateRowID();
-                    if(chummerfile.characters.character.qualities.quality[i].qualitytype_english == "Negative")
+                    if(character.qualities.quality[i].qualitytype_english == "Negative")
                     {
-                        attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=chummerfile.characters.character.qualities.quality[i].name;
+                        attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=character.qualities.quality[i].name;
 
-                        if(chummerfile.characters.character.qualities.quality[i].extra != null) {
-                            attributes["repeating_negqualities_"+newrowid+"_negqualitydescription"]=chummerfile.characters.character.qualities.quality[i].extra;
+                        if(character.qualities.quality[i].extra != null) {
+                            attributes["repeating_negqualities_"+newrowid+"_negqualitydescription"]=character.qualities.quality[i].extra;
                         }
 
-                        attributes["repeating_negqualities_"+newrowid+"_negqualitykarma"]=chummerfile.characters.character.qualities.quality[i].bp;
+                        attributes["repeating_negqualities_"+newrowid+"_negqualitykarma"]=character.qualities.quality[i].bp;
 
-                        if(chummerfile.characters.character.qualities.quality[i].notes != null) {
-                            attributes["repeating_negqualities_"+newrowid+"_negqualnotes"]=chummerfile.characters.character.qualities.quality[i].notes;
+                        if(character.qualities.quality[i].notes != null) {
+                            attributes["repeating_negqualities_"+newrowid+"_negqualnotes"]=character.qualities.quality[i].notes;
                         }
                         else {
                             attributes["repeating_negqualities_"+newrowid+"_negqualnotes"]="";
@@ -13966,41 +13967,41 @@ async function importEnhancementTabChummer(text, chummerfile) {
                     }
                     else
                     {
-                        attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality[i].name;
-                        if(chummerfile.characters.character.qualities.quality[i].extra != null) {
-                            attributes["repeating_posqualities_"+newrowid+"_posqualitydescription"]=chummerfile.characters.character.qualities.quality[i].extra;
+                        attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=character.qualities.quality[i].name;
+                        if(character.qualities.quality[i].extra != null) {
+                            attributes["repeating_posqualities_"+newrowid+"_posqualitydescription"]=character.qualities.quality[i].extra;
                         }
-                        attributes["repeating_posqualities_"+newrowid+"_posqualitykarma"]=chummerfile.characters.character.qualities.quality[i].bp;
-                        if(chummerfile.characters.character.qualities.quality[i].notes != null) {
-                            attributes["repeating_posqualities_"+newrowid+"_posqualnotes"]=chummerfile.characters.character.qualities.quality[i].notes;
+                        attributes["repeating_posqualities_"+newrowid+"_posqualitykarma"]=character.qualities.quality[i].bp;
+                        if(character.qualities.quality[i].notes != null) {
+                            attributes["repeating_posqualities_"+newrowid+"_posqualnotes"]=character.qualities.quality[i].notes;
                         }
                         else {
                             attributes["repeating_posqualities_"+newrowid+"_posqualnotes"]="";
                         }
                     }
                 }
-            }else if(chummerfile.characters.character.qualities.quality != null){
+            }else if(character.qualities.quality != null){
                 var newrowid=generateRowID();
-                if(chummerfile.characters.character.qualities.quality.qualitytype_english=="Negative")
+                if(character.qualities.quality.qualitytype_english=="Negative")
                 {
-                    attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=chummerfile.characters.character.qualities.quality.name;
-                    if(chummerfile.characters.character.qualities.quality.extra != null) {
-                        attributes["repeating_negqualities_"+newrowid+"_negqualitydescription"]=chummerfile.characters.character.qualities.quality.extra;
+                    attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=character.qualities.quality.name;
+                    if(character.qualities.quality.extra != null) {
+                        attributes["repeating_negqualities_"+newrowid+"_negqualitydescription"]=character.qualities.quality.extra;
                     }
-                    attributes["repeating_negqualities_"+newrowid+"_negqualitykarma"]=chummerfile.characters.character.qualities.quality.bp;
-                    if(chummerfile.characters.character.qualities.quality.notes != null) {
-                        attributes["repeating_negqualities_"+newrowid+"_negqualnotes"]=chummerfile.characters.character.qualities.quality.notes;
+                    attributes["repeating_negqualities_"+newrowid+"_negqualitykarma"]=character.qualities.quality.bp;
+                    if(character.qualities.quality.notes != null) {
+                        attributes["repeating_negqualities_"+newrowid+"_negqualnotes"]=character.qualities.quality.notes;
                     }
                 }
                 else
                 {
-                    attributes["repeating_posqualities_"+newrowid+"_posqualityname"] = chummerfile.characters.character.qualities.quality.name;
-                    if(chummerfile.characters.character.qualities.quality.extra != null) {
-                        attributes["repeating_posqualities_"+newrowid+"_posqualitydescription"] = chummerfile.characters.character.qualities.quality.extra;
+                    attributes["repeating_posqualities_"+newrowid+"_posqualityname"] = character.qualities.quality.name;
+                    if(character.qualities.quality.extra != null) {
+                        attributes["repeating_posqualities_"+newrowid+"_posqualitydescription"] = character.qualities.quality.extra;
                     }
-                    attributes["repeating_posqualities_"+newrowid+"_posqualitykarma"] = chummerfile.characters.character.qualities.quality.bp;
-                    if(chummerfile.characters.character.qualities.quality.notes != null) {
-                       attributes["repeating_posqualities_"+newrowid+"_posqualnotes"] = chummerfile.characters.character.qualities.quality.notes;
+                    attributes["repeating_posqualities_"+newrowid+"_posqualitykarma"] = character.qualities.quality.bp;
+                    if(character.qualities.quality.notes != null) {
+                       attributes["repeating_posqualities_"+newrowid+"_posqualnotes"] = character.qualities.quality.notes;
                     }
                 }
             }
@@ -14011,26 +14012,26 @@ async function importEnhancementTabChummer(text, chummerfile) {
     }
 
     try{
-        if(chummerfile.characters.character.powers != null){
+        if(character.powers != null){
             console.log("Importing Adept Powers");
-            if(chummerfile.characters.character.powers.power.length>1){
-                for(var i=0;i<chummerfile.characters.character.powers.power.length;i++){
+            if(character.powers.power.length>1){
+                for(var i=0;i<character.powers.power.length;i++){
                     var newrowid=generateRowID();
-                    attributes["repeating_powers_"+newrowid+"_poweryname"]=chummerfile.characters.character.powers.power[i].name;
-                    attributes["repeating_powers_"+newrowid+"_powerdescription"]=chummerfile.characters.character.powers.power[i].rating;
-                    attributes["repeating_powers_"+newrowid+"_powerpoints"]=chummerfile.characters.character.powers.power[i].totalpoints;
-                    if(chummerfile.characters.character.powers.power[i].notes != null) {
-                        attributes["repeating_powers_"+newrowid+"_powernotes"]=chummerfile.characters.character.powers.power[i].notes;
+                    attributes["repeating_powers_"+newrowid+"_poweryname"]=character.powers.power[i].name;
+                    attributes["repeating_powers_"+newrowid+"_powerdescription"]=character.powers.power[i].rating;
+                    attributes["repeating_powers_"+newrowid+"_powerpoints"]=character.powers.power[i].totalpoints;
+                    if(character.powers.power[i].notes != null) {
+                        attributes["repeating_powers_"+newrowid+"_powernotes"]=character.powers.power[i].notes;
                     }
 
                 }
             }else{
                 var newrowid=generateRowID();
-                attributes["repeating_powers_"+newrowid+"_poweryname"]=chummerfile.characters.character.powers.power.name;
-                attributes["repeating_powers_"+newrowid+"_powerdescription"]=chummerfile.characters.character.powers.power.rating;
-                attributes["repeating_powers_"+newrowid+"_powerpoints"]=chummerfile.characters.character.powers.power.totalpoints;
-                if(chummerfile.characters.character.powers.power.notes != null) {
-                        attributes["repeating_powers_"+newrowid+"_powernotes"]=chummerfile.characters.character.powers.power.notes;
+                attributes["repeating_powers_"+newrowid+"_poweryname"]=character.powers.power.name;
+                attributes["repeating_powers_"+newrowid+"_powerdescription"]=character.powers.power.rating;
+                attributes["repeating_powers_"+newrowid+"_powerpoints"]=character.powers.power.totalpoints;
+                if(character.powers.power.notes != null) {
+                        attributes["repeating_powers_"+newrowid+"_powernotes"]=character.powers.power.notes;
                     }
             }
         }
@@ -14041,24 +14042,24 @@ async function importEnhancementTabChummer(text, chummerfile) {
 
     try{
         var essence=0.0;
-        if(chummerfile.characters.character.cyberwares != null){
+        if(character.cyberwares != null){
             console.log("Importing Cyberware");
-            if(chummerfile.characters.character.cyberwares.cyberware.length > 1){
-                for(var i=0; i< chummerfile.characters.character.cyberwares.cyberware.length; i++){
+            if(character.cyberwares.cyberware.length > 1){
+                for(var i=0; i< character.cyberwares.cyberware.length; i++){
                     var newrowid=generateRowID();
-                    attributes["repeating_ware_"+newrowid+"_warename"]=chummerfile.characters.character.cyberwares.cyberware[i].name;
-                    attributes["repeating_ware_"+newrowid+"_waredescription"]=chummerfile.characters.character.cyberwares.cyberware[i].rating;
-                    attributes["repeating_ware_"+newrowid+"_waregrade"]=chummerfile.characters.character.cyberwares.cyberware[i].grade;
-                    attributes["repeating_ware_"+newrowid+"_warekarma"]=chummerfile.characters.character.cyberwares.cyberware[i].ess;
-                    essence += Number(chummerfile.characters.character.cyberwares.cyberware[i].ess.replace(",","."));
+                    attributes["repeating_ware_"+newrowid+"_warename"]=character.cyberwares.cyberware[i].name;
+                    attributes["repeating_ware_"+newrowid+"_waredescription"]=character.cyberwares.cyberware[i].rating;
+                    attributes["repeating_ware_"+newrowid+"_waregrade"]=character.cyberwares.cyberware[i].grade;
+                    attributes["repeating_ware_"+newrowid+"_warekarma"]=character.cyberwares.cyberware[i].ess;
+                    essence += Number(character.cyberwares.cyberware[i].ess.replace(",","."));
                 }
             }else{
                 var newrowid=generateRowID();
-                attributes["repeating_ware_"+newrowid+"_warename"]=chummerfile.characters.character.cyberwares.cyberware.name;
-                attributes["repeating_ware_"+newrowid+"_waredescription"]=chummerfile.characters.character.cyberwares.cyberware.rating;
-                attributes["repeating_ware_"+newrowid+"_waregrade"]=chummerfile.characters.character.cyberwares.cyberware.grade;
-                attributes["repeating_ware_"+newrowid+"_warekarma"]=chummerfile.characters.character.cyberwares.cyberware.ess;
-                essence+=Number(chummerfile.characters.character.cyberwares.cyberware.ess.replace(",","."));
+                attributes["repeating_ware_"+newrowid+"_warename"]=character.cyberwares.cyberware.name;
+                attributes["repeating_ware_"+newrowid+"_waredescription"]=character.cyberwares.cyberware.rating;
+                attributes["repeating_ware_"+newrowid+"_waregrade"]=character.cyberwares.cyberware.grade;
+                attributes["repeating_ware_"+newrowid+"_warekarma"]=character.cyberwares.cyberware.ess;
+                essence+=Number(character.cyberwares.cyberware.ess.replace(",","."));
             }
         }
         attributes.ess_total=6-essence;
@@ -14068,48 +14069,48 @@ async function importEnhancementTabChummer(text, chummerfile) {
     }
 
     try{
-        if(chummerfile.characters.character.martialarts != null){
+        if(character.martialarts != null){
             console.log("Importing martialarts");
-            if(chummerfile.characters.character.martialarts.martialart.length>1){
-                for(var i=0;i<chummerfile.characters.character.martialarts.martialart.length;i++){
-                    if(chummerfile.characters.character.martialarts.martialart[i].martialarttechniques != null){
-                        if(chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.length > 1){
-                            for(var j=0; j < chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.length; j++){
+            if(character.martialarts.martialart.length>1){
+                for(var i=0;i<character.martialarts.martialart.length;i++){
+                    if(character.martialarts.martialart[i].martialarttechniques != null){
+                        if(character.martialarts.martialart[i].martialarttechniques.length > 1){
+                            for(var j=0; j < character.martialarts.martialart[i].martialarttechniques.length; j++){
                                 var newrowid=generateRowID();
-                                attributes["repeating_martial_"+newrowid+"_martialname"] = chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique[j].name;
-                                attributes["repeating_martial_"+newrowid+"_martialdescription"] = chummerfile.characters.character.martialarts.martialart[i].name;
-                                if(chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique[j].notes != undefined) {
-                                    attributes["repeating_martial_"+newrowid+"_martialnotes"] = chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique[j].notes;
+                                attributes["repeating_martial_"+newrowid+"_martialname"] = character.martialarts.martialart[i].martialarttechniques.martialarttechnique[j].name;
+                                attributes["repeating_martial_"+newrowid+"_martialdescription"] = character.martialarts.martialart[i].name;
+                                if(character.martialarts.martialart[i].martialarttechniques.martialarttechnique[j].notes != undefined) {
+                                    attributes["repeating_martial_"+newrowid+"_martialnotes"] = character.martialarts.martialart[i].martialarttechniques.martialarttechnique[j].notes;
                                 }
                             }
                         }else{
-                            console.log(chummerfile.characters.character.martialarts.martialart[i]);
+                            console.log(character.martialarts.martialart[i]);
                             var newrowid=generateRowID();
-                            attributes["repeating_martial_"+newrowid+"_martialname"]=chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique.name;
-                            attributes["repeating_martial_"+newrowid+"_martialdescription"]=chummerfile.characters.character.martialarts.martialart[i].name;
-                            if(chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique.notes != undefined) {
-                                attributes["repeating_martial_"+newrowid+"_martialnotes"] = chummerfile.characters.character.martialarts.martialart[i].martialarttechniques.martialarttechnique.notes;
+                            attributes["repeating_martial_"+newrowid+"_martialname"]=character.martialarts.martialart[i].martialarttechniques.martialarttechnique.name;
+                            attributes["repeating_martial_"+newrowid+"_martialdescription"]=character.martialarts.martialart[i].name;
+                            if(character.martialarts.martialart[i].martialarttechniques.martialarttechnique.notes != undefined) {
+                                attributes["repeating_martial_"+newrowid+"_martialnotes"] = character.martialarts.martialart[i].martialarttechniques.martialarttechnique.notes;
                             }
                         }
                     }
                 }
             }else{
-                if(chummerfile.characters.character.martialarts.martialart.martialarttechniques != null){
-                    if(chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique.length>1){
-                        for(var j=0;j<chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique.length;j++){
+                if(character.martialarts.martialart.martialarttechniques != null){
+                    if(character.martialarts.martialart.martialarttechniques.martialarttechnique.length>1){
+                        for(var j=0;j<character.martialarts.martialart.martialarttechniques.martialarttechnique.length;j++){
                             var newrowid=generateRowID();
-                            attributes["repeating_martial_"+newrowid+"_martialname"]=chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique[j].name;
-                            attributes["repeating_martial_"+newrowid+"_martialdescription"]=chummerfile.characters.character.martialarts.martialart.name;
-                            if(chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique[j].notes != undefined) {
-                                attributes["repeating_martial_"+newrowid+"_martialnotes"] = chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique[j].notes;
+                            attributes["repeating_martial_"+newrowid+"_martialname"]=character.martialarts.martialart.martialarttechniques.martialarttechnique[j].name;
+                            attributes["repeating_martial_"+newrowid+"_martialdescription"]=character.martialarts.martialart.name;
+                            if(character.martialarts.martialart.martialarttechniques.martialarttechnique[j].notes != undefined) {
+                                attributes["repeating_martial_"+newrowid+"_martialnotes"] = character.martialarts.martialart.martialarttechniques.martialarttechnique[j].notes;
                             }
                         }
                     }else{
                         var newrowid=generateRowID();
-                        attributes["repeating_martial_"+newrowid+"_martialname"]=chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique.name;
-                        attributes["repeating_martial_"+newrowid+"_martialdescription"]=chummerfile.characters.character.martialarts.martialart.name;
-                        if(chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique.notes != undefined) {
-                            attributes["repeating_martial_"+newrowid+"_martialnotes"] = chummerfile.characters.character.martialarts.martialart.martialarttechniques.martialarttechnique.notes;
+                        attributes["repeating_martial_"+newrowid+"_martialname"]=character.martialarts.martialart.martialarttechniques.martialarttechnique.name;
+                        attributes["repeating_martial_"+newrowid+"_martialdescription"]=character.martialarts.martialart.name;
+                        if(character.martialarts.martialart.martialarttechniques.martialarttechnique.notes != undefined) {
+                            attributes["repeating_martial_"+newrowid+"_martialnotes"] = character.martialarts.martialart.martialarttechniques.martialarttechnique.notes;
                         }
                     }
                 }
@@ -14133,16 +14134,16 @@ async function importEnhancementTabChummer(text, chummerfile) {
     }
 }
 
-async function importMatrixTabChummer(experimental, chummerfile) {
+async function importMatrixTabChummer(experimental, character) {
 
     var goodcode = true;
     var error = "";
     var attributes = {};
 
     try{
-       if(chummerfile.characters.character.gears != null){
+       if(character.gears != null){
             console.log("Importing Cyberdeck");
-            let decks = chummerfile.characters.character.gears.gear.filter(gear => gear.category_english == "Cyberdecks" || gear.category_english == "Rigger Command Consoles").sort((g1,g2) => g1.devicerating < g2.devicerating);
+            let decks = character.gears.gear.filter(gear => gear.category_english == "Cyberdecks" || gear.category_english == "Rigger Command Consoles").sort((g1,g2) => g1.devicerating < g2.devicerating);
             if(decks.length > 0) {
                 cyberdeck = decks[0];
                 attributes.attack_base = cyberdeck.attack;
@@ -14152,7 +14153,7 @@ async function importMatrixTabChummer(experimental, chummerfile) {
                 attributes.devicertg_base = cyberdeck.devicerating;
             }
             else {
-                let commlinks = chummerfile.characters.character.gears.gear.filter(gear => gear.category_english == "Commlinks").sort((g1,g2) => g1.devicerating < g2.devicerating);
+                let commlinks = character.gears.gear.filter(gear => gear.category_english == "Commlinks").sort((g1,g2) => g1.devicerating < g2.devicerating);
                 if(commlinks.length > 0) {
                     link = commlinks[0];
                     attributes.attack_base = link.attack;
@@ -14169,17 +14170,17 @@ async function importMatrixTabChummer(experimental, chummerfile) {
     }
 
     try {
-        if(chummerfile.characters.character.aiprograms != null){
+        if(character.aiprograms != null){
             console.log("Importing ai programs");
-            if(chummerfile.characters.character.aiprograms.aiprogram.length > 1){
-                for(var i=0; i < chummerfile.characters.character.aiprograms.aiprogram.length; i++){
+            if(character.aiprograms.aiprogram.length > 1){
+                for(var i=0; i < character.aiprograms.aiprogram.length; i++){
                     var newrowid=generateRowID();
-                    attributes["repeating_programs_"+newrowid+"_programname"]=chummerfile.characters.character.aiprograms.aiprogram[i].name;
+                    attributes["repeating_programs_"+newrowid+"_programname"]=character.aiprograms.aiprogram[i].name;
                 }
             }
             else {
                 var newrowid=generateRowID();
-                attributes["repeating_programs_"+newrowid+"_programname"] = chummerfile.characters.character.aiprograms.aiprogram.name;
+                attributes["repeating_programs_"+newrowid+"_programname"] = character.aiprograms.aiprogram.name;
             }
         }
     }catch(err){
@@ -14188,27 +14189,27 @@ async function importMatrixTabChummer(experimental, chummerfile) {
     }
 
     try{
-        if(chummerfile.characters.character.gears != null){
+        if(character.gears != null){
             console.log("Importing programs");
-            if(chummerfile.characters.character.gears.gear.length>1){
-                for(var i=0;i<chummerfile.characters.character.gears.gear.length;i++){
+            if(character.gears.gear.length>1){
+                for(var i=0;i<character.gears.gear.length;i++){
                     var newrowid=generateRowID();
-                    if((chummerfile.characters.character.gears.gear[i].category_english == "Common Programs")||(chummerfile.characters.character.gears.gear[i].category_english == "Hacking Programs")){
-                        attributes["repeating_programs_"+newrowid+"_programname"]=chummerfile.characters.character.gears.gear[i].name;
+                    if((character.gears.gear[i].category_english == "Common Programs")||(character.gears.gear[i].category_english == "Hacking Programs")){
+                        attributes["repeating_programs_"+newrowid+"_programname"]=character.gears.gear[i].name;
                     } else {
-                        if(chummerfile.characters.character.gears.gear[i].name != null){
-                            if(chummerfile.characters.character.gears.gear[i].children != null){
-                                if(chummerfile.characters.character.gears.gear[i].children.gear.length > 1){
-                                    for(var j=0; j<chummerfile.characters.character.gears.gear[i].children.gear.length; j++){
-                                        if(chummerfile.characters.character.gears.gear[i].children.gear[j].category_english == "Common Programs"||chummerfile.characters.character.gears.gear[i].children.gear[j].category_english == "Hacking Programs"){
+                        if(character.gears.gear[i].name != null){
+                            if(character.gears.gear[i].children != null){
+                                if(character.gears.gear[i].children.gear.length > 1){
+                                    for(var j=0; j<character.gears.gear[i].children.gear.length; j++){
+                                        if(character.gears.gear[i].children.gear[j].category_english == "Common Programs"||character.gears.gear[i].children.gear[j].category_english == "Hacking Programs"){
                                             var newrowidb=generateRowID();
-                                            attributes["repeating_programs_"+newrowidb+"_programname"] = chummerfile.characters.character.gears.gear[i].children.gear[j].name;
+                                            attributes["repeating_programs_"+newrowidb+"_programname"] = character.gears.gear[i].children.gear[j].name;
                                         }
                                     }
                                 } else{
-                                    if(chummerfile.characters.character.gears.gear[i].children.gear.category_english  ==  "Common Programs"||chummerfile.characters.character.gears.gear[i].children.gear.category_english == "Hacking Programs"){
+                                    if(character.gears.gear[i].children.gear.category_english  ==  "Common Programs"||character.gears.gear[i].children.gear.category_english == "Hacking Programs"){
                                         var newrowidb=generateRowID();
-                                        attributes["repeating_programs_"+newrowidb+"_programname"]=chummerfile.characters.character.gears.gear[i].children.gear.name;
+                                        attributes["repeating_programs_"+newrowidb+"_programname"]=character.gears.gear[i].children.gear.name;
                                     }
                                 }
                             }
@@ -14235,23 +14236,23 @@ async function importMatrixTabChummer(experimental, chummerfile) {
     }
 }
 
-async function importVehiclesTabChummer(experimental, chummerfile) {
+async function importVehiclesTabChummer(experimental, character) {
 
     var goodcode = true;
     var error = "";
     var attributes = {};
 
     try{
-        if(chummerfile.characters.character.vehicles != null){
+        if(character.vehicles != null){
             console.log("Importing vehicles");
-            if(chummerfile.characters.character.vehicles.vehicle.length > 1){
-                let vehicles = chummerfile.characters.character.vehicles.vehicle.filter( vehicle => vehicle.seats > 0);
+            if(character.vehicles.vehicle.length > 1){
+                let vehicles = character.vehicles.vehicle.filter( vehicle => vehicle.seats > 0);
                 for(var i=0; i < vehicles.length; i++){
                     importSingleVehicle(vehicles[i], attributes);
                 }
             } else {
-                if(chummerfile.characters.character.vehicles.vehicle.seats > 0) {
-                    importSingleVehicle(chummerfile.characters.character.vehicles.vehicle, attributes);
+                if(character.vehicles.vehicle.seats > 0) {
+                    importSingleVehicle(character.vehicles.vehicle, attributes);
                 }
             }
         }
@@ -14261,16 +14262,16 @@ async function importVehiclesTabChummer(experimental, chummerfile) {
     }
 
     try{
-        if(chummerfile.characters.character.vehicles != null){
+        if(character.vehicles != null){
             console.log("Importing drones");
-            if(chummerfile.characters.character.vehicles.vehicle.length > 1){
-                let drones = chummerfile.characters.character.vehicles.vehicle.filter( vehicle => vehicle.seats == 0);
+            if(character.vehicles.vehicle.length > 1){
+                let drones = character.vehicles.vehicle.filter( vehicle => vehicle.seats == 0);
                 for(var i=0; i < drones.length; i++){
                     importSingleDrone(drones[i], attributes);
                 }
             } else {
-                if(chummerfile.characters.character.vehicles.vehicle.seats == 0) {
-                    importSingleDrone(chummerfile.characters.character.vehicles.vehicle, attributes);
+                if(character.vehicles.vehicle.seats == 0) {
+                    importSingleDrone(character.vehicles.vehicle, attributes);
                 }
             }
         }
@@ -14292,16 +14293,16 @@ async function importVehiclesTabChummer(experimental, chummerfile) {
     }
 }
 
-async function importEquipmentTabChummer(experimental, chummerfile) {
+async function importEquipmentTabChummer(experimental, character) {
 
     var goodcode = true;
     var error = "";
     var attributes = {};
 
-    if(chummerfile.characters.character.armors != null){
+    if(character.armors != null){
         console.log("Importing armors");
-        if(chummerfile.characters.character.armors.armor.length > 1){
-            chummerfile.characters.character.armors.armor.forEach(async(armor) => {
+        if(character.armors.armor.length > 1){
+            character.armors.armor.forEach(async(armor) => {
                 try{
                     importSingleArmor(armor, attributes);
                 }catch(err){
@@ -14311,33 +14312,33 @@ async function importEquipmentTabChummer(experimental, chummerfile) {
             })
         }else{
             try{
-                importSingleArmor(chummerfile.characters.character.armors.armor, attributes);
+                importSingleArmor(character.armors.armor, attributes);
             }catch(err){
                 goodcode = false;
-                error= error + "\n" + "Error with Armor " + chummerfile.characters.character.armors.armor.name + ": " + err
+                error= error + "\n" + "Error with Armor " + character.armors.armor.name + ": " + err
             }
         }
     }
 
-    if(chummerfile.characters.character.cyberwares != null){
+    if(character.cyberwares != null){
         console.log("Importing Cyberware Armor");
-        if(chummerfile.characters.character.cyberwares.cyberware.length > 1){
-            chummerfile.characters.character.cyberwares.cyberware.forEach(cyberware =>  importCyberwareArmor(cyberware, attributes));
+        if(character.cyberwares.cyberware.length > 1){
+            character.cyberwares.cyberware.forEach(cyberware =>  importCyberwareArmor(cyberware, attributes));
         }else{
-            importCyberwareArmor(chummerfile.characters.character.cyberwares.cyberware, attributes);
+            importCyberwareArmor(character.cyberwares.cyberware, attributes);
         }
     }
 
-    if(chummerfile.characters.character.otherarmors != null){
+    if(character.otherarmors != null){
         console.log("Importing Other Armors");
-        if(chummerfile.characters.character.otherarmors.otherarmor.length > 1){
-            chummerfile.characters.character.otherarmors.otherarmor.forEach(armor =>  importOtherArmor(armor, attributes));
+        if(character.otherarmors.otherarmor.length > 1){
+            character.otherarmors.otherarmor.forEach(armor =>  importOtherArmor(armor, attributes));
         }else{
-            importOtherArmor(chummerfile.characters.character.otherarmors.otherarmor, attributes);
+            importOtherArmor(character.otherarmors.otherarmor, attributes);
         }
     }
 
-    if(chummerfile.characters.character.weapons != null){
+    if(character.weapons != null){
         console.log("Importing weapons");
         for(var i=1; i<9; i++){
             attributes["weaponismelee"+i] = "on";
@@ -14354,12 +14355,12 @@ async function importEquipmentTabChummer(experimental, chummerfile) {
             attributes["weaponnotes"+i] = "";
         }
         ammunition = [];
-        if(chummerfile.characters.character.gears != null) {
-            for( var j = 0; j < chummerfile.characters.character.gears.gear.length; j++) {
-                if(chummerfile.characters.character.gears.gear[j].category_english.includes("Ammunition") ||
-                    chummerfile.characters.character.gears.gear[j].name_english == "Micro Flares"
+        if(character.gears != null) {
+            for( var j = 0; j < character.gears.gear.length; j++) {
+                if(character.gears.gear[j].category_english.includes("Ammunition") ||
+                    character.gears.gear[j].name_english == "Micro Flares"
                 ){
-                    ammunition.push(chummerfile.characters.character.gears.gear[j]);
+                    ammunition.push(character.gears.gear[j]);
                 }
             }
         }
@@ -14368,70 +14369,70 @@ async function importEquipmentTabChummer(experimental, chummerfile) {
         let charAttributes = await asw.getAttrs(["agi_base", "agi_aug", "str_base", "str_aug"]);
         attributes = Object.assign(attributes, charAttributes);
 
-        if(chummerfile.characters.character.weapons.weapon.length > 1){
-            for(var i=1; i<chummerfile.characters.character.weapons.weapon.length+1; i++){
+        if(character.weapons.weapon.length > 1){
+            for(var i=1; i<character.weapons.weapon.length+1; i++){
                 try{
                     if(i < 9) {
-                        importSingleWeaponChummer(chummerfile.characters.character.weapons.weapon[i-1], i, ammunition, attributes);
+                        importSingleWeaponChummer(character.weapons.weapon[i-1], i, ammunition, attributes);
                     }
-                    await importSingleRepeatingWeapon(chummerfile.characters.character.weapons.weapon[i-1], ammunition, attributes);
+                    await importSingleRepeatingWeapon(character.weapons.weapon[i-1], ammunition, attributes);
                 }
                 catch(err) {
                     goodcode=false;
-                    error= error + "\n" + "Error with Weapon " + chummerfile.characters.character.weapons.weapon[i-1].name + ": " +err
+                    error= error + "\n" + "Error with Weapon " + character.weapons.weapon[i-1].name + ": " +err
                 }
             }
         }else{
             try{
-                importSingleWeaponChummer(chummerfile.characters.character.weapons.weapon, 1, ammunition, attributes);
+                importSingleWeaponChummer(character.weapons.weapon, 1, ammunition, attributes);
             }
             catch(err) {
                 goodcode=false;
-                error= error + "\n" + "Error with Weapon " + chummerfile.characters.character.weapons.weapon.name + ": " +err
+                error= error + "\n" + "Error with Weapon " + character.weapons.weapon.name + ": " +err
             }
         }
     }
 
     try{
-        if(chummerfile.characters.character.gears != null){
+        if(character.gears != null){
             console.log("Importing gear");
-            if(chummerfile.characters.character.gears.gear.length>1){
-                for(var i=0;i<chummerfile.characters.character.gears.gear.length;i++){
+            if(character.gears.gear.length>1){
+                for(var i=0;i<character.gears.gear.length;i++){
                     var newrowid=generateRowID();
-                    if((chummerfile.characters.character.gears.gear[i].category_english != "Common Programs")&&(chummerfile.characters.character.gears.gear[i].category_english != "Hacking Programs")){
-                        if(chummerfile.characters.character.gears.gear[i].name!=null){
-                            name = chummerfile.characters.character.gears.gear[i].name;
-                            if(chummerfile.characters.character.gears.gear[i].rating > 0){
-                                name += " " + chummerfile.characters.character.gears.gear[i].rating;
+                    if((character.gears.gear[i].category_english != "Common Programs")&&(character.gears.gear[i].category_english != "Hacking Programs")){
+                        if(character.gears.gear[i].name!=null){
+                            name = character.gears.gear[i].name;
+                            if(character.gears.gear[i].rating > 0){
+                                name += " " + character.gears.gear[i].rating;
                             }
                             attributes["repeating_equipment_"+newrowid+"_equipmentname"]=name;
-                            attributes["repeating_equipment_"+newrowid+"_equipmentnumber"]=chummerfile.characters.character.gears.gear[i].qty ? chummerfile.characters.character.gears.gear[i].qty : 1;
-                            if(chummerfile.characters.character.gears.gear[i].extra != null) {
-                                attributes["repeating_equipment_"+newrowid+"_equipmentdescription"]=chummerfile.characters.character.gears.gear[i].extra;
+                            attributes["repeating_equipment_"+newrowid+"_equipmentnumber"]=character.gears.gear[i].qty ? character.gears.gear[i].qty : 1;
+                            if(character.gears.gear[i].extra != null) {
+                                attributes["repeating_equipment_"+newrowid+"_equipmentdescription"]=character.gears.gear[i].extra;
                             }
                             attributes["repeating_equipment_"+newrowid+"_equipmentnotes"]="";
-                            if(chummerfile.characters.character.gears.gear[i].children!=null){
-                                if(chummerfile.characters.character.gears.gear[i].children.gear.length>1){
-                                    for(var j=0; j<chummerfile.characters.character.gears.gear[i].children.gear.length; j++){
-                                        if(chummerfile.characters.character.gears.gear[i].children.gear[j].category_english !="Common Programs" && chummerfile.characters.character.gears.gear[i].children.gear[j].category_english !="Hacking Programs"){
-                                            note = chummerfile.characters.character.gears.gear[i].children.gear[j].name;
-                                            if(chummerfile.characters.character.gears.gear[i].children.gear[j].rating > 0){
-                                                note += " " + chummerfile.characters.character.gears.gear[i].children.gear[j].rating;
+                            if(character.gears.gear[i].children!=null){
+                                if(character.gears.gear[i].children.gear.length>1){
+                                    for(var j=0; j<character.gears.gear[i].children.gear.length; j++){
+                                        if(character.gears.gear[i].children.gear[j].category_english !="Common Programs" && character.gears.gear[i].children.gear[j].category_english !="Hacking Programs"){
+                                            note = character.gears.gear[i].children.gear[j].name;
+                                            if(character.gears.gear[i].children.gear[j].rating > 0){
+                                                note += " " + character.gears.gear[i].children.gear[j].rating;
                                             }
-                                            if(chummerfile.characters.character.gears.gear[i].children.gear[j].extra != null) {
-                                                note += " " + chummerfile.characters.character.gears.gear[i].children.gear[j].extra;
+                                            if(character.gears.gear[i].children.gear[j].extra != null) {
+                                                note += " " + character.gears.gear[i].children.gear[j].extra;
                                             }
                                             attributes["repeating_equipment_"+newrowid+"_equipmentnotes"]+= note +"\n";
                                         }
                                     }
                                 }else{
-                                    if(chummerfile.characters.character.gears.gear[i].children.gear.category_english !="Common Programs" && chummerfile.characters.character.gears.gear[i].children.gear.category_english !="Hacking Programs"){
-                                        note = chummerfile.characters.character.gears.gear[i].children.gear.name;
-                                        if(chummerfile.characters.character.gears.gear[i].children.gear.rating > 0){
-                                            note += " " + chummerfile.characters.character.gears.gear[i].children.gear.rating;
+                                    if(character.gears.gear[i].children.gear.category_english !="Common Programs" && character.gears.gear[i].children.gear.category_english !="Hacking Programs"){
+                                        note = character.gears.gear[i].children.gear.name;
+                                        if(character.gears.gear[i].children.gear.rating > 0){
+                                            note += " " + character.gears.gear[i].children.gear.rating;
                                         }
-                                        if(chummerfile.characters.character.gears.gear[i].children.gear.extra != null) {
-                                            note += " " + chummerfile.characters.character.gears.gear[i].children.gear.extra;
+                                        if(character.gears.gear[i].children.gear.extra != null) {
+                                            note += " " + character.gears.gear[i].children.gear.extra;
                                         }
                                         attributes["repeating_equipment_"+newrowid+"_equipmentnotes"]+= note +"\n";
                                     }
@@ -14461,44 +14462,44 @@ async function importEquipmentTabChummer(experimental, chummerfile) {
     }
 }
 
-async function importSocialTabChummer(chummerfile) {
+async function importSocialTabChummer(character) {
 
     var goodcode = true;
     var error = "";
     var attributes = {};
 
     try{
-       if(chummerfile.characters.character.contacts != null){
+       if(character.contacts != null){
         console.log("Importing Contacts");
-        if(chummerfile.characters.character.contacts.contact.length>1){
-            for(var i=0; i<chummerfile.characters.character.contacts.contact.length; i++){
+        if(character.contacts.contact.length>1){
+            for(var i=0; i<character.contacts.contact.length; i++){
                 var newrowid=generateRowID();
-                if(chummerfile.characters.character.contacts.contact[i].name !== null) {
-                     attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact[i].name;
+                if(character.contacts.contact[i].name !== null) {
+                     attributes["repeating_contacts_"+newrowid+"_contactname"]=character.contacts.contact[i].name;
                 }
                 else {
                     attributes["repeating_contacts_"+newrowid+"_contactname"]="";
                 }
-                if(chummerfile.characters.character.contacts.contact[i].role !== null) {
-                    attributes["repeating_contacts_"+newrowid+"_contactdescription"] = chummerfile.characters.character.contacts.contact[i].role;
+                if(character.contacts.contact[i].role !== null) {
+                    attributes["repeating_contacts_"+newrowid+"_contactdescription"] = character.contacts.contact[i].role;
                 }
-                if(chummerfile.characters.character.contacts.contact[i].location !== null) {
-                    attributes["repeating_contacts_"+newrowid+"_contactlocation"] = chummerfile.characters.character.contacts.contact[i].location;
+                if(character.contacts.contact[i].location !== null) {
+                    attributes["repeating_contacts_"+newrowid+"_contactlocation"] = character.contacts.contact[i].location;
                 }
-                attributes["repeating_contacts_"+newrowid+"_contactconnection"] = chummerfile.characters.character.contacts.contact[i].connection;
-                attributes["repeating_contacts_"+newrowid+"_contactloyalty"] = chummerfile.characters.character.contacts.contact[i].loyalty;
+                attributes["repeating_contacts_"+newrowid+"_contactconnection"] = character.contacts.contact[i].connection;
+                attributes["repeating_contacts_"+newrowid+"_contactloyalty"] = character.contacts.contact[i].loyalty;
             }
         }else{
             var newrowid=generateRowID();
-            attributes["repeating_contacts_"+newrowid+"_contactname"] = chummerfile.characters.character.contacts.contact.name;
-            if(chummerfile.characters.character.contacts.contact.role !== null) {
-                attributes["repeating_contacts_"+newrowid+"_contactdescription"] = chummerfile.characters.character.contacts.contact.role;
+            attributes["repeating_contacts_"+newrowid+"_contactname"] = character.contacts.contact.name;
+            if(character.contacts.contact.role !== null) {
+                attributes["repeating_contacts_"+newrowid+"_contactdescription"] = character.contacts.contact.role;
             }
-            if(chummerfile.characters.character.contacts.contact.location !== null) {
-                attributes["repeating_contacts_"+newrowid+"_contactlocation"] = chummerfile.characters.character.contacts.contact.location;
+            if(character.contacts.contact.location !== null) {
+                attributes["repeating_contacts_"+newrowid+"_contactlocation"] = character.contacts.contact.location;
             }
-            attributes["repeating_contacts_"+newrowid+"_contactconnection"] = chummerfile.characters.character.contacts.contact.connection;
-            attributes["repeating_contacts_"+newrowid+"_contactloyalty"] = chummerfile.characters.character.contacts.contact.loyalty;
+            attributes["repeating_contacts_"+newrowid+"_contactconnection"] = character.contacts.contact.connection;
+            attributes["repeating_contacts_"+newrowid+"_contactloyalty"] = character.contacts.contact.loyalty;
         }
        }
     }catch(err){
