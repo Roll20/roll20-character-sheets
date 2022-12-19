@@ -1,9 +1,17 @@
 	<section class="tabs borderless">
 		<input type="hidden" class="tabstoggle" name="attr_sheetTab"  value="charactersheet"  />
-		<div class="tabholder">
+		<div class="hidden tabholder">
 				<button class="charsheetbtn" type="action" name="act_charactersheet" >Character</button>
 				<button class="basesheetbtn" type="action" name="act_basesheet" >Base</button>
 				<button class="campaignsheetbtn" type="action" name="act_campaignsheet" >Campaign</button>
+		</div>
+		<div class="character_sheet_type">
+			<label for="attr_sheet_type">What type of sheet is this?</label>
+			<select name="attr_sheet_type">
+				<option value="charactersheet">Character</option>
+				<option value="basesheet">Base</option>
+				<option value="campaignsheet">Campaign Tracker</option>
+			</select>
 		</div>
 		<span class="briny-setting">
 			<label class="inline setting">Briny Bastards?</label>
@@ -71,10 +79,13 @@
 	</section>
 
 	<section class="powers">
-		<h2>All Known Powers</h2>
+		<span class="spacer">
+			<h2 class="narrow">All Known Powers</h2>
+			<h3 class="right">Equipped <span class="powersused" value="0" name="attr_powersEquipped"></span>/5</h3>
+		</span>
 	<fieldset class="repeating_powers">
 		<label class="inline">Equipped?</label>
-		<input type="checkbox" name="attr_equipped">
+		<input class="equippedpower" type="checkbox" name="attr_equipped">
 		<button type="roll"  name="roll_power" value="&{template:powers} {{title=Power}} {{name=@{character_name}}} {{description=@{powertext}}} {{cost=@{powercost}}} {{powerName=@{powername}}}"></button>
 		<input class="powername" spellcheck="false" type="text" name="attr_powername" value="Name">
 		<span class="right">
@@ -1100,11 +1111,11 @@
 					<div class="victory">
 						<div class="threat status victory">
 							<input type="radio" id="valvic-0" value="0" name="attr_valvic" class="threatbar" checked>
-							<label for="valvic-0" class="threatlabel">0</label>
+							<label for="valvic-0" class="threatlabel threat1">0</label>
 							<input type="radio" id="valvic-1" value="1" name="attr_valvic" class="threatbar">
-							<label for="valvic-1" class="threatlabel">1</label>
+							<label for="valvic-1" class="threatlabel threat1">1</label>
 							<input type="radio" id="valvic-2" value="2" name="attr_valvic" class="threatbar">
-							<label for="valvic-2" class="threatlabel">2</label>
+							<label for="valvic-2" class="threatlabel threat1">2</label>
 							<input type="radio" id="valvic-3" value="3" name="attr_valvic" class="threatbar">
 							<label for="valvic-3" class="threatlabel threat2">3</label>
 							<input type="radio" id="valvic-4" value="4" name="attr_valvic" checked class="threatbar">
@@ -1172,11 +1183,11 @@
 					<div class="victory">
 						<div class="threat status victory">
 							<input type="radio" id="intvic-0" value="0" name="attr_intvic" class="threatbar" checked>
-							<label for="intvic-0" class="threatlabel">0</label>
+							<label for="intvic-0" class="threatlabel threat1">0</label>
 							<input type="radio" id="intvic-1" value="1" name="attr_intvic" class="threatbar">
-							<label for="intvic-1" class="threatlabel">1</label>
+							<label for="intvic-1" class="threatlabel threat1">1</label>
 							<input type="radio" id="intvic-2" value="2" name="attr_intvic" class="threatbar">
-							<label for="intvic-2" class="threatlabel">2</label>
+							<label for="intvic-2" class="threatlabel threat1">2</label>
 							<input type="radio" id="intvic-3" value="3" name="attr_intvic" class="threatbar">
 							<label for="intvic-3" class="threatlabel threat2">3</label>
 							<input type="radio" id="intvic-4" value="4" name="attr_intvic" class="threatbar">
@@ -1921,6 +1932,7 @@ on("change:cyber", function(eventInfo) {
 	});
 });
 
+
 on("clicked:corpMiss", function(eventInfo) {
 	getSectionIDs("repeating_cutback", function(idarray) {
       for(var i=0; i < idarray.length; i++) {
@@ -2059,6 +2071,22 @@ on("change:repeating_adversaries:adversaryname", function(eventInfo) {
 	});
 });
 
+on("change:repeating_powers:equipped", function(eventInfo) {
+	console.log(eventInfo);
+	const changeval = eventInfo.newValue === "on" ? 1 : -1;
+
+
+	getAttrs(["powersEquipped"], (values) => {
+		setAttrs(
+			{
+				powersEquipped: values.powersEquipped + changeval
+			}
+		);
+	});
+
+
+});
+
 on("change:buildingnameroom1 change:buildingnameroom2 change:buildingnameroom3 change:buildingnameroom4 change:buildingnameroom5 change:buildingnameroom6 change:buildingnameroom7 change:buildingnameroom8 change:buildingnameroom9 change:buildingnameroom10 change:buildingnameroom11 change:buildingnameroom12 change:buildingnameroom13 change:buildingnameroom14 change:buildingnameroom15 change:buildingnameroom16 ", function(eventInfo){
 	const roomNumber = eventInfo.sourceAttribute.match(/\d+/).shift(); // regex to grab the number from a string. Relies on naming scheme.
 	const room = eventInfo.newValue;
@@ -2190,6 +2218,8 @@ on("clicked:reset", function() {
 	});
 });
 
+
+
 on("clicked:griefbtn", function() {
         startRoll("&{template:grief} {{name=@{character_name}}} {{roll=[[1d6cf>6cs<1]]}}", (results) => {
             const total = results.results.roll.result
@@ -2207,6 +2237,13 @@ on("clicked:griefbtn", function() {
 });
 
 <!-- Tab Switching -->
+on("change:sheet_type", function(eventInfo) {
+		setAttrs({
+					sheetTab: eventInfo.newValue
+			});
+});
+
+
 const buttonlist = ["charactersheet","basesheet","campaignsheet"];
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
