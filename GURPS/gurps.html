@@ -26306,9 +26306,17 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	// apply and close the roll modifiers modal box
 	on("clicked:apply_roll_modifiers", (event) => {
 	
+		applyRollModifiers();
+	
+	});
+
+	function applyRollModifiers() {
+
 		let fields = [
 			"roll_modifier_types",
 			"max_skill_nine",
+			"dialog_custom_roll_modifier",
+			"dialog_custom_roll_modifier_reason",
 			"roll_modifier",
 			"roll_modifier_summary",
 			"roll_trait_summary",
@@ -26330,11 +26338,13 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			if (Number(values.max_skill_nine) === 1) {
 				maxSkillNine = 9;
 			}
-	
+
 			// fields to get updated 
 			const updateFields = {
 				"show_roll_modifiers": 0,
 				"roll_modifier_types": "",
+				[`${section}_custom_roll_modifier`]: Number(values.dialog_custom_roll_modifier),
+				[`${section}_custom_roll_modifier_reason`]: values.dialog_custom_roll_modifier_reason,
 				[`${section}_roll_modifier`]: Number(values.roll_modifier),
 				[`${section}_roll_modifier_summary`]: values.roll_modifier_summary,
 				[`${section}_roll_trait_summary`]: values.roll_trait_summary,
@@ -26344,12 +26354,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				[`${section}_roll_maneuver`]: values.roll_maneuver,
 				[`${section}_roll_allout_attack`]: values.roll_allout_attack,
 			};
-	
+
 			setAttrs(updateFields, { silent: true });
 	
 		});
-	
-	});
+
+	}
 	
 	// reset modifiers but keep traits
 	on("clicked:reset_roll_modifiers", event => {
@@ -27043,14 +27053,16 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					if (modReasons && modReasons.length > 0) {
 
 						// add two spaces before each reason and combine into single string list
-						displayReasons = modReasons.map(reason => {
-							return `  • ${reason}\n`;
+						const updateModReasons = modReasons.map(reason => {
+							return `  • ${reason}`;
 						});
+
+						displayReasons = updateModReasons.join("\n"); 
 
 					}
 					
 					description = `Custom Modifier\n${displayReasons}`;
-	
+
 				} else if (key === "hit_location_modifier" && values.hit_location) {
 	
 					// hit location row
@@ -28013,30 +28025,59 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		const CUSTOM_MOD_DESC = "custom modifier";
 	
-		/* check for manual changes to skill modifier boxes */
-		on(`change:${section}_roll_modifier`, event => {
+		/* check for manual changes to modifier tool just above the repeating tables section. */
+		on(`change:${section}_custom_roll_modifier change:${section}_custom_roll_modifier_reason change:${section}_roll_max_nine change:${section}_roll_apply_encumbrance change:encumbrance_level`, event => {
 	
-			let newValue = Number(event.newValue);
+			// get the current values
+			const fields = [
+				`${section}_custom_roll_modifier`,
+				`${section}_custom_roll_modifier_reason`,
+				`${section}_roll_max_nine`,
+				`${section}_roll_apply_encumbrance`,
+				"encumbrance_level"
+			];
 	
-			if (isNaN(newValue)) {
-				newValue = 0;
-			}
-	
-			getAttrs([`${section}_roll_modifier`, `${section}_roll_modifier_summary`], values => {
-	
-				let summary = values[`${section}_roll_modifier_summary`];
-	
-				let [customMod, summaryUpdated] = updateCustomModifierSummary(newValue, summary, CUSTOM_MOD_DESC);
-	
-				let updateFields = {
-					[`${section}_roll_modifier_summary`]: summaryUpdated,
-					dialog_custom_roll_modifier: customMod
+			getAttrs(fields, values => {
+
+				console.log(values);
+
+				// update the corresponding fields on the dialog box
+				let customMod = Number(values[`${section}_custom_roll_modifier`]);
+
+				if (isNaN(customMod)) {
+					customMod = 0;
 				}
-	
-				setAttrs(updateFields);
-	
+				
+				let customModReason = values[`${section}_custom_roll_modifier_reason`];
+
+				let applyEncumbrance = Number(values[`${section}_roll_apply_encumbrance`]);
+
+				let encumbranceLevel = values.encumbrance_level;
+
+				let encumberanceLevelMod = 0;
+
+				if (!isNaN(applyEncumbrance) && applyEncumbrance > 0) {
+					encumberanceLevelMod = encumbranceLevel;
+				}
+
+				let updateFields = {
+					dialog_custom_roll_modifier: customMod,
+					dialog_custom_roll_modifier_reason: customModReason,
+					max_skill_nine: values[`${section}_roll_max_nine`],
+					skill_encumbered: encumberanceLevelMod,
+				};
+
+				console.log(updateFields);
+
+				// update the dialog and then trigger the apply button
+				setAttrs(updateFields, null, () => {
+
+					applyRollModifiers();
+
+				});
+
 			});
-	
+
 		});
 	
 	});
@@ -29147,7 +29188,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		let updates = {};
 	
 		updates[`${section}_custom_roll_modifier`] = 0;
-		updates[`${section}_custom_roll_modifier_summary`] = "";
+		updates[`${section}_custom_roll_modifier_reason`] = "";
 		updates[`${section}_roll_modifier`] = 0;
 		updates[`${section}_roll_modifier_summary`] = "";
 		updates[`${section}_roll_trait_summary`] = "";
@@ -29166,7 +29207,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			updates[`${section}_roll_apply_encumbrance`] = 0;
 		}
 	
-		setAttrs(updates, { silent: true });
+		setAttrs(updates, { silent: true }, () => {
+			
+			resetRollModifiersToolBox();
+			
+		});
 	
 	}
 	
