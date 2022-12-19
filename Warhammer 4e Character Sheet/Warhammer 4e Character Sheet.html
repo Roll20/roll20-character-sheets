@@ -44224,23 +44224,6 @@ on('sheet:opened change:repeating_otherxp:otherxp change:repeating_otherxp:other
 	});
 	});	
 
-on('sheet:opened change:Talents_XP_Dis change:XP_Display3 change:XP_Mode', function(event) {
-
-	getAttrs(["Talents_XP_Dis", "Talents_XP", "XP_Display3"], function (v) {
-		dis1 = v.Talents_XP_Dis || "";
-		out2 = v.Talents_XP || 0;
-		dis2 = v.XP_Display3 || " ";
-	console.log(out2);
-	console.log("Talent XP change");
-			out = dis1 + ' ' + dis2;
-		setAttrs({
-		[`Talents_XP_Display`]: out,
-		[`Talents_XP`]: out2,		
-		});				
-	});		
-});
-
-		
 	//--- REPEATING SCRIPT ---
 		/* ===== PARAMETERS ==========
 		destination = the name of the attribute that stores the total quantity
@@ -46094,11 +46077,29 @@ on('change:talentmode change:Talent_CoolheadedLvl change:Talent_LightningReflexe
 
 		//<!-- ON SHEET OPEN EXISTING REP ID GATHER SCRIPT -->
 
+on('sheet:opened change:Talents_XP_Dis change:XP_Display3 change:XP_Mode', function(event) {
+
+	getAttrs(["Talents_XP_Dis", "Talents_XP", "XP_Display3", "Advantage_casting"], function (v) {
+		dis1 = v.Talents_XP_Dis || "";
+		out2 = v.Talents_XP || 0;
+		dis2 = v.XP_Display3 || " ";
+	console.log(out2);
+	console.log("Talent XP change");
+			out = dis1 + ' ' + dis2;
+	if (v.Advantage_casting > 0) {spa = v.Advantage_casting} else {spa = 0}
+    console.log("Casting Adv Set");	
+		setAttrs({
+		[`Talents_XP_Display`]: out,
+		[`Talents_XP`]: out2,
+		"SpellAdv": spa,		
+		});				
+	});		
+});
+
 on('sheet:opened', function() {
 			getAttrs(["sheetcheck"], function(c) {
             console.log(c.sheetcheck);
 			if (c.sheetcheck == 8) return;
-			
 			if (c.sheetcheck == 0) {	
 		setAttrs({
 			"MeleeOffType": 0,
@@ -46194,6 +46195,7 @@ on('sheet:opened change:initiative_houserule', function(event) {
 });	
 
 
+		//<!-- SHEET ACTION ROLLS -->
 
 on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain clicked:dualwieldmain', (eventInfo) => {
 	getAttrs(["Advantageinput","LastRollOff","LastCritRoll", "Used_MeleeWeaponSkill", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_BNE", "MeleeMode_Drilled", "MeleeMode_Disarm", "MeleeMode_Feint", "MeleeMode_Infight", "MeleeMode_Charging", "Used_MeleeBonus", "Used_DefenseBonus", "MeleeMode_STS", "MeleeMode_Aimed", "MeleeMode_Beat", "CritTable", "GroupAdv", "MeleeSizeMod" , "MeleeMainType"], function(v) {	
@@ -50378,21 +50380,6 @@ on('change:Talent_DrilledLvl change:Talent_BreakandEnterLvl change:Talent_Disarm
 	}, {silent: true});			   
 	});		
 });	
-
-
-on('sheet:opened', function(event){
-        if (event.sourceType === 'sheetworker') return;
-    console.log("Casting Adv Set");	
-	getAttrs(["Advantage_casting"], function(v) {	
-
-	if (v.Advantage_casting > 0) {spa = v.Advantage_casting} else {spa = 0}
-	setAttrs(
-	{
-		"SpellAdv": spa,
-	}, {silent: true});			   
-	});			
-});	
-
 
 on('change:armorimpenetrable change:armorweakpoints change:armorpartial change:armorcustom', function(event){
         if (event.sourceType === 'sheetworker') return;
