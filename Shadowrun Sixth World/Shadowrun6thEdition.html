@@ -14,6 +14,7 @@
 <input class="enable-modifiers" name="attr_enable_modifiers" type="hidden" value="0"/>
 <input class="compendium-drop-data" type="hidden" accept="data" name="attr_compendium_drop_data" value="">
 <input class="compendium-drop-content" type="hidden" accept="Content" name="attr_compendium_drop_content" value="">
+<input class="compendium-drop-category" type="hidden" accept="Category" name="attr_compendium_drop_category" value="">
 <div class="pc">
   <img class="shadowrun-logo" alt="Shadowrun sixth edition logo" src="https://s3.amazonaws.com/files.d20.io/images/204802539/QInmmma8HvUBA90c8e8H8Q/max.png?1614545502"/>
   <div class="tabs">
@@ -10811,16 +10812,15 @@ console.log(data);
 
 	// if there are blobs, add those and ignore the parent (it should be one of the blobs?)
 	if(data.blobs && Object.keys(data.blobs).length > 0) {
-		if(data.Category == "QSR Tool Cards") {
-			let blob = data.blobs[data["data-name"]];
-			data.blobs = {};
-			data.blobs[data["data-name"]] = blob;
-		}
+console.log(data.blobs);
+//		if(data.Category == "QSR Tool Cards") {
+//			let blob = data.blobs[data["data-name"]];
+//			data.blobs = {};
+//			data.blobs[data["data-name"]] = blob;
+//		}
 		Object.keys(data.blobs).forEach((key) => {
 			blob = data.blobs[key];
-//console.log("blob.Cat: "+blob.Category);
-//console.log("data.Cat: "+data.Category);
-//console.log("blob.data-Cat: "+blob["data-Category"]);
+
 			if(! blob.Category) {
 				if(data.Category == "QSR Tool Cards") {
 					blob.Category = trans["qsr_blob_types"][data["data-type"]];
@@ -11072,6 +11072,16 @@ var canvasAddNPC = function(data) {
 		addattrs[blocks[key]] = data[`data-${key}`] || '';
 	});
 
+	// if there are matrix attributes (ASDF) deal with them and turn "has matrix device" on
+	if(data["data-attack"] || data["data-sleaze"] || data["data-data_process"] || data["data-firewall"] || data["data-device_name"] || data["data-device_rating"]) {
+		addattrs["flag_matrix"] = "on";
+		addattrs["device_name"] = data["data-device_name"] || "";
+		addattrs["device_rating"] = data["data-device_rating"] || "";
+		addattrs["attack"] = data["data-attack"] || 0;
+		addattrs["sleaze"] = data["data-sleaze"] || 0;
+		addattrs["data_processing"] = data["data-data_processing"] || 0;
+		addattrs["firewall"] = data["data-firewall"] || 0;
+	}
 
 	// Knowledges and Languages
 	if(data["data-knowledges"]) {
@@ -11278,7 +11288,26 @@ var compendiumAddDevice = function(data) {
 	rowattrs["repeating_" + type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
 	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
 
-	setAttrs(rowattrs);
+	getAttrs(['sheet_type', 'matrix', 'compendium_drop_category'], (v) => {
+console.log("device dropped, getting some sheet vars");
+console.log(v);
+		// we don't want to do this stuff to the PC sheet it'll mess things up
+		if(v.compendium_drop_category == 'NPCs' || v.sheet_type == 'grunt') {
+			if(! data["data-matrix"] && data["data-device_rating"]) {
+				rowattrs['matrix'] = 8 + Math.ceil(data["data-device_rating"] / 2);
+				rowattrs['matrix_max'] = rowattrs['matrix'];
+			}
+			rowattrs['flag_matrix'] = "matrix";
+			rowattrs['device_name'] = data["data-name"] || 'Matrix Device';
+			rowattrs['device_rating'] = data["data-device_rating"] || 'Matrix Device';
+			rowattrs['attack'] = data["data-attack"] || 0;
+			rowattrs['sleaze'] = data["data-sleaze"] || 0;
+			rowattrs['data_processing'] = data["data-data_processing"] || 0;
+			rowattrs['firewall'] = data["data-firewall"] || 0;
+		}
+console.log(rowattrs);
+		setAttrs(rowattrs);
+	});
 };
 
 
