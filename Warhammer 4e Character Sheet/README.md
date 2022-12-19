@@ -86,7 +86,7 @@ December 20th 2022 v1.65
 - Added Ranged Weapons to be equipable in Mainhand/Offhand. This allows ranged offhand, and mixing with Melee inclding Dualwield Ranged.
 - Ranged weapons now have Two-handed weapon option to support full Main/Off hand functionality.
 - Added a new quick weapon selector at the bottom of Combat actions section for all Mainhand/Offhand and Rangd weapons. Once Weapons are added in the Weapons tab they will show on the selector.
-- Added "Master And Commander" Talent from Sea of Claws to the Talent list, with integrated Leadrship SL bonus support.
+- Added "Master And Commander" Talent (from C7 Sea of Claws) to the Talent list, with integrated Leadrship SL bonus support.
 - Implemented Besmirched Condition effects, when besmirched Characters will get -2 SL to tests rolled with Fellowship Skill.
 - Added Warpstone & ZZAP! Weapon Qualities for skaven weapons (from C7 Horned Rat Companion) to both Melee and Ranged Weapons, and apporpriate effects in roll output for Main PC & NPCs.
 - Various bug fixes
