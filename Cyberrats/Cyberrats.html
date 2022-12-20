@@ -1412,26 +1412,6 @@
 </datalist>
 
 <!-- roll templates -->
-
-<rolltemplate class="sheet-rolltemplate-rolls">
-	<div class="sheet-container">
-		<div class="sheet-header">
-			{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
-			{{#name}}<div class="sheet-name">{{name}}</div>{{/name}}
-			{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
-		</div>
-		<div class="sheet-content">
-			{{#allprops() title name subtitle desc}}
-			<div class="sheet-key">{{key}}</div>
-			<div class="sheet-value">{{value}}</div>
-			{{/allprops() title name subtitle desc}}
-			{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
-		</div>
-	</div>
-</rolltemplate>
-
-
-
 <rolltemplate class="sheet-rolltemplate-powers">
 
 			{{#title}}
@@ -1538,6 +1518,15 @@
 	</div>
 </rolltemplate>
 
+
+<rolltemplate class="sheet-rolltemplate-drops">
+	<div class="title">
+		<span>Drops</span>
+	</div>
+	<div class="result">
+		{{drops}} 
+	</div>
+</rolltemplate>
 
 
 <rolltemplate class="sheet-rolltemplate-attributeroll">
@@ -2094,7 +2083,6 @@ on("clicked:repeating_weapon:rollweapon", function(eventInfo) {
 				const lowAmmostr = (hasAmmo && `${values.repeating_weapon_ammo}` < 2) ? "{{lowAmmo=true}}" : "";
 				const ammoStr = hasAmmo ? `{{ammo=${values.repeating_weapon_ammo -1}}}` + lowAmmostr : "";
 			
-			
 				startRoll(`&{template:weapon} {{title=Weapon}} {{name=@{character_name}}} {{description=${values.repeating_weapon_weapontext}}} {{weaponname=${values.repeating_weapon_weaponname}}} {{harm=${values.repeating_weapon_harm}}} {{range=${values.repeating_weapon_rangetext}}} ` + ammoStr, (results) => {
 							finishRoll(
 									results.rollId,
@@ -2109,11 +2097,7 @@ on("clicked:repeating_weapon:rollweapon", function(eventInfo) {
 						repeating_weapon_ammo: values.repeating_weapon_ammo -1
 					});
 				}
-				
 		});
-
-
-
 });
 
 
@@ -2287,8 +2271,6 @@ on("sheet:opened", () => {
 });
 
 
-
-
 on("clicked:drops", function() {
 	 getAttrs(["briDead", "milDead", "intDead", "divDead", "bonusDrops", "briny"], (values) => {
 		const isBriny = values.briny === "on";
@@ -2310,6 +2292,21 @@ on("clicked:drops", function() {
 		
 		console.log(drops);
 		console.log(text);
+
+			startRoll(`&{template:drops} {{drops=${text}}}`, (results) => {
+					finishRoll(
+							results.rollId,
+							{
+							}
+					);
+			});
+			
+			setAttrs({
+				"briDead" : 0,
+				"milDead" : 0,
+				"intDead" : 0,
+				"divDead" : 0
+			});
 
 		// What if for each one I find out how many times I'm rolling for each one.
 		// Then pass that to a bespoke funciton, where I simulate a roll and get the corresponding result off the correspond table.
