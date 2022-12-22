@@ -4361,6 +4361,8 @@
 				<!-- current version notes: 2.9.2 -->			
 				<ul>
 					<li>For Skills, Melee, and Ranged tables, if the <b>Max skill of 9</b> is visible, if it is checked/unchecked the effective skill is now updated to reflect the checkbox.</li>
+					<li>Roll Modifier Tool. Each repeating section has a toolbar to modify the hit modifier for all the skills in the section. A few options were added to the toolbar and the syncing of data between the toolbar and Roll Modifier Dialog Box have been improved.</li>
+					<li>Repeating Skills - Attribute drop-down. The value for <b>10</b> is highleghted to show that a non-standard value was selected. This is helpful if something happened while importing the character.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -8092,7 +8094,14 @@ Engineering: Back to School.
 						<span data-i18n="skill-level-label">Level</span>
 					</div>
 					<div class="cell col4">
-						<span data-i18n="abbreviation-attribute-label">Attr</span>
+						<div class="popup">
+							<span data-i18n="abbreviation-attribute-label">Attr</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="skill-attribute-tooltip">
+If the <b>10</b> was selected, it will be highlighted red. This could have happened during the import if the skill has an attribute not identified by the system. Check the attribute on your chosen <i>Character Creation App</i> to see if the attribute exists on Roll20.
+							</span>
+						</span>
 					</div>
 					<div class="cell col5">
 						<div class="popup">
@@ -8150,13 +8159,13 @@ PU2:126 = Power-Ups 2. Page 126
 								<div class="roll-traits">
 									<b>Traits:</b>
 									<div>
-										<textarea name="attr_skill_roll_trait_summary" style="width:95%;height:50px;" readonly></textarea>
+										<textarea name="attr_skill_roll_trait_summary" class="trait-summary" readonly></textarea>
 									</div>
 								</div>
 								<div class="roll-summary">
 									<b>Summary:</b>
 									<div>
-										<textarea name="attr_skill_roll_modifier_summary" style="width:95%;height:100px" readonly></textarea>
+										<textarea name="attr_skill_roll_modifier_summary" class="roll-summary" readonly></textarea>
 									</div>
 								</div>
 							</div>
@@ -8252,6 +8261,7 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="text" name="attr_level" title="Macro: @{NAME|repeating_skills_$[row #]_level}" readonly="readonly" value="10"/>
 						</div>
 						<div class="cell col4">
+							<input type="hidden" class="option-alert" name="attr_base" />
 							<select name="attr_base" title="Macro: @{NAME|repeating_skills_$[row #]_base}">
 								<option value="@{strength}" data-i18n="option-strength">ST</option>
 								<option value="@{dexterity}" data-i18n="option-dexterity" selected>DX</option>
@@ -8620,6 +8630,28 @@ PU2:126 = Power-Ups 2. Page 126
 				<!-- attr_use_technique_modifier_tool is linked to checkbox on options sheet -->
 				<input type="hidden" name="attr_use_technique_modifier_tool" value="0" />
 				<div class="row roll-modifiers">
+					<div class="cell">
+						<button type="action" name="act_show_roll_modifiers_for_technique" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
+					</div>
+					<div class="cell">
+						<div class="summary-group">
+							<div class="icon"><span data-i18n="notes-label">Notes</span></div>
+							<div class="summary" style="width:250px">
+								<div class="roll-traits">
+									<b>Traits:</b>
+									<div>
+										<textarea name="attr_technique_roll_trait_summary" class="trait-summary" readonly></textarea>
+									</div>
+								</div>
+								<div class="roll-summary">
+									<b>Summary:</b>
+									<div>
+										<textarea name="attr_technique_roll_modifier_summary" class="roll-summary" readonly></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="cell label">
 						<div class="popup">
 							<span data-i18n="modifier-label">Modifier:</span>
@@ -8628,16 +8660,30 @@ PU2:126 = Power-Ups 2. Page 126
 							<span data-i18n="modifier-dialog-tooltip">Enter a modifier to apply to any rolls on the this table.<br />Use the pencil/paper icon to select modifiers.<br /><b>NOTE:</b> Changing the modifier or check status of <i>Max skill of 9</i> will clear modifiers used by dialog box.</span>
 						</div>
 					</div>
+					<div  class="cell number-input">
+						<input type="number" value="0" step="1" name="attr_technique_custom_roll_modifier" />
+					</div>
+					<div class="cell">
+						<span>Reason for Mod:</span>
+					</div>
+					<div class="cell">
+						<textarea style="height: 36px;width:150px;" name="attr_technique_custom_roll_modifier_reason"></textarea>
+					</div>
+					<div class="cell">
+						<div class="popup">
+							<span data-i18n="final-modifier-label">Final Modifier</span>:
+						</div>
+						<div class="tooltip">
+							<span data-i18n="final-modifier-dialog-tooltip">The final modifier that will be applied to the effective skill level.</span>
+						</div>
+					</div>
 					<div class="cell number-input">
-						<input type="number" value="0" step="1" name="attr_technique_roll_modifier" />
+						<input type="number" value="0" step="1" name="attr_technique_roll_modifier" readonly />
 						<input type="hidden" value="" name="attr_technique_roll_modifier_summary" />
 						<input type="hidden" value="" name="attr_technique_roll_trait_summary" />
 						<input type="hidden" value="" name="attr_technique_roll_hit_location" />
 						<input type="hidden" value="" name="attr_technique_roll_maneuver" />
 						<input type="hidden" value="" name="attr_technique_roll_allout_attack" />
-					</div>
-					<div class="cell">
-						<button type="action" name="act_show_roll_modifiers_for_technique" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
 					</div>
 					<div class="cell cell-popup">
 						<div>
@@ -8669,25 +8715,6 @@ PU2:126 = Power-Ups 2. Page 126
 					</div>
 					<div class="cell">
 						<button type="action" name="act_technique_roll_reset" class="btn tool-modifier-reset" title="Reset Skill Modifiers"><span data-i18n="reset-label">Reset</span></button>
-					</div>
-					<div class="cell">
-						<div class="summary-group">
-							<div class="icon"><span data-i18n="notes-label">Notes</span></div>
-							<div class="summary">
-								<div class="roll-traits">
-									<b>Traits:</b>
-									<div>
-										<span name="attr_technique_roll_trait_summary"></span>
-									</div>
-								</div>
-								<div class="roll-summary">
-									<b>Summary:</b>
-									<div>
-										<span name="attr_technique_roll_modifier_summary"></span>
-									</div>
-								</div>
-							</div>
-						</div>
 					</div>
 				</div>
 				
@@ -13604,6 +13631,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 				<div class="header spell-stats-header">
 					<div class="cell"><span data-i18n="spells-based-on-label">Spells Based on:</span></div>
 					<div class="cell margin-right">
+						<input type="hidden" class="option-alert" name="attr_spell_base" />
 						<select name="attr_spell_base" title="Macro: @{NAME|spell_base}">
 							<option value="@{strength}"><span data-i18n="abbreviation-option-strength">ST</span></option>
 							<option value="@{dexterity}"><span data-i18n="abbreviation-option-dexterity">DX</span></option>
@@ -14060,6 +14088,8 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 			
 			<ul>
 				<li>For Skills, Melee, and Ranged tables, if the <b>Max skill of 9</b> is visible, if it is checked/unchecked the effective skill is now updated to reflect the checkbox.</li>
+				<li>Roll Modifier Tool. Each repeating section has a toolbar to modify the hit modifier for all the skills in the section. A few options were added to the toolbar and the syncing of data between the toolbar and Roll Modifier Dialog Box have been improved.</li>
+				<li>Repeating Skills - Attribute drop-down. The value for <b>10</b> is highleghted to show that a non-standard value was selected. This is helpful if something happened while importing the character.</li>
 			</ul>
 			
 			<h4>Version: 2.9.1</h4>
@@ -26306,10 +26336,16 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	// apply and close the roll modifiers modal box
 	on("clicked:apply_roll_modifiers", (event) => {
 	
+		console.log("clicked applyRollModifiers");
+
 		applyRollModifiers();
 	
 	});
 
+	/**
+	*
+	* @param string forcedSection skill | technique | defense | melee | ranged
+	*/
 	function applyRollModifiers() {
 
 		let fields = [
@@ -26330,7 +26366,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			// roll_modifier_types stores which repeating section we're applying modifiers to.
 			// roll_modifier_types = skill | technique | defense | melee | ranged
 			let section = values.roll_modifier_types;
-	
+
 			// If max 9 is not used, set value to 100, so it will never be used
 			// If max 9 is used, then limit effective skill to 9 by setting value to 9
 			let maxSkillNine = 100;
@@ -26682,7 +26718,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let showRollDialog = +values.show_roll_modifiers;
 	
 			let modifierType = values.roll_modifier_types
-	
+
 			if (showRollDialog && modifierType) {
 	
 				totalRollModifiersDialogBox(modifierType);
@@ -26699,8 +26735,10 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * 
 	 * @param {string} modifierType Values: skill | technique | melee | range | spell
 	 */
-	function totalRollModifiersDialogBox(modifierType) {
+	function totalRollModifiersDialogBox(modifierType, callback) {
 	
+		callback = callback || noop;
+
 		let fields;
 	
 		// fields are defined constants, see beginning of script
@@ -26782,7 +26820,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				"roll_allout_attack": allOutAttack,
 			};
 	
-			setAttrs(updateFields, { silent: true });
+			setAttrs(updateFields, { silent: true }, callback);
 	
 		});
 	
@@ -28026,63 +28064,87 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		const CUSTOM_MOD_DESC = "custom modifier";
 	
 		/* check for manual changes to modifier tool just above the repeating tables section. */
-		on(`change:${section}_custom_roll_modifier change:${section}_custom_roll_modifier_reason change:${section}_roll_max_nine change:${section}_roll_apply_encumbrance change:encumbrance_level`, event => {
+		on(`change:${section}_custom_roll_modifier change:${section}_custom_roll_modifier_reason change:${section}_roll_max_nine change:${section}_roll_apply_encumbrance`, event => {
 	
-			// get the current values
-			const fields = [
-				`${section}_custom_roll_modifier`,
-				`${section}_custom_roll_modifier_reason`,
-				`${section}_roll_max_nine`,
-				`${section}_roll_apply_encumbrance`,
-				"encumbrance_level"
-			];
-	
-			getAttrs(fields, values => {
+			// get the section name
+			// example: sourceAttribute: "skill_roll_apply_encumbrance"
+			// we want the first part, `skill`
+			let arrSourceName = event.sourceAttribute.split("_");
 
-				console.log(values);
+			if (event.sourceType === "player" && !isEmpty(arrSourceName) && arrSourceName.length > 0) {
 
-				// update the corresponding fields on the dialog box
-				let customMod = Number(values[`${section}_custom_roll_modifier`]);
+				const section = arrSourceName[0];
 
-				if (isNaN(customMod)) {
-					customMod = 0;
-				}
-				
-				let customModReason = values[`${section}_custom_roll_modifier_reason`];
+				syncRollModToolbarToDialogueBox(section);
 
-				let applyEncumbrance = Number(values[`${section}_roll_apply_encumbrance`]);
-
-				let encumbranceLevel = values.encumbrance_level;
-
-				let encumberanceLevelMod = 0;
-
-				if (!isNaN(applyEncumbrance) && applyEncumbrance > 0) {
-					encumberanceLevelMod = encumbranceLevel;
-				}
-
-				let updateFields = {
-					dialog_custom_roll_modifier: customMod,
-					dialog_custom_roll_modifier_reason: customModReason,
-					max_skill_nine: values[`${section}_roll_max_nine`],
-					skill_encumbered: encumberanceLevelMod,
-				};
-
-				console.log(updateFields);
-
-				// update the dialog and then trigger the apply button
-				setAttrs(updateFields, null, () => {
-
-					applyRollModifiers();
-
-				});
-
-			});
-
+			}
+			
 		});
 	
 	});
-	
-	
+
+	on(`change:encumbrance_level`, event => {
+
+		// loop through each section and sync each toolbar
+
+	});
+
+	function syncRollModToolbarToDialogueBox(section) {
+
+		// get the current values
+		const fields = [
+			`${section}_custom_roll_modifier`,
+			`${section}_custom_roll_modifier_reason`,
+			`${section}_roll_max_nine`,
+			`${section}_roll_apply_encumbrance`,
+			"encumbrance_level"
+		];
+		getAttrs(fields, values => {
+
+			// update the corresponding fields on the dialog box
+			let customMod = Number(values[`${section}_custom_roll_modifier`]);
+
+			if (isNaN(customMod)) {
+				customMod = 0;
+			}
+			
+			let customModReason = values[`${section}_custom_roll_modifier_reason`];
+
+			let applyEncumbrance = Number(values[`${section}_roll_apply_encumbrance`]);
+
+			let encumbranceLevel = values.encumbrance_level;
+
+			let encumberanceLevelMod = 0;
+
+			if (!isNaN(applyEncumbrance) && applyEncumbrance > 0) {
+				encumberanceLevelMod = encumbranceLevel;
+			}
+
+			let updateFields = {
+				dialog_custom_roll_modifier: customMod,
+				dialog_custom_roll_modifier_reason: customModReason,
+				max_skill_nine: values[`${section}_roll_max_nine`],
+				skill_encumbered: encumberanceLevelMod,
+				roll_modifier_types: section
+			};
+
+			// update the dialog and then trigger the apply button
+			setAttrs(updateFields, {silent: false}, function (section) {
+				
+				getAttrs(["roll_modifier_types"], values => {
+
+					const section = values.roll_modifier_types;
+
+					totalRollModifiersDialogBox(section, applyRollModifiers);
+
+				});
+				
+			});
+
+		});
+
+	}
+		
 	/**
 	 * Updates the custom modifier line for a summary 
 	 * and returns the corrected total
@@ -29210,7 +29272,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		setAttrs(updates, { silent: true }, () => {
 			
 			resetRollModifiersToolBox();
-			
+
 		});
 	
 	}
