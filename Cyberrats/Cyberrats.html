@@ -1024,8 +1024,44 @@
 						<textarea spellcheck="false" name="attr_cutbacktext"></textarea>
 					</fieldset>
 			</div>
+		</section>
+		
+		<section class="drops">
+			<div class="sectiontop">
+				<h2 class="enemyheader">Generate Drops</h2>
+				<span class="adj">
+					<label class="narrow" for="attr_bonusDrops">Adjustment to rolls</label>
+					<input type="number" name="attr_bonusDrops" value="0">
+				</span>
+			</div>
+			<div class="alldrops">
+
+				<div class="drop intdrop">
+					<label for="attr_intDead">Interlopers Defeated</label>
+					<input type="number" name="attr_intDead" value="0">
+				</div>
+				
+				<div class="drop valdrop">
+					<label for="attr_divDead">Valdivian Defeated</label>
+					<input type="number" name="attr_divDead" value="0">
+				</div>
+				
+				<div class="drop valdrop">
+					<label for="attr_milDead">Military Defeated</label>
+					<input type="number" name="attr_milDead" value="0">
+				</div>
+				
+				<div class="drop brinydrop">
+					<label for="attr_briDead">Briny Defeated</label>
+					<input type="number" name="attr_briDead" value="0">
+				</div>
 			
-		</section>	
+			</div>
+			<div class="centerbtn">
+				<button class="dropbtn btn" type="action" name="act_drops">Generate Drops!</button>
+			</div>
+		</section>
+
 		<section class="camprogress">
 				<h2 class="enemyheader">Military</h2>
 			<div class="prog military">
@@ -1210,8 +1246,6 @@
 			
 			<div class="lieutenants">
 				<hr class="separate">
-				
-				
 				<!-- Liuetants -->
 				<h2 class="enemyheader">Briny Bastards</h2>
 			<div class="prog lieutenants lieustats">
@@ -1226,7 +1260,6 @@
 						<label class="inline">Auxiliary Mission Available?</label>
 					</div>
 				</div>
-				
 				
 				<div class="lieuholder">
 					<h3 class="liename">The Diver</h3>
@@ -1251,24 +1284,15 @@
 						<label class="inline">Auxiliary Mission Available?</label>
 					</div>
 				</div>
-				
-					
 			</div>
-				
-				
-				
-				
 			</div>
-			
 		</section>
+
 		<section class="campnotes">
 			<h2>Notes</h2>
 			<textarea name="attr_campnotes"></textarea>
 		</section>
 	</div>
-	
-
-
 </div>
 
 <!-- End Campaign Sheet -->
@@ -1388,26 +1412,6 @@
 </datalist>
 
 <!-- roll templates -->
-
-<rolltemplate class="sheet-rolltemplate-rolls">
-	<div class="sheet-container">
-		<div class="sheet-header">
-			{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
-			{{#name}}<div class="sheet-name">{{name}}</div>{{/name}}
-			{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
-		</div>
-		<div class="sheet-content">
-			{{#allprops() title name subtitle desc}}
-			<div class="sheet-key">{{key}}</div>
-			<div class="sheet-value">{{value}}</div>
-			{{/allprops() title name subtitle desc}}
-			{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
-		</div>
-	</div>
-</rolltemplate>
-
-
-
 <rolltemplate class="sheet-rolltemplate-powers">
 
 			{{#title}}
@@ -1515,6 +1519,15 @@
 </rolltemplate>
 
 
+<rolltemplate class="sheet-rolltemplate-drops">
+	<div class="title">
+		<span>Drops</span>
+	</div>
+	<div class="result">
+		{{drops}} 
+	</div>
+</rolltemplate>
+
 
 <rolltemplate class="sheet-rolltemplate-attributeroll">
 	<div class="title">
@@ -1556,9 +1569,8 @@ const submarineOrigins = {
 	Found: `Subsystems can be used one additional time per mission and Operatives restore up to 1 HP, 1 Biotech, 1 Shard, and 1 Soak after each mission.`,
 	Stolen: `Start ALL missions with 5 Awareness, but can allocate one hit each mission to the submarine for free`,
 	Built: `Unlock the sixth room, but when it's damaged, roll again to damage a second room.`
-}
+};
 
-	
 const Rooms = {
 	Armory: "Armory",
 	Auguary: "Auguary",
@@ -1591,7 +1603,7 @@ const Rooms = {
 	Sentinel_System: 'Sentinel System',
 	Trophy_Room: 'Trophy Room',
 	Workbench: 'Workbench'
-}
+};
 
 const Relationships = {
 	Confidant: 'Confidant',
@@ -1601,7 +1613,7 @@ const Relationships = {
 	Rival: 'Rival',
 	Strictly_Professional: 'Strictly Professional',
 	Other: 'Other'
-}
+};
 
 const Assistants = {
 		Trisha_Young: "Trisha Young",
@@ -1613,8 +1625,7 @@ const Assistants = {
 		Stella_the_Solicitous: "Stella the Solicitous",
 		Ella_Mile: "Ella Mile",
 		Kirby: "Kirby"
-}
-
+};
 
 const Adversaries = {
 	Juliette_Brochard: "Juliette Brochard",
@@ -1626,33 +1637,49 @@ const Adversaries = {
 	Richard_Trochowfski: "Richard Trochowfski",
 	Jeff_St_Clair: "Jeff St. Clair",
 	Terrat_Essej: "Terrat Essej"
-}
+};
+
+const EnemyFactions = {
+	INTERLOPER: 1,
+	VALDIVIAN: 2,
+	MILITARY: 3,
+	BRINY: 4,
+	NUM_FACTIONS: 5
+};
+
+const DropTableRewards = {
+	BIOTECH: 1,
+	HP: 2,
+	CONSTRUCTION_PIECE: 3,
+	GEAR_PART: 4,
+	SCHEMATIC: 5,
+	NUM_DROPS: 6
+};
 
 <!-- Functions -->
 function getRelationshipDetails(relationship, name) {
 	switch(relationship) {
 		case Relationships.Confidant:
-			return `Once per mission, ${name} can choose to offer support by restoring your HP or Biotech at the expense of their own supply, spending one for one. If you die, ${name} can keep your stuff.`
+			return `Once per mission, ${name} can choose to offer support by restoring your HP or Biotech at the expense of their own supply, spending one for one. If you die, ${name} can keep your stuff.`;
 			
 		case Relationships.Crush:
-			return `When ${name} is targeted with an attack, you can throw yourself in the way: move next to ${name} and take the attack for them, ignoring all Soak and Barrier.\r\n\r\nAfter a mission where you did this, you may choose to confess your feelings. If you do, on every mission where ${name} is present, you have the Perpetual Painted tag and ${name} has the Perpetual Favored tag.`
+			return `When ${name} is targeted with an attack, you can throw yourself in the way: move next to ${name} and take the attack for them, ignoring all Soak and Barrier.\r\n\r\nAfter a mission where you did this, you may choose to confess your feelings. If you do, on every mission where ${name} is present, you have the Perpetual Painted tag and ${name} has the Perpetual Favored tag.`;
 
 		case Relationships.Enemy:
-			return `Every time you take an Enemy relationship, gain one stack of Perpetual Painted. If ${name} dies or you stop being enemies, you do not lose this stack of Perpetual Painted.\r\n\r\nOnce per mission (inlcuding secondary), when you would become Injured, you can declare that ${name} is Injured instead. You still drop to 0 HP.`
+			return `Every time you take an Enemy relationship, gain one stack of Perpetual Painted. If ${name} dies or you stop being enemies, you do not lose this stack of Perpetual Painted.\r\n\r\nOnce per mission (inlcuding secondary), when you would become Injured, you can declare that ${name} is Injured instead. You still drop to 0 HP.`;
 
 		case Relationships.Jeopordized:
-			return `You messed up your professional relationship. This can only be removed by completing a mission together.\r\n\r\nWhen on a mission with ${name}, ALL Operatives subtract 1 from all dice (even drops). You cannot help or be helped by ${name}.`
+			return `You messed up your professional relationship. This can only be removed by completing a mission together.\r\n\r\nWhen on a mission with ${name}, ALL Operatives subtract 1 from all dice (even drops). You cannot help or be helped by ${name}.`;
 			
 		case Relationships.Rival:
-			return `If ${name} fails an attack, you can move into range and make a free attack against the target. If you miss, you suffer the original consequences as well.`
+			return `If ${name} fails an attack, you can move into range and make a free attack against the target. If you miss, you suffer the original consequences as well.`;
 			
 		case Relationships.Strictly_Professional:
-			return `Whenever you take the help action to give extra dice to ${name}, you grant three extra dice instead of just one.`
+			return `Whenever you take the help action to give extra dice to ${name}, you grant three extra dice instead of just one.`;
 			
 		case Relationships.Other:
 		default:
 			return "";
-			break;
 	}
 }
 
@@ -1757,7 +1784,6 @@ function getRawRoomDetails(room) {
 			
 	default:
 			return "";
-			break;
 	}
 }
 
@@ -1836,7 +1862,7 @@ function getAssistantInfo(assistant) {
 			return `Action: Your next power costs 0 Biotech`;
 	
 	case Assistants.Kirby:
-		return `Action: Move two range bands.`
+		return `Action: Move two range bands.`;
 	
 		default: return '';	
 	}
@@ -1876,7 +1902,7 @@ function getRangeText(close, near, far) {
 		rangeText += "Close";
 		
 		if(rangecount === 2) {
-			rangeText += " and "
+			rangeText += " and ";
 		}
 	}
 	
@@ -1884,15 +1910,100 @@ function getRangeText(close, near, far) {
 		rangeText += "Near";
 		
 		if(far) {
-			rangeText += " and "
+			rangeText += " and ";
 		}
 	}
 	
 	if(far) {
-		rangeText += " Far"
+		rangeText += " Far";
 	}
 
 	return rangeText + (rangecount > 1 ? " ranges." : " range.");
+}
+
+function getD6Roll() {
+	return Math.floor(Math.random()*6)+1;
+}
+
+<!-- const DropTableRewards = { -->
+	<!-- BIOTECH: 1, -->
+	<!-- HP: 2, -->
+	<!-- CONSTRUCTION_PIECE: 3, -->
+	<!-- GEAR_PART: 4, -->
+	<!-- SCHEMATIC: 5, -->
+	<!-- NUM_DROPS: 6 -->
+<!-- }; -->
+
+function getDropTextFromNumber(number) {
+	switch(number) {
+		case DropTableRewards.BIOTECH:
+			return "Tubes of Biotech";
+		case DropTableRewards.HP:
+			return "HP";
+		case DropTableRewards.CONSTRUCTION_PIECE:
+			return "Construction Pieces";	
+		case DropTableRewards.GEAR_PART:
+			return "Gear Parts";	
+		case DropTableRewards.SCHEMATIC:
+			return "Schematics";
+	}
+}
+
+function getTextFromDrops(drops) {
+	let text = "";
+	let first = true;
+	for(i = 0; i <= DropTableRewards.NUM_DROPS; i++) {
+			if(drops[i]) {
+				if(!first) {
+					text += ",\r\n";
+				}
+				text += drops[i] + "x " + getDropTextFromNumber(i);
+				first = false;
+			}
+	}
+	return text;
+}
+
+function getDropForRoll(faction, roll) {
+	switch(faction) {
+		case EnemyFactions.INTERLOPER:
+				if(roll >= 6) return DropTableRewards.CONSTRUCTION_PIECE; 
+				if(roll >= 4) return DropTableRewards.HP;
+				return DropTableRewards.BIOTECH;
+			break;
+		case EnemyFactions.VALDIVIAN:
+				if(roll >= 6) return DropTableRewards.GEAR_PART; 
+				if(roll >= 3) return DropTableRewards.HP;
+				return DropTableRewards.BIOTECH;
+			break;
+		case EnemyFactions.MILITARY:
+				if(roll >= 6) return DropTableRewards.CONSTRUCTION_PIECE; 
+				if(roll >= 4) return DropTableRewards.GEAR_PART;
+				if(roll >= 2) return DropTableRewards.HP;
+				return DropTableRewards.BIOTECH;
+			break;
+		case EnemyFactions.BRINY:
+				if(roll >= 6) return DropTableRewards.SCHEMATIC; 
+				if(roll >= 5) return DropTableRewards.GEAR_PART;
+				if(roll >= 3) return DropTableRewards.HP;
+				return DropTableRewards.BIOTECH;
+			break;
+	}
+}
+
+function getDropForFaction(faction, number, modifier, drops) {
+	while(number--){
+		drops[getDropForRoll(faction, getD6Roll() + modifier)]++;
+	}
+	return drops;
+}
+
+function initializeDrops() {
+	let drops = [];
+	for(i = 0; i <= DropTableRewards.NUM_DROPS; i++) {
+		drops[i] = 0;
+	}
+	return drops;
 }
 
 
@@ -1972,7 +2083,6 @@ on("clicked:repeating_weapon:rollweapon", function(eventInfo) {
 				const lowAmmostr = (hasAmmo && `${values.repeating_weapon_ammo}` < 2) ? "{{lowAmmo=true}}" : "";
 				const ammoStr = hasAmmo ? `{{ammo=${values.repeating_weapon_ammo -1}}}` + lowAmmostr : "";
 			
-			
 				startRoll(`&{template:weapon} {{title=Weapon}} {{name=@{character_name}}} {{description=${values.repeating_weapon_weapontext}}} {{weaponname=${values.repeating_weapon_weaponname}}} {{harm=${values.repeating_weapon_harm}}} {{range=${values.repeating_weapon_rangetext}}} ` + ammoStr, (results) => {
 							finishRoll(
 									results.rollId,
@@ -1987,11 +2097,7 @@ on("clicked:repeating_weapon:rollweapon", function(eventInfo) {
 						repeating_weapon_ammo: values.repeating_weapon_ammo -1
 					});
 				}
-				
 		});
-
-
-
 });
 
 
@@ -2165,6 +2271,56 @@ on("sheet:opened", () => {
 });
 
 
+on("clicked:drops", function() {
+	 getAttrs(["briDead", "milDead", "intDead", "divDead", "bonusDrops", "briny"], (values) => {
+		const isBriny = values.briny === "on";
+		
+		const numMil = parseInt(values.milDead);
+		const numVal = parseInt(values.divDead);
+		const numInt = parseInt(values.intDead);
+		const numBri = isBriny ? parseInt(values.briDead) : 0;
+		
+		const bonusDrops = parseInt(values.bonusDrops); // Modifier to add to each roll.
+		let drops = initializeDrops(); // Drops counts how many times a given drop appears.
+		
+		drops = getDropForFaction(EnemyFactions.INTERLOPER, numInt, bonusDrops, drops);
+		drops = getDropForFaction(EnemyFactions.VALDIVIAN, numVal, bonusDrops, drops);
+		drops = getDropForFaction(EnemyFactions.MILITARY, numMil, bonusDrops, drops);
+		drops = getDropForFaction(EnemyFactions.BRINY, numBri, bonusDrops, drops);
+		
+		const text = getTextFromDrops(drops);
+		
+		console.log(drops);
+		console.log(text);
+
+			startRoll(`&{template:drops} {{drops=${text}}}`, (results) => {
+					finishRoll(
+							results.rollId,
+							{
+							}
+					);
+			});
+			
+			setAttrs({
+				"briDead" : 0,
+				"milDead" : 0,
+				"intDead" : 0,
+				"divDead" : 0
+			});
+
+		// What if for each one I find out how many times I'm rolling for each one.
+		// Then pass that to a bespoke funciton, where I simulate a roll and get the corresponding result off the correspond table.
+		// That function returns the numbers it "rolled" and the results, e.g. {nums: [3,6,1], BT, HP, GearPiece) and then we
+		// Take that result AND the modifiers and toss it to the template so it shows like [3+1] 4, [6+1] 7, [1+1] 2, and the reuslts
+		// Is that possible?
+		// better approach: return an array of each type of result. So we need an enumerator of each possible value.
+		
+		// Fake the rolls in Javascript, get a list of the results, then pass those into the template?
+		
+	 });
+});
+
+
 // Reset after each mission
 on("clicked:reset", function() {
   getAttrs(["hp_max", "resetpowers", "biotech_max", "barrier_max", "soak_max", "shard_max"], (values) => {
@@ -2182,8 +2338,6 @@ on("clicked:reset", function() {
 			"soak": sk,
 			"shard": sd
 		});
-
-		
 		
 		// Unuse all drones
 		getSectionIDs("repeating_drone",  idarray => {
@@ -2218,22 +2372,20 @@ on("clicked:reset", function() {
 	});
 });
 
-
-
 on("clicked:griefbtn", function() {
-        startRoll("&{template:grief} {{name=@{character_name}}} {{roll=[[1d6cf>6cs<1]]}}", (results) => {
-            const total = results.results.roll.result
+			startRoll("&{template:grief} {{name=@{character_name}}} {{roll=[[1d6cf>6cs<1]]}}", (results) => {
+					const total = results.results.roll.result;
 
-            finishRoll(
-                results.rollId,
-                {
-                    roll1: total
-                }
-            );
-						setAttrs( {
-							"grief": total
-						});
-        });
+					finishRoll(
+							results.rollId,
+							{
+									roll1: total
+							}
+					);
+					setAttrs( {
+						"grief": total
+					});
+			});
 });
 
 <!-- Tab Switching -->
@@ -2251,7 +2403,7 @@ const buttonlist = ["charactersheet","basesheet","campaignsheet"];
                 sheetTab: button
             });
         });
-    })
+    });
 
 const basebuttonlist = ["mainbase", "subbase", "hivebase"];
 	basebuttonlist.forEach(button => {
@@ -2260,9 +2412,7 @@ const basebuttonlist = ["mainbase", "subbase", "hivebase"];
                 baseTab: button
             });
         });
-    })
-
-
+    });
 
 </script>
 
