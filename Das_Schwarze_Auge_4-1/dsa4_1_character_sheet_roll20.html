@@ -20601,6 +20601,58 @@ function unpackObject(cargo) {
 }
 
 /*
+	Roll Macro Nester
+
+Roll20 technically allows to nest roll macro, but requires every inner macro to replace the special characters '&', '|', '}' and ',' with HTML entities. This function takes a nesting level and an input string and returns an accordingly prepared string.
+
+This only works with roll macros without attribute, ability or macro calls which can contain '|' and '}'.
+*/
+function nestRollMacro(rollMacro, level) {
+	var caller = "nestRollMacro()";
+	var result = '';
+
+	// Sanity Checking
+	if (typeof(rollMacro) !== "string") {
+		debugLog(caller, "Function input is not of type 'string'. Aborting ...");
+		result = { "error": caller + ": Function input is not of type 'string'. Type was '" + typeof(rollMacro) + "'." };
+		return result;
+	}
+
+	if (typeof(level) !== "number") {
+		debugLog(caller, "Function input is not of type 'number'. Aborting ...");
+		result = { "error": caller + ": Function input is not of type 'number'. Type was '" + typeof(level) + "'." };
+		return result;
+	}
+
+	level = parseInt(level);
+
+	if (level < 0) {
+		debugLog(caller, "Nesting level is negative. Aborting ...");
+		result = { "error": caller + ": Nesting level is negative. Nesting level was '" + level + "'." };
+		return result;
+	}
+
+	if (level < 1) {
+		debugLog(caller, "No nesting requested. Aborting ...");
+		result = { "error": caller + ": Nesting level is 0. Nesting level was '" + level + "'." };
+		return rollMacro;
+	}
+
+	// Use an internal function
+	function replacer (rollMacro, level) {
+		rollMacro = rollMacro.replaceAll(/\&/g, '&amp;').replaceAll(/\|/g, '&#124;').replaceAll(/\}/g, '&#125;').replaceAll(/,/g, '&#44;');
+		level -= 1;
+		if (level > 0) {
+			rollMacro = replacer(rollMacro, level);
+        }
+		return rollMacro;
+     }
+
+     result = replacer(rollMacro, level);
+     return result;
+}
+
+/*
 	Generate Simple Roll Tag from Date.now()
 
 In order to quickly see that a reaction/confirmation roll belongs to the correct original roll, we use roll tags.
