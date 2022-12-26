@@ -13139,28 +13139,44 @@ Click again to switch to Manual and Remote">
                 </label>
             </details>
 
-            <div>
-                <details>
-                    <summary class="settings-caption" >Wound Calculation Modifier</summary>
-                    <div>
-                        <div class="woundsmodrow">
-                            <div><label>Single Box</label></div>
-                            <div><label>Multiplier</label></div>
-                            <div><label>Empty Overfl</label></div>
-                            <div><label>Empty Phys</label></div>
-                            <div><label>Empty Stun</label></div>
-                        </div>
-                        <div class="woundsmodrow">
-                            <div><input type="text" name="attr_woundadditive" value="0" title="Ignores that many Boxes of Damage on both Tracks before calculating the Woundpenalty like the High Pain Tolerance Quality"></div>
-                            <div><input type="text" name="attr_woundmultiplikative" value="3" title="Modifies the Multiplier of how many Boxes of Damage before incuring another Penalty like the Low Pain Tolerance Quality"></div>
-                            <div><input type="text" name="attr_overflowmod" value="0" title="Additional empty Overflow Boxes like the Will To Live Quality"></div>
-                            <div><input type="text" name="attr_physicaltrackmod" value="0" title="Additional empty Damage Boxes for the physical Track"></div>
-                            <div><input type="text" name="attr_stuntrackmod" value="0" title="Additional empty Damage Boxes for the stun Track"></div>
-                        </div>
+            <details>
+                <summary class="settings-caption" >Wound Calculation Modifier</summary>
+                <div>
+                    <div class="woundsmodrow">
+                        <div><label>Single Box</label></div>
+                        <div><label>Multiplier</label></div>
+                        <div><label>Empty Overfl</label></div>
+                        <div><label>Empty Phys</label></div>
+                        <div><label>Empty Stun</label></div>
                     </div>
-                </details>
+                    <div class="woundsmodrow">
+                        <div><input type="text" name="attr_woundadditive" value="0" title="Ignores that many Boxes of Damage on both Tracks before calculating the Woundpenalty like the High Pain Tolerance Quality"></div>
+                        <div><input type="text" name="attr_woundmultiplikative" value="3" title="Modifies the Multiplier of how many Boxes of Damage before incuring another Penalty like the Low Pain Tolerance Quality"></div>
+                        <div><input type="text" name="attr_overflowmod" value="0" title="Additional empty Overflow Boxes like the Will To Live Quality"></div>
+                        <div><input type="text" name="attr_physicaltrackmod" value="0" title="Additional empty Damage Boxes for the physical Track"></div>
+                        <div><input type="text" name="attr_stuntrackmod" value="0" title="Additional empty Damage Boxes for the stun Track"></div>
+                    </div>
+                </div>
+            </details>
 
-            </div>
+            <details>
+                <summary class="settings-caption" >Defense settings</summary>
+                <div style="display: flex">
+                    <label for="parrySkill">
+                        <span>Parry Skill</span>
+                        <select id="parrySkill" name="attr_parrySkill" title="Skill to use">
+                            <option value="45" selected>Blades</option>
+                            <option value="46">Clubs</option>
+                        </select>
+                    </label>
+                    <label for="parryAccuracy">
+                        <span>Parry Accuracy</span>
+                        <input id="parryAccuracy" type="number" title="Accuracy" name="attr_parryAccuracy" value="0">
+                    </label>
+
+
+                </div>
+            </details>
         </div>
         <div class="chummerimport">
             <h2>Chummer Import</h2>
@@ -13388,7 +13404,10 @@ Click again to switch to Manual and Remote">
     <!--     Buttons used for reaction rolls-->
     <div class="hidden-section" style="display:none">
         <button type="action" name="act_rollextended"></button>
+        <button type="action" name="act_reactdefend"></button>
         <button type="action" name="act_reactdodge"></button>
+        <button type="action" name="act_reactparry"></button>
+        <button type="action" name="act_reactblock"></button>
         <button type="action" name="act_reactsoak"></button>
         <button type="action" name="act_reroll"></button>
     </div>
@@ -16909,16 +16928,121 @@ const rollDogableAttack = async (rollPart, dmgType) => {
     );
 }
 
-on('clicked:reactdodge', async (ev) => {
-    await rollReactDodge(ev);
+on('clicked:reactdefend', async (ev) => {
+    await rollReactDefend(ev);
 });
 
-const rollReactDodge = async (ev) => {
+const rollReactDefend = async (ev) => {
     // The data we passed into the button will be stored in the originalRollId key
     let attackRoll = rollEscape.unescape(ev.originalRollId);
     let attrs = await asw.getAttrs(['gmroll','character_name','rea_total', 'int_total', 'avoid_total', 'avoid_bonus', 'edgeroll','edg_total','wound_total','sustainedspells','edgn','standardroll']);
 
-    let rollBase = `${attrs.gmroll}&{template:reactdodge}{{nethits=[[0]]}}{{attackAp=[[0]]}}{{attackDamage=[[0]]}}{{attackDmgType=[[0]]}}{{passthrough=[[0]]}}{{name=${attrs.character_name}}}{{attacker_name=${attackRoll.attacker}}}{{rea=[[${attrs.rea_total}}]]}}{{int=[[${attrs.int_total}]]}}{{bonus=[[${attrs.avoid_bonus}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{wounds_num=[[${attrs.wound_total}]]}}{{sustainedspells=[[${attrs.sustainedspells}*2]]}}{{result=[[(${attrs.avoid_total}+?{Situational Modifiers}-[[${attrs.wound_total}]]-[[${attrs.sustainedspells}*2]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}]]}}`;
+    let rollBase = `${attrs.gmroll}&{template:reactdefend}{{defend=Defend}}{{nethits=[[0]]}}{{attackAp=[[0]]}}{{attackDamage=[[0]]}}{{attackDmgType=[[0]]}}{{passthrough=[[0]]}}{{name=${attrs.character_name}}}{{attacker_name=${attackRoll.attacker}}}{{rea=[[${attrs.rea_total}}]]}}{{int=[[${attrs.int_total}]]}}{{bonus=[[${attrs.avoid_bonus}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{wounds_num=[[${attrs.wound_total}]]}}{{sustainedspells=[[${attrs.sustainedspells}*2]]}}{{result=[[(${attrs.avoid_total}+?{Situational Modifiers}-[[${attrs.wound_total}]]-[[${attrs.sustainedspells}*2]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}]]}}`;
+    let defendRoll = await startRoll(rollBase);
+
+    let defendSuccesses = defendRoll.results.result.result;
+    let nethits = attackRoll.attackHits - defendSuccesses;
+    let attackDamage = attackRoll.attackDV + nethits;
+
+    let rollData = {
+        attackAp: attackRoll.attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackRoll.attackDmgType,
+    }
+
+    finishRoll(defendRoll.rollId, {
+        nethits: nethits,
+        attackAp: attackRoll.attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackRoll.attackDmgType,
+        passthrough: rollEscape.escape(rollData),
+    });
+}
+
+on('clicked:reactdodge', async (ev) => {
+    await rollReactDodge(ev);
+});
+const rollReactDodge = async (ev) => {
+    // The data we passed into the button will be stored in the originalRollId key
+    let attackRoll = rollEscape.unescape(ev.originalRollId);
+    let attrs = await asw.getAttrs(['gmroll','character_name','rea_total', 'int_total', 'avoid_total', 'avoid_bonus', 'edgeroll','edg_total','wound_total','sustainedspells','edgn','standardroll']);
+    let skill = await asw.getAttrs(['skillrating6', 'skillbonus6']);
+    let limit = await asw.getAttrs(['skilllimitbonus6', 'physical_total']);
+
+    let rollBase = `${attrs.gmroll}&{template:reactdefend}{{defend=Dodge}}{{nethits=[[0]]}}{{attackAp=[[0]]}}{{attackDamage=[[0]]}}{{attackDmgType=[[0]]}}{{passthrough=[[0]]}}{{name=${attrs.character_name}}}{{attacker_name=${attackRoll.attacker}}}{{rea=[[${attrs.rea_total}}]]}}{{int=[[${attrs.int_total}]]}}{{bonus=[[${attrs.avoid_bonus}]]}}{{skill=@{skillname6}}}{{skilldice=[[${skill.skillrating6}+${skill.skillbonus6}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{limit=[[${limit.physical_total}+${limit.skilllimitbonus6}]]}}{{wounds_num=[[${attrs.wound_total}]]}}{{sustainedspells=[[${attrs.sustainedspells}*2]]}}{{result=[[(${attrs.avoid_total}+[[${skill.skillrating6}+${skill.skillbonus6}]]+?{Situational Modifiers}-[[${attrs.wound_total}]]-[[${attrs.sustainedspells}*2]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}kh[[${limit.physical_total}+${limit.skilllimitbonus6}]] ]]}}{{description= -5 Initiative}}`;
+     console.log(rollBase);
+    let defendRoll = await startRoll(rollBase);
+
+    let defendSuccesses = defendRoll.results.result.result;
+    let nethits = attackRoll.attackHits - defendSuccesses;
+    let attackDamage = attackRoll.attackDV + nethits;
+
+    let rollData = {
+        attackAp: attackRoll.attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackRoll.attackDmgType,
+    }
+
+    finishRoll(defendRoll.rollId, {
+        nethits: nethits,
+        attackAp: attackRoll.attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackRoll.attackDmgType,
+        passthrough: rollEscape.escape(rollData),
+    });
+}
+
+on('clicked:reactparry', async (ev) => {
+    await rollReactParry(ev);
+});
+const rollReactParry = async (ev) => {
+    // The data we passed into the button will be stored in the originalRollId key
+    let attackRoll = rollEscape.unescape(ev.originalRollId);
+    let attrs = await asw.getAttrs(['gmroll','character_name','rea_total', 'int_total', 'avoid_total', 'avoid_bonus', 'edgeroll','edg_total','wound_total','sustainedspells','edgn','standardroll']);
+
+    let choosenSkill = await asw.getAttrs(['parrySkill']);
+    let skill = await asw.getAttrs(['skillname' + choosenSkill.parrySkill, 'skillrating' + choosenSkill.parrySkill, 'skillbonus' + choosenSkill.parrySkill]);
+    let limit = await asw.getAttrs(['parryAccuracy']);
+
+
+    let rollBase = `${attrs.gmroll}&{template:reactdefend}{{defend=Parry}}{{nethits=[[0]]}}{{attackAp=[[0]]}}{{attackDamage=[[0]]}}{{attackDmgType=[[0]]}}{{passthrough=[[0]]}}{{name=${attrs.character_name}}}{{attacker_name=${attackRoll.attacker}}}{{rea=[[${attrs.rea_total}}]]}}{{int=[[${attrs.int_total}]]}}{{bonus=[[${attrs.avoid_bonus}]]}}{{skill=${skill[Object.keys(skill)[0]]}}}{{skilldice=[[${skill[Object.keys(skill)[1]]}+${skill[Object.keys(skill)[2]]}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{limit=[[${limit.parryAccuracy}]]}}{{wounds_num=[[${attrs.wound_total}]]}}{{sustainedspells=[[${attrs.sustainedspells}*2]]}}{{result=[[(${attrs.avoid_total}+[[${skill[Object.keys(skill)[1]]}+${skill[Object.keys(skill)[2]]}]]+?{Situational Modifiers}-[[${attrs.wound_total}]]-[[${attrs.sustainedspells}*2]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}kh[[${limit.parryAccuracy}]] ]]}}{{description= -5 Initiative}}`;
+
+    if(limit.parryAccuracy == 0) {
+        rollBase += '{{configuration= Set Limit under Character -> Defense Settings}}'
+    }
+
+    let defendRoll = await startRoll(rollBase);
+
+    let defendSuccesses = defendRoll.results.result.result;
+    let nethits = attackRoll.attackHits - defendSuccesses;
+    let attackDamage = attackRoll.attackDV + nethits;
+
+    let rollData = {
+        attackAp: attackRoll.attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackRoll.attackDmgType,
+    }
+
+    finishRoll(defendRoll.rollId, {
+        nethits: nethits,
+        attackAp: attackRoll.attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackRoll.attackDmgType,
+        passthrough: rollEscape.escape(rollData),
+    });
+}
+
+on('clicked:reactblock', async (ev) => {
+    await rollReactBlock(ev);
+});
+const rollReactBlock = async (ev) => {
+    // The data we passed into the button will be stored in the originalRollId key
+    let attackRoll = rollEscape.unescape(ev.originalRollId);
+    let attrs = await asw.getAttrs(['gmroll','character_name','rea_total', 'int_total', 'avoid_total', 'avoid_bonus', 'edgeroll','edg_total','wound_total','sustainedspells','edgn','standardroll']);
+    let skill = await asw.getAttrs(['skillrating51', 'skillbonus51']);
+    let limit = await asw.getAttrs(['skilllimitbonus51', 'physical_total']);
+
+    let rollBase = `${attrs.gmroll}&{template:reactdefend}{{defend=Block}}{{nethits=[[0]]}}{{attackAp=[[0]]}}{{attackDamage=[[0]]}}{{attackDmgType=[[0]]}}{{passthrough=[[0]]}}{{name=${attrs.character_name}}}{{attacker_name=${attackRoll.attacker}}}{{rea=[[${attrs.rea_total}}]]}}{{int=[[${attrs.int_total}]]}}{{bonus=[[${attrs.avoid_bonus}]]}}{{skill=@{skillname51}}}{{skilldice=[[${skill.skillrating51}+${skill.skillbonus51}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{limit=[[${limit.physical_total}+${limit.skilllimitbonus51}]]}}{{wounds_num=[[${attrs.wound_total}]]}}{{sustainedspells=[[${attrs.sustainedspells}*2]]}}{{result=[[(${attrs.avoid_total}+[[${skill.skillrating51}+${skill.skillbonus51}]]+?{Situational Modifiers}-[[${attrs.wound_total}]]-[[${attrs.sustainedspells}*2]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}kh[[${limit.physical_total}+${limit.skilllimitbonus51}]] ]]}}{{description= -5 Initiative}}`;
     let defendRoll = await startRoll(rollBase);
 
     let defendSuccesses = defendRoll.results.result.result;
@@ -17946,9 +18070,21 @@ var TAS = TAS || (function(){
     </table>
     {{#rollGreater() result 0}}
     {{#^rollTotal() computed::passthrough 0}}
-    <div class="sheet-rolltemplate-button">
-        [Dodge](~selected|reactdodge||{{computed::passthrough}})
+    <div class="sheet-rolltemplate-button-row">
+        <div class="sheet-rolltemplate-button">
+            [Defend](~selected|reactdefend||{{computed::passthrough}})
+        </div>
+        <div class="sheet-rolltemplate-button">
+            [Dodge](~selected|reactdodge||{{computed::passthrough}})
+        </div>
+        <div class="sheet-rolltemplate-button">
+            [Parry](~selected|reactparry||{{computed::passthrough}})
+        </div>
+        <div class="sheet-rolltemplate-button">
+            [Block](~selected|reactblock||{{computed::passthrough}})
+        </div>
     </div>
+
     {{/^rollTotal() computed::passthrough 0}}
     {{/rollGreater() result 0}}
 
@@ -18027,8 +18163,19 @@ var TAS = TAS || (function(){
     </table>
     {{#rollGreater() result 0}}
     {{#^rollTotal() computed::passthrough 0}}
-    <div class="sheet-rolltemplate-button">
-        [Dodge](~selected|reactdodge||{{computed::passthrough}})
+    <div class="sheet-rolltemplate-button-row">
+        <div class="sheet-rolltemplate-button">
+            [Defend](~selected|reactdefend||{{computed::passthrough}})
+        </div>
+        <div class="sheet-rolltemplate-button">
+            [Dodge](~selected|reactdodge||{{computed::passthrough}})
+        </div>
+        <div class="sheet-rolltemplate-button">
+            [Parry](~selected|reactparry||{{computed::passthrough}})
+        </div>
+        <div class="sheet-rolltemplate-button">
+            [Block](~selected|reactblock||{{computed::passthrough}})
+        </div>
     </div>
     {{/^rollTotal() computed::passthrough 0}}
     {{/rollGreater() result 0}}
@@ -18177,8 +18324,10 @@ var TAS = TAS || (function(){
         </tr>
     </table>
     {{#^rollTotal() computed::passthrough 0}}
-    <div class="sheet-rolltemplate-button">
-        [Next Roll](~{{name}}|rollextended||{{computed::passthrough}})
+    <div class="sheet-rolltemplate-button-row">
+        <div class="sheet-rolltemplate-button">
+            [Next Roll](~{{name}}|rollextended||{{computed::passthrough}})
+        </div>
     </div>
     {{/^rollTotal() computed::passthrough 0}}
 </rolltemplate>
@@ -18423,11 +18572,11 @@ var TAS = TAS || (function(){
     </table>
 </rolltemplate>
 
-<rolltemplate class="sheet-rolltemplate-reactdodge">
+<rolltemplate class="sheet-rolltemplate-reactdefend">
     <table>
         <tr>
             <th>
-                {{name}} rolls to Dodge {{attacker_name}}
+                {{name}} rolls to {{defend}} against {{attacker_name}}
             </th>
         </tr>
         <tr>
@@ -18452,6 +18601,14 @@ var TAS = TAS || (function(){
         </tr>
         {{/^rollTotal() bonus 0}}
 
+        {{#skill}}
+        {{#^rollTotal() skilldice 0}}
+        <tr>
+            <td>> {{skill}}({{skilldice}})</td>
+        </tr>
+        {{/^rollTotal() skilldice 0}}
+        {{/skill}}
+
         {{#mod}}
         {{#^rollTotal() mod 0}}
         <tr>
@@ -18473,6 +18630,7 @@ var TAS = TAS || (function(){
         </tr>
         {{/^rollTotal() wounds_num 0}}
         {{/wounds_num}}
+
         {{#edge}}
         <tr>
             <td>
@@ -18490,6 +18648,26 @@ var TAS = TAS || (function(){
             </td>
         </tr>
         {{/edge}}
+        {{^edge}}
+        {{#limit}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"> </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-sectionheading">Limit</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-limit">> Limit({{limit}})</div>
+            </td>
+        </tr>
+        {{/limit}}
+        {{/edge}}
+
         {{#result}}
         <tr>
             <td>
@@ -18547,11 +18725,47 @@ var TAS = TAS || (function(){
         </tr>
         {{/^rollGreater() computed::nethits 0}}
         {{/nethits}}
+        {{#description}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"> </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-sectionheading">Description</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-description">{{description}}</div>
+            </td>
+        </tr>
+        {{/description}}
+        {{#configuration}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"> </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-sectionheading">Configuration</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-description">{{configuration}}</div>
+            </td>
+        </tr>
+        {{/configuration}}
     </table>
     {{#rollGreater() computed::nethits 0}}
     {{#^rollTotal() computed::passthrough 0}}
-    <div class="sheet-rolltemplate-button">
-        [Soak](~{{name}}|reactsoak||{{computed::passthrough}})
+    <div class="sheet-rolltemplate-button-row">
+        <div class="sheet-rolltemplate-button">
+            [Soak](~{{name}}|reactsoak||{{computed::passthrough}})
+        </div>
     </div>
     {{/^rollTotal() computed::passthrough 0}}
     {{/rollGreater() computed::nethits 0}}
