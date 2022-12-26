@@ -23910,67 +23910,251 @@ const meleeData = {
 	}
 }
 
-on('clicked:k_attacke_waffe-action', async (info) => {
-	var rollMacro = "@{gm_roll_opt} " +
-		"&{template:test} " +
-		"{{name=Nahkampfangriff}} " +
-		"{{mod=[[0]]}} " +
-		"{{ansage=[[8]]}} " +
-		"{{wert=[[@{AT_Aktiv}]]}} " +
-		"{{taw=[[@{AT_Aktiv_TaW}]]}} " +
-		"{{roll=[[1d20cs<@{cs_kampf_at}cf>@{cf_kampf_at}]]}} " +
-		"{{msg=[[0]]}} " +
-		"{{result=[[0]]}} " +
-		"{{characterid=@{character_id}}} " +
-		"{{charactername=@{character_name}}} " +
-		"{{rollTag=[[0]]}} " +
-		"{{isConfirmationRoll=[[0]]}} " +
-		"{{confirmationRoll=[[0]]}} " +
-		"{{passthrough=[[0]]}}"
-	results = await startRoll(rollMacro);
-	var macroVars = {
-		'template': rollMacro.replace(/^.*\&\{template:([^}]+)\}.*$/, '$1'),
-		'name': rollMacro.replace(/^.*\{\{name=([^}]+)\}\}.*$/, '$1'),
-		'mod': parseInt(rollMacro.replace(/^.*\{\{mod=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
-		'ansage': parseInt(rollMacro.replace(/^.*\{\{ansage=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
-		'wert': rollMacro.replace(/^.*\{\{wert=\[\[([^\]]+)\]\]\}\}.*$/, '$1'),
-		'taw': rollMacro.replace(/^.*\{\{taw=([^\}]+\})\}\}.*$/, '$1'),
-		'roll': rollMacro.replace(/^.*\{\{roll=\[\[([^\]]+)\]\]\}\}.*$/, '$1'),
-		'msg': parseInt(rollMacro.replace(/^.*\{\{msg=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
-		'result': parseInt(rollMacro.replace(/^.*\{\{result=\[\[([^}]+)\]\]\}\}.*$/, '$1')),
-		'characterid': rollMacro.replace(/^.*\{\{characterid=([^\}]+\})\}\}.*$/, '$1'),
-		'charactername': rollMacro.replace(/^.*\{\{charactername=([^\}]+\})\}\}.*$/, '$1'),
-		'rollTag': rollMacro.replace(/^.*\{\{rollTag=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
-		'rollTime': rollMacro.replace(/^.*\{\{rollTime=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
-		'isConfirmationRoll': rollMacro.replace(/^.*\{\{isConfirmationRoll=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
-		'confirmationRoll': rollMacro.replace(/^.*\{\{confirmationRoll=\[\[([^}]+)\]\]\}\}.*$/, '$1'),
-		'passthrough': rollMacro.replace(/^.*\{\{passthrough=\[\[([^}]+)\]\]\}\}.*$/, '$1')
+on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info) => {
+	var func = "Action Listener for Melee Buttons";
+
+	// Get trigger aka the name of the melee maneuver
+	var trigger = info["triggerName"].replace(/clicked:([^-]+)-action/, '$1');
+	var data = meleeData[trigger];
+
+	// Fill rolls array to three elements
+	const rollCountMax = 3;
+	const critAttrsAT = [ 'cs_kampf_at', 'cf_kampf_at' ];
+	const critAttrsPA = [ 'cs_kampf_pa', 'cf_kampf_pa' ];
+	const critAttrsDict = {
+		'at': critAttrsAT, 'pa': critAttrsPA,
+		'pa-ausweichen': critAttrsPA,
+		'at-parierwaffe': critAttrsAT, 'pa-parierwaffe': critAttrsPA,
+		'pa+pa-parierwaffe': critAttrsPA,
+		'at-schild': critAttrsAT, 'pa-schild': critAttrsPA
+	};
+	var rolls = [];
+	while (rolls.length < rollCountMax) {
+		if (rolls.length < data["rollCount"]) {
+			rolls.push(`1d20cs<@{${critAttrsDict[data["typ"]][0]}}cf>@{${critAttrsDict[data["typ"]][1]}}`);
+		} else {
+			rolls.push(0);
+		}
 	}
+	debugLog(func, trigger, data, rolls);
+	data["rolls"] = rolls;
+
+	// Build Roll Macro
+	const wertDict = {
+		'at': '@{AT_Aktiv}',
+		'pa': '@{PA_Aktiv}',
+		'pa-ausweichen': '@{PABasis}',
+		'at-parierwaffe': '@{parryweapon_at}',
+		'pa-parierwaffe': '@{parryweapon_pa}',
+		'pa+pa-parierwaffe': '[[{@{PA_Aktiv}d1, @{parryweapon_pa}d1}kh1]]',
+		'at-schild': '@{AT_Raufen}',
+		'pa-schild': '@{shield_pa}'
+	};
+	const tawDict = {
+		'at': '@{AT_Aktiv_TaW}',
+		'pa': '@{PA_Aktiv_TaW}',
+		'pa-ausweichen': '@{PABasis}',
+		'at-parierwaffe': '@{parryweapon_at}',
+		'pa-parierwaffe': '@{parryweapon_pa}',
+		'pa+pa-parierwaffe': '[[{@{PA_Aktiv}d1, @{parryweapon_pa}d1}kh1]]',
+		'at-schild': '@{AT_Raufen}',
+		'pa-schild': '@{shield_pa}'
+	};
+
+	// Maneuver-specific Behaviour
+	// Beware of an Ugly Hack
+	/*
+	Custom Roll Parsing gives you a results object.
+	Unfortunately, is does not contain all variables declared in the roll.
+	Why? Custom ROLL Parsing only allows customizing ROLLS.
+	Anything not embraced by [[]] is not a roll. No roll -> no access.
+	Using inline labels after bogus rolls (0d1, does not spawn 3D dice) solves this.
+	Example: 0d1[hello]
+	Instead of accessing the roll result, access the roll expression.
+	Example: "0d1[hello]"
+	It is a string and from this point it is quite straightforward to continue.
+	*/
+	var ausfall = [];
+	switch(trigger) {
+		case 'k_ausfall':
+		case 'k_attacke_schild':
+			// Gegner zurückdrängbar-Prüfung
+			ausfall.push('{{ausfall-einleitung=[[?{' +
+				'Ist der Gegner noch zurückdrängbar und ist die Situation nicht beengt?'+
+				'|Ja,1' +
+				'|Nein,0' +
+			'}]]}}');
+			// BE-Prüfung: via CRP im Roll (Attribut wird ja geholt)
+			// Prüfung auf "INI höher als Gegner"
+			ausfall.push('{{ausfall-ini=[[?{' +
+				'Ist die eigene Initiative höher als die des Gegners?'+
+				'|Ja,1' +
+				'|Nein,0' +
+			'}]]}}');
+			// DK-Verkürzung?
+			ausfall.push('{{ausfall-dk-verkuerzen=[[?{' +
+				'Soll mit dieser Attacke die Distanzklasse verkürzt werden?'+
+				'|Ja,' +
+					nestRollMacro(
+						'?{Um wie viele Distanzklassen soll verkürzt werden?' +
+						'|eine Distanzklasse (±0),0d1[DK1/WS0/F0]' +
+						'|zwei Distanzklassen (+4),0d1[DK2/WS0/F0]' +
+						'}' ,
+						1) +
+				'|Nein,0d1[DK0/' +
+			// Wuchtschlag und Finte?
+					nestRollMacro(
+						'?{Kombinieren mit Wuchtschlag (max. +4)?' +
+						'|Ja: +1,WS1/' +
+						nestRollMacro(
+							'?{Kombinieren mit Finte (max. +4)?' +
+							'|Ja: +1,F1]' +
+							'|Ja: +2,F2]' +
+							'|Ja: +3,F3]' +
+							'|Ja: +4,F4]' +
+							'|Nein,F0]' +
+							'}' ,
+							1) +
+						'|Ja: +2,WS2/]' +
+						nestRollMacro(
+							'?{Kombinieren mit Finte (max. +4)?' +
+							'|Ja: +1,F1]' +
+							'|Ja: +2,F2]' +
+							'|Ja: +3,F3]' +
+							'|Ja: +4,F4]' +
+							'|Nein,F0]' +
+							'}' ,
+							1) +
+						'|Ja: +3,WS3/]' +
+						nestRollMacro(
+							'?{Kombinieren mit Finte (max. +4)?' +
+							'|Ja: +1,F1]' +
+							'|Ja: +2,F2]' +
+							'|Ja: +3,F3]' +
+							'|Ja: +4,F4]' +
+							'|Nein,F0]' +
+							'}' ,
+							1) +
+						'|Ja: +4,WS4/]' +
+						nestRollMacro(
+							'?{Kombinieren mit Finte (max. +4)?' +
+							'|Ja: +1,F1]' +
+							'|Ja: +2,F2]' +
+							'|Ja: +3,F3]' +
+							'|Ja: +4,F4]' +
+							'|Nein,F0]' +
+							'}' ,
+							1) +
+						'|Nein,WS0/' +
+						nestRollMacro(
+							'?{Kombinieren mit Finte (max. +4)?' +
+							'|Ja: +1,F1]' +
+							'|Ja: +2,F2]' +
+							'|Ja: +3,F3]' +
+							'|Ja: +4,F4]' +
+							'|Nein,F0]' +
+							'}' ,
+							1) +
+						'}' ,
+						1) +
+			'}]]}}');
+			// bei erfolgreichem Abschluss gewünschte DK
+			ausfall.push('{{ausfall-dk-ende=[[?{' +
+				'In welcher Distanzklasse soll ein erfolgreicher Ausfall enden?'+
+				'|Handgemenge (H),0d1[H]' +
+				'|Nahkampf (N),0d1[N]' +
+				'|Stangenwaffe (S),0d1[S]' +
+				'|Pike (P),0d1[P]' +
+			'}]]}}');
+			break;
+		default:
+	}
+	var macroVars = {
+		'prelude': '@{gm_roll_opt}',
+		'template': '&{template:test}',
+		'name': `{{name=${data["ui"]}}}`,
+		'mod': '{{mod=[[0]]}}',
+		'ansage': '{{ansage=' +
+			'[[' +
+				`${data["ansagen"]["manoever"]["fest"]} + (${data["ansagen"]["manoever"]["variabel"]})` +
+			']]}}',
+		'wert': `{{wert=[[${wertDict[data["typ"]]}]]}}`,
+		'taw': `{{taw=[[${tawDict[data["typ"]]}]]}}`,
+		'roll0': `{{roll0=[[${rolls[0]}]]}}`,
+		'roll1': `{{roll1=[[${rolls[1]}]]}}`,
+		'roll2': `{{roll2=[[${rolls[2]}]]}}`,
+		'msg': '{{msg=[[0]]}}',
+		'result': '{{result=[[0]]}}',
+		'characterid': '{{characterid=@{character_id}}}',
+		'charactername': '{{charactername=@{character_name}}}',
+		'rollTag': '{{rollTag=[[0]]}}',
+		'rollTime': `{{rollTime=[[${Date.now()}]]}}`,
+		'isConfirmationRoll': '{{isConfirmationRoll=[[0]]}}',
+		'confirmationRoll': '{{confirmationRoll=[[0]]}}',
+		'passthrough': '{{passthrough=[[0]]}}'
+	};
+
+	var rollMacro = [
+		macroVars['prelude'],
+		macroVars['template'],
+		macroVars['name'],
+		macroVars['mod'],
+		macroVars['ansage'],
+		macroVars['wert'],
+		macroVars['taw'],
+		macroVars['roll0'],
+		macroVars['roll1'],
+		macroVars['roll2'],
+		macroVars['msg'],
+		macroVars['result'],
+		macroVars['characterid'],
+		macroVars['charactername'],
+		macroVars['rollTag'],
+		macroVars['rollTime'],
+		macroVars['isConfirmationRoll'],
+		macroVars['confirmationRoll'],
+		macroVars['passthrough'],
+		... ausfall
+	].join(' ');
+	debugLog(func, "rollMacro", rollMacro);
+
+	// Prepare required attributes
 	var attrsToGet = [
 		'character_id',
 		'character_name',
-		'cs_kampf_at',
-		'cf_kampf_at'
+		... critAttrsDict[data["typ"]],
+		... data["attributes"]
 	];
+
+	// Start the roll
+	var results = await startRoll(rollMacro);
+	const rollID = results.rollId;
+	results = results.results;
 
 	safeGetAttrs(attrsToGet,
 		function(v, missing, badDef)
 		{
-			debugLog("values/missing/badDef", v, missing, badDef, "macroVars", macroVars);
-			console.log("test: info:", info, "results:", results);
-			var wert = results.results.wert.result;
-			var taw = results.results.taw.result;
-			var roll = results.results.roll.rolls[0].results[0];
-			var mod = macroVars["mod"];
-			var ansage = macroVars["ansage"];
+			debugLog("values/missing/badDef", v, missing, badDef, "macroVars", macroVars, "test: info:", info, "results:", results);
+
+			var wert = results.wert.result;
+			var taw = results.taw.result;
+			var rolls = [
+				results.roll0.result,
+				results.roll1.result,
+				results.roll2.result,
+			];
+			var roll = rolls[0];
+			var mod = results.mod.result;
+			var ansage = results.ansage.result;
 			var msg = macroVars["msg"];
 			var result = macroVars["result"];
 			var confirmationRoll = macroVars["confirmationRoll"];
 			var passthrough = {};
-			var cs = parseInt(v["cs_kampf_at"]);
-			var cf = parseInt(v["cf_kampf_at"]);
+			var cs = parseInt(v[critAttrsDict[data["typ"]][0]]);
+			var cf = parseInt(v[critAttrsDict[data["typ"]][1]]);
 
 			var effWert = wert - mod - ansage;
+			console.log("effWert", effWert, "cs", cs, "cf", cf);
 			// komplette _Ansage_ darf nicht höher als Kampftechnik-TaW und AT-Wert der aktiven Waffe (das jeweils niedrigere gilt)
 			if (
 				ansage > 0 &&
@@ -24031,7 +24215,7 @@ on('clicked:k_attacke_waffe-action', async (info) => {
 			}
 
 			finishRoll(
-				results.rollId,
+				rollID,
 				{
 					confirmationRoll: confirmationRoll,
 					msg: msg,
