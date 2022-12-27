@@ -1,1 +1,0 @@
-Hoja de personaje para el juego Tierras Quebradas de T&T Ediciones. Cualquier sugerencia/incidencia, contactar conmigo al siguiente email elfonochasis@gmail.com  usando el siguiente asunto para facilitar la gestión: [Roll20][Nombre del juego] Asunto

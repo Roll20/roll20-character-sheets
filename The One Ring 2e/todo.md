@@ -1,1 +1,0 @@
-We have switched tracking the backlog to trello here: https://trello.com/b/SNbA7qEn/roll20-tor2e
