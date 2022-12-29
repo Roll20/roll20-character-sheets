@@ -17787,6 +17787,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * These fields modify a skill
 	 **/
 	const skillModifierFields = [
+		"max_skill_nine",
 		"shock_penalty",
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
@@ -17831,6 +17832,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * These fields modify a technique rolls.
 	 **/
 	const techniqueModifierFields = [
+		"max_skill_nine",
 		"shock_penalty",
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
@@ -17875,6 +17877,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * These fields modify a skill
 	 **/
 	const meleeModifierFields = [
+		"max_skill_nine",
 		"shock_penalty",
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
@@ -17931,6 +17934,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * These fields modify a skill
 	 **/
 	const rangedModifierFields = [
+		"max_skill_nine",
 		"shock_penalty",
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
@@ -17990,6 +17994,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * These fields modify a skill
 	 **/
 	const defenseModifierFields = [
+		"max_skill_nine",
 		"shock_penalty",
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
@@ -18051,6 +18056,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * These fields modify a skill
 	 **/
 	const spellModifierFields = [
+		"max_skill_nine",
 		"shock_penalty",
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
@@ -19604,8 +19610,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 				getAttrs(fields, values => {
 
-					console.log(values);
-
 					const hasLanguageTalent = values.has_language_talent === "1";
 
 					let spokenPoints = Number(values[spokenFieldName]);
@@ -19629,8 +19633,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					items[`repeating_languages_${id}_spoken_points`] = spokenPoints;
 
 					items[`repeating_languages_${id}_written_points`] = spokenPoints;
-
-					console.log(items);
 
 					setAttrs(items);
 
@@ -26466,42 +26468,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	}
 
-	/* Individually changed max nine checkboxes on main sheet */
-
-	const maxNineSections = [
-		"skill",
-		"melee",
-		"ranged",
-	];
-
-	maxNineSections.forEach(section => {
-
-		on(`change:${section}_roll_max_nine`, event => {
-
-			// only run if the the actual checkbox was clicked
-			if (event.triggerName === `${section}_roll_max_nine`) {
-
-				const maxNineField = event.triggerName + "_value";
-
-				let newValue = 100;
-
-				if (event.newValue === "1") {
-					newValue = 9;
-				}
-
-				let fields = {
-					[`${maxNineField}`]: newValue
-				};
-
-				setAttrs(fields);
-
-			}
-
-		});
-
-	});
-
-
 	/* ROLL MODIFIERS BOX */
 	
 	// close roll modifiers, no updates
@@ -27154,7 +27120,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		let hasLowPainThreshold = +values.has_low_pain_threshold;
 	
-		let max9 = false;
+		// get the current checkbox state of "max_skill_nine",
+		let max9 = values.max_skill_nine === "1";
 	
 		let hitLocationDescription = "";
 	
@@ -28265,7 +28232,13 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	on(`change:encumbrance_level`, event => {
 
-		// loop through each section and sync each toolbar
+		// loop through each section and sync each roll modifier toolbar
+		toolSections.forEach(section => {
+
+			// resync the roll modifiers for that section
+			syncRollModToolbarToDialogueBox(section);
+
+		});
 
 	});
 
@@ -28299,6 +28272,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			let encumberanceLevelMod = 0;
 
+			let maxNine = values[`${section}_roll_max_nine`];
+
 			if (!isNaN(applyEncumbrance) && applyEncumbrance > 0) {
 				encumberanceLevelMod = encumbranceLevel;
 			}
@@ -28306,7 +28281,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let updateFields = {
 				dialog_custom_roll_modifier: customMod,
 				dialog_custom_roll_modifier_reason: customModReason,
-				max_skill_nine: values[`${section}_roll_max_nine`],
+				max_skill_nine: maxNine,
 				skill_encumbered: encumberanceLevelMod,
 				roll_modifier_types: section
 			};
