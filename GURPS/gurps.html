@@ -8291,7 +8291,8 @@ PU2:126 = Power-Ups 2. Page 126
 						</div>
 					</div>
 					<div class="cell number-input">
-						<input type="number" value="0" step="1" name="attr_skill_roll_modifier" readonly />
+						<input type="hidden" name="attr_skill_roll_modifier_status" value="neutral" class="modifier-status" />
+						<input type="number" value="0" step="1" name="attr_skill_roll_modifier" class="final-modifier" readonly />
 						<input type="hidden" value="" name="attr_skill_roll_modifier_summary" />
 						<input type="hidden" value="" name="attr_skill_roll_trait_summary" />
 						<input type="hidden" value="" name="attr_skill_roll_hit_location" />
@@ -8770,7 +8771,8 @@ PU2:126 = Power-Ups 2. Page 126
 						</div>
 					</div>
 					<div class="cell number-input">
-						<input type="number" value="0" step="1" name="attr_technique_roll_modifier" readonly />
+						<input type="hidden" name="attr_technique_roll_modifier_status" value="neutral" class="modifier-status" />
+						<input type="number" value="0" step="1" name="attr_technique_roll_modifier" class="final-modifier" readonly />
 						<input type="hidden" value="" name="attr_technique_roll_modifier_summary" />
 						<input type="hidden" value="" name="attr_technique_roll_trait_summary" />
 						<input type="hidden" value="" name="attr_technique_roll_hit_location" />
@@ -10019,7 +10021,8 @@ visualize what it will look like in chat.
 									</div>
 								</div>
 								<div class="cell number-input">
-									<input type="number" value="0" step="1" name="attr_defense_roll_modifier" readonly />
+									<input type="hidden" name="attr_defense_roll_modifier_status" value="neutral" class="modifier-status" />
+									<input type="number" value="0" step="1" name="attr_defense_roll_modifier" class="final-modifier" readonly />
 									<input type="hidden" value="" name="attr_defense_roll_modifier_summary" />
 									<input type="hidden" value="" name="attr_defense_roll_trait_summary" />
 									<input type="hidden" value="" name="attr_defense_roll_hit_location" />
@@ -11290,7 +11293,8 @@ visualize what it will look like in chat.
 									</div>
 								</div>
 								<div class="cell number-input">
-									<input type="number" value="0" step="1" name="attr_melee_roll_modifier" readonly />
+									<input type="hidden" name="attr_melee_roll_modifier_status" value="neutral" class="modifier-status" />
+									<input type="number" value="0" step="1" name="attr_melee_roll_modifier" class="final-modifier" readonly />
 									<input type="hidden" value="" name="attr_melee_roll_modifier_summary" />
 									<input type="hidden" value="" name="attr_melee_roll_trait_summary" />
 									<input type="hidden" value="" name="attr_melee_roll_hit_location" />
@@ -11853,7 +11857,8 @@ visualize what it will look like in chat.
 									</div>
 								</div>
 								<div class="cell number-input">
-									<input type="number" value="0" step="1" name="attr_ranged_roll_modifier" readonly />
+									<input type="hidden" name="attr_ranged_roll_modifier_status" value="neutral" class="modifier-status" />
+									<input type="number" value="0" step="1" name="attr_ranged_roll_modifier" class="final-modifier" readonly />
 									<input type="hidden" value="" name="attr_ranged_roll_modifier_summary" />
 									<input type="hidden" value="" name="attr_ranged_roll_trait_summary" />
 									<input type="hidden" value="" name="attr_ranged_roll_hit_location" />
@@ -13960,7 +13965,8 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 						</div>
 					</div>
 					<div class="cell number-input">
-						<input type="number" value="0" step="1" name="attr_spell_roll_modifier" readonly />
+						<input type="hidden" name="attr_spell_roll_modifier_status" value="neutral" class="modifier-status" />
+						<input type="number" value="0" step="1" name="attr_spell_roll_modifier" class="final-modifier" readonly />
 						<input type="hidden" value="" name="attr_spell_roll_modifier_summary" />
 						<input type="hidden" value="" name="attr_spell_roll_trait_summary" />
 						<input type="hidden" value="" name="attr_spell_roll_hit_location" />
@@ -22790,8 +22796,17 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					rangedRollModSummary += `${sizeMod} Size Modifier\n`;
 	
 				}
+
+				let hitModifierStatus = "neutral";
+
+				if (hitModifier > 0) {
+					hitModifierStatus = "positive";
+				} else if (hitModifier < 0) {
+					hitModifierStatus = "negative";
+				}
 	
 				updates = {
+					ranged_roll_modifier_status: hitModifierStatus,
 					ranged_roll_modifier: hitModifier,
 					ranged_roll_modifier_summary: rangedRollModSummary,
 					target_size_modifier: sizeMod,
@@ -26521,13 +26536,24 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				maxSkillNine = 9;
 			}
 
+			const rollModifier = Number(values.roll_modifier);
+
+			let rollModifierStatus = "neutral";
+
+			if (rollModifier > 0) {
+				rollModifierStatus = "positive";
+			} else if (rollModifier < 0) {
+				rollModifierStatus = "negative";
+			}
+				
 			// fields to get updated 
 			const updateFields = {
 				"show_roll_modifiers": 0,
 				"roll_modifier_types": "",
 				[`${section}_custom_roll_modifier`]: Number(values.dialog_custom_roll_modifier),
 				[`${section}_custom_roll_modifier_reason`]: values.dialog_custom_roll_modifier_reason,
-				[`${section}_roll_modifier`]: Number(values.roll_modifier),
+				[`${section}_roll_modifier_status`]: rollModifierStatus,
+				[`${section}_roll_modifier`]: rollModifier,
 				[`${section}_roll_modifier_summary`]: values.roll_modifier_summary,
 				[`${section}_roll_trait_summary`]: values.roll_trait_summary,
 				[`${section}_roll_max_nine`]: values.max_skill_nine,
@@ -28187,27 +28213,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			setAttrs(fields, { silent: true });
 	
 		});
-	
-		/* If roll modifier is turned off, clear the values to avoid them from being used in roll template */
-		on(`change:use_${section}_modifier_tool`, event => {
-	
-			let updateFields = {
-				[`${section}_custom_roll_modifier`]: 0,
-				[`${section}_custom_roll_modifier_summary`]: "",
-				[`${section}_roll_modifier`]: 0,
-				[`${section}_roll_modifier_summary`]: "",
-				[`${section}_roll_trait_summary`]: "",
-				[`${section}_roll_max_nine`]: 0,
-				[`${section}_roll_max_nine_value`]: 100,
-				[`${section}_roll_hit_location`]: "",
-				[`${section}_roll_maneuver`]: "",
-				[`${section}_roll_allout_attack`]: "",
-			}
-	
-			setAttrs(updateFields, { silent: true });
-	
-		});
-	
+		
 		const CUSTOM_MOD_DESC = "custom modifier";
 	
 		/* check for manual changes to modifier tool just above the repeating tables section. */
@@ -29413,6 +29419,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		updates[`${section}_custom_roll_modifier`] = 0;
 		updates[`${section}_custom_roll_modifier_reason`] = "";
+		updates[`${section}_roll_modifier_status`] = "neutral";
 		updates[`${section}_roll_modifier`] = 0;
 		updates[`${section}_roll_modifier_summary`] = "";
 		updates[`${section}_roll_trait_summary`] = "";
@@ -29495,6 +29502,14 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 			}
 	
+			let rollModifierStatus = "neutral";
+
+			if (currentModifier > 0) {
+				rollModifierStatus = "positive";
+			} else if (currentModifier < 0) {
+				rollModifierStatus = "negative";
+			}
+				
 			const updates = {};
 	
 			switch (section) {
@@ -29512,6 +29527,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			}
 	
 			updates[`${section}_roll_modifier_summary`] = newSummary;
+	
+			updates[`${section}_roll_modifier_status`] = rollModifierStatus;
 	
 			updates[`${section}_roll_modifier`] = currentModifier;
 	
@@ -29614,11 +29631,21 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 			}
 	
+			let rollModifierStatus = "neutral";
+
+			if (currentModifier > 0) {
+				rollModifierStatus = "positive";
+			} else if (currentModifier < 0) {
+				rollModifierStatus = "negative";
+			}
+				
 			const updates = {};
 	
 			updates[`${type}_db`] = applyDB;
 	
 			updates[`defense_roll_modifier_summary`] = newSummary;
+
+			updates[`defense_roll_modifier_status`] = rollModifierStatus;
 	
 			updates[`defense_roll_modifier`] = currentModifier;
 	
