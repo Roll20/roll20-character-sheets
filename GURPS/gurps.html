@@ -4266,6 +4266,14 @@
 	<!-- HIDDEN FIELDS -->
 	<input type="hidden" name="attr_10" value="10" />
 	<input type="hidden" name="attr_VS" value="vs:" />
+	<input type="hidden" name="attr_attribute_positive_total" value="0" />
+	<input type="hidden" name="attr_attribute_negative_total" value="0" />
+	<input type="hidden" name="attr_racial_points_advantage" value="0" />
+	<input type="hidden" name="attr_racial_points_disadvantage" value="0" />
+	<input type="hidden" name="attr_tech_level_points_advantage" value="0" />
+	<input type="hidden" name="attr_tech_level_points_disadvantage" value="0" />
+	<input type="hidden" name="attr_language_points_advantage" value="0" />
+	<input type="hidden" name="attr_language_points_disadvantage" value="0" />
 	<input type="hidden" name="attr_languages_points" value="0" />
 	<input type="hidden" name="attr_cf_points" value="0" />
 	<input type="hidden" name="attr_advantages_points" value="0" />
@@ -4276,7 +4284,6 @@
 	<input type="hidden" name="attr_skills_points" value="0" />
 	<input type="hidden" name="attr_techniques_points" value="0" />
 	<input type="hidden" name="attr_techniques_revised_points" value="0" />
-	<input type="hidden" name="attr_skill_points" value="0" />
 	<input type="hidden" name="attr_spells_points" value="0" />
 	<input type="hidden" name="attr_announcements_hide" value="0" />
 	<input type="hidden" name="attr_inventory_fixed_digits" value="0" />
@@ -4353,6 +4360,7 @@
 
 				<!-- current version notes: 2.9.2 -->			
 				<ul>
+					<li><b>Important:</b> Point Summary Table. Added a new option for the GCA5 format. In addition, any negative attributes or a negative racial template total are treated as disadvantages.</li>
 					<li>For Skills, Melee, and Ranged tables, if the <b>Max skill of 9</b> is visible, if it is checked/unchecked the effective skill is now updated to reflect the checkbox.</li>
 					<li>Roll Modifier Tools. Each repeating section has a toolbar to modify the effective skill and other roll traits. 
 						<ul>
@@ -4362,6 +4370,7 @@
 					<li>Repeating Skills - Attribute drop-down. The value for <b>10</b> is highleghted to show that a non-standard value was selected. This is helpful if something happened while importing the character.</li>
 					<li>Repeating Languages - Add a checkbox for Language Talent. If checked the drop-down will be updated to show the new costs. You can also modifier the costs of spoken/written for special circumstances.</li>
 					<li>General Tab - The <b>turning and velocity modifiers</b> tool is no longer hidden by a toggle button.</li>
+					<li>Grimoire Table - Updated the tooltip for <b>Resist</b> column name.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -6535,22 +6544,25 @@ PC in Character Points (spent and unspent combined).
 						<input type="text" name="attr_total_points" value="150" title="Macro: @{NAME|total_points}" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row margin-bottom row-spent hr">
 					<div class="cell col0 label">
 						<span data-i18n="spent-label">Spent</span>
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_point_summary" disabled="disabled" value="@{att_points} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skill_points} + @{techniques_points} + @{techniques_revised_points} + @{spells_points} + @{misc_points}" title="Macro: @{NAME|point_summary}" />
+						<input type="text" name="attr_point_summary" disabled="disabled" value="@{attribute_positive_total} + @{attribute_negative_total} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} + @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skills_points} + @{techniques_points} + @{techniques_revised_points} + @{spells_points} + @{misc_points_detailed}" title="Macro: @{NAME|point_summary}" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row margin-bottom row-total hr">
 					<div class="cell col0 label">
 						<span data-i18n="unspent-label">Unspent</span>
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_point_diff" value="@{total_points} - (@{att_points} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skill_points} + @{techniques_points} + @{techniques_revised_points} + @{spells_points} + @{misc_points})" disabled="disabled" title="Macro: @{NAME|point_diff}" />
+						<input type="text" name="attr_point_diff" value="@{total_points} - (@{attribute_positive_total} + @{attribute_negative_total} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skills_points} + @{techniques_points} + @{techniques_revised_points} + @{spells_points} + @{misc_points_detailed})" disabled="disabled" title="Macro: @{NAME|point_diff}" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row margin-bottom row-unspent hr">
 					<div class="cell col0 label unspent-points-label">
 						<span data-i18n="unspent-label">Unspent</span>
@@ -6560,268 +6572,516 @@ PC in Character Points (spent and unspent combined).
 					</div>
 				</div> <!-- .row -->
 				
-				<input type="hidden" class="point-summary-layout" name="attr_point_summary_layout" value="1" />
-				
-				<div class="row row-traits gca hr">
-					<div class="cell title">
-						<div class="popup">
-							<span data-i18n="gca-format-label">GCA4 Format</span>
-						</div>
-						<span class="tooltip">
-							<span data-i18n="gca-format-tooltip">
-GURPS Character Assistant (GCA4) Format<br />
-To change to GCS or Detailed go to options tab<br />
-and change the radio button for <b>Point Summary Layout</b>
+				<input type="hidden" class="point-summary-layout" name="attr_point_summary_layout" value="4" />
+
+				<!-- Point Summary GCA5 Format -->
+				<div class="point-summary-gca5">
+
+					<div class="row row-traits hr">
+						<div class="cell title">
+							<div class="popup">
+								<span data-i18n="gca5-format-label">GCA5 Format</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="gca5-format-tooltip">
+	GURPS Character Assistant (GCA5) Format<br />
+	To change to GCS or Detailed go to options tab<br />
+	and change the radio button for <b>Point Summary Layout</b>
+								</span>
 							</span>
-						</span>
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits gcs hr">
-					<div class="cell title">
-						<div class="popup">
-							<span data-i18n="gcs-format-label">GCS Format</span>
 						</div>
-						<span class="tooltip">
-							<span data-i18n="gcs-format-format-tooltip">
-GURPS Character Sheet (GCS) format<br />
-To change to GCA or Detailed go to options tab<br />
-and change the radio button for <b>Point Summary Layout</b>
+					</div> <!-- .row -->
+
+					<div class="row row-attributes">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="attributes-label">Attributes</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="points-summary-for-attributes-tooltip">
+	Point Summary for: <br />
+	ST, DX, IQ, HT,<br />
+	HP, FP, Energy Reserve One, Two, and Three,<br />
+	Per, Vision, Hearing, Smell, Touch,<br />
+	Will, Fright, Unconsciousness, Death,<br />
+	Speed, Move, Lift ST, Striking ST,<br />
+	Flying, Air Move, Enhanced Air Move, Super Jump
+								</span>
 							</span>
-						</span>
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits all hr">
-					<div class="cell title">
-						<div class="popup">
-							<span data-i18n="detailed-format-label">Detailed Format</span>
 						</div>
-						<span class="tooltip">
-							<span data-i18n="detailed-format-tooltip">
-To change to GCA4 or GCS go to options tab<br />
-and change the radio button for <b>Point Summary Layout</b>
+						<div class="cell col1">
+							<input type="text" name="attr_attribute_total_gca5" value="@{attribute_positive_total}" disabled="disabled" title="Macro: @{NAME|attribute_total_gca5}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-languages-label">Lang.</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="point-summary-for-languages-tooltip">Languages Point Summary</span>
 							</span>
-						</span>
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits gcs">
-					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="race-label">Race</span>
 						</div>
-						<span class="tooltip">
-							<span data-i18n="race-point-summary-tooltip">Point Summary for Racial Traits.</span>
-						</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_trait_racial_points" disabled="disabled" value="@{racial_points}" title="Macro: @{NAME|trait_racial_points}">
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits all">
-					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="race-label">Race</span>
+						<div class="cell col1">
+							<input type="text" name="attr_trait_advantages_language_points_gca5" disabled="disabled" value="@{languages_points}" title="Macro: @{NAME|trait_advantages_language_points_gca5}" />
 						</div>
-						<span class="tooltip">
-							<span data-i18n="race-point-summary-tooltip">Point Summary for Racial Traits.</span>
-						</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_trait_racial_points" disabled="disabled" value="@{racial_points}" title="Macro: @{NAME|trait_racial_points}">
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-attributes">
-					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="attributes-label">Attributes</span>
-						</div>
-						<span class="tooltip">
-							<span data-i18n="points-summary-for-attributes-tooltip">
-Point Summary for: <br />
-ST, DX, IQ, HT,<br />
-HP, FP, Energy Reserve One, Two, and Three,<br />
-Per, Vision, Hearing, Smell, Touch,<br />
-Will, Fright, Unconsciousness, Death,<br />
-Speed, Move, Lift ST, Striking ST,<br />
-Flying, Air Move, Enhanced Air Move, Super Jump
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-advantages-label">Adv.</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="gca5-point-summary-for-advantages-tooltip">
+	Point Summary for the following trais with <b>Positive values</b>: <br />
+	Tech Level, Cultural Familiarities,<br />
+	Advantages, and Racial traits.
+								</span>
 							</span>
-						</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_att_points" value="@{strength_points} + @{dexterity_points} + @{intelligence_points} + @{health_points} + @{perception_points} + @{vision_points} + @{hearing_points} + @{taste_smell_points} + @{touch_points} + @{willpower_points} + @{fear_check_points} + @{hit_points_points} + @{fatigue_points_points} + @{energy_points_points} + @{user_pool1_points} + @{user_pool2_points} + @{basic_speed_points} + @{basic_move_points} + @{striking_st_points} + @{lift_st_points} + @{enhanced_ground_move_points} + @{flight_points} + @{basic_air_move_points} + racial_points@{enhanced_air_move_points} + @{amphibious_points} + @{basic_water_move_points} + @{enhanced_water_move_points} + @{super_jump_points} + @{unconscious_check_points} + @{death_check_points}" disabled="disabled" title="Macro: @{NAME|att_points}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits gca">
-					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="abbreviation-advantages-label">Adv.</span>
 						</div>
-						<span class="tooltip">
-							<span data-i18n="gca-point-summary-for-advantages-tooltip">
-Point Summary for: <br />
-Languages, Tech Level, Cultural Familiarities,<br />
-Advantages, and Racial traits.
+						<div class="cell col1">
+							<input type="text" name="attr_trait_advantages_points_gca5" disabled="disabled" value="@{tech_level_points_advantage} + @{cf_points} + @{racial_points_advantage} + @{advantages_points}" title="Macro: @{NAME|trait_advantages_points_gca5}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<span data-i18n="perks-label">Perks</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_advantages_perks_display_gca5" disabled="disabled" value="@{advantages_perks}" title="Macro: @{NAME|advantages_perks_display_gca5}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-disadvantages-label">Disadv.</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="point-summary-for-disadvantages-no-language-tooltip">Point Summary for Disadvantages, <b>NOT</b> including traits with negative values.</span>
 							</span>
-						</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_trait_advantages_points" disabled="disabled" value="@{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} + @{advantages_points}" title="Macro: @{NAME|trait_advantages_points}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits gcs">
-					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="abbreviation-advantages-label">Adv.</span>
 						</div>
-						<span class="tooltip">
-							<span data-i18n="gcs-point-summary-for-advantages-tooltip">
-Point Summary for: <br />
-Languages, Tech Level, Cultural Familiarities,<br />
-Advantages, and Perks.
+						<div class="cell col1">
+							<input type="text" name="attr_trait_disadvantages_points_gca5" disabled="disabled" value="@{disadvantages_points} + @{racial_points_disadvantage} + @{attribute_negative_total} + @{tech_level_points_disadvantage}" title="Macro: @{NAME|trait_disadvantages_points_gca5}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<span data-i18n="quirks-label">Quirks</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_disadvantages_quirks_display_gca5" disabled="disabled" value="@{disadvantages_quirks}" title="Macro: @{NAME|disadvantages_quirks_display_gca5}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-skills">
+						<div class="cell col0 label">
+							<span data-i18n="skills-label">Skills</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_skill_technique_points_gca5" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{techniques_revised_points}" title="Macro: @{NAME|skill_technique_points_gca5}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-skills">
+						<div class="cell col0 label">
+							<span data-i18n="spells-label">Spells</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_spells_total_points_gca5" disabled="disabled" value="@{spells_points}" title="Macro: @{NAME|spell_total_points_gca5}" />
+						</div>
+					</div> <!-- .row -->
+
+				</div><!-- End Point Summary GCA5 Format -->
+				
+				<!-- Point Summary GCA4 Format -->
+				<div class="point-summary-gca4">
+
+					<div class="row row-traits hr">
+						<div class="cell title">
+							<div class="popup">
+								<span data-i18n="gca-format-label">GCA4 Format</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="gca-format-tooltip">
+	GURPS Character Assistant (GCA4) Format<br />
+	To change to GCS or Detailed go to options tab<br />
+	and change the radio button for <b>Point Summary Layout</b>
+								</span>
 							</span>
-						</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_trait_advantages_points_gcs" disabled="disabled" value="@{languages_points} +  @{tl_pts} +  @{cf_points} + @{advantages_points} + @{advantages_perks}" title="Macro: @{NAME|trait_advantages_points_gcs}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits all">
-					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="abbreviation-advantages-label">Adv.</span>
 						</div>
-						<span class="tooltip">
-							<span data-i18n="detailed-point-summary-for-advantages-tooltip">
-Point Summary for: <br />
-Languages, Tech Level, Cultural Familiarities,<br />
-and Advantages.
+					</div> <!-- .row -->
+
+					<div class="row row-attributes">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="attributes-label">Attributes</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="points-summary-for-attributes-tooltip">
+	Point Summary for: <br />
+	ST, DX, IQ, HT,<br />
+	HP, FP, Energy Reserve One, Two, and Three,<br />
+	Per, Vision, Hearing, Smell, Touch,<br />
+	Will, Fright, Unconsciousness, Death,<br />
+	Speed, Move, Lift ST, Striking ST,<br />
+	Flying, Air Move, Enhanced Air Move, Super Jump
+								</span>
 							</span>
-						</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_trait_advantages_points_all" disabled="disabled" value="@{languages_points} + @{tl_pts} + @{cf_points} + @{advantages_points}" title="Macro: @{NAME|trait_advantages_points_all}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits gca">
-					<div class="cell col0 label">
-						<span data-i18n="perks-label">Perks</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_advantages_perks_display" disabled="disabled" value="@{advantages_perks}" title="Macro: @{NAME|advantages_perks_display}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits all">
-					<div class="cell col0 label">
-						<span data-i18n="perks-label">Perks</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_advantages_perks_display" disabled="disabled" value="@{advantages_perks}" title="Macro: @{NAME|advantages_perks_display}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits">
-					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="abbreviation-disadvantages-label">Disadv.</span>
 						</div>
-						<span class="tooltip">
-							<span data-i18n="point-summary-for-disadvantages-tooltip">Point Summary for Disadvantages</span>
-						</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_trait_disadvantages_points" disabled="disabled" value="@{disadvantages_points}" title="Macro: @{NAME|trait_disadvantages_points}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-traits">
-					<div class="cell col0 label">
-						<span data-i18n="quirks-label">Quirks</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_disadvantages_quirks_display" disabled="disabled" value="@{disadvantages_quirks}" title="Macro: @{NAME|disadvantages_quirks_display}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-skills gca">
-					<div class="cell col0 label">
-						<span data-i18n="skills-label">Skills</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_skill_technique_points" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{techniques_revised_points}" title="Macro: @{NAME|skill_technique_points}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-skills gcs">
-					<div class="cell col0 label">
-						<span data-i18n="skills-label">Skills</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_skill_technique_points" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{techniques_revised_points}" title="Macro: @{NAME|skill_technique_points}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-skills all">
-					<div class="cell col0 label">
-						<span data-i18n="skills-label">Skills</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_skill_points" disabled="disabled" value="@{skills_points}" title="Macro: @{NAME|skill_points}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-skills all">
-					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="abbreviation-techniques-label">Tech.</span>
+						<div class="cell col1">
+							<input type="text" name="attr_attribute_total_gca4" value="@{attribute_positive_total}" disabled="disabled" title="Macro: @{NAME|attribute_total_gca4}" />
 						</div>
-						<span class="tooltip">
-							<span data-i18n="point-summary-techniques-tooltip">Techniques</span>
-						</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_techniques_total_points" disabled="disabled" value="@{techniques_points}" title="Macro: @{NAME|techniques_total_points}" />
-					</div>
-				</div> <!-- .row -->
-				
-				<div class="row row-skills all">
-					<div class="cell col0 label">
-						<div class="popup">
-							<span data-i18n="abbreviation-techniques-revised-label">Tech. (r)</span>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-advantages-label">Adv.</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="gca-point-summary-for-advantages-tooltip">
+	Point Summary for: <br />
+	Languages, Tech Level, Cultural Familiarities,<br />
+	Advantages, and Racial traits.
+								</span>
+							</span>
 						</div>
-						<span class="tooltip">
-							<span data-i18n="point-summary-for-techniques-revised-tooltip">Techniques Revised</span>
-						</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_techniques_total_points" disabled="disabled" value="@{techniques_revised_points}" title="Macro: @{NAME|techniques_total_points}" />
-					</div>
-				</div> <!-- .row -->
-				<div class="row row-skills">
-					<div class="cell col0 label">
-						<span data-i18n="spells-label">Spells</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_spells_total_points" disabled="disabled" value="@{spells_points}" title="Macro: @{NAME|spell_total_points}" />
-					</div>
-				</div> <!-- .row -->
+						<div class="cell col1">
+							<input type="text" name="attr_trait_advantages_points_gca4" disabled="disabled" value="@{language_points_advantage} + @{tech_level_points_advantage} + @{cf_points} + @{racial_points_advantage} + @{advantages_points}" title="Macro: @{NAME|trait_advantages_points_gca4}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<span data-i18n="perks-label">Perks</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_advantages_perks_display" disabled="disabled" value="@{advantages_perks}" title="Macro: @{NAME|advantages_perks_display}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-disadvantages-label">Disadv.</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="point-summary-for-disadvantages-tooltip">Point Summary for Disadvantages, <b>NOT</b> including traits with negative values.</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_trait_disadvantages_points_gca4" disabled="disabled" value="@{disadvantages_points} + @{racial_points_disadvantage} + @{attribute_negative_total} + @{tech_level_points_disadvantage} + @{language_points_disadvantage}" title="Macro: @{NAME|trait_disadvantages_points_gca4}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<span data-i18n="quirks-label">Quirks</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_disadvantages_quirks_display_gca4" disabled="disabled" value="@{disadvantages_quirks}" title="Macro: @{NAME|disadvantages_quirks_display_gca4}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-skills">
+						<div class="cell col0 label">
+							<span data-i18n="skills-label">Skills</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_skill_technique_points_gca4" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{techniques_revised_points}" title="Macro: @{NAME|skill_technique_points_gca4}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-skills">
+						<div class="cell col0 label">
+							<span data-i18n="spells-label">Spells</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_spells_total_points_gca4" disabled="disabled" value="@{spells_points}" title="Macro: @{NAME|spell_total_points_gca4}" />
+						</div>
+					</div> <!-- .row -->
+
+				</div><!-- End Point Summary GCA4 Format -->
 				
-				<div class="row row-other all">
-					<div class="cell col0 label">
-						<span data-i18n="other-label">Other</span>
-					</div>
-					<div class="cell col1">
-						<input type="text" name="attr_misc_points" value="0" title="Macro: @{NAME|misc_points}" />
-					</div>
-				</div> <!-- .row -->
+				<!-- Point Summary GCS Format -->
+				<div class="point-summary-gcs">
+
+					<div class="row row-traits hr">
+						<div class="cell title">
+							<div class="popup">
+								<span data-i18n="gcs-format-label">GCS Format</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="gcs-format-format-tooltip">
+	GURPS Character Sheet (GCS) format<br />
+	To change to GCA or Detailed go to options tab<br />
+	and change the radio button for <b>Point Summary Layout</b>
+								</span>
+							</span>
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="race-label">Race</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="race-point-summary-tooltip">Point Summary for Racial Traits.</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_trait_racial_points_gcs" disabled="disabled" value="@{racial_points}" title="Macro: @{NAME|trait_racial_points_gcs}">
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-attributes">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="attributes-label">Attributes</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="points-summary-for-attributes-tooltip">
+	Point Summary for: <br />
+	ST, DX, IQ, HT,<br />
+	HP, FP, Energy Reserve One, Two, and Three,<br />
+	Per, Vision, Hearing, Smell, Touch,<br />
+	Will, Fright, Unconsciousness, Death,<br />
+	Speed, Move, Lift ST, Striking ST,<br />
+	Flying, Air Move, Enhanced Air Move, Super Jump
+								</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_attribute_total_gcs" value="@{attribute_positive_total}" disabled="disabled" title="Macro: @{NAME|attribute_total_gcs}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-advantages-label">Adv.</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="gcs-point-summary-for-advantages-tooltip">
+	Point Summary for: <br />
+	Languages, Tech Level, Cultural Familiarities,<br />
+	Advantages, and Perks.
+								</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_trait_advantages_points_gcs" disabled="disabled" value="@{language_points_advantage} + @{tech_level_points_advantage} + @{cf_points} + @{advantages_points} + @{advantages_perks}" title="Macro: @{NAME|trait_advantages_points_gcs}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-disadvantages-label">Disadv.</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="point-summary-for-disadvantages-no-racial-cost-tooltip">Point Summary for Disadvantages, <b>NOT</b> including traits with negative values.</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_trait_disadvantages_points_gcs" disabled="disabled" value="@{disadvantages_points} + @{attribute_negative_total} + @{tech_level_points_disadvantage} + @{language_points_disadvantage}" title="Macro: @{NAME|trait_disadvantages_points_gcs}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<span data-i18n="quirks-label">Quirks</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_disadvantages_quirks_display_gcs" disabled="disabled" value="@{disadvantages_quirks}" title="Macro: @{NAME|disadvantages_quirks_display_gcs}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-skills">
+						<div class="cell col0 label">
+							<span data-i18n="skills-label">Skills</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_skill_technique_points_gcs" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{techniques_revised_points}" title="Macro: @{NAME|skill_technique_points_gcs}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-skills">
+						<div class="cell col0 label">
+							<span data-i18n="spells-label">Spells</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_spells_total_points_gcs" disabled="disabled" value="@{spells_points}" title="Macro: @{NAME|spell_total_points_gcs}" />
+						</div>
+					</div> <!-- .row -->
+
+				</div><!-- End Point Summary GCS Format -->
+
+				<!-- Point Summary Detailed Format -->
+				<div class="point-summary-detailed">
+
+					<div class="row row-traits hr">
+						<div class="cell title">
+							<div class="popup">
+								<span data-i18n="detailed-format-label">Detailed Format</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="detailed-format-tooltip">
+	To change to GCA4 or GCS go to options tab<br />
+	and change the radio button for <b>Point Summary Layout</b>
+								</span>
+							</span>
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="race-label">Race</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="race-point-summary-tooltip">Point Summary for Racial Traits.</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_trait_racial_points_detailed" disabled="disabled" value="@{racial_points}" title="Macro: @{NAME|trait_racial_points_detailed}">
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-attributes">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="attributes-label">Attributes</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="points-summary-for-attributes-tooltip">
+	Point Summary for: <br />
+	ST, DX, IQ, HT,<br />
+	HP, FP, Energy Reserve One, Two, and Three,<br />
+	Per, Vision, Hearing, Smell, Touch,<br />
+	Will, Fright, Unconsciousness, Death,<br />
+	Speed, Move, Lift ST, Striking ST,<br />
+	Flying, Air Move, Enhanced Air Move, Super Jump
+								</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_attribute_total_detailed" value="@{attribute_positive_total}" disabled="disabled" title="Macro: @{NAME|attribute_total_detailed}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-advantages-label">Adv.</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="detailed-point-summary-for-advantages-tooltip">
+	Point Summary for: <br />
+	Languages, Tech Level, Cultural Familiarities,<br />
+	and Advantages.
+								</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_trait_advantages_points_all_detailed" disabled="disabled" value="@{language_points_advantage} + @{tech_level_points_advantage} + @{cf_points} + @{advantages_points}" title="Macro: @{NAME|trait_advantages_points_all_detailed}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<span data-i18n="perks-label">Perks</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_advantages_perks_display_detailed" disabled="disabled" value="@{advantages_perks}" title="Macro: @{NAME|advantages_perks_display_detailed}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-disadvantages-label">Disadv.</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="point-summary-for-disadvantages-no-racial-cost-tooltip">Point Summary for Disadvantages, <b>NOT</b> including traits with negative values.</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_trait_disadvantages_points_detailed_detailed" disabled="disabled" value="@{disadvantages_points} + @{attribute_negative_total} + @{tech_level_points_disadvantage} + @{language_points_disadvantage}" title="Macro: @{NAME|trait_disadvantages_points_detailed_detailed}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-traits">
+						<div class="cell col0 label">
+							<span data-i18n="quirks-label">Quirks</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_disadvantages_quirks_display_detailed" disabled="disabled" value="@{disadvantages_quirks}" title="Macro: @{NAME|disadvantages_quirks_display_detailed}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-skills">
+						<div class="cell col0 label">
+							<span data-i18n="skills-label">Skills</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_skill_points_detailed" disabled="disabled" value="@{skills_points}" title="Macro: @{NAME|skill_points_detailed}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-skills">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-techniques-label">Tech.</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="point-summary-techniques-tooltip">Techniques</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_techniques_total_points_detailed" disabled="disabled" value="@{techniques_points}" title="Macro: @{NAME|techniques_total_points_detailed}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-skills">
+						<div class="cell col0 label">
+							<div class="popup">
+								<span data-i18n="abbreviation-techniques-revised-label">Tech. (r)</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="point-summary-for-techniques-revised-tooltip">Techniques Revised</span>
+							</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_techniques_total_points_detailed" disabled="disabled" value="@{techniques_revised_points}" title="Macro: @{NAME|techniques_total_points_detailed}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-skills">
+						<div class="cell col0 label">
+							<span data-i18n="spells-label">Spells</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_spells_total_points_gcs" disabled="disabled" value="@{spells_points}" title="Macro: @{NAME|spell_total_points_gcs}" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-other">
+						<div class="cell col0 label">
+							<span data-i18n="other-label">Other</span>
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_misc_points_detailed" value="0" title="Macro: @{NAME|misc_points_detailed}" />
+						</div>
+					</div> <!-- .row -->
+
+				</div><!-- End Point Summary Detailed Format -->
 				
 			</div> <!-- .table -->
 		</div> <!-- box points -->
@@ -14225,6 +14485,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 				<li>Repeating Skills - Attribute drop-down. The value for <b>10</b> is highleghted to show that a non-standard value was selected. This is helpful if something happened while importing the character.</li>
 				<li>Repeating Languages - Add a checkbox for Language Talent. If checked the drop-down will be updated to show the new costs. You can also modifier the costs of spoken/written for special circumstances.</li>
 				<li>General Tab - The <b>turning and velocity modifiers</b> tool is no longer hidden by a toggle button.</li>
+				<li>Grimoire Table - Updated the tooltip for <b>Resist</b> column name.</li>
 			</ul>
 			
 			<h4>Version: 2.9.1</h4>
@@ -15123,12 +15384,21 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 						</h4>
 						
 						<div>
+							<input type="radio" name="attr_point_summary_layout" value="4" checked="checked" />
+							<span class="popup">
+								<span data-i18n="abbreviation-gurps-character-assistant5-label">GCA5</span>
+							</span>
+							<span class="tooltip" style="margin-left: 0;">
+								<span data-i18n="gurps-character-assistant5-tooltip">GURPS Character Assistant 5.</span>
+							</span>
+						</div>
+						<div>
 							<input type="radio" name="attr_point_summary_layout" value="1" checked="checked" />
 							<span class="popup">
 								<span data-i18n="abbreviation-gurps-character-assistant-label">GCA4</span>
 							</span>
 							<span class="tooltip" style="margin-left: 0;">
-								<span data-i18n="gurps-character-assistant-tooltip">GURPS Character Assistant.</span>
+								<span data-i18n="gurps-character-assistant-tooltip">GURPS Character Assistant 4.</span>
 							</span>
 						</div>
 						<div>
@@ -18757,6 +19027,14 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		setRangedMaxMalfunctionValues();
 
 		updateRepeatingLanguages();
+
+		totalAttributeCharacterPoints();
+
+		updateRacialCharacterPoints();
+
+		updateTechLevelPoints();
+
+		updateLanguagePoints();
 	
 	}
 	
@@ -34241,6 +34519,14 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			resyncRepeatingSpells();
 
+			totalAttributeCharacterPoints();
+
+			updateRacialCharacterPoints();
+
+			updateTechLevelPoints();
+
+			updateLanguagePoints();
+
 			resetResyncButtonSate();
 
 		});
@@ -35286,6 +35572,164 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			attributes[`${baseFieldName}_notes`] = skill.SpellNotes;
 
 			await setAttrsAsync(attributes);
+
+		});
+
+	}
+
+	/* Character Point Total Methods */
+	const arrCheckForAttributes = [
+		"strength_points",
+		"dexterity_points",
+		"intelligence_points",
+		"health_points",
+		"perception_points",
+		"vision_points",
+		"hearing_points",
+		"taste_smell_points",
+		"touch_points",
+		"willpower_points",
+		"fear_check_points",
+		"hit_points_points",
+		"fatigue_points_points",
+		"energy_points_points",
+		"user_pool1_points",
+		"user_pool2_points",
+		"basic_speed_points",
+		"basic_move_points",
+		"striking_st_points",
+		"lift_st_points",
+		"enhanced_ground_move_points",
+		"flight_points",
+		"basic_air_move_points",
+		"enhanced_air_move_points",
+		"amphibious_points",
+		"basic_water_move_points",
+		"enhanced_water_move_points",
+		"super_jump_points",
+		"unconscious_check_points",
+		"death_check_points",
+	];
+
+	// get on change string
+	const onChangeAttributes = arrCheckForAttributes.map(attribute => {
+		return `change:${attribute}`;
+	}).join(" ");
+
+	on(onChangeAttributes, (event) => {
+
+		// only run if player instigated the change
+		if (event.sourceType === "player") {
+			totalAttributeCharacterPoints();
+		}
+
+	});
+
+	function totalAttributeCharacterPoints() {
+
+		getAttrs(arrCheckForAttributes, (values) => {
+
+			let positivePointTotal = 0;
+
+			let negativePointTotal = 0;
+
+			// https://atomizedobjects.com/blog/javascript/how-to-use-foreach-with-an-object-in-javascript/ 
+			Object.entries(values).forEach(([key, value]) => {
+
+				let characterPoints = Number(value) || 0;
+
+				if (characterPoints < 0) {
+					negativePointTotal += characterPoints;
+
+				} else {
+					positivePointTotal += characterPoints;
+					
+				}
+
+			});
+
+			let updateFields = {
+				attribute_positive_total: positivePointTotal,
+				attribute_negative_total: negativePointTotal,
+
+			};
+
+			setAttrs(updateFields);
+
+		});
+
+	}
+
+	on("change:racial_points", (event) => {
+
+		updateRacialCharacterPoints();
+
+	});
+
+	function updateRacialCharacterPoints() {
+
+		getAttrs(["racial_points"], (values) => {
+
+			const racialPoints = Number(values.racial_points) || 0;
+
+			const racialPointsPositive = racialPoints >= 0 ? racialPoints : 0;
+
+			const racialPointsNegative = racialPoints < 0 ? racialPoints : 0;
+
+			setAttrs({
+				racial_points_advantage: racialPointsPositive,
+				racial_points_disadvantage: racialPointsNegative
+			});
+
+		});
+
+	}
+
+	on("change:tl_pts", event => {
+
+		updateTechLevelPoints();
+
+	});
+
+	function updateTechLevelPoints() {
+
+		getAttrs(["tl_pts"], (values) => {
+
+			const tlPoints = Number(values.tl_pts) || 0;
+
+			const tlPointsPositive = tlPoints >= 0 ? tlPoints : 0;
+
+			const tlPointsNegative = tlPoints < 0 ? tlPoints : 0;
+
+			setAttrs({
+				tech_level_points_advantage: tlPointsPositive,
+				tech_level_points_disadvantage: tlPointsNegative
+			});
+
+		});
+
+	}
+
+	on("change:languages_points", event => {
+
+		updateLanguagePoints();
+
+	});
+
+	function updateLanguagePoints() {
+
+		getAttrs(["languages_points"], (values) => {
+
+			const languagePoints = Number(values.languages_points) || 0;
+
+			const languagePointsPositive = languagePoints >= 0 ? languagePoints : 0;
+
+			const languagePointsNegative = languagePoints < 0 ? languagePoints : 0;
+
+			setAttrs({
+				language_points_advantage: languagePointsPositive,
+				language_points_disadvantage: languagePointsNegative
+			});
 
 		});
 
