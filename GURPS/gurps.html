@@ -4371,6 +4371,7 @@
 					<li>Repeating Languages - Add a checkbox for Language Talent. If checked the drop-down will be updated to show the new costs. You can also modifier the costs of spoken/written for special circumstances.</li>
 					<li>General Tab - The <b>turning and velocity modifiers</b> tool is no longer hidden by a toggle button.</li>
 					<li>Grimoire Table - Updated the tooltip for <b>Resist</b> column name.</li>
+					<li>GCA5 Import. Equipment cost is rounded to 2 decimal places. Weight is rounded to 3 decimal places.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -14486,6 +14487,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 				<li>Repeating Languages - Add a checkbox for Language Talent. If checked the drop-down will be updated to show the new costs. You can also modifier the costs of spoken/written for special circumstances.</li>
 				<li>General Tab - The <b>turning and velocity modifiers</b> tool is no longer hidden by a toggle button.</li>
 				<li>Grimoire Table - Updated the tooltip for <b>Resist</b> column name.</li>
+				<li>GCA5 Import. Equipment cost is rounded to 2 decimal places. Weight is rounded to 3 decimal places.</li>
 			</ul>
 			
 			<h4>Version: 2.9.1</h4>
@@ -16163,7 +16165,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 						<li>Open GCA5 and a character</li>
 						<li>Click on File -> Export...</li>
 						<li>Save the character and note where you saved it.</li>
-						<li>Open the file in a text editor, NOT a web browser.</li>
+					</ul>
+
+					<h5>How to import</h5>
+
+					<ul>
+						<li>Open the file in a text editor, <b style="color:red;">NOT</b> a web browser.</li>
 						<li>Copy the content and paste it into the box to the right.</li>
 					</ul>
 	
@@ -17834,7 +17841,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const version = "2.9.2";
 	
-	const latestChangesDate = "12/9/2022";
+	const latestChangesDate = "1/1/2023";
 	
 	let modCascade = true;
 	
@@ -30158,7 +30165,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			"unconscious_check_mod": 0,
 			"death_check_mod": 0,
 			"apply_size_modifier": 0,
-			"import_message": "Import has completed.",
+			"import_message": "Import has completed. Please wait a minute or two for Roll20 to finish processing the data.",
 			"json_data": "",
 			"templates": [],
 			"templateNotes": "",
@@ -30197,8 +30204,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 										delete runningTotals.templateNames;
 										delete runningTotals.templateNotes;
 	
-										// TODO: add callback to delete orphaned records
-										setAttrs(runningTotals);
+										setAttrs(runningTotals, {silent: false}, totalAttributeCharacterPoints);
 	
 									});
 	
@@ -33598,11 +33604,21 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		}
 	
 		if (item.basecost) {
-			rows[`${baseFieldName}_cost`] = Number(item.basecost);
+			let cost = Number(item.basecost);
+
+			// round to 2 decimal places
+			cost = Number(Math.round(cost * 100) / 100).toFixed(2);
+
+			rows[`${baseFieldName}_cost`] = cost;
 		}
 	
 		if (item.baseweight) {
-			rows[`${baseFieldName}_weight`] = Number(item.baseweight);
+			let weight = Number(item.baseweight);
+
+			// round to 3 decimal places
+			weight = Number(Math.round(weight * 100) / 100).toFixed(3);
+
+			rows[`${baseFieldName}_weight`] = weight;
 		}
 	
 		if (importNotes) {
@@ -34791,9 +34807,13 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			await setAttrsAsync({combat_reflexes: applyCombatReflexes});
 
+			// finally re-total attribute totals. 
+			await totalAttributeCharacterPointsAsync();
+
+
 			setAttrs({ 
 				import_json_state: "normal",
-				import_json_message: "Import has completed!",
+				import_json_message: "Import has completed! Please wait a minute or two for Roll20 to finish processing the data.",
 				character_json_data: ""
 				});
 
@@ -35499,6 +35519,16 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			let rowId = generateOrGetRowId(uniqueKeys, trait.Idkey);
 
+			let cost = Number(trait.Cost) || 0;
+
+			// round to 2 decimal places
+			cost = Number(Math.round(cost * 100) / 100).toFixed(2);
+
+			let weight = Number(trait.Weight) || 0;
+
+			// round to 3 decimal places
+			weight = Number(Math.round(weight * 100) / 100).toFixed(3);
+
 			let baseFieldName = `repeating_item_${rowId}`;
 
 			let attributes = {};
@@ -35515,9 +35545,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			attributes[`${baseFieldName}_count`] = parseInt(trait.Count);
 
-			attributes[`${baseFieldName}_cost`] = Number(trait.Cost);
+			attributes[`${baseFieldName}_cost`] = cost;
 
-			attributes[`${baseFieldName}_weight`] = Number(trait.Weight);
+			attributes[`${baseFieldName}_weight`] = weight;
 
 			attributes[`${baseFieldName}_notes`] = trait.Notes;
 
@@ -35659,6 +35689,42 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		});
 
 	}
+
+	let totalAttributeCharacterPointsAsync = async () => {
+
+		let values = await getAttrsAsync(arrCheckForAttributes);
+
+		let positivePointTotal = 0;
+
+
+		let negativePointTotal = 0;
+
+		// https://atomizedobjects.com/blog/javascript/how-to-use-foreach-with-an-object-in-javascript/ 
+		Object.entries(values).forEach(([key, value]) => {
+
+			let characterPoints = Number(value) || 0;
+
+			if (characterPoints < 0) {
+				negativePointTotal += characterPoints;
+
+			} else {
+				positivePointTotal += characterPoints;
+				
+			}
+
+		});
+
+		let updateFields = {
+			attribute_positive_total: positivePointTotal,
+			attribute_negative_total: negativePointTotal,
+
+		};
+
+		await setAttrsAsync(updateFields);
+		
+	}
+
+
 
 	on("change:racial_points", (event) => {
 
