@@ -13161,21 +13161,82 @@ Click again to switch to Manual and Remote">
 
             <details>
                 <summary class="settings-caption" >Defense settings</summary>
-                <div style="display: flex">
-                    <label for="parrySkill">
-                        <span>Parry Skill</span>
-                        <select id="parrySkill" name="attr_parrySkill" title="Skill to use">
-                            <option value="45" selected>Blades</option>
-                            <option value="46">Clubs</option>
-                        </select>
-                    </label>
-                    <label for="parryAccuracy">
-                        <span>Parry Accuracy</span>
-                        <input id="parryAccuracy" type="number" title="Accuracy" name="attr_parryAccuracy" value="0">
-                    </label>
+                <details class="sub-settings">
+                    <summary class="settings-caption">Melee</summary>
+                    <div style="display: flex">
+                        <label for="showBlock" class="settings-checkbox">
+                            <input id="showBlock" name="attr_showBlock" type="checkbox"/>
+                            <span>Show Block</span>
+                        </label>
+                        <label for="showCounterstrike" class="settings-checkbox">
+                            <input id="showCounterstrike" name="attr_showCounterstrike" type="checkbox"/>
+                            <span>Show Counterstrike</span>
+                        </label>
+                        <label for="showParry" class="settings-checkbox">
+                            <input id="showParry" name="attr_showParry" type="checkbox"/>
+                            <span>Show Parry</span>
+                        </label>
+                        <label for="showRiposte" class="settings-checkbox">
+                            <input id="showRiposte" name="attr_showRiposte" type="checkbox"/>
+                            <span>Show Riposte</span>
+                        </label>
+                    </div>
 
+                    <input type="hidden" class="counterstrikeToggle"  name="attr_showCounterstrike"/>
+                    <div class="settings-counterstrike" >
+                        <label for="counterstrikeDamage">
+                            <span>Counterstrike Damage</span>
+                            <input id="counterstrikeDamage" type="number" title="Damage" name="attr_counterstrikeDamage" value="0">
+                        </label>
+                        <label for="counterstrikeAp">
+                            <span>Counterstrike AP</span>
+                            <input id="counterstrikeAp" type="number" title="AP" name="attr_counterstrikeAp" value="0">
+                        </label>
+                        <label>
+                            <span>Counterstrike Damage Type</span>
+                            <select class="setting-select" name="attr_counterstrikeWeaponDmgtype" title="Select the Damage Type done by this Weapon">
+                                <option value="P" selected>Physical</option>
+                                <option value="S">Stun</option>
+                                <option value="S(e)">Stun (electric)</option>
+                            </select>
+                        </label>
+                    </div>
 
-                </div>
+                    <input type="hidden" class="parryToggle"  name="attr_showParry"/>
+                    <div class="settings-parry">
+                        <label for="parrySkill">
+                            <span>Parry Skill</span>
+                            <select id="parrySkill" name="attr_parrySkill" title="Skill to use" class="setting-select">
+                                <option value="45" selected>Blades</option>
+                                <option value="46">Clubs</option>
+                            </select>
+                        </label>
+                        <label for="parryAccuracy">
+                            <span>Parry Accuracy</span>
+                            <input id="parryAccuracy" type="number" title="Accuracy" name="attr_parryAccuracy" value="0">
+                        </label>
+                    </div>
+
+                    <input type="hidden" class="riposteToggle"  name="attr_showRiposte"/>
+                    <div class="settings-riposte" title="Riposte uses Parry Settings">
+                        <label for="riposteDamage">
+                            <span>Riposte Damage</span>
+                            <input id="riposteDamage" type="number" title="Damage" name="attr_riposteDamage" value="0">
+                        </label>
+                        <label for="riposteAp">
+                            <span>Riposte AP</span>
+                            <input id="riposteAp" type="number" title="AP" name="attr_riposteAp" value="0">
+                        </label>
+                        <label>
+                            <span>Riposte Damage Type</span>
+                            <select class="setting-select" name="attr_riposteWeaponDmgtype" title="Select the Damage Type done by this Weapon">
+                                <option value="P" selected>Physical</option>
+                                <option value="S">Stun</option>
+                                <option value="S(e)">Stun (electric)</option>
+                            </select>
+                        </label>
+                    </div>
+                </details>
             </details>
         </div>
         <div class="chummerimport">
@@ -13406,8 +13467,13 @@ Click again to switch to Manual and Remote">
         <button type="action" name="act_rollextended"></button>
         <button type="action" name="act_reactdefend"></button>
         <button type="action" name="act_reactdodge"></button>
+
+        <button type="action" name="act_reactmelee"></button>
         <button type="action" name="act_reactparry"></button>
+        <button type="action" name="act_reactriposte"></button>
         <button type="action" name="act_reactblock"></button>
+        <button type="action" name="act_reactcounterstrike"></button>
+
         <button type="action" name="act_reactsoak"></button>
         <button type="action" name="act_reroll"></button>
     </div>
@@ -16992,6 +17058,54 @@ const rollReactDodge = async (ev) => {
     });
 }
 
+/////////////////////
+//  Melee Defense  //
+/////////////////////
+
+on('clicked:reactmelee', async (ev) => {
+    await rollMelee(ev);
+});
+const rollMelee = async (ev) => {
+    let character = await asw.getAttrs(['character_name']);
+    let defendOption = await asw.getAttrs(['showBlock', 'showCounterstrike', 'showParry', 'showRiposte']);
+
+    console.log(defendOption);
+
+    if(defendOption.showBlock == "on" && defendOption.showCounterstrike == 0 && defendOption.showParry == 0 && defendOption.showRiposte == 0) {
+        await rollReactBlock(ev);
+        return;
+    }
+
+    if(defendOption.showBlock == 0 && defendOption.showCounterstrike == "on" && defendOption.showParry == 0 && defendOption.showRiposte == 0) {
+        await rollReactCounterstrike(ev);
+        return;
+    }
+
+    if(defendOption.showBlock == 0 && defendOption.showCounterstrike == 0 && defendOption.showParry == "on" && defendOption.showRiposte == 0) {
+        await rollReactParry(ev);
+        return;
+    }
+
+    if(defendOption.showBlock == 0 && defendOption.showCounterstrike == 0 && defendOption.showParry == 0 && defendOption.showRiposte == "on") {
+        await rollReactRiposte(ev);
+        return;
+    }
+
+    let rollBase = `/w ${character.character_name} &{template:meleedefend}{{passthrough=[[0]]}}{{showBlock=[[0]]}}{{showCounterstrike=[[0]]}}{{showParry=[[0]]}}{{showRiposte=[[0]]}}`;
+    if(defendOption.showBlock == 0 && defendOption.showCounterstrike == 0 && defendOption.showParry == 0 && defendOption.showRiposte == 0) {
+        rollBase += '{{configuration= Melee Defense is not configured. Set it under Character -> Defense Settings -> Melee}}'
+    }
+    let defendRoll = await startRoll(rollBase);
+
+    finishRoll(defendRoll.rollId, {
+        passthrough: ev.originalRollId,
+        showBlock: defendOption.showBlock == "on" ? 1 : 0,
+        showCounterstrike: defendOption.showCounterstrike == "on" ? 1 : 0,
+        showParry: defendOption.showParry == "on" ? 1 : 0,
+        showRiposte: defendOption.showRiposte == "on" ? 1 : 0,
+    });
+}
+
 on('clicked:reactparry', async (ev) => {
     await rollReactParry(ev);
 });
@@ -17008,7 +17122,7 @@ const rollReactParry = async (ev) => {
     let rollBase = `${attrs.gmroll}&{template:reactdefend}{{defend=Parry}}{{nethits=[[0]]}}{{attackAp=[[0]]}}{{attackDamage=[[0]]}}{{attackDmgType=[[0]]}}{{passthrough=[[0]]}}{{name=${attrs.character_name}}}{{attacker_name=${attackRoll.attacker}}}{{rea=[[${attrs.rea_total}}]]}}{{int=[[${attrs.int_total}]]}}{{bonus=[[${attrs.avoid_bonus}]]}}{{skill=${skill[Object.keys(skill)[0]]}}}{{skilldice=[[${skill[Object.keys(skill)[1]]}+${skill[Object.keys(skill)[2]]}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{limit=[[${limit.parryAccuracy}]]}}{{wounds_num=[[${attrs.wound_total}]]}}{{sustainedspells=[[${attrs.sustainedspells}*2]]}}{{result=[[(${attrs.avoid_total}+[[${skill[Object.keys(skill)[1]]}+${skill[Object.keys(skill)[2]]}]]+?{Situational Modifiers}-[[${attrs.wound_total}]]-[[${attrs.sustainedspells}*2]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}kh[[${limit.parryAccuracy}]] ]]}}{{description= -5 Initiative}}`;
 
     if(limit.parryAccuracy == 0) {
-        rollBase += '{{configuration= Set Limit under Character -> Defense Settings}}'
+        rollBase += '{{configuration= Set Limit under Character -> Defense Settings -> Melee}}'
     }
 
     let defendRoll = await startRoll(rollBase);
@@ -17028,6 +17142,69 @@ const rollReactParry = async (ev) => {
         attackAp: attackRoll.attackAp,
         attackDamage: attackDamage,
         attackDmgType: attackRoll.attackDmgType,
+        passthrough: rollEscape.escape(rollData),
+    });
+}
+
+on('clicked:reactriposte', async (ev) => {
+    await rollReactRiposte(ev);
+});
+const rollReactRiposte = async (ev) => {
+    // The data we passed into the button will be stored in the originalRollId key
+    let attackRoll = rollEscape.unescape(ev.originalRollId);
+    let attrs = await asw.getAttrs(['gmroll','character_name','rea_total', 'edgeroll','edg_total','wound_total','sustainedspells','edgn','standardroll']);
+
+    let choosenSkill = await asw.getAttrs(['parrySkill']);
+    let skill = await asw.getAttrs(['skillname' + choosenSkill.parrySkill, 'skillrating' + choosenSkill.parrySkill, 'skillbonus' + choosenSkill.parrySkill]);
+    let limit = await asw.getAttrs(['parryAccuracy']);
+    let riposte = await asw.getAttrs(['riposteDamage', 'riposteAp', 'riposteWeaponDmgtype']);
+
+    let rollBase = `${attrs.gmroll}&{template:reactdefend}{{defend=Riposte}}{{nethits=[[0]]}}{{counterhits=[[0]]}}{{attackAp=[[0]]}}{{attackDamage=[[0]]}}{{attackDmgType=[[0]]}}{{passthrough=[[0]]}}{{name=${attrs.character_name}}}{{attacker_name=${attackRoll.attacker}}}{{rea=[[${attrs.rea_total}}]]}}{{skill=${skill[Object.keys(skill)[0]]}}}{{skilldice=[[${skill[Object.keys(skill)[1]]}+${skill[Object.keys(skill)[2]]}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{limit=[[${limit.parryAccuracy}]]}}{{wounds_num=[[${attrs.wound_total}]]}}{{sustainedspells=[[${attrs.sustainedspells}*2]]}}{{result=[[(${attrs.rea_total}+[[${skill[Object.keys(skill)[1]]}+${skill[Object.keys(skill)[2]]}]]+?{Situational Modifiers}-[[${attrs.wound_total}]]-[[${attrs.sustainedspells}*2]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}kh[[${limit.parryAccuracy}]] ]]}}{{description= -7 Initiative, +2 DV taken (already included)}}`;
+
+    if(limit.parryAccuracy == 0 || riposte.riposteDamage == 0) {
+        rollBase += '{{configuration= Configure Riposte under Character -> Defense Settings -> Melee}}'
+    }
+
+    let defendRoll = await startRoll(rollBase);
+
+    let defendSuccesses = defendRoll.results.result.result;
+    let nethits = attackRoll.attackHits - defendSuccesses;
+    let counterhits = defendSuccesses - attackRoll.attackHits;
+
+    let attackDamage;
+    if(nethits > counterhits) {
+        attackDamage = attackRoll.attackDV + nethits + 2;
+    } else {
+        attackDamage = parseInt(riposte.riposteDamage) + parseInt(counterhits);
+    }
+
+    let attackAp;
+    if(nethits > counterhits) {
+        attackAp = attackRoll.attackAp;
+    } else {
+        attackAp = riposte.riposteAp;
+    }
+
+    let attackDmgType;
+    if(nethits > counterhits) {
+        attackDmgType = attackRoll.attackDmgType;
+    } else {
+        attackDmgType = riposte.riposteWeaponDmgtype;
+    }
+
+
+    let rollData = {
+        attackAp: attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackDmgType,
+    }
+
+    finishRoll(defendRoll.rollId, {
+        nethits: nethits,
+        counterhits: counterhits,
+        attackAp: attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackDmgType,
         passthrough: rollEscape.escape(rollData),
     });
 }
@@ -17064,6 +17241,66 @@ const rollReactBlock = async (ev) => {
     });
 }
 
+on('clicked:reactcounterstrike', async (ev) => {
+    await rollReactCounterstrike(ev);
+});
+const rollReactCounterstrike = async (ev) => {
+    // The data we passed into the button will be stored in the originalRollId key
+    let attackRoll = rollEscape.unescape(ev.originalRollId);
+    let attrs = await asw.getAttrs(['gmroll','character_name','rea_total', 'edgeroll','edg_total','wound_total','sustainedspells','edgn','standardroll']);
+    let skill = await asw.getAttrs(['skillrating51', 'skillbonus51']);
+    let limit = await asw.getAttrs(['skilllimitbonus51', 'physical_total']);
+    let counterstrike = await asw.getAttrs(['counterstrikeDamage', 'counterstrikeAp', 'counterstrikeWeaponDmgtype']);
+
+    let rollBase = `${attrs.gmroll}&{template:reactdefend}{{defend=Block}}{{nethits=[[0]]}}{{counterhits=[[0]]}}{{attackAp=[[0]]}}{{attackDamage=[[0]]}}{{attackDmgType=[[0]]}}{{passthrough=[[0]]}}{{name=${attrs.character_name}}}{{attacker_name=${attackRoll.attacker}}}{{rea=[[${attrs.rea_total}}]]}}{{skill=@{skillname51}}}{{skilldice=[[${skill.skillrating51}+${skill.skillbonus51}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{limit=[[${limit.physical_total}+${limit.skilllimitbonus51}]]}}{{wounds_num=[[${attrs.wound_total}]]}}{{sustainedspells=[[${attrs.sustainedspells}*2]]}}{{result=[[(${attrs.rea_total}+[[${skill.skillrating51}+${skill.skillbonus51}]]+?{Situational Modifiers}-[[${attrs.wound_total}]]-[[${attrs.sustainedspells}*2]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}kh[[${limit.physical_total}+${limit.skilllimitbonus51}]] ]]}}{{description= -7 Initiative}}`;
+    if(counterstrike.counterstrikeDamage == 0) {
+        rollBase += '{{configuration= Configure Counterstrike under Character -> Defense Settings -> Melee}}'
+    }
+    console.log(rollBase);
+    let defendRoll = await startRoll(rollBase);
+
+    let defendSuccesses = defendRoll.results.result.result;
+    let nethits = attackRoll.attackHits - defendSuccesses;
+    let counterhits = defendSuccesses - attackRoll.attackHits;
+
+    let attackDamage;
+    if(nethits > counterhits) {
+        attackDamage = attackRoll.attackDV + nethits + 2;
+    } else {
+        attackDamage = parseInt(counterstrike.counterstrikeDamage) + parseInt(counterhits);
+    }
+
+    let attackAp;
+    if(nethits > counterhits) {
+        attackAp = attackRoll.attackAp;
+    } else {
+        attackAp = counterstrike.counterstrikeAp;
+    }
+
+    let attackDmgType;
+    if(nethits > counterhits) {
+        attackDmgType = attackRoll.attackDmgType;
+    } else {
+        attackDmgType = counterstrike.counterstrikeWeaponDmgtype;
+    }
+
+
+    let rollData = {
+        attackAp: attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackDmgType,
+    }
+
+    finishRoll(defendRoll.rollId, {
+        nethits: nethits,
+        counterhits: counterhits,
+        attackAp: attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackDmgType,
+        passthrough: rollEscape.escape(rollData),
+    });
+}
+
 on('clicked:reactsoak', async (ev) => {
     await rollReactSoak(ev);
 });
@@ -17074,7 +17311,8 @@ const rollReactSoak = async (ev) => {
     let attrs = await asw.getAttrs(['gmroll','character_name','bod_total', 'armor_total', 'soak_bonus', 'edgeroll','edg_total','edgn','standardroll']);
 
     //AP only reduces armor
-    let armorPenetration = attrs.armor_total + dmgRoll.attackAp < 0  ? -attrs.armor_total : dmgRoll.attackAp;
+    let armorPenetration = parseInt(attrs.armor_total) + parseInt(dmgRoll.attackAp) < 0  ? -attrs.armor_total : dmgRoll.attackAp;
+    console.log(armorPenetration);
 
     if(attrs.armor_total == 0){
         armorPenetration = 0;
@@ -18078,10 +18316,7 @@ var TAS = TAS || (function(){
             [Dodge](~selected|reactdodge||{{computed::passthrough}})
         </div>
         <div class="sheet-rolltemplate-button">
-            [Parry](~selected|reactparry||{{computed::passthrough}})
-        </div>
-        <div class="sheet-rolltemplate-button">
-            [Block](~selected|reactblock||{{computed::passthrough}})
+            [Melee](~selected|reactmelee||{{computed::passthrough}})
         </div>
     </div>
 
@@ -18592,9 +18827,11 @@ var TAS = TAS || (function(){
         <tr>
             <td>> Reaction({{rea}})</td>
         </tr>
-        <tr>
-            <td>> Intuition({{int}})</td>
-        </tr>
+        {{#int}}
+            <tr>
+                <td>> Intuition({{int}})</td>
+            </tr>
+        {{/int}}
         {{#^rollTotal() bonus 0}}
         <tr>
             <td>> Bonus({{bonus}})</td>
@@ -18650,125 +18887,195 @@ var TAS = TAS || (function(){
         {{/edge}}
         {{^edge}}
         {{#limit}}
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"> </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-sectionheading">Limit</div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-limit">> Limit({{limit}})</div>
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"> </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-sectionheading">Limit</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-limit">> Limit({{limit}})</div>
+                </td>
+            </tr>
         {{/limit}}
         {{/edge}}
 
         {{#result}}
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"> </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-sectionheading">Result</div>
-            </td>
-        </tr>
-        {{#rollGreater() result 1}}
-        <tr class="sheet-rolltemplate-results-success">
-            <td class="result">{{result}} Successes</td>
-        </tr>
-        {{/rollGreater() result 1}}
-        {{#rollTotal() result 1}}
-        <tr class="sheet-rolltemplate-results-success">
-            <td class="result">{{result}} Success</td>
-        </tr>
-        {{/rollTotal() result 1}}
-        {{#rollTotal() result 0}}
-        <tr class="sheet-rolltemplate-results-fail">
-            <td class="result">{{result}} Successes</td>
-        </tr>
-        {{/rollTotal() result 0}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"> </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-sectionheading">Result</div>
+                </td>
+            </tr>
+            {{#rollGreater() result 1}}
+                <tr class="sheet-rolltemplate-results-success">
+                    <td class="result">{{result}} Successes</td>
+                </tr>
+            {{/rollGreater() result 1}}
+            {{#rollTotal() result 1}}
+                <tr class="sheet-rolltemplate-results-success">
+                    <td class="result">{{result}} Success</td>
+                </tr>
+            {{/rollTotal() result 1}}
+            {{#rollTotal() result 0}}
+                <tr class="sheet-rolltemplate-results-fail">
+                    <td class="result">{{result}} Successes</td>
+                </tr>
+            {{/rollTotal() result 0}}
         {{/result}}
+
         {{#nethits}}
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"> </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-sectionheading">Attacker Nethits</div>
-            </td>
-        </tr>
-        {{#rollGreater() computed::nethits 0}}
-        <tr class="sheet-rolltemplate-results-fail">
-            <td class="result">{{computed::nethits}} Nethits</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-sectionheading">Damage taken</div>
-            </td>
-        </tr>
-        <tr class="sheet-rolltemplate-after">
-            <td>AP({{computed::attackAp}}) ~ DV({{computed::attackDamage}}{{computed::attackDmgType}})</td>
-        </tr>
-        {{/rollGreater() computed::nethits 0}}
-        {{#^rollGreater() computed::nethits 0}}
-        <tr class="sheet-rolltemplate-results-success">
-            <td class="result">0 Nethits</td>
-        </tr>
-        {{/^rollGreater() computed::nethits 0}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"> </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-sectionheading">Attacker Nethits</div>
+                </td>
+            </tr>
+            {{#rollGreater() computed::nethits 0}}
+                <tr class="sheet-rolltemplate-results-fail">
+                    <td class="result">{{computed::nethits}} Nethits</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="sheet-rolltemplate-sectionheading">Damage taken</div>
+                    </td>
+                </tr>
+                <tr class="sheet-rolltemplate-after">
+                    <td>AP({{computed::attackAp}}) ~ DV({{computed::attackDamage}}{{computed::attackDmgType}})</td>
+                </tr>
+            {{/rollGreater() computed::nethits 0}}
+            {{#^rollGreater() computed::nethits 0}}
+                <tr class="sheet-rolltemplate-results-success">
+                    <td class="result">0 Nethits</td>
+                </tr>
+            {{/^rollGreater() computed::nethits 0}}
         {{/nethits}}
+        {{#counterhits}}
+            {{#rollGreater() computed::counterhits 0}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"> </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-sectionheading">Defender Nethits</div>
+                </td>
+            </tr>
+            <tr class="sheet-rolltemplate-results-success">
+                <td class="result">{{computed::counterhits}} Nethits</td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-sectionheading">Damage taken</div>
+                </td>
+            </tr>
+            <tr class="sheet-rolltemplate-after">
+                <td>AP({{computed::attackAp}}) ~ DV({{computed::attackDamage}}{{computed::attackDmgType}})</td>
+            </tr>
+            {{/rollGreater() computed::counterhits 0}}
+        {{/counterhits}}
+
         {{#description}}
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"> </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-sectionheading">Description</div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-description">{{description}}</div>
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"> </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-sectionheading">Description</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-description">{{description}}</div>
+                </td>
+            </tr>
         {{/description}}
         {{#configuration}}
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"> </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-sectionheading">Configuration</div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-description">{{configuration}}</div>
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"> </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-sectionheading">Configuration</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-description">{{configuration}}</div>
+                </td>
+            </tr>
         {{/configuration}}
     </table>
     {{#rollGreater() computed::nethits 0}}
+        {{#^rollTotal() computed::passthrough 0}}
+            <div class="sheet-rolltemplate-button-row">
+                <div class="sheet-rolltemplate-button">
+                    [Soak](~{{name}}|reactsoak||{{computed::passthrough}})
+                </div>
+            </div>
+        {{/^rollTotal() computed::passthrough 0}}
+    {{/rollGreater() computed::nethits 0}}
+
+    {{#rollGreater() computed::counterhits 0}}
     {{#^rollTotal() computed::passthrough 0}}
     <div class="sheet-rolltemplate-button-row">
         <div class="sheet-rolltemplate-button">
-            [Soak](~{{name}}|reactsoak||{{computed::passthrough}})
+            [Counter-Soak](~{{attacker_name}}|reactsoak||{{computed::passthrough}})
         </div>
     </div>
     {{/^rollTotal() computed::passthrough 0}}
-    {{/rollGreater() computed::nethits 0}}
+    {{/rollGreater() computed::counterhits 0}}
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-meleedefend">
+    <div>
+        {{#configuration}}
+           {{configuration}}
+        {{/configuration}}
+    </div>
+    <div class="sheet-rolltemplate-button-row">
+        {{#rollGreater() computed::showBlock 0}}
+        <div class="sheet-rolltemplate-button">
+            [Block](~selected|reactblock||{{computed::passthrough}})
+        </div>
+        {{/rollGreater() computed::showBlock 0}}
+
+        {{#rollGreater() computed::showCounterstrike 0}}
+        <div class="sheet-rolltemplate-button">
+            [Counterstrike](~selected|reactcounterstrike||{{computed::passthrough}})
+        </div>
+        {{/rollGreater() computed::showCounterstrike 0}}
+
+        {{#rollGreater() computed::showParry 0}}
+        <div class="sheet-rolltemplate-button">
+            [Parry](~selected|reactparry||{{computed::passthrough}})
+        </div>
+        {{/rollGreater() computed::showParry 0}}
+
+        {{#rollGreater() computed::showRiposte 0}}
+        <div class="sheet-rolltemplate-button">
+            [Riposte](~selected|reactriposte||{{computed::passthrough}})
+        </div>
+        {{/rollGreater() computed::showRiposte 0}}
+    </div>
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-reactsoak">
