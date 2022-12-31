@@ -18110,6 +18110,10 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"has_low_pain_threshold",
 		"is_used_to_blindness",
 	];
+
+	const checkBoxFields = [];
+
+	const dropDownField = [];
 	
 	/**
 	 * These fields modify a skill
@@ -26856,12 +26860,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			"roll_allout_attack",
 			"shield_db",
 			"magic_db",
+			"defense_encumbered",
+			"skill_encumbered"
 		];
 	
 		getAttrs(fields, values => {
 	
-			console.log(values);
-
 			// roll_modifier_types stores which repeating section we're applying modifiers to.
 			// roll_modifier_types = skill | technique | defense | melee | ranged
 			let section = values.roll_modifier_types;
@@ -26883,6 +26887,18 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			} else if (rollModifier < 0) {
 				rollModifierStatus = "negative";
 			}
+
+			let defenseEncumbered = Number(values.defense_encumbered) || 0;
+
+			let skillEncumbered = Number(values.skill_encumbered) || 0;
+
+			let toolbarEncumberedChecked = "0";
+
+			if ( section === "defense" && defenseEncumbered < 0 ) {
+				toolbarEncumberedChecked = "1";
+			} else if (section != "defense" && skillEncumbered < 0) {
+				toolbarEncumberedChecked = "1";
+			}
 				
 			// fields to get updated 
 			const updateFields = {
@@ -26899,14 +26915,13 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				[`${section}_roll_hit_location`]: values.roll_hit_location,
 				[`${section}_roll_maneuver`]: values.roll_maneuver,
 				[`${section}_roll_allout_attack`]: values.roll_allout_attack,
+				[`${section}_roll_apply_encumbrance`]: toolbarEncumberedChecked,
 			};
 
 			if (section === "defense") {
 				updateFields[`${section}_apply_shield_db`] = values.shield_db;
 				updateFields[`${section}_apply_magic_db`] = values.magic_db;
 			}
-
-			console.log(updateFields);
 
 			setAttrs(updateFields, { silent: true });
 	
@@ -26932,8 +26947,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 		getAttrs(["roll_modifier_types", "spell_on_penalty_total", "spell_maintained_penalty_total"], values => {
 	
-			console.log(values);
-
 			let modType = values.roll_modifier_types;
 	
 			let modFields;
@@ -27074,8 +27087,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 			}
 
-			console.log(updateFields);
-	
 			setAttrs(updateFields, { silent: true }, callback);
 	
 		});
@@ -29753,7 +29764,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	["melee", "ranged", "spell", "skill", "technique", "defense"].forEach(section => {
 	
-		on(`clicked:${section}_roll_reset`, (event) => {
+		on(`clicked:${section}_roll_reset`, async (event) => {
 
 			// get the section name
 			// example: htmlAttributes.name: "act_defense_roll_reset"
@@ -29765,7 +29776,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				const section = arrEventName[1];
 
 				// set the section type and then simply reset the Roll Modifiers Toolbox, then reapply the values using a callback
-				setAttrs({roll_modifier_types: section}, {silent: false}, resetRollModifiersToolBox(applyRollModifiers));
+				await setAttrsAsync({roll_modifier_types: section});
+
+				resetRollModifiersToolBox(applyRollModifiers);
 		
 			}
 			
@@ -34765,7 +34778,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		await setAttrsAsync(attribs);
 
 		await importCharacterJson();
-
 	
 	});
 
