@@ -1,1 +1,62 @@
-//- Note that rolletemplate classes still need the 'sheet-' prefix, even with CSE
+//-     Note that rolletemplate classes still need the 'sheet-' prefix, even with CSE
+
++templateWrapper(templateName)
+  .header
+    +templateConditionalDisplay('name')
+      h3 {{name}}
+    +characterLink
+  +templateConditionalDisplay('roll')
+    .template-row
+      +templateConditionalDisplay('roll_name')
+        h5 {{roll_name}}
+      +templateConditionalDisplay('roll_name','invert')
+        h5(data-i18n='roll')
+      span.description 
+        |{{roll}}
+        +templateConditionalDisplay('target')
+          span(data-i18n='vs')
+          |{{target}}
+    +templateConditionalDisplay('target')
+      +rollBetween({values:'computed::result 1 1'})
+        .template-row.template-row--summary
+          span(data-i18n='success').capitalize.result-display-true
+      +rollBetween({values:'computed::result 0 0'})
+        .template-row.template-row--summary
+          span(data-i18n='failure').capitalize.result-display-false
+  +templateConditionalDisplay('damage')
+    .template-row
+      +templateConditionalDisplay('damage_type')
+        h5 {{roll_name}}
+      +templateConditionalDisplay('damage_type','invert')
+        h5(data-i18n='damage')
+      span.description {{damage}}
+  +templateConditionalDisplay('range')
+    .template-row
+      h5(data-i18n='range')
+      span.description {{range}}
+  +templateConditionalDisplay('traits')
+    .template-row
+      h5(data-i18n='traits')
+      span.description {{traits}}
+  +templateConditionalDisplay('aspects')
+    .template-row
+      h5(data-i18n='aspects')
+      span.description {{aspects}}
+  +templateConditionalDisplay('description')
+    .template-row.template-row--text
+      h5(data-i18n='description')
+      span.description {{description}}
+  +templateConditionalDisplay('effect')
+    .template-row.template-row--text
+      h5(data-i18n='effect')
+      span.description {{effect}}
+  each num in [1,2,3]
+    +templateConditionalDisplay(`effect_${num}`)
+      .template-row.template-row--text
+        h5(data-i18n=`effect ${num}`)
+        span.description {{effect_#{num}}}
+  //- This template will be user extensible. User defined field/value combos will be displayed using the same format as other rows
+  +allProps({values:'character_name character_id name roll_name roll damage damage_type effect effect_1 effect_2 effect_3 description range traits aspects target result'})
+    .template-row.template-row--text
+      h5 {{key}}
+      span.description {{value}}
