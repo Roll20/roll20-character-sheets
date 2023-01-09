@@ -88,7 +88,6 @@ const equipItem = function({trigger,attributes,sections,casc}){
   attributes[`${newRow}_equipped`] = newSection.endsWith('stored') ?
     0 :
     1;
-    debugger;
   if(section !== 'repeating_stored'){
     attributes[`${newRow}_type`] = section.endsWith('equipped') ?
       'gear' :
@@ -97,6 +96,7 @@ const equipItem = function({trigger,attributes,sections,casc}){
     attributes[`${newRow}_type`] = attributes[`${newRow}_type`] || 'gear';
   }
   k.removeRepeatingRow(row,attributes,sections);
+  k.setActionCalls({attributes,sections});
 };
 k.registerFuncs({equipItem});
 
