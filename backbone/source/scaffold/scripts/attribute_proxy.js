@@ -12,7 +12,7 @@ const createAttrProxy = function(attrs){
       'attr_';
     let cascName = `${typePrefix}${eventName.replace(/(?:removed|clicked):/,'')}`;
     let cascObj = casc[cascName];
-    if(typePrefix === 'attr_'){
+    if(cascObj && typePrefix === 'attr_'){
       cascObj.previousValue = event.previousValue;
     }
     return cascObj;
@@ -225,6 +225,7 @@ const setActionCalls = function({attributes,sections}){
   });
 };
 funcs.setActionCalls = setActionCalls;
+kFuncs.setActionCalls = setActionCalls;
 
 /**
  * Function to call a function previously registered to the funcs object. May not be used that much. Either returns the function or null if no function exists.

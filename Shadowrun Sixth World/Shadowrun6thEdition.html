@@ -3430,6 +3430,10 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
+								<span class="changelog-entry">**2023-01-05 ** v.68 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - Bugfix - PC -> Modifications - changing astral_initiative_dice_mod was doing strange things to the astral initiative dice.  This has been fixed but if your character ended up with a messed up astral_initiative_dice amount look in "Attributes & Abilities" for "astral_initiative_dice" and change it to the correct ammount.
+								</ul>
 								<span class="changelog-entry">**2022-12-12 ** v.67 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">E</span><b>Update</b> - Update - PC -> Magic -> Meta Tradition Hermeticism now displays as "Hermeticism (Logic)" and Shamanism now displays as "Shamanism (Charisma)" for clarity
@@ -6039,7 +6043,7 @@
 <input type="hidden" name="attr_wild_die1" value="0" />
 <input type="hidden" name="attr_wild_die2" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.67">
+<input type="hidden" name="attr_sheet_version" value="0.68">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 // Sheet workers
@@ -8555,7 +8559,7 @@ var update_astral_initiative = () => {
 		const tmp = (v.astral_initiative_temp_flag === "on") ? parseInt(v.astral_initiative_temp) || 0 : 0;
 		const bas = int + log;
 		const tot = int + log + mod + tmp;
-		const dice_base = parseInt(v.astral_initiative_dice) || 2;
+		const dice_base = 2;
 
 		const dice_mod = parseInt(v.astral_initiative_dice_mod) || 0;
 		const dice_tmp = (v.astral_initiative_dice_temp_flag === "on") ? parseInt(v.astral_initiative_dice_temp) || 0 : 0;
@@ -11048,8 +11052,9 @@ var canvasAddNPC = function(data) {
 	addattrs["stats_toggle"] = false;
 
 	// attributes that need no translation
-	["body_base", "agility_base", "reaction_base", "strength_base", "willpower_base", "logic_base", "intuition_base", "charisma_base", "edge", "magic", "resonance", "essence", "initiative_base", "initiative_dice", "defense_rating", "physical", "pr", "move_speed", "sprint_speed", "sprint_speed_modifier", "matrix_initiative_base", "matrix_initiative_dice", "cold_sim_initiative_base", "cold_sim_initiative_dice", "hot_sim_initiative_base", "hot_sim_initiative_dice", "pain_tolerance", "submersion", "initiate", "major_actions", "minor_actions"].forEach((attr) => {
+	["body_base", "agility_base", "reaction_base", "strength_base", "willpower_base", "logic_base", "intuition_base", "charisma_base", "edge", "magic", "resonance", "initiative_base", "initiative_dice", "defense_rating", "physical", "pr", "move_speed", "sprint_speed", "sprint_speed_modifier", "matrix_initiative_base", "matrix_initiative_dice", "cold_sim_initiative_base", "cold_sim_initiative_dice", "hot_sim_initiative_base", "hot_sim_initiative_dice", "pain_tolerance", "submersion", "initiate", "major_actions", "minor_actions"].forEach((attr) => {
 		if(data[`data-${attr}`]) {
+console.log("data-"+attr+": "+data[`data-${attr}`]);
 			addattrs[attr] = data[`data-${attr}`] || '';
 		} else {
 		}
@@ -11065,11 +11070,16 @@ var canvasAddNPC = function(data) {
 		"spells_text": "spells",
 		"metamagics_text": "metamagic",
 		"echoes_text": "echos",
-		"complex_forms_text": "complex_forms"
+		"complex_forms_text": "complex_forms",
+		"essence": "essence_mod"
 	};
 
 	Object.keys(blocks).forEach((key) => {
-		addattrs[blocks[key]] = data[`data-${key}`] || '';
+		if(key == "essence") {
+			addattrs[blocks[key]] = data[`data-${key}`] - 6;
+		} else {
+			addattrs[blocks[key]] = data[`data-${key}`] || '';
+		}
 	});
 
 	// if there are matrix attributes (ASDF) deal with them and turn "has matrix device" on
@@ -11170,32 +11180,6 @@ var canvasAddDrone = function(data) {
 /**************************************
 *        COMPENDIUM IMPORTERS         *
 **************************************/
-/**************************************
-*   Example Compendium Add Function   *
-**************************************/
-/*
-var compendiumAddArmor = function(data) {
-	rowattrs = {};
-
-	row_id = generateRowID();
-
-	var type = '';
-
-	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
-	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
-	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-	rowattrs["repeating_" + type + "_" + row_id + "_rating"] = data["data-rating"] || 0;
-
-	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
-
-	setAttrs(rowattrs);
-};
-*/
-/**************************************
-*             End Example             *
-**************************************/
-
-
 var compendiumAddDrone = function(data) {
 	rowattrs = {};
 
@@ -11454,7 +11438,7 @@ var compendiumAddQuality = function(data) {
 
 	var rep_type = 'quality';
 
-	[].forEach((key) => {
+	['data-description', 'data-game_effect'].forEach((key) => {
 		if(typeof(data[key]) === 'undefined') {
 			data[key] = '';
 		}
@@ -11463,8 +11447,8 @@ var compendiumAddQuality = function(data) {
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = "on";
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-	rowattrs["repeating_" + rep_type + "_" + row_id + "_type"] = (data["data-type"] == "TRUE") ? 'p' : 'n';
-	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_type"] = (data["data-type"] == "TRUE") ? 'P' : 'N';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"] + data["data-game_effect"];
 
 	setAttrs(rowattrs);
 };
