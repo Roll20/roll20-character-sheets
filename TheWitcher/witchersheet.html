@@ -3685,6 +3685,7 @@
 					<label class='stattitle' data-i18n="will-u" >WILL</label><input name='attr_total_will_npc' title='@{total_will_npc}' class='smallbox' type='number' value='0'><input name='attr_will_npc' title='@{will_npc}' class='smallbox' type='text' value='[[floor((@{total_will_npc}+@{stat_mod_will_npc}))]]' disabled><button type='action' name='act_roll' class='stat-roll' value= '@{whisper}&{template:saveroll} {{name=@{character_name}}} {{title=WILL SAVE}} {{description=To succeed you need to roll below @{will_npc}.}} {{roll=[[1d10]]}}'></button><br />
 					<label class='stattitle' data-i18n="luck-u" >LUCK</label><input name='attr_total_luck_npc' title='@{total_luck_npc}' class='smallbox' type='number' value='0'><input name='attr_luck_npc' title='@{luck_npc}' class='smallbox' type='text' value='0'><br />
 					<label class='sizetitle' style='margin-top: 7px; margin-left: 28px;' data-i18n="threat-u" >THREAT</label><input name='attr_npc_threat' class='size-box2' type='text'>
+					<label class='sizetitle' style='margin-top: 7px; margin-left: 28px;' data-i18n="senses-u" >SENSES</label><input name='attr_npc_senses' class='size-box2' type='text'>
 
 				</div>
 				<div class='character-box' style='margin-left: 10px;'>
@@ -3771,13 +3772,26 @@
 						<label class='weapontitle' data-i18n="weapons-u" >WEAPONS</label>
     					</span>
                             <fieldset style='margin-bottom: 10px;' class="repeating_npcweapons">
-    					<span class='repeating_npc_weapon_container'>
-    					        <input class='repeating_npc_weapon_name' name='attr_npc_weapon_name' type='text' placeholder='Weapon Name Here...'><span style='color: #000;'> |</span>
-    					        <input class='repeating_npc_weapon_damage' name='attr_npc_weapon_damage' type='text' placeholder='1d6'><span style='color: #000;'> |</span>
-    					        <input class='repeating_npc_weapon_effect' name='attr_npc_weapon_effect' type='text' placeholder='Weapon effects go here...'><span style='color: #000;'> |</span>
-    					        <input class='repeating_npc_weapon_rof' name='attr_npc_weapon_rof' type='text' placeholder='0'>
-    					        <button type='roll' style='margin-top: 0px;' class='repeating_npc_weapon_roll' value='@{whisper}&{template:npcweapon} {{weapon-name=@{npc_weapon_name}}} {{name=@{character_name}}} {{effect=@{npc_weapon_effect}}} {{damage=[[@{npc_weapon_damage}]]}}'></button>
-    					    </span>
+								<details  class='repeating_npc_weapon_container' open>
+									<summary>
+										<input class='repeating_npc_weapon_name' name='attr_npc_weapon_name' type='text' placeholder='Weapon Name Here...'><span style='color: #000;'> |</span>
+										<input class='repeating_npc_weapon_effect' name='attr_npc_weapon_effect' type='text' placeholder='Weapon effects go here...'><span style='color: #000;'> |</span>
+										<input class='repeating_npc_weapon_rof' name='attr_npc_weapon_rof' type='text' title="ROF" placeholder='0'>
+									</summary>
+									<div class="npc-weapon-subsection">
+										<span data-i18n="attack-u" >ATTACK</span>
+										<input class='repeating_npc_weapon_damage' name='attr_npc_weapon_attackbase' type='number' placeholder='16' title="ATK Base"><span style='color: #000;'> |</span>
+										<input class='repeating_npc_weapon_damage' name='attr_npc_weapon_reliability' type='number' placeholder='16' title="Rel."><span style='color: #000;'> |</span>
+										<input class='repeating_npc_weapon_damage' name='attr_npc_weapon_rng' type='text' placeholder='100m' title="Range"><span style='color: #000;'> |</span>
+										<button type='action' name="act_roll" style='margin-top: 0px;' class='repeating_npc_weapon_roll' value='@{whisper}&{template:npcweapon} {{weapon-name=@{prefix-npc_weapon_name}}} {{name=@{character_name}}} {{roll=[[1d10!+@{prefix-npc_weapon_attackbase}+?{ADDITIONAL MODS? (Bright Light, No Vision, Terrain etc)|0}[MOD]]]}} {{range=@{prefix-npc_weapon_rng}}} {{effect=@{prefix-npc_weapon_effect}}}'></button>
+									</div>
+									<div class="npc-weapon-subsection">
+										<span data-i18n="damage-u" >DAMAGE</span>
+										<input class='repeating_npc_weapon_damage' name='attr_npc_weapon_type' type='text' placeholder='P' title="Type"><span style='color: #000;'> |</span>
+										<input class='repeating_npc_weapon_damage' name='attr_npc_weapon_damage' type='text' placeholder='1d6' title="DMG"><span style='color: #000;'> |</span>
+										<button type='roll' style='margin-top: 0px;' class='repeating_npc_weapon_roll' value='@{whisper}&{template:npcweapon} {{weapon-name=@{npc_weapon_name}}} {{name=@{character_name}}} {{type=@{npc_weapon_type}}} {{effect=@{npc_weapon_effect}}} {{damage=[[@{npc_weapon_damage}]]}}'></button>
+									</div>
+								</details>
                             </fieldset>
                         </div>
                         <div class='middle2-grid' style='margin-left: -10px;'>
@@ -3806,9 +3820,14 @@
                         <div class='npc-armor-box'>
                             <label class='npcarmortitle' data-i18n="armor-u" >ARMOR</label>
                             <input class='npc-armor' name='attr_npc_armor' type='number' value='0'>
+
                             <hr style='margin-top: 6px; margin-bottom: 8px;'>
-                            <label class='npcarmortitle' data-i18n="vigor-u" >VIGOR</label>
-                            <input class='npc-armor' name='attr_npc_vigor' type='number' value='0'>
+                            <label class='npcarmortitle' data-i18n="regeneration-u" >REGENERATION</label>
+                            <input class='npc-armor' name='attr_npc_regeneration' type='number' value='0'>
+
+							<hr style='margin-top: 6px; margin-bottom: 8px;'>
+							<label class='npcarmortitle' data-i18n="vigor-u" >VIGOR</label>
+							<input class='npc-armor' name='attr_npc_vigor' type='number' value='0'>
                         </div>
                         <div class='stat-mod-box'>
                             <label class='modifiertitle-top' data-i18n="stat-modifier-u" >STAT MODIFIERS</label><br />
@@ -4516,7 +4535,7 @@ on('clicked:roll', async (event) => {
 		);
 });
 
-on('clicked:repeating_finearts:roll clicked:repeating_performance:roll clicked:repeating_npcskill:roll', async (event) => {
+on('clicked:repeating_finearts:roll clicked:repeating_performance:roll clicked:repeating_npcskill:roll clicked:repeating_npcweapons:roll', async (event) => {
 
 	// prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
 	var trigger = event.triggerName.slice(8); // this always starts with 'clicked:'
@@ -5564,10 +5583,32 @@ const asw = (() => {
     <table>
         <tr><th style='text-transform: uppercase;'>{{weapon-name}}</th></tr>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
+		{{#roll}}
+		<tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">ATTACK ROLL: </strong> {{computed::roll}}</td></tr>
+		{{/roll}}
+		{{#range}}
+		<tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">MAX RANGE: </strong> {{range}}</td></tr>
+		{{/range}}
+
+		{{#rollWasFumble() roll}}
+		{{#^rollWasCrit() roll}}
+		<tr style='text-align: justify; font-size: 12px;'>
+			<td>
+				<strong class="template-title">FUMBLED BY:</strong> {{fumble}}
+			</td>
+		</tr>
+		{{/^rollWasCrit() roll}}
+		{{/rollWasFumble() roll}}
+
+		{{#type}}
+		<tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">TYPE: </strong> {{type}}</td></tr>
+		{{/type}}
 		{{#effect}}
         <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">EFFECT: </strong> {{effect}}</td></tr>
 		{{/effect}}
+		{{#damage}}
         <tr><td><strong class="template-title">DAMAGE: </strong> {{damage}}</td></tr>
+		{{/damage}}
     </table>
 </rolltemplate>
 
