@@ -1484,8 +1484,9 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
             if (!match)
                 return;
 
-            let baseWeaponName = weaponName.replace(match[0], ' ').trim();
-            baseWeapons = WEAPONS_TABLE[baseWeaponName];
+            let baseWeaponName1 = weaponName.replace(match[0], '');
+            let baseWeaponName2 = weaponName.replace(match[0], ' ').trim();
+            baseWeapons = WEAPONS_TABLE[baseWeaponName1] || WEAPONS_TABLE[baseWeaponName2];
             if (!baseWeapons)
                 return;
 
@@ -1737,9 +1738,9 @@ on('clicked:grenade-miss', async function (eventInfo) {
         let distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
         rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
         switch (distanceName) {
-            case 'Short': rollBuilder.push('distance=[[1d6]]'); break;
-            case 'Medium': rollBuilder.push('distance=[[1d10]]'); break;
-            case 'Long': rollBuilder.push('distance=[[2d10]]'); break;
+            case 'Short': rollBuilder.push('distance=[[1d6cs1cf6]]'); break;
+            case 'Medium': rollBuilder.push('distance=[[1d10cs1cf10]]'); break;
+            case 'Long': rollBuilder.push('distance=[[2d10cs1cf10]]'); break;
         }
         rollBuilder.push('hit=[[0]]','splash=[[0]]');
         let finalRollText = rollBuilder.string();
