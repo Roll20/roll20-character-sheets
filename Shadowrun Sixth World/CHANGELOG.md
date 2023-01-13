@@ -5,7 +5,7 @@ Change Log
 	New Feature - Sprite drag and drop
 	Bugfix - Sprite sheet matrix_max
 	New Feature - Complex Forms drag and drop
-	Bugfix - Bugfix - PC -> Modifications - changing astral_initiative_dice_mod was doing strange things to the astral initiative dice.  This has been fixed but if your character ended up with a messed up astral_initiative_dice amount look in "Attributes & Abilities" for "astral_initiative_dice" and change it to the correct ammount.
+	Bugfix - PC -> Modifications - changing astral_initiative_dice_mod was doing strange things to the astral initiative dice.  This has been fixed but if your character ended up with a messed up astral_initiative_dice amount look in "Attributes & Abilities" for "astral_initiative_dice" and change it to the correct ammount.
 **2022-12-12 ** v.67 Chuz (James Culp)
 	Update PC -> Magic -> Meta Tradition Hermeticism now displays as "Hermeticism (Logic)" and Shamanism now displays as "Shamanism (Charisma)" for clarity
 	Bugfix NPC -> Vehicles - fixed vehicle/drone default actions
