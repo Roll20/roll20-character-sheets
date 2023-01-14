@@ -7,7 +7,7 @@ Rules reminders are built in and can be hidden or show by clicking orange 'i' in
 The sheet is also flexible enough to hopefully allow for homebrew rules and custom features.
 I hope you enjoy!
 
-![preview](https://raw.githubusercontent.com/Seraaron/roll20-character-sheets/tree/master/ICON%20RPG%20%5BMassifPress%5D/preview.jpg)
+![preview](https://raw.githubusercontent.com/Seraaron/roll20-character-sheets/master/ICON%20RPG%20%5BMassifPress%5D/preview.jpg)
 
 [report a bug](https://github.com/Seraaron/roll20-character-sheets/issues)
 
