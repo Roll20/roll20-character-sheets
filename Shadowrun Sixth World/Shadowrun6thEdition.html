@@ -11078,7 +11078,6 @@ var canvasAddNPC = function(data) {
 	// attributes that need no translation
 	["body_base", "agility_base", "reaction_base", "strength_base", "willpower_base", "logic_base", "intuition_base", "charisma_base", "edge", "magic", "resonance", "initiative_base", "initiative_dice", "defense_rating", "physical", "pr", "move_speed", "sprint_speed", "sprint_speed_modifier", "matrix_initiative_base", "matrix_initiative_dice", "cold_sim_initiative_base", "cold_sim_initiative_dice", "hot_sim_initiative_base", "hot_sim_initiative_dice", "pain_tolerance", "submersion", "initiate", "major_actions", "minor_actions"].forEach((attr) => {
 		if(data[`data-${attr}`]) {
-console.log("data-"+attr+": "+data[`data-${attr}`]);
 			addattrs[attr] = data[`data-${attr}`] || '';
 		} else {
 		}
@@ -11158,7 +11157,7 @@ console.log("data-"+attr+": "+data[`data-${attr}`]);
 
 	addattrs["notes"] = data["data-description"] || '';
 
-	setAttrs(addattrs, {silent:true});
+	setAttrs(addattrs);
 };
 
 
@@ -11445,15 +11444,21 @@ var compendiumAddSpell = function(data) {
 	rowattrs["repeating_" + spell_type + "_" + row_id + "_drain"] = data["data-drain"] || 0;
 	rowattrs["repeating_" + spell_type + "_" + row_id + "_duration"] = trans.Spells.duration[data["data-duration"].toUpperCase()] || '';
 
-	var eftype = data["data-typename"];
-	var reg = /.*\((.*)\).*/;
-	eftype = eftype.match(reg) || ('', '');
-	eftype = eftype[1].toUpperCase();
+	var eftype = '';
+	if(data["data-effect_type"]) {
+		eftype = data["data-effect_type"].toUpperCase();
+	} else if(data["data-typename"]) {
+		eftype = data["data-typename"];
+		var reg = /.*\((.*)\).*/;
+		eftype = eftype.match(reg) || ('', '');
+		eftype = eftype[1].toUpperCase();
+	}
 
 	rowattrs["repeating_" + spell_type + "_" + row_id + "_effect_type"] = trans.Spells.effect_type[eftype] || '';
 	rowattrs["repeating_" + spell_type + "_" + row_id + "_range"] = trans.Spells.range[data["data-range"].toUpperCase()] || '';
 	rowattrs["repeating_" + spell_type + "_" + row_id + "_type"] = ucfirst(data["data-type"]) || '';
 
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_notes"] = data["data-notes"] || '';
 	setAttrs(rowattrs);
 };
 
@@ -11635,9 +11640,13 @@ const trans = {
 		},
 		'duration': {
 			'INSTANTANEOUS': 'Instant',
+			'I': 'Instant',
 			'SUSTAINED': 'Sustained',
+			'S': 'Sustained',
 			'LIMITED': 'Limited',
-			'PERMANENT': 'Permanent'
+			'L': 'Limited',
+			'PERMANENT': 'Permanent',
+			'P': 'Permanent',
 		},
 		'damage': {
 			'STUN': 'Stun',
