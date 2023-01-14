@@ -74,7 +74,7 @@
   const calcBloodied = function({attributes}){
     let returnValue;
     let hp_max = attributes.vitality * attributes.ratio_max_hp;
-    let bloodied_hp = hp_max * attributes.ratio_bloodied;
+    let bloodied_hp = Math.ceil(hp_max * attributes.ratio_bloodied);
     switch(true){ //We're looking for the first expression that returns true;
       case (attributes.hp <= bloodied_hp):
         returnValue = 1;
@@ -86,6 +86,16 @@
     return returnValue;
   }
   k.registerFuncs({calcBloodied});
+
+  const calcDash = function({attributes}){
+    return Math.ceil(attributes.speed * attributes.ratio_dash);
+  };
+  k.registerFuncs({calcDash});
+
+  const calcInterval = function({attributes}){
+    return Math.ceil(attributes.xp_max / 3);
+  };
+  k.registerFuncs({calcInterval});
 
   // const calcPlusOne = function({attributes}){
   //   return attributes.number + 1;
