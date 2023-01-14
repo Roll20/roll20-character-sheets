@@ -4,6 +4,27 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.06.00 (Build 27)
+
+- fixed missing checkboxes stance parry, shield parry, other parry
+
+## 03.05.01 (Build 26)
+
+- fixed translation bugs
+
+## 03.05.00 (Build 25)
+
+- added "Daunted" modifier
+
+## 03.04.00 (Build 24)
+
+- added bonus modifier to useful items
+- added whisper mode pc and npc
+
+## 03.03.00 (Build 23)
+
+- added Useful item
+
 ## 03.02.00 (Build 22)
 
 - target attacks calculate priercing blow correctly
