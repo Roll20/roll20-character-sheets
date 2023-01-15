@@ -10885,9 +10885,9 @@ console.log("compendium item dropped: "+data.Category);
 console.log(data);
 	switch(data.Category) {
 			case 'NPCs':
-				if(typeof data["data-sub_type"] !== 'undefined' && data["data-sub_type"] === "CONTACT") {
+//				if(typeof data["data-sub_type"] !== 'undefined' && data["data-sub_type"] === "CONTACT") {
 					compendiumAddContact(data);
-				}
+//				}
 				break;
 //			case 'Grunts':
 //			case 'Critters':
@@ -11664,7 +11664,20 @@ var compendiumAddContact = function(data) {
 
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = "on";
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_loyalty"] = data["data-loyalty"];
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_influence"] = data["data-connections"];
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_favors"] = data["data-favors"];
+
+	let labels = {"contact_uses": "Uses: ", "contact_places_to_meet": "Places To Meet: ", "contact_similar_contacts": "Similar Contacts: "};
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = '';
+	["contact_uses", "contact_places_to_meet", "contact_similar_contacts", "description", "notes"].forEach((k) => {
+		if(typeof data[`data-${k}`] !== 'undefined') {
+			if(labels[k]) {
+				rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] += labels[k];
+			}
+			rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] += data[`data-${k}`] + "\n";
+		}
+	});
 
 	setAttrs(rowattrs);
 };
