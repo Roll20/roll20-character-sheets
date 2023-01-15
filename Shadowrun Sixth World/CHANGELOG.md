@@ -2,6 +2,9 @@ Change Log
 ==============================================
 **2023-01-16 ** v.69 Chuz (James Culp)
 	Add Contacts drag and drop capability, you can now drag ANY NPC from the compendium and their name and description will be added to your contacts, also loyalty, connections and favors if the NPC has those attributes (currently none do)
+	NPCs->Powers text added for all NPCs not just Awakened
+	NPCs->Weaknesses text added for all NPCs
+	NPCs->Spirits added Weaknesses to the Spirts sheet auto-generation code.
 **2023-01-05 ** v.68 Chuz (James Culp)
 	BugFix - drag and drop QSR Combat spells
 	New Feature - Sprite drag and drop
