@@ -3012,7 +3012,7 @@
 				</div>
 				<fieldset class="repeating_contacts">
 					<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
-					<input class="display-flag" type="checkbox" name="attr_display_flag" />
+					<input class="display-flag" type="checkbox" name="attr_display_flag" value="on" />
 					<label title="Contact name"><span name="attr_display"></span></label>
 					<label title="Loyalty"><span name="attr_loyalty"></span></label>
 					<label title="Influence"><span name="attr_influence"></span></label>
@@ -10884,8 +10884,11 @@ var compendium_import = function(data) {
 console.log("compendium item dropped: "+data.Category);
 console.log(data);
 	switch(data.Category) {
-//			case 'NPCs':
-//			case 'Contacts':
+			case 'NPCs':
+				if(typeof data["data-sub_type"] !== 'undefined' && data["data-sub_type"] === "CONTACT") {
+					compendiumAddContact(data);
+				}
+				break;
 //			case 'Grunts':
 //			case 'Critters':
 //			case 'Spirits':
@@ -11078,8 +11081,9 @@ var canvasAddNPC = function(data) {
 	// attributes that need no translation
 	["body_base", "agility_base", "reaction_base", "strength_base", "willpower_base", "logic_base", "intuition_base", "charisma_base", "edge", "magic", "resonance", "initiative_base", "initiative_dice", "defense_rating", "physical", "pr", "move_speed", "sprint_speed", "sprint_speed_modifier", "matrix_initiative_base", "matrix_initiative_dice", "cold_sim_initiative_base", "cold_sim_initiative_dice", "hot_sim_initiative_base", "hot_sim_initiative_dice", "pain_tolerance", "submersion", "initiate", "major_actions", "minor_actions"].forEach((attr) => {
 		if(data[`data-${attr}`]) {
-			addattrs[attr] = data[`data-${attr}`] || '';
+			addattrs[attr] = data[`data-${attr}`];
 		} else {
+			addattrs[attr] = '';
 		}
 	});
 	addattrs.physical_max = addattrs['physical'];
@@ -11155,7 +11159,16 @@ var canvasAddNPC = function(data) {
 		}
 	});
 
-	addattrs["notes"] = data["data-description"] || '';
+	addattrs["notes"] = '';
+	let labels = {"contact_uses": "Uses: ", "contact_places_to_meet": "Places To Meet: ", "contact_similar_contacts": "Similar Contacts: "};
+	["contact_uses", "contact_places_to_meet", "contact_similar_contacts", "description", "notes"].forEach((k) => {
+		if(typeof data[`data-${k}`] !== 'undefined') {
+			if(labels[k]) {
+				addattrs["notes"] += labels[k];
+			}
+			addattrs["notes"] += data[`data-${k}`] + "\n";
+		}
+	});
 
 	setAttrs(addattrs);
 };
@@ -11629,6 +11642,33 @@ var compendiumAddSpritePower = function(data) {
 
 	setAttrs(rowattrs);
 };
+
+
+var compendiumAddContact = function(data) {
+	rowattrs = {};
+
+	row_id = generateRowID();
+
+	var rep_type = 'contacts';
+
+	["data-loyalty", "data-influence", "data-favors"].forEach((key) => {
+		if(typeof(data[key]) === 'undefined') {
+			data[key] = '';
+		}
+	});
+
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+	if(! data["data-loyalty"] || ! data["data-influence"]) {
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = "on";
+	}
+
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = "on";
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+
+	setAttrs(rowattrs);
+};
+
 
 
 const trans = {
