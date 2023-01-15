@@ -1020,6 +1020,75 @@
       </div>
     </section>
     
+    <section class="secondary">
+      <div class="sectiontop">
+          <h2 class="enemyheader">Secondary Mission</h2>
+      </div>
+      
+          <div class="myRow">
+
+            <span class="bonus">
+              <label class="narrow" for="attr_dangerousSecondary">Dangerous?</label>
+              <input type="checkbox" name="attr_dangerousSecondary" value="1">
+            </span>
+
+            <span class="bonus">
+              <label class="narrow" for="attr_multipleSecondary">Multiple targets?</label>
+              <input type="checkbox" name="attr_multipleSecondary" value="1">
+            </span>
+
+            <span class="bonus">
+              <label class="narrow" for="attr_threatSecondary">Highest target's Threat</label>
+              <input type="number" name="attr_threatSecondary" value="1">
+            </span>
+              
+            <span class="bonus">
+              <label class="narrow" for="attr_milSecondary">Is the Military a target?</label>
+              <input type="checkbox" name="attr_milSecondary" value="1">
+            </span>
+           </div>
+              
+        
+    
+    
+      <div class="sectiontop">
+<h3>Number of Operatives who...</h3>
+      </div>
+      <div class="alldrops">
+        <div class="drop">
+          <label for="attr_careerOps">Have a career</label>
+          <input type="number" name="attr_careerOps" value="0">
+        </div>
+        
+        <div class="drop">
+          <label for="attr_injuredOps">Are Injured</label>
+          <input type="number" name="attr_injuredOps" value="0">
+        </div>
+        
+        <div class="drop">
+          <label for="attr_gearOps">Have a weapon/gear with 3+ tags </label>
+          <input type="number" name="attr_gearOps" value="0">
+        </div>
+        
+        <div class="drop">
+          <label for="attr_powerOps">Have a power from row 3 or higher</label>
+          <input type="number" name="attr_powerOps" value="0">
+        </div>
+        
+
+      
+      </div>
+    
+      <div class="centerbtn">
+            <span class="bonus">
+              <label class="narrow" for="attr_bonusSecondary">Bonus dice</label>
+              <input type="number" name="attr_bonusSecondary" value="0">
+            </span>
+      
+        <button class="secondarybtn btn" type="action" name="act_secondary">Roll for secondary mission</button>
+      </div>
+    </section>
+    
     <section class="drops">
       <div class="sectiontop">
         <h2 class="enemyheader">Generate Drops</h2>
@@ -1521,6 +1590,153 @@
     {{drops}} 
   </div>
 </rolltemplate>
+
+
+<rolltemplate class="sheet-rolltemplate-mission">
+  <div class="title">
+    <span>Secondary Mission</span>
+  </div>
+  
+  <div class="roll">
+    <div class="main-roll">{{roll}}</div>
+    <div class="results-roll">{{results}}</div>
+  </div>
+  
+  
+  <!-- Failure -->
+  {{#rollLess() roll 3}}
+  <div class="failure">
+    <div class="failMsg">Failure</div>
+  {{#multiple}}
+    <div class="deets">
+      The Threat levels for the factions you targeted increase by 1.
+    </div>
+    
+    <div class="deets">
+      The Victory Meters of the Targets increase by 2. 
+    </div>
+    
+  {{/multiple}}
+  
+  {{^multiple}}
+    <div class="deets">
+    The Threat level for the faction you targeted increases by 1.
+  </div>
+  
+  <!-- Single target failure not military -->
+  {{^isMilitary}}
+    <div class="deets">
+      The Target's Victory Meter increases by 3. 
+    </div>
+  {{/isMilitary}}
+  {{/multiple}}
+  </div>
+  {{/rollLess() roll 3}}
+
+
+  
+  
+  <!-- Success -->
+  {{#rollGreater() roll 2}}
+  <div class="success">
+  
+    <div class="succMsg">Success!</div> 
+   
+   <!-- With Cost? -->
+   
+    <!-- Not dangerous, roll less than 5 -->
+   {{^dangerous}}
+   {{#rollLess() roll 5}}
+    (with cost)
+    {{/rollLess() roll 5}}
+   {{/dangerous}}
+   
+   <!-- Are dangerous, roll less thann 6 -->
+    {{#dangerous}}
+     {{#rollLess() roll 6}}
+      (with cost)
+      {{/rollLess() roll 6}}
+     {{/dangerous}}
+    
+    
+    <!-- Single target success not military -->
+      {{^multiple}}
+      {{^isMilitary}}
+        <div class="deets">
+          Victory Meter of the Target decreases by 2. 
+        </div>
+      {{/isMilitary}}
+      {{/multiple}}
+      
+      
+      <!-- You won and the military was the only target -->
+      {{#isMilitary}}
+      {{^multiple}}
+        <div class="deets">Valdivian's Victory Meter decreases by 2 and the Interlopers Victory Meter incresaes by 2.</div>
+      {{/multiple}}
+      {{/isMilitary}}
+      
+      <!-- You won against multiple targets and military was one of them -->
+      {{#isMilitary}}
+      {{#multiple}}
+        <div class="deets">The Victory Meter for the non-Military Target decreases by 1. Additionally, Valdivian's Victory Meter decreases by 1, and the Interlopers Victory Meter incresaes by 1.</div>
+      {{/multiple}}
+      {{/isMilitary}}
+      
+      <!-- Succeed against multiple targets, neither are Military -->
+      {{^isMilitary}}
+        {{#multiple}}
+          <div class="deets">The Victory Meters of all Targets decrease by 1.</div>
+        {{/multiple}}
+      {{/isMilitary}}
+      
+  </div>
+  {{/rollGreater() roll 2}}
+  
+  
+
+    <!-- Dangerous -->
+    {{#dangerous}}
+      {{#rollLess() roll 6}}
+      <div class="costs deets">
+        Either injure two Operartives on this mission or kill one Operative who as on the misson. Alternatively, sacrifice an Assistant who was on the mission.
+      </div>
+      {{/rollLess() roll 6}}
+      
+      <!-- Injure Operatives dangerous -->
+      {{#anyInjured}}
+        {{#rollGreater() roll 5}}
+        <div class="injured deets">
+          One Injured Operative on this mission can become uninjured.
+        </div>
+        {{/rollGreater() roll 5}}
+      {{/anyInjured}}
+      
+    {{/dangerous}}
+    
+  
+  <!-- Not Dangerous -->
+    {{^dangerous}}
+      {{#rollLess() roll 5}}
+        <div class="costs deets">
+          Either injure two Operartives on this mission or kill one Operative who as on the misson. Alternatively, sacrifice an Assistant who was on the mission.
+        </div>
+      {{/rollLess() roll 5}}
+    
+    
+        {{#anyInjured}}
+          {{#rollGreater() roll 4}}
+          <div class="injured">
+            One Injured Operative on this mission can become uninjured.
+          </div>
+          {{/rollGreater() roll 4}}
+        {{/anyInjured}}
+    {{/dangerous}}
+    
+
+</rolltemplate>
+
+
 
 
 <rolltemplate class="sheet-rolltemplate-attributeroll">
@@ -2264,6 +2480,69 @@ on("sheet:opened", () => {
   });
 });
 
+on("clicked:secondary", function() {
+  getAttrs(["powerOps", "gearOps", "injuredOps", "careerOps", "dangerousSecondary", "bonusSecondary", "threatSecondary", "multipleSecondary"], (values) => {
+    const numPower = parseInt(values.powerOps);
+    const numGear = parseInt(values.gearOps);
+    const numInj = parseInt(values.injuredOps);
+    const numCar = parseInt(values.careerOps);
+    const bonusDice = parseInt(values.bonusSecondary);
+    const threat = parseInt(values.threatSecondary);
+    const isDangerous = values.dangerousSecondary == 1;
+    const isMultiple = values.multipleSecondary == 1;
+    const isMilitary = values.milSecondary == 1;
+    let zeroDice = false;
+    
+    let numDice = 1;
+    
+    numDice += (Math.floor(numCar / 2)); // Extra dice for every 2 Operatives with a career.
+    
+    numDice -= numInj; // -1 per Injured Operative
+    
+    numDice += numGear; // +1 per Operative with nice gear / weapon
+    
+    numDice += numPower; // +1 per Operative with nice Power
+    
+    // -1 die if there's only interns
+    if(numCar === 0) {
+      numDice--;
+    }
+    
+    if(threat >=3) {
+      numDice--;
+    }
+    
+    if(numDice > 5) {
+      numDice = 5;
+    }
+    
+    if(numDice <= 0) {
+      numDice = 0;
+      zeroDice = true;
+    }
+    
+    const anyInjuredText = numInj > 0 ? "{{anyInjured=${anyInjured}}}" : "";
+
+    const DangerousText = isDangerous ? "{{dangerous=true}}" : "";
+    
+    const militaryText = isMilitary ? "{{isMilitary=true}}" : "";
+    
+    const multipleText = isMultiple ? "{{multiple=true}}" : "";
+    
+    const roll_formula_secondary = buildDicePool(numDice);
+    const roll_results_secondary = getResults(numDice);
+    
+    startRoll(`&{template:mission} {{roll=${roll_formula_secondary}}} {{results=${roll_results_secondary}}}` + anyInjuredText + DangerousText + militaryText + multipleText, (results) => {
+          finishRoll(
+              results.rollId,
+              {
+              }
+          );
+      });
+    
+  });
+});
+
 
 on("clicked:drops", function() {
    getAttrs(["briDead", "milDead", "intDead", "divDead", "bonusDrops", "briny"], (values) => {
@@ -2283,9 +2562,6 @@ on("clicked:drops", function() {
     drops = getDropForFaction(EnemyFactions.BRINY, numBri, bonusDrops, drops);
     
     const text = getTextFromDrops(drops);
-    
-    console.log(drops);
-    console.log(text);
 
       startRoll(`&{template:drops} {{drops=${text}}}`, (results) => {
           finishRoll(
