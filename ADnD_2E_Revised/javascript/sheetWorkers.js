@@ -1484,8 +1484,9 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
             if (!match)
                 return;
 
-            let baseWeaponName = weaponName.replace(match[0], ' ').trim();
-            baseWeapons = WEAPONS_TABLE[baseWeaponName];
+            let baseWeaponName1 = weaponName.replace(match[0], '');
+            let baseWeaponName2 = weaponName.replace(match[0], ' ').trim();
+            baseWeapons = WEAPONS_TABLE[baseWeaponName1] || WEAPONS_TABLE[baseWeaponName2];
             if (!baseWeapons)
                 return;
 

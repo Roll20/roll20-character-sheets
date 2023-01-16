@@ -3430,6 +3430,10 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
+								<span class="changelog-entry">**2023-01-05 ** v.68 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - Bugfix - PC -> Modifications - changing astral_initiative_dice_mod was doing strange things to the astral initiative dice.  This has been fixed but if your character ended up with a messed up astral_initiative_dice amount look in "Attributes & Abilities" for "astral_initiative_dice" and change it to the correct ammount.
+								</ul>
 								<span class="changelog-entry">**2022-12-12 ** v.67 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">E</span><b>Update</b> - Update - PC -> Magic -> Meta Tradition Hermeticism now displays as "Hermeticism (Logic)" and Shamanism now displays as "Shamanism (Charisma)" for clarity
@@ -4045,7 +4049,7 @@
     <div class="sprite attribute pc-box">
       <button data-i18n="level" name="roll_level" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{level}}}{{rating=@{level}}}">Level</button><span name="attr_level"></span>
       <label class="settings" data-i18n-title="level" title="Level">
-        <input name="attr_level" placeholder="5" title="@{level}" type="number" value=""/>
+        <input name="attr_level" placeholder="5" title="@{level}" type="number" value="1"/>
       </label>
       <h1 data-i18n="tasks">Tasks</h1><span name="attr_tasks"></span>
       <label class="settings" data-i18n-title="tasks" title="Tasks">
@@ -6039,7 +6043,7 @@
 <input type="hidden" name="attr_wild_die1" value="0" />
 <input type="hidden" name="attr_wild_die2" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.67">
+<input type="hidden" name="attr_sheet_version" value="0.68">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 // Sheet workers
@@ -8555,7 +8559,7 @@ var update_astral_initiative = () => {
 		const tmp = (v.astral_initiative_temp_flag === "on") ? parseInt(v.astral_initiative_temp) || 0 : 0;
 		const bas = int + log;
 		const tot = int + log + mod + tmp;
-		const dice_base = parseInt(v.astral_initiative_dice) || 2;
+		const dice_base = 2;
 
 		const dice_mod = parseInt(v.astral_initiative_dice_mod) || 0;
 		const dice_tmp = (v.astral_initiative_dice_temp_flag === "on") ? parseInt(v.astral_initiative_dice_temp) || 0 : 0;
@@ -8822,7 +8826,7 @@ on("change:level", () => {
 		var lev = parseInt(v.level) || 0;
 		var tot = 8 + Math.ceil(lev/2);
 
-		setAttrs({matrix: tot});
+		setAttrs({matrix: tot, matrix_max: tot});
 	});
 });
 
@@ -9496,7 +9500,7 @@ on("change:sprite_type change:level", (eventInfo) => {
 	sprite_update();
 });
 var sprite_update = () => {
-	getAttrs(['level', 'sprite_type', 'sheet_type'], (v) => {
+	getAttrs(['level', 'sprite_type', 'sheet_type', 'compendium_drop_data', 'canvas_drop_data'], (v) => {
 		if(v.sheet_type != 'sprite') {
 			return;
 		}
@@ -10861,6 +10865,7 @@ var canvas_import = function(data) {
 		case 'Spirits':
 		case 'Hosts':
 		case 'Sprites':
+console.log(data.Category + " dropped on canvas.");
 			canvasDroppedNPC(data);
 			break;
 		default:
@@ -10930,6 +10935,15 @@ console.log(data);
 			break;
 		case 'Programs':
 			compendiumAddProgram(data);
+			break;
+		case 'Complex Forms':
+			compendiumAddComplexForm(data);
+			break;
+		case 'ICs':
+			compendiumAddIC(data);
+			break;
+		case 'Sprite Powers':
+			compendiumAddSpritePower(data);
 			break;
 		default:
 			console.log("Unknown Compendium Drop: "+data.Category);
@@ -11009,12 +11023,22 @@ var canvasDroppedNPC = function(data) {
 			tokenAttrs.bar3_max = 7;
 
 			break;
+		case 'Sprites':
+			setAttrs({
+				sheet_type: 'sprite',
+				sprite_type: data.sprite_type || '',
+				tasks: 1,
+				matrix: 9,
+				matrix_max: 9,
+			});
+
+			tokenAttrs.bar1_link = 'sheetattr_matrix';
+			tokenAttrs.bar2_link = 'sheetattr_tasks';
+			break;
 		default:
 			break;
 	}
 
-console.log("tokenAttrs: ");
-console.log(tokenAttrs);
 	setup_token(tokenAttrs);
 };
 
@@ -11048,8 +11072,9 @@ var canvasAddNPC = function(data) {
 	addattrs["stats_toggle"] = false;
 
 	// attributes that need no translation
-	["body_base", "agility_base", "reaction_base", "strength_base", "willpower_base", "logic_base", "intuition_base", "charisma_base", "edge", "magic", "resonance", "essence", "initiative_base", "initiative_dice", "defense_rating", "physical", "pr", "move_speed", "sprint_speed", "sprint_speed_modifier", "matrix_initiative_base", "matrix_initiative_dice", "cold_sim_initiative_base", "cold_sim_initiative_dice", "hot_sim_initiative_base", "hot_sim_initiative_dice", "pain_tolerance", "submersion", "initiate", "major_actions", "minor_actions"].forEach((attr) => {
+	["body_base", "agility_base", "reaction_base", "strength_base", "willpower_base", "logic_base", "intuition_base", "charisma_base", "edge", "magic", "resonance", "initiative_base", "initiative_dice", "defense_rating", "physical", "pr", "move_speed", "sprint_speed", "sprint_speed_modifier", "matrix_initiative_base", "matrix_initiative_dice", "cold_sim_initiative_base", "cold_sim_initiative_dice", "hot_sim_initiative_base", "hot_sim_initiative_dice", "pain_tolerance", "submersion", "initiate", "major_actions", "minor_actions"].forEach((attr) => {
 		if(data[`data-${attr}`]) {
+console.log("data-"+attr+": "+data[`data-${attr}`]);
 			addattrs[attr] = data[`data-${attr}`] || '';
 		} else {
 		}
@@ -11065,11 +11090,16 @@ var canvasAddNPC = function(data) {
 		"spells_text": "spells",
 		"metamagics_text": "metamagic",
 		"echoes_text": "echos",
-		"complex_forms_text": "complex_forms"
+		"complex_forms_text": "complex_forms",
+		"essence": "essence_mod"
 	};
 
 	Object.keys(blocks).forEach((key) => {
-		addattrs[blocks[key]] = data[`data-${key}`] || '';
+		if(key == "essence") {
+			addattrs[blocks[key]] = data[`data-${key}`] - 6;
+		} else {
+			addattrs[blocks[key]] = data[`data-${key}`] || '';
+		}
 	});
 
 	// if there are matrix attributes (ASDF) deal with them and turn "has matrix device" on
@@ -11108,7 +11138,6 @@ var canvasAddNPC = function(data) {
 	// Skills stuff
 	["astral", "athletics", "biotech", "close_combat", "con", "conjuring", "cracking", "electronics", "enchanting", "engineering", "exotic_weapons", "firearms", "influence", "outdoors", "perception", "piloting", "sorcery", "stealth", "tasking"].forEach((skill) => {
 		if(data["data-" + skill + "_rating"]) {
-console.log("Skill: "+skill);
 			let row_id = generateRowID();
 			name = skill.split('_').map(word => ucfirst(word)).join(' ');
 			addattrs["repeating_skills_" + row_id + "_rating"] = data["data-" + skill + "_rating"];
@@ -11124,7 +11153,7 @@ console.log("Skill: "+skill);
 	});
 
 	addattrs["notes"] = data["data-description"] || '';
-console.log(addattrs);
+
 	setAttrs(addattrs, {silent:true});
 };
 
@@ -11170,32 +11199,6 @@ var canvasAddDrone = function(data) {
 /**************************************
 *        COMPENDIUM IMPORTERS         *
 **************************************/
-/**************************************
-*   Example Compendium Add Function   *
-**************************************/
-/*
-var compendiumAddArmor = function(data) {
-	rowattrs = {};
-
-	row_id = generateRowID();
-
-	var type = '';
-
-	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
-	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
-	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-	rowattrs["repeating_" + type + "_" + row_id + "_rating"] = data["data-rating"] || 0;
-
-	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
-
-	setAttrs(rowattrs);
-};
-*/
-/**************************************
-*             End Example             *
-**************************************/
-
-
 var compendiumAddDrone = function(data) {
 	rowattrs = {};
 
@@ -11289,8 +11292,6 @@ var compendiumAddDevice = function(data) {
 	rowattrs["repeating_" + type + "_" + row_id + "_notes"] = data["data-description"] || '';
 
 	getAttrs(['sheet_type', 'matrix', 'compendium_drop_category'], (v) => {
-console.log("device dropped, getting some sheet vars");
-console.log(v);
 		// we don't want to do this stuff to the PC sheet it'll mess things up
 		if(v.compendium_drop_category == 'NPCs' || v.sheet_type == 'grunt') {
 			if(! data["data-matrix"] && data["data-device_rating"]) {
@@ -11305,7 +11306,7 @@ console.log(v);
 			rowattrs['data_processing'] = data["data-data_processing"] || 0;
 			rowattrs['firewall'] = data["data-firewall"] || 0;
 		}
-console.log(rowattrs);
+
 		setAttrs(rowattrs);
 	});
 };
@@ -11439,7 +11440,18 @@ var compendiumAddSpell = function(data) {
 	rowattrs["repeating_" + spell_type + "_" + row_id + "_damage"] = trans.Spells.damage[data["data-damage"].toUpperCase()] || '';
 	rowattrs["repeating_" + spell_type + "_" + row_id + "_drain"] = data["data-drain"] || 0;
 	rowattrs["repeating_" + spell_type + "_" + row_id + "_duration"] = trans.Spells.duration[data["data-duration"].toUpperCase()] || '';
-	rowattrs["repeating_" + spell_type + "_" + row_id + "_effect_type"] = trans.Spells.effect_type[data["data-effect_type"].toUpperCase()] || '';
+
+	var eftype = data["data-typename"];
+console.log("eftype: "+eftype);
+	var reg = /.*\((.*)\).*/;
+console.log("reg: "+reg);
+//	eftype = eftype.replace(reg, "$1");
+	eftype = eftype.match(reg) || ('', '');
+console.log(eftype);
+	eftype = eftype[1].toUpperCase();
+console.log(eftype);
+console.log(trans.Spells.effect_type[eftype]);
+	rowattrs["repeating_" + spell_type + "_" + row_id + "_effect_type"] = trans.Spells.effect_type[eftype] || '';
 	rowattrs["repeating_" + spell_type + "_" + row_id + "_range"] = trans.Spells.range[data["data-range"].toUpperCase()] || '';
 	rowattrs["repeating_" + spell_type + "_" + row_id + "_type"] = ucfirst(data["data-type"]) || '';
 
@@ -11454,7 +11466,7 @@ var compendiumAddQuality = function(data) {
 
 	var rep_type = 'quality';
 
-	[].forEach((key) => {
+	['data-description', 'data-game_effect'].forEach((key) => {
 		if(typeof(data[key]) === 'undefined') {
 			data[key] = '';
 		}
@@ -11463,8 +11475,8 @@ var compendiumAddQuality = function(data) {
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = "on";
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-	rowattrs["repeating_" + rep_type + "_" + row_id + "_type"] = (data["data-type"] == "TRUE") ? 'p' : 'n';
-	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_type"] = (data["data-type"] == "TRUE") ? 'P' : 'N';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"] + data["data-game_effect"];
 
 	setAttrs(rowattrs);
 };
@@ -11538,6 +11550,83 @@ var compendiumAddPower = function(data) {
 };
 
 
+var compendiumAddComplexForm = function(data) {
+	rowattrs = {};
+
+	row_id = generateRowID();
+
+	var rep_type = 'forms';
+
+	['data-duration'].forEach((key) => {
+		if(typeof(data[key]) === 'undefined') {
+			data[key] = '';
+		}
+	});
+
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = 'on';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_fade"] = data["data-fade"];
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_duration"] = ucfirst(data["data-duration"]);
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+
+	setAttrs(rowattrs);
+};
+
+
+var compendiumAddIC = function(data) {
+	rowattrs = {};
+
+	row_id = generateRowID();
+
+	var rep_type = 'IC';
+
+	[].forEach((key) => {
+		if(typeof(data[key]) === 'undefined') {
+			data[key] = '';
+		}
+	});
+
+	getAttrs(['sheet_type', 'host_rating', 'data_processing'], (v) => {
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = 'on';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_powered_on_IC"] = 'off';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_dice"] = v.host_rating * 2;
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_ar"] = v.host_rating * 2;
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_cm"] = v.host_rating * 2;
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_init"] = v.data_processing * 2;
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_attribute"] = data["data-defense_attribute_1"];
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_matrix"] = data["data-defense_attribute_2"];
+
+		rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+
+		setAttrs(rowattrs);
+	});
+};
+
+
+var compendiumAddSpritePower = function(data) {
+	rowattrs = {};
+
+	row_id = generateRowID();
+
+	var rep_type = 'powers';
+
+	[].forEach((key) => {
+		if(typeof(data[key]) === 'undefined') {
+			data[key] = '';
+		}
+	});
+
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+	rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+
+	setAttrs(rowattrs);
+};
+
+
 const trans = {
 	'Spells': {
 		'range': {
@@ -11557,10 +11646,10 @@ const trans = {
 			'PHYSICAL_SPECIAL': 'Physical, Special'
 		},
 		'effect_type': {
-			'DIRECT': 'Direct Combat',
-			'DIRECT, AREA': 'Direct Combat, Area',
-			'INDIRECT': 'Indirect Combat',
-			'INDIRECT, AREA': 'Indirect Combat, Area',
+			'DIRECT COMBAT': 'Direct Combat',
+			'DIRECT COMBAT, AREA': 'Direct Combat, Area',
+			'INDIRECT COMBAT': 'Indirect Combat',
+			'INDIRECT COMBAT, AREA': 'Indirect Combat, Area',
 			'SENSE_SINGLE': 'Single-Sense',
 			'SENSE_MULTI': 'Multi-Sense'
 		}
@@ -12484,7 +12573,7 @@ const clean = () => {
 /******************
 *    Utilities    *
 ******************/
-const ucfirst = (string) => {
+const ucfirst = (string = '') => {
   return string.charAt(0).toUpperCase() + string.slice(1) || '';
 };
 </script>
