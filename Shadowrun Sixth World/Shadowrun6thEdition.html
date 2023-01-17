@@ -3430,6 +3430,14 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
+								<span class="changelog-entry">**2023-01-17 ** v.69 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">F</span><b>New Feature</b> - Add Contacts drag and drop capability, you can now drag ANY NPC from the compendium and their name and description will be added to your contacts, also loyalty, connections and favors if the NPC has those attributes (currently none do)
+									<li><span class="bullet">F</span><b>New Feature</b> - NPCs->Powers text added for all NPCs not just Awakened
+									<li><span class="bullet">F</span><b>New Feature</b> - NPCs->Weaknesses text added for all NPCs
+									<li><span class="bullet">F</span><b>New Feature</b> - NPCs->Spirits added Weaknesses to the Spirts sheet auto-generation code.
+									<li><span class="bullet">A</span><b>Bugfix</b> - PCs->Armor didn't update DR when deleting armor entries
+								</ul>
 								<span class="changelog-entry">**2023-01-05 ** v.68 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">A</span><b>Bugfix</b> - drag and drop QSR Combat spells
@@ -8145,7 +8153,7 @@ on("change:electronics change:resonance", (eventInfo) => {
 
 
 //This function checks changes to repeating_armor and updates the Primary Armor if needed
-on("change:repeating_armor change:body change:charisma", (eventInfo) => {
+on("change:repeating_armor change:body change:charisma remove:repeating_armor", (eventInfo) => {
 	const source = eventInfo.sourceAttribute;
 	const newV   = eventInfo.newValue;
 	const arm    = ["repeating_armor"];
@@ -11367,7 +11375,7 @@ var compendiumAddWeapon = function(type = 'range', data) {
 	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
 	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
 	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-	rowattrs["repeating_" + type + "_" + row_id + "_skill"] = data["data-skill"] || '';
+	rowattrs["repeating_" + type + "_" + row_id + "_skill"] = trans.Weapons[data["data-skill"]] || '';
 	rowattrs["repeating_" + type + "_" + row_id + "_dicepool"] = 0;
 	rowattrs["repeating_" + type + "_" + row_id + "_dicepool_base"] = 0;
 	rowattrs["repeating_" + type + "_" + row_id + "_damage"] = data["data-dv"] || 0;
@@ -11452,7 +11460,7 @@ var compendiumAddArmor = function(data) {
 	rowattrs["repeating_" + type + "_" + row_id + "_flag"] = false;
 	rowattrs["repeating_" + type + "_" + row_id + "_display_flag"] = "on";
 	rowattrs["repeating_" + type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
-	rowattrs["repeating_" + type + "_" + row_id + "_rating"] = data["data-rating"] || 0;
+	rowattrs["repeating_" + type + "_" + row_id + "_rating"] = data["data-rating"] || data["data-defense"] || 0;
 	rowattrs["repeating_" + type + "_" + row_id + "_chem"] = data["data-chem"] || 0;
 	rowattrs["repeating_" + type + "_" + row_id + "_cold"] = data["data-cold"] || 0;
 	rowattrs["repeating_" + type + "_" + row_id + "_elec"] = data["data-elec"] || 0;
@@ -11765,7 +11773,21 @@ const trans = {
 		'program': 'Programs',
 		'drone': 'Vehicles',
 		'npc': 'NPC'
-	}
+	},
+	"Weapons": {
+		'athletics': 'Athletics',
+		'Athletics': 'Athletics',
+		'close_combat': 'Close Combat',
+		'Close Combat': 'Close Combat',
+		'exotic_weapons': 'Exotic Weapons',
+		'Exotic Weapons': 'Exotic Weapons',
+		'engineering': 'Engineering',
+		'Engineering': 'Engineering',
+		'firearms': 'Firearms',
+		'Firearms': 'Firearms',
+		'unarmed': 'Unarmed',
+		'Unarmed': 'Unarmed',
+	},
 };
 
 
