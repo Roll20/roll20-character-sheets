@@ -4358,29 +4358,23 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.2.2 -->			
+				<!-- current version notes: 2.9.3 -->			
 				<ul>
-					<li>2.9.2.2 - Added a fix for broken techniques table. Reported by JanMikal.</li>
-					<li>2.9.2.1 - Added a quick fix to the default values when adding a new language.</li>
-					<li><b>Important:</b> Point Summary Table. Added a new option for the GCA5 format. In addition, any negative attributes or a negative racial template total are treated as disadvantages.</li>
-					<li>For Skills, Melee, and Ranged tables. If the Max skill of 9 is visible and if it is checked/unchecked, then the effective skill is now updated to reflect the checkbox.</li>
-					<li>Roll Modifier Tools. Each repeating section has a toolbar to modify the effective skill and other roll traits.
+					<li>
+						Revised how the <b>Combat Reflexes</b> checkbox modifies Fright Check and Dodge. It no longer directly updates the Fright and Dodge Modifier input boxes, 
+						instead hidden fields are used to store the values. This will be more reliable and avoids conflicts with users who don't use the combat reflexes checkbox. 
+						This also fixes an error that was occurring when importing characters.
 						<ul>
-							<li>A few options were added to the <b>Roll Modifiers Toolbar</b> and the syncing of data between the <b>Roll Modifiers Toolbar</b> and <b>Roll Modifiers Toolbox</b> have been improved.</li>
-							<li>The buttons to view the <b>Roll Modifiers Toolbox</b> is always available now, you no longer have to set the character sheet options or the Campaign Options to view them.</li>
-						</ul>
-					<li>Repeating Skills - Attribute drop-down. The value for <b>10</b> is highlighted to show that a non-standard value was selected. This is helpful if something happened while importing the character.</li>
-					<li>Repeating Languages - Add a checkbox for Language Talent. If checked the drop-down will be updated to show the new costs. You can also manually modify the costs of spoken/written for special circumstances.</li>
-					<li>Repeating Ranged Attacks - Fixed bug where malfunction was modifying the effective skill.</li>
-					<li>General Tab - The <b>turning and velocity modifiers</b> tool is no longer hidden by a toggle button.</li>
-					<li>Grimoire Table
-						<ul>
-							<li>Updated the tooltip for <b>Resist</b> column name.</li>
-							<li>Added Difficulty <b>T/H</b>. This covers the situation for ritual magic spells. <b>Suggestion:</b> Set the points to 0 and use the modifier to get the correct spell level. Place the magic ritual spell on the Techniques table.</li>
+							<li><b>NOTE:</b> When updating to the newest character sheet version, if you had combat reflexes checked, it should <b>move</b>...
+							<li>
+								the <b>+2 fright check bonus</b> from the Fright Check Modifier Input box to the new Combat Reflexes Fright Check Modifier.
+								You can see this modifier by hovering over the tooltip for <b style="color: red;">Fright</b>.
+							<li>
+								the <b>+1 dodge bonus</b> from the Dodge Modifier Input box to the new Combat Reflexes Dodge Modifier.
+								You can see this modifier by hovering over the tooltip for <b style="color: red;">Dodge</b>.
+							</li>
 						</ul>
 					</li>
-					<li>GCA5 Import. Equipment cost is rounded to 2 decimal places. Weight is rounded to 3 decimal places.</li>
-					<li>Predefined Dodges - For Dodge, Dodge and Retreat, and Dodge and Drop, the roll result on the chat window will show current modifiers from HP and/or HP loss and encumbrance level.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -4736,8 +4730,8 @@ Unmodified: <span name="attr_willpower_base"></span>
 Fright Check (B360)<br />
 Based on Willpower<br />
 2pts/level<br />
-Unmodified: <span name="attr_fear_check_base"></span>
-<br/>
+Unmodified: <span name="attr_fear_check_base"></span><br/>
+Combat Reflexes Modifier: <span name="attr_combat_reflexes_fear_check_mod"></span><br />
 See extensive list of Modifiers B360 & GURPS Horror p139-142.
 							</span>
 						</span>
@@ -4747,6 +4741,7 @@ See extensive list of Modifiers B360 & GURPS Horror p139-142.
 					</div>
 					<div class="cell col2">
 						<input type="number" name="attr_fear_check_mod" value="0" step="1" title="Macro: @{NAME|fear_check_mod}" />
+						<input type="hidden" name="attr_combat_reflexes_fear_check_mod" value="0" />
 					</div>
 					<div class="cell col3">
 						<input type="number" name="attr_fear_check_points" value="0" step="2" title="Macro: @{NAME|fear_check_points}" />
@@ -4987,7 +4982,8 @@ Level: <span name="attr_enhanced_ground_move_multiple" value="0"></span>
 						<span class="tooltip">
 							<span data-i18n="attribute-dodge-tooltip">
 Dodge - Based on Basic Speed - Unmodified: <span name="attr_dodge_base" value="0"></span><br />
-Note: The Dodge score automatically adjusts for HP and/or FP loss below 1/3. (B419, B426)
+Combat Reflexes Modifier: <span name="attr_combat_reflexes_dodge_mod"></span><br />
+Note: The Dodge score automatically adjusts for HP and/or FP loss below 1/3. (B419, B426)<br />
 							</span>
 						</span>
 					</div>
@@ -4996,6 +4992,7 @@ Note: The Dodge score automatically adjusts for HP and/or FP loss below 1/3. (B4
 					</div>
 					<div class="cell col2">
 						<input type="number" name="attr_dodge_mod" value="0" step="1" title="Macro: @{NAME|dodge_mod}" />
+						<input type="hidden" name="attr_combat_reflexes_dodge_mod" value="-1" />
 					</div>
 				</div> <!-- .row -->
 				<div class="row row-lift-st hr">
@@ -11318,6 +11315,7 @@ visualize what it will look like in chat.
 									
 									<div style="float: left;">
 										<input type="hidden" name="attr_reflexes_converted_to_base_skill" value="0" />
+										<input type="hidden" name="attr_reflex_mods_added" value="0" />
 										<input type="checkbox" class="boolean combat-reflex-check" name="attr_combat_reflexes" value="1" />
 										<div class="popup">
 											<span data-i18n="apply-combat-reflexes-label">Apply Combat Reflexes</span>
@@ -14484,8 +14482,30 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.2.2 -->
+			<!-- current version notes: 2.9.3 -->
+
+			<ul>
+				<li>
+					Revised how the <b>Combat Reflexes</b> checkbox modifies Fright Check and Dodge. It no longer directly updates the Fright and Dodge Modifier input boxes, 
+					instead hidden fields are used to store the values. This will be more reliable and avoids conflicts with users who don't use the combat reflexes checkbox. 
+					This also fixes an error that was occurring when importing characters.
+					<ul>
+						<li><b>NOTE:</b> When updating to the newest character sheet version, if you had combat reflexes checked, it should <b>move</b>...
+						<li>
+							the <b>+2 fright check bonus</b> from the Fright Check Modifier Input box to the new Combat Reflexes Fright Check Modifier.
+							You can see this modifier by hovering over the tooltip for <b style="color: red;">Fright</b>.
+						<li>
+							the <b>+1 dodge bonus</b> from the Dodge Modifier Input box to the new Combat Reflexes Dodge Modifier.
+							You can see this modifier by hovering over the tooltip for <b style="color: red;">Dodge</b>.
+						</li>
+					</ul>
+				</li>
+			</ul>
 			
+			<h4>Version: 2.9.2.2</h4>
+
+			<p>Pull Request: 1/16/2023</p>
+
 			<ul>
 				<li>2.9.2.2 - Added a fix for broken techniques table. Reported by JanMikal.</li>
 				<li>2.9.2.1 - Added a quick fix to the default values when adding a new language.</li>
@@ -17902,9 +17922,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.2.2";
+	const version = "2.9.3";
 	
-	const latestChangesDate = "1/16/2023";
+	const latestChangesDate = "1/20/2023";
 	
 	let modCascade = true;
 	
@@ -18971,7 +18991,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * @param {boolean} isNewSheet               Is this a brand new sheet
 	 * @param {boolean} hasCombatReflexes        Does character sheet have combat reflexes checked
 	 * @param {boolean} hasReflexesBeenConverted Has the character sheet already been converted
-	 * 
 	 */ 
 	function resetAll(mod_cascade, isNewSheet, hasCombatReflexes, hasReflexesBeenConverted) {
 		
@@ -19011,6 +19030,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			updateFatiguePointThresholds();
 	
 			updateReach();
+
+			updateCombatReflexesMod();
 	
 		});
 	
@@ -19510,23 +19531,24 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	}
 	
 	// Updage Willpower, Fear (This is actually called Fright Check - the General page reflects this)
-	on('change:intelligence change:willpower_points change:willpower_mod change:fear_check_points change:fear_check_mod', function (e) {
+	on('change:intelligence change:willpower_points change:willpower_mod change:fear_check_points change:fear_check_mod change:combat_reflexes_fear_check_mod', function (e) {
 		updateWill();
 	});
 	
 	// Updage Willpower, Fear (This is actually called Fright Check - the General page reflects this)
 	function updateWill() {
 		console.log('********* updateWill *********');
-		getAttrs(['intelligence', 'intelligence_base', 'willpower_points', 'willpower_mod', 'fear_check_points', 'fear_check_mod'], function (v) {
+		getAttrs(['intelligence', 'intelligence_base', 'willpower_points', 'willpower_mod', 'fear_check_points', 'fear_check_mod', 'combat_reflexes_fear_check_mod'], function (v) {
 			let wBase = (modCascade ? +v.intelligence : +v.intelligence_base) + ((+v.willpower_points || 0) / 5 | 0);
 			let wMod = +v.willpower_mod || 0;
 			let fBase = wBase + (modCascade ? +wMod : 0) + ((+v.fear_check_points || 0) / 2 | 0);
 			let fMod = +v.fear_check_mod || 0;
+			let combatFearCheckMod = +v.combat_reflexes_fear_check_mod || 0;
 			setAttrs({
 				willpower_base: wBase,
 				willpower: wBase + wMod,
 				fear_check_base: fBase,
-				fear_check: fBase + fMod
+				fear_check: fBase + fMod + combatFearCheckMod
 			});
 		});
 	}
@@ -19616,7 +19638,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	}
 	
 	// Dodge
-	on('change:basic_speed change:dodge_mod', function (e) {
+	on('change:basic_speed change:dodge_mod change:combat_reflexes_dodge_mod', function (e) {
 		updateDodge();
 	});
 	
@@ -19624,13 +19646,16 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	function updateDodge(callback) {
 		console.log('********* updateDodge *********');
 		callback = callback || noop;
-		getAttrs(['basic_speed', 'basic_speed_base', 'dodge_mod'], function (v) {
+		getAttrs(['basic_speed', 'basic_speed_base', 'dodge_mod', `combat_reflexes_dodge_mod`], function (v) {
+			
 			let speed = (modCascade ? +v.basic_speed : +v.basic_speed_base);
 			let base = Math.floor(speed) + 3;
 			let mod = +v.dodge_mod || 0;
+			let combatReflexesDodgeMod = +v.combat_reflexes_dodge_mod || 0;
+			
 			setAttrs({
 				dodge_base: base,
-				dodge: base + mod
+				dodge: base + mod + combatReflexesDodgeMod
 			}, null, callback);
 		});
 	}
@@ -19649,7 +19674,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		callback = callback || noop;
 	
-		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max', 'strength'], function (v) {
+		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max', 'strength', 'dodge_mod'], function (v) {
 	
 			let dodge = +v.dodge;
 	
@@ -19666,7 +19691,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let strengthDisplay = +v.strength;
 	
 			let strengthHalved = 0;
-	
+
 			if (v.encumbrance_level === 5) {
 	
 				dodge = 1;
@@ -20725,7 +20750,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	function updateActiveDefenses(callback) {
 	
 		// get the defense values
-		getAttrs(['combat_reflexes', 'dodge_mod', 'fear_check_mod'], function (values) {
+		getAttrs(['combat_reflexes'], function (values) {
 	
 			callback = callback || noop;
 	
@@ -20742,38 +20767,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 				modFear = 2;
 	
-			} else {
-	
-				modDodge = -1;
-	
-				modFear = -2;
-	
 			}
-	
-			// update dodge modifier
-			let orig_dodge_mod = Number(values.dodge_mod);
-	
-			if (isNaN(orig_dodge_mod)) {
-				orig_dodge_mod = 0;
-			}
-	
-			let new_dodge_mod = orig_dodge_mod + modDodge;
-	
-			// update fear check
-			let orig_fear_check_mod = Number(values.fear_check_mod);
-	
-			if (isNaN(orig_fear_check_mod)) {
-				orig_fear_check_mod = 0;
-			}
-	
-			let new_fear_check_mod = orig_fear_check_mod + modFear;
-	
-			// update 
-	
-			// set thrust and swing
+
+			// set the combat reflex fields for dodge and fear check
 			setAttrs({
-				dodge_mod: new_dodge_mod,
-				fear_check_mod: new_fear_check_mod
+				combat_reflexes_dodge_mod: modDodge,
+				combat_reflexes_fear_check_mod: modFear
 			}, null, callback);
 	
 		});
@@ -24012,7 +24011,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 * @param {boolean} hasCombatReflexes        Does character sheet have combat reflexes checked
 	 * @param {boolean} hasReflexesBeenConverted Has the character sheet already been converted
 	 */
-	function updateRepeatingDefenseNotes(isNewSheet, hasCombatReflexes, hasReflexesBeenConverted) {
+	function updateRepeatingDefenseNotes(isNewSheet, hasCombatReflexes,hasReflexesBeenConverted ) {
 	
 		getSectionIDs("repeating_defense", function (ids) {
 	
@@ -26836,6 +26835,70 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		});
 	
+	}
+
+	function updateCombatReflexesMod() {
+
+		getAttrs(["combat_reflexes", "reflex_mods_added", "fear_check_mod", "dodge_mod"], values => {
+
+			const hasReflexModsBeenApplied = values.reflex_mods_added === "1" ? true : false;
+
+			/*
+			if (hasReflexModsBeenApplied) {
+				//we're done, let's get out of here.
+				return;
+			}
+			*/
+
+			console.log('***** UPDATE COMBAT REFLEX MODIFIERS *****');
+
+			let currentFearCheckMod = Number(values.fear_check_mod) || 0;
+
+			let newFearCheckMod = currentFearCheckMod;
+
+			let currentDodgeMod = Number(values.dodge_mod) || 0;
+
+			let newDodgeMod = currentDodgeMod;
+
+			let hasCombatReflexes = values.combat_reflexes === "1" ? true : false;
+
+			let combatReflexesFearCheckMod = 0;
+
+			let combatReflexesDodgeMod = 0;
+
+			if (hasCombatReflexes) {
+
+				// let's set the new attributes
+				combatReflexesFearCheckMod = 2;
+
+				combatReflexesDodgeMod = 1;
+
+			}
+
+			if (hasCombatReflexes && currentFearCheckMod >= 2) {
+
+				// let's remove that +2 fright check bonus, it is now stored in the new field
+				newFearCheckMod = currentFearCheckMod - 2;
+
+			} 
+
+			if (hasCombatReflexes && currentDodgeMod >= 1) {
+
+				// let's remove the +1 dodge, it is now stored in the new field
+				newDodgeMod = currentDodgeMod - 1;
+
+			} 
+
+			setAttrs({
+				fear_check_mod: newFearCheckMod,
+				dodge_mod: newDodgeMod,
+				combat_reflexes_fear_check_mod: combatReflexesFearCheckMod,
+				combat_reflexes_dodge_mod: combatReflexesDodgeMod,
+				reflex_mods_added: 1
+			});
+
+		});
+
 	}
 
 	/* ROLL MODIFIERS BOX */
@@ -34884,8 +34947,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			// finally re-total attribute totals. 
 			await totalAttributeCharacterPointsAsync();
-
-
+			
 			setAttrs({ 
 				import_json_state: "normal",
 				import_json_message: "Import has completed! Please wait a minute or two for Roll20 to finish processing the data.",
