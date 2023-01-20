@@ -4378,6 +4378,9 @@
 					<li>
 						Minor bugfix when adding a brand new language to set default values correctly.
 					</li>
+					<li>
+						General tab - Left attribute column. Added a new section for Stress and Derangement for GURPS Horror 4th Edition.
+					</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -5172,7 +5175,104 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_striking_st_bas
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Swing Damage}} {{damageRoll=[[@{swing}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}}" name="roll_dmgSwing" class="roll_damage" />
 					</div>
 				</div> <!-- .row -->
-				
+				<div class="row row-stress hr">
+					<div class="cell col0 label">
+						&nbsp;
+					</div>
+					<div class="cell col1">
+						<span data-i18n="abbreviation-maximum-label">Max</span>
+					</div>
+					<div class="cell col2">
+						<span data-i18n="abbreviation-modifier-label">Mod</span>
+					</div>
+					<div class="cell col3">
+						<span data-i18n="current-label">Current</span>
+					</div>
+				</div> <!-- .row -->
+				<div class="row row-stress">
+					<div class="cell col0 label">
+						<div class="popup">
+							<span data-i18n="attribute-stress">Stress</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="attribute-stress-tooltip">
+Stress level from GURPS Fourth Edition Edition.pdf page 141-142. When failing a Fright Check or other conditions the GM has exposed the character to.
+							</span>
+						</span>
+					</div>
+					<div class="cell col1">
+						<input type="number" name="attr_stress_level_max" value="0" readonly="readonly" title="Macro: @{NAME|stress_level_max}" />
+					</div>
+					<div class="cell col2">
+						<input type="number" name="attr_stress_level_modifier" value="0" step="1" title="Macro: @{NAME|stress_level_modifier}" />
+					</div>
+					<div class="cell col3">
+						<input type="number" name="attr_stress_level" value="0" max="0" step="1" title="Macro: @{NAME|stress_level}" />
+					</div>
+				</div> <!-- .row -->
+				<div class="row row-derangement">
+					<div class="cell col0 label">
+						<div class="popup">
+							<span data-i18n="abbreviation-derangement">Derange</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="attribute-derangement-tooltip">
+Derangement level from GURPS Fourth Edition Edition.pdf page 141-142. When going over the max level of Stress or failing a Sanity-Blasting Fright Check. 
+							</span>
+						</span>
+					</div>
+					<div class="cell col1">
+						<input type="number" name="attr_derangement_level_max" value="0" readonly="readonly" title="Macro: @{NAME|derangement_level_max}" />
+					</div>
+					<div class="cell col2">
+						<input type="number" name="attr_derangement_level_modifier" value="0" step="1" title="Macro: @{NAME|derangement_level_modifier}" />
+					</div>
+					<div class="cell col3">
+						<input type="number" name="attr_derangement_level" value="0" max="0" step="1" title="Macro: @{NAME|derangement_level}" />
+					</div>
+				</div> <!-- .row -->
+				<div class="row row-stress-derangement-penalty">
+					<div class="cell col0 label">
+					    <div class="popup">
+							<span data-i18n="abbreviation-penalty-label">Pen</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="attribute-stress-derangement-penalty-tooltip">
+The Fright Check Penalty, which is (Stess + Derangement)/2. This will automatically be applied to Fright Check.
+							</span>
+						</span>
+					</div>
+					<div class="cell col1">
+						<input type="number" name="attr_stress_derangement_fright_check_penalty" value="0" readonly="readonly" title="Macro: @{NAME|stress_derangement_fright_check_penalty}" />
+					</div>
+					<div class="cell col2">
+						&nbsp;
+					</div>
+					<div class="cell col3">
+						&nbsp;
+					</div>
+				</div> <!-- .row -->
+				<div class="row row-stress-derangement-penalty">
+					<div class="cell col0 label">
+					    <div class="popup">
+							<span data-i18n="abbreviation-disadvantages-label">Disadv.</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="attribute-stress-derangement-disadvantage-points-tooltip">
+The amount of disadvantage points acrued due to derangement. At a certain point, these points should be converted to permanent mental disadvantages!
+							</span>
+						</span>
+					</div>
+					<div class="cell col1">
+						<input type="number" name="attr_stress_derangement_disadvantage_points" value="0" max="0" step="1" title="Macro: @{NAME|stress_derangement_disadvantage_points}" />
+					</div>
+					<div class="cell col2">
+						&nbsp;
+					</div>
+					<div class="cell col3">
+						&nbsp;
+					</div>
+				</div> <!-- .row -->
 			</div> <!-- .table -->
 		</div> <!-- .box .attributes -->
 
@@ -14506,6 +14606,9 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 				<li>
 					Minor bugfix when adding a brand new language to set default values correctly.
 				</li>
+				<li>
+					General tab - Left attribute column. Added a new section for Stress and Derangement for GURPS Horror 4th Edition.
+				</li>
 			</ul>
 			
 			<h4>Version: 2.9.2.2</h4>
@@ -19537,28 +19640,39 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	}
 	
 	// Updage Willpower, Fear (This is actually called Fright Check - the General page reflects this)
-	on('change:intelligence change:willpower_points change:willpower_mod change:fear_check_points change:fear_check_mod change:combat_reflexes_fear_check_mod', function (e) {
+	on('change:intelligence change:willpower_points change:willpower_mod change:fear_check_points change:fear_check_mod change:combat_reflexes_fear_check_mod change:stress_level change:derangement_level', function (e) {
 		updateWill();
 	});
 	
 	// Updage Willpower, Fear (This is actually called Fright Check - the General page reflects this)
 	function updateWill() {
 		console.log('********* updateWill *********');
-		getAttrs(['intelligence', 'intelligence_base', 'willpower_points', 'willpower_mod', 'fear_check_points', 'fear_check_mod', 'combat_reflexes_fear_check_mod'], function (v) {
+		getAttrs(['intelligence', 'intelligence_base', 'willpower_points', 'willpower_mod', 'fear_check_points', 'fear_check_mod', 'combat_reflexes_fear_check_mod', 'stress_level_modifier', 'derangement_level_modifier', 'stress_level', 'derangement_level'], function (v) {
 			let wBase = (modCascade ? +v.intelligence : +v.intelligence_base) + ((+v.willpower_points || 0) / 5 | 0);
 			let wMod = +v.willpower_mod || 0;
 			let fBase = wBase + (modCascade ? +wMod : 0) + ((+v.fear_check_points || 0) / 2 | 0);
 			let fMod = +v.fear_check_mod || 0;
 			let combatFearCheckMod = +v.combat_reflexes_fear_check_mod || 0;
+			let stressLevelModifier =  Number(v.stress_level_modifier) || 0;
+			let derangementLevelModifier = Number(v.derangement_level_modifier) || 0;
+			let stressLevel = Number(v.stress_level) || 0;
+			let derangementLevel = Number(v.derangement_level) || 0;
+
+			let stressDerangementPenalty = stressLevel + derangementLevel;
+
 			setAttrs({
 				willpower_base: wBase,
 				willpower: wBase + wMod,
 				fear_check_base: fBase,
-				fear_check: fBase + fMod + combatFearCheckMod
+				fear_check: fBase + fMod + combatFearCheckMod + stressDerangementPenalty,
+				stress_level_max: (-1 * (wBase + wMod)) + stressLevelModifier,
+				derangement_level_max: (-1 * (wBase + wMod)) + derangementLevelModifier,
+				stress_derangement_fright_check_penalty: stressDerangementPenalty
 			});
+
 		});
 	}
-	
+
 	// Check for conditions to HT and conditions
 	on('change:health change:stun_check_mod change:knockdown_check_mod change:unconscious_check_mod change:unconscious_check_points change:death_check_mod change:death_check_points', function (e) {
 		updateHealthConditionChecks();
