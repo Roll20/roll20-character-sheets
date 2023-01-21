@@ -22,6 +22,14 @@ These should be imported automatically by your browser, but in the event that th
 - [PT Mono](https://fonts.google.com/specimen/PT+Mono), [PT Sans Caption](https://fonts.google.com/specimen/PT+Sans+Caption), & [PT Serif Caption](https://fonts.google.com/specimen/PT+Serif+Caption)
 
 ## Changelog
+
+#### v0.4.3 (23-01-21)
+- Made class resources into a repeating segment
+- Added light and heavy attacks separately
+- Added bonus damage prompt and fixed critical damage not displaying separately
+- Moved save target to tactics tab
+- Added a 'whack' button
+
 ### v0.4 LIVE (23-01-14)
 - Wrote this readme, and the json file, made a [tipee](https://en.tipeee.com/seraaron/), and generally got the sheet ready for live use on roll20
 - Added lots of new CSS stylization to make it all look pretty
