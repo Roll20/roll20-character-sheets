@@ -2884,6 +2884,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 const REPEATING_SECTIONS = [
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
     'scrolls',
+    'spells-wizmonster',
 ];
 REPEATING_SECTIONS.forEach(section => {
    on(`clicked:repeating_${section}:show clicked:repeating_${section}:hide`, function (eventInfo) {
