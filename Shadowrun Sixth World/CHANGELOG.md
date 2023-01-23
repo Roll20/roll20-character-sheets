@@ -1,5 +1,35 @@
 Change Log
 ==============================================
+**2023-01-17 ** v.69 Chuz (James Culp)
+	Add Contacts drag and drop capability, you can now drag ANY NPC from the compendium and their name and description will be added to your contacts, also loyalty, connections and favors if the NPC has those attributes (currently none do)
+	NPCs->Powers text added for all NPCs not just Awakened
+	NPCs->Weaknesses text added for all NPCs
+	NPCs->Spirits added Weaknesses to the Spirts sheet auto-generation code.
+	Bugfix PCs->Armor didn't update DR when deleting armor entries
+**2023-01-05 ** v.68 Chuz (James Culp)
+	BugFix - drag and drop QSR Combat spells
+	New Feature - Sprite drag and drop
+	Bugfix - Sprite sheet matrix_max
+	New Feature - Complex Forms drag and drop
+	Bugfix - PC -> Modifications - changing astral_initiative_dice_mod was doing strange things to the astral initiative dice.  This has been fixed but if your character ended up with a messed up astral_initiative_dice amount look in "Attributes & Abilities" for "astral_initiative_dice" and change it to the correct ammount.
+**2022-12-12 ** v.67 Chuz (James Culp)
+	Update PC -> Magic -> Meta Tradition Hermeticism now displays as "Hermeticism (Logic)" and Shamanism now displays as "Shamanism (Charisma)" for clarity
+	Bugfix NPC -> Vehicles - fixed vehicle/drone default actions
+	New Feature - added alternate melee/ranged roll buttons on npc sheets.  If there's no dicepool set the alternate button prompts for skill and attribute values.
+	New Feature - PC sheet Weapon Mods now allows JSON imports via Notes field.
+**2022-12-05 ** v.66 Chuz (James Culp)
+	New Feature - Added modifiers for primary_range_weapon_close_mod, primary_range_weapon_near_mod, primary_range_weapon_medium_mod, primary_range_weapon_far_mod, primary_range_weapon_extreme_mod, primary_range_weapon_damage_mod, primary_range_weapon_dicepool_mod for changing the ARs at various ranges and the damage for the primary weapon.
+	New Feature - Added modifiers for single_shot_penalty_mod, semi_auto_penalty_mod, burst_fire_penalty_mod, burst_wide_penalty_mod, full_auto_penalty_mod for changing the AR penalties for firing modes.
+	New Feature - Primary Weapon Mods section that allows a list of mods to be added and turned on/off to apply bonuses/penalties to ARs, DV, dicepool (not reflected in listed dicepool) and firing mode penalties. Upon changing primary ranged weapon, mods will be disabled, if the weapon has the "Has Mods" checkbox checked the screen will switch to the Mod selection screen.
+	New Feature - Added Blood and the various Insect spirits from Street Wyrd
+	New Feature - Updated spirits to allow my templates to have more than one melee or ranged attack.
+	Update - There are now a maximum of 30 physical and 21 stun condition monitor boxes for PCs, these numbers should exceed the current theoretical maximums.
+	Bugfix - Skill name for multi-word skills wasn't being formatted properly.
+	Bugfix - At some point NPC -> Vehicle DR input and button disappeared, they've been found and replaced
+**2022-11-21 ** v.65 Chuz (James Culp)
+	Bugfix - PC Weapon skills weren't applying the -1 unskilled penalty to some skills, this has been updated however users will need to update the skill to something else and back to trigger the data change.
+	Bugfix - PC Sheet imported from Genesis in a non-English language had many problems mostly related to skills.  I believe I've fixed these issues please report any new ones
+	Bugfix - NPC Spell roll template issue where if drain was under 2 it added "Drain: 2" at the bottom of the description.
 **2022-11-14 ** v.64 Chuz (James Culp)
 	Bugfix - PC Judge Intentions wasn't updating on Willpower changes.
 **2022-11-06 ** v.63 Chuz (James Culp)
