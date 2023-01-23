@@ -1164,7 +1164,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
 //#endregion
 
 //#region Wizard and Priest spells and Powers setup
-function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFields) {
+function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
     if (!spellsTable[section])
         return;
 
@@ -1183,7 +1183,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
 
             let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level'], className),
+                [`repeating_spells-${section}_spell-level`]        : displaySpellLevel(spell['level'], className),
                 [`repeating_spells-${section}_spell-school`]       : getSpellSchools(spell, books),
                 [`repeating_spells-${section}_spell-components`]   : spell['components'],
                 [`repeating_spells-${section}_spell-range`]        : spell['range'],
@@ -1202,6 +1202,8 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
                 [`repeating_spells-${section}_spell-crit-size`]    : spell['crit-size'] || '',
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
+
+
 
             if (isPriest) {
                 let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
@@ -1266,11 +1268,11 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells, displaySpellLevel, SCHOOL_FIELDS);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, SCHOOL_FIELDS);
         setupSpellCrit(lastSection);
     }
 });
-setupAutoFillSpellInfo('wizmonster', wizardSpells, displaySpellLevel, SCHOOL_FIELDS);
+setupAutoFillSpellInfo('wizmonster', wizardSpells, SCHOOL_FIELDS);
 setupSpellCrit('wizmonster');
 
 priestSpellLevelsSections.forEach(spellLevel => {
@@ -1284,14 +1286,14 @@ priestSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, priestSpells, displaySpellLevel, SPHERE_FIELDS);
+        setupAutoFillSpellInfo(lastSection, priestSpells, SPHERE_FIELDS);
         setupSpellCrit(lastSection);
         if (lastSection !== 'priq') {
             setupAddPriestSpell(lastSection);
         }
     }
 });
-setupAutoFillSpellInfo('primonster', priestSpells, displaySpellLevel, SPHERE_FIELDS);
+setupAutoFillSpellInfo('primonster', priestSpells, SPHERE_FIELDS);
 setupSpellCrit('primonster');
 // --- End setup Spell Slots --- //
 
