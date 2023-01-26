@@ -1,1 +1,0 @@
-Hoja de personaje para el sistema Cthulhu D100. Cualquier sugerencia/incidencia, contactar conmigo al siguiente email elfonochasis@gmail.com

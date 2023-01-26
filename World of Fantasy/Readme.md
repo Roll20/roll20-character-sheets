@@ -1,1 +1,0 @@
-Hoja de personaje para el juego World of Fantasy de Dani Yimbo. Cualquier sugerencia/incidencia, contactar conmigo al siguiente email elfonochasis@gmail.com  usando el siguiente asunto para facilitar la gesti&oacute;n: [Roll20][Nombre del juego] Asunto

@@ -1,1 +1,0 @@
-This is an unofficial character sheet for the Terra Devastada RPG game by John Bogéa.
