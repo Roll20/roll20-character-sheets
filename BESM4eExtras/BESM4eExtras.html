@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.8.7" readonly />
+													<input type="text" class="center" name="attr_version" value="1.8.8" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -6823,7 +6823,70 @@
 								<div class="flex-1-4 padr">
 									<h4 class="center border">
 										<span>Skill
-											<input type="text" class="center" name="attr_name" placeholder="Skill Name" value="" readonly />
+											<!--<input type="text" class="center" name="attr_name" placeholder="Skill Name" value="" readonly />-->
+											<select class="center" name="attr_name">
+												<option value=''></option>
+												<option value='Acrobatics'>Acrobatics</option>
+												<option value='Animal Training'>Animal Training</option>
+												<option value='Architecture'>Architecture</option>
+												<option value='Area Knowledge'>Area Knowledge</option>
+												<option value='Artisan'>Artisan</option>
+												<option value='Biological Sciences'>Biological Sciences</option>
+												<option value='Boating'>Boating</option>
+												<option value='Burglary'>Burglary</option>
+												<option value='Business'>Business</option>
+												<option value='Civilisation'>Civilisation</option>
+												<option value='Climbing'>Climbing</option>
+												<option value='Computers'>Computers</option>
+												<option value='Controlled Breathing'>Controlled Breathing</option>
+												<option value='Cultural Arts'>Cultural Arts</option>
+												<option value='Demolitions'>Demolitions</option>
+												<option value='Disguise'>Disguise</option>
+												<option value='Domestic Arts'>Domestic Arts</option>
+												<option value='Driving'>Driving</option>
+												<option value='Engineering'>Engineering</option>
+												<option value='Environmental Sciences'>Environmental Sciences</option>
+												<option value='Electronics'>Electronics</option>
+												<option value='Empathy'>Empathy</option>
+												<option value='Etiquette'>Etiquette</option>
+												<option value='Forgery'>Forgery</option>
+												<option value='Gaming'>Gaming</option>
+												<option value='Interrogation'>Interrogation</option>
+												<option value='Intimidation'>Intimidation</option>
+												<option value='Languages'>Languages</option>
+												<option value='Law'>Law</option>
+												<option value='Leadership'>Leadership</option>
+												<option value='Listening'>Listening</option>
+												<option value='Mechanics'>Mechanics</option>
+												<option value='Medical'>Medical</option>
+												<option value='Military Sciences'>Military Sciences</option>
+												<option value='Naturopathy'>Naturopathy</option>
+												<option value='Navigation'>Navigation</option>
+												<option value='Occult'>Occult</option>
+												<option value='Occupation'>Occupation</option>
+												<option value='Performing Arts'>Performing Arts</option>
+												<option value='Persuasion'>Persuasion</option>
+												<option value='Physical Sciences'>Physical Sciences</option>
+												<option value='Piloting'>Piloting</option>
+												<option value='Poisons'>Poisons</option>
+												<option value='Police Sciences'>Police Sciences</option>
+												<option value='Power Lifting'>Power Lifting</option>
+												<option value='Religion'>Religion</option>
+												<option value='Riding'>Riding</option>
+												<option value='Search'>Search</option>
+												<option value='Seduction'>Seduction</option>
+												<option value='Sleight of Hand'>Sleight of Hand</option>
+												<option value='Social Sciences'>Social Sciences</option>
+												<option value='Sports'>Sports</option>
+												<option value='Stealth'>Stealth</option>
+												<option value='Street Sense'>Street Sense</option>
+												<option value='Survival'>Survival</option>
+												<option value='Swimming'>Swimming</option>
+												<option value='Urban Tracking'>Urban Tracking</option>
+												<option value='Visual Arts'>Visual Arts</option>
+												<option value='Wilderness Tracking'>Wilderness Tracking</option>
+												<option value='Writing'>Writing</option>
+											</select>
 										</span>
 									</h4>
 								</div>
@@ -7020,6 +7083,7 @@
 						</div>
 					</div>
 				</fieldset>
+				<!--
 				<div>
 					<h5 style="float: left;" class="col-1-20">
 						<div>
@@ -7063,6 +7127,7 @@
 						</div>
 					</h5>
 				</div>
+				-->
 			</div>
 		</div>
 
@@ -8900,8 +8965,9 @@
 		function getSkillCost(debug, timer, value, name){
 			const json = JSON.parse(global_templates_skills_json);
 			const skills = json.template;
+			const capName = capital(name);
 			const skill = _.find(skills, s => {
-				const result = s.name == name ? true : false;
+				const result = s.name === capName ? true : false;
 				return result;
 			});
 			const game_genre = parseInt(value.static_options_selection_gamegenre) || 0;
@@ -13563,7 +13629,7 @@
 			setDamageLevelByDamageTaken(debug, timer, value, setObj, 'fatigue');
 		}
 		
-		function getStatStateArray(debug, timer, value, sourceAttr, setObj, type, source = '') {
+		function getStatStateArray(debug, timer, value, setObj, type, source = '') {
 			const stats = type.major == 1 ? major_stats_array : allaspects_stats_array;
 			const skill = source.length > 0 ? `${source}_` : '';
 			let result = [];
@@ -13611,7 +13677,7 @@
 		}
 		
 		function getStatRollBase(debug, timer, value, sourceAttr, setObj, type, source = '') {
-			const statStates = getStatStateArray(debug, timer, value, sourceAttr, setObj, type, source);
+			const statStates = getStatStateArray(debug, timer, value, setObj, type, source);
 			const statValues = getStatValuesArray(value, type);
 			const denominator = getStateDenominator(statStates);
 			const base = getActivatedStatsBase(debug, timer, statStates, statValues, denominator);
@@ -13755,7 +13821,7 @@
 			const groupcost = parseInt(value[`static_skillgroup_${groupID}_groupcost`]) || 0;
 			setObj[`static_skillgroup_${groupID}_groupcost`] = groupcost + cost;
 		}
-		
+		/*
 		function createSkill(debug, timer, value, skillmap, rowID, setObj){
 			const json = JSON.parse(global_templates_skills_json);
 			const skills = json.template;
@@ -13797,6 +13863,69 @@
 				writeValues(debug, timer, value, `repeating_skill_${skillID}_${a}`, skill_attributes_values[i], setObj);
 			});
 			value.skillIDs = value.skillIDs.push(skillID.toLowerCase());
+			setObj.skillmanagement = 0;
+		}
+		*/
+		function setSkill(debug, timer, eventInfo, value, rowID, setObj) {
+			const json = JSON.parse(global_templates_skills_json);    
+			const skills = json.template;
+			const temp = {};
+			clog(debug, timer, '', temp, 'setSkill()');
+			temp.level = parseInt(value[`repeating_skill_${rowID}_level`]) || 0;
+			if (temp.level !== 0) {
+				writeValues(debug, timer, value, `repeating_skill_${rowID}_name`, eventInfo.previousValue, setObj);
+				return;
+			}
+			if (eventInfo.newValue === undefined) {   
+				temp.clear_skill_attributes = ['skillspecilizations','majorstats','minorstats','stat','skillrollvalue'];
+				_.each(temp.clear_skill_attributes, (a,i) => {
+					writeValues(debug, timer, value, `repeating_skill_${rowID}_${a}`, '', setObj);
+				});
+				return;
+			}
+			temp.name = capital(eventInfo.newValue);
+			temp.group = getGroupID(value, 'skill');
+			temp.skill = 
+				_.find(skills, s => {
+					if (s.name === temp.name) return true;
+				});
+			temp.game_genre = parseInt(value.static_options_selection_gamegenre) || 0;
+			temp.cost = temp.skill.cost[temp.game_genre];
+			temp.statarray = temp.skill.statallaspect.concat(temp.skill.statmajor);
+			temp.type = getStatType(value);
+			_.each(temp.statarray,stat=>{
+				writeValues(debug, timer, value, `repeating_skill_${rowID}_${stat}state`, 1 , setObj);
+			});
+			temp.disabledStats = _.chain(all_stats_array)
+				.map(s => {
+					if(temp.statarray.indexOf(s) === -1) return s;
+				})
+				.compact().value();
+			_.each(temp.disabledStats, s => {
+				writeValues(debug, timer, value, `repeating_skill_${rowID}_${s}state`, 0 , setObj);
+			});
+			temp.stats = temp.type.major==1 ? temp.skill.statmajor: temp.skill.statallaspect;
+			temp.sum = _.chain(temp.stats)
+				.map(stat=>{
+					return parseInt(value[`stat_total_${stat}`]) || 0;
+				})
+				.reduce((memo,stat)=>{
+					return memo + stat;
+				})
+				.value();
+			temp.base = Math.round(temp.sum / temp.stats.length);
+			temp.roll = `&{template:besmDefault} {{rolls=1}} {{skillroll=1}} ` +
+				`{{title=Skill Roll}} {{character_name=@{charactername}}} ` +
+				`{{pronoun=@{pronoun}}} {{skill=${temp.name}}} {{level=0}} ` +
+				`{{base=${temp.base}}} {{total=[[ [[?{Roll is|Normal, 2d6|` +
+				`Minor Edge, 3d6kh2|Minor Obstacle, 3d6kl2|Major Edge, 4d6kh2|` +
+				`Major Obstacle, 4d6kl2}]] + [[${temp.base}]] ]]}} {{roll=$[[0]]}}`;
+			temp.skill_attributes = ['group','skillspecilizations','majorstats','minorstats','stat','skillrollvalue'];
+			temp.skill_attributes_values = [temp.group, temp.skill.specializations, temp.type.major, temp.type.minor, getSkillStatsDisplay(temp.stats), temp.roll];
+			_.each(temp.skill_attributes, (a,i) => {
+				writeValues(debug, timer, value, `repeating_skill_${rowID}_${a}`, temp.skill_attributes_values[i], setObj);
+			});
+			value.skillIDs = value.skillIDs.push(rowID);
 			setObj.skillmanagement = 0;
 		}
 		
@@ -14284,6 +14413,9 @@
 										setLevelElevation(eventInfo, source, `levelelevation`, setObj);
 										setSkillCostByRankChange(debug, timer, skillIDs, value, rowID, setObj);
 										setSkillRoll(debug, timer, value, source, rowID, sourceAttr, level, setObj, type);
+									break;
+									case 'name':
+										setSkill(debug, timer, eventInfo, value, rowID, setObj);
 									break;
 									case 'specializations':
 										setSkillCostBySpecilizationChange(debug, timer, skillIDs, eventInfo, value, sectionName, rowID, setObj);
