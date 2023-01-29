@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.8.8" readonly />
+													<input type="text" class="center" name="attr_version" value="1.8.9" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -7936,7 +7936,7 @@
 			}
 		}
 		
-		function doUpgrade(value, sheetdb, attrIDs,sizetemplateIDs, setObj){
+		function doUpgrade(value, sheetdb, attrIDs, attrdb, sizetemplateIDs, setObj){
 			clog(2, {}, `global_version =`, value.global_version, 'doUpgrade()');
 			clog(2, {}, 'sheet_version =', value.version);
 			const sheet_version = value.version;
@@ -7977,6 +7977,11 @@
 				true : false;
 			if (isLesserThan186) {
 				upgradeTo_1_8_6(value, setObj);
+			}
+			const isLesserThan189 = major_global_version <= 1 && minor_global_version < 8.9 ?
+				true : false;
+			if (isLesserThan189) {
+				upgradeTo_1_8_9(value, attrIDs, attrdb, setObj);
 			}
 			setObj.global_version = sheet_version;
 		}
@@ -8093,6 +8098,23 @@
 				setObj[`stat_cost_${allaspects_stats_array[i]}`] = cost;
 			});
 			clog(2, {}, 'upgraded to 1.8.6');
+		}
+		
+		function upgradeTo_1_8_9(value, attrIDs, attrdb, setObj) {
+			const restoreActiveGroupID = value.static_attrgroup_selected_tab;
+			_.each(attrIDs, id => {
+				if (value[`repeating_attr_${id}_attribute`] === 'defect') {
+					const rank = {};
+					rank.newValue = parseInt(value[`repeating_attr_${id}_rank`]) || 0;
+					value.static_attrgroup_selected_tab = 
+						`attrgroup${value[`repeating_attr_${id}_group`]}`;
+					setDefectPointsByRankChange(2, {}, rank, value, id, setObj);
+					value[`repeating_attr_${id}_totalcost`] = setObj[`repeating_attr_${id}_totalcost`];
+					setGroupDefectPointsOnActivation(2, {}, attrIDs, attrdb, value, 'attr', id, setObj);
+				}
+			})
+			value.static_attrgroup_selected_tab = restoreActiveGroupID;
+			clog(2, {}, 'upgraded to 1.8.9');
 		}
 		
 		/** Build UI Functions **/
@@ -8442,8 +8464,8 @@
 			const aspect = value[`repeating_attr_${rowID}_defectaspect`] || [];
 			const result = defect == 'shortcoming' ? aspect.length > 3 ? -4 : -1 :
 				lesser_defects_regex.test(defect) ? -1 :
-				serious_defects_regex.test(defect) ? -2 :
-				greater_defects_regex.test(defect) ? -3 :
+				greater_defects_regex.test(defect) ? -2 :
+				serious_defects_regex.test(defect) ? -3 :
 				0;
 			return result;
 		}
@@ -14165,8 +14187,9 @@
 						setObj.stat_total_body = '0';
 						setObj.stat_total_mind = '0';
 						setObj.stat_total_soul = '0';
-						doUpgrade(value, sheetdb, attrIDs, sizetemplateIDs, setObj);
+						doUpgrade(value, sheetdb, attrIDs, setObj.attrdb, sizetemplateIDs, setObj);
 					}else{
+						const attrdb = JSON.parse(value.attrdb);
 						const skillmap = _.chain(skilltempIDs)
 						.map( id => {
 								return { [id]: value[`repeating_skilltemplate_${id}_label`] };
@@ -14174,7 +14197,7 @@
 							.compact()
 							.value();
 						sheetdb.skillmap = skillmap;
-						doUpgrade(value, sheetdb, attrIDs, sizetemplateIDs, setObj);
+						doUpgrade(value, sheetdb, attrIDs, attrdb, sizetemplateIDs, setObj);
 					}
 					setObj.sheetdb = JSON.stringify(sheetdb);
 					clog(3, timer, 'Ready to write setObj to cache:', setObj, 'setAttrs()');
