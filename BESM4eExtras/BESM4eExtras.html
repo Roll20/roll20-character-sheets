@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.8.9" readonly />
+													<input type="text" class="center" name="attr_version" value="1.8.10" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -3580,6 +3580,30 @@
 																		<h4 class="center border">
 																			<span>Object</span>
 																			<input type='text' name="attr_object" placeholder='Enter Object' value='' />
+																		</h4>
+																	</div>
+																</div>
+															</div>
+															<div>
+																<input type="checkbox" class="block-switch" name="attr_showuniqueattributecost" value="1" />
+																<div class="block-a"></div>
+																<div class="block-b">
+																	<div class="col-1 padr">
+																		<h4 class="center border container">
+																			<span>Unique Attribute Cost per Level</span>
+																			<select class="boarder" name="attr_uniqueattributecost">
+																				<option value=0></option>
+																				<option value=1>1</option>
+																				<option value=2>2</option>
+																				<option value=3>3</option>
+																				<option value=4>4</option>
+																				<option value=5>5</option>
+																				<option value=6>6</option>
+																				<option value=7>7</option>
+																				<option value=8>8</option>
+																				<option value=9>9</option>
+																				<option value=10>10</option>
+																			</select>
 																		</h4>
 																	</div>
 																</div>
@@ -8355,6 +8379,7 @@
 				'totalcost',
 				'unaffectedattributes',
 				'uniquephenomena',
+				'uniqueattributecost',
 				'unpredictable',
 				'visible',
 				'weaponclass'
@@ -9812,7 +9837,7 @@
 				"unaffected": 2,
 				"unassailable": 1,
 				"undetectable": 2,
-				"unique attribute": 0,
+				"unique attribute": parseInt(value[`repeating_attr_${rowID}_uniqueattributecost`]),
 				"unknown power": 1,
 				"water speed": 1,
 				"wealth": 3,
@@ -10957,6 +10982,7 @@
 				'showsupersense',
 				'showunaffected',
 				'showunaffectedweapon',
+				'showuniqueattributecost',
 				'showvariablestat', 
 				'showweaponclass'
 			];
@@ -10989,6 +11015,7 @@
 				'supersense':['showsupersense'],
 				'transmute':['showvariablestat'],
 				'unaffected':['showunaffected','showattrsrc'],
+				'uniqueattribute':['showuniqueattributecost'],
 				'weapon':['showdamagetype','showweaponclass']
 			};
 			const settings_array = settingsObj[attribute] || [];
@@ -14421,8 +14448,13 @@
 									default:
 										const isDefect = value[`${source}_attribute`] == 'defect' ?
 											true : false;
+										const isUniqueAttribute = value[`${source}_attribute`] == 'unique attribute' ?
+											true : false;
 										if (isDefect) {
 											setDefectCharacteristic(debug, timer,attrdb, value, rowID, setObj);
+										}
+										if (isUniqueAttribute) {
+											setAttrCost(debug, timer, value, rowID, setObj);
 										}
 										setStatButtonStatsAndRolls(debug, timer, eventInfo, value, rowID, sourceAttr, setObj);
 								}
