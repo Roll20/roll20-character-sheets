@@ -1,5 +1,22 @@
 Change Log
 ==============================================
+**2023-01-17 ** v.69 Chuz (James Culp)
+	Add Contacts drag and drop capability, you can now drag ANY NPC from the compendium and their name and description will be added to your contacts, also loyalty, connections and favors if the NPC has those attributes (currently none do)
+	NPCs->Powers text added for all NPCs not just Awakened
+	NPCs->Weaknesses text added for all NPCs
+	NPCs->Spirits added Weaknesses to the Spirts sheet auto-generation code.
+	Bugfix PCs->Armor didn't update DR when deleting armor entries
+**2023-01-05 ** v.68 Chuz (James Culp)
+	BugFix - drag and drop QSR Combat spells
+	New Feature - Sprite drag and drop
+	Bugfix - Sprite sheet matrix_max
+	New Feature - Complex Forms drag and drop
+	Bugfix - PC -> Modifications - changing astral_initiative_dice_mod was doing strange things to the astral initiative dice.  This has been fixed but if your character ended up with a messed up astral_initiative_dice amount look in "Attributes & Abilities" for "astral_initiative_dice" and change it to the correct ammount.
+**2022-12-12 ** v.67 Chuz (James Culp)
+	Update PC -> Magic -> Meta Tradition Hermeticism now displays as "Hermeticism (Logic)" and Shamanism now displays as "Shamanism (Charisma)" for clarity
+	Bugfix NPC -> Vehicles - fixed vehicle/drone default actions
+	New Feature - added alternate melee/ranged roll buttons on npc sheets.  If there's no dicepool set the alternate button prompts for skill and attribute values.
+	New Feature - PC sheet Weapon Mods now allows JSON imports via Notes field.
 **2022-12-05 ** v.66 Chuz (James Culp)
 	New Feature - Added modifiers for primary_range_weapon_close_mod, primary_range_weapon_near_mod, primary_range_weapon_medium_mod, primary_range_weapon_far_mod, primary_range_weapon_extreme_mod, primary_range_weapon_damage_mod, primary_range_weapon_dicepool_mod for changing the ARs at various ranges and the damage for the primary weapon.
 	New Feature - Added modifiers for single_shot_penalty_mod, semi_auto_penalty_mod, burst_fire_penalty_mod, burst_wide_penalty_mod, full_auto_penalty_mod for changing the AR penalties for firing modes.
