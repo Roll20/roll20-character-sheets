@@ -1,0 +1,315 @@
+-
+  const saves = ['death', 'hazard', 'magic', 'sickness', 'corruption'];
+  // First left column then right column
+  const conditions = ['blinded', 'prone', 'stunned', 'restrained', 'slowed', 'confused', 'poisoned', 'frightened', 'charmed', 'paralyzed', 'unconscious', 'exhausted', 'troubled', 'blemished'].sort()
+  const skills = ['unarmed', 'grappling', 'daggers', 'swords', 'axes', 'bludgeons', 'polearms', 'esoteric', 'bows', 'throwing', 'shields']
+
+.character-grid
+    +griditem('traits').tile.traits
+        .inline 
+            .trait-improved(style="margin-top: 20px").left Impr.
+            .trait-name
+                h2(data-i18n="TRAITS") TRAITS
+            // For reasons of alignment
+            .trait-improved  
+        - for (let i = 0; i < 8; i++)
+            .inline
+                .trait-improved
+                    input(type="checkbox" name=`trait_${i}_imrpoved`).custom-checkbox.checkbox-normal
+                .trait-name
+                    +text-input-inline(`trait_${i}`)(placeholder=" ").noline.placeholder-line
+    +griditem('armor').tile.armor.general
+        .column
+            .armor-armor
+                h3(data-i18n="ARMOR").center
+                .equipment-row
+                    .column
+                        label.medium S
+                            input(name=`attr_armor_s`, value="0", type="number").menolarge
+                    .column
+                        label.medium C
+                            input(name=`attr_armor_c`, value="0", type="number").menolarge
+                    .column
+                        label.medium P
+                            input(name=`attr_armor_p`, value="0", type="number").menolarge
+                    .column
+                        label.medium B
+                            input(name=`attr_armor_b`, value="0", type="number").menolarge
+                    .column
+                        label.medium E
+                            input(name=`attr_armor_e`, value="0", type="number").menolarge
+                .inline.durability
+                    label(style="margin: 0;").inline
+                        span(data-i18n="DURABILITY") Durability
+                        +number-input-arrows("armor_max_dents")(value="3", min="1", max="6", type="number")
+                        input(type="hidden" name="attr_armor_max_dents_max" value=6)
+                        input(type="hidden" name="attr_armor_max_dents_min" value=1)
+                .inline
+                    +slider('DENTED', 6, 'armor', 'midlarge', 'left', ((i) => i >= 1 ? [2, 3, 4, 5, 6].filter(n => n <= i+1).map(n => `dented-${n}`).join(' ') + ' hidden' : '')).capitalize
+                        div.right(style="margin-right: 10px;")
+                            h4(data-i18n="DENTED").capitalize
+            .resilience
+                h3.center(data-i18n="RESILIENCE") RESILIENCE
+                label(style="margin: 0;").center.inline
+                    span(data-i18n="MAX_RESILIENCE") Max Resilience
+                    +number-input-arrows("armor_max_resilience", 2)(value="0", min="0", max="10", step="2", type="number", style="display: inline-block;")
+                    input(type="hidden" name="attr_armor_max_resilience_max" value="10")
+                    input(type="hidden" name="attr_armor_max_resilience_min" value="0")
+                +slider('resilience', 5, null, 'large', undefined, ((i) => [2, 4, 6, 8, 10].filter(n => Math.floor(n / 2) <= i+1).map(n => `resilience-${n}`).join(' ') + ' hidden')).x2.resilience-2
+    +griditem('general').tile.general
+        .column
+            .bruises
+                .inline
+                    div
+                        +textaction('rest')
+                    h3(data-i18n="BRUISES") BRUISES
+                    div(style="text-align: right;")
+                        +textaction('recover')
+                div
+                    +slider('bruises_x1', 8, null, 'large', undefined, ((i) => i >= 6 ? 'toughness-4' : '')).x1
+                    br
+                    +slider('bruises_x2', 5, null, 'large', undefined, ((i) => i >= 4 ? 'toughness-5' : '')).x2
+            .wounds
+                h3(data-i18n="WOUNDS").center WOUNDS
+                .inline
+                    .column
+                        +slider('wounds_x3', 4, null, 'large').x3
+                        p.center Injury
+                    .column
+                        +slider('wounds_x6', 2, null, 'large').x6
+                        p.center Injury
+            .inline
+                .column
+                    +danger('bleed', true).medium
+                .column
+                    +danger('burning', true).medium
+                .column
+                    +danger('withered', true).medium
+            .madness
+                h3(data-i18n="MADNESS").center MADNESS
+                +slider('madness_x1', 8, null, 'large', undefined, ((i) => i >= 7 ? 'insight-5' : i >= 6 ? 'insight-4' : '')).x1
+                p.center Trauma
+    +griditem('damage').tile.damage.general
+        .column
+            h3(data-i18n='DAMAGE').center.uppercase
+            .inline.center.damage-rolls
+                .column.damage-num
+                    .text.input.power-level.noline
+                        label.inline
+                            +number-input-arrows('damage_dice')(value="1")
+                            input(type="hidden" name="attr_damage_dice_min" value="1")
+                .column.damage-dice
+                    .inline 
+                        +damageroll('d4', 'd4')
+                        +damageroll('d6', 'd6')
+                        +damageroll('d8', 'd8')
+                    .inline
+                        +damageroll('d10', 'd10')
+                        +damageroll('d12', 'd12')
+                .column.damage-bonus
+                    .column.text-input.power-level.noline
+                        label.inline
+                            span +
+                            +number-input-arrows("damage_mods")
+                            input(type="hidden" name="attr_damage_mods_min" value="1")
+                        .inline.small.bolder
+                            +inline-radio("damage_mods_enable", ["@{damage_mods}", "0"], "0", ["ON", "OFF"], [" / "])
+            .inline.center.damage-extra.damage-rolls
+                .column.damage-num
+                    span Extra
+                .column.damage-dice
+                    .inline
+                        +extradamageroll('d4', 'd4')
+                        +extradamageroll('d6', 'd6')
+                        +extradamageroll('d8', 'd8')
+                .column.damage-bonus
+                    .inline
+                        +extradamageroll('1', '1')
+                        span -
+                        +extradamageroll('2', '2')
+                        span -
+                        +extradamageroll('3', '3')
+
+
+            h3(data-i18n='RESOURCES').nowrap.center.uppercase
+            .resources
+                .inline.power
+                    .power-name
+                        .power-name-static Blood Points
+                    .power-level
+                        +text-input-duo('blood_points', 'blood_points_max', undefined, {type: 'number', value: 6, min: 0, step: 1})(type="number" value="0" min="0" step="1").inline.noline.center
+                .inline.power
+                    .power-name
+                        .power-name-static Doom Points
+                    .power-level
+                        +text-input-duo('doom_points', 'doom_points_max', undefined, {type: 'number', value: 6, min: 0, step: 1})(type="number" value="0" min="0" step="1").inline.noline.center
+                - for (let i = 0; i < 3; i++)
+                    .inline.power
+                        .power-name
+                            +text-input-inline(`resource_${i}_name`, 'skill')(placeholder=" ").noline.placeholder-line
+                        .power-level
+                            +text-input-duo(`resource_${i}`, `resource_${i}_max`, undefined, {type: 'number', value: 0, min: 0, step: 1})(type="number" value="0" step="1").noline.inline
+
+
+    +griditem('powers').tile.powers
+        .inline
+            .column.left(style="margin-top: 20px") Impr.
+            .column.center
+                input(type="hidden" name="attr_show_powers_magic" value="powers")
+                h2(data-i18n="POWERS")
+                h2(data-i18n="MAGIC")
+            .column.right(style="margin-top: 20px") BP
+        - for (let i = 0; i < 10; i++)
+            .inline
+                .power-improved.center
+                    input(type="checkbox" name=`attr_power_${i}_improved`).checkbox-normal.custom-checkbox
+                .power-name
+                    +text-input-inline(`power_${i}_name`, 'skill')(placeholder=" ").noline.placeholder-line
+                .power-level.center
+                    +text-input-inline(`power_${i}_level`, 'skill')(type="number").noline
+    +griditem('feats').tile.feats
+        h2(data-i18n='FEATS').uppercase
+        - for (let i = 0; i < 6; i++)
+            +text-input-inline(`feat_${i}`)(placeholder=' ').noline.placeholder-line
+    +griditem('skills').tile.skills
+        h2(data-i18n="COMBAT_SKILLS").nowrap.mezzolarge COMBAT SKILLS
+        each skill in skills
+            +skill(skill)
+    // ABILITIES
+    +griditem('abilities').tile.abilities
+        .inline.center
+            div
+                +textaction('doom_roll', 'DOOM_ROLL')
+            div
+                //+textaction('roll_action_dice').large.nowrap
+                h4(data-i18n='ACTION_DICE').nowrap.mezzolarge.uppercase
+                //+inline-radio('ability_action_dice', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 1, undefined, []).midlarge
+            div.doom-rolls
+                +textaction('roll_doom_reroll', 'reroll')
+                +textaction('roll_doom_roll5', 'roll_5')
+        .ability-roll.inline.space-around
+            - for (let i = 1; i < 13; i++)
+                +textaction('roll_action_dice', i.toString())(value=i).mezzolarge.bold
+        br
+        .inline.center
+            div
+                h4(data-i18n='DIFFICULTY').uppercase DIFFICULTY
+                .inline.center.inline-radio.difficulty
+                    each label, index in ['EASY', 'NORMAL', 'HARD', 'EXTREME', 'NIGHTMARE']
+                        label
+                            input(name='attr_ability_difficulty', type='radio', value=index + 1, checked=(index === 1))
+                            span
+                                h5(data-i18n=label).uppercase.center
+                                h5.center.midlarge=index+1
+                    //+inline-radio('ability_difficulty', [1, 2, 3, 4, 5, 6], 2, ['EASY', 'NORMAL', 'HARD', 'EXTREME', 'NIGHTMARE'], []).uppercase.small
+        h2.strike
+            span(data-i18n="ABILITIES") ABILITIES
+        .ability-scores
+            .inline
+                +ability('strength') STRENGTH
+                +ability('intellect') INTELLECT
+                +ability('heart') HEART
+            .inline
+                +ability('dexterity') DEXTERITY
+                +ability('wisdom') WISDOM
+                +ability('mystique') MYSTIQUE
+            .inline
+                +ability('toughness') TOUGHNESS
+                +ability('lore') LORE
+                +ability('courage') COURAGE
+            .inline
+                +ability('reflex') REFLEX
+                +ability('awareness') AWARENESS
+                +ability('insight') INSIGHT
+            .inline
+                +ability('stealth') STEALTH
+                +ability('focus') FOCUS
+                +ability('willpower') WILLPOWER
+    // ADV SKILLS
+    +griditem('advskills').tile.advskills
+        h2(data-i18n='ADVENTURING_SKILLS').nowrap.mezzolarge ADVENTURING SKILLS
+        - for (let i = 0; i < 8; i++)
+            +advSkill(i)
+    // RESOURCES
+    +griditem('cantrips').tile.cantrips
+        h2(data-i18n='CANTRIPS').uppercase
+        - for (let i = 0; i < 6; i++)
+            +text-input-inline(`cantrip_${i}`)(placeholder=' ').noline.placeholder-line
+    // CONDITIONS
+    +griditem('conditions').tile
+        // TODO: Rename all this stuff to "conditions"
+        h2(data-i18n="CONDITIONS").uppercase CONDITIONS
+        .conditions
+            .column
+                each condition in conditions.slice(0, conditions.length / 2)
+                    +danger(condition)
+            .column
+                each condition in conditions.slice(conditions.length / 2)
+                    +danger(condition)
+    // AFFLICTIONS
+    +griditem('afflictions').tile.afflictions
+        h2 AFFLICTIONS
+        - for (let i = 0; i < 8; i++)
+            +text-input-inline(`affliction_${i}`)(placeholder=" ").noline.placeholder-line
+
+    // EQUIPMENT
+    +griditem('equipment').tile
+        div.center
+            h2(style="display: inline;") Equipment
+            span.ignore-width.nowrap
+                span.fake-checkbox.checkbox-small
+                | =
+                |
+                span(data-i18n="DENTED").capitalize
+        .equipment
+            mixin equipment-row(i, right)
+                .equipment-row&attributes(attributes)
+                    .column.equipment-name
+                        +text-input-inline(`equipment_${i}_name`)
+                    if(right)
+                        .column.equipment-uses
+                            +text-input-duo(`equipment_${i}_uses`, `equipment_${i}_uses_max`, null, {}).inline.center
+                    .column.equipment-broken
+                        input(type="checkbox" name=`equipment_${i}_broken`).custom-checkbox
+            .column
+                .equipment-row
+                    .column.equipment-name.inline
+                        .left NAME & TAGS
+                - for(let i = 1; i < 13; i++)
+                    +equipment-row(i, false)(class= i===11 ? 'strength-4' : i===12 ? 'strength-5': '')
+            .column
+                .equipment-row
+                    .column.equipment-name.inline
+                        .left NAME & TAGS
+                        .right USES OR SUPPLY:
+                    .column.equipment-uses CUR / MAX
+                - for(let i = 13; i < 25; i++)
+                    +equipment-row(i, true)(class= i===23 ? 'strength-4' : i===24 ? 'strength-5': '')
+
+    // TODO: Clean up and re-add once Hireling rules are to be released with the full game.
+    //+griditem('hirelings').tile
+    //    h2 Hirelings
+    //    .hirelings.equipment
+    //        .column
+    //            - for(let i = 1; i < 7; i++)
+    //                if (i % 4 === 1)
+    //                    br
+    //                .hireling-row
+    //                    .column.hireling-name
+    //                        +text-input-inline(`hireling_${i}_name`)
+    //                    .column.hireling-oath
+    //                        +text-input-inline(`hireling_${i}_oath`)
+    //                    .column.hireling-loyalty
+    //                        +text-input-inline(`hireling_${i}_loyalty`)
+    //        .column
+    //            - for(let i = 7; i < 13; i++)
+    //                if (i % 4 === 1)
+    //                    br
+    //                .hireling-row
+    //                    .column.hireling-name
+    //                        +text-input-inline(`hireling_${i}_name`)
+    //                    .column.hireling-oath
+    //                        +text-input-inline(`hireling_${i}_oath`)
+    //                    .column.hireling-loyalty
+    //                        +text-input-inline(`hireling_${i}_loyalty`)
+
