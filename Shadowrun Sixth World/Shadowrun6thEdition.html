@@ -8304,7 +8304,6 @@ const update_track = (track) => {
 	(track === "stun") ? attrs.push("willpower") : attrs.push("body", "sheet_type", "flag_drone");
 	attrs.push('compendium_drop_in_progress');
 	getAttrs(attrs, (v) =>{
-
 		// If we're in the middle of a compendium drop don't update the tracks, sometimes the compendiums set odd values
 		if(v.compendium_drop_in_progress) {
 			return;
@@ -10863,11 +10862,6 @@ console.log(data);
 	// if there are blobs, add those and ignore the parent (it should be one of the blobs?)
 	if(data.blobs && Object.keys(data.blobs).length > 0) {
 console.log(data.blobs);
-//		if(data.Category == "QSR Tool Cards") {
-//			let blob = data.blobs[data["data-name"]];
-//			data.blobs = {};
-//			data.blobs[data["data-name"]] = blob;
-//		}
 		Object.keys(data.blobs).forEach((key) => {
 			blob = data.blobs[key];
 
@@ -10882,9 +10876,8 @@ console.log(data.blobs);
 			}
 			blob["data-name"] = key;
 
-
 			if(dropType == 'canvasdrop') {
-					canvas_import(blob);
+				canvas_import(blob);
 			} else {
 				compendium_import(blob);
 			}
@@ -10906,6 +10899,7 @@ var canvas_import = function(data) {
 		case 'Contacts':
 		case 'Grunts':
 		case 'Critters':
+		case 'Drone':
 		case 'Drones':
 		case 'Vehicles':
 		case 'Spirits':
@@ -10926,20 +10920,12 @@ var compendium_import = function(data) {
 console.log("compendium item dropped: "+data.Category);
 console.log(data);
 	switch(data.Category) {
-			case 'NPCs':
-//				if(typeof data["data-sub_type"] !== 'undefined' && data["data-sub_type"] === "CONTACT") {
-					compendiumAddContact(data);
-//				}
-				break;
-//			case 'Grunts':
-//			case 'Critters':
-//			case 'Spirits':
-//			case 'Hosts':
-//			case 'Sprites':
-//				// make it use the right character sheet...
-//				compendiumDroppedNPC(data);
-//				break;
+		case 'NPCs':
+			compendiumAddContact(data);
+			break;
+		case 'Drone':
 		case 'Drones':
+		case 'Vehicle':
 		case 'Vehicles':
 			compendiumAddDrone(data);
 			break;
@@ -11002,6 +10988,7 @@ console.log(data);
 
 var canvasDroppedNPC = function(data) {
 	var tokenAttrs = {
+		showname: 1,
 		width: data["data-token_width"] || 70,
 		height: data["data-token_height"] || 70
 	};
@@ -11026,7 +11013,9 @@ var canvasDroppedNPC = function(data) {
 			tokenAttrs.bar3_value = data["data-edge"] || 0;
 			tokenAttrs.bar3_max = 7;
 			break;
+		case 'Vehicle':
 		case 'Vehicles':
+		case 'Drone':
 		case 'Drones':
 			canvasAddDrone(data);
 
@@ -11036,7 +11025,7 @@ var canvasDroppedNPC = function(data) {
 				physical = 8 + Math.ceil(data["data-body_base"] / 2);
 			}
 
-			if(typeof data["data-matrix"]) {
+			if(typeof data["data-matrix"] !== 'undefined') {
 				matrix = data["data-matrix"];
 			} else if(typeof data["data-sensor_base"] !== 'undefined') {
 				matrix = 8 + Math.ceil(data["data-sensor_base"]);
@@ -11095,10 +11084,13 @@ var setup_token = (tokenAttrs) => {
 //	setDefaultToken({
 //		 bar1_value: tokenAttrs.bar1_value,
 //		 bar1_max: tokenAttrs.bar1_value_max,
+//		 bar1_link: "physical";
 //		 bar2_value: tokenAttrs.bar2_value,
 //		 bar2_max: tokenAttrs.bar2_value_max,
+//		 bar2_link: "matrix";
 //		 bar3_value: tokenAttrs.bar3_value,
 //		 bar3_max: tokenAttrs.bar3_value_max,
+//		 bar3_link: "speed";
 //		 showname: tokenAttrs.showname,
 //		 width: tokenAttrs.width,
 //		 height: tokenAttrs.height
