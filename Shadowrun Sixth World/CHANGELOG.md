@@ -1,5 +1,11 @@
 Change Log
 ==============================================
+**2023-02-13 ** v.71 Chuz (James Culp)
+	Began adding weapon information as it's own section in the attack Roll Templates
+	Added weapon info to Ranged attack Roll Templates
+	Added weapon info to Ranged (Burst Fire Wide) attack Roll Templates
+	Added weapon info to Melee attack Roll Templates
+	Began adding tooltips at the bottom of Roll Templates.
 **2023-02-06 ** v.70 Chuz (James Culp)
 	Bugfix - PC Condition Monitor boxes broke if the maximum value was below 8.  Changed the minimum to 6 which is 0 body with Neoteny so should be unattainable.
 **2023-01-17 ** v.69 Chuz (James Culp)
