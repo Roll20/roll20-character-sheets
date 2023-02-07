@@ -3906,6 +3906,7 @@
 		<button type="action" name="act_reactblock"></button>
 		<button type="action" name="act_monsterlocation"></button>
 		<button type="action" name="act_humanlocation"></button>
+		<button type="action" name="act_critlocation"></button>
 	</div>
 </div>
 
@@ -4707,7 +4708,7 @@ on('clicked:monsterlocation', async (ev) => {
 	let passin = rollEscape.unescape(ev.originalRollId);
 	console.log(passin);
 
-	let rollBase = `@{whisper}&{template:monsterlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}{{weapon_effect=${passin.weapon_effect}}}`
+	let rollBase = `@{whisper}&{template:monsterlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0[WEAPON]]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0[LOCATION]]]}}{{armor=[[0[ARMOR]]]}}{{damage=[[0[TOTAL]]]}}{{critdmg=[[0[CRIT]]]}}{{weapon_effect=${passin.weapon_effect}}}`
 	let rollResult = await startRoll(rollBase);
 
 	console.log(rollResult);
@@ -4747,7 +4748,7 @@ on('clicked:humanlocation', async (ev) => {
 	let passin = rollEscape.unescape(ev.originalRollId);
 	console.log(passin);
 
-	let rollBase = `@{whisper}&{template:humanlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0]]}}{{armor=[[0]]}}{{damage=[[0]]}}{{critdmg=[[0]]}}{{weapon_effect=${passin.weapon_effect}}}`
+	let rollBase = `@{whisper}&{template:humanlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0[WEAPON]]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0[LOCATION]]]}}{{armor=[[0[ARMOR]]]}}{{damage=[[0[TOTAL]]]}}{{critdmg=[[0[CRIT]]]}}{{weapon_effect=${passin.weapon_effect}}}`
 	let rollResult = await startRoll(rollBase);
 
 	console.log(rollResult);
@@ -4761,6 +4762,46 @@ on('clicked:humanlocation', async (ev) => {
 		locationmultiplier = 1;
 	}
 	else if(location > 4) {
+		locationmultiplier = 0.5;
+	}
+
+
+	//(attack multiplicator x rolled dmg - SP) * location * resistance + bonus crit damage
+	let damage = passin.afterArmor * locationmultiplier + passin.critdmg;
+
+		finishRoll(
+			rollResult.rollId,
+			{
+				attackmultiplier: passin.attackmultiplier,
+				locationmultiplier: locationmultiplier,
+				weapondmg: passin.weapondmg,
+				critdmg: passin.critdmg,
+				armor: passin.armor,
+				afterArmor: passin.afterArmor,
+				damage: damage
+			}
+		);
+
+});
+
+on('clicked:critlocation', async (ev) => {
+	let passin = rollEscape.unescape(ev.originalRollId);
+	console.log(passin);
+
+	let rollBase = `@{whisper}&{template:critlocation} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[2d6]]}}{{attackmultiplier=[[0]]}}{{weapondmg=[[0[WEAPON]]]}}{{afterArmor=[[0]]}}{{locationmultiplier=[[0[LOCATION]]]}}{{armor=[[0[ARMOR]]]}}{{damage=[[0[TOTAL]]]}}{{critdmg=[[0[CRIT]]]}}{{weapon_effect=${passin.weapon_effect}}}`
+	let rollResult = await startRoll(rollBase);
+
+	console.log(rollResult);
+	var location = rollResult.results.roll.result;
+
+	let locationmultiplier = 1;
+	if(location === 12 || location === 11) {
+		locationmultiplier = 3;
+	}
+	else if(location > 5 && location < 11) {
+		locationmultiplier = 1;
+	}
+	else if(location > 6) {
 		locationmultiplier = 0.5;
 	}
 
@@ -5652,84 +5693,27 @@ const asw = (() => {
 		{{/rollGreater() computed::hit 0}}
 	</table>
 	{{#rollGreater() computed::hit 0}}
+
 		<div class="sheet-rolltemplate-button-row">
 			{{#^rollTotal() computed::rolllocation 0}}
+			{{#^rollGreater() computed::critdmg 0}}
 				<div class="sheet-rolltemplate-button">
 					[Location(Monster)](~{{name}}|monsterlocation||{{computed::passthrough}})
 				</div>
 				<div class="sheet-rolltemplate-button">
 					[Location(Humanoid)](~{{name}}|humanlocation||{{computed::passthrough}})
 				</div>
+			{{/^rollGreater() computed::critdmg 0}}
+			{{#rollGreater() computed::critdmg 0}}
+			<div class="sheet-rolltemplate-button">
+				[Location(Crit)](~{{name}}|critlocation||{{computed::passthrough}})
+			</div>
+			{{/rollGreater() computed::critdmg 0}}
 			{{/^rollTotal() computed::rolllocation 0}}
 		</div>
+
+
 	{{/rollGreater() computed::hit 0}}
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-monsterlocation">
-	<table>
-		<tr>
-			<th>{{title}}</th>
-		</tr>
-		<tr>
-			<td><strong class="template-title">NAME: </strong> {{name}}</td>
-		</tr>
-		{{#rollTotal() roll 1}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">HEAD:</strong> If successful, your attack will deal x3 damage.</td></tr>{{/rollTotal() roll 1}}
-		{{#rollBetween() roll 2 5}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">TORSO (MONSTER):</strong> If successful, your attack will deal standard damage.</td></tr>{{/rollBetween() roll 2 5}}
-		{{#rollBetween() roll 6 7}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">RIGHT LIMB (MONSTER):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 6 7}}
-		{{#rollBetween() roll 8 9}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">LEFT LIMB (MONSTER):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 8 9}}
-		{{#rollTotal() roll 10}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">WING/TAIL (MONSTER):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollTotal() roll 10}}
-		<tr>
-			<td><strong class="template-title">TARGET LOCATION: </strong> {{roll}}</td>
-		</tr>
-		{{#computed::damage}}
-		<tr class="sheet-rolltemplate-calculation">
-			<td>
-				<strong class="template-title">DAMAGE:</strong> ({{#^rollTotal() computed::attackmultiplier 1}}{{computed::attackmultiplier}} x {{/^rollTotal() computed::attackmultiplier 1}}{{computed::weapondmg}} - {{computed::armor}}) = {{computed::afterArmor}} x {{computed::locationmultiplier}} + {{computed::critdmg}} ={{computed::damage}}
-			</td>
-		</tr>
-		{{/computed::damage}}
-		{{#weapon_effect}}
-		<tr class="sheet-rolltemplate-calculation">
-			<td>
-				<strong class="template-title">EFFECT:</strong> {{weapon_effect}}
-			</td>
-		</tr>
-		{{/weapon_effect}}
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-humanlocation">
-	<table>
-		<tr>
-			<th>{{title}}</th>
-		</tr>
-		<tr>
-			<td><strong class="template-title">NAME: </strong> {{name}}</td>
-		</tr>
-		{{#rollTotal() roll 1}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">HEAD:</strong> If successful, your attack will deal x3 damage.</td></tr>{{/rollTotal() roll 1}}
-		{{#rollBetween() roll 2 4}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">TORSO (HUMANOID):</strong> If successful, your attack will deal standard damage.</td></tr>{{/rollBetween() roll 2 4}}
-		{{#rollTotal() roll 5}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">RIGHT ARM (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollTotal() roll 5}}
-		{{#rollTotal() roll 6}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">LEFT ARM (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollTotal() roll 6}}
-		{{#rollBetween() roll 7 8}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">RIGHT LEG (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 7 8}}
-		{{#rollBetween() roll 9 10}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">LEFT LEG (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 9 10}}
-		<tr>
-			<td><strong class="template-title">TARGET LOCATION: </strong> {{roll}}</td>
-		</tr>
-		{{#computed::damage}}
-		<tr class="sheet-rolltemplate-calculation">
-			<td>
-				<strong class="template-title">DAMAGE:</strong> ({{#^rollTotal() computed::attackmultiplier 1}}{{computed::attackmultiplier}} x {{/^rollTotal() computed::attackmultiplier 1}}{{computed::weapondmg}} - {{computed::armor}}) = {{computed::afterArmor}} x {{computed::locationmultiplier}} + {{computed::critdmg}} ={{computed::damage}}
-			</td>
-		</tr>
-		{{/computed::damage}}
-		{{#weapon_effect}}
-		<tr class="sheet-rolltemplate-calculation">
-			<td>
-				<strong class="template-title">EFFECT:</strong> {{weapon_effect}}
-			</td>
-		</tr>
-		{{/weapon_effect}}
-	</table>
 </rolltemplate>
 
 <!-- ---- Casting Templates ---- -->
@@ -5798,4 +5782,135 @@ const asw = (() => {
 		{{/^rollWasCrit() roll}}
 		{{/rollWasFumble() roll}}
     </table>
+</rolltemplate>
+
+<!-- ---- Location Templates ---- -->
+<rolltemplate class="sheet-rolltemplate-monsterlocation">
+	<table>
+		<tr>
+			<th>{{title}}</th>
+		</tr>
+		<tr>
+			<td><strong class="template-title">NAME: </strong> {{name}}</td>
+		</tr>
+		{{#rollTotal() roll 1}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">HEAD:</strong> If successful, your attack will deal x3 damage.</td></tr>{{/rollTotal() roll 1}}
+		{{#rollBetween() roll 2 5}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">TORSO (MONSTER):</strong> If successful, your attack will deal standard damage.</td></tr>{{/rollBetween() roll 2 5}}
+		{{#rollBetween() roll 6 7}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">RIGHT LIMB (MONSTER):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 6 7}}
+		{{#rollBetween() roll 8 9}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">LEFT LIMB (MONSTER):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 8 9}}
+		{{#rollTotal() roll 10}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">WING/TAIL (MONSTER):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollTotal() roll 10}}
+		<tr>
+			<td><strong class="template-title">TARGET LOCATION: </strong> {{roll}}</td>
+		</tr>
+		{{#computed::damage}}
+		<tr class="sheet-rolltemplate-calculation">
+			<td>
+				<strong class="template-title">DAMAGE:</strong> ({{#^rollTotal() computed::attackmultiplier 1}}{{computed::attackmultiplier}} x {{/^rollTotal() computed::attackmultiplier 1}}{{computed::weapondmg}} - {{computed::armor}}) = {{computed::afterArmor}} x {{computed::locationmultiplier}} + {{computed::critdmg}} ={{computed::damage}}
+			</td>
+		</tr>
+		{{/computed::damage}}
+		{{#weapon_effect}}
+		<tr class="sheet-rolltemplate-calculation">
+			<td>
+				<strong class="template-title">EFFECT:</strong> {{weapon_effect}}
+			</td>
+		</tr>
+		{{/weapon_effect}}
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-humanlocation">
+	<table>
+		<tr>
+			<th>{{title}}</th>
+		</tr>
+		<tr>
+			<td><strong class="template-title">NAME: </strong> {{name}}</td>
+		</tr>
+		{{#rollTotal() roll 1}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">HEAD:</strong> If successful, your attack will deal x3 damage.</td></tr>{{/rollTotal() roll 1}}
+		{{#rollBetween() roll 2 4}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">TORSO (HUMANOID):</strong> If successful, your attack will deal standard damage.</td></tr>{{/rollBetween() roll 2 4}}
+		{{#rollTotal() roll 5}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">RIGHT ARM (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollTotal() roll 5}}
+		{{#rollTotal() roll 6}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">LEFT ARM (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollTotal() roll 6}}
+		{{#rollBetween() roll 7 8}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">RIGHT LEG (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 7 8}}
+		{{#rollBetween() roll 9 10}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">LEFT LEG (HUMANOID):</strong> If successful, your attack will deal half damage.</td></tr>{{/rollBetween() roll 9 10}}
+		<tr>
+			<td><strong class="template-title">TARGET LOCATION: </strong> {{roll}}</td>
+		</tr>
+		{{#computed::damage}}
+		<tr class="sheet-rolltemplate-calculation">
+			<td>
+				<strong class="template-title">DAMAGE:</strong> ({{#^rollTotal() computed::attackmultiplier 1}}{{computed::attackmultiplier}} x {{/^rollTotal() computed::attackmultiplier 1}}{{computed::weapondmg}} - {{computed::armor}}) = {{computed::afterArmor}} x {{computed::locationmultiplier}} + {{computed::critdmg}} ={{computed::damage}}
+			</td>
+		</tr>
+		{{/computed::damage}}
+		{{#weapon_effect}}
+		<tr class="sheet-rolltemplate-calculation">
+			<td>
+				<strong class="template-title">EFFECT:</strong> {{weapon_effect}}
+			</td>
+		</tr>
+		{{/weapon_effect}}
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-critlocation">
+	<table>
+		<tr>
+			<th>{{title}}</th>
+		</tr>
+		<tr>
+			<td><strong class="template-title">NAME: </strong> {{name}}</td>
+		</tr>
+		{{#rollTotal() computed::critdmg 3}}
+			{{#rollBetween() roll 2 3}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">SPRAINED LEG:</strong> -2 SPD, Dodge, Escape, Athletics</td></tr>{{/rollBetween() roll 2 3}}
+			{{#rollBetween() roll 4 5}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">SPRAINED ARM:</strong> -2 to actions with this arm</td></tr>{{/rollBetween() roll 4 5}}
+			{{#rollBetween() roll 6 8}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">FOREIGN OBJECT (TORSO):</strong> Recovery and Critical Healing are quartered</td></tr>{{/rollBetween() roll 6 8}}
+			{{#rollBetween() roll 9 10}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">CRACKED RIBS (TORSO):</strong> -2 BODY, does not affect Health Points</td></tr>{{/rollBetween() roll 9 10}}
+			{{#rollTotal() roll 11}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">DISFIGURING SCAR (HEAD):</strong> -3 empathic Verbal Combat</td></tr>{{/rollTotal() roll 11}}
+			{{#rollTotal() roll 12}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">CRACKED JAW (HEAD):</strong> -2 Magical Skills, Verbal Combat</td></tr>{{/rollTotal() roll 12}}
+		{{/rollTotal() computed::critdmg 3}}
+
+		{{#rollTotal() computed::critdmg 5}}
+			{{#rollBetween() roll 2 3}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">FRACTURED LEG:</strong> -3 SPD, Dodge, Escape, Athletics</td></tr>{{/rollBetween() roll 2 3}}
+			{{#rollBetween() roll 4 5}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">FRACTURED ARM:</strong> -3 to actions with this arm</td></tr>{{/rollBetween() roll 4 5}}
+			{{#rollBetween() roll 6 8}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">BROKEN RIBS (TORSO):</strong> -2 BODY; -1 REF/DEX</td></tr>{{/rollBetween() roll 6 8}}
+			{{#rollBetween() roll 9 10}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">RUPTURED SPLEEN (TORSO):</strong> Stun save every 5 rounds; bleeding</td></tr>{{/rollBetween() roll 9 10}}
+			{{#rollTotal() roll 11}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">LOST TEETH (HEAD):</strong> [[1d10]] teeth; -3 magical skills; verbal combat</td></tr>{{/rollTotal() roll 11}}
+			{{#rollTotal() roll 12}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">MINOR HEAD WOUND (HEAD):</strong> -1 to INT, WILL, STUN</td></tr>{{/rollTotal() roll 12}}
+		{{/rollTotal() computed::critdmg 5}}
+
+		{{#rollTotal() computed::critdmg 8}}
+			{{#rollBetween() roll 2 3}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">COMPOUND LEG FRACTURE:</strong> leg useless, quarter SPD Dodge/Escape Atheletics; bleeding</td></tr>{{/rollBetween() roll 2 3}}
+			{{#rollBetween() roll 4 5}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">COMPOUND ARM FRACTURE:</strong> arm useless; bleeding</td></tr>{{/rollBetween() roll 4 5}}
+			{{#rollBetween() roll 6 8}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">SUCKING CHEST WOUND (TORSO):</strong> -3 BODY,SPD; suffocating</td></tr>{{/rollBetween() roll 6 8}}
+			{{#rollBetween() roll 9 10}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">TORN STOMACH (TORSO):</strong> -2 to all action; 4 acid damage per round</td></tr>{{/rollBetween() roll 9 10}}
+			{{#rollTotal() roll 11}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">CONCUSSION (HEAD):</strong> all [[1d6]] rounds stun save; -2 INT/REF/DEX</td></tr>{{/rollTotal() roll 11}}
+			{{#rollTotal() roll 12}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">SKULL FRACTURE (HEAD):</strong> bleeding; -1 INT/DEX; 4x head damage</td></tr>{{/rollTotal() roll 12}}
+		{{/rollTotal() computed::critdmg 8}}
+
+		{{#rollTotal() computed::critdmg 10}}
+			{{#rollBetween() roll 2 3}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">DISMEMBERED LEG:</strong> leg useless; quarter SPD Dodge/Escape Atheletics; bleeding</td></tr>{{/rollBetween() roll 2 3}}
+			{{#rollBetween() roll 4 5}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">DISMEMBERED ARM:</strong> arm useless; bleeding</td></tr>{{/rollBetween() roll 4 5}}
+			{{#rollBetween() roll 6 8}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">SEPTIC SHOCK (TORSO):</strong> -3 INT, WILL, REF, DEX; poisoned</td></tr>{{/rollBetween() roll 6 8}}
+			{{#rollBetween() roll 9 10}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">HEART DAMAGE (TORSO):</strong> quarter Stamina, SPD, BODY; bleeding</td></tr>{{/rollBetween() roll 9 10}}
+			{{#rollTotal() roll 11}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">DAMAGED EYE (HEAD):</strong> -5 sight based Awareness; -4 DEX; bleeding</td></tr>{{/rollTotal() roll 11}}
+			{{#rollTotal() roll 12}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">SEPARATED SPINE/DECAPITATED (HEAD):</strong> You are dead</td></tr>{{/rollTotal() roll 12}}
+		{{/rollTotal() computed::critdmg 10}}
+		<tr>
+			<td><strong class="template-title">TARGET LOCATION: </strong> {{roll}}</td>
+		</tr>
+		{{#computed::damage}}
+		<tr class="sheet-rolltemplate-calculation">
+			<td>
+				<strong class="template-title">DAMAGE:</strong> ({{#^rollTotal() computed::attackmultiplier 1}}{{computed::attackmultiplier}} x {{/^rollTotal() computed::attackmultiplier 1}}{{computed::weapondmg}} - {{computed::armor}}) = {{computed::afterArmor}} x {{computed::locationmultiplier}} + {{computed::critdmg}} ={{computed::damage}}
+			</td>
+		</tr>
+		{{/computed::damage}}
+		{{#weapon_effect}}
+		<tr class="sheet-rolltemplate-calculation">
+			<td>
+				<strong class="template-title">EFFECT:</strong> {{weapon_effect}}
+			</td>
+		</tr>
+		{{/weapon_effect}}
+	</table>
 </rolltemplate>
