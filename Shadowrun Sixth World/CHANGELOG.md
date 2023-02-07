@@ -1,6 +1,9 @@
 Change Log
 ==============================================
 **2023-02-13 ** v.71 Chuz (James Culp)
+	Converted Vehicle Autosoft roll buttons to the newer PC style
+	Converted NPC attribute roll buttons to the newer PC style
+	Converted NPC Initiative and Defense button blocks to the newer PC style
 	Began adding weapon information as it's own section in the attack Roll Templates
 	Added weapon info to Ranged attack Roll Templates
 	Added weapon info to Ranged (Burst Fire Wide) attack Roll Templates
