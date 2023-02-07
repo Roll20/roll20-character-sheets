@@ -1,6 +1,11 @@
 Change Log
 ==============================================
 **2023-02-13 ** v.71 Chuz (James Culp)
+	Converted NPC Spell roll buttons to use the newer PC style
+	Converted NPC Attack (ranged and melee) buttons to use the new roll buttons
+	Converted NPC Attack (ranged and melee) buttons to use the new roll template weapon info block
+	Updated Matrix Roll buttons to include inline opposed roll buttons.  To use these the target's token must be selected.
+	Converted Grunt skill buttons to new style
 	Converted Vehicle Autosoft roll buttons to the newer PC style
 	Converted NPC attribute roll buttons to the newer PC style
 	Converted NPC Initiative and Defense button blocks to the newer PC style
