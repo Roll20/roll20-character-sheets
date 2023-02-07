@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2023-02-06 ** v.70 Chuz (James Culp)
+	Bugfix - PC Condition Monitor boxes broke if the maximum value was below 8.  Changed the minimum to 6 which is 0 body with Neoteny so should be unattainable.
 **2023-01-17 ** v.69 Chuz (James Culp)
 	Add Contacts drag and drop capability, you can now drag ANY NPC from the compendium and their name and description will be added to your contacts, also loyalty, connections and favors if the NPC has those attributes (currently none do)
 	NPCs->Powers text added for all NPCs not just Awakened

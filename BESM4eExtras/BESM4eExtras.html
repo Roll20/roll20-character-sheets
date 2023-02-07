@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.8.10" readonly />
+													<input type="text" class="center" name="attr_version" value="1.8.11" readonly />
 													<input type="hidden" name="attr_global_version" value="0.0.0" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
@@ -4383,12 +4383,29 @@
 																</div>
 															</div>
 															<div>
-																<input type="checkbox" class="block-switch" name="attr_showunique" value="1" />
+																<input type="checkbox" class="block-switch" name="attr_showuniquedefect" value="1" />
 																<div class="block-a"></div>
 																<div class="block-b">
 																	<div class="col-1 padr">
 																		<h4 class="center border container">
-																			<span>Defect</span>
+																			<span>Unique Defect Category</span>
+																			<select class="boarder" name="attr_uniquedefectcategory">
+																				<option value=0></option>
+																				<option value=1>Lesser</option>
+																				<option value=2>Greater</option>
+																				<option value=3>Serious</option>
+																			</select>
+																		</h4>
+																	</div>
+																</div>
+															</div>
+															<div>
+																<input type="checkbox" class="block-switch" name="attr_showuniquedefect" value="1" />
+																<div class="block-a"></div>
+																<div class="block-b">
+																	<div class="col-1 padr">
+																		<h4 class="center border container">
+																			<span>Defect Rank</span>
 																			<select class="boarder" name="attr_rank">
 																				<option value=0></option>
 																				<option value=1>Infrequent/Slight</option>
@@ -7961,53 +7978,70 @@
 		}
 		
 		function doUpgrade(value, sheetdb, attrIDs, attrdb, sizetemplateIDs, setObj){
-			clog(2, {}, `global_version =`, value.global_version, 'doUpgrade()');
-			clog(2, {}, 'sheet_version =', value.version);
-			const sheet_version = value.version;
-			let global_version = value.global_version.split('.').map(Number);
-			const major_global_version = parseInt(global_version.shift());
-			const minor_global_version = parseFloat(global_version.join('.'));
-			const isLesserThan122 = major_global_version <= 1 && minor_global_version < 2.2 ?
-				true : false;
-			if (isLesserThan122) {
+			const temp = {};
+			clog(2, {}, '', temp, 'doUpgrade()');
+			//clog(2, {}, `global_version =`, value.global_version, 'doUpgrade()');
+			//clog(2, {}, 'sheet_version =', value.version);
+			temp.sheet_version = value.version;
+			temp.global_version = value.global_version.split('.').map(Number);
+			temp.major_global_version = temp.global_version[0]; //parseInt(temp.global_version.shift());
+			temp.minor_global_version = temp.global_version[1]; //parseFloat(temp.global_version.join('.'));
+			temp.build_number = temp.global_version[2];
+			temp.isLesserThan122 = 
+				temp.major_global_version <= 1 && 
+				temp.minor_global_version <= 2 &&
+				temp.build_number < 2;
+			if (temp.isLesserThan122) {
 				upgradeTo_1_2_2(value, setObj);
 			}
-			const isLesserThan131 = major_global_version <= 1 && minor_global_version < 3.1 ?
-				true : false;
-			if (isLesserThan131) {
+			temp.isLesserThan131 = 
+				temp.major_global_version <= 1 && 
+				temp.minor_global_version <= 3 &&
+				temp.build_number < 1;
+			if (temp.isLesserThan131) {
 				upgradeTo_1_3_1(value, setObj);
 			}
-			const isLesserThan150 = major_global_version <= 1 && minor_global_version < 5.0 ?
-				true : false;
-			if (isLesserThan150) {
+			temp.isLesserThan150 = 
+				temp.major_global_version <= 1 && 
+				temp.minor_global_version < 5;
+			if (temp.isLesserThan150) {
 				upgradeTo_1_5_0(setObj);
 			}
-			const isLesserThan172 = major_global_version <= 1 && minor_global_version < 7.2 ?
-				true : false;
-			if (isLesserThan172) {
+			temp.isLesserThan172 = 
+				temp.major_global_version <= 1 && 
+				temp.minor_global_version <= 7 &&
+				temp.build_number < 2;
+			if (temp.isLesserThan172) {
 				upgradeTo_1_7_2(attrIDs, setObj);
 			}
-			const isLesserThan180 = major_global_version <= 1 && minor_global_version < 8.0 ?
-				true : false;
-			if (isLesserThan180) {
+			temp.isLesserThan180 = 
+				temp.major_global_version <= 1 && 
+				temp.minor_global_version < 8;
+			if (temp.isLesserThan180) {
 				upgradeTo_1_8_0(sizetemplateIDs, value, sheetdb, setObj);
 			}
-			const isLesserThan183 = major_global_version <= 1 && minor_global_version < 8.3 ?
-				true : false;
-			if (isLesserThan183) {
+			temp.isLesserThan183 = 
+				temp.major_global_version <= 1 && 
+				temp.minor_global_version <= 8 &&
+				temp.build_number < 3;
+			if (temp.isLesserThan183) {
 				upgradeTo_1_8_3(value, setObj);
 			}
-			const isLesserThan186 = major_global_version <= 1 && minor_global_version < 8.6 ?
-				true : false;
-			if (isLesserThan186) {
+			temp.isLesserThan186 = 
+				temp.major_global_version <= 1 && 
+				temp.minor_global_version <= 8 &&
+				temp.build_number < 6;
+			if (temp.isLesserThan186) {
 				upgradeTo_1_8_6(value, setObj);
 			}
-			const isLesserThan189 = major_global_version <= 1 && minor_global_version < 8.9 ?
-				true : false;
-			if (isLesserThan189) {
+			temp.isLesserThan189 = 
+				temp.major_global_version <= 1 && 
+				temp.minor_global_version <= 8 &&
+				temp.build_number < 9;
+			if (temp.isLesserThan189) {
 				upgradeTo_1_8_9(value, attrIDs, attrdb, setObj);
 			}
-			setObj.global_version = sheet_version;
+			setObj.global_version = temp.sheet_version;
 		}
 		
 		function upgradeTo_1_2_2(value, setObj){
@@ -8380,6 +8414,7 @@
 				'unaffectedattributes',
 				'uniquephenomena',
 				'uniqueattributecost',
+				'uniquedefectcategory',
 				'unpredictable',
 				'visible',
 				'weaponclass'
@@ -8488,6 +8523,7 @@
 		function getDefectPointsByCategory(value, rowID, defect){
 			const aspect = value[`repeating_attr_${rowID}_defectaspect`] || [];
 			const result = defect == 'shortcoming' ? aspect.length > 3 ? -4 : -1 :
+				defect == 'uniquedefect' ? parseInt(value[`repeating_attr_${rowID}_uniquedefectcategory`]) * -1 :
 				lesser_defects_regex.test(defect) ? -1 :
 				greater_defects_regex.test(defect) ? -2 :
 				serious_defects_regex.test(defect) ? -3 :
@@ -8517,12 +8553,15 @@
 		}
 		
 		function setDefectPointsByRankChange(debug, timer, eventInfo, value, rowID, setObj) {
-			const defect = removeWhiteSpace(value[`repeating_attr_${rowID}_defect`]);
-			const category = getDefectPointsByCategory(value, rowID, defect);
-			const rank = parseInt(eventInfo.newValue) || 0;
-			const cost = rank * category;
-			setObj[`repeating_attr_${rowID}_totalcost`] = cost;
-			clog(debug, timer, 'cost =', cost, 'setDefectPointsByRankChange()');
+			const temp = {};
+			clog(debug, timer, '', temp, 'setDefectPointsByRankChange()');
+			temp.defect = removeWhiteSpace(value[`repeating_attr_${rowID}_defect`]);
+			temp.category = getDefectPointsByCategory(value, rowID, temp.defect);
+			temp.rank = /_defect/i.test(eventInfo.sourceAttribute) ?
+					parseInt(eventInfo.newValue) || 0 :
+					parseInt(value[`repeating_attr_${rowID}_rank`]) || 0;
+			temp.cost = temp.rank * temp.category;
+			setObj[`repeating_attr_${rowID}_totalcost`] = temp.cost;
 		}
 		
 		function setEffectiveLevelByLevelChange(debug, timer, eventInfo, value, sectionName, rowID, sourceAttr, setObj) {
@@ -14417,6 +14456,9 @@
 									case 'defect':
 										resetRank(value, rowID, setObj);
 										exposeDefectSettingsOnDefectChange(debug, timer, value, rowID, setObj);
+										setDefectPointsByRankChange(debug, timer, eventInfo, value, rowID, setObj);
+									break;
+									case 'uniquedefectcategory':
 										setDefectPointsByRankChange(debug, timer, eventInfo, value, rowID, setObj);
 									break;
 									case 'rank':
