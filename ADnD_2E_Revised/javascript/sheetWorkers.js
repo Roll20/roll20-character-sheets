@@ -1203,8 +1203,6 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
             };
 
-
-
             if (isPriest) {
                 let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
                 spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
