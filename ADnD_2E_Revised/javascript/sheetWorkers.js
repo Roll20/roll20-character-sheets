@@ -1553,13 +1553,13 @@ on('change:repeating_weapons:weaponname', function(eventInfo) {
 //melee damage autofill
 on('change:repeating_weapons-damage:weaponname1', function(eventInfo) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
-        let fisk = ['small-medium','large'];
+        let compareFields = ['small-medium','large'];
         if (isPlayersOption) {
-            fisk.push('size');
-            fisk.push('type');
-            fisk.push('knockdown');
+            compareFields.push('size');
+            compareFields.push('type');
+            compareFields.push('knockdown');
         }
-        return fisk.every(f => weapon1[f] === weapon2[f])
+        return compareFields.every(f => weapon1[f] === weapon2[f])
     }
     let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
@@ -2882,9 +2882,12 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
 // Show / Hide buttons for various repeating sections
 const REPEATING_SECTIONS = [
+    ...wizardSpellLevelsSections.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
+    'spells-wizmonster',
+    ...priestSpellLevelsSections.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
+    'spells-primonster',
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
     'scrolls',
-    'spells-wizmonster',
 ];
 REPEATING_SECTIONS.forEach(section => {
    on(`clicked:repeating_${section}:show clicked:repeating_${section}:hide`, function (eventInfo) {
