@@ -7,30 +7,32 @@ const pugFolder = path.join(sourceFolder, 'pug');
 const htmlFolder = path.join(sourceFolder, 'html', 'components');
 const miscFolder = path.join(sourceFolder, 'misc');
 const booksPriority = [
-    'PHB',
-    'The Complete Fighter\'s Handbook',
-    'The Complete Thief\'s Handbook',
-    'The Complete Priest\'s Handbook',
-    'The Complete Wizard\'s Handbook',
-    'The Complete Psionics Handbook',
-    'Tome of Magic',
-    'Arms and Equipment Guide',
-    'The Complete Book of Dwarves',
-    'The Complete Bard\'s Handbook',
-    'The Complete Book of Elves',
-    'The Complete Book of Humanoids',
-    'The Complete Ranger\'s Handbook',
-    'The Complete Paladin\'s Handbook',
-    'The Complete Druid\'s Handbook',
-    'The Complete Barbarian\'s Handbook',
-    'The Complete Book of Necromancers',
-    'The Complete Ninja\'s Handbook',
-    'Player\'s Option: Combat & Tactics',
-    'Player\'s Option: Skills & Powers',
-    'Player\'s Option: Spells & Magic',
+    {book: 'PHB', print: 'First Printing May 2013'},
+    {book: 'The Complete Fighter\'s Handbook', print: '11th Printing, May 1996'},
+    {book: 'The Complete Thief\'s Handbook', print: 'November 1993'},
+    {book: 'The Complete Priest\'s Handbook', print: 'Seventh printing, October 1996'},
+    {book: 'The Complete Wizard\'s Handbook', print: '10th printing, March 1996'},
+    {book: 'The Complete Psionics Handbook', print: 'Ninth printing: October 1996'},
+    {book: 'Tome of Magic', print: 'Seventh Printing: March, 1996'},
+    {book: 'Arms and Equipment Guide', print: 'Fifth Printing: January 1994'},
+    {book: 'The Complete Book of Dwarves', print: 'November 1993'},
+    {book: 'The Complete Bard\'s Handbook', print: 'Fourth printing, November 1994'},
+    {book: 'The Complete Book of Elves', print: ''},
+    {book: 'The Complete Book of Humanoids', print: 'Sixth printing, March 1999'},
+    {book: 'The Complete Ranger\'s Handbook', print: 'Fifth printing, July 1995'},
+    {book: 'The Complete Paladin\'s Handbook', print: ''},
+    {book: 'The Complete Druid\'s Handbook', print: ''},
+    {book: 'The Complete Barbarian\'s Handbook', print: ''},
+    {book: 'The Complete Book of Necromancers', print: ''},
+    {book: 'The Complete Ninja\'s Handbook', print: '2nd printing, March 1996'},
+    {book: 'Player\'s Option: Combat & Tactics', print: ''},
+    {book: 'Player\'s Option: Skills & Powers', print: ''},
+    {book: 'Player\'s Option: Spells & Magic', print: ''},
 ];
+let sortOrder = booksPriority.map(bookPriority => bookPriority.book)
 function bookShorthand(books) {
-    return books.map(b => b.replace('The Complete', '')
+    return books.sort((x,y) => sortOrder.indexOf(x) - sortOrder.indexOf(y))
+        .map(b => b.replace('The Complete', '')
         .replace('Book of', '')
         .replace('Handbook', '')
         .replace('Player\'s Option:','')
@@ -54,14 +56,18 @@ spellsJs.forEach(jsFile => {
     html += pug.renderFile(path.join(pugFolder, 'spellsDatalists.pug'), {pretty: true, data: spells});
 
     if (jsFile === 'wizardSpells.js') {
-        let schoolTable = pug.renderFile(path.join(pugFolder, 'schoolsOverview.pug'), {pretty: true, data: spells});
+        let schoolTable = pug.renderFile(path.join(pugFolder, 'schoolsOverview.pug'), {pretty: true, data: spells, booksPriority});
         fs.writeFileSync(path.join(miscFolder, 'schools-overview.html'), schoolTable);
     }
     if (jsFile === 'priestSpells.js') {
-        let sphereTable = pug.renderFile(path.join(pugFolder, 'spheresOverview.pug'), {pretty: true, data: spells});
+        let sphereTable = pug.renderFile(path.join(pugFolder, 'spheresOverview.pug'), {pretty: true, data: spells, booksPriority});
         fs.writeFileSync(path.join(miscFolder, 'spheres-overview.html'), sphereTable);
     }
 });
+
+const wizardSpells = require(path.join(jsFolder, 'wizardSpells.js'));
+const priestSpells = require(path.join(jsFolder, 'priestSpells.js'));
+html += pug.renderFile(path.join(pugFolder, 'spellScrollsDatalists.pug'), {pretty: true, wizardSpells, priestSpells});
 
 const psionicCorePowers = require(path.join(jsFolder, 'psionicPowers.js'));
 html += pug.renderFile(path.join(pugFolder, 'psionicCorePowerDatalists.pug'), {pretty: true, data: psionicCorePowers});
