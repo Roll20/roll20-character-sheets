@@ -262,6 +262,17 @@
 
 <script type="text/worker">
 
+	// Set side of sheet to view
+    const buttonlist = ['character','equipment'];
+    buttonlist.forEach( button => {
+        on( `clicked:${button}`, function() {
+            setAttrs({
+                sheetTab: button
+            });
+        });
+    });
+
+	// Set ability modifiers
     const stats = ['str','int','wis','dex','con','cha'];
     stats.forEach( stat => {
         on( `change:${stat} sheet:opened`, () => {
@@ -275,21 +286,14 @@
         });
     });
 
-    const buttonlist = ['character','equipment'];
-    buttonlist.forEach( button => {
-        on( `clicked:${button}`, function() {
-            setAttrs({
-                sheetTab: button
-            });
-        });
-    });
-
+	// Gather encumbrance fields
     const items = [];
     for ( i = 1; i < 38; i++ ) {
         items.push( 'weight_' + i );
     }
     items.reverse();
 
+	// Set total encumbrance
     var total = 0; 
     items.forEach( item => {
         on( `change:${item} sheet:opened`, () => {
@@ -303,5 +307,30 @@
             });
         });
     });
+
+	// Set movement rate
+	on ("change:total change:str sheet:opened", function() {
+		getAttrs(["str","total"], function(vals) {
+			var moveRate = 0;
+			const strVal = parseInt(vals.str)||0;
+			const totalWeight = parseFloat(vals.total)||0;
+			if (totalWeight <= strVal * 1 / 3.) {
+				moveRate = 12;
+			}
+			else if (totalWeight <= strVal * 2 / 3.) {
+				moveRate = 9;
+			}
+			else if (totalWeight <= strVal * 1) {
+				moveRate = 6;
+			}
+			else if (totalWeight <= strVal * 2) {
+				moveRate = 3;
+			}
+			else {
+				moveRate = 0;
+			}
+			setAttrs({["move"]: moveRate});
+		});
+	});
 
 </script>
