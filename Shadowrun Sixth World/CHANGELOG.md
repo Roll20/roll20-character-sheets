@@ -1,6 +1,8 @@
 Change Log
 ==============================================
 **2023-02-13 ** v.71 Chuz (James Culp)
+	Added esence calculations for drag and drop (and others) allowing for Essence Base to be "Rating x #.##", also Grade calculations now.
+	Added drag and drop for Augmentations
 	Converted NPC Spell roll buttons to use the newer PC style
 	Converted NPC Attack (ranged and melee) buttons to use the new roll buttons
 	Converted NPC Attack (ranged and melee) buttons to use the new roll template weapon info block
