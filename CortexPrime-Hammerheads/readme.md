@@ -5,22 +5,19 @@ Cortex Prime: Hammerhead Character Sheet
 - Open the Journal tab, and add a new Character.
 - Click on save changes.
 - Open the Character Sheet Tab
-- Tick the Edit Checkbox.
+- Hover over the green buttons and click the Edit Traits button to toggle the edit panel on and off.
 - Select One of the Portraits, or select the dot next to the word Portrait to set no portrait.
 - Set the dice values for the Attributes, Training Packages, and Relationships using the drop downs.
 - Untick the Edit check box to hide the editor
 - Enter the remaining details - Name, Description, Value statements, Relationship names, Distinctions title and description in the editable text fields.
 
-##Dice Pool Builder
+##Stress
 
-The inbuilt Dice Pool Builder pulls from the character's attributes, rolls and keeps highest two dice in the pool by default. I refer to this as the suggested best result.
+NEW: Two buttons have been added to the top of the character sheet, hover over the green buttons and click on the Edit Stress button to toggle the edit feature on. New trait boxes appear below the attributes and info block, and you can select from not stressed/d4/d6/d8/d10/d12/stressed out for each of the stress values.
 
-##Stress and Trauma
+###Diceroller
 
-I have been using API macro's to adjust Stress values. But these are simply Attributes (PhysicalStress, MentalStress, SocialStress and PhysicalTrauma, MentalTrauma, SocialTrauma ).
-You can add these to the Attributes and Abilities tab manually, and assign values ranging from the 4,6,8,10 or 12 corresponding to the dice value.
-
-If you have added a stress and it's not showing check the spelling, Capitalisation, and dice value to be sure you got those all correct.
+Using the 'Dice Pool Builder' button will ask the player which traits to include and roll in a dice pool. The output to the chat panel will also indicate if the character is shaken or stricken. 
 
 Any feedback, or requests - I'm happy to hear.
 
@@ -34,6 +31,24 @@ Character Portraits sourced from https://thispersondoesnotexist.com/
 
 ##Changelog
 
+### V1.3 2021-04-08
+
+Changed the Edit checkbox to a styled hover button.
+Added a second button that shows/hides a specific edit feature for Stress values.
+
+### V1.2 2021-03-22
+
+Added mobile layout support - which includes support for the beta release of the mobile app.
+Currently the beta release of the mobile app does not support the dice pool builder macros.
+Roll Template includes prompts when the character is shaken or stricken.
+Stress can now go higher than 12, if set a value of 14 the icon shows as 12+ to indicate being stressed out.
+
+
+### V1.2 2021-03-19
+
+Added a Roll Template, to better display the roll results.
+Added black dice icons and dark dice icons to use in roll template
+
 ### V1.1 2021-03-17
 
 Fixed broken images
@@ -41,4 +56,4 @@ Removed Trauma
 Added d10 and d12 settings to relationships
 Minor adjustments
 
-### v.1.0 2021-03-13"
+### v.1.0 2021-03-13

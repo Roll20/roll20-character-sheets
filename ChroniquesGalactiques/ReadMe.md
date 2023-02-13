@@ -10,9 +10,40 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 
 # Version courante
 
-V3.113 [Screenshot](cog_v3.png)
+V4.0.0 [Screenshot](cog_v4.png)
 
 # Notes de version
+
+## V4.0.0 (2022.12.30)
+
+_Chroniques Oubliées Galactiques v2_
+
+- Révision des fiches de PJ, PNJ et Vaisseau
+- Ajout de la fiche de Mécha
+
+V3.115.1 [Screenshot](cog_v3.png)
+
+## V3.115.1 (2021.12.18)
+
+- Correction noms boutons action (pas de \_ dans le nom après act\_)
+- Modification libellés options DM sans limites (bug 'optgroup' de Roll20)
+
+## V3.115.0 (2021.11.12)
+
+- Ajout du nouveau pseudo-attribut permettant d'afficher le token par défaut sur la fiche
+
+## V3.114.1 (2021.04.28)
+
+- Correction d'un bug sur le titre de la capacité de rang 3 de la voie 3 dupliquée sur le rang 3 de la voie 8
+- Correction d'un bug sur le nom d'attribut de la capacité de rang 4 de la voie 2
+- Correction du calcul du rang dans une voie : la case doit être cochée et soit le titre soit le texte de la capacité doit être renseigné
+
+## V3.114 (2021.04.12)
+
+- Ajout d'un champ titre pour chaque capacité (attributs @{voieN-tR} où N = no de voie et R = rang)
+  - Migration automatique d'une version antérieure : la première ligne de la capacité est considérée comme titre
+  - Prise en compte dans les autres fonctions (liaison d'un jet de capacité à une voie+rang)
+- Correction d'un bug après suppression du seul modificateur d'attaque ou de DM de la liste (le modificateur n'est plus pris en compte dans les jets d'attaque)
 
 ## V3.113 (2021.03.07)
 

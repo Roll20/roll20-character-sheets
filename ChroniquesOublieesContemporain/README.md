@@ -10,9 +10,59 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.8.1 [Screenshot](coc_v2.png)
+v3.13.0 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.13.0 (2022-10-31)
+
+- Ajout d'une section Notes de Version sur l'onglet Configuration
+- Modification cosmétique des boutons +Add, Modify et Done des sections répétables
+
+## v3.12.0 (2022-04-10)
+
+Modification cosmétique
+
+Un bug de "sanitization" de Roll20 élimine les éléments HTML optgroup permettant de séparer les options par types dans les listes dépliantes (élements HTML select). Une solution de contournement a été implémentée en utilisant une option 'disabled' avec un style CSS.
+
+Ces séparateurs d'options sont par exemple utilisés dans les listes dépliantes des dés de dommages pour distinguer les DM normaux des DM sans limites.
+
+## v3.11.0 (2022-01-16)
+
+Nouvelles fonctionnalités
+
+- Possibilité de sélectionner le mod de test (mod carac + buff/debuff) dans les bonus aux DM des attaques
+- Possibilité d'afficher le token du personnage dans les jets de dés de la fiche
+
+## v3.10.1 (2021-12-18)
+
+Corrections de bugs
+
+- Dysfonctionnement des boutons d'états préjudiciables
+- Libellé du modificateur d'attaque persistant après avoir été annulé
+- Meilleur support des modificateurs de DM sous formes de jets de dés
+- Mauvais affichage en cas de sélection du setting Surhumains
+- Affichage de la version de la fiche sur l'onglet Configuration
+
+## v3.10.0 (2021-11-12)
+
+- Ajout du token par défaut sur la fiche de personnage
+
+## v3.9.2 (2021-04-27)
+
+- Correction d'un bug sur le titre de la capacité de rang 2 de la voie n°4
+- Correction du calcul du rang dans une voie : la case doit être cochée et soit le titre soit le texte de la capacité doit être renseigné
+
+## v3.9.1 (2021-04-25)
+
+- Correction d'un bug sur le titre de la capacité de rang 3 de la voie n°3 dupliquée dans la voie n°8
+
+## v3.9.0 (2021-03-30)
+
+- Ajout d'un champ titre pour chaque capacité (attributs @{voieN-tR} où N = no de voie et R = rang)
+  - Migration automatique d'une version antérieure : la première ligne de la capacité est considérée comme titre
+  - Prise en compte dans les autres fonctions (liaison d'un jet de capacité à une voie+rang, import de données de profil JSON)
+- Correction d'un bug après suppression du seul modificateur d'attaque ou de DM de la liste (le modificateur n'est plus pris en compte dans les jets d'attaque)
 
 ## v3.8.1 (2021-03-01)
 
