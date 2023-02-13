@@ -43,6 +43,29 @@ If you want to compile everything just once, use `npm run build` instead.
 
 ## Changelog
 
+## 2.6.5
+
+* Fix icon link broken by external service.
+
+## 2.6.4
+
+* Fix weapon AB not displaying correctly with the Sunblade skill.
+
+### 2.6.3
+
+* Fix quick menus giving "unrecognised command /w".
+
+### 2.6.2
+
+* Fix rolltemplates not being migrated properly to CSE.
+
+### 2.6.1
+
+* Add datalists to most free-fill fields with autofilling
+  * Drones, drone fittings, ship hulltypes, class
+* Update sheet to use the new Character Sheet Enhancement sanitiser.
+* Some TypeScript refactoring.
+
 ### 2.6.0
 
 * Migrate worker codebase to TypeScript. Should hopefully reduce future bugs.

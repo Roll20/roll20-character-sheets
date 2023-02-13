@@ -1,0 +1,208 @@
+mixin SpellContainer(level, isCantrip=false)
+  fieldset(class=`repeating_spell-${level}`)
+    .spell
+      //input.spell__flag--details(type="hidden" name="attr_details-flag" checked="checked")
+      input.spell__flag--options(type="hidden" name="attr_options-flag" checked="checked")
+
+      .spell__display
+        input(type="hidden" name="attr_rollcontent" value="@{wtype}&{template:spell} {{level=@{spellschool} @{spelllevel}}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} {{savedc=@{spell_save_dc}}} @{spellconcentration} @{charname_output}")
+        
+        if !isCantrip
+          .spell__prepped
+            input.spell__prepped-input(type="checkbox" name="attr_spellprepared" value="1")
+            span.spell__prepped-mark
+        
+        button.spell__card-button(type="roll" name="roll_spell" value="@{rollcontent}")
+          span.spell__name(name="attr_spellname")
+          span.spell__innate(name="attr_innate")
+        
+        .spell__indicators
+          
+          input.spell__flag--innate(type="hidden" name="attr_innate" value="")
+          input.spell__flag--ritual(type="hidden" name="attr_spellritual" value="0")
+          input.spell__flag--concentration(type="hidden" name="attr_spellconcentration" value="0")
+          .spell__casting-details
+            span.spell__ritual(data-i18n="spell-ritual") R
+            span.spell__concentration(data-i18n="spell-concentration") C
+          
+          input.spell__flag--v(type="hidden" name="attr_spellcomp_v" value="{{v=1}}")
+          input.spell__flag--s(type="hidden" name="attr_spellcomp_s" value="{{s=1}}")
+          input.spell__flag--m(type="hidden" name="attr_spellcomp_m" value="{{m=1}}")
+          .spell__components
+            span.spell__component--v(data-i18n="spell-component-verbal") V
+            span.spell__component--s(data-i18n="spell-component-somatic") S
+            span.spell__component--m(data-i18n="spell-component-material") M
+        
+        input.spell__flag--spellsave(type="hidden" name="attr_roll_output_dc" value="@{spell_save_dc}")
+        button.spell__chat-button.output.btn.ui-draggable(type="roll" name="roll_output" value="@{wtype}&{template:spelloutput} {{level=@{spellschool} @{spelllevel}}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} {{savedc=@{roll_output_dc}}} @{spellconcentration} @{charname_output}") w
+        
+        //.spell__details-container
+          input.spell__flag--details(type="checkbox" name="attr_details-flag" checked="checked")
+          span i
+        
+        .spell__options-container
+          input.spell__flag--options(type="checkbox" name="attr_options-flag" checked="checked")
+          span y
+
+      .spell__options.options
+        .options__row
+          span.options__label(data-i18n="name:-u") NAME:
+          input.options__flex(type="text" name="attr_spellname")
+        
+        .options__row.options__row--noborder
+          span.options__label(data-i18n="school:-u") SCHOOL:
+          select.options__flex(name="attr_spellschool")
+            option(value="abjuration" data-i18n="abjuration") Abjuration
+            option(value="conjuration" data-i18n="conjuration") Conjuration
+            option(value="divination" data-i18n="divination") Divination
+            option(value="enchantment" data-i18n="enchantment") Enchantment
+            option(value="evocation" data-i18n="evocation") Evocation
+            option(value="illusion" data-i18n="illusion") Illusion
+            option(value="necromancy" data-i18n="necromancy") Necromancy
+            option(value="transmutation" data-i18n="transmutation") Transmutation
+          input.options__flex(type="checkbox" name="attr_spellritual" value="{{ritual=1}}")
+          span.options__label(data-i18n="ritual-u") RITUAL
+        .options__row.options__row--noborder
+          span.options__label(data-i18n="casting-time:-u") CASTING TIME:
+          input.options__flex(type="text" name="attr_spellcastingtime")
+        .options__row.options__row--noborder
+          span.options__label(data-i18n="range:-u") RANGE:
+          input.options__flex(type="text" name="attr_spellrange")
+        .options__row
+          span.options__label(data-i18n="target:-u") TARGET:
+          input.options__flex(type="text" name="attr_spelltarget")
+        
+        input(type="hidden" name="attr_spellcomp")
+        .options__row.options__row--noborder
+          span.options__label(data-i18n="components:-u") COMPONENTS:
+          input.options__flex(type="checkbox" name="attr_spellcomp_v" value="{{v=1}}" checked="checked")
+          span.options__label(data-i18n="spell-component-verbal") V
+          input.options__flex(type="checkbox" name="attr_spellcomp_s" value="{{s=1}}" checked="checked")
+          span.options__label(data-i18n="spell-component-somatic") S
+          input.options__flex(type="checkbox" name="attr_spellcomp_m" value="{{m=1}}" checked="checked")
+          span.options__label(data-i18n="spell-component-material") M
+        .options__row
+          input.options__flex(type="text" name="attr_spellcomp_materials" placeholder="ruby dust worth 50gp" data-i18n-placeholder="ruby-dust-place")
+        
+        .options__row
+          input.options__flex--1(type="checkbox" name="attr_spellconcentration" value="{{concentration=1}}")
+          span.options__label.options__flex--9(data-i18n="concentration-u") CONCENTRATION
+        
+        .options__row
+          span.options__label(data-i18n="duration:-u") DURATION:
+          input.options__flex(type="text" name="attr_spellduration")
+        
+        .options__row
+          span.options__label(data-i18n="spell-ability-u") SPELLCASTING ABILITY
+          select.options__flex(name="attr_spell_ability")
+            option(value="0*" data-i18n="none-u") NONE
+            option(value="spell" data-i18n="spell-u") SPELL
+            option(value="@{strength_mod}+" data-i18n="strength-u") STRENGTH
+            option(value="@{dexterity_mod}+" data-i18n="dexterity-u") DEXTERITY
+            option(value="@{constitution_mod}+" data-i18n="constitution-u") CONSTITUTION
+            option(value="@{intelligence_mod}+" data-i18n="intelligence-u") INTELLIGENCE
+            option(value="@{wisdom_mod}+" data-i18n="wisdom-u") WISDOM
+            option(value="@{charisma_mod}+" data-i18n="charisma-u") CHARISMA
+        
+        .options__row
+          span.options__label(data-i18n="innate:-u") INNATE:
+          input.options__flex(type="text" name="attr_innate" placeholder="1/day" value="")
+        
+        .options__row
+          span.options__label(data-i18n="output:-u") OUTPUT:
+          select.options__flex(name="attr_spelloutput")
+            option(value="SPELLCARD" data-i18n="spellcard-u") SPELLCARD
+            option(value="ATTACK" data-i18n="attack-u") ATTACK
+            
+        input.spell__flag--output(type="hidden" name="attr_spelloutput")        
+        .spell__options--attack
+          
+          .options__row--noborder
+            span.options__label(data-i18n="spell-atk:-u") SPELL ATTACK:
+            select.options__flex(name="attr_spellattack")
+              option(value="None" data-i18n="none") None
+              option(value="Melee" data-i18n="melee") Melee
+              option(value="Ranged" data-i18n="ranged") Ranged
+          .options__row.options__row--noborder
+            span.options__label(data-i18n="damage:-u") DAMAGE:
+            input.options__flex(type="text" name="attr_spelldamage" )
+            span.options__label(data-i18n="type:-u") TYPE:
+            input.options__flex(type="text" name="attr_spelldamagetype" )
+          .options__row.options__row--noborder
+            span.options__label(data-i18n="damage2:-u") DAMAGE2:
+            input.options__flex(type="text" name="attr_spelldamage2" )
+            span.options__label(data-i18n="type:-u") TYPE:
+            input.options__flex(type="text" name="attr_spelldamagetype2" )
+          .options__row.options__row--noborder
+            span.options__label(data-i18n="healing:-u") HEALING:
+            input(type="text" name="attr_spellhealing" )
+          .options__row
+            input.options__flex--1(type="checkbox" name="attr_spelldmgmod" value="Yes")
+            span.options__label.options__flex--9(data-i18n="add-ability-mod-u") ADD ABILITY MOD TO DAMAGE OR HEALING
+          
+          if isCantrip
+            .options__row
+              span.options__label(data-i18n="cantrip-progression:-u") CANTRIP PROGRESSION
+              select.options__flex(name="attr_spell_damage_progression")
+                option(value="" selected="selected" data-i18n="none-u") NONE
+                option(value="Cantrip Dice" data-i18n="cantrip-dice-u") CANTRIP DICE
+                option(value="Cantrip Beam" data-i18n="cantrip-beam-u") CANTRIP BEAM
+          
+          .options__row
+            span.options__label(data-i18n="saving-throw:-u") SAVING THROW:
+            select(name="attr_spellsave")
+              option(value="" selected="selected" data-i18n="none-u") NONE
+              option(value="Strength" data-i18n="str-u") STR
+              option(value="Dexterity" data-i18n="dex-u") DEX
+              option(value="Constitution" data-i18n="con-u") CON
+              option(value="Intelligence" data-i18n="int-u") INT
+              option(value="Wisdom" data-i18n="wis-u") WIS
+              option(value="Charisma" data-i18n="cha-u") CHA
+          
+          .options__row
+            span.options__label(data-i18n="effect:-u") EFFECT:
+            input(type="text" name="attr_spellsavesuccess"  placeholder="Half damage" data-i18n-placeholder="half-dmg-place")
+          
+          .options__row.options__row--noborder
+            span.options__label(data-i18n="at-higher-lvl-dmg:-u") HIGHER LVL CAST DMG:
+          .options__row
+            input.options__flex--3(type="text" name="attr_`spellhldie" placeholder="1" )
+            select.options__flex--3(name="attr_spellhldietype")
+              option(value="" selected="selected" data-i18n="none-u") NONE
+              option(value="d4") d4
+              option(value="d6") d6
+              option(value="d8") d8
+              option(value="d10") d10
+              option(value="d12") d12
+              option(value="d20") d20
+            span.options__flex--1 +
+            input.options__flex--3(type="text" name="attr_spellhlbonus" placeholder="0" )
+          
+          .options__row
+            span.options__label.options__flex--7(data-i18n="include_spell_desc:-u") INCLUDE SPELL DESCRIPTION IN ATTACK:
+            select.options__flex--3(name="attr_includedesc")
+              option(value="off" selected="selected" data-i18n="off") Off
+              option(value="partial" data-i18n="partial") Partial
+              option(value="on" data-i18n="on") On
+        
+        .options__row.options__row--topborder
+          span.options__label(data-i18n="description:-u") DESCRIPTION:
+        .options__row
+          textarea(name="attr_spelldescription")
+
+        if !isCantrip
+          .options__row.options__row--noborder
+            span.options__label(data-i18n="at-higher-lvl:-u") AT HIGHER LEVELS:
+          .options__row
+            textarea(name="attr_spellathigherlevels")
+        
+        .options__row
+          span.options__label(data-i18n="class:-u") CLASS:
+          input(type="text" name="attr_spellclass" )
+        
+        .options__row
+          span.options__label(data-i18n="type:-u") TYPE:
+          input(type="text" name="attr_spellsource" )
+        
+        input(type="hidden" name="attr_spellattackid")
+        input(type="hidden" name="attr_spelllevel" value=`${level}`)
