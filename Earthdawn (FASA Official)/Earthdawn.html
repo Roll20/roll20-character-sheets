@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 
 <!--
-v3.02 released 23 02 12
+v3.02 released 23 02 13
 
 Character Sheet For Earthdawn Developped by JBF (Discord/Facebook Jiboux Faure) v2.
 Largerly using material from the work on the Official FASA version of Chris Dickey
@@ -4578,6 +4578,18 @@ Comments JBF@CD are action/reminders to Chris
                     <!-- <span class="sheet-nowrap0 sheet-HideIfNoRoll" title="@{repeating_talents_X_T_CombatSlot}:   Should this Talent be summarized on the combat tab and placed in a Token Action?">
                     <span class="sheet-api">Tkn Actn</span><span class="sheet-NoAPI">Combat Tab</span>
                     <input name="attr_T_CombatSlot" type="checkbox" value="1" ></span> -->
+                  </div>
+
+                  <div class="sheet-HideIfZeroDisc sheet-HideIfOneDisc">
+                    <span class="sheet-nowrap sheet-label" title="@{repeating_talents_X_T_Type_max}   Record here Other Disciplines the Talent is a Discipline too, in the form of D2-Novice, D3-Journeyman ...etc">
+                      Other Origins :
+                      <span class="sheet-autoexpand-wrap">
+                        <input name="attr_T_Type_max" type="text" class="sheet-bordered">
+                        <span name="attr_T_Type_max" class="sheet-autoexpand"></span>
+                      </span>
+                    </span>
+
+
                   </div>
 
                         <!--Talent Fieldset - Parameters -->
@@ -13298,6 +13310,7 @@ var updateTalentSummary = function fnupdateTalentSummary() {
         for( let i = 0; i < tarray.length; i++) {
           attarray.push( buildPre( "T", tarray[ i ] ) + "Rank");
           attarray.push( buildPre( "T", tarray[ i ] ) + "Type");
+          attarray.push( buildPre( "T", tarray[ i ] ) + "Type_max");
           attarray.push( buildPre( "T", tarray[ i ] ) + "Name");
         }
         getSectionIDsOrdered("repeating_discipline", function gsIdRepeatingDiscipline(darray) {
@@ -13331,6 +13344,12 @@ var updateTalentSummary = function fnupdateTalentSummary() {
               tmp = values[ buildPre( "T", tarray[ i ] ) + "Type" ];
               if( !tmp || tmp=="" || tmp=="0") tmp= "D1-Novice";
               if( tmp.indexOf( "-" ) != -1) arr.push( { type: getParam( tmp, 1, "-"), level: getParam( tmp, 2, "-"), rank: rnk} ); //We're only interested in values with - as they are either Versatility or Discipline or Path or QD
+              tmp = values[ buildPre( "T", tarray[ i ] ) + "Type_max" ]; //Dealing with talents of multiple disciplines, comma separated list of Origins
+              if(tmp){
+                let tmp2=tmp.split(",");
+                for(let i=0; i<tmp2.length;i++)
+                  if( tmp2[i].indexOf( "-" ) != -1) arr.push( { type: getParam( tmp2[i], 1, "-"), level: getParam( tmp2[i], 2, "-"), rank: rnk} ); //We're only interested in values with - as they are either Versatility or Discipline or Path or QD
+              }
             }
 
             var artype = _.groupBy( arr, "type");       // Now artype is an object whose named properties are objects (groups) that contain arrays of objects.
@@ -13458,7 +13477,7 @@ var updateTalentSummary = function fnupdateTalentSummary() {
   });
   } catch(err) {log("Earthdawn:updateTalentSummary() error caught: " + err);}
 }; // End updateTalentSummary()
-on("change:uatta change:repeating_discipline change:repeating_matrix:spm_rank change:repeating_matrix:spm_origin change:repeating_talents:t_rank change:repeating_talents:t_type remove:repeating_talents remove:repeating_matrix", fn(updateTalentSummary) );
+on("change:uatta change:repeating_discipline change:repeating_matrix:spm_rank change:repeating_matrix:spm_origin change:repeating_talents:t_rank change:repeating_talents:t_type change:repeating_talents:t_type_max remove:repeating_talents remove:repeating_matrix", fn(updateTalentSummary) );
 
 
 
@@ -16780,6 +16799,8 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
         attarray.push( buildPre( "T", tarray[ i ] ) + "Name");
         attarray.push( buildPre( "T", tarray[ i ] ) + "Rank");
         attarray.push( buildPre( "T", tarray[ i ] ) + "Type");
+        attarray.push( buildPre( "T", tarray[ i ] ) + "Type_max");
+
       }
       getSectionIDsOrdered("repeating_discipline", function gsIdRepeatingDiscipline(darray) {
         for( let i = 0; i < darray.length; i++){
@@ -16805,7 +16826,7 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
             return;
           }
 
-          let tnamearray = [];
+          let tnamearray = [], ridarray=[];
           let nbdisc = 0,
               nbsc = 0,nbsc5=0,
               ddatatmp, newId, newInfo,mnewId, mnewInfo, flags = "", dtarr, mincircle = 15, multinb = 0,nbto=[0,0,0,0];
@@ -16831,6 +16852,8 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
           if(values[buildPre( "T", tarray[ i ] ) + "Type"]) ty=values[buildPre( "T", tarray[ i ] ) + "Type"];
           if( !ty.startsWith("V") && !ty.startsWith("QD")){ //Talents learned through Versatility will actually be duplicated, and Devotions are just not Talents
             tnamearray.push( values[buildPre( "T", tarray[ i ] ) + "Name"].toLowerCase().trim());
+            ridarray.push( tarray[ i ]);
+
             if(ty.startsWith("TO"+nbdisc)) //Count TO that we have already
             if(ty.endsWith("Novice")) nbto[0]++;
             else if(ty.endsWith("Journeyman")) nbto[1]++;
@@ -16926,7 +16949,15 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
                 AutoFill(newInfo+"Name","CreateTalents",dtarr[i].trim(),null,comp_data);
                 vals[newInfo+"Type"]="D"+nbdisc+"-"+(j>=13 ? "Master" : (j>=9?"Warden":(j>=5?"Journeyman":"Novice")));
                 if(j==1) multinb++;
-          } } }
+          } else { //we have been trying to recreate a Talent that was already Existing
+            let rid=ridarray[tnamearray.indexOf(dtarr[i].toLowerCase().trim())],
+            pre=buildPre("T",rid),
+            tt="D"+nbdisc+"-"+(j>=13 ? "Master" : (j>=9?"Warden":(j>=5?"Journeyman":"Novice"))),
+            ttm=values[pre+"Type_max"]||"";
+            if(values[pre+"Type"]!== tt && !ttm.includes(tt))
+              vals[pre+"Type_max"]=(ttm=="" ? tt : (ttm+","+tt));
+          }
+         } }
           if(ddata["abilityadd_C" + j]){
             //log(ddata["abilityadd_C" + j]);
             let newdata=parseJSON(ddata["abilityadd_C" + j])
