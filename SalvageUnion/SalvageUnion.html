@@ -175,7 +175,7 @@
 
     <div class="mech">
         <h2>Mech
-            <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
+            <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}{{mech=1}}"></button>
         </h2>
         <div style="display:flex">
             <div class="twocolumns">
@@ -214,8 +214,8 @@
                     <label> of <input type="number" min="0" name="attr_energy_max" value="10"></label>
                 </div>
                 <div class="descValuePair">
-                    <label for="heat">Heat</label>
-                    <input type="number" id="heat" min="0" max="10" name="attr_heat" value="0">
+                    <button type="action" class="textbutton" name="act_reactOverload">Heat</button>
+                    <input type="number" min="0" max="10" name="attr_heat" value="0">
                     <label> of <input type="number" min="0" name="attr_heat_max" value="10"> </label>
                 </div>
             </div>
@@ -234,7 +234,7 @@
                         <input type="text" name="attr_weaponname" title="Name of the Weapon">
                         <input type="text" name="attr_range" title="Range">
                         <input type="text" name="attr_damage" title="Damage">
-                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
+                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}{{mech=1}}">
                         </button>
                     </summary>
                     <textarea name="attr_weaponDetails"></textarea>
@@ -433,6 +433,13 @@
     </div>
 </div>
 
+<!--     Buttons used for reaction rolls-->
+<div class="hidden-section" style="display:none">
+    <button type="action" name="act_reactPush"></button>
+    <button type="action" name="act_reactPushWeapon"></button>
+    <button type="action" name="act_reactOverload"></button>
+</div>
+
 
 <script type="text/worker">
     const buttonlist = ["pilot","mech","crawler","settings"];
@@ -443,6 +450,77 @@
             });
         });
     });
+
+on('clicked:reactPush', async (ev) => {
+    await push(ev, 'roll');
+});
+
+on('clicked:reactPushWeapon', async (ev) => {
+    await push(ev, 'weapon');
+});
+
+const push = async (ev, template) => {
+
+    let attrs = await asw.getAttrs(['character_name', 'heat']);
+
+    let resultingHeat = parseInt(attrs.heat) + 2;
+
+    let rollBase = `&{template:${template}}{{name=${attrs.character_name}}}{{roll=[[1d20]]}}{{mech=1}}{{heatroll=[[1d20]]}}{{heat=[[${resultingHeat}]]}}`;
+    let roll = await startRoll(rollBase);
+
+    asw.setAttrs({
+		heat: resultingHeat
+	});
+
+    finishRoll(roll.rollId, {
+
+    });
+}
+
+on('clicked:reactOverload', async (ev) => {
+    await reactOverload(ev);
+});
+
+const reactOverload = async (ev) => {
+
+    let attrs = await asw.getAttrs(['character_name', 'heat', 'heat_max']);
+
+    let rollBase = `&{template:overload}{{name=${attrs.character_name}}}{{roll=[[1d20]]}}{{heat=${attrs.heat}}}{{maxheat=${attrs.heat_max}}}`;
+    let roll = await startRoll(rollBase);
+
+    finishRoll(roll.rollId, {
+
+    });
+}
+
+
+
+const asw = (() => {
+    const setActiveCharacterId = function(charId){
+        let oldAcid=getActiveCharacterId();
+        let ev = new CustomEvent("message");
+        ev.data={"id":"0", "type":"setActiveCharacter", "data":charId};
+        self.dispatchEvent(ev);
+        return oldAcid;
+    };
+    const promisifyWorker = (worker, parameters) => {
+        let acid=getActiveCharacterId();
+        let prevAcid=null;
+        return new Promise((res,rej)=>{
+            prevAcid=setActiveCharacterId(acid);
+            try {if (worker===0) getAttrs(parameters[0]||[],(v)=>res(v));
+                else if (worker===1) setAttrs(parameters[0]||{}, parameters[1]||{},(v)=>res(v));
+                else if (worker===2) getSectionIDs(parameters[0]||'',(v)=>res(v));
+            } catch(err) {rej(console.error(err))}
+        }).finally(()=>setActiveCharacterId(prevAcid));
+    }
+    return {
+        getAttrs(attrArray) {return promisifyWorker(0, [attrArray])},
+        setAttrs(attrObj, options) {return promisifyWorker(1, [attrObj, options])},
+        getSectionIDs(section) {return promisifyWorker(2, [section])},
+        setActiveCharacterId,
+    }
+})();
 </script>
 
 <rolltemplate class="sheet-rolltemplate-weapon">
@@ -482,6 +560,7 @@
                 {{/rollBetween() roll 1 1}}
             </td>
         </tr>
+        {{#damage}}
         <tr>
             <td>
                 <div class="sheet-rolltemplate-spacer"></div>
@@ -492,7 +571,33 @@
                 Weapondamage: {{damage}}
             </td>
         </tr>
+        {{/damage}}
+        {{#heat}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Heat Check: {{heat}} vs {{heatroll}}
+            </td>
+        </tr>
+        {{/heat}}
     </table>
+    {{#mech}}
+    <div class="sheet-rolltemplate-button-row">
+        <div class="sheet-rolltemplate-button">
+            [Push](~{{callsign}}|reactPushWeapon)
+        </div>
+
+        {{#^rollGreater() heatroll heat}}
+        <div class="sheet-rolltemplate-button">
+            [Reactor Overload](~{{callsign}}|reactOverload)
+        </div>
+        {{/^rollGreater() heatroll heat}}
+    </div>
+    {{/mech}}
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-roll">
@@ -528,6 +633,71 @@
 
                 {{#rollBetween() roll 1 1}}
                 Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice.
+                {{/rollBetween() roll 1 1}}
+            </td>
+        </tr>
+        {{#heat}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Heat Check: {{heat}} vs {{heatroll}}
+            </td>
+        </tr>
+        {{/heat}}
+    </table>
+    {{#mech}}
+    <div class="sheet-rolltemplate-button-row">
+
+        <div class="sheet-rolltemplate-button">
+            [Push](~{{name}}|reactPush)
+        </div>
+
+        {{#^rollGreater() heatroll heat}}
+        <div class="sheet-rolltemplate-button">
+            [Reactor Overload](~{{name}}|reactOverload)
+        </div>
+        {{/^rollGreater() heatroll heat}}
+    </div>
+    {{/mech}}
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-overload">
+    <table>
+        <tr>
+            <th>
+                {{name}} rolls
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{#rollBetween() roll 20 20}}
+                <strong>Reactor Overdrive</strong> ({{roll}}) <br>
+                Your Mech’s reactor goes into overdrive. Your Mech can take any additional action this turn or Push their next roll within 10 minutes for free.
+                {{/rollBetween() roll 20 20}}
+
+                {{#rollBetween() roll 11 19}}
+                Reactor Overheat ({{roll}}) - Your Mech’s reactor has overheated. Your Mech shuts down and gains the Vulnerable Trait. Your Mech will re-activate at the end of your next turn. In addition, your Mech takes {{heat}} of SP damage.
+                {{/rollBetween() roll 11 19}}
+
+                {{#rollBetween() roll 6 10}}
+                Module Overload ({{roll}}) - One of your Mech’s Modules chosen at random or by the Mediator is destroyed.
+                {{/rollBetween() roll 6 10}}
+
+                {{#rollBetween() roll 2 5}}
+                System Overload ({{roll}}) - One of your Mech’s Systems chosen at random or by the Mediator is destroyed.
+                {{/rollBetween() roll 2 5}}
+
+                {{#rollBetween() roll 1 1}}
+                Reactor Overload ({{roll}}) - Your Mech’s reactor goes into full meltdown and explodes. Your Mech, as well as any mounted Systems, Modules, and all Cargo, is destroyed in the explosion. Everything in Close Range of your Mech takes {{maxheat}} SP damage. They may take any Turn Action or Reaction in response to try to avoid this. Your Pilot dies unless they have a means to escape. The area your Mech was in becomes irradiated.
                 {{/rollBetween() roll 1 1}}
             </td>
         </tr>
