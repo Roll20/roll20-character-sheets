@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2023-02-07 ** v.20 Paul V
+	Fixed Stat rolls and NPC Stat rolls and saves
+	Added Features and traits list
 **2023-01-24 ** v.19 Paul V
 	Fixed Initiative (Vehicles and Dex)
 **2022-12-12 ** v.18 Paul V
