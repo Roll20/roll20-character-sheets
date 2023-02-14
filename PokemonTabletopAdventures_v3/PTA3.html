@@ -1131,14 +1131,14 @@
               <b class="sheet-info-tooltip" title="Choose the Scatter type of the attack. This will effect which roll template is used for the chat log output.">ℹ</b>
             </span>
             <span>
-              <input name="attr_attack_rolls" type="hidden" />
-              <input name="attr_quick_attack_rolls" type="hidden" />
+              <input name="attr_attack_rolls" type="hidden" value="{{accuracy=[[ d20cf0cs>@{move_critthreshold} + [[ @{move_totalaccuracy} + ?{Temp Accuracy Bonus|0} ]] ]]}} {{damage=[[ ([[@{move_dicenumber} + ?{Effectiveness}]])d@{damage_dice} + [[ @{move_totaldamage} + ?{Temp Damage Bonus}]] ]]}}"/>
+              <input name="attr_quick_attack_rolls" type="hidden" value="{{accuracy=[[ d20cf0cs>@{move_critthreshold} + @{move_totalaccuracy} ]]}} {{damage=[[ @{move_dicenumber}d@{damage_dice} + @{move_totaldamage} ]]}}" />
               <select class="sheet-move-text" name="attr_move_template" title="Attribute: move_template">
                 <option value="move-roll" selected>One Hit</option>
                 <option value="dual-hit-move-roll">Two Hits</option>
                 <option value="triple-hit-move-roll">Three Hits</option>
-                <option value="quintuple-hit-move-roll">Up to Five Hits</option>
-                <option value="dectuple-hit-move-roll">Up to Ten Hits</option>
+                <option value="multi-hit-move-roll">Up to Five Hits</option>
+                <option value="ten-hit-move-roll">Up to Ten Hits</option>
       </select>
             </span>
 
@@ -1669,7 +1669,7 @@
     </div>
   </rolltemplate>
 
-  <rolltemplate class="sheet-rolltemplate-dectuple-hit-move-roll">
+  <rolltemplate class="sheet-rolltemplate-ten-hit-move-roll">
     <div class="sheet-container sheet-rolltemplate-color-setting-{{move-type}}-move">
       <table class="sheet-move-template">
         <tbody>
@@ -2247,7 +2247,7 @@
     </div>
   </rolltemplate>
 
-  <rolltemplate class="sheet-rolltemplate-quintuple-hit-move-roll">
+  <rolltemplate class="sheet-rolltemplate-multi-hit-move-roll">
     <div class="sheet-container sheet-rolltemplate-color-setting-{{move-type}}-move">
       <table class="sheet-move-template">
         <tbody>
@@ -2964,22 +2964,6 @@
   on("sheet:opened", function (_) {
     getSectionIDs("repeating_moves", function (idArray) {
       const templates = idArray.map((id) => `repeating_moves_${id}_move_template`);
-      getAttrs([...templates], function (values) {
-        const rows = templates.reduce((obj, template) => {
-          const selection = values[template];
-          
-          if (selection.includes("multi-hit-move-roll")) obj[template] = "quintuple-hit-move-roll";
-          return obj;
-        });
-
-        if (rows) setAttrs(rows);
-      });
-    });
-  });
-
-  on("sheet:opened", function (_) {
-    getSectionIDs("repeating_moves", function (idArray) {
-      const templates = idArray.map((id) => `repeating_moves_${id}_move_template`);
       const attackRolls = idArray.map((id) => `repeating_moves_${id}_attack_rolls`);
       const quickAttackRolls = idArray.map((id) => `repeating_moves_${id}_quick_attack_rolls`);
 
@@ -3010,8 +2994,8 @@
   function generateAttackRollsFromScatterSelection(selection) {
     let extraAttacks = 0;
     switch (selection) {
-      case "dectuple-hit-move-roll": extraAttacks = 9; break;
-      case "quintuple-hit-move-roll": extraAttacks = 4; break;
+      case "ten-hit-move-roll": extraAttacks = 9; break;
+      case "multi-hit-move-roll": extraAttacks = 4; break;
       case "triple-hit-move-roll": extraAttacks = 2; break;
       case "dual-hit-move-roll": extraAttacks = 1; break;
     }
