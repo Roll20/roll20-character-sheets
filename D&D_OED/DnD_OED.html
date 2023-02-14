@@ -248,7 +248,7 @@
             <!-- row 21 -->   
             <span class="grid-16-span-16">&nbsp;</span>
             <!-- row 22 -->    
-            <span class="grid-16-span-6"><div class="center font-size-sm line-height-28" data-i18n="totalEnc-u">Total Encumbrance</div></span>      
+            <span class="grid-16-span-6"><div class="center font-size-sm line-height-28" data-i18n="totalEnc-u">Encumbrance in Stone</div></span>      
             <span class="grid-16-span-2"><div class="center font-size-sm line-height-28" data-i18n="moveRate-u">Move Rate</div></span>  
             <span class="grid-16-span-4">&nbsp;</span>
             <span class="grid-16-span-2"><label class="font-size-sm line-height-28" data-i18n="total-u">Total:</label></span>
@@ -430,15 +430,17 @@
         on( `change:${item} sheet:opened`, () => {
             getAttrs( items, values => {
                 items.forEach( enc => {
-                    total = total + parseFloat( values[enc] )||0
+                    total = total + parseFloat( values[enc] )||0;
                 });
-                setAttrs({total_enc: total});
+                total = Math.round(total * 10) / 10;
+                var display = total.toFixed(1);
+                setAttrs({total_enc: display});
             });
         });
     });
 
     // Compute movement rate
-    on ("change:total change:str sheet:opened", function() {
+    on ("sheet:opened change:str change:total_enc", function() {
         getAttrs(["str","total_enc"], function(vals) {
             var moveRate = 0;
             const strVal = parseInt(vals.str)||0;
