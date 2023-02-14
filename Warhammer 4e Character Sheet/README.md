@@ -85,6 +85,7 @@ February 14th 2022 v1.65a
 
 - Fixed some skill rolls not always working due to new Besmirched condition bug
 - Fixed NPC fumble/crit not working from the combat text clicky
+- Fixed Talent integration discrptions il8n tags
 
 
 December 20th 2022 v1.65
