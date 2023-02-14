@@ -22,6 +22,10 @@ All the TypeScript files in `src/ts` are concatenated together and then placed i
 
 ## Changelog
 
+### 1.0.1
+
+* Fix the logo having the wrong URL
+
 ### 1.0.0
 
 * Initial release of the sheet.
