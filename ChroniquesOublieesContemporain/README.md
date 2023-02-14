@@ -10,9 +10,15 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.13.0 [Screenshot](coc_v2.png)
+v3.14.0 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.14.0 (2023-02-11)
+
+- Ajout des compteurs génériques 2 & 3
+
+  Les valeurs des compteurs sont chargées dans des attributs nommés 'cptr_xxx' ou 'xxx' est l'abréviation du compteur
 
 ## v3.13.0 (2022-10-31)
 
