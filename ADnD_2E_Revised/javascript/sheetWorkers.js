@@ -668,7 +668,7 @@ on('change:intelligence change:reason change:knowledge', function() {
 });
 
 // Set sub-attributes based on Wisdom, Intuition, and Willpower
-function parseWisBonus(abilityScore) {
+function parseWisBonus(abilityScore, wisdom) {
     if (abilityScore < 13) {
         return {
             '1st': 0,
@@ -678,6 +678,7 @@ function parseWisBonus(abilityScore) {
             '5th': 0,
             '6th': 0,
             '7th': 0,
+            'wind': wisdomTable['wisdom-wind'][wisdom],
             'wisbonus': wisdomTable['wisbonus'][abilityScore],
             'wisbonus-prime': wisdomTable['wisbonus'][abilityScore],
             'wisbonus-extra': wisdomTable['wisbonus'][abilityScore],
@@ -699,11 +700,21 @@ function parseWisBonus(abilityScore) {
         '5th': (bonusString.match(/5th/g) || []).length,
         '6th': (bonusString.match(/6th/g) || []).length,
         '7th': (bonusString.match(/7th/g) || []).length,
+        'wind': wisdomTable['wisdom-wind'][wisdom],
     };
 
     // Generate bonus prime and bonus extra strings
-    bonus['wisbonus-prime'] = wisdomTable['wisbonus-prime'][abilityScore];
-    bonus['wisbonus-extra'] = wisdomTable['wisbonus-extra'][abilityScore];
+    function format(bonus, key) {
+        if (bonus[key] === 0) {
+            return '';
+        }
+        if (bonus[key] === 1) {
+            return key
+        }
+        return `${bonus[key]}x${key}`;
+    }
+    bonus['wisbonus-prime'] = [format(bonus, '1st'), format(bonus, '2nd'), format(bonus, '3rd'), format(bonus, '4th')].filter(Boolean).join(', ');
+    bonus['wisbonus-extra'] = [format(bonus, '5th'), format(bonus, '6th'), format(bonus, '7th')].filter(Boolean).join(', ');
     bonus['wisbonus'] = [bonus['wisbonus-prime'], bonus['wisbonus-extra']].filter(Boolean).join(', ');
 
     return bonus;
@@ -722,7 +733,7 @@ on('change:wisdom change:intuition change:willpower', function() {
 
         let bonusSpells;
         if (wisdom === 0) {
-            bonusSpells = parseWisBonus(0);
+            bonusSpells = parseWisBonus(0, 0);
             assignAttributes(0, 0, 0, bonusSpells, wisdomTable['wisimmune'][0], wisdomTable['wisimmune'][0], wisdomTable['wisnotes'][0], wisdomTable['wisnotes'][0]);
             return;
         }
@@ -754,7 +765,7 @@ on('change:wisdom change:intuition change:willpower', function() {
             wisimm1 = wisImmuneArray.slice(0, slicePoint).filter(Boolean).join(', ');
             wisimm2 = wisImmuneArray.slice(slicePoint).filter(Boolean).join(', ');
         }
-        bonusSpells = parseWisBonus(willpower);
+        bonusSpells = parseWisBonus(intuition, wisdom);
 
         assignAttributes(wisdom, intuition, willpower, bonusSpells, wisimm1, wisimm2, wisnotes, wis2notes);
 
@@ -777,6 +788,7 @@ on('change:wisdom change:intuition change:willpower', function() {
                 'spell-priest-level5-wisdom': bonusSpells['5th'],
                 'spell-priest-level6-wisdom': bonusSpells['6th'],
                 'spell-priest-level7-wisdom': bonusSpells['7th'],
+                'wisdom-wind': bonusSpells['wind'],
             });
         }
     });
@@ -935,7 +947,7 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
 }
 
 function setupCalculateRemaining(totalField, sumField, remainingField) {
-    on(`change:${totalField} change:${sumField}`, function () {
+    on(`change:${totalField} change:${sumField}`, function (eventInfo) {
         getAttrs([totalField, sumField], function (values) {
             let intTotal = parseInt(values[totalField]) || 0;
             let intSum = parseInt(values[sumField]) || 0;
@@ -1309,6 +1321,7 @@ let priestSpellPoints = 'spell-points-priest';
 let wind = 'total-wind';
 let allPriestSpellSections = priestSpellLevelsSections.flatMap(sl => sl.sections);
 setupStaticCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
+setupStaticCalculateTotal(wind, ['level-wind', 'wisdom-wind']);
 setupRepeatingSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`, true);
 setupRepeatingSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`, true);
 setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
