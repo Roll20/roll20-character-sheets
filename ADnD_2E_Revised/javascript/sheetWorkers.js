@@ -659,6 +659,7 @@ on('change:intelligence change:reason change:knowledge', function() {
                 intimm5th: intelligenceTable['intimm5th'][reason],
                 intimm6th: intelligenceTable['intimm6th'][reason],
                 intimm7th: intelligenceTable['intimm7th'][reason],
+                // ['spell-points-int']: intelligenceTable['spell-points-int'][intelligence],
                 intnotes: intnotes,
                 int2notes: int2notes,
             });
