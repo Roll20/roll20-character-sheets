@@ -936,8 +936,8 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
 function setupCalculateRemaining(totalField, sumField, remainingField) {
     on(`change:${totalField} change:${sumField}`, function () {
         getAttrs([totalField, sumField], function (values) {
-            let intTotal = parseInt(values[totalField]);
-            let intSum = parseInt(values[sumField]);
+            let intTotal = parseInt(values[totalField]) || 0;
+            let intSum = parseInt(values[sumField]) || 0;
 
             console.log(`Setting ${remainingField} with value from ${totalField}: ${intTotal} and ${sumField}: ${intSum}`);
 
@@ -1218,6 +1218,17 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
     });
 }
 
+const addSpellRow = function(section) {
+    on(`clicked:spells-${section}-add-row`, function (eventObject) {
+        getAttrs(['spell-tracking-system'], function (values) {
+            let spellTrackingSystem = values['spell-tracking-system'];
+            const rowID = generateRowID();
+            const setObj = {};
+            setObj[`repeating_spells-${section}_${rowID}_show-${spellTrackingSystem}`] = 1;
+            setAttrs(setObj,{silent:true});
+        });
+    });
+}
 
 let wizardSpellLevelsSections = [
     {level: '1', sections: ['', '2', '3', 'wiz1']},
@@ -1268,6 +1279,7 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     if (isNewSpellSection(lastSection)) {
         setupAutoFillSpellInfo(lastSection, wizardSpells, SCHOOL_FIELDS);
         setupSpellCrit(lastSection);
+        addSpellRow(lastSection);
     }
 });
 setupAutoFillSpellInfo('wizmonster', wizardSpells, SCHOOL_FIELDS);
@@ -2881,7 +2893,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 //#endregion
 
 // Show / Hide buttons for various repeating sections
-const REPEATING_SECTIONS = [
+const FOLDABLE_REPEATING_SECTIONS = [
     ...wizardSpellLevelsSections.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
     'spells-wizmonster',
     ...priestSpellLevelsSections.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
@@ -2889,7 +2901,7 @@ const REPEATING_SECTIONS = [
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
     'scrolls',
 ];
-REPEATING_SECTIONS.forEach(section => {
+FOLDABLE_REPEATING_SECTIONS.forEach(section => {
    on(`clicked:repeating_${section}:show clicked:repeating_${section}:hide`, function (eventInfo) {
        let parse = parseSourceAttribute(eventInfo);
        $20(`div[data-reprowid=${parse.rowId}] .sheet-hidden`).toggleClass('sheet-show');
