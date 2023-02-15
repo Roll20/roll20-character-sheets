@@ -85,7 +85,8 @@ February 14th 2022 v1.65a
 
 - Fixed some skill rolls not always working due to new Besmirched condition bug
 - Fixed NPC fumble/crit not working from the combat text clicky
-- Fixed Talent integration discrptions il8n tags
+- Fixed Talent integration description il8n tags
+- Fixed Channelling so no long removes SL from the Ext Accu SL pool when failing the roll
 
 
 December 20th 2022 v1.65
