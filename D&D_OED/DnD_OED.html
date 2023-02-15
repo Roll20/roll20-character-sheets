@@ -7,7 +7,7 @@
     <button type="action" name="act_Spellbook" data-i18n="spellbookButton-u">Spellbook</button>
 </div>
 <div class="oed">
-    <input type="hidden" class="tabstoggle" name="attr_sheetTab"  value="character"  />
+    <input type="hidden" class="tabstoggle" name="attr_sheetTab" value="character"  />
 
     <!-- Character main page -->
     <div class="character">
@@ -24,7 +24,7 @@
             <span class="grid-16-span-3"><label data-i18n="alignment-u">Alignment:</label></span>
             <span class="grid-16-span-5"><input  class="fill" name="attr_alignment" tabindex="4" title="@{alignment}" type="text" /></span>
             <!-- row 3 -->
-            <span class="grid-16-span-16" data-i18n="abilities-u">Abilities</span>
+            <span class="grid-16-span-16" data-i18n="abilities-u">ABILITIES</span>
             <!-- row 4 -->
             <span class="grid-16-span-3"><input class="center fill box top" name="attr_str" tabindex="5" title="@{str}" type="text" value="10" /></span>
             <span class="grid-16-span-2"><label class="line-height-20" data-i18n="str-u">STR</label><span class="attr-mod backed center fill" name="attr_str_mod" title="@{str_mod}" type="text" />0</span></span>
@@ -39,7 +39,7 @@
             <span class="grid-16-span-2"><label class="line-height-20" data-i18n="int-u">INT</label><span class="attr-mod backed center fill" name="attr_int_mod" title="@{int_mod}" type="text">0</span></span>
             <span class="grid-16-span-3"><div class="details font-size-sm">Find Traps /<br />Secrets</div></span>
             <span class="grid-16-span-8">
-                <label class="line-height-20" data-i18n="specialAbilities-u">SPECIAL ABILITIES:</label>
+                <label class="line-height-20" data-i18n="specialAbilities-u">SPECIAL ABILITIES</label>
                 <input class="fill line-height-38" name="attr_special_abilities_1" tabindex="14" title="@{special_abilities_1}" type="text" />
             </span>
             <!-- row 6 -->
@@ -77,8 +77,10 @@
             <!-- row 10 -->
             <span class="grid-16-span-16">&nbsp;</span>
             <!-- row 11 -->
-            <span class="grid-16-span-8"><label class="line-height-20" data-i18n="languages-u">LANGUAGES:</label></span>
-            <span class="grid-16-span-8"><label class="line-height-20" data-i18n="experience-u">EXPERIENCE:</label></span>
+            <span class="grid-16-span-8"><label class="line-height-20" data-i18n="languages-u">LANGUAGES</label></span>
+            <span class="grid-16-span-4"><label class="line-height-20" data-i18n="experience-u">EXPERIENCE</label></span>
+            <span class="grid-16-span-2"><label class="line-height-20" data-i18n="saves-u">SAVES</label></span>
+            <span class="grid-16-span-2"><button type="roll" name="roll_saves" value="?{Choose:|Spells,@{character_name} saves vs. Spells: [[1d20 + @{max_level} + 0]] |Breath,@{character_name} saves vs. Breath: [[1d20 + @{max_level} + 1]]|Stone,@{character_name} saves vs. Stone: [[1d20 + @{max_level} + 2]]|Wands,@{character_name} saves vs. Wands: [[1d20 + @{max_level} + 3]]|Death,@{character_name} saves vs. Death: [[1d20 + @{max_level} + 4]]}"></button></span>
             <!-- row 12 -->
             <span class="grid-16-span-4"><input class="fill line-height-28" name="attr_languages_1" tabindex="23" title="@{languages_1}" type="text" /></span>
             <span class="grid-16-span-4"><input class="fill line-height-28" name="attr_languages_2" tabindex="24" title="@{languages_2}" type="text" /></span>  
@@ -101,7 +103,7 @@
             <span class="grid-16-span-8"><div class="line-height-10">&nbsp;</div></span>  
             <span class="grid-16-span-8 bdr-btm"><div class="line-height-10">&nbsp;</div></span>
             <!-- row 17 -->
-            <span class="grid-16-span-16"><label class="line-height-28" data-i18n="attacks-u">ATTACKS:</label></span>
+            <span class="grid-16-span-16"><label class="line-height-28" data-i18n="attacks-u">ATTACKS</label></span>
             <span class="grid-16-span-16 bdr-top"><div class="line-height-10">&nbsp;</div></span>
             <!-- row 18 -->
             <span class="grid-16-span-6 bdr-mid lft"><label class="font-size-sm line-height-28 ml-10" data-i18n="weapon-u">Weapon</label></span>
@@ -462,5 +464,25 @@
             setAttrs({move: moveRate});
         });
     });
-
+    
+    // Parse out max level from class field
+    on ("sheet:opened change:class", function() {
+        getAttrs(["class"], function(val) {
+            const str = val.class;
+            var num = 0, res = 0;
+            for (i = 0; i < str.length; i++) {
+                var c = str.charAt(i);
+                if ('0' <= c && c <= '9') {
+                    num = num * 10 +
+                    (c.charCodeAt(0)- '0'.charCodeAt(0));
+                }
+                else {
+                    res = Math.max(res, num);
+                    num = 0;
+                }
+            }
+            var finalVal = Math.max(res, num);
+            setAttrs({max_level: finalVal});
+        });
+    });
 </script>
