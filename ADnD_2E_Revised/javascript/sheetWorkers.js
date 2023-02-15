@@ -1219,18 +1219,6 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
     });
 }
 
-const addSpellRow = function(section) {
-    on(`clicked:spells-${section}-add-row`, function (eventObject) {
-        getAttrs(['spell-tracking-system'], function (values) {
-            let spellTrackingSystem = values['spell-tracking-system'];
-            const rowID = generateRowID();
-            const setObj = {};
-            setObj[`repeating_spells-${section}_${rowID}_show-${spellTrackingSystem}`] = 1;
-            setAttrs(setObj,{silent:true});
-        });
-    });
-}
-
 let wizardSpellLevelsSections = [
     {level: '1', sections: ['', '2', '3', 'wiz1']},
     {level: '2', sections: ['4', '5', '6', 'wiz2']},
@@ -1280,7 +1268,6 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     if (isNewSpellSection(lastSection)) {
         setupAutoFillSpellInfo(lastSection, wizardSpells, SCHOOL_FIELDS);
         setupSpellCrit(lastSection);
-        addSpellRow(lastSection);
     }
 });
 setupAutoFillSpellInfo('wizmonster', wizardSpells, SCHOOL_FIELDS);
