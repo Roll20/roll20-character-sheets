@@ -24,6 +24,12 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Feb 14, 2023
+- Gave the attack rolls some love, as befitting the day of the year.
+  - Updated the scatter selection to change the attack rolls, so that lower-hit moves aren't rolling many sets of dice
+  - Added support for scatter attacks that hit up to 10 times
+  - Clarified the intent of each scatter type selection by explicitly stating how many hits are in each roll
+
 ### Aug 11, 2022
 - Implemented the ability to change the background and roll template colours for class and origin features, accessible to Trainer and Hybrid character types
 
