@@ -99,7 +99,7 @@ intelligenceTable['intimm4th'] = ['Error','','','','','','','','','','','','',''
 intelligenceTable['intimm5th'] = ['Error','','','','','','','','','','','','','','','','','','','','','','','5th-level','5th-level','5th-level'];
 intelligenceTable['intimm6th'] = ['Error','','','','','','','','','','','','','','','','','','','','','','','','6th-level','6th-level'];
 intelligenceTable['intimm7th'] = ['Error','','','','','','','','','','','','','','','','','','','','','','','','','7th-level'];
-// intelligenceTable['spell-points-int'] = ['Error','','','','','','','','','2','2','2','3','3','4','4','5','6','7','8','9','9','9','9','9','9'];
+intelligenceTable['spell-points-int'] = [0,0,0,0,0,0,0,0,0,2,2,2,3,3,4,4,5,6,7,8,9,9,9,9,9,9];
 intelligenceTable['intnotes'] = ['INVALID INTELLIGENCE','Communicate by Grunts & Gestures','','','','','','','','','','','','','','','','','','','','','','','','',''];
 
 const wisdomTable = {};

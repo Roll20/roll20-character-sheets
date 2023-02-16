@@ -1323,6 +1323,17 @@ setupRepeatingSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-poi
 setupRepeatingSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`, true);
 setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
 setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
+on('change:spell-points-int-enabled change:intelligence', function (eventInfo) {
+    getAttrs(['spell-points-int-enabled', 'intelligence'], function (values) {
+        let newValue = {'spell-points-int': 0}
+        if (values['spell-points-int-enabled'] !== '1') {
+            return setAttrs(newValue)
+        }
+        let intelligence = getLookupValue(values['intelligence'], 0);
+        newValue['spell-points-int'] = intelligenceTable['spell-points-int'][intelligence];
+        setAttrs(newValue);
+    });
+});
 
 let priestSpellPoints = 'spell-points-priest';
 let wind = 'total-wind';
