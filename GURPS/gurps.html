@@ -4358,21 +4358,20 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.4 -->			
+				<!-- current version notes: 2.9.5 -->
 				<ul>
-					<li>Wound Modifier Notes: Added formatting to improve legibility on roll template.
-						<ul>
-							<li>To update the Wound Modifier Notes for an existing character, go to the <b>Options->Rules</b> tab and under the section <b>Editable Wound Modifier Notes</b> click the reset button.</li>
-						</ul>
-					</li>
 					<li>
-						Slam, Falling, and Collision notes revisions. Added damage type to Falling and Collision. If the damage type is other than crushing damage is halved.
+						Hit Location & Armor Table. Added a new column to show the final to hit penalty, it will total the modifier for the hit location and the Size Modifier. 
+						This should avoid weird syncing issues when changing hit location and size modifiers.
 						<ul>
-							<li>Notes in roll template. Collapsible notes section should be available when the character sheet is updated to work with Roll20s non-legacy html/css.</li>
+							<li>
+								<b>Note:</b> When the sheet is updated, it will attempt to remove the size modifier from the hit location modifier. 
+								However, this may not work, you may have to manually adjust the hit location modifier.
+							</li>
 						</ul>
 					</li>
 				</ul>
-				
+					
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
 			</div>
@@ -9378,7 +9377,7 @@ visualize what it will look like in chat.
 			<!-- tabs -->
 			<label>
 				<input type="radio" name="attr_combat_tabs" value="damage" class="tab-control" checked />
-				<span data-i18n="damage-label">Damage</span>
+				<span data-i18n="hit-locations-label">Hit Locations</span>
 			</label>
 			<label>
 				<input type="radio" name="attr_combat_tabs" value="defense" class="tab-control" />
@@ -9772,6 +9771,7 @@ visualize what it will look like in chat.
 
 						<input type="hidden" name="attr_armor_show_back" />
 						<input type="hidden" name="attr_armor_layers" />
+						<input type="hidden" name="attr_hit_location_modifiers_upgraded" value="false" />
 						<div class="hit-location-grid">
 
 							<!-- header row -->
@@ -9782,10 +9782,19 @@ visualize what it will look like in chat.
 							<div class="item grid-header">
 								<h4 class="spacer">&nbsp;</h4>
 								<div class="popup">
-									<span data-i18n="abbreviation-penalty-label">Pen</span>
+									<span data-i18n="abbreviation-penalty-label">PEN</span>
 								</div>
 								<span class="tooltip">
-									<span data-i18n="armor-penalty-tooltip">Penalty to hit this location.<br /><b>NOTE:</b> Size Modifier is factored in on <i>Applying</i> location type or changing <i>Size Modifier</i>.</span>
+									<span data-i18n="armor-penalty-tooltip">Penalty to hit this location.</span>
+								</span>
+							</div>
+							<div class="item grid-header">
+								<h4 class="spacer">&nbsp;</h4>
+								<div class="popup">
+									<span data-i18n="modifier-abbreviation-label">MOD</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="armor-modifier-tooltip">The final <b>To Hit</b> modifier, the <b>Hit Location Penalty</b> plus the character's <b>Size Modifier</b>.</span>
 								</span>
 							</div>
 							<div class="item grid-header">
@@ -9914,6 +9923,9 @@ visualize what it will look like in chat.
 								</div>
 								<div class="item">
 									<input type="number" step="1" value="0" name="attr_penalty" title="Macro: @{NAME|repeating_hitlocation_$[row #]_penalty}" />
+								</div>
+								<div class="item">
+									<input type="number" value="@{penalty} + @{size}" disabled="disabled" name="attr_final_modifier" title="Macro: @{NAME|repeating_hitlocation_$[row #]_final_modifier}" />
 								</div>
 								<div class="item">
 									<input type="number" value="0" step="1" min="0" name="attr_defense_bonus" title="Macro: @{NAME|repeating_hitlocation_$[row #]_defense_bonus}" />
@@ -14626,7 +14638,25 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.4 -->
+			<!-- current version notes: 2.9.5 -->
+
+			<ul>
+				<li>
+					Hit Location & Armor Table. Added a new column to show the final to hit penalty, it will total the modifier for the hit location and the Size Modifier. 
+					This should avoid weird syncing issues when changing hit location and size modifiers.
+					<ul>
+						<li>
+							<b>Note:</b> When the sheet is updated, it will attempt to remove the size modifier from the hit location modifier. 
+							However, this may not work, you may have to manually adjust the hit location modifier.
+						</li>
+					</ul>
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.4</h4>
+
+			<p>Pull Request: 2/6/2023</p>
+
 			<ul>
 				<li>Wound Modifier Notes: Added formatting to improve legibility on roll template.
 					<ul>
@@ -18113,9 +18143,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.4";
+	const version = "2.9.5";
 	
-	const latestChangesDate = "2/6/2023";
+	const latestChangesDate = "2/20/2023";
 	
 	let modCascade = true;
 	
@@ -19321,6 +19351,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		updateTechLevelPoints();
 
 		updateLanguagePoints();
+
+		upgradeHitLocationPenaltiesToNewVersion();
 	
 	}
 	
@@ -26992,23 +27024,9 @@ B378
 	
 	}
 	
-	on("change:size", (event) => {
-	
-		let sizeDiff = Number(event.newValue) - Number(event.previousValue);
-	
-		if (isNaN(sizeDiff)) {
-			sizeDiff = 0;
-		}
-	
-		updateReach();
-	
-		updateRepeatingHitLocationPenaltyCrippledValues(sizeDiff);
-	
-	});
-	
 	on("change:hit_points_max", (event) => {
 	
-		updateRepeatingHitLocationPenaltyCrippledValues(0);
+		updateRepeatingHitLocationCrippledValues();
 	
 	});
 	
@@ -29708,6 +29726,68 @@ B378
 	
 	
 	}
+
+	function upgradeHitLocationPenaltiesToNewVersion() {
+
+		getAttrs(["hit_location_modifiers_upgraded", "size"], values => {
+
+			const upgraded = values.hit_location_modifiers_upgraded === "true";
+
+			const sizeModifier = Number(values.size) ?? 0;
+
+			let updates = {
+				hit_location_modifiers_upgraded: "true"
+			};
+
+			if (upgraded) {
+				// only upgraded, Leave
+				return;
+			} else if (sizeModifier == 0) {
+				// don't do anything if there's no size modifier
+				setAttrs(updates, { silent: true });
+				return;
+			}
+
+			// get all the section id numbers
+			getSectionIDs("repeating_hitlocation", (ids) => {
+		
+				let repeatingFields = [];
+
+				// get a list of values we need from the table rows
+				for (let i = 0; i < ids.length; i++) {
+
+					let penaltyProp = `repeating_hitlocation_${ids[i]}_penalty`;
+
+					repeatingFields.push(penaltyProp);
+
+				}
+
+				// get the values
+				getAttrs(repeatingFields, function (repeatingValues) {
+
+					// loop through ids and create a list value to update
+					for (let i = 0; i < ids.length; i++) {
+
+						let penaltyProp = `repeating_hitlocation_${ids[i]}_penalty`;
+
+						let penalty = Number(repeatingValues[penaltyProp]);
+
+						// remove the size modifier
+						penalty = penalty - sizeModifier;
+
+						updates[penaltyProp] = penalty;
+
+					}
+
+					setAttrs(updates, { silent: true });
+
+				});
+
+			});
+			
+		});
+
+	}
 	
 	/**
 	 * Updates hit location table's penalty and crippled values
@@ -29715,9 +29795,8 @@ B378
 	 * Get original penalty value
 	 * then update the final penalty, divisor, and disabled hit points
 	 *
-	 * @param {number} sizeDiff The size difference.
 	 */
-	function updateRepeatingHitLocationPenaltyCrippledValues(sizeDiff) {
+	function updateRepeatingHitLocationCrippledValues() {
 	
 		let fields = [
 			"hit_points_max",
@@ -29727,6 +29806,8 @@ B378
 	
 			let hitPoints = Number(values.hit_points_max);
 	
+			let updates = {};
+	
 			// get all the section id numbers
 			getSectionIDs("repeating_hitlocation", (ids) => {
 	
@@ -29735,12 +29816,8 @@ B378
 				// get a list of values we need from the table rows
 				for (let i = 0; i < ids.length; i++) {
 	
-					let penaltyProp = `repeating_hitlocation_${ids[i]}_penalty`;
-	
 					let divisorProp = `repeating_hitlocation_${ids[i]}_divisor`;
-	
-					repeatingFields.push(penaltyProp);
-	
+
 					repeatingFields.push(divisorProp);
 	
 				}
@@ -29748,20 +29825,12 @@ B378
 				// get the values
 				getAttrs(repeatingFields, function (repeatingValues) {
 	
-					let updates = {};
-	
 					// loop through ids and create a list value to update
 					for (let i = 0; i < ids.length; i++) {
-	
-						let penaltyProp = `repeating_hitlocation_${ids[i]}_penalty`;
-	
-						let penalty = Number(repeatingValues[penaltyProp]);
 	
 						let divisorProp = `repeating_hitlocation_${ids[i]}_divisor`;
 	
 						let divisor = Number(repeatingValues[divisorProp]);
-	
-						let newPenalty = sizeDiff + penalty;
 	
 						if (divisor < 0) {
 							divisor = 1;
@@ -29776,8 +29845,6 @@ B378
 	
 						let crippledProp = `repeating_hitlocation_${ids[i]}_crippled`;
 	
-						updates[penaltyProp] = newPenalty;
-	
 						updates[crippledProp] = crippled;
 	
 					}
@@ -29787,7 +29854,7 @@ B378
 				});
 	
 			});
-	
+
 		});
 	
 	}
@@ -29987,7 +30054,6 @@ B378
 		updateCurrentHitPointsByDamageTable(previousValue, newValue);
 	
 	});
-	
 	
 	/**
 	 * If option to update Hit Points when changing damage table location damage
