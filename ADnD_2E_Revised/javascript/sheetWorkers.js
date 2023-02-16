@@ -668,21 +668,28 @@ on('change:intelligence change:reason change:knowledge', function() {
 });
 
 // Set sub-attributes based on Wisdom, Intuition, and Willpower
-function parseWisBonus(abilityScore, wisdom) {
-    if (abilityScore < 13) {
-        return {
-            '1st': 0,
-            '2nd': 0,
-            '3rd': 0,
-            '4th': 0,
-            '5th': 0,
-            '6th': 0,
-            '7th': 0,
-            'wind': wisdomTable['wisdom-wind'][wisdom],
-            'wisbonus': wisdomTable['wisbonus'][abilityScore],
-            'wisbonus-prime': wisdomTable['wisbonus'][abilityScore],
-            'wisbonus-extra': wisdomTable['wisbonus'][abilityScore],
-        };
+async function parseWisBonus(abilityScore, wisdom) {
+    let bonus = {
+        '1st': 0,
+        '2nd': 0,
+        '3rd': 0,
+        '4th': 0,
+        '5th': 0,
+        '6th': 0,
+        '7th': 0,
+        'wind': 0,
+        'wisbonus': '—',
+        'wisbonus-prime': '—',
+        'wisbonus-extra': '—',
+    };
+    if (abilityScore < 13 && wisdom < 13) {
+        await keepContextRoll();
+        return bonus;
+    }
+
+    let answer = await extractQueryResult('?{Priests get bonus spells from high Wisdom (but not Paladins and Rangers). Do you play a priest?|My character is a priest,true|My character is a different class,false}');
+    if (answer !== 'true') {
+        return bonus;
     }
 
     // Combine all spell levels into one string
@@ -692,7 +699,7 @@ function parseWisBonus(abilityScore, wisdom) {
     }
 
     // Count instances of each spell level
-    let bonus = {
+    bonus = {
         '1st': (bonusString.match(/1st/g) || []).length,
         '2nd': (bonusString.match(/2nd/g) || []).length,
         '3rd': (bonusString.match(/3rd/g) || []).length,
@@ -721,7 +728,7 @@ function parseWisBonus(abilityScore, wisdom) {
 }
 
 on('change:wisdom change:intuition change:willpower', function() {
-    getAttrs(['wisdom','intuition','willpower'], function(values) {
+    getAttrs(['wisdom','intuition','willpower'], async function (values) {
         let wisdomRaw = values.wisdom.replace(/\s+/g, '');
         let intuitionRaw = values.intuition.replace(/\s+/g, '');
         let willpowerRaw = values.willpower.replace(/\s+/g, '');
@@ -733,7 +740,7 @@ on('change:wisdom change:intuition change:willpower', function() {
 
         let bonusSpells;
         if (wisdom === 0) {
-            bonusSpells = parseWisBonus(0, 0);
+            bonusSpells = await parseWisBonus(0, 0);
             assignAttributes(0, 0, 0, bonusSpells, wisdomTable['wisimmune'][0], wisdomTable['wisimmune'][0], wisdomTable['wisnotes'][0], wisdomTable['wisnotes'][0]);
             return;
         }
@@ -761,35 +768,35 @@ on('change:wisdom change:intuition change:willpower', function() {
             for (let i = willpower; i > 18; i--) {
                 wisImmuneArray.push(wisdomTable['wisimmune'][i]);
             }
-            let slicePoint = Math.round(wisImmuneArray.length/2);
+            let slicePoint = Math.round(wisImmuneArray.length / 2);
             wisimm1 = wisImmuneArray.slice(0, slicePoint).filter(Boolean).join(', ');
             wisimm2 = wisImmuneArray.slice(slicePoint).filter(Boolean).join(', ');
         }
-        bonusSpells = parseWisBonus(intuition, wisdom);
+        bonusSpells = await parseWisBonus(intuition, wisdom);
 
         assignAttributes(wisdom, intuition, willpower, bonusSpells, wisimm1, wisimm2, wisnotes, wis2notes);
 
         function assignAttributes(wisdom, intuition, willpower, bonusSpells, wisimm1, wisimm2, wisnotes, wis2notes) {
-            setAttrs({
-                wisdef: wisdomTable['wisdef'][willpower],
-                wisbonus: bonusSpells['wisbonus'],
-                'wisbonus-prime': bonusSpells['wisbonus-prime'],
-                'wisbonus-extra': bonusSpells['wisbonus-extra'],
-                wisfail: wisdomTable['wisfail'][intuition],
-                wisimm: wisimm1,
-                wisimm1: wisimm1,
-                wisimm2: wisimm2,
-                wisnotes: wisnotes,
-                wis2notes: wis2notes,
-                'spell-priest-level1-wisdom': bonusSpells['1st'],
-                'spell-priest-level2-wisdom': bonusSpells['2nd'],
-                'spell-priest-level3-wisdom': bonusSpells['3rd'],
-                'spell-priest-level4-wisdom': bonusSpells['4th'],
-                'spell-priest-level5-wisdom': bonusSpells['5th'],
-                'spell-priest-level6-wisdom': bonusSpells['6th'],
-                'spell-priest-level7-wisdom': bonusSpells['7th'],
-                'wisdom-wind': bonusSpells['wind'],
-            });
+            let newValue = {};
+            newValue['wisdef'] = wisdomTable['wisdef'][willpower];
+            newValue['wisbonus'] = bonusSpells['wisbonus'];
+            newValue['wisbonus-prime'] = bonusSpells['wisbonus-prime'];
+            newValue['wisbonus-extra'] = bonusSpells['wisbonus-extra'];
+            newValue['wisfail'] = wisdomTable['wisfail'][intuition];
+            newValue['wisimm'] = wisimm1;
+            newValue['wisimm1'] = wisimm1;
+            newValue['wisimm2'] = wisimm2;
+            newValue['wisnotes'] = wisnotes;
+            newValue['wis2notes'] = wis2notes;
+            newValue['spell-priest-level1-wisdom'] = bonusSpells['1st'];
+            newValue['spell-priest-level2-wisdom'] = bonusSpells['2nd'];
+            newValue['spell-priest-level3-wisdom'] = bonusSpells['3rd'];
+            newValue['spell-priest-level4-wisdom'] = bonusSpells['4th'];
+            newValue['spell-priest-level5-wisdom'] = bonusSpells['5th'];
+            newValue['spell-priest-level6-wisdom'] = bonusSpells['6th'];
+            newValue['spell-priest-level7-wisdom'] = bonusSpells['7th'];
+            newValue['wisdom-wind'] = bonusSpells['wind'];
+            setAttrs(newValue);
         }
     });
 });
