@@ -83,8 +83,8 @@ constitutionTable['conadj'] = ['Error','-3','-2','-2','-1','-1','-1','0','0','0'
 constitutionTable['conshock'] = ['Error','25','30','35','40','45','50','55','60','65','70','75','80','85','88','90','95','97','99','99','99','99','99','99','99','100'];
 constitutionTable['conres'] = ['Error','30','35','40','45','50','55','60','65','70','75','80','85','90','92','94','96','98','100','100','100','100','100','100','100','100'];
 constitutionTable['conpoisonsave'] = ['Error','-2','-1','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','+1','+1','+2','+2','+3','+3','+4'];
-constitutionTable['conregen'] = ['Error','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','1/6','1/5','1/4','1/3','1/2','1/1'];
-constitutionTable['connotes'] = ['INVALID CONSTITUTION','','','','','','','','','','','','','','','','','','','','1 hp/6 turns - not acid/fire','1 hp/5 turns - not acid/fire','1 hp/4 turns - not acid/fire','1 hp/3 turns - not acid/fire','1 hp/2 turns - not acid/fire','1 hp/turn - not acid/fire'];
+constitutionTable['conregen'] = ['Error','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','1/6 turns','1/5 turns','1/4 turns','1/3 turns','1/2 turns','1/1 turn'];
+constitutionTable['connotes'] = ['INVALID CONSTITUTION','','','','','','','','','','','','','','','','','','','','Fire and acid damage cannot be regenerated','Fire and acid damage cannot be regenerated','Fire and acid damage cannot be regenerated','Fire and acid damage cannot be regenerated','Fire and acid damage cannot be regenerated','Fire and acid damage cannot be regenerated'];
 constitutionTable['con2notes'] = ['INVALID CONSTITUTION','','','','','','','','','','','','','','','','','(+3) Warriors only','(+4) Warriors only','(+5) Warriors only','(+5) Warriors only','(+6) Warriors only','(+6) Warriors only','(+6) Warriors only','(+7) Warriors only','(+7) Warriors only'];
 
 const intelligenceTable = {};
