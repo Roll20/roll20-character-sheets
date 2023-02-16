@@ -11,9 +11,13 @@ Il est aussi possible d'utiliser cette fiche pour jouer avec l'ensemble de règl
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-4.04 [Screenshot](co_v3.jpg)
+5.02 [Screenshot](co_v3.jpg)
 
 # Notes de version
+## v5.02 (2023-01-26)
+* Ajout des munitions
+* Champs prédicat pour les armes portées
+
 ## v5.00 (2021-07-09)
 * Ajout d'une partie dédiée pour l'interaction avec le script
 * Ajout d'un type de dégâts drain
