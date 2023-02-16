@@ -2905,7 +2905,7 @@ const FOLDABLE_REPEATING_SECTIONS = [
 FOLDABLE_REPEATING_SECTIONS.forEach(section => {
    on(`clicked:repeating_${section}:show clicked:repeating_${section}:hide`, function (eventInfo) {
        let parse = parseSourceAttribute(eventInfo);
-       $20(`div[data-reprowid=${parse.rowId}] .sheet-hidden`).toggleClass('sheet-show');
+       $20(`div[data-reprowid=${parse.rowId}] .sheet-hidden.sheet-fold`).toggleClass('sheet-show');
    });
 });
 
