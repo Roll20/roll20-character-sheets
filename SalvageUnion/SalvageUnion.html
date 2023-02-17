@@ -1,14 +1,17 @@
 <div class="wrapper">
     <input type="hidden" class="tabstoggle" name="attr_sheetTab" value="settings"/>
     <div>
-        <input class="show-pilot" name="attr_isPilot" type="checkbox" checked hidden/>
+        <input class="show-pilot" name="attr_is-pilot" type="checkbox" checked hidden/>
         <button type="action" name="act_pilot" class="tabs pilot-button">Pilot</button>
 
-        <input class="show-mech" name="attr_isMech" type="checkbox" hidden/>
+        <input class="show-mech" name="attr_is-mech" type="checkbox" hidden/>
         <button type="action" name="act_mech" class="tabs mech-button">Mech</button>
 
-        <input class="show-crawler" name="attr_isCrawler" type="checkbox" hidden/>
+        <input class="show-crawler" name="attr_iscrawler" type="checkbox" hidden/>
         <button type="action" name="act_crawler" class="tabs crawler-button">Union Crawler</button>
+
+        <input class="show-notes" name="attr_show-notes-tab" type="checkbox" hidden/>
+        <button type="action" name="act_notes" class="tabs notes-button">Notes</button>
 
         <button type="action" name="act_settings" class="tabs">Settings</button>
     </div>
@@ -175,7 +178,7 @@
 
     <div class="mech">
         <h2>Mech
-            <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}{{mech=1}}"></button>
+            <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}{{mech=1}}{{heatroll=[[0]]}}"></button>
         </h2>
         <div style="display:flex">
             <div class="twocolumns">
@@ -185,11 +188,11 @@
                 </div>
                 <div class="descValuePair">
                     <label for="system">System Slots</label>
-                    <input id="system" type="text" name="attr_system">
+                    <input id="system" type="text" name="attr_system_max">
                 </div>
                 <div class="descValuePair">
                     <label for="module">Module Slots </label>
-                    <input id="module" type="text" name="attr_module">
+                    <input id="module" type="text" name="attr_module_max">
                 </div>
                 <details>
                     <summary>
@@ -214,8 +217,8 @@
                     <label> of <input type="number" min="0" name="attr_energy_max" value="10"></label>
                 </div>
                 <div class="descValuePair">
-                    <button type="action" class="textbutton" name="act_reactOverload">Heat</button>
-                    <input type="number" min="0" max="10" name="attr_heat" value="0">
+                    <button type="roll" class="textbutton" value="&{template:roll}{{name=@{character_name}}}{{mech=1}}{{heatroll=[[1d20]]}}{{heat=[[@{heat}]]}}">Heat</button>
+                    <input type="number" min="0" max="@{heat_max}" name="attr_heat" value="0">
                     <label> of <input type="number" min="0" name="attr_heat_max" value="10"> </label>
                 </div>
             </div>
@@ -230,11 +233,11 @@
         <div>
             <fieldset class="repeating_mechweapons">
                 <details>
-                    <summary>
+                    <summary class="rollButton">
                         <input type="text" name="attr_weaponname" title="Name of the Weapon">
                         <input type="text" name="attr_range" title="Range">
                         <input type="text" name="attr_damage" title="Damage">
-                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}{{mech=1}}">
+                        <button type="action" name="act_roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-weaponname}}}{{roll=[[1d20]]}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-weaponheat}]]}}{{mech=1}}{{heatroll=[[0]]}}">
                         </button>
                     </summary>
                     <details class="subdetails">
@@ -243,18 +246,18 @@
                         </summary>
                         <div class="descValuePair">
                             <label>Heat produced</label>
-                            <input type="text" name="heat" placeholder="1">
+                            <input type="number" name="attr_weaponheat" value="0" min="0">
                         </div>
                         <div class="descValuePair">
                             <label>Cost</label>
-                            <input type="text" name="cost" placeholder="1 T1 Scrap">
+                            <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
                         </div>
                         <div class="descValuePair">
                             <label>Slots</label>
-                            <input type="text" name="slot" placeholder="1 System">
+                            <input type="text" name="attr_slot" placeholder="1 System">
                         </div>
                     </details>
-                    <textarea name="attr_weaponDetails"></textarea>
+                    <textarea name="attr_weapondetails"></textarea>
                 </details>
             </fieldset>
         </div>
@@ -288,11 +291,11 @@
                 <textarea name="attr_details" class="textarea"></textarea>
                 <div class="descValuePair">
                     <label>Cost</label>
-                    <input type="text" name="cost" placeholder="1 T1 Scrap">
+                    <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
                 </div>
                 <div class="descValuePair">
                     <label>Slots</label>
-                    <input type="text" name="slot" placeholder="1 System">
+                    <input type="text" name="attr_slot" placeholder="1 System">
                 </div>
             </details>
         </fieldset>
@@ -315,11 +318,11 @@
                 <textarea name="attr_details" class="textarea"></textarea>
                 <div class="descValuePair">
                     <label>Cost</label>
-                    <input type="text" name="cost" placeholder="1 T1 Scrap">
+                    <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
                 </div>
                 <div class="descValuePair">
                     <label>Slots</label>
-                    <input type="text" name="slot" placeholder="1 System">
+                    <input type="text" name="attr_slot" placeholder="1 System">
                 </div>
             </details>
         </fieldset>
@@ -376,7 +379,7 @@
                         <input type="text" name="attr_weaponname" title="Name of the Weapon">
                         <input type="text" name="attr_range" title="Range">
                         <input type="text" name="attr_damage" title="Damage">
-                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}{{mech=1}}">
+                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
                         </button>
                     </summary>
                     <details class="subdetails">
@@ -385,18 +388,18 @@
                         </summary>
                         <div class="descValuePair">
                             <label>Heat produced</label>
-                            <input type="text" name="heat" placeholder="1">
+                            <input type="number" name="attr_heat" value="0">
                         </div>
                         <div class="descValuePair">
                             <label>Cost</label>
-                            <input type="text" name="cost" placeholder="1 T1 Scrap">
+                            <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
                         </div>
                         <div class="descValuePair">
                             <label>Slots</label>
-                            <input type="text" name="slot" placeholder="1 System">
+                            <input type="text" name="attr_slot" placeholder="1 System">
                         </div>
                     </details>
-                    <textarea name="attr_weaponDetails"></textarea>
+                    <textarea name="attr_details"></textarea>
                 </details>
             </fieldset>
         </div>
@@ -432,21 +435,38 @@
         </fieldset>
     </div>
 
+    <div class="notes">
+        <h2>Notes </h2>
+        <fieldset class="repeating_notes">
+            <details class="equipment">
+                <summary>
+                    <input type="text" name="attr_name" title="Name of the Note">
+                </summary>
+                <textarea name="attr_details" class="textarea"></textarea>
+            </details>
+        </fieldset>
+    </div>
+
     <div class="settings">
         <br>
         <label for="isPilot" class="settings-checkbox">
             <span>Is Pilot</span>
-            <input id="isPilot" name="attr_isPilot" type="checkbox" checked/>
+            <input id="isPilot" name="attr_is-pilot" type="checkbox" checked/>
         </label>
         <br>
         <label for="isMech" class="settings-checkbox">
             <span>Is Mech</span>
-            <input id="isMech" name="attr_isMech" type="checkbox"/>
+            <input id="isMech" name="attr_is-mech" type="checkbox"/>
         </label>
         <br>
         <label for="isCrawler" class="settings-checkbox">
             <span>Is Crawler</span>
-            <input id="isCrawler" name="attr_isCrawler" type="checkbox"/>
+            <input id="isCrawler" name="attr_is-crawler" type="checkbox"/>
+        </label>
+        <br>
+        <label for="showNotesTab" class="settings-checkbox">
+            <span>Show Notes Tab</span>
+            <input id="showNotesTab" name="attr_show-notes-tab" type="checkbox"/>
         </label>
     </div>
 </div>
@@ -460,7 +480,7 @@
 
 
 <script type="text/worker">
-    const buttonlist = ["pilot","mech","crawler","settings"];
+const buttonlist = ["pilot","mech","crawler","notes","settings"];
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
             setAttrs({
@@ -468,6 +488,27 @@
             });
         });
     });
+
+
+on('clicked:repeating_mechweapons:roll',
+     async (event) => {
+	// prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
+	var prefix = event.sourceAttribute.split('_').slice(0,3).join('_') + '_'
+
+	let rollPart = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
+    let results = await startRoll(rollPart);
+
+    let attrs = await asw.getAttrs(['heat']);
+    let resultingHeat = parseInt(attrs.heat) + results.results.weaponheat.result;
+    asw.setAttrs({
+		heat: resultingHeat
+	});
+
+    finishRoll(
+		  	results.rollId,
+		  	{}
+	  	);
+});
 
 on('clicked:reactPush', async (ev) => {
     await push(ev, 'roll');
@@ -590,6 +631,13 @@ const asw = (() => {
             </td>
         </tr>
         {{/damage}}
+        {{#^rollTotal() weaponheat 0}}
+        <tr>
+            <td>
+                Weaponheat: {{weaponheat}}
+            </td>
+        </tr>
+        {{/^rollTotal() weaponheat 0}}
         {{#heat}}
         <tr>
             <td>
@@ -605,9 +653,11 @@ const asw = (() => {
     </table>
     {{#mech}}
     <div class="sheet-rolltemplate-button-row">
+        {{#rollTotal() heatroll 0}}
         <div class="sheet-rolltemplate-button">
             [Push](~{{callsign}}|reactPushWeapon)
         </div>
+        {{/rollTotal() heatroll 0}}
 
         {{#^rollGreater() heatroll heat}}
         <div class="sheet-rolltemplate-button">
@@ -670,9 +720,11 @@ const asw = (() => {
     {{#mech}}
     <div class="sheet-rolltemplate-button-row">
 
+        {{#rollTotal() heatroll 0}}
         <div class="sheet-rolltemplate-button">
             [Push](~{{name}}|reactPush)
         </div>
+        {{/rollTotal() heatroll 0}}
 
         {{#^rollGreater() heatroll heat}}
         <div class="sheet-rolltemplate-button">
