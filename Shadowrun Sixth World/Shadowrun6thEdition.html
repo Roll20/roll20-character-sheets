@@ -11300,9 +11300,48 @@ var compendium_drop_done = function() {
 	}, {silent:true});
 }
 
+
+let priorities = {
+	'NPCs': 0,
+	'Contacts': 1,
+	'Grunts': 2,
+	'Critters': 3,
+	'Drone': 4,
+	'Drones': 5,
+	'Vehicle': 6,
+	'Vehicles': 7,
+	'Spirits': 8,
+	'Hosts': 9,
+	'Sprites': 10,
+	'Qualities': 11,
+	'Spells': 12,
+	'Combat': 13,
+	'Detection': 14,
+	'Health': 15,
+	'Illusion': 16,
+	'Manipulation': 17,
+	'Rituals': 18,
+	'Powers': 19,
+	'Metamagic': 20,
+	'gear-misc': 21,
+	'Gear': 22,
+	'Complex Forms': 23,
+	'ICs': 24,
+	'Sprite Powers': 25,
+	'Augmentations': 26,
+	'gear-armor': 27,
+	'Armor': 28,
+	'Ranged': 29,
+	'weapon-ranged': 30,
+	'Melee': 31,
+	'weapon-melee': 32,
+	'Weapon Both': 33,
+	'Devices': 34,
+	'Programs':	35,
+};
+
+
 var compendium_drop_handler = ((dropType, eventInfo) => {
-//console.log(eventInfo);
-//console.log("dropType: "+dropType);
 	try{
 		data = JSON.parse(eventInfo.newValue) || false;
 	} catch(e) {
@@ -11332,29 +11371,46 @@ console.log(data);
 	// if there are blobs, add those and ignore the parent (it should be one of the blobs?)
 	if(data.blobs && Object.keys(data.blobs).length > 0) {
 console.log(data.blobs);
+		let orderedBlobs = {};
 		Object.keys(data.blobs).forEach((key) => {
 			blob = data.blobs[key];
-//console.log(blob);
-//console.log("blob.Category: "+blob.Category);
-//console.log("blob.data-Category: "+blob["data-Category"]);
-//console.log("blob.data-category: "+blob["data-category"]);
-//console.log("data.Category: "+data.Category);
+
 			if(! blob.Category) {
 				if(data.Category == "QSR Tool Cards") {
 					blob.Category = trans["qsr_blob_types"][data["data-type"]];
 				} else if(blob["data-Category"]) {
-//console.log("HIT ONE!");
 					blob.Category = blob["data-Category"];
 				} else if(blob["data-category"]) {
-//console.log("HIT TWO!");
 					blob.Category = blob["data-category"];
 				} else {
-//console.log("HIT THREE!");
 					blob.Category = data.Category;
 				}
 			}
-			blob["data-name"] = key;
-console.log("Category: "+blob.Category);
+
+			if(Object.keys(priorities).includes(blob.Category)) {
+				blob.sort_priority = priorities[blob.Category];
+			} else {
+				blob.sort_priority = 99;
+			}
+
+			orderedBlobs[key] = blob;
+		});
+
+		// Custom sort the orderedBlobs so they are processed in the order we want
+		let blobKeys = Object.keys(orderedBlobs);
+
+		blobKeys.sort(function(a, b) {
+			return orderedBlobs[a].sort_priority - orderedBlobs[b].sort_priority;
+		});
+
+		// Now process the blobs
+		blobKeys.forEach((key) => {
+			let blob = orderedBlobs[key];
+
+			if(! blob["data-name"]) {
+				blob["data-name"] = key;
+			}
+
 			if(dropType == 'canvasdrop') {
 				canvas_import(blob);
 			} else {
@@ -11370,6 +11426,7 @@ console.log("Category: "+blob.Category);
 		}
 	}
 });
+
 
 var canvas_import = function(data) {
 	// process the dropped data
@@ -11392,48 +11449,6 @@ console.log(data.Category + " dropped on canvas.");
 			compendium_import(data);
 			break;
 	}
-};
-
-var sort_blobs = function(a, b) {
-	priorities = {
-		'NPCs': 0,
-		'Contacts': 1,
-		'Grunts': 2,
-		'Critters': 3,
-		'Drone': 4,
-		'Drones': 5,
-		'Vehicle': 6,
-		'Vehicles': 7,
-		'Spirits': 8,
-		'Hosts': 9,
-		'Sprites': 10,
-		'Qualities': 11,
-		'Spells': 12,
-		'Combat': 13,
-		'Detection': 14,
-		'Health': 15,
-		'Illusion': 16,
-		'Manipulation': 17,
-		'Rituals': 18,
-		'Powers': 19,
-		'Metamagic': 20,
-		'gear-misc': 21,
-		'Gear': 22,
-		'Complex Forms': 23,
-		'ICs': 24,
-		'Sprite Powers': 25,
-		'Augmentations': 26,
-		'gear-armor': 27,
-		'Armor': 28,
-		'Ranged': 29,
-		'weapon-ranged': 30,
-		'Melee': 31,
-		'weapon-melee': 32,
-		'Weapon Both': 33,
-		'Devices': 34,
-		'Programs':	35,
-	};
-//	if(priorities.includes(
 };
 
 var compendium_import = function(data) {
@@ -11782,6 +11797,8 @@ var canvasAddNPC = function(data) {
 			usedIDs.push(row_id);
 
 			name = skill.split('_').map(word => ucfirst(word)).join(' ');
+			addattrs[skill] = data["data-"+skill+"_rating"];
+
 			addattrs["repeating_skills_" + row_id + "_rating"] = data["data-" + skill + "_rating"];
 			addattrs["repeating_skills_" + row_id + "_flag"] = false;
 			addattrs["repeating_skills_" + row_id + "_name"] = name;
@@ -12088,7 +12105,8 @@ var compendiumAddSpell = function(data) {
 		});
 
 		let spell_type = 'spell';
-
+console.log("Adding Spell: "+data["data-name"]);
+console.log(v);
 		if(v.sheet_type != 'pc' && v.magic && v.sorcery) {
 			rowattrs["repeating_" + spell_type + "_" + row_id + "_dicepool"] = parseInt(v.magic) + parseInt(v.sorcery);
 		} else {
