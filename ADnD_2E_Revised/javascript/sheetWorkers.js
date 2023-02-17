@@ -1327,7 +1327,7 @@ on('change:spell-points-int-enabled change:intelligence', function (eventInfo) {
     getAttrs(['spell-points-int-enabled', 'intelligence'], function (values) {
         let newValue = {'spell-points-int': 0}
         if (values['spell-points-int-enabled'] !== '1') {
-            return setAttrs(newValue)
+            return setAttrs(newValue);
         }
         let intelligence = getLookupValue(values['intelligence'], 0);
         newValue['spell-points-int'] = intelligenceTable['spell-points-int'][intelligence];
@@ -1344,6 +1344,70 @@ setupRepeatingSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-poi
 setupRepeatingSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`, true);
 setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
 setupCalculateRemaining(wind, `${wind}-sum`, `${wind}-remaining`);
+let PRIEST_SPELL_POINTS_WIS = 'spell-points-priest-wis';
+on('change:spell-points-priest-wis-enabled change:wisdom change:level-priest', function (eventInfo) {
+    getAttrs(['spell-points-priest-wis-enabled', 'wisdom', 'level-priest'], async function (values) {
+        await keepContextRoll();
+        let newValue = {};
+        newValue[PRIEST_SPELL_POINTS_WIS] = 0;
+        if (values['spell-points-priest-wis-enabled'] !== '1') {
+            return setAttrs(newValue);
+        }
+        let wisdom = getLookupValue(values['wisdom'], 0);
+        if (wisdom < 13) {
+            return setAttrs(newValue);
+        }
+        if (wisdom === 13) {
+            newValue[PRIEST_SPELL_POINTS_WIS] = 4;
+            return setAttrs(newValue);
+        }
+        if (wisdom === 14) {
+            newValue[PRIEST_SPELL_POINTS_WIS] = 8;
+            return setAttrs(newValue);
+        }
+        let level = await extractRollResult(values['level-priest']);
+        if (isNaN(level) || level < 0) {
+            level = 1;
+        }
+        let spellPoints = 0;
+        if (wisdom === 15) {
+            spellPoints = level < 3 ? 8 : 15;
+        } else if (wisdom === 16) {
+            spellPoints = level < 3 ? 8 : 20;
+        } else if (wisdom === 17) {
+            if (1 <= level && level <= 2) {
+                spellPoints = 8;
+            } else if (3 <= level && level <= 4) {
+                spellPoints = 20;
+            } else {
+                spellPoints = 30;
+            }
+        } else if (wisdom === 18) {
+            if (1 <= level && level <= 2) {
+                spellPoints = 8;
+            } else if (3 <= level && level <= 4) {
+                spellPoints = 20;
+            } else if (5 <= level && level <= 6) {
+                spellPoints = 30;
+            } else {
+                spellPoints = 45;
+            }
+        } else if (wisdom >= 19) {
+            if (1 <= level && level <= 2) {
+                spellPoints = 12;
+            } else if (3 <= level && level <= 4) {
+                spellPoints = 25;
+            } else if (5 <= level && level <= 6) {
+                spellPoints = 45;
+            } else {
+                spellPoints = 60;
+            }
+        }
+
+        newValue[PRIEST_SPELL_POINTS_WIS] = spellPoints;
+        setAttrs(newValue);
+    });
+});
 // --- End setup Spell Points, Arc, and Wind --- //
 
 // --- Start setup reset buttons --- //

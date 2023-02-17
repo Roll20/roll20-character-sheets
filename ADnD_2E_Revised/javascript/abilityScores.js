@@ -99,16 +99,16 @@ intelligenceTable['intimm4th'] = ['Error','','','','','','','','','','','','',''
 intelligenceTable['intimm5th'] = ['Error','','','','','','','','','','','','','','','','','','','','','','','5th-level','5th-level','5th-level'];
 intelligenceTable['intimm6th'] = ['Error','','','','','','','','','','','','','','','','','','','','','','','','6th-level','6th-level'];
 intelligenceTable['intimm7th'] = ['Error','','','','','','','','','','','','','','','','','','','','','','','','','7th-level'];
-intelligenceTable['spell-points-int'] = [0,0,0,0,0,0,0,0,0,2,2,2,3,3,4,4,5,6,7,8,9,9,9,9,9,9];
 intelligenceTable['intnotes'] = ['INVALID INTELLIGENCE','Communicate by Grunts & Gestures','','','','','','','','','','','','','','','','','','','','','','','','',''];
+intelligenceTable['spell-points-int'] = [0,0,0,0,0,0,0,0,0,2,2,2,3,3,4,4,5,6,7,8,9,9,9,9,9,9];
 
 const wisdomTable = {};
 wisdomTable['wisdef'] = ['Error','-6','-4','-3','-2','-1','-1','-1','0','0','0','0','0','0','0','+1','+2','+3','+4','+4','+4','+4','+4','+4','+4','+4'];
 wisdomTable['wisbonus'] = ['Error','—','—','—','—','—','—','—','—','0','0','0','0','1st','1st','2nd','2nd','3rd','4th','1st,3rd','2nd,4th','3rd,5th','4th,5th','1st,6th','5th,6th','6th,7th'];
-wisdomTable['wisdom-wind']  = [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,2,3,4,5,6,7,8,9,10,11,12];
 wisdomTable['wisfail'] = ['Error','80','60','50','45','40','35','30','25','20','15','10','5','0','0','0','0','0','0','0','0','0','0','0','0','0'];
 wisdomTable['wisimmune'] = ['Error','','','','','','','','','','','','','','','','','','','cause fear, charm person, command, friends, hypnotism','forget, hold person, ray of enfeeblement, scare','fear','charm monster, confusion, emotion, fumble, suggestion','chaos, feeblemind, hold monster, magic jar, quest','geas, mass suggestion, rod of rulership','antipathy/sympathy, death spell, mass charm'];
 wisdomTable['wisnotes'] = ['INVALID WISDOM','','','','','','','','','','','','','','','','','','','','','','','','','',''];
+wisdomTable['wisdom-wind']  = [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,2,3,4,5,6,7,8,9,10,11,12];
 
 const charismaTable = {};
 charismaTable['chamax'] = ['Error','0','1','1','1','2','2','3','3','4','4','4','5','5','6','7','8','10','15','20','25','30','35','40','45','50'];
