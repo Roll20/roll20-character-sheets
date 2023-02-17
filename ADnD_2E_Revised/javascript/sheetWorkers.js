@@ -67,45 +67,42 @@ const capitalizeFirst = function (s) {
 }
 
 const displaySize = function(size) {
-    if (typeof size !== 'string')
+    if (typeof size !== 'string' || size.length === 0)
         return '';
 
-    size = size.toLowerCase();
-    switch (size) {
-        case 't':
-        case 'tiny': return 'Tiny';
-        case 's':
-        case 'small': return 'Small';
-        case 'm':
-        case 'medium': return 'Medium';
-        case 'l':
-        case 'large': return 'Large';
-        case 'h':
-        case 'huge': return 'Huge';
-        case 'g':
-        case 'gargantuan': return 'Gargantuan';
+    let sizeLetter = size.charAt(0).toLowerCase();
+    switch (sizeLetter) {
+        case 't': return 'Tiny';
+        case 's': return 'Small';
+        case 'm': return 'Medium';
+        case 'l': return 'Large';
+        case 'h': return 'Huge';
+        case 'g': return 'Gargantuan';
         default: return capitalizeFirst(size);
     }
 }
 
 const sizeToInt = function(size) {
-    size = displaySize(size);
-    switch (size) {
-        case 'Tiny': return 0;
-        case 'Small': return 1;
-        case 'Medium': return 2;
-        case 'Large': return 3;
-        case 'Huge': return 4;
-        case 'Gargantuan': return 5;
+    if (typeof size !== 'string' || size.length === 0)
+        return '';
+
+    let sizeLetter = size.charAt(0).toLowerCase();
+    switch (sizeLetter) {
+        case 't': return 0;
+        case 's': return 1;
+        case 'm': return 2;
+        case 'l': return 3;
+        case 'h': return 4;
+        case 'g': return 5;
     }
 }
 
 const displayWeaponType = function (type) {
-    if (typeof type !== 'string')
+    if (typeof type !== 'string' || type.length === 0)
         return '';
 
-    type = type.toLowerCase();
-    switch (type) {
+    let typeLetter = type.toLowerCase();
+    switch (typeLetter) {
         case 's': return 'Slashing';
         case 'p': return 'Piercing';
         case 'b': return 'Bludgeoning';
@@ -1481,19 +1478,14 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 //#endregion
 
 //#region Weapons tab logic and autofil
-//Used in version.js
-const updateNonprofPenalty = function () {
-    getAttrs(['nonprof-penalty'], function(values) {
-        let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
-        let famil = Math.floor(nonprof / 2)
-        setAttrs({
-            ['nonprof-penalty']: nonprof,
-            ['famil-penalty']: famil
-        },{silent:true});
-    });
-}
 on('change:nonprof-penalty', function (eventInfo){
-    updateNonprofPenalty();
+    let nonprofRaw = parseInt(eventInfo.newValue) || 0;
+    let nonprof = Math.abs(nonprofRaw) * -1;
+    let famil = Math.floor(nonprof / 2)
+    setAttrs({
+        ['nonprof-penalty']: nonprof,
+        ['famil-penalty']: famil
+    },{silent:true});
 });
 
 on('change:thac0-base-calc', function(eventInfo) {
@@ -2402,11 +2394,10 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
 
 //#region Proficiencies
 //Weapon proficiency slots
-const updateWeaponProfsRemaining = () => repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprof-slots-total-calc', function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['weapprofnum']))
         return;
-    updateWeaponProfsRemaining();
+    repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
 });
 //Weapon proficiency autofill
 on('change:repeating_weaponprofs:weapprofname', function(eventInfo) {
