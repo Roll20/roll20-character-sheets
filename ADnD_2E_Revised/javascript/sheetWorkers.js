@@ -427,7 +427,7 @@ on('clicked:hide-toast', function(eventInfo) {
 
 //#region Ability Scores logic
 // Ability Score Parser function
-const EXCEPTIONAL_STRENGHT_REGEX = /18[\[(]([0-9]{1,3})[\])]/; // Ie. 18[65], 18(65)
+const EXCEPTIONAL_STRENGTH_REGEX = /18[\[(]([0-9]{1,3})[\])]/; // Ie. 18[65], 18(65)
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     if (abilityScoreString === '') {
         return defaultValue;
@@ -439,7 +439,7 @@ function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     }
 
     if (isStrength) {
-        let exceptionalMatch = abilityScoreString.match(EXCEPTIONAL_STRENGHT_REGEX);
+        let exceptionalMatch = abilityScoreString.match(EXCEPTIONAL_STRENGTH_REGEX);
         if (exceptionalMatch !== null) {
             let exceptionalStrNumber = parseInt(exceptionalMatch[1]);
             if (1 <= exceptionalStrNumber && exceptionalStrNumber <= 50) {
@@ -976,9 +976,9 @@ const PRIEST_SPHERES = [
     'Chaos','Law','Numbers','Thought','Time','Travelers','War','Wards'
 ];
 
-const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
-const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
-const elementalRegex = /Earth|Air|Fire|Water/gi
+const PRIMARY_SPHERE_REGEX = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
+const NO_ELEMENTAL_REGEX = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
+const ELEMENTAL_REGEX = /Earth|Air|Fire|Water/gi
 
 function parseSpheres(spheresStrings, regex) {
     let spheres = new Set();
@@ -1012,7 +1012,7 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
 
     let spheres = getSpellSpheres(spell, optionalSpheres);
 
-    let primarySpellSpheres = spheres.match(noElementalRegex) || [];
+    let primarySpellSpheres = spheres.match(NO_ELEMENTAL_REGEX) || [];
     let isAvailable = primarySpellSpheres.some(sphere => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
@@ -1024,7 +1024,7 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
         return false;
 
     if (spheres.includes(`${ELEMENTAL} (`))
-        return spheres.match(elementalRegex).some((element) => elementalSpheres.has(element))
+        return spheres.match(ELEMENTAL_REGEX).some((element) => elementalSpheres.has(element))
 
     // The player and the spell has the elemental sphere (without any sub elements)
     // Currently only 'Commune With Nature' in the revised Player's Handbook (1995) has this property
@@ -1049,8 +1049,8 @@ function setupAddPriestSpell(postfix) {
                 knownSpells.add(row.S[field]);
                 return knownSpells;
             }, new Set(), function (knownSpells,_,attrSet){
-                let primarySpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), primarySphereRegex);
-                let elementalSpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), elementalRegex);
+                let primarySpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), PRIMARY_SPHERE_REGEX);
+                let elementalSpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), ELEMENTAL_REGEX);
 
                 if (primarySpheres.size < 1) {
                     showToast(WARNING, 'No spheres found', `No valid spheres found. Please write or select some spheres`);
@@ -1516,7 +1516,7 @@ async function selectVersion(foundObjects, values, comparer, objectName) {
         return;
     }
 
-    let isPlayersOption = values[PLAYERS_OPTION_FIELD] === '2';
+    let isPlayersOption = values[WEAPONS_PLAYERS_OPTION_FIELD] === '2';
     let isAllEqual = activeObjects.every(o => comparer(o, activeObjects[0], isPlayersOption));
     if (isAllEqual) {
         await keepContextRoll();
@@ -1556,13 +1556,13 @@ function combineBooks(activeObjects, comparer, isPlayersOptions) {
 }
 
 //#region Weapons autofill
-const PLAYERS_OPTION_FIELD = 'tab81';
+const WEAPONS_PLAYERS_OPTION_FIELD = 'tab81';
 function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, category) {
     if (!weaponName)
         return;
 
     weaponName = weaponName.toLowerCase();
-    let fields = [...BOOK_FIELDS, PLAYERS_OPTION_FIELD, thac0Field].filter(Boolean);
+    let fields = [...BOOK_FIELDS, WEAPONS_PLAYERS_OPTION_FIELD, thac0Field].filter(Boolean);
     getAttrs(fields, async function (values) {
         let bonus = 0;
         let baseWeapons = WEAPONS_TABLE[weaponName]
@@ -1750,7 +1750,7 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
     });
 }
 
-const followerWeapons = [
+const FOLLOWER_WEAPONS = [
     {repeating: '',       sections: ['',    '001', '002']},
     {repeating: 'hench',  sections: ['003', '004', '005']},
     {repeating: '',       sections: ['006', '007', '008']},
@@ -1765,7 +1765,7 @@ const followerWeapons = [
     {repeating: 'hench6', sections: ['033', '034', '035']},
 ];
 
-followerWeapons.forEach(fw => {
+FOLLOWER_WEAPONS.forEach(fw => {
     setupFollowerWeaponsAutoFill(fw.repeating, fw.sections);
 });
 
@@ -2724,12 +2724,14 @@ const setPsionicDisciplineVisibility = function(newValue) {
         elements.removeClass('sheet-show');
     }
 }
-on('change:tab8 sheet:opened', function (eventInfo) {
+
+const PSIONIC_SKILLS_AND_POWERS_FIELD = 'tab8';
+on(`change:${PSIONIC_SKILLS_AND_POWERS_FIELD} sheet:opened`, function (eventInfo) {
     if (eventInfo.newValue)
         return setPsionicDisciplineVisibility(eventInfo.newValue);
 
-    getAttrs(['tab8'], function (values) {
-        setPsionicDisciplineVisibility(values['tab8']);
+    getAttrs([PSIONIC_SKILLS_AND_POWERS_FIELD], function (values) {
+        setPsionicDisciplineVisibility(values[PSIONIC_SKILLS_AND_POWERS_FIELD]);
     })
 });
 
