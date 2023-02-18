@@ -1435,7 +1435,7 @@
           stay as your Tera Type as long as you are Terastallized.
         </p>
         <b title="Default value: Normal">Tera Type: </b>
-        <select class="sheet-no-dropdown" name="attr_tera-type" title="Attribute: tera-type">
+        <select class="sheet-no-dropdown" name="attr_tera-type1" title="Attribute: tera-type1">
           <option value="bug">Bug</option>
           <option value="dark">Dark</option>
           <option value="dragon">Dragon</option>
@@ -3186,49 +3186,109 @@
   });
 
   on(`clicked:activate-tera`, function () {
-    performFormChange("tera_active", "tera_label", "Terastallize", "End Terastallization");
+    performFormChange("tera", "Terastallize", "End Terastallization", true);
   });
 
   on(`clicked:activate-dyna`, function () {
-    performFormChange("dyna_active", "dyna_label", "Dynamax", "End Dynamax");
+    performFormChange("dyna", "Dynamax", "End Dynamax", true);
   });
 
   on(`clicked:activate-mega`, function () {
-    performFormChange("mega_active", "mega_label", "Mega Evolve", "End Mega Evolution");
+    performFormChange("mega", "Mega Evolve", "End Mega Evolution", true);
   });
 
   on(`clicked:activate-custom1`, function () {
     getAttrs(["custom1-name"], function (values) {
-      performFormChange("custom1_active", "custom1_label", `${values["custom1-name"]}`, `End ${values["custom1-name"]}`);
+      performFormChange("custom1", `${values["custom1-name"]}`, `End ${values["custom1-name"]}`, true);
     });
   });
 
   on(`clicked:activate-custom2`, function () {
     getAttrs(["custom2-name"], function (values) {
-      performFormChange("custom2_active", "custom2_label", `${values["custom2-name"]}`, `End ${values["custom2-name"]}`);
+      performFormChange("custom2", `${values["custom2-name"]}`, `End ${values["custom2-name"]}`, true);
     });
   });
 
   on(`clicked:activate-custom3`, function () {
     getAttrs(["custom3-name"], function (values) {
-      performFormChange("custom3_active", "custom3_label", `${values["custom3-name"]}`, `End ${values["custom3-name"]}`);
+      performFormChange("custom3", `${values["custom3-name"]}`, `End ${values["custom3-name"]}`, true);
     });
   });
 
-  function performFormChange(activationAttr, labelAttr, activeText, inactiveText){
-    getAttrs([activationAttr], function (values) {
-      var newActiveStatus = true;
-      var newLabel = inactiveText;
-      if(values[activationAttr]){
-        newActiveStatus = false;
-        newLabel = activeText;
-      }
+  on("change:tera-type1", function () {
+    performFormChange("tera", "", "", false)
+  });
 
-      setAttrs({
-        [labelAttr]: newLabel,
-        [activationAttr]: newActiveStatus,
-      });
+  on("change:mega-type1 change:mega-type2 change:atkmega change:defmega change:spatkmega change:spdefmega change:spdmega", function () {
+    performFormChange("mega", "", "", false)
+  });
+
+  on("change:custom1-type1 change:custom1-type2 change:atkcustom1 change:defcustom1 change:spatkcustom1 change:spdefcustom1 change:spdcustom1", function () {
+    performFormChange("custom1", "", "", false)
+  });
+
+  on("change:custom2-type1 change:custom2-type2 change:atkcustom2 change:defcustom2 change:spatkcustom2 change:spdefcustom2 change:spdcustom2", function () {
+    performFormChange("custom2", "", "", false)
+  });
+
+  on("change:custom3-type1 change:custom3-type2 change:atkcustom3 change:defcustom3 change:spatkcustom3 change:spdefcustom3 change:spdcustom3", function () {
+    performFormChange("custom3", "", "", false)
+  });
+
+  const formActiveAttrs = ["tera_active", "mega_active", "custom1_active", "custom2_active", "custom3_active"];
+
+  const formTypeAttrs = ["type1", "type2", "tera-type1", "mega-type1", "mega-type2", "custom1-type1", "custom1-type2", "custom2-type1", "custom2-type2", "custom3-type1", "custom3-type2"];
+
+  function performFormChange(prefix, activeText, inactiveText, clickedButton){
+    activationAttr = `${prefix}_active`;
+    labelAttr = `${prefix}_label`;
+    type1Attr = `${prefix}-type1`;
+    type2Attr = `${prefix}-type2`;
+    getAttrs([activationAttr, type1Attr, type2Attr, ...formActiveAttrs, ...formTypeAttrs], function (values) {
+      const attrs = {};
+      if(clickedButton){
+        var newActiveStatus = true;
+        var newLabel = inactiveText;
+        if(values[activationAttr]){
+          newActiveStatus = false;
+          newLabel = activeText;
+        }
+        attrs[labelAttr] = newLabel;
+        attrs[activationAttr] = newActiveStatus;
+        // Set value in advance so getActiveTypeAsAttrs can figure out the right types to use
+        values[activationAttr] = newActiveStatus;
+      }
+      Object.assign(attrs, getActiveTypeAsAttrs(values));
+      setAttrs(attrs);
     });
+  }
+
+  function getActiveTypeAsAttrs(values){
+    const attrs = {
+      active_type1: values["type1"],
+      active_type2: values["type2"]
+    };
+    if(values["mega_active"]){
+      attrs["active_type1"] = values["mega-type1"] || "";
+      attrs["active_type2"] = values["mega-type2"] || "";
+    }
+    if(values["custom3_active"]){
+      attrs["active_type1"] = values["custom3-type1"] || "";
+      attrs["active_type2"] = values["custom3-type2"] || "";
+    }
+    if(values["custom2_active"]){
+      attrs["active_type1"] = values["custom2-type1"] || "";
+      attrs["active_type2"] = values["custom2-type2"] || "";
+    }
+    if(values["custom1_active"]){
+      attrs["active_type1"] = values["custom1-type1"] || "";
+      attrs["active_type2"] = values["custom1-type2"] || "";
+    }
+    if(values["tera_active"]){
+      attrs["active_type1"] = values["tera-type1"] || "";
+      attrs["active_type2"] = values["tera-type2"] || ""; //Should always be undefined
+    }
+    return attrs;
   }
 
   on("change:custom1-name change:enable-custom1", function () {
@@ -3928,18 +3988,14 @@
   }
 
   //Abstracting type1 and type2
-  on("change:type1 change:type2 change:tera-type change:mega-type1 change:mega-type2 change:custom1-type1 change:custom1-type2 change:custom2-type1 change:custom2-type2 change:custom3-type1 change:custom3-type2 sheet:opened", function (eventInfo) {
-    getAttrs(["type1", "type2", "tera-type", "mega-type1", "mega-type2", "custom1-type1", "custom1-type2", "custom2-type1", "custom2-type2", "custom3-type1", "custom3-type2", ], function (values) {
-      let newType1 = values.type1;
-      let newType2 = values.type2;
-
-
-
-
-      setAttrs({
-        "active_type1": values.type1,
-        "active_type2": values.type2
-      });
+  on("change:type1 change:type2 sheet:opened", function (eventInfo) {
+    getAttrs(["type1", "type2", ...formActiveAttrs], function (values) {
+      if(!(values["tera_active"] || values["mega_active"] || values["custom1_active"] || values["custom2_active"] || values["custom3_active"])){
+        setAttrs({
+          "active_type1": values.type1,
+          "active_type2": values.type2
+        });
+      }
     });
   });
 
