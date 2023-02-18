@@ -12,7 +12,7 @@ wiz1['Affect Normal Fires'] = {
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'None',
-    'materials': 'Open fire or flame',
+    'materials': 'Open fire or flame.',
     'reference': 'p. 170',
     'book': 'PHB',
     'damage': '',
@@ -69,7 +69,7 @@ wiz1['Audible Glamer'] = {
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'Special',
-    'materials': 'A bit of wool or a small lump of wax',
+    'materials': 'A bit of wool or a small lump of wax.',
     'reference': 'p. 170',
     'book': 'PHB',
     'damage': '',
@@ -329,7 +329,7 @@ wiz1['Find Familiar'] = {
     'components': 'V, S, M',
     'cast-time': '2d12 hours',
     'saving-throw': 'Special',
-    'materials': '1000 gp worth of incense and herbs',
+    'materials': '1000 gp worth of incense and herbs.',
     'reference': 'p. 174',
     'book': 'PHB',
     'damage': '',
@@ -443,7 +443,7 @@ wiz1['Identify'] = {
     'components': 'V, S, M',
     'cast-time': 'Special',
     'saving-throw': 'None',
-    'materials': 'A pearl (of at least 100 gp value) and an owl feather steeped in wine;',
+    'materials': 'A pearl (of at least 100 gp value) and an owl feather steeped in wine.',
     'reference': 'p. 175',
     'book': 'PHB',
     'damage': '',
@@ -504,7 +504,7 @@ wiz1['Magic Missile'] = {
     'damage': 'M1: [[1d4+1]]}}{{d2t=[[ [[@{level-wizard}]]-2]]}}{{d2=, M2: [[1d4+1]]}}{{d3t=[[ [[@{level-wizard}]]-4]]}}{{d3=, M3: [[1d4+1]]}}{{d4t=[[ [[@{level-wizard}]]-6]]}}{{d4=, M4: [[1d4+1]]}}{{d5t=[[ [[@{level-wizard}]]-8]]}}{{d5=, M5: [[1d4+1]]',
     'damage-type': '',
     'healing': '',
-    'effect': 'Use of the *magic missile* spell creates up to five missiles of magical energy that dart forth from the wizard’s fingertip and unerringly strike their target. This includes enemy creatures in a melee. The target creature must be seen or otherwise detected to be hit, however, so near-total concealment, such as that offered by arrow slits, can render the spell ineffective. Likewise, the caster must be able to identify the target. He cannot direct a magic missile to “Strike the commander of the legion,” unless he can single out the commander from the rest of the soldiers. Specific parts of a creature cannot be singled out. Inanimate objects (locks, etc.) cannot be damaged by the spell, and any attempt to do so wastes the missiles to no effect. Against creatures, each missile inflicts 1d4+1 points of damage.\n&emsp;For every two extra levels of experience, the wizard gains an additional missile—he has two at 3rd level, three at 5th level, four at 7th level, etc., up to a total of five missiles at 9th level. Currently [[1+([[{{floor(([[@{level-wizard}]]-1)/2),4}kl1}]])]] missiles. If the wizard has multiple missile capability, he can have them strike a single target creature or several creatures, as desired.'
+    'effect': 'Use of the *magic missile* spell creates up to five missiles of magical energy that dart forth from the wizard’s fingertip and unerringly strike their target. This includes enemy creatures in a melee. The target creature must be seen or otherwise detected to be hit, however, so near-total concealment, such as that offered by arrow slits, can render the spell ineffective. Likewise, the caster must be able to identify the target. He cannot direct a magic missile to “Strike the commander of the legion,” unless he can single out the commander from the rest of the soldiers. Specific parts of a creature cannot be singled out. Inanimate objects (locks, etc.) cannot be damaged by the spell, and any attempt to do so wastes the missiles to no effect. Against creatures, each missile inflicts 1d4+1 points of damage.\n&emsp;For every two extra levels of experience, the wizard gains an additional missile—he has two at 3rd level, three at 5th level, four at 7th level, etc., up to a total of five missiles at 9th level. Currently [[1+[[{{ceil([[@{level-wizard}]]/2)-1,4}kl1}]] ]] missiles. If the wizard has multiple missile capability, he can have them strike a single target creature or several creatures, as desired.'
 };
 
 wiz1['Mending'] = {
@@ -963,7 +963,7 @@ wiz2['Deafness'] = {
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'Negate',
-    'materials': 'Beeswax',
+    'materials': 'Beeswax.',
     'reference': 'p. 181',
     'book': 'PHB',
     'damage': '',
@@ -1132,7 +1132,7 @@ wiz2['Glitterdust'] = {
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'Special',
-    'materials': 'Ground mica',
+    'materials': 'Ground mica.',
     'reference': 'p. 183',
     'book': 'PHB',
     'damage': '',
@@ -1409,7 +1409,7 @@ wiz2['Pyrotechnics'] = {
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'None',
-    'materials': 'One fire source within a 20-foot cube',
+    'materials': 'One fire source within a 20-foot cube.',
     'reference': 'p. 186',
     'book': 'PHB',
     'damage': '',
@@ -1674,7 +1674,7 @@ wiz3['Clairaudience'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A small horn of at least 100 gp value',
+    'materials': 'A small horn of at least 100 gp value.',
     'reference': 'p. 190',
     'book': 'PHB',
     'damage': '',
@@ -1693,7 +1693,7 @@ wiz3['Clairvoyance'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A pinch of powdered pineal gland',
+    'materials': 'A pinch of powdered pineal gland.',
     'reference': 'p. 190',
     'book': 'PHB',
     'damage': '',
@@ -1786,7 +1786,7 @@ wiz3['Fireball'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': '½',
-    'materials': 'A tiny ball of bat guano and sulphur',
+    'materials': 'A tiny ball of bat guano and sulphur.',
     'reference': 'p. 191',
     'book': 'PHB',
     'damage': '[[ [[{[[@{level-wizard}]],10}kl1]]d6]]',
@@ -1805,7 +1805,7 @@ wiz3['Flame Arrow'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': ' A drop of oil and a small piece of flint',
+    'materials': ' A drop of oil and a small piece of flint.',
     'reference': 'p. 192',
     'book': 'PHB',
     'damage': '*First version:* Normal arrow damage + 1 Fire\n*Second version:* 1d6 piercing + 4d6',
@@ -1823,7 +1823,7 @@ wiz3['Fly'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A wing feather from any bird',
+    'materials': 'A wing feather from any bird.',
     'reference': 'p. 192',
     'book': 'PHB',
     'damage': '',
@@ -1842,7 +1842,7 @@ wiz3['Gust of Wind'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A legume seed',
+    'materials': 'A legume seed.',
     'reference': 'p. 192',
     'book': 'PHB',
     'damage': '',
@@ -1860,7 +1860,7 @@ wiz3['Haste'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A shaving of licorice root',
+    'materials': 'A shaving of licorice root.',
     'reference': '',
     'book': 'PHB',
     'damage': '',
@@ -1879,7 +1879,7 @@ wiz3['Hold Person'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'Negate',
-    'materials': 'A small, straight piece of iron',
+    'materials': 'A small, straight piece of iron.',
     'reference': 'p. 193',
     'book': 'PHB',
     'damage': '',
@@ -1897,7 +1897,7 @@ wiz3['Hold Undead'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'Negate',
-    'materials': 'A pinch of sulphur and powdered garlic',
+    'materials': 'A pinch of sulphur and powdered garlic.',
     'reference': 'p. 193',
     'book': 'PHB',
     'damage': '',
@@ -1915,7 +1915,7 @@ wiz3['Illusionary Script'] = {
     'components': 'V, S, M',
     'cast-time': 'Special',
     'saving-throw': 'Special',
-    'materials': 'A lead-based ink that requires special manufacture by an alchemist, at a cost of not less than 300 gp per usage',
+    'materials': 'A lead-based ink that requires special manufacture by an alchemist, at a cost of not less than 300 gp per usage.',
     'reference': 'p. 193',
     'book': 'PHB',
     'damage': '',
@@ -1933,7 +1933,7 @@ wiz3['Infravision'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'Either a pinch of dried carrot or an agate',
+    'materials': 'Either a pinch of dried carrot or an agate.',
     'reference': 'p. 193',
     'book': 'PHB',
     'damage': '',
@@ -1951,7 +1951,7 @@ wiz3['Invisibility, 10\' Radius'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'An eyelash and a bit of gum arabic, the former encased in the latter',
+    'materials': 'An eyelash and a bit of gum arabic, the former encased in the latter.',
     'reference': 'p. 193',
     'book': 'PHB',
     'damage': '',
@@ -1988,7 +1988,7 @@ wiz3['Leomund\'s Tiny Hut'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A small crystal bead that shatters when the spell duration expires or the hut is dispelled',
+    'materials': 'A small crystal bead that shatters when the spell duration expires or the hut is dispelled.',
     'reference': 'p. 194',
     'book': 'PHB',
     'damage': '',
@@ -2007,7 +2007,7 @@ wiz3['Lightning Bolt'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': '½',
-    'materials': 'A bit of fur and an amber, crystal, or glass rod',
+    'materials': 'A bit of fur and an amber, crystal, or glass rod.',
     'reference': 'p. 194',
     'book': 'PHB',
     'damage': '[[ [[{[[@{level-wizard}]],10}kl1]]d6]]',
@@ -2045,7 +2045,7 @@ wiz3['Monster Summoning I'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A tiny bag and a small (not necessarily lit) candle',
+    'materials': 'A tiny bag and a small (not necessarily lit) candle.',
     'reference': 'p. 195',
     'book': 'PHB',
     'damage': '',
@@ -2064,7 +2064,7 @@ wiz3['Nondetection'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A pinch of diamond dust worth 300 gp',
+    'materials': 'A pinch of diamond dust worth 300 gp.',
     'reference': 'p. 195',
     'book': 'PHB',
     'damage': '',
@@ -2102,7 +2102,7 @@ wiz3['Protection from Evil, 10\' Radius'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'Powdered silver or iron',
+    'materials': 'Powdered silver or iron.',
     'reference': 'p. 195',
     'book': 'PHB',
     'damage': '',
@@ -2120,7 +2120,7 @@ wiz3['Protection From Normal Missiles'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A piece of tortoise or turtle shell',
+    'materials': 'A piece of tortoise or turtle shell.',
     'reference': 'p. 196',
     'book': 'PHB',
     'damage': '',
@@ -2139,7 +2139,7 @@ wiz3['Secret Page'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'Powdered herring scales and either will o’ wisp or boggart essense',
+    'materials': 'Powdered herring scales and either will o’ wisp or boggart essense.',
     'reference': 'p. 196',
     'book': 'PHB',
     'damage': '',
@@ -2158,13 +2158,13 @@ wiz3['Sepia Snake Sigil'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': '100 gp worth of powdered amber, a scale from any snake, and a pinch of mushroom spores',
+    'materials': '100 gp worth of powdered amber, a scale from any snake, and a pinch of mushroom spores.',
     'reference': 'p. 196',
     'book': 'PHB',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, a small written symbol appears in the text of any written work. When read, the so-called sepia snake springs into being and strikes at the nearest living creature (but does not attack the wizard who cast the spell). Its attack is made as if it were a monster with Hit Dice equal to the level of the wizard who cast the spell. If it strikes successfully, the victim is engulfed in a shimmering amber field of force, frozen and immobilized until released, either at the caster’s command, by a successful *dispel magic* spell, or until a time equal to 1d4 days + 1 day per caster level has elapsed. Until then, nothing can get at the victim, move the shimmering force surrounding him, or otherwise affect him. The victim does not age, grow hungry, sleep, or regain spells while in this state. He is not aware of his surroundings. If the sepia snake misses its target, it dissipates in a flash of brown light, with a loud noise and a puff of dun-colored smoke that is 10 feet in diameter and lasts for one round.\n&emps;The spell cannot be detected by normal observation, and *detect magic* reveals only that the entire text is magical. A *dispel magic* can remove it; an *erase* spell destroys the entire page of text. It can be cast in combination with other spells that hide or garble text.'
+    'effect': 'When this spell is cast, a small written symbol appears in the text of any written work. When read, the so-called sepia snake springs into being and strikes at the nearest living creature (but does not attack the wizard who cast the spell). Its attack is made as if it were a monster with Hit Dice equal to the level of the wizard who cast the spell. If it strikes successfully, the victim is engulfed in a shimmering amber field of force, frozen and immobilized until released, either at the caster’s command, by a successful *dispel magic* spell, or until a time equal to 1d4 days + 1 day per caster level has elapsed. Until then, nothing can get at the victim, move the shimmering force surrounding him, or otherwise affect him. The victim does not age, grow hungry, sleep, or regain spells while in this state. He is not aware of his surroundings. If the sepia snake misses its target, it dissipates in a flash of brown light, with a loud noise and a puff of dun-colored smoke that is 10 feet in diameter and lasts for one round.\n&emsp;The spell cannot be detected by normal observation, and *detect magic* reveals only that the entire text is magical. A *dispel magic* can remove it; an *erase* spell destroys the entire page of text. It can be cast in combination with other spells that hide or garble text.'
 };
 
 wiz3['Slow'] = {
@@ -2176,7 +2176,7 @@ wiz3['Slow'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'Negate',
-    'materials': 'A drop of molasses',
+    'materials': 'A drop of molasses.',
     'reference': 'p. 196',
     'book': 'PHB',
     'damage': '',
@@ -2190,7 +2190,7 @@ wiz3['Spectral Force'] = {
     'school': 'Illusion/Phantasm',
     'range': '[[60+[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
-    'aoe': '[[40+10*[[@{level-wizard}]]-foot cube',
+    'aoe': '[[40+10*[[@{level-wizard}]] ]]-foot cube',
     'components': 'V, S',
     'cast-time': '3',
     'saving-throw': 'Special',
@@ -2213,7 +2213,7 @@ wiz3['Suggestion'] = {
     'components': 'V, M',
     'cast-time': '3',
     'saving-throw': 'Negate',
-    'materials': 'A snake’s tongue and either a bit of honeycomb or a drop of sweet oil',
+    'materials': 'A snake’s tongue and either a bit of honeycomb or a drop of sweet oil.',
     'reference': 'p. 197',
     'book': 'PHB',
     'damage': '',
@@ -2231,7 +2231,7 @@ wiz3['Tongues'] = {
     'components': 'V, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A small clay model of a ziggurat, which shatters when the spell is pronounced',
+    'materials': 'A small clay model of a ziggurat, which shatters when the spell is pronounced.',
     'reference': 'p. 197',
     'book': 'PHB',
     'damage': '',
@@ -2263,12 +2263,12 @@ wiz3['Water Breathing'] = {
     'school': 'Alteration (Reversible)',
     'school-spells-and-magic': 'Alteration, Elemental (Air, Water) (Reversible)',
     'range': 'Touch',
-    'duration': '[[ [[@level-wizard}]]+1d4]] hours',
+    'duration': '[[ [[@{level-wizard}]]+1d4]] hours',
     'aoe': 'Creature touched',
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A short reed or piece of straw',
+    'materials': 'A short reed or piece of straw.',
     'reference': 'p. 197',
     'book': 'PHB',
     'damage': '',
@@ -2282,12 +2282,12 @@ wiz3['Wind Wall'] = {
     'school': 'Alteration',
     'school-spells-and-magic': 'Alteration, Elemental Air',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
-    'duration': '[[@level-wizard}]] rounds',
-    'aoe': 'wall, [[10*[[@{level-wizard}]] ]] x [[5*[[@{level-wizard}]] ]] feet x 2 feet wide',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': 'wall, [[10*[[@{level-wizard}]] ]] x [[5*[[@{level-wizard}]] ]] feet, 2 feet wide',
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'Special',
-    'materials': 'A tiny fan and a feather of exotic origin',
+    'materials': 'A tiny fan and a feather of exotic origin.',
     'reference': 'p. 198',
     'book': 'PHB',
     'damage': '',
@@ -2301,12 +2301,12 @@ wiz3['Wraithform'] = {
     'school': 'Alteration, Illusion',
     'school-spells-and-magic': 'Alteration, Illusion/Phantasm, Shadow',
     'range': '0',
-    'duration': '[[2*[[@level-wizard}]] ]] rounds',
+    'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'The caster',
     'components': 'S, M',
     'cast-time': '1',
     'saving-throw': 'None',
-    'materials': 'A bit of gauze and a wisp of smoke',
+    'materials': 'A bit of gauze and a wisp of smoke.',
     'reference': 'p. 198',
     'book': 'PHB',
     'damage': '',
@@ -2345,7 +2345,7 @@ wiz4['Confusion'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'Special',
-    'materials': 'A set of three nut shells',
+    'materials': 'A set of three nut shells.',
     'reference': 'p. 198',
     'book': 'PHB',
     'damage': '',
@@ -2457,7 +2457,7 @@ wiz4['Enchanted Weapon'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'Powdered lime and carbon',
+    'materials': 'Powdered lime and carbon.',
     'reference': 'p. 200',
     'book': 'PHB',
     'damage': '',
@@ -2495,7 +2495,7 @@ wiz4['Evard\'s Black Tentacles'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'A piece of tentacle from a giant octopus or giant squid',
+    'materials': 'A piece of tentacle from a giant octopus or giant squid.',
     'reference': 'p. 200',
     'book': 'PHB',
     'damage': '*Saving throw success:* 1d4\n*Saving throw failure, first round:* 2d4\n*Saving throw failure, all succeeding rounds:* 3d4',
@@ -2532,7 +2532,7 @@ wiz4['Fear'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'Negate',
-    'materials': 'Either the heart of a hen or a white feather',
+    'materials': 'Either the heart of a hen or a white feather.',
     'reference': 'p. 201',
     'book': 'PHB',
     'damage': '',
@@ -2565,12 +2565,12 @@ wiz4['Fire Shield'] = {
     'school': 'Evocation, Alteration',
     'school-spells-and-magic': 'Alteration, Invocation/Evocation, Elemental Fire',
     'range': '0',
-    'duration': '[[2+[[@{level-wizard]] ]] rounds',
+    'duration': '[[2+[[@{level-wizard}]] ]] rounds',
     'aoe': 'The caster',
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': '*Warm shield:* A bit of phosphorous\n*Chill shield:*A live firefly or glow worm or the tail portions of four dead ones',
+    'materials': '*Warm shield:* A bit of phosphorous\n*Chill shield:* A live firefly or glow worm or the tail portions of four dead ones.',
     'reference': 'p. 201',
     'book': 'PHB',
     'damage': '',
@@ -2607,7 +2607,7 @@ wiz4['Fumble'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'Special',
-    'materials': 'A dab of solidified milk fat',
+    'materials': 'A dab of solidified milk fat.',
     'reference': 'p. 202',
     'book': 'PHB',
     'damage': '',
@@ -2625,7 +2625,7 @@ wiz4['Hallucinatory Terrain'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'A stone, a twig, and a bit of green plant—a leaf or grass blade',
+    'materials': 'A stone, a twig, and a bit of green plant—a leaf or grass blade.',
     'reference': 'p. 202',
     'book': 'PHB',
     'damage': '',
@@ -2644,7 +2644,7 @@ wiz4['Ice Storm'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'A pinch of dust and a few drops of water',
+    'materials': 'A pinch of dust and a few drops of water.',
     'reference': 'p. 202',
     'book': 'PHB',
     'damage': '*First effect, great hail stones:* 3d10',
@@ -2662,7 +2662,7 @@ wiz4['Illusionary Wall'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'A rare dust that costs at least 400 gp and requires four days to prepare',
+    'materials': 'A rare dust that costs at least 400 gp and requires four days to prepare.',
     'reference': 'p. 202',
     'book': 'PHB',
     'damage': '',
@@ -2699,7 +2699,7 @@ wiz4['Leomund\'s Secure Shelter'] = {
     'components': 'V, S, M',
     'cast-time': '4 turns',
     'saving-throw': 'None',
-    'materials': 'A square chip of stone, crushed lime, a few grains of sand, a sprinkling of water, and several splinters of wood, augmented by the components of the *alarm* and *unseen servant* spells if these benefits are to be included (string and silver wire and a small bell)',
+    'materials': 'A square chip of stone, crushed lime, a few grains of sand, a sprinkling of water, and several splinters of wood, augmented by the components of the *alarm* and *unseen servant* spells if these benefits are to be included (string and silver wire and a small bell).',
     'reference': 'p. 203',
     'book': 'PHB',
     'damage': '',
@@ -2718,7 +2718,7 @@ wiz4['Magic Mirror'] = {
     'components': 'V, S, M',
     'cast-time': '1 hr.',
     'saving-throw': 'None',
-    'materials': 'A mirror of finely wrought and highly polished silver costing not less than 1,000 gp, the eye of a hawk, an eagle, or even a roc, and nitric acid, copper, and zinc',
+    'materials': 'A mirror of finely wrought and highly polished silver costing not less than 1,000 gp, the eye of a hawk, an eagle, or even a roc, and nitric acid, copper, and zinc.',
     'reference': 'p. 203',
     'book': 'PHB',
     'damage': '',
@@ -2736,7 +2736,7 @@ wiz4['Massmorph'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'A handful of bark chips from the type of tree the creatures are to become',
+    'materials': 'A handful of bark chips from the type of tree the creatures are to become.',
     'reference': 'p. 203',
     'book': 'PHB',
     'damage': '',
@@ -2755,7 +2755,7 @@ wiz4['Minor Creation'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'A tiny piece of matter of the same type of item he plans to create by means of the *minor creation* spell—a bit of twisted hemp to create rope, a splinter of wood to create a door, and so forth',
+    'materials': 'A tiny piece of matter of the same type of item he plans to create by means of the *minor creation* spell—a bit of twisted hemp to create rope, a splinter of wood to create a door, and so forth.',
     'reference': 'p. 203',
     'book': 'PHB',
     'damage': '',
@@ -2774,7 +2774,7 @@ wiz4['Minor Globe of Invulnerability'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'A glass or crystal bead that shatters at the expiration of the spell',
+    'materials': 'A glass or crystal bead that shatters at the expiration of the spell.',
     'reference': 'p. 204',
     'book': 'PHB',
     'damage': '',
@@ -2788,12 +2788,12 @@ wiz4['Monster Summoning II'] = {
     'school': 'Conjuration/Summoning',
     'school-spells-and-magic': 'Conjuration/Summoning, Song',
     'range': 'Special',
-    'duration': '[[3+[[@{[level-wizard}]] ]] rounds',
+    'duration': '[[3+[[@{level-wizard}]] ]] rounds',
     'aoe': '40 yard radius',
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'A tiny bag and a small (not necessarily lit) candle',
+    'materials': 'A tiny bag and a small (not necessarily lit) candle.',
     'reference': 'p. 204',
     'book': 'PHB',
     'damage': '',
@@ -2812,7 +2812,7 @@ wiz4['Otiluke\'s Resilient Sphere'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'Negate',
-    'materials': 'A hemispherical piece of diamond (or similar hard, clear gem material) and a matching hemispherical piece of gum arabic',
+    'materials': 'A hemispherical piece of diamond (or similar hard, clear gem material) and a matching hemispherical piece of gum arabic.',
     'reference': 'p. 204',
     'book': 'PHB',
     'damage': '',
@@ -2867,7 +2867,7 @@ wiz4['Polymorph Other'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'Negate',
-    'materials': 'A caterpillar cocoon',
+    'materials': 'A caterpillar cocoon.',
     'reference': 'p. 206',
     'book': 'PHB',
     'damage': '',
@@ -2904,7 +2904,7 @@ wiz4['Rainbow Pattern'] = {
     'components': 'S, M',
     'cast-time': '4',
     'saving-throw': 'Negate',
-    'materials': 'A crystal prism and a piece of phosphor',
+    'materials': 'A crystal prism and a piece of phosphor.',
     'reference': 'p. 206',
     'book': 'PHB',
     'damage': '',
@@ -2923,7 +2923,7 @@ wiz4['Rary\'s Mnemonic Enhancer'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'A piece of string, an ivory plaque of at least 100 gp value, and ink consisting of squid secretion with either black dragon’s blood or giant slug digestive juice',
+    'materials': 'A piece of string, an ivory plaque of at least 100 gp value, and ink consisting of squid secretion with either black dragon’s blood or giant slug digestive juice.',
     'reference': 'p. 206',
     'book': 'PHB',
     'damage': '',
@@ -2980,7 +2980,7 @@ wiz4['Shout'] = {
     'components': 'V, M',
     'cast-time': '1',
     'saving-throw': 'Special',
-    'materials': 'A drop of honey, a drop of citric acid, and a small cone made from a bull or ram horn',
+    'materials': 'A drop of honey, a drop of citric acid, and a small cone made from a bull or ram horn.',
     'reference': 'p. 207',
     'book': 'PHB',
     'damage': '[[2d6]]',
@@ -2999,7 +2999,7 @@ wiz4['Solid Fog'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'A pinch of dried, powdered peas combined with powdered animal hoof',
+    'materials': 'A pinch of dried, powdered peas combined with powdered animal hoof.',
     'reference': 'p. 207',
     'book': 'PHB',
     'damage': '',
@@ -3018,7 +3018,7 @@ wiz4['Stoneskin'] = {
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'None',
-    'materials': 'Granite and diamond dust sprinkled on the recipient’s skin',
+    'materials': 'Granite and diamond dust sprinkled on the recipient’s skin.',
     'reference': 'p. 208',
     'book': 'PHB',
     'damage': '',
@@ -3036,7 +3036,7 @@ wiz4['Vacancy'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'A square of the finest black silk worth at least 100 gp',
+    'materials': 'A square of the finest black silk worth at least 100 gp.',
     'reference': 'p. 208',
     'book': 'PHB',
     'damage': '',
@@ -3055,13 +3055,13 @@ wiz4['Wall of Fire'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'Phosphorus',
+    'materials': 'Phosphorus.',
     'reference': 'p. 208',
     'book': 'PHB',
     'damage': '*Within 10 feet:* 2d4 Heat\n*Within 20 feet:* 1d4 Heat\n*Pass through wall:* 2d6+[[@{level-wizard}]]',
     'damage-type': 'Fire',
     'healing': '',
-    'effect': 'The *wall of fire* spell brings forth an immobile, blazing curtain of magical fire of shimmering color—violet or reddish blue. The spell creates either an opaque sheet of flame up to one 20-foot square per level of the spellcaster ([[20*[[@{level-wizard}]] ]]-foot square), or a ring with a radius of up to 10 feet + 5 feet per two levels of experience of the wizard ([[10+5*floor([[@{level-wizard}]]/2)]] foot radius). In either form, the wall of fire is 20 feet high.\n&emsp;The wall of fire must be cast so that it is vertical with respect to the caster. One side of the wall, selected by the caster, sends forth waves of heat, inflicting 2d4 points of damage upon creatures within 10 feet and 1d4 points of damage upon those within 20 feet. In addition, the wall inflicts 2d6, plus 1 point of damage per level of the spellcaster, upon any creature passing through it. Creatures especially subject to fire may take additional damage, and undead always take twice normal damage. Note that attempting to catch a moving creature with a newly-created wall of fire is difficult; a successful saving throw enables the creature to avoid the wall, while its rate and direction of movement determine which side of the created wall it is on. The wall of fire lasts as long as the wizard concentrates on maintaining it, or one round per level of experience of the wizard, in the event he does not wish to concentrate upon it. Currently [[@{level-wizard}]] rounds'
+    'effect': 'The *wall of fire* spell brings forth an immobile, blazing curtain of magical fire of shimmering color—violet or reddish blue. The spell creates either an opaque sheet of flame up to one 20-foot square per level of the spellcaster ([[@{level-wizard}]] 20-foot squares), or a ring with a radius of up to 10 feet + 5 feet per two levels of experience of the wizard ([[10+5*floor([[@{level-wizard}]]/2)]] foot radius). In either form, the wall of fire is 20 feet high.\n&emsp;The wall of fire must be cast so that it is vertical with respect to the caster. One side of the wall, selected by the caster, sends forth waves of heat, inflicting 2d4 points of damage upon creatures within 10 feet and 1d4 points of damage upon those within 20 feet. In addition, the wall inflicts 2d6, plus 1 point of damage per level of the spellcaster, upon any creature passing through it. Creatures especially subject to fire may take additional damage, and undead always take twice normal damage. Note that attempting to catch a moving creature with a newly-created wall of fire is difficult; a successful saving throw enables the creature to avoid the wall, while its rate and direction of movement determine which side of the created wall it is on. The wall of fire lasts as long as the wizard concentrates on maintaining it, or one round per level of experience of the wizard, in the event he does not wish to concentrate upon it. Currently [[@{level-wizard}]] rounds'
 };
 
 wiz4['Wall of Ice'] = {
@@ -3074,7 +3074,7 @@ wiz4['Wall of Ice'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'A small piece of quartz or similar rock crystal',
+    'materials': 'A small piece of quartz or similar rock crystal.',
     'reference': 'p. 208',
     'book': 'PHB',
     'damage': '*A) Ice plane:*\nNormal creature: [[2*[[@{level-wizard}]] ]]\nFire-using creature: [[3*[[@{level-wizard}]] ]]\nCold-using creature: [[@{level-wizard}]]\n*C) Ice sheet:* 3d10',
@@ -3092,7 +3092,7 @@ wiz4['Wizard Eye'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'A bit of bat fur',
+    'materials': 'A bit of bat fur.',
     'reference': 'p. 209',
     'book': 'PHB',
     'damage': '',
@@ -3111,7 +3111,7 @@ wiz5['Advanced Illusion'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'Special',
-    'materials': 'A bit of fleece and several grains of sand',
+    'materials': 'A bit of fleece and several grains of sand.',
     'reference': 'p. 209',
     'book': 'PHB',
     'damage': '',
@@ -3130,7 +3130,7 @@ wiz5['Airy Water'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'A small handful of alkaline or bromine salts',
+    'materials': 'A small handful of alkaline or bromine salts.',
     'reference': 'p.209',
     'book': 'PHB',
     'damage': '',
@@ -3148,7 +3148,7 @@ wiz5['Animal Growth'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'A pinch of powdered bone',
+    'materials': 'A pinch of powdered bone.',
     'reference': 'p. 209',
     'book': 'PHB',
     'damage': '',
@@ -3167,7 +3167,7 @@ wiz5['Animate Dead'] = {
     'components': 'V, S, M',
     'cast-time': '5 rounds',
     'saving-throw': 'None',
-    'materials': 'A drop of blood and a pinch of bone powder or a bone shard',
+    'materials': 'A drop of blood and a pinch of bone powder or a bone shard.',
     'reference': 'p. 210',
     'book': 'PHB',
     'damage': '',
@@ -3186,7 +3186,7 @@ wiz5['Avoidance'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'Special',
-    'materials': 'A magnetized needle',
+    'materials': 'A magnetized needle.',
     'reference': 'p. 210',
     'book': 'PHB',
     'damage': '',
@@ -3205,7 +3205,7 @@ wiz5['Bigby\'s Interposing Hand'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'A soft glove',
+    'materials': 'A soft glove.',
     'reference': 'p. 210',
     'book': 'PHB',
     'damage': '',
@@ -3224,13 +3224,13 @@ wiz5['Chaos'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'Special',
-    'materials': 'A small disc of bronze and a small rod of iron',
+    'materials': 'A small disc of bronze and a small rod of iron.',
     'reference': 'p. 210',
     'book': 'PHB',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell is similar to the 4th-level *confusion* spell, but only the following beings receive a saving throw: fighters, wizards specialized in enchantments, monsters that use no magic and have an Intelligence of 4 or less, creatures of 21 Intelligence or higher, and creatures with more levels or Hit Dice than the caster’s level. Currently [[@{level-wizard}]] levels or Hit Dice.\n&emps;The spell causes disorientation and severe perceptual distortion, creating indecision and the inability to take effective action. The spell affects 1d4 creatures, plus one creature per caster level. Currently [[1d4+[[@{level-wizard}]] ]] creatures. Those allowed saving throws roll them vs. spell with –2 penalties, adjusted for Wisdom. Those who successfully save are unaffected by the spell. Affected creatures react as follows:}}{{style=center1 sheet-spell-bottom2}}{{c1-1=**D10 Roll**}}{{c2-1=1}}{{c3-1=2–6}}{{c4-1=7–9}}{{c5-1=10}}{{c1-2=**Action**}}{{c2-2=Wander away (unless prevented) for duration of spell}}{{c3-2=Stand confused for one round (then roll again)}}{{c4-2=Attack nearest creature for one round (then roll again)}}{{c5-2=Act normally for one round (then roll again)}}{{effects2=&emsp;The spell lasts one round for each level of the caster. Those affected are checked by the DM for actions each round for the duration of the spell, or until the “wander away for the duration of the spell” result occurs.\n&emsp;Wandering creatures move as far from the caster as possible using their most typical mode of movement (characters walk, fish swim, bats fly, etc.). Saving throws and actions are checked at the beginning of each round. Any confused creature that is attacked perceives the attacker as an enemy and acts according to its basic nature.'
+    'effect': 'This spell is similar to the 4th-level *confusion* spell, but only the following beings receive a saving throw: fighters, wizards specialized in enchantments, monsters that use no magic and have an Intelligence of 4 or less, creatures of 21 Intelligence or higher, and creatures with more levels or Hit Dice than the caster’s level. Currently [[@{level-wizard}]] levels or Hit Dice.\n&emsp;The spell causes disorientation and severe perceptual distortion, creating indecision and the inability to take effective action. The spell affects 1d4 creatures, plus one creature per caster level. Currently [[1d4+[[@{level-wizard}]] ]] creatures. Those allowed saving throws roll them vs. spell with –2 penalties, adjusted for Wisdom. Those who successfully save are unaffected by the spell. Affected creatures react as follows:}}{{style=center1 sheet-spell-bottom2}}{{c1-1=**D10 Roll**}}{{c2-1=1}}{{c3-1=2–6}}{{c4-1=7–9}}{{c5-1=10}}{{c1-2=**Action**}}{{c2-2=Wander away (unless prevented) for duration of spell}}{{c3-2=Stand confused for one round (then roll again)}}{{c4-2=Attack nearest creature for one round (then roll again)}}{{c5-2=Act normally for one round (then roll again)}}{{effects2=&emsp;The spell lasts one round for each level of the caster. Those affected are checked by the DM for actions each round for the duration of the spell, or until the “wander away for the duration of the spell” result occurs.\n&emsp;Wandering creatures move as far from the caster as possible using their most typical mode of movement (characters walk, fish swim, bats fly, etc.). Saving throws and actions are checked at the beginning of each round. Any confused creature that is attacked perceives the attacker as an enemy and acts according to its basic nature.'
 };
 
 wiz5['Cloudkill'] = {
@@ -3262,7 +3262,7 @@ wiz5['Cone of Cold'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': '½',
-    'materials': 'A crystal or glass cone of very small size',
+    'materials': 'A crystal or glass cone of very small size.',
     'reference': 'p. 212',
     'book': 'PHB',
     'damage': '[[ [[@{level-wizard}]]d4+[[@{level-wizard}]] ]]',
@@ -3281,7 +3281,7 @@ wiz5['Conjure Elemental'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'A considerable quantity of the element at hand and a small amount of one of the following:\nAir Elemental—burning incense\nEarth Elemental—soft clay\nFire Elemental—sulphur and phosphorus\nWater Elemental—water and sand',
+    'materials': 'A considerable quantity of the element at hand and a small amount of one of the following:\nAir Elemental—burning incense\nEarth Elemental—soft clay\nFire Elemental—sulphur and phosphorus\nWater Elemental—water and sand.',
     'reference': 'p. 212',
     'book': 'PHB',
     'damage': '',
@@ -3337,7 +3337,7 @@ wiz5['Dismissal'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'Negate',
-    'materials': 'Any item that is distasteful to the subject creature',
+    'materials': 'Any item that is distasteful to the subject creature.',
     'reference': 'p. 213',
     'book': 'PHB',
     'damage': '',
@@ -3356,7 +3356,7 @@ wiz5['Distance Distortion'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'A small lump of soft clay',
+    'materials': 'A small lump of soft clay.',
     'reference': 'p. 213',
     'book': 'PHB',
     'damage': '',
@@ -3430,7 +3430,7 @@ wiz5['Fabricate'] = {
     'components': 'V, S, M',
     'cast-time': 'Special',
     'saving-throw': 'None',
-    'materials': 'The material to be affected by the spell',
+    'materials': 'The material to be affected by the spell.',
     'reference': 'p. 214',
     'book': 'PHB',
     'damage': '',
@@ -3448,7 +3448,7 @@ wiz5['False Vision'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'The ground dust of an emerald worth at least 500 gp, which is sprinkled into the air when the spell is cast',
+    'materials': 'The ground dust of an emerald worth at least 500 gp, which is sprinkled into the air when the spell is cast.',
     'reference': 'p. 214',
     'book': 'PHB',
     'damage': '',
@@ -3467,7 +3467,7 @@ wiz5['Feeblemind'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'Negate',
-    'materials': 'A handful of clay, crystal, glass, or mineral spheres, which disappears when the spell is cast',
+    'materials': 'A handful of clay, crystal, glass, or mineral spheres, which disappears when the spell is cast.',
     'reference': 'p. 215',
     'book': 'PHB',
     'damage': '',
@@ -3486,7 +3486,7 @@ wiz5['Hold Monster'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'Negate',
-    'materials': 'One hard metal bar or rod for each monster to be held; the bar or rod can be as small as a three-penny nail',
+    'materials': 'One hard metal bar or rod for each monster to be held; the bar or rod can be as small as a three-penny nail.',
     'reference': 'p. 215',
     'book': 'PHB',
     'damage': '',
@@ -3543,7 +3543,7 @@ wiz5['Magic Jar'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'Special',
-    'materials': 'A gem or large crystal',
+    'materials': 'A gem or large crystal.',
     'reference': 'p. 216',
     'book': 'PHB',
     'damage': '',
@@ -3562,7 +3562,7 @@ wiz5['Major Creation'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'At least a tiny piece of matter of the same type as the item he plans to create—a bit of twisted hemp to create rope, a chip of stone to create a boulder, and so on',
+    'materials': 'At least a tiny piece of matter of the same type as the item he plans to create—a bit of twisted hemp to create rope, a chip of stone to create a boulder, and so on.',
     'reference': 'p. 217',
     'book': 'PHB',
     'damage': '',
@@ -3581,7 +3581,7 @@ wiz5['Monster Summoning III'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'Special',
-    'materials': 'A tiny bag and a small candle',
+    'materials': 'A tiny bag and a small candle.',
     'reference': 'p. 217',
     'book': 'PHB',
     'damage': '',
@@ -3600,7 +3600,7 @@ wiz5['Mordenkainen\'s Faithful Hound'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'A tiny silver whistle, a  piece of bone, and a thread',
+    'materials': 'A tiny silver whistle, a  piece of bone, and a thread.',
     'reference': 'p. 217',
     'book': 'PHB',
     'damage': '',
@@ -3619,7 +3619,7 @@ wiz5['Passwall'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'A pinch of sesame seeds',
+    'materials': 'A pinch of sesame seeds.',
     'reference': 'p. 217',
     'book': 'PHB',
     'damage': '',
@@ -3633,7 +3633,7 @@ wiz5['Seeming'] = {
     'school': 'Illusion/Phantasm',
     'range': '10-foot radius',
     'duration': '12 hours',
-    'aoe': '[[floor([[@level-wizard}]]/2)]] persons',
+    'aoe': '[[floor([[@{level-wizard}]]/2)]] persons',
     'components': 'V, S',
     'cast-time': '5',
     'saving-throw': 'None',
@@ -3656,7 +3656,7 @@ wiz5['Sending'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'Two tiny cylinders, each with one open end, connected by a short piece of fine copper wire',
+    'materials': 'Two tiny cylinders, each with one open end, connected by a short piece of fine copper wire.',
     'reference': 'p. 218',
     'book': 'PHB',
     'damage': '',
@@ -3713,7 +3713,7 @@ wiz5['Stone Shape'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'Soft clay that must be worked into roughly the desired shape of the stone object and then touched to the stone when the spell is uttered',
+    'materials': 'Soft clay that must be worked into roughly the desired shape of the stone object and then touched to the stone when the spell is uttered.',
     'reference': 'p. 218',
     'book': 'PHB',
     'damage': '',
@@ -3727,18 +3727,18 @@ wiz5['Summon Shadow'] = {
     'school': 'Conjuration/Summoning, Necromancy',
     'school-spells-and-magic': 'Conjuration/Summoning, Necromancy, Shadow',
     'range': '10 yards',
-    'duration': '[[1+[[@{level-wizard]] ]] rounds',
+    'duration': '[[1+[[@{level-wizard}]] ]] rounds',
     'aoe': '10-foot cube',
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'A bit of smoky quartz',
+    'materials': 'A bit of smoky quartz.',
     'reference': 'p. 218',
     'book': 'PHB',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard conjures up one shadow (see the *MONSTROUS MANUAL*) for every three levels of experience he has attained. Currently [[floor([[@level-wizard}]]/3)]] shadows. These monsters are under the control of the spellcaster and attack his enemies on command. The shadows remain until slain, turned, or the spell duration expires.'
+    'effect': 'When this spell is cast, the wizard conjures up one shadow (see the *MONSTROUS MANUAL*) for every three levels of experience he has attained. Currently [[floor([[@{level-wizard}]]/3)]] shadows. These monsters are under the control of the spellcaster and attack his enemies on command. The shadows remain until slain, turned, or the spell duration expires.'
 };
 
 wiz5['Telekinesis'] = {
@@ -3789,7 +3789,7 @@ wiz5['Transmute Rock to Mud'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'Clay and water (or sand, lime, and water for the reverse)',
+    'materials': 'Clay and water (or sand, lime, and water for the reverse).',
     'reference': 'p. 219',
     'book': 'PHB',
     'damage': '',
@@ -3808,7 +3808,7 @@ wiz5['Wall of Force'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'A pinch of powdered diamond worth 5,000 gp',
+    'materials': 'A pinch of powdered diamond worth 5,000 gp.',
     'reference': 'p. 219',
     'book': 'PHB',
     'damage': '',
@@ -3827,7 +3827,7 @@ wiz5['Wall of Iron'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'A small piece of sheet iron',
+    'materials': 'A small piece of sheet iron.',
     'reference': 'p. 220',
     'book': 'PHB',
     'damage': '',
@@ -3846,7 +3846,7 @@ wiz5['Wall of Stone'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'A small block of granite',
+    'materials': 'A small block of granite.',
     'reference': 'p. 220',
     'book': 'PHB',
     'damage': '',
@@ -3884,7 +3884,7 @@ wiz6['Bigby\'s Forceful Hand'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'None',
-    'materials': 'A glove',
+    'materials': 'A glove.',
     'reference': 'p. 221',
     'book': 'PHB',
     'damage': '',
@@ -3903,7 +3903,7 @@ wiz6['Chain Lightning'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': '½',
-    'materials': 'A bit of fur, a piece of amber, glass, or crystal rod, and one silver pin for each experience level of the caster. Currently [[@{level-wizard}]] silver pins',
+    'materials': 'A bit of fur, a piece of amber, glass, or crystal rod, and one silver pin for each experience level of the caster. Currently [[@{level-wizard}]] silver pins.',
     'reference': 'p. 221',
     'book': 'PHB',
     'damage': '*Target #1:* [[ [[{[[@{level-wizard}]],12}kl1]]d6]]}}{{d2t=[[ [[@{level-wizard}]]-1]]}}{{d2=\n*Target #2:* [[ [[{[[@{level-wizard}]]-1,11}kl1]]d6]]}}{{d3t=[[ [[@{level-wizard}]]-2]]}}{{d3=\n*Target #3:* [[ [[{[[@{level-wizard}]]-2,10}kl1]]d6]]}}{{d4t=[[ [[@{level-wizard}]]-3]]}}{{d4=\n*Target #4:* [[ [[{[[@{level-wizard}]]-3,9}kl1]]d6]]}}{{d5t=[[ [[@{level-wizard}]]-4]]}}{{d5=\n*Target #5:* [[ [[{[[@{level-wizard}]]-4,8}kl1]]d6]]}}{{d6t=[[ [[@{level-wizard}]]-5]]}}{{d6=\n*Target #6:* [[ [[{[[@{level-wizard}]]-5,7}kl1]]d6]]}}{{d7t=[[ [[@{level-wizard}]]-6]]}}{{d7=\n*Target #7:* [[ [[{[[@{level-wizard}]]-6,6}kl1]]d6]]}}{{d8t=[[ [[@{level-wizard}]]-7]]}}{{d8=\n*Target #8:* [[ [[{[[@{level-wizard}]]-7,5}kl1]]d6]]}}{{d9t=[[ [[@{level-wizard}]]-8]]}}{{d9=\n*Target #9:* [[ [[{[[@{level-wizard}]]-8,4}kl1]]d6]]}}{{d10t=[[ [[@{level-wizard}]]-9]]}}{{d10=\n*Target #10:* [[ [[{[[@{level-wizard}]]-9,3}kl1]]d6]]}}{{d11t=[[ [[@{level-wizard}]]-10]]}}{{d11=\n*Target #11:* [[ [[{[[@{level-wizard}]]-10,2}kl1]]d6]]}}{{d12t=[[ [[@{level-wizard}]]-11]]}}{{d12=\n*Target #12:* [[ [[{[[@{level-wizard}]]-11,1}kl1]]d6]]',
@@ -3940,7 +3940,7 @@ wiz6['Contingency'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'In addition to those of the companion spell, 100 gp worth of quicksilver and an eyelash of an ogre mage, ki-rin, or similar spell-using creature; in addition, the spell requires a statuette of the wizard carved from elephant ivory (which is not destroyed, though it is subject to wear and tear), which must be carried on the person of the spellcaster for the contingency spell to perform its function when called upon',
+    'materials': 'In addition to those of the companion spell, 100 gp worth of quicksilver and an eyelash of an ogre mage, ki-rin, or similar spell-using creature; in addition, the spell requires a statuette of the wizard carved from elephant ivory (which is not destroyed, though it is subject to wear and tear), which must be carried on the person of the spellcaster for the contingency spell to perform its function when called upon.',
     'reference': 'p. 221',
     'book': 'PHB',
     'damage': '',
@@ -3959,7 +3959,7 @@ wiz6['Control Weather'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'Burning incense and bits of earth and wood mixed in water',
+    'materials': 'Burning incense and bits of earth and wood mixed in water.',
     'reference': 'p. 222',
     'book': 'PHB',
     'damage': '',
@@ -3978,7 +3978,7 @@ wiz6['Death Fog'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'None',
-    'materials': 'A pinch of dried and powdered peas, powdered animal hoof, and strong acid of any sort (including highly distilled vinegar or acid crystals), which must be obtained from an alchemist',
+    'materials': 'A pinch of dried and powdered peas, powdered animal hoof, and strong acid of any sort (including highly distilled vinegar or acid crystals), which must be obtained from an alchemist.',
     'reference': 'p. 222',
     'book': 'PHB',
     'damage': '*1st round:* 1\n*2nd round:* 2\n*3rd round:* 4\n*4th round & beyond:* 8',
@@ -3996,7 +3996,7 @@ wiz6['Death Spell'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'None',
-    'materials': 'C crushed black pearl with a minimum value of 1,000 gp',
+    'materials': 'C crushed black pearl with a minimum value of 1,000 gp.',
     'reference': 'p. 222',
     'book': 'PHB',
     'damage': '',
@@ -4033,7 +4033,7 @@ wiz6['Disintegrate'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'Negate',
-    'materials': 'A lodestone and a pinch of dust',
+    'materials': 'A lodestone and a pinch of dust.',
     'reference': 'p. 223',
     'book': 'PHB',
     'damage': '',
@@ -4052,7 +4052,7 @@ wiz6['Enchant an Item'] = {
     'components': 'V, S, M',
     'cast-time': 'Special',
     'saving-throw': 'Negate',
-    'materials': 'Special',
+    'materials': 'Special.',
     'reference': 'p. 223',
     'book': 'PHB',
     'damage': '',
@@ -4071,7 +4071,7 @@ wiz6['Ensnarement'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'Negate',
-    'materials': 'Special',
+    'materials': 'Special.',
     'reference': 'p. 224',
     'book': 'PHB',
     'damage': '',
@@ -4146,7 +4146,7 @@ wiz6['Glassee'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'A small piece of crystal or glass',
+    'materials': 'A small piece of crystal or glass.',
     'reference': 'p. 225',
     'book': 'PHB',
     'damage': '',
@@ -4165,7 +4165,7 @@ wiz6['Globe of Invulnerability'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'A glass or crystal bead that shatters at the expiration of the spell',
+    'materials': 'A glass or crystal bead that shatters at the expiration of the spell.',
     'reference': 'p. 225',
     'book': 'PHB',
     'damage': '',
@@ -4184,7 +4184,7 @@ wiz6['Guards and Wards'] = {
     'components': 'V, S, M',
     'cast-time': '3 turns',
     'saving-throw': 'None',
-    'materials': 'Burning incense, a small measure of sulphur and oil, a knotted string, a small amount of umber hulk blood, and a small silver rod',
+    'materials': 'Burning incense, a small measure of sulphur and oil, a knotted string, a small amount of umber hulk blood, and a small silver rod.',
     'reference': 'p. 226',
     'book': 'PHB',
     'damage': '',
@@ -4202,7 +4202,7 @@ wiz6['Invisible Stalker'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'Burning incense and a piece of horn carved into a crescent shape',
+    'materials': 'Burning incense and a piece of horn carved into a crescent shape.',
     'reference': 'p. 226',
     'book': 'PHB',
     'damage': '',
@@ -4239,7 +4239,7 @@ wiz6['Lower Water'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'A small vial of dust or a small vial of water for the reverse',
+    'materials': 'A small vial of dust or a small vial of water for the reverse.',
     'reference': 'p. 227',
     'book': 'PHB',
     'damage': '',
@@ -4258,7 +4258,7 @@ wiz6['Mass Suggestion'] = {
     'components': 'V, M',
     'cast-time': '6',
     'saving-throw': 'Negate',
-    'materials': 'A snake’s tongue and either a bit of honeycomb or a drop of sweet oil',
+    'materials': 'A snake’s tongue and either a bit of honeycomb or a drop of sweet oil.',
     'reference': 'p. 227',
     'book': 'PHB',
     'damage': '',
@@ -4313,7 +4313,7 @@ wiz6['Monster Summoning IV'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'None',
-    'materials': 'A tiny bag and a small (not necessarily lit) candle',
+    'materials': 'A tiny bag and a small (not necessarily lit) candle.',
     'reference': 'p. 228',
     'book': 'PHB',
     'damage': '',
@@ -4350,7 +4350,7 @@ wiz6['Move Earth'] = {
     'components': 'V, S, M',
     'cast-time': 'Special',
     'saving-throw': 'None',
-    'materials': 'A mixture of soils (clay, loam, sand) in a small bag and an iron blade',
+    'materials': 'A mixture of soils (clay, loam, sand) in a small bag and an iron blade.',
     'reference': 'p. 228',
     'book': 'PHB',
     'damage': '',
@@ -4369,7 +4369,7 @@ wiz6['Otiluke\'s Freezing Sphere'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'Special',
-    'materials': 'A) *Frigid globe:* A thin sheet of crystal about an inch square. B) *Cold ray:* A white sapphire of not less than 1,000 gp value. C) *Globe of cold:* a 1,000-gp diamond',
+    'materials': 'A) *Frigid globe:* A thin sheet of crystal about an inch square. B) *Cold ray:* A white sapphire of not less than 1,000 gp value. C) *Globe of cold:* a 1,000-gp diamond.',
     'reference': 'p. 228',
     'book': 'PHB',
     'damage': '*Cold ray:* [[ [[@{level-wizard}]]d4+2*[[@{level-wizard}]] ]] Cold. *Globe of cold:* [[6d6]]',
@@ -4388,7 +4388,7 @@ wiz6['Part Water'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'Two small sheets of crystal or glass',
+    'materials': 'Two small sheets of crystal or glass.',
     'reference': 'p. 229',
     'book': 'PHB',
     'damage': '',
@@ -4406,7 +4406,7 @@ wiz6['Permanent Illusion'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'Special',
-    'materials': 'A bit of fleece',
+    'materials': 'A bit of fleece.',
     'reference': 'p. 229',
     'book': 'PHB',
     'damage': '',
@@ -4424,7 +4424,7 @@ wiz6['Programmed Illusion'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'Special',
-    'materials': 'A bit of fleece',
+    'materials': 'A bit of fleece.',
     'reference': 'p. 229',
     'book': 'PHB',
     'damage': '',
@@ -4442,7 +4442,7 @@ wiz6['Project Image'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'None',
-    'materials': 'A small replica (doll) of the wizard',
+    'materials': 'A small replica (doll) of the wizard.',
     'reference': 'p. 229',
     'book': 'PHB',
     'damage': '',
@@ -4460,7 +4460,7 @@ wiz6['Reincarnation'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'A small drum and a drop of blood',
+    'materials': 'A small drum and a drop of blood.',
     'reference': 'p. 230',
     'book': 'PHB',
     'damage': '',
@@ -4479,7 +4479,7 @@ wiz6['Repulsion'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'None',
-    'materials': 'A pair of small magnetized iron bars attached to two small canine statuettes, one ivory and one ebony',
+    'materials': 'A pair of small magnetized iron bars attached to two small canine statuettes, one ivory and one ebony.',
     'reference': 'p. 230',
     'book': 'PHB',
     'damage': '',
@@ -4517,7 +4517,7 @@ wiz6['Stone to Flesh'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'Special',
-    'materials': 'A pinch of earth and a drop of blood; or lime, water, and earth for the reverse',
+    'materials': 'A pinch of earth and a drop of blood; or lime, water, and earth for the reverse.',
     'reference': 'p. 230',
     'book': 'PHB',
     'damage': '',
@@ -4536,7 +4536,7 @@ wiz6['Tenser\'s Transformation'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'None',
-    'materials': 'A *potion of heroism* (or *superheroism*) that the wizard must consume during the course of uttering the spell',
+    'materials': 'A *potion of heroism* (or *superheroism*) that the wizard must consume during the course of uttering the spell.',
     'reference': 'p. 231',
     'book': 'PHB',
     'damage': '',
@@ -4555,7 +4555,7 @@ wiz6['Transmute Water to Dust'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None (special)',
-    'materials': 'Diamond dust of at least 500 gp value and a bit of seashell; plus a pinch of normal dust for the reverse',
+    'materials': 'Diamond dust of at least 500 gp value and a bit of seashell; plus a pinch of normal dust for the reverse.',
     'reference': 'p. 231',
     'book': 'PHB',
     'damage': '',
@@ -4573,7 +4573,7 @@ wiz6['True Seeing'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'An ointment for the eyes that is made from a very rare mushroom powder, saffron, and fat which costs no less than 300 gp per use and must be aged for 1d6 months',
+    'materials': 'An ointment for the eyes that is made from a very rare mushroom powder, saffron, and fat which costs no less than 300 gp per use and must be aged for 1d6 months.',
     'reference': 'p. 231',
     'book': 'PHB',
     'damage': '',
@@ -4611,7 +4611,7 @@ wiz7['Banishment'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'Special',
-    'materials': 'Substances harmful, hateful, or opposed to the nature of the subject(s) of the spell (see additional considerations below)',
+    'materials': 'Substances harmful, hateful, or opposed to the nature of the subject(s) of the spell (see additional considerations below).',
     'reference': 'p. 232',
     'book': 'PHB',
     'damage': '',
@@ -4630,7 +4630,7 @@ wiz7['Bigby\'s Grasping Hand'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'None',
-    'materials': 'A leather glove',
+    'materials': 'A leather glove.',
     'reference': 'p. 232',
     'book': 'PHB',
     'damage': '',
@@ -4649,7 +4649,7 @@ wiz7['Charm Plants'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'Negate',
-    'materials': 'A pinch of humus, a drop of water, and a twig or leaf',
+    'materials': 'A pinch of humus, a drop of water, and a twig or leaf.',
     'reference': 'p. 232',
     'book': 'PHB',
     'damage': '',
@@ -4667,7 +4667,7 @@ wiz7['Control Undead'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'Special',
-    'materials': 'A small piece each of bone and raw meat',
+    'materials': 'A small piece each of bone and raw meat.',
     'reference': 'p. 232',
     'book': 'PHB',
     'damage': '',
@@ -4686,7 +4686,7 @@ wiz7['Delayed Blast Fireball'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': '½',
-    'materials': 'A tiny ball of bat guano and sulphur',
+    'materials': 'A tiny ball of bat guano and sulphur.',
     'reference': 'p. 233',
     'book': 'PHB',
     'damage': '[[ [[{[[@{level-wizard}]],10}kl1]]d6+[[{[[@{level-wizard}]],10}kl1]] ]]',
@@ -4705,7 +4705,7 @@ wiz7['Drawmij\'s Instant Summons'] = {
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'None',
-    'materials': 'A gem of not less than 5,000 gp value and the desired item',
+    'materials': 'A gem of not less than 5,000 gp value and the desired item.',
     'reference': 'p. 233',
     'book': 'PHB',
     'damage': '',
@@ -4724,7 +4724,7 @@ wiz7['Duo-Dimension'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'None',
-    'materials': 'A flat ivory likeness of the spellcaster (which must be of finest workmanship, gold filigreed, and enameled and gem-studded at an average cost of 500 to 1,000 gp) and a strip of parchment',
+    'materials': 'A flat ivory likeness of the spellcaster (which must be of finest workmanship, gold filigreed, and enameled and gem-studded at an average cost of 500 to 1,000 gp) and a strip of parchment.',
     'reference': 'p. 233',
     'book': 'PHB',
     'damage': '',
@@ -4761,7 +4761,7 @@ wiz7['Forcecage'] = {
     'components': 'V, S, special',
     'cast-time': '3–4',
     'saving-throw': 'None',
-    'materials': 'Powder of a diamond of at least 1,000 gp value, consumed during memorization',
+    'materials': 'Powder of a diamond of at least 1,000 gp value, consumed during memorization.',
     'reference': 'p. 234',
  'book': 'PHB',
     'damage': '',
@@ -4797,7 +4797,7 @@ wiz7['Mass Invisibility'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'None',
-    'materials': 'An eyelash and a bit of gum arabic, the former encased in the latter',
+    'materials': 'An eyelash and a bit of gum arabic, the former encased in the latter.',
     'reference': 'p. 234',
     'book': 'PHB',
     'damage': '',
@@ -4816,7 +4816,7 @@ wiz7['Monster Summoning V'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'None',
-    'materials': 'A tiny bag and a small (not necessarily lit) candle',
+    'materials': 'A tiny bag and a small (not necessarily lit) candle.',
     'reference': 'p. 234',
     'book': 'PHB',
     'damage': '',
@@ -4854,7 +4854,7 @@ wiz7['Mordenkainen\'s Sword'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'None',
-    'materials': 'A miniature platinum sword with a grip and pommel of copper and zinc, which costs 500 gp to construct, and which disappears after the spell’s completion',
+    'materials': 'A miniature platinum sword with a grip and pommel of copper and zinc, which costs 500 gp to construct, and which disappears after the spell’s completion.',
     'reference': 'p. 235',
     'book': 'PHB',
     'damage': '',
@@ -4928,7 +4928,7 @@ wiz7['Reverse Gravity'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'None',
-    'materials': 'Lodestone and iron filings',
+    'materials': 'Lodestone and iron filings.',
     'reference': 'p. 236',
     'book': 'PHB',
     'damage': '',
@@ -4947,7 +4947,7 @@ wiz7['Sequester'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'Special',
-    'materials': 'A basilisk eyelash, gum arabic, and a dram of whitewash',
+    'materials': 'A basilisk eyelash, gum arabic, and a dram of whitewash.',
     'reference': 'p. 236',
     'book': 'PHB',
     'damage': '',
@@ -4984,7 +4984,7 @@ wiz7['Simulacrum'] = {
     'components': 'V, S, M',
     'cast-time': 'Special',
     'saving-throw': 'None',
-    'materials': 'Ice or snow to form the body, some piece of the creature to be duplicated, and powdered ruby',
+    'materials': 'Ice or snow to form the body, some piece of the creature to be duplicated, and powdered ruby.',
     'reference': 'p. 236',
     'book': 'PHB',
     'damage': '',
@@ -5002,7 +5002,7 @@ wiz7['Spell Turning'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'None',
-    'materials': 'A small silver mirror',
+    'materials': 'A small silver mirror.',
     'reference': 'p. 237',
     'book': 'PHB',
     'damage': '',
@@ -5021,7 +5021,7 @@ wiz7['Statue'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'Special',
-    'materials': 'Lime, sand, and a drop of water stirred by an iron bar, such as a nail or spike',
+    'materials': 'Lime, sand, and a drop of water stirred by an iron bar, such as a nail or spike.',
     'reference': 'p. 237',
     'book': 'PHB',
     'damage': '',
@@ -5077,7 +5077,7 @@ wiz7['Vision'] = {
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'None',
-    'materials': 'The sacrifice of something valued by the spellcaster or by the power supplicated (see below)',
+    'materials': 'The sacrifice of something valued by the spellcaster or by the power supplicated (see below).',
     'reference': 'p. 238',
     'book': 'PHB',
     'damage': '',
@@ -5305,7 +5305,7 @@ wiz8['Otiluke\'s Telekinetic Sphere'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'Negate',
-    'materials': 'A hemispherical piece of diamond and a matching piece of gum arabic, as well as a pair of small bar magnets',
+    'materials': 'A hemispherical piece of diamond and a matching piece of gum arabic, as well as a pair of small bar magnets.',
     'reference': 'p. 241',
     'book': 'PHB',
     'damage': '',
@@ -5361,7 +5361,7 @@ wiz8['Polymorph Any Object'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'Special',
-    'materials': 'Mercury, gum arabic, and smoke',
+    'materials': 'Mercury, gum arabic, and smoke.',
     'reference': 'p. 242',
     'book': 'PHB',
     'damage': '',
@@ -5435,7 +5435,7 @@ wiz8['Serten\'s Spell Immunity'] = {
     'components': 'V, S, M',
     'cast-time': '1 round/recipient',
     'saving-throw': 'None',
-    'materials': 'A diamond of at least 500 gp value, which must be crushed and sprinkled over the spell recipients; each such creature must also have in its possession a diamond of at least one carat size, intact and carried on its person',
+    'materials': 'A diamond of at least 500 gp value, which must be crushed and sprinkled over the spell recipients; each such creature must also have in its possession a diamond of at least one carat size, intact and carried on its person.',
     'reference': 'p. 244',
     'book': 'PHB',
     'damage': '',
@@ -5473,7 +5473,7 @@ wiz8['Symbol'] = {
     'components': 'V, S, M',
     'cast-time': '8',
     'saving-throw': 'Special',
-    'materials': 'Powdered black opal and diamond dust, worth not less than 5,000 gp each',
+    'materials': 'Powdered black opal and diamond dust, worth not less than 5,000 gp each.',
     'reference': 'p. 244',
     'book': 'PHB',
     'damage': '',
@@ -5492,7 +5492,7 @@ wiz8['Trap the Soul'] = {
     'components': 'V, S, M',
     'cast-time': 'Special + 1',
     'saving-throw': 'Special',
-    'materials': 'A gem of at least 1,000 gp value for every Hit Die or level of experience possessed by the creature to be trapped, onto which is cast a *enchant an item* and a *maze* spell (see below)',
+    'materials': 'A gem of at least 1,000 gp value for every Hit Die or level of experience possessed by the creature to be trapped, onto which is cast a *enchant an item* and a *maze* spell (see below).',
     'reference': 'p. 245',
     'book': 'PHB',
     'damage': '',
@@ -5531,7 +5531,7 @@ wiz9['Bigby\'s Crushing Hand'] = {
     'components': 'V, S, M',
     'cast-time': '9',
     'saving-throw': 'None',
-    'materials': 'A glove of snake skin and the shell of an egg',
+    'materials': 'A glove of snake skin and the shell of an egg.',
     'reference': 'p. 247',
     'book': 'PHB',
     'damage': '*1st round:* 1d10\n*2nd round:* 2d10\n*3rd round:* 2d10\n*4th round & beyond:* 4d10',
@@ -5569,7 +5569,7 @@ wiz9['Energy Drain'] = {
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'Essence of spectre or vampire dust',
+    'materials': 'Essence of spectre or vampire dust.',
     'reference': 'p . 247',
     'book': 'PHB',
     'damage': '',
@@ -5587,7 +5587,7 @@ wiz9['Foresight'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'A hummingbird’s feather',
+    'materials': 'A hummingbird’s feather.',
     'reference': 'p. 247',
     'book': 'PHB',
     'damage': '',
@@ -5662,7 +5662,7 @@ wiz9['Monster Summoning VII'] = {
     'components': 'V, S, M',
     'cast-time': '9',
     'saving-throw': 'None',
-    'materials': 'A tiny bag and a small (not necessarily lit) candle',
+    'materials': 'A tiny bag and a small (not necessarily lit) candle.',
     'reference': 'p. 249',
     'book': 'PHB',
     'damage': '',
@@ -5737,7 +5737,7 @@ wiz9['Shape Change'] = {
     'components': 'V, S, M',
     'cast-time': '9',
     'saving-throw': 'None',
-    'materials': 'A jade circlet worth no less than 5,000 gp',
+    'materials': 'A jade circlet worth no less than 5,000 gp.',
     'reference': 'p. 250',
     'book': 'PHB',
     'damage': '',
@@ -5756,7 +5756,7 @@ wiz9['Succor'] = {
     'components': 'V, S, M',
     'cast-time': '1 to 4 days',
     'saving-throw': 'None',
-    'materials': 'Gemstones totaling not  less than 5,000 gp value (whether they are faceted gems or not is immaterial)',
+    'materials': 'Gemstones totaling not  less than 5,000 gp value (whether they are faceted gems or not is immaterial).',
     'reference': 'p. 250',
     'book': 'PHB',
     'damage': '',
@@ -5774,7 +5774,7 @@ wiz9['Temporal Stasis'] = {
     'components': 'V, S, M',
     'cast-time': '9',
     'saving-throw': 'None',
-    'materials': '*Temporal stasis:* A powder composed of diamond, emerald, ruby, and sapphire dust, with each crushed stone worth at least 100 gp. *Temporal reinstatement:* None',
+    'materials': '*Temporal stasis:* A powder composed of diamond, emerald, ruby, and sapphire dust, with each crushed stone worth at least 100 gp. *Temporal reinstatement:* None.',
     'reference': 'p. 251',
     'book': 'PHB',
     'damage': '',
@@ -5850,7 +5850,7 @@ wiz1['Copy'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'Special',
-    'materials': 'A piece of blank parchment (or a book with blank pages, as described above), and a drop of black ink',
+    'materials': 'A piece of blank parchment (or a book with blank pages, as described above), and a drop of black ink.',
     'reference': 'p. 95',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
@@ -5869,7 +5869,7 @@ wiz1['Chromatic Orb'] = {
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'Negate',
-    'materials': 'A gem of the appropriate hue or any diamond. The gem must have a value of at least 50 gp',
+    'materials': 'A gem of the appropriate hue or any diamond. The gem must have a value of at least 50 gp.',
     'reference': 'p. 95',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
@@ -5912,7 +5912,7 @@ wiz1['Detect Disease'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': '*Detect disease* reveals to the wizard whether a subject creature or object carries a disease, whether normal or magical. Additionally, there is a 10 percent chance per level of the caster that he is able to identify the exact type of disease. Currently [[10*[[@{level-wizard}]] ]]% chance to identify type of disease'
+    'effect': '*Detect disease* reveals to the wizard whether a subject creature or object carries a disease, whether normal or magical. Additionally, there is a 10 percent chance per level of the caster that he is able to identify the exact type of disease. Currently [[{10*[[@{level-wizard}]],100}kl1]]% chance to identify type of disease'
 };
 
 wiz1['Divining Rod'] = {
@@ -5949,7 +5949,7 @@ wiz1['Protection from Hunger and Thirst'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When *protection from hunger and thirst* is cast, the recipient requires no food, water, or nourishment of any kind for the duration of the spell. The recipient can be the caster or anyone he touches. Each day the caster (or the subject of the caster’s choice) is under the effect of the spell, he is fully nourished as if he had eaten and drunk normally. At the end of the spell\'s duration, the subject is no more hungry or thirsty than he was when the spell was originally cast.'
+    'effect': 'When *protection from hunger and thirst* is cast, the recipient requires no food, water, or nourishment of any kind for the duration of the spell. The recipient can be the caster or anyone he touches. Each day the caster (or the subject of the caster’s choice) is under the effect of the spell, he is fully nourished as if he had eaten and drunk normally. At the end of the spell’s duration, the subject is no more hungry or thirsty than he was when the spell was originally cast.'
 };
 
 wiz2['Choke'] = {
@@ -5961,13 +5961,13 @@ wiz2['Choke'] = {
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': '½',
-    'materials': 'A handkerchief or similarly-sized piece of cloth that has been tied in a knot',
+    'materials': 'A handkerchief or similarly-sized piece of cloth that has been tied in a knot.',
     'reference': 'p. 97',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '[[1d4]]',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of *choke*, the caster causes a pair of ghostly hands to appear around the throat of a single victim. The victim must be a human, demihuman, or humanoid, and must be within 30 yards of the caster. The hands will choke and strangle the affected victim for the duration of the spell; each round, the victim suffers 1-4 hit points of damage from the choking hands. If the victim makes a successful saving throw, he suffers half- damage each round.\n&emsp;*Choke* can be negated by *dispel magic* or a similar spell; the victim makes all attack rolls at a -2 penalty while affected by *choke*.'
+    'effect': 'By means of *choke*, the caster causes a pair of ghostly hands to appear around the throat of a single victim. The victim must be a human, demihuman, or humanoid, and must be within 30 yards of the caster. The hands will choke and strangle the affected victim for the duration of the spell; each round, the victim suffers 1-4 hit points of damage from the choking hands. If the victim makes a successful saving throw, he suffers half-damage each round.\n&emsp;*Choke* can be negated by *dispel magic* or a similar spell; the victim makes all attack rolls at a -2 penalty while affected by *choke*.'
 };
 
 wiz2['Death Recall'] = {
@@ -5979,7 +5979,7 @@ wiz2['Death Recall'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'A fragment from a shattered mirror',
+    'materials': 'A fragment from a shattered mirror.',
     'reference': 'p. 97',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
@@ -5991,13 +5991,13 @@ wiz2['Death Recall'] = {
 wiz2['Detect Life'] = {
     'level': '2',
     'school': 'Divination',
-    'range': '10 feet/level',
+    'range': '[[10*[[@{level-wizard}]] ]] feet',
     'duration': '5 rounds',
     'aoe': 'One creature',
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'None',
-    'materials': '',
+    'materials': 'A holy symbol and a hair from the head of a newborn animal.',
     'reference': 'p. 98',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
@@ -6015,7 +6015,7 @@ wiz2['Filter'] = {
     'components': 'V, M',
     'cast-time': '2',
     'saving-throw': 'None',
-    'materials': 'A strand of spider web and a scrap of cotton cloth approximately one inch square',
+    'materials': 'A strand of spider web and a scrap of cotton cloth approximately one inch square.',
     'reference': 'p. 98',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
@@ -6058,7 +6058,7 @@ wiz2['Ice Knife'] = {
     'damage': '*Hit:* 2d4 damage\n*Shatter:* 1d4 cold damage and numb for 1d3 rounds',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell fires a dagger of ice at the target. The caster makes a normal attack roll as if attacking with a missile weapon, factoring in the range from the attacker to the target (the *ice knife* has a long range of 30 yards, a medium range of 20 yards, and a short range of 10 yards). A successful hit causes 2-8 (2d4) hit points of damage. If the *ice knife* misses its target, consult the rules for grenade-like missiles on pages 62-63 of the *Dungeon Master’s Guide* to determine where it lands.\n&emsp;When an *ice knife* strikes a solid object or a creature, the knife shatters, releasing a wave of numbing cold. All creatures within a 5-foot radius must make a successful saving throw vs. paralyzation or suffer 1-4 hit points of cold damage and become numb for 1-3 rounds. Numbed creatures have their movement rates reduced by half and their chance to hit reduced by 2. Proximity to major sources of heat, such as a roaring bonfire, improves a creature’s saving throw by +2.\n&emsp;An *ice knife* that misses or is lost cannot be picked up by the caster (or anyone else) and thrown again. If the *ice knife* is touched, it instantly shatters, releasing a wave of cold as described above. If a lost *ice knife* is not touched, it melts away in a pool of water 1 round after it was originally created; this melting occurs regardless of the environmental temperature.'
+    'effect': 'This spell fires a dagger of ice at the target. The caster makes a normal attack roll as if attacking with a missile weapon, factoring in the range from the attacker to the target (the *ice knife* has a long range of 30 yards, a medium range of 20 yards, and a short range of 10 yards). A successful hit causes 2-8 (2d4) hit points of damage. If the *ice knife* misses its target, consult the rules for grenade-like missiles on pages 88-89 of the *Dungeon Master’s Guide* to determine where it lands.\n&emsp;When an *ice knife* strikes a solid object or a creature, the knife shatters, releasing a wave of numbing cold. All creatures within a 5-foot radius must make a successful saving throw vs. paralyzation or suffer 1-4 hit points of cold damage and become numb for 1-3 rounds. Numbed creatures have their movement rates reduced by half and their chance to hit reduced by 2. Proximity to major sources of heat, such as a roaring bonfire, improves a creature’s saving throw by +2.\n&emsp;An *ice knife* that misses or is lost cannot be picked up by the caster (or anyone else) and thrown again. If the *ice knife* is touched, it instantly shatters, releasing a wave of cold as described above. If a lost *ice knife* is not touched, it melts away in a pool of water 1 round after it was originally created; this melting occurs regardless of the environmental temperature.'
 };
 
 wiz2['Vocalize'] = {
@@ -6070,7 +6070,7 @@ wiz2['Vocalize'] = {
     'components': 'S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'A small golden bell without a clapper',
+    'materials': 'A small golden bell without a clapper.',
     'reference': 'p. 99',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
@@ -6089,13 +6089,13 @@ wiz3['Bone Club'] = {
     'components': 'V, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'An appropriately-sized bone and a pinch of dirt from a grave',
+    'materials': 'An appropriately-sized bone and a pinch of dirt from a grave.',
     'reference': 'p. 99',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A wizard can use this spell to enchant a bone, causing it to become a magical club. This magical weapon acts as a *club +4* against undead, inflicting 5-10 (1d6 +4) hit points of damage, and a *club +1* against all other opponents, inflicting 2-7 (1d6 + 1) hit points of damage. The bone can be from any animal, providing the bone normally could be wielded as a club; for instance, a human femur could be enchanted by this spell, but a skull could not. At the end of the spell’s duration, the *bone club* reverts to a normal bone.\n&emsp;If the proficiency rules are being used, characters with a weapon proficiency with a club also have a profiency with a *bone club*. Those wielding a *bone club* without the club profiency suffer the penalties described on page 52 of the *Player’s Handbook*.'
+    'effect': 'A wizard can use this spell to enchant a bone, causing it to become a magical club. This magical weapon acts as a *club +4* against undead, inflicting 5-10 (1d6 +4) hit points of damage, and a *club +1* against all other opponents, inflicting 2-7 (1d6 + 1) hit points of damage. The bone can be from any animal, providing the bone normally could be wielded as a club; for instance, a human femur could be enchanted by this spell, but a skull could not. At the end of the spell’s duration, the *bone club* reverts to a normal bone.\n&emsp;If the proficiency rules are being used, characters with a weapon proficiency with a club also have a proficiency with a *bone club*. Those wielding a *bone club* without the club proficiency suffer the penalties described on page 52 of the *Player’s Handbook*. And remember that wizards cannot use clubs at all.'
 };
 
 wiz3['Delay Death'] = {
@@ -6108,13 +6108,13 @@ wiz3['Delay Death'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'A chip from a tombstone or a sliver of wood from a coffin',
+    'materials': 'A chip from a tombstone or a sliver of wood from a coffin.',
     'reference': 'p. 99',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables one person or creature to postpone death. If *delay death* is cast before the indicated creature or person reaches 0 hit points, he is able to fight, cast spells, communicate, and take all other normal actions until he reaches -10 hit points. However, from the time he reaches 0 hit points until he is reduced to -10 hit points, the affected person or creature makes all attack rolls and saving throws at a -2 penalty, and his movement rate is reduced by half.\n&emsp;When the subject reaches -10 hit points, he is dead and *Delay death* is no longer in effect. Note that the spell has a limited duration; if the spell expires after the affected subject has reached 0 hit points but before he has been reduced to -10 hit points, the subject dies instantly. A deceased subject previously under the effect of *delay Death* can be raised normally by raise dead and similar spells.'
+    'effect': 'This spell enables one person or creature to postpone death. If *delay death* is cast before the indicated creature or person reaches 0 hit points, he is able to fight, cast spells, communicate, and take all other normal actions until he reaches -10 hit points. However, from the time he reaches 0 hit points until he is reduced to -10 hit points, the affected person or creature makes all attack rolls and saving throws at a -2 penalty, and his movement rate is reduced by half.\n&emsp;When the subject reaches -10 hit points, he is dead and *delay death* is no longer in effect. Note that the spell has a limited duration; if the spell expires after the affected subject has reached 0 hit points but before he has been reduced to -10 hit points, the subject dies instantly. A deceased subject previously under the effect of *delay death* can be raised normally by raise dead and similar spells.'
 };
 
 wiz3['Hovering Skull'] = {
@@ -6123,7 +6123,7 @@ wiz3['Hovering Skull'] = {
     'range': 'Special',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Special',
-    'components': 'V, S',
+    'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
     'materials': 'The tooth from a human skull.',
@@ -6132,7 +6132,7 @@ wiz3['Hovering Skull'] = {
     'damage': '1d6',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates a glowing human skull with sharp fangs. The skull hovers about a foot above the caster’s shoulder; as the caster moves, the skull hovers along with him. If the caster stops moving and concentrates, he can mentally command the *hovering skull* to move in any direction within a 30- foot radius.\n&emsp;The caster can see through the skull’s eyes as if they were his own; for instance, the *hovering skull* could be ordered to investigate a dark cave or peek over a high wall. Additionally, the caster can order the *hovering skull* to attack victims with its razor-sharp teeth. If the caster’s concentration is interrupted while controlling the skull, the skull immediately drops to the ground (but it takes no damage). If the caster resumes concentration, he can continue to command the skull.\n&emsp;The *hovering skull* has the same statistics as the caster, except the skull has 3 hit points and inflicts 1-6 hit points of damage with its bite. Attacks directed at the skull do not harm the caster, nor does damage directed at the caster affect the skull.'
+    'effect': 'This spell creates a glowing human skull with sharp fangs. The skull hovers about a foot above the caster’s shoulder; as the caster moves, the skull hovers along with him. If the caster stops moving and concentrates, he can mentally command the *hovering skull* to move in any direction within a 30-foot radius.\n&emsp;The caster can see through the skull’s eyes as if they were his own; for instance, the *hovering skull* could be ordered to investigate a dark cave or peek over a high wall. Additionally, the caster can order the *hovering skull* to attack victims with its razor-sharp teeth. If the caster’s concentration is interrupted while controlling the skull, the skull immediately drops to the ground (but it takes no damage). If the caster resumes concentration, he can continue to command the skull.\n&emsp;The *hovering skull* has the same statistics as the caster, except the skull has 3 hit points and inflicts 1-6 hit points of damage with its bite. Attacks directed at the skull do not harm the caster, nor does damage directed at the caster affect the skull.'
 };
 
 wiz3['Invisible Mail'] = {
@@ -6175,8 +6175,7 @@ wiz3['Iron Mind'] = {
 
 wiz3['Pain Touch'] = {
     'level': '3',
-    'school': 'Divination',
-    'school-spells-and-magic': 'Necromancy',
+    'school': 'Necromancy',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'One creature',
@@ -6227,7 +6226,7 @@ wiz4['Duplicate'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates an exact copy of any single item the caster touches. The item to be copied must fit inside a 20-foot cube. The spell has no effect on living creatures, including undead, nor will it copy magical items. The *duplicated* item is identical to the original in every way--for instance, a *duplicated* sword can be wielded to inflict damage as a normal sword--but *detect magic* can reveal its true nature and *dispel magic* can cause it to disappear. The *duplicated* object exists for 1 hour/level of the caster, at which time it vanishes; permanency does not affect *duplicated* items.'
+    'effect': 'This spell creates an exact copy of any single item the caster touches. The item to be copied must fit inside a 20-foot cube. The spell has no effect on living creatures, including undead, nor will it copy magical items. The *duplicated* item is identical to the original in every way—for instance, a *duplicated* sword can be wielded to inflict damage as a normal sword—but *detect magic* can reveal its true nature and *dispel magic* can cause it to disappear. The *duplicated* object exists for 1 hour/level of the caster, at which time it vanishes; permanency does not affect *duplicated* items.'
 };
 
 wiz4['Fire Aura'] = {
@@ -6239,7 +6238,7 @@ wiz4['Fire Aura'] = {
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'Special',
-    'materials': 'A scrap of singed paper and a piece of flint',
+    'materials': 'A scrap of singed paper and a piece of flint.',
     'reference': 'p. 101',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '*Touch:* 2d4 Fire\n*If set afire:* 1d6 additional',
@@ -6299,10 +6298,10 @@ wiz4['Wind Breath'] = {
     'materials': 'A handmade silk fan with a value of at least 1 gp.',
     'reference': 'p. 101',
     'book': 'The Complete Wizard\'s Handbook',
-    'damage': '[[5*[[@{level-wizard}]] ]] MHP:}}{{d2t=[[{{[[5*[[@{level-wizard}]] ]],30}<29}]]}}{{d2=[[0]]}}{{d3t=[[{{[[5*[[@{level-wizard}]] ]],0}>30}*{{[[5*[[@{level-wizard}]] ]],50}<49}]]}}{{d3=[[1]]}}{{d4t=[[{{[[5*[[@{level-wizard}]] ]],0}>50}*{{[[5*[[@{level-wizard}]] ]],70}<69}]]}}{{d4=[[1d4]]}}{{d5t=[[{{[[5*[[@{level-wizard}]] ]],0}>70}]]}}{{d5=[[1d8]]',
+    'damage': '[[5*[[@{level-wizard}]] ]] MHP:}}{{d2t=[[{{[[5*[[@{level-wizard}]] ]],30}<29}]]}}{{d2=[[0]]}}{{d3t=[[{{[[5*[[@{level-wizard}]] ]],0}>30}*{{[[5*[[@{level-wizard}]] ]],50}<49}]]}}{{d3= [[1]]}}{{d4t=[[{{[[5*[[@{level-wizard}]] ]],0}>50}*{{[[5*[[@{level-wizard}]] ]],70}<69}]]}}{{d4= [[1d4]]}}{{d5t=[[{{[[5*[[@{level-wizard}]] ]],0}>70}]]}}{{d5=[[1d8]]\n*If knocked down:* 1d6 per 10 feet blown',
     'damage-type': '',
     'healing': '',
-    'effect': 'A variation of *gust of wind*, this spell allows the caster to fill his lungs with air and expel a powerful wind. The strength of this wind is about 5 miles per hour for every level of the caster ([[5*[[@{level-wizard}]] ]] miles per hour). Those outside the area of effect do not notice the tremendous winds, though objects may be blown out of the spell’s area into their path. The DM should determine the precise effects of the *wind breath* using the following parameters as guidelines.\n&emsp;If the *wind breath* is 30-50 miles per hour, there is a 10 percent chance that small boats capsize, a 1 percent chance that ships capsize, and a 10 percent chance that a man is knocked down. There is a 20 percent chance that branches snap, light articles are blown away, and tents and sails tear. Creatures caught in the cone of the *wind breath* suffer 1 hit points of damage from blown sand and grit.\n&emsp;If the *wind breath* is 50-70 miles per hour, there is a 70 percent chance that small boats capsize, a 20 percent chance that ships capsize, and a 50 percent chance that a man is knocked down. Trees bend and there is a 70 percent chance that branches snap, and a 20 percent chance that a trunk snaps. Medium-sized articles are blown away, and there is a 50 percent chance that tents and sails are torn, and a 40 percent chance that shacks are blown down. Creatures caught in the cone of the *wind breath* suffer 1-4 hit points of damage from sand and grit. Flying creatures are blown back 10-40 (10d4) feet.)\n&emsp;If the *wind breath* is 70 miles per hour or more, there is a 100 percent chance that small boats capsize, a 70 percent chance that ships capsize, and a 70 percent chance that a man is knocked down and blown 10-40 (10d4) feet to suffer 1-6 hit points of damage per 10 feet blown. There is a 70 percent chance that tree trunks snap, and a 100 percent chance that branches are ripped from trees. Heavy articles are blown away, medium articles are ripped from fastenings, and tents and sails have a 70 percent chance of being destroyed. There is a 20 percent chance that common buildings are blown down and a 60 percent chance that shacks are flattened. Creatures caught in the cone of the *wind breath* suffer 1-8 hit points of damage from blown objects. Flying creatures are blown back 50-100 (40+10d6) feet.'
+    'effect': 'A variation of *gust of wind*, this spell allows the caster to fill his lungs with air and expel a powerful wind. The strength of this wind is about 5 miles per hour for every level of the caster ([[5*[[@{level-wizard}]] ]] miles per hour). Those outside the area of effect do not notice the tremendous winds, though objects may be blown out of the spell’s area into their path. The DM should determine the precise effects of the *wind breath* using the following parameters as guidelines.\n&emsp;If the *wind breath* is 30-50 miles per hour, there is a 10 percent chance that small boats capsize, a 1 percent chance that ships capsize, and a 10 percent chance that a man is knocked down. There is a 20 percent chance that branches snap, light articles are blown away, and tents and sails tear. Creatures caught in the cone of the *wind breath* suffer 1 hit points of damage from blown sand and grit.\n&emsp;If the *wind breath* is 50-70 miles per hour, there is a 70 percent chance that small boats capsize, a 20 percent chance that ships capsize, and a 50 percent chance that a man is knocked down. Trees bend and there is a 70 percent chance that branches snap, and a 20 percent chance that a trunk snaps. Medium-sized articles are blown away, and there is a 50 percent chance that tents and sails are torn, and a 40 percent chance that shacks are blown down. Creatures caught in the cone of the *wind breath* suffer 1-4 hit points of damage from sand and grit. Flying creatures are blown back 10-40 (10d4) feet.\n&emsp;If the *wind breath* is 70 miles per hour or more, there is a 100 percent chance that small boats capsize, a 70 percent chance that ships capsize, and a 70 percent chance that a man is knocked down and blown 10-40 (10d4) feet to suffer 1-6 hit points of damage per 10 feet blown. There is a 70 percent chance that tree trunks snap, and a 100 percent chance that branches are ripped from trees. Heavy articles are blown away, medium articles are ripped from fastenings, and tents and sails have a 70 percent chance of being destroyed. There is a 20 percent chance that common buildings are blown down and a 60 percent chance that shacks are flattened. Creatures caught in the cone of the *wind breath* suffer 1-8 hit points of damage from blown objects. Flying creatures are blown back 50-100 (40+10d6) feet.'
 };
 
 wiz5['Force Shapechange'] = {
@@ -6312,15 +6311,15 @@ wiz5['Force Shapechange'] = {
     'duration': 'Instantaneous',
     'aoe': '[[@{level-wizard}]] creatures',
     'components': 'V, S, M',
-    'cast-time': '1',
+    'cast-time': '5',
     'saving-throw': '½',
     'materials': 'A hair from the hide of any lycanthrope and a live butterfly, released when the verbal component is uttered.',
     'reference': 'p. 102',
     'book': 'The Complete Wizard\'s Handbook',
-    'damage': '*Saving throw failed*: 3d10\n*Saving throw successful*: 2d10/2',
+    'damage': '[[3d10]]',
     'damage-type': '',
     'healing': '',
-    'effect': 'With this spell, the caster can force any shapechanger or magic-wielder using any form of a *shapechanging* spell to instantly revert to his true form (or his most common form). To use the spell, the caster points at creatures he knows or believes to be shapechangers. If the creatures are indeed shapechangers, they must make a successful saving throw or immediately revert to their true form and suffer 3-30 (3d10) hit points of damage from the wracking pain caused by the forced change. The change takes a full round, during which time a victim can take no other actions. If the saving throw was successful, the victim does not change form, but still suffers half damage (2d10/2).'
+    'effect': 'With this spell, the caster can force any shapechanger or magic-wielder using any form of a *shapechanging* spell to instantly revert to his true form (or his most common form). To use the spell, the caster points at creatures he knows or believes to be shapechangers. If the creatures are indeed shapechangers, they must make a successful saving throw or immediately revert to their true form and suffer 3-30 (3d10) hit points of damage from the wracking pain caused by the forced change. The change takes a full round, during which time a victim can take no other actions. If the saving throw was successful, the victim does not change form, but still suffers half damage (3d10/2).'
 };
 
 wiz5['Invulnerability to Normal Weapons'] = {
@@ -6333,7 +6332,7 @@ wiz5['Invulnerability to Normal Weapons'] = {
     'components': 'V, M',
     'cast-time': '2',
     'saving-throw': 'None',
-    'materials': 'A piece of a broken non-magical weapon and a scale from a dragon',
+    'materials': 'A piece of a broken non-magical weapon and a scale from a dragon.',
     'reference': 'p. 103',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
@@ -6351,7 +6350,7 @@ wiz5['Know Value'] = {
     'components': 'V, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'A copper piece and a phony gem',
+    'materials': 'A copper piece and a phony gem.',
     'reference': 'p. 103',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
@@ -6424,7 +6423,7 @@ wiz5['Throbbing Bones'] = {
     'components': 'V, M',
     'cast-time': '3',
     'saving-throw': '½',
-    'materials': 'Both pieces of a small bone that has been snapped in half',
+    'materials': 'Both pieces of a small bone that has been snapped in half.',
     'reference': 'p. 104',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '[[1d4]]',
@@ -6443,10 +6442,10 @@ wiz5['Wall of Bones'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'The branch of a withered tree taken from a cemetery',
+    'materials': 'The branch of a withered tree taken from a cemetery.',
     'reference': 'p. 104',
     'book': 'The Complete Wizard\'s Handbook',
-    'damage': '*Wiggle through*: 1d8 per 10 feet thickness\n*On cast*: 2d8',
+    'damage': '*Wiggle through*: 1d8 per 10 feet thickness\n*Cast on creature*: 2d8',
     'damage-type': '',
     'healing': '',
     'effect': 'This spell causes a wall of bones to erupt from the earth in whatever shape the caster desires within the limits of the area of effect. The wall is a random construction of bones from many types of creatures. The wall need not be vertical, but it must rest upon a firm foundation or it will collapse. Since the wall has many small openings and gaps, it provides only 50 percent cover. Missiles can easily be fired from behind the wall, and creatures of small size (less than 4 feet tall) can wriggle through openings in the wall at the rate of 10 feet per round. However, the wall has many sharp edges and creatures wriggling through it suffer 1-8 hit points of damage per 10 feet traveled.\n&emsp;If the spell is cast in an area occupied by creatures, the *wall of bones* appears everywhere except where the creatures stand. Creatures in the affected area suffer an immediate 2-16 (2d8) hit points of damage when the wall appears. The wall can be smashed by creatures wielding blunt weapons with a Strength of 18 or greater. Every 10 hit points of damage causes a 5 foot x 5 foot x 6 inch section of the wall to collapse. The *wall of bones* is unaffected by *animate dead*.'
@@ -6462,7 +6461,7 @@ wiz6['Blackmantle'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'Negate',
-    'materials': 'A small mummified animal, such as a mouse or a toad',
+    'materials': 'A small mummified animal, such as a mouse or a toad.',
     'reference': 'p. 104',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
@@ -6480,7 +6479,7 @@ wiz6['Dead Man\'s Eyes'] = {
     'components': 'S, M',
     'cast-time': '1 round',
     'saving-throw': 'Special',
-    'materials': 'Two eyeball-sized glass marbles. The marbles must be the same color as the caster’s eyes',
+    'materials': 'Two eyeball-sized glass marbles. The marbles must be the same color as the caster’s eyes.',
     'reference': 'p. 105',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '2d6',
@@ -6536,13 +6535,13 @@ wiz6['Tentacles'] = {
     'components': 'V, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'A dried tentacle from a small octopus',
+    'materials': 'A dried tentacle from a small octopus.',
     'reference': 'p. 105',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '*Strike*: 1d6\n*Grab*: 2d4',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the caster causes two 10-foot-long greenish tentacles to grow from his body. One tentacle grows on each side of the caster’s body, centered between his armpit and his thigh. The caster can use the tentacles as normal appendages to grasp tools, use weapons, or help with climbing.\n&emsp;Each tentacle can make an attack, effectively giving the caster two extra attacks per round; a tentacle can strike to inflict 1-6 hit points of damage, or it can wield a sword, dagger, or other weapon (at the same ability of the caster). The flexible tentacles can easily reach victims on any side of the caster’s body.\n&emsp;If an unarmed tentacle makes a successful strike against a victim who is man-sized or smaller (less than 7 feet tall), it also grabs and holds the victim to inflict an automatic 2-8 (2d4) hit points of damage in every subsequent round. To free himself, the victim must sever the tentacle; there is no way to loosen the grip other than severing the member, killing the caster, or negating the spell with *dispel magic*. A tentacle is severed if it takes 10 hit points of damage; damage directed at the tentacle has no adverse effects on the caster.\n&emsp;A caster with two intact tentacles adds a 40 percent bonus modifier to his climbing success rate (see page 161 of the Player’s Handbook,) and adds a 20 percent modifier if he has only one intact tentacle.'
+    'effect': 'By means of this spell, the caster causes two 10-foot-long greenish tentacles to grow from his body. One tentacle grows on each side of the caster’s body, centered between his armpit and his thigh. The caster can use the tentacles as normal appendages to grasp tools, use weapons, or help with climbing.\n&emsp;Each tentacle can make an attack, effectively giving the caster two extra attacks per round; a tentacle can strike to inflict 1-6 hit points of damage, or it can wield a sword, dagger, or other weapon (at the same ability of the caster). The flexible tentacles can easily reach victims on any side of the caster’s body.\n&emsp;If an unarmed tentacle makes a successful strike against a victim who is man-sized or smaller (less than 7 feet tall), it also grabs and holds the victim to inflict an automatic 2-8 (2d4) hit points of damage in every subsequent round. To free himself, the victim must sever the tentacle; there is no way to loosen the grip other than severing the member, killing the caster, or negating the spell with *dispel magic*. A tentacle is severed if it takes 10 hit points of damage; damage directed at the tentacle has no adverse effects on the caster.\n&emsp;A caster with two intact *tentacles* adds a 40 percent bonus modifier to his climbing success rate (see page 161 of the Player’s Handbook,) and adds a 20 percent modifier if he has only one intact *tentacle*.'
 };
 
 wiz7['Zombie Double'] = {
@@ -6554,13 +6553,13 @@ wiz7['Zombie Double'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'A bit of wax from a black candle and a lock of hair from the caster',
+    'materials': 'A bit of wax from a black candle and a lock of hair from the caster.',
     'reference': 'p. 106',
     'book': 'The Complete Wizard\'s Handbook',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates a ju-ju zombie duplicate of the caster. The *zombie double* has the same memories, consciousness, and alignment as the caster; essentially, the caster now exists in two bodies simultaneously. In all other respects, the *zombie double* is the same as a normal ju-ju zombie (AC 6; MV 9; HD 3+12; #AT 1; Dmg 3-12; SA strike as a 6 HD monster; SD immune to all mind-affecting spells, including illusions; immune to *sleep*, *charm*, *hold*, *death magic*, *magic missiles*, electricity, poisons, and cold-based spells; edged and cleaving weapons inflict normal damage while blunt and piercing weapons inflict half- damage; magical and normal fire inflicts half-damage); THAC0 16.\n&emsp;The *zombie double* cannot cast spells, but it can use any weapons that the caster can use. It is also able to climb walls as a thief (92 percent). The *zombie double* can be turned as a spectre. If it strays more than 30 yards from the caster, the *zombie double* becomes inactive and collapses to the ground; it becomes active again the instant the caster moves within 30 yards.'
+    'effect': 'This spell creates a ju-ju zombie duplicate of the caster. The *zombie double* has the same memories, consciousness, and alignment as the caster; essentially, the caster now exists in two bodies simultaneously. In all other respects, the *zombie double* is the same as a normal ju-ju zombie (AC 6; MV 9; HD 3+12; #AT 1; Dmg 3-12; SA strike as a 6 HD monster; SD immune to all mind-affecting spells, including illusions; immune to *sleep*, *charm*, *hold*, *death magic*, *magic missiles*, electricity, poisons, and cold-based spells; edged and cleaving weapons inflict normal damage while blunt and piercing weapons inflict half-damage; magical and normal fire inflicts half-damage); THAC0 16.\n&emsp;The *zombie double* cannot cast spells, but it can use any weapons that the caster can use. It is also able to climb walls as a thief (92 percent). The *zombie double* can be turned as a spectre. If it strays more than 30 yards from the caster, the *zombie double* becomes inactive and collapses to the ground; it becomes active again the instant the caster moves within 30 yards.'
 };
 
 wiz8['Defoliate'] = {
@@ -6695,7 +6694,7 @@ wiz1['Hornung\'s Guess'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Hornung, one of the leading wizards in the field of wild magic (before his untimely disappearance while experimenting with wildwind ), developed this spell to improve the accuracy of his estimates. The spell provides a wizard with an instant and highly accurate estimate of the number of persons or objects in a group.\n&emsp;The spell’s area of effect is one group of a general class of objects. All objects of the group must be within spell range and the group as a whole must be visible to the caster. The wizard need not see every individual in the group, merely the general limits of the group’s size and area. For example, a wizard on a hill could look down on a forest and estimate the number of trees in all or part of it. He could not get an estimate of the number of goblins within the forest, however, since the group as a whole (the goblins) is concealed from sight.\n&emsp;The estimate generated is accurate to the largest factor of ten (rounded up). For example, if *Hornung’s guess* were cast on a group of 439 horsemen, the estimate would be 400. If there were 2,670 horsemen, the spell would estimate 3,000. If there were 37 horsemen, the answer would be 40. Clearly, using the spell on small groups (especially those with fewer than 10 members) is pointless.\n&emsp;*Hornung’s guess* can be used to quickly estimate the size of treasure hoards and army units. It is particularly popular with moneylenders and generals.'
+    'effect': 'Hornung, one of the leading wizards in the field of wild magic (before his untimely disappearance while experimenting with *wildwind*), developed this spell to improve the accuracy of his estimates. The spell provides a wizard with an instant and highly accurate estimate of the number of persons or objects in a group.\n&emsp;The spell’s area of effect is one group of a general class of objects. All objects of the group must be within spell range and the group as a whole must be visible to the caster. The wizard need not see every individual in the group, merely the general limits of the group’s size and area. For example, a wizard on a hill could look down on a forest and estimate the number of trees in all or part of it. He could not get an estimate of the number of goblins within the forest, however, since the group as a whole (the goblins) is concealed from sight.\n&emsp;The estimate generated is accurate to the largest factor of ten (rounded up). For example, if *Hornung’s guess* were cast on a group of 439 horsemen, the estimate would be 400. If there were 2,670 horsemen, the spell would estimate 3,000. If there were 37 horsemen, the answer would be 40. Clearly, using the spell on small groups (especially those with fewer than 10 members) is pointless.\n&emsp;*Hornung’s guess* can be used to quickly estimate the size of treasure hoards and army units. It is particularly popular with moneylenders and generals.'
 };
 
 wiz1['Lasting Breath'] = {
@@ -6723,7 +6722,7 @@ wiz1['Metamorphose Liquids'] = {
     'school-spells-and-magic': 'Alteration, Elemental Water, Alchemy',
     'range': 'Touch',
     'duration': 'Permanent',
-    'aoe': '[[@{level-wizard}]]’-cube',
+    'aoe': '[[@{level-wizard}]]’ cube',
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'Special',
@@ -6791,7 +6790,7 @@ wiz1['Patternweave'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': '*Patternweave* allows the caster to make sense of apparent chaos. The caster can see such things as pottery shards reformed into a whole pot, shreds of paper formed into a page, scattered parts as a working machine, or specific trails appearing out of overlapping footprints.\n&emsp;After casting the spell, the mage studies seemingly random elements--broken bits of glass, shreds of paper, intermingled trails, etc. The items to be studied must be tangible--coded flashing lights, garbled speech, or thoughts of any kind cannot be studied.\n&emsp;The wizard must study the random elements for one round, after which the DM secretly makes a saving throw vs. spell for the wizard. If the saving throw is failed, the spell fails. However, if the saving throw is successful, the caster sees in his mind the pattern these objects form. If the items studied are truly random, no information is gained.\n&emsp;After the caster has visualized the pattern, he can attempt to reassemble the parts into their original form. This requires another saving throw vs. spell to determine whether the mage remembers sufficient details to accomplish the task. The amount of time required and the quality of restoration vary according to the complexity of the pattern. Reassembling a shredded map may be easy; reassembling a broken clock is significantly more difficult; rebuilding a shattered mosaic is extremely difficult. In any case, the wizard can make only a reasonable copy of the item. He can use this spell to restore works of art, but they will be worth only a small percentage of their original value.'
+    'effect': '*Patternweave* allows the caster to make sense of apparent chaos. The caster can see such things as pottery shards reformed into a whole pot, shreds of paper formed into a page, scattered parts as a working machine, or specific trails appearing out of overlapping footprints.\n&emsp;After casting the spell, the mage studies seemingly random elements—broken bits of glass, shreds of paper, intermingled trails, etc. The items to be studied must be tangible—coded flashing lights, garbled speech, or thoughts of any kind cannot be studied.\n&emsp;The wizard must study the random elements for one round, after which the DM secretly makes a saving throw vs. spell for the wizard. If the saving throw is failed, the spell fails. However, if the saving throw is successful, the caster sees in his mind the pattern these objects form. If the items studied are truly random, no information is gained.\n&emsp;After the caster has visualized the pattern, he can attempt to reassemble the parts into their original form. This requires another saving throw vs. spell to determine whether the mage remembers sufficient details to accomplish the task. The amount of time required and the quality of restoration vary according to the complexity of the pattern. Reassembling a shredded map may be easy; reassembling a broken clock is significantly more difficult; rebuilding a shattered mosaic is extremely difficult. In any case, the wizard can make only a reasonable copy of the item. He can use this spell to restore works of art, but they will be worth only a small percentage of their original value.'
 };
 
 wiz2['Chaos Shield'] = {
@@ -6855,7 +6854,7 @@ wiz2['Insatiable Thirst'] = {
 
 wiz2['Maximilian\'s Earthen Grasp'] = {
     'level': '2',
-    'school': 'Evocation',
+    'school': 'Alteration',
     'school-spells-and-magic': 'Alteration, Elemental Earth',
     'range': '[[10+10*[[@{level-wizard}]] ]] yards',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
@@ -6944,7 +6943,7 @@ wiz2['Ride the Wind'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell allows creatures targeted by the caster to become virtually weightless and be lifted upon the wind. Affected creatures can control their altitude by rising or descending at a movement rate of 12, but are at the mercy of the wind for speed and direction. Recipients can stop forward movement only by grasping something to anchor them in place. If no wind is present, this spell has no effect.\n&emsp;Unwilling targets are allowed a saving throw to resist the effect.\n&emsp;Each subject and his equipment must weigh less than 100 pounds per level of the caster. Currently [[100*[[@{level-wizard}]] ]] pounds per creature. Thus, a 6th-level wizard could affect six creatures each weighing 600lbs. or less. This spell may be cast only on living creatures.'
+    'effect': 'This spell allows creatures targeted by the caster to become virtually weightless and be lifted upon the wind. Affected creatures can control their altitude by rising or descending at a movement rate of 12, but are at the mercy of the wind for speed and direction. Recipients can stop forward movement only by grasping something to anchor them in place. If no wind is present, this spell has no effect.\n&emsp;Unwilling targets are allowed a saving throw to resist the effect.\n&emsp;Each subject and his equipment must weigh less than 100 pounds per level of the caster. Currently [[100*[[@{level-wizard}]] ]] pounds per creature. Thus, a 6th-level wizard could affect six creatures each weighing 600 lbs. or less. This spell may be cast only on living creatures.'
 };
 
 wiz2['Sense Shifting'] = {
@@ -7038,7 +7037,7 @@ wiz3['Augmentation I'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell augments the damage inflicted by any spell of levels 1-3. For each die of damage rolled, the caster adds one point to the damage total.\n&emsp;The *augmentation I* spell affects only one spell cast on the round immediately following the *augmentation*. If an entire round or more elapses, the *augmentation* is wasted.\n&emsp;Only spells which cause direct physical damage are affected by augmentation; for example, monsters gained through *monster summoning I* gain no bonuses to their damage.'
+    'effect': 'This spell augments the damage inflicted by any spell of levels 1-3. For each die of damage rolled, the caster adds one point to the damage total.\n&emsp;The *augmentation I* spell affects only one spell cast on the round immediately following the *augmentation*. If an entire round or more elapses, the *augmentation* is wasted.\n&emsp;Only spells which cause direct physical damage are affected by *augmentation*; for example, monsters gained through *monster summoning I* gain no bonuses to their damage.'
 };
 
 wiz3['Far Reaching I'] = {
@@ -7086,7 +7085,7 @@ wiz3['Fool\'s Speech'] = {
     'school-spells-and-magic': 'Wild Magic',
     'range': 'Touch',
     'duration': '[[@{level-wizard}]] hours',
-    'aoe': 'Caster+[[@{level-wizard}]] creatures',
+    'aoe': 'Caster + [[@{level-wizard}]] creatures',
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
@@ -7385,7 +7384,7 @@ wiz4['Summon Lycanthrope'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'Negate',
-    'materials': 'A drop of blood from any animal, a human hair, and a moonstone worth at least 150 gp. If the caster elects to create the warding circle, the components described above are also required.',
+    'materials': 'A drop of blood from any animal, a human hair, and a moonstone worth at least 150 gp. If the caster elects to create the warding circle, the components are a specially prepared pigments laced with silver filings. These pigments cost 100 gp for each foot of diameter of the circle. A warding circle must be at least 5 feet in diameter.',
     'reference': 'p. 30',
     'book': 'Tome of Magic',
     'damage': '',
@@ -7406,12 +7405,12 @@ wiz4['There/Not There'] = {
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': 'A small piece of cat fur sealed inside a small box.',
-    'reference': 'p. 31',
+    'reference': 'p. 32',
     'book': 'Tome of Magic',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This peculiar wild magic creates a random fluctuation in the probabilities of existence. The spell can be cast only upon nonliving objects and can affect only materials within a 10’×10’×10’ cube.\n&emsp;Objects in the area of effect either remain normal and visible or they disappear (50% chance). The state of existence for any object is determined randomly and changes with each viewing and viewer. Thus, a single object could appear and disappear several times during the course of the spell. Furthermore, it might be “there“ for one onlooker, but “not there“ for another.\n&emsp;For example, a wild mage casts this spell on a doorway. The DM rolls percentile dice and determines the door is “there“ for the wizard. The wizard’s companion also looks at the door. The DM rolls and determines that the door is “not there“ for the companion. The pair studies the door for several minutes, during which time the door does not change (this counts as a single viewing for each character).\n&emsp;The wizard and his companion then close their eyes. When they look at the door again, new checks for each character reveal the door is “not there” for both characters. The pair steps through the open archway and turns around to look at the door once again. This time it is “not there” for the wizard, but “there” for his companion. This random changing continues throughout the duration of the spell.\n&emsp;Objects that are “there” are normal in all respects. Doors can be opened, chests can be picked up and carried, and rocks can be used as barricades. Objects that are “not there” are gone, although their absence does not cause ceilings to collapse or other damage. A wizard could walk through a “not there” wall without difficulty.\n&emsp;When two parties perceive a *there/not there* object differently, the object functions for each party according to its own perceptions. For example, a wizard hides behind a rock that he sees as “there.” Her enemy, a fighter, perceives the rock as “not there” and fires arrows at the wizard. The wizard would perceive the arrows as bouncing off the rock, while the fighter would perceive the arrows as missing their target or falling short. The fighter would be subject to a check before firing each arrow to determine whether his perception changes (assume that the fighter must look away from the rock every time he nocks an arrow; each time he takes aim, this counts as a new viewing).\n&emsp;After the spell is cast, any objects removed from the area of effect retain their uncertain existence for the duration of the spell. Thus, a pair of heroes could pick up a treasure chest, carry it down the hall, set it down, and discover it had vanished while their backs were turned. Worse still, one might see the chest and the other not!'
+    'effect': 'This peculiar wild magic creates a random fluctuation in the probabilities of existence. The spell can be cast only upon nonliving objects and can affect only materials within a 10’×10’×10’ cube.\n&emsp;Objects in the area of effect either remain normal and visible or they disappear (50% chance). The state of existence for any object is determined randomly and changes with each viewing and viewer. Thus, a single object could appear and disappear several times during the course of the spell. Furthermore, it might be “there” for one onlooker, but “not there” for another.\n&emsp;For example, a wild mage casts this spell on a doorway. The DM rolls percentile dice and determines the door is “there” for the wizard. The wizard’s companion also looks at the door. The DM rolls and determines that the door is “not there” for the companion. The pair studies the door for several minutes, during which time the door does not change (this counts as a single viewing for each character).\n&emsp;The wizard and his companion then close their eyes. When they look at the door again, new checks for each character reveal the door is “not there” for both characters. The pair steps through the open archway and turns around to look at the door once again. This time it is “not there” for the wizard, but “there” for his companion. This random changing continues throughout the duration of the spell.\n&emsp;Objects that are “there” are normal in all respects. Doors can be opened, chests can be picked up and carried, and rocks can be used as barricades. Objects that are “not there” are gone, although their absence does not cause ceilings to collapse or other damage. A wizard could walk through a “not there” wall without difficulty.\n&emsp;When two parties perceive a *there/not there* object differently, the object functions for each party according to its own perceptions. For example, a wizard hides behind a rock that he sees as “there.” Her enemy, a fighter, perceives the rock as “not there” and fires arrows at the wizard. The wizard would perceive the arrows as bouncing off the rock, while the fighter would perceive the arrows as missing their target or falling short. The fighter would be subject to a check before firing each arrow to determine whether his perception changes (assume that the fighter must look away from the rock every time he nocks an arrow; each time he takes aim, this counts as a new viewing).\n&emsp;After the spell is cast, any objects removed from the area of effect retain their uncertain existence for the duration of the spell. Thus, a pair of heroes could pick up a treasure chest, carry it down the hall, set it down, and discover it had vanished while their backs were turned. Worse still, one might see the chest and the other not!'
 };
 
 wiz4['Thunder Staff'] = {
@@ -7427,7 +7426,7 @@ wiz4['Thunder Staff'] = {
     'materials': 'A vial of rain gathered during a thunderstorm and the wizard’s staff, which must be made of oak. The staff is not destroyed during casting.',
     'reference': 'p. 32',
     'book': 'Tome of Magic',
-    'damage': '(4d4+4)/2',
+    'damage': '(4d4+4)/2\n*Giant-sized*: (2d4+2)/2',
     'damage-type': '',
     'healing': '',
     'effect': 'Upon completion of this spell, the wizard raps his staff on the ground and produces a thundering cone of force 5’ wide at the apex, 20’ wide at the base, and 40’ long. All creatures wholly or partially within this cone must roll a successful saving throw or be stunned for 1d3 rounds. Stunned creatures are unable to think coherently or act during this time and are deafened for 1d3+1 rounds. Additionally, those who fail the save are hurled 4d4+4 feet by the wave of force, suffering 1 point of damage per two feet thrown. Intervening surfaces (walls, doors, etc.) may restrict this distance, but damage remains the same (4d4+4).\n&emsp;If the save is successful, the victim is not stunned, but is deafened for 1d3+1 rounds and is hurled only half the distance.\n&emsp;Giant-sized or larger creatures who succeed at their saving throws are deafened but are not thrown, suffer no loss of hit points, and are not stunned. If the saving throw is failed, such creatures are hurled 2d4+2 feet, suffer one point of damage per two feet thrown, and are deafened and stunned.\n&emsp;The cone of force is considered to have a Strength of 19 for purposes of opening locked, barred, or magically held doors. This spell can move objects weighing up to 640 pounds a maximum distance of 4d4+4 feet. Fragile items must make a saving throw vs. crushing blow or be destroyed.'
@@ -7449,7 +7448,7 @@ wiz4['Turn Pebble to Boulder'] = {
     'damage': '3d6+8',
     'damage-type': '',
     'healing': '',
-    'effect': 'At the culmination of this spell, the caster hurls a pebble which grows and increases in speed, becoming a deadly boulder that inflicts 3d6+8 points of damage if it strikes the target. (The rules for boulders as missile weapons apply as described in the *DUNGEON MASTER Guide.*) The caster’s THAC0 is used to determine success, and the caster is considered to be proficient with the thrown pebble and receives no penalty for range. The maximum range of attack is equal to 50 feet plus 10 feet per level of the caster. Currently [[50+10*[[@{level-wizard}]] ]] feet. Only the caster may throw the pebble.\n&emsp;The wizard can enchant one stone at 7th level and gains one stone per three levels of experience thereafter (two stones at 10th level, three at 13th level, etc.). Currently [[floor(([[@{level-wizard}]]-4)/3)]] pebble(s). Only one pebble may be thrown per round, and pebbles must be hurled in consecutive rounds. The spell has a duration in rounds equal to the number of pebbles enchanted. Each pebble requires a separate attack roll. Pebbles may be thrown at different targets within range.\n&emsp;The reverse of this spell, *turn boulder to pebble*, shrinks a boulder to the size of a pebble. It affects only naturally occurring rocks and can not be used to shrink a statue or a cut gemstone.\n&emsp;The number of rocks that may be affected is equal to the number of experience levels of the caster. Currently [[@{level-wizard}]] boulders. Boulders must not exceed one cubic foot per level of the caster. Currently [[10*[[@{level-wizard}]] ]] cubic-feet. Thus, a 10th-level wizard could shrink 10 rocks, each of which is equal to or less than 10 cubic feet in size. All rocks are affected in the same round the spell is cast. Though they need not be touched, the boulders must be within 50 feet of the caster. Boulders that have been shrunk remain so until dispelled.'
+    'effect': 'At the culmination of this spell, the caster hurls a pebble which grows and increases in speed, becoming a deadly boulder that inflicts 3d6+8 points of damage if it strikes the target. (The rules for boulders as missile weapons apply as described in the *DUNGEON MASTER Guide.*) The caster’s THAC0 is used to determine success, and the caster is considered to be proficient with the thrown pebble and receives no penalty for range. The maximum range of attack is equal to 50 feet plus 10 feet per level of the caster. Currently [[50+10*[[@{level-wizard}]] ]] feet. Only the caster may throw the pebble.\n&emsp;The wizard can enchant one stone at 7th level and gains one stone per three levels of experience thereafter (two stones at 10th level, three at 13th level, etc.). Currently [[floor(([[@{level-wizard}]]-4)/3)]] pebble(s). Only one pebble may be thrown per round, and pebbles must be hurled in consecutive rounds. The spell has a duration in rounds equal to the number of pebbles enchanted. Each pebble requires a separate attack roll. Pebbles may be thrown at different targets within range.\n&emsp;The reverse of this spell, *turn boulder to pebble*, shrinks a boulder to the size of a pebble. It affects only naturally occurring rocks and can not be used to shrink a statue or a cut gemstone.\n&emsp;The number of rocks that may be affected is equal to the number of experience levels of the caster. Currently [[@{level-wizard}]] boulders. Boulders must not exceed one cubic foot per level of the caster. Currently [[@{level-wizard}]] cubic feet. Thus, a 10th-level wizard could shrink 10 rocks, each of which is equal to or less than 10 cubic feet in size. All rocks are affected in the same round the spell is cast. Though they need not be touched, the boulders must be within 50 feet of the caster. Boulders that have been shrunk remain so until dispelled.'
 };
 
 wiz4['Unluck'] = {
@@ -7469,7 +7468,7 @@ wiz4['Unluck'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'With this spell, the wild mage creates a negative pattern in the random forces surrounding one creature. The creature is allowed a saving throw; if successful, the spell fails. If the saving throw is failed, random chance falls into an *unluck*y pattern. Any action involving random chance (i.e., any time a die roll affects the character) performed by the victim during the next 2-20 rounds requires two separate attempts; the worse result is always applied. (The victim rolls twice for attacks, damages, saving throws, etc., always using the worse die roll.)\n&emsp;A *luckstone* or similar magical device will negate *unluck*. Doing so, however, prevents the magical item from functioning for 2d10 rounds.'
+    'effect': 'With this spell, the wild mage creates a negative pattern in the random forces surrounding one creature. The creature is allowed a saving throw; if successful, the spell fails. If the saving throw is failed, random chance falls into an unlucky pattern. Any action involving random chance (i.e., any time a die roll affects the character) performed by the victim during the next 2-20 rounds requires two separate attempts; the worse result is always applied. (The victim rolls twice for attacks, damages, saving throws, etc., always using the worse die roll.)\n&emsp;A *luckstone* or similar magical device will negate *unluck*. Doing so, however, prevents the magical item from functioning for 2d10 rounds.'
 };
 
 wiz5['Far Reaching III'] = {
@@ -7506,14 +7505,14 @@ wiz5['Khazid\'s Procurement'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell allows the caster to more easily access rare or dangerous spell components. The wizard casts this spell upon a silver mirror while concentrating on a mental image of the material he desires. The base chance of success is 50%, modified by the following factors:\n&emsp;•+1% per level of the caster ([[@{level-wizard}]]%)\n&emsp;•+10% if the caster has seen the same type of substance or object before; this bonus is\n&emsp;not cumulative with the following bonus\n&emsp;•+20% if the caster has a sample of the material or the same type of object in his\n&emsp;possession; this bonus is not cumulative with the bonus above\n&emsp;•+30% if the wizard knows the location of the desired object\n&emsp;•-50% if the caster has never seen the same type of material or item before\n&emsp;If the percentile roll indicates failure, the caster is unable to locate the desired ingredient and the spell ends. If the roll indicates success, the wizard has located the object or substance and the mirror becomes a magical gate through which the caster can see the target. The size of the gate is determined by the size of the mirror, to a maximum size of 3 feet by 2 feet.\n&emsp;The gate always appears within arm’s length of the target, allowing the wizard to reach through the mirror, grasp the object of his desire, and draw it back through the gate. The wizard must risk his own safety--the gate does not allow the use of probes, long-handled ladles, tongs, or other equipment to gather the material. The caster cannot move completely through the gate.\n&emsp;The gate vanishes when the spell’s duration expires or when the target or the wizard moves more than 10’ away from it.\n&emsp;The gate is visible from both sides, and other creatures can reach through the gate. Breath weapons, gaze attacks, missiles, spells, and similar attacks cannot be cast through the gate. Because creatures can pass their limbs through the gate, physical attacks and touch spells can be used.\n&emsp;The only limit to the range of this spell is that the caster and the target must be on the same plane of existence. Elemental forces (not creatures) will not pass through the gate. Thus, the wizard does not run the risk of flooding his laboratory by opening a gate beneath the sea, for example. However, the spell does not provide any sort of protection against a hostile environment.'
+    'effect': 'This spell allows the caster to more easily access rare or dangerous spell components. The wizard casts this spell upon a silver mirror while concentrating on a mental image of the material he desires. The base chance of success is 50%, modified by the following factors:}}{{style=min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c4-1=•}}{{c5-1=•}}{{c1-2=+1% per level of the caster. Currently +[[@{level-wizard}]]%}}{{c2-2=+10% if the caster has seen the same type of substance or object before; this bonus is not cumulative with the following bonus}}{{c3-2=+20% if the caster has a sample of the material or the same type of object in his possession; this bonus is not cumulative with the bonus above}}{{c4-2=+30% if the wizard knows the location of the desired object}}{{c5-2=-50% if the caster has never seen the same type of material or item before}}{{effects2=&emsp;If the percentile roll indicates failure, the caster is unable to locate the desired ingredient and the spell ends. If the roll indicates success, the wizard has located the object or substance and the mirror becomes a magical gate through which the caster can see the target. The size of the gate is determined by the size of the mirror, to a maximum size of 3 feet by 2 feet.\n&emsp;The gate always appears within arm’s length of the target, allowing the wizard to reach through the mirror, grasp the object of his desire, and draw it back through the gate. The wizard must risk his own safety—the gate does not allow the use of probes, long-handled ladles, tongs, or other equipment to gather the material. The caster cannot move completely through the gate.\n&emsp;The gate vanishes when the spell’s duration expires or when the target or the wizard moves more than 10’ away from it.\n&emsp;The gate is visible from both sides, and other creatures can reach through the gate. Breath weapons, gaze attacks, missiles, spells, and similar attacks cannot be cast through the gate. Because creatures can pass their limbs through the gate, physical attacks and touch spells can be used.\n&emsp;The only limit to the range of this spell is that the caster and the target must be on the same plane of existence. Elemental forces (not creatures) will not pass through the gate. Thus, the wizard does not run the risk of flooding his laboratory by opening a gate beneath the sea, for example. However, the spell does not provide any sort of protection against a hostile environment.'
 };
 
 wiz5['Lower Resistance'] = {
     'level': '5',
     'school': 'Abjuration, Alteration',
     'range': '60 yards',
-    'duration': '1 trun+[[@{level-wizard}]] rounds',
+    'duration': '1 turn+[[@{level-wizard}]] rounds',
     'aoe': 'One creature',
     'components': 'V, S, M',
     'cast-time': '5',
@@ -7542,7 +7541,7 @@ wiz5['Magic Staff'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell allows a wizard’s staff to store one spell level for every three levels of the caster. Currently [[floor([[@{level-wizard}]]/3)]] spell levels. Thus, a 9th-level wizard can store three spell levels (three 1st-level spells, one 1st and one 2nd, or one 3rd-level spell).\n&emsp;Spells that are to be stored in the staff must be memorized normally by the wizard. The spells are then cast as normal when charging the staff; casting requires the spell’s normal casting time plus one round. The spell is wiped from memory and material components are consumed. All spells to be stored must be cast into the staff within 1 turn.\n&emsp;All stored spells have a casting time of 1.\n&emsp;Spells remain in the staff until cast or dispelled, or up to 1 hour per level of the caster ([[@{level-wizard}]] hours). After this time, all stored spells fade away.\n&emsp;Only wizards who know the *magic staff* spell can cast spells from another wizard’s staff. This applies to wizards who have never learned or could not normally cast the spells stored in a staff. It is common, however, for the staff’s owner to implement a command word which must be known by anyone wishing to use the staff.'
+    'effect': 'This spell allows a wizard’s staff to store one spell level for every three levels of the caster. Currently [[floor([[@{level-wizard}]]/3)]] spell levels. Thus, a 9th-level wizard can store three spell levels (three 1st-level spells, one 1st and one 2nd, or one 3rd-level spell).\n&emsp;Spells that are to be stored in the staff must be memorized normally by the wizard. The spells are then cast as normal when charging the staff; casting requires the spell’s normal casting time plus one round. The spell is wiped from memory and material components are consumed. All spells to be stored must be cast into the staff within 1 turn.\n&emsp;All stored spells have a casting time of 1.\n&emsp;Spells remain in the staff until cast or dispelled, or up to 1 hour per level of the caster. Currently [[@{level-wizard}]] hours. After this time, all stored spells fade away.\n&emsp;Only wizards who know the *magic staff* spell can cast spells from another wizard’s staff. This applies to wizards who have never learned or could not normally cast the spells stored in a staff. It is common, however, for the staff’s owner to implement a command word which must be known by anyone wishing to use the staff.'
 };
 
 wiz5['Mind Fog'] = {
@@ -7627,7 +7626,7 @@ wiz5['Waveform'] = {
     'school-spells-and-magic': 'Wild Magic',
     'range': '40 yards',
     'duration': '[[1d10]] rounds',
-    'aoe': '10-foot-cube/level',
+    'aoe': '[[10*[[@{level-wizard}]] ]]-foot-cube',
     'components': 'S, M',
     'cast-time': '5',
     'saving-throw': '½',
@@ -7637,7 +7636,7 @@ wiz5['Waveform'] = {
     'damage': '*Normal creatures*: [[@{level-wizard}]]d4\n*Water-based creatures*: [[@{level-wizard}]]d6',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wild mage is able to shape and direct the patterns of water currents, allowing him to mold liquids into a variety of forms. The spell affects a quantity of liquid no larger than the area of effect. If cast onto a larger body, such as an ocean or large lake, the spell affects only the water within the area of effect.\n&emsp;After casting *waveform*, the mage can form the water into any desired shape. The spell does not bind the liquid together in any fashion; it is still limited by its fluid properties and gravity. Thus, a mage could not use *waveform* to create a humanoid creature with arms and legs and direct it to walk across land. He could, however, create a roughly human shape with flowing arms that rises out of the water, crashes forward in a huge splash, then rises and repeats the process. Other possible shapes include gigantic waves, geysers, whirlpools, and troughs.\n&emsp;The shape takes one round to form, after which it can be maintained by concentration. The shape can be directed to move in any direction at the rate of 90 feet per round. If the *waveform* moves into or through a body of water, the form loses no intensity. However, if the wave is moved over dry ground, it loses one die of damage for every 10 feet crossed.\n&emsp;If propelled against a target, the *waveform* causes 1d4 points of damage per level of the caster to creatures in its path. The *waveform* can be directed against creatures on the surface or underwater. Those struck are allowed a saving throw; success indicates half damage.\n&emsp;If the victims are in or on a body of water, the shape will sweep them along. Creatures of small size are carried with the form, moving at its speed. Medium and large size creatures are swept along at half the water’s speed. Creatures larger than this resist the movement. Those caught in the current can make a Strength check each round to swim free of the current.\n&emsp;Boats and ships are particularly vulnerable to the *waveform*. If the *waveform* is twice the size of the vessel or more, the ship must make a seaworthiness check (as described in Table 77 of the *DMG*). Vessels passing the check suffer damage as described above, reducing seaworthiness ratings for future checks by 2d6 points until repairs are made.\n&emsp;Alternatively, this spell can be cast directly at a single water-based creature--a water weird, water elemental, or other creature from the elemental plane of water. In this case, the spell causes 1d6 points of damage per level of the caster. The effect is instantaneous and the spell ends immediately after the attack is made.'
+    'effect': 'By means of this spell, the wild mage is able to shape and direct the patterns of water currents, allowing him to mold liquids into a variety of forms. The spell affects a quantity of liquid no larger than the area of effect. If cast onto a larger body, such as an ocean or large lake, the spell affects only the water within the area of effect.\n&emsp;After casting *waveform*, the mage can form the water into any desired shape. The spell does not bind the liquid together in any fashion; it is still limited by its fluid properties and gravity. Thus, a mage could not use *waveform* to create a humanoid creature with arms and legs and direct it to walk across land. He could, however, create a roughly human shape with flowing arms that rises out of the water, crashes forward in a huge splash, then rises and repeats the process. Other possible shapes include gigantic waves, geysers, whirlpools, and troughs.\n&emsp;The shape takes one round to form, after which it can be maintained by concentration. The shape can be directed to move in any direction at the rate of 90 feet per round. If the *waveform* moves into or through a body of water, the form loses no intensity. However, if the wave is moved over dry ground, it loses one die of damage for every 10 feet crossed.\n&emsp;If propelled against a target, the *waveform* causes 1d4 points of damage per level of the caster to creatures in its path. The *waveform* can be directed against creatures on the surface or underwater. Those struck are allowed a saving throw; success indicates half damage.\n&emsp;If the victims are in or on a body of water, the shape will sweep them along. Creatures of small size are carried with the form, moving at its speed. Medium and large size creatures are swept along at half the water’s speed. Creatures larger than this resist the movement. Those caught in the current can make a Strength check each round to swim free of the current.\n&emsp;Boats and ships are particularly vulnerable to the *waveform*. If the *waveform* is twice the size of the vessel or more, the ship must make a seaworthiness check (as described in Table 77 of the *DMG*). Vessels passing the check suffer damage as described above, reducing seaworthiness ratings for future checks by 2d6 points until repairs are made.\n&emsp;Alternatively, this spell can be cast directly at a single water-based creature—a water weird, water elemental, or other creature from the elemental plane of water. In this case, the spell causes 1d6 points of damage per level of the caster. The effect is instantaneous and the spell ends immediately after the attack is made.'
 };
 
 wiz6['Augmentation II'] = {
@@ -7675,7 +7674,7 @@ wiz6['Bloodstone\'s Spectral Steed'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell allows a wizard to create a quasi-real, vulturelike creature. The flying steed can carry the caster and one other person per three levels of the wizard’s experience (four at 12th level, five at 15th, etc.). All passengers must be specifically named during the casting.\n&emsp;The spectral steed looks like a huge, skeletal vulture with tattered wings. As it flies, it utters hideous screeches that echo through the sky. The spectral steed flies at a movement rate of 4 per level of the caster, to a maximum movement rate of 48. Currently [[{[[4*[[@{level-wizard}]] ]],48}kl1]] movement rate. It appears with a bit and bridle, plus one saddle per passenger.\n&emsp;All normal animals shun the spectral steed and only monsters will attack it. The mount has AC 2 and 10 hit points plus 1 hit point per level of the caster. Currently [[10+[[@{level-wizard}]] ]] hit points. If it loses all of its hit points, the spectral steed disappears. It has no attack mode.'
+    'effect': 'This spell allows a wizard to create a quasi-real, vulturelike creature. The flying steed can carry the caster and one other person per three levels of the wizard’s experience (four at 12th level, five at 15th, etc.). Currently [[1+floor([[@{level-wizard}]]/4)]] passengers. All passengers must be specifically named during the casting.\n&emsp;The spectral steed looks like a huge, skeletal vulture with tattered wings. As it flies, it utters hideous screeches that echo through the sky. The spectral steed flies at a movement rate of 4 per level of the caster, to a maximum movement rate of 48. Currently [[{4*[[@{level-wizard}]],48}kl1]] movement rate. It appears with a bit and bridle, plus one saddle per passenger.\n&emsp;All normal animals shun the spectral steed and only monsters will attack it. The mount has AC 2 and 10 hit points plus 1 hit point per level of the caster. Currently [[10+[[@{level-wizard}]] ]] hit points. If it loses all of its hit points, the spectral steed disappears. It has no attack mode.'
 };
 
 wiz6['Claws of the Umber Hulk'] = {
@@ -7690,7 +7689,7 @@ wiz6['Claws of the Umber Hulk'] = {
     'materials': 'An umber hulk’s claw.',
     'reference': 'p. 38',
     'book': 'Tome of Magic',
-    'damage': '',
+    'damage': '2d6 per attack',
     'damage-type': '',
     'healing': '',
     'effect': 'When this spell is cast, the subject’s hands widen and his fingernails thicken and grow, becoming equivalent in size and power to the iron-like claws of an umber hulk. The transformation takes one full round and is excruciatingly painful, requiring a system shock roll. A failed roll causes the subject to suffer 3d4 points of damage.\n&emsp;The subject can burrow as an umber hulk, cutting through 10 feet of solid stone or 60 feet of soil per turn. The only limitation to this is the subject’s stamina; at the end of each turn of burrowing, the subject must succeed a Constitution check or be forced to rest for one turn.\n&emsp;Burrowing through soil does not necessarily create a passable tunnel. If the subject wishes to make a passage in which others can travel or that he can exit when the spell ends, he must dig at a rate of 30 feet per turn. Cutting a tunnel through solid rock does not require extra care or time.\n&emsp;The recipient of this spell can make two claw attacks per round, each inflicting 2d6 points of damage plus any Strength bonuses. Each attack is made with a -2 penalty to hit. This penalty applies until the subject has made two successful consecutive attacks (not necessarily in the same round), at which time he is accustomed to using the claws. The penalty is dropped for the remainder of the spell.'
@@ -7711,7 +7710,7 @@ wiz6['Dilation II'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell functions exactly like the 4th-level *dilation I* spell, except that the area of effect of a 1st-, 2nd-, or 3rd- level spell is extended by 50%. Alternatively, the wizard may extend the area of effect of one 4th- or 5th-level spell by 25%.'
+    'effect': 'This spell functions exactly like the 4th-level *dilation I* spell, except that the area of effect of a 1st-, 2nd-, or 3rd-level spell is extended by 50%. Alternatively, the wizard may extend the area of effect of one 4th- or 5th-level spell by 25%.'
 };
 
 wiz6['Forest\'s Fiery Constrictor'] = {
@@ -7808,7 +7807,7 @@ wiz7['Acid Storm'] = {
     'damage': '*Round 1-3:* [[1d4]]}}{{d2t=[[{[[@{level-wizard}]],0}>4]]}}{{d2=\n*Round 4-6:* [[1d6]]}}{{d3t=[[{[[@{level-wizard}]],0}>7]]}}{{d3=\n*Round 7+:* [[1d8]]',
     'damage-type': 'Acid',
     'healing': '',
-    'effect': 'This deadly spell unleashes a downpour of magical, gelatinous acid droplets. All creatures within the area of effect are coated by globs of gooey acid. The acid can be washed off only with wine, vinegar, or by a successful dispel magic or similar spell. The acid remains present for 1 round per level of the caster, then vanishes.\n&emsp;Creatures coated by the acid suffer 1d4 hit points of damage each round during rounds 1-3, 1d6 points in each of rounds 4-6, and 1d8 points on each round thereafter. Characters who successfully save vs. spells during the first round suffer only half damage from the acid for the remaining rounds. When the spell expires, no further damage is inflicted.'
+    'effect': 'This deadly spell unleashes a downpour of magical, gelatinous acid droplets. All creatures within the area of effect are coated by globs of gooey acid. The acid can be washed off only with wine, vinegar, or by a successful *dispel magic* or similar spell. The acid remains present for 1 round per level of the caster, then vanishes.\n&emsp;Creatures coated by the acid suffer 1d4 hit points of damage each round during rounds 1-3, 1d6 points in each of rounds 4-6, and 1d8 points on each round thereafter. Characters who successfully save vs. spells during the first round suffer only half damage from the acid for the remaining rounds. When the spell expires, no further damage is inflicted.\n&emsp;Acid damage can be healed through any means except regeneration.'
 };
 
 wiz7['Bloodstone\'s Frightful Joining'] = {
@@ -7826,7 +7825,7 @@ wiz7['Bloodstone\'s Frightful Joining'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this powerful spell is employed, the wizard transfers his spirit to the body of an undead creature, totally dominating it. If the undead creature has intelligence, it is allowed a saving throw vs. spell to resist the joining. If the save is successful, the caster’s spirit is forced back into his own body. The wizard must make a system shock roll; if the roll fails, the wizard suffers 5d6 points of damage. If the roll succeeds, the wizard suffers half this damage.\n&emsp;If the creature’s save fails, the necromancer joins his life essence with that of the undead. While in the creature’s body, the caster can use all of its special attacks and innate abilities, excluding spells memorized by the creature.\n&emsp;The wizard’s body remains comatose, is subject to all regular attacks, and suffers damage normally. The wizard’s spirit can travel an unlimited distance from his physical body as long as they remain on the same plane of existence.\n&emsp;If intelligent, the possessed undead continually tries to purge the caster with mental threats that can be heard only by the wizard. The thoughts of the undead are ghastly. During the first minute of each hour of possession, the caster must succeed an Intelligence check in order to retain his sanity. The roll is modified by the difference between the creature’s Intelligence and that of the spellcaster. If the undead has a higher score, the difference is added to the die roll. If the necromancer has a higher Intelligence, the difference is subtracted from the roll.\n&emsp;If the roll is successful, nothing happens and the caster may continue to possess the undead. If the Intelligence roll fails, the wizard’s intellect degenerates, making him a raving, homicidal maniac. His spirit is immediately forced to return to his body, and he must attempt a system shock roll with damage occurring as outlined above. The caster remains dangerously insane until a *heal* or *wish spell* is used to restore his intellect.\n&emsp;This spell can be very useful when combined with the *mask of death* spell.\n&emsp;When the spell’s duration expires, the necromancer’s spirit immediately returns to his body.'
+    'effect': 'When this powerful spell is employed, the wizard transfers his spirit to the body of an undead creature, totally dominating it. If the undead creature has intelligence, it is allowed a saving throw vs. spell to resist the joining. If the save is successful, the caster’s spirit is forced back into his own body. The wizard must make a system shock roll; if the roll fails, the wizard suffers 5d6 points of damage. If the roll succeeds, the wizard suffers half this damage.\n&emsp;If the creature’s save fails, the necromancer joins his life essence with that of the undead. While in the creature’s body, the caster can use all of its special attacks and innate abilities, excluding spells memorized by the creature.\n&emsp;The wizard’s body remains comatose, is subject to all regular attacks, and suffers damage normally. The wizard’s spirit can travel an unlimited distance from his physical body as long as they remain on the same plane of existence.\n&emsp;If intelligent, the possessed undead continually tries to purge the caster with mental threats that can be heard only by the wizard. The thoughts of the undead are ghastly. During the first minute of each hour of possession, the caster must succeed an Intelligence check in order to retain his sanity. The roll is modified by the difference between the creature’s Intelligence and that of the spellcaster. If the undead has a higher score, the difference is added to the die roll. If the necromancer has a higher Intelligence, the difference is subtracted from the roll.\n&emsp;If the roll is successful, nothing happens and the caster may continue to possess the undead. If the Intelligence roll fails, the wizard’s intellect degenerates, making him a raving, homicidal maniac. His spirit is immediately forced to return to his body, and he must attempt a system shock roll with damage occurring as outlined above. The caster remains dangerously insane until a *heal* or *wish* spell is used to restore his intellect.\n&emsp;This spell can be very useful when combined with the *mask of death* spell.\n&emsp;When the spell’s duration expires, the necromancer’s spirit immediately returns to his body.'
 };
 
 wiz7['Hatch the Stone from the Egg'] = {
@@ -7839,7 +7838,7 @@ wiz7['Hatch the Stone from the Egg'] = {
     'components': 'V, S, M',
     'cast-time': '[[1d4+4]] hours',
     'saving-throw': 'None',
-    'materials': 'A magical item known as the *philosopher’s egg*, which is an enchanted retort used to hold the alchemical mixture. The egg is not destroyed upon completion of the spell and may be used again. (Further details about the *philosopher’s egg* are found in Chapter 4 of the Tome of Magic.)',
+    'materials': 'A magical item known as the *philosopher’s egg*, which is an enchanted retort used to hold the alchemical mixture. The egg is not destroyed upon completion of the spell and may be used again. (Further details about the *philosopher’s egg* are found in Chapter 4 of the Tome of Magic.).',
     'reference': 'p. 40',
     'book': 'Tome of Magic',
     'damage': '',
@@ -7865,7 +7864,7 @@ wiz7['Hornung\'s Surge Selector'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The great Hornung, having been blasted more than once by his own wild surges, devised a method of improving the results of wild magic and, not incidentally, his own chances of survival. The result was *Hornung’s surge selector*.\n&emsp;By casting this spell, the wild mage gains greater control over wild surges. When the caster’s spell creates a wild surge, two separate results are determined from Table 2. The caster can then choose which of the two results will take effect. This spell can be used in conjunction with *Nahal’s reckless dweomer*.\n&emsp;The spell’s duration is a fixed number of surges or 12 hours, whichever comes first. The wild mage is able to shape one wild surge per five levels of his experience; thus, a 15th-level caster could shape three wild surges within a 12-hour period. Currently [[floor([[@{level-wizard}]]/5)]] wild surges. At the end of 12 hours, the spell expires, regardless of the number of surges remaining.'
+    'effect': 'The great Hornung, having been blasted more than once by his own wild surges, devised a method of improving the results of wild magic and, not incidentally, his own chances of survival. The result was *Hornung’s surge selector*. By casting this spell, the wild mage gains greater control over wild surges. When the caster’s spell creates a wild surge, two separate results are determined from Table 2. The caster can then choose which of the two results will take effect. This spell can be used in conjunction with *Nahal’s reckless dweomer*.\n&emsp;The spell’s duration is a fixed number of surges or 12 hours, whichever comes first. The wild mage is able to shape one wild surge per five levels of his experience; thus, a 15th-level caster could shape three wild surges within a 12-hour period. Currently [[floor([[@{level-wizard}]]/5)]] wild surges. At the end of 12 hours, the spell expires, regardless of the number of surges remaining.'
 };
 
 wiz7['Intensify Summoning'] = {
@@ -7941,7 +7940,7 @@ wiz7['Spell Shape'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell gives the wild mage the ability to seize magical energy directed at him and reshape it as he desires. While it is in effect, the spell gives no visible sign of its existence. It offers no protection against area effect spells.\n&emsp;If a wild mage is the target of a spell or magical item, this spell automatically allows him a saving throw. If the saving throw is failed, the opponent’s spell has normal effects. If the saving throw is successful, the *spell shape* absorbs the magical energy of the opponent’s spell. The wild mage can then choose to let the energy dissipate or he can instantly use it to cast a spell back at the opposing mage. The return spell must be of an equal or lesser spell level than the original one and must be currently memorized by the mage. The act of returning the spell does not cost the wild mage any of his memorized spells. Spell energy cannot be saved; if not used immediately, it dissipates.\n&emsp;For example, Hamos, a wild mage, is protected by a *spell shape* and is struck by a *finger of death* (a 7th-level spell). He succeeds at his saving throw and is now able to cast a spell of 7th level or lower. Hamos currently has *feeblemind memorized*. Since it is only a 5th-level spell, he chooses to cast it back at his enemy. He makes his level variation check (and doesn’t get a wild surge) and the *feeblemind* is sent hurtling back at his foe. Hamos still has his original *feeblemind* memorized. The remaining two spell levels are lost, since they were not used in the same round.\n&emsp;If a wild mage is struck by two spells at once, he may choose which spell to shape. He suffers all effects of the remaining spell.'
+    'effect': 'This spell gives the wild mage the ability to seize magical energy directed at him and reshape it as he desires. While it is in effect, the spell gives no visible sign of its existence. It offers no protection against area effect spells.\n&emsp;If a wild mage is the target of a spell or magical item, this spell automatically allows him a saving throw. If the saving throw is failed, the opponent’s spell has normal effects. If the saving throw is successful, the *spell shape* absorbs the magical energy of the opponent’s spell. The wild mage can then choose to let the energy dissipate or he can instantly use it to cast a spell back at the opposing mage. The return spell must be of an equal or lesser spell level than the original one and must be currently memorized by the mage. The act of returning the spell does not cost the wild mage any of his memorized spells. Spell energy cannot be saved; if not used immediately, it dissipates.\n&emsp;For example, Hamos, a wild mage, is protected by a *spell shape* and is struck by a *finger of death* (a 7th-level spell). He succeeds at his saving throw and is now able to cast a spell of 7th level or lower. Hamos currently has *feeblemind* memorized. Since it is only a 5th-level spell, he chooses to cast it back at his enemy. He makes his level variation check (and doesn’t get a wild surge) and the *feeblemind* is sent hurtling back at his foe. Hamos still has his original *feeblemind* memorized. The remaining two spell levels are lost, since they were not used in the same round.\n&emsp;If a wild mage is struck by two spells at once, he may choose which spell to shape. He suffers all effects of the remaining spell.'
 };
 
 wiz7['Steal Enchantment'] = {
@@ -7960,7 +7959,7 @@ wiz7['Steal Enchantment'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell “steals” the enchantment from a magical item and places it within another, non-magical item (the material component). Both objects must be touched by the wizard during casting. The two items must be of the same category (blunt weapon, edged weapon, ring, amulet, shield, armor, wand, etc.).\n&emsp;The enchantment can be transferred only to a nonmagical item. Only the energy of one item can be transferred; it is not possible to combine two magical items into one item. The new item has all the properties of the original magical item (including the same number of charges, if any).\n&emsp;At the culmination of the spell, the original magical object is allowed an item saving throw vs. disintegration with all modifiers it is allowed as a magical item. Exceptionally powerful objects (such as artifacts) may be considered to automatically succeed the saving throw at the DM’s discretion.\n&emsp;If the saving throw is successful, the magical object resists the effect and the spell ends in failure. If the roll is failed, the magical item loses all of its powers, which are transferred to the previously nonmagical object.\n&emsp;Even if the magical item fails its saving throw, the spell’s success is not guaranteed. There is a chance that the enchantment might be lost. The base chance of this occurring is 100%, modified by -5% per level of the caster. Currently [[{100-(5*[[@{level-wizard}]]),0}kh1]]% chance that the enchant is lost. Thus, a 20th-level wizard has no chance of losing the magic. If the enchantment is lost, both items become nonmagical.\n&emsp;'
+    'effect': 'This spell “steals” the enchantment from a magical item and places it within another, non-magical item (the material component). Both objects must be touched by the wizard during casting. The two items must be of the same category (blunt weapon, edged weapon, ring, amulet, shield, armor, wand, etc.).\n&emsp;The enchantment can be transferred only to a nonmagical item. Only the energy of one item can be transferred; it is not possible to combine two magical items into one item. The new item has all the properties of the original magical item (including the same number of charges, if any).\n&emsp;At the culmination of the spell, the original magical object is allowed an item saving throw vs. disintegration with all modifiers it is allowed as a magical item. Exceptionally powerful objects (such as artifacts) may be considered to automatically succeed the saving throw at the DM’s discretion.\n&emsp;If the saving throw is successful, the magical object resists the effect and the spell ends in failure. If the roll is failed, the magical item loses all of its powers, which are transferred to the previously nonmagical object.\n&emsp;Even if the magical item fails its saving throw, the spell’s success is not guaranteed. There is a chance that the enchantment might be lost. The base chance of this occurring is 100%, modified by -5% per level of the caster. Currently [[{100-(5*[[@{level-wizard}]]),0}kh1]]% chance that the enchant is lost. Thus, a 20th-level wizard has no chance of losing the magic. If the enchantment is lost, both items become nonmagical.'
 };
 
 wiz7['Suffocate'] = {
@@ -8017,7 +8016,7 @@ wiz8['Airboat'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell must be cast under a cloudy sky. The caster points at a cloud, which immediately descends toward him. As it comes closer, the cloud changes shape, becoming any sort of vessel imagined by the wizard (a dragon-shaped galley, a one-man dinghy, etc.).\n&emsp;Although the *airboat* is made of cloud, it feels solid and can support the weight of the caster plus one passenger per level of the wizard. It can fly at any speed up to 5 miles per hour per level of the caster (to a maximum of 90 miles per hour). Currently max [[{5*[[@{level-wizard}]],90}kl1]] miles per hour.\n&emsp;The caster maintains total telepathic control over the *airboat’s* speed and direction. While controlling the vessel, the wizard is able to perform other actions but may not cast other spells.'
+    'effect': 'This spell must be cast under a cloudy sky. The caster points at a cloud, which immediately descends toward him. As it comes closer, the cloud changes shape, becoming any sort of vessel imagined by the wizard (a dragon-shaped galley, a one-man dinghy, etc.).\n&emsp;Although the *airboat* is made of cloud, it feels solid and can support the weight of the caster plus one passenger per level of the wizard. Currently [[@{level-wizard}]] passengers. It can move at a rate of 21 (MC:D).\n&emsp;The caster maintains total telepathic control over the *airboat’s* speed and direction. While controlling the vessel, the wizard is able to perform other actions but may not cast other spells.'
 };
 
 wiz8['Gunther\'s Kaleidoscopic Strike'] = {
@@ -8035,7 +8034,7 @@ wiz8['Gunther\'s Kaleidoscopic Strike'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, a thin beam of shimmering, kaleidoscopic light shoots from the wizard’s fingertips toward his target. The victim is allowed a saving throw to resist the beam.\n&emsp;This spell has no effect on nonspellcasters, causing them no harm whatsoever. Creatures with innate spell-like abilities are also unaffected. Against wizards and priests, this spell can be devastating. It “short-circuits” the arcane energy stored in a spellcaster’s mind, wiping away a number of memorized spells. Lost spells must be rememorized.\n&emsp;The number of spells drained is equal to the caster’s level minus 1d20. [[{[[@{level-wizard}]]-1d20,0}kh1]] spells wiped. Thus, a 16th-level wizard drains a maximum of 15 spells, but could drain no spells depending on the die roll. After subtracting the die roll from the caster’s level, any result of zero or a negative number indicates that the victim loses no spells.\n&emsp;Spells are drained from the wizard’s memorized spells beginning with 1st-level spells and working up to higher level spells. Any decision regarding which spell should be drained from a specific level should be determined randomly.\n&emsp;'
+    'effect': 'When this spell is cast, a thin beam of shimmering, kaleidoscopic light shoots from the wizard’s fingertips toward his target. The victim is allowed a saving throw to resist the beam.\n&emsp;This spell has no effect on nonspellcasters, causing them no harm whatsoever. Creatures with innate spell-like abilities are also unaffected. Against wizards and priests, this spell can be devastating. It “short-circuits” the arcane energy stored in a spellcaster’s mind, wiping away a number of memorized spells. Lost spells must be rememorized.\n&emsp;The number of spells drained is equal to the caster’s level minus 1d20 ([[{[[@{level-wizard}]]-1d20,{0} }kh1]] spells wiped). Thus, a 16th-level wizard drains a maximum of 15 spells, but could drain no spells depending on the die roll. After subtracting the die roll from the caster’s level, any result of zero or a negative number indicates that the victim loses no spells.\n&emsp;Spells are drained from the wizard’s memorized spells beginning with 1st-level spells and working up to higher level spells. Any decision regarding which spell should be drained from a specific level should be determined randomly.'
 };
 
 wiz8['Homunculus Shield'] = {
@@ -8054,7 +8053,7 @@ wiz8['Homunculus Shield'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By creating a *homunculus shield*, the wizard separates a portion of his mind in the form of an exteriorized magical homunculus. This creature is invisible to all but the caster and appears as a miniature version of the caster perched atop the wizard’s head.\n&emsp;The wizard may move and act normally while this spell is in effect. The magical homunculus operates as an independent spellcaster. It may cast only *teleport*, *contingency*, and protective spells of 4th level and lower. It casts only spells from the wizard’s memorized store of spells, but any spells cast by the homunculus are done so with a casting time of 1. The wizard selects which spells are cast by his homunculus; after they are cast, they are wiped from the caster’s memory.\n&emsp;The homunculus has 1 hit point per two levels of the caster. Currently [[2*[[@{level-wizard}]] ]] hit points. These points are “borrowed” from the caster; while the homunculus is present, the wizard’s hit points are reduced by this amount.\n&emsp;The homunculus cannot be struck by melee or missile weapons separately from the wizard. It can be damaged separately from the wizard (e.g., by a *magic missile* targeted at the homunculus or by area effect spells). The homunculus has the attributes and saving throws of the wizard.\n&emsp;At the end of the spell’s duration, the homunculus disappears and any hit points it had are restored to the wizard. Hit points lost by the homunculus can be regained only by magical healing.\n&emsp;If the wizard’s hit points are reduced to zero at any time during the spell, the wizard is dead even if the homunculus had hit points remaining.\n&emsp;A wizard with an active *homunculus shield* suffers a -4 saving throw penalty against *magic jar* spells cast upon him due to the division of his mental energy.\n&emsp;'
+    'effect': 'By creating a *homunculus shield*, the wizard separates a portion of his mind in the form of an exteriorized magical homunculus. This creature is invisible to all but the caster and appears as a miniature version of the caster perched atop the wizard’s head.\n&emsp;The wizard may move and act normally while this spell is in effect. The magical homunculus operates as an independent spellcaster. It may cast only *teleport*, *contingency*, and protective spells of 4th level and lower. It casts only spells from the wizard’s memorized store of spells, but any spells cast by the homunculus are done so with a casting time of 1. The wizard selects which spells are cast by his homunculus; after they are cast, they are wiped from the caster’s memory.\n&emsp;The homunculus has 1 hit point per two levels of the caster. Currently [[floor([[@{level-wizard}]]/2)]] hit points. These points are “borrowed” from the caster; while the homunculus is present, the wizard’s hit points are reduced by this amount.\n&emsp;The homunculus cannot be struck by melee or missile weapons separately from the wizard. It can be damaged separately from the wizard (e.g., by a *magic missile* targeted at the homunculus or by area effect spells). The homunculus has the attributes and saving throws of the wizard.\n&emsp;At the end of the spell’s duration, the homunculus disappears and any hit points it had are restored to the wizard. Hit points lost by the homunculus can be regained only by magical healing.\n&emsp;If the wizard’s hit points are reduced to zero at any time during the spell, the wizard is dead even if the homunculus had hit points remaining.\n&emsp;A wizard with an active *homunculus shield* suffers a -4 saving throw penalty against *magic jar* spells cast upon him due to the division of his mental energy.'
 };
 
 wiz8['Hornung\'s Random Dispatcher'] = {
@@ -8074,7 +8073,7 @@ wiz8['Hornung\'s Random Dispatcher'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'With the utterance of a few words, this spell can hurl a creature to a random plane and leave him there. The target, if unwilling, is allowed a saving throw. If successful, the spell fails. If unsuccessful, the victim and all items carried by him are sent to a random plane. To determine the plane, roll on the table below.}}{{style=center1 sheet-spell-bottom2}}{{c1-1=**D100**\n**Roll**}}{{c2-1=01-03}}{{c3-1=04-06}}{{c4-1=07-12}}{{c5-1=13-17}}{{c6-1=18-23}}{{c7-1=24-27}}{{c8-1=28-30}}{{c9-1=31-35}}{{c10-1=36-38}}{{c11-1=39-44}}{{c12-1=45-47}}{{c13-1=48-50}}{{c14-1=51-53}}{{c15-1=54-58}}{{c16-1=59-61}}{{c17-1=62-64}}{{c18-1=65-67}}{{c19-1=68-70}}{{c20-1=71-73}}{{c21-1=74-76}}{{c22-1=77-79}}{{c23-1=80-82}}{{c24-1=83-85}}{{c25-1=86-91}}{{c26-1=92-94}}{{c27-1=95-97}}{{c28-1=98-100}}{{c1-2=**Plane**}}{{c2-2=Abyss}}{{c3-2=Acheron}}{{c4-2=Alternate Prime Material Plane}}{{c5-2=Arcadia}}{{c6-2=Astral Plane}}{{c7-2=Beastlands (Happy Hunting Grounds)}}{{c8-2=Concordant Opposition}}{{c9-2=Elemental Plane (Air, Fire, Earth, or Water)}}{{c10-2=Elysium}}{{c11-2=Ethereal Plane}}{{c12-2=Gehenna}}{{c13-2=Gladsheim}}{{c14-2=Hades}}{{c15-2=Limbo}}{{c16-2=Negative Material Plane}}{{c17-2=Negative Quasi-Plane (Vacuum, Ash, Dust, or Salt)}}{{c18-2=Nine Hells}}{{c19-2=Nirvana}}{{c20-2=Olympus}}{{c21-2=Pandemonium}}{{c22-2=Para-Elemental Plane (Smoke, Magma, Ooze, or Ice)}}{{c23-2=Positive Material Plane}}{{c24-2=Positive Quasi-Plane (Lightning, Radiance, Minerals, or Steam)}}{{c25-2=Prime Material Plane*}}{{c26-2=Seven Heavens}}{{c27-2=Tarterus}}{{c28-2=Twin Paradises}}{{effects2=&emsp;&ast; Characters sent to the Prime Material plane are teleported elsewhere in the same world.\n\n&emsp;The caster has no control over the destination of the target. The conditions at the destination may kill the target (for example, arriving in the elemental plane of fire) or merely make life difficult. This determination is left to the DM.'
+    'effect': 'With the utterance of a few words, this spell can hurl a creature to a random plane and leave him there. The target, if unwilling, is allowed a saving throw. If successful, the spell fails. If unsuccessful, the victim and all items carried by him are sent to a random plane. To determine the plane, roll on the table below.}}{{style=center1 sheet-spell-fixed1 sheet-spell-bottom2}}{{c1-1=**D100**\n**Roll**}}{{c2-1=01-03}}{{c3-1=04-06}}{{c4-1=07-12}}{{c5-1=13-17}}{{c6-1=18-23}}{{c7-1=24-27}}{{c8-1=28-30}}{{c9-1=31-35}}{{c10-1=36-38}}{{c11-1=39-44}}{{c12-1=45-47}}{{c13-1=48-50}}{{c14-1=51-53}}{{c15-1=54-58}}{{c16-1=59-61}}{{c17-1=62-64}}{{c18-1=65-67}}{{c19-1=68-70}}{{c20-1=71-73}}{{c21-1=74-76}}{{c22-1=77-79}}{{c23-1=80-82}}{{c24-1=83-85}}{{c25-1=86-91}}{{c26-1=92-94}}{{c27-1=95-97}}{{c28-1=98-100}}{{c1-2=**Plane**}}{{c2-2=Abyss}}{{c3-2=Acheron}}{{c4-2=Alternate Prime Material Plane}}{{c5-2=Arcadia}}{{c6-2=Astral Plane}}{{c7-2=Beastlands (Happy Hunting Grounds)}}{{c8-2=Concordant Opposition}}{{c9-2=Elemental Plane (Air, Fire, Earth, or Water)}}{{c10-2=Elysium}}{{c11-2=Ethereal Plane}}{{c12-2=Gehenna}}{{c13-2=Gladsheim}}{{c14-2=Hades}}{{c15-2=Limbo}}{{c16-2=Negative Material Plane}}{{c17-2=Negative Quasi-Plane (Vacuum, Ash, Dust, or Salt)}}{{c18-2=Nine Hells}}{{c19-2=Nirvana}}{{c20-2=Olympus}}{{c21-2=Pandemonium}}{{c22-2=Para-Elemental Plane (Smoke, Magma, Ooze, or Ice)}}{{c23-2=Positive Material Plane}}{{c24-2=Positive Quasi-Plane (Lightning, Radiance, Minerals, or Steam)}}{{c25-2=Prime Material Plane*}}{{c26-2=Seven Heavens}}{{c27-2=Tarterus}}{{c28-2=Twin Paradises}}{{effects2=&emsp;&ast; Characters sent to the Prime Material plane are teleported elsewhere in the same world.\n\n&emsp;The caster has no control over the destination of the target. The conditions at the destination may kill the target (for example, arriving in the elemental plane of fire) or merely make life difficult. This determination is left to the DM.'
 };
 
 wiz8['Wildzone'] = {
@@ -8132,7 +8131,7 @@ wiz9['Elemental Aura'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell has four very different effects depending on the type (air, earth, fire, water) of *elemental aura* cast. Only the caster may receive an *elemental aura*, and it is not possible to benefit from more than one aura at one time.\n&emsp;Each aura is three inches thick and covers the caster’s entire body. An aura of air is hazy white in color, an aura of earth is dull grey, an aura of fire is flickering red, and an aura of water is shimmering blue. The auras have these effects:\n&emsp;Air\n&emsp;• immunity to gas and air-based attacks\n&emsp;• total protection from physical attacks by creatures of the elemental plane of Air\n&emsp;• ability to cast *fly* and *protection from normal missiles* once each\n&emsp;Earth\n&emsp;• immunity to attacks from nonmagical weapons made of stone or metal\n&emsp;• immunity to physical attacks by creatures of the elemental plane of Earth\n&emsp;• ability to breathe and move at full movement rate within the element of earth\n&emsp;• ability to cast *wall of stone* once\n&emsp;Fire\n&emsp;• immunity to normal and magical fire\n&emsp;• total protection from physical attacks by creatures of the elemental plane of Fire\n&emsp;• ability to breathe and move at full movement rate within the element of fire\n&emsp;• total protection from hostile environmental effects while traveling plane of Fire\n&emsp;• ability to cast *wall of fire* once\n&emsp;Water\n&emsp;• immunity to water- and cold-based attacks\n&emsp;• total protection from physical attacks by creatures of the plane of Water\n&emsp;• ability to breathe and move at full movement rate within the element of water\n&emsp;• ability to cast *wall of ice* once\n&emsp;The auras do not restrict the caster in any way. He is free to move and act normally while under the influence of an aura.'
+    'effect': 'This spell has four very different effects depending on the type (air, earth, fire, water) of *elemental aura* cast. Only the caster may receive an *elemental aura*, and it is not possible to benefit from more than one aura at one time.\n&emsp;Each aura is three inches thick and covers the caster’s entire body. An aura of air is hazy white in color, an aura of earth is dull grey, an aura of fire is flickering red, and an aura of water is shimmering blue. The auras have these effects:}}{{style=min1}}{{c1-1=**Air**}}{{cs1-1=2}}{{c2-1=•}}{{cc2-1=center}}{{c3-1=•}}{{cc3-1=center}}{{c4-1=•}}{{cc4-1=center}}{{c5-1=**Earth**}}{{cs5-1=2}}{{c6-1=•}}{{cc6-1=center}}{{c7-1=•}}{{cc7-1=center}}{{c8-1=•}}{{cc8-1=center}}{{c9-1=•}}{{cc9-1=center}}{{c10-1=**Fire**}}{{cs10-1=2}}{{c11-1=•}}{{cc11-1=center}}{{c12-1=•}}{{cc12-1=center}}{{c13-1=•}}{{cc13-1=center}}{{c14-1=•}}{{cc14-1=center}}{{c15-1=•}}{{cc15-1=center}}{{c16-1=**Water**}}{{cs16-1=2}}{{c17-1=•}}{{cc17-1=center}}{{c18-1=•}}{{cc18-1=center}}{{c19-1=•}}{{cc19-1=center}}{{c20-1=•}}{{cc20-1=center}}{{c2-2=immunity to gas and air-based attacks}}{{c3-2=total protection from physical attacks by creatures of the elemental plane of Air}}{{c4-2=ability to cast *fly* and *protection from normal missiles* once each}}{{c6-2=immunity to attacks from nonmagical weapons made of stone or metal}}{{c7-2=immunity to physical attacks by creatures of the elemental plane of Earth}}{{c8-2=ability to breathe and move at full movement rate within the element of earth}}{{c9-2=ability to cast *wall of stone* once}}{{c11-2=immunity to normal and magical fire}}{{c12-2=total protection from physical attacks by creatures of the elemental plane of Fire}}{{c13-2=ability to breathe and move at full movement rate within the element of fire}}{{c14-2=total protection from hostile environmental effects while traveling plane of Fire}}{{c15-2=ability to cast *wall of fire* once}}{{c17-2=immunity to water- and cold-based attacks}}{{c18-2=total protection from physical attacks by creatures of the plane of Water}}{{c19-2=ability to breathe and move at full movement rate within the element of water}}{{c20-2=ability to cast *wall of ice* once}}{{effects2=&emsp;The auras do not restrict the caster in any way. He is free to move and act normally while under the influence of an aura.'
 };
 
 wiz9['Estate Transference'] = {
@@ -8140,7 +8139,7 @@ wiz9['Estate Transference'] = {
     'school': 'Alteration',
     'range': '0',
     'duration': 'Permanent',
-    'aoe': '[[1000*[[@{level-wizard}]] ]] square feet',
+    'aoe': '[[@{level-wizard}]] square miles',
     'components': 'V, S, M',
     'cast-time': '10 turns',
     'saving-throw': 'None',
@@ -8169,7 +8168,7 @@ wiz9['Glorious Transmutation'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell turns iron into silver or lead into gold at the caster’s option. The prime ingredient for this spell is a magical item called the *philosopher’s stone*, which must be touched by the wizard and alchemically combined with the metal during casting. The formula for mixing the stone and the metal must be known by the caster; this information is not provided by this spell and the spell is useless without it. (The exact ingredients and formula are decided by the Dungeon Master and must be discovered by the wizard in the course of adventuring.)\n&emsp;*Philosopher’s stones* vary in quality so much that each is capable of transmuting either 1d10x50 pounds of iron into an equal quantity of silver or 1d10x10 pounds of lead into the same amount of gold. It is not possible to know how much metal can be transmuted until the process is complete. If the caster has more iron or lead prepared than the spell is capable of changing, any excess is unchanged.\n&emsp;The entire transmutation must be made at one time. Only one stone may be used per casting of the spell. The entire *philosopher’s stone* is consumed in the process.'
+    'effect': 'This spell turns iron into silver or lead into gold at the caster’s option. The prime ingredient for this spell is a magical item called the *philosopher’s stone*, which must be touched by the wizard and alchemically combined with the metal during casting. The formula for mixing the stone and the metal must be known by the caster; this information is not provided by this spell and the spell is useless without it. (The exact ingredients and formula are decided by the Dungeon Master and must be discovered by the wizard in the course of adventuring.)\n&emsp;*Philosopher’s stones* vary in quality so much that each is capable of transmuting either 1d10 ✕ 50 pounds of iron into an equal quantity of silver *or* 1d10 ✕ 10 pounds of lead into the same amount of gold. It is not possible to know how much metal can be transmuted until the process is complete. If the caster has more iron or lead prepared than the spell is capable of changing, any excess is unchanged.\n&emsp;The entire transmutation must be made at one time. Only one stone may be used per casting of the spell. The entire *philosopher’s stone* is consumed in the process.'
 };
 
 wiz9['Stabilize'] = {
@@ -8208,7 +8207,7 @@ wiz9['Wail of the Banshee'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'At the culmination of this dreadful spell, the wizard screams like a banshee (a groaning spirit). For each level of the caster, one listener within 30 feet hears the wail. Currently [[@{level-wizard}]] listeners. Those who fail a saving throw vs. death magic die instantly.\n&emsp;The wizard cannot be the victim of his own spell, nor can he choose who will be affected. If there are more potential victims than the\n&emsp;the caster, the DM must randomly de\n&emsp;which creatures are affected. Creatures not hear (due to ear plugs, deafness, et targets, but cannot be affected and are to automatically make their saving th'
+    'effect': 'At the culmination of this dreadful spell, the wizard screams like a banshee (a groaning spirit). For each level of the caster, one listener within 30 feet hears the wail. Currently [[@{level-wizard}]] listeners. Those who fail a saving throw vs. death magic die instantly.\n&emsp;The wizard cannot be the victim of his own spell, nor can he choose who will be affected. If there are more potential victims than the level of the caster, the DM must randomly determine which creatures are affected. Creatures who cannot hear (due to ear plugs, deafness, etc.) can be targets, but cannot be affected and are considered to automatically make their saving throws.'
 };
 
 wiz9['Wildfire'] = {
@@ -8223,7 +8222,7 @@ wiz9['Wildfire'] = {
     'cast-time': '1',
     'saving-throw': 'Variable',
     'materials': '',
-    'reference': 'p. 47',
+    'reference': 'p. 48',
     'book': 'Tome of Magic',
     'damage': '',
     'damage-type': '',
@@ -8340,7 +8339,7 @@ wiz3['Instant Audience'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, audience members are magically conjured. Each round 1d4 people enter the room or area in a normal manner. (They actually appear just outside the room when no one is looking.) This continues for a number of rounds equal to the caster’s level. Currently [[@{level-wizard}]] rounds.\n&emsp;The audience contains a combination of races, gender, and social class appropriate to the occasion.\n&emsp;Instant audience members act in every way like any other members of the audience. They walk around during intermission, talk, eat snacks, and so on. However, they always evade questions about their past, their history, or current events, as they have no past, no history, and have no idea as to what is going on in the world outside of the room.\n&emsp;*Instant audience* members are strictly noncombative and never attack or cast spells (although they can be bullies or braggarts if that is appropriate). If one suffers even a single point of damage, he instantly vanishes along with all of his items (including items no longer on his body, such as clothes that he hung in the linen closet).\n&emsp;Once the performance ends, instant audience members leave in an appropriate manner and vanish as soon as they are out of view.\n&emsp;If the audience is treated in an inappropriate way (as determined by the DM), the spell instantly ends. For example, an audience could be summoned to watch a combat, but if the audience is used as a human shield, it vanishes.'
+    'effect': 'When this spell is cast, audience members are magically conjured. Each round 1d4 people enter the room or area in a normal manner. (They actually appear just outside the room when no one is looking.) This continues for a number of rounds equal to the caster’s level. Currently [[@{level-wizard}]] rounds.\n&emsp;The audience contains a combination of races, gender, and social class appropriate to the occasion.\n&emsp;Instant audience members act in every way like any other members of the audience. They walk around during intermission, talk, eat snacks, and so on. However, they always evade questions about their past, their history, or current events, as they have no past, no history, and have no idea as to what is going on in the world outside of the room.\n&emsp;Instant audience members are strictly noncombative and never attack or cast spells (although they can be bullies or braggarts if that is appropriate). If one suffers even a single point of damage, he instantly vanishes along with all of his items (including items no longer on his body, such as clothes that he hung in the linen closet).\n&emsp;Once the performance ends, instant audience members leave in an appropriate manner and vanish as soon as they are out of view.\n&emsp;If the audience is treated in an inappropriate way (as determined by the DM), the spell instantly ends. For example, an audience could be summoned to watch a combat, but if the audience is used as a human shield, it vanishes.'
 };
 
 wiz3['Wall of Sound'] = {
@@ -8376,7 +8375,7 @@ wiz4['Conjure Cabinet'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This is a very special spell created specifically for the bard class. Before this spell can be used, the bard must have a special cabinet made. It must be of the highest quality, worth at least 1,000 gold pieces. It can be any size up to 4 feet wide by 4 feet deep by 8 feet high.\n&emsp;Once the cabinet is made, this spell must be cast upon it and the cabinet must be named. At any later date, the bard can cast this spell and the cabinet temporarily teleports to the bard’s current location. The cabinet carries with it any contents that are of a performing nature usable by the bard. (For example, it might contain musical instruments, cleaning tools, a playing stool, *etc.*, for a True Bard. It might be lined with throwing daggers, rapiers {for sword swallowing}, and blindfolds for a Blade).\n&emsp;When the cabinet teleports to the bard, a percentile die must be rolled. On a 01-04, it appears 2d20 feet in the air and falls, destroying itself (but its contents are recoverable). On a roll of 99-00, it teleports into the ground and is destroyed. Otherwise, it is safe.\n&emsp;The cabinet remains for the duration of the spell or until the bard speaks the cabinet’s name. It then teleports safely back to its previous location, along with any carried items of a performing nature usable by the bard.\n&emsp;A bard may have only one such cabinet at a time. The teleport will not carry the cabinet to another plane. If items of a nonperforming nature are left in the cabinet, then the cabinet will not teleport.'
+    'effect': 'This is a very special spell created specifically for the bard class. Before this spell can be used, the bard must have a special cabinet made. It must be of the highest quality, worth at least 1,000 gold pieces. It can be any size up to 4 feet wide by 4 feet deep by 8 feet high.\n&emsp;Once the cabinet is made, this spell must be cast upon it and the cabinet must be named. At any later date, the bard can cast this spell and the cabinet temporarily teleports to the bard’s current location. The cabinet carries with it any contents that are of a performing nature usable by the bard. (For example, it might contain musical instruments, cleaning tools, a playing stool, *etc.*, for a True Bard. It might be lined with throwing daggers, rapiers [for sword swallowing], and blindfolds for a Blade).\n&emsp;When the cabinet teleports to the bard, a percentile die must be rolled. On a 01-04, it appears 2d20 feet in the air and falls, destroying itself (but its contents are recoverable). On a roll of 99-00, it teleports into the ground and is destroyed. Otherwise, it is safe.\n&emsp;The cabinet remains for the duration of the spell or until the bard speaks the cabinet’s name. It then teleports safely back to its previous location, along with any carried items of a performing nature usable by the bard.\n&emsp;A bard may have only one such cabinet at a time. The teleport will not carry the cabinet to another plane. If items of a nonperforming nature are left in the cabinet, then the cabinet will not teleport.'
 };
 //#endregion
 
@@ -8452,7 +8451,7 @@ wiz1['Animate Dead Animals'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates undead skeletons and zombies from the bones and bodies of dead animals, specifically vertebrates (fish, amphibians, reptiles, birds, and mammals). The animated remains obey simple verbal commands given by the caster, regardless of the language employed. Only naturally occurring animals of no higher than semi-intelligence can be animated with this particular spell (lizards, cats, frogs, weasels, tigers, and so on), including minimals and non-magical, giant-sized animals. These undead remain animated until they are destroyed in combat or turned; the animating magic cannot be dispelled.\n&emsp;The number of undead that a wizard can animate depends on the animal’s original hit dice, the caster’s level, and the type of undead being created. The caster can create the following number of animal skeletons:\n\n&emsp;• ¼ HD animal or less: 4/caster level ([[4*[[@{level-wizard}]] ]])\n&emsp;• ½ to 1 HD animal: 2/caster level ([[2*[[@{level-wizard}]] ]])\n&emsp;• 1+ to 3 HD animal: 1/caster level ([[@{level-wizard}]])\n&emsp;• 3+ to 6 HD animal: 1/2 caster levels ([[floor([[@{level-wizard}]]/2)]])\n&emsp;• Animal of over 6 HD: 1/4 caster levels ([[floor([[@{level-wizard}]]/4)]])\n\n&emsp;The caster can create the following number of animal zombies:\n\n&emsp;• ¼ HD animal or less: 2/caster level ([[2*[[@{level-wizard}]] ]])\n&emsp;• ½ to 1–1 HD animal: 1/caster level ([[@{level-wizard}]])\n&emsp;• 1 to 3 HD animal: 1/2 caster levels ([[floor([[@{level-wizard}]]/2)]])\n&emsp;• Animal of over 3 HD: 1/4 caster levels ([[floor([[@{level-wizard}]]/4)]])\n\n&emsp;Animated skeletons of animals that had ¼ to 1 HD conform to the statistics of animal skeletons (see “Skeleton” in the *MC*). Skeletons of animals that had less than ¼ HD when living conform to those same statistics, with the following changes: AC 9, HD 1-4; hp 1, #AT 1, Dmg 1. Skeletons of those animals of over 1 HD conform to the regular animal statistics in the *MM*, with the following changes: armor class is worsened by two (AC 10 maximum), damage per attack is reduced by two (1 hp minimum), and movement is reduced by half. Animal zombies conform to the statistics for the particular animal that has been animated, with the following changes: the animal’s number of hit dice is increased by one, AC is worsened by three (AC 8 maximum), and movement is reduced by half.\n&emsp;Skeletal and zombie animals gain the standard undead immunities (resistance to cold-based, *sleep*, *charm*, and *hold* spells), but lose any normal defenses that the living animal might have had. They also lose any special attacks (raking of rear claws, swallowing whole, and so on) and cannot inject poison or emit fluids, such as musk or saliva. Swallowing does no further damage to the creature swallowed, except to trap it within the swallower’s rib cage. Priests gain a +1 bonus when turning these undead.\n&emsp;This spell is often a necromancer’s first experience animating corpses. For this to work, the animal bodies or skeletons must be intact.'
+    'effect': 'This spell creates undead skeletons and zombies from the bones and bodies of dead animals, specifically vertebrates (fish, amphibians, reptiles, birds, and mammals). The animated remains obey simple verbal commands given by the caster, regardless of the language employed. Only naturally occurring animals of no higher than semi-intelligence can be animated with this particular spell (lizards, cats, frogs, weasels, tigers, and so on), including minimals and non-magical, giant-sized animals. These undead remain animated until they are destroyed in combat or turned; the animating magic cannot be dispelled.\n&emsp;The number of undead that a wizard can animate depends on the animal’s original hit dice, the caster’s level, and the type of undead being created. The caster can create the following number of animal skeletons:\n\n&emsp;• ¼ HD animal or less: 4/caster level ([[4*[[@{level-wizard}]] ]])\n&emsp;• ½ to 1 HD animal: 2/caster level ([[2*[[@{level-wizard}]] ]])\n&emsp;• 1+ to 3 HD animal: 1/caster level ([[@{level-wizard}]])\n&emsp;• 3+ to 6 HD animal: 1/2 caster levels ([[floor([[@{level-wizard}]]/2)]])\n&emsp;• Animal of over 6 HD: 1/4 caster levels ([[floor([[@{level-wizard}]]/4)]])\n\n&emsp;The caster can create the following number of animal zombies:\n\n&emsp;• ¼ HD animal or less: 2/caster level ([[2*[[@{level-wizard}]] ]])\n&emsp;• ½ to 1–1 HD animal: 1/caster level ([[@{level-wizard}]])\n&emsp;• 1 to 3 HD animal: 1/2 caster levels ([[floor([[@{level-wizard}]]/2)]])\n&emsp;• Animal of over 3 HD: 1/4 caster levels ([[floor([[@{level-wizard}]]/4)]])\n\n&emsp;Animated skeletons of animals that had ¼ to 1 HD conform to the statistics of animal skeletons (see “Skeleton” in the *MC*). Skeletons of animals that had less than ¼ HD when living conform to those same statistics, with the following changes: AC 9, HD ¼; hp 1, #AT 1, Dmg 1. Skeletons of those animals of over 1 HD conform to the regular animal statistics in the *MM*, with the following changes: armor class is worsened by two (AC 10 maximum), damage per attack is reduced by two (1 hp minimum), and movement is reduced by half. Animal zombies conform to the statistics for the particular animal that has been animated, with the following changes: the animal’s number of hit dice is increased by one, AC is worsened by three (AC 8 maximum), and movement is reduced by half.\n&emsp;Skeletal and zombie animals gain the standard undead immunities (resistance to cold-based, *sleep*, *charm*, and *hold* spells), but lose any normal defenses that the living animal might have had. They also lose any special attacks (raking of rear claws, swallowing whole, and so on) and cannot inject poison or emit fluids, such as musk or saliva. Swallowing does no further damage to the creature swallowed, except to trap it within the swallower’s rib cage. Priests gain a +1 bonus when turning these undead.\n&emsp;This spell is often a necromancer’s first experience animating corpses. For this to work, the animal bodies or skeletons must be intact.'
 };
 
 wiz1['Corpse Link'] = {
@@ -8470,7 +8469,7 @@ wiz1['Corpse Link'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'With this versatile spell, a wizard establishes a sensory link between him- or herself and a corpse or freshly animated zombie of a human, demihuman, or humanoid within the spell’s range. This link allows the caster to gather sensory information from the vicinity of the cadaver or undead being. For every three levels of experience past the 1st, the wizard gains the ability to collect information from an additional sense via the corpse link. Currently [[{1+floor(([[@{level-wizard}]]-1)/3),5}kl1]] senses. At 4th level, for instance, the wizard may choose up to two senses (up to three at 7th level, four at 10th level, and all five at 13th level).\n&emsp;*Sight:* The caster can see what the corpse or undead creature sees as if looking through one of the creature’s eyes.\n&emsp;*Sound:* The wizard can now hear through one ear, exactly as if standing at the corpse’s current location (if a wizard/thief, the caster can use his or her hear noise ability too).\n&emsp;*Smell:* With one nostril, the wizard can now smell things exactly as if standing at the corpse’s current location. The spell conveniently masks the putrefying stench of the cadaver (if any) so that subtle variations of aroma (like the scent of a rose) can easily be detected.\n&emsp;*Taste:* The caster can taste any substance which is introduced into the corpse’s mouth. The substance (which may be solid or liquid) tastes exactly as if the wizard had placed it on one side of his or her own tongue. This can be especially useful when checking for poison in food or *identifying* unknown potions. Thankfully, the taste of the corpse’s own rotting flesh can be masked out by the spell.\n&emsp;*Touch:* The caster gains the ability to sense the textural and environmental conditions, with a single hand, as if standing at the corpse’s location. The wizard can gauge the surface texture and temperature of any object or substance which is placed in contact with the corresponding hand of the corpse.\n&emsp;The type and number of sensory signals is chosen by the wizard at the time of casting, and cannot be changed for the duration of the spell. The caster collects all the sensory information through a single organ (eye, ear, nostril, half of the tongue, or hand) belonging to the corpse or undead recipient. *This organ need not be attached to the rest of the cadaver for the spell to function properly*.\n&emsp;While the spell is in effect, the wizard can still see/hear/smell/taste/touch normally through other (unlinked) organs. For example, a necromancer harvests the left eye from a fresh cadaver (with a successful Anatomy ability check) and places it on a high ledge, with a strategic view of a front door. If the spell is now cast, the wizard’s left eye would be able to see through the left eye of the corpse and spy on any visitors, while his or her right eye remains normal.\n&emsp;Furthermore, if the target of the spell is a zombie, the magic enables the caster to issue simple commands to the undead creature via this link. The commands can be no longer than four words and can deal only with the creature’s movement (turn left, walk forward two steps, and so on) If either the caster or the undead creature moves beyond the range of the spell, the effects are negated. *Corpse link* does not impart any animation to dead tissue; if cast on a regular cadaver, it remains stationary for the duration of the spell.'
+    'effect': 'With this versatile spell, a wizard establishes a sensory link between him- or herself and a corpse or freshly animated zombie of a human, demihuman, or humanoid within the spell’s range. This link allows the caster to gather sensory information from the vicinity of the cadaver or undead being. For every three levels of experience past the 1st, the wizard gains the ability to collect information from an additional sense via the corpse link. Currently up to [[{1+floor(([[@{level-wizard}]]-1)/3),5}kl1]] senses. At 4th level, for instance, the wizard may choose up to two senses (up to three at 7th level, four at 10th level, and all five at 13th level).\n&emsp;*Sight:* The caster can see what the corpse or undead creature sees as if looking through one of the creature’s eyes.\n&emsp;*Sound:* The wizard can now hear through one ear, exactly as if standing at the corpse’s current location (if a wizard/thief, the caster can use his or her hear noise ability too).\n&emsp;*Smell:* With one nostril, the wizard can now smell things exactly as if standing at the corpse’s current location. The spell conveniently masks the putrefying stench of the cadaver (if any) so that subtle variations of aroma (like the scent of a rose) can easily be detected.\n&emsp;*Taste:* The caster can taste any substance which is introduced into the corpse’s mouth. The substance (which may be solid or liquid) tastes exactly as if the wizard had placed it on one side of his or her own tongue. This can be especially useful when checking for poison in food or *identifying* unknown potions. Thankfully, the taste of the corpse’s own rotting flesh can be masked out by the spell.\n&emsp;*Touch:* The caster gains the ability to sense the textural and environmental conditions, with a single hand, as if standing at the corpse’s location. The wizard can gauge the surface texture and temperature of any object or substance which is placed in contact with the corresponding hand of the corpse.\n&emsp;The type and number of sensory signals is chosen by the wizard at the time of casting, and cannot be changed for the duration of the spell. The caster collects all the sensory information through a single organ (eye, ear, nostril, half of the tongue, or hand) belonging to the corpse or undead recipient. *This organ need not be attached to the rest of the cadaver for the spell to function properly*.\n&emsp;While the spell is in effect, the wizard can still see/hear/smell/taste/touch normally through other (unlinked) organs. For example, a necromancer harvests the left eye from a fresh cadaver (with a successful Anatomy ability check) and places it on a high ledge, with a strategic view of a front door. If the spell is now cast, the wizard’s left eye would be able to see through the left eye of the corpse and spy on any visitors, while his or her right eye remains normal.\n&emsp;Furthermore, if the target of the spell is a zombie, the magic enables the caster to issue simple commands to the undead creature via this link. The commands can be no longer than four words and can deal only with the creature’s movement (turn left, walk forward two steps, and so on) If either the caster or the undead creature moves beyond the range of the spell, the effects are negated. *Corpse link* does not impart any animation to dead tissue; if cast on a regular cadaver, it remains stationary for the duration of the spell.'
 };
 
 wiz1['Exterminate'] = {
@@ -8478,7 +8477,7 @@ wiz1['Exterminate'] = {
     'school': 'Necromancy',
     'range': '10 feet',
     'duration': 'Instantaneous',
-    'aoe': '[[{[[@{level-wizard}]],10}kl1]]small creature or cubic feet.',
+    'aoe': '[[{[[@{level-wizard}]],10}kl1]] small creature or [[{[[@{level-wizard}]],10}kl1]] cubic feet.',
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'None',
@@ -8506,7 +8505,7 @@ wiz1['Locate Remains'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell attunes the caster to the physical remains of dead beings in the area of effect. *Locate remains* will thus easily detect the presence of unburied corpses or corporeal undead (such as skeletons, zombies, or ghasts), but has no effect on noncorporeal undead (such as ghosts or spectres). The area of effect extends in a 10’ wide path, facing the in the caster’s current direction. Scanning in a direction requires one round, during which time the caster remains motionless in concentration.\n&emsp;*Locate remains* is mostly unaffected by walls or obstacles, though the area of effect is decreased (to [[10+[[@{level-wizard}]] ]]’) by more than three feet of solid stone, ten feet of wood or packed earth, or one inch of metal.\n&emsp;In the most general application, the spell precisely locates any and all physical remains of individuals in the area of effect, regardless of sex, species, and undead status. This spell does not impart any knowledge regarding the identity (or undead nature) of the remains; only the current locations of corpses within the area of effect are learned. If a personal item or a small fragment of the deceased individual is available at the time of casting, the spell can be used to locate the remains of that specific individual. In that case, the spell does not register the presence of any remains except those of the desired individual.\n&emsp;Both the general and specific versions of the spell have no effect if cast on a living creature of any kind. This spell is popular in regions with strict burial customs.'
+    'effect': 'This spell attunes the caster to the physical remains of dead beings in the area of effect. *Locate remains* will thus easily detect the presence of unburied corpses or corporeal undead (such as skeletons, zombies, or ghasts), but has no effect on noncorporeal undead (such as ghosts or spectres). The area of effect extends in a 10’ wide path, facing the in the caster’s current direction. Scanning in a direction requires one round, during which time the caster remains motionless in concentration.\n&emsp;*Locate remains* is mostly unaffected by walls or obstacles, though the area of effect is decreased (to 10’ + 1’/ level, currently [[10+[[@{level-wizard}]] ]]’) by more than three feet of solid stone, ten feet of wood or packed earth, or one inch of metal.\n&emsp;In the most general application, the spell precisely locates any and all physical remains of individuals in the area of effect, regardless of sex, species, and undead status. This spell does not impart any knowledge regarding the identity (or undead nature) of the remains; only the current locations of corpses within the area of effect are learned. If a personal item or a small fragment of the deceased individual is available at the time of casting, the spell can be used to locate the remains of that specific individual. In that case, the spell does not register the presence of any remains except those of the desired individual.\n&emsp;Both the general and specific versions of the spell have no effect if cast on a living creature of any kind. This spell is popular in regions with strict burial customs.'
 };
 
 wiz1['Spectral Voice'] = {
@@ -8560,7 +8559,7 @@ wiz2['Living Link'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'With this spell, a wizard establishes a sensory link between him- or herself and any living creature within range. If the wizard knows a specific creature or person within range, then the spell can take effect on that specific creature. Otherwise, the *living link* will be established with any sentient creature within range, determined randomly.\n&emsp;Similar to the 1st-level spell *corpse link* (which only works with fresh cadavers and zombies), *living link* allows the caster to gather sensory information from the vicinity of the targeted creature (sight, sound, smell, taste, or touch). For every four levels of experience past the 1st, the wizard can collect information from an additional sense (up to two senses at 5th level, three at 9th, four at 13th, and all five at the 17th level of experience). Currently [[1+floor(([[@{level-wizard}]]-1)/4)]] senses.\n&emsp;The target creature of this spell experiences nothing to indicate that its senses have been tapped, and it remains in control of its own actions, entirely unaware of the magical connection to the wizard. In other words, the wizard cannot force the subject to look at something (listen at a keyhole, taste a glass of wine, pick up an object, and so on). This spell merely enables the wizard to directly experience the world through another creature’s perceptions. For instance, looking through another creature’s eyes gives the wizard all of its visual capabilities, like infravision should the creature have that ability.\n&emsp;While the spell is in effect, the *living link* overrides the wizard’s own sensory perceptions. Thus, while a wizard is seeing through another creature’s eyes, he or she is unable to see through his or her own. The spell can be ended early with no risk to the caster.'
+    'effect': 'With this spell, a wizard establishes a sensory link between him- or herself and any living creature within range. If the wizard knows a specific creature or person within range, then the spell can take effect on that specific creature. Otherwise, the *living link* will be established with any sentient creature within range, determined randomly.\n&emsp;Similar to the 1st-level spell *corpse link* (which only works with fresh cadavers and zombies), *living link* allows the caster to gather sensory information from the vicinity of the targeted creature (sight, sound, smell, taste, or touch). For every four levels of experience past the 1st, the wizard can collect information from an additional sense (up to two senses at 5th level, three at 9th, four at 13th, and all five at the 17th level of experience). Currently up to [[{1+floor(([[@{level-wizard}]]-1)/4),5}kl1]] senses.\n&emsp;The target creature of this spell experiences nothing to indicate that its senses have been tapped, and it remains in control of its own actions, entirely unaware of the magical connection to the wizard. In other words, the wizard cannot force the subject to look at something (listen at a keyhole, taste a glass of wine, pick up an object, and so on). This spell merely enables the wizard to directly experience the world through another creature’s perceptions. For instance, looking through another creature’s eyes gives the wizard all of its visual capabilities, like infravision should the creature have that ability.\n&emsp;While the spell is in effect, the *living link* overrides the wizard’s own sensory perceptions. Thus, while a wizard is seeing through another creature’s eyes, he or she is unable to see through his or her own. The spell can be ended early with no risk to the caster.'
 };
 
 wiz2['Skeletal Hands'] = {
@@ -8572,13 +8571,13 @@ wiz2['Skeletal Hands'] = {
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'The complete, *skeletal hands* of any human, demihuman, or humanoid. These hand bones may be reused in multiple castings of the spell, providing the hands have not been damaged or destroyed in combat.',
+    'materials': 'The complete, skeletal hands of any human, demihuman, or humanoid. These hand bones may be reused in multiple castings of the spell, providing the hands have not been damaged or destroyed in combat.',
     'reference': 'p. 51',
     'book': 'The Complete Book of Necromancers',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By casting this spell, a wizard animates a pair of *skeletal hands* that levitate in midair and move as directed by the caster, who uses verbal commands and somatic gestures to guide them. The hands can perform only simple grasping, lifting, and carrying activities. They cannot perform complex movements that require great dexterity, such as picking locks. They can, however, open unlocked doors and chests, or turn pages in a spell book. The hands can also make two clawing attacks per round, each attack directed against a different target. They attack using the wizard’s table at the same level as the spellcaster, and each inflicts 1–3 hp damage on a successful hit. The hands may be physically attacked in turn (each hand has AC 5, hp 4, and MV 6) and may move anywhere within their range.\n&emsp;The hands can carry up to 5 pounds each; together, they can carry an object of up to 20 pounds. The hands may wield weapons within these weight limits. When using weapons, the *skeletal hands* attack on the wizard’s combat table, with a level half that of the spellcaster and with applicable penalties for nonproficiency. Hand-held melee weapons do half their normal damage (round up fractions), because the hands cannot generate the proper forces that the weapons need in order to inflict normal damage. The hands may fire an already loaded crossbow and inflict normal damage, because the crossbow provides the necessary force to propel the bolt. All other missile weapons have their ranges reduced to one quarter and inflict their normal damage (round up fractions).'
+    'effect': 'By casting this spell, a wizard animates a pair of skeletal hands that levitate in midair and move as directed by the caster, who uses verbal commands and somatic gestures to guide them. The hands can perform only simple grasping, lifting, and carrying activities. They cannot perform complex movements that require great dexterity, such as picking locks. They can, however, open unlocked doors and chests, or turn pages in a spell book. The hands can also make two clawing attacks per round, each attack directed against a different target. They attack using the wizard’s table at the same level as the spellcaster, and each inflicts 1–3 hp damage on a successful hit. The hands may be physically attacked in turn (each hand has AC 5, hp 4, and MV 6) and may move anywhere within their range.\n&emsp;The hands can carry up to 5 pounds each; together, they can carry an object of up to 20 pounds. The hands may wield weapons within these weight limits. When using weapons, the skeletal hands attack on the wizard’s combat table, with a level half that of the spellcaster (level [[floor([[@{level-wizard}]]/2)]]) and with applicable penalties for nonproficiency. Hand-held melee weapons do half their normal damage (round up fractions), because the hands cannot generate the proper forces that the weapons need in order to inflict normal damage. The hands may fire an already loaded crossbow and inflict normal damage, because the crossbow provides the necessary force to propel the bolt. All other missile weapons have their ranges reduced to one quarter and inflict their normal damage (round up fractions).'
 };
 
 wiz3['Bone Dance'] = {
@@ -8596,7 +8595,7 @@ wiz3['Bone Dance'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell temporarily animates the physical remains of a human, demihuman, or humanoid. *Bone dance* forges a mystical link with the newly made undead creature, enabling the caster to mentally control its movements, just as a master puppeteer manipulates the actions of a wooden puppet.\n&emsp;The skeleton or zombie animated by this spell is incapable of carrying out any independent actions—the wizard must mentally command his or her undead puppet to walk forward, pick up a sword, strike an opponent with it, and so on. While the caster concentrates on maintaining the *bone dance*, he or she may not speak, cast other spells, or actively engage in melee. The spell occupies the greater part of the caster’s attention.\n&emsp;The skeleton or zombie created by this spell conforms to the normal variety described in the *MM*. It is compatible with (can be affected by) other necromantic spells that affect undead, and the creature may perform all of the simple actions outlined in the *skeletal hands* spell. If directed into combat, it fights as a regular skeleton (even if it still has some flesh on its bones).\n&emsp;When combined with *spectral voice*, *bone dance* can make for an effective decoy, a menacing bluff, or at least a ghastly form of entertainment. When augmented by *corpse link*, a *dancing* cadaver may serve as an effective (and ultimately expendable) scout that can work beyond the immediate visual range of the caster.\n&emsp;Normally, the *bone dance* progresses for the duration of the spell or until the caster loses concentration. The *dance* also ends prematurely if the caster causes the skeleton to move beyond spell range or out of direct sight (certain divinations, such as *corpse link* or *clairvoyance*, may lift this hindrance). The *bone dance* may be destroyed in combat, or broken by a successful *dispel magic*.'
+    'effect': 'This spell temporarily animates the physical remains of a human, demihuman, or humanoid. *Bone dance* forges a mystical link with the newly made undead creature, enabling the caster to mentally control its movements, just as a master puppeteer manipulates the actions of a wooden puppet.\n&emsp;The skeleton or zombie animated by this spell is incapable of carrying out any independent actions—the wizard must mentally command his or her undead puppet to walk forward, pick up a sword, strike an opponent with it, and so on. While the caster concentrates on maintaining the *bone dance*, he or she may not speak, cast other spells, or actively engage in melee. The spell occupies the greater part of the caster’s attention.\n&emsp;The skeleton or zombie created by this spell conforms to the normal variety described in the *MM*. It is compatible with (can be affected by) other necromantic spells that affect undead, and the creature may perform all of the simple actions outlined in the *skeletal hands* spell. If directed into combat, it fights as a regular skeleton (even if it still has some flesh on its bones).\n&emsp;When combined with *spectral voice*, *bone dance* can make for an effective decoy, a menacing bluff, or at least a ghastly form of entertainment. When augmented by *corpse link*, a *dancing* cadaver may serve as an effective (and ultimately expendable) scout that can work beyond the immediate visual range of the caster.\n&emsp;Normally, the *bone dance* progresses for the duration of the spell or until the caster loses concentration. The *dance* also ends prematurely if the caster causes the skeleton to move beyond spell range or out of direct sight (certain divinations, such as *corpse link* or *clairvoyance*, may lift this hindrance). The bone dance may be destroyed in combat, or broken by a successful *dispel magic*.'
 };
 
 wiz3['False Face'] = {
@@ -8629,10 +8628,10 @@ wiz3['Skulltrap'] = {
     'materials': 'A pinch of dust from the physical remains of a corporeal undead being with strong ties to the Negative Material Plane, such as a wight or vampire.',
     'reference': 'p. 53',
     'book': 'The Complete Book of Necromancers',
-    'damage': '2d4 + [[@{level-wizard}]]d4',
+    'damage': '2d4+[[@{level-wizard}]]d4',
     'damage-type': '',
     'healing': '',
-    'effect': 'This ward may be placed on any non-living skull or the skull of an undead skeleton. The *skulltrap* remains dormant until the skull is touched by living matter or is struck and damaged by non-living matter (for instance, it’s struck by in combat or falls to the floor). Assume a normal skull is AC 8 and has 2 hp. This simple warding does not discriminate; it can just as easily be triggered by the wizard who cast the spell as by a curious rat brushing up against it.\n&emsp;When the *skulltrap* discharges, the skull flashes briefly with red or violet light and violently explodes, releasing a blast of energy drawn from the Negative Material plane. The burst of negative energy does 2d4 hp damage plus 1d4 hp damage for every level of the caster. All living creatures within 10’ of the skull must make a saving throw vs. breath weapon to suffer only half damage from the blast.\n&emsp;Because the trap is so easily triggered, the skull is often placed in its final resting place before casting the spell on it. The trapped skull may be moved without triggering the trap, but it must be moved very slowly and without contact with living matter. Gloves or any other thin materials used to cover the flesh of a living being are not enough to prevent the *skulltrap* from being discharged.'
+    'effect': 'This ward may be placed on any non-living skull or the skull of an undead skeleton. The *skulltrap* remains dormant until the skull is touched by living matter or is struck and damaged by non-living matter (for instance, it’s struck by in combat or falls to the floor). Assume a normal skull is AC 8 and has 2 hp. This simple warding does not discriminate; it can just as easily be triggered by the wizard who cast the spell as by a curious rat brushing up against it.\n&emsp;When the *skulltrap* discharges, the skull flashes briefly with red or violet light and violently explodes, releasing a blast of energy drawn from the Negative Material plane. The burst of negative energy does 2d4 hp damage plus 1d4 hp damage for every level of the caster. All living creatures within 10’ of the skull must make a saving throw vs. breath weapon to suffer only half damage from the blast.\n&emsp;Because the trap is so easily triggered, the skull is often placed in its final resting place before casting the spell on it. The trapped skull may be moved without triggering the trap, but it must be moved very slowly and without contact with living matter. Gloves or any other thin materials used to cover the flesh of a living being are not enough to prevent the skulltrap from being discharged.'
 };
 
 wiz4['Brainkill'] = {
@@ -8647,7 +8646,7 @@ wiz4['Brainkill'] = {
     'materials': '',
     'reference': 'p. 54',
     'book': 'The Complete Book of Necromancers',
-    'damage': '[[1d6]]',
+    'damage': '1d6',
     'damage-type': '',
     'healing': '',
     'effect': 'A wizard using this spell, which operates much like a *forget* spell, can permanently burn from the memory of any one creature all knowledge of either a specific place or person or a time period of up to one year (the spellcaster may choose the desired result). The spell works on any intelligent creature by destroying a portion of its brain, but a victim is entitled to a saving throw vs. death magic to resist the effects of the spell. If successful, the creature suffers only a painful headache, which dissipates in 1–4 hours but is otherwise harmless. If failed, the victim suffers 1–6 points of damage from an excruciating headache, leaving him or her with selected gaps in his memory.\n&emsp;*Brainkill* can affect only the victim’s memory and ability to recall factual information. For example, a person thus affected might be completely unable to remember details of a place, the name, appearance, or any traits of a person, or might have a one-year blank in his or her memory. The spell has no effect on a person’s learned abilities or skills. For instance, suppose an individual gained a swimming proficiency six months before coming under the influence of this spell. While the victim will no longer recall the swimming lessons, he or she still retains the ability, though it might not become evident until the victim jumps into a large body of water. Aside from relearning it as best as one can, the lost knowledge and memories can never be regained except by a *wish*.'
@@ -8665,9 +8664,9 @@ wiz4['Empathic Wound Transfer'] = {
     'materials': 'Hair and blood from both the recipient and the caster, two newt eyes, and two wolf teeth (each from a different animal). These components are consumed in the casting.',
     'reference': 'p. 54',
     'book': 'The Complete Book of Necromancers',
-    'damage': 'Up to [[{2*[[@{level-wizard}]],@{HP}}kl1]] to self\n*Hoovering on death’s door:* Up to [[{2*[[@{level-wizard}]],@{HP}+9}kl1]] to self',
+    'damage': 'Up to [[{2*[[@{level-wizard}]],@{HP}-1}kl1]] to self\n*Hoovering on death’s door:* Up to [[{2*[[@{level-wizard}]],@{HP}+9}kl1]] to self',
     'damage-type': '',
-    'healing': 'Up to [[{2*[[@{level-wizard}]],@{HP}}kl1]] to other\n*Hoovering on death’s door:* Up to [[{2*[[@{level-wizard}]],@{HP}+9}kl1]] to other',
+    'healing': 'Up to [[{2*[[@{level-wizard}]],@{HP}-1}kl1]] to other\n*Hoovering on death’s door:* Up to [[{2*[[@{level-wizard}]],@{HP}+9}kl1]] to other',
     'effect': 'By casting this spell, a wizard transfers some of the wounds of another creature to him- or herself, thereby partially curing the recipient. Up to 2 hp per level of the caster may be transferred, so a 10th level necromancer could cure an ally of a 20-hp wound (but the wizard will then take 20 hp in damage).\n&emsp;The hit point loss could have originally resulted from physical attacks, certain poisons, spell effects, diseases, or curses (except those that cannot be removed by the *remove curse* spell). This spell cannot restore amputated limbs, drained life levels, or lost life. It also cannot undo any continuously acting poison or disease. The spell only temporarily reverses such harm, which will then continue to affect the victim.\n&emsp;The caster cannot drain his or her own life. Normally, a wizard can only transfer up to his or her current number of hit points. However, if the DM makes use of the rules for “hovering on death’s door” (page 104 of the *DMG*), then a necromancer might be voluntarily drained to the brink of death (–9 hp). Of course, the mage immediately loses consciousness in such a case (as noted in the *DMG*), but his or her condition does not deteriorate unless further wounded by another agent. At the DM’s discretion, this spell also enables a necromancer to immediately restore an incapacitated and dying victim, as per the 3rd-level priest spell *death’s door*. Unlike the priest version, however, hit points cured by the *wound transfer* are inflicted on the caster. Hit points lost by the wizard may be regained by normal healing or magic.\n&emsp;Finally, after the *transfer* is complete, the wizard temporarily loses four points of Constitution due to extreme exhaustion; each point may be recovered by six turns of complete rest. If the caster’s Constitution drops below 3, unconsciousness results, and full Constitution is not regained for 24 hours.'
 };
 
@@ -8686,7 +8685,7 @@ wiz4['Summon Spirit'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell allows the wizard to raise up the spirit of a dead human or demihuman, which may answer questions put to it by those present at the summoning. Of course, the questioners must speak the same language as the dead creature.\n&emsp;Summoning a dead spirit is far from a certain or trouble-free enterprise. The base chance that a spirit will answer the summons is 50% + 1% for each experience level of the wizard casting the spell. Currently [[50+[[@{level-wizard}]] ]]%. This chance of success also depends on the authority of the caster in the spirit world, the length of time the subject has been dead, and the specific time of day during the casting (see Table 11).\n&emsp;Regardless of actual penalties or bonuses, the chance of success never drops below 5% or rises above 95%. If the spell fails, there is always the chance that the summoning will attract the attention of some other (potentially hostile) spirit or undead creature, either from the netherworld or the general vicinity of the caster. The chances of summoning a malicious undead are 5%, cumulative with every failed attempt by the same caster. The DM may roll on the table for the clerical spell *summon undead*. Note that this spell in no way protects the wizard (or those present at the casting) from the attacks of inadvertently summoned undead.\n&emsp;If the summoning is successful, the desired spirit slowly rises from the ground before the caster. The spirit’s willingness to answer questions will first determine the effectiveness of the spell. If the spirit is of a different alignment than the caster or formerly had more hit dice than the caster’s current level of experience, the shade is entitled to a saving throw vs. spells to resist the interrogation.\n&emsp;Provided that the spirit is agreeable, it can answer no more than one question for every three levels of the caster. Currently [[floor([[@{level-wizard}]]/3)]] questions. Summoned spirits tend to be evasive and cryptic when questioned by the living. In general, their knowledge is limited to what they knew while alive. A spirit may also be called upon to answer specific questions about the near future, regarding actions undertaken before the next nightfall. Questions and predictions about future events are subject to the same conditions and limitations as the priest spell *augury*.}}{{c1-1=**Table 11:** Spirit Summoning Modifiers\n\n}}{{cs1-1=2}}{{c2-1=**Modifier**}}{{c3-1=+5%}}{{c4-1=+5%}}{{c5-1=+10%}}{{c6-1=None}}{{c7-1=–5%}}{{c8-1=–10%}}{{c9-1=–15%}}{{c10-1=–20%}}{{c11-1=–30%}}{{c12-1=–50%}}{{c13-1=–25%}}{{c14-1=None}}{{c15-1=+10%}}{{c16-1=+25%}}{{c17-1=+10%}}{{c18-1=–10%}}{{c2-2=**Condition**}}{{c3-2=Caster is a necromancer}}{{c4-2=Caster has spirit lore proficiency}}{{c5-2=Caster is a member of the Witch kit}}{{c6-2=Subject dead for up to 1 week}}{{c7-2=Subject dead for up to 1 month}}{{c8-2=Subject dead for up to 1 year}}{{c9-2=Subject dead for up to 10 years}}{{c10-2=Subject dead for up to 100 years}}{{c11-2=Subject dead for up to 1000 years}}{{c12-2=Subject dead 1000 years +}}{{c13-2=Spell cast by day}}{{c14-2=Spell cast at night}}{{c15-2=Spell cast at full moon}}{{c16-2=cast on a holy day associated with the dead}}{{c17-2=Ancestor present at summoning}}{{c18-2=Spirit previously summoned within the same month}}{{effects2=This spell requires a shallow pit filled with the blood from a slaughtered ram. The pit opens a symbolic link with the netherworld, while the blood serves to lure a spirit back into the world of the living. Note that the blood may also attract hostile undead (if the summoning fails). The DM may care to modify this spell so that it always summons a host of spirits (numbering 1–20) who must be individually questioned and placated before the desired shade arrives. The DM may also care to increase the chances of summoning a hostile undead (even if the spell succeeds) to reflect the caster’s location and the tone of the campaign. Obviously, calling a beneficial spirit near the burial mound of a wraith may bring both creatures to investigate the unusual summons.'
+    'effect': 'This spell allows the wizard to raise up the spirit of a dead human or demihuman, which may answer questions put to it by those present at the summoning. Of course, the questioners must speak the same language as the dead creature.\n&emsp;Summoning a dead spirit is far from a certain or trouble-free enterprise. The base chance that a spirit will answer the summons is 50% + 1% for each experience level of the wizard casting the spell. Currently [[50+[[@{level-wizard}]] ]]%. This chance of success also depends on the authority of the caster in the spirit world, the length of time the subject has been dead, and the specific time of day during the casting (see Table 11).\n&emsp;Regardless of actual penalties or bonuses, the chance of success never drops below 5% or rises above 95%. If the spell fails, there is always the chance that the summoning will attract the attention of some other (potentially hostile) spirit or undead creature, either from the netherworld or the general vicinity of the caster. The chances of summoning a malicious undead are 5%, cumulative with every failed attempt by the same caster. The DM may roll on the table for the clerical spell *summon undead*. Note that this spell in no way protects the wizard (or those present at the casting) from the attacks of inadvertently summoned undead.\n&emsp;If the summoning is successful, the desired spirit slowly rises from the ground before the caster. The spirit’s willingness to answer questions will first determine the effectiveness of the spell. If the spirit is of a different alignment than the caster or formerly had more hit dice than the caster’s current level of experience (more than [[@{level-wizard}]] hit dice), the shade is entitled to a saving throw vs. spells to resist the interrogation.\n&emsp;Provided that the spirit is agreeable, it can answer no more than one question for every three levels of the caster. Currently [[floor([[@{level-wizard}]]/3)]] questions. Summoned spirits tend to be evasive and cryptic when questioned by the living. In general, their knowledge is limited to what they knew while alive. A spirit may also be called upon to answer specific questions about the near future, regarding actions undertaken before the next nightfall. Questions and predictions about future events are subject to the same conditions and limitations as the priest spell *augury*.}}{{c1-1=**Table 11:** Spirit Summoning Modifiers\n\n}}{{cs1-1=2}}{{c2-1=**Modifier**}}{{c3-1=+5%}}{{c4-1=+5%}}{{c5-1=+10%}}{{c6-1=None}}{{c7-1=–5%}}{{c8-1=–10%}}{{c9-1=–15%}}{{c10-1=–20%}}{{c11-1=–30%}}{{c12-1=–50%}}{{c13-1=–25%}}{{c14-1=None}}{{c15-1=+10%}}{{c16-1=+25%}}{{c17-1=+10%}}{{c18-1=–10%}}{{c2-2=**Condition**}}{{c3-2=Caster is a necromancer}}{{c4-2=Caster has spirit lore proficiency}}{{c5-2=Caster is a member of the Witch kit}}{{c6-2=Subject dead for up to 1 week}}{{c7-2=Subject dead for up to 1 month}}{{c8-2=Subject dead for up to 1 year}}{{c9-2=Subject dead for up to 10 years}}{{c10-2=Subject dead for up to 100 years}}{{c11-2=Subject dead for up to 1000 years}}{{c12-2=Subject dead 1000 years +}}{{c13-2=Spell cast by day}}{{c14-2=Spell cast at night}}{{c15-2=Spell cast at full moon}}{{c16-2=cast on a holy day associated with the dead}}{{c17-2=Ancestor present at summoning}}{{c18-2=Spirit previously summoned within the same month}}{{effects2=This spell requires a shallow pit filled with the blood from a slaughtered ram. The pit opens a symbolic link with the netherworld, while the blood serves to lure a spirit back into the world of the living. Note that the blood may also attract hostile undead (if the summoning fails). The DM may care to modify this spell so that it always summons a host of spirits (numbering 1–20) who must be individually questioned and placated before the desired shade arrives. The DM may also care to increase the chances of summoning a hostile undead (even if the spell succeeds) to reflect the caster’s location and the tone of the campaign. Obviously, calling a beneficial spirit near the burial mound of a wraith may bring both creatures to investigate the unusual summons.'
 };
 
 wiz5['Bind Undead'] = {
@@ -8722,7 +8721,7 @@ wiz5['Bone Blight'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This nasty curse slowly erodes the healthy bone of any chosen creature within range, who is entitled to a saving throw vs. spells. If failed, all bone in the creature slowly begins to dissolve, eventually reducing it to a quivering mound of formless flesh.\n&emsp;Except for experiencing a strange “tingling sensation” at the time of casting, the victim is not immediately aware of the spell’s effect (making it even more insidious). In the short term (starting at the moment of casting up to the first full day), the bones of the victim become embrittled, greatly increasing his or her susceptibility to crushing attacks or falling damage. At the onset, the subject of this spell sustains double normal damage from such attacks; by the end of the first day, the victim’s current hit points are reduced by 20%.\n&emsp;In the medium term (lasting [[1d6+1]] days from the time of the casting), a victim is subject to frequent, painful fractures. All attacks by piercing and slashing weapons inflict double normal damage, while crushing attacks inflict quadruple damage. By the end of this period, the creature’s hit points are reduced by 60%. In the terminal stage of this spell, a victim’s bones finally dissolve, collapsing the subject’s spine and skull, bringing a slow and painful death.\n&emsp;While under the effects of this spell, the victim’s body is unable to undergo normal healing processes. Magical healing (spells or potions) slows the onset of the terminal stage, but it cannot halt the bone loss process completely. Every 10 hp of magical healing effectively prolongs the victim’s life in the intermediate stage of the affliction for one full day. The slow dissolution of bone can only be halted by a successful *dispel magic* or by *remove curse*, *cure disease*, *limited wish*, *wish*, *heal*, or *restoration* spells. Once the spell has been broken, lost hit points can be healed by normal or magical means.\n&emsp;The reverse of the spell, *bone growth*, immediately halts the *bone blight* and slowly (over a period of 1–6 days) restores all damage caused by that spell. *Bone growth* can also be used to fuse normal fractures by accelerating the recipient’s normal healing processes. Mild compression fractures heal in a day, while more serious ruptures (such as a broken leg or back) might take 1–4 days to fuse (assuming complete bed rest for the patient; otherwise healing time is doubled). This spell does not affect wounds or soft tissue damage, including cuts and sprains, nor does it correct for improper alignment of the bones while healing.\n&emsp;Both versions of this spell only work on living creatures and have no effect if cast on undead.'
+    'effect': 'This nasty curse slowly erodes the healthy bone of any chosen creature within range, who is entitled to a saving throw vs. spells. If failed, all bone in the creature slowly begins to dissolve, eventually reducing it to a quivering mound of formless flesh.\n&emsp;Except for experiencing a strange “tingling sensation” at the time of casting, the victim is not immediately aware of the spell’s effect (making it even more insidious). In the short term (starting at the moment of casting up to the first full day), the bones of the victim become embrittled, greatly increasing his or her susceptibility to crushing attacks or falling damage. At the onset, the subject of this spell sustains double normal damage from such attacks; by the end of the first day, the victim’s current hit points are reduced by 20%.\n&emsp;In the medium term (lasting 1d6+1 days from the time of the casting), a victim is subject to frequent, painful fractures. All attacks by piercing and slashing weapons inflict double normal damage, while crushing attacks inflict quadruple damage. By the end of this period, the creature’s hit points are reduced by 60%. In the terminal stage of this spell, a victim’s bones finally dissolve, collapsing the subject’s spine and skull, bringing a slow and painful death.\n&emsp;While under the effects of this spell, the victim’s body is unable to undergo normal healing processes. Magical healing (spells or potions) slows the onset of the terminal stage, but it cannot halt the bone loss process completely. Every 10 hp of magical healing effectively prolongs the victim’s life in the intermediate stage of the affliction for one full day. The slow dissolution of bone can only be halted by a successful *dispel magic* or by *remove curse*, *cure disease*, *limited wish*, *wish*, *heal*, or *restoration* spells. Once the spell has been broken, lost hit points can be healed by normal or magical means.\n&emsp;The reverse of the spell, *bone growth*, immediately halts the *bone blight* and slowly (over a period of 1–6 days) restores all damage caused by that spell. *Bone growth* can also be used to fuse normal fractures by accelerating the recipient’s normal healing processes. Mild compression fractures heal in a day, while more serious ruptures (such as a broken leg or back) might take 1–4 days to fuse (assuming complete bed rest for the patient; otherwise healing time is doubled). This spell does not affect wounds or soft tissue damage, including cuts and sprains, nor does it correct for improper alignment of the bones while healing.\n&emsp;Both versions of this spell only work on living creatures and have no effect if cast on undead.'
 };
 
 wiz5['Graft Flesh'] = {
@@ -8758,7 +8757,7 @@ wiz6['Corpse Host'] = {
     'damage': '[[1d3]] to the recipient',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables an individual touched by the caster to transfer his or her life force to temporarily animate the fresh corpse of a human, demihuman, or humanoid. This spell will fail if cast on undead. The recipient wills the cadaver to move and act and can even cast spells through it—all while his or her own body is safely up to 5 miles away per level of the caster. Currently [[5*[[@{level-wizard}]] ]]. While animated by the host’s life force, the corpse ceases to decay; however, unless illusionary magic is cast upon it, the cadaver will appear to be a form of undead (such a ju-ju zombie).\n&emsp;The recipient (who may be the caster) can see, hear, and sense through the *corpse host*. The host can fight, talk hoarsely (with the voice of the corpse), and carry things—in fact, it can perform all tasks less exacting than lock-picking, sewing, and similar handicrafts. It can even go adventuring and earn experience points for its “master.”\n&emsp;The recipient’s mind functions in two places simultaneously—within the *corpse host* and within his or her real body. The real body can still sense (see, hear, and so on) exactly as before, even benefiting from enhancements such as a magical ring. The tradeoff is paralysis. Aside from breathing, blinking, and moving his or her eyes, the recipient cannot move his or her real body while the host is animated. (Friendly guards are a wise precaution. So is a pleasant or strategic view). The real body does not need to eat, drink, or sleep.\n&emsp;The recipient is vulnerable when his or her *corpse host* is the target of magical and psionic powers that affect the mind. The host can be fooled by illusion spells to the same degree as the recipient. It works this way because both recipient and host are actually sharing the same mind.\n&emsp;Physical attacks against the corpse host don’t damage the real body, though they do harm the host. The latter has a number of “hit points” equal to the recipient’s normal maximum (even if the recipient is currently crippled). The host has the recipient’s natural armor class (10), though it may wear armor and employ weaponry with the same restrictions that apply to the recipient. The host does not benefit from anything worn or carried by the recipient’s real body, however.\n&emsp;The corpse host can withstand attacks as well as (or as poorly as) the recipient can normally. Note that since the host is not undead, it may not be turned or affected with spells or magical items that influence such creatures.\n&emsp;If the host drops to 0 or fewer hit points, the owner must make a system shock roll. Failure indicates that the real body also dies along with the host. The spiritual link between the recipient and host can also be abruptly severed by (successfully) casting the wizard spells *dispel magic*, *limited wish* or *wish* or by employing the clerical spells *spirit release* or *dispel evil*. Severance of the spiritual link also requires the recipient to make a system shock roll in order to survive the ordeal.\n&emsp;The recipient of this spell can abandon the link with the *corpse host* at any time, with no harm to him- or herself. The host immediately collapses (resuming its usual decay), and the recipient immediately regains control of his or her real body. The same thing occurs when the spell ends or the *corpse host* somehow moves beyond the spell’s range or to another plane.\n&emsp;Harvesting the piece of flesh from the recipient’s at the time of casting also inflicts 1–3 hit points of damage. At the conclusion of the spell, the recipient is entitled to a saving throw vs. death magic. If failed, the hit point loss is permanent (consumed by the spell) and cannot be reversed or magically healed except with a *wish* or *restoration* spell. If successful, the loss in hit points, while temporary, can only be regained by normal rest.'
+    'effect': 'This spell enables an individual touched by the caster to transfer his or her life force to temporarily animate the fresh corpse of a human, demihuman, or humanoid. This spell will fail if cast on undead. The recipient wills the cadaver to move and act and can even cast spells through it—all while his or her own body is safely up to 5 miles away per level of the caster. Currently up to [[5*[[@{level-wizard}]] ]] miles away. While animated by the host’s life force, the corpse ceases to decay; however, unless illusionary magic is cast upon it, the cadaver will appear to be a form of undead (such a ju-ju zombie).\n&emsp;The recipient (who may be the caster) can see, hear, and sense through the corpse host. The host can fight, talk hoarsely (with the voice of the corpse), and carry things—in fact, it can perform all tasks less exacting than lock-picking, sewing, and similar handicrafts. It can even go adventuring and earn experience points for its “master.”\n&emsp;The recipient’s mind functions in two places simultaneously—within the corpse host and within his or her real body. The real body can still sense (see, hear, and so on) exactly as before, even benefiting from enhancements such as a magical ring. The tradeoff is paralysis. Aside from breathing, blinking, and moving his or her eyes, the recipient cannot move his or her real body while the host is animated. (Friendly guards are a wise precaution. So is a pleasant or strategic view). The real body does not need to eat, drink, or sleep.\n&emsp;The recipient is vulnerable when his or her corpse host is the target of magical and psionic powers that affect the mind. The host can be fooled by illusion spells to the same degree as the recipient. It works this way because both recipient and host are actually sharing the same mind.\n&emsp;Physical attacks against the corpse host don’t damage the real body, though they do harm the host. The latter has a number of “hit points” equal to the recipient’s normal maximum (even if the recipient is currently crippled). The host has the recipient’s natural armor class (10), though it may wear armor and employ weaponry with the same restrictions that apply to the recipient. The host does not benefit from anything worn or carried by the recipient’s real body, however.\n&emsp;The corpse host can withstand attacks as well as (or as poorly as) the recipient can normally. Note that since the host is not undead, it may not be turned or affected with spells or magical items that influence such creatures.\n&emsp;If the host drops to 0 or fewer hit points, the owner must make a system shock roll. Failure indicates that the real body also dies along with the host. The spiritual link between the recipient and host can also be abruptly severed by (successfully) casting the wizard spells *dispel magic*, *limited wish* or *wish* or by employing the clerical spells *spirit release* or *dispel evil*. Severance of the spiritual link also requires the recipient to make a system shock roll in order to survive the ordeal.\n&emsp;The recipient of this spell can abandon the link with the *corpse host* at any time, with no harm to him- or herself. The host immediately collapses (resuming its usual decay), and the recipient immediately regains control of his or her real body. The same thing occurs when the spell ends or the *corpse host* somehow moves beyond the spell’s range or to another plane.\n&emsp;Harvesting the piece of flesh from the recipient’s at the time of casting also inflicts 1–3 hit points of damage. At the conclusion of the spell, the recipient is entitled to a saving throw vs. death magic. If failed, the hit point loss is permanent (consumed by the spell) and cannot be reversed or magically healed except with a *wish* or *restoration* spell. If successful, the loss in hit points, while temporary, can only be regained by normal rest.'
 };
 
 wiz6['Ghoul Gauntlet'] = {
@@ -8794,7 +8793,7 @@ wiz6['Transmute Bone to Steel'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A wizard casting this spell makes any object made of bone, including a skeleton, as strong as steel. The spell may be cast only upon dead, inanimate bones; after they have been transmuted, the bones may now be animated by the usual means. Despite their increased strength, the bones do not change in appearance, and they retain their original weight. Bone objects make all future saving throws as if they were hard metal (*DMG*, page 39). Transmuted skeletons now have AC 3 and take half the usual damage from physical attacks. However, these skeletons still take normal damage from holy water and magical attacks and are also subject to spells affecting metal (*transmute metal to wood* or *heat metal*) and the attacks of creatures that especially affect metal, such as rust monsters.\n&emsp;The reverse of this spell, *transmute steel to bone*, weakens any metal by making it as brittle as dry bone (altering all saving throws appropriately). Each non-living recipient of this spell must make an item saving throw vs. disintegration. If failed, the former metal item makes all future saves as if it were fashioned from bone. Metal armor loses its effectiveness,\n&emsp;becoming AC 7. Whenever a successful hit is made by or upon the item, the transmuted object must make a save vs. crushing blow to remain intact and functional. Magic items weakened by this spell remain magical, with any bonuses applied to their saving throws. Weapons affected by this spell inflict –2 hp per die of damage (and must save to avoid breakage whenever they hit a target). Physical attacks versus transmuted metal creatures inflict +2 hp per die of damage.'
+    'effect': 'A wizard casting this spell makes any object made of bone, including a skeleton, as strong as steel. The spell may be cast only upon dead, inanimate bones; after they have been transmuted, the bones may now be animated by the usual means. Despite their increased strength, the bones do not change in appearance, and they retain their original weight. Bone objects make all future saving throws as if they were hard metal (*DMG*, page 39). Transmuted skeletons now have AC 3 and take half the usual damage from physical attacks. However, these skeletons still take normal damage from holy water and magical attacks and are also subject to spells affecting metal (*transmute metal to wood* or *heat metal*) and the attacks of creatures that especially affect metal, such as rust monsters.\n&emsp;The reverse of this spell, *transmute steel to bone*, weakens any metal by making it as brittle as dry bone (altering all saving throws appropriately). Each non-living recipient of this spell must make an item saving throw vs. disintegration. If failed, the former metal item makes all future saves as if it were fashioned from bone. Metal armor loses its effectiveness, becoming AC 7. Whenever a successful hit is made by or upon the item, the transmuted object must make a save vs. crushing blow to remain intact and functional. Magic items weakened by this spell remain magical, with any bonuses applied to their saving throws. Weapons affected by this spell inflict –2 hp per die of damage (and must save to avoid breakage whenever they hit a target). Physical attacks versus transmuted metal creatures inflict +2 hp per die of damage.'
 };
 
 wiz7['Wound Conferral'] = {
@@ -8830,7 +8829,7 @@ wiz8['Death Shroud'] = {
     'damage': '20% of current hit points per round',
     'damage-type': '',
     'healing': '',
-    'effect': '*Death shroud* draws upon the Negative Material Plane to surround the caster in a dark and shadowy aura of life-draining energy. While the spellcaster suffers no ill-effects from this baneful radiance, it may have dire consequences for anyone who comes into contact with the aura.\n&emsp;The *death shroud* can be used actively in offense and passively in defense. In combat, the wizard may activate the deadly power of the spell by touching a victim (requiring a successful attack roll). Any creature touched must immediately save vs. death magic with a –4 penalty. If the roll is successful, the victim is unharmed. If the save is failed, a black haze forms around the victim, draining 20% of his or her current hit points each round until the unfortunate individual dies at the end of the fifth round. The *death shroud* also serves as a passive ward or protection for the caster. Anyone who touches the wizard or attempts to strike him or her with any hand-held object or melee weapon must make a saving throw vs. death magic (with no penalties) or be stricken by the *death shroud* in a similar manner.\n&emsp;The following spells remove the *death shroud* from an afflicted individual: *cure critical wounds*, *heal*, *limited wish*, *wish*, or a successful *dispel magic*. Lesser curing spells and *healing* potions delay death only by one round. Multiple applications of these spells or potions may prolong a victim’s life until the duration of the spell expires. The spell may also be ended prematurely by killing or successfully employing *dispel magic* on the caster (this immediately releases all creatures afflicted by the spell).\n&emsp;The *death shroud* remains in effect until the wizard has successfully attacked or been attacked by a number of creatures equal to his or her current level (or the spell’s maximum duration of two rounds per level has elapsed). Currently [[@{level-wizard}]] creatures. Undead are not affected by this spell. In fact, if an undead creature is attacked by a *death shroud*, it immediately gains 1 HD, and the wizard must save vs. death magic or suffer the effects of the *death shroud* him- or herself.\n&emsp;This dreadful spell is known only to a select cadre of necromancers who purportedly learned it from a mysterious, bronze-bound book of extraplanar origin.'
+    'effect': '*Death shroud* draws upon the Negative Material Plane to surround the caster in a dark and shadowy aura of life-draining energy. While the spellcaster suffers no ill-effects from this baneful radiance, it may have dire consequences for anyone who comes into contact with the aura.\n&emsp;The *death shroud* can be used actively in offense and passively in defense. In combat, the wizard may activate the deadly power of the spell by touching a victim (requiring a successful attack roll). Any creature touched must immediately save vs. death magic with a –4 penalty. If the roll is successful, the victim is unharmed. If the save is failed, a black haze forms around the victim, draining 20% of his or her current hit points each round until the unfortunate individual dies at the end of the fifth round. The *death shroud* also serves as a passive ward or protection for the caster. Anyone who touches the wizard or attempts to strike him or her with any hand-held object or melee weapon must make a saving throw vs. death magic (with no penalties) or be stricken by the *death shroud* in a similar manner.\n&emsp;The following spells remove the *death shroud* from an afflicted individual: *cure critical wounds*, *heal*, *limited wish*, *wish*, or a successful *dispel magic*. Lesser curing spells and *healing* potions delay death only by one round. Multiple applications of these spells or potions may prolong a victim’s life until the duration of the spell expires. The spell may also be ended prematurely by killing or successfully employing *dispel magic* on the caster (this immediately releases all creatures afflicted by the spell).\n&emsp;The *death shroud* remains in effect until the wizard has successfully attacked or been attacked by a number of creatures equal to his or her current level (or the spell’s maximum duration of two rounds per level has elapsed). Undead are not affected by this spell. In fact, if an undead creature is attacked by a *death shroud*, it immediately gains 1 HD, and the wizard must save vs. death magic or suffer the effects of the *death shroud* him- or herself.\n&emsp;This dreadful spell is known only to a select cadre of necromancers who purportedly learned it from a mysterious, bronze-bound book of extraplanar origin.'
 };
 
 wiz8['Life Force Transfer'] = {
@@ -8861,12 +8860,12 @@ wiz9['Death Ward'] = {
     'cast-time': '1 turn',
     'saving-throw': 'Negate',
     'materials': 'A magical ink fabricated exclusively for this spell. The list of the ink’s noxious ingredients is lengthy and complex, but it includes the venom of numerous poisonous animals and the acrid ichor of extraplanar fiends. The ink also requires the dust of powdered perdiots and garnets, worth between 2,000–8,000 gp.',
-    'reference': 'p. 61',
+    'reference': 'p. 62',
     'book': 'The Complete Book of Necromancers',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By covering a doorway with the most forbidden and lethal of necromantic runes, a wizard can protect a small portal so that any creature that tries to pass through the warded area without first speaking a word of command is immediately subjected to a modified *death spell*. A *death ward* may also be cast on an item (usually a spell book or phylactery) or on a tunnel or cave entrance no larger than 30’ feet in diameter. A single application of this spell can kill up to twice as many hit dice or levels of creatures as the wizard who cast the spell has levels of experience (thus a 20th-level wizard can slay up to 40 levels with a single *death ward*). Currently up to [[2*[[@{level-wizard}]] ]] levels or hit dice.\n&emsp;Each creature passing through the ward is entitled to a saving throw vs. death magic with a –4 penalty; if successful, the individual survives and the ward loses none of its lethality. However, those who fail their saves are immediately slain (as per a *death spell*) and their levels or hit dice are subtracted from the potency of the ward. Those with greater hit dice than the current power of the *death ward* are unaffected by the spell.\n&emsp;For example, an 18th-level lich has cast the *death ward* (which can slay up to 36 levels) on the entrance to her inner sanctum. A party of four characters, each 15th level, enter her lair and foolishly traverse the warding. The first member fails his save and perishes, reducing the ward’s effectiveness to 21 levels. The second character makes her save and thus escapes any ill effects (the ward remains unaffected, however). The third character fails the save and dies also, reducing the ward to 6 levels of potency. The fourth 15th-level character has too many levels of experience to be affected by the weakened ward, which remains in effect until drained by a less powerful being.\n&emsp;Despite its lethality, this is not a subtle warding. The protected area or object is literally covered with intricate, arcane runes and symbols at the time of casting These glyphs may flash ominously with pale red or blue light when approached within 10 feet. The entire area radiates a magical aura of lethal necromancy. Provided that he or she is on the same plane of existence, the caster will be immediately aware if the *death ward* has been triggered. By concentrating, the wizard who cast the ward may determine its current level of lethality, regardless of distance.\n&emsp;This terrible spell is a closely held secret, guarded jealously by the most powerful and black-hearted of necromancers and liches. It was originally designed by liches, as they can easily sustain the rigors of casting such a spell.\n&emsp;Mortal wizards who employ this powerful spell have a 25% chance of going insane (as per the *contact other plane* spell), contracting permanent paralysis (via a stroke), or suffering from a terminal illness (as per the *cause disease* spell) as adjudicated by the DM. The danger of misfortune is reduced by 5% for every point by which the mortal wizard’s Intelligence is above 18, though this modified chance never drops below 5%. Currently [[{25-[[{@{Intelligence},0}>18*(@{Intelligence}-18)*5]],5}kh1]]%. Curiously, the mental stability afforded by lichdom makes these undying wizards completely immune to the dangers of employing this ward. It is similarly rumored that certain ancient, evil dragons have developed an even more potent version of this spell, which they may employ in their lairs with impunity.\n&emsp;Not surprisingly, the accumulation of these deadly components and the subsequent fabrication of the baneful ink itself sometimes results in tragedy for a mortal wizard, as mentioned previously.\n&emsp;While the inscription process (the actual casting) of the *death ward* takes only 1 turn, the fabrication process of the ink (once the proper ingredients have been assembled) takes 1–4 days.'
+    'effect': 'By covering a doorway with the most forbidden and lethal of necromantic runes, a wizard can protect a small portal so that any creature that tries to pass through the warded area without first speaking a word of command is immediately subjected to a modified *death spell*. A *death ward* may also be cast on an item (usually a spell book or phylactery) or on a tunnel or cave entrance no larger than 30 feet in diameter. A single application of this spell can kill up to twice as many hit dice or levels of creatures as the wizard who cast the spell has levels of experience (thus a 20th-level wizard can slay up to 40 levels with a single *death ward*). Currently up to [[2*[[@{level-wizard}]] ]] levels or hit dice.\n&emsp;Each creature passing through the ward is entitled to a saving throw vs. death magic with a –4 penalty; if successful, the individual survives and the ward loses none of its lethality. However, those who fail their saves are immediately slain (as per a *death spell*) and their levels or hit dice are subtracted from the potency of the ward. Those with greater hit dice than the current power of the *death ward* are unaffected by the spell.\n&emsp;For example, an 18th-level lich has cast the *death ward* (which can slay up to 36 levels) on the entrance to her inner sanctum. A party of four characters, each 15th level, enter her lair and foolishly traverse the warding. The first member fails his save and perishes, reducing the ward’s effectiveness to 21 levels. The second character makes her save and thus escapes any ill effects (the ward remains unaffected, however). The third character fails the save and dies also, reducing the ward to 6 levels of potency. The fourth 15th-level character has too many levels of experience to be affected by the weakened ward, which remains in effect until drained by a less powerful being.\n&emsp;Despite its lethality, this is not a subtle warding. The protected area or object is literally covered with intricate, arcane runes and symbols at the time of casting. These glyphs may flash ominously with pale red or blue light when approached within 10 feet. The entire area radiates a magical aura of lethal necromancy. Provided that he or she is on the same plane of existence, the caster will be immediately aware if the *death ward* has been triggered. By concentrating, the wizard who cast the ward may determine its current level of lethality, regardless of distance.\n&emsp;This terrible spell is a closely held secret, guarded jealously by the most powerful and black-hearted of necromancers and liches. It was originally designed by liches, as they can easily sustain the rigors of casting such a spell.\n&emsp;Mortal wizards who employ this powerful spell have a 25% chance of going insane (as per the *contact other plane* spell), contracting permanent paralysis (via a stroke), or suffering from a terminal illness (as per the *cause disease* spell) as adjudicated by the DM. The danger of misfortune is reduced by 5% for every point by which the mortal wizard’s Intelligence is above 18, though this modified chance never drops below 5%. Curiously, the mental stability afforded by lichdom makes these undying wizards completely immune to the dangers of employing this ward. It is similarly rumored that certain ancient, evil dragons have developed an even more potent version of this spell, which they may employ in their lairs with impunity.\n&emsp;The material component is a magical ink fabricated exclusively for this spell. The list of the ink’s noxious ingredients is lengthy and complex, but it includes the venom of numerous poisonous animals and the acrid ichor of extraplanar fiends. Not surprisingly, the accumulation of these deadly components and the subsequent fabrication of the baneful ink itself sometimes results in tragedy for a mortal wizard, as mentioned previously.\n&emsp;While the inscription process (the actual casting) of the *death ward* takes only 1 turn, the fabrication process of the ink (once the proper ingredients have been assembled) takes 1–4 days. The ink also requires the dust of powdered perdiots and garnets, worth between 2,000–8,000 gp. '
 };
 
 wiz9['Life Force Exchange'] = {
@@ -8884,7 +8883,7 @@ wiz9['Life Force Exchange'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell permanently switches the life forces of two creatures (one of which may be the caster). Both recipients must be within range at the time the spell is completed, or it fails automatically. When employed correctly, both creatures are surrounded by a radiant green aura and must save vs. spells at –6 to avoid the effects (obviously, willing recipients may forego the saving throw to consciously accept the effect).\n&emsp;The spell only functions properly if both recipients fail their saving throws. If only one target of the spell fails the save, then the one who made the saving throw is automatically stunned (reeling and unable to take action) for 1 round. Meanwhile the other subject (the one who failed the save) is stunned for 1–4 rounds.\n&emsp;In the event of a successful transfer, both life forces retain all of their original mental abilities and behavioral patterns, although their physical abilities are limited (or possibly enhanced) by their new forms. For instance, a decrepit necromancer uses this spell to exchange life forces with a hale, young warrior in the prime of his health. While the wizard gains a young and vigorous body (and all of the benefits that go with it), the unfortunate youth finds himself trapped in the withered shell of a dying, old man. Creatures unaccustomed to being shifted in this way are stunned for a minimum of 1 round after the transfer.\n&emsp;The effects of this spell are permanent and can only be reversed by a full *wish* or by the reverse of the spell, *revoke life force exchange*. If one of the bodies is slain before reversal can take place, the life force currently inhabiting that body departs. That spirit and its new body are dead just as if the spirit was in the body that actually belonged to it in the first place. The life force originally belonging to the slain body is now irreversibly trapped in its new form. Short of expending two *wishes* (one to restore the slain body, and the second to transfer the life force), the only way to now restore the victim to his or her rightful body is by cloning the original body and casting *revoke life force exchange*.'
+    'effect': 'This spell permanently switches the life forces of two creatures (one of which may be the caster). Both recipients must be within range at the time the spell is completed, or it fails automatically. When employed correctly, both creatures are surrounded by a radiant green aura and must save vs. spells at –6 to avoid the effects (obviously, willing recipients may forego the saving throw to consciously accept the effect).\n&emsp;The spell only functions properly if both recipients fail their saving throws. If only one target of the spell fails the save, then the one who made the saving throw is automatically stunned (reeling and unable to take action) for 1 round. Meanwhile the other subject (the one who failed the save) is stunned for 1–4 rounds.\n&emsp;In the event of a successful transfer, both life forces retain all of their original mental abilities and behavioral patterns, although their physical abilities are limited (or possibly enhanced) by their new forms. For instance, a decrepit necromancer uses this spell to exchange life forces with a hale, young warrior in the prime of his health. While the wizard gains a young and vigorous body (and all of the benefits that go with it), the unfortunate youth finds himself trapped in the withered shell of a dying, old man. Creatures unaccustomed to being shifted in this way are stunned for a minimum of 1 round after the transfer.\n&emsp;The effects of this spell are permanent and can only be reversed by a full *wish* or by the reverse of the spell, *revoke life force exchange*. If one of the bodies is slain before reversal can take place, the life force currently inhabiting that body departs. That spirit and its new body are dead just as if the spirit was in the body that actually belonged to it in the first place. The life force originally belonging to the slain body is now irreversibly trapped in its new form. Short of expending two *wishes* (one to restore the slain body, and the second to transfer the life force), the only way to now restore the victim to his or her rightful body is by *cloning* the original body and casting *revoke life force exchange*.'
 };
 //#endregion
 
@@ -8946,7 +8945,7 @@ wiz1['Find Direction'] = {
 wiz1['Lesser Distraction'] = {
     'level': '1',
     'school': 'Illusion',
-    'range': '[[5*[[@{level-wizard}]] ]] feets',
+    'range': '[[5*[[@{level-wizard}]] ]] feet',
     'duration': 'Instantaneous',
     'aoe': 'One creature',
     'components': 'S',
@@ -8976,17 +8975,17 @@ wiz2['Deepen Shadows'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell slowly, inconspicuously darkens the room where the ninja is. The change is gradual, taking five rounds (five minutes). With a successful saving throw at a -4 penalty, someone inside the room can notice that it is getting darker, but this observation does not affect the spell’s progress.\n&emsp;When the spell is completed, the room is as full of shadow and darkness as possible without arousing suspicion. If it is daylight outside, it will seem that a cloud has passed over the sun. If it is nighttime, the candles and fire seem to have burned low. The dimming of the light does not appear at all menacing to people in the area, though a *detect magic* spell will reveal the presence of the *deepen shadows* spell.\n&emsp;The caster receives a +2% bonus per experience level to her hide in shadows roll within the effect of the *deepen shadows* spell. Currently +[[2*[[@{level-wizard}]] ]]%. Only the caster receives this bonus, because only she has complete understanding of the way the shadows fall.\n&emsp;This spell is useful to a ninja who cannot use her ability to hide in shadows because the area is too bright. The shadows created by this spell can help ninja to escape, to infiltrate, to pull sleight-of-hand switches, etc.\n&emsp;If the casting ninja is in a portal or doorway between rooms, she may choose which room is darkened by this spell.\n&emsp;If the ninja is of sufficient level that she could cover more than the area of the room she occupies, the excess area is lost unless there is an open portal between the ninja’s room and an adjacent room, and the ninja’s spell can affect enough area to cover both mms completely.\n&emsp;If the ninja is not of sufficient level to affect the entire area of a room, the spell automatically fails.\n\n&emsp;**Example:** As a 10th-level Spirit Warrior, Noriko casts magic as a 2nd-level spellcaster and thus can cover a 1O’✕20’ area with her *deepen shadows* spell. However, she is standing in a 2O’✕20’ room and so cannot cover the entire area. If she attempts to cast her spell here, the casting will fail.'
+    'effect': 'This spell slowly, inconspicuously darkens the room where the ninja is. The change is gradual, taking five rounds (five minutes). With a successful saving throw at a -4 penalty, someone inside the room can notice that it is getting darker, but this observation does not affect the spell’s progress.\n&emsp;When the spell is completed, the room is as full of shadow and darkness as possible without arousing suspicion. If it is daylight outside, it will seem that a cloud has passed over the sun. If it is nighttime, the candles and fire seem to have burned low. The dimming of the light does not appear at all menacing to people in the area, though a *detect magic* spell will reveal the presence of the *deepen shadows* spell.\n&emsp;The caster receives a +2% bonus per experience level to her hide in shadows roll within the effect of the *deepen shadows* spell. Currently +[[2*[[@{level-wizard}]] ]]%. Only the caster receives this bonus, because only she has complete understanding of the way the shadows fall.\n&emsp;This spell is useful to a ninja who cannot use her ability to hide in shadows because the area is too bright. The shadows created by this spell can help ninja to escape, to infiltrate, to pull sleight-of-hand switches, etc.\n&emsp;If the casting ninja is in a portal or doorway between rooms, she may choose which room is darkened by this spell.\n&emsp;If the ninja is of sufficient level that she could cover more than the area of the room she occupies, the excess area is lost unless there is an open portal between the ninja’s room and an adjacent room, and the ninja’s spell can affect enough area to cover both rooms completely.\n&emsp;If the ninja is not of sufficient level to affect the entire area of a room, the spell automatically fails.\n\n&emsp;**Example:** As a 10th-level Spirit Warrior, Noriko casts magic as a 2nd-level spellcaster and thus can cover a 10’✕20’ area with her *deepen shadows* spell. However, she is standing in a 20’✕20’ room and so cannot cover the entire area. If she attempts to cast her spell here, the casting will fail.'
 };
 
 wiz2['Featherfoot'] = {
     'level': '2',
     'school': 'Alteration (Reversible)',
     'range': 'Touch',
-    'duration': '1 turn',
+    'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': 'One creature',
     'components': 'S',
-    'cast-time': '[[5*[[@{level-wizard}]] ]] rounds',
+    'cast-time': '1 turn',
     'saving-throw': 'None',
     'materials': '',
     'reference': 'p. 19',
@@ -8994,7 +8993,7 @@ wiz2['Featherfoot'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The person affected by this spell gains the magical ability to move quietly and weightlessly at a normal walking pace or slower. If he tries to go any faster, the effect of the spell is lost.\n&emsp;While the spell is in effect, the character gains +30% to his move silently roll. (If he does not possess this skill, for the duration of the spell he performs as though he does possess the skill with a score of 30%.)\n&emsp;The person affected by this spell does not leave any footprints,nor does he set off weight- or pressure-based traps.\n&emsp;The reverse of this spell, *leadfoot*, affects one creature. The victim is allowed a saving throw to avoid being affected by the spell.\n&emsp;The victim of a *leadfoot* spell moves loudly and heavily. He cannot move silently or hide in shadows, and automatically sets off any pressure-based traps he steps on. (No roll is necessary.)\n&emsp;A *leadfooted* character inside the area of a silence spell moves normally; he can be heard if he fails to make a move silently roll.'
+    'effect': 'The person affected by this spell gains the magical ability to move quietly and weightlessly at a normal walking pace or slower. If he tries to go any faster, the effect of the spell is lost.\n&emsp;While the spell is in effect, the character gains +30% to his move silently roll. (If he does not possess this skill, for the duration of the spell he performs as though he does possess the skill with a score of 30%.)\n&emsp;The person affected by this spell does not leave any footprints, nor does he set off weight- or pressure-based traps.\n&emsp;The reverse of this spell, *leadfoot*, affects one creature. The victim is allowed a saving throw to avoid being affected by the spell.\n&emsp;The victim of a *leadfoot* spell moves loudly and heavily. He cannot move silently or hide in shadows, and automatically sets off any pressure-based traps he steps on. (No roll is necessary.)\n&emsp;A *leadfooted* character inside the area of a *silence* spell moves normally; he can be heard if he fails to make a move silently roll.\n&emsp;(***Sheet Author’s note:*** Duration and casting time has been swapped from as written in the book, since increasing cast time made no sense and was not consistent with *Improve Featherfoot*.)'
 };
 
 wiz3['Age to Destruction'] = {
@@ -9020,7 +9019,7 @@ wiz3['Detect the Living'] = {
     'school': 'Divination',
     'range': '0',
     'duration': '3 turns',
-    'aoe': '[[60+10*[[@{level-wizard}]] ]] feets',
+    'aoe': '[[60+10*[[@{level-wizard}]] ]] feet',
     'components': 'S',
     'cast-time': '1 round',
     'saving-throw': 'None',
@@ -9084,7 +9083,7 @@ wiz4['Improved Mirror Image'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell works much like the 2nd-level wizard spell *mirror image*, with some important differences.\n&emsp;The *mirror images* appear in the vicinity of the caster, but they can move up to 30 feet away. Although the images must face the same target or enemy (whichever one the spellcaster is facing), they do not have to perform exactly the same actions. They can draw different weapons or appear to choose different tactics in combat.\n&emsp;When struck in combat, these images collapse as if “injured or killed, feeling solid to the person attacking them. Only at the start of the next combat round do “injured” images disappear.\n&emsp;Like the images created by a *mirror image* spell, these visions can do no actual damage. If they attack an enemy in combat, all their attacks seem to miss until they are struck or the spell duration ends.\n&emsp;To determine how many images appear, the DM rolls 1d4 and adds 1 for every three levels of the ninja’s spellcasting experience. Currently [[floor([[@{level-wizard}]]/3)]] additional images.'
+    'effect': 'This spell works much like the 2nd-level wizard spell *mirror image*, with some important differences.\n&emsp;The *mirror images* appear in the vicinity of the caster, but they can move up to 30 feet away. Although the images must face the same target or enemy (whichever one the spellcaster is facing), they do not have to perform exactly the same actions. They can draw different weapons or appear to choose different tactics in combat.\n&emsp;When struck in combat, these images collapse as if injured or killed, feeling solid to the person attacking them. Only at the start of the next combat round do “injured” images disappear.\n&emsp;Like the images created by a *mirror image* spell, these visions can do no actual damage. If they attack an enemy in combat, all their attacks seem to miss until they are struck or the spell duration ends.\n&emsp;To determine how many images appear, the DM rolls 1d4 and adds 1 for every three levels of the ninja’s spellcasting experience. Currently [[floor([[@{level-wizard}]]/3)]] additional images.'
 };
 
 wiz5['Shadow-Form'] = {
@@ -9102,15 +9101,15 @@ wiz5['Shadow-Form'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'With this spell, the ninja creates a transparent duplicate of himself. The duplicate, or *shadow-form*, appears adjacent to the spellcaster. It wears all the clothing and carries all the equipment that were in the ninja’s possession when he cast the spell, leaving him unclothed and unarmed; the clothing and equipment are not transparent.\n&emsp;For the duration of the spell, the ninja controls the *shadow-form*’s actions and sees through its eyes. It is an extension of him and possesses all of his physical and mental skills but not his magical abilities. (In other words, it moves, sounds, and fights just as he does but cannot cast spells.) The ninja sees through both sets of eyes at once. When the *shadow-form* is waiting or resting, the ninja can take actions on his own, but he cannot make both his real body and his *shadow-form* act at the same time.\n&emsp;If the *shadow-form* is hit in combat or struck with a *dispel magic* spell, it disappears—leaving behind all the clothing and equipment it was carrying. Also left behind is a handful of leaves inside the clothes, all that remains of the insubstantial body.\n&emsp;Spirit Warriors and spellcasting shinobi use this spell to perform particularly frightening short-term assignments.The *shadow-form* may be sent off to attack someone, to deliver a message, to scout a dangerous area, or to undertake any sort of action in which the ninja cannot afford to be caught. Usually the spellcaster dresses in a ninja night-suit before casting this spell, so that it is not readily obvious that the person within the clothing is transparent. When the *shadow-form* wears a night-suit and moves around in the dark, it is difficult to see that it is not a physical being.'
+    'effect': 'With this spell, the ninja creates a transparent duplicate of himself. The duplicate, or *shadow-form*, appears adjacent to the spellcaster. It wears all the clothing and carries all the equipment that were in the ninja’s possession when he cast the spell, leaving him unclothed and unarmed; the clothing and equipment are not transparent.\n&emsp;For the duration of the spell, the ninja controls the *shadow-form*’s actions and sees through its eyes. It is an extension of him and possesses all of his physical and mental skills but not his magical abilities. (In other words, it moves, sounds, and fights just as he does but cannot cast spells.) The ninja sees through both sets of eyes at once. When the *shadow-form* is waiting or resting, the ninja can take actions on his own, but he cannot make both his real body and his *shadow-form* act at the same time.\n&emsp;If the *shadow-form* is hit in combat or struck with a *dispel magic* spell, it disappears—leaving behind all the clothing and equipment it was carrying. Also left behind is a handful of leaves inside the clothes, all that remains of the insubstantial body.\n&emsp;Spirit Warriors and spellcasting shinobi use this spell to perform particularly frightening short-term assignments. The *shadow-form* may be sent off to attack someone, to deliver a message, to scout a dangerous area, or to undertake any sort of action in which the ninja cannot afford to be caught. Usually the spellcaster dresses in a ninja night-suit before casting this spell, so that it is not readily obvious that the person within the clothing is transparent. When the *shadow-form* wears a night-suit and moves around in the dark, it is difficult to see that it is not a physical being.'
 };
 
 wiz6['Sense Treason'] = {
     'level': '6',
     'school': 'Divination',
-    'range': 'special',
+    'range': 'Special',
     'duration': 'Instantaneous',
-    'aoe': 'the caster',
+    'aoe': 'The caster',
     'components': 'S',
     'cast-time': '5 rounds',
     'saving-throw': 'None',
@@ -9495,7 +9494,7 @@ wiz4['Conjure Elemental-Kin'] = {
     'sensory': 'Medium tactile',
     'knockdown': 'None',
     'crit-size': 'None',
-    'materials': 'Elemental-kin can only be conjured if there is a good amount of their native element at hand; a good-sized fire or a body of water is required for those elemental-kin. In addition to this and either an aquamarine, amber, ruby or emerald gem worth 1,500 gold pieces, the wizard must also provide the spell’s material component, which varies by element: **Air Elemental-kin:** Burning incense. **Earth Elemental-kin:** Soft clay. **Fire Elemental-kin:** Sulphur and phosphorus. **Water Elemental-kin:** Water and sand',
+    'materials': 'Elemental-kin can only be conjured if there is a good amount of their native element at hand; a good-sized fire or a body of water is required for those elemental-kin. In addition to this and either an aquamarine, amber, ruby or emerald gem worth 1,500 gold pieces, the wizard must also provide the spell’s material component, which varies by element: **Air Elemental-kin:** Burning incense. **Earth Elemental-kin:** Soft clay. **Fire Elemental-kin:** Sulphur and phosphorus. **Water Elemental-kin:** Water and sand.',
     'reference': 'p. 145',
     'book': 'Player\'s Option: Spells & Magic',
     'damage': '',

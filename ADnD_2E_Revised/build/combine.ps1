@@ -39,7 +39,7 @@ function CombineRecursive([String[]] $inputContent) {
       $fileName = $split[1]
       $arguments = $split[2]
       $file = Get-ChildItem -Path $sourceFolder -Filter $fileName -Recurse
-      $fileContent = Get-Content -Path $file.FullName
+      $fileContent = @(Get-Content -Path $file.FullName)
 
       $replaceDic = CreateReplaceDictionary($arguments)
 
