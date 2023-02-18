@@ -10,9 +10,23 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 
 # Version courante
 
-V3.115.0 [Screenshot](cog_v3.png)
+V4.0.0 [Screenshot](cog_v4.png)
 
 # Notes de version
+
+## V4.0.0 (2022.12.30)
+
+_Chroniques Oubliées Galactiques v2_
+
+- Révision des fiches de PJ, PNJ et Vaisseau
+- Ajout de la fiche de Mécha
+
+V3.115.1 [Screenshot](cog_v3.png)
+
+## V3.115.1 (2021.12.18)
+
+- Correction noms boutons action (pas de \_ dans le nom après act\_)
+- Modification libellés options DM sans limites (bug 'optgroup' de Roll20)
 
 ## V3.115.0 (2021.11.12)
 
