@@ -656,7 +656,6 @@ on('change:intelligence change:reason change:knowledge', function() {
                 intimm5th: intelligenceTable['intimm5th'][reason],
                 intimm6th: intelligenceTable['intimm6th'][reason],
                 intimm7th: intelligenceTable['intimm7th'][reason],
-                // ['spell-points-int']: intelligenceTable['spell-points-int'][intelligence],
                 intnotes: intnotes,
                 int2notes: int2notes,
             });
@@ -1225,8 +1224,7 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
                 spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
             }
             if (!books[levelField].trim()) {
-                let classLevel = capitalizeFirst(levelField.replace('level-', ''));
-                let toast = getToastObject(INFO, `Set ${classLevel} caster level`, 'Almost every spell requires a caster level to calculate its effect. Without it most spells will fail and show and error in the chat');
+                let toast = getToastObject(INFO, `Set ${className} caster level`, 'Almost every spell requires a caster level to calculate its effect. Without it most spells will fail and show and error in the chat');
                 Object.assign(spellInfo, toast);
             }
 
@@ -1235,7 +1233,7 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
     });
 }
 
-let wizardSpellLevelsSections = [
+const WIZARD_SPELL_LEVELS_SECTIONS = [
     {level: '1', sections: ['', '2', '3', 'wiz1']},
     {level: '2', sections: ['4', '5', '6', 'wiz2']},
     {level: '3', sections: ['7', '8', '9', 'wiz3']},
@@ -1253,7 +1251,7 @@ let wizardSpellLevelsSections = [
     {level: '15', sections: ['64', '65', '66', 'wiz15']},
 ];
 
-let priestSpellLevelsSections = [
+const PRIEST_SPELL_LEVELS_SECTIONS = [
     {level: '1', sections: ['28', '29', '30', 'pri1']},
     {level: '2', sections: ['31', '32', '33', 'pri2']},
     {level: '3', sections: ['34', '35', '36', 'pri3']},
@@ -1271,7 +1269,7 @@ const displaySpellLevel = function(level, className) {
 }
 
 // --- Start setup Spell Slots --- //
-wizardSpellLevelsSections.forEach(spellLevel => {
+WIZARD_SPELL_LEVELS_SECTIONS.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
     setupStaticCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
@@ -1289,7 +1287,7 @@ wizardSpellLevelsSections.forEach(spellLevel => {
 setupAutoFillSpellInfo('wizmonster', wizardSpells, SCHOOL_FIELDS);
 setupSpellCrit('wizmonster');
 
-priestSpellLevelsSections.forEach(spellLevel => {
+PRIEST_SPELL_LEVELS_SECTIONS.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
     setupStaticCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
@@ -1312,14 +1310,14 @@ setupSpellCrit('primonster');
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
-let wizardSpellPoints = 'spell-points';
-let arc = 'total-arc';
-let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
-setupStaticCalculateTotal(`${wizardSpellPoints}-total`, [`${wizardSpellPoints}-lvl`, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
-setupRepeatingSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`, true);
-setupRepeatingSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`, true);
-setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
-setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
+const WIZARD_SPELL_POINTS = 'spell-points';
+const TOTAL_ARC = 'total-arc';
+const ALL_WIZARD_SPELL_SECTIONS = WIZARD_SPELL_LEVELS_SECTIONS.flatMap(sl => sl.sections);
+setupStaticCalculateTotal(`${WIZARD_SPELL_POINTS}-total`, [`${WIZARD_SPELL_POINTS}-lvl`, `${WIZARD_SPELL_POINTS}-spc`, `${WIZARD_SPELL_POINTS}-int`]);
+setupRepeatingSpellSumming(ALL_WIZARD_SPELL_SECTIONS, WIZARD_SPELL_POINTS, 'spell-points', `${WIZARD_SPELL_POINTS}-sum`, true);
+setupRepeatingSpellSumming(ALL_WIZARD_SPELL_SECTIONS, 'arc', 'spell-arc', `${TOTAL_ARC}-sum`, true);
+setupCalculateRemaining(`${WIZARD_SPELL_POINTS}-total`, `${WIZARD_SPELL_POINTS}-sum`, `${WIZARD_SPELL_POINTS}-remaining`);
+setupCalculateRemaining(TOTAL_ARC, `${TOTAL_ARC}-sum`, `${TOTAL_ARC}-remaining`);
 on('change:spell-points-int-enabled change:intelligence', function (eventInfo) {
     getAttrs(['spell-points-int-enabled', 'intelligence'], function (values) {
         let newValue = {'spell-points-int': 0}
@@ -1332,15 +1330,15 @@ on('change:spell-points-int-enabled change:intelligence', function (eventInfo) {
     });
 });
 
-let priestSpellPoints = 'spell-points-priest';
-let wind = 'total-wind';
-let allPriestSpellSections = priestSpellLevelsSections.flatMap(sl => sl.sections);
-setupStaticCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
-setupStaticCalculateTotal(wind, ['level-wind', 'wisdom-wind']);
-setupRepeatingSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`, true);
-setupRepeatingSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`, true);
-setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
-setupCalculateRemaining(wind, `${wind}-sum`, `${wind}-remaining`);
+const PRIEST_SPELL_POINTS = 'spell-points-priest';
+const TOTAL_WIND = 'total-wind';
+const ALL_PRIEST_SPELL_SECTIONS = PRIEST_SPELL_LEVELS_SECTIONS.flatMap(sl => sl.sections);
+setupStaticCalculateTotal(`${PRIEST_SPELL_POINTS}-total`, [`${PRIEST_SPELL_POINTS}-lvl`, `${PRIEST_SPELL_POINTS}-wis`]);
+setupStaticCalculateTotal(TOTAL_WIND, ['level-wind', 'wisdom-wind']);
+setupRepeatingSpellSumming(ALL_PRIEST_SPELL_SECTIONS, PRIEST_SPELL_POINTS, 'spell-points', `${PRIEST_SPELL_POINTS}-sum`, true);
+setupRepeatingSpellSumming(ALL_PRIEST_SPELL_SECTIONS, 'wind', 'spell-wind', `${TOTAL_WIND}-sum`, true);
+setupCalculateRemaining(`${PRIEST_SPELL_POINTS}-total`, `${PRIEST_SPELL_POINTS}-sum`, `${PRIEST_SPELL_POINTS}-remaining`);
+setupCalculateRemaining(TOTAL_WIND, `${TOTAL_WIND}-sum`, `${TOTAL_WIND}-remaining`);
 let PRIEST_SPELL_POINTS_WIS = 'spell-points-priest-wis';
 on('change:spell-points-priest-wis-enabled change:wisdom change:level-priest', function (eventInfo) {
     getAttrs(['spell-points-priest-wis-enabled', 'wisdom', 'level-priest'], async function (values) {
@@ -1362,7 +1360,13 @@ on('change:spell-points-priest-wis-enabled change:wisdom change:level-priest', f
             newValue[PRIEST_SPELL_POINTS_WIS] = 8;
             return setAttrs(newValue);
         }
-        let level = await extractRollResult(values['level-priest']);
+
+        let level = 1;
+        if (values['level-priest'] === '') {
+            return showToast(INFO, 'Set Priest caster level', 'The Priest\'s level is needed to calculate the bonus Spell Points from high Wisdom.');
+        } else {
+            level = await extractRollResult(values['level-priest']);
+        }
         if (isNaN(level) || level < 0) {
             level = 1;
         }
@@ -1410,9 +1414,9 @@ on('change:spell-points-priest-wis-enabled change:wisdom change:level-priest', f
 // --- Start setup reset buttons --- //
 //tab6 = wizard levels
 //tab7 = priest levels
-setupSpellSlotsReset('reset-spent-slots-wiz', 'tab6', wizardSpellLevelsSections, allWizardSpellSections);
-let allPriestSectionsExceptQuest = priestSpellLevelsSections.slice(0, -1).flatMap(sl => sl.sections);
-setupSpellSlotsReset('reset-spent-slots-pri', 'tab7', priestSpellLevelsSections, allPriestSectionsExceptQuest);
+setupSpellSlotsReset('reset-spent-slots-wiz', 'tab6', WIZARD_SPELL_LEVELS_SECTIONS, ALL_WIZARD_SPELL_SECTIONS);
+let allPriestSectionsExceptQuest = PRIEST_SPELL_LEVELS_SECTIONS.slice(0, -1).flatMap(sl => sl.sections);
+setupSpellSlotsReset('reset-spent-slots-pri', 'tab7', PRIEST_SPELL_LEVELS_SECTIONS, allPriestSectionsExceptQuest);
 // --- End setup reset buttons --- //
 
 // --- Start setup Granted Powers --- //
@@ -2970,9 +2974,9 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
 // Show / Hide buttons for various repeating sections
 const FOLDABLE_REPEATING_SECTIONS = [
-    ...wizardSpellLevelsSections.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
+    ...WIZARD_SPELL_LEVELS_SECTIONS.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
     'spells-wizmonster',
-    ...priestSpellLevelsSections.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
+    ...PRIEST_SPELL_LEVELS_SECTIONS.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
     'spells-primonster',
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
     'scrolls',
