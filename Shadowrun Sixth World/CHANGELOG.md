@@ -1,5 +1,23 @@
 Change Log
 ==============================================
+**2023-02-13 ** v.71 Chuz (James Culp)
+	Added essence calculations for drag and drop (and others) allowing for Essence Base to be "Rating x #.##", also Grade calculations now.
+	Added drag and drop for Augmentations
+	Converted NPC Spell roll buttons to use the newer PC style
+	Converted NPC Attack (ranged and melee) buttons to use the new roll buttons
+	Converted NPC Attack (ranged and melee) buttons to use the new roll template weapon info block
+	Updated Matrix Roll buttons to include inline opposed roll buttons.  To use these the target's token must be selected.
+	Converted Grunt skill buttons to new style
+	Converted Vehicle Autosoft roll buttons to the newer PC style
+	Converted NPC attribute roll buttons to the newer PC style
+	Converted NPC Initiative and Defense button blocks to the newer PC style
+	Began adding weapon information as it's own section in the attack Roll Templates
+	Added weapon info to Ranged attack Roll Templates
+	Added weapon info to Ranged (Burst Fire Wide) attack Roll Templates
+	Added weapon info to Melee attack Roll Templates
+	Began adding tooltips at the bottom of Roll Templates.
+**2023-02-06 ** v.70 Chuz (James Culp)
+	Bugfix - PC Condition Monitor boxes broke if the maximum value was below 8.  Changed the minimum to 6 which is 0 body with Neoteny so should be unattainable.
 **2023-01-17 ** v.69 Chuz (James Culp)
 	Add Contacts drag and drop capability, you can now drag ANY NPC from the compendium and their name and description will be added to your contacts, also loyalty, connections and favors if the NPC has those attributes (currently none do)
 	NPCs->Powers text added for all NPCs not just Awakened
