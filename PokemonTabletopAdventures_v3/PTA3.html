@@ -1,5 +1,6 @@
 <!-- Background coloring strategy inspired by the GURPS sheet -->
 <input class="sheet-color-setting" name="attr_active_type1" type="hidden" value="typeless" />
+<input class="sheet-form-setting" name="attr_display-form" type="hidden" value="" />
 <div class="sheet-wrapper sheet-color-background">
   <div class="sheet-page-selection">
     <button class="sheet-page-selection-option" name="act_character-page" type="action">Character</button>
@@ -3376,7 +3377,8 @@
       }
       Object.assign(attrs, getActiveTypeAsAttrs(values));
       Object.assign(attrs, getFormStatModifiers(values));
-      Object.assign(attrs, performDynamax(values, clickedButton));
+      Object.assign(attrs, performDynamax(values, prefix, clickedButton));
+      Object.assign(attrs, setActiveStyle(values));
       setAttrs(attrs);
     });
   }
@@ -3467,7 +3469,7 @@
     };
   }
 
-  function performDynamax(values, clickedButton) {
+  function performDynamax(values, prefix, clickedButton) {
     var dynaCheckbox = "off";
     if(values["dyna_active"]){
       dynaCheckbox = "on";
@@ -3475,7 +3477,7 @@
     const attrs = {
       "active_dyna": dynaCheckbox,
     };
-    if(clickedButton && values["dyna-auto-hp"] == "on"){
+    if(clickedButton && prefix == "dyna" && values["dyna-auto-hp"] == "on"){
       var currentHP = parseInt(values["HP"]) || 0;
       var maxHP = parseInt(values["HP_max"]) || 0;
       if(values["dyna_active"]){
@@ -3491,6 +3493,22 @@
       attrs["HP_max"] = maxHP;
     }
     return attrs;
+  }
+
+  function setActiveStyle(values) {
+    var style = "";
+    if(values["mega_active"]){
+      style = "mega";
+    }
+    if(values["dyna_active"]){
+      style = "dyna";
+    }
+    if(values["tera_active"]){
+      style = "tera";
+    }
+    return {
+      "display-form": style,
+    };
   }
 
   on("change:custom1-name change:enable-custom1", function () {
