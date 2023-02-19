@@ -81,6 +81,14 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+February 14th 2022 v1.65a
+
+- Fixed some skill rolls not always working due to new Besmirched condition bug
+- Fixed NPC fumble/crit not working from the combat text clicky
+- Fixed Talent integration description il8n tags
+- Fixed Channelling so no long removes SL from the Ext Accu SL pool when failing the roll
+
+
 December 20th 2022 v1.65
 
 - Added Ranged Weapons to be equipable in Mainhand/Offhand. This allows ranged offhand, and mixing with Melee inclding Dualwield Ranged.

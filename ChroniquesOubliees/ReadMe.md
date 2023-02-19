@@ -15,6 +15,7 @@ Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements grat
 
 # Notes de version
 ## v5.02 (2023-01-26)
+* Support des statblocks JSON de CO-DRS
 * Ajout des munitions
 * Champs prédicat pour les armes portées
 
