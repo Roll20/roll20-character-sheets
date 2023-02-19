@@ -1363,7 +1363,7 @@ on('change:spell-points-priest-wis-enabled change:wisdom change:level-priest', f
 
         let level = 1;
         if (values['level-priest'] === '') {
-            return showToast(INFO, 'Set Priest caster level', 'The Priest\'s level is needed to calculate the bonus Spell Points from high Wisdom.');
+            return showToast(INFO, 'Set Priest caster level', 'The Priest\'s level is needed to calculate bonus Spell Points from high Wisdom.');
         } else {
             level = await extractRollResult(values['level-priest']);
         }
