@@ -187,12 +187,20 @@
                     <input id="mechname" type="text" name="attr_character_name">
                 </div>
                 <div class="descValuePair">
-                    <label for="system">System Slots</label>
-                    <input id="system" type="text" name="attr_system_max">
+                    <label>System Slots </label>
+                    <span style="display: flex">
+                        <input type="number" name="attr_system" value="@{systems_used}" disabled>
+                        <label> of </label>
+                        <input type="number" name="attr_system_max">
+                    </span>
                 </div>
                 <div class="descValuePair">
-                    <label for="module">Module Slots </label>
-                    <input id="module" type="text" name="attr_module_max">
+                    <label >Module Slots </label>
+                    <span style="display: flex">
+                        <input type="number" name="attr_module" value="@{modules_used}" disabled>
+                        <label> of</label>
+                        <input type="number" name="attr_module_max">
+                    </span>
                 </div>
                 <details>
                     <summary>
@@ -250,11 +258,11 @@
                         </div>
                         <div class="descValuePair">
                             <label>Cost</label>
-                            <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
+                            <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
                         </div>
                         <div class="descValuePair">
                             <label>Slots</label>
-                            <input type="text" name="attr_slot" placeholder="1 System">
+                            <input type="number" name="attr_slot" value="1">
                         </div>
                     </details>
                     <textarea name="attr_weapondetails"></textarea>
@@ -291,11 +299,11 @@
                 <textarea name="attr_details" class="textarea"></textarea>
                 <div class="descValuePair">
                     <label>Cost</label>
-                    <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
+                    <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
                 </div>
                 <div class="descValuePair">
                     <label>Slots</label>
-                    <input type="text" name="attr_slot" placeholder="1 System">
+                    <input type="number" name="attr_slot" value="1">
                 </div>
             </details>
         </fieldset>
@@ -318,11 +326,11 @@
                 <textarea name="attr_details" class="textarea"></textarea>
                 <div class="descValuePair">
                     <label>Cost</label>
-                    <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
+                    <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
                 </div>
                 <div class="descValuePair">
                     <label>Slots</label>
-                    <input type="text" name="attr_slot" placeholder="1 System">
+                    <input type="number" name="attr_slot" value="1">
                 </div>
             </details>
         </fieldset>
@@ -392,11 +400,11 @@
                         </div>
                         <div class="descValuePair">
                             <label>Cost</label>
-                            <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
+                            <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
                         </div>
                         <div class="descValuePair">
                             <label>Slots</label>
-                            <input type="text" name="attr_slot" placeholder="1 System">
+                            <input type="number" name="attr_slot" value="1">
                         </div>
                     </details>
                     <textarea name="attr_details"></textarea>
@@ -454,10 +462,19 @@
             <input id="isPilot" name="attr_is-pilot" type="checkbox" checked/>
         </label>
         <br>
-        <label for="isMech" class="settings-checkbox">
-            <span>Is Mech</span>
-            <input id="isMech" name="attr_is-mech" type="checkbox"/>
-        </label>
+        <details>
+            <summary>
+                <label for="isMech" class="settings-checkbox">
+                    <span>Is Mech</span>
+                    <input id="isMech" name="attr_is-mech" type="checkbox"/>
+                </label>
+            </summary>
+            <label for="countWeapons" class="settings-checkbox">
+                <span>Count Weapons as Systems</span>
+                <input id="countWeapons" name="attr_count-weapons" type="checkbox"/>
+            </label>
+        </details>
+
         <br>
         <label for="isCrawler" class="settings-checkbox">
             <span>Is Crawler</span>
@@ -489,6 +506,55 @@ const buttonlist = ["pilot","mech","crawler","notes","settings"];
         });
     });
 
+on('change:repeating_modules remove:repeating_modules sheet:opened', function() {
+    repeatingSum("modules_used", "slot", "repeating_modules");
+});
+
+on('change:repeating_systems remove:repeating_systems change:repeating_mechweapons remove:repeating_mechweapons sheet:opened', async function() {
+    let countWeapons = (await asw.getAttrs(["count-weapons"]))["count-weapons"];
+
+    if(countWeapons == 'on') {
+        repeatingSum("systems_used", "slot", "repeating_systems", "repeating_mechweapons");
+    }
+    else {
+        repeatingSum("systems_used", "slot", "repeating_systems");
+    }
+
+});
+
+async function repeatingSum (destination, fieldsum, ...sections){
+    // destination = the name of the attribute that stores the total
+    // fieldsum = the name of the field to be summed
+    // sections = name for/of repeating fieldset, without the repeating_
+
+    let attrs = [];
+
+    await Promise.all(sections.map(async (section) => {
+        let ids = await asw.getSectionIDs(section);
+        var sumFields = [];
+        for (var a=0; a< ids.length; a++) {
+            sumFields[sumFields.length] = section + "_" + ids[a] + "_" + fieldsum;
+        }
+        attrs.push(...sumFields);
+    }
+    ));
+
+    let values = await asw.getAttrs(attrs);
+
+    let sumTotal = 0;
+    let tempSum = 0;
+    for(a=0; a < attrs.length; a++){
+        tempSum = parseFloat(values[attrs[a]],10) || 0;
+        sumTotal += tempSum;
+    }
+    var setSumValue = {};
+    setSumValue[destination] = sumTotal;
+    asw.setAttrs(setSumValue);
+}
+
+////////////////////////////
+//  ROLL AUTOMATION     ////
+///////////////////////////
 
 on('clicked:repeating_mechweapons:roll',
      async (event) => {
