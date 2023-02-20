@@ -1,6 +1,7 @@
 Change Log
 ==============================================
 **2023-02-20 ** v.72 Chuz (James Culp)
+	Added Magic and Resonance to attribute roll buttons as additional options in the drop down
 	Updated NPC Technomancer Complex Forms
 	Updated NPC Drag&Drop for Spells to attempt to auto-populate the dicepool
 	NPC Complex forms display changes
