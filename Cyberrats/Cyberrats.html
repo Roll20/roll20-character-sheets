@@ -150,6 +150,12 @@
   <h3 class="sidebar">Attributes</h3>
 
   <div class="sideholder">
+      <input type="number" class="sidebar-input attr" name="attr_dicemod" value="0">
+    <label>Extra Dice</label>
+    <hr class="overline">
+  </div>
+
+  <div class="sideholder">
       <input type="number" min="0" class="sidebar-input attr" name="attr_smash" value="0">
     <label>Smash</label>
     <button type="roll" value="&{template:attributeroll} {{title=Smash}} {{name=@{character_name}}} {{roll=@{roll_formula_smash}}} {{results=@{roll_results_smash}}} {{details=Smash Smash SMASH!}} {{success_at_cost=@{smash_fail}}} {{smash=1}}"></button>
@@ -2227,36 +2233,77 @@ function initializeDrops() {
 /* * * * * * * * * * * * * * * 
  *         Listeners         *
  * * * * * * * * * * * * * * */
-on("change:smash", function(eventInfo) {
-   const newVal = parseInt(eventInfo.newValue); // this is the source of like 99% of my problems.
-   const roll_formula_smash = buildDicePool(newVal);
-   const roll_results_smash = getResults(newVal);
-
-   setAttrs({
-  roll_formula_smash,
-  roll_results_smash,
+on("change:dicemod", function(eventInfo) {
+  getAttrs([
+      "smash",
+      "sly",
+      "cyber"
+    ], function(values) {
+    
+    const diceMod = parseInt(eventInfo.newValue);
+    updateSmashFormulas(parseInt(values.smash) + diceMod);
+    updateSlyFormulas(parseInt(values.sly) + diceMod);
+    updateCyberFormulas(parseInt(values.cyber) + diceMod);
    });
 });
 
-on("change:sly", function(eventInfo) {
-  const newVal = parseInt(eventInfo.newValue);
-  const roll_formula_sly = buildDicePool(newVal);
-  const roll_results_sly = getResults(newVal);
-   
+function updateSmashFormulas(totalSmashDice) {
+       const roll_formula_smash = buildDicePool(totalSmashDice);
+       const roll_results_smash = getResults(totalSmashDice);
+       setAttrs({
+      roll_formula_smash,
+      roll_results_smash,
+       });
+}
+ 
+on("change:smash", function(eventInfo) {
+  getAttrs([
+      "dicemod"
+    ], function(values) {
+       let newVal = parseInt(eventInfo.newValue); // this is the source of like 99% of my problems.
+       newVal += parseInt(values.dicemod);
+       
+       updateSmashFormulas(newVal);
+   });
+});
+
+function updateSlyFormulas(totalSlyDice) {
+  const roll_formula_sly = buildDicePool(totalSlyDice);
+  const roll_results_sly = getResults(totalSlyDice);
    setAttrs({
   roll_formula_sly,
   roll_results_sly,
    });
+}
+
+on("change:sly", function(eventInfo) {
+  const newVal = parseInt(eventInfo.newValue);
+    getAttrs([
+      "dicemod"
+    ], function(values) {
+  
+  updateSlyFormulas(newVal + parseInt(values.dicemod));
+  
+  });
 });
 
-on("change:cyber", function(eventInfo) {
-  const newVal = parseInt(eventInfo.newValue);
-  const roll_formula_cyber = buildDicePool(newVal);
-  const roll_results_cyber = getResults(newVal);
-   
+function updateCyberFormulas(totalCyberDice) {
+console.log(totalCyberDice);
+  const roll_formula_cyber = buildDicePool(totalCyberDice);
+  const roll_results_cyber = getResults(totalCyberDice);
   setAttrs({
     roll_formula_cyber,
     roll_results_cyber,
+  });
+}
+
+on("change:cyber", function(eventInfo) {
+  const newVal = parseInt(eventInfo.newValue);
+      getAttrs([
+      "dicemod"
+    ], function(values) {
+  updateCyberFormulas(newVal + parseInt(values.dicemod));
+  
   });
 });
 
@@ -2457,20 +2504,22 @@ on("change:hivedecayroom1 change:hivedecayroom2 change:hivedecayroom3 change:hiv
 
 on("sheet:opened", () => {
   // Initialize our default values. Not necessary if we used translation.
-  getAttrs(["smash_fail", "cyber_fail", "sly_fail", "smash", "sly", "cyber", "sublockedroom6"], (values) => {
+  getAttrs(["smash_fail", "cyber_fail", "sly_fail", "smash", "sly", "cyber", "dicemod", "sublockedroom6"], (values) => {
     const sm = values.smash_fail;
     const cy = values.cyber_fail;
     const sl = values.sly_fail
     const sublockedroom6 = values.sublockedroom6; // I deeply resent that this is necessary. CSS doesn't initialize correctly without explicitly "changing" it here.
     
-    const roll_formula_smash = buildDicePool(parseInt(values.smash));
-    const roll_results_smash = getResults(parseInt(values.smash));
+    const diceMod = parseInt(values.dicemod);
     
-    const roll_formula_cyber = buildDicePool(parseInt(values.cyber));
-    const roll_results_cyber = getResults(parseInt(values.cyber));
+    const roll_formula_smash = buildDicePool(parseInt(values.smash) + diceMod);
+    const roll_results_smash = getResults(parseInt(values.smash)  + diceMod);
     
-    const roll_formula_sly = buildDicePool(parseInt(values.sly));
-    const roll_results_sly = getResults(parseInt(values.sly));
+    const roll_formula_cyber = buildDicePool(parseInt(values.cyber) + diceMod);
+    const roll_results_cyber = getResults(parseInt(values.cyber) + diceMod);
+    
+    const roll_formula_sly = buildDicePool(parseInt(values.sly) + diceMod);
+    const roll_results_sly = getResults(parseInt(values.sly) + diceMod);
     
     setAttrs({
       "smash_fail" : sm,

@@ -24,6 +24,15 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Feb 14, 2023
+- Gave the attack rolls some love, as befitting the day of the year.
+  - Updated the scatter selection to change the attack rolls, so that lower-hit moves aren't rolling many sets of dice
+  - Added support for scatter attacks that hit up to 10 times
+  - Clarified the intent of each scatter type selection by explicitly stating how many hits are in each roll
+
+<details>
+  <summary><u>Expand for 2022 Changes</u></summary>
+  
 ### Aug 11, 2022
 - Implemented the ability to change the background and roll template colours for class and origin features, accessible to Trainer and Hybrid character types
 
@@ -69,6 +78,11 @@ Current mobile bugs that I'm pretty sure are roll20 bugs:
 - HP updates seem to clear out the _max value sometimes?
 - Stat in parenthesis for skill checks doesn't populate
 - The roll20 dice font is not available
+
+</details>
+
+<details>
+  <summary><u>Expand for 2021 Changes</u></summary>
 
 ### Jul 17th, 2021
 - Added a level field to the `hybrid` _(or Pokémon (Character Class))_ character type.
@@ -161,6 +175,11 @@ Current mobile bugs that I'm pretty sure are roll20 bugs:
 - Added a quick roll button that rolls a move without any query boxes for temporary modifiers or effectiveness, rolling with +0/+0/Neutral values
 - Streamlined move displays to show the configuration only when desired via a collapsible control
 
+</details>
+
+<details>
+<summary><u>Expand for 2020 Changes</u></summary>
+
 ### Dec 12, 2020
 
 - Migrated the character sheet style attributes to new fields
@@ -248,3 +267,5 @@ Current mobile bugs that I'm pretty sure are roll20 bugs:
 ### Sept 16, 2020
 
 - Initial Commit
+
+</details>
