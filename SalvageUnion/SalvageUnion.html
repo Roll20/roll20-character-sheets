@@ -73,6 +73,7 @@
                     <input id="abilityPts" type="number" min="0" name="attr_abilitypts" value="5">
                     <label> of <input type="number" min="5" name="attr_abilitypts_max" value="5"></label>
                 </div>
+                <button type="action" class="textbutton" name="act_downtime">Start Downtime</button>
             </div>
         </div>
 
@@ -229,6 +230,7 @@
                     <input type="number" min="0" max="@{heat_max}" name="attr_heat" value="0">
                     <label> of <input type="number" min="0" name="attr_heat_max" value="10"> </label>
                 </div>
+                <button type="action" class="textbutton" name="act_downtime">Start Downtime</button>
             </div>
         </div>
 
@@ -522,36 +524,6 @@ on('change:repeating_systems remove:repeating_systems change:repeating_mechweapo
 
 });
 
-async function repeatingSum (destination, fieldsum, ...sections){
-    // destination = the name of the attribute that stores the total
-    // fieldsum = the name of the field to be summed
-    // sections = name for/of repeating fieldset, without the repeating_
-
-    let attrs = [];
-
-    await Promise.all(sections.map(async (section) => {
-        let ids = await asw.getSectionIDs(section);
-        var sumFields = [];
-        for (var a=0; a< ids.length; a++) {
-            sumFields[sumFields.length] = section + "_" + ids[a] + "_" + fieldsum;
-        }
-        attrs.push(...sumFields);
-    }
-    ));
-
-    let values = await asw.getAttrs(attrs);
-
-    let sumTotal = 0;
-    let tempSum = 0;
-    for(a=0; a < attrs.length; a++){
-        tempSum = parseFloat(values[attrs[a]],10) || 0;
-        sumTotal += tempSum;
-    }
-    var setSumValue = {};
-    setSumValue[destination] = sumTotal;
-    asw.setAttrs(setSumValue);
-}
-
 ////////////////////////////
 //  ROLL AUTOMATION     ////
 ///////////////////////////
@@ -618,7 +590,47 @@ const reactOverload = async (ev) => {
     });
 }
 
+on('clicked:downtime', async (ev) => {
+    let attrs = await asw.getAttrs(['health_max', 'abilitypts_max', 'structure_max', 'energypts_max']);
 
+    asw.setAttrs({
+		health: attrs['health_max'],
+		abilitypts: attrs['abilitypts_max'],
+		structure: attrs['structure_max'],
+		energypts: attrs['energypts_max'],
+		heat: 0,
+	});
+});
+
+async function repeatingSum (destination, fieldsum, ...sections){
+    // destination = the name of the attribute that stores the total
+    // fieldsum = the name of the field to be summed
+    // sections = name for/of repeating fieldset, without the repeating_
+
+    let attrs = [];
+
+    await Promise.all(sections.map(async (section) => {
+        let ids = await asw.getSectionIDs(section);
+        var sumFields = [];
+        for (var a=0; a< ids.length; a++) {
+            sumFields[sumFields.length] = section + "_" + ids[a] + "_" + fieldsum;
+        }
+        attrs.push(...sumFields);
+    }
+    ));
+
+    let values = await asw.getAttrs(attrs);
+
+    let sumTotal = 0;
+    let tempSum = 0;
+    for(a=0; a < attrs.length; a++){
+        tempSum = parseFloat(values[attrs[a]],10) || 0;
+        sumTotal += tempSum;
+    }
+    var setSumValue = {};
+    setSumValue[destination] = sumTotal;
+    asw.setAttrs(setSumValue);
+}
 
 const asw = (() => {
     const setActiveCharacterId = function(charId){
