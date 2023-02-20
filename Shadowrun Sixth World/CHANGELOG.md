@@ -2,7 +2,8 @@ Change Log
 ==============================================
 **2023-02-20 ** v.72 Chuz (James Culp)
 	Updated NPC Technomancer Complex Forms
-	Updated NPC Drag&Drop for Spells to attempt to auto-populate the dicepool	NPC Complex forms display changes
+	Updated NPC Drag&Drop for Spells to attempt to auto-populate the dicepool
+	NPC Complex forms display changes
 	NPC Complex forms roll buttons for no dicepool defined (uses attr_skill + resonance), dicepool defined (uses the dicepool) or description only (skill empty)
 	Update - The old NPCspells repeating data should be retained just in case, for now.
 	Bugfix - Updated calls to geneerateRowID to use a work around to prevent them (hopefully) from duplicating an already existing ID which caused drag and drop items to sometimes not apply properly, causing symptoms like drag and drop NPCs without all of their skills, attacks, or some other repeating item. Or even weirder once a Skill that got overwritten so it had a Specialization from another skill that wasn't there.
