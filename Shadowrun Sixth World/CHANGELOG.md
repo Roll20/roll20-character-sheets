@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2023-02-27 ** v.73 Chuz (James Culp)
+	Bugfix - PC Initiatives - Fixed a condition where if a dice mod is set and then the initiative base is changed it keeps adding the dice mod repeatedly.
 **2023-02-20 ** v.72 Chuz (James Culp)
 	Added Magic and Resonance to attribute roll buttons as additional options in the drop down
 	Updated NPC Technomancer Complex Forms
