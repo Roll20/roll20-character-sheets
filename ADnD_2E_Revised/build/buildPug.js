@@ -81,17 +81,17 @@ writeFile(path.join(htmlFolder,'shared'), 'priest-spell-template.html',
     pug.renderFile(path.join(pugFolder, 'spellTemplate.pug'), {pretty: true, isPriest: true})
 );
 
-let html = '';
-html += pug.renderFile(path.join(pugFolder, 'spellsDatalists.pug'), {pretty: true, data: wizardSpellsJs});
-html += pug.renderFile(path.join(pugFolder, 'spellsDatalists.pug'), {pretty: true, data: priestSpellsJs});
-html += pug.renderFile(path.join(pugFolder, 'spellScrollsDatalists.pug'), {pretty: true, wizardSpells: wizardSpellsJs, priestSpells: priestSpellsJs});
-html += pug.renderFile(path.join(pugFolder, 'psionicCorePowerDatalists.pug'), {pretty: true, data: psionicPowersJs});
-html += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weaponsJs, proficiencies: weaponsProficienciesJs, booksPriority, bookShorthand});
-html += pug.renderFile(path.join(pugFolder, 'nonweaponProficienciesDatalist.pug'), {pretty: true, data: nonWeaponProfsJs, booksPriority, bookShorthand});
-html += pug.renderFile(path.join(pugFolder, 'simpleDatalists.pug'), {pretty: true, data: talentsJs, id:'talents'});
-html += pug.renderFile(path.join(pugFolder, 'simpleDatalists.pug'), {pretty: true, data: traitsJs, id:'traits'});
-html += pug.renderFile(path.join(pugFolder, 'simpleDatalists.pug'), {pretty: true, data: disadvantagesJs, id:'disadvantages'});
-writeFile(path.join(htmlFolder, 'components'), 'dynamicDatalists.html', html);
+let datalistHtml = '';
+datalistHtml += pug.renderFile(path.join(pugFolder, 'spellsDatalists.pug'), {pretty: true, data: wizardSpellsJs});
+datalistHtml += pug.renderFile(path.join(pugFolder, 'spellsDatalists.pug'), {pretty: true, data: priestSpellsJs});
+datalistHtml += pug.renderFile(path.join(pugFolder, 'spellScrollsDatalists.pug'), {pretty: true, wizardSpells: wizardSpellsJs, priestSpells: priestSpellsJs});
+datalistHtml += pug.renderFile(path.join(pugFolder, 'psionicCorePowerDatalists.pug'), {pretty: true, data: psionicPowersJs});
+datalistHtml += pug.renderFile(path.join(pugFolder, 'weaponsDatalists.pug'), {pretty: true, data: weaponsJs, proficiencies: weaponsProficienciesJs, booksPriority, bookShorthand});
+datalistHtml += pug.renderFile(path.join(pugFolder, 'nonweaponProficienciesDatalist.pug'), {pretty: true, data: nonWeaponProfsJs, booksPriority, bookShorthand});
+datalistHtml += pug.renderFile(path.join(pugFolder, 'simpleDatalists.pug'), {pretty: true, data: talentsJs, id:'talents'});
+datalistHtml += pug.renderFile(path.join(pugFolder, 'simpleDatalists.pug'), {pretty: true, data: traitsJs, id:'traits'});
+datalistHtml += pug.renderFile(path.join(pugFolder, 'simpleDatalists.pug'), {pretty: true, data: disadvantagesJs, id:'disadvantages'});
+writeFile(path.join(htmlFolder, 'components'), 'dynamicDatalists.html', datalistHtml);
 console.log('    wizardSpells.js');
 console.log('    priestSpells.js');
 console.log('    psionicPowers.js');
