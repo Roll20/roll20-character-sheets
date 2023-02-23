@@ -208,14 +208,14 @@
           <div class="sheet-display-when-not-dyna">
             <input class="sheet-top-information" name="attr_size" spellcheck="false" title="Attribute: size" type="text" />
           </div>
-          <div class="sheet-display-when-dyna">
+          <div class="sheet-display-when-dyna-inline">
             <input class="sheet-top-information" name="dynasize" spellcheck="false" value="Dynamic" type="text" readonly />
           </div>
           <b>Weight</b>
           <div class="sheet-display-when-not-dyna">
             <input class="sheet-top-information" name="attr_weight" spellcheck="false" title="Attribute: weight" type="text" />
           </div>
-          <div class="sheet-display-when-dyna">
+          <div class="sheet-display-when-dyna-inline">
             <input class="sheet-top-information" name="dynaweight" spellcheck="false" value="Dynamic" type="text" readonly />
           </div>
           <b>Sex</b>
@@ -609,6 +609,18 @@
           </div>
         </div>
       </div>
+      <input class="sheet-active_tera" name="attr_active_tera" readonly hidden type="checkbox" />
+      <input class="sheet-active_dyna" name="attr_active_dyna" readonly hidden type="checkbox" />
+      <input class="sheet-active_mega" name="attr_active_mega" readonly hidden type="checkbox" />
+      <input class="sheet-active_custom1" name="attr_active_custom1" readonly hidden type="checkbox" />
+      <input class="sheet-active_custom2" name="attr_active_custom2" readonly hidden type="checkbox" />
+      <input class="sheet-active_custom3" name="attr_active_custom3" readonly hidden type="checkbox" />
+      <div class="sheet-display-when-tera"><textarea class="sheet-2row-textarea-wide" name="attr_tera-notes" placeholder="Additional Terastallization Notes" spellcheck="false" title="Attribute: tera-notes"></textarea></div>
+      <div class="sheet-display-when-dyna"><textarea class="sheet-2row-textarea-wide" name="attr_dyna-notes" placeholder="Additional Dynamax Notes" spellcheck="false" title="Attribute: dyna-notes"></textarea></div>
+      <div class="sheet-display-when-mega"><textarea class="sheet-2row-textarea-wide" name="attr_mega-notes" placeholder="Additional Mega Notes" spellcheck="false" title="Attribute: mega-notes"></textarea></div>
+      <div class="sheet-display-when-custom1"><textarea class="sheet-2row-textarea-wide" name="attr_custom1-notes" placeholder="Additional Notes" spellcheck="false" title="Attribute: custom1-notes"></textarea></div>
+      <div class="sheet-display-when-custom2"><textarea class="sheet-2row-textarea-wide" name="attr_custom2-notes" placeholder="Additional Notes" spellcheck="false" title="Attribute: custom2-notes"></textarea></div>
+      <div class="sheet-display-when-custom3"><textarea class="sheet-2row-textarea-wide" name="attr_custom3-notes" placeholder="Additional Notes" spellcheck="false" title="Attribute: custom3-notes"></textarea></div>
     </div>
 
     <div class="sheet-tab-trainer sheet-tab-pokemon sheet-tab-hybrid">
@@ -3379,6 +3391,7 @@
       Object.assign(attrs, getFormStatModifiers(values));
       Object.assign(attrs, performDynamax(values, prefix, clickedButton));
       Object.assign(attrs, setActiveStyle(values));
+      Object.assign(attrs, setVisibility(values, prefix));
       setAttrs(attrs);
     });
   }
@@ -3470,13 +3483,7 @@
   }
 
   function performDynamax(values, prefix, clickedButton) {
-    var dynaCheckbox = "off";
-    if(values["dyna_active"]){
-      dynaCheckbox = "on";
-    }
-    const attrs = {
-      "active_dyna": dynaCheckbox,
-    };
+    const attrs = {};
     if(clickedButton && prefix == "dyna" && values["dyna-auto-hp"] == "on"){
       var currentHP = parseInt(values["HP"]) || 0;
       var maxHP = parseInt(values["HP_max"]) || 0;
@@ -3508,6 +3515,16 @@
     }
     return {
       "display-form": style,
+    };
+  }
+
+  function setVisibility(values, prefix) {
+    var checkbox = "off";
+    if(values[`${prefix}_active`]){
+      checkbox = "on";
+    }
+    return {
+      [`active_${prefix}`]: checkbox,
     };
   }
 
