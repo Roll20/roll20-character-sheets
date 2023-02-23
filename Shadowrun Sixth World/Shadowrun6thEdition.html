@@ -3457,7 +3457,10 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
-
+								<span class="changelog-entry">**2023-02-27 ** v.73 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - PC Initiatives - Fixed a condition where if a dice mod is set and then the initiative base is changed it keeps adding the dice mod repeatedly.
+								</ul>
 								<span class="changelog-entry">**2023-02-20 ** v.72 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">F</span><b>New Feature</b> - Added Magic and Resonance to attribute roll buttons as additional options in the drop down
@@ -3730,6 +3733,7 @@
   <img class="shadowrun-logo" alt="Shadowrun sixth edition logo" src="https://s3.amazonaws.com/files.d20.io/images/204802539/QInmmma8HvUBA90c8e8H8Q/max.png?1614545502"/>
   <input name="attr_stats_toggle" type="hidden" value="settings" checked="checked"/>
   <input name="attr_flag_matrix" type="hidden" value=""/>
+  <input name="attr_show_stun" type="hidden" value=""/>
   <div class="tabs border-box">
     <div class="pc-box">
       <div class="header-nav">
@@ -3751,7 +3755,7 @@
           <option value="Machine" data-i18n="machinesprite">Machine</option>
           <option value="Other" data-i18n="other">Other</option>
         </select>
-        <select class="spirit" name="attr_spirit_type" title="Sprite Type">
+        <select class="spirit" name="attr_spirit_type" title="Spirit Type">
           <option value="Air" data-i18n="air">Air</option>
           <option value="Beasts" data-i18n="beasts">Beasts</option>
           <option value="Blood" data-i18n="blood"></option>
@@ -4266,6 +4270,18 @@
 			  <br>
 			</div>
 
+			<div class="rows grunt show-stun">
+			  <span data-i18n="stun">Stun</span>
+			  <label class="settings" data-i18n-title="conditionmonitor" title="Condition Monitor">
+				 <input name="attr_stun" placeholder="0" title="@{stun}" type="number" value=""/>
+			  </label><span class="settings"> / </span>
+			  <label class="settings" data-i18n-title="conditionmonitor" title="Condition Monitor">
+				 <input name="attr_stun_max" placeholder="0" title="@{stun_max}" type="number" value=""/>
+			  </label>
+			  <span class="toggle-display" name="attr_stun" title="@{stun}"></span><span class="toggle-display"> / </span><span class="toggle-display" name="attr_stun_max" title="@{stun_max}"></span>
+			  <br>
+			</div>
+
 			<div class="rows grunt spirit vehicle sprite">
 			  <input name="attr_flag_matrix" type="hidden" value=""/>
 			  <div class="matrix">
@@ -4431,6 +4447,12 @@
 					<option value="0" data-i18n="none" selected="selected">None</option>
 					<option value="-1" data-i18n="lowpaintolerance">Low Pain Tolerance</option>
 				 </select>
+			  </label>
+			</div>
+			<div class="rows grunt">
+			  <label class="settings" title="Show Stun Monitor?">
+				 <input class="character-type" name="attr_show_stun" title="@{show_stun}" type="checkbox" value="show_stun"/>
+				 <h2 data-i18n="showstunmonitor">Show Stun Monitor?</h2>
 			  </label>
 			</div>
 			<div class="rows grunt">
@@ -6205,7 +6227,7 @@
 <input type="hidden" name="attr_spellcasting_specialist" value="0" />
 <input type="hidden" name="attr_spellcasting_expert" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.72">
+<input type="hidden" name="attr_sheet_version" value="0.73">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 // Sheet workers
@@ -8974,26 +8996,28 @@ var update_initiative = () => {
 			// spirit initiative is auto-calculated elsewhere
 			return;
 		}
-
+//console.log("Initiative Updating");
+//console.log(v);
 		const rea = parseInt(v.reaction) || 0;
 		const int = parseInt(v.intuition) || 0;
 		const mod = parseInt(v.initiative_mod) || 0;
 		const tmp = (v.initiative_temp_flag === "on") ? parseInt(v.initiative_temp) || 0 : 0;
 		var bas = rea + int;
 		var tot = rea + int + mod + tmp;
-
-		const dice = parseInt(v.initiative_dice) || 1;
+//console.log("bas: "+bas+"\ntot: "+tot);
+//		const dice = parseInt(v.initiative_dice) || 1;
+		const dice = 1;
 		const dice_mod = parseInt(v.initiative_dice_mod) || 0;
 		const dice_tmp = (v.initiative_dice_temp_flag === "on") ? parseInt(v.initiative_dice_temp) || 0 : 0;
 		var dice_tot = dice + dice_mod + dice_tmp;
-
+//console.log("dice: "+dice+"\ndice_mod: "+dice_mod+"\ndice_tmp: "+dice_tmp+"\ndice_tot: "+dice_tot);
 		if(v.sheet_type === 'vehicle') {
 			bas = v.pilot * 2 || 0;
 			tot = bas + mod + tmp;
 
 			dice_tot = 4 + dice_mod + dice_tmp;
 		}
-
+//console.log("dice_tot: "+dice_tot);
 		let update = {};
 		update["initiative_base"] = tot;
 		update["display_initiative_base"] = (mod != 0 || tmp != 0) ? `${bas} (${tot})` : bas;
@@ -9534,7 +9558,7 @@ var disable_ranged_mods = () => {
 
 
 
-//REFACTORED Range & MELEE UPDATES
+//REFACTORED RANGE & MELEE UPDATES
 ['repeating_range','repeating_melee'].forEach(weap => {
 	on(`change:${weap}`, (eventInfo) => {
 		const source = eventInfo.sourceAttribute;
@@ -9543,9 +9567,13 @@ var disable_ranged_mods = () => {
 		const regex = /_(-.*)$/;
 		var rowID = eventInfo.triggerName.match(regex)[1];
 
+//console.log(eventInfo);
 		getAttrs([`${weap}_name`, `${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `${weap}_attribute`, `${weap}_attr_rating`, `${weap}_primary`, `${weap}_firing_modes`, `${weap}_default_mode`, `${weap}_damage`, `${weap}_close`, `${weap}_near`, `${weap}_medium`, `${weap}_far`, `${weap}_extreme`, `${weap}_has_mods`, `${weap}_notes`, `sheet_type`, `${weap}_dicepool`, `${weap}_dicepool_base`], (v) => {
-			if(v.sheet_type != 'pc') {
-//				return;
+//console.log(v);
+			// Trying to detect this firing on a remove: event and stop processing if it was
+			if(typeof eventInfo.newValue === 'undefined' && typeof eventInfo.previousValue === 'undefined' && ! v[`${weap}_name`]) {
+				console.log("do nothing!");
+				return;
 			}
 
 
@@ -10218,6 +10246,10 @@ var spirit_update = () => {
 				ranged = [{
 					'name': 'Elemental Attack',
 					'pool': force + spirit.agility,
+					'skill': 'Magic',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': force + 'P',
 					'c': force * 2,
 					'n': ((force * 2) - 2),
@@ -10229,6 +10261,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Engulf',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': parseInt(force + 2) + 'S',
 					'c': (force * 2) + 1,
 					'n': 0,
@@ -10268,6 +10304,14 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Claws/Bite',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
+					'skill': 'Magic',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': parseInt(Math.ceil(force / 2)) + 'P',
 					'c': force * 2,
 					'n': 0,
@@ -10306,6 +10350,10 @@ var spirit_update = () => {
 				ranged = [{
 					'name': 'Elemental Attack',
 					'pool': force + spirit.agility,
+					'skill': 'Magic',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': force + 'P',
 					'c': force * 2,
 					'n': ((force * 2) - 2),
@@ -10317,6 +10365,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Engulf',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': parseInt(force + 2) + 'S',
 					'c': (force * 2) + 1,
 					'n': 0,
@@ -10355,6 +10407,10 @@ var spirit_update = () => {
 				ranged = [{
 					'name': 'Elemental Attack',
 					'pool': force + spirit.agility,
+					'skill': 'Magic',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': force + 'P',
 					'c': force * 2,
 					'n': ((force * 2) - 2),
@@ -10366,6 +10422,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Engulf',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': parseInt(force + 2) + 'S',
 					'c': (force * 2) + 1,
 					'n': 0,
@@ -10405,6 +10465,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Fists',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': parseInt(Math.ceil(force / 2)) + 'S',
 					'c': force * 2,
 					'n': 0,
@@ -10443,6 +10507,10 @@ var spirit_update = () => {
 				ranged = [{
 					'name': 'Elemental Attack',
 					'pool': force + spirit.agility,
+					'skill': 'Magic',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': force + 'P',
 					'c': force * 2,
 					'n': ((force * 2) - 2),
@@ -10454,6 +10522,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Engulf',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': parseInt(force + 2) + 'S',
 					'c': (force * 2) + 1,
 					'n': 0,
@@ -10493,6 +10565,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Engulf',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': force + 'S',
 					'c': force * 3,
 					'n': 0,
@@ -10531,6 +10607,10 @@ var spirit_update = () => {
 				ranged = [{
 					'name': 'Elemental Attack',
 					'pool': force + spirit.agility,
+					'skill': 'Magic',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': force + 'P',
 					'c': force * 2,
 					'n': ((force * 2) - 2),
@@ -10542,6 +10622,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Natural Weapon',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': parseInt((force / 2) + 1) + 'P',
 					'c': force * 2,
 					'n': 0,
@@ -10581,6 +10665,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Engulf',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': force + 'S',
 					'c': force * 3,
 					'n': 0,
@@ -10645,9 +10733,14 @@ var spirit_update = () => {
 				skills = ['Astral', 'Athletics', 'Close Combat', 'Outdoors', 'Perception'];
 				powers = ['Astral Form', 'Binding', 'Engulf', 'Enhanced Senses (Smell)', 'Fear', 'Materialization'];
 				optional_powers = ['Concealment', 'Confusion', 'Guard', 'Movement', 'Natural Weapon (claws/bite)', 'Noxious Breath'];
+				ranged = [];
 				close = [{
 					'name': 'Engulf',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': parseInt(force + 2) + 'P',
 					'c': (force * 2) + 2,
 					'n': ((force * 2) - 2),
@@ -10659,6 +10752,10 @@ var spirit_update = () => {
 				{
 					'name': 'Optional claw/bite',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': Math.ceil(force / 2) + 'P',
 					'c': (force * 2) + 2,
 					'n': 0,
@@ -10756,6 +10853,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Natural Weapon (claw/bite)',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': Math.ceil(force / 2) + 'P',
 					'c': (force * 2) + 1,
 					'n': 0,
@@ -10795,6 +10896,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Natural Weapon (claw/bite)',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': Math.ceil(force / 2) + 'P',
 					'c': (force * 2) + 1,
 					'n': 0,
@@ -10834,6 +10939,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Natural Weapon (claw/bite)',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': Math.ceil(force / 2) + 'P',
 					'c': force * 2,
 					'n': 0,
@@ -10873,6 +10982,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Natural Weapon (claw/bite)',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': parseInt(Math.ceil(force / 2) + 2) + 'P',
 					'c': (force * 2) + 9,
 					'n': 0,
@@ -10912,6 +11025,10 @@ var spirit_update = () => {
 				close = [{
 					'name': 'Natural Weapon (claw/bite)',
 					'pool': force + spirit.agility,
+					'skill': 'Close Combat',
+					'rating': force,
+					'attribute': 'Agility',
+					'attr_rating': spirit.agility,
 					'dam': parseInt(Math.ceil(force / 2) + 2) + 'P',
 					'c': (force * 2) + 4,
 					'n': 0,
@@ -11117,7 +11234,7 @@ var spirit_update = () => {
 				if(v.spirit_reset_toggle === 'reset') {
 					// The reset toggle is turned on, wipe out the skills
 					ids.forEach(rowId => {
-						removeRepeatingRow(`repeating_range_${rowId}`);
+						removeRepeatingRow("repeating_range_"+rowId.toLowerCase());
 					});
 				}
 
@@ -11125,7 +11242,7 @@ var spirit_update = () => {
 					let usedIDs = [];
 					ranged.forEach(atk => {
 						// make a new repeatingRowID
-						var newId = generateRowID();
+						let newId = generateRowID();
 						while(newId in usedIDs) {
 							newId = generateRowID();
 						}
@@ -11133,6 +11250,10 @@ var spirit_update = () => {
 
 						setAttrs({
 							[`repeating_range_${newId}_name`]: atk.name,
+							[`repeating_range_${newId}_skill`]: atk.skill,
+							[`repeating_range_${newId}_rating`]: atk.rating,
+							[`repeating_range_${newId}_attribute`]: atk.attribute,
+							[`repeating_range_${newId}_attr_rating`]: atk.attr_rating,
 							[`repeating_range_${newId}_dicepool`]: atk.pool,
 							[`repeating_range_${newId}_dicepool_base`]: atk.pool,
 							[`repeating_range_${newId}_damage_base`]: atk.dam,
@@ -11166,7 +11287,7 @@ var spirit_update = () => {
 					let usedIDs = [];
 					close.forEach(atk => {
 						// make a new repeatingRowID
-						var newId = generateRowID();
+						let newId = generateRowID();
 						while(newId in usedIDs) {
 							newId = generateRowID();
 						}
@@ -11174,6 +11295,10 @@ var spirit_update = () => {
 
 						setAttrs({
 							[`repeating_melee_${newId}_name`]: atk.name,
+							[`repeating_melee_${newId}_skill`]: atk.skill,
+							[`repeating_melee_${newId}_rating`]: atk.rating,
+							[`repeating_melee_${newId}_attribute`]: atk.attribute,
+							[`repeating_melee_${newId}_attr_rating`]: atk.attr_rating,
 							[`repeating_melee_${newId}_dicepool`]: atk.pool,
 							[`repeating_melee_${newId}_dicepool_base`]: atk.pool,
 							[`repeating_melee_${newId}_damage_base`]: atk.dam,
@@ -11297,6 +11422,7 @@ console.info("/*************************************************/");
 console.info("/*                 DROP EVENT                    */");
 console.info("/*************************************************/");
 console.log(eventInfo);
+console.log("starting compendium_drop_done");
 	compendium_drop_done();
 });
 
@@ -11307,6 +11433,7 @@ on("change:canvas_drop_data", (eventInfo) => {
 	setAttrs({compendium_drop_in_progress: true}, {silent:true});
 	compendium_drop_handler('canvasdrop', eventInfo);
 });
+
 // Compendium Dropped to Sheet
 on("change:compendium_drop_data", (eventInfo) => {
 	console.log("Compendium Item Dropped on Sheet!");
@@ -11470,6 +11597,7 @@ console.log(data.Category + " dropped on canvas.");
 			compendium_import(data);
 			break;
 	}
+console.log("done canvas_import");
 };
 
 var compendium_import = function(data) {
@@ -11552,6 +11680,7 @@ console.log(data);
 }
 
 var canvasDroppedNPC = function(data) {
+console.log("processing canvasDroppedNPC");
 	var tokenAttrs = {
 		showname: 1,
 		width: data["data-token_width"] || 70,
@@ -11560,22 +11689,18 @@ var canvasDroppedNPC = function(data) {
 
 	// default condition monitors for physical and matrix
 	let physical = 0, matrix = 0;
-
+console.log("Category: "+data.Category);
 	switch(data.Category) {
 		case 'Spirits':
 			setAttrs({
-				sheet_type: data.sheet_type,
-				spirit_type: data.spirit_type || '',
+				sheet_type: 'spirit',
+				spirit_type: data["data-spirit_type"] || '',
 			});
 
-			if(typeof data["data-physical"] !== 'undefined') {
-				physical = data["data-physical"];
-			} else if(typeof data["data-body_base"] !== 'undefined') {
-				physical = 8 + Math.ceil(data["data-body_base"] / 2);
-			}
-			tokenAttrs.bar1_value = physical || 0;
-			tokenAttrs.bar1_max = physical || 0;
-			tokenAttrs.bar3_value = data["data-edge"] || 0;
+//			tokenAttrs.bar1_value = physical || 0;
+//			tokenAttrs.bar1_max = physical || 0;
+//			tokenAttrs.bar1_link = 'physical';
+			tokenAttrs.bar3_value = 0;
 			tokenAttrs.bar3_max = 7;
 			break;
 		case 'Vehicle':
@@ -11629,7 +11754,7 @@ var canvasDroppedNPC = function(data) {
 		case 'Sprites':
 			setAttrs({
 				sheet_type: 'sprite',
-				sprite_type: data.sprite_type || '',
+				sprite_type: data["data-sprite_type"] || '',
 				tasks: 1,
 				matrix: 9,
 				matrix_max: 9,
@@ -11660,7 +11785,8 @@ var setup_token = (tokenAttrs) => {
 //		 width: tokenAttrs.width,
 //		 height: tokenAttrs.height
 //	});
-
+console.log("setting token attrs");
+console.log(tokenAttrs);
 	setDefaultToken(tokenAttrs);
 };
 
@@ -11678,7 +11804,7 @@ var canvasAddNPC = function(data) {
 	addattrs["stats_toggle"] = false;
 
 	// attributes that need no translation
-	["body_base", "agility_base", "reaction_base", "strength_base", "willpower_base", "logic_base", "intuition_base", "charisma_base", "edge", "magic", "resonance", "initiative_base", "initiative_dice", "defense_rating", "physical", "stun", "metatype", "pr", "move_speed", "sprint_speed", "sprint_modifier", "matrix_initiative_base", "matrix_initiative_dice", "cold_sim_initiative_base", "cold_sim_initiative_dice", "hot_sim_initiative_base", "hot_sim_initiative_dice", "pain_tolerance", "submersion", "initiate", "major_actions", "minor_actions", "alternate_movement"].forEach((attr) => {
+	["body_base", "agility_base", "reaction_base", "strength_base", "willpower_base", "logic_base", "intuition_base", "charisma_base", "edge", "magic", "resonance", "initiative_base", "defense_rating", "physical", "stun", "metatype", "pr", "move_speed", "sprint_speed", "sprint_modifier", "matrix_initiative_base", "cold_sim_initiative_base", "hot_sim_initiative_base", "pain_tolerance", "submersion", "initiate", "major_actions", "minor_actions", "alternate_movement"].forEach((attr) => {
 		if(data[`data-${attr}`]) {
 			addattrs[attr] = data[`data-${attr}`];
 		} else {
@@ -11686,6 +11812,35 @@ var canvasAddNPC = function(data) {
 		}
 	});
 	addattrs.physical_max = addattrs['physical'];
+
+
+	// Need to convert initiative dice to initiative dice and initiative dice mod
+	["initiative_dice", "matrix_initiative_dice", "cold_sim_initiative_dice", "hot_sim_initiative_dice"].forEach((die) => {
+		let dice_base = 1;
+		switch(die) {
+			case 'initiative_dice':
+			case 'matrix_initiative_dice':
+				dice_base = 1;
+				break;
+			case 'cold_sim_initiative_dice':
+				dice_base = 2;
+				break;
+			case 'hot_sim_initiative_dice':
+				dice_base = 3;
+				break;
+			default:
+				break;
+		}
+
+		let dice_mod = 0;
+		if(data[`data-${die}`]) {
+			dice_mod = parseInt(data[`data-${die}`] - dice_base);
+		}
+
+		addattrs[`${die}`] = dice_base;
+		addattrs[`${die}_mod`] = dice_mod;
+	});
+
 
 	// attribute mods need to be calculated and applied
 	["body", "agility", "reaction", "strength", "willpower", "logic", "intuition", "charisma"].forEach((attr) => {
@@ -11755,9 +11910,9 @@ var canvasAddNPC = function(data) {
 
 	// if there are matrix attributes (ASDF) deal with them and turn "has matrix device" on
 	if(data["data-attack"] || data["data-sleaze"] || data["data-data_process"] || data["data-firewall"] || data["data-device_name"] || data["data-device_rating"]) {
-		addattrs["flag_matrix"] = "on";
+		addattrs["flag_matrix"] = "matrix";
 		addattrs["device_name"] = data["data-device_name"] || "";
-		addattrs["device_rating"] = data["data-device_rating"] || "";
+		addattrs["matrix_device_rating"] = data["data-device_rating"] || "";
 		addattrs["attack"] = data["data-attack"] || 0;
 		addattrs["sleaze"] = data["data-sleaze"] || 0;
 		addattrs["data_processing"] = data["data-data_processing"] || 0;
