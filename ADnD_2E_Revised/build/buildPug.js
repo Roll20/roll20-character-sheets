@@ -4,7 +4,7 @@ const path = require('path');
 const sourceFolder = path.join(__dirname, '..');
 const jsFolder = path.join(sourceFolder, 'javascript');
 const pugFolder = path.join(sourceFolder, 'pug');
-const htmlFolder = path.join(sourceFolder, 'html', 'components');
+const htmlFolder = path.join(sourceFolder, 'html');
 const miscFolder = path.join(sourceFolder, 'misc');
 const booksPriority = [
     {book: 'PHB', print: 'First Printing May 2013'},
@@ -65,6 +65,11 @@ spellsJs.forEach(jsFile => {
     }
 });
 
+let spellTemplate = pug.renderFile(path.join(pugFolder, 'spellTemplate.pug'), {pretty: true, isPriest: false});
+fs.writeFileSync(path.join(htmlFolder, 'shared', 'wizard-spell-template.html'), spellTemplate);
+spellTemplate = pug.renderFile(path.join(pugFolder, 'spellTemplate.pug'), {pretty: true, isPriest: true});
+fs.writeFileSync(path.join(htmlFolder, 'shared', 'priest-spell-template.html'), spellTemplate);
+
 const wizardSpells = require(path.join(jsFolder, 'wizardSpells.js'));
 const priestSpells = require(path.join(jsFolder, 'priestSpells.js'));
 html += pug.renderFile(path.join(pugFolder, 'spellScrollsDatalists.pug'), {pretty: true, wizardSpells, priestSpells});
@@ -96,5 +101,5 @@ simpleDatalists.forEach(simpleDatalist => {
    html += pug.renderFile(path.join(pugFolder, 'simpleDatalists.pug'), {pretty: true, data: data, id:simpleDatalist[1]})
 });
 
-fs.writeFileSync(path.join(htmlFolder, 'dynamicDatalists.html'), html);
+fs.writeFileSync(path.join(htmlFolder, 'components', 'dynamicDatalists.html'), html);
 console.log('');

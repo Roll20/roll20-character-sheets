@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
 const SHEET_NAME = 'AD&D 2E Revised';
-const SHEET_VERSION = '4.14.2';
+const SHEET_VERSION = '4.15.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -27,9 +27,6 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(3, 3, 2))
                 migrate3_3_2();
-
-            if (oldSheetVersion.isBelowMigrate(3, 4, 0))
-                migrate3_4_0();
 
             if (oldSheetVersion.isBelowMigrate(4, 3, 0))
                 migrate4_3_0();
@@ -184,13 +181,6 @@ function migrateOtherValuables() {
         if (!_.isEmpty(newValue))
             setAttrs(newValue);
     });
-}
-//#endregion
-
-//#region version 3.4.0
-function migrate3_4_0() {
-    console.log('Migrating to v3.4.0');
-    updateNonprofPenalty();
 }
 //#endregion
 
