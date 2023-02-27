@@ -227,7 +227,7 @@ const checkClassLevel = async function(values, rollExpression) {
     }
 }
 
-const calculateFormula = function(formulaField, calculatedField, checkClassLevel) {
+const calculateFormula = function(formulaField, calculatedField, checkLevel) {
     getAttrs([formulaField, ...Object.entries(LEVEL_FIELDS).flat()], async function (values) {
         let rollExpression = values[formulaField];
         let valid = isRollValid(rollExpression, formulaField);
@@ -235,7 +235,7 @@ const calculateFormula = function(formulaField, calculatedField, checkClassLevel
             return;
 
         let valueToSet = {};
-        if (checkClassLevel) {
+        if (checkLevel) {
             valueToSet[formulaField] = await checkClassLevel(values, rollExpression);
         }
 
@@ -878,8 +878,8 @@ CALCULATION_FIELDS.forEach(({formulaField, calculatedField}) => {
         if (isSheetWorkerUpdate(eventInfo))
             return;
 
-        let checkClassLevel = !!eventInfo.newValue;
-        calculateFormula(formulaField, calculatedField, checkClassLevel);
+        let checkLevel = !!eventInfo.newValue;
+        calculateFormula(formulaField, calculatedField, checkLevel);
     });
 });
 
