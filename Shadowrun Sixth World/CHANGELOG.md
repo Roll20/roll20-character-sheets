@@ -1,6 +1,10 @@
 Change Log
 ==============================================
-**2023-02-27 ** v.73 Chuz (James Culp)
+**2023-02-27 ** v.74 Chuz (James Culp)
+	Fix for matrix device stats on drag and drop for NPCs
+	Fix for Sprite drag and drop issue
+	NPCs->Grunts added a stun monitor and flag to display it (it is hidden by default)
+**2023-02-23 ** v.73 Chuz (James Culp)
 	Bugfix - PC Initiatives - Fixed a condition where if a dice mod is set and then the initiative base is changed it keeps adding the dice mod repeatedly.
 **2023-02-20 ** v.72 Chuz (James Culp)
 	Added Magic and Resonance to attribute roll buttons as additional options in the drop down
