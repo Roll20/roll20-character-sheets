@@ -227,7 +227,7 @@ const checkClassLevel = async function(values, rollExpression) {
     }
 }
 
-const calculateFormula = function(formulaField, calculatedField, doCheckClassLevel) {
+const calculateFormula = function(formulaField, calculatedField, checkClassLevel) {
     getAttrs([formulaField, ...Object.entries(LEVEL_FIELDS).flat()], async function (values) {
         let rollExpression = values[formulaField];
         let valid = isRollValid(rollExpression, formulaField);
@@ -235,12 +235,17 @@ const calculateFormula = function(formulaField, calculatedField, doCheckClassLev
             return;
 
         let valueToSet = {};
-        if (doCheckClassLevel) {
-            valueToSet[formulaField] = rollExpression = await checkClassLevel(values, rollExpression);
+        if (checkClassLevel) {
+            valueToSet[formulaField] = await checkClassLevel(values, rollExpression);
         }
 
-        valueToSet[calculatedField] = await extractRollResult(rollExpression);
-        setAttrs(valueToSet);
+        if (calculatedField) {
+            valueToSet[calculatedField] = await extractRollResult(valueToSet[formulaField]);
+        }
+
+        if (Object.keys(valueToSet).length > 0) {
+            setAttrs(valueToSet);
+        }
     });
 }
 
@@ -854,6 +859,9 @@ on('clicked:opendoor-check', function (eventInfo){
 //#endregion
 
 const CALCULATION_FIELDS = [
+    { formulaField: 'rogue-level-base'},
+    { formulaField: 'level-wizard'},
+    { formulaField: 'level-priest'},
     { formulaField: 'thac0-base',            calculatedField: 'thac0-base-calc' },
     // Proficiencies
     { formulaField: 'weapprof-slots-total',  calculatedField: 'weapprof-slots-total-calc' },
@@ -870,8 +878,8 @@ CALCULATION_FIELDS.forEach(({formulaField, calculatedField}) => {
         if (isSheetWorkerUpdate(eventInfo))
             return;
 
-        let doCheckClassLevel = !!eventInfo.newValue; // conversion into a bool
-        calculateFormula(formulaField, calculatedField, doCheckClassLevel);
+        let checkClassLevel = !!eventInfo.newValue;
+        calculateFormula(formulaField, calculatedField, checkClassLevel);
     });
 });
 
@@ -1421,25 +1429,6 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 //#endregion
 
 //#region Rogue skills
-on('change:rogue-level-base', function (eventInfo) {
-    if (isSheetWorkerUpdate(eventInfo))
-        return;
-
-    let rollExpression = eventInfo.newValue;
-    if (!rollExpression)
-        return;
-
-    if (!isRollValid(rollExpression, 'rogue-level-base'))
-        return;
-
-    getAttrs([...Object.entries(LEVEL_FIELDS).flat()], async function (values) {
-        let newRollExpression = await checkClassLevel(values, rollExpression);
-        console.log(newRollExpression);
-        if (newRollExpression !== rollExpression)
-            setAttrs({'rogue-level-base': newRollExpression});
-    });
-});
-
 // --- Start setup Rogue skills total --- //
 let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
 let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
