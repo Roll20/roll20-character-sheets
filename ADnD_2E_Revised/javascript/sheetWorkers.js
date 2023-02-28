@@ -229,7 +229,7 @@ const checkClassLevel = async function(values, rollExpression) {
 
 const calculateFormula = function(formulaField, calculatedField, doCheckClassLevel) {
     getAttrs([formulaField, ...Object.entries(LEVEL_FIELDS).flat()], async function (values) {
-        let rollExpression = values[formulaField].trim();
+        let rollExpression = values[formulaField];
         let valid = isRollValid(rollExpression, formulaField);
         if (!valid)
             return;
