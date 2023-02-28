@@ -6233,7 +6233,7 @@
 <input type="hidden" name="attr_spellcasting_specialist" value="0" />
 <input type="hidden" name="attr_spellcasting_expert" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.74">
+<input type="hidden" name="attr_sheet_version" value="0.75">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 // Sheet workers
@@ -6451,9 +6451,11 @@ var _v71_update = () => {
 			});
 
 			// Update npc sheets to use matrix_device_rating instead of device_rating
-			setAttrs({
-				matrix_device_rating: v.device_rating
-			});
+			if(v.device_rating) {
+				setAttrs({
+					matrix_device_rating: v.device_rating
+				});
+			}
 		}
 	});
 
@@ -6510,7 +6512,7 @@ var _v71_update = () => {
 	// Update repeating augmentations to preserve legacy data.
 	getSectionIDs("augmentations", (ids) => {
 		// If there are no augmentations it was likely triggered by a deletion, need to reset aug_essence_cost to 0
-		_.each(ids, (id) => {
+		ids.forEach((id) => {
 			getAttrs([`repeating_augmentations_${id}_essence_cost`, `repeating_augmentations_${id}_essence_base`], (aug_ess) => {
 				let toUpdate = {};
 				if(aug_ess[`repeating_augmentations_${id}_essence_cost`]) {
