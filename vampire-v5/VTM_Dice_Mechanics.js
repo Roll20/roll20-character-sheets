@@ -829,7 +829,8 @@ function calculateDc(run) {
 	return dc;
 }
 
-on("chat:message", function (msg) {
+on("chat:message", function (msg_orig) {
+        let msg=_.clone(msg_orig);
 	// returns the chat window command entered, all in lowercase.
 	if (msg.type != 'api') {
 		return;
