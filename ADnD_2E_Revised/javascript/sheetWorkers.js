@@ -195,27 +195,25 @@ const isRollValid = function (rollExpression, field) {
 const LEVEL_CLASS_REGEX = /@\{level-class[1-5]}/g;
 const checkClassLevel = async function(values, rollExpression) {
     await keepContextRoll();
-    let result = {rollExpression: rollExpression};
     let match = rollExpression.match(LEVEL_CLASS_REGEX);
     if (!match)
-        return result; // There is no scaling
+        return rollExpression; // There is no scaling
 
     let levelsInExpression = new Set(match);
     if (levelsInExpression.size > 1)
-        return result; // The user presumably knows what he is doing
+        return rollExpression; // The user presumably knows what he is doing
 
     let levelsWithValues = Object.keys(LEVEL_FIELDS).filter(level => values[level]);
     if (levelsWithValues.length === 0)
-        return result; // The user has not set levels in any fields
+        return rollExpression; // The user has not set levels in any fields
 
-    let [levelInExpression] = levelsInExpression;
+    let [levelInExpression] = levelsInExpression; // first element from set
     let levelInExpressionNoBrackets = levelInExpression.replace(/[@{}]/g, '');
     if (levelsWithValues.length === 1) {
         if (levelInExpressionNoBrackets === levelsWithValues[0]) {
-            return result;
+            return rollExpression;
         } else {
-            result.rollExpression = rollExpression.replaceAll(levelInExpressionNoBrackets, levelsWithValues[0]);
-            return result;
+            return  rollExpression.replaceAll(levelInExpressionNoBrackets, levelsWithValues[0]);
         }
     } else {
         let suggestedClasses = levelsWithValues.map(l => `${values[LEVEL_FIELDS[l]].replaceAll(',', '')} (${l}),${l}`)
@@ -224,11 +222,8 @@ const checkClassLevel = async function(values, rollExpression) {
             ? `?{Please confirm the class to use|${suggestedClasses}}`
             : `?{${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
 
-        result.func = async function() {
-            let field = await extractQueryResult(query);
-            return rollExpression.replaceAll(levelInExpressionNoBrackets, field);
-        };
-        return result;
+        let field = await extractQueryResult(query);
+        return rollExpression.replaceAll(levelInExpressionNoBrackets, field);
     }
 }
 
@@ -241,15 +236,19 @@ const calculateFormula = function(formulaField, calculatedField, doCheckClassLev
 
         let valueToSet = {};
         if (doCheckClassLevel) {
-            let result = await checkClassLevel(values, rollExpression);
-            if (result.func)
-                valueToSet[formulaField] = rollExpression = await result.func();
-            else
-                valueToSet[formulaField] = rollExpression = result.rollExpression;
+            let updatedRollExpression = await checkClassLevel(values, rollExpression);
+            if (rollExpression !== updatedRollExpression) {
+                valueToSet[formulaField] = rollExpression = updatedRollExpression;
+            }
         }
 
-        valueToSet[calculatedField] = await extractRollResult(rollExpression);
-        setAttrs(valueToSet);
+        if (calculatedField) {
+            valueToSet[calculatedField] = await extractRollResult(rollExpression);
+        }
+
+        if (Object.keys(valueToSet).length > 0) {
+            setAttrs(valueToSet);
+        }
     });
 }
 
@@ -863,6 +862,9 @@ on('clicked:opendoor-check', function (eventInfo){
 //#endregion
 
 const CALCULATION_FIELDS = [
+    { formulaField: 'rogue-level-base'},
+    { formulaField: 'level-wizard'},
+    { formulaField: 'level-priest'},
     { formulaField: 'thac0-base',            calculatedField: 'thac0-base-calc' },
     // Proficiencies
     { formulaField: 'weapprof-slots-total',  calculatedField: 'weapprof-slots-total-calc' },
