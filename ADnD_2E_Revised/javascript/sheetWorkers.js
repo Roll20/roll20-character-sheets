@@ -2831,11 +2831,10 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`prep=${prep}`);
             macroBuilder.push(`prereq=${power['prerequisites']}`);
             macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
-            let powerRoll = `[[1d20cf20-(@{psionic-mod${number}})]]`;
-            if (power['roll-override']) {
-                powerRoll = `[${power['roll-override']}](~${values.character_name}|repeating_${section}_${parse.rowId}_action-check-dm)`;
+            macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
+            if (power['secret-by-dm']) {
+                macroBuilder.push('secret=true');
             }
-            macroBuilder.push(`powerroll=${powerRoll}`);
             let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
             if (power['context-modifier']) {
                 powerScore += `+(${power['context-modifier']})`;
@@ -2929,8 +2928,14 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
     on(`clicked:repeating_${section}:action-macro`, function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
-        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
+        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty', 'character_name'], function (values) {
             let macroValue = values[`repeating_${section}_${macro}`];
+
+            let isSecret = macroValue.match(/\{\{(secret=true)}}/);
+            let powerRollMatch = macroValue.match(/\{\{(powerroll=.*?)}} *\{\{/);
+            if (isSecret && powerRollMatch) {
+                macroValue = macroValue.replace(powerRollMatch[1], `powerroll=[Secret by DM](~${values.character_name}|repeating_${section}_${parse.rowId}_action-check-dm)`)
+            }
 
             rollPsionicTemplate(macroValue, parse.rowId, values);
         });
