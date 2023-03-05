@@ -1,5 +1,9 @@
 Change Log
 ==============================================
+**2023-03-06 ** v.75 Chuz (James Culp)
+	New Feature - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
+	New Feature - Added Heat, Reputation and AsRep to the Social Pane
+	Added Drag and Drop support for Gear-Ammunition-Grenades Gear-Ammunition-Rockets to place them in the Arms-Grenades section instead of Gear
 **2023-02-27 ** v.74 Chuz (James Culp)
 	Fix for matrix device stats on drag and drop for NPCs
 	Fix for Sprite drag and drop issue
