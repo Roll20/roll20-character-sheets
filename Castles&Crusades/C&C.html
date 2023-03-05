@@ -162,7 +162,7 @@
             <span data-i18n="Misc">Misc</span>
          </div>
 		<div class="sheet-AC">
-            <input type="number" name="attr_AC" class="short" value="10+@{ArmorAC}+@{ShieldAC}+@{ModAC}+@{MagicAC}+@{MiscAC}" disabled="true" title="@{AC}"/>
+            <input type="number" name="attr_AC" class="short" value="" title="@{AC}"/>
 			<span data-i18n="= 10 +">= 10 +</span>
             <input type="number" name="attr_ArmorAC" class="short" value="0" data-i18n-placeholder="ArmorAC" placeholder="ArmorAC" spellcheck="false" title="@{ArmorAC}"/>
             <input type="number" name="attr_ShieldAC" class="short" value="0" data-i18n-placeholder="ShieldAC" placeholder="ShieldAC" spellcheck="false" title="@{ShieldAC}"/>
@@ -1252,6 +1252,19 @@ on("sheet:opened change:character_name", function(eventInfo) {
 		attrsToChange["MonWeaponFour_action"] = "%{" + v["character_name"] + "|MonWeaponFour-action}";
 		setAttrs(attrsToChange);
 	});
+});
+
+
+on("sheet:opened change:AC change:ArmorAC change:ShieldAC change:ModAC change:MagicAC change:MiscAC", async (info) => {
+	const values = await getAttrsAsync(["character_name", "AC", "ArmorAC", "ShieldAC", "ModAC", "MagicAC", "MiscAC"]);
+	const ArmorAC = parseInt(values.ArmorAC) || 0;
+	const ShieldAC = parseInt(values.ShieldAC) || 0;
+	const ModAC = parseInt(values.ModAC) || 0;
+	const MagicAC = parseInt(values.MagicAC) || 0;
+	const MiscAC = parseInt(values.MiscAC) || 0;
+	var attrsToChange = {};
+	attrsToChange["AC"] = 10 + ArmorAC + ShieldAC + ModAC + MagicAC + MiscAC;
+	setAttrs(attrsToChange);
 });
 
 on('clicked:WeaponOne-action', async (info) => {
