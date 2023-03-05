@@ -35,13 +35,7 @@
         <label>Tattoo/Brand</label>
       </div>
   </div>  
-  
-  <div class="stack header-left empty">
-        <label for="attr_injured">Injured?
-        <input name="attr_injured" type="checkbox"></label>
-  </div>
-  
-  
+    
   <div class="stack header-left">
     <div class="autoExpand long">
      <input spellcheck="false" class="header-input" name="attr_character_name" type="text">
@@ -83,6 +77,88 @@
     
 
   </div>
+  </section>
+
+  <input class="hidden sheet-briny" name="attr_briny" type="checkbox">
+  <section class="conditions">
+    <div class="title">
+      <h2>Conditions</h2>
+    </div>
+      
+    <div class="allConditions">
+      
+        <div class="conds">
+            <div class="cond">
+               <label for="attr_injured">Injured?
+               <input name="attr_injured" type="checkbox"></label>
+            </div>
+        </div>
+        
+        <div class="conds">
+            <div class="cond">
+               <label for="attr_taunted">Taunted?
+                 <input name="attr_taunted" type="checkbox">
+                 By <input name="attr_taunted_by" type="text">
+               </label>
+            </div>
+        </div>
+      
+        <div class="conds">
+            <div class="cond">
+               <label for="attr_painted">Painted?
+                 <input name="attr_painted" type="number" min="0" value="0">
+               </label>
+            </div>
+        </div>
+        
+        <div class="conds">
+            <div class="cond">
+               <label for="attr_bleed">Bleed?
+                 <input name="attr_bleed" type="number" min="0" value="0">
+               </label>
+            </div>
+        </div>
+         
+        <div class="conds">
+            <div class="cond">
+               <label for="attr_screwed">Screwed?
+               <input name="attr_screwed" type="checkbox"></label>
+            </div>
+        </div>
+        
+        <div class="conds brinycond">
+            <div class="cond">
+               <label for="attr_burn">Burning?
+                 <input name="attr_burn" type="number" min="0" value="0">
+               </label>
+            </div>
+        </div>
+        
+        <div class="conds brinycond">
+            <div class="cond">
+               <label for="attr_immobilized">Immobilized?
+               <input name="attr_immobilized" type="checkbox"></label>
+            </div>
+        </div>
+         
+        <div class="conds">
+            <div class="cond">
+               <input name="attr_blank1" type="text">
+            </div>
+        </div>
+        
+        <div class="conds">
+            <div class="cond">
+               <input name="attr_blank2" type="text">
+            </div>
+        </div> 
+        
+        <div class="conds">
+            <div class="cond">
+               <input name="attr_blank3" type="text">
+            </div>
+        </div> 
+      </div>
   </section>
 
   <section class="powers">
@@ -148,6 +224,12 @@
   </div>
   
   <h3 class="sidebar">Attributes</h3>
+
+  <div class="sideholder">
+      <input type="number" class="sidebar-input attr" name="attr_dicemod" value="0">
+    <label>Extra Dice</label>
+    <hr class="overline">
+  </div>
 
   <div class="sideholder">
       <input type="number" min="0" class="sidebar-input attr" name="attr_smash" value="0">
@@ -1069,7 +1151,7 @@
         
         <div class="drop">
           <label for="attr_injuredOps">Are Injured</label>
-          <input type="number" name="attr_injuredOps" value="0">
+          <input type="number" name="attr_injuredOps" value="0" min="0">
         </div>
         
         <div class="drop">
@@ -1424,8 +1506,20 @@
     <option>Valdivian Ops</option>
 </datalist>
 
+<datalist id="subbuildings">
+  <option>Escape Pods</option>
+  <option>HARPOON CANNON</option>
+  <option>Machine Shop</option>
+  <option>Portable 'Finery</option>
+  <option>Radar Lounge</option>
+  <option>Reinforced Hull</option>
+  <option>Shipwreck Station</option>
+  <option>Torpedos</option>
+  <option>Whaling Table</option>
+</datalist>
+
 <datalist id="brinybuildings">
-    <option>Artillery Lounge </option>
+    <option>Artillery Lounge</option>
     <option>Auguary</option>
     <option>Biotech Refinery</option>
     <option>Breakroom</option>
@@ -1788,6 +1882,18 @@ const submarineOrigins = {
   Built: `Unlock the sixth room, but when it's damaged, roll again to damage a second room.`
 };
 
+const subrooms = {
+  Radar_Lounge: "Radar Lounge",
+  Escape_Pods: "Escape Pods",
+  Whaling_Table: "Whaling Table",
+  Portable_Finery: "Portable 'Finery",
+  Shipwreck_Station: "Shipwreck Station",
+  HARPOON_CANNON: "HARPOON CANNON",
+  Machine_Shop: "Machine Shop",
+  Reinforced_Hull: "Reinforced Hull",
+  Torpedos: "Torpedos"
+}
+
 const Rooms = {
   Armory: "Armory",
   Auguary: "Auguary",
@@ -1889,13 +1995,38 @@ function getRelationshipDetails(relationship, name) {
       return `You messed up your professional relationship. This can only be removed by completing a mission together.\r\n\r\nWhen on a mission with ${name}, ALL Operatives subtract 1 from all dice (even drops). You cannot help or be helped by ${name}.`;
       
     case Relationships.Rival:
-      return `If ${name} fails an attack, you can move into range and make a free attack against the target. If you miss, you suffer the original consequences as well.`;
+      return `Once per mission, if ${name} fails an attack, you can move into range and make a free attack against the target. If you miss, you suffer the original consequences as well.`;
       
     case Relationships.Strictly_Professional:
       return `Whenever you take the help action to give extra dice to ${name}, you grant three extra dice instead of just one.`;
       
     case Relationships.Other:
     default:
+      return "";
+  }
+}
+
+function getSubRoomDetails(room) {
+   switch(room) {
+  case subrooms.Radar_Lounge:
+    return `All Operatives act with +1 Cyber. \r\nUpgradeable cost 2: Every item can be used an additional time per mission\r\nUpgradeable cost 2: Lieutenants generate 1 less Cohort Point each round.`;
+  case subrooms.Escape_Pods:
+    return `Operatives may retreat from missions without returning to the Submarine. \r\nSpecial: this subsystem does NOT take up a room, and cannot be damaged. Operatives may spend 1 Construction Piece to remove the pods and clear the way for something new, opening up an additional space to build. Any building or subsystem in this spot may not be damaged.`;
+  case subrooms.Whaling_Table:
+    return `Operatives restore to full HP after missions.\r\nUpgradeable cost 2: Any Operative (s) can spend 2 Scrip during downtime to un-Injure an Injured Operative. Every time an Operative uses the whaling table in this way, the cost increases by 1 Scrip.`;
+  case subrooms.Portable_Finery:
+    return `Operative restore to full Biotech after missions.`;
+  case subrooms.Shipwreck_Station:
+    return `Operatives restore Barrier, Shard, and Soak between missions.`;
+  case subrooms.HARPOON_CANNON:
+    return `Twice a mission this subsystem can be activated. One enemy takes 5 Harm, is yanked any number of range bands towars the Submarine, and is Immobilized until the end of the round.`;
+  case subrooms.Machine_Shop:
+    return `You can repair rooms on the submarine between missions (instead of returning home) at the cost of 2 Construction Pieces per room.`
+  case subrooms.Reinforced_Hull:
+    return `All rooms on the ship can be damaged twice.  Rooms operate as normal until they are damaged twice. The first time they are damaged, the effect of the room can still be accessed.`;
+  case subrooms.Torpedos:
+    return `Once per mission, either make a hole in a wall or deal 15 True Harm to one target with a clear line of sight to the Submarine. Increase Awareness by 40.`;
+   default: 
       return "";
   }
 }
@@ -2227,36 +2358,77 @@ function initializeDrops() {
 /* * * * * * * * * * * * * * * 
  *         Listeners         *
  * * * * * * * * * * * * * * */
-on("change:smash", function(eventInfo) {
-   const newVal = parseInt(eventInfo.newValue); // this is the source of like 99% of my problems.
-   const roll_formula_smash = buildDicePool(newVal);
-   const roll_results_smash = getResults(newVal);
-
-   setAttrs({
-  roll_formula_smash,
-  roll_results_smash,
+on("change:dicemod", function(eventInfo) {
+  getAttrs([
+      "smash",
+      "sly",
+      "cyber"
+    ], function(values) {
+    
+    const diceMod = parseInt(eventInfo.newValue);
+    updateSmashFormulas(parseInt(values.smash) + diceMod);
+    updateSlyFormulas(parseInt(values.sly) + diceMod);
+    updateCyberFormulas(parseInt(values.cyber) + diceMod);
    });
 });
 
-on("change:sly", function(eventInfo) {
-  const newVal = parseInt(eventInfo.newValue);
-  const roll_formula_sly = buildDicePool(newVal);
-  const roll_results_sly = getResults(newVal);
-   
+function updateSmashFormulas(totalSmashDice) {
+       const roll_formula_smash = buildDicePool(totalSmashDice);
+       const roll_results_smash = getResults(totalSmashDice);
+       setAttrs({
+      roll_formula_smash,
+      roll_results_smash,
+       });
+}
+ 
+on("change:smash", function(eventInfo) {
+  getAttrs([
+      "dicemod"
+    ], function(values) {
+       let newVal = parseInt(eventInfo.newValue); // this is the source of like 99% of my problems.
+       newVal += parseInt(values.dicemod);
+       
+       updateSmashFormulas(newVal);
+   });
+});
+
+function updateSlyFormulas(totalSlyDice) {
+  const roll_formula_sly = buildDicePool(totalSlyDice);
+  const roll_results_sly = getResults(totalSlyDice);
    setAttrs({
   roll_formula_sly,
   roll_results_sly,
    });
+}
+
+on("change:sly", function(eventInfo) {
+  const newVal = parseInt(eventInfo.newValue);
+    getAttrs([
+      "dicemod"
+    ], function(values) {
+  
+  updateSlyFormulas(newVal + parseInt(values.dicemod));
+  
+  });
 });
 
-on("change:cyber", function(eventInfo) {
-  const newVal = parseInt(eventInfo.newValue);
-  const roll_formula_cyber = buildDicePool(newVal);
-  const roll_results_cyber = getResults(newVal);
-   
+function updateCyberFormulas(totalCyberDice) {
+console.log(totalCyberDice);
+  const roll_formula_cyber = buildDicePool(totalCyberDice);
+  const roll_results_cyber = getResults(totalCyberDice);
   setAttrs({
     roll_formula_cyber,
     roll_results_cyber,
+  });
+}
+
+on("change:cyber", function(eventInfo) {
+  const newVal = parseInt(eventInfo.newValue);
+      getAttrs([
+      "dicemod"
+    ], function(values) {
+  updateCyberFormulas(newVal + parseInt(values.dicemod));
+  
   });
 });
 
@@ -2426,6 +2598,23 @@ on("change:buildingnameroom1 change:buildingnameroom2 change:buildingnameroom3 c
   });
 });
 
+
+<!-- Sub room change -->
+on("change:subroom1 change:subroom2 change:subroom3 change:subroom4 change:subroom5 change:subroom6", function(eventInfo) {
+   const roomNumber = eventInfo.sourceAttribute.match(/\d+/).shift(); // regex to grab the number from a string.
+   const room = eventInfo.newValue;
+   const roomKey = "subroomtext" + roomNumber; // Relying on attribute naming scheme.
+   
+    const details = getSubRoomDetails(room, true, true);
+
+    setAttrs(
+      {
+        [`${roomKey}`]: details
+      }
+    );
+}); 
+
+
 <!-- Hive room change -->
 on("change:hivename1 change:hivename2 change:hivename3 change:hivename4 change:hivename5 change:hivename6 change:hivename7 change:hivename8 change:hivename9 change:hivename10", function(eventInfo){
   const roomNumber = eventInfo.sourceAttribute.match(/\d+/).shift(); // regex to grab the number from a string. Relies on naming scheme.
@@ -2457,20 +2646,22 @@ on("change:hivedecayroom1 change:hivedecayroom2 change:hivedecayroom3 change:hiv
 
 on("sheet:opened", () => {
   // Initialize our default values. Not necessary if we used translation.
-  getAttrs(["smash_fail", "cyber_fail", "sly_fail", "smash", "sly", "cyber", "sublockedroom6"], (values) => {
+  getAttrs(["smash_fail", "cyber_fail", "sly_fail", "smash", "sly", "cyber", "dicemod", "sublockedroom6"], (values) => {
     const sm = values.smash_fail;
     const cy = values.cyber_fail;
     const sl = values.sly_fail
     const sublockedroom6 = values.sublockedroom6; // I deeply resent that this is necessary. CSS doesn't initialize correctly without explicitly "changing" it here.
     
-    const roll_formula_smash = buildDicePool(parseInt(values.smash));
-    const roll_results_smash = getResults(parseInt(values.smash));
+    const diceMod = parseInt(values.dicemod);
     
-    const roll_formula_cyber = buildDicePool(parseInt(values.cyber));
-    const roll_results_cyber = getResults(parseInt(values.cyber));
+    const roll_formula_smash = buildDicePool(parseInt(values.smash) + diceMod);
+    const roll_results_smash = getResults(parseInt(values.smash)  + diceMod);
     
-    const roll_formula_sly = buildDicePool(parseInt(values.sly));
-    const roll_results_sly = getResults(parseInt(values.sly));
+    const roll_formula_cyber = buildDicePool(parseInt(values.cyber) + diceMod);
+    const roll_results_cyber = getResults(parseInt(values.cyber) + diceMod);
+    
+    const roll_formula_sly = buildDicePool(parseInt(values.sly) + diceMod);
+    const roll_results_sly = getResults(parseInt(values.sly) + diceMod);
     
     setAttrs({
       "smash_fail" : sm,
@@ -2509,6 +2700,8 @@ on("clicked:secondary", function() {
     numDice += numGear; // +1 per Operative with nice gear / weapon
     
     numDice += numPower; // +1 per Operative with nice Power
+    
+    
     
     // -1 die if there's only interns
     if(numCar === 0) {

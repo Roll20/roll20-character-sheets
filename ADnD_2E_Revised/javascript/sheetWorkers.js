@@ -67,45 +67,42 @@ const capitalizeFirst = function (s) {
 }
 
 const displaySize = function(size) {
-    if (typeof size !== 'string')
+    if (typeof size !== 'string' || size.length === 0)
         return '';
 
-    size = size.toLowerCase();
-    switch (size) {
-        case 't':
-        case 'tiny': return 'Tiny';
-        case 's':
-        case 'small': return 'Small';
-        case 'm':
-        case 'medium': return 'Medium';
-        case 'l':
-        case 'large': return 'Large';
-        case 'h':
-        case 'huge': return 'Huge';
-        case 'g':
-        case 'gargantuan': return 'Gargantuan';
+    let sizeLetter = size.charAt(0).toLowerCase();
+    switch (sizeLetter) {
+        case 't': return 'Tiny';
+        case 's': return 'Small';
+        case 'm': return 'Medium';
+        case 'l': return 'Large';
+        case 'h': return 'Huge';
+        case 'g': return 'Gargantuan';
         default: return capitalizeFirst(size);
     }
 }
 
 const sizeToInt = function(size) {
-    size = displaySize(size);
-    switch (size) {
-        case 'Tiny': return 0;
-        case 'Small': return 1;
-        case 'Medium': return 2;
-        case 'Large': return 3;
-        case 'Huge': return 4;
-        case 'Gargantuan': return 5;
+    if (typeof size !== 'string' || size.length === 0)
+        return '';
+
+    let sizeLetter = size.charAt(0).toLowerCase();
+    switch (sizeLetter) {
+        case 't': return 0;
+        case 's': return 1;
+        case 'm': return 2;
+        case 'l': return 3;
+        case 'h': return 4;
+        case 'g': return 5;
     }
 }
 
 const displayWeaponType = function (type) {
-    if (typeof type !== 'string')
+    if (typeof type !== 'string' || type.length === 0)
         return '';
 
-    type = type.toLowerCase();
-    switch (type) {
+    let typeLetter = type.toLowerCase();
+    switch (typeLetter) {
         case 's': return 'Slashing';
         case 'p': return 'Piercing';
         case 'b': return 'Bludgeoning';
@@ -198,27 +195,25 @@ const isRollValid = function (rollExpression, field) {
 const LEVEL_CLASS_REGEX = /@\{level-class[1-5]}/g;
 const checkClassLevel = async function(values, rollExpression) {
     await keepContextRoll();
-    let result = {rollExpression: rollExpression};
     let match = rollExpression.match(LEVEL_CLASS_REGEX);
     if (!match)
-        return result; // There is no scaling
+        return rollExpression; // There is no scaling
 
     let levelsInExpression = new Set(match);
     if (levelsInExpression.size > 1)
-        return result; // The user presumably knows what he is doing
+        return rollExpression; // The user presumably knows what he is doing
 
     let levelsWithValues = Object.keys(LEVEL_FIELDS).filter(level => values[level]);
     if (levelsWithValues.length === 0)
-        return result; // The user has not set levels in any fields
+        return rollExpression; // The user has not set levels in any fields
 
-    let [levelInExpression] = levelsInExpression;
+    let [levelInExpression] = levelsInExpression; // first element from set
     let levelInExpressionNoBrackets = levelInExpression.replace(/[@{}]/g, '');
     if (levelsWithValues.length === 1) {
         if (levelInExpressionNoBrackets === levelsWithValues[0]) {
-            return result;
+            return rollExpression;
         } else {
-            result.rollExpression = rollExpression.replaceAll(levelInExpressionNoBrackets, levelsWithValues[0]);
-            return result;
+            return  rollExpression.replaceAll(levelInExpressionNoBrackets, levelsWithValues[0]);
         }
     } else {
         let suggestedClasses = levelsWithValues.map(l => `${values[LEVEL_FIELDS[l]].replaceAll(',', '')} (${l}),${l}`)
@@ -227,11 +222,8 @@ const checkClassLevel = async function(values, rollExpression) {
             ? `?{Please confirm the class to use|${suggestedClasses}}`
             : `?{${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
 
-        result.func = async function() {
-            let field = await extractQueryResult(query);
-            return rollExpression.replaceAll(levelInExpressionNoBrackets, field);
-        };
-        return result;
+        let field = await extractQueryResult(query);
+        return rollExpression.replaceAll(levelInExpressionNoBrackets, field);
     }
 }
 
@@ -244,15 +236,19 @@ const calculateFormula = function(formulaField, calculatedField, doCheckClassLev
 
         let valueToSet = {};
         if (doCheckClassLevel) {
-            let result = await checkClassLevel(values, rollExpression);
-            if (result.func)
-                valueToSet[formulaField] = rollExpression = await result.func();
-            else
-                valueToSet[formulaField] = rollExpression = result.rollExpression;
+            let updatedRollExpression = await checkClassLevel(values, rollExpression);
+            if (rollExpression !== updatedRollExpression) {
+                valueToSet[formulaField] = rollExpression = updatedRollExpression;
+            }
         }
 
-        valueToSet[calculatedField] = await extractRollResult(rollExpression);
-        setAttrs(valueToSet);
+        if (calculatedField) {
+            valueToSet[calculatedField] = await extractRollResult(rollExpression);
+        }
+
+        if (Object.keys(valueToSet).length > 0) {
+            setAttrs(valueToSet);
+        }
     });
 }
 
@@ -430,7 +426,7 @@ on('clicked:hide-toast', function(eventInfo) {
 
 //#region Ability Scores logic
 // Ability Score Parser function
-const EXCEPTIONAL_STRENGHT_REGEX = /18[\[(]([0-9]{1,3})[\])]/; // Ie. 18[65], 18(65)
+const EXCEPTIONAL_STRENGTH_REGEX = /18[\[(]([0-9]{1,3})[\])]/; // Ie. 18[65], 18(65)
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     if (abilityScoreString === '') {
         return defaultValue;
@@ -442,7 +438,7 @@ function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     }
 
     if (isStrength) {
-        let exceptionalMatch = abilityScoreString.match(EXCEPTIONAL_STRENGHT_REGEX);
+        let exceptionalMatch = abilityScoreString.match(EXCEPTIONAL_STRENGTH_REGEX);
         if (exceptionalMatch !== null) {
             let exceptionalStrNumber = parseInt(exceptionalMatch[1]);
             if (1 <= exceptionalStrNumber && exceptionalStrNumber <= 50) {
@@ -667,20 +663,28 @@ on('change:intelligence change:reason change:knowledge', function() {
 });
 
 // Set sub-attributes based on Wisdom, Intuition, and Willpower
-function parseWisBonus(abilityScore) {
-    if (abilityScore < 13) {
-        return {
-            '1st': 0,
-            '2nd': 0,
-            '3rd': 0,
-            '4th': 0,
-            '5th': 0,
-            '6th': 0,
-            '7th': 0,
-            'wisbonus': wisdomTable['wisbonus'][abilityScore],
-            'wisbonus-prime': wisdomTable['wisbonus'][abilityScore],
-            'wisbonus-extra': wisdomTable['wisbonus'][abilityScore],
-        };
+async function parseWisBonus(abilityScore, wisdom) {
+    let bonus = {
+        '1st': 0,
+        '2nd': 0,
+        '3rd': 0,
+        '4th': 0,
+        '5th': 0,
+        '6th': 0,
+        '7th': 0,
+        'wind': 0,
+        'wisbonus': '—',
+        'wisbonus-prime': '—',
+        'wisbonus-extra': '—',
+    };
+    if (abilityScore < 13 && wisdom < 13) {
+        await keepContextRoll();
+        return bonus;
+    }
+
+    let answer = await extractQueryResult('?{Priests get bonus spells from high Wisdom (but not Paladins and Rangers). Do you play a priest?|My character is a priest,true|My character is a different class,false}');
+    if (answer !== 'true') {
+        return bonus;
     }
 
     // Combine all spell levels into one string
@@ -690,7 +694,7 @@ function parseWisBonus(abilityScore) {
     }
 
     // Count instances of each spell level
-    let bonus = {
+    bonus = {
         '1st': (bonusString.match(/1st/g) || []).length,
         '2nd': (bonusString.match(/2nd/g) || []).length,
         '3rd': (bonusString.match(/3rd/g) || []).length,
@@ -698,18 +702,28 @@ function parseWisBonus(abilityScore) {
         '5th': (bonusString.match(/5th/g) || []).length,
         '6th': (bonusString.match(/6th/g) || []).length,
         '7th': (bonusString.match(/7th/g) || []).length,
+        'wind': wisdomTable['wisdom-wind'][wisdom],
     };
 
     // Generate bonus prime and bonus extra strings
-    bonus['wisbonus-prime'] = wisdomTable['wisbonus-prime'][abilityScore];
-    bonus['wisbonus-extra'] = wisdomTable['wisbonus-extra'][abilityScore];
+    function format(bonus, key) {
+        if (bonus[key] === 0) {
+            return '';
+        }
+        if (bonus[key] === 1) {
+            return key
+        }
+        return `${bonus[key]}x${key}`;
+    }
+    bonus['wisbonus-prime'] = [format(bonus, '1st'), format(bonus, '2nd'), format(bonus, '3rd'), format(bonus, '4th')].filter(Boolean).join(', ');
+    bonus['wisbonus-extra'] = [format(bonus, '5th'), format(bonus, '6th'), format(bonus, '7th')].filter(Boolean).join(', ');
     bonus['wisbonus'] = [bonus['wisbonus-prime'], bonus['wisbonus-extra']].filter(Boolean).join(', ');
 
     return bonus;
 }
 
 on('change:wisdom change:intuition change:willpower', function() {
-    getAttrs(['wisdom','intuition','willpower'], function(values) {
+    getAttrs(['wisdom','intuition','willpower'], async function (values) {
         let wisdomRaw = values.wisdom.replace(/\s+/g, '');
         let intuitionRaw = values.intuition.replace(/\s+/g, '');
         let willpowerRaw = values.willpower.replace(/\s+/g, '');
@@ -721,7 +735,7 @@ on('change:wisdom change:intuition change:willpower', function() {
 
         let bonusSpells;
         if (wisdom === 0) {
-            bonusSpells = parseWisBonus(0);
+            bonusSpells = await parseWisBonus(0, 0);
             assignAttributes(0, 0, 0, bonusSpells, wisdomTable['wisimmune'][0], wisdomTable['wisimmune'][0], wisdomTable['wisnotes'][0], wisdomTable['wisnotes'][0]);
             return;
         }
@@ -749,34 +763,35 @@ on('change:wisdom change:intuition change:willpower', function() {
             for (let i = willpower; i > 18; i--) {
                 wisImmuneArray.push(wisdomTable['wisimmune'][i]);
             }
-            let slicePoint = Math.round(wisImmuneArray.length/2);
+            let slicePoint = Math.round(wisImmuneArray.length / 2);
             wisimm1 = wisImmuneArray.slice(0, slicePoint).filter(Boolean).join(', ');
             wisimm2 = wisImmuneArray.slice(slicePoint).filter(Boolean).join(', ');
         }
-        bonusSpells = parseWisBonus(willpower);
+        bonusSpells = await parseWisBonus(intuition, wisdom);
 
         assignAttributes(wisdom, intuition, willpower, bonusSpells, wisimm1, wisimm2, wisnotes, wis2notes);
 
         function assignAttributes(wisdom, intuition, willpower, bonusSpells, wisimm1, wisimm2, wisnotes, wis2notes) {
-            setAttrs({
-                wisdef: wisdomTable['wisdef'][willpower],
-                wisbonus: bonusSpells['wisbonus'],
-                'wisbonus-prime': bonusSpells['wisbonus-prime'],
-                'wisbonus-extra': bonusSpells['wisbonus-extra'],
-                wisfail: wisdomTable['wisfail'][intuition],
-                wisimm: wisimm1,
-                wisimm1: wisimm1,
-                wisimm2: wisimm2,
-                wisnotes: wisnotes,
-                wis2notes: wis2notes,
-                'spell-priest-level1-wisdom': bonusSpells['1st'],
-                'spell-priest-level2-wisdom': bonusSpells['2nd'],
-                'spell-priest-level3-wisdom': bonusSpells['3rd'],
-                'spell-priest-level4-wisdom': bonusSpells['4th'],
-                'spell-priest-level5-wisdom': bonusSpells['5th'],
-                'spell-priest-level6-wisdom': bonusSpells['6th'],
-                'spell-priest-level7-wisdom': bonusSpells['7th'],
-            });
+            let newValue = {};
+            newValue['wisdef'] = wisdomTable['wisdef'][willpower];
+            newValue['wisbonus'] = bonusSpells['wisbonus'];
+            newValue['wisbonus-prime'] = bonusSpells['wisbonus-prime'];
+            newValue['wisbonus-extra'] = bonusSpells['wisbonus-extra'];
+            newValue['wisfail'] = wisdomTable['wisfail'][intuition];
+            newValue['wisimm'] = wisimm1;
+            newValue['wisimm1'] = wisimm1;
+            newValue['wisimm2'] = wisimm2;
+            newValue['wisnotes'] = wisnotes;
+            newValue['wis2notes'] = wis2notes;
+            newValue['spell-priest-level1-wisdom'] = bonusSpells['1st'];
+            newValue['spell-priest-level2-wisdom'] = bonusSpells['2nd'];
+            newValue['spell-priest-level3-wisdom'] = bonusSpells['3rd'];
+            newValue['spell-priest-level4-wisdom'] = bonusSpells['4th'];
+            newValue['spell-priest-level5-wisdom'] = bonusSpells['5th'];
+            newValue['spell-priest-level6-wisdom'] = bonusSpells['6th'];
+            newValue['spell-priest-level7-wisdom'] = bonusSpells['7th'];
+            newValue['wisdom-wind'] = bonusSpells['wind'];
+            setAttrs(newValue);
         }
     });
 });
@@ -847,6 +862,9 @@ on('clicked:opendoor-check', function (eventInfo){
 //#endregion
 
 const CALCULATION_FIELDS = [
+    { formulaField: 'rogue-level-base'},
+    { formulaField: 'level-wizard'},
+    { formulaField: 'level-priest'},
     { formulaField: 'thac0-base',            calculatedField: 'thac0-base-calc' },
     // Proficiencies
     { formulaField: 'weapprof-slots-total',  calculatedField: 'weapprof-slots-total-calc' },
@@ -934,10 +952,10 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
 }
 
 function setupCalculateRemaining(totalField, sumField, remainingField) {
-    on(`change:${totalField} change:${sumField}`, function () {
+    on(`change:${totalField} change:${sumField}`, function (eventInfo) {
         getAttrs([totalField, sumField], function (values) {
-            let intTotal = parseInt(values[totalField]);
-            let intSum = parseInt(values[sumField]);
+            let intTotal = parseInt(values[totalField]) || 0;
+            let intSum = parseInt(values[sumField]) || 0;
 
             console.log(`Setting ${remainingField} with value from ${totalField}: ${intTotal} and ${sumField}: ${intSum}`);
 
@@ -959,9 +977,9 @@ const PRIEST_SPHERES = [
     'Chaos','Law','Numbers','Thought','Time','Travelers','War','Wards'
 ];
 
-const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
-const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
-const elementalRegex = /Earth|Air|Fire|Water/gi
+const PRIMARY_SPHERE_REGEX = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
+const NO_ELEMENTAL_REGEX = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
+const ELEMENTAL_REGEX = /Earth|Air|Fire|Water/gi
 
 function parseSpheres(spheresStrings, regex) {
     let spheres = new Set();
@@ -995,7 +1013,7 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
 
     let spheres = getSpellSpheres(spell, optionalSpheres);
 
-    let primarySpellSpheres = spheres.match(noElementalRegex) || [];
+    let primarySpellSpheres = spheres.match(NO_ELEMENTAL_REGEX) || [];
     let isAvailable = primarySpellSpheres.some(sphere => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
@@ -1007,7 +1025,7 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
         return false;
 
     if (spheres.includes(`${ELEMENTAL} (`))
-        return spheres.match(elementalRegex).some((element) => elementalSpheres.has(element))
+        return spheres.match(ELEMENTAL_REGEX).some((element) => elementalSpheres.has(element))
 
     // The player and the spell has the elemental sphere (without any sub elements)
     // Currently only 'Commune With Nature' in the revised Player's Handbook (1995) has this property
@@ -1032,8 +1050,8 @@ function setupAddPriestSpell(postfix) {
                 knownSpells.add(row.S[field]);
                 return knownSpells;
             }, new Set(), function (knownSpells,_,attrSet){
-                let primarySpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), primarySphereRegex);
-                let elementalSpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), elementalRegex);
+                let primarySpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), PRIMARY_SPHERE_REGEX);
+                let elementalSpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), ELEMENTAL_REGEX);
 
                 if (primarySpheres.size < 1) {
                     showToast(WARNING, 'No spheres found', `No valid spheres found. Please write or select some spheres`);
@@ -1164,7 +1182,7 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
 //#endregion
 
 //#region Wizard and Priest spells and Powers setup
-function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFields) {
+function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
     if (!spellsTable[section])
         return;
 
@@ -1183,7 +1201,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
 
             let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level'], className),
+                [`repeating_spells-${section}_spell-level`]        : displaySpellLevel(spell['level'], className),
                 [`repeating_spells-${section}_spell-school`]       : getSpellSchools(spell, books),
                 [`repeating_spells-${section}_spell-components`]   : spell['components'],
                 [`repeating_spells-${section}_spell-range`]        : spell['range'],
@@ -1208,8 +1226,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
                 spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
             }
             if (!books[levelField].trim()) {
-                let classLevel = capitalizeFirst(levelField.replace('level-', ''));
-                let toast = getToastObject(INFO, `Set ${classLevel} caster level`, 'Almost every spell requires a caster level to calculate its effect. Without it most spells will fail and show and error in the chat');
+                let toast = getToastObject(INFO, `Set ${className} caster level`, 'Almost every spell requires a caster level to calculate its effect. Without it most spells will fail and show and error in the chat');
                 Object.assign(spellInfo, toast);
             }
 
@@ -1218,8 +1235,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
     });
 }
 
-
-let wizardSpellLevelsSections = [
+const WIZARD_SPELL_LEVELS_SECTIONS = [
     {level: '1', sections: ['', '2', '3', 'wiz1']},
     {level: '2', sections: ['4', '5', '6', 'wiz2']},
     {level: '3', sections: ['7', '8', '9', 'wiz3']},
@@ -1237,7 +1253,7 @@ let wizardSpellLevelsSections = [
     {level: '15', sections: ['64', '65', '66', 'wiz15']},
 ];
 
-let priestSpellLevelsSections = [
+const PRIEST_SPELL_LEVELS_SECTIONS = [
     {level: '1', sections: ['28', '29', '30', 'pri1']},
     {level: '2', sections: ['31', '32', '33', 'pri2']},
     {level: '3', sections: ['34', '35', '36', 'pri3']},
@@ -1255,7 +1271,7 @@ const displaySpellLevel = function(level, className) {
 }
 
 // --- Start setup Spell Slots --- //
-wizardSpellLevelsSections.forEach(spellLevel => {
+WIZARD_SPELL_LEVELS_SECTIONS.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
     setupStaticCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
@@ -1266,14 +1282,14 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells, displaySpellLevel, SCHOOL_FIELDS);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, SCHOOL_FIELDS);
         setupSpellCrit(lastSection);
     }
 });
-setupAutoFillSpellInfo('wizmonster', wizardSpells, displaySpellLevel, SCHOOL_FIELDS);
+setupAutoFillSpellInfo('wizmonster', wizardSpells, SCHOOL_FIELDS);
 setupSpellCrit('wizmonster');
 
-priestSpellLevelsSections.forEach(spellLevel => {
+PRIEST_SPELL_LEVELS_SECTIONS.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
     setupStaticCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
@@ -1284,43 +1300,125 @@ priestSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, priestSpells, displaySpellLevel, SPHERE_FIELDS);
+        setupAutoFillSpellInfo(lastSection, priestSpells, SPHERE_FIELDS);
         setupSpellCrit(lastSection);
         if (lastSection !== 'priq') {
             setupAddPriestSpell(lastSection);
         }
     }
 });
-setupAutoFillSpellInfo('primonster', priestSpells, displaySpellLevel, SPHERE_FIELDS);
+setupAutoFillSpellInfo('primonster', priestSpells, SPHERE_FIELDS);
 setupSpellCrit('primonster');
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
-let wizardSpellPoints = 'spell-points';
-let arc = 'total-arc';
-let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
-setupStaticCalculateTotal(`${wizardSpellPoints}-total`, [`${wizardSpellPoints}-lvl`, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
-setupRepeatingSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`, true);
-setupRepeatingSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`, true);
-setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
-setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
+const WIZARD_SPELL_POINTS = 'spell-points';
+const TOTAL_ARC = 'total-arc';
+const ALL_WIZARD_SPELL_SECTIONS = WIZARD_SPELL_LEVELS_SECTIONS.flatMap(sl => sl.sections);
+setupStaticCalculateTotal(`${WIZARD_SPELL_POINTS}-total`, [`${WIZARD_SPELL_POINTS}-lvl`, `${WIZARD_SPELL_POINTS}-spc`, `${WIZARD_SPELL_POINTS}-int`]);
+setupRepeatingSpellSumming(ALL_WIZARD_SPELL_SECTIONS, WIZARD_SPELL_POINTS, 'spell-points', `${WIZARD_SPELL_POINTS}-sum`, true);
+setupRepeatingSpellSumming(ALL_WIZARD_SPELL_SECTIONS, 'arc', 'spell-arc', `${TOTAL_ARC}-sum`, true);
+setupCalculateRemaining(`${WIZARD_SPELL_POINTS}-total`, `${WIZARD_SPELL_POINTS}-sum`, `${WIZARD_SPELL_POINTS}-remaining`);
+setupCalculateRemaining(TOTAL_ARC, `${TOTAL_ARC}-sum`, `${TOTAL_ARC}-remaining`);
+on('change:spell-points-int-enabled change:intelligence', function (eventInfo) {
+    getAttrs(['spell-points-int-enabled', 'intelligence'], function (values) {
+        let newValue = {'spell-points-int': 0}
+        if (values['spell-points-int-enabled'] !== '1') {
+            return setAttrs(newValue);
+        }
+        let intelligence = getLookupValue(values['intelligence'], 0);
+        newValue['spell-points-int'] = intelligenceTable['spell-points-int'][intelligence];
+        setAttrs(newValue);
+    });
+});
 
-let priestSpellPoints = 'spell-points-priest';
-let wind = 'total-wind';
-let allPriestSpellSections = priestSpellLevelsSections.flatMap(sl => sl.sections);
-setupStaticCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
-setupRepeatingSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`, true);
-setupRepeatingSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`, true);
-setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
-setupCalculateRemaining(wind, `${wind}-sum`, `${wind}-remaining`);
+const PRIEST_SPELL_POINTS = 'spell-points-priest';
+const TOTAL_WIND = 'total-wind';
+const ALL_PRIEST_SPELL_SECTIONS = PRIEST_SPELL_LEVELS_SECTIONS.flatMap(sl => sl.sections);
+setupStaticCalculateTotal(`${PRIEST_SPELL_POINTS}-total`, [`${PRIEST_SPELL_POINTS}-lvl`, `${PRIEST_SPELL_POINTS}-wis`]);
+setupStaticCalculateTotal(TOTAL_WIND, ['level-wind', 'wisdom-wind']);
+setupRepeatingSpellSumming(ALL_PRIEST_SPELL_SECTIONS, PRIEST_SPELL_POINTS, 'spell-points', `${PRIEST_SPELL_POINTS}-sum`, true);
+setupRepeatingSpellSumming(ALL_PRIEST_SPELL_SECTIONS, 'wind', 'spell-wind', `${TOTAL_WIND}-sum`, true);
+setupCalculateRemaining(`${PRIEST_SPELL_POINTS}-total`, `${PRIEST_SPELL_POINTS}-sum`, `${PRIEST_SPELL_POINTS}-remaining`);
+setupCalculateRemaining(TOTAL_WIND, `${TOTAL_WIND}-sum`, `${TOTAL_WIND}-remaining`);
+let PRIEST_SPELL_POINTS_WIS = 'spell-points-priest-wis';
+on('change:spell-points-priest-wis-enabled change:wisdom change:level-priest', function (eventInfo) {
+    getAttrs(['spell-points-priest-wis-enabled', 'wisdom', 'level-priest'], async function (values) {
+        await keepContextRoll();
+        let newValue = {};
+        newValue[PRIEST_SPELL_POINTS_WIS] = 0;
+        if (values['spell-points-priest-wis-enabled'] !== '1') {
+            return setAttrs(newValue);
+        }
+        let wisdom = getLookupValue(values['wisdom'], 0);
+        if (wisdom < 13) {
+            return setAttrs(newValue);
+        }
+        if (wisdom === 13) {
+            newValue[PRIEST_SPELL_POINTS_WIS] = 4;
+            return setAttrs(newValue);
+        }
+        if (wisdom === 14) {
+            newValue[PRIEST_SPELL_POINTS_WIS] = 8;
+            return setAttrs(newValue);
+        }
+
+        let level = 1;
+        if (values['level-priest'] === '') {
+            return showToast(INFO, 'Set Priest caster level', 'The Priest\'s level is needed to calculate bonus Spell Points from high Wisdom.');
+        } else {
+            level = await extractRollResult(values['level-priest']);
+        }
+        if (isNaN(level) || level < 0) {
+            level = 1;
+        }
+        let spellPoints = 0;
+        if (wisdom === 15) {
+            spellPoints = level < 3 ? 8 : 15;
+        } else if (wisdom === 16) {
+            spellPoints = level < 3 ? 8 : 20;
+        } else if (wisdom === 17) {
+            if (1 <= level && level <= 2) {
+                spellPoints = 8;
+            } else if (3 <= level && level <= 4) {
+                spellPoints = 20;
+            } else {
+                spellPoints = 30;
+            }
+        } else if (wisdom === 18) {
+            if (1 <= level && level <= 2) {
+                spellPoints = 8;
+            } else if (3 <= level && level <= 4) {
+                spellPoints = 20;
+            } else if (5 <= level && level <= 6) {
+                spellPoints = 30;
+            } else {
+                spellPoints = 45;
+            }
+        } else if (wisdom >= 19) {
+            if (1 <= level && level <= 2) {
+                spellPoints = 12;
+            } else if (3 <= level && level <= 4) {
+                spellPoints = 25;
+            } else if (5 <= level && level <= 6) {
+                spellPoints = 45;
+            } else {
+                spellPoints = 60;
+            }
+        }
+
+        newValue[PRIEST_SPELL_POINTS_WIS] = spellPoints;
+        setAttrs(newValue);
+    });
+});
 // --- End setup Spell Points, Arc, and Wind --- //
 
 // --- Start setup reset buttons --- //
 //tab6 = wizard levels
 //tab7 = priest levels
-setupSpellSlotsReset('reset-spent-slots-wiz', 'tab6', wizardSpellLevelsSections, allWizardSpellSections);
-let allPriestSectionsExceptQuest = priestSpellLevelsSections.slice(0, -1).flatMap(sl => sl.sections);
-setupSpellSlotsReset('reset-spent-slots-pri', 'tab7', priestSpellLevelsSections, allPriestSectionsExceptQuest);
+setupSpellSlotsReset('reset-spent-slots-wiz', 'tab6', WIZARD_SPELL_LEVELS_SECTIONS, ALL_WIZARD_SPELL_SECTIONS);
+let allPriestSectionsExceptQuest = PRIEST_SPELL_LEVELS_SECTIONS.slice(0, -1).flatMap(sl => sl.sections);
+setupSpellSlotsReset('reset-spent-slots-pri', 'tab7', PRIEST_SPELL_LEVELS_SECTIONS, allPriestSectionsExceptQuest);
 // --- End setup reset buttons --- //
 
 // --- Start setup Granted Powers --- //
@@ -1386,19 +1484,14 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 //#endregion
 
 //#region Weapons tab logic and autofil
-//Used in version.js
-const updateNonprofPenalty = function () {
-    getAttrs(['nonprof-penalty'], function(values) {
-        let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
-        let famil = Math.floor(nonprof / 2)
-        setAttrs({
-            ['nonprof-penalty']: nonprof,
-            ['famil-penalty']: famil
-        },{silent:true});
-    });
-}
 on('change:nonprof-penalty', function (eventInfo){
-    updateNonprofPenalty();
+    let nonprofRaw = parseInt(eventInfo.newValue) || 0;
+    let nonprof = Math.abs(nonprofRaw) * -1;
+    let famil = Math.floor(nonprof / 2)
+    setAttrs({
+        ['nonprof-penalty']: nonprof,
+        ['famil-penalty']: famil
+    },{silent:true});
 });
 
 on('change:thac0-base-calc', function(eventInfo) {
@@ -1429,7 +1522,7 @@ async function selectVersion(foundObjects, values, comparer, objectName) {
         return;
     }
 
-    let isPlayersOption = values[PLAYERS_OPTION_FIELD] === '2';
+    let isPlayersOption = values[WEAPONS_PLAYERS_OPTION_FIELD] === '2';
     let isAllEqual = activeObjects.every(o => comparer(o, activeObjects[0], isPlayersOption));
     if (isAllEqual) {
         await keepContextRoll();
@@ -1469,13 +1562,13 @@ function combineBooks(activeObjects, comparer, isPlayersOptions) {
 }
 
 //#region Weapons autofill
-const PLAYERS_OPTION_FIELD = 'tab81';
+const WEAPONS_PLAYERS_OPTION_FIELD = 'tab81';
 function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, category) {
     if (!weaponName)
         return;
 
     weaponName = weaponName.toLowerCase();
-    let fields = [...BOOK_FIELDS, PLAYERS_OPTION_FIELD, thac0Field].filter(Boolean);
+    let fields = [...BOOK_FIELDS, WEAPONS_PLAYERS_OPTION_FIELD, thac0Field].filter(Boolean);
     getAttrs(fields, async function (values) {
         let bonus = 0;
         let baseWeapons = WEAPONS_TABLE[weaponName]
@@ -1553,13 +1646,13 @@ on('change:repeating_weapons:weaponname', function(eventInfo) {
 //melee damage autofill
 on('change:repeating_weapons-damage:weaponname1', function(eventInfo) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
-        let fisk = ['small-medium','large'];
+        let compareFields = ['small-medium','large'];
         if (isPlayersOption) {
-            fisk.push('size');
-            fisk.push('type');
-            fisk.push('knockdown');
+            compareFields.push('size');
+            compareFields.push('type');
+            compareFields.push('knockdown');
         }
-        return fisk.every(f => weapon1[f] === weapon2[f])
+        return compareFields.every(f => weapon1[f] === weapon2[f])
     }
     let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
@@ -1663,7 +1756,7 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
     });
 }
 
-const followerWeapons = [
+const FOLLOWER_WEAPONS = [
     {repeating: '',       sections: ['',    '001', '002']},
     {repeating: 'hench',  sections: ['003', '004', '005']},
     {repeating: '',       sections: ['006', '007', '008']},
@@ -1678,7 +1771,7 @@ const followerWeapons = [
     {repeating: 'hench6', sections: ['033', '034', '035']},
 ];
 
-followerWeapons.forEach(fw => {
+FOLLOWER_WEAPONS.forEach(fw => {
     setupFollowerWeaponsAutoFill(fw.repeating, fw.sections);
 });
 
@@ -2307,11 +2400,10 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
 
 //#region Proficiencies
 //Weapon proficiency slots
-const updateWeaponProfsRemaining = () => repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprof-slots-total-calc', function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['weapprofnum']))
         return;
-    updateWeaponProfsRemaining();
+    repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
 });
 //Weapon proficiency autofill
 on('change:repeating_weaponprofs:weapprofname', function(eventInfo) {
@@ -2638,12 +2730,14 @@ const setPsionicDisciplineVisibility = function(newValue) {
         elements.removeClass('sheet-show');
     }
 }
-on('change:tab8 sheet:opened', function (eventInfo) {
+
+const PSIONIC_SKILLS_AND_POWERS_FIELD = 'tab8';
+on(`change:${PSIONIC_SKILLS_AND_POWERS_FIELD} sheet:opened`, function (eventInfo) {
     if (eventInfo.newValue)
         return setPsionicDisciplineVisibility(eventInfo.newValue);
 
-    getAttrs(['tab8'], function (values) {
-        setPsionicDisciplineVisibility(values['tab8']);
+    getAttrs([PSIONIC_SKILLS_AND_POWERS_FIELD], function (values) {
+        setPsionicDisciplineVisibility(values[PSIONIC_SKILLS_AND_POWERS_FIELD]);
     })
 });
 
@@ -2881,14 +2975,18 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 //#endregion
 
 // Show / Hide buttons for various repeating sections
-const REPEATING_SECTIONS = [
+const FOLDABLE_REPEATING_SECTIONS = [
+    ...WIZARD_SPELL_LEVELS_SECTIONS.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
+    'spells-wizmonster',
+    ...PRIEST_SPELL_LEVELS_SECTIONS.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
+    'spells-primonster',
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
     'scrolls',
 ];
-REPEATING_SECTIONS.forEach(section => {
+FOLDABLE_REPEATING_SECTIONS.forEach(section => {
    on(`clicked:repeating_${section}:show clicked:repeating_${section}:hide`, function (eventInfo) {
        let parse = parseSourceAttribute(eventInfo);
-       $20(`div[data-reprowid=${parse.rowId}] .sheet-hidden`).toggleClass('sheet-show');
+       $20(`div[data-reprowid=${parse.rowId}] .sheet-hidden.sheet-fold`).toggleClass('sheet-show');
    });
 });
 

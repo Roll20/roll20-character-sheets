@@ -4358,41 +4358,20 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.3 -->			
+				<!-- current version notes: 2.9.4 -->			
 				<ul>
-					<li>
-						Revised how the <b>Combat Reflexes</b> checkbox modifies Fright Check and Dodge. It no longer directly updates the Fright and Dodge Modifier input boxes, 
-						instead hidden fields are used to store the values. This will be more reliable and avoids conflicts with users who don't use the combat reflexes checkbox. 
-						This also fixes an error that was occurring when importing characters.
+					<li>Wound Modifier Notes: Added formatting to improve legibility on roll template.
 						<ul>
-							<li><b>NOTE:</b> When updating to the newest character sheet version, if you had combat reflexes checked, it should <b>move</b>...
-							<li>
-								the <b>+2 fright check bonus</b> from the Fright Check Modifier Input box to the new Combat Reflexes Fright Check Modifier.
-								You can see this modifier by hovering over the tooltip for <b style="color: red;">Fright</b>.
-							<li>
-								the <b>+1 dodge bonus</b> from the Dodge Modifier Input box to the new Combat Reflexes Dodge Modifier.
-								You can see this modifier by hovering over the tooltip for <b style="color: red;">Dodge</b>.
-							</li>
+							<li>To update the Wound Modifier Notes for an existing character, go to the <b>Options->Rules</b> tab and under the section <b>Editable Wound Modifier Notes</b> click the reset button.</li>
 						</ul>
-						<li>
-							GCA5 Point Summary Table. Split points for Cultural Familiarities into a separate row.
-						</li>
 					</li>
 					<li>
-						Minor bugfix when adding a brand new language to set default values correctly.
+						Slam, Falling, and Collision notes revisions. Added damage type to Falling and Collision. If the damage type is other than crushing damage is halved.
+						<ul>
+							<li>Notes in roll template. Collapsible notes section should be available when the character sheet is updated to work with Roll20s non-legacy html/css.</li>
+						</ul>
 					</li>
-					<li>
-						General tab - Left attribute column. Added a new section for Stress and Derangement for GURPS Horror 4th Edition.
-					</li>
-					<li>
-						Combat tab - Damage table. Updated the layout by moving <b>Wounds</b> and <b>Notes</b> text boxes below the armor location data row. 
-						The summary table is now editable but be aware that editing one of the other layer text boxes will overwrite any changes you made.
-						The order of the columns changed a little in order to accommodate the responsiveness of different armor layers.
-					</li>
-					<li>
-						Combat - Defense Tab. Fixed bug where the note on the roll table <b>Alert: Max effective skill is 9</b> is displayed for new characters whenever an active defense is rolled.
-					</li>
-			</ul>
+				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
@@ -13216,9 +13195,9 @@ Slam requires an Attack, All-out Attack, or Move and Attack maneuver. Your foe m
 							</div>
 							<div class="item">
 								<select name="attr_slam_damage_type" title="Macro: @{NAME|slam_damage_type}">
+									<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
 									<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
 									<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
-									<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
 									<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
 									<option value="Piercing (pi)"><span data-i18n="abbreviation-option-piercing">pi</span></option>
 									<option value="Large Piercing (pi+)"><span data-i18n="abbreviation-option-piercing-plus">pi+</span></option>
@@ -13233,6 +13212,7 @@ Slam requires an Attack, All-out Attack, or Move and Attack maneuver. Your foe m
 								</select>
 								<input type="hidden" name="attr_slam_damage_type_note" value="@{damage_type_note_cr}" />
 								<input type="hidden" name="attr_slam_minimum_damage_note" value="Min 1" />
+								<input type="hidden" name="attr_slam_damage_divisor" value="1" />
 							</div>
 							<div class="item">
 								<input type="number" step="1" value="0" name="attr_slam_skill_modifier" title="Macro: @{NAME|skill_modifier}" />
@@ -13542,6 +13522,14 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 								<div class="cell damage">
 									<span data-i18n="damage-label">Damage</span>
 								</div>
+								<div class="cell damage-type">
+									<div class="popup">
+										<span data-i18n="type-label">Type</span>
+									</div>
+									<div class="tooltip">
+										<span data-i18n="falling-damage-type-tooltip">Normal objects are crushing. If bullet-shaped, sharp, or spiked select appropriate damage type, but damage is halved. B430</span>
+									</div>
+								</div>
 								<div class="cell roll-damage">
 									&nbsp;
 								</div>
@@ -13580,9 +13568,23 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<div class="cell damage">
 										<input type="text" value="1d6-2" name="attr_falling_damage" readonly="readonly" title="Macro: @{NAME|falling_damage}" />
 									</div>
+									<div class="cell damage-type">
+										<select name="attr_falling_damage_type" title="Macro: @{NAME|falling_damage_type}">
+											<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
+											<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
+											<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
+											<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
+											<option value="Piercing (pi)"><span data-i18n="abbreviation-option-piercing">pi</span></option>
+											<option value="Large Piercing (pi+)"><span data-i18n="abbreviation-option-piercing-plus">pi+</span></option>
+											<option value="Huge Piercing (pi++)"><span data-i18n="abbreviation-option-piercing-plus-plus">pi++</span></option>
+										</select>
+										<input type="hidden" name="attr_falling_damage_type_note" value="@{damage_type_note_cr}" />
+										<input type="hidden" name="attr_falling_minimum_damage_note" value="Min 1" />
+										<input type="hidden" name="attr_falling_damage_divisor" value="1" />
+									</div>
 									<div class="cell roll-damage">
 										<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Falling Damage}} {{damageRoll=[[@{falling_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{falling_collision_damage_notes}}}" name="roll_dmgFalling" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Falling Damage}} {{damageRoll=[[@{falling_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{falling_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{falling_damage_type_note}}} {{showNotes=[[1]]}} {{notes=@{falling_damage_notes}}}" name="roll_dmgFalling" class="roll_damage" />
 									</div>
 									<div class="cell reset">
 										<button type="action" name="act_falling_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
@@ -13617,9 +13619,23 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<div class="cell damage">
 										<input type="text" value="1d6-3" name="attr_collision_damage" readonly="readonly" title="Macro: @{NAME|collision_damage}" />
 									</div>
+									<div class="cell damage-type">
+										<select name="attr_collision_damage_type" title="Macro: @{NAME|collision_damage_type}">
+											<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
+											<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
+											<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
+											<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
+											<option value="Piercing (pi)"><span data-i18n="abbreviation-option-piercing">pi</span></option>
+											<option value="Large Piercing (pi+)"><span data-i18n="abbreviation-option-piercing-plus">pi+</span></option>
+											<option value="Huge Piercing (pi++)"><span data-i18n="abbreviation-option-piercing-plus-plus">pi++</span></option>
+										</select>
+										<input type="hidden" name="attr_collision_damage_type_note" value="@{damage_type_note_cr}" />
+										<input type="hidden" name="attr_collision_minimum_damage_note" value="Min 1" />
+										<input type="hidden" name="attr_collision_damage_divisor" value="1" />
+									</div>
 									<div class="cell roll-damage">
 										<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Collision Damage}} {{damageRoll=[[@{collision_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{falling_collision_damage_notes}}}" name="roll_dmgFalling" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Collision Damage}} {{damageRoll=[[@{collision_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{collision_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{collision_damage_type_note}}} {{showNotes=[[1]]}} {{notes=@{collision_damage_notes}}}" name="roll_dmgFalling" class="roll_damage" />
 									</div>
 									<div class="cell reset">
 										<button type="action" name="act_collision_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
@@ -14610,7 +14626,24 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.3 -->
+			<!-- current version notes: 2.9.4 -->
+			<ul>
+				<li>Wound Modifier Notes: Added formatting to improve legibility on roll template.
+					<ul>
+						<li>To update the Wound Modifier Notes for an existing character, go to the <b>Options->Rules</b> tab and under the section <b>Editable Wound Modifier Notes</b> click the reset button.</li>
+					</ul>
+				</li>
+				<li>
+					Slam, Falling, and Collision damage notes revisions. Added damage type to Falling and Collision. If the damage type is other than crushing damage is halved.
+					<ul>
+						<li>Notes in roll template. Collapsible notes section should be available when the character sheet is updated to work with Roll20s non-legacy html/css.</li>
+					</ul>
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.3</h4>
+
+			<p>Pull Request: 1/20/2023</p>
 
 			<ul>
 				<li>
@@ -15846,19 +15879,30 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 				
 					<div class="option-container collision-falling-options">
 						<h4>
-							<span data-i18n="falling-collision-damage-notes-label">Falling & Collision Damage Notes B431</span>
+							<span data-i18n="falling-damage-notes-label">Falling Damage Notes B431</span>
 						</h4>
-						<textarea name="attr_falling_collision_damage_notes">**Immovable Objects:** Inflict damage on both objects. If immovable is breakable, moving object can't inflict/take more damage than immovable's (HP + DR). 
+						<textarea name="attr_falling_damage_notes">**Immovable Objects:** Inflict damage on both objects. If immovable is breakable, moving object can't inflict/take more damage than immovable's (HP + DR). 
 							
 	**Immovable Soft Object:** Add DR 2 (feather bed) to DR 10 (safety net).
 
 	**Striking Water:** Swimming or Vehicle Skill Roll minus Speed Penalty from Size and Speed/Range Table B550 to avoid all damage.
 
-	**Falls and Armor:** ALL armor counts as flexible armor. If DR blocks all damage, moving object suffers 1 HP per 5 points of falling damage.
-
-	**Collisions**: If an object is bullet-shaped, sharp, or spiked, it does half damage, but this damage is piercing, cutting, or impaling, rather than crushing.
-					
+	**Armor:** ALL armor counts as flexible armor. If DR blocks all damage, moving object suffers 1 HP per 5 points of falling damage.
+			
 	**Falling Damage**: If using hit locations, roll randomly. If extremity/limb, do not ignore injury in excess of crippling damage. Instead, subtract the full amount from HP! If crippled limb, roll 1d. On 5-6, all limbs of that type are crippled, although there is no extra injury.</textarea>
+					</div>
+
+					<div class="option-container collision-falling-options">
+						<h4>
+							<span data-i18n="collision-damage-notes-label">Collision Damage Notes B431</span>
+						</h4>
+						<textarea name="attr_collision_damage_notes">**Immovable Objects:** Inflict damage on both objects. If immovable is breakable, moving object can't inflict/take more damage than immovable's (HP + DR). 
+							
+	**Immovable Soft Object:** Add DR 2 (feather bed) to DR 10 (safety net).
+
+	**Striking Water:** Swimming or Vehicle Skill Roll minus Speed Penalty from Size and Speed/Range Table B550 to avoid all damage.
+
+	**Armor:** ALL armor counts as flexible armor. If DR blocks all damage, moving object suffers 1 HP per 5 points of falling damage.</textarea>
 					</div>
 					
 					<div class="option-container collision-falling-options">
@@ -17809,7 +17853,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                 {{#rollTotal() showNotes 1}}
                     {{#notes}}
                     <tr class="notes">
-                        <td colspan="2">{{notes}}</td>
+                        <td colspan="2">
+							{{notes}}
+						</td>
                     </tr>
                     {{/notes}}
                 {{/rollTotal() showNotes 1}}
@@ -18067,9 +18113,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.3";
+	const version = "2.9.4";
 	
-	const latestChangesDate = "1/20/2023";
+	const latestChangesDate = "2/6/2023";
 	
 	let modCascade = true;
 	
@@ -23424,11 +23470,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	});
 	
 	// handle falling/collision damage
-	on("change:falling_velocity change:falling_hit_points change:falling_hard_object", function () {
+	on("change:falling_velocity change:falling_hit_points change:falling_hard_object change:falling_damage_divisor", function () {
 	
 		let strDmg = "";
 	
-		getAttrs(["falling_velocity", "falling_hit_points", "falling_hard_object"], function (values) {
+		getAttrs(["falling_velocity", "falling_hit_points", "falling_hard_object", "falling_damage_divisor"], function (values) {
 	
 			let hitPoints = Number(values.falling_hit_points);
 	
@@ -23437,8 +23483,10 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			if (isHardObject) {
 				hitPoints = hitPoints * 2;
 			}
+
+			let damageDivisor = Number(values.falling_damage_divisor) ?? 1;
 	
-			strDmg = getCollisionDamage(values.falling_velocity, hitPoints);
+			strDmg = getCollisionDamage(values.falling_velocity, hitPoints, 0, damageDivisor);
 	
 			setAttrs({
 				"falling_damage": strDmg
@@ -23448,11 +23496,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	});
 	
-	on("change:collision_velocity change:collision_hit_points change:collision_hard_object", function () {
+	on("change:collision_velocity change:collision_hit_points change:collision_hard_object change:collision_damage_divisor", function () {
 	
 		let strDmg = "";
 	
-		getAttrs(["collision_velocity", "collision_hit_points", "collision_hard_object"], function (values) {
+		getAttrs(["collision_velocity", "collision_hit_points", "collision_hard_object", "collision_damage_divisor"], function (values) {
 	
 			let hitPoints = Number(values.collision_hit_points);
 	
@@ -23461,8 +23509,10 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			if (isHardObject) {
 				hitPoints = hitPoints * 2;
 			}
+
+			let damageDivisor = Number(values.collision_damage_divisor) ?? 1;
 	
-			strDmg = getCollisionDamage(values.collision_velocity, hitPoints);
+			strDmg = getCollisionDamage(values.collision_velocity, hitPoints, 0, damageDivisor);
 	
 			setAttrs({
 				"collision_damage": strDmg
@@ -23472,7 +23522,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	});
 	
-	function getCollisionDamage(velocity, hit_points, customDamageModifier = 0) {
+	function getCollisionDamage(velocity, hit_points, customDamageModifier = 0, damageDivisor = 1) {
 	
 		let strDmg = "1d6-3";
 	
@@ -23525,12 +23575,88 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		}
 
 		if (dieModifier > 0) {
+
 			strDmg = `${strDmg}+${dieModifier}`;
+		
+			if (damageDivisor > 1) {
+				strDmg = `(${strDmg})/2`;
+			}
+		
 		} else if (dieModifier < 0) {
+		
 			strDmg = `${strDmg}${dieModifier}`
-		}
 	
+			if (damageDivisor > 1) {
+				strDmg = `(${strDmg})/2`;
+			}
+		
+		} else if (damageDivisor > 1) {
+			strDmg = `${strDmg}/2`;
+		}
+
+		
 		return strDmg;
+	}
+
+	// update damage notes by type
+	["falling", "collision", "slam"].forEach(type => {
+
+		on(`change:${type}_damage_type`, (event) => {
+
+			updateDamageTypeNotes(type);
+	
+		});
+
+	});
+
+	/**
+	 * Update damage type notes for a specific type of damage.
+	 * 
+	 * @param string type falling|collision|slam
+	 */
+	function updateDamageTypeNotes(type) {
+
+		getAttrs([`${type}_damage_type`,
+			'damage_type_note_cut',
+			'damage_type_note_imp',
+			'damage_type_note_cr',
+			'damage_type_note_pi_minus',
+			'damage_type_note_pi',
+			'damage_type_note_pi_plus',
+			'damage_type_note_pi_plus_plus',
+			'damage_type_note_aff',
+			'damage_type_note_burn',
+			'damage_type_note_cor',
+			'damage_type_note_fat',
+			'damage_type_note_tox',
+			'damage_type_note_spec',
+			'damage_type_note_knockback'
+		], (values) => {
+	
+			const damageType = `${type}_damage_type`;
+
+			const typeNote = getDamageTypeNote(values[damageType], values);
+	
+			const minDamageNote = getMinimumDamageNote(damageType);
+
+			let damageDivisor = 2;
+
+			if (values[damageType] === "Crushing (cr)") {
+				damageDivisor = 1;
+			}
+
+			let updateFields = {};
+
+			updateFields[`${type}_damage_divisor`] = damageDivisor;
+
+			updateFields[`${type}_damage_type_note`] = typeNote;
+
+			updateFields[`${type}_minimum_damage_note`] = minDamageNote;
+	
+			setAttrs(updateFields);
+	
+		});
+
 	}
 	
 	on("clicked:falling_reset", function () {
@@ -26505,139 +26631,105 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		const slamDamageNotes = getTranslationByKey("slam-damage-notes");
 
-		const woundNotesCutting = `CUTTING (Always round down)
-Damage: x1.5
-Neck Damage: x2
-Skull Damage: x4
-Knockback: A cutting attack can cause knockback only if it fails to penetrate DR. (B378)
-----
-B380
-Unliving: Hit location has its usual effect
-Homogenous: x1
-Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesCutting = `**CUTTING** *(Always round down)*
+**Damage:** x1.5 **Neck:** x2 **Skull:** x4
+**Knockback:** A cutting attack can cause knockback only if it fails to penetrate DR. (B378)
+**Unliving:** Hit location has its usual effect
+**Homogenous:** x1
+**Diffuse:** Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesImpaling = `IMPALING (Always round down)
-Damage: x2
-Arm, Leg, Foot, or Hand: x1 (B399)
-Vitals Damage: x3
-Skull Damage: x4
-----
-B380
-Unliving: x1 (other than the eye, skull, or vitals  - otherwise per location) (B400)
-Homogenous: x0.5
-Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesImpaling = `**IMPALING** *(Always round down)*
+**Damage:** x2 **Limbs:** x1 **Vitals:** x3 **Skull:** x4
+**Unliving:** x1 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+**Homogenous:** x0.5
+**Diffuse:** Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesCrushing = `CRUSHING (Always round down)
-Damage: x1
-Neck Damage: x1.5
-Skull Damage: x4
-Knockback: A crushing attack can cause knockback regardless of whether it penetrates DR. (B378)
----
-B380
-Unliving: Hit location has its usual effect
-Homogenous: x1
-Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesCrushing = `**CRUSHING** *(Always round down)*
+**Damage:** x1 **Neck:** x1.5 **Skull:** x4
+**Knockback:** A crushing attack can cause knockback regardless of whether it penetrates DR. (B378)
+**Unliving:** Hit location has its usual effect
+**Homogenous:** x1
+**Diffuse:** Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesPiercingMinus = `PIERCING- (Always round down)
-Damage: x.5
-Vitals Damage: x3
-Skull Damage: x4
-----
-B380
-Unliving: x1/5 (other than the eye, skull, or vitals  - otherwise per location) (B400)
-Homogenous: x1/10
-Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesPiercingMinus = `**PIERCING-** *(Always round down)*
+**Damage:** x.5 **Vitals:** x3 **Skull:** x4
+**Unliving:** x1/5 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+**Homogenous:** x1/10
+**Diffuse:** Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesPiercing = `PIERCING (Always round down)
-Damage: x1
-Vitals Damage: x3
-Skull Damage: x4
-----
-B380
-Unliving: x1/3 (other than the eye, skull, or vitals  - otherwise per location) (B400)
-Homogenous: x1/5
-Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesPiercing = `**PIERCING** *(Always round down)*
+**Damage:** x1 **Vitals:** x3 **Skull:** x4
+**Unliving:** x1/3 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+**Homogenous:** x1/5
+**Diffuse:** Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesPiercingPlus = `PIERCING+ (Always round down)
-Damage: x1.5
-Arm, Leg, Foot, or Hand: x1 (B399)
-Vitals Damage: x3
-Skull Damage: x4
-----
-B380
-Unliving: x0.5 (other than the eye, skull, or vitals  - otherwise per location) (B400)
-Homogenous: x1/3
-Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesPiercingPlus = `**PIERCING+** *(Always round down)*
+**Damage:** x1.5 **Limbs**: x1 **Vitals:** x3 **Skull:** x4
+**Unliving:** x0.5 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+**Homogenous:** x1/3
+**Diffuse:** Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesPiercingPlusPlus = `PIERCING++ (Always round down)
-Damage: x2
-Arm, Leg, Foot, or Hand: x1 (B399)
-Vitals Damage: x3
-Skull Damage: x4
-----
-B380
-Unliving: x1 (other than the eye, skull, or vitals  - otherwise per location) (B400)
-Homogenous: x0.5
-Diffuse: Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesPiercingPlusPlus = `**PIERCING++** *(Always round down)*
+**Damage:** x2 **Limbs:** x1 **Vitals:** x3 **Skull:** x4
+**Unliving:** x1 (other than the eye, skull, or vitals  - otherwise per location) (B400)
+**Homogenous:** x0.5
+**Diffuse:** Max 1HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesAffliction = `AFFLICTION (Always round down)
+		const woundNotesAffliction = `**AFFLICTION** *(Always round down)*
 Special damage and affects based on affliction description
-----
-B380
-Unliving: Hit location has its usual effect
-Homogenous: x1`;
+**Unliving:** Hit location has its usual effect
+**Homogenous:** x1
+**Diffuse:** Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
 
-		const woundNotesBurn = `BURN (Always round down)
-Damage: x1
-Skull Damage x4
-----
-B380
-Unliving: Hit location has its usual effect
-Homogenous: x1
-Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesBurn = `**BURN** *(Always round down)*
+**Damage:** x1 **Skull:** x4
+**Unliving:** Hit location has its usual effect
+**Homogenous:** x1
+**Diffuse:** Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesCorrosion = `CORRROSION (Always round down)
-Damage: x1
-Face Damage x1.5, blind eye if major wound, both eyes if full HP
-Neck Damage x1.5
-Skull Damage x4
--1 DR per 5 points damage
-----
-B380
-Unliving: Hit location has its usual effect
-Homogenous: x1
-Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesCorrosion = `**CORROSION** *(Always round down)*
+**Damage:** x1 **Neck:** x1.5 **Skull:** x4 **Face** x1.5
+**Face** blind eye if major wound, both eyes if full HP
+**Armor:** -1 DR per 5 points damage
+**Unliving:** Hit location has its usual effect
+**Homogenous:** x1
+**Diffuse:** Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesFatigue = `FATIGUE (Always round down)
-Damage: x1
-----
-B380
-Unliving: Hit location has its usual effect
-Homogenous: x1
-Diffuse: Normal Fatigue Damage, but apply HP modifier if applicable. Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesFatigue = `**FATIGUE** *(Always round down)*
+**Damage:** x1
+**Unliving:** Hit location has its usual effect
+**Homogenous:** x1
+**Diffuse:** Normal Fatigue Damage, but apply HP modifier if applicable. Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesToxic = `TOXIC (Always round down)
-Damage x1
-----
-B380
-Unliving: Hit location has its usual effect
-Homogenous: x1
-Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesToxic = `**TOXIC** *(Always round down)*
+**Damage:** x1
+**Unliving:** Hit location has its usual effect
+**Homogenous:** x1
+**Diffuse:** Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)(Additional Ref: B380)`;
 
-		const woundNotesSpecial = `SPECIAL (Always round down)
+		const woundNotesSpecial = `**SPECIAL** *(Always round down)*
 See notes for weapon.
-----
-B380
-Unliving: Hit location has its usual effect
-Homogenous: x1
-Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+**Unliving:** Hit location has its usual effect
+**Homogenous:** x1
+**Diffuse:** Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
-		const woundNotesKnockback = `Knockback Only. (B378) (Always round down)
-----
-B380
-Unliving: Hit location has its usual effect
-Homogenous: x1
-Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause normal injury.)`;
+		const woundNotesKnockback = `**Knockback Only**  *(Always round down)*
+B378
+**Unliving:** Hit location has its usual effect
+**Homogenous:** x1
+**Diffuse:** Max 2HP Knockback (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
+(Additional Ref: B380)`;
 
 	    const notes = [
 			{ code: "dodge_success_notes", value: dodgeSuccessNotes },
@@ -34436,48 +34528,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	}
 
-	// update damage notes for thrown object
-	on('change:slam_damage_type', function (event) {
-	
-		updateThrownObject();
-	
-	});
-	
-	/*
-	 * Update the thrown object weight damage notes
-	 */
-	function updateThrownObject() {
-	
-		getAttrs(['slam_damage_type',
-			'damage_type_note_cut',
-			'damage_type_note_imp',
-			'damage_type_note_cr',
-			'damage_type_note_pi_minus',
-			'damage_type_note_pi',
-			'damage_type_note_pi_plus',
-			'damage_type_note_pi_plus_plus',
-			'damage_type_note_aff',
-			'damage_type_note_burn',
-			'damage_type_note_cor',
-			'damage_type_note_fat',
-			'damage_type_note_tox',
-			'damage_type_note_spec',
-			'damage_type_note_knockback'
-		], function (values) {
-	
-			let typeNote = getDamageTypeNote(values.slam_damage_type, values);
-	
-			let minDamageNote = getMinimumDamageNote(values.slam_damage_type);
-	
-			setAttrs({
-				"slam_damage_type_note": typeNote,
-				"slam_minimum_damage_note": minDamageNote,
-			});
-	
-		});
-	
-	}
-
 	// check for slam modifier skill change
 	on("change:slam_link_type change:slam_skill_row_id", event => {
 	
@@ -34708,11 +34758,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	}
 
 	// handle slam damage
-	on("change:slam_velocity change:slam_hit_points change:slam_shield_db", function (event) {
+	on("change:slam_velocity change:slam_hit_points change:slam_shield_db change:slam_damage_divisor", function (event) {
 	
 		let strDmg = "";
 	
-		getAttrs(["slam_velocity", "slam_hit_points", "slam_shield_db"], function (values) {
+		getAttrs(["slam_velocity", "slam_hit_points", "slam_shield_db", "slam_damage_divisor"], function (values) {
 	
 			const hitPoints = Number(values.slam_hit_points);
 
@@ -34721,8 +34771,10 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			const customDamageModifier = shieldDamageBonus;
 	
 			const isHardObject = false;
+
+			const damageDivisor = Number(values.slam_damage_divisor) ?? 1;
 	
-			strDmg = getCollisionDamage(values.slam_velocity, hitPoints, customDamageModifier);
+			strDmg = getCollisionDamage(values.slam_velocity, hitPoints, customDamageModifier, damageDivisor);
 	
 			setAttrs({
 				slam_damage: strDmg
