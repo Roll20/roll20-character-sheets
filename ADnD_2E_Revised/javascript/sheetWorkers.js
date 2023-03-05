@@ -2986,6 +2986,8 @@ const FOLDABLE_REPEATING_SECTIONS = [
     ...PRIEST_SPELL_LEVELS_SECTIONS.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
     'spells-primonster',
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
+    'potions',
+    'dusts',
     'scrolls',
 ];
 FOLDABLE_REPEATING_SECTIONS.forEach(section => {
