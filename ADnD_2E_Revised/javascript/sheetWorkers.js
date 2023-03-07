@@ -370,7 +370,7 @@ const repeatingCalculateRemainingRecursive = function (tail, accumulator, result
 //#endregion
 
 //#region Generic Setup functions
-function setupStaticCalculateTotal(totalField, fieldsToSum, maxValue) {
+const setupStaticCalculateTotal = function(totalField, fieldsToSum, maxValue) {
     let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
     on(onChange, function () {
         getAttrs(fieldsToSum, function (values) {
@@ -2722,23 +2722,30 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
 
 //#region Psionic
 // Psionic tabs, control hidden or visible options
-const setPsionicDisciplineVisibility = function(newValue) {
-    let elements = $20('.sheet-section-psionics option.sheet-hidden');
-    if (newValue === "1") {
-        elements.addClass('sheet-show');
-    } else {
-        elements.removeClass('sheet-show');
-    }
-}
-
 const PSIONIC_SKILLS_AND_POWERS_FIELD = 'tab8';
 on(`change:${PSIONIC_SKILLS_AND_POWERS_FIELD} sheet:opened`, function (eventInfo) {
-    if (eventInfo.newValue)
-        return setPsionicDisciplineVisibility(eventInfo.newValue);
-
     getAttrs([PSIONIC_SKILLS_AND_POWERS_FIELD], function (values) {
-        setPsionicDisciplineVisibility(values[PSIONIC_SKILLS_AND_POWERS_FIELD]);
+        let elements = $20('.sheet-section-psionics option.sheet-hidden');
+        if (values[PSIONIC_SKILLS_AND_POWERS_FIELD] === "1") {
+            elements.addClass('sheet-show');
+        } else {
+            elements.removeClass('sheet-show');
+        }
     })
+});
+
+setupStaticCalculateTotal('constitution-psi', ['constitution','psion-con-mod']);
+setupStaticCalculateTotal('intelligence-psi', ['intelligence','psion-int-mod']);
+setupStaticCalculateTotal('wisdom-psi', ['wisdom','psion-wis-mod']);
+on('sheet:opened', function (eventInfo) { // Ensure the calculated value is set for existing sheets
+    getAttrs(['constitution','intelligence','wisdom','psion-con-mod','psion-int-mod','psion-wis-mod'], function (values) {
+        let newValue = {};
+        newValue['constitution-psi'] = (parseInt(values['constitution']) || 0) + (parseInt(values['psion-con-mod']) || 0);
+        newValue['intelligence-psi'] = (parseInt(values['intelligence']) || 0) + (parseInt(values['psion-int-mod']) || 0);
+        newValue['wisdom-psi'] = (parseInt(values['wisdom']) || 0) + (parseInt(values['psion-wis-mod']) || 0);
+
+        setAttrs(newValue, {silent: true});
+    });
 });
 
 const PSIONIC_CORE_SECTIONS = [
