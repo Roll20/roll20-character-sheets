@@ -2737,16 +2737,6 @@ on(`change:${PSIONIC_SKILLS_AND_POWERS_FIELD} sheet:opened`, function (eventInfo
 setupStaticCalculateTotal('constitution-psi', ['constitution','psion-con-mod']);
 setupStaticCalculateTotal('intelligence-psi', ['intelligence','psion-int-mod']);
 setupStaticCalculateTotal('wisdom-psi', ['wisdom','psion-wis-mod']);
-on('sheet:opened', function (eventInfo) { // Ensure the calculated value is set for existing sheets
-    getAttrs(['constitution','intelligence','wisdom','psion-con-mod','psion-int-mod','psion-wis-mod'], function (values) {
-        let newValue = {};
-        newValue['constitution-psi'] = (parseInt(values['constitution']) || 0) + (parseInt(values['psion-con-mod']) || 0);
-        newValue['intelligence-psi'] = (parseInt(values['intelligence']) || 0) + (parseInt(values['psion-int-mod']) || 0);
-        newValue['wisdom-psi'] = (parseInt(values['wisdom']) || 0) + (parseInt(values['psion-wis-mod']) || 0);
-
-        setAttrs(newValue, {silent: true});
-    });
-});
 
 const PSIONIC_CORE_SECTIONS = [
     { discipline: 'Telepathic',      section: 'psion-telepathy',            name: 'psiontelepathic',    macro: 'psiontelepathic-macro',         number: '',   cost_number: '20' },
@@ -2823,7 +2813,12 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`discipline=${displayDiscipline}`);
             macroBuilder.push(`tier=${tier}`);
             let attribute = power['attribute'];
-            attribute = attribute.startsWith("@") ? attribute.substring(2,attribute.length-1) : 'Affected'
+            let attributeMatch = attribute.match(/^@{(\w+).*}/);
+            if (attributeMatch) {
+                attribute = attributeMatch[1];
+            } else {
+                attribute = 'Affected';
+            }
             let modifier = power['modifier'] === '0' ? '' : power['modifier'];
             macroBuilder.push(`powerscoretext=${attribute} ${modifier}`.trim());
             macroBuilder.push(`initial=@{PSP-cost${cost_number}}`);
@@ -2870,7 +2865,11 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
     on(`clicked:repeating_${section}:action-check clicked:repeating_${section}:action-check-dm`, function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
-        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
+        getAttrs([`repeating_${section}_${macro}`,
+            `repeating_${section}_powerscore-nomod${number}`,
+            `repeating_${section}_powerscore-mod${number}`,
+            'psion-armor-penalty'
+        ], function (values) {
             let displayDiscipline = discipline;
             let tier = name.includes('science') ? 'Science' : 'Devotion';
             let fullMacro = values[`repeating_${section}_${macro}`];
@@ -2894,6 +2893,21 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             match = fullMacro.match(/\{\{(tier=.*?)}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
             else macroBuilder.push(`tier=${tier}`);
+
+            match = fullMacro.match(/\{\{(powerscoretext=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else {
+                let attribute = values[`repeating_${section}_powerscore-nomod${number}`];;
+                let attributeMatch = attribute.match(/^@{(\w+).*}/);
+                if (attributeMatch) {
+                    attribute = attributeMatch[1];
+                } else {
+                    attribute = 'Affected';
+                }
+                let modifier = values[`repeating_${section}_powerscore-mod${number}`];
+                modifier = modifier === '0' ? '' : modifier;
+                macroBuilder.push(`powerscoretext=${attribute} ${modifier}`.trim());
+            }
 
             match = fullMacro.match(/\{\{(powerroll=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
