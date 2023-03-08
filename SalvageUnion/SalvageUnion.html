@@ -64,7 +64,7 @@
 
             <div class="marginleft twocolumns">
                 <div class="descValuePair">
-                    <label for="health">Health</label>
+                    <button type="roll" class="textbutton" value="&{template:criticalinjury}{{name=@{character_name}}}{{roll=[[1d20]]}}">Health</button>
                     <input id="health" type="number" min="0" name="attr_health" value="10">
                     <label> of <input type="number" min="0" name="attr_health_max" value="10"></label>
                 </div>
@@ -216,7 +216,7 @@
 
             <div class="marginleft twocolumns">
                 <div class="descValuePair">
-                    <label for="structure">Structure</label>
+                    <button type="roll" class="textbutton" value="&{template:criticaldamage}{{name=@{character_name}}}{{roll=[[1d20]]}}">Structure</button>
                     <input type="number" id="structure" min="0" name="attr_structure" value="10">
                     <label> of <input type="number" min="0" name="attr_structure_max" value="10"></label>
                 </div>
@@ -734,6 +734,73 @@ const asw = (() => {
 })();
 </script>
 
+<rolltemplate class="sheet-rolltemplate-roll">
+    <table>
+        <tr>
+            <th>
+                {{name}} rolls
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{#rollBetween() roll 20 20}}
+                <strong>Nailed it</strong> ({{roll}}) <br>
+                You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
+                {{/rollBetween() roll 20 20}}
+
+                {{#rollBetween() roll 11 19}}
+                Success ({{roll}}) - You’ve achieved your goal without any compromises.
+                {{/rollBetween() roll 11 19}}
+
+                {{#rollBetween() roll 6 10}}
+                Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence.
+                {{/rollBetween() roll 6 10}}
+
+                {{#rollBetween() roll 2 5}}
+                Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice.
+                {{/rollBetween() roll 2 5}}
+
+                {{#rollBetween() roll 1 1}}
+                Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice.
+                {{/rollBetween() roll 1 1}}
+            </td>
+        </tr>
+        {{#heat}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Heat Check: {{heat}} vs {{heatroll}}
+            </td>
+        </tr>
+        {{/heat}}
+    </table>
+    {{#mech}}
+    <div class="sheet-rolltemplate-button-row">
+
+        {{#rollTotal() heatroll 0}}
+        <div class="sheet-rolltemplate-button">
+            [Push](~{{name}}|reactPush)
+        </div>
+        {{/rollTotal() heatroll 0}}
+
+        {{#^rollGreater() heatroll heat}}
+        <div class="sheet-rolltemplate-button">
+            [Reactor Overload](~{{name}}|reactOverload)
+        </div>
+        {{/^rollGreater() heatroll heat}}
+    </div>
+    {{/mech}}
+</rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-weapon">
     <table>
         <tr>
@@ -820,7 +887,7 @@ const asw = (() => {
     {{/mech}}
 </rolltemplate>
 
-<rolltemplate class="sheet-rolltemplate-roll">
+<rolltemplate class="sheet-rolltemplate-criticalinjury">
     <table>
         <tr>
             <th>
@@ -835,56 +902,28 @@ const asw = (() => {
         <tr>
             <td>
                 {{#rollBetween() roll 20 20}}
-                <strong>Nailed it</strong> ({{roll}}) <br>
-                You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
+                <strong>Miraculous Survival</strong> ({{roll}}) <br>
+                You survive against the odds. You have 1 HP, remain conscious and can act normally.
                 {{/rollBetween() roll 20 20}}
 
                 {{#rollBetween() roll 11 19}}
-                Success ({{roll}}) - You’ve achieved your goal without any compromises.
+                Unconscious ({{roll}}): You are stable at 0 HP, but unconscious and cannot move or take actions until you gain at least 1 HP. You will regain consciousness naturally in 1 hour and get back up with 1 HP.
                 {{/rollBetween() roll 11 19}}
 
                 {{#rollBetween() roll 6 10}}
-                Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence.
+                Minor Injury ({{roll}}): You suffer a Minor Injury such as a sprain, burns, or minor concussion. Your Max HP are reduced by 1 until healed in a Tech 3 - 4 MedBay. In addition, you are Unconscious. Apply the result of 11 - 19.
                 {{/rollBetween() roll 6 10}}
 
                 {{#rollBetween() roll 2 5}}
-                Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice.
+                Major Injury ({{roll}}): You suffer a Major Injury such as permanent scarring, broken ribs, or internal injuries. Your Max HP is reduced by 2 until healed in a Tech 5 - 6 MedBay. In addition, you are Unconscious. Apply the result of 11-19.
                 {{/rollBetween() roll 2 5}}
 
                 {{#rollBetween() roll 1 1}}
-                Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice.
+                Fatal Injury ({{roll}}): Your Pilot suffers a fatal injury and dies.
                 {{/rollBetween() roll 1 1}}
             </td>
         </tr>
-        {{#heat}}
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Heat Check: {{heat}} vs {{heatroll}}
-            </td>
-        </tr>
-        {{/heat}}
     </table>
-    {{#mech}}
-    <div class="sheet-rolltemplate-button-row">
-
-        {{#rollTotal() heatroll 0}}
-        <div class="sheet-rolltemplate-button">
-            [Push](~{{name}}|reactPush)
-        </div>
-        {{/rollTotal() heatroll 0}}
-
-        {{#^rollGreater() heatroll heat}}
-        <div class="sheet-rolltemplate-button">
-            [Reactor Overload](~{{name}}|reactOverload)
-        </div>
-        {{/^rollGreater() heatroll heat}}
-    </div>
-    {{/mech}}
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-overload">
@@ -920,6 +959,45 @@ const asw = (() => {
 
                 {{#rollBetween() roll 1 1}}
                 Reactor Overload ({{roll}}) - Your Mech’s reactor goes into full meltdown and explodes. Your Mech, as well as any mounted Systems, Modules, and all Cargo, is destroyed in the explosion. Everything in Close Range of your Mech takes {{maxheat}} SP damage. They may take any Turn Action or Reaction in response to try to avoid this. Your Pilot dies unless they have a means to escape. The area your Mech was in becomes irradiated.
+                {{/rollBetween() roll 1 1}}
+            </td>
+        </tr>
+    </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-criticaldamage">
+    <table>
+        <tr>
+            <th>
+                {{name}} rolls
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{#rollBetween() roll 20 20}}
+                <strong> Miraculous Survival</strong> ({{roll}}) <br>
+                Your Mech is somehow Intact. It has 1 SP and is still fully operational. Your Pilot is unharmed.
+                {{/rollBetween() roll 20 20}}
+
+                {{#rollBetween() roll 11 19}}
+                Core Damage ({{roll}}): Your Mech Chassis is damaged and inoperable until repaired. All mounted Systems and Modules remain Intact. Your Pilot is reduced to 0 HP unless they have some means to escape the Mech.
+                {{/rollBetween() roll 11 19}}
+
+                {{#rollBetween() roll 6 10}}
+                Module Destruction ({{roll}}): A Module mounted on your Mech is destroyed. This is chosen by the Mediator or at random. Your Mech Chassis is damaged and inoperable until repaired. Your Pilot is unharmed.
+                {{/rollBetween() roll 6 10}}
+
+                {{#rollBetween() roll 2 5}}
+                System Destruction ({{roll}}): A System mounted on your Mech is destroyed. This is chosen by the Mediator or at random. Your Mech Chassis is damaged and inoperable until repaired. Your Pilot is unharmed.
+                {{/rollBetween() roll 2 5}}
+
+                {{#rollBetween() roll 1 1}}
+                Catastrophic Damage ({{roll}}): The Mech, as well as any mounted Systems and Modules as well as all Cargo, is destroyed. Your Pilot dies unless they have a means to escape the Mech.
                 {{/rollBetween() roll 1 1}}
             </td>
         </tr>
