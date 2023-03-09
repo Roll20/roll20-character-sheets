@@ -3,7 +3,7 @@ const attributes = {
   healing: ["strength", "constitution"],
   movement: ["strength", "dexterity"],
   hp: ["size", "constitution"],
-  unconcious: ["total_hit_points"],
+  unconscious: ["total_hit_points"],
   knights: ["old_knights", "middle_aged_knights", "young_knights"],
 };
 
@@ -52,7 +52,7 @@ const sumOfCalculator = (attributes, set) => {
   });
 };
 
-const unconciousCalculator = (attributes, set) => {
+const unconsciousCalculator = (attributes, set) => {
   getAttrs(attributes, (values) => {
     let sum = totalAttributes(values);
     sum = divideBy(sum, 4);
