@@ -64,7 +64,7 @@
 
             <div class="marginleft twocolumns">
                 <div class="descValuePair">
-                    <label for="health">Health</label>
+                    <button type="roll" class="textbutton" value="&{template:criticalinjury}{{name=@{character_name}}}{{roll=[[1d20]]}}">Health</button>
                     <input id="health" type="number" min="0" name="attr_health" value="10">
                     <label> of <input type="number" min="0" name="attr_health_max" value="10"></label>
                 </div>
@@ -73,6 +73,7 @@
                     <input id="abilityPts" type="number" min="0" name="attr_abilitypts" value="5">
                     <label> of <input type="number" min="5" name="attr_abilitypts_max" value="5"></label>
                 </div>
+                <button type="action" class="textbutton" name="act_downtime">Start Downtime</button>
             </div>
         </div>
 
@@ -187,12 +188,20 @@
                     <input id="mechname" type="text" name="attr_character_name">
                 </div>
                 <div class="descValuePair">
-                    <label for="system">System Slots</label>
-                    <input id="system" type="text" name="attr_system_max">
+                    <label>System Slots </label>
+                    <span style="display: flex">
+                        <input type="number" name="attr_system" value="@{systems_used}" disabled>
+                        <label> of </label>
+                        <input type="number" name="attr_system_max">
+                    </span>
                 </div>
                 <div class="descValuePair">
-                    <label for="module">Module Slots </label>
-                    <input id="module" type="text" name="attr_module_max">
+                    <label >Module Slots </label>
+                    <span style="display: flex">
+                        <input type="number" name="attr_module" value="@{modules_used}" disabled>
+                        <label> of</label>
+                        <input type="number" name="attr_module_max">
+                    </span>
                 </div>
                 <details>
                     <summary>
@@ -207,7 +216,7 @@
 
             <div class="marginleft twocolumns">
                 <div class="descValuePair">
-                    <label for="structure">Structure</label>
+                    <button type="roll" class="textbutton" value="&{template:criticaldamage}{{name=@{character_name}}}{{roll=[[1d20]]}}">Structure</button>
                     <input type="number" id="structure" min="0" name="attr_structure" value="10">
                     <label> of <input type="number" min="0" name="attr_structure_max" value="10"></label>
                 </div>
@@ -221,6 +230,7 @@
                     <input type="number" min="0" max="@{heat_max}" name="attr_heat" value="0">
                     <label> of <input type="number" min="0" name="attr_heat_max" value="10"> </label>
                 </div>
+                <button type="action" class="textbutton" name="act_downtime">Start Downtime</button>
             </div>
         </div>
 
@@ -250,11 +260,11 @@
                         </div>
                         <div class="descValuePair">
                             <label>Cost</label>
-                            <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
+                            <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
                         </div>
                         <div class="descValuePair">
                             <label>Slots</label>
-                            <input type="text" name="attr_slot" placeholder="1 System">
+                            <input type="number" name="attr_slot" value="1">
                         </div>
                     </details>
                     <textarea name="attr_weapondetails"></textarea>
@@ -284,19 +294,40 @@
             <details class="equipment">
                 <summary>
                     <input type="text" name="attr_name" title="Name of the Equipment">
-                    <input type="text" name="attr_cost" title="AP/Uses">
+                    <input type="text" name="attr_cost" title="EP/Uses">
                     <input type="text" name="attr_range" title="Range">
                     <input type="text" name="attr_action" title="Action">
+                    <input type="checkbox" name="attr_is-passive" hidden>
+                    <button type="action" class="textbutton passiv-hide" name="act_use-module">Use</button>
+                    <input type="checkbox" class="show-active" name="attr_has-active" hidden>
+                    <input type="checkbox" class="active" name="attr_active" title="Active">
                 </summary>
+                <details class="subdetails">
+                    <summary>
+                        Settings
+                    </summary>
+                    <div class="descValuePair">
+                        <label>Cost</label>
+                        <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Slots</label>
+                        <input type="number" name="attr_slot" value="1">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Is passive</label>
+                        <input type="checkbox" name="attr_is-passive">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Has active effect</label>
+                        <input type="checkbox" name="attr_has-active">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Has Uses instead of EP cost</label>
+                        <input type="checkbox" name="attr_has-uses">
+                    </div>
+                </details>
                 <textarea name="attr_details" class="textarea"></textarea>
-                <div class="descValuePair">
-                    <label>Cost</label>
-                    <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
-                </div>
-                <div class="descValuePair">
-                    <label>Slots</label>
-                    <input type="text" name="attr_slot" placeholder="1 System">
-                </div>
             </details>
         </fieldset>
 
@@ -311,19 +342,40 @@
             <details class="equipment">
                 <summary>
                     <input type="text" name="attr_name" title="Name of the Equipment">
-                    <input type="text" name="attr_cost" title="AP/Uses">
+                    <input type="text" name="attr_cost" title="EP/Uses">
                     <input type="text" name="attr_range" title="Range">
                     <input type="text" name="attr_action" title="Action">
+                    <input type="checkbox" name="attr_is-passive" class="passiv-hide" hidden>
+                    <button type="action" class="textbutton passiv-hide" name="act_use-system">Use</button>
+                    <input type="checkbox" class="show-active" name="attr_has-active" hidden>
+                    <input type="checkbox" class="active" name="attr_active" title="Active">
                 </summary>
+                <details class="subdetails">
+                    <summary>
+                        Settings
+                    </summary>
+                    <div class="descValuePair">
+                        <label>Cost</label>
+                        <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Slots</label>
+                        <input type="number" name="attr_slot" value="1">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Is passive</label>
+                        <input type="checkbox" name="attr_is-passive">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Has active effect</label>
+                        <input type="checkbox" name="attr_has-active">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Has Uses instead of EP cost</label>
+                        <input type="checkbox" name="attr_has-uses">
+                    </div>
+                </details>
                 <textarea name="attr_details" class="textarea"></textarea>
-                <div class="descValuePair">
-                    <label>Cost</label>
-                    <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
-                </div>
-                <div class="descValuePair">
-                    <label>Slots</label>
-                    <input type="text" name="attr_slot" placeholder="1 System">
-                </div>
             </details>
         </fieldset>
     </div>
@@ -392,11 +444,11 @@
                         </div>
                         <div class="descValuePair">
                             <label>Cost</label>
-                            <input type="text" name="attr_cost" placeholder="1 T1 Scrap">
+                            <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
                         </div>
                         <div class="descValuePair">
                             <label>Slots</label>
-                            <input type="text" name="attr_slot" placeholder="1 System">
+                            <input type="number" name="attr_slot" value="1">
                         </div>
                     </details>
                     <textarea name="attr_details"></textarea>
@@ -454,10 +506,19 @@
             <input id="isPilot" name="attr_is-pilot" type="checkbox" checked/>
         </label>
         <br>
-        <label for="isMech" class="settings-checkbox">
-            <span>Is Mech</span>
-            <input id="isMech" name="attr_is-mech" type="checkbox"/>
-        </label>
+        <details>
+            <summary>
+                <label for="isMech" class="settings-checkbox">
+                    <span>Is Mech</span>
+                    <input id="isMech" name="attr_is-mech" type="checkbox"/>
+                </label>
+            </summary>
+            <label for="countWeapons" class="settings-checkbox">
+                <span>Count Weapons as Systems</span>
+                <input id="countWeapons" name="attr_count-weapons" type="checkbox"/>
+            </label>
+        </details>
+
         <br>
         <label for="isCrawler" class="settings-checkbox">
             <span>Is Crawler</span>
@@ -489,6 +550,25 @@ const buttonlist = ["pilot","mech","crawler","notes","settings"];
         });
     });
 
+on('change:repeating_modules remove:repeating_modules sheet:opened', function() {
+    repeatingSum("modules_used", "slot", "repeating_modules");
+});
+
+on('change:repeating_systems remove:repeating_systems change:repeating_mechweapons remove:repeating_mechweapons sheet:opened', async function() {
+    let countWeapons = (await asw.getAttrs(["count-weapons"]))["count-weapons"];
+
+    if(countWeapons == 'on') {
+        repeatingSum("systems_used", "slot", "repeating_systems", "repeating_mechweapons");
+    }
+    else {
+        repeatingSum("systems_used", "slot", "repeating_systems");
+    }
+
+});
+
+////////////////////////////
+//  ROLL AUTOMATION     ////
+///////////////////////////
 
 on('clicked:repeating_mechweapons:roll',
      async (event) => {
@@ -547,12 +627,84 @@ const reactOverload = async (ev) => {
     let rollBase = `&{template:overload}{{name=${attrs.character_name}}}{{roll=[[1d20]]}}{{heat=${attrs.heat}}}{{maxheat=${attrs.heat_max}}}`;
     let roll = await startRoll(rollBase);
 
-    finishRoll(roll.rollId, {
-
-    });
+    finishRoll(roll.rollId, {});
 }
 
+on('clicked:downtime', async (ev) => {
+    let attrs = await asw.getAttrs(['health_max', 'abilitypts_max', 'structure_max', 'energy_max']);
 
+    asw.setAttrs({
+		health: attrs['health_max'],
+		abilitypts: attrs['abilitypts_max'],
+		structure: attrs['structure_max'],
+		energy: parseInt(attrs['energy_max']),
+		heat: 0,
+	});
+});
+
+on('clicked:repeating_modules:use-module clicked:repeating_systems:use-system', async (event) => {
+
+    // prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
+	var trigger = event.triggerName.slice(8); // this always starts with 'clicked:'
+	var prefix = trigger.split('_').slice(0,3).join('_') + '_'
+
+	let attrs = await asw.getAttrs(['character_name', 'energy', prefix+'name', prefix+'cost', prefix+'has-uses']);
+	let cost = parseInt(attrs[prefix+'cost']);
+
+    let toSet = {}
+
+    let rollBase = `/w ${attrs.character_name} &{template:info}{{info= You activated  ${attrs[prefix+'name']} for `;
+    if(attrs[prefix+'has-uses'] ==! 'on') {
+        toSet.energy = attrs['energy'] - cost;
+        rollBase += `${cost} EP. ${toSet.energy} Energy remaining}}`
+    }
+    else {
+        toSet[prefix+'cost'] = cost-1;
+        rollBase += `1 use. ${toSet[prefix+'cost']} Uses remaining}}`
+    }
+    toSet[prefix+'active'] = 'on';
+
+	asw.setAttrs(toSet);
+
+    let roll = await startRoll(rollBase);
+    finishRoll(roll.rollId, {});
+});
+
+
+
+///////////////////
+//  HELPER     ////
+///////////////////
+
+async function repeatingSum (destination, fieldsum, ...sections){
+    // destination = the name of the attribute that stores the total
+    // fieldsum = the name of the field to be summed
+    // sections = name for/of repeating fieldset, without the repeating_
+
+    let attrs = [];
+
+    await Promise.all(sections.map(async (section) => {
+        let ids = await asw.getSectionIDs(section);
+        var sumFields = [];
+        for (var a=0; a< ids.length; a++) {
+            sumFields[sumFields.length] = section + "_" + ids[a] + "_" + fieldsum;
+        }
+        attrs.push(...sumFields);
+    }
+    ));
+
+    let values = await asw.getAttrs(attrs);
+
+    let sumTotal = 0;
+    let tempSum = 0;
+    for(a=0; a < attrs.length; a++){
+        tempSum = parseFloat(values[attrs[a]],10) || 0;
+        sumTotal += tempSum;
+    }
+    var setSumValue = {};
+    setSumValue[destination] = sumTotal;
+    asw.setAttrs(setSumValue);
+}
 
 const asw = (() => {
     const setActiveCharacterId = function(charId){
@@ -581,6 +733,73 @@ const asw = (() => {
     }
 })();
 </script>
+
+<rolltemplate class="sheet-rolltemplate-roll">
+    <table>
+        <tr>
+            <th>
+                {{name}} rolls
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{#rollBetween() roll 20 20}}
+                <strong>Nailed it</strong> ({{roll}}) <br>
+                You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
+                {{/rollBetween() roll 20 20}}
+
+                {{#rollBetween() roll 11 19}}
+                Success ({{roll}}) - You’ve achieved your goal without any compromises.
+                {{/rollBetween() roll 11 19}}
+
+                {{#rollBetween() roll 6 10}}
+                Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence.
+                {{/rollBetween() roll 6 10}}
+
+                {{#rollBetween() roll 2 5}}
+                Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice.
+                {{/rollBetween() roll 2 5}}
+
+                {{#rollBetween() roll 1 1}}
+                Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice.
+                {{/rollBetween() roll 1 1}}
+            </td>
+        </tr>
+        {{#heat}}
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Heat Check: {{heat}} vs {{heatroll}}
+            </td>
+        </tr>
+        {{/heat}}
+    </table>
+    {{#mech}}
+    <div class="sheet-rolltemplate-button-row">
+
+        {{#rollTotal() heatroll 0}}
+        <div class="sheet-rolltemplate-button">
+            [Push](~{{name}}|reactPush)
+        </div>
+        {{/rollTotal() heatroll 0}}
+
+        {{#^rollGreater() heatroll heat}}
+        <div class="sheet-rolltemplate-button">
+            [Reactor Overload](~{{name}}|reactOverload)
+        </div>
+        {{/^rollGreater() heatroll heat}}
+    </div>
+    {{/mech}}
+</rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-weapon">
     <table>
@@ -668,7 +887,7 @@ const asw = (() => {
     {{/mech}}
 </rolltemplate>
 
-<rolltemplate class="sheet-rolltemplate-roll">
+<rolltemplate class="sheet-rolltemplate-criticalinjury">
     <table>
         <tr>
             <th>
@@ -683,56 +902,28 @@ const asw = (() => {
         <tr>
             <td>
                 {{#rollBetween() roll 20 20}}
-                <strong>Nailed it</strong> ({{roll}}) <br>
-                You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
+                <strong>Miraculous Survival</strong> ({{roll}}) <br>
+                You survive against the odds. You have 1 HP, remain conscious and can act normally.
                 {{/rollBetween() roll 20 20}}
 
                 {{#rollBetween() roll 11 19}}
-                Success ({{roll}}) - You’ve achieved your goal without any compromises.
+                Unconscious ({{roll}}): You are stable at 0 HP, but unconscious and cannot move or take actions until you gain at least 1 HP. You will regain consciousness naturally in 1 hour and get back up with 1 HP.
                 {{/rollBetween() roll 11 19}}
 
                 {{#rollBetween() roll 6 10}}
-                Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence.
+                Minor Injury ({{roll}}): You suffer a Minor Injury such as a sprain, burns, or minor concussion. Your Max HP are reduced by 1 until healed in a Tech 3 - 4 MedBay. In addition, you are Unconscious. Apply the result of 11 - 19.
                 {{/rollBetween() roll 6 10}}
 
                 {{#rollBetween() roll 2 5}}
-                Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice.
+                Major Injury ({{roll}}): You suffer a Major Injury such as permanent scarring, broken ribs, or internal injuries. Your Max HP is reduced by 2 until healed in a Tech 5 - 6 MedBay. In addition, you are Unconscious. Apply the result of 11-19.
                 {{/rollBetween() roll 2 5}}
 
                 {{#rollBetween() roll 1 1}}
-                Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice.
+                Fatal Injury ({{roll}}): Your Pilot suffers a fatal injury and dies.
                 {{/rollBetween() roll 1 1}}
             </td>
         </tr>
-        {{#heat}}
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Heat Check: {{heat}} vs {{heatroll}}
-            </td>
-        </tr>
-        {{/heat}}
     </table>
-    {{#mech}}
-    <div class="sheet-rolltemplate-button-row">
-
-        {{#rollTotal() heatroll 0}}
-        <div class="sheet-rolltemplate-button">
-            [Push](~{{name}}|reactPush)
-        </div>
-        {{/rollTotal() heatroll 0}}
-
-        {{#^rollGreater() heatroll heat}}
-        <div class="sheet-rolltemplate-button">
-            [Reactor Overload](~{{name}}|reactOverload)
-        </div>
-        {{/^rollGreater() heatroll heat}}
-    </div>
-    {{/mech}}
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-overload">
@@ -772,4 +963,49 @@ const asw = (() => {
             </td>
         </tr>
     </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-criticaldamage">
+    <table>
+        <tr>
+            <th>
+                {{name}} rolls
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{#rollBetween() roll 20 20}}
+                <strong> Miraculous Survival</strong> ({{roll}}) <br>
+                Your Mech is somehow Intact. It has 1 SP and is still fully operational. Your Pilot is unharmed.
+                {{/rollBetween() roll 20 20}}
+
+                {{#rollBetween() roll 11 19}}
+                Core Damage ({{roll}}): Your Mech Chassis is damaged and inoperable until repaired. All mounted Systems and Modules remain Intact. Your Pilot is reduced to 0 HP unless they have some means to escape the Mech.
+                {{/rollBetween() roll 11 19}}
+
+                {{#rollBetween() roll 6 10}}
+                Module Destruction ({{roll}}): A Module mounted on your Mech is destroyed. This is chosen by the Mediator or at random. Your Mech Chassis is damaged and inoperable until repaired. Your Pilot is unharmed.
+                {{/rollBetween() roll 6 10}}
+
+                {{#rollBetween() roll 2 5}}
+                System Destruction ({{roll}}): A System mounted on your Mech is destroyed. This is chosen by the Mediator or at random. Your Mech Chassis is damaged and inoperable until repaired. Your Pilot is unharmed.
+                {{/rollBetween() roll 2 5}}
+
+                {{#rollBetween() roll 1 1}}
+                Catastrophic Damage ({{roll}}): The Mech, as well as any mounted Systems and Modules as well as all Cargo, is destroyed. Your Pilot dies unless they have a means to escape the Mech.
+                {{/rollBetween() roll 1 1}}
+            </td>
+        </tr>
+    </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-info">
+    <div>
+        {{info}}
+    </div>
 </rolltemplate>
