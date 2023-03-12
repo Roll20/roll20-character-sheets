@@ -13,6 +13,9 @@
           .col.2autocolumn
             h2(data-i18n='age')
             +numberInput('age')
+          .col.2autocolumn
+            h2.text-accent(data-i18n='session glory')
+            +numberInput('session glory')
         .grid.2autocolumn
           h2(data-i18n='distinctive features')
           +textInput('distinctive features')
@@ -31,29 +34,45 @@
             .col.2autocolumn
               h2(data-i18n=val)
               +textInput(val)
-        .grid.2column
-          each val in ['glory this game', 'total glory']
-            .col.2autocolumn
-              h2(data-i18n=val)
-              +numberInput(val)
+        each val in ['coat of arms', 'motto']
+          .grid.2autocolumn
+            h2(data-i18n=val)
+            +textInput(val)
 
   .row.character-body
     .col.grid
+      .current-hit-points.grid
+        .header
+          h1(data-i18n='HP & Wounds')
+        .row.grid.current-hp.2column
+          .col.2autocolumn.debilitated
+            h2.font-medium(data-i18n="current hp")
+            +numberInput('current hp')
+          .col.2autocolumn.debilitated
+            h2(data-i18n="debilitated?")
+            +checkboxInput(`debilitated?`)
+        .row.grid.wounds
+          each val in ['aggravation damage', 'deterioration damage']
+            .row.grid.2autocolumn
+              h2.small-caps.text-accent.font-small.text-center(data-i18n=val)
+              +textInput(val)  
+          .row.grid.headers
+            each val in ['wounds', 'dmg', 'description']
+              h2.small-caps.text-accent.font-medium.text-center(data-i18n=val)  
+          .repeating-container
+            fieldset(class='repeating_wounds')
+              .row.grid
+                +numberInput('wound')
+                +numberInput('dmg')
+                +textInput('description') 
       .personality-traits
         .header
           h1(data-i18n='personality traits')
-        .row.2autocolumn.knight
-          h2(data-i18n='Chivalry Bonus[*](total=80+)')
-          +textInput('chivalry bonus')
         .row.2autocolumn
-          h2(data-i18n='Religious Bonus(traits all 16+)')
+          h2(data-i18n='religious bonus')
           +textInput('religious bonus')
         each val, key in personalityTraits
           .row.traits
-            .font-weight-bold
-              - const chivalryBonusIndicator = ['energetic','generous','just','merciful','modest','valorous']
-              if chivalryBonusIndicator.includes(key)
-                span.knight *
             +checkboxInput(`${key} check`)
             +rollButton(key)
             +numberInput(key)
@@ -64,15 +83,15 @@
         .repeating-container
           fieldset(class='repeating_directed-trait')
             .row
-                h2(data-i18n='directed trait')
-                +textInput('name')
-                +numberInput('trait')
-                +checkboxInput(`check`)
-                +repeatingRollButton('trait')
+              h2(data-i18n='directed trait')
+              +textInput('name')
+              +numberInput('trait')
+              +checkboxInput(`check`)
+              +repeatingRollButton('trait')
       .passions
         .header
           h1(data-i18n='passions')
-        each val in ['loyalty lord', 'love family', 'hospitality', 'honor']
+        each val in ['honor', 'hospitality', 'loyalty lord', 'love family',  ]
           .row
             +rollButton(val)
             +numberInput(val)
@@ -84,12 +103,6 @@
               +numberInput('passion')
               +checkboxInput(`check`)
               +repeatingRollButton('passion')
-      each val in ['coat of arms', 'motto']
-        - const attrName = val.replace(/ /g, '_');
-        .header
-          h1(data-i18n=val)
-        .row
-          textarea(data-i18n-placeholder=val name=`attr_${attrName}` placeholder=val)
           
     .col.grid.gold-left-border
       .attributes
@@ -110,29 +123,7 @@
             h2(data-i18n='other')
             - const otherRows = ['movement', 'armor points', 'current glory', 'healing rate']
             +table(otherRows)
-      .current-hit-points.grid
-        .header
-          h1(data-i18n='HP & Wounds')
-        .row.grid.current-hp.2column
-          .col.2autocolumn.debilitated
-            h2.font-medium(data-i18n="current hp")
-            +numberInput('current hp')
-          .col.2autocolumn.debilitated
-            h2(data-i18n="debilitated?")
-            +checkboxInput(`debilitated?`)
 
-        .row.grid.wounds
-          .row.grid.headers
-            each val in ['wounds', 'dmg', 'description']
-              h2.small-caps.text-accent.font-medium.text-center(data-i18n=val)
-          .repeating-container
-            fieldset(class='repeating_wounds')
-              .row.grid
-                +numberInput('wound')
-                +numberInput('dmg')
-                +textInput('description') 
-
-      
       .row.grid.2column
         .col.grid
           .skills
@@ -150,30 +141,6 @@
                   +textInput('name')
                   +numberInput('skill')
                   +repeatingRollButton('skill')
-          .squire
-            .header.knight
-              h1(data-i18n='squire')
-            each val in ['name']
-              .row.2autocolumn
-                h2(data-i18n=`${val}`)
-                if val === 'name'
-                  +textInput(`squire ${val}`)
-                else
-                  +numberInput(`squire ${val}`)
-            each val in ['age', 'first aid', 'battle', 'horsemanship']
-              - const attrName = val.replace(/ /g, '_');
-              .row.col-3.knight
-                +checkboxInput(`squire ${val} check`)
-                +squireButton(val)
-                label(data-i18n-title=`enter ${val}` title=`enter ${val}`)
-                  input(name=`attr_squire_${attrName}` placeholder='#' title=`@{squire_${attrName}}` type='number' value='')
-            .repeating-container
-              fieldset(class='repeating_squire_skills')
-                .row
-                    +textInput('name')
-                    +numberInput('skill')
-                    +checkboxInput(`check`)
-                    +repeatingRollButton('skill')
 
         .col.grid.gold-left-border
           .combat-skills
@@ -187,95 +154,114 @@
             .repeating-container
               fieldset(class='repeating_combat-skills')
                 .row
+                  +checkboxInput(`check`)
                   +textInput('name')
                   +numberInput('skill')
-                  +checkboxInput(`check`)
                   +repeatingRollButton('skill')
-          .joust-score.knight
-          .header
-            h1(data-i18n='joust score')
-          .row.2column
-            each val in ['win', 'losses']
-              .col.2autocolumn
-                h2(data-i18n=val)
-                +numberInput(val)
-          .horse
-          .header
-            h1(data-i18n='horses')
-          .row
-            h2.text-primary.knight(data-i18n='best warhorse (#1)')
-          .row.2autocolumn
-            h2(data-i18n='type')
-            +textInput('horse type')
-          .row.2column
-            each val in ['damage', 'move']
-              .col.2autocolumn
-                if val === 'damage'
-                  +damageButton(`horse ${val}`, 'damage')
-                else
+          .squire
+            .header
+              h1(data-i18n='squire')
+            .row.grid.body
+              .row.grid.2autocolumn
+                h2(data-i18n='name')
+                +textInput(`squire name`)
+              .row.grid.skill
+                h2(data-i18n='skill')
+                +numberInput(`squire skill`)
+                +squireButton(`squire skill`)
+            .repeating-container
+              fieldset(class='repeating_squire_skills')
+                .row
+                  +checkboxInput(`check`)
+                  +textInput('name')
+                  +numberInput('skill')
+                  +repeatingRollButton('skill')
+
+
+      .joust-score
+        .header
+          h1(data-i18n='joust score')
+        .row.2column
+          each val in ['win', 'losses']
+            .col.2autocolumn
+              h2(data-i18n=val)
+              +numberInput(val)
+      .horse
+            .header
+              h1(data-i18n='horses')
+            .row
+              h2.text-primary.knight(data-i18n='best warhorse (#1)')
+            .row.2autocolumn
+              h2(data-i18n='type')
+              +textInput('horse type')
+            .row.2column
+              each val in ['damage', 'move']
+                .col.2autocolumn
+                  if val === 'damage'
+                    +damageButton(`horse ${val}`, 'damage')
+                  else
+                    h2(data-i18n=val)
+                  +textInput(`horse ${val}`)
+            .row.2column
+              each val in ['armor', 'hp']
+                .col.2autocolumn
                   h2(data-i18n=val)
-                +textInput(`horse ${val}`)
-          .row.2column
-            each val in ['armor', 'hp']
-              .col.2autocolumn
-                h2(data-i18n=val)
-                +numberInput(`horse ${val}`)
-          .row.3column
-            each val in ['siz', 'con', 'dex']
-              .col.2autocolumn
-                h2.text-uppercase(data-i18n=`${val}`)
-                +textInput(`horse ${val}`)
-          .row.2autocolumn
-            h2(data-i18n='breed')
-            +textInput('horse breed')
-          .row
-            h2.text-primary(data-i18n='other horses')
-          .row.other-horse
-            h2(data-i18n='riding(#2)')
-            +textInput('horse 2')
-            h2(data-i18n='move')
-            +textInput('horse 2 move')
-          .row.other-horse
-            h2.knight(data-i18n='squire(#3)')
-            +textInput('horse 3')
-            h2(data-i18n='move')
-            +textInput('horse 3 move')
-          .row.other-horse
-            h2(data-i18n='(#4)')
-            +textInput('horse 4')
-            h2(data-i18n='move')
-            +textInput('horse 4 move')
-          .repeating-container
-            fieldset(class='repeating_horses')
-              .row
-                  +textInput('horse')
-                  h2(data-i18n='move')
-                  +textInput('horse move')
+                  +numberInput(`horse ${val}`)
+            .row.3column
+              each val in ['siz', 'con', 'dex']
+                .col.2autocolumn
+                  h2.text-uppercase(data-i18n=`${val}`)
+                  +textInput(`horse ${val}`)
+            .row.2autocolumn
+              h2(data-i18n='breed')
+              +textInput('horse breed')
+            .row
+              h2.text-primary(data-i18n='other horses')
+            .row.other-horse
+              h2(data-i18n='riding(#2)')
+              +textInput('horse 2')
+              h2(data-i18n='move')
+              +textInput('horse 2 move')
+            .row.other-horse
+              h2.knight(data-i18n='squire(#3)')
+              +textInput('horse 3')
+              h2(data-i18n='move')
+              +textInput('horse 3 move')
+            .row.other-horse
+              h2(data-i18n='(#4)')
+              +textInput('horse 4')
+              h2(data-i18n='move')
+              +textInput('horse 4 move')
+            .repeating-container
+              fieldset(class='repeating_horses')
+                .row
+                    +textInput('horse')
+                    h2(data-i18n='move')
+                    +textInput('horse move')
 
       .equipment-carried
-      .header
-        h1(data-i18n='equipment carried')
-      .row.armor.knight
-        h2(data-i18n='armor type')
-        +textInput('armor type')
-        h2(data-i18n='points')
-        +numberInput('armor points')
-      .row.clothing
-        h2(data-i18n='clothing')
-        +textInput('clothing')
-        h2(data-i18n='libra value')
-        +textInput('libra value')
-      .row
-        h2.text-primary(data-i18n='gear')
-      each val in ['personal', 'travel', 'war']
-        - const classNotation = val === 'war' ? "knight" : "";
-        .row.gear(class=classNotation)
-          +checkboxInput(`${val} gear check`)
-          h2(data-i18n=`${val}`)
-          +textInput(`${val} gear`)
-          h2(data-i18n=`on horse #`)
-          +numberInput(`${val} gear on horse`)
-      .repeating-container
-        fieldset(class='repeating_equipment-carried')
-          .row
-              +textInput('equipment')
+        .header
+          h1(data-i18n='equipment carried')
+        .row.armor.knight
+          h2(data-i18n='armor type')
+          +textInput('armor type')
+          h2(data-i18n='points')
+          +numberInput('armor points')
+        .row.clothing
+          each val in ['clothing', 'libra value']
+            h2(data-i18n=val)
+            +textInput(val)
+        .row
+          h2.text-primary(data-i18n='gear')
+        each val in ['personal', 'travel', 'war']
+          - const classNotation = val === 'war' ? "knight" : "";
+          .row.gear(class=classNotation)
+            +checkboxInput(`${val} gear check`)
+            h2(data-i18n=`${val}`)
+            +textInput(`${val} gear`)
+            h2(data-i18n=`on horse #`)
+            +numberInput(`${val} gear on horse`)
+        .repeating-container
+          fieldset(class='repeating_equipment-carried')
+            .row
+                +textInput('equipment')
