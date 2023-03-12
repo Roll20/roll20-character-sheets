@@ -370,7 +370,7 @@ const repeatingCalculateRemainingRecursive = function (tail, accumulator, result
 //#endregion
 
 //#region Generic Setup functions
-function setupStaticCalculateTotal(totalField, fieldsToSum, maxValue) {
+const setupStaticCalculateTotal = function(totalField, fieldsToSum, maxValue) {
     let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
     on(onChange, function () {
         getAttrs(fieldsToSum, function (values) {
@@ -2722,24 +2722,21 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
 
 //#region Psionic
 // Psionic tabs, control hidden or visible options
-const setPsionicDisciplineVisibility = function(newValue) {
-    let elements = $20('.sheet-section-psionics option.sheet-hidden');
-    if (newValue === "1") {
-        elements.addClass('sheet-show');
-    } else {
-        elements.removeClass('sheet-show');
-    }
-}
-
 const PSIONIC_SKILLS_AND_POWERS_FIELD = 'tab8';
 on(`change:${PSIONIC_SKILLS_AND_POWERS_FIELD} sheet:opened`, function (eventInfo) {
-    if (eventInfo.newValue)
-        return setPsionicDisciplineVisibility(eventInfo.newValue);
-
     getAttrs([PSIONIC_SKILLS_AND_POWERS_FIELD], function (values) {
-        setPsionicDisciplineVisibility(values[PSIONIC_SKILLS_AND_POWERS_FIELD]);
+        let elements = $20('.sheet-section-psionics option.sheet-hidden');
+        if (values[PSIONIC_SKILLS_AND_POWERS_FIELD] === "1") {
+            elements.addClass('sheet-show');
+        } else {
+            elements.removeClass('sheet-show');
+        }
     })
 });
+
+setupStaticCalculateTotal('constitution-psi', ['constitution','psion-con-mod']);
+setupStaticCalculateTotal('intelligence-psi', ['intelligence','psion-int-mod']);
+setupStaticCalculateTotal('wisdom-psi', ['wisdom','psion-wis-mod']);
 
 const PSIONIC_CORE_SECTIONS = [
     { discipline: 'Telepathic',      section: 'psion-telepathy',            name: 'psiontelepathic',    macro: 'psiontelepathic-macro',         number: '',   cost_number: '20' },
@@ -2816,7 +2813,12 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`discipline=${displayDiscipline}`);
             macroBuilder.push(`tier=${tier}`);
             let attribute = power['attribute'];
-            attribute = attribute.startsWith("@") ? attribute.substring(2,attribute.length-1) : 'Affected'
+            let attributeMatch = attribute.match(/^@{(\w+).*}/);
+            if (attributeMatch) {
+                attribute = attributeMatch[1];
+            } else {
+                attribute = 'Affected';
+            }
             let modifier = power['modifier'] === '0' ? '' : power['modifier'];
             macroBuilder.push(`powerscoretext=${attribute} ${modifier}`.trim());
             macroBuilder.push(`initial=@{PSP-cost${cost_number}}`);
@@ -2831,11 +2833,10 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`prep=${prep}`);
             macroBuilder.push(`prereq=${power['prerequisites']}`);
             macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
-            let powerRoll = `[[1d20cf20-(@{psionic-mod${number}})]]`;
-            if (power['roll-override']) {
-                powerRoll = `[${power['roll-override']}](~${values.character_name}|repeating_${section}_${parse.rowId}_action-check-dm)`;
+            macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
+            if (power['secret-by-dm']) {
+                macroBuilder.push('secret=true');
             }
-            macroBuilder.push(`powerroll=${powerRoll}`);
             let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
             if (power['context-modifier']) {
                 powerScore += `+(${power['context-modifier']})`;
@@ -2864,7 +2865,11 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
     on(`clicked:repeating_${section}:action-check clicked:repeating_${section}:action-check-dm`, function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
-        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
+        getAttrs([`repeating_${section}_${macro}`,
+            `repeating_${section}_powerscore-nomod${number}`,
+            `repeating_${section}_powerscore-mod${number}`,
+            'psion-armor-penalty'
+        ], function (values) {
             let displayDiscipline = discipline;
             let tier = name.includes('science') ? 'Science' : 'Devotion';
             let fullMacro = values[`repeating_${section}_${macro}`];
@@ -2888,6 +2893,21 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             match = fullMacro.match(/\{\{(tier=.*?)}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
             else macroBuilder.push(`tier=${tier}`);
+
+            match = fullMacro.match(/\{\{(powerscoretext=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else {
+                let attribute = values[`repeating_${section}_powerscore-nomod${number}`];;
+                let attributeMatch = attribute.match(/^@{(\w+).*}/);
+                if (attributeMatch) {
+                    attribute = attributeMatch[1];
+                } else {
+                    attribute = 'Affected';
+                }
+                let modifier = values[`repeating_${section}_powerscore-mod${number}`];
+                modifier = modifier === '0' ? '' : modifier;
+                macroBuilder.push(`powerscoretext=${attribute} ${modifier}`.trim());
+            }
 
             match = fullMacro.match(/\{\{(powerroll=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
@@ -2929,8 +2949,14 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
     on(`clicked:repeating_${section}:action-macro`, function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
-        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
+        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty', 'character_name'], function (values) {
             let macroValue = values[`repeating_${section}_${macro}`];
+
+            let isSecret = macroValue.match(/\{\{(secret=true)}}/);
+            let powerRollMatch = macroValue.match(/\{\{(powerroll=.*?)}} *\{\{/);
+            if (isSecret && powerRollMatch) {
+                macroValue = macroValue.replace(powerRollMatch[1], `powerroll=[Secret by DM](~${values.character_name}|repeating_${section}_${parse.rowId}_action-check-dm)`)
+            }
 
             rollPsionicTemplate(macroValue, parse.rowId, values);
         });
@@ -2981,6 +3007,8 @@ const FOLDABLE_REPEATING_SECTIONS = [
     ...PRIEST_SPELL_LEVELS_SECTIONS.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
     'spells-primonster',
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
+    'potions',
+    'dusts',
     'scrolls',
 ];
 FOLDABLE_REPEATING_SECTIONS.forEach(section => {
