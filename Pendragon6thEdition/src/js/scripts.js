@@ -1,5 +1,4 @@
 const attributes = {
-  damage: ["strength", "size"],
   healing: ["strength", "constitution"],
   movement: ["strength", "dexterity"],
   hp: ["size", "constitution"],

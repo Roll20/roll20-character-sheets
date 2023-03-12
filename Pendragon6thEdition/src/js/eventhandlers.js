@@ -1,11 +1,7 @@
 attributes.movement.forEach((attr) => {
   on(`change:${attr}`, () =>
-    attributeSumDivide(attributes.movement, "movement_rate")
+    attributeSumDivide(attributes.movement, "movement")
   );
-});
-
-attributes.damage.forEach((attr) => {
-  on(`change:${attr}`, () => attributeSumDivide(attributes.damage, "damage"));
 });
 
 attributes.healing.forEach((attr) => {
@@ -15,9 +11,7 @@ attributes.healing.forEach((attr) => {
 });
 
 attributes.hp.forEach((attr) => {
-  on(`change:${attr}`, () =>
-    sumOfCalculator(attributes.hp, "total_hit_points")
-  );
+  on(`change:${attr}`, () => sumOfCalculator(attributes.hp, "hit_points"));
 });
 
 attributes.unconscious.forEach((attr) => {
