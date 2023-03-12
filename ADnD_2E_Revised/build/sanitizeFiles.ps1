@@ -1,7 +1,8 @@
-﻿$htmlFolder = Join-Path $PSScriptRoot ".." "html"
-$javascriptFolder = Join-Path $PSScriptRoot ".." "javascript"
-$sassFolder = Join-Path $PSScriptRoot ".." "sass"
-$cssFolder = Join-Path $PSScriptRoot ".." "css"
+﻿$sourceFolder = Join-Path $PSScriptRoot ".."
+$htmlFolder = Join-Path $sourceFolder "html"
+$javascriptFolder = Join-Path $sourceFolder "javascript"
+$sassFolder = Join-Path $sourceFolder "sass"
+$cssFolder = Join-Path $sourceFolder "css"
 
 "---- Sanitize Javascript files ----"
 Get-ChildItem -Path $javascriptFolder -Recurse -File | ForEach-Object {
@@ -41,6 +42,10 @@ Get-ChildItem -Path $sassFolder -Recurse -File | ForEach-Object {
     $cssOutput = Join-Path $cssFolder "$cssFilename.css"
     sass --no-source-map $_.FullName $cssOutput
 }
+#"2EStyle-base.scss"
+#$scssFilename = Join-Path $cssFolder "2EStyle-base.scss"
+#$cssOutput = Join-Path $sourceFolder "2EStyle.css"
+#sass $scssFilename $cssOutput --no-source-map --quotes double
 ""
 
 "---- Sanitize CSS files ----"
@@ -55,5 +60,8 @@ Get-ChildItem -Path $cssFolder -Recurse -File | ForEach-Object {
     }
     $content | Set-Content -Path $_.FullName
 }
-
+#"2EStyle.css"
+#$cssContent = Get-Content $cssOutput
+#$cssContent = $cssContent -replace '^(  )[^ ].*', '$1$0' #makes indentation 4 spaces instead of 2
+#$cssContent | Set-Content -Path $cssOutput
 ""
