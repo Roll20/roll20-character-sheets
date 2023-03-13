@@ -216,6 +216,7 @@
                                 value="@{mastery}%"
                                 disabled
                             />
+                            <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                         </div>
                     </fieldset>
                 </div>
@@ -263,6 +264,7 @@
                                     value="@{mastery}%"
                                     disabled
                                 />
+                                <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                             </div>
                         </fieldset>
                     </div>
@@ -377,6 +379,7 @@
                                             value="@{mastery}%"
                                             disabled
                                         />
+                                        <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                                     </div>
                                 </fieldset>
                             </div>
@@ -438,6 +441,7 @@
                                             value="@{mastery}%"
                                             disabled
                                         />
+                                        <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                                     </div>
                                 </fieldset>
                             </div>
@@ -499,6 +503,7 @@
                                             value="@{mastery}%"
                                             disabled
                                         />
+                                        <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                                     </div>
                                 </fieldset>
                             </div>
@@ -560,6 +565,7 @@
                                             value="@{mastery}%"
                                             disabled
                                         />
+                                        <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                                     </div>
                                 </fieldset>
                             </div>
@@ -621,6 +627,7 @@
                                             value="@{mastery}%"
                                             disabled
                                         />
+                                        <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                                     </div>
                                 </fieldset>
                             </div>
@@ -682,6 +689,7 @@
                                             value="@{mastery}%"
                                             disabled
                                         />
+                                        <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                                     </div>
                                 </fieldset>
                             </div>
@@ -743,6 +751,7 @@
                                             value="@{mastery}%"
                                             disabled
                                         />
+                                        <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                                     </div>
                                 </fieldset>
                             </div>
@@ -804,6 +813,7 @@
                                             value="@{mastery}%"
                                             disabled
                                         />
+                                        <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                                     </div>
                                 </fieldset>
                             </div>
@@ -865,6 +875,7 @@
                                             value="@{mastery}%"
                                             disabled
                                         />
+                                        <input type="hidden" name="attr_mastery_max" value="@{mastery_max}" disabled />
                                     </div>
                                 </fieldset>
                             </div>
@@ -1208,7 +1219,7 @@
         }
 
         on(
-            "clicked:strength clicked:dexterity clicked:endurance clicked:intelligence clicked:charisma clicked:skill",
+            "clicked:strength clicked:dexterity clicked:endurance clicked:intelligence clicked:charisma",
             (eventInfo) => {
                 const attrName = eventInfo.triggerName.substring(8);
                 getAttrs([attrName, `${attrName}_name`], (values) => {
@@ -1228,7 +1239,7 @@
         }
 
         on("clicked:repeating_skills:roll clicked:repeating_masteries:roll", async (eventInfo) => {
-            skillClicked(eventInfo.sourceAttribute, "roll", "skillname", "mastery");
+            skillClicked(eventInfo.sourceAttribute, "roll", "skillname", "mastery_max");
         });
 
         on("clicked:repeating_attacks:roll", async (eventInfo) => {
@@ -1251,20 +1262,8 @@
                 .join(" "),
             async function (eventInfo) {
                 const pathBase = eventInfo.sourceAttribute.substring(0, eventInfo.sourceAttribute.length - 4);
-                getAttrs([`${pathBase}talent_name`, `${pathBase}skillname`, `${pathBase}skill_mastered`], (values) => {
-                    const talentName = values[`${pathBase}talent_name`];
-                    getAttrs(
-                        [`talent_${talentName}_link1`, `talent_${talentName}_link2`, ...characteristicNames],
-                        (talentValues) => {
-                            const mastery = Math.floor(
-                                (values[`${pathBase}skill_mastered`] === "on" ? 10 : 0) +
-                                    (parseInt(talentValues[talentValues[`talent_${talentName}_link1`]]) +
-                                        parseInt(talentValues[talentValues[`talent_${talentName}_link2`]])) *
-                                        2.5
-                            );
-                            roll_rt1(values[`${pathBase}skillname`], mastery);
-                        }
-                    );
+                getAttrs([`${pathBase}skillname`, `${pathBase}mastery_max`], (values) => {
+                    roll_rt1(values[`${pathBase}skillname`], values[`${pathBase}mastery_max`]);
                 });
             }
         );
@@ -1282,6 +1281,11 @@
                         parseInt(values[getLinkAttr(values[`${repSection}_link2`])])) *
                         2.5
                 ));
+                output[`${repSection}_mastery_max`] = Math.floor(
+                    (parseInt(values[getLinkAttr(values[`${repSection}_link1`])]) +
+                        parseInt(values[getLinkAttr(values[`${repSection}_link2`])])) *
+                        2.5
+                );
                 setAttrs(output);
             });
         }
@@ -1311,6 +1315,12 @@
                                 2 +
                                 parseInt(values[`${repSection}_mastery_bonus`])
                         ));
+                        output[`${repSection}_mastery_max`] = Math.floor(
+                            (parseInt(values[getLinkAttr(values[`${repSection}_link1`])]) +
+                                parseInt(values[getLinkAttr(values[`${repSection}_link2`])])) /
+                                2 +
+                                parseInt(values[`${repSection}_mastery_bonus`])
+                        );
                     });
                     setAttrs(output);
                 }
@@ -1357,6 +1367,12 @@
                                             parseInt(talentValues[talentValues[`talent_${talentName}_link2`]])) *
                                             2.5
                                 ));
+                                output[`${pathBase}mastery_max`] = Math.floor(
+                                    (values[`${pathBase}skill_mastered`] === "on" ? 10 : 0) +
+                                        (parseInt(talentValues[talentValues[`talent_${talentName}_link1`]]) +
+                                            parseInt(talentValues[talentValues[`talent_${talentName}_link2`]])) *
+                                            2.5
+                                );
                             });
                             setAttrs(output);
                         }
