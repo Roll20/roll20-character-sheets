@@ -1064,7 +1064,7 @@
                     "Langue commune",
                     "Langue runique",
                     "Langue elfique",
-                    "Langue orc (Alabarand)",
+                    "Langue orc",
                     "Langue sacrée",
                     "Langue draconique",
                     "Langue elfique ancienne",
@@ -1247,7 +1247,7 @@
         on(
             skills
                 .filter((s) => s["repeating_section_name"])
-                .map((s) => `change:repeating_talent-${s["repeating_section_name"]}:roll`)
+                .map((s) => `clicked:repeating_talent-${s["repeating_section_name"]}:roll`)
                 .join(" "),
             async function (eventInfo) {
                 const pathBase = eventInfo.sourceAttribute.substring(0, eventInfo.sourceAttribute.length - 4);
@@ -1286,11 +1286,8 @@
             });
         }
 
-        on("change:repeating_skills", async (eventInfo) => {
-            if (eventInfo.triggerName.indexOf("_-") === -1) {
-                return;
-            }
-            calculate_repeating_skills(eventInfo.triggerName);
+        on("change:repeating_skills:link1 change:repeating_skills:link2", async (eventInfo) => {
+            calculate_repeating_skills(eventInfo.sourceAttribute.substring(0, eventInfo.sourceAttribute.length - 6));
         });
 
         function calculate_repeating_masteries(repSections) {
@@ -1320,11 +1317,8 @@
             );
         }
 
-        on("change:repeating_masteries", async (eventInfo) => {
-            if (eventInfo.triggerName.indexOf("_-") === -1) {
-                return;
-            }
-            calculate_repeating_masteries([eventInfo.triggerName]);
+        on("change:repeating_masteries:link1 change:repeating_masteries:link2", async (eventInfo) => {
+            calculate_repeating_masteries([eventInfo.sourceAttribute.substring(0, eventInfo.sourceAttribute.length - 6)]);
         });
 
         function calculate_repeating_talent(basePaths) {
@@ -1334,8 +1328,6 @@
                         ...acc,
                         `${pathBase}talent_name`,
                         `${pathBase}skillname`,
-                        `${pathBase}link1`,
-                        `${pathBase}link2`,
                         `${pathBase}skill_mastered`,
                     ],
                     []
@@ -1384,7 +1376,9 @@
                         calculate_repeating_talent(ids.map((id) => `${sectionName}_${id}_`));
                     });
                 } else {
-                    calculate_repeating_talent([`${eventInfo.triggerName}_`]);
+                    if (eventInfo.sourceAttribute.indexOf("_", eventInfo.sourceAttribute.indexOf('-', 17)) !== -1) {
+                        calculate_repeating_talent([`${eventInfo.triggerName}_`]);
+                    }
                 }
             }
         );
