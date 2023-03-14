@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2023-03-13 ** v.76 Chuz (James Culp)
+Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
 **2023-03-06 ** v.75 Chuz (James Culp)
 	New Feature - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
 	New Feature - Added Heat, Reputation and AsRep to the Social Pane

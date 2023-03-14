@@ -3474,7 +3474,11 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
-								<span class="changelog-entry">**2023-02-27 ** v.74 Chuz (James Culp)</span>
+								<span class="changelog-entry">**2023-03-13 ** v.76 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
+								</ul>
+								<span class="changelog-entry">**2023-02-27 ** v.75 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">F</span><b>New Feature</b> - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
 									<li><span class="bullet">F</span><b>New Feature</b> - Added Heat, Reputation and AsRep to the Social Pane
@@ -6263,7 +6267,7 @@
 <input type="hidden" name="attr_spellcasting_specialist" value="0" />
 <input type="hidden" name="attr_spellcasting_expert" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.75">
+<input type="hidden" name="attr_sheet_version" value="0.76">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 // Sheet workers
@@ -9044,14 +9048,19 @@ var update_initiative = () => {
 
 //Calculate Astral Initiative
 var update_astral_initiative = () => {
-	getAttrs(["intuition", "logic", "astral_initiative_mod", "astral_initiative_temp", "astral_initiative_temp_flag", "astral_initiative_dice_mod", "astral_initiative_dice_temp", "astral_initiative_dice_temp_flag", "astral_initiative_dice"], (v) => {
+	getAttrs(["intuition", "logic", "astral_initiative_mod", "astral_initiative_temp", "astral_initiative_temp_flag", "astral_initiative_dice_mod", "astral_initiative_dice_temp", "astral_initiative_dice_temp_flag", "astral_initiative_dice", "sheet_type"], (v) => {
+		// spirits have specifically defined initiatives, this is messing them up
+		if(v.sheet_type === 'spirit') {
+			return;
+		}
+
 		const int = parseInt(v.intuition) || 0;
 		const log = parseInt(v.logic) || 0;
 		const mod = parseInt(v.astral_initiative_mod) || 0;
 		const tmp = (v.astral_initiative_temp_flag === "on") ? parseInt(v.astral_initiative_temp) || 0 : 0;
 		const bas = int + log;
 		const tot = int + log + mod + tmp;
-		const dice_base = 2;
+		let dice_base = 2;
 
 		const dice_mod = parseInt(v.astral_initiative_dice_mod) || 0;
 		const dice_tmp = (v.astral_initiative_dice_temp_flag === "on") ? parseInt(v.astral_initiative_dice_temp) || 0 : 0;

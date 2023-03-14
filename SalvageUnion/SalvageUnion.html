@@ -7,7 +7,7 @@
         <input class="show-mech" name="attr_is-mech" type="checkbox" hidden/>
         <button type="action" name="act_mech" class="tabs mech-button">Mech</button>
 
-        <input class="show-crawler" name="attr_iscrawler" type="checkbox" hidden/>
+        <input class="show-crawler" name="attr_is-crawler" type="checkbox" hidden/>
         <button type="action" name="act_crawler" class="tabs crawler-button">Union Crawler</button>
 
         <input class="show-notes" name="attr_show-notes-tab" type="checkbox" hidden/>
@@ -190,17 +190,17 @@
                 <div class="descValuePair">
                     <label>System Slots </label>
                     <span style="display: flex">
-                        <input type="number" name="attr_system" value="@{systems_used}" disabled>
+                        <input type="number" name="attr_systems" value="@{systems_used}" disabled>
                         <label> of </label>
-                        <input type="number" name="attr_system_max">
+                        <input type="number" name="attr_systems_max">
                     </span>
                 </div>
                 <div class="descValuePair">
                     <label >Module Slots </label>
                     <span style="display: flex">
-                        <input type="number" name="attr_module" value="@{modules_used}" disabled>
+                        <input type="number" name="attr_modules" value="@{modules_used}" disabled>
                         <label> of</label>
-                        <input type="number" name="attr_module_max">
+                        <input type="number" name="attr_modules_max">
                     </span>
                 </div>
                 <details>
@@ -219,6 +219,11 @@
                     <button type="roll" class="textbutton" value="&{template:criticaldamage}{{name=@{character_name}}}{{roll=[[1d20]]}}">Structure</button>
                     <input type="number" id="structure" min="0" name="attr_structure" value="10">
                     <label> of <input type="number" min="0" name="attr_structure_max" value="10"></label>
+                </div>
+                <input class="show-shield" name="attr_show-shield" type="checkbox" hidden/>
+                <div class="descValuePair shield">
+                    <label for="shield">Shield</label>
+                    <input type="number" id="shield" min="0" name="attr_shield" value="0">
                 </div>
                 <div class="descValuePair">
                     <label for="energyPts">Energy Pts </label>
@@ -264,7 +269,7 @@
                         </div>
                         <div class="descValuePair">
                             <label>Slots</label>
-                            <input type="number" name="attr_slot" value="1">
+                            <input type="number" name="attr_slots" value="1">
                         </div>
                     </details>
                     <textarea name="attr_weapondetails"></textarea>
@@ -312,7 +317,7 @@
                     </div>
                     <div class="descValuePair">
                         <label>Slots</label>
-                        <input type="number" name="attr_slot" value="1">
+                        <input type="number" name="attr_slots" value="1">
                     </div>
                     <div class="descValuePair">
                         <label>Is passive</label>
@@ -360,7 +365,7 @@
                     </div>
                     <div class="descValuePair">
                         <label>Slots</label>
-                        <input type="number" name="attr_slot" value="1">
+                        <input type="number" name="attr_slots" value="1">
                     </div>
                     <div class="descValuePair">
                         <label>Is passive</label>
@@ -415,6 +420,10 @@
                     <input type="number" id="crawlerstructure" min="0" name="attr_structure" value="20">
                     <label> of <input type="number" min="0" name="attr_structure_max" value="20"></label>
                 </div>
+                <div class="descValuePair">
+                    <label for="population">Population</label>
+                    <input type="text" id="population" name="attr_population" value="100">
+                </div>
             </div>
         </div>
 
@@ -448,7 +457,7 @@
                         </div>
                         <div class="descValuePair">
                             <label>Slots</label>
-                            <input type="number" name="attr_slot" value="1">
+                            <input type="number" name="attr_slots" value="1">
                         </div>
                     </details>
                     <textarea name="attr_details"></textarea>
@@ -517,6 +526,10 @@
                 <span>Count Weapons as Systems</span>
                 <input id="countWeapons" name="attr_count-weapons" type="checkbox"/>
             </label>
+            <label for="showShield" class="settings-checkbox">
+                <span>Show Shield</span>
+                <input id="showShield" name="attr_show-shield" type="checkbox"/>
+            </label>
         </details>
 
         <br>
@@ -529,6 +542,15 @@
             <span>Show Notes Tab</span>
             <input id="showNotesTab" name="attr_show-notes-tab" type="checkbox"/>
         </label>
+        <br>
+        <details>
+            <summary>Importer</summary>
+            <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window."></textarea>
+            <button type="action" class="textbutton passiv-hide" name="act_import-mech-stats">Import Mech Stats</button>
+            <button type="action" class="textbutton passiv-hide" name="act_import-mech-weapon">Import Mech Weapon</button>
+            <button type="action" class="textbutton passiv-hide" name="act_import-mech-system">Import Mech System</button>
+            <button type="action" class="textbutton passiv-hide" name="act_import-mech-module">Import Mech Module</button>
+        </details>
     </div>
 </div>
 
@@ -550,18 +572,36 @@ const buttonlist = ["pilot","mech","crawler","notes","settings"];
         });
     });
 
+on("sheet:opened", (eventInfo) => {
+	getAttrs(['character_name'], (v) => {
+		set_display_name(v.character_name);
+	});
+});
+
+on("change:character_name", (eventInfo) => {
+	set_display_name(eventInfo.newValue);
+});
+
+var set_display_name = (name) => {
+	character_name = name.replace(/\(/g, '\[').replace(/\)/g, '\]').replace(/\"/g, '\'');
+	setAttrs({
+		character_name: character_name
+	});
+};
+
+
 on('change:repeating_modules remove:repeating_modules sheet:opened', function() {
-    repeatingSum("modules_used", "slot", "repeating_modules");
+    repeatingSum("modules_used", "slots", "repeating_modules");
 });
 
 on('change:repeating_systems remove:repeating_systems change:repeating_mechweapons remove:repeating_mechweapons sheet:opened', async function() {
     let countWeapons = (await asw.getAttrs(["count-weapons"]))["count-weapons"];
 
     if(countWeapons == 'on') {
-        repeatingSum("systems_used", "slot", "repeating_systems", "repeating_mechweapons");
+        repeatingSum("systems_used", "slots", "repeating_systems", "repeating_mechweapons");
     }
     else {
-        repeatingSum("systems_used", "slot", "repeating_systems");
+        repeatingSum("systems_used", "slots", "repeating_systems");
     }
 
 });
@@ -670,11 +710,173 @@ on('clicked:repeating_modules:use-module clicked:repeating_systems:use-system', 
     finishRoll(roll.rollId, {});
 });
 
+/////////////////////
+//  IMPORTER     ////
+/////////////////////
+
+on('clicked:import-mech-stats', async (ev) => {
+
+        let mech = {};
+
+        let toImport = (await asw.getAttrs(['importerText'])).importerText;
+        let stats = toImport.replaceAll(/[a-zA-Z]/g, '').replaceAll(/\./g, '').replaceAll(/^\s*[\r\n]/gm, '').trim().split(/\r?\n|\s+/);
+
+        if(stats.length < 6) {
+            asw.setAttrs({
+                importerText: 'Could not parse input: Not enough values'
+            });
+            return;
+        }
+
+        if(!toImport.startsWith(' ') && !/^\d+/g.test(toImport)) {
+            let name = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+            mech.character_name = name;
+            mech.chassis = name;
+        }
+
+        if(/CHASSIS\s*ABILITY/.test(toImport)) {
+           mech.chassisDetails = toImport.split(/CHASSIS\s*ABILITY/)[1].replaceAll(/[\r\n]/gm, '').trim();
+        }
+
+        mech.structure = stats[0];
+        mech.structure_max = stats[0];
+        mech.energy = stats[1];
+        mech.energy_max = stats[1];
+        mech.heat_max = stats[2];
+        mech.systems_max = stats[3];
+        mech.modules_max = stats[4];
+        mech.maxcargo = stats[5];
+        mech.importerText = "Values imported";
+
+         await asw.setAttrs(mech);
+});
+
+on('clicked:import-mech-weapon', async (ev) => {
+
+        let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
+
+        var row = "repeating_mechweapons_" + generateRowID() + "_";
+        let weapon = {};
+
+        if(/T\d/.test(toImport)) {
+           let tier = toImport.match(/T\d/).pop();
+
+           let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
+           weapon[row + "scrap"] = associatedCost[1] + " " + tier;
+           weapon[row + "slots"] = parseInt(associatedCost[0]);
+
+           toImport = toImport.split(/T\d/)[0].trim()
+        }
+
+        toImport = toImport.replaceAll(/[\r\n]/gm, '#').split('#');
+
+        weapon[row + "weaponname"] = toImport[0];
+        weapon[row + "range"] = toImport[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim();
+        weapon[row + "damage"] = toImport[1].split('//')[1].replaceAll(/[a-zA-Z]*:/g, '').trim();
+
+        if(toImport[1].includes("Hot (")) {
+            weapon[row + "weaponheat"] = toImport[1].match(/Hot \(\d\)/g).pop().match(/\d+/).pop();
+        }
+        else {
+            weapon[row + "weaponheat"] = 0;
+        }
+
+        weapon[row + "weapondetails"] = toImport[1].split('//').slice(2).join('//').trim() + "\n" + toImport.slice(2).join(' ').trim();
+        weapon["importerText"] ='Values imported'
+
+        asw.setAttrs(weapon);
+});
+
+on('clicked:import-mech-system', async (ev) => {
+
+        let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
+
+        var row = "repeating_systems_" + generateRowID() + "_";
+        let system = {};
+
+        system[row + "name"] = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+
+        if(toImport.split(/\r?\n/)[1].includes("EP")) {
+            system[row + "cost"] = toImport.split(/\r?\n/)[1].trim();
+            toImport = toImport.replaceAll(toImport.split(/\r?\n/)[1], '');
+        }
+
+        toImport = toImport.replaceAll(/^\s*[\r\n]/gm, '');
+
+        let rules = toImport.split(/\r?\n/)[1].trim();
+
+        if(rules.includes("Range:")) {
+            system[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
+            rules = rules.split('//').slice(1).join('//').trim()
+        }
+
+         if(/T\d/.test(toImport)) {
+           let tier = toImport.match(/T\d/).pop();
+
+           let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
+           system[row + "scrap"] = associatedCost[1] + " " + tier;
+           system[row + "slots"] = associatedCost[0];
+
+           toImport = toImport.split(/T\d/)[0].trim()
+        }
+
+        let longtext = toImport.split('\n').slice(2).join('').trim();
+        system[row + "details"] = rules + "\n" + longtext;
+
+        system.importerText = 'Values imported'
+
+        asw.setAttrs(system);
+});
+
+on('clicked:import-mech-module', async (ev) => {
+
+let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
+
+        var row = "repeating_modules_" + generateRowID() + "_";
+        let module = {};
+
+        module[row + "name"] = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+
+        if(toImport.split(/\r?\n/)[1].includes("EP")) {
+            module[row + "cost"] = toImport.split(/\r?\n/)[1].trim();
+            toImport = toImport.replaceAll(toImport.split(/\r?\n/)[1], '');
+        }
+
+        toImport = toImport.replaceAll(/^\s*[\r\n]/gm, '');
+
+        let rules = toImport.split(/\r?\n/)[1].trim();
+
+        if(rules.includes("Range:")) {
+            module[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
+            rules = rules.split('//').slice(1).join('//').trim()
+        }
+
+         if(/T\d/.test(toImport)) {
+           let tier = toImport.match(/T\d/).pop();
+
+           let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
+           module[row + "scrap"] = associatedCost[1] + " " + tier;
+           module[row + "slots"] = associatedCost[0];
+
+           toImport = toImport.split(/T\d/)[0].trim()
+        }
+
+        let longtext = toImport.split('\n').slice(2).join('').trim();
+        module[row + "details"] = rules + "\n" + longtext;
+
+        module.importerText = 'Values imported'
+
+        asw.setAttrs(module);
+});
 
 
 ///////////////////
 //  HELPER     ////
 ///////////////////
+
+const removeLineBreakInRules = (toImport) => {
+    return toImport.replaceAll(/\/\/\s*[\r\n]/gm, '// ').replaceAll(/[\r\n]/gm, '#').replaceAll(/#\/\//g, '//').replaceAll(/#/g, '\n')
+};
 
 async function repeatingSum (destination, fieldsum, ...sections){
     // destination = the name of the attribute that stores the total
