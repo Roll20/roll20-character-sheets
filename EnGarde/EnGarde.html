@@ -492,22 +492,22 @@
     <div class="sheet-outcome">
         <div class="sheet-monthlyVariablesDesc sheet-borderRight" data-i18n="Death"></div>
         <div class="sheet-borderRight">
-            <input type="text" class="sheet-text_input" name="attr_death" value="0"> 
+            <input type="text" class="sheet-text_input" name="attr_death" readonly value="0"> 
         </div>       
          <div class="sheet-monthlyVariablesDesc sheet-borderRight" data-i18n="Mention"></div>
         <div class="sheet-borderRight">
-            <input type="text" class="sheet-text_input" name="attr_mention" value="0">             
+            <input type="text" class="sheet-text_input" name="attr_mention"  readonly value="0">             
         </div>   
         <div class="sheet-monthlyVariablesDesc sheet-borderRight" data-i18n="Promotion"></div>
         <div class="sheet-borderRight">
-            <input type="text" class="sheet-text_input" name="attr_promotion" value="0">             
+            <input type="text" class="sheet-text_input" name="attr_promotion"  readonly value="0">             
         </div>
         <div class="sheet-monthlyVariablesDesc sheet-borderRight" data-i18n="Plunder"></div>
         <div class="sheet-borderRight">
-            <input type="text" class="sheet-text_input" name="attr_plunder" value="0">             
+            <input type="text" class="sheet-text_input" name="attr_plunder"  readonly value="0">             
         </div>
             <div class="sheet-borderRight">
-            <input type="text" class="sheet-text_input" name="attr_plunder_value" value="">             
+            <input type="text" class="sheet-text_input" name="attr_plunder_value"  readonly value="">             
         </div> 
     </div>
     <!--<div class="sheet-bravery-poltroonery sheet-borderRight">
@@ -565,17 +565,18 @@
             <b><span  data-i18n="Yes">Yes</span></b>
         {{/^rollLess() promotion_roll promotion_target}}    
    </div>  
-      
-   {{#rollTotal() show_plunder 1}}     
-        <div>Plunder   {{plunder_roll}} >= {{plunder_target}}
-        {{#rollLess() plunder_roll plunder_target}}
-            <b><span data-i18n="No">No</span></b></div>
-        {{/rollLess() plunder_roll plunder_target}}
-        {{#^rollLess() plunder_roll plunder_target}}
-            <b><span  data-i18n="Yes">Yes</span></b></div>                  
-            <div>{{plunder_value}} Crowns</div>
-        {{/^rollLess() plunder_roll plunder_target}}        
-   {{/rollTotal() show_plunder 1}} 
+   {{#rollTotal() poltroon 0}}   
+       {{#rollTotal() show_plunder 1}}     
+            <div>Plunder   {{plunder_roll}} >= {{plunder_target}}
+            {{#rollLess() plunder_roll plunder_target}}
+                <b><span data-i18n="No">No</span></b></div>
+            {{/rollLess() plunder_roll plunder_target}}
+            {{#^rollLess() plunder_roll plunder_target}}
+                <b><span  data-i18n="Yes">Yes</span></b></div>                  
+                <div>{{plunder_value}} Crowns</div>
+            {{/^rollLess() plunder_roll plunder_target}}        
+       {{/rollTotal() show_plunder 1}}
+   {{/rollTotal() poltroon 0}}      
    {{#rollTotal() poltroon 1}}
      <div>
         <span  data-i18n="poltroonery"></span> {{poltroon_value}}
@@ -600,7 +601,7 @@
     
     const defense = [["9","9","8","7","2x100"],["8","10","7","9","2x50"],["10","12","9","12","1x50"],["10","12","9","12","1x50"],["6","7","5","-",""],["7","11","6","-",""]];
     
-    const fieldops = [["10","9","9","8","2 x 50"],["10","10","9","9","2 x 100"],["9","12","8","10","2 x 50"],["8","12","7","11","1 x 50"],["7","10","6","12","1 x 50"],["6","7","5","-",""]];
+    const fieldops = [["10","9","9","8","2x50"],["10","10","9","9","2x100"],["9","12","8","10","2x50"],["8","12","7","11","1x50"],["7","10","6","12","1x50"],["6","7","5","-",""]];
     
     
     const army = {death:4, mention:0, promotion:0, plunder:-3};    
@@ -666,9 +667,9 @@
         if (dice_mod < 0){
             roll_str="&{template:outcome} {{death_roll=[[2D6"+values.bravery_poltroonery+"]]}} {{mention_roll=[[2D6]]}} {{promotion_roll=[[2D6]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{poltroon=[[1]]}} {{poltroon_value=[["+Math.abs(dice_mod)+"]]}} {{plunder_roll=[[2D6]]}}"            
         } else if (dice_mod > 0){
-            roll_str="&{template:outcome} {{death_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{mention_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{promotion_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{bravery=[[1]]}} {{bravery_value=[["+dice_mod+"]]}} {{plunder_roll=[[2D6+"+values.bravery_poltroonery+"]]}}"    
+            roll_str="&{template:outcome} {{death_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{mention_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{promotion_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{bravery=[[1]]}} {{bravery_value=[["+dice_mod+"]]}} {{plunder_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{poltroon=[[0]]}}"    
         } else {
-            roll_str="&{template:outcome} {{death_roll=[[2D6]]}} {{mention_roll=[[2D6]]}} {{promotion_roll=[[2D6]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{plunder_roll=[[2D6]]}}" 
+            roll_str="&{template:outcome} {{death_roll=[[2D6]]}} {{mention_roll=[[2D6]]}} {{promotion_roll=[[2D6]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{plunder_roll=[[2D6]]}}  {{poltroon=[[0]]}}" 
             console.log("marker1");
             console.log("roll_str1:"+roll_str)        
         }
@@ -704,8 +705,7 @@
                 if (values.battle_regiment=="regiment0" || values.force_deployment=="0" ||   values.battle_result=="0" ){
                     setAttrs({death:0,mention:0,promotion:0,plunder:0,plunder_value:""})
                 } else{
-                    deployment = values.force_deployment
-                    console.log("fing deployment:"+deployment);
+                    deployment = values.force_deployment;
                     br = parseInt(values.battle_result);
                     
                     let death = 0;
