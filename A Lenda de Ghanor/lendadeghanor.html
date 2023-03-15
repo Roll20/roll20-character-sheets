@@ -3352,7 +3352,7 @@
                 "condicaoperfisico", "condicaopermental", "condicaocego", "condicaomodataquedis"   
         ], function(v){
 
-        let setObj = {}
+            let setObj = {};
         setObj['menace_name'] = v.character_name;
         setObj['menace_hp'] = v.vida_max;
         let mana_total = parseInt(v.manatotal) ? parseInt(v.manatotal) : 0;
@@ -3362,14 +3362,28 @@
 
 
         let metade_nivel = Math.floor(Number.parseFloat(v.charnivel)/2);
+            let splitAttr = stripTag(v.iniciativaatributo2).split("+");
+            let attrSum = 0;
             
-        let atribute = parseInt(v.condicaopericia) + parseInt(v.periciatemp) + parseInt(v.rolltemp) + parseInt(v.condicaoiniciativa) + parseInt(metade_nivel) + parseInt(v[stripTag(v.iniciativaatributo2)]) + (parseInt(v.bonus_treino) * parseInt(v.iniciativa_treinada)) + parseInt(v.iniciativaoutros);
+            for(let i=0; i < splitAttr.length; i++){                    
+                attrSum += parseInt(v[`${stripTag(splitAttr[i].trim())}`]);      
+            }
+                
+            let atribute = parseInt(v.condicaopericia) + parseInt(v.periciatemp) + parseInt(v.rolltemp) + parseInt(v.condicaoiniciativa) + parseInt(metade_nivel) + parseInt(attrSum) + (parseInt(v.bonus_treino) * parseInt(v.iniciativa_treinada)) + parseInt(v.iniciativaoutros);
         setObj['menace_init'] = atribute > 0 ? "+" + atribute : atribute;
-        atribute = parseInt(v.condicaopericia) + parseInt(v.periciatemp) + parseInt(v.rolltemp) + parseInt(v.condicaopercepcao) + parseInt(metade_nivel) + parseInt(v[stripTag(v.percepcaoatributo2)]) + (parseInt(v.bonus_treino) * parseInt(v.percepcao_treinada)) + parseInt(v.percepcaooutros); 
+
+            splitAttr = stripTag(v.percepcaoatributo2).split("+");
+            attrSum = 0;
+            
+            for(let i=0; i < splitAttr.length; i++){                    
+                attrSum += parseInt(v[stripTag(splitAttr[i].trim())]);            
+            }
+            
+            atribute = parseInt(v.condicaopericia) + parseInt(v.periciatemp) + parseInt(v.rolltemp) + parseInt(v.condicaopercepcao) + parseInt(metade_nivel) + parseInt(attrSum) + (parseInt(v.bonus_treino) * parseInt(v.percepcao_treinada)) + parseInt(v.percepcaooutros); 
         setObj['menace_percep'] = atribute > 0 ? "+" + atribute : atribute;
 
-            let splitAttr = stripTag(v.fortitudeatributo2).split("+");
-            let attrSum = 0;
+            splitAttr = stripTag(v.fortitudeatributo2).split("+");
+            attrSum = 0;
             
             for(let i=0; i < splitAttr.length; i++){                    
                 attrSum += parseInt(v[stripTag(splitAttr[i].trim())]);            
@@ -3383,6 +3397,8 @@
             
             for(let i=0; i < splitAttr.length; i++){                    
                 attrSum += parseInt(v[stripTag(splitAttr[i].trim())]);            
+                
+                console.log(splitAttr[i] + stripTag(splitAttr[i]) + v[stripTag(splitAttr[i].trim())])                 
             }
                        
             atribute = parseInt(v.resistemp) + parseInt(v.condicaopericia) + parseInt(v.periciatemp) + parseInt(v.rolltemp) + parseInt(metade_nivel) + parseInt(attrSum) + (parseInt(v.bonus_treino) * parseInt(v.reflexos_treinada)) + parseInt(v.reflexosoutros);      
@@ -3393,6 +3409,8 @@
             
             for(let i=0; i < splitAttr.length; i++){                    
                 attrSum += parseInt(v[stripTag(splitAttr[i].trim())]);            
+                
+                console.log(splitAttr[i] + stripTag(splitAttr[i]) + v[stripTag(splitAttr[i].trim())])              
             }
             
             atribute = parseInt(v.resistemp) + parseInt(v.condicaoreflexo) + parseInt(v.condicaopericia) + parseInt(v.periciatemp) + parseInt(v.rolltemp) + parseInt(metade_nivel) + parseInt(attrSum) + (parseInt(v.bonus_treino) * parseInt(v.vontade_treinada)) + parseInt(v.vontadeoutros);            
@@ -3409,8 +3427,8 @@
                 
         [
             'acrobacia','adestramento','atletismo','atuacao','cavalgar','conhecimento','cura','diplomacia',
-            'enganacao','furtividade','guerra','intimidacao','intuicao','investigacao','jogatina','ladinagem',
-            'misticismo','nobreza','oficio','oficio2','pilotagem','religiao','sobrevivencia'
+            'enganacao','furtividade','guerra','intimidacao','intuicao','investigacao','ladinagem',
+            'misticismo','nobreza','oficio','oficio2','religiao','sobrevivencia'
         ].forEach(skill => {                          
             getAttrs([
                 `${skill}_treinada`, `menace-${skill}`, `${skill}atributo2`, `${skill}outros`, 'bonus_treino',
@@ -3418,13 +3436,12 @@
                 "periciatemp", "rolltemp", "condicaopericia", "condicaomodataquecc", "condicaomodataque",
                 "condicaoperfisico", "condicaopermental", "condicaocego", "condicaomodataquedis"         
             ], function(x){  
-                let setObj = {}
-
-                let splitAttr = stripTag(x[`${skill}atributo2`]).split(" + ");
+                let setObj = {};
+                let splitAttr = stripTag(x[`${skill}atributo2`]).split("+");
                 let attrSum = 0;
                 
                 for(let i=0; i < splitAttr.length; i++){                    
-                    attrSum += parseInt(x[stripTag(splitAttr[i])]);            
+                    attrSum += parseInt(x[stripTag(splitAttr[i].trim())]);            
                 }
                 
                 let metade_nivel = Math.floor(Number.parseFloat(x.charnivel)/2);
@@ -3452,7 +3469,11 @@
     }
     
 
-    const stripTag = (tag) => { return tag.replace('@{','').replace('}','').replace('+@{condicaomodataquecc}+@{condicaomodataque}','').replace(' ',''); } 
+    const stripTag = (tag) => { 
+            let clean_tag = tag.replace('@{','').replace('}','').replace('+@{condicaomodataquecc}+@{condicaomodataque}','')
+                .replace('+@{condicaomodataquedis}+@{condicaomodataque}','').trim(); 
+            return clean_tag;
+        } 
 
     const createDice = () => {
         return '<button type="roll" name="roll_attack" class="buttonrollataque dado-simples" value="">T</button>'                    
@@ -3569,8 +3590,10 @@
 
         getSectionIDs('repeating_attacks', (idarray) => {
             getAttrs(
-                [   'charnivel', 'lutaatributo2', 'bonus_treino', 'luta_treinada', 'lutaoutros',
+                [   'charnivel', 'bonus_treino',
+                    'lutaatributo2', 'luta_treinada', 'lutaoutros',
                     'pontariaatributo2', 'pontaria_treinada', 'pontariaoutros',
+                    'atuacaoatributo2', 'atuacao_treinada', 'atuacaooutros',
                     'for_mod', 'des_mod', 'con_mod', 'int_mod', 'sab_mod', 'car_mod', 'character_name',
                     "condicaomodataquecc", "condicaomodataquedis", "condicaomodataque", 
                     "rolltemp", "ataquetemp", "danotemp", "periciatemp"
@@ -3597,6 +3620,7 @@
                             let newrowattrs = {};
                             let rowId = generateRowID();        
                             let ataqueaTributo = stripTag(values[`${tagPericia}atributo2`]).split(' ')[0]; 
+                            
                                             
                             let ataque_fim = calcAtaqueFim(values['charnivel'], values[ataqueaTributo], values['bonus_treino'], values[`${tagPericia}_treinada`], values[`${tagPericia}outros`]);
                             
