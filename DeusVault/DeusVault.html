@@ -4,7 +4,7 @@
     <input id="section-1" type="radio" name="attr_section" value="1" hidden />
     <input id="section-2" type="radio" name="attr_section" value="2" hidden />
     <input id="section-3" type="radio" name="attr_section" value="3" hidden />
-    <input class="sheet-option-btn" type="checkbox" name="attr_options_show" />
+    <input class="sheet-option-btn" type="checkbox" name="options_show" />
     <span></span>
     <div class="sheet-options">
         <h2>Options</h2>
@@ -170,7 +170,7 @@
             </div>
             <div>
                 <div class="sheet-s-50">
-                    <input name="attr_speed" type="text" title="@{speed}" value="0" />
+                    <input name="attr_speed" type="text" title="@{speed}" value="9" />
                 </div>
                 <span>Vitesse</span>
             </div>
@@ -276,7 +276,7 @@
                     </div>
                     <div>
                         <fieldset class="repeating_attacks">
-                            <div class="sheet-attack-section">
+                            <div class="sheet-attack-section sheet-option-btn-container">
                                 <input type="hidden" name="attr_extended" />
                                 <div class="sheet-skill-section">
                                     <button class="sheet-button-roll" name="act_roll" type="action"></button>
@@ -880,6 +880,85 @@
                                 </fieldset>
                             </div>
                         </div>
+                        <div class="sheet-talent-container sheet-display-repcontrol">
+                            <input
+                                class="sheet-expand-talent-btn"
+                                type="checkbox"
+                                id="attr_expend_other"
+                                name="attr_expend_other"
+                                hidden
+                            />
+                            <div class="sheet-talent-title">
+                                <label for="attr_expend_other">
+                                    <h3>
+                                        <span class="material-icons sheet-expend-icon">expand_more</span>
+                                        <span class="material-icons sheet-retract-icon">expand_less</span>
+                                        Autres
+                                    </h3>
+                                </label>
+                            </div>
+                            <div class="sheet-talent-list">
+                                <fieldset class="repeating_talent-other">
+                                    <div class="sheet-talent-other sheet-option-btn-container">
+                                        <div class="sheet-skill-section">
+                                            <input type="hidden" name="attr_extended" />
+                                            <div>
+                                                <button
+                                                    class="sheet-button-roll"
+                                                    name="act_roll"
+                                                    type="action"
+                                                ></button>
+                                                <input type="text" name="attr_skillname" value="" />
+                                                <div class="sheet-skill-xp">
+                                                    <input type="text" name="attr_skill_xp" value="0" />/1000
+                                                </div>
+                                                <input
+                                                    type="checkbox"
+                                                    name="attr_skill_mastered"
+                                                    title="@{skill_mastered}"
+                                                />
+                                                <input
+                                                    class="sheet-mastery-value"
+                                                    type="text"
+                                                    name="attr_mastery"
+                                                    value="@{mastery}%"
+                                                    disabled
+                                                />
+                                                <input
+                                                    type="hidden"
+                                                    name="attr_mastery_max"
+                                                    value="@{mastery_max}"
+                                                    disabled
+                                                />
+                                            </div>
+                                            <div class="sheet-link">
+                                                <select name="attr_link1">
+                                                    <option value="strength">FOR</option>
+                                                    <option value="dexterity">DEX</option>
+                                                    <option selected value="endurance">END</option>
+                                                    <option value="intelligence">INT</option>
+                                                    <option value="charisma">CHA</option>
+                                                </select>
+                                                /
+                                                <select name="attr_link2">
+                                                    <option value="strength">FOR</option>
+                                                    <option value="dexterity">DEX</option>
+                                                    <option value="endurance">END</option>
+                                                    <option selected value="intelligence">INT</option>
+                                                    <option value="charisma">CHA</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <input
+                                            class="sheet-option-btn sheet-extend-btn"
+                                            type="checkbox"
+                                            name="attr_extended"
+                                        />
+                                        <span></span>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1195,8 +1274,8 @@
             getAttrs(["privaterolls"], (values) => {
                 const success = skillLevel
                     ? [
-                          Math.min(Math.floor(skillLevel * 1/3), 90),
-                          Math.min(Math.floor(skillLevel * 2/3), 90),
+                          Math.min(Math.floor((skillLevel * 1) / 3), 90),
+                          Math.min(Math.floor((skillLevel * 2) / 3), 90),
                           Math.min(skillLevel, 90),
                           Math.min(skillLevel + 10, 90),
                           Math.min(skillLevel + 20, 90),
@@ -1204,7 +1283,7 @@
                     : undefined;
                 const cmd = `${
                     values["privaterolls"]
-                }&{template:rt1} {{ccc=1}} {{name=${name}}} {{character_name=[@{character_name}](http://journal.roll20.net/character/@{character_id})}} ${
+                }&{template:rt1} {{name=${name}}} {{character_name=[@{character_name}](http://journal.roll20.net/character/@{character_id})}} ${
                     success ? success.map((v, i) => `{{success${i}=${v}%}}`).join(" ") + " {{successLevel=[[-1]]}}" : ""
                 } {{roll=[[${roll ? roll : "1d100"}]]}} ${description ? `{{description=${description}}}` : ""} ${
                     displayRoll ? `{{damageRolled=${roll}}}` : ""
@@ -1256,10 +1335,10 @@
         });
 
         on(
-            skills
+            `clicked:repeating_talent-other:roll ${skills
                 .filter((s) => s["repeating_section_name"])
                 .map((s) => `clicked:repeating_talent-${s["repeating_section_name"]}:roll`)
-                .join(" "),
+                .join(" ")}`,
             async function (eventInfo) {
                 const pathBase = eventInfo.sourceAttribute.substring(0, eventInfo.sourceAttribute.length - 4);
                 getAttrs([`${pathBase}skillname`, `${pathBase}mastery_max`], (values) => {
@@ -1276,16 +1355,13 @@
         function calculate_repeating_skills(repSection) {
             getAttrs([`${repSection}_link1`, `${repSection}_link2`, ...characteristicNames], (values) => {
                 const output = {};
-                output[`${repSection}_mastery`] = Math.min(90, Math.floor(
-                    (parseInt(values[getLinkAttr(values[`${repSection}_link1`])]) +
-                        parseInt(values[getLinkAttr(values[`${repSection}_link2`])])) *
-                        2.5
-                ));
-                output[`${repSection}_mastery_max`] = Math.floor(
+                const masteryMax = Math.floor(
                     (parseInt(values[getLinkAttr(values[`${repSection}_link1`])]) +
                         parseInt(values[getLinkAttr(values[`${repSection}_link2`])])) *
                         2.5
                 );
+                output[`${repSection}_mastery`] = Math.min(90, masteryMax);
+                output[`${repSection}_mastery_max`] = masteryMax;
                 setAttrs(output);
             });
         }
@@ -1309,18 +1385,14 @@
                 (values) => {
                     const output = {};
                     repSections.forEach((repSection) => {
-                        output[`${repSection}_mastery`] = Math.min(90, Math.floor(
-                            (parseInt(values[getLinkAttr(values[`${repSection}_link1`])]) +
-                                parseInt(values[getLinkAttr(values[`${repSection}_link2`])])) /
-                                2 +
-                                parseInt(values[`${repSection}_mastery_bonus`])
-                        ));
-                        output[`${repSection}_mastery_max`] = Math.floor(
+                        const masteryMax = Math.floor(
                             (parseInt(values[getLinkAttr(values[`${repSection}_link1`])]) +
                                 parseInt(values[getLinkAttr(values[`${repSection}_link2`])])) /
                                 2 +
                                 parseInt(values[`${repSection}_mastery_bonus`])
                         );
+                        output[`${repSection}_mastery`] = Math.min(90, masteryMax);
+                        output[`${repSection}_mastery_max`] = masteryMax;
                     });
                     setAttrs(output);
                 }
@@ -1328,21 +1400,20 @@
         }
 
         on("change:repeating_masteries:link1 change:repeating_masteries:link2", async (eventInfo) => {
-            calculate_repeating_masteries([eventInfo.sourceAttribute.substring(0, eventInfo.sourceAttribute.length - 6)]);
+            calculate_repeating_masteries([
+                eventInfo.sourceAttribute.substring(0, eventInfo.sourceAttribute.length - 6),
+            ]);
         });
         on("change:repeating_masteries:mastery_bonus", async (eventInfo) => {
-            calculate_repeating_masteries([eventInfo.sourceAttribute.substring(0, eventInfo.sourceAttribute.length - 14)]);
+            calculate_repeating_masteries([
+                eventInfo.sourceAttribute.substring(0, eventInfo.sourceAttribute.length - 14),
+            ]);
         });
 
         function calculate_repeating_talent(basePaths) {
             getAttrs(
                 basePaths.reduce(
-                    (acc, pathBase) => [
-                        ...acc,
-                        `${pathBase}talent_name`,
-                        `${pathBase}skillname`,
-                        `${pathBase}skill_mastered`,
-                    ],
+                    (acc, pathBase) => [...acc, `${pathBase}talent_name`, `${pathBase}skill_mastered`],
                     []
                 ),
                 (values) => {
@@ -1361,18 +1432,14 @@
                             const output = {};
                             basePaths.forEach((pathBase) => {
                                 const talentName = values[`${pathBase}talent_name`];
-                                output[`${pathBase}mastery`] = Math.min(90, Math.floor(
-                                    (values[`${pathBase}skill_mastered`] === "on" ? 10 : 0) +
-                                        (parseInt(talentValues[talentValues[`talent_${talentName}_link1`]]) +
-                                            parseInt(talentValues[talentValues[`talent_${talentName}_link2`]])) *
-                                            2.5
-                                ));
-                                output[`${pathBase}mastery_max`] = Math.floor(
+                                const masteryMax = Math.floor(
                                     (values[`${pathBase}skill_mastered`] === "on" ? 10 : 0) +
                                         (parseInt(talentValues[talentValues[`talent_${talentName}_link1`]]) +
                                             parseInt(talentValues[talentValues[`talent_${talentName}_link2`]])) *
                                             2.5
                                 );
+                                output[`${pathBase}mastery`] = Math.min(90, masteryMax);
+                                output[`${pathBase}mastery_max`] = masteryMax;
                             });
                             setAttrs(output);
                         }
@@ -1394,12 +1461,55 @@
                         calculate_repeating_talent(ids.map((id) => `${sectionName}_${id}_`));
                     });
                 } else {
-                    if (eventInfo.sourceAttribute.indexOf("_", eventInfo.sourceAttribute.indexOf('-', 17)) !== -1) {
+                    if (eventInfo.sourceAttribute.indexOf("_", eventInfo.sourceAttribute.indexOf("-", 17)) !== -1) {
                         calculate_repeating_talent([`${eventInfo.triggerName}_`]);
                     }
                 }
             }
         );
+
+        function calculate_repeating_talent_other(basePaths) {
+            getAttrs(
+                basePaths.reduce(
+                    (acc, pathBase) => [
+                        ...acc,
+                        `${pathBase}skillname`,
+                        `${pathBase}skill_mastered`,
+                        `${pathBase}link1`,
+                        `${pathBase}link2`,
+                    ],
+                    [...characteristicNames]
+                ),
+                (values) => {
+                    const output = {};
+                    basePaths.forEach((pathBase) => {
+                        const masteryMax = Math.floor(
+                            (values[`${pathBase}skill_mastered`] === "on" ? 10 : 0) +
+                                (parseInt(values[values[`${pathBase}link1`]]) +
+                                    parseInt(values[values[`${pathBase}link2`]])) *
+                                    2.5
+                        );
+                        output[`${pathBase}mastery`] = Math.min(90, masteryMax);
+                        output[`${pathBase}mastery_max`] = masteryMax;
+                    });
+                    setAttrs(output);
+                }
+            );
+        }
+
+        on("change:repeating_talent-other", (eventInfo) => {
+            const rowIdIdx = eventInfo.triggerName.indexOf("_-");
+            if (rowIdIdx === -1) {
+                const sectionName = eventInfo.triggerName.substring(0, eventInfo.triggerName.lastIndexOf("_"));
+                getSectionIDs(sectionName, (ids) => {
+                    calculate_repeating_talent_other(ids.map((id) => `${sectionName}_${id}_`));
+                });
+            } else {
+                if (eventInfo.sourceAttribute.indexOf("_", eventInfo.sourceAttribute.indexOf("-", 17)) !== -1) {
+                    calculate_repeating_talent_other([`${eventInfo.triggerName}_`]);
+                }
+            }
+        });
 
         on(characteristicNames.map((c) => `change:${c}`).join(" "), async (eventInfo) => {
             getSectionIDs("repeating_masteries", (ids) => {
@@ -1431,6 +1541,9 @@
                     });
                 }
             );
+            getSectionIDs("repeating_talent-other", (ids) => {
+                calculate_repeating_talent_other(ids.map((i) => `repeating_talent-other_${i}_`));
+            });
         });
     })();
 </script>
