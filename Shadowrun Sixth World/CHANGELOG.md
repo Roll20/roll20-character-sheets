@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2023-03-20 ** v.77 Chuz (James Culp)
+	Bugfix - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
+	Bugfix - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
 **2023-03-13 ** v.76 Chuz (James Culp)
 Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
 **2023-03-06 ** v.75 Chuz (James Culp)
