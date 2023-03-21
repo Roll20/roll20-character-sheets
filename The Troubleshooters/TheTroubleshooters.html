@@ -1,0 +1,1439 @@
+<!--
+	CREATED by 			Richard M
+	EDITED by 			Gorthian
+	Version				CF Release
+	Letzte Änderung		2022-10-29
+	
+	GitHub				https://github.com/Gorthian/Roll20_Troubleshooters_CharacterSheet
+	Wiki				https://github.com/Gorthian/Roll20_Troubleshooters_CharacterSheet/wiki
+	Bugs & Issues		https://github.com/Gorthian/Roll20_Troubleshooters_CharacterSheet/issues
+//-->
+
+<input style="display:none;" type="checkbox" class="sheet-isnpc-check" name="attr_isnpc" value="1" />
+<div class="sheet-ts">
+	<div class="sheet-header">
+		<div>
+			<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/The Troubleshooters/Logo-Black.png" class="sheet-logo" title="" data-i18n-title="image-disclaimer">
+		</div>
+		<div></div>
+		<div style="border: 1px black solid; padding: 10px;">
+			<div class="sheet-pcstats">
+				<input type="number" name="attr_vitality" class="sheet-number" min="0" max="20" title="Current Vitality" data-i18n-title="current-vitality"/> / <input type="number" name="attr_vitality_max_vis" class="sheet-skill" value="4" readonly="true" title="Max Vitality (based on skill values & conditions)" data-i18n-title="max-vitality"/>
+				<input type="hidden" class="sheet-number" name="attr_vitality_max"  value="4"/>&nbsp;|&emsp;&emsp;
+				<input type="number" name="attr_storypoints" class="sheet-number" value="4" min="0" max="12" title="Story Points" data-i18n-title="story-points"/>&emsp;&emsp;|&emsp;
+				<input type="number" name="attr_advancements" class="sheet-number" value="0" min="0" max="10" title="Advancement / Reward Rolls" data-i18n-title="advancement"/>
+				<br>
+				&ensp;<label style="display: inline; font-size: 1em" data-i18n="vitality-max">Vitality / Max</label>&ensp;&nbsp;|&ensp;
+				<label style="display: inline; font-size: 1em" data-i18n="story-points">Story Points</label>&nbsp;|&nbsp; 
+				<label style="display: inline; font-size: 1em" data-i18n="advances">Advances</label>
+			</div>
+			<br/>
+			<span style="display:none" data-i18n="how-many-dice">How many dice</span>
+			<button type="roll" class="sheet-blank-button" value="&{template:basic} {{name=@{name}}} {{result=[[?{@{how_many_dice}|1}d6]]}} {{dicetype=d6}} {{dicecount=?{@{how_many_dice}|1}}}" title="Summing Dice" data-i18n-title="summing-dice-title" data-i18n="summing-dice">Nd6</button>
+			<button type="roll" class="sheet-blank-button" value="&{template:basic} {{name=@{name}}} {{result=[[?{@{how_many_dice}|1}d6>4]]}} {{dicetype=dP}} {{dicecount=?{@{how_many_dice}|1}}}" title="Non-exploding Dice Pool" data-i18n-title="non-exploding-pool-title" data-i18n="non-exploding-pool">NdP</button>
+			<button type="roll" class="sheet-blank-button" value="&{template:basic} {{name=@{name}}} {{result=[[?{@{how_many_dice}|1}d6!>6>4]]}} {{dicetype=dX}} {{dicecount=?{@{how_many_dice}|1}}}" title="Exploding Dice Pool" data-i18n-title="exploding-pool-title" data-i18n="exploding-pool">NdX</button>
+			<button type="action" class="sheet-blank-button btn ui-draggable" name="act_basicd100" title="Add text in translation files" data-i18n-title="percentile-dice-title" data-i18n="percentile-dice">d100</button>
+			<button hidden="true" style="display:none;" type="roll" name="roll_flip" value="&{template:d100-flip} {{name=@{name}}} {{charname=@{character_name}}} {{tens=@{last-roll-ones}}} {{ones=@{last-roll-tens}}} {{outcome=[[@{last-roll-fliped}]]}} {{skill=@{last-roll-skill}}} {{skill_raw=@{last-roll-skill-raw}}} {{target=@{last-roll-target}}} {{pips=@{last-roll-pips}}} {{type=[[@{last-roll-type}]]}}" />
+			<button hidden="true" style="display:none;" type="roll" name="roll_flip-ini" value="&{template:d100-flip-ini} {{name=@{name}}} {{charname=@{character_name}}} {{tens=@{last-roll-ones}}} {{ones=@{last-roll-tens}}} {{success=[[@{last-roll-fliped}]]}} {{skill=@{last-roll-skill}}} {{target=@{last-roll-target}}} {{pips=@{last-roll-pips}}} {{ini=@{last-roll-ini-fliped}}}" />
+			<button hidden="true" style="display:none;" type="roll" name="roll_settracker" value="! [[@{last-roll-ini} &{tracker}]]" />
+			<button hidden="true" style="display:none;" type="roll" name="roll_flip-settracker" value="! [[@{last-roll-ini-fliped} &{tracker}]]" />
+			<button hidden="true" style="display:none;" type="roll" name="roll_damage" value="&{template:damage} {{name=@{name}}} {{damage=[[@{damage-dices}d6!>6>4]]}}" />
+			<button hidden="true" style="display:none;" type="roll" name="roll_damage-whump" value="&{template:damage} {{name=@{name}}} {{damage=[[1d6!>6>4]]}}" />
+			<button hidden="true" style="display:none;" type="roll" name="roll_damage-pam" value="&{template:damage} [[ [[@{damage-dices}d6!>6>4]] + [[1d6!>6>4]] ]] {{name=@{name}}} {{damage=$[[0]]}} {{bonus=$[[1]]}} {{total=$[[2]]}}" />
+			<button hidden="true" style="display:none;" type="roll" name="roll_damage-ratatat" value="&{template:damage} [[ [[@{damage-dices}d6!>6>4]] + [[2d6!>6>4]] ]] {{name=@{name}}} {{damage=$[[0]]}} {{bonus=$[[1]]}} {{total=$[[2]]}}" />
+			
+			
+			&emsp;<span data-i18n="npc">add text in translation files</span> : <input type="checkbox" class="sheet-isnpc-check" name="attr_isnpc" value="1" />
+		</div>
+	</div>	
+	<br/>
+	<input type="radio" class="sheet-page1" name="attr_page" value="1" checked="checked" id="sheet-page1">
+		<label for="sheet-page1" class="sheet-pagetab sheet-pc-view" data-i18n="cover">COVER</label>
+	<input type="radio" class="sheet-page2" name="attr_page" value="2" id="sheet-page2">
+		<label for="sheet-page2" class="sheet-pagetab sheet-pc-view" data-i18n="character">CHARACTER</label>
+	<input type="radio" class="sheet-page3" name="attr_page" value="3" id="sheet-page3">
+		<label for="sheet-page3" class="sheet-pagetab sheet-pc-view" data-i18n="skills">SKILLS</label>
+	<input type="radio" class="sheet-page4" name="attr_page" value="4" id="sheet-page4">
+		<label for="sheet-page4" class="sheet-pagetab sheet-pc-view" data-i18n="gear-visas">GEAR / VISAS</label>
+	<input type="radio" class="sheet-page5" name="attr_page" value="5" id="sheet-page5">
+		<label for="sheet-page5" class="sheet-pagetab sheet-pc-view" data-i18n="journal">JOURNAL</label>
+	<input type="radio" class="sheet-page6" name="attr_page" value="6" id="sheet-page6">
+		<label for="sheet-page6" class="sheet-pagetab sheet-pc-view" data-i18n="combat">COMBAT</label>	
+	<input type="radio" class="sheet-page7" name="attr_page" value="7" id="sheet-page7">
+		<label for="sheet-page7" class="sheet-pagetab sheet-npc-view" data-i18n="npc">NPC</label>	
+
+	<div class="sheet-cover sheet-pc-view">
+		<div class="sheet-passport">
+			<div class="sheet-passport-page">
+				<div class="sheet-cover-centered">
+					<h2 data-i18n="emergency-passport">EMERGENCY PASSPORT<br/>PASSEPORT TEMPORAIRE<br/>PASSERSATZ</h2>
+					<br />
+
+					<input class="sheet-coverfluff" type="text" name="attr_passport_number" placeholder="Passport Number" data-i18n-placeholder="passport-number"/><br /><h3 data-i18n="no-of-passport">No of Passport / No du Passeport / Nummer des Reisepasses</h3>
+					<br />
+					<input class="sheet-coverfluff" type="text" name="attr_character_name" placeholder="Name" data-i18n-placeholder="name"/><br /><h3 data-i18n="name-of-bearer">Name of bearer / Nom du titulaire / Name des Passinhabers</h3> 
+					<br />
+					<input class="sheet-coverfluff" type="text" name="attr_nationality" placeholder="Nationality" data-i18n-placeholder="nationality"/><br /><h3 data-i18n="national-status">National status / Nationalité / Staatsangehörigkeit</h3>
+					<br />
+				</div>
+			</div>
+			<div class="sheet-passport-page">
+				&nbsp;
+			</div>
+		</div>
+	</div>
+
+	<div class="sheet-character sheet-pc-view">
+		<div class="sheet-passport">
+			<div class="sheet-passport-page">
+
+				<h3 data-i18n="description-title">Description / Description / Beschreibung</h3>	
+				<br />
+
+				<input class="sheet-fluff" type="text" name="attr_profession" placeholder="Profession" data-i18n-placeholder="profession"/> <br />
+				<h4 data-i18n="profession-title">Profession / Profession / Beruf</h4>	
+				<input class="sheet-fluff" type="text" name="attr_surname" placeholder="Family name" data-i18n-placeholder="family-name"/><br />
+				<h4 data-i18n="family-name-title">Name / Nom / Name</h4>
+				<input class="sheet-fluff" type="text" name="attr_name" placeholder="Given name" data-i18n-placeholder="given-name"/><br />
+				<h4 data-i18n="given-name-title">Given name / Prénom / Vornamen</h4>
+				<input class="sheet-fluff" type="text" name="attr_residence" placeholder="Place of residence" data-i18n-placeholder="residence"/><br />
+				<h4 data-i18n="residence-title">Residence / Domicile / Wohnort</h4>
+				<input class="sheet-fluff" type="text" name="attr_height" placeholder="Height" data-i18n-placeholder="height"/><br />
+				<h4 data-i18n="height-title">Height / Taille / Größe</h4>
+				<input class="sheet-fluff" type="text" name="attr_eyecolour" placeholder="Eye colour" data-i18n-placeholder="eye-color"/><br />
+				<h4 data-i18n-placeholder="eye-color-title">Colour of eyes / Couleur des yeux / Augenfarbe</h4>
+				<input class="sheet-fluff" type="text" name="attr_haircolour" placeholder="Hair colour" data-i18n-placeholder="hair-color"/><br />
+				<h4 data-i18n="hair-color-title">Colour of hair / Couleur des cheveux / Haarfarbe</h4>
+				<input class="sheet-fluff" type="text" name="attr_marks" placeholder="Distinguishing marks" data-i18n-placeholder="distinguishing-marks"/><br />
+				<input class="sheet-fluff" type="text" name="attr_marks2" /><br />	
+				<h4 data-i18n="distinguishing-marks-title">Distinguishing marks / Signes particuliers / Unveränderliche Kennzeichen</h4>
+				<input class="sheet-fluff" type="text" name="attr_dob" placeholder="Date of birth" data-i18n-placeholder="date-of-birth"/><br />
+				<h4 data-i18n="date-of-birth-title">Date of birth / Date de naissance / Geburtsdatum</h4>
+				<input class="sheet-fluff" type="text" name="attr_birthplace" placeholder="Birthplace" data-i18n-placeholder="birthplace"/><br />
+				<h4 data-i18n-placeholder="birthplace-title">Place of birth / Lieu de naissance / Geburtsort</h4>
+				<input class="sheet-fluff" type="text" name="attr_character_name" placeholder="Signature" data-i18n-placeholder="signature" style="font-family: Parisienne"/><br />
+				<h4 data-i18n="signature-title">Holder's signature/ Signature du titulaire / Unterschrift des Passinhabers</h4>
+		
+			</div>
+		
+			<div class="sheet-passport-page">
+				<div class="sheet-mugshot">
+					<img class="sheet-portrait" name="attr_character_avatar" height="350px" width="auto"/>
+					<div class="sheet-caption" data-i18n="photo-title">Photo of holder/Photo du titulaire/Foto des Passinhabers</div>
+				</div>
+				<br/>
+				<h3 data-i18n="language-title">Native language(s) / Langue(s) maternelle / Muttersprache(n)</h3>
+						
+					<input class="sheet-fluff" type="text" name="attr_language1" placeholder="Language" data-i18n-placeholder="language" style="width: 45%"/>
+					<input class="sheet-fluff" type="text" name="attr_language2" placeholder="Language" data-i18n-placeholder="language" style="width: 45%"/>
+					<br />
+				<br/>	
+				<h3 data-i18n="fluent-language-title">Fluent languages / Langues parlées / Sprachkenntnisse</h3>
+						
+					<fieldset class="repeating_languages">
+						<input class="sheet-fluff" type="text" name="attr_language" placeholder="Language" data-i18n-placeholder="language" style="width: 45%"/>
+						<input class="sheet-skill" type="text" placeholder="Cost" data-i18n-placeholder="cost" style="width: 8ch"/>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_languagetick" value="0">
+							<input type="radio" class="radiobox" name="attr_languagetick" value="1">
+							<input type="radio" class="radiobox" name="attr_languagetick" value="2">
+							<input type="radio" class="radiobox" name="attr_languagetick" value="3">
+							<input type="radio" class="radiobox" name="attr_languagetick" value="4">
+							<input type="radio" class="radiobox" name="attr_languagetick" value="5">
+						</div>
+					</fieldset>
+				<br />
+				<h3 data-i18n="contacts-title">Contacts / Contacts / Kontakte</h3>
+						
+					<input class="sheet-fluff" type="text" name="attr_plothook1" placeholder="Plot hook/Accroche scénaristique/Handlungsstrang" data-i18n-placeholder="plot-hook"/>
+					<input class="sheet-fluff" type="text" name="attr_plothook2" placeholder="Plot hook/Accroche scénaristique/Handlungsstrang" data-i18n-placeholder="plot-hook"/>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="sheet-skills sheet-npc">
+		<div class="sheet-passport">
+			<div class="sheet-passport-page">
+				<div class="sheet-pc-view">
+					<h3 data-i18n="complications-title">Complications / Desavantages / Komplikationen</h3>
+					<br/>			
+					<fieldset class="repeating_complications">
+						<details>
+							<summary><input type="text" style="width:90%;" name="attr_complication" placeholder="Complication" data-i18n-placeholder="complication"/></summary>  
+							<textarea name="attr_compdesc" placeholder="Description" data-i18n-placeholder="description" style="width:95%"></textarea>
+						</details>
+					</fieldset>	
+					<br/>
+					<h3 data-i18n="abilities-title">Abilities / Capacites / Fahigkeiten</h3>
+					<br/>		
+					<fieldset class="repeating_abilities">
+						<details>
+							<summary>
+							<input type="text" style="width:90%;" name="attr_ability" placeholder="Ability" data-i18n-placeholder="ability"/>														
+							</summary>
+							<input class="sheet-skill" type="text" placeholder="Cost" data-i18n-placeholder="cost" style="width:10ch;" />
+							<div class="radiocontainer">
+								<input type="radio" checked="checked" class="radiobox reset" name="attr_abilitytick" value="0">
+								<input type="radio" class="radiobox" name="attr_abilitytick" value="1">
+								<input type="radio" class="radiobox" name="attr_abilitytick" value="2">
+								<input type="radio" class="radiobox" name="attr_abilitytick" value="3">
+								<input type="radio" class="radiobox" name="attr_abilitytick" value="4">
+								<input type="radio" class="radiobox" name="attr_abilitytick" value="5">
+								<input type="radio" class="radiobox" name="attr_abilitytick" value="6">
+								<input type="radio" class="radiobox" name="attr_abilitytick" value="7">
+								<input type="radio" class="radiobox" name="attr_abilitytick" value="8">
+							</div><br/>
+							<textarea name="attr_abilitydesc" placeholder="Description" data-i18n-placeholder="description" style="width:95%"></textarea>
+						</details>
+					</fieldset>
+				</div>
+				<div class="sheet-npc-view">
+					<input type="text" name="attr_character_name" placeholder="Name" data-i18n-placeholder="name" style="width:30%"/>
+					<input type="text" name="attr_name" placeholder="Chat Name" data-i18n-placeholder="chatname" style="width:20%"/>
+					<input type="text" name="attr_npcaffiliation" placeholder="Affiliation" data-i18n-placeholder="affiliation" style="width:20%"/>
+					<select name="attr_npclevel" style="width:20%">
+						<option value="" data-i18n="rank" hidden>Rank</option>
+						<option value="Mook" data-i18n="mook">Mook</option>
+						<option value="Underling" data-i18n="underling">Underling</option>
+						<option value="Lieutenant" data-i18n="lieutenant">Lieutenant</option>
+						<option value="Boss" data-i18n="boss">Boss</option>
+					</select>	
+					<div>
+						<label data-i18n="stats">Stats</label>
+						<label class="sheet-skilllabel" data-i18n="vitality">Vitality</label><input type="number" name="attr_vitality" class="sheet-number" min="0" max="20"/>
+						<br/>
+						<label class="sheet-skilllabel" data-i18n="initiative">Initiative</label><input type="number" class="sheet-npcskill" name="attr_npcinitiative" value="0"/>
+						<button type="action" class="sheet-npcroll btn ui-draggable" name="act_npc_ini_fix" title="NPC fixed initiative" data-i18n-title="npc-fixed-initiative" value="3" data-i18n="fixed">Fixed</button>		
+						<button type="action" class="sheet-npcroll btn ui-draggable" name="act_npc_ini" title="NPC rolled initiative" data-i18n-title="npc-rolled-initiative" value="2" data-i18n="roll">Roll</button><br>			
+						<label class="sheet-skilllabel" data-i18n="conditional-max">Conditional Max</label><input type="number" name="attr_vitality_max_vis" class="sheet-number" value="0" readonly="true"/>
+						<label class="sheet-skilllabel" data-i18n="defence">Defence</label><input type="number" class="sheet-npcskill" name="attr_npcdefence" value="0"/>
+						<button type="action" class="sheet-npcroll" name="act_def_npc" title="NPC defence" data-i18n-title="npc-defence" value="3" data-i18n="roll">Roll</button><br>
+						<label class="sheet-skilllabel" data-i18n="vitality-max2">Vitality Max</label><input type="number" class="sheet-number" name="attr_vitality_npc_max" title="Overrides calculated values. Should be set to 0 unless NPC" data-i18n-title="npc-vitality-info" value="0"/>
+						<label class="sheet-skilllabel" data-i18n="protection">Protection</label><input type="number" name="attr_soakvalue" value="0" min="0" title="Protection value" data-i18n-title="protection-value"/><span data-i18n="dP">dP</span>
+						<button type="action" class="sheet-npcroll" name="act_soak" title="NPC Protection / Armour" data-i18n-title="npc-protection" data-i18n="soak">Soak</button><br>
+						<button type="action" class="sheet-cbtroll" name="act_recover" title="Recovery" data-i18n-title="recovery" data-i18n="recovery">Recovery</button>			
+						<br><br>
+						<label data-i18n="attacks">Attacks</label>
+						<fieldset class="repeating_attacks">
+							<input type="text" name="attr_npcatktxt" placeholder="Attack" data-i18n-placeholder="attack" style="width:25%"/>
+							<input type="number" name="attr_npcattack" class="sheet-npcskill" value = "15" min="0" title="Attack skill" data-i18n-title="attack-skill"/>
+							<input type="number" name="attr_npcweapondmg" value="0" min="0" title="Damage dice" data-i18n-title="damage-dice"/><span data-i18n="dX">dX</span>
+							<button type="action" class="sheet-npcroll" name="act_atknpc" title="NPC attack" data-i18n-title="npc-attack" data-i18n="roll">Roll</button>
+							<br/><span data-i18n="tags">Tags</span> :<input type="text" name="attr_npcweapontags" placeholder="Tags" data-i18n-placeholder="tags"/>
+							<span data-i18n="reload">Reload</span> :<input type="number" name="attr_npcreloadval" title="Reload: Enter lower tag value OR use 99 for single-shot and melee weapons" data-i18n-title="npc-reload-info" value="99" min="0"/>	
+						</fieldset>	
+					</div>
+					<div>		
+						<label data-i18n="tags">Tags</label>			
+						<textarea name="attr_npctags" placeholder="Tags" data-i18n-placeholder="tags" style="height: 40px"></textarea>
+						<br>
+					</div>			
+				</div>
+			</div>
+
+			<div class="sheet-passport-page">
+				<div class="sheet-2colrow">
+					<h3 data-i18n="skills-title">Skills / Competences / Kompetenzen</h3>
+					<br/>
+
+					<div class="sheet-pc-view">
+						<div class="sheet-col" style="width: 45%; margin: 0px">
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Agility" data-i18n-title="agility" value="agility" data-i18n="agility">Agility</button><input type="number" name="attr_agility" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_agilityused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Alertness" data-i18n-title="alertness" value="alertness" data-i18n="alertness">Alertness</button><input type="number" name="attr_alertness" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_alertnessused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Charm" data-i18n-title="charm" value="charm" data-i18n="charm">Charm</button><input type="number" name="attr_charm" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_charmused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Contacts" data-i18n-title="contacts" value="contacts" data-i18n="contacts">Contacts</button><input type="number" name="attr_contacts" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_contactsused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Credit" data-i18n-title="credit" value="credit" data-i18n="credit">Credit</button><input type="number" name="attr_credit" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_creditused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Electronics" data-i18n-title="electronics" value="electronics" data-i18n="electronics">Electronics</button><input type="number" name="attr_electronics" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_electronicsused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Endurance" data-i18n-title="endurance" value="endurance" data-i18n="endurance">Endurance</button><input type="number" name="attr_endurance" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_enduranceused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Engineering" data-i18n-title="engineering" value="engineering" data-i18n="engineering">Engineering</button><input type="number" name="attr_engineering" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_engineeringused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Entertainment" data-i18n-title="entertainment" value="entertainment" data-i18n="entertainment">Entertainment</button><input type="number" name="attr_entertainment" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_entertainmentused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Humanities" data-i18n-title="humanities" value="humanities" data-i18n="humanities">Humanities</button><input type="number" name="attr_humanities" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_humanitiesused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Investigation" data-i18n-title="investigation" value="investigation" data-i18n="investigation">Investigation</button><input type="number" name="attr_investigation" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_investigationused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Languages" data-i18n-title="languages" value="languages" data-i18n="languages">Languages</button><input type="number" name="attr_languages" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_languagesused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Machinery" data-i18n-title="machinery" value="machinery" data-i18n="machinery">Machinery</button><input type="number" name="attr_machinery" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_machineryused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Medicine" data-i18n-title="medicine" value="medicine" data-i18n="medicine">Medicine</button><input type="number" name="attr_medicine" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_medicineused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+						</div>
+						
+						<div class="sheet-col" style="width: 45%; margin: 0px; border-left: 1px solid black; padding-left: 5px">		
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Melee" data-i18n-title="melee" value="melee" data-i18n="melee">Melee</button><input type="number" name="attr_melee" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_meleeused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Prestidigitation" data-i18n-title="prestidigitation" value="prestidigitation" data-i18n="prestidigitation">Prestidigitation</button><input type="number" name="attr_prestidigitation" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_prestidigitationused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="RangedCombat" data-i18n-title="rangedcombat" value="rangedcombat" data-i18n="rangedcombat">Ranged Combat</button><input type="number" name="attr_rangedcombat" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_rangedused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="RedTape" data-i18n-title="redtape" value="redtape" data-i18n="redtape">Red Tape</button><input type="number" name="attr_redtape" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_redtapeused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Science" data-i18n-title="science" value="science" data-i18n="science">Science</button><input type="number" name="attr_science" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_scienceused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Search" data-i18n-title="search" value="search" data-i18n="search">Search</button><input type="number" name="attr_search" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_searchused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Security" data-i18n-title="security" value="security" data-i18n="security">Security</button><input type="number" name="attr_security" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_securityused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Sneak" data-i18n-title="sneak" value="sneak" data-i18n="sneak">Sneak</button><input type="number" name="attr_sneak" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_sneakused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Status" data-i18n-title="status" value="status" data-i18n="status">Status</button><input type="number" name="attr_status" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_statusused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Strength" data-i18n-title="strength" value="strength" data-i18n="strength">Strength</button><input type="number" name="attr_strength" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_strengthused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Subterfuge" data-i18n-title="subterfuge" value="subterfuge" data-i18n="subterfuge">Subterfuge</button><input type="number" name="attr_subterfuge" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_subterfugeused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Survival" data-i18n-title="survival" value="survival" data-i18n="survival">Survival</button><input type="number" name="attr_survival" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_survivalused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Vehicles" data-i18n-title="vehicles" value="vehicles" data-i18n="vehicles">Vehicles</button><input type="number" name="attr_vehicles" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_vehiclesused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+							<br />
+							<button type="action" class="sheet-skillroll" name="act_skillroll" title="Willpower" data-i18n-title="willpower" value="willpower" data-i18n="willpower">Willpower</button><input type="number" name="attr_willpower" class="sheet-skill" value = "15" min="0" style="width: 2.5em; text-align: right"/>
+							<input type="checkbox" name="attr_willpowerused" value="1" title="Check when used" data-i18n-title="check-when-used"/>
+						</div>
+					</div>
+					<div class="sheet-npc-view">
+						<button type="action" class="sheet-skillroll" name="act_gennpc" title="General" data-i18n-title="general" value="general" data-i18n="general">General</button>
+						<input type="number" name="attr_general" class="sheet-npcskill" value = "15" min="0"/><br>
+						<button type="action" class="sheet-skillroll" name="act_specnpc" title="Special" data-i18n-title="special" value="special" data-i18n="specialist">Specialist</button>
+						<input type="number" name="attr_special" class="sheet-npcskill" value = "15" min="0"/><br>
+						<fieldset class="repeating_skills">
+							<input type="text" class="sheet-skilllabel" name="attr_npcskilltext" placeholder="Skill" data-i18n-placeholder="skill" />
+							<input type="number" name="attr_skillnpc" class="sheet-npcskill" value = "15" min="0"/>
+							<button type="action" class="sheet-npcroll btn ui-draggable" name="act_skillnpc" title="Other skills" data-i18n-title="other-skills" data-i18n="roll">Roll</button><br>
+						</fieldset><br>	
+					</div>
+				</div>
+		
+				<hr />
+				<h3 data-i18n="conditions-title">Conditions</h3>
+				<br/>
+				<div class="sheet-conditions">
+					<div style="grid-area:blinded;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="blinded-info" data-i18n="blinded">Blinded</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_blinded" value="0">
+							<input type="radio" class="radiobox" name="attr_blinded" value="1">
+						</div>
+					</div>
+					<div style="grid-area:deaf;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="deaf-info" data-i18n="deaf">Deaf</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_deaf" value="0">
+							<input type="radio" class="radiobox" name="attr_deaf" value="1">
+						</div>
+					</div>
+					<div style="grid-area:exhausted;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="exhausted-info" data-i18n="exhausted">Exhausted</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_exhausted" value="0">
+							<input type="radio" class="radiobox" name="attr_exhausted" value="1">
+							<input type="radio" class="radiobox" name="attr_exhausted" value="2">
+							<input type="radio" class="radiobox" name="attr_exhausted" value="3">
+						</div>
+					</div>
+					<div style="grid-area:frightend;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="frightened-info" data-i18n="frightened">Frightened</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_frightend" value="0">
+							<input type="radio" class="radiobox" name="attr_frightend" value="1">
+						</div>
+					</div>
+					<div style="grid-area:intoxicated;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="intoxicated-info" data-i18n="intoxicated">Intoxicated</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_intoxicated" value="0">
+							<input type="radio" class="radiobox" name="attr_intoxicated" value="1">
+							<input type="radio" class="radiobox" name="attr_intoxicated" value="2">
+							<input type="radio" class="radiobox" name="attr_intoxicated" value="3">
+						</div>
+					</div>
+					<div style="grid-area:mortalperil;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="mortalperil-info" data-i18n="mortalperil">Mortal Peril</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_mortalperil" value="0">
+							<input type="radio" class="radiobox" name="attr_mortalperil" value="1">
+						</div>
+					</div>
+					<div style="grid-area:onfire;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="onfire-info" data-i18n="onfire">On Fire</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_onfire" value="0">
+							<input type="radio" class="radiobox" name="attr_onfire" value="1">
+						</div>
+					</div>
+					<div style="grid-area:outcold;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="outcold-info" data-i18n="outcold">Out Cold</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_outcold" value="0">
+							<input type="radio" class="radiobox" name="attr_outcold" value="1">
+						</div>
+					</div>
+					<div style="grid-area:overburdened;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="overburdened-info" data-i18n="overburdened">Overburdened</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_overburdened" value="0">
+							<input type="radio" class="radiobox" name="attr_overburdened" value="1">
+						</div>
+					</div>
+					<div style="grid-area:paralysed;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="paralysed-info" data-i18n="paralysed">Paralysed</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_paralysed" value="0">
+							<input type="radio" class="radiobox" name="attr_paralysed" value="1">
+						</div>
+					</div>
+					<div style="grid-area:prone;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="prone-info" data-i18n="prone">Prone</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_prone" value="0">
+							<input type="radio" class="radiobox" name="attr_prone" value="1">
+						</div>
+					</div>
+					<div style="grid-area:restrained;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="restrained-info" data-i18n="restrained">Restrained</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_restrained" value="0">
+							<input type="radio" class="radiobox" name="attr_restrained" value="1">
+						</div>
+					</div>
+					<div style="grid-area:stunned;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="stunned-info" data-i18n="stunned">Stunned</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_stunned" value="0">
+							<input type="radio" class="radiobox" name="attr_stunned" value="1">
+						</div>
+					</div>
+					<div style="grid-area:surprised;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="surprised-info" data-i18n="surprised">Surprised</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_surprised" value="0">
+							<input type="radio" class="radiobox" name="attr_surprised" value="1">
+						</div>
+					</div>
+					<div style="grid-area:terrified;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="terrified-info" data-i18n="terrified">Terrified</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_terrified" value="0">
+							<input type="radio" class="radiobox" name="attr_terrified" value="1">
+						</div>
+					</div>
+					<div style="grid-area:wounded;">
+						<label class="sheet-conditionlabel" title="Add title in language file" data-i18n-title="wounded-info" data-i18n="wounded">Wounded</label>
+						<div class="radiocontainer">
+							<input type="radio" checked="checked" class="radiobox reset" name="attr_wounded" value="0">
+							<input type="radio" class="radiobox" name="attr_wounded" value="1">
+						</div>
+					</div>
+				</div>
+				<div class="sheet-npc-view">
+					<label data-i18n="notes">Notes</label>
+					<textarea name="attr_npcnotes" placeholder="Notes" data-i18n-placeholder="notes" style="height:60px;"></textarea>		
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="sheet-gear sheet-pc-view">
+		<div class="sheet-passport">
+			<div class="sheet-passport-page">
+				<h3 data-i18n="licenses-title">Licences for dangerous items /<br/>Permis pour objets reglementes /<br/>Lizenzen fur verbotene gegenstande</h3>
+				<hr />
+					<fieldset class="repeating_gearkits">
+						<details>
+							<summary><input type="text" name="attr_gearkit" placeholder="Gear kit" data-i18n-title="gear-kit"/> 
+							<input type="number" name="attr_gearcost" title="Cost in Story Points" data-i18n-title="cost-in" value="1">
+							<input type="checkbox" name="attr_signatureitem" title="Character's Signature Item?" data-i18n-title="signature-item" value="1"/><input type="text" style="width: 25ch; text-align: center; border: none; background-color: #f9f9eb;  font-weight: bold; margin = 0" value="Signature item | Equipped" readonly="true"/>
+							<input type="checkbox" name="attr_equipped" title="Tick if carried" data-i18n-title="tick" value="1"/></summary>
+							<textarea name="attr_gearcontents" style="height:60px; width:95%;" placeholder="Contents" data-i18n-placeholder="contents" ></textarea>				
+							<textarea name="attr_geartags" placeholder="Tags" data-i18n-placeholder="tags" style="height: 40px; width:95%"></textarea>
+						</details>
+					</fieldset>			
+			</div>
+			<div class="sheet-passport-page">
+				<h3 data-i18n="visa-title">Visa Stamps /<br/>Visas /<br/>Visastempel</h3>
+				<hr/>
+					<textarea name="attr_journal" placeholder="Notes" data-i18n-placeholder="notes"></textarea>		
+			</div>
+		</div>
+	</div>
+
+	<div class="sheet-journal sheet-pc-view">
+		<div class="sheet-passport">
+			<div class="sheet-passport-page">
+				<h3 data-i18n="visa-title-nowrap">Visa Stamps / Visas / Visastempel</h3>
+				<textarea name="attr_journal" placeholder="Notes" data-i18n-placeholder="notes" style="height:500px;"></textarea>
+			</div>
+			<div class="sheet-passport-page">
+				<h3>&nbsp;</h3>
+				<textarea name="attr_journal2" placeholder="Notes" data-i18n-placeholder="notes" style="height:500px;"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="sheet-combat sheet-pc-view">
+	<!--
+	Set the 'value' for the PAM and RATATATAT buttons to 1 and 2 respectively and 3 and 4 for the
+	 normal attack and Whump! where the value is only used as part of the roll template.
+	Things seem out of order, but it allows this value to be used for the bonus damage 
+	calculation in the Custom Roll Parsing reducing the number of values passed.
+	-->
+		<div class="sheet-passport">
+			<div class="sheet-passport-page">
+				<h2 data-i18n="combat-rolls">Combat rolls</h2> 	
+				<button type="action" class="sheet-blank-button btn ui-draggable" name="act_d100-ini" title="Initiative" data-i18n-title="initiative" value="1" data-i18n="initiative">Initiative</button>
+				<button type="action" class="sheet-blank-button btn ui-draggable" name="act_skillroll" title="Defend with AGILITY" data-i18n-title="defend-agility" value="agility" data-i18n="take-cover">Take Cover!</button>
+				<br/>
+				<button type="action" class="sheet-blank-button btn ui-draggable" name="act_skillroll" title="Defend with MELEE" data-i18n-title="defend-melee" value="melee" data-i18n="parry">Parry!</button>
+				<button type="roll" class="sheet-blank-button btn ui-draggable" name="act_recover" value="&{template:recovers} {{name=@{name}}} {{result=[[?{@{how_many_dice}|2}d6>4]]}} {{dicetype=d6P}} {{dicecount=?{@{how_many_dice}|2}}}" title="Recovery" data-i18n-title="recovery" data-i18n="recovery">Recovery</button>
+				<br />
+				<hr/>
+			
+				<input type="text" name="attr_armour" class="sheet-short" placeholder="Armour" data-i18n-placeholder="armour"/>
+				<input type="number" name="attr_soakvalue" title="Protection value" data-i18n-title="protection-value" value="0" min="0"/><span data-i18n="dP">dP</span>
+				<input name="attr_armourtags" placeholder="Tags" data-i18n-placeholder="tags" style="width: 40ch"/>
+				<button type="roll" class="sheet-blank-button btn ui-draggable" name="act_soak" title="Soak damage" data-i18n-title="soak-damage" value="&{template:soaks} {{name=@{name}}} {{result=[[@{soakvalue}d6>4]]}} {{dicetype=d6P}} {{dicecount=@{soakvalue}}}" data-i18n="soak">Soak</button>				
+			</div>
+			<div class="sheet-passport-page">
+				<input type="text" name="attr_weapon" class="sheet-short" placeholder="Unarmed" data-i18n-placeholder="unarmed" readonly="true"/>
+				<input type="text" name="attr_unarmedskill" class="sheet-shorter" readonly="true"/>
+				<input type="number" name="attr_weapondmg" value="2" min="0" title="Damage Dice" data-i18n-title="damage-dice"/><span data-i18n="dX">dX</span>
+				<input type="text" name="attr_unarmedtags" placeholder="Tags" data-i18n-placeholder="tags" style="width: 40ch"/><br/>				
+				<button type="action" class="sheet-blank-button btn ui-draggable" name="act_attack_unarmed" title="Attack!" data-i18n-title="attack!" data-i18n="attack!">Attack!</button>
+				<button type="action" class="sheet-blank-button btn ui-draggable" name="act_whump_unarmed" title="Whump!" data-i18n-title="whump!" data-i18n="whump!">Whump!</button>
+				<hr>
+				<fieldset class="repeating_attacks">
+					<input type="text" name="attr_weapon" style="width:40%" placeholder="Weapon" data-i18n-placeholder="weapon" /> 
+					<select name="attr_weaponskill" style="width:30%">
+						<option value="0" data-i18n="skill">Skill</option>
+						<option value="1" data-i18n="melee">Melee</option>
+						<option value="2" data-i18n="ranged">Ranged</option>
+					</select>
+					<input class="sheet-revealbuttons" type="checkbox" name="attr_weaponskill" value="1" style="display: none"/>
+					<input class="sheet-revealbuttons" type="checkbox" name="attr_weaponskill" value="2" style="display: none"/>
+					<input type="number" name="attr_weapondmg" value="0" min="0" title="Damage Dice" data-i18n-title="damage-dice"><span data-i18n="dX">dX</span>
+
+					<div class="sheet-meleebuttons">
+						<input type="text" name="attr_weapontags" placeholder="Tags" data-i18n-placeholder="tags" style="width: 40ch"/><br/>
+						<button type="action" class="sheet-blank-button btn ui-draggable" name="act_melee" title="Attack!" data-i18n-title="attack!" data-i18n="attack!">Attack!</button>
+						<button type="action" class="sheet-blank-button btn ui-draggable" name="act_whump" title="Whump!" data-i18n-title="whump!"value="4" data-i18n="whump!">Whump!</button>
+					</div>
+					
+					<div class="sheet-rangedbuttons">
+						<span data-i18n="reload">Reload</span>&nbsp;<input type="number" name="attr_reloadval" title="Reload: Enter lower tag value OR use 99 for single-shot" data-i18n-title="reload-info" value="99" min="0"/><br/>
+						<input type="text" name="attr_weapontags" placeholder="Tags" data-i18n-placeholder="tags" style="width: 33ch"/><br/>
+						<button type="action" class="sheet-blank-button btn ui-draggable" name="act_ranged" title="Attack!" data-i18n-title="attack!" value="3" data-i18n="attack!">Attack!</button>
+						<button type="action" class="sheet-blank-button btn ui-draggable" name="act_pam" title="Aimed Shot!" data-i18n-title="aimed-shot" value="1" data-i18n="pam">Pam!</button>				
+						<button type="action" class="sheet-blank-button btn ui-draggable" name="act_rat" title="Empty the magazine!" data-i18n-title="empty" value="2" data-i18n="ratatatat!">Ratatatat!</button>					
+					</div>
+					<hr>
+				</fieldset>
+			</div>
+		</div>
+	</div>
+
+	<footer>
+		<hr/>
+		<span data-i18n="image-disclaimer">'The Troubleshooters' logo and the coat of arms are &#169; Helmgast and are used here with their kind permission</span>
+	</footer>
+</div>
+
+<rolltemplate class="sheet-rolltemplate-basic">
+    <div class="sheet-template-container">
+		<p>{{name}}</p>
+		<p><span data-i18n="rolls">Rolls</span> {{dicecount}} <span data-i18n="{{dicetype}}">dicetype</span></p>
+		<div class="sheet-template-result">{{result}}</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-damage">
+    <div class="sheet-template-container">
+		{{name}}
+		<div class="sheet-template-result">
+			{{damage}}{{#bonus}} + {{bonus}}{{/bonus}}{{#total}} = {{total}}{{/total}}
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-soaks">
+    <div class="sheet-template-container">
+		{{name}} <span data-i18n="soaks">soaks</span>
+		<div class="sheet-template-result">
+			{{result}}
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-recovers">
+    <div class="sheet-template-container">
+		{{name}} <span data-i18n="recovers">recovers</span>
+		<div class="sheet-template-result">
+			{{result}}
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-d100">
+	<!--
+		computed::type defines different types of rolls
+			0	- nothing special
+			1	- PAM
+			2	- Ratatatat
+			3	- Basic Attack
+			4	- WHUMP!
+	//-->	
+    <div class="sheet-template-container">
+		{{#rollTotal() computed::type 2}}<h1><span data-i18n="ratatatat!">RATATATAT!</span></h1>{{/rollTotal() computed::type 2}}
+		{{#rollTotal() computed::type 4}}<h1><span data-i18n="whump!">WHUMP!</span></h1>{{/rollTotal() computed::type 4}}
+		{{name}} 
+		{{#rollTotal() computed::type 1}}<span data-i18n="takes-aim">takes aim and...PAM!</span>{{/rollTotal() computed::type 1}}
+		{{#rollTotal() computed::type 2}}<span data-i18n="empties-weapon">empties their weapon at the target</span>{{/rollTotal() computed::type 2}}
+		{{#rollTotal() computed::type 3}}<span data-i18n="attacks!">attacks!</span>{{/rollTotal() computed::type 3}}
+		{{#rollTotal() computed::type 4}}<span data-i18n="attempts-takedown">attempts a takedown</span>{{/rollTotal() computed::type 4}}
+		{{^skill}}{{^skill_raw}}<br/><span data-i18n="rolls">Rolls</span> 1 <span data-i18n="d%">d%</span>{{/skill_raw}}{{/skill}}
+		{{#skill}}<br/><span data-i18n="{{skill}}">Skill</span> <span data-i18n="of">of</span> {{target}}{{/skill}}
+		{{#skill_raw}}<br/>{{skill_raw}} <span data-i18n="of">of</span> {{target}}{{/skill_raw}}
+		<div class="sheet-template-result">
+			<div class="sheet-template-tens">{{tens}}</div>
+			<div class="sheet-template-ones">{{ones}}</div>
+			{{#pips}}
+			<div class="sheet-template-pips">
+				{{pips}} <span data-i18n="pips"></span>
+			</div>
+			{{/pips}}
+		</div>
+		<div class="sheet-template-info">			
+			{{#rollTotal() computed::outcome 1}}
+				{{^computed::type}}<p><span data-i18n="success">Success!</span></p>{{/computed::type}}
+				{{#rollLess() computed::type 2}}<p><span data-i18n="success">Success!</span></p>{{/rollLess() computed::type 2}}
+				{{#rollTotal() computed::type 2}}
+					<p><span data-i18n="a-hit-choose">A hit! Choose from</span>:</p>
+					<ul>
+						<li>[<span data-i18n="damage">damage</span>](~{{charname}}|damage) <span data-i18n="damage-all">damage to all targets</span></li>
+						<li>[<span data-i18n="damage">damage</span>](~{{charname}}|damage-ratatat) <span data-i18n="damage-one">damage to one target</span></li>
+					</ul>
+				{{/rollTotal() computed::type 2}}
+				{{#rollTotal() computed::type 3}}
+					<p><span data-i18n="success">Success!</span></p>
+					[<span data-i18n="damage">damage</span>](~{{charname}}|damage)<br/>
+				{{/rollTotal() computed::type 3}}
+				{{#rollTotal() computed::type 4}}
+					<p><span data-i18n="success-choose-two">Success! Choose two from</span>:</p>
+					<ul>
+						<li>[<span data-i18n="damage">damage</span>](~{{charname}}|damage-whump)</li>
+						<li><span data-i18n="target-restrained">The target is RESTRAINED</span></li>
+						<li><span data-i18n="target-prone">The target is PRONE</span></li>
+					</ul>
+				{{/rollTotal() computed::type 4}}
+				{{#rollTotal() computed::type 1}}
+					[<span data-i18n="damage">damage</span>](~{{charname}}|damage-pam)<br/>
+				{{/rollTotal() computed::type 1}}
+				{{#rollTotal() computed::type 2}}
+					{{#rollGreater() computed::karma 0}}[<span data-i18n="damage">damage</span>](~{{charname}}|damage-ratatat)<br/>{{/rollGreater() computed::karma 0}}
+				{{/rollTotal() computed::type 2}}
+				{{#rollTotal() computed::karma 1}}
+					{{#rollLess() computed::type 1}}<p><span data-i18n="good-karma">Good Karma!</span></p>{{/rollLess() computed::type 1}}
+					{{#rollBetween() computed::type 1 4}}<p><span data-i18n="good-karma-underlings">Good Karma! Underlings and Mooks are OUT COLD.</span></p>{{/rollBetween() computed::type 1 4}}
+					{{#rollBetween() computed::type 1 3}}<p><span data-i18n="reroll-damage">Re-roll damage if you wish.</span></p>{{/rollBetween() computed::type 1 3}}
+				{{/rollTotal() computed::karma 1}}
+			{{/rollTotal() computed::outcome 1}}
+			{{#rollTotal() computed::outcome 2}}
+				<p><span data-i18n="failure">Zut! Failure</span></p>
+				{{#rollTotal() computed::karma 1}}
+					{{#rollLess() computed::type 1}}<p><span data-i18n="bad-karma">Bad Karma!</span></p>{{/rollLess() computed::type 1}}
+					{{#rollBetween() computed::type 1 4}}
+						<p><span data-i18n="bad-karma-minus">#$@$*#@! Bad Karma strikes! your next check is at -2 pips</span></p>
+						{{#rollBetween() computed::type 1 3}}{{#rollBetween() computed::reload 1 1}}<p><span data-i18n="weapon-jammed">Weapon jammed!</span></p>{{/rollBetween() computed::reload 1 1}}{{/rollBetween() computed::type 1 3}}
+					{{/rollBetween() computed::type 1 4}}
+				{{/rollTotal() computed::karma 1}}
+			{{/rollTotal() computed::outcome 2}}			
+			{{#rollBetween() computed::reload 1 1}}<p><span data-i18n="out-of-ammo">Out of ammo!</span></p>{{/rollBetween() computed::reload 1 1}}
+			{{#rollTotal() computed::type 1}}<span data-i18n="reduce-ini">Reduce initiative score by 2</span>{{/rollTotal() computed::type 1}}
+		</div>
+		<div class="sheet-template-flip">
+			[<span data-i18n="flip">Flip</span>](~{{charname}}|flip)
+		</div>
+	</div>	
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-d100-flip">
+	<!--
+		type defines different types of rolls
+			0	- nothing special
+			1	- PAM
+			2	- Ratatatat
+			3	- Basic Attack
+			4	- WHUMP!
+	//-->	
+    <div class="sheet-template-container">
+		{{#rollTotal() type 2}}<h1><span data-i18n="ratatatat!">RATATATAT!</span></h1>{{/rollTotal() type 2}}
+		{{#rollTotal() type 4}}<h1><span data-i18n="whump!">WHUMP!</span></h1>{{/rollTotal() type 4}}
+		{{name}}
+		{{#rollTotal() type 1}}<span data-i18n="takes-aim">takes aim and...PAM!</span>{{/rollTotal() type 1}}
+		{{#rollTotal() type 2}}<span data-i18n="empties-weapon">empties their weapon at the target</span>{{/rollTotal() type 2}}
+		{{#rollTotal() type 3}}<span data-i18n="attacks!">attacks!</span>{{/rollTotal() type 3}}
+		{{#rollTotal() type 4}}<span data-i18n="attempts-takedown">attempts a takedown</span>{{/rollTotal() type 4}}
+		<span data-i18n="flips">flip</span>
+		{{#skill}}<br/><span data-i18n="{{skill}}">Skill</span> <span data-i18n="of">of</span> {{target}}{{/skill}}
+		{{#skill_raw}}<br/>{{skill_raw}} <span data-i18n="of">of</span> {{target}}{{/skill_raw}}
+		<div class="sheet-template-result">
+			<div class="sheet-template-tens">{{tens}}</div>
+			<div class="sheet-template-ones">{{ones}}</div>
+			{{#pips}}
+			<div class="sheet-template-pips">
+				{{pips}} <span data-i18n="pips"></span>
+			</div>
+			{{/pips}}
+		</div>
+		<div class="sheet-template-info">
+			{{#rollTotal() outcome 1}}
+				{{^type}}<p><span data-i18n="success">Success!</span></p>{{/type}}
+				{{#rollLess() type 2}}<p><span data-i18n="success">Success!</span></p>{{/rollLess() type 2}}
+				{{#rollTotal() type 2}}
+					<p><span data-i18n="a-hit-choose">A hit! Choose from</span>:</p>
+					<ul>
+						<li>[<span data-i18n="damage">damage</span>](~{{charname}}|damage) <span data-i18n="damage-all">damage to all targets</span></li>
+						<li>[<span data-i18n="damage">damage</span>](~{{charname}}|damage-ratatat) <span data-i18n="damage-one">damage to one target</span></li>
+					</ul>
+				{{/rollTotal() type 2}}
+				{{#rollTotal() type 3}}
+					<p><span data-i18n="success">Success!</span></p>
+					[<span data-i18n="damage">damage</span>](~{{charname}}|damage)<br/>
+				{{/rollTotal() type 3}}
+				{{#rollTotal() type 4}}
+					<p><span data-i18n="success-choose-two">Success! Choose two from</span>:</p>
+					<ul>
+						<li>[<span data-i18n="damage">damage</span>](~{{charname}}|damage-whump)</li>
+						<li><span data-i18n="target-restrained">The target is RESTRAINED</span></li>
+						<li><span data-i18n="target-prone">The target is PRONE</span></li>
+					</ul>
+				{{/rollTotal() type 4}}
+				{{#rollTotal() type 1}}
+					[<span data-i18n="damage">damage</span>](~{{charname}}|damage-pam)<br/>
+				{{/rollTotal() type 1}}
+				{{#rollTotal() type 2}}
+					{{#rollGreater() karma 0}}[<span data-i18n="damage">damage</span>](~{{charname}}|damage-ratatat)<br/>{{/rollGreater() karma 0}}
+				{{/rollTotal() type 2}}
+				{{#rollTotal() karma 1}}
+					{{#rollLess() type 1}}<p><span data-i18n="good-karma">Good Karma!</span></p>{{/rollLess() type 1}}
+					{{#rollBetween() type 1 4}}<p><span data-i18n="good-karma-underlings">Good Karma! Underlings and Mooks are OUT COLD.</span></p>{{/rollBetween() type 1 4}}
+					{{#rollBetween() type 1 3}}<p><span data-i18n="reroll-damage">Re-roll damage if you wish.</span></p>{{/rollBetween() type 1 3}}
+				{{/rollTotal() karma 1}}
+			{{/rollTotal() outcome 1}}
+			{{#rollTotal() outcome 2}}
+				<p><span data-i18n="failure">Zut! Failure</span></p>
+				{{#rollTotal() karma 1}}
+					{{#rollLess() type 1}}<p><span data-i18n="bad-karma">Bad Karma!</span></p>{{/rollLess() type 1}}
+					{{#rollBetween() type 1 4}}
+						<p><span data-i18n="bad-karma-minus">#$@$*#@! Bad Karma strikes! your next check is at -2 pips</span></p>
+						{{#rollBetween() type 1 3}}{{#rollBetween() reload 1 1}}<p><span data-i18n="weapon-jammed">Weapon jammed!</span></p>{{/rollBetween() reload 1 1}}{{/rollBetween() type 1 3}}
+					{{/rollBetween() type 1 4}}
+				{{/rollTotal() karma 1}}
+			{{/rollTotal() outcome 2}}			
+			{{#rollBetween() reload 1 1}}<p><span data-i18n="out-of-ammo">Out of ammo!</span></p>{{/rollBetween() reload 1 1}}
+			{{#rollTotal() type 1}}<span data-i18n="reduce-ini">Reduce initiative score by 2</span>{{/rollTotal() type 1}}
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-npc-ini-fix">
+    <div class="sheet-template-container">
+		<p>{{name}}</p>
+		<div class="sheet-template-info">		
+			<p><span data-i18n="initiative">ini</span> <b>{{computed::ini}}</b></p>
+		</div>
+		<div class="sheet-template-flip">
+			[<span data-i18n="add-to-ini">INI</span>](~{{charname}}|settracker)
+		</div>
+	</div>	
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-d100-ini">
+    <div class="sheet-template-container">
+		<p>{{name}}</p>
+		<p><span data-i18n="{{skill}}">Skill</span> <span data-i18n="of">of</span> {{target}}</p>
+		<div class="sheet-template-result">
+			<div class="sheet-template-tens">{{tens}}</div>
+			<div class="sheet-template-ones">{{ones}}</div>
+			{{#pips}}
+			<div class="sheet-template-pips">
+				{{pips}} <span data-i18n="pips"></span>
+			</div>
+			{{/pips}}		
+		</div>
+		<div class="sheet-template-info">
+			{{#rollTotal() computed::outcome 1}}
+				<p><span data-i18n="success">Success!</span></p>
+				{{#rollTotal() computed::karma 1}}<p><span data-i18n="good-karma">Good Karma!</span></p>{{/rollTotal() computed::karma 1}}
+			{{/rollTotal() computed::outcome 1}}
+			{{#rollTotal() computed::outcome 2}}
+				<p><span data-i18n="failure">Zut! Failure</span></p>
+				{{#rollTotal() computed::karma 1}}<p><span data-i18n="bad-karma">Bad Karma!</span></p>{{/rollTotal() computed::karma 1}}
+			{{/rollTotal() computed::outcome 2}}
+			<p><span data-i18n="initiative">ini</span> <b>{{computed::ini}}</b></p>
+		</div>
+		<div class="sheet-template-flip">
+			[<span data-i18n="flip">Flip</span>](~{{charname}}|flip-ini)
+			[<span data-i18n="add-to-ini">INI</span>](~{{charname}}|settracker)
+		</div>
+	</div>	
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-d100-flip-ini">
+    <div class="sheet-template-container">
+		<p>{{name}}</p>
+		<p><span data-i18n="flips">flip</span></p>
+		<div class="sheet-template-result">
+			<div class="sheet-template-tens">{{tens}}</div>
+			<div class="sheet-template-ones">{{ones}}</div>
+			{{#pips}}
+			<div class="sheet-template-pips">
+				{{pips}} <span data-i18n="pips"></span>
+			</div>
+			{{/pips}}
+		</div>
+		<div class="sheet-template-info">
+			{{#rollGreater() success 0}}
+				<p><span data-i18n="success">Success!</span></p>
+			{{/rollGreater() success 0}}
+			{{#rollTotal() success 0}}
+				<p><span data-i18n="failure">Zut! Failure</span></p>
+			{{/rollTotal() success 0}}
+			<p><span data-i18n="initiative">ini</span> <b>{{ini}}</b></p>
+		</div>
+		<div class="sheet-template-flip">
+			[<span data-i18n="add-to-ini">INI</span>](~{{charname}}|flip-settracker)
+		</div>
+	</div>
+</rolltemplate>
+
+<script type="text/worker">
+//Attributes for multilanguage support in roll queries
+on("sheet:opened", function(eventInfo){
+	setAttrs({
+        ["how_many_dice"]: 	getTranslationByKey("how-many-dice"),
+		["weapon"]: 		getTranslationByKey("unarmed"),
+		["unarmedskill"]: 	getTranslationByKey("melee"),
+    });    
+});
+
+
+//Set max Vitality based on skill values    
+    on("change:agility change:melee change:rangedcombat change:vitality_npc_max sheet:opened", function() {
+        getAttrs(["agility","melee","rangedcombat","vitality_npc_max"], function(values) {
+			var agi = parseInt(values["agility"])||0;
+			var mel = parseInt(values["melee"])||0;
+			var rng = parseInt(values["rangedcombat"])||0;
+			var npc = parseInt(values["vitality_npc_max"])||0;
+			
+			let agimod = 0;
+			if(agi > 64) agimod = 2;
+			else if(agi > 44) agimod = 1;
+			
+			let cbtmod = 0;
+			if(mel > 64 || rng > 64) cbtmod = 2;			
+			else if(mel > 44 || rng > 44) cbtmod = 1;
+
+			let mod = 4;
+			if (npc > 0) mod = npc;
+			else if(agimod == 2 && cbtmod == 2) mod = 7;	
+			else if(agimod == 2 || cbtmod == 2) mod = 6;			
+			else if(agimod == 1 && cbtmod == 1) mod = 5;			
+			else if(agimod == 1 || cbtmod == 1) mod = 5;
+						
+			setAttrs({
+                vitality_max: mod
+            });
+        });
+	});
+
+//Modify max Vitality if exhausted	
+    on("change:exhausted change:vitality_max sheet:opened", function() {
+        getAttrs(["exhausted","vitality_max"], function(values) {
+			var exhausted = parseInt(values.exhausted)||0;			
+			var vmax = parseInt(values.vitality_max)||0;
+			
+			let newmax = vmax
+			if(exhausted == 1) newmax = Math.ceil(vmax/2);
+			else if(exhausted == 2) newmax = Math.ceil(vmax / 4);			
+			else if(exhausted == 3) newmax = Math.ceil(vmax / 8);			
+						
+			setAttrs({
+                vitality_max_vis: newmax
+            });
+        });
+	});
+
+//Regular skill rolls
+
+	on('clicked:basicd100', (event) => {
+		const mRollParams = new Map();
+		startRoll(getRollString("d100",mRollParams), (results) => {
+			
+			//safe results for a flip
+			safeFlipResults(results,new Map());	
+			
+			finishRoll(results.rollId);
+		});
+	});
+
+	on('clicked:skillroll clicked:gennpc clicked:specnpc', (event) => {	
+		const skill = event.htmlAttributes.value;
+		const mRollParams = new Map([
+			["skill",	skill],
+			["target",	"[[@{"+skill+"}]]"],
+			["outcome",	"[[0]]"],
+			["karma",	"[[0]]"],
+			["pips",	"[[?{"+getTranslationByKey("total-pips")+"|0}]]"],
+			["type",	"[[0]]"]
+		]);
+		startRoll(getRollString("d100",mRollParams), (results) => {
+            const tens = results.results.tens.result;
+			const ones = results.results.ones.result;
+			const target = results.results.target.result;
+			const pips = results.results.pips.result;
+			var total = calcTotal(tens,ones,0);
+			var totalfliped = calcTotal(tens,ones,1);
+			var krm = calcKarma(tens,ones);
+			var out = getSuccessOrFailure(tens,ones,pips,target,0);
+			var outfliped = getSuccessOrFailure(tens,ones,pips,target,1);
+			
+			//safe results for a flip
+			safeFlipResults(results,new Map([
+				["last-roll-fliped",	outfliped],
+				["last-roll-skill",		skill],
+				["last-roll-pips",		pips],
+				["last-roll-target",	target],
+			]));
+            
+			finishRoll(
+                results.rollId,
+                {
+					outcome: out,
+					karma: krm
+                }
+            );
+        });
+    });
+
+//INI Rolls
+	on('clicked:d100-ini', (event) => {rollIni(event,1)});
+	on('clicked:npc_ini_fix', (event) => {rollIni(event,2)});
+	on('clicked:npc_ini', (event) => {rollIni(event,3)});
+
+//NPC skill rolls
+	on('clicked:repeating_skills:skillnpc', (event) => {
+        const trigger = event.triggerName.slice(8);  // this always starts with 'clicked:'
+		const prefix = trigger.startsWith('repeating_') ? trigger.split('_').slice(0,3).join('_') + '_' : '' // prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes 
+		let txtVal = "@{npcskilltext}";
+        let txtPart = txtVal.replaceAll('@{', `@{${prefix}`);		
+		let tgtVal = "@{skillnpc}";
+        let tgtPart = tgtVal.replaceAll('@{', `@{${prefix}`);
+		const skill = txtPart;
+		const mRollParams = new Map([
+			["skill_raw",	skill],
+			["target",		"[["+tgtPart+"]]"],
+			["outcome",		"[[0]]"],
+			["karma",		"[[0]]"],
+			["pips",		"[[?{"+getTranslationByKey("total-pips")+"|0}]]"],
+			["type",		"[[0]]"]
+		]);		
+
+		startRoll(getRollString("d100",mRollParams), (results) => {
+            const tens = results.results.tens.result;
+            const ones = results.results.ones.result;			
+			const target = results.results.target.result;
+			const pips = results.results.pips.result;
+			const invpips = pips * -1;
+			var total = calcTotal(tens,ones,0);
+			var totalfliped = calcTotal(tens,ones,1);
+			var krm = calcKarma(tens,ones);
+			var out = getSuccessOrFailure(tens,ones,pips,target,0);
+			var outfliped = getSuccessOrFailure(tens,ones,pips,target,1);
+			
+            //safe results for a flip
+			safeFlipResults(results,new Map([
+				["last-roll-fliped",	outfliped],
+				["last-roll-skill",		skill],
+				["last-roll-pips",		pips],
+				["last-roll-target",	target],
+				["last-roll-skill-raw",	skill],
+			]));
+            
+			finishRoll(
+                results.rollId,
+                {
+					outcome: out,
+					karma: krm
+                }
+            );
+        });
+    });
+
+
+//Combat rolls	
+	on('clicked:repeating_attacks:pam', (event) => {rollRangedAttack(event,1);});
+	on('clicked:repeating_attacks:rat', (event) => {rollRangedAttack(event,2);});
+	on('clicked:repeating_attacks:ranged', (event) => {rollRangedAttack(event,3);});
+	on('clicked:attack_unarmed clicked:repeating_attacks:melee', (event) => {rollMeleeAttack(event,3);});
+	on('clicked:whump_unarmed clicked:repeating_attacks:whump', (event) => {rollMeleeAttack(event,4);});
+
+//NPC combat rolls
+	on('clicked:repeating_attacks:atknpc', (event) => {
+		resetFlipResults();
+
+		const trigger = event.triggerName.slice(8);  // this always starts with 'clicked:'
+		const prefix = trigger.startsWith('repeating_') ? trigger.split('_').slice(0,3).join('_') + '_' : '' // prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes 
+		let dmgVal = "@{npcweapondmg}";
+        let dmgPart = dmgVal.replaceAll('@{', `@{${prefix}`);
+		let relVal = "@{npcreloadval}";
+		let relPart = relVal.replaceAll('@{', `@{${prefix}`);		
+		let tgtVal = "@{npcattack}";
+		let tgtPart = tgtVal.replaceAll('@{', `@{${prefix}`);
+		let txtVal = "@{npcatktxt}";
+		let txtPart = txtVal.replaceAll('@{', `@{${prefix}`);
+		const mRollParams = new Map([
+			["skill_raw",	txtPart],
+			["target",	"[["+tgtPart+"]]"],
+			["outcome",	"[[0]]"],
+			["karma",	"[[0]]"],
+			["ini",		"[[0]]"],
+			["pips",	"[[?{"+getTranslationByKey("total-pips")+"|0}]]"],
+			["type",	"[[3]]"],	
+			["reload",	"[["+relPart+"]]"],
+		]);
+				
+		//const rolltext = "&{template:atk} {{char=@{name}}} {{atktxt="+txtPart+"}} {{target=[["+tgtPart+"]]}} {{roll1=[[1d100]]}} {{outcome=[[0]]}} {{pips=[[?{"+getTranslationByKey("total-pips")+"|0}]]}} {{type=[[5]]}} {{reload=[["+relPart+"]]}}"
+		startRoll(getRollString("d100",mRollParams), (results) => {
+			const tens = results.results.tens.result;
+			const ones = results.results.ones.result;
+			const target = results.results.target.result;
+			const pips = results.results.pips.result;
+			var total = calcTotal(tens,ones,0);
+			var totalfliped = calcTotal(tens,ones,1);
+            var krm = calcKarma(tens,ones);
+			var out = getSuccessOrFailure(tens,ones,pips,target,0);
+			var outfliped = getSuccessOrFailure(tens,ones,pips,target,1);
+			var rld = results.results.reload.result;
+			
+			//Reload
+			if (rld < 99 && rld <= ones) {rld = 1;}
+			if (ones == 0) {rld = 1;}
+
+			mFlipResults = new Map([
+				["last-roll-fliped",	outfliped],
+				["last-roll-skill-raw",	txtPart],
+				["last-roll-pips",		pips],
+				["last-roll-target",	target],
+				["last-roll-outcome",	out],
+				["last-roll-karma",		krm],
+				["damage-dices",		dmgPart],			
+			]);				
+
+			//safe results for a flip
+			safeFlipResults(results,mFlipResults);
+			
+            finishRoll(
+                results.rollId,
+                {
+					outcome: out,
+					karma: krm,
+					reload: rld,
+                }
+            );
+        });
+    });
+
+//Defence rolls
+	on('clicked:def_npc', (event) => {
+		const rolltext = "&{template:def} {{char=@{name}}} {{targetm=[[@{melee}]]}} {{targetr=[[@{agility}]]}} {{targetn=[[@{npcdefence}]]}} {{target=[[0]]}} {{roll1=[[1d100]]}} {{outcome=[[0]]}} {{pips=[[?{"+getTranslationByKey("total-pips")+"|0}]]}} {{type=[["+event.htmlAttributes.value+"]]}}"
+		startRoll(rolltext, (results) => {
+			const total = results.results.roll1.result;
+            const tens = Math.floor(total / 10);
+			const ones = total % 10;
+			const tgtm = results.results.targetm.result;
+			const tgtr = results.results.targetr.result;
+			const tgtn = results.results.targetn.result;
+			const pips = results.results.pips.result;
+			const invpips = pips * -1;
+			const rolltype = results.results.type.result;
+			var tens2 = tens;
+			var out = 0;
+			var tgt = tgtm;
+			if (rolltype == 1) {
+				tgt = tgtr;
+			}
+			else if (rolltype == 3) {
+				tgt = tgtn;
+			}
+			if (tens == 10) {
+				tens2 = 0;
+			}
+			if (pips > 0 && ones > 0 && pips >= ones && tens2 == ones) {
+				out = 3;
+			}
+			else if (pips > 0 && ones > 0 && pips >= ones) {
+				out = 1;
+			}
+			else if (invpips > 0 && ones > 0 && invpips >= ones && tens2 == ones) {
+				out = 4;
+			}
+			else if (invpips > 0 && ones > 0 && invpips >= ones) {
+				out = 2;
+			}
+			else if (total <= tgt && tens2 == ones) {
+				out = 3;
+			}
+			else if (total > tgt && tens2 == ones) {
+				out = 4;
+			}
+			else if (total <= tgt) {
+				out = 1;
+			}
+			else if (total > tgt) {
+				out = 2;
+			}
+            finishRoll(
+                results.rollId,
+                {
+					outcome: out,
+					target: tgt,
+                }
+            );
+        });
+    });
+	
+//Helper Functions
+function getRollString(sTemplate,mRollParams) {
+	let sRoll = "";
+	
+	sRoll = "&{template:"+sTemplate+"} {{name=@{name}}} {{charname=@{character_name}}} {{tens=[[1d10-1]]}} {{ones=[[1d10-1]]}} {{dicetype=d%}} {{dicecount=1}}"
+	//sRoll = "&{template:"+sTemplate+"} {{name=@{name}}} {{charname=@{character_name}}} {{tens=[[7]]}} {{ones=[[7]]}} {{dicetype=d%}} {{dicecount=1}}"
+	mRollParams.forEach((value, key) => sRoll = sRoll + " {{"+key+"="+value+"}}");
+	return sRoll;
+}
+
+function safeFlipResults(results,mFlipParams) {
+	if (typeof results.results.ones !== 'undefined') {ones = results.results.ones.result} else {ones = 0}
+	if (typeof results.results.tens !== 'undefined') {tens = results.results.tens.result} else {tens = 0}
+	if (typeof results.results.type !== 'undefined') {type = results.results.type.result} else {type = 0}
+	if (typeof results.results.outcome !== 'undefined') {outcome = results.results.outcome.result} else {outcome = 0}
+
+	setAttrs({
+		["last-roll-ones"]: 		ones,
+		["last-roll-tens"]: 		tens,
+		["last-roll-type"]: 		type,
+		["last-roll-outcome"]: 		outcome,
+		["last-roll-fliped"]: 		mFlipParams.get("last-roll-fliped")||0,
+		["last-roll-ini"]: 			mFlipParams.get("last-roll-ini")||0,
+		["last-roll-ini-fliped"]: 	mFlipParams.get("last-roll-ini-fliped")||0,
+		["last-roll-skill"]: 		mFlipParams.get("last-roll-skill")||"",
+		["last-roll-skill-raw"]: 	mFlipParams.get("last-roll-skill-raw")||"",
+		["last-roll-pips"]: 		mFlipParams.get("last-roll-pips")||0,
+		["last-roll-target"]: 		mFlipParams.get("last-roll-target")||0,
+		["last-roll-wdamage"]: 		mFlipParams.get("last-roll-wdamage")||0,
+		["damage-dices"]: 			mFlipParams.get("damage-dices")||0
+	});
+}
+
+function resetFlipResults () {
+	setAttrs({
+		["last-roll-ones"]: 		"",
+		["last-roll-tens"]: 		"",
+		["last-roll-type"]: 		"",
+		["last-roll-outcome"]: 		"",
+		["last-roll-fliped"]: 		"",
+		["last-roll-ini"]: 			"",
+		["last-roll-ini-fliped"]: 	"",
+		["last-roll-skill"]: 		"",
+		["last-roll-skill-raw"]: 	"",
+		["last-roll-pips"]: 		"",
+		["last-roll-target"]: 		"",
+		["damage-dices"]: 			""
+	});
+}
+
+function calcTotal(iTens, iOnes, iFliped) {
+	let iTotal
+	
+	if (iFliped == 0) {	//Total of real d100
+		iTotal = (iTens * 10) + iOnes;
+	} else {	//Total of fliped d100
+		iTotal = (iOnes * 10) + iTens;
+	}
+	if (iOnes == 0 && iTens == 0) {		//Two 0 count 100
+		iTotal = 100;
+	}
+	
+	return iTotal
+}
+
+function getSuccessOrFailure(iTens, iOnes, iPips, iTarget, iFliped) {
+	let iOut = 0; // 1 - Success / 2 - Failure
+	let iTotal = calcTotal(iTens,iOnes,iFliped);
+	let iCheck = 0;
+	const iInvPips = iPips * - 1;
+	
+	if (iFliped == 0){		//Check ones on real d100
+		iCheck = iOnes;
+	} else {				//Check tens on fliped d100
+		iCheck = iTens;
+	}
+	
+	if (iPips > 0) {
+		if ((1 <= iCheck && iCheck <= iPips) || iTotal <= iTarget) {iOut = 1} else {iOut = 2};
+	} else if (iPips < 0) {
+		if ((1 <= iCheck && iCheck <= iInvPips) || iTotal > iTarget) {iOut = 2} else {iOut = 1};
+	} else if (iTotal <= iTarget) {
+		iOut = 1;
+	} else {
+		iOut = 2;
+	}
+	
+	//if (iOut == 2 && iFliped == 1) {iOut = ""} //Warum habe ich das gemacht?? Flips bei NPC-Attacken zeigen damit jedenfalls Misserfolge nicht an
+	
+	return iOut;
+}
+
+function calcKarma(iTens,iOnes) {
+	let iKarma = 0;
+	
+	if (iOnes == iTens) {iKarma = 1}
+	
+	return iKarma;
+}
+
+function rollRangedAttack(event, iType){
+	resetFlipResults();
+	
+	const trigger = event.triggerName.slice(8);  // this always starts with 'clicked:'
+	const prefix = trigger.startsWith('repeating_') ? trigger.split('_').slice(0,3).join('_') + '_' : '' // prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes 
+	let dmgVal = "@{weapondmg}";
+	let dmgPart = dmgVal.replaceAll('@{', `@{${prefix}`);
+	let relVal = "@{reloadval}";
+	let relPart = relVal.replaceAll('@{', `@{${prefix}`);
+	const skill = "rangedcombat";
+	
+	const mRollParams = new Map([
+		["skill",	skill],
+		["target",	"[[@{"+skill+"}]]"],
+		["outcome",	"[[0]]"],
+		["karma",	"[[0]]"],
+		["ini",		"[[0]]"],
+		["pips",	"[[?{"+getTranslationByKey("total-pips")+"|0}]]"],
+		["type",	"[["+iType+"]]"],	
+		["reload",	"[["+relPart+"]]"],
+	]);
+	
+	startRoll(getRollString("d100",mRollParams), (results) => {
+		const tens = results.results.tens.result;
+		const ones = results.results.ones.result;
+		const target = results.results.target.result;
+		const pips = results.results.pips.result;
+		var total = calcTotal(tens,ones,0);
+		var totalfliped = calcTotal(tens,ones,1);
+		var krm = calcKarma(tens,ones);
+		var out = getSuccessOrFailure(tens,ones,pips,target,0);
+		var outfliped = getSuccessOrFailure(tens,ones,pips,target,1);
+		var rld = results.results.reload.result;
+		
+		//Reload
+		if (rld < 99 && rld <= ones) {rld = 1;}
+		if (ones == 0) {rld = 1;}
+		
+		mFlipResults = new Map([
+			["last-roll-fliped",	outfliped],
+			["last-roll-skill",		skill],
+			["last-roll-pips",		pips],
+			["last-roll-target",	target],
+			["last-roll-outcome",	out],
+			["last-roll-karma",		krm],
+			["damage-dices",		dmgPart],			
+		]);				
+
+		//safe results for a flip
+		safeFlipResults(results,mFlipResults);
+		
+		finishRoll(
+			results.rollId,
+			{
+				outcome: out,
+				karma: krm,
+				reload: rld,
+			}
+		);	
+	});
+}
+
+function rollMeleeAttack(event, iType){
+	resetFlipResults();
+	
+	const trigger = event.triggerName.slice(8);  // this always starts with 'clicked:'
+	const prefix = trigger.startsWith('repeating_') ? trigger.split('_').slice(0,3).join('_') + '_' : '' // prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes 
+	let dmgVal = "@{weapondmg}";
+	let dmgPart = dmgVal.replaceAll('@{', `@{${prefix}`);
+	const skill = "melee";
+	
+	const mRollParams = new Map([
+		["skill",	skill],
+		["target",	"[[@{"+skill+"}]]"],
+		["outcome",	"[[0]]"],
+		["karma",	"[[0]]"],
+		["ini",		"[[0]]"],
+		["pips",	"[[?{"+getTranslationByKey("total-pips")+"|0}]]"],
+		["type",	"[["+iType+"]]"],	
+		["reload",	"[[0]]"],
+	]);
+	
+	startRoll(getRollString("d100",mRollParams), (results) => {
+		const tens = results.results.tens.result;
+		const ones = results.results.ones.result;
+		const target = results.results.target.result;
+		const pips = results.results.pips.result;
+		var total = calcTotal(tens,ones,0);
+		var totalfliped = calcTotal(tens,ones,1);
+		var krm = calcKarma(tens,ones);
+		var out = getSuccessOrFailure(tens,ones,pips,target,0);
+		var outfliped = getSuccessOrFailure(tens,ones,pips,target,1);
+		
+		mFlipResults = new Map([
+			["last-roll-fliped",	outfliped],
+			["last-roll-skill",		skill],
+			["last-roll-pips",		pips],
+			["last-roll-target",	target],
+			["last-roll-outcome",	out],
+			["last-roll-karma",		krm],
+			["damage-dices",		dmgPart],
+		]);		
+				
+		//safe results for a flip
+		safeFlipResults(results,mFlipResults);
+		
+		finishRoll(
+			results.rollId,
+			{
+				outcome: out,
+				karma: krm,				
+			}
+		);
+	});
+}
+
+function rollIni(event, iType) {
+	// iType
+	// 1 - pc ini
+	// 2 - npc ini fixed
+	// 3 - npc ini rolled
+
+	if (iType == 2)
+	{
+		const mRollParams = new Map([
+			["ini",		"[[0]]"],		
+		]);
+		startRoll(getRollString("npc-ini-fix",mRollParams), (results) => {
+			getAttrs(["npcinitiative"], function(values){
+				var iIni = parseInt(values["npcinitiative"]);
+			
+				//safe results for a flip
+				safeFlipResults(results,new Map([
+					["last-roll-ini",			iIni],
+				]));
+
+				finishRoll(results.rollId,{ini: iIni});
+			});
+		});
+	} else {
+		var skill = "alertness";
+		if (iType == 3) {skill = "npcinitiative";} //npcs use general skill
+
+		const mRollParams = new Map([
+			["skill",	skill],
+			["target",	"[[@{"+skill+"}]]"],
+			["outcome",	"[[0]]"],
+			["karma",	"[[0]]"],
+			["ini",		"[[0]]"],
+			["pips",	"[[?{"+getTranslationByKey("total-pips")+"|0}]]"],
+		]);
+
+		startRoll(getRollString("d100-ini",mRollParams), (results) => {
+			const tens = results.results.tens.result;
+			const ones = results.results.ones.result;
+			const target = results.results.target.result;
+			const pips = results.results.pips.result;
+			var total = calcTotal(tens,ones,0);
+			var totalfliped = calcTotal(tens,ones,1);
+			var krm = calcKarma(tens,ones);
+			var out = getSuccessOrFailure(tens,ones,pips,target,0);
+			var outfliped = getSuccessOrFailure(tens,ones,pips,target,1);
+			var ini = 0;
+			var inifliped = 0;
+			
+			//Ini
+			if (out == 2 && krm == 1) {ini=0}
+			if (out == 2 && krm == 0) {ini=ones}
+			if (out == 1 && krm == 1) {ini=ones+tens+10}
+			if (out == 1 && krm == 0) {ini=ones+tens}
+			
+			//Inifliped
+			if (outfliped == "" && krm == 1) {inifliped=0}
+			if (outfliped == "" && krm == 0) {inifliped=tens}
+			if (outfliped == 1 && krm == 1) {inifliped=ones+tens+10}
+			if (outfliped == 1 && krm == 0) {inifliped=ones+tens}
+
+			//safe results for a flip
+			safeFlipResults(results,new Map([
+				["last-roll-fliped",		outfliped],
+				["last-roll-skill",			skill],
+				["last-roll-pips",			pips],
+				["last-roll-target",		target],
+				["last-roll-ini",			ini],
+				["last-roll-ini-fliped",	inifliped],
+			]));			
+
+			finishRoll(
+				results.rollId,
+				{
+					outcome: out,
+					karma: krm,
+					ini: ini
+				}
+			);
+		});
+	}
+}
+</script>

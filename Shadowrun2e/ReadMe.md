@@ -6,6 +6,16 @@ This sheet is designed to be functional for any level of subscription, but API h
 
 ## Changelog
 
+### 24/07/2021
+Added and changed by [Darren H](https://app.roll20.net/users/3856359/darren-h)
+
+All Condition monitors (Physical, Stun, Vehicle, Drone, Deck, etc) all apply TN mods to appropiate skills.
+
+Skill Section added to Deck, Vehicle and Drone, so when decking, drving atc, no flicking between tabs to the skill section.
+
+Two columns for Programs to be listed by deckers to avoid a long page scroll.
+
+
 ### 01/02/2021 
 Added and changed by [Darren H](https://app.roll20.net/users/3856359/darren-h)
 

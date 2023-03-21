@@ -1,4 +1,6 @@
 
+//current sheet version
+const currentversion = "1.3.0";
 
 const int = score => parseInt(score, 10) || 0;
 
@@ -14,6 +16,7 @@ buttonlist.forEach(button => {
       });
     });
 });
+
 
 // game system
 
