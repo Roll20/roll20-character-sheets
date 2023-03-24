@@ -4359,40 +4359,12 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.5 -->
+				<!-- current version notes: 2.9.6 -->
 				<ul>
-					<li>My Modifier on Chat Window Skill Rolls. A new row was added to the chat window to show what number you entered in the pop-up dialog box.</li>
 					<li>
-						New Sheet Option. <b>Display Roll Modifier Summary in Chat Window</b>. If checked (by default), the roll chat window will show a summary of modifiers, if any. 
-						This option is available on the campaign level and character sheet level.
-					</li>
-					<li>
-						Combat Tab - Common information tab. Fixed the tooltip for Size Modifier, this refers to <b>your</b> Size Modifer. Reported by underjack.
-					</li>
-					<li>
-						Chat Window Roll Results. Added some formatting, including highlighting the <b>Malfunction</b> warning.
-					</li>
-					<li>
-						Grimoire tab. Added collapsible notes area.
-					</li>
-					<li>
-						Traits notes, removed some unnecessary text from default critical fail/success notes.
-					</li>
-					<li>
-						Repeating Melee and Ranged Tables. Increased the width of the <b>Reference</b> field and updated tooltip.
-					</li>
-					<li>
-						Hit Location & Armor Table. Added a new column to show the final to hit penalty, it will total the modifier for the hit location and the Size Modifier. 
-						This should avoid weird syncing issues when changing hit location and size modifiers. Based on feedback provided by underjack.
-						<ul>
-							<li>
-								<b>Note:</b> When the sheet is updated, it will attempt to remove the size modifier from the hit location modifier. 
-								However, this may not work, you may have to manually adjust the hit location modifier.
-							</li>
-						</ul>
-					</li>
-					<li>
-						Added new Help Section. This is the first iteration and will be expanded and revised over time.
+						Inventory Tab. Updated the table to better handle parent/child relationships. You can assign an item to have a parent item 
+						and select an indent level. There is also a Sort and Indent button that will sort the table alphabetically, then by child items, 
+						including indenting. This should result in child items being directly below parent items.
 					</li>
 				</ul>
 					
@@ -14029,7 +14001,24 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 			<div class="table">
 				<div class="header">
 					<div class="cell col0"><span data-i18n="inventory-label">Inventory</span></div>
-					<div class="cell col-location"><span data-i18n="location-label">Location</span></div>
+					<div class="cell col-location">
+						<div class="popup"><span data-i18n="location-label">Location</span></div>
+						<div class="tooltip tooltip-spell-ref">
+							<span data-i18n="inventory-location-tooltip">
+Where is the item located? This can be a simple description or a Row ID.<br />
+If you enter a Row ID of an inventory item, you will create a parent/child relationship.<br />
+When you change the <b>ON</b> checkbox for the parent, the child will be updated at the same time.<br />
+<b>Example:</b><br />
+You have a backpack, and its Row ID is <i>-mtz5wtyl7cnlrk17p82</i>.<br />
+You also have a rope in your inventory. You can set the location field to <i>-mtz5wtyl7cnlrk17p82</i>.<br />
+That means the rope is now a child of the backpack.<br />
+If you uncheck the <b>ON</b> checkbox for the backpack, the rope's <b>ON</b> checkbox will also become unchecked.<br />
+<b>Note:</b> If you expand the notes, you can select the indent level, this will help show an item is a child of another item<br />
+In the example above, you can set the rope with indent level = 1, the name field for rope will be indented one step.<br />
+If you move the rope directly below the backpack, it will help show the rope is a child of the backpack.
+							</span>
+						</div>	
+					</div>
 					<div class="cell col1"><span data-i18n="abbreviation-technology-level-label">TL</span></div>
 					<div class="cell col1">
 						<div class="popup"><span data-i18n="abbreviation-legality-class-label">LC</span></div>
@@ -14074,7 +14063,8 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
-							<input type="text" name="attr_name" title="Macro: @{NAME|repeating_item_$[row #]_name}" />
+							<input type="hidden" class="indent-field" name="attr_indent_level" value="0" />
+							<input type="text" class="field-to-indent" name="attr_name" title="Macro: @{NAME|repeating_item_$[row #]_name}" />
 							<input type="hidden" name="attr_idkey" />
 						</div>
 						<div class="cell col-location">
@@ -14110,6 +14100,47 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 						</div>
 					</div> <!-- .row -->
 					<div class="row row-details notebox">
+
+						<div class="row-misc">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="row-id-label">Row ID:</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="inventory-row-id-tooltip">
+For inventory, the row id can used to link an inventory item to a parent item.<br />
+That means, if you uncheck the <b>ON</b> checkbox, all the child inventory items will also become unchecked.<br />
+You can use the row id with macros.
+									</span>
+								</span> 
+							</div>
+							<div class="cell">
+								<input type="text" readonly="readonly" name="attr_row_id" value="" />
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row-misc">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="indent-label">Indent</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="inventory-indent-tooltip">
+Select the indent level of the inventory item. This is handy to help show the item belongs to a parent item.
+									</span>
+								</span> 
+							</div>
+							<div class="cell">
+								<select name="attr_indent_level">
+									<option>0</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3</option>
+									<option>4</option>
+								</select>
+							</div>
+						</div> <!-- .row -->
+
 						<div class="cell col-notebox">
 							<div class="show-notes">
 								<span class="label">
@@ -14118,8 +14149,13 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 							</div>
 							<textarea name="attr_notes" title="Macro: @{NAME|repeating_item_$[row #]_notes}"></textarea>
 						</div>
+
+
 					</div> <!-- .row -->
 				</fieldset> <!-- .repeating_item -->
+				<div class="sort-control">
+					<button type="action" name="act_sort_inventory" class="btn sort">Sort & Indent</button>
+				</div>
 				<div class="row row-totals">
 					<div class="cell col0">
 						<div class="cell" style="width: 50px;">
@@ -14682,13 +14718,27 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.5 -->
+			<!-- current version notes: 2.9.6 -->
+			<ul>
+				<li>
+					Inventory Tab. Updated the table to better handle parent/child relationships. You can assign an item to have a parent item 
+					and select an indent level. There is also a Sort and Indent button that will sort the table alphabetically, then by child items, 
+					including indenting. This should result in child items being directly below parent items.
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.5</h4>
+
+			<p>Pull Request: 3/20/2023</p>
 
 			<ul>
 				<li>My Modifier on Chat Window Skill Rolls. A new row was added to the chat window to show what number you entered in the pop-up dialog box.</li>
 				<li>
 					New Sheet Option. <b>Display Roll Modifier Summary in Chat Window</b>. If checked (by default), the roll chat window will show a summary of modifiers, if any. 
 					This option is available on the campaign level and character sheet level.
+				</li>
+				<li>
+					Combat Tab - Common information tab. Fixed the tooltip for Size Modifier, this refers to <b>your</b> Size Modifer. Reported by underjack.
 				</li>
 				<li>
 					Chat Window Roll Results. Added some formatting, including highlighting the <b>Malfunction</b> warning.
@@ -18873,9 +18923,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.5";
+	const version = "2.9.6";
 	
-	const latestChangesDate = "3/20/2023";
+	const latestChangesDate = "3/28/2023";
 	
 	let modCascade = true;
 	
@@ -21289,7 +21339,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	// if toggle is clicked, update the display id.
 	// event = {sourceAttribute, sourceType, triggerName, sourceAttribute, previousValue, newValue}
-	on("change:repeating_spells:spell_toggle_notes change:repeating_skills:skill_toggle_notes change:repeating_techniquesrevised:technique_revised_toggle_notes change:repeating_melee:melee_toggle_notes", event => {
+	on("change:repeating_spells:spell_toggle_notes change:repeating_skills:skill_toggle_notes change:repeating_techniquesrevised:technique_revised_toggle_notes change:repeating_melee:melee_toggle_notes change:repeating_item:item_toggle_notes", event => {
 	
 		let row = event.triggerName;
 	
@@ -21309,6 +21359,10 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				break;
 	
 			case "repeating_melee":
+				updateRowIdDisplay(section, rowId);
+				break;
+
+			case "repeating_item":
 				updateRowIdDisplay(section, rowId);
 				break;
 		}
