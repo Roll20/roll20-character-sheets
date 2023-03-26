@@ -14005,17 +14005,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 						<div class="popup"><span data-i18n="location-label">Location</span></div>
 						<div class="tooltip tooltip-spell-ref">
 							<span data-i18n="inventory-location-tooltip">
-Where is the item located? This can be a simple description or a Row ID.<br />
-If you enter a Row ID of an inventory item, you will create a parent/child relationship.<br />
-When you change the <b>ON</b> checkbox for the parent, the child will be updated at the same time.<br />
-<b>Example:</b><br />
-You have a backpack, and its Row ID is <i>-mtz5wtyl7cnlrk17p82</i>.<br />
-You also have a rope in your inventory. You can set the location field to <i>-mtz5wtyl7cnlrk17p82</i>.<br />
-That means the rope is now a child of the backpack.<br />
-If you uncheck the <b>ON</b> checkbox for the backpack, the rope's <b>ON</b> checkbox will also become unchecked.<br />
-<b>Note:</b> If you expand the notes, you can select the indent level, this will help show an item is a child of another item<br />
-In the example above, you can set the rope with indent level = 1, the name field for rope will be indented one step.<br />
-If you move the rope directly below the backpack, it will help show the rope is a child of the backpack.
+Where is the item located? If you entered a Parent ID in the expanded notes area, this field will be updated with the name of the parent inventory item.<br />
 							</span>
 						</div>	
 					</div>
@@ -14095,7 +14085,7 @@ If you move the rope directly below the backpack, it will help show the rope is 
 							<span name="attr_costtotal" value="0.00" title="Macro: @{NAME|repeating_item_$[row #]_costtotal}" />
 						</div>
 						<div class="cell col8" style="text-align: right;background-color: #c9c9c9;border-bottom: 1px solid white;border-right: 1px solid white;">
-							<input type="hidden" name="attr_inventory_item_carried" value="1" />
+							<input type="hidden" name="attr_carried" />
 							<span name="attr_weighttotal" value="0.000" class="item-weight-total" title="Macro: @{NAME|repeating_item_$[row #]_weighttotal}" />
 						</div>
 					</div> <!-- .row -->
@@ -14116,6 +14106,24 @@ You can use the row id with macros.
 							</div>
 							<div class="cell">
 								<input type="text" readonly="readonly" name="attr_row_id" value="" />
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row-misc">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="parent-id-label">Parent ID</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="inventory-parent-id-tooltip">
+For inventory, the row id can used to link an inventory item to a parent item.<br />
+That means, if you uncheck the <b>ON</b> checkbox, all the child inventory items will also become unchecked.<br />
+You can use the row id with macros.
+									</span>
+								</span> 
+							</div>
+							<div class="cell">
+								<input type="text" name="attr_parent_id" value="" />
 							</div>
 						</div> <!-- .row -->
 
@@ -25260,29 +25268,254 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 		return fields;
 
-	}
+	};
 	
-	on("change:repeating_item:carried", function (event) {
+	on("change:repeating_item:carried", async (event) => {
 	
-		markItemRowAsCarried();
-	
+		if (event.sourceType === "player") {
+
+			let checked = event.newValue;
+
+			let parentId = getRowIdFromEventInfo(event, "repeating_item");
+
+			await updateCarriedStatusOfChildrenAsync(parentId, checked);
+
+		}
+		
 	});
-	
+
 	/**
-	 * Update the hidden input field on/off
-	 * If ON, the row will bold the weight text.
-	 * 
+	 * We're going to generate an inventory tree and use that to find
+	 * child items of the parentId and update their checked status.
+	 * Which will trigger updating totals.
+	 * see: https://typeofnan.dev/an-easy-way-to-build-a-tree-with-object-references/
 	 */
-	function markItemRowAsCarried() {
-	
-		getAttrs(["repeating_item_carried"], function (values) {
-	
-			setAttrs({
-				"repeating_item_inventory_item_carried": values.repeating_item_carried
+	let updateCarriedStatusOfChildrenAsync = async (parentId, checked) => {
+
+		const treeData = await getInventoryTreeData();
+
+		const inventoryTree = getInventoryTree(treeData);
+
+		const parentItem = searchTree(inventoryTree, parentId);
+
+		const descendantIds = getDescendantIdsFromParent(parentItem);
+
+		// only run if we have al least one descendant
+		if (descendantIds.length > 0) {
+
+			let fieldsToUpdate = {};
+
+			descendantIds.forEach(id => {
+
+				let itemCheckFieldName = `repeating_item_${id}_carried`;
+
+				fieldsToUpdate[itemCheckFieldName] = checked;
+
 			});
-	
+
+			setAttrs(fieldsToUpdate);
+
+		}
+		
+	};
+
+	/**
+	 * Gets an array of each inventory item as an object; id, name, parentId
+	 * This can be used to generate a tree structure.
+	 * 
+	 * @return array
+	 */
+	let getInventoryTreeData = async () => {
+
+		let ids = await getSectionIDsAsync("repeating_item");
+
+		// index will correspond with indexes for ids!
+		let fieldsToGet = [];
+
+		ids.forEach( id => {
+
+			let itemNameField = `repeating_item_${id}_name`;
+
+			let itemParentIdField = `repeating_item_${id}_parent_id`;
+
+			fieldsToGet.push(itemNameField);
+
+			fieldsToGet.push(itemParentIdField);
+
 		});
-	
+
+		let values = await getAttrsAsync(fieldsToGet);
+
+		// this is our root of our tree. They key is setting parentId = null
+		let baseRoot = {
+			id: "root",
+			name: "root",
+			parentId: null,
+			children: []
+		};
+
+		let treeData = [baseRoot];
+
+		// now we can loop through ids again and find the values we need.
+		ids.forEach( id => {
+
+			let itemNameField = `repeating_item_${id}_name`;
+
+			let itemParentIdField = `repeating_item_${id}_parent_id`;
+
+			let nameValue = values[itemNameField];
+
+			let parentIdValue = values[itemParentIdField];
+
+			// if it doesn't have a parent id that means
+			// it's a top level item, therefore it's parent is root.
+			if (isEmpty(parentIdValue)) {
+				parentIdValue = "root";
+			}
+
+			let treeItem = {
+				id: id,
+				name: nameValue,
+				parentId: parentIdValue,
+				children: []
+			};
+
+			treeData.push(treeItem);
+
+		});
+
+		return treeData;
+
+	};
+
+	/**
+	 * Generates a tree structure based on array of objects; id, name, parentId
+	 * see: https://typeofnan.dev/an-easy-way-to-build-a-tree-with-object-references/
+	 */
+	let getInventoryTree = (treeData) => {
+
+		// Making an ID-to-Array Position Map
+		const idMapping = treeData.reduce((acc, el, i) => {
+			acc[el.id] = i;
+			return acc;
+		}, {});
+
+		let root;
+
+		treeData.forEach((el) => {
+
+			// Handle the root element
+			if (el.parentId === null) {
+				root = el;
+				return;
+			}
+
+			// Use our mapping to locate the parent element in our data array
+			const parentEl = treeData[idMapping[el.parentId]];
+		
+			// Add our current el to its parent's `children` array
+			parentEl.children = [...(parentEl.children || []), el];
+		
+		});
+
+		return root;
+
+	};
+
+	/**
+	 * find a node in a tree by the element id
+	 * see: https://stackoverflow.com/a/9133680
+	 */
+	let searchTree = (node, idToFind) => {
+
+		if(node.id == idToFind) {
+        
+			return node;
+     
+		} else if (node.children.length > 0) {
+        
+			let foundNode = null;
+          
+			for (let i = 0; foundNode == null && i < node.children.length; i++){
+               
+				foundNode = searchTree(node.children[i], idToFind);
+          
+			}
+          
+			return foundNode;
+     	}
+
+    	return null;
+
+	};
+
+	/**
+	 * Get an array of descendant ids from a parent node.
+	 */
+	let getDescendantIdsFromParent = (parentNode, ids = null) => {
+
+		if (ids == null) {
+			ids = [];
+		}
+
+		parentNode.children.forEach(childNode => {
+
+			ids.push(childNode.id);
+
+			if (childNode.children.length > 0) {
+				ids = getDescendantIdsFromParent(childNode, ids);
+			}
+
+		});
+
+		return ids;
+
+	}; 
+
+	on("change:repeating_item:parent_id", event => {
+
+		if (event.sourceType === "player") {
+
+			let parentId = event.newValue;
+
+			let childId = getRowIdFromEventInfo(event, "repeating_item");
+
+			if (!isEmpty(parentId) && !isEmpty(childId)) {
+
+				updateInventoryLocationName(parentId, childId);
+			}
+
+		}		
+		
+	});
+
+	function updateInventoryLocationName(parentId, childId) {
+
+		const parentNameField = `repeating_item_${parentId}_name`;
+
+		const childLocationField = `repeating_item_${childId}_location`;
+
+		const childIndentField = `repeating_item_${childId}_indent_level`;
+
+		getAttrs([parentNameField], values => {
+
+			const parentName = values[parentNameField];
+
+			if (!isEmpty(parentName)) {
+
+				let updateFields = {};
+
+				updateFields[childLocationField] = parentName;
+
+				// for now just indent one level
+				updateFields[childIndentField] = 1;
+
+				setAttrs(updateFields);
+
+			}
+			
+		});
+
 	}
 	
 	/**
