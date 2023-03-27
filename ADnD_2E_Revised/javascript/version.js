@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
 const SHEET_NAME = 'AD&D 2E Revised';
-const SHEET_VERSION = '4.14.2';
+const SHEET_VERSION = '4.16.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -28,11 +28,11 @@ on('sheet:opened', function(){
             if (oldSheetVersion.isBelowMigrate(3, 3, 2))
                 migrate3_3_2();
 
-            if (oldSheetVersion.isBelowMigrate(3, 4, 0))
-                migrate3_4_0();
-
             if (oldSheetVersion.isBelowMigrate(4, 3, 0))
                 migrate4_3_0();
+
+            if (oldSheetVersion.isBelowMigrate(4, 16, 0))
+                migrate4_16_0();
         }
     });
 });
@@ -79,6 +79,20 @@ function moveStaticToRepeating(section, fieldsToMove) {
     });
 }
 //#endregion
+
+//#region version 4.16.0
+function migrate4_16_0() {
+    console.log('Migrating to v4.16.0');
+    // Ensure the calculated psionic ability score value is set for existing sheets
+    getAttrs(['constitution','intelligence','wisdom','psion-con-mod','psion-int-mod','psion-wis-mod'], function (values) {
+        let newValue = {};
+        newValue['constitution-psi'] = (parseInt(values['constitution']) || 0) + (parseInt(values['psion-con-mod']) || 0);
+        newValue['intelligence-psi'] = (parseInt(values['intelligence']) || 0) + (parseInt(values['psion-int-mod']) || 0);
+        newValue['wisdom-psi'] = (parseInt(values['wisdom']) || 0) + (parseInt(values['psion-wis-mod']) || 0);
+
+        setAttrs(newValue, {silent: true});
+    });
+}
 
 //#region version 4.3.0
 let oldCurrencySections = [['2', 'Dragonlance'], ['3', 'Dark Sun'], ['4', 'Ravenloft'], ['5', 'Maztica'], ['6', 'BirthRight']];
@@ -184,13 +198,6 @@ function migrateOtherValuables() {
         if (!_.isEmpty(newValue))
             setAttrs(newValue);
     });
-}
-//#endregion
-
-//#region version 3.4.0
-function migrate3_4_0() {
-    console.log('Migrating to v3.4.0');
-    updateNonprofPenalty();
 }
 //#endregion
 
