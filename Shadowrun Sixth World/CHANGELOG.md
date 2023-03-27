@@ -1,11 +1,59 @@
 Change Log
 ==============================================
+**2023-03-20 ** v.77 Chuz (James Culp)
+	Bugfix - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
+	Bugfix - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
+**2023-03-13 ** v.76 Chuz (James Culp)
+Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
+**2023-03-06 ** v.75 Chuz (James Culp)
+	New Feature - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
+	New Feature - Added Heat, Reputation and AsRep to the Social Pane
+	Added Drag and Drop support for Gear-Ammunition-Grenades Gear-Ammunition-Rockets to place them in the Arms-Grenades section instead of Gear
+	Added Grenade dicepool calculations
+**2023-02-27 ** v.74 Chuz (James Culp)
+	Fix for matrix device stats on drag and drop for NPCs
+	Fix for Sprite drag and drop issue
+	NPCs->Grunts added a stun monitor and flag to display it (it is hidden by default)
+**2023-02-23 ** v.73 Chuz (James Culp)
+	Bugfix - PC Initiatives - Fixed a condition where if a dice mod is set and then the initiative base is changed it keeps adding the dice mod repeatedly.
+**2023-02-20 ** v.72 Chuz (James Culp)
+	Added Magic and Resonance to attribute roll buttons as additional options in the drop down
+	Updated NPC Technomancer Complex Forms
+	Updated NPC Drag&Drop for Spells to attempt to auto-populate the dicepool
+	NPC Complex forms display changes
+	NPC Complex forms roll buttons for no dicepool defined (uses attr_skill + resonance), dicepool defined (uses the dicepool) or description only (skill empty)
+	Update - The old NPCspells repeating data should be retained just in case, for now.
+	Bugfix - Updated calls to geneerateRowID to use a work around to prevent them (hopefully) from duplicating an already existing ID which caused drag and drop items to sometimes not apply properly, causing symptoms like drag and drop NPCs without all of their skills, attacks, or some other repeating item. Or even weirder once a Skill that got overwritten so it had a Specialization from another skill that wasn't there.
+**2023-02-13 ** v.71 Chuz (James Culp)
+	Added essence calculations for drag and drop (and others) allowing for Essence Base to be "Rating x #.##", also Grade calculations now.
+	Added drag and drop for Augmentations
+	Converted NPC Spell roll buttons to use the newer PC style
+	Converted NPC Attack (ranged and melee) buttons to use the new roll buttons
+	Converted NPC Attack (ranged and melee) buttons to use the new roll template weapon info block
+	Updated Matrix Roll buttons to include inline opposed roll buttons.  To use these the target's token must be selected.
+	Converted Grunt skill buttons to new style
+	Converted Vehicle Autosoft roll buttons to the newer PC style
+	Converted NPC attribute roll buttons to the newer PC style
+	Converted NPC Initiative and Defense button blocks to the newer PC style
+	Began adding weapon information as it's own section in the attack Roll Templates
+	Added weapon info to Ranged attack Roll Templates
+	Added weapon info to Ranged (Burst Fire Wide) attack Roll Templates
+	Added weapon info to Melee attack Roll Templates
+	Began adding tooltips at the bottom of Roll Templates.
+**2023-02-06 ** v.70 Chuz (James Culp)
+	Bugfix - PC Condition Monitor boxes broke if the maximum value was below 8.  Changed the minimum to 6 which is 0 body with Neoteny so should be unattainable.
+**2023-01-17 ** v.69 Chuz (James Culp)
+	Add Contacts drag and drop capability, you can now drag ANY NPC from the compendium and their name and description will be added to your contacts, also loyalty, connections and favors if the NPC has those attributes (currently none do)
+	NPCs->Powers text added for all NPCs not just Awakened
+	NPCs->Weaknesses text added for all NPCs
+	NPCs->Spirits added Weaknesses to the Spirts sheet auto-generation code.
+	Bugfix PCs->Armor didn't update DR when deleting armor entries
 **2023-01-05 ** v.68 Chuz (James Culp)
 	BugFix - drag and drop QSR Combat spells
 	New Feature - Sprite drag and drop
 	Bugfix - Sprite sheet matrix_max
 	New Feature - Complex Forms drag and drop
-	Bugfix - Bugfix - PC -> Modifications - changing astral_initiative_dice_mod was doing strange things to the astral initiative dice.  This has been fixed but if your character ended up with a messed up astral_initiative_dice amount look in "Attributes & Abilities" for "astral_initiative_dice" and change it to the correct ammount.
+	Bugfix - PC -> Modifications - changing astral_initiative_dice_mod was doing strange things to the astral initiative dice.  This has been fixed but if your character ended up with a messed up astral_initiative_dice amount look in "Attributes & Abilities" for "astral_initiative_dice" and change it to the correct ammount.
 **2022-12-12 ** v.67 Chuz (James Culp)
 	Update PC -> Magic -> Meta Tradition Hermeticism now displays as "Hermeticism (Logic)" and Shamanism now displays as "Shamanism (Charisma)" for clarity
 	Bugfix NPC -> Vehicles - fixed vehicle/drone default actions

@@ -1,5 +1,10 @@
 Change Log
 ==============================================
+**2023-02-07 ** v.20 Paul V
+	Fixed Stat rolls and NPC Stat rolls and saves
+	Added Features and traits list
+**2023-01-24 ** v.19 Paul V
+	Fixed Initiative (Vehicles and Dex)
 **2022-12-12 ** v.18 Paul V
 	Added Hit Dice Roller - maxes out the number of dice to roll as the current hit dice and reduces the HD by the number of dice rolled - also adds the result to current HP with a maximum of the HP max
 	Added Generic Initiative Bonus

@@ -52,6 +52,9 @@ If you think anything is missing or you see any bugs, please message me via my [
 
 ## Versions
 
+### Version 2.5
+Added whispering and minor bug fix where two skills where the wrong way around. Added Cost and Duration fields to Disciplines
+
 ### Version 2.4
 Added ability to hide attributes of 6+
 
