@@ -36,3 +36,18 @@ Updates 2020-08:
 - change coin weigh calculation (500:1 weight)
 - update inventory page with provisions and carry capcaity
 - update beastman starting bonuses
+
+Updates 2022-01:
+-added Morale field for PCs and hirelings
+-changed skill bonus calculations
+-changed to hit and damage calclations to use skill
+-recoded repeating fields to use getSectionIds, simpler and auto-updating.
+-added small weapons (lower encumbrance)
+-added small/light weapon check for rogue class
+-update class starting text
+-(re)added monster/npc mode sheet
+-clean up unused css
+-fixed encumbrance rounding, added conditional formatting
+-added rogue and hunter bonus to ranged weapons
+-removed str bonus from light and small weapon damage
+-fixed some formatting in javascript

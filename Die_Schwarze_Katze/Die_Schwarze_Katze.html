@@ -86,7 +86,7 @@
                                 <span class="player-character-sheet">(MU + KL + IN) / 3 - 10 + Mod</span>
                                 <input class="player-character-sheet" type="number" name="attr_seelenkraftmod" value="0" />
                                 <span class="player-character-sheet">=</span>
-                                <input class="player-character-sheet" type="number" name="attr_seelenkraft" value="(round((@{mut}+@{klugheit}+@{intuition})/3)-10+@{seelenkraftmod})" disabled />
+                                <input class="player-character-sheet" type="number" name="attr_seelenkraft" value="0" readonly />
                                 <input class="nsc-sheet-inline-block" type="number" name="attr_seelenkraft" value="0" />
                                 <div class="base-info-seelenkraft-detail detail-container">
                                     <label>Notizen</label>
@@ -101,7 +101,7 @@
                                 <span class="player-character-sheet">(KO + KO + KK) / 3 - 10 + Mod</span>
                                 <input class="player-character-sheet" type="number" name="attr_zaehigkeitmod" value="0" />
                                 <span class="player-character-sheet">=</span>
-                                <input class="player-character-sheet" type="number" name="attr_zaehigkeit" value="(round((@{konstitution}+@{konstitution}+@{koerperkraft})/3)-10+@{zaehigkeitmod})" disabled />
+                                <input class="player-character-sheet" type="number" name="attr_zaehigkeit" value="0" readonly />
                                 <input class="nsc-sheet-inline-block" type="number" name="attr_zaehigkeit" value="0" />
                                 <div class="base-info-zaehigkeit-detail detail-container">
                                     <label>Notizen</label>
@@ -116,7 +116,7 @@
                                 <span class="player-character-sheet">(MU + GE) / 2 + Mod</span>
                                 <input class="player-character-sheet" type="number" name="attr_initiativemod" value="0" />
                                 <span class="player-character-sheet">=</span>
-                                <input class="player-character-sheet" type="number" name="attr_initiative" value="(round((@{mut}+@{gewandtheit})/2)+@{initiativemod})" disabled />
+                                <input class="player-character-sheet" type="number" name="attr_initiative" value="0" readonly />
                                 <input class="nsc-sheet-inline-block" type="number" name="attr_initiative" value="0" />
                                 <div class="base-info-initiative-detail detail-container">
                                     <label>Notizen</label>
@@ -1198,7 +1198,7 @@
                 <h3 class="input-label-left">Aktuelle Ahnenenergie</h3>
                 <input class="aktuelleahnenenergie" type="number" name="attr_ahnenenergie" value="0" />
                 <h3 class="input-label-left">Maximale Ahnenenergie</h3>
-                 <input class="fw" type="number" name="attr_ahnenenergie_max" readonly />
+                <input type="number" name="attr_ahnenenergie_max" readonly />
             </div>
             <div class="ancestor-ahnengeschenke">
                 <div class="ancestor-ahnengeschenke-headers">
@@ -1492,29 +1492,14 @@
         return toggle_nsc_charactersheet !== "0";
     }
 
-    // Ahnenenergie calculation
-    on("sheet:opened change:leiteigenschaft change:ahnenenergiemod", function() {
-        getAttrs(["leiteigenschaft", "ahnenenergiemod", "charisma", "klugheit", "intuition", "mut", "toggle_nsc_charactersheet"], function(values) {
-
-            if (isNscSheet(values.toggle_nsc_charactersheet)) {
-                return;
-            }
-
-            let ahnenenergiemod = parseInt(values.ahnenenergiemod)||0;
-            let leiteigenschaft = values.leiteigenschaft;
-            let leiteigenschaftAttribut = parseInt(values[leiteigenschaft])||0;
-            let ahnenenergieCalculated = leiteigenschaftAttribut === 0 ? 0 : 20 + leiteigenschaftAttribut + ahnenenergiemod;
-            // console.log("calculated ahnenenergie_max = " + ahnenenergieCalculated);
-            setAttrs({
-                ahnenenergie_max: ahnenenergieCalculated
-            });
-        });
-    });
+    function parseIntValue(attr) {
+        return parseInt(attr)||0;
+    }
 
     // Skill value calculation
     function calculateEw(e1, e2) {
-        let e1Int = parseInt(e1)||0;
-        let e2Int = parseInt(e2)||0;
+        let e1Int = parseIntValue(e1);
+        let e2Int = parseIntValue(e2);
         return Math.ceil((e1Int + e2Int) / 2);
     }
 
@@ -1544,6 +1529,46 @@
     let skillsListEw2 = skillsList.map(skill => skill + "Ew2");
     let attributeChangeRequiredAttrs = skillsList.concat(skillsListEw1).concat(skillsListEw2).concat(attributeList).concat(["toggle_nsc_charactersheet"]);
 
+
+    // update calculated values
+    on("sheet:opened change:initiativemod change:mut change:gewandtheit change:klugheit change:leiteigenschaft change:ahnenenergiemod change:konstitution change:intuition change:koerperkraft " +
+       "change:lebensenergiemod change:seelenkraftmod change:zaehigkeitmod"
+        , function() {
+        getAttrs(["leiteigenschaft", "ahnenenergiemod", "charisma", "klugheit", "intuition", "konstitution", "initiativemod", "mut",
+                  "gewandtheit", "seelenkraftmod", "toggle_nsc_charactersheet", "lebensenergiemod", "koerperkraft", "zaehigkeitmod"], function(values) {
+
+            if (isNscSheet(values.toggle_nsc_charactersheet)) {
+                return;
+            }
+
+            let mut = parseIntValue(values.mut);
+            let gewandtheit = parseIntValue(values.gewandtheit);
+            let klugheit = parseIntValue(values.klugheit);
+            let konstitution = parseIntValue(values.konstitution);
+            let intuition = parseIntValue(values.intuition);
+            let koerperkraft = parseIntValue(values.koerperkraft);
+
+            let lebensenergiemod = parseIntValue(values.lebensenergiemod);
+            let initiativemod = parseIntValue(values.initiativemod);
+            let ahnenenergiemod = parseIntValue(values.ahnenenergiemod);
+            let seelenkraftmod = parseIntValue(values.seelenkraftmod);
+            let zaehigkeitmod = parseIntValue(values.zaehigkeitmod);
+
+            // Ahnenenergie calculation
+            let leiteigenschaft = values.leiteigenschaft;
+            let leiteigenschaftAttribut = parseIntValue(values[leiteigenschaft]);
+            let ahnenenergieCalculated = leiteigenschaftAttribut === 0 ? 0 : 20 + leiteigenschaftAttribut + ahnenenergiemod;
+
+            setAttrs({
+                "lebensenergie_max": (konstitution*2)+lebensenergiemod,
+                "ahnenenergie_max": ahnenenergieCalculated,
+                "seelenkraft": Math.round((mut+klugheit+intuition)/3)-10+seelenkraftmod,
+                "zaehigkeit": Math.round((konstitution+konstitution+koerperkraft)/3)-10+zaehigkeitmod,
+                "initiative": Math.round((mut + gewandtheit) / 2) + initiativemod
+            });
+        });
+    });
+
     // on attribute change skill update
     attributeList.forEach(attr => {
         on(`change:${attr}`, function() {
@@ -1558,11 +1583,11 @@
                     // update Skill ew properties
                     let skillEw1Abbr = values[skill+"Ew1"];
                     let skillEw1 = getAttributeName(skillEw1Abbr);
-                    let skillEw1Value = parseInt(values[skillEw1])||0;
+                    let skillEw1Value = parseIntValue(values[skillEw1]);
 
                     let skillEw2Abbr = values[skill+"Ew2"];
                     let skillEw2 = getAttributeName(skillEw2Abbr);
-                    let skillEw2Value = parseInt(values[skillEw2])||0;
+                    let skillEw2Value = parseIntValue(values[skillEw2]);
 
                     let skillEw = calculateEw(skillEw1Value, skillEw2Value);
                     attrsToSet[skill+"ew"] = skillEw;
@@ -1577,10 +1602,10 @@
         on("change:"+skill+"ew change:"+skill, function() {
             getAttrs([skill, skill+"ew", "mut", "klugheit", "charisma", "intuition", "gewandtheit", "fingerfertigkeit", "koerperkraft", "konstitution"], function(values) {
                 // console.log("Skill: "+skill);
-                let skillEw = parseInt(values[skill+"ew"])||0;
+                let skillEw = parseIntValue(values[skill+"ew"])||0;
                 // console.log("skillEw: " + skillEw);
 
-                let skillFw = parseInt(values[skill])||0;
+                let skillFw = parseIntValue(values[skill])||0;
                 // console.log("skillFw: " + skillFw);
 
                 // update skill pw, aw, vw properties
@@ -1602,7 +1627,7 @@
 
     // get skillAw or skillVw from meleetype or rangedtype as int
     function getSkillAwOrVw(values, attacktype, awOrVw) {
-        return parseInt(values["skill"+attacktype+awOrVw])||0;
+        return parseIntValue(values["skill"+attacktype+awOrVw]);
     }
 
     // on melee weapon mod aw / vw & melee type change
@@ -1617,8 +1642,8 @@
             let meleetype = values.repeating_meleeweapon_meleetype;
             let skillaw = getSkillAwOrVw(values, meleetype, "aw");
             let skillvw = getSkillAwOrVw(values, meleetype, "vw");
-            let skillawMod = parseInt(values.repeating_meleeweapon_meleemodaw)||0;
-            let skillvwMod = parseInt(values.repeating_meleeweapon_meleemodvw)||0;
+            let skillawMod = parseIntValue(values.repeating_meleeweapon_meleemodaw);
+            let skillvwMod = parseIntValue(values.repeating_meleeweapon_meleemodvw);
 
             let weaponawCalculated = skillaw + skillawMod;
             let weaponvwCalculated = skillvw + skillvwMod;
@@ -1643,7 +1668,7 @@
 
             let rangedtype = values.repeating_rangedweapon_rangedtype;
             // console.log("rangedtype "+rangedtype);
-            let skillaw = parseInt(values["skill"+rangedtype+"aw"])||0;
+            let skillaw = parseIntValue(values["skill"+rangedtype+"aw"]);
             // console.log("skillaw = " + skillaw);
 
             setAttrs({
@@ -1681,8 +1706,8 @@
                     let skillaw = getSkillAwOrVw(values, meleetype, "aw");
                     let skillvw = getSkillAwOrVw(values, meleetype, "vw");
 
-                    let skillawMod = parseInt(values["repeating_meleeweapon_" + id + "_meleemodaw"])||0;
-                    let skillvwMod = parseInt(values["repeating_meleeweapon_" + id + "_meleemodvw"])||0;
+                    let skillawMod = parseIntValue(values["repeating_meleeweapon_" + id + "_meleemodaw"]);
+                    let skillvwMod = parseIntValue(values["repeating_meleeweapon_" + id + "_meleemodvw"]);
 
                     // console.log("skillaw "+skillaw+", skillvw "+skillvw+", skillawMod "+skillawMod+", skillvwMod "+skillvwMod);
 
@@ -1739,14 +1764,14 @@
                 return;
             }
 
-            let skillFw = parseInt(values.repeating_ahnengaben_ahnengabefw)||0;
+            let skillFw = parseIntValue(values.repeating_ahnengaben_ahnengabefw);
 
             let skillEw1Abbr = values["repeating_ahnengaben_ahnengabeEw1"];
             let skillEw1 = getAttributeName(skillEw1Abbr);
-            let skillEw1Value = parseInt(values[skillEw1])||0;
+            let skillEw1Value = parseIntValue(values[skillEw1]);
             let skillEw2Abbr = values["repeating_ahnengaben_ahnengabeEw2"];
             let skillEw2 = getAttributeName(skillEw2Abbr);
-            let skillEw2Value = parseInt(values[skillEw2])||0;
+            let skillEw2Value = parseIntValue(values[skillEw2]);
 
             let skillEw = calculateEw(skillEw1Value, skillEw2Value);
             let skillPw = skillEw + skillFw + 5;
@@ -1779,14 +1804,14 @@
                     let attrsToSet = {};
                     for(var i=0; i < idarray.length; i++) {
                         let id = idarray[i];
-                        let skillFw = parseInt(values["repeating_ahnengaben_" + id + "_ahnengabefw"])||0;
+                        let skillFw = parseIntValue(values["repeating_ahnengaben_" + id + "_ahnengabefw"]);
                         let skillEw1Abbr = values["repeating_ahnengaben_" + id + "_ahnengabeEw1"];
                         let skillEw1 = getAttributeName(skillEw1Abbr);
-                        let skillEw1Value = parseInt(values[skillEw1])||0;
+                        let skillEw1Value = parseIntValue(values[skillEw1]);
 
                         let skillEw2Abbr = values["repeating_ahnengaben_" + id + "_ahnengabeEw2"];
                         let skillEw2 = getAttributeName(skillEw2Abbr);
-                        let skillEw2Value = parseInt(values[skillEw2])||0;
+                        let skillEw2Value = parseIntValue(values[skillEw2]);
 
                         let skillEw = calculateEw(skillEw1Value, skillEw2Value);
                         let skillPw = skillEw + skillFw + 5;

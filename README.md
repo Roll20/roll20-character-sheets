@@ -1,16 +1,94 @@
-Roll20 Character Sheets
-=======================
+<div align="center">
+    <a href="https://roll20.net">
+        <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Roll20%20Logo.png" alt="Roll20 logo" title="Roll20" height="60" />
+    </a>
 
-This repository is the collection of all the community-contributed character sheets that are available for use on Roll20. 
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/Roll20/roll20-character-sheets/master?color=ff0066&label=last%20updated) ![GitHub contributors](https://img.shields.io/github/contributors/Roll20/roll20-character-sheets?color=ff0066) ![Lines of code](https://img.shields.io/tokei/lines/github/Roll20/roll20-character-sheets?color=ff0066&label=lines%20of%20code) ![GitHub repo size](https://img.shields.io/github/repo-size/Roll20/roll20-character-sheets?color=ff0066)
+    
+</div>
 
-Contributing
-============
+# Roll20 Character Sheets
 
-Full Character Sheet documentation can be found on the [Roll20 Wiki: Building Character Sheets](https://wiki.roll20.net/Building_Character_Sheets).
+Roll20.net is the easy-to-use virtual tabletop that brings pen and paper gaming to the web the right way. Built on a powerful platform of tools, yet elegantly simple, it focuses on enhancing what makes tabletop gaming great: storytelling and camaraderie.
 
-Pull requests are processed weekly and should be **submitted no later than 6am PST Mondays**, roughly 13:00-14:00 UTC. Earlier submissions are encouraged to allow for peer review from other contributors. On Monday, a Roll20 staff member will review the content to ensure it meets the standards documented on the [Roll20 Wiki](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository). Comments, concerns, and changes as a result of review will need to be addressed before the pull request can be merged into the repository.
+This repository is the collection of all the community-contributed character sheets that are available for use on [Roll20](https://roll20.net). These are, mostly, created for free, for use by the community, and represent dozens, if not hundreds of hours of effort on the parts of their creators. 
 
-## Internationalization &amp; Translations
+This repository consists of over 📜 **800 community contributed sheets**, from over 🧑 **300 contributors**, who have written over ⌨️ **400,000 lines of code**. This is an 🦦 **otter**.
+
+## Community Conduct
+
+The [Roll20 Code of Conduct](https://help.roll20.net/hc/en-us/articles/360037254334-Community-Code-of-Conduct) applies to your participation on this repository.
+
+**tl;dr**
+
+Following the Roll20 Code of Conduct means **no racism, no sexism, no hate speech, no backseat gaming, no personal attacks, no transphobia, no misgendering, no ableism, no anti-LGBTQIA+ sentiments (and so on) are allowed.**
+
+## Table of Contents
+
+- [Roll20 Character Sheets](#roll20-character-sheets)
+  - [Community Conduct](#community-conduct)
+  - [Table of Contents](#table-of-contents)
+  - [Contributing](#contributing)
+    - [Getting Started](#getting-started)
+    - [Improving Existing Character Sheets](#improving-existing-character-sheets)
+    - [Starting a New Character Sheet](#starting-a-new-character-sheet)
+    - [Submission Guidelines](#submission-guidelines)
+    - [Release Cadence](#release-cadence)
+    - [Internationalization & Translations](#internationalization--translations)
+  - [License](#license)
+  - [Contact](#contact)
+
+## Contributing
+
+There are many ways in which you can contribute to these sheets, and to the health of the space: 
+
+* [Report issues and bugs](https://github.com/Roll20/roll20-character-sheets/issues) you encounter when using the sheets.
+* [Review sheet code changes](https://github.com/Roll20/roll20-character-sheets/pulls)
+* Review and contribute to the documentation on the [community wiki](https://wiki.roll20.net/Building_Character_Sheets).
+* Write or contribute to a new or existing character sheet!
+
+### Getting Started
+
+If you are interested in contributing code, fixing issues, or adding content, the [Roll20 Wiki: Building Character Sheets](https://wiki.roll20.net/Building_Character_Sheets) documentation is a great place to start familiarizing yourself with the space.
+
+### Improving Existing Character Sheets
+
+Before you submit work to the repository, please ensure that there is not already a sheet that covers the game you are intending to create a sheet for. If there is already one, fear not! Be bold and suggest some changes. 
+
+In general, this should look something like this:
+
+* Fork the repository. 
+* Make your changes to the sheet in question.
+* Make the Pull Request.
+* Invite previous contributors to review your changes.
+* Once everyone is satisfied with the changes, we can merge the changes into the existing sheet.
+
+ We have learned from experience that it is better to have a single sheet that is contributed to by a number of people, rather than perpetuating the cycle of a contributing a sheet, losing interest, moving on, and then the next contributor creating an entirely new sheet. This is a collaborative community, please feel empowered to collaborate!
+
+[Beginner's Guide to GitHub](https://wiki.roll20.net/Github) - for Roll20 character sheets
+
+### Starting a New Character Sheet
+
+If you have a burning desire to start from scratch, and there isn't already an existing sheet for a game or system, then it's time to embark upon a voyage of discovery. ⛵ There is plenty of documentation available on the [Roll20 Help Center](https://help.roll20.net/hc/en-us/articles/360037773413) and on the [community wiki](https://wiki.roll20.net/Building_Character_Sheets), but here's a quick primer to get you started. 
+
+A character sheet, at a minimum requires four files in an appropriately named subfolder of the repo:
+
+* **\<sheetname>.html** - This HTML file describes the structure and functionality of your character sheet. It might consist of [inputs to store user data](https://wiki.roll20.net/Building_Character_Sheets#Text_.26_Numbers), [buttons to make rolls](https://wiki.roll20.net/Button#Roll_Button) to the VTT, [repeating sections](https://wiki.roll20.net/Repeating_Sections) to store lists of information (like inventory items), or more advanced elements such as [roll templates](https://wiki.roll20.net/Building_Character_Sheets/Roll_Templates) or [sheet workers](https://wiki.roll20.net/Sheet_Worker_Scripts).
+* **\<sheetname>.css** - This CSS file is primarily responsible for adding styles to your character sheet. However, CSS can be very versatile and such is used for [much](https://wiki.roll20.net/CSS_Wizardry#Tabs), [much](https://wiki.roll20.net/CSS_Wizardry#Custom_Progress_Bar), [much](https://wiki.roll20.net/CSS_Wizardry#Clocks) more. 
+* **preview.(jpg/png/gif)** - This image file is what users will see as a preview, before selecting your sheet.
+* **sheet.json** - This JSON file includes metadata about the sheet, including the filenames for your sheet, your credit as author(s), and much more. It's integral to your sheet being implemented correctly that this format is followed. Please see [this document](https://wiki.roll20.net/Sheet.json) for more information.
+
+### Submission Guidelines
+
+All contributions to this repository must meet the minimum requirements outlined in [this article](https://help.roll20.net/hc/en-us/articles/360037773453).
+
+### Release Cadence
+
+Pull Requests are reviewed *at least* weekly by 00:00 UTC on Thursdays, although cadence is often more frequent. 
+
+Once a Pull Request has been merged, changes should be served on [Roll20.net](https://roll20.net) within approximately ten minutes. Contributors are encouraged to open a GitHub issue if their changes haven't appeared 24 hours after the Pull Request has been merged.
+
+### Internationalization & Translations
 
 We use [Crowdin](https://crowdin.com/) to crowdsource and manage translations for various aspects of our site. 
 
@@ -22,39 +100,10 @@ Check out the Help Center articles and Community Wiki documentation below to lea
 
 **Sheet translations submitted outside of Crowdin will not be accepted and/or will be overwritten by Crowdin.**
 
-## Improving Existing Character Sheets
-
-If you want to help improve an existing sheet, just clone this repository. Make your changes, test them in app using the Custom accessible with a Roll20 Pro account, and submit a pull request.
-
-## Creating your own
-
-If you would like to contribute a new sheet for the community to use, just clone this repository and follow the [directions for GitHub](https://wiki.roll20.net/Beginner%27s_Guide_to_GitHub). New sheets will need to meet the minimum required standards located in the [Roll20 Wiki](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository). 
-
-**Creating a sheet.json File**
-
-When you are ready to submit your template for **public use**, create a `sheet.json` file in your sheet's folder (see the [kitchensink](https://github.com/Roll20/roll20-character-sheets/tree/master/kitchensink) folder for an example [sheet.json](https://github.com/Roll20/roll20-character-sheets/blob/master/kitchensink/sheet.json) file). This file is required to be named `sheet.json`. The file has the following fields:
-
-* `html`: The **exact** name, including capitzation, of the HTML file for the sheet (e.g. `kitchensink.html`).
-* `css`: The **exact** name, including capitzation, of the CSS file for the sheet (e.g. `kitchensink.css`).
-* `authors`: A simple string telling who contributed toward the sheet (e.g. `Riley Dutton` or `Riley Dutton, John Doe`)
-* `roll20userid`: A simple string telling the Roll20 User ID's of the authors (e.g. `1` or `45672,145678`). Just used so we know who to credit internally, won't be shown publicly on the site.
-* `patreon`: *(optional)* Place the URL for a Patreon campaign here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.patreon.com/<name>"`)
-* `tipeee`: *(optional)* Place the URL for a Tipeee here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.tipeee.com/<name>"`)
-* `preview`: The **exact** name, including capitzation, of an image file which included in your sheet folder showing a preview/screenshot of the sheet (will be displayed in-app at 500x500 resolution) (e.g. `kitchensink.png`).
-* `instructions`: Markdown-formatted instructions for using the sheet. If there are any particular setup steps, special rolls you want to make the player aware of, etc., this is the place to put that info. Try to be succinct. If you have sheet instructions elsewhere, it can be a good idea to provide a link here (e.g. `full sheet instructions in the [Readme](https://github.com/Roll20/roll20-character-sheets/blob/master/kitchensink/README.md)` or `Sheet instuctions, Roll20 Wiki: [Example PRG](https://wiki.roll20.net/ExampleRPG)`)
-* `legacy` : set to either `true` or `false`. If the sheet code have been updated to work with the [Character Sheet Enhancement](https://wiki.roll20.net/Character_Sheet_Enhancement)-update (released [March 2021](https://app.roll20.net/forum/permalink/9883156/)), set it to `false`. Otherwise, set it to `true`.
-
-After we have reviewed your sheet if we approve it we will add it to the `approved.yaml` file in the root directory which will cause it to be available to everyone on the main Roll20 site. If we reject your sheet, we will comment on your Github commit and let you know what changes need to be made before it can be accepted. 
-
-PLEASE VERIFY YOUR SHEET.JSON IS VALID JSON at http://jsonlint.com before you submit it!
-
-Guidelines
-==========
-
-The former guidelines found here have been moved and expanded on in the [Roll20 Wiki: Building Character Sheets](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository).
-
-
-License
-=======
+## License
 
 All of the code (HTML/CSS) of the sheets in this repository is released under the MIT license (see [LICENSE](https://github.com/Roll20/roll20-character-sheets/blob/master/LICENSE) file for details). If you contribute a new sheet or help improve an existing sheet, you agree that your contribution is released under the MIT License as well.
+
+## Contact
+
+For urgent concerns, problems, or hotfixes, please submit a ticket at [https://roll20.net/help](https://roll20.net/help)
