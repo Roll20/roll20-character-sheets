@@ -779,7 +779,7 @@
                     <span>/</span>
                     <input type="number" name="attr_pence" value="0" class="no-spinners" data-i18n="pennies" title="pennies (12/shilling)">
                     <span>d = £</span>
-                    <input type="number" name="attr_money" value="round(250*(@{pounds} +@{shillings}/20 + @{pence}/240))/250" disabled class="no-spinners total" data-i18n="total-pound" title="total pound value">
+                    <input type="number" name="attr_money" value="" readonly class="no-spinners total" data-i18n="total-pound" title="total pound value">
                 </summary>
                 <textarea name="attr_valuables" data-i18n-placeholder="unusual-values" placeholder="Enter Unusual Valuables Here"></textarea>
             </details>
@@ -837,3 +837,28 @@
     <option data-i18n="wizard">Wizard</option>
     <option data-i18n="writer">Writer</option>
 </datalist>
+
+<script type="text/worker">
+    on('change:wounds change:wounds_max sheet:opened', function() {
+        getAttrs(['wounds', 'wounds_max'], function(values) {
+            const current = +values.wounds || 0;
+            const max  = +values.wounds_max || 0;
+            if (current > max || max < current) {
+                setAttrs({
+                    wounds: max,
+                    silent: true
+                });
+            }
+        });
+    });
+    on('change:pence change:shillings change:pounds sheet:opened', function() {
+        getAttrs(['pence', 'shillings', 'pounds'], function(values) {
+            const pence  = +values.pence || 0;
+            const shillings  = +values.shillings || 0;
+            const pounds  = +values.pounds || 0;
+            const amount = pounds + (shillings/20) + (pence/240);
+            const money = Math.round(amount * 100) / 100;
+            setAttrs({money});
+        });
+    });
+</script>
