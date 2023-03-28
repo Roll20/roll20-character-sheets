@@ -864,7 +864,7 @@ PSYCHOMETABOLIC['Science']['Life Draining'] = {
     'power-score': 'Rate of drain increases to 1d20 points per round.',
     '20': 'Backfire! Half of the psionicist’s remaining hit points ([[@{HP}/2]]) are absorbed by the target, reversing the power’s effects.',
     '1': '',
-    'effect': 'With this devotion, a psionicist can drain hit points from another character and use them to recover his own. This transfer occurs at the rate of 1d6 points per round.\n&emsp;The character can absorb up to 10 more hit points than his healthy total, but these bonus points last only one hour. After that, if the psionicist still has more hit points than he should, the excess points vanish.\n&emsp;*Power Score*—Rate of drain increases to 1d20 points per round.\n&emsp;*20*—Backfire! Half of the psionicist’s remaining hit points are absorbed by the target, reversing the power’s effects.'
+    'effect': 'With this power, a psionicist can drain hit points from another character and use them to recover his own. This transfer occurs at the rate of 1d6 points per round.\n&emsp;The character can absorb up to 10 more hit points than his healthy total, but these bonus points last only one hour. After that, if the psionicist still has more hit points than he should, the excess points vanish.\n&emsp;*Power Score*—Rate of drain increases to 1d20 points per round.\n&emsp;*20*—Backfire! Half of the psionicist’s remaining hit points are absorbed by the target, reversing the power’s effects.'
 };
 PSYCHOMETABOLIC['Science']['Metamorphosis'] = {
     'attribute': '@{Constitution-psi}',
