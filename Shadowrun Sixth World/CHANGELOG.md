@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2023-03-27 ** v.77 Chuz (James Culp)
+	Bugfix - Final(?) fix to Spirit and Vehicle dicepool bug.  Spirit ranged/melee dicepools are set when the spirit is created (when force/type are changed and reset toggle is on).  Vehicle pools are set when the sheet owner sets them.  They will only change now if/when they are in grunt groups and the number of grunts change or the sheet owner changes the dicepool directly.
 **2023-03-20 ** v.77 Chuz (James Culp)
 	Bugfix - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
 	Bugfix - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
