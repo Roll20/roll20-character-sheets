@@ -179,7 +179,7 @@
 
     <div class="mech">
         <h2>Mech
-            <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}{{mech=1}}{{heatroll=[[0]]}}{{toMuchHeat=[[0]]}}"></button>
+            <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}{{mech=1}}{{pushable=[[0]]}}{{toMuchHeat=[[0]]}}"></button>
         </h2>
         <div style="display:flex">
             <div class="twocolumns">
@@ -252,7 +252,7 @@
                         <input type="text" name="attr_weaponname" title="Name of the Weapon">
                         <input type="text" name="attr_range" title="Range">
                         <input type="text" name="attr_damage" title="Damage">
-                        <button type="action" name="act_roll" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{roll=[[1d20]]}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-weaponname}}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-heat}]]}}{{mech=1}}{{heatroll=[[0]]}}">
+                        <button type="action" name="act_roll" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{roll=[[1d20]]}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-weaponname}}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-heat}]]}}{{mech=1}}{{pushable=[[0]]}}">
                         </button>
                     </summary>
                     <details>
@@ -275,6 +275,10 @@
                             <div class="descValuePair">
                                 <label>Heat produced</label>
                                 <input type="number" name="attr_heat" value="0" min="0">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Heat Spike</label>
+                                <input type="checkbox" name="attr_heatspike">
                             </div>
                         </details>
                     </details>
@@ -334,6 +338,10 @@
                             <label>Heat produced</label>
                             <input type="number" name="attr_heat" value="0" min="0">
                         </div>
+                        <div class="descValuePair">
+                            <label>Heat Spike</label>
+                            <input type="checkbox" name="attr_heatspike">
+                        </div>
                     </details>
                     <div class="descValuePair">
                         <label>Is passive</label>
@@ -391,6 +399,10 @@
                         <div class="descValuePair">
                             <label>Heat produced</label>
                             <input type="number" name="attr_heat" value="0" min="0">
+                        </div>
+                        <div class="descValuePair">
+                            <label>Heat Spike</label>
+                            <input type="checkbox" name="attr_heatspike">
                         </div>
                     </details>
                     <div class="descValuePair">
@@ -641,9 +653,10 @@ on('clicked:repeating_mechweapons:roll',
 	// prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
 	var prefix = event.sourceAttribute.split('_').slice(0,3).join('_') + '_'
 
-	let attrs = await asw.getAttrs([`${prefix}heat`]);
-	let weaponheat = attrs[Object.keys(attrs)[0]]
-	let overheat = await overheatCheck(weaponheat);
+	let attrs = await asw.getAttrs([prefix+'heat', prefix+'heatspike']);
+	let overheat = await overheatCheck( attrs[prefix+'heat'],  attrs[prefix+'heatspike']);
+
+	console.log(overheat);
 
 	let rollPart = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
     let results = await startRoll(rollPart + overheat.queryMod);
@@ -664,11 +677,12 @@ on('clicked:repeating_modules:use-module clicked:repeating_systems:use-system', 
 	var trigger = event.triggerName.slice(8); // this always starts with 'clicked:'
 	var prefix = trigger.split('_').slice(0,3).join('_') + '_'
 
-	let attrs = await asw.getAttrs(['character_name', 'energy', 'heat', prefix+'name', prefix+'cost', prefix+'heat', prefix+'has-uses']);
+	let attrs = await asw.getAttrs(['character_name', 'energy', 'heat', prefix+'name', prefix+'cost', prefix+'heat', prefix+'heatspike', prefix+'has-uses']);
 	let cost = parseInt(attrs[prefix+'cost']);
 	let heat = parseInt(attrs[prefix+'heat']);
+	let heatspike = attrs[prefix+'heatspike'];
 
-	let overheat = await overheatCheck(heat);
+	let overheat = await overheatCheck(heat, heatspike);
 
 	if(overheat.queryMod.includes("{{toMuchHeat=[[1]]}}")) {
 	    let rollBase = `/w ${attrs.character_name} &{template:info}{{info= You have to much heat to use ${attrs[prefix+'name']} }}`;
@@ -679,7 +693,7 @@ on('clicked:repeating_modules:use-module clicked:repeating_systems:use-system', 
 
     let toSet = {}
 
-    let rollBase = `/w ${attrs.character_name} &{template:info}{{info= You activated  ${attrs[prefix+'name']} for `;
+    let rollBase = `/w ${attrs.character_name} &{template:info}{{name=${attrs.character_name}}}{{info= You activated  ${attrs[prefix+'name']} for `;
     if(heat !== 0) {
         rollBase += `${heat} heat and `
         toSet.heat = overheat.resultingHeat;
@@ -697,7 +711,7 @@ on('clicked:repeating_modules:use-module clicked:repeating_systems:use-system', 
 
 	asw.setAttrs(toSet);
 
-    let roll = await startRoll(rollBase);
+    let roll = await startRoll(rollBase + overheat.queryMod);
     finishRoll(roll.rollId, {});
 });
 
@@ -727,31 +741,35 @@ const push = async (ev, template) => {
     });
 }
 
-const overheatCheck = async (heatchange) => {
-
-    console.log(heatchange);
+const overheatCheck = async (heatchange, heatspike) => {
 
     let attrs = await asw.getAttrs(['heat', 'heat_max']);
     let resultingHeat = parseInt(attrs.heat) + parseInt(heatchange);
 
+    let queryMod = '';
+
+    if(heatspike === 'on') {
+        queryMod = `{{heat=[[${resultingHeat}]]}}{{heatspike=[[1d20]]}}`;
+    }
+
     if(resultingHeat > parseInt(attrs.heat_max)) {
         return {
             resultingHeat: parseInt(attrs.heat),
-            queryMod: '{{toMuchHeat=[[1]]}}'
+            queryMod: queryMod + '{{toMuchHeat=[[1]]}}'
         }
     }
 
     if(resultingHeat === parseInt(attrs.heat_max)) {
         return {
             resultingHeat: resultingHeat,
-            queryMod: `{{heatroll=[[1d20]]}}{{heat=[[${resultingHeat}]]}}{{toMuchHeat=[[0]]}}`,
+            queryMod: queryMod + `{{heatroll=[[1d20]]}}{{heat=[[${resultingHeat}]]}}{{toMuchHeat=[[0]]}}`,
 
         }
     }
 
     return {
             resultingHeat: resultingHeat,
-            queryMod: '{{toMuchHeat=[[0]]}}',
+            queryMod: queryMod +'{{toMuchHeat=[[0]]}}',
         }
 }
 
@@ -1055,7 +1073,7 @@ const asw = (() => {
                     {{/^rollWasCrit() roll}}
                 </td>
             </tr>
-            {{#heat}}
+            {{#heatroll}}
             <tr>
                 <td>
                     <div class="sheet-rolltemplate-spacer"></div>
@@ -1066,23 +1084,41 @@ const asw = (() => {
                     Heat Check: {{heat}} vs {{heatroll}}
                 </td>
             </tr>
-            {{/heat}}
+            {{/heatroll}}
+            {{#heatspike}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Heat Spike: {{heat}} vs {{heatspike}}
+                </td>
+            </tr>
+            {{/heatspike}}
         {{/rollTotal() toMuchHeat 0}}
     </table>
     {{#mech}}
     <div class="sheet-rolltemplate-button-row">
         {{#rollTotal() toMuchHeat 0}}
-            {{#rollTotal() heatroll 0}}
+            {{#pushable}}
             <div class="sheet-rolltemplate-button">
-                [Push](~{{name}}|reactPush)
+                [Push](~{{name}}|reactPushWeapon)
             </div>
-            {{/rollTotal() heatroll 0}}
+            {{/pushable}}
 
-            {{#^rollGreater() heatroll heat}}
+            {{#^rollGreater() heatspike heat}}
             <div class="sheet-rolltemplate-button">
                 [Reactor Overload](~{{name}}|reactOverload)
             </div>
-            {{/^rollGreater() heatroll heat}}
+            {{/^rollGreater() heatspike heat}}
+
+            {{#^rollGreater() heatspike heat}}
+            <div class="sheet-rolltemplate-button">
+                [Heat Spike](~{{name}}|reactOverload)
+            </div>
+            {{/^rollGreater() heatspike heat}}
         {{/rollTotal() toMuchHeat 0}}
     </div>
     {{/mech}}
@@ -1154,7 +1190,7 @@ const asw = (() => {
                 </td>
             </tr>
             {{/^rollTotal() weaponheat 0}}
-            {{#heat}}
+            {{#heatroll}}
             <tr>
                 <td>
                     <div class="sheet-rolltemplate-spacer"></div>
@@ -1165,23 +1201,41 @@ const asw = (() => {
                     Heat Check: {{heat}} vs {{heatroll}}
                 </td>
             </tr>
-            {{/heat}}
+            {{/heatroll}}
+            {{#heatspike}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Heat Spike: {{heat}} vs {{heatspike}}
+                </td>
+            </tr>
+            {{/heatspike}}
         {{/rollTotal() toMuchHeat 0}}
     </table>
     {{#mech}}
     <div class="sheet-rolltemplate-button-row">
         {{#rollTotal() toMuchHeat 0}}
-            {{#rollTotal() heatroll 0}}
+            {{#pushable}}
             <div class="sheet-rolltemplate-button">
                 [Push](~{{name}}|reactPushWeapon)
             </div>
-            {{/rollTotal() heatroll 0}}
+            {{/pushable}}
 
             {{#^rollGreater() heatroll heat}}
             <div class="sheet-rolltemplate-button">
                 [Reactor Overload](~{{name}}|reactOverload)
             </div>
             {{/^rollGreater() heatroll heat}}
+
+            {{#^rollGreater() heatspike heat}}
+            <div class="sheet-rolltemplate-button">
+                [Heat Spike](~{{name}}|reactOverload)
+            </div>
+            {{/^rollGreater() heatspike heat}}
         {{/rollTotal() toMuchHeat 0}}
     </div>
     {{/mech}}
@@ -1307,5 +1361,30 @@ const asw = (() => {
 <rolltemplate class="sheet-rolltemplate-info">
     <div>
         {{info}}
+        <br>
+        {{#heatroll}}
+        <br>
+                Heat Check: {{heat}} vs {{heatroll}}
+        {{/heatroll}}
+        {{#heatspike}}
+        <br>
+                Heat Spike: {{heat}} vs {{heatspike}}
+        {{/heatspike}}
+        <br><br>
+        <div class="sheet-rolltemplate-button-row">
+            {{#rollTotal() toMuchHeat 0}}
+                {{#^rollGreater() heatroll heat}}
+                <div class="sheet-rolltemplate-button">
+                    [Reactor Overload](~{{name}}|reactOverload)
+                </div>
+                {{/^rollGreater() heatroll heat}}
+
+                {{#^rollGreater() heatspike heat}}
+                <div class="sheet-rolltemplate-button">
+                    [Heat Spike](~{{name}}|reactOverload)
+                </div>
+                {{/^rollGreater() heatspike heat}}
+            {{/rollTotal() toMuchHeat 0}}
+        </div>
     </div>
 </rolltemplate>
