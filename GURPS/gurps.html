@@ -4359,13 +4359,10 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.6 -->
+				<!-- current version notes: 2.9.7 -->
 				<ul>
 					<li>
-						Inventory Tab. Updated the table to better handle parent/child relationships. You can assign an item to have a parent item 
-						and select an indent level. When you assign a parent to an inventory item, the location field will be updated to show the name of the parent.
-						<b>Tip:</b> A sorting button is under development, until then you can manually move items beneath 
-						parent items.
+						Inventory Tab. Added a button to sort and indent inventory items.
 					</li>
 				</ul>
 					
@@ -14162,7 +14159,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 					</div> <!-- .row -->
 				</fieldset> <!-- .repeating_item -->
-				<div class="sort-control" style="display: none;">
+				<div class="sort-control">
 					<button type="action" name="act_sort_inventory" class="btn sort">Sort & Indent</button>
 				</div>
 				<div class="row row-totals">
@@ -14727,13 +14724,10 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.6 -->
+			<!-- current version notes: 2.9.7 -->
 			<ul>
 				<li>
-					Inventory Tab. Updated the table to better handle parent/child relationships. You can assign an item to have a parent item 
-					and select an indent level. When you assign a parent to an inventory item, the location field will be updated to show the name of the parent.
-					<b>Tip:</b> A sorting button is under development, until then you can manually move items beneath 
-					parent items.
+					Inventory Tab. Added a button to sort and indent inventory items.
 				</li>
 			</ul>
 
@@ -18933,9 +18927,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.6";
+	const version = "2.9.7";
 	
-	const latestChangesDate = "3/28/2023";
+	const latestChangesDate = "4/11/2023";
 	
 	let modCascade = true;
 	
@@ -25286,6 +25280,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		
 	});
 
+	on("clicked:sort_inventory", async (event) => {
+
+		await sortIndentInventoryAsync();
+		
+	});
+
 	/**
 	 * We're going to generate an inventory tree and use that to find
 	 * child items of the parentId and update their checked status.
@@ -25319,6 +25319,37 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 		}
 		
+	};
+
+	let sortIndentInventoryAsync = async () => {
+
+		let treeData = await getInventoryTreeData();
+
+		// before making the tree, let's sort everything
+		// see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+		treeData = treeData.sort((item1, item2) => {
+
+			const item1Name = item1.name.toUpperCase();
+			const item2Name = item2.name.toUpperCase();
+
+			if (item1Name < item2Name) {
+				return -1;
+			}
+
+			if (item1Name > item2Name) {
+				return 1;
+			}
+
+			// names must be equeal
+			return 0;
+
+		});
+
+		const inventoryTree = getInventoryTree(treeData);
+
+		console.log(inventoryTree);
+
+
 	};
 
 	/**
