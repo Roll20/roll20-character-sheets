@@ -87,10 +87,10 @@
             <fieldset class="repeating_weapons">
                 <details>
                     <summary>
-                        <input type="text" name="attr_weaponname" title="Name of the Weapon">
+                        <input type="text" name="attr_name" title="Name of the Weapon">
                         <input type="text" name="attr_range" title="Range">
                         <input type="text" name="attr_damage" title="Damage">
-                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
+                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{range=@{range}}}{{weapon_name=@{name}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
                         </button>
                     </summary>
                     <textarea name="attr_weaponDetails"></textarea>
@@ -249,10 +249,10 @@
             <fieldset class="repeating_mechweapons">
                 <details>
                     <summary class="rollButton">
-                        <input type="text" name="attr_weaponname" title="Name of the Weapon">
+                        <input type="text" name="attr_name" title="Name of the Weapon">
                         <input type="text" name="attr_range" title="Range">
                         <input type="text" name="attr_damage" title="Damage">
-                        <button type="action" name="act_roll" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{roll=[[1d20]]}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-weaponname}}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-heat}]]}}{{mech=1}}{{pushable=[[0]]}}">
+                        <button type="action" name="act_roll" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{roll=[[1d20]]}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-name}}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-heat}]]}}{{mech=1}}{{pushable=[[0]]}}">
                         </button>
                     </summary>
                     <details>
@@ -475,10 +475,10 @@
             <fieldset class="repeating_mechweapons">
                 <details>
                     <summary>
-                        <input type="text" name="attr_weaponname" title="Name of the Weapon">
+                        <input type="text" name="attr_name" title="Name of the Weapon">
                         <input type="text" name="attr_range" title="Range">
                         <input type="text" name="attr_damage" title="Damage">
-                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
+                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{range=@{range}}}{{weapon_name=@{name}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
                         </button>
                     </summary>
                     <details>
@@ -859,7 +859,7 @@ on('clicked:import-mech-weapon', async (ev) => {
 
         toImport = toImport.replaceAll(/[\r\n]/gm, '#').split('#');
 
-        weapon[row + "weaponname"] = toImport[0];
+        weapon[row + "name"] = toImport[0];
         weapon[row + "range"] = toImport[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim();
         weapon[row + "damage"] = toImport[1].split('//')[1].replaceAll(/[a-zA-Z]*:/g, '').trim();
 
@@ -868,6 +868,9 @@ on('clicked:import-mech-weapon', async (ev) => {
         }
         else {
             weapon[row + "heat"] = 0;
+        }
+        if(toImport[1].includes("Heat Spike")) {
+            weapon[row + "heatspike"] = "on";
         }
 
         weapon[row + "weapondetails"] = toImport[1].split('//').slice(2).join('//').trim() + "\n" + toImport.slice(2).join(' ').trim();
@@ -897,6 +900,10 @@ on('clicked:import-mech-system', async (ev) => {
         if(rules.includes("Range:")) {
             system[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
             rules = rules.split('//').slice(1).join('//').trim()
+        }
+
+        if(rules.includes("Heat Spike")) {
+            system[row + "heatspike"] = "on";
         }
 
          if(/T\d/.test(toImport)) {
@@ -938,6 +945,10 @@ let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).imp
         if(rules.includes("Range:")) {
             module[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
             rules = rules.split('//').slice(1).join('//').trim()
+        }
+
+        if(rules.includes("Heat Spike")) {
+            module[row + "heatspike"] = "on";
         }
 
          if(/T\d/.test(toImport)) {
