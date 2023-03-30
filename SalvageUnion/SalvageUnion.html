@@ -805,178 +805,177 @@ on('clicked:downtime', async (ev) => {
 
 on('clicked:import-mech-stats', async (ev) => {
 
-        let mech = {};
+    let mech = {};
 
-        let toImport = (await asw.getAttrs(['importerText'])).importerText;
-        let stats = toImport.replaceAll(/[a-zA-Z]/g, '').replaceAll(/\./g, '').replaceAll(/^\s*[\r\n]/gm, '').trim().split(/\r?\n|\s+/);
+    let toImport = (await asw.getAttrs(['importerText'])).importerText;
+    let stats = toImport.replaceAll(/[a-zA-Z]/g, '').replaceAll(/\./g, '').replaceAll(/^\s*[\r\n]/gm, '').trim().split(/\r?\n|\s+/);
 
-        if(stats.length < 6) {
-            asw.setAttrs({
-                importerText: 'Could not parse input: Not enough values'
-            });
-            return;
-        }
+    if(stats.length < 6) {
+        asw.setAttrs({
+            importerText: 'Could not parse input: Not enough values'
+        });
+        return;
+    }
 
-        if(!toImport.startsWith(' ') && !/^\d+/g.test(toImport)) {
-            let name = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
-            mech.character_name = name;
-            mech.chassis = name;
-        }
+    if(!toImport.startsWith(' ') && !/^\d+/g.test(toImport)) {
+        let name = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+        mech.character_name = name;
+        mech.chassis = name;
+    }
 
-        if(/CHASSIS\s*ABILITY/.test(toImport)) {
-           mech.chassisDetails = toImport.split(/CHASSIS\s*ABILITY/)[1].replaceAll(/[\r\n]/gm, '').trim();
-        }
+    if(/CHASSIS\s*ABILITY/.test(toImport)) {
+       mech.chassisDetails = toImport.split(/CHASSIS\s*ABILITY/)[1].replaceAll(/[\r\n]/gm, '').trim();
+    }
 
-        mech.structure = stats[0];
-        mech.structure_max = stats[0];
-        mech.energy = stats[1];
-        mech.energy_max = stats[1];
-        mech.heat_max = stats[2];
-        mech.systems_max = stats[3];
-        mech.modules_max = stats[4];
-        mech.maxcargo = stats[5];
-        mech.importerText = "Values imported";
+    mech.structure = stats[0];
+    mech.structure_max = stats[0];
+    mech.energy = stats[1];
+    mech.energy_max = stats[1];
+    mech.heat_max = stats[2];
+    mech.systems_max = stats[3];
+    mech.modules_max = stats[4];
+    mech.maxcargo = stats[5];
+    mech.importerText = "Values imported";
 
-         await asw.setAttrs(mech);
+     await asw.setAttrs(mech);
 });
 
 on('clicked:import-mech-weapon', async (ev) => {
 
-        let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
+    let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
 
-        var row = "repeating_mechweapons_" + generateRowID() + "_";
-        let weapon = {};
+    var row = "repeating_mechweapons_" + generateRowID() + "_";
+    let weapon = {};
 
-        if(/T\d/.test(toImport)) {
-           let tier = toImport.match(/T\d/).pop();
+    if(/T\d/.test(toImport)) {
+       let tier = toImport.match(/T\d/).pop();
 
-           let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
-           weapon[row + "scrap"] = associatedCost[1] + " " + tier;
-           weapon[row + "slots"] = parseInt(associatedCost[0]);
+       let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
+       weapon[row + "scrap"] = associatedCost[1] + " " + tier;
+       weapon[row + "slots"] = parseInt(associatedCost[0]);
 
-           toImport = toImport.split(/T\d/)[0].trim()
-        }
+       toImport = toImport.split(/T\d/)[0].trim()
+    }
 
-        toImport = toImport.replaceAll(/[\r\n]/gm, '#').split('#');
+    toImport = toImport.replaceAll(/[\r\n]/gm, '#').split('#');
 
-        weapon[row + "name"] = toImport[0];
-        weapon[row + "range"] = toImport[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim();
-        weapon[row + "damage"] = toImport[1].split('//')[1].replaceAll(/[a-zA-Z]*:/g, '').trim();
+    weapon[row + "name"] = toImport[0];
+    weapon[row + "range"] = toImport[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim();
+    weapon[row + "damage"] = toImport[1].split('//')[1].replaceAll(/[a-zA-Z]*:/g, '').trim();
 
-        if(toImport[1].includes("Hot (")) {
-            weapon[row + "heat"] = toImport[1].match(/Hot \(\d\)/g).pop().match(/\d+/).pop();
-        }
-        else {
-            weapon[row + "heat"] = 0;
-        }
-        if(toImport[1].includes("Heat Spike")) {
-            weapon[row + "heatspike"] = "on";
-        }
+    if(toImport[1].includes("Hot (")) {
+        weapon[row + "heat"] = toImport[1].match(/Hot \(\d\)/g).pop().match(/\d+/).pop();
+    }
+    else {
+        weapon[row + "heat"] = 0;
+    }
+    if(toImport[1].includes("Heat Spike")) {
+        weapon[row + "heatspike"] = "on";
+    }
 
-        weapon[row + "weapondetails"] = toImport[1].split('//').slice(2).join('//').trim() + "\n" + toImport.slice(2).join(' ').trim();
-        weapon["importerText"] ='Values imported'
+    weapon[row + "weapondetails"] = toImport[1].split('//').slice(2).join('//').trim() + "\n" + toImport.slice(2).join(' ').trim();
+    weapon["importerText"] ='Values imported'
 
-        asw.setAttrs(weapon);
+    asw.setAttrs(weapon);
 });
 
 on('clicked:import-mech-system', async (ev) => {
 
-        let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
+    let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
 
-        var row = "repeating_systems_" + generateRowID() + "_";
-        let system = {};
+    var row = "repeating_systems_" + generateRowID() + "_";
+    let system = {};
 
-        system[row + "name"] = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+    system[row + "name"] = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
 
-        if(toImport.split(/\r?\n/)[1].includes("EP")) {
-            system[row + "cost"] = toImport.split(/\r?\n/)[1].trim();
-            toImport = toImport.replaceAll(toImport.split(/\r?\n/)[1], '');
-        }
+    if(toImport.split(/\r?\n/)[1].includes("EP")) {
+        system[row + "cost"] = toImport.split(/\r?\n/)[1].trim();
+        toImport = toImport.replaceAll(toImport.split(/\r?\n/)[1], '');
+    }
 
-        toImport = toImport.replaceAll(/^\s*[\r\n]/gm, '');
+    toImport = toImport.replaceAll(/^\s*[\r\n]/gm, '');
 
-        let rules = toImport.split(/\r?\n/)[1].trim();
+    let rules = toImport.split(/\r?\n/)[1].trim();
 
-        if(rules.includes("Range:")) {
-            system[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
-            rules = rules.split('//').slice(1).join('//').trim()
-        }
+    if(rules.includes("Range:")) {
+        system[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
+        rules = rules.split('//').slice(1).join('//').trim()
+    }
 
-        if(rules.includes("Heat Spike")) {
-            system[row + "heatspike"] = "on";
-        }
+    if(rules.includes("Heat Spike")) {
+        system[row + "heatspike"] = "on";
+    }
 
-         if(/T\d/.test(toImport)) {
-           let tier = toImport.match(/T\d/).pop();
+     if(/T\d/.test(toImport)) {
+       let tier = toImport.match(/T\d/).pop();
 
-           let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
-           system[row + "scrap"] = associatedCost[1] + " " + tier;
-           system[row + "slots"] = associatedCost[0];
+       let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
+       system[row + "scrap"] = associatedCost[1] + " " + tier;
+       system[row + "slots"] = associatedCost[0];
 
-           toImport = toImport.split(/T\d/)[0].trim()
-        }
+       toImport = toImport.split(/T\d/)[0].trim()
+    }
 
-        let longtext = toImport.split('\n').slice(2).join('').trim();
-        system[row + "details"] = rules + "\n" + longtext;
+    let longtext = toImport.split('\n').slice(2).join('').trim();
+    system[row + "details"] = rules + "\n" + longtext;
 
-        system.importerText = 'Values imported'
+    system.importerText = 'Values imported'
 
-        asw.setAttrs(system);
+    asw.setAttrs(system);
 });
 
 on('clicked:import-mech-module', async (ev) => {
 
-let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
+    let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
 
-        var row = "repeating_modules_" + generateRowID() + "_";
-        let module = {};
+    var row = "repeating_modules_" + generateRowID() + "_";
+    let module = {};
 
-        module[row + "name"] = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+    module[row + "name"] = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
 
-        if(toImport.split(/\r?\n/)[1].includes("EP")) {
-            module[row + "cost"] = toImport.split(/\r?\n/)[1].trim();
-            toImport = toImport.replaceAll(toImport.split(/\r?\n/)[1], '');
-        }
+    if(toImport.split(/\r?\n/)[1].includes("EP")) {
+        module[row + "cost"] = toImport.split(/\r?\n/)[1].trim();
+        toImport = toImport.replaceAll(toImport.split(/\r?\n/)[1], '');
+    }
 
-        toImport = toImport.replaceAll(/^\s*[\r\n]/gm, '');
+    toImport = toImport.replaceAll(/^\s*[\r\n]/gm, '');
 
-        let rules = toImport.split(/\r?\n/)[1].trim();
+    let rules = toImport.split(/\r?\n/)[1].trim();
 
-        if(rules.includes("Range:")) {
-            module[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
-            rules = rules.split('//').slice(1).join('//').trim()
-        }
+    if(rules.includes("Range:")) {
+        module[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
+        rules = rules.split('//').slice(1).join('//').trim()
+    }
 
-        if(rules.includes("Heat Spike")) {
-            module[row + "heatspike"] = "on";
-        }
+    if(rules.includes("Heat Spike")) {
+        module[row + "heatspike"] = "on";
+    }
 
-         if(/T\d/.test(toImport)) {
-           let tier = toImport.match(/T\d/).pop();
+     if(/T\d/.test(toImport)) {
+       let tier = toImport.match(/T\d/).pop();
 
-           let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
-           module[row + "scrap"] = associatedCost[1] + " " + tier;
-           module[row + "slots"] = associatedCost[0];
+       let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
+       module[row + "scrap"] = associatedCost[1] + " " + tier;
+       module[row + "slots"] = associatedCost[0];
 
-           toImport = toImport.split(/T\d/)[0].trim()
-        }
+       toImport = toImport.split(/T\d/)[0].trim()
+    }
 
-        let longtext = toImport.split('\n').slice(2).join('').trim();
-        module[row + "details"] = rules + "\n" + longtext;
+    let longtext = toImport.split('\n').slice(2).join('').trim();
+    module[row + "details"] = rules + "\n" + longtext;
 
-        module.importerText = 'Values imported'
+    module.importerText = 'Values imported'
 
-        asw.setAttrs(module);
+    asw.setAttrs(module);
 });
-
-
-///////////////////
-//  HELPER     ////
-///////////////////
 
 const removeLineBreakInRules = (toImport) => {
     return toImport.replaceAll(/\/\/\s*[\r\n]/gm, '// ').replaceAll(/[\r\n]/gm, '#').replaceAll(/#\/\//g, '//').replaceAll(/#/g, '\n')
 };
+
+///////////////////
+//  HELPER     ////
+///////////////////
 
 async function repeatingSum (destination, fieldsum, ...sections){
     // destination = the name of the attribute that stores the total
