@@ -93,7 +93,7 @@
                         <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{range=@{range}}}{{weapon_name=@{name}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
                         </button>
                     </summary>
-                    <textarea name="attr_weaponDetails"></textarea>
+                    <textarea name="attr_details"></textarea>
                 </details>
             </fieldset>
         </div>
@@ -282,7 +282,7 @@
                             </div>
                         </details>
                     </details>
-                    <textarea name="attr_weapondetails"></textarea>
+                    <textarea name="attr_details"></textarea>
                 </details>
             </fieldset>
         </div>
@@ -570,7 +570,7 @@
             </label>
             <details>
                 <summary>Importer</summary>
-                <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window."></textarea>
+                <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. Names have to be on one line."></textarea>
                 <button type="action" class="textbutton passiv-hide" name="act_import-mech-stats">Import Stats</button>
                 <button type="action" class="textbutton passiv-hide" name="act_import-mech-weapon">Import Weapon</button>
                 <button type="action" class="textbutton passiv-hide" name="act_import-mech-system">Import System</button>
@@ -655,8 +655,6 @@ on('clicked:repeating_mechweapons:roll',
 
 	let attrs = await asw.getAttrs([prefix+'heat', prefix+'heatspike']);
 	let overheat = await overheatCheck( attrs[prefix+'heat'],  attrs[prefix+'heatspike']);
-
-	console.log(overheat);
 
 	let rollPart = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
     let results = await startRoll(rollPart + overheat.queryMod);
@@ -842,136 +840,147 @@ on('clicked:import-mech-stats', async (ev) => {
 
 on('clicked:import-mech-weapon', async (ev) => {
 
-    let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
 
     var row = "repeating_mechweapons_" + generateRowID() + "_";
     let weapon = {};
 
-    if(/T\d/.test(toImport)) {
-       let tier = toImport.match(/T\d/).pop();
+    toImport = importName(toImport, weapon, row);
+    toImport = importCost(toImport, weapon, row);
 
-       let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
-       weapon[row + "scrap"] = associatedCost[1] + " " + tier;
-       weapon[row + "slots"] = parseInt(associatedCost[0]);
+    let rules = toImport.split(/\r?\n/)[0].trim();
+    rules = importRange(rules, weapon, row);
+    rules = importDamage(rules, weapon, row);
 
-       toImport = toImport.split(/T\d/)[0].trim()
-    }
+    importHeat(rules, weapon, row);
+    importDetails(rules, toImport, weapon, row);
 
-    toImport = toImport.replaceAll(/[\r\n]/gm, '#').split('#');
-
-    weapon[row + "name"] = toImport[0];
-    weapon[row + "range"] = toImport[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim();
-    weapon[row + "damage"] = toImport[1].split('//')[1].replaceAll(/[a-zA-Z]*:/g, '').trim();
-
-    if(toImport[1].includes("Hot (")) {
-        weapon[row + "heat"] = toImport[1].match(/Hot \(\d\)/g).pop().match(/\d+/).pop();
-    }
-    else {
-        weapon[row + "heat"] = 0;
-    }
-    if(toImport[1].includes("Heat Spike")) {
-        weapon[row + "heatspike"] = "on";
-    }
-
-    weapon[row + "weapondetails"] = toImport[1].split('//').slice(2).join('//').trim() + "\n" + toImport.slice(2).join(' ').trim();
     weapon["importerText"] ='Values imported'
 
     asw.setAttrs(weapon);
 });
 
 on('clicked:import-mech-system', async (ev) => {
-
-    let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
-
-    var row = "repeating_systems_" + generateRowID() + "_";
-    let system = {};
-
-    system[row + "name"] = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
-
-    if(toImport.split(/\r?\n/)[1].includes("EP")) {
-        system[row + "cost"] = toImport.split(/\r?\n/)[1].trim();
-        toImport = toImport.replaceAll(toImport.split(/\r?\n/)[1], '');
-    }
-
-    toImport = toImport.replaceAll(/^\s*[\r\n]/gm, '');
-
-    let rules = toImport.split(/\r?\n/)[1].trim();
-
-    if(rules.includes("Range:")) {
-        system[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
-        rules = rules.split('//').slice(1).join('//').trim()
-    }
-
-    if(rules.includes("Heat Spike")) {
-        system[row + "heatspike"] = "on";
-    }
-
-     if(/T\d/.test(toImport)) {
-       let tier = toImport.match(/T\d/).pop();
-
-       let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
-       system[row + "scrap"] = associatedCost[1] + " " + tier;
-       system[row + "slots"] = associatedCost[0];
-
-       toImport = toImport.split(/T\d/)[0].trim()
-    }
-
-    let longtext = toImport.split('\n').slice(2).join('').trim();
-    system[row + "details"] = rules + "\n" + longtext;
-
-    system.importerText = 'Values imported'
-
-    asw.setAttrs(system);
+    importModuleSystem("systems");
 });
 
 on('clicked:import-mech-module', async (ev) => {
+    importModuleSystem("modules");
+});
 
-    let toImport = removeLineBreakInRules((await asw.getAttrs(['importerText'])).importerText);
+const importModuleSystem = async (type) => {
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
 
-    var row = "repeating_modules_" + generateRowID() + "_";
-    let module = {};
+    let row = "repeating_" + type + "_" + generateRowID() + "_";
+    let object = {};
 
-    module[row + "name"] = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+    toImport = importName(toImport, object, row);
+    toImport = importCost(toImport, object, row);
 
-    if(toImport.split(/\r?\n/)[1].includes("EP")) {
-        module[row + "cost"] = toImport.split(/\r?\n/)[1].trim();
-        toImport = toImport.replaceAll(toImport.split(/\r?\n/)[1], '');
-    }
+    toImport = importEp(toImport, object, row);
+    let rules = toImport.split(/\r?\n/)[0].trim();
 
-    toImport = toImport.replaceAll(/^\s*[\r\n]/gm, '');
+    rules = importRange(rules, object, row);
 
-    let rules = toImport.split(/\r?\n/)[1].trim();
-
-    if(rules.includes("Range:")) {
-        module[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
+    if(rules.includes("Passive")) {
+        object[row + "is-passive"] = "on";
         rules = rules.split('//').slice(1).join('//').trim()
     }
 
-    if(rules.includes("Heat Spike")) {
-        module[row + "heatspike"] = "on";
+    importHeat(rules, object, row);
+    importDetails(rules, toImport, object, row);
+
+    object.importerText = 'Values imported'
+
+    asw.setAttrs(object);
+};
+
+const formatImporterText = (toImport) => {
+    let formatted = toImport.replaceAll(/\/\/\s*[\r\n]/gm, '// ').replaceAll(/[\r\n]/gm, '#').replaceAll(/#\/\//g, '//').replaceAll(/#/g, '\n').replaceAll(/^\s*\n/gm,'');
+
+    let multilineName = formatted.split(/\r?\n/);
+    if(multilineName[2].includes("Range") || multilineName[2].includes("Passive") || multilineName[2].includes("EP")) {
+        formatted = multilineName.slice(0,2).join('') + "\n" + multilineName.slice(2).join("\n");
+        console.log(formatted);
     }
 
-     if(/T\d/.test(toImport)) {
+    let multilineRules = formatted.split(/\r?\n/);
+    if(multilineRules[2].includes("//")) {
+        formatted = multilineRules[0] + "\n" + multilineRules.slice(1,3).join('') + "\n" + multilineRules.slice(3).join("\n");
+    }
+    return formatted;
+};
+
+const importName = (toImport, object, row) => {
+   let textSplits = toImport.split(/\r?\n/);
+   object[row + "name"] = textSplits[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+
+   return textSplits.slice(1).join('\n');
+};
+
+const importCost = (toImport, object, row) => {
+    if(/T\d/.test(toImport)) {
        let tier = toImport.match(/T\d/).pop();
 
        let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
-       module[row + "scrap"] = associatedCost[1] + " " + tier;
-       module[row + "slots"] = associatedCost[0];
+       object[row + "scrap"] = associatedCost[1] + " " + tier;
+       object[row + "slots"] = parseInt(associatedCost[0]);
 
-       toImport = toImport.split(/T\d/)[0].trim()
+       return toImport.split(/T\d/)[0].trim()
     }
 
-    let longtext = toImport.split('\n').slice(2).join('').trim();
-    module[row + "details"] = rules + "\n" + longtext;
+    return toImport;
+}
 
-    module.importerText = 'Values imported'
+const importEp = (toImport, object, row) => {
 
-    asw.setAttrs(module);
-});
+    if(toImport.split(/\r?\n/)[0].includes("EP")) {
+        object[row + "cost"] = toImport.split(/\r?\n/)[0].trim();
+        return toImport.split(/\r?\n/).slice(1).join("\n");
+    }
+    return toImport;
+}
 
-const removeLineBreakInRules = (toImport) => {
-    return toImport.replaceAll(/\/\/\s*[\r\n]/gm, '// ').replaceAll(/[\r\n]/gm, '#').replaceAll(/#\/\//g, '//').replaceAll(/#/g, '\n')
-};
+const importRange = (rules, object, row) => {
+    if(rules.includes("Range:")) {
+        object[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
+        return rules.split('//').slice(1).join('//').trim()
+    }
+
+    return rules;
+}
+
+const importDamage = (rules, object, row) => {
+    if(rules.includes("Damage:")) {
+        let damage = rules.split('Damage:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim();
+        if(damage.match(/\d+[d]\d+/g)) {
+           damage = "[[" + damage + "]]";
+        }
+        object[row + "damage"] = damage;
+        return rules.split('//').slice(1).join('//').trim()
+    }
+
+    return rules;
+}
+
+const importHeat = (rules, object, row) => {
+
+     if(rules.includes("Hot (")) {
+        object[row + "heat"] = rules.match(/Hot \(\d\)/g).pop().match(/\d+/).pop();
+    }
+    else {
+        object[row + "heat"] = 0;
+    }
+
+    if(rules.includes("Heat Spike")) {
+        object[row + "heatspike"] = "on";
+    }
+}
+
+const importDetails = (rules, toImport, object, row) => {
+    let longtext = toImport.split('\n').slice(1).join('').trim();
+    object[row + "details"] = rules + "\n" + longtext;
+}
 
 ///////////////////
 //  HELPER     ////
