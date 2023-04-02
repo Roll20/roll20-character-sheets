@@ -13,13 +13,14 @@ const attributes = {
 //For example, a character with a Damage value of 4.43 would
 //have an effective value of 4, while a character with a Damage val-
 //ue of 4.5 would have a 5.
-const round = sum => sum % 1 >= 0.5 ? Math.ceil(sum) : Math.floor(sum);
+const round = (sum) => (sum % 1 >= 0.5 ? Math.ceil(sum) : Math.floor(sum));
 
-const total = v => Object.values(v).reduce((partialSum, a) => partialSum + parseFloat(a), 0);
+const total = (v) =>
+  Object.values(v).reduce((partialSum, a) => partialSum + parseFloat(a), 0);
 
 attributes.movement.forEach((attr) => {
   on(`change:${attr}`, () => {
-    getAttrs(attributes.movement, values => {
+    getAttrs(attributes.movement, (values) => {
       //Movement Rate = [(STR + DEX) /2] + 5
       setAttrs({
         movement: round(total(values) / 2) + 5,
@@ -28,7 +29,7 @@ attributes.movement.forEach((attr) => {
   });
 });
 
-attributes.healingRate.forEach(attr => {
+attributes.healingRate.forEach((attr) => {
   on(`change:${attr}`, ({ newValue }) => {
     //Healing Rate = CON/5
     setAttrs({
@@ -39,7 +40,7 @@ attributes.healingRate.forEach(attr => {
 
 attributes.hp.forEach((attr) => {
   on(`change:${attr}`, () => {
-    getAttrs(attributes.hp, values => {
+    getAttrs(attributes.hp, (values) => {
       //Total Hit Points = CON+SIZ
       setAttrs({
         hit_points: total(values),
@@ -50,7 +51,7 @@ attributes.hp.forEach((attr) => {
 
 attributes.unconscious.forEach((attr) => {
   on(`change:${attr}`, () =>
-    getAttrs(attributes.unconscious, values => {
+    getAttrs(attributes.unconscious, (values) => {
       //Unconscious = Total Hit Points/4
       setAttrs({
         unconscious: round(total(values) / 4),
@@ -61,7 +62,7 @@ attributes.unconscious.forEach((attr) => {
 
 attributes.knights.forEach((attr) => {
   on(`change:${attr}`, () => {
-    getAttrs(attributes.knights, values => {
+    getAttrs(attributes.knights, (values) => {
       setAttrs({
         total_family_knights: total(values),
       });
@@ -69,7 +70,7 @@ attributes.knights.forEach((attr) => {
   });
 });
 
-attributes.knockdown.forEach(attr => {
+attributes.knockdown.forEach((attr) => {
   on(`change:${attr}`, ({ newValue }) => {
     setAttrs({
       knockdown: newValue,
@@ -77,7 +78,7 @@ attributes.knockdown.forEach(attr => {
   });
 });
 
-attributes.majorWound.forEach(attr => {
+attributes.majorWound.forEach((attr) => {
   on(`change:${attr}`, ({ newValue }) => {
     setAttrs({
       [`major_wound`]: newValue,
@@ -112,4 +113,4 @@ on(`change:repeating_events:new_glory`, ({ triggerName }) => {
       });
     });
   });
-);
+});
