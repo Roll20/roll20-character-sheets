@@ -329,7 +329,7 @@
                         </div>
                         <div class="descValuePair">
                             <label>Slots</label>
-                            <input type="number" name="attr_slots" value="1">
+                            <input type="number" name="attr_slots" value="0">
                         </div>
                     </details>
                     <details>
@@ -391,7 +391,7 @@
                         </div>
                         <div class="descValuePair">
                             <label>Slots</label>
-                            <input type="number" name="attr_slots" value="1">
+                            <input type="number" name="attr_slots" value="0">
                         </div>
                     </details>
                     <details>
@@ -861,18 +861,26 @@ on('clicked:import-mech-weapon', async (ev) => {
 });
 
 on('clicked:import-mech-system', async (ev) => {
-    importModuleSystem("systems");
+    importFromImporter("systems");
 });
 
 on('clicked:import-mech-module', async (ev) => {
-    importModuleSystem("modules");
+    importFromImporter("modules");
 });
 
-const importModuleSystem = async (type) => {
+const importFromImporter = async(type) => {
     let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+    await importModuleSystem(type, toImport);
+}
+
+const importModuleSystem = async (type, toImport) => {
 
     let row = "repeating_" + type + "_" + generateRowID() + "_";
     let object = {};
+
+    if(checkForMultipleEP(toImport)) {
+        importMultipleEp(type, toImport);
+    }
 
     toImport = importName(toImport, object, row);
     toImport = importCost(toImport, object, row);
@@ -896,6 +904,22 @@ const importModuleSystem = async (type) => {
     asw.setAttrs(object);
 };
 
+const importMultipleEp = async (type, toImport) => {
+    let template = {};
+    let name = importName(toImport, template, '');
+    //remove cost
+    toImport = importCost(toImport, template, '');
+
+    let splitByEp = toImport.split(/(?=^\dEP|XEP)/gm).slice(1);
+
+    for (const ability of splitByEp) {
+       let perLine = ability.split(/\r?\n/g);
+        let firstLine = perLine[0].split(/\s+/g);
+        let importerText = template.name + " "+ firstLine[1] + "\n" + firstLine[0] + "\n" + perLine.slice(1).join("\n");
+        await importModuleSystem(type, importerText);
+    }
+}
+
 const formatImporterText = (toImport) => {
     let formatted = toImport.replaceAll(/\/\/\s*[\r\n]/gm, '// ').replaceAll(/[\r\n]/gm, '#').replaceAll(/#\/\//g, '//').replaceAll(/#/g, '\n').replaceAll(/^\s*\n/gm,'');
 
@@ -911,6 +935,10 @@ const formatImporterText = (toImport) => {
 
     return formatted;
 };
+
+const checkForMultipleEP = (toImport) => {
+   return (toImport.match(/^\dEP|XEP/gm) || []).length > 1;
+}
 
 const importName = (toImport, object, row) => {
    let textSplits = toImport.split(/\r?\n/);
@@ -977,6 +1005,16 @@ const importAction = (rules, object, row) => {
    if(rules.includes("Turn Action")) {
         object[row + "action"] = "Turn Action";
         return rules.replaceAll("Turn Action //", '').replaceAll("Turn Action", '').trim();
+   }
+
+  if(rules.includes("Short Action")) {
+        object[row + "action"] = "Short Action";
+        return rules.replaceAll("Short Action //", '').replaceAll("Short Action", '').trim();
+   }
+
+  if(rules.includes("Long Action")) {
+        object[row + "action"] = "Long Action";
+        return rules.replaceAll("Long Action //", '').replaceAll("Long Action", '').trim();
    }
 
    return rules;
