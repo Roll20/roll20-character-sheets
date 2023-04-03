@@ -4362,7 +4362,7 @@
 				<!-- current version notes: 2.9.7 -->
 				<ul>
 					<li>
-						Inventory Tab. Added a button to sort and indent inventory items.
+						Bugfix: Stress and Derangement wasn't being divided by 2, rounded up.
 					</li>
 				</ul>
 					
@@ -14159,7 +14159,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 					</div> <!-- .row -->
 				</fieldset> <!-- .repeating_item -->
-				<div class="sort-control">
+				<div class="sort-control" style="display: none;">
 					<button type="action" name="act_sort_inventory" class="btn sort">Sort & Indent</button>
 				</div>
 				<div class="row row-totals">
@@ -14727,7 +14727,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 			<!-- current version notes: 2.9.7 -->
 			<ul>
 				<li>
-					Inventory Tab. Added a button to sort and indent inventory items.
+					Bugfix: Stress and Derangement wasn't being divided by 2, rounded up.
 				</li>
 			</ul>
 
@@ -20556,7 +20556,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let stressLevel = Number(v.stress_level) || 0;
 			let derangementLevel = Number(v.derangement_level) || 0;
 
-			let stressDerangementPenalty = stressLevel + derangementLevel;
+			let stressDerangementPenalty = Math.ceil((stressLevel + derangementLevel)/2);
 
 			setAttrs({
 				willpower_base: wBase,
@@ -25282,7 +25282,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	on("clicked:sort_inventory", async (event) => {
 
-		await sortIndentInventoryAsync();
+		//await sortIndentInventoryAsync();
 		
 	});
 
@@ -25347,8 +25347,24 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 		const inventoryTree = getInventoryTree(treeData);
 
-		console.log(inventoryTree);
+		// get ALL the data for each inventory item so we can re-insert them.
+		const inventoryItems = await getInventoryItems();
 
+		// start at -1 since the root level doesn't get added to the table.
+		const tableItems = getInventoryTableItems({}, inventoryTree, -1, inventoryItems);
+
+		// clear the existing table
+		treeData.forEach(node => {
+
+			if (node.id !== "root") {
+				setTimeout(() => {
+					removeRepeatingRow(`repeating_item_${node.id}`)
+				},300);
+			}
+			
+		})
+
+		setAttrs(tableItems);
 
 	};
 
@@ -25504,6 +25520,126 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		return ids;
 
 	}; 
+
+	/**
+	 * Returns an array of inventory objects
+	 */
+	let getInventoryItems = async() => {
+
+		let ids = await getSectionIDsAsync("repeating_item");
+
+		// index will correspond with indexes for ids!
+		let fieldsToGet = [];
+
+		ids.forEach( id => {
+
+			let itemHighlightField = `repeating_item_${id}_highlight`;
+			fieldsToGet.push(itemHighlightField);
+
+			let itemItemToggleNotesField = `repeating_item_${id}_item_toggle_notes`;
+			fieldsToGet.push(itemItemToggleNotesField);
+
+			let itemIndentLevelField = `repeating_item_${id}_indent_level`;
+			fieldsToGet.push(itemIndentLevelField);
+
+			let itemNameField = `repeating_item_${id}_name`;
+			fieldsToGet.push(itemNameField);
+
+			let itemLocationField = `repeating_item_${id}_location`;
+			fieldsToGet.push(itemLocationField);
+
+			let itemTechLevelField = `repeating_item_${id}_tl`;
+			fieldsToGet.push(itemTechLevelField);
+
+			let itemLegalityClassField = `repeating_item_${id}_legality_class`;
+			fieldsToGet.push(itemLegalityClassField);
+
+			let itemRefField = `repeating_item_${id}_ref`;
+			fieldsToGet.push(itemRefField);
+
+			let itemCarriedField = `repeating_item_${id}_carried`;
+			fieldsToGet.push(itemCarriedField);
+
+			let itemCountField = `repeating_item_${id}_count`;
+			fieldsToGet.push(itemCountField);
+
+			let itemCostField = `repeating_item_${id}_cost`;
+			fieldsToGet.push(itemCostField);
+
+			let itemWeightField = `repeating_item_${id}_weight`;
+			fieldsToGet.push(itemWeightField);
+
+			let itemRowIdField = `repeating_item_${id}_row_id`;
+			fieldsToGet.push(itemRowIdField);
+
+			let itemParentIdField = `repeating_item_${id}_parent_id`;
+			fieldsToGet.push(itemParentIdField);
+			
+			let itemNotesField = `repeating_item_${id}_notes`;
+			fieldsToGet.push(itemNotesField);
+
+		});
+
+		let values = await getAttrsAsync(fieldsToGet);
+
+		return values;
+
+	};
+
+	/**
+	 * Get all the data for building the inventory table
+	 * 
+	 * @param object tableItems     Items for repeating_item table
+	 * @param object itemNode       The current node on the tree
+	 * @param int    indentLevel    The depth level of the tree.
+	 * @param object inventoryItems Original item data from repeating_item talbe
+	 * @return object Data for repeating_item
+	 */
+	let getInventoryTableItems = (tableItems, itemNode, indentLevel, inventoryItems) => {
+
+		// ignore the root level
+		if (itemNode.id != "root") {
+
+			// filter objects: https://masteringjs.io/tutorials/fundamentals/filter-object
+
+			// convert object to an array
+			const inventoryItemsAsArray = Object.entries(inventoryItems);
+
+			// get filtered data
+
+			// get the data for the inventory usig the row id.
+			// example array: ["repeating_item_-mtzce6xvluz3aksvzqo_row_id": "-mtzce6xvluz3aksvzqo", "repeating_item_-mtzce6xvluz3aksvzqo_name": "Purse", key: value]
+			const inventoryItemsFiltered = inventoryItemsAsArray.filter( ([key, value]) => {
+				return key.includes(itemNode.id);
+			});
+
+			// set the indent level
+			inventoryItemsFiltered[`repeating_item_${itemNode.id}_indent_level`] = indentLevel;
+
+			// convert to object
+			const inventoryData = Object.fromEntries(inventoryItemsFiltered);
+			
+			// loop through each property and add it to the original tableItems
+			Object.keys(inventoryData).forEach( key => {
+
+				tableItems[key] = inventoryData[key];
+
+			});
+			
+		}
+
+		// get child items
+		// now add any children
+		itemNode.children.forEach(childNode => {
+
+			tableItems = getInventoryTableItems(tableItems, childNode, indentLevel + 1, inventoryItems);
+
+		});
+
+
+		return tableItems;
+		
+	}
 
 	on("change:repeating_item:parent_id", event => {
 
