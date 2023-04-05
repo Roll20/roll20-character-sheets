@@ -4359,10 +4359,11 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.7 -->
+				<!-- current version notes: 2.9.8 -->
 				<ul>
 					<li>
-						Bugfix: Stress and Derangement wasn't being divided by 2, rounded up.
+						Inventory Tab. Added a <b>Sort & Indent</b> button. The button will sort the inventory alphabetically and then update 
+						the indent level of a child item.
 					</li>
 				</ul>
 					
@@ -14159,7 +14160,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 					</div> <!-- .row -->
 				</fieldset> <!-- .repeating_item -->
-				<div class="sort-control" style="display: none;">
+				<div class="sort-control">
 					<button type="action" name="act_sort_inventory" class="btn sort">Sort & Indent</button>
 				</div>
 				<div class="row row-totals">
@@ -14724,7 +14725,16 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.7 -->
+			<!-- current version notes: 2.9.8 -->
+			<ul>
+				<li>
+					Inventory Tab. Added a <b>Sort & Indent</b> button. The button will sort the inventory alphabetically and then update 
+					the indent level of a child item.
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.7</h4>
+			<p>Pull Request: 4/2/2023</p>
 			<ul>
 				<li>
 					Bugfix: Stress and Derangement wasn't being divided by 2, rounded up.
@@ -18927,7 +18937,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.7";
+	const version = "2.9.8";
 	
 	const latestChangesDate = "4/11/2023";
 	
@@ -25282,7 +25292,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 	on("clicked:sort_inventory", async (event) => {
 
-		//await sortIndentInventoryAsync();
+		await sortIndentInventoryAsync();
 		
 	});
 
@@ -25330,6 +25340,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		treeData = treeData.sort((item1, item2) => {
 
 			const item1Name = item1.name.toUpperCase();
+
 			const item2Name = item2.name.toUpperCase();
 
 			if (item1Name < item2Name) {
@@ -25347,24 +25358,18 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 		const inventoryTree = getInventoryTree(treeData);
 
-		// get ALL the data for each inventory item so we can re-insert them.
-		const inventoryItems = await getInventoryItems();
+		// this will get the row ids in the correct order.
+		const inventoryRowIds = getInventoryRowIdsUsingTree([], inventoryTree);
 
-		// start at -1 since the root level doesn't get added to the table.
-		const tableItems = getInventoryTableItems({}, inventoryTree, -1, inventoryItems);
+		// get all the indent levels of each item.
+		// indent must start at -1 because we have a "root" level that 
+		// is the base of the tree but not used.
+		const inventoryItemIndentLevels = getInventoryIndentLevelsUsingTree({}, inventoryTree, -1);
 
-		// clear the existing table
-		treeData.forEach(node => {
+		setSectionOrder("item", inventoryRowIds);
 
-			if (node.id !== "root") {
-				setTimeout(() => {
-					removeRepeatingRow(`repeating_item_${node.id}`)
-				},300);
-			}
-			
-		})
-
-		setAttrs(tableItems);
+		// now update the indent levels
+		setAttrs(inventoryItemIndentLevels);
 
 	};
 
@@ -25639,6 +25644,48 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 		return tableItems;
 		
+	}
+
+	let getInventoryRowIdsUsingTree = (rowIds, itemNode) => {
+
+		// ignore the root level
+		if (itemNode.id != "root") {
+
+			rowIds.push(itemNode.id);
+			
+		}
+	
+		// get child items
+		// now add any children
+		itemNode.children.forEach(childNode => {
+
+			rowIds = getInventoryRowIdsUsingTree(rowIds, childNode);
+
+		});
+
+		return rowIds;
+	}
+
+	let getInventoryIndentLevelsUsingTree = (inventoryItemIndentLevels, itemNode, indentLevel) => {
+
+		// ignore the root level
+		if (itemNode.id != "root") {
+
+			// set the indent level
+			inventoryItemIndentLevels[`repeating_item_${itemNode.id}_indent_level`] = indentLevel;
+
+		}
+
+		// get child items
+		// now add any children
+		itemNode.children.forEach(childNode => {
+
+			inventoryItemIndentLevels = getInventoryIndentLevelsUsingTree(inventoryItemIndentLevels, childNode, indentLevel + 1);
+
+		});
+
+		return inventoryItemIndentLevels;
+
 	}
 
 	on("change:repeating_item:parent_id", event => {
