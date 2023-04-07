@@ -1,4 +1,4 @@
-const attributes = {
+const characteristics = {
   movement: ["strength", "dexterity"],
   hp: ["size", "constitution"],
   unconscious: ["hit_points"],
@@ -18,9 +18,9 @@ const round = (sum) => (sum % 1 >= 0.5 ? Math.ceil(sum) : Math.floor(sum));
 const total = (v) =>
   Object.values(v).reduce((partialSum, a) => partialSum + parseFloat(a), 0);
 
-attributes.movement.forEach((attr) => {
+characteristics.movement.forEach((attr) => {
   on(`change:${attr}`, () => {
-    getAttrs(attributes.movement, (values) => {
+    getAttrs(characteristics.movement, (values) => {
       //Movement Rate = [(STR + DEX) /2] + 5
       setAttrs({
         movement: round(total(values) / 2) + 5,
@@ -29,7 +29,7 @@ attributes.movement.forEach((attr) => {
   });
 });
 
-attributes.healingRate.forEach((attr) => {
+characteristics.healingRate.forEach((attr) => {
   on(`change:${attr}`, ({ newValue }) => {
     //Healing Rate = CON/5
     setAttrs({
@@ -38,9 +38,9 @@ attributes.healingRate.forEach((attr) => {
   });
 });
 
-attributes.hp.forEach((attr) => {
+characteristics.hp.forEach((attr) => {
   on(`change:${attr}`, () => {
-    getAttrs(attributes.hp, (values) => {
+    getAttrs(characteristics.hp, (values) => {
       //Total Hit Points = CON+SIZ
       setAttrs({
         hit_points: total(values),
@@ -49,9 +49,9 @@ attributes.hp.forEach((attr) => {
   });
 });
 
-attributes.unconscious.forEach((attr) => {
+characteristics.unconscious.forEach((attr) => {
   on(`change:${attr}`, () =>
-    getAttrs(attributes.unconscious, (values) => {
+    getAttrs(characteristics.unconscious, (values) => {
       //Unconscious = Total Hit Points/4
       setAttrs({
         unconscious: round(total(values) / 4),
@@ -60,9 +60,9 @@ attributes.unconscious.forEach((attr) => {
   );
 });
 
-attributes.knights.forEach((attr) => {
+characteristics.knights.forEach((attr) => {
   on(`change:${attr}`, () => {
-    getAttrs(attributes.knights, (values) => {
+    getAttrs(characteristics.knights, (values) => {
       setAttrs({
         total_family_knights: total(values),
       });
@@ -70,7 +70,7 @@ attributes.knights.forEach((attr) => {
   });
 });
 
-attributes.knockdown.forEach((attr) => {
+characteristics.knockdown.forEach((attr) => {
   on(`change:${attr}`, ({ newValue }) => {
     setAttrs({
       knockdown: newValue,
@@ -78,7 +78,7 @@ attributes.knockdown.forEach((attr) => {
   });
 });
 
-attributes.majorWound.forEach((attr) => {
+characteristics.majorWound.forEach((attr) => {
   on(`change:${attr}`, ({ newValue }) => {
     setAttrs({
       [`major_wound`]: newValue,
@@ -97,12 +97,12 @@ on(`change:repeating_events:new_glory`, ({ triggerName }) => {
   const repeatingRow = helpers.getReprowid(triggerName);
 
   getSectionIDs("events", (idArray) => {
-    let attributes = [];
+    let characteristics = [];
     idArray.forEach((id) =>
-      attributes.push(`repeating_events_${id}_new_glory`)
+      characteristics.push(`repeating_events_${id}_new_glory`)
     );
 
-    getAttrs(attributes, (values) => {
+    getAttrs(characteristics, (values) => {
       const parsedNums = helpers.parseIntegers(values);
       const gloryValues = Object.values(parsedNums);
       const sum = helpers.sumIntegers(gloryValues);
