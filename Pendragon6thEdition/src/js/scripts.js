@@ -2,7 +2,6 @@ const characteristics = {
   movement: ["strength", "dexterity"],
   hp: ["size", "constitution"],
   unconscious: ["hit_points"],
-  knights: ["old_knights", "middle_aged_knights", "young_knights"],
   knockdown: ["size"],
   majorWound: ["constitution"],
   healingRate: ["constitution"],
