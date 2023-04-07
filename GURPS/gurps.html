@@ -4365,6 +4365,9 @@
 						Inventory Tab. Added a <b>Sort & Indent</b> button. The button will sort the inventory alphabetically and then update 
 						the indent level of a child item.
 					</li>
+					<li>
+						Import GCA5. Added a button to delete repeating secdtions/tables before importing a character.
+					</li>
 				</ul>
 					
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -14731,6 +14734,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 					Inventory Tab. Added a <b>Sort & Indent</b> button. The button will sort the inventory alphabetically and then update 
 					the indent level of a child item.
 				</li>
+				<li>
+					Import GCA5. Added a button to delete repeating secdtions/tables before importing a character.
+				</li>
 			</ul>
 
 			<h4>Version: 2.9.7</h4>
@@ -17217,6 +17223,23 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 						<div class="import-reset">
 							<button type="action" name="act_import_json_reset" class="btn">Reset</button>
+						</div>
+
+						<div class="import-button reset">
+							<label style="display: inline; font-weight: normal; font-size: 12px;">
+								<input type="checkbox" name="attr_import_confirm_delete_tables" value="1" />
+
+								<span class="popup">
+									<span data-i18n="delete-repeating-tables-question">Do you want to delete tables?</span>
+								</span>
+								<span class="tooltip">
+									<span data-i18n="delete-repeating-tables-question-tooltip">If checked, the delete button will become active. This can be helpful if items were re-added or removed in the original application. The system is unable to delete tables and import them at the same time, so you have to delete the tables before importing.</span>
+								</span>
+
+								
+							</label>
+							<input type="hidden" name="attr_import_confirm_delete_tables" />
+							<button type="action" name="act_import_delete_tables" class="btn reset">Delete Tables</button>
 						</div>
 
 						<div class="import-button reset">
@@ -19811,6 +19834,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
         self.dispatchEvent(ev);
         return oldAcid;
     }
+
     var _sIn = setInterval;
     setInterval = function (callback, timeout) {
         var acid = getActiveCharacterId();
@@ -19822,6 +19846,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
             }
             , timeout);
     }
+
     var _sto = setTimeout
     setTimeout = function (callback, timeout) {
         var acid = getActiveCharacterId();
@@ -19833,6 +19858,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
             }
             , timeout);
     }
+
     function getAttrsAsync(props) {
         var acid = getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
         var prevAcid = null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
@@ -19846,6 +19872,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
             setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
         });
     }
+
     //use the same pattern for each of the following...
     function setAttrsAsync(propObj, options) {
         var acid = getActiveCharacterId();
@@ -19874,6 +19901,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
             setActiveCharacterId(prevAcid);
         });
     }
+
     function getSingleAttrAsync(prop) {
         var acid = getActiveCharacterId();
         var prevAcid = null;
@@ -36368,6 +36396,32 @@ B378
 	
 	});
 
+	on("clicked:import_delete_tables", async (event) => {
+
+		const values = await getAttrsAsync(["import_confirm_delete_tables"]);
+
+		const canDelete = values.import_confirm_delete_tables === "1";
+
+		if (canDelete) {
+			await clearRepeatingSectionAsync("repeating_languages");	
+			await clearRepeatingSectionAsync("repeating_cultures");	
+			await clearRepeatingSectionAsync("repeating_traits");	
+			await clearRepeatingSectionAsync("repeating_perks");	
+			await clearRepeatingSectionAsync("repeating_quirks");	
+			await clearRepeatingSectionAsync("repeating_disadvantages");	
+			await clearRepeatingSectionAsync("repeating_racial");	
+			await clearRepeatingSectionAsync("repeating_skills");	
+			await clearRepeatingSectionAsync("repeating_techniquesrevised");	
+			await clearRepeatingSectionAsync("repeating_defense");	
+			await clearRepeatingSectionAsync("repeating_melee");	
+			await clearRepeatingSectionAsync("repeating_ranged");	
+			await clearRepeatingSectionAsync("repeating_item");	
+			await clearRepeatingSectionAsync("repeating_spells");
+			setAttrsAsync({import_confirm_delete_tables: 0});	
+		}
+
+	});
+
 	on("clicked:import_json_reset", (event) => {
 	
 		setAttrs({
@@ -36380,7 +36434,9 @@ B378
 
 	let importCharacterJson = async () => {
 
-		let values = await getAttrsAsync(["character_json_data"]);
+		let values = await getAttrsAsync(["character_json_data", "import_delete_tables"]);
+
+		const deleteTables = values.import_delete_tables === "1";
 
 		let data = String(values.character_json_data).trim();
 
@@ -36465,6 +36521,30 @@ B378
 
 			setAttrs({ "import_json_message": message });
 
+		}
+
+	}
+
+	/**
+	 * Delete all rows from a repeating section
+	 * 
+	 * @param string table Example: repeating_item
+	 * 
+	 */
+	let clearRepeatingSectionAsync = async (table) => {
+	
+		let ids = await getSectionIDsAsync(table);
+		
+		if (ids.length === 0) {
+			return;
+		}
+		
+		// loop through the rows
+		for (let i = 0; i < ids.length; i++) {
+	
+			let rowId = ids[i];
+
+			removeRepeatingRow(`${table}_${rowId}`);
 		}
 
 	}
