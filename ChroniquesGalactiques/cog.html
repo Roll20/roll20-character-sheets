@@ -1,8 +1,8 @@
 <div class="sheet-mainBg">
   <!-- FDP -->
   <!-- INPUT HIDDEN Version FdP -->
-  <input type="hidden" name="attr_VERFDP" value="4.1.0" />
-  <input type="hidden" name="attr_VERSION" value="4.1.0" />
+  <input type="hidden" name="attr_VERFDP" value="4.2.0" />
+  <input type="hidden" name="attr_VERSION" value="4.2.0" />
   <!-- INPUT HIDDEN Univers (COF, CG, COC) -->
   <input type="hidden" name="attr_UNIVERS" value="COG" />
   <input type="hidden" name="attr_token_url" value="" />
@@ -66,7 +66,6 @@
   <input type="hidden" name="attr_INIT_BUFF" value="0" />
   <input type="hidden" name="attr_DEF_BUFF" value="0" />
   <input type="hidden" name="attr_DEP_BUFF" value="0" />
-  <input type="hidden" name="attr_PV_NIVEAU" value="" />
   <input type="hidden" name="attr_PV_BUFF" value="0" />
   <!-- INPUT HIDDEN Malus Armure -->
   <input type="hidden" name="attr_ARMURE_MALUS" value="0" />
@@ -135,7 +134,7 @@
     <div style="width: 420px; vertical-align: middle; text-align: center">
       <img
         width="320px"
-        title="Version 4.1.0 - 29/03/2023"
+        title="Version 4.2.0 - 09/04/2023"
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog2_logo.png"
       />
       <img width="90px" height="90px" name="attr_character_token" />
@@ -397,6 +396,12 @@
       class="sheet-tab sheet-tab4"
       value="config"
     /><span title="Configuration"></span>
+    <input
+      type="radio"
+      name="attr_tab"
+      class="sheet-tab sheet-tab5"
+      value="version"
+    /><span title="Version"></span>
     <img
       class="sheet-imghr-up"
       src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
@@ -1192,7 +1197,7 @@
                       <div class="sheet-optional-block">
                         <table class="sheet-tabsep">
                           <tr>
-                            <td class="sheet-boxtitre" style="width: 120px">
+                            <td class="sheet-boxtitre" style="width: 130px">
                               <button
                                 class="sheet-boxtitre"
                                 type="roll"
@@ -1262,9 +1267,10 @@
                         <td class="sheet-boxtitre" style="width: 65px">
                           <button
                             class="sheet-boxtitre"
-                            type="action"
-                            name="act_hitdice"
-                            title="Progression d'un niveau"
+                            type="roll"
+                            name="roll_hitdie"
+                            title="Lancement dé de vie"
+                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Dé de Vie}} {{subtags=}} {{DV=[[ [[1d@{DV}]][DV] ]] + [[[[{[[@{CON}]], 0}kl1]][CON si négative] ]] }}"
                           >
                             DV
                           </button>
@@ -1365,6 +1371,42 @@
                         </td>
                       </tr>
                     </table>
+                    <div>
+                      <input
+                        type="checkbox"
+                        class="sheet-optional-block-switch"
+                        name="attr_option_pip"
+                        value="1"
+                      /><span></span>
+                      <div class="sheet-optional-block">
+                        <table class="sheet-tabsep">
+                          <tr>
+                            <td class="sheet-textfatleft" colspan="2">Instabilité Psy</td>
+                          </tr>
+                          <tr>
+                            <td class="sheet-boxtitre" style="width: 65px">
+                              <button
+                                class="sheet-boxtitre"
+                                type="roll"
+                                name="roll_pip"
+                                title="Instabilité Psy"
+                                value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Instabilité Psychique}} {{subtags=Volonté}} {{carac=[[@{CHA_SUP}[Dé] + [[@{CHA_TEST}]][Bonus CHA] ]] vs [[[[@{PIP}]][Instabilité] ]] }}"
+                              >
+                              PIP
+                              </button>
+                            </td>
+                            <td class="sheet-boxinput">
+                              <input
+                                type="number"
+                                name="attr_PIP"
+                                value="0"
+                                title="@{PIP} Points d'Instabilité Psychique"
+                              />
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                    </div>
                     <div>
                       <input
                         type="checkbox"
@@ -4893,7 +4935,7 @@
           </div>
           <ul>
             <li>
-              Jets :
+              <span class="sheet-textbase">Jets :</span>
               <select
                 class="sheet-carac"
                 style="width: 130px"
@@ -4918,7 +4960,7 @@
               </select>
             </li>
             <li>
-              Initiative variable :
+              <span class="sheet-textbase">Initiative variable :</span>
               <input
                 type="checkbox"
                 name="attr_INIT_VAR"
@@ -4927,7 +4969,7 @@
               />
             </li>
             <li>
-              Compteur PC :
+              <span class="sheet-textbase">Compteur PC :</span>
               <select
                 class="sheet-carac"
                 style="width: 80px"
@@ -4939,7 +4981,16 @@
               </select>
             </li>
             <li>
-              Encombrement :
+              <span class="sheet-textbase">Instabilité Psychique :</span>
+              <input
+                type="checkbox"
+                name="attr_option_pip"
+                value="1"
+                title="@{option_pip}"
+              />
+            </li>
+            <li>
+              <span class="sheet-textbase">Encombrement :</span>
               <input
                 type="checkbox"
                 name="attr_use_encombrement"
@@ -4948,34 +4999,10 @@
               />
             </li>
             <li>
-              Progression PV :
-              <select
-                class="sheet-carac"
-                style="width: 90px"
-                name="attr_prog_pv"
-                title="@{prog_pv}"
-                size="1"
-              >
-                <option value="0" selected>Jet DV</option>
-                <option value="1">Moyenne</option>
-              </select><br>
-              Niv 1: <span class="sheet-levels" name="attr_pv_niv1"></span> <span name="attr_prog_pv_desc"></span> :<br>
-              Niv 2: <input type="number" class="sheet-carac" name="attr_pv_niv2" value="0">
-              4: <input type="number" class="sheet-carac" name="attr_pv_niv4" value="0">
-              6: <input type="number" class="sheet-carac" name="attr_pv_niv6" value="0">
-              8: <input type="number" class="sheet-carac" name="attr_pv_niv8" value="0">
-              10: <input type="number" class="sheet-carac" name="attr_pv_niv10" value="0">
-              <br>
-              Niv 3: <span class="sheet-levels" name="attr_pv_niv3"></span>
-              5: <span class="sheet-levels" name="attr_pv_niv5"></span>
-              7: <span class="sheet-levels" name="attr_pv_niv7"></span>
-              9: <span class="sheet-levels" name="attr_pv_niv9"></span>
-            </li>
-            <li>
-              Magie (Space Fantasy) :
+              <span class="sheet-textbase">Magie (Space Fantasy) :</span>
               <ul>
                 <li>
-                  Attaque magique :
+                  <span class="sheet-textbase">Attaque magique :</span>
                   <input
                     type="checkbox"
                     name="attr_option_atkmag"
@@ -4984,7 +5011,7 @@
                   />
                 </li>
                 <li>
-                  Points de Mana :
+                  <span class="sheet-textbase">Points de Mana :</span>
                   <input
                     type="checkbox"
                     name="attr_option_pm"
@@ -4996,7 +5023,64 @@
             </li>
           </ul>
         </div>
-        <!-- Release notes -->
+        <!-- Custom attributes -->
+        <div class="sheet-col"> <!--
+          <div>
+            <span class="sheet-textfatleft">ATTRIBUTS PERSONNALISES</span>
+          </div>
+          <textarea 
+            class="sheet-statblock" 
+            name="attr_custom" 
+            placeholder="nom_attribut : valeur"
+            title="Un nom d'attribut et sa valeur par ligne &#13;Les attributs sont créés sous le nom @{custom_<nom_attribut>} &#13;Les lignes commençant par // sont des commentaires et ne sont pas traitées"
+          ></textarea> -->
+        </div>
+      </div>
+      <!-- FIN Config -->
+      <img
+        class="sheet-imghr"
+        src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
+      />
+      <div class="sheet-row">
+        <input type="checkbox" class="sheet-block-switch" />
+        <span class="sheet-textbase">Importer profil</span>
+        <div class="sheet-block-hidden"></div>
+        <div class="sheet-block-show">
+          <div class="sheet-2colrow">
+            <div class="sheet-col">
+              <textarea
+                class="sheet-boxinputleft sheet-statblock"
+                name="attr_json_profile"
+              ></textarea>
+            </div>
+            <div class="sheet-col">
+              <button 
+                type="roll" 
+                name="roll_exportcomob" 
+                class="sheet-flatbtn sheet-iconbtn" 
+                title="Exporter le profil"
+                value="[Export Chroniques Mobiles](http://comob-data.rpgapps.net)">
+                <span class="sheet-iconbtn">c</span>&nbsp;Export Chroniques Mobiles
+              </button>
+              <br>
+              Composez votre profil avec l'application Export Chroniques Mobiles et insérez le code JSON dans le champ ci-contre
+              <br>
+              <button
+                type="action"
+                name="act_importprofile"
+                class="sheet-flatbtn sheet-iconbtn"
+                title="Importer le profil"
+              >
+                <span class="sheet-iconbtn">W</span>&nbsp;Importer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-tab-content sheet-tab5">
+      <div class="sheet-2colrow">
+        <!-- VERSION -->
         <div class="sheet-col">
           <div>
             <span class="sheet-textfatleft">NOTES DE VERSION</span> (v<span
@@ -5007,7 +5091,15 @@
           <div class="sheet-scroll-300">
             <ul>
               <li>
-                <strong>Version 4.1.0</strong> (2023.01.21)
+                <strong>Version 4.2.0</strong> (2023.04.08)
+                <ul>
+                  <em>Fiche de personnage</em>
+                  <li>Suppression du calcul automatique des PV par niveau</li>
+                  <li>Ajout option Instabilité Psy</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Version 4.1.0</strong> (2023.03.29)
                 <ul>
                   <em>Fiche de personnage</em>
                   <li>Ajout jets de capacités</li>
@@ -5139,47 +5231,16 @@
             </ul>
           </div>
         </div>
-      </div>
-      <!-- FIN Config -->
-      <img
-        class="sheet-imghr"
-        src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
-      />
-      <div class="sheet-row">
-        <input type="checkbox" class="sheet-block-switch" /><span
-          >Importer profil</span
-        >
-        <div class="sheet-block-hidden"></div>
-        <div class="sheet-block-show">
-          <div class="sheet-2colrow">
-            <div class="sheet-col">
-              <textarea
-                class="sheet-boxinputleft sheet-statblock"
-                name="attr_json_profile"
-              ></textarea>
-            </div>
-            <div class="sheet-col">
-              <button 
-                type="roll" 
-                name="roll_exportcomob" 
-                class="sheet-flatbtn sheet-iconbtn" 
-                title="Exporter le profil"
-                value="[Export Chroniques Mobiles](http://comob-data.rpgapps.net)">
-                <span class="sheet-iconbtn">c</span>&nbsp;Export Chroniques Mobiles
-              </button>
-              <br>
-              Composez votre profil avec l'application Export Chroniques Mobiles et insérez le code JSON dans le champ ci-contre
-              <br>
-              <button
-                type="action"
-                name="act_importprofile"
-                class="sheet-flatbtn sheet-iconbtn"
-                title="Importer le profil"
-              >
-                <span class="sheet-iconbtn">W</span>&nbsp;Importer
-              </button>
-            </div>
+        <div class="sheet-col">
+          <div>
+            <span class="sheet-textfatleft">LOG</span>
           </div>
+          <textarea 
+            class="sheet-statblock" 
+            readonly="true" 
+            name="attr_logvers"
+            title="Compte-rendu des migrations pour les mises à jour majeures de la fiche"
+          ></textarea>
         </div>
       </div>
     </div>
@@ -6388,7 +6449,7 @@
               value="[[1d6!]]"
             />
           </li>
-          <li>
+          <li title="Le script MOD COlib est concçu pour maintenir à jour les bonus d'équipage">
             <span class="textbase">Utiliser COlib</span>&nbsp;
             <input type="checkbox" name="attr_colib" value="1">
           </li>
@@ -6775,9 +6836,8 @@
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
       />
       <div class="sheet-row">
-        <input type="checkbox" class="sheet-block-switch" /><span
-          >Importer un statblock</span
-        >
+        <input type="checkbox" class="sheet-block-switch" />
+        <span class="sheet-textbase">Importer un statblock</span>
         <div class="sheet-block-hidden"></div>
         <div class="sheet-block-show">
           <div class="sheet-2colrow">
@@ -7369,9 +7429,8 @@
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
       />
       <div class="sheet-row">
-        <input type="checkbox" class="sheet-block-switch" /><span
-          >Importer un statblock</span
-        >
+        <input type="checkbox" class="sheet-block-switch" />
+        <span class="sheet-textbase">Importer un statblock</span>
         <div class="sheet-block-hidden"></div>
         <div class="sheet-block-show">
           <div class="sheet-2colrow">
@@ -8191,7 +8250,7 @@
                 value="[[1d6!]]"
               />
             </li>
-            <li>
+            <li title="Le script MOD COlib est concçu pour maintenir à jour les bonus d'équipage">
               <span class="textbase">Utiliser COlib</span>&nbsp;
               <input type="checkbox" name="attr_colib" value="1">
             </li>
@@ -8204,9 +8263,8 @@
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
       />
       <div class="sheet-row">
-        <input type="checkbox" class="sheet-block-switch" /><span
-          >Importer un statblock</span
-        >
+        <input type="checkbox" class="sheet-block-switch" />
+        <span class="sheet-textbase">Importer un statblock</span>
         <div class="sheet-block-hidden"></div>
         <div class="sheet-block-show">
           <div class="sheet-2colrow">
@@ -10095,6 +10153,33 @@ function migrateSheetV4() {
   });
 }
 
+function migrateSheetV420() {
+  getAttrs(["type_personnage", "PV_NIVEAU", "PV_max", "logvers"], function (values) {
+    if (values.type_personnage !== SHEET_PC) return;
+
+    let logvers = stringOrDefault(values.logvers);
+    let logv = "Migration Version 4.2.0 - " + new Date().toLocaleDateString();
+    let pv_max = 0;
+    let pv = [];
+    try {
+      pv = JSON.parse(stringOrDefault(values.PV_NIVEAU));
+    } catch (e) {}
+    if (pv.length === 0) {
+      logv += ` : erreur PV_NIVEAU ${PV_NIVEAU}\n`
+    } else {
+      for (n=0; n <= 9; n++) {
+        pv_max += int(pv[n]);
+      }
+      if (pv_max !== int(values.PV_max)) {
+        logv += `PV : ${PV_max}, PV calculés : ${pv_max}\n`;
+      } else {
+        logv += " : Succès\n";
+      }
+    }
+    setAttrs({ logvers: logv + logvers });
+  });
+}
+
 /**
  * Run migrations
  * @param {string} verfdp current character sheet version
@@ -10151,8 +10236,11 @@ function migrateSheet(verfdp, newver) {
   }
   // update to COG v2
   if (verfdp.major < 4) {
-    // WILL NEED TO BE CHANGED TO MAJOR < 4
     migrateSheetV4();
+    clog(newver, "migrate sheet");
+  }
+  if (verfdp.major === 4 && verfdp.minor <= 2) {
+    migrateSheetV420();
     clog(newver, "migrate sheet");
   }
 }
@@ -10287,15 +10375,6 @@ on("sheet:opened", function () {
         seuil_enc: 10 + int(values.FOR) * 2,
       });
     }
-  });
-  getAttrs(["PV_NIVEAU"], function (v) {
-    const pv_niveaux = JSON.parse(v.PV_NIVEAU);
-    const attrs = {};
-    for (const niv of [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]) {
-      attrs[`pv_niv${niv}`] = int(pv_niveaux[niv-1]);
-    }
-    clog(attrs);
-    setAttrs(attrs);
   });
   // rebuild all
   rebuildAll();
@@ -12330,6 +12409,7 @@ function rebuildAllPC() {
   }
   encumbrance();
   buildCaracs();
+  rebuildCustom();
   updateINIT();
   updateDEF();
   updateDEP();
@@ -12701,122 +12781,51 @@ on(
 );
 
 /**
- * Adjust total hit points based on attribute value change
- * @param {string} attr Attribute name
+ * Adjust starship total hit points 
  */
-function hitPoints(attr) {
-  getAttrs(
-    ["type_fiche", "NIVEAU", "DV", "CON", "PV_NIVEAU", "PV_BUFF", "prog_pv"],
+function starshipHP() {
+  getAttrs(["type_fiche", "NIVEAU", "DV", "CON"], 
     function (values) {
+      if (values.type_fiche !== SHEET_STARSHIP) return;
+
       const niveau = int(values.NIVEAU);
-      if (niveau === 0) return;
       const dv = int(values.DV);
-      if (dv === 0) return;
+      if (niveau === 0 || dv === 0) return;
+    
       const valCON = int(values.CON);
-      let pv = [];
-      const pv_niveau = stringOrDefault(values.PV_NIVEAU);
-      if (pv_niveau !== "") pv = JSON.parse(pv_niveau);
-      while (pv.length < 10) {
-        pv.push(0) 
-      }
-      const average = int(values.prog_pv) === 1 ? 1 + dv / 2 : 0;
-      const prog_pv_desc = int(values.prog_pv) === 1 ? "Moyennes" : "Tirages";
-      const pv_buff = int(values.PV_BUFF);
-      let pv_prog = "";
-      let pv_max = 0;
-      if (values.type_fiche == SHEET_STARSHIP) {
-        pv_max = (dv + valCON) * niveau;
-      } else {
-        for (let n = 1; n <= niveau; n++) {
-          let pvie = 0;
-          if (n === 1) { // niveau 1 : Max. DV + Mod. CON
-            pv_prog += "";
-            pvie = dv + valCON; 
-          } else {
-            if (n > 10) { // niveaux > 10 : 1 ou 2 PV selon DV
-              if (dv >= 10) pvie = 2;
-              else pvie = 1;
-              pv_prog += "";
-            } else { // niveaux <= 10
-              if (n % 2 === 0) { // niveau pair
-                if (average !== 0) {
-                  pvie = average; // ... soit moyenne du DV + 1
-                  pv_prog += "";
-                } else {
-                  pvie = pv[n - 1]; // ... soit tirage de DV
-                }
-                if (pvie === 0) pvie = getRandom(dv);
-                pv_prog += "";
-                if (valCON < 0) pvie += valCON; // ... + Mod. CON si négative
-                pv_prog += "";
-                if (pvie < 0) pvie = 0; // ... mais on ne perd pas de PV
-                pv_prog += "";
-              } else { // niveau impair
-                if (valCON > 0) pvie = valCON; // Mod. CON si positif
-                pv_prog += "";
-              }
-            }
-          }
-          pv[n - 1] = pvie;
-          pv_max += pvie;
-        }
-      }
+      let pv_max = (dv + valCON) * niveau;
       pv_max += pv_buff;
-      pv_prog += "";
-      setAttrs({
-        PV_NIVEAU: JSON.stringify(pv),
-        PV_max: pv_max,
-        PV: pv_max,
-        pv_niv2: pv[1] || 0,
-        pv_niv4: pv[3] || 0,
-        pv_niv6: pv[5] || 0,
-        pv_niv8: pv[7] || 0,
-        pv_niv10: pv[9] || 0,
-        prog_pv_desc
-      });
+      setAttrs({ PV_max: pv_max });
     }
   );
 }
 
 /**
  * On changing any attribute related to hit points
- * - Re-compute the total hit points
+ * - Re-compute the total hit points for starship
  */
 on(
   [
     "change:niveau",
     "change:dv",
     "change:con",
-    "change:pv_buff",
-    "change:prog_pv",
-    "change:pv_niveau",
   ].join(" "),
-  function (eventInfo) {
-    hitPoints(eventInfo.sourceAttribute);
+  function () {
+    starshipHP();
   }
 );
 
-function rolledHitPoints(attr) {
-  getAttrs(["PV_NIVEAU", attr ], function (values) {
-    const pv_niveaux = JSON.parse(values.PV_NIVEAU);
-    const niv = int(attr.replace("pv_niv",""));
-    pv_niveaux[niv-1] = int(values[Object.keys(values)[1]]);
-    setAttrs({ PV_NIVEAU: JSON.stringify(pv_niveaux) });
+/**
+ * On changing the HP buff
+ * - Re-compute max HP for PC
+ */
+on("change:pv_buff", function(eventInfo) {
+  const oldVal = int(eventInfo.previousValue);
+  const newVal = int(eventInfo.newValue);
+  getAttrs(["PV_max"], function(v) {
+    setAttrs({ PV_max: int(v.PV_max) - oldVal + newVal });
   });
-}
-
-on(
-  [
-    "change:pv_niv2",
-    "change:pv_niv4",
-    "change:pv_niv6",
-    "change:pv_niv8",
-    "change:pv_niv10",
-  ].join(" "),
-  function (eventInfo) {
-    rolledHitPoints(eventInfo.sourceAttribute);
-  }
-);
+});
 
 /**
  * Compute starship damage threshold
@@ -12855,28 +12864,6 @@ on(
     starshipDMThreshold();
   }
 );
-
-
-/**
- * On Hit Dice button click
- * - Increase character level
- */
-on("clicked:hitdice", function () {
-  getAttrs(
-    ["NIVEAU", "DV", "pv_niv2", "pv_niv4", "pv_niv6", "pv_niv8", "pv_niv10"], 
-    function (values) {
-    const niveau = int(values.NIVEAU) + 1;
-    const dv = int(values.DV);
-    if (niveau > 0 && niveau <= 20) {
-      const attrs = { NIVEAU: niveau };
-      if (niveau % 2 === 0 && niveau <= 10) {
-        const pv_niveau = `pv_niv${niveau}`;
-        if (int(values[pv_niveau]) === 0) attrs[pv_niveau] = getRandom(dv);
-      }
-      setAttrs(attrs);
-    }
-  });
-});
 
 /**
  * Recalculate the crew adjustments to mecha's abilities
@@ -13185,6 +13172,31 @@ on(
   }
 );
 
+/**
+ * Custom attributes
+ 
+function rebuildCustom() {
+  getAttrs(["custom"], function (v) {
+    const custom = stringOrDefault(v.custom).split("\n");
+    if (custom.length === 0) return;
+    const customAttrs = {};
+    custom.forEach(row => {
+      if (row.startsWith("//")) return;
+      let sepChar;
+      if (row.indexOf("::") !== -1) sepChar = "::";
+      else sepChar = ":";
+      const name = row.split(sepChar)[0].trim();
+      const value = row.split(sepChar)[1].trim();
+      if (name !== "" && value !== "") customAttrs[`custom_${name}`] = value;
+    });
+    setAttrs(customAttrs);
+  });
+}
+
+on("change:custom", function() {
+  rebuildCustom();
+});
+ */
 
 </script>
 <!-- FIN SCRIPTS / SHEET WORKERS -->
