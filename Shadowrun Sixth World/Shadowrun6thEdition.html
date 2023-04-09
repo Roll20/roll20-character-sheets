@@ -3474,6 +3474,10 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
+								<span class="changelog-entry">**2023-03-27 ** v.77 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - Final(?) fix to Spirit and Vehicle dicepool bug.  Spirit ranged/melee dicepools are set when the spirit is created (when force/type are changed and reset toggle is on).  Vehicle pools are set when the sheet owner sets them.  They will only change now if/when they are in grunt groups and the number of grunts change or the sheet owner changes the dicepool directly.
+								</ul>
 								<span class="changelog-entry">**2023-03-20 ** v.77 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">A</span><b>Bugfix</b> - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
@@ -4933,8 +4937,8 @@
 						<label data-i18n-title="modeoptions" title="Mode Options">
 							<input name="attr_firing_modes" placeholder="SS/SA/BF/BW/FA" type="text" title="@{repeating_range_${x}_firing_modes}}"/>
 						</label>
-						<h3 data-i18n="modifier">modifier</h3>
-						<label data-i18n-title="modifier" title="modifier">
+						<h3 class="atk-dp-mod" data-i18n="modifier">modifier</h3>
+						<label class="atk-dp-mod" data-i18n-title="modifier" title="modifier">
 							<input name="attr_dicepool_modifier" title="@{repeating_range_${x}_dicepool_modifier}" type="number" value="0"/>
 						</label>
 					</div>
@@ -5012,7 +5016,7 @@
 				 <label data-i18n-title="extreme" title="Extreme 500+">
 					<input name="attr_extreme_base" placeholder="-" title="@{repeating_melee_${x}_extreme_base}" type="text" value=""/>
 				 </label>
-				 <div class="row">
+				 <div class="row atk-dp-mod">
 					 <h3 data-i18n="modifier">modifier</h3>
 					 <label data-i18n-title="modifier" title="modifier">
 						 <input name="attr_dicepool_modifier" title="@{repeating_range_${x}_dicepool_modifier}" type="number" value="0"/>
@@ -6274,7 +6278,7 @@
 <input type="hidden" name="attr_spellcasting_specialist" value="0" />
 <input type="hidden" name="attr_spellcasting_expert" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.77">
+<input type="hidden" name="attr_sheet_version" value="0.78">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 // Sheet workers
@@ -6353,7 +6357,6 @@ on("sheet:opened", function() {
 				case (v.data_version < 0.77):
 					_v77_update();
 					console.log("Data now fits v.77");
-break;
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -9755,7 +9758,7 @@ console.log("updating dicepool_base to: "+v[`${weap}_dicepool`]);
 //			}
 
 			// If this is a vehicle/drone sheet there's nothing more to do
-			if(v.sheet_type == 'vehicle') {
+			if(v.sheet_type == 'vehicle' || v.sheet_type == 'spirit') {
 				return;
 			}
 

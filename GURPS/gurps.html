@@ -4359,40 +4359,10 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.5 -->
+				<!-- current version notes: 2.9.7 -->
 				<ul>
-					<li>My Modifier on Chat Window Skill Rolls. A new row was added to the chat window to show what number you entered in the pop-up dialog box.</li>
 					<li>
-						New Sheet Option. <b>Display Roll Modifier Summary in Chat Window</b>. If checked (by default), the roll chat window will show a summary of modifiers, if any. 
-						This option is available on the campaign level and character sheet level.
-					</li>
-					<li>
-						Combat Tab - Common information tab. Fixed the tooltip for Size Modifier, this refers to <b>your</b> Size Modifer. Reported by underjack.
-					</li>
-					<li>
-						Chat Window Roll Results. Added some formatting, including highlighting the <b>Malfunction</b> warning.
-					</li>
-					<li>
-						Grimoire tab. Added collapsible notes area.
-					</li>
-					<li>
-						Traits notes, removed some unnecessary text from default critical fail/success notes.
-					</li>
-					<li>
-						Repeating Melee and Ranged Tables. Increased the width of the <b>Reference</b> field and updated tooltip.
-					</li>
-					<li>
-						Hit Location & Armor Table. Added a new column to show the final to hit penalty, it will total the modifier for the hit location and the Size Modifier. 
-						This should avoid weird syncing issues when changing hit location and size modifiers. Based on feedback provided by underjack.
-						<ul>
-							<li>
-								<b>Note:</b> When the sheet is updated, it will attempt to remove the size modifier from the hit location modifier. 
-								However, this may not work, you may have to manually adjust the hit location modifier.
-							</li>
-						</ul>
-					</li>
-					<li>
-						Added new Help Section. This is the first iteration and will be expanded and revised over time.
+						Bugfix: Stress and Derangement wasn't being divided by 2, rounded up.
 					</li>
 				</ul>
 					
@@ -14029,7 +13999,14 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 			<div class="table">
 				<div class="header">
 					<div class="cell col0"><span data-i18n="inventory-label">Inventory</span></div>
-					<div class="cell col-location"><span data-i18n="location-label">Location</span></div>
+					<div class="cell col-location">
+						<div class="popup"><span data-i18n="location-label">Location</span></div>
+						<div class="tooltip tooltip-spell-ref">
+							<span data-i18n="inventory-location-tooltip">
+Where is the item located? If you entered a Parent ID in the expanded notes area, this field will be updated with the name of the parent inventory item.<br />
+							</span>
+						</div>	
+					</div>
 					<div class="cell col1"><span data-i18n="abbreviation-technology-level-label">TL</span></div>
 					<div class="cell col1">
 						<div class="popup"><span data-i18n="abbreviation-legality-class-label">LC</span></div>
@@ -14074,7 +14051,8 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
-							<input type="text" name="attr_name" title="Macro: @{NAME|repeating_item_$[row #]_name}" />
+							<input type="hidden" class="indent-field" name="attr_indent_level" value="0" />
+							<input type="text" class="field-to-indent" name="attr_name" title="Macro: @{NAME|repeating_item_$[row #]_name}" />
 							<input type="hidden" name="attr_idkey" />
 						</div>
 						<div class="cell col-location">
@@ -14105,11 +14083,70 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 							<span name="attr_costtotal" value="0.00" title="Macro: @{NAME|repeating_item_$[row #]_costtotal}" />
 						</div>
 						<div class="cell col8" style="text-align: right;background-color: #c9c9c9;border-bottom: 1px solid white;border-right: 1px solid white;">
-							<input type="hidden" name="attr_inventory_item_carried" value="1" />
+							<input type="hidden" name="attr_carried" />
 							<span name="attr_weighttotal" value="0.000" class="item-weight-total" title="Macro: @{NAME|repeating_item_$[row #]_weighttotal}" />
 						</div>
 					</div> <!-- .row -->
 					<div class="row row-details notebox">
+
+						<div class="row-misc">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="row-id-label">Row ID:</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="inventory-row-id-tooltip">
+For inventory, the row id can used to link an inventory item to a parent item.<br />
+That means, if you uncheck the <b>ON</b> checkbox, all the child inventory items will also become unchecked.<br />
+You can use the row id with macros.
+									</span>
+								</span> 
+							</div>
+							<div class="cell">
+								<input type="text" readonly="readonly" name="attr_row_id" value="" />
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row-misc">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="parent-id-label">Parent ID</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="inventory-parent-id-tooltip">
+For inventory, the row id can used to link an inventory item to a parent item.<br />
+That means, if you uncheck the <b>ON</b> checkbox, all the child inventory items will also become unchecked.<br />
+You can use the row id with macros.
+									</span>
+								</span> 
+							</div>
+							<div class="cell">
+								<input type="text" name="attr_parent_id" value="" />
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row-misc">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="indent-label">Indent</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="inventory-indent-tooltip">
+Select the indent level of the inventory item. This is handy to help show the item belongs to a parent item.
+									</span>
+								</span> 
+							</div>
+							<div class="cell">
+								<select name="attr_indent_level">
+									<option>0</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3</option>
+									<option>4</option>
+								</select>
+							</div>
+						</div> <!-- .row -->
+
 						<div class="cell col-notebox">
 							<div class="show-notes">
 								<span class="label">
@@ -14118,8 +14155,13 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 							</div>
 							<textarea name="attr_notes" title="Macro: @{NAME|repeating_item_$[row #]_notes}"></textarea>
 						</div>
+
+
 					</div> <!-- .row -->
 				</fieldset> <!-- .repeating_item -->
+				<div class="sort-control" style="display: none;">
+					<button type="action" name="act_sort_inventory" class="btn sort">Sort & Indent</button>
+				</div>
 				<div class="row row-totals">
 					<div class="cell col0">
 						<div class="cell" style="width: 50px;">
@@ -14682,13 +14724,25 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.5 -->
+			<!-- current version notes: 2.9.7 -->
+			<ul>
+				<li>
+					Bugfix: Stress and Derangement wasn't being divided by 2, rounded up.
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.5</h4>
+
+			<p>Pull Request: 3/20/2023</p>
 
 			<ul>
 				<li>My Modifier on Chat Window Skill Rolls. A new row was added to the chat window to show what number you entered in the pop-up dialog box.</li>
 				<li>
 					New Sheet Option. <b>Display Roll Modifier Summary in Chat Window</b>. If checked (by default), the roll chat window will show a summary of modifiers, if any. 
 					This option is available on the campaign level and character sheet level.
+				</li>
+				<li>
+					Combat Tab - Common information tab. Fixed the tooltip for Size Modifier, this refers to <b>your</b> Size Modifer. Reported by underjack.
 				</li>
 				<li>
 					Chat Window Roll Results. Added some formatting, including highlighting the <b>Malfunction</b> warning.
@@ -18873,9 +18927,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.5";
+	const version = "2.9.7";
 	
-	const latestChangesDate = "3/20/2023";
+	const latestChangesDate = "4/11/2023";
 	
 	let modCascade = true;
 	
@@ -20502,7 +20556,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let stressLevel = Number(v.stress_level) || 0;
 			let derangementLevel = Number(v.derangement_level) || 0;
 
-			let stressDerangementPenalty = stressLevel + derangementLevel;
+			let stressDerangementPenalty = Math.ceil((stressLevel + derangementLevel)/2);
 
 			setAttrs({
 				willpower_base: wBase,
@@ -21289,7 +21343,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	// if toggle is clicked, update the display id.
 	// event = {sourceAttribute, sourceType, triggerName, sourceAttribute, previousValue, newValue}
-	on("change:repeating_spells:spell_toggle_notes change:repeating_skills:skill_toggle_notes change:repeating_techniquesrevised:technique_revised_toggle_notes change:repeating_melee:melee_toggle_notes", event => {
+	on("change:repeating_spells:spell_toggle_notes change:repeating_skills:skill_toggle_notes change:repeating_techniquesrevised:technique_revised_toggle_notes change:repeating_melee:melee_toggle_notes change:repeating_item:item_toggle_notes", event => {
 	
 		let row = event.triggerName;
 	
@@ -21309,6 +21363,10 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				break;
 	
 			case "repeating_melee":
+				updateRowIdDisplay(section, rowId);
+				break;
+
+			case "repeating_item":
 				updateRowIdDisplay(section, rowId);
 				break;
 		}
@@ -25206,29 +25264,427 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 		return fields;
 
-	}
+	};
 	
-	on("change:repeating_item:carried", function (event) {
+	on("change:repeating_item:carried", async (event) => {
 	
-		markItemRowAsCarried();
-	
+		if (event.sourceType === "player") {
+
+			let checked = event.newValue;
+
+			let parentId = getRowIdFromEventInfo(event, "repeating_item");
+
+			await updateCarriedStatusOfChildrenAsync(parentId, checked);
+
+		}
+		
 	});
-	
+
+	on("clicked:sort_inventory", async (event) => {
+
+		//await sortIndentInventoryAsync();
+		
+	});
+
 	/**
-	 * Update the hidden input field on/off
-	 * If ON, the row will bold the weight text.
-	 * 
+	 * We're going to generate an inventory tree and use that to find
+	 * child items of the parentId and update their checked status.
+	 * Which will trigger updating totals.
+	 * see: https://typeofnan.dev/an-easy-way-to-build-a-tree-with-object-references/
 	 */
-	function markItemRowAsCarried() {
-	
-		getAttrs(["repeating_item_carried"], function (values) {
-	
-			setAttrs({
-				"repeating_item_inventory_item_carried": values.repeating_item_carried
+	let updateCarriedStatusOfChildrenAsync = async (parentId, checked) => {
+
+		const treeData = await getInventoryTreeData();
+
+		const inventoryTree = getInventoryTree(treeData);
+
+		const parentItem = searchTree(inventoryTree, parentId);
+
+		const descendantIds = getDescendantIdsFromParent(parentItem);
+
+		// only run if we have al least one descendant
+		if (descendantIds.length > 0) {
+
+			let fieldsToUpdate = {};
+
+			descendantIds.forEach(id => {
+
+				let itemCheckFieldName = `repeating_item_${id}_carried`;
+
+				fieldsToUpdate[itemCheckFieldName] = checked;
+
 			});
-	
+
+			setAttrs(fieldsToUpdate);
+
+		}
+		
+	};
+
+	let sortIndentInventoryAsync = async () => {
+
+		let treeData = await getInventoryTreeData();
+
+		// before making the tree, let's sort everything
+		// see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+		treeData = treeData.sort((item1, item2) => {
+
+			const item1Name = item1.name.toUpperCase();
+			const item2Name = item2.name.toUpperCase();
+
+			if (item1Name < item2Name) {
+				return -1;
+			}
+
+			if (item1Name > item2Name) {
+				return 1;
+			}
+
+			// names must be equeal
+			return 0;
+
 		});
-	
+
+		const inventoryTree = getInventoryTree(treeData);
+
+		// get ALL the data for each inventory item so we can re-insert them.
+		const inventoryItems = await getInventoryItems();
+
+		// start at -1 since the root level doesn't get added to the table.
+		const tableItems = getInventoryTableItems({}, inventoryTree, -1, inventoryItems);
+
+		// clear the existing table
+		treeData.forEach(node => {
+
+			if (node.id !== "root") {
+				setTimeout(() => {
+					removeRepeatingRow(`repeating_item_${node.id}`)
+				},300);
+			}
+			
+		})
+
+		setAttrs(tableItems);
+
+	};
+
+	/**
+	 * Gets an array of each inventory item as an object; id, name, parentId
+	 * This can be used to generate a tree structure.
+	 * 
+	 * @return array
+	 */
+	let getInventoryTreeData = async () => {
+
+		let ids = await getSectionIDsAsync("repeating_item");
+
+		// index will correspond with indexes for ids!
+		let fieldsToGet = [];
+
+		ids.forEach( id => {
+
+			let itemNameField = `repeating_item_${id}_name`;
+
+			let itemParentIdField = `repeating_item_${id}_parent_id`;
+
+			fieldsToGet.push(itemNameField);
+
+			fieldsToGet.push(itemParentIdField);
+
+		});
+
+		let values = await getAttrsAsync(fieldsToGet);
+
+		// this is our root of our tree. They key is setting parentId = null
+		let baseRoot = {
+			id: "root",
+			name: "root",
+			parentId: null,
+			children: []
+		};
+
+		let treeData = [baseRoot];
+
+		// now we can loop through ids again and find the values we need.
+		ids.forEach( id => {
+
+			let itemNameField = `repeating_item_${id}_name`;
+
+			let itemParentIdField = `repeating_item_${id}_parent_id`;
+
+			let nameValue = values[itemNameField];
+
+			let parentIdValue = values[itemParentIdField];
+
+			// if it doesn't have a parent id that means
+			// it's a top level item, therefore it's parent is root.
+			if (isEmpty(parentIdValue)) {
+				parentIdValue = "root";
+			}
+
+			let treeItem = {
+				id: id,
+				name: nameValue,
+				parentId: parentIdValue,
+				children: []
+			};
+
+			treeData.push(treeItem);
+
+		});
+
+		return treeData;
+
+	};
+
+	/**
+	 * Generates a tree structure based on array of objects; id, name, parentId
+	 * see: https://typeofnan.dev/an-easy-way-to-build-a-tree-with-object-references/
+	 */
+	let getInventoryTree = (treeData) => {
+
+		// Making an ID-to-Array Position Map
+		const idMapping = treeData.reduce((acc, el, i) => {
+			acc[el.id] = i;
+			return acc;
+		}, {});
+
+		let root;
+
+		treeData.forEach((el) => {
+
+			// Handle the root element
+			if (el.parentId === null) {
+				root = el;
+				return;
+			}
+
+			// Use our mapping to locate the parent element in our data array
+			const parentEl = treeData[idMapping[el.parentId]];
+		
+			// Add our current el to its parent's `children` array
+			parentEl.children = [...(parentEl.children || []), el];
+		
+		});
+
+		return root;
+
+	};
+
+	/**
+	 * find a node in a tree by the element id
+	 * see: https://stackoverflow.com/a/9133680
+	 */
+	let searchTree = (node, idToFind) => {
+
+		if(node.id == idToFind) {
+        
+			return node;
+     
+		} else if (node.children.length > 0) {
+        
+			let foundNode = null;
+          
+			for (let i = 0; foundNode == null && i < node.children.length; i++){
+               
+				foundNode = searchTree(node.children[i], idToFind);
+          
+			}
+          
+			return foundNode;
+     	}
+
+    	return null;
+
+	};
+
+	/**
+	 * Get an array of descendant ids from a parent node.
+	 */
+	let getDescendantIdsFromParent = (parentNode, ids = null) => {
+
+		if (ids == null) {
+			ids = [];
+		}
+
+		parentNode.children.forEach(childNode => {
+
+			ids.push(childNode.id);
+
+			if (childNode.children.length > 0) {
+				ids = getDescendantIdsFromParent(childNode, ids);
+			}
+
+		});
+
+		return ids;
+
+	}; 
+
+	/**
+	 * Returns an array of inventory objects
+	 */
+	let getInventoryItems = async() => {
+
+		let ids = await getSectionIDsAsync("repeating_item");
+
+		// index will correspond with indexes for ids!
+		let fieldsToGet = [];
+
+		ids.forEach( id => {
+
+			let itemHighlightField = `repeating_item_${id}_highlight`;
+			fieldsToGet.push(itemHighlightField);
+
+			let itemItemToggleNotesField = `repeating_item_${id}_item_toggle_notes`;
+			fieldsToGet.push(itemItemToggleNotesField);
+
+			let itemIndentLevelField = `repeating_item_${id}_indent_level`;
+			fieldsToGet.push(itemIndentLevelField);
+
+			let itemNameField = `repeating_item_${id}_name`;
+			fieldsToGet.push(itemNameField);
+
+			let itemLocationField = `repeating_item_${id}_location`;
+			fieldsToGet.push(itemLocationField);
+
+			let itemTechLevelField = `repeating_item_${id}_tl`;
+			fieldsToGet.push(itemTechLevelField);
+
+			let itemLegalityClassField = `repeating_item_${id}_legality_class`;
+			fieldsToGet.push(itemLegalityClassField);
+
+			let itemRefField = `repeating_item_${id}_ref`;
+			fieldsToGet.push(itemRefField);
+
+			let itemCarriedField = `repeating_item_${id}_carried`;
+			fieldsToGet.push(itemCarriedField);
+
+			let itemCountField = `repeating_item_${id}_count`;
+			fieldsToGet.push(itemCountField);
+
+			let itemCostField = `repeating_item_${id}_cost`;
+			fieldsToGet.push(itemCostField);
+
+			let itemWeightField = `repeating_item_${id}_weight`;
+			fieldsToGet.push(itemWeightField);
+
+			let itemRowIdField = `repeating_item_${id}_row_id`;
+			fieldsToGet.push(itemRowIdField);
+
+			let itemParentIdField = `repeating_item_${id}_parent_id`;
+			fieldsToGet.push(itemParentIdField);
+			
+			let itemNotesField = `repeating_item_${id}_notes`;
+			fieldsToGet.push(itemNotesField);
+
+		});
+
+		let values = await getAttrsAsync(fieldsToGet);
+
+		return values;
+
+	};
+
+	/**
+	 * Get all the data for building the inventory table
+	 * 
+	 * @param object tableItems     Items for repeating_item table
+	 * @param object itemNode       The current node on the tree
+	 * @param int    indentLevel    The depth level of the tree.
+	 * @param object inventoryItems Original item data from repeating_item talbe
+	 * @return object Data for repeating_item
+	 */
+	let getInventoryTableItems = (tableItems, itemNode, indentLevel, inventoryItems) => {
+
+		// ignore the root level
+		if (itemNode.id != "root") {
+
+			// filter objects: https://masteringjs.io/tutorials/fundamentals/filter-object
+
+			// convert object to an array
+			const inventoryItemsAsArray = Object.entries(inventoryItems);
+
+			// get filtered data
+
+			// get the data for the inventory usig the row id.
+			// example array: ["repeating_item_-mtzce6xvluz3aksvzqo_row_id": "-mtzce6xvluz3aksvzqo", "repeating_item_-mtzce6xvluz3aksvzqo_name": "Purse", key: value]
+			const inventoryItemsFiltered = inventoryItemsAsArray.filter( ([key, value]) => {
+				return key.includes(itemNode.id);
+			});
+
+			// set the indent level
+			inventoryItemsFiltered[`repeating_item_${itemNode.id}_indent_level`] = indentLevel;
+
+			// convert to object
+			const inventoryData = Object.fromEntries(inventoryItemsFiltered);
+			
+			// loop through each property and add it to the original tableItems
+			Object.keys(inventoryData).forEach( key => {
+
+				tableItems[key] = inventoryData[key];
+
+			});
+			
+		}
+
+		// get child items
+		// now add any children
+		itemNode.children.forEach(childNode => {
+
+			tableItems = getInventoryTableItems(tableItems, childNode, indentLevel + 1, inventoryItems);
+
+		});
+
+
+		return tableItems;
+		
+	}
+
+	on("change:repeating_item:parent_id", event => {
+
+		if (event.sourceType === "player") {
+
+			let parentId = event.newValue;
+
+			let childId = getRowIdFromEventInfo(event, "repeating_item");
+
+			if (!isEmpty(parentId) && !isEmpty(childId)) {
+
+				updateInventoryLocationName(parentId, childId);
+			}
+
+		}		
+		
+	});
+
+	function updateInventoryLocationName(parentId, childId) {
+
+		const parentNameField = `repeating_item_${parentId}_name`;
+
+		const childLocationField = `repeating_item_${childId}_location`;
+
+		const childIndentField = `repeating_item_${childId}_indent_level`;
+
+		getAttrs([parentNameField], values => {
+
+			const parentName = values[parentNameField];
+
+			if (!isEmpty(parentName)) {
+
+				let updateFields = {};
+
+				updateFields[childLocationField] = parentName;
+
+				// for now just indent one level
+				updateFields[childIndentField] = 1;
+
+				setAttrs(updateFields);
+
+			}
+			
+		});
+
 	}
 	
 	/**
