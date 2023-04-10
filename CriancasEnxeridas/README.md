@@ -1,1 +1,0 @@
-This is a character sheet for the Crianças Enxeridas RPG game by Raphael Lima.

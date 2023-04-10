@@ -1,1 +1,0 @@
-A simple character sheet designed for the Space Ninja Cyber Crisis Xdo role-playing game produced by  Matthew Ian Johnston. A game set in a world filled with beautiful cyborgs, cute robots, superfast cyberbikes, powered exoskeletons, giant mechanoids, speed lines, comical pets, strange aliens, maniacal villains and demons with amazing groinal powers.

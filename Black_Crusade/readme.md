@@ -1,1 +1,0 @@
-The old Black Crusade sheet was pretty outdated, so I made a new one based on Dark Heresy Advanced 2nd Edition sheet for my beloved players. Don't say your GM never did anything for you. (^_-)

@@ -1,1 +1,0 @@
-This is a character sheet for the OPERA RPG game written by Léo Andrade and Rogério Godoy.

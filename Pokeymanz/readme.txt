@@ -1,1 +1,0 @@
-This is a Character Sheet for a Unofficial Fanmade Pokémon Tabletop Roleplaying game, called Pokeymanz. It uses the Savage Worlds engine and a lot of other inspiration as its basis. The rules and additional content can be downloaded for free on: https://chronicdelusionist.neocities.org/Pokeymanz/index.html

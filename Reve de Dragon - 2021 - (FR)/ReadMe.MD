@@ -1,3 +1,0 @@
-This is a non-official character sheet for the french RPG Rêve de Dragon. This version is actually still BETA, but works pretty well. No new features will be added in the current version, but feel free to report any bugs you may encounter. Thank you :)
-
-Cette fiche est une fiche non-officielle pour le JDR Rêve de Dragon. La présente fiche est en version BETA, mais fonctionne déjà très bien. Aucune nouvelle fonctionnalité ne sera ajoutée sur cette version, je vais me concentrer sur la stabilité et la correction de bugs. N'hésitez pas à rapporter tout bug éventuellement rencontré. Merci beaucoup :)
