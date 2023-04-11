@@ -159,7 +159,10 @@
                     <input type="text" name="attr_range" title="Range">
                     <input type="text" name="attr_action" title="Action">
                 </summary>
-                <textarea name="attr_equipment" class="textarea"></textarea>
+                <div>
+                    <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                    <textarea name="attr_equipment" class="textarea"></textarea>
+                </div>
             </details>
         </fieldset>
 
@@ -178,7 +181,9 @@
                     <input type="text" name="attr_range" title="Range">
                     <input type="text" name="attr_action" title="Action">
                 </summary>
-                <textarea name="attr_ability" class="textarea"></textarea>
+                <div>
+                    <textarea name="attr_ability" class="textarea"></textarea>
+                </div>
             </details>
         </fieldset>
     </div>
@@ -676,6 +681,11 @@
                     <span>Is Pilot</span>
                     <input id="isPilot" name="attr_is-pilot" type="checkbox"/>
                 </label>
+                <details>
+                    <summary>Importer</summary>
+                    <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. Names have to be on one line."></textarea>
+                    <button type="action" class="textbutton" name="act_import-weapon">Import Weapon</button>
+                </details>
             </div>
         </details>
 
@@ -993,6 +1003,22 @@ on('clicked:downtime', async (ev) => {
 });
 
 ///////////////////////
+//  PILOT IMPORTER  ///
+///////////////////////
+
+on('clicked:import-weapon', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    let weapon = {};
+    var row = "repeating_weapons_" + generateRowID() + "_";
+    await importWeapon(toImport, weapon, row);
+    weapon.importerText = 'Values imported';
+
+    asw.setAttrs(weapon);
+});
+
+///////////////////////
 //  MECH IMPORTER  ////
 ///////////////////////
 
@@ -1036,29 +1062,18 @@ on('clicked:import-mech-stats', async (ev) => {
 on('clicked:import-mech-weapon', async (ev) => {
 
     let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
-    await importWeapon(toImport);
 
-     asw.setAttrs({
-		    importerText: 'Values imported'
-	    });
-});
-
-const importWeapon = async (toImport) => {
-    var row = "repeating_mechweapons_" + generateRowID() + "_";
     let weapon = {};
 
-    toImport = importName(toImport, weapon, row);
-    toImport = importCost(toImport, weapon, row);
-
-    let rules = toImport.split(/\r?\n/)[0].trim();
-    rules = importRange(rules, weapon, row);
-    rules = importDamage(rules, weapon, row);
-
-    rules = importHeat(rules, weapon, row);
-    importWeaponTraits(rules, weapon, row);
-    importDetails(toImport, weapon, row);
+    await importMechWeapon(toImport, weapon);
+    weapon.importerText = 'Values imported';
 
     asw.setAttrs(weapon);
+});
+
+const importMechWeapon = async (toImport, object) => {
+    var row = "repeating_mechweapons_" + generateRowID() + "_";
+    importWeapon(toImport, object, row);
 }
 
 on('clicked:import-mech-system', async (ev) => {
@@ -1101,7 +1116,7 @@ const importModuleSystem = async (type, toImport) => {
     }
 
     rules = importHeat(rules, object, row);
-    importWeaponTraits(rules, object, row);
+    importMechWeaponTraits(rules, object, row);
     importDetails(toImport, object, row);
 
     asw.setAttrs(object);
@@ -1123,6 +1138,236 @@ const importMultipleEp = async (type, toImport) => {
     }
 }
 
+const checkForMultipleEP = (toImport) => {
+   return (toImport.match(/^\dEP|XEP/gm) || []).length > 1;
+}
+
+/////////////////////////
+//  DENIZEN IMPORTER  ///
+/////////////////////////
+
+on('clicked:import-biotitan', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let biotitan = {};
+    biotitan.techlevel = "Tech 1 / Bio-Salvage";
+
+    toImport = toImport.split('\n');
+
+    biotitan.structure = toImport.pop().replaceAll(/[a-zA-Z.]/g, '').trim();
+    biotitan.structure_max = biotitan.structure;
+    biotitan.scrapvalue = biotitan.structure;
+
+    //look for name (all caps)
+    let typeDetails = "";
+    while(toImport[toImport.length-1] !== toImport[toImport.length-1].toUpperCase()) {
+        typeDetails = toImport.pop().trim() + " " + typeDetails;
+    }
+    typeDetails = typeDetails.replaceAll(/(?=•)/g, '\n');
+    biotitan.typeDetails =typeDetails;
+
+    biotitan.character_name = toImport.pop().trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+
+    biotitan["importerText"] = 'Values imported';
+    asw.setAttrs(biotitan);
+});
+
+on('clicked:import-biotitan-orangebox', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let biotitan = {};
+    biotitan.techlevel = "Tech 1 / Bio-Salvage";
+
+    toImport = toImport.split('\n');
+
+     while(toImport.length !== 0) {
+        let name = toImport.shift().trim();
+        let rules = toImport.shift().trim();
+        let details = "";
+
+        while(toImport.length > 3 && !toImport[2].includes("//") && !toImport[2].includes("Passive")) {
+            details = details + toImport.shift();
+        }
+        details = details + toImport.shift();
+        if(toImport.length < 3) {
+            details = details + toImport.join("");
+            //exit loop
+            toImport = [];
+        }
+        details = details.replaceAll("  ", " ");
+
+        if(rules.includes("//")) {
+            await importMechWeapon(name + "\n" + rules + "\n" + details, biotitan);
+        }
+
+        if(rules.includes("Passive")) {
+            let row = "repeating_traits_" + generateRowID();
+            biotitan[row + "_name"] = name;
+            biotitan[row + "_details"] = rules + "\n" + details;
+        }
+     }
+
+    biotitan["importerText"] = 'Values imported';
+    asw.setAttrs(biotitan);
+});
+
+on('clicked:import-vehicle', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let vehicle = {};
+
+    toImport = toImport.split('\n');
+
+    vehicle.scrapvalue = toImport.pop();
+    vehicle.techlevel = toImport.pop();
+
+    let traits = "";
+    while(!toImport[toImport.length-1].includes("SP")) {
+        traits = toImport.pop().trim() + " " + traits;
+    }
+    traits = traits.replaceAll("  ", " ").split("//");;
+    importTraits(traits, vehicle);
+
+    if(toImport[toImport.length-1].includes("SP")) {
+        vehicle.structure = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
+        vehicle.structure_max = vehicle.structure;
+    }
+
+    vehicle.character_name = toImport.pop().trim();
+
+    if(toImport[toImport.length-1].includes("//")) {
+        let rules = toImport.pop();
+        let weaponName = toImport.pop();
+
+        importMechWeapon(weaponName +"\n" + rules, vehicle);
+    }
+
+    while(!toImport[toImport.length-1].includes(".")) {
+        await importModuleSystem('traits', toImport.pop());
+    }
+
+    vehicle.typeDetails = toImport.join('');
+
+    vehicle["importerText"] ='Values imported'
+
+    asw.setAttrs(vehicle);
+});
+
+on('clicked:import-creature', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let creature = {};
+    creature.scrapvalue = 0;
+    creature.techlevel = 0;
+
+    toImport = toImport.split('\n');
+
+    let traits = "";
+    while(!toImport[toImport.length-1].includes("HP")) {
+        traits = toImport.pop().trim() + " " + traits;
+    }
+    traits = traits.replaceAll("  ", " ");
+    importTraits(traits, creature);
+
+    creature.health = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
+    creature.health_max = creature.health;
+
+    if(toImport[0].includes("Scorpion")) {
+        creature.character_name = toImport[0];
+        toImport = toImport.shift();
+    }
+    else {
+        creature.character_name = toImport.pop().trim();
+    }
+
+    if(toImport[toImport.length-1].includes("//")) {
+        let rules = toImport.pop();
+        let weaponName = toImport.pop();
+
+        importMechWeapon(weaponName +"\n" + rules, creature);
+    }
+
+    creature.typeDetails = toImport.join('');
+
+    creature["importerText"] = 'Values imported';
+
+    asw.setAttrs(creature);
+});
+
+on('clicked:import-peoplesquad', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let people = {};
+    people.scrapvalue = 0;
+    people.techlevel = 0;
+
+    toImport = toImport.split('\n');
+
+    people.character_name = toImport.shift();
+
+    people.health = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
+    people.health_max = people.health;
+
+    let traits = "";
+    while(!toImport[toImport.length-1].includes("//")) {
+        traits = toImport.pop().trim() + "\n" + traits;
+    }
+    traits = traits.replaceAll("  ", " ").split("\n");;
+    importTraits(traits, people);
+
+    if(toImport[toImport.length-1].includes("//")) {
+        let rules = toImport.pop();
+        let weaponName = toImport.pop();
+
+        importMechWeapon(weaponName +"\n" + rules, people);
+    }
+
+    people.typeDetails = toImport.join('');
+
+    people["importerText"] = 'Values imported';
+
+    asw.setAttrs(people);
+});
+
+///////////////////////
+//  IMPORT HELPER  ////
+///////////////////////
+
 const formatImporterText = (toImport) => {
     let formatted = toImport.replaceAll(/\/\/\s*[\r\n]/gm, '// ').replaceAll(/[\r\n]/gm, '#').replaceAll(/#\/\//g, '//').replaceAll(/#/g, '\n').replaceAll(/^\s*\n/gm,'').replaceAll(/\n(\(\d\))/gm, "$1").trim();
 
@@ -1139,8 +1384,17 @@ const formatImporterText = (toImport) => {
     return formatted;
 };
 
-const checkForMultipleEP = (toImport) => {
-   return (toImport.match(/^\dEP|XEP/gm) || []).length > 1;
+const importWeapon = async (toImport, object, row) => {
+    toImport = importName(toImport, object, row);
+    toImport = importCost(toImport, object, row);
+
+    let rules = toImport.split(/\r?\n/)[0].trim();
+    rules = importRange(rules, object, row);
+    rules = importDamage(rules, object, row);
+
+    rules = importHeat(rules, object, row);
+    importMechWeaponTraits(rules, object, row);
+    importDetails(toImport, object, row);
 }
 
 const importName = (toImport, object, row) => {
@@ -1247,235 +1501,13 @@ const importHeat = (rules, object, row) => {
     return rules;
 }
 
-const importWeaponTraits = (rules, object, row) => {
+const importMechWeaponTraits = (rules, object, row) => {
     object[row + "traits"] = rules.trim();
 }
 
 const importDetails = (toImport, object, row) => {
     object[row + "details"] = toImport.split('\n').slice(1).join(' ').trim();
 }
-
-/////////////////////////
-//  DENIZEN IMPORTER  ///
-/////////////////////////
-
-on('clicked:import-biotitan', async (ev) => {
-
-    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
-
-    if(!toImport.includes(".")) {
-        asw.setAttrs({
-		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
-	    });
-    }
-
-    let biotitan = {};
-    biotitan.techlevel = "Tech 1 / Bio-Salvage";
-
-    toImport = toImport.split('\n');
-
-    biotitan.structure = toImport.pop().replaceAll(/[a-zA-Z.]/g, '').trim();
-    biotitan.structure_max = biotitan.structure;
-    biotitan.scrapvalue = biotitan.structure;
-
-    //look for name (all caps)
-    let typeDetails = "";
-    while(toImport[toImport.length-1] !== toImport[toImport.length-1].toUpperCase()) {
-        typeDetails = toImport.pop().trim() + " " + typeDetails;
-    }
-    typeDetails = typeDetails.replaceAll(/(?=•)/g, '\n');
-    biotitan.typeDetails =typeDetails;
-
-    biotitan.character_name = toImport.pop().trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
-
-    biotitan["importerText"] = 'Values imported';
-    asw.setAttrs(biotitan);
-});
-
-on('clicked:import-biotitan-orangebox', async (ev) => {
-
-    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
-
-    if(!toImport.includes(".")) {
-        asw.setAttrs({
-		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
-	    });
-    }
-
-    let biotitan = {};
-    biotitan.techlevel = "Tech 1 / Bio-Salvage";
-
-    toImport = toImport.split('\n');
-
-     while(toImport.length !== 0) {
-        let name = toImport.shift().trim();
-        let rules = toImport.shift().trim();
-        let details = "";
-
-        while(toImport.length > 3 && !toImport[2].includes("//") && !toImport[2].includes("Passive")) {
-            details = details + toImport.shift();
-        }
-        details = details + toImport.shift();
-        if(toImport.length < 3) {
-            details = details + toImport.join("");
-            //exit loop
-            toImport = [];
-        }
-        details = details.replaceAll("  ", " ");
-
-        if(rules.includes("//")) {
-            await importWeapon(name + "\n" + rules + "\n" + details);
-        }
-
-        if(rules.includes("Passive")) {
-            let row = "repeating_traits_" + generateRowID();
-            biotitan[row + "_name"] = name;
-            biotitan[row + "_details"] = rules + "\n" + details;
-        }
-     }
-
-    biotitan["importerText"] = 'Values imported';
-    asw.setAttrs(biotitan);
-});
-
-on('clicked:import-vehicle', async (ev) => {
-
-    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
-
-    if(!toImport.includes(".")) {
-        asw.setAttrs({
-		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
-	    });
-    }
-
-    let vehicle = {};
-
-    toImport = toImport.split('\n');
-
-    vehicle.scrapvalue = toImport.pop();
-    vehicle.techlevel = toImport.pop();
-
-    let traits = "";
-    while(!toImport[toImport.length-1].includes("SP")) {
-        traits = toImport.pop().trim() + " " + traits;
-    }
-    traits = traits.replaceAll("  ", " ").split("//");;
-    importTraits(traits, vehicle);
-
-    if(toImport[toImport.length-1].includes("SP")) {
-        vehicle.structure = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
-        vehicle.structure_max = vehicle.structure;
-    }
-
-    vehicle.character_name = toImport.pop().trim();
-
-    if(toImport[toImport.length-1].includes("//")) {
-        let rules = toImport.pop();
-        let weaponName = toImport.pop();
-
-        importWeapon(weaponName +"\n" + rules);
-    }
-
-    while(!toImport[toImport.length-1].includes(".")) {
-        await importModuleSystem('traits', toImport.pop());
-    }
-
-    vehicle.typeDetails = toImport.join('');
-
-    vehicle["importerText"] ='Values imported'
-
-    asw.setAttrs(vehicle);
-});
-
-on('clicked:import-creature', async (ev) => {
-
-    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
-
-    if(!toImport.includes(".")) {
-        asw.setAttrs({
-		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
-	    });
-    }
-
-    let creature = {};
-    creature.scrapvalue = 0;
-    creature.techlevel = 0;
-
-    toImport = toImport.split('\n');
-
-    let traits = "";
-    while(!toImport[toImport.length-1].includes("HP")) {
-        traits = toImport.pop().trim() + " " + traits;
-    }
-    traits = traits.replaceAll("  ", " ");
-    importTraits(traits, creature);
-
-    creature.health = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
-    creature.health_max = creature.health;
-
-    if(toImport[0].includes("Scorpion")) {
-        creature.character_name = toImport[0];
-        toImport = toImport.shift();
-    }
-    else {
-        creature.character_name = toImport.pop().trim();
-    }
-
-    if(toImport[toImport.length-1].includes("//")) {
-        let rules = toImport.pop();
-        let weaponName = toImport.pop();
-
-        importWeapon(weaponName +"\n" + rules);
-    }
-
-    creature.typeDetails = toImport.join('');
-
-    creature["importerText"] = 'Values imported';
-
-    asw.setAttrs(creature);
-});
-
-on('clicked:import-peoplesquad', async (ev) => {
-
-    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
-
-    if(!toImport.includes(".")) {
-        asw.setAttrs({
-		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
-	    });
-    }
-
-    let people = {};
-    people.scrapvalue = 0;
-    people.techlevel = 0;
-
-    toImport = toImport.split('\n');
-
-    people.character_name = toImport.shift();
-
-    people.health = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
-    people.health_max = people.health;
-
-    let traits = "";
-    while(!toImport[toImport.length-1].includes("//")) {
-        traits = toImport.pop().trim() + "\n" + traits;
-    }
-    traits = traits.replaceAll("  ", " ").split("\n");;
-    importTraits(traits, people);
-
-    if(toImport[toImport.length-1].includes("//")) {
-        let rules = toImport.pop();
-        let weaponName = toImport.pop();
-
-        importWeapon(weaponName +"\n" + rules);
-    }
-
-    people.typeDetails = toImport.join('');
-
-    people["importerText"] = 'Values imported';
-
-    asw.setAttrs(people);
-});
 
 const importTraits = (traits, object) => {
 
