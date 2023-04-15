@@ -171,7 +171,7 @@
         <button
           type="roll"
           name="roll_luc"
-          value="&{template:rol} {{name=@{luck_txt}}} {{success=[[@{current_luck}]]}} {{hard=[[floor(@{current_luck}/2)]]}} {{roll1=[[1d100]]}}"
+          value="&{template:rol-simple} {{name=@{luck_txt}}} {{success=[[@{current_luck}]]}} {{roll1=[[1d100]]}}"
           ></button>
         <label for="attr_luc">
           <span> <span class="stat-abbreviation">LUC</span>K </span>
@@ -609,7 +609,7 @@
   <input type="hidden" name="attr_social_txt" value="Social"/>
   <input type="hidden" name="attr_stealth_txt" value="Stealth"/>
 
-  <!--  Roll Template
+  <!--  Roll Template Normal (Success/Hard/Fail/Fumble/Critical)
     --  &{template:rol} {{name=Test}} {{success=[[50]]}} {{hard=[[floor(50/2)]]}} {{roll1=[[1d100]]}}
     -->
   <rolltemplate class="sheet-rolltemplate-rol">
@@ -652,8 +652,32 @@
       </tr>
     </table>
   </rolltemplate>
-  
-  
+
+  <!--  Roll Template Simple Success/Failure
+    --  &{template:rol-simple} {{name=Test}} {{success=[[50]]}} {{roll1=[[1d100]]}}
+    -->
+  <rolltemplate class="sheet-rolltemplate-rol-simple">
+    <table>
+      <caption>{{name}} ({{success}})</caption>
+      <tr style="background:#BEBEBE;">
+        <td class="template_label" data-i18n="result">Result:</td> 
+          <!-- Is Success -->
+          {{#rollBetween() roll1 1 success}}
+            <td style="background:DarkGreen;" class="template_value" data-i18n="success">Success</td>
+          {{/rollBetween() roll1 1 success}}
+          <!-- Is Not Success -->
+          {{#rollGreater() roll1 success}}
+            <td style="background:Crimson;" class="template_value" data-i18n="fail">Fail</td>
+          {{/rollGreater() roll1 success}}
+        </td>
+      </tr>
+      <tr>
+        <td class="template_label" data-i18n="rolled">Rolled:</td>
+        <td class="template_value">{{roll1}}</td>
+      </tr>
+    </table>
+  </rolltemplate>
+
   <!--
     -- &{template:rol-attack}
     -->
