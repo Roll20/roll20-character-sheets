@@ -165,8 +165,8 @@
                 <div>
                     <div class="textarea-with-controls">
                         <input type="text" name="attr_traits" class="fullsize" title="Traits">
-                        <textarea name="attr_equipment" class="textarea"></textarea>
-                        <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{equipment}}}">w</button>
+                        <textarea name="attr_details" class="textarea"></textarea>
+                        <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
                     </div>
                 </div>
             </details>
@@ -724,6 +724,7 @@
                 <details>
                     <summary>Importer</summary>
                     <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. Names have to be on one line."></textarea>
+                    <button type="action" class="textbutton" name="act_import-equipment">Import Equipment</button>
                     <button type="action" class="textbutton" name="act_import-weapon">Import Weapon</button>
                 </details>
             </div>
@@ -1058,6 +1059,41 @@ on('clicked:import-weapon', async (ev) => {
     asw.setAttrs(weapon);
 });
 
+on('clicked:import-equipment', async (ev) => {
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+    importEquipment(toImport);
+});
+
+const importEquipment = async (toImport) => {
+    let row = "repeating_equipment_" + generateRowID() + "_";
+    let object = {};
+
+    if(checkForMultipleAP(toImport)) {
+        importMultipleAp(toImport);
+        return;
+    }
+
+    toImport = importName(toImport, object, row);
+
+    let rules = toImport.split(/\r?\n/)[0].trim();
+    rules = importAp(rules, object, row);
+
+    rules = importAction(rules, object, row);
+    rules = importRange(rules, object, row);
+
+    if(rules.includes("Passive")) {
+        object[row + "is-passive"] = "on";
+        rules = rules.split('//').slice(1).join('//').trim()
+    }
+
+    importEquipmentTraits(rules, object, row);
+    importDetails(toImport, object, row);
+
+    object.importerText = "Values imported";
+
+    asw.setAttrs(object);
+}
+
 ///////////////////////
 //  MECH IMPORTER  ////
 ///////////////////////
@@ -1097,7 +1133,7 @@ on('clicked:import-mech-stats', async (ev) => {
     mech.chassis_cost = stats[7] + " Tech " + stats[6];
     mech.importerText = "Values imported";
 
-     await asw.setAttrs(mech);
+    await asw.setAttrs(mech);
 });
 
 on('clicked:import-mech-weapon', async (ev) => {
@@ -1140,6 +1176,7 @@ const importModuleSystem = async (type, toImport) => {
 
     if(checkForMultipleEP(toImport)) {
         importMultipleEp(type, toImport);
+        return;
     }
 
     toImport = importName(toImport, object, row);
@@ -1179,8 +1216,53 @@ const importMultipleEp = async (type, toImport) => {
     }
 }
 
+const importMultipleAp = async (toImport) => {
+    let template = {};
+    let name = importName(toImport, template, '');
+
+    let searchBlocks = toImport.split(/\r?\n/g).slice(1);
+    let splitByAp = [];
+
+    while(searchBlocks.length !== 0) {
+        if(searchBlocks[1].includes("AP")) {
+            let blockName = template.name + " " + searchBlocks.shift();
+            let blockRules = searchBlocks.shift();
+            let blockDescription = "";
+
+            //gather description
+            while(searchBlocks.length > 2 && !searchBlocks[1].includes("AP")) {
+                blockDescription = blockDescription + searchBlocks.shift();
+            }
+
+            if(searchBlocks.length <= 2) {
+               blockDescription = blockDescription + searchBlocks.join('');
+               searchBlocks = [];
+            }
+
+            //no separate title for next block
+            else if(searchBlocks[0].includes(".")) {
+                blockDescription = blockDescription + searchBlocks[0];
+                searchBlocks[0] = blockName.split(" ").pop();
+            }
+
+            splitByAp.push(blockName + "\n" + blockRules + "\n" + blockDescription);
+        }
+        else {
+            searchBlocks.shift();
+        }
+    }
+
+    for (const ability of splitByAp) {
+        await importEquipment(ability);
+    }
+}
+
 const checkForMultipleEP = (toImport) => {
    return (toImport.match(/^\dEP|XEP/gm) || []).length > 1;
+}
+
+const checkForMultipleAP = (toImport) => {
+   return (toImport.match(/.*\d\s(AP|XAP).*/gm) || []).length > 1;
 }
 
 /////////////////////////
@@ -1413,8 +1495,8 @@ const formatImporterText = (toImport) => {
     let formatted = toImport.replaceAll(/\/\/\s*[\r\n]/gm, '// ').replaceAll(/[\r\n]/gm, '#').replaceAll(/#\/\//g, '//').replaceAll(/#/g, '\n').replaceAll(/^\s*\n/gm,'').replaceAll(/\n(\(\d\))/gm, "$1").trim();
 
     let multilineName = formatted.split(/\r?\n/);
-    if(multilineName[2].includes("Range") || multilineName[2].includes("Passive") || multilineName[2].includes("EP")) {
-        formatted = multilineName.slice(0,2).join(' ') + "\n" + multilineName.slice(2).join("\n");
+    if(multilineName[2].includes("Range") || multilineName[2].includes("Passive") || multilineName[2].includes("EP") || multilineName[2].includes("AP")) {
+        formatted = multilineName.slice(0,2).join('') + "\n" + multilineName.slice(2).join("\n");
     }
 
     let multilineRules = formatted.split(/\r?\n/);
@@ -1466,6 +1548,19 @@ const importEp = (toImport, object, row) => {
         return toImport.split(/\r?\n/).slice(1).join("\n");
     }
     return toImport;
+}
+
+const importAp = (rules, object, row) => {
+
+    if(rules.includes("AP")) {
+        object[row + "cost"] =  rules.match(/\d+\s*AP/g).pop();
+        let index = rules.split(' // ').indexOf(object[row + "cost"]);
+        rules = rules.split(' // ');
+        rules.splice(index, 1);
+
+        return rules.join(' // ').trim()
+    }
+    return rules;
 }
 
 const importRange = (rules, object, row) => {
@@ -1543,6 +1638,10 @@ const importHeat = (rules, object, row) => {
 }
 
 const importMechWeaponTraits = (rules, object, row) => {
+    object[row + "traits"] = rules.trim();
+}
+
+const importEquipmentTraits = (rules, object, row) => {
     object[row + "traits"] = rules.trim();
 }
 
