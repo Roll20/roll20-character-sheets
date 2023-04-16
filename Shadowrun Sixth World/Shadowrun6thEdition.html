@@ -3474,7 +3474,20 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
-								<span class="changelog-entry">**2023-02-27 ** v.74 Chuz (James Culp)</span>
+								<span class="changelog-entry">**2023-03-27 ** v.77 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - Final(?) fix to Spirit and Vehicle dicepool bug.  Spirit ranged/melee dicepools are set when the spirit is created (when force/type are changed and reset toggle is on).  Vehicle pools are set when the sheet owner sets them.  They will only change now if/when they are in grunt groups and the number of grunts change or the sheet owner changes the dicepool directly.
+								</ul>
+								<span class="changelog-entry">**2023-03-20 ** v.77 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
+									<li><span class="bullet">A</span><b>Bugfix</b> - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
+								</ul>
+								<span class="changelog-entry">**2023-03-13 ** v.76 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
+								</ul>
+								<span class="changelog-entry">**2023-02-27 ** v.75 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">F</span><b>New Feature</b> - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
 									<li><span class="bullet">F</span><b>New Feature</b> - Added Heat, Reputation and AsRep to the Social Pane
@@ -4867,6 +4880,7 @@
 				<input name="attr_far" type="hidden" value=""/>
 				<input name="attr_extreme" type="hidden" value=""/>
 				<input name="attr_dicepool" type="hidden" value=""/>
+				<input name="attr_dicepool_base" type="hidden" value=""/>
 				<button class="no-dicepool" name="act_npcrangeweaponnodicepool" type="action" value="@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (Dicepool: ?{Skill / Autosoft Rating?|1,1|2,2|3,3|4,4|5,5|6,6|7,7|8,8|9,9|10,10} + ?{Attribute / Sensor Rating?|1,1|2,2|3,3|4,4|5,5|6,6|7,7|8,8|9,9|10,10})}}{{dice=[[(?{Skill / Autosoft Rating?}+?{Attribute / Sensor Rating?}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode @{mode}, Damage @{damage}, Dicepool = @{dicepool} + Wounds @{wounds_toggle} + Modifiers @{modifiers_toggle} + Edge @{edge_toggle}, Notes @{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
 				<button class="dicepool" name="act_npcrangeweapon" type="action" value="@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (Dicepool: @{dicepool})}}{{dice=[[(@{dicepool}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode @{mode}, Damage @{damage}, Dicepool = @{dicepool} + Wounds @{wounds_toggle} + Modifiers @{modifiers_toggle} + Edge @{edge_toggle}, Notes @{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
 				<span class="center" name="attr_dicepool"></span>
@@ -4923,8 +4937,8 @@
 						<label data-i18n-title="modeoptions" title="Mode Options">
 							<input name="attr_firing_modes" placeholder="SS/SA/BF/BW/FA" type="text" title="@{repeating_range_${x}_firing_modes}}"/>
 						</label>
-						<h3 data-i18n="modifier">modifier</h3>
-						<label data-i18n-title="modifier" title="modifier">
+						<h3 class="atk-dp-mod" data-i18n="modifier">modifier</h3>
+						<label class="atk-dp-mod" data-i18n-title="modifier" title="modifier">
 							<input name="attr_dicepool_modifier" title="@{repeating_range_${x}_dicepool_modifier}" type="number" value="0"/>
 						</label>
 					</div>
@@ -4963,6 +4977,7 @@
 			  <input name="attr_far" type="hidden" value=""/>
 			  <input name="attr_extreme" type="hidden" value=""/>
 			  <input name="attr_dicepool" type="hidden" value=""/>
+			  <input name="attr_dicepool_base" type="hidden" value=""/>
 			  <input name="attr_dicepool_modifier" type="hidden" value=""/>
 			  <button class="no-dicepool" name="act_npcmeleeweaponnodicepool" type="action" value="@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (Dicepool: ?{Skill / Autosoft?|1,1|2,2|3,3|4,4|5,5|6,6|7,7|8,8|9,9|10,10} + ?{Attribute / Sensor?|1,1|2,2|3,3|4,4|5,5|6,6|7,7|8,8|9,9|10,10})}}{{dice=[[(?{Skill / Autosoft?}+?{Attribute / Sensor?}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=DV @{damage}, Notes: @{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
 			  <button class="dicepool" name="act_npcmeleeweapon" type="action" value="@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (Dicepool: @{dicepool})}}{{dice=[[(@{dicepool}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=DV @{damage}, Notes: @{notes}}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}"><span name="attr_name"></span></button>
@@ -5001,7 +5016,7 @@
 				 <label data-i18n-title="extreme" title="Extreme 500+">
 					<input name="attr_extreme_base" placeholder="-" title="@{repeating_melee_${x}_extreme_base}" type="text" value=""/>
 				 </label>
-				 <div class="row">
+				 <div class="row atk-dp-mod">
 					 <h3 data-i18n="modifier">modifier</h3>
 					 <label data-i18n-title="modifier" title="modifier">
 						 <input name="attr_dicepool_modifier" title="@{repeating_range_${x}_dicepool_modifier}" type="number" value="0"/>
@@ -6263,7 +6278,7 @@
 <input type="hidden" name="attr_spellcasting_specialist" value="0" />
 <input type="hidden" name="attr_spellcasting_expert" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.75">
+<input type="hidden" name="attr_sheet_version" value="0.78">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 // Sheet workers
@@ -6339,6 +6354,9 @@ on("sheet:opened", function() {
 				case (v.data_version < 0.72):
 					_v72_update();
 					console.log("Data now fits v.72");
+				case (v.data_version < 0.77):
+					_v77_update();
+					console.log("Data now fits v.77");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -6359,6 +6377,33 @@ var show_changelog = () => {
 	});
 };
 
+
+var _v77_update = () => {
+	getAttrs(["sheet_type"], (v) => {
+		if(v.sheet_type == 'grunt' || v.sheet_type == 'spirit' || v.sheet_type == 'vehicle') {
+			// set the new repeating melee and repeating ranged dicepool_base attribute to dicepool - dicepool_modifier
+			getSectionIDs('repeating_range', (ids) => {
+				ids.forEach((row_id) => {
+					getAttrs([`repeating_range_${row_id}_dicepool_base`, `repeating_range_${row_id}_dicepool`, `repeating_range_${row_id}_dicepool_modifier`], (v) => {
+						setAttrs({
+							[`repeating_range_${row_id}_dicepool_base`]: parseInt(v[`repeating_range_${row_id}_dicepool`]) - parseInt(v[`repeating_range_${row_id}_dicepool_modifier`])
+						}, {silent: true});
+					});
+				});
+			});
+
+			getSectionIDs('repeating_melee', (ids) => {
+				ids.forEach((row_id) => {
+					getAttrs([`repeating_melee_${row_id}_dicepool_base`, `repeating_melee_${row_id}_dicepool`, `repeating_melee_${row_id}_dicepool_modifier`], (v) => {
+						setAttrs({
+							[`repeating_melee_${row_id}_dicepool_base`]: parseInt(v[`repeating_melee_${row_id}_dicepool`]) - parseInt(v[`repeating_melee_${row_id}_dicepool_modifier`])
+						}, {silent: true});
+					});
+				});
+			});
+		}
+	});
+};
 
 var _v72_update = () => {
 	getAttrs(["sheet_type"], (v) => {
@@ -9044,14 +9089,19 @@ var update_initiative = () => {
 
 //Calculate Astral Initiative
 var update_astral_initiative = () => {
-	getAttrs(["intuition", "logic", "astral_initiative_mod", "astral_initiative_temp", "astral_initiative_temp_flag", "astral_initiative_dice_mod", "astral_initiative_dice_temp", "astral_initiative_dice_temp_flag", "astral_initiative_dice"], (v) => {
+	getAttrs(["intuition", "logic", "astral_initiative_mod", "astral_initiative_temp", "astral_initiative_temp_flag", "astral_initiative_dice_mod", "astral_initiative_dice_temp", "astral_initiative_dice_temp_flag", "astral_initiative_dice", "sheet_type"], (v) => {
+		// spirits have specifically defined initiatives, this is messing them up
+		if(v.sheet_type === 'spirit') {
+			return;
+		}
+
 		const int = parseInt(v.intuition) || 0;
 		const log = parseInt(v.logic) || 0;
 		const mod = parseInt(v.astral_initiative_mod) || 0;
 		const tmp = (v.astral_initiative_temp_flag === "on") ? parseInt(v.astral_initiative_temp) || 0 : 0;
 		const bas = int + log;
 		const tot = int + log + mod + tmp;
-		const dice_base = 2;
+		let dice_base = 2;
 
 		const dice_mod = parseInt(v.astral_initiative_dice_mod) || 0;
 		const dice_tmp = (v.astral_initiative_dice_temp_flag === "on") ? parseInt(v.astral_initiative_dice_temp) || 0 : 0;
@@ -9677,9 +9727,7 @@ console.log(toSet);
 		const regex = /_(-.*)$/;
 		var rowID = eventInfo.triggerName.match(regex)[1];
 
-//console.log(eventInfo);
 		getAttrs([`${weap}_name`, `${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `${weap}_attribute`, `${weap}_attr_rating`, `${weap}_primary`, `${weap}_firing_modes`, `${weap}_default_mode`, `${weap}_damage`, `${weap}_close`, `${weap}_near`, `${weap}_medium`, `${weap}_far`, `${weap}_extreme`, `${weap}_has_mods`, `${weap}_notes`, `sheet_type`, `${weap}_dicepool`, `${weap}_dicepool_base`], (v) => {
-//console.log(v);
 			// Trying to detect this firing on a remove: event and stop processing if it was
 			if(typeof eventInfo.newValue === 'undefined' && typeof eventInfo.previousValue === 'undefined' && ! v[`${weap}_name`]) {
 				console.log("do nothing!");
@@ -9688,14 +9736,30 @@ console.log(toSet);
 
 
 			if(eventInfo.sourceAttribute.endsWith("dicepool") && eventInfo.newValue && eventInfo.newValue != "0") {
+console.log(eventInfo);
+				if(eventInfo.sourceType === 'player') {
+console.log("updating dicepool_base to: "+v[`${weap}_dicepool`]);
+					setAttrs({
+						[`${weap}_dicepool_base`]: v[`${weap}_dicepool`],
+					}, {silent: true});
+				}
 				return;
 			} else if(v[`${weap}_dicepool_base`] && v[`${weap}_dicepool_base`] != v[`${weap}_dicepool`]) {
-				let diff = parseInt(v[`${weap}_dicepool_base`]) - parseInt(v[`${weap}_dicepool`]);
+//console.log("updating dicepool_base to: "+v[`${weap}_dicepool`]);
+//				let diff = parseInt(v[`${weap}_dicepool_base`]) - parseInt(v[`${weap}_dicepool`]);
 
-				setAttrs({
-					[`${weap}_dicepool_base`]: '',
-					[`${weap}_dicepool_modifier`]: parseInt(v[`${weap}_dicepool_modifier`] + diff)
-				});
+//				setAttrs({
+//					[`${weap}_dicepool_modifier`]: parseInt(v[`${weap}_dicepool_modifier`] + diff)
+//				}, {silent: true});
+			}
+
+//			if(v[`${weap}_dicepool_base`] == '') {
+//				v[`${weap}_dicepool_base`] = v[`${weap}_dicepool`];
+//			}
+
+			// If this is a vehicle/drone sheet there's nothing more to do
+			if(v.sheet_type == 'vehicle' || v.sheet_type == 'spirit') {
+				return;
 			}
 
 			const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
@@ -10003,9 +10067,13 @@ on("change:grunt_group_count change:grunt_group_member change:repeating_melee:mo
 							[`repeating_${wtype}_${id}_medium`]: m,
 							[`repeating_${wtype}_${id}_far`]: f,
 							[`repeating_${wtype}_${id}_extreme`]: e
-						});
+						}, {silent: true});
 					} else { // they are now a grunt group member we need to adjust dicepool and ARs
+//console.log("dicepool_base: "+dice);
+//console.log("dicepool_modifier: "+diceMod);
+//console.log("grunt group dicepool bonus: "+bonuses.dice);
 						var dp = parseInt(dice) + parseInt(diceMod) + parseInt(bonuses.dice) || 0;
+//console.log("dicepool: "+dp);
 						setAttrs({
 							[`repeating_${wtype}_${id}_damage`]: DV,
 							[`repeating_${wtype}_${id}_dicepool`]: dp,
@@ -10014,7 +10082,7 @@ on("change:grunt_group_count change:grunt_group_member change:repeating_melee:mo
 							[`repeating_${wtype}_${id}_medium`]: m,
 							[`repeating_${wtype}_${id}_far`]: f,
 							[`repeating_${wtype}_${id}_extreme`]: e
-						});
+						}, {silent: true});
 					}
 				});
 			});
@@ -11821,19 +11889,27 @@ console.log("Category: "+data.Category);
 		case 'Vehicles':
 		case 'Drone':
 		case 'Drones':
-			canvasAddDrone(data);
-
 			if(typeof data["data-physical"] !== 'undefined') {
 				physical = data["data-physical"];
 			} else if(typeof data["data-body_base"] !== 'undefined') {
 				physical = 8 + Math.ceil(data["data-body_base"] / 2);
 			}
-
+console.log("Physical: "+physical);
 			if(typeof data["data-matrix"] !== 'undefined') {
 				matrix = data["data-matrix"];
 			} else if(typeof data["data-sensor_base"] !== 'undefined') {
-				matrix = 8 + Math.ceil(data["data-sensor_base"]);
+				matrix = 8 + Math.ceil(data["data-sensor_base"] / 2);
 			}
+console.log("Matrix: "+matrix);
+
+			if(! data["data-physical"]) {
+				data["data-physical"] = physical;
+			}
+			if(! data["data-matrix"]) {
+				data["data-matrix"] = matrix;
+			}
+
+			canvasAddDrone(data);
 
 			tokenAttrs.bar1_value = physical;
 			tokenAttrs.bar1_max = physical;
@@ -11925,6 +12001,7 @@ var canvasAddNPC = function(data) {
 			addattrs[attr] = '';
 		}
 	});
+
 	addattrs.physical_max = addattrs['physical'];
 
 
@@ -12144,6 +12221,10 @@ var canvasAddDrone = function(data) {
 	addattrs["maneuvering"] = data["data-maneuvering"] || 0;
 	addattrs["stealth"] = data["data-stealth"] || 0;
 	addattrs["targeting"] = data["data-targeting"] || 0;
+	addattrs["physical"] = data["data-physical"] || 0;
+	addattrs["physical_max"] = data["data-physical"] || 0;
+	addattrs["matrix"] = data["data-matrix"] || 0;
+	addattrs["matrix_max"] = data["data-matrix"] || 0;
 
 	addattrs["notes"] = data["data-description"] || '';
 
