@@ -452,7 +452,8 @@
         <button
           type="roll"
           name="roll_fighting"
-          value="/em uses Fighting (@{fighting}) and rolls [[d100]]"></button>
+          value="&{template:rol-attack} {{name=Fighting}} {{success=[[@{fighting}]]}} {{hard=[[floor(@{fighting}/2)]]}} {{roll1=[[1d100]]}} {{rolld=[[1d100]]}}"
+          ></button>
         <label for="attr_fighting">Fighting</label>
         <input
           type="number"
@@ -472,7 +473,8 @@
         <button
           type="roll"
           name="roll_firearms"
-          value="/em uses Firearms (@{firearms}) and rolls [[d100]]"></button>
+          value="&{template:rol-attack} {{name=Firearms}} {{success=[[@{firearms}]]}} {{hard=[[floor(@{firearms}/2)]]}} {{roll1=[[1d100]]}} {{rolld=[[1d100]]}}"
+          ></button>
         <label for="attr_firearms">Firearms</label>
         <input
           type="number"
@@ -496,7 +498,8 @@
         <button
           type="roll"
           name="roll_weapon"
-          value="/em uses @{weaponname} (@{weapon}) and rolls [[d100]]"></button>
+          value="&{template:rol-attack} {{name=@{weaponname}}} {{success=[[@{weapon}]]}} {{hard=[[floor(@{weapon}/2)]]}} {{roll1=[[1d100]]}} {{rolld=[[1d100]]}}"
+          ></button>
         <label for="attr_weapon">
           <input type="text" name="attr_weaponname" />
         </label>
@@ -695,47 +698,61 @@
     -- &{template:rol-attack}
     -->
   <rolltemplate class="sheet-rolltemplate-rol-attack">
-    <table>
-      <caption>{{name}}</caption>
-      <tr><td class="template_label" data-i18n="value">Value:</td><td class="template_value">{{success}}/{{hard}}</td></tr>
-      {{#malf}}
-        <tr><td class="template_label" data-i18n="malf">Malf:</td><td class="template_value">{{malf}}</td></tr>
-      {{/malf}}
-      <tr><td class="template_label" data-i18n="rolled">Rolled:</td><td class="template_value">{{roll1}}</td></tr>
-      <tr style="background:#BEBEBE;">
-        <td class="template_label" data-i18n="result">Result:</td>
-        <!-- 01 is always Critical -->
-        {{#rollTotal() roll1 1}} 
-          <td style="background:Lime;" class="template_value"><b data-i18n="critical">Critical</b></td>
-        {{/rollTotal() roll1 1}} 
-        <!-- Is Success -->
-        {{#rollBetween() roll1 2 success}}
-          <!-- Is Standard -->
-          {{#rollGreater() roll1 hard}}
-            <td style="background:DarkGreen;" class="template_value" data-i18n="success">Success</td>
-          {{/rollGreater() roll1 hard}}
-          <!-- Is Hard -->
-          {{#rollBetween() roll1 2 hard}}
-            <!-- Is Hard -->
-            <td style="background:Green;" class="template_value" data-i18n="hard">Hard</td>
-          {{/rollBetween() roll1 2 hard}}
-        {{/rollBetween() roll1 2 success}}
-        <!-- Is Not Success -->
+    <div class="sheet-rol-roll__container">
+      <h2>{{character_name}}</h2>
+      <h1>{{name}}</h1>
+      <div class="sheet-rol-roll__wrapper">
+        {{#rollBetween() roll1 1 success}}
+          <div class="sheet-rol-roll__success">
+            {{#rollTotal() roll1 1}} 
+              <span data-i18n="critical">critical</span>
+            {{/rollTotal() roll1 1}} 
+            {{#rollBetween() roll1 2 hard}}
+              <span data-i18n="hard">hard</span>
+            {{/rollBetween() roll1 2 hard}}
+            <!-- always say success -->
+            <span data-i18n="success">success</span>
+          </div>
+        {{/rollBetween() roll1 1 success}}
         {{#rollGreater() roll1 success}}
-          <!-- Is Fumble -->
-          {{#rollTotal() roll1 100}} 
-            <td style="background:Red;" class="template_value"><b data-i18n="fumble">Fumble</b></td>
-          {{/rollTotal() roll1 100}} 
-          <!-- Is Fail -->
-          {{#rollLess() roll1 100}}
-            <td style="background:Crimson;" class="template_value" data-i18n="fail">Fail</td>
-          {{/rollLess() roll1 100}}
+          <div class="sheet-rol-roll__failure">
+            {{#rollTotal() roll1 100}}
+              <span data-i18n="fumble">fumble</span>
+            {{/rollTotal() roll1 100}} 
+            {{#rollLess() roll1 100}}
+              <span data-i18n="failure">failure</span>
+            {{/rollLess() roll1 100}}
+          </div>
         {{/rollGreater() roll1 success}}
-      </tr>
-      <tr>
-        <td class="template_label" data-i18n="dam">Dam:</td><td class="template_value">{{damage}}</td>
-      </tr>
-    </table>
+        <div class="sheet-rol-roll__result">
+          <span class="sheet-rol-roll__roll">{{roll1}}</span>
+          <span class="sheet-rol-roll__vs"><span data-i18n="vs.">vs.</span></span>
+          <span class="sheet-rol-roll__roll">{{success}}</span>
+        </div>
+        <div class="sheet-rol-roll__verbose">
+          <div class="sheet-rol-roll__verboseitem">
+            <div class="sheet-rol-roll__verbosetitle"
+              data-i18n="regular">regular</div>
+            <div class="sheet-rol-roll__verbosetarget">{{success}}</div>
+          </div>
+          <div class="sheet-rol-roll__verboseitem">
+            <div class="sheet-rol-roll__verbosetitle"
+              data-i18n="hard">hard</div>
+            <div class="sheet-rol-roll__verbosetarget">{{hard}}</div>
+          </div>
+          <div class="sheet-rol-roll__verboseitem">
+            <div class="sheet-rol-roll__verbosetitle"
+              data-i18n="damage">damage</div>
+            <div class="sheet-rol-roll__verbosetarget">{{rolld}}</div>
+          </div>
+        </div>
+        {{#malf}}
+          <div class="sheet-rol-roll__malf">{{malf}}</div>
+        {{/malf}}
+        <div class="sheet-rol-roll__attr-container">
+        </div>
+      </div>
+    </div>
   </rolltemplate>
       
   <script type="text/worker">
