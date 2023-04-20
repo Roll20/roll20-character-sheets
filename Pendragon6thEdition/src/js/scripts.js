@@ -59,16 +59,6 @@ characteristics.unconscious.forEach((attr) => {
   );
 });
 
-characteristics.knights.forEach((attr) => {
-  on(`change:${attr}`, () => {
-    getAttrs(characteristics.knights, (values) => {
-      setAttrs({
-        total_family_knights: total(values),
-      });
-    });
-  });
-});
-
 characteristics.knockdown.forEach((attr) => {
   on(`change:${attr}`, ({ newValue }) => {
     setAttrs({
