@@ -145,6 +145,36 @@
                 </summary>
                 <textarea name="attr_itemDetails6"></textarea>
             </details>
+            <input class="nojobtobig" name="attr_nojobtobig" type="checkbox" hidden/>
+            <span class="nojobtobig">
+                <details>
+                    <summary>
+                        <input type="text" name="attr_nojobtobig2">
+                    </summary>
+                <textarea name="attr_nojobtobigDetails2"></textarea>
+                </details>
+                <details>
+                    <summary>
+                        <input type="text" name="attr_nojobtobig1">
+                    </summary>
+                    <textarea name="attr_nojobtobigDetails1"></textarea>
+                </details>
+            </span>
+            <input class="beefcake" name="attr_beefcake" type="checkbox" hidden/>
+            <span class="beefcake">
+                <details>
+                    <summary>
+                        <input type="text" name="attr_beefcake1">
+                    </summary>
+                <textarea name="attr_beefackeDetails1"></textarea>
+                </details>
+                <details>
+                    <summary>
+                        <input type="text" name="attr_beefcake2">
+                    </summary>
+                    <textarea name="attr_beefackeDetails2"></textarea>
+                </details>
+            </span>
         </div>
 
         <h3>Equipment</h3>
@@ -165,8 +195,8 @@
                 <div>
                     <div class="textarea-with-controls">
                         <input type="text" name="attr_traits" class="fullsize" title="Traits">
-                        <textarea name="attr_equipment" class="textarea"></textarea>
-                        <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{equipment}}}">w</button>
+                        <textarea name="attr_details" class="textarea"></textarea>
+                        <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
                     </div>
                 </div>
             </details>
@@ -214,7 +244,7 @@
                     </span>
                 </div>
                 <div class="descValuePair">
-                    <label >Module Slots </label>
+                    <label>Module Slots </label>
                     <span style="display: flex">
                         <input type="number" name="attr_modules" value="@{modules_used}" disabled>
                         <label> of</label>
@@ -228,7 +258,13 @@
                                 <input id="chassis" type="text" name="attr_chassis">
                             </span>
                     </summary>
-                    <textarea name="attr_chassisDetails"></textarea>
+                    <div>
+                        <div class="descValuePair">
+                            <label for="chassiscost">Cost</label>
+                            <input id="chassiscost" type="text" name="attr_chassis_cost">
+                        </div>
+                        <textarea name="attr_chassisDetails"></textarea>
+                    </div>
                 </details>
             </div>
 
@@ -381,6 +417,7 @@
                     </div>
                 </details>
                 <div class="textarea-with-controls">
+                    <input type="text" name="attr_traits" class="fullsize" title="Traits">
                     <textarea name="attr_details" class="textarea"></textarea>
                     <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
                 </div>
@@ -447,6 +484,7 @@
                     </div>
                 </details>
                 <div class="textarea-with-controls">
+                    <input type="text" name="attr_traits" class="fullsize" title="Traits">
                     <textarea name="attr_details" class="textarea"></textarea>
                     <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
                 </div>
@@ -713,9 +751,18 @@
                     <span>Is Pilot</span>
                     <input id="isPilot" name="attr_is-pilot" type="checkbox"/>
                 </label>
+                <label for="NoJobTooBig" class="settings-checkbox">
+                    <span>No Job Too Big</span>
+                    <input id="NoJobTooBig" name="attr_nojobtobig" type="checkbox"/>
+                </label>
+                <label for="Beefcake" class="settings-checkbox">
+                    <span>Beefcake</span>
+                    <input id="Beefcake" name="attr_beefcake" type="checkbox"/>
+                </label>
                 <details>
                     <summary>Importer</summary>
                     <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. Names have to be on one line."></textarea>
+                    <button type="action" class="textbutton" name="act_import-equipment">Import Equipment</button>
                     <button type="action" class="textbutton" name="act_import-weapon">Import Weapon</button>
                 </details>
             </div>
@@ -1050,6 +1097,41 @@ on('clicked:import-weapon', async (ev) => {
     asw.setAttrs(weapon);
 });
 
+on('clicked:import-equipment', async (ev) => {
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+    importEquipment(toImport);
+});
+
+const importEquipment = async (toImport) => {
+    let row = "repeating_equipment_" + generateRowID() + "_";
+    let object = {};
+
+    if(checkForMultipleAP(toImport)) {
+        importMultipleAp(toImport);
+        return;
+    }
+
+    toImport = importName(toImport, object, row);
+
+    let rules = toImport.split(/\r?\n/)[0].trim();
+    rules = importAp(rules, object, row);
+
+    rules = importAction(rules, object, row);
+    rules = importRange(rules, object, row);
+
+    if(rules.includes("Passive")) {
+        object[row + "is-passive"] = "on";
+        rules = rules.split('//').slice(1).join('//').trim()
+    }
+
+    importEquipmentTraits(rules, object, row);
+    importDetails(toImport, object, row);
+
+    object.importerText = "Values imported";
+
+    asw.setAttrs(object);
+}
+
 ///////////////////////
 //  MECH IMPORTER  ////
 ///////////////////////
@@ -1086,9 +1168,10 @@ on('clicked:import-mech-stats', async (ev) => {
     mech.systems_max = stats[3];
     mech.modules_max = stats[4];
     mech.maxcargo = stats[5];
+    mech.chassis_cost = stats[7] + " Tech " + stats[6];
     mech.importerText = "Values imported";
 
-     await asw.setAttrs(mech);
+    await asw.setAttrs(mech);
 });
 
 on('clicked:import-mech-weapon', async (ev) => {
@@ -1131,6 +1214,7 @@ const importModuleSystem = async (type, toImport) => {
 
     if(checkForMultipleEP(toImport)) {
         importMultipleEp(type, toImport);
+        return;
     }
 
     toImport = importName(toImport, object, row);
@@ -1144,7 +1228,7 @@ const importModuleSystem = async (type, toImport) => {
 
     if(rules.includes("Passive")) {
         object[row + "is-passive"] = "on";
-        rules = rules.split('//').slice(1).join('//').trim()
+        rules = rules.split('//').slice(1).map(s => s.trim()).join(' // ').trim()
     }
 
     rules = importHeat(rules, object, row);
@@ -1170,8 +1254,53 @@ const importMultipleEp = async (type, toImport) => {
     }
 }
 
+const importMultipleAp = async (toImport) => {
+    let template = {};
+    let name = importName(toImport, template, '');
+
+    let searchBlocks = toImport.split(/\r?\n/g).slice(1);
+    let splitByAp = [];
+
+    while(searchBlocks.length !== 0) {
+        if(searchBlocks[1].includes("AP")) {
+            let blockName = template.name + " " + searchBlocks.shift();
+            let blockRules = searchBlocks.shift();
+            let blockDescription = "";
+
+            //gather description
+            while(searchBlocks.length > 2 && !searchBlocks[1].includes("AP")) {
+                blockDescription = blockDescription + searchBlocks.shift();
+            }
+
+            if(searchBlocks.length <= 2) {
+               blockDescription = blockDescription + searchBlocks.join('');
+               searchBlocks = [];
+            }
+
+            //no separate title for next block
+            else if(searchBlocks[0].includes(".")) {
+                blockDescription = blockDescription + searchBlocks[0];
+                searchBlocks[0] = blockName.split(" ").pop();
+            }
+
+            splitByAp.push(blockName + "\n" + blockRules + "\n" + blockDescription);
+        }
+        else {
+            searchBlocks.shift();
+        }
+    }
+
+    for (const ability of splitByAp) {
+        await importEquipment(ability);
+    }
+}
+
 const checkForMultipleEP = (toImport) => {
    return (toImport.match(/^\dEP|XEP/gm) || []).length > 1;
+}
+
+const checkForMultipleAP = (toImport) => {
+   return (toImport.match(/.*\d\s(AP|XAP).*/gm) || []).length > 1;
 }
 
 /////////////////////////
@@ -1236,7 +1365,7 @@ on('clicked:import-biotitan-orangebox', async (ev) => {
         }
         details = details + toImport.shift();
         if(toImport.length < 3) {
-            details = details + toImport.join("");
+            details = details + toImport.map(s => s.trim()).join(' ');
             //exit loop
             toImport = [];
         }
@@ -1299,7 +1428,7 @@ on('clicked:import-vehicle', async (ev) => {
         await importModuleSystem('traits', toImport.pop());
     }
 
-    vehicle.typeDetails = toImport.join('');
+    vehicle.typeDetails = toImport.map(s => s.trim()).join(' ');
 
     vehicle["importerText"] ='Values imported'
 
@@ -1347,7 +1476,7 @@ on('clicked:import-creature', async (ev) => {
         importMechWeapon(weaponName +"\n" + rules, creature);
     }
 
-    creature.typeDetails = toImport.join('');
+    creature.typeDetails = toImport.map(s => s.trim()).join(' ');
 
     creature["importerText"] = 'Values imported';
 
@@ -1389,7 +1518,7 @@ on('clicked:import-peoplesquad', async (ev) => {
         importMechWeapon(weaponName +"\n" + rules, people);
     }
 
-    people.typeDetails = toImport.join('');
+    people.typeDetails = toImport.map(s => s.trim()).join(' ');
 
     people["importerText"] = 'Values imported';
 
@@ -1404,8 +1533,8 @@ const formatImporterText = (toImport) => {
     let formatted = toImport.replaceAll(/\/\/\s*[\r\n]/gm, '// ').replaceAll(/[\r\n]/gm, '#').replaceAll(/#\/\//g, '//').replaceAll(/#/g, '\n').replaceAll(/^\s*\n/gm,'').replaceAll(/\n(\(\d\))/gm, "$1").trim();
 
     let multilineName = formatted.split(/\r?\n/);
-    if(multilineName[2].includes("Range") || multilineName[2].includes("Passive") || multilineName[2].includes("EP")) {
-        formatted = multilineName.slice(0,2).join(' ') + "\n" + multilineName.slice(2).join("\n");
+    if(multilineName[2].includes("Range") || multilineName[2].includes("Passive") || multilineName[2].includes("EP") || multilineName[2].includes("AP")) {
+        formatted = multilineName.slice(0,2).join('') + "\n" + multilineName.slice(2).join("\n");
     }
 
     let multilineRules = formatted.split(/\r?\n/);
@@ -1459,13 +1588,26 @@ const importEp = (toImport, object, row) => {
     return toImport;
 }
 
+const importAp = (rules, object, row) => {
+
+    if(rules.includes("AP")) {
+        object[row + "cost"] =  rules.match(/\d+\s*AP/g).pop();
+        let index = rules.split(' // ').indexOf(object[row + "cost"]);
+        rules = rules.split(' // ');
+        rules.splice(index, 1);
+
+        return rules.join(' // ').trim()
+    }
+    return rules;
+}
+
 const importRange = (rules, object, row) => {
     if(rules.includes("Range:")) {
         object[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
         let index = rules.split(' // ').indexOf('Range: '+ object[row + "range"]);
         rules = rules.split(' // ');
         rules.splice(index, 1);
-        return rules.join(' // ').trim()
+        return rules.map(s => s.trim()).join(' // ').trim()
     }
 
     return rules;
@@ -1478,7 +1620,7 @@ const importDamage = (rules, object, row) => {
            damage = "[[" + damage + "]]";
         }
         object[row + "damage"] = damage;
-        return rules.split('//').slice(1).join('//').trim()
+        return rules.split('//').slice(1).map(s => s.trim()).join(' // ').trim()
     }
 
     return rules;
@@ -1489,6 +1631,11 @@ const importAction = (rules, object, row) => {
     if(rules.includes("Reaction")) {
         object[row + "action"] = "Reaction";
         return rules.replaceAll("Reaction //", '').replaceAll("Reaction", '').trim();
+   }
+
+       if(rules.includes("Free Action")) {
+        object[row + "action"] = "Free Action";
+        return rules.replaceAll("Free Action //", '').replaceAll("Free Action", '').trim();
    }
 
    if(rules.includes("Turn Action")) {
@@ -1516,7 +1663,7 @@ const importHeat = (rules, object, row) => {
         let index = rules.split(' // ').indexOf('Hot ('+ object[row + "heat"]+')');
         rules = rules.split(' // ');
         rules.splice(index, 1);
-        rules = rules.join(' // ').trim()
+        rules = rules.map(s => s.trim()).join(' // ').trim()
     }
     else {
         object[row + "heat"] = 0;
@@ -1527,7 +1674,7 @@ const importHeat = (rules, object, row) => {
         let index = rules.split(' // ').indexOf('Heat Spike');
         rules = rules.split(' // ');
         rules.splice(index, 1);
-        rules = rules.join(' // ').trim()
+        rules = rules.map(s => s.trim()).join(' // ').trim()
     }
 
     return rules;
@@ -1537,8 +1684,12 @@ const importMechWeaponTraits = (rules, object, row) => {
     object[row + "traits"] = rules.trim();
 }
 
+const importEquipmentTraits = (rules, object, row) => {
+    object[row + "traits"] = rules.trim();
+}
+
 const importDetails = (toImport, object, row) => {
-    object[row + "details"] = toImport.split('\n').slice(1).join(' ').trim();
+    object[row + "details"] = toImport.split('\n').slice(1).map(s => s.trim()).join(' ').trim();
 }
 
 const importTraits = (traits, object) => {
@@ -1821,7 +1972,7 @@ const asw = (() => {
         {{#rollTotal() toMuchHeat 0}}
             {{#pushable}}
             <div class="sheet-rolltemplate-button">
-                [Push](~{{name}}|reactPushWeapon)
+                [Push](~{{name}}|reactPush)
             </div>
             {{/pushable}}
 
