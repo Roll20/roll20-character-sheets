@@ -142,9 +142,13 @@ Skill Enhancers, when purchased (checked), reduce the cost of relevant knowledge
 
 ![Page 4](/HeroSystem6eHeroic/images/screenshot-04-scaled.png)
 
-The Power page can accommodate ten powers. The left and right sides have different color schemes for organizational purposes, but are otherwise the same. Each power's points and endurance costs are calculated from the base cost provided and advantages and limitations entered. A power framework is treated as its own entry as shown in the figure below. The second power "Ice Bolts" belongs to the Multipower as a Variable Slot. The "AF" in "Reduced AF" refers to *autofire,* which is an advantage chosen for this particular power that increases the cost of Reduced Endurance.
+The Power page can accommodate seventeen powers. The left and right sides have different color schemes for organizational purposes, but are otherwise the same. A health status bar occupies the upper right corner of the sheet.
+
+Each power's points and endurance costs are calculated from the base cost provided and advantages and limitations entered. A power framework is treated as its own entry as shown in the figure below. The second power "Ice Bolts" belongs to the Multipower as a Variable Slot. The "AF" in "Reduced AF" refers to *autofire,* which is an advantage chosen for this particular power that increases the cost of Reduced Endurance.
 
 ![Multipower](/HeroSystem6eHeroic/images/Multipower.png)
+
+Each column displays one power in its fully expanded form, which is activated by the triangle widget on the second line. The up and down arrow widgets will move the power accordingly, swapping positions with the adjacent power.
 
 The "Roll" button produces general output that may or may not apply to the power being used. When pressed, Roll20 will make a 3d6 success roll to compare against the given activation roll target, roll an unmodified attack roll of 3d6, roll the dice provided as an effect (which may need to be translated as normal damage), displays the endurance cost, and shows the text box contents as a description. 
 
@@ -210,4 +214,4 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
-*Villain In Glasses, August 1, 2021. Last updated on September 26, 2021 to reflect changes to weapon attacks being damage-type selectable as well as the option to automatically apply END costs.*
+*Villain In Glasses, August 1, 2021. Last updated on April 30, 2023 to reflect the adition of more powers and the addition of a health status bar. *
