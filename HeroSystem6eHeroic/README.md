@@ -182,6 +182,8 @@ The last page of this sheet contains a number of options:
 
 (5) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
+(6) Takes No STUN. Select this option to set STUN to zero if the character has the automaton power *Takes No STUN.*
+
 # <a id="tokens">Tokens Settings</a>
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
