@@ -1,8 +1,12 @@
 Change Log
 ==============================================
 **2023-03-27 ** v.79 Chuz (James Culp)
-	Bugfix - Fix to Grunts dicepool bug.
+	New Feature - Added Resonance and Level to the sprite skill rolls attribute options
+	New Feature - Added Magic and Force to the spirit skill rolls attribute options
+	New Feature - Added Magic AR to combat spell roll templates
+	New Feature - PC Added DR to Defense rolls template
 	New Feature - NPC Added Universal Dicepool Adjustment (@{uda}) for GMs that with to add a dicepool penalty/bonus to all rolls the NPC makes.
+	Bugfix - Fix to Grunts dicepool bug.
 **2023-03-20 ** v.77 Chuz (James Culp)
 	Bugfix - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
 	Bugfix - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
