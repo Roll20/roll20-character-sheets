@@ -1,6 +1,8 @@
 Change Log
 ==============================================
-**2023-03-27 ** v.79 Chuz (James Culp)
+**2023-05-08 ** v.80 Chuz (James Culp)
+	Bugfix - PC/NPC Defense rolls throwing an error for the armor_rating, updated PC sheets to use defense_rating so they match NPC sheets.
+**2023-05-01 ** v.79 Chuz (James Culp)
 	New Feature - Added Resonance and Level to the sprite skill rolls attribute options
 	New Feature - Added Magic and Force to the spirit skill rolls attribute options
 	New Feature - Added Magic AR to combat spell roll templates
