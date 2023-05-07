@@ -24888,7 +24888,9 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 				passthrough["effWert"] = effWert;
 				passthrough["mod"] = mod;
 				passthrough["ansage"] = ansage;
-				passthrough["roll"] = macroVars["roll"];
+				passthrough["roll0"] = macroVars["roll0"];
+				passthrough["roll1"] = macroVars["roll1"];
+				passthrough["roll2"] = macroVars["roll2"];
 				passthrough["result"] = result;
 				passthrough["cs"] = cs;
 				passthrough["cf"] = cf;
@@ -24901,7 +24903,9 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 					"{{ansage=[[" + ansage + "]]}} " +
 					"{{wert=[[" + wert + "]]}} " +
 					"{{taw=[[" + taw + "]]}} " +
-					"{{roll=[[" + macroVars["roll"] + "]]}} " +
+					macroVars["roll0"] +
+					macroVars["roll1"] +
+					macroVars["roll2"] +
 					"{{msg=[[0]]}} " +
 					"{{characterid=" + v["character_id"] + "}} " +
 					"{{charactername=" + v["character_name"] + "}} " +
@@ -24912,7 +24916,7 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 					"{{rollExpired=[[0]]}} " +
 					"{{rollTimeHuman=[[0]]}} " +
 					"{{passthrough=[[0]]}}";
-				console.log(passthrough);
+				console.log("passthrough:", passthrough);
 			}
 
 			finishRoll(
@@ -24938,7 +24942,7 @@ on('clicked:combat_reaction', async (info) => {
 	*/
 	var rollTime = 0;
 	results = await startRoll(received["rollMacro"]);
-	console.log("test: info:", info, "results:", results, "received:", received);
+	console.log("combat_reaction: info:", info, "results:", results, "received:", received);
 
 	// Time for triggering reaction before warning appears, in milliseconds
 	var reactionTimeLimit = 15 * 60 * 1000;
@@ -24954,7 +24958,12 @@ on('clicked:combat_reaction', async (info) => {
 		rollTime = 1;
 	}
 
-	var roll = results.results.roll.result;
+	var rolls = [
+		results.results.roll0.result,
+		results.results.roll1.result,
+		results.results.roll2.result,
+	];
+	var roll = rolls[0];
 	var originalResult = received["result"];
 	var wert = received["wert"];
 	var taw = received["taw"];
