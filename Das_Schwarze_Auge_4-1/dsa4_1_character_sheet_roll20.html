@@ -24602,174 +24602,93 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 	Example: "0d1[hello]"
 	It is a string and from this point it is quite straightforward to continue.
 	*/
-	var ausfalltobeprepared = {
-		'reuse': {
-			'finte': [
-				{
-					'type': 'drop-down',
-					'q': 'Kombinieren mit Finte (max. +4)?',
-					'a': [
-						[ 'Ja: zusätzlich +1', '1' ],
-						[ 'Ja: zusätzlich +2', '2' ],
-						[ 'Ja: zusätzlich +3', '3' ],
-						[ 'Ja: zusätzlich +4', '4' ],
-						[ 'Nein', '0' ]
-					]
-				}
+	var reuse = {
+		"finte4": {
+			"q": "Finte (max. +4)?",
+			"a": [
+				{ "desc": [ "Ja, +1." ], "val": [ "1d1[fi]" ] },
+				{ "desc": [ "Ja, +2." ], "val": [ "2d1[fi]" ] },
+				{ "desc": [ "Ja, +3." ], "val": [ "3d1[fi]" ] },
+				{ "desc": [ "Ja, +4." ], "val": [ "4d1[fi]" ] },
+				{ "desc": [ "Keine Finte." ], "val": [ "0d1[fi]" ] }
 			]
 		},
-		'einleitung': {
-			'type': 'drop-down',
-			'q': 'Ist der Gegner noch zurückdrängbar und ist die Situation nicht beengt?',
-			'a': [
-				[ 'Ja', 1 ],
-				[ 'Nein', 0 ]
-			]
-		},
-		'ini': {
-			'type': 'drop-down',
-			'q': 'Ist die eigene Initiative höher als die des Gegners?',
-			'a': [
-				[ 'Ja', 1 ],
-				[ 'Nein', 0 ]
-			]
-		},
-		'art': {
-			'type': 'drop-down',
-			'q': 'Soll diese Attacke der Verkürzung der Distanzklasse gelten?',
-			'a': [
-				[ 'Ja',
-					{
-						'type': 'drop-down',
-						'q': 'Um wie viele Distanzklassen soll verkürzt werden?',
-						'a': [
-							[ 'eine Distanzklasse (zusätzlich ±0)', '0d1[DK1/WS0/F0]' ],
-							[ 'zwei Distanzklassen (zusätzlich +4)', '0d1[DK2/WS0/F0]' ]
-						],
-					}
-				],
-				[ 'Nein',
-					{
-						'type': 'drop-down',
-						'q': 'Kombinieren mit Wuchtschlag (max. +4)?',
-						'prefix': '0d1[DK0/W',
-						'a': [
-							[ 'Ja: zusätzlich +1', [ '1/F', 'reuse:finte', ']' ] ],
-							[ 'Ja: zusätzlich +2', [ '2/F', 'reuse:finte', ']' ] ],
-							[ 'Ja: zusätzlich +3', [ '3/F', 'reuse:finte', ']' ] ],
-							[ 'Ja: zusätzlich +4', [ '4/F', 'reuse:finte', ']' ] ],
-							[ 'Nein', [ '0/F', 'reuse:finte', ']' ] ]
-						]
-					}
-				]
-			]
-		},
-		'dk-ende': {
-			'type': 'drop-down',
-			'q': 'In welcher Distanzklasse soll ein erfolgreicher Ausfall enden?',
-			'a': [
-				[ 'Handgemenge (H)', '0d1[H]' ],
-				[ 'Nahkampf (N)', '0d1[N]' ],
-				[ 'Stangenwaffe (S)', '0d1[S]' ],
-				[ 'Pike (P)', '0d1[P]' ]
+		"wuchtschlag4": {
+			"q": "Wuchtschlag (max. +4)?",
+			"a": [
+				{ "desc": [ "Ja, +1." ], "val": [ "1d1[ws]" ] },
+				{ "desc": [ "Ja, +2." ], "val": [ "2d1[ws]" ] },
+				{ "desc": [ "Ja, +3." ], "val": [ "3d1[ws]" ] },
+				{ "desc": [ "Ja, +4." ], "val": [ "4d1[ws]" ] },
+				{ "desc": [ "Kein Wuchtschlag." ], "val": [ "0d1[ws]" ] }
 			]
 		}
 	};
-	var ausfall = [];
-	switch(trigger) {
-		case 'k_ausfall':
-		case 'k_attacke_schild':
-			// Gegner zurückdrängbar-Prüfung
-			ausfall.push('{{ausfall-einleitung=[[?{' +
-				'Ist der Gegner noch zurückdrängbar und ist die Situation nicht beengt?'+
-				'|Ja,1' +
-				'|Nein,0' +
-			'}]]}}');
-			// BE-Prüfung: via CRP im Roll (Attribut wird ja geholt)
-			// Prüfung auf "INI höher als Gegner"
-			ausfall.push('{{ausfall-ini=[[?{' +
-				'Ist die eigene Initiative höher als die des Gegners?'+
-				'|Ja,1' +
-				'|Nein,0' +
-			'}]]}}');
-			// DK-Verkürzung?
-			ausfall.push('{{ausfall-dk-verkuerzen=[[?{' +
-				'Soll mit dieser Attacke die Distanzklasse verkürzt werden?'+
-				'|Ja,' +
-					nestRollMacro(
-						'?{Um wie viele Distanzklassen soll verkürzt werden?' +
-						'|eine Distanzklasse (±0),0d1[DK1/WS0/F0]' +
-						'|zwei Distanzklassen (+4),0d1[DK2/WS0/F0]' +
-						'}' ,
-						1) +
-				'|Nein,0d1[DK0/' +
-			// Wuchtschlag und Finte?
-					nestRollMacro(
-						'?{Kombinieren mit Wuchtschlag (max. +4)?' +
-						'|Ja: +1,WS1/' +
-						nestRollMacro(
-							'?{Kombinieren mit Finte (max. +4)?' +
-							'|Ja: +1,F1]' +
-							'|Ja: +2,F2]' +
-							'|Ja: +3,F3]' +
-							'|Ja: +4,F4]' +
-							'|Nein,F0]' +
-							'}' ,
-							1) +
-						'|Ja: +2,WS2/]' +
-						nestRollMacro(
-							'?{Kombinieren mit Finte (max. +4)?' +
-							'|Ja: +1,F1]' +
-							'|Ja: +2,F2]' +
-							'|Ja: +3,F3]' +
-							'|Ja: +4,F4]' +
-							'|Nein,F0]' +
-							'}' ,
-							1) +
-						'|Ja: +3,WS3/]' +
-						nestRollMacro(
-							'?{Kombinieren mit Finte (max. +4)?' +
-							'|Ja: +1,F1]' +
-							'|Ja: +2,F2]' +
-							'|Ja: +3,F3]' +
-							'|Ja: +4,F4]' +
-							'|Nein,F0]' +
-							'}' ,
-							1) +
-						'|Ja: +4,WS4/]' +
-						nestRollMacro(
-							'?{Kombinieren mit Finte (max. +4)?' +
-							'|Ja: +1,F1]' +
-							'|Ja: +2,F2]' +
-							'|Ja: +3,F3]' +
-							'|Ja: +4,F4]' +
-							'|Nein,F0]' +
-							'}' ,
-							1) +
-						'|Nein,WS0/' +
-						nestRollMacro(
-							'?{Kombinieren mit Finte (max. +4)?' +
-							'|Ja: +1,F1]' +
-							'|Ja: +2,F2]' +
-							'|Ja: +3,F3]' +
-							'|Ja: +4,F4]' +
-							'|Nein,F0]' +
-							'}' ,
-							1) +
-						'}' ,
-						1) +
-			'}]]}}');
-			// bei erfolgreichem Abschluss gewünschte DK
-			ausfall.push('{{ausfall-dk-ende=[[?{' +
-				'In welcher Distanzklasse soll ein erfolgreicher Ausfall enden?'+
-				'|Handgemenge (H),0d1[H]' +
-				'|Nahkampf (N),0d1[N]' +
-				'|Stangenwaffe (S),0d1[S]' +
-				'|Pike (P),0d1[P]' +
-			'}]]}}');
-			break;
-		default:
-	}
+	var reuse_ausfall = {
+		"einleitung": {
+			"q": "Ist der Gegner noch zurückdrängbar und ist die Situation nicht beengt?",
+			"a": [
+				{ "desc": [ "Ja." ], "val": [ "1d1[ein]" ] },
+				{ "desc": [ "Nein." ], "val": [ "0d1[ein]" ] }
+			]
+		},
+		"ini": {
+			"q": "Ist die Initiative höher als die des Ziels?",
+			"a": [
+				{ "desc": [ "Ja, sie ist höher." ], "val": [ "1d1[ini]" ] },
+				{ "desc": [ "Nein, sie ist kleiner oder gleich." ], "val": [ "0d1[ini]" ] }
+			]
+		},
+		"einleitung-dk": {
+			"q": "Soll mit dieser Attacke die Distanzklasse verkürzt werden?",
+			"a": [
+				{ "desc": [ "Ja." ], "val": [ { "reuse": "einleitung-dk-auswahl" } ] },
+				{ "desc": [ "Nein." ], "val": [ "0d1[dkintro]" ] }
+			]
+		},
+		"einleitung-dk-auswahl": {
+			"q": "Um wie viele Distanzklassen soll verkürzt werden?",
+			"a": [
+				{ "desc": [ "eine Distanzklasse (±0)" ], "val": [ "1d1[dkintro]" ] },
+				{ "desc": [ "zwei Distanzklassen (+4)" ], "val": [ "2d1[dkintro]" ] },
+				{ "desc": [ "Doch lieber nicht." ], "val": [ "0d1[dkintro]" ] }
+			]
+		},
+		"ende?": {
+			"q": "Ausfall beenden?",
+			"a": [
+				{ "desc": [ "Ja." ], "val": [ { "reuse": "endmanöver" } ] },
+				{ "desc": [ "Nein." ], "val": [ "0d1[end]" ] }
+			]
+		},
+		"endmanöver": {
+			"q": "Beenden mit gewöhnlicher Attacke oder einem Manöver?",
+			"a": [
+				{ "desc": [ "Gewöhnliche Attacke" ], "val": [ "0d1[em]", { "reuse": "ende-dk" } ] },
+				{ "desc": [ "Niederwerfen" ], "val": [ "0d1[em]", { "reuse": "ende-dk" } ] },
+				{ "desc": [ "Hammerschlag" ], "val": [ "0d1[em]", { "reuse": "ende-dk" } ] },
+				{ "desc": [ "Gezielter Stich" ], "val": [ "0d1[em]", { "reuse": "ende-dk" } ] },
+				{ "desc": [ "Todesstoß" ], "val": [ "0d1[em]", { "reuse": "ende-dk" } ] }
+			]
+		},
+		"ende-dk": {
+			"q": "In welcher Distanzklasse soll ein erfolgreicher Ausfall enden?",
+			"a": [
+				{ "desc": [ "Handgemenge (H)" ], "val": [ "1d1[dkende]" ] },
+				{ "desc": [ "Nahkampf (N)" ], "val": [ "2d1[dkende]" ] },
+				{ "desc": [ "Stangenwaffe (S)" ], "val": [ "3d1[dkende]" ] },
+				{ "desc": [ "Pike (P)" ], "val": [ "4d1[dkende]" ] }
+			]
+		}
+	};
+	var macros_ausfall = [
+		{ "name": "einleitung", "reuse": "einleitung" },
+		{ "name": "iniUnterschied", "reuse": "ini" },
+		{ "name": "dkintro", "reuse": "einleitung-dk" },
+		{ "name": "wuchtschlag", "reuse": "wuchtschlag4" },
+		{ "name": "finte", "reuse": "finte4" }
+	];
+
 	var macroVars = {
 		'prelude': '@{gm_roll_opt}',
 		'template': '&{template:test}',
@@ -24814,9 +24733,10 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 		macroVars['rollTime'],
 		macroVars['isConfirmationRoll'],
 		macroVars['confirmationRoll'],
-		macroVars['passthrough'],
-		... ausfall
-	].join(' ');
+		macroVars['passthrough']
+	].join(' ') + ' ' +
+	buildMacros(macros_ausfall, {... reuse, ... reuse_ausfall });
+
 	debugLog(func, "rollMacro", rollMacro);
 
 	// Prepare required attributes
