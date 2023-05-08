@@ -1,3 +1,3 @@
 # WWN
 Worlds Without number Roll20 Character Sheet
-Version .2  
+Version .3
