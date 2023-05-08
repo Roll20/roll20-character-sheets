@@ -768,8 +768,8 @@
 			<div class="row-long cc-arm">
 				<div class="armor-info">
 					<div>&nbsp;</div>
-					<button type="action" name="act_dr" value="@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{defense} ^{rating}}}{{rating=@{armor_rating}}}">
-						<span class="center"><span data-i18n="dr">DR</span> <span name="attr_armor_rating"></span></span>
+					<button type="action" name="act_dr" value="@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{defense} ^{rating}}}{{rating=@{defense_rating}}}">
+						<span class="center"><span data-i18n="dr">DR</span> <span name="attr_defense_rating"></span></span>
 					</button>
 					<div>&nbsp;</div>
 					<button type="action" name="act_defense" value="@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{defense} = ^{reaction} + ^{intuition}}}{{dice=[[((@{defense})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{wilddie=[[@{wild_die}]]}}{{wilddie_dice=[[0]]}}">
@@ -3474,6 +3474,10 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
+								<span class="changelog-entry">**2023-05-08 ** v.80 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - PC/NPC Defense rolls throwing an error for the armor_rating, updated PC sheets to use defense_rating so they match NPC sheets.
+								</ul>
 								<span class="changelog-entry">**2023-05-01 ** v.79 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">F</span><b>New Feature</b> - Added Resonance and Level to the sprite skill rolls attribute options
@@ -5929,7 +5933,7 @@
 			{{#arm}}<span>{{arm}}</span>{{/arm}}
 			{{#reason}}<span>{{reason}}</span><br>{{/reason}}
 			{{#base}}<span>{{base}}</span><br>{{/base}}
-			{{#armorrating}}<span>DR: {{armorrating}}</span><br>{{/armorrating}}
+			{{#defense_rating}}<span>DR: {{defense_rating}}</span><br>{{/defense_rating}}
 			{{#magicar}}<span>Magic AR: {{magicar}}</span><br>{{/magicar}}
 			{{#effecttype}}<span>{{effecttype}}</span><br>{{/effecttype}}
 			{{#computed::dicepool}}<span class="dicepool">Dicepool: {{computed::dicepool}}</span><br>{{/computed::dicepool}}
@@ -6375,6 +6379,9 @@ on("sheet:opened", function() {
 				case (v.data_version < 0.77):
 					_v77_update();
 					console.log("Data now fits v.77");
+				case (v.data_version < 0.80):
+					_v80_update();
+					console.log("Data now fits v.80");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -6395,6 +6402,18 @@ var show_changelog = () => {
 	});
 };
 
+
+var _v80_update = () => {
+	getAttrs(["sheet_type", "defense_rating", "armor_rating"], (v) => {
+		if(v.sheet_type == 'pc') {
+			if(v.armor_rating && (! v.defense_rating || v.defense_rating == 0)) {
+				setAttrs({
+					defense_rating: v.armor_rating
+				});
+			}
+		}
+	});
+};
 
 var _v77_update = () => {
 	getAttrs(["sheet_type"], (v) => {
@@ -7046,8 +7065,8 @@ const rollButtons = {
 	specialization: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} + @{display_attribute} + ^{specialization}}}{{dice=[[(@{dicepool}+@{attribute}+2+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle}+@{uda})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Spec: @{specialization}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	expertise: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} + @{display_attribute} + ^{expertise}}}{{dice=[[(@{dicepool}+@{attribute}+3+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle}+@{uda})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Expert: @{expertise}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 
-	dr: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{defenserating}}}{{rating=@{armor_rating}}}",
-	defense: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{defense} = ^{reaction} + ^{intuition}}}{{dice=[[((@{defense})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle}+@{uda})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{armorrating=@{armor_rating}}}",
+	dr: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{defenserating}}}{{rating=@{defense_rating}}}",
+	defense: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{defense} = ^{reaction} + ^{intuition}}}{{dice=[[((@{defense})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle}+@{uda})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{defense_rating=@{defense_rating}}}",
 	toxin_resist: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{toxin_resistance} = ^{body} + ^{willpower}}}{{dice=[[((@{body}+@{willpower}+?{Toxin Resistance Gear?|0})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle}+@{uda})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	soak: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{soak} ^{damage}}}{{dice=[[((@{soak})+@{modifiers_toggle}+@{edge_toggle}+@{uda})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}",
 	magic_ar: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{magic} ^{attack} ^{rating}}}{{rating=@{magic_ar}}}{{desc=^{magic} + @{tradition_attribute}}}",
@@ -8709,7 +8728,7 @@ on("change:repeating_armor change:body change:charisma remove:repeating_armor", 
 			let update = {};
 
 			for(var i=0; i < ids.length; i++) {
-				IDs.push(`${arm}_` + ids[i] + "_");
+				IDs.push(`${arm}_` + ids[i] + "_primary");
 			};
 
 			IDs.forEach(id => {
@@ -8759,7 +8778,6 @@ on("change:repeating_armor change:body change:charisma remove:repeating_armor", 
 		});
 	}
 
-
 	// Update DR and resists on Core Combat Info -> Armor section
 	getSectionIDs("armor", function(ids) {
 		// Update rating and resist totals
@@ -8777,6 +8795,7 @@ on("change:repeating_armor change:body change:charisma remove:repeating_armor", 
 
 		ids.forEach(id => {
 			var armorFields = [`${arm}_${id}_rating`, `${arm}_${id}_chem`, `${arm}_${id}_cold`, `${arm}_${id}_elec`, `${arm}_${id}_fire`, `${arm}_${id}_social`, `${arm}_${id}_primary`, `${arm}_${id}_cumulative`];
+
 			getAttrs(armorFields, (af) => {
 				if(af[`${arm}_${id}_primary`] != 0 || af[`${arm}_${id}_cumulative`] != 0) {
 					ratingTot += parseInt(af[`${arm}_${id}_rating`]);
@@ -8789,7 +8808,7 @@ on("change:repeating_armor change:body change:charisma remove:repeating_armor", 
 				fireTot += parseInt(af[`${arm}_${id}_fire`]);
 
 				setAttrs({
-					'armor_rating': ratingTot,
+					'defense_rating': ratingTot,
 					'resist_cold_total': coldTot,
 					'resist_chem_total': chemTot,
 					'resist_elec_total': elecTot,
