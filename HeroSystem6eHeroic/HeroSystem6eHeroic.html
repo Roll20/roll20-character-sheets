@@ -6913,7 +6913,8 @@
 				+ "{{subtitle= @{powerName"+powerId+"} - @{powerEffect"+powerId+"}}} {{desc=@{powerText"+powerId+"}}} "
 				+ "{{Activate On = [[?{Modifiers|0}+@{powerSkillRoll"+powerId+"}]] **or less**}} "
 				+ "{{Success Roll=[[3d6cf<0cs>0]]}} {{Attack Roll=[[3d6cf<0cs>0]]}} "
-				+ "{{Effect Roll=[[@{hiddenPowerDice"+powerId+"}sd]]}} {{END=[[@{powerEND"+powerId+"}]]}}";
+				+ "{{Effect Roll=[[@{hiddenPowerDice"+powerId+"}sd]]}} "
+				+ "{{END=[[@{powerEND"+powerId+"}]]}}";
 
 			startRoll(theRoll, (results) => {
 				// Roll activation and effect dice. If the option to auto apply endurance is TRUE, subtract the power's END once from endurance.
@@ -8244,8 +8245,8 @@
 			
 			let theRoll = "&{template:custom-"+ (isNormalDamage ? "normal-" : "") +"attack} {{title=@{character_name} - @{character_title}}} "
 					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}}} "
-					+ "{{Hit DCV=[[11-3d6[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]+@{targetOCVpenalty}[TargetOCV]+[[?{Block|Yes,1|No,0}*@{shieldDCV}]][Shield DCV]+?{Modifiers|0}[Modifier]]]}} "
-					+ (subtractENDAmt ? "{{END=[[@{shieldEndurance}]] (@{endurance})}} " : "")
+					+ "{{Hit DCV=[[11-3d6[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]+@{targetOCVpenalty}[TargetOCV]+[[?{Blocking|Yes,1|No,-1}*@{shieldDCV}]][Shield DCV]+?{Modifiers|0}[Modifier]]]}} "
+					+ (subtractENDAmt ? "{{END=[[[[abs(?{Blocking}-1)/2]][Blocking]*@{shieldEndurance}[Endurance Cost]]] (@{endurance})}} " : "")
 					+ "{{"+ dmgType +"=[[@{hiddenShieldDamage01}]]}} "
 					+ "{{" + otherDmgType + "=[[0[See " + dmgType + "]]]}}";
 			if (useHitLocations)
@@ -8255,6 +8256,12 @@
 				let theMessage = "";
 				let theSTUNMultipler = Math.floor(Math.random()*3+1);
 				let theHitLocation = new Object();
+
+				// Little hacky get whether or not the person is blocking.
+				let regex = /\+(-?\d+)\[Shield DCV\]/g
+				let isBlocking = parseInt(regex.exec(results.results["Hit DCV"].expression)) >= 0;
+
+				console.log(results);
 
 				// Convert dice roll to equivalent BODY damage.
 				let computed = convertStunToBody(results.results.STUN.rolls);
@@ -8279,11 +8286,18 @@
 				}
 				
 				let theResult = new Object();
-				theResult["HITLOC"] = theMessage;
-				theResult[otherDmgType] = computed;
+
+				if (isBlocking) {
+					theResult["HITLOC"] = "BLOCK";
+					theResult["STUN"] = "BLOCK";
+					theResult["BODY"] = "BLOCK";
+				} else {
+					theResult["HITLOC"] = theMessage;
+					theResult[otherDmgType] = computed;
+				}
 
 				// Subtract END cost if option checked.
-				if (values.optionAutoSubtractEND != 0) {
+				if (!isBlocking && values.optionAutoSubtractEND != 0) {
 					subtractEndurance(subtractENDAmt);
 				}
 
