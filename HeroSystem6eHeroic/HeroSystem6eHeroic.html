@@ -5489,6 +5489,16 @@
 				</label>
 				<h1>Takes No STUN</h1>
 			</div>
+
+			<div class="item-version-row">
+				<div class="item-version-label">
+					<h2>Version:</h2>
+				</div>
+				
+				<div class="item-version-information">
+					<input type="text" value="2.0" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				</div>
+			</div>
 		</div>	
 	</div>
 </div>
@@ -5703,12 +5713,84 @@
 
 	// Get the URL to the pseudo attribute attr_character_avatar for use in the Portrait Section.
 	on("sheet:opened", function() {  
-		getAttrs(["character_avatar"], function(values) {
-			setAttrs({
-				theSheetAvatar:values.character_avatar
-			});
+		getAttrs(["version","character_name","validateMay23","character_avatar"], function(values) {
+			var name = values.character_name;
+			var attributes = {theSheetAvatar: values.character_avatar};
+
+			/* ----------------------- */
+			/* Version Handling        */
+			/* ----------------------- */
+
+			// For future use in case updates only need to be performed on certain versions
+			var origVersion = parseFloat(values.version);
+			var version = origVersion;
+
+			// This is a check for sheets before versioning.
+			if (version < 2 || values.validateMay23 == undefined) {
+				if (updateVersion1()) {
+					origVersion = 1.0;
+					version = 2.0;
+					console.log(`Updated ${name} to Version 2.0`);
+				} else {
+					console.log(`Validated ${name} is Version ${version}`);
+				}
+				attributes.validateMay23 = 1;
+			}
+
+			setAttrs(attributes);
 		});
 	});
+
+	function updateVersion1() {
+		getAttrs(["CurrentBODY", "CurrentSTUN", "CurrentEND", "body_max", "stun_max", "endurance_max", "bodyCP", "stunCP", "enduranceCP", "useCharacteristicMaximums" ], function(values) {
+
+			const useMaximums = values.useCharacteristicMaximums;
+
+			const bodyBase = 10;
+			const bodyStatMax = 20;
+			const bodyCost = 1;
+			const stunBase = 20;
+			const stunStatMax = 50;
+			const stunCost = 0.5;
+			const enduranceBase = 30;
+			const enduranceStatMax = 50;
+			const enduranceCost = 0.2;
+
+			const bodyCP = parseInt(values.bodyCP)||0;
+			const stunCP = parseInt(values.stunCP)||0;
+			const enduranceCP = parseInt(values.enduranceCP)||0;
+
+			// We are giving them the stats to match their points
+			var bodyMax = bodyBase + (bodyCP / bodyCost);
+			var stunMax = stunBase + (stunCP / stunCost);
+			var enduranceMax = enduranceBase + (enduranceCP / enduranceCost);
+
+			if (useMaximums) {
+				bodyMax -= Math.max(0,(bodyMax - bodyStatMax) / 2);
+				stunMax -= Math.max(0,(stunMax - stunStatMax) / 2);
+				enduranceMax -= Math.max(0,(enduranceMax - enduranceStatMax) / 2);
+			}
+
+			// Check if this update is even necessary, if these math check out we don't need to update
+			if (bodyMax == parseInt(values.body_max)||bodyBase &&
+					stunMax == parseInt(values.stunMax)||stunBase &&
+					endurance_max == parseInt(values.endurance_max)||enduranceBase) {
+				return 0;
+			}
+
+			// They should have these stats
+			setAttrs({
+				body: parseInt(values.CurrentBODY)||bodyMax,
+				body_max: bodyMax,
+				stun: parseInt(values.CurrentSTUN)||stunMax,
+				stun_max: stunMax,
+				endurance: parseInt(values.CurrentEND)||enduranceMax,
+				endurance_max: enduranceMax
+			});
+
+			return 1;
+		})
+	}
 
 
 	// Tab buttons
