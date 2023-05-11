@@ -105,13 +105,38 @@
               class="sheet-hidden-roll"><span data-i18n="soul-mv-u">See Through the Illusion</span></button>  
           </div>
           <div class="sheet-actatt" style="position: absolute; top: 598px; left: 190px;"><input type="number" name="attr_soul" min="-5" max="5"></div>
+		  
+		  
+          <div class="sheet-attlabel" style="position: absolute; top: 10px; left: -30px;">
+					<select name="attr_helphinder">
+					  <option value="Select">--attribute--</option>
+					  <option value="Fortitude" data-i18n="fortitude-u">Fortitude</option>
+					  <option value="Willpower" data-i18n="willpower-u">Willpower</option>
+					  <option value="Reflexes" data-i18n="reflexes-u">Reflexes</option>
+					  <option value="Reason" data-i18n="reason-u">Reason</option>
+					  <option value="Intuition" data-i18n="intuition-u">Intuition</option>
+					  <option value="Perception" data-i18n="perception-u">Perception</option>
+					  <option value="Coolness" data-i18n="coolness-u">Coolness</option>
+					  <option value="Violence" data-i18n="violence-u">Violence</option>
+					  <option value="Charisma" data-i18n="charisma-u">Charisma</option>
+					  <option value="Soul" data-i18n="soul-u">Soul</option>
+					</select>
+					<input type="hidden" name="attr_helphindermod" value="0"></input>
+					<button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{helphinder-mv-u} @{helphinder} }}{{valor=[[2d10+@{helphindermod}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{moves-helphinder-success}}} {{partial=@{moves-helphinder-partial}}} {{failure=@{moves-helphinder-failure}}}"
+					  class="sheet-ui-draggable btn ui-draggable" data-i18n="helphinder-mv-u">Help or Hinder</button>
+          </div>
 
 		</div>
   
-		  <div class="relations">
-			  <div class="sheet-label">&#x2B2A; <span data-i18n="relations-u">Relations</span></div>
-			  <textarea name="attr_relations" style="height: 140px;width:400px;"></textarea>
-		  </div>
+		<div class="relations">
+			<div class="sheet-label">&#x2B2A; <span data-i18n="relations-u">Relations</span></div>
+			<textarea name="attr_relations" style="height: 140px;width:400px;display:none;"></textarea>
+			  
+			<fieldset class="repeating_relations">
+				<input type="text" name="attr_relation_name"><span></span><input type="number" name="attr_relation_value" value="0" max="2" min="0">
+				<textarea name="attr_relation_description"></textarea>
+			</fieldset>        
+		</div>
   </div>
   
 <!-- move possible outcomes -->
@@ -245,6 +270,19 @@
 	<div class="sheet-action">
 		<span class="sheet-action">Result 9- : </span>
 		<textarea name="attr_moves-soul-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">The GM explains what you see and makes a Move.</textarea>
+	</div>
+	<!-- Help/Hinder -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-helphinder-success" class="sheet-actiondesc" placeholder="Success" title="Success">You may modify the subsequent roll by +2/−2.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-helphinder-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">You may modify the subsequent roll by +1/−1.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-helphinder-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">Your interference has unintended consequences. The GM makes a Move.</textarea>
 	</div>
 </div>
   
@@ -654,9 +692,9 @@ on("sheet:opened", function(eventInfo){
 	getAttrs(["version"], function(values) {
 		var version = parseInt(values.version)||0;
 		if (version == 0){
-			getAttrs(["charname","stability","disadvantages","advantages","weapons"], function(subvalues) {
+			getAttrs(["charname","stability","disadvantages","advantages","weapons","relations"], function(subvalues) {
 				var newrowattrs = {};
-				newrowattrs["version"] = 2;
+				newrowattrs["version"] = 3;
 				
 				if (subvalues.charname != undefined){
 					newrowattrs["character_name"] = subvalues.charname;
@@ -707,6 +745,26 @@ on("sheet:opened", function(eventInfo){
 					newrowattrs["repeating_weapons_" + newrowid + "_weapon_description"] = subvalues.weapons;
 				}
 				
+				if (subvalues.relations != undefined){
+					var newrowid = generateRowID();
+					newrowattrs["repeating_relations_" + newrowid + "_relation_description"] = subvalues.relations;
+				}
+				
+				setAttrs(newrowattrs);
+			});
+		}
+		else if (version == 2)
+		{
+			// Just do the relations update
+			getAttrs(["relations"], function(subvalues) {
+				var newrowattrs = {};
+				newrowattrs["version"] = 3;
+				
+				if (subvalues.relations != undefined){
+					var newrowid = generateRowID();
+					newrowattrs["repeating_relations_" + newrowid + "_relation_description"] = subvalues.relations;
+				}
+				
 				setAttrs(newrowattrs);
 			});
 		}
@@ -751,6 +809,48 @@ on('change:repeating_advantages:advantage_attribute', function() {
     }
     setAttrs({                            
       repeating_advantages_attributemod: modifier
+    });
+  });
+});
+
+// Set help/hinder modifier when an attribute is selected or when an attribute modifier is changed.
+on('change:helphinder change:fortitude change:willpower change:reflexes change:reason change:intuition change:perception change:coolness change:violence change:charisma change:soul', function() {  
+  getAttrs(["helphinder","Fortitude","Willpower","Reflexes","Reason","Intuition","Perception","Coolness","Violence","Charisma","Soul"], function(values) {	
+    var modifier = 0;
+    switch(values.helphinder){
+	  case "Fortitude":
+	    modifier = parseInt(values.Fortitude)||0;
+		break;
+	  case "Willpower":
+	    modifier = parseInt(values.Willpower)||0;
+		break;
+	  case "Reflexes":
+	    modifier = parseInt(values.Reflexes)||0;
+		break;
+	  case "Reason":
+	    modifier = parseInt(values.Reason)||0;
+		break;
+	  case "Intuition":
+	    modifier = parseInt(values.Intuition)||0;
+		break;
+	  case "Perception":
+	    modifier = parseInt(values.Perception)||0;
+		break;
+	  case "Coolness":
+	    modifier = parseInt(values.Coolness)||0;
+		break;
+	  case "Violence":
+	    modifier = parseInt(values.Violence)||0;
+		break;
+	  case "Charisma":
+	    modifier = parseInt(values.Charisma)||0;
+		break;
+	  case "Soul":
+	    modifier = parseInt(values.Soul)||0;
+		break;
+    }
+    setAttrs({                            
+      helphindermod: modifier
     });
   });
 });
