@@ -5730,6 +5730,7 @@
 	/* Functions used sheet-wide */
 	/* ------------------------- */
 	
+	const maxTalentNum = 7;
 	const maxComplicationNum = 6;
 
 	function arrayOf(num) {
@@ -7267,15 +7268,9 @@
 	
 	function sumPowersPerksTalents() {
 		getAttrs(["talentCP01","talentCP02","talentCP03","talentCP04","talentCP05","talentCP06","talentCP07","powerCP01","powerCP02","powerCP03","powerCP04","powerCP05","powerCP06", "powerCP07", "powerCP08", "powerCP09", "powerCP10"], function(values) {
-			const talent01cost = parseInt(values.talentCP01)||0;
-			const talent02cost = parseInt(values.talentCP02)||0;
-			const talent03cost = parseInt(values.talentCP03)||0;
-			const talent04cost = parseInt(values.talentCP04)||0;
-			const talent05cost = parseInt(values.talentCP05)||0;
-			const talent06cost = parseInt(values.talentCP06)||0;
-			const talent07cost = parseInt(values.talentCP07)||0;
-			
-			let talentsCost = talent01cost+talent02cost+talent03cost+talent04cost+talent05cost+talent06cost+talent07cost;
+			let talentsCost = 0;
+			for (let i = 0; i < maxTalentNum; i++)
+				talentsCost += parseInt(values["talentCP"+String(i).padStart(2,'0')])||0;
 			
 			const power01cost = parseInt(values.powerCP01)||0;
 			const power02cost = parseInt(values.powerCP02)||0;
@@ -13257,143 +13252,24 @@
 		});
 	});
 	
-	// Talent Movers
-	on("clicked:talentDown01 clicked:talentUp02", function () {
-		getAttrs(["talentName01", "talentName02", "talentText01", "talentText02", "talentCP01", "talentCP02"], function(values) {
-			let destinationName = values.talentName02;
-			let sourceName = values.talentName01;
-			let destinationText = values.talentText02;
-			let sourceText = values.talentText01;
-			let destinationCP = values.talentCP02;
-			let sourceCP = values.talentCP01;
-						
-			setAttrs({
-				"talentName02":sourceName,
-				"talentName01":destinationName,
-				"talentText02":sourceText,
-				"talentText01":destinationText,
-				"talentCP02":sourceCP,
-				"talentCP01":destinationCP
-			});
-		});
-	});
+	/* ------------- */
+	/* Talent Movers */
+	/* ------------- */
 	
-	on("clicked:talentDown02 clicked:talentUp03", function () {
-		getAttrs(["talentName02", "talentName03", "talentText02", "talentText03", "talentCP02", "talentCP03"], function(values) {
-			let destinationName = values.talentName03;
-			let sourceName = values.talentName02;
-			let destinationText = values.talentText03;
-			let sourceText = values.talentText02;
-			let destinationCP = values.talentCP03;
-			let sourceCP = values.talentCP02;
+	arrayOf(maxTalentNum).forEach(num => {
+		var lowId = String(num).padStart(2,'0');
+		var highId = String(num == maxTalentNum ? 1 : num + 1).padStart(2,'0');
+		on("clicked:talentDown"+lowId+" clicked:talentUp"+highId, function () {
+			getAttrs(["talentName"+lowId, "talentName"+highId, "talentText"+lowId, "talentText"+highId, "talentCP"+lowId, "talentCP"+highId], function(values) {
+				var attributes = new Object();
+				attributes["talentName"+lowId] = values["talentName"+highId];
+				attributes["talentName"+highId] = values["talentName"+lowId];
+				attributes["talentText"+lowId] = values["talentText"+highId];
+				attributes["talentText"+highId] = values["talentText"+lowId];
+				attributes["talentCP"+lowId] = values["talentCP"+highId];
+				attributes["talentCP"+highId] = values["talentCP"+lowId];
 						
-			setAttrs({
-				"talentName03":sourceName,
-				"talentName02":destinationName,
-				"talentText03":sourceText,
-				"talentText02":destinationText,
-				"talentCP03":sourceCP,
-				"talentCP02":destinationCP
-			});
-		});
-	});
-	
-	on("clicked:talentDown03 clicked:talentUp04", function () {
-		getAttrs(["talentName03", "talentName04", "talentText03", "talentText04", "talentCP03", "talentCP04"], function(values) {
-			let destinationName = values.talentName04;
-			let sourceName = values.talentName03;
-			let destinationText = values.talentText04;
-			let sourceText = values.talentText03;
-			let destinationCP = values.talentCP04;
-			let sourceCP = values.talentCP03;
-						
-			setAttrs({
-				"talentName04":sourceName,
-				"talentName03":destinationName,
-				"talentText04":sourceText,
-				"talentText03":destinationText,
-				"talentCP04":sourceCP,
-				"talentCP03":destinationCP
-			});
-		});
-	});
-	
-	on("clicked:talentDown04 clicked:talentUp05", function () {
-		getAttrs(["talentName04", "talentName05", "talentText04", "talentText05", "talentCP04", "talentCP05"], function(values) {
-			let destinationName = values.talentName05;
-			let sourceName = values.talentName04;
-			let destinationText = values.talentText05;
-			let sourceText = values.talentText04;
-			let destinationCP = values.talentCP05;
-			let sourceCP = values.talentCP04;
-						
-			setAttrs({
-				"talentName05":sourceName,
-				"talentName04":destinationName,
-				"talentText05":sourceText,
-				"talentText04":destinationText,
-				"talentCP05":sourceCP,
-				"talentCP04":destinationCP
-			});
-		});
-	});
-	
-	on("clicked:talentDown05 clicked:talentUp06", function () {
-		getAttrs(["talentName05", "talentName06", "talentText05", "talentText06", "talentCP05", "talentCP06"], function(values) {
-			let destinationName = values.talentName06;
-			let sourceName = values.talentName05;
-			let destinationText = values.talentText06;
-			let sourceText = values.talentText05;
-			let destinationCP = values.talentCP06;
-			let sourceCP = values.talentCP05;
-						
-			setAttrs({
-				"talentName06":sourceName,
-				"talentName05":destinationName,
-				"talentText06":sourceText,
-				"talentText05":destinationText,
-				"talentCP06":sourceCP,
-				"talentCP05":destinationCP
-			});
-		});
-	});
-	
-	on("clicked:talentDown06 clicked:talentUp07", function () {
-		getAttrs(["talentName06", "talentName07", "talentText06", "talentText07", "talentCP06", "talentCP07"], function(values) {
-			let destinationName = values.talentName07;
-			let sourceName = values.talentName06;
-			let destinationText = values.talentText07;
-			let sourceText = values.talentText06;
-			let destinationCP = values.talentCP07;
-			let sourceCP = values.talentCP06;
-						
-			setAttrs({
-				"talentName07":sourceName,
-				"talentName06":destinationName,
-				"talentText07":sourceText,
-				"talentText06":destinationText,
-				"talentCP07":sourceCP,
-				"talentCP06":destinationCP
-			});
-		});
-	});
-	
-	on("clicked:talentDown07 clicked:talentUp01", function () {
-		getAttrs(["talentName07", "talentName01", "talentText07", "talentText01", "talentCP07", "talentCP01"], function(values) {
-			let destinationName = values.talentName01;
-			let sourceName = values.talentName07;
-			let destinationText = values.talentText01;
-			let sourceText = values.talentText07;
-			let destinationCP = values.talentCP01;
-			let sourceCP = values.talentCP07;
-						
-			setAttrs({
-				"talentName01":sourceName,
-				"talentName07":destinationName,
-				"talentText01":sourceText,
-				"talentText07":destinationText,
-				"talentCP01":sourceCP,
-				"talentCP07":destinationCP
+				setAttrs(attributes);
 			});
 		});
 	});
