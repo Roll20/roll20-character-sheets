@@ -5706,25 +5706,6 @@
 			});
 		});
 	});
-
-		
-	const buttonExpandLeftPowerList = ["powerExpand01", "powerExpand02", "powerExpand03", "powerExpand04", "powerExpand05", "powerExpand06", "powerExpand07", "powerExpand08", "powerExpand09"];
-	buttonExpandLeftPowerList.forEach(button => {
-		on(`clicked:${button}`, function() {
-			setAttrs({
-				leftPowerToggle: button
-			});
-		});
-	});
-	
-	const buttonExpandRightPowerList = ["powerExpand10", "powerExpand11", "powerExpand12", "powerExpand13", "powerExpand14", "powerExpand15", "powerExpand16", "powerExpand17"];
-	buttonExpandRightPowerList.forEach(button => {
-		on(`clicked:${button}`, function() {
-			setAttrs({
-				rightPowerToggle: button
-			});
-		});
-	});
 	
 	/* ------------------------- */
 	/* Functions used sheet-wide */
@@ -5732,6 +5713,7 @@
 	
 	const maxEquipmentNum = 16;
 	const maxSkillNum = 30;
+	const maxPowerNum = 17;
 	const maxTalentNum = 7;
 	const maxComplicationNum = 6;
 
@@ -7274,30 +7256,12 @@
 			for (let i = 0; i < maxTalentNum; i++)
 				talentsCost += parseInt(values["talentCP"+String(i).padStart(2,'0')])||0;
 			
-			const power01cost = parseInt(values.powerCP01)||0;
-			const power02cost = parseInt(values.powerCP02)||0;
-			const power03cost = parseInt(values.powerCP03)||0;
-			const power04cost = parseInt(values.powerCP04)||0;
-			const power05cost = parseInt(values.powerCP05)||0;
-			const power06cost = parseInt(values.powerCP06)||0;
-			const power07cost = parseInt(values.powerCP07)||0;
-			const power08cost = parseInt(values.powerCP08)||0;
-			const power09cost = parseInt(values.powerCP09)||0;
-			const power10cost = parseInt(values.powerCP10)||0;
-			const power11cost = parseInt(values.powerCP11)||0;
-			const power12cost = parseInt(values.powerCP12)||0;
-			const power13cost = parseInt(values.powerCP13)||0;
-			const power14cost = parseInt(values.powerCP14)||0;
-			const power15cost = parseInt(values.powerCP15)||0;
-			const power16cost = parseInt(values.powerCP16)||0;
-			const power17cost = parseInt(values.powerCP17)||0;
-			
-			let powersCost = power01cost+power02cost+power03cost+power04cost+power05cost+power06cost+power07cost+power08cost+power09cost+power10cost+power11cost+power12cost+power13cost+power14cost+power15cost+power16cost+power17cost;
-			
-			let totalCost=talentsCost+powersCost;
+			let powersCost = 0;
+			for (let i = 0; i < maxPowerNum; i++)
+				powersCost += parseInt(values["powerCP"+String(i).padStart(2,'0')])||0;
 			
 			setAttrs({
-				"powersPerksTalentsCost":totalCost
+				"powersPerksTalentsCost":(talentsCost+powersCost)
 			});
 		});
 	}
@@ -7439,6 +7403,18 @@
 			default: return 0;
 		}
 	}
+
+	/* Expanders for Powers */
+	arrayOf(maxPowerNum).forEach(num => {
+		var button = "powerExpand"+String(num).padStart(2,'0');
+		on(`clicked:${button}`, function() {
+			var attributes = new Object();
+			var attribToSet = num <= (maxPowerNum + 1) / 2 ? "leftPowerToggle" : "rightPowerToggle";
+
+			attributes[attribToSet] = button;
+			setAttrs(attributes);
+		});
+	});
 	
 	/* Update Power01 after detecting change to any of the numerical vales in the flex container */
 	on("change:powerType01 change:powerBaseCost01 change:powerAdvantages01 change:powerReducedEND01 change:powerLimitations01 change:powerDice01", function () {
@@ -7497,7 +7473,7 @@
 			
 		});
 	});
-	
+
 	// Use Power 01 Endurance
 	on("clicked:buttonPowerEND01", function () {
 		getAttrs(["powerCurrentEND","powerEND01"], function(values) {
