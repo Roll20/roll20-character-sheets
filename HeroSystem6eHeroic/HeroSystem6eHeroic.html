@@ -5730,6 +5730,13 @@
 	/* Functions used sheet-wide */
 	/* ------------------------- */
 	
+	const maxComplicationNum = 6;
+
+	function arrayOf(num) {
+		// For use in our forEach loops, this creates an array of numbers 1 to num
+		return Array.from({length: num}, (_, i) => i + 1);
+	}	
+
 	function heroRoundHigh(theNumber) {
 		// In the Hero System rounding favors the player. Here where high is good.
 		let theIntegerPart = Math.floor(theNumber);
@@ -7244,27 +7251,18 @@
 	/* -------------------------------------------------- */
 	/* Functions used for talents and complications tab   */
 	/* -------------------------------------------------- */
-	
-	function sumComplicationsBenefit() {
+
+	// Update Tally Bar after change notice any complication's CP benefit.
+	on("change:complicationCP01 change:complicationCP02 change:complicationCP03 change:complicationCP04 change:complicationCP05 change:complicationCP06", function () {
 		getAttrs(["complicationCP01","complicationCP02","complicationCP03","complicationCP04","complicationCP05","complicationCP06"], function(values) {
-			const complication01benefit = parseInt(values.complicationCP01)||0;
-			const complication02benefit = parseInt(values.complicationCP02)||0;
-			const complication03benefit = parseInt(values.complicationCP03)||0;
-			const complication04benefit = parseInt(values.complicationCP04)||0;
-			const complication05benefit = parseInt(values.complicationCP05)||0;
-			const complication06benefit = parseInt(values.complicationCP06)||0;
-			
-			let totalBenefit = complication01benefit+complication02benefit+complication03benefit+complication04benefit+complication05benefit+complication06benefit;
+			let totalBenefit = 0;
+			for (let i = 0; i < maxComplicationNum; i++)
+				totalBenefit += parseInt(values["complicationCP"+String(i).padStart(2,'0')])||0;
 			
 			setAttrs({
 				"complicationsBenefit":totalBenefit
 			});
 		});
-	}
-	
-	// Update Tally Bar after change notice any complication's CP benefit.
-	on("change:complicationCP01 change:complicationCP02 change:complicationCP03 change:complicationCP04 change:complicationCP05 change:complicationCP06", function () {
-		sumComplicationsBenefit();
 	});
 	
 	function sumPowersPerksTalents() {
@@ -13400,123 +13398,24 @@
 		});
 	});
 	
-	// Complication Movers
-	on("clicked:complicationDown01 clicked:complicationUp02", function () {
-		getAttrs(["complicationName01", "complicationName02", "complicationText01", "complicationText02", "complicationCP01", "complicationCP02"], function(values) {
-			let destinationName = values.complicationName02;
-			let sourceName = values.complicationName01;
-			let destinationText = values.complicationText02;
-			let sourceText = values.complicationText01;
-			let destinationCP = values.complicationCP02;
-			let sourceCP = values.complicationCP01;
-						
-			setAttrs({
-				"complicationName02":sourceName,
-				"complicationName01":destinationName,
-				"complicationText02":sourceText,
-				"complicationText01":destinationText,
-				"complicationCP02":sourceCP,
-				"complicationCP01":destinationCP
-			});
-		});
-	});
-	
-	on("clicked:complicationDown02 clicked:complicationUp03", function () {
-		getAttrs(["complicationName02", "complicationName03", "complicationText02", "complicationText03", "complicationCP02", "complicationCP03"], function(values) {
-			let destinationName = values.complicationName03;
-			let sourceName = values.complicationName02;
-			let destinationText = values.complicationText03;
-			let sourceText = values.complicationText02;
-			let destinationCP = values.complicationCP03;
-			let sourceCP = values.complicationCP02;
-						
-			setAttrs({
-				"complicationName03":sourceName,
-				"complicationName02":destinationName,
-				"complicationText03":sourceText,
-				"complicationText02":destinationText,
-				"complicationCP03":sourceCP,
-				"complicationCP02":destinationCP
-			});
-		});
-	});
-	
-	on("clicked:complicationDown03 clicked:complicationUp04", function () {
-		getAttrs(["complicationName03", "complicationName04", "complicationText03", "complicationText04", "complicationCP03", "complicationCP04"], function(values) {
-			let destinationName = values.complicationName04;
-			let sourceName = values.complicationName03;
-			let destinationText = values.complicationText04;
-			let sourceText = values.complicationText03;
-			let destinationCP = values.complicationCP04;
-			let sourceCP = values.complicationCP03;
-						
-			setAttrs({
-				"complicationName04":sourceName,
-				"complicationName03":destinationName,
-				"complicationText04":sourceText,
-				"complicationText03":destinationText,
-				"complicationCP04":sourceCP,
-				"complicationCP03":destinationCP
-			});
-		});
-	});
-	
-	on("clicked:complicationDown04 clicked:complicationUp05", function () {
-		getAttrs(["complicationName04", "complicationName05", "complicationText04", "complicationText05", "complicationCP04", "complicationCP05"], function(values) {
-			let destinationName = values.complicationName05;
-			let sourceName = values.complicationName04;
-			let destinationText = values.complicationText05;
-			let sourceText = values.complicationText04;
-			let destinationCP = values.complicationCP05;
-			let sourceCP = values.complicationCP04;
-						
-			setAttrs({
-				"complicationName05":sourceName,
-				"complicationName04":destinationName,
-				"complicationText05":sourceText,
-				"complicationText04":destinationText,
-				"complicationCP05":sourceCP,
-				"complicationCP04":destinationCP
-			});
-		});
-	});
-	
-	on("clicked:complicationDown05 clicked:complicationUp06", function () {
-		getAttrs(["complicationName05", "complicationName06", "complicationText05", "complicationText06", "complicationCP05", "complicationCP06"], function(values) {
-			let destinationName = values.complicationName06;
-			let sourceName = values.complicationName05;
-			let destinationText = values.complicationText06;
-			let sourceText = values.complicationText05;
-			let destinationCP = values.complicationCP06;
-			let sourceCP = values.complicationCP05;
-						
-			setAttrs({
-				"complicationName06":sourceName,
-				"complicationName05":destinationName,
-				"complicationText06":sourceText,
-				"complicationText05":destinationText,
-				"complicationCP06":sourceCP,
-				"complicationCP05":destinationCP
-			});
-		});
-	});
-	
-	on("clicked:complicationDown06 clicked:complicationUp01", function () {
-		getAttrs(["complicationName06", "complicationName01", "complicationText06", "complicationText01", "complicationCP06", "complicationCP01"], function(values) {
-			let destinationName = values.complicationName01;
-			let sourceName = values.complicationName06;
-			let destinationText = values.complicationText01;
-			let sourceText = values.complicationText06;
-			let destinationCP = values.complicationCP01;
-			let sourceCP = values.complicationCP06;
-						
-			setAttrs({
-				"complicationName01":sourceName,
-				"complicationName06":destinationName,
-				"complicationText01":sourceText,
-				"complicationText06":destinationText,
-				"complicationCP01":sourceCP,
-				"complicationCP06":destinationCP
+	/* ------------------- */
+	/* Complication Movers */
+	/* ------------------- */
+
+	arrayOf(maxComplicationNum).forEach(num => {
+		var lowId = String(num).padStart(2,'0');
+		var highId = String(num == maxComplicationNum ? 1 : num + 1).padStart(2,'0');
+		on("clicked:complicationDown"+lowId+" clicked:complicationUp"+highId, function () {
+			getAttrs(["complicationName"+lowId, "complicationName"+highId, "complicationText"+lowId, "complicationText"+highId, "complicationCP"+lowId, "complicationCP"+highId], function(values) {
+				var attributes = new Object();
+				attributes["complicationName"+lowId] = values["complicationName"+highId];
+				attributes["complicationName"+highId] = values["complicationName"+lowId];
+				attributes["complicationText"+lowId] = values["complicationText"+highId];
+				attributes["complicationText"+highId] = values["complicationText"+lowId];
+				attributes["complicationCP"+lowId] = values["complicationCP"+highId];
+				attributes["complicationCP"+highId] = values["complicationCP"+lowId];
+							
+				setAttrs(attributes);
 			});
 		});
 	});
