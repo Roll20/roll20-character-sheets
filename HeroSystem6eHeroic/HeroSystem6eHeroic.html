@@ -5554,6 +5554,7 @@
 <input type="hidden" name="attr_hiddenWeaponDamage04"  value="0"/>
 <input type="hidden" name="attr_hiddenWeaponDamage05"  value="0"/>
 <input type="hidden" name="attr_hiddenManeuverDamage01"  value="2d6"/>
+<input type="hidden" name="attr_hiddenBasicEndurance" value="2"/>
 
 <!-- Hidden variables for clean power dice strings -->
 <input type="hidden" name="attr_hiddenPowerDice01"  value="0"/>
@@ -5744,11 +5745,14 @@
 
 		
 		if (version < 1.1) {
-			values = await _getAttrs(["intelligenceChance", "enhancedPerceptionModifier", "body", "stun", "endurance"]);
+			values = await _getAttrs(["intelligenceChance", "enhancedPerceptionModifier", "body", "stun", "endurance", "strength", "optionSuperHeroicEndurance"]);
+			var hiddenBasicEndurance = (parseInt(values.strength)||0) / (values.optionSuperHeroicEndurance != 0 ? 5 : 10);
+
 			attributes.perceptionEnhanced = parseInt(values.intelligenceChance)||11 + parseInt(values.enhancedPerceptionModifier)||0;
 			attributes.CurrentBODY_max = parseInt(values.body)||0;
 			attributes.CurrentSTUN_max = parseInt(values.stun)||0;
 			attributes.CurrentEND_max = parseInt(values.endurance)||0;
+			attributes.hiddenBasicEndurance = Math.max(1,heroRoundLow(hiddenBasicEndurance));
 			version = 1.1;
 		};
 
@@ -7845,8 +7849,8 @@
 	/* -------------------------------------------------- */
 						
 	/* Calculate weapon endurance costs */
-	on("change:optionSuperHeroicEndurance change:weaponStrength01 change:weaponStrength02 change:weaponStrength03 change:weaponStrength04 change:weaponStrength05 change:shieldStrength", function() {
-		getAttrs(["optionSuperHeroicEndurance", "weaponStrength01","weaponStrength02","weaponStrength03","weaponStrength04","weaponStrength05","shieldStrength"], function(values) {
+	on("change:optionSuperHeroicEndurance change:weaponStrength01 change:weaponStrength02 change:weaponStrength03 change:weaponStrength04 change:weaponStrength05 change:shieldStrength change:strength", function() {
+		getAttrs(["optionSuperHeroicEndurance", "weaponStrength01","weaponStrength02","weaponStrength03","weaponStrength04","weaponStrength05","shieldStrength","strength"], function(values) {
 			// If optionSuperHeroicEndurance is true, endurance cost is 1 per 5 strength, otherwise it is 1 per 10 strength used.
 											 
 			optionSuperHeroic = values.optionSuperHeroicEndurance;
@@ -7854,7 +7858,7 @@
 							
 			if (optionSuperHeroic != 0) {
 				enduranceCostFactor=5;
-							}
+			}
 
 			let enduranceCost01= heroRoundLow( (parseInt(values.weaponStrength01)||0)/enduranceCostFactor );
 			if ( (enduranceCost01<1) && (parseInt(values.weaponStrength01)||0)>0) {
@@ -7885,15 +7889,21 @@
 			if ( (enduranceCostShield<1) && (parseInt(values.shieldStrength)||0)>0) {
 				enduranceCostShield=1
 			}
-						
+
+			let enduranceCostBasic= heroRoundLow( (parseInt(values.strength)||0)/enduranceCostFactor );
+			if ( (enduranceCostBasic<1) && (parseInt(values.strength)||0)>0) {
+				enduranceCostBasic=1
+			}
+			
 			setAttrs({
 				"weaponEndurance01":enduranceCost01,
 				"weaponEndurance02":enduranceCost02,
 				"weaponEndurance03":enduranceCost03,
 				"weaponEndurance04":enduranceCost04,
 				"weaponEndurance05":enduranceCost05,
-				"shieldEndurance":enduranceCostShield
-				});
+				"shieldEndurance":enduranceCostShield,
+				"hiddenBasicEndurance":enduranceCostBasic
+			});
 		});
 	});
 	
@@ -9544,11 +9554,9 @@
 		startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with Strength @{strength}}} {{OCV=[[?{Modifiers|0}+@{ocv}+@{targetOCVpenalty}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenManeuverDamage01}]]}}", (results) => {
 			// A standard strength-based attack is complicated by the need to use a 1d3 for strength%5 == 3 or 4, such as 4, 8, 13, 19, etc.
 
-			getAttrs(["optionHitLocationSystem", "targetSelection", "strength", "optionAutoSubtractEND", "optionSuperHeroicEndurance"], function(values) {
+			getAttrs(["optionHitLocationSystem", "targetSelection", "strength", "optionAutoSubtractEND", "hiddenBasicEndurance"], function(values) {
 				let useHitLocations = values.optionHitLocationSystem;
 				let autoSubtractEND = values.optionAutoSubtractEND;
-				let optionSuperHeroic = values.optionSuperHeroicEndurance;
-				let enduranceCostFactor = 10;
 				let targetSelectionType = parseInt(values.targetSelection)||1;
 				let theMessage = " ";
 				let computed =0;
@@ -9556,17 +9564,7 @@
 				
 				// Subtract END cost if option checked.
 				if (autoSubtractEND != 0) {
-					/* Determine END cost */
-					if (optionSuperHeroic != 0) {
-						enduranceCostFactor=5;
-					}
-				
-					let enduranceCost= heroRoundLow( (parseInt(values.strength)||0)/enduranceCostFactor );
-					if ( (enduranceCost<1) && (parseInt(values.strength)||0)>0) {
-						enduranceCost=1
-					}
-					
-					subtractEndurance(enduranceCost);
+					subtractEndurance(values.hiddenBasicEndurance)||0;
 				}
 				
 				// Determine BODY damage of d3 dice.
