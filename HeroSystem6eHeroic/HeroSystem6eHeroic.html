@@ -5780,6 +5780,7 @@
 	/* Functions used sheet-wide */
 	/* ------------------------- */
 	
+	const maxWeaponNum = 5;
 	const maxEquipmentNum = 16;
 	const maxSkillNum = 30;
 	const maxPowerNum = 17;
@@ -7975,348 +7976,78 @@
 	/* ------------------------------------------------ */
 	/* --- Weapon Attacks and Hit Location Helpers  --- */
 	/* ------------------------------------------------ */
+
+	arrayOf(maxWeaponNum).forEach(num => {
+		var weaponId = String(num).padStart(2,'0');
+		on("change:optionHitLocationSystem change:targetSelection change:weaponAreaEffect"+weaponId+" change:halveTargetOCVpenalty change:penaltySkillLevels", function () {
+			getAttrs(["optionHitLocationSystem","targetSelection","weaponAreaEffect"+weaponId,"halveTargetOCVpenalty","penaltySkillLevels"], function(values) {
+
+				let penalty = 0;
+				let useHitLocations = values.optionHitLocationSystem;
+				let areaEffectWeapon = values["weaponAreaEffect"+weaponId];
+				let targetSelectionType = parseInt(values.targetSelection)||1;
+				let halveTargetPenalty = values.halveTargetOCVpenalty;
+				let penaltySkillLevels = parseInt(values.penaltySkillLevels)||0;
+				  
+				// For some reason I couldn't get this switch function work in an independent function. Will have to suffer with the extra space needed.
+				if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
+					switch (targetSelectionType) {
+						case 1:		penalty = 0;
+									break;
+						case 2:     penalty = -8;
+									break;
+						case 3:     penalty = -6;
+									break;
+						case 4:     penalty = -5;
+									break;
+						case 5:     penalty = -5;
+									break;
+						case 6:     penalty = -3;
+									break;
+						case 7:     penalty = -7;
+									break;
+						case 8:     penalty = -8;
+									break;
+						case 9:     penalty = -4;
+									break;
+						case 10:    penalty = -6;
+									break;
+						case 11:    penalty = -8;
+									break;
+						case 12:    penalty = -4;
+									break;
+						case 13:    penalty = -2;
+									break;
+						case 14:    penalty = -1;
+									break;
+						case 15:    penalty = -2;
+									break;
+						case 16:	penalty = -4;
+									break;
+						default:	penalty = 0;
+					};
 					
-	// Update weaponOCVPenalty01
-	on("change:optionHitLocationSystem change:targetSelection change:weaponAreaEffect01 change:halveTargetOCVpenalty change:penaltySkillLevels", function () {
-		getAttrs(["optionHitLocationSystem","targetSelection","weaponAreaEffect01","halveTargetOCVpenalty","penaltySkillLevels"], function(values) {
-		  
-			let penalty = 0;
-			let useHitLocations = values.optionHitLocationSystem;
-			let areaEffectWeapon = values.weaponAreaEffect01;
-			let targetSelectionType = parseInt(values.targetSelection)||1;
-			let halveTargetPenalty = values.halveTargetOCVpenalty;
-			let penaltySkillLevels = parseInt(values.penaltySkillLevels)||0;
-			  
-			// For some reason I couldn't get this switch function work in an independent function. Will have to suffer with the extra space needed.
-			if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-				switch (targetSelectionType) {
-					case 1:		penalty = 0;
-								break;
-					case 2:     penalty = -8;
-								break;
-					case 3:     penalty = -6;
-								break;
-					case 4:     penalty = -5;
-								break;
-					case 5:     penalty = -5;
-								break;
-					case 6:     penalty = -3;
-								break;
-					case 7:     penalty = -7;
-								break;
-					case 8:     penalty = -8;
-								break;
-					case 9:     penalty = -4;
-								break;
-					case 10:    penalty = -6;
-								break;
-					case 11:    penalty = -8;
-								break;
-					case 12:    penalty = -4;
-								break;
-					case 13:    penalty = -2;
-								break;
-					case 14:    penalty = -1;
-								break;
-					case 15:    penalty = -2;
-								break;
-					case 16:	penalty = -4;
-								break;
-					default:	penalty = 0;
-				};
-				
-				if (halveTargetPenalty != 0) {
-					penalty = heroRoundHigh(penalty/2);
+					if (halveTargetPenalty != 0) {
+						penalty = heroRoundHigh(penalty/2);
 					}
-					
-				// Apply penalty skill levels.
-				penalty = penalty+penaltySkillLevels;
+						
+					// Apply penalty skill levels.
+					penalty = penalty+penaltySkillLevels;
+								
+					// The net penaly cannot be positive.
+					if (penalty>0) {
+						penalty=0;
+					}
+				}
 							
-				// The net penaly cannot be positive.
-				if (penalty>0) {
-					penalty=0;
-						}
-						}
-						
-			// Update OCV penalty for weapon01		
-						setAttrs({
-				"weaponOCVPenalty01":penalty
-					}); 
-				});
-	});
-	
-	// Update weaponOCVPenalty02
-	on("change:optionHitLocationSystem change:targetSelection change:weaponAreaEffect02 change:halveTargetOCVpenalty change:penaltySkillLevels", function () {
-		getAttrs(["optionHitLocationSystem","targetSelection","weaponAreaEffect02","halveTargetOCVpenalty","penaltySkillLevels"], function(values) {
-		  
-			let penalty = 0;
-			let useHitLocations = values.optionHitLocationSystem;
-			let areaEffectWeapon = values.weaponAreaEffect02;
-			let targetSelectionType = parseInt(values.targetSelection)||1;
-			let halveTargetPenalty = values.halveTargetOCVpenalty;
-			let penaltySkillLevels = parseInt(values.penaltySkillLevels)||0;
-				
-			if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-				switch (targetSelectionType) {
-					case 1:		penalty = 0;
-								break;
-					case 2:     penalty = -8;
-								break;
-					case 3:     penalty = -6;
-								break;
-					case 4:     penalty = -5;
-								break;
-					case 5:     penalty = -5;
-								break;
-					case 6:     penalty = -3;
-								break;
-					case 7:     penalty = -7;
-								break;
-					case 8:     penalty = -8;
-								break;
-					case 9:     penalty = -4;
-								break;
-					case 10:    penalty = -6;
-								break;
-					case 11:    penalty = -8;
-								break;
-					case 12:    penalty = -4;
-								break;
-					case 13:    penalty = -2;
-								break;
-					case 14:    penalty = -1;
-								break;
-					case 15:    penalty = -2;
-								break;
-					case 16:	penalty = -4;
-								break;
-					default:	penalty = 0;
-		};
-					
-				if (halveTargetPenalty != 0) {
-					penalty = heroRoundHigh(penalty/2);
-	}
-				
-				// Apply penalty skill levels.
-				penalty = penalty+penaltySkillLevels;
-					
-				// The net penaly cannot be positive.
-				if (penalty>0) {
-					penalty=0;
-					}
-				}
-	
-			// Update OCV penalty for weapon02		
-			setAttrs({
-				"weaponOCVPenalty02":penalty
+				// Update OCV penalty for weaponXX
+				var attributes = new Object();
+				attributes["weaponOCVPenalty"+weaponId] = penalty;
+				setAttrs(attributes); 
 			});
 		});
 	});
-						
-	// Update weaponOCVPenalty03
-	on("change:optionHitLocationSystem change:targetSelection change:weaponAreaEffect03 change:halveTargetOCVpenalty change:penaltySkillLevels", function () {
-		getAttrs(["optionHitLocationSystem","targetSelection","weaponAreaEffect03","halveTargetOCVpenalty","penaltySkillLevels"], function(values) {
-	
-			let penalty = 0;
-			let useHitLocations = values.optionHitLocationSystem;
-			let areaEffectWeapon = values.weaponAreaEffect03;
-			let targetSelectionType = parseInt(values.targetSelection)||1;
-			let halveTargetPenalty = values.halveTargetOCVpenalty;
-			let penaltySkillLevels = parseInt(values.penaltySkillLevels)||0;
-						
-			if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-				switch (targetSelectionType) {
-					case 1:		penalty = 0;
-								break;
-					case 2:     penalty = -8;
-								break;
-					case 3:     penalty = -6;
-								break;
-					case 4:     penalty = -5;
-								break;
-					case 5:     penalty = -5;
-								break;
-					case 6:     penalty = -3;
-								break;
-					case 7:     penalty = -7;
-								break;
-					case 8:     penalty = -8;
-								break;
-					case 9:     penalty = -4;
-								break;
-					case 10:    penalty = -6;
-								break;
-					case 11:    penalty = -8;
-								break;
-					case 12:    penalty = -4;
-								break;
-					case 13:    penalty = -2;
-								break;
-					case 14:    penalty = -1;
-								break;
-					case 15:    penalty = -2;
-								break;
-					case 16:	penalty = -4;
-								break;
-					default:	penalty = 0;
-				};
-	
-				if (halveTargetPenalty != 0) {
-					penalty = heroRoundHigh(penalty/2);
-				}
-						
-				// Apply penalty skill levels.
-				penalty = penalty+penaltySkillLevels;
-	
-				// The net penaly cannot be positive.
-				if (penalty>0) {
-					penalty=0;
-				}
-			}
-						
-			// Update OCV penalty for weapon03		
-			setAttrs({
-				"weaponOCVPenalty03":penalty
-			});
-		});
-	});
-	
-	// Update weaponOCVPenalty04
-	on("change:optionHitLocationSystem change:targetSelection change:weaponAreaEffect04 change:halveTargetOCVpenalty change:penaltySkillLevels", function () {
-		getAttrs(["optionHitLocationSystem","targetSelection","weaponAreaEffect04","halveTargetOCVpenalty","penaltySkillLevels"], function(values) {
-						
-			let penalty = 0;
-			let useHitLocations = values.optionHitLocationSystem;
-			let areaEffectWeapon = values.weaponAreaEffect04;
-			let targetSelectionType = parseInt(values.targetSelection)||1;
-			let halveTargetPenalty = values.halveTargetOCVpenalty;
-			let penaltySkillLevels = parseInt(values.penaltySkillLevels)||0;
-	
-			if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-				switch (targetSelectionType) {
-					case 1:		penalty = 0;
-								break;
-					case 2:     penalty = -8;
-								break;
-					case 3:     penalty = -6;
-								break;
-					case 4:     penalty = -5;
-								break;
-					case 5:     penalty = -5;
-								break;
-					case 6:     penalty = -3;
-								break;
-					case 7:     penalty = -7;
-								break;
-					case 8:     penalty = -8;
-								break;
-					case 9:     penalty = -4;
-								break;
-					case 10:    penalty = -6;
-								break;
-					case 11:    penalty = -8;
-								break;
-					case 12:    penalty = -4;
-								break;
-					case 13:    penalty = -2;
-								break;
-					case 14:    penalty = -1;
-								break;
-					case 15:    penalty = -2;
-								break;
-					case 16:	penalty = -4;
-								break;
-					default:	penalty = 0;
-				};
-				
-				if (halveTargetPenalty != 0) {
-					penalty = heroRoundHigh(penalty/2);
-				}
-				
-				// Apply penalty skill levels.
-				penalty = penalty+penaltySkillLevels;
-				
-				// The net penaly cannot be positive.
-				if (penalty>0) {
-					penalty=0;
-				}
-			}
-			
-			// Update OCV penalty for weapon04		
-			setAttrs({
-				"weaponOCVPenalty04":penalty
-			});
-		});
-	});
-	
-	// Update weaponOCVPenalty05
-	on("change:optionHitLocationSystem change:targetSelection change:weaponAreaEffect05 change:halveTargetOCVpenalty change:penaltySkillLevels", function () {
-		getAttrs(["optionHitLocationSystem","targetSelection","weaponAreaEffect05","halveTargetOCVpenalty","penaltySkillLevels"], function(values) {
-		  
-			let penalty = 0;
-			let useHitLocations = values.optionHitLocationSystem;
-			let areaEffectWeapon = values.weaponAreaEffect05;
-			let targetSelectionType = parseInt(values.targetSelection)||1;
-			let halveTargetPenalty = values.halveTargetOCVpenalty;
-			let penaltySkillLevels = parseInt(values.penaltySkillLevels)||0;
-			  
-			if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-				switch (targetSelectionType) {
-					case 1:		penalty = 0;
-								break;
-					case 2:     penalty = -8;
-								break;
-					case 3:     penalty = -6;
-								break;
-					case 4:     penalty = -5;
-								break;
-					case 5:     penalty = -5;
-								break;
-					case 6:     penalty = -3;
-								break;
-					case 7:     penalty = -7;
-								break;
-					case 8:     penalty = -8;
-								break;
-					case 9:     penalty = -4;
-								break;
-					case 10:    penalty = -6;
-								break;
-					case 11:    penalty = -8;
-								break;
-					case 12:    penalty = -4;
-								break;
-					case 13:    penalty = -2;
-								break;
-					case 14:    penalty = -1;
-								break;
-					case 15:    penalty = -2;
-								break;
-					case 16:	penalty = -4;
-								break;
-					default:	penalty = 0;
-				};
-				
-				if (halveTargetPenalty != 0) {
-					penalty = heroRoundHigh(penalty/2);
-				}
-				
-				// Apply penalty skill levels.
-				penalty = penalty+penaltySkillLevels;
-				
-				// The net penaly cannot be positive.
-				if (penalty>0) {
-					penalty=0;
-				}
-			}
-			
-			// Update OCV penalty for weapon05		
-			setAttrs({
-				"weaponOCVPenalty05":penalty
-			});
-		});
-	});
-	
+
 	// Update targetOCVpenalty. No area of effect complication. Used for shield and basic attacks.
 	on("change:optionHitLocationSystem change:targetSelection change:halveTargetOCVpenalty change:penaltySkillLevels", function () {
 		getAttrs(["optionHitLocationSystem","targetSelection","halveTargetOCVpenalty","penaltySkillLevels"], function(values) {
@@ -8690,724 +8421,158 @@
 		});
 	});
 
-	on('clicked:attackWeapon01', (info) => {
-		// Roll attack and damage dice for Weapon 01.
-		
-		// First determine if the weapon does normal or killing damage.
-		getAttrs(["weaponNormalDamage01", "optionAutoSubtractEND", "weaponEndurance01"], function(values) {
-			let isNormalDamage = values.weaponNormalDamage01;
-			let autoSubtractEND = values.optionAutoSubtractEND;
-			let weaponEND = parseInt(values.weaponEndurance01)||0;
+	arrayOf(maxWeaponNum).forEach(num => {
+		var weaponId = String(num).padStart(2,'0');	
+		on(`clicked:attackWeapon${weaponId}`, (info) => {
+			// Roll attack and damage dice for Weapon 01.
 			
-			// If isNormalDamage is TRUE, use the Normal Damage template.
-			if (isNormalDamage != 0) {
-				startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle=Attacks with @{weaponName01}}} {{OCV=[[?{Modifier|0}+@{weaponOCV01}+@{weaponOCVPenalty01}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenWeaponDamage01}]]}}", (results) => {
-					
-					// Convert dice roll to equivalent BODY damage.
-					
-					let computed =0;
-					const theDice = results.results.STUN.rolls;
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
-					}
-					
-					// For each type of dice (d3 or d6) calculate BODY:
-					for(let groupOfDice of theDice) {
-						if (groupOfDice.sides == 3) {
-							// calculate normal damage of d3 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 3) {
-									computed = computed+1;
-								  } else if (element === 2) {
-									 computed = computed + Math.floor(Math.random()*2); // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
-								  } else {
-									  computed = computed+0; // Add nothing.
-								  }
-							}
-						} else if (groupOfDice.sides == 6) {
-							// calculate normal damage of d6 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 1) {
-									computed = computed+0; // Add nothing.
-								  } else if (element === 6) {
-									  computed = computed+2;
-								  } else {
-									  computed = computed+1;
-								  }
-							}
-						}
-					}
-					
-					// Get hit location message if system used.
-					getAttrs(["optionHitLocationSystem", "weaponAreaEffect01", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect01;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-											 
-					
-						if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-							var theHitLocation = new normalHitLocation(targetSelectionType);
-							theMessage = theHitLocation.message;
-							
-						} else if (areaEffectWeapon != 0) {
-							theMessage = " AoE";
-						}
-						
-						setAttrs({
-							rollDialogMessage:theMessage
-						});
-						
-						let theResult = String(computed);
-						
-						finishRoll(
-							results.rollId,
-							{
-								STUN: theResult.concat(theMessage)
-							}
-						);
-					});
-				});
-			} else {
-				// If isNormalDamage is FALSE, use the killing Damage template.
-				startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName01}}} {{OCV=[[?{Modifier|0}+@{weaponOCV01}+@{weaponOCVPenalty01}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenWeaponDamage01}]]}}", (results) => {
-					
-					let computed = parseInt(results.results.BODY.result)||0;
-					
-					setAttrs({
-						hiddenDamageRoll: computed
-					});
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
-					}
-							
-					getAttrs(["optionHitLocationSystem", "weaponStunMod01", "weaponAreaEffect01", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect01;
-						let theSTUNmodifier = parseInt(values.weaponStunMod01)||0;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-						
-						// Determine the base stun multiple, which is 1d3.	
-						let theSTUNmultiplier = Math.floor(Math.random()*3+1);
-											 
-						// If the hit location system option is used and the weapon is not of type area effect call the hit location function.
-						if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {					
-							var theHitLocation = new killingHitLocation(targetSelectionType);
-							
-							theSTUNmultiplier = theHitLocation.stunMultiplier;
-							theMessage = theHitLocation.message;
-							}
-						else if (areaEffectWeapon != 0) {
-							theMessage = " AoE";
-						}
-						
-						
-						// Add the weapon's stun modifier.
-						theSTUNmultiplier = theSTUNmultiplier + theSTUNmodifier;
-						
-						// Prevent STUN multiples of less than 1.
-						if (theSTUNmultiplier < 1) {
-							theSTUNmultiplier = 1;
-						}
-						
-						setAttrs({
-							rollDialogMessage:theMessage,
-							hiddenSTUNmultiplier:theSTUNmultiplier
-						});
-						
-						let theResult = String(computed*theSTUNmultiplier);
-						
-						finishRoll(
-							results.rollId,
-							{
-								BODY: theResult.concat(theMessage)
-							}
-						); 
-					}); 
-				});
-			}
-		});
-	});
-	
-	on('clicked:attackWeapon02', (info) => {
-		// Roll attack and damage dice for Weapon 02.
-		
-		// First determine if the weapon does normal or killing damage.
-		getAttrs(["weaponNormalDamage02", "optionAutoSubtractEND", "weaponEndurance02"], function(values) {
-			let isNormalDamage = values.weaponNormalDamage02;
-			let autoSubtractEND = values.optionAutoSubtractEND;
-			let weaponEND = parseInt(values.weaponEndurance02)||0;
-			
-			// If isNormalDamage is TRUE, use the Normal Damage template.
-			if (isNormalDamage != 0) {
-				startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle=Attacks with @{weaponName02}}} {{OCV=[[?{Modifier|0}+@{weaponOCV02}+@{weaponOCVPenalty02}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenWeaponDamage02}]]}}", (results) => {
-					
-					// Convert dice roll to equivalent BODY damage.
-					
-					let computed =0;
-					const theDice = results.results.STUN.rolls;
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
-					}
-					
-					// For each type of dice (d3 or d6) calculate BODY:
-					for(let groupOfDice of theDice) {
-						if (groupOfDice.sides == 3) {
-							// calculate normal damage of d3 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 3) {
-									computed = computed+1;
-								  } else if (element === 2) {
-									 computed = computed + Math.floor(Math.random()*2); // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
-								  } else {
-									  computed = computed+0; // Add nothing.
-								  }
-							}
-						} else if (groupOfDice.sides == 6) {
-							// calculate normal damage of d6 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 1) {
-									computed = computed+0; // Add nothing.
-								  } else if (element === 6) {
-									  computed = computed+2;
-								  } else {
-									  computed = computed+1;
-								  }
-							}
-						}
-					}
-					
-					// Get hit location message if system used.
-					getAttrs(["optionHitLocationSystem", "weaponAreaEffect02", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect02;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-											 
-					
-						if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-							var theHitLocation = new normalHitLocation(targetSelectionType);
-							theMessage = theHitLocation.message;
-							
-						} else if (areaEffectWeapon != 0) {
-							theMessage = " AoE";
-						}
-						
-						setAttrs({
-							rollDialogMessage:theMessage
-						});
-						
-						let theResult = String(computed);
-						
-						finishRoll(
-							results.rollId,
-							{
-								STUN: theResult.concat(theMessage)
-							}
-						);
-					});
-				});
-			} else {
-				// If isNormalDamage is FALSE, use the killing Damage template.
-				startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName02}}} {{OCV=[[?{Modifier|0}+@{weaponOCV02}+@{weaponOCVPenalty02}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenWeaponDamage02}]]}}", (results) => {
-					
-					let computed = parseInt(results.results.BODY.result)||0;
-					
-					setAttrs({
-						hiddenDamageRoll: computed
-					});
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
-					}
-							
-					getAttrs(["optionHitLocationSystem", "weaponStunMod02", "weaponAreaEffect02", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect02;
-						let theSTUNmodifier = parseInt(values.weaponStunMod02)||0;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-						
-						// Determine the base stun multiple, which is 1d3.	
-						let theSTUNmultiplier = Math.floor(Math.random()*3+1);
-											 
-						// If the hit location system option is used and the weapon is not of type area effect call the hit location function.
-						if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {					
-							var theHitLocation = new killingHitLocation(targetSelectionType);
-							
-							theSTUNmultiplier = theHitLocation.stunMultiplier;
-							theMessage = theHitLocation.message;
-							}
-						else if (areaEffectWeapon != 0) {
-							theMessage = " AoE";
-						}
-						
-						
-						// Add the weapon's stun modifier.
-						theSTUNmultiplier = theSTUNmultiplier + theSTUNmodifier;
-						
-						// Prevent STUN multiples of less than 1.
-						if (theSTUNmultiplier < 1) {
-							theSTUNmultiplier = 1;
-						}
-						
-						setAttrs({
-							rollDialogMessage:theMessage,
-							hiddenSTUNmultiplier:theSTUNmultiplier
-						});
-						
-						let theResult = String(computed*theSTUNmultiplier);
-						
-						finishRoll(
-							results.rollId,
-							{
-								BODY: theResult.concat(theMessage)
-							}
-						); 
-					}); 
-				});
-			}
-		});
-	});
-	
-	on('clicked:attackWeapon03', (info) => {
-		// Roll attack and damage dice for Weapon 03.
-		
-		// First determine if the weapon does normal or killing damage.
-		getAttrs(["weaponNormalDamage03", "optionAutoSubtractEND", "weaponEndurance03"], function(values) {
-			let isNormalDamage = values.weaponNormalDamage03;
-			let autoSubtractEND = values.optionAutoSubtractEND;
-			let weaponEND = parseInt(values.weaponEndurance03)||0;
-			
-			// If isNormalDamage is TRUE, use the Normal Damage template.
-			if (isNormalDamage != 0) {
-				startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle=Attacks with @{weaponName03}}} {{OCV=[[?{Modifier|0}+@{weaponOCV03}+@{weaponOCVPenalty03}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenWeaponDamage03}]]}}", (results) => {
-					
-					// Convert dice roll to equivalent BODY damage.
-					
-					let computed =0;
-					const theDice = results.results.STUN.rolls;
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
-					}
-					
-					// For each type of dice (d3 or d6) calculate BODY:
-					for(let groupOfDice of theDice) {
-						if (groupOfDice.sides == 3) {
-							// calculate normal damage of d3 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 3) {
-									computed = computed+1;
-								  } else if (element === 2) {
-									 computed = computed + Math.floor(Math.random()*2); // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
-								  } else {
-									  computed = computed+0; // Add nothing.
-								  }
-							}
-						} else if (groupOfDice.sides == 6) {
-							// calculate normal damage of d6 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 1) {
-									computed = computed+0; // Add nothing.
-								  } else if (element === 6) {
-									  computed = computed+2;
-								  } else {
-									  computed = computed+1;
-								  }
-							}
-						}
-					}
-					
-					// Get hit location message if system used.
-					getAttrs(["optionHitLocationSystem", "weaponAreaEffect03", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect03;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-											 
-					
-						if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-							var theHitLocation = new normalHitLocation(targetSelectionType);
-							theMessage = theHitLocation.message;
-							
-						} else if (areaEffectWeapon != 0) {
-							theMessage = " AoE";
-						}
-						
-						setAttrs({
-							rollDialogMessage:theMessage
-						});
-						
-						let theResult = String(computed);
-						
-						finishRoll(
-							results.rollId,
-							{
-								STUN: theResult.concat(theMessage)
-							}
-						);
-					});
-				});
-			} else {
-				// If isNormalDamage is FALSE, use the killing Damage template.
-				startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName03}}} {{OCV=[[?{Modifier|0}+@{weaponOCV03}+@{weaponOCVPenalty03}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenWeaponDamage03}]]}}", (results) => {
-					
-					let computed = parseInt(results.results.BODY.result)||0;
-					
-					setAttrs({
-						hiddenDamageRoll: computed
-					});
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
-					}
-							
-					getAttrs(["optionHitLocationSystem", "weaponStunMod03", "weaponAreaEffect03", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect03;
-						let theSTUNmodifier = parseInt(values.weaponStunMod03)||0;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-						
-						// Determine the base stun multiple, which is 1d3.	
-						let theSTUNmultiplier = Math.floor(Math.random()*3+1);
-											 
-						// If the hit location system option is used and the weapon is not of type area effect call the hit location function.
-						if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {					
-							var theHitLocation = new killingHitLocation(targetSelectionType);
-							
-							theSTUNmultiplier = theHitLocation.stunMultiplier;
-							theMessage = theHitLocation.message;
-							}
-						else if (areaEffectWeapon != 0) {
-							theMessage = " AoE";
-						}
-						
-						
-						// Add the weapon's stun modifier.
-						theSTUNmultiplier = theSTUNmultiplier + theSTUNmodifier;
-						
-						// Prevent STUN multiples of less than 1.
-						if (theSTUNmultiplier < 1) {
-							theSTUNmultiplier = 1;
-						}
-						
-						setAttrs({
-							rollDialogMessage:theMessage,
-							hiddenSTUNmultiplier:theSTUNmultiplier
-						});
-						
-						let theResult = String(computed*theSTUNmultiplier);
-						
-						finishRoll(
-							results.rollId,
-							{
-								BODY: theResult.concat(theMessage)
-							}
-						); 
-					}); 
-				});
-			}
-		});
-	});
-	
-	on('clicked:attackWeapon04', (info) => {
-		// Roll attack and damage dice for Weapon 04.
-		
-		// First determine if the weapon does normal or killing damage.
-		getAttrs(["weaponNormalDamage04", "optionAutoSubtractEND", "weaponEndurance04"], function(values) {
-			let isNormalDamage = values.weaponNormalDamage04;
-			let autoSubtractEND = values.optionAutoSubtractEND;
-			let weaponEND = parseInt(values.weaponEndurance04)||0;
-			
-			// If isNormalDamage is TRUE, use the Normal Damage template.
-			if (isNormalDamage != 0) {
-				startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle=Attacks with @{weaponName04}}} {{OCV=[[?{Modifier|0}+@{weaponOCV04}+@{weaponOCVPenalty04}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenWeaponDamage04}]]}}", (results) => {
-					
-					// Convert dice roll to equivalent BODY damage.
-					
-					let computed =0;
-					const theDice = results.results.STUN.rolls;
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
-					}
-					
-					// For each type of dice (d3 or d6) calculate BODY:
-					for(let groupOfDice of theDice) {
-						if (groupOfDice.sides == 3) {
-							// calculate normal damage of d3 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 3) {
-									computed = computed+1;
-								  } else if (element === 2) {
-									 computed = computed + Math.floor(Math.random()*2); // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
-								  } else {
-									  computed = computed+0; // Add nothing.
-								  }
-							}
-						} else if (groupOfDice.sides == 6) {
-							// calculate normal damage of d6 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 1) {
-									computed = computed+0; // Add nothing.
-								  } else if (element === 6) {
-									  computed = computed+2;
-								  } else {
-									  computed = computed+1;
-								  }
-							}
-						}
-					}
-					
-					// Get hit location message if system used.
-					getAttrs(["optionHitLocationSystem", "weaponAreaEffect04", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect04;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-											 
-					
-						if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-							var theHitLocation = new normalHitLocation(targetSelectionType);
-							theMessage = theHitLocation.message;
-							
-						} else if (areaEffectWeapon != 0) {
-							theMessage = " AoE";
-						}
-						
-						setAttrs({
-							rollDialogMessage:theMessage
-						});
-						
-						let theResult = String(computed);
-						
-						finishRoll(
-							results.rollId,
-							{
-								STUN: theResult.concat(theMessage)
-							}
-						);
-					});
-				});
-			} else {
-				// If isNormalDamage is FALSE, use the killing Damage template.
-				startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName04}}} {{OCV=[[?{Modifier|0}+@{weaponOCV04}+@{weaponOCVPenalty04}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenWeaponDamage04}]]}}", (results) => {
-					
-					let computed = parseInt(results.results.BODY.result)||0;
-					
-					setAttrs({
-						hiddenDamageRoll: computed
-					});
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
-					}
-							
-					getAttrs(["optionHitLocationSystem", "weaponStunMod04", "weaponAreaEffect04", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect04;
-						let theSTUNmodifier = parseInt(values.weaponStunMod04)||0;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-						
-						// Determine the base stun multiple, which is 1d3.	
-						let theSTUNmultiplier = Math.floor(Math.random()*3+1);
-											 
-						// If the hit location system option is used and the weapon is not of type area effect call the hit location function.
-						if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {					
-							var theHitLocation = new killingHitLocation(targetSelectionType);
-						
-							theSTUNmultiplier = theHitLocation.stunMultiplier;
-							theMessage = theHitLocation.message;
-							}
-						else if (areaEffectWeapon != 0) {
-							theMessage = " AoE";
-			}
-	
-						
-						// Add the weapon's stun modifier.
-						theSTUNmultiplier = theSTUNmultiplier + theSTUNmodifier;
-						
-						// Prevent STUN multiples of less than 1.
-						if (theSTUNmultiplier < 1) {
-							theSTUNmultiplier = 1;
-						}
-						
-			setAttrs({
-							rollDialogMessage:theMessage,
-							hiddenSTUNmultiplier:theSTUNmultiplier
-						});
-						
-						let theResult = String(computed*theSTUNmultiplier);
-						
-						finishRoll(
-							results.rollId,
-							{
-								BODY: theResult.concat(theMessage)
-							}
-						); 
-					}); 
-			});
-			}
-		});
-	});
-	
-	on('clicked:attackWeapon05', (info) => {
-		// Roll attack and damage dice for Weapon 02.
-		
-		// First determine if the weapon does normal or killing damage.
-		getAttrs(["weaponNormalDamage05", "optionAutoSubtractEND", "weaponEndurance05"], function(values) {
-			let isNormalDamage = values.weaponNormalDamage05;
-			let autoSubtractEND = values.optionAutoSubtractEND;
-			let weaponEND = parseInt(values.weaponEndurance05)||0;
+			// First determine if the weapon does normal or killing damage.
+			getAttrs(["weaponNormalDamage"+weaponId, "optionAutoSubtractEND", "weaponEndurance"+weaponId], function(values) {
+				let isNormalDamage = values["weaponNormalDamage"+weaponId];
+				let autoSubtractEND = values.optionAutoSubtractEND;
+				let weaponEND = parseInt(values["weaponEndurance"+weaponId])||0;
+				
+				// If isNormalDamage is TRUE, use the Normal Damage template.
+				if (isNormalDamage != 0) {
+					var theRoll = "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle=Attacks with @{weaponName"+weaponId+"}}} "
+							+ "{{OCV=[[?{Modifier|0}+@{weaponOCV"+weaponId+"}+@{weaponOCVPenalty"+weaponId+"}+@{ocv}]]}} "
+							+ "{{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenWeaponDamage"+weaponId+"}]]}}";
 
-			// If isNormalDamage is TRUE, use the Normal Damage template.
-			if (isNormalDamage != 0) {
-				startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle=Attacks with @{weaponName05}}} {{OCV=[[?{Modifier|0}+@{weaponOCV05}+@{weaponOCVPenalty05}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenWeaponDamage05}]]}}", (results) => {
-	
-					// Convert dice roll to equivalent BODY damage.
+					startRoll(theRoll, (results) => {
 						
-					let computed =0;
-					const theDice = results.results.STUN.rolls;
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
-					}
-					
-					// For each type of dice (d3 or d6) calculate BODY:
-					for(let groupOfDice of theDice) {
-						if (groupOfDice.sides == 3) {
-							// calculate normal damage of d3 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 3) {
-									computed = computed+1;
-								  } else if (element === 2) {
-									 computed = computed + Math.floor(Math.random()*2); // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
-								  } else {
-									  computed = computed+0; // Add nothing.
-								  }
-							}
-						} else if (groupOfDice.sides == 6) {
-							// calculate normal damage of d6 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 1) {
-									computed = computed+0; // Add nothing.
-								  } else if (element === 6) {
-									  computed = computed+2;
-								  } else {
-									  computed = computed+1;
-								  }
-							}
-					}
-					}
-					
-					// Get hit location message if system used.
-					getAttrs(["optionHitLocationSystem", "weaponAreaEffect05", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect05;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-	
+						// Convert dice roll to equivalent BODY damage.
 						
-						if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-							var theHitLocation = new normalHitLocation(targetSelectionType);
-							theMessage = theHitLocation.message;
-							
-						} else if (areaEffectWeapon != 0) {
-							theMessage = " AoE";
-						}
-	
-						setAttrs({
-							rollDialogMessage:theMessage
-						});
+						let computed =0;
+						const theDice = results.results.STUN.rolls;
 						
-						let theResult = String(computed);
-						
-						finishRoll(
-							results.rollId,
-							{
-								STUN: theResult.concat(theMessage)
-					}
-						);
-					});
-				});
-			} else {
-				// If isNormalDamage is FALSE, use the killing Damage template.
-				startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName05}}} {{OCV=[[?{Modifier|0}+@{weaponOCV05}+@{weaponOCVPenalty05}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenWeaponDamage05}]]}}", (results) => {
-						
-					let computed = parseInt(results.results.BODY.result)||0;
-					
-					setAttrs({
-						hiddenDamageRoll: computed
-					});
-	
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
-					}
-					
-							
-					getAttrs(["optionHitLocationSystem", "weaponStunMod05", "weaponAreaEffect05", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect05;
-						let theSTUNmodifier = parseInt(values.weaponStunMod05)||0;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-						
-						// Determine the base stun multiple, which is 1d3.	
-						let theSTUNmultiplier = Math.floor(Math.random()*3+1);
-											 
-						// If the hit location system option is used and the weapon is not of type area effect call the hit location function.
-						if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {					
-							var theHitLocation = new killingHitLocation(targetSelectionType);
-							
-							theSTUNmultiplier = theHitLocation.stunMultiplier;
-							theMessage = theHitLocation.message;
-							}
-						else if (areaEffectWeapon != 0) {
-							theMessage = " AoE";
+						// Subtract END cost if option checked.
+						if (autoSubtractEND != 0) {
+							subtractEndurance(weaponEND);
 						}
 						
+						// For each type of dice (d3 or d6) calculate BODY:
+						for(let groupOfDice of theDice) {
+							if (groupOfDice.sides == 3) {
+								// calculate normal damage of d3 dice.
+								for (let element of groupOfDice.results) {
+									if (element === 3) {
+										computed = computed+1;
+									} else if (element === 2) {
+										computed = computed + Math.floor(Math.random()*2); // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
+									} else {
+										computed = computed+0; // Add nothing.
+									}
+								}
+							} else if (groupOfDice.sides == 6) {
+								// calculate normal damage of d6 dice.
+								for (let element of groupOfDice.results) {
+									if (element === 1) {
+										computed = computed+0; // Add nothing.
+									} else if (element === 6) {
+										computed = computed+2;
+									} else {
+										computed = computed+1;
+									}
+								}
+							}
+						}
 						
-						// Add the weapon's stun modifier.
-						theSTUNmultiplier = theSTUNmultiplier + theSTUNmodifier;
+						// Get hit location message if system used.
+						getAttrs(["optionHitLocationSystem", "weaponAreaEffect"+weaponId, "targetSelection"], function(values) {
+							let useHitLocations = values.optionHitLocationSystem;
+							let areaEffectWeapon = values["weaponAreaEffect"+weaponId];
+							let targetSelectionType = parseInt(values.targetSelection)||1;
+							let theMessage = " ";
+												
 						
-						// Prevent STUN multiples of less than 1.
-						if (theSTUNmultiplier < 1) {
-							theSTUNmultiplier = 1;
-					}
+							if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
+								var theHitLocation = new normalHitLocation(targetSelectionType);
+								theMessage = theHitLocation.message;
+								
+							} else if (areaEffectWeapon != 0) {
+								theMessage = " AoE";
+							}
+							
+							setAttrs({
+								rollDialogMessage:theMessage
+							});
+							
+							let theResult = String(computed);
+							
+							finishRoll(
+								results.rollId,
+								{
+									STUN: theResult.concat(theMessage)
+								}
+							);
+						});
+					});
+				} else {
+					// If isNormalDamage is FALSE, use the killing Damage template.
+					var theRoll = "&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName"+weaponId+"}}} "
+							+ "{{OCV=[[?{Modifier|0}+@{weaponOCV"+weaponId+"}+@{weaponOCVPenalty"+weaponId+"}+@{ocv}]]}} "
+							+ "{{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenWeaponDamage"+weaponId+"}]]}}";
+
+					startRoll(theRoll, (results) => {
+						
+						let computed = parseInt(results.results.BODY.result)||0;
 						
 						setAttrs({
-							rollDialogMessage:theMessage,
-							hiddenSTUNmultiplier:theSTUNmultiplier
+							hiddenDamageRoll: computed
 						});
 						
-						let theResult = String(computed*theSTUNmultiplier);
-						
-						finishRoll(
-							results.rollId,
-							{
-								BODY: theResult.concat(theMessage)
+						// Subtract END cost if option checked.
+						if (autoSubtractEND != 0) {
+							subtractEndurance(weaponEND);
+						}
+								
+						getAttrs(["optionHitLocationSystem", "weaponStunMod"+weaponId, "weaponAreaEffect"+weaponId, "targetSelection"], function(values) {
+							let useHitLocations = values.optionHitLocationSystem;
+							let areaEffectWeapon = values["weaponAreaEffect"+weaponId];
+							let theSTUNmodifier = parseInt(values["weaponStunMod"+weaponId])||0;
+							let targetSelectionType = parseInt(values.targetSelection)||1;
+							let theMessage = " ";
+							
+							// Determine the base stun multiple, which is 1d3.	
+							let theSTUNmultiplier = Math.floor(Math.random()*3+1);
+												
+							// If the hit location system option is used and the weapon is not of type area effect call the hit location function.
+							if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {					
+								var theHitLocation = new killingHitLocation(targetSelectionType);
+								
+								theSTUNmultiplier = theHitLocation.stunMultiplier;
+								theMessage = theHitLocation.message;
+								}
+							else if (areaEffectWeapon != 0) {
+								theMessage = " AoE";
 							}
-						); 
-				});
+							
+							
+							// Add the weapon's stun modifier.
+							theSTUNmultiplier = theSTUNmultiplier + theSTUNmodifier;
+							
+							// Prevent STUN multiples of less than 1.
+							if (theSTUNmultiplier < 1) {
+								theSTUNmultiplier = 1;
+							}
+							
+							setAttrs({
+								rollDialogMessage:theMessage,
+								hiddenSTUNmultiplier:theSTUNmultiplier
+							});
+							
+							let theResult = String(computed*theSTUNmultiplier);
+							
+							finishRoll(
+								results.rollId,
+								{
+									BODY: theResult.concat(theMessage)
+								}
+							); 
+						}); 
+					});
+				}
 			});
-			}
 		});
 	});
 	
