@@ -8455,7 +8455,7 @@
 	arrayOf(maxWeaponNum).forEach(num => {
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
-			// Roll attack and damage dice for Weapon 01.
+			// Roll attack and damage dice for Weapon XX.
 			
 			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId,
 					"optionAutoSubtractEND", "optionHitLocationSystem", "targetSelection"], function(values) {
@@ -8466,7 +8466,7 @@
 				let targetSelectionType = parseInt(values.targetSelection)||1;
 
 				let autoSubtractEND = values.optionAutoSubtractEND;
-				let weaponEND = parseInt(values["weaponEndurance"+weaponId])||0;
+				let subtractENDAmt = parseInt(values["weaponEndurance"+weaponId])||0;
 
 				let dmgType = isNormalDamage ? "STUN" : "BODY";
 				
@@ -8511,7 +8511,7 @@
 						
 					// Subtract END cost if option checked.
 					if (autoSubtractEND != 0) {
-						subtractEndurance(weaponEND);
+						subtractEndurance(subtractENDAmt);
 					}
 
 					finishRoll(results.rollId, theResult);
@@ -8523,139 +8523,61 @@
 	on('clicked:attackShield', (info) => {
 		// Roll attack and damage dice for the shield.
 						
-		// First determine if the shield does normal or killing damage.
-		getAttrs(["shieldNormalDamage", "optionAutoSubtractEND", "shieldEndurance"], function(values) {
-			let isNormalDamage = values.shieldNormalDamage;
-			let autoSubtractEND = values.optionAutoSubtractEND;
-			let shieldEND = parseInt(values.shieldEndurance)||0;
-			
-			// If isNormalDamage is TRUE, use the Normal Damage template.
-			if (isNormalDamage != 0) {
-				startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle=Attacks with @{shieldName}}} {{OCV=[[?{Modifiers|0}-@{shieldDCV}+@{shieldOCV}+@{targetOCVpenalty}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenShieldDamage01}]]}}", (results) => {
-					
-					// Convert dice roll to equivalent BODY damage.
-					
-					let computed =0;
-					const theDice = results.results.STUN.rolls;
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(shieldEND);
-					}
-					
-					// For each type of dice (d3 or d6) calculate BODY:
-					for(let groupOfDice of theDice) {
-						if (groupOfDice.sides == 3) {
-							// calculate normal damage of d3 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 3) {
-									computed = computed+1;
-								  } else if (element === 2) {
-									 computed = computed + Math.floor(Math.random()*2); // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
-								  } else {
-									  computed = computed+0; // Add nothing.
-								  }
-							}
-						} else if (groupOfDice.sides == 6) {
-							// calculate normal damage of d6 dice.
-							for (let element of groupOfDice.results) {
-								  if (element === 1) {
-									computed = computed+0; // Add nothing.
-								  } else if (element === 6) {
-									  computed = computed+2;
-								  } else {
-									  computed = computed+1;
-								  }
-							}
-						}
-					}
+		getAttrs(["shieldNormalDamage", "shieldStunMod", "shieldEndurance",
+				"optionAutoSubtractEND", "optionHitLocationSystem", "targetSelection"], function(values) {
+			let useHitLocations = values.optionHitLocationSystem != 0;
+			let isNormalDamage = values.shieldNormalDamage != 0;
+			let stunMod = parseInt(values.shieldStunMod)||0;
+			let targetSelectionType = parseInt(values.targetSelection)||1;
 
-					// Get hit location message if system used.
-					getAttrs(["optionHitLocationSystem", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-				let theMessage = "";
-	
-						
-						if (useHitLocations != 0) {
-							var theHitLocation = new normalHitLocation(targetSelectionType);
-							theMessage = theHitLocation.message;
-	
+			let autoSubtractEND = values.optionAutoSubtractEND;
+			let subtractENDAmt = parseInt(values.shieldEndurance)||0;
+
+			let dmgType = isNormalDamage ? "STUN" : "BODY";
+
+			// If isNormalDamage is TRUE, use the Normal Damage template.
+			var theRoll = "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
+					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}}} "
+					+ "{{OCV=[[?{Modifier|0}-@{shieldDCV}+@{shieldOCV}+@{targetOCVpenalty}+@{ocv}]]}} "
+					+ "{{Result=[[3d6cf<0cs>0]]}} "
+					+ "{{"+dmgType+"=[[@{hiddenShieldDamage01}]]}}";
+
+			startRoll(theRoll, (results) => {
+				let theMessage = " ";
+				let theSTUNMultiplier = isNormalDamage ? 1 : Math.floor(Math.random()*3+1);
+				let computed = parseInt(results.results[dmgType].result)||0;
+
+				// Get hit location message if system used.
+				if (useHitLocations) {
+					var theHitLocation = isNormalDamage ? normalHitLocation(targetSelectionType) : killingHitLocation(targetSelectionType);
+					theMessage = theHitLocation.message;
+					if (!isNormalDamage)
+					theSTUNMultiplier = theHitLocation.stunMultiplier;
 				}
-						
-						setAttrs({
-							rollDialogMessage:theMessage
-						});
-	
-						let theResult = String(computed);
-						
-						finishRoll(
-							results.rollId,
-							{
-								STUN: theResult.concat(theMessage)
-					}
-						);
-					});
+
+				// Convert dice roll to equivalent BODY damage.
+				if (isNormalDamage) {
+					computed = convertStunToBody(results.results.STUN.rolls);
+				} else {
+					theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
+					computed *= theSTUNMultiplier;
+				}
+
+				setAttrs({
+					rollDialogMessage:theMessage,
+					hiddenSTUNmultiplier:theSTUNMultiplier
 				});
-			} else {
-				// If isNormalDamage is FALSE, use the killing Damage template.
-				startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{shieldName}}} {{OCV=[[?{Modifiers|0}-@{shieldDCV}+@{shieldOCV}+@{targetOCVpenalty}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenShieldDamage01}]]}}", (results) => {
-						
-					let computed = parseInt(results.results.BODY.result)||0;
+
+				let theResult = new Object();
+				theResult[dmgType] = String(computed).concat(theMessage);
 					
-					setAttrs({
-						hiddenDamageRoll: computed
-					});
-					
-					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
-						subtractEndurance(shieldEND);
-					}
-					
-							
-					getAttrs(["optionHitLocationSystem", "shieldStunMod", "targetSelection"], function(values) {
-						let useHitLocations = values.optionHitLocationSystem;
-						let areaEffectWeapon = values.weaponAreaEffect05;
-						let theSTUNmodifier = parseInt(values.shieldStunMod)||0;
-						let targetSelectionType = parseInt(values.targetSelection)||1;
-						let theMessage = " ";
-						
-						// Determine the base stun multiple, which is 1d3.	
-						let theSTUNmultiplier = Math.floor(Math.random()*3+1);
-											 
-						// If the hit location system option is used and the weapon is not of type area effect call the hit location function.
-						if (useHitLocations != 0){					
-							var theHitLocation = new killingHitLocation(targetSelectionType);
-							
-							theSTUNmultiplier = theHitLocation.stunMultiplier;
-							theMessage = theHitLocation.message;
+				// Subtract END cost if option checked.
+				if (autoSubtractEND != 0) {
+					subtractEndurance(subtractENDAmt);
 				}
-	
-						
-						// Add the weapon's stun modifier.
-						theSTUNmultiplier = theSTUNmultiplier + theSTUNmodifier;
-						
-						// Prevent STUN multiples of less than 1.
-						if (theSTUNmultiplier < 1) {
-							theSTUNmultiplier = 1;
-				}
-						
-						setAttrs({
-							rollDialogMessage:theMessage,
-							hiddenSTUNmultiplier:theSTUNmultiplier
-						});
-						
-						let theResult = String(computed*theSTUNmultiplier);
-						
-						finishRoll(
-							results.rollId,
-							{
-								BODY: theResult.concat(theMessage)
-							}
-						); 
-					}); 
-			});
-			}
+
+				finishRoll(results.rollId, theResult);
+			});				
 		});
 	});
 	
