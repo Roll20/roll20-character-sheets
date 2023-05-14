@@ -8501,11 +8501,6 @@
 						computed *= theSTUNMultiplier;
 					}
 
-					setAttrs({
-						rollDialogMessage:theMessage,
-						hiddenSTUNmultiplier:theSTUNMultiplier
-					});
-
 					let theResult = new Object();
 					theResult[dmgType] = String(computed).concat(theMessage);
 						
@@ -8563,11 +8558,6 @@
 					computed *= theSTUNMultiplier;
 				}
 
-				setAttrs({
-					rollDialogMessage:theMessage,
-					hiddenSTUNmultiplier:theSTUNMultiplier
-				});
-
 				let theResult = new Object();
 				theResult[dmgType] = String(computed).concat(theMessage);
 					
@@ -8582,67 +8572,44 @@
 	});
 	
 	on('clicked:standardAttackRoll', (info) => {
-		startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with Strength @{strength}}} {{OCV=[[?{Modifiers|0}+@{ocv}+@{targetOCVpenalty}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenManeuverDamage01}]]}}", (results) => {
-			// A standard strength-based attack is complicated by the need to use a 1d3 for strength%5 == 3 or 4, such as 4, 8, 13, 19, etc.
+		// Roll attack and damage dice for standardAttack
 
-			getAttrs(["optionHitLocationSystem", "targetSelection", "strength", "optionAutoSubtractEND", "hiddenBasicEndurance"], function(values) {
-				let useHitLocations = values.optionHitLocationSystem;
-				let autoSubtractEND = values.optionAutoSubtractEND;
-				let targetSelectionType = parseInt(values.targetSelection)||1;
+		getAttrs(["hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "targetSelection"], function(values) {
+			let useHitLocations = values.optionHitLocationSystem != 0;
+			let targetSelectionType = parseInt(values.targetSelection)||1;
+
+			let autoSubtractEND = values.optionAutoSubtractEND;
+			let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
+
+			let dmgType = "STUN";
+
+			// If isNormalDamage is TRUE, use the Normal Damage template.
+			var theRoll = "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} "
+					+ "{{subtitle= Attacks with Strength @{strength}}} "
+					+ "{{OCV=[[?{Modifier|0}+@{targetOCVpenalty}+@{ocv}]]}} "
+					+ "{{Result=[[3d6cf<0cs>0]]}} "
+					+ "{{"+dmgType+"=[[@{hiddenManeuverDamage01}]]}}";
+
+			startRoll(theRoll, (results) => {
 				let theMessage = " ";
-				let computed =0;
-				const theDiceD6 = results.results.STUN.dice;
-				
+				let computed = convertStunToBody(results.results[dmgType].rolls);
+
+				// Get hit location message if system used.
+				if (useHitLocations) {
+					var theHitLocation = normalHitLocation(targetSelectionType);
+					theMessage = theHitLocation.message;
+				}
+
+				let theResult = new Object();
+				theResult[dmgType] = String(computed).concat(theMessage);
+					
 				// Subtract END cost if option checked.
 				if (autoSubtractEND != 0) {
-					subtractEndurance(values.hiddenBasicEndurance)||0;
+					subtractEndurance(subtractENDAmt);
 				}
-				
-				// Determine BODY damage of d3 dice.
-				if (parseInt(values.strength)%5>2) {
-					// Get the last die value, which was rolled with a d3.
-					let theDiceD3 = theDiceD6.pop(); // Take the d3 off of the array.
-					
-					if (theDiceD3 == 3) {
-						computed = computed+1;
-					} else if (theDiceD3 == 2) {
-						computed = computed + Math.floor(Math.random()*2); // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
-					} else {
-						computed = computed+0; // Add nothing.
-					}
-				} 
-				
-				// Calculate BODY damage of d6 dice.
-				for (let element of theDiceD6) {
-					if (element === 1) {
-						computed = computed+0; // Add nothing.
-					} else if (element === 6) {
-						computed = computed+2;
-					} else {
-						computed = computed+1;
-					}
-				}
-	
-				// Get hit location message if system used.
-				if (useHitLocations != 0) {
-					var theHitLocation = new normalHitLocation(targetSelectionType);
-					theMessage = theHitLocation.message;
-					
-				}
-						
-				setAttrs({
-					rollDialogMessage:theMessage
-				});
-				
-				let theResult = String(computed);
-	
-				finishRoll(
-					results.rollId,
-					{
-						STUN: theResult.concat(theMessage)
-				}
-				);
-			});
+
+				finishRoll(results.rollId, theResult);
+			});					
 		});
 	});
 	
