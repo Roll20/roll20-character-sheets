@@ -8274,8 +8274,8 @@
 			// If isNormalDamage is TRUE, use the Normal Damage template.
 			var theRoll = "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
 					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}}} "
-					+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-@{targetOCVpenalty}[TargetOCV]-@{shieldDCV}[Shield DCV]+?{Modifiers|0}[Modifier]]]}} "
-					+ (subtractENDAmt ? "{{END=[[@{shieldEndurance}]] (@{currentEND})}} " : "")
+					+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-[[abs(?{Blocking|Yes,1|No,-1}-1)/2*@{targetOCVpenalty}]][TargetOCV]+[[?{Blocking}*@{shieldDCV}]][ShieldDCV]+?{Modifiers|0}[Modifier]]]}} "
+					+ (subtractENDAmt ? "{{END=[[[[abs(?{Blocking}-1)/2]][Blocking]*@{shieldEndurance}[Endurance Cost]]] (@{currentEND})}} " : "")
 					+ "{{"+dmgType+"=[[@{hiddenShieldDamage01}]]}} "
 					+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 			if (useHitLocations)
@@ -8286,8 +8286,12 @@
 				let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 				let computed = parseInt(results.results[dmgType].result)||0;
 
+				// Little hacky get whether or not the person is blocking.
+				let regex = /\+(-?\d+)\[ShieldDCV\]/g
+				let isBlocking = parseInt(regex.exec(results.results["Hit DCV"].expression)) > 0;
+
 				// Get hit location message if system used.
-				if (useHitLocations) {
+				if (useHitLocations && !isBlocking) {
 					var theHitLocation = hitLocationDetails(results.results.HITLOC.result);
 					theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
 					theSTUNMultiplier = theHitLocation.STUNx;
@@ -8305,11 +8309,18 @@
 				}
 
 				let theResult = new Object();
-				theResult[otherDmgType] = computed;
-				theResult.HITLOC = theMessage;
+
+				if (!isBlocking) {
+					theResult[otherDmgType] = computed;
+					theResult.HITLOC = theMessage;
+				} else {
+					theResult.STUN = "BLOCK";
+					theResult.BODY = "BLOCK";
+					theResult.HITLOC = "vs. OCV";
+				}
 					
 				// Subtract END cost if option checked.
-				if (values.optionAutoSubtractEND != 0) {
+				if (!isBlocking && values.optionAutoSubtractEND != 0) {
 					subtractEndurance(subtractENDAmt);
 				}
 
