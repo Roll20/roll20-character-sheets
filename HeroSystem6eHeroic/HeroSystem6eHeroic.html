@@ -612,7 +612,7 @@
 				</div>
 				
 				<input type="hidden" name="attr_targetOCVpenalty" value="0"/>
-				<input type="hidden" name="attr_targetHitRoll" value="3d6"/>
+				<input type="hidden" name="attr_targetHitRoll" value="3d6cs0cf0"/>
 				
 				<div class="subitem-tab-gear-flex-container-shield-row">
 					<input type="text" name="attr_shieldName" title="@{shieldName}" value="" maxlength="20" tabindex="76"/>
@@ -652,8 +652,6 @@
 			</div>
 			
 			<!-- Weapon 01 -->
-			<input type="hidden" name="attr_weaponOCVPenalty01" value="0"/>
-			
 			<div class="subitem-tab-gear-flex-container-weapon-row">
 				<input type="text" name="attr_weaponName01" title="@{weaponName01}" value="" maxlength="20" tabindex="86"/>
 				<input type="text" name="attr_weaponDamage01" title="@{weaponDamage01}" value="0" maxlength="16" tabindex="87"/>
@@ -677,8 +675,6 @@
 			</div>
 			
 			<!-- Weapon 02 -->
-			<input type="hidden" name="attr_weaponOCVPenalty02" value="0"/>
-			
 			<div class="subitem-tab-gear-flex-container-weapon-row">
 				<input type="text" name="attr_weaponName02" title="@{weaponName02}" value="" maxlength="20" tabindex="95"/>
 				<input type="text" name="attr_weaponDamage02" title="@{weaponDamage02}" value="0" maxlength="16" tabindex="96"/>
@@ -702,8 +698,6 @@
 			</div>
 			
 			<!-- Weapon 03 -->
-			<input type="hidden" name="attr_weaponOCVPenalty03" value="0"/>
-			
 			<div class="subitem-tab-gear-flex-container-weapon-row">
 				<input type="text" name="attr_weaponName03" title="@{weaponName03}" value="" maxlength="20" tabindex="104"/>
 				<input type="text" name="attr_weaponDamage03" title="@{weaponDamage03}" value="0" maxlength="16" tabindex="105"/>
@@ -727,8 +721,6 @@
 			</div>
 			
 			<!-- Weapon 04 -->
-			<input type="hidden" name="attr_weaponOCVPenalty04" value="0"/>
-			
 			<div class="subitem-tab-gear-flex-container-weapon-row">
 				<input type="text" name="attr_weaponName04" title="@{weaponName04}" value="" maxlength="20" tabindex="113"/>
 				<input type="text" name="attr_weaponDamage04" title="@{weaponDamage04}" value="0" maxlength="16" tabindex="114"/>
@@ -752,8 +744,6 @@
 			</div>
 			
 			<!-- Weapon 05 -->
-			<input type="hidden" name="attr_weaponOCVPenalty05" value="0"/>
-			
 			<div class="subitem-tab-gear-flex-container-weapon-row">
 				<input type="text" name="attr_weaponName05" title="@{weaponName05}" vvalue="" maxlength="20" tabindex="122"/>
 				<input type="text" name="attr_weaponDamage05" title="@{weaponDamage05}" value="0" maxlength="16" tabindex="123"/>
@@ -5601,14 +5591,18 @@
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
 			</div>
 			<div class="sheet-content">
-				{{#allprops() title subtitle desc color}}
+				{{#allprops() title subtitle desc color HITLOC}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color}}
+				{{/allprops() title subtitle desc color HITLOC}}
 				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 				<!-- Computed result inserted as final row -->
 				<div class="sheet-key">BODY</div>
 				<div class="sheet-value">{{computed::STUN}}</div>
+				{{#HITLOC}}
+				<div class="sheet-key">Hit Location</div>
+				<div class="sheet-value">{{computed::HITLOC}}</div>
+				{{/HITLOC}}
 			</div>
 		</div>
 	</div>
@@ -5623,14 +5617,18 @@
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
 			</div>
 			<div class="sheet-content">
-				{{#allprops() title subtitle desc color}}
+				{{#allprops() title subtitle desc color HITLOC}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color}}
+				{{/allprops() title subtitle desc color HITLOC}}
 				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 				<!-- Computed result inserted as final row -->
 				<div class="sheet-key">STUN</div>
 				<div class="sheet-value">{{computed::BODY}}</div>
+				{{#HITLOC}}
+				<div class="sheet-key">Hit Location</div>
+				<div class="sheet-value">{{computed::HITLOC}}</div>
+				{{/HITLOC}}
 			</div>
 		</div>
 	</div>
@@ -7977,82 +7975,12 @@
 	/* --- Weapon Attacks and Hit Location Helpers  --- */
 	/* ------------------------------------------------ */
 
-	arrayOf(maxWeaponNum).forEach(num => {
-		var weaponId = String(num).padStart(2,'0');
-		on("change:optionHitLocationSystem change:targetSelection change:weaponAreaEffect"+weaponId+" change:halveTargetOCVpenalty change:penaltySkillLevels", function () {
-			getAttrs(["optionHitLocationSystem","targetSelection","weaponAreaEffect"+weaponId,"halveTargetOCVpenalty","penaltySkillLevels"], function(values) {
-
-				let penalty = 0;
-				let useHitLocations = values.optionHitLocationSystem;
-				let areaEffectWeapon = values["weaponAreaEffect"+weaponId];
-				let targetSelectionType = parseInt(values.targetSelection)||1;
-				let halveTargetPenalty = values.halveTargetOCVpenalty;
-				let penaltySkillLevels = parseInt(values.penaltySkillLevels)||0;
-				  
-				// For some reason I couldn't get this switch function work in an independent function. Will have to suffer with the extra space needed.
-				if ((useHitLocations != 0) && (areaEffectWeapon == 0)) {
-					switch (targetSelectionType) {
-						case 1:		penalty = 0;
-									break;
-						case 2:     penalty = -8;
-									break;
-						case 3:     penalty = -6;
-									break;
-						case 4:     penalty = -5;
-									break;
-						case 5:     penalty = -5;
-									break;
-						case 6:     penalty = -3;
-									break;
-						case 7:     penalty = -7;
-									break;
-						case 8:     penalty = -8;
-									break;
-						case 9:     penalty = -4;
-									break;
-						case 10:    penalty = -6;
-									break;
-						case 11:    penalty = -8;
-									break;
-						case 12:    penalty = -4;
-									break;
-						case 13:    penalty = -2;
-									break;
-						case 14:    penalty = -1;
-									break;
-						case 15:    penalty = -2;
-									break;
-						case 16:	penalty = -4;
-									break;
-						default:	penalty = 0;
-					};
-					
-					if (halveTargetPenalty != 0) {
-						penalty = heroRoundHigh(penalty/2);
-					}
-						
-					// Apply penalty skill levels.
-					penalty = penalty+penaltySkillLevels;
-								
-					// The net penaly cannot be positive.
-					if (penalty>0) {
-						penalty=0;
-					}
-				}
-							
-				// Update OCV penalty for weaponXX
-				var attributes = new Object();
-				attributes["weaponOCVPenalty"+weaponId] = penalty;
-				setAttrs(attributes); 
-			});
-		});
-	});
-
-	// Update targetOCVpenalty. No area of effect complication. Used for shield and basic attacks.
+	// Update targetOCVpenalty.
 	on("change:optionHitLocationSystem change:targetSelection change:halveTargetOCVpenalty change:penaltySkillLevels", function () {
 		getAttrs(["optionHitLocationSystem","targetSelection","halveTargetOCVpenalty","penaltySkillLevels"], function(values) {
 		  
 			let penalty = 0;
+			let targetString = "3d6cs0cf0";
 			let useHitLocations = values.optionHitLocationSystem;
 			let targetSelectionType = parseInt(values.targetSelection)||1;
 			let halveTargetPenalty = values.halveTargetOCVpenalty;
@@ -8062,35 +7990,50 @@
 				switch (targetSelectionType) {
 					case 1:		penalty = 0;
 								break;
-					case 2:     penalty = -8;
+					case 2:		penalty = -8;
+								targetString = "1d3cs0cf0+2";
 								break;
 					case 3:     penalty = -6;
+								targetString = "6";
 								break;
 					case 4:     penalty = -5;
+								targetString = "1d2cs0cf0+6";
 								break;
 					case 5:     penalty = -5;
+								targetString = "9";
 								break;
 					case 6:     penalty = -3;
+								targetString = "1d2cs0cf0+9";
 								break;
 					case 7:     penalty = -7;
+								targetString = "12";
 								break;
 					case 8:     penalty = -8;
+								targetString = "13";
 								break;
 					case 9:     penalty = -4;
+								targetString = "14";
 								break;
 					case 10:    penalty = -6;
+								targetString = "1d2cs0cf0+14";
 								break;
 					case 11:    penalty = -8;
+								targetString = "1d2cs0cf0+16";
 								break;
 					case 12:    penalty = -4;
+								targetString = "1d6cs0cf0+3";
 								break;
 					case 13:    penalty = -2;
+								targetString = "2d6cs0cf0+1";
 								break;
 					case 14:    penalty = -1;
+								targetString = "2d6cs0cf0+4";
 								break;
 					case 15:    penalty = -2;
+								targetString = "2d6cs0cf0+7";
 								break;
 					case 16:	penalty = -4;
+								targetString = "1d6cs0cf0+12";
 								break;
 					default:	penalty = 0;
 				};
@@ -8100,272 +8043,119 @@
 				}
 				
 				// Apply penalty skill levels.
-				penalty = penalty+penaltySkillLevels;
-				
-				// The net penaly cannot be positive.
-				if (penalty>0) {
-					penalty=0;
-				}
+				penalty = Math.min(0,penalty+penaltySkillLevels);
 			}
 			
 			// Update OCV penalty for the shield		
 			setAttrs({
-				"targetOCVpenalty":penalty
+				"targetOCVpenalty": penalty,
+				"targetHitRoll": targetString
 			});
 		});
 	});
 	
-	function killingHitLocation(targetSelection) {
-		// Used to determine hit location message and stun multiplier of Killing Attacks.
-		
-		var theHitLocation = new Object();
-		
-		// From the targeting selection determine the target roll:
-		
-		switch (targetSelection) {
-			//Standard attack.
-			case 1:		theHitLocation.roll = Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1);
-						break;
-					
-			// Head (3-5)
-			case 2:		theHitLocation.roll = Math.floor(Math.random()*3+1)+2;
-						break;
-					
-			// Hands (6)
-			case 3:		theHitLocation.roll = 6;
-						break;
-					
-			// Arms (7-8)
-			case 4:		theHitLocation.roll = Math.floor(Math.random()*2+1)+6;
-						break;
-					
-			// Shoulders (9)
-			case 5:		theHitLocation.roll = 9;
-						break;
-					
-			// Shoulders (10-11)
-			case 6:		theHitLocation.roll = Math.floor(Math.random()*2+1)+9;
-						break;
-					
-			// Stomach (12)
-			case 7:		theHitLocation.roll = 12;
-						break;
-					
-			// Vitals (13)
-			case 8:		theHitLocation.roll = 13;
-						break;
-					
-			// Thighs (14)
-			case 9:		theHitLocation.roll = 14;
-						break;
-					
-			// Legs (15-16)
-			case 10:	theHitLocation.roll = Math.floor(Math.random()*2+1)+14;
-						break;
-						
-			// Feet (17-18)
-			case 11:	theHitLocation.roll = Math.floor(Math.random()*2+1)+16;
-						break;
-						
-			// Head Shot (1d6+3)
-			case 12:	theHitLocation.roll = Math.floor(Math.random()*6+1)+3;
-						break;
-						
-			// High Shot (2d6+1)
-			case 13:	theHitLocation.roll = Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1)+1;
-						break;
-						
-			// Body Shot (2d6+4)
-			case 14:	theHitLocation.roll = Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1)+4;
-						break;
-						
-			// Low Shot (2d6+7)
-			case 15:	theHitLocation.roll = Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1)+7;
-						break;
-						
-			// Leg Shot (1d6+12)
-			case 16:	theHitLocation.roll = Math.floor(Math.random()*6+1)+12;
-						break;
-						
-			// Default 3d6
-			default:	theHitLocation.roll = Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1);
-		}
-		
+	function hitLocationDetails(hitLocation) {
+		// Used to get information about a hit location.
+		let theMessage = "Chest";
+		let STUNx = 1;
+		let NSTUN = 1;
+		let BODYx = 1;
+				
 		// Determine target location and stun multiplier.
-		switch (theHitLocation.roll) {
-			case 3: theMessage = ": Head(3) BODYx2";
-					theSTUNmultiplier = 5;
-					break;
-			case 4: theMessage = ": Head(4) BODYx2";
-					theSTUNmultiplier = 5;
-					break;
-			case 5: theMessage = ": Head(5) BODYx2";
-					theSTUNmultiplier = 5;
-					break;
-			case 6: theMessage = ": Hands(6) BODY/2";
-					theSTUNmultiplier = 1;
-					break;
-			case 7: theMessage = ": Arms(7) BODY/2";
-					theSTUNmultiplier = 1;
-					break;
-			case 8: theMessage = ": Arms(8) BODY/2";
-					theSTUNmultiplier = 2;
-					break;
-			case 9: theMessage = ": Shoulders(9) BODYx1";
-					theSTUNmultiplier = 3;
-					break;
-			case 10: theMessage = ": Chest(10) BODYx1";
-					theSTUNmultiplier = 3;
-					break;
-			case 11: theMessage = ": Chest(11) BODYx1";
-					theSTUNmultiplier = 3;
-					break;
-			case 12: theMessage = ": Stomach(12) BODYx1";
-					theSTUNmultiplier = 4;
-					break;
-			case 13: theMessage = ": Vitals(13) BODYx2";
-					theSTUNmultiplier = 4;
-					break;
-			case 14: theMessage = ": Thighs(14) BODYx1";
-					theSTUNmultiplier = 2;
-					break;
-			case 15: theMessage = ": Legs(15) BODY/2";
-					theSTUNmultiplier = 2;
-					break;
-			case 16: theMessage = ": Legs(16) BODY/2";
-					theSTUNmultiplier = 2;
-					break;
-			case 17: theMessage = ": Feet(17) BODY/2";
-					theSTUNmultiplier = 1;
-					break;
-			case 18: theMessage = ": Feet(18) BODY/2";
-					theSTUNmultiplier = 1;
-					break;
-			default: theMessage = ": Feet(18) BODY/2";
-					theSTUNmultiplier = 1;
+		switch (hitLocation) {
+			case 3:
+			case 4:
+			case 5:
+				theMessage = "Head";
+				STUNx = 5;
+				NSTUN = 2;
+				BODYx = 2;
+				break;
+			case 6:
+				theMessage = "Hands";
+				STUNx = 1;
+				NSTUN = 1/2;
+				BODYx = 1/2;
+				break;
+			case 7:
+			case 8:
+				theMessage = "Arms";
+				STUNx = 2;
+				NSTUN = 1/2;
+				BODYx = 1/2;
+				break;
+			case 9:
+				theMessage = "Shoulders";
+				STUNx = 3;
+				NSTUN = 1;
+				BODYx = 1;
+				break;
+			case 10:
+			case 11:
+				theMessage = "Chest";
+				STUNx = 3;
+				NSTUN = 1;
+				BODYx = 1;
+				break;
+			case 12:
+				theMessage = "Stomach";
+				STUNx = 4;
+				NSTUN = 3/2;
+				BODYx = 1;
+				break;
+			case 13:
+				theMessage = "Vitals";
+				STUNx = 4;
+				NSTUN = 3/2;
+				BODYx = 2;
+				break;
+			case 14:
+				theMessage = "Thighs";
+				STUNx = 2;
+				NSTUN = 1;
+				BODYx = 1;
+				break;
+			case 15:
+			case 16:
+				theMessage = "Legs";
+				STUNx = 2;
+				NSTUN = 1/2;
+				BODYx = 1/2;
+				break;
+			case 17:
+			case 18:
+				theMessage = "Feet";
+				STUNx = 1;
+				NSTUN = 1/2;
+				BODYx = 1/2;
+				break;
 		}
 		
-		theHitLocation.stunMultiplier=theSTUNmultiplier;
-		theHitLocation.message=theMessage; 
-		
-		return theHitLocation;
-	}
-	
-	function normalHitLocation(targetSelection) {
-		// Used to determine hit location message of normal attacks.
-		
-		var theHitLocation = new Object();
-		
-		// From the targeting selection determine the target roll:
-		
-		switch (targetSelection) {
-			//Standard attack.
-			case 1:		theHitLocation.roll = Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1);
-						break;
-					
-			// Head (3-5)
-			case 2:		theHitLocation.roll = Math.floor(Math.random()*3+1)+2;
-						break;
-					
-			// Hands (6)
-			case 3:		theHitLocation.roll = 6;
-						break;
-					
-			// Arms (7-8)
-			case 4:		theHitLocation.roll = Math.floor(Math.random()*2+1)+6;
-						break;
-					
-			// Shoulders (9)
-			case 5:		theHitLocation.roll = 9;
-						break;
-					
-			// Shoulders (10-11)
-			case 6:		theHitLocation.roll = Math.floor(Math.random()*2+1)+9;
-						break;
-					
-			// Stomach (12)
-			case 7:		theHitLocation.roll = 12;
-						break;
-					
-			// Vitals (13)
-			case 8:		theHitLocation.roll = 13;
-						break;
-					
-			// Thighs (14)
-			case 9:		theHitLocation.roll = 14;
-						break;
-					
-			// Legs (15-16)
-			case 10:	theHitLocation.roll = Math.floor(Math.random()*2+1)+14;
-						break;
-						
-			// Feet (17-18)
-			case 11:	theHitLocation.roll = Math.floor(Math.random()*2+1)+16;
-						break;
-						
-			// Head Shot (1d6+3)
-			case 12:	theHitLocation.roll = Math.floor(Math.random()*6+1)+3;
-						break;
-						
-			// High Shot (2d6+1)
-			case 13:	theHitLocation.roll = Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1)+1;
-						break;
-						
-			// Body Shot (2d6+4)
-			case 14:	theHitLocation.roll = Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1)+4;
-						break;
-						
-			// Low Shot (2d6+7)
-			case 15:	theHitLocation.roll = Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1)+7;
-						break;
-						
-			// Leg Shot (1d6+12)
-			case 16:	theHitLocation.roll = Math.floor(Math.random()*6+1)+12;
-						break;
-						
-			// Default 3d6
-			default:	theHitLocation.roll = Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1)+Math.floor(Math.random()*6+1);
+		normalMessage = hitLocation + ": " + theMessage;
+		killMessage = normalMessage;
+
+		// This is left out, because it's included in the calculations...
+		if (STUNx != 1) {
+			killMessage += "";
+			// killMessage += " x" + STUNx + "STUN*";
 		}
-		
-		// Determine target location and stun multiplier.
-		switch (theHitLocation.roll) {
-			case 3: theMessage = ": Head(3) Sx2 Bx2";
-					break;
-			case 4: theMessage = ": Head(4) Sx2 Bx2";
-					break;
-			case 5: theMessage = ": Head(5) Sx2 Bx2";
-					break;
-			case 6: theMessage = ": Hands(6) S/2 B/2";
-					break;
-			case 7: theMessage = ": Arms(7) S/2 B/2";
-					break;
-			case 8: theMessage = ": Arms(8) S/2 B/2";
-					break;
-			case 9: theMessage = ": Shoulders(9) Sx1 Bx1";
-					break;
-			case 10: theMessage = ": Chest(10) Sx1 Bx1";
-					break;
-			case 11: theMessage = ": Chest(11) Sx1 Bx1";
-					break;
-			case 12: theMessage = ": Stomach(12) 3S/2 Bx1";
-					break;
-			case 13: theMessage = ": Vitals(13) 3S/2 Bx2";
-					break;
-			case 14: theMessage = ": Thighs(14) Sx1 Bx1";
-					break;
-			case 15: theMessage = ": Legs(15) S/2 B/2";
-					break;
-			case 16: theMessage = ": Legs(16) S/2 B/2";
-					break;
-			case 17: theMessage = ": Feet(17) S/2 B/2";
-					break;
-			case 18: theMessage = ": Feet(18) S/2 B/2";
-					break;
-			default: theMessage = ": No Location";
+		if (NSTUN != 1) {
+			normalMessage += " x" + NSTUN + "STUN";
 		}
-		
-		theHitLocation.message=theMessage; 
-		
+		if (BODYx != 1) {
+			normalMessage += " x" + BODYx + "BODY";
+			killMessage += " x" + BODYx + "BODY";
+		}
+
+		var theHitLocation = {
+			normalMessage: normalMessage,
+			killMessage: killMessage,
+			roll: hitLocation,
+			STUNx: STUNx,
+			NSTUN: NSTUN,
+			BODYx: BODYx
+		};
+					
 		return theHitLocation;
 	}
 	
@@ -8458,12 +8248,11 @@
 			// Roll attack and damage dice for Weapon XX.
 			
 			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId,
-					"optionAutoSubtractEND", "optionHitLocationSystem", "targetSelection"], function(values) {
+					"optionAutoSubtractEND", "optionHitLocationSystem"], function(values) {
 				let areaOfEffect = values["weaponAreaEffect"+weaponId] != 0;
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["weaponNormalDamage"+weaponId] != 0;
 				let stunMod = parseInt(values["weaponStunMod"+weaponId])||0;
-				let targetSelectionType = parseInt(values.targetSelection)||1;
 
 				let autoSubtractEND = values.optionAutoSubtractEND;
 				let subtractENDAmt = parseInt(values["weaponEndurance"+weaponId])||0;
@@ -8473,28 +8262,27 @@
 				// If isNormalDamage is TRUE, use the Normal Damage template.
 				var theRoll = "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
 						+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{weaponName"+weaponId+"}}} "
-						+ "{{OCV=[[?{Modifier|0}+@{weaponOCV"+weaponId+"}+@{weaponOCVPenalty"+weaponId+"}+@{ocv}]]}} "
+						+ "{{OCV=[[?{Modifier|0}+@{weaponOCV"+weaponId+"}+[["+(areaOfEffect ? 0 : 1)+"@{targetOCVPenalty}]]+@{ocv}]]}} "
 						+ "{{Result=[[3d6cf<0cs>0]]}} "
 						+ "{{"+dmgType+"=[[@{hiddenWeaponDamage"+weaponId+"}]]}}";
-
-
+				if (useHitLocations)
+					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
+	
 				startRoll(theRoll, (results) => {
-					let theMessage = " ";
-					let theSTUNMultiplier = isNormalDamage ? 1 : Math.floor(Math.random()*3+1);
 					let computed = parseInt(results.results[dmgType].result)||0;
+					let theMessage = "AOE";
+					let theSTUNMultiplier = Math.floor(Math.random()*3+1);
+
 
 					// Get hit location message if system used.
 					if (useHitLocations && !areaOfEffect) {
-						var theHitLocation = isNormalDamage ? normalHitLocation(targetSelectionType) : killingHitLocation(targetSelectionType);
-						theMessage = theHitLocation.message;
-						if (!isNormalDamage)
-						theSTUNMultiplier = theHitLocation.stunMultiplier;
-					} else if (useHitLocations && areaOfEffect) {
-						theMessage = " AoE";
+						let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
+						theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
+						theSTUNMultipler = theHitLocation.STUNx;
 					}
 
-					// Convert dice roll to equivalent BODY damage.
 					if (isNormalDamage) {
+						// Convert dice roll to equivalent BODY damage.
 						computed = convertStunToBody(results.results.STUN.rolls);
 					} else {
 						theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
@@ -8502,7 +8290,8 @@
 					}
 
 					let theResult = new Object();
-					theResult[dmgType] = String(computed).concat(theMessage);
+					theResult[dmgType] = computed;
+					theResult.HITLOC = theMessage;
 						
 					// Subtract END cost if option checked.
 					if (autoSubtractEND != 0) {
@@ -8519,11 +8308,10 @@
 		// Roll attack and damage dice for the shield.
 						
 		getAttrs(["shieldNormalDamage", "shieldStunMod", "shieldEndurance",
-				"optionAutoSubtractEND", "optionHitLocationSystem", "targetSelection"], function(values) {
+				"optionAutoSubtractEND", "optionHitLocationSystem"], function(values) {
 			let useHitLocations = values.optionHitLocationSystem != 0;
 			let isNormalDamage = values.shieldNormalDamage != 0;
 			let stunMod = parseInt(values.shieldStunMod)||0;
-			let targetSelectionType = parseInt(values.targetSelection)||1;
 
 			let autoSubtractEND = values.optionAutoSubtractEND;
 			let subtractENDAmt = parseInt(values.shieldEndurance)||0;
@@ -8536,22 +8324,23 @@
 					+ "{{OCV=[[?{Modifier|0}-@{shieldDCV}+@{shieldOCV}+@{targetOCVpenalty}+@{ocv}]]}} "
 					+ "{{Result=[[3d6cf<0cs>0]]}} "
 					+ "{{"+dmgType+"=[[@{hiddenShieldDamage01}]]}}";
+			if (useHitLocations)
+				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 
 			startRoll(theRoll, (results) => {
-				let theMessage = " ";
-				let theSTUNMultiplier = isNormalDamage ? 1 : Math.floor(Math.random()*3+1);
+				let theMessage = "AOE";
+				let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 				let computed = parseInt(results.results[dmgType].result)||0;
 
 				// Get hit location message if system used.
 				if (useHitLocations) {
-					var theHitLocation = isNormalDamage ? normalHitLocation(targetSelectionType) : killingHitLocation(targetSelectionType);
-					theMessage = theHitLocation.message;
-					if (!isNormalDamage)
+					var theHitLocation = hitLocationDetails(results.results.HITLOC.result);
+					theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
 					theSTUNMultiplier = theHitLocation.stunMultiplier;
 				}
 
-				// Convert dice roll to equivalent BODY damage.
 				if (isNormalDamage) {
+					// Convert dice roll to equivalent BODY damage.
 					computed = convertStunToBody(results.results.STUN.rolls);
 				} else {
 					theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
@@ -8559,7 +8348,8 @@
 				}
 
 				let theResult = new Object();
-				theResult[dmgType] = String(computed).concat(theMessage);
+				theResult[dmgType] = computed;
+				theResult.HITLOC = theMessage;
 					
 				// Subtract END cost if option checked.
 				if (autoSubtractEND != 0) {
@@ -8574,9 +8364,8 @@
 	on('clicked:standardAttackRoll', (info) => {
 		// Roll attack and damage dice for standardAttack
 
-		getAttrs(["hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "targetSelection"], function(values) {
+		getAttrs(["hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem"], function(values) {
 			let useHitLocations = values.optionHitLocationSystem != 0;
-			let targetSelectionType = parseInt(values.targetSelection)||1;
 
 			let autoSubtractEND = values.optionAutoSubtractEND;
 			let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
@@ -8589,6 +8378,8 @@
 					+ "{{OCV=[[?{Modifier|0}+@{targetOCVpenalty}+@{ocv}]]}} "
 					+ "{{Result=[[3d6cf<0cs>0]]}} "
 					+ "{{"+dmgType+"=[[@{hiddenManeuverDamage01}]]}}";
+			if (useHitLocations)
+				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 
 			startRoll(theRoll, (results) => {
 				let theMessage = " ";
@@ -8596,12 +8387,12 @@
 
 				// Get hit location message if system used.
 				if (useHitLocations) {
-					var theHitLocation = normalHitLocation(targetSelectionType);
-					theMessage = theHitLocation.message;
+					theMessage = hitLocationDetails(results.results.HITLOC.result).normalMessage;
 				}
 
 				let theResult = new Object();
-				theResult[dmgType] = String(computed).concat(theMessage);
+				theResult[dmgType] = computed;
+				theResult.HITLOC = theMessage;
 					
 				// Subtract END cost if option checked.
 				if (autoSubtractEND != 0) {
