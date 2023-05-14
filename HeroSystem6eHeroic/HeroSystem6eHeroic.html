@@ -6867,80 +6867,22 @@
 	function calculatePowerEND(powerActiveCost,powerReducedEND) {
 		// Calculates power endurance given active cost and reduced, standard, or increased endurance limitation.
 		var powerEND=0;
+		var found=1;
 		
-		switch (powerReducedEND) {
-			case 'increasedENDx10':	powerEND=10*(heroRoundLow(powerActiveCost/10));
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'increasedENDx9':	powerEND=9*(heroRoundLow(powerActiveCost/10));
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'increasedENDx8':	powerEND=8*(heroRoundLow(powerActiveCost/10));
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'increasedENDx7':	powerEND=7*(heroRoundLow(powerActiveCost/10));
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'increasedENDx6':	powerEND=6*(heroRoundLow(powerActiveCost/10));
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'increasedENDx5':	powerEND=5*(heroRoundLow(powerActiveCost/10));
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'increasedENDx4':	powerEND=4*(heroRoundLow(powerActiveCost/10));
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'increasedENDx3':	powerEND=3*(heroRoundLow(powerActiveCost/10));
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'increasedENDx2':	powerEND=2*(heroRoundLow(powerActiveCost/10));
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'standardEND':	powerEND=heroRoundLow(powerActiveCost/10);
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'reducedEND': powerEND=heroRoundLow(powerActiveCost/20);
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'reducedENDAF': powerEND=heroRoundLow(powerActiveCost/20);
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'costsENDhalf': powerEND=heroRoundLow(powerActiveCost/20);
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			case 'costsENDfull': powerEND=heroRoundLow(powerActiveCost/10);
-								if (powerEND<1) {
-									powerEND=1;
-								};
-								break;
-			default: powerEND=0;
+		if (["standardEND", "costsENDfull"].includes(powerReducedEND)) {
+			powerEND=heroRoundLow(powerActiveCost/10);
+		} else if (["reducedEND", "reducedENDAF", "costsENDhalf"].includes(powerReducedEND)) {
+			powerEND=heroRoundLow(powerActiveCost/20);
+		} else if (powerReducedEND.startsWith("increasedENDx")) {
+			// Grab the Multiplier first, if 0 then that means we're x10
+			powerEND = parseInt(powerReducedEND.slice(-1));
+			powerEND = (powerEND ? powerEND : 10) * (heroRoundLow(powerActiveCost/10));
+		} else {
+			found = 0;
 		}
+	
+		if (found)
+			powerEND = Math.max(found, powerEND);
 	
 		return powerEND;
 	}
@@ -8270,8 +8212,8 @@
 				// If isNormalDamage is TRUE, use the Normal Damage template.
 				var theRoll = "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
 						+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{weaponName"+weaponId+"}}} "
-						+ "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[["+(areaOfEffect ? 0 : 1)+"@{targetOCVPenalty}]][TargetOCV Penalty]+?{Modifier|0}[Modifier]]]}} "
-						+ "{{Result=[[3d6cf6cs1]]}} "
+						+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[["+ (areaOfEffect ? 0 : 1) +"*@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} "
+						+ (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}} " : "")
 						+ "{{"+dmgType+"=[[@{hiddenWeaponDamage"+weaponId+"}]]}} "
 						+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 				if (useHitLocations)
@@ -8332,8 +8274,8 @@
 			// If isNormalDamage is TRUE, use the Normal Damage template.
 			var theRoll = "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
 					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}}} "
-					+ "{{OCV=[[@{ocv}[OCV]+@{shieldOCV}[ShieldOCV]-@{targetOCVpenalty}[TargetOCV Penalty]-@{shieldDCV}[ShieldDCV]+?{Modifier|0}[Modifier]]]}} "
-					+ "{{Result=[[3d6cf6cs1]]}} "
+					+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-@{targetOCVpenalty}[TargetOCV]-@{shieldDCV}[Shield DCV]+?{Modifiers|0}[Modifier]]]}} "
+					+ (subtractENDAmt ? "{{END=[[@{shieldEndurance}]] (@{currentEND})}} " : "")
 					+ "{{"+dmgType+"=[[@{hiddenShieldDamage01}]]}} "
 					+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 			if (useHitLocations)
@@ -8384,13 +8326,12 @@
 
 			let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
 
-			// If isNormalDamage is TRUE, use the Normal Damage template.
-			var theRoll = "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Makes a normal attack with Strength @{strength}}} "
-					+ "{{OCV=[[@{ocv}[OCV]-@{targetOCVpenalty}[TargetOCV Penalty]+?{Modifier|0}[Modifier]]]}} "
-					+ "{{Result=[[3d6cf6cs1]]}} "
-					+ "{{STUN=[[@{hiddenManeuverDamage01}]]}} "
-					+ "{{BODY=[[0[See STUN]]]}}";
+			let theRoll = "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} "
+				+ "{{subtitle= Makes a normal attack with Strength @{strength}}} "
+				+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]-@{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} "
+				+ (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}} " : "")
+				+ "{{STUN=[[@{hiddenManeuverDamage01}]]}} "
+				+ "{{BODY=[[0[See STUN]]]}}";
 			if (useHitLocations)
 				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 
