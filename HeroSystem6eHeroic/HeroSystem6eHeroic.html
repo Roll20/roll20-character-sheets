@@ -5591,14 +5591,20 @@
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
 			</div>
 			<div class="sheet-content">
-				{{#allprops() title subtitle desc color HITLOC}}
+				{{#allprops() title subtitle desc color HITLOC STUN BODY}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color HITLOC}}
+				{{/allprops() title subtitle desc color HITLOC STUN BODY}}
 				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
-				<!-- Computed result inserted as final row -->
-				<div class="sheet-key">BODY</div>
+				<!-- Stun, Body, and Hit Location go at the end -->
+				{{#STUN}}
+				<div class="sheet-key">STUN</div>
 				<div class="sheet-value">{{computed::STUN}}</div>
+				{{/STUN}}
+				{{#BODY}}
+				<div class="sheet-key">BODY</div>
+				<div class="sheet-value">{{computed::BODY}}</div>
+				{{/BODY}}
 				{{#HITLOC}}
 				<div class="sheet-key">Hit Location</div>
 				<div class="sheet-value">{{computed::HITLOC}}</div>
@@ -5617,14 +5623,20 @@
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
 			</div>
 			<div class="sheet-content">
-				{{#allprops() title subtitle desc color HITLOC}}
+				{{#allprops() title subtitle desc color HITLOC STUN BODY}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color HITLOC}}
+				{{/allprops() title subtitle desc color HITLOC STUN BODY}}
 				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
-				<!-- Computed result inserted as final row -->
+				<!-- Stun, Body, and Hit Location go at the end -->
+				{{#STUN}}
 				<div class="sheet-key">STUN</div>
+				<div class="sheet-value">{{computed::STUN}}</div>
+				{{/STUN}}
+				{{#BODY}}
+				<div class="sheet-key">BODY</div>
 				<div class="sheet-value">{{computed::BODY}}</div>
+				{{/BODY}}
 				{{#HITLOC}}
 				<div class="sheet-key">Hit Location</div>
 				<div class="sheet-value">{{computed::HITLOC}}</div>
@@ -7981,13 +7993,9 @@
 		  
 			let penalty = 0;
 			let targetString = "3d6cs0cf0";
-			let useHitLocations = values.optionHitLocationSystem;
-			let targetSelectionType = parseInt(values.targetSelection)||1;
-			let halveTargetPenalty = values.halveTargetOCVpenalty;
-			let penaltySkillLevels = parseInt(values.penaltySkillLevels)||0;
 			  
-			if (useHitLocations != 0) {
-				switch (targetSelectionType) {
+			if (values.optionHitLocationSystem != 0) {
+				switch (parseInt(values.targetSelection)||1) {
 					case 1:		penalty = 0;
 								break;
 					case 2:		penalty = -8;
@@ -8038,17 +8046,17 @@
 					default:	penalty = 0;
 				};
 				
-				if (halveTargetPenalty != 0) {
+				if (values.halveTargetOCVpenalty != 0) {
 					penalty = heroRoundHigh(penalty/2);
 				}
 				
 				// Apply penalty skill levels.
-				penalty = Math.min(0,penalty+penaltySkillLevels);
+				penalty = Math.min(0,penalty+(parseInt(values.penaltySkillLevels)||0));
 			}
 			
-			// Update OCV penalty for the shield		
+			// Update OCV penalty.. We flip it here so we can subtract it later.		
 			setAttrs({
-				"targetOCVpenalty": penalty,
+				"targetOCVpenalty": -penalty,
 				"targetHitRoll": targetString
 			});
 		});
@@ -8134,11 +8142,11 @@
 		normalMessage = hitLocation + ": " + theMessage;
 		killMessage = normalMessage;
 
-		// This is left out, because it's included in the calculations...
-		if (STUNx != 1) {
-			killMessage += "";
-			// killMessage += " x" + STUNx + "STUN*";
-		}
+		// This is already included in calculations shown
+		//	if (STUNx != 1) {
+		//		killMessage += "";
+		//		killMessage += " x" + STUNx + "STUN*";
+		//	}
 		if (NSTUN != 1) {
 			normalMessage += " x" + NSTUN + "STUN";
 		}
@@ -8254,17 +8262,18 @@
 				let isNormalDamage = values["weaponNormalDamage"+weaponId] != 0;
 				let stunMod = parseInt(values["weaponStunMod"+weaponId])||0;
 
-				let autoSubtractEND = values.optionAutoSubtractEND;
 				let subtractENDAmt = parseInt(values["weaponEndurance"+weaponId])||0;
 
 				let dmgType = isNormalDamage ? "STUN" : "BODY";
+				let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 				
 				// If isNormalDamage is TRUE, use the Normal Damage template.
 				var theRoll = "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
 						+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{weaponName"+weaponId+"}}} "
-						+ "{{OCV=[[?{Modifier|0}+@{weaponOCV"+weaponId+"}+[["+(areaOfEffect ? 0 : 1)+"@{targetOCVPenalty}]]+@{ocv}]]}} "
-						+ "{{Result=[[3d6cf<0cs>0]]}} "
-						+ "{{"+dmgType+"=[[@{hiddenWeaponDamage"+weaponId+"}]]}}";
+						+ "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[["+(areaOfEffect ? 0 : 1)+"@{targetOCVPenalty}]][TargetOCV Penalty]+?{Modifier|0}[Modifier]]]}} "
+						+ "{{Result=[[3d6cf6cs1]]}} "
+						+ "{{"+dmgType+"=[[@{hiddenWeaponDamage"+weaponId+"}]]}} "
+						+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 				if (useHitLocations)
 					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 	
@@ -8278,7 +8287,7 @@
 					if (useHitLocations && !areaOfEffect) {
 						let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
 						theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
-						theSTUNMultipler = theHitLocation.STUNx;
+						theSTUNMultiplier = theHitLocation.STUNx;
 					}
 
 					if (isNormalDamage) {
@@ -8287,14 +8296,17 @@
 					} else {
 						theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
 						computed *= theSTUNMultiplier;
+
+						if (theSTUNMultiplier != 1)
+							computed = String(computed) + " (x" + theSTUNMultiplier + " included)";
 					}
 
 					let theResult = new Object();
-					theResult[dmgType] = computed;
+					theResult[otherDmgType] = computed;
 					theResult.HITLOC = theMessage;
 						
 					// Subtract END cost if option checked.
-					if (autoSubtractEND != 0) {
+					if (values.optionAutoSubtractEND != 0) {
 						subtractEndurance(subtractENDAmt);
 					}
 
@@ -8307,23 +8319,23 @@
 	on('clicked:attackShield', (info) => {
 		// Roll attack and damage dice for the shield.
 						
-		getAttrs(["shieldNormalDamage", "shieldStunMod", "shieldEndurance",
-				"optionAutoSubtractEND", "optionHitLocationSystem"], function(values) {
+		getAttrs(["shieldNormalDamage", "shieldStunMod", "shieldEndurance", "optionAutoSubtractEND", "optionHitLocationSystem"], function(values) {
 			let useHitLocations = values.optionHitLocationSystem != 0;
 			let isNormalDamage = values.shieldNormalDamage != 0;
 			let stunMod = parseInt(values.shieldStunMod)||0;
 
-			let autoSubtractEND = values.optionAutoSubtractEND;
 			let subtractENDAmt = parseInt(values.shieldEndurance)||0;
 
 			let dmgType = isNormalDamage ? "STUN" : "BODY";
+			let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 
 			// If isNormalDamage is TRUE, use the Normal Damage template.
 			var theRoll = "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
 					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}}} "
-					+ "{{OCV=[[?{Modifier|0}-@{shieldDCV}+@{shieldOCV}+@{targetOCVpenalty}+@{ocv}]]}} "
-					+ "{{Result=[[3d6cf<0cs>0]]}} "
-					+ "{{"+dmgType+"=[[@{hiddenShieldDamage01}]]}}";
+					+ "{{OCV=[[@{ocv}[OCV]+@{shieldOCV}[ShieldOCV]-@{targetOCVpenalty}[TargetOCV Penalty]-@{shieldDCV}[ShieldDCV]+?{Modifier|0}[Modifier]]]}} "
+					+ "{{Result=[[3d6cf6cs1]]}} "
+					+ "{{"+dmgType+"=[[@{hiddenShieldDamage01}]]}} "
+					+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 			if (useHitLocations)
 				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 
@@ -8336,7 +8348,7 @@
 				if (useHitLocations) {
 					var theHitLocation = hitLocationDetails(results.results.HITLOC.result);
 					theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
-					theSTUNMultiplier = theHitLocation.stunMultiplier;
+					theSTUNMultiplier = theHitLocation.STUNx;
 				}
 
 				if (isNormalDamage) {
@@ -8345,14 +8357,17 @@
 				} else {
 					theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
 					computed *= theSTUNMultiplier;
+
+					if (theSTUNMultiplier != 1)
+						computed = String(computed) + " (x" + theSTUNMultiplier + " included)";
 				}
 
 				let theResult = new Object();
-				theResult[dmgType] = computed;
+				theResult[otherDmgType] = computed;
 				theResult.HITLOC = theMessage;
 					
 				// Subtract END cost if option checked.
-				if (autoSubtractEND != 0) {
+				if (values.optionAutoSubtractEND != 0) {
 					subtractEndurance(subtractENDAmt);
 				}
 
@@ -8367,23 +8382,21 @@
 		getAttrs(["hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem"], function(values) {
 			let useHitLocations = values.optionHitLocationSystem != 0;
 
-			let autoSubtractEND = values.optionAutoSubtractEND;
 			let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
-
-			let dmgType = "STUN";
 
 			// If isNormalDamage is TRUE, use the Normal Damage template.
 			var theRoll = "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Attacks with Strength @{strength}}} "
-					+ "{{OCV=[[?{Modifier|0}+@{targetOCVpenalty}+@{ocv}]]}} "
-					+ "{{Result=[[3d6cf<0cs>0]]}} "
-					+ "{{"+dmgType+"=[[@{hiddenManeuverDamage01}]]}}";
+					+ "{{subtitle= Makes a normal attack with Strength @{strength}}} "
+					+ "{{OCV=[[@{ocv}[OCV]-@{targetOCVpenalty}[TargetOCV Penalty]+?{Modifier|0}[Modifier]]]}} "
+					+ "{{Result=[[3d6cf6cs1]]}} "
+					+ "{{STUN=[[@{hiddenManeuverDamage01}]]}} "
+					+ "{{BODY=[[0[See STUN]]]}}";
 			if (useHitLocations)
 				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 
 			startRoll(theRoll, (results) => {
 				let theMessage = " ";
-				let computed = convertStunToBody(results.results[dmgType].rolls);
+				let computed = convertStunToBody(results.results.STUN.rolls);
 
 				// Get hit location message if system used.
 				if (useHitLocations) {
@@ -8391,11 +8404,11 @@
 				}
 
 				let theResult = new Object();
-				theResult[dmgType] = computed;
+				theResult.BODY = computed;
 				theResult.HITLOC = theMessage;
 					
 				// Subtract END cost if option checked.
-				if (autoSubtractEND != 0) {
+				if (values.optionAutoSubtractEND != 0) {
 					subtractEndurance(subtractENDAmt);
 				}
 
