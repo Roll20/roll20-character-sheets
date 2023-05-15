@@ -10,9 +10,15 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.14.0 [Screenshot](coc_v2.png)
+v3.15.0 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.15.0 (2023-04-30)
+
+- Suppression du calcul automatique des PV par niveau
+- Ajout onglet Version avec notes et log
+- Améliorations cosmétiques mineures
 
 ## v3.14.0 (2023-02-11)
 

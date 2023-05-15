@@ -1,5 +1,22 @@
 Change Log
 ==============================================
+**2023-03-27 ** v.79 Chuz (James Culp)
+	New Feature - Added Resonance and Level to the sprite skill rolls attribute options
+	New Feature - Added Magic and Force to the spirit skill rolls attribute options
+	New Feature - Added Magic AR to combat spell roll templates
+	New Feature - PC Added DR to Defense rolls template
+	New Feature - NPC Added Universal Dicepool Adjustment (@{uda}) for GMs that with to add a dicepool penalty/bonus to all rolls the NPC makes.
+	Bugfix - Fix to Grunts dicepool bug.
+**2023-03-20 ** v.77 Chuz (James Culp)
+	Bugfix - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
+	Bugfix - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
+**2023-03-13 ** v.76 Chuz (James Culp)
+Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
+**2023-03-06 ** v.75 Chuz (James Culp)
+	New Feature - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
+	New Feature - Added Heat, Reputation and AsRep to the Social Pane
+	Added Drag and Drop support for Gear-Ammunition-Grenades Gear-Ammunition-Rockets to place them in the Arms-Grenades section instead of Gear
+	Added Grenade dicepool calculations
 **2023-02-27 ** v.74 Chuz (James Culp)
 	Fix for matrix device stats on drag and drop for NPCs
 	Fix for Sprite drag and drop issue
