@@ -31273,11 +31273,11 @@ on('clicked:repeating_armor:setarmor', (info) => {
         const mageLevel = data["data-mageLevel"] || "Weltliche"
         switch (mageLevel) {
             case "Geweihte":
-                update["glaube-tradition"] = data["data-tradition"]
+                update["glaube_tradition"] = data["data-tradition"]
                 update["leiteigenschaft_ke"] = data["data-guidevalue"].toUpperCase()
                 break
             case "Zauberer":
-                update["magie-tradition"] = data["data-tradition"]
+                update["magie_tradition"] = data["data-tradition"]
                 update["leiteigenschaft_ae"] = data["data-guidevalue"].toUpperCase()
                 update["ae_faktor"] = Number(data["data-energyfactor"]) || 1.0
                 break
@@ -31609,11 +31609,15 @@ on('clicked:repeating_armor:setarmor', (info) => {
             if (data["data-guideValueMagical"]) {
                 update["leiteigenschaft_ae"] = data["data-guideValueMagical"].toUpperCase()
                 update["ae"] = 20 + update[dsa5Module().dsa5.attributes[update["leiteigenschaft_ae"]]]
+                update["magie_tradition"] = data["data-tradition"] || ""
+                update["ae_faktor"] = Number(data["data-energyfactor"]) || 1.0
             }
             if (data["data-guideValueClerical"]) {
                 update["leiteigenschaft_ke"] = data["data-guideValueClerical"].toUpperCase()
+                update["glaube_tradition"] = data["data-tradition"] || ""
                 update["ke"] = 20 + update[dsa5Module().dsa5.attributes[update["leiteigenschaft_ke"]]]
             }
+
 
             update["linkToToken"] = "on"
 
@@ -31896,7 +31900,7 @@ on('clicked:repeating_armor:setarmor', (info) => {
     }
 
     const createAttack = (data, last_id = "") => {
-        data.stat = data.stat.replace(/[\u00A0\u25A0\u00A0\s]+/g, ' ').trim()
+        data.stat = data.stat.replace(/[\u00A0\u25A0\s\u00a0]+/g, ' ').trim()
         const rangeAttack = /(FK| LZ) \d/.test(data.stat)
         const category = rangeAttack ? "npcfkkampf" : "npcnahkampf"
         const { update, row } = prefabdata(category, last_id)
