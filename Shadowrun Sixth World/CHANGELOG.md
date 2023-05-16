@@ -1,5 +1,38 @@
 Change Log
 ==============================================
+**2023-05-08 ** v.80 Chuz (James Culp)
+	Bugfix - PC/NPC Defense rolls throwing an error for the armor_rating, updated PC sheets to use defense_rating so they match NPC sheets.
+**2023-05-01 ** v.79 Chuz (James Culp)
+	New Feature - Added Resonance and Level to the sprite skill rolls attribute options
+	New Feature - Added Magic and Force to the spirit skill rolls attribute options
+	New Feature - Added Magic AR to combat spell roll templates
+	New Feature - PC Added DR to Defense rolls template
+	New Feature - NPC Added Universal Dicepool Adjustment (@{uda}) for GMs that with to add a dicepool penalty/bonus to all rolls the NPC makes.
+	Bugfix - Fix to Grunts dicepool bug.
+**2023-03-20 ** v.77 Chuz (James Culp)
+	Bugfix - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
+	Bugfix - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
+**2023-03-13 ** v.76 Chuz (James Culp)
+Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
+**2023-03-06 ** v.75 Chuz (James Culp)
+	New Feature - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
+	New Feature - Added Heat, Reputation and AsRep to the Social Pane
+	Added Drag and Drop support for Gear-Ammunition-Grenades Gear-Ammunition-Rockets to place them in the Arms-Grenades section instead of Gear
+	Added Grenade dicepool calculations
+**2023-02-27 ** v.74 Chuz (James Culp)
+	Fix for matrix device stats on drag and drop for NPCs
+	Fix for Sprite drag and drop issue
+	NPCs->Grunts added a stun monitor and flag to display it (it is hidden by default)
+**2023-02-23 ** v.73 Chuz (James Culp)
+	Bugfix - PC Initiatives - Fixed a condition where if a dice mod is set and then the initiative base is changed it keeps adding the dice mod repeatedly.
+**2023-02-20 ** v.72 Chuz (James Culp)
+	Added Magic and Resonance to attribute roll buttons as additional options in the drop down
+	Updated NPC Technomancer Complex Forms
+	Updated NPC Drag&Drop for Spells to attempt to auto-populate the dicepool
+	NPC Complex forms display changes
+	NPC Complex forms roll buttons for no dicepool defined (uses attr_skill + resonance), dicepool defined (uses the dicepool) or description only (skill empty)
+	Update - The old NPCspells repeating data should be retained just in case, for now.
+	Bugfix - Updated calls to geneerateRowID to use a work around to prevent them (hopefully) from duplicating an already existing ID which caused drag and drop items to sometimes not apply properly, causing symptoms like drag and drop NPCs without all of their skills, attacks, or some other repeating item. Or even weirder once a Skill that got overwritten so it had a Specialization from another skill that wasn't there.
 **2023-02-13 ** v.71 Chuz (James Culp)
 	Added essence calculations for drag and drop (and others) allowing for Essence Base to be "Rating x #.##", also Grade calculations now.
 	Added drag and drop for Augmentations
