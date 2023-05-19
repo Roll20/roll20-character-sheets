@@ -1,6 +1,8 @@
 Change Log
 ==============================================
-**2023-05-08 ** v.80 Chuz (James Culp)
+**2023-05-18 ** v.80 Chuz (James Culp)
+	Bugfix - PC Qualities were always showing up as Negative regardless of the actual type.
+	Bugfix - PC->Spells Ranges of Touch were showing up as LOS.
 	Bugfix - PC/NPC Defense rolls throwing an error for the armor_rating, updated PC sheets to use defense_rating so they match NPC sheets.
 **2023-05-01 ** v.79 Chuz (James Culp)
 	New Feature - Added Resonance and Level to the sprite skill rolls attribute options
