@@ -5578,7 +5578,33 @@
 		</div>
 	  </div>
 	</div>
-</rolltemplate> 
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-custom-success-roll">
+	<div class="template-wrapper">
+		<div class="sheet-container sheet-color-{{color}}">
+			<div class="sheet-header">
+				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+			</div>
+			<div class="sheet-content">
+				{{#rollGreater() computed::SUCCESS -1}}
+				<div class="sheet-key">Degree of Success</div>
+				<div class="sheet-value">{{SUCCESS}}</div>
+				{{/rollGreater() computed::SUCCESS -1}}
+				{{#rollLess() computed::SUCCESS 0}}
+				<div class="sheet-key">Degree of Failure</div>
+				<div class="sheet-value">{{SUCCESS}}</div>
+				{{/rollLess() computed::SUCCESS 0}}
+				{{#allprops() title subtitle desc color SUCCESS}}
+				<div class="sheet-key">{{key}}</div>
+				<div class="sheet-value">{{value}}</div>
+				{{/allprops() title subtitle desc color SUCCESS}}
+				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+			</div>
+		</div>
+	</div>
+</rolltemplate>
 
 <!-- Jackob's Roll Template for normal damage attacks -->
 <!-- Includes row for computed BODY damage using July, 2021 Roll Parsing feature -->
@@ -7315,12 +7341,13 @@
 	arrayOf(maxSkillNum).forEach(num => {
 		var skillId = String(num).padStart(2,'0');	
 		on(`clicked:testSkill${skillId}`, (info) => {
-			var theRoll = "&{template:custom} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses @{skillName"+skillId+"}}} "
-			+ "{{Base Chance = [[@{skillRollChance"+skillId+"}+?{Modifiers|0}]] }} {{Roll=[[3d6cf6cs1]]}} {{}}";
+			var theRoll = "&{template:custom-success-roll} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses @{skillName"+skillId+"}}} "
+			+ "{{SUCCESS=[[@{skillRollChance"+skillId+"}[Skill Chance]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}"
 
 			startRoll(theRoll, (results) => {
-
-				finishRoll(results.rollId,{});
+				finishRoll(results.rollId,{
+					SUCCESS:results.results.SUCCESS.result
+				});
 			});
 		});
 	});
