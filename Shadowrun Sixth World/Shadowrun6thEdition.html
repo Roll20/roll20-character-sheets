@@ -11619,6 +11619,7 @@ let priorities = {
 	'Weapon Both': 33,
 	'Devices': 34,
 	'Programs':	35,
+	'Critter Powers': 36,
 };
 
 
@@ -11761,6 +11762,9 @@ console.log(data);
 			break;
 		case 'Powers':
 			compendiumAddPower(data);
+			break;
+		case 'Critter Powers':
+			compendiumAddCritterPower(data);
 			break;
 		case 'Metamagic':
 			compendiumAddMetamagic(data);
@@ -12582,6 +12586,41 @@ var compendiumAddPower = function(data) {
 	rowattrs["repeating_" + rep_type + "_" + row_id + "_modifications"] = data["data-modifications"] || '';
 
 	setAttrs(rowattrs);
+};
+
+
+var compendiumAddCritterPower = function(data) {
+console.log("Critter Power Drop");
+	getAttrs(['sheet_type', 'powers'], (v) => {
+		if(v.sheet_type == 'grunt') {
+			let powers = v.powers;
+			let re = /\((.*?)\)/gi;
+			let parens = powers.match(re);
+
+			powers.replace(re, parens);
+			powers = v.powers.split(/,\s*/);
+
+			let powerName = data["data-name"];
+
+			v.powers = [v.powers, powerName].join(', ');
+
+			setAttrs({
+				powers: v.powers
+			}, {silent: true});
+		} else if(v.sheet_type == 'spirit') {
+			rowattrs = {};
+
+			row_id = generateRowID();
+			var rep_type = 'powers';
+
+			rowattrs["repeating_" + rep_type + "_" + row_id + "_flag"] = false;
+			rowattrs["repeating_" + rep_type + "_" + row_id + "_display_flag"] = 'on';
+			rowattrs["repeating_" + rep_type + "_" + row_id + "_name"] = data["data-name"] || 'No Name';
+			rowattrs["repeating_" + rep_type + "_" + row_id + "_notes"] = data["data-description"];
+
+			setAttrs(rowattrs);
+		}
+	});
 };
 
 
