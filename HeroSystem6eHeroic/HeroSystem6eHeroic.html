@@ -347,7 +347,7 @@
 						<div class="subitem-characteristics-perception-column-container">
 							<input type="text" name="attr_intelligenceChance" title="@{intelligenceChance}" value="11" readonly tabindex="-1">
 							<span>+<input type="number" name="attr_enhancedPerceptionModifier" title="@{enhancedPerceptionModifier}" value="0" min="-10" max="10" step="1" tabindex="29"></span>
-							<button type="roll" class="button buttonRoll" tabindex="-1" name="roll_perceptionRoll" title="%{perceptionRoll}" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception}} {{Base Chance = [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}} {{}}" >Roll</button>
+							<button type="action" class="button buttonRoll" tabindex="-1" name="act_perceptionRoll" title="%{perceptionRoll}" >Roll</button>
 						</div>
 					</div>
 					
@@ -356,7 +356,7 @@
 						<div class="subitem-characteristics-perception-column-container">
 							<input type="text" name="attr_perceptionEnhanced" title="@{perceptionEnhanced}" value="11" readonly tabindex="-1">
 							<span>+<input type="number" name="attr_perceptionModifierVision" title="@{perceptionModifierVision}" value="0" min="-10" max="10" step="1" tabindex="31"></span>
-							<button type="roll" class="button buttonRoll" tabindex="-1" name="roll_perceptionRollVision" title="%{roll_perceptionRollVision}" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception - @{perceptionVisionLabel} }} {{Base Chance = [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]+@{perceptionModifierVision}[@{perceptionVisionLabel} Modifier]+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}} {{}}" >Roll</button>
+							<button type="action" class="button buttonRoll" tabindex="-1" name="act_perceptionRollVision" title="%{roll_perceptionRollVision}" >Roll</button>
 						</div>
 					</div>
 					
@@ -365,7 +365,7 @@
 						<div class="subitem-characteristics-perception-column-container">
 							<input type="text" name="attr_perceptionEnhanced" title="@{perceptionEnhanced}" value="11" readonly tabindex="-1">
 							<span>+<input type="number" name="attr_perceptionModifierHearing" title="@{perceptionModifierHearing}" value="0" min="-10" max="10" step="1" tabindex="33"></span>
-							<button type="roll" class="button buttonRoll" tabindex="-1" name="roll_perceptionRollHearing" title="%{roll_perceptionRollHearing}" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception - @{perceptionHearingLabel} }} {{Base Chance = [[?{Modifiers|0}+@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]+@{perceptionModifierHearing}[@{perceptionHearingLabel} Modifier]+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}} {{}}" >Roll</button>
+							<button type="action" class="button buttonRoll" tabindex="-1" name="act_perceptionRollHearing" title="%{roll_perceptionRollHearing}" >Roll</button>
 						</div>
 					</div>
 					
@@ -374,7 +374,7 @@
 						<div class="subitem-characteristics-perception-column-container">
 							<input type="text" name="attr_perceptionEnhanced" title="@{perceptionEnhanced}" value="11" readonly tabindex="-1">
 							<span>+<input type="number" name="attr_perceptionModifierSmell" title="@{perceptionModifierSmell}" value="0" min="-10" max="10" step="1" tabindex="35"></span>
-							<button type="roll" class="button buttonRoll" tabindex="-1" name="roll_perceptionRollSmell" title="%{roll_perceptionRollSmell}" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception - @{perceptionSmellLabel} }} {{Base Chance = [[?{Modifiers|0}+@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]+@{perceptionModifierSmell}[@{perceptionSmellLabel} Modifier]+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}} {{}}" >Roll</button>
+							<button type="action" class="button buttonRoll" tabindex="-1" name="act_perceptionRollSmell" title="%{roll_perceptionRollSmell}" >Roll</button>
 						</div>
 					</div>
 				</div>
@@ -7335,7 +7335,7 @@
 	});
 
 	/* ------------------- */
-	/* Success Rolls         */
+	/* Success Rolls       */
 	/* ------------------- */
 	
 	var characteristics = ['strength', 'dexterity', 'constitution', 'intelligence', 'ego', 'presence']
@@ -7348,6 +7348,25 @@
 			} else {
 				theRoll += "{{SUCCESS=[[@{"+characteristic+"Chance}["+displayName+" Chance]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}";
 			}
+
+			startRoll(theRoll, (results) => {
+				finishRoll(results.rollId,{
+					SUCCESS:results.results.SUCCESS.result
+				});
+			});
+		});
+	});
+
+	var perceptionTypes = ['', 'Vision', 'Hearing', 'Smell']
+	perceptionTypes.forEach(percType => {
+		var subtitleExt = (percType != '') ? " - @{perception"+percType+"Label}" : "";
+		on (`clicked:perceptionRoll${percType}`, (info) => {
+			var theRoll = "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception"+subtitleExt+" }} "
+				+ "{{SUCCESS= [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]-3d6cf6cs1[Roll]";
+			if (percType != '') {
+				theRoll += "+@{perceptionModifier"+percType+"}[@{perception"+percType+"Label} Modifier]";
+			}
+			theRoll += "+?{Modifiers|0}[Modifier]]] }}"
 
 			startRoll(theRoll, (results) => {
 				finishRoll(results.rollId,{
