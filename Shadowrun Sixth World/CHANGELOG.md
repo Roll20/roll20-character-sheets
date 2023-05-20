@@ -2,7 +2,7 @@ Change Log
 ==============================================
 **2023-05-22 ** v.81 Chuz (James Culp)
 	Bugfix - More weapon dicepool tweaks
-	
+	NPC->Spirits made spirits awakened and now display the spells section for them.  Dicepool does not auto-update when spirit force changes, that is an exercise for the user.
 **2023-05-18 ** v.80 Chuz (James Culp)
 	Bugfix - PC Qualities were always showing up as Negative regardless of the actual type.
 	Bugfix - PC->Spells Ranges of Touch were showing up as LOS.
