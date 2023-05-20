@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2023-05-22 ** v.81 Chuz (James Culp)
+	Bugfix - More weapon dicepool tweaks
+	
 **2023-05-18 ** v.80 Chuz (James Culp)
 	Bugfix - PC Qualities were always showing up as Negative regardless of the actual type.
 	Bugfix - PC->Spells Ranges of Touch were showing up as LOS.

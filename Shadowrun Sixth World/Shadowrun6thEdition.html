@@ -3474,6 +3474,10 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
+								<span class="changelog-entry">**2023-05-22 ** v.81 Chuz (James Culp)</span>
+								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - More weapon dicepool tweaks
+								</ul>
 								<span class="changelog-entry">**2023-05-18 ** v.80 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">A</span><b>Bugfix</b> - PC Qualities were always showing up as Negative regardless of the actual type.
@@ -6302,7 +6306,7 @@
 <input type="hidden" name="attr_spellcasting_expert" value="0" />
 <input type="hidden" name="attr_universal_dicepool_adjustment" value="0" />
 
-<input type="hidden" name="attr_sheet_version" value="0.80">
+<input type="hidden" name="attr_sheet_version" value="0.81">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 // Sheet workers
@@ -9298,79 +9302,6 @@ function repeatingStringBuilder(v, keyBase) {
 }
 
 
-/* vvv Commented out 2023-03-04 vvv */
-/*
-on("change:repeating_weapon", () => {
-	const source = "repeating_weapon_name";
-	 getAttrs([`${source}_range`, `${source}_type`, `${source}_dv`, `${source}_ap`, `${source}_mode`, `${source}_rc`, `${source}_ammo`, `${source}_note`, `${source}_primary`], (v) => {
-		  // Local builder putting the needed variables into scope for repeatingStringBuilder
-		  const b = repeatingStringBuilder(v, `${source}_`);
-		  // Determine fields to display and in their proper order and formatting
-		  // Anonymous function is purely stylistic and adds more overhead than just a simple switch/case.  Personally I find the function looks cleaner and hides any internal scope that might conflict with outside
-		  const display = (() => {
-				// 0 for weapon_range is a ranged weapon. A 1 is a melee weapon.
-				switch(v.repeating_weapon_range) {
-					 case '0':
-					 // Not a fan of how ammo has to be handled.  Could potentially be placed in the repeatingStringBuilder if used more often for other change:repeating functions as some sort of suffix parameter
-					 const ammo = b('amm');
-					 return [
-						  b('type'),
-						  b('dv', 'DV'),
-						  b('mode'),
-						  ammo ? `${ammo} (c)` : '',
-						  b('note')
-					 ];
-					 case '1': return [
-						  b('type'),
-						  b('dv', 'DV'),
-						  b('note')
-					 ];
-					 default: return [
-						  b('type'),
-						  b('dv', 'DV'),
-						  b('note')
-					 ];
-				}
-		  })()
-				// Remove all empty strings
-				.filter(s => s)
-				// Concat all the strings and add comma between
-				.join(', ');
-
-		  let update = {};
-		  update[`${source}`] = `[${display}]`;
-
-		  // Finally wrap square brackets around the weapon display
-		  setAttrs(update);
-	 });
-});
-*/
-/* ^^^ Commented out 2023-03-04 ^^^ */
-
-/* vvv Commented out 2023-03-04 vvv */
-/*
-//Spell displays set into an Array
-on("change:repeating_NPCspell", () => {
-	 getAttrs(["repeating_NPCspell_combat_type", "repeating_NPCspell_type", "repeating_NPCspell_range", "repeating_NPCspell_damage", "repeating_NPCspell_duration", "repeating_NPCspell_drain", "repeating_NPCspell_note"], (v) =>{
-		  const com = v.repeating_NPCspell_combat_type;
-		  const typ = `Type ${v.repeating_NPCspell_type}, `;
-		const ran = `${v.repeating_NPCspell_range}, `;
-		const dam = `Damage ${v.repeating_NPCspell_damage}, `;
-		const dur = `Duration ${v.repeating_NPCspell_duration}, `;
-		const not = `, ${v.repeating_NPCspell_note}`;
-		const dra = v.repeating_NPCspell_drain;
-
-		const drain = (dra > 0) ? `F+${dra} ` : (dra < 0) ? `F${dra} ` :"F ";
-		const info = `[${typ}${ran}${dam}${dur}${drain}${not}]`;
-
-		display = (com === "Direct, Force ") ? ` (Direct) ${info}` :
-			(com === "Indirect, Force ?{Force|}, AP -") ? ` (Indirect) ${info}` : `${info}`;
-		  setAttrs({repeating_NPCspell_spell: display});
-	 });
-});
-*/
-/* ^^^ Commented out 2023-03-04 ^^^ */
-
 
 //IC displays are set into an Array
 on("change:repeating_IC", () => {
@@ -9773,7 +9704,6 @@ console.log(toSet);
 				return;
 			}
 
-
 console.log(eventInfo);
 			if(eventInfo.sourceAttribute.endsWith("dicepool") && eventInfo.newValue && eventInfo.newValue != "0") {
 				if(eventInfo.sourceType === 'player') {
@@ -9783,6 +9713,12 @@ console.log("updating dicepool_base to: "+v[`${weap}_dicepool`]);
 					}, {silent: true});
 				}
 				return;
+			} else if(eventInfo.sourceAttribute.endsWith("dicepool") && ! eventInfo.newValue) {
+console.log("updating dicepool and dicepool_base to 0");
+				setAttrs({
+					[`${weap}_dicepool_base`]: 0,
+					[`${weap}_dicepool`]: 0
+				}, {silent: true});
 			} else if(v[`${weap}_dicepool_base`] && v[`${weap}_dicepool_base`] != v[`${weap}_dicepool`]) {
 console.log("updating dicepool_base to: "+v[`${weap}_dicepool`]);
 //				let diff = parseInt(v[`${weap}_dicepool_base`]) - parseInt(v[`${weap}_dicepool`]);
@@ -9796,13 +9732,15 @@ console.log("updating dicepool_base to: "+v[`${weap}_dicepool`]);
 //				v[`${weap}_dicepool_base`] = v[`${weap}_dicepool`];
 //			}
 
-			// If this is a vehicle/drone sheet there's nothing more to do
+			// If this is a vehicle/drone or spirit sheet there's nothing more to do
 			if(v.sheet_type == 'vehicle' || v.sheet_type == 'spirit') {
 				return;
 			}
 
+console.log(v.sheet_type);
 			// We only auto-fill the dicepool if it's empty or 0
-			if(! v[`${weap}_dicepool`] || v[`${weap}_dicepool`] == 0) {
+			if(v.sheet_type == 'pc' || (! v[`${weap}_dicepool`] || v[`${weap}_dicepool`] == 0)) {
+console.log("dicepool recalculation");
 				const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
 				const spec = parseInt(v[`${weap}_spec`]) || 0;
 				const expert = parseInt(v[`${weap}_expert`]) || 0;
@@ -9822,6 +9760,7 @@ console.log("updating dicepool_base to: "+v[`${weap}_dicepool`]);
 				}
 
 				getAttrs([`${skill}`, `${attribute}`], (s) => {
+console.log(s);
 					rating = s[`${skill}`] || -1;
 					if(rating <= 0) {
 						rating = -1;
@@ -9843,6 +9782,7 @@ console.log("updating dicepool_base to: "+v[`${weap}_dicepool`]);
 
 			// Apply dicepool mod if that changed
 			if(eventInfo.sourceAttribute.endsWith('_dicepool_modifier')) {
+console.log("updating dicepool for dicepool_modifier change");
 				let nv = parseInt(eventInfo.newValue) || 0;
 				let pv = parseInt(eventInfo.previousValue) || 0;
 				let delta = nv - pv;
