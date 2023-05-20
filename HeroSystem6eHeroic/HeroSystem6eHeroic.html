@@ -100,17 +100,17 @@
 				<div class="item-characteristics-primary-attributes-rollButtons">
 					<h1>&#8205;</h1> <!-- Invisible character -->
 					
-					<button type="roll" class="button buttonRoll" tabindex="-1" name="roll_strength" title="%{strength}" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Strength }} {{Base Chance = [[@{strengthChance}[Strength Chance]+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}} {{}}" >Roll</button>
+					<button type="action" class="button buttonRoll" tabindex="-1" name="act_strength" title="%{strength}" >Roll</button>
 					
-					<button type="roll" class="button buttonRoll" tabindex="-1" name="roll_dexterity" title="%{dexterity}" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Dexterity }} {{Base Chance = [[@{dexterityChance}[Dexterity Chance]+@{weightDexDCVPenalty}[Weight Penalty]+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}} {{}}" >Roll</button>
+					<button type="action" class="button buttonRoll" tabindex="-1" name="act_dexterity" title="%{dexterity}" >Roll</button>
 					
-					<button type="roll" class="button buttonRoll" tabindex="-1" name="roll_constitution" title="%{constitution}" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Constitution}} {{Base Chance = [[@{constitutionChance}[Constitution Chance]+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}} {{}}" >Roll</button>
+					<button type="action" class="button buttonRoll" tabindex="-1" name="act_constitution" title="%{constitution}" >Roll</button>
 					
-					<button type="roll" class="button buttonRoll" tabindex="-1" name="roll_intelligence" title="%{intelligence}" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Intelligence}} {{Base Chance = [[@{intelligenceChance}[Intelligence Chance]+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}} {{}}" >Roll</button>
+					<button type="action" class="button buttonRoll" tabindex="-1" name="act_intelligence" title="%{intelligence}" >Roll</button>
 					
-					<button type="roll" class="button buttonRoll" tabindex="-1" name="roll_ego" title="%{ego}" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Ego}} {{Base Chance = [[@{egoChance}[Ego Chance]+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}} {{}}" >Roll</button>
+					<button type="action" class="button buttonRoll" tabindex="-1" name="act_ego" title="%{ego}" >Roll</button>
 					
-					<button type="roll" class="button buttonRoll" tabindex="-1" name="roll_presence" title="%{presence}" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Presence}} {{Base Chance = [[@{presenceChance}[Presence Chance]+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}} {{}}" >Roll</button>
+					<button type="action" class="button buttonRoll" tabindex="-1" name="act_presence" title="%{presence}" >Roll</button>
 				</div>
 				
 				<div class="item-characteristics-primary-attributes-costs">
@@ -7335,9 +7335,28 @@
 	});
 
 	/* ------------------- */
-	/* Skill Rolls         */
+	/* Success Rolls         */
 	/* ------------------- */
-					
+	
+	var characteristics = ['strength', 'dexterity', 'constitution', 'intelligence', 'ego', 'presence']
+	characteristics.forEach(characteristic => {
+		var displayName = characteristic.charAt(0).toUpperCase() + characteristic.slice(1);
+		on (`clicked:${characteristic}`, (info) => {
+			var theRoll = "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses "+displayName+" }} ";
+			if (characteristic == 'dexterity') {
+				theRoll += "{{SUCCESS=[[@{dexterityChance}[Dexterity Chance]+@{weightDexDCVPenalty}[Weight Penalty]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}";
+			} else {
+				theRoll += "{{SUCCESS=[[@{"+characteristic+"Chance}["+displayName+" Chance]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}";
+			}
+
+			startRoll(theRoll, (results) => {
+				finishRoll(results.rollId,{
+					SUCCESS:results.results.SUCCESS.result
+				});
+			});
+		});
+	});
+
 	arrayOf(maxSkillNum).forEach(num => {
 		var skillId = String(num).padStart(2,'0');	
 		on(`clicked:testSkill${skillId}`, (info) => {
