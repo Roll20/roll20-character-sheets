@@ -5485,6 +5485,14 @@
 				<h1>Takes No STUN</h1>
 			</div>
 
+			<div class="item-options-row">
+				<label class="container-checkbox">
+					<input type="checkbox" checked="checked" name="attr_displayDegreeOfSuccess">
+					<span class="checkmark" title="@{displayDegreeOfSuccess}"></span>
+				</label>
+				<h1>Display Degree of Success</h1>
+			</div>
+
 			<div class="item-version-row">
 				<div class="item-version-label">
 					<h2>Version:</h2>
@@ -7340,19 +7348,31 @@
 	
 	var characteristics = ['strength', 'dexterity', 'constitution', 'intelligence', 'ego', 'presence']
 	characteristics.forEach(characteristic => {
-		var displayName = characteristic.charAt(0).toUpperCase() + characteristic.slice(1);
 		on (`clicked:${characteristic}`, (info) => {
-			var theRoll = "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses "+displayName+" }} ";
-			if (characteristic == 'dexterity') {
-				theRoll += "{{SUCCESS=[[@{dexterityChance}[Dexterity Chance]+@{weightDexDCVPenalty}[Weight Penalty]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}";
-			} else {
-				theRoll += "{{SUCCESS=[[@{"+characteristic+"Chance}["+displayName+" Chance]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}";
-			}
-
-			startRoll(theRoll, (results) => {
-				finishRoll(results.rollId,{
-					SUCCESS:results.results.SUCCESS.result
-				});
+			getAttrs(["displayDegreeOfSuccess"], function(values) {
+				var displayName = characteristic.charAt(0).toUpperCase() + characteristic.slice(1);
+				var theRoll = "";
+	
+				if (values.displayDegreeOfSuccess != 0) {
+					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses "+displayName+" }} ";
+					if (characteristic == 'dexterity') {
+						theRoll += "{{SUCCESS=[[@{dexterityChance}[Dexterity Chance]+@{weightDexDCVPenalty}[Weight Penalty]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}";
+					} else {
+						theRoll += "{{SUCCESS=[[@{"+characteristic+"Chance}["+displayName+" Chance]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}";
+					}
+				} else {
+					theRoll += "&{template:custom} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses "+displayName+"}} "
+					if (characteristic == 'dexterity') {
+						theRoll += "{{Base Chance = [[@{dexterityChance}[Dexterity Chance]+@{weightDexDCVPenalty}[Weight Penalty]+?{Modifiers|0}[Modifier]]] }}";
+					} else {
+						theRoll += "{{Base Chance = [[@{"+characteristic+"Chance}["+displayName+" Chance]+?{Modifiers|0}[Modifier]]] }}"
+					}
+					theRoll += "{{Roll=[[3d6cf6cs1]]}}";
+				}
+	
+				startRoll(theRoll, (results) => {
+					finishRoll(results.rollId,{});
+				});	
 			});
 		});
 	});
@@ -7361,17 +7381,29 @@
 	perceptionTypes.forEach(percType => {
 		var subtitleExt = (percType != '') ? " - @{perception"+percType+"Label}" : "";
 		on (`clicked:perceptionRoll${percType}`, (info) => {
-			var theRoll = "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception"+subtitleExt+" }} "
-				+ "{{SUCCESS= [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]-3d6cf6cs1[Roll]";
-			if (percType != '') {
-				theRoll += "+@{perceptionModifier"+percType+"}[@{perception"+percType+"Label} Modifier]";
-			}
-			theRoll += "+?{Modifiers|0}[Modifier]]] }}"
+			getAttrs(["displayDegreeOfSuccess"], function(values) {
+				var theRoll = "";
 
-			startRoll(theRoll, (results) => {
-				finishRoll(results.rollId,{
-					SUCCESS:results.results.SUCCESS.result
+				if (values.displayDegreeOfSuccess != 0) {
+					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception"+subtitleExt+" }} "
+						+ "{{SUCCESS= [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]-3d6cf6cs1[Roll]";
+					if (percType != '') {
+						theRoll += "+@{perceptionModifier"+percType+"}[@{perception"+percType+"Label} Modifier]";
+					}
+					theRoll += "+?{Modifiers|0}[Modifier]]] }}"
+				} else {
+					theRoll += "&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception"+subtitleExt+" }} "
+						+ "{{Base Chance = [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]";
+					if (percType != '') {
+						theRoll += "+@{perceptionModifier"+percType+"}[@{perception"+percType+"Label} Modifier]";
+					}
+					theRoll += "+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}}"
+				}
+
+				startRoll(theRoll, (results) => {
+					finishRoll(results.rollId,{});
 				});
+
 			});
 		});
 	});
@@ -7379,13 +7411,20 @@
 	arrayOf(maxSkillNum).forEach(num => {
 		var skillId = String(num).padStart(2,'0');	
 		on(`clicked:testSkill${skillId}`, (info) => {
-			var theRoll = "&{template:custom-success-roll} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses @{skillName"+skillId+"}}} "
-			+ "{{SUCCESS=[[@{skillRollChance"+skillId+"}[Skill Chance]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}"
+			getAttrs(["displayDegreeOfSuccess"], function(values) {
+				var theRoll = "";
 
-			startRoll(theRoll, (results) => {
-				finishRoll(results.rollId,{
-					SUCCESS:results.results.SUCCESS.result
-				});
+				if (values.displayDegreeOfSuccess != 0) {
+					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses @{skillName"+skillId+"}}} "
+						+ "{{SUCCESS=[[@{skillRollChance"+skillId+"}[Skill Chance]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}"
+				} else {
+					theRoll += "&{template:custom} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses @{skillName"+skillId+"}}} "
+						+ "{{Base Chance = [[@{skillRollChance"+skillId+"}[Skill Chance]+?{Modifiers|0}[Modifiers]]] }} {{Roll=[[3d6cf6cs1]]}}"
+				}
+	
+				startRoll(theRoll, (results) => {
+					finishRoll(results.rollId,{});
+				});	
 			});
 		});
 	});
@@ -7747,7 +7786,7 @@
 							
 			if (values.optionLiteracyCostsPoints!=0) {
 				literacyCost = 1;
-						}
+			}
 						
 			let skill41Cost = calculateLanguageSkillCost( values.skillFluency41 , values.skillLiteracy41, linguist, literacyCost);
 			let skill42Cost = calculateLanguageSkillCost( values.skillFluency42 , values.skillLiteracy42, linguist, literacyCost);
