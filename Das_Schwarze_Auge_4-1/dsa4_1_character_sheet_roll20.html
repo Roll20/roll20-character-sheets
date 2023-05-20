@@ -24543,6 +24543,7 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 
 	// Get trigger aka the name of the melee maneuver
 	var trigger = info["triggerName"].replace(/clicked:([^-]+)-action/, '$1');
+	// Get trigger-specific data
 	var data = meleeData[trigger];
 
 	// Fill rolls array to three elements
@@ -24556,18 +24557,22 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 		'pa+pa-parierwaffe': critAttrsPA,
 		'at-schild': critAttrsAT, 'pa-schild': critAttrsPA
 	};
-	var rolls = [];
-	while (rolls.length < rollCountMax) {
-		if (rolls.length < data["rollCount"]) {
-			rolls.push(`1d20cs<@{${critAttrsDict[data["typ"]][0]}}cf>@{${critAttrsDict[data["typ"]][1]}}`);
+	// Build Rolls Strings
+	data["rolls"] = [];
+	var cs = critAttrsDict[data["typ"]][0];
+	var cf = critAttrsDict[data["typ"]][1];
+	while (data["rolls"].length < rollCountMax) {
+		if (data["rolls"].length < data["rollCount"]) {
+			data["rolls"].push(`1d20cs<@{${cs}}cf>@{${cf}}`);
 		} else {
-			rolls.push(0);
+			data["rolls"].push(0);
 		}
 	}
-	debugLog(func, trigger, data, rolls);
-	data["rolls"] = rolls;
+	debugLog(func, trigger, data);
 
-	// Build Roll Macro
+	// Build Roll Button Macro Code
+	// Start with gathering all elements (prefix, template, roll variables with definitions) in objects
+	// Put the objects in an array to preserve the order
 	const wertDict = {
 		'at': '@{AT_Aktiv}',
 		'pa': '@{PA_Aktiv}',
@@ -24588,6 +24593,70 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 		'at-schild': '@{AT_Raufen}',
 		'pa-schild': '@{shield_pa}'
 	};
+	var defaultElements = [];
+
+	// Build String
+	// Prefixes
+	{
+	var template = data.hasOwnProperty('template') ? data["template"] : 'test';
+	defaultElements.push(
+		{ 'prefix':
+			'@{gm_roll_opt} ' +
+			// Not strictly required at the beginning, but conventionally done this way
+			'&{template:' + template + '}'
+		}
+	);
+	}
+
+	// UI Name
+	defaultElements.push( { 'name': 'name', 'value': data["ui"] } );
+
+	// (Sub-)Rolls
+	defaultElements.push( { 'name': 'roll0', 'value': `[[${data["rolls"][0]}]]` } );
+	defaultElements.push( { 'name': 'roll1', 'value': `[[${data["rolls"][1]}]]` } );
+	defaultElements.push( { 'name': 'roll2', 'value': `[[${data["rolls"][2]}]]` } );
+
+	// Roll Modifiers
+	defaultElements.push( { 'name': 'mod', 'value': '[[0]]' } );
+	defaultElements.push( { 'name': 'ansage', 'value': `[[${data["ansagen"]["manoever"]["fest"]} + (${data["ansagen"]["manoever"]["variabel"]})]]` } );
+
+	// Limit (upper, must not be exceeded by unmodified roll)
+	// TODO: Rename "wert" to "limit_result"
+	defaultElements.push( { 'name': 'wert', 'value': `[[${wertDict[data["typ"]]}]]` } );
+
+	// Modification Limit
+	// TODO: Rename "taw" to "limit_mods"
+	defaultElements.push( { 'name': 'taw', 'value': `[[${tawDict[data["typ"]]}]]` } );
+
+	// Custom Roll Parsing-related
+	// Character ID and name for fetching attributes
+	defaultElements.push( { 'name': 'characterid', 'value': '@{character_id}' } );
+	defaultElements.push( { 'name': 'charactername', 'value': '@{character_name}' } );
+
+	// Confirmation Rolls
+	defaultElements.push( { 'name': 'isConfirmationRoll', 'value': '[[0]]' } );
+	// TODO: Expand confirmation rolls to up to three rolls as well (?)
+	defaultElements.push( { 'name': 'confirmationRollRequired', 'value': '[[0]]' } );
+
+	// Anti-Cheat Measures
+	// Cave: These identifiers are produced on the client side (= suspected cheater). With the right equipment and knowledge, it could be relatively simple to circumvent these measures.
+	// Roll Time allows to compare the reaction roll's time with the original roll's time
+	// If too much time passed between both rolls, a warning is emitted.
+	defaultElements.push( { 'name': 'rollTime', 'value': `[[${Date.now()}]]` } );
+	// Roll Tags are short identifiers based on the roll time that are printed in roll templates, if further rolls are possible.
+	// Since every roll of that "chain" will have the same roll tag, all players can verify that the correct roll button was clicked.
+	// TODO: Offer option to hide roll tags ("Wurfkennung").
+	defaultElements.push( { 'name': 'rollTag', 'value': '[[0]]' } );
+
+	// Result Code: -3 (triple 20) to +3 (triple 1)
+	defaultElements.push( { 'name': 'result', 'value': '[[0]]' } );
+
+	// Message Code: Messages depend on roll template
+	defaultElements.push( { 'name': 'msg', 'value': '[[0]]' } );
+
+	// Passthrough, used to carry all relevant information from one roll to the next
+	defaultElements.push( { 'name': 'passthrough', 'value': '[[0]]' } );
+
 
 	// Maneuver-specific Behaviour
 	// Beware of an Ugly Hack
@@ -24689,55 +24758,69 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 		{ "name": "finte", "reuse": "finte4" }
 	];
 
-	var macroVars = {
-		'prelude': '@{gm_roll_opt}',
-		'template': '&{template:test}',
-		'name': `{{name=${data["ui"]}}}`,
-		'mod': '{{mod=[[0]]}}',
-		'ansage': '{{ansage=' +
-			'[[' +
-				`${data["ansagen"]["manoever"]["fest"]} + (${data["ansagen"]["manoever"]["variabel"]})` +
-			']]}}',
-		'wert': `{{wert=[[${wertDict[data["typ"]]}]]}}`,
-		'taw': `{{taw=[[${tawDict[data["typ"]]}]]}}`,
-		'roll0': `{{roll0=[[${rolls[0]}]]}}`,
-		'roll1': `{{roll1=[[${rolls[1]}]]}}`,
-		'roll2': `{{roll2=[[${rolls[2]}]]}}`,
-		'msg': '{{msg=[[0]]}}',
-		'result': '{{result=[[0]]}}',
-		'characterid': '{{characterid=@{character_id}}}',
-		'charactername': '{{charactername=@{character_name}}}',
-		'rollTag': '{{rollTag=[[0]]}}',
-		'rollTime': `{{rollTime=[[${Date.now()}]]}}`,
-		'isConfirmationRoll': '{{isConfirmationRoll=[[0]]}}',
-		'confirmationRoll': '{{confirmationRoll=[[0]]}}',
-		'passthrough': '{{passthrough=[[0]]}}'
-	};
+	/*
+		transformElements
+		The elements of a roll button macro code are divided into "prefix", "main" and "suffix".
+		"prefix" and "suffix" are stored as plain strings only.
+		"main" is stored as plain string or on a per roll variable basis as an object.
+		The property name equals the roll variable name, the content is the macro code.
+		The plain string version and the object version contain a concatenated form featuring the prefix and the suffix alongside "main".
 
-	var rollMacro = [
-		macroVars['prelude'],
-		macroVars['template'],
-		macroVars['name'],
-		macroVars['mod'],
-		macroVars['ansage'],
-		macroVars['wert'],
-		macroVars['taw'],
-		macroVars['roll0'],
-		macroVars['roll1'],
-		macroVars['roll2'],
-		macroVars['msg'],
-		macroVars['result'],
-		macroVars['characterid'],
-		macroVars['charactername'],
-		macroVars['rollTag'],
-		macroVars['rollTime'],
-		macroVars['isConfirmationRoll'],
-		macroVars['confirmationRoll'],
-		macroVars['passthrough']
-	].join(' ') + ' ' +
-	buildMacros(macros_ausfall, {... reuse, ... reuse_ausfall });
+		["string"]["full"] is directly usable roll button macro code.
+		["object"]["full"] is the full object version of the roll button macro code.
+	*/
+	function transformElements(elements) {
+		const func = "transformElements()";
 
-	debugLog(func, "rollMacro", rollMacro);
+		// Prepare results data structure
+		var transformed = {
+			// Prefix and suffix are always strings
+			"common":
+				{ "prefix": "", "suffix": "" },
+			"string": 
+				{ "main": "", "full": "" },
+			"object":
+				{ "main": {}, "full": {} }
+			};
+
+		// Add contents to the results data structure
+		for (macro of elements) {
+			if (macro.hasOwnProperty("prefix")) {
+				transformed["common"]["prefix"] += macro["prefix"] + " ";
+			} else if (macro.hasOwnProperty("suffix")) {
+				transformed["common"]["suffix"] += macro["suffix"] + " ";
+			} else {
+				transformed["string"]["main"] += '{{' + macro["name"] + '=' + macro["value"] + '}} ';
+				transformed["object"]["main"][macro["name"]] = '{{' + macro["name"] + '=' + macro["value"] + '}}';
+			}
+		}
+		transformed["string"]["full"] = transformed["common"]["prefix"] + transformed["string"]["main"] + transformed["common"]["suffix"];
+
+		// "prefix" and "suffix" are reserved for this internal use case, so check against accidentally using them
+		if (
+			transformed["object"]["main"].hasOwnProperty("prefix") === true
+			||
+			transformed["object"]["main"].hasOwnProperty("suffix") === true
+		) {
+			debugLog(func, "Warning: 'prefix' and/or 'suffix' are used as actual roll variables and will be overwritten.");
+		}
+		transformed["object"]["full"]["prefix"] = transformed["common"]["prefix"];
+		transformed["object"]["full"]["suffix"] = transformed["common"]["suffix"];
+		transformed["object"]["full"] = { ... transformed["object"]["prefix"], ... transformed["object"]["suffix"], ... transformed["object"]["main"] };
+		return transformed;
+	}
+
+	// Gather/Create case-specific elements
+	// Currently unused
+	var specialElements = []; //buildMacros(macros_ausfall, { ... reuse, ... reuse_ausfall }, 'structured')
+	var specialRollButtonMacroCode = ""; //buildMacros(macros_ausfall, {... reuse, ... reuse_ausfall }, 'string')
+
+	// Create different representations of the final roll button macro code
+	var allElements = [ ... defaultElements, ... specialElements ];
+	var allElementsObject = transformElements(allElements)["object"]["full"];
+	var rollButtonMacroCode = transformElements(defaultElements)["string"]["full"] + ' ' + specialRollButtonMacroCode;
+
+	debugLog(func, "rollButtonMacroCode", rollButtonMacroCode, "allElements", allElements, "objectified macro variables", allElementsObject);
 
 	// Prepare required attributes
 	var attrsToGet = [
@@ -24748,14 +24831,14 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 	];
 
 	// Start the roll
-	var results = await startRoll(rollMacro);
+	var results = await startRoll(rollButtonMacroCode);
 	const rollID = results.rollId;
 	results = results.results;
 
 	safeGetAttrs(attrsToGet,
 		function(v, missing, badDef)
 		{
-			debugLog("values/missing/badDef", v, missing, badDef, "macroVars", macroVars, "test: info:", info, "results:", results);
+			debugLog("values/missing/badDef", v, missing, badDef, "allElementsObject", allElementsObject, "test: info:", info, "results:", results);
 
 			var wert = results.wert.result;
 			var taw = results.taw.result;
@@ -24767,9 +24850,9 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 			var roll = rolls[0];
 			var mod = results.mod.result;
 			var ansage = results.ansage.result;
-			var msg = macroVars["msg"];
-			var result = macroVars["result"];
-			var confirmationRoll = macroVars["confirmationRoll"];
+			var msg = allElementsObject["msg"];
+			var result = 0;
+			var confirmationRollRequired = 0;
 			var passthrough = {};
 			var cs = parseInt(v[critAttrsDict[data["typ"]][0]]);
 			var cf = parseInt(v[critAttrsDict[data["typ"]][1]]);
@@ -24789,43 +24872,42 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 			// Auswertung des Wurfs
 			if (roll >= cf) {
 				result = -2;
-				confirmationRoll = 1;
+				confirmationRollRequired = 1;
 			} else if (roll > effWert) {
 				result = -1;
 			} else if (roll <= cs) {
 				result = 2;
-				confirmationRoll = 1;
+				confirmationRollRequired = 1;
 			} else {
 				result = 1;
 			}
 
-			if (confirmationRoll === 1) {
+			if (confirmationRollRequired === 1) {
 				passthrough["rollTime"] = Date.now();
 				passthrough["rollTag"] = generateShortRollTag(passthrough["rollTime"]);
-				passthrough["name"] = macroVars["name"];
+				passthrough["name"] = allElementsObject["name"];
 				passthrough["wert"] = wert;
 				passthrough["taw"] = taw;
 				passthrough["effWert"] = effWert;
 				passthrough["mod"] = mod;
 				passthrough["ansage"] = ansage;
-				passthrough["roll0"] = macroVars["roll0"];
-				passthrough["roll1"] = macroVars["roll1"];
-				passthrough["roll2"] = macroVars["roll2"];
+				passthrough["roll0"] = allElementsObject["roll0"];
+				passthrough["roll1"] = allElementsObject["roll1"];
+				passthrough["roll2"] = allElementsObject["roll2"];
 				passthrough["result"] = result;
 				passthrough["cs"] = cs;
 				passthrough["cf"] = cf;
 				passthrough["isConfirmationRoll"] = 1;
 				passthrough["rollMacro"] =
-					"@{gm_roll_opt} " +
-					"&{template:test} " +
+					allElements[0]["prefix"] + " " +
 					"{{name=Nahkampfangriff}} " +
 					"{{mod=[[" + mod + "]]}} " +
 					"{{ansage=[[" + ansage + "]]}} " +
 					"{{wert=[[" + wert + "]]}} " +
 					"{{taw=[[" + taw + "]]}} " +
-					macroVars["roll0"] +
-					macroVars["roll1"] +
-					macroVars["roll2"] +
+					allElementsObject["roll0"] +
+					allElementsObject["roll1"] +
+					allElementsObject["roll2"] +
 					"{{msg=[[0]]}} " +
 					"{{characterid=" + v["character_id"] + "}} " +
 					"{{charactername=" + v["character_name"] + "}} " +
@@ -24842,7 +24924,7 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 			finishRoll(
 				rollID,
 				{
-					confirmationRoll: confirmationRoll,
+					confirmationRollRequired: confirmationRollRequired,
 					msg: msg,
 					result: result,
 					rollTag: passthrough["rollTag"],
