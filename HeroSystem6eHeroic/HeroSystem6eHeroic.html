@@ -5493,6 +5493,14 @@
 				<h1>Display Degree of Success</h1>
 			</div>
 
+			<div class="item-options-row">
+				<label class="container-checkbox">
+					<input type="checkbox" name="attr_whisperToGM">
+					<span class="checkmark" title="@{whisperToGM}"></span>
+				</label>
+				<h1>Whisper Rolls to GM</h1>
+			</div>
+
 			<div class="item-version-row">
 				<div class="item-version-label">
 					<h2>Version:</h2>
@@ -7056,26 +7064,30 @@
 	arrayOf(maxPowerNum).forEach(num => {
 		var powerId = String(num).padStart(2,'0');
 		on("clicked:powerRoll"+powerId, function() {
-			var theRoll = "&{template:custom-power-attack} {{title=@{character_name} - @{character_title}}} "
-				+ "{{subtitle= @{powerName"+powerId+"} - @{powerEffect"+powerId+"}}} {{desc=@{powerText"+powerId+"}}} "
-				+ "{{Activate On = [[?{Modifiers|0}+@{powerSkillRoll"+powerId+"}]] **or less**}} "
-				+ "{{Success Roll=[[3d6cf6cs1]]}} {{Attack Roll=[[3d6cf6cs1]]}} "
-				+ "{{Effect Roll=[[@{hiddenPowerDice"+powerId+"}sd]]}} "
-				+ "{{END=[[@{powerEND"+powerId+"}]] (@{CurrentEND})}}";
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
+				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
 
-			startRoll(theRoll, (results) => {
-				// Roll activation and effect dice. If the option to auto apply endurance is TRUE, subtract the power's END once from endurance.
-				getAttrs(["optionAutoSubtractEND", "powerEND"+powerId], function(values) {
-					let powerEND = parseInt(values["powerEND"+powerId])||0;
+				theRoll += "&{template:custom-power-attack} {{title=@{character_name} - @{character_title}}} "
+					+ "{{subtitle= @{powerName"+powerId+"} - @{powerEffect"+powerId+"}}} {{desc=@{powerText"+powerId+"}}} "
+					+ "{{Activate On = [[?{Modifiers|0}+@{powerSkillRoll"+powerId+"}]] **or less**}} "
+					+ "{{Success Roll=[[3d6cf6cs1]]}} {{Attack Roll=[[3d6cf6cs1]]}} "
+					+ "{{Effect Roll=[[@{hiddenPowerDice"+powerId+"}sd]]}} "
+					+ "{{END=[[@{powerEND"+powerId+"}]] (@{CurrentEND})}}";
 
-					if (values.optionAutoSubtractEND != 0)
-						subtractEndurance(powerEND);
+				startRoll(theRoll, (results) => {
+					// Roll activation and effect dice. If the option to auto apply endurance is TRUE, subtract the power's END once from endurance.
+					getAttrs(["optionAutoSubtractEND", "powerEND"+powerId], function(values) {
+						let powerEND = parseInt(values["powerEND"+powerId])||0;
+
+						if (values.optionAutoSubtractEND != 0)
+							subtractEndurance(powerEND);
+					});
+
+					finishRoll(results.rollId, {});
 				});
-
-				finishRoll(results.rollId, {});
-			});
 			});
 		});
+	});
 	
 	// Update Tally Bar after change to any Power's CP cost.
 	on("change:powerCP01 change:powerCP02 change:powerCP03 change:powerCP04 change:powerCP05 change:powerCP06 change:powerCP07 change:powerCP08 change:powerCP09 change:powerCP10 change:powerCP11 change:powerCP12 change:powerCP13 change:powerCP14 change:powerCP15 change:powerCP16 change:powerCP17", function () {
@@ -7349,9 +7361,9 @@
 	var characteristics = ['strength', 'dexterity', 'constitution', 'intelligence', 'ego', 'presence']
 	characteristics.forEach(characteristic => {
 		on (`clicked:${characteristic}`, (info) => {
-			getAttrs(["displayDegreeOfSuccess"], function(values) {
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
+				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
 				var displayName = characteristic.charAt(0).toUpperCase() + characteristic.slice(1);
-				var theRoll = "";
 	
 				if (values.displayDegreeOfSuccess != 0) {
 					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses "+displayName+" }} ";
@@ -7381,8 +7393,8 @@
 	perceptionTypes.forEach(percType => {
 		var subtitleExt = (percType != '') ? " - @{perception"+percType+"Label}" : "";
 		on (`clicked:perceptionRoll${percType}`, (info) => {
-			getAttrs(["displayDegreeOfSuccess"], function(values) {
-				var theRoll = "";
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
+				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
 
 				if (values.displayDegreeOfSuccess != 0) {
 					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception"+subtitleExt+" }} "
@@ -7411,8 +7423,8 @@
 	arrayOf(maxSkillNum).forEach(num => {
 		var skillId = String(num).padStart(2,'0');	
 		on(`clicked:testSkill${skillId}`, (info) => {
-			getAttrs(["displayDegreeOfSuccess"], function(values) {
-				var theRoll = "";
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
+				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
 
 				if (values.displayDegreeOfSuccess != 0) {
 					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses @{skillName"+skillId+"}}} "
@@ -8319,7 +8331,8 @@
 			// Roll attack and damage dice for Weapon XX.
 			
 			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId,
-					"optionAutoSubtractEND", "optionHitLocationSystem"], function(values) {
+					"optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM"], function(values) {
+				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
 				let areaOfEffect = values["weaponAreaEffect"+weaponId] != 0;
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["weaponNormalDamage"+weaponId] != 0;
@@ -8331,7 +8344,7 @@
 				let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 				
 				// If isNormalDamage is TRUE, use the Normal Damage template.
-				var theRoll = "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
+				theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
 						+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{weaponName"+weaponId+"}}} "
 						+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[["+ (areaOfEffect ? 0 : 1) +"*@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} "
 						+ (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}} " : "")
@@ -8381,7 +8394,8 @@
 	on('clicked:attackShield', (info) => {
 		// Roll attack and damage dice for the shield.
 						
-		getAttrs(["shieldNormalDamage", "shieldStunMod", "shieldEndurance", "optionAutoSubtractEND", "optionHitLocationSystem"], function(values) {
+		getAttrs(["shieldNormalDamage", "shieldStunMod", "shieldEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM"], function(values) {
+			var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
 			let useHitLocations = values.optionHitLocationSystem != 0;
 			let isNormalDamage = values.shieldNormalDamage != 0;
 			let stunMod = parseInt(values.shieldStunMod)||0;
@@ -8392,7 +8406,7 @@
 			let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 
 			// If isNormalDamage is TRUE, use the Normal Damage template.
-			var theRoll = "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
+			theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
 					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}}} "
 					+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-[[abs(?{Blocking|Yes,1|No,-1}-1)/2*@{targetOCVpenalty}]][TargetOCV]+[[?{Blocking}*@{shieldDCV}]][ShieldDCV]+?{Modifiers|0}[Modifier]]]}} "
 					+ (subtractENDAmt ? "{{END=[[[[abs(?{Blocking}-1)/2]][Blocking]*@{shieldEndurance}[Endurance Cost]]] (@{currentEND})}} " : "")
@@ -8452,12 +8466,13 @@
 	on('clicked:standardAttackRoll', (info) => {
 		// Roll attack and damage dice for standardAttack
 
-		getAttrs(["hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem"], function(values) {
+		getAttrs(["hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM"], function(values) {
+			var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
 			let useHitLocations = values.optionHitLocationSystem != 0;
 
 			let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
 
-			let theRoll = "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} "
+			theRoll += "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} "
 				+ "{{subtitle= Makes a normal attack with Strength @{strength}}} "
 				+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]-@{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} "
 				+ (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}} " : "")
