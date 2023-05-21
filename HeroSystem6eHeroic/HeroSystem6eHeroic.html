@@ -483,7 +483,7 @@
 							<option value="18" selected>NA</option>
 						</select>
 					</div>
-					<button type="roll" class="button buttonRollActivate" tabindex="-1" name="roll_armorActivation01" title="%{armorActivation01}" value="&{template:custom-activate} {{title=@{character_name} - @{character_title}}} {{subtitle= Defends with @{armorName01}**}} {{Activate on = [[@{armorActivation01}]] **or less**}} {{Result = [[3d6cf6cs1]]}} {{Resistant Defense = **rPD ``@{armorPD01}`` rED ``@{armorED01}``**}} {{Total Defense = **PD ``@{totalPD01}`` ED ``@{totalED01}``**}}" >Roll</button>
+					<button type="action" class="button buttonRollActivate" tabindex="-1" name="act_armorActivation01" title="%{armorActivation01}" >Roll</button>
 					<input type="text" class="armorLocationsText" name="attr_armorLocations01" title="@{armorLocations01}" maxlength="24" tabindex="54"/>
 					<input type="number" name="attr_armorMass01" title="@{armorMass01}" value="0" min="0" step="0.1" tabindex="55"/>
 				</div>
@@ -518,7 +518,7 @@
 							<option value="18" selected>NA</option>
 						</select>
 					</div>
-					<button type="roll" class="button buttonRollActivate" tabindex="-1" name="roll_armorActivation02" title="%{armorActivation02}" value="&{template:custom-activate} {{title=@{character_name} - @{character_title}}} {{subtitle= Defends with @{armorName02}**}} {{Activate on = [[@{armorActivation02}]] **or less**}} {{Result = [[3d6cf6cs1]]}} {{Resistant Defense = **rPD ``@{armorPD02}`` rED ``@{armorED02}``**}} {{Total Defense = **PD ``@{totalPD02}`` ED ``@{totalED02}``**}}" >Roll</button>
+					<button type="action" class="button buttonRollActivate" tabindex="-1" name="act_armorActivation02" title="%{armorActivation02}" >Roll</button>
 					<input type="text" class="armorLocationsText" name="attr_armorLocations02" title="@{armorLocations02}" maxlength="24" tabindex="59"/>
 					<input type="number" name="attr_armorMass02" title="@{armorMass02}" value="0" min="0" step="0.1" tabindex="60"/>
 				</div>
@@ -553,7 +553,7 @@
 							<option value="18" selected>NA</option>
 						</select>
 					</div>
-					<button type="roll" class="button buttonRollActivate" tabindex="-1" name="roll_armorActivation03" title="%{armorActivation03}" value="&{template:custom-activate} {{title=@{character_name} - @{character_title}}} {{subtitle= Defends with @{armorName03}**}} {{Activate on = [[@{armorActivation03}]] **or less**}} {{Result = [[3d6cf6cs1]]}} {{Resistant Defense = **rPD ``@{armorPD03}`` rED ``@{armorED03}``**}} {{Total Defense = **PD ``@{totalPD03}`` ED ``@{totalED03}``**}}" >Roll</button>
+					<button type="action" class="button buttonRollActivate" tabindex="-1" name="act_armorActivation03" title="%{armorActivation03}" >Roll</button>
 					<input type="text" class="armorLocationsText" name="attr_armorLocations03" title="@{armorLocations03}" maxlength="24" tabindex="64"/>
 					<input type="number" name="attr_armorMass03" title="@{armorMass03}" value="0" min="0" step="0.1" tabindex="65"/>
 				</div>
@@ -588,7 +588,7 @@
 							<option value="18" selected>NA</option>
 						</select>
 					</div>
-					<button type="roll" class="button buttonRollActivate" tabindex="-1" name="roll_armorActivation04" title="%{armorActivation04}" value="&{template:custom-activate} {{title=@{character_name} - @{character_title}}} {{subtitle= Defends with @{armorName04}**}} {{Activate on = [[@{armorActivation04}]] **or less**}} {{Result = [[3d6cf6cs1]]}} {{Resistant Defense = **rPD ``@{armorPD04}`` rED ``@{armorED04}``**}} {{Total Defense = **PD ``@{totalPD04}`` ED ``@{totalED04}``**}}" >Roll</button>
+					<button type="action" class="button buttonRollActivate" tabindex="-1" name="act_armorActivation04" title="%{armorActivation04}" >Roll</button>
 					<input type="text" class="armorLocationsText" name="attr_armorLocations04" title="@{armorLocations04}" maxlength="24" tabindex="69"/>
 					<input type="number" name="attr_armorMass04" title="@{armorMass04}" value="0" min="0" step="0.1" tabindex="70"/>
 				</div>
@@ -5832,6 +5832,7 @@
 	/* Functions used sheet-wide */
 	/* ------------------------- */
 	
+	const maxArmorNum = 4;
 	const maxWeaponNum = 5;
 	const maxEquipmentNum = 16;
 	const maxSkillNum = 30;
@@ -8058,6 +8059,30 @@
 		setAttrs({sheetTab:"characteristics"});
 	});
 	
+	/* ----------------------- */
+	/* --- Armor Functions --- */
+	/* ----------------------- */
+
+	arrayOf(maxArmorNum).forEach(num => {
+		var armorId = String(num).padStart(2,'0');	
+		on(`clicked:armorActivation${armorId}`, (info) => {
+			getAttrs(["whisperToGM"], function(values) {
+				var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
+				
+				theRoll += "&{template:custom-activate} {{title=@{character_name} - @{character_title}}} "
+					+ "{{subtitle= Defends with @{armorName"+armorId+"}**}} "
+					+ "{{Activate on = [[@{armorActivation"+armorId+"}]] **or less**}} "
+					+ "{{Result = [[3d6cf6cs1]]}} "
+					+ "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} "
+					+ "{{Total Defense = **PD ``@{totalPD"+armorId+"}`` ED ``@{totalED"+armorId+"}``**}}";
+				
+				startRoll(theRoll, (results) => {
+					finishRoll(results.rollId, {});
+				});
+			});
+		});
+	});
+
 	/* ------------------------------------------------ */
 	/* --- Weapon Attacks and Hit Location Helpers  --- */
 	/* ------------------------------------------------ */
