@@ -6,9 +6,24 @@ This sheet works largely on its own, however there is [a Roll20 wiki page devote
 
 The roll buttons assume you have a number of rollable tables (`feat`, `lm-feat`, `normal` and `weary`) setup, as described on [the Wiki page](https://wiki.roll20.net/The_One_Ring).
 
-### Loremaster and Adversary sheets
+### Loremaster and Adversary sheets 
 
 This is in fact three character sheets in one. A full-on Player Character sheet and two Loremaster sheets meant for characters (that is people who are on the side of the players) and adversaries (that is characters who are not, or creatures). The two former use the `feat` table for rolls, and the latter uses the `lm-feat` table (and has Hate instead of Hope).
+
+### Update 2.0.3 1/10/2021
+
+Updated the Player Character sheet added total_experiance points (as may have asked for this to be added. have also added a custom roll template to use If you previously used the default roll template on your sheet and want to edit the macros to work with the new one, there are two spots you must to edit to make it work.
+
+This macro using the default roll template: 
+
+&{template:default} {{name=Sword Attack}} {{attack=[[1d20]]}} {{damage=[[2d6]]}} {{Notes=Sword shouts "Gnome" repeatedly when you're within 20ft of any halfling or dwarf.}}
+
+Needs at the very least change the template name and swap the header name from name to title, to keep things working the same:
+
+&{template:custom} {{color=00ffff}}   {{title=Sword Attack}} {{attack=[[1d20]]}} {{damage=[[2d6]]}} {{Notes=Sword shouts "Gnome" repeatedly when you're within 20ft of any halfling or dwarf.}}
+
+I have added all 66 character chat/ping colors that can be used. more documentation on the roll template https://wiki.roll20.net/Building_Character_Sheets/Roll_Templates
+
 
 ### Internationalisation
 

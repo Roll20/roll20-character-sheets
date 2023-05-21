@@ -29,56 +29,70 @@
 			.grid.section-stats
 				h2.aligned-left(data-i18n='8. statistics' data-i18n-title='8. statistics' title='8. statistics') 8. statistics
 				.vert-line
-				each string in ['score', 'x5']
+				each string in ['score', '×5']
 					h2.center(data-i18n=string data-i18n-title=string)= string
 					.vert-line
 				h2.aligned-left(data-i18n='distinguishing features' data-i18n-title='') distinguishing features
 				.horz-line
 				each val, key in statsObject
-					- const statRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
+					//- const statRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}}`;
+					//without modifier - const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}} {{stat=[[@{${key+'_score'}}]]}} {{score=[[@{${key}}]]}}`;
+					- const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{stat=[[@{${key+'_score'}}+round(?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}/10)]]}} {{score=[[@{${key}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}`;
 					button(name=key data-i18n-title=key + ' roll' title=key + ' roll' type='roll' value!=statRollValue)
 						h3.aligned-left(data-i18n=key)= key
-						span.para(data-i18n=val)= '(' + val + ')'
+						span.para(data-i18n=val)=   val 
 					.vert-line
-					label(data-i18n-title=key + ' score' title=key + ' score')
-						input(data-i18n-placeholder='10' min=0 name='attr_' + key + '_score' placeholder='10' title='@{' + key + '_score' + '}' type='number' value='10')
+					if (val === 'POW' || val === 'STR' || val === 'CON' )
+						label(data-i18n-title=key + ' score' title=key + ' score')
+							input( min=0 name='attr_' + key + '_score' placeholder='-' title='@{' + key + '_score' + '}' type='number' value=' ')
+					else
+						label(data-i18n-title=key + ' score' title=key + ' score')
+							input(data-i18n-placeholder='-' min=0 name='attr_' + key + '_score' placeholder='-' title='@{' + key + '_score' + '}' type='number' value=' ')
 					.vert-line
 					span.center(name='attr_' + key title='@{' + key + '}')
 					.vert-line
 					label(data-i18n-title=key + ' distinguishing features' title=key + ' distinguishing features')
 						input(data-i18n-placeholder='distinguishing features' name='attr_' + key + '_features' placeholder='distinguishing features' title='@{' + key + '_features' + '}' type='text')
-					input(name='attr_' + key type='hidden' value='50')
+					input(name='attr_' + key type='hidden' value='0')
 					.horz-line
 
 			//DERIVED ATTRIBUTES
 			.grid.section-derived
-				.grid.section.border-bottom
+				.grid.section
 					h2(class='aligned-left') 9. derived attributes
 					each string in ['maximum', 'current']
 						.vert-line
 						h2(class='center')= string
-				each val, key in {'hit points': 'HP', 'willpower points': 'WP', 'sanity points': 'SAN', 'breaking point': 'BP'}
-					- const presetValue =  (val === 'HP' || val === 'WP') ? 10 : (val === 'SAN') ? 50 : 40;
-					- const attrName = key.replace(' ','_');
-					.grid.section.border-bottom
-						.derived-attr
-							if val === 'SAN'
-								button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`)
-									h3.aligned-left(data-i18n=key data-i18n-title=key)= key
-									span.para(data-i18n=val)= '(' + val + ')'
-							else
+					.horz-line
+					each val, key in {'hit points': 'HP', 'willpower points': 'WP', 'sanity points': 'SAN', 'breaking point': 'BP', 'luck':'Luck'}
+						- const presetValue =  (val === 'HP' || val === 'WP') ? 0 : (val === 'SAN') ? 0 : (val === 'BP') ? 0: 50;
+						- const attrName = key.replace(' ','_');
+						if (val === 'SAN') 
+							//without modifier button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}]]}} {{dice=[[1d100]]}}`)
+							button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{dice=[[1d100]]}}`)
+							
 								h3.aligned-left(data-i18n=key data-i18n-title=key)= key
-								span.para(data-i18n=val)= '(' + val + ')'
-						.vert-line
-						if val === 'SAN'
-							label(data-i18n-title=key + ' maximum' title=key + ' maximum')
-								input(class="max" name='attr_' + attrName + "_max" placeholder='50' title='@{' + attrName + '_max}' type='number' value=presetValue)
+								span.para(data-i18n=val)=  val 
+						else if (val==='Luck')
+							//without modifier button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}]]}} {{dice=[[1d100]]}}`)
+							button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{dice=[[1d100]]}}`)
+								h3.aligned-left(data-i18n=key data-i18n-title=key)= key
 						else
-							span(class='center' name='attr_' + attrName + '_max' title='@{' + attrName + '_max' + '}')
+							.derived-attr.nbsp
+								h3.aligned-left(data-i18n=key data-i18n-title=key)= key
+								span.para(data-i18n=val)=  val 
 						.vert-line
-						label(data-i18n-title=key title=key)
-							input(name='attr_' + attrName placeholder='10' title='@{' + attrName + '}' type='number' value=presetValue)
+						span(class='center' name='attr_' + attrName + '_max' title='@{' + attrName + '_max' + '}')
+						.vert-line
+						if (val === 'Luck')
+							span(class='center' name='attr_' + attrName + '_max' title='@{' + attrName + '_max' + '}')
+								input(name='attr_' + attrName placeholder='10' title='@{' + attrName + '}' type='hidden' value=presetValue)
+								span.percent %
+						else
+							label(data-i18n-title=key title=key)
+								input(name='attr_' + attrName placeholder='-' title='@{' + attrName + '}' type='number' value=' ')
 						input(name='attr_' + attrName + '_max' type='hidden' value=presetValue)
+						.horz-line
 			//PHYSICAL DESCRIPTION
 			.grid.section-physical
 				h2(class='aligned-left') 9. physical description
@@ -101,7 +115,8 @@
 								input(name='attr_name' placeholder='bond' title='@{repeating_bonds_${x}_name}' type='text')
 							.vert-line
 							label(data-i18n-title='bond score' title='bond score')
-								input(data-i18n-placeholder='10' name='attr_score' placeholder='10' title='@{repeating_bonds_${x}_score}' type='number')
+								input(data-i18n-placeholder='-' name='attr_score' placeholder='-' title='@{repeating_bonds_${x}_score}' type='number')
+								input( name='attr_flag' title='@{repeating_bonds_${x}_flag}' type='hidden' value='0')
 			.grid.section-motivations
 				.grid.section.border-bottom
 					h2.aligned-left(data-i18n='12. motivations and mental disorders' data-i18n-title='12. motivations and mental disorders') 12. motivations and mental disorders
@@ -129,12 +144,15 @@
 			.grid.section-skill-col
 				each val, key in skills3
 					+skill(val, key)
+				each val, key in skills4
+					+skillunnatural(val, key)
 				.repeating-container.border-bottom
 					h3.margin-left(data-i18n='foriegn languages and other skills:' data-i18n-title='foriegn languages and other skills:') foriegn languages and other skills:
 					.horz-line
 					fieldset.repeating_skills
 						.grid.section-repeating.border-bottom
-							- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
+							//without modifier - const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{rating=[[@{rank}]]}} {{dice=[[1d100]]}}`;
+							- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{rating=[[@{rank}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{dice=[[1d100]]}}`;
 							label.styled-checkbox(data-i18n-title='skill fail checkbox' title='skill fail checkbox')
 								input(name='attr_fail' title='@{repeating_skills_${x}_fail}' type='checkbox')
 							label(data-i18n-title='skill name' title='skill name')
@@ -143,9 +161,19 @@
 							.vert-line
 							label(data-i18n-title='skill rank' title='skill rank')
 								input(data-i18n-placeholder='0' name='attr_rank' title='@{repeating_skills_${x}_rank}' placeholder='0' type='number' value='')
-			.section-directions.center 
-				span(data-i18n='Check a box when you attempt to use a skill and fail. After the session, add 1 to each checked skill and erase all checks.') Check a box when you attempt to use a skill and fail. After the session, add 1 to each checked skill and erase all checks.
-
+			.section-directions.center.updateinfo 
+				span(data-i18n='Check a box when you attempt to use a skill and fail. After the session, add 1d4 to each checked skill and erase all checks.') Check a box when you attempt to use a skill and fail. After the session, add 1d4 to each checked skill and erase all checks.
+				button(name='act_levelup' type='action')
+					h3.aligned-center(data-i18n='Update' data-i18n-title='Update')= Update
+				input(type='checkbox')
+				span
+				.summary
+					fieldset.repeating_summary
+						.section-summary
+							span( name='attr_skillname')
+							span(style='color:red;' name='attr_oldval')
+							span.slash →
+							span(style='color:green;' name='attr_newval')
 	//INJURIES
 	.grid.header-body.injuries.border
 		.section-header
@@ -179,15 +207,30 @@
 			.repeating-container.border-bottom
 				fieldset.repeating_weapons
 					.grid.section-weapons.border-bottom
-						- const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}`; 
+						//without modifier - const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{rating=[[@{skill_percent}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}} {{AP=[[@{armor_piercing}+0]]}}`; 
+						- const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{rating=[[@{skill_percent}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}} {{AP=[[@{armor_piercing}+0]]}}`; 
 						each weapon in weaponsAttrs
 							- const attrName = weapon.replace(' ', '_').replace('%', 'percent')
 							- const type = weapon.includes('%') || weapon === 'ammo' ? 'number' : 'text';
+							if (attrName==='lethality_percent')
+								label(data-i18n-title=weapon + ' input' title=weapon + ' input')
+									input(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=type value='')
+									input(name='attr_haslethality' type='hidden' value='0')
+								.vert-line
+							else if (attrName==='damage')
+								label(data-i18n-title=weapon + ' input' title=weapon + ' input')
+									input(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=type value='')
+									input(name='attr_hasdamage'  type='hidden' value='0')
+								.vert-line
+							else
 								label(data-i18n-title=weapon + ' input' title=weapon + ' input')
 									input(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=type value='')
 								.vert-line
 						button.dicefontd10(name='weapon' type='roll' title='weapon roll' value=weaponRollValue) k
-						button.none(name='roll_damage' type='roll' value='@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=^{damage}}} {{damage=[[@{damage}]]}}')
+						button.none(name='roll_damage' type='roll' value='@{gm_toggle} &{template:damage} {{header=@{weapons}}} {{subheader=@{damage}}} {{damage=[[@{damage}]]}} {{AP=[[@{armor_piercing}+0]]}}')
+						button.none(name='roll_lethality' type='roll' value='@{gm_toggle} &{template:lethality} {{header=@{weapons}}} {{subheader=@{lethality_percent}}}{{lethality_rating=[[@{lethality_percent}]]}} {{lethality=[[1d100]]}} {{AP=[[@{armor_piercing}+0]]}}')
+						button.none(name='roll_damage_critical' type='roll' value='@{gm_toggle} &{template:damage} {{header=@{weapons}}} {{subheader=@{damage}}} {{damage=[[(@{damage})*2]]}} {{AP=[[@{armor_piercing}+0]]}}')
+						button.none(name='roll_lethality_critical' type='roll' value='@{gm_toggle} &{template:lethality_critical} {{header=@{weapons}}} {{subheader=@{lethality_percent}}} {{lethality_rating=[[@{lethality_percent}*2]]}} {{lethality=[[1d100]]}} {{AP=[[@{armor_piercing}+0]]}}')
 
 	//REMARKS
 	.grid.header-body.remarks.border

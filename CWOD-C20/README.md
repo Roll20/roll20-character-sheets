@@ -10,6 +10,12 @@ Any help improving the sheet are welcome.
 
 # Version History
 
+
+## Version 0.7(2020-05-05)
+
+- fix"skills"-section to align text better with their dots
+- fix "skills"-section fix spanish skill names better 
+
 ## Version 0.6(2018-09-04)
 
 - fix Nightmare Imbalance attribute

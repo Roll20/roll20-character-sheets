@@ -1,4 +1,4 @@
-// Vampire the Masquerade 5e Dice Mechanics by Momtahan K (Version 1.3).
+// Vampire the Masquerade 5e Dice Mechanics by Momtahan K (Version 1.4).
 //
 // The following code is an adaptation of that produced by Roll20 user Konrad J. for "Hero Quest Dice Mechanics". 
 // Many thanks for providing this code free to use.
@@ -27,6 +27,8 @@
 // try to use it for commerical gain. This has been added to ensure the community benefits from it.
 
 // Versions
+// Version 1.4
+// Enabled GM Whisper rolls
 // Version 1.3
 // Bug fix. Macros previously may have caused issues, removing some error checking to fix this issue.
 // Version 1.2
@@ -115,7 +117,8 @@ var vtmGlobal = {
 	diceTestEnabled: false,
 	diceLogRolledOnOneLine: false,
 	luckydice: false,
-	reroll: ""
+	reroll: "",
+	whisper: ""
 };
 
 function rollVTMDice(diceQty, type, dc) {
@@ -303,7 +306,7 @@ function processVampireDiceScript(run, dc) {
 	}
 
 	let endTemplateSection = "}} ";
-	let outputMessage = "&{template:wod} {{name=" + user + endTemplateSection;
+	let outputMessage = vtmGlobal.whisper + "&{template:wod} {{name=" + user + endTemplateSection;
 
 	if (run.rollname) {
 		outputMessage += "{{Rollname=" + run.rollname + endTemplateSection;
@@ -329,7 +332,7 @@ function processVampireDiceScript(run, dc) {
 		}
 	}
 
-	let thebeast = '<img src="https://raw.githubusercontent.com/Kirintale/roll20-character-sheets/master/vampire-v5/Banners/TheBeast.png" title="The Beast" height="20" width="228"/>';
+	let thebeast = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/TheBeast.png" title="The Beast" height="20" width="228"/>';
 
 	if (run.rouseStatRoll) {
 		if (diceTotals.successScore > 0) {
@@ -381,11 +384,11 @@ function addRollDeclarations(diceTotals, outputMessage, endTemplateSection, theb
 	if (diceTotals.successScore == 0 && vtmGlobal.luckydice) {
 		let lastResort = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/lastresort.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Fate=" + lastResort + endTemplateSection;
-		let miss = '<img src="https://raw.githubusercontent.com/Kirintale/roll20-character-sheets/master/vampire-v5/Banners/MissFail.png" title="Miss" height="20" width="228"/>';
+		let miss = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/MissFail.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Miss=" + miss + endTemplateSection;
 	} else if (diceTotals.successScore == 0) {
 		//outputMessage += "{{Fate=" + "Total failure" + endTemplateSection;
-		let miss = '<img src="https://raw.githubusercontent.com/Kirintale/roll20-character-sheets/master/vampire-v5/Banners/MissFail.png" title="Miss" height="20" width="228"/>';
+		let miss = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/MissFail.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Miss=" + miss + endTemplateSection;
 	} else if (vtmGlobal.luckydice) {
 		let lastResort = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/lastresort.png" title="Miss" height="20" width="228"/>';
@@ -393,10 +396,10 @@ function addRollDeclarations(diceTotals, outputMessage, endTemplateSection, theb
 	}
 
 	if ((diceTotals.muddyCritScore >= 2) || (diceTotals.muddyCritScore === 1 && (diceTotals.critScore >= 1))) {
-		let messy = '<img src="https://raw.githubusercontent.com/Kirintale/roll20-character-sheets/master/vampire-v5/Banners/MessyCritical.png" title="Messy" height="20" width="228"/>';
+		let messy = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/MessyCritical.png" title="Messy" height="20" width="228"/>';
 		outputMessage += "{{Messy=" + messy + endTemplateSection;
 	} else if (diceTotals.critScore >= 2) {
-		let crit = '<img src="https://raw.githubusercontent.com/Kirintale/roll20-character-sheets/master/vampire-v5/Banners/CriticalHit.png" title="Crit" height="20" width="228"/>';
+		let crit = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/CriticalHit.png" title="Crit" height="20" width="228"/>';
 		outputMessage += "{{Crit=" + crit + endTemplateSection;
 	}
 
@@ -728,6 +731,12 @@ function calculateVariables(argv, who) {
 			// The number of successes required (used for only certain rolls)
 			let value = parseInt(entry.substring(1), 10);
 			input.difficulty = value;
+		} else if (identifier === "g") {
+			i++;
+			let value = argv[i];
+			if (value != undefined) {
+				vtmGlobal.whisper= value.trim();
+			}
 		} else if (input.type === "remorse") {
 			log("remorse variable")
 			// Used for remorse rolls
@@ -820,7 +829,8 @@ function calculateDc(run) {
 	return dc;
 }
 
-on("chat:message", function (msg) {
+on("chat:message", function (msg_orig) {
+        let msg=_.clone(msg_orig);
 	// returns the chat window command entered, all in lowercase.
 	if (msg.type != 'api') {
 		return;

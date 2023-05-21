@@ -1,15 +1,21 @@
 # MERP Roll20 Character Sheet
 
-Middle Earth Role Playing (MERP) has often been described as a simplified version of **Rolemaster**, the flagship game of Iron Crown Enterprises. Be as it may, this Roll20 character sheet for MERP contains quite a few automatic calculations and cascading effects. This brief documents is an attempt to shed some light on those. For further details, please consult the rule book and the source code of the sheet.  
+Middle Earth Role Playing (MERP) has often been described as a simplified version of **Rolemaster**, the flagship game of Iron Crown Enterprises. It condenses the wealth of options of Rolemaster down to a few professions and spell lists. In similar vein, the massive volume of charts have been truncated in variety and size. 
+
+Despite the simplification, this Roll20 character sheet for MERP contains quite a few automatic calculations and cascading effects. This brief documents is an attempt to shed some light on those. For further details, please consult the rule book and the source code of the sheet.  
 
 This sheet in its organization and content is mostly based on the second U.S. edition from 1986. Currently, the only inclusion of house rules is placeholder for stride modifier as the movement rate would have been difficult to modify without side effects.
+
+### Contributing to the project
+
+This open-source project welcomes contributions. Bear in mind, however, there may be more to MERP than Third Age Eriador. Before making a pull-request to Roll20 master, make sure to leave room for custom choices. 
+
+If you want a completely automatized character sheet with all options integrated as drop-down menus and built-in tables, you could perhaps publish it as its own character sheet. 
 
 
 ## Personal Sheet
 
-The personal information of the character is subdivided into seven sections.
-
-Subdivisions into sections
+The personal information of the character is subdivided into seven subsections.
 
 ### Personal 
 
@@ -19,7 +25,7 @@ In MERP, different **cultures** and/or **races** provide slightly different set 
 
 ### Resistances and defenses
 
-The choice of **realm** the character is attuned to determines what kinds of magical spells he or she is able to learn. Bards and mages are essence users while animists and rangers are channelling users, respectively. However, the selection of profession does not automatically change the realm. 
+The choice of **realm** the character is attuned to determines what kinds of magical spells he or she is able to learn. Bards and mages are essence users while animists and rangers are attuned to channelling. However, the selection of profession does not automatically change the realm. 
 
 There are five different armor types, if no armor at all is considered one. The field **armor worn** affects the movement rate: the corresponding moving maneuver skill is either added or subtracted from movement base rate (i.e., 50 feet/rnd). In addition, the character can protect him/herself with a helmet, arm greaves, and leg greaves that lower slightly perception, offensive bonuses and moving maneuver bonuses, respectively. The perception penalty is shown on skill sheet in column 'spec'. The penalties from greaves are added to the OB and MM penalties in Status section. The use of a shield will improve the defensive bonus by 25.
 
@@ -57,7 +63,7 @@ All the stats default to value 50 for a new character. This is only for convenie
 
 The upper limit for a stat is 102 and lower limit is 0. The changes in stat values or bonuses cascade automatically through-out the sheet.
 
-### Special abilities and languages
+### Injuries, Special abilities and languages
 
 These are merely for book-keeping without any automatic mechanisms attached.
 
@@ -87,3 +93,11 @@ The spell lists are for book-keeping. The little arrow or triangle can be used t
 The items carried by the character add to his or her encumbrance if they are not worn (e.g., an armor). The checking "worn" checkbox excludes the corresponding item from encumbrance. The sheet keeps track of total weight of the equipment as well as total encumbrance which then turns into encumbrance penalty (modified by strength bonus and the weight of the character). 
 
 A character might want to drop his or her backpack before a battle to lower or to eliminate the encumbrance penalty. To this sort of temporary encumbrance change, an item can be dropped by checking the "dropped" checkbox. It is thus excluded from total weight and total encumbrance.
+
+## NPC/Creature
+
+The elaborate character sheet is a poor fit for many of the NPCs and creatures. As a remedy, NPC/Creature tab represents a sheet for the basic information for a non-player character, an animal or a monster. 
+
+## Settings
+
+Currently, there is only the setting for whispering die rolls. You can choose to never whisper your rolls and thus make them always public. Alternatively, you can have the system prompt you for a decision for each roll. There is also the option for always whispering the rolls thus sharing die rolls with only the GM.

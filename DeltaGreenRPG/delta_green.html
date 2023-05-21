@@ -3,24 +3,25 @@
 	// A full night of sleep cures exhaustion so if sedatives work, you are not exhausted anymore
 	// the day after a full night of sleep and both exhaustion (they work mechanically the same)
 	
-const fillRepeatingSectionFromData = (sectionName, dataList) => {
-const createdIDs = [];
-const setting = dataList.map(o => {
-let rowID;
-while (!rowID) {
-let newID = generateRowID();
-if (!createdIDs.includes(newID)) {
-rowID = newID;
-createdIDs.push(rowID);
-}
-}
-return Object.keys(o).reduce((m, key) => {
-m[`${sectionName}_${rowID}_${key}`] = o[key];
-return m;
-}, {});
-})
-.reduce((m, o) => Object.assign(m, o), {});
-setAttrs(setting);
+
+	const fillRepeatingSectionFromData = (sectionName, dataList) => {
+	const createdIDs = [];
+	const setting = dataList.map(o => {
+		let rowID;
+		while (!rowID) {
+			let newID = generateRowID();
+			if (!createdIDs.includes(newID)) {
+				rowID = newID;
+				createdIDs.push(rowID);
+			}
+		}
+		return Object.keys(o).reduce((m, key) => {
+		m[`${sectionName}_${rowID}_${key}`] = o[key];
+		return m;
+	}, {});
+	})
+	.reduce((m, o) => Object.assign(m, o), {});
+	setAttrs(setting);
 };   
 
 // Set breaking point at char creation
@@ -845,9 +846,9 @@ on("sheet:opened change:totattackmod change:totdistmod change:accmod8 change:wea
             setAttrs({texplmodif8:explmod});
             setAttrs({tshotmodif8:shotmod});
         });
-});
-                                                            	
-                                                
+});                                                
+
+
 on('sheet:opened, change:str_mod',function(){
     getAttrs(['str_mod'],function(v){
         let modif=parseInt(v.str_mod,10)||0;
@@ -1588,7 +1589,7 @@ on("change:modskillchk change:customskillmod",function(){
 });
 
 
-	
+
 on("change:modskillchk_npc change:customskillmod_npc",function(){
    getAttrs(['modskillchk_npc', 'customskillmod_npc'],function(v){
        if (v.modskillchk_npc == 'normal'){
@@ -1763,48 +1764,78 @@ on("change:check_violence_1 change:check_violence_2 change:check_violence_3 chan
        }
     });
 });
-
-on("sheet:opened", function() {
-var updates = {};
-getAttrs(['version','firsttime','name','sex','v1','v2','v3','h1','h2','h3','special1','special2','special3','special4','special5','special6','special_skill1','special_skill2','special_skill3','special_skill4','special_skill5','special_skill6'], function(v) {
-if(v.version != "1.5") {
-//updates=[{'version': '1.2'} , {'gender': attrs['sex'] ||''}, {'violence_1': attrs['v1'] ||''}, {'violence_2': attrs['v2'] ||''}, {'violence_3': attrs['v3'] ||''}, {'helpness_1': attrs['h1'] ||''}, {'helpness_2': attrs['h2'] ||''}, {'helpness_3': attrs['h3'] ||''}, ]
-updates.firsttime=0;
-if(v.name) {
-updates.character_name = v.name;
-}
-if(v.sex) {
-updates.gender = v.sex;
-}
-if(v.v1) {
-updates.violence_1 = v.v1;
-}
-if(v.v2) {
-updates.violence_2 = v.v2;
-}
-if(v.v3) {
-updates.violence_3 = v.v3;
-}
-
-if(v.h1) {
-updates.helpness_1 = v.h1;
-}
-if(v.h2) {
-updates.helpness_2 = v.h2;
-}
-if(v.h3) {
-updates.helpness_3 = v.h3;
-}
-updates.version = "1.5";
-
-setAttrs(updates);
-let data = [{newtraining: v.special1 ||'', skilltraining: v.special_skill1 ||''}, {newtraining: v.special2 ||'', skilltraining: v.special_skill2 ||''}, {newtraining: v.special3 ||'', skilltraining: v.special_skill3 ||''}, {newtraining: v.special4 ||'', skilltraining: v.special_skill4 ||''}, {newtraining: v.special5 ||'', skilltraining: v.special_skill5 ||''}, {newtraining: v.special6 ||'', skilltraining: v.special_skill6 ||''} ].filter(o => (o.newtraining || o.skilltraining));
-fillRepeatingSectionFromData('repeating_training', data);
-
-}
-});
+// === SHEET VERSIONING
+on('sheet:opened', () => {
+	getAttrs(['version'], values => { versioning(parseFloat(values.version) || 1); });
 });
 
+const versioning = (version) => {
+	   console.log(`%c Versioning, ${version}`, 'color: green; font-weight:bold');
+	   if (version < 1.5) {
+		   version_0_150();
+	    } 
+		else if (version <1.8) {
+			version_150_180();
+		}
+};
+
+	// UPDATE TO VERSION 1.05
+const version_0_150= () => {
+		let codeversion=1.5;
+		let updates={};
+
+		getAttrs(['version','firsttime','name','sex','v1','v2','v3','h1','h2','h3','special1','special2','special3','special4','special5','special6','special_skill1','special_skill2','special_skill3','special_skill4','special_skill5','special_skill6'],function(v){
+			if(v.version < 1.5) {
+				//updates=[{'version': '1.2'} , {'gender': attrs['sex'] ||''}, {'violence_1': attrs['v1'] ||''}, {'violence_2': attrs['v2'] ||''}, {'violence_3': attrs['v3'] ||''}, {'helpness_1': attrs['h1'] ||''}, {'helpness_2': attrs['h2'] ||''}, {'helpness_3': attrs['h3'] ||''}, ]
+				updates.firsttime=0;
+				if(v.name) {
+					updates.character_name = v.name;
+				}
+				if(v.sex) {
+					updates.gender = v.sex;
+				}
+				if(v.v1) {
+					updates.violence_1 = v.v1;
+				}
+				if(v.v2) {
+					updates.violence_2 = v.v2;
+				}
+				if(v.v3) {
+					updates.violence_3 = v.v3;
+				}
+				if(v.h1) {
+					updates.helpness_1 = v.h1;
+				}
+				if(v.h2) {
+					updates.helpness_2 = v.h2;
+				}
+				if(v.h3) {
+					updates.helpness_3 = v.h3;
+				}
+			//	updates.version = 1.5;
+			//	setAttrs(updates);
+				let data = [{newtraining: v.special1 ||'', skilltraining: v.special_skill1 ||''}, {newtraining: v.special2 ||'', skilltraining: v.special_skill2 ||''}, {newtraining: v.special3 ||'', skilltraining: v.special_skill3 ||''}, {newtraining: v.special4 ||'', skilltraining: v.special_skill4 ||''}, {newtraining: v.special5 ||'', skilltraining: v.special_skill5 ||''}, {newtraining: v.special6 ||'', skilltraining: v.special_skill6 ||''} ].filter(o => (o.newtraining || o.skilltraining));
+				fillRepeatingSectionFromData('repeating_training', data);
+			}
+    		console.log(`%c updates`, 'color: green; font-weight:bold');
+        	console.info(updates);
+        	setAttrs(updates, //Update attributes
+        			{silent:true},  // will not trigger sheet workers
+        			versioning(codeversion)); // call versioning again
+		});
+	};
+	// UPDATE TO VERSION 1.8
+const version_150_180 = () => {
+		let codeversion=1.8;
+		let update={version:codeversion,
+					firsttime:0,
+		};
+		console.log(`%c update`, 'color: green; font-weight:bold');
+		console.info(update);
+		setAttrs(update, //Update attributes
+				{silent:true},  // will not trigger sheet workers
+        		versioning(codeversion)); // call versioning again
+};
 
 let checkstim=['stim1_chk','stim2_chk','hardstim1_chk','hardstim2_chk','exhaustion_chk'];
 on(checkstim.map(str => `change:${str}`).join(' '),function(){
@@ -2266,19 +2297,17 @@ on("sheet:opened change:specialdmgtype4",function(){
 });
 //generalmod.map(str => `change:${str}_chk`);
 on('sheet:opened '+ generalmodchk.map(str => `change:${str}`).join(' '), function(){
-getAttrs(generalmod.concat(generalmodchk),function(v){
-let sum=0;
-for (let i=0; i < (generalmod.length); i++){
-sum += ( parseInt(v[generalmod[i]],10) * (parseInt(v[generalmodchk[i]],10) || 0) );
-}
-setAttrs({totalgeneralmod: sum});
+	getAttrs(generalmod.concat(generalmodchk),function(v){
+	let sum=0;
+	for (let i=0; i < (generalmod.length); i++){
+		sum += ( parseInt(v[generalmod[i]],10) * (parseInt(v[generalmodchk[i]],10) || 0) );
+	}
+	setAttrs({totalgeneralmod: sum});
 });
 });
 </script>
 
-
-
-<input type="hidden" name="attr_version" value="1.5"/>
+<input type="number" name="attr_version" value="1.8"/>
 <input type="hidden" name="attr_firsttime" value="1"/>
 <input type="hidden" name="attr_lowwill_chk" value="0"/>
 <div class="manila">
@@ -2379,7 +2408,7 @@ setAttrs({totalgeneralmod: sum});
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <input type="number" name="attr_str"  value="10" >
+                                                    <input type="number" name="attr_str" value="10" >
                                                     <button class='dg-roll blank-roll-button' type='roll' value='&{template:dg-stat}{{lowwp=[[@{lowwill_chk}]]}}  {{name=STR roll}} {{score=[[@{str}]]}}  {{score_d=[[floor(@{str}/10)]]}}  {{score_u=[[@{str}%10]]}} {{mod=[[@{modskillchk_tot_npc}]]}} {{rating_d=[[floor(@{strx5}/10)]]}} {{rating_u=[[@{strx5}%10]]}} {{normal_d=[[floor((@{strx5}+@{modskillchk_tot_npc})/10)]]}} {{normal_u=[[(@{strx5}+@{modskillchk_tot_npc})%10]]}}{{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}} '   name='roll_str_check'/>
                                                 </td>
                                                 <td>
@@ -2395,7 +2424,7 @@ setAttrs({totalgeneralmod: sum});
                                                     <button class='dg-roll blank-roll-button' type='roll' value='&{template:dg-stat}{{lowwp=[[@{lowwill_chk}]]}}  {{name=INT roll}} {{score=[[@{int}]]}}  {{score_d=[[floor(@{int}/10)]]}}  {{score_u=[[@{int}%10]]}} {{mod=[[@{modskillchk_tot_npc}]]}} {{rating_d=[[floor(@{intx5}/10)]]}} {{rating_u=[[@{intx5}%10]]}} {{normal_d=[[floor((@{intx5}+@{modskillchk_tot_npc})/10)]]}} {{normal_u=[[(@{intx5}+@{modskillchk_tot_npc})%10]]}}{{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}} '   name='roll_int_check'/>
                                                 </td>
                                                 <td>
-                                                    <input type="number" name="attr_pow"  value="10" >
+                                                    <input type="number" name="attr_pow"  placeholder="-" value="" >
                                                     <button class='dg-roll blank-roll-button' type='roll' value='&{template:dg-stat}{{lowwp=[[@{lowwill_chk}]]}}  {{name=POW roll}} {{score=[[@{pow}]]}}  {{score_d=[[floor(@{pow}/10)]]}}  {{score_u=[[@{pow}%10]]}} {{mod=[[@{modskillchk_tot_npc}]]}} {{rating_d=[[floor(@{powx5}/10)]]}} {{rating_u=[[@{powx5}%10]]}} {{normal_d=[[floor((@{powx5}+@{modskillchk_tot_npc})/10)]]}} {{normal_u=[[(@{powx5}+@{modskillchk_tot_npc})%10]]}}{{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}} '   name='roll_pow_check'/>
                                                 </td>
                                                 <td>
@@ -2442,8 +2471,8 @@ setAttrs({totalgeneralmod: sum});
                                                             	
                                                             <tr>
                                                             	<td class="headertable"   style="text-align: left;margin-left: 1em;" >  &nbsp;  Willpower Points (WP)</td>
-                                                            	<td><input type="number" name="attr_wp_max"   value="10"></td>
-                                                            	<td><input type="number" name="attr_wp"  value="10"></td>
+                                                            	<td><input type="number" name="attr_wp_max" value="10"></td>
+                                                            	<td><input type="number" name="attr_wp"   value="10"></td>
                                                             	<td></td>
                                                             </tr>
                                                             	
@@ -2454,13 +2483,13 @@ setAttrs({totalgeneralmod: sum});
                                                             	    Sanity (SAN)
                                                             	</td>
                                                             	<td><input type="number" name="attr_san_max" value="99"></td>
-                                                            	<td><input type="number" name="attr_san"   value="50"></td>
+                                                            	<td><input type="number" name="attr_san"  placeholder="-" value=""></td>
                                                             	<td class="attr-roll" ><button class='dg-roll blank-roll-button'  type='roll'value='&{template:dg}{{lowwp=[[@{lowwill_chk}]]}}  {{mod=[[@{modskillchk_tot_npc}]]}}  {{name=SAN roll}} {{rating_d=[[floor(@{san}/10)]]}} {{rating_u=[[@{san}%10]]}} {{normal_d=[[floor((@{san}+@{modskillchk_tot_npc})/10)]]}} {{normal_u=[[(@{san}+@{modskillchk_tot_npc})%10]]}}  {{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}} ' name='roll_san_check' /></td>
                                                             </tr>
                                                             <tr>
                                                                 <td class="headertable"   style="text-align: left;margin-left: 1em;" >  &nbsp;  Breaking Point (BP)</td>
-                                                            	<td><input type="number" name="attr_bp_max"   value="40"></td>
-                                                            	<td><input type="number" name="attr_bp"  value="40"></td>
+                                                            	<td><input type="number" name="attr_bp_max"  placeholder="-" value=""></td>
+                                                            	<td><input type="number" name="attr_bp"  placeholder="-" value=""></td>
                                                             	<td></td>
                                                             </tr>
                                                 </table>
@@ -2681,18 +2710,18 @@ setAttrs({totalgeneralmod: sum});
                                                         <span class="attack-button1">
                                                        
                                                         <button class='dg-roll blank-roll-button'  
-                                                        type='roll' value='&{template:dg-attackhand}{{lowwp=[[@{lowwill_chk}]]}}  {{name=@{weapon_name1}}} {{skillname=@{weapon_skillname1}}}  {{custom=[[@{modskillchk_tot_npc}]]}}  {{rating_d=[[floor(@{weaponrealskill1}/10)]]}} {{rating_u=[[(@{weaponrealskill1}%10)]]}} {{normal_d=[[floor((@{weaponrealskill1}+@{modskillchk_tot_npc})/10)]]}} {{normal_u=[[(@{weaponrealskill1}+@{modskillchk_tot_npc})%10]]}} {{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}}  {{AP=[[@{AP1}]]}} {{damage=[[@{damage1}+@{str_mod}]]}} {{damagec=[[(@{damage1})*2+(@{str_mod})*2]]}}' /> 
+                                                        type='roll' value='&{template:dg-attackhand}{{lowwp=[[@{lowwill_chk}]]}}  {{name=@{weapon_name2}}} {{skillname=@{weapon_skillname2}}}  {{custom=[[@{modskillchk_tot_npc}]]}}  {{rating_d=[[floor(@{weaponrealskill1}/10)]]}} {{rating_u=[[(@{weaponrealskill1}%10)]]}} {{normal_d=[[floor((@{weaponrealskill1}+@{modskillchk_tot_npc})/10)]]}} {{normal_u=[[(@{weaponrealskill1}+@{modskillchk_tot_npc})%10]]}} {{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}}  {{AP=[[@{AP1}]]}} {{damage=[[@{damage1}+@{str_mod}]]}} {{damagec=[[(@{damage1})*2+(@{str_mod})*2]]}}' /> 
                                                         </span>
 <!-- damage roll attack -->
 
                                                         <input type="checkbox" style="display:none" value="1" class="block-button2"  name="attr_rfired2"/>
                                                         <span class="attack-button2">
-                                                        <button class='dg-roll blank-roll-button'  type='roll' value='&{template:dg-attackfire}{{lowwp=[[@{lowwill_chk}]]}}  {{name=@{weapon_name1}}} {{skillname=@{weapon_skillname1}}} {{dist=[[0]]}} {{base=[[@{rangea1}]]}}   {{base2=[[@{rangea1}*2]]}}   {{base5=[[@{rangea1}*5]]}} {{custom=[[@{modskillchk_tot_npc}]]}}  {{rating_d=[[floor(@{weaponrealskill1}/10)]]}} {{rating_u=[[(@{weaponrealskill1}%10)]]}} {{normal_d=[[floor((@{weaponrealskill1}+@{modskillchk_tot_npc})/10)]]}} {{normal_u=[[(@{weaponrealskill1}+@{modskillchk_tot_npc})%10]]}} {{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}}  {{AP=[[@{AP1}]]}} {{damage=[[@{damage1}]]}} {{damagec=[[(@{damage1})*2]]}}' />
+                                                        <button class='dg-roll blank-roll-button'  type='roll' value='&{template:dg-attackfire}{{lowwp=[[@{lowwill_chk}]]}}  {{name=@{weapon_name2}}} {{skillname=@{weapon_skillname2}}} {{dist=[[0]]}} {{base=[[@{rangea1}]]}}   {{base2=[[@{rangea1}*2]]}}   {{base5=[[@{rangea1}*5]]}} {{custom=[[@{modskillchk_tot_npc}]]}}  {{rating_d=[[floor(@{weaponrealskill1}/10)]]}} {{rating_u=[[(@{weaponrealskill1}%10)]]}} {{normal_d=[[floor((@{weaponrealskill1}+@{modskillchk_tot_npc})/10)]]}} {{normal_u=[[(@{weaponrealskill1}+@{modskillchk_tot_npc})%10]]}} {{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}}  {{AP=[[@{AP1}]]}} {{damage=[[@{damage1}]]}} {{damagec=[[(@{damage1})*2]]}}' />
                                                         </span>
 <!-- lethality roll attack -->
                                                         <input type="checkbox" style="display:none" value="1" class="block-button3"  name="attr_rfirel2"/>
                                                         <span class="attack-button3">
-                                                        <button class='dg-roll blank-roll-button'  type='roll' value='&{template:dg-attacklethal}{{lowwp=[[@{lowwill_chk}]]}}  {{name=@{weapon_name1}}} {{skillname=@{weapon_skillname1}}} {{kradius=[[@{radius1}]]}} {{dist=[[0]]}}   {{base=[[@{rangea1}]]}}   {{base2=[[@{rangea1}*2]]}}   {{base5=[[@{rangea1}*5]]}}  {{accmod=[[0]]}} {{custom=[[@{modskillchk_tot_npc}]]}}  {{rating_d=[[floor(@{weaponrealskill1}/10)]]}} {{rating_u=[[(@{weaponrealskill1}%10)]]}} {{normal_d=[[floor((@{weaponrealskill1}+@{modskillchk_tot_npc})/10)]]}} {{normal_u=[[(@{weaponrealskill1}+@{modskillchk_tot_npc})%10]]}} {{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}}  {{AP=[[@{AP1}]]}}  {{lethal_d=[[@{lethality1}/10]]}} {{lethal_u=[[@{lethality1}%10]]}}  {{lethal_cd=[[(@{lethality1}/10)*2]]}} {{lethal_cu=[[(@{lethality1}%10)*2]]}} {{lethality=[[@{lethality1}]]}} {{huge_l=[[@{lethality1}]]}} {{huge_lc=[[@{lethality1}*2]]}}  {{roll_l1=[[1d10-1]]}} {{roll_l2=[[1d10-1]]}}' />
+                                                        <button class='dg-roll blank-roll-button'  type='roll' value='&{template:dg-attacklethal}{{lowwp=[[@{lowwill_chk}]]}}  {{name=@{weapon_name2}}} {{skillname=@{weapon_skillname2}}} {{kradius=[[@{radius1}]]}} {{dist=[[0]]}}   {{base=[[@{rangea1}]]}}   {{base2=[[@{rangea1}*2]]}}   {{base5=[[@{rangea1}*5]]}}  {{accmod=[[0]]}} {{custom=[[@{modskillchk_tot_npc}]]}}  {{rating_d=[[floor(@{weaponrealskill1}/10)]]}} {{rating_u=[[(@{weaponrealskill1}%10)]]}} {{normal_d=[[floor((@{weaponrealskill1}+@{modskillchk_tot_npc})/10)]]}} {{normal_u=[[(@{weaponrealskill1}+@{modskillchk_tot_npc})%10]]}} {{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}}  {{AP=[[@{AP1}]]}}  {{lethal_d=[[@{lethality1}/10]]}} {{lethal_u=[[@{lethality1}%10]]}}  {{lethal_cd=[[(@{lethality1}/10)*2]]}} {{lethal_cu=[[(@{lethality1}%10)*2]]}} {{lethality=[[@{lethality1}]]}} {{huge_l=[[@{lethality1}]]}} {{huge_lc=[[@{lethality1}*2]]}}  {{roll_l1=[[1d10-1]]}} {{roll_l2=[[1d10-1]]}}' />
                                                         </span>
 <!-- shotgun roll attack -->
                                                         <input type="checkbox" style="display:none" value="1" class="block-button4"   name="attr_rshot2"/>
@@ -4573,8 +4602,8 @@ setAttrs({totalgeneralmod: sum});
                                                                  &nbsp; Power
                                                         	    
                                                         	</td>
-                                                        	<td><input type="number" name="attr_pow" value="10"></td>
-                                                        	<td><input type="number" name="attr_powx5"   value="50" ></td>
+                                                        	<td><input type="number" name="attr_pow" placeholder="-" value=""></td>
+                                                        	<td><input type="number" name="attr_powx5"  placeholder="-" value=""></td>
                                                         	<td><input type="text" style="text-align:left"  name="attr_pow_features"></td>
                                                         	<td class="attr-roll" ><button class='dg-roll blank-roll-button'  style="align:center" type='roll'  value='&{template:dg-stat}{{lowwp=[[@{lowwill_chk}]]}} {{name=POW roll}} {{score=[[@{pow}]]}}  {{score_d=[[floor(@{pow}/10)]]}}  {{score_u=[[@{pow}%10]]}}  {{mod=[[@{modskillchk_tot}]]}} {{rating_d=[[floor(@{powx5}/10)]]}} {{rating_u=[[@{powx5}%10]]}} {{normal_d=[[floor((@{powx5}+@{modskillchk_tot})/10)]]}} {{normal_u=[[(@{powx5}+@{modskillchk_tot})%10]]}}  {{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}} '    name='roll_pow_check'/></td>
                                                         </tr>
@@ -4614,13 +4643,13 @@ setAttrs({totalgeneralmod: sum});
                                                         	    Sanity (SAN)
                                                         	</td>
                                                         	<td><input type="number" name="attr_san_max" value="99"></td>
-                                                        	<td><input type="number" name="attr_san"   value="50"></td>
+                                                        	<td><input type="number" name="attr_san" placeholder="-" value=""></td>
                                                         	<td class="attr-roll" ><button class='dg-roll blank-roll-button'  type='roll'value='&{template:dg}{{lowwp=[[@{lowwill_chk}]]}} {{mod=[[@{modskillchk_tot}]]}}{{lowwp=[[@{lowwill_chk}]]}} {{name=SAN roll}} {{rating_d=[[floor(@{san}/10)]]}} {{rating_u=[[@{san}%10]]}} {{normal_d=[[floor((@{san}+@{modskillchk_tot})/10)]]}} {{normal_u=[[(@{san}+@{modskillchk_tot})%10]]}}  {{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}} ' name='roll_san_check' /></td>
                                                         </tr>
                                                         <tr>
                                                             <td class="headertable"   style="text-align: left;margin-left: 1em;" colspan="2">  &nbsp;  Breaking Point (BP)</td>
-                                                        	<td><input type="number" name="attr_bp_max"   value="40"></td>
-                                                        	<td><input type="number" name="attr_bp"  value="40"></td>
+                                                        	<td><input type="number" name="attr_bp_max" placeholder="-" value=""></td>
+                                                        	<td><input type="number" name="attr_bp" placeholder="-" value=""></td>
                                                         	<td></td>
                                                         </tr>
                                                     </table>     
@@ -19979,3 +20008,4 @@ setAttrs({totalgeneralmod: sum});
         
     </table>
 </rolltemplate>
+

@@ -1,0 +1,600 @@
+mixin bottomBar(firstTab, lastTab)
+	.bottombar
+		button.prev(data-i18n='back' type='back' value=`l1-${firstTab}`)
+		button.jump(data-i18n='back-to-top' data-scroll='#top' type='button')
+		button.next(data-i18n='next' type='back' value=`l1-${lastTab}`)
+
+mixin cancelPrompt(slide)
+	.choice.cancel-prompt
+		p.label(data-i18n='charmancer-cancel-heading')
+		button.warning(data-i18n='cancel_charactermancer' type='cancel' value='l1-cancel')
+		button(data-i18n='save_progress_and_exit' type='cancel' value=`l1-${slide}`)
+		button(data-i18n='continue-charmancer' name='act_continue' type='action')
+		p.warning
+			span(data-i18n='charmancer-discard-warning')
+
+mixin buttonMancerInfo(name)
+	button.mancer_info(name=`act_info_${name}` type='action' required) i
+
+mixin infoDiv(className, acceptString)
+	.info
+		.sheet-compendium-page(accept=acceptString class=`sheet-${className}-info`)
+
+mixin abilitiesOptions()
+	option(data-i18n='choose' value='')
+	each val in globalAttributesByCategory.abilities
+		option(data-i18n=val value=val)
+
+mixin classOptions()
+	option(data-i18n='choose' value='')
+	each val in globalAttributesByCategory.classes
+		option(data-i18n=val value=val)
+
+mixin diceOptions()
+	option(data-i18n='choose' value='')
+	each val in globalAttributesByCategory.diceSizes
+		- const value = val.slice(-1)
+		option(data-i18n=val value=value)
+
+charmancer.sheet-charmancer-l1-welcome
+	.charmancer.container
+		input(type='hidden' name='comp_has_tasha' value='0')
+		ol.steps
+		.logos
+			span.charmancer-logo
+			span.compendium-logo
+		p.label(data-i18n='charmancer-welcome')
+		p(data-i18n='charmancer-what-is')
+		p.label(data-i18n='charmancer-compendium')
+		p(data-i18n='charmancer-compendium-detail')
+		p.label(data-i18n='get-started')
+		.bottombar
+			button.prev(data-i18n='opt-out-u' type='cancel' value='l1-cancel')
+			button.jump(data-i18n='back-to-top' data-scroll='#top' type='button')
+			button.next(data-i18n='next' type='back' value='l1-race')
+		+cancelPrompt('welcome')
+
+charmancer.sheet-charmancer-l1-race
+	.charmancer.container
+		ol.steps
+		.topbar-holder
+		.choices
+			.row
+				input(type='hidden' name='comp_has_tasha')
+				.customize-origin
+					label
+						span(data-i18n='customize-your-origin')
+						span(data-i18n='customize-your-origin-info')
+					.toggle
+						input(type='checkbox' name='comp_customize_origin' value='1')
+						.knob
+			.row
+				label.hilite
+					span(data-i18n='charmancer-choose-race')
+					select(accept='Category:Races' name='comp_race' required)
+						option(data-i18n='choose' value='')
+						option.custom(data-i18n='custom' value='Rules:Races')
+					+buttonMancerInfo('race')
+				.choice.custom_race
+					label.hilite(data-i18n='charmancer-custom-race-name')
+					input(name='comp_race_name' placeholder='Custom Race' type='text' required)
+			.row.choice.race_possible.custom_race.race_abilities
+				label
+					.choice.tasha_race_enabled
+						input(type='hidden' name='comp_tasha_race_ability_choice1_increase')
+						span.choice.tasha_race_ability_choice1.tasha(data-i18n='ability-score-increase-tasha')
+						select.choice.race_possible.tasha_race_ability_choice1(name='comp_tasha_race_ability_choice1')
+							+abilitiesOptions()
+						input(type='hidden' name='comp_tasha_race_ability_choice2_increase')
+						span.choice.tasha_race_ability_choice2.tasha(data-i18n='ability-score-increase-tasha')
+						select.choice.race_possible.tasha_race_ability_choice2(name='comp_tasha_race_ability_choice2')
+							+abilitiesOptions()
+						input(type='hidden' name='comp_tasha_race_ability_choice3_increase')
+						span.choice.tasha_race_ability_choice3.tasha(data-i18n='ability-score-increase-tasha')
+						select.choice.race_possible.tasha_race_ability_choice3(name='comp_tasha_race_ability_choice3')
+							+abilitiesOptions()
+						input(type='hidden' name='comp_tasha_race_ability_choice4_increase')
+						span.choice.tasha_race_ability_choice4.tasha(data-i18n='ability-score-increase-tasha')
+						select.choice.race_possible.tasha_race_ability_choice4(name='comp_tasha_race_ability_choice4')
+							+abilitiesOptions()
+						input(type='hidden' name='comp_tasha_race_ability_choice5_increase')
+						span.choice.tasha_race_ability_choice5.tasha(data-i18n='ability-score-increase-tasha')
+						select.choice.race_possible.tasha_race_ability_choice5(name='comp_tasha_race_ability_choice5')
+							+abilitiesOptions()
+						input(type='hidden' name='comp_tasha_race_ability_choice6_increase')
+						span.choice.tasha_race_ability_choice6.tasha(data-i18n='ability-score-increase-tasha')
+						select.choice.race_possible.tasha_race_ability_choice6(name='comp_tasha_race_ability_choice6')
+							+abilitiesOptions()
+					.choice.tasha_race_disabled
+						span(data-i18n='ability-score-increase')
+						p.race_ability_score.race_text
+						p.race_ability_choice_rule.race_text
+						select.choice.race_possible.race_ability_choice1(name='comp_race_ability_choice1')
+							+abilitiesOptions()
+						select.choice.race_possible.race_ability_choice2(name='comp_race_ability_choice2')
+							+abilitiesOptions()
+						select.choice.race_possible.race_ability_choice3(name='comp_race_ability_choice3')
+							+abilitiesOptions()
+					each val in globalAttributesByCategory.abilities
+						label.choice.custom_race
+							span(data-i18n=val)
+							input.choice.custom_race(max='5' min='-5' name=`comp_race_custom_${val}` type='number' value='0')
+			.row.choice.race_always.custom_race
+				label
+					span(data-i18n='alignment')
+					select(name='comp_alignment')
+						option(data-i18n='choose' value='')
+						each val in globalAttributesByCategory.alignments
+							- const datai18n = val.toLowerCase().replace(' ', '-')
+							option(data-i18n=datai18n value=val)
+			.row.choice.race_always.custom_race
+				label
+					span(data-i18n='size')
+					p.race_size.race_text
+					select.choice.custom_race(name='comp_size')
+						option(data-i18n='choose' value='')
+							each val in globalAttributesByCategory.sizes
+								- const datai18n = val.toLowerCase();
+								option(data-i18n=datai18n value=val)
+			.row.choice.race_always.custom_race
+				label
+					span(data-i18n='speed')
+					p.race_speed.race_text
+					input.choice.custom_race(min='0' name='comp_speed' type='number')
+			.race_holder.holder
+			.choice.subrace
+				.row
+					label.hilite
+						span(data-i18n='subrace')
+						select.choose_subrace(name='comp_subrace' required)
+							option(data-i18n='choose' value='')
+							option.custom(data-i18n='custom' value='Rules:Races')
+						+buttonMancerInfo('subrace')
+					.choice.custom_subrace
+						label.hilite
+							span(data-i18n='charmancer-custom-subrace-name')
+							input(name='comp_subrace_name' placeholder='Custom Subrace' type='text' required)
+				.choice.subrace_options
+					.row.choice.subrace_possible.subrace_abilities.custom_subrace
+						label
+							.choice.tasha_subrace_enabled
+								input(type='hidden' name='comp_tasha_subrace_ability_choice1_increase')
+								span.choice.tasha_subrace_ability_choice1.tasha(data-i18n='ability-score-increase-tasha')
+								select.choice.subrace_possible.tasha_subrace_ability_choice1(name='comp_tasha_subrace_ability_choice1')
+									+abilitiesOptions()
+								input(type='hidden' name='comp_tasha_subrace_ability_choice2_increase')
+								span.choice.tasha_subrace_ability_choice2.tasha(data-i18n='ability-score-increase-tasha')
+								select.choice.subrace_possible.tasha_subrace_ability_choice2(name='comp_tasha_subrace_ability_choice2')
+									+abilitiesOptions()
+								input(type='hidden' name='comp_tasha_subrace_ability_choice3_increase')
+								span.choice.tasha_subrace_ability_choice3.tasha(data-i18n='ability-score-increase-tasha')
+								select.choice.subrace_possible.tasha_subrace_ability_choice3(name='comp_tasha_subrace_ability_choice3')
+									+abilitiesOptions()
+								input(type='hidden' name='comp_tasha_subrace_ability_choice4_increase')
+								span.choice.tasha_subrace_ability_choice4.tasha(data-i18n='ability-score-increase-tasha')
+								select.choice.subrace_possible.tasha_subrace_ability_choice4(name='comp_tasha_subrace_ability_choice4')
+									+abilitiesOptions()
+								input(type='hidden' name='comp_tasha_subrace_ability_choice5_increase')
+								span.choice.tasha_subrace_ability_choice5.tasha(data-i18n='ability-score-increase-tasha')
+								select.choice.subrace_possible.tasha_subrace_ability_choice5(name='comp_tasha_subrace_ability_choice5')
+									+abilitiesOptions()
+								input(type='hidden' name='comp_tasha_subrace_ability_choice6_increase')
+								span.choice.tasha_subrace_ability_choice6.tasha(data-i18n='ability-score-increase-tasha')
+								select.choice.subrace_possible.tasha_subrace_ability_choice6(name='comp_tasha_subrace_ability_choice6')
+									+abilitiesOptions()
+							.choice.tasha_subrace_disabled
+								span(data-i18n='subrace-ability-increase')
+								p.subrace_ability_score.subrace_text
+								- let subraceChoiceInt = 1;
+								while subraceChoiceInt <= 3
+									select(class=`choice subrace_possible subrace_ability_choice${subraceChoiceInt}` name=`comp_subrace_ability_choice${subraceChoiceInt}`)
+										+abilitiesOptions()
+									- subraceChoiceInt++
+							each val in globalAttributesByCategory.abilities
+								label.choice.custom_subrace
+									span(data-i18n=val)
+									input.choice.custom_subrace(max='5' min='-5' name=`comp_subrace_custom_${val}` type='number' value='0')
+					.row.choice.subrace_possible.subrace_speed_row.custom_subrace
+						label
+							span(data-i18n='speed')
+							p.subrace_speed.subrace_text
+							input.choice.custom_subrace(name='comp_speed' min='0' type='number')
+					.subrace_holder.holder
+			.row.choice.race_possible.custom_race.custom_subrace
+				label
+					span(data-i18n='innate-spellcasting:')
+					label
+						span(data-i18n='spellcasting-ability')
+						select(name='comp_custom_race_spell_ability')
+							+abilitiesOptions()
+					label.hilite.choice.custom_spellcasting
+						span(data-i18n='number-of-cantrips')
+						input(min='1' name='comp_custom_race_spell_number' type='number' value='1' required)
+					label.hilite.choice.custom_spellcasting
+						span(data-i18n='spell-list')
+						select(name='comp_custom_race_spell_list')
+							+classOptions()
+		+infoDiv('race','Rules:Races')
+		+bottomBar('welcome', 'class')
+		+cancelPrompt('race')
+		input(name='comp_has_subrace' type='hidden')
+
+//- Class slide is throwing an error when converted to pug
+include ../html/charactermancer/class.html
+
+charmancer.sheet-charmancer-l1-abilities
+	.charmancer.container
+		ol.steps
+		.topbar-holder
+		input(name='comp_pointbuy_points' type='hidden' value='27')
+		input(name='comp_roll_results' type='hidden' value='0')
+		.choices
+			.row
+				label.hilite
+					span(data-i18n='ability-score-method')
+					select(name='comp_abilities' required)
+						option(data-i18n='choose' value='')
+						option.custom(data-i18n='custom' value='custom')
+			.row.choice.abilities_possible.abilities_stdarray
+				p(data-i18n='select-your-choices')
+				button(data-i18n='clear-abilities' name='act_clearstats' type='action')
+			.row.choice.abilities_possible.abilities_rollstats
+				p(data-i18n='select-your-choices')
+				p
+					.rollstats-button
+						button(data-i18n='standard-roll' type="roll" name="roll_rollstats" value="@{wtype}&{template:mancerroll} {{title=Roll for Stats}} {{r1=[[4d6dl1]]}} {{r2=[[4d6dl1]]}} {{r3=[[4d6dl1]]}} {{r4=[[4d6dl1]]}} {{r5=[[4d6dl1]]}} {{r6=[[4d6dl1]]}}")
+					button(data-i18n='clear-abilities' name='act_clearstats' type='action')
+			.row.choice.abilities_possible.abilities_rollstats_rolled
+				p
+					span(data-i18n='stats-rolled-hint')
+			.row.choice.abilities_possible.abilities_pointbuy
+				p(data-i18n='select-your-choices')
+				p
+					span(data-i18n='available-points:')
+					strong
+						span(class='points_available_display')
+					button(data-i18n='clear-abilities' name='act_clearstats' type='action')
+			.choice.abilities_possible.abilities_selects
+				.row
+					.hilite
+						each val in globalAttributesByCategory.abilities
+							div
+								span.label(data-i18n=val)
+								span(class=`abilities_radio_${val}` name=`comp_${val}` required)
+						each val in globalAttributesByCategory.optionalAbilites
+							.sheet-choice(class=`${val}_toggle`)
+								span.label(data-i18n=val)
+								span(class=`abilities_radio_${val}` name=`comp_${val}` required)
+			.row.choice.abilities_possible.abilities_custom
+				p(data-i18n='input-your-scores')
+				.abilities_possible.abilities_selects
+					.hilite
+						each val in globalAttributesByCategory.abilities
+							div
+								span.label(data-i18n=val)
+								input(max='20' min='0' name=`comp_${val}` type='number' required)
+						each val in globalAttributesByCategory.optionalAbilites
+							.sheet-choice(class=`${val}_toggle`)
+								span.label(data-i18n=val)
+								input(min="0" max="20" name=`comp_${val}` type="number" required)
+		+infoDiv('abilscores','Rules:Ability%20Scores')
+		+bottomBar('class', 'background')
+		+cancelPrompt('abilities')
+
+mixin backgroundOptions(type)
+	label
+		span(data-i18n=type)
+		br
+		select.choice.background_possible.background_ideal_choice(name=`comp_background_${type}_choice`)
+			option(data-i18n='choose' value='')
+		button.choice.standardbg.bg_roll(data-i18n='roll' name=`roll_background_${type}_choice_roll` type='roll' value='')
+		input.choice.custom_background(name=`comp_background_${type}_choice` type='text')
+
+charmancer.sheet-charmancer-l1-background
+	.charmancer.container
+		ol.steps
+		.topbar-holder
+		.choices
+			.row
+				label.hilite
+					span(data-i18n='choose-background')
+					select(accept='Category:Backgrounds' name='comp_background' required)
+						option(data-i18n='choose' value='')
+						option.custom(data-i18n='custom' value='Rules:Backgrounds')
+				.choice.custom_background
+					label.hilite
+						span(data-i18n='name-background')
+						input(name='comp_background_name' placeholder='Artisan' type='text' required)
+			.choice.backgrounds_options
+				.holder.background_holder
+				.row.choice.background_possible.background_detail_choice_row
+					label
+						span.label
+							span.background_detail_choice_name(data-i18n='option' name='comp_background_detail_choice_name')
+							br
+							select.choice.background_possible.background_detail_choice(name='comp_background_detail_choice')
+								option(data-i18n='choose' value='')
+							button.choice.standardbg.bg_roll(data-i18n='roll' name='roll_background_detail_choice_roll' type='roll' value='')
+				.row.choice.background_possible.background_personality_row.custom_background
+					label
+						span(data-i18n='personality-traits')
+						br
+						- let backgroundChoiceInt = 1;
+						while backgroundChoiceInt <= 2
+							select.choice.background_possible.background_personality_choice1(name=`comp_background_personality_choice${backgroundChoiceInt}`)
+								option(data-i18n='choose' value='')
+							button.choice.standardbg.bg_roll(data-i18n='roll' name=`roll_background_personality_choice${backgroundChoiceInt}_roll` type='roll' value='')
+							input.choice.custom_background(name=`comp_background_personality_choice${backgroundChoiceInt}` type='text')
+							- backgroundChoiceInt++
+					each val in ['ideal', 'bond', 'flaw']
+						+backgroundOptions(val)
+				.row.choice.background_possible.background_equipment_row
+					p
+						span.label(data-i18n='equipment')
+						span.background_standard_equipment
+		+infoDiv('background','Rules:Backgrounds')
+		+bottomBar('abilities', 'equipment')
+		+cancelPrompt('background')
+
+		each val in ['detail_choice', 'personality_choice1', 'personality_choice2', 'ideal_choice', 'bond_choice', 'flaw_choice']
+			input(name=`comp_background_${val}_array` type='hidden')
+
+charmancer.sheet-charmancer-l1-equipment
+	.charmancer.container
+		ol.steps
+		.topbar-holder
+		.choices
+			each val in ['equipment_class', 'equipment_background', 'starting_gold_roll', 'background_starting_gold']
+				input(name=`comp_${val}` type='hidden')
+			.row
+				p.choice.no_class
+					span.label(data-i18n='you-havent-selected-class')
+				p.choice.eqp_custom_class
+					span.label(data-i18n='you-have-created-custom-class')
+				p.choice.no_gold_option
+					span.label(data-i18n='pick-your-equipment')
+					span :	
+					span.class_label
+				.choice.has_class.equipment_type.hilite
+					p
+						span.label(data-i18n='equipment-choice-text')
+							span(data-i18n='class')
+							span :	
+							span.class_label
+					select.equipment_type(name='comp_equipment_type' required)
+						option(data-i18n='choose' value='')
+						option(data-i18n='class-equipment' value='class')
+						option(data-i18n='starting-wealth' value='gold')
+			.row.choice.gold_option
+				p.choice.custom_class_gold
+					span.label(data-i18n='equipment-from-class')
+					span (
+					span.class_label
+					span )
+				p
+					span.label(data-i18n='starting-gold:')
+				p
+					.choice.random_gold_option
+						button(name='roll_starting_gold' type='roll' value='')
+							span.starting_gold_btn_label
+						input(name='comp_starting_gold' type='number' value='0')
+			.row.choice.class_option
+				p
+					span.class_equipment
+				- let equipmentChoiceInt = 1;
+				while equipmentChoiceInt <= 4
+					p.equipment_choice_title
+						span.choice.class_possible(class=`class_equipment_choice${equipmentChoiceInt} class_equipment_choice${equipmentChoiceInt}_title`)
+					select.choice.class_possible(class=`class_equipment_choice${equipmentChoiceInt}` name=`comp_class_equipment_choice${equipmentChoiceInt}`)
+						option(data-i18n='choose' value='')
+					select.choice.class_possible(class=`class_equipment_choice${equipmentChoiceInt}_double` name=`comp_class_equipment_choice${equipmentChoiceInt+4}`)
+						option(data-i18n='choose' value='')
+					- equipmentChoiceInt++
+			.row.choice.no_class_warning
+				span.warning(data-i18n='no_class_warning-u')
+			.row
+				p.choice.no_background
+					span.label(data-i18n='you-havent-chosen-background')
+				p.choice.has_background.class_option
+					span.label(data-i18n='equipment-from-background')
+					span (
+					span.background_label
+					span )
+				p.choice.background_chose_starting_gold.background_gold_option
+					span.label(data-i18n='you-have-chosen-starting-gold')
+				p.choice.has_background.class_option
+					span.background_equipment
+				.choice.class_option
+					- let backEquipInt = 1;
+					while backEquipInt <= 4
+						p.equipment_choice_title
+							span.choice.background_possible(class=`background_equipment_choice${backEquipInt} background_equipment_choice${backEquipInt}_title`)
+							select.choice.background_possible(class=`background_equipment_choice${backEquipInt}` name=`comp_background_equipment_choice${backEquipInt}`)
+								option(data-i18n='choose' value='')
+						- backEquipInt++
+		+infoDiv('background','Rules:Equipment')
+		+bottomBar('background', 'spells')
+		+cancelPrompt('equipment')
+
+charmancer.sheet-charmancer-l1-spells
+	.charmancer.container
+		ol.steps
+		.topbar-holder
+		.choice.no_spells
+			p.label(data-i18n='arcane-is-mystery')
+			p(data-i18n='your-character-dont-have-spells-this-lvl')
+		.choices.spell_holder
+		.info.choice.spell-info-container
+			.sheet-compendium-page.sheet-spell-info(accept='Rules:Spells' class=`sheet-spells-info`)
+		+bottomBar('equipment', 'feat')
+		+cancelPrompt('spells')
+		each val in ['race_spells', 'class_spells', 'race_number', 'class_number']
+			input(name=`comp_${val}` type='hidden')
+
+mixin featChoices(type, acceptString)
+	.row.choice.feat_possible(class=`feat_${type}_row`)
+		label
+			span(data-i18n=`${type}-proficiencies`)
+			- const typePlural = `${type}s`
+			p.feat_text(class=`feat_${typePlural}`)
+			- let choiceInt = 1;
+			while choiceInt <= 4
+				if acceptString
+					select.choice.feat_possible(class=`feat_${type}_choice${choiceInt}` name=`comp_feat_${type}_choice${choiceInt}` accept=acceptString)
+						option(data-i18n='choose' value='')
+				else
+					select.choice.feat_possible(class=`feat_${type}_choice${choiceInt}` name=`comp_feat_${type}_choice${choiceInt}`)
+						option(data-i18n='choose' value='')
+				- choiceInt++
+
+charmancer.sheet-charmancer-l1-feat
+	.charmancer.container
+		ol.steps
+		.topbar-holder
+		.choice.no_feat
+			p.label(data-i18n='charmancer-a-feat-represents')
+			p(data-i18n='you-really-havent-done')
+		.choices.choice.yes_feat
+			.row
+				label
+					span(data-i18n='choose-a-feat:')
+					select(accept='Category:Feats' name='comp_feat')
+						option(data-i18n='choose' value='')
+			.choice.feat_options
+				.row.choice.feat_prereq.feat_possible
+					label.warning
+						span(data-i18n='prerequisite:')
+						p.feat_prerequisite.feat_text
+						p.feat_text(data-i18n='feat-pre-check')
+				.row.choice.feat_ability.feat_possible
+					label
+						span(data-i18n='ability-score-increase:')
+						p.feat_ability_score.feat_text
+						select.choice.feat_possible.feat_ability_choice(name='comp_feat_ability_choice')
+							option(data-i18n='choose' value='')
+				+featChoices('language')
+				+featChoices('skill', 'Category:Proficiencies Type:Skill')
+				+featChoices('weapon')
+				+featChoices('armor')
+				+featChoices('tool')
+				.sheet-row.sheet-choice.sheet-feat_possible.sheet-feat_spell_row
+					label
+						span(data-i18n='spell-list') Spell List:
+							span(style='color: red;')
+						p.sheet-feat_text.sheet-feat_spells
+						select.sheet-choice.sheet-feat_possible.sheet-feat_spell_choice1(name='comp_feat_spell_choice1')
+							option(data-i18n='choose' value='') Choose
+						select.sheet-choice.sheet-feat_possible.sheet-feat_spell_choice2(name='comp_feat_spell_choice2')
+							option(data-i18n='choose' value='') Choose
+						select.sheet-choice.sheet-feat_possible.sheet-feat_spell_choice3(name='comp_feat_spell_choice3')
+							option(data-i18n='choose' value='') Choose
+						select.sheet-choice.sheet-feat_possible.sheet-feat_spell_choice4(name='comp_feat_spell_choice4')
+							option(data-i18n='choose' value='') Choose
+				.row.choice.feat_possible.feat_expertise_row
+					label
+						span(data-i18n='expertise')
+						each val in [1, 2]
+							select(class=`choice feat_possible feat_expertise_choice${val}` name=`comp_feat_expertise_choice_${val}`)
+								option(data-i18n='choose' value='')
+				.row.choice.feat_possible.feat_feature_row_1
+					h4.feat_feature_name_1
+					span(class='feat_feature_1')
+					select.feat_possible.feat_feature_choice_1(name='comp_feat_feature_choice_1')
+						option(data-i18n='choose' value='')
+						option.custom(data-i18n='custom')
+					p.description.feat_feature_description_1
+				.row.choice.feat_possible.feat_feature_row_1_double
+					h4.feat_feature_name_1_double
+					span.feat_feature_1_double
+					select.feat_possible.feat_feature_choice_1_double(name='comp_feat_feature_choice_3')
+						option(data-i18n='choose' value='')
+						option.custom(data-i18n='custom')
+					p.description.feat_feature_description_1_double
+				.row.choice.feat_possible.feat_feature_row_2
+					h4.feat_feature_name_2
+					span.feat_feature_2
+					select.feat_possible.feat_feature_choice_2(name='comp_feat_feature_choice_2')
+						option(data-i18n='choose' value='')
+						option.custom(data-i18n='custom')
+					p.description.feat_feature_description_2
+				.choice.row.feat_possible.other_options_and_features1
+					label
+						span.other_options_and_features_title1
+						select.feat_possible.other_options_and_features_choice1(name='comp_other_options_and_features_choice1')
+							option(data-i18n='choose' value='')
+				.choice.row.feat_possible.other_options_and_features2
+					label
+						span.other_options_and_features_title2
+						select.feat_possible.other_options_and_features_choice1(name='comp_other_options_and_features_choice2')
+							option(data-i18n='choose' value='')
+		.info.feat-info-container.choice.yes_feat
+			.sheet-compendium-page.sheet-feat-info(accept='Rules:Feats')
+		+bottomBar('spells', 'bio')
+		+cancelPrompt('feat')
+
+
+charmancer.sheet-charmancer-l1-bio
+	.charmancer.container
+		ol.steps
+		.topbar-holder
+		.choices
+			input(name='comp_previous_race' type='hidden' value='')
+			each val in ['Name', 'Age', 'Height', 'Weight', 'Eyes', 'Hair', 'Skin']
+				- const attributeName = val === 'Name' ? 'character_name' : val.toLowerCase();
+				- const datai18n = val === 'Name' ? 'char-name-u' : val === 'Eyes' ?  `eye-u` : `${val.toLowerCase()}-u`;
+				.row
+					label
+						div(data-i18n=datai18n)
+						input(name=`comp_${attributeName}` type='text')
+		+infoDiv('race','Rules:Races')
+		+bottomBar('feat', 'summary')
+		+cancelPrompt('bio')
+
+
+mixin summaryBlocks(type)
+	.summary
+		p.label(data-i18n=type)
+		div(class=`${type}_info`)
+		.choice.returnblock(class=`${type}_button`)
+			span(data-i18n='return-to:')
+			button.step(data-i18n=`${type}-u` type='back' value=`l1-${type}`)
+
+charmancer.sheet-charmancer-l1-summary
+	.charmancer
+		ol.steps
+		.topbar-holder
+		p.choice.ready_text(data-i18n='charmancer-only-choice-left-is-on-or')
+		p.label.ready_message
+		p.label(data-i18n='review-your-choices')
+		.summary-container
+			+summaryBlocks('race')
+			+summaryBlocks('class')
+			+summaryBlocks('abilities')
+			+summaryBlocks('background')
+			+summaryBlocks('equipment')
+			+summaryBlocks('spells')
+			.summary
+				p.label(data-i18n='feats')
+				.feat_info
+			.summary
+				p.label(data-i18n='bio')
+				.race_warning
+				.bio_info
+			.bottombar
+				button.prev(data-i18n='back' type='back' value='l1-bio')
+				button.jump(data-i18n='back-to-top' data-scroll='#top' type='button')
+				button.next.apply_changes(data-i18n='apply-changes' type='finish' value=`l1-mancer`)
+			+cancelPrompt('summary')
+
+
+charmancer.sheet-charmancer-final
+	.charmancer
+		div
+			h1(data-i18n='building-your-character')
+		.mancer_progress
+			div(style='width: 0%')
+		input(name='attr_mancer_category' type='hidden')
+		input(name='attr_mancer_progress' type='hidden')
+
+
+
