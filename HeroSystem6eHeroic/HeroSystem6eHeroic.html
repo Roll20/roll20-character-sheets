@@ -5604,6 +5604,7 @@
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
 			</div>
 			<div class="sheet-content">
+				{{#SUCCESS}}
 				{{#rollGreater() computed::SUCCESS -1}}
 				<div class="sheet-key">Degree of Success</div>
 				<div class="sheet-value">{{SUCCESS}}</div>
@@ -5612,6 +5613,7 @@
 				<div class="sheet-key">Degree of Failure</div>
 				<div class="sheet-value">{{SUCCESS}}</div>
 				{{/rollLess() computed::SUCCESS 0}}
+				{{/SUCCESS}}
 				{{#allprops() title subtitle desc color SUCCESS}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
@@ -5697,10 +5699,20 @@
 		  {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
 		</div>
 		<div class="sheet-content">
-		  {{#allprops() title subtitle desc color}}
+		  {{#SUCCESS}}
+			{{#rollGreater() computed::SUCCESS -1}}
+			<div class="sheet-key">Activate Armor</div>
+			<div class="sheet-value">{{SUCCESS}}</div>
+			{{/rollGreater() computed::SUCCESS -1}}
+			{{#rollLess() computed::SUCCESS 0}}
+			<div class="sheet-key">Failed to Activate</div>
+			<div class="sheet-value">{{SUCCESS}}</div>
+			{{/rollLess() computed::SUCCESS 0}}
+		  {{/SUCCESS}}
+		  {{#allprops() title subtitle desc color SUCCESS}}
 		  <div class="sheet-key">{{key}}</div>
 		  <div class="sheet-value">{{value}}</div>
-		  {{/allprops() title subtitle desc color}}
+		  {{/allprops() title subtitle desc color SUCCESS}}
 		  {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 		</div>
 	  </div>
@@ -8065,16 +8077,25 @@
 	/* ----------------------- */
 
 	arrayOf(maxArmorNum).forEach(num => {
-		var armorId = String(num).padStart(2,'0');	
+		var armorId = String(num).padStart(2,'0');
 		on(`clicked:armorActivation${armorId}`, (info) => {
-			getAttrs(["whisperToGM"], function(values) {
+			getAttrs(["whisperToGM", "displayDegreeOfSuccess", "armorActivation"+armorId, "armorLocations"+armorId], function(values) {
 				var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
+				var actOn = values["armorActivation"+armorId]||18;
+				var locations = values["armorLocations"+armorId]||"";
 				
 				theRoll += "&{template:custom-activate} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Defends with @{armorName"+armorId+"}**}} "
-					+ "{{Activate on = [[@{armorActivation"+armorId+"}]] **or less**}} "
-					+ "{{Result = [[3d6cf6cs1]]}} "
-					+ "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} "
+					+ "{{subtitle= Defends with @{armorName"+armorId+"}**}} ";
+				if (actOn >= 18 && locations != "") {
+					theRoll += "{{Locations=@{armorLocations"+armorId+"}}}";
+				} else if (values.displayDegreeOfSuccess != 0) {
+					theRoll += "{{SUCCESS=[[@{armorActivation"+armorId+"}[Armor Activation]-3d6cf6cs1[Roll]]]}} ";
+				} else {
+					theRoll += "{{Activate on = [[@{armorActivation"+armorId+"}]] **or less**}} "
+						+ "{{Result = [[3d6cf6cs1]]}} ";
+				}
+
+				theRoll += "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} "
 					+ "{{Total Defense = **PD ``@{totalPD"+armorId+"}`` ED ``@{totalED"+armorId+"}``**}}";
 				
 				startRoll(theRoll, (results) => {
