@@ -5728,10 +5728,20 @@
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
 			</div>
 			<div class="sheet-content">
-				{{#allprops() title subtitle desc color}}
+				{{#SUCCESS}}
+					{{#rollGreater() computed::SUCCESS -1}}
+					<div class="sheet-key">Activate Power</div>
+					<div class="sheet-value">{{SUCCESS}}</div>
+					{{/rollGreater() computed::SUCCESS -1}}
+					{{#rollLess() computed::SUCCESS 0}}
+					<div class="sheet-key">Failed to Activate</div>
+					<div class="sheet-value">{{SUCCESS}}</div>
+					{{/rollLess() computed::SUCCESS 0}}
+				{{/SUCCESS}}
+				{{#allprops() title subtitle desc color SUCCESS}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color}}
+				{{/allprops() title subtitle desc color SUCCESS}}
 				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 			</div>
 		</div>
@@ -7082,10 +7092,14 @@
 				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
 
 				theRoll += "&{template:custom-power-attack} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= @{powerName"+powerId+"} - @{powerEffect"+powerId+"}}} {{desc=@{powerText"+powerId+"}}} "
-					+ "{{Activate On = [[?{Modifiers|0}+@{powerSkillRoll"+powerId+"}]] **or less**}} "
-					+ "{{Success Roll=[[3d6cf6cs1]]}} {{Attack Roll=[[3d6cf6cs1]]}} "
-					+ "{{Effect Roll=[[@{hiddenPowerDice"+powerId+"}sd]]}} "
+					+ "{{subtitle= @{powerName"+powerId+"} - @{powerEffect"+powerId+"}}} {{desc=@{powerText"+powerId+"}}} ";
+				if (values.displayDegreeOfSuccess != 0) {
+					theRoll += "{{SUCCESS=[[@{powerSkillRoll"+powerId+"}[Activation]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]]}} "
+				} else {
+					theRoll += "{{Activate On = [[@{powerSkillRoll"+powerId+"}[Activation]+?{Modifiers|0}[Modifiers]]] **or less**}} "
+						+ "{{Success Roll=[[3d6cf6cs1]]}} {{Attack Roll=[[3d6cf6cs1]]}} ";
+				}
+				theRoll += "{{Effect Roll=[[@{hiddenPowerDice"+powerId+"}sd]]}} "
 					+ "{{END=[[@{powerEND"+powerId+"}]] (@{CurrentEND})}}";
 
 				startRoll(theRoll, (results) => {
