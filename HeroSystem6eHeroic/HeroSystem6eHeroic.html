@@ -8402,7 +8402,7 @@
 			// Roll attack and damage dice for Weapon XX.
 			
 			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId,
-					"optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM"], function(values) {
+					"optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
 				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
 				let areaOfEffect = values["weaponAreaEffect"+weaponId] != 0;
 				let useHitLocations = values.optionHitLocationSystem != 0;
@@ -8416,9 +8416,14 @@
 				
 				// If isNormalDamage is TRUE, use the Normal Damage template.
 				theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
-						+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{weaponName"+weaponId+"}}} "
-						+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[["+ (areaOfEffect ? 0 : 1) +"*@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} "
-						+ (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}} " : "")
+						+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{weaponName"+weaponId+"}}} ";
+				if (values.displayDegreeOfSuccess != 0) {
+					theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[["+ (areaOfEffect ? 0 : 1) +"*@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} ";
+				} else {
+					theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[["+ (areaOfEffect ? 0 : 1) +"*@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} "
+						+ "{{Result=[[3d6cf6cs1]]}}"
+				}
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}} " : "")
 						+ "{{"+dmgType+"=[[@{hiddenWeaponDamage"+weaponId+"}]]}} "
 						+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 				if (useHitLocations)
@@ -8465,11 +8470,12 @@
 	on('clicked:attackShield', (info) => {
 		// Roll attack and damage dice for the shield.
 						
-		getAttrs(["shieldNormalDamage", "shieldStunMod", "shieldEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM"], function(values) {
+		getAttrs(["shieldNormalDamage", "shieldStunMod", "shieldEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
 			var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
 			let useHitLocations = values.optionHitLocationSystem != 0;
 			let isNormalDamage = values.shieldNormalDamage != 0;
 			let stunMod = parseInt(values.shieldStunMod)||0;
+			let dispDoS = values.displayDegreeOfSuccess != 0;
 
 			let subtractENDAmt = parseInt(values.shieldEndurance)||0;
 
@@ -8478,9 +8484,14 @@
 
 			// If isNormalDamage is TRUE, use the Normal Damage template.
 			theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}}} "
-					+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-[[abs(?{Blocking|Yes,1|No,-1}-1)/2*@{targetOCVpenalty}]][TargetOCV]+[[?{Blocking}*@{shieldDCV}]][ShieldDCV]+?{Modifiers|0}[Modifier]]]}} "
-					+ (subtractENDAmt ? "{{END=[[[[abs(?{Blocking}-1)/2]][Blocking]*@{shieldEndurance}[Endurance Cost]]] (@{currentEND})}} " : "")
+					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}}} ";
+			if (dispDoS) {
+				theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-[[abs(?{Blocking|Yes,1|No,-1}-1)/2*@{targetOCVpenalty}]][TargetOCV]+[[?{Blocking}*@{shieldDCV}]][ShieldDCV]+?{Modifiers|0}[Modifier]]]}} ";
+			} else {
+				theRoll += "{{OCV=[[@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-[[abs(?{Blocking|Yes,1|No,-1}-1)/2*@{targetOCVpenalty}]][TargetOCV]+[[?{Blocking}*@{shieldDCV}]][ShieldDCV]+?{Modifiers|0}[Modifier]]]}} "
+					+ "{{Result=[[3d6cf6cs1]]}}";
+			}
+			theRoll += (subtractENDAmt ? "{{END=[[[[abs(?{Blocking}-1)/2]][Blocking]*@{shieldEndurance}[Endurance Cost]]] (@{currentEND})}} " : "")
 					+ "{{"+dmgType+"=[[@{hiddenShieldDamage01}]]}} "
 					+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 			if (useHitLocations)
@@ -8493,7 +8504,7 @@
 
 				// Little hacky get whether or not the person is blocking.
 				let regex = /\+(-?\d+)\[ShieldDCV\]/g
-				let isBlocking = parseInt(regex.exec(results.results["Hit DCV"].expression)) > 0;
+				let isBlocking = parseInt(regex.exec(results.results[(dispDoS ? "Hit DCV" : "OCV")].expression)) > 0;
 
 				// Get hit location message if system used.
 				if (useHitLocations && !isBlocking) {
@@ -8537,16 +8548,21 @@
 	on('clicked:standardAttackRoll', (info) => {
 		// Roll attack and damage dice for standardAttack
 
-		getAttrs(["hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM"], function(values) {
+		getAttrs(["hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
 			var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
 			let useHitLocations = values.optionHitLocationSystem != 0;
 
 			let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
 
 			theRoll += "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} "
-				+ "{{subtitle= Makes a normal attack with Strength @{strength}}} "
-				+ "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]-@{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} "
-				+ (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}} " : "")
+				+ "{{subtitle= Makes a normal attack with Strength @{strength}}} ";
+			if (values.displayDegreeOfSuccess != 0) {
+				theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]-@{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} ";
+			} else {
+				theRoll += "{{OCV=[[@{ocv}[OCV]-@{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} "
+					+ "{{Result=[[3d6cf6cs1]]}}";
+			}
+			theRoll += (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}} " : "")
 				+ "{{STUN=[[@{hiddenManeuverDamage01}]]}} "
 				+ "{{BODY=[[0[See STUN]]]}}";
 			if (useHitLocations)
