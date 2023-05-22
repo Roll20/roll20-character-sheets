@@ -48,7 +48,7 @@ def main():
         else:
             new_translation_data[key] = value
 
-    with open('translations.json', 'w') as f:
+    with open('translation.json', 'w') as f:
         json.dump(new_translation_data, f, sort_keys=True, indent=4)
 
     with open('removed_i18n_keys.txt', 'w') as f:

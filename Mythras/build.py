@@ -100,7 +100,7 @@ if args.campaign:
     with open(css_min_path, 'r') as css_file:
         css_src = css_file.read()
 
-    with open('translations.json', 'r') as translation_file:
+    with open('translation.json', 'r') as translation_file:
         translation_src = translation_file.read()
 
     sheet_data = {

@@ -4,7 +4,7 @@ import json
 import re
 import sys
 
-with open(file='translations.json', mode="r") as translation_file:
+with open(file='translation.json', mode="r") as translation_file:
     translation_data = json.load(translation_file)
     i18n_keys = list(translation_data.keys())
 
