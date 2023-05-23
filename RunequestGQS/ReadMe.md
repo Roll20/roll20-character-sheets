@@ -36,6 +36,7 @@ STR and DEX minimums are not currently supported this maybe added in a future re
 
 ## 23.05.2023
     Fixed 2 Headed Dragonsnail location roll
+    Adjusted location of hit location button
 
 ## 16.05.2023
     Scorpion men Thorax hit location roll fix
