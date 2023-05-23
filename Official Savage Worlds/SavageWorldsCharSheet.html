@@ -1,7 +1,7 @@
 
 <script type="text/worker">
   const sheetVersionPrefix = 'Official Savage Worlds v';
-const sheetVersion = '1.00.25';
+const sheetVersion = '1.00.30';
 
 // Define colors for Logs
 const r20color = '#E948C9';
@@ -198,8 +198,10 @@ function repeatingSimpleSumWCheck(
 function fauxChange(field, fauxvalue) {
   //repeating  fields should be passed in the format: repeating_<section>:attributes
   //example: repeating_skills:skillnamerank
+  log('FauxChange Reached: Field', field, r20color);
   log('Setting faux value(s) for', field, 'orangered');
   if (field.indexOf(':') > -1) {
+    log('fauxChange', 'repeating section', '#CCCCFF');
     //console.log("Need to update values in a repeating section");
     let getfields = field.split(':');
     let repeatingSection = getfields[0];
@@ -218,36 +220,45 @@ function fauxChange(field, fauxvalue) {
         getAttrs(fieldArray, function (v) {
           for (let b = 0; b < idArray.length; b++) {
             oldValues[oldValues.length] = v[fieldArray[b]];
+            log(`Setting Faux Value (${fieldArray[b]})`, fauxvalue, r20color);
             sattrs[fieldArray[b]] = fauxvalue;
           }
           log('Step', '!!! Setting Fake Value !!!', 'orangered');
-          setAttrs(sattrs);
-          for (let c = 0; c < idArray.length; c++) {
-            log(
-              'Added Field',
-              fieldArray[c] + ' = ' + oldValues[c],
-              'orangered'
-            );
-            sattrs[fieldArray[c]] = oldValues[c];
-          }
-          log('Step', '!!! Setting Real Values !!!', 'orangered');
-          setAttrs(sattrs);
+          setAttrs(sattrs, null, () => {
+            for (let c = 0; c < idArray.length; c++) {
+              log(
+                'Added Field',
+                fieldArray[c] + ' = ' + oldValues[c],
+                'orangered'
+              );
+              log(
+                `Setting Previous Value (${fieldArray[c]})`,
+                oldValues[c],
+                r20color
+              );
+              sattrs[fieldArray[c]] = oldValues[c];
+            }
+            log('Step', '!!! Setting Real Values !!!', 'orangered');
+            setAttrs(sattrs);
+          });
         });
       }
     });
   } else {
     //console.log("Updating values in a Non-Repeating Section");
+    log('fauxChange', 'Not Repeating Section', '#CCCCFF');
     getAttrs([field], function (v) {
       let prevValue = v[field];
       let sattrs = {};
       //console.log(`++++ Setting ${field} to ${fauxvalue} ++++`);
       //console.log("Setting " + field + " to " + fauxvalue);
       sattrs[field] = fauxvalue;
-      setAttrs(sattrs);
-      //console.log(`---- Setting ${field} to ${prevValue} ----`);
-      //console.log("Setting " + field + " to " + fauxvalue);
-      sattrs[field] = prevValue;
-      setAttrs(sattrs);
+      log(`Setting Faux Value (${field})`, fauxvalue, r20color);
+      setAttrs(sattrs, null, () => {
+        sattrs[field] = prevValue;
+        log(`Setting Previous Value (${field})`, prevValue, r20color);
+        setAttrs(sattrs);
+      });
     });
   }
 }
@@ -260,7 +271,7 @@ const stepwiseFaux = function (section, field) {
   //field = the field within the section to fauxily change
   //example call: stepwiseFaux("weapons","dmgbonusnum");
   //will do a faux change during each for loop
-
+  log('stepWiseFaux', 'Entered this thing', '#CCCCFF');
   let repeatingSection = `repeating_${section}`;
   getSectionIDs(repeatingSection, function (idArray) {
     if (idArray.length > 0) {
@@ -355,6 +366,44 @@ const repeatingCount = function (repSection, countField) {
     const setCount = {};
     setCount[`${countField}`] = repCount;
     setAttrs(setCount);
+  });
+};
+
+//Manage Background Image
+const updateBackgroundImage = function (backgroundSelection) {
+  let imageURL = '';
+  getAttrs(['background', 'backgroundurl'], function (bgSelection) {
+    switch (bgSelection.background) {
+      case '1':
+        imageURL =
+          'https://raw.githubusercontent.com/finderski/SWT/master/Parchement_Background2.jpg';
+        break;
+      case '2':
+        imageURL =
+          'https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/backgrounds/swade-parchment-seamless.jpg';
+        break;
+      case '3':
+        imageURL =
+          'https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/backgrounds/r20-rifts-hex-pattern.png';
+        break;
+      case '4':
+        imageURL = bgSelection.backgroundurl;
+        break;
+      default:
+        imageURL = '';
+    }
+    setAttrs({
+      backgroundImage: imageURL,
+    });
+  });
+};
+
+const calcWoundsRemaining = function () {
+  getAttrs(['wounds_max', 'wounds'], function (v) {
+    let maxWounds = parseInt(v.wounds_max) || 0;
+    let totalWounds = parseInt(v.wounds) || 0;
+    let remainingWounds = maxWounds - totalWounds;
+    setAttrs({ woundsRemaining: remainingWounds });
   });
 };
 
@@ -507,10 +556,43 @@ const upgradeSheet = function (
       stepwiseFaux('weapons', 'weaponskill');
       stepwiseFaux('spells', 'spellskill');
       setattrvals['newcontent'] = 'unread';
+    }
+    if (versionthree < 0.26) {
+      setattrvals['newcontent'] = 'unread';
+    }
+    if (versionthree < 0.27) {
+      const nameList = [
+        'faith',
+        'focus',
+        'performance',
+        'psionics',
+        'spellcasting',
+      ];
+      nameList.forEach(skillName => {
+        fauxChange(`${skillName}name`, `${skillName}_old`);
+      });
+      setattrvals['newcontent'] = 'unread';
+      setattrvals['newdocumentation'] = 'unread';
+    }
+    if (versionthree < 0.28) {
+      log('Sheet Version', 'Upgrading to version 0.0.28', '#CCCCFF');
+      fauxChange(`repeating_weapons:weaponskill`, 'fakeWeapon');
+      //stepwiseFaux("weapons", "weaponbutton");
+      setattrvals['newcontent'] = 'unread';
     } else {
       log('Upgrade', `Sheet already updgraded (${characterName})`, 'lime');
     }
-    setAttrs(setattrvals, { silent: true });
+    if (versionthree < 0.29) {
+      updateBackgroundImage();
+      setattrvals['newcontent'] = 'unread';
+    }
+    if (versionthree < 0.3) {
+      log('Sheet Version', 'Upgrading to version 0.0.30', '#CCCCFF');
+      fauxChange(`repeating_weapons:weaponskill`, 'fighting');
+      setattrvals['newcontent'] = 'unread';
+    }
+    setAttrs(setattrvals);
+    //setAttrs(setattrvals, { silent: true });
   });
 };
 
@@ -518,9 +600,10 @@ const upgradeSheet = function (
 
 // Adjust CSS for long Character Names
 on(
-  'sheet:opened change:character_name change:character_avatar change:character_token',
+  'sheet:opened change:character_name change:character_avatar change:character_token change:show_token',
   function () {
     log('Name Change', 'Name was changed', r20color);
+    let setValues = {};
     getAttrs(
       ['character_name', 'character_avatar', 'character_token'],
       function (v) {
@@ -532,13 +615,34 @@ on(
           ? (nameclass = 'smallHeader')
           : (nameclass = 'normalHeader');
         log('Name Class', nameclass, r20color);
-        log('Character Token', v.character_token, r20color);
-        setAttrs({
+        setValues['namelength'] = nameclass;
+        let avatarURL = v.character_avatar;
+        let tokenURL = v.character_token;
+        setValues['avatar'] = avatarURL;
+        setValues['ctoken'] = tokenURL;
+        if (avatarURL.length < 1 && tokenURL.length < 1) {
+          //Avatar and Token is empty, so make sure show_token is set to 0
+          setValues['show_token'] = '0';
+        } else if (tokenURL.length > 0) {
+          tokenURL.substring(tokenURL.length - 4, tokenURL.length - 3) !== '.'
+            ? (tokenURL += '.png')
+            : log('URL Has Extension', tokenURL, r20color);
+          //use the token image for the rolltemplate
+          setValues['roll_template_token'] = '{{token=[x](' + tokenURL + ')}}';
+        } else {
+          avatarURL.substring(avatarURL.length - 4, avatarURL.length - 3) !==
+          '.'
+            ? (avatarURL += '.png')
+            : log('URL Has Extension', avatarURL, r20color);
+          setValues['roll_template_token'] = '{{token=[x](' + avatarURL + ')}}';
+        }
+        /*setAttrs({
           namelength: nameclass,
           avatar: v.character_avatar,
           ctoken: v.character_token,
           roll_template_token: '{{token=[x](' + v.character_token + '.png)}}',
-        });
+        });*/
+        setAttrs(setValues);
       }
     );
   }
@@ -1009,6 +1113,11 @@ on('change:sheet_theme', function (eventInfo) {
     updatedValues.background = '1';
   }
   setAttrs(updatedValues);
+});
+
+//watch for a change in the background
+on('change:background', function () {
+  updateBackgroundImage();
 });
   //Create Trait values for rank and display hidden fields is in the workers.js file
 //Setting default Skill Names is in the workers.js file (with all the other on:opened stuff)
@@ -1990,18 +2099,23 @@ on('change:burn_points_mod', function (eventInfo) {
 });
   //Wound and Fatigue Configuration Pane buttons are in teh actionButtonScripts.js file
 
-on("change:stunned", function(eventInfo) {
-    if (eventInfo.newValue === "-2") {
-        getAttrs(["distracted"], function(v) {
-            v.distracted === "0" ?
-                setAttrs({ distracted: "-2",
-                           vulnerable: "-2" }) :
-                log("Distracted", "Setting distracted", "darkblue");
-        });
-    } else {
-        log("Distracted", "Don't need to change Distracted", "darkblue");
-    }
-});/*jshint esversion: 11, laxcomma:true, eqeqeq:true*/
+on('change:stunned', function (eventInfo) {
+  if (eventInfo.newValue === '-2') {
+    getAttrs(['distracted'], function (v) {
+      v.distracted === '0'
+        ? setAttrs({ distracted: '-2', vulnerable: '-2' })
+        : log('Distracted', 'Setting distracted', 'darkblue');
+    });
+  } else {
+    log('Distracted', "Don't need to change Distracted", 'darkblue');
+  }
+});
+
+on('change:wounds', function (value) {
+  //call the function
+  calcWoundsRemaining();
+});
+  /*jshint esversion: 11, laxcomma:true, eqeqeq:true*/
 /*jshint -W014,-W084,-W030,-W033*/
 //Initiate a compendium lookup
 /*Expansion IDs:
@@ -2037,7 +2151,8 @@ const nameAttrLookupBase = {
     Hindrances: 'hindrance',
     Edges: 'edge',
     SpecialAbilities: 'specialability',
-    Vehicle:'display_name'
+    Vehicle:'display_name',
+    Gear:'item'
 };
 const categoryLookupBase = {
     Armors: 'Armor',
@@ -2059,7 +2174,16 @@ const PHEGSingular = {
     'Shields':'Shield',
     'Armors':'Armor',
     'Vehicle':'Vehicle',
-    'SpecialAbilities':'SpecialAbility'
+    'SpecialAbilities':'SpecialAbility',
+    'powers':'power',
+    'hindrances':'hindrance',
+    'edges':'edge',
+    'gear':'gear',
+    'weapons':'weapon',
+    'shields':'shield',
+    'armors':'armor',
+    'vehicle':'vehicle',
+    'specialabilities':'specialability'
 };
 //Lookup proxy handlers. These functions are used int he proxies to return an appropriate value from the lookup objects above, even when a given key does not exist in those objects.
 const genericLookupHandler = {
@@ -2080,14 +2204,22 @@ const requiredAttrLookup = new Proxy(requiredAttrLookupBase, genericLookupHandle
 //statblock (object): base object dropped from the compendium
 //callback (function): A function that will use the parsed compendium lookup data to finish the drag and drop of the item
 //The callback function receives the parsed statblock as an argument
-const compendiumLookup = function({queue, callback, origBlock}) {
-    const IDPathways = { //the expansion IDs to search through. The importer will start with the ID that matches the expansion of the statblock and work it's way to the end of the array. Each array should end with the SWADE core rules. As a fallback, if a matching item is not found with any of these expansions, the importer will grab the first option that matches the name. See the Pathfinder Entry for more details.
-        SWADE: [8893],
-        //          SWPF Main | Bestiary | SWADE
-        Pathfinder: [12479, 10864, 8893], //These should be in order of dependencies. This is most likely newest -> oldest release order
-        Deadlands: [10712, 10215, 8893],
-        Rifts: [12398, 12397, 12396 , 8893]
-    };
+const compendiumLookup = function({queue, callback}) {
+    getCompendiumPage(`Introduction:BookIndex`,(data)=>{
+        if(data.data['data-IDPathways']){
+            try{
+                const IDPathways = JSON.parse(data.data['data-IDPathways']);
+                compendiumDataLookup({queue,callback,IDPathways});
+            }catch(err){
+                debug('No IDPathways found, exiting drag and drop');
+            }
+        }else{
+            debug(`!!! No product index page found. No valid base compendiums present !!!`);
+        }
+    });
+};
+
+const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
     origBlock = origBlock || queue[0];
     let productIndex = 0;
     const productLine = Object.keys(IDPathways).find((line) => {//Find the productLine key from IDPathways that matches the expansion of the item. E.g. The SWPF Bestiary (10864) would match to 'Pathfinder'.
@@ -2104,13 +2236,16 @@ const compendiumLookup = function({queue, callback, origBlock}) {
     queue.forEach((statblock)=>{
         searchArray = PHEGCategories.reduce((m, type) => {//Construct an array of items to search for.
             if (statblock[`data-${type}`]){
-                let searchNames = statblock[`data-${type}`].map((obj) => obj[specialNameRefs[obj.type]]).join('|');
-                let searchString = `Category:${categoryLookup[type]} ${nameAttrLookup[type]}:${searchNames}`;
-                m.push(searchString);
+                let searchNames = statblock[`data-${type}`].map((obj) => obj[specialNameRefs[obj.type]] || obj.name).join('|').replace(/\|\s*(?:\||$)/g,'');
+                if(searchNames){
+                    let searchString = `Category:${categoryLookup[type]} ${nameAttrLookup[type]}:${searchNames}`;
+                    m.push(searchString);
+                }
             }
             return m;
         }, searchArray);
-        lookupBurndown(statblock, productArray, searchArray, callback, origBlock);
+        debug({searchArray});
+        lookupBurndown(statblock, productArray, searchArray, callback, origBlock,IDPathways);
     });
 };
 
@@ -2120,8 +2255,9 @@ const compendiumLookup = function({queue, callback, origBlock}) {
 //productArray (array): The array of expansion IDs that this product may rely on
 //callback (function): A function that will use the parsed compendium lookup data to finish the drag and drop of the item
 //The callback function receives the parsed statblock as an argument
-const lookupBurndown = function(statblock, productArray, searchArray, callback, origBlock) {
+const lookupBurndown = function(statblock, productArray, searchArray, callback, origBlock,IDPathways) {
     getCompendiumQuery(searchArray, (dataArr) => {
+        debug({dataArr});
         PHEGCategories.forEach((category) => {
             if (origBlock[`data-${category}`]) {
                 origBlock[`data-${category}`] = origBlock[`data-${category}`].map((obj) => {
@@ -2136,8 +2272,9 @@ const lookupBurndown = function(statblock, productArray, searchArray, callback, 
         });
         let queue = additionalLookups(statblock,origBlock);
         if(queue.length){
-            compendiumLookup({queue,callback,origBlock});
+            compendiumDataLookup({queue,callback,origBlock,IDPathways});
         }else{
+            debug({origBlock});
             callback(origBlock);
         }
     });
@@ -2217,7 +2354,9 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
         }
     });
     return phegObj;
-};//Reset Compendium fields to empty
+};/*jshint esversion: 11, laxcomma:true, eqeqeq:true*/
+/*jshint -W014,-W084,-W030,-W033*/
+//Reset Compendium fields to empty
 const getDropInfoCommand = (category, source) => {
   const PHEGCategoryTypes = {
     Edges: 'npc_Edge',
@@ -2313,6 +2452,9 @@ const specialAbiltyUpdates = {
     tufnessMod: '2',
   },
 };
+const sheetAttributes = [
+  "character_sheet","firstInit","namelength","wdNum","dopay","dealtJoker","showFightingByDefault","initstatblock","initdesc","chardesc","charatts","initskills","charskills","initderived","charderived","initgear","chargear","inithindrances","charhindrances","initsbedges","charedges","initspecabilities","showspec","charspecabilities","initpowers","powercount","charpowers","ab1powerlist","ab2powerlist","ab3powerlist","ab4powerlist","ab5powerlist","unshakeTemplate","templateConditions","ttmod","dmgmod","ModSum","ModSumEnc","armorMinStrMod","CompendiumName","CompendiumCategory","CompendiumContent","CompendiumData","avatar","ctoken","dark_mode","sheet_theme","background","sheetTab","miniDisplay","vehicle","power_Armor","robot_Armor","is_npc","WCI","showFear","newcontent","newdocumentation","character_name","rank","rank_display","race","size","sizecategory","bennies","conviction","physdescription","worstNightmare","nightmare","showconditions","distracted","vulnerable","stunned","wounds","wounds_max","isShaken","isinc","fatigue","fatigue_max","agility_delta","agility_display","smarts_delta","animalsmarts_display","smarts_display","spirit_delta","spirit_display","strength_delta","strength_display","vigor_delta","vigor_display","parryCur","toughnesscur","toughnessArmor","runningDie","paceCur","showDominion","showadditionalderived","dominion","showBurn","burn_die_type","derivedFirstName","derivedFirstCurrent","useLoad","totalloadcarried","encumbrance","hindranceCount","specialAbilityCount","staticacademics","academicsname","academics_display","staticathletics","athleticsname","athletics_display","staticbattle","battlename","battle_display","staticboating","boatingname","boating_display","staticcommonknowledge","commonknowledgename","commonknowledge_display","staticdriving","drivingname","driving_display","staticelectronics","electronicsname","electronics_display","staticfaith","faithname","faith_display","staticfighting","fightingname","fighting_display","staticfocus","focusname","focus_display","staticgambling","gamblingname","gambling_display","statichacking","hackingname","hacking_display","statichealing","healingname","healing_display","staticintimidation","intimidationname","intimidation_display","staticlanguage","native-languagename","language_display","staticnotice","noticename","notice_display","staticoccult","occultname","occult_display","staticperformance","performancename","performance_display","staticpersuasion","persuasionname","persuasion_display","staticpiloting","pilotingname","piloting_display","staticpsionics","psionicsname","psionics_display","staticrepair","repairname","repair_display","staticresearch","researchname","research_display","staticriding","ridingname","riding_display","staticscience","sciencename","science_display","staticshooting","shootingname","shooting_display","staticspellcasting","spellcastingname","spellcasting_display","staticstealth","stealthname","stealth_display","staticsurvival","survivalname","survival_display","statictaunt","tauntname","taunt_display","staticthievery","thieveryname","thievery_display","statictrade","tradename","trade_display","staticweirdscience","weirdsciencename","weirdscience_display","staticKnowledgeOther","useAlphaNum","powerCount","powerlabelplural","NoPPRule","numberofabs","ab1color","ablabel","PowerPoints","PowerPoints_max","ppelabel","ab2color","ablabel2","powerpoints2","powerpoints2_max","pplabel2","ab3color","ablabel3","powerpoints3","powerpoints3_max","pplabel3","ab4color","ablabel4","powerpoints4","powerpoints4_max","pplabel4","ab5color","ablabel5","powerpoints5","powerpoints5_max","pplabel5","vbonusdamage","RaiseHBRule","usewealth","moneyfields","moneyonename","moneytwoname","moneythreename","moneyfourname","moneyname","money","money2","money3","money4","wealth","useWealthMod","wealthmod","rollwealth","useconsumables","edgeCount","logo","agilitybutton","agility","agilitymod","agModType","agrollMod","whisperagility","agwilddie","agwilddieinfo","agility_base","agilitymod_base","agility_rank","rolltagility","agilityRollFormula","agilityWildDieFormula","smartsbutton","smarts","smartsmod","smModType","smrollMod","whispersmarts","smwilddie","smwilddieinfo","animalsmarts","smarts_base","smartsmod_base","smarts_rank","rolltsmarts","smartsRollFormula","smartsWildDieFormula","spiritbutton","spirit","spiritmod","spModType","sprollMod","whisperspirit","spwilddie","spwilddieinfo","spirit_base","spiritmod_base","spirit_rank","rolltspirit","spiritRollFormula","spiritWildDieFormula","strengthbutton","strength","strengthmod","stModType","strollMod","whisperstrength","stwilddie","stwilddieinfo","strength_base","strengthmod_base","strength_rank","rolltstrength","strengthRollFormula","strengthWildDieFormula","vigorbutton","vigor","vigormod","viModType","virollMod","whispervigor","viwilddie","viwilddieinfo","vigor_base","vigormod_base","vigor_rank","rolltvigor","vigorRollFormula","vigorWildDieFormula","altRuleSkillSpec","staticAll","staticCore","unskilledencumbrance","whisperunskilled","unskilledwilddie","unskilledwilddieinfo","unskilled_rank","unskilled_display","unskilledSkillRollFormula","unskilledWildDieFormula","rolltUnskilled","unskilledencumbrancebutton","unskilledrollformula","academics_cla","academics_lao","academics_delta","academics_makeButton","academics_mbVarType","academicsRollValue","academics","academicsmod","academicsModType","AcademicsskillMod","linkedacademicsattbutton","linkedacademicsattformula","whisperacademics","academicswilddie","academicswilddieinfo","academics_base","academicsmod_base","academics_rank","academicsSkillRollFormula","academicsWildDieFormula","rolltAcademics","athletics_cla","athletics_lao","athletics_delta","athletics_makeButton","athletics_mbVarType","linkedathleticsatt","athleticsRollValue","athletics","athleticsmod","athleticsModType","AthleticsskillMod","linkedathleticsattbutton","linkedathleticsattformula","whisperathletics","athleticswilddie","athleticswilddieinfo","athletics_base","athleticsmod_base","athletics_rank","athleticsSkillRollFormula","athleticsWildDieFormula","rolltAthletics","battle_cla","battle_lao","battle_delta","battle_makeButton","battle_mbVarType","battleRollValue","battle","battlemod","battleModType","BattleskillMod","linkedbattleattbutton","linkedbattleattformula","whisperbattle","battlewilddie","battlewilddieinfo","battle_base","battlemod_base","battle_rank","battleSkillRollFormula","battleWildDieFormula","rolltBattle","boating_cla","boating_lao","boating_delta","boating_makeButton","boating_mbVarType","boatingRollValue","boating","boatingmod","boatingModType","BoatingskillMod","linkedboatingattbutton","linkedboatingattformula","whisperboating","boatingwilddie","boatingwilddieinfo","boating_base","boatingmod_base","boating_rank","boatingSkillRollFormula","boatingWildDieFormula","rolltBoating","commonknowledge_cla","commonknowledge_lao","commonknowledge_delta","commonknowledge_makeButton","commonknowledge_mbVarType","commonknowledgeRollValue","commonknowledge","commonknowledgemod","commonknowledgeModType","CommonknowledgeskillMod","linkedcommonknowledgeattbutton","linkedcommonknowledgeattformula","whispercommonknowledge","commonknowledgewilddie","commonknowledgewilddieinfo","commonknowledge_base","commonknowledgemod_base","commonknowledge_rank","commonknowledgeSkillRollFormula","commonknowledgeWildDieFormula","rolltCommonknowledge","driving_cla","driving_lao","driving_delta","driving_makeButton","driving_mbVarType","drivingRollValue","driving","drivingmod","drivingModType","DrivingskillMod","linkeddrivingattbutton","linkeddrivingattformula","whisperdriving","drivingwilddie","drivingwilddieinfo","driving_base","drivingmod_base","driving_rank","drivingSkillRollFormula","drivingWildDieFormula","rolltDriving","electronics_cla","electronics_lao","electronics_delta","electronics_makeButton","electronics_mbVarType","electronicsRollValue","electronics","electronicsmod","electronicsModType","ElectronicsskillMod","linkedelectronicsattbutton","linkedelectronicsattformula","whisperelectronics","electronicswilddie","electronicswilddieinfo","electronics_base","electronicsmod_base","electronics_rank","electronicsSkillRollFormula","electronicsWildDieFormula","rolltElectronics","faith_cla","faith_lao","faith_delta","faith_makeButton","faith_mbVarType","faithRollValue","faith","faithmod","faithModType","FaithskillMod","linkedfaithattbutton","linkedfaithattformula","whisperfaith","faithwilddie","faithwilddieinfo","faith_base","faithmod_base","faith_rank","faithSkillRollFormula","faithWildDieFormula","rolltFaith","fighting_cla","fighting_lao","fighting_delta","fighting_makeButton","fighting_mbVarType","fightingRollValue","fighting","fightingmod","fightingModType","FightingskillMod","linkedfightingattbutton","linkedfightingattformula","whisperfighting","fightingwilddie","fightingwilddieinfo","fighting_base","fightingmod_base","fighting_rank","fightingSkillRollFormula","fightingWildDieFormula","rolltFighting","focus_cla","focus_lao","focus_delta","focus_makeButton","focus_mbVarType","focusRollValue","focus","focusmod","focusModType","FocusskillMod","linkedfocusattbutton","linkedfocusattformula","whisperfocus","focuswilddie","focuswilddieinfo","focus_base","focusmod_base","focus_rank","focusSkillRollFormula","focusWildDieFormula","rolltFocus","gambling_cla","gambling_lao","gambling_delta","gambling_makeButton","gambling_mbVarType","gamblingRollValue","gambling","gamblingmod","gamblingModType","GamblingskillMod","linkedgamblingattbutton","linkedgamblingattformula","whispergambling","gamblingwilddie","gamblingwilddieinfo","gambling_base","gamblingmod_base","gambling_rank","gamblingSkillRollFormula","gamblingWildDieFormula","rolltGambling","hacking_cla","hacking_lao","hacking_delta","hacking_makeButton","hacking_mbVarType","hackingRollValue","hacking","hackingmod","hackingModType","HackingskillMod","linkedhackingattbutton","linkedhackingattformula","whisperhacking","hackingwilddie","hackingwilddieinfo","hacking_base","hackingmod_base","hacking_rank","hackingSkillRollFormula","hackingWildDieFormula","rolltHacking","healing_cla","healing_lao","healing_delta","healing_makeButton","healing_mbVarType","healingRollValue","healing","healingmod","healingModType","HealingskillMod","linkedhealingattbutton","linkedhealingattformula","whisperhealing","healingwilddie","healingwilddieinfo","healing_base","healingmod_base","healing_rank","healingSkillRollFormula","healingWildDieFormula","rolltHealing","intimidation_cla","intimidation_lao","intimidation_delta","intimidation_makeButton","intimidation_mbVarType","intimidationRollValue","intimidation","intimidationmod","intimidationModType","IntimidationskillMod","linkedintimidationattbutton","linkedintimidationattformula","whisperintimidation","intimidationwilddie","intimidationwilddieinfo","intimidation_base","intimidationmod_base","intimidation_rank","intimidationSkillRollFormula","intimidationWildDieFormula","rolltIntimidation","language_cla","language_lao","language_delta","language_makeButton","language_mbVarType","languageRollValue","language","languagemod","languageModType","LanguageskillMod","linkedlanguageattbutton","linkedlanguageattformula","whisperlanguage","languagewilddie","languagewilddieinfo","language_base","languagemod_base","language_rank","languageSkillRollFormula","languageWildDieFormula","rolltLanguage","notice_cla","notice_lao","notice_delta","notice_makeButton","notice_mbVarType","noticeRollValue","notice","noticemod","noticeModType","NoticeskillMod","linkednoticeattbutton","linkednoticeattformula","whispernotice","noticewilddie","noticewilddieinfo","notice_base","noticemod_base","notice_rank","noticeSkillRollFormula","noticeWildDieFormula","rolltNotice","occult_cla","occult_lao","occult_delta","occult_makeButton","occult_mbVarType","occultRollValue","occult","occultmod","occultModType","OccultskillMod","linkedoccultattbutton","linkedoccultattformula","whisperoccult","occultwilddie","occultwilddieinfo","occult_base","occultmod_base","occult_rank","occultSkillRollFormula","occultWildDieFormula","rolltOccult","performance_cla","performance_lao","performance_delta","performance_makeButton","performance_mbVarType","performanceRollValue","performance","performancemod","performanceModType","PerformanceskillMod","linkedperformanceattbutton","linkedperformanceattformula","whisperperformance","performancewilddie","performancewilddieinfo","performance_base","performancemod_base","performance_rank","performanceSkillRollFormula","performanceWildDieFormula","rolltPerformance","persuasion_cla","persuasion_lao","persuasion_delta","persuasion_makeButton","persuasion_mbVarType","persuasionRollValue","persuasion","persuasionmod","persuasionModType","PersuasionskillMod","linkedpersuasionattbutton","linkedpersuasionattformula","whisperpersuasion","persuasionwilddie","persuasionwilddieinfo","persuasion_base","persuasionmod_base","persuasion_rank","persuasionSkillRollFormula","persuasionWildDieFormula","rolltPersuasion","piloting_cla","piloting_lao","piloting_delta","piloting_makeButton","piloting_mbVarType","pilotingRollValue","piloting","pilotingmod","pilotingModType","PilotingskillMod","linkedpilotingattbutton","linkedpilotingattformula","whisperpiloting","pilotingwilddie","pilotingwilddieinfo","piloting_base","pilotingmod_base","piloting_rank","pilotingSkillRollFormula","pilotingWildDieFormula","rolltPiloting","psionics_cla","psionics_lao","psionics_delta","psionics_makeButton","psionics_mbVarType","linkedpsionicsatt","psionicsRollValue","psionics","psionicsmod","psionicsModType","PsionicsskillMod","linkedpsionicsattbutton","linkedpsionicsattformula","whisperpsionics","psionicswilddie","psionicswilddieinfo","psionics_base","psionicsmod_base","psionics_rank","psionicsSkillRollFormula","psionicsWildDieFormula","rolltPsionics","repair_cla","repair_lao","repair_delta","repair_makeButton","repair_mbVarType","repairRollValue","repair","repairmod","repairModType","RepairskillMod","linkedrepairattbutton","linkedrepairattformula","whisperrepair","repairwilddie","repairwilddieinfo","repair_base","repairmod_base","repair_rank","repairSkillRollFormula","repairWildDieFormula","rolltRepair","research_cla","research_lao","research_delta","research_makeButton","research_mbVarType","researchRollValue","research","researchmod","researchModType","ResearchskillMod","linkedresearchattbutton","linkedresearchattformula","whisperresearch","researchwilddie","researchwilddieinfo","research_base","researchmod_base","research_rank","researchSkillRollFormula","researchWildDieFormula","rolltResearch","riding_cla","riding_lao","riding_delta","riding_makeButton","riding_mbVarType","ridingRollValue","riding","ridingmod","ridingModType","RidingskillMod","linkedridingattbutton","linkedridingattformula","whisperriding","ridingwilddie","ridingwilddieinfo","riding_base","ridingmod_base","riding_rank","ridingSkillRollFormula","ridingWildDieFormula","rolltRiding","science_cla","science_lao","science_delta","science_makeButton","science_mbVarType","scienceRollValue","science","sciencemod","scienceModType","ScienceskillMod","linkedscienceattbutton","linkedscienceattformula","whisperscience","sciencewilddie","sciencewilddieinfo","science_base","sciencemod_base","science_rank","scienceSkillRollFormula","scienceWildDieFormula","rolltScience","shooting_cla","shooting_lao","shooting_delta","shooting_makeButton","shooting_mbVarType","shootingRollValue","shooting","shootingmod","shootingModType","ShootingskillMod","linkedshootingattbutton","linkedshootingattformula","whispershooting","shootingwilddie","shootingwilddieinfo","shooting_base","shootingmod_base","shooting_rank","shootingSkillRollFormula","shootingWildDieFormula","rolltShooting","spellcasting_cla","spellcasting_lao","spellcasting_delta","spellcasting_makeButton","spellcasting_mbVarType","linkedspellcastingatt","spellcastingRollValue","spellcasting","spellcastingmod","spellcastingModType","SpellcastingskillMod","linkedspellcastingattbutton","linkedspellcastingattformula","whisperspellcasting","spellcastingwilddie","spellcastingwilddieinfo","spellcasting_base","spellcastingmod_base","spellcasting_rank","spellcastingSkillRollFormula","spellcastingWildDieFormula","rolltSpellcasting","stealth_cla","stealth_lao","stealth_delta","stealth_makeButton","stealth_mbVarType","stealthRollValue","stealth","stealthmod","stealthModType","StealthskillMod","linkedstealthattbutton","linkedstealthattformula","whisperstealth","stealthwilddie","stealthwilddieinfo","stealth_base","stealthmod_base","stealth_rank","stealthSkillRollFormula","stealthWildDieFormula","rolltStealth","survival_cla","survival_lao","survival_delta","survival_makeButton","survival_mbVarType","survivalRollValue","survival","survivalmod","survivalModType","SurvivalskillMod","linkedsurvivalattbutton","linkedsurvivalattformula","whispersurvival","survivalwilddie","survivalwilddieinfo","survival_base","survivalmod_base","survival_rank","survivalSkillRollFormula","survivalWildDieFormula","rolltSurvival","taunt_cla","taunt_lao","taunt_delta","taunt_makeButton","taunt_mbVarType","tauntRollValue","taunt","tauntmod","tauntModType","TauntskillMod","linkedtauntattbutton","linkedtauntattformula","whispertaunt","tauntwilddie","tauntwilddieinfo","taunt_base","tauntmod_base","taunt_rank","tauntSkillRollFormula","tauntWildDieFormula","rolltTaunt","thievery_cla","thievery_lao","thievery_delta","thievery_makeButton","thievery_mbVarType","thieveryRollValue","thievery","thieverymod","thieveryModType","ThieveryskillMod","linkedthieveryattbutton","linkedthieveryattformula","whisperthievery","thieverywilddie","thieverywilddieinfo","thievery_base","thieverymod_base","thievery_rank","thieverySkillRollFormula","thieveryWildDieFormula","rolltThievery","trade_cla","trade_lao","trade_delta","trade_makeButton","trade_mbVarType","tradeRollValue","trade","trademod","tradeModType","TradeskillMod","linkedtradeattbutton","linkedtradeattformula","whispertrade","tradewilddie","tradewilddieinfo","trade_base","trademod_base","trade_rank","tradeSkillRollFormula","tradeWildDieFormula","rolltTrade","weirdscience_cla","weirdscience_lao","weirdscience_delta","weirdscience_makeButton","weirdscience_mbVarType","linkedweirdscienceatt","weirdscienceRollValue","weirdscience","weirdsciencemod","weirdscienceModType","WeirdscienceskillMod","linkedweirdscienceattbutton","linkedweirdscienceattformula","whisperweirdscience","weirdsciencewilddie","weirdsciencewilddieinfo","weirdscience_base","weirdsciencemod_base","weirdscience_rank","weirdscienceSkillRollFormula","weirdscienceWildDieFormula","rolltWeirdscience","gender","racename","age","character_height","character_weight","sizecur","setadvance","xp","manualAdvance","showPaceMod","running_formula","showParryMod","showToughnessMod","pace","paceModReason","paceMod","woundsMod","parry","shieldparry","parryModReason","parryMod","toughness","armor_embedded_toughness","power_armor","power_armor_toughness","toughnessModReason","tufnessMod","dominion_max","burn_points_mod","burn_points","derivedFirstBase","derivedFirstMod","derivedFirstMax","loadlimitmod","loadlimit","usekg","encumbrancerules","loadlimitdietypedelta","geartotalweightcarried","showWoundmods","showFatiguemods","fatigueMod","reducereason","reducewoundsby","increasereason","increasewoundsby","maxreason","maxwoundmods","fatiguereducereason","reducefatigueby","fatigueincreasereason","increasefatigueby","fatiguemaxreason","maxfatiguemods","showunshake","whisperunshake","unshakewilddieinfo","unshakewilddie","unshakemodtype","unshakemod","rolltunshake","showsoak","whispersoak","soakwilddieinfo","soakwilddie","soakmodtype","soakmod","rolltSoak","showSpecAbilities","hideWeapons","staticAthletics","staticShooting","staticWeirdScience","weapontotalweightcarried","ArcanumTab","hidepowers","powerconfigindicator","showpowersectionconfig","powerlabelsingular","ppabbr","staticFaith","staticFocus","staticPerformance","staticPsionics","staticSpellcasting","hideArmor","pa_armorState","armortotalweightcarried","hideShield","shieldtotalweightcarried","permInjuries","injuries","questlog","hideQL","CharNotes","vehicletype","vehiclewounds","vehiclewounds_max","vehicleisinc","vehiclesize","vehiclehandling","vehicletopspeed","vehicletoughness","vehiclecrew","vehiclecargo","vehiclenotes","pa_vehicletype","wornArmorRowIDs","pa_vehiclesize","pa_vehiclehandling","pa_vehicletopspeed","pa_run_numdice","pa_run_dietype","pa_running_formula","pa_vehiclepace","pa_image","pa_embeddedtoughness","pa_pilotarmor","pa_pilotSkillMod","pastrength_cla","pastrength_lao","staticpastrength","pastrength_delta","pastrength_makeButton","pastrength_mbVarType","pastrengthname","pastrength_display","pastrengthRollValue","pastrength","pastrengthmod","pastrengthModType","PastrengthskillMod","linkedpastrengthattbutton","linkedpastrengthattformula","whisperpastrength","pastrengthwilddie","pastrengthwilddieinfo","pastrength_base","pastrengthmod_base","pastrength_rank","pastrengthSkillRollFormula","pastrengthWildDieFormula","rolltPastrength","pa_vehiclenotes","ra_vehicletype","ra_vehiclewounds","ra_vehiclewounds_max","ra_vehicleisinc","ra_vehiclesize","ra_vehiclepace","ra_vehicletopspeed","ra_vehicletoughness","ra_run_numdice","ra_run_dietype","ra_running_formula","ra_vehiclecrew","ra_image","ra_pilotSkillMod","ra_total_parry","show_ra_parry_config","ra_base_parry","ra_shield_parry","ra_parryModReason","ra_parry_mod","ra_","rastrength_cla","rastrength_lao","staticrastrength","rastrength_delta","rastrength_makeButton","rastrength_mbVarType","rastrengthname","rastrength_display","rastrengthRollValue","rastrength","rastrengthmod","rastrengthModType","RastrengthskillMod","linkedrastrengthattbutton","linkedrastrengthattformula","whisperrastrength","rastrengthwilddie","rastrengthwilddieinfo","rastrength_base","rastrengthmod_base","rastrength_rank","rastrengthSkillRollFormula","rastrengthWildDieFormula","rolltRastrength","ra_vehiclenotes","gritty","dominion-table","injurytablename","paceignoreswounds","usexp","wealthwilddie","wealthwilddieinfo","atkxconfig","attsatdsix","autorollbonusdmg","promptmods","useBGPhysicalDesc","setrank","showmods","setmods","setmodsenc","setdmgmods","showtraitmods","showdmgmods","traitmods","damagemods","absmod","absmodenc","whisperstatblock","whisperall","InitEdges","tokenURL","avatarURL","jsonImport","releasenotes10024","releasenotes10023","releasenotes10021","releasenotes10020","releasenotes10019","releasenotes10018","releasenotes10017","releasenotes10016","releasenotes10014","releasenotes10013","releasenotes10012","releasenotes10011","releasenotes10010","releasenotes10008","releasenotes10007","releasenotes10006","releasenotes10005","releasenotes10004","releasenotes10003","releasenotes10002","releasenotes10001","releasenotes10000","iconexamples"
+];
 //Set attribute field names...these are all in repeating sections unless otherwise noted
 const hindrancefields = ['hindrance', 'hindrancedescription', 'hindranceType'];
 const edgefields = ['edge', 'edgedescription'];
@@ -2462,7 +2604,6 @@ const badshieldfields = [
 ];
 
 const convertPersonalToVehicle = function (jsonObj, convertType = 'vehicle') {
-  debug({ jsonObj });
   let fieldArray;
   let badFields;
   if (convertType === 'vehicle') {
@@ -2482,7 +2623,6 @@ const convertPersonalToVehicle = function (jsonObj, convertType = 'vehicle') {
         log('Bad Field', "Doesn't exist...nothing to convert", r20color);
       }
     });
-    debug({ 'Ship Weapon JSON': jsonObj });
     return jsonObj;
   } else {
     log('jsonObj', 'Not Found', r20color);
@@ -2548,145 +2688,219 @@ const determineWeaponOptions = function (
   });
 };
 
-const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
-  let fields;
-  let repSectionID;
-  let prefix = '';
-  repSection
-    ? (repSectionID = generateRowID())
-    : log('Repeating Section', 'Not Found', r20color);
-  switch (repSection) {
-    case 'gear':
-      fields = gearfields;
-      targetObj[`repeating_${repSection}_${repSectionID}_itemcarried`] = 'on';
-      break;
-    case 'npc_hindrance':
-      repSection = 'hindrances';
-      targetObj[`repeating_${repSection}_${repSectionID}_whisperDeets`] =
-        '/w gm ';
-    //fall through to hindrances
-    case 'hindrances':
-      fields = hindrancefields;
-      targetObj[`repeating_${repSection}_${repSectionID}_showHindraceDesc`] =
-        '0';
-      break;
-    case 'npc_Edge':
-      repSection = 'edges';
-      targetObj[`repeating_${repSection}_${repSectionID}_tookat`] = 'GM';
-      targetObj[`repeating_${repSection}_${repSectionID}_showEdgeDesc`] = '0';
-      targetObj[`repeating_${repSection}_${repSectionID}_whisperEdgeDeets`] =
-        '/w gm ';
-    //fall through to edges
-    case 'edges':
-      fields = edgefields;
-      break;
-    case 'specialabilities':
-      fields = abilitiesfields;
-      //handle specialabilityeffect
-      targetObj[`repeating_${repSection}_${repSectionID}_showSpecAbilityDesc`] =
-        '0';
-      if (typeof jsonObj['specialabilityeffect'] !== 'undefined') {
-        //get all the different pieces
-        let effects = jsonObj['specialabilityeffect'].split(/\s*,\s*/);
-        for (let i = 0; i < effects.length; i++) {
-          //process each effect
-          let effect = effects[i].split(':');
-          let saeField = effect[0].trim();
-          let saeEffect = effect[1].trim();
-          targetObj[`${saeField}`] = saeEffect;
-        }
-      } else {
-        log('Special Ability Effect(s)', 'N/A', r20color);
-      }
-      break;
-    case 'weapons':
-      fields = weaponfields;
-      jsonObj['weaponnotes'] = jsonObj['description'];
-      determineWeaponOptions(
-        jsonObj,
-        targetObj,
-        `repeating_weapons_${repSectionID}`,
-        attributes
-      );
-      break;
-    case 'spells':
-      fields = powerfields;
-      if (
-        typeof jsonObj.spelldamageatt === 'undefined' &&
-        typeof jsonObj.spelldmgnumdice === 'undefined' &&
-        typeof jsonObj.spelldmgdietype === 'undefined' &&
-        typeof jsonObj.spelldmgbonusnum === 'undefined'
-      ) {
-        //Non-Damaging Power, set button to Cast instead of Damage
-        targetObj[`repeating_${repSection}_${repSectionID}_spellbutton`] = '2';
-        targetObj[`repeating_${repSection}_${repSectionID}_spelldmgnumdice`] =
-          '0';
-      } else {
-        //Damaging Power, do nothing so button remains with Damage.
-        log(
-          'Power Type',
-          'Att: ' +
-            jsonObj.spelldamageatt +
-            ', Number of Dice ' +
-            jsonObj.spelldmgnumdice +
-            ', Die Type: ' +
-            jsonObj.spelldmgdietype +
-            ',Bonus: ' +
-            jsonObj.spelldmgbonusnum +
-            ' ergo: Damage causing power',
-          r20color
-        );
-      }
-      break;
-    case 'armor':
-      fields = armorfields;
-      break;
-    case 'shields':
-      jsonObj = convertPersonalToVehicle(jsonObj, 'shields');
-      fields = shieldfields;
-      targetObj[`repeating_${repSection}_${repSectionID}_shieldWorn`] = '1';
-      break;
-    case 'vehicle_non-repeating':
-      log('Vehicle Info', 'Made it to getting Vehicle Fields', r20color);
-      fields = [
-        ...(jsonObj.subcategory ? powerRobotArmorFields : vehiclefields),
-      ];
-      if (jsonObj.subcategory) {
-        prefix = jsonObj.subcategory === 'Power Armor' ? 'pa_' : 'ra_';
-      }
-      repSection = false;
-      break;
-    case 'shipweapons':
-      log('jsonObj', 'Convert for Vehicle Weapons', r20color);
-      jsonObj = convertPersonalToVehicle(jsonObj);
-      fields = [...vehicleweaponfields];
-      break;
-    case 'paweapons':
-    case 'raweapons':
-      log('jsonObj', 'Convert for Armor Weapons', r20color);
-      let section = `repeating_${repSection}_${repSectionID}`;
-      jsonObj.showweaponconfig = 0;
-      jsonObj.weaponbutton = +jsonObj.rof > 1 ? '2' : '0';
-      jsonObj.weaponroll = '@{skillNDamage}';
-      let multiAttackRef = `${section}_multiattack`;
-      targetObj[multiAttackRef] = '';
-      determineWeaponOptions(jsonObj, targetObj, section, attributes);
-      let rof = +jsonObj.rof || 0;
-      targetObj[multiAttackRef] += `{{numroll=[[1d0+${rof}]]}}`;
-      let skill = targetObj[`${section}_weaponskill`];
-      _.range(rof - 1).forEach(n => {
-        let num = n + 2;
-        targetObj[
-          multiAttackRef
-        ] += `{{skill_roll${num}=&{noerror} [[@{weapon${skill}Formula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}]]]}}`;
+/**
+ * A function to parse any generalized effects of the PHEG. Modifies `targetObj` in place. Uses the [destructuring argument assignment pattern](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment).
+ * @param {object} argument - The object containing the arguments.
+ * @param {object} argument.targetObj - The object to apply the changes from the effect field to. This is modified in place.
+ * @param {string} argument.sectionName - The name of the repeating section that is being parsed.
+ * @param {object} argument.jsonObj - The PHEG compendium data that is being parsed.
+ * @returns {void}
+ */
+const applyGeneralEffects = function({targetObj,sectionName,jsonObj}){
+  debug('Applying effects fields');
+  const effectPrefix = PHEGSingular[sectionName];
+  if (jsonObj[`${effectPrefix}effect`]) {
+    //get all the different pieces
+    jsonObj[`${effectPrefix}effect`]
+      .split(/\s*,\s*/)
+      .forEach((effectString)=>{
+        effectString.replace(
+          /(.+?)\s*:\s*(.+)/,
+          (match,field,value)=>{
+            if(targetObj.hasOwnProperty(field)){
+              let numValue = +value;
+              let numFieldValue = +targetObj[field];
+              if(!Number.isNaN(numValue) && !Number.isNaN(numFieldValue)){
+                targetObj[field] += numValue;
+              }else{
+                targetObj[field] += `& ${value}`;
+              }
+            }else{
+              targetObj[field] = value;
+            }
+          }
+        )
       });
-      fields = [...armorWeaponFields];
-      break;
-    default:
-      log('repSection', 'Not Found', r20color);
-      break;
+  } else {
+    log(`${sectionName} Effect(s)`, 'N/A', r20color);
   }
-  if (fields.length) {
+};
+
+//These drop functions should really be refactored to not need so much redundant code.
+const dropGear = function({repSectionID,repSection,targetObj}){
+  targetObj[`repeating_${repSection}_${repSectionID}_itemcarried`] = 'on';
+  return [repSection,gearfields];
+};
+
+const dropNpcHindrance = function({repSectionID,targetObj}){
+  targetObj[`repeating_hindrances_${repSectionID}_whisperDeets`] = '/w gm ';
+  return dropHindrances({repSectionID,targetObj})
+};
+
+const dropHindrances = function({repSectionID,targetObj}){
+  targetObj[`repeating_hindrances_${repSectionID}_showHindraceDesc`] =
+    '0';
+  return ['hindrances',hindrancefields]
+};
+
+const dropNpcEdge = function({repSectionID,targetObj}){
+  targetObj[`repeating_edges_${repSectionID}_tookat`] = 'GM';
+  targetObj[`repeating_edges_${repSectionID}_whisperEdgeDeets`] =
+    '/w gm ';
+  //fall through to edges
+  return dropEdges({repSectionID,targetObj});
+};
+
+const dropEdges = function({repSectionID,targetObj}){
+  targetObj[`repeating_edges_${repSectionID}_showEdgeDesc`] = '0';
+  return ['edges',edgefields];
+};
+
+const dropSpecialAbilities = function({repSectionID,repSection,targetObj}){
+  //handle specialabilityeffect
+  targetObj[`repeating_${repSection}_${repSectionID}_showSpecAbilityDesc`] =
+    '0';
+  return [repSection,abilitiesfields];
+};
+
+const dropWeapons = function({repSectionID,repSection,targetObj,jsonObj,attributes}){
+  jsonObj['weaponnotes'] = jsonObj['description'];
+  targetObj[`repeating_${repSection}_${repSectionID}_showweaponconfig`] = 0;
+  determineWeaponOptions(
+    jsonObj,
+    targetObj,
+    `repeating_weapons_${repSectionID}`,
+    attributes
+  );
+  return [repSection,weaponfields];
+};
+
+const dropSpells = function({repSectionID,repSection,targetObj,jsonObj,attributes}){
+  if (
+    typeof jsonObj.spelldamageatt === 'undefined' &&
+    typeof jsonObj.spelldmgnumdice === 'undefined' &&
+    typeof jsonObj.spelldmgdietype === 'undefined' &&
+    typeof jsonObj.spelldmgbonusnum === 'undefined'
+  ) {
+    //Non-Damaging Power, set button to Cast instead of Damage
+    targetObj[`repeating_${repSection}_${repSectionID}_spellbutton`] = '2';
+    targetObj[`repeating_${repSection}_${repSectionID}_spelldmgnumdice`] =
+      '0';
+    targetObj[`repeating_${repSection}_${repSectionID}_showspellconfig`] = 0;
+  } else {
+    //Damaging Power, do nothing so button remains with Damage.
+    log(
+      'Power Type',
+      'Att: ' +
+        jsonObj.spelldamageatt +
+        ', Number of Dice ' +
+        jsonObj.spelldmgnumdice +
+        ', Die Type: ' +
+        jsonObj.spelldmgdietype +
+        ',Bonus: ' +
+        jsonObj.spelldmgbonusnum +
+        ' ergo: Damage causing power',
+      r20color
+    );
+  }
+  return [repSection,powerfields];
+};
+
+const dropArmor = function({repSection,targetObj,repSectionID}){
+  targetObj[`repeating_${repSection}_${repSectionID}_showarmorconfig`] = 0;
+  return [repSection,armorfields];
+};
+
+const dropShields = function({repSectionID,repSection,targetObj,jsonObj}){
+  jsonObj = convertPersonalToVehicle(jsonObj, 'shields');
+  targetObj[`repeating_${repSection}_${repSectionID}_shieldWorn`] = '1';
+  targetObj[`repeating_${repSection}_${repSectionID}_showshieldconfig`] = 0;
+  return [repSection,shieldfields];
+};
+
+const dropVehicle = function({jsonObj}){
+  log('Vehicle Info', 'Made it to getting Vehicle Fields', r20color);
+  const fields = [
+    ...(jsonObj.subcategory ? powerRobotArmorFields : vehiclefields),
+  ];
+  if (jsonObj.subcategory) {
+    prefix = jsonObj.subcategory === 'Power Armor' ? 'pa_' : 'ra_';
+  }
+  return [false,fields];
+};
+
+const dropShipweapons = function({repSection,jsonObj}){
+  log('jsonObj', 'Convert for Vehicle Weapons', r20color);
+  jsonObj = convertPersonalToVehicle(jsonObj);
+  return [repSection,vehicleweaponfields];
+};
+
+const dropArmorweapons = function({repSectionID,repSection,targetObj,jsonObj,attributes}){
+  log('jsonObj', 'Convert for Armor Weapons', r20color);
+  let section = `repeating_${repSection}_${repSectionID}`;
+  jsonObj.showweaponconfig = 0;
+  jsonObj.weaponbutton = +jsonObj.rof > 1 ? '2' : '0';
+  jsonObj.weaponroll = '@{skillNDamage}';
+  let multiAttackRef = `${section}_multiattack`;
+  targetObj[multiAttackRef] = '';
+  determineWeaponOptions(jsonObj, targetObj, section, attributes);
+  let rof = +jsonObj.rof || 0;
+  targetObj[multiAttackRef] += `{{numroll=[[1d0+${rof}]]}}`;
+  let skill = targetObj[`${section}_weaponskill`];
+  _.range(rof - 1).forEach(n => {
+    let num = n + 2;
+    targetObj[
+      multiAttackRef
+    ] += `{{skill_roll${num}=&{noerror} [[@{weapon${skill}Formula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}]]]}}`;
+  });
+  return [repSection,armorWeaponFields];
+};
+
+const dropCharacterType = function({repSectionID,repSection,targetObj,jsonObj,attributes}){
+  //Character types are not directly stored in repeating sections
+  debug('dropping character type');
+  const retValue = [false,sheetAttributes];
+  return retValue;
+};
+
+
+const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
+  debug('Entering getDropInfo');
+  let repSectionID;
+  let fields;
+  let prefix = '';
+  repSection ? 
+    (repSectionID = generateRowID()) :
+    log('Repeating Section', 'Not Found', r20color);
+  const dropSwitch = {
+    'gear':dropGear,
+    'npc_hindrance':dropNpcHindrance,
+    'hindrances':dropHindrances,
+    'npc_Edge':dropNpcEdge,
+    'edges':dropEdges,
+    'specialabilities':dropSpecialAbilities,
+    'weapons':dropWeapons,
+    'spells':dropSpells,
+    'armor':dropArmor,
+    'shields':dropShields,
+    'vehicle_non-repeating':dropVehicle,
+    'shipweapons':dropShipweapons,
+    'paweapons':dropArmorweapons,
+    'raweapons':dropArmorweapons,
+    race:dropCharacterType,
+    iconic_framework:dropCharacterType
+  };
+  [repSection,fields] = dropSwitch.hasOwnProperty(repSection) ?
+    dropSwitch[repSection]({repSection,targetObj,jsonObj,attributes,fields,repSectionID}) :
+    [null,[]];
+  if(repSection){
+    applyGeneralEffects({
+      targetObj,
+      sectionName:repSection,
+      jsonObj,
+    });
+  }
+  if(fields.length) {
     if (repSection) {
       log('Repeating Fields', 'Fields Found', r20color);
       if (/^(pa|ra)/.test(repSection)) {
@@ -2707,7 +2921,6 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
       });
     }
   }
-
   return targetObj;
 };
 const determineVehicleWeaponType = function (activePage) {
@@ -2717,129 +2930,141 @@ const determineVehicleWeaponType = function (activePage) {
   vehiclePages[10] = 'raweapons';
   return vehiclePages[+activePage] || vehiclePages[3];
 };
+
+const prepAbilities = function({setObj,jsonObj}){
+  setObj['showSpecAbilities'] = '1';
+  return 'specialabilities';
+};
+
+const prepWeapons = function({attributes,setObj,jsonObj}){
+  return [1, 2, 3].some(
+    num => jsonObj[`category${num}`] === 'Vehicular Weapons'
+  ) ?
+    determineVehicleWeaponType(attributes.sheetTab)
+    : 'weapons';
+};
+
+const prepVehicles = function({attributes,setObj,jsonObj}){
+  //clear all character sheet vehicle fields in preparation for updated
+  //This is to avoid getting mixed data if there was another vehicle on the sheet already when the drop occurred.
+  const subCat = jsonObj.subcategory;
+  let prefix = '';
+  let vFields
+  if(subCat){
+    prefix = `${subCat.replace(/(\w)\w+\s*/g,(match,letter)=>letter.toLowerCase())}_`;
+    vFields = powerRobotArmorFields.map((field)=>`${prefix}${field}`);
+    setObj[
+      jsonObj.subcategory.replace(/\s+/g, '_').toLowerCase()
+    ] = 1;
+  }else{
+    vFields = [...vehiclefields];
+    setObj['vehicle'] = 'on';
+    setObj['vehiclewounds'] = '0';
+  }
+  vFields.forEach((field)=>{
+    setObj[`${field}`] = '';
+  });
+  //Check if Vehicle Type is cared for; if not, will need to set it here.
+  jsonObj.vehicletype ?
+    log('Vehicle Type', 'Should already be cared for', r20color)
+    : (setObj[`${prefix}vehicletype`] = jsonObj.name ||
+      jsonObj['display_name'] ||
+      '');
+  if (jsonObj['data-Weapons']) {
+    //if this is a vehicle with weapons, then need to add more stuff to the JSON
+    log('Vehicle Weapons Array', 'Found', r20color);
+    jsonObj['data-Weapons'].forEach(weapon => {
+      let source = subCat || jsonObj.Category;
+      let dropType = getDropInfoCommand('Weapons', source);
+      log(
+        'Import Vehicle Weapon',
+        weapon.data && weapon.data.weapon,
+        r20color
+      );
+      log('dropType', dropType, r20color);
+      log('source', source, r20color);
+      setObj = getDropInfo(
+        weapon.data,
+        setObj,
+        dropType,
+        attributes
+      );
+    });
+  }
+  return 'vehicle_non-repeating'; //Vehicles don't have a Repeating Sections for the core vehicle
+};
+
+const prepCharacterType = function({jsonObj}){
+  /*
+    ability bonus dice steps are going to be handled via an inc compendium attribute (e.g. agilityinc)
+    straight ability references will set the ability die value directly
+  */
+  if(!jsonObj.subcategory){
+    log('Not a droppable character aspect',`Attempted to drop ${jsonObj.Name}`, r20color);
+    return null;
+  }
+  if(jsonObj.subcategory === 'Race'){
+    jsonObj.race = jsonObj.display_name || jsonObj.Name;
+  }
+  return jsonObj.subcategory.toLowerCase().replace(/\s+/g,'_');
+};
+
+const prepVehicularWeapons = function({}){
+  return 'shipweapons';
+};
+
+const prepPowers = function({}){
+  return 'spells'
+};
+
 const compendiumDrop = function (category) {
   //do stuff
   log('Made it here', 'compendiumDrop: ' + category, r20color);
-  getAttrs(
-    [
-      ...weaponsskillnamelist,
-      'CompendiumData',
-      'CompendiumContent',
-      'sheetTab',
-    ],
+  getAttrs(sheetAttributes,
     function (v) {
       //reset the compendium drop fields
       resetCompendiumFields();
       //Set up setAttrs object variable AND add Compendium variables to be reset to blank
-      let setattrvalues = {};
+      let setattrvalues = {
+        CompendiumName:'',
+        CompendiumCategory:'',
+        CompendiumContent:'',
+        CompendiumData:''
+      };
       //clean the data
       v.CompendiumData = cleanCompendiumData(v.CompendiumData);
       log('JSON data', v.CompendiumData, r20color);
       //parse the JSON Object
       let jObj = JSON.parse(v.CompendiumData);
-      let repSection;
+      const dropSwitch = {
+        Abilities:prepAbilities,
+        Weapons:prepWeapons,
+        Vehicles:prepVehicles,
+        Characters:prepCharacterType,
+        'Vehicle Weapons':prepVehicularWeapons,
+        Powers:prepPowers,
+        Edges:() => 'edges',
+        Hindrances:() => 'hindrances',
+        Gear:() => 'gear',
+        Armor:() => 'armor',
+        Shields:() => 'shields'
+      };
       compendiumLookup({
         queue: [jObj],
         callback: jsonObj => {
-          switch (jsonObj.Category) {
-            case 'Gear':
-              repSection = 'gear';
-              break;
-            case 'Hindrances':
-              repSection = 'hindrances';
-              break;
-            case 'Edges':
-              repSection = 'edges';
-              break;
-            case 'Abilities':
-              repSection = 'specialabilities';
-              setattrvalues['showSpecAbilities'] = '1';
-              break;
-            case 'Powers':
-              repSection = 'spells';
-              break;
-            case 'Weapons':
-              [1, 2, 3].some(
-                num => jsonObj[`category${num}`] === 'Vehicular Weapons'
-              )
-                ? (repSection = determineVehicleWeaponType(v.sheetTab))
-                : (repSection = 'weapons');
-              break;
-            case 'Armor':
-              repSection = 'armor';
-              break;
-            case 'Shields':
-              repSection = 'shields';
-              break;
-            case 'Vehicles':
-              //clear all character sheet vehicle fields in preparation for updated
-              //This is to avoid getting mixed data if there was another vehicle on the sheet already when the drop occurred.
-              let resetObj = {};
-              let vFields = [
-                ...(jsonObj.subcategory
-                  ? powerRobotArmorFields
-                  : vehiclefields),
-              ];
-              vFields.forEach(field => {
-                resetObj[`${field}`] = '';
-              });
-              setAttrs(resetObj, { silent: true });
-              //Check if Vehicle Type is cared for; if not, will need to set it here.
-              typeof jsonObj['vehicletype'] !== 'undefined'
-                ? log('Vehicle Type', 'Should already be cared for', r20color)
-                : (setattrvalues['vehicletype'] =
-                    jsonObj.name !== undefined
-                      ? jsonObj.name
-                      : jsonObj['display_name'] || '');
-              //if not already set, show vehicle tab
-              if (jsonObj.subcategory) {
-                setattrvalues[
-                  jsonObj.subcategory.replace(/\s+/g, '_').toLowerCase()
-                ] = 1;
-              } else {
-                setattrvalues['vehicle'] = 'on';
-                setattrvalues['vehiclewounds'] = '0';
-              }
-              repSection = 'vehicle_non-repeating'; //Vehicles don't have a Repeating Sections for the core vehicle
-              break;
-            case 'Vehicle Weapons':
-              repSection = 'shipweapons';
-              break;
-            default:
-              repSection = false;
-              break;
+          debug(`entering compendiumDrop callback`);
+          let repSection = dropSwitch[jsonObj.Category] ?
+            dropSwitch[jsonObj.Category]({attributes:v,setObj:setattrvalues,jsonObj}) :
+            undefined;
+          //If an invalid item was dropped, delete the compendium drop data and stop import.
+          if(repSection === undefined){
+            debug('Invalid drop category, no drop performed.');
+            setAttrs(setattrvalues,{silent:true});
+            return;
           }
           setattrvalues = getDropInfo(jsonObj, setattrvalues, repSection, v);
-          jsonObj.Category === 'Vehicles'
-            ? log('Returned', 'Made it back to compendiumDrop', r20color)
-            : console.log('Ignore me');
-          if (
-            jsonObj.Category === 'Vehicles' &&
-            jsonObj['data-Weapons'] !== undefined
-          ) {
-            //if this is a vehicle with weapons, then need to add more stuff to the JSON
-            log('Vehicle Weapons Array', 'Found', r20color);
-            debug({ 'weapon array': jsonObj['data-Weapons'] });
-            jsonObj['data-Weapons'].forEach(weapon => {
-              let source = weapon.datasource;
-              let dropType = getDropInfoCommand('Weapons', source);
-              log(
-                'Import Vehicle Weapon',
-                weapon.data && weapon.data.weapon,
-                r20color
-              );
-              log('dropType', dropType, r20color);
-              log('source', source, r20color);
-              setattrvalues = getDropInfo(
-                weapon.data,
-                setattrvalues,
-                dropType,
-                v
-              );
-            });
-          }
+          setattrvalues = processAdditionalPHEGs(jsonObj,setattrvalues,v);
           log('setattrvalues', '', r20color);
-          debug({ setattrvalues });
           setAttrs(setattrvalues);
           log('Values', 'Set...character sheet is updated', r20color);
         },
@@ -3040,80 +3265,11 @@ const compendiumBestiary = function () {
             lookupObj.display_name
               ? (finalCharacterDetails.character_name = lookupObj.display_name)
               : log('Character Name', 'Using compendium default', r20color);
-
-            const PHEGCategoryExtraSets = {
-              Edges: {
-                edgeCount: obj => obj['data-Edges'].length,
-              },
-              Hindrances: {
-                hindranceCount: obj => obj['data-Hindrances'].length,
-              },
-              Weapons: {},
-              Powers: {
-                powerCount: obj => obj['data-Powers'].length,
-              },
-              Armors: {},
-              Shields: {},
-              Vehicle: {
-                vehicle: obj =>
-                  obj['data-Vehicle'].some(o => !o.data.subcategory) ? 'on' : 0,
-                power_armor: obj =>
-                  obj['data-Vehicle'].some(
-                    o => o.data.subcategory === 'Power Armor'
-                  )
-                    ? 1
-                    : 0,
-                robot_armor: obj =>
-                  obj['data-Vehicle'].some(
-                    o => o.data.subcategory === 'Robot Armor'
-                  )
-                    ? 1
-                    : 0,
-              },
-              SpecialAbilities: {
-                showspecabilities: obj => 1,
-                specialAbilityCount: obj => obj['data-SpecialAbilities'].length,
-              },
-            };
-            PHEGCategories.forEach(type => {
-              if (Array.isArray(lookupObj[`data-${type}`])) {
-                log(
-                  type,
-                  `importing ${lookupObj[`data-${type}`].length} ${type}`,
-                  r20color
-                );
-                debug({ [`data-${type}`]: lookupObj[`data-${type}`] });
-                let singular = PHEGSingular[type];
-
-                //Handle additional extraneous attribute sets
-                Object.entries(PHEGCategoryExtraSets[type]).forEach(
-                  ([attr, func]) => {
-                    finalCharacterDetails[attr] = func(lookupObj);
-                  }
-                );
-                lookupObj[`data-${type}`].forEach(phegObj => {
-                  log(`Import ${singular}`, phegObj.name, r20color);
-                  log(`Monster`, singular, r20color);
-                  let source = phegObj.datasource;
-                  let dropType = getDropInfoCommand(type, source);
-                  finalCharacterDetails = getDropInfo(
-                    phegObj.data,
-                    finalCharacterDetails,
-                    dropType,
-                    monster
-                  );
-                });
-              }
-            });
-
-            //Set Power Points if any
-            if (typeof lookupObj.PowerPoints !== 'undefined') {
-              finalCharacterDetails['PowerPoints'] = lookupObj.PowerPoints;
-              finalCharacterDetails['PowerPoints_max'] = lookupObj.PowerPoints;
-            }
+            finalCharacterDetails.sheet_theme = lookupObj['data-sheet_theme'] || 0;
+            finalCharacterDetails.rolltemplate_theme = lookupObj['data-rolltemplate_theme'] || 'default';
             //switch character sheet view to mini-view
             //run dice handling
-            debug({ lookupObj });
+            finalCharacterDetails = processAdditionalPHEGs(lookupObj,finalCharacterDetails,monster);
             if (lookupObj.runningDie) {
               finalCharacterDetails.runningDie = `1d${lookupObj.runningDie}`;
             }
@@ -3123,7 +3279,6 @@ const compendiumBestiary = function () {
               'Write PHEG data and all remaining attributes to character sheet',
               r20color
             );
-            debug({ finalCharacterDetails });
             setAttrs(finalCharacterDetails);
           });
         },
@@ -3132,31 +3287,90 @@ const compendiumBestiary = function () {
   );
 };
 
+const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster){
+  const PHEGCategoryExtraSets = {
+    Edges: {
+      edgeCount: obj => obj['data-Edges'].length,
+    },
+    Hindrances: {
+      hindranceCount: obj => obj['data-Hindrances'].length,
+    },
+    Powers: {
+      powerCount: obj => obj['data-Powers'].length,
+    },
+    Vehicle: {
+      vehicle: obj =>
+        obj['data-Vehicle'].some(o => !o.data.subcategory) ? 'on' : 0,
+      power_armor: obj =>
+        obj['data-Vehicle'].some(
+          o => o.data.subcategory === 'Power Armor'
+        )
+          ? 1
+          : 0,
+      robot_armor: obj =>
+        obj['data-Vehicle'].some(
+          o => o.data.subcategory === 'Robot Armor'
+        )
+          ? 1
+          : 0,
+    },
+    SpecialAbilities: {
+      showspecabilities: obj => 1,
+      specialAbilityCount: obj => obj['data-SpecialAbilities'].length,
+    },
+  };
+  PHEGCategories.forEach(type => {
+    if (Array.isArray(lookupObj[`data-${type}`])) {
+      log(
+        type,
+        `importing ${lookupObj[`data-${type}`].length} ${type}`,
+        r20color
+      );
+      debug({ [`data-${type}`]: lookupObj[`data-${type}`] });
+      let singular = PHEGSingular[type];
+
+      //Handle additional extraneous attribute sets
+      if(PHEGCategoryExtraSets.hasOwnProperty(type)){
+        Object.entries(PHEGCategoryExtraSets[type]).forEach(
+          ([attr, func]) => {
+            finalCharacterDetails[attr] = func(lookupObj);
+          }
+        );
+      }
+      lookupObj[`data-${type}`].forEach(phegObj => {
+        log(`Import ${singular}`, phegObj.name, r20color);
+        log(`Monster`, singular, r20color);
+        let source = phegObj.datasource;
+        let dropType = getDropInfoCommand(type, source);
+        finalCharacterDetails = getDropInfo(
+          phegObj.data,
+          finalCharacterDetails,
+          dropType,
+          monster
+        );
+      });
+    }
+  });
+
+  //Set Power Points if any
+  if (typeof lookupObj.PowerPoints !== 'undefined') {
+    finalCharacterDetails['PowerPoints'] = lookupObj.PowerPoints;
+    finalCharacterDetails['PowerPoints_max'] = lookupObj.PowerPoints;
+  }
+  return finalCharacterDetails;
+};
+
 on('change:CompendiumCategory', function (eventInfo) {
   log('Compendium Drop', eventInfo.newValue, '#E948C9');
   log('Compendium Change Source', eventInfo.sourceType, r20color);
+  debug(eventInfo);
   if (eventInfo.newValue !== '') {
     let cCategory = eventInfo.newValue;
     let resetFields;
-    switch (cCategory) {
-      case 'Edges':
-      case 'Hindrances':
-      case 'Powers':
-      case 'Weapons':
-      case 'Armor':
-      case 'Vehicles':
-      case 'Gear':
-      case 'Shields':
-      case 'Abilities':
-        compendiumDrop(cCategory);
-        break;
-      case 'Bestiary':
-        compendiumBestiary();
-        break;
-      default:
-        log(`Category: ${cCategory}`, `Not recognized`, r20color);
-        resetCompendiumFields();
-        break;
+    if(cCategory === 'Bestiary' ||cCategory === 'Archetypes' || cCategory === 'SWADE Archetypes'){
+      compendiumBestiary();
+    }else{
+      compendiumDrop(cCategory);
     }
   } else {
     log('Compendium Drop', 'Nothing dropped', '#E948C9');
@@ -3178,7 +3392,12 @@ weaponlist.forEach(weapon => {
   on(
     `change:${weapon}:weaponbutton change:${weapon}:weaponskill change:${weapon}:weaponAttackBonus`,
     function (eventInfo) {
-      console.log(eventInfo.sourceAttribute);
+      log(
+        'Weapon Button Config Triggered',
+        eventInfo.sourceAttribute,
+        '#CCCCFF'
+      );
+      //console.log(eventInfo.sourceAttribute);
       let pa = '';
       let wbutton = 'repeating_weapons_weaponbutton';
       let wskill = 'repeating_weapons_weaponskill';
@@ -3191,14 +3410,28 @@ weaponlist.forEach(weapon => {
         wbutton = 'repeating_raweapons_weaponbutton';
         wskill = 'repeating_raweapons_weaponskill';
       }
-      const skillUn = `@{whisperweapon} &{template:roll} {{name=@{character_name} }} {{namelength=@{namelength}}} @{rolltUnskilled} {{skill_roll=&{noerror} [[ @{weaponUnskilledFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ @{weaponUnskilledWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} @{unshakeTemplate} {{trait=^{unskilled}}} {{source=@{weapon}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_dmg) }} @{unskilledencumbrancebutton} @{showtraitmods} @{multiattack} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}`;
-      const skillFi = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} {{trait=@{fightingname}}} {{source=@{weapon}}} @{rolltFighting} {{skill_roll=&{noerror} [[ @{weaponFightingFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponFightingWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}`;
+      const templateCommon = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} {{source=@{weapon}}} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}`;
 
-      const skillAt = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} {{trait=@{athleticsname}}} {{source=@{weapon}}} @{rolltAthletics} {{skill_roll=&{noerror} [[ @{weaponAthleticsFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponAthleticsWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}`;
+      const skillUn = `${templateCommon} {{name=@{character_name} }} @{rolltUnskilled} {{skill_roll=&{noerror} [[ @{weaponUnskilledFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ @{weaponUnskilledWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{trait=^{unskilled}}} @{unskilledencumbrancebutton}`;
+      const skillFi = `${templateCommon} {{trait=@{fightingname}}} @{rolltFighting} {{skill_roll=&{noerror} [[ @{weaponFightingFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponFightingWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
 
-      const skillSh = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} {{trait=@{shootingname}}} {{source=@{weapon}}} @{rolltShooting} {{skill_roll=&{noerror} [[ @{weaponShootingFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponShootingWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}@{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}`;
+      const skillAt = `${templateCommon} {{trait=@{athleticsname}}} @{rolltAthletics} {{skill_roll=&{noerror} [[ @{weaponAthleticsFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponAthleticsWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
 
-      const skillWS = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} {{trait=@{weirdsciencename}}} {{source=@{weapon}}} @{rolltWeirdScience} {{skill_roll=&{noerror} [[ @{weaponWeirdScienceFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponWeirdScienceWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}@{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}`;
+      const skillSh = `${templateCommon} {{trait=@{shootingname}}} @{rolltShooting} {{skill_roll=&{noerror} [[ @{weaponShootingFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponShootingWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
+
+      const skillWS = `${templateCommon} {{trait=@{weirdsciencename}}} @{rolltWeirdScience} {{skill_roll=&{noerror} [[ @{weaponWeirdScienceFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponWeirdScienceWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
+      // faith
+      const skillFa = `${templateCommon} {{trait=@{faithname}}} @{rolltFaith} {{skill_roll=&{noerror} [[ @{weaponfaithFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponfaithWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
+      // Focus
+      const skillFo = `${templateCommon} {{trait=@{focusname}}} @{rolltFocus} {{skill_roll=&{noerror} [[ @{weaponfocusFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponfocusWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
+      // Performance
+      const skillPe = `${templateCommon} {{trait=@{performancename}}} @{rolltPerformance} {{skill_roll=&{noerror} [[ @{weaponperformanceFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponperformanceWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
+      // Psionics
+      const skillPs = `${templateCommon} {{trait=@{psionicsname}}} @{rolltPsionics} {{skill_roll=&{noerror} [[ @{weaponpsionicsFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponpsionicsWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
+      // Spellcasting
+      const skillSp = `${templateCommon} {{trait=@{spellcastingname}}} @{rolltSpellcasting} {{skill_roll=&{noerror} [[ @{weaponspellcastingFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponspellcastingWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
+      // Spirit
+      const skillSpi = `${templateCommon} {{trait=^{spirit}}} @{rolltspirit} {{skill_roll=&{noerror} [[ @{weaponspiritFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponspiritWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
 
       console.log(eventInfo.sourceAttribute);
       let sid = eventInfo.sourceAttribute.slice(18, 38);
@@ -3227,6 +3460,24 @@ weaponlist.forEach(weapon => {
                 break;
               case 'weirdscience':
                 skillToUse = skillWS;
+                break;
+              case 'faith':
+                skillToUse = skillFa;
+                break;
+              case 'performance':
+                skillToUse = skillPe;
+                break;
+              case 'psionics':
+                skillToUse = skillPs;
+                break;
+              case 'spellcasting':
+                skillToUse = skillSp;
+                break;
+              case 'spirit':
+                skillToUse = skillSpi;
+                break;
+              case 'focus':
+                skillToUse = skillFo;
                 break;
               case 'unskilled':
                 skillToUse = skillUn;
@@ -3369,6 +3620,24 @@ weaponlist.forEach(weaponSection => {
                 break;
               case 'weirdscience':
                 x = 'Weirdscience';
+                break;
+              case 'faith':
+                x = 'faith';
+                break;
+              case 'focus':
+                x = 'focus';
+                break;
+              case 'performance':
+                x = 'performance';
+                break;
+              case 'psionics':
+                x = 'psionics';
+                break;
+              case 'spellcasting':
+                x = 'spellcasting';
+                break;
+              case 'spirit':
+                x = 'spirit';
                 break;
               default:
                 x = 'Unskilled';
@@ -4147,10 +4416,20 @@ function setSkillDropdown(section, field, value, rowid) {
   }
 }
 
-const weaponsskilllist = ['fighting', 'athletics', 'shooting', 'weirdscience'];
+const weaponsskilllist = [
+  'fighting',
+  'athletics',
+  'shooting',
+  'weirdscience',
+  'faith',
+  'focus',
+  'performance',
+  'psionics',
+  'spellcasting',
+];
 weaponsskilllist.forEach(weaponsskill => {
   on(`change:${weaponsskill}name`, function (eventInfo) {
-    console.log('Triggering Attribute: ' + eventInfo.sourceAttribute);
+    log('Weapon Skill List', 'Skill Name Change', 'lime');
     let field = 'r' + eventInfo.sourceAttribute;
     let value = eventInfo.newValue;
     setSkillDropdown('weapons', field, value);
@@ -4183,6 +4462,11 @@ const weaponsskillnamelist = [
   'athleticsname',
   'shootingname',
   'weirdsciencename',
+  'faithname',
+  'focusname',
+  'performancename',
+  'psionicsname',
+  'spellcastingname',
 ]; // Considering a refactor here
 const spellskillnamelist = [
   'faithname',
@@ -6380,7 +6664,7 @@ on(
 </script>
 <!-- Necessary Mixins-->
 <!-- Hidden inputs for character sheet versioning, etc-->
-<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.25"/>
+<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.30"/>
 <input type="hidden" name="attr_firstInit" value="0"/>
 <input type="hidden" name="attr_namelength" value="0"/>
 <input type="hidden" name="attr_wdNum" value="1"/>
@@ -6440,7 +6724,7 @@ on(
   <input class="useDarkMode" type="hidden" name="attr_dark_mode" value="0"/>
   <input class="useTheme" type="hidden" name="attr_sheet_theme" value="0"/>
   <input class="useBackground hiddenInput" type="hidden" name="attr_background" value="1"/>
-  <div class="background">
+  <div class="background" name="attr_backgroundImage">
     <div class="base"> 
       <!--"sheet of paper" the character sheet is on.-->
       <div class="buttonbar">
@@ -6711,6 +6995,10 @@ on(
               </div>
               <div class="skillsCondensed"> 
                 <h3 class="groupHeading" data-i18n="skills">Skills</h3>&nbsp; &nbsp;
+                <!--Unskilled-->
+                <!--Button for Statblock view--><span class="unskilled condensedSkill">
+                  <button class="traitbutton miniButton" type="roll" name="roll_tUnskilledRoll" title="@{tUnskilledRoll}" value="@{unskilledRollValue} {{skill_roll=[[ @{unskilledSkillRollFormula} ]]}} {{wild_die=[[ @{unskilledWildDieFormula} ]]}}"> <span data-i18n="unskilled-d4-2">Unskilled (d4-2)</span>
+                  </button></span>
                 <!--static skill list-->
                 <!--do stuff-->
                 <input class="hiddenInput staticacademics" type="checkbox" name="attr_staticacademics"/>
@@ -7740,27 +8028,83 @@ on(
                   <label class="configlabels" data-i18n="skill">Skill</label>
                   <div class="container">
                     <div class="child">
-                      <label class="ddmenu"> 
-                        <input class="select-radio fighting" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="fighting" checked="checked"/>&nbsp;<span name="attr_rfightingname"> </span>
-                      </label>
                       <label class="ddmenu athletics"> 
-                        <input class="select-radio athletics" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="athletics"/>&nbsp;<span name="attr_rathleticsname"> </span>
+                        <input class="select-radio athletics" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="athletics"/>&nbsp;<span name="attr_rathleticsname"></span>
+                      </label>
+                      <label class="ddmenu faith"> 
+                        <input class="select-radio faith" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="faith"/>&nbsp;<span name="attr_rfaithname"></span>
+                      </label>
+                      <label class="ddmenu fighting"> 
+                        <input class="select-radio fighting" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="fighting"/>&nbsp;<span name="attr_rfightingname"></span>
+                      </label>
+                      <label class="ddmenu focus"> 
+                        <input class="select-radio focus" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="focus"/>&nbsp;<span name="attr_rfocusname"></span>
+                      </label>
+                      <label class="ddmenu performance"> 
+                        <input class="select-radio performance" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="performance"/>&nbsp;<span name="attr_rperformancename"></span>
+                      </label>
+                      <label class="ddmenu psionics"> 
+                        <input class="select-radio psionics" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="psionics"/>&nbsp;<span name="attr_rpsionicsname"></span>
                       </label>
                       <label class="ddmenu shooting"> 
-                        <input class="select-radio shooting" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="shooting"/>&nbsp;<span name="attr_rshootingname"> </span>
+                        <input class="select-radio shooting" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="shooting"/>&nbsp;<span name="attr_rshootingname"></span>
                       </label>
-                      <label class="ddmenu"> 
-                        <input class="select-radio unskilled" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="unskilled"/>&nbsp;<span data-i18n="unskilled">Unskilled</span>
+                      <label class="ddmenu spellcasting"> 
+                        <input class="select-radio spellcasting" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="spellcasting"/>&nbsp;<span name="attr_rspellcastingname"></span>
                       </label>
                       <label class="ddmenu weirdscience"> 
-                        <input class="select-radio weirdscience" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="weirdscience"/>&nbsp;<span name="attr_rweirdsciencename"> </span>
+                        <input class="select-radio weirdscience" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="weirdscience"/>&nbsp;<span name="attr_rweirdsciencename"></span>
+                      </label>
+                      <!--
+                      label(class="ddmenu") 
+                           input(type="radio" class="select-radio fighting" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="fighting" checked="checked")
+                           | &nbsp;
+                           span(name='attr_rfightingname') 
+                      label(class="ddmenu athletics") 
+                           input(type="radio" class="select-radio athletics" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="athletics")
+                           | &nbsp;
+                           span(name='attr_rathleticsname') 
+                      label(class="ddmenu shooting") 
+                           input(type="radio" class="select-radio shooting" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="shooting")
+                           | &nbsp;
+                           span(name='attr_rshootingname') 
+                      label(class="ddmenu") 
+                           input(type="radio" class="select-radio unskilled" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="unskilled")
+                           | &nbsp;
+                           span(data-i18n='unskilled') Unskilled
+                      label(class="ddmenu weirdscience") 
+                           input(type="radio" class="select-radio weirdscience" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="weirdscience")
+                           | &nbsp;
+                           span(name='attr_rweirdsciencename') 
+                      
+                      -->
+                      <!--Manually add the stuff for Spirit, because it doesn't follow the pattern...-->
+                      <label class="ddmenu spirit"> 
+                        <input class="select-radio spirit" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="spirit"/>&nbsp;<span data-i18n="spirit">Spirit</span>
                       </label>
                       <input class="select-radio" type="hidden" name="attr_weaponskill" value="fighting"/>
-                      <div class="fighting"><span name="attr_rfightingname"> </span></div>
-                      <div class="athletics"><span name="attr_rathleticsname"> </span></div>
-                      <div class="shooting"><span name="attr_rshootingname"> </span></div>
-                      <div class="unskilled"><span data-i18n="unskilled">Unskilled</span></div>
-                      <div class="weirdscience"><span name="attr_rweirdsciencename"> </span></div>
+                      <div class="athletics"><span name="attr_rathleticsname"></span></div>
+                      <div class="faith"><span name="attr_rfaithname"></span></div>
+                      <div class="fighting"><span name="attr_rfightingname"></span></div>
+                      <div class="focus"><span name="attr_rfocusname"></span></div>
+                      <div class="performance"><span name="attr_rperformancename"></span></div>
+                      <div class="psionics"><span name="attr_rpsionicsname"></span></div>
+                      <div class="shooting"><span name="attr_rshootingname"></span></div>
+                      <div class="spellcasting"><span name="attr_rspellcastingname"></span></div>
+                      <div class="weirdscience"><span name="attr_rweirdsciencename"></span></div>
+                      <div class="spirit"><span data-i18n="spirit">Spirit</span></div>
+                      <!--
+                      div(class="fighting")
+                           span(name='attr_rfightingname') 
+                      div(class="athletics")
+                           span(name='attr_rathleticsname') 
+                      div(class="shooting")
+                           span(name='attr_rshootingname') 
+                      div(class="unskilled")
+                           span(data-i18n='unskilled') Unskilled
+                      div(class="weirdscience")
+                           span(name='attr_rweirdsciencename') 
+                      -->
                     </div>
                   </div>
                   <label class="configlabels" data-i18n="skill-modifier">Skill Modifier</label>(
@@ -7808,14 +8152,36 @@ on(
               <!-- Skill Formulae-->
               <input type="hidden" name="attr_weaponUnskilledFormula" value="@{unskilledSkillRollFormula}"/>
               <input type="hidden" name="attr_weaponUnskilledWildDieFormula" value="@{unskilledWildDieFormula}"/>
+              <!-- Fighting-->
               <input type="hidden" name="attr_weaponFightingFormula" value="@{fightingSkillRollFormula}"/>
               <input type="hidden" name="attr_weaponFightingWildDieFormula" value="@{fightingWildDieFormula}"/>
+              <!-- Athletics-->
               <input type="hidden" name="attr_weaponAthleticsFormula" value="@{athleticsSkillRollFormula}"/>
               <input type="hidden" name="attr_weaponAthleticsWildDieFormula" value="@{athleticsWildDieFormula}"/>
+              <!-- Shooting-->
               <input type="hidden" name="attr_weaponShootingFormula" value="@{shootingSkillRollFormula}"/>
               <input type="hidden" name="attr_weaponShootingWildDieFormula" value="@{shootingWildDieFormula}"/>
+              <!-- Weird Science-->
               <input type="hidden" name="attr_weaponWeirdScienceFormula" value="@{weirdscienceSkillRollFormula}"/>
               <input type="hidden" name="attr_weaponWeirdScienceWildDieFormula" value="@{weirdscienceWildDieFormula}"/>
+              <!-- Faith-->
+              <input type="hidden" name="attr_weaponfaithFormula" value="@{faithSkillRollFormula}"/>
+              <input type="hidden" name="attr_weaponfaithWildDieFormula" value="@{faithWildDieFormula}"/>
+              <!-- Focus-->
+              <input type="hidden" name="attr_weaponfocusFormula" value="@{focusSkillRollFormula}"/>
+              <input type="hidden" name="attr_weaponfocusWildDieFormula" value="@{focusWildDieFormula}"/>
+              <!-- Performance-->
+              <input type="hidden" name="attr_weaponperformanceFormula" value="@{performanceSkillRollFormula}"/>
+              <input type="hidden" name="attr_weaponperformanceWildDieFormula" value="@{performanceWildDieFormula}"/>
+              <!-- Psionics-->
+              <input type="hidden" name="attr_weaponpsionicsFormula" value="@{psionicsSkillRollFormula}"/>
+              <input type="hidden" name="attr_weaponpsionicsWildDieFormula" value="@{psionicsWildDieFormula}"/>
+              <!-- Spellcasting-->
+              <input type="hidden" name="attr_weaponspellcastingFormula" value="@{spellcastingSkillRollFormula}"/>
+              <input type="hidden" name="attr_weaponspellcastingWildDieFormula" value="@{spellcastingWildDieFormula}"/>
+              <!-- Spirit-->
+              <input type="hidden" name="attr_weaponspiritFormula" value="@{spiritRollFormula}"/>
+              <input type="hidden" name="attr_weaponspiritWildDieFormula" value="@{spiritWildDieFormula}"/>
               <!-- Hidden Fields for the roll button(s), etc-->
               <input type="hidden" name="attr_weaponroll" value="@{damageOnly}"/>
               <!-- Used for Skill and Damage roll-->
@@ -8037,7 +8403,7 @@ on(
           </fieldset>
         </div>
         <div class="logoBlock"> 
-          <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/finderski/SWT/master/PEG_LOGO_White.png"/><img class="logo Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png"/><img class="logo SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/finderski/SWT/master/SWAD%20Update%20Images/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/>
+          <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PEG_LOGO_White.png"/><img class="logo Deadlands" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Deadlands.png"/><img class="logo SWADE" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/><img class="logo Custom" name="attr_logoURL"/>
         </div>
       </div>
       <div class="character">
@@ -8335,8 +8701,7 @@ on(
                       </label></span><span class="skillItem" data-i18n-list-item="core-skills">
                       <label class="SkillListLabel">
                         <input class="StaticSkill" type="checkbox" name="attr_staticCore" value="1"/><span> </span><span class="boldMaroon" data-i18n="core-skills">Core Skills</span>
-                      </label></span>
-                    <!-- each skill in skillNamesList--><span class="skillItem" data-i18n-list-item="academics">
+                      </label></span><span class="skillItem" data-i18n-list-item="academics">
                       <label class="SkillListLabel">
                         <!-- input(type="checkbox", class="StaticSkill", name=`attr_static${skill}`)-->
                         <input class="StaticSkill staticacademics" type="checkbox" name="attr_staticacademics"/><span> </span><span name="attr_academicsname"></span>
@@ -8479,7 +8844,8 @@ on(
               <div class="selected-skills" data-i18n-list="character-skills">
                 <!-- unskilled-->
                 <div class="basetrait" data-i18n-list-item="unskilled">
-                  <button class="unskilledbutton traitflexattbutton" type="roll" name="roll_tUnskilledRoll" title="@{tUnskilledRoll}" value="@{whisperunskilled} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltUnskilled} {{skill_roll=[[ @{unskilledSkillRollFormula} ]]}} {{wild_die=[[ @{unskilledWildDieFormula} ]]}} @{unskilledencumbrancebutton} @{showtraitmods} {{conviction=[[ [[@{conviction}]]d6! ]] }} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~tUnskilledRoll)}} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"> <span data-i18n="unskilled-d4-2">Unskilled (d4-2)</span></button><span class="unskilledOptions">
+                  <!-- button(type="roll", class="unskilledbutton traitflexattbutton", name="roll_tUnskilledRoll", title="@{tUnskilledRoll}", value="@{whisperunskilled} &{template:roll} {{namelength=@{namelength}}} @{rolltUnskilled} {{skill_roll=[[ @{unskilledSkillRollFormula} ]]}} {{wild_die=[[ @{unskilledWildDieFormula} ]]}} @{unskilledencumbrancebutton} @{showtraitmods} {{conviction=[[ [[@{conviction}]]d6! ]] }} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~tUnskilledRoll)}} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}") -->
+                  <button class="unskilledbutton traitflexattbutton" type="roll" name="roll_tUnskilledRoll" title="@{tUnskilledRoll}" value="@{unskilledRollValue} {{skill_roll=[[ @{unskilledSkillRollFormula} ]]}} {{wild_die=[[ @{unskilledWildDieFormula} ]]}}"> <span data-i18n="unskilled-d4-2">Unskilled (d4-2)</span></button><span class="unskilledOptions">
                     <label class="traitlabel" data-i18n-title="apply-encumbrance">
                       <input class="traitradio" type="checkbox" name="attr_unskilledencumbrance" title="@{unskilledencumbrance}" value="1"/><span class="joat">O</span>
                     </label></span>
@@ -8498,6 +8864,7 @@ on(
                       <input class="wildDieDesc" type="text" name="attr_unskilledwilddieinfo" placeholder="Standard Wild Die die type" data-i18n-placeholder="no-modifying-edges"/>
                     </div>
                   </details>
+                  <input type="hidden" name="attr_unskilledRollValue" value="@{whisperunskilled} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltUnskilled} @{unskilledencumbrancebutton} @{showtraitmods} {{conviction=[[ [[@{conviction}]]d6! ]] }} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~tUnskilledRoll)}} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                   <input type="hidden" name="attr_unskilled_rank" value="1d4! -2"/>
                   <input type="hidden" name="attr_unskilled_display" value="1d4-2"/>
                   <input type="hidden" name="attr_unskilledSkillRollFormula" value="@{unskilled_rank} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} + [[@{UnskilledEncumbrance}*@{encumbrance}]][Encumbrance Penalty]"/>
@@ -11663,15 +12030,15 @@ on(
                 </div>
                 <!--input(type="hidden", value=`${name}`)-->
                 <!--input(type="hidden", value=`${skillAbbr}`)-->
-                <input type="hidden" value="false" name="attr_survival_cla"/>
+                <input type="hidden" value="true" name="attr_survival_cla"/>
                 <!--input(type="hidden", value=`${chooseLinkedAttribute}`)-->
-                <input type="hidden" value="sma" name="attr_survival_lao"/>
+                <input type="hidden" value="sma,spi" name="attr_survival_lao"/>
                 <!--input(type="hidden", value=`${vartype}`)-->
                 <!-- Begin the Actual HTML for the Character Sheet-->
                 <input class="StaticSkill hiddenInput" type="checkbox" name="attr_staticsurvival"/>
                 <div class="basetrait staticSurvival" data-i18n-list-item="survival">
                   <input class="deltabutton" type="hidden" name="attr_survival_delta" value="0"/>
-                  <input type="hidden" value="false" name="attr_survival_makeButton"/>
+                  <input type="hidden" value="true" name="attr_survival_makeButton"/>
                   <input type="hidden" value="string" name="attr_survival_mbVarType"/>
                   <button class="skillbutton skillflexattbutton" type="roll" name="roll_tSurvivalRoll" value="@{survivalRollValue} {{skill_roll=[[ @{survivalSkillRollFormula} ]]}} {{wild_die=[[ @{survivalWildDieFormula} ]]}}" title="@{tSurvivalRoll}">&nbsp;<span name="attr_survivalname"></span>
                     <!--
@@ -11682,9 +12049,9 @@ on(
                     else
                         span(name=`attr_${skill}name`) 
                     
-                    -->&nbsp;<span class="linkedAtt" data-i18n="sma-u"></span><span class="statblock">(<span name="attr_survival_display"></span>)</span>
+                    -->&nbsp;<span class="linkedAtt" name="attr_linkedsurvivalatt" data-i18n-dynamic="data-i18n-dynamic"></span><span class="statblock">(<span name="attr_survival_display"></span>)</span>
                   </button>
-                  <input type="hidden" name="attr_survivalRollValue" value="@{whispersurvival} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~tSurvivalRoll)}} {{trait=@{survivalname}}} @{rolltSurvival} @{setmods} @{showtraitmods} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
+                  <input type="hidden" name="attr_survivalRollValue" value="@{whispersurvival} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~tSurvivalRoll)}} {{trait=@{survivalname}}} @{rolltSurvival} @{linkedsurvivalattbutton} @{showtraitmods} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                   <div class="skillRankContainer">
                     <div class="skillRankChild">
                       <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
@@ -11731,7 +12098,12 @@ on(
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
                       <input class="ModDesc" type="text" name="attr_survivalModType" placeholder="Modifier due to edges, hindrances, etc" data-i18n-placeholder="att-mod-description"/>+
-                      <input class="otraitmod" type="number" name="attr_SurvivalskillMod" title="@{Survivalskillmod}" value="0"/>
+                      <input class="otraitmod" type="number" name="attr_SurvivalskillMod" title="@{Survivalskillmod}" value="0"/><span class="ModDesc" data-i18n="linked-attribute">Linked Attribute</span>
+                      <select class="LinkedAttSelect" name="attr_linkedsurvivalatt">
+                        <option value="sma-u" data-i18n="smarts">Smarts</option>
+                        <option value="spi-u" data-i18n="spirit">Spirit</option>
+                      </select>
+                      <!-- The following IF/Else was at this indentation...-->
                       <input type="hidden" name="attr_linkedsurvivalattbutton" value="@{setmods}"/>
                       <input type="hidden" name="attr_linkedsurvivalattformula" value="@{ModSum}[Distracted, Wounds, Fatigue]"/>
                       <hr class="modsection"/>
@@ -12766,7 +13138,7 @@ on(
             img(class="logo Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png")
             img(class="logo SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png")
             -->
-            <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/finderski/SWT/master/PEG_LOGO_White.png"/><img class="logo Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png"/><img class="logo SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/finderski/SWT/master/SWAD%20Update%20Images/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/>
+            <input class="showLogo" type="hidden" value="SavageWorlds" name="attr_logo"/><img class="logo PEG" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PEG_LOGO_White.png"/><img class="logo Deadlands" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Deadlands.png"/><img class="logo SWADE" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/SW_Logo_AE.png"/><img class="logo SWPF" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/PFforSW_logo9_square_smaller.png"/><img class="logo Rifts" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Official%20Savage%20Worlds/images/logos/Savage_Rifts_Logo.png"/><img class="logo Custom" name="attr_logoURL"/>
             <!--Right Column (Hindrances, Ancestry Abilities, Special Abilties, Edges/Advances)-->
             <input class="showconditions hiddenInput" type="checkbox" name="attr_showconditions" checked="checked"/>
             <div class="conditions">
@@ -12787,6 +13159,7 @@ on(
               </div>
             </div><!-- End Conditions -->
             <div class="health"><!-- Wounds -->
+              <input class="hidden" type="number" name="attr_woundsRemaining"/>
               <div class="baseHealthTrait characterWounds">
                 <input class="standardHealth" type="number" name="attr_wounds" title="@{wounds}" value="0"/>||
                 <input class="standardHealth" type="number" name="attr_wounds_max" title="@{wounds_max}" value="3"/>
@@ -12970,9 +13343,30 @@ on(
             <hr class="weaponItem weapon-hr"/>
             <input type="hidden" name="attr_vbonusdamage" value="1d6"/>
             <input class="vdamage" type="checkbox" name="attr_RaiseHBRule" value="2" checked="checked"/>
-            <input class="AthleticsStaticSkill hiddenButton" type="checkbox" name="attr_staticAthletics"/>
-            <input class="ShootingStaticSkill hiddenButton" type="checkbox" name="attr_staticShooting"/>
-            <input class="WSStaticSkill hiddenButton" type="checkbox" name="attr_staticWeirdScience"/>
+            <!--
+            input(class="AthleticsStaticSkill hiddenButton" type="checkbox" name="attr_staticAthletics")
+            input(class="ShootingStaticSkill hiddenButton" type="checkbox" name="attr_staticShooting")
+            input(class="WSStaticSkill hiddenButton" type="checkbox" name="attr_staticWeirdScience")
+            
+            -->
+            <!--do stuff-->
+            <input class="hiddenInput staticathletics" type="checkbox" name="attr_staticathletics"/>
+            <!--do stuff-->
+            <input class="hiddenInput staticfaith" type="checkbox" name="attr_staticfaith"/>
+            <!--do stuff-->
+            <input class="hiddenInput staticfighting" type="checkbox" name="attr_staticfighting"/>
+            <!--do stuff-->
+            <input class="hiddenInput staticfocus" type="checkbox" name="attr_staticfocus"/>
+            <!--do stuff-->
+            <input class="hiddenInput staticperformance" type="checkbox" name="attr_staticperformance"/>
+            <!--do stuff-->
+            <input class="hiddenInput staticpsionics" type="checkbox" name="attr_staticpsionics"/>
+            <!--do stuff-->
+            <input class="hiddenInput staticshooting" type="checkbox" name="attr_staticshooting"/>
+            <!--do stuff-->
+            <input class="hiddenInput staticspellcasting" type="checkbox" name="attr_staticspellcasting"/>
+            <!--do stuff-->
+            <input class="hiddenInput staticweirdscience" type="checkbox" name="attr_staticweirdscience"/>
             <input type="hidden" name="attr_vbonusdamage" value="1d6"/>
             <input class="vdamage" type="checkbox" name="attr_RaiseHBRule" value="2" checked="checked"/>
             <fieldset class="repeating_weapons" style="width: 100%;">
@@ -13033,27 +13427,83 @@ on(
                     <label class="configlabels" data-i18n="skill">Skill</label>
                     <div class="container">
                       <div class="child">
-                        <label class="ddmenu"> 
-                          <input class="select-radio fighting" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="fighting" checked="checked"/>&nbsp;<span name="attr_rfightingname"> </span>
-                        </label>
                         <label class="ddmenu athletics"> 
-                          <input class="select-radio athletics" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="athletics"/>&nbsp;<span name="attr_rathleticsname"> </span>
+                          <input class="select-radio athletics" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="athletics"/>&nbsp;<span name="attr_rathleticsname"></span>
+                        </label>
+                        <label class="ddmenu faith"> 
+                          <input class="select-radio faith" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="faith"/>&nbsp;<span name="attr_rfaithname"></span>
+                        </label>
+                        <label class="ddmenu fighting"> 
+                          <input class="select-radio fighting" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="fighting"/>&nbsp;<span name="attr_rfightingname"></span>
+                        </label>
+                        <label class="ddmenu focus"> 
+                          <input class="select-radio focus" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="focus"/>&nbsp;<span name="attr_rfocusname"></span>
+                        </label>
+                        <label class="ddmenu performance"> 
+                          <input class="select-radio performance" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="performance"/>&nbsp;<span name="attr_rperformancename"></span>
+                        </label>
+                        <label class="ddmenu psionics"> 
+                          <input class="select-radio psionics" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="psionics"/>&nbsp;<span name="attr_rpsionicsname"></span>
                         </label>
                         <label class="ddmenu shooting"> 
-                          <input class="select-radio shooting" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="shooting"/>&nbsp;<span name="attr_rshootingname"> </span>
+                          <input class="select-radio shooting" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="shooting"/>&nbsp;<span name="attr_rshootingname"></span>
                         </label>
-                        <label class="ddmenu"> 
-                          <input class="select-radio unskilled" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="unskilled"/>&nbsp;<span data-i18n="unskilled">Unskilled</span>
+                        <label class="ddmenu spellcasting"> 
+                          <input class="select-radio spellcasting" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="spellcasting"/>&nbsp;<span name="attr_rspellcastingname"></span>
                         </label>
                         <label class="ddmenu weirdscience"> 
-                          <input class="select-radio weirdscience" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="weirdscience"/>&nbsp;<span name="attr_rweirdsciencename"> </span>
+                          <input class="select-radio weirdscience" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="weirdscience"/>&nbsp;<span name="attr_rweirdsciencename"></span>
+                        </label>
+                        <!--
+                        label(class="ddmenu") 
+                             input(type="radio" class="select-radio fighting" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="fighting" checked="checked")
+                             | &nbsp;
+                             span(name='attr_rfightingname') 
+                        label(class="ddmenu athletics") 
+                             input(type="radio" class="select-radio athletics" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="athletics")
+                             | &nbsp;
+                             span(name='attr_rathleticsname') 
+                        label(class="ddmenu shooting") 
+                             input(type="radio" class="select-radio shooting" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="shooting")
+                             | &nbsp;
+                             span(name='attr_rshootingname') 
+                        label(class="ddmenu") 
+                             input(type="radio" class="select-radio unskilled" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="unskilled")
+                             | &nbsp;
+                             span(data-i18n='unskilled') Unskilled
+                        label(class="ddmenu weirdscience") 
+                             input(type="radio" class="select-radio weirdscience" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="weirdscience")
+                             | &nbsp;
+                             span(name='attr_rweirdsciencename') 
+                        
+                        -->
+                        <!--Manually add the stuff for Spirit, because it doesn't follow the pattern...-->
+                        <label class="ddmenu spirit"> 
+                          <input class="select-radio spirit" type="radio" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="spirit"/>&nbsp;<span data-i18n="spirit">Spirit</span>
                         </label>
                         <input class="select-radio" type="hidden" name="attr_weaponskill" value="fighting"/>
-                        <div class="fighting"><span name="attr_rfightingname"> </span></div>
-                        <div class="athletics"><span name="attr_rathleticsname"> </span></div>
-                        <div class="shooting"><span name="attr_rshootingname"> </span></div>
-                        <div class="unskilled"><span data-i18n="unskilled">Unskilled</span></div>
-                        <div class="weirdscience"><span name="attr_rweirdsciencename"> </span></div>
+                        <div class="athletics"><span name="attr_rathleticsname"></span></div>
+                        <div class="faith"><span name="attr_rfaithname"></span></div>
+                        <div class="fighting"><span name="attr_rfightingname"></span></div>
+                        <div class="focus"><span name="attr_rfocusname"></span></div>
+                        <div class="performance"><span name="attr_rperformancename"></span></div>
+                        <div class="psionics"><span name="attr_rpsionicsname"></span></div>
+                        <div class="shooting"><span name="attr_rshootingname"></span></div>
+                        <div class="spellcasting"><span name="attr_rspellcastingname"></span></div>
+                        <div class="weirdscience"><span name="attr_rweirdsciencename"></span></div>
+                        <div class="spirit"><span data-i18n="spirit">Spirit</span></div>
+                        <!--
+                        div(class="fighting")
+                             span(name='attr_rfightingname') 
+                        div(class="athletics")
+                             span(name='attr_rathleticsname') 
+                        div(class="shooting")
+                             span(name='attr_rshootingname') 
+                        div(class="unskilled")
+                             span(data-i18n='unskilled') Unskilled
+                        div(class="weirdscience")
+                             span(name='attr_rweirdsciencename') 
+                        -->
                       </div>
                     </div>
                     <label class="configlabels" data-i18n="skill-modifier">Skill Modifier</label>(
@@ -13101,14 +13551,36 @@ on(
                 <!-- Skill Formulae-->
                 <input type="hidden" name="attr_weaponUnskilledFormula" value="@{unskilledSkillRollFormula}"/>
                 <input type="hidden" name="attr_weaponUnskilledWildDieFormula" value="@{unskilledWildDieFormula}"/>
+                <!-- Fighting-->
                 <input type="hidden" name="attr_weaponFightingFormula" value="@{fightingSkillRollFormula}"/>
                 <input type="hidden" name="attr_weaponFightingWildDieFormula" value="@{fightingWildDieFormula}"/>
+                <!-- Athletics-->
                 <input type="hidden" name="attr_weaponAthleticsFormula" value="@{athleticsSkillRollFormula}"/>
                 <input type="hidden" name="attr_weaponAthleticsWildDieFormula" value="@{athleticsWildDieFormula}"/>
+                <!-- Shooting-->
                 <input type="hidden" name="attr_weaponShootingFormula" value="@{shootingSkillRollFormula}"/>
                 <input type="hidden" name="attr_weaponShootingWildDieFormula" value="@{shootingWildDieFormula}"/>
+                <!-- Weird Science-->
                 <input type="hidden" name="attr_weaponWeirdScienceFormula" value="@{weirdscienceSkillRollFormula}"/>
                 <input type="hidden" name="attr_weaponWeirdScienceWildDieFormula" value="@{weirdscienceWildDieFormula}"/>
+                <!-- Faith-->
+                <input type="hidden" name="attr_weaponfaithFormula" value="@{faithSkillRollFormula}"/>
+                <input type="hidden" name="attr_weaponfaithWildDieFormula" value="@{faithWildDieFormula}"/>
+                <!-- Focus-->
+                <input type="hidden" name="attr_weaponfocusFormula" value="@{focusSkillRollFormula}"/>
+                <input type="hidden" name="attr_weaponfocusWildDieFormula" value="@{focusWildDieFormula}"/>
+                <!-- Performance-->
+                <input type="hidden" name="attr_weaponperformanceFormula" value="@{performanceSkillRollFormula}"/>
+                <input type="hidden" name="attr_weaponperformanceWildDieFormula" value="@{performanceWildDieFormula}"/>
+                <!-- Psionics-->
+                <input type="hidden" name="attr_weaponpsionicsFormula" value="@{psionicsSkillRollFormula}"/>
+                <input type="hidden" name="attr_weaponpsionicsWildDieFormula" value="@{psionicsWildDieFormula}"/>
+                <!-- Spellcasting-->
+                <input type="hidden" name="attr_weaponspellcastingFormula" value="@{spellcastingSkillRollFormula}"/>
+                <input type="hidden" name="attr_weaponspellcastingWildDieFormula" value="@{spellcastingWildDieFormula}"/>
+                <!-- Spirit-->
+                <input type="hidden" name="attr_weaponspiritFormula" value="@{spiritRollFormula}"/>
+                <input type="hidden" name="attr_weaponspiritWildDieFormula" value="@{spiritWildDieFormula}"/>
                 <!-- Hidden Fields for the roll button(s), etc-->
                 <input type="hidden" name="attr_weaponroll" value="@{damageOnly}"/>
                 <!-- Used for Skill and Damage roll-->
@@ -15272,7 +15744,12 @@ on(
                 <option value="Deadlands" data-i18n="deadlands">Deadlands</option>
                 <option value="Pathfinder" data-i18n="pathfinder-for-savage-worlds">Pathfinder for Savage Worlds</option>
                 <option value="Rifts" data-i18n="rifts">Rifts</option>
+                <option value="Custom" data-i18n="custom">Custom </option>
               </select>
+            </label>
+            <input class="showCustomLogo" type="hidden" name="attr_logo" value="SavageWorlds"/>
+            <label class="miscItem customLogo"><span data-i18n="logo-url">Logo URL </span>
+              <input type="text" name="attr_logoURL"/>
             </label>
             <label class="miscItem"><span data-i18n="sheet-background">Sheet Background</span>
               <select class="sheet-background" name="attr_background">
@@ -15280,7 +15757,12 @@ on(
                 <option value="1" selected="selected" data-i18n="swade-parchment">SWADE Parchment</option>
                 <option value="2" data-i18n="seamless-parchment">Seamless Parchment</option>
                 <option value="3" data-i18n="gray-hex">Gray Hex </option>
+                <option value="4" data-i18n="custom">Custom</option>
               </select>
+            </label>
+            <input class="showCustomBackground" type="hidden" name="attr_background" value="1"/>
+            <label class="miscItem customBackground"><span data-i18n="background-url">Background URL </span>
+              <input type="text" name="attr_backgroundurl"/>
             </label>
             <label class="miscItem darkMode">
               <input type="checkbox" name="attr_dark_mode" value="1"/>&nbsp; <span data-i18n="dark-mode-invert-colors">Dark Mode</span>
@@ -15468,6 +15950,86 @@ on(
       </div>
       <div class="releasenotesTab">
         <h1 class="groupHeader documentationHeader" data-i18n="release-notes">Release Notes</h1>
+        <!-- Release 1.00.30-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10030" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.30</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10030" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
+          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="nature-sense">Added support for Druid Ability <em>Nature Sense</em> from Pathfinder for Savage Worlds; Survival can now be linked with Spirit instead of Smarts only.</span></li>
+            <li> <span class="black" data-i18n="weapon-rate-of-fire-for-spellcasters">Fixed an issue with Rates of Fire greater than 2 for spellcasting skills (e.g. Faith, Focus, Spellcasting, etc). You may need to change the skill and change it back again for the change to take effect.</span></li>
+            <li> <span class="black" data-i18n="firefox-alphanumer-trait-display">Fixed a bug in Firefox when using the Alphanumeric labels that caused the trait modifier box to wrap to the next line.</span></li>
+          </ul>
+        </div>
+        <!-- Release 1.00.29-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10029" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.29</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10029" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="minor-release">Minor Release</h2>
+          <p data-i18n="minor-release-info">This release focuses on Minor Enhancements and Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="enhancements">Enhancements</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="custom-logo">Added the ability to assign your own custom logo to the sheet </span></li>
+            <li> <span class="black" data-i18n="custom-background">Added the ability to assign your own custom background to the sheet </span></li>
+            <li> <span class="black" data-i18n="wounds-remaining">Added a field that calculates the number of wounds remaining  </span></li>
+          </ul>
+        </div>
+        <!-- Release 1.00.28-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10028" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.28</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10028" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
+          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="weapon-shooting-not-rolling-wild-die">Fixed an issue where rolling Shooting (or Weird Science) from a weapon was not including the Wild Die roll. This fix should automatically fix any broken skills on the sheet, but if for some reason it doesn't, simply change the skill to a different one and then switch it back.</span></li>
+          </ul>
+        </div>
+        <!-- Release 1.00.27-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10027" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.27</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10027" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="minor-release">Minor Release</h2>
+          <p data-i18n="minor-release-info">This release focuses on Minor Enhancements and Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="enhancements">Enhancements</h2>
+          <ul class="releaseNotesList">
+            <li><span class="black" data-i18n="add-artificer-support">Added support for the Artificer Edge and Arcane Devices; sometimes the user needs to use the Caster's arcane skill, it is now possible to designate an Arcane skill for a weapon. The skill must be checked and configured properly for it to show up in the list of options.  Because the user may be using another character's Arcane skill, it's recommended that you add that skill and configure it as temporarily boosted to get the appropriate rank. </span></li>
+          </ul>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="hide-arcane-skills-in-weapons">Fixed an issue where the arcane skill (Weird Science) wasn't hidden if the user didn't have Weird Science.</span></li>
+          </ul>
+        </div>
+        <!-- Release 1.00.26-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10026" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.26</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10026" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
+          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="statblock-view-skill-spillover">Fixed an issue where the if one had a lot of custom skills, it would not wrap properly and the skills (and potentially Hindrances and Special Abilities) would flow off the character sheet.</span></li>
+            <li> <span class="black" data-i18n="unskilled-button-on-statblock-view">Fixed an issue where the Unskilled roll button was not present on the Statblock (locked) view of the character sheet.</span></li>
+            <li><span class="black" data-i18n="token-in-rolltemplate-not-showing">Fixed an issue where if the character sheet didn't have a token assigned, the roll template would still attempt to show the image. Now, if a token is not assigned, the sheet will look to see if an Avatar is assigned for the character and if so, it will use that; if neither a token nor an avatar are assigned, the sheet will uncheck the setting to display the token on the roll template.</span></li>
+          </ul>
+        </div>
         <!-- Release 1.00.25-->
         <label class="rowlabel">
           <input class="releasenotes" type="checkbox" name="attr_releasenotes10025" value="1"/><span class="releasenotesVersion">
@@ -16268,7 +16830,7 @@ on(
 					{{#skill_roll5}}<span class="sheet-rollContainer">{{skill_roll5}}</span>{{/skill_roll5}}
 				{{/rollGreater() numrolls 4}}
 				{{#rollGreater() numrolls 5}}
-					{{#allprops() skill_rank mook showtt showwounds showfatigue showdistracted showenc skill_roll skill_roll2 skill_roll3 skill_roll4 skill_roll5 name trait source PowerTemplate wild_die wild_die2 wild_die3 wild_die4 wild_die5 mods ttmod wounds fatigue distracted encumbrance notes button DmgRoll numrolls wcicon distracteds vulnerable stunned unshake ReRoll vigorStunned unshakeTemplate ap getgritty GrittyRoll skill_rollall trappings bonus_die wci showspec showap wildcard shaken namelength conviction ignoremaxheight}}<span class="sheet-rollContainer">{{value}}</span>{{/allprops() skill_rank mook showtt showwounds showfatigue showdistracted showenc skill_roll skill_roll2 skill_roll3 skill_roll4 skill_roll5 name trait source PowerTemplate wild_die wild_die2 wild_die3 wild_die4 wild_die5 mods ttmod wounds fatigue distracted encumbrance notes button DmgRoll numrolls wcicon distracteds vulnerable stunned unshake ReRoll vigorStunned unshakeTemplate ap getgritty GrittyRoll skill_rollall trappings bonus_die wci showspec showap wildcard shaken namelength conviction ignoremaxheight}}
+					{{#allprops() theme skill_rank mook showtt showwounds showfatigue showdistracted showenc skill_roll skill_roll2 skill_roll3 skill_roll4 skill_roll5 name trait source PowerTemplate wild_die wild_die2 wild_die3 wild_die4 wild_die5 mods ttmod wounds fatigue distracted encumbrance notes button DmgRoll numrolls wcicon distracteds vulnerable stunned unshake ReRoll vigorStunned unshakeTemplate ap getgritty GrittyRoll skill_rollall trappings bonus_die wci showspec showap wildcard shaken namelength conviction ignoremaxheight}}<span class="sheet-rollContainer">{{value}}</span>{{/allprops() theme skill_rank mook showtt showwounds showfatigue showdistracted showenc skill_roll skill_roll2 skill_roll3 skill_roll4 skill_roll5 name trait source PowerTemplate wild_die wild_die2 wild_die3 wild_die4 wild_die5 mods ttmod wounds fatigue distracted encumbrance notes button DmgRoll numrolls wcicon distracteds vulnerable stunned unshake ReRoll vigorStunned unshakeTemplate ap getgritty GrittyRoll skill_rollall trappings bonus_die wci showspec showap wildcard shaken namelength conviction ignoremaxheight}}
 				{{/rollGreater() numrolls 5}}
 			</div>
 			<div class="sheet-templateRoll sheet-trollRight">
@@ -16410,7 +16972,7 @@ on(
 				{{/rollGreater() computed::lastcallroll 0}}
 			{{/burnroll}}
 			{{#buttonstyle}}<div class="sheet-buttonstyle">{{/buttonstyle}}
-			{{#allprops() description item type wildcard fear heartattack ignoremaxheight buttonstyle burnroll lastcallroll lastcalldesc}}<p><strong>{{key}}</strong><span>{{value}}</span></p>{{/allprops() description item type wildcard fear heartattack ignoremaxheight buttonstyle burnroll lastcallroll lastcalldesc}}
+			{{#allprops() theme description item type wildcard fear heartattack ignoremaxheight buttonstyle burnroll lastcallroll lastcalldesc}}<p><strong>{{key}}</strong><span>{{value}}</span></p>{{/allprops() theme description item type wildcard fear heartattack ignoremaxheight buttonstyle burnroll lastcallroll lastcalldesc}}
 			{{#buttonstyle}}</div>{{/buttonstyle}}
         </div>
     </div>

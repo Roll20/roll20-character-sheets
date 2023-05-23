@@ -31,6 +31,30 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 	repeatingSum("EquipmentTotal", "equipment", ["ItemMass", "ItemQty", "ItemIsWorn"]);
 });
 
+on('sheet:opened', function() {
+	getAttrs(['wealth', 'socialstatus', 'LongNotes'], function(values) {
+		// If the user has an wealth value we need to add a new currency row with our old value and remove the old one 
+		if (!!values.wealth) {
+			console.log(`Found old Currency data (${values.wealth}), migrating to new Currency fields`);
+			setAttrs({
+				['repeating_currency_' + generateRowID() + '_wealth']: values.wealth,
+				wealth: ''
+			});
+		}
+		
+		// If the user has an socialstatus value we can add it to their Extended Notes field so at least it's not lost and remove the old one
+		if (!!values.socialstatus) {
+			console.log(`Found old Social Status data (${values.socialstatus}), appending to Extended Notes field`);
+			setAttrs({
+				LongNotes: values.LongNotes + `
+
+Old Social Status: ${values.socialstatus}`,
+				socialstatus: ''
+			});
+		}
+	});
+});
+
 </script>
 
 <img src="http://i.imgur.com/Qw48Upj.png" title="Alternity Science Fiction Roleplaying Game"/>
@@ -152,7 +176,7 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 			</table>
 			</div>
 		</div>
-		<div class="sheet-twothirdwidth">
+		<div class="sheet-thirdwidth">
 			<div>
 			<TABLE>
 			<TR>
@@ -436,6 +460,46 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 			<TD><input type="text" name="attr_weapondata5clipsize" class="sheet-dicetype">/<input type="text" name="attr_weapondata5ammoused"></TD>
 			<TD><input type="text" name="attr_weapondata5hide" class="sheet-dicetype"></TD>
 			<TD><input type="text" name="attr_weapondata5mass" class="sheet-dicetype"></TD>
+		</tr>
+		<tr>
+			<TD><span name="attr_form6" class="sheet-12emwidth"></span></TD>
+			<TD><input type="text" name="attr_weapondata6accuracy" class="sheet-dicetype" disabled="true" value="@{form6accuracy}"></TD>
+			<TD><input type="text" name="attr_weapondata6actions" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_weapondata6clipsize" class="sheet-dicetype">/<input type="text" name="attr_weapondata6ammoused"></TD>
+			<TD><input type="text" name="attr_weapondata6hide" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_weapondata6mass" class="sheet-dicetype"></TD>
+		</tr>
+		<tr>
+			<TD><span name="attr_form7" class="sheet-12emwidth"></span></TD>
+			<TD><input type="text" name="attr_weapondata7accuracy" class="sheet-dicetype" disabled="true" value="@{form7accuracy}"></TD>
+			<TD><input type="text" name="attr_weapondata7actions" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_weapondata7clipsize" class="sheet-dicetype">/<input type="text" name="attr_weapondata7ammoused"></TD>
+			<TD><input type="text" name="attr_weapondata7hide" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_weapondata7mass" class="sheet-dicetype"></TD>
+		</tr>
+		<tr>
+			<TD><span name="attr_form8" class="sheet-12emwidth"></span></TD>
+			<TD><input type="text" name="attr_weapondata8accuracy" class="sheet-dicetype" disabled="true" value="@{form8accuracy}"></TD>
+			<TD><input type="text" name="attr_weapondata8actions" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_weapondata8clipsize" class="sheet-dicetype">/<input type="text" name="attr_weapondata8ammoused"></TD>
+			<TD><input type="text" name="attr_weapondata8hide" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_weapondata8mass" class="sheet-dicetype"></TD>
+		</tr>
+		<tr>
+			<TD><span name="attr_form9" class="sheet-12emwidth"></span></TD>
+			<TD><input type="text" name="attr_weapondata9accuracy" class="sheet-dicetype" disabled="true" value="@{form9accuracy}"></TD>
+			<TD><input type="text" name="attr_weapondata9actions" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_weapondata9clipsize" class="sheet-dicetype">/<input type="text" name="attr_weapondata9ammoused"></TD>
+			<TD><input type="text" name="attr_weapondata9hide" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_weapondata9mass" class="sheet-dicetype"></TD>
+		</tr>
+		<tr>
+			<TD><span name="attr_form10" class="sheet-12emwidth"></span></TD>
+			<TD><input type="text" name="attr_weapondata10accuracy" class="sheet-dicetype" disabled="true" value="@{form10accuracy}"></TD>
+			<TD><input type="text" name="attr_weapondata10actions" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_weapondata10clipsize" class="sheet-dicetype">/<input type="text" name="attr_weapondata10ammoused"></TD>
+			<TD><input type="text" name="attr_weapondata10hide" class="sheet-dicetype"></TD>
+			<TD><input type="text" name="attr_weapondata10mass" class="sheet-dicetype"></TD>
 		</tr>
 		</table>
 	</div>
@@ -1671,7 +1735,7 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 			</TABLE>
 			</div>
 		</div>
-		<div class="sheet-col">
+		<div class="sheet-twothirdwidth">
 			<div class="sheet-bordersolid sheet-fullwidth">
 			<div class="sheet-table">
 			<div class="sheet-rowtable sheet-skilltitle">MUTATIONS</div>
@@ -1735,6 +1799,7 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 			<div class="sheet-col sheet-4emwidth sheet-broadskill">Size</div>
 			<div class="sheet-col sheet-4emwidth sheet-broadskill">Active</div>
 			<div class="sheet-col sheet-4emwidth sheet-broadskill">Storage</div>
+			<div class="sheet-col sheet-4emwidth sheet-broadskill">Function</div>
 			</div>
 			<fieldset class="repeating_programs">
 				<div class="sheet-row">
@@ -1742,6 +1807,7 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 				<div class="sheet-col sheet-4emwidth"><input type="text" name="attr_ProgramSize" class="sheet-dicetype"/></div>
 				<div class="sheet-col sheet-4emwidth sheet-aligncenter"><input type="radio" name="attr_ActiveStorage" value="1"/></div>
 				<div class="sheet-col sheet-4emwidth sheet-aligncenter"><input type="radio" name="attr_ActiveStorage" value="0"/></div>
+				<div class="sheet-col sheet-4emwidth"><input type="text" name="attr_ProgramFunction"/></div>
 				</div>
 			</fieldset>
 			</div>
@@ -1753,18 +1819,70 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 
 <div class="sheet-section-wealthequipment">
 	<div class="sheet-row">
-		<div class="sheet-broadskill sheet-col" style="width:8em">Allegiance</div>
-		<div class="sheet-col"><input type="text" name="attr_allegiance" class="sheet-16emwidth"></div>
+		<div class="sheet-thirdwidth">
+			<div class="sheet-row">
+				<div class="sheet-broadskill sheet-col" style="width:8em">Allegiance</div>
+				<div class="sheet-col"><input type="text" name="attr_allegiance" class="sheet-16emwidth"></div>
+			</div>
+			<div class="sheet-row">
+				<div class="sheet-broadskill sheet-col" style="width:8em">
+					Social Status 
+					<span title="Missing data? We've moved it to the bottom of your Extended Notes below as we could not automatically migrate it for you" style="cursor: help;">?</span>
+				</div>
+				<table class="sheet-bordersolid">
+					<thead>
+					<tr>
+						<th colspan="2" style="border-right: 1px solid black;">Authority</th>
+						<th colspan="2" style="border-right: 1px solid black;">Wealth</th>
+						<th colspan="2">Fame</th>
+					</tr>
+					<tr>
+						<!-- Authority -->
+						<td>Rank</td>
+						<td style="border-right: 1px solid black;">Steps</td>
+						<!-- Wealth -->
+						<td>Rank</td>
+						<td style="border-right: 1px solid black;">Income</td>
+						<!-- Fame -->
+						<td>Rank</td>
+						<td>Steps</td>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<!-- Authority -->
+						<td><input type="number" name="attr_AuthorityRank" class="sheet-score" value="0"></td>
+						<td style="border-right: 1px solid black;">
+							<input type="text" name="attr_AuthoritySteps" class="sheet-score" value="+0">
+						</td>
+						<!-- Wealth -->
+						<td><input type="number" name="attr_WealthRank" class="sheet-score" value="0"></td>
+						<td style="border-right: 1px solid black;">
+							<input type="number" name="attr_WealthIncome" class="sheet-ability" value="0" placeholder="/month" title="Income /month">
+						</td>
+						<!-- Fame -->
+						<td><input type="number" name="attr_FameRank" class="sheet-score" value="0"></td>
+						<td><input type="text" name="attr_FameSteps" class="sheet-score" value="+0"></td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="sheet-thirdwidth">
+			<div class="sheet-broadskill sheet-col" style="width:8em">Currency</div>
+			<div class="sheet-row">
+				<div class="sheet-col sheet-10emwidth">Amount</div>
+				<div class="sheet-col sheet-16emwidth">Location</div>
+			</div>
+			<fieldset class="repeating_currency">
+				<div class="sheet-row">
+					<div class="sheet-col"><input type="text" name="attr_wealth" class="sheet-10emwidth" value="0"></div>
+					<div class="sheet-col"><input type="text" name="attr_wealthLocation" class="sheet-16emwidth"></div>
+				</div>
+			</fieldset>
+		</div>
 	</div>
-	<div class="sheet-row">
-		<div class="sheet-broadskill sheet-col" style="width:8em">Social Status</div>
-		<div class="sheet-col"><input type="text" name="attr_socialstatus" class="sheet-16emwidth"></div>
-	</div>
-	<div class="sheet-row">
-		<div class="sheet-broadskill sheet-col" style="width:8em">Currency</div>
-		<div class="sheet-col"><input type="text" name="attr_wealth" class="sheet-16emwidth"></div>
-	</div>
-	<div class="sheet-row sheet-broadskill">Extended Notes:</div>
+	<div class="sheet-row sheet-broadskill" style="padding-top: 1em;">Extended Notes:</div>
 	<div class="sheet-row">
 		<textarea name="attr_LongNotes" class="sheet-fullbox"></textarea>
 	</div>
@@ -1775,7 +1893,7 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 			<div class="sheet-col sheet-16emwidth">Item Name</div>
 			<div class="sheet-col" style="width:24em;">Item Description</div>
 			<div class="sheet-col sheet-10emwidth">Location</div>
-			<div class="sheet-col" style="width:3em;">Equipped?</div>
+			<div class="sheet-col" style="width:3em;">Eqp?</div>
 			<div class="sheet-col" style="width:3em;">Mass</div>
 			<div class="sheet-col">Total</div>
 		</div>
@@ -1793,7 +1911,7 @@ on('change:repeating_equipment:ItemMass change:repeating_equipment:ItemQty chang
 	</fieldset>
 
 	<div class="sheet-row">
-		<div class="sheet-broadskill sheet-col" style="width: 8em">Total equipped mass: </div>
+		<div class="sheet-broadskill sheet-col">Total equipped mass: </div>
 		<span name="attr_EquipmentTotal"></span>
 	</div>
 

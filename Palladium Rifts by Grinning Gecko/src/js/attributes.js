@@ -136,9 +136,8 @@ async function psBonusComplete(prefix = "") {
       }
       break;
     case "3":
-      name = "Robotic";
     case "3.5":
-      name = "Giant Robotic";
+      name = ps_type === "3" ? "Robotic" : "Giant Robotic";
       if (ps >= 17) {
         if (ps_type == "3") {
           lift = carry = ps * 25;

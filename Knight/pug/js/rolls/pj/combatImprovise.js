@@ -91,7 +91,6 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     let exec = [];
     exec.push(roll);
 
-    let isConditionnelA = false;
     let isConditionnelD = false;
     let isConditionnelV = false;
 
@@ -106,9 +105,9 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     const baseViolence = dViolence;
 
     let diceDegats = baseDegats;
-    let diceViolence = baseDegats;
+    let diceViolence = baseViolence;
 
-    const bDegats = [];
+    let bDegats = [];
     const bViolence = [];
 
     let degats = [];
@@ -166,6 +165,8 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
 
     let ODBarbarian = [];
     let ODMALBarbarian = [];
+    let ODRogue = [];
+    let ODMALRogue = [];
     let ODShaman = [];
     let ODMALShaman = [];
     const ODWarrior = [];
@@ -181,15 +182,15 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     let isSurprise = false;
     let isTenebricide = false;
 
-    let attaquesSurprises = [];
-    let attaquesSurprisesValue = [];
+    const attaquesSurprises = [];
+    const attaquesSurprisesValue = [];
     let attaquesSurprisesCondition = '';
 
     const devaste = +attrs.devasterAnatheme;
     const bourreau = +attrs.bourreauTenebres;
     const equilibre = +attrs.equilibreBalance;
 
-    const autresEffets = [];
+    let autresEffets = [];
     if (hasArmure) { exec.push('{{OD=true}}'); }
 
     const C1Value = +attrs[C1Nom];
@@ -281,47 +282,37 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = await getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = armorBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = armorBonus.isConditionnelD; }
-
-    attaquesSurprises = armorBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = armorBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = armorBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(armorBonus.diceDegats);
+    bDegats = bDegats.concat(armorBonus.bDegats);
     diceViolence += Number(armorBonus.diceViolence);
 
     ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
+    ODRogue = ODRogue.concat(armorBonus.ODRogue);
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
     ODWarrior.push(armorBonus.ODWarrior);
 
-    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
+
+    const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(MALBonus.diceDegats);
+    bDegats = bDegats.concat(MALBonus.bDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
     ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
@@ -336,6 +327,8 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     bonus = bonus.concat(OD);
     bonus = bonus.concat(ODBarbarian);
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODRogue);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODShaman);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODWarrior);
@@ -351,9 +344,16 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
 
     if (cBonus.length !== 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+    const pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+    const malusRoll = 0;
+    const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+    const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+    const baseJet = '{{basejet=[[0]]}}';
 
     exec.push(jet);
+    exec.push(baseJet);
     exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
     exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
@@ -405,8 +405,6 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
       exec.push(`{{effets=${autresEffets.join(' / ')}}}`);
     }
 
-    if (isConditionnelA) { exec.push('{{succesConditionnel=true}}'); }
-
     if (isConditionnelD) { exec.push('{{degatsConditionnel=true}}'); }
 
     if (isConditionnelV) { exec.push('{{violenceConditionnel=true}}'); }
@@ -415,6 +413,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     const finalRoll = await startRoll(exec.join(' '));
 
     const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
 
     const tBonus = finalRoll.results.bonus.result;
     const tExploit = finalRoll.results.Exploit.result;
@@ -433,22 +432,28 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
       isTenebricide,
     };
 
-    const computed = updateRoll(finalRoll, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
 
-    const finalComputed = {
-      jet: tJet + tBonus,
-    };
+    finishRoll(finalRoll.rollId, computed);
 
-    Object.assign(finalComputed, computed);
-
-    finishRoll(finalRoll.rollId, finalComputed);
-
-    if (tJet !== 0 && tJet === tExploit) {
+    if (tJet !== 0 && computed.basejet === tExploit) {
       const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
-      const tRExploit = exploitRoll.results.jet.result;
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
 
       const exploitComputed = {
-        jet: tRExploit,
+        jet: jetExploit,
       };
 
       finishRoll(exploitRoll.rollId, exploitComputed);

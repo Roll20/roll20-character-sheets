@@ -1,5 +1,47 @@
 Change Log
 ==============================================
+**2023-02-07 ** v.21 Paul V
+	Minor increase in maneuver list font size
+**2023-02-07 ** v.20 Paul V
+	Fixed Stat rolls and NPC Stat rolls and saves
+	Added Features and traits list
+**2023-01-24 ** v.19 Paul V
+	Fixed Initiative (Vehicles and Dex)
+**2022-12-12 ** v.18 Paul V
+	Added Hit Dice Roller - maxes out the number of dice to roll as the current hit dice and reduces the HD by the number of dice rolled - also adds the result to current HP with a maximum of the HP max
+	Added Generic Initiative Bonus
+	Fixed Hit Point Maximum's attribute label it should have been HP_Max
+	Added Death Save roll button that Automatically checks the Success or Failure boxes.
+	Added Str, Dex, Int, Wis, Con, Cha settings windows to store save prof, indivudial save bonus and global save bonus
+	Recoded the Save buttons to use the new tech and the new global and individual bonuses
+	Added the Ability to whispher the GM rolls
+	Added Maneuver settings to add in Maneuver DC Bonus and Exertion point bonus, also added in current exertion points freely edited field
+**2022-12-05 ** v.17 Paul V
+	Fixed issue with NPC Skill and Attack rolls - converted the rolls to use the new Action button tech
+	Added Initative roll to NPC Sheet
+	Fixed issue with Tool rolls
+**2022-11-22 ** v.16 Paul V
+	Fixed all the Passive Checks to be 10+modifiers+stat modifier and not +stat
+	Fixed issue where the Skill speciality couldn't be edited on the main screen, it can now be edited on both main screen and popup
+**2022-11-15 ** v.15 Paul V
+	Added new Dice rolling logic, that gathers the components of the dice roll when the button is press this means that the every roll on the sheet doesn't need to be updated everytime standard/Advantage/Disdadvantage is pressed
+	Fixed Wisdom (perception) initiative to use Wisdom
+	Fixed all the Passive Checks to be 10+modifiers	
+**2022-09-28 ** v.14 Paul V
+	Added D10 and D12 in to the Expertise dice list for high level Rogues - but this is a static Expertise dice uneffected by Specialty (as that caps at d8)
+	Changed the Expertise to be a dropdown list no data entry allowed
+	Added logic to exclude the expertise dice from the crit colour logic of roll20
+**2022-08-14 ** v.13 Paul V
+	Added new Dex(Basic) initiative option
+	Added Bloodied HP on to the NPC sheet 
+	Added all the missing words into the translate
+	Added Standard / Advantage / Disadvantage logic for initiative, saves, stat rolls
+**2022-05-04 ** v.12 Paul V
+	Major changes to the Skills rolls added a skill settings window for each skill. moved Expertise dice on to that window
+	Added a whole swave of modifiers to the rolls 
+	Moved Jack of all trades into the Global skill settings window
+	Moves all Expertise Dice and Proficient into the skill specific setting windows
+	Added Standard / Advantage / Disadvantage buttons on to the sheet allowing to rolls with advantage or disadvantage
 **2022-03-07 ** v.11 Paul V
 	Split the Archtypes so only the selected class's archtypes will appear in the list 
 	Fixed bug in NPC Sheet
