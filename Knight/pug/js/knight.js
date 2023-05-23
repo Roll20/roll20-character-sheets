@@ -930,9 +930,9 @@ on('change:fichePNJ change:armure change:tir change:savoir change:technique chan
 
   if (fiche !== 0) { return; }
 
-  const armure = +attrs.armure;
+  const armure = attrs.armure;
 
-  const aspect = +attrs.machine;
+  const aspect = attrs.machine;
 
   const car1 = +attrs.tir;
   const car2 = +attrs.savoir;
