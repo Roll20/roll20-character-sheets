@@ -8093,7 +8093,7 @@
 	arrayOf(maxArmorNum).forEach(num => {
 		var armorId = String(num).padStart(2,'0');
 		on(`clicked:armorActivation${armorId}`, (info) => {
-			getAttrs(["whisperToGM", "displayDegreeOfSuccess", "armorActivation"+armorId, "armorLocations"+armorId], function(values) {
+			getAttrs(["whisperToGM", "displayDegreeOfSuccess", "armorActivation"+armorId, "armorLocations"+armorId, "totalPD"+armorId, "totalED"+armorId], function(values) {
 				var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
 				var actOn = values["armorActivation"+armorId]||18;
 				var locations = values["armorLocations"+armorId]||"";
@@ -8110,8 +8110,20 @@
 				}
 
 				theRoll += "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} "
-					+ "{{Total Defense = **PD ``@{totalPD"+armorId+"}`` ED ``@{totalED"+armorId+"}``**}}";
+					+ "{{Total Defense = ";
 				
+				// if TotalPD is not filled, then calcluate Character + Armor
+				if (values["totalPD"+armorId] == 0)	
+					theRoll += "**PD [[@{pd}[Character PD]+@{armorPD"+armorId+"}[Armor PD]]] ";
+				else
+					theRoll += "**PD ``@{totalPD"+armorId+"}`` ";
+				
+				// if TotalED is not filled, then calcluate Character + Armor
+				if (values["totalED"+armorId] == 0)
+					theRoll += "ED [[@{ed}[Character ED]+@{armorED"+armorId+"}[Armor ED]]]**}}";
+				else
+					theRoll += "ED ``@{totalED"+armorId+"}``**}}";
+					
 				startRoll(theRoll, (results) => {
 					finishRoll(results.rollId, {});
 				});
