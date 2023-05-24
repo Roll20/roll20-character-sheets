@@ -5697,6 +5697,14 @@
 		<div class="sheet-header">
 		  {{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
 		  {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+		  {{#PHASE12}}
+		  {{#rollTotal() PHASE12 0}}
+		  <div class="sheet-subtitle">Recovery: Full Phase Action</div>
+		  {{/rollTotal() PHASE12 0}}
+		  {{#^rollTotal() PHASE12 0}}
+		  <div class="sheet-subtitle">Recovery: Post Segment 12</div>
+		  {{/^rollTotal() PHASE12 0}}
+		  {{/PHASE12}}
 		</div>
 		<div class="sheet-content">
 		  {{#SUCCESS}}
@@ -5709,10 +5717,16 @@
 			<div class="sheet-value">{{SUCCESS}}</div>
 			{{/rollLess() computed::SUCCESS 0}}
 		  {{/SUCCESS}}
-		  {{#allprops() title subtitle desc color SUCCESS}}
+		  {{#rollTotal() PHASE12 0}}
+			<div class="sheet-key">Phase</div>
+			<div class="sheet-value">Full</div>
+			<div class="sheet-key">DCV</div>
+			<div class="sheet-value">1/2</div>
+		  {{/rollTotal() PHASE12 0}}
+		  {{#allprops() title subtitle desc color SUCCESS PHASE12}}
 		  <div class="sheet-key">{{key}}</div>
 		  <div class="sheet-value">{{value}}</div>
-		  {{/allprops() title subtitle desc color SUCCESS}}
+		  {{/allprops() title subtitle desc color SUCCESS PHASE12}}
 		  {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 		</div>
 	  </div>
@@ -6087,21 +6101,33 @@
 			
 	// Recover endurance and stun when the recover button in the item-characteristics-health box is clicked.
 	on("clicked:recoverHealth", function () {
-		getAttrs(["endurance","stun","CurrentEND", "CurrentSTUN", "recovery"], function(values) {
-			const maxEND = parseInt(values.endurance);
-			const maxSTUN = parseInt(values.stun);
-			const recovery = parseInt(values.recovery);
-			let currentEND = parseInt(values.CurrentEND);
-			let currentSTUN = parseInt(values.CurrentSTUN);
-			
-			let newSTUN = Math.min(currentSTUN + recovery, maxSTUN);
-			let newEND = Math.min(currentEND + recovery, maxEND);
-			
-			// Check to see if character hasn't been boosted above character max by Aid power or similar.
-			setAttrs({
-				CurrentSTUN:Math.max(currentSTUN,newSTUN),
-				CurrentEND:Math.max(currentEND,newEND)
+		getAttrs(["endurance","stun","CurrentEND", "CurrentSTUN", "weightEndPenalty", "recovery"], function(values) {
+			var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
+			const currentEND = parseInt(values.CurrentEND)||0;
+			const currentSTUN = parseInt(values.CurrentSTUN)||0;
+
+			// If character is boosted, than their max is what they are currently at
+			const maxEND = Math.max(parseInt(values.endurance), currentEND);
+			const maxSTUN = Math.max(parseInt(values.stun), currentSTUN);
+
+
+			theRoll += "&{template:custom-activate} {{title=@{character_name} - @{character_title}}} "
+			+ "{{PHASE12=[[?{Recovery Type|Post Segement 12 (includes END penalty),1|Recovery Action,0}]]}} "
+			+ "{{STUN Recovery=[[@{recovery}[Recovery]]] (@{CurrentSTUN})}} "
+			+ "{{END Recovery=[[@{recovery}[Recovery]-[[@{weightEndPenalty}*?{Recovery Type}]][END/Turn Cost]]] (@{CurrentEND})}}";
+
+			startRoll(theRoll, (results) => {
+				recoverSTUN = results.results["STUN Recovery"].result;
+				recoverEND = results.results["END Recovery"].result;
+
+				setAttrs({
+					CurrentSTUN:Math.min(currentSTUN + recoverSTUN, maxSTUN),
+					CurrentEND:Math.max(0,Math.min(currentEND + recoverEND, maxEND))
+				});
+
+				finishRoll(results.rollId, {});
 			});
+
 		});
 	});
 					
