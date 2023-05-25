@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
 const SHEET_NAME = 'AD&D 2E Revised';
-const SHEET_VERSION = '4.16.0';
+const SHEET_VERSION = '4.17.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -33,6 +33,9 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(4, 16, 0))
                 migrate4_16_0();
+
+            if (oldSheetVersion.isBelowMigrate(4, 17, 0))
+                migrate4_17_0();
         }
     });
 });
@@ -77,6 +80,38 @@ function moveStaticToRepeating(section, fieldsToMove) {
             setAttrs(newValue);
         }
     });
+}
+//#endregion
+
+//#region version 4.17.0
+function migrate4_17_0() {
+    console.log('Migrate to v4.17.0');
+
+    TAS.repeating('customrogue')
+        .fields('cra','crarmorp')
+        .each(function (row) {
+            let armorValue = row.I['crarmorp'];
+            if (armorValue === 0)
+                return
+
+            console.log(`Moving value ${armorValue} from crarmorp to cra`);
+            row.I['cra'] = armorValue;
+        }, function () {
+            getAttrs(ROGUE_SKILL_COLUMNS.map(s => s+'armorp'), function (values) {
+                let newValue = {};
+
+                for (let rogueSkill of ROGUE_SKILL_COLUMNS) {
+                    let armorValue = values[rogueSkill+'armorp'];
+                    let number = parseInt(armorValue) || 0;
+                    if (number === 0)
+                        continue;
+
+                    console.log(`Moving value ${number} from ${rogueSkill}armorp to ${rogueSkill}a`);
+                    newValue[rogueSkill+'a'] = number;
+                }
+                setAttrs(newValue);
+            });
+        }).execute()
 }
 //#endregion
 

@@ -389,7 +389,7 @@ const setupStaticCalculateTotal = function(totalField, fieldsToSum, maxValue) {
     });
 }
 
-function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName, maxValue) {
+function setupRepeatingRowCalculateTotal(repeatingName, repeatingFieldsToSum, repeatingTotalField, maxValue) {
     let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
     let allFields = [...repeatingFieldsToSum];
     allFields.push(repeatingTotalField);
@@ -1433,17 +1433,12 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 
 //#region Rogue skills
 // --- Start setup Rogue skills total --- //
-let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
-let rogueStandardColumns = ['b', 'r', 'd', 'k', 'a', 'm', 'l'];
-rogueStandardSkills.forEach(skill => {
-    setupStaticCalculateTotal(`${skill}t`, rogueStandardColumns.map(column => `${skill}${column}`), 95);
+const ROGUE_STANDARD_SKILLS = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
+const ROGUE_SKILL_COLUMNS = ['b', 'r', 'd', 'k', 'a', 'm', 'l'];
+ROGUE_STANDARD_SKILLS.forEach(skill => {
+    setupStaticCalculateTotal(`${skill}t`, ROGUE_SKILL_COLUMNS.map(column => `${skill}${column}`), 95);
 });
-
-// Setup custom rogue skills total
-setupRepeatingRowCalculateTotal('crt-hidden', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
-setupRepeatingRowCalculateTotal('crt', ['crt-hidden'], 'customrogue', 95);
-setupRepeatingRowCalculateTotal('crnoarmort', ['crt-hidden', 'crnoarmorb'], 'customrogue', 95);
-setupRepeatingRowCalculateTotal('crarmort', ['crt-hidden', 'crarmorp'], 'customrogue', 95);
+setupRepeatingRowCalculateTotal('customrogue', ROGUE_SKILL_COLUMNS.map(column => `cr${column}`), 'crt', 95);
 // --- End setup Rogue skills total --- //
 
 //Rogue armor modifier auto fill
@@ -1464,18 +1459,9 @@ on('change:armorname', function(eventInfo) {
     setAttrs(armorModifiers);
 });
 //Rogue Custom Skills level sum
-on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
-    TAS.repeating('customrogue')
-        .attrs('newskill')
-        .fields('crl')
-        .reduce(function(m,r){
-            m.crl+=(r.I.crl);
-            return m;
-        },{crl:0},function(m,r,a){
-            a.newskill=m.crl;
-        })
-        .execute();
+on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
+    TAS.repeatingSimpleSum('customrogue', 'crl', 'newskill');
 });
 // --- End setup Rogue skills total --- //
 //#endregion
