@@ -1434,12 +1434,9 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 //#region Rogue skills
 // --- Start setup Rogue skills total --- //
 let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
-let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
+let rogueStandardColumns = ['b', 'r', 'd', 'k', 'a', 'm', 'l'];
 rogueStandardSkills.forEach(skill => {
-    setupStaticCalculateTotal(`${skill}t-hidden`, rogueStandardColumns.map(column => `${skill}${column}`));
-    setupStaticCalculateTotal(`${skill}t`, [`${skill}t-hidden`], 95);
-    setupStaticCalculateTotal(`${skill}noarmort`, [`${skill}t-hidden`, `${skill}noarmorb`], 95);
-    setupStaticCalculateTotal(`${skill}armort`, [`${skill}t-hidden`, `${skill}armorp`], 95);
+    setupStaticCalculateTotal(`${skill}t`, rogueStandardColumns.map(column => `${skill}${column}`), 95);
 });
 
 // Setup custom rogue skills total
@@ -1451,18 +1448,18 @@ setupRepeatingRowCalculateTotal('crarmort', ['crt-hidden', 'crarmorp'], 'customr
 
 //Rogue armor modifier auto fill
 on('change:armorname', function(eventInfo) {
-    let armor = rogueArmor[eventInfo.newValue];
+    let armor = ROGUE_ARMOR[eventInfo.newValue];
     if (armor === undefined)
         return;
 
     let armorModifiers = {
-        'pparmorp': armor['Pick Pockets'],
-        'olarmorp': armor['Open Locks'] || '-0',
-        'rtarmorp': armor['Find/Remove Traps'] || '-0',
-        'msarmorp': armor['Move Silently'] || '-0',
-        'hsarmorp': armor['Hide in Shadows'] || '-0',
-        'dnarmorp': armor['Detect Noise'],
-        'cwarmorp': armor['Climb Walls'],
+        'ppa': armor['Pick Pockets'] || '0',
+        'ola': armor['Open Locks'] || '0',
+        'rta': armor['Find/Remove Traps'] || '0',
+        'msa': armor['Move Silently'] || '0',
+        'hsa': armor['Hide in Shadows'] || '0',
+        'dna': armor['Detect Noise'] || '0',
+        'cwa': armor['Climb Walls'] || '0',
     };
     setAttrs(armorModifiers);
 });
