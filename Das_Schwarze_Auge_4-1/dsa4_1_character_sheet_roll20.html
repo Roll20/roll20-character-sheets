@@ -15078,9 +15078,11 @@
 					</div>
 				</td>
 			</tr>
+			{{#rollTotal() showRollTag 1}}
 			<tr>
-				<td>Wurfkennung: {{computed::rollTag}}</td>
+				<td>Folgewurf zu <span class="sheet-abbr" title="Wurfkennung des Ursprungswurfs">{{computed::rollTag}}</span></td>
 			</tr>
+			{{/rollTotal() showRollTag 1}}
 		{{/rollGreater() computed::confirmationRoll 0}}
 {{/rollTotal() computed::isConfirmationRoll 0}}
 {{#rollTotal() computed::isConfirmationRoll 1}}
@@ -15115,9 +15117,11 @@
 				<td>Zwischen dieser Reaktion und dem Ursprungswurf liegt eine lange Zeit (mindestens {{computed::rollTimeHuman}}&nbsp;min). Bitte sicherstellen, dass der richtige Reaktionsknopf benutzt wurde.</td>
 			</tr>
 		{{/rollGreater() computed::rollExpired 0}}
+		{{#rollTotal() showRollTag 1}}
 			<tr>
-				<td>Wurfkennung des Ursprungswurfs: {{computed::rollTag}}</td>
+				<td>Folgewurf zu <span class="sheet-abbr" title="Wurfkennung des Ursprungswurfs">{{computed::rollTag}}</span></td>
 			</tr>
+		{{/rollTotal() showRollTag 1}}
 {{/rollTotal() computed::isConfirmationRoll 1}}
 {{#rollTotal() computed::msg 1}}
 			<tr>
@@ -16626,6 +16630,13 @@ ID      0           1          2         3         4
                 ({{wurf}})
             </td>
         </tr>
+        {{#rollTotal() isOriginalRoll 0}}
+            {{#rollTotal() showRollTag 1}}
+                <tr>
+                    <td>Folgewurf zu <span class="sheet-abbr" title="Wurfkennung des Ursprungswurfs">{{computed::rollTag}}</span></td>
+                </tr>
+            {{/rollTotal() showRollTag 1}}
+        {{/rollTotal() isOriginalRoll 0}}
     </table>
 </div>
 </rolltemplate>
@@ -24813,7 +24824,6 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 	defaultElements.push( { 'name': 'rollTime', 'value': `[[${Date.now()}]]` } );
 	// Roll Tags are short identifiers based on the roll time that are printed in roll templates, if further rolls are possible.
 	// Since every roll of that "chain" will have the same roll tag, all players can verify that the correct roll button was clicked.
-	// TODO: Offer option to hide roll tags ("Wurfkennung").
 	defaultElements.push( { 'name': 'rollTag', 'value': '[[0]]' } );
 
 	// Result Code: -3 (triple 20) to +3 (triple 1)
@@ -25066,6 +25076,7 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 				passthrough["cs"] = cs;
 				passthrough["cf"] = cf;
 				passthrough["isConfirmationRoll"] = 1;
+				passthrough["showRollTag"] = allElementsObject["showRollTag"];
 				passthrough["rollMacro"] =
 					allElements[0]["prefix"] + " " +
 					"{{name=Nahkampfangriff}} " +
@@ -25081,6 +25092,7 @@ on('clicked:k_attacke_waffe-action clicked:k_attacke_schild-action', async (info
 					"{{charactername=" + v["character_name"] + "}} " +
 					"{{result=[[0]]}} " +
 					"{{isConfirmationRoll=[[1]]}} " +
+					"{{showRollTag=[[@{show_roll_tags}]]}} " +
 					"{{rollTag=[[0]]}} " +
 					"{{rollTime=[[0]]}} " +
 					"{{rollExpired=[[0]]}} " +
@@ -25168,6 +25180,8 @@ on('clicked:combat_reaction', async (info) => {
 					"&{template:DSA-Nahkampf-Patzer} " +
 					"{{name=Nahkampfangriffspatzer}} " +
 					"{{wurf=[[2d6cs1cf6]]}} " +
+					"{{isOriginalRoll=[[0]]}} " +
+					"{{showRollTag=[[@{show_roll_tags}]]}} " +
 					"{{rollTag=[[0]]}} " +
 					"{{rollTime=[[0]]}} " +
 					"{{rollExpired=[[0]]}} " +
