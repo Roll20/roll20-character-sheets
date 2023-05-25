@@ -97,10 +97,9 @@ function migrate4_17_0() {
             console.log(`Moving value ${armorValue} from crarmorp to cra`);
             row.I['cra'] = armorValue;
         }, function () {
-            getAttrs(ROGUE_SKILL_COLUMNS.map(s => s+'armorp'), function (values) {
+            getAttrs(ROGUE_STANDARD_SKILLS.map(s => s+'armorp'), function (values) {
                 let newValue = {};
-
-                for (let rogueSkill of ROGUE_SKILL_COLUMNS) {
+                for (let rogueSkill of ROGUE_STANDARD_SKILLS) {
                     let armorValue = values[rogueSkill+'armorp'];
                     let number = parseInt(armorValue) || 0;
                     if (number === 0)
