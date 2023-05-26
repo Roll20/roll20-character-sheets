@@ -552,8 +552,6 @@ on('change:dexterity change:aim change:balance', function() {
                 msd: dexterityTable['balance-movesilently'][balance] || dexterityTable['dex-movesilently'][dexterity],
                 hsd: dexterityTable['dex-hideinshadows'][dexterity],
                 cwd: standardRules ? '0' : dexterityTable['balance-climbwalls'][balance] || dexterityTable['dex-climbwalls'][dexterity],
-                tud: standardRules ? '0' : dexterityTable['dex-tunneling'][dexterity],
-                ebd: standardRules ? '0' : dexterityTable['dex-escapebonds'][dexterity],
                 dexreact: dexterityTable['dexreact'][getLookupValue(balance, dexterity)],
                 dexmissile: dexterityTable['dexmissile'][getLookupValue(aim, dexterity)],
                 dexdefense: dexterityTable['dexdefense'][getLookupValue(balance, dexterity)],
