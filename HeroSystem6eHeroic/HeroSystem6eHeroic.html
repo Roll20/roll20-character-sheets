@@ -5494,10 +5494,13 @@
 			</div>
 
 			<div class="item-options-row">
-				<label class="container-checkbox">
-					<input type="checkbox" name="attr_whisperToGM">
-					<span class="checkmark" title="@{whisperToGM}"></span>
-				</label>
+				<div class="custom-select-skill">
+					<select name="attr_whisperToGM">
+						<option value="" selected>Never</option>
+						<option value="/w GM ">Always</option>
+						<option value="?{Whisper to GM|No,|Yes,/w GM }">Prompt</option>
+					</select>
+				</div>
 				<h1>Whisper Rolls to GM</h1>
 			</div>
 
@@ -5507,7 +5510,7 @@
 				</div>
 				
 				<div class="item-version-information">
-					<input type="text" value="2.0" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+					<input type="text" value="2.1" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 				</div>
 			</div>
 		</div>	
@@ -5844,6 +5847,15 @@
 			version = 1.1;
 		};
 
+		if (version < 2.1) {
+			values = await _getAttrs(["whisperToGM"]);
+			if (values.whisperToGM||0 == "on")
+				attributes.whisperToGM = "/w GM ";
+			else
+				attributes.whisperToGM = "";
+			version = 2.1;
+		}
+
 		if (version != origVersion) {
 			console.log(`Updated ${name} from ${origVersion} to ${version}`);
 			attributes.version = version;
@@ -6102,7 +6114,7 @@
 	// Recover endurance and stun when the recover button in the item-characteristics-health box is clicked.
 	on("clicked:recoverHealth", function () {
 		getAttrs(["endurance","stun","CurrentEND", "CurrentSTUN", "weightEndPenalty", "recovery"], function(values) {
-			var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
+			var theRoll = values.whisperToGM||"";
 			const currentEND = parseInt(values.CurrentEND)||0;
 			const currentSTUN = parseInt(values.CurrentSTUN)||0;
 
@@ -7115,7 +7127,7 @@
 		var powerId = String(num).padStart(2,'0');
 		on("clicked:powerRoll"+powerId, function() {
 			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
-				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
+				var theRoll = values.whisperToGM||"";
 
 				theRoll += "&{template:custom-power-attack} {{title=@{character_name} - @{character_title}}} "
 					+ "{{subtitle= @{powerName"+powerId+"} - @{powerEffect"+powerId+"}}} {{desc=@{powerText"+powerId+"}}} ";
@@ -7416,7 +7428,7 @@
 	characteristics.forEach(characteristic => {
 		on (`clicked:${characteristic}`, (info) => {
 			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
-				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
+				var theRoll = values.whisperToGM||"";
 				var displayName = characteristic.charAt(0).toUpperCase() + characteristic.slice(1);
 	
 				if (values.displayDegreeOfSuccess != 0) {
@@ -7448,7 +7460,7 @@
 		var subtitleExt = (percType != '') ? " - @{perception"+percType+"Label}" : "";
 		on (`clicked:perceptionRoll${percType}`, (info) => {
 			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
-				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
+				var theRoll = values.whisperToGM||"";
 
 				if (values.displayDegreeOfSuccess != 0) {
 					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception"+subtitleExt+" }} "
@@ -7478,7 +7490,7 @@
 		var skillId = String(num).padStart(2,'0');	
 		on(`clicked:testSkill${skillId}`, (info) => {
 			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
-				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
+				var theRoll = values.whisperToGM||"";
 
 				if (values.displayDegreeOfSuccess != 0) {
 					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses @{skillName"+skillId+"}}} "
@@ -8120,7 +8132,7 @@
 		var armorId = String(num).padStart(2,'0');
 		on(`clicked:armorActivation${armorId}`, (info) => {
 			getAttrs(["whisperToGM", "displayDegreeOfSuccess", "armorActivation"+armorId, "armorLocations"+armorId, "totalPD"+armorId, "totalED"+armorId], function(values) {
-				var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
+				var theRoll = values.whisperToGM||"";
 				var actOn = values["armorActivation"+armorId]||18;
 				var locations = values["armorLocations"+armorId]||"";
 				
@@ -8165,7 +8177,7 @@
 		var maneuverId = String(num).padStart(2,'0');	
 		on(`clicked:showMartialRoll${maneuverId}`, (info) => {
 			getAttrs(["whisperToGM"], function(values) {
-				var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
+				var theRoll = values.whisperToGM||"";
 				
 				theRoll += "&{template:custom-show} {{title=@{character_name} - @{character_title}}} "
 					+ "{{subtitle= Martial Maneuver - @{martialManeuverName"+maneuverId+"}}} "
@@ -8456,7 +8468,7 @@
 			
 			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId,
 					"optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
-				var theRoll = values.whisperToGM != 0 ? "/w gm " : "";
+				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = values["weaponAreaEffect"+weaponId] != 0;
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["weaponNormalDamage"+weaponId] != 0;
@@ -8524,7 +8536,7 @@
 		// Roll attack and damage dice for the shield.
 						
 		getAttrs(["shieldNormalDamage", "shieldStunMod", "shieldEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
-			var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
+			var theRoll = values.whisperToGM||"";
 			let useHitLocations = values.optionHitLocationSystem != 0;
 			let isNormalDamage = values.shieldNormalDamage != 0;
 			let stunMod = parseInt(values.shieldStunMod)||0;
@@ -8616,7 +8628,7 @@
 		// Roll attack and damage dice for standardAttack
 
 		getAttrs(["hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
-			var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
+			var theRoll = values.whisperToGM||"";
 			let useHitLocations = values.optionHitLocationSystem != 0;
 
 			let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
@@ -8705,7 +8717,7 @@
 		var talentId = String(num).padStart(2,'0');	
 		on(`clicked:showTalentRoll${talentId}`, (info) => {
 			getAttrs(["whisperToGM"], function(values) {
-				var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
+				var theRoll = values.whisperToGM||"";
 				
 				theRoll += "&{template:custom-show} {{title=@{character_name} - @{character_title}}} "
 					+ "{{subtitle= Perks & Talents - @{talentName"+talentId+"}}} "
@@ -8744,7 +8756,7 @@
 		var complicationId = String(num).padStart(2,'0');	
 		on(`clicked:showComplicationRoll${complicationId}`, (info) => {
 			getAttrs(["whisperToGM"], function(values) {
-				var theRoll = values.whisperToGM != 0 ? "/w GM " : "";
+				var theRoll = values.whisperToGM||"";
 				
 				theRoll += "&{template:custom-show} {{title=@{character_name} - @{character_title}}} "
 					+ "{{subtitle= Complication - @{complicationName"+complicationId+"}}} "
