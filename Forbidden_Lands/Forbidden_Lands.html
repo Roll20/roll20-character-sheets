@@ -21,10 +21,13 @@
   <span class="announcements-show toggle-monster-only" name="attr_version">&nbsp;</span>
   <div class="announcements toggle-monster-only">
     <h3 data-i18n="latest-announcements">Latest Announcements</h3>
-    <span class="footer">5/24/23</span>
+    <span class="footer">5/25/23</span>
     <ol style="margin: 0 2em 0 2em; padding: 0 1em 0 3em;">
       <span>v1.82</span>
       <li>Fixed a bug where the localized "Roll" button popover could prevent pre-loading the dice pool.</li>
+      <li>Fixed a bug with Negative Dice where negative dice would not be included in the roll unless they were the last dice selected in the pool.</li>
+      <li>Expanded the Talent and Spell ranks selector up to 6. Should allow more flexibility for homebrew/expansion rules.</li>
+      <li>Added repeating rows to Stronghold notes.</li>
       <li>Roll template: Added {{subtitle2}} ie Subtitle without quotes.
       <li>Roll template: Added {{free-text-center}} and {{free-text-right}} ie Should allow a little more flexibility for macros.</li>
       <li>Removed an errant extra space that was pushing the last Misc+/- modifier to a new line in the roll template.</li>
@@ -2166,6 +2169,9 @@
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
               </select>
               <!-- expand 2nd row -->
               <textarea class="talents-box4 input-textarea" name="attr_talent_description" title="@{repeating_talents_$X_talent_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
@@ -3046,6 +3052,8 @@
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
               </select>
               <input class="spells-box3 input" type="number" name="attr_spell_willpower" value="1" min="1" title="@{repeating_spells_$X_spell_willpower}" />
               <select class="spells-box4 input" name="attr_spell_range" title="@{repeating_spells_$X_spell_range}">
@@ -3244,8 +3252,13 @@
         <div class="stronghold-notes-box1 header">
           <h1 data-i18n="stronghold-notes-u">STRONGHOLD NOTES</h1>
         </div>
-        <textarea class="stronghold-stronghold_notes-box2 input-textarea" name="attr_stronghold_notes" title="@{stronghold_notes}"></textarea>
+        <textarea class="stronghold-notes-box2 input-textarea" name="attr_stronghold_notes" title="@{stronghold_notes}"></textarea>
       </div>
+      <fieldset class="repeating_stronghold_notes">
+        <div class="stronghold-notes-grid">
+          <textarea class="stronghold-notes-box2 input-textarea" name="attr_stronghold_note" title="@{repeating_stronghold_notes_$X_stronghold_note}"></textarea>
+        </div>
+      </fieldset>
     </div>
   </div>
 </div>
@@ -4709,6 +4722,7 @@
   });
 
   /* Wes's Dice Pool */
+  // need to know the max pool size for each type, and whether negative dice should be in the pool.
   const pools = {
     attribute: {
       max: 12,
@@ -4723,13 +4737,15 @@
       negative: 0,
     },
   };
-  // need to know the max pool size for each type, and whether negative dice should be in the pool.
+  // need to convert numbers 1-12 to text. index 0 is "", as its not needed.
   const numbers = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
-  // need to convert numbers 1-12 to text. left index 0 empty, as its not needed.
   Object.keys(pools).forEach((which) => {
     on(`change:${which}`, function () {
-      getAttrs([which], function (values) {
+      getAttrs([which, 'skill'], function (values) {
         const score = Math.min(pools[which].max, int(values[which]));
+        const negativeDice = values.skill < 0 ? values.skill : 0;
+        // clog(`~~~ NEGATIVE DICE: ${negativeDice}`);
+
         const settings = {};
         // loop through numbers from 1 to the pool's max, and enter a value of 1 if less < pool value, or 0 otherwise.
         for (let d = 1; d <= pools[which].max; d++) {
@@ -4742,8 +4758,8 @@
         // need to check negative dice, and compare score
         // negative dice are set to zero. They are set to 1 only if pools.negative > 0, score is below zero, and absolute value of score is below 1-3.
         for (let n = 1; n <= 3; n++) {
-          settings[`negative_die_${numbers[n]}`] = pools[which].negative && score < 0 && n <= Math.abs(score) ? 1 : 0;
-
+          // settings[`negative_die_${numbers[n]}`] = pools[which].negative && score < 0 && n <= Math.abs(score) ? 1 : 0;
+          settings[`negative_die_${numbers[n]}`] = negativeDice && n <= Math.abs(negativeDice) ? 1 : 0;
           clog(
             `Negative dice are being evaluated. |pools.negative value=${pools[which].negative} |Skill score=${score} |n=${n} |abs of score=${Math.abs(score)} |include negative die=${
               settings[`negative_die_${numbers[n]}`]
