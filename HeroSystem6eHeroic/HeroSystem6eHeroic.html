@@ -8535,29 +8535,47 @@
 			let dmgType = isNormalDamage ? "STUN" : "BODY";
 			let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 
-			// If isNormalDamage is TRUE, use the Normal Damage template.
-			theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}}} ";
+			theRoll += "?{Blocking|Yes,";
+			// This is nested queries so we need to use &rbrace; for } and &#124; for |
+
+			// Blocking Roll
+			theRoll += "&{template:custom&rbrace; {{title=@{character_name} - @{character_title}&rbrace;&rbrace; "
+					+ "{{subtitle=Blocks with @{shieldName}&rbrace;&rbrace; ";
 			if (dispDoS) {
-				theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-[[abs(?{Blocking|Yes,1|No,-1}-1)/2*@{targetOCVpenalty}]][TargetOCV]+[[?{Blocking}*@{shieldDCV}]][ShieldDCV]+?{Modifiers|0}[Modifier]]]}} ";
+				theRoll	+= "{{vs OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]+@{shieldDCV}[ShieldDCV]+?{Modifiers&#124;0&rbrace;[Modifier]]]&rbrace;&rbrace; ";
 			} else {
-				theRoll += "{{OCV=[[@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-[[abs(?{Blocking|Yes,1|No,-1}-1)/2*@{targetOCVpenalty}]][TargetOCV]+[[?{Blocking}*@{shieldDCV}]][ShieldDCV]+?{Modifiers|0}[Modifier]]]}} "
-					+ "{{Result=[[3d6cf6cs1]]}}";
+				theRoll += "{{OCV=[[@{ocv}[OCV]+@{shieldOCV}[Shield OCV]+@{shieldDCV}[ShieldDCV]+?{Modifiers&#124;0&rbrace;[Modifier]]]&rbrace;&rbrace; "
+					+ "{{Result=[[3d6cf6cs1]]&rbrace;&rbrace; ";
 			}
-			theRoll += (subtractENDAmt ? "{{END=[[[[abs(?{Blocking}-1)/2]][Blocking]*@{shieldEndurance}[Endurance Cost]]] (@{currentEND})}} " : "")
-					+ "{{"+dmgType+"=[[@{hiddenShieldDamage01}]]}} "
-					+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
+
+			// The second option in the nested query
+			theRoll += "|No,";
+
+			// Attacking Roll
+			theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack&rbrace; {{title=@{character_name} - @{character_title}&rbrace;&rbrace; "
+					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}&rbrace;&rbrace; ";
+			if (dispDoS) {
+				theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-@{targetOCVpenalty}[TargetOCV]-@{shieldDCV}[ShieldDCV]+?{Modifiers&#124;0&rbrace;[Modifier]]]&rbrace;&rbrace; ";
+			} else {
+				theRoll += "{{OCV=[[@{ocv}[OCV]+@{shieldOCV}[Shield OCV]-@{targetOCVpenalty}[TargetOCV]-@{shieldDCV}[ShieldDCV]+?{Modifiers&#124;0&rbrace;[Modifier]]]&rbrace;&rbrace; "
+					+ "{{Result=[[3d6cf6cs1]]&rbrace;&rbrace; ";
+			}
+			theRoll += (subtractENDAmt ? "{{END=[[@{shieldEndurance}[Endurance Cost]]] (@{currentEND})&rbrace;&rbrace; " : "")
+					+ "{{"+dmgType+"=[[@{hiddenShieldDamage01}]]&rbrace;&rbrace; "
+					+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]&rbrace;&rbrace;";
 			if (useHitLocations)
-				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
+				theRoll += " {{HITLOC=[[@{targetHitRoll}]]&rbrace;&rbrace;";
+
+			// End Nested Query
+			theRoll += "}";
 
 			startRoll(theRoll, (results) => {
 				let theMessage = "AOE";
 				let theSTUNMultiplier = Math.floor(Math.random()*3+1);
-				let computed = parseInt(results.results[dmgType].result)||0;
+				let computed = parseInt(results.results[dmgType]?.result)||0;
 
-				// Little hacky get whether or not the person is blocking.
-				let regex = /\+(-?\d+)\[ShieldDCV\]/g
-				let isBlocking = parseInt(regex.exec(results.results[(dispDoS ? "Hit DCV" : "OCV")].expression)) > 0;
+				// No Damage Sections for Blocking
+				let isBlocking = results.results.STUN == undefined;
 
 				// Get hit location message if system used.
 				if (useHitLocations && !isBlocking) {
@@ -8566,7 +8584,7 @@
 					theSTUNMultiplier = theHitLocation.STUNx;
 				}
 
-				if (isNormalDamage) {
+				if (isNormalDamage && !isBlocking) {
 					// Convert dice roll to equivalent BODY damage.
 					computed = convertStunToBody(results.results.STUN.rolls);
 				} else {
@@ -8574,7 +8592,7 @@
 					computed *= theSTUNMultiplier;
 
 					if (theSTUNMultiplier != 1)
-						computed = String(computed) + " (x" + theSTUNMultiplier + " included)";
+						computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
 				}
 
 				let theResult = new Object();
@@ -8582,10 +8600,6 @@
 				if (!isBlocking) {
 					theResult[otherDmgType] = computed;
 					theResult.HITLOC = theMessage;
-				} else {
-					theResult.STUN = "BLOCK";
-					theResult.BODY = "BLOCK";
-					theResult.HITLOC = "vs. OCV";
 				}
 					
 				// Subtract END cost if option checked.
