@@ -129,7 +129,7 @@
                     </div>
                     <div class="sheet-atuais">
                         <label class="sheet-pv-pe-span">Atuais</label>
-                        <input type="text" name="attr_pvatuais">
+                        <input type="text" name="attr_peatuais">
                     </div>
                 </div>
                 <!-- DEF SAN-->
@@ -166,6 +166,22 @@
                             <label class="sheet-pv-pe-span">Atuais</label>
                             <input type="text" name="attr_sanatual">
                         </div>
+                    </div>
+                </div>
+
+                <!-- Esquiva / Bloqueio -->
+                <div class="sheet-esquiv-block">
+                    <div class="sheet-esquiva">
+                        <span>ESQUIVA</span>
+                        <input type="text" name="attr_esquiva" readonly="1" value="0">
+                        <div class="signal">+</div>
+                        <input type="text" name="attr_esquivabonus" value="0">
+                    </div>
+                    <div class="sheet-bloqueio">
+                        <span>BLOQUEIO</span>
+                        <input type="text" name="attr_bloqueio" readonly="1" value="0">
+                        <div class="signal">+</div>
+                        <input type="text" name="attr_bloqueiobonus" value="0">
                     </div>
                 </div>
 
@@ -1070,7 +1086,7 @@
                                 <!-- Ataques -->
                                 <fieldset class="repeating_attacks"> 
                                     <div class="attacksgrid">
-                                        <button type="roll" name="attr_roll_attack" class="buttonrollataque dado-simples" value="&{template:ordem-paranormal-attack}{{character=@{character_name}}}{{attackname=@{nomeataque}}}{{attackroll=[[1d20cs>@{margemcriticoataque}+[[@{ataquepericia}]]+@{bonusataque}]]}} {{damageroll=[[@{danoataque}+@{modatributodano}+@{danoextraataque}]]}} {{criticaldamageroll=[[@{danocriticoataque}+@{dadoextraataque}+@{modatributodano}]]}}{{typeofdamage=@{ataquetipodedano}}}{{description=@{ataquedescricao}}}">T</button> 
+                                        <button type="roll" name="attr_roll_attack" class="buttonrollataque dado-simples" value="&{template:ordem-paranormal-attack}{{character=@{character_name}}}{{attackname=@{nomeataque}}}{{attackroll=[[1d20kh1cs>@{margemcriticoataque}+[[@{lutatreino} + @{lutaoutros}]]+0]]}} {{damageroll=[[@{danoataque}+@{modatributodano}+@{danoextraataque}]]}} {{criticaldamageroll=[[@{danocriticoataque}+@{dadoextraataque}+@{modatributodano}]]}}{{typeofdamage=@{ataquetipodedano}}}{{description=@{ataquedescricao}}}">T</button> 
                                         <input name="attr_nomeataque" type="text" spellcheck="false" class="" value="">
                                         <input name="attr_bonusataque" type="text" spellcheck="false" class="" value="0">
                                         <input name="attr_danoataque" type="text" spellcheck="false" class="" value="0">
@@ -1228,7 +1244,7 @@
                         </div>
                         <div>
                             <span>HISTÓRICO</span>
-                            <textarea name="attr_background"></textarea>
+                            <textarea name="attr_history"></textarea>
                         </div>
                         <div>
                             <span>OBJETIVO</span>
@@ -1802,6 +1818,38 @@ on("sheet:opened change:agi change:defequip change:defoutros", function(e){
         setAttrs({["defense"]: defesa_total});
     });
 });
+
+//ESQUIVA E BLOQUEIO
+on("sheet:opened change:defense change:reflexosoutros change:agi change:fortitudeoutros change:vig change:fortitudetreino change:reflexostreino change:esquivabonus change:bloqueiobonus", function(e){
+    getAttrs(["esquiva", "bloqueio", "reflexosoutros", "fortitudeoutros", "esquivabonus", "reflexosbonus", "vig", "agi", "fortitudetreino", "reflexostreino", "defense", "bloqueiobonus"], function(x){
+        console.log("Entrou");
+        let fort_train = isNaN(parseInt(x["fortitudetreino"])) ? 0 : parseInt(x["fortitudetreino"]);
+        let for_others = isNaN(parseInt(x["fortitudeoutros"])) ? 0 : parseInt(x["fortitudeoutros"]);
+        let reflex_train = isNaN(parseInt(x["reflexostreino"])) ? 0 : parseInt(x["reflexostreino"]);
+        let reflex_others = isNaN(parseInt(x["reflexosoutros"])) ? 0 : parseInt(x["reflexosoutros"]);
+        let final_def = isNaN(parseInt(x["defense"])) ? 0 : parseInt(x["defense"]);
+
+        let block_bonus = isNaN(parseInt(x["bloqueiobonus"])) ? 0 : parseInt(x["bloqueiobonus"]);
+        let evade_bonus = isNaN(parseInt(x["esquivabonus"])) ? 0 : parseInt(x["esquivabonus"]);
+
+        console.log(reflex_train, reflex_others);
+
+        if(fort_train > 0){
+            let bloqueio_final = for_others + fort_train + block_bonus;
+            setAttrs({["bloqueio"]: bloqueio_final});
+        } else {
+            setAttrs({["bloqueio"]: 0});
+        }
+
+        if(reflex_train > 0){
+            let esquiva_final = reflex_train + reflex_others + evade_bonus + final_def;
+            setAttrs({["esquiva"]: esquiva_final});
+        } else {
+            setAttrs({["esquiva"]: 0});
+        }
+    });
+});
+
 
 //DT
 on("sheet:opened change:pre change:perodada", function(e){
