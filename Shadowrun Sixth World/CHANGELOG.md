@@ -1,6 +1,14 @@
 Change Log
 ==============================================
-**2023-03-27 ** v.79 Chuz (James Culp)
+**2023-05-22 ** v.81 Chuz (James Culp)
+	Bugfix - More weapon dicepool tweaks
+	New Feature - NPC->Spirits made spirits awakened and now display the spells section for them.  Dicepool does not auto-update when spirit force changes, that is an exercise for the user.
+	New Feature - Added Critter Powers drag and drop from the compendium for spirits and grunts.
+**2023-05-18 ** v.80 Chuz (James Culp)
+	Bugfix - PC Qualities were always showing up as Negative regardless of the actual type.
+	Bugfix - PC->Spells Ranges of Touch were showing up as LOS.
+	Bugfix - PC/NPC Defense rolls throwing an error for the armor_rating, updated PC sheets to use defense_rating so they match NPC sheets.
+**2023-05-01 ** v.79 Chuz (James Culp)
 	New Feature - Added Resonance and Level to the sprite skill rolls attribute options
 	New Feature - Added Magic and Force to the spirit skill rolls attribute options
 	New Feature - Added Magic AR to combat spell roll templates
