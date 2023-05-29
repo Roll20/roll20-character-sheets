@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2023-05-30 ** v.82 Chuz (James Culp)
+	
 **2023-05-22 ** v.81 Chuz (James Culp)
 	Bugfix - More weapon dicepool tweaks
 	New Feature - NPC->Spirits made spirits awakened and now display the spells section for them.  Dicepool does not auto-update when spirit force changes, that is an exercise for the user.
