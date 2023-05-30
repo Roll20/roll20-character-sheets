@@ -21740,7 +21740,7 @@ function safeSetAttrs( attrsToSet, options = "", callback = function() {}) {
 */
 function DSAsane (value, type) {
 	var func = "DSAsane";
-	var errors = false;
+	var sane = true;
 
 	function limitedIntValid(value, minimum, maximum) {
 		if (isNaN(value)
@@ -21760,7 +21760,7 @@ function DSAsane (value, type) {
 			// Must be integer in range [0, 99]
 			if (!limitedIntValid(value, 0, 99)) {
 				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
-				errors = true;
+				sane = false;
 			}
 			break;
 		case "wound-box":
@@ -21769,7 +21769,7 @@ function DSAsane (value, type) {
 			// Must be integer in range [0, 1]
 			if (!limitedIntValid(value, 0, 1)) {
 				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
-				errors = true;
+				sane = false;
 			}
 			break;
 		case "ini-mod-weapon":
@@ -21778,7 +21778,7 @@ function DSAsane (value, type) {
 			// Must be integer in range [-9, 9]
 			if (!limitedIntValid(value, -9, 9)) {
 				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
-				errors = true;
+				sane = false;
 			}
 			break;
 		case "encumbrance":
@@ -21787,13 +21787,30 @@ function DSAsane (value, type) {
 			// Must be integer in range [0, 99]
 			if (!limitedIntValid(value, 0, 99)) {
 				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
-				errors = true;
+				sane = false;
+			}
+			break;
+		case "melee-combat-technique":
+			// Limited set of combat techniques to choose from
+			// Must be within the set
+			const meleeCombatTechniques = [
+			    "anderthalbhander", "dolche",              "fechtwaffen",
+			    "hiebwaffen",       "infanteriewaffen",    "kettenstabe",
+			    "kettenwaffen",     "lanzenreiten",        "peitsche",
+			    "raufen",           "ringen",              "sabel",
+			    "schwerter",        "speere",              "stabe",
+			    "zweihandflegel",   "zweihand-hiebwaffen", "zweihandschwerter"
+			];
+			const stringValue = String(value);
+			if (meleeCombatTechniques.includes(stringValue.toLowerCase()) === false) {
+				debugLog(func, "Value '" + stringValue + "' check against type '" + type + "' failed.");
+				sane = false;
 			}
 			break;
 		default:
 			debugLog(func, "type '", type, "' not understood.");
 	}
-	return !errors;
+	return sane;
 }
 
 /*
