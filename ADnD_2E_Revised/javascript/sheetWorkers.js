@@ -527,34 +527,36 @@ on('change:dexterity change:aim change:balance', function() {
             return;
         }
 
-        let aim = getLookupValue(aimRaw, '');
-        let balance = getLookupValue(balanceRaw, '');
+        let aim = getLookupValue(aimRaw, dexterity);
+        let balance = getLookupValue(balanceRaw, dexterity);
 
         let dexnotes;
         let dex2notes;
         let standardRules = false;
         if (aimRaw === '' && balanceRaw === '') {
-            dexnotes = '';
+            dexnotes = dexterityTable['dexnotes'][dexterity];
             dex2notes = '';
             standardRules = true;
         } else {
-            dexnotes = aim === 0 ? 'INVALID AIM' : '';
-            dex2notes = balance === 0 ? 'INVALID BALANCE' : '';
+            dexnotes = aim === 0 ? 'INVALID AIM' : dexterityTable['dexnotes'][aim];
+            dex2notes = balance === 0 ? 'INVALID BALANCE' : dexterityTable['dexnotes'][balance];
         }
 
         assignAttributes(dexterity, aim, balance, dexnotes, dex2notes, standardRules);
 
         function assignAttributes(dexterity, aim, balance, dexnotes, dex2notes, standardRules) {
             setAttrs({
-                ppd: dexterityTable['aim-pickpocket'][aim] || dexterityTable['dex-pickpocket'][dexterity],
-                old: dexterityTable['aim-openlocks'][aim] || dexterityTable['dex-openlocks'][dexterity],
-                rtd: dexterityTable['dex-findtraps'][dexterity],
-                msd: dexterityTable['balance-movesilently'][balance] || dexterityTable['dex-movesilently'][dexterity],
-                hsd: dexterityTable['dex-hideinshadows'][dexterity],
-                cwd: standardRules ? '0' : dexterityTable['balance-climbwalls'][balance] || dexterityTable['dex-climbwalls'][dexterity],
-                dexreact: dexterityTable['dexreact'][getLookupValue(balance, dexterity)],
-                dexmissile: dexterityTable['dexmissile'][getLookupValue(aim, dexterity)],
-                dexdefense: dexterityTable['dexdefense'][getLookupValue(balance, dexterity)],
+                ppd: dexterityTable['pickpocket'][aim],
+                old: dexterityTable['openlocks'][aim],
+                rtd: dexterityTable['findtraps'][aim],
+                msd: dexterityTable['movesilently'][balance],
+                hsd: dexterityTable['hideinshadows'][balance],
+                cwd: standardRules ? '0' : dexterityTable['climbwalls'][balance],
+                tud: dexterityTable['tunneling'][dexterity],
+                ebd: dexterityTable['escapebonds'][dexterity],
+                dexreact: dexterityTable['dexreact'][balance],
+                dexmissile: dexterityTable['dexmissile'][aim],
+                dexdefense: dexterityTable['dexdefense'][balance],
                 dexnotes: dexnotes,
                 dex2notes: dex2notes,
             });

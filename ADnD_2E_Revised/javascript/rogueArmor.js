@@ -1,22 +1,26 @@
 ﻿const ROGUE_ARMOR = {};
 // Thief armor
 ROGUE_ARMOR['No Armor'] = {
-    'Pick Pockets'      : '5',
-    'Open Locks'        : '0',
-    'Find/Remove Traps' : '0',
-    'Move Silently'     : '10',
-    'Hide in Shadows'   : '5',
-    'Detect Noise'      : '0',
-    'Climb Walls'       : '10',
+    'Pick Pockets'     : '5',
+    'Open Locks'       : '0',
+    'Find/Remove Traps': '0',
+    'Move Silently'    : '10',
+    'Hide in Shadows'  : '5',
+    'Detect Noise'     : '0',
+    'Climb Walls'      : '10',
+    'Tunneling'        : '10',
+    'Escape bonds'     : '5',
 }
 ROGUE_ARMOR['Leather Armor'] = {
-    'Pick Pockets'      : '0',
-    'Open Locks'        : '0',
-    'Find/Remove Traps' : '0',
-    'Move Silently'     : '0',
-    'Hide in Shadows'   : '0',
-    'Detect Noise'      : '0',
-    'Climb Walls'       : '0',
+    'Pick Pockets'     : '0',
+    'Open Locks'       : '0',
+    'Find/Remove Traps': '0',
+    'Move Silently'    : '0',
+    'Hide in Shadows'  : '0',
+    'Detect Noise'     : '0',
+    'Climb Walls'      : '0',
+    'Tunneling'        : '0',
+    'Escape bonds'     : '0',
 }
 ROGUE_ARMOR['Padded Armor'] = ROGUE_ARMOR['Studded Leather'] = {
     'Pick Pockets'     : '-30',
@@ -26,6 +30,8 @@ ROGUE_ARMOR['Padded Armor'] = ROGUE_ARMOR['Studded Leather'] = {
     'Hide in Shadows'  : '-20',
     'Detect Noise'     : '-10',
     'Climb Walls'      : '-30',
+    'Tunneling'        : '-10',
+    'Escape bonds'     : '-5',
 };
 ROGUE_ARMOR['Elven Chain Mail'] = {
     'Pick Pockets'     : '-20',
@@ -35,6 +41,8 @@ ROGUE_ARMOR['Elven Chain Mail'] = {
     'Hide in Shadows'  : '-10',
     'Detect Noise'     : '-5',
     'Climb Walls'      : '-20',
+    'Tunneling'        : '-5',
+    'Escape bonds'     : '-5',
 };
 ROGUE_ARMOR['Silenced Elven Chain Mail'] = {
     'Pick Pockets'     : '-25',
