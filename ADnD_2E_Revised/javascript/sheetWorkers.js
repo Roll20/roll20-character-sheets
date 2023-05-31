@@ -390,7 +390,7 @@ const setupStaticCalculateTotal = function(totalField, fieldsToSum, maxValue) {
                 maxValueInt = parseInt(values[maxValue])
 
             if (!isNaN(maxValueInt))
-                total = Math.min(total, maxValue);
+                total = Math.min(total, maxValueInt);
 
             setAttrs({
                 [totalField]: total
