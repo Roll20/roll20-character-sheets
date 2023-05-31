@@ -12372,7 +12372,7 @@
 				<span class="grid-label sheet-hideable-parry-weapon-active">Parierwaffe</span>
 				<div class="flex-container flex-container-melee-head sheet-hideable-parry-weapon-active">
 					<div><span name="attr_shield_name"></span></div>
-					<div>AT: <span title="Angriffe mit der Parierwaffe (noch) nicht implementiert.">X</span></div>
+					<div>AT: <span name="attr_parryweapon_at"></span></div>
 					<div>PA: <span name="attr_parryweapon_pa"></span></div>
 					<div>TP(A): <span name="attr_shield_tp"></span></div>
 					<div>TP/KK: <span name="attr_shield_tpkk"></span></div>
@@ -19446,6 +19446,7 @@ function calculateCombatValues() {
                 "PA_Aktiv": 0,
                 "PA_Aktiv_TaW": "0",
                 "shield_pa": 0,
+                "parryweapon_at": 0,
                 "parryweapon_pa": 0,
                 "shield_pa_available": "0",
                 "parryweapon_pa_available": "0"
@@ -19487,6 +19488,7 @@ function calculateCombatValues() {
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tp");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tpkk");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_combat_technique");
         }
 
         safeGetAttrs(variablesToGet, function(values) {
@@ -19581,8 +19583,9 @@ function calculateCombatValues() {
                 attrsToChange["PA_Aktiv_TaW"] = taw;
             }
 
-            // Berechne Schild-PA Wert
+            // Berechne Schild-PA und Parierwaffen-AT (Annahme: Kampf mit "falscher" Hand)
             var shieldPa = 0;
+            var parryweaponAT = 0;
             var parryweaponPa = 0;
             // natürlich nur, wenn ein Schild aktiv ist (Siehe WdS S. 70)
             if (activeShieldRowId) {
@@ -19619,6 +19622,27 @@ function calculateCombatValues() {
                     // Zuletzt: Addiere den PA-Modifikator des Schildes
                     shieldPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
                 } else if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "parryweapon") {
+                    // Parierwaffen-AT besteht aus: AT der Kampftechnik + AT-WM der Waffe + Wundmod. + BE-Mod
+                    // TODO: Spezialisierungen beachten
+                    var parryWeaponCombatTechnique = values["repeating_shields_" + activeShieldRowId + "_combat_technique"];
+                    if (DSAsane(parryWeaponCombatTechnique, "melee-combat-technique")) {
+                        var AT = 0;
+
+                        // Suche nach der richtigen Schreibweise des Attributnamens ...
+                        AT = parseInt(values["AT_" + parryWeaponCombatTechnique]);
+                        if (isNaN(AT)) {
+                            AT = parseInt(values["AT_" + parryWeaponCombatTechnique.toLowerCase()])
+                        }
+
+                        var atMod = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
+
+                        var atValue =
+                            AT + atMod
+                            + values["AT_mod_wounds"]
+                            - parseInt(values["be_at_mod"]);
+                        attrsToChange["parryweapon_at"] = atValue;
+                    }
+
                     var parierwaffen1 = values["sf_parierwaffenI"];
                     var parierwaffen2 = values["sf_parierwaffenII"];
                     // Basis für Parierwaffen-PA ist die PA der Hauptwaffe
@@ -20758,6 +20782,7 @@ const defaultValues = {
 	"ftp_w_aktiv": 1,
 
 	/// Shields and Parry Weapons
+	"parryweapon_at": 0,
 	"parryweapon_pa": 0,
 	"parryweapon_pa_available": "0",
 
