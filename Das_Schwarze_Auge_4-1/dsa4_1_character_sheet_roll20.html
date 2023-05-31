@@ -19019,7 +19019,7 @@ function migrateTo20210413(migrationChain) {
 		    let attrsToChange = {};
 
 		    for (var i = 1; i <= 4; i++) {
-		        attrsToChange["NKW" + i + "_SB"] = calculateTpKKMod(values, i);
+		        attrsToChange["NKW" + i + "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, i);
 		    }
 
 		    let result = calculateShieldAttack(values, activeShieldRowId);
@@ -19692,7 +19692,7 @@ function calculateCombatValues() {
                 var TPKK = new Object();
                 TPKK["Schwellenwert"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[1]);
                 TPKK["Schritt"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[2]);
-                shieldparrytpkk = calculateTpKKMod(
+                shieldparrytpkk = calculateTpKKModFromValuesAndWeaponNumber(
                     {
                         "KK": values["KK"],
                         "NKW-schild_SchwellenwertKK": TPKK["Schwellenwert"],
@@ -20363,7 +20363,7 @@ on(
         let attrsToChange = {};
         for (var i = 0; i < weaponsToCalculate.length; i++) {
             let weapon = weaponsToCalculate[i];
-            attrsToChange["NKW" + weapon +  "_SB"] = calculateTpKKMod(values, weapon);
+            attrsToChange["NKW" + weapon +  "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, weapon);
         }
         safeSetAttrs(attrsToChange);
     })
@@ -20419,19 +20419,43 @@ Str. Dif. Flo. Res.
  16    6    2    2
 
 */
-function calculateTpKKMod(values, weapon) {
+
+// Special version
+function calculateTpKKModFromValuesAndWeaponNumber(values, weapon) {
+    const func = "calculateTpKKModFromValuesAndWeaponNumber";
     let KK = parseInt(values["KK"]);
-    let weaponKK = parseInt(values["NKW" + weapon + "_SchwellenwertKK"]);
-    let threshold = parseInt(values["NKW" + weapon + "_Schwellenwert"]);
+    let threshold = parseInt(values["NKW" + weapon + "_SchwellenwertKK"]);
+    let step = parseInt(values["NKW" + weapon + "_Schwellenwert"]);
 
-    let kkDifference = KK - weaponKK;
-
-    var tpkkMod = Math.floor(Math.abs(kkDifference) / threshold);
-
-    if (kkDifference < 0) {
-        tpkkMod = tpkkMod * -1;
-    }
+    var tpkkMod = calculateTpKKMod(KK, threshold, step);
     return tpkkMod;
+}
+
+// General version
+function calculateTpKKMod(KK, threshold, step) {
+	const func = "calculateTpKKMod";
+	var tpkkMod = 0;
+	if (!DSAsane(KK, "stat")) {
+		tpkkMod = 0;
+		debugLog(func, "KK not sane. TP/KK modifier set to 0.");
+	}
+	if (!DSAsane(threshold, "stat")) {
+		tpkkMod = 0;
+		debugLog(func, "Weapon's KK requirement not sane. TP/KK modifier set to 0.");
+	}
+	if (isNaN(parseInt(step))) {
+		tpkkMod = 0;
+		debugLog(func, "Weapon's damage step not sane. TP/KK modifier set to 0.");
+	}
+
+	var kkDifference = KK - threshold;
+	tpkkMod = Math.floor(Math.abs(kkDifference) / step);
+
+	// Lower damage points if too weak
+	if (kkDifference < 0) {
+		tpkkMod = -tpkkMod;
+	}
+	return tpkkMod;
 }
 
 // calculate shield attack modifier
