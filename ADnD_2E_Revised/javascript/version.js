@@ -87,6 +87,7 @@ function moveStaticToRepeating(section, fieldsToMove) {
 function migrate4_17_0() {
     console.log('Migrate to v4.17.0');
 
+    calculateFormula('rogue-level-base', 'rogue-level-total');
     TAS.repeating('customrogue')
         .fields('cra','crarmorp')
         .each(function (row) {

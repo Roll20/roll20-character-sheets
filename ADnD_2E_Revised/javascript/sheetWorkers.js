@@ -371,15 +371,25 @@ const repeatingCalculateRemainingRecursive = function (tail, accumulator, result
 
 //#region Generic Setup functions
 const setupStaticCalculateTotal = function(totalField, fieldsToSum, maxValue) {
-    let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
+    let fieldsToRead = structuredClone(fieldsToSum);
+    let maxIsField = typeof maxValue === 'string';
+    if (maxIsField) {
+        fieldsToRead.push(maxValue);
+    }
+
+    let onChange = fieldsToRead.map(field => `change:${field}`).join(' ');
     on(onChange, function () {
-        getAttrs(fieldsToSum, function (values) {
+        getAttrs(fieldsToRead, function (values) {
             let total = 0;
             fieldsToSum.forEach(field => {
                 total += parseInt(values[field]) || 0;
             });
 
-            if (!isNaN(maxValue))
+            let maxValueInt = maxValue;
+            if (maxIsField)
+                maxValueInt = parseInt(values[maxValue])
+
+            if (!isNaN(maxValueInt))
                 total = Math.min(total, maxValue);
 
             setAttrs({
@@ -862,7 +872,7 @@ on('clicked:opendoor-check', function (eventInfo){
 //#endregion
 
 const CALCULATION_FIELDS = [
-    { formulaField: 'rogue-level-base'},
+    { formulaField: 'rogue-level-base',      calculatedField: 'rogue-level-total'},
     { formulaField: 'level-wizard'},
     { formulaField: 'level-priest'},
     { formulaField: 'thac0-base',            calculatedField: 'thac0-base-calc' },
@@ -1434,12 +1444,34 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 //#region Rogue skills
 // --- Start setup Rogue skills total --- //
 const ROGUE_STANDARD_SKILLS = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
+const ROGUE_EXTRA_SKILLS = ['dm', 'di', 'br', 'tu', 'eb', 'fd', 'ap'];
 const ROGUE_SKILL_COLUMNS = ['b', 'r', 'd', 'k', 'a', 'm', 'l'];
-ROGUE_STANDARD_SKILLS.forEach(skill => {
-    setupStaticCalculateTotal(`${skill}t`, ROGUE_SKILL_COLUMNS.map(column => `${skill}${column}`), 95);
+ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).forEach(skill => {
+    let maxValue = 95;
+    if (skill === 'ms' || skill === 'hs')
+        maxValue = 'rogue-ranger';
+    setupStaticCalculateTotal(`${skill}t`, ROGUE_SKILL_COLUMNS.map(column => `${skill}${column}`), maxValue);
 });
 setupRepeatingRowCalculateTotal('customrogue', ROGUE_SKILL_COLUMNS.map(column => `cr${column}`), 'crt', 95);
 // --- End setup Rogue skills total --- //
+
+//Rogue sum skill points
+let rogueLevelAttributes = ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).map(skill => skill+'l');
+on(`${rogueLevelAttributes.map(s => 'change:'+s).join(' ')} change:rogue-level-total change:repeating_customrogue:crl remove:repeating_customrogue`, function(){
+    TAS.repeating('customrogue')
+        .attrs([...rogueLevelAttributes, 'all-thief-points-remain', 'rogue-level-total'])
+        .fields('crl')
+        .reduce(function (memo, row, attrSet, id, rowSet) {
+            memo += row.I['crl'];
+            return memo;
+        }, 0, function(memo, rowSet, attrSet) {
+            rogueLevelAttributes.forEach(attr => {
+                memo += attrSet.I[attr];
+            })
+            attrSet.I['all-thief-points-remain'] = attrSet.I['rogue-level-total'] - memo;
+        })
+        .execute();
+});
 
 //Rogue armor modifier auto fill
 on('change:armorname', function(eventInfo) {
@@ -1458,12 +1490,6 @@ on('change:armorname', function(eventInfo) {
     };
     setAttrs(armorModifiers);
 });
-//Rogue Custom Skills level sum
-
-on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
-    TAS.repeatingSimpleSum('customrogue', 'crl', 'newskill');
-});
-// --- End setup Rogue skills total --- //
 //#endregion
 
 //#region Weapons tab logic and autofil
