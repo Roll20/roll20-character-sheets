@@ -90,7 +90,7 @@ Along the top is an accounting of your carried weight and DCV and movement penal
 
 ![Encumbrance](/HeroSystem6eHeroic/images/encumbrance.png)
 
-The sheet includes space for four suits or pieces of armor. Although this sheet is designed for the simpler armor activation system, there is a field for hit locations if your GM chooses to use that system. 
+The sheet includes space for four suits or pieces of armor. If PD/ED are left at 0, then Total Defense will be automatically calculated when you click Roll. Although this sheet is designed for the simpler armor activation system, there is a field for hit locations if your GM chooses to use that system. 
 
 ![Armor Table](/HeroSystem6eHeroic/images/armor.png)
 
