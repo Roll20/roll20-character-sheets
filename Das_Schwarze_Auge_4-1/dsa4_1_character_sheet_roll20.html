@@ -20591,6 +20591,78 @@ function calculateShieldAttack(values, activeShieldRowId) {
     };
 }
 
+// Calculate modifier from using the left/wrong hand
+on(
+	"change:vorteil_beidhaendig " +
+	"change:sf_linkhand " +
+	"change:sf_beidhandigerkampfI " +
+	"change:sf_beidhandigerkampfII ",
+	function(eventInfos) {
+		const func = "Action Listener for calculating the modifier from using the left/wrong hand";
+		debugLog(func, "eventInfos", eventInfos);
+
+		const attrs = [
+			"vorteil_beidhaendig",
+			"sf_linkhand",
+			"sf_beidhandigerkampfI",
+			"sf_beidhandigerkampfII"
+		];
+
+		var attrsToChange = { "k_mod_left_hand": 0 };
+
+		// Activation/Deactivation logic for ambidextrous fighting
+		if (
+			   eventInfos["sourceAttribute"] === "sf_beidhandigerkampfii"
+			&& eventInfos["newValue"] === "1"
+		) {
+			attrsToChange["sf_linkhand"] = "1";
+			attrsToChange["sf_beidhandigerkampfI"] = "1";
+		}
+		if (
+			   eventInfos["sourceAttribute"] === "sf_beidhandigerkampfi"
+			&& eventInfos["newValue"] === "1"
+		) {
+			attrsToChange["sf_linkhand"] = "1";
+		}
+		if (
+			   eventInfos["sourceAttribute"] === "sf_linkhand"
+			&& eventInfos["newValue"] === "0"
+		) {
+			attrsToChange["sf_beidhandigerkampfI"] = "0";
+			attrsToChange["sf_beidhandigerkampfII"] = "0";
+		}
+		if (
+			   eventInfos["sourceAttribute"] === "sf_beidhandigerkampfi"
+			&& eventInfos["newValue"] === "0"
+		) {
+			attrsToChange["sf_beidhandigerkampfII"] = "0";
+		}
+
+    safeGetAttrs(attrs, function(values) {
+			const ambidextrous = values["vorteil_beidhaendig"];
+			const lefthandedFighting = values["sf_linkhand"];
+			const ambidextrousFighting1 = values["sf_beidhandigerkampfI"];
+			const ambidextrousFighting2 = values["sf_beidhandigerkampfII"];
+
+			// Advantage trumps the two lower special skills and is on par with the highest special skill
+			if (ambidextrous === "on") {
+				attrsToChange["k_mod_left_hand"] = 0;
+			} else {
+				if (ambidextrousFighting2 === "1") {
+					attrsToChange["k_mod_left_hand"] = 0;
+				} else if (ambidextrousFighting1 === "1") {
+					attrsToChange["k_mod_left_hand"] = 3;
+				} else if (lefthandedFighting === "1") {
+					attrsToChange["k_mod_left_hand"] = 6;
+				} else {
+					attrsToChange["k_mod_left_hand"] = 9;
+				}
+			}
+			debugLog(func, "attrsToChange", attrsToChange);
+			safeSetAttrs(attrsToChange);
+    });
+});
+
 /* 
 	UTILITY FUNCTIONS AND CONSTANTS
 */
@@ -20715,6 +20787,8 @@ const defaultValues = {
 	"NKW2_SB": 0,
 	"NKW3_SB": 0,
 	"NKW4_SB": 0,
+
+	"k_mod_left_hand": 9,
 
 	/// Ranged Combat
 	"FK_Aktiv": 5,
