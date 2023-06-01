@@ -2472,7 +2472,7 @@ NONWEAPON_PROFICIENCY_SECTIONS.forEach(({section, nameField, slotsField, ability
             return;
         }
 
-        let sectionsCopy = [...NONWEAPON_PROFICIENCY_SECTIONS];
+        let sectionsCopy = structuredClone(NONWEAPON_PROFICIENCY_SECTIONS);
         getAttrs(['prof-slots-total-calc'], function (values) {
             let accumulator = values['prof-slots-total-calc'];
             repeatingCalculateRemainingRecursive(sectionsCopy, accumulator, 'prof-slots-remain');
