@@ -370,27 +370,14 @@ const repeatingCalculateRemainingRecursive = function (tail, accumulator, result
 //#endregion
 
 //#region Generic Setup functions
-const setupStaticCalculateTotal = function(totalField, fieldsToSum, maxValue) {
-    let fieldsToRead = structuredClone(fieldsToSum);
-    let maxIsField = typeof maxValue === 'string';
-    if (maxIsField) {
-        fieldsToRead.push(maxValue);
-    }
-
-    let onChange = fieldsToRead.map(field => `change:${field}`).join(' ');
+const setupStaticCalculateTotal = function(totalField, fieldsToSum) {
+    let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
     on(onChange, function () {
-        getAttrs(fieldsToRead, function (values) {
+        getAttrs(fieldsToSum, function (values) {
             let total = 0;
             fieldsToSum.forEach(field => {
                 total += parseInt(values[field]) || 0;
             });
-
-            let maxValueInt = maxValue;
-            if (maxIsField)
-                maxValueInt = parseInt(values[maxValue])
-
-            if (!isNaN(maxValueInt))
-                total = Math.min(total, maxValueInt);
 
             setAttrs({
                 [totalField]: total
@@ -399,7 +386,7 @@ const setupStaticCalculateTotal = function(totalField, fieldsToSum, maxValue) {
     });
 }
 
-function setupRepeatingRowCalculateTotal(repeatingName, repeatingFieldsToSum, repeatingTotalField, maxValue) {
+function setupRepeatingRowCalculateTotal(repeatingName, repeatingFieldsToSum, repeatingTotalField) {
     let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
     let allFields = [...repeatingFieldsToSum];
     allFields.push(repeatingTotalField);
@@ -416,9 +403,6 @@ function setupRepeatingRowCalculateTotal(repeatingName, repeatingFieldsToSum, re
                 repeatingFieldsToSum.forEach(column => {
                     total += row.I[column];
                 });
-
-                if (!isNaN(maxValue))
-                    total = Math.min(total, maxValue);
 
                 row[repeatingTotalField] = total;
             })
@@ -1447,12 +1431,9 @@ const ROGUE_STANDARD_SKILLS = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', '
 const ROGUE_EXTRA_SKILLS = ['dm', 'di', 'br', 'tu', 'eb', 'fd', 'ap'];
 const ROGUE_SKILL_COLUMNS = ['b', 'r', 'd', 'k', 'a', 'm', 'l'];
 ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).forEach(skill => {
-    let maxValue = 95;
-    if (skill === 'ms' || skill === 'hs')
-        maxValue = 'rogue-ranger';
-    setupStaticCalculateTotal(`${skill}t`, ROGUE_SKILL_COLUMNS.map(column => `${skill}${column}`), maxValue);
+    setupStaticCalculateTotal(`${skill}t`, ROGUE_SKILL_COLUMNS.map(column => `${skill}${column}`));
 });
-setupRepeatingRowCalculateTotal('customrogue', ROGUE_SKILL_COLUMNS.map(column => `cr${column}`), 'crt', 95);
+setupRepeatingRowCalculateTotal('customrogue', ROGUE_SKILL_COLUMNS.map(column => `cr${column}`), 'crt');
 // --- End setup Rogue skills total --- //
 
 //Rogue sum skill points
@@ -1489,6 +1470,55 @@ on('change:armorname', function(eventInfo) {
         'cwa': armor['Climb Walls'] || '0',
     };
     setAttrs(armorModifiers);
+});
+
+on('clicked:rt', function (eventInfo){
+    getAttrs([''], async function (values) {
+        console.log(eventInfo);
+        let rollBuilder = new RollTemplateBuilder('2Echeck');
+        rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]');
+
+        let skill = await extractQueryResult(`?{Find or Removing Trap?|Find Traps|Remove Traps|Remove Invisible/Magical Traps}`);
+        if (skill === 'Find Traps') {
+            rollBuilder.push('checkvs=Find Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you find the trap and knows its general principle but not exact nature.', 'fail=After [[1d10]] round(s) you find nothing.\nYou can try again at next level.');
+        } else if (skill === 'Remove Traps') {
+            rollBuilder.push('checkvs=Remove Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+        } else if (skill === 'Remove Invisible/Magical Traps') {
+            rollBuilder.push('checkvs=Remove Invisible/Magical Traps\n(in @{armorname})', 'checktarget=[[floor({@{rtt}+(@{misc-mod}),95}kl1 / 2)]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+        }
+
+        return printRoll(rollBuilder.string());
+    });
+});
+
+on('clicked:ms clicked:hs', function (eventInfo){
+    getAttrs(['rogue-ranger'], async function (values) {
+        let skill = eventInfo.triggerName.replace('clicked:', '');
+        let rollBuilder = new RollTemplateBuilder('2Echeck');
+        rollBuilder.push('character=@{character_name}','checkroll=[[1d100cs<1cf>[[@{rogue-ranger}+1]] ]]');
+
+        if (skill ==='ms') {
+            rollBuilder.push('checkvs=Move Silently\n(in @{armorname})', 'success=You are silent. Movement rate reduced to 1/3 of normal. Opponents get -2 to surprise roll from silence and another -2 if you are unseen.', 'fail=You are not silent. Movement rate reduced to 1/3 of normal.');
+        } else if (skill === 'hs') {
+            rollBuilder.push('checkvs=Hide in Shadows\n(in @{armorname})', 'success=You are hidden while remaining virtually motionless. (Small careful movements: drawing a weapon, uncork a potion, etc. is allowed)', 'fail=You are not hidden.');
+        }
+
+        // The player is a rogue, so no check for surroundings
+        if (values['rogue-ranger'] === "95") {
+            rollBuilder.push(`checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
+            await keepContextRoll();
+            return printRoll(rollBuilder.string());
+        }
+
+        let surroundings = await extractQueryResult(`?{What are your surroundings?|Natural (woodland / forrest / plains),Natural|Non-natural (crypt / city street / indoor / underground),Non-natural}`);
+        if (surroundings === 'Natural') {
+            rollBuilder.push(`checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
+        } else {
+            rollBuilder.push(`checktarget=[[floor({@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1 / 2)]]%`);
+        }
+
+        return printRoll(rollBuilder.string());
+    });
 });
 //#endregion
 
