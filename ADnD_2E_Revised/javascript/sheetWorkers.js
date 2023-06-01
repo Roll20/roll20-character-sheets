@@ -1485,7 +1485,7 @@ on('clicked:rt', function (eventInfo){
             rollBuilder.push('checkvs=Remove Invisible/Magical Traps\n(in @{armorname})', 'checktarget=[[floor({@{rtt}+(@{misc-mod}),95}kl1 / 2)]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
         }
 
-        return printRoll(rollBuilder.string());
+        return printRoll(`/w gm ${rollBuilder.string()}`);
     });
 });
 
@@ -1505,7 +1505,7 @@ on('clicked:ms clicked:hs', function (eventInfo){
         if (values['rogue-ranger'] === "95") {
             rollBuilder.push(`checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
             await keepContextRoll();
-            return printRoll(rollBuilder.string());
+            return printRoll(`/w gm ${rollBuilder.string()}`);
         }
 
         let surroundings = await extractQueryResult(`?{What are your surroundings?|Natural (woodland / forrest / plains),Natural|Non-natural (crypt / city street / indoor / underground),Non-natural}`);
@@ -1515,7 +1515,7 @@ on('clicked:ms clicked:hs', function (eventInfo){
             rollBuilder.push(`checktarget=[[floor({@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1 / 2)]]%`);
         }
 
-        return printRoll(rollBuilder.string());
+        return printRoll(`/w gm ${rollBuilder.string()}`);
     });
 });
 //#endregion
