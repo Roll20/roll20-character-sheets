@@ -388,14 +388,12 @@ const setupStaticCalculateTotal = function(totalField, fieldsToSum) {
 
 function setupRepeatingRowCalculateTotal(repeatingName, repeatingFieldsToSum, repeatingTotalField) {
     let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
-    let allFields = structuredClone(repeatingFieldsToSum);
-    allFields.push(repeatingTotalField);
     on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
         if (eventInfo.removedInfo)
             return;
 
         TAS.repeating(repeatingName)
-            .fields(allFields)
+            .fields([...repeatingFieldsToSum, repeatingTotalField])
             .tap(function(rowSet) {
                 let rowId = parseSourceAttribute(eventInfo).rowId;
                 let row = rowSet[rowId];
@@ -1234,13 +1232,13 @@ const WIZARD_SPELL_LEVELS_SECTIONS = [
     {level: '2', sections: ['4', '5', '6', 'wiz2']},
     {level: '3', sections: ['7', '8', '9', 'wiz3']},
     {level: '4', sections: ['10', '11', '12', 'wiz4']},
-    {level: '5', sections: ['70', '71', '72', 'wiz5']}, //... legacy naming convention
+    {level: '5', sections: ['70', '71', '72', 'wiz5']}, // legacy naming convention
     {level: '6', sections: ['13', '14', '15', 'wiz6']},
     {level: '7', sections: ['16', '17', '18', 'wiz7']},
     {level: '8', sections: ['19', '20', '21', 'wiz8']},
     {level: '9', sections: ['22', '23', '24', 'wiz9']},
     {level: '10', sections: ['25', '26', '27', 'wiz10']},
-    {level: '11', sections: ['52', '53', '54', 'wiz11']}, //... legacy naming convention
+    {level: '11', sections: ['52', '53', '54', 'wiz11']}, // legacy naming convention
     {level: '12', sections: ['55', '56', '57', 'wiz12']},
     {level: '13', sections: ['58', '59', '60', 'wiz13']},
     {level: '14', sections: ['61', '62', '63', 'wiz14']},
