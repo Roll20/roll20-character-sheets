@@ -1504,7 +1504,6 @@ on('clicked:ms clicked:hs', function (eventInfo){
         // The player is a rogue, so no check for surroundings
         if (values['rogue-ranger'] === "95") {
             rollBuilder.push(`checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
-            await keepContextRoll();
             return printRoll(`/w gm ${rollBuilder.string()}`);
         }
 
@@ -1514,6 +1513,21 @@ on('clicked:ms clicked:hs', function (eventInfo){
         } else {
             rollBuilder.push(`checktarget=[[floor({@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1 / 2)]]%`);
         }
+
+        return printRoll(`/w gm ${rollBuilder.string()}`);
+    });
+});
+
+on('clicked:repeating_customrogue:cr-dm', function (eventInfo) {
+    let parse = parseSourceAttribute(eventInfo);
+    let row = `repeating_customrogue_${parse.rowId}`;
+    getAttrs(['character_name'], async function (values) {
+        let rollBuilder = new RollTemplateBuilder('2Edefault');
+        rollBuilder.push('subtitle=for @{character_name}', 'color=dark-purple');
+        rollBuilder.push(`name=@{${values.character_name}|${row}_customskill}\n(in @{armorname})`);
+        rollBuilder.push(`[Secret by DM](~${values.character_name}|${row}_cr)=`);
+        rollBuilder.push(`desc=You try to use @{${values.character_name}|${row}_customskill}...`);
+        console.log(rollBuilder.string());
 
         return printRoll(`/w gm ${rollBuilder.string()}`);
     });
