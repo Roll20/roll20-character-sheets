@@ -388,7 +388,7 @@ const setupStaticCalculateTotal = function(totalField, fieldsToSum) {
 
 function setupRepeatingRowCalculateTotal(repeatingName, repeatingFieldsToSum, repeatingTotalField) {
     let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
-    let allFields = [...repeatingFieldsToSum];
+    let allFields = structuredClone(repeatingFieldsToSum);
     allFields.push(repeatingTotalField);
     on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
         if (eventInfo.removedInfo)
@@ -937,7 +937,7 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
 
             console.log(`Summing started by section ${repeatingName}. Fieldname ${fieldName}`);
             console.time('Summing time');
-            let levelsCopy = [...sections];
+            let levelsCopy = structuredClone(sections);
             let accumulator = 0;
 
             recursiveSpellSum(levelsCopy, accumulator, oldField, newField, resultFieldName);
@@ -1578,10 +1578,8 @@ async function selectVersion(foundObjects, values, comparer, objectName) {
 
 function combineBooks(activeObjects, comparer, isPlayersOptions) {
     // Copying fields from active object to avoid side effects being saved permanently
-    let copyActiveObjects = activeObjects.map(e => {
-        return {...e}
-    });
-    let copyArray = [...copyActiveObjects];
+    let copyActiveObjects = structuredClone(activeObjects);
+    let copyArray = [...copyActiveObjects]; // intentionally use shallow copy to keep references the same
 
     copyActiveObjects.forEach(activeObject => {
         copyArray.forEach((copyObject, i) => {
