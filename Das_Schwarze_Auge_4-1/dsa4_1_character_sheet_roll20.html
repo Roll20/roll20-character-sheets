@@ -20553,6 +20553,7 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_combat_technique");
         } else {
             debugLog(caller, "no active shield found");
             safeSetAttrs({
@@ -20567,11 +20568,7 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
             let result = calculateShieldAttack(values, activeShieldRowId);
             debugLog(caller, 'calculated shield attack');
             debugLog(caller, result);
-            safeSetAttrs({
-				"shield_at": result["shield_at"],
-				"shield_at_mod": result["shieldAtMod"],
-				"shield_at_available": result["shieldAtAvailable"]
-            });
+            safeSetAttrs(result);
         });
 
     });
@@ -20579,49 +20576,60 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
 
 function calculateShieldAttack(values, activeShieldRowId) {
 	var caller = "calculateShieldAttack";
-    var shieldAtAvailable = "on";
 
-	// Default Value: +3
-    var shieldAtMod = 3;
-    var activeShieldAtMod = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
+	debugLog(caller, "values", values);
+	var atModShield = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
 	var shieldType = values["repeating_shields_" + activeShieldRowId + "_shield_type"];
-    var schildkampfI = values["sf_schildkampfI"];
-    var schildkampfII = values["sf_schildkampfII"];
-    var knaufschlag = values["sf_knaufschlag"];
-    var schmutzigeTricks = values["sf_schmutzigetricks"];
-    var raufenAT = isNaN(values["AT_raufen"]) ? 0 : parseInt(values["AT_raufen"]);
-    var ATmods = isNaN(values["AT_mod_wounds"]) ? 0 : parseInt(values["AT_mod_wounds"]);
-    var shieldAt = Math.max(0, raufenAT + ATmods);
+	var combatTechnique = values["repeating_shields_" + activeShieldRowId + "_combat_technique"];
+	var schildkampfI = values["sf_schildkampfI"];
+	var schildkampfII = values["sf_schildkampfII"];
+	var knaufschlag = values["sf_knaufschlag"];
+	var schmutzigeTricks = values["sf_schmutzigetricks"];
+	var raufenAT = parseInt(values["AT_raufen"]);
+	var atModWounds = parseInt(values["AT_mod_wounds"]);
+	var shieldAt = Math.max(0, raufenAT + atModWounds);
+	var result = { "shield_at": 0, "shield_at_mod": 3, "shield_at_available": "off" };
 
-	// Without a Shield, no Shield Attack
-	if (shieldType !== "shield" || !activeShieldRowId) {
-		shieldAtAvailable = "0";
-		shieldAt = 0;
-		debugLog(caller, "ping");
+	// Continue only for shields
+	if (shieldType === "shield") {
+		// Do nothing in case no shield is active
+		if (!activeShieldRowId) {
+			result["shield_at_available"] = "off";
+			result["shield_at"] = 0;
+			debugLog(caller, "ping");
+			return result;
+		}
 
-    // Without Shield Combat I, no Shield Attacks
-	} else if (schildkampfI !== "1") {
-    	debugLog(caller, "schildkampfI:", schildkampfI);
-		shieldAtAvailable = "0";
-		shieldAt = 0;
-		debugLog(caller, "pong");
+		// Shields' combat technique may only be 'Raufen', so set it accordingly
+		if (combatTechnique !== "Raufen") {
+			result["repeating_shields_" + activeShieldRowId + "_combat_technique"] = "Raufen";
+		}
 
-	// Good to go, check for modifier reduction
-    } else if (schildkampfII === "1" || knaufschlag === "1" || schmutzigeTricks === "1") {
-    	debugLog(caller, "schildkampfII:", schildkampfII, "knaufschlag:", knaufschlag, "schmutzigeTricks:", schmutzigeTricks);
-    	shieldAtMod = 0;
-    }
+		// Without Shield Combat I, no Shield Attacks
+		if (schildkampfI !== "1") {
+			debugLog(caller, "schildkampfI:", schildkampfI);
+			result["shield_at_available"] = "off";
+			result["shield_at"] = 0;
+			debugLog(caller, "pong");
+			return result;
+		} else {
+			result["shield_at_available"] = "on";
+			result["shield_at"] = shieldAt;
+		}
 
-	// Add active shield AT modifier
-	// CAUTION: AT modifier != check modifier (i.e. signs have different meaning)
-	if (activeShieldAtMod) {
-		shieldAtMod -= activeShieldAtMod;
+		// Good to go, check for modifier reduction
+		if (schildkampfII === "1" || knaufschlag === "1" || schmutzigeTricks === "1") {
+			debugLog(caller, "schildkampfII:", schildkampfII, "knaufschlag:", knaufschlag, "schmutzigeTricks:", schmutzigeTricks);
+			result["shield_at_mod"] = 0;
+		}
+
+		// Add AT modifier of the active shield
+		// CAUTION: AT modifier != check modifier (i.e. signs have different meaning)
+		if (atModShield) {
+			result["shield_at_mod"] -= atModShield;
+		}
 	}
-    return {
-		"shield_at": shieldAt,
-		"shieldAtMod": shieldAtMod,
-		"shieldAtAvailable": shieldAtAvailable
-    };
+	return result;
 }
 
 // Calculate modifier from using the left/wrong hand
