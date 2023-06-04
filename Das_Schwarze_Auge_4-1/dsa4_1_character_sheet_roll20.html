@@ -15013,6 +15013,11 @@
 					{{name}}
 					{{#rollTotal() computed::isConfirmationRoll 0}}
 						{{#rollTotal() showRollTag 1}}
+							{{#rollTotal() computed::confirmationRollRequired 0}}
+								{{#rollTotal() computed::result -3}}
+								(<span class="sheet-abbr" title="Wurfkennung dieses Wurfs.">{{computed::rollTag}}</span>)</th>
+								{{/rollTotal() computed::result -3}}
+							{{/rollTotal() computed::confirmationRollRequired 0}}
 							{{#rollTotal() computed::confirmationRollRequired 1}}
 							(<span class="sheet-abbr" title="Wurfkennung dieses Wurfs.">{{computed::rollTag}}</span>)</th>
 							{{/rollTotal() computed::confirmationRollRequired 1}}
@@ -15030,9 +15035,47 @@
 				<td>Ergebnis: {{computed::result}}</td>
 			</tr>
 			<tr>
-				<td>Würfelergebnisse: {{roll0}}/{{roll1}}/{{roll2}}</td>
+				<td>Würfelergebnisse: {{roll0}}/{{roll1}}/{{roll2}}//{{confirmationRoll0}}/{{confirmationRoll1}}/{{confirmationRoll2}}</td>
 			</tr>
-{{#rollTotal() computed::isConfirmationRoll 0}}
+{{#rollTotal() computed::confirmationRollRequired 0}}
+		{{#rollTotal() computed::result -3}}
+			<tr>
+				<td>Ergebnis: Kritisch misslungen und bestätigt!</td>
+			</tr>
+			<tr>
+				<td>
+					[<span class="sheet-rolltemplate-roll-button"><span style="font-family: 'dicefontd20'; font-size: 1.3em">t</span> Patzerauswirkung bestimmen</span>](~{{characterid}}|patzer||{{computed::passthrough}})
+				</td>
+			</tr>
+		{{/rollTotal() computed::result -3}}
+		{{#rollTotal() computed::result -2}}
+			<tr>
+				<td>Ergebnis: Kritisch misslungen und nicht bestätigt!</td>
+			</tr>
+		{{/rollTotal() computed::result -2}}
+		{{#rollTotal() computed::result -1}}
+			<tr>
+				<td>Ergebnis: Misslungen!</td>
+			</tr>
+		{{/rollTotal() computed::result -1}}
+		{{#rollTotal() computed::result 1}}
+			<tr>
+				<td>Ergebnis: Gelungen!</td>
+			</tr>
+		{{/rollTotal() computed::result 1}}
+		{{#rollTotal() computed::result 2}}
+			<tr>
+				<td>Ergebnis: Kritisch gelungen und nicht bestätigt!</td>
+			</tr>
+		{{/rollTotal() computed::result 2}}
+		{{#rollTotal() computed::result 3}}
+			<tr>
+				<td>Ergebnis: Kritisch gelungen und bestätigt!</td>
+			</tr>
+		{{/rollTotal() computed::result 3}}
+{{/rollTotal() computed::confirmationRollRequired 0}}
+{{#rollTotal() computed::confirmationRollRequired 1}}
+	{{#rollTotal() computed::isConfirmationRoll 0}}
 		{{#rollTotal() computed::result -2}}
 			<tr>
 				<td>Ergebnis: Kritisch misslungen! Bestätigungswurf nötig.</td>
@@ -15060,8 +15103,8 @@
 				</td>
 			</tr>
 		{{/rollGreater() computed::confirmationRollRequired 0}}
-{{/rollTotal() computed::isConfirmationRoll 0}}
-{{#rollTotal() computed::isConfirmationRoll 1}}
+	{{/rollTotal() computed::isConfirmationRoll 0}}
+	{{#rollTotal() computed::isConfirmationRoll 1}}
 		{{#rollTotal() computed::result -3}}
 			<tr>
 				<td>Ergebnis: Kritisch misslungen und bestätigt!</td>
@@ -15099,7 +15142,8 @@
 				<td>Zwischen dieser Reaktion und dem Ursprungswurf liegt eine lange Zeit (mindestens {{computed::rollTimeHuman}}&nbsp;min). Bitte sicherstellen, dass der richtige Reaktionsknopf benutzt wurde.</td>
 			</tr>
 		{{/rollGreater() computed::rollExpired 0}}
-{{/rollTotal() computed::isConfirmationRoll 1}}
+	{{/rollTotal() computed::isConfirmationRoll 1}}
+{{/rollTotal() computed::confirmationRollRequired 1}}
 {{#rollTotal() computed::msg 1}}
 			<tr>
 				<td class="sheet-templates-warning"><span class="sheet-abbr" title="Gemäß WdS 59 darf die Gesamtansage weder höher als der Talentwert der für den Angriff benutzten Kampftechnik noch höher als der Attackewert mit der genutzten Waffe sein. Ohne Hausregel hätte diese Attacke daher nicht gewürfelt werden dürfen.">Hohe Erschwernis.</span></td>
@@ -25223,6 +25267,9 @@ on(
 	defaultElements.push( { 'name': 'roll0', 'value': `[[${data["rolls"][0]}]]` } );
 	defaultElements.push( { 'name': 'roll1', 'value': `[[${data["rolls"][1]}]]` } );
 	defaultElements.push( { 'name': 'roll2', 'value': `[[${data["rolls"][2]}]]` } );
+	defaultElements.push( { 'name': 'confirmationRoll0', 'value': `[[${data["rolls"][0]}]]` } );
+	defaultElements.push( { 'name': 'confirmationRoll1', 'value': `[[${data["rolls"][1]}]]` } );
+	defaultElements.push( { 'name': 'confirmationRoll2', 'value': `[[${data["rolls"][2]}]]` } );
 
 	// Roll Modifiers
 	defaultElements.push( { 'name': 'mod', 'value': `[[${data["mod"]}]]` } );
@@ -25244,7 +25291,6 @@ on(
 	// Confirmation Rolls
 	defaultElements.push( { 'name': 'isConfirmationRoll', 'value': '[[0]]' } );
 	defaultElements.push( { 'name': 'showRollTag', 'value': '[[@{show_roll_tags}]]' } );
-	// TODO: Expand confirmation rolls to up to three rolls as well (?)
 	defaultElements.push( { 'name': 'confirmationRollRequired', 'value': '[[0]]' } );
 
 	// Anti-Cheat Measures
@@ -25434,6 +25480,7 @@ on(
 	var attrsToGet = [
 		'character_id',
 		'character_name',
+		'k_option_autoroll_confirmation_rolls',
 		... critAttrsDict[data["typ"]],
 		... data["attributes"]
 	];
@@ -25455,7 +25502,13 @@ on(
 				results.roll1.result,
 				results.roll2.result,
 			];
+			var confirmationRolls = [
+				results.confirmationRoll0.result,
+				results.confirmationRoll1.result,
+				results.confirmationRoll2.result,
+			];
 			var roll = rolls[0];
+			var confirmationRoll = confirmationRolls[0];
 			var mod = results.mod.result;
 			var ansage = results.ansage.result;
 			var msg = allElementsObject["msg"];
@@ -25491,44 +25544,86 @@ on(
 			}
 
 			if (confirmationRollRequired === 1) {
-				passthrough["rollTime"] = Date.now();
-				passthrough["rollTag"] = generateShortRollTag(passthrough["rollTime"]);
-				passthrough["name"] = allElementsObject["name"];
-				passthrough["wert"] = wert;
-				passthrough["taw"] = taw;
-				passthrough["effWert"] = effWert;
-				passthrough["mod"] = mod;
-				passthrough["ansage"] = ansage;
-				passthrough["roll0"] = allElementsObject["roll0"];
-				passthrough["roll1"] = allElementsObject["roll1"];
-				passthrough["roll2"] = allElementsObject["roll2"];
-				passthrough["result"] = result;
-				passthrough["cs"] = cs;
-				passthrough["cf"] = cf;
-				passthrough["isConfirmationRoll"] = 1;
-				passthrough["showRollTag"] = allElementsObject["showRollTag"];
-				passthrough["rollMacro"] =
-					allElements[0]["prefix"] + " " +
-					"{{name=Nahkampfangriff}} " +
-					"{{mod=[[" + mod + "]]}} " +
-					"{{ansage=[[" + ansage + "]]}} " +
-					"{{wert=[[" + wert + "]]}} " +
-					"{{taw=[[" + taw + "]]}} " +
-					allElementsObject["roll0"] +
-					allElementsObject["roll1"] +
-					allElementsObject["roll2"] +
-					"{{msg=[[0]]}} " +
-					"{{characterid=" + v["character_id"] + "}} " +
-					"{{charactername=" + v["character_name"] + "}} " +
-					"{{result=[[0]]}} " +
-					"{{isConfirmationRoll=[[1]]}} " +
-					"{{showRollTag=[[@{show_roll_tags}]]}} " +
-					"{{rollTag=[[0]]}} " +
-					"{{rollTime=[[0]]}} " +
-					"{{rollExpired=[[0]]}} " +
-					"{{rollTimeHuman=[[0]]}} " +
-					"{{passthrough=[[0]]}}";
-				console.log("passthrough:", passthrough);
+				if (v["k_option_autoroll_confirmation_rolls"] === "1"){
+					if (result === -2) {
+						if (confirmationRoll >= cf) {
+							result = -3;
+						} else if (confirmationRoll > effWert) {
+							result = -3;
+						}
+					} else if (result === 2) {
+						if (confirmationRoll <= cs) {
+							result = 3;
+						} else if (confirmationRoll <= effWert) {
+							result = 3;
+						}
+					}
+					confirmationRollRequired = 0;
+					if (result === -3) {
+						passthrough["rollTime"] = Date.now();
+						passthrough["rollTag"] = generateShortRollTag(passthrough["rollTime"]);
+						passthrough["rollMacro"] =
+								"@{gm_roll_opt} " +
+								"&{template:DSA-Nahkampf-Patzer} " +
+								"{{name=Nahkampfangriffspatzer}} " +
+								"{{wurf=[[2d6cs1cf6]]}} " +
+								"{{isOriginalRoll=[[0]]}} " +
+								"{{showRollTag=[[@{show_roll_tags}]]}} " +
+								"{{rollTag=[[0]]}} " +
+								"{{rollTime=[[0]]}} " +
+								"{{rollExpired=[[0]]}} " +
+								"{{rollTimeHuman=[[0]]}} " +
+								"{{passthrough=[[0]]}}";
+						console.log(passthrough);
+					}
+				} else {
+					passthrough["rollTime"] = Date.now();
+					passthrough["rollTag"] = generateShortRollTag(passthrough["rollTime"]);
+					passthrough["name"] = allElementsObject["name"];
+					passthrough["wert"] = wert;
+					passthrough["taw"] = taw;
+					passthrough["effWert"] = effWert;
+					passthrough["mod"] = mod;
+					passthrough["ansage"] = ansage;
+					passthrough["roll0"] = allElementsObject["roll0"];
+					passthrough["roll1"] = allElementsObject["roll1"];
+					passthrough["roll2"] = allElementsObject["roll2"];
+					passthrough["confirmationRoll0"] = allElementsObject["confirmationRoll0"];
+					passthrough["confirmationRoll1"] = allElementsObject["confirmationRoll1"];
+					passthrough["confirmationRoll2"] = allElementsObject["confirmationRoll2"];
+					passthrough["result"] = result;
+					passthrough["cs"] = cs;
+					passthrough["cf"] = cf;
+					passthrough["isConfirmationRoll"] = 1;
+					passthrough["confirmationRollRequired"] = 1;
+					passthrough["showRollTag"] = allElementsObject["showRollTag"];
+					passthrough["rollMacro"] =
+						allElements[0]["prefix"] + " " +
+						"{{name=Nahkampfangriff}} " +
+						"{{mod=[[" + mod + "]]}} " +
+						"{{ansage=[[" + ansage + "]]}} " +
+						"{{wert=[[" + wert + "]]}} " +
+						"{{taw=[[" + taw + "]]}} " +
+						allElementsObject["roll0"] +
+						allElementsObject["roll1"] +
+						allElementsObject["roll2"] +
+						allElementsObject["confirmationRoll0"] +
+						allElementsObject["confirmationRoll1"] +
+						allElementsObject["confirmationRoll2"] +
+						"{{msg=[[0]]}} " +
+						"{{characterid=" + v["character_id"] + "}} " +
+						"{{charactername=" + v["character_name"] + "}} " +
+						"{{result=[[0]]}} " +
+						"{{isConfirmationRoll=[[1]]}} " +
+						"{{confirmationRollRequired=[[1]]}} " +
+						"{{showRollTag=[[@{show_roll_tags}]]}} " +
+						"{{rollTag=[[0]]}} " +
+						"{{rollTime=[[0]]}} " +
+						"{{rollExpired=[[0]]}} " +
+						"{{rollTimeHuman=[[0]]}} " +
+						"{{passthrough=[[0]]}}";
+					console.log("passthrough:", passthrough);
+				}
 			}
 
 			finishRoll(
