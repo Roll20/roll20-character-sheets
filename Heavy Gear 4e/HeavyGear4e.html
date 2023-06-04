@@ -171,12 +171,12 @@
                     <fieldset class="repeating_personal-equipment">
                         <span><input class="infoused" name="attr_personal_equipment_name" type="text"> </span>
                         <span class="pull-right">
-                            <input type="number" name="attr_personal_equipment_burden" />
+                            <input type="number" name="attr_personal_equipment_burden" step="0.5"/>
                             </span>
                             <input type="checkbox" name="attr_hide" class="sheet-toggle-show">
                             
                         <div class="sheet-body">
-                            [G] <input type="checkbox" name="attr_personal_equipment_gadget" />
+                            [G] <input type="checkbox" name="attr_personal_equipment_gadget" /> 
                             [K] <input type="checkbox" name="attr_personal_equipment_kit" />
                             [R] <input type="checkbox" name="attr_personal_equipment_rig" />
                             [S] <input type="checkbox" name="attr_personal_equipment_suit" />
@@ -1066,7 +1066,7 @@
                         </div>
                     </span>
                 </fieldset>
-                <span>Hull Integrity(<span type="number" name="attr_gear_damage_total"></span>/<input type="number"
+                <span>Hull Integrity(<span type="number" name="attr_gear_damage_total"></span>/<span type="number"
                         name="attr_gear_hi"></span>) </span>
             </div>
             <h4>Gear Damage Notes</h4> <textarea class="inputarea" name="attr_gear_damage_desc" rows="3"></textarea>
@@ -1268,21 +1268,15 @@ domains.forEach(function (domains) { //calculates expertise when improving or de
 
 
 on('change:repeating_damage remove:repeating_damage sheet:opened', function() { //calculates total damage
-	repeatingSum("damage_total","damage",["damage_level"]);
 	repeatingSum(["damage_shell","damage_system"],"damage",["damage_shell_check","damage_system_check", "damage_level"]);
 }); 
 
-on('change:repeating_damage remove:repeating_damage sheet:opened', function() { //calculates total damage
-	repeatingSum("damage_total","damage",["damage_level"]);
-	repeatingSum(["damage_shell","damage_system"],"damage",["damage_shell_check","damage_system_check", "damage_level"]);
+
+on('change:repeating_gear-damage remove:repeating_gear-damage sheet:opened', function() { //calculates gear damage
+	repeatingSum("gear_damage_total","gear-damage",["gear_damage_level"]);
 }); 
 
-on('change:repeating_gear-damage remove:repeating_gear-damage sheet:opened', function() { //calculates total damage
-	repeatingSum("gearDamageTotal","gearDamage",["gear_damage_level"]);
-	repeatingSum(["damage_shell","damage_system"],"damage",["damage_shell_check","damage_system_check", "damage_level"]);
-}); 
-
-on('change:repeating_weapon:weapon_domain', function() { //calculates domains to expertise used in personal weapons
+on('change:repeating_weapon:weapon_domain sheet:opened', function() { //calculates domains to expertise used in personal weapons
     console.log("getting weapon domain");
     getAttrs(["repeating_weapon_weapon_domain"], (values) => {
         console.log("getting weapon domain2");
@@ -1320,7 +1314,7 @@ on("clicked:repeating_weapon:tumble", function () { //roll for personal weapons
 });
 
 on("clicked:repeating_gear-weapons:tumble", function () {//roller for gear weapons
-    roller("repeating_gear-weapons_gear_weapon_type","name_gunnery","repeating_gear-weapons_skill_level","expertise_gunnery","bonus_dice","Tn");
+    roller("repeating_gear-weapons_gear_weapon_type","name_gunnery","repeating_gear-weapons_gear_skill_level","expertise_gunnery","bonus_dice","Tn");
 });
 
 //
@@ -1404,6 +1398,7 @@ const multistats = {
     gear_gunnery_total: {rule: 'sum', attributes: ['gear_gunnery','gear_gunnery_skill','gear_gunnery_misc']},
     gear_pilot_total: {rule: 'sum', attributes: ['gear_pilot','gear_pilot_skill','gear_pilot_misc']},
     gear_electronicwarfare_total: {rule: 'sum', attributes: ['gear_electronicwarfare','gear_electronicwarfare_skill','gear_electronicwarfare_misc']},
+    damage_total: {rule: 'sum', attributes: ['damage_shell','damage_system']},
 
 };
 domains.forEach(domains => {
