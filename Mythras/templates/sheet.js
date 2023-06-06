@@ -323,6 +323,28 @@ function damageTable(step) {
 {% include 'sheet_types/vehicle/vehicle.js' %}
 {% include 'sheet_types/star_system/star_system.js' %}
 
+/* Generic versioning functions */
+/**
+ * Make the changes needs to get a sheet updated from 3.0 to 3.1
+ */
+function upgradeGeneric3Dot1() {
+    if (debug) {
+        console.log("Upgrading sheet to 3.1");
+    }
+
+    /* Fetch attrs */
+    getAttrs(['sheet_notes'], function (v) {
+        let newAttrs = {'version': '3.1'};
+
+        /* Move shet_notes to sheetnotes to avoid conflicts with repeating items using _notes */
+        if (v['sheet_notes']) {
+            newAttrs['sheetnotes'] = v['sheet_notes'];
+            newAttrs['sheet_notes'] = "";
+        }
+
+        setAttrs(newAttrs);
+    });
+}
 
 /* Versioning */
 /**
@@ -331,13 +353,14 @@ function damageTable(step) {
  * @param version the sheet version already parse to a float or 0 if not a valid float
  */
 function versioning(sheet_type, version) {
-    const latestVersion = '3.0';
+    const latestVersion = '3.1';
     if (debug) {console.log(`Current sheet version = ${version}`);}
     version = parseFloat(version) || 0;
     /* Eval sheet version and run upgrade functions as needed, note we have dropped functions of old versions */
     if(version === 0) {
-        if (debug) {console.log(`Current version invalid, setting to ${latestVersion}`);}
-        setAttrs({['version']: latestVersion});
+        if (debug) {console.log(`Current version invalid, setting to 2.7`);}
+        setAttrs({['version']: '2.7'});
+        versioning(sheet_type, '3.0');
     } else if (version < 3.0) {
         if (sheet_type === 'pc') {upgradeCharacter3Dot0();}
         else if (sheet_type === 'battle_unit') {upgradeBattleUnit3Dot0();}
@@ -345,6 +368,16 @@ function versioning(sheet_type, version) {
         else if (sheet_type === 'solar_system') {upgradeStarSystem3Dot0();}
         else if (sheet_type === 'vehicle') {upgradeVehicle3Dot0();}
         versioning(sheet_type, '3.0');
+    }
+    else if (version < 3.1) {
+        if (sheet_type === 'pc') {upgradeCharacter3Dot1();}
+        else if (sheet_type === 'battle_unit') {upgradeGeneric3Dot1();}
+        else if (sheet_type === 'ship') {upgradeGeneric3Dot1();}
+        else if (sheet_type === 'solar_system') {upgradeGeneric3Dot1();}
+        else if (sheet_type === 'vehicle') {upgradeGeneric3Dot1();}
+        versioning(sheet_type, '3.1');
+    } else if (version === 3.1) {
+        setAttrs({"version": "3.1"});
     }
 }
 
@@ -370,9 +403,16 @@ function setTranslationAttrs() {
 
 /* On Open Triggers */
 on("sheet:opened", function() {
-    /* TODO replace with sheet_type after v4 release */
-    getAttrs(['type', 'version', 'character_id'], function(v) {
-        versioning(v['type'], v['version']);
+    getAttrs(['type', 'sheet_type', 'version', 'character_id'], function(v) {
+        const version = parseFloat(v['version']) || 0;
+        if (version < 3.0) {
+            let sheet_type = (typeof v['type'] === 'undefined') ? "pc" : v['type'];
+            versioning(sheet_type, version);
+        } else {
+            let sheet_type = (typeof v['sheet_type'] === 'undefined') ? "pc" : v['type'];
+            versioning(sheet_type, version);
+        }
+
         let newAttrs = setTranslationAttrs();
         /* Was seeing errors in the console about not being able to eval @{character_id} for some formula, but it did seem to actually work.
         Adding this to specifically set the value in the sheet to avoid those errors just to be safe.
@@ -380,5 +420,14 @@ on("sheet:opened", function() {
         newAttrs['character_id'] = v['character_id'];
         setAttrs(newAttrs);
     });
+});
 
+on('clicked:redo-v3-upgrade', function(event) {
+    console.log("redoing v3 upgrade");
+    getAttrs(['type', 'version'], function(v) {
+        console.log("redoing v3 upgrade");
+        let sheet_type = (typeof v['type'] === 'undefined') ? "pc" : v['type'];
+        console.log("redoing v3 upgrade");
+        versioning(sheet_type, '2.7');
+    });
 });

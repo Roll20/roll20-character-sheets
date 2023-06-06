@@ -1,5 +1,9 @@
 Change Log
 ==============================================
+**2023-05-30 ** v.82 Chuz (James Culp)
+	Update - Added Hack & Slash Matrix Actions to the Rolls Pane -> Matrix Roll Buttons
+	New Feature - Added Matrix Roll Buttons Legality Filter, this allows you to hide illegal actions.  For pcs without a matrix persona or that are worried about OS
+	New Feature - Added Matrix Roll Buttons Access Level Filter, this allows you to hide actions that are not usable at a particular Matrix Access Level (outsider/user/admin)
 **2023-05-22 ** v.81 Chuz (James Culp)
 	Bugfix - More weapon dicepool tweaks
 	New Feature - NPC->Spirits made spirits awakened and now display the spells section for them.  Dicepool does not auto-update when spirit force changes, that is an exercise for the user.

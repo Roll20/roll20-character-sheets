@@ -34,6 +34,10 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+## 23.05.2023
+    Fixed 2 Headed Dragonsnail location roll
+    Adjusted location of hit location button
+
 ## 16.05.2023
     Scorpion men Thorax hit location roll fix
     Centered THP loss header

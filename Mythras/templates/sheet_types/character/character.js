@@ -1459,13 +1459,13 @@ function calcProSkill(skillId, v, sourceAttribute) {
         ...newSocialDamageAttrs
     }
 }
-on('change:repeating_professionalskill:total change:repeating_professionalskill:notes change:repeating_professionalskill:name change:repeating_professionalskill:char1 change:repeating_professionalskill:char2 change:repeating_combatstyle:total change:repeating_combatstyle:notes change:repeating_combatstyle:name change:repeating_combatstyle:char1 change:repeating_combatstyle:char2', function(event) {
+on('change:repeating_standardskill:total change:repeating_standardskill:notes change:repeating_standardskill:name change:repeating_standardskill:char1 change:repeating_standardskill:char2 change:repeating_professionalskill:total change:repeating_professionalskill:notes change:repeating_professionalskill:name change:repeating_professionalskill:char1 change:repeating_professionalskill:char2 change:repeating_combatstyle:total change:repeating_combatstyle:notes change:repeating_combatstyle:name change:repeating_combatstyle:char1 change:repeating_combatstyle:char2', function(event) {
     if (event.sourceType === "sheetworker") {return;}
     const type = event.sourceAttribute.split('_')[1];
     const id = event.sourceAttribute.split('_')[2];
     getAttrs([`repeating_${type}_${id}_total`, `repeating_${type}_${id}_other`, `repeating_${type}_${id}_notes`, `repeating_${type}_${id}_name`,
         `repeating_${type}_${id}_char1`, `repeating_${type}_${id}_char2`,  'social_defense_id'].concat(
-            characteristicAttrs, spiritDamageGetAttrs, socialDamageGetAttrs), function(v) {
+        characteristicAttrs, spiritDamageGetAttrs, socialDamageGetAttrs), function(v) {
         setAttrs(calcProSkill(`repeating_${type}_${id}`, v, event.sourceAttribute));
     });
 });
@@ -1510,7 +1510,7 @@ on('change:repeating_passion:total change:repeating_passion:notes change:repeati
         setAttrs(calcPassion(`repeating_passion_${id}`, v));
     });
 });
-on('clicked:repeating_combatstyle:augment clicked:repeating_professionalskill:augment clicked:repeating_affiliation:augment clicked:repeating_passion:augment clicked:repeating_dependency:augment clicked:repeating_peculiarity:augment', function(event) {
+on('clicked:repeating_standardskill:augment clicked:repeating_combatstyle:augment clicked:repeating_professionalskill:augment clicked:repeating_affiliation:augment clicked:repeating_passion:augment clicked:repeating_dependency:augment clicked:repeating_peculiarity:augment', function(event) {
     const type = event.sourceAttribute.split('_')[1];
     const id = event.sourceAttribute.split('_')[2];
     getAttrs([`repeating_${type}_${id}_total`], function(v) {
@@ -1523,7 +1523,7 @@ on('clicked:repeating_combatstyle:augment clicked:repeating_professionalskill:au
         });
     });
 });
-on('clicked:repeating_professionalskill:set-social-offense clicked:repeating_passion:set-social-offense', function(event) {
+on('clicked:repeating_standardskill:set-social-offense clicked:repeating_professionalskill:set-social-offense clicked:repeating_passion:set-social-offense', function(event) {
     const type = event.sourceAttribute.split('_')[1];
     const id = event.sourceAttribute.split('_')[2];
     getAttrs([`repeating_${type}_${id}_name`, `repeating_${type}_${id}_total`, `repeating_${type}_${id}_notes`].concat(socialDamageGetAttrs), function(v) {
@@ -1540,7 +1540,7 @@ on('clicked:repeating_professionalskill:set-social-offense clicked:repeating_pas
         });
     });
 });
-on('clicked:repeating_professionalskill:set-social-defense clicked:repeating_passion:set-social-defense', function(event) {
+on('clicked:repeating_standardskill:set-social-defense clicked:repeating_professionalskill:set-social-defense clicked:repeating_passion:set-social-defense', function(event) {
     const type = event.sourceAttribute.split('_')[1];
     const id = event.sourceAttribute.split('_')[2];
     getAttrs([`repeating_${type}_${id}_name`, `repeating_${type}_${id}_total`, `repeating_${type}_${id}_notes`], function(v) {
@@ -1554,7 +1554,7 @@ on('clicked:repeating_professionalskill:set-social-defense clicked:repeating_pas
         setAttrs(newAttrs);
     });
 });
-on(`clicked:repeating_professionalskill:set-spirit-combat clicked:repeating_passion:set-spirit-combat`, function(event) {
+on(`clicked:repeating_standardskill:set-spirit-combat clicked:repeating_professionalskill:set-spirit-combat clicked:repeating_passion:set-spirit-combat`, function(event) {
     const type = event.sourceAttribute.split('_')[1];
     const id = event.sourceAttribute.split('_')[2];
     getAttrs([`repeating_${type}_${id}_name`, `repeating_${type}_${id}_total`,
@@ -1953,7 +1953,7 @@ on("change:location1_armor_enc change:location1_armor_equipped change:location2_
 });
 
 /* Repeating IDs */
-on("change:repeating_combatstyle change:repeating_professionalskill change:repeating_affiliation change:repeating_passion change:repeating_dependency change:repeating_peculiarity change:repeating_meleeweapon change:repeating_rangedweapon change:repeating_equipment change:repeating_currency change:repeating_tradition change:repeating_ability change:repeating_skilledability change:repeating_feature", function(event) {
+on("change:repeating_standardskill change:repeating_combatstyle change:repeating_professionalskill change:repeating_affiliation change:repeating_passion change:repeating_dependency change:repeating_peculiarity change:repeating_meleeweapon change:repeating_rangedweapon change:repeating_equipment change:repeating_currency change:repeating_tradition change:repeating_ability change:repeating_skilledability change:repeating_feature", function(event) {
     if (event.sourceType === "sheetworker") {return;}
     const type = event.sourceAttribute.split('_')[1];
     const id = event.sourceAttribute.split('_')[2];
