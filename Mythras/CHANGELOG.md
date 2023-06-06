@@ -4,6 +4,18 @@ All notable changes to the Mythras sheet will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## 3.1
+### Added
+- Added a button in the help section that will re-attempt the upgrade to v3 if someone ran into issues the first time around.
+- Reintroduced the repeating custom standard skills, should convert any old v2.7 data that was present.
+
+### Fixed
+- If sheet version was undefined it would the versioning scripts would skip upgrading which caused a number of people to miss any conversion logic.  Added checks and changed default behavior to handle this situation better.
+- Resolution Pool fixed
+
+### Changed
+- Moved @{sheet_notes} to @{sheetnotes} because a number of repeating fields with a _notes attr apparent to hit conflicts with this when using ability buttons.
+
 ## 3.0
 
 v3.0 is a complete re-write of the character sheet from the ground up.  Primary goals of the re-write were simplifying the sheet, fixing performance issues, and making it easier to maintain as future publications are released.  The changes are too numerous to itemize in the Changelog but some key highlights are listed below.  Conversion code should run and ensure all data in maintained but put into the new sheet forms.
