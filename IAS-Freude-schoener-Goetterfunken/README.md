@@ -18,6 +18,9 @@ Das Projekt wurde inspiriert von Hitdice, die auch den Entwicklungsprozess in ve
 
 # History
 
+## 2023-06-02
+- Layout: Verbessertes Layout
+
 ## 2023-01-09
 - Bugfix: Felder für Grundschaden und Panzerung
 
