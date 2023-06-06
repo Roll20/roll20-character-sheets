@@ -1346,32 +1346,19 @@
         <h1>{{title}}</h1>
         <div class="sheet-results">
             <h4>Result = {{Result}}</h4>
-            <h4>Base Target = {{Target}}</h4>
+            <h4>Challenge Base = {{Target}}</h4>
         </div>
     </div>
 </rolltemplate>
 
 <script type="text/worker">
-/*
-on("sheet:opened change:usemodifiers", function(eventInfo) {
-	getAttrs(["usemodifiers"], function(v) {
-		const Mod = parseInt(values[usemodifiers])||0;
-		var rollmod = "";
-		if (Mod == 1 ) { rollmod = "?{Mod|0}";}	
-	
-		var attrsToChange = {};
-		attrsToChange["rollmod"] = rollmod;
-		attrsToChange["Skill_Name2"] = "banana";
-		setAttrs(attrsToChange);
-	});
-});
-*/
+
 on("change:usemodifiers sheet:opened", function () {
 	getAttrs(["usemodifiers"], function (values) {
 		const Mod = parseInt(values.usemodifiers)||0;
 
 		var dicemod = "";
-		if (Mod === 1 ) { dicemod = "?{Mod|0}"; }	
+		if (Mod === 1 ) { dicemod = "?{Mod|0}"; } else { dicemod = "0"; } 
 
 		setAttrs({
 			rollmod: dicemod,
@@ -1580,6 +1567,48 @@ on("change:Attribute1 change:Attribute2 change:Attribute3 change:Attribute4 chan
 	});
 });
 
+//dictionary to convert sheet attribute name to compendium attribute name
+const spellFields = {
+  name:'Name',
+  'caster-Spell_Lvl':'data-Caster-Spell_Lvl',
+  'casting-time':'data-Casting-Time',
+  range:'data-Range',
+  'target-area-of-effect':'data-Target-Area-Of-Effect',
+  duration:'data-Duration',
+  'saving-throw':'data-Saving-Throw',
+  'spell-resistance':'data-Spell-Resistance',
+  components:'data-Components',
+  damage:'data-Damage',
+  damageperlevel:'data-Damage_per_level',
+  description:'data-Description'
+};
+const processSpell = (attributes,data) => {
+  const rowID = generateRowID();
+  const setObj = {};
+  //Iterate over the dictionary. Assign attributes for each compendium key
+  return Object.entries(spellFields).reduce((obj,[sheetKey,compendiumKey]) => {
+    obj[`repeating_spells_${rowID}_spell${sheetKey}`] = data[compendiumKey];
+    return obj;
+  },{});
+};
+on('change:drop_data',(event)=>{
+  getAttrs(['drop_data'],(attributes) => {
+    try{
+      const data = JSON.parse(attributes.data);
+      const funcSwitch = {
+        //Switch the key here to whatever the category name for spells is in your compendium
+        Spells:processSpell
+      };
+      if(funcSwitch[data.Category]){
+        //Passing the attributes in case you need to use them for something else in another drop function.
+        const setObj = funcSwitch[data.Category](attributes,data);
+        setAttrs(setObj,{silent:true});
+      }
+    }catch{
+        //Do nothing if the thing fails. It means this wasn't a valid drop.
+    }
+  })
+})
 
 const monstats = ['monstr','mondex','moncon','monint','monwis','moncha'];
 monstats.forEach(function (stat) {
@@ -1646,7 +1675,7 @@ on('clicked:WeaponOne-action', async (info) => {
 	const HitTotal = parseInt(values.WeaponBth_1)+parseInt(values.WeaponHitMod_1)+parseInt(values.WeaponHitMisc_1)+parseInt(values.WeaponHitMagic_1) || 0;
 	const DmgTotal = parseInt(values.WeaponDmgMod_1)+parseInt(values.WeaponDmgMisc_1)+parseInt(values.WeaponDmgMagic_1) || 0;
 	const CharName = values.CharacterName||"";
-	const rollmod = values.rollmod||"";
+	const rollmod = values.rollmod||"0";
 	const results = await startRoll("&{template:attack} {{name="+CharName+" "+WpnName+"}} {{roll1=[[1d20+"+HitTotal+"+"+rollmod+"]]}} {{roll2=[["+WpnDmg+"+"+DmgTotal+"]]}}");
 	const tohit = results.results.roll1.result;
 	const totaldmg = results.results.roll2.result;
@@ -1672,7 +1701,7 @@ on('clicked:WeaponTwo-action', async (info) => {
 	const HitTotal = parseInt(values.WeaponBth_2)+parseInt(values.WeaponHitMod_2)+parseInt(values.WeaponHitMisc_2)+parseInt(values.WeaponHitMagic_2) || 0;
 	const DmgTotal = parseInt(values.WeaponDmgMod_2)+parseInt(values.WeaponDmgMisc_2)+parseInt(values.WeaponDmgMagic_2) || 0;
 	const CharName = values.CharacterName||"";
-	const rollmod = values.rollmod||"";
+	const rollmod = values.rollmod||"0";
 	const results = await startRoll("&{template:attack} {{name="+CharName+" "+WpnName+"}} {{roll1=[[1d20+"+HitTotal+"+"+rollmod+"]]}} {{roll2=[["+WpnDmg+"+"+DmgTotal+"]]}}");
 	const tohit = results.results.roll1.result;
 	const totaldmg = results.results.roll2.result;
@@ -1698,7 +1727,7 @@ on('clicked:WeaponThree-action', async (info) => {
 	const HitTotal = parseInt(values.WeaponBth_3)+parseInt(values.WeaponHitMod_3)+parseInt(values.WeaponHitMisc_3)+parseInt(values.WeaponHitMagic_3) || 0;
 	const DmgTotal = parseInt(values.WeaponDmgMod_3)+parseInt(values.WeaponDmgMisc_3)+parseInt(values.WeaponDmgMagic_3) || 0;
 	const CharName = values.CharacterName||"";
-	const rollmod = values.rollmod||"";
+	const rollmod = values.rollmod||"0";
 	const results = await startRoll("&{template:attack} {{name="+CharName+" "+WpnName+"}} {{roll1=[[1d20+"+HitTotal+"+"+rollmod+"]]}} {{roll2=[["+WpnDmg+"+"+DmgTotal+"]]}}");
 	const tohit = results.results.roll1.result;
 	const totaldmg = results.results.roll2.result;
@@ -1724,7 +1753,7 @@ on('clicked:WeaponFour-action', async (info) => {
 	const HitTotal = parseInt(values.WeaponBth_4)+parseInt(values.WeaponHitMod_4)+parseInt(values.WeaponHitMisc_4)+parseInt(values.WeaponHitMagic_4) || 0;
 	const DmgTotal = parseInt(values.WeaponDmgMod_4)+parseInt(values.WeaponDmgMisc_4)+parseInt(values.WeaponDmgMagic_4) || 0;
 	const CharName = values.CharacterName||"";
-	const rollmod = values.rollmod||"";
+	const rollmod = values.rollmod||"0";
 	const results = await startRoll("&{template:attack} {{name="+CharName+" "+WpnName+"}} {{roll1=[[1d20+"+HitTotal+"+"+rollmod+"]]}} {{roll2=[["+WpnDmg+"+"+DmgTotal+"]]}}");
 	const tohit = results.results.roll1.result;
 	const totaldmg = results.results.roll2.result;
@@ -1750,7 +1779,7 @@ on('clicked:WeaponFive-action', async (info) => {
 	const HitTotal = parseInt(values.WeaponBth_5)+parseInt(values.WeaponHitMod_5)+parseInt(values.WeaponHitMisc_5)+parseInt(values.WeaponHitMagic_5) || 0;
 	const DmgTotal = parseInt(values.WeaponDmgMod_5)+parseInt(values.WeaponDmgMisc_5)+parseInt(values.WeaponDmgMagic_5) || 0;
 	const CharName = values.CharacterName||"";
-	const rollmod = values.rollmod||"";
+	const rollmod = values.rollmod||"0";
 	const results = await startRoll("&{template:attack} {{name="+CharName+" "+WpnName+"}} {{roll1=[[1d20+"+HitTotal+"+"+rollmod+"]]}} {{roll2=[["+WpnDmg+"+"+DmgTotal+"]]}}");
 	const tohit = results.results.roll1.result;
 	const totaldmg = results.results.roll2.result;
@@ -1776,7 +1805,7 @@ on('clicked:MonWeaponOne-action', async (info) => {
 	const HitTotal = parseInt(values.MonWeaponBth_1)+parseInt(values.MonWeaponHitMod_1)+parseInt(values.MonWeaponHitMisc_1)+parseInt(values.MonWeaponHitMagic_1) || 0;
 	const DmgTotal = parseInt(values.MonWeaponDmgMod_1)+parseInt(values.MonWeaponDmgMisc_1)+parseInt(values.MonWeaponDmgMagic_1) || 0;
 	const CharName = values.MonsterName||"";
-	const rollmod = values.rollmod||"";
+	const rollmod = values.rollmod||"0";
 	const results = await startRoll("&{template:attack} {{name="+CharName+" "+WpnName+"}} {{roll1=[[1d20+"+HitTotal+"+"+rollmod+"]]}} {{roll2=[["+WpnDmg+"+"+DmgTotal+"]]}}");
 	const tohit = results.results.roll1.result;
 	const totaldmg = results.results.roll2.result;
@@ -1802,7 +1831,7 @@ on('clicked:MonWeaponTwo-action', async (info) => {
 	const HitTotal = parseInt(values.MonWeaponBth_2)+parseInt(values.MonWeaponHitMod_2)+parseInt(values.MonWeaponHitMisc_2)+parseInt(values.MonWeaponHitMagic_2) || 0;
 	const DmgTotal = parseInt(values.MonWeaponDmgMod_2)+parseInt(values.MonWeaponDmgMisc_2)+parseInt(values.MonWeaponDmgMagic_2) || 0;
 	const CharName = values.MonsterName||"";
-	const rollmod = values.rollmod||"";
+	const rollmod = values.rollmod||"0";
 	const results = await startRoll("&{template:attack} {{name="+CharName+" "+WpnName+"}} {{roll1=[[1d20+"+HitTotal+"+"+rollmod+"]]}} {{roll2=[["+WpnDmg+"+"+DmgTotal+"]]}}");
 	const tohit = results.results.roll1.result;
 	const totaldmg = results.results.roll2.result;
@@ -1828,7 +1857,7 @@ on('clicked:MonWeaponThree-action', async (info) => {
 	const HitTotal = parseInt(values.MonWeaponBth_3)+parseInt(values.MonWeaponHitMod_3)+parseInt(values.MonWeaponHitMisc_3)+parseInt(values.MonWeaponHitMagic_3) || 0;
 	const DmgTotal = parseInt(values.MonWeaponDmgMod_3)+parseInt(values.MonWeaponDmgMisc_3)+parseInt(values.MonWeaponDmgMagic_3) || 0;
 	const CharName = values.MonsterName||"";
-	const rollmod = values.rollmod||"";
+	const rollmod = values.rollmod||"0";
 	const results = await startRoll("&{template:attack} {{name="+CharName+" "+WpnName+"}} {{roll1=[[1d20+"+HitTotal+"+"+rollmod+"]]}} {{roll2=[["+WpnDmg+"+"+DmgTotal+"]]}}");
 	const tohit = results.results.roll1.result;
 	const totaldmg = results.results.roll2.result;
@@ -1854,7 +1883,7 @@ on('clicked:MonWeaponFour-action', async (info) => {
 	const HitTotal = parseInt(values.MonWeaponBth_4)+parseInt(values.MonWeaponHitMod_4)+parseInt(values.MonWeaponHitMisc_4)+parseInt(values.MonWeaponHitMagic_4) || 0;
 	const DmgTotal = parseInt(values.MonWeaponDmgMod_4)+parseInt(values.MonWeaponDmgMisc_4)+parseInt(values.MonWeaponDmgMagic_4) || 0;
 	const CharName = values.MonsterName||"";
-	const rollmod = values.rollmod||"";
+	const rollmod = values.rollmod||"0";
 	const results = await startRoll("&{template:attack} {{name="+CharName+" "+WpnName+"}} {{roll1=[[1d20+"+HitTotal+"+"+rollmod+"]]}} {{roll2=[["+WpnDmg+"+"+DmgTotal+"]]}}");
 	const tohit = results.results.roll1.result;
 	const totaldmg = results.results.roll2.result;
