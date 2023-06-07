@@ -142,34 +142,34 @@ function register_repeated_section_totals(section, properties) {
 register_repeated_section_totals("armors", ["prot", "load"]);
 register_repeated_section_totals("combat-mods", ["init", "atk", "dfn", "dam", "soak"]);
 
+// Weapon update has been ported to kScaffold, this isn't needed anymore
 // Fix weapon attributes
+// on("sheet:opened", function() {
+//     const fixes = {
+//         "_Wounds_Load": "_Weapon_Load",
+//         "_Wounds_Range": "_Weapon_Range",
+//     };
+//     const keys = Object.keys(fixes);
+//     getSectionIDs("repeating_weapons", function(id_array) {
+//         var attr_names = [];
+//         id_array.forEach( (id_) => (keys.forEach((key) => attr_names.push("repeating_weapons_" + id_ + key))));
 
-on("sheet:opened", function() {
-    const fixes = {
-        "_Wounds_Load": "_Weapon_Load",
-        "_Wounds_Range": "_Weapon_Range",
-    };
-    const keys = Object.keys(fixes);
-    getSectionIDs("repeating_weapons", function(id_array) {
-        var attr_names = [];
-        id_array.forEach( (id_) => (keys.forEach((key) => attr_names.push("repeating_weapons_" + id_ + key))));
-
-        getAttrs(attr_names, function(attrs) {
-            var value = 0;
-            var updates = {};
-            id_array.forEach( (id_) => (keys.forEach(function(key) {
-                if (attrs["repeating_weapons_" + id_ + key]) {
-                    console.log(attrs["repeating_weapons_" + id_ + key]);
-                    console.log("Fixing " + "repeating_weapons_" + id_ + key + " to " + "repeating_weapons_" + id_ + fixes[key]);
-                    updates["repeating_weapons_" + id_ + fixes[key]] = parseInt(attrs["repeating_weapons_" + id_ + key]) || 0;
-                    updates["repeating_weapons_" + id_ + key] = "";
-                }
-            })));
-            console.log("All fixes :" + JSON.stringify(updates, null, 1));
-            setAttrs(updates);
-        });
-    });
-});
+//         getAttrs(attr_names, function(attrs) {
+//             var value = 0;
+//             var updates = {};
+//             id_array.forEach( (id_) => (keys.forEach(function(key) {
+//                 if (attrs["repeating_weapons_" + id_ + key]) {
+//                     console.log(attrs["repeating_weapons_" + id_ + key]);
+//                     console.log("Fixing " + "repeating_weapons_" + id_ + key + " to " + "repeating_weapons_" + id_ + fixes[key]);
+//                     updates["repeating_weapons_" + id_ + fixes[key]] = parseInt(attrs["repeating_weapons_" + id_ + key]) || 0;
+//                     updates["repeating_weapons_" + id_ + key] = "";
+//                 }
+//             })));
+//             console.log("All fixes :" + JSON.stringify(updates, null, 1));
+//             setAttrs(updates);
+//         });
+//     });
+// });
 
 // Duplicate the global bonuses inside the weapons repeating section for display
 // From https://app.roll20.net/forum/post/10297616/how-do-i-reference-a-global-attribute-in-a-span-in-a-repeating-section
@@ -272,79 +272,81 @@ on("sheet:opened", function(eventInfo){
         "vim_i18n": getTranslationByKey("vim")
     });
 
-    getAttrs(["notNew"], function (values) {
-        if (values.notNew == 0) {
-            setAttrs({
-                "notNew": 1,
-                "alert-alert-update-v1-7-1": 1,
-                "alert-alert-update-v1-7": 1,
-                "alert-alert-update-v1-6-5": 1,
-                "alert-alert-update-v1-6-4": 1,
-                "alert-alert-update-v1-6-3": 1,
-                "alert-alert-update-v1-6-2": 1,
-                "alert-alert-update-v1-6-1": 1,
-                "alert-alert-update-v1-6": 1,
-                "alert-alert-update-v1-51": 1,
-                "alert-alert-update-v1-5": 1,
-                "alert-alert-update-v1-4": 1,
-                "alert-161-spell-update": 1,
-                "alert-alert-update-v1_6-dataloss": 1,
-                "alert-alert-update-v1-7-armorylegacy": 1
-            }); 
-        }
-    });
+    // Alert system has been replaced, this serves no purposes
+    // getAttrs(["notNew"], function (values) {
+    //     if (values.notNew == 0) {
+    //         setAttrs({
+    //             "notNew": 1,
+    //             "alert-alert-update-v1-7-1": 1,
+    //             "alert-alert-update-v1-7": 1,
+    //             "alert-alert-update-v1-6-5": 1,
+    //             "alert-alert-update-v1-6-4": 1,
+    //             "alert-alert-update-v1-6-3": 1,
+    //             "alert-alert-update-v1-6-2": 1,
+    //             "alert-alert-update-v1-6-1": 1,
+    //             "alert-alert-update-v1-6": 1,
+    //             "alert-alert-update-v1-51": 1,
+    //             "alert-alert-update-v1-5": 1,
+    //             "alert-alert-update-v1-4": 1,
+    //             "alert-161-spell-update": 1,
+    //             "alert-alert-update-v1_6-dataloss": 1,
+    //             "alert-alert-update-v1-7-armorylegacy": 1
+    //         }); 
+    //     }
+    // });
 
+    // The spell update has been ported to k-Scaffold, this is unneeded
     // Update old spell art selection to new format
     // Skip it if the Warning banner for that update is closed
-    getAttrs(["alert-161-spell-update"], function(values) {
-        if (values["alert-161-spell-update"] == 0) {
-            getSectionIDs("spell", function(idarray) {
-                const tech_translation = {
-                    0: "unselected",
-                    1: "Creo",
-                    2: "Intellego",
-                    3: "Muto",
-                    4: "Perdo",
-                    5: "Rego"
-                };
-                const form_translation = {
-                    0: "unselected",
-                    1: "Animal",
-                    2: "Aquam",
-                    3: "Auram",
-                    4: "Corpus",
-                    5: "Herbam",
-                    6: "Ignem",
-                    7: "Imaginem",
-                    8: "Mentem",
-                    9: "Terram",
-                    10: "Vim"
-                };
-                for (var i=0; i < idarray.length; i++) {
-                    const spellid = idarray[i];
-                    console.log("Update 1.6.1 - Spell arts updater script - scheduling update for spell ID:" + spellid);
-                    getAttrs(
-                        [   
-                            "repeating_spell_" + spellid + "_spell_name",
-                            "repeating_spell_" + spellid + "_Technique_select",
-                            "repeating_spell_" + spellid + "_Form_select"
-                        ],
-                        function (values) {
-                            attr_updates = {
-                                ["repeating_spell_" + spellid + "_spell_tech_name"]: tech_translation[values["repeating_spell_" + spellid + "_Technique_select"]] || "unselected",
-                                ["repeating_spell_" + spellid + "_spell_form_name"]: form_translation[values["repeating_spell_" + spellid + "_Form_select"]] || "unselected"
-                            };
-                            console.log("Update 1.6.1 - Spell arts updater script - " + values["repeating_spell_" + spellid + "_spell_name"] + " (ID " + spellid + ")");
-                            console.log(attr_updates);
-                            console.log("Update 1.6.1 - Spell arts updater script - spell " + spellid + " END");
-                            setAttrs(attr_updates);
-                        }
-                    );
-                }
-                console.log("Update 1.6.1 - Spell arts updater script - all spell scheduled for update");
-                setAttrs({"alert-161-spell-update": 1});
-            });
-        }
-    });
+    // getAttrs(["alert-161-spell-update"], function(values) {
+    //     if (values["alert-161-spell-update"] == 0) {
+    //         getSectionIDs("spell", function(idarray) {
+    //             const tech_translation = {
+    //                 0: "unselected",
+    //                 1: "Creo",
+    //                 2: "Intellego",
+    //                 3: "Muto",
+    //                 4: "Perdo",
+    //                 5: "Rego"
+    //             };
+    //             const form_translation = {
+    //                 0: "unselected",
+    //                 1: "Animal",
+    //                 2: "Aquam",
+    //                 3: "Auram",
+    //                 4: "Corpus",
+    //                 5: "Herbam",
+    //                 6: "Ignem",
+    //                 7: "Imaginem",
+    //                 8: "Mentem",
+    //                 9: "Terram",
+    //                 10: "Vim"
+    //             };
+    //             for (var i=0; i < idarray.length; i++) {
+    //                 const spellid = idarray[i];
+    //                 console.log("Update 1.6.1 - Spell arts updater script - scheduling update for spell ID:" + spellid);
+    //                 getAttrs(
+    //                     [   
+    //                         "repeating_spell_" + spellid + "_spell_name",
+    //                         "repeating_spell_" + spellid + "_Technique_select",
+    //                         "repeating_spell_" + spellid + "_Form_select"
+    //                     ],
+    //                     function (values) {
+    //                         attr_updates = {
+    //                             ["repeating_spell_" + spellid + "_spell_tech_name"]: tech_translation[values["repeating_spell_" + spellid + "_Technique_select"]] || "unselected",
+    //                             ["repeating_spell_" + spellid + "_spell_form_name"]: form_translation[values["repeating_spell_" + spellid + "_Form_select"]] || "unselected"
+    //                         };
+    //                         console.log("Update 1.6.1 - Spell arts updater script - " + values["repeating_spell_" + spellid + "_spell_name"] + " (ID " + spellid + ")");
+    //                         console.log(attr_updates);
+    //                         console.log("Update 1.6.1 - Spell arts updater script - spell " + spellid + " END");
+    //                         setAttrs(attr_updates);
+    //                     }
+    //                 );
+    //             }
+    //             console.log("Update 1.6.1 - Spell arts updater script - all spell scheduled for update");
+    //             setAttrs({"alert-161-spell-update": 1});
+    //         });
+    //     }
+    // });
     
 });
