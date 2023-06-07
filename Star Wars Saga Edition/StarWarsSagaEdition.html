@@ -1668,7 +1668,8 @@
 						</div>
 					</div>	</div>
 				</div>	</div>
-				<span class="sheet-small">Athletics skill house rule?</span>&nbsp;<input type="checkbox" class="athleticsShow" value="1" name="attr_athletics-Show"  title="Replace Climb, Jump, and Swim skills with Athletics skill?"/>
+				<span class="sheet-small" style="margin-left: 20px;">Athletics skill house rule?</span>&nbsp;<input type="checkbox" class="athleticsShow" value="1" name="attr_athletics-Show"  title="Replace Climb, Jump, and Swim skills with Athletics skill?"/>
+				<span class="sheet-small not-show" style="vertical-align:inherit; margin-left: 30px;">Skill Focus as 1/2 level house rule?</span>&nbsp;<input type="checkbox" value="1" name="attr_FocusHouseRule"  title="Skill Focus will increase a skill's modifier at odd levels. Checking this box will overwrite the formulas for skills."/>
 			</div>
 			<br />			
 			<div class="sheet-textHead2Col" data-i18n="attack_options">Attack Options</div>
@@ -2956,7 +2957,7 @@
 <!-- start help section --> 
 <div> 
 For Help, please see the wiki page. <input type="text" disabled="true" name="wiki_URL" style="width:30em" title="Wiki URL" value="https://wiki.roll20.net/Star_Wars_Saga_Edition_Character_Sheet"/> <br/>
-<span data-i18n="last_updated"><b>Last updated</b></span> 2 June 2023
+<span data-i18n="last_updated"><b>Last updated</b></span> 7 June 2023
 </div>
 <!-- start roll templates --> 
 <body>
@@ -3696,6 +3697,7 @@ var TAS = TAS || (function(){
 // ====== PC /NPC Sheet ====== \\
 on("change:level", function() {
 	ArmorUpdate();
+	SkillUpdate();
 });
 on("change:size", function() {
 	SizeUpdate();
@@ -3703,8 +3705,12 @@ on("change:size", function() {
 
 on("change:dex", function() {
 	ArmorUpdate();
+	//SkillUpdate();
 });
-
+/* Not exactly sure why this doesn't work for attributes like it does for the level. The console log indicates success...
+on("change:str change:con change:int change:wis change:cha", function() {
+	SkillUpdate();
+});*/
 //Changes to Armor
 on("change:armorworncheck change:armorprof", function() {
 	ArmorUpdate();
@@ -3767,6 +3773,99 @@ on("clicked:SecondWind", function() {
 				"Second_Wind_Count": Second_Wind_Count
         	});
    });
+});
+on("change:FocusHouseRule", function() {
+   //sheetworker triggers on any changes to the "FocusHouseRule" attribute
+	getAttrs(["FocusHouseRule","AcrobaticsFormula","AthleticsFormula","ClimbFormula","DeceptionFormula","EnduranceFormula","GatherInformationFormula","InitiativeFormula","JumpFormula","Knowledge-BureaucracyFormula","Knowledge-GalacticLoreFormula","Knowledge-LifeSciencesFormula","Knowledge-PhysicalScienceFormula","Knowledge-SocialScienceFormula","Knowledge-TacticsFormula","Knowledge-TechnologyFormula","MechanicsFormula","PerceptionFormula","PersuasionFormula","PilotFormula","RideFormula","StealthFormula","SurvivalFormula","SwimFormula","TreatInjuryFormula","UseComputerFormula","UsetheForceFormula"], function(values) {
+    //get the values for the two attributes, so they can used.
+		let FHR = values.FocusHouseRule||0;
+		var AcrobaticsFormula = "@{level|max}[Half Level]+@{AcrobaticsMod}[Mod]+@{AcrobaticsFeat}[Training]+@{AcrobaticsFeat|max}[Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{AcrobaticsMisc}[Misc]+@{CT}[CT]";
+		var AthleticsFormula = "@{level|max}[Half Level]+@{AthleticsMod}[Mod]+@{AthleticsFeat}[Training]+@{AthleticsFeat|max}[Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{AthleticsMisc}[Misc]+@{CT}[CT]";
+		var ClimbFormula = "@{level|max}[Half Level]+@{ClimbMod}[Mod]+@{ClimbFeat}[Training]+@{ClimbFeat|max}[Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{ClimbMisc}[Misc]+@{CT}[CT]";
+		var DeceptionFormula = "@{level|max}[Half Level]+@{DeceptionMod}[Mod]+@{DeceptionFeat}[Training]+@{DeceptionFeat|max}[Focus]+@{DeceptionMisc}[Misc]+@{CT}[CT]";
+		var EnduranceFormula = "@{level|max}[Half Level]+@{EnduranceMod}[Mod]+@{EnduranceFeat}[Training]+@{EnduranceFeat|max}[Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{EnduranceMisc}[Misc]+@{CT}[CT]";
+		var GatherInformationFormula = "@{level|max}[Half Level]+@{GatherInformationMod}[Mod]+@{GatherInformationFeat}[Training]+@{GatherInformationFeat|max}[Focus]+@{GatherInformationMisc}[Misc]+@{CT}[CT]";
+		var InitiativeFormula = "@{level|max}[Half Level]+@{InitiativeMod}[Mod]+@{InitiativeFeat}[Training]+@{InitiativeFeat|max}[Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{InitiativeMisc}[Misc]+@{CT}[CT]";
+		var JumpFormula = "@{level|max}[Half Level]+@{JumpMod}[Mod]+@{JumpFeat}[Training]+@{JumpFeat|max}[Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{JumpMisc}[Misc]+@{CT}[CT]";
+		var BureaucracyFormula = "@{level|max}[Half Level]+@{Knowledge-BureaucracyMod}[Mod]+@{Knowledge-BureaucracyFeat}[Training]+@{Knowledge-BureaucracyFeat|max}[Focus]+@{Knowledge-BureaucracyMisc}[Misc]+@{CT}[CT]";
+		var GalacticLoreFormula = "@{level|max}[Half Level]+@{Knowledge-GalacticLoreMod}[Mod]+@{Knowledge-GalacticLoreFeat}[Training]+@{Knowledge-GalacticLoreFeat|max}[Focus]+@{Knowledge-GalacticLoreMisc}[Misc]+@{CT}[CT]";
+		var LifeSciencesFormula = "@{level|max}[Half Level]+@{Knowledge-LifeSciencesMod}[Mod]+@{Knowledge-LifeSciencesFeat}[Training]+@{Knowledge-LifeSciencesFeat|max}[Focus]+@{Knowledge-LifeSciencesMisc}[Misc]+@{CT}[CT]";
+		var PhysicalScienceFormula = "@{level|max}[Half Level]+@{Knowledge-PhysicalScienceMod}[Mod]+@{Knowledge-PhysicalScienceFeat}[Training]+@{Knowledge-PhysicalScienceFeat|max}[Focus]+@{Knowledge-PhysicalScienceMisc}[Misc]+@{CT}[CT]";
+		var SocialScienceFormula = "@{level|max}[Half Level]+@{Knowledge-SocialScienceMod}[Mod]+@{Knowledge-SocialScienceFeat}[Training]+@{Knowledge-SocialScienceFeat|max}[Focus]+@{Knowledge-SocialScienceMisc}[Misc]+@{CT}[CT]";
+		var TacticsFormula = "@{level|max}[Half Level]+@{Knowledge-TacticsMod}[Mod]+@{Knowledge-TacticsFeat}[Training]+@{Knowledge-TacticsFeat|max}[Focus]+@{Knowledge-TacticsMisc}[Misc]+@{CT}[CT]";
+		var TechnologyFormula = "@{level|max}[Half Level]+@{Knowledge-TechnologyMod}[Mod]+@{Knowledge-TechnologyFeat}[Training]+@{Knowledge-TechnologyFeat|max}[Focus]+@{Knowledge-TechnologyMisc}[Misc]+@{CT}[CT]";
+		var MechanicsFormula = "@{level|max}[Half Level]+@{MechanicsMod}[Mod]+@{MechanicsFeat}[Training]+@{MechanicsFeat|max}[Focus]+@{MechanicsMisc}[Misc]+@{CT}[CT]";
+		var PerceptionFormula = "@{level|max}[Half Level]+@{PerceptionMod}[Mod]+@{PerceptionFeat}[Training]+@{PerceptionFeat|max}[Focus]+@{PerceptionMisc}[Misc]+@{CT}[CT]";
+		var PersuasionFormula = "@{level|max}[Half Level]+@{PersuasionMod}[Mod]+@{PersuasionFeat}[Training]+@{PersuasionFeat|max}[Focus]+@{PersuasionMisc}[Misc]+@{CT}[CT]";
+		var PilotFormula = "@{level|max}[Half Level]+@{PilotMod}[Mod]+@{PilotFeat}[Training]+@{PilotFeat|max}[Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{PilotMisc}[Misc]+@{CT}[CT]";
+		var RideFormula = "@{level|max}[Half Level]+@{RideMod}[Mod]+@{RideFeat}[Training]+@{RideFeat|max}[Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{RideMisc}[Misc]+@{CT}[CT]";
+		var StealthFormula = "@{level|max}[Half Level]+@{StealthMod}[Mod]+@{StealthFeat}[Training]+@{StealthFeat|max}[Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{StealthMisc}[Misc]+@{CT}[CT]";
+		var SurvivalFormula = "@{level|max}[Half Level]+@{SurvivalMod}[Mod]+@{SurvivalFeat}[Training]+@{SurvivalFeat|max}[Focus]+@{SurvivalMisc}[Misc]+@{CT}[CT]";
+		var SwimFormula = "@{level|max}[Half Level]+@{SwimMod}[Mod]+@{SwimFeat}[Training]+@{SwimFeat|max}[Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{SwimMisc}[Misc]+@{CT}[CT]";
+		var TreatInjuryFormula = "@{level|max}[Half Level]+@{TreatInjuryMod}[Mod]+@{TreatInjuryFeat}[Training]+@{TreatInjuryFeat|max}[Focus]+@{TreatInjuryMisc}[Misc]+@{CT}[CT]";
+		var UseComputerFormula = "@{level|max}[Half Level]+@{UseComputerMod}[Mod]+@{UseComputerFeat}[Training]+@{UseComputerFeat|max}[Focus]+@{UseComputerMisc}[Misc]+@{CT}[CT]";
+		var UsetheForceFormula = "@{level|max}[Half Level]+@{UsetheForceMod}[Mod]+@{UsetheForceFeat}[Training]+@{UsetheForceFeat|max}[Focus]+@{UsetheForceMisc}[Misc]+@{CT}[CT]";
+        //sets the values of the variables to the default formulas.
+		if(FHR ==1) {
+			AcrobaticsFormula = "@{level|max}[Half Level]+@{AcrobaticsMod}[Mod]+@{AcrobaticsFeat}[Training]+[[ceil(@{level}/2)*@{AcrobaticsFeat|max}/5]][Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{AcrobaticsMisc}[Misc]+@{CT}[CT]";
+			AthleticsFormula = "@{level|max}[Half Level]+@{AthleticsMod}[Mod]+@{AthleticsFeat}[Training]+[[ceil(@{level}/2)*@{AthleticsFeat|max}/5]][Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{AthleticsMisc}[Misc]+@{CT}[CT]";
+			ClimbFormula = "@{level|max}[Half Level]+@{ClimbMod}[Mod]+@{ClimbFeat}[Training]+[[ceil(@{level}/2)*@{ClimbFeat|max}/5]][Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{ClimbMisc}[Misc]+@{CT}[CT]";
+			DeceptionFormula = "@{level|max}[Half Level]+@{DeceptionMod}[Mod]+@{DeceptionFeat}[Training]+[[ceil(@{level}/2)*@{DeceptionFeat|max}/5]][Focus]+@{DeceptionMisc}[Misc]+@{CT}[CT]";
+			EnduranceFormula = "@{level|max}[Half Level]+@{EnduranceMod}[Mod]+@{EnduranceFeat}[Training]+[[ceil(@{level}/2)*@{EnduranceFeat|max}/5]][Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{EnduranceMisc}[Misc]+@{CT}[CT]";
+			GatherInformationFormula = "@{level|max}[Half Level]+@{GatherInformationMod}[Mod]+@{GatherInformationFeat}[Training]+[[ceil(@{level}/2)*@{GatherInformationFeat|max}/5]][Focus]+@{GatherInformationMisc}[Misc]+@{CT}[CT]";
+			InitiativeFormula = "@{level|max}[Half Level]+@{InitiativeMod}[Mod]+@{InitiativeFeat}[Training]+[[ceil(@{level}/2)*@{InitiativeFeat|max}/5]][Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{InitiativeMisc}[Misc]+@{CT}[CT]";
+			JumpFormula = "@{level|max}[Half Level]+@{JumpMod}[Mod]+@{JumpFeat}[Training]+[[ceil(@{level}/2)*@{JumpFeat|max}/5]][Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{JumpMisc}[Misc]+@{CT}[CT]";
+			BureaucracyFormula = "@{level|max}[Half Level]+@{Knowledge-BureaucracyMod}[Mod]+@{Knowledge-BureaucracyFeat}[Training]+[[ceil(@{level}/2)*@{Knowledge-BureaucracyFeat|max}/5]][Focus]+@{Knowledge-BureaucracyMisc}[Misc]+@{CT}[CT]";
+			GalacticLoreFormula = "@{level|max}[Half Level]+@{Knowledge-GalacticLoreMod}[Mod]+@{Knowledge-GalacticLoreFeat}[Training]+[[ceil(@{level}/2)*@{Knowledge-GalacticLoreFeat|max}/5]][Focus]+@{Knowledge-GalacticLoreMisc}[Misc]+@{CT}[CT]";
+			LifeSciencesFormula = "@{level|max}[Half Level]+@{Knowledge-LifeSciencesMod}[Mod]+@{Knowledge-LifeSciencesFeat}[Training]+[[ceil(@{level}/2)*@{Knowledge-LifeSciencesFeat|max}/5]][Focus]+@{Knowledge-LifeSciencesMisc}[Misc]+@{CT}[CT]";
+			PhysicalScienceFormula = "@{level|max}[Half Level]+@{Knowledge-PhysicalScienceMod}[Mod]+@{Knowledge-PhysicalScienceFeat}[Training]+[[ceil(@{level}/2)*@{Knowledge-PhysicalScienceFeat|max}/5]][Focus]+@{Knowledge-PhysicalScienceMisc}[Misc]+@{CT}[CT]";
+			SocialScienceFormula = "@{level|max}[Half Level]+@{Knowledge-SocialScienceMod}[Mod]+@{Knowledge-SocialScienceFeat}[Training]+[[ceil(@{level}/2)*@{Knowledge-SocialScienceFeat|max}/5]][Focus]+@{Knowledge-SocialScienceMisc}[Misc]+@{CT}[CT]";
+			TacticsFormula = "@{level|max}[Half Level]+@{Knowledge-TacticsMod}[Mod]+@{Knowledge-TacticsFeat}[Training]+[[ceil(@{level}/2)*@{Knowledge-TechnologyFeat|max}/5]][Focus]+@{Knowledge-TacticsMisc}[Misc]+@{CT}[CT]";
+			TechnologyFormula = "@{level|max}[Half Level]+@{Knowledge-TechnologyMod}[Mod]+@{Knowledge-TechnologyFeat}[Training]+[[ceil(@{level}/2)*@{Knowledge-TechnologyFeat|max}/5]][Focus]+@{Knowledge-TechnologyMisc}[Misc]+@{CT}[CT]";
+			MechanicsFormula = "@{level|max}[Half Level]+@{MechanicsMod}[Mod]+@{MechanicsFeat}[Training]+[[ceil(@{level}/2)*@{MechanicsFeat|max}/5]][Focus]+@{MechanicsMisc}[Misc]+@{CT}[CT]";
+			PerceptionFormula = "@{level|max}[Half Level]+@{PerceptionMod}[Mod]+@{PerceptionFeat}[Training]+[[ceil(@{level}/2)*@{PerceptionFeat|max}/5]][Focus]+@{PerceptionMisc}[Misc]+@{CT}[CT]";
+			PersuasionFormula = "@{level|max}[Half Level]+@{PersuasionMod}[Mod]+@{PersuasionFeat}[Training]+[[ceil(@{level}/2)*@{PersuasionFeat|max}/5]][Focus]+@{PersuasionMisc}[Misc]+@{CT}[CT]";
+			PilotFormula = "@{level|max}[Half Level]+@{PilotMod}[Mod]+@{PilotFeat}[Training]+[[ceil(@{level}/2)*@{PilotFeat|max}/5]][Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{PilotMisc}[Misc]+@{CT}[CT]";
+			RideFormula = "@{level|max}[Half Level]+@{RideMod}[Mod]+@{RideFeat}[Training]+[[ceil(@{level}/2)*@{RideFeat|max}/5]][Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{RideMisc}[Misc]+@{CT}[CT]";
+			StealthFormula = "@{level|max}[Half Level]+@{StealthMod}[Mod]+@{StealthFeat}[Training]+[[ceil(@{level}/2)*@{StealthFeat|max}/5]][Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{StealthMisc}[Misc]+@{CT}[CT]";
+			SurvivalFormula = "@{level|max}[Half Level]+@{SurvivalMod}[Mod]+@{SurvivalFeat}[Training]+[[ceil(@{level}/2)*@{SurvivalFeat|max}/5]][Focus]+@{SurvivalMisc}[Misc]+@{CT}[CT]";
+			SwimFormula = "@{level|max}[Half Level]+@{SwimMod}[Mod]+@{SwimFeat}[Training]+[[ceil(@{level}/2)*@{SwimFeat|max}/5]][Focus]+@{ArmorType|max}[Armor Penalty]+@{EquipmentLoad}[Heavy Load]+@{SwimMisc}[Misc]+@{CT}[CT]";
+			TreatInjuryFormula = "@{level|max}[Half Level]+@{TreatInjuryMod}[Mod]+@{TreatInjuryFeat}[Training]+[[ceil(@{level}/2)*@{TreatInjuryFeat|max}/5]][Focus]+@{TreatInjuryMisc}[Misc]+@{CT}[CT]"; 
+			UseComputerFormula = "@{level|max}[Half Level]+@{UseComputerMod}[Mod]+@{UseComputerFeat}[Training]+[[ceil(@{level}/2)*@{UseComputerFeat|max}/5]][Focus]+@{UseComputerMisc}[Misc]+@{CT}[CT]";
+			UsetheForceFormula = "@{level|max}[Half Level]+@{UsetheForceMod}[Mod]+@{UsetheForceFeat}[Training]+[[ceil(@{level}/2)*@{UsetheForceFeat|max}/5]][Focus]+@{UsetheForceMisc}[Misc]+@{CT}[CT]";
+			// If the house rule is used, sets the temporary variables to the house rule formula
+			console.log("Using Skill Focus house rule");} 
+		else {console.log("Using Skill Focus default rules");}
+		setAttrs({
+			"AcrobaticsFormula": AcrobaticsFormula,
+			"AthleticsFormula": AthleticsFormula,
+			"ClimbFormula": ClimbFormula,
+			"DeceptionFormula": DeceptionFormula,
+			"EnduranceFormula": EnduranceFormula,
+			"GatherInformationFormula": GatherInformationFormula,
+			"InitiativeFormula": InitiativeFormula,
+			"JumpFormula": JumpFormula,
+			"Knowledge-BureaucracyFormula": BureaucracyFormula,
+			"Knowledge-GalacticLoreFormula": GalacticLoreFormula,
+			"Knowledge-LifeSciencesFormula": LifeSciencesFormula,
+			"Knowledge-PhysicalScienceFormula": PhysicalScienceFormula,
+			"Knowledge-SocialScienceFormula": SocialScienceFormula,
+			"Knowledge-TacticsFormula": TacticsFormula,
+			"Knowledge-TechnologyFormula": TechnologyFormula,
+			"MechanicsFormula": MechanicsFormula,
+			"PerceptionFormula": PerceptionFormula,
+			"PersuasionFormula": PersuasionFormula,
+			"PilotFormula": PilotFormula,
+			"RideFormula": RideFormula,
+			"StealthFormula": StealthFormula,
+			"SurvivalFormula": SurvivalFormula,
+			"SwimFormula": SwimFormula,
+			"TreatInjuryFormula": TreatInjuryFormula,
+			"UseComputerFormula": UseComputerFormula,
+			"UsetheForceFormula": UsetheForceFormula
+            // Overwrites the skill formulas
+		});
+	});
 });
 // ====== Vehicle Sheet ====== \\
 
@@ -4009,6 +4108,66 @@ var SizeUpdate = function() {
 			"GrappleSize": Grapple
 		});		
 	});
+};
+var SkillUpdate = function() {
+	getAttrs(["AcrobaticsFormula","AthleticsFormula","ClimbFormula","DeceptionFormula","EnduranceFormula","GatherInformationFormula","InitiativeFormula","JumpFormula","Knowledge-BureaucracyFormula","Knowledge-GalacticLoreFormula","Knowledge-LifeSciencesFormula","Knowledge-PhysicalScienceFormula","Knowledge-SocialScienceFormula","Knowledge-TacticsFormula","Knowledge-TechnologyFormula","MechanicsFormula","PerceptionFormula","PersuasionFormula","PilotFormula","RideFormula","StealthFormula","SurvivalFormula","SwimFormula","TreatInjuryFormula","UseComputerFormula","UsetheForceFormula"], function(values) {
+	var AcrobaticsFormula = values.AcrobaticsFormula;
+    var AthleticsFormula = values.AthleticsFormula;
+    var ClimbFormula = values.ClimbFormula;
+    var DeceptionFormula = values.DeceptionFormula;
+    var EnduranceFormula = values.EnduranceFormula;
+    var GatherInformationFormula = values.GatherInformationFormula;
+    var InitiativeFormula = values.InitiativeFormula;
+    var JumpFormula = values.JumpFormula;
+    var BureaucracyFormula = values.Knowledge-BureaucracyFormula;
+    var GalacticLoreFormula = values.Knowledge-GalacticLoreFormula;
+    var LifeSciencesFormula = values.Knowledge-LifeSciencesFormula;
+    var PhysicalScienceFormula = values.Knowledge-PhysicalScienceFormula;
+    var SocialScienceFormula = values.Knowledge-SocialScienceFormula;
+    var TacticsFormula = values.Knowledge-TacticsFormula;
+    var TechnologyFormula = values.Knowledge-TechnologyFormula;
+    var MechanicsFormula = values.MechanicsFormula;
+    var PerceptionFormula = values.PerceptionFormula;
+    var PersuasionFormula = values.PersuasionFormula;
+    var PilotFormula = values.PilotFormula;
+    var RideFormula = values.RideFormula;
+    var StealthFormula = values.StealthFormula;
+	var SurvivalFormula = values.SurvivalFormula;
+	var SwimFormula = values.SwimFormula;
+	var TreatInjuryFormula = values.TreatInjuryFormula;
+    var UseComputerFormula = values.UseComputerFormula;
+    var UsetheForceFormula = values.UsetheForceFormula;
+	setAttrs({
+			"AcrobaticsFormula": AcrobaticsFormula,
+			"AthleticsFormula": AthleticsFormula,
+			"ClimbFormula": ClimbFormula,
+			"DeceptionFormula": DeceptionFormula,
+			"EnduranceFormula": EnduranceFormula,
+			"GatherInformationFormula": GatherInformationFormula,
+			"InitiativeFormula": InitiativeFormula,
+			"JumpFormula": JumpFormula,
+			"Knowledge-BureaucracyFormula": BureaucracyFormula,
+			"Knowledge-GalacticLoreFormula": GalacticLoreFormula,
+			"Knowledge-LifeSciencesFormula": LifeSciencesFormula,
+			"Knowledge-PhysicalScienceFormula": PhysicalScienceFormula,
+			"Knowledge-SocialScienceFormula": SocialScienceFormula,
+			"Knowledge-TacticsFormula": TacticsFormula,
+			"Knowledge-TechnologyFormula": TechnologyFormula,
+			"MechanicsFormula": MechanicsFormula,
+			"PerceptionFormula": PerceptionFormula,
+			"PersuasionFormula": PersuasionFormula,
+			"PilotFormula": PilotFormula,
+			"RideFormula": RideFormula,
+			"StealthFormula": StealthFormula,
+			"SurvivalFormula": SurvivalFormula,
+			"SwimFormula": SwimFormula,
+			"TreatInjuryFormula": TreatInjuryFormula,
+			"UseComputerFormula": UseComputerFormula,
+			"UsetheForceFormula": UsetheForceFormula
+            // Sets the formulas to what they already were.
+		});
+	});
+	console.log("Updated skill modifiers");
 };
 var VehicleSizeUpdate = function() {
 	getAttrs(["vehicle-size"], function(v) {
