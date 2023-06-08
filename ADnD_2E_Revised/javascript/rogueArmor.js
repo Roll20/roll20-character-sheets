@@ -10,6 +10,7 @@ ROGUE_ARMOR['No Armor'] = {
     'Climb Walls'      : '10',
     'Tunneling'        : '10',
     'Escape bonds'     : '5',
+    'Bribe'            : '-10', // DM Options: High-Level Campaigns
 }
 ROGUE_ARMOR['Leather Armor'] = {
     'Pick Pockets'     : '0',
@@ -21,6 +22,7 @@ ROGUE_ARMOR['Leather Armor'] = {
     'Climb Walls'      : '0',
     'Tunneling'        : '0',
     'Escape bonds'     : '0',
+    'Bribe'            : '0', // DM Options: High-Level Campaigns
 }
 ROGUE_ARMOR['Padded Armor'] = ROGUE_ARMOR['Studded Leather'] = {
     'Pick Pockets'     : '-30',
@@ -32,6 +34,7 @@ ROGUE_ARMOR['Padded Armor'] = ROGUE_ARMOR['Studded Leather'] = {
     'Climb Walls'      : '-30',
     'Tunneling'        : '-10',
     'Escape bonds'     : '-5',
+    'Bribe'            : '-5', // DM Options: High-Level Campaigns
 };
 ROGUE_ARMOR['Elven Chain Mail'] = {
     'Pick Pockets'     : '-20',
@@ -43,6 +46,7 @@ ROGUE_ARMOR['Elven Chain Mail'] = {
     'Climb Walls'      : '-20',
     'Tunneling'        : '-5',
     'Escape bonds'     : '-5',
+    'Bribe'            : '+5', // DM Options: High-Level Campaigns
 };
 ROGUE_ARMOR['Silenced Elven Chain Mail'] = {
     'Pick Pockets'     : '-25',

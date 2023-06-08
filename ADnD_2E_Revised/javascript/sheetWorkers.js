@@ -1466,6 +1466,9 @@ on('change:armorname', function(eventInfo) {
         'hsa': armor['Hide in Shadows'] || '0',
         'dna': armor['Detect Noise'] || '0',
         'cwa': armor['Climb Walls'] || '0',
+        'bra': armor['Bribe'] || '0',
+        'tua': armor['Tunneling'] || '0',
+        'eba': armor['Escape bonds'] || '0',
     };
     setAttrs(armorModifiers);
 });
