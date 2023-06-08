@@ -111,7 +111,26 @@ function migrate4_17_0() {
                 }
                 setAttrs(newValue);
             });
-        }).execute()
+        })
+        .execute(function () {
+            let rogueSkills = ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS);
+            let allRogueSkills = rogueSkills.flatMap(skill => ROGUE_SKILL_COLUMNS.map(c => `${skill}c`));
+
+            getAttrs(allRogueSkills, function (values) {
+                let setValue = {};
+
+                rogueSkills.forEach(skill => {
+                    setValue[`${skill}t`] = 0;
+                    ROGUE_SKILL_COLUMNS.forEach(c => {
+                        let skillNumber = parseInt(values[`${skill}c`]) || 0;
+                        setValue[`${skill}t`] += skillNumber;
+                    });
+                    console.log(`Updating ${skill}t to ${setValue[`${skill}t`]}`);
+                });
+
+                setAttrs(setValue);
+            });
+        });
 }
 //#endregion
 
