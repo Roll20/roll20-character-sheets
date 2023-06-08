@@ -86,9 +86,9 @@ function moveStaticToRepeating(section, fieldsToMove) {
 //#region version 4.17.0
 function migrate4_17_0() {
     console.log('Migrate to v4.17.0');
-
     calculateFormula('rogue-level-base', 'rogue-level-total');
     TAS.repeating('customrogue')
+        .attrs(ROGUE_STANDARD_SKILLS.flatMap(skill => [`${skill}armorp`, `${skill}a`]))
         .fields('cra','crarmorp')
         .each(function (row) {
             let armorValue = row.I['crarmorp'];
@@ -97,38 +97,33 @@ function migrate4_17_0() {
 
             console.log(`Moving value ${armorValue} from crarmorp to cra`);
             row.I['cra'] = armorValue;
-        }, function () {
-            getAttrs(ROGUE_STANDARD_SKILLS.map(s => s+'armorp'), function (values) {
-                let newValue = {};
-                for (let rogueSkill of ROGUE_STANDARD_SKILLS) {
-                    let armorValue = values[rogueSkill+'armorp'];
-                    let number = parseInt(armorValue) || 0;
-                    if (number === 0)
-                        continue;
+        }, function (rowSet, attrSet) {
+            ROGUE_STANDARD_SKILLS.forEach(skill => {
+                let armorValue = attrSet.I[`${skill}armorp`];
+                if (armorValue === 0)
+                    return;
 
-                    console.log(`Moving value ${number} from ${rogueSkill}armorp to ${rogueSkill}a`);
-                    newValue[rogueSkill+'a'] = number;
-                }
-                setAttrs(newValue);
-            });
+                attrSet.I[`${skill}a`] = armorValue;
+                console.log(`Moving value ${armorValue} from ${skill}armorp to ${skill}a`);
+            })
         })
         .execute(function () {
-            let rogueSkills = ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS);
-            let allRogueSkills = rogueSkills.flatMap(skill => ROGUE_SKILL_COLUMNS.map(c => `${skill}c`));
+            let allRogueSkills = ROGUE_STANDARD_SKILLS.flatMap(skill => ROGUE_SKILL_COLUMNS.map(c => `${skill}${c}`));
 
             getAttrs(allRogueSkills, function (values) {
-                let setValue = {};
+                let newValue = {};
 
-                rogueSkills.forEach(skill => {
-                    setValue[`${skill}t`] = 0;
+                ROGUE_STANDARD_SKILLS.forEach(skill => {
+                    let totalField = `${skill}t`;
+                    newValue[totalField] = 0;
                     ROGUE_SKILL_COLUMNS.forEach(c => {
-                        let skillNumber = parseInt(values[`${skill}c`]) || 0;
-                        setValue[`${skill}t`] += skillNumber;
+                        let skillNumber = parseInt(values[`${skill}${c}`]) || 0;
+                        newValue[totalField] += skillNumber;
                     });
-                    console.log(`Updating ${skill}t to ${setValue[`${skill}t`]}`);
+                    console.log(`Updating ${totalField} to ${newValue[totalField]}`);
                 });
 
-                setAttrs(setValue);
+                setAttrs(newValue);
             });
         });
 }
