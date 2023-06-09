@@ -1485,7 +1485,7 @@ on('clicked:rt', function (eventInfo){
         } else if (skill === 'Remove Traps') {
             rollBuilder.push('checkvs=Remove Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
         } else if (skill === 'Remove Invisible/Magical Traps') {
-            rollBuilder.push('checkvs=Remove Invisible/Magical Traps\n(in @{armorname})', 'checktarget=[[floor({@{rtt}+(@{misc-mod}),95}kl1 / 2)]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+            rollBuilder.push('checkvs=Remove Invisible/Magical Traps\n(in @{armorname})', 'checktarget=[[{floor((@{rtt}+(@{misc-mod}))/2),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
         }
 
         return printRoll(`/w gm ${rollBuilder.string()}`);
@@ -1514,7 +1514,7 @@ on('clicked:ms clicked:hs', function (eventInfo){
         if (surroundings === 'Natural') {
             rollBuilder.push(`checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
         } else {
-            rollBuilder.push(`checktarget=[[floor({@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1 / 2)]]%`);
+            rollBuilder.push(`checktarget=[[{floor((@{${skill}t}+(@{misc-mod}))/2),@{rogue-ranger}}kl1]]%`);
         }
 
         return printRoll(`/w gm ${rollBuilder.string()}`);
