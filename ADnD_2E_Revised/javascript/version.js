@@ -108,19 +108,22 @@ function migrate4_17_0() {
             })
         })
         .execute(function () {
-            let allRogueSkills = ROGUE_STANDARD_SKILLS.flatMap(skill => ROGUE_SKILL_COLUMNS.map(c => `${skill}${c}`));
+            let allRogueSkills = ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).flatMap(skill => ROGUE_SKILL_COLUMNS.map(c => `${skill}${c}`));
 
             getAttrs(allRogueSkills, function (values) {
                 let newValue = {};
 
-                ROGUE_STANDARD_SKILLS.forEach(skill => {
+                ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).forEach(skill => {
                     let totalField = `${skill}t`;
-                    newValue[totalField] = 0;
+                    let total = 0;
                     ROGUE_SKILL_COLUMNS.forEach(c => {
                         let skillNumber = parseInt(values[`${skill}${c}`]) || 0;
-                        newValue[totalField] += skillNumber;
+                        total += skillNumber;
                     });
-                    console.log(`Updating ${totalField} to ${newValue[totalField]}`);
+                    if (total !== 0) {
+                        console.log(`Updating ${totalField} to ${total}`);
+                        newValue[totalField] = total;
+                    }
                 });
 
                 setAttrs(newValue);
