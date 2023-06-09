@@ -170,7 +170,7 @@
                         <input class="digit" type="number" name="attr_burden_total_max" value="8">
                     </span></span>
                 <div class="infobox">
-                    <h4> <label for="equipment" name="attr_personal_equipment_hide"> Equipment</label> <input
+                    <h4> <label for="equipment" name="attr_personal_equipment_hide">Equipment.</label> <input
                             type="checkbox" id="equipment" name="attr_personal_equipment_hide" class="sheet-toggle-show"
                             hidden>
                         <span class="pull-right">Burden</span>
@@ -278,9 +278,9 @@
                                 <option value="tactics">Tactics</option>
                             </select> </span>
                         <span>Skill:<input type="number" name="attr_skill_level" class="digit" value="0" min="0"
-                                max="5">(<input type="checkbox" name="attr_skill_familiar" value="1">F) 
-                                Expertise: <span type="number" name="attr_weapon_expertise"> 
-                                </span>
+                                max="5">(<input type="checkbox" name="attr_skill_familiar" value="1">F)
+                            Expertise: <span type="number" name="attr_weapon_expertise">
+                            </span>
                             Notes:<textarea class="inputarea" name="attr_weapon_mods"> </textarea>
 
 
@@ -322,7 +322,6 @@
                 <h3>Skills</h3>
                 <h4> Bonus Dice: <input type="number" name="attr_bonus_dice" value="0">
                     TN: <input type="number" name="attr_tn" value="5">
-                    TN+/- <input type="number" name="attr_tn_bonus" value="0">
                     Reliable: <input type="number" name="attr_reliable" value="0">
                 </h4>
 
@@ -1108,7 +1107,9 @@
             <h3> Weapon Systems </h3>
             <div class="gearweapon-rep">
                 <h4>Bonus Dice: <input type="number" name="attr_bonus_dice" value="0">
-                    TN: <input type="number" name="attr_tn" value="5"></h4>
+                    TN: <input type="number" name="attr_tn" value="5">
+                    Reliable: <input type="number" name="attr_reliable" value="0">
+                </h4>
                 <fieldset class="repeating_gearweapon">
                     <span type="text" name="attr_gear_weapon_size"></span>
                     <span type="text" name="attr_gear_weapon_type"></span>
@@ -1225,8 +1226,7 @@
     </span>
     <div>
         <h3>Current Issues</h3>
-        <p>To be added: Favored/disfamiliar.
-            Personal Armor list.
+        <p>To be added: Personal Armor list.
         </p>
         <p>Formatting: Gear Weapons. </p>
 
@@ -1238,7 +1238,7 @@
     Version Changes:
     <span>Ver:<span name="attr_load_version"></span> </span>
     0.20 - Roll20 public beta release.
-    0.21 -
+    0.21 - Reliable dice added to roller
     <div>
 
     </div>
@@ -1300,24 +1300,26 @@
             {{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
             {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
         </div>
-        <div class="sheet-content"> 
+        <div class="sheet-content">
             <span>Score </span>{{computed::roll}}
-            <span>MOS </span> {{computed::MOS}} 
-            </div>
-            {{#rollGreater() reliable 0}} 
-            <div class="sheet-content">
-            <span>{{reliable}} Reliable dice</span>  <span> {{computed::changedone}}|{{computed::changedtwo}}|{{computed::changedthree}}|
-            {{computed::changedfour}}|{{computed::changedfive}}|{{computed::changedsix}}</span> 
-            </div>
-            {{/rollGreater() reliable 0}}
-            {{#rollLess() reliable 0}} 
-            <div class="sheet-content">
-            <span>{{reliable}}Reliable dice</span>  <span> {{computed::changedone}}|{{computed::changedtwo}}|{{computed::changedthree}}|
-            {{computed::changedfour}}|{{computed::changedfive}}|{{computed::changedsix}}</span> 
-            </div>
-            {{/rollLess() reliable 0}}
+            <span>MOS </span> {{computed::MOS}}
+        </div>
+        {{#rollGreater() reliable 0}}
+        <div class="sheet-content">
+            <span>{{reliable}} Reliable dice</span> <span>
+                {{computed::changedone}}|{{computed::changedtwo}}|{{computed::changedthree}}|
+                {{computed::changedfour}}|{{computed::changedfive}}|{{computed::changedsix}}</span>
+        </div>
+        {{/rollGreater() reliable 0}}
+        {{#rollLess() reliable 0}}
+        <div class="sheet-content">
+            <span>{{reliable}}Reliable dice</span> <span>
+                {{computed::changedone}}|{{computed::changedtwo}}|{{computed::changedthree}}|
+                {{computed::changedfour}}|{{computed::changedfive}}|{{computed::changedsix}}</span>
+        </div>
+        {{/rollLess() reliable 0}}
 
-            <div class="sheet-content"> 
+        <div class="sheet-content">
             {{#rollGreater() doubles 1}}
             <span>Doubles on</span> <span>{{computed::doubles}} </span>
             {{/rollGreater() doubles 1 }}
@@ -1325,7 +1327,7 @@
         <div class="sheet-desc">{{computed::one}}x1s | {{computed::two}}x2s | {{computed::three}}x3s |
             {{computed::four}}x4s | {{computed::five}}x5s | {{computed::six}}x6s
         </div>
-        
+
 </rolltemplate>
 
 <script type="text/worker">
@@ -1438,22 +1440,43 @@ const roller = (getskillname,getdomainname,getskilllevel,getexpertise,getbonus,g
     getAttrs([getskillname,getdomainname,getskilllevel,getexpertise,getbonus,getTn,getTnBonus,getReliable,getFamilar], (values) => {
         let skillname = values[getskillname];
         let domain = values[getdomainname];
-        let skilllevel = values[getskilllevel];
-        let expertise = values[getexpertise];
-        let bonus = values[getbonus];
-        let Tn = values[getTn];
-        let tnBonus = values[getTnBonus];
-        let reliable =  values[getReliable];
-        let familiar = values[getFamilar];
-        reliable = parseInt(reliable) + parseInt(familiar);//add familiar to reliable dice
-        let reliableRoll =  + Math.abs(parseInt(reliable));//need to make positive
-        Tn = parseInt(Tn) + parseInt(tnBonus);
+        let skilllevel = parseInt(values[getskilllevel]);
+        let expertise = parseInt(values[getexpertise]);
+        let bonus = parseInt(values[getbonus]);
+        let Tn = parseInt(values[getTn]);
+        let tnBonus = parseInt(values[getTnBonus]);
+        tnBonus = tnBonus*-1;//make negative
+        let reliable =  parseInt(values[getReliable]);
+        let familiar = parseInt(values[getFamilar]);
+        reliable = reliable + familiar;//add familiar to reliable dice
+        let reliableRoll = Math.abs(reliable);//need to make positive
+        Tn = Tn + tnBonus;
         if (expertise == 3){ // expertise 3 TN bonus
             Tn--;
             console.log("TN reduced due to Expertise 3");
+        }; 
+        if (Tn > 6) { //TN over 6 is converted to bonus dice at 1:2
+            bonus = bonus - Math.floor((Tn - 6)/2);
+            Tn = 6;
+        };
+        console.log("skilllevel:"+skilllevel);
+        if (skilllevel == 0) {
+            bonus--;
+            console.log("bonus reduced due to skill level 0",bonus,skilllevel);
+        }; 
+        // if skillevel+bonus+reliable is less than 1, roll 2d6kl1
+        let pooldice = Math.abs(skilllevel + bonus);
+        console.log("pooldice:"+pooldice);
+        let rolldice = "d6k1";
+
+        if (skilllevel + bonus < 1) {
+            console.log("skilllevel + bonus < 1");
+            let rolldice = "d6kl1";
+        } else {
+            let rolldice = "d6k1";  
         };
         console.log(skillname, domain, skilllevel,expertise,bonus,Tn,tnBonus,reliable);
-        startRoll("&{template:diceroll} {{title=@{character_name} using "+skillname+"}} {{subtitle= Expertise ("+domain+"):"+expertise+" TN("+Tn+")| Skill="+skilllevel+"+Bonus="+bonus+"(Reliable="+reliableRoll+")}}  {{roll=[[("+skilllevel+"+"+bonus+"+"+reliableRoll+"+1)d6k1]] }} {{MOS=[[0]]}} {{doubles=[["+expertise+"]]}} {{reliable=[["+reliable+"]]}} {{six=[[6]]}} {{five=[[5]]}} {{four=[[4]]}} {{three=[[3]]}} {{two=[[2]]}} {{one=[[1]]}}  {{changedsix=[[6]]}} {{changedfive=[[5]]}} {{changedfour=[[4]]}} {{changedthree=[[3]]}} {{changedtwo=[[2]]}} {{changedone=[[1]]}}" , (diceroll) => {
+        startRoll("&{template:diceroll} {{title=@{character_name} using "+skillname+"}} {{subtitle= Expertise ("+domain+"):"+expertise+" TN("+Tn+")| Skill="+skilllevel+"+Bonus="+bonus+"(Reliable="+reliable+")}}  {{roll=[[("+pooldice+"+"+reliableRoll+"+1)"+rolldice+"]] }} {{MOS=[[0]]}} {{doubles=[["+expertise+"]]}} {{reliable=[["+reliable+"]]}} {{six=[[6]]}} {{five=[[5]]}} {{four=[[4]]}} {{three=[[3]]}} {{two=[[2]]}} {{one=[[1]]}}  {{changedsix=[[6]]}} {{changedfive=[[5]]}} {{changedfour=[[4]]}} {{changedthree=[[3]]}} {{changedtwo=[[2]]}} {{changedone=[[1]]}}" , (diceroll) => {
             let total = diceroll.results.roll.result;
             let dice = diceroll.results.roll.dice;
             let MOS = 0;
@@ -1470,7 +1493,8 @@ const roller = (getskillname,getdomainname,getskilllevel,getexpertise,getbonus,g
             console.log(targetArray,total);
             let tempArray = targetArray;
             
-            //if reliable is greater than 1, remove lowest 
+            //remove x reliable dice
+            //if reliable is greater than 1, remove x lowest 
             if (reliableArray[0] > 0) {
                 console.log("reliable is greater than 1");
                 while (reliableArray[0] > 0) {
@@ -1484,8 +1508,8 @@ const roller = (getskillname,getdomainname,getskilllevel,getexpertise,getbonus,g
                     };
                 };
             };
-            
-            //if reliable is less than 1, remove highest
+
+            //if reliable is less than 1, remove x highest
             if (reliableArray[0] < 0) {
                 console.log("reliable is less than 1");
                 while (reliableArray[0] < 0) {
@@ -1500,16 +1524,28 @@ const roller = (getskillname,getdomainname,getskilllevel,getexpertise,getbonus,g
                 };
             };
             //calculate total
-            console.log("calculate total");
-            for (i=6;i>0;i--) {
-                if (tempArray[i] > 0) {
-                    console.log("calculate total "+i);
-                    total = i;
-                    i = 0;
+            //if (skilllevel + bonus) is >0 find highest number
+            if ((skilllevel + bonus) > 0) { 
+                for (i=6;i>0;i--) {
+                    if (tempArray[i] > 0) {
+                        console.log("calculate high total :"+i);
+                        total = i;
+                        i = 0;
+                    };
                 };
+            };            
+            //if (skilllevel + bonus) is <1 find lowest number
+            if ((skilllevel + bonus) < 1) {
+                for (i=1;i<7;i++) {
+                    if (tempArray[i] > 0) {
+                        console.log("calculate low total :"+i);
+                        total = i;
+                        i = 7;
+                    };
             };
+        };
+            tempArray[total]--;//take out the total from the array
             
-            tempArray[total]--;//take out the highest number from the array
             if (total < Tn) { //TN is bigger, calculate MOF
             } else {  //TN is smaller, calculate MOS
                 for (i=Tn;i<=total;i++) {
@@ -1529,6 +1565,7 @@ const roller = (getskillname,getdomainname,getskilllevel,getexpertise,getbonus,g
                     };
                 };
             };
+                
                 total = total + MOS;
                 MOS = total - Tn;
                 
