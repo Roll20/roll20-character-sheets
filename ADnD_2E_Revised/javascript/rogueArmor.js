@@ -1,15 +1,15 @@
 ﻿const ROGUE_ARMOR = {};
 // Thief armor
 ROGUE_ARMOR['No Armor'] = {
-    'Pick Pockets'     : '5',
+    'Pick Pockets'     : '+5',
     'Open Locks'       : '0',
     'Find/Remove Traps': '0',
-    'Move Silently'    : '10',
+    'Move Silently'    : '+10',
     'Hide in Shadows'  : '5',
     'Detect Noise'     : '0',
-    'Climb Walls'      : '10',
-    'Tunneling'        : '10',
-    'Escape bonds'     : '5',
+    'Climb Walls'      : '+10',
+    'Tunneling'        : '+10',
+    'Escape bonds'     : '+5',
     'Bribe'            : '-10', // DM Options: High-Level Campaigns
 }
 ROGUE_ARMOR['Leather Armor'] = {
