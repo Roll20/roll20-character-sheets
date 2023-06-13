@@ -858,6 +858,7 @@ PSYCHOMETABOLIC['Science']['Life Draining'] = {
     'prerequisites': 'none',
     'reference': 'p. 52',
     'book': 'The Complete Psionics Handbook',
+    'errata': 'Deck of Psionic Powers #78 of 288\nSage Advice #186 p. 52',
     'damage': '1d6 per round',
     'damage-type': '',
     'healing': 'Same as damage',
