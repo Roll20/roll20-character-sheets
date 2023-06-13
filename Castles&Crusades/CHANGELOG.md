@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2023-06-05 ** v.2.5 Paul V
+	Fixed issue with the weapon rolls, they will now correctly add the total mod, if 'modifiers on rolls' is disabled
+	Fixed issue with stat rolls, they will now correctly add the modifier if 'modifiers on rolls' is disabled
 **2023-05-29 ** v.2.4 Paul V
 	Added Primary/Seconday, Teritary target onto the Settings tab
 	All saving throws now show base target based on associated stat
