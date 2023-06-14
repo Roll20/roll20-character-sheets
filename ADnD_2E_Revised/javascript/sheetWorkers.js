@@ -1499,22 +1499,25 @@ on('clicked:ms clicked:hs', function (eventInfo){
         rollBuilder.push('character=@{character_name}','checkroll=[[1d100cs<1cf>[[@{rogue-ranger}+1]] ]]');
 
         if (skill ==='ms') {
-            rollBuilder.push('checkvs=Move Silently\n(in @{armorname})', 'success=You are silent. Movement rate reduced to 1/3 of normal. Opponents get -2 to surprise roll from silence and another -2 if you are unseen.', 'fail=You are not silent. Movement rate reduced to 1/3 of normal.');
+            rollBuilder.push('success=You are silent. Movement rate reduced to 1/3 of normal. Opponents get -2 to surprise roll from silence and another -2 if you are unseen.', 'fail=You are not silent. Movement rate reduced to 1/3 of normal.');
         } else if (skill === 'hs') {
-            rollBuilder.push('checkvs=Hide in Shadows\n(in @{armorname})', 'success=You are hidden while remaining virtually motionless. (Small careful movements: drawing a weapon, uncork a potion, etc. is allowed)', 'fail=You are not hidden.');
+            rollBuilder.push('success=You are hidden while remaining virtually motionless. (Small careful movements: drawing a weapon, uncork a potion, etc. is allowed). You cannot be detected by Infravision. Magic that reveal invisible objects can reveal you.', 'fail=You are not hidden.');
         }
 
         // The player is a rogue, so no check for surroundings
         if (values['rogue-ranger'] === "95") {
-            rollBuilder.push(`checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
+            let skillName = skill === 'ms' ? 'checkvs=Move Silently\n(in @{armorname})' : 'checkvs=Hide in Shadows\n(in @{armorname})';
+            rollBuilder.push(skillName, `checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
             return printRoll(`/w gm ${rollBuilder.string()}`);
         }
 
         let surroundings = await extractQueryResult(`?{What are your surroundings?|Natural (woodland / forrest / plains),Natural|Non-natural (crypt / city street / indoor / underground),Non-natural}`);
+        let displaySurrounding = `*${surroundings} surroundings*`;
+        let skillName = skill === 'ms' ? `checkvs=Move Silently\n${displaySurrounding}\n(in @{armorname})` : `checkvs=Hide in Shadows\n${displaySurrounding}\n(in @{armorname})`;
         if (surroundings === 'Natural') {
-            rollBuilder.push(`checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
+            rollBuilder.push(skillName, `checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
         } else {
-            rollBuilder.push(`checktarget=[[{floor((@{${skill}t}+(@{misc-mod}))/2),@{rogue-ranger}}kl1]]%`);
+            rollBuilder.push(skillName, `checktarget=[[{floor((@{${skill}t}+(@{misc-mod}))/2),@{rogue-ranger}}kl1]]%`);
         }
 
         return printRoll(`/w gm ${rollBuilder.string()}`);
