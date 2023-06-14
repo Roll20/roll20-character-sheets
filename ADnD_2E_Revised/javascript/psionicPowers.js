@@ -467,9 +467,9 @@ PSYCHOKINETIC['Science']['Project Force'] = {
 PSYCHOKINETIC['Science']['Telekinesis'] = {
     'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
-    'context-modifier': '[[ceil(?{Object’s weight in pounds|0}/-3)]] [?{Object’s weight in pounds|0} pounds]',
-    'initial-cost': '[[{3,?{Object’s weight in pounds|0}}kh1]]',
-    'maintenance-cost': '[[{1,floor(?{Object’s weight in pounds|0}/2)}kh1]]/round',
+    'context-modifier': '[[floor(?{Object’s weight in pounds|0}/3)*([[{?{Object’s weight in pounds|0},4}<3]]-1)]] [?{Object’s weight in pounds|0} pounds]',
+    'initial-cost': '[[{?{Object’s weight in pounds|0},3}kh1]]',
+    'maintenance-cost': '[[{floor(?{Object’s weight in pounds|0}/2),1}kh1]]/round',
     'range': '30 yards',
     'prep': '0',
     'aoe': 'single item',
@@ -482,7 +482,7 @@ PSYCHOKINETIC['Science']['Telekinesis'] = {
     'power-score': 'The character can lift a second item of equal or lesser weight simultaneously for the same cost.',
     '20': 'The psionicist “fumbles” the item, knocking it over, etc.',
     '1': '',
-    'effect': 'Telekinesis, or “TK” for short, is the ability to move objects through space without touching them. All telekinetic efforts tend to be physically taxing, because they involve real work. Moving small, light objects is relatively easy. As the objects become more massive, the task becomes significantly more difficult.\n&emsp;The costs above (3 PSPs initially and 1 per round of maintenance) assume that the object being moved weighs 3 pounds or less. For heavier objects, these rules apply:}}{{style=min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c1-2=The initial cost equals the object’s weight in pounds.}}{{c2-2=The maintenance cost is half the initial cost, rounded down.}}{{c3-2=The character’s power score is decreased by one-third of the object’s weight in pounds, rounded down.}}{{effects2=&emsp;For example, to telekinetically snatch a 15-pound battle axe from a rack, a psionicist must pay 15 PSPs and make a power check with a -5 modifier to his score.\n&emsp;A psionicist using TK can move an object up to 60 feet per round. The object can serve as a weapon. In this case, the character attacks using his own TAHC0 score, with a penalty equaling the objects weight modifier (one—third its weight, rounded down).\n&emsp;*Power Score*—The character can lift a second item of equal or lesser weight simultaneously for the same cost.\n&emsp;*20*—The psionicist “fumbles” the item, knocking it over, etc.'
+    'effect': 'Telekinesis, or “TK” for short, is the ability to move objects through space without touching them. All telekinetic efforts tend to be physically taxing, because they involve real work. Moving small, light objects is relatively easy. As the objects become more massive, the task becomes significantly more difficult.\n&emsp;The costs above (3 PSPs initially and 1 per round of maintenance) assume that the object being moved weighs 3 pounds or less. For heavier objects, these rules apply:}}{{style=min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c1-2=The initial cost equals the object’s weight in pounds.}}{{c2-2=The maintenance cost is half the initial cost, rounded down.}}{{c3-2=The character’s power score is decreased by one-third of the object’s weight in pounds, rounded down.}}{{effects2=&emsp;For example, to telekinetically snatch a 15-pound battle axe from a rack, a psionicist must pay 15 PSPs and make a power check with a -5 modifier to his score.\n&emsp;A psionicist using TK can move an object up to 60 feet per round. The object can serve as a weapon. In this case, the character attacks using his own THAC0 score, with a penalty equaling the objects weight modifier (one—third its weight, rounded down). Currently [[floor(?{Object’s weight in pounds|0}/3)*([[{?{Object’s weight in pounds|0},4}<3]]-1) [?{Object’s weight in pounds|0} pounds] ]] attack penalty.\n&emsp;*Power Score*—The character can lift a second item of equal or lesser weight simultaneously for the same cost.\n&emsp;*20*—The psionicist “fumbles” the item, knocking it over, etc.'
 };
 PSYCHOKINETIC['Devotion']['Animate Object'] = {
     'attribute': '@{Intelligence-psi}',
@@ -858,13 +858,14 @@ PSYCHOMETABOLIC['Science']['Life Draining'] = {
     'prerequisites': 'none',
     'reference': 'p. 52',
     'book': 'The Complete Psionics Handbook',
+    'errata': 'Deck of Psionic Powers #78 of 288\nSage Advice #186 p. 52',
     'damage': '1d6 per round',
     'damage-type': '',
     'healing': 'Same as damage',
     'power-score': 'Rate of drain increases to 1d20 points per round.',
     '20': 'Backfire! Half of the psionicist’s remaining hit points ([[@{HP}/2]]) are absorbed by the target, reversing the power’s effects.',
     '1': '',
-    'effect': 'With this devotion, a psionicist can drain hit points from another character and use them to recover his own. This transfer occurs at the rate of 1d6 points per round.\n&emsp;The character can absorb up to 10 more hit points than his healthy total, but these bonus points last only one hour. After that, if the psionicist still has more hit points than he should, the excess points vanish.\n&emsp;*Power Score*—Rate of drain increases to 1d20 points per round.\n&emsp;*20*—Backfire! Half of the psionicist’s remaining hit points are absorbed by the target, reversing the power’s effects.'
+    'effect': 'With this power, a psionicist can drain hit points from another character and use them to recover his own. This transfer occurs at the rate of 1d6 points per round.\n&emsp;The character can absorb up to 10 more hit points than his healthy total, but these bonus points last only one hour. After that, if the psionicist still has more hit points than he should, the excess points vanish.\n&emsp;*Power Score*—Rate of drain increases to 1d20 points per round.\n&emsp;*20*—Backfire! Half of the psionicist’s remaining hit points are absorbed by the target, reversing the power’s effects.'
 };
 PSYCHOMETABOLIC['Science']['Metamorphosis'] = {
     'attribute': '@{Constitution-psi}',
