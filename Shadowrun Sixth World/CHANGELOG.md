@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2023-06-15 ** v.83 Chuz (James Culp)
+	New Feature - Beginning work on the GM Helper sheet, step 1 add an OS Tracker.  I'm open to suggestions for other helpful GM tools to include in this sheet in the usual venues (Discord, Patreon, Roll20 DMs)
+	New Feature - GMs rejoice, select a token on the board and click the "Track Selected" button on the GM Helper character sheet to add the selected character's name and A/S/D/F to the tracker.
 **2023-05-30 ** v.82 Chuz (James Culp)
 	Update - Added Hack & Slash Matrix Actions to the Rolls Pane -> Matrix Roll Buttons
 	New Feature - Added Matrix Roll Buttons Legality Filter, this allows you to hide illegal actions.  For pcs without a matrix persona or that are worried about OS
@@ -23,7 +26,7 @@ Change Log
 	Bugfix - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
 	Bugfix - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
 **2023-03-13 ** v.76 Chuz (James Culp)
-Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
+	Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
 **2023-03-06 ** v.75 Chuz (James Culp)
 	New Feature - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
 	New Feature - Added Heat, Reputation and AsRep to the Social Pane
