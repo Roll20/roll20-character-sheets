@@ -36,6 +36,9 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(4, 17, 0))
                 migrate4_17_0();
+
+            if (oldSheetVersion.isBelowMigrate(4, 18, 0))
+                migrate4_18_0();
         }
     });
 });
@@ -80,6 +83,28 @@ function moveStaticToRepeating(section, fieldsToMove) {
             setAttrs(newValue);
         }
     });
+}
+//#endregion
+
+//#region verison 4.18.0
+function migrate4_18_0() {
+    console.log('Migrate to v4.18.0');
+    TAS.repeating('hench5')
+        .attrs('psionclai-science-macro527','psionclair-science-macro527')
+        .fields('psiontelepathic-macro505','psiontelepathic-science-macro505')
+        .each(function (row) {
+            let macro = row.S['psiontelepathic-macro505'].trim();
+            if (macro !== '') {
+                console.log('Moved macro from psiontelepathic-macro505 to psiontelepathic-science-macro505');
+                row.S['psiontelepathic-science-macro505'] = macro;
+            }
+        }, function (rowSet, attrSet) {
+            let macro = attrSet.S['psionclai-science-macro527'].trim();
+            if (macro !== '') {
+                console.log('Moved macro from psionclai-science-macro527 to psionclair-science-macro527');
+                attrSet.S['psionclair-science-macro527'] = macro;
+            }
+        }).execute();
 }
 //#endregion
 
