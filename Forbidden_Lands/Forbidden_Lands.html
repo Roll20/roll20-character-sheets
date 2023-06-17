@@ -1,9 +1,12 @@
 <!--set sheet version manually using currentVersion in sheetworkers-->
 <input type="hidden" name="attr_version" value="0" />
 <!-- ADDED recalc checkbox to force sheet worker events. temporarily reveal for testing purposes-->
-<input class="hidden" name="attr_recalc1" type="checkbox" />
+<input class="hidden" name="attr_recalc1" type="checkbox" value="1"/>
 <!--the_dice_local_macro: value used for local rolls (roll_the_dice_local). Set by sheetworker-->
-<input type="text" class="hidden" name="attr_the_dice_local_macro" value=""  />
+<input type="checkbox" class="hidden" name="attr_the_dice_local_macro" value="1" />
+<input type="checkbox" class="hidden display-mount" name="attr_display_mount_flag" value="1" checked />
+<input type="checkbox" class="hidden display-beasts" name="attr_display_beasts_flag" value="1" checked />
+<input type="checkbox" class="hidden display-spells" name="attr_display_spells_flag" value="1"checked />
 <!--background -->
 <input type="checkbox" class="hidden background-selected" name="attr_background" value="1" checked />
 <input type="checkbox" class="hidden background-selected" name="attr_background" value="2" />
@@ -26,9 +29,10 @@
   <span class="announcements-show toggle-monster-only" name="attr_version">&nbsp;</span>
   <div class="announcements toggle-monster-only">
     <h3 data-i18n="latest-announcements">Latest Announcements</h3>
-    <span class="footer">6/16/23</span>
+    <span class="footer">6/17/23</span>
     <ol style="margin: 0 2em 0 2em; padding: 0 1em 0 3em;">
       <span>v1.854</span>
+        <li>Added an option to Show/Hide Mount, Beasts, and Spells to the sheet settings.</li>
         <li>Added rolls to Talents.</li>
         <li>Fixed a bug where spell subtitle2 text could be included with subsequent rolls from the dice pool unless the pool was manually cleared.</li>
         <li>Reputation total(age+mod) is now seen on the sheet button.</li>
@@ -2211,279 +2215,287 @@
           </fieldset>
         </div>
       </div>
-      <div class="gear-grid">
-        <div class="gear-box5">
-          <!--Consumable Encumbrance-->
-            <div class="consumables-grid">
-              <div class="gear-box header">
-                <h1 data-i18n="consumable-u">CONSUMABLES</h1>
+      <section class="gear">
+        <div class="gear-grid">
+          <div class="gear-box5">
+            <!--Consumable Encumbrance-->
+              <div class="consumables-grid">
+                <div class="gear-box header">
+                  <h1 data-i18n="consumable-u">CONSUMABLES</h1>
+                </div>
+                <div class="gear-box2 column-header">
+                  <span data-i18n="quantity-abbr">Qty</span>
+                </div>
+                <div class="gear-box3 column-header">
+                  <span data-i18n="carried-abbr">Carr</span>
+                </div>
+                <div class="gear-box4 column-header">
+                  <span data-i18n="weight-abbr">Wt</span>
+                </div>
+                <button class="roll-button-textonly header-h1" type="roll" name="roll_food" title="%{food}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{food_macro}">
+                    <span data-i18n="food">Food</span>
+                </button>
+                <select class="input" name="attr_food" title="@{food}">
+                  <option value="0" selected>0</option>
+                  <option value="1" data-i18n="die-6">d6</option>
+                  <option value="2">d8</option>
+                  <option value="3" data-i18n="die-10">d10</option>
+                  <option value="4">d12</option>
+                </select>
+                <input type="hidden" name="attr_food_macro" value="0" />
+                <input class="input" type="checkbox" name="attr_food_carried" value="1" title="@{food_carried}" checked />
+                <input type="hidden" name="attr_food_weight" value="0" />
+                <select class="input" name="attr_food_weight" title="@{food_weight}">
+                  <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
+                  <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
+                </select>
+                <button class="roll-button-textonly header-h1" type="roll" name="roll_water" title="%{water}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{water_macro}">
+                    <span data-i18n="water">Water</span>
+                </button>
+                <select class="input" name="attr_water" title="@{water}">
+                  <option value="0" selected>0</option>
+                  <option value="1" data-i18n="die-6">d6</option>
+                  <option value="2">d8</option>
+                  <option value="3" data-i18n="die-10">d10</option>
+                  <option value="4">d12</option>
+                </select>
+                <input type="hidden" name="attr_water_macro" value="0" />
+                <input class="input" type="checkbox" name="attr_water_carried" value="1" title="@{water_carried}" checked />
+                <input type="hidden" name="attr_water_weight" value="0" />
+                <select class="input" name="attr_water_weight" title="@{water_weight}">
+                  <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
+                  <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
+                </select>
+                <button class="roll-button-textonly header-h1" type="roll" name="roll_arrows" title="%{arrows}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{arrows_macro}">
+                    <span data-i18n="arrows">Arrows</span>
+                </button>
+                <select class="input" name="attr_arrows" title="@{arrows}">
+                  <option value="0" selected>0</option>
+                  <option value="1" data-i18n="die-6">d6</option>
+                  <option value="2">d8</option>
+                  <option value="3" data-i18n="die-10">d10</option>
+                  <option value="4">d12</option>
+                </select>
+                <input type="hidden" name="attr_arrows_macro" value="0" />
+                <input class="input" type="checkbox" name="attr_arrows_carried" value="1" title="@{arrows_carried}" checked />
+                <input type="hidden" name="attr_arrows_weight" value="0" />
+                <select class="input" name="attr_arrows_weight" title="@{arrows_weight}">
+                  <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
+                  <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
+                </select>
+                <button class="roll-button-textonly header-h1" type="roll" name="roll_torches" title="%{torches}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{torches_macro}">
+                    <span data-i18n="torches">Torches</span>
+                </button>
+                <select class="input" name="attr_torches" title="@{torches}">
+                  <option value="0" selected>0</option>
+                  <option value="1" data-i18n="die-6">d6</option>
+                  <option value="2">d8</option>
+                  <option value="3" data-i18n="die-10">d10</option>
+                  <option value="4">d12</option>
+                </select>
+                <input type="hidden" name="attr_torches_macro" value="0" />
+                <input class="input" type="checkbox" name="attr_torches_carried" value="1" title="@{torches_carried}" checked />
+                <input type="hidden" name="attr_torches_weight" value="0" />
+                <select class="input" name="attr_torches_weight" title="@{torches_weight}">
+                  <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
+                  <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
+                </select>
               </div>
-              <div class="gear-box2 column-header">
-                <span data-i18n="quantity-abbr">Qty</span>
+            <!-- Repeating Gear -->
+              <div class="gear-grid">
+                <input type="checkbox" class="gear-box1 section-toggle-checkbox" name="attr_toggle_gear" value="1" style=" position: relative; z-index: -1;">
+                <div class="gear-box header">
+                  <h1 data-i18n="gea-u">GEAR</h1>
+                </div>
+                <div class="gear-box2 column-header">
+                  <span data-i18n="quantity-abbr">Qty</span>
+                </div>
+                <div class="gear-box3 column-header">
+                  <span data-i18n="carried-abbr">Carr</span>
+                </div>
+                <div class="gear-box4 column-header">
+                  <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_gear" value="1" title="more/less" data-i18n="show-more-or-less">
+                  <span class="expand-section-nav"></span>
+                  <span data-i18n="weight-abbr">Wt</span>
+                </div>
               </div>
-              <div class="gear-box3 column-header">
-                <span data-i18n="carried-abbr">Carr</span>
-              </div>
-              <div class="gear-box4 column-header">
-                <span data-i18n="weight-abbr">Wt</span>
-              </div>
-              <button class="roll-button-textonly header-h1" type="roll" name="roll_food" title="%{food}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{food_macro}">
-                  <span data-i18n="food">Food</span>
-              </button>
-              <select class="input" name="attr_food" title="@{food}">
-                <option value="0" selected>0</option>
-                <option value="1" data-i18n="die-6">d6</option>
-                <option value="2">d8</option>
-                <option value="3" data-i18n="die-10">d10</option>
-                <option value="4">d12</option>
-              </select>
-              <input type="hidden" name="attr_food_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_food_carried" value="1" title="@{food_carried}" checked />
-              <input type="hidden" name="attr_food_weight" value="0" />
-              <select class="input" name="attr_food_weight" title="@{food_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
-              </select>
-              <button class="roll-button-textonly header-h1" type="roll" name="roll_water" title="%{water}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{water_macro}">
-                  <span data-i18n="water">Water</span>
-              </button>
-              <select class="input" name="attr_water" title="@{water}">
-                <option value="0" selected>0</option>
-                <option value="1" data-i18n="die-6">d6</option>
-                <option value="2">d8</option>
-                <option value="3" data-i18n="die-10">d10</option>
-                <option value="4">d12</option>
-              </select>
-              <input type="hidden" name="attr_water_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_water_carried" value="1" title="@{water_carried}" checked />
-              <input type="hidden" name="attr_water_weight" value="0" />
-              <select class="input" name="attr_water_weight" title="@{water_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
-              </select>
-              <button class="roll-button-textonly header-h1" type="roll" name="roll_arrows" title="%{arrows}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{arrows_macro}">
-                  <span data-i18n="arrows">Arrows</span>
-              </button>
-              <select class="input" name="attr_arrows" title="@{arrows}">
-                <option value="0" selected>0</option>
-                <option value="1" data-i18n="die-6">d6</option>
-                <option value="2">d8</option>
-                <option value="3" data-i18n="die-10">d10</option>
-                <option value="4">d12</option>
-              </select>
-              <input type="hidden" name="attr_arrows_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_arrows_carried" value="1" title="@{arrows_carried}" checked />
-              <input type="hidden" name="attr_arrows_weight" value="0" />
-              <select class="input" name="attr_arrows_weight" title="@{arrows_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
-              </select>
-              <button class="roll-button-textonly header-h1" type="roll" name="roll_torches" title="%{torches}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{torches_macro}">
-                  <span data-i18n="torches">Torches</span>
-              </button>
-              <select class="input" name="attr_torches" title="@{torches}">
-                <option value="0" selected>0</option>
-                <option value="1" data-i18n="die-6">d6</option>
-                <option value="2">d8</option>
-                <option value="3" data-i18n="die-10">d10</option>
-                <option value="4">d12</option>
-              </select>
-              <input type="hidden" name="attr_torches_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_torches_carried" value="1" title="@{torches_carried}" checked />
-              <input type="hidden" name="attr_torches_weight" value="0" />
-              <select class="input" name="attr_torches_weight" title="@{torches_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
-              </select>
-            </div>
-          <!-- Repeating Gear -->
-            <div class="gear-grid">
               <input type="checkbox" class="hidden section-toggle-checkbox" name="attr_toggle_gear" value="1" />
-              <div class="gear-box header">
-                <h1 data-i18n="gea-u">GEAR</h1>
-              </div>
-              <div class="gear-box2 column-header">
-                <span data-i18n="quantity-abbr">Qty</span>
-              </div>
-              <div class="gear-box3 column-header">
-                <span data-i18n="carried-abbr">Carr</span>
-              </div>
-              <div class="gear-box4 column-header">
-                <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_gear" value="1" title="more/less" data-i18n="show-more-or-less">
-                <span class="expand-section-nav"></span>
-                <span data-i18n="weight-abbr">Wt</span>
-              </div>
+              <fieldset class="repeating_gear">
+                <div class="gear-grid">
+                  <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" /><span></span>
+                  <input class="gear-box1 input" type="text" name="attr_gear_name" value="" title="@{repeating_gear_$X_gear_name}" data-i18n-placeholder="item" placeholder="item" />
+                  <input class="gear-box2 input-number" type="number" name="attr_gear_qty" value="1" min="0" title="@{repeating_gear_$X_gear_qty}" />
+                  <input class="gear-box3 input" type="checkbox" name="attr_gear_carried" value="1" title="@{repeating_gear_$X_gear_carried}" checked />
+                  <select class="gear-box4 input" name="attr_gear_weight" title="@{repeating_gear_$X_gear_weight}">
+                    <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected>T</option>
+                    <option data-i18n="light-abbr" data-i18n-title="weight-light" value="0.5">L</option>
+                    <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1">N</option>
+                    <option data-i18n="heavy-abbr" data-i18n-title="weight-heavy" value="2">H</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                  <!-- expand 2nd row -->
+                  <textarea class="gear-box5 input-textarea" name="attr_gear_description" title="@{repeating_talents_$X_gear_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+                </div>
+              </fieldset>
+          </div>
+          <!-- Weight -->
+          <div class="gear-weight">
+            <div><span class="label" data-i18n="gear-consumables">Gear & Consumables</span></div>
+            <div>
+              <input class="input-number" type="text" name="attr_character_gear_and_consumables_encumbrance" value="0" title="@{character_gear_and_consumables_encumbrance}" readonly />
             </div>
-          <input type="checkbox" class="hidden section-toggle-checkbox" name="attr_toggle_gear" value="1" />
-          <fieldset class="repeating_gear">
-            <div class="gear-grid">
-              <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" /><span></span>
-              <input class="gear-box1 input" type="text" name="attr_gear_name" value="" title="@{repeating_gear_$X_gear_name}" data-i18n-placeholder="item" placeholder="item" />
-              <input class="gear-box2 input-number" type="number" name="attr_gear_qty" value="1" min="0" title="@{repeating_gear_$X_gear_qty}" />
-              <input class="gear-box3 input" type="checkbox" name="attr_gear_carried" value="1" title="@{repeating_gear_$X_gear_carried}" checked />
-              <select class="gear-box4 input" name="attr_gear_weight" title="@{repeating_gear_$X_gear_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected>T</option>
-                <option data-i18n="light-abbr" data-i18n-title="weight-light" value="0.5">L</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1">N</option>
-                <option data-i18n="heavy-abbr" data-i18n-title="weight-heavy" value="2">H</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-              </select>
-              <!-- expand 2nd row -->
-              <textarea class="gear-box5 input-textarea" name="attr_gear_description" title="@{repeating_talents_$X_gear_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+            <div><span class="label" data-i18n="weapons">Weapons</span></div>
+            <div>
+              <input class="input-number" type="text" name="attr_weapons_encumbrance" value="0" title="@{weapons_encumbrance}" readonly />
             </div>
-          </fieldset>
-        </div>
-        <div class="gear-weight">
-          <div><span class="label" data-i18n="gear-consumables">Gear & Consumables</span></div>
-          <div>
-            <input class="input-number" type="text" name="attr_character_gear_and_consumables_encumbrance" value="0" title="@{character_gear_and_consumables_encumbrance}" readonly />
+            <div><span class="label" data-i18n="armor">Armor</span></div>
+            <div>
+              <input class="input-number" type="text" name="attr_armor_shield_encumbrance" value="0" title="@{armor_shield_encumbrance}" readonly />
+            </div>
+            <div>
+              <span class="label" data-i18n="coins-carried">Coins Carried</span>
+            </div>
+            <div>
+              <input class="input-number" type="text" name="attr_coins_carried" value="0" title="@{coins_carried}" readonly />
+            </div>
           </div>
-          <div><span class="label" data-i18n="weapons">Weapons</span></div>
-          <div>
-            <input class="input-number" type="text" name="attr_weapons_encumbrance" value="0" title="@{weapons_encumbrance}" readonly />
-          </div>
-          <div><span class="label" data-i18n="armor">Armor</span></div>
-          <div>
-            <input class="input-number" type="text" name="attr_armor_shield_encumbrance" value="0" title="@{armor_shield_encumbrance}" readonly />
-          </div>
-          <div>
-            <span class="label" data-i18n="coins-carried">Coins Carried</span>
-          </div>
-          <div>
-            <input class="input-number" type="text" name="attr_coins_carried" value="0" title="@{coins_carried}" readonly />
-          </div>
-        </div>
-        <div class="gear-box6 header">
-          <div class="gear">
-            <span class="label" data-i18n="carry">Carry</span>
-          </div>
-          <div class="gear">
-            <input class="input-number" type="text" name="attr_carry" value="0" title="@{carry} = 2 x @{strength} + @{pack_rat}" readonly />
-          </div>
-          <div class="gear">
-            <span class="label over-encumbered" data-i18n="encumbrance">Encumbrance</span>
-          </div>
-          <input class="hidden warning" type="checkbox" name="attr_encumbered_flag" value="1" />
-          <div class="gear">
-            <input class="input-number over-encumbered" type="text" name="attr_character_encumbrance" value="0" title="@{character_encumbrance}" readonly />
+          <!-- Encumbrance -->
+          <div class="gear-box6 header">
+            <div class="gear">
+              <span class="label" data-i18n="carry">Carry</span>
+            </div>
+            <div class="gear">
+              <input class="input-number" type="text" name="attr_carry" value="0" title="@{carry} = 2 x @{strength} + @{pack_rat}" readonly />
+            </div>
+            <div class="gear">
+              <span class="label over-encumbered" data-i18n="encumbrance">Encumbrance</span>
+            </div>
+            <input class="hidden warning" type="checkbox" name="attr_encumbered_flag" value="1" />
+            <div class="gear">
+              <input class="input-number over-encumbered" type="text" name="attr_character_encumbrance" value="0" title="@{character_encumbrance}" readonly />
+            </div>
           </div>
         </div>
-      </div>
-      <div class="gear-subgrid2" style="margin-bottom: 1em;">
-        <div class="gear-box12">
-          <span class="label" data-i18n-title="pack-rat-title" data-i18n="pack-rat">Pack Rat Talent?</span>
+        <!-- Misc -->
+        <div class="gear-subgrid2" style="margin-bottom: 1em;">
+          <div class="gear-box12">
+            <span class="label" data-i18n-title="pack-rat-title" data-i18n="pack-rat">Pack Rat Talent?</span>
+          </div>
+          <div class="gear-box13">
+            <select class="input" name="attr_pack_rat">
+              <option value="0" data-i18n="no" selected>No</option>
+              <option value="2" data-i18n="rank-1-pack-rat">Rank 1 (+2)</option>
+              <option value="5" data-i18n="rank-2-pack-rat">Rank 2 (+5)</option>
+              <option value="10" data-i18n="rank-3-pack-rat">Rank 3 (+10)</option>
+            </select>
+          </div>
         </div>
-        <div class="gear-box13">
-          <select class="input" name="attr_pack_rat">
-            <option value="0" data-i18n="no" selected>No</option>
-            <option value="2" data-i18n="rank-1-pack-rat">Rank 1 (+2)</option>
-            <option value="5" data-i18n="rank-2-pack-rat">Rank 2 (+5)</option>
-            <option value="10" data-i18n="rank-3-pack-rat">Rank 3 (+10)</option>
-          </select>
+      </section>
+      <!-- Mount -->
+      <section class="mount">
+        <div class="mount-grid">
+          <div class="mount-box1 header">
+            <h1 data-i18n="moun-u">MOUNT</h1>
+          </div>
+          <input class="expand" type="checkbox" name="attr_expand_mount1" value="1" data-i18n-title="show-hide"
+            title="show/hide" style="margin-top: 3.35em;" /><span></span>
+          <input class="mount-box2 input" type="text" name="attr_mount_name" value="" title="@{mount_name}" data-i18n-placeholder="name" placeholder="name" />
+          <div class="mount-box3">
+            <span class="label" data-i18n="strength-abbr-u">STR</span>
+          </div>
+          <input class="mount-box4 input-number" type="number" name="attr_mount_strength" value="1"
+            title="@{mount_strength}" />
+          <div class="mount-box5">
+            <span class="label" data-i18n="agility-abbr-u">AGI</span>
+          </div>
+          <input class="mount-box6 input-number" type="number" name="attr_mount_agility" value="1"
+            title="@{mount_agility}" />
+          <!-- expand 2nd row -->
+          <textarea class="mount-box7 mount-row2 input-textarea" name="attr_mount_description"
+            title="@{mount_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
         </div>
-      </div>
-      <div class="mount-grid">
-        <div class="mount-box1 header">
-          <h1 data-i18n="moun-u">MOUNT</h1>
-        </div>
-        <input class="expand" type="checkbox" name="attr_expand_mount1" value="1" data-i18n-title="show-hide"
-          title="show/hide" style="margin-top: 3.35em;" /><span></span>
-        <input class="mount-box2 input" type="text" name="attr_mount_name" value="" title="@{mount_name}" data-i18n-placeholder="name" placeholder="name" />
-        <div class="mount-box3">
-          <span class="label" data-i18n="strength-abbr-u">STR</span>
-        </div>
-        <input class="mount-box4 input-number" type="number" name="attr_mount_strength" value="1"
-          title="@{mount_strength}" />
-        <div class="mount-box5">
-          <span class="label" data-i18n="agility-abbr-u">AGI</span>
-        </div>
-        <input class="mount-box6 input-number" type="number" name="attr_mount_agility" value="1"
-          title="@{mount_agility}" />
-        <!-- expand 2nd row -->
-        <textarea class="mount-box7 mount-row2 input-textarea" name="attr_mount_description"
-          title="@{mount_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
-      </div>
-      <div class="mount_gear-grid">
-        <input type="checkbox" class="hidden section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" />
-        <div class="mount_gear-box header">
-          <h1 data-i18n="on-mount">Gear on Mount</h1>
-        </div>
-        <div class="mount_gear-box2 column-header">
-          <span data-i18n="quantity-abbr">Qty</span>
-        </div>
-        <div class="mount_gear-box3 column-header">
-          <span data-i18n="carried-abbr">Carr</span>
-        </div>
-        <div class="mount_gear-box4 column-header">
-          <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" title="more/less" data-i18n="show-more-or-less" />
-          <span class="expand-section-nav"></span>
-          <span data-i18n="weight-abbr">Wt</span>
-        </div>
-        <div class="mount_gear-box5">
+        <div class="mount_gear-grid">
           <input type="checkbox" class="hidden section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" />
-          <fieldset class="repeating_mount">
-            <div class="mount_gear-grid">
-              <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" /><span></span>
-              <input class="mount_gear-box1 input" type="text" name="attr_mount_gear_name" value="" title="@{repeating_mount_$X_mount_gear_name}" data-i18n-placeholder="item" placeholder="item" />
-              <input class="mount_gear-box2 input-number" type="number" name="attr_mount_gear_qty" value="1" title="Quantity @{repeating_mount_$X_mount_gear_qty}" />
-              <input class="mount_gear-box3 input" type="checkbox" name="attr_mount_gear_carried" value="1" title="@{repeating_mount_$X_mount_gear_carried}" checked />
-              <select class="mount_gear-box4 input" name="attr_mount_gear_weight" title="@{repeating_mount_$X_mount_gear_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected>T</option>
-                <option data-i18n="light-abbr" data-i18n-title="weight-light" value="0.5">L</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1">N</option>
-                <option data-i18n="heavy-abbr" data-i18n-title="weight-heavy" value="2">H</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-              </select>
-              <textarea class="mount_gear-box5 input-textarea" name="attr_mount_gear_description" title="@{repeating_mount_$X_mount_gear_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+          <div class="mount_gear-box header">
+            <h1 data-i18n="on-mount">Gear on Mount</h1>
+          </div>
+          <div class="mount_gear-box2 column-header">
+            <span data-i18n="quantity-abbr">Qty</span>
+          </div>
+          <div class="mount_gear-box3 column-header">
+            <span data-i18n="carried-abbr">Carr</span>
+          </div>
+          <div class="mount_gear-box4 column-header">
+            <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" title="more/less" data-i18n="show-more-or-less" />
+            <span class="expand-section-nav"></span>
+            <span data-i18n="weight-abbr">Wt</span>
+          </div>
+          <div class="mount_gear-box5">
+            <input type="checkbox" class="hidden section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" />
+            <fieldset class="repeating_mount">
+              <div class="mount_gear-grid">
+                <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" /><span></span>
+                <input class="mount_gear-box1 input" type="text" name="attr_mount_gear_name" value="" title="@{repeating_mount_$X_mount_gear_name}" data-i18n-placeholder="item" placeholder="item" />
+                <input class="mount_gear-box2 input-number" type="number" name="attr_mount_gear_qty" value="1" title="Quantity @{repeating_mount_$X_mount_gear_qty}" />
+                <input class="mount_gear-box3 input" type="checkbox" name="attr_mount_gear_carried" value="1" title="@{repeating_mount_$X_mount_gear_carried}" checked />
+                <select class="mount_gear-box4 input" name="attr_mount_gear_weight" title="@{repeating_mount_$X_mount_gear_weight}">
+                  <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected>T</option>
+                  <option data-i18n="light-abbr" data-i18n-title="weight-light" value="0.5">L</option>
+                  <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1">N</option>
+                  <option data-i18n="heavy-abbr" data-i18n-title="weight-heavy" value="2">H</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </select>
+                <textarea class="mount_gear-box5 input-textarea" name="attr_mount_gear_description" title="@{repeating_mount_$X_mount_gear_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+              </div>
+            </fieldset>
+          </div>
+          <div class="gear-weight gear-weight2">
+            <div><span class="label" data-i18n="gear">Gear</span></div>
+            <div>
+              <input class="input-number" type="text" name="attr_mount_gear_encumbrance" value="0" title="@{mount_gear_encumbrance}" readonly />
             </div>
-          </fieldset>
-        </div>
-        <div class="gear-weight gear-weight2">
-          <div><span class="label" data-i18n="gear">Gear</span></div>
-          <div>
-            <input class="input-number" type="text" name="attr_mount_gear_encumbrance" value="0" title="@{mount_gear_encumbrance}" readonly />
+            <div>
+              <span class="label" data-i18n="coins-carried">Coins Carried</span>
+            </div>
+            <div>
+              <input class="input-number" type="text" name="attr_coins_carried_mount" value="0" title="@{coins_carried_mount}" readonly />
+            </div>
           </div>
-          <div>
-            <span class="label" data-i18n="coins-carried">Coins Carried</span>
-          </div>
-          <div>
-            <input class="input-number" type="text" name="attr_coins_carried_mount" value="0" title="@{coins_carried_mount}" readonly />
-          </div>
-        </div>
-        <div class="mount_gear-box6 header">
-          <div class="mount_gear">
-            <span class="label" data-i18n="carry">Carry</span>
-          </div>
-          <div class="mount_gear">
-            <input class="input-number" type="text" name="attr_mount_carry" value="0" title="@{mount_carry} = mount_strength x2, unmounted x4" readonly />
-          </div>
-          <div class="mount_gear">
-            <span class="label" data-i18n="encumbrance">Encumbrance</span>
-          </div>
-          <input class="hidden warning" type="checkbox" name="attr_mount_encumbered_flag" value="1" />
-          <div class="mount_gear">
-            <input class="input-number over-encumbered" type="text" name="attr_mount_encumbrance" value="0" title="@{mount_encumbrance}" readonly />
+          <div class="mount_gear-box6 header">
+            <div class="mount_gear">
+              <span class="label" data-i18n="carry">Carry</span>
+            </div>
+            <div class="mount_gear">
+              <input class="input-number" type="text" name="attr_mount_carry" value="0" title="@{mount_carry} = mount_strength x2, unmounted x4" readonly />
+            </div>
+            <div class="mount_gear">
+              <span class="label" data-i18n="encumbrance">Encumbrance</span>
+            </div>
+            <input class="hidden warning" type="checkbox" name="attr_mount_encumbered_flag" value="1" />
+            <div class="mount_gear">
+              <input class="input-number over-encumbered" type="text" name="attr_mount_encumbrance" value="0" title="@{mount_encumbrance}" readonly />
+            </div>
           </div>
         </div>
-      </div>
-      <div class="mount_gear-subgrid2">
-        <span style="text-align: center; margin-top: -3px;"><input class="input" title="@{mounted}" type="checkbox" name="attr_mounted" value="1" style="margin: 0;" /></span>
-        <span class="label" data-i18n="mounted" style="margin: 0;">Mounted</span>
-      </div>
+        <div class="mount_gear-subgrid2">
+          <span style="text-align: center; margin-top: -3px;"><input class="input" title="@{mounted}" type="checkbox" name="attr_mounted" value="1" style="margin: 0;" /></span>
+          <span class="label" data-i18n="mounted" style="margin: 0;">Mounted</span>
+        </div>
+      </section>
     </div>
     <div class="box toggle-monster-only character-armor">
       <div class="armor-container">
@@ -3344,8 +3356,16 @@
     </div>
   </div>
 </div>
+
+<!-- Sheet Settings -->
 <div class="wrapper tab-content settings">
   <div class="settings-options">
+    <div>
+      <span data-i18n="show-hide-label">Show/Hide:</span>
+      <span class="inline-label"><span data-i18n="mount">Mount</span>&nbsp;<input type="checkbox" class="display-mount" name="attr_display_mount_flag" value="1" checked /></span>
+      <span class="inline-label"><span data-i18n="beasts">Beasts</span>&nbsp;<input type="checkbox" class="display-beasts" name="attr_display_beasts_flag" value="1" checked /></span>
+      <span class="inline-label"><span data-i18n="spells">Spells</span>&nbsp;<input type="checkbox" class="display-spells" name="attr_display_spells_flag" value="1" checked /></span>
+    </div>
     <input type="hidden" name="attr_translation_whisper_query" value="whisper-query" />
     <input type="hidden" name="attr_translation_whisper_api_query" value="whisper_api-query" />
     <div>
@@ -3364,63 +3384,67 @@
         <option value="@{translation_whisper_api_macro_query}" data-i18n="whisper-query">Use a query.</option>
       </select>
     </div>
-    <!-- used to translate query-->
-    <span style="display: none;" name="attr_translation_whisper_macro_query" value=""></span>
-    <span style="display: none;" name="attr_translation_whisper_api_macro_query" value=""></span>
-    <span style="display: none;" data-i18n="whisper-query">Whisper roll?</span>
-    <span style="display: none;" data-i18n="yes">yes</span>
-    <span style="display: none;" data-i18n="no">no</span>
+    <!-- used by sheetworker to translate query -->
+    <span class="hidden" name="attr_translation_whisper_macro_query" value=""></span>
+    <span class="hidden" name="attr_translation_whisper_api_macro_query" value=""></span>
+    <span class="hidden" data-i18n="whisper-query">Whisper roll?</span>
+    <span class="hidden" data-i18n="yes">yes</span>
+    <span class="hidden" data-i18n="no">no</span>
     <div>
-      <span data-i18n="sort-skills">Sort Skills by Attribute:</span>
-      <input type="checkbox" name="attr_skill_order_group" value="1" title="@{skill_order_group}" style="vertical-align: text-top;" />
+      <span class="inline-label">
+        <span data-i18n="sort-skills">Sort Skills by Attribute:</span>&nbsp;
+        <input type="checkbox" name="attr_skill_order_group" value="1" title="@{skill_order_group}" style="vertical-align: text-top;" />
+      </span>
     </div>
     <div>
-      <span data-i18n="sort-stockpile">Sort Stockpile resources alphabetically:</span>
-      <input type="checkbox" name="attr_stockpile_order_group" value="1" title="@{stockpile_order_group}" style="vertical-align: text-top;" checked />
+      <span class="inline-label">
+        <span data-i18n="sort-stockpile">Sort Stockpile resources alphabetically:</span>&nbsp;
+        <input type="checkbox" name="attr_stockpile_order_group" value="1" title="@{stockpile_order_group}" style="vertical-align: text-top;" checked />
+      </span>
     </div>
-    <div>
-      <div class="rank-totals-grid">
-        <details>
-          <summary class="nav-after">
-            <span data-i18n="rank-level-totals">Rank & Level Totals</span>
-          </summary>
-            <div class="talent-ranks expanded-area">
-              <span class="label" data-i18n="rank">Rank</span>
-              <span>1</span>
-              <span>2</span>
-              <span>3</span>
-              <span>4</span>
-              <span>5</span>
-              <span>6</span>
-              <span></span>
-              <span class="label" data-i18n="level">Level</span>
-              <span>1st</span>
-              <span>2nd</span>
-              <span>3rd</span>
-              <span>4th</span>
-              <span>5th</span>
-              <span>6th</span>
-              <!-- Talents Row-->
-              <span class="label" data-i18n="talents">Talents</span>
-              <span><input type="text" name="attr_talent_rank1_total" value="0" title="@{talent_rank1_total}" readonly=""></span>
-              <span><input type="text" name="attr_talent_rank2_total" value="0" title="@{talent_rank2_total}" readonly=""></span>
-              <span><input type="text" name="attr_talent_rank3_total" value="0" title="@{talent_rank3_total}" readonly=""></span>
-              <span><input type="text" name="attr_talent_rank4_total" value="0" title="@{talent_rank4_total}" readonly=""></span>
-              <span><input type="text" name="attr_talent_rank5_total" value="0" title="@{talent_rank5_total}" readonly=""></span>
-              <span><input type="text" name="attr_talent_rank6_total" value="0" title="@{talent_rank6_total}" readonly=""></span>
-              <span></span>
-              <!-- Skills Row-->
-              <span class="label" data-i18n="skills">Skills</span>
-              <span><input type="text" name="attr_skill_level1_total" value="0" title="@{skill_level1_total}" readonly=""></span>
-              <span><input type="text" name="attr_skill_level2_total" value="0" title="@{skill_level2_total}" readonly=""></span>
-              <span><input type="text" name="attr_skill_level3_total" value="0" title="@{skill_level3_total}" readonly=""></span>
-              <span><input type="text" name="attr_skill_level4_total" value="0" title="@{skill_level4_total}" readonly=""></span>
-              <span><input type="text" name="attr_skill_level5_total" value="0" title="@{skill_level5_total}" readonly=""></span>
-              <span><input type="text" name="attr_skill_level6_total" value="0" title="@{skill_level6_total}" readonly=""></span>
-          </div>
-        </details>
-      </div>
+    <!-- Talent and Skill totals to help track integrity -->
+    <div class="rank-totals-grid">
+      <details>
+        <summary class="nav-after">
+          <span data-i18n="rank-level-totals">Rank & Level Totals</span>
+        </summary>
+          <div class="talent-ranks expanded-area">
+            <span class="label" data-i18n="rank">Rank</span>
+            <span>1</span>
+            <span>2</span>
+            <span>3</span>
+            <span>4</span>
+            <span>5</span>
+            <span>6</span>
+            <span></span>
+            <span class="label" data-i18n="level">Level</span>
+            <span>1st</span>
+            <span>2nd</span>
+            <span>3rd</span>
+            <span>4th</span>
+            <span>5th</span>
+            <span>6th</span>
+            <!-- Talents Row-->
+            <span class="label" data-i18n="talents">Talents</span>
+            <span><input type="text" name="attr_talent_rank1_total" value="0" title="@{talent_rank1_total}" readonly=""></span>
+            <span><input type="text" name="attr_talent_rank2_total" value="0" title="@{talent_rank2_total}" readonly=""></span>
+            <span><input type="text" name="attr_talent_rank3_total" value="0" title="@{talent_rank3_total}" readonly=""></span>
+            <span><input type="text" name="attr_talent_rank4_total" value="0" title="@{talent_rank4_total}" readonly=""></span>
+            <span><input type="text" name="attr_talent_rank5_total" value="0" title="@{talent_rank5_total}" readonly=""></span>
+            <span><input type="text" name="attr_talent_rank6_total" value="0" title="@{talent_rank6_total}" readonly=""></span>
+            <span></span>
+            <!-- Skills Row-->
+            <span class="label" data-i18n="skills">Skills</span>
+            <span><input type="text" name="attr_skill_level1_total" value="0" title="@{skill_level1_total}" readonly=""></span>
+            <span><input type="text" name="attr_skill_level2_total" value="0" title="@{skill_level2_total}" readonly=""></span>
+            <span><input type="text" name="attr_skill_level3_total" value="0" title="@{skill_level3_total}" readonly=""></span>
+            <span><input type="text" name="attr_skill_level4_total" value="0" title="@{skill_level4_total}" readonly=""></span>
+            <span><input type="text" name="attr_skill_level5_total" value="0" title="@{skill_level5_total}" readonly=""></span>
+            <span><input type="text" name="attr_skill_level6_total" value="0" title="@{skill_level6_total}" readonly=""></span>
+        </div>
+      </details>
     </div>
+    <!-- Background -->
     <div>
       <span data-i18n="sheet-background">Sheet Background</span>
         <select name="attr_background" title="@{background}" style="width:8em;">
