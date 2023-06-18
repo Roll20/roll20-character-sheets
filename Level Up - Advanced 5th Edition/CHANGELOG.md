@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2023-02-07 ** v.21 Paul V
+	Minor increase in maneuver list font size
 **2023-02-07 ** v.20 Paul V
 	Fixed Stat rolls and NPC Stat rolls and saves
 	Added Features and traits list

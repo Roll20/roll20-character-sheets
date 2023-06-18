@@ -1,0 +1,72 @@
+- const templateHeader = name => `&{template:rolls} {{header=^{${name}}}}`
+- const rollFormula = attrName => `{{dice=[[{1d20+({@{${attrName}}+(?{Mod.|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{${attrName}}+(?{Mod.|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{${attrName}}+(?{Mod.|0}),0}kl1)]]}}`
+- const damageForumla = attrName => `{{damage=[[(@{${attrName}}+(?{Mod.|0}))d6]]}}`;
+- const buttonName = name => name.replace(/ /g, '-');
+- const attrName = name => name.replace(/ /g, '_');
+
+mixin accentSubheader(name)
+  h2.text-accent.small-caps(data-i18n=name)
+
+mixin primarySubheader(name)
+  h2.text-primary.small-caps(data-i18n=name)
+
+mixin boldSubheader(name)
+  h3.bold.uppercase(data-i18n=name)
+
+mixin textInput(name, i18n)
+  - i18n = i18n ? i18n : name
+  label(data-i18n-title=`enter ${i18n}` title=`enter ${name}`)
+    input(data-i18n-placeholder=i18n name=`attr_${attrName(name)}` placeholder=name title=`@{${attrName(name)}}` type='text' value='')
+
+mixin numberInput(name)
+  label(data-i18n-title=`enter ${name}` title=`enter ${name}`)
+    input(name=`attr_${attrName(name)}` placeholder='#' title=`@{${attrName(name)}}` type='number' value='0')
+
+mixin checkboxInput(name)
+  label.styled-checkbox.grid(data-i18n-title=`${name}` title=`${name}`)
+    input(name=`attr_${attrName(name)}` title=`@{${attrName(name)}}` type='checkbox' value=name)
+    span.pictos 3
+
+mixin attributeButton(name)
+  button.uppercase(data-i18n=`${name.slice(0, 3)}` name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${rollFormula(attrName(name))}`)
+
+mixin rollButton(name)
+  button.capitalize(data-i18n=name title=name name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${rollFormula(attrName(name))}`)
+
+mixin squireButton(name)
+  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=^{squire} ^{${name}}}} ${rollFormula(attrName(`squire_${name}`))}`) t
+
+mixin damageButton(name, i18n)
+  - i18n = i18n ? i18n : name
+  button.capitalize(data-i18n=i18n name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${damageForumla(attrName(name))}`)
+
+mixin repeatingRollButton(name)
+  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=@{name}}} ${rollFormula(attrName(name))}`) t
+
+mixin repeatingAttackRollButton(name)
+  button.d20.capitalize(name=`roll_damage` type='roll' value!=`&{template:rolls} {{header=@{name} (Damage)}} {{damage=[[(@{damage}+(?{Mod.|0}))]]}}`) t
+
+mixin tabButtons(value, className, selected)
+  - const selectedKeyWord = selected ? 'selected' : ''
+  label(class=`${className}` data-i18n-title=`sheet: ${value}`)
+    input(name=`attr_sheet_type` title=`@{sheet_type}` type='radio' value=value ${selectedKeyWord})
+    span.capitalize.text-center(data-i18n=`${value}`)
+
+mixin table(rows)
+  .table
+    .grid.header.2column
+      h3.small-caps.text-left(data-i18n='statistic')
+      .flex-center
+        h3.small-caps(data-i18n='value')
+    .grid.body
+      each val in rows
+        - const inputs = ['armor points', 'current glory']
+        .row.grid.2column
+          h3.text-left(data-i18n=val)
+          if inputs.includes(val)
+            +textInput(val)
+          else
+            span.text-center(name=`attr_${attrName(val)}`)
+
+mixin textArea(name)
+  textarea(data-i18n-placeholder=name name=`attr_${attrName(name)}` placeholder=name)

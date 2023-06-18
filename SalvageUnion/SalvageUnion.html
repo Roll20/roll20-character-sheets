@@ -1,14 +1,17 @@
 <div class="wrapper">
     <input type="hidden" class="tabstoggle" name="attr_sheetTab" value="settings"/>
     <div>
-        <input class="show-pilot" name="attr_is-pilot" type="checkbox" checked hidden/>
+        <input class="show-pilot" name="attr_is-pilot" type="checkbox" hidden/>
         <button type="action" name="act_pilot" class="tabs pilot-button">Pilot</button>
 
         <input class="show-mech" name="attr_is-mech" type="checkbox" hidden/>
         <button type="action" name="act_mech" class="tabs mech-button">Mech</button>
 
-        <input class="show-crawler" name="attr_iscrawler" type="checkbox" hidden/>
+        <input class="show-crawler" name="attr_is-crawler" type="checkbox" hidden/>
         <button type="action" name="act_crawler" class="tabs crawler-button">Union Crawler</button>
+
+        <input class="show-denizen" name="attr_is-denizen" type="checkbox" hidden/>
+        <button type="action" name="act_denizen" class="tabs denizen-button">Denizen</button>
 
         <input class="show-notes" name="attr_show-notes-tab" type="checkbox" hidden/>
         <button type="action" name="act_notes" class="tabs notes-button">Notes</button>
@@ -18,7 +21,7 @@
 
     <div class="pilot">
         <h2>Pilot
-            <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
+            <button type="action" name="act_roll" class="rollButton" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
         </h2>
         <div style="display:flex">
             <div class="twocolumns">
@@ -87,13 +90,19 @@
             <fieldset class="repeating_weapons">
                 <details>
                     <summary>
-                        <input type="text" name="attr_weaponname" title="Name of the Weapon">
+                        <input type="text" name="attr_name" title="Name of the Weapon">
                         <input type="text" name="attr_range" title="Range">
                         <input type="text" name="attr_damage" title="Damage">
-                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
+                        <button type="action" name="act_roll" class="rollButton" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-name}}}{{roll=[[1d20]]}}{{damage=@{prefix-damage}}}{{traits=@{prefix-traits}}}">
                         </button>
                     </summary>
-                    <textarea name="attr_weaponDetails"></textarea>
+                    <div>
+                        <div class="textarea-with-controls">
+                            <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                            <textarea name="attr_details"></textarea>
+                            <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
+                        </div>
+                    </div>
                 </details>
             </fieldset>
         </div>
@@ -136,6 +145,36 @@
                 </summary>
                 <textarea name="attr_itemDetails6"></textarea>
             </details>
+            <input class="nojobtobig" name="attr_nojobtobig" type="checkbox" hidden/>
+            <span class="nojobtobig">
+                <details>
+                    <summary>
+                        <input type="text" name="attr_nojobtobig2">
+                    </summary>
+                <textarea name="attr_nojobtobigDetails2"></textarea>
+                </details>
+                <details>
+                    <summary>
+                        <input type="text" name="attr_nojobtobig1">
+                    </summary>
+                    <textarea name="attr_nojobtobigDetails1"></textarea>
+                </details>
+            </span>
+            <input class="beefcake" name="attr_beefcake" type="checkbox" hidden/>
+            <span class="beefcake">
+                <details>
+                    <summary>
+                        <input type="text" name="attr_beefcake1">
+                    </summary>
+                <textarea name="attr_beefackeDetails1"></textarea>
+                </details>
+                <details>
+                    <summary>
+                        <input type="text" name="attr_beefcake2">
+                    </summary>
+                    <textarea name="attr_beefackeDetails2"></textarea>
+                </details>
+            </span>
         </div>
 
         <h3>Equipment</h3>
@@ -153,7 +192,13 @@
                     <input type="text" name="attr_range" title="Range">
                     <input type="text" name="attr_action" title="Action">
                 </summary>
-                <textarea name="attr_equipment" class="textarea"></textarea>
+                <div>
+                    <div class="textarea-with-controls">
+                        <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                        <textarea name="attr_details" class="textarea"></textarea>
+                        <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
+                    </div>
+                </div>
             </details>
         </fieldset>
 
@@ -172,14 +217,17 @@
                     <input type="text" name="attr_range" title="Range">
                     <input type="text" name="attr_action" title="Action">
                 </summary>
-                <textarea name="attr_ability" class="textarea"></textarea>
+                <div class="textarea-with-controls">
+                    <textarea name="attr_ability" class="textarea"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{ability}}}">w</button>
+                </div>
             </details>
         </fieldset>
     </div>
 
     <div class="mech">
         <h2>Mech
-            <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}{{mech=1}}{{heatroll=[[0]]}}"></button>
+            <button type="action" name="act_mechroll" class="rollButton" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
         </h2>
         <div style="display:flex">
             <div class="twocolumns">
@@ -190,17 +238,17 @@
                 <div class="descValuePair">
                     <label>System Slots </label>
                     <span style="display: flex">
-                        <input type="number" name="attr_system" value="@{systems_used}" disabled>
+                        <input type="number" name="attr_systems" value="@{systems_used}" disabled>
                         <label> of </label>
-                        <input type="number" name="attr_system_max">
+                        <input type="number" name="attr_systems_max">
                     </span>
                 </div>
                 <div class="descValuePair">
-                    <label >Module Slots </label>
+                    <label>Module Slots </label>
                     <span style="display: flex">
-                        <input type="number" name="attr_module" value="@{modules_used}" disabled>
+                        <input type="number" name="attr_modules" value="@{modules_used}" disabled>
                         <label> of</label>
-                        <input type="number" name="attr_module_max">
+                        <input type="number" name="attr_modules_max">
                     </span>
                 </div>
                 <details>
@@ -210,7 +258,13 @@
                                 <input id="chassis" type="text" name="attr_chassis">
                             </span>
                     </summary>
-                    <textarea name="attr_chassisDetails"></textarea>
+                    <div>
+                        <div class="descValuePair">
+                            <label for="chassiscost">Cost</label>
+                            <input id="chassiscost" type="text" name="attr_chassis_cost">
+                        </div>
+                        <textarea name="attr_chassisDetails"></textarea>
+                    </div>
                 </details>
             </div>
 
@@ -220,13 +274,18 @@
                     <input type="number" id="structure" min="0" name="attr_structure" value="10">
                     <label> of <input type="number" min="0" name="attr_structure_max" value="10"></label>
                 </div>
+                <input class="show-shield" name="attr_show-shield" type="checkbox" hidden/>
+                <div class="descValuePair shield">
+                    <label for="shield">Shield <input type="number" id="shield" min="0" name="attr_shield" value="0"></label>
+
+                </div>
                 <div class="descValuePair">
                     <label for="energyPts">Energy Pts </label>
                     <input type="number" id="energyPts" min="0" name="attr_energy" value="10">
                     <label> of <input type="number" min="0" name="attr_energy_max" value="10"></label>
                 </div>
                 <div class="descValuePair">
-                    <button type="roll" class="textbutton" value="&{template:roll}{{name=@{character_name}}}{{mech=1}}{{heatroll=[[1d20]]}}{{heat=[[@{heat}]]}}">Heat</button>
+                    <button type="action" name="act_roll" class="textbutton" value="&{template:roll}{{name=@{character_name}}}{{mech=1}}{{heatroll=[[1d20]]}}{{heat=[[@{heat}]]}}">Heat</button>
                     <input type="number" min="0" max="@{heat_max}" name="attr_heat" value="0">
                     <label> of <input type="number" min="0" name="attr_heat_max" value="10"> </label>
                 </div>
@@ -243,31 +302,47 @@
         <div>
             <fieldset class="repeating_mechweapons">
                 <details>
-                    <summary class="rollButton">
-                        <input type="text" name="attr_weaponname" title="Name of the Weapon">
+                    <summary>
+                        <input type="text" name="attr_name" title="Name of the Weapon">
                         <input type="text" name="attr_range" title="Range">
                         <input type="text" name="attr_damage" title="Damage">
-                        <button type="action" name="act_roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-weaponname}}}{{roll=[[1d20]]}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-weaponheat}]]}}{{mech=1}}{{heatroll=[[0]]}}">
+                        <button type="action" name="act_mechroll" class="rollButton" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{roll=[[1d20]]}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-name}}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-heat}]]}}{{traits=@{prefix-traits}}}">
                         </button>
                     </summary>
-                    <details class="subdetails">
+                    <details>
                         <summary>
-                            Settings
+                            <h4>Settings</h4>
                         </summary>
-                        <div class="descValuePair">
-                            <label>Heat produced</label>
-                            <input type="number" name="attr_weaponheat" value="0" min="0">
-                        </div>
-                        <div class="descValuePair">
-                            <label>Cost</label>
-                            <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
-                        </div>
-                        <div class="descValuePair">
-                            <label>Slots</label>
-                            <input type="number" name="attr_slot" value="1">
-                        </div>
+                        <details>
+                            <summary><h4>Cost</h4></summary>
+                            <div class="descValuePair">
+                                <label>Cost</label>
+                                <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Slots</label>
+                                <input type="number" name="attr_slots" value="1">
+                            </div>
+                        </details>
+                        <details>
+                            <summary><h4>Heat</h4></summary>
+                            <div class="descValuePair">
+                                <label>Heat produced</label>
+                                <input type="number" name="attr_heat" value="0" min="0">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Heat Spike</label>
+                                <input type="checkbox" name="attr_heatspike">
+                            </div>
+                        </details>
                     </details>
-                    <textarea name="attr_weapondetails"></textarea>
+                    <div>
+                        <div class="textarea-with-controls">
+                            <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                            <textarea name="attr_details"></textarea>
+                            <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
+                        </div>
+                    </div>
                 </details>
             </fieldset>
         </div>
@@ -297,23 +372,37 @@
                     <input type="text" name="attr_cost" title="EP/Uses">
                     <input type="text" name="attr_range" title="Range">
                     <input type="text" name="attr_action" title="Action">
-                    <input type="checkbox" name="attr_is-passive" hidden>
+                    <input type="checkbox" name="attr_is-passive" class="passiv-hide" hidden>
                     <button type="action" class="textbutton passiv-hide" name="act_use-module">Use</button>
                     <input type="checkbox" class="show-active" name="attr_has-active" hidden>
                     <input type="checkbox" class="active" name="attr_active" title="Active">
                 </summary>
-                <details class="subdetails">
+                <details>
                     <summary>
-                        Settings
+                        <h4>Settings</h4>
                     </summary>
-                    <div class="descValuePair">
-                        <label>Cost</label>
-                        <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
-                    </div>
-                    <div class="descValuePair">
-                        <label>Slots</label>
-                        <input type="number" name="attr_slot" value="1">
-                    </div>
+                    <details>
+                        <summary><h4>Cost</h4></summary>
+                        <div class="descValuePair">
+                            <label>Cost</label>
+                            <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                        </div>
+                        <div class="descValuePair">
+                            <label>Slots</label>
+                            <input type="number" name="attr_slots" value="0">
+                        </div>
+                    </details>
+                    <details>
+                        <summary><h4>Heat</h4></summary>
+                        <div class="descValuePair">
+                            <label>Heat produced</label>
+                            <input type="number" name="attr_heat" value="0" min="0">
+                        </div>
+                        <div class="descValuePair">
+                            <label>Heat Spike</label>
+                            <input type="checkbox" name="attr_heatspike">
+                        </div>
+                    </details>
                     <div class="descValuePair">
                         <label>Is passive</label>
                         <input type="checkbox" name="attr_is-passive">
@@ -327,7 +416,12 @@
                         <input type="checkbox" name="attr_has-uses">
                     </div>
                 </details>
-                <textarea name="attr_details" class="textarea"></textarea>
+                <div class="textarea-with-controls">
+                    <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                    <textarea name="attr_details" class="textarea"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
+                </div>
+
             </details>
         </fieldset>
 
@@ -350,18 +444,32 @@
                     <input type="checkbox" class="show-active" name="attr_has-active" hidden>
                     <input type="checkbox" class="active" name="attr_active" title="Active">
                 </summary>
-                <details class="subdetails">
+                <details>
                     <summary>
-                        Settings
+                        <h4>Settings</h4>
                     </summary>
-                    <div class="descValuePair">
-                        <label>Cost</label>
-                        <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
-                    </div>
-                    <div class="descValuePair">
-                        <label>Slots</label>
-                        <input type="number" name="attr_slot" value="1">
-                    </div>
+                    <details>
+                        <summary><h4>Cost</h4></summary>
+                        <div class="descValuePair">
+                            <label>Cost</label>
+                            <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                        </div>
+                        <div class="descValuePair">
+                            <label>Slots</label>
+                            <input type="number" name="attr_slots" value="0">
+                        </div>
+                    </details>
+                    <details>
+                        <summary><h4>Heat</h4></summary>
+                        <div class="descValuePair">
+                            <label>Heat produced</label>
+                            <input type="number" name="attr_heat" value="0" min="0">
+                        </div>
+                        <div class="descValuePair">
+                            <label>Heat Spike</label>
+                            <input type="checkbox" name="attr_heatspike">
+                        </div>
+                    </details>
                     <div class="descValuePair">
                         <label>Is passive</label>
                         <input type="checkbox" name="attr_is-passive">
@@ -375,14 +483,18 @@
                         <input type="checkbox" name="attr_has-uses">
                     </div>
                 </details>
-                <textarea name="attr_details" class="textarea"></textarea>
+                <div class="textarea-with-controls">
+                    <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                    <textarea name="attr_details" class="textarea"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
+                </div>
             </details>
         </fieldset>
     </div>
 
     <div class="crawler">
         <h2>Crawler
-            <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
+            <button type="action" name="act_roll" class="rollButton" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
         </h2>
         <div style="display:flex">
             <div class="twocolumns">
@@ -415,6 +527,10 @@
                     <input type="number" id="crawlerstructure" min="0" name="attr_structure" value="20">
                     <label> of <input type="number" min="0" name="attr_structure_max" value="20"></label>
                 </div>
+                <div class="descValuePair">
+                    <label for="population">Population</label>
+                    <input type="text" id="population" name="attr_population" value="100">
+                </div>
             </div>
         </div>
 
@@ -428,30 +544,46 @@
             <fieldset class="repeating_mechweapons">
                 <details>
                     <summary>
-                        <input type="text" name="attr_weaponname" title="Name of the Weapon">
+                        <input type="text" name="attr_name" title="Name of the Weapon">
                         <input type="text" name="attr_range" title="Range">
                         <input type="text" name="attr_damage" title="Damage">
-                        <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
+                        <button type="action" name="act_roll" class="rollButton" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{roll=[[1d20]]}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-name}}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-heat}]]}}{{traits=@{prefix-traits}}}">
                         </button>
                     </summary>
-                    <details class="subdetails">
+                    <details>
                         <summary>
-                            Settings
+                            <h4>Settings</h4>
                         </summary>
-                        <div class="descValuePair">
-                            <label>Heat produced</label>
-                            <input type="number" name="attr_heat" value="0">
-                        </div>
-                        <div class="descValuePair">
-                            <label>Cost</label>
-                            <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
-                        </div>
-                        <div class="descValuePair">
-                            <label>Slots</label>
-                            <input type="number" name="attr_slot" value="1">
-                        </div>
+                        <details>
+                            <summary><h4>Cost</h4></summary>
+                            <div class="descValuePair">
+                                <label>Cost</label>
+                                <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Slots</label>
+                                <input type="number" name="attr_slots" value="1">
+                            </div>
+                        </details>
+                        <details>
+                            <summary><h4>Heat</h4></summary>
+                            <div class="descValuePair">
+                                <label>Heat produced</label>
+                                <input type="number" name="attr_heat" value="0" min="0">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Heat Spike</label>
+                                <input type="checkbox" name="attr_heatspike">
+                            </div>
+                        </details>
                     </details>
-                    <textarea name="attr_details"></textarea>
+                    <div>
+                        <div class="textarea-with-controls">
+                            <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                            <textarea name="attr_details"></textarea>
+                            <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
+                        </div>
+                    </div>
                 </details>
             </fieldset>
         </div>
@@ -478,11 +610,118 @@
 
         <h3>Bays</h3>
         <fieldset class="repeating_bays">
-            <details class="equipment">
+            <details>
                 <summary>
-                    <input type="text" name="attr_name" title="Name of the Bay">
+                    <input type="text" name="attr_name" class="fullsize" title="Name of the Bay">
                 </summary>
-                <textarea name="attr_details" class="textarea"></textarea>
+                <div class="textarea-with-controls">
+                    <textarea name="attr_details"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
+                </div>
+            </details>
+        </fieldset>
+    </div>
+
+    <div class="denizen">
+        <h2>Denizen
+            <button type="action" name="act_roll" class="rollButton" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
+        </h2>
+        <div style="display:flex">
+            <div class="twocolumns">
+                <div class="descValuePair">
+                    <label for="denizenname">Name</label>
+                    <input id="denizenname" type="text" name="attr_character_name">
+                </div>
+
+                <div class="descValuePair">
+                    <label for="denzientechlevel">Tech Level</label>
+                    <input id="denzientechlevel" type="text" name="attr_techlevel">
+                </div>
+                <div class="descValuePair">
+                    <label for="denizenscrap">Scrap</label>
+                    <input id="denizenscrap" type="number" name="attr_scrapvalue">
+                </div>
+                <textarea name="attr_typeDetails"></textarea>
+            </div>
+
+            <div class="marginleft twocolumns">
+                <div class="descValuePair">
+                    <label for="denizenhealth">HP</label>
+                    <input type="number" id="denizenhealth" min="0" name="attr_health" value="0">
+                    <label> of <input type="number" min="0" name="attr_health_max" value="0"></label>
+                </div>
+                <div class="descValuePair">
+                    <label for="denizenstructure">SP</label>
+                    <input type="number" id="denizenstructure" min="0" name="attr_structure" value="0">
+                    <label> of <input type="number" min="0" name="attr_structure_max" value="0"></label>
+                </div>
+            </div>
+        </div>
+
+        <h3>Weapons</h3>
+        <div class="weapon">
+            <label>Name</label>
+            <label>Range</label>
+            <label>Damage</label>
+        </div>
+        <div>
+            <fieldset class="repeating_mechweapons">
+                <details>
+                    <summary>
+                        <input type="text" name="attr_name" title="Name of the Weapon">
+                        <input type="text" name="attr_range" title="Range">
+                        <input type="text" name="attr_damage" title="Damage">
+                        <button type="action" name="act_roll" class="rollButton" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{roll=[[1d20]]}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-name}}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-heat}]]}}{{traits=@{prefix-traits}}}">
+                        </button>
+                    </summary>
+                    <details>
+                        <summary>
+                            <h4>Settings</h4>
+                        </summary>
+                        <details>
+                            <summary><h4>Cost</h4></summary>
+                            <div class="descValuePair">
+                                <label>Cost</label>
+                                <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Slots</label>
+                                <input type="number" name="attr_slots" value="1">
+                            </div>
+                        </details>
+                        <details>
+                            <summary><h4>Heat</h4></summary>
+                            <div class="descValuePair">
+                                <label>Heat produced</label>
+                                <input type="number" name="attr_heat" value="0" min="0">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Heat Spike</label>
+                                <input type="checkbox" name="attr_heatspike">
+                            </div>
+                        </details>
+                    </details>
+                    <div>
+                        <div class="textarea-with-controls">
+                            <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                            <textarea name="attr_details"></textarea>
+                            <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
+                        </div>
+                    </div>
+                </details>
+            </fieldset>
+        </div>
+
+        <h3>Traits</h3>
+        <fieldset class="repeating_traits">
+            <details>
+                <summary>
+                    <input type="text" name="attr_name" class="fullsize" title="Name of the Trait">
+                </summary>
+                <div class="textarea-with-controls">
+                    <textarea name="attr_details"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
+                </div>
             </details>
         </fieldset>
     </div>
@@ -494,37 +733,102 @@
                 <summary>
                     <input type="text" name="attr_name" title="Name of the Note">
                 </summary>
-                <textarea name="attr_details" class="textarea"></textarea>
+                <div class="textarea-with-controls">
+                    <textarea name="attr_details"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
+                </div>
             </details>
         </fieldset>
     </div>
 
     <div class="settings">
-        <br>
-        <label for="isPilot" class="settings-checkbox">
-            <span>Is Pilot</span>
-            <input id="isPilot" name="attr_is-pilot" type="checkbox" checked/>
-        </label>
-        <br>
         <details>
             <summary>
+                <span>Pilot Settings</span>
+            </summary>
+            <div>
+                <label for="isPilot" class="settings-checkbox">
+                    <span>Is Pilot</span>
+                    <input id="isPilot" name="attr_is-pilot" type="checkbox"/>
+                </label>
+                <label for="NoJobTooBig" class="settings-checkbox">
+                    <span>No Job Too Big</span>
+                    <input id="NoJobTooBig" name="attr_nojobtobig" type="checkbox"/>
+                </label>
+                <label for="Beefcake" class="settings-checkbox">
+                    <span>Beefcake</span>
+                    <input id="Beefcake" name="attr_beefcake" type="checkbox"/>
+                </label>
+                <details>
+                    <summary>Importer</summary>
+                    <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. Names have to be on one line."></textarea>
+                    <button type="action" class="textbutton" name="act_import-equipment">Import Equipment</button>
+                    <button type="action" class="textbutton" name="act_import-weapon">Import Weapon</button>
+                </details>
+            </div>
+        </details>
+
+        <details>
+            <summary>
+                <span>Mech Settings</span>
+            </summary>
+            <div>
                 <label for="isMech" class="settings-checkbox">
                     <span>Is Mech</span>
                     <input id="isMech" name="attr_is-mech" type="checkbox"/>
                 </label>
-            </summary>
-            <label for="countWeapons" class="settings-checkbox">
-                <span>Count Weapons as Systems</span>
-                <input id="countWeapons" name="attr_count-weapons" type="checkbox"/>
-            </label>
+                <label for="countWeapons" class="settings-checkbox">
+                    <span>Count Weapons as Systems</span>
+                    <input id="countWeapons" name="attr_count-weapons" type="checkbox"/>
+                </label>
+                <label for="showShield" class="settings-checkbox">
+                    <span>Show Shield</span>
+                    <input id="showShield" name="attr_show-shield" type="checkbox"/>
+                </label>
+                <details>
+                    <summary>Importer</summary>
+                    <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. Names have to be on one line. Hot(x) has to be replaced with the number."></textarea>
+                    <button type="action" class="textbutton" name="act_import-mech-stats">Import Stats</button>
+                    <button type="action" class="textbutton" name="act_import-mech-weapon">Import Weapon</button>
+                    <button type="action" class="textbutton" name="act_import-mech-system">Import System</button>
+                    <button type="action" class="textbutton" name="act_import-mech-module">Import Module</button>
+                </details>
+            </div>
         </details>
 
-        <br>
-        <label for="isCrawler" class="settings-checkbox">
-            <span>Is Crawler</span>
-            <input id="isCrawler" name="attr_is-crawler" type="checkbox"/>
-        </label>
-        <br>
+        <details>
+            <summary>
+                <span>Crawler Settings</span>
+            </summary>
+            <div>
+                <label for="isCrawler" class="settings-checkbox">
+                    <span>Is Crawler</span>
+                    <input id="isCrawler" name="attr_is-crawler" type="checkbox"/>
+                </label>
+            </div>
+        </details>
+
+        <details>
+            <summary>
+                <span>Mediator Settings</span>
+            </summary>
+            <div>
+                <label for="isDenizen" class="settings-checkbox">
+                    <span>Is Denizen</span>
+                    <input id="isDenizen" name="attr_is-denizen" type="checkbox"/>
+                </label>
+                <details>
+                    <summary>Importer</summary>
+                    <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. For Bio-Titans copy everything without the orange boxes and import the orange boxes separately. Multiple orange boxes can be imported at once."></textarea>
+                    <button type="action" class="textbutton" name="act_import-biotitan">Import Biotitan</button>
+                    <button type="action" class="textbutton" name="act_import-biotitan-orangebox">Import Biotitan orange box</button>
+                    <button type="action" class="textbutton" name="act_import-vehicle">Import Vehicle</button>
+                    <button type="action" class="textbutton" name="act_import-creature">Import Creature</button>
+                    <button type="action" class="textbutton" name="act_import-peoplesquad">Import People/Squad</button>
+                </details>
+            </div>
+        </details>
+
         <label for="showNotesTab" class="settings-checkbox">
             <span>Show Notes Tab</span>
             <input id="showNotesTab" name="attr_show-notes-tab" type="checkbox"/>
@@ -541,7 +845,7 @@
 
 
 <script type="text/worker">
-const buttonlist = ["pilot","mech","crawler","notes","settings"];
+const buttonlist = ["pilot","mech","crawler", "denizen", "notes","settings"];
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
             setAttrs({
@@ -550,18 +854,36 @@ const buttonlist = ["pilot","mech","crawler","notes","settings"];
         });
     });
 
+on("sheet:opened", (eventInfo) => {
+	getAttrs(['character_name'], (v) => {
+		set_display_name(v.character_name);
+	});
+});
+
+on("change:character_name", (eventInfo) => {
+	set_display_name(eventInfo.newValue);
+});
+
+var set_display_name = (name) => {
+	character_name = name.replace(/\(/g, '\[').replace(/\)/g, '\]').replace(/\"/g, '\'');
+	setAttrs({
+		character_name: character_name
+	});
+};
+
+
 on('change:repeating_modules remove:repeating_modules sheet:opened', function() {
-    repeatingSum("modules_used", "slot", "repeating_modules");
+    repeatingSum("modules_used", "slots", "repeating_modules");
 });
 
 on('change:repeating_systems remove:repeating_systems change:repeating_mechweapons remove:repeating_mechweapons sheet:opened', async function() {
     let countWeapons = (await asw.getAttrs(["count-weapons"]))["count-weapons"];
 
     if(countWeapons == 'on') {
-        repeatingSum("systems_used", "slot", "repeating_systems", "repeating_mechweapons");
+        repeatingSum("systems_used", "slots", "repeating_systems", "repeating_mechweapons");
     }
     else {
-        repeatingSum("systems_used", "slot", "repeating_systems");
+        repeatingSum("systems_used", "slots", "repeating_systems");
     }
 
 });
@@ -570,24 +892,109 @@ on('change:repeating_systems remove:repeating_systems change:repeating_mechweapo
 //  ROLL AUTOMATION     ////
 ///////////////////////////
 
-on('clicked:repeating_mechweapons:roll',
+on('clicked:roll', async (event) => {
+
+    let rollPart = event.htmlAttributes.value;
+    let results = await startRoll(rollPart + '{{toMuchHeat=[[0]]}}');
+
+    finishRoll(
+		  	results.rollId,
+		  	{}
+	  	);
+});
+
+on('clicked:repeating_weapons:roll clicked:repeating_mechweapons:roll',
      async (event) => {
 	// prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
 	var prefix = event.sourceAttribute.split('_').slice(0,3).join('_') + '_'
 
 	let rollPart = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
-    let results = await startRoll(rollPart);
+	let results = await startRoll(rollPart + '{{toMuchHeat=[[0]]}}');
 
-    let attrs = await asw.getAttrs(['heat']);
-    let resultingHeat = parseInt(attrs.heat) + results.results.weaponheat.result;
+    finishRoll(
+		  	results.rollId,
+		  	{}
+	  	);
+});
+
+on('clicked:mechroll', async (event) => {
+
+	let overheat = await overheatCheck(0, 0);
+
+    let rollPart = event.htmlAttributes.value;
+	let mechPart = '{{mech=1}}{{pushable=[[0]]}}';
+    let results = await startRoll(rollPart + mechPart + overheat.queryMod);
+
+    finishRoll(
+		  	results.rollId,
+		  	{}
+	  	);
+});
+
+on('clicked:repeating_mechweapons:mechroll',
+     async (event) => {
+	// prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
+	var prefix = event.sourceAttribute.split('_').slice(0,3).join('_') + '_'
+
+	let attrs = await asw.getAttrs([prefix+'heat', prefix+'heatspike']);
+	let overheat = await overheatCheck( attrs[prefix+'heat'],  attrs[prefix+'heatspike']);
+
+	let rollPart = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
+	let mechPart = '{{mech=1}}{{pushable=[[0]]}}';
+    let results = await startRoll(rollPart + mechPart + overheat.queryMod);
+
     asw.setAttrs({
-		heat: resultingHeat
+		heat: overheat.resultingHeat
 	});
 
     finishRoll(
 		  	results.rollId,
 		  	{}
 	  	);
+});
+
+on('clicked:repeating_modules:use-module clicked:repeating_systems:use-system', async (event) => {
+
+    // prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
+	var trigger = event.triggerName.slice(8); // this always starts with 'clicked:'
+	var prefix = trigger.split('_').slice(0,3).join('_') + '_'
+
+	let attrs = await asw.getAttrs(['character_name', 'energy', 'heat', prefix+'name', prefix+'cost', prefix+'heat', prefix+'heatspike', prefix+'has-uses']);
+	let cost = parseInt(attrs[prefix+'cost']);
+	let heat = parseInt(attrs[prefix+'heat']);
+	let heatspike = attrs[prefix+'heatspike'];
+
+	let overheat = await overheatCheck(heat, heatspike);
+
+	if(overheat.queryMod.includes("{{toMuchHeat=[[1]]}}")) {
+	    let rollBase = `/w ${attrs.character_name} &{template:info}{{info= You have to much heat to use ${attrs[prefix+'name']} }}`;
+	    let roll = await startRoll(rollBase);
+        finishRoll(roll.rollId, {});
+        return;
+	}
+
+    let toSet = {}
+
+    let rollBase = `/w ${attrs.character_name} &{template:info}{{name=${attrs.character_name}}}{{info= You activated  ${attrs[prefix+'name']} for `;
+    if(heat !== 0) {
+        rollBase += `${heat} heat and `
+        toSet.heat = overheat.resultingHeat;
+    }
+    if(attrs[prefix+'has-uses'] !== 'on') {
+        toSet.energy = attrs['energy'] - cost;
+        rollBase += `${cost} EP. ${toSet.energy} Energy remaining}}`
+    }
+    else {
+        toSet[prefix+'cost'] = cost-1;
+        rollBase += `1 use. ${toSet[prefix+'cost']} Uses remaining}}`
+    }
+
+    toSet[prefix+'active'] = 'on';
+
+	asw.setAttrs(toSet);
+
+    let roll = await startRoll(rollBase + overheat.queryMod);
+    finishRoll(roll.rollId, {});
 });
 
 on('clicked:reactPush', async (ev) => {
@@ -600,20 +1007,52 @@ on('clicked:reactPushWeapon', async (ev) => {
 
 const push = async (ev, template) => {
 
-    let attrs = await asw.getAttrs(['character_name', 'heat']);
+    let attrs = await asw.getAttrs(['character_name']);
 
-    let resultingHeat = parseInt(attrs.heat) + 2;
+    let overheat = await overheatCheck(2);
 
-    let rollBase = `&{template:${template}}{{name=${attrs.character_name}}}{{roll=[[1d20]]}}{{mech=1}}{{heatroll=[[1d20]]}}{{heat=[[${resultingHeat}]]}}`;
+    let rollBase = `&{template:${template}}{{name=${attrs.character_name}}}{{roll=[[1d20]]}}{{mech=1}}` + overheat.queryMod ;
     let roll = await startRoll(rollBase);
 
-    asw.setAttrs({
-		heat: resultingHeat
+    await asw.setAttrs({
+		heat: overheat.resultingHeat
 	});
 
     finishRoll(roll.rollId, {
 
     });
+}
+
+const overheatCheck = async (heatchange, heatspike) => {
+
+    let attrs = await asw.getAttrs(['heat', 'heat_max']);
+    let resultingHeat = parseInt(attrs.heat) + parseInt(heatchange);
+
+    let queryMod = '';
+
+    if(heatspike === 'on') {
+        queryMod = `{{heat=[[${resultingHeat}[Heat]]]}}{{heatspike=[[1d20[Heat Check]]]}}`;
+    }
+
+    if(resultingHeat > parseInt(attrs.heat_max)) {
+        return {
+            resultingHeat: parseInt(attrs.heat),
+            queryMod: queryMod + '{{toMuchHeat=[[1]]}}'
+        }
+    }
+
+    if(resultingHeat === parseInt(attrs.heat_max)) {
+        return {
+            resultingHeat: resultingHeat,
+            queryMod: queryMod + `{{heat=[[${resultingHeat}[Heat]]]}}{{heatroll=[[1d20[Heat Check]]]}}{{toMuchHeat=[[0]]}}`,
+
+        }
+    }
+
+    return {
+            resultingHeat: resultingHeat,
+            queryMod: queryMod +'{{toMuchHeat=[[0]]}}',
+        }
 }
 
 on('clicked:reactOverload', async (ev) => {
@@ -622,9 +1061,9 @@ on('clicked:reactOverload', async (ev) => {
 
 const reactOverload = async (ev) => {
 
-    let attrs = await asw.getAttrs(['character_name', 'heat', 'heat_max']);
+    let attrs = await asw.getAttrs(['character_name']);
 
-    let rollBase = `&{template:overload}{{name=${attrs.character_name}}}{{roll=[[1d20]]}}{{heat=${attrs.heat}}}{{maxheat=${attrs.heat_max}}}`;
+    let rollBase = `&{template:overload}{{name=${attrs.character_name}}}{{roll=[[1d20]]}}`;
     let roll = await startRoll(rollBase);
 
     finishRoll(roll.rollId, {});
@@ -642,35 +1081,626 @@ on('clicked:downtime', async (ev) => {
 	});
 });
 
-on('clicked:repeating_modules:use-module clicked:repeating_systems:use-system', async (event) => {
+///////////////////////
+//  PILOT IMPORTER  ///
+///////////////////////
 
-    // prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
-	var trigger = event.triggerName.slice(8); // this always starts with 'clicked:'
-	var prefix = trigger.split('_').slice(0,3).join('_') + '_'
+on('clicked:import-weapon', async (ev) => {
 
-	let attrs = await asw.getAttrs(['character_name', 'energy', prefix+'name', prefix+'cost', prefix+'has-uses']);
-	let cost = parseInt(attrs[prefix+'cost']);
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
 
-    let toSet = {}
+    let weapon = {};
+    var row = "repeating_weapons_" + generateRowID() + "_";
+    await importWeapon(toImport, weapon, row);
+    weapon.importerText = 'Values imported';
 
-    let rollBase = `/w ${attrs.character_name} &{template:info}{{info= You activated  ${attrs[prefix+'name']} for `;
-    if(attrs[prefix+'has-uses'] ==! 'on') {
-        toSet.energy = attrs['energy'] - cost;
-        rollBase += `${cost} EP. ${toSet.energy} Energy remaining}}`
-    }
-    else {
-        toSet[prefix+'cost'] = cost-1;
-        rollBase += `1 use. ${toSet[prefix+'cost']} Uses remaining}}`
-    }
-    toSet[prefix+'active'] = 'on';
-
-	asw.setAttrs(toSet);
-
-    let roll = await startRoll(rollBase);
-    finishRoll(roll.rollId, {});
+    asw.setAttrs(weapon);
 });
 
+on('clicked:import-equipment', async (ev) => {
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+    importEquipment(toImport);
+});
 
+const importEquipment = async (toImport) => {
+    let row = "repeating_equipment_" + generateRowID() + "_";
+    let object = {};
+
+    if(checkForMultipleAP(toImport)) {
+        importMultipleAp(toImport);
+        return;
+    }
+
+    toImport = importName(toImport, object, row);
+
+    let rules = toImport.split(/\r?\n/)[0].trim();
+    rules = importAp(rules, object, row);
+
+    rules = importAction(rules, object, row);
+    rules = importRange(rules, object, row);
+
+    if(rules.includes("Passive")) {
+        object[row + "is-passive"] = "on";
+        rules = rules.split('//').slice(1).join('//').trim()
+    }
+
+    importEquipmentTraits(rules, object, row);
+    importDetails(toImport, object, row);
+
+    object.importerText = "Values imported";
+
+    asw.setAttrs(object);
+}
+
+///////////////////////
+//  MECH IMPORTER  ////
+///////////////////////
+
+on('clicked:import-mech-stats', async (ev) => {
+
+    let mech = {};
+
+    let toImport = (await asw.getAttrs(['importerText'])).importerText;
+    let stats = toImport.replaceAll(/[a-zA-Z]/g, '').replaceAll(/\./g, '').replaceAll(/^\s*[\r\n]/gm, '').trim().split(/\r?\n|\s+/);
+
+    if(stats.length < 6) {
+        asw.setAttrs({
+            importerText: 'Could not parse input: Not enough values'
+        });
+        return;
+    }
+
+    if(!toImport.startsWith(' ') && !/^\d+/g.test(toImport)) {
+        let name = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+        mech.character_name = name;
+        mech.chassis = name;
+    }
+
+    if(/CHASSIS\s*ABILITY/.test(toImport)) {
+       mech.chassisDetails = toImport.split(/CHASSIS\s*ABILITY/)[1].replaceAll(/[\r\n]/gm, '').trim();
+    }
+
+    mech.structure = stats[0];
+    mech.structure_max = stats[0];
+    mech.energy = stats[1];
+    mech.energy_max = stats[1];
+    mech.heat_max = stats[2];
+    mech.systems_max = stats[3];
+    mech.modules_max = stats[4];
+    mech.maxcargo = stats[5];
+    mech.chassis_cost = stats[7] + " Tech " + stats[6];
+    mech.importerText = "Values imported";
+
+    await asw.setAttrs(mech);
+});
+
+on('clicked:import-mech-weapon', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    let weapon = {};
+
+    await importMechWeapon(toImport, weapon);
+    weapon.importerText = 'Values imported';
+
+    asw.setAttrs(weapon);
+});
+
+const importMechWeapon = async (toImport, object) => {
+    var row = "repeating_mechweapons_" + generateRowID() + "_";
+    importWeapon(toImport, object, row);
+}
+
+on('clicked:import-mech-system', async (ev) => {
+    importFromImporter("systems");
+});
+
+on('clicked:import-mech-module', async (ev) => {
+    importFromImporter("modules");
+});
+
+const importFromImporter = async(type) => {
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+    await importModuleSystem(type, toImport);
+    asw.setAttrs({
+		    importerText: 'Values imported'
+	    });
+}
+
+const importModuleSystem = async (type, toImport) => {
+
+    let row = "repeating_" + type + "_" + generateRowID() + "_";
+    let object = {};
+
+    if(checkForMultipleEP(toImport)) {
+        importMultipleEp(type, toImport);
+        return;
+    }
+
+    toImport = importName(toImport, object, row);
+    toImport = importCost(toImport, object, row);
+
+    toImport = importEp(toImport, object, row);
+    let rules = toImport.split(/\r?\n/)[0].trim();
+
+    rules = importAction(rules, object, row);
+    rules = importRange(rules, object, row);
+
+    if(rules.includes("Passive")) {
+        object[row + "is-passive"] = "on";
+        rules = rules.split('//').slice(1).map(s => s.trim()).join(' // ').trim()
+    }
+
+    rules = importHeat(rules, object, row);
+    importMechWeaponTraits(rules, object, row);
+    importDetails(toImport, object, row);
+
+    asw.setAttrs(object);
+};
+
+const importMultipleEp = async (type, toImport) => {
+    let template = {};
+    let name = importName(toImport, template, '');
+    //remove cost
+    toImport = importCost(toImport, template, '');
+
+    let splitByEp = toImport.split(/(?=^\dEP|XEP)/gm).slice(1);
+
+    for (const ability of splitByEp) {
+       let perLine = ability.split(/\r?\n/g);
+        let firstLine = perLine[0].split(/\s+/g);
+        let importerText = template.name + " "+ firstLine[1] + "\n" + firstLine[0] + "\n" + perLine.slice(1).join("\n");
+        await importModuleSystem(type, importerText);
+    }
+}
+
+const importMultipleAp = async (toImport) => {
+    let template = {};
+    let name = importName(toImport, template, '');
+
+    let searchBlocks = toImport.split(/\r?\n/g).slice(1);
+    let splitByAp = [];
+
+    while(searchBlocks.length !== 0) {
+        if(searchBlocks[1].includes("AP")) {
+            let blockName = template.name + " " + searchBlocks.shift();
+            let blockRules = searchBlocks.shift();
+            let blockDescription = "";
+
+            //gather description
+            while(searchBlocks.length > 2 && !searchBlocks[1].includes("AP")) {
+                blockDescription = blockDescription + searchBlocks.shift();
+            }
+
+            if(searchBlocks.length <= 2) {
+               blockDescription = blockDescription + searchBlocks.join('');
+               searchBlocks = [];
+            }
+
+            //no separate title for next block
+            else if(searchBlocks[0].includes(".")) {
+                blockDescription = blockDescription + searchBlocks[0];
+                searchBlocks[0] = blockName.split(" ").pop();
+            }
+
+            splitByAp.push(blockName + "\n" + blockRules + "\n" + blockDescription);
+        }
+        else {
+            searchBlocks.shift();
+        }
+    }
+
+    for (const ability of splitByAp) {
+        await importEquipment(ability);
+    }
+}
+
+const checkForMultipleEP = (toImport) => {
+   return (toImport.match(/^\dEP|XEP/gm) || []).length > 1;
+}
+
+const checkForMultipleAP = (toImport) => {
+   return (toImport.match(/.*\d\s(AP|XAP).*/gm) || []).length > 1;
+}
+
+/////////////////////////
+//  DENIZEN IMPORTER  ///
+/////////////////////////
+
+on('clicked:import-biotitan', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let biotitan = {};
+    biotitan.techlevel = "Tech 1 / Bio-Salvage";
+
+    toImport = toImport.split('\n');
+
+    biotitan.structure = toImport.pop().replaceAll(/[a-zA-Z.]/g, '').trim();
+    biotitan.structure_max = biotitan.structure;
+    biotitan.scrapvalue = biotitan.structure;
+
+    //look for name (all caps)
+    let typeDetails = "";
+    while(toImport[toImport.length-1] !== toImport[toImport.length-1].toUpperCase()) {
+        typeDetails = toImport.pop().trim() + " " + typeDetails;
+    }
+    typeDetails = typeDetails.replaceAll(/(?=•)/g, '\n');
+    biotitan.typeDetails =typeDetails;
+
+    biotitan.character_name = toImport.pop().trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+
+    biotitan["importerText"] = 'Values imported';
+    asw.setAttrs(biotitan);
+});
+
+on('clicked:import-biotitan-orangebox', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let biotitan = {};
+    biotitan.techlevel = "Tech 1 / Bio-Salvage";
+
+    toImport = toImport.split('\n');
+
+     while(toImport.length !== 0) {
+        let name = toImport.shift().trim();
+        let rules = toImport.shift().trim();
+        let details = "";
+
+        while(toImport.length > 3 && !toImport[2].includes("//") && !toImport[2].includes("Passive")) {
+            details = details + toImport.shift();
+        }
+        details = details + toImport.shift();
+        if(toImport.length < 3) {
+            details = details + toImport.map(s => s.trim()).join(' ');
+            //exit loop
+            toImport = [];
+        }
+        details = details.replaceAll("  ", " ");
+
+        if(rules.includes("//")) {
+            await importMechWeapon(name + "\n" + rules + "\n" + details, biotitan);
+        }
+
+        if(rules.includes("Passive")) {
+            let row = "repeating_traits_" + generateRowID();
+            biotitan[row + "_name"] = name;
+            biotitan[row + "_details"] = rules + "\n" + details;
+        }
+     }
+
+    biotitan["importerText"] = 'Values imported';
+    asw.setAttrs(biotitan);
+});
+
+on('clicked:import-vehicle', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let vehicle = {};
+
+    toImport = toImport.split('\n');
+
+    vehicle.scrapvalue = toImport.pop();
+    vehicle.techlevel = toImport.pop();
+
+    let traits = "";
+    while(!toImport[toImport.length-1].includes("SP")) {
+        traits = toImport.pop().trim() + " " + traits;
+    }
+    traits = traits.replaceAll("  ", " ").split("//");;
+    importTraits(traits, vehicle);
+
+    if(toImport[toImport.length-1].includes("SP")) {
+        vehicle.structure = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
+        vehicle.structure_max = vehicle.structure;
+    }
+
+    vehicle.character_name = toImport.pop().trim();
+
+    if(toImport[toImport.length-1].includes("//")) {
+        let rules = toImport.pop();
+        let weaponName = toImport.pop();
+
+        importMechWeapon(weaponName +"\n" + rules, vehicle);
+    }
+
+    while(!toImport[toImport.length-1].includes(".")) {
+        await importModuleSystem('traits', toImport.pop());
+    }
+
+    vehicle.typeDetails = toImport.map(s => s.trim()).join(' ');
+
+    vehicle["importerText"] ='Values imported'
+
+    asw.setAttrs(vehicle);
+});
+
+on('clicked:import-creature', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let creature = {};
+    creature.scrapvalue = 0;
+    creature.techlevel = 0;
+
+    toImport = toImport.split('\n');
+
+    let traits = "";
+    while(!toImport[toImport.length-1].includes("HP")) {
+        traits = toImport.pop().trim() + " " + traits;
+    }
+    traits = traits.replaceAll("  ", " ");
+    importTraits(traits, creature);
+
+    creature.health = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
+    creature.health_max = creature.health;
+
+    if(toImport[0].includes("Scorpion")) {
+        creature.character_name = toImport[0];
+        toImport = toImport.shift();
+    }
+    else {
+        creature.character_name = toImport.pop().trim();
+    }
+
+    if(toImport[toImport.length-1].includes("//")) {
+        let rules = toImport.pop();
+        let weaponName = toImport.pop();
+
+        importMechWeapon(weaponName +"\n" + rules, creature);
+    }
+
+    creature.typeDetails = toImport.map(s => s.trim()).join(' ');
+
+    creature["importerText"] = 'Values imported';
+
+    asw.setAttrs(creature);
+});
+
+on('clicked:import-peoplesquad', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let people = {};
+    people.scrapvalue = 0;
+    people.techlevel = 0;
+
+    toImport = toImport.split('\n');
+
+    people.character_name = toImport.shift();
+
+    people.health = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
+    people.health_max = people.health;
+
+    let traits = "";
+    while(!toImport[toImport.length-1].includes("//")) {
+        traits = toImport.pop().trim() + "\n" + traits;
+    }
+    traits = traits.replaceAll("  ", " ").split("\n");;
+    importTraits(traits, people);
+
+    if(toImport[toImport.length-1].includes("//")) {
+        let rules = toImport.pop();
+        let weaponName = toImport.pop();
+
+        importMechWeapon(weaponName +"\n" + rules, people);
+    }
+
+    people.typeDetails = toImport.map(s => s.trim()).join(' ');
+
+    people["importerText"] = 'Values imported';
+
+    asw.setAttrs(people);
+});
+
+///////////////////////
+//  IMPORT HELPER  ////
+///////////////////////
+
+const formatImporterText = (toImport) => {
+    let formatted = toImport.replaceAll(/\/\/\s*[\r\n]/gm, '// ').replaceAll(/[\r\n]/gm, '#').replaceAll(/#\/\//g, '//').replaceAll(/#/g, '\n').replaceAll(/^\s*\n/gm,'').replaceAll(/\n(\(\d\))/gm, "$1").trim();
+
+    let multilineName = formatted.split(/\r?\n/);
+    if(multilineName[2].includes("Range") || multilineName[2].includes("Passive") || multilineName[2].includes("EP") || multilineName[2].includes("AP")) {
+        formatted = multilineName.slice(0,2).join('') + "\n" + multilineName.slice(2).join("\n");
+    }
+
+    let multilineRules = formatted.split(/\r?\n/);
+    if(multilineRules[2].includes("//") && !multilineRules[1].includes("EP")) {
+        formatted = multilineRules[0] + "\n" + multilineRules.slice(1,3).join('') + "\n" + multilineRules.slice(3).join("\n");
+    }
+
+    return formatted;
+};
+
+const importWeapon = async (toImport, object, row) => {
+    toImport = importName(toImport, object, row);
+    toImport = importCost(toImport, object, row);
+
+    let rules = toImport.split(/\r?\n/)[0].trim();
+    rules = importRange(rules, object, row);
+    rules = importDamage(rules, object, row);
+
+    rules = importHeat(rules, object, row);
+    importMechWeaponTraits(rules, object, row);
+    importDetails(toImport, object, row);
+}
+
+const importName = (toImport, object, row) => {
+   let textSplits = toImport.split(/\r?\n/);
+   object[row + "name"] = textSplits[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+
+   return textSplits.slice(1).join('\n');
+};
+
+const importCost = (toImport, object, row) => {
+    if(/T\d/.test(toImport)) {
+       let tier = toImport.match(/T\d/).pop();
+
+       let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
+       object[row + "scrap"] = associatedCost[1] + " " + tier;
+       object[row + "slots"] = parseInt(associatedCost[0]);
+
+       return toImport.split(/T\d/)[0].trim()
+    }
+
+    return toImport;
+}
+
+const importEp = (toImport, object, row) => {
+
+    if(toImport.split(/\r?\n/)[0].includes("EP")) {
+        object[row + "cost"] = toImport.split(/\r?\n/)[0].trim();
+        return toImport.split(/\r?\n/).slice(1).join("\n");
+    }
+    return toImport;
+}
+
+const importAp = (rules, object, row) => {
+
+    if(rules.includes("AP")) {
+        object[row + "cost"] =  rules.match(/\d+\s*AP/g).pop();
+        let index = rules.split(' // ').indexOf(object[row + "cost"]);
+        rules = rules.split(' // ');
+        rules.splice(index, 1);
+
+        return rules.join(' // ').trim()
+    }
+    return rules;
+}
+
+const importRange = (rules, object, row) => {
+    if(rules.includes("Range:")) {
+        object[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
+        let index = rules.split(' // ').indexOf('Range: '+ object[row + "range"]);
+        rules = rules.split(' // ');
+        rules.splice(index, 1);
+        return rules.map(s => s.trim()).join(' // ').trim()
+    }
+
+    return rules;
+}
+
+const importDamage = (rules, object, row) => {
+    if(rules.includes("Damage:")) {
+        let damage = rules.split('Damage:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim();
+        if(damage.match(/\d+[d]\d+/g)) {
+           damage = "[[" + damage + "]]";
+        }
+        object[row + "damage"] = damage;
+        return rules.split('//').slice(1).map(s => s.trim()).join(' // ').trim()
+    }
+
+    return rules;
+}
+
+const importAction = (rules, object, row) => {
+
+    if(rules.includes("Reaction")) {
+        object[row + "action"] = "Reaction";
+        return rules.replaceAll("Reaction //", '').replaceAll("Reaction", '').trim();
+   }
+
+       if(rules.includes("Free Action")) {
+        object[row + "action"] = "Free Action";
+        return rules.replaceAll("Free Action //", '').replaceAll("Free Action", '').trim();
+   }
+
+   if(rules.includes("Turn Action")) {
+        object[row + "action"] = "Turn Action";
+        return rules.replaceAll("Turn Action //", '').replaceAll("Turn Action", '').trim();
+   }
+
+  if(rules.includes("Short Action")) {
+        object[row + "action"] = "Short Action";
+        return rules.replaceAll("Short Action //", '').replaceAll("Short Action", '').trim();
+   }
+
+  if(rules.includes("Long Action")) {
+        object[row + "action"] = "Long Action";
+        return rules.replaceAll("Long Action //", '').replaceAll("Long Action", '').trim();
+   }
+
+   return rules;
+}
+
+const importHeat = (rules, object, row) => {
+
+     if(rules.includes("Hot (")) {
+        object[row + "heat"] = rules.match(/Hot \(\d\)/g).pop().match(/\d+/).pop();
+        let index = rules.split(' // ').indexOf('Hot ('+ object[row + "heat"]+')');
+        rules = rules.split(' // ');
+        rules.splice(index, 1);
+        rules = rules.map(s => s.trim()).join(' // ').trim()
+    }
+    else {
+        object[row + "heat"] = 0;
+    }
+
+    if(rules.includes("Heat Spike")) {
+        object[row + "heatspike"] = "on";
+        let index = rules.split(' // ').indexOf('Heat Spike');
+        rules = rules.split(' // ');
+        rules.splice(index, 1);
+        rules = rules.map(s => s.trim()).join(' // ').trim()
+    }
+
+    return rules;
+}
+
+const importMechWeaponTraits = (rules, object, row) => {
+    object[row + "traits"] = rules.trim();
+}
+
+const importEquipmentTraits = (rules, object, row) => {
+    object[row + "traits"] = rules.trim();
+}
+
+const importDetails = (toImport, object, row) => {
+    object[row + "details"] = toImport.split('\n').slice(1).map(s => s.trim()).join(' ').trim();
+}
+
+const importTraits = (traits, object) => {
+
+    traits.forEach(trait => {
+        if(trait.trim() !== "") {
+            let row = "repeating_traits_" + generateRowID() + "_name";
+            object[row] = trait.trim();
+        }
+    })
+}
 
 ///////////////////
 //  HELPER     ////
@@ -741,62 +1771,94 @@ const asw = (() => {
                 {{name}} rolls
             </th>
         </tr>
+
+        {{#rollTotal() toMuchHeat 1}}
         <tr>
             <td>
-                <div class="sheet-rolltemplate-spacer"></div>
+                You cannot make this roll due to heat.
             </td>
         </tr>
-        <tr>
-            <td>
-                {{#rollBetween() roll 20 20}}
-                <strong>Nailed it</strong> ({{roll}}) <br>
-                You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
-                {{/rollBetween() roll 20 20}}
+        {{/rollTotal() toMuchHeat 1}}
 
-                {{#rollBetween() roll 11 19}}
-                Success ({{roll}}) - You’ve achieved your goal without any compromises.
-                {{/rollBetween() roll 11 19}}
+        {{#rollTotal() toMuchHeat 0}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{#rollWasCrit() roll}}
+                    <strong>Nailed it</strong> ({{roll}}) <br>
+                    You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
+                    {{/rollWasCrit() roll}}
 
-                {{#rollBetween() roll 6 10}}
-                Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence.
-                {{/rollBetween() roll 6 10}}
+                    {{#^rollWasCrit() roll}}
+                        {{#rollBetween() roll 11 19}}
+                        Success ({{roll}}) - You’ve achieved your goal without any compromises.
+                        {{/rollBetween() roll 11 19}}
 
-                {{#rollBetween() roll 2 5}}
-                Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice.
-                {{/rollBetween() roll 2 5}}
+                        {{#rollBetween() roll 6 10}}
+                        Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence.
+                        {{/rollBetween() roll 6 10}}
 
-                {{#rollBetween() roll 1 1}}
-                Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice.
-                {{/rollBetween() roll 1 1}}
-            </td>
-        </tr>
-        {{#heat}}
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Heat Check: {{heat}} vs {{heatroll}}
-            </td>
-        </tr>
-        {{/heat}}
+                        {{#rollBetween() roll 2 5}}
+                        Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice.
+                        {{/rollBetween() roll 2 5}}
+
+                        {{#rollBetween() roll 1 1}}
+                        Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice.
+                        {{/rollBetween() roll 1 1}}
+                    {{/^rollWasCrit() roll}}
+                </td>
+            </tr>
+            {{#heatroll}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Heat Check: {{heat}} vs {{heatroll}}
+                </td>
+            </tr>
+            {{/heatroll}}
+            {{#heatspike}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Heat Spike: {{heat}} vs {{heatspike}}
+                </td>
+            </tr>
+            {{/heatspike}}
+        {{/rollTotal() toMuchHeat 0}}
     </table>
     {{#mech}}
     <div class="sheet-rolltemplate-button-row">
+        {{#rollTotal() toMuchHeat 0}}
+            {{#pushable}}
+            <div class="sheet-rolltemplate-button">
+                [Push](~{{name}}|reactPushWeapon)
+            </div>
+            {{/pushable}}
 
-        {{#rollTotal() heatroll 0}}
-        <div class="sheet-rolltemplate-button">
-            [Push](~{{name}}|reactPush)
-        </div>
-        {{/rollTotal() heatroll 0}}
+            {{#^rollGreater() heatspike heat}}
+            <div class="sheet-rolltemplate-button">
+                [Reactor Overload](~{{name}}|reactOverload)
+            </div>
+            {{/^rollGreater() heatspike heat}}
 
-        {{#^rollGreater() heatroll heat}}
-        <div class="sheet-rolltemplate-button">
-            [Reactor Overload](~{{name}}|reactOverload)
-        </div>
-        {{/^rollGreater() heatroll heat}}
+            {{#^rollGreater() heatspike heat}}
+            <div class="sheet-rolltemplate-button">
+                [Heat Spike](~{{name}}|reactOverload)
+            </div>
+            {{/^rollGreater() heatspike heat}}
+        {{/rollTotal() toMuchHeat 0}}
     </div>
     {{/mech}}
 </rolltemplate>
@@ -805,7 +1867,7 @@ const asw = (() => {
     <table>
         <tr>
             <th>
-                {{callsign}} rolls an attack on range {{range}} with {{weapon_name}}
+                {{name}} rolls an attack on range {{range}} with {{weapon_name}}
             </th>
         </tr>
         <tr>
@@ -813,76 +1875,119 @@ const asw = (() => {
                 <div class="sheet-rolltemplate-spacer"></div>
             </td>
         </tr>
+        {{#rollTotal() toMuchHeat 1}}
         <tr>
             <td>
-                {{#rollBetween() roll 20 20}}
-                <strong>Nailed it</strong> ({{roll}}) <br>
-                You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action e.g. double the damage.
-                {{/rollBetween() roll 20 20}}
+                You cannot make this roll due to heat.
+            </td>
+        </tr>
+        {{/rollTotal() toMuchHeat 1}}
+        {{#rollTotal() toMuchHeat 0}}
+            <tr>
+                <td>
+                    {{#rollWasCrit() roll}}
+                    <strong>Nailed it</strong> ({{roll}}) <br>
+                    You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action e.g. double the damage.
+                    {{/rollWasCrit() roll}}
 
-                {{#rollBetween() roll 11 19}}
-                Success ({{roll}}) - You hit the target and deal standard damage
-                {{/rollBetween() roll 11 19}}
+                    {{#^rollWasCrit() roll}}
+                        {{#rollBetween() roll 11 19}}
+                        Success ({{roll}}) - You hit the target and deal standard damage
+                        {{/rollBetween() roll 11 19}}
 
-                {{#rollBetween() roll 6 10}}
-                Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence. You hit but something has
-                gone wrong.
-                {{/rollBetween() roll 6 10}}
+                        {{#rollBetween() roll 6 10}}
+                        Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence. You hit but something has
+                        gone wrong.
+                        {{/rollBetween() roll 6 10}}
 
-                {{#rollBetween() roll 2 5}}
-                Failure ({{roll}}) - You miss the target.
-                {{/rollBetween() roll 2 5}}
+                        {{#rollBetween() roll 2 5}}
+                        Failure ({{roll}}) - You miss the target.
+                        {{/rollBetween() roll 2 5}}
 
-                {{#rollBetween() roll 1 1}}
-                Cascade Failure ({{roll}}) - You miss the target and something has gone wrong.
-                {{/rollBetween() roll 1 1}}
-            </td>
-        </tr>
-        {{#damage}}
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Weapondamage: {{damage}}
-            </td>
-        </tr>
-        {{/damage}}
-        {{#^rollTotal() weaponheat 0}}
-        <tr>
-            <td>
-                Weaponheat: {{weaponheat}}
-            </td>
-        </tr>
-        {{/^rollTotal() weaponheat 0}}
-        {{#heat}}
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Heat Check: {{heat}} vs {{heatroll}}
-            </td>
-        </tr>
-        {{/heat}}
+                        {{#rollBetween() roll 1 1}}
+                        Cascade Failure ({{roll}}) - You miss the target and something has gone wrong.
+                        {{/rollBetween() roll 1 1}}
+                    {{/^rollWasCrit() roll}}
+                </td>
+            </tr>
+            {{#damage}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Weapondamage: {{damage}}
+                </td>
+            </tr>
+            {{/damage}}
+            {{#^rollTotal() weaponheat 0}}
+            <tr>
+                <td>
+                    Weaponheat: {{weaponheat}}
+                </td>
+            </tr>
+            {{/^rollTotal() weaponheat 0}}
+            {{#heatroll}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Heat Check: {{heat}} vs {{heatroll}}
+                </td>
+            </tr>
+            {{/heatroll}}
+            {{#heatspike}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Heat Spike: {{heat}} vs {{heatspike}}
+                </td>
+            </tr>
+            {{/heatspike}}
+            {{#traits}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Traits: {{traits}}
+                </td>
+            </tr>
+            {{/traits}}
+        {{/rollTotal() toMuchHeat 0}}
     </table>
     {{#mech}}
     <div class="sheet-rolltemplate-button-row">
-        {{#rollTotal() heatroll 0}}
-        <div class="sheet-rolltemplate-button">
-            [Push](~{{callsign}}|reactPushWeapon)
-        </div>
-        {{/rollTotal() heatroll 0}}
+        {{#rollTotal() toMuchHeat 0}}
+            {{#pushable}}
+            <div class="sheet-rolltemplate-button">
+                [Push](~{{name}}|reactPush)
+            </div>
+            {{/pushable}}
 
-        {{#^rollGreater() heatroll heat}}
-        <div class="sheet-rolltemplate-button">
-            [Reactor Overload](~{{callsign}}|reactOverload)
-        </div>
-        {{/^rollGreater() heatroll heat}}
+            {{#^rollGreater() heatroll heat}}
+            <div class="sheet-rolltemplate-button">
+                [Reactor Overload](~{{name}}|reactOverload)
+            </div>
+            {{/^rollGreater() heatroll heat}}
+
+            {{#^rollGreater() heatspike heat}}
+            <div class="sheet-rolltemplate-button">
+                [Heat Spike](~{{name}}|reactOverload)
+            </div>
+            {{/^rollGreater() heatspike heat}}
+        {{/rollTotal() toMuchHeat 0}}
     </div>
     {{/mech}}
 </rolltemplate>
@@ -1007,5 +2112,30 @@ const asw = (() => {
 <rolltemplate class="sheet-rolltemplate-info">
     <div>
         {{info}}
+        {{#heatroll}}
+        <br>
+        <br>
+                Heat Check: {{heat}} vs {{heatroll}}
+        {{/heatroll}}
+        {{#heatspike}}
+        <br>
+                Heat Spike: {{heat}} vs {{heatspike}}
+        {{/heatspike}}
+        <br><br>
+        <div class="sheet-rolltemplate-button-row">
+            {{#rollTotal() toMuchHeat 0}}
+                {{#^rollGreater() heatroll heat}}
+                <div class="sheet-rolltemplate-button">
+                    [Reactor Overload](~{{name}}|reactOverload)
+                </div>
+                {{/^rollGreater() heatroll heat}}
+
+                {{#^rollGreater() heatspike heat}}
+                <div class="sheet-rolltemplate-button">
+                    [Heat Spike](~{{name}}|reactOverload)
+                </div>
+                {{/^rollGreater() heatspike heat}}
+            {{/rollTotal() toMuchHeat 0}}
+        </div>
     </div>
 </rolltemplate>

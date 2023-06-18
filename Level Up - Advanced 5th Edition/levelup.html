@@ -4072,7 +4072,7 @@ on('clicked:strength-button', async (info) => {
 
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Strength Roll}}{{save=[["+diceroll+"+"+bonus+"]]}}");
+	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Strength Roll}}{{roll=[["+diceroll+"+"+bonus+"]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:strengthsave-button', async (info) => {
@@ -4108,7 +4108,7 @@ on('clicked:dexterity-button', async (info) => {
 
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" dexterity Roll}}{{save=[["+diceroll+"+"+bonus+"]]}}");
+	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Dexterity Roll}}{{roll=[["+diceroll+"+"+bonus+"]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:dexteritysave-button', async (info) => {
@@ -4144,7 +4144,7 @@ on('clicked:constitution-button', async (info) => {
 
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Constitution Roll}}{{save=[["+diceroll+"+"+bonus+"]]}}");
+	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Constitution Roll}}{{roll=[["+diceroll+"+"+bonus+"]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:constitutionsave-button', async (info) => {
@@ -4180,7 +4180,7 @@ on('clicked:intelligence-button', async (info) => {
 
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Intelligence Roll}}{{save=[["+diceroll+"+"+bonus+"]]}}");
+	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Intelligence Roll}}{{roll=[["+diceroll+"+"+bonus+"]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:intelligencesave-button', async (info) => {
@@ -4216,7 +4216,7 @@ on('clicked:wisdom-button', async (info) => {
 
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Wisdom Roll}}{{save=[["+diceroll+"+"+bonus+"]]}}");
+	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Wisdom Roll}}{{roll=[["+diceroll+"+"+bonus+"]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:wisdomsave-button', async (info) => {
@@ -4252,7 +4252,7 @@ on('clicked:charisma-button', async (info) => {
 
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Charisma Roll}}{{save=[["+diceroll+"+"+bonus+"]]}}");
+	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Charisma Roll}}{{roll=[["+diceroll+"+"+bonus+"]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:charismasave-button', async (info) => {
@@ -4275,6 +4275,7 @@ on('clicked:charismasave-button', async (info) => {
 	const results = await startRoll( gmroll+"&{template:default} {{name="+charname+" Charisma Save}}{{save=[["+diceroll+"+"+bonus+"]]}}");
 	finishRoll(results.rollId);
 });
+
 
 	
 on('clicked:acrobatics-button', async (info) => {
@@ -4316,12 +4317,17 @@ on('clicked:acrobatics-button', async (info) => {
 	var diceroll = "1d20";
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
+	
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
 
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=Acrobatics ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Acrobatics "+specialtyText+" Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
-});
+});  
 on('clicked:animalhandling-button', async (info) => {
 	const values = await getAttrsAsync(['character_name','animalhandling_exdice','animalhandling_specialty','animalhandling_check','animalhandling_check_bonus','passive_animalhandling_bonus','globalskillbonus','globalabilitycheckbonus','rolladvdis','rollgmnormal','PB','strength_mod','intelligence_mod','wisdom_mod','dexterity_mod','constitution_mod','charisma_mod','jackofalltrades_check']);
 	const prof = parseInt(values.animalhandling_check)||0;
@@ -4362,9 +4368,14 @@ on('clicked:animalhandling-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat||Wisdom, "+wis+"Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=animalhandling ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Wisdom, "+wis+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Animal Handling "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:arcana-button', async (info) => {
@@ -4407,9 +4418,14 @@ on('clicked:arcana-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=arcana ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Arcana "+specialtyText+" Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:athletics-button', async (info) => {
@@ -4452,9 +4468,14 @@ on('clicked:athletics-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=athletics ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Strength, "+str+"|Dexterity, "+dex+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Athletics "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:culture-button', async (info) => {
@@ -4497,9 +4518,14 @@ on('clicked:culture-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=culture ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Culture "+specialtyText+" Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:deception-button', async (info) => {
@@ -4542,9 +4568,14 @@ on('clicked:deception-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Charisma, "+cha+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=deception ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Charisma, "+cha+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Deception "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:engineering-button', async (info) => {
@@ -4587,9 +4618,14 @@ on('clicked:engineering-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=engineering ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Engineering "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:history-button', async (info) => {
@@ -4632,9 +4668,14 @@ on('clicked:history-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=history ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" History "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:insight-button', async (info) => {
@@ -4676,9 +4717,14 @@ on('clicked:insight-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Wisdom, "+wis+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=insight ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Wisdom, "+wis+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Insight "+specialtyText+" Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:intimidation-button', async (info) => {
@@ -4721,9 +4767,14 @@ on('clicked:intimidation-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Charisma, "+cha+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=intimidation ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Charisma, "+cha+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Intimidation "+specialtyText+" Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:investigation-button', async (info) => {
@@ -4766,9 +4817,14 @@ on('clicked:investigation-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=investigation ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Investigation "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:medicine-button', async (info) => {
@@ -4811,9 +4867,14 @@ on('clicked:medicine-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Wisdom, "+wis+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=medicine ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Wisdom, "+wis+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Medicine "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:nature-button', async (info) => {
@@ -4856,9 +4917,14 @@ on('clicked:nature-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=nature ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Nature "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:perception-button', async (info) => {
@@ -4901,9 +4967,14 @@ on('clicked:perception-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Wisdom, "+wis+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=perception ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Wisdom, "+wis+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Perception "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:performance-button', async (info) => {
@@ -4946,9 +5017,14 @@ on('clicked:performance-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Charisma, "+cha+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=performance ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Charisma, "+cha+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Performance "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:persuasion-button', async (info) => {
@@ -4991,9 +5067,14 @@ on('clicked:persuasion-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Charisma, "+cha+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=persuasion ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Charisma, "+cha+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Persuasion "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:religion-button', async (info) => {
@@ -5036,9 +5117,14 @@ on('clicked:religion-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=religion ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Intelligence, "+intel+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Religion "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:sleightofhand-button', async (info) => {
@@ -5081,9 +5167,14 @@ on('clicked:sleightofhand-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=sleightofhand ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Sleight of Hand "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:stealth-button', async (info) => {
@@ -5126,9 +5217,14 @@ on('clicked:stealth-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=stealth ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Stealth "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:survival-button', async (info) => {
@@ -5171,9 +5267,14 @@ on('clicked:survival-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Wisdom, "+wis+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=survival ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Wisdom, "+wis+"|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Survival "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:vehicles-button', async (info) => {
@@ -5216,9 +5317,14 @@ on('clicked:vehicles-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=vehicles ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Vehicles "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:misc1-button', async (info) => {
@@ -5261,9 +5367,14 @@ on('clicked:misc1-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=misc1 ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Misc1 "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 on('clicked:misc2-button', async (info) => {
@@ -5306,9 +5417,14 @@ on('clicked:misc2-button', async (info) => {
 	if (rolladvdis == "adv") {diceroll = "2d20kh1";};
 	if (rolladvdis == "dis") {diceroll = "2d20dh1";};
 
+	var specialtyText = "";
+	if (specialty != ""){
+		specialtyText = "("+specialty+")";
+	}
+
 	var gmroll = "";
 	if (rollgmnormal == "gm") { gmroll = "/w gm ";}
-	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name=misc2 ("+specialty+") Roll}}{{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
+	const results = await startRoll( gmroll+"&{template:default} !?{Stat|Dexterity, "+dex+"|Strength, "+str+"|Constitution, "+con+"|Intelligence, "+intel+"|Wisdom, "+wis+"|Charisma, "+cha+"} ?{IncludeSpecialty|No, "+exdice+"|Yes, "+specdice+" } {{name="+charname+" Misc 2 "+specialtyText+" Roll}} {{roll=[["+diceroll+"+?{Stat}+"+finalbonus+"+?{IncludeSpecialty}cf<0cs>101]]}}");
 	finishRoll(results.rollId);
 });
 

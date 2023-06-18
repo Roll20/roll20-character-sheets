@@ -3,8 +3,7 @@
     <div>
         <button type="action" name="act_pilot" class="tabs">Character</button>
         <button type="action" name="act_info" class="tabs">Info</button>
-        <button type="action" name="act_inv" class="tabs">Inventory</button>
-        <button type="action" name="act_grim" class="tabs">Effects</button>
+        <button type="action" name="act_inv" class="tabs">Gear</button>
     </div>
     <div class="info">
         <h2>Information</h2>
@@ -30,6 +29,18 @@
                 <input class="colInput" type="text" name="attr_age">
             </div>
             <div class="col">
+                <label>Height </label>
+                <input class="colInput" type="text" name="attr_height">
+            </div>
+            <div class="col">
+                <label>Weight </label>
+                <input class="colInput" type="text" name="attr_weight">
+            </div>
+            <div class="col">
+                <label>Language </label>
+                <input class="colInput" type="text" name="attr_lang">
+            </div>
+            <div class="col">
                 <label>Notes </label>
                 <textarea class="colInput" name="attr_notes">
             </div>
@@ -37,11 +48,41 @@
     </div>
     <div class="pilot">
         <div class="tabstoggle">
-            <h2>High <button type="roll" value="&{template:rollhigh}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button> or Low <button type="roll" value="&{template:rolllow}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button> D20 <button type="roll" value="[[1d20]]"></button></h2>
+            <h2></button> D20 <button type="roll" value="[[1d20]]"></button>High <button type="roll" value="&{template:rollhigh}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button> or Low <button type="roll" value="&{template:rolllow}{{name=@{character_name}}}{{roll=[[1d20]]}}"></h2>
         </div>
         <div class="twocolumns">
             <div>
                 <h2 title="All stats cost 5 points. No need to roll if the difficulty is lower than the stat.">Stats</h2>
+                <div class="twocolumns">
+                    <div class="labels">
+                        <label title="Tuf 5 CP. Rolled for life saving throws (poison, drowning, etc.), strength throws, defense against Persuade, and Inventory slots (if used). +1 HP">Toughness </label>
+                        <label title="Ath 5 CP. Rolled for physical feats (attack, climbing/falling, picking locks, etc.)">Athleticism </label>
+                        <label title="IQ 5 CP. Rolled for magic and mental feats (perception, puzzles, knowledge, etc.)">Intelligence </label>
+                    </div>
+                    <div class="valuecolumn">
+                        <input type="number" min="0" max="40" name="attr_tuf" value="5">
+                        <input type="number" min="0" max="40" name="attr_dx" value="5">
+                        <input type="number" min="0" max="40" name="attr_iq" value="5">
+                    </div>
+                    <div class="valuecolumn">
+                        <button style="height: 18px;" type="roll" title="Roll stat." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + @{tuf}[Tuf] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Toughness'}}"></button>
+                        <button style="height: 18px;" type="roll" title="Roll stat." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + @{dx}[Ath] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Athleticism'}}"></button>
+                        <button style="height: 18px;" type="roll" title="Roll stat." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + @{iq}[IQ] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Intelligence'}}"></button>
+                    </div>
+                    <div class="valuecolumn">
+                        <button style="height: 18px; color: orange;" type="roll" title="Roll stat with mods." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + ?{Modifier?|0}[Mod] + @{tuf}[Tuf] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Toughness'}}"></button>
+                        <button style="height: 18px; color: orange;" type="roll" title="Roll stat with mods." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + ?{Modifier?|0}[Mod] + @{dx}[Ath] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Athleticism'}}"></button>
+                        <button style="height: 18px; color: orange;" type="roll" title="Roll stat with mods." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + ?{Modifier?|0}[Mod] + @{iq}[IQ] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Intelligence'}}"></button>
+                    </div>
+                    <div class="valuecolumn">
+                        <input type="hidden" name="attr_foo_tufperc" value="80%">
+                        <input type="hidden" name="attr_foo_dxperc" value="80%">
+                        <input type="hidden" name="attr_foo_iqperc" value="80%">
+                        <input style="width: 46px;" type="text" disabled name="attr_tufperc" value="@{foo_tufperc}">
+                        <input style="width: 46px;" type="text" disabled name="attr_dxperc" value="@{foo_dxperc}">
+                        <input style="width: 46px;" type="text" disabled name="attr_iqperc" value="@{foo_iqperc}">
+                    </div>
+                </div>
                 <div class="twocolumns">
                     <div class="valuecolumn">
                         <input type="number" min="-60" max="60" name="attr_targetr" value="10">
@@ -50,57 +91,27 @@
                         <label style="float: left;" title="Target is used against stat checks">Target </label>
                     </div>
                 </div>
-                <div class="twocolumns">
-                    <div class="labels">
-                        <label title="Tuf. Rolled for life saving throws (poison, drowning, etc.), Strength throws, HPx2, and Inventory slots (if used)">Toughness </label>
-                        <label title="DX. Rolled for physical feats (attack, climbing/falling, picking locks, etc.)">Dexterity </label>
-                        <label title="IQ. Rolled for magic and mental feats (perception, puzzles, knowledge, etc.)">Intelligence </label>
-                        <label title="DMG. Rolled for breaking inanaimate objects. Adds to all damage dealt, and is the minimum damage you can do.&#10;1 : d2     | 11 : 2d8&#10;2 : d4     | 12 : d20&#10;3 : d6     | 13 : 2d10&#10;4 : d8     | 14 : 2d11&#10;5 : 2d4   | 15 : 2d12&#10;6 : d10   | 16 : 2d20&#10;7 : 2d5   |   |  :   ''&#10;8 : d12   |   |  :   ''&#10;9 : 2d6   |   v :   ''&#10;10 : 2d7 | 40 :   ''">Damage </label>
-                    </div>
-                    <div class="valuecolumn">
-                        <input type="number" min="0" max="40" name="attr_con" value="0">
-                        <input type="number" min="0" max="40" name="attr_dx" value="0">
-                        <input type="number" min="0" max="40" name="attr_iq" value="0">
-                        <input type="number" min="0" max="40" name="attr_dmg" value="0">
-                    </div>
-                    <div class="valuecolumn">
-                        <button style="height: 18px;" type="roll" title="Roll stat." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + @{con}[Tuf] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Toughness'}}"></button>
-                        <button style="height: 18px;" type="roll" title="Roll stat." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + @{dx}[DX] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Dexterity'}}"></button>
-                        <button style="height: 18px;" type="roll" title="Roll stat." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + @{iq}[IQ] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Intelligence'}}"></button>
-                        <button style="height: 18px;" type="roll" value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + @{dmg}[Dmg] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Damage'}}" title="Roll stat. (DMG Should only be used for breaking inanimate objects)"></button>
-                    </div>
-                    <div class="valuecolumn">
-                        <button style="height: 18px; color: orange;" type="roll" title="Roll stat with mods." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + ?{Modifier?|0}[Mod] + @{con}[Tuf] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Toughness'}}"></button>
-                        <button style="height: 18px; color: orange;" type="roll" title="Roll stat with mods." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + ?{Modifier?|0}[Mod] + @{dx}[DX] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Dexterity'}}"></button>
-                        <button style="height: 18px; color: orange;" type="roll" title="Roll stat with mods." value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + ?{Modifier?|0}[Mod] + @{iq}[IQ] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Intelligence'}}"></button>
-                        <button style="height: 18px; color: orange;" type="roll" value="&{template:roll}{{name=@{character_name}}}{{total=[[ [[1d20]] + ?{Modifier?|0}[Mod] + @{dmg}[Dmg] ]]}}{{roll=$[[0]]}}{{target=[[@{targetr}]]}}{{stat='Damage'}}" title="Roll stat with mods. (DMG Should only be used for breaking inanimate objects)"></button>
-                    </div>
-                </div>
             </div>
             <div style="margin-left: 50px;">
                 <h2>Utility</h2>
                 <div class="twocolumns">
                     <div class="labels">
-                        <label title="HP. The hit points you have left.">Hit Points </label>
-                        <label title="This cannot be lower than 5. Derived form Tuf*2">Max HP </label>
-                        <label title="Def (total from armor)">Defense </label>
-                        <label title="MR. Increases difficulty of Effects that target you (2 points)">Magic Resistance </label>
-                        <label title="The amount of mana you have left. Also listed in your Effects page">Mana </label>
-                        <label title="Used to cast spells (1 point)">Max Mana </label>
-                        <br>
-                        <label>Silver </label>
+                        <label title="HP / Max. Your avaialble & Max HP. Tuf gives +1 HP.">Hit Points </label>
+                        <label title="1 CP. Adds to Max HP.">HP Bonus </label>
+                        <label title="E / Max. Your avaialble & Max E. Ath & IQ give +1 E. E is used for Abilities & Overdrive.">Energy </label>
+                        <label title="1 CP. Adds to Max E">E Bonus </label>
                     </div>
                     <div class="valuecolumn">
-                        <input type="number" name="attr_hp" value="5">
-                        <input type="hidden" name="attr_foo_hpmax" value="5">
-                        <input type="number" title="To increase, you must increase Tuf" disabled name="attr_hp_max" value="@{foo_hpmax}">
-                        <input type="number" title="To increase, you must buy armor" disabled name="attr_totalar" title="Total Def: all your armor ACs." value="(@{foo_totalar})">
-                        <input type="number" min="0" name="attr_mr" value="0">
-                        <input type="number" min="0" name="attr_mana" value="0">
-                        <input type="hidden" name="attr_mana_max" value="@{manamax}">
-                        <input type="number" min="0" name="attr_manamax" value="0">
-                        <br>
-                        <input type="number" style="width: 80px;" step=".01" name="attr_gold" value="100">
+                        <div><input type="number" min="0" name="attr_hp" value="5">/</div>
+                        <input type="number" min="0" name="attr_hpmax" value="0">
+                        <div><input type="number" min="0" name="attr_e" value="10">/</div>
+                        <input type="number" min="0" name="attr_emax" value="0">
+                    </div>
+                    <div class="valuecolumn">
+                        <input type="number" disabled name="attr_hp_max" title="HP Max" value="((@{tuf}) + (@{hpmax}))">
+                        <button title="Restore HP to Max HP" type="action" name="act_restore_hp" style="height: 20px;">Rest HP</button>
+                        <input type="number" disabled name="attr_e_max" title="E Max" value="((@{emax}) + (@{dx}) + (@{iq}))">
+                        <button title="Restore E to Max E" type="action" name="act_restore_e" style="height: 20px;">Rest E</button>
                     </div>
                 </div>
             </div>
@@ -108,59 +119,111 @@
                 <h2>Points</h2>
                 <div class="twocolumns">
                     <div class="labels">
-                        <label title="The points awarded to you by the gm">Total Worth </label>
-                        <label title="The total points you have spent">Spent </label>
+                        <label title="The points awarded to you by the GM">Total Worth </label>
+                        <label title="Total points you have spent">Spent </label>
                         <label title="The remaining points" style="color: chartreuse;">Available </label>
-                        <label title="The points you have spent on Stats">Stats </label>
-                        <label title="The points you spent on Gear">Gear </label>
-                        <label title="The points you have spent on abilites">Abilities </label>
-                        <label title="Total number of spells. All spells cost 1">Spells </label>
+                        <label title="Stats (5 CP each) & Utility (1 CP each)">Stats </label>
+                        <label title="Cost of all Dmg (5 CP each)">Dmg </label>
+                        <label title="Cost of all Attacks. Attacks Cost the same as their Max DC">Abilities </label>
+                        <label title="Total points spent on Armor. 2 CP each">Armor </label>
+                        <label title="The points you have spent on Passives">Passives </label>
                     </div>
                     <div class="valuecolumn">
                         <input type="number" name="attr_tw" value="100" style="width: 100px;">
-                        <input type="number" disabled name="attr_totalspent" value="(@{stats} + @{gears} + @{abilities} + @{spells})" class="x">
-                        <input type="number" disabled name="attr_avail" value="(@{tw}-@{totalspent})" class="x">
-                        <input type="number" disabled name="attr_stats" title="5 points for each stat + 2 points for each MR + a point for each mana." value="((@{con})*5 + (@{dx})*5 + (@{iq})*5 + (@{dmg})*5 + (@{mr})*2 + @{manamax})" class="x">
-                        <input type="hidden" name="attr_foo_wpns" value="0" />
-                        <input type="hidden" name="attr_foo_armors" value="0" />
-                        <input type="number" disabled name="attr_gears" value="(@{foo_wpns} + @{foo_armors})" class="x">
-                        <input type="hidden" name="attr_foo_abils" value="0" />
-                        <input type="number" disabled name="attr_abilities" value="@{foo_abils}" class="x">
-                        <input type="hidden" name="attr_foo_spells" value="0" />
-                        <input type="number" title="Total number of spells. All spells cost 1" disabled name="attr_spells" value="@{foo_spells}" class="x">
+                        <input type="number" disabled name="attr_totalspent" title="Spent" value="((@{stats}) + (@{armor}) + (@{passives}) + (@{atks}) + (@{dmgc}))" class="x">
+                        <input type="number" disabled name="attr_avail" title="Available" value="((@{tw})-(@{totalspent}))" class="x">
+                        <input type="number" disabled name="attr_stats" title="Stats" value="(((@{tuf})-5)*5 + ((@{dx})-5)*5 + ((@{iq})-5)*5 + (@{emax}) + (@{hpmax}))" class="x">
+                        <input type="hidden" name="attr_foo_dmgc" value="0" class="x">
+                        <input type="hidden" name="attr_foo_atks" value="0" class="x">
+                        <input type="hidden" name="attr_foo_armor" value="0" class="x">
+                        <input type="hidden" name="attr_foo_passives" value="0" class="x">
+                        <input type="number" disabled name="attr_dmgc" title="Dmg" value="@{foo_dmgc}" class="x">
+                        <input type="number" disabled name="attr_atks" title="Attacks" value="@{foo_atks}" class="x">
+                        <input type="number" disabled name="attr_armor" title="Armor" value="@{foo_armor}" class="x">
+                        <input type="number" disabled name="attr_passives" title="Passives" value="@{foo_passives}" class="x">
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="sheet-rolltemplate-spacer"></div>
-        <h2>Gear</h2>
+
         <h3>Attacks</h3>
         <div class="weapon">
-            <label title="Name of the Weapon">Name</label>
-            <label style="width: 63px;" title="Damage bonus this weapon gives (2 points)&#10;1 : d2     | 11 : 2d8&#10;2 : d4     | 12 : d20&#10;3 : d6     | 13 : 2d10&#10;4 : d8     | 14 : 2d11&#10;5 : 2d4   | 15 : 2d12&#10;6 : d10   | 16 : 2d20&#10;7 : 2d5   |   |  :   ''&#10;8 : d12   |   |  :   ''&#10;9 : 2d6   |   v :   ''&#10;10 : 2d7 | 40 :   ''">Bonus DMG</label>
-            <label style="width: 68px;" title="Bonus to hit (2 points)">Accuracy</label>
-            <label title="Point cost of this weapon">Cost</label>
+            <label style="width: 200px">Name</label>
+            <label style="width: 40px" title="The Dmg this Attack deals. 5 CP">Base Dmg</label>
+            <label style="width: 36px; color: rgb(102, 0, 0);" title="Base Dmg + Dmg Effort.">Total Dmg</label>
+            &emsp;
+            <label style="width: 40px" title="Additional Dmg through Effort. Each Dmg Effort increases Total DC by 2">Dmg Effort</label>
+            <label style="width: 36px; color: rgb(102, 0, 0);" title="Dmg Effort x2.">DC</label>
+            <label style="width: 80px">Stat</label>
+            <label style="width: 36px" title="Use Attack with or without Mods.">Roll</label>
+            <label style="width: 60px; color: rgb(102, 0, 0);" title="The percent chance you have of landing this Attack.">Success %</label>
         </div>
         <div>
-            <fieldset class="repeating_weapons">
+            <fieldset class="repeating_attacks">
                 <div class="weapon">
-                    <input type="text" name="attr_weaponname">
-                    <input type="number" name="attr_damage" min="0" value="0">
-                    <button type="roll" style="color: red;" name="attr_dmgbtn" title="Damage after hit" value="[[1d2]]}}"></button>
-                    <input type="number" name="attr_acc" value="0">
-                    <button type="roll" title="Use the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{weaponname=@{weaponname}}}{{total=[[ [[1d20]] + @{dx}[DX] + @{acc}[Acc] ]]}}{{roll=$[[0]]}}"></button>
-                    <button type="roll" style="color: orange;" title="Use the Weapon with mods" value="&{template:weapon}{{name=@{character_name}}}{{weaponname=@{weaponname}}}{{total=[[ [[1d20]] + ?{Modifiers?|0}[Mod] + @{dx}[DX] + @{acc}[Acc] ]]}}{{roll=$[[0]]}}"></button>
-                    <input type="number" disabled name="attr_wpncost" title="Point cost of this weapon" value="(@{damage}*2+ @{acc}*2)" >
+                    <input type="hidden" name="attr_foo_success" value="100">
+
+                    <input type="text" name="attr_atkname">
+                    <input type="number" name="attr_bdmg" value="0">
+                    <input style="color:rgb(102, 0, 0);" type="number" disabled name="attr_totdmg" title="Total Dmg" value="((@{bdmg})+(@{dmg}))">
+                    &emsp;
+                    <input type="number" min="0" max="30" name="attr_dmg" value="0">
+                    <input style="color:rgb(102, 0, 0);" type="number" disabled name="attr_dc" title="Total DC" value="2*(@{dmg})">
+                    <select name="attr_type" style="width: 80px;">
+                        <option value="@{tuf}">Tuf (m)</option>
+                        <option value="@{dx}" selected="selected">Ath</option>
+                        <option value="@{iq}" selected="selected">IQ</option>
+                      </select>
+                    <button style="height: 24px;" type="roll" title="Use the Attack" value="&{template:weapon}{{name=@{character_name}}}{{atkname=@{atkname}}}{{total=[[ [[1d20]]+ @{type}[stat] ]]}}{{roll=$[[0]]}}{{diff=[[@{dc}]]}}{{dmg=[[@{bdmg}[base] + @{dmg}[eff]]]}}"></button>
+                    <button style="height: 24px; color: orange;" type="roll" title="Use the Attack with Mods" value="&{template:weapon}{{name=@{character_name}}}{{atkname=@{atkname}}}{{total=[[ [[1d20]] + ?{Hit Mod?|0}[Mod] + @{type}[stat] ]]}}{{roll=$[[0]]}}{{diff=[[@{dc}]]}}{{dmg=[[@{dmg}[Dmg] + ?{Dmg Mod?|0}[Mod] ]]}}"></button>
+                    <input style="color:rgb(102, 0, 0);" type="number" style="width: 70px;" disabled name="attr_success" title="% Success" value="@{foo_success}" class="x">
                 </div>
             </fieldset>
         </div>
 
+        <br>
+        <div class="sheet-rolltemplate-spacer"></div>
+
+        <h3>Abilities</h3>
+        <div class="weapon">
+            <label style="width: 170px;">Name</label>
+            <label style="width: 210px" title="The 1 Ability for this Attack. Leave blank if the Attack only does Damage. Include Duration unit.">Ability</label>
+            <label style="width: 30px;color:rgb(0, 209, 0);" title="E cost to cast the Ability, derived from Ability DC (0-4 = 1, 5-9 = 2, 10-14 = 3, etc.)">E</label>
+            <label style="width: 36px" title="The DC of the Ability. If this is >= Dmg the Ability is IQ based">ADC</label>
+            <label style="width: 39px" title="The physical Dmg this Ability deals. Each Dmg increases Total DC by 2. If this is > ADC the Ability is Ath based">Dmg</label>
+            <label style="width: 45px; color:rgb(102, 0, 0)ed;" title="Ability DC + Dmgx2.">Total DC</label>
+            <label style="width: 36px" title="Use Attack with or without Mods. If Dmg is > Ability DC, This rolls Ath, otherwise IQ.">Roll</label>
+            <label style="width: 60px;color:rgb(102, 0, 0);" title="The percent you have of landing this Attack.">Success %</label>
+        </div>
+        <div>
+            <fieldset class="repeating_spells">
+                <div class="weapon">
+                    <input type="hidden" name="attr_type" value="@{dx}">
+                    <input type="hidden" name="attr_foo_success" value="Ath: 100%">
+
+                    <input type="text" name="attr_atkname">
+                    <textarea type="text" name="attr_ability"></textarea>
+                    <input style="color:rgb(0, 209, 0);" min="1" type="number" name="attr_e" title="Energy Cost" value="1">
+                    <input type="number" min="0" max="60" name="attr_adc" value="0">
+                    <input type="number" min="0" max="30" name="attr_dmg" value="0">
+                    <input style="color:rgb(102, 0, 0);" type="number" disabled name="attr_dc" title="Total DC" value="((@{adc}) + 2*(@{dmg}))">
+                    <button style="height: 24px;" type="roll" title="Use the Attack" value="&{template:spell}{{name=@{character_name}}}{{atkname=@{atkname}}}{{cost=@{e}}}{{total=[[ [[1d20]]+ @{type}[stat] ]]}}{{roll=$[[0]]}}{{diff=[[@{dc}]]}}{{ability=@{ability}}}{{dmg=[[@{dmg}]]}}{{adc=[[@{adc}]]}}"></button>
+                    <button style="height: 24px; color: orange;" type="roll" title="Use the Attack with Mods" value="&{template:spell}{{name=@{character_name}}}{{atkname=@{atkname}}}{{cost=@{e}}}{{total=[[ [[1d20]] + ?{Hit Mod?|0}[Mod] + @{type}[stat] ]]}}{{roll=$[[0]]}}{{diff=[[@{dc}]]}}{{ability=@{ability}}}{{dmg=[[@{dmg}[Dmg] + ?{Dmg Mod?|0}[Mod] ]]}}{{adc=[[@{adc}]]}}"></button>
+                    <input style="color:rgb(102, 0, 0);" type="text" style="width: 70px;" disabled name="attr_success" title="% Success" value="@{foo_success}" class="x">
+                </div>
+            </fieldset>
+        </div>
+
+        <br>
+        <div class="sheet-rolltemplate-spacer"></div>
+
         <h3>Armor</h3>
         <div class="weapon">
             <label>Name</label>
-            <label title="The place on the body the armor resides. The most important spot is the body, since that's the default hit location.">Location</label>
-            <label title="Defense Bonus (2 points)" style="width: 38px;">Def</label>
-            <label title="Damage Reduciton for this location only (5 points)." style="width: 35px;">DR</label>
+            <label title="The place on the body the armor resides. The most important spot is the Torso, since that's the default hit location.">Location</label>
+            <label title="Armor (2 points)" style="width: 38px;">Armor</label>
             <label>Cost</label>
         </div>
         <div>
@@ -168,65 +231,32 @@
                 <div class="weapon">
                     <input type="text" name="attr_armorname" title="Name of the Armor">
                     <input type="text" name="attr_armorloc" title="location of the Armor">
-                    <input type="number" min="0" name="attr_armar" value="0">
-                    <input type="number" min="0" name="attr_armas" value="0">
-                    <input type="number" disabled name="attr_armorcost" title="cost of this Armor" value="(@{armar}*2 + @{armas}*5)" >
+                    <input type="number" min="0" name="attr_armorp" value="0">
+                    <input type="number" disabled name="attr_armorcp" title="cost of this Armor" value="(@{armorp})*2" >
                 </div>
             </fieldset>
-            <input type="hidden" name="attr_foo_totalar" value="0" />
-            <div class="weapon">
-                <label style="width: 80px;">Def</label><input type="number" disabled name="attr_totalar" title="Total Def: all your armor ACs." value="(@{foo_totalar})">
-            </div>
         </div>
+        <br>
         <div class="sheet-rolltemplate-spacer"></div>
 
-        <h3>Abilities</h3>
+        <h3>Passives</h3>
         <div class="weapon">
             <label style="width: 170px;">Name</label>
-            <label style="width: 190px;" title="Makes sure to put all details in this box (length, bonus, rolls, all of it)">Effect</label>
-            <label>Cost</label>
+            <label style="width: 190px;" title="Makes sure to put all details in this box (length, bonus, rolls, all of it)">Passive</label>
+            <label>CP</label>
         </div>
-        <fieldset class="repeating_abilities">
+        <fieldset class="repeating_passives">
             <div class="weapon">
-                <input type="text" name="attr_abilname" title="Name of the ability"><textarea name="attr_ability"></textarea> <input type="number" name="attr_abilcost" title="+ for advantage, - for disadvantage">
+                <input type="text" name="attr_abilname" title="Name of the ability"><textarea name="attr_ability"></textarea> <input type="number" name="attr_passcp" title="+ for advantage, - for disadvantage">
             </div>
         </fieldset>
     </div>
 
-    <div class="grim">
-        <h2>Effects</h2>
-        <div class="weapon">
-            <label style="width: 170px">Name</label>
-            <label style="width: 190px" title="Makes ure to put all details in this box (length, bonus, rolls, multipliers, levels, all of it)">Effect</label>
-            <label style="width: 62px" title="Damage bonus (leave blank if the spell does no damage, put 0 for base damage)">Damage</label>
-            <label style="width: 63px" title="What you must roll (+ penalties) to use the spell">Difficulty</label>
-            <label style="width: 40px" title="Cost to cast the spell, derived from difficulty (5-9 = 0, 10-14 = 1, 15-19 = 2, 20-24 = 3, etc.).">Mana Cost</label>
-        </div>
-        <div class="weapon">
-            <button title="This will set all uses to their max use" type="action" name="act_restoreall">Restore Mana</button>
-            <input type="number" name="attr_mana" title="The mana you have left until you rest." min="0" value="0">
-        </div>
-        <div>
-            <fieldset class="repeating_spells">
-                <div class="weapon">
-                    <input type="text" name="attr_weaponname" title="Name of the Spell">
-                    <textarea type="text" name="attr_spelleffect" title="Effect of the Spell"></textarea>
-                    <input type="number" name="attr_damage" min="0" value="">
-                    <button style="height: 24px; color: red;" type="roll" name="attr_dmgbtn" title="Damage after hit" value="[[1d2]]]"></button>
-                    <button style="height: 24px;" type="roll" title="Use the Spell" value="&{template:spell}{{name=@{character_name}}}{{weaponname=@{weaponname}}}{{cost=@{cost}}}{{total=[[ [[1d20]] + ?{Modifiers?|0}[Mod] + @{iq}[IQ] ]]}}{{roll=$[[0]]}}{{diff=[[@{spelldiff}]]}}{{effect=@{spelleffect}}}"></button>
-                    <input type="number" min="5" max="60" name="attr_spelldiff" value="5">
-                    <input type="hidden" name="attr_foo_cost" value="0">
-                    <input type="number" disabled name="attr_cost" title="Cost to cast the spell, derived from difficulty." value="@{foo_cost}">
-                </div>
-            </fieldset>
-        </div>
-    </div>
-
     <div class="inv">
-        <h2>Inventory</h2>
+        <h2>Gear</h2>     Silver<input type="number" style="width: 80px;" step=".01" name="attr_gold" value="100">
         <div class="weapon">
             <label>Name</label>
-            <label>Effect</label>
+            <label>Description</label>
             <label style="width: 35px;">#</label>
             <label style="width: 35px;">Slots</label>
             <label>Cost</label>
@@ -235,8 +265,8 @@
             <fieldset class="repeating_items">
                 <div class="weapon">
                     <input type="text" name="attr_itemname" title="Name of the Item">
-                    <input type="text" name="attr_itemeffect" title="Effect of the item">
-                    <input type="number" name="attr_quantity" title="Number of this item you have. Most items can't have more than 10, and some can have fewer">
+                    <input type="text" name="attr_itemdescr" title="Description">
+                    <input type="number" name="attr_quantity" title="Number of this item you have. Most items can't have more than 10.">
                     <input type="number" name="attr_slots" title="items don't have a weight, just a slot count. Most items take 1 slot">
                     <input type="number" name="attr_itemcost" title="The amount in silver the item costs">
                 </div>
@@ -244,7 +274,7 @@
         </div>
         <div>
             <input type="hidden" name="attr_foo_slotsused" value="0">
-            Slots used: <input name="attr_slotsused" type="number" disabled value="@{foo_slotsused}"> Slots available: <input type="number" name="attr_slotsavail" disabled value="(@{con}*2-@{foo_slotsused}+10)">
+            Slots used: <input name="attr_slotsused" type="number" disabled value="@{foo_slotsused}"> Slots available: <input type="number" name="attr_slotsavail" disabled value="((@{tuf})*2-(@{foo_slotsused})+10)">
         </div>
     </div>
 </div>
@@ -259,139 +289,79 @@
         });
     });
 
-    const dmgTable = ["1d2","1d4","1d6","1d8","2d4","1d10","2d5","1d12","2d6","2d7","2d8","1d20","2d10","2d11","2d12","2d20"];
-
-    //const spellCostTable = [.1, .2, .2, .333333, .333333, .333333, .5, .5, .5, .5, 1, 1, 1, 1, 1, 2, 3,3,3,3,3, 4,4,4,4,4, 5,5,5,5,5 ,6,6,6,6,6 ,7,7,7,7,7 ,8,8,8,8,8,8 
-    //,9,9,9,9,9 ,10,10,10,10,10];
-
-    function getDamageRollStr(dmgAttr, callback){
-        getAttrs([
-            "dmg", dmgAttr
-        ]
+    on('clicked:restore_e', function() {
+        getAttrs( ["emax", "dx", "iq"]
         , function(values) {
-            const dmgV = Math.min(15, Math.max(0, sumFieldValues(values)-1));
-            callback(dmgTable[dmgV]);
-        });        
-    }
-
-    function getCostOfSpell(spellDiff){
-        return Math.floor(parseInt(spellDiff)/5) - 1;
-        //const mult = spellCostTable[parseInt(spellDiff)-5];
-        //const fullCost = Math.ceil(mult*parseInt(maxUses))
-        //return [fullCost, Math.max(1,Math.round(fullCost*(1/mult)))];
-
-    }
-
-    on('change:manamax', function(eventInfo) {
-        getAttrs( ["mana"]
-        , function(values) {
-            console.log(eventInfo);
-            setAttrs({"mana": (parseInt(values.mana) + (parseInt(eventInfo.newValue) - (parseInt(eventInfo.previousValue)||0)))}, {silent:true});
-        });
-    });
-
-    on('clicked:restoreall', function() {
-        getAttrs([
-            "manamax"
-        ]
-        , function(values) {
-            setAttrs({"mana":values.manamax}
+            setAttrs({"e": (parseInt(values.emax) + parseInt(values.dx) + parseInt(values.iq))}
             , {silent:true}
             );
         });
     });
 
-    // Changing damage
-    on("change:repeating_weapons change:repeating_spells", function(eventInfo) {
-        const btndmgAttr = eventInfo.triggerName + "_dmgbtn";
-        //document.getElementsByName(btndmgAttr)[0].disabled = false;
-        // set the attribute to a template with the updated die roll 
-        let templateStr = "&{template:weapondmg}{{weaponname=@{weaponname}}}{{mindmg=[[@{dmg}+?{Mod? (Applies to min & dmg)|0}]]}}{{damage=[[";
-        getDamageRollStr(eventInfo.triggerName + "_damage", function(dmgroll){
-            templateStr += dmgroll + "+?{Mod? (Applies to min & dmg)|0}]]}}";
+    on('clicked:restore_hp', function() {
+        getAttrs( ["hpmax", "tuf"]
+        , function(values) {
+            setAttrs({"hp":(parseInt(values.hpmax) + parseInt(values.tuf))}
+            , {silent:true}
+            );
+        });
+    });
+    
+    on("change:repeating_attacks:bdmg remove:repeating_attacks", function(eventInfo) {
+        getRepeatingFields("repeating_attacks", ["bdmg"], function(fieldValues){
             setAttrs({
-                [btndmgAttr]: templateStr
-            }
-            , {silent:true}
-            );
+                "foo_dmgc": sumFieldValues(fieldValues)*5
+            });
         });
     });
+
+    on("remove:repeating_spells", function(eventinfo) {
+        getRepeatingFields("repeating_spells", ["adc"], function(fieldValues){
+            setAttrs({
+                "foo_atks": sumFieldValues(fieldValues)
+            });
+        });
+     });
+
+     on("change:repeating_armors:armorp remove:repeating_armors", function(eventinfo) {
+         getRepeatingFields("repeating_armors", ["armorp"], function(fieldValues){
+             setAttrs({
+                 "foo_armor": sumFieldValues(fieldValues)*2
+             });
+         });
+      });
+    
+      on("change:repeating_items:slots remove:repeating_items", function(eventInfo) {
+          getRepeatingFields("repeating_items", ["slots"], function(fieldValues){
+              setAttrs({
+                  "foo_slotsused": sumFieldValues(fieldValues)
+              });
+          });
+      });
+      
+      on("change:repeating_passives:passcp remove:repeating_passives", function(eventInfo) {
+          getRepeatingFields("repeating_passives", ["passcp"], function(fieldValues){
+              setAttrs({
+                  "foo_passives": sumFieldValues(fieldValues)
+              });
+          });
+      });
 
     function sumFieldValues(fieldValues){
-        let sum = 0;
+        var sum = 0;
         Object.values(fieldValues).forEach(element => sum += parseInt(element)||0);
         return sum;
     }
     
-    on("change:repeating_weapons:damage change:repeating_weapons:acc", function(eventInfo) {
-        getRepeatingFields("repeating_weapons", ["damage","acc"], function(fieldValues){
-            setAttrs({
-                "foo_wpns": sumFieldValues(fieldValues)*2
-            }
-            , {silent:true}
-            );
-        });
-    });
-    
-    on("change:repeating_items:slots", function(eventInfo) {
-        getRepeatingFields("repeating_items", ["slots"], function(fieldValues){
-            setAttrs({
-                "foo_slotsused": sumFieldValues(fieldValues)
-            });
-        });
-    });
-    
-    // 
-    on("change:repeating_spells", function(eventInfo) {
-        // get total spell count
-        getRepeatingFields("repeating_spells", ["spelldiff"], function(fieldValues){
-            let sendValues = {"foo_spells":0};
-            let idName = "";
-            for (const property in fieldValues) {
-                idName = property.substring(0, property.lastIndexOf("_"));
-                sendValues[idName + "_foo_cost"] = getCostOfSpell(fieldValues[property]);
-                sendValues["foo_spells"] += 1;
-            }
-            setAttrs( sendValues , {silent:true} );
-        }); 
-    });
-    
-    on("change:repeating_armors:armar change:repeating_armors:armas", function(eventInfo) {
-        getRepeatingFields("repeating_armors", ["armar","armas"], function(fieldValues){
-            let arSum = 0;
-            let asSum = 0;
-            for (const property in fieldValues) {
-                if(property.indexOf("_armar") != -1){
-                    arSum += parseInt(fieldValues[property]);
-                }else{
-                    asSum += parseInt(fieldValues[property]);
-                }
-              }
-            setAttrs({
-                "foo_armors": asSum*5 + arSum*2
-                , "foo_totalar": arSum
-            });
-        });
-    });
-    
-    on("change:repeating_abilities:abilcost", function(eventInfo) {
-        getRepeatingFields("repeating_abilities", ["abilcost"], function(fieldValues){
-            setAttrs({
-                "foo_abils": sumFieldValues(fieldValues)
-            });
-        });
-    });
-
-    // function to get fields from a repeating section
 	function getRepeatingFields(sectionName, fieldNames, callback) {
 		getSectionIDs(sectionName, function (ids) {
 			if (ids.length === 0) {
 				callback(0);
 				return;
 			}
-			let fieldArray = [];
-            for (let j = 0; j < fieldNames.length; j++) {
-                for (let i = 0; i < ids.length; i++) {
+			var fieldArray = [];
+            for (var j = 0; j < fieldNames.length; j++) {
+                for (var i = 0; i < ids.length; i++) {
                     fieldArray.push(sectionName + '_' + ids[i] + '_' + fieldNames[j]);
                 }
             }
@@ -401,6 +371,147 @@
 		});
 	}
 
+    on('change:iq change:dx change:emax' , function(eventInfo) {
+        getAttrs( ["e"]
+        , function(values) {
+            setAttrs({"e": (parseInt(values.e) + (parseInt(eventInfo.newValue) - (parseInt(eventInfo.previousValue)||0)))}, {silent:true});
+        });
+    });
+
+    on("change:tuf change:hpmax", function(eventInfo) {
+        getAttrs([
+            "hp",
+        ]
+        , function(values) {
+            setAttrs({
+                "hp": (parseInt(values.hp) + parseInt(eventInfo.newValue) - (parseInt(eventInfo.previousValue)||0))
+            }
+            , {silent:true}
+            );
+        });
+    });
+
+    function calculateChance(dc, subtractStat){
+        if(dc == subtractStat + 1)
+            return 95;
+        return 100*Math.max(0, (20 - Math.max(0, dc - subtractStat-1)))/20;
+    }
+
+    on("change:targetr", function(eventInfo){
+        getAttrs(
+            ["iq", "dx", "tuf", "targetr"]
+        , function(values) {
+            var sendValues = {};
+            sendValues["foo_tufperc"] = String(calculateChance(parseInt(values.targetr), parseInt(values.tuf))) + "%";
+            sendValues["foo_dxperc"] = String(calculateChance(parseInt(values.targetr), parseInt(values.dx)))+ "%";
+            sendValues["foo_iqperc"] = String(calculateChance(parseInt(values.targetr), parseInt(values.iq)))+ "%";
+            setAttrs(sendValues,{silent:true});
+        });
+    });
+
+    on("change:dx change:iq change:tuf", function(eventInfo) {
+        getAttrs(
+            ["iq", "dx", "tuf", "targetr"]
+        , function(values) {
+            var sendValuesFirst = {};
+            sendValuesFirst["foo_tufperc"] = String(calculateChance(parseInt(values.targetr), parseInt(values.tuf))) + "%";
+            sendValuesFirst["foo_dxperc"] = String(calculateChance(parseInt(values.targetr), parseInt(values.dx)))+ "%";
+            sendValuesFirst["foo_iqperc"] = String(calculateChance(parseInt(values.targetr), parseInt(values.iq)))+ "%";
+            setAttrs( sendValuesFirst , {silent:true} );
+            getRepeatingFields("repeating_spells", ["adc", "dmg"], function(fieldValues){
+                var sendValues = {};
+                fieldValues.iq = values.iq;
+                fieldValues.dx = values.dx;
+                var incomingAtk;
+                for(const property in fieldValues){
+                    if(property[0] == 'r'){
+                        incomingAtk = property.substring(0, property.lastIndexOf("_"));
+                        if(sendValues[incomingAtk + "_type"] == undefined){
+                            setTypeAndSuccess(sendValues, incomingAtk, fieldValues);
+                        }
+                    }
+                }
+                setAttrs(sendValues,{silent:true});
+            });
+            getRepeatingFields("repeating_attacks", ["type", "dmg"], function(fieldValues){
+                var sendValues = {};
+                var incomingAtk;
+                for(const property in fieldValues){
+                    if(property[property.length - 1] == 'e'){
+                        incomingAtk = property.substring(0, property.lastIndexOf("_"));
+                        var subtractStat = getSubtractStat(fieldValues[incomingAtk + "_type"], values);
+                        sendValues[incomingAtk + "_foo_success"] = calculateChance(parseInt(fieldValues[incomingAtk + "_dmg"])*2, subtractStat);
+                    }
+                }
+                setAttrs(sendValues,{silent:true});
+            });
+        });
+    });
+
+    function getSubtractStat(type, values){
+        if(type == "@{tuf}"){
+            return parseInt(values.tuf);
+        }
+        if(type == "@{dx}"){
+            return parseInt(values.dx);
+        }
+        if(type == "@{iq}"){
+            return parseInt(values.iq);
+        }
+    }
+    
+    on("change:repeating_attacks:dmg change:repeating_attacks:type", function(eventInfo) {
+        const last_Ind = eventInfo.sourceAttribute.lastIndexOf("_");
+        const incomingAtk = eventInfo.sourceAttribute.substring(0, last_Ind);
+
+        getAttrs(
+            [incomingAtk + "_type", incomingAtk + "_dmg", "iq", "dx", "tuf"]
+        , function(values) {
+            var sendValues = {};
+            var subtractStat = getSubtractStat(values[incomingAtk + "_type"], values);
+            sendValues[incomingAtk + "_foo_success"] = calculateChance(parseInt(values[incomingAtk + "_dmg"])*2, subtractStat);
+            setAttrs( sendValues , {silent:true} );
+        });
+    });
+    
+    on("change:repeating_spells:adc change:repeating_spells:dmg", function(eventInfo) {
+
+        var sendValues = {};
+
+        const last_Ind = eventInfo.sourceAttribute.lastIndexOf("_");
+        const incomingAtk = eventInfo.sourceAttribute.substring(0, last_Ind);
+
+        getAttrs(
+            [incomingAtk + "_adc", incomingAtk + "_dmg", "iq", "dx"]
+        , function(values) {
+            var totalDC = parseInt(values[incomingAtk + "_adc"]) + parseInt(values[incomingAtk + "_dmg"])*2;
+            // making sure we didnt go over 60
+            if(totalDC > 60){
+                sendValues[eventInfo.sourceAttribute] = eventInfo.previousValue;
+                eventInfo.newValue = eventInfo.previousValue;
+                values[incomingAtk + eventInfo.sourceAttribute.substring(last_Ind, eventInfo.sourceAttribute.length)] = eventInfo.previousValue;
+            }
+
+            setTypeAndSuccess(sendValues, incomingAtk, values);
+            setAttrs( sendValues , {silent:true} );
+            getRepeatingFields("repeating_spells", ["adc"], function(fieldValues){
+                setAttrs({
+                    "foo_atks": sumFieldValues(fieldValues)
+                });
+            });
+        });
+    });
+
+    function setTypeAndSuccess(sendValues, incomingAtk, values){
+        if(parseInt(values[incomingAtk + "_adc"]) >= parseInt(values[incomingAtk + "_dmg"])){
+            sendValues[incomingAtk + "_type"] = "@{iq}"
+            sendValues[incomingAtk + "_foo_success"] ="IQ: " + String(calculateChance(parseInt(values[incomingAtk + "_adc"]) + parseInt(values[incomingAtk + "_dmg"])*2, parseInt(values.iq))) + "%";
+        }else{
+            sendValues[incomingAtk + "_type"] = "@{dx}"
+            sendValues[incomingAtk + "_foo_success"] ="DX: " + String(calculateChance(parseInt(values[incomingAtk + "_adc"]) + parseInt(values[incomingAtk + "_dmg"])*2, parseInt(values.dx))) + "%";
+        }
+    }
+
     on("sheet:opened", function(eventInfo){
         getAttrs([
             "first"
@@ -408,55 +519,24 @@
         , function(values) {
             if(values.first == undefined){
                 setAttrs({
-                    "con": 1
-                    ,"dmg":1
-                    ,"hp_max":5
-                    ,"foo_hpmax":5
+                    "tuf": 5
+                    ,"iq":5
+                    ,"dx":5
+                    ,"hpmax":0
                     ,"hp":5
                     ,"first":1
-                    ,"mana":0
-                    ,"manamax":0
+                    ,"e":10
+                    ,"emax":0
                     ,"gold":100
+                    ,"foo_armor":0
+                    ,"foo_passives":0
+                    ,"foo_atks":0
                 }
                 , {silent:true}
                 );
             }
         });
     });
-    on("change:con", function(eventInfo) {
-        const newV = parseInt(eventInfo.newValue);
-        const oldV = parseInt(eventInfo.previousValue);
-        let diff4 = Math.max(5, newV*2) - Math.max(5, oldV*2);
-        getAttrs([
-            "hp",
-            "hp_max",
-            "foo_hpmax",
-        ]
-        , function(values) {
-            setAttrs({
-                "hp": parseInt(values.hp) + diff4
-                , "hp_max": parseInt(values.hp_max) + diff4
-                , "foo_hpmax": parseInt(values.foo_hpmax) + diff4
-            }
-            , {silent:true}
-            );
-        });
-    });
-    //on("change:hp_max", function(eventInfo) {
-    //    const newV = parseInt(eventInfo.newValue);
-    //    const oldV = parseInt(eventInfo.previousValue);
-    //    let diff = newV - oldV;
-    //    getAttrs([
-    //        "hp"
-    //    ]
-    //    , function(values) {
-    //        setAttrs({
-    //            "hp": parseInt(values.hp) + diff
-    //        }
-    //        , {silent:true}
-    //        );
-    //    });
-    //  });
 </script>
 
 <rolltemplate class="sheet-rolltemplate-roll">
@@ -475,7 +555,7 @@
             <td>
                 {{#rollTotal() roll 20}}
                 <strong style="color: green;">CRIT SUCCESS!</strong> ({{roll}}) <br>
-                You succeed, and get really lucky! Optionally you can gamble with a high or low. Success means you double the effect. Fail means you just succeed.
+                You succeed, and get really lucky! Optionally you can gamble with a high or low. Success means you Double Crit. Fail means you just succeed.
                 {{/rollTotal() roll 20}}
 
                 {{#rollBetween() roll 2 19}}
@@ -499,35 +579,11 @@
     </table>
 </rolltemplate>
 
-<rolltemplate class="sheet-rolltemplate-weapondmg">
-    <table>
-        <tr>
-            <th>
-                {{weaponname}} deals:
-            </th>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                {{damage}}
-                {{#rollLess() damage mindmg}}
-                Damage cannot be below your Damage stat: {{mindmg}}
-                {{/rollLess() damage mindmg}}
-                - DR
-            </td>
-        </tr>
-    </table>
-</rolltemplate>
-
 <rolltemplate class="sheet-rolltemplate-weapon">
     <table>
         <tr>
             <th>
-                {{name}} attacks with {{weaponname}}
+                {{name}} attacks with {{atkname}} Difficulty: {{diff}}
             </th>
         </tr>
         <tr>
@@ -537,19 +593,28 @@
         </tr>
         <tr>
             <td>
-                {{#rollTotal() roll 20}}
+                {{#rollWasCrit() roll}}
                 <strong style="color: green;">CRIT SUCCESS!</strong> ({{roll}}) <br>
-                Your attack auto hits, and double Dmg or Add stun. Optionally you can gamble with a high or low. Success means you double the effect. Fail means you just succeed.
-                {{/rollTotal() roll 20}}
+                Your attack auto hits. Double Dmg {{dmg}} + {{dmg}}.
+                {{/rollWasCrit() roll}}
+
+                {{#rollWasFumble() roll}}
+                <strong style="color: red;">CRIT FAIL!</strong> ({{roll}}) <br>
+                Your attack auto fails. Succeed a "high or low" or drop your weapon or fall prone.
+                {{/rollWasFumble() roll}}
 
                 {{#rollBetween() roll 2 19}}
-                Compare {{total}} to target Def
-                {{/rollBetween() roll 2 19}}
 
-                {{#rollTotal() roll 1}}
-                <strong style="color: red;">CRIT FAIL!</strong> ({{roll}}) <br>
-                Your attack auto fails, succeed a "high or low" or you dorp your weapon or fall to the floor
-                {{/rollTotal() roll 1}}
+                {{#rollLess() total diff}}
+                {{total}} <strong style="color: red;">Fails...</strong>. Action wasted.
+                {{/rollLess() total diff}}
+
+                {{#^rollLess() total diff}}
+                {{total}} <strong style="color: green;">Success</strong>. <br>
+                Dmg: {{dmg}}
+                {{/^rollLess() total diff}}
+
+                {{/rollBetween() roll 2 19}}
             </td>
         </tr>
     </table>
@@ -559,7 +624,7 @@
     <table>
         <tr>
             <th>
-                {{name}} attempts to cast spell {{weaponname}} Difficulty: {{diff}}
+                {{name}} attacks with {{atkname}} Difficulty: {{diff}}
             </th>
         </tr>
         <tr>
@@ -569,33 +634,48 @@
         </tr>
         <tr>
             <td>
-                {{#rollTotal() roll 20}}
+                {{#rollWasCrit() roll}}
                 <strong style="color: green;">CRIT SUCCESS!</strong> ({{roll}}) <br>
-                Your attack auto hits, you can double dmg or add an additional effect (the GM approves), and mana is NOT consumed.
-                Optionally you can gamble with a high or low. Success means you double the effect. Fail means you just succeed.
+                Your attack auto hits. Double Ability or Dmg. No E cost.
+                {{#^rollTotal() dmg 0}}
                 <br>
-                {{effect}}
-                {{/rollTotal() roll 20}}
+                Dmg: {{dmg}}
+                {{/^rollTotal() dmg 0}}
+                {{#^rollTotal() adc 0}}
+                <br>
+                Ability: Subtract <strong >{{cost}}</strong> E.
+                <div class="sheet-rolltemplate-spacer"></div>
+                {{ability}}
+                {{/^rollTotal() adc 0}}
+                <div class="sheet-rolltemplate-spacer"></div>
+                Optionally, gamble with a High-or-Low for even more Benefits. A Fail loses all Crits.
+                {{/rollWasCrit() roll}}
 
-                {{#rollTotal() roll 1}}
+                {{#rollWasFumble() roll}}
                 <strong style="color: red;">CRIT FAIL!</strong> ({{roll}}) <br>
-                Your attack auto fails, succeed a "high or low" or your spell backfires. This also wastes mana.
-                {{/rollTotal() roll 1}}
+                Your attack auto fails. Succeed a "high or low" or drop your weapon or fall prone.<br>Subtract {{cost}} E.
+                {{/rollWasFumble() roll}}
 
                 {{#rollBetween() roll 2 19}}
+
                 {{#rollLess() total diff}}
-                {{total}} <strong style="color: red;">Fails...</strong>. maneuver wasted. do NOT subtract mana.
+                {{total}} <strong style="color: red;">Fails...</strong>. Action wasted. Do NOT subtract E.
                 {{/rollLess() total diff}}
-                {{#rollGreater() total diff}}
-                {{total}} <strong style="color: green;">Success</strong>, apply effect! Roll Dmg if necessary. Subtract {{cost}} mana.
+
+                {{#^rollLess() total diff}}
+                {{total}} <strong style="color: green;">Success</strong>.
+                {{#^rollTotal() dmg 0}}
+                <br>
+                Dmg: {{dmg}}
+                {{/^rollTotal() dmg 0}}
+                {{#^rollTotal() adc 0}}
+                <br>
+                Ability: Subtract <strong >{{cost}}</strong> E.
                 <div class="sheet-rolltemplate-spacer"></div>
-                {{effect}}
-                {{/rollGreater() total diff}}
-                {{#rollTotal() total diff}}
-                {{total}} <strong style="color: green;">Success</strong>, apply effect! Roll Dmg if necessary. Subtract {{cost}} mana.
-                <div class="sheet-rolltemplate-spacer"></div>
-                {{effect}}
-                {{/rollTotal() total diff}}
+                {{ability}}
+                {{/^rollTotal() adc 0}}
+                {{/^rollLess() total diff}}
+
                 {{/rollBetween() roll 2 19}}
             </td>
         </tr>

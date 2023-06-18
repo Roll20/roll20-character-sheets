@@ -5,6 +5,16 @@
 
 
 ## Changelog
+### v1.5.5 (03/20/2023)
+* Preview ranged attack roll final die
+  
+### v1.5.4 (03/04/2023)
+* Support for Patron
+* Support for Demonmark
+* Support for magical sign
+* Grimorum Cantiones update
+* Pact special abilities
+
 ### v1.5.0 (11/14/2022)
 * LE, KE, AE section has been reworked and simplified (pain levels visible via hover on max LE or in the headerbar on LE)
 * Advanced roll dialog (3d20) has now a dropdown for default difficulties

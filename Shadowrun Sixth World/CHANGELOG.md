@@ -1,5 +1,32 @@
 Change Log
 ==============================================
+**2023-06-15 ** v.83 Chuz (James Culp)
+	New Feature - Beginning work on the GM Helper sheet, step 1 add an OS Tracker.  I'm open to suggestions for other helpful GM tools to include in this sheet in the usual venues (Discord, Patreon, Roll20 DMs)
+	New Feature - GMs rejoice, select a token on the board and click the "Track Selected" button on the GM Helper character sheet to add the selected character's name and A/S/D/F to the tracker.
+**2023-05-30 ** v.82 Chuz (James Culp)
+	Update - Added Hack & Slash Matrix Actions to the Rolls Pane -> Matrix Roll Buttons
+	New Feature - Added Matrix Roll Buttons Legality Filter, this allows you to hide illegal actions.  For pcs without a matrix persona or that are worried about OS
+	New Feature - Added Matrix Roll Buttons Access Level Filter, this allows you to hide actions that are not usable at a particular Matrix Access Level (outsider/user/admin)
+**2023-05-22 ** v.81 Chuz (James Culp)
+	Bugfix - More weapon dicepool tweaks
+	New Feature - NPC->Spirits made spirits awakened and now display the spells section for them.  Dicepool does not auto-update when spirit force changes, that is an exercise for the user.
+	New Feature - Added Critter Powers drag and drop from the compendium for spirits and grunts.
+**2023-05-18 ** v.80 Chuz (James Culp)
+	Bugfix - PC Qualities were always showing up as Negative regardless of the actual type.
+	Bugfix - PC->Spells Ranges of Touch were showing up as LOS.
+	Bugfix - PC/NPC Defense rolls throwing an error for the armor_rating, updated PC sheets to use defense_rating so they match NPC sheets.
+**2023-05-01 ** v.79 Chuz (James Culp)
+	New Feature - Added Resonance and Level to the sprite skill rolls attribute options
+	New Feature - Added Magic and Force to the spirit skill rolls attribute options
+	New Feature - Added Magic AR to combat spell roll templates
+	New Feature - PC Added DR to Defense rolls template
+	New Feature - NPC Added Universal Dicepool Adjustment (@{uda}) for GMs that with to add a dicepool penalty/bonus to all rolls the NPC makes.
+	Bugfix - Fix to Grunts dicepool bug.
+**2023-03-20 ** v.77 Chuz (James Culp)
+	Bugfix - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
+	Bugfix - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
+**2023-03-13 ** v.76 Chuz (James Culp)
+	Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
 **2023-03-06 ** v.75 Chuz (James Culp)
 	New Feature - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
 	New Feature - Added Heat, Reputation and AsRep to the Social Pane
