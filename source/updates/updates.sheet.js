@@ -84,7 +84,7 @@ k.registerFuncs({ onAlertRemoved });
 
 
 const updateSpellArts = wrapUpdateFunction(
-    function updateSpellArts() {
+    function updateSpellArts({ attributes, sections }) {
         // Only update if the update was not previously applied
         // In the old sheet system, we had an explicit attribute to hide/display
         // each alert, and updating spells was conditionned on this alert being shown
@@ -179,16 +179,15 @@ const renameWeaponAttributes = wrapUpdateFunction(
     }
 );
 
-const updateToKScaffold = wrapUpdateFunction(
-    function updateToKScaffold({ trigger, attributes, sections, casc }) {
-        // This attribute is only defined on old sheets
-        if (typeof attributes["notNew"] !== "undefined") {
-            updateSpellArts({ trigger, attributes, sections, casc });
-            renameWeaponAttributes({ trigger, attributes, sections, casc });
-        }
+// NOTE: not wrapped by wrapUpdateFunction because sub-functions already are
+const updateToKScaffold = function updateToKScaffold({ trigger, attributes, sections, casc }) {
+    // This attribute is only defined on old sheets
+    if (typeof attributes["notNew"] !== "undefined") {
+        updateSpellArts({ trigger, attributes, sections, casc });
+        renameWeaponAttributes({ trigger, attributes, sections, casc });
     }
-);
-k.registerFuncs({updateToKScaffold}, {type: ["new"]});
+};
+k.registerFuncs({ updateToKScaffold }, { type: ["new"] });
 
 // const displayKScaffoldArgs = function ({ trigger, attributes, sections, casc }) {
 //     console.log("Displaying kScaffold arguments");

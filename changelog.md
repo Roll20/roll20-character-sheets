@@ -1,5 +1,7 @@
 ## Changelog
 
++ **June 2023 - v2.0 - kScaffold update**
+    - Switched to PUG, SCSS and k-Scaffold framework to build the sheet
 + **February 2022 - v1.7.1 - Fix**
     - Fixed accelerated abilities
 + **January 2022 - v1.7 - Magic & Armory update**

@@ -1,5 +1,5 @@
 
-const tabs = ["character","abilities","magic","combat","spells","sheet"].forEach(function (button) {
+const tabs = ["character","abilities","magic","combat","spells"].forEach(function (button) {
     on("clicked:" + button, function() {
         setAttrs({
             "sheetTab": button
