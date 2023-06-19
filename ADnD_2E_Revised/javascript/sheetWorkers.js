@@ -1477,7 +1477,7 @@ on('clicked:rt', function (eventInfo){
     getAttrs([''], async function (values) {
         console.log(eventInfo);
         let rollBuilder = new RollTemplateBuilder('2Echeck');
-        rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]');
+        rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]%');
 
         let skill = await extractQueryResult(`?{Find or Removing Trap?|Find Traps|Remove Traps|Remove Invisible/Magical Traps}`);
         if (skill === 'Find Traps') {
@@ -1496,7 +1496,7 @@ on('clicked:ms clicked:hs', function (eventInfo){
     getAttrs(['rogue-ranger'], async function (values) {
         let skill = eventInfo.triggerName.replace('clicked:', '');
         let rollBuilder = new RollTemplateBuilder('2Echeck');
-        rollBuilder.push('character=@{character_name}','checkroll=[[1d100cs<1cf>[[@{rogue-ranger}+1]] ]]');
+        rollBuilder.push('character=@{character_name}','checkroll=[[1d100cs<1cf>[[@{rogue-ranger}+1]] ]]%');
 
         if (skill ==='ms') {
             rollBuilder.push('success=You are silent. Movement rate reduced to 1/3 of normal. Opponents get -2 to surprise roll from silence and another -2 if you are unseen.', 'fail=You are not silent. Movement rate reduced to 1/3 of normal.');
