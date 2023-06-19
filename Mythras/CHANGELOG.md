@@ -4,6 +4,11 @@ All notable changes to the Mythras sheet will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## 3.2
+### Fixed
+- Issue causing default setting of Mythic Britain to actually be Mythic Babylon and visa-versa.
+- Fixed issue with default "whisper rolls to GM" being set incorrectly.
+
 ## 3.1
 ### Added
 - Added a button in the help section that will re-attempt the upgrade to v3 if someone ran into issues the first time around.

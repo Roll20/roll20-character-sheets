@@ -370,7 +370,7 @@ const repeatingCalculateRemainingRecursive = function (tail, accumulator, result
 //#endregion
 
 //#region Generic Setup functions
-const setupStaticCalculateTotal = function(totalField, fieldsToSum, maxValue) {
+const setupStaticCalculateTotal = function(totalField, fieldsToSum) {
     let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
     on(onChange, function () {
         getAttrs(fieldsToSum, function (values) {
@@ -379,9 +379,6 @@ const setupStaticCalculateTotal = function(totalField, fieldsToSum, maxValue) {
                 total += parseInt(values[field]) || 0;
             });
 
-            if (!isNaN(maxValue))
-                total = Math.min(total, maxValue);
-
             setAttrs({
                 [totalField]: total
             });
@@ -389,16 +386,14 @@ const setupStaticCalculateTotal = function(totalField, fieldsToSum, maxValue) {
     });
 }
 
-function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName, maxValue) {
+function setupRepeatingRowCalculateTotal(repeatingName, repeatingFieldsToSum, repeatingTotalField) {
     let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
-    let allFields = [...repeatingFieldsToSum];
-    allFields.push(repeatingTotalField);
     on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
         if (eventInfo.removedInfo)
             return;
 
         TAS.repeating(repeatingName)
-            .fields(allFields)
+            .fields([...repeatingFieldsToSum, repeatingTotalField])
             .tap(function(rowSet) {
                 let rowId = parseSourceAttribute(eventInfo).rowId;
                 let row = rowSet[rowId];
@@ -406,9 +401,6 @@ function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToS
                 repeatingFieldsToSum.forEach(column => {
                     total += row.I[column];
                 });
-
-                if (!isNaN(maxValue))
-                    total = Math.min(total, maxValue);
 
                 row[repeatingTotalField] = total;
             })
@@ -527,36 +519,36 @@ on('change:dexterity change:aim change:balance', function() {
             return;
         }
 
-        let aim = getLookupValue(aimRaw, '');
-        let balance = getLookupValue(balanceRaw, '');
+        let aim = getLookupValue(aimRaw, dexterity);
+        let balance = getLookupValue(balanceRaw, dexterity);
 
         let dexnotes;
         let dex2notes;
         let standardRules = false;
         if (aimRaw === '' && balanceRaw === '') {
-            dexnotes = '';
+            dexnotes = dexterityTable['dexnotes'][dexterity];
             dex2notes = '';
             standardRules = true;
         } else {
-            dexnotes = aim === 0 ? 'INVALID AIM' : '';
-            dex2notes = balance === 0 ? 'INVALID BALANCE' : '';
+            dexnotes = aim === 0 ? 'INVALID AIM' : dexterityTable['dexnotes'][aim];
+            dex2notes = balance === 0 ? 'INVALID BALANCE' : dexterityTable['dexnotes'][balance];
         }
 
         assignAttributes(dexterity, aim, balance, dexnotes, dex2notes, standardRules);
 
         function assignAttributes(dexterity, aim, balance, dexnotes, dex2notes, standardRules) {
             setAttrs({
-                ppd: dexterityTable['aim-pickpocket'][aim] || dexterityTable['dex-pickpocket'][dexterity],
-                old: dexterityTable['aim-openlocks'][aim] || dexterityTable['dex-openlocks'][dexterity],
-                rtd: dexterityTable['dex-findtraps'][dexterity],
-                msd: dexterityTable['balance-movesilently'][balance] || dexterityTable['dex-movesilently'][dexterity],
-                hsd: dexterityTable['dex-hideinshadows'][dexterity],
-                cwd: standardRules ? '0' : dexterityTable['balance-climbwalls'][balance] || dexterityTable['dex-climbwalls'][dexterity],
-                tud: standardRules ? '0' : dexterityTable['dex-tunneling'][dexterity],
-                ebd: standardRules ? '0' : dexterityTable['dex-escapebonds'][dexterity],
-                dexreact: dexterityTable['dexreact'][getLookupValue(balance, dexterity)],
-                dexmissile: dexterityTable['dexmissile'][getLookupValue(aim, dexterity)],
-                dexdefense: dexterityTable['dexdefense'][getLookupValue(balance, dexterity)],
+                ppd: dexterityTable['pickpocket'][aim],
+                old: dexterityTable['openlocks'][aim],
+                rtd: dexterityTable['findtraps'][aim],
+                msd: dexterityTable['movesilently'][balance],
+                hsd: dexterityTable['hideinshadows'][balance],
+                cwd: standardRules ? '0' : dexterityTable['climbwalls'][balance],
+                tud: dexterityTable['tunneling'][dexterity],
+                ebd: dexterityTable['escapebonds'][dexterity],
+                dexreact: dexterityTable['dexreact'][balance],
+                dexmissile: dexterityTable['dexmissile'][aim],
+                dexdefense: dexterityTable['dexdefense'][balance],
                 dexnotes: dexnotes,
                 dex2notes: dex2notes,
             });
@@ -862,7 +854,7 @@ on('clicked:opendoor-check', function (eventInfo){
 //#endregion
 
 const CALCULATION_FIELDS = [
-    { formulaField: 'rogue-level-base'},
+    { formulaField: 'rogue-level-base',      calculatedField: 'rogue-level-total'},
     { formulaField: 'level-wizard'},
     { formulaField: 'level-priest'},
     { formulaField: 'thac0-base',            calculatedField: 'thac0-base-calc' },
@@ -943,7 +935,7 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
 
             console.log(`Summing started by section ${repeatingName}. Fieldname ${fieldName}`);
             console.time('Summing time');
-            let levelsCopy = [...sections];
+            let levelsCopy = structuredClone(sections);
             let accumulator = 0;
 
             recursiveSpellSum(levelsCopy, accumulator, oldField, newField, resultFieldName);
@@ -1240,13 +1232,13 @@ const WIZARD_SPELL_LEVELS_SECTIONS = [
     {level: '2', sections: ['4', '5', '6', 'wiz2']},
     {level: '3', sections: ['7', '8', '9', 'wiz3']},
     {level: '4', sections: ['10', '11', '12', 'wiz4']},
-    {level: '5', sections: ['70', '71', '72', 'wiz5']}, //... legacy naming convention
+    {level: '5', sections: ['70', '71', '72', 'wiz5']}, // legacy naming convention
     {level: '6', sections: ['13', '14', '15', 'wiz6']},
     {level: '7', sections: ['16', '17', '18', 'wiz7']},
     {level: '8', sections: ['19', '20', '21', 'wiz8']},
     {level: '9', sections: ['22', '23', '24', 'wiz9']},
     {level: '10', sections: ['25', '26', '27', 'wiz10']},
-    {level: '11', sections: ['52', '53', '54', 'wiz11']}, //... legacy naming convention
+    {level: '11', sections: ['52', '53', '54', 'wiz11']}, // legacy naming convention
     {level: '12', sections: ['55', '56', '57', 'wiz12']},
     {level: '13', sections: ['58', '59', '60', 'wiz13']},
     {level: '14', sections: ['61', '62', '63', 'wiz14']},
@@ -1433,54 +1425,119 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 
 //#region Rogue skills
 // --- Start setup Rogue skills total --- //
-let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
-let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
-rogueStandardSkills.forEach(skill => {
-    setupStaticCalculateTotal(`${skill}t-hidden`, rogueStandardColumns.map(column => `${skill}${column}`));
-    setupStaticCalculateTotal(`${skill}t`, [`${skill}t-hidden`], 95);
-    setupStaticCalculateTotal(`${skill}noarmort`, [`${skill}t-hidden`, `${skill}noarmorb`], 95);
-    setupStaticCalculateTotal(`${skill}armort`, [`${skill}t-hidden`, `${skill}armorp`], 95);
+const ROGUE_STANDARD_SKILLS = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
+const ROGUE_EXTRA_SKILLS = ['dm', 'di', 'br', 'tu', 'eb', 'fd', 'ap'];
+const ROGUE_SKILL_COLUMNS = ['b', 'r', 'd', 'k', 'a', 'm', 'l'];
+ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).forEach(skill => {
+    setupStaticCalculateTotal(`${skill}t`, ROGUE_SKILL_COLUMNS.map(column => `${skill}${column}`));
 });
-
-// Setup custom rogue skills total
-setupRepeatingRowCalculateTotal('crt-hidden', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
-setupRepeatingRowCalculateTotal('crt', ['crt-hidden'], 'customrogue', 95);
-setupRepeatingRowCalculateTotal('crnoarmort', ['crt-hidden', 'crnoarmorb'], 'customrogue', 95);
-setupRepeatingRowCalculateTotal('crarmort', ['crt-hidden', 'crarmorp'], 'customrogue', 95);
+setupRepeatingRowCalculateTotal('customrogue', ROGUE_SKILL_COLUMNS.map(column => `cr${column}`), 'crt');
 // --- End setup Rogue skills total --- //
+
+//Rogue sum skill points
+let rogueLevelAttributes = ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).map(skill => skill+'l');
+on(`${rogueLevelAttributes.map(s => 'change:'+s).join(' ')} change:rogue-level-total change:repeating_customrogue:crl remove:repeating_customrogue`, function(){
+    TAS.repeating('customrogue')
+        .attrs([...rogueLevelAttributes, 'all-thief-points-remain', 'rogue-level-total'])
+        .fields('crl')
+        .reduce(function (memo, row, attrSet, id, rowSet) {
+            memo += row.I['crl'];
+            return memo;
+        }, 0, function(memo, rowSet, attrSet) {
+            rogueLevelAttributes.forEach(attr => {
+                memo += attrSet.I[attr];
+            })
+            attrSet.I['all-thief-points-remain'] = attrSet.I['rogue-level-total'] - memo;
+        })
+        .execute();
+});
 
 //Rogue armor modifier auto fill
 on('change:armorname', function(eventInfo) {
-    let armor = rogueArmor[eventInfo.newValue];
+    let armor = ROGUE_ARMOR[eventInfo.newValue];
     if (armor === undefined)
         return;
 
     let armorModifiers = {
-        'pparmorp': armor['Pick Pockets'],
-        'olarmorp': armor['Open Locks'] || '-0',
-        'rtarmorp': armor['Find/Remove Traps'] || '-0',
-        'msarmorp': armor['Move Silently'] || '-0',
-        'hsarmorp': armor['Hide in Shadows'] || '-0',
-        'dnarmorp': armor['Detect Noise'],
-        'cwarmorp': armor['Climb Walls'],
+        'ppa': armor['Pick Pockets'] || '0',
+        'ola': armor['Open Locks'] || '0',
+        'rta': armor['Find/Remove Traps'] || '0',
+        'msa': armor['Move Silently'] || '0',
+        'hsa': armor['Hide in Shadows'] || '0',
+        'dna': armor['Detect Noise'] || '0',
+        'cwa': armor['Climb Walls'] || '0',
+        'bra': armor['Bribe'] || '0',
+        'tua': armor['Tunneling'] || '0',
+        'eba': armor['Escape bonds'] || '0',
     };
     setAttrs(armorModifiers);
 });
-//Rogue Custom Skills level sum
-on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
-    TAS.repeating('customrogue')
-        .attrs('newskill')
-        .fields('crl')
-        .reduce(function(m,r){
-            m.crl+=(r.I.crl);
-            return m;
-        },{crl:0},function(m,r,a){
-            a.newskill=m.crl;
-        })
-        .execute();
+on('clicked:rt', function (eventInfo){
+    getAttrs([''], async function (values) {
+        console.log(eventInfo);
+        let rollBuilder = new RollTemplateBuilder('2Echeck');
+        rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]');
+
+        let skill = await extractQueryResult(`?{Find or Removing Trap?|Find Traps|Remove Traps|Remove Invisible/Magical Traps}`);
+        if (skill === 'Find Traps') {
+            rollBuilder.push('checkvs=Find Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you find the trap and knows its general principle but not exact nature.', 'fail=After [[1d10]] round(s) you find nothing.\nYou can try again at next level.');
+        } else if (skill === 'Remove Traps') {
+            rollBuilder.push('checkvs=Remove Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+        } else if (skill === 'Remove Invisible/Magical Traps') {
+            rollBuilder.push('checkvs=Remove Invisible/Magical Traps\n(in @{armorname})', 'checktarget=[[{floor((@{rtt}+(@{misc-mod}))/2),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+        }
+
+        return printRoll(`/w gm ${rollBuilder.string()}`);
+    });
 });
-// --- End setup Rogue skills total --- //
+
+on('clicked:ms clicked:hs', function (eventInfo){
+    getAttrs(['rogue-ranger'], async function (values) {
+        let skill = eventInfo.triggerName.replace('clicked:', '');
+        let rollBuilder = new RollTemplateBuilder('2Echeck');
+        rollBuilder.push('character=@{character_name}','checkroll=[[1d100cs<1cf>[[@{rogue-ranger}+1]] ]]');
+
+        if (skill ==='ms') {
+            rollBuilder.push('success=You are silent. Movement rate reduced to 1/3 of normal. Opponents get -2 to surprise roll from silence and another -2 if you are unseen.', 'fail=You are not silent. Movement rate reduced to 1/3 of normal.');
+        } else if (skill === 'hs') {
+            rollBuilder.push('success=You are hidden while remaining virtually motionless. (Small careful movements: drawing a weapon, uncork a potion, etc. is allowed). You cannot be detected by Infravision. Magic that reveal invisible objects can reveal you.', 'fail=You are not hidden.');
+        }
+
+        // The player is a rogue, so no check for surroundings
+        if (values['rogue-ranger'] === "95") {
+            let skillName = skill === 'ms' ? 'checkvs=Move Silently\n(in @{armorname})' : 'checkvs=Hide in Shadows\n(in @{armorname})';
+            rollBuilder.push(skillName, `checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
+            return printRoll(`/w gm ${rollBuilder.string()}`);
+        }
+
+        let surroundings = await extractQueryResult(`?{What are your surroundings?|Natural (woodland / forrest / plains),Natural|Non-natural (crypt / city street / indoor / underground),Non-natural}`);
+        let displaySurrounding = `*${surroundings} surroundings*`;
+        let skillName = skill === 'ms' ? `checkvs=Move Silently\n${displaySurrounding}\n(in @{armorname})` : `checkvs=Hide in Shadows\n${displaySurrounding}\n(in @{armorname})`;
+        if (surroundings === 'Natural') {
+            rollBuilder.push(skillName, `checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
+        } else {
+            rollBuilder.push(skillName, `checktarget=[[{floor((@{${skill}t}+(@{misc-mod}))/2),@{rogue-ranger}}kl1]]%`);
+        }
+
+        return printRoll(`/w gm ${rollBuilder.string()}`);
+    });
+});
+
+on('clicked:repeating_customrogue:cr-dm', function (eventInfo) {
+    let parse = parseSourceAttribute(eventInfo);
+    let row = `repeating_customrogue_${parse.rowId}`;
+    getAttrs(['character_name'], async function (values) {
+        let rollBuilder = new RollTemplateBuilder('2Edefault');
+        rollBuilder.push('subtitle=for @{character_name}', 'color=dark-purple');
+        rollBuilder.push(`name=@{${values.character_name}|${row}_customskill}\n(in @{armorname})`);
+        rollBuilder.push(`[Secret by DM](~${values.character_name}|${row}_cr)=`);
+        rollBuilder.push(`desc=You try to use @{${values.character_name}|${row}_customskill}...`);
+        console.log(rollBuilder.string());
+
+        return printRoll(`/w gm ${rollBuilder.string()}`);
+    });
+});
 //#endregion
 
 //#region Weapons tab logic and autofil
@@ -1539,10 +1596,8 @@ async function selectVersion(foundObjects, values, comparer, objectName) {
 
 function combineBooks(activeObjects, comparer, isPlayersOptions) {
     // Copying fields from active object to avoid side effects being saved permanently
-    let copyActiveObjects = activeObjects.map(e => {
-        return {...e}
-    });
-    let copyArray = [...copyActiveObjects];
+    let copyActiveObjects = structuredClone(activeObjects);
+    let copyArray = [...copyActiveObjects]; // intentionally use shallow copy to keep references the same
 
     copyActiveObjects.forEach(activeObject => {
         copyArray.forEach((copyObject, i) => {
@@ -2433,7 +2488,7 @@ NONWEAPON_PROFICIENCY_SECTIONS.forEach(({section, nameField, slotsField, ability
             return;
         }
 
-        let sectionsCopy = [...NONWEAPON_PROFICIENCY_SECTIONS];
+        let sectionsCopy = structuredClone(NONWEAPON_PROFICIENCY_SECTIONS);
         getAttrs(['prof-slots-total-calc'], function (values) {
             let accumulator = values['prof-slots-total-calc'];
             repeatingCalculateRemainingRecursive(sectionsCopy, accumulator, 'prof-slots-remain');

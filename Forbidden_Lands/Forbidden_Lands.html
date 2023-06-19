@@ -1,9 +1,17 @@
-<!--5/31/20 set sheet version manually with currentVersion in sheetworkers-->
+<!--set sheet version manually using currentVersion in sheetworkers-->
 <input type="hidden" name="attr_version" value="0" />
 <!-- ADDED recalc checkbox to force sheet worker events. temporarily reveal for testing purposes-->
-<input class="hidden" name="attr_recalc1" type="checkbox" />
+<input class="hidden" name="attr_recalc1" type="checkbox" value="1"/>
 <!--the_dice_local_macro: value used for local rolls (roll_the_dice_local). Set by sheetworker-->
-<input type="text" name="attr_the_dice_local_macro" value="" class="hidden" />
+<input type="checkbox" class="hidden" name="attr_the_dice_local_macro" value="1" />
+<input type="checkbox" class="hidden display-mount" name="attr_display_mount_flag" value="1" checked />
+<input type="checkbox" class="hidden display-beasts" name="attr_display_beasts_flag" value="1" checked />
+<input type="checkbox" class="hidden display-spells" name="attr_display_spells_flag" value="1"checked />
+<!--background -->
+<input type="checkbox" class="hidden background-selected" name="attr_background" value="1" checked />
+<input type="checkbox" class="hidden background-selected" name="attr_background" value="2" />
+<input type="checkbox" class="hidden background-selected" name="attr_background" value="3" />
+<input type="checkbox" class="hidden background-selected" name="attr_background" value="4" />
 
 <!--tabs-->
 <input class="tab character" name="attr_tab" data-i18n-title="character" title="Character" type="radio" value="1" checked />
@@ -21,8 +29,24 @@
   <span class="announcements-show toggle-monster-only" name="attr_version">&nbsp;</span>
   <div class="announcements toggle-monster-only">
     <h3 data-i18n="latest-announcements">Latest Announcements</h3>
-    <span class="footer">6/6/23</span>
+    <span class="footer">6/18/23</span>
     <ol style="margin: 0 2em 0 2em; padding: 0 1em 0 3em;">
+      <span>v1.854</span>
+        <li>Added an option to Show/Hide Mount, Beasts, and Spells to the sheet settings.</li>
+        <li>Added rolls to Talents.</li>
+        <li>Fixed a bug where spell subtitle2 text could be included with subsequent rolls from the dice pool unless the pool was manually cleared.</li>
+        <li>Reputation total(age+mod) is now seen on the sheet button.</li>
+        <li>Updated the Artifact dice images in the dice pool.</li>
+        <li>Artifact dice rolled will now show the actual # rolled, supperimposed over the # of successes. Prior to this change, Artifact dice results would show the # rolled up to the first success(ie 6+), then only show the #of success. This could be a confusing.</li>
+      <span>v1.853</span>
+      <li>Added a couple Sheet Background options in settings. note: Darkmode overrides this option.</li>
+      <span>v1.852</span>
+      <li>Updated the Spell section to include rolls for 'Safe' Casting ie <code>WP-(Talent Rank-(Spell Rank-1 if using Grimoire/Scroll))</code> or 'Over'charged Casting ie <code>WP only</code>. Toggling the 'Grim'oire option will adjust the dice pool accordingly. Toggling 'Ingr'edients will adjust the Base Power Level accordingly as seen in the chat output. The sheet will also adjust the dice pool for Chance Casting ie <code>Spell Rank > Talent Rank</code> Note: to remove only a portion of the mishap dice, use the 'Over'charged button to pre-load the dice pool, then remove any unwanted dice before making the roll.</li>
+      <li>Changed Consumable rolls to match the appropriate polyhedral image.</li>
+      <li>Only show the Consumable reminder "footnote" when a Bane (1 or 2) has been rolled.</li>
+      <li>Consumables have now been given it's own sub-section.</li>
+      <li>Fixed hidden checkbox for the expand/collapse buttons.</li>
+      <li>Minor darkmode adjustments.</li>
       <span>v1.851</span>
       <li>Swap imgur images for polyhedral dice to github.</li>
       <li>Further adjustments to try and get the Swedish logo to display properly. It appears this is still a roll20 bug.</li>
@@ -458,7 +482,7 @@
     <div class="box toggle-monster-only character-details">
       <div class="details-grid">
         <div class="details-box1">
-          <button class="roll-button-textonly font-color-initial" type="roll" name="roll_pride" title="%{roll_pride}" data-i18n="pride" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{pride-roll}}} {{subtitle=@{pride}}} {{artifact-die-twelve=[[1]] }} {{artifact-roll-twelve=[[1d12]] }} {{pride-flag=1}}">
+          <button class="roll-button-textonly font-color-initial" type="roll" name="roll_pride" title="%{roll_pride}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{pride-roll}}} {{subtitle=@{pride}}} {{artifact-die-twelve=[[1]] }} {{artifact-roll-twelve=[[1d12]] }} {{pride-flag=1}}">
             <span data-i18n="pride">Pride</span>
           </button>
         </div>
@@ -471,25 +495,31 @@
         <div class="details-box4">
           <textarea class="input-textarea" name="attr_dark_secret" title="@{dark_secret}"></textarea>
         </div>
-        <div class="details-box5">
-          <span class="label" data-i18n="age">Age</span>
-        </div>
-        <div class="details-box6">
-          <select name="attr_age" class="input" title="@{age}">
-            <option value="young" data-i18n="young-1" selected>Young</option>
-            <option value="adult" data-i18n="adult-2">Adult+1</option>
-            <option value="old" data-i18n="old-3">Old+2</option>
-          </select>
-        </div>
-        <div class="details-box7">
-          <button type="action" name="act_reputation-roll" class="roll-button-textonly font-color-initial" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice." data-i18n="reputation">
-            <span data-i18n="reputation">Reputation</span>
-          </button>
-          <button class="rollme-relative" type="roll" name="roll_the_dice_local" data-i18n-title="roll-dice" title="Roll the Dice!" value="@{the_dice_local_macro}">&nbsp;<span data-i18n="roll">Roll</span>&nbsp;</button>
-        </div>
-        <div class="details-box8">
-          <input type="text" class="input-number" name="attr_reputation" data-i18n-title="reputation-bonus" title="How well known are you? (note: dice pool caps at 34) @{reputation}"/>
-          <input type="hidden" name="attr_reputation_total" value="" />
+        <div class="span-all">
+          <div class="details-box5">
+            <span class="label" data-i18n="age">Age</span>
+          </div>
+          <div class="details-box6">
+            <select name="attr_age" class="input" title="@{age}">
+              <option value="young" data-i18n="young-1" selected>Young</option>
+              <option value="adult" data-i18n="adult-2">Adult+1</option>
+              <option value="old" data-i18n="old-3">Old+2</option>
+            </select>
+          </div>
+          <span>+</span>
+          <div class="details-box7">
+            <input type="text" class="input-number" name="attr_reputation" value="0" data-i18n-title="reputation-bonus" title="How well known are you? (note: dice pool caps at 34) @{reputation}" />
+            <input type="hidden" name="attr_reputation_total" value="" />
+          </div>
+          <span>=</span>
+          <span name="attr_reputation_total" class="hidden" value="0"></span>
+          <div class="details-box8">
+            <button type="action" name="act_reputation-roll" class="roll-button-textonly font-color-initial" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+              <span class="readonly" name="attr_reputation_total" style="margin-top:-.35em;"></span>
+              <span data-i18n="reputation">Reputation</span>
+            </button>
+            <button class="rollme-relative" type="roll" name="roll_the_dice_local" data-i18n-title="roll-dice" title="Roll the Dice!" value="@{the_dice_local_macro}">&nbsp;<span data-i18n="roll">Roll</span>&nbsp;</button>
+          </div>
         </div>
       </div>
     </div>
@@ -592,10 +622,10 @@
           <h1 data-i18n="weapon-u" style="margin-top: -21px;">WEAPONS</h1>
         </div>
         <div class="weapons-box1 column-header">
-          <span data-i18n="attack-abbrv">Attk</span>
+          <span class="rotate-45" data-i18n="attack-abbr">Attk</span>
         </div>
         <div class="weapons-box2 column-header">
-          <span data-i18n="parry">Parry</span>
+          <span class="rotate-45" data-i18n="parry">Parry</span>
         </div>
         <div class="weapons-box3 column-header">
           <span data-i18n="name">Name</span>
@@ -2085,17 +2115,17 @@
             </div>
             <div class="dice-artifact-rolls">
               <input type="checkbox" name="attr_artifact_die_ocho" value="1" class="dice-selection mighty" data-i18n-title="mighty" title="Mighty" />
-              <span></span>
-              <span class="artifact-die font-color-initial" data-i18n="die-8">d8</span>
-              <input type="checkbox" name="attr_artifact_die_eight" value="1" class="dice-selection mighty" data-i18n-title="mighty" title="Mighty" />
-              <span></span>
-              <span class="artifact-die font-color-initial" data-i18n="die-8">d8</span>
+              <span class="mighty"></span>
+              <span class="artifact-die mighty font-color-initial" data-i18n-title="die-8"></span>
+              <input type="checkbox" name="attr_artifact_die_eight" value="1" class="dice-selection mighty2" data-i18n-title="mighty" title="Mighty" />
+              <span class="mighty2"></span>
+              <span class="artifact-die mighty2 font-color-initial" data-i18n-title="die-8"></span>
               <input type="checkbox" name="attr_artifact_die_ten" value="1" class="dice-selection epic" data-i18n-title="epic" title="Epic" />
-              <span></span>
-              <span class="artifact-die font-color-initial" data-i18n="die-10">d10</span>
+              <span class="epic"></span>
+              <span class="artifact-die epic font-color-initial" data-i18n-title="die-10"></span>
               <input type="checkbox" name="attr_artifact_die_twelve" value="1" class="dice-selection legendary" data-i18n-title="legendary" title="Legendary" />
-              <span></span>
-              <span class="artifact-die font-color-initial" data-i18n="die-12">d12</span>
+              <span class="legendary" style="margin-left: -0.75em;"></span>
+              <span class="artifact-die legendary" data-i18n-title="die-12"></span>
             </div>
           </div>
           <div class="dice-rolls">
@@ -2103,7 +2133,7 @@
             <div class="template-roll dice-rolls-roll">
               <input class="hidden roll-indicator" type="checkbox" name="attr_roll_the_dice_flag" value="1" readonly />
               <span class="box-indicator">
-                <button class="dice-pool" type="roll" name="roll_the_dice" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{dice-pool}}} {{subtitle=@{current_preset}}} {{free-text}} {{footer}} {{attribute-die-one=[[ @{attribute_die_one}]] }} {{attribute-roll-one=[[1d6]] }} {{attribute-die-two=[[ @{attribute_die_two}]] }} {{attribute-roll-two=[[1d6]] }} {{attribute-die-three=[[ @{attribute_die_three}]] }} {{attribute-roll-three=[[1d6]] }} {{attribute-die-four=[[ @{attribute_die_four}]] }} {{attribute-roll-four=[[1d6]] }} {{attribute-die-five=[[ @{attribute_die_five}]] }} {{attribute-roll-five=[[1d6]] }} {{attribute-die-six=[[ @{attribute_die_six}]] }} {{attribute-roll-six=[[1d6]] }} {{attribute-die-seven=[[ @{attribute_die_seven}]] }} {{attribute-roll-seven=[[1d6]] }} {{attribute-die-eight=[[ @{attribute_die_eight}]] }} {{attribute-roll-eight=[[1d6]] }} {{attribute-die-nine=[[ @{attribute_die_nine}]] }} {{attribute-roll-nine=[[1d6]] }} {{attribute-die-ten=[[ @{attribute_die_ten}]] }} {{attribute-roll-ten=[[1d6]] }} {{attribute-die-eleven=[[ @{attribute_die_eleven}]] }} {{attribute-roll-eleven=[[1d6]] }} {{attribute-die-twelve=[[ @{attribute_die_twelve}]] }} {{attribute-roll-twelve=[[1d6]] }} {{skill-die-one=[[ @{skill_die_one}]] }} {{skill-roll-one=[[1d6]] }} {{skill-die-two=[[ @{skill_die_two}]] }} {{skill-roll-two=[[1d6]] }} {{skill-die-three=[[ @{skill_die_three}]] }} {{skill-roll-three=[[1d6]] }} {{skill-die-four=[[ @{skill_die_four}]] }} {{skill-roll-four=[[1d6]] }} {{skill-die-five=[[ @{skill_die_five}]] }} {{skill-roll-five=[[1d6]] }} {{skill-die-six=[[ @{skill_die_six}]] }} {{skill-roll-six=[[1d6]] }} {{skill-die-seven=[[ @{skill_die_seven}]] }} {{skill-roll-seven=[[1d6]] }} {{skill-die-eight=[[ @{skill_die_eight}]] }} {{skill-roll-eight=[[1d6]] }} {{skill-die-nine=[[ @{skill_die_nine}]] }} {{skill-roll-nine=[[1d6]] }} {{skill-die-ten=[[ @{skill_die_ten}]] }} {{skill-roll-ten=[[1d6]] }} {{negative-die-one=[[ @{negative_die_one}]] }} {{negative-roll-one=[[1d6]] }} {{negative-die-two=[[ @{negative_die_two}]] }} {{negative-roll-two=[[1d6]] }} {{negative-die-three=[[ @{negative_die_three}]] }} {{negative-roll-three=[[1d6]] }} {{gear-die-one=[[ @{gear_die_one}]] }} {{gear-roll-one=[[1d6]] }} {{gear-die-two=[[ @{gear_die_two}]] }} {{gear-roll-two=[[1d6]] }} {{gear-die-three=[[ @{gear_die_three}]] }} {{gear-roll-three=[[1d6]] }} {{gear-die-four=[[ @{gear_die_four}]] }} {{gear-roll-four=[[1d6]] }} {{gear-die-five=[[ @{gear_die_five}]] }} {{gear-roll-five=[[1d6]] }} {{gear-die-six=[[ @{gear_die_six}]] }} {{gear-roll-six=[[1d6]] }} {{gear-die-seven=[[ @{gear_die_seven}]] }} {{gear-roll-seven=[[1d6]] }} {{gear-die-eight=[[ @{gear_die_eight}]] }} {{gear-roll-eight=[[1d6]] }} {{gear-die-nine=[[ @{gear_die_nine}]] }} {{gear-roll-nine=[[1d6]] }} {{gear-die-ten=[[ @{gear_die_ten}]] }} {{gear-roll-ten=[[1d6]] }} {{gear-die-eleven=[[ @{gear_die_eleven}]] }} {{gear-roll-eleven=[[1d6]] }} {{gear-die-twelve=[[ @{gear_die_twelve}]] }} {{gear-roll-twelve=[[1d6]] }} {{artifact-die-eight=[[ @{artifact_die_eight}]] }} {{artifact-roll-eight=[[1d8]] }} {{artifact-die-ocho=[[ @{artifact_die_ocho}]] }} {{artifact-roll-ocho=[[1d8]] }} {{artifact-die-ten=[[ @{artifact_die_ten}]] }} {{artifact-roll-ten=[[1d10]] }} {{artifact-die-twelve=[[ @{artifact_die_twelve}]] }} {{artifact-roll-twelve=[[1d12]] }} @{include_with_roll}" data-i18n-title="roll-dice" title="Roll the Dice!">&nbsp;
+                <button class="dice-pool" type="roll" name="roll_the_dice" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{dice-pool}}} {{subtitle=@{current_preset}}} {{subtitle2=@{subtitle2}}} {{free-text}} {{footer}} {{attribute-die-one=[[ @{attribute_die_one}]] }} {{attribute-roll-one=[[1d6]] }} {{attribute-die-two=[[ @{attribute_die_two}]] }} {{attribute-roll-two=[[1d6]] }} {{attribute-die-three=[[ @{attribute_die_three}]] }} {{attribute-roll-three=[[1d6]] }} {{attribute-die-four=[[ @{attribute_die_four}]] }} {{attribute-roll-four=[[1d6]] }} {{attribute-die-five=[[ @{attribute_die_five}]] }} {{attribute-roll-five=[[1d6]] }} {{attribute-die-six=[[ @{attribute_die_six}]] }} {{attribute-roll-six=[[1d6]] }} {{attribute-die-seven=[[ @{attribute_die_seven}]] }} {{attribute-roll-seven=[[1d6]] }} {{attribute-die-eight=[[ @{attribute_die_eight}]] }} {{attribute-roll-eight=[[1d6]] }} {{attribute-die-nine=[[ @{attribute_die_nine}]] }} {{attribute-roll-nine=[[1d6]] }} {{attribute-die-ten=[[ @{attribute_die_ten}]] }} {{attribute-roll-ten=[[1d6]] }} {{attribute-die-eleven=[[ @{attribute_die_eleven}]] }} {{attribute-roll-eleven=[[1d6]] }} {{attribute-die-twelve=[[ @{attribute_die_twelve}]] }} {{attribute-roll-twelve=[[1d6]] }} {{skill-die-one=[[ @{skill_die_one}]] }} {{skill-roll-one=[[1d6]] }} {{skill-die-two=[[ @{skill_die_two}]] }} {{skill-roll-two=[[1d6]] }} {{skill-die-three=[[ @{skill_die_three}]] }} {{skill-roll-three=[[1d6]] }} {{skill-die-four=[[ @{skill_die_four}]] }} {{skill-roll-four=[[1d6]] }} {{skill-die-five=[[ @{skill_die_five}]] }} {{skill-roll-five=[[1d6]] }} {{skill-die-six=[[ @{skill_die_six}]] }} {{skill-roll-six=[[1d6]] }} {{skill-die-seven=[[ @{skill_die_seven}]] }} {{skill-roll-seven=[[1d6]] }} {{skill-die-eight=[[ @{skill_die_eight}]] }} {{skill-roll-eight=[[1d6]] }} {{skill-die-nine=[[ @{skill_die_nine}]] }} {{skill-roll-nine=[[1d6]] }} {{skill-die-ten=[[ @{skill_die_ten}]] }} {{skill-roll-ten=[[1d6]] }} {{negative-die-one=[[ @{negative_die_one}]] }} {{negative-roll-one=[[1d6]] }} {{negative-die-two=[[ @{negative_die_two}]] }} {{negative-roll-two=[[1d6]] }} {{negative-die-three=[[ @{negative_die_three}]] }} {{negative-roll-three=[[1d6]] }} {{gear-die-one=[[ @{gear_die_one}]] }} {{gear-roll-one=[[1d6]] }} {{gear-die-two=[[ @{gear_die_two}]] }} {{gear-roll-two=[[1d6]] }} {{gear-die-three=[[ @{gear_die_three}]] }} {{gear-roll-three=[[1d6]] }} {{gear-die-four=[[ @{gear_die_four}]] }} {{gear-roll-four=[[1d6]] }} {{gear-die-five=[[ @{gear_die_five}]] }} {{gear-roll-five=[[1d6]] }} {{gear-die-six=[[ @{gear_die_six}]] }} {{gear-roll-six=[[1d6]] }} {{gear-die-seven=[[ @{gear_die_seven}]] }} {{gear-roll-seven=[[1d6]] }} {{gear-die-eight=[[ @{gear_die_eight}]] }} {{gear-roll-eight=[[1d6]] }} {{gear-die-nine=[[ @{gear_die_nine}]] }} {{gear-roll-nine=[[1d6]] }} {{gear-die-ten=[[ @{gear_die_ten}]] }} {{gear-roll-ten=[[1d6]] }} {{gear-die-eleven=[[ @{gear_die_eleven}]] }} {{gear-roll-eleven=[[1d6]] }} {{gear-die-twelve=[[ @{gear_die_twelve}]] }} {{gear-roll-twelve=[[1d6]] }} {{artifact-die-eight=[[ @{artifact_die_eight}]] }} {{artifact-roll-eight=[[1d8]] }} {{artifact-die-ocho=[[ @{artifact_die_ocho}]] }} {{artifact-roll-ocho=[[1d8]] }} {{artifact-die-ten=[[ @{artifact_die_ten}]] }} {{artifact-roll-ten=[[1d10]] }} {{artifact-die-twelve=[[ @{artifact_die_twelve}]] }} {{artifact-roll-twelve=[[1d12]] }} @{include_with_roll}" data-i18n-title="roll-dice" title="Roll the Dice!">&nbsp;
                   <span data-i18n="roll">Roll</span>&nbsp;
                 </button>
               </span>
@@ -2117,7 +2147,7 @@
               </span>
             </div>
             <div class="template-roll dice-rolls-push">
-              <button class="dice-pool font-color-initial" type="roll" name="roll_a_push" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{pushes-the-roll}}} {{subtitle=@{current_preset}}} {{free-text}} {{footer}} {{attribute-die-one=[[ @{attribute_die_one}]] }} {{attribute-roll-one=[[1d6]] }} {{attribute-die-two=[[ @{attribute_die_two}]] }} {{attribute-roll-two=[[1d6]] }} {{attribute-die-three=[[ @{attribute_die_three}]] }} {{attribute-roll-three=[[1d6]] }} {{attribute-die-four=[[ @{attribute_die_four}]] }} {{attribute-roll-four=[[1d6]] }} {{attribute-die-five=[[ @{attribute_die_five}]] }} {{attribute-roll-five=[[1d6]] }} {{attribute-die-six=[[ @{attribute_die_six}]] }} {{attribute-roll-six=[[1d6]] }} {{attribute-die-seven=[[ @{attribute_die_seven}]] }} {{attribute-roll-seven=[[1d6]] }} {{attribute-die-eight=[[ @{attribute_die_eight}]] }} {{attribute-roll-eight=[[1d6]] }} {{attribute-die-nine=[[ @{attribute_die_nine}]] }} {{attribute-roll-nine=[[1d6]] }} {{attribute-die-ten=[[ @{attribute_die_ten}]] }} {{attribute-roll-ten=[[1d6]] }} {{attribute-die-eleven=[[ @{attribute_die_eleven}]] }} {{attribute-roll-eleven=[[1d6]] }} {{attribute-die-twelve=[[ @{attribute_die_twelve}]] }} {{attribute-roll-twelve=[[1d6]] }} {{skill-die-one=[[ @{skill_die_one}]] }} {{skill-roll-one=[[1d6]] }} {{skill-die-two=[[ @{skill_die_two}]] }} {{skill-roll-two=[[1d6]] }} {{skill-die-three=[[ @{skill_die_three}]] }} {{skill-roll-three=[[1d6]] }} {{skill-die-four=[[ @{skill_die_four}]] }} {{skill-roll-four=[[1d6]] }} {{skill-die-five=[[ @{skill_die_five}]] }} {{skill-roll-five=[[1d6]] }} {{skill-die-six=[[ @{skill_die_six}]] }} {{skill-roll-six=[[1d6]] }} {{skill-die-seven=[[ @{skill_die_seven}]] }} {{skill-roll-seven=[[1d6]] }} {{skill-die-eight=[[ @{skill_die_eight}]] }} {{skill-roll-eight=[[1d6]] }} {{skill-die-nine=[[ @{skill_die_nine}]] }} {{skill-roll-nine=[[1d6]] }} {{skill-die-ten=[[ @{skill_die_ten}]] }} {{skill-roll-ten=[[1d6]] }} {{negative-die-one=[[ @{negative_die_one}]] }} {{negative-roll-one=[[1d6]] }} {{negative-die-two=[[ @{negative_die_two}]] }} {{negative-roll-two=[[1d6]] }} {{negative-die-three=[[ @{negative_die_three}]] }} {{negative-roll-three=[[1d6]] }} {{gear-die-one=[[ @{gear_die_one}]] }} {{gear-roll-one=[[1d6]] }} {{gear-die-two=[[ @{gear_die_two}]] }} {{gear-roll-two=[[1d6]] }} {{gear-die-three=[[ @{gear_die_three}]] }} {{gear-roll-three=[[1d6]] }} {{gear-die-four=[[ @{gear_die_four}]] }} {{gear-roll-four=[[1d6]] }} {{gear-die-five=[[ @{gear_die_five}]] }} {{gear-roll-five=[[1d6]] }} {{gear-die-six=[[ @{gear_die_six}]] }} {{gear-roll-six=[[1d6]] }} {{gear-die-seven=[[ @{gear_die_seven}]] }} {{gear-roll-seven=[[1d6]] }} {{gear-die-eight=[[ @{gear_die_eight}]] }} {{gear-roll-eight=[[1d6]] }} {{gear-die-nine=[[ @{gear_die_nine}]] }} {{gear-roll-nine=[[1d6]] }} {{gear-die-ten=[[ @{gear_die_ten}]] }} {{gear-roll-ten=[[1d6]] }} {{gear-die-eleven=[[ @{gear_die_eleven}]] }} {{gear-roll-eleven=[[1d6]] }} {{gear-die-twelve=[[ @{gear_die_twelve}]] }} {{gear-roll-twelve=[[1d6]] }} {{artifact-die-eight=[[ @{artifact_die_eight}]] }} {{artifact-roll-eight=[[1d8]] }} {{artifact-die-ocho=[[ @{artifact_die_ocho}]] }} {{artifact-roll-ocho=[[1d8]] }} {{artifact-die-ten=[[ @{artifact_die_ten}]] }} {{artifact-roll-ten=[[1d10]] }} {{artifact-die-twelve=[[ @{artifact_die_twelve}]] }} {{artifact-roll-twelve=[[1d12]] }} {{push-query=?{@{translation_push_query}} }} @{include_with_roll}" data-i18n-title="push-dice" title="Push the Dice!">&nbsp;
+              <button class="dice-pool font-color-initial" type="roll" name="roll_a_push" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{pushes-the-roll}}} {{subtitle=@{current_preset}}} {{subtitle2=@{subtitle2}}} {{free-text}} {{footer}} {{attribute-die-one=[[ @{attribute_die_one}]] }} {{attribute-roll-one=[[1d6]] }} {{attribute-die-two=[[ @{attribute_die_two}]] }} {{attribute-roll-two=[[1d6]] }} {{attribute-die-three=[[ @{attribute_die_three}]] }} {{attribute-roll-three=[[1d6]] }} {{attribute-die-four=[[ @{attribute_die_four}]] }} {{attribute-roll-four=[[1d6]] }} {{attribute-die-five=[[ @{attribute_die_five}]] }} {{attribute-roll-five=[[1d6]] }} {{attribute-die-six=[[ @{attribute_die_six}]] }} {{attribute-roll-six=[[1d6]] }} {{attribute-die-seven=[[ @{attribute_die_seven}]] }} {{attribute-roll-seven=[[1d6]] }} {{attribute-die-eight=[[ @{attribute_die_eight}]] }} {{attribute-roll-eight=[[1d6]] }} {{attribute-die-nine=[[ @{attribute_die_nine}]] }} {{attribute-roll-nine=[[1d6]] }} {{attribute-die-ten=[[ @{attribute_die_ten}]] }} {{attribute-roll-ten=[[1d6]] }} {{attribute-die-eleven=[[ @{attribute_die_eleven}]] }} {{attribute-roll-eleven=[[1d6]] }} {{attribute-die-twelve=[[ @{attribute_die_twelve}]] }} {{attribute-roll-twelve=[[1d6]] }} {{skill-die-one=[[ @{skill_die_one}]] }} {{skill-roll-one=[[1d6]] }} {{skill-die-two=[[ @{skill_die_two}]] }} {{skill-roll-two=[[1d6]] }} {{skill-die-three=[[ @{skill_die_three}]] }} {{skill-roll-three=[[1d6]] }} {{skill-die-four=[[ @{skill_die_four}]] }} {{skill-roll-four=[[1d6]] }} {{skill-die-five=[[ @{skill_die_five}]] }} {{skill-roll-five=[[1d6]] }} {{skill-die-six=[[ @{skill_die_six}]] }} {{skill-roll-six=[[1d6]] }} {{skill-die-seven=[[ @{skill_die_seven}]] }} {{skill-roll-seven=[[1d6]] }} {{skill-die-eight=[[ @{skill_die_eight}]] }} {{skill-roll-eight=[[1d6]] }} {{skill-die-nine=[[ @{skill_die_nine}]] }} {{skill-roll-nine=[[1d6]] }} {{skill-die-ten=[[ @{skill_die_ten}]] }} {{skill-roll-ten=[[1d6]] }} {{negative-die-one=[[ @{negative_die_one}]] }} {{negative-roll-one=[[1d6]] }} {{negative-die-two=[[ @{negative_die_two}]] }} {{negative-roll-two=[[1d6]] }} {{negative-die-three=[[ @{negative_die_three}]] }} {{negative-roll-three=[[1d6]] }} {{gear-die-one=[[ @{gear_die_one}]] }} {{gear-roll-one=[[1d6]] }} {{gear-die-two=[[ @{gear_die_two}]] }} {{gear-roll-two=[[1d6]] }} {{gear-die-three=[[ @{gear_die_three}]] }} {{gear-roll-three=[[1d6]] }} {{gear-die-four=[[ @{gear_die_four}]] }} {{gear-roll-four=[[1d6]] }} {{gear-die-five=[[ @{gear_die_five}]] }} {{gear-roll-five=[[1d6]] }} {{gear-die-six=[[ @{gear_die_six}]] }} {{gear-roll-six=[[1d6]] }} {{gear-die-seven=[[ @{gear_die_seven}]] }} {{gear-roll-seven=[[1d6]] }} {{gear-die-eight=[[ @{gear_die_eight}]] }} {{gear-roll-eight=[[1d6]] }} {{gear-die-nine=[[ @{gear_die_nine}]] }} {{gear-roll-nine=[[1d6]] }} {{gear-die-ten=[[ @{gear_die_ten}]] }} {{gear-roll-ten=[[1d6]] }} {{gear-die-eleven=[[ @{gear_die_eleven}]] }} {{gear-roll-eleven=[[1d6]] }} {{gear-die-twelve=[[ @{gear_die_twelve}]] }} {{gear-roll-twelve=[[1d6]] }} {{artifact-die-eight=[[ @{artifact_die_eight}]] }} {{artifact-roll-eight=[[1d8]] }} {{artifact-die-ocho=[[ @{artifact_die_ocho}]] }} {{artifact-roll-ocho=[[1d8]] }} {{artifact-die-ten=[[ @{artifact_die_ten}]] }} {{artifact-roll-ten=[[1d10]] }} {{artifact-die-twelve=[[ @{artifact_die_twelve}]] }} {{artifact-roll-twelve=[[1d12]] }} {{push-query=?{@{translation_push_query}} }} @{include_with_roll}" data-i18n-title="push-dice" title="Push the Dice!">&nbsp;
                 <span data-i18n="push">Push</span>&nbsp;
               </button>
               <input type="hidden" name="attr_translation_push_query" value="push-query" />
@@ -2130,319 +2160,346 @@
           </div>
           <div class="dice-preset">
             <input type="hidden" class="input" name="attr_current_preset" value="" readonly />
+            <input type="hidden" class="input" name="attr_subtitle2" value="" readonly />
             <input type="hidden" name="attr_include_with_roll" value="" readonly />
             <span class="label dice-preset-header" data-i18n="current-preset">Current Preset</span>
             <span class="header-h1 dice-preset-preset" data-i18n-title="type-of-roll" name="attr_current_preset"></span>
           </div>
           <div class="dice-footer">
-            <button type="action" name="act_dice_pool_clear" class="small-caps dice-footer-clear" data-i18n-title="reset-dice" title="Reset dice pool." data-i18n="clear-dice-pool">
-              Clear Dice Pool
+            <button type="action" name="act_dice_pool_clear" class="small-caps dice-footer-clear" data-i18n-title="reset-dice" title="Reset dice pool.">
+              <span data-i18n="clear-dice-pool">Clear Dice Pool</span>
             </button>
-            <button type="action" name="act_api_dice_toggle" class="api-button small-caps dice-footer-api" data-i18n-title="api-dice-title" title="Use API Dice Roller. (API is a Pro feature) 'Forbidden Lands Year-Zero Die Roller' script must be installed." data-i18n="api-dice">
-              api dice
+            <button type="action" name="act_api_dice_toggle" class="api-button small-caps dice-footer-api" data-i18n-title="api-dice-title" title="Use API Dice Roller. (API is a Pro feature) 'Forbidden Lands Year-Zero Die Roller' script must be installed.">
+              <span data-i18n="api-dice">api dice</span>
             </button>
           </div>
         </div>
       </div>
     </div>
     <div class="box toggle-monster-only character-column3">
-      <div class="talents-grid" style="margin-bottom: 1em;">
-        <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_talents" value="1" />
-        <div class="talents-box header">
-          <h1 data-i18n="talent-u">TALENTS</h1>
+      <section class="talents">
+        <div class="talents-grid">
+          <input type="checkbox" class="hidden section-toggle-checkbox" name="attr_toggle_talents" value="1" />
+          <div class="talents-box header">
+            <h1 data-i18n="talent-u">TALENTS</h1>
+          </div>
+          <div class="talents-box2 column-header">
+            <span data-i18n="type">Type</span>
+          </div>
+          <div class="talents-box3 column-header">
+            <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_talents" value="1" title="more/less" data-i18n="show-more-or-less" checked />
+            <span class="expand-section-nav"></span>
+            <span data-i18n="rank">Rank</span>
+          </div>
+          <div class="talents-box4">
+            <input type="checkbox" class="hidden section-toggle-checkbox" name="attr_toggle_talents" value="1" />
+            <fieldset class="repeating_talents">
+              <div class="talents-grid">
+                <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" checked /><span></span>
+                <button class="talents-box0 roll-button" type="roll" name="attr_talent_roll" value="@{selected|whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=character_id}}} {{name=^{@{talent_type}} ^{talent}}} {{subtitle2=@{talent_name} - ^{rank} @{talent_rank}}} {{free-text=@{talent_description}}}"></button>
+                <input class="talents-box1 input" type="text" name="attr_talent_name" value="" title="@{repeating_talents_$X_talent_name}" data-i18n-placeholder="name" placeholder="Name" />
+                <select class="talents-box2 input" name="attr_talent_type" title="@{repeating_talents_$X_talent_type}">
+                  <option value="kin" data-i18n="kin">Kin</option>
+                  <option value="general" data-i18n="general-abbr" selected>Gen</option>
+                  <option value="profession" data-i18n="profession-abbr">Prof</option>
+                </select>
+                <select class="talents-box3 input" name="attr_talent_rank" title="@{repeating_talents_$X_talent_rank}">
+                  <option value="0" select>0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+                <!-- expand 2nd row -->
+                <textarea class="talents-box4 input-textarea" name="attr_talent_description" title="@{repeating_talents_$X_talent_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+              </div>
+            </fieldset>
+          </div>
         </div>
-        <div class="talents-box2 column-header">
-          <span data-i18n="type">Type</span>
-        </div>
-        <div class="talents-box3 column-header">
-          <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_talents" value="1" title="more/less" data-i18n="show-more-or-less"/>
-          <span class="expand-section-nav"></span>
-          <span data-i18n="rank">Rank</span>
-        </div>
-        <div class="talents-box4">
-          <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_talents" value="1" />
-          <fieldset class="repeating_talents">
-            <div class="talents-grid">
-              <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" checked /><span></span>
-              <input class="talents-box1 input" type="text" name="attr_talent_name" value="" title="@{repeating_talents_$X_talent_name}" data-i18n-placeholder="name" placeholder="Name" />
-              <select class="talents-box2 input" name="attr_talent_type" title="@{repeating_talents_$X_talent_type}">
-                <option value="Kin" data-i18n="kin">Kin</option>
-                <option value="Gen" data-i18n="general-abbrv" selected>Gen</option>
-                <option value="Prof" data-i18n="profession-abbrv">Prof</option>
-              </select>
-              <select class="talents-box3 input" name="attr_talent_rank" title="@{repeating_talents_$X_talent_rank}">
-                <option value="0" select>0</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-              </select>
-              <!-- expand 2nd row -->
-              <textarea class="talents-box4 input-textarea" name="attr_talent_description" title="@{repeating_talents_$X_talent_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+      </section>
+      <section class="gear">
+        <div class="gear-grid">
+          <div class="gear-box5">
+            <!--Consumable Encumbrance-->
+              <div class="consumables-grid">
+                <div class="gear-box header">
+                  <h1 data-i18n="consumable-u">CONSUMABLES</h1>
+                </div>
+                <div class="gear-box2 column-header">
+                  <span data-i18n="quantity-abbr">Qty</span>
+                </div>
+                <div class="gear-box3 column-header">
+                  <span data-i18n="carried-abbr">Carr</span>
+                </div>
+                <div class="gear-box4 column-header">
+                  <span data-i18n="weight-abbr">Wt</span>
+                </div>
+                <button class="roll-button-textonly header-h1" type="roll" name="roll_food" title="%{food}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{food_macro}">
+                    <span data-i18n="food">Food</span>
+                </button>
+                <select class="input" name="attr_food" title="@{food}">
+                  <option value="0" selected>0</option>
+                  <option value="1" data-i18n="die-6">d6</option>
+                  <option value="2">d8</option>
+                  <option value="3" data-i18n="die-10">d10</option>
+                  <option value="4">d12</option>
+                </select>
+                <input type="hidden" name="attr_food_macro" value="0" />
+                <input class="input" type="checkbox" name="attr_food_carried" value="1" title="@{food_carried}" checked />
+                <input type="hidden" name="attr_food_weight" value="0" />
+                <select class="input" name="attr_food_weight" title="@{food_weight}">
+                  <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
+                  <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
+                </select>
+                <button class="roll-button-textonly header-h1" type="roll" name="roll_water" title="%{water}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{water_macro}">
+                    <span data-i18n="water">Water</span>
+                </button>
+                <select class="input" name="attr_water" title="@{water}">
+                  <option value="0" selected>0</option>
+                  <option value="1" data-i18n="die-6">d6</option>
+                  <option value="2">d8</option>
+                  <option value="3" data-i18n="die-10">d10</option>
+                  <option value="4">d12</option>
+                </select>
+                <input type="hidden" name="attr_water_macro" value="0" />
+                <input class="input" type="checkbox" name="attr_water_carried" value="1" title="@{water_carried}" checked />
+                <input type="hidden" name="attr_water_weight" value="0" />
+                <select class="input" name="attr_water_weight" title="@{water_weight}">
+                  <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
+                  <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
+                </select>
+                <button class="roll-button-textonly header-h1" type="roll" name="roll_arrows" title="%{arrows}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{arrows_macro}">
+                    <span data-i18n="arrows">Arrows</span>
+                </button>
+                <select class="input" name="attr_arrows" title="@{arrows}">
+                  <option value="0" selected>0</option>
+                  <option value="1" data-i18n="die-6">d6</option>
+                  <option value="2">d8</option>
+                  <option value="3" data-i18n="die-10">d10</option>
+                  <option value="4">d12</option>
+                </select>
+                <input type="hidden" name="attr_arrows_macro" value="0" />
+                <input class="input" type="checkbox" name="attr_arrows_carried" value="1" title="@{arrows_carried}" checked />
+                <input type="hidden" name="attr_arrows_weight" value="0" />
+                <select class="input" name="attr_arrows_weight" title="@{arrows_weight}">
+                  <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
+                  <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
+                </select>
+                <button class="roll-button-textonly header-h1" type="roll" name="roll_torches" title="%{torches}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{torches_macro}">
+                    <span data-i18n="torches">Torches</span>
+                </button>
+                <select class="input" name="attr_torches" title="@{torches}">
+                  <option value="0" selected>0</option>
+                  <option value="1" data-i18n="die-6">d6</option>
+                  <option value="2">d8</option>
+                  <option value="3" data-i18n="die-10">d10</option>
+                  <option value="4">d12</option>
+                </select>
+                <input type="hidden" name="attr_torches_macro" value="0" />
+                <input class="input" type="checkbox" name="attr_torches_carried" value="1" title="@{torches_carried}" checked />
+                <input type="hidden" name="attr_torches_weight" value="0" />
+                <select class="input" name="attr_torches_weight" title="@{torches_weight}">
+                  <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
+                  <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
+                </select>
+              </div>
+            <!-- Repeating Gear -->
+              <div class="gear-grid">
+                <input type="checkbox" class="gear-box1 section-toggle-checkbox" name="attr_toggle_gear" value="1" style=" position: relative; z-index: -1;">
+                <div class="gear-box header">
+                  <h1 data-i18n="gea-u">GEAR</h1>
+                </div>
+                <div class="gear-box2 column-header">
+                  <span data-i18n="quantity-abbr">Qty</span>
+                </div>
+                <div class="gear-box3 column-header">
+                  <span data-i18n="carried-abbr">Carr</span>
+                </div>
+                <div class="gear-box4 column-header">
+                  <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_gear" value="1" title="more/less" data-i18n="show-more-or-less" checked />
+                  <span class="expand-section-nav"></span>
+                  <span data-i18n="weight-abbr">Wt</span>
+                </div>
+              </div>
+              <input type="checkbox" class="hidden section-toggle-checkbox" name="attr_toggle_gear" value="1" />
+              <fieldset class="repeating_gear">
+                <div class="gear-grid">
+                  <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" /><span></span>
+                  <input class="gear-box1 input" type="text" name="attr_gear_name" value="" title="@{repeating_gear_$X_gear_name}" data-i18n-placeholder="item" placeholder="item" />
+                  <input class="gear-box2 input-number" type="number" name="attr_gear_qty" value="1" min="0" title="@{repeating_gear_$X_gear_qty}" />
+                  <input class="gear-box3 input" type="checkbox" name="attr_gear_carried" value="1" title="@{repeating_gear_$X_gear_carried}" checked />
+                  <select class="gear-box4 input" name="attr_gear_weight" title="@{repeating_gear_$X_gear_weight}">
+                    <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected>T</option>
+                    <option data-i18n="light-abbr" data-i18n-title="weight-light" value="0.5">L</option>
+                    <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1">N</option>
+                    <option data-i18n="heavy-abbr" data-i18n-title="weight-heavy" value="2">H</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                  <!-- expand 2nd row -->
+                  <textarea class="gear-box5 input-textarea" name="attr_gear_description" title="@{repeating_talents_$X_gear_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+                </div>
+              </fieldset>
+          </div>
+          <!-- Weight -->
+          <div class="gear-weight">
+            <div><span class="label" data-i18n="gear-consumables">Gear & Consumables</span></div>
+            <div>
+              <input class="input-number" type="text" name="attr_character_gear_and_consumables_encumbrance" value="0" title="@{character_gear_and_consumables_encumbrance}" readonly />
             </div>
-          </fieldset>
-        </div>
-      </div>
-      <div class="gear-grid">
-        <div class="gear-box1 header">
-          <h1 data-i18n="gea-u">GEAR</h1>
-        </div>
-        <div class="gear-box2 column-header">
-          <span data-i18n="quantity-abbr">Qty</span>
-        </div>
-        <div class="gear-box3 column-header">
-          <span data-i18n="carried-abbr">Carr</span>
-        </div>
-        <div class="gear-box4 column-header">
-          <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_gear" value="1" title="more/less" data-i18n="show-more-or-less" />
-          <span class="expand-section-nav"></span>
-          <span data-i18n="weight-abbr">Wt</span>
-        </div>
-        <div class="gear-box5">
-          <!--Consumable Encumbrance-->
-            <div class="gear-grid">
-              <button class="roll-button-textonly header-h1" type="roll" name="roll_food" title="%{food}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer=^{consumable-note}}} {{consumable-flag=1}} @{food_macro}">
-                  <span data-i18n="food">Food</span>
-              </button>
-              <select class="input" name="attr_food" title="@{food}">
-                <option value="0" selected>0</option>
-                <option value="1" data-i18n="die-6">d6</option>
-                <option value="2">d8</option>
-                <option value="3" data-i18n="die-10">d10</option>
-                <option value="4">d12</option>
-              </select>
-              <input type="hidden" name="attr_food_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_food_carried" value="1" title="@{food_carried}" checked />
-              <input type="hidden" name="attr_food_weight" value="0" />
-              <select class="input" name="attr_food_weight" title="@{food_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
-              </select>
-              <button class="roll-button-textonly header-h1" type="roll" name="roll_water" title="%{water}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer=^{consumable-note}}} {{consumable-flag=1}} @{water_macro}">
-                  <span data-i18n="water">Water</span>
-              </button>
-              <select class="input" name="attr_water" title="@{water}">
-                <option value="0" selected>0</option>
-                <option value="1" data-i18n="die-6">d6</option>
-                <option value="2">d8</option>
-                <option value="3" data-i18n="die-10">d10</option>
-                <option value="4">d12</option>
-              </select>
-              <input type="hidden" name="attr_water_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_water_carried" value="1" title="@{water_carried}" checked />
-              <input type="hidden" name="attr_water_weight" value="0" />
-              <select class="input" name="attr_water_weight" title="@{water_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
-              </select>
-              <button class="roll-button-textonly header-h1" type="roll" name="roll_arrows" title="%{arrows}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer=^{consumable-note}}} {{consumable-flag=1}} @{arrows_macro}">
-                  <span data-i18n="arrows">Arrows</span>
-              </button>
-              <select class="input" name="attr_arrows" title="@{arrows}">
-                <option value="0" selected>0</option>
-                <option value="1" data-i18n="die-6">d6</option>
-                <option value="2">d8</option>
-                <option value="3" data-i18n="die-10">d10</option>
-                <option value="4">d12</option>
-              </select>
-              <input type="hidden" name="attr_arrows_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_arrows_carried" value="1" title="@{arrows_carried}" checked />
-              <input type="hidden" name="attr_arrows_weight" value="0" />
-              <select class="input" name="attr_arrows_weight" title="@{arrows_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
-              </select>
-              <button class="roll-button-textonly header-h1" type="roll" name="roll_torches" title="%{torches}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer=^{consumable-note}}} {{consumable-flag=1}} @{torches_macro}">
-                  <span data-i18n="torches">Torches</span>
-              </button>
-              <select class="input" name="attr_torches" title="@{torches}">
-                <option value="0" selected>0</option>
-                <option value="1" data-i18n="die-6">d6</option>
-                <option value="2">d8</option>
-                <option value="3" data-i18n="die-10">d10</option>
-                <option value="4">d12</option>
-              </select>
-              <input type="hidden" name="attr_torches_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_torches_carried" value="1" title="@{torches_carried}" checked />
-              <input type="hidden" name="attr_torches_weight" value="0" />
-              <select class="input" name="attr_torches_weight" title="@{torches_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
-              </select>
+            <div><span class="label" data-i18n="weapons">Weapons</span></div>
+            <div>
+              <input class="input-number" type="text" name="attr_weapons_encumbrance" value="0" title="@{weapons_encumbrance}" readonly />
             </div>
-            <br>
-          <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_gear" value="1" />
-          <fieldset class="repeating_gear">
-            <div class="gear-grid">
-              <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" /><span></span>
-              <input class="gear-box1 input" type="text" name="attr_gear_name" value="" title="@{repeating_gear_$X_gear_name}" data-i18n-placeholder="item" placeholder="item" />
-              <input class="gear-box2 input-number" type="number" name="attr_gear_qty" value="1" min="0" title="@{repeating_gear_$X_gear_qty}" />
-              <input class="gear-box3 input" type="checkbox" name="attr_gear_carried" value="1" title="@{repeating_gear_$X_gear_carried}" checked />
-              <select class="gear-box4 input" name="attr_gear_weight" title="@{repeating_gear_$X_gear_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected>T</option>
-                <option data-i18n="light-abbr" data-i18n-title="weight-light" value="0.5">L</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1">N</option>
-                <option data-i18n="heavy-abbr" data-i18n-title="weight-heavy" value="2">H</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-              </select>
-              <!-- expand 2nd row -->
-              <textarea class="gear-box5 input-textarea" name="attr_gear_description" title="@{repeating_talents_$X_gear_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+            <div><span class="label" data-i18n="armor">Armor</span></div>
+            <div>
+              <input class="input-number" type="text" name="attr_armor_shield_encumbrance" value="0" title="@{armor_shield_encumbrance}" readonly />
             </div>
-          </fieldset>
-        </div>
-        <div class="gear-weight">
-          <div><span class="label" data-i18n="gear-consumables">Gear & Consumables</span></div>
-          <div>
-            <input class="input-number" type="text" name="attr_character_gear_and_consumables_encumbrance" value="0" title="@{character_gear_and_consumables_encumbrance}" readonly />
-          </div>
-          <div><span class="label" data-i18n="weapons">Weapons</span></div>
-          <div>
-            <input class="input-number" type="text" name="attr_weapons_encumbrance" value="0" title="@{weapons_encumbrance}" readonly />
-          </div>
-          <div><span class="label" data-i18n="armor">Armor</span></div>
-          <div>
-            <input class="input-number" type="text" name="attr_armor_shield_encumbrance" value="0" title="@{armor_shield_encumbrance}" readonly />
-          </div>
-          <div>
-            <span class="label" data-i18n="coins-carried">Coins Carried</span>
-          </div>
-          <div>
-            <input class="input-number" type="text" name="attr_coins_carried" value="0" title="@{coins_carried}" readonly />
-          </div>
-        </div>
-        <div class="gear-box6 header">
-          <div class="gear">
-            <span class="label" data-i18n="carry">Carry</span>
-          </div>
-          <div class="gear">
-            <input class="input-number" type="text" name="attr_carry" value="0" title="@{carry} = 2 x @{strength} + @{pack_rat}" readonly />
-          </div>
-          <div class="gear">
-            <span class="label over-encumbered" data-i18n="encumbrance">Encumbrance</span>
-          </div>
-          <input class="hidden warning" type="checkbox" name="attr_encumbered_flag" value="1" />
-          <div class="gear">
-            <input class="input-number over-encumbered" type="text" name="attr_character_encumbrance" value="0" title="@{character_encumbrance}" readonly />
-          </div>
-        </div>
-      </div>
-      <div class="gear-subgrid2" style="margin-bottom: 1em;">
-        <div class="gear-box12">
-          <span class="label" data-i18n-title="pack-rat-title" data-i18n="pack-rat">Pack Rat Talent?</span>
-        </div>
-        <div class="gear-box13">
-          <select class="input" name="attr_pack_rat">
-            <option value="0" data-i18n="no" selected>No</option>
-            <option value="2" data-i18n="rank-1-pack-rat">Rank 1 (+2)</option>
-            <option value="5" data-i18n="rank-2-pack-rat">Rank 2 (+5)</option>
-            <option value="10" data-i18n="rank-3-pack-rat">Rank 3 (+10)</option>
-          </select>
-        </div>
-      </div>
-      <div class="mount-grid">
-        <div class="mount-box1 header">
-          <h1 data-i18n="moun-u">MOUNT</h1>
-        </div>
-        <input class="expand" type="checkbox" name="attr_expand_mount1" value="1" data-i18n-title="show-hide"
-          title="show/hide" style="margin-top: 3.35em;" /><span></span>
-        <input class="mount-box2 input" type="text" name="attr_mount_name" value="" title="@{mount_name}" data-i18n-placeholder="name" placeholder="name" />
-        <div class="mount-box3">
-          <span class="label" data-i18n="strength-abbr-u">STR</span>
-        </div>
-        <input class="mount-box4 input-number" type="number" name="attr_mount_strength" value="1"
-          title="@{mount_strength}" />
-        <div class="mount-box5">
-          <span class="label" data-i18n="agility-abbr-u">AGI</span>
-        </div>
-        <input class="mount-box6 input-number" type="number" name="attr_mount_agility" value="1"
-          title="@{mount_agility}" />
-        <!-- expand 2nd row -->
-        <textarea class="mount-box7 mount-row2 input-textarea" name="attr_mount_description"
-          title="@{mount_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
-      </div>
-      <div class="mount_gear-grid">
-        <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" />
-        <div class="mount_gear-box1 header">
-          <h1 data-i18n="on-mount">Gear on Mount</h1>
-        </div>
-        <div class="mount_gear-box2 column-header">
-          <span data-i18n="quantity-abbr">Qty</span>
-        </div>
-        <div class="mount_gear-box3 column-header">
-          <span data-i18n="carried-abbr">Carr</span>
-        </div>
-        <div class="mount_gear-box4 column-header">
-          <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" title="more/less" data-i18n="show-more-or-less" />
-          <span class="expand-section-nav"></span>
-          <span data-i18n="weight-abbr">Wt</span>
-        </div>
-        <div class="mount_gear-box5">
-          <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" />
-          <fieldset class="repeating_mount">
-            <div class="mount_gear-grid">
-              <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" /><span></span>
-              <input class="mount_gear-box1 input" type="text" name="attr_mount_gear_name" value="" title="@{repeating_mount_$X_mount_gear_name}" data-i18n-placeholder="item" placeholder="item" />
-              <input class="mount_gear-box2 input-number" type="number" name="attr_mount_gear_qty" value="1" title="Quantity @{repeating_mount_$X_mount_gear_qty}" />
-              <input class="mount_gear-box3 input" type="checkbox" name="attr_mount_gear_carried" value="1" title="@{repeating_mount_$X_mount_gear_carried}" checked />
-              <select class="mount_gear-box4 input" name="attr_mount_gear_weight" title="@{repeating_mount_$X_mount_gear_weight}">
-                <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected>T</option>
-                <option data-i18n="light-abbr" data-i18n-title="weight-light" value="0.5">L</option>
-                <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1">N</option>
-                <option data-i18n="heavy-abbr" data-i18n-title="weight-heavy" value="2">H</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-              </select>
-              <textarea class="mount_gear-box5 input-textarea" name="attr_mount_gear_description" title="@{repeating_mount_$X_mount_gear_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+            <div>
+              <span class="label" data-i18n="coins-carried">Coins Carried</span>
             </div>
-          </fieldset>
-        </div>
-        <div class="gear-weight gear-weight2">
-          <div><span class="label" data-i18n="gear">Gear</span></div>
-          <div>
-            <input class="input-number" type="text" name="attr_mount_gear_encumbrance" value="0" title="@{mount_gear_encumbrance}" readonly />
+            <div>
+              <input class="input-number" type="text" name="attr_coins_carried" value="0" title="@{coins_carried}" readonly />
+            </div>
           </div>
-          <div>
-            <span class="label" data-i18n="coins-carried">Coins Carried</span>
-          </div>
-          <div>
-            <input class="input-number" type="text" name="attr_coins_carried_mount" value="0" title="@{coins_carried_mount}" readonly />
-          </div>
-        </div>
-        <div class="mount_gear-box6 header">
-          <div class="mount_gear">
-            <span class="label" data-i18n="carry">Carry</span>
-          </div>
-          <div class="mount_gear">
-            <input class="input-number" type="text" name="attr_mount_carry" value="0" title="@{mount_carry} = mount_strength x2, unmounted x4" readonly />
-          </div>
-          <div class="mount_gear">
-            <span class="label" data-i18n="encumbrance">Encumbrance</span>
-          </div>
-          <input class="hidden warning" type="checkbox" name="attr_mount_encumbered_flag" value="1" />
-          <div class="mount_gear">
-            <input class="input-number over-encumbered" type="text" name="attr_mount_encumbrance" value="0" title="@{mount_encumbrance}" readonly />
+          <!-- Encumbrance -->
+          <div class="gear-box6 header">
+            <div class="gear">
+              <span class="label" data-i18n="carry">Carry</span>
+            </div>
+            <div class="gear">
+              <input class="input-number" type="text" name="attr_carry" value="0" title="@{carry} = 2 x @{strength} + @{pack_rat}" readonly />
+            </div>
+            <div class="gear">
+              <span class="label over-encumbered" data-i18n="encumbrance">Encumbrance</span>
+            </div>
+            <input class="hidden warning" type="checkbox" name="attr_encumbered_flag" value="1" />
+            <div class="gear">
+              <input class="input-number over-encumbered" type="text" name="attr_character_encumbrance" value="0" title="@{character_encumbrance}" readonly />
+            </div>
           </div>
         </div>
-      </div>
-      <div class="mount_gear-subgrid2">
-        <span style="text-align: center; margin-top: -3px;"><input class="input" title="@{mounted}" type="checkbox" name="attr_mounted" value="1" style="margin: 0;" /></span>
-        <span class="label" data-i18n="mounted" style="margin: 0;">Mounted</span>
-      </div>
+        <!-- Misc -->
+        <div class="gear-subgrid2" style="margin-bottom: 1em;">
+          <div class="gear-box12">
+            <span class="label" data-i18n-title="pack-rat-title" data-i18n="pack-rat">Pack Rat Talent?</span>
+          </div>
+          <div class="gear-box13">
+            <select class="input" name="attr_pack_rat">
+              <option value="0" data-i18n="no" selected>No</option>
+              <option value="2" data-i18n="rank-1-pack-rat">Rank 1 (+2)</option>
+              <option value="5" data-i18n="rank-2-pack-rat">Rank 2 (+5)</option>
+              <option value="10" data-i18n="rank-3-pack-rat">Rank 3 (+10)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+      <!-- Mount -->
+      <section class="mount">
+        <div class="mount-grid">
+          <div class="mount-box1 header">
+            <h1 data-i18n="moun-u">MOUNT</h1>
+          </div>
+          <input class="expand" type="checkbox" name="attr_expand_mount1" value="1" data-i18n-title="show-hide"
+            title="show/hide" style="margin-top: 3.35em;" /><span></span>
+          <input class="mount-box2 input" type="text" name="attr_mount_name" value="" title="@{mount_name}" data-i18n-placeholder="name" placeholder="name" />
+          <div class="mount-box3">
+            <span class="label" data-i18n="strength-abbr-u">STR</span>
+          </div>
+          <input class="mount-box4 input-number" type="number" name="attr_mount_strength" value="1"
+            title="@{mount_strength}" />
+          <div class="mount-box5">
+            <span class="label" data-i18n="agility-abbr-u">AGI</span>
+          </div>
+          <input class="mount-box6 input-number" type="number" name="attr_mount_agility" value="1"
+            title="@{mount_agility}" />
+          <!-- expand 2nd row -->
+          <textarea class="mount-box7 mount-row2 input-textarea" name="attr_mount_description"
+            title="@{mount_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+        </div>
+        <div class="mount_gear-grid">
+          <input type="checkbox" class="hidden section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" />
+          <div class="mount_gear-box header">
+            <h1 data-i18n="on-mount">Gear on Mount</h1>
+          </div>
+          <div class="mount_gear-box2 column-header">
+            <span data-i18n="quantity-abbr">Qty</span>
+          </div>
+          <div class="mount_gear-box3 column-header">
+            <span data-i18n="carried-abbr">Carr</span>
+          </div>
+          <div class="mount_gear-box4 column-header">
+            <input type="checkbox" class="section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" title="more/less" data-i18n="show-more-or-less" checked />
+            <span class="expand-section-nav"></span>
+            <span data-i18n="weight-abbr">Wt</span>
+          </div>
+          <div class="mount_gear-box5">
+            <input type="checkbox" class="hidden section-toggle-checkbox" name="attr_toggle_mount_gear" value="1" />
+            <fieldset class="repeating_mount">
+              <div class="mount_gear-grid">
+                <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" /><span></span>
+                <input class="mount_gear-box1 input" type="text" name="attr_mount_gear_name" value="" title="@{repeating_mount_$X_mount_gear_name}" data-i18n-placeholder="item" placeholder="item" />
+                <input class="mount_gear-box2 input-number" type="number" name="attr_mount_gear_qty" value="1" title="Quantity @{repeating_mount_$X_mount_gear_qty}" />
+                <input class="mount_gear-box3 input" type="checkbox" name="attr_mount_gear_carried" value="1" title="@{repeating_mount_$X_mount_gear_carried}" checked />
+                <select class="mount_gear-box4 input" name="attr_mount_gear_weight" title="@{repeating_mount_$X_mount_gear_weight}">
+                  <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected>T</option>
+                  <option data-i18n="light-abbr" data-i18n-title="weight-light" value="0.5">L</option>
+                  <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1">N</option>
+                  <option data-i18n="heavy-abbr" data-i18n-title="weight-heavy" value="2">H</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </select>
+                <textarea class="mount_gear-box5 input-textarea" name="attr_mount_gear_description" title="@{repeating_mount_$X_mount_gear_description}" data-i18n-placeholder="description" placeholder="description"></textarea>
+              </div>
+            </fieldset>
+          </div>
+          <div class="gear-weight gear-weight2">
+            <div><span class="label" data-i18n="gear">Gear</span></div>
+            <div>
+              <input class="input-number" type="text" name="attr_mount_gear_encumbrance" value="0" title="@{mount_gear_encumbrance}" readonly />
+            </div>
+            <div>
+              <span class="label" data-i18n="coins-carried">Coins Carried</span>
+            </div>
+            <div>
+              <input class="input-number" type="text" name="attr_coins_carried_mount" value="0" title="@{coins_carried_mount}" readonly />
+            </div>
+          </div>
+          <div class="mount_gear-box6 header">
+            <div class="mount_gear">
+              <span class="label" data-i18n="carry">Carry</span>
+            </div>
+            <div class="mount_gear">
+              <input class="input-number" type="text" name="attr_mount_carry" value="0" title="@{mount_carry} = mount_strength x2, unmounted x4" readonly />
+            </div>
+            <div class="mount_gear">
+              <span class="label" data-i18n="encumbrance">Encumbrance</span>
+            </div>
+            <input class="hidden warning" type="checkbox" name="attr_mount_encumbered_flag" value="1" />
+            <div class="mount_gear">
+              <input class="input-number over-encumbered" type="text" name="attr_mount_encumbrance" value="0" title="@{mount_encumbrance}" readonly />
+            </div>
+          </div>
+        </div>
+        <div class="mount_gear-subgrid2">
+          <span style="text-align: center; margin-top: -3px;"><input class="input" title="@{mounted}" type="checkbox" name="attr_mounted" value="1" style="margin: 0;" /></span>
+          <span class="label" data-i18n="mounted" style="margin: 0;">Mounted</span>
+        </div>
+      </section>
     </div>
     <div class="box toggle-monster-only character-armor">
       <div class="armor-container">
@@ -2451,7 +2508,7 @@
             <h1 data-i18n="armor-helmet">ARMOR/HELMET</h1>
           </div>
           <div class="armor-box1 column-header">
-            <span data-i18n="name">Name</span>
+            <span data-i18n="type">Type</span>
           </div>
           <div class="armor-box2 column-header">
             <span data-i18n="armor-rating-abbr">AR</span>
@@ -2738,8 +2795,8 @@
               </span>
               <span class="armor-box4 input-span" name="attr_ar" value="0" data-i18n-title="armor-rating-total" title="Total GEAR dice included for armor1 + armor2. @{ar}"></span>
               <span class="armor-box5">
-                <button type="action" name="act_armor-roll" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice." data-i18n="armor"   style="height: 2em; width: 4em;">
-                  Armor
+                <button type="action" name="act_armor-roll" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice." style="height: 2em; width: 4em;">
+                  <span data-i18n="armor">Armor</span>
                 </button>
                 <button class="rollme-relative" type="roll" name="roll_the_dice_local" data-i18n-title="roll-dice" title="Roll the Dice!" value="@{the_dice_local_macro}">&nbsp;<span data-i18n="roll">Roll</span>&nbsp;</button>
               </span>
@@ -2755,13 +2812,13 @@
             <h1 data-i18n="shield-u">SHIELD</h1>
           </div>
           <div class="shield-box1 column-header">
-            <span data-i18n="shove">Shove</span>
+            <span class="rotate-45" data-i18n="shove">Shove</span>
           </div>
           <div class="shield-box2 column-header">
-            <span data-i18n="parry">Parry</span>
+            <span class="rotate-45" data-i18n="parry">Parry</span>
           </div>
           <div class="shield-box3 column-header">
-            <span data-i18n="name">Name</span>
+            <span data-i18n="type">Type</span>
           </div>
           <div class="shield-box4 column-header">
             <span data-i18n="attr-abbr">Attr</span>
@@ -3033,42 +3090,44 @@
         <div class="spells-box header">
           <h1 data-i18n="spell-u">SPELLS</h1>
         </div>
-        <div class="spells-box0 column-header"></div>
-        <div class="spells-box1 column-header">
+        <div class="spells-box0 column-header"><span class="rotate-45" data-i18n="safe-casting">Safe</span></div>
+        <div class="spells-box1 column-header"><span class="rotate-45" data-i18n="overcharging-abbr">Over</span></div>
+        <div class="spells-box2 column-header">
           <span data-i18n="name">Name</span>
         </div>
-        <div class="spells-box2 column-header">
-          <span data-i18n="rank-caster">Caster Rank</span>
-        </div>
         <div class="spells-box3 column-header">
-          <span data-i18n="rank-spell">Spell Rank</span>
+          <span data-i18n="talent-rank">Talent Rank</span>
         </div>
         <div class="spells-box4 column-header">
-          <span data-i18n="willpower-abbr">Will</span>
+          <span data-i18n="rank-spell">Spell Rank</span>
         </div>
         <div class="spells-box5 column-header">
-          <span data-i18n="range">Range</span>
+          <span data-i18n="willpower-abbr">Will</span>
         </div>
         <div class="spells-box6 column-header">
-          <span data-i18n="duration">Duration</span>
+          <span data-i18n="range">Range</span>
         </div>
         <div class="spells-box7 column-header">
-          <span data-i18n="ingredients">Ingredients</span>
+          <span data-i18n="duration">Duration</span>
         </div>
         <div class="spells-box8 column-header">
-          <!-- <span data-i18n="used">Used</span> -->
+          <span data-i18n="ingredients">Ingredients/span>
         </div>
         <div class="spells-box9 column-header">
-          <span data-i18n="grimoire-abbrv">Grim</span>
+          <span data-i18n="use-ingredients-abbr">Use Ingr</span>
         </div>
-        <div class="spells-box10">
+        <div class="spells-box10 column-header">
+          <span data-i18n="use-grimoire-abbr">Use Grim</span>
+        </div>
+        <div class="spells-box11">
           <fieldset class="repeating_spells">
             <div class="spells-grid">
               <input class="expand" type="checkbox" name="attr_expand" value="1" data-i18n-title="show-hide" title="show/hide" checked /><span></span>
               <button class="spells-box0 roll-button" type="action" name="act_spell-roll" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">t</button>
+              <button class="spells-box1 roll-button" type="action" name="act_spell-rollovercharge" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">t</button>
               <button class="rollme" type="roll" name="roll_the_dice_local" data-i18n-title="roll-dice" title="Roll the Dice!" value="@{the_dice_local_macro}">&nbsp;<span data-i18n="roll">Roll</span>&nbsp;</button>
-              <input class="spells-box1 input" type="text" name="attr_spell_name" value="" title="@{repeating_spells_$X_spell_name}" data-i18n-placeholder="spell-name" placeholder="Spell's name" />
-              <select class="spells-box2 input" name="attr_spell_caster_rank" title="@{repeating_spells_$X_spell_caster_rank}">
+              <input class="spells-box2 input" type="text" name="attr_spell_name" value="" title="@{repeating_spells_$X_spell_name}" data-i18n-placeholder="spell-name" placeholder="Spell's name" />
+              <select class="spells-box3 input" name="attr_spell_caster_rank" title="@{repeating_spells_$X_spell_caster_rank}">
                 <option value="1" selected>1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -3076,7 +3135,7 @@
                 <option value="5">5</option>
                 <option value="6">6</option>
               </select>
-              <select class="spells-box3 input" name="attr_spell_rank" title="@{repeating_spells_$X_spell_rank}">
+              <select class="spells-box4 input" name="attr_spell_rank" title="@{repeating_spells_$X_spell_rank}">
                 <option value="1" selected>1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -3084,19 +3143,19 @@
                 <option value="5">5</option>
                 <option value="6">6</option>
               </select>
-              <input class="spells-box4 input" type="number" name="attr_spell_willpower" value="1" min="1" title="@{repeating_spells_$X_spell_willpower}" />
-              <select class="spells-box5 input" name="attr_spell_range" title="@{repeating_spells_$X_spell_range}">
+              <input class="spells-box5 input" type="number" name="attr_spell_willpower" value="1" min="1" title="@{repeating_spells_$X_spell_willpower}" />
+              <select class="spells-box6 input" name="attr_spell_range" title="@{repeating_spells_$X_spell_range}">
                 <option value="Personal" selected data-i18n="personal">Personal</option>
                 <option value="Arm's L." data-i18n="arms-length-abbr">Arm's L.</option>
                 <option value="Short" data-i18n="short">Short</option>
                 <option value="Near" data-i18n="near">Near</option>
                 <option value="Distant" data-i18n="distant">Distant</option>
               </select>
-              <input class="spells-box6 input" type="text" name="attr_spell_duration" value="" title="@{repeating_spells_$X_spell_duration}" />
-              <input class="spells-box7 input" type="text" name="attr_spell_ingredients" value="" title="@{repeating_spells_$X_spell_ingredients}" />
-              <input class="spells-box8 input" type="checkbox" name="attr_spell_ingredients_included" value="1" title="@{repeating_spells_$X_spell_ingredients_included}" />
-              <input class="spells-box9 input" type="checkbox" name="attr_spell_grimoire" value="1" title="@{repeating_spells_$X_spell_grimoire}" />
-              <textarea class="spells-box10 input-textarea" name="attr_spell_description" title="@{repeating_spells_$X_spell_description}" data-i18n-placeholder="description" placeholder="Description."></textarea>
+              <input class="spells-box7 input" type="text" name="attr_spell_duration" value="" title="@{repeating_spells_$X_spell_duration}" />
+              <input class="spells-box8 input" type="text" name="attr_spell_ingredients" value="" title="@{repeating_spells_$X_spell_ingredients}" />
+              <input class="spells-box9 input" type="checkbox" name="attr_spell_ingredients_included" value="1" title="@{repeating_spells_$X_spell_ingredients_included}" />
+              <input class="spells-box10 input" type="checkbox" name="attr_spell_grimoire" value="1" title="@{repeating_spells_$X_spell_grimoire}" />
+              <textarea class="spells-box11 input-textarea" name="attr_spell_description" title="@{repeating_spells_$X_spell_description}" data-i18n-placeholder="description" placeholder="Description."></textarea>
             </div>
           </fieldset>
         </div>
@@ -3302,8 +3361,15 @@
   </div>
 </div>
 
+<!-- Sheet Settings -->
 <div class="wrapper tab-content settings">
   <div class="settings-options">
+    <div>
+      <span data-i18n="show-hide-label">Show/Hide:</span>
+      <span class="inline-label"><span data-i18n="mount">Mount</span>&nbsp;<input type="checkbox" class="display-mount" name="attr_display_mount_flag" value="1" checked /></span>
+      <span class="inline-label"><span data-i18n="beasts">Beasts</span>&nbsp;<input type="checkbox" class="display-beasts" name="attr_display_beasts_flag" value="1" checked /></span>
+      <span class="inline-label"><span data-i18n="spells">Spells</span>&nbsp;<input type="checkbox" class="display-spells" name="attr_display_spells_flag" value="1" checked /></span>
+    </div>
     <input type="hidden" name="attr_translation_whisper_query" value="whisper-query" />
     <input type="hidden" name="attr_translation_whisper_api_query" value="whisper_api-query" />
     <div>
@@ -3322,62 +3388,75 @@
         <option value="@{translation_whisper_api_macro_query}" data-i18n="whisper-query">Use a query.</option>
       </select>
     </div>
-    <!-- used to translate query-->
-    <span style="display: none;" name="attr_translation_whisper_macro_query" value=""></span>
-    <span style="display: none;" name="attr_translation_whisper_api_macro_query" value=""></span>
-    <span style="display: none;" data-i18n="whisper-query">Whisper roll?</span>
-    <span style="display: none;" data-i18n="yes">yes</span>
-    <span style="display: none;" data-i18n="no">no</span>
+    <!-- used by sheetworker to translate query -->
+    <span class="hidden" name="attr_translation_whisper_macro_query" value=""></span>
+    <span class="hidden" name="attr_translation_whisper_api_macro_query" value=""></span>
+    <span class="hidden" data-i18n="whisper-query">Whisper roll?</span>
+    <span class="hidden" data-i18n="yes">yes</span>
+    <span class="hidden" data-i18n="no">no</span>
     <div>
-      <span data-i18n="sort-skills">Sort Skills by Attribute:</span>
-      <input type="checkbox" name="attr_skill_order_group" value="1" title="@{skill_order_group}" style="vertical-align: text-top;" />
+      <span class="inline-label">
+        <span data-i18n="sort-skills">Sort Skills by Attribute:</span>&nbsp;
+        <input type="checkbox" name="attr_skill_order_group" value="1" title="@{skill_order_group}" style="vertical-align: text-top;" />
+      </span>
     </div>
     <div>
-      <span data-i18n="sort-stockpile">Sort Stockpile resources alphabetically:</span>
-      <input type="checkbox" name="attr_stockpile_order_group" value="1" title="@{stockpile_order_group}" style="vertical-align: text-top;" checked />
+      <span class="inline-label">
+        <span data-i18n="sort-stockpile">Sort Stockpile resources alphabetically:</span>&nbsp;
+        <input type="checkbox" name="attr_stockpile_order_group" value="1" title="@{stockpile_order_group}" style="vertical-align: text-top;" checked />
+      </span>
     </div>
+    <!-- Talent and Skill totals to help track integrity -->
+    <div class="rank-totals-grid">
+      <details>
+        <summary class="nav-after">
+          <span data-i18n="rank-level-totals">Rank & Level Totals</span>
+        </summary>
+          <div class="talent-ranks expanded-area">
+            <span class="label" data-i18n="rank">Rank</span>
+            <span>1</span>
+            <span>2</span>
+            <span>3</span>
+            <span>4</span>
+            <span>5</span>
+            <span>6</span>
+            <span></span>
+            <span class="label" data-i18n="level">Level</span>
+            <span>1st</span>
+            <span>2nd</span>
+            <span>3rd</span>
+            <span>4th</span>
+            <span>5th</span>
+            <span>6th</span>
+            <!-- Talents Row-->
+            <span class="label" data-i18n="talents">Talents</span>
+            <span><input type="text" name="attr_talent_rank1_total" value="0" title="@{talent_rank1_total}" readonly=""></span>
+            <span><input type="text" name="attr_talent_rank2_total" value="0" title="@{talent_rank2_total}" readonly=""></span>
+            <span><input type="text" name="attr_talent_rank3_total" value="0" title="@{talent_rank3_total}" readonly=""></span>
+            <span><input type="text" name="attr_talent_rank4_total" value="0" title="@{talent_rank4_total}" readonly=""></span>
+            <span><input type="text" name="attr_talent_rank5_total" value="0" title="@{talent_rank5_total}" readonly=""></span>
+            <span><input type="text" name="attr_talent_rank6_total" value="0" title="@{talent_rank6_total}" readonly=""></span>
+            <span></span>
+            <!-- Skills Row-->
+            <span class="label" data-i18n="skills">Skills</span>
+            <span><input type="text" name="attr_skill_level1_total" value="0" title="@{skill_level1_total}" readonly=""></span>
+            <span><input type="text" name="attr_skill_level2_total" value="0" title="@{skill_level2_total}" readonly=""></span>
+            <span><input type="text" name="attr_skill_level3_total" value="0" title="@{skill_level3_total}" readonly=""></span>
+            <span><input type="text" name="attr_skill_level4_total" value="0" title="@{skill_level4_total}" readonly=""></span>
+            <span><input type="text" name="attr_skill_level5_total" value="0" title="@{skill_level5_total}" readonly=""></span>
+            <span><input type="text" name="attr_skill_level6_total" value="0" title="@{skill_level6_total}" readonly=""></span>
+        </div>
+      </details>
+    </div>
+    <!-- Background -->
     <div>
-      <div class="rank-totals-grid">
-        <details>
-          <summary class="nav-after">
-            <span data-i18n="rank-level-totals">Rank & Level Totals</span>
-          </summary>
-            <div class="talent-ranks expanded-area">
-              <span class="label" data-i18n="rank">Rank</span>
-              <span>1</span>
-              <span>2</span>
-              <span>3</span>
-              <span>4</span>
-              <span>5</span>
-              <span>6</span>
-              <span></span>
-              <span class="label" data-i18n="level">Level</span>
-              <span>1st</span>
-              <span>2nd</span>
-              <span>3rd</span>
-              <span>4th</span>
-              <span>5th</span>
-              <span>6th</span>
-              <!-- Talents Row-->
-              <span class="label" data-i18n="talents">Talents</span>
-              <span><input type="text" name="attr_talent_rank1_total" value="0" title="@{talent_rank1_total}" readonly=""></span>
-              <span><input type="text" name="attr_talent_rank2_total" value="0" title="@{talent_rank2_total}" readonly=""></span>
-              <span><input type="text" name="attr_talent_rank3_total" value="0" title="@{talent_rank3_total}" readonly=""></span>
-              <span><input type="text" name="attr_talent_rank4_total" value="0" title="@{talent_rank4_total}" readonly=""></span>
-              <span><input type="text" name="attr_talent_rank5_total" value="0" title="@{talent_rank5_total}" readonly=""></span>
-              <span><input type="text" name="attr_talent_rank6_total" value="0" title="@{talent_rank6_total}" readonly=""></span>
-              <span></span>
-              <!-- Skills Row-->
-              <span class="label" data-i18n="skills">Skills</span>
-              <span><input type="text" name="attr_skill_level1_total" value="0" title="@{skill_level1_total}" readonly=""></span>
-              <span><input type="text" name="attr_skill_level2_total" value="0" title="@{skill_level2_total}" readonly=""></span>
-              <span><input type="text" name="attr_skill_level3_total" value="0" title="@{skill_level3_total}" readonly=""></span>
-              <span><input type="text" name="attr_skill_level4_total" value="0" title="@{skill_level4_total}" readonly=""></span>
-              <span><input type="text" name="attr_skill_level5_total" value="0" title="@{skill_level5_total}" readonly=""></span>
-              <span><input type="text" name="attr_skill_level6_total" value="0" title="@{skill_level6_total}" readonly=""></span>
-          </div>
-        </details>
-      </div>
+      <span data-i18n="sheet-background">Sheet Background</span>
+        <select name="attr_background" title="@{background}" style="width:8em;">
+          <option value="1" data-i18n="nothing">Nothing</option>
+          <option value="2" data-i18n="background-parchment">Parchment</option>
+          <option value="3" data-i18n="background-floral-white">Floral White</option>
+          <option value="4" data-i18n="background-light-gray">Light Gray</option>
+        </select>
     </div>
   </div>
 </div>
@@ -3750,11 +3829,11 @@
         {{#rollBetween() artifact-roll-eight 1 5}} {{artifact-roll-eight}} {{/rollBetween() artifact-roll-eight 1 5}}
         {{#rollBetween() artifact-roll-eight 6 7}}
         <div class="template-artifact-1">
-          <span class="template-inline" data-i18n-title="success-1" title="1 Success">1</span>
+          <span class="template-inline" data-i18n-title="success-1" title="1 Success">{{artifact-roll-eight}}</span>
         </div>
         {{/rollBetween() artifact-roll-eight 6 7}} {{#rollWasCrit() artifact-roll-eight}}
         <div class="template-artifact-2">
-          <span class="template-inline" data-i18n-title="success-2" title="2 Successes">2</span>
+          <span class="template-inline" data-i18n-title="success-2" title="2 Successes">{{artifact-roll-eight}}</span>
         </div>
         {{/rollWasCrit() artifact-roll-eight}}
       </div>
@@ -3763,11 +3842,11 @@
         {{#rollBetween() artifact-roll-ocho 1 5}} {{artifact-roll-ocho}} {{/rollBetween() artifact-roll-ocho 1 5}}
         {{#rollBetween() artifact-roll-ocho 6 7}}
         <div class="template-artifact-1">
-          <span class="template-inline" data-i18n-title="success-1" title="1 Success">1</span>
+          <span class="template-inline" data-i18n-title="success-1" title="1 Success">{{artifact-roll-ocho}}</span>
         </div>
         {{/rollBetween() artifact-roll-ocho 6 7}} {{#rollWasCrit() artifact-roll-ocho}}
         <div class="template-artifact-2">
-          <span class="template-inline" data-i18n-title="success-2" title="2 Successes">2</span>
+          <span class="template-inline" data-i18n-title="success-2" title="2 Successes">{{artifact-roll-ocho}}</span>
         </div>
         {{/rollWasCrit() artifact-roll-ocho}}
       </div>
@@ -3778,15 +3857,15 @@
         {{#rollBetween() artifact-roll-ten 1 5}} {{artifact-roll-ten}} {{/rollBetween() artifact-roll-ten 1 5}}
         {{#rollBetween() artifact-roll-ten 6 7}}
         <div class="template-artifact-1">
-          <span class="template-inline" data-i18n-title="success-1" title="1 Success">1</span>
+          <span class="template-inline" data-i18n-title="success-1" title="1 Success">{{artifact-roll-ten}}</span>
         </div>
         {{/rollBetween() artifact-roll-ten 6 7}} {{#rollBetween() artifact-roll-ten 8 9}}
         <div class="template-artifact-2">
-          <span class="template-inline" data-i18n-title="success-2" title="2 Successes">2</span>
+          <span class="template-inline" data-i18n-title="success-2" title="2 Successes">{{artifact-roll-ten}}</span>
         </div>
         {{/rollBetween() artifact-roll-ten 8 9}} {{#rollWasCrit() artifact-roll-ten}}
         <div class="template-artifact-3">
-          <span class="template-inline" data-i18n-title="success-3" title="3 Successes">3</span>
+          <span class="template-inline" data-i18n-title="success-3" title="3 Successes">{{artifact-roll-ten}}</span>
         </div>
         {{/rollWasCrit() artifact-roll-ten}}
       </div>
@@ -3794,21 +3873,21 @@
       <div class="template-grid-item template-span-shix template-orange-dice">
         {{#rollBetween() artifact-roll-twelve 1 5}} {{artifact-roll-twelve}} {{/rollBetween() artifact-roll-twelve 1 5}}
         {{#rollBetween() artifact-roll-twelve 6 7}}
-        <div class="template-artifact-1">
-          <span class="template-inline" data-i18n-title="success-1" title="1 Success">1</span>
-        </div>
+          <div class="template-artifact-1">
+            <span class="template-inline" data-i18n-title="success-1" title="1 Success">{{artifact-roll-twelve}}</span>
+          </div>
         {{/rollBetween() artifact-roll-twelve 6 7}} {{#rollBetween() artifact-roll-twelve 8 9}}
-        <div class="template-artifact-2">
-          <span class="template-inline" data-i18n-title="success-2" title="2 Successes">2</span>
-        </div>
+          <div class="template-artifact-2">
+            <span class="template-inline" data-i18n-title="success-2" title="2 Successes">{{artifact-roll-twelve}}</span>
+          </div>
         {{/rollBetween() artifact-roll-twelve 8 9}} {{#rollBetween() artifact-roll-twelve 10 11}}
-        <div class="template-artifact-3">
-          <span class="template-inline" data-i18n-title="success-3" title="3 Successes">3</span>
-        </div>
+          <div class="template-artifact-3">
+            <span class="template-inline" data-i18n-title="success-3" title="3 Successes">{{artifact-roll-twelve}}</span>
+          </div>
         {{/rollBetween() artifact-roll-twelve 10 11}} {{#rollWasCrit() artifact-roll-twelve}}
-        <div class="template-artifact-4">
-          <span class="template-inline" data-i18n-title="success-4" title="4 Successes">4</span>
-        </div>
+          <div class="template-artifact-4">
+            <span class="template-inline" data-i18n-title="success-4" title="4 Successes">{{artifact-roll-twelve}}</span>
+          </div>
         {{/rollWasCrit() artifact-roll-twelve}}
       </div>
       {{/rollTotal() artifact-die-twelve 1}}
@@ -3816,40 +3895,57 @@
       <!--- consumables -->
       <!--- d6 -->
       {{#rollTotal() consumable-die-six 1}}
-      <div class="template-grid-item template-span-center-die template-purple-dice">
+        <div class="template-grid-item template-span-center-die template-purple-dice">
+          {{#rollBetween() consumable-roll-six 1 2}}
+            <span data-i18n-title="bane" title="Bane"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Forbidden_Lands/images/bane_skull_white.png" alt="Bane" class="template-bane" /></span>
+          {{/rollBetween() consumable-roll-six 1 2}} {{#rollBetween() consumable-roll-six 3 6}} {{consumable-roll-six}}
+          {{/rollBetween() consumable-roll-six 3 6}}
+        </div>
         {{#rollBetween() consumable-roll-six 1 2}}
-        <span data-i18n-title="bane" title="Bane"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Forbidden_Lands/images/bane_skull_white.png" alt="Bane" class="template-bane" /></span>
-        {{/rollBetween() consumable-roll-six 1 2}} {{#rollBetween() consumable-roll-six 3 6}} {{consumable-roll-six}}
+        <div class="sheet-template-grid-item sheet-template-span-six sheet-template-footer" style="margin-bottom: -.5em;"><span data-i18n="consumable-note"></span></div>
+        {{/rollBetween() consumable-roll-six 1 2}} {{#rollBetween() consumable-roll-six 3 6}}
         {{/rollBetween() consumable-roll-six 3 6}}
-      </div>
       {{/rollTotal() consumable-die-six 1}}
       <!--- d8 -->
       {{#rollTotal() consumable-die-eight 1}}
-      <div class="template-grid-item template-span-center-die template-purple-dice">
-        {{#rollBetween() consumable-roll-eight 1 2}}
-        <span data-i18n-title="bane" title="Bane"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Forbidden_Lands/images/bane_skull_white.png" alt="Bane" class="template-bane" /></span>
-        {{/rollBetween() consumable-roll-eight 1 2}} {{#rollBetween() consumable-roll-eight 3 8}}
-        {{consumable-roll-eight}} {{/rollBetween() consumable-roll-eight 3 8}}
-      </div>
+        <div class="template-grid-item template-span-center-die template-green-dice" style="padding: 4px 1px 2px 2px;">
+          {{#rollBetween() consumable-roll-eight 1 2}}
+            <span data-i18n-title="bane" title="Bane"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Forbidden_Lands/images/bane_skull_white.png" alt="Bane" class="template-bane" /></span>
+          {{/rollBetween() consumable-roll-eight 1 2}} {{#rollBetween() consumable-roll-eight 3 8}}
+            {{consumable-roll-eight}} {{/rollBetween() consumable-roll-eight 3 8}}
+        </div>
+          {{#rollBetween() consumable-roll-eight 1 2}}
+          <div class="sheet-template-grid-item sheet-template-span-six sheet-template-footer" style="margin-bottom: -.5em;"><span data-i18n="consumable-note"></span></div>
+          {{/rollBetween() consumable-roll-eight 1 2}} {{#rollBetween() consumable-roll-eight 3 8}}
+          {{/rollBetween() consumable-roll-eight 3 8}}
       {{/rollTotal() consumable-die-eight 1}}
       <!--- d10 -->
       {{#rollTotal() consumable-die-ten 1}}
-      <div class="template-grid-item template-span-center-die template-purple-dice">
-        {{#rollBetween() consumable-roll-ten 1 2}}
-        <span data-i18n-title="bane" title="Bane"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Forbidden_Lands/images/bane_skull_white.png" alt="Bane" class="template-bane" /></span>
-        {{/rollBetween() consumable-roll-ten 1 2}} {{#rollBetween() consumable-roll-ten 3 10}} {{consumable-roll-ten}}
-        {{/rollBetween() consumable-roll-ten 3 10}}
-      </div>
+        <div class="template-grid-item template-span-center-die template-blue-dice">
+          {{#rollBetween() consumable-roll-ten 1 2}}
+            <span data-i18n-title="bane" title="Bane"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Forbidden_Lands/images/bane_skull_white.png" alt="Bane" class="template-bane" /></span>
+          {{/rollBetween() consumable-roll-ten 1 2}} {{#rollBetween() consumable-roll-ten 3 10}} {{consumable-roll-ten}}
+          {{/rollBetween() consumable-roll-ten 3 10}}
+        </div>
+          {{#rollBetween() consumable-roll-ten 1 2}}
+          <div class="sheet-template-grid-item sheet-template-span-six sheet-template-footer" style="margin-bottom: -.5em;"><span data-i18n="consumable-note"></span></div>
+          {{/rollBetween() consumable-roll-ten 1 2}} {{#rollBetween() consumable-roll-ten 3 10}}
+          {{/rollBetween() consumable-roll-ten 3 10}}
       {{/rollTotal() consumable-die-ten 1}}
       <!--- d12 -->
       {{#rollTotal() consumable-die-twelve 1}}
-      <div class="template-grid-item template-span-center-die template-purple-dice">
-        {{#rollBetween() consumable-roll-twelve 1 2}}
-        <span data-i18n-title="bane" title="Bane"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Forbidden_Lands/images/bane_skull_white.png" alt="Bane" class="template-bane" /></span>
-        {{/rollBetween() consumable-roll-twelve 1 2}} {{#rollBetween() consumable-roll-twelve 3 12}}
-        {{consumable-roll-twelve}} {{/rollBetween() consumable-roll-twelve 3 12}}
-      </div>
+        <div class="template-grid-item template-span-center-die template-orange-dice">
+          {{#rollBetween() consumable-roll-twelve 1 2}}
+            <span data-i18n-title="bane" title="Bane"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Forbidden_Lands/images/bane_skull_white.png" alt="Bane" class="template-bane" /></span>
+          {{/rollBetween() consumable-roll-twelve 1 2}} {{#rollBetween() consumable-roll-twelve 3 12}}
+            {{consumable-roll-twelve}} {{/rollBetween() consumable-roll-twelve 3 12}}
+        </div>
+          {{#rollBetween() consumable-roll-twelve 1 2}}
+          <div class="sheet-template-grid-item sheet-template-span-six sheet-template-footer" style="margin-bottom: -.5em;"><span data-i18n="consumable-note"></span></div>
+          {{/rollBetween() consumable-roll-twelve 1 2}} {{#rollBetween() consumable-roll-twelve 3 12}}
+          {{/rollBetween() consumable-roll-twelve 3 12}}
       {{/rollTotal() consumable-die-twelve 1}}
+
       <!--- d66 -->
       <!-- increased range of each d66 dice to allow for custom rolls 0-100-->
       {{#rollTotal() d66-die-one 1}}
@@ -3910,7 +4006,7 @@
         <span class="label">{{armor1-name}}</span>
       </div>
       <div class="template-grid-item template-span-six condensed">
-        {{#armor1-rating}}<span class="label"><span data-i18n="armor-rating-abbr">AR</span>:<span class="results">{{armor1-rating}}</span>{{/armor1-rating}}<span class="results">{{#armor1-rating-max}}</span>/<span class="results">{{armor1-rating-max}}</span></span>{{/armor1-rating-max}}
+        {{#armor1-rating}}<span class="label"><span data-i18n="armor-rating-abbr">AR</span>:<span class="results">{{armor1-rating}}</span>{{/armor1-rating}}{{#armor1-rating-max}}/<span class="results">{{armor1-rating-max}}</span></span>{{/armor1-rating-max}}
         {{#armor1-rating-misc}}&#177;<span class="label"><span data-i18n="misc-abbr">Misc</span>:<span class="results">{{armor1-rating-misc}}</span></span>{{/armor1-rating-misc}}
         {{#armor1-rating-total}}=<span class="label"><span data-i18n="total">Total</span>:<span class="results">{{armor1-rating-total}}</span></span>{{/armor1-rating-total}}
       </div>
@@ -3923,7 +4019,7 @@
         <span class="label">{{armor2-name}}</span>
       </div>
       <div class="template-grid-item template-span-six condensed">
-        {{#armor2-rating}}<span class="label"><span data-i18n="armor-rating-abbr">AR</span>:<span class="results">{{armor2-rating}}</span>{{/armor2-rating}}<span class="results">{{#armor2-rating-max}}</span>/<span class="results">{{armor2-rating-max}}</span></span>{{/armor2-rating-max}}
+        {{#armor2-rating}}<span class="label"><span data-i18n="armor-rating-abbr">AR</span>:<span class="results">{{armor2-rating}}</span>{{/armor2-rating}}{{#armor2-rating-max}}/<span class="results">{{armor2-rating-max}}</span></span>{{/armor2-rating-max}}
         {{#armor2-rating-misc}}&#177;<span class="label"><span data-i18n="misc-abbr">Misc</span>:<span class="results">{{armor2-rating-misc}}</span></span>{{/armor2-rating-misc}}
         {{#armor2-rating-total}}=<span class="label"><span data-i18n="total">Total</span>:<span class="results">{{armor2-rating-total}}</span></span>{{/armor2-rating-total}}
       </div>
@@ -3936,7 +4032,7 @@
         <span class="label">{{armor3-name}}</span>
       </div>
       <div class="template-grid-item template-span-six condensed">
-        {{#armor3-rating}}<span class="label"><span data-i18n="armor-rating-abbr">AR</span>:<span class="results">{{armor3-rating}}{{/armor3-rating}}{{#armor3-rating-max}}/{{armor3-rating-max}}</span>{{/armor3-rating-max}}
+        {{#armor3-rating}}<span class="label"><span data-i18n="armor-rating-abbr">AR</span>:<span class="results">{{armor3-rating}}</span>{{/armor3-rating}}{{#armor3-rating-max}}/<span class="results">{{armor3-rating-max}}</span></span>{{/armor3-rating-max}}
         {{#armor3-rating-misc}}&#177;<span class="label"><span data-i18n="misc-abbr">Misc</span>:<span class="results">{{armor3-rating-misc}}</span>{{/armor3-rating-misc}}
         {{#armor3-rating-total}}=<span class="label"><span data-i18n="total">Total</span>:<span class="results">{{armor3-rating-total}}</span>{{/armor3-rating-total}}
       </div>
@@ -3949,7 +4045,7 @@
         <span class="label">{{armor4-name}}</span>
       </div>
       <div class="template-grid-item template-span-six condensed">
-        {{#armor4-rating}}<span class="label"><span data-i18n="armor-rating-abbr">AR</span>:<span class="results">{{armor4-rating}}{{/armor4-rating}}{{#armor4-rating-max}}/{{armor4-rating-max}}</span>{{/armor4-rating-max}}
+        {{#armor4-rating}}<span class="label"><span data-i18n="armor-rating-abbr">AR</span>:<span class="results">{{armor4-rating}}</span>{{/armor4-rating}}{{#armor4-rating-max}}/<span class="results">{{armor4-rating-max}}</span></span>{{/armor4-rating-max}}
         {{#armor4-rating-misc}}&#177;<span class="label"><span data-i18n="misc-abbr">Misc</span>:<span class="results">{{armor4-rating-misc}}</span>{{/armor4-rating-misc}}
         {{#armor4-rating-total}}=<span class="label"><span data-i18n="total">Total</span>:<span class="results">{{armor4-rating-total}}</span>{{/armor4-rating-total}}
       </div>
@@ -3967,44 +4063,49 @@
         {{#shield1-skill}}
         <span class="label"><span data-i18n="skill">Skill</span>:<span class="results">{{shield1-skill}}</span></span>
         {{/shield1-skill}}
-        {{#shield1-bonus}}
-        <span class="label"><span data-i18n="bonus-abbr">BON</span>:<span class="results">{{shield1-bonus}}</span></span>
-        {{/shield1-bonus}}<span class="results">{{#shield1-bonus-max}}</span>/<span class="results">{{shield1-bonus-max}}</span>{{/shield1-bonus-max}}
+        {{#shield1-bonus}}<span class="label"><span data-i18n="bonus-abbr">BON</span>:<span class="results">{{shield1-bonus}}</span>{{/shield1-bonus}}/{{#shield1-bonus-max}}<span class="results">{{shield1-bonus-max}}</span>{{/shield1-bonus-max}}</span>
         {{#shield1-bonus-misc}}&#177;<span class="label"><span data-i18n="misc-abbr">Misc</span>:<span class="results">{{shield1-bonus-misc}}</span></span>
         {{/shield1-bonus-misc}}
       </div>
       {{/shield1-name}}
 
       <!--- spell -->
-      <div class="template-grid-item template-span-six condensed">
+      <div class="template-grid-item template-span-six condensed left">
         {{#willpower-total}}
-        <span class="label"><span data-i18n="willpower">Willpower</span>:<span class="results">{{willpower-total}}</span></span>
+        <span class="label"><span data-i18n="willpower-total-abbr">Total WP</span>:<span class="results">{{willpower-total}}</span></span>
         {{/willpower-total}}
         {{#caster-rank}}
-        <span class="label"><span data-i18n="rank-caster">Caster Rank</span>:<span class="results">{{caster-rank}}</span></span>
+        <span class="label"><span data-i18n="talent-rank-abbr">Talent Rnk</span>:<span class="results">{{caster-rank}}</span></span>
         {{/caster-rank}}
         {{#spell-rank}}
-        <span class="label"><span data-i18n="rank-spell">Spell Rank</span>:<span class="results">{{spell-rank}}</span></span>
+        <span class="label"><span data-i18n="spell-rank-abbr">Spell Rnk</span>:<span class="results">{{spell-rank}}</span></span>
         {{/spell-rank}}
-        {{#spell-willpower}}
-        <span class="label"><span data-i18n="willpower-spent-abbr">WP Spent</span>:<span class="results">{{spell-willpower}}</span></span>
-        {{/spell-willpower}}
+        {{#spell-grimoire}}
+        (<span>-</span><span class="results">1</span><span data-i18n="for">for</span>&nbsp;<span class="label" data-i18n="grimoire">{{spell-grimoire}}</span>)
+        {{/spell-grimoire}}
+      </div>
+      {{#spell-willpower}}
+        <div class="template-grid-item template-span-six condensed left">
+          <span class="label"><span data-i18n="base-power-level-abbr">Base PL</span> = </span>
+          <span class="results">{{spell-willpower}}</span>
+          {{^spell-ingredients-included}}
+            (<span data-i18n="willpower-used-abbr">WP Used</span>)
+          {{/spell-ingredients-included}}
+          {{#spell-ingredients-included}}
+            (<span data-i18n="willpower-used-abbr">WP Used</span><span>&nbsp;+1&nbsp;</span><span data-i18n="for">for</span>&nbsp;<span data-i18n="ingredients-abbr">{{spell-ingredients-included}}</span>)
+          {{/spell-ingredients-included}}
+        </div>
+      {{/spell-willpower}}
+      <div class="template-grid-item template-span-six condensed left">
+        {{#spell-range}}<span class="label" data-i18n="range">Range</span>:&nbsp;{{spell-range}}&nbsp;{{/spell-range}}{{#spell-duration}}<span class="label" data-i18n="duration">Duration</span>:&nbsp;{{spell-duration}}{{/spell-duration}}
+        {{#spell-ingredients-included}}
+          {{#spell-ingredients}}
+            <span class="label" data-i18n="ingredients">{{spell-ingredients-included}}</span>
+            <span>{{spell-ingredients}}</span>
+          {{/spell-ingredients}}
+        {{/spell-ingredients-included}}
       </div>
 
-      <div class="template-grid-item template-span-six condensed">{{#spell-range}}<span class="label" data-i18n="range">Range</span>:&nbsp;{{spell-range}}&nbsp;{{/spell-range}}{{#spell-duration}}<span class="label" data-i18n="duration">Duration</span>:&nbsp;{{spell-duration}}{{/spell-duration}}
-        {{#spell-grimoire}}<br><span class="label" data-i18n="grimoire-used">&nbsp;{{spell-grimoire}}</span><span class="image-inline-success"></span>{{/spell-grimoire}}
-      </div>
-
-      {{#spell-ingredients-included}}
-      {{#spell-ingredients}}
-      <div class="template-grid-item template-span-six condensed">
-        <span class="label">
-          <span class="label" data-i18n="ingredients">Ingredients</span>
-          <span class="label" data-i18n="included">{{spell-ingredients-included}}</span>:
-        </span>{{spell-ingredients}}
-      </div>
-      {{/spell-ingredients}}
-      {{/spell-ingredients-included}}
 
       {{#spell-description}}
       <hr class="template-span-six" style="margin: 5px 10px 5px 10px;" />
@@ -4015,8 +4116,7 @@
       <div class="template-grid-item template-span-six condensed">
         {{#skill-base}}<span class="label"><span data-i18n="attr-abbr">Attr</span>:<span class="sheet-results">{{skill-base}}</span></span>{{/skill-base}}
         {{#skill-skill}}<span class="label"><span data-i18n="skill">Skill</span>:<span class="sheet-results">{{skill-skill}}</span></span>{{/skill-skill}}
-        {{#skill-bonus-misc-skill}}<span class="label">&#177;<span data-i18n="misc-abbr">Misc</span>:<span class="sheet-results">
-        {{skill-bonus-misc-skill}}</span></span>{{/skill-bonus-misc-skill}}{{#skill-bonus-misc-gear}}<span class="label">&#177;<span data-i18n="misc-abbr">Misc</span>:<span class="sheet-results">{{skill-bonus-misc-gear}}</span></span>{{/skill-bonus-misc-gear}}
+        {{#skill-bonus-misc-skill}}<span class="label">&#177;<span data-i18n="misc-abbr">Misc</span>:<span class="sheet-results">{{skill-bonus-misc-skill}}</span></span>{{/skill-bonus-misc-skill}}{{#skill-bonus-misc-gear}}<span class="label">&#177;<span data-i18n="misc-abbr">Misc</span>:<span class="sheet-results">{{skill-bonus-misc-gear}}</span></span>{{/skill-bonus-misc-gear}}
         {{#skill-notes}}
         <hr class="template-span-six" style="margin: 5px 10px 5px 10px;" />
         <div class="template-grid-item template-span-six scroll-text"><span>{{skill-notes}}</span></div>
@@ -4053,7 +4153,7 @@
 
   'use strict';
 
-  /* number and log handling */
+  /* GLOBAL number and log handling */
   const int = (score, on_error = 0) => parseInt(score) || on_error;
   const float = (score, on_error = 0) => parseFloat(score) || on_error;
   const clog = (text, title = '', color = 'green', style = 'font-size:12px; font-weight:normal;', headerstyle = 'font-size:13px; font-weight:bold;') => {
@@ -4069,7 +4169,6 @@
   };
 
   /* version tracking */
-
   const newAnnouncement = (old_version, new_version, show_announcement) => {
     const setter = {};
     clog(`Current sheet data version: ${old_version}, Sheet code version: ${new_version}`);
@@ -4090,7 +4189,7 @@
     // set the sheet version you are upgrading sheet to,
     // and set show_announcement to 1 if you want to force an announcement to be shown.
     // don't set a code_version; we use the switch below for that.
-    const new_version = 1.851;
+    const new_version = 1.854;
     const show_announcement = 0;
     if (!old_version) old_version = 0;
     switch (true) {
@@ -4152,6 +4251,13 @@
 
   /* ===== PARAMETERS ==========
   GiGs 'Super Simple Summarizer'
+  destinations = the name of the attribute that stores the total quantity
+        can be a single attribute, or an array: ['total_cost', 'total_weight']
+        If more than one, the matching fields must be in the same order.
+   section = name of repeating fieldset, without the repeating_
+   fields = the name of the attribute field to be summed
+         destination and fields both can be a single attribute: 'weight'
+         or an array of attributes: ['weight','number','equipped']
   */
   const repeatingSum = (destination, section, fields, multiplier = 1) => {
     // if (!Array.isArray(fields)) fields = [fields];
@@ -4162,7 +4268,6 @@
         clog(`values of v: ${JSON.stringify(v)}`);
         // getValue: if not a number, returns 1 if it is 'on' (checkbox), otherwise returns 0..
         const getValue = (section, id, field) => float(v[`repeating_${section}_${id}_${field}`]) || (v[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : 0);
-
         const sumTotal = idArray.reduce((total, id) => total + normalizedFields.reduce((subtotal, field) => subtotal * getValue(section, id, field), 1), 0);
         setAttrs({
           [destination]: sumTotal * multiplier,
@@ -4275,16 +4380,16 @@
   /* consumables macro */
   on('sheet:opened change:food change:water change:arrows change:torches', function (eventInfo) {
     // clog(`~~~ Change Detected: ${eventInfo.sourceAttribute}`);
-    getAttrs(['food', 'water', 'arrows', 'torches', 'food_macro', 'water_macro', 'arrows_macro', 'torches_macro'], function (values) {
+    getAttrs(['food', 'water', 'arrows', 'torches'], function (values) {
       const settings = {};
       const {food} = values;
       const {water} = values;
       const {arrows} = values;
       const {torches} = values;
-      const {food_macro} = values;
-      const {water_macro} = values;
-      const {arrows_macro} = values;
-      const {torches_macro} = values;
+      // const {food_macro} = values;
+      // const {water_macro} = values;
+      // const {arrows_macro} = values;
+      // const {torches_macro} = values;
       if (food) {
         switch (values.food) {
           case '0':
@@ -4915,6 +5020,7 @@
           skill_only_selected,
           skill_notes_selected,
           current_preset: whichKey,
+          subtitle2: '',
           include_with_roll: `{{skill-base=${skill_attribute_selected}}} {{skill-skill=${skill_only_selected}}} {{skill-bonus-misc-skill=${skill_bonus_misc_selected}}} {{skill-bonus-misc-gear=${skill_bonus_misc_gear_selected}}} {{skill-notes=${skill_notes_selected}}}`,
         });
       }
@@ -4938,6 +5044,7 @@
         gear: miscGear_score,
         skill: miscSkill_score,
         current_preset: whichKey,
+        subtitle2: '',
         include_with_roll: '',
       });
     });
@@ -5013,6 +5120,7 @@
       artifact_die_ten: 0,
       artifact_die_twelve: 0,
       current_preset: getTranslationByKey(`custom-roll`),
+      subtitle2: '',
       include_with_roll: '',
     });
   });
@@ -5081,7 +5189,12 @@
         attribute: attributeOverflow,
         skill: reputation_total,
         gear: gearOverflow,
+        artifact_die_ocho: 0,
+        artifact_die_eight: 0,
+        artifact_die_ten: 0,
+        artifact_die_twelve: 0,
         current_preset: getTranslationByKey(`reputation-roll`),
+        subtitle2: '',
         // include_with_roll: '{{attribute-die-one}}', // hides the dice column footer
         include_with_roll: '{{dice-label-flag=1}}',
       });
@@ -5141,6 +5254,7 @@
           artifact_die_ten: weapon_artifact_die_ten,
           artifact_die_twelve: weapon_artifact_die_twelve,
           current_preset: `${getTranslationByKey(`attack`)} - ${weapon_name}`,
+          subtitle2: '',
           include_with_roll: `{{weapon-bonus=${weapon_bonus}}} {{weapon-bonus-max=${weapon_bonus_max}}} {{weapon-bonus-misc=${weapon_bonus_misc}}} {{weapon-damage=${weapon_damage}}} {{weapon-damage-misc=${weapon_damage_misc}}} {{weapon-range=${weapon_range}}} {{weapon-features=${weapon_features}}}`,
         });
       }
@@ -5199,6 +5313,7 @@
           artifact_die_ten: weapon_artifact_die_ten,
           artifact_die_twelve: weapon_artifact_die_twelve,
           current_preset: `${getTranslationByKey(`parry`)} - ${weapon_name}`,
+          subtitle2: '',
           include_with_roll: `{{weapon-bonus=${weapon_bonus}}} {{weapon-bonus-max=${weapon_bonus_max}}} {{weapon-bonus-misc=${weapon_bonus_misc}}} {{weapon-damage=${weapon_damage}}} {{weapon-damage-misc=${weapon_damage_misc}}} {{weapon-range=^{arms-length-abbr}}} {{weapon-features=${weapon_features}}}`,
         });
       }
@@ -5230,6 +5345,7 @@
           skill: 0,
           gear: 0,
           current_preset: `${getTranslationByKey(`attack`)} - ${monster_attack_name}`,
+          subtitle2: '',
           include_with_roll: `{{weapon-damage=${monster_attack_damage}}} {{attack-features=${monster_attack_features}}} {{weapon-range=${monster_attack_range}}} {{attack-description=${monster_attack_description}}}`,
         });
       }
@@ -5237,8 +5353,8 @@
   });
 
   /* set spell dice pool */
-  on('clicked:repeating_spells:spell-roll', function (eventInfo) {
-    // clog(`Change Detected: ${eventInfo.sourceAttribute}`);
+  on('clicked:repeating_spells:spell-roll clicked:repeating_spells:spell-rollovercharge', function (eventInfo) {
+    clog(`Change Detected: ${eventInfo.sourceAttribute}`);
     getAttrs(
       [
         'repeating_spells_spell_name',
@@ -5254,6 +5370,8 @@
         'willpower',
       ],
       function (values) {
+        // check action button to determine if the roll is safe or overcharged
+        const isOvercharged = /rollovercharge/.test(eventInfo.sourceAttribute) ? 1 : 0;
         const spell_name = values.repeating_spells_spell_name;
         const caster_rank = int(values.repeating_spells_spell_caster_rank);
         const spell_rank = int(values.repeating_spells_spell_rank);
@@ -5262,17 +5380,33 @@
         const spell_duration = values.repeating_spells_spell_duration;
         const spell_ingredients = values.repeating_spells_spell_ingredients;
         let spell_ingredients_included = int(values.repeating_spells_spell_ingredients_included);
-        let spell_grimoire = int(values.repeating_spells_spell_grimoire);
+        let spell_grimoire_text = '';
+        const spell_grimoire = int(values.repeating_spells_spell_grimoire);
         const spell_description = values.repeating_spells_spell_description;
         const willpower = int(values.willpower);
-        spell_ingredients_included = spell_ingredients_included === 1 ? 'included' : '';
-        spell_grimoire = spell_grimoire === 1 ? 'Grimoire was used.' : '';
+        const basePowerLevel = spell_willpower + spell_ingredients_included;
+        const chanceCasting = caster_rank < spell_rank ? spell_rank - caster_rank : 0;
+        // check action button to determine if the roll is safe or overcharged
+        let typeOfCastingText = isOvercharged === 1 ? `${getTranslationByKey(`casting-overcharged`)}` : `${getTranslationByKey(`casting-safe`)}`;
+        let dicePool = isOvercharged === 1 ? spell_willpower + chanceCasting : spell_willpower - (caster_rank - (spell_rank - spell_grimoire));
+        // check for Chance casting
+        if (chanceCasting !== 0) {
+          typeOfCastingText = isOvercharged === 1 ? `${getTranslationByKey(`casting-overcharged-chance`)}` : `${getTranslationByKey(`casting-safe`)}`;
+          dicePool = isOvercharged === 1 ? spell_willpower + chanceCasting : spell_willpower - (caster_rank - (Math.min(spell_rank, caster_rank) - spell_grimoire));
+        }
+        spell_ingredients_included = spell_ingredients_included === 1 ? 'Ingred.' : '';
+        spell_grimoire_text = spell_grimoire === 1 ? 'Grimoire' : '';
         setAttrs({
-          attribute: spell_willpower,
+          attribute: dicePool,
           skill: 0,
           gear: 0,
+          artifact_die_eight: 0,
+          artifact_die_ocho: 0,
+          artifact_die_ten: 0,
+          artifact_die_twelve: 0,
           current_preset: `${getTranslationByKey(`spell`)} - ${spell_name}`,
-          include_with_roll: `{{willpower-total=${willpower}}} {{caster-rank=${caster_rank}}} {{spell-rank=${spell_rank}}} {{spell-willpower=${spell_willpower}}} {{spell-range=${spell_range}}} {{spell-duration=${spell_duration}}} {{spell-ingredients-included=${spell_ingredients_included}}} {{spell-ingredients=${spell_ingredients}}} {{spell-grimoire=${spell_grimoire}}} {{spell-description=${spell_description}}}`,
+          subtitle2: typeOfCastingText,
+          include_with_roll: `{{willpower-total=${willpower}}} {{caster-rank=${caster_rank}}} {{spell-rank=${spell_rank}}} {{spell-willpower=${basePowerLevel}}} {{spell-range=${spell_range}}} {{spell-duration=${spell_duration}}} {{spell-ingredients-included=${spell_ingredients_included}}} {{spell-ingredients=${spell_ingredients}}} {{spell-grimoire=${spell_grimoire_text}}} {{spell-description=${spell_description}}}`,
         });
       }
     );
@@ -5524,6 +5658,7 @@
           artifact_die_ten: Math.max(armor_artifact_die_ten, armor1_artifact_die_ten, armor2_artifact_die_ten, armor3_artifact_die_ten, armor4_artifact_die_ten),
           artifact_die_twelve: Math.max(armor_artifact_die_twelve, armor1_artifact_die_twelve, armor2_artifact_die_twelve, armor3_artifact_die_twelve, armor4_artifact_die_twelve),
           current_preset: getTranslationByKey(`armor-roll`),
+          subtitle2: '',
           include_with_roll: `{{armor1-equipped=[[ ${armor1_equipped} ]]}} {{armor1-name=${armor1_name}}} {{armor1-rating=${armor1_bonus}}} {{armor1-rating-max=${armor1_bonus_max}}} {{armor1-rating-misc=${armor1_damage}}} {{armor1-rating-total=${armor1_ar}}} {{armor2-equipped=[[ ${armor2_equipped} ]]}} {{armor2-name=${armor2_name}}} {{armor2-rating=${armor2_bonus}}} {{armor2-rating-max=${armor2_bonus_max}}} {{armor2-rating-misc=${armor2_damage}}} {{armor2-rating-total=${armor2_ar}}} {{armor3-equipped=[[ ${armor3_equipped} ]]}} {{armor3-name=${armor3_name}}} {{armor3-rating=${armor3_bonus}}} {{armor3-rating-max=${armor3_bonus_max}}} {{armor3-rating-misc=${armor3_damage}}} {{armor3-rating-total=${armor3_ar}}} {{armor4-equipped=[[ ${armor4_equipped} ]]}} {{armor4-name=${armor4_name}}} {{armor4-rating=${armor4_bonus}}} {{armor4-rating-max=${armor4_bonus_max}}} {{armor4-rating-misc=${armor4_damage}}} {{armor4-rating-total=${armor4_ar}}}`,
         });
       }
@@ -5572,6 +5707,7 @@
           artifact_die_ten: shield1_artifact_die_ten,
           artifact_die_twelve: shield1_artifact_die_twelve,
           current_preset: `${getTranslationByKey(`shove`)} - ${getTranslationByKey(`shield`)}`,
+          subtitle2: '',
           include_with_roll: `{{shield1-name=${shield1_name}}} {{shield1-base=${strength_total}}} {{shield1-skill=${melee}}} {{shield1-bonus=${shield1_bonus}}} {{shield1-bonus-max=${shield1_bonus_max}}} {{shield1-bonus-misc=${shield1_bonus_misc}}}`,
         });
       }
@@ -5619,6 +5755,7 @@
           artifact_die_ten: shield1_artifact_die_ten,
           artifact_die_twelve: shield1_artifact_die_twelve,
           current_preset: `${getTranslationByKey(`parry`)} - ${getTranslationByKey(`shield`)}`,
+          subtitle2: '',
           include_with_roll: `{{shield1-name=${shield1_name}}} {{shield1-base=${strength_total}}} {{shield1-skill=${melee}}} {{shield1-bonus=${shield1_bonus}}} {{shield1-bonus-max=${shield1_bonus_max}}} {{shield1-bonus-misc=${shield1_bonus_misc}}}`,
         });
       }
@@ -5656,7 +5793,7 @@
   const stats = ['strength', 'agility', 'wits', 'empathy'];
   /* Update the Dice Pool indicator */
   on(
-    'clicked:armor-roll clicked:dice_pool_animal_handling clicked:dice_pool_crafting clicked:dice_pool_crafting_monster clicked:dice_pool_endurance clicked:dice_pool_endurance_monster clicked:dice_pool_healing clicked:dice_pool_insight clicked:dice_pool_lore clicked:dice_pool_manipulation clicked:dice_pool_marksmanship clicked:dice_pool_melee clicked:dice_pool_melee_monster clicked:dice_pool_might clicked:dice_pool_might_monster clicked:dice_pool_move clicked:dice_pool_performance clicked:dice_pool_scouting clicked:dice_pool_sleight_of_hand clicked:dice_pool_stealth clicked:dice_pool_survival clicked:repeating_monster:monster-attack-roll clicked:repeating_spells:spell-roll clicked:repeating_weapons:attack-roll clicked:reputation-roll clicked:shield-roll clicked:shield-shove-roll',
+    'clicked:armor-roll clicked:dice_pool_animal_handling clicked:dice_pool_crafting clicked:dice_pool_crafting_monster clicked:dice_pool_endurance clicked:dice_pool_endurance_monster clicked:dice_pool_healing clicked:dice_pool_insight clicked:dice_pool_lore clicked:dice_pool_manipulation clicked:dice_pool_marksmanship clicked:dice_pool_melee clicked:dice_pool_melee_monster clicked:dice_pool_might clicked:dice_pool_might_monster clicked:dice_pool_move clicked:dice_pool_performance clicked:dice_pool_scouting clicked:dice_pool_sleight_of_hand clicked:dice_pool_stealth clicked:dice_pool_survival clicked:repeating_monster:monster-attack-roll clicked:repeating_spells:spell-roll clicked:repeating_spells:spell-rollovercharge clicked:repeating_weapons:attack-roll clicked:reputation-roll clicked:shield-roll clicked:shield-shove-roll',
     function (eventInfo) {
       // clog(`Change Detected: ${eventInfo.sourceAttribute}`);
       getAttrs(['roll_the_dice_flag'], function (values) {
@@ -5761,7 +5898,12 @@
         attribute: strength_total,
         skill: 0,
         gear: 0,
+        artifact_die_eight: 0,
+        artifact_die_ocho: 0,
+        artifact_die_ten: 0,
+        artifact_die_twelve: 0,
         current_preset: getTranslationByKey(`roll-strength`),
+        subtitle2: '',
         include_with_roll: '',
       });
     });
@@ -5776,7 +5918,12 @@
         attribute: agility_total,
         skill: 0,
         gear: 0,
+        artifact_die_eight: 0,
+        artifact_die_ocho: 0,
+        artifact_die_ten: 0,
+        artifact_die_twelve: 0,
         current_preset: getTranslationByKey(`roll-agility`),
+        subtitle2: '',
         include_with_roll: '',
       });
     });
@@ -5791,7 +5938,12 @@
         attribute: wits_total,
         skill: 0,
         gear: 0,
+        artifact_die_eight: 0,
+        artifact_die_ocho: 0,
+        artifact_die_ten: 0,
+        artifact_die_twelve: 0,
         current_preset: getTranslationByKey(`roll-wits`),
+        subtitle2: '',
         include_with_roll: '',
       });
     });
@@ -5806,7 +5958,12 @@
         attribute: empathy_total,
         skill: 0,
         gear: 0,
+        artifact_die_eight: 0,
+        artifact_die_ocho: 0,
+        artifact_die_ten: 0,
+        artifact_die_twelve: 0,
         current_preset: getTranslationByKey(`roll-empathy`),
+        subtitle2: '',
         include_with_roll: '',
       });
     });
@@ -5959,13 +6116,13 @@
                         output[`repeating_injuries_${newrowid}_injury_value`] = 1;
                       }
                       // adds 10 rows
-                      if (gearRows < 10) {
+                      if (gearRows < 5) {
                         let i = gearRows;
                         do {
                           i++;
                           const newrowid = generateRowID();
                           output[`repeating_gear_${newrowid}_gear_value`] = 1;
-                        } while (i < 10);
+                        } while (i < 5);
                       }
                       if (spellsRows === 0) {
                         const newrowid = generateRowID();
