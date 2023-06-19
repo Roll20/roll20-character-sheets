@@ -1511,7 +1511,7 @@ on('clicked:ms clicked:hs', function (eventInfo){
             return printRoll(`/w gm ${rollBuilder.string()}`);
         }
 
-        let surroundings = await extractQueryResult(`?{What are your surroundings?|Natural (woodland / forrest / plains),Natural|Non-natural (crypt / city street / indoor / underground),Non-natural}`);
+        let surroundings = await extractQueryResult(`?{What are your surroundings?|Natural (woodland / forest / plains),Natural|Non-natural (crypt / city street / indoor / underground),Non-natural}`);
         let displaySurrounding = `*${surroundings} surroundings*`;
         let skillName = skill === 'ms' ? `checkvs=Move Silently\n${displaySurrounding}\n(in @{armorname})` : `checkvs=Hide in Shadows\n${displaySurrounding}\n(in @{armorname})`;
         if (surroundings === 'Natural') {
