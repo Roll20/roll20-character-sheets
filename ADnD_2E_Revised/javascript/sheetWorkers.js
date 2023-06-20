@@ -1453,23 +1453,31 @@ on(`${rogueLevelAttributes.map(s => 'change:'+s).join(' ')} change:rogue-level-t
 });
 
 //Rogue armor modifier auto fill
-on('change:armorname', function(eventInfo) {
+const ARMOR_NUMBER_REGEX = /armorname(\d{0,2})$/;
+on('change:armorname change:armorname2 change:repeating_hench4:armorname22', function(eventInfo) {
     let armor = ROGUE_ARMOR[eventInfo.newValue];
     if (armor === undefined)
         return;
 
-    let armorModifiers = {
-        'ppa': armor['Pick Pockets'] || '0',
-        'ola': armor['Open Locks'] || '0',
-        'rta': armor['Find/Remove Traps'] || '0',
-        'msa': armor['Move Silently'] || '0',
-        'hsa': armor['Hide in Shadows'] || '0',
-        'dna': armor['Detect Noise'] || '0',
-        'cwa': armor['Climb Walls'] || '0',
-        'bra': armor['Bribe'] || '0',
-        'tua': armor['Tunneling'] || '0',
-        'eba': armor['Escape bonds'] || '0',
-    };
+    let row = '';
+    let parse = parseSourceAttribute(eventInfo);
+    if (parse.rowId) {
+        row = `repeating_${parse.section}_${parse.rowId}_`;
+    }
+    let armorNumber = parse.attribute.match(ARMOR_NUMBER_REGEX)[1];
+
+    let armorModifiers = {};
+    armorModifiers[`${row}ppa${armorNumber}`]= armor['Pick Pockets'] || '0';
+    armorModifiers[`${row}ola${armorNumber}`]= armor['Open Locks'] || '0';
+    armorModifiers[`${row}rta${armorNumber}`]= armor['Find/Remove Traps'] || '0';
+    armorModifiers[`${row}msa${armorNumber}`]= armor['Move Silently'] || '0';
+    armorModifiers[`${row}hsa${armorNumber}`]= armor['Hide in Shadows'] || '0';
+    armorModifiers[`${row}dna${armorNumber}`]= armor['Detect Noise'] || '0';
+    armorModifiers[`${row}cwa${armorNumber}`]= armor['Climb Walls'] || '0';
+    armorModifiers[`${row}bra${armorNumber}`]= armor['Bribe'] || '0';
+    armorModifiers[`${row}tua${armorNumber}`]= armor['Tunneling'] || '0';
+    armorModifiers[`${row}eba${armorNumber}`]= armor['Escape bonds'] || '0';
+    console.log(armorModifiers);
     setAttrs(armorModifiers);
 });
 
