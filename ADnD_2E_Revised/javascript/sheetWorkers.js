@@ -2896,7 +2896,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`prep=${prep}`);
             macroBuilder.push(`prereq=${power['prerequisites']}`);
             macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
-            macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
+            macroBuilder.push(`powerroll=[[1d20cf20]]`);
             if (power['secret-by-dm']) {
                 macroBuilder.push('secret=true');
             }
@@ -2974,7 +2974,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
             match = fullMacro.match(/\{\{(powerroll=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
-            else macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
+            else macroBuilder.push(`powerroll=[[1d20cf20]]`);
 
             let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
             match = fullMacro.match(/\{\{(powerscore=\[\[.*?]])}} *\{\{/);
@@ -3028,7 +3028,6 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
     let rollPsionicTemplate = async function(macroValue, rowId, values) {
         let repeating = `repeating_${section}_${rowId}`;
         macroValue = macroValue.replaceAll(`${name}`,`${repeating}_${name}`)
-            .replaceAll(`psionic-mod${number}`,`${repeating}_psionic-mod${number}`)
             .replaceAll(`powerscore-nomod${number}`,`${repeating}_powerscore-nomod${number}`)
             .replaceAll(`powerscore-mod${number}`,`${repeating}_powerscore-mod${number}`)
             .replaceAll(`powerscore-enhanced`,`${repeating}_powerscore-enhanced`)
