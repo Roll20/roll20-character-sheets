@@ -17,7 +17,7 @@ If you have question, need help or would like to provide feedback, you can:
   Include `[Ars Magica 5th]` in your title and tag `@Riernar`.
 
 - Open an issue in [Riernar's own repository](https://github.com/Riernar/arm5-sheet)
-  were I develop the sheet. This is where I schedule up-coming features, so be sure
+  where I develop the sheet. This is where I schedule up-coming features, so be sure
   to check here if you have a feature request: maybe it's already in the work !
 
 ### Contributing

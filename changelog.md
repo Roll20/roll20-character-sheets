@@ -14,6 +14,8 @@
     Fix Lab Total computation when General Quality has a leading `+`
     (PR [#15](https://github.com/Riernar/arm5-sheet/pull/15))
 
+  - Added an indicator that shows collapsed abilities's selected characteristic
+
 - **February 2022 - v1.7.1 - Fix**
   - Fixed accelerated abilities
 - **January 2022 - v1.7 - Magic & Armory update**
