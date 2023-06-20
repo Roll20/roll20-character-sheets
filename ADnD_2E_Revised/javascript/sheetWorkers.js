@@ -2904,8 +2904,8 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             if (power['context-modifier']) {
                 powerScore += `+(${power['context-modifier']})`;
             }
-            macroBuilder.push(`powerscore=[[${powerScore}]]`);
-            macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})]]`)
+            macroBuilder.push(`powerscore=[[${powerScore}+(@{misc-mod})]]`);
+            macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})+(@{misc-mod})]]`)
             macroBuilder.push(`powerscoreeffect=${power['power-score']}`);
             macroBuilder.push(`20effect=${power['20']}`);
             macroBuilder.push(`1effect=${power['1']}`);
@@ -2979,11 +2979,11 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
             match = fullMacro.match(/\{\{(powerscore=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
-            else macroBuilder.push(`powerscore=[[${powerScore}]]`);
+            else macroBuilder.push(`powerscore=[[${powerScore}+(@{misc-mod})]]`);
 
             match = fullMacro.match(/\{\{(powerscoreenhanced=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
-            else macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})]]`);
+            else macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})+(@{misc-mod})]]`);
 
             match = fullMacro.match(/\{\{(powerscoreeffect=.*?)}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
