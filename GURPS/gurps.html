@@ -12952,7 +12952,7 @@ visualize what it will look like in chat.
 										<input type="number" step="1" value="0" min="0" name="attr_firing_speed_difference" title="Macro: @{NAME|firing_speed_difference}" />
 									</div>
 									<div class="cell fire-up-dwn-distance">
-										<input type="number" step="1" value="0" min="0" name="attr_firing_elevation" title="Macro: @{NAME|firing_elevation}" />
+										<input type="number" step="1" value="0" name="attr_firing_elevation" title="Macro: @{NAME|firing_elevation}" />
 									</div>
 									<div class="cell new-range">
 										<input type="number" step="1" value="0" min="0" name="attr_firing_new_range" readonly="readonly" title="Macro: @{NAME|firing_new_range}" />
@@ -12968,7 +12968,7 @@ visualize what it will look like in chat.
 										</select>
 									</div>
 									<div class="cell rof">
-										<input type="number" step="1" value="0" min="1" name="attr_firing_rof" title="Macro: @{NAME|firing_acc}" />
+										<input type="number" step="1" value="1" min="1" name="attr_firing_rof" title="Macro: @{NAME|firing_acc}" />
 									</div>
 									<div class="cell size">
 										<input type="number" step="1" value="0" name="attr_firing_size_mod" title="Macro: @{NAME|firing_size_mod}" />
@@ -14163,6 +14163,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 				</fieldset> <!-- .repeating_item -->
 				<div class="sort-control">
 					<button type="action" name="act_sort_inventory" class="btn sort">Sort & Indent</button>
+					<div>
+						<i>After sorting, please open/close the notes for one item. This will fix the weirdness caused by the Roll20 sorter.</i>
+					</div>
 				</div>
 				<div class="row row-totals">
 					<div class="cell col0">
@@ -14712,7 +14715,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 			
 			<ul>
 				<p>Please note: I, Mike W, and MadCoder are not one of the original authors of this sheet. All we have done is to fix a number of small issues, changed some formatting, and implemented some suggested changes. The basic functionality of the sheet has remained the same.</p>
-						
+				
+				<p>The original authors are Devindra Payment (@Ardnived), Joseph Mason (@sdJasper).</p>
+
 				<p>To report any Issues or a Suggestion, please use the Roll20 forum under Character Sheets & Compendium. I have created a thread named: [GURPS] - Sheet #1 - Thread 2 (that seems to be similar to the naming convention used by other sheets).</p>
 				
 				<p>https://app.roll20.net/forum/post/10667695/gurps-sheet-number-1-thread-2</p>
@@ -16138,7 +16143,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 					</div>
 
 					<div class="option-container">
-						<h4>Import</h4>
+						<h4>Import GCA5</h4>
 						<div>
 							<p>
 								This is a generic tool for importing characters from GCA5. It uses a generic data structure; this allows a 
@@ -16160,11 +16165,11 @@ Select the indent level of the inventory item. This is handy to help show the it
 						<h4>Roll Template for Skill Rolls</h4>
 						<div>
 							<p>
-								Most skill and damage rolls use the same template. Below is a link to a file to help explain they work, in 
-								case you want to try make your own macro for skill and damage rolls.
+								Most skill and damage rolls use the same template. Below is a link to a file to help explain how they work, 
+								in case you want to try to make your own macro for skill and damage rolls.
 							</p>
 							<div class="control">
-								<button type="roll" class="no-decoration" name="roll_blank" value="https://github.com/MadCoder253/roll20-character-sheets/raw/gurps-2.9.5/GURPS/Docs/Roll20-GURPS-4E-Roll-Template.pdf" title="Show link in chat. NOTE: Right-click to open in new window">
+								<button type="roll" class="no-decoration" name="roll_blank" value="https://github.com/Roll20/roll20-character-sheets/blob/master/GURPS/Docs/Roll20-GURPS-4E-Roll-Template.pdf" title="Show link in chat. NOTE: Right-click to open in new window">
 									<span data-i18n="gurps-4th-edition-roll-template-button">Roll20 GURPS 4E Roll Template</span>
 								</button>
 							</div>
@@ -19922,6 +19927,20 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
         });
     }
 
+	function setSectionOrderAsync(sectionName, rowIds) {
+		var acid = getActiveCharacterId();
+        var prevAcid = null;
+        return new Promise((resolve, reject) => {
+            prevAcid = setActiveCharacterId(acid);
+            try {
+                setSectionOrder(sectionName, rowIds, (values) => { resolve(values[prop]); });
+            }
+            catch { reject(); }
+        }).finally(() => {
+            setActiveCharacterId(prevAcid);
+        });
+	}
+
 	/**
 	 * Async foreach.
 	 * see: https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
@@ -21492,12 +21511,143 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		});
 	});
 	
+
+	// check to see if the inventory item parent name changed
+	// update any children's location
+	on("change:repeating_item:name", event => {
+
+		let updatedRowId = getRowIdFromEventInfo(event, "repeating_item");
+
+		let newParentName = event.newValue ?? "";
+
+		updateInventoryItemChildLocations(updatedRowId, newParentName);
+
+
+	});
+
+	/**
+	 * Update the location name of children if a parent name changed.
+	 * 
+	 */
+	function updateInventoryItemChildLocations(updatedRowId, newParentName) {
+
+		getSectionIDs("item", (ids) => {
+
+			if (ids.length === 0) return;
+
+			let fieldArray = [];
+
+			ids.forEach(id => fieldArray.push(
+				`repeating_item_${id}_parent_id`
+			));
+
+			let doUpdate = false;
+
+			getAttrs(fieldArray, (values) => {
+
+				let items = {};
+
+				ids.forEach(id => {
+
+					const parentFieldName = `repeating_item_${id}_parent_id`;
+
+					const locationFieldName = `repeating_item_${id}_location`;
+
+					if (values[parentFieldName] === updatedRowId) {
+
+						doUpdate = true;
+
+						items[locationFieldName] = newParentName;	
+					}
+
+				});
+
+				if (doUpdate) {
+					setAttrs(items);
+				}
+				
+			});
+
+		});
+
+	}
+
 	// Update the total weight of all carried items.
 	on('change:repeating_item:weighttotal remove:repeating_item', function (e) {
+
+		let removeTrigger = e.triggerName ?? "";
+
+		if (removeTrigger === "remove:repeating_item") {
+
+			let deletedRowId = getRowIdFromEventInfo(e, "repeating_item");
+
+			clearInventoryParentValueFromChildren(deletedRowId, sumInventory);
+
+		} else {
+
+			sumInventory();
+
+		}
+		
+	});
+
+	/**
+	 * If a item was deleted, we have to make sure any children related to that 
+	 * item parent item has it's parent_id value cleared. fixing orphaned child items.
+	 */
+	function clearInventoryParentValueFromChildren(deletedRowId, callback) {
+
+		callback = callback || noop;
+
+		getSectionIDs("item", (ids) => {
+
+			if (ids.length === 0) return;
+
+			let fieldArray = [];
+
+			ids.forEach(id => fieldArray.push(
+				`repeating_item_${id}_parent_id`
+			));
+
+			getAttrs(fieldArray, (values) => {
+
+				let items = {};
+
+				let doUpdate = false;
+
+				ids.forEach(id => {
+
+					const parentFieldName = `repeating_item_${id}_parent_id`;
+
+					const locationFieldName = `repeating_item_${id}_location`;
+
+					if (values[parentFieldName] === deletedRowId) {
+
+						// clear the parent id
+						items[parentFieldName] = "";
+
+						items[locationFieldName] = "";	
+					}
+
+				});
+
+				if (doUpdate) {
+					setAttrs(items, null, callback);
+				}
+				
+			});
+
+		});
+
+	}
+
+	function sumInventory() {
+
 		sumRepeating('repeating_item', 'weighttotal', function (v) {
 			setAttrs({ total_weight: Number(Math.round(v * 1000) / 1000).toFixed(3) });
 		});
-	});
+
+	}
 	
 	// Update the line Format for existing inventory weight and cost - Script provided by GiGs ID:157788 (Roll20)
 	on('change:inventory_fixed_digits', function () {
@@ -25400,10 +25550,10 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		// is the base of the tree but not used.
 		const inventoryItemIndentLevels = getInventoryIndentLevelsUsingTree({}, inventoryTree, -1);
 
-		setSectionOrder("item", inventoryRowIds);
-
 		// now update the indent levels
-		setAttrs(inventoryItemIndentLevels);
+		await setAttrsAsync(inventoryItemIndentLevels);
+
+		setSectionOrder("item", inventoryRowIds);
 
 	};
 
@@ -25493,7 +25643,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		treeData.forEach((el) => {
 
 			// Handle the root element
-			if (el.parentId === null) {
+			if (el.id == "root") {
 				root = el;
 				return;
 			}
@@ -25501,9 +25651,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			// Use our mapping to locate the parent element in our data array
 			const parentEl = treeData[idMapping[el.parentId]];
 		
-			// Add our current el to its parent's `children` array
-			parentEl.children = [...(parentEl.children || []), el];
-		
+			if (parentEl && parentEl.children) {
+				// Add our current el to its parent's `children` array
+				parentEl.children = [...(parentEl.children || []), el];
+			}
+				
 		});
 
 		return root;
