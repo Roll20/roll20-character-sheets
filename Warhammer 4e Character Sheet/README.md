@@ -81,8 +81,9 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
-June 22nd 2023
+June 22nd 2023 v1.65c
 
+- Added the Norse Race (Sea of Claws), same attribute as humans with default size average.
 - Fixed some rolls not working under certain conditions.
 - Fixed some failed roll Talent modifier text not displeying correctly. eg - You may Reverse Dice
 
