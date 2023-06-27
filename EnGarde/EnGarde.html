@@ -432,6 +432,11 @@
         <div class="sheet-borderRight">
             <input type="text" class="sheet-text_input" name="attr_bravery_poltroonery" data-i18n-title="polbrav-title"  value="0"> 
         </div>
+        <div class="sheet-monthlyVariablesDesc sheet-borderRight" data-i18n="better-result">
+        </div>        
+        <div class="sheet-borderRight">
+            <input type="checkbox" class="sheet-text_input" name="attr_better_result" value="1"> 
+        </div>        
         <div>
             <button type="action" name="act_outcome" class="sheet-text_roll">
                 <img style="height: 20px;width: 21px;" src="https://raw.githubusercontent.com/Lockbox313/imagedump/master//EnGarde/d6s_small3.png">            
@@ -446,6 +451,7 @@
                 <option value="army" data-i18n="army-commander"></option>
                 <option value="division" data-i18n="divison-commander"></option>                
                 <option value="brigade" data-i18n="brigade-commander"></option>
+                <option value="battalion" data-i18n="battalion-commander"></option>
             </select>
         </div>        
         <div class="sheet-monthlyVariablesDesc sheet-borderRight" data-i18n="regiment"></div>
@@ -510,6 +516,11 @@
             <input type="text" class="sheet-text_input" name="attr_plunder_value"  readonly value="">             
         </div> 
     </div>
+    
+
+    <input class="sheet-hideIt" type="text" name="attr_death_drm">
+    <input class="sheet-hideIt" type="text" name="attr_dispatches_promotion_drm">
+    
     <!--<div class="sheet-bravery-poltroonery sheet-borderRight">
         <div class="sheet-monthlyVariablesDesc sheet-borderRight" data-i18n="bravery"></div>
         <div class="sheet-borderRight">
@@ -593,7 +604,7 @@
 
 <script type="text/worker">
 
-	const outcome_listeners = ["force_deployment","battle_result","bravery","poltroonery","battle_command","battle_rank","battle_regiment"];
+	const outcome_listeners = ["force_deployment","battle_result","bravery","poltroonery","battle_command","battle_rank","battle_regiment","better_result"];
 
     const siege = [["10","11","9","9","3x100"],["8","9","7","8","4x100"],["11","12","10","11","2x100"],["11","12","10","12","1x100"],["9","10","8","-",""],["7","8","6","-",""]]
     
@@ -641,8 +652,9 @@
     
    on("clicked:outcome", function() {
         console.log("Activate button clicked"); 
-        getAttrs(["death", "mention","promotion","plunder","plunder_value","bravery_poltroonery"], function(values) {
-                console.log(`values ${JSON.stringify(values)}`);   
+        getAttrs(["death", "mention","promotion","plunder","plunder_value","bravery_poltroonery","death_drm","dispatches_promotion_drm"], function(values) {
+                console.log(`outcome values ${JSON.stringify(values)}`);   
+
 
         let dice_mod = parseInt(values.bravery_poltroonery);
         let show_plunder=1
@@ -665,11 +677,11 @@
 
        
         if (dice_mod < 0){
-            roll_str="&{template:outcome} {{death_roll=[[2D6"+values.bravery_poltroonery+"]]}} {{mention_roll=[[2D6]]}} {{promotion_roll=[[2D6]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{poltroon=[[1]]}} {{poltroon_value=[["+Math.abs(dice_mod)+"]]}} {{plunder_roll=[[2D6]]}}"            
+            roll_str="&{template:outcome} {{death_roll=[[2D6+"+values.bravery_poltroonery+"+"+values.death_drm+"]]}} {{mention_roll=[[2D6+"+values.dispatches_promotion_drm+"+"+values.bravery_poltroonery+"]]}} {{promotion_roll=[[2D6+"+values.dispatches_promotion_drm+"+"+values.bravery_poltroonery+"]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{poltroon=[[1]]}} {{poltroon_value=[["+Math.abs(dice_mod)+"]]}} {{plunder_roll=[[2D6]]}}"            
         } else if (dice_mod > 0){
-            roll_str="&{template:outcome} {{death_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{mention_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{promotion_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{bravery=[[1]]}} {{bravery_value=[["+dice_mod+"]]}} {{plunder_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{poltroon=[[0]]}}"    
+            roll_str="&{template:outcome} {{death_roll=[[2D6+"+values.bravery_poltroonery+"+"+values.death_drm+"]]}} {{mention_roll=[[2D6+"+values.dispatches_promotion_drm+"+"+values.bravery_poltroonery+"]]}} {{promotion_roll=[[2D6+"+values.dispatches_promotion_drm+"+"+values.bravery_poltroonery+"]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{bravery=[[1]]}} {{bravery_value=[["+dice_mod+"]]}} {{plunder_roll=[[2D6+"+values.bravery_poltroonery+"]]}} {{poltroon=[[0]]}}"    
         } else {
-            roll_str="&{template:outcome} {{death_roll=[[2D6]]}} {{mention_roll=[[2D6]]}} {{promotion_roll=[[2D6]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{plunder_roll=[[2D6]]}}  {{poltroon=[[0]]}}" 
+            roll_str="&{template:outcome} {{death_roll=[[2D6+"+values.death_drm+"]]}} {{mention_roll=[[2D6+"+values.dispatches_promotion_drm+"]]}} {{promotion_roll=[[2D6+"+values.dispatches_promotion_drm+"]]}} {{death_target=[["+values.death+"]]}} {{mention_target=[["+values.mention+"]]}} {{promotion_target=[["+values.promotion+"]]}} {{plunder_roll=[[2D6]]}}  {{poltroon=[[0]]}}" 
             console.log("marker1");
             console.log("roll_str1:"+roll_str)        
         }
@@ -681,7 +693,7 @@
         }
         
        console.log("roll_str2:"+roll_str)        
-        setAttrs({bravery_poltroonery:0});
+        setAttrs({bravery_poltroonery:0,better_result:0});
         startRoll(roll_str, (results) => {
             finishRoll(
                 results.rollId,
@@ -700,7 +712,7 @@
 	outcome_listeners.forEach(attribute => {
 		on(`change:${attribute}`, function(event) {
 			console.log(`income listener event ${JSON.stringify(event)}`);
-			getAttrs(["force_deployment","battle_result","bravery","poltroonery","battle_command","battle_rank","battle_regiment"], function(values) {
+			getAttrs(["force_deployment","battle_result","bravery","poltroonery","battle_command","battle_rank","battle_regiment","better_result"], function(values) {
 			   console.log(`values ${JSON.stringify(values)}`);
                 if (values.battle_regiment=="regiment0" || values.force_deployment=="0" ||   values.battle_result=="0" ){
                     setAttrs({death:0,mention:0,promotion:0,plunder:0,plunder_value:""})
@@ -713,6 +725,13 @@
                     let promotion = 0;
                     let plunder = 0;
                     let plunder_str= "";
+                    let death_drm = 0;
+                    let dispatches_promotion_drm = 0;
+                    
+                    
+                    if (parseInt(values.better_result)==1){
+                       dispatches_promotion_drm = 1;
+                    }
                     
                     if (deployment=="siege"){
                         results = siege[br-1];
@@ -762,7 +781,7 @@
                     if (plunder!="-"){
                         plunder = parseInt(plunder);                        
                     }
-
+console.log("battle_command: "+values.battle_command);
                     if (values.battle_command=="army"){
                         console.log("army.death:"+army.death);
                         console.log("army.mention:"+army.mention);
@@ -798,8 +817,9 @@
                         if (plunder!="-"){
                             plunder = plunder+brigade.plunder;
                         }                            
-                    }
-                    
+                    } else if (values.battle_command=="battalion"){                                                        
+                       death_drm = -1;      
+                    }                    
                     
                     
                     
@@ -842,15 +862,15 @@
 
                         
 
-                   setAttrs({death:death,mention:mention,promotion:promotion,plunder:plunder,plunder_value:plunder_str});
+                   setAttrs({death:death,mention:mention,promotion:promotion,plunder:plunder,plunder_value:plunder_str,death_drm:death_drm,dispatches_promotion_drm});
                 }
 
 			});
 			
 		});
 	});    
-	    ;
-    
+
+
 
 
     on("clicked:reset", function() {
