@@ -81,12 +81,19 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
-February 28th 2022 v1.65b
+June 22nd 2023 v1.65c
+
+- Added the Norse Race (Sea of Claws), same attribute as humans with default size average.
+- Fixed some rolls not working under certain conditions.
+- Fixed some failed roll Talent modifier text not displeying correctly. eg - You may Reverse Dice
+
+
+February 28th 2023 v1.65b
 
 - Fixed Talent Nobleblood test +SL text during leadership rolls, now correctly dislays as situational bonus SL.
 
 
-February 14th 2022 v1.65a
+February 14th 2023 v1.65a
 
 - Fixed some skill rolls not always working due to new Besmirched condition bug
 - Fixed NPC fumble/crit not working from the combat text clicky

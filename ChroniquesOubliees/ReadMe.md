@@ -10,15 +10,12 @@ Il est aussi possible d'utiliser cette fiche pour jouer avec l'ensemble de règl
 
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
+Cette feuille de personnage utilise des marques déposées et des droits d’auteurs qui sont la propriété de Black Book Editions comme l’y autorisent les conditions d’utilisation de Black Book Editions. Cette feuille de personnage n’est pas publiée par Black Book Editions et n’a pas reçu son aval ni une quelconque approbation de sa part. Pour de plus amples informations sur Black Book Editions, consultez www.black-book-editions.fr.
+
 # Version courante
-5.02 [Screenshot](co_v3.jpg)
+5.00 [Screenshot](Images/co_v4.webp)
 
 # Notes de version
-## v5.02 (2023-01-26)
-* Support des statblocks JSON de CO-DRS
-* Ajout des munitions
-* Champs prédicat pour les armes portées
-
 ## v5.00 (2021-07-09)
 * Ajout d'une partie dédiée pour l'interaction avec le script
 * Ajout d'un type de dégâts drain
