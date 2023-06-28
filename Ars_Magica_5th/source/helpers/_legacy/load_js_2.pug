@@ -1,0 +1,60 @@
+mixin __dummy()
+    p
+
+-
+    const js_loader2 = {
+        loaded_paths: {},
+
+        log: function(message) {
+            console.log(`[js_loader] ${message}`);
+        },
+
+        _load: function(path, namespace) {
+            const vm = require("node:vm");
+            const fs = require("fs");
+
+            js_loader2.log(`Reading ${path}...`);
+            const code = fs.readFileSync(path, "utf8");
+            js_loader2.log(`Reading ${path}: read\n${code}`);
+            js_loader2.log(`Reading ${path}: done`);
+            
+            js_loader2.log(`Executing ${path}...`);
+            const context = {...namespace};
+            vm.createContext(context, {name: `Execution context for ${path}`});
+            vm.runInContext(code, context, {filename: path});
+            const that = vm.runInContext('this', context);
+            js_loader2.log(Object.keys(that));
+            js_loader2.log(`Executing ${path}: done`);
+
+            js_loader2.log(`Execution of ${path} produced:\n${JSON.stringify(context, null, 2)}`);
+            
+            return context;
+        },
+
+        __load: function(path, namespace) {
+            
+        }
+
+        load: function(path, namespace=null) {
+            js_loader2.log(`Loading ${path}...`);
+            if (path.substring(0, 1) != "/") {
+                path = `${sourcedir}${path}`;
+            }
+            if (namespace === null) {
+                namespace = {};
+            }
+            if (path in js_loader2.loaded_paths) {
+                js_loader2.log(`${path} is already loaded, skipping execution.`);
+            } else {
+                const fs = require("fs");
+                if (! fs.existsSync(path)) {
+                    throw new Error(`${path} doesn't exists`);
+                }
+                js_loader2.loaded_paths[path] = js_loader2._load(path, namespace);
+            }
+            const result = Object.assign(namespace, js_loader2.loaded_paths[path]);
+            js_loader2.log(`Loading ${path}: done`);
+            
+            return result;
+        }
+    };

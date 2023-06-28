@@ -1453,23 +1453,31 @@ on(`${rogueLevelAttributes.map(s => 'change:'+s).join(' ')} change:rogue-level-t
 });
 
 //Rogue armor modifier auto fill
-on('change:armorname', function(eventInfo) {
+const ARMOR_NUMBER_REGEX = /armorname(\d{0,2})$/;
+on('change:armorname change:armorname2 change:repeating_hench4:armorname22', function(eventInfo) {
     let armor = ROGUE_ARMOR[eventInfo.newValue];
     if (armor === undefined)
         return;
 
-    let armorModifiers = {
-        'ppa': armor['Pick Pockets'] || '0',
-        'ola': armor['Open Locks'] || '0',
-        'rta': armor['Find/Remove Traps'] || '0',
-        'msa': armor['Move Silently'] || '0',
-        'hsa': armor['Hide in Shadows'] || '0',
-        'dna': armor['Detect Noise'] || '0',
-        'cwa': armor['Climb Walls'] || '0',
-        'bra': armor['Bribe'] || '0',
-        'tua': armor['Tunneling'] || '0',
-        'eba': armor['Escape bonds'] || '0',
-    };
+    let row = '';
+    let parse = parseSourceAttribute(eventInfo);
+    if (parse.rowId) {
+        row = `repeating_${parse.section}_${parse.rowId}_`;
+    }
+    let armorNumber = parse.attribute.match(ARMOR_NUMBER_REGEX)[1];
+
+    let armorModifiers = {};
+    armorModifiers[`${row}ppa${armorNumber}`]= armor['Pick Pockets'] || '0';
+    armorModifiers[`${row}ola${armorNumber}`]= armor['Open Locks'] || '0';
+    armorModifiers[`${row}rta${armorNumber}`]= armor['Find/Remove Traps'] || '0';
+    armorModifiers[`${row}msa${armorNumber}`]= armor['Move Silently'] || '0';
+    armorModifiers[`${row}hsa${armorNumber}`]= armor['Hide in Shadows'] || '0';
+    armorModifiers[`${row}dna${armorNumber}`]= armor['Detect Noise'] || '0';
+    armorModifiers[`${row}cwa${armorNumber}`]= armor['Climb Walls'] || '0';
+    armorModifiers[`${row}bra${armorNumber}`]= armor['Bribe'] || '0';
+    armorModifiers[`${row}tua${armorNumber}`]= armor['Tunneling'] || '0';
+    armorModifiers[`${row}eba${armorNumber}`]= armor['Escape bonds'] || '0';
+    console.log(armorModifiers);
     setAttrs(armorModifiers);
 });
 
@@ -1477,7 +1485,7 @@ on('clicked:rt', function (eventInfo){
     getAttrs([''], async function (values) {
         console.log(eventInfo);
         let rollBuilder = new RollTemplateBuilder('2Echeck');
-        rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]');
+        rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]%');
 
         let skill = await extractQueryResult(`?{Find or Removing Trap?|Find Traps|Remove Traps|Remove Invisible/Magical Traps}`);
         if (skill === 'Find Traps') {
@@ -1496,7 +1504,7 @@ on('clicked:ms clicked:hs', function (eventInfo){
     getAttrs(['rogue-ranger'], async function (values) {
         let skill = eventInfo.triggerName.replace('clicked:', '');
         let rollBuilder = new RollTemplateBuilder('2Echeck');
-        rollBuilder.push('character=@{character_name}','checkroll=[[1d100cs<1cf>[[@{rogue-ranger}+1]] ]]');
+        rollBuilder.push('character=@{character_name}','checkroll=[[1d100cs<1cf>[[@{rogue-ranger}+1]] ]]%');
 
         if (skill ==='ms') {
             rollBuilder.push('success=You are silent. Movement rate reduced to 1/3 of normal. Opponents get -2 to surprise roll from silence and another -2 if you are unseen.', 'fail=You are not silent. Movement rate reduced to 1/3 of normal.');
@@ -1511,7 +1519,7 @@ on('clicked:ms clicked:hs', function (eventInfo){
             return printRoll(`/w gm ${rollBuilder.string()}`);
         }
 
-        let surroundings = await extractQueryResult(`?{What are your surroundings?|Natural (woodland / forrest / plains),Natural|Non-natural (crypt / city street / indoor / underground),Non-natural}`);
+        let surroundings = await extractQueryResult(`?{What are your surroundings?|Natural (woodland / forest / plains),Natural|Non-natural (crypt / city street / indoor / underground),Non-natural}`);
         let displaySurrounding = `*${surroundings} surroundings*`;
         let skillName = skill === 'ms' ? `checkvs=Move Silently\n${displaySurrounding}\n(in @{armorname})` : `checkvs=Hide in Shadows\n${displaySurrounding}\n(in @{armorname})`;
         if (surroundings === 'Natural') {
@@ -2888,7 +2896,7 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`prep=${prep}`);
             macroBuilder.push(`prereq=${power['prerequisites']}`);
             macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
-            macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
+            macroBuilder.push(`powerroll=[[1d20cf20]]`);
             if (power['secret-by-dm']) {
                 macroBuilder.push('secret=true');
             }
@@ -2896,8 +2904,8 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             if (power['context-modifier']) {
                 powerScore += `+(${power['context-modifier']})`;
             }
-            macroBuilder.push(`powerscore=[[${powerScore}]]`);
-            macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})]]`)
+            macroBuilder.push(`powerscore=[[${powerScore}+(@{misc-mod})]]`);
+            macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})+(@{misc-mod})]]`)
             macroBuilder.push(`powerscoreeffect=${power['power-score']}`);
             macroBuilder.push(`20effect=${power['20']}`);
             macroBuilder.push(`1effect=${power['1']}`);
@@ -2966,16 +2974,16 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
             match = fullMacro.match(/\{\{(powerroll=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
-            else macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
+            else macroBuilder.push(`powerroll=[[1d20cf20]]`);
 
             let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
             match = fullMacro.match(/\{\{(powerscore=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
-            else macroBuilder.push(`powerscore=[[${powerScore}]]`);
+            else macroBuilder.push(`powerscore=[[${powerScore}+(@{misc-mod})]]`);
 
             match = fullMacro.match(/\{\{(powerscoreenhanced=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
-            else macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})]]`);
+            else macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})+(@{misc-mod})]]`);
 
             match = fullMacro.match(/\{\{(powerscoreeffect=.*?)}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
@@ -3020,7 +3028,6 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
     let rollPsionicTemplate = async function(macroValue, rowId, values) {
         let repeating = `repeating_${section}_${rowId}`;
         macroValue = macroValue.replaceAll(`${name}`,`${repeating}_${name}`)
-            .replaceAll(`psionic-mod${number}`,`${repeating}_psionic-mod${number}`)
             .replaceAll(`powerscore-nomod${number}`,`${repeating}_powerscore-nomod${number}`)
             .replaceAll(`powerscore-mod${number}`,`${repeating}_powerscore-mod${number}`)
             .replaceAll(`powerscore-enhanced`,`${repeating}_powerscore-enhanced`)
