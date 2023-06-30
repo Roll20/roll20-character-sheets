@@ -81,11 +81,17 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+June 30nd 2023 v1.66
+
+- Added Practical Quality option tick box to all Mail/Plate Armor, this will reduce all penalties by -10 on the given armor piece and update the penalties boxes accordingly.
+- Corrected issue on Armor Tab where Shield Durability was adding to AP on the hit locatiojns display to the right.
+
+
 June 22nd 2023 v1.65c
 
 - Added the Norse Race (Sea of Claws), same attribute as humans with default size average.
 - Fixed some rolls not working under certain conditions.
-- Fixed some failed roll Talent modifier text not displeying correctly. eg - You may Reverse Dice
+- Fixed some failed roll Talent modifier text not displaying correctly. eg - You may Reverse Dice
 
 
 February 28th 2023 v1.65b
