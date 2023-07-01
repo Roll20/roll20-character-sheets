@@ -1,6 +1,6 @@
 # _CY_BORG_ Character Sheet
 
-This character sheet was developed for [_CY_BORG_](http://www.morkborg.com).
+This character sheet was developed for [_CY_BORG_](https://www.cy-borg.io).
 
 To the best of my knowledge/ability, the sheet is set up for internationalization/translation of all text displayed in the sheet and outputted from sheet roll buttons.
 
@@ -10,10 +10,13 @@ To the best of my knowledge/ability, the sheet is set up for internationalizatio
 Several Roll20 players pitched in to offer feedback to the sheet as it was under initial development. Thank you very much:
 
 * [Blaze](https://app.roll20.net/users/4407184)
+* [Chris B.](https://app.roll20.net/users/9959653)
 * [John O.](https://app.roll20.net/users/5451119)
 * [KatanaGunslinger](https://app.roll20.net/users/9927442)
 * [Ye Olde Weasel](https://app.roll20.net/users/1008171)
 * [Zack K.](https://app.roll20.net/users/206703)
+
+Credit also to Isabella Green @ the Mörk Borg Discord server for generously providing the NPC roll content/output.
 
 In addition, more than a few Roll20 players pitched in to offer feedback to the Mörk Borg sheet this was based on as part of the former's development. Thank you as well:
 
