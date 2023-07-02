@@ -189,6 +189,21 @@ const updateToKScaffold = function updateToKScaffold({ trigger, attributes, sect
 };
 k.registerFuncs({ updateToKScaffold }, { type: ["new"] });
 
+// const _testAlerts = function ({ trigger, attributes, sections }) {
+//     ["info", "warning", "error", "success"].forEach(level => {
+//         kCreateAlert({
+//             name: "global-alerts",
+//             title: "test alert",
+//             text: "test alert\nnewline",
+//             level,
+//             attributes,
+//             sections
+
+//         });
+//     });
+// }
+// k.registerFuncs({ _testAlerts }, { type: ["opener"] });
+
 // const displayKScaffoldArgs = function ({ trigger, attributes, sections, casc }) {
 //     console.log("Displaying kScaffold arguments");
 //     console.log(trigger);
