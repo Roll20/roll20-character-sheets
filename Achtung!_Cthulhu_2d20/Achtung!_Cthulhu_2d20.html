@@ -620,28 +620,6 @@
   </section>
 </div>
 
-<!-- scripts -->
-
-<script type="text/worker">
-     const buttonlist = ["main_char","equipment","spells"];
-     buttonlist.forEach(button => {
-         on(`clicked:${button}`, function() {
-  		$20(".tab_button_selected").removeClass('tab_button_selected');
-  		$20("#act_" + button).addClass('tab_button_selected');
-  		setAttrs({
-                 sheetTab: button
-             });
-         });
-     });
-
-  on('sheet:opened',function(){
-  	$20("#act_main_char").addClass('tab_button_selected');
-  	setAttrs({
-  		sheetTab: "main_char"
-  	});
-  });
-</script>
-
 <!-- roll templates -->
 
 <rolltemplate class="sheet-rolltemplate-rolls">
@@ -743,3 +721,54 @@
     </div>
     </div>
 </rolltemplate>
+
+
+<!-- scripts -->
+
+<script type="text/worker">
+
+
+
+  const int = score => parseInt(score, 10) || 0;
+
+  const stats = ["agility", "brawn", "coordination", "insight", "reason", "will"];
+  stats.forEach(stat => {
+
+    on(`change:${stat}`, () => {
+        getAttrs([stat], values => {
+            const stat_base = int(values[stat]);
+              let stat_mod = 0;
+              if (stat_base >= 16) stat_mod = 5;
+              else if (stat_base >= 14) stat_mod = 4;
+              else if (stat_base >= 12) stat_mod = 3;
+              else if (stat_base >= 10) stat_mod = 2;
+              else if (stat_base >= 9) stat_mod = 1;
+              
+              setAttrs({
+                  [`${stat}_bonus_dmg`]: stat_mod
+              });
+          });
+      });
+  });
+
+
+  const buttonlist = ["main_char","equipment","spells"];
+  buttonlist.forEach(button => {
+      on(`clicked:${button}`, function() {
+      $20(".tab_button_selected").removeClass('tab_button_selected');
+      $20("#act_" + button).addClass('tab_button_selected');
+      setAttrs({
+        sheetTab: button
+      });
+    });
+  });
+
+  on('sheet:opened',function(){
+  	$20("#act_main_char").addClass('tab_button_selected');
+  	setAttrs({
+  		sheetTab: "main_char"
+  	});
+  });
+
+
+</script>
