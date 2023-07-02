@@ -25222,9 +25222,6 @@ on(
 	}
 	debugLog(func, trigger, data);
 
-	// Build Roll Button Macro Code
-	// Start with gathering all elements (prefix, template, roll variables with definitions) in objects
-	// Put the objects in an array to preserve the order
 	const wertDict = {
 		'at': '@{AT_Aktiv}',
 		'pa': '@{PA_Aktiv}',
@@ -25245,71 +25242,6 @@ on(
 		'at-schild': '@{AT_Raufen}',
 		'pa-schild': '@{shield_pa}'
 	};
-	var defaultElements = [];
-
-	// Build String
-	// Prefixes
-	{
-	var template = data.hasOwnProperty('template') ? data["template"] : 'test';
-	defaultElements.push(
-		{ 'prefix':
-			'@{gm_roll_opt} ' +
-			// Not strictly required at the beginning, but conventionally done this way
-			'&{template:' + template + '}'
-		}
-	);
-	}
-
-	// UI Name
-	defaultElements.push( { 'name': 'name', 'value': data["ui"] } );
-
-	// (Sub-)Rolls
-	defaultElements.push( { 'name': 'roll0', 'value': `[[${data["rolls"][0]}]]` } );
-	defaultElements.push( { 'name': 'roll1', 'value': `[[${data["rolls"][1]}]]` } );
-	defaultElements.push( { 'name': 'roll2', 'value': `[[${data["rolls"][2]}]]` } );
-	defaultElements.push( { 'name': 'confirmationRoll0', 'value': `[[${data["rolls"][0]}]]` } );
-	defaultElements.push( { 'name': 'confirmationRoll1', 'value': `[[${data["rolls"][1]}]]` } );
-	defaultElements.push( { 'name': 'confirmationRoll2', 'value': `[[${data["rolls"][2]}]]` } );
-
-	// Roll Modifiers
-	defaultElements.push( { 'name': 'mod', 'value': `[[${data["mod"]}]]` } );
-	defaultElements.push( { 'name': 'ansage', 'value': `[[${data["ansagen"]["manoever"]["fest"]} + (${data["ansagen"]["manoever"]["variabel"]})]]` } );
-
-	// Limit (upper, must not be exceeded by unmodified roll)
-	// TODO: Rename "wert" to "limit_result"
-	defaultElements.push( { 'name': 'wert', 'value': `[[${wertDict[data["typ"]]}]]` } );
-
-	// Modification Limit
-	// TODO: Rename "taw" to "limit_mods"
-	defaultElements.push( { 'name': 'taw', 'value': `[[${tawDict[data["typ"]]}]]` } );
-
-	// Custom Roll Parsing-related
-	// Character ID and name for fetching attributes
-	defaultElements.push( { 'name': 'characterid', 'value': '@{character_id}' } );
-	defaultElements.push( { 'name': 'charactername', 'value': '@{character_name}' } );
-
-	// Confirmation Rolls
-	defaultElements.push( { 'name': 'isConfirmationRoll', 'value': '[[0]]' } );
-	defaultElements.push( { 'name': 'showRollTag', 'value': '[[@{show_roll_tags}]]' } );
-	defaultElements.push( { 'name': 'confirmationRollRequired', 'value': '[[0]]' } );
-
-	// Anti-Cheat Measures
-	// Cave: These identifiers are produced on the client side (= suspected cheater). With the right equipment and knowledge, it could be relatively simple to circumvent these measures.
-	// Roll Time allows to compare the reaction roll's time with the original roll's time
-	// If too much time passed between both rolls, a warning is emitted.
-	defaultElements.push( { 'name': 'rollTime', 'value': `[[${Date.now()}]]` } );
-	// Roll Tags are short identifiers based on the roll time that are printed in roll templates, if further rolls are possible.
-	// Since every roll of that "chain" will have the same roll tag, all players can verify that the correct roll button was clicked.
-	defaultElements.push( { 'name': 'rollTag', 'value': '[[0]]' } );
-
-	// Result Code: -3 (triple 20) to +3 (triple 1)
-	defaultElements.push( { 'name': 'result', 'value': '[[0]]' } );
-
-	// Message Code: Messages depend on roll template
-	defaultElements.push( { 'name': 'msg', 'value': '[[0]]' } );
-
-	// Passthrough, used to carry all relevant information from one roll to the next
-	defaultElements.push( { 'name': 'passthrough', 'value': '[[0]]' } );
 
 
 	// Maneuver-specific Behaviour
@@ -25464,18 +25396,6 @@ on(
 		return transformed;
 	}
 
-	// Gather/Create case-specific elements
-	// Currently unused
-	var specialElements = []; //buildMacros(macros_ausfall, { ... reuse, ... reuse_ausfall }, 'structured')
-	var specialRollButtonMacroCode = ""; //buildMacros(macros_ausfall, {... reuse, ... reuse_ausfall }, 'string')
-
-	// Create different representations of the final roll button macro code
-	var allElements = [ ... defaultElements, ... specialElements ];
-	var allElementsObject = transformElements(allElements)["object"]["full"];
-	var rollButtonMacroCode = transformElements(defaultElements)["string"]["full"] + ' ' + specialRollButtonMacroCode;
-
-	debugLog(func, "rollButtonMacroCode", rollButtonMacroCode, "allElements", allElements, "objectified macro variables", allElementsObject);
-
 	// Prepare required attributes
 	var attrsToGet = [
 		'character_id',
@@ -25485,14 +25405,96 @@ on(
 		... data["attributes"]
 	];
 
-	// Start the roll
-	var results = await startRoll(rollButtonMacroCode);
-	const rollID = results.rollId;
-	results = results.results;
-
 	safeGetAttrs(attrsToGet,
-		function(v, missing, badDef)
+		async function(v, missing, badDef)
 		{
+			// Build Roll Button Macro Code
+			// Start with gathering all elements (prefix, template, roll variables with definitions) in objects
+			// Put the objects in an array to preserve the order
+			var defaultElements = [];
+
+			// Build String
+			// Prefixes
+			{
+			var template = data.hasOwnProperty('template') ? data["template"] : 'test';
+			defaultElements.push(
+				{ 'prefix':
+					'@{gm_roll_opt} ' +
+					// Not strictly required at the beginning, but conventionally done this way
+					'&{template:' + template + '}'
+				}
+			);
+			}
+
+			// UI Name
+			defaultElements.push( { 'name': 'name', 'value': data["ui"] } );
+
+			// (Sub-)Rolls
+			defaultElements.push( { 'name': 'roll0', 'value': `[[${data["rolls"][0]}]]` } );
+			defaultElements.push( { 'name': 'roll1', 'value': `[[${data["rolls"][1]}]]` } );
+			defaultElements.push( { 'name': 'roll2', 'value': `[[${data["rolls"][2]}]]` } );
+			if (v["k_option_autoroll_confirmation_rolls"] !== "0") {
+				defaultElements.push( { 'name': 'confirmationRoll0', 'value': `[[${data["rolls"][0]}]]` } );
+				defaultElements.push( { 'name': 'confirmationRoll1', 'value': `[[${data["rolls"][1]}]]` } );
+				defaultElements.push( { 'name': 'confirmationRoll2', 'value': `[[${data["rolls"][2]}]]` } );
+			}
+
+			// Roll Modifiers
+			defaultElements.push( { 'name': 'mod', 'value': `[[${data["mod"]}]]` } );
+			defaultElements.push( { 'name': 'ansage', 'value': `[[${data["ansagen"]["manoever"]["fest"]} + (${data["ansagen"]["manoever"]["variabel"]})]]` } );
+
+			// Limit (upper, must not be exceeded by unmodified roll)
+			// TODO: Rename "wert" to "limit_result"
+			defaultElements.push( { 'name': 'wert', 'value': `[[${wertDict[data["typ"]]}]]` } );
+
+			// Modification Limit
+			// TODO: Rename "taw" to "limit_mods"
+			defaultElements.push( { 'name': 'taw', 'value': `[[${tawDict[data["typ"]]}]]` } );
+
+			// Custom Roll Parsing-related
+			// Character ID and name for fetching attributes
+			defaultElements.push( { 'name': 'characterid', 'value': '@{character_id}' } );
+			defaultElements.push( { 'name': 'charactername', 'value': '@{character_name}' } );
+
+			// Confirmation Rolls
+			defaultElements.push( { 'name': 'isConfirmationRoll', 'value': '[[0]]' } );
+			defaultElements.push( { 'name': 'showRollTag', 'value': '[[@{show_roll_tags}]]' } );
+			defaultElements.push( { 'name': 'confirmationRollRequired', 'value': '[[0]]' } );
+
+			// Anti-Cheat Measures
+			// Cave: These identifiers are produced on the client side (= suspected cheater). With the right equipment and knowledge, it could be relatively simple to circumvent these measures.
+			// Roll Time allows to compare the reaction roll's time with the original roll's time
+			// If too much time passed between both rolls, a warning is emitted.
+			defaultElements.push( { 'name': 'rollTime', 'value': `[[${Date.now()}]]` } );
+			// Roll Tags are short identifiers based on the roll time that are printed in roll templates, if further rolls are possible.
+			// Since every roll of that "chain" will have the same roll tag, all players can verify that the correct roll button was clicked.
+			defaultElements.push( { 'name': 'rollTag', 'value': '[[0]]' } );
+
+			// Result Code: -3 (triple 20) to +3 (triple 1)
+			defaultElements.push( { 'name': 'result', 'value': '[[0]]' } );
+
+			// Message Code: Messages depend on roll template
+			defaultElements.push( { 'name': 'msg', 'value': '[[0]]' } );
+
+			// Passthrough, used to carry all relevant information from one roll to the next
+			defaultElements.push( { 'name': 'passthrough', 'value': '[[0]]' } );
+
+			// Gather/Create case-specific elements
+			// Currently unused
+			var specialElements = []; //buildMacros(macros_ausfall, { ... reuse, ... reuse_ausfall }, 'structured')
+			var specialRollButtonMacroCode = ""; //buildMacros(macros_ausfall, {... reuse, ... reuse_ausfall }, 'string')
+
+			// Create different representations of the final roll button macro code
+			var allElements = [ ... defaultElements, ... specialElements ];
+			var allElementsObject = transformElements(allElements)["object"]["full"];
+			var rollButtonMacroCode = transformElements(defaultElements)["string"]["full"] + ' ' + specialRollButtonMacroCode;
+
+			debugLog(func, "rollButtonMacroCode", rollButtonMacroCode, "allElements", allElements, "objectified macro variables", allElementsObject);
+
+			// Start the roll
+			var results = await startRoll(rollButtonMacroCode);
+			const rollID = results.rollId;
+			results = results.results;
 			debugLog("values/missing/badDef", v, missing, badDef, "allElementsObject", allElementsObject, "test: info:", info, "results:", results);
 
 			var wert = results.wert.result;
@@ -25502,13 +25504,15 @@ on(
 				results.roll1.result,
 				results.roll2.result,
 			];
-			var confirmationRolls = [
-				results.confirmationRoll0.result,
-				results.confirmationRoll1.result,
-				results.confirmationRoll2.result,
-			];
 			var roll = rolls[0];
-			var confirmationRoll = confirmationRolls[0];
+			if (v["k_option_autoroll_confirmation_rolls"] !== "0") {
+				var confirmationRolls = [
+					results.confirmationRoll0.result,
+					results.confirmationRoll1.result,
+					results.confirmationRoll2.result,
+				];
+				var confirmationRoll = confirmationRolls[0];
+			}
 			var mod = results.mod.result;
 			var ansage = results.ansage.result;
 			var msg = allElementsObject["msg"];
