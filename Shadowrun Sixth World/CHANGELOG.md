@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2023-07-03 ** v.84 Chuz (James Culp)
+	
 **2023-06-15 ** v.83 Chuz (James Culp)
 	New Feature - Beginning work on the GM Helper sheet, step 1 add an OS Tracker.  I'm open to suggestions for other helpful GM tools to include in this sheet in the usual venues (Discord, Patreon, Roll20 DMs)
 	New Feature - GMs rejoice, select a token on the board and click the "Track Selected" button on the GM Helper character sheet to add the selected character's name and A/S/D/F to the tracker.
