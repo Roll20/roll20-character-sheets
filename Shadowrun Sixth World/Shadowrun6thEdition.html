@@ -6397,6 +6397,26 @@
 <input type="hidden" name="attr_spellcasting_expert" value="0" />
 <input type="hidden" name="attr_universal_dicepool_adjustment" value="0" />
 
+<input type="hidden" name="attr_astral" value="-1" />
+<input type="hidden" name="attr_athletics" value="-1" />
+<input type="hidden" name="attr_biotech" value="-1" />
+<input type="hidden" name="attr_closecombat" value="-1" />
+<input type="hidden" name="attr_con" value="-1" />
+<input type="hidden" name="attr_conjuring" value="-1" />
+<input type="hidden" name="attr_cracking" value="-1" />
+<input type="hidden" name="attr_electronics" value="-1" />
+<input type="hidden" name="attr_enchanting" value="-1" />
+<input type="hidden" name="attr_engineering" value="-1" />
+<input type="hidden" name="attr_exoticweapons" value="-1" />
+<input type="hidden" name="attr_firearms" value="-1" />
+<input type="hidden" name="attr_influence" value="-1" />
+<input type="hidden" name="attr_outdoors" value="-1" />
+<input type="hidden" name="attr_perception" value="-1" />
+<input type="hidden" name="attr_piloting" value="-1" />
+<input type="hidden" name="attr_sorcery" value="-1" />
+<input type="hidden" name="attr_stealth" value="-1" />
+<input type="hidden" name="attr_tasking" value="-1" />
+
 <input type="hidden" name="attr_sheet_version" value="0.84">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
@@ -9510,8 +9530,10 @@ on("change:level", () => {
 
 
 on("change:repeating_skills:name", (eventInfo) => {
-//console.log(eventInfo);
 	update_skill_attribute(eventInfo.triggerName.replace('_name', ''), eventInfo.newValue);
+
+	// resynch the hidden attr_<SKILLNAME> attributes so the old skill gets wiped and the new one gets set.
+	update_skill_ratings();
 });
 
 var update_skill_attribute = (prefix, skill) => {
@@ -9568,11 +9590,9 @@ var update_skill_attribute = (prefix, skill) => {
 
 
 on("change:repeating_skills:specialization", (eventInfo) => {
-console.log(eventInfo);
 	let key = eventInfo.triggerName
 	key = key.substring(0, key.length - 10);
-console.log(key);
-console.log(eventInfo.newValue);
+
 	setAttrs({
 		[key]: eventInfo.newValue
 	});
@@ -9717,6 +9737,39 @@ console.log(eventInfo.newValue);
 	});
 });
 
+on("remove:repeating_skills", (eventInfo) => {
+console.log("Skill deleted");
+console.log(eventInfo);
+	update_skill_ratings();
+});
+
+// Do some housekeeping on the hidden attr_<SKILLNAME> (ex: attr_closecombat, attr_sorcery, etc) attributes
+var update_skill_ratings = () => {
+	let skill_list = {'astral': '-1', 'athletics': '-1', 'biotech': '-1', 'closecombat': '-1', 'con': '-1', 'conjuring': '-1', 'cracking': '-1', 'electronics': '-1', 'enchanting': '-1', 'engineering': '-1', 'exoticweapons': '-1', 'firearms': '-1', 'influence': '-1', 'outdoors': '-1', 'perception': '-1', 'piloting': '-1', 'sorcery': '-1', 'stealth': '-1', 'tasking': '-1'};
+
+	// walk the repeating skills section to grab the skills that the PC currently has
+	toGet = [];
+	getSectionIDs('repeating_skills', (skill_IDs) => {
+		// grab the name and rating attribute names for each of their skills
+		skill_IDs.forEach((rowID) => {
+			toGet.push('repeating_skills_'+rowID+'_name');
+			toGet.push('repeating_skills_'+rowID+'_rating');
+		});
+
+		// get all of the current skills and update skill_list with the current ratings for those skills
+		//   leaving everything else at -1
+		getAttrs(toGet, (v) => {
+			skill_IDs.forEach((ID) => {
+				let skill_name_simplified = v[`repeating_skills_${ID}_name`].toLowerCase().replace(/\s/g, '');
+				skill_list[skill_name_simplified] = v[`repeating_skills_${ID}_rating`];
+			});
+
+
+			// update the hidden attr_<SKILLNAME> attributes with the current skill rank or -1.
+			setAttrs(skill_list);
+		});
+	});
+};
 
 var disable_ranged_mods = () => {
 	// Get the currently active mods and disable them
