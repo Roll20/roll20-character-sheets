@@ -733,9 +733,8 @@
 
   const stats = ["agility", "brawn", "coordination", "insight", "reason", "will"];
   stats.forEach(stat => {
-
     on(`change:${stat}`, () => {
-        getAttrs([stat], values => {
+      getAttrs([stat], values => {
             const stat_base = int(values[stat]);
               let stat_mod = 0;
               if (stat_base >= 16) stat_mod = 5;
@@ -751,6 +750,19 @@
       });
   });
 
+  on("change:brawn change:will change:skill_resilience", function() {  
+    getAttrs(["brawn","will","skill_resilience"], function(values) {
+      let brawn = parseInt(values.brawn)||0;
+      let will = parseInt(values.will)||0;
+      let resilience = parseInt(values.skill_resilience)||0;
+      let stress_brawn = brawn + resilience;
+      let stress_will = will + resilience;
+      let stress_total = stress_brawn >= stress_will ? stress_brawn: stress_will;
+      setAttrs({                            
+        "stress_max": stress_total
+      });
+    });
+  });
 
   const buttonlist = ["main_char","equipment","spells"];
   buttonlist.forEach(button => {
