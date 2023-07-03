@@ -523,11 +523,11 @@
                 <span class="input" name="attr_initiative" />
             </div>
         </div>
-        
+
         <div class="refmark">Treat as 0 if no levels in relevant classes</div>
         <div class="grid boxstat move">
             <label>Limited Move</label>
-            <input type="hidden" name="attr_limited_move" />
+            <input type="hidden" name="attr_limited_move" value="3" />
             <span class="input" name="attr_limited_move" />
         </div>
         <div class="grid boxstat move">
@@ -540,6 +540,50 @@
             <label>Full Move</label>
             <input type="hidden" name="attr_full_move" />
             <span class="input" name="attr_full_move" />
+        </div>
+    </div>
+
+    <div class="grid col3-accdmg nogap">
+        <div class="grid nogap box wide">
+            <input class="class-level" type="hidden" value="" name="attr_fighter_level" />
+            <label>Fighter</label>
+            <span name="attr_fighter_level" />
+
+            <input class="class-level" type="hidden" value="" name="attr_grappler_level" />
+            <label>Grappler</label>
+            <span name="attr_grappler_level" />
+
+            <input class="class-level" type="hidden" value="" name="attr_fencer_level" />
+            <label>Fencer</label>
+            <span name="attr_fencer_level" />
+
+            <input class="class-level" type="hidden" value="" name="attr_marksman_level" />
+            <label>Marksman</label>
+            <span name="attr_marksman_level" />
+        </div>
+
+        <div class="grid col2 nogap">
+            <div>Dexterity Modifier</div>
+            <div class="grid">
+                <label class="refmark">Base Accuracy</label>
+                <input type="hidden" name="attr_base_accuracy" />
+                <span class="input" name="attr_base_accuracy" />
+            </div>
+
+            <div>Strength Modifier</div>
+            <div class="grid">
+                <label class="refmark">Extra Damage</label>
+                <input type="hidden" name="attr_extra_damage" />
+                <span class="input" name="attr_extra_damage" />
+            </div>
+        </div>
+
+        <div class="grid boxstat">
+            <label>Movement Enhancements</label>
+            <div class="grid col2">
+                <div><input type="text" spellcheck="false" name="attr_movement_enhancements" /></div>
+                <div><input type="number" name="attr_movement_enhancements_modifier" /></div>
+            </div>
         </div>
     </div>
 </div>
@@ -558,7 +602,8 @@
     const growth_list = "123456".split("");
     const total_list = base_list
         .concat(correction_list.map(i => "ability_" + i))
-        .concat(growth_list.map(i => "growth_" + i));
+        .concat(growth_list.map(i => "growth_" + i))
+        .concat(["movement_enhancements_modifier"]);
 
     const class_list = ["fighter","grappler","fencer","marksman","sorcerer",
         "conjurer","priest","artificer","faerie_tamer","scout","ranger",
@@ -580,6 +625,22 @@
         "knowledge": {
             "classes": ["sage","alchemist"],
             "ability": "intelligence"
+        },
+        "monster_knowledge": {
+            "classes": ["sage","rider"],
+            "ability": "intelligence"
+        },
+        "initiative": {
+            "classes": ["scout","tactician"],
+            "ability": "agility"
+        },
+        "base_accuracy": {
+            "classes": ["fighter","grappler","fencer","marksman"],
+            "ability": "dexterity"
+        },
+        "extra_damage": {
+            "classes": ["fighter","grappler","fencer","marksman"],
+            "ability": "strength"
         }
     };
     const package_list = Object.keys(package_data);
@@ -595,6 +656,7 @@
             getAttrs(total_list, function(values) {
                 let update = {};
                 let counter = 0;
+                let move_mod = parseInt(values["movement_enhancements_modifier"])||0;
                 base_list.forEach(base => {
                     let base_value = parseInt(values[`${base}`])||0;
                     for (let i = 0; i < 2; i++) {
@@ -607,6 +669,10 @@
                         let modifier = Math.floor(score / 6);
                         update[`${ability}`] = score;
                         update[`${ability}_modifier`] = modifier;
+                        if (ability == "agility") {
+                            update["normal_move"] = score + move_mod;
+                            update["full_move"] = (score + move_mod) * 3;
+                        }
                         counter++;
                     }
                 });
