@@ -4,26 +4,22 @@ A character sheet inspired by other Star Wars character sheets, and made for the
 
 ## Instructions
 
-If you hover over the Star Wars logo a popup with instructions will appear. They are shown here as well.
+Still working on them to be shown as previous character sheets like D6StarWars.
 
 ### Dice Codes
 
-Dice codes must be written as xD or xD+y. For example, 2D and 2D+2 are valid. Damage codes for weapons can use str (Strength) and ctrl (Control for lightsabers), e.g. str+2D.
+Dice codes must be written as number of Dice before "D +" input and modifiers afterward.
 
-**Important!** For a dice code to update you need to tab away from the field before you press a roll button. This is due to that the roll buttons use hidden input fields where D is replaced with d6.
+### Translation
 
-### Armor Codes
-
-Armor code must be either a value with a plus sign, for example +1; or a normal dice code like 1D.
+Currently working in Spanish and in time make it to English, and other languages as well.
 
 ### Wound Status
 
 The dropdown has the following values:
-- H = Healthy
-- S = Stunned
-- W = Wounded
-- T = Wounded Twice
-- I = Incapacitated
-- M = Mortally Wounded
-
-W, T, I and M will reduce all dice codes with 1D. H and S will revert back to normal dice codes.
+<li>"Normal [ 0 ]" = Healthy</li>
+<li>"Aturdido [ -1D ]" = Stunned</li>
+<li>"Herido [ -1D ]" = Wounded</li>
+<li>"Doblemente Herido [ -2D ]" = Wounded Twice</li>
+<li>"Incapacitado [ -5D ]" = Incapacitated</li>
+<li>"Mortalmente Herido [ X ]" = Mortally Wounded</li>
