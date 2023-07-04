@@ -15,6 +15,14 @@ input[type=number] {
     /* Firefox */
 }
 
+body .charsheet .repitem .itemcontrol {
+    z-index: 99;
+}
+body .charsheet .repitem .itemcontrol > * {
+    font-size 8px;
+    padding: 0 10px;
+}
+
 .charsheet h1 {
     background: url('https://raw.githubusercontent.com/coyotegrey/roll20-character-sheets/sword-world-dev/Sword%20World/images/logo.png') left top no-repeat;
     background-size: contain;
@@ -63,6 +71,14 @@ body .charsheet div .grid input[type=number],
     overflow: hidden;
 }
 
+body .charsheet select {
+    background: white;
+    appearance: none;
+    box-shadow: none;
+    border: 0;
+    border-radius: 0;
+}
+
 .charsheet .grid,
 .repcontainer,
 .repitem {
@@ -71,6 +87,9 @@ body .charsheet div .grid input[type=number],
     padding: 0;
     grid-auto-rows: minmax(min-content, max-content);
     gap: 10px;
+}
+.repitem {
+    height: 20px;
 }
 .charsheet .nogap {
     gap: 0px;
@@ -106,6 +125,15 @@ body .charsheet div .grid input[type=number],
 .col2-feats {
     grid-template-columns: 1fr 11fr;
 }
+.col2-locdef {
+    grid-template-columns: 5fr 6fr;
+}
+.col2-locations {
+    grid-template-columns: 1fr 5fr;
+}
+.col2-evasion {
+    grid-template-columns: 5fr 4fr;
+}
 .col3 {
     grid-template-columns: repeat(3, 1fr);
 }
@@ -119,7 +147,7 @@ body .charsheet div .grid input[type=number],
     grid-template-columns: 3fr 2fr 98px;
 }
 .col3-accdmg {
-    grid-template-columns: 5fr 9fr 5fr;
+    grid-template-columns: 5fr 9fr 219px;
 }
 .col4 {
     grid-template-columns: repeat(4, 1fr);
@@ -137,7 +165,11 @@ body .charsheet div .grid input[type=number],
     grid-template-columns: repeat(6, 1fr);
 }
 .col8-initmove {
-    grid-template-columns: 3fr 3fr 3fr 3fr 2fr 2fr 2fr 2fr;
+    grid-template-columns: 3fr 3fr 3fr 3fr 2fr 73px 73px 73px;
+}
+.col-weapons,
+.repeating_weapons ~ .repcontainer .repitem {
+    grid-template-columns: 7fr 2fr 2fr 3fr 3fr 3fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 2fr 3fr 3fr;
 }
 .slot1 {
     grid-column: 1;
@@ -416,11 +448,13 @@ body .charsheet .grid.lined.single .grid > * {
     border-top: solid 1px black;
 }
 body .charsheet .grid.lined .grid > *:not(.header),
-body .charsheet .grid.lined .repcontainer .repitem > div {
+body .charsheet .grid.lined .repcontainer .repitem > div:not(.itemcontrol) {
+    position: relative;
     background: white;
 }
-body .charsheet .grid.lined input,
-body .charsheet .grid.lined .input {
+body .charsheet div .grid.lined input,
+body .charsheet div .grid.lined input[type=number],
+body .charsheet div .grid.lined .input {
     border: none;
 }
 .check-yes:before {
@@ -460,8 +494,8 @@ body .charsheet .col3-languages *:nth-child(3n+3) {
 
 .profile > .label,
 .col5-abilities > * label,
-body .charsheet .box + div > div:nth-child(even) label,
-body .charsheet .boxstat label,
+body .charsheet .box + div:not(.stretch) > div:nth-child(even) label,
+body .charsheet .boxstat:not(.nogap) label,
 body .charsheet .boxstat .label {
     -webkit-font-smoothing: antialiased;
     text-shadow: 0 0 4px white, 0 0 4px white, 0 0 4px white,
@@ -664,6 +698,7 @@ body .charsheet .box:after {
 body .charsheet .box + div div:nth-child(odd) {
     position: relative;
     height: fit-content;
+    line-height: 20px;
     padding-left: 10px;
     font-size: 10px;
 }
@@ -691,6 +726,45 @@ body .charsheet .boxstat {
     margin-right: 10px;
     place-content: center;
 }
+body .charsheet .boxstat {
+    border: solid 1px black;
+}
+body .charsheet .boxstat.nogap {
+    margin-right: 0;
+    place-content: unset;
+}
+body .charsheet .boxstat.nogap:before {
+    position: absolute;
+    content: '';
+    background: white;
+    top: -2px;
+    left: 0;
+    margin: 0 10px;
+    width: calc(100% - 20px);
+    height: 110%;
+}
+body .charsheet .boxstat.nogap > * {
+    z-index: 1;
+    padding: 0 10px;
+}
+body .charsheet .boxstat.move:after {
+    position: absolute;
+    content: 'm';
+    bottom: 0;
+    right: 2px;
+    font-size: 10px;
+}
+body .charsheet .boxstat.move + .move + .move {
+    margin-left: 10px;
+    margin-right: 0;
+}
+body .charsheet .boxstat.move + .move + .move:before {
+    position: absolute;
+    content: 'x3=';
+    bottom: 0;
+    left: -19px;
+    font-size: 10px;
+}
 body .charsheet .box + div.nogap > div:nth-child(2n+4) {
     border-top: none;
 }
@@ -700,10 +774,23 @@ body .charsheet .boxstat label {
     top: -8px;
     left: 0;
     right: 0;
-    width: min-content;
+    width: auto;
     line-height: unset;
     margin: auto;
     text-align: center;
+}
+body .charsheet .box.wide + div.stretch > div:nth-child(even) {
+    grid-template-columns: 1fr 1fr;
+    place-content: center;
+}
+body .charsheet .box.wide + div.stretch > div:nth-child(even) label,
+body .charsheet .boxstat.nogap label {
+    position: unset;
+    width: auto;
+    height: auto;
+    margin: 0 5px;
+    line-height: 100%;
+    text-align: left;
 }
 body .charsheet .boxstat .label {
     position: absolute;
@@ -714,8 +801,8 @@ body .charsheet .boxstat .label {
     left: -10px;
     width: fit-content;
 }
-body .charsheet div .grid .boxstat input,
-body .charsheet div .grid .boxstat input[type=number] {
+body .charsheet div.grid .boxstat input,
+body .charsheet div.grid .boxstat input[type=number] {
     border: none;
 }
 body .charsheet .boxstat div.col2 {
@@ -735,8 +822,16 @@ body .charsheet .boxstat .input {
     line-height: 35px;
     text-align: center;
 }
+body .charsheet .box.wide + div.stretch > div:nth-child(even) .input {
+    height: auto;
+    line-height: 100%;
+}
 body .charsheet .box + div {
     grid-template-columns: auto 98px;
+}
+body .charsheet .box.wide + div {
+    grid-template-columns: 2fr 5fr;
+    grid-auto-rows: auto;
 }
 
 body .col2-feats .header {
@@ -764,4 +859,80 @@ body .col2-feats .header {
 /* page 2 */
 .col8-initmove .box + .col2 {
     grid-auto-rows: unset;
+}
+
+.col-weapons div:nth-child(n+3):nth-child(-n+5),
+.col-weapons div:nth-child(n+18):nth-child(-n+20) {
+    font-size: 7px;
+    line-height: unset;
+}
+.col-weapons div:nth-child(3),
+.col-weapons div:nth-child(22) {
+    padding: 0 5px;
+}
+body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(n+10):nth-child(-n+21) * {
+    font-size: 10px;
+    line-height: unset;
+}
+body .charsheet .grid.lined .repeating_weapons ~ .repcontainer .repitem div:nth-child(8),
+body .charsheet .grid.lined .repeating_weapons ~ .repcontainer .repitem div:nth-child(23) {
+    background: black;
+    padding: 0 2px;
+}
+body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(8) span,
+body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(23) span {
+    display: block;
+    background: white;
+    height: 100%;
+    clip-path: polygon(
+        0% 20%,
+        15% 0%,
+        85% 0%,
+        100% 20%,
+        100% 80%,
+        85% 100%,
+        15% 100%,
+        0% 80%
+    );
+}
+body .charsheet .repeating_weapons ~ .repcontainer .repitem:last-child div:nth-child(8),
+body .charsheet .repeating_weapons ~ .repcontainer .repitem:last-child div:nth-child(23) {
+    padding-bottom: 2px;
+}
+body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(21):before {
+    position: absolute;
+    content: '';
+    left: 0;
+    right: 0;
+    top: 1px;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: solid 1px black;
+    border-radius: 50%;
+}
+body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(21) input {
+    z-index: 1;
+}
+body .charsheet .repeating_weapons ~ .repcontainer .repitem input[type=number],
+body .charsheet .repeating_weapons ~ .repcontainer .repitem .input {
+    text-align: center;
+}
+
+.repeating_accessories ~ .repcontainer .repitem {
+    grid-template-columns: 1fr 5fr;
+}
+body .charsheet .col2-locations div,
+body .charsheet .grid .col2-locations input,
+.repeating_accessories ~ .repcontainer .repitem div,
+.repeating_accessories ~ .repcontainer .repitem input {
+    text-align: center;
+}
+body .charsheet .col2-locations *:nth-child(13),
+body .charsheet .col2-locations *:nth-child(15) {
+    font-size: 7px;
+}
+
+body .charsheet .col2-evasion div:nth-child(2) div:nth-child(2) {
+    margin-right: 0;
 }
