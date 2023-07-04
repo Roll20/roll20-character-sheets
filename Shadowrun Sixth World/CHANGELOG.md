@@ -2,6 +2,8 @@ Change Log
 ==============================================
 **2023-07-03 ** v.84 Chuz (James Culp)
 	Bugfix - Sprint rolls now include -1 skill modifier if the PC doesn't have an Athletics skill.  Also added a function to resynch the hidden skill attributes any time a skill name is changed (via the drop down changing) or a skill is deleted.
+	Bugfix - Fixed the increment button on the OS Tracker it now adds 1 instead of concatenating a 1 after the other digits sometimes.
+	New Feature -  New Feature - skill mods in the repeating skill list now should update those skills everywhere in the sheet.
 **2023-06-15 ** v.83 Chuz (James Culp)
 	New Feature - Beginning work on the GM Helper sheet, step 1 add an OS Tracker.  I'm open to suggestions for other helpful GM tools to include in this sheet in the usual venues (Discord, Patreon, Roll20 DMs)
 	New Feature - GMs rejoice, select a token on the board and click the "Track Selected" button on the GM Helper character sheet to add the selected character's name and A/S/D/F to the tracker.
