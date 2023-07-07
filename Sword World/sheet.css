@@ -23,6 +23,10 @@ body .charsheet .repitem .itemcontrol > * {
     padding: 0 10px;
 }
 
+body .charsheet sub {
+    bottom: unset;
+}
+
 .charsheet h1 {
     background: url('https://raw.githubusercontent.com/coyotegrey/roll20-character-sheets/sword-world-dev/Sword%20World/images/logo.png') left top no-repeat;
     background-size: contain;
@@ -47,6 +51,7 @@ body .charsheet .repitem .itemcontrol > * {
     text-transform: uppercase;
     color: black;
     border-radius: 0;
+    white-space: unset;
 }
 body .charsheet div .grid input,
 body .charsheet div .grid input[type=number],
@@ -70,15 +75,28 @@ body .charsheet div .grid input[type=number],
     outline: none;
     overflow: hidden;
 }
+.input {
+    cursor: default;
+}
+body .charsheet div .grid input.lrg,
+body .charsheet div .grid input[type=number].lrg,
+.charsheet select.lrg,
+.input.lrg  {
+    font-size: 20px;
+}
 
 body .charsheet select {
     background: white;
     appearance: none;
     box-shadow: none;
-    border: 0;
-    border-radius: 0;
 }
 
+.charsheet .flex {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    gap: 10px;
+}
 .charsheet .grid,
 .repcontainer,
 .repitem {
@@ -91,6 +109,10 @@ body .charsheet select {
 .repitem {
     height: 20px;
 }
+.charsheet .smrowgap {
+    column-gap: 0px;
+    row-gap: 5px;
+}
 .charsheet .nogap {
     gap: 0px;
 }
@@ -101,7 +123,8 @@ body .charsheet select {
     grid-template-columns: 2fr 3fr;
     column-gap: 20px;
 }
-.col2-guild {
+.col2-guild,
+.repeating_consumables ~ .repcontainer .repitem {
     grid-template-columns: 2fr 1fr;
 }
 .col2-guild .col2 {
@@ -134,6 +157,9 @@ body .charsheet select {
 .col2-evasion {
     grid-template-columns: 5fr 4fr;
 }
+.col2-monitems {
+    grid-template-columns: 1fr 2fr;
+}
 .col3 {
     grid-template-columns: repeat(3, 1fr);
 }
@@ -155,6 +181,10 @@ body .charsheet select {
 .col4-xp {
     grid-template-columns: 5fr 3fr 2fr 1fr;
 }
+.col4-armor,
+.repeating_armor ~ .repcontainer .repitem {
+    grid-template-columns: 5fr 1fr 1fr 1fr;
+}
 .col5 {
     grid-template-columns: repeat(5, 1fr);
 }
@@ -164,8 +194,15 @@ body .charsheet select {
 .col6 {
     grid-template-columns: repeat(6, 1fr);
 }
+.col7 {
+    grid-template-columns: repeat(7, 1fr);
+}
 .col8-initmove {
     grid-template-columns: 3fr 3fr 3fr 3fr 2fr 73px 73px 73px;
+}
+.col12,
+.repeating_powertable ~ .repcontainer .repitem {
+    grid-template-columns: repeat(12, 1fr);
 }
 .col-weapons,
 .repeating_weapons ~ .repcontainer .repitem {
@@ -207,6 +244,9 @@ body .charsheet select {
 	word-wrap: break-word;
     min-height: 20px;
 }
+.auto-expand.tall {
+    min-height: 100px;
+}
 .auto-expand span {
 	visibility: hidden;
 	white-space: pre-wrap;
@@ -236,6 +276,10 @@ body .charsheet select {
 	text-align: inherit;
 	text-transform: inherit;
 }
+.auto-expand.lrg span,
+.auto-expand.lrg textarea {
+    font-size: 20px;
+}
 
 /* radio stuff */
 .charsheet .grid input[type='radio'] {
@@ -259,6 +303,7 @@ body .charsheet select {
     transition: 120ms transform ease-in-out;
     background: black;
     line-height: 8px;
+    font-size: 10px;
 }
 .charsheet .grid input[type='radio']:checked ~ input[type='radio']:before {
     transform: scale(0);
@@ -302,6 +347,27 @@ body .charsheet select {
 .charsheet .grid input[type='checkbox']:checked:hover:before {
     content: '✖';
 }
+.charsheet .grid input[type=checkbox].standard {
+    background: white;
+    width: 10px;
+    height: 10px;
+    border: solid 1px black;
+}
+.charsheet .grid input[type=checkbox].standard:hover:before,
+.charsheet .grid input[type=checkbox].standard:before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    background: black;
+    line-height: 8px;
+}
+.charsheet .grid input[type='checkbox'].standard:checked:hover:before,
+.charsheet .grid input[type='checkbox'].standard:checked:before {
+    content: '';
+    transform: scale(1);
+}
 
 /* tabs */
 .tabs {
@@ -340,6 +406,16 @@ body .charactersheet .page2,
 body .charactersheet .settings {
     display: none;
 }
+body .charactersheet .page1:after,
+body .charactersheet .page2:after,
+body .charactersheet .settings:after {
+    content: 'Sword World 2.5 Character Sheet Ver.0.1 | https://app.roll20.net/users/2699740/robert-b';
+    text-align: right;
+    font-size: 8px;
+}
+body .charactersheet .page1:after {
+    grid-column: span 2;
+}
 body .toggle-tabs[value='page1'] ~ div.page1,
 body .toggle-tabs[value='page2'] ~ div.page2,
 body .toggle-tabs[value='settings'] ~ div.settings {
@@ -358,8 +434,15 @@ body .toggle-tabs[value='settings'] ~ div.settings {
     line-height: 20px;
 }
 
+.charsheet .footnote {
+    font-size: 9px;
+    line-height: unset;
+    text-align: center;
+}
+
 .charsheet *:not(label).refmark {
     font-size: 10px;
+    line-height: unset;
 }
 .charsheet .refmark:before {
     content: '※';
@@ -720,14 +803,21 @@ body .charsheet .box + div.nogap div:nth-child(odd):after {
 body .charsheet .box + div > div:nth-child(even),
 body .charsheet .boxstat {
     position: relative;
-    display: grid;
     background: white;
     border: solid 2px black;
     margin-right: 10px;
     place-content: center;
 }
-body .charsheet .boxstat {
+body .charsheet .boxstat:not(.black) {
     border: solid 1px black;
+}
+body .charsheet .boxstat.total,
+body .charsheet .boxstat.total + .boxstat,
+body .charsheet *:not(.nogap) > .boxstat {
+    margin: 0;
+}
+body .charsheet .boxstat.total label {
+    z-index: 1;
 }
 body .charsheet .boxstat.nogap {
     margin-right: 0;
@@ -741,7 +831,7 @@ body .charsheet .boxstat.nogap:before {
     left: 0;
     margin: 0 10px;
     width: calc(100% - 20px);
-    height: 110%;
+    height: calc(100% + 4px);
 }
 body .charsheet .boxstat.nogap > * {
     z-index: 1;
@@ -768,6 +858,27 @@ body .charsheet .boxstat.move + .move + .move:before {
 body .charsheet .box + div.nogap > div:nth-child(2n+4) {
     border-top: none;
 }
+body .charsheet .box + div > div:nth-child(even) button.input,
+body .charsheet .box + div > div:nth-child(even) button.input:hover {
+    position: absolute;
+    background: none;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+body .charsheet .box + div > div:nth-child(even) button:before {
+    content: 'F';
+    font-family: 'dicefontd6';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    text-shadow: none;
+}
+body .charsheet .box + div > div:nth-child(even) button:hover:before {
+    color: gold;
+}
 body .charsheet .box + div > div:nth-child(even) label,
 body .charsheet .boxstat label {
     position: absolute;
@@ -775,7 +886,7 @@ body .charsheet .boxstat label {
     left: 0;
     right: 0;
     width: auto;
-    line-height: unset;
+    line-height: 100%;
     margin: auto;
     text-align: center;
 }
@@ -792,7 +903,7 @@ body .charsheet .boxstat.nogap label {
     line-height: 100%;
     text-align: left;
 }
-body .charsheet .boxstat .label {
+body .charsheet .boxstat .label.rotate {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -816,6 +927,7 @@ body .charsheet .boxstat div.col2 div:last-child:before {
     margin: -5px;
 }
 body .charsheet .box + div > div:nth-child(even) .input,
+body .charsheet div .boxstat input[type=number],
 body .charsheet .boxstat .input {
     border: none;
     height: 35px;
@@ -861,26 +973,47 @@ body .col2-feats .header {
     grid-auto-rows: unset;
 }
 
+.col-weapons div.header {
+    position: relative;
+}
 .col-weapons div:nth-child(n+3):nth-child(-n+5),
-.col-weapons div:nth-child(n+18):nth-child(-n+20) {
+.col-weapons div:nth-child(n+7):nth-child(-n+20) {
     font-size: 7px;
     line-height: unset;
+    display: grid;
+    align-items: center;
 }
-.col-weapons div:nth-child(3),
-.col-weapons div:nth-child(22) {
-    padding: 0 5px;
+.col-weapons div:nth-child(n+7):nth-child(-n+17):before {
+    position: absolute;
+    content: '';
+    left: 0;
+    right: 0;
+    top: 1px;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: solid 1px white;
+    border-radius: 50%;
 }
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(n+10):nth-child(-n+21) * {
     font-size: 10px;
     line-height: unset;
 }
 body .charsheet .grid.lined .repeating_weapons ~ .repcontainer .repitem div:nth-child(8),
-body .charsheet .grid.lined .repeating_weapons ~ .repcontainer .repitem div:nth-child(23) {
+body .charsheet .grid.lined .repeating_weapons ~ .repcontainer .repitem div:nth-child(23),
+body .charsheet .boxstat.total {
     background: black;
     padding: 0 2px;
 }
+body .charsheet .boxstat.total {
+    padding: 2px;
+}
+body .charsheet .boxstat.total + .total  {
+    padding: 2px 2px 2px 0;
+}
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(8) span,
-body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(23) span {
+body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(23) span,
+body .charsheet .boxstat.total .input {
     display: block;
     background: white;
     height: 100%;
@@ -894,6 +1027,9 @@ body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(23) sp
         15% 100%,
         0% 80%
     );
+}
+body .charsheet .boxstat.total .input {
+    height: 35px;
 }
 body .charsheet .repeating_weapons ~ .repcontainer .repitem:last-child div:nth-child(8),
 body .charsheet .repeating_weapons ~ .repcontainer .repitem:last-child div:nth-child(23) {
@@ -924,8 +1060,10 @@ body .charsheet .repeating_weapons ~ .repcontainer .repitem .input {
 }
 body .charsheet .col2-locations div,
 body .charsheet .grid .col2-locations input,
+body .charsheet .grid .col4-armor input[type=number],
 .repeating_accessories ~ .repcontainer .repitem div,
-.repeating_accessories ~ .repcontainer .repitem input {
+.repeating_accessories ~ .repcontainer .repitem input,
+.repeating_armor ~ .repcontainer .repitem input[type=number] {
     text-align: center;
 }
 body .charsheet .col2-locations *:nth-child(13),
@@ -935,4 +1073,121 @@ body .charsheet .col2-locations *:nth-child(15) {
 
 body .charsheet .col2-evasion div:nth-child(2) div:nth-child(2) {
     margin-right: 0;
+}
+
+body .charsheet div .grid .magic-circle {
+    display: none;
+}
+body .charsheet div .grid .magic-power:not([value='']) + .magic-circle {
+    display: grid;
+}
+.magic-circle span {
+    text-align: center;
+}
+.magic-circle span:first-child {
+    display: grid;
+    aspect-ratio : 1 / 1;
+    width: 100%;
+    height: unset;
+    border: solid 1px black;
+    border-radius: 50%;
+    align-items: center;
+}
+body .charsheet .magic-circle span:nth-child(2) {
+    font-size: 7px;
+}
+body .charsheet .magic-circle span:nth-child(3) {
+    border: none;
+    font-size: 13px;
+}
+
+body .charsheet .lined.black {
+    border: solid 2px black;
+}
+body .charsheet .powertable div,
+.repeating_powertable ~ .repcontainer .repitem div,
+.repeating_powertable ~ .repcontainer .repitem input[type=number] {
+    font-size: 10px;
+    line-height: unset;
+    display: grid;
+    align-items: center;
+    text-align: center;
+}
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+1),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+2),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+3),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+4),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+5),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+6),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+7),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+8),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+9),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+10),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+11),
+body .charsheet .grid.lined .grid.powertable > div:nth-child(24n+12),
+body .charsheet .grid.lined .repeating_powertable ~ .repcontainer .repitem:nth-child(odd) > div {
+    background: gainsboro;
+}
+body .charsheet .grid.lined .grid.powertable > div:first-child {
+    background:
+        linear-gradient(to top right,
+            gainsboro 0%,
+            gainsboro calc(50% - 0.8px),
+            black 50%,
+            gainsboro calc(50% + 0.8px),
+            gainsboro 100%);
+}
+body .charsheet .powertable div:nth-child(n+2):nth-child(-n+12) {
+    font-size: 7px;
+}
+body .charsheet .powertable div:nth-child(n+2):nth-child(-n+12):before {
+    position: absolute;
+    content: '';
+    left: 0;
+    right: 0;
+    top: 1px;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: solid 1px black;
+    border-radius: 50%;
+}
+
+.repeating_consumables ~ .repcontainer {
+    margin-top: -10px;
+    gap: 5px;
+}
+.repeating_consumables ~ .repcontainer .repitem {
+    place-content: center;
+    align-items: center;
+}
+
+body .charsheet .toggle-cards + div {
+    display: none;
+}
+body .charsheet .toggle-cards:not([value='']) + div {
+    display: grid;
+}
+.charsheet .cards .header {
+    background: dimgray;
+}
+body .charsheet .profile .cards input[type=number] {
+    text-align: center;
+}
+
+/* Roll templates */
+
+.sheet-rolltemplate-swskill {
+    box-sizing: border-box;
+    background: #dedbca;
+    width: 100%;
+    border-radius: 5px;
+    padding: 5px;
+}
+.sheet-rolltemplate-swskill .sheet-container {
+    border: 20px solid transparent;
+    padding: 10px;
+    border-image: url('https://raw.githubusercontent.com/coyotegrey/roll20-character-sheets/sword-world-dev/Sword%20World/images/border2.png') 65 stretch;
+    display: grid;
+    grid-template-columns: 1fr;
 }
