@@ -22,7 +22,12 @@
     <div class="tab-content setting-generic">
       <div class = "container" >
         <div style="vertical-align: middle;text-align: center;">
-          <img style="width:70%;"  title="Version 5.00 - 09/07/2021" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesOubliees/CO_Logo3.png"/><br>
+          <img style="width:70%;"  
+               title="Version 5.00 - 09/07/2021
+Cette feuille de personnage utilise des marques déposées et des droits d’auteurs qui sont la propriété de Black Book Editions comme l’y autorisent les conditions d’utilisation de Black Book Editions. Cette feuille de personnage n’est pas publiée par Black Book Editions et n’a pas reçu son aval ni une quelconque approbation de sa part. Pour de plus amples informations sur Black Book Editions, consultez ww.black-book-editions.fr." 
+          src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesOubliees/CO_Logo3.png"/>
+          <span style="display:inline-block; width:20px"></span>
+          <img width="70px" height="70px" name="attr_character_token" />
         </div>
         <div style="width:250px;">
           <table>
@@ -4265,20 +4270,26 @@
   const patternStats = buildRegexp(statsReconnues);
 
   const listeArmes = [{
-    keys: ['épée', 'epee', 'sabre', 'cimetere', 'cimetère'],
+    keys: ['épée', 'epee', 'sabre', 'cimeterre', 'cimetère'],
     typeattaque: 'Arme 1 main',
     typedegats: 'tranchant',
-    modificateurs: ''
+    modificateurs: 'metal'
+  }, {
+    keys: ['fleau', 'fléau'],
+    typeattaque: 'Arme 1 main',
+    typedegats: 'contondant',
+    modificateurs: 'metal',
+    options: '--bonusContreBouclier 2',
   }, {
     keys: ['hache'],
     typeattaque: 'Arme 1 main',
     typedegats: 'tranchant',
-    modificateurs: 'hache'
+    modificateurs: 'hache metal'
   }, {
     keys: ['katana', 'vivelame'],
     typeattaque: 'Arme 2 mains',
     typedegats: 'tranchant',
-    modificateurs: ''
+    modificateurs: 'metal'
   }, {
     keys: ['epieu', 'épieu'],
     typeattaque: 'Arme 2 mains',
@@ -4298,17 +4309,17 @@
     keys: ['dague', 'rapière', 'rapiere', 'stylet'],
     typeattaque: 'Arme 1 main',
     typedegats: 'percant',
-    modificateurs: ''
+    modificateurs: 'metal'
   }, {
     keys: ['mousquet'],
     typeattaque: 'Arme 2 main',
     typedegats: 'percant',
-    modificateurs: 'poudre'
+    modificateurs: 'poudre metal'
   }, {
     keys: ['pétoire', 'petoire'],
     typeattaque: 'Arme 1 main',
     typedegats: 'percant',
-    modificateurs: 'poudre'
+    modificateurs: 'poudre metal'
   }, {
     keys: ['arc', 'arbalète', 'arbalete'],
     typeattaque: 'Arme 2 mains',
@@ -4323,7 +4334,7 @@
     keys: ['marteau'],
     typeattaque: 'Arme 1 main',
     typedegats: 'contondant',
-    modificateurs: 'marteau'
+    modificateurs: 'marteau metal'
   }, {
     keys: ['javelot'],
     typeattaque: 'Arme de jet',
@@ -4332,12 +4343,12 @@
   }, {
     keys: ['hachette'],
     typeattaque: 'Arme de jet',
-    typedegats: 'tranchant',
+    typedegats: 'tranchant metal',
     modificateurs: ''
   }, {
     keys: ['lance'],
     typeattaque: 'Arme 2 mains',
-    typedegats: 'percant',
+    typedegats: 'percant metal',
     modificateurs: ''
   }];
 
@@ -4371,16 +4382,17 @@
         newAttrs[prefix + 'typeattaque'] = s.typeattaque;
         switch (s.typeattaque) {
           case 'Arme de jet':
-            newAttrs[prefix + 'armejet'] = 'on';
+            newAttrs[prefix + 'jet'] = 'on';
             break;
           case 'Arme 1 main':
           case 'Arme 2 mains':
           case 'Arme gauche':
-            newAttrs[prefix + 'armeportable'] = 'on';
+            newAttrs[prefix + 'portable'] = 'on';
             break;
         }
         typeAttaque = s.typeattaque;
         newAttrs[prefix + 'modificateurs'] = s.modificateurs;
+        if (s.options) newAttrs[prefix + 'options'] = s.options;
         newAttrs[prefix + 'typedegats'] = s.typedegats;
       }
     });
@@ -4447,6 +4459,34 @@
   }
 
   const voiesDeCreatures = {
+    72: {
+      nom: 'Voie du tueur',
+      1: {
+        predicats: 'discretion:5 ',
+        actions:[{
+          titre: 'Attaque mortelle (L)',
+          code: '#Attaque -1 --bonusAttaque 5 --sournoise 2'
+        }]
+      },
+      2: {
+        actions:[{
+          titre: 'Attaque mortelle (remplace le rang 1)',
+          code: '#Attaque -1 --bonusAttaque 5 --sournoise 4'
+        }, {
+          titre: 'Disparition',
+          code: '#Attaque -1 --disparition 4'
+        }]
+      },
+      3: {
+        actions:[{
+          titre: 'Attaque mortelle (remplace le rang 2)',
+          code: '#Attaque -1 --bonusAttaque 5 --sournoise 6 --if etatCible surpris --etat mort --save CON 15 --endif'
+        }, {
+          titre: 'Disparition',
+          code: '#Attaque -1 --disparition 6 --if etatCible surpris --etat mort --save CON 15 --endif'
+        }]
+      }
+    },
     82: {
       nom: 'Voie du prédateur',
       1: {
@@ -4465,6 +4505,15 @@
         predicats: 'gober ',
       },
     },
+    83: {
+      nom: 'Voie du PNJ récurrent',
+      1: {
+        predicats: 'instinctDeSurvie '
+      },
+      2: {
+        predicats: 'chairACanon '
+      },
+    },
     84: {
       nom: 'Voie de la meute',
       1: {
@@ -4476,6 +4525,9 @@
           code: '#Attaque -1 --sournoise 2 --bonusAttaque 5'
         }]
       },
+    },
+    85: {
+      nom: 'Voie de la magie maléfique',
     },
     87: {
       nom: 'Voie de la magie de combat',

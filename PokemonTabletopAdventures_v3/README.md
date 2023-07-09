@@ -8,21 +8,33 @@ https://discord.gg/F24Ka8E
 
 ## To-Do:
 
+<details>
+  <summary><u>Expand for potential future to-do list</u></summary>
+
 Things we want to add to the character sheet, presented in no particular order of priority:
 
-- [X] Mobile support!
-  - [X] Set legacy to false
-  - [X] Refactor sheets to minimize overhead
-  - [X] Reasonable user experience on the Companion App
-  - [ ] Full "optimized for use" support for Companion App
-- [X] Support Dark Mode sheet
-- [X] Support Dark Mode roll templates
+- [ ] Automatically provide Dynamax moves, Z-Moves, and Tera Blast
+- [ ] Full "optimized for use" support for Companion App
 - [ ] Allow a second ability score to apply to skill checks
 - [ ] Allow formula calculations for the extra damage fields
 - [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
 
+</details>
 
 ## Changelog
+
+### Feb 22, 2023
+- It's the Form Changes update!
+  - Added Terastallization, Dynamax/Gigantamax, Mega Evolution, and 3 fully customizable form changes
+  - Sheet auto changes type to selected type, for forms that have one
+  - Sheet automatically adds stats to your own, if you supply stats (auto +3 defenses for Tera)
+  - Stat changes and notes show up on main page
+  - Dynamax changes your height, weight, move speed, and optionally HP
+  - Descriptions in the configuration page for what each form change does and how to configure it
+  - Form changes start as not enabled. Check to enable configuration and add button to activate.
+  - Buttons for each form change appear on the character page, in the top right
+  - Most form references are read-only from the main page, except for notes
+  - The type used for STAB (and sheet color) is abstracted from type1/type2 to active_type1/active_type2
 
 ### Feb 14, 2023
 - Gave the attack rolls some love, as befitting the day of the year.

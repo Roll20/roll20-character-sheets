@@ -10,16 +10,30 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 
 # Version courante
 
-V4.0.0 [Screenshot](cog_v4.png)
+V4.2.0 [Screenshot](cog_v4.png)
 
 # Notes de version
 
-## V4.0.0 (2022.12.30)
+___Chroniques Oubliées Galactiques Version 2___
 
-_Chroniques Oubliées Galactiques v2_
+## V4.2.0 (2023.04.09)
+
+- Suppression du calcul automatique des PV par niveau
+- Ajout option Instabilité Psy
+- Ajout onglet Version avec notes et log
+
+## V4.1.0 (2023.03.29)
+
+- Ajout import de statblock de vaisseau et de mécha
+- Prise en compte malus d'armure sur INIT, tests de DEX et d'ATD
+- Ajout détail des PV par niveaux
+
+## V4.0.0 (2022.12.30)
 
 - Révision des fiches de PJ, PNJ et Vaisseau
 - Ajout de la fiche de Mécha
+
+___Chroniques Oubliées Galactiques Version 1 (Casus)___
 
 V3.115.1 [Screenshot](cog_v3.png)
 

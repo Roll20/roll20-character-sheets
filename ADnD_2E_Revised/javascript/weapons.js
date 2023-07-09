@@ -1706,7 +1706,7 @@ WEAPONS_TABLE['shield-rush'].push({
     'noProf': true,
     'size': 'M/L',
     'type': 'B',
-    'speed': 0,
+    'speed': 3,
     'small-medium': '1d3',
     'large': '1d3',
     'book': ['The Complete Fighter\'s Handbook'],

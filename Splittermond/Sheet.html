@@ -1534,12 +1534,23 @@
                 <div class="mr--3 mb--3">
                     <span class="form-header pl--1 pr--1">Ressourcen</span>
                     <fieldset class="repeating_ressources">
-                        <div class="d--flex">
-                            <div class="form__group d--flex__item--grow2 mr--1">
-                                <input type="text" name="attr_ressourcename" placeholder="Ressource Name" class="form__field" /> 
+                        <div class="sheet-form__group sheet-d--flex sheet-d--flex--align-center sheet-p--1">
+                            <label class="sheet-d--flex__item--grow0 sheet-p--0 sheet-pr--1">
+                                <input type="checkbox" name="attr_ressourcen_collapse" class="sheet-collapse_switch sheet-d--none">
+                                <div class="sheet-arrow sheet-d--flex__item--grow0"></div>
+                            </label>
+                            <div class="sheet-d--flex__item--grow2 sheet-mr--1">
+                                <input type="text" name="attr_ressourcename" placeholder="Ressource Name" class="sheet-form__field"> 
                             </div>
-                            <div class="form__group">
-                                <input type="number" name="attr_ressourcevalue" min=-2 value="0" placeholder="0" class="form__field" />
+                            <div>
+                                <input type="number" name="attr_ressourcevalue" min="-2" value="0" placeholder="0" class="sheet-form__field">
+                            </div>
+                        </div>
+                        <input type="checkbox" name="attr_ressourcen_collapse"  class="collapse_switch d--none" />
+                        <div class="collapse_child collapse_child--lg">
+                        	<div class="form__group form__group--lg mb--3">
+                                <textarea name="attr_ressourcenbeschreibung"></textarea>
+                                <label class="form__label">Beschreibung</label>
                             </div>
                         </div>
                     </fieldset>
@@ -1549,12 +1560,23 @@
                 <div class="pr--3 mr--3--negate mb--3">
                     <span class="form-header pl--1 pr--1">St&auml;rken</span>
                     <fieldset class="repeating_staerken">
-                        <div class="d--flex">
-                            <div class="form__group d--flex__item--grow2 mr--1">
+                        <div class="sheet-form__group sheet-d--flex sheet-d--flex--align-center sheet-p--1">
+                            <label class="sheet-d--flex__item--grow0 sheet-p--0 sheet-pr--1">
+                                <input type="checkbox" name="attr_staerken_collapse" class="sheet-collapse_switch sheet-d--none">
+                                <div class="sheet-arrow sheet-d--flex__item--grow0"></div>
+                            </label>
+                            <div class="sheet-d--flex__item--grow2 sheet-mr--1">
                                 <input type="text" name="attr_staerke" placeholder="Staerke" class="form__field" /> 
                             </div>
-                            <div class="form__group">
+                            <div>
                                 <input type="number" name="attr_staerkenwert" min=-2 value="1" placeholder="1" class="form__field" />
+                            </div>
+                        </div>
+                        <input type="checkbox" name="attr_staerken_collapse"  class="collapse_switch d--none" />
+                        <div class="collapse_child collapse_child--lg">
+                        	<div class="form__group form__group--lg mb--3">
+                                <textarea name="attr_staerkenbeschreibung"></textarea>
+                                <label class="form__label">Beschreibung</label>
                             </div>
                         </div>
                     </fieldset>
@@ -12107,8 +12129,101 @@ function modifySum(result, oDice, nDice, mode, success) {
 
 function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) }
 
+on("change:repeating_zauber:zaubername", function(eventInfo) {
+    let repID = eventInfo.sourceAttribute.split("_")[2];
+    let update = {};
+    
+    getAttrs(['repeating_zauber_' + repID + '_zaubername'], function(values) {
+        let zaubername = values['repeating_zauber_' + repID + '_zaubername'];
+        let zauber;
+        
+        if (zaubername.length > 40) {
+            zauber = parse_spell(zaubername);
+            if (zauber.school === "Stärkung") { 
+                zauber.school = "staerkung"; 
+            } else {
+                zauber.school = zauber.school.charAt(0).toLowerCase() + zauber.school.slice(1);
+            }           
+
+            update['repeating_zauber_' + repID + '_zauberkosten'] = zauber.cost;
+            update['repeating_zauber_' + repID + '_zauberkostenv'] = zauber.cost_enhanced;
+            update['repeating_zauber_' + repID + '_zauberschwierigkeit'] = zauber.difficulty;
+            update['repeating_zauber_' + repID + '_zauberrw'] = zauber.range;
+            update['repeating_zauber_' + repID + '_zauberdauer'] = zauber.casttime;
+            update['repeating_zauber_' + repID + '_zauberwd'] = zauber.duration;
+            update['repeating_zauber_' + repID + '_magieschulen'] = zauber.school;
+            update['repeating_zauber_' + repID + '_zauberbeschreibung'] = zauber.text;
+            update['repeating_zauber_' + repID + '_zaubername'] = zauber.name;       
+                    
+            setAttrs(update);            
+        }                
+        
+    });
+});
+
+on("change:repeating_zaubernsc:zaubernamensc", function(eventInfo) {
+    let repID = eventInfo.sourceAttribute.split("_")[2];
+    let update = {};
+    
+    getAttrs(['repeating_zaubernsc_' + repID + '_zaubernamensc'], function(values) {
+        let zaubername = values['repeating_zaubernsc_' + repID + '_zaubernamensc'];
+        let zauber;
+        
+        if (zaubername.length > 40) {
+            zauber = parse_spell(zaubername);
+            if (zauber.school === "Stärkung") { 
+                zauber.school = "staerkung"; 
+            } else {
+                zauber.school = zauber.school.charAt(0).toLowerCase() + zauber.school.slice(1);
+            }           
+
+            update['repeating_zaubernsc_' + repID + '_zauberkostennsc'] = zauber.cost;
+            update['repeating_zaubernsc_' + repID + '_zauberkostennscv'] = zauber.cost_enhanced;
+            update['repeating_zaubernsc_' + repID + '_zauberschwierigkeitnsc'] = zauber.difficulty;
+            update['repeating_zaubernsc_' + repID + '_zauberrwnsc'] = zauber.range;
+            update['repeating_zaubernsc_' + repID + '_zauberdauernsc'] = zauber.casttime;
+            update['repeating_zaubernsc_' + repID + '_zauberwdnsc'] = zauber.duration;
+            update['repeating_zaubernsc_' + repID + '_magieschulennsc'] = zauber.school;
+            update['repeating_zaubernsc_' + repID + '_zauberwirkungnsc'] = zauber.text;
+            update['repeating_zaubernsc_' + repID + '_zaubernamensc'] = zauber.name;       
+                    
+            setAttrs(update);            
+        }                
+        
+    });
+});
+
+function parse_spell(spell_string) {    
+    const cells = spell_string.split('\t');
+    const spell_name = cells[0];
+    const magic_schools = ["Bann", "Beherrschung", "Bewegung", "Erkenntnis", "Fels", "Feuer", "Heilung", "Illusion", "Kampf", "Licht", "Natur", "Schatten", "Schicksal", "Schutz", "Stärkung", "Tod", "Verwandlung", "Wasser", "Wind"];
+    const spell_schools = cells.slice(5, 5 + 19);
+    // first cell with a value
+    const spell_school = magic_schools.find(function (v, i) {
+        return spell_schools[i];
+    });
+    const spell_difficulty = cells[104];
+    const spell_cost = cells[105];
+    const spell_casttime = cells[106];
+    const spell_range = cells[107].replace("Zaub.", "Z").replace("Ber.", "B").replace(" m", "m");
+    const spell_duration = cells[108];
+    const spell_cost_enhanced = cells[111].split("+")[1];
+    const spell_text = cells[114].replace('"', '')
+    return {
+        name: spell_name,
+        school: spell_school,
+        difficulty: spell_difficulty,
+        cost: spell_cost,
+        casttime: spell_casttime,
+        range: spell_range,
+        duration: spell_duration,
+        cost_enhanced: spell_cost_enhanced,
+        text: spell_text,
+    };
+}
+
 on("clicked:nscimport", function(eventInfo) {
-    getAttrs(['nscimport'], function (values) {
+                (['nscimport'], function (values) {
         let nscimport = values.nscimport;
         nscimport = nscimport.replace(/\r?\n|\r/g, " ");
         let merkmale = ["–", "Durchdringung", "Wuchtig", "Scharf", "Exakt", "Kritisch", "Umklammern", "Defensiv", "Entwaffnend", "Ablenkend", "Deckung", "Doppelwaffe", "Improvisiert", "Lange Waffe", "Nahkampftauglich", "Parierwaffe", "Primitiv", "Reiterwaffe", "Standfestigkeit", "Stumpf", "Teilbar", "Unhandlich", "Vielseitig", "Wattiert", "Wurffähig", "Zweihändig"];
