@@ -702,9 +702,9 @@
             <div><input type="number" name="attr_weapon_crit_value" /></div>
             <div><input type="number" name="attr_weapon_extra_damage" value="" /></div>
             <div>
-                <button class="input lrg" type="roll" name="roll_damage"
-                    value="&{template:swskill} {{reroll=[Reroll](~repeating_weapons_damage)}} {{name=@{character_name}}} {{skill=@{weapon_name}}} {{skillverb=deals damage with}} {{result=[[[[2d6]]+@{weapon_total_accuracy}]]}} {{raw=$[[0]]}} {{result2=[[12+@{weapon_total_accuracy}+5]]}}" />
-                <span class="input" name="attr_weapon_total_extra_damage" />
+                <button class="input lrg" type="action" name="act_damage">
+                    <span class="input" name="attr_weapon_total_extra_damage" />
+                </button>
             </div>
         </fieldset>
     </div>
@@ -1523,6 +1523,25 @@
         });
     });
 
+    /*
+    repeating_weapons_
+    weapon_name
+    weapon_total_extra_damage
+    weapon_power
+    weapon_power_3,weapon_power_4,weapon_power_4,weapon_power_6,weapon_power_7
+    weapon_power_8.weapon_power_9,weapon_power_10,weapon_power_11,weapon_power_12
+    weapon_crit_value
+
+    sourceAttribute: "repeating_weapons_-NZRNWFEgQEZyDZ9COpT_damage"
+    */
+    on("clicked:repeating_weapons:damage", function(eventInfo) {
+        let key = eventInfo["sourceAttribute"];
+        key = key.replace("repeating_weapons_","").replace("_damage","");
+        startRoll(`&{template:swdamage} {{name=@{character_name}}} {{skill=@{repeating_weapons_${key}_weapon_name}}} {{power=@{repeating_weapons_${key}_weapon_power}}} {{result=[[2d6]]}}`, (results) => {
+            finishRoll(results.rollId, {});
+        });
+    });
+
     /* ===== PARAMETERS ==========
     destinations = the name of the attribute that stores the total quantity
             can be a single attribute, or an array: ['total_cost', 'total_weight']
@@ -1571,7 +1590,7 @@ result: roll + level + modifier
 bonus: # add; +1 to +4
 penalty: # subtract; -1 to -4
 
-&{template:swskill} {{reroll=[Reroll](~NAME)}} {{name=@{character_name}}} {{skill=Technique}} {{class=@{technique_class}}} {{level=@{technique}-@{dexterity_modifier}}} {{ability=Dexterity}} {{modifier=@{dexterity_modifier}}} {{target=[[?{Target Number|9}]]}} {{result=[[[[2d6]]+@{technique}]]}} {{raw=$[[0]]}}
+&{template:swskill} {{reroll=[Reroll](~repeating_weapons_attack)}} {{name=@{character_name}}} {{skill=@{weapon_name}}} {{skillverb=attacks with}} {{result=[[[[2d6]]+@{weapon_total_accuracy}]]}} {{raw=$[[0]]}} {{result2=[[12+@{weapon_total_accuracy}+5]]}}
 
 -->
 <rolltemplate class="sheet-rolltemplate-swskill">
@@ -1616,6 +1635,28 @@ penalty: # subtract; -1 to -4
             {{/^rollTotal() raw 2}}
         {{/^rollTotal() raw 12}}
         <div class="crit"></div>
+        <div class="fumble"></div>
+        <div class="options">
+            {{reroll}}
+        </div>
+    </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-swdamage">
+    {{#rollTotal() raw 2}}
+        <span class="sheet-template-fumble"></span>
+    {{/rollTotal() raw 2}}
+    <div class="container">
+        <h1>
+            {{name}}'s {{skill}}
+        </h1>
+        <p>Power Level {{power}}</p>
+        {{#rollTotal() result 2}}
+            <p><strong>{{result}}</strong> = <strong>0</strong> damage</p>
+        {{/rollTotal() result 2}}
+        {{#^rollTotal() result 2}}
+            <p>{{result}} = <strong>{{damage}}</strong> damage</p>
+        {{/^rollTotal() result 2}}
         <div class="fumble"></div>
         <div class="options">
             {{reroll}}
