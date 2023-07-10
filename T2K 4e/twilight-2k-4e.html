@@ -1,10 +1,14 @@
 
+<input type='hidden' class='version' name='attr_version' value='0' />
+<input type='hidden' class='sheetversion' name='attr_sheet_version' value='1.01' />
+<input type='hidden' name='attr_newchar' value='1' />
 <input type='hidden' class='tabstoggle' name='attr_sheetTab'  value='basic'  />
 <div class="tab-buttons-container">
     <button type="action" name="act_basic" class="main-buttons button-basic">Basic</button>
     <button type="action" name="act_combat" class="main-buttons button-combat">Combat</button>
     <button type="action" name="act_gear" class="main-buttons button-gear">Gear</button>
     <button type="action" name="act_vehicle"  class="main-buttons button-vehicle">Vehicles</button>
+    <button type="action" name="act_platoon"  class="main-buttons button-platoon">Allies</button>
 </div>
 <input type='hidden' class='tabstoggle' name='attr_sheetTab'  value='basic'  />
 <br />
@@ -148,6 +152,8 @@
             <input name="attr_empathydie" type="hidden">
             <input name="attr_commanddie" type="hidden">
             <input name="attr_manipulationdie" type="hidden">
+            <input name="attr_manipulation" type="hidden"> <!-- Kept for worker upgrade script to not throw errors -->
+            <input name="attr_persuasiondie" type="hidden">
             <input name="attr_medicalaiddie" type="hidden">
         </div>
 
@@ -311,16 +317,16 @@
             </select>
             <button class="command-skill attribute-button" type='roll' name='roll_command' value='&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Command}} {{roll-die-one=[[1d@{empathydie}]] }} {{roll-die-two=[[1d@{commanddie}]] }} {{roll-one-type=[[@{empathydie}]]}} {{roll-two-type=[[@{commanddie}]]}}'></button>
     
-            <!-- ROW THREE: MANIPULATION -->
-            <span class="manipulation-skill minor attribute-label">Manipulation</span>
-            <select name='attr_manipulation' class="manipulation-skill short attribute-select">
+            <!-- ROW THREE: PERSUASION -->
+            <span class="persuasion-skill minor attribute-label">Persuasion</span>
+            <select name='attr_persuasion' class="persuasion-skill short attribute-select">
                 <option value='-'> - </option>
                 <option value='A'>A</option>
                 <option value='B'>B</option>
                 <option value='C'>C</option>
                 <option value='D'>D</option>
             </select>
-            <button class="manipulation-skill attribute-button" type='roll' name='roll_manipulation' value='&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Manipulation}} {{roll-die-one=[[1d@{empathydie}]] }} {{roll-die-two=[[1d@{manipulationdie}]] }} {{roll-one-type=[[@{empathydie}]]}} {{roll-two-type=[[@{manipulationdie}]]}}'></button>
+            <button class="persuasion-skill attribute-button" type='roll' name='roll_persuasion' value='&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Persuasion}} {{roll-die-one=[[1d@{empathydie}]] }} {{roll-die-two=[[1d@{persuasiondie}]] }} {{roll-one-type=[[@{empathydie}]]}} {{roll-two-type=[[@{persuasiondie}]]}}'></button>
 
             <!-- ROW TWO: MEDICAL AID -->
             <span class="medical-aid-skill minor attribute-label">Medical Aid</span>
@@ -1722,6 +1728,844 @@ value="&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Coolnes
 
 </div>
 
+<div class='platoon'>
+
+    <input type="hidden" class="tab-platoons" name="attr_tab_platoon" value="tab_platoon_one"/>
+    <div class="platoons-section">
+        <button type="action" name="act_tab_platoon_one" class="action-tab platoons-header platoon-button-one">Allies I-V</button>
+        <button type="action" name="act_tab_platoon_two" class="action-tab platoons-header platoon-button-two">Allies VI-X</button>
+
+        <div class="custom-rolls-section weapons-rolls-section">
+		<div class="custom-roll die-roll">
+                <button type="roll" name="roll_rawdice" class="custom-roll attribute-button"
+    value="&{template:t2k} {{character-name=@{character_name} }} {{roll-name=General Dice Roll}} {{roll-die-one=[[1d@{rawdie1}]] }} {{roll-die-two=[[1d@{rawdie2}]] }} {{roll-one-type=[[@{rawdie1}]]}} {{roll-two-type=[[@{rawdie2}]]}} {{ammo-dice=[[@{rawammo}]] }} {{ammo-roll-one=[[1d6]] }} {{ammo-roll-two=[[1d6]] }} {{ammo-roll-three=[[1d6]] }} {{ammo-roll-four=[[1d6]] }} {{ammo-roll-five=[[1d6]] }} {{ammo-roll-six=[[1d6]] }}"></button>
+            </div>
+    
+            <div class="custom-roll die-one">
+                <span class="input-label attribute-label">Attr</span>
+                <select name='attr_rawdie1' class="custom-roll-select short">
+                    <option value='12'>A: d12</option>
+                    <option value='10'>B: d10</option>
+                    <option value='8' selected="selected">C: d8</option>
+                    <option value='6'>D: d6</option>
+                </select>
+            </div>
+    
+            <div class="custom-roll die-two">
+                <span class="input-label attribute-label">Skill</span>
+                <select name='attr_rawdie2' class="custom-roll-select short">
+                    <option value='0'> - </option>
+                    <option value='12'>A: d12</option>
+                    <option value='10'>B: d10</option>
+                    <option value='8' selected="selected">C: d8</option>
+                    <option value='6'>D: d6</option>
+                </select>
+            </div>
+    
+            <div class="custom-roll die-ammo">
+                <span class="input-label attribute-label">Ammo Dice</span>
+    
+                <input type="checkbox" name="attr_rawammo_1" value="1" class="numbered-box grey-box" title="@{rawammo_1}"/><span title="1" ></span>
+                <input type="checkbox" name="attr_rawammo_2" value="1" class="numbered-box grey-box" title="@{rawammo_2}"/><span title="2" ></span>
+                <input type="checkbox" name="attr_rawammo_3" value="1" class="numbered-box grey-box" title="@{rawammo_3}"/><span title="3" ></span>
+                <input type="checkbox" name="attr_rawammo_4" value="1" class="numbered-box grey-box" title="@{rawammo_4}"/><span title="4" ></span>
+                <input type="checkbox" name="attr_rawammo_5" value="1" class="numbered-box grey-box" title="@{rawammo_5}"/><span title="5" ></span>
+                <input type="checkbox" name="attr_rawammo_6" value="1" class="numbered-box grey-box" title="@{rawammo_6}"/><span title="6" ></span>
+            </div>
+
+            <div class="coolness-under-fire">
+                <span class="coolness-under-fire input-label attribute-label cuf" title="Coolness Under Fire">C.U.F.</span>
+                <span class="coolness-under-fire input-label minor attribute-label cuf-self">Self</span>
+                <span class="coolness-under-fire input-label minor attribute-label cuf-unit">Unit</span>
+                <select name='attr_CUF' class="coolness-under-fire short attribute-select cuf-self-input">
+                    <option value='0'> - </option>
+                    <option value='12'>A</option>
+                    <option value='10'>B</option>
+                    <option value='8'>C</option>
+                    <option value='6'>D</option>
+                </select>
+                <select name='attr_CUF_unit' class="coolness-under-fire short attribute-select cuf-unit-input">
+                    <option value='0'> - </option>
+                    <option value='12'>A</option>
+                    <option value='10'>B</option>
+                    <option value='8'>C</option>
+                    <option value='6'>D</option>
+                </select>
+                <button type="roll" name="roll_cuf" title="Roll C.U.F." class="coolness-under-fire attribute-button cuf-roll"
+value="&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Coolness Under Fire}} {{roll-die-one=[[1d@{CUF}]] }} {{roll-die-two=[[1d@{CUF_unit}]] }} {{roll-one-type=[[@{CUF}]]}} {{roll-two-type=[[@{CUF_unit}]]}}"></button>
+                
+            </div>
+    
+        </div>
+    
+        <input type="hidden" class="tab-platoons" name="attr_tab_platoon" value="tab_platoon_one"/>
+        <div class="tab-content tab-platoon-one-contents">
+            <div class="platoons-details">
+                <!-- ROW ONE: HEADER -->
+                <span class="platoons-header minor platoon-name">Name</span>
+                <span class="platoons-header minor platoon-str">STR</span>
+                <span class="platoons-header minor platoon-agi">AGL</span>
+                <span class="platoons-header minor platoon-int">INT</span>
+                <span class="platoons-header minor platoon-emp">EMP</span>
+                <span class="platoons-header minor platoon-hitcap">Hit Cap</span>
+                <span class="platoons-header minor platoon-cuf">CUF</span>
+                <span class="platoons-header minor platoon-skill1">Skill 1</span>
+                <span class="platoons-header minor platoon-rank1">Rank</span>
+                <span class="platoons-header minor platoon-skill2">Skill 2</span>
+                <span class="platoons-header minor platoon-rank2">Rank</span>
+                <span class="platoons-header minor platoon-skill3">Skill 3</span>
+                <span class="platoons-header minor platoon-rank3">Rank</span>
+                <span class="platoons-header minor platoon-skill4">Skill 4</span>
+                <span class="platoons-header minor platoon-rank4">Rank</span>
+       	        <span class="platoons-header minor platoon-gear">Typical Gear</span>
+                    
+                <!-- ROW TWO -->
+                <input type="text" name="attr_platoon_one_name" class="input-text platoons-one platoon-name" />
+                <select name='attr_platoon_one_strength' class="platoons-one platoon-str short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_one_agility' class="platoons-one platoon-agi short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_one_intellect' class="platoons-one platoon-int short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_one_empathy' class="platoons-one platoon-emp short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="number" name="attr_platoon_one_hitcap" class="number-input no-spin-input platoons-one platoon-hitcap" />
+                <select name='attr_platoon_one_cuf' class="platoons-one platoon-cuf short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_one_skill1" class="input-text platoons-one platoon-skill1" />
+                <select name='attr_platoon_one_rank1' class="platoons-one platoon-rank1 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_one_skill2" class="input-text platoons-one platoon-skill2" />
+                <select name='attr_platoon_one_rank2' class="platoons-one platoon-rank2 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_one_skill3" class="input-text platoons-one platoon-skill3" />
+                <select name='attr_platoon_one_rank3' class="platoons-one platoon-rank3 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_one_skill4" class="input-text platoons-one platoon-skill4" />
+                <select name='attr_platoon_one_rank4' class="platoons-one platoon-rank4 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_one_gear" class="input-text platoons-one platoon-gear" />
+    
+                <!-- ROW THREE -->
+                <input type="text" name="attr_platoon_two_name" class="input-text platoons-two platoon-name" />
+                <select name='attr_platoon_two_strength' class="platoons-two platoon-str short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_two_agility' class="platoons-two platoon-agi short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_two_intellect' class="platoons-two platoon-int short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_two_empathy' class="platoons-two platoon-emp short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="number" name="attr_platoon_two_hitcap" class="number-input no-spin-input platoons-two platoon-hitcap" />
+                <select name='attr_platoon_two_cuf' class="platoons-two platoon-cuf short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_two_skill1" class="input-text platoons-two platoon-skill1" />
+                <select name='attr_platoon_two_rank1' class="platoons-two platoon-rank1 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_two_skill2" class="input-text platoons-two platoon-skill2" />
+                <select name='attr_platoon_two_rank2' class="platoons-two platoon-rank2 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_two_skill3" class="input-text platoons-two platoon-skill3" />
+                <select name='attr_platoon_two_rank3' class="platoons-two platoon-rank3 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_two_skill4" class="input-text platoons-two platoon-skill4" />
+                <select name='attr_platoon_two_rank4' class="platoons-two platoon-rank4 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_two_gear" class="input-text platoons-two platoon-gear" />
+    
+                <!-- ROW FOUR -->
+                <input type="text" name="attr_platoon_three_name" class="input-text platoons-three platoon-name" />
+                <select name='attr_platoon_three_strength' class="platoons-three platoon-str short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_three_agility' class="platoons-three platoon-agi short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_three_intellect' class="platoons-three platoon-int short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_three_empathy' class="platoons-three platoon-emp short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="number" name="attr_platoon_three_hitcap" class="number-input no-spin-input platoons-three platoon-hitcap" />
+                <select name='attr_platoon_three_cuf' class="platoons-three platoon-cuf short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_three_skill1" class="input-text platoons-three platoon-skill1" />
+                <select name='attr_platoon_three_rank1' class="platoons-three platoon-rank1 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_three_skill2" class="input-text platoons-three platoon-skill2" />
+                <select name='attr_platoon_three_rank2' class="platoons-three platoon-rank2 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_three_skill3" class="input-text platoons-three platoon-skill3" />
+                <select name='attr_platoon_three_rank3' class="platoons-three platoon-rank3 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_three_skill4" class="input-text platoons-three platoon-skill4" />
+                <select name='attr_platoon_three_rank4' class="platoons-three platoon-rank4 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_three_gear" class="input-text platoons-three platoon-gear" />
+    
+                <!-- ROW FIVE -->
+                <input type="text" name="attr_platoon_four_name" class="input-text platoons-four platoon-name" />
+                <select name='attr_platoon_four_strength' class="platoons-four platoon-str short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_four_agility' class="platoons-four platoon-agi short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_four_intellect' class="platoons-four platoon-int short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_four_empathy' class="platoons-four platoon-emp short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="number" name="attr_platoon_four_hitcap" class="number-input no-spin-input platoons-four platoon-hitcap" />
+                <select name='attr_platoon_four_cuf' class="platoons-four platoon-cuf short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_four_skill1" class="input-text platoons-four platoon-skill1" />
+                <select name='attr_platoon_four_rank1' class="platoons-four platoon-rank1 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_four_skill2" class="input-text platoons-four platoon-skill2" />
+                <select name='attr_platoon_four_rank2' class="platoons-four platoon-rank2 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_four_skill3" class="input-text platoons-four platoon-skill3" />
+                <select name='attr_platoon_four_rank3' class="platoons-four platoon-rank3 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_four_skill4" class="input-text platoons-four platoon-skill4" />
+                <select name='attr_platoon_four_rank4' class="platoons-four platoon-rank4 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_four_gear" class="input-text platoons-four platoon-gear" />
+    
+                <!-- ROW SIX -->
+                <input type="text" name="attr_platoon_five_name" class="input-text platoons-five platoon-name" />
+                <select name='attr_platoon_five_strength' class="platoons-five platoon-str short">
+                    <option value='-'>-</option>           
+		    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_five_agility' class="platoons-five platoon-agi short">
+                    <option value='-'>-</option>                    
+		    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_five_intellect' class="platoons-five platoon-int short">
+                    <option value='-'>-</option>                    
+		    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_five_empathy' class="platoons-five platoon-emp short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="number" name="attr_platoon_five_hitcap" class="number-input no-spin-input platoons-five platoon-hitcap" />
+                <select name='attr_platoon_five_cuf' class="platoons-five platoon-cuf short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_five_skill1" class="input-text platoons-five platoon-skill1" />
+                <select name='attr_platoon_five_rank1' class="platoons-five platoon-rank1 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_five_skill2" class="input-text platoons-five platoon-skill2" />
+                <select name='attr_platoon_five_rank2' class="platoons-five platoon-rank2 short">
+                    <option value='-'>-</option>                  
+		    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_five_skill3" class="input-text platoons-five platoon-skill3" />
+                <select name='attr_platoon_five_rank3' class="platoons-five platoon-rank3 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_five_skill4" class="input-text platoons-five platoon-skill4" />
+                <select name='attr_platoon_five_rank4' class="platoons-five platoon-rank4 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_five_gear" class="input-text platoons-five platoon-gear" />
+            </div>
+        </div>
+
+        <div class="tab-content tab-platoon-two-contents">
+            <div class="platoons-details">
+                <!-- ROW ONE: HEADER -->
+                <span class="platoons-header minor platoon-name">Name</span>
+                <span class="platoons-header minor platoon-str">STR</span>
+                <span class="platoons-header minor platoon-agi">AGL</span>
+                <span class="platoons-header minor platoon-int">INT</span>
+                <span class="platoons-header minor platoon-emp">EMP</span>
+                <span class="platoons-header minor platoon-hitcap">Hit Cap</span>
+                <span class="platoons-header minor platoon-cuf">CUF</span>
+                <span class="platoons-header minor platoon-skill1">Skill 1</span>
+                <span class="platoons-header minor platoon-rank1">Rank</span>
+                <span class="platoons-header minor platoon-skill2">Skill 2</span>
+                <span class="platoons-header minor platoon-rank2">Rank</span>
+                <span class="platoons-header minor platoon-skill3">Skill 3</span>
+                <span class="platoons-header minor platoon-rank3">Rank</span>
+                <span class="platoons-header minor platoon-skill4">Skill 4</span>
+                <span class="platoons-header minor platoon-rank4">Rank</span>
+       	        <span class="platoons-header minor platoon-gear">Typical Gear</span>
+    
+                <!-- ROW TWO -->
+                <input type="text" name="attr_platoon_six_name" class="input-text platoons-one platoon-name" />
+                <select name='attr_platoon_six_strength' class="platoons-one platoon-str short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_six_agility' class="platoons-one platoon-agi short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_six_intellect' class="platoons-one platoon-int short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_six_empathy' class="platoons-one platoon-emp short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="number" name="attr_platoon_six_hitcap" class="number-input no-spin-input platoons-one platoon-hitcap" />
+                <select name='attr_platoon_six_cuf' class="platoons-one platoon-cuf short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_six_skill1" class="input-text platoons-one platoon-skill1" />
+                <select name='attr_platoon_six_rank1' class="platoons-one platoon-rank1 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_six_skill2" class="input-text platoons-one platoon-skill2" />
+                <select name='attr_platoon_six_rank2' class="platoons-one platoon-rank2 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_six_skill3" class="input-text platoons-one platoon-skill3" />
+                <select name='attr_platoon_six_rank3' class="platoons-one platoon-rank3 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_six_skill4" class="input-text platoons-one platoon-skill4" />
+                <select name='attr_platoon_six_rank4' class="platoons-one platoon-rank4 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_six_gear" class="input-text platoons-one platoon-gear" />
+    
+                <!-- ROW THREE -->
+                <input type="text" name="attr_platoon_seven_name" class="input-text platoons-two platoon-name" />
+                <select name='attr_platoon_seven_strength' class="platoons-two platoon-str short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_seven_agility' class="platoons-two platoon-agi short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_seven_intellect' class="platoons-two platoon-int short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_seven_empathy' class="platoons-two platoon-emp short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="number" name="attr_platoon_seven_hitcap" class="number-input no-spin-input platoons-two platoon-hitcap" />
+                <select name='attr_platoon_seven_cuf' class="platoons-two platoon-cuf short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_seven_skill1" class="input-text platoons-two platoon-skill1" />
+                <select name='attr_platoon_seven_rank1' class="platoons-two platoon-rank1 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_seven_skill2" class="input-text platoons-two platoon-skill2" />
+                <select name='attr_platoon_seven_rank2' class="platoons-two platoon-rank2 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_seven_skill3" class="input-text platoons-two platoon-skill3" />
+                <select name='attr_platoon_seven_rank3' class="platoons-two platoon-rank3 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_seven_skill4" class="input-text platoons-two platoon-skill4" />
+                <select name='attr_platoon_seven_rank4' class="platoons-two platoon-rank4 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_seven_gear" class="input-text platoons-two platoon-gear" />
+    
+                <!-- ROW FOUR -->
+                <input type="text" name="attr_platoon_eight_name" class="input-text platoons-three platoon-name" />
+                <select name='attr_platoon_eight_strength' class="platoons-three platoon-str short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_eight_agility' class="platoons-three platoon-agi short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_eight_intellect' class="platoons-three platoon-int short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_eight_empathy' class="platoons-three platoon-emp short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="number" name="attr_platoon_eight_hitcap" class="number-input no-spin-input platoons-three platoon-hitcap" />
+                <select name='attr_platoon_eight_cuf' class="platoons-three platoon-cuf short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_eight_skill1" class="input-text platoons-three platoon-skill1" />
+                <select name='attr_platoon_eight_rank1' class="platoons-three platoon-rank1 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_eight_skill2" class="input-text platoons-three platoon-skill2" />
+                <select name='attr_platoon_eight_rank2' class="platoons-three platoon-rank2 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_eight_skill3" class="input-text platoons-three platoon-skill3" />
+                <select name='attr_platoon_eight_rank3' class="platoons-three platoon-rank3 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_eight_skill4" class="input-text platoons-three platoon-skill4" />
+                <select name='attr_platoon_eight_rank4' class="platoons-three platoon-rank4 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_eight_gear" class="input-text platoons-three platoon-gear" />
+    
+                <!-- ROW FIVE -->
+                <input type="text" name="attr_platoon_nine_name" class="input-text platoons-four platoon-name" />
+                <select name='attr_platoon_nine_strength' class="platoons-four platoon-str short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_nine_agility' class="platoons-four platoon-agi short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_nine_intellect' class="platoons-four platoon-int short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_nine_empathy' class="platoons-four platoon-emp short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="number" name="attr_platoon_nine_hitcap" class="number-input no-spin-input platoons-four platoon-hitcap" />
+                <select name='attr_platoon_nine_cuf' class="platoons-four platoon-cuf short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_nine_skill1" class="input-text platoons-four platoon-skill1" />
+                <select name='attr_platoon_nine_rank1' class="platoons-four platoon-rank1 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_nine_skill2" class="input-text platoons-four platoon-skill2" />
+                <select name='attr_platoon_nine_rank2' class="platoons-four platoon-rank2 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_nine_skill3" class="input-text platoons-four platoon-skill3" />
+                <select name='attr_platoon_nine_rank3' class="platoons-four platoon-rank3 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_nine_skill4" class="input-text platoons-four platoon-skill4" />
+                <select name='attr_platoon_nine_rank4' class="platoons-four platoon-rank4 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_nine_gear" class="input-text platoons-four platoon-gear" />
+    
+                <!-- ROW SIX -->
+                <input type="text" name="attr_platoon_ten_name" class="input-text platoons-five platoon-name" />
+                <select name='attr_platoon_ten_strength' class="platoons-five platoon-str short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_ten_agility' class="platoons-five platoon-agi short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_ten_intellect' class="platoons-five platoon-int short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <select name='attr_platoon_ten_empathy' class="platoons-five platoon-emp short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="number" name="attr_platoon_ten_hitcap" class="number-input no-spin-input platoons-five platoon-hitcap" />
+                <select name='attr_platoon_ten_cuf' class="platoons-five platoon-cuf short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_ten_skill1" class="input-text platoons-five platoon-skill1" />
+                <select name='attr_platoon_ten_rank1' class="platoons-five platoon-rank1 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_ten_skill2" class="input-text platoons-five platoon-skill2" />
+                <select name='attr_platoon_ten_rank2' class="platoons-five platoon-rank2 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_ten_skill3" class="input-text platoons-five platoon-skill3" />
+                <select name='attr_platoon_ten_rank3' class="platoons-five platoon-rank3 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_ten_skill4" class="input-text platoons-five platoon-skill4" />
+                <select name='attr_platoon_ten_rank2' class="platoons-five platoon-rank4 short">
+                    <option value='-'>-</option>
+                    <option value='A'>A</option>
+                    <option value='B'>B</option>
+                    <option value='C'>C</option>
+                    <option value='D'>D</option>
+                </select>
+                <input type="text" name="attr_platoon_ten_gear" class="input-text platoons-five platoon-gear" />
+            </div>
+        </div>
+
+    </div>
+	<hr />
+
 <div class="stockpile">
 	<h2>Stockpile</h2>
 	<hr />
@@ -2007,7 +2851,7 @@ value="&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Coolnes
         });
     });
 
-    const buttonlist = ["basic","attributes","combat","gear","vehicle","stockpile"];
+    const buttonlist = ["basic","attributes","combat","gear","vehicle","platoon","stockpile"];
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
             setAttrs({
@@ -2022,6 +2866,16 @@ value="&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Coolnes
             console.log('clicked'+button);
             setAttrs({
                 tab_weapon: button
+            });
+        });
+    });
+
+    const platoonbuttonlist = ["tab_platoon_one", "tab_platoon_two"];
+    platoonbuttonlist.forEach(button => {
+        on(`clicked:${button}`, function() {
+            console.log('clicked'+button);
+            setAttrs({
+                tab_platoon: button
             });
         });
     });
@@ -2296,15 +3150,15 @@ value="&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Coolnes
 		});
 	});
 
-	on("change:manipulation sheet:opened", function() {  
-		getAttrs(["manipulation"], function(values) {
-        		const per = values.manipulation;
+	on("change:persuasion sheet:opened", function() {  
+		getAttrs(["persuasion"], function(values) {
+        	const per = values.persuasion;
 			var perdie = 0;
 			if (per == "A") perdie = 12;
 			if (per == "B") perdie = 10;
 			if (per == "C") perdie = 8;
 			if (per == "D") perdie = 6;
-			setAttrs({manipulationdie: perdie });
+			setAttrs({persuasiondie: perdie });
 		});
 	});
 
@@ -2328,7 +3182,7 @@ value="&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Coolnes
             var cl = 0;
             var bpcl = 0;
             if (lc == 1) {
-                cl = 2+strdie;
+                cl = 4+strdie;
                 bpcl = 4+strdie;
             }
             else {
@@ -2337,6 +3191,41 @@ value="&{template:t2k} {{character-name=@{character_name} }} {{roll-name=Coolnes
             }
             setAttrs({carry_limit: cl});
             setAttrs({carry_limit_backpack: bpcl });
+        });
+    });
+
+    on("sheet:opened", () => {
+        getAttrs(["character_name", "sheet_version", "version", "newchar", "manipulation", "persuasion"], (values) => {
+            const sheet_version = parseFloat(values.sheet_version) || 0, 
+                version = parseFloat(values.version) || 0,
+                newchar = parseInt(values.newchar) || 0; 
+            switch (true) {
+                // In case a new character: do nothing, set as not new character, 
+                // set version same as sheet, then break all further versioning 
+                case newchar == 1 && version > 1:
+                    setAttrs({newchar: 0, version: sheet_version});
+                    console.log(`New sheet for ${values.character_name}.`);
+                    break;
+                // In case version is lower than 1.01, change manipulation to persuasion, then continue
+                case version < 1.01 :
+                    const per = values.manipulation;
+                    var perdie = 0;
+                    if (per == "A") perdie = 12;
+                    if (per == "B") perdie = 10;
+                    if (per == "C") perdie = 8;
+                    if (per == "D") perdie = 6;
+                    setAttrs({
+                        persuasion: per,
+                        persuasiondie: perdie,
+                        newchar: '0',
+                    });
+                    console.log(`Sheet upgraded for ${values.character_name} to 1.01 version.`);  
+                // When all version processing is done, set version to same as sheet and log it.               
+                default: 
+                    setAttrs({version: sheet_version});
+                    console.log(`Sheet for ${values.character_name} at latest version ${sheet_version}.`);
+                    break;                    
+            }
         });
     });
 

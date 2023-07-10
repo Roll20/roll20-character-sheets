@@ -36,11 +36,11 @@ Roll buttons are color-coded:
 
 ![Blue Button](/HeroSystem6eHeroic/images/BlueButton.png) Blue buttons are for armor activation rolls.
 
-![Red Button](/HeroSystem6eHeroic/images/RedButton.png) Red buttons are weapon attacks. They can do killing or normal damage.
-
-![Brown Button](/HeroSystem6eHeroic/images/BrownButton.png) The brown button is for shield attacks. They can do killing or normal damage.
+![Red Button](/HeroSystem6eHeroic/images/RedButton.png) Red buttons are for killing damage attacks.
 
 ![Green Button](/HeroSystem6eHeroic/images/GreenButton.png) Green buttons are for normal damage attacks.
+
+![Brown Button](/HeroSystem6eHeroic/images/BrownButton.png) The brown button is for shield use. This can be used for block checks, or to do killing or normal damage.
 
 ![Purple Button](/HeroSystem6eHeroic/images/PurpleButton.png) Purple buttons are for powers.
 
@@ -66,7 +66,7 @@ The first page also includes a portrait section designed as a slideshow. The fir
 
 ![Health Status Indicator](/HeroSystem6eHeroic/images/HealthStatus.png)
 
-In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your characteristic values.
+In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your characteristic values. The Recover button will also prompt if you are taking a Post-Segment 12 Recovery, or action. In the case of a Post-Segment 12 Recovery, your END/Turn costs will be subtracted from the recovery.
 
 ## Turn Segments and Initiative
 
@@ -86,23 +86,23 @@ The default roll for Perception is equal to the character's Intelligence Roll. P
 
 The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a list of common and marital combat maneuvers.
 
-Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost should be accounted for manually by deducting points from the character's health status at the end of each turn. Each value is read-only except "DCV Modifier." Use this field to account for skill levels or items that might reduce or enhance your DCV (see the note on current DCV in the token section below).
+Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost is accounted for automatically when taking a Post-Segment 12 recovery. Each value is read-only except "DCV Modifier." Use this field to account for skill levels or items that might reduce or enhance your DCV (see the note on current DCV in the token section below).
 
 ![Encumbrance](/HeroSystem6eHeroic/images/encumbrance.png)
 
-The sheet includes space for four suits or pieces of armor. Although this sheet is designed for the simpler armor activation system, there is a field for hit locations if your GM chooses to use that system. 
+The sheet includes space for four suits or pieces of armor. If PD/ED are left at 0, then Total Defense will be automatically calculated when you click Roll. Although this sheet is designed for the simpler armor activation system, there is a field for hit locations if your GM chooses to use that system. 
 
 ![Armor Table](/HeroSystem6eHeroic/images/armor.png)
 
-Click the "Roll" button to roll armor activation. The message like the one shown below will be sent to the chat window. 
+Click the "Roll" button to roll armor activation. A message like the one shown below will be sent to the chat window. If ACT is set to NA, and locations are filled then the second message will appear.
 
-![Armor Activation Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat.png)
+![Armor Activation Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat.png)![Armor Activation Alternate Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat2.png)
 
 Hero System weapons generally do killing damage or normal damage (e.g., a club or staff). Check the "N" box next to a weapon's damage dice to mark it as doing normal damage. In order to calculate the correct endurance expended, the STR field refers to the strength used, not the minimum strength required for the weapon. The "AoE" checkbox indicates an Area of Effect weapon.
 
 ![Weapons Table](/HeroSystem6eHeroic/images/weapons.png)
 
-When a weapon attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made, hit location (optional), and the BODY and STUN damage results. Attacking with a shield is similar to attacking with a weapon except that the DCV bonus for defense is an OCV penalty for attacks. Shields usually do normal damage, but in some cases can do killing damage (e.g., spiked shields). The shield attack button is brown to set it apart from other weapon attacks.
+When a weapon attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made, hit location (optional), and the BODY and STUN damage results. Attacking with a shield is similar to attacking with a weapon except that the DCV bonus for defense is an OCV penalty for attacks. Shields usually do normal damage, but in some cases can do killing damage (e.g., spiked shields). The shield button can also be used to block with the Shield in which case the DCV is added as a bonus to the OCV. The shield attack button is brown to set it apart from other weapon attacks.
 
 An attack doing killing damage appears in chat with a red heading. The damage dice determine the BODY damage done. The STUN damage is determined from BODY damage times the total STUN multiple. 
 
@@ -110,13 +110,14 @@ An attack doing killing damage appears in chat with a red heading. The damage di
 
 An attack doing normal damage appears in chat with a green heading. The weapon's damage dice determine STUN and BODY is calculated from the Hero formula: 1 pip is 0 BODY, 2-5 pips are 1 BODY, and 6 is 2 BODY damage. The weapon's STUNx modifier is ignored. Note that a d3 result of "3" does 1 BODY and a "2" has a 50% chance to contribute 1 BODY damage as well. In the example below, the 1d3 damage added to the bo staff (here 5d6+1d3), contributed 1 BODY and 2 STUN.
 
-![Normal Attack Chat Message](/HeroSystem6eHeroic/images/GreenButtonChatRoll.png)
+![Normal Attack Chat Message](/HeroSystem6eHeroic/images/GreenButtonChatRoll.png)![Normal Attack Chat Message Expanded](/HeroSystem6eHeroic/images/GreenButtonChatRoll2.png)
 
-The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers (shown below). The third pane contains hit location tables and targeting options. A fourth pane can be used for notes and treasures.
+The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane includes a button for the Basic Attack and allows for the addition of purchased martial maneuvers (shown below). The third pane contains hit location tables and targeting options. A fourth pane can be used for notes and treasures.
 
 ![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuvers.png)
 
 Basic information about a martial maneuver can be shared in the chat window via the 'show' buttons.
+*Strength Damage*: This value can be used for rolls with the @{hiddenManeuverDamage01} attribute.
 
 ![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuversChat.png)
 
@@ -142,9 +143,13 @@ Skill Enhancers, when purchased (checked), reduce the cost of relevant knowledge
 
 ![Page 4](/HeroSystem6eHeroic/images/screenshot-04-scaled.png)
 
-The Power page can accommodate ten powers. The left and right sides have different color schemes for organizational purposes, but are otherwise the same. Each power's points and endurance costs are calculated from the base cost provided and advantages and limitations entered. A power framework is treated as its own entry as shown in the figure below. The second power "Ice Bolts" belongs to the Multipower as a Variable Slot. The "AF" in "Reduced AF" refers to *autofire,* which is an advantage chosen for this particular power that increases the cost of Reduced Endurance.
+The Power page can accommodate seventeen powers. The left and right sides have different color schemes for organizational purposes, but are otherwise the same. A health status bar occupies the upper right corner of the sheet.
+
+Each power's points and endurance costs are calculated from the base cost provided and advantages and limitations entered. A power framework is treated as its own entry as shown in the figure below. The second power "Ice Bolts" belongs to the Multipower as a Variable Slot. The "AF" in "Reduced AF" refers to *autofire,* which is an advantage chosen for this particular power that increases the cost of Reduced Endurance.
 
 ![Multipower](/HeroSystem6eHeroic/images/Multipower.png)
+
+Each column displays one power in its fully expanded form, which is activated by the triangle widget on the second line. The up and down arrow widgets will move the power accordingly, swapping positions with the adjacent power.
 
 The "Roll" button produces general output that may or may not apply to the power being used. When pressed, Roll20 will make a 3d6 success roll to compare against the given activation roll target, roll an unmodified attack roll of 3d6, roll the dice provided as an effect (which may need to be translated as normal damage), displays the endurance cost, and shows the text box contents as a description. 
 
@@ -178,11 +183,17 @@ The last page of this sheet contains a number of options:
 
 (5) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
+(6) Takes No STUN. Select this option to set STUN to zero if the character has the automaton power *Takes No STUN.*
+
+(7) Display Degree of Success. By default this is checked, showing the amount a roll succeeded or failed by. In the case of attacks it will show the DCV that you are able to hit. Unchecking this will instead show a Base Chance for skills, and the total OCV bonus for attacks, followed by a Roll line that will show the results of 3d6 roll. This doesn't affect anything rules wise, just a preference on how players would want to see the details of their rolls.
+
+(8) Whisper Rolls to GM. This dropdown offers 3 options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
+
 # <a id="tokens">Tokens Settings</a>
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
-Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *currentDCV,* *currentBODY,* and *currentEND* coupled with their maximum values as shown in the example settings dialog below. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty + DCV Modifier.
+Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *currentDCV,* *currentBODY,* and *currentEND* these should automatically be coupled with their maximum values. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty + DCV Modifier.
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
@@ -210,4 +221,4 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
-*Villain In Glasses, August 1, 2021. Last updated on September 26, 2021 to reflect changes to weapon attacks being damage-type selectable as well as the option to automatically apply END costs.*
+*Villain In Glasses, August 1, 2021. Last updated on May 31, 2023 to reflect additional options, and maneuvers changes. *

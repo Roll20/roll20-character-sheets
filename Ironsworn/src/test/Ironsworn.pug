@@ -17,17 +17,32 @@ html
     script(type="text/javascript", src="https://app.roll20.net/js/d20/charsheetjs/view/attribute_tab.js")
     script(type="text/javascript", src="https://app.roll20.net/js/d20/charsheetjs/view/draggables.js")
     script(type="text/javascript", src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js")
+    script(type="text/javascript", src="https://unpkg.com/i18next/dist/umd/i18next.min.js")
 
     link(rel="stylesheet", type="text/css" href="../../Ironsworn.css")
   body
     div(class="ui-dialog")
       div(class="dialog largedialog characterviewer" style="display: block;")
-        form(class="sheetform")
+        form(class="sheetform" novalidate)
           div(class="charactersheet tab-pane charsheet lang-en", style="display: block;")
             include ../app/pages/index
 
+  - var translations = locals.i18n ? JSON.stringify(locals.i18n) : "{}"
+  script(type="text/javascript").
+    i18next.init({
+      lng: 'en',
+      resources: {
+        en: {
+          translation: !{translations}
+        }
+      },
+      skipInterpolation: true
+    });
+
   script(type="text/javascript")
     include ./attributes.js
+
+    include ./localize.js
 
     include ./test.js
     
@@ -43,3 +58,16 @@ html
     include ../app/workers/scripts/vows.js
     include ../app/workers/scripts/legacy-vows.js
     include ../app/workers/scripts/bonds.js
+
+  script(type="text/javascript").
+    window.addEventListener('submit', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    window.addEventListener('keydown', function(e) {
+      if(e.which === 13 && e.target.tagName.toLowerCase() === 'input') {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    });
