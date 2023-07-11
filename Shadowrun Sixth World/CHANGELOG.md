@@ -1,6 +1,8 @@
 Change Log
 ==============================================
 **2023-07-10 ** v.84 Chuz (James Culp)
+	Bugfix - AoE Spells weren't adding the right amount of drain for 12m and 14m
+	Bugfix - Attribute+Attribute selections were missing Strength
 	New Feature - skill mods in the repeating skill list now should update those skills everywhere in the sheet.
 	Bugfix - Sprint rolls now include -1 skill modifier if the PC doesn't have an Athletics skill.  Also added a function to resynch the hidden skill attributes any time a skill name is changed (via the drop down changing) or a skill is deleted.
 	Bugfix - Fixed the increment button on the OS Tracker it now adds 1 instead of concatenating a 1 after the other digits sometimes.
