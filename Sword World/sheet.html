@@ -17,20 +17,14 @@
 
             <div class="grid col2-guild">
                 <div class="grid">
-                    <div class="grid col2 vcol">
+                    <div class="grid vcol">
                         <label>Reputation</label>
-                        <input type="text" spellcheck="false" name="attr_reputation" value="Hollow" />
-
-                        <label>Points</label>
-                        <input type="text" spellcheck="false" name="attr_reputation_points" value="0" />
+                        <input type="text" spellcheck="false" name="attr_reputation" value="0" />
                     </div>
 
-                    <div class="grid col2 vcol">
+                    <div class="grid vcol">
                         <label>Rank</label>
                         <input type="text" spellcheck="false" name="attr_rank" value="None" />
-
-                        <label>Grade</label>
-                        <input type="text" spellcheck="false" name="attr_grade" />
                     </div>
                 </div>
 
@@ -640,6 +634,7 @@
     <div class="grid nogap lined">
         <div class="grid col-weapons nogap">
             <div class="header">Weapon Name/Notes</div>
+            <div class="header">Class</div>
             <div class="header">Stance</div>
             <div class="header">Min STR</div>
             <div class="header">Weapon Accuracy</div>
@@ -666,6 +661,16 @@
 
             <div><input type="text" spellcheck="false" name="attr_weapon_name" placeholder="Weapon" /></div>
             <div>
+                <select class="input" name="attr_weapon_class">
+                    <option value=""></option>
+                    <option value="fighter">Fighter</option>
+                    <option value="grappler">Grappler</option>
+                    <option value="fencer">Fencer</option>
+                    <option value="marksman">Marksman</option>
+                    <option value="gun">Gun</option>
+                </select>
+            </div>
+            <div>
                 <select class="input" name="attr_weapon_stance">
                     <option value=""></option>
                     <option value="1h">1H</option>
@@ -684,7 +689,7 @@
             <div><input type="number" name="attr_weapon_accuracy" value="" /></div>
             <div>
                 <button class="input lrg" type="roll" name="roll_attack"
-                    value="&{template:swskill} {{reroll=[Reroll](~repeating_weapons_attack)}} {{name=@{character_name}}} {{skill=@{weapon_name}}} {{skillverb=attacks with}} {{result=[[[[2d6]]+@{weapon_total_accuracy}]]}} {{raw=$[[0]]}} {{result2=[[12+@{weapon_total_accuracy}+5]]}}" />
+                    value="&{template:swskill} {{reroll=[Reroll](~repeating_weapons_attack)}} {{damage=[Damage](~repeating_weapons_damage)}} {{name=@{character_name}}} {{skill=@{weapon_name}}} {{skillverb=attacks with}} {{result=[[[[2d6]]+@{weapon_total_accuracy}]]}} {{raw=$[[0]]}} {{result2=[[12+@{weapon_total_accuracy}+5]]}}" />
                 <span class="input" name="attr_weapon_total_accuracy" />
             </div>
             <div><input type="number" name="attr_weapon_power" /></div>
@@ -702,9 +707,10 @@
             <div><input type="number" name="attr_weapon_crit_value" /></div>
             <div><input type="number" name="attr_weapon_extra_damage" value="" /></div>
             <div>
-                <button class="input lrg" type="action" name="act_damage">
-                    <span class="input" name="attr_weapon_total_extra_damage" />
-                </button>
+                <button class="input lrg" type="roll" name="roll_damage" value="@{damage_action}" />
+                <button class="hidden" type="action" name="act_damage-action" />
+                <input type="hidden" name="attr_damage_action" value="">
+                <span class="input" name="attr_weapon_total_extra_damage" />
             </div>
         </fieldset>
     </div>
@@ -1394,6 +1400,9 @@
                 let wizard_level = 0;
                 let hp = parseInt(values["vitality"])||0;
                 let mp = parseInt(values["spirit"])||0;
+                let dexterity = parseInt(values["dexterity_modifier"])||0;
+                let strength = parseInt(values["strength_modifier"])||0;
+                let intelligence = parseInt(values["intelligence_modifier"])||0;
                 let fortitude = parseInt(values["vitality_modifier"])||0;
                 let willpower = parseInt(values["spirit_modifier"])||0;
                 let race = values["race"];
@@ -1453,41 +1462,47 @@
                     }
                 });
                 setAttrs(update);
-            });
-        });
-    });
 
-    on("change:base_accuracy change:extra_damage", function(eventInfo) {
-        getAttrs(["base_accuracy","extra_damage"], function(values) {
-            let update = {};
-            let accuracy = parseInt(values["base_accuracy"])||0;
-            let damage = parseInt(values["extra_damage"])||0;
-
-            getSectionIDs("repeating_weapons", function(idarray) {
-                for (var i=0; i < idarray.length; i++) {
-                    let id = idarray[i];;
-                    getAttrs([`repeating_weapons_${id}_weapon_accuracy`,`repeating_weapons_${id}_weapon_extra_damage`], function(values2) {
-                        let update2 = {};
-                        let w_accuracy = parseInt(values2[`repeating_weapons_${id}_weapon_accuracy`])||0;
-                        let w_damage = parseInt(values2[`repeating_weapons_${id}_weapon_extra_damage`])||0;
-                        update2[`repeating_weapons_${id}_weapon_total_accuracy`] = accuracy + w_accuracy;
-                        update2[`repeating_weapons_${id}_weapon_total_extra_damage`] = damage + w_damage;
-                        setAttrs(update2);
-                    });
-                }
+                getSectionIDs("repeating_weapons", function(idarray) {
+                    for (var i=0; i < idarray.length; i++) {
+                        let id = idarray[i];;
+                        getAttrs([`repeating_weapons_${id}_weapon_class`,`repeating_weapons_${id}_weapon_accuracy`,`repeating_weapons_${id}_weapon_extra_damage`], function(values2) {
+                            let update2 = {};
+                            let w_class = values2[`repeating_weapons_${id}_weapon_class`];
+                            let w_acc_level = w_class == "gun" ? parseInt(values["marksman_level"])||0 : parseInt(values[`${w_class}_level`])||0;
+                            let w_dmg_level = w_class == "gun" ? parseInt(values["artificer_level"])||0 : parseInt(values[`${w_class}_level`])||0;
+                            let w_accuracy = parseInt(values2[`repeating_weapons_${id}_weapon_accuracy`])||0;
+                            let w_damage = parseInt(values2[`repeating_weapons_${id}_weapon_extra_damage`])||0;
+                            w_accuracy += w_acc_level + dexterity;
+                            w_damage += w_class == "gun" ? intelligence + w_dmg_level : strength + w_dmg_level;
+                            update2[`repeating_weapons_${id}_weapon_total_accuracy`] = w_accuracy;
+                            update2[`repeating_weapons_${id}_weapon_total_extra_damage`] = w_damage;
+                            setAttrs(update2, {silent:true});
+                        });
+                    }
+                });
             });
         });
     });
 
     on("change:repeating_weapons", function(eventInfo) {
-        getAttrs(["repeating_weapons_weapon_accuracy","repeating_weapons_weapon_extra_damage","base_accuracy","extra_damage"], function(values) {
+        getAttrs(["repeating_weapons_weapon_class","repeating_weapons_weapon_accuracy",
+                "repeating_weapons_weapon_extra_damage","fighter_level","grappler_level",
+                "fencer_level","marksman_level","artificer_level","strength_modifier",
+                "dexterity_modifier","intelligence_modifier"], function(values) {
             let update = {};
-            let accuracy = parseInt(values["base_accuracy"])||0;
-            let damage = parseInt(values["extra_damage"])||0;
+            let dexterity = parseInt(values["dexterity_modifier"])||0;
+            let strength = parseInt(values["strength_modifier"])||0;
+            let intelligence = parseInt(values["intelligence_modifier"])||0;
+            let w_class = values["repeating_weapons_weapon_class"];
+            let w_acc_level = w_class == "gun" ? parseInt(values["marksman_level"])||0 : parseInt(values[`${w_class}_level`])||0;
+            let w_dmg_level = w_class == "gun" ? parseInt(values["artificer_level"])||0 : parseInt(values[`${w_class}_level`])||0;
             let w_accuracy = parseInt(values["repeating_weapons_weapon_accuracy"])||0;
             let w_damage = parseInt(values["repeating_weapons_weapon_extra_damage"])||0;
-            update["repeating_weapons_weapon_total_accuracy"] = accuracy + w_accuracy;
-            update["repeating_weapons_weapon_total_extra_damage"] = damage + w_damage;
+            w_accuracy += w_acc_level + dexterity;
+            w_damage += w_class == "gun" ? intelligence + w_dmg_level : strength + w_dmg_level;
+            update["repeating_weapons_weapon_total_accuracy"] = w_accuracy;
+            update["repeating_weapons_weapon_total_extra_damage"] = w_damage;
             setAttrs(update);
         });
     });
@@ -1531,16 +1546,104 @@
     weapon_power_3,weapon_power_4,weapon_power_4,weapon_power_6,weapon_power_7
     weapon_power_8.weapon_power_9,weapon_power_10,weapon_power_11,weapon_power_12
     weapon_crit_value
-
-    sourceAttribute: "repeating_weapons_-NZRNWFEgQEZyDZ9COpT_damage"
     */
-    on("clicked:repeating_weapons:damage", function(eventInfo) {
-        let key = eventInfo["sourceAttribute"];
-        key = key.replace("repeating_weapons_","").replace("_damage","");
-        startRoll(`&{template:swdamage} {{name=@{character_name}}} {{skill=@{repeating_weapons_${key}_weapon_name}}} {{power=@{repeating_weapons_${key}_weapon_power}}} {{result=[[2d6]]}}`, (results) => {
-            finishRoll(results.rollId, {});
+    on("clicked:repeating_weapons:damage-action", function(eventInfo) {
+        getAttrs(["repeating_weapons_weapon_power_3","repeating_weapons_weapon_power_4","repeating_weapons_weapon_power_5",
+                "repeating_weapons_weapon_power_6","repeating_weapons_weapon_power_7","repeating_weapons_weapon_power_8",
+                "repeating_weapons_weapon_power_9","repeating_weapons_weapon_power_10","repeating_weapons_weapon_power_11",
+                "repeating_weapons_weapon_power_12","repeating_weapons_weapon_name","repeating_weapons_weapon_power",
+                "repeating_weapons_weapon_total_extra_damage","repeating_weapons_weapon_crit_value"], function(values) {
+            let key = eventInfo["sourceAttribute"];
+            key = key.replace("repeating_weapons_","").replace("_damage-action","");
+            let name = values["repeating_weapons_weapon_name"];
+            let power = values["repeating_weapons_weapon_power"];
+            let extra = parseInt(values["repeating_weapons_weapon_total_extra_damage"])||0;
+            let crit = parseInt(values["repeating_weapons_weapon_crit_value"])||0;
+            let power3 = values["repeating_weapons_weapon_power_3"];
+            let power4 = values["repeating_weapons_weapon_power_4"];
+            let power5 = values["repeating_weapons_weapon_power_5"];
+            let power6 = values["repeating_weapons_weapon_power_6"];
+            let power7 = values["repeating_weapons_weapon_power_7"];
+            let power8 = values["repeating_weapons_weapon_power_8"];
+            let power9 = values["repeating_weapons_weapon_power_9"];
+            let power10 = values["repeating_weapons_weapon_power_10"];
+            let power11 = values["repeating_weapons_weapon_power_11"];
+            let power12 = values["repeating_weapons_weapon_power_12"];
+
+            startRoll(`&{template:swdamage} {{reroll=[Reroll](~repeating_weapons_${key}_damage)}} {{name=@{character_name}}} {{skill=${name}}} {{power=${power}}} {{extra=${extra}}} {{crit=[[${crit}]]}} {{power3=${power3}}} {{power4=${power4}}} {{power5=${power5}}} {{power6=${power6}}} {{power7=${power7}}} {{power8=${power8}}} {{power9=${power9}}} {{power10=${power10}}} {{power11=${power11}}} {{power12=${power12}}} {{result=[[2d6]]}}`, (results) => {
+                const roll = results.results.result.result
+                let computed = parseInt(values[`repeating_weapons_weapon_power_${roll}`])||0;
+                if (computed != 0 ) {
+                    computed += extra;
+                }
+
+                finishRoll(
+                    results.rollId,
+                    {
+                        result: computed
+                    }
+                );
+            });
         });
     });
+
+    /*
+        Repeating Section Update - Custom Roll Parsing
+        A function to combine getting repeating and non repeating attributes.
+    */
+    const getAllAttrs = function(props, section_details, callback) {
+        getSections(section_details, (repeats, sections) => {
+            getAttrs([...props, ...repeats], (attributes) => {
+                callback(attributes, sections);
+            })
+        });
+    };
+    // Iterates over the provided repeating sections and assembles an array
+    // of attributes to get from those sections for each row.
+    const getSections = function(section_details, callback){
+        let queue_clone = _.clone(section_details);
+        const worker = (queue, repeat_attrs=[], sections={}) => {
+            let detail = queue.shift();
+            getSectionIDs(detail.section, (IDs) => {
+                sections[detail.section] = IDs;
+                IDs.forEach((id) => {
+                    detail.fields.forEach((f) => {
+                        repeat_attrs.push(`${detail.section}_${id}_${f}`);
+                    });
+                });
+                repeat_attrs.push(`_reporder_${detail.section}`);
+                if (queue.length) {
+                    worker(queue, repeat_attrs, sections);
+                } else {
+                    callback(repeat_attrs, sections);
+                }
+            });
+        };
+        if (!queue_clone[0]) {
+            callback([], {});
+        }
+        worker(queue_clone);
+    };
+    const repeating_sections = [
+        {
+            section: "repeating_weapons",
+            fields: ["damage_action"]
+        }
+    ];
+    const action_refs = []; // non-repeating buttons
+    const actionCallUpdate = function() {
+        getAllAttrs(["character_name", ...action_refs], repeating_sections, (attributes, sections) => {
+            let actions = Object.keys(attributes).filter((key) => key !== "character_name");
+            const set_obj = actions.reduce((accumulator, action_name)=>{
+                let key = action_name.replace(/_([^_]*)$/, "-" + '$1');
+                accumulator[action_name] = `%{${attributes.character_name}|${key}}`;
+                return accumulator;
+            }, {});
+            setAttrs(set_obj, {silent:true});
+        });
+    };
+
+    on("sheet:opened change:character_name", actionCallUpdate);
 
     /* ===== PARAMETERS ==========
     destinations = the name of the attribute that stores the total quantity
@@ -1570,29 +1673,6 @@
 
 </script>
 
-<!--
-Standard Value: Class Level + Ability Modifier OR Adventurer Level + Ability Modifier
-Target Number: difficulty number, typically 5 to 21
-Success Value: final total of 2d6 + Standard Value; if >= Target Number, then success; otherwise failure
-Automatic Success: 2d6 = 12; the Success Value = 12 + Standard Value + 5 (if needed)
-Automatic Failure: 2d6 = 2; the Success Value = 0 (if needed)
-Bonus/Penalty: add or subtract from Success Value; penalty cannot reduce below 0
-
-name: the character
-skill: the skill name
-class: class name or default to "Adventurer"
-level: # level of class OR 0
-ability: ability name
-modifier: # modifier of ability OR 0
-target: # difficulty (determined by the GM, so may not be known)
-raw: 2d6
-result: roll + level + modifier
-bonus: # add; +1 to +4
-penalty: # subtract; -1 to -4
-
-&{template:swskill} {{reroll=[Reroll](~repeating_weapons_attack)}} {{name=@{character_name}}} {{skill=@{weapon_name}}} {{skillverb=attacks with}} {{result=[[[[2d6]]+@{weapon_total_accuracy}]]}} {{raw=$[[0]]}} {{result2=[[12+@{weapon_total_accuracy}+5]]}}
-
--->
 <rolltemplate class="sheet-rolltemplate-swskill">
     {{#rollTotal() raw 12}}
         {{#result2}}
@@ -1621,6 +1701,7 @@ penalty: # subtract; -1 to -4
             {{#rollTotal() raw 2}}
                 <p><strong>0</strong>{{#target}} vs. {{target}}{{/target}}</p>
                 <p class="fail">Automatic Failure!</p>
+                <p class="fail">Gain 50 experience</p>
             {{/rollTotal() raw 2}}
             {{#^rollTotal() raw 2}}
                 <p>{{result}}{{#target}} vs. {{target}}{{/target}}</p>
@@ -1637,26 +1718,191 @@ penalty: # subtract; -1 to -4
         <div class="crit"></div>
         <div class="fumble"></div>
         <div class="options">
+            {{damage}}
             {{reroll}}
         </div>
     </div>
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-swdamage">
-    {{#rollTotal() raw 2}}
+    {{#rollBetween() result crit 12}}
+        <span class="sheet-template-crit"></span>
+    {{/rollBetween() result crit 12}}
+    {{#rollTotal() result 2}}
         <span class="sheet-template-fumble"></span>
-    {{/rollTotal() raw 2}}
+    {{/rollTotal() result 2}}
+    {{#rollTotal() result 3}}
+        <span class="sheet-template-3"></span>
+    {{/rollTotal() result 3}}
+    {{#rollTotal() result 4}}
+        <span class="sheet-template-4"></span>
+    {{/rollTotal() result 4}}
+    {{#rollTotal() result 5}}
+        <span class="sheet-template-5"></span>
+    {{/rollTotal() result 5}}
+    {{#rollTotal() result 6}}
+        <span class="sheet-template-6"></span>
+    {{/rollTotal() result 6}}
+    {{#rollTotal() result 7}}
+        <span class="sheet-template-7"></span>
+    {{/rollTotal() result 7}}
+    {{#rollTotal() result 8}}
+        <span class="sheet-template-8"></span>
+    {{/rollTotal() result 8}}
+    {{#rollTotal() result 9}}
+        <span class="sheet-template-9"></span>
+    {{/rollTotal() result 9}}
+    {{#rollTotal() result 10}}
+        <span class="sheet-template-10"></span>
+    {{/rollTotal() result 10}}
+    {{#rollTotal() result 11}}
+        <span class="sheet-template-11"></span>
+    {{/rollTotal() result 11}}
+    {{#rollTotal() result 12}}
+        <span class="sheet-template-12"></span>
+    {{/rollTotal() result 12}}
     <div class="container">
         <h1>
             {{name}}'s {{skill}}
         </h1>
-        <p>Power Level {{power}}</p>
+        <p>{{result}}</p>
+        <div class="powertable">
+            <div />
+            <div>2</div>
+            {{#rollLess() crit 3}}
+                <div class="crit">3</div>
+            {{/rollLess() crit 3}}
+            {{#^rollLess() crit 3}}
+                <div>3</div>
+            {{/^rollLess() crit 3}}
+            {{#rollLess() crit 4}}
+                <div class="crit">4</div>
+            {{/rollLess() crit 4}}
+            {{#^rollLess() crit 4}}
+                <div>4</div>
+            {{/^rollLess() crit 4}}
+            {{#rollLess() crit 5}}
+                <div class="crit">5</div>
+            {{/rollLess() crit 5}}
+            {{#^rollLess() crit 5}}
+                <div>5</div>
+            {{/^rollLess() crit 5}}
+            {{#rollLess() crit 6}}
+                <div class="crit">6</div>
+            {{/rollLess() crit 6}}
+            {{#^rollLess() crit 6}}
+                <div>6</div>
+            {{/^rollLess() crit 6}}
+            {{#rollLess() crit 7}}
+                <div class="crit">7</div>
+            {{/rollLess() crit 7}}
+            {{#^rollLess() crit 7}}
+                <div>7</div>
+            {{/^rollLess() crit 7}}
+            {{#rollLess() crit 8}}
+                <div class="crit">8</div>
+            {{/rollLess() crit 8}}
+            {{#^rollLess() crit 8}}
+                <div>8</div>
+            {{/^rollLess() crit 8}}
+            {{#rollLess() crit 9}}
+                <div class="crit">9</div>
+            {{/rollLess() crit 9}}
+            {{#^rollLess() crit 9}}
+                <div>9</div>
+            {{/^rollLess() crit 9}}
+            {{#rollLess() crit 10}}
+                <div class="crit">10</div>
+            {{/rollLess() crit 10}}
+            {{#^rollLess() crit 10}}
+                <div>10</div>
+            {{/^rollLess() crit 10}}
+            {{#rollLess() crit 11}}
+                <div class="crit">11</div>
+            {{/rollLess() crit 11}}
+            {{#^rollLess() crit 11}}
+                <div>11</div>
+            {{/^rollLess() crit 11}}
+            {{#rollLess() crit 12}}
+                <div class="crit">12</div>
+            {{/rollLess() crit 12}}
+            {{#^rollLess() crit 12}}
+                <div>12</div>
+            {{/^rollLess() crit 12}}
+
+            <div>{{power}}</div>
+            <div>*</div>
+            {{#rollLess() crit 3}}
+                <div class="crit">{{power3}}</div>
+            {{/rollLess() crit 3}}
+            {{#^rollLess() crit 3}}
+                <div>{{power3}}</div>
+            {{/^rollLess() crit 3}}
+            {{#rollLess() crit 4}}
+                <div class="crit">{{power4}}</div>
+            {{/rollLess() crit 4}}
+            {{#^rollLess() crit 4}}
+                <div>{{power4}}</div>
+            {{/^rollLess() crit 4}}
+            {{#rollLess() crit 5}}
+                <div class="crit">{{power5}}</div>
+            {{/rollLess() crit 5}}
+            {{#^rollLess() crit 5}}
+                <div>{{power5}}</div>
+            {{/^rollLess() crit 5}}
+            {{#rollLess() crit 6}}
+                <div class="crit">{{power6}}</div>
+            {{/rollLess() crit 6}}
+            {{#^rollLess() crit 6}}
+                <div>{{power6}}</div>
+            {{/^rollLess() crit 6}}
+            {{#rollLess() crit 7}}
+                <div class="crit">{{power7}}</div>
+            {{/rollLess() crit 7}}
+            {{#^rollLess() crit 7}}
+                <div>{{power7}}</div>
+            {{/^rollLess() crit 7}}
+            {{#rollLess() crit 8}}
+                <div class="crit">{{power8}}</div>
+            {{/rollLess() crit 8}}
+            {{#^rollLess() crit 8}}
+                <div>{{power8}}</div>
+            {{/^rollLess() crit 8}}
+            {{#rollLess() crit 9}}
+                <div class="crit">{{power9}}</div>
+            {{/rollLess() crit 9}}
+            {{#^rollLess() crit 9}}
+                <div>{{power9}}</div>
+            {{/^rollLess() crit 9}}
+            {{#rollLess() crit 10}}
+                <div class="crit">{{power10}}</div>
+            {{/rollLess() crit 10}}
+            {{#^rollLess() crit 10}}
+                <div>{{power10}}</div>
+            {{/^rollLess() crit 10}}
+            {{#rollLess() crit 11}}
+                <div class="crit">{{power11}}</div>
+            {{/rollLess() crit 11}}
+            {{#^rollLess() crit 11}}
+                <div>{{power11}}</div>
+            {{/^rollLess() crit 11}}
+            {{#rollLess() crit 12}}
+                <div class="crit">{{power12}}</div>
+            {{/rollLess() crit 12}}
+            {{#^rollLess() crit 12}}
+                <div>{{power12}}</div>
+            {{/^rollLess() crit 12}}
+        </div>
+        <p>{{computed::result}} damage</p>
+        {{#rollBetween() result crit 12}}
+            <span class="success">Critical!</span>
+            <span class="success">(roll again and add)</span>
+        {{/rollBetween() result crit 12}}
+        <div class="crit"></div>
         {{#rollTotal() result 2}}
-            <p><strong>{{result}}</strong> = <strong>0</strong> damage</p>
+            <p class="fail">Gain 50 experience</p>
+            <p class="fail">(except on critical)</p>
         {{/rollTotal() result 2}}
-        {{#^rollTotal() result 2}}
-            <p>{{result}} = <strong>{{damage}}</strong> damage</p>
-        {{/^rollTotal() result 2}}
         <div class="fumble"></div>
         <div class="options">
             {{reroll}}
