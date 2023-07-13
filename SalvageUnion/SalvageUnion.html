@@ -822,9 +822,77 @@
                     <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. For Bio-Titans copy everything without the orange boxes and import the orange boxes separately. Multiple orange boxes can be imported at once."></textarea>
                     <button type="action" class="textbutton" name="act_import-biotitan">Import Biotitan</button>
                     <button type="action" class="textbutton" name="act_import-biotitan-orangebox">Import Biotitan orange box</button>
-                    <button type="action" class="textbutton" name="act_import-vehicle">Import Vehicle</button>
-                    <button type="action" class="textbutton" name="act_import-creature">Import Creature</button>
-                    <button type="action" class="textbutton" name="act_import-peoplesquad">Import People/Squad</button>
+
+                    <div>
+                        <select name="attr_selecteddenizen">
+                            <optgroup label="BioTitan">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Bio-Titan</option>
+                                <option value="Scylla">Scylla</option>
+                                <option value="Typhon">Typhon</option>
+                            </optgroup>
+                            <optgroup label="Meld">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Meld</option>
+                                <option value="drone">Drone</option>
+                                <option value="droneswarm">Drone Swarm</option>
+                                <option value="nanoid">Nanoid</option>
+                                <option value="splitter">Splitter</option>
+                                <option value="behemoth">Behemoth</option>
+                            </optgroup>
+                            <optgroup label="Vehicles">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Vehicles</option>
+                                <option value="powerloader">Power Loader</option>
+                                <option value="boxwheel">Box Wheel</option>
+                                <option value="FightingBoxWheel">Fighting Box Wheel</option>
+                                <option value="MachineGunTurret">Machine Gun Turret</option>
+                                <option value="ArmouredBoxWheel">Armoured Box Wheel</option>
+                                <option value="Tank">Tank</option>
+                                <option value="Rotorcraft">Rotorcraft</option>
+                            </optgroup>
+                            <optgroup label="Drones">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Drones</option>
+                                <option value="DefacerDrone">Defacer Drone</option>
+                                <option value="SurveyDrone">Survey Drone</option>
+                                <option value="SalvoDrone">Salvo Drone</option>
+                                <option value="CombatDrone">Combat Drone</option>
+                                <option value="HeavyCombatDrone">Heavy Combat Drone</option>
+                                <option value="WalkerDrone">Walker Drone</option>
+                                <option value="PestDrone">Pest Drone</option>
+                                <option value="HoverDrone">Hover Drone</option>
+                                <option value="NeedleDrone">Needle Drone</option>
+                            </optgroup>
+                            <optgroup label="Creatures">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Creatures</option>
+                                <option value="scorpion" selected>Irradiated Scorpion</option>
+                                <option value="Artl">Artl</option>
+                                <option value="Chimeripede">Chimeripede</option>
+                                <option value="bear">Wasteland Bear</option>
+                                <option value="bird">Carrion Bird</option>
+                                <option value="Molebear">Molebear</option>
+                            </optgroup>
+                            <optgroup label="People">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; People</option>
+                                <option value="Wastelander">Wastelander</option>
+                                <option value="Raider">Raider</option>
+                                <option value="Trooper">Trooper</option>
+                                <option value="Veteran">Veteran</option>
+                                <option value="CombatPilot">Combat Pilot</option>
+                                <option value="Ace">Ace</option>
+                            </optgroup>
+                            <optgroup label="Squads">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Squads</option>
+                                <option value="WasterMob">Waster Mob</option>
+                                <option value="RaiderBand">Raider Band</option>
+                                <option value="RifleSquad">Rifle Squad</option>
+                                <option value="MachineGunSquad">Machine Gun Squad</option>
+                                <option value="MissileSquad">Missile Squad</option>
+                                <option value="EliteBladeSquad">Elite Blade Squad</option>
+                                <option value="WastelandHerd">Wasteland Herd</option>
+                                <option value="EliteBeamSquad">Elite Beam Squad</option>
+                                <option value="DroneSquadron">Drone Squadron</option>
+                            </optgroup>
+                        </select>
+                        <button type="action" class="textbutton" name="act_import-denizendropdown">Import Denizen</button>
+                    </div>
                 </details>
             </div>
         </details>
@@ -1386,144 +1454,1229 @@ on('clicked:import-biotitan-orangebox', async (ev) => {
     asw.setAttrs(biotitan);
 });
 
-on('clicked:import-vehicle', async (ev) => {
+on('clicked:import-denizendropdown', async (ev) => {
 
-    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+    let importKey = (await asw.getAttrs(['selecteddenizen']))['selecteddenizen']
+    let toImport = denizen[importKey];
 
-    if(!toImport.includes(".")) {
-        asw.setAttrs({
-		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
-	    });
-    }
+    await clearMechWeapons();
+    await clearTraits();
 
-    let vehicle = {};
+    toImport.weapons?.forEach(weapon => {
+        var row = "repeating_mechweapons_" + generateRowID() + "_";
+        creatureWeapon = {};
+        creatureWeapon[row + "name"] = weapon.name;
+        creatureWeapon[row + "range"] = weapon.range;
+        creatureWeapon[row + "damage"] = weapon.damage;
+        creatureWeapon[row + "traits"] = weapon.traits;
+        asw.setAttrs(creatureWeapon);
+    });
 
-    toImport = toImport.split('\n');
+    toImport.traits?.forEach(trait => {
+        var row = "repeating_traits_" + generateRowID() + "_";
+        creatureTrait = {};
+        creatureTrait[row + "name"] = trait.name;
+        creatureTrait[row + "details"] = trait.details;
+        asw.setAttrs(creatureTrait);
+    });
 
-    vehicle.scrapvalue = toImport.pop();
-    vehicle.techlevel = toImport.pop();
-
-    let traits = "";
-    while(!toImport[toImport.length-1].includes("SP")) {
-        traits = toImport.pop().trim() + " " + traits;
-    }
-    traits = traits.replaceAll("  ", " ").split("//");;
-    importTraits(traits, vehicle);
-
-    if(toImport[toImport.length-1].includes("SP")) {
-        vehicle.structure = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
-        vehicle.structure_max = vehicle.structure;
-    }
-
-    vehicle.character_name = toImport.pop().trim();
-
-    if(toImport[toImport.length-1].includes("//")) {
-        let rules = toImport.pop();
-        let weaponName = toImport.pop();
-
-        importMechWeapon(weaponName +"\n" + rules, vehicle);
-    }
-
-    while(!toImport[toImport.length-1].includes(".")) {
-        await importModuleSystem('traits', toImport.pop());
-    }
-
-    vehicle.typeDetails = toImport.map(s => s.trim()).join(' ');
-
-    vehicle["importerText"] ='Values imported'
-
-    asw.setAttrs(vehicle);
+    asw.setAttrs(toImport);
 });
 
-on('clicked:import-creature', async (ev) => {
+let Scylla = {
+    character_name: "Scylla",
+    health: 0,
+    health_max: 0,
+    structure: 39,
+    structure_max: 39,
+    scrapvalue: 39,
+    techlevel: "Bio-Titan",
+    typeDetails: "Titanic Actions \nScylla can take three Titanic Actions, choosing from the options below. Only one Titanic Action may be chosen at a time and only at the end of another Pilot’s or NPC’s turn. Scylla regains spent Titanic Actions at the start of their turn. \n• Scylla moves one Range Band. \n• Scylla makes a single Scythe Attack. This does not have the Multi-Attack Trait. \n• Scylla makes a Tail Sweep Attack (Costs 2 Titanic Actions).",
 
-    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+    weapons: [
+        {
+            name: "Scythe Attack",
+            range: "Close",
+            damage: "4 SP",
+            traits: "Melee // Multi-Attack (2)"
+        },
+        {
+            name: "Tail Sweep (Roll for each target)",
+            range: "Medium",
+            damage: "3 SP",
+            traits: "Melee // Targets hit are knocked Prone and gain the Vulnerable Trait."
+        }
+    ],
 
-    if(!toImport.includes(".")) {
-        asw.setAttrs({
-		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
-	    });
-    }
+    traits: [
+        {
+            name: "Ambush Predator",
+            details: "Passive\nUnless detected, Scylla always acts first in combat"
+        },
+        {
+            name: "Armour Plating x 3",
+            details: "Passive\nWhen Scylla takes damage they may remove a layer of Armour Plating as a Reaction and instead take no damage."
+        },
+        {
+            name: "Climb",
+            details: "Passive\nScylla can effortlessly climb over difficult and vertical terrain, rocky surfaces, and other obstacles."
+        },
+        {
+            name: "Tail Sweep",
+            details: "Turn Action // Melee\nScylla makes one giant sweeping attack with their tail. This hits every target within Medium Range, dealing 3 SP damage on a hit. Targets hit are knocked Prone and gain the Vulnerable Trait."
+        }
+    ]
+}
 
-    let creature = {};
-    creature.scrapvalue = 0;
-    creature.techlevel = 0;
+let Typhon = {
+    character_name: "Typhon",
+    health: 0,
+    health_max: 0,
+    structure: 67,
+    structure_max: 67,
+    scrapvalue: 67,
+    techlevel: "Bio-Titan",
+    typeDetails: "Titanic Actions\nTyphon can take three Titanic Actions, choosing from the options below. Only one Titanic Action may be chosen at a time and only at the end of another Pilot’s or NPC’s turn. Typhon regains spent Titanic Actions at the start of their turn.\n• Typhon uses their Burrower Ability to either burrow or unburrow.\n• Typhon moves one Range Band.\n• Typhon makes a Swallow Whole Attack (Costs three Titanic Actions).",
 
-    toImport = toImport.split('\n');
+    weapons: [
+        {
+            name: "Swallow Whole",
+            range: "Close",
+            damage: "See trait",
+            traits: "Melee"
+        }
+    ],
 
-    let traits = "";
-    while(!toImport[toImport.length-1].includes("HP")) {
-        traits = toImport.pop().trim() + " " + traits;
-    }
-    traits = traits.replaceAll("  ", " ");
-    importTraits(traits, creature);
+    traits: [
+        {
+            name: "Armour Plating x 2",
+            details: "Passive\nWhen Typhon takes damage they may remove a layer of Armour Plating as a Reaction and instead take no damage."
+        },
+        {
+            name: "Burrower",
+            details: "Passive\nTyphon can move freely on land and traverse underground through earth, even through the hardest of rock deposits. \nIt can burrow into the earth as a Turn Action and unburrow as a Free Action. Whilst burrowed, it cannot be seen or targeted by anything on the ground, but can be spotted via the huge amounts of earth it kicks up."
+        },
+        {
+            name: "Spiked Carapace",
+            details: "Passive\nWhen Typhon unborrows all targets within Close Range of the area it unburrows up to take 5 SP damage from its spiked carapace. \nIn addition, any target that attacks Typhon with an attack that has the Melee Trait takes 3 SP damage on a hit"
+        },
+        {
+            name: "Swallow Whole",
+            details: "Turn Action // Range: Close // Melee\nTyphon attempts to swallow a target into its humongous maw. Typhon may have multiple targets swallowed at once.\n\n20: The target is swallowed whole and entirely mulched in the jaws of Typhon. A Mech or Vehicle is destroyed, a creature is killed.\n11 - 19: Typhon swallows the target whole. The target takes 10 SP damage as it enters the Bio-Titan’s gullet. Whilst swallowed, the target takes 5 SP damage at the end of their turn, and cannot move. They can attempt to use a Turn Action to escape. If Typhon takes 25 or more SP damage in one round it will regurgitate whatever it has swallowed.\n6 - 10: Typhon chews through the target. A random System on the target is destroyed and the target takes 5 SP damage.\n2 - 5: Typhon misses the target.\n1: Typhon misses the target and its jaws become locked. It cannot use its Swallow Whole attack for one turn."
+        }
+    ]
+}
 
-    creature.health = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
-    creature.health_max = creature.health;
+let drone = {
+    character_name: "Meld Drone",
+    health: 3,
+    health_max: 3,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 1,
+    techlevel: "N",
+    typeDetails: "Meld when they take over a biological organism, around the size of a human. The brain is sludged, only the stem remains, they become a peon of the swarm.",
 
-    if(toImport[0].includes("Scorpion")) {
-        creature.character_name = toImport[0];
-        toImport = toImport.shift();
-    }
-    else {
-        creature.character_name = toImport.pop().trim();
-    }
+    weapons: [
+        {
+            name: "Bite",
+            range: "Close",
+            damage: "2 HP",
+            traits: "Melee // Meld Infection"
+        }
+    ]
+}
 
-    if(toImport[toImport.length-1].includes("//")) {
-        let rules = toImport.pop();
-        let weaponName = toImport.pop();
+let droneswarm = {
+    character_name: "Meld Drone Swarm",
+    health: 0,
+    health_max: 0,
+    structure: 3,
+    structure_max: 3,
+    scrapvalue: 1,
+    techlevel: "N",
+    typeDetails: "A swarm of multiple zombie-like Meld Drones",
 
-        importMechWeapon(weaponName +"\n" + rules, creature);
-    }
+    weapons: [
+        {
+            name: "Devour",
+            range: "Close",
+            damage: "2 HP",
+            traits: "Melee // Meld Infection // Multiattack (3)"
+        }
+    ],
+}
 
-    creature.typeDetails = toImport.map(s => s.trim()).join(' ');
+let nanoid = {
+    character_name: "Meld Drone",
+    health: 0,
+    health_max: 0,
+    structure: 5,
+    structure_max: 5,
+    scrapvalue: 5,
+    techlevel: "N",
+    typeDetails: "Meld in a small, swift form, about the size of a large wolf with lashing tendrils.",
 
-    creature["importerText"] = 'Values imported';
+    weapons: [
+        {
+            name: "Nanoid Tendrils",
+            range: "Close",
+            damage: "3 SP",
+            traits: "Melee // Meld Infection"
+        }
+    ],
+    traits: [
+        {
+            name: "Fast",
+            details: ""
+        }
+    ]
+}
 
-    asw.setAttrs(creature);
-});
+let splitter = {
+    character_name: "Meld Splitter",
+    health: 0,
+    health_max: 0,
+    structure: 10,
+    structure_max: 10,
+    scrapvalue: 10,
+    techlevel: "N",
+    typeDetails: "Formless inky darkness, Meld Splitters are around the height of a Mech and made of boundless swarms of coagulated meld.",
 
-on('clicked:import-peoplesquad', async (ev) => {
+    weapons: [
+        {
+            name: "Splitter Tendrils",
+            range: "Medium",
+            damage: "4 SP",
+            traits: "Melee // Meld Infection // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Split",
+            details: "When a Meld Splitter is reduced to 0 SP it turns into 2 Meld Nanoids. These act at the start of the next round"
+        }
+    ]
+}
 
-    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+let behemoth = {
+    character_name: "Behemoth (Titanic)",
+    health: 0,
+    health_max: 0,
+    structure: 60,
+    structure_max: 60,
+    scrapvalue: 60,
+    techlevel: "N",
+    typeDetails: "Titanic Actions \nThe Meld Behemoth can take three Titanic Actions, choosing from the options below. Only one Titanic Action may be chosen at a time and only at the end of another Pilot’s or NPC’s turn. Meld Behemoth regains spent Titanic Actions at the start of their turn. \n• The Meld Behemoth moves one Range Band. \n• The Meld Behemoth makes a single Behemoth Tendrils Attack. This does not have the Multi-Attack Trait. \n• The Meld Behemoth uses the Behemoth Assimilation Ability",
 
-    if(!toImport.includes(".")) {
-        asw.setAttrs({
-		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
-	    });
-    }
+    weapons: [
+        {
+            name: "Behemoth Tendrils",
+            range: "Medium",
+            damage: "6 SP",
+            traits: "Melee // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Assimilation",
+            details: "Passive \nA Meld Behemoth does not infect, instead it absorbs everything it destroys into its mammoth, ever expanding form. \nWhen the Meld Behemoth uses this Ability a target Mech or Vehicle in Close Range that is damaged or on 0 SP becomes assimilated into its bulk. \nThe Meld Behemoth gains an amount of SP equal to the target’s Max SP. If this would increase the Meld Behemoth’s current SP beyond its Max SP, increase its Max SP by that amount as well. For example, if the Meld Behemoth has 60 SP and gained 10 SP it would now have 70 SP with a Max SP of 70."
+        }
+    ]
+}
 
-    let people = {};
-    people.scrapvalue = 0;
-    people.techlevel = 0;
+let powerloader = {
+    character_name: "Power Loader",
+    health: 0,
+    health_max: 0,
+    structure: 1,
+    structure_max: 1,
+    scrapvalue: 1,
+    techlevel: "T1",
+    typeDetails: "A pneumatically powered heavy loader for moving cargo",
 
-    toImport = toImport.split('\n');
+    weapons: [
+        {
+            name: "Rigging Arm",
+            range: "Close",
+            damage: "1 SP",
+            traits: "Melee // Load"
+        }
+    ],
+    traits: [
+        {
+            name: "Locomotion System",
+        }
+    ]
+}
 
-    people.character_name = toImport.shift();
+let boxwheel = {
+    character_name: "Box Wheel",
+    health: 0,
+    health_max: 0,
+    structure: 1,
+    structure_max: 1,
+    scrapvalue: 1,
+    techlevel: "T1",
+    typeDetails: "A four seater box wheel vehicle designed for recreational driving. Not a lot of these nowadays.",
 
-    people.health = toImport.pop().replaceAll(/[a-zA-Z]/g, '').trim();
-    people.health_max = people.health;
+    traits: [
+        {
+            name: "Locomotion System",
+        },
+        {
+            name: "Personnel Capacity (4)",
+        },
+        {
+            name: "Wheeled",
+        },
+    ]
+}
 
-    let traits = "";
-    while(!toImport[toImport.length-1].includes("//")) {
-        traits = toImport.pop().trim() + "\n" + traits;
-    }
-    traits = traits.replaceAll("  ", " ").split("\n");;
-    importTraits(traits, people);
+let FightingBoxWheel = {
+    character_name: "Fighting Box Wheel",
+    health: 0,
+    health_max: 0,
+    structure: 2,
+    structure_max: 2,
+    scrapvalue: 2,
+    techlevel: "T1",
+    typeDetails: "An improvised fighting vehicle, modified to carry heavy weaponry",
 
-    if(toImport[toImport.length-1].includes("//")) {
-        let rules = toImport.pop();
-        let weaponName = toImport.pop();
+    weapons: [
+        {
+            name: ".50 Cal Machine Gun",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Ballistic // Jamming // Pinning"
+        }
+    ],
+    traits: [
+        {
+            name: "Locomotion System",
+        },
+        {
+            name: "Personnel Capacity (6)",
+        },
+        {
+            name: "Wheeled",
+        },
+    ]
+}
 
-        importMechWeapon(weaponName +"\n" + rules, people);
-    }
+let MachineGunTurret = {
+    character_name: "Machine Gun Turret",
+    health: 0,
+    health_max: 0,
+    structure: 2,
+    structure_max: 2,
+    scrapvalue: 2,
+    techlevel: "T1",
+    typeDetails: "A static gun emplacement",
 
-    people.typeDetails = toImport.map(s => s.trim()).join(' ');
+    weapons: [
+        {
+            name: ".50 Cal Machine Gun",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Ballistic // Jamming // Pinning"
+        }
+    ],
+    traits: [
+        {
+            name: "Immobile",
+        },
+    ]
+}
 
-    people["importerText"] = 'Values imported';
+let ArmouredBoxWheel = {
+    character_name: "Armoured Box Wheel",
+    health: 0,
+    health_max: 0,
+    structure: 4,
+    structure_max: 4,
+    scrapvalue: 3,
+    techlevel: "T2",
+    typeDetails: "An armoured, wheeled vehicle that carries personnel and provides fire support",
 
-    asw.setAttrs(people);
-});
+    weapons: [
+        {
+            name: "30mm Autocannon",
+            range: "Close",
+            damage: "4 SP",
+            traits: "Ballistic // Jamming"
+        }
+    ],
+    traits: [
+        {
+            name: "Locomotion System",
+        },
+        {
+            name: "Personnel Capacity (18)",
+        },
+        {
+            name: "Wheeled",
+        },
+    ]
+}
+
+let Tank = {
+    character_name: "Tank",
+    health: 0,
+    health_max: 0,
+    structure: 6,
+    structure_max: 6,
+    scrapvalue: 4,
+    techlevel: "T3",
+    typeDetails: "A conventional tracked, armoured battle vehicle",
+
+    weapons: [
+        {
+            name: "120mm Autocannon",
+            range: "Long",
+            damage: "6 SP",
+            traits: "Ballistic // Explosive (1)"
+        }
+    ],
+    traits: [
+        {
+            name: "Locomotion System",
+        },
+    ]
+}
+
+let Rotorcraft = {
+    character_name: "Rotorcraft",
+    health: 0,
+    health_max: 0,
+    structure: 3,
+    structure_max: 3,
+    scrapvalue: 3,
+    techlevel: "T4",
+    typeDetails: "A flying vehicle that can hover over terrain.",
+
+    weapons: [
+        {
+            name: "Rotary Mini Gun",
+            range: "Medium",
+            damage: "4 SP",
+            traits: "Ballistic // Hot (1) // Jamming // Multiattack (2) // Pinning"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let DefacerDrone = {
+    character_name: "Defacer Drone",
+    health: 0,
+    health_max: 0,
+    structure: 2,
+    structure_max: 2,
+    scrapvalue: 1,
+    techlevel: "T1",
+    typeDetails: "Used for salvaging and crowd control, their distinctive buzzsaw sound has struck fear into many protesters.",
+
+    weapons: [
+        {
+            name: "Chainsaw Arm",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Melee // Salvaging"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let SurveyDrone = {
+    character_name: "Survey Drone",
+    health: 0,
+    health_max: 0,
+    structure: 1,
+    structure_max: 1,
+    scrapvalue: 1,
+    techlevel: "T1",
+    typeDetails: "An unarmed drone used as a reconnaissance tool",
+
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+        {
+            name: "Survey Scanner",
+        },
+    ]
+}
+
+let SalvoDrone = {
+    character_name: "Salvo Drone",
+    health: 0,
+    health_max: 0,
+    structure: 3,
+    structure_max: 3,
+    scrapvalue: 2,
+    techlevel: "T1",
+    typeDetails: "A simple machine gun drone often used to defend areas of strategic importance.",
+
+    weapons: [
+        {
+            name: ".50 Cal Machine Gun",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Ballistic // Jamming // Pinning"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let CombatDrone = {
+    character_name: "Combat Drone",
+    health: 0,
+    health_max: 0,
+    structure: 4,
+    structure_max: 4,
+    scrapvalue: 2,
+    techlevel: "T2",
+    typeDetails: "A laser armed drone used in a defensive capacity",
+
+    weapons: [
+        {
+            name: "Red Laser",
+            range: "Medium",
+            damage: "3 SP",
+            traits: "Energy // Hot (1)"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let HeavyCombatDrone = {
+    character_name: "Heavy Combat Drone",
+    health: 0,
+    health_max: 0,
+    structure: 5,
+    structure_max: 5,
+    scrapvalue: 2,
+    techlevel: "T3",
+    typeDetails: "A heavily armoured drone designed for battlefield use",
+
+    weapons: [
+        {
+            name: "30mm Autocannon",
+            range: "Medium",
+            damage: "4 SP",
+            traits: "Ballistic // Jamming"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let WalkerDrone = {
+    character_name: "Walker Drone",
+    health: 0,
+    health_max: 0,
+    structure: 6,
+    structure_max: 6,
+    scrapvalue: 3,
+    techlevel: "T2",
+    typeDetails: "An anthropomorphic, Mech-like drone.",
+
+    weapons: [
+        {
+            name: "Green Laser",
+            range: "Medium",
+            damage: "4 SP",
+            traits: "Energy // Hot (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Locomotion System",
+        },
+        {
+            name: "Articulated Rigging Arm",
+        },
+    ]
+}
+
+let PestDrone = {
+    character_name: "Pest Drone",
+    health: 0,
+    health_max: 0,
+    structure: 4,
+    structure_max: 4,
+    scrapvalue: 3,
+    techlevel: "T3",
+    typeDetails: "A versatile multi-legged drone armed with a flamethrower for ‘industrial’ use",
+
+    weapons: [
+        {
+            name: "FM-3 Flamethrower",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Anti-Organic // Multi-Attack (2) // Overheat"
+        },
+        {
+            name: "FM-3 Flamethrower",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Anti-Organic // Multi-Attack (2) // Overheat"
+        }
+    ],
+    traits: [
+        {
+            name: "Spider Locomotion System",
+        },
+    ]
+}
+
+let HoverDrone = {
+    character_name: "Hover Drone",
+    health: 0,
+    health_max: 0,
+    structure: 4,
+    structure_max: 4,
+    scrapvalue: 3,
+    techlevel: "T4",
+    typeDetails: "A highly mobile missile platform used in offensive and defensive roles.",
+
+    weapons: [
+        {
+            name: "Missile Pod",
+            range: "Long",
+            damage: "8 SP",
+            traits: "Missile // Explosive (2) // Hot (1) // Uses (6)"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let NeedleDrone = {
+    character_name: "Needle Drone",
+    health: 0,
+    health_max: 0,
+    structure: 2,
+    structure_max: 2,
+    scrapvalue: 3,
+    techlevel: "T4",
+    typeDetails: "A miniaturised corpo stealth drone developed for black ops and wetwork",
+
+    weapons: [
+        {
+            name: "Needler",
+            range: "Close",
+            damage: "1 SP",
+            traits: "Poison // Deadly (Creatures Only)"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+        {
+            name: "Polycarbonate Stealth Chassis",
+            details: "The Needle Drone cannot be targeted with anything that uses the Targeter Trait such as targeting Modules. It also cannot be seen by anything with the Optics Trait or Scanner Trait. It does not appear on sensors, radar systems, or scanners and needs direct visual confirmation to be spotted"
+        },
+    ]
+}
+
+let scorpion = {
+    character_name: "Irradiated Scorpion",
+    health: 4,
+    health_max: 4,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Mutated beyond their usual size, they have been known to kill entire camps of wasters.",
+
+    weapons: [
+        {
+            name: "Stinger",
+            range: "Close",
+            damage: "2 HP",
+            traits: "Melee // Poison // Deadly (Creatures Only)"
+        }
+    ],
+}
+
+let Artl = {
+    character_name: "Artl",
+    health: 2,
+    health_max: 2,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Burrowing, ambush predators that liquify their prey for easier digestion.",
+
+    weapons: [
+        {
+            name: "Acid Spit",
+            range: "Medium",
+            damage: "2 HP",
+            traits: "Burn (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Corrosive Skin Glands",
+            details: "When hit by a melee attack, the attacker takes 2 HP damage."
+        }
+    ]
+}
+
+let Chimeripede = {
+    character_name: "Chimeripede",
+    health: 10,
+    health_max: 10,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A mutated, radiation scarred amalgamation of flesh.",
+
+    weapons: [
+        {
+            name: "Barbed Tentacles",
+            range: "Close",
+            damage: "3 HP",
+            traits: "Melee // Pinning // Poison // Multiattack (3)"
+        }
+    ],
+}
+
+let bear = {
+    character_name: "Wasteland Bear",
+    health: 5,
+    health_max: 5,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Large, hungry, and ferocious, these bears are not just after your picnic basket.",
+
+    weapons: [
+        {
+            name: "Bear Carnage",
+            range: "Close",
+            damage: "4 HP",
+            traits: "Melee"
+        }
+    ],
+}
+
+let bird = {
+    character_name: "Carrion Bird",
+    health: 3,
+    health_max: 3,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Large flying scavengers that feast on flesh and bone.",
+
+    weapons: [
+        {
+            name: "Talons",
+            range: "Close",
+            damage: "3 HP",
+            traits: ""
+        }
+    ],
+    traits: [
+        {
+            name: "Fly",
+            details: "Anything with this Trait can fly, allowing them to move in the air over obstacles and terrain. Anything attacking a target with this Trait treats it as though it is in Long Range unless it also has the Fly or Hover Trait"
+        }
+    ]
+}
+
+let Molebear = {
+    character_name: "Molebear",
+    health: 12,
+    health_max: 12,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Terrifying, huge burrowing predators known to rend through metal.",
+
+    weapons: [
+        {
+            name: "Iron Claw",
+            range: "Close",
+            damage: "4 SP",
+            traits: "Melee "
+        }
+    ],
+    traits: [
+        {
+            name: "Burrower",
+            details: "This Trait allows for movement underneath the ground. Something with this Trait can burrow into the ground as a Turn Action and unburrow as a Free Action. Whilst burrowed, it cannot be directly seen or targeted by anything on the ground, but may be spotted by other signs such as mounds of earth"
+        }
+    ]
+}
+
+let Wastelander = {
+    character_name: "Wastelander",
+    health: 2,
+    health_max: 2,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Represents the myriad of common denizens of the wastelands",
+
+    weapons: [
+        {
+            name: "Improvised Melee Weapon",
+            range: "Close",
+            damage: "2 HP",
+            traits: "Melee "
+        }
+    ],
+    traits: [
+        {
+            name: "Salvaging Tools",
+        }
+    ]
+}
+
+let Raider = {
+    character_name: "Raider",
+    health: 3,
+    health_max: 3,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Wastelanders who take what they need by force",
+
+    weapons: [
+        {
+            name: "Improvised Firearm",
+            range: "Close",
+            damage: "2 HP",
+            traits: "Ballistic // Unwieldy "
+        }
+    ],
+}
+
+let Trooper = {
+    character_name: "Trooper",
+    health: 5,
+    health_max: 5,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Combat trained troops deployed in a wide range of roles",
+
+    weapons: [
+        {
+            name: "Rifle",
+            range: "Medium",
+            damage: "5 HP",
+            traits: "Ballistic"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        }
+    ]
+}
+
+let Veteran = {
+    character_name: "Veteran",
+    health: 9,
+    health_max: 9,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A well trained and seasoned soldier deployed on difficult operations.",
+
+    weapons: [
+        {
+            name: "Green Laser Rifle",
+            range: "Medium",
+            damage: "5 HP",
+            traits: "Energy "
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        }
+    ]
+}
+
+let CombatPilot = {
+    character_name: "Combat Pilot",
+    health: 2,
+    health_max: 2,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A combat trained Mech Pilot, such as a Union Salvager.",
+
+    weapons: [
+        {
+            name: "Pistol",
+            range: "Close",
+            damage: "3 HP",
+            traits: "Ballistic "
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        }
+    ]
+}
+
+let Ace = {
+    character_name: "Ace",
+    health: 16,
+    health_max: 16,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A veteran Mech Pilot, usually with Corpo training.",
+
+    weapons: [
+        {
+            name: "Sniper Rifle",
+            range: "Long",
+            damage: "6 HP",
+            traits: "Ballistic "
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        }
+    ]
+}
+
+let WasterMob = {
+    character_name: "Waster Mob",
+    health: 4,
+    health_max: 4,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A mob of wastelanders with improvised weapons",
+
+    weapons: [
+        {
+            name: "Improvised Weapons",
+            range: "Close",
+            damage: "4 HP",
+            traits: "Melee // Multiattack (2) "
+        }
+    ],
+    traits: [
+        {
+            name: "Salvaging Tools",
+        }
+    ]
+}
+
+let RaiderBand = {
+    character_name: "Raider Band",
+    health: 6,
+    health_max: 6,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A band of raiders hungry for scrap.",
+
+    weapons: [
+        {
+            name: "Improvised Firearms",
+            range: "Close",
+            damage: "4 HP",
+            traits: "Ballistic // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "High Tensile Wire",
+        }
+    ]
+}
+
+let RifleSquad = {
+    character_name: "Rifle Squad",
+    health: 10,
+    health_max: 10,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A group of grunts armed with rifles.",
+
+    weapons: [
+        {
+            name: "Rifles",
+            range: "Close",
+            damage: "6 HP",
+            traits: "Ballistic // Jamming // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        }
+    ]
+}
+
+let MachineGunSquad = {
+    character_name: "Machine Gun Squad",
+    health: 10,
+    health_max: 10,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Combat trained troops armed with a mobile heavy machine gun.",
+
+    weapons: [
+        {
+            name: "Improvised Weapons",
+            range: "Close",
+            damage: "3 SP",
+            traits: "Ballistic // Jamming // Pinning // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        },
+        {
+            name: "First Aid Kit",
+        }
+    ]
+}
+
+let MissileSquad = {
+    character_name: "Missile Squad",
+    health: 10,
+    health_max: 10,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Combat trained troops armed with a mobile missile launcher.",
+
+    weapons: [
+        {
+            name: "Rocket Launcher",
+            range: "Long",
+            damage: "6 SP",
+            traits: "Missile // Explosive (1) // Multiattack (2) // Uses (3)"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        },
+        {
+            name: "First Aid Kit",
+        }
+    ]
+}
+
+let EliteBladeSquad = {
+    character_name: "Elite Blade Squad",
+    health: 20,
+    health_max: 20,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Heavy assault troops armed with energised blades",
+
+    weapons: [
+        {
+            name: "Monomolecular Katana",
+            range: "Close",
+            damage: "6 SP",
+            traits: "Melee // Deadly // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        },
+        {
+            name: "Electro Grappling Hook",
+        }
+    ]
+}
+
+let WastelandHerd = {
+    character_name: "Wasteland Herd",
+    health: 4,
+    health_max: 4,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A herd of wasteland creatures",
+
+    weapons: [
+        {
+            name: "Stampede",
+            range: "Close",
+            damage: "3 HP",
+            traits: "Melee // Multiattack (2) // Creatures hit by this attack are knocked prone"
+        }
+    ],
+}
+
+let EliteBeamSquad = {
+    character_name: "Elite Beam Squad",
+    health: 20,
+    health_max: 20,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Apex troops in heavy armour armed with a big ol’ gun",
+
+    weapons: [
+        {
+            name: "Beta Fission Gun",
+            range: "Long",
+            damage: "9 SP",
+            traits: "Burn (2) // Energy // Explosive (1) // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        },
+        {
+            name: "Night Vision Optics",
+        }
+    ]
+}
+
+let DroneSquadron = {
+    character_name: "Drone Squadron",
+    health: 0,
+    health_max: 0,
+    structure: 8,
+    structure_max: 8,
+    scrapvalue: 4,
+    techlevel: "T2",
+    typeDetails: "A swarm of Combat Drones flying in sync.",
+
+    weapons: [
+        {
+            name: "Red Laser",
+            range: "Medium",
+            damage: "4 SP",
+            traits: "Energy // Hot (1) // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        }
+    ]
+}
+
+let denizen = {
+    //biotitans
+    Scylla,
+    Typhon,
+
+    //meld
+    drone,
+    droneswarm,
+    nanoid,
+    splitter,
+    behemoth,
+
+    //vehicles
+    powerloader,
+    boxwheel,
+    FightingBoxWheel,
+    MachineGunTurret,
+    ArmouredBoxWheel,
+    Tank,
+    Rotorcraft,
+
+    //drones
+    DefacerDrone,
+    SurveyDrone,
+    SalvoDrone,
+    CombatDrone,
+    HeavyCombatDrone,
+    WalkerDrone,
+    PestDrone,
+    HoverDrone,
+    NeedleDrone,
+
+    //creatures
+    scorpion,
+    Artl,
+    Chimeripede,
+    bear,
+    bird,
+    Molebear,
+
+    //people
+    Wastelander,
+    Raider,
+    Trooper,
+    Veteran,
+    CombatPilot,
+    Ace,
+
+    //squads
+    WasterMob,
+    RaiderBand,
+    RifleSquad,
+    MachineGunSquad,
+    MissileSquad,
+    EliteBladeSquad,
+    WastelandHerd,
+    EliteBeamSquad,
+    DroneSquadron
+}
 
 ///////////////////////
 //  IMPORT HELPER  ////
@@ -1556,6 +2709,22 @@ const importWeapon = async (toImport, object, row) => {
     rules = importHeat(rules, object, row);
     importMechWeaponTraits(rules, object, row);
     importDetails(toImport, object, row);
+}
+
+const clearMechWeapons = async () => {
+    getSectionIDs("repeating_mechweapons", function(idarray) {
+        for(var i=0; i < idarray.length; i++) {
+            removeRepeatingRow("repeating_mechweapons_"+idarray[i]);
+        }
+    });
+}
+
+const clearTraits = async () => {
+    getSectionIDs("repeating_traits", function(idarray) {
+        for(var i=0; i < idarray.length; i++) {
+            removeRepeatingRow("repeating_traits_"+idarray[i]);
+        }
+    });
 }
 
 const importName = (toImport, object, row) => {
