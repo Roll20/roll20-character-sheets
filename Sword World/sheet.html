@@ -8,6 +8,11 @@
         name="act_page2">Page 2</button></div>
     <div class="tab-settings"><button type="action"
         name="act_settings">Settings</button></div>
+    <div class="roller">
+        <button type="roll" name="roll_roll" value="@{roll_action}" />
+        <button class="hidden" type="action" name="act_roll-action" />
+        <input type="hidden" name="attr_roll_action" value="">
+    </div>
 </div>
 
 <div class="grid col2-main page1">
@@ -143,7 +148,9 @@
                         <option value="dwarf">Dwarf</option>
                         <option value="tabbit">Tabbit</option>
                         <option value="runefolk">Runefolk</option>
-                        <option value="nightmare">Nightmare</option>
+                        <option value="nightmare_human">Nightmare (Human)</option>
+                        <option value="nightmare_elf">Nightmare (Elf)</option>
+                        <option value="nightmare_dwarf">Nightmare (Dwarf)</option>
                         <option value="lykant">Lykant</option>
                         <option value="lildraken">Lildraken</option>
                         <option value="grassrunner">Grassrunner</option>
@@ -926,6 +933,8 @@
 
                 <div class="grid col2 smrowgap">
                     <div class="boxstat total">
+                        <button class="input lrg" type="roll" name="roll_total_evasion"
+                            value="&{template:swskill} {{reroll=[Reroll](~total_evasion)}} {{name=@{character_name}}} {{skill=Evasion}} {{result=[[[[2d6]]+@{total_evasion}]]}} {{raw=$[[0]]}} {{result2=[[12+5+@{total_evasion}]]}}" />
                         <label>Total Evasion</label>
                         <input type="hidden" name="attr_other_evasion" value="0" />
                         <input type="hidden" name="attr_total_evasion" value="0" />
@@ -1336,7 +1345,15 @@
 
     const tab_list = ["page1","page2","settings"];
     const base_list = ["skill","body","mind"];
-    const ability_list = ["dexterity","agility","strength","vitality","intelligence","spirit"];
+    const ability_data = {
+        "dexterity": "Dexterity",
+        "agility": "Agility",
+        "strength": "Strength",
+        "vitality": "Vitality",
+        "intelligence": "Intelligence",
+        "spirit": "Spirit"
+    };
+    const ability_list = Object.keys(ability_data);
     const ability_modifier_list = ability_list.map(i => i + "_modifier");
     const correction_list = "abcdef".split("");
     const growth_list = "123456".split("");
@@ -1700,6 +1717,50 @@
         });
     });
 
+    on("clicked:roll-action", function(eventInfo) {
+        getAttrs(class_level_list.concat(ability_modifier_list), function(values) {
+            let class_roll = "?{Class";
+            class_list.forEach(c => {
+                let c_name = class_data[c];
+                let c_level = parseInt(values[`${c}_level`])||0;
+                class_roll += `|${c_name},${c_level}[${c}]`;
+            });
+            class_roll += "}";
+            let ability_roll = "?{Ability";
+            ability_list.forEach(a => {
+                let a_name = ability_data[a];
+                let a_mod = parseInt(values[`${a}_modifier`])||0;
+                ability_roll += `|${a_name},${a_mod}[${a}]`;
+            });
+            ability_roll += "}";
+            startRoll(`&{template:swskill} {{reroll=[Reroll](~roll)}} {{name=@{character_name}}} {{class=${class_roll}}} {{level=[[?{Class}]]}} {{ability=${ability_roll}}} {{modifier=[[?{Ability}]]}} {{target=[[?{Target Number|9}]]}} {{result=[[[[2d6]]+?{Class}+?{Ability}]]}} {{raw=$[[3]]}} {{result2=[[12+5+?{Class}+?{Ability}]]}}`, (results) => {
+                const raw = results.results.raw.result;
+                const level = results.results.level.result;
+                const mod = results.results.modifier.result;
+                let c_name = results.results.level.expression.slice(2, -1);
+                c_name = class_data[c_name];
+                let a_name = results.results.modifier.expression.slice(2, -1);
+                a_name = ability_data[a_name];
+                let computed = raw;
+                let computed2 = 17;
+                if (level > 0 ) {
+                    computed += level + mod;
+                    computed2 += level + mod;
+                }
+
+                finishRoll(
+                    results.rollId,
+                    {
+                        "result": computed,
+                        "result2": computed2,
+                        "level": c_name,
+                        "modifier": a_name
+                    }
+                );
+            });
+        });
+    });
+
     const powerb_list = [0,5,10,15,20,25,30,35,40,45,50].map(i => `power${i}`);
     powerb_list.forEach(trigger => {
         on(`clicked:${trigger}-action`, function(eventInfo) {
@@ -1833,7 +1894,8 @@
     ];
     const action_refs = ["power0_action","power5_action","power10_action",
         "power15_action","power20_action","power25_action","power30_action",
-        "power35_action","power40_action","power45_action","power50_action"]; // non-repeating buttons
+        "power35_action","power40_action","power45_action","power50_action",
+        "roll_action"]; // non-repeating buttons
     const actionCallUpdate = function() {
         getAllAttrs(["character_name", ...action_refs], repeating_sections, (attributes, sections) => {
             let actions = Object.keys(attributes).filter((key) => key !== "character_name");
@@ -1890,15 +1952,25 @@
             {{name}}
             {{#skillverb}}{{skillverb}}{{/skillverb}}
             {{^skillverb}}checks{{/skillverb}}
-            {{skill}}
+            {{#skill}}{{skill}}{{/skill}}
+            {{^skill}}{{computed::level}} + {{computed::modifier}}{{/skill}}
         </h1>
         {{#rollTotal() raw 12}}
             <p>
-                {{#result2}}{{result2}}{{/result2}}
-                {{^result2}}{{result}}{{/result2}}
+                {{#computed::result2}}{{computed::result2}}{{/computed::result2}}
+                {{^computed::result2}}
+                    {{#computed::result}}{{computed::result}}{{/computed::result}}
+                    {{^computed::result}}
+                        {{#result2}}{{result2}}{{/result2}}
+                        {{^result2}}{{result}}{{/result2}}
+                    {{/computed::result}}
+                {{/computed::result2}}
                 {{#target}} vs. {{target}}{{/target}}
             </p>
-            {{#result2}}<p class="success">Automatic Success!</p>{{/result2}}
+            {{#computed::result2}}<p class="success">Automatic Success!</p>{{/computed::result2}}
+            {{^computed::result2}}
+                {{#result2}}<p class="success">Automatic Success!</p>{{/result2}}
+            {{/computed::result2}}
         {{/rollTotal() raw 12}}
         {{#^rollTotal() raw 12}}
             {{#rollTotal() raw 2}}
@@ -1907,14 +1979,28 @@
                 <p class="fail">Gain 50 experience</p>
             {{/rollTotal() raw 2}}
             {{#^rollTotal() raw 2}}
-                <p>{{result}}{{#target}} vs. {{target}}{{/target}}</p>
+                <p>
+                    {{#computed::result}}{{computed::result}}{{/computed::result}}
+                    {{^computed::result}}{{result}}{{/computed::result}}
+                    {{#target}} vs. {{target}}{{/target}}
+                </p>
                 {{#target}}
-                    {{#rollLess() result target}}
-                        <p class="fail">Failure</p>
-                    {{/rollLess() result target}}
-                    {{#^rollLess() result target}}
-                        <p class="success">Success</p>
-                    {{/^rollLess() result target}}
+                    {{#computed::result}}
+                        {{#rollLess() computed::result target}}
+                            <p class="fail">Failure</p>
+                        {{/rollLess() computed::result target}}
+                        {{#^rollLess() computed::result target}}
+                            <p class="success">Success</p>
+                        {{/^rollLess() computed::result target}}
+                    {{/computed::result}}
+                    {{^computed::result}}
+                        {{#rollLess() result target}}
+                            <p class="fail">Failure</p>
+                        {{/rollLess() result target}}
+                        {{#^rollLess() result target}}
+                            <p class="success">Success</p>
+                        {{/^rollLess() result target}}
+                    {{/computed::result}}
                 {{/target}}
             {{/^rollTotal() raw 2}}
         {{/^rollTotal() raw 12}}
@@ -1924,6 +2010,7 @@
             {{damage}}
             {{reroll}}
         </div>
+        <p class="refmark">2d: {{raw}}</p>
     </div>
 </rolltemplate>
 
@@ -1968,7 +2055,7 @@
         <h1>
             {{name}}'s {{skill}}
         </h1>
-        <p>{{result}}</p>
+        <p>2d: {{result}}</p>
         <div class="powertable">
             <div />
             <div>2</div>
