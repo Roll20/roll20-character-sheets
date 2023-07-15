@@ -184,17 +184,18 @@ wiz1['Color Spray'] = {
     'school': 'Alteration',
     'range': '0',
     'duration': 'Instantaneous',
-    'aoe': '5 x 20 x 20 feet wedge',
+    'aoe': '5 x 20 foot wedge, 20 feet long',
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'Special',
     'materials': 'A pinch each of powder or sand that is colored red, yellow, and blue.',
     'reference': 'p. 172',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 154', //errata
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. From one to six creatures ([[1d6]]) within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.'
+    'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. These make a triangular plane, 5 feet wide at the caster’s end opening to 20 feet wide at the far end, which ends 20 feet from the caster.\n&emsp;From one to six creatures ([[1d6]]) within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.'
 };
 
 wiz1['Comprehend Languages'] = {
@@ -210,10 +211,11 @@ wiz1['Comprehend Languages'] = {
     'materials': 'A pinch of soot and a few grains of salt.',
     'reference': 'p. 172',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 161',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard is able to understand the spoken words of a creature or read an otherwise incomprehensible written message (such as writing in another language). In either case, the wizard must touch the creature or the writing. Note that the ability to read does not necessarily impart understanding of the material, nor does the spell enable the caster to speak or write an unknown language. Written material can be read at the rate of one page or equivalent per round. Magical writing cannot be read, other than to know it is magical, but the spell is often useful when deciphering treasure maps. This spell can be foiled by certain warding magic (the 3rd-level secret page and *illusionary script* spells), and it does not reveal messages concealed in otherwise normal text.\n&emsp;The reverse of this spell, *confuse languages*, cancels a *comprehend languages* spell or renders a writing or a creature’s speech incomprehensible, for the same duration as above.'
+    'effect': 'When this spell is cast, the wizard is able to understand the spoken words of a creature or read an otherwise incomprehensible written message (such as writing in another language). In either case, the wizard must touch the creature or the writing. Note that the ability to read does not necessarily impart understanding of the material, nor does the spell enable the caster to speak or write an unknown language. Written material can be read at the rate of one page or equivalent per round. Magical writing cannot be read, other than to know it is magical, but the spell is often useful when deciphering treasure maps. This spell can be foiled by certain warding magic (the 3rd-level *secret page* and *illusionary script* spells), and it does not reveal messages concealed in otherwise normal text.\n&emsp;The reverse of this spell, *confuse languages*, cancels a *comprehend languages* spell or renders a writing or a creature’s speech incomprehensible, for the same duration as above.'
 };
 
 wiz1['Dancing Lights'] = {
