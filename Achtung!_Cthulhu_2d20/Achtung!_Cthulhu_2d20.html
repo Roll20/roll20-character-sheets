@@ -62,42 +62,55 @@
     <div>
       <div class="nowrap">
         <label>Stress:</label>
-        <span style="
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-top: 3px;
-            padding-top: 3px;
-          ">Maximum:</span>
-        <input type="number" name="attr_stress_max" value="0" />
       </div>
-      <div style="width: fit-content">
-        <input name="attr_stress_1" type="checkbox" />
-        <input name="attr_stress_2" type="checkbox" />
-        <input name="attr_stress_3" type="checkbox" />
-        <input name="attr_stress_4" type="checkbox" />
-        <input name="attr_stress_5" type="checkbox" />
-        <input name="attr_stress_6" type="checkbox" />
-        <input name="attr_stress_7" type="checkbox" />
-        <input name="attr_stress_8" type="checkbox" />
-        <input name="attr_stress_9" type="checkbox" />
-        <input name="attr_stress_10" type="checkbox" />
+      <div class="f-row nowrap">
+        <span class="f1 stress_sublabel">Attributes:</span>
+        <span class="f1 stress_sublabel">Bonus:</span>
+        <span class="f1 stress_sublabel">Fatigue:</span>
+        <span class="f1 stress_sublabel">Maximum:</span>
       </div>
-      <div style="width: fit-content">
-        <input name="attr_stress_11" type="checkbox" />
-        <input name="attr_stress_12" type="checkbox" />
-        <input name="attr_stress_13" type="checkbox" />
-        <input name="attr_stress_14" type="checkbox" />
-        <input name="attr_stress_15" type="checkbox" />
-        <input name="attr_stress_16" type="checkbox" />
-        <input name="attr_stress_17" type="checkbox" />
-        <input name="attr_stress_18" type="checkbox" />
-        <input name="attr_stress_19" type="checkbox" />
-        <input name="attr_stress_20" type="checkbox" />
+      <div class="f-row nowrap">
+        <div class="f1">
+          <input type="number" id="attr_stress_attributes" name="attr_stress_attributes" value="0" />
+        </div>
+        <div class="f1">
+          <input type="number" id="attr_stress_bonus" name="attr_stress_bonus" value="0" />
+        </div>
+        <div class="f1">
+          <input type="number" id="attr_stress_fatigue" name="attr_stress_fatigue" value="0" />
+        </div>
+        <div class="f1">
+          <input type="number" id="attr_stress_total" name="attr_stress_total"  value="0" />
+        </div>
+      </div>
+      <div class="stress_box_row">
+        <input name="attr_stress_1" id="attr_stress_1" type="checkbox" />
+        <input name="attr_stress_2" id="attr_stress_2" type="checkbox" />
+        <input name="attr_stress_3" id="attr_stress_3" type="checkbox" />
+        <input name="attr_stress_4" id="attr_stress_4" type="checkbox" />
+        <input name="attr_stress_5" id="attr_stress_5" type="checkbox" />
+        <input name="attr_stress_6" id="attr_stress_6" type="checkbox" />
+        <input name="attr_stress_7" id="attr_stress_7" type="checkbox" />
+        <input name="attr_stress_8" id="attr_stress_8" type="checkbox" />
+        <input name="attr_stress_9" id="attr_stress_9" type="checkbox" />
+        <input name="attr_stress_10" id="attr_stress_10" type="checkbox" />
+      </div>
+      <div class="stress_box_row">
+        <input name="attr_stress_11" id="attr_stress_11" type="checkbox" />
+        <input name="attr_stress_12" id="attr_stress_12" type="checkbox" />
+        <input name="attr_stress_13" id="attr_stress_13" type="checkbox" />
+        <input name="attr_stress_14" id="attr_stress_14" type="checkbox" />
+        <input name="attr_stress_15" id="attr_stress_15" type="checkbox" />
+        <input name="attr_stress_16" id="attr_stress_16" type="checkbox" />
+        <input name="attr_stress_17" id="attr_stress_17" type="checkbox" />
+        <input name="attr_stress_18" id="attr_stress_18" type="checkbox" />
+        <input name="attr_stress_19" id="attr_stress_19" type="checkbox" />
+        <input name="attr_stress_20" id="attr_stress_20" type="checkbox" />
       </div>
     </div>
     <div>
       <label>Languages:</label>
-      <textarea name="attr_lnaguages"></textarea>
+      <textarea style="margin-top: 3px;" name="attr_lnaguages"></textarea>
     </div>
   </section>
 
@@ -887,6 +900,64 @@
 
   const int = score => parseInt(score, 10) || 0;
 
+  const hideShowSpellTradition = () => {
+    getAttrs(["spell_skill"], function(values) {
+      let skill = parseInt(values.spell_skill)||"";
+
+      $20("#NoTradition").removeClass("show_element").addClass("hide_element");
+      $20("#YesTradition").removeClass("show_element").addClass("hide_element");;
+
+      if (values.spell_skill == "Traditional")
+        $20("#YesTradition").removeClass("hide_element").addClass("show_element");
+      else
+        $20("#NoTradition").removeClass("hide_element").addClass("show_element");
+  
+    });
+  };
+
+  const calcualteStressValues = () => {
+    getAttrs(["brawn","will","skill_resilience","stress_bonus","stress_fatigue"], function(values) {
+      debugger
+      let brawn = parseInt(values.brawn)||0;
+      let will = parseInt(values.will)||0;
+      let resilience = parseInt(values.skill_resilience)||0;
+      let bonus = parseInt(values.stress_bonus)||0;
+      let fatigue = parseInt(values.stress_fatigue)||0;
+      let stress_brawn = brawn + resilience;
+      let stress_will = will + resilience;
+      let stress_attributes = stress_brawn >= stress_will ? stress_brawn: stress_will;
+      let stress_total = stress_attributes + bonus - fatigue;
+      setAttrs({                            
+        "stress_attributes": stress_attributes,
+        "stress_total": stress_total
+      });
+
+      for (let i = 1; i < 21; i++) {
+        $20("#attr_stress_" + i).removeClass("disableStressBox");
+        if (i > stress_total)
+          $20("#attr_stress_" + i).addClass("disableStressBox");
+      }
+    });
+  };
+
+
+<!-- Add on change or onclick events -->
+
+  on("change:spell_skill", function() {  
+    hideShowSpellTradition();
+  });
+
+  const buttonlist = ["main_char","equipment","spells","settings"];
+  buttonlist.forEach(button => {
+      on(`clicked:${button}`, function() {
+      $20(".tab_button_selected").removeClass('tab_button_selected');
+      $20("#act_" + button).addClass('tab_button_selected');
+      setAttrs({
+        sheetTab: button
+      });
+    });
+  });
+
   const stats = ["agility", "brawn", "coordination", "insight", "reason", "will"];
   stats.forEach(stat => {
     on(`change:${stat}`, () => {
@@ -906,49 +977,11 @@
       });
   });
 
-  on("change:brawn change:will change:skill_resilience", function() {  
-    getAttrs(["brawn","will","skill_resilience"], function(values) {
-      let brawn = parseInt(values.brawn)||0;
-      let will = parseInt(values.will)||0;
-      let resilience = parseInt(values.skill_resilience)||0;
-      let stress_brawn = brawn + resilience;
-      let stress_will = will + resilience;
-      let stress_total = stress_brawn >= stress_will ? stress_brawn: stress_will;
-      setAttrs({                            
-        "stress_max": stress_total
-      });
-    });
+  on("change:brawn change:will change:skill_resilience change:stress_bonus change:stress_fatigue", function() {  
+    calcualteStressValues();
   });
 
-  const hideShowSpellTradition = () => {
-    getAttrs(["spell_skill"], function(values) {
-      let skill = parseInt(values.spell_skill)||"";
-
-      $20("#NoTradition").removeClass("show_element").addClass("hide_element");
-      $20("#YesTradition").removeClass("show_element").addClass("hide_element");;
-
-      if (values.spell_skill == "Traditional")
-        $20("#YesTradition").removeClass("hide_element").addClass("show_element");
-      else
-        $20("#NoTradition").removeClass("hide_element").addClass("show_element");
-  
-      });
-  };
-
-  on("change:spell_skill", function() {  
-    hideShowSpellTradition();
-  });
-
-  const buttonlist = ["main_char","equipment","spells","settings"];
-  buttonlist.forEach(button => {
-      on(`clicked:${button}`, function() {
-      $20(".tab_button_selected").removeClass('tab_button_selected');
-      $20("#act_" + button).addClass('tab_button_selected');
-      setAttrs({
-        sheetTab: button
-      });
-    });
-  });
+  <!-- Some stuff to run everytime the sheet opens -->
 
   on('sheet:opened',function(){
   	$20("#act_main_char").addClass('tab_button_selected');
@@ -956,6 +989,7 @@
   		sheetTab: "main_char"
   	});
     hideShowSpellTradition();
+    calcualteStressValues();
   });
 
 
