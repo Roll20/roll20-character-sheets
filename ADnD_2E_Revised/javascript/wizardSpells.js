@@ -15,16 +15,17 @@ wiz1['Affect Normal Fires'] = {
     'materials': 'Open fire or flame.',
     'reference': 'p. 170',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 25',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the wizard to cause nonmagical fires—from as small as a torch or lantern to as large as the area of effect—to reduce in size and brightness to become mere coals or increase in light to become as bright as full daylight and increase the illumination to double the normal radius. Note that this does not affect either fuel consumption or damage caused by the fire. The caster can affect any or all fires in the spell’s area. He can alter their intensities with a single gesture as long as the spell is in effect. The spell lasts until the caster cancels it, all fuel is burned, or the duration expires. The caster can also extinguish all flames in the area, which expends the spell immediately. The spell does not affect fire elementals or similar creatures.'
+    'effect': 'This spell enables the wizard to cause nonmagical fires—from as small as a torch or lantern to as large as the area of effect—to reduce in size and brightness to become mere coals or increase in light to become as bright as full daylight and increase the illumination to double the normal radius. Note that this does not affect either fuel consumption or damage caused by the fire.\n&emsp;The caster can affect any or all fires in the spell’s area. He can alter their intensities with a single gesture as long as the spell is in effect. The spell lasts until the caster cancels it, all fuel is burned, or the duration expires. The caster can also extinguish all flames in the area, which expends the spell immediately. The spell does not affect fire elementals or similar creatures.'
 };
 
 wiz1['Alarm'] = {
     'level': '1',
     'school': 'Abjuration, Evocation',
-    'school-spells-and-magic': 'Abjuration, Invocation/Evocation, Geometry',
+    'school-spells-and-magic': 'Abjuration, Evocation, Geometry',
     'range': '10 yards',
     'duration': '[[4+(0.5*[[@{level-wizard}]])]] hours',
     'aoe': 'Up tp 20-foot cube',
@@ -34,18 +35,19 @@ wiz1['Alarm'] = {
     'materials': 'A tiny bell and a piece of very fine silver wire.',
     'reference': 'p. 170',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 32',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When an *alarm* spell is cast, the wizard causes a selected area to react to the presence of any creature larger than a normal rat—anything larger than about 1 ⁄ 2 cubic foot in volume or more than about three pounds in weight. The area of effect can be a portal, a section of floor, stairs, etc. As soon as any creature enters the warded area, touches it, or otherwise contacts it without speaking a password established by the caster, the *alarm* spell lets out a loud ringing that can be heard clearly within a 60-foot radius. (Reduce the radius by 10 feet for each interposing door and by 20 feet for each substantial interposing wall.) The sound lasts for one round and then ceases. Ethereal or astrally projected creatures do not trigger an alarm, but flying or levitating creatures, invisible creatures, or incorporeal or gaseous creatures do. The caster can dismiss the alarm with a single word.'
+    'effect': 'When an *alarm* spell is cast, the wizard causes a selected area to react to the presence of any creature larger than a normal rat—anything larger than about ½ cubic foot in volume or more than about three pounds in weight. The area of effect can be a portal, a section of floor, stairs, etc. As soon as any creature enters the warded area, touches it, or otherwise contacts it without speaking a password established by the caster, the *alarm* spell lets out a loud ringing that can be heard clearly within a 60-foot radius. (Reduce the radius by 10 feet for each interposing door and by 20 feet for each substantial interposing wall.) The sound lasts for one round and then ceases. Ethereal or astrally projected creatures do not trigger an alarm, but flying or levitating creatures, invisible creatures, or incorporeal or gaseous creatures do. The caster can dismiss the alarm with a single word.'
 };
 
 wiz1['Armor'] = {
     'level': '1',
     'school': 'Conjuration',
-    'school-spells-and-magic': 'Conjuration/Summoning, Force',
+    'school-spells-and-magic': 'Conjuration, Force',
     'range': 'Touch',
-    'duration': 'Special',
+    'duration': 'Until destroyed by damage',
     'aoe': '1 creature',
     'components': 'V, S, M',
     'cast-time': '1 round',
@@ -53,10 +55,11 @@ wiz1['Armor'] = {
     'materials': 'A piece of finely cured leather that has been blessed by a priest.',
     'reference': 'p. 170',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 55',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wizard creates a magical field of force that serves as if it were scale mail armor (AC 6). The spell has no effect on a person already armored or a creature with Armor Class 6 or better. It is not cumulative with the *shield* spell, but it is cumulative with Dexterity and, in case of fighter/mages, with the shield bonus. The *armor* spell does not hinder movement or prevent spellcasting, and adds no weight or encumbrance. It lasts until successfully dispelled or until the wearer sustains cumulative damage totaling greater than 8 points + 1 per level of the caster ([[8+[[@{level-wizard}]] ]] points). (It is important to note that the armor does *not* absorb this damage. The armor merely grants an AC of 6; the wearer still suffers full damage from any successful attacks.) Thus, the wearer might suffer 8 points from an attack, then several minutes later sustain an additional 1 point of damage. Unless the spell were cast by a wizard of 2nd level or higher, it would be dispelled at this time. Until it is dispelled, the *armor* spell grants the wearer full benefits of the Armor Class gained.'
+    'effect': 'By means of this spell, the wizard creates a magical field of force that serves as if it were scale mail armor (AC 6). The spell has no effect on a person already armored or a creature with Armor Class 6 or better. It is not cumulative with the *shield* spell, but it is cumulative with Dexterity and, in case of fighter/mages, with the shield bonus. The *armor* spell does not hinder movement or prevent spellcasting, and adds no weight or encumbrance. It lasts until successfully dispelled or until the wearer sustains cumulative damage totaling greater than 8 points + 1 per level of the caster. Currently [[8+[[@{level-wizard}]] ]] points of damage. (It is important to note that the armor does *not* absorb this damage. The armor merely grants an AC of 6; the wearer still suffers full damage from any successful attacks.) Thus, the wearer might suffer 8 points from an attack, then several minutes later sustain an additional 1 point of damage. Unless the spell were cast by a wizard of 2nd level or higher, it would be dispelled at this time. Until it is dispelled, the *armor* spell grants the wearer full benefits of the Armor Class gained.'
 };
 
 wiz1['Audible Glamer'] = {
@@ -72,10 +75,11 @@ wiz1['Audible Glamer'] = {
     'materials': 'A bit of wool or a small lump of wax.',
     'reference': 'p. 170',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 59',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the *audible glamer* spell is cast, the wizard causes a volume of sound to arise, at whatever distance he desires (within range), and seem to recede, approach, or remain at a fixed place as desired. The volume of sound created, however, is directly related to the level of the spellcaster. The noise of the *audible glamer* is that of 4 men per level of the caster. Current noise is [[4*[[@{level-wizard}]] ]] men. Thus, talking, singing, shouting, walking, marching, or running sounds can be created. The auditory illusion created by an *audible glamer* spell can be virtually any type of sound, but the relative volume must be commensurate with the level of the wizard casting the spell. A horde of rats running and squeaking is about the same volume as eight men running and shouting. A roaring lion is equal to the noise volume of 16 men, while a roaring dragon is equal to the noise volume of no fewer than 24 men.\n&emsp;A character stating that he does not believe the sound receives a saving throw, and if it succeeds, the character then hears a faint and obviously false sound, emanating from the caster’s direction. Note that this spell can enhance the effectiveness of the *phantasmal force* spell.'
+    'effect': 'When the *audible glamer* spell is cast, the wizard causes a volume of sound to arise, at whatever distance he desires (within range), and seem to recede, approach, or remain at a fixed place as desired. The volume of sound created, however, is directly related to the level of the spellcaster. The volume is based upon the lowest level at which the spell can be cast, 1st level. The noise of the *audible glamer* at this level is that of four men, maximum. Each additional experience level of the wizard adds a like volume, so that at 2nd level the wizard can have the spell cause sound equal to that of eight men. Current noise is that of [[4*[[@{level-wizard}]] ]] men, maximum. Thus, talking, singing, shouting, walking, marching, or running sounds can be created. The auditory illusion created by an *audible glamer* spell can be virtually any type of sound, but the relative volume must be commensurate with the level of the wizard casting the spell. A horde of rats running and squeaking is about the same volume as eight men running and shouting. A roaring lion is equal to the noise volume of 16 men, while a roaring dragon is equal to the noise volume of no fewer than 24 men.\n&emsp;A character stating that he does not believe the sound receives a saving throw, and if it succeeds, the character then hears a faint and obviously false sound, emanating from the caster’s direction. Note that this spell can enhance the effectiveness of the *phantasmal force* spell.'
 };
 wiz1['Burning Hands'] = {
     'level': '1',
@@ -90,10 +94,11 @@ wiz1['Burning Hands'] = {
     'materials': '',
     'reference': 'p. 170',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 113',
     'damage': '[[1d3+([[{2*[[@{level-wizard}]], 20}kl1]])]]',
     'damage-type': 'Fire',
     'healing': '',
-    'effect': 'When the wizard casts this spell, a jet of searing flame shoots from his fingertips. His hands must be held so as to send forth a fanlike sheet of flames: The wizard’s thumbs must touch each other and the fingers must be spread. The burning hands send out flame jets 5 feet long in a horizontal arc of about 120 degrees in front of the wizard. Any creature in the area of the flames suffers 1d3 points of damage, plus 2 points for each level of experience of the spellcaster, to a maximum of 1d3+20 points of fire damage. Those successfully saving vs. spell receive half damage. Flammable materials touched by the fire burn (for example, cloth, paper, parchment, thin wood, etc.). Such materials can be extinguished in the next round if no other action is taken.'
+    'effect': 'When the wizard casts this spell, a jet of searing flame shoots from his fingertips. His hands must be held so as to send forth a fanlike sheet of flames: The wizard’s thumbs must touch each other and the fingers must be spread. The *burning hands* send out flame jets 5 feet long in a horizontal arc of about 120 degrees in front of the wizard. Any creature in the area of the flames suffers 1d3 points of damage, plus 2 points for each level of experience of the spellcaster, to a maximum of 1d3+20 points of fire damage. Those successfully saving vs. spell receive half damage. Flammable materials touched by the fire burn (for example, cloth, paper, parchment, thin wood, etc.). Such materials can be extinguished in the next round if no other action is taken.'
 };
 wiz1['Cantrip'] = {
     'level': '1',
@@ -108,6 +113,7 @@ wiz1['Cantrip'] = {
     'materials': '',
     'reference': 'p. 171',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 123',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -125,6 +131,7 @@ wiz1['Change Self'] = {
     'materials': '',
     'reference': 'p. 171',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 131',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -144,6 +151,7 @@ wiz1['Charm Person'] = {
     'materials': '',
     'reference': 'p. 171',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 137',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -163,10 +171,12 @@ wiz1['Chill Touch'] = {
     'materials': '',
     'reference': 'p. 172',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 139',
+    'errata': 'Sage Advice #266 p. 20',
     'damage': '[[1d4]]',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the caster completes this spell, a blue glow encompasses his hand. This energy attacks the life force of any living creature upon which the wizard makes a successful melee attack. The touched creature must roll a successful saving throw vs. spell or suffer 1d4 points of damage and lose 1 point of Strength. If the save is successful, the creature remains unharmed. Creatures not rated for Strength suffer a –1 penalty to their attack rolls for every other successful touch. Lost Strength returns at the rate of 1 point per hour. Damage must be cured magically or healed naturally.\n&emsp;This spell has a special effect on undead creatures. Undead touched by the caster suffer no damage or Strength loss, but they must successfully save vs. spell or flee for 1d4 rounds + 1 round per level of the caster.'
+    'effect': 'When the caster completes this spell, a blue glow encompasses his hand. This energy attacks the life force of any living creature upon which the wizard makes a successful melee attack. The caster can make one touch attack each round the *chill touch* spell lasts. The touched creature must roll a successful saving throw vs. spell or suffer 1d4 points of damage and lose 1 point of Strength. If the save is successful, the creature remains unharmed. Creatures not rated for Strength suffer a –1 penalty to their attack rolls for every other successful touch. Lost Strength returns at the rate of 1 point per hour. Damage must be cured magically or healed naturally.\n&emsp;This spell has a special effect on undead creatures. Undead touched by the caster suffer no damage or Strength loss, but they must successfully save vs. spell or flee for 1d4 rounds + 1 round per level of the caster. Currently flee for 1d4+[[@{level-wizard}]] rounds.'
 };
 
 wiz1['Color Spray'] = {

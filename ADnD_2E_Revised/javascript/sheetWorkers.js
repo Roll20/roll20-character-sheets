@@ -985,9 +985,10 @@ function parseSpheres(spheresStrings, regex) {
 
 const getSpellSchools = function (spell, books) {
     let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
-    return schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
-        ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
-        : spell['school'];
+    return spell['school'] + `%NEWLINE%(${spell[SCHOOL_SPELLS_AND_MAGIC]})`;
+    // return schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
+    //     ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
+    //     : spell['school'];
 }
 
 const getSpellSpheres = function (spell, sphereRules) {
@@ -1204,7 +1205,7 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
                 [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
                 [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
                 [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-                [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
+                [`repeating_spells-${section}_spell-reference`]    : displayReference(spell),
                 [`repeating_spells-${section}_spell-subtlety`]     : spell['subtlety'] || '',
                 [`repeating_spells-${section}_spell-sensory`]      : spell['sensory'] || '',
                 [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
@@ -1260,6 +1261,17 @@ const displaySpellLevel = function(level, className) {
     return level === 'q'
         ? 'Quest Spell Priest'
         : `Level ${level} ${className}`;
+}
+
+const displayReference = function(spell) {
+    let reference = `${spell['book']} ${spell['reference']}`
+    if (spell['book-compendium'])
+        reference += `\n${spell['book-compendium']}`;
+
+    if (spell['errata'])
+        reference += `\n${spell['errata']}`;
+
+    return reference;
 }
 
 // --- Start setup Spell Slots --- //
