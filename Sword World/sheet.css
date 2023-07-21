@@ -84,6 +84,7 @@ body .charsheet div .grid input[type=number].lrg,
 .charsheet select.lrg,
 .input.lrg  {
     font-size: 20px;
+    min-height: 30px;
 }
 
 body .charsheet select {
@@ -176,6 +177,12 @@ body .charsheet select {
 .col3-accdmg {
     grid-template-columns: 5fr 9fr 219px;
 }
+.col3-title {
+    grid-template-columns: 1fr 8fr 3fr;
+}
+.repeating_monsterloot ~ .repcontainer .repitem {
+    grid-template-columns: 2fr 7fr 1fr;
+}
 .col4 {
     grid-template-columns: repeat(4, 1fr);
 }
@@ -186,6 +193,12 @@ body .charsheet select {
 .repeating_armor ~ .repcontainer .repitem {
     grid-template-columns: 5fr 1fr 1fr 1fr;
 }
+.col4-stats2 {
+    grid-template-columns: 2fr 13fr 1fr 7fr;
+}
+.col4-sections {
+    grid-template-columns: 1fr 8fr 2fr 5fr;
+}
 .col5 {
     grid-template-columns: repeat(5, 1fr);
 }
@@ -195,11 +208,27 @@ body .charsheet select {
 .col6 {
     grid-template-columns: repeat(6, 1fr);
 }
+.col6-stats3 {
+    grid-template-columns: 1fr 2fr 1fr 2fr 2fr 12fr;
+}
 .col7 {
     grid-template-columns: repeat(7, 1fr);
 }
+.col7-sections,
+.repeating_monstersections ~ .repcontainer .repitem {
+    grid-template-columns: 3fr 2fr 2fr 2fr 1fr 2fr 2fr;
+}
+.col8 {
+    grid-template-columns: repeat(8, 1fr);
+}
 .col8-initmove {
     grid-template-columns: 3fr 3fr 3fr 3fr 2fr 73px 73px 73px;
+}
+.col8-stats1 {
+    grid-template-columns: 3fr 3fr 3fr 6fr 3fr 3fr 2fr 1fr;
+}
+.col8-stats4 {
+    grid-template-columns: 1fr 1fr 2fr 2fr 1fr 2fr 1fr 2fr;
 }
 .col13,
 .repeating_powertable ~ .repcontainer .repitem {
@@ -236,6 +265,59 @@ body .charsheet select {
 .vcol {
     grid-template-rows: 20px auto;
     grid-auto-flow: column;
+}
+
+/* slider */
+body .charsheet div .switch {
+    background: none;
+    border: none;
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 5px;
+    right: 0;
+    bottom: 0;
+    background-color: darkgray;
+    border-radius: 20px;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+.slider:before {
+    position: absolute;
+    content: '';
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+input:checked + .slider {
+    background-color: black;
+}
+.injury + .switch input:checked + .slider {
+    background-color: black;
+}
+input:focus + .slider {
+    border: solid 1px gold;
+}
+input:checked + .slider:before {
+    -webkit-transform: translateX(16px);
+    -ms-transform: translateX(16px);
+    transform: translateX(16px);
 }
 
 /* autoexpand */
@@ -280,6 +362,10 @@ body .charsheet select {
 .auto-expand.lrg span,
 .auto-expand.lrg textarea {
     font-size: 20px;
+}
+
+.col2-header .auto-expand textarea {
+    border-bottom: solid 1px black;
 }
 
 /* radio stuff */
@@ -398,49 +484,74 @@ body .charsheet select {
 }
 .toggle-tabs[value='page1'] ~ .tabs div.tab-page1 button,
 .toggle-tabs[value='page2'] ~ .tabs div.tab-page2 button,
+.toggle-tabs[value='monster'] ~ .tabs div.tab-monster button,
 .toggle-tabs[value='settings'] ~ .tabs div.tab-settings button {
     background: darkgray;
     color: white;
 }
+
+.charactersheet .toggle-monster[value='1'] ~ .tabs div.tab-page1,
+.charactersheet .toggle-monster[value='1'] ~ .tabs div.tab-page2,
+.charactersheet .toggle-monster:not([value='1']) ~ .tabs div.tab-monster {
+    display: none;
+}
+
 body .charactersheet .page1,
 body .charactersheet .page2,
+body .charactersheet .monster,
 body .charactersheet .settings {
     display: none;
 }
 body .charactersheet .page1:after,
 body .charactersheet .page2:after,
+body .charactersheet .monster:after,
 body .charactersheet .settings:after {
-    content: 'Sword World 2.5 Character Sheet Ver.0.13 | https://app.roll20.net/users/2699740/robert-b';
+    content: 'Sword World 2.5 Character Sheet Ver.0.14 | https://app.roll20.net/users/2699740/robert-b';
     text-align: right;
     font-size: 8px;
 }
 body .charactersheet .page1:after {
     grid-column: span 2;
 }
+body .charactersheet .settings:after {
+    grid-column: span 4;
+}
 body .toggle-tabs[value='page1'] ~ div.page1,
 body .toggle-tabs[value='page2'] ~ div.page2,
+body .toggle-tabs[value='monster'] ~ div.monster,
 body .toggle-tabs[value='settings'] ~ div.settings {
     display: grid;
+}
+.charactersheet .toggle-monster[value='1'] ~ .tabs .roller {
+    display: none;
 }
 body .charsheet .tabs .roller {
     flex: 1;
     text-align: right;
 }
-body .charsheet .tabs .roller button {
+body .charsheet .tabs .roller button,
+body .charsheet .monster div:not(.repcontrol) > button {
     background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+body .charsheet .tabs .roller button {
     border-left: solid 1px black;
     border-right: solid 1px black;
-    border-radius: 0;
     padding: 0 5px;
-    margin: 0;
     height: 100%;
 }
-body .charsheet .tabs .roller button:before {
+body .charsheet .tabs .roller button:before,
+body .charsheet .monster div:not(.repcontrol) > button:before {
     content: 'F';
     font-family: 'dicefontd6';
     color: black;
 }
-body .charsheet .tabs .roller button:hover:before {
+body .charsheet .tabs .roller button:hover:before,
+body .charsheet .monster div:not(.repcontrol) > button:hover:before {
     color: gold;
 }
 /* end tabs */
@@ -527,7 +638,7 @@ body .charsheet .col2-failures > label {
     place-content: center;
 }
 
-body .charsheet .grid.lined .grid > *,
+body .charsheet .grid.lined > .grid > *,
 body .charsheet .grid.lined .repcontainer .repitem > div {
     outline: solid 1px black;
     box-sizing: border-box;
@@ -545,14 +656,14 @@ body .charsheet .grid.lined.single > *:not(.repcontrol):nth-child(2) {
 body .charsheet .grid.lined.single > *:nth-last-child(2) {
     border-bottom: solid 1px black;
 }
-body .charsheet .grid.lined.single .grid > *,
+body .charsheet .grid.lined.single > .grid > *,
 body .charsheet .grid.lined.single .repcontainer .repitem > div {
     outline: none;
 }
-body .charsheet .grid.lined.single .grid > * {
+body .charsheet .grid.lined.single > .grid > * {
     border-top: solid 1px black;
 }
-body .charsheet .grid.lined .grid > *:not(.header),
+body .charsheet .grid.lined > .grid > *:not(.header),
 body .charsheet .grid.lined .repcontainer .repitem > div:not(.itemcontrol) {
     position: relative;
     background: white;
@@ -755,8 +866,8 @@ body .charsheet .col2-classes .input {
 body .charsheet .col2-classes div input[type=number] {
     text-align: center;
 }
-body .charsheet .toggle-class[value='1'] ~ .col2-classes .toggle-class[value=''] + div,
-body .charsheet .toggle-class[value='1'] ~ .col2-classes .toggle-class[value=''] + div + div {
+body .charsheet .toggle-class[value='1'] ~ .col2-classes .toggle-class[value='0'] + div,
+body .charsheet .toggle-class[value='1'] ~ .col2-classes .toggle-class[value='0'] + div + div {
     display: none;
 }
 .col3-packages {
@@ -799,8 +910,11 @@ body .charsheet .box label:before {
     top: 4px;
     left: -14px;
 }
-body .charsheet .box .class-level[value=''] + label:before {
+body .charsheet .box .class-level[value='0'] + label:before {
     background: none;
+}
+body .charsheet .box .class-level[value='0'] + label + span {
+    visibility: hidden;
 }
 body .charsheet .box span {
     text-align: right;
@@ -899,6 +1013,8 @@ body .charsheet div .grid div.magic-circle button.input,
 body .charsheet div .grid div.magic-circle button.input:hover,
 body .charsheet div .grid div.boxstat.total button.input,
 body .charsheet div .grid div.boxstat.total button.input:hover,
+body .charsheet div .grid div.boxstat.black button.input,
+body .charsheet div .grid div.boxstat.black button.input:hover,
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(9) button.input,
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(9) button.input:hover,
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(24) button.input,
@@ -919,6 +1035,7 @@ body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(24) bu
 body .charsheet .box + div > div:nth-child(even) button:before,
 body .charsheet div .grid div.magic-circle button:before,
 body .charsheet div .grid div.boxstat.total button:before,
+body .charsheet div .grid div.boxstat.black button:before,
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(9) button:before,
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(24) button:before {
     content: 'F';
@@ -936,6 +1053,7 @@ body .charsheet div .grid div.magic-circle button:before {
     right: 4px;
 }
 body .charsheet div .grid div.boxstat.total button:before,
+body .charsheet div .grid div.boxstat.black button:before,
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(9) button:before,
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(24) button:before {
     right: 8px;
@@ -943,6 +1061,7 @@ body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(24) bu
 body .charsheet .box + div > div:nth-child(even) button:hover:before,
 body .charsheet div .grid div.magic-circle button:hover:before,
 body .charsheet div .grid div.boxstat.total button:hover:before,
+body .charsheet div .grid div.boxstat.black button:hover:before,
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(9) button:hover:before,
 body .charsheet .repeating_weapons ~ .repcontainer .repitem div:nth-child(24) button:hover:before {
     color: gold;
@@ -1176,6 +1295,9 @@ body .charsheet .magic-circle > span:nth-child(3) {
     border: none;
     font-size: 13px;
 }
+body .charsheet div .grid .magic-circle .input.lrg {
+    min-height: unset;
+}
 
 body .charsheet .lined.black {
     border: solid 2px black;
@@ -1282,10 +1404,235 @@ body .charsheet .profile .cards input[type=number] {
     text-align: center;
 }
 
+/* monster */
+body .charsheet .monster span.input {
+    border: none;
+}
+.charsheet .monster > div:not(.lined) {
+    border: solid 1px black;
+}
+.monster .repitem {
+    height: unset;
+}
+body .charsheet .monster input[type=text],
+body .charsheet .monster div input[type=number],
+.monster .auto-expand textarea {
+    border-bottom: solid 1px gainsboro;
+}
+body .charsheet div .col3-title input,
+body .charsheet div .col3-title input[type=number] {
+    border: none;
+}
+.charsheet .col3-title input:not(:first-child) {
+    background: black;
+    color: white;
+}
+.charsheet .col3-title input.label {
+    height: 30px;
+    text-align: right;
+}
+.charsheet .monster > div:nth-child(2),
+.charsheet .monster > div:nth-child(4),
+.charsheet .monster > div:nth-child(7) {
+    padding: 5px 10px;
+}
+.charsheet .monster .header {
+    background: gray;
+}
+body .charsheet .monster > .grid.lined:nth-child(3) .repcontainer .repitem:nth-child(odd) > div {
+    background: gainsboro;
+}
+.charsheet .monster .lined input[type=text],
+.charsheet .monster .lined input[type=number],
+.charsheet .monster .lined .input {
+    text-align: center;
+}
+body .charsheet .monster .grid.lined .grid.col3.damage {
+    position: relative;
+}
+body .charsheet .monster .grid.lined .grid.col3.damage:before {
+    content: '+';
+    position: absolute;
+    bottom: 2px;
+    left: calc(33% - 3.5px);
+}
+body .charsheet .monster .repeating_monsterskills ~ .repcontainer .repitem .grid.col4 .input:nth-child(5):before,
+body .charsheet .monster .grid .grid.col4 .input:nth-child(4):before {
+    content: '(';
+}
+body .charsheet .monster .repeating_monsterskills ~ .repcontainer .repitem .grid.col4 .input:nth-child(5):after,
+body .charsheet .monster .grid .grid.col4 .input:nth-child(4):after {
+    content: ')';
+}
+body .charsheet .monster .grid.lined .maxvs {
+    position: relative;
+}
+body .charsheet .monster .grid.lined .maxvs:before,
+body .charsheet .monster .grid.lined .maxvs:after {
+    position: absolute;
+    bottom: 2px;
+    font-size: 7px;
+    height: 14px;
+}
+body .charsheet .monster .grid.lined .maxvs:before {
+    content: 'MAX';
+    left: calc(25% - 9px);
+}
+body .charsheet .monster .grid.lined .maxvs:after {
+    content: 'CURRENT';
+    right: calc(25% - 19px);
+}
+body .charsheet .monster .grid .grid.divide,
+body .charsheet .monster .grid.lined .repcontainer .repitem > .grid.divide {
+    background:
+        linear-gradient(105deg,
+            white 0%,
+            white calc(50% - 0.8px),
+            darkgray 50%,
+            white calc(50% + 0.8px),
+            white 100%);
+}
+body .charsheet .monster > .grid.lined:nth-child(3) .repcontainer .repitem:nth-child(odd) > .grid.divide {
+    background:
+        linear-gradient(105deg,
+            gainsboro 0%,
+            gainsboro calc(50% - 0.8px),
+            darkgray 50%,
+            gainsboro calc(50% + 0.8px),
+            gainsboro 100%);
+}
+body .charsheet .monster .grid.nogap:nth-child(5) {
+    border: none;
+}
+body .charsheet .monster .grid.nogap:nth-child(5) > div:first-child {
+    border: solid 1px black;
+}
+body .charsheet .monster .grid.nogap:nth-child(5) > div:nth-child(3) {
+    border: solid 1px black;
+    border-top: none;
+}
+body .charsheet .monster .repeating_monsterskills ~ .repcontainer .repitem {
+    padding: 5px 10px;
+}
+body .charsheet .monster .repeating_monsterskills ~ .repcontainer .repitem input[type=number],
+body .charsheet .monster .repeating_monsterskills ~ .repcontainer .repitem .input {
+    text-align: center;
+}
+
+.dropdown {
+    display: grid;
+    position: relative;
+}
+.dropbtn {
+    cursor: pointer;
+    transition: 0.35s ease-out;
+    text-align: center;
+}
+.dropdown .dropdown-content {
+    position: absolute;
+    top: 50%;
+    background-color: #f7f7f7;
+    min-width: 50vw;
+    padding: 5px 10px;
+    border: solid 1px darkgray;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 99;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.35s ease-out;
+}
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    display: block;
+    text-decoration: none;
+    transition: 0.35s ease-out;
+}
+.dropdown-content a:hover {
+    background-color: #eaeaea;
+}
+.dropdown:focus .dropdown-content {
+    outline: none;
+    transform: translateY(5px);
+    visibility: visible;
+    opacity: 1;
+}
+.dropbtn:hover,
+.dropdown:focus .dropbtn {
+    color: gold;
+    text-decoration: none;
+}
+.dropdown .db2 {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0; opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+    display: none;
+}
+.dropdown:focus .db2 {
+    display: inline-block;
+}
+.dropdown .db2:focus .dropdown-content {
+    outline: none;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.monster .repeating_monsterskills ~ .repcontainer .repitem .grid.col4.nogap {
+    width: 33%;
+}
+.type-declared,
+.type-preparation,
+.toggle-template[value=""] ~ div .grid.col4.nogap,
+.toggle-template[value="magic"] ~ div .grid.col4.nogap button.target,
+.toggle-template[value="resistance"] ~ div .grid.col4.nogap button.check,
+.toggle-action[value="section"] ~ div .grid.col4.nogap,
+.toggle-action[value="section"] ~ div.auto-expand {
+    display: none;
+}
+.toggle-declared[value="1"] ~ div .type-declared,
+.toggle-preparation[value="1"] ~ div .type-preparation {
+    display: block;
+}
+.action-type:before {
+    content: '◯';
+}
+.toggle-action[value="major"] ~ div .action-type:before {
+    content: '▶';
+}
+.toggle-action[value="minor"] ~ div .action-type:before {
+    content: '7';
+    font-family: 'Pictos';
+}
+.toggle-action[value="section"] ~ div .action-type:before {
+    content: '●';
+}
+.type-declared:before {
+    content: 'y';
+    font-family: 'Pictos Custom';
+}
+.type-preparation:before {
+    content: '△';
+}
+body .charsheet .grid.lined .repeating_monsterloot ~ .repcontainer .repitem div:nth-child(2) {
+    background: gainsboro;
+}
+.repeating_monsterloot ~ .repcontainer .repitem div:nth-child(3) input[type=text] {
+    text-align: left;
+}
+.repeating_monsterloot ~ .repcontainer .repitem div:nth-child(4) {
+    text-align: center;
+}
+.repeating_monsterloot ~ .repcontainer .repitem div:nth-child(4) button:before {
+    content: 'g';
+    font-family: 'Pictos Three';
+}
+
 /* Roll templates */
 
 .sheet-rolltemplate-swskill,
-.sheet-rolltemplate-swdamage {
+.sheet-rolltemplate-swdamage,
+.sheet-rolltemplate-swinfo {
     box-sizing: border-box;
     background: #e7e4d2;
     width: 100%;
@@ -1300,7 +1647,8 @@ body .charsheet .profile .cards input[type=number] {
     padding: 0;
 }
 .sheet-rolltemplate-swskill .sheet-container,
-.sheet-rolltemplate-swdamage .sheet-container {
+.sheet-rolltemplate-swdamage .sheet-container,
+.sheet-rolltemplate-swinfo .sheet-container {
     border: 20px solid transparent;
     border-image: url('https://raw.githubusercontent.com/coyotegrey/roll20-character-sheets/sword-world-dev/Sword%20World/images/border2.png') 65 stretch;
     display: grid;
@@ -1308,15 +1656,23 @@ body .charsheet .profile .cards input[type=number] {
     gap: 10px;
 }
 .sheet-rolltemplate-swskill .sheet-container *,
-.sheet-rolltemplate-swdamage .sheet-container * {
+.sheet-rolltemplate-swdamage .sheet-container *,
+.sheet-rolltemplate-swinfo .sheet-container * {
     font-family: 'Noto Sans', serif;
     text-align: center;
     color: #765a37;
 }
+.sheet-rolltemplate-swskill .sheet-container > a > img,
+.sheet-rolltemplate-swdamage .sheet-container > a > img,
+.sheet-rolltemplate-swinfo .sheet-container > a > img {
+    width: 70px;
+}
 .sheet-rolltemplate-swskill .sheet-container h1,
 .sheet-rolltemplate-swdamage .sheet-container h1,
+.sheet-rolltemplate-swinfo .sheet-container h1,
 .sheet-rolltemplate-swskill .sheet-container h1 *,
-.sheet-rolltemplate-swdamage .sheet-container h1 * {
+.sheet-rolltemplate-swdamage .sheet-container h1 *,
+.sheet-rolltemplate-swinfo .sheet-container h1 * {
     font-family: 'Jim Nightshade', cursive;
     font-size: 20px;
     line-height: 25px;
@@ -1324,7 +1680,8 @@ body .charsheet .profile .cards input[type=number] {
     padding: 0;
 }
 .sheet-rolltemplate-swskill .sheet-container p,
-.sheet-rolltemplate-swdamage .sheet-container p {
+.sheet-rolltemplate-swdamage .sheet-container p,
+.sheet-rolltemplate-swinfo .sheet-container p {
     margin: 0;
     padding: 0;
 }
@@ -1381,13 +1738,15 @@ body .charsheet .profile .cards input[type=number] {
     margin: -10px 0 0 0;
 }
 .sheet-rolltemplate-swskill .sheet-container .sheet-options a[href^="~"],
-.sheet-rolltemplate-swdamage .sheet-container .sheet-options a[href^="~"] {
+.sheet-rolltemplate-swdamage .sheet-container .sheet-options a[href^="~"],
+.sheet-rolltemplate-swinfo .sheet-container .sheet-options a[href^="~"] {
     background: #e7e4d2;
     color: #c9b48c;
     border: solid 1px #c9b48c;
 }
 .sheet-rolltemplate-swskill .sheet-container .sheet-options a[href^="~"]:hover,
-.sheet-rolltemplate-swdamage .sheet-container .sheet-options a[href^="~"]:hover {
+.sheet-rolltemplate-swdamage .sheet-container .sheet-options a[href^="~"]:hover,
+.sheet-rolltemplate-swinfo .sheet-container .sheet-options a[href^="~"]:hover {
     background: #e7e4d2;
     color: #765a37;
     border: solid 1px #765a37;
@@ -1468,12 +1827,14 @@ body .charsheet .profile .cards input[type=number] {
     border-color: white;
 }
 .sheet-rolltemplate-swskill .sheet-container .sheet-refmark,
-.sheet-rolltemplate-swdamage .sheet-container .sheet-refmark {
+.sheet-rolltemplate-swdamage .sheet-container .sheet-refmark,
+.sheet-rolltemplate-swinfo .sheet-container .sheet-refmark {
     font-size: 10px;
     line-height: unset;
 }
 .sheet-rolltemplate-swskill .sheet-container .sheet-refmark:before,
-.sheet-rolltemplate-swdamage .sheet-container .sheet-refmark:before {
+.sheet-rolltemplate-swdamage .sheet-container .sheet-refmark:before,
+.sheet-rolltemplate-swinfo .sheet-container .sheet-refmark:before {
     content: '※';
     font-family: cursive;
 }
