@@ -191,8 +191,9 @@ wiz1['Color Spray'] = {
     'materials': 'A pinch each of powder or sand that is colored red, yellow, and blue.',
     'reference': 'p. 172',
     'book': 'PHB',
-    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 154', //errata
-    'damage': '',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 154',
+    'errata': 'Sage Advice #213 p. 85',
+    'damage': 'Dungeon Master Option: High-Level Campaigns p. 70',
     'damage-type': '',
     'healing': '',
     'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. These make a triangular plane, 5 feet wide at the caster’s end opening to 20 feet wide at the far end, which ends 20 feet from the caster.\n&emsp;From one to six creatures ([[1d6]]) within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.'
@@ -231,6 +232,7 @@ wiz1['Dancing Lights'] = {
     'materials': 'Either a bit of phosphorus or wychwood, or a glowworm.',
     'reference': 'p. 172',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 207',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -243,17 +245,19 @@ wiz1['Detect Magic'] = {
     'school-spells-and-magic': 'Universal Magic',
     'range': '0',
     'duration': '[[2*[[@{level-wizard}]] ]]',
-    'aoe': '10 x 60 feet',
+    'aoe': '10 × 60 feet path',
     'components': 'V, S',
     'cast-time': '1',
     'saving-throw': 'None',
     'materials': '',
     'reference': 'p. 172',
     'book': 'PHB',
+    'book-compendium': 'Wizard Spell Compendium Volume 1 p. 237',
+    'errata': 'Sage Advice #213 p. 85',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the *detect magic* spell is cast, the wizard detects magical radiations in a path 10 feet wide and up to 60 feet long, in the direction he is facing. The intensity of the magic can be determined (dim, faint, moderate, strong, overwhelming), and the wizard has a 10% chance per level ([[10*[[@{level-wizard}]] ]]%) to recognize if a certain type of magic (alteration, conjuration, etc.) is present. The caster can turn, scanning a 60-degree arc per round. A stone wall of 1 foot or more thickness, solid metal of 1 inch thickness, or a yard or more of solid wood blocks the spell. Magical areas, multiple types of magic, or strong local magical emanations may confuse or conceal weaker radiations. Note that this spell does not reveal the presence of good or evil, or reveal alignment. Otherplanar creatures are not necessarily magical.'
+    'effect': 'When the *detect magic* spell is cast, the wizard detects magical radiations in a path 10 feet wide and up to 60 feet long, in the direction he is facing. The intensity of the magic can be determined (dim, faint, moderate, strong, overwhelming), and the wizard has a 10% chance per level ([[10*[[@{level-wizard}]] ]]%) to recognize if a certain type of magic (alteration, conjuration, etc.) is present. The caster can turn, scanning a 60-degree arc per round. A stone wall of 1 foot or more thickness, solid metal of 1 inch thickness, or a yard or more of solid wood blocks the spell. Magical areas, multiple types of magic, or strong local magical emanations may confuse or conceal weaker radiations. Note that this spell does not reveal the presence of good or evil, or reveal alignment. Otherplanar creatures are not necessarily magical.\n&emsp;*Detect magic* can detect an invisible creature’s magical aura, but not pinpoint the invisible creature’s exact location. See *DUNGEON MASTER Guide* p. 161.'
 };
 
 wiz1['Detect Undead'] = {

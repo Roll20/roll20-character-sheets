@@ -62,6 +62,12 @@ const traitsJs = require(path.join(jsFolder,'players-option-traits.js'));
 const disadvantagesJs = require(path.join(jsFolder,'players-option-disadvantages.js'));
 const dexterityModifier = require(path.join(jsFolder,'abilityScores.js'))
 
+for (const [spellName, spell] of Object.entries(priestSpellsJs['primonster'])) {
+    if (wizardSpellsJs['wizmonster'][spellName]) {
+        console.log(spellName);
+    }
+}
+
 console.log('---- Generating HTML files ----');
 writeFile(miscFolder, 'schools-overview.html',
     pug.renderFile(path.join(pugFolder, 'schoolsOverview.pug'), {pretty: true, data: wizardSpellsJs, booksPriority})

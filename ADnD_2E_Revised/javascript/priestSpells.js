@@ -143,17 +143,19 @@ pri1['Detect Magic'] = {
     'sphere-spells-and-magic': 'All',
     'range': '0',
     'duration': '1 turn',
-    'aoe': '10 feet x 30 yards',
+    'aoe': '10 feet path × 30 yards',
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': 'The use of the priest’s holy symbol.',
     'reference': 'p. 253',
     'book': 'PHB',
+    'book-compendium': 'Priest Spell Compendium Volume 1 p. 201',
+    'errata': 'Sage Advice #213 p. 85',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the *detect magic* spell is cast, the priest detects magical radiations in a path 10 feet wide and up to 30 yards long, in the direction he is facing. The intensity of the magic can be detected (dim, faint, moderate, strong, or overwhelming). The caster has a 10% chance per level ([[10*[[@{level-priest}]] ]]%) to determine the sphere of the magic, but unlike the wizard version of the spell, the type of magic (alteration, conjuration, etc.) cannot be divined. The caster can turn, scanning a 60° arc per round. The spell is blocked by solid stone at least 1 foot thick, solid metal at least 1 inch thick, or solid wood at least 1 yard thick.'
+    'effect': 'When the *detect magic* spell is cast, the priest detects magical radiations in a path 10 feet wide and up to 30 yards long, in the direction he is facing. The intensity of the magic can be detected (dim, faint, moderate, strong, or overwhelming). The caster has a 10% chance per level ([[10*[[@{level-priest}]] ]]%) to determine the sphere of the magic, but unlike the wizard version of the spell, the type of magic (alteration, conjuration, etc.) cannot be divined. The caster can turn, scanning a 60° arc per round. The spell is blocked by solid stone at least 1 foot thick, solid metal at least 1 inch thick, or solid wood at least 1 yard thick.\n&emsp;*Detect magic* can detect an invisible creature’s magical aura, but not pinpoint the invisible creature’s exact location. See *DUNGEON MASTER Guide* p. 161.'
 };
 
 pri1['Detect Poison'] = {
