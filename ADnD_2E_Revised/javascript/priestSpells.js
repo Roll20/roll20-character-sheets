@@ -150,7 +150,7 @@ pri1['Detect Magic'] = {
     'materials': 'The use of the priest’s holy symbol.',
     'reference': 'p. 253',
     'book': 'PHB',
-    'book-compendium': 'Priest Spell Compendium Volume 1 p. 201',
+    'book-compendium': 'Priest’ Spell Compendium Volume One p. 201',
     'errata': 'Sage Advice #213 p. 85',
     'damage': '',
     'damage-type': '',
