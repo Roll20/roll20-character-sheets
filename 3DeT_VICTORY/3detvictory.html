@@ -17,21 +17,33 @@
                         <div name="Atributos" class="sheet-attributes">
                             <div>&nbsp;</div>
                             <div name="Poder" class="sheet-bold sheet-border">
-                                <button type='roll' value='&{template:default}{{name=@{charactername} - Poder}} {{Resultado=[[{1d6[Atributo]+?{Perícia?|Sim,1d6[Pericia]|Não,0}+?{Ganho?|Sim,1d6[Ganho]|Não,0}}+@{poder}]]}}' class="sheet-button-attribute">Poder</button>
+                                <button type="action" name="act_rolld6" class="sheet-button-attribute sheet-d6" value='d6-poder'>a</button>
+                                <button type="action" name="act_rolld6" class="sheet-button-attribute sheet-d6" value='2d6-poder'>b</button>
+                                <button type="action" name="act_rolld6" class="sheet-button-attribute sheet-d6" value='3d6-poder'>c</button>
+                                
+                                <label>Poder</label>
                                 <div>
                                     <input type="number" name="attr_poder" class="sheet-main-attributes" min="0" value="0"/>
                                 </div>
                             </div>
                             <div>&nbsp;</div>
                             <div name="Habilidade" class="sheet-bold sheet-border">
-                                <button type='roll' class="sheet-button-attribute" value='&{template:default}{{name=@{charactername} - Habilidade}} {{Resultado: [[{1d6[Atributo]+?{Perícia?|Sim,1d6[Pericia]|Não,0}+?{Ganho?|Sim,1d6[Ganho]|Não,0}}+@{habilidade}]] }}' >Habilidade</button>
+                                <button type="action" name="act_rolld6" class="sheet-button-attribute sheet-d6" value='d6-habilidade'>a</button>
+                                <button type="action" name="act_rolld6" class="sheet-button-attribute sheet-d6" value='2d6-habilidade'>b</button>
+                                <button type="action" name="act_rolld6" class="sheet-button-attribute sheet-d6" value='3d6-habilidade'>c</button>
+                                
+                                <label>Habilidade</label>
                                 <div>
                                     <input type="number" name="attr_habilidade" class="sheet-main-attributes" min="0" value="0"/>
                                 </div>
                             </div>
                             <div>&nbsp;</div>
                             <div name="Resistencia" class="sheet-bold sheet-border">
-                                <button type='roll' class="sheet-button-attribute" value='&{template:default}{{name=@{charactername} - Resistencia}} {{Resultado: [[{1d6[Atributo]+?{Perícia?|Sim,1d6[Pericia]|Não,0}+?{Ganho?|Sim,1d6[Ganho]|Não,0}}+@{resistencia}]] }}' >Resistência</button>
+                                <button type="action" name="act_rolld6" class="sheet-button-attribute sheet-d6" value='d6-resistencia'>a</button>
+                                <button type="action" name="act_rolld6" class="sheet-button-attribute sheet-d6" value='2d6-resistencia'>b</button>
+                                <button type="action" name="act_rolld6" class="sheet-button-attribute sheet-d6" value='3d6-resistencia'>c</button>
+                                
+                                <label>Resistência</label>
                                 <div>
                                     <input type="number" name="attr_resistencia" class="sheet-main-attributes"  min="0" value="0"/>
                                 </div>
@@ -99,14 +111,44 @@
     <div class="sheet-rollbox-container">
         <div class="rollbox">
             <div class="roll-title">
-                {{character}} - {{attributename}}
+                {{character}} 
             </div>
-            <div class="roll-result">
-                {{resultroll}}
+            <div class="roll-rolls">
+                <label>Rolagem: {{roll}}</label>
+                <label>Atributo: {{attribute}}</label>
+                <label>Crítico: {{computed::critical}}</label>
             </div>
-            <div class="roll-name">
-                <span>{{rollname}}</span>
+            <div class="roll-result">                
+                <label>Resultado: {{computed::resultroll}}</label>
             </div>
         </div>
     </div>
 </rolltemplate>
+
+<script type="text/worker">
+    on("clicked:rolld6", function(r){    
+        let dado = r.htmlAttributes.value.split('-')[0];
+        let atributo = r.htmlAttributes.value.split('-')[1];
+
+        getAttrs(["charactername", atributo], function(v){ 
+            startRoll(`&{template:3det} {{character=${v.charactername}}} {{roll=[[${dado}+${v[atributo]}]]}} {{attribute=[[${v[atributo]}]]}} {{critical=[[0]]}} {{resultroll=[[0]]}}`, diceroll => {
+                console.log({diceroll})
+                const dice = diceroll.results.roll.dice;
+                const rolls = dice.join(' + ');
+                const successes = dice.filter(d => d == 6);
+
+                const sum_dice = dice.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0) + parseInt(v[atributo]);
+                const critical = (successes.length * parseInt(v[atributo]));
+                const result = parseInt(sum_dice) + parseInt(critical);    
+                
+                console.log(dice, rolls, successes)
+                                                
+                // in finishroll, you can save computed values - the hidden alternate values in your roll's keys.
+                finishRoll(diceroll.rollId,{
+                    critical: critical,
+                    resultroll: result
+                });
+            });        
+        });
+    });
+</script>
