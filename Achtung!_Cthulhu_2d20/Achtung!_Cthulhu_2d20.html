@@ -775,27 +775,52 @@
       <div class="sheet-subtitle">{{subtitle}}</div>
       {{/subtitle}}
     </div>
+    <div class="sheet-result">
+      {{#rollTotal() computed::outcome 1}}
+      <div class="sheet-success">Success!</div>
+      {{/rollTotal() computed::outcome 1}}
+      {{#rollTotal() computed::outcome 0}}
+      <div class="sheet-failure">Failure!</div>
+      {{/rollTotal() computed::outcome 0}}
+    </div>
     <div class="sheet-content">
-      <span class="sheet-roll-normal-nopad">{{computed::attribute_text}} value is:</span>
-      <span class="sheet-roll-normal">{{computed::target_attribute}}</span>
-      <span class="sheet-roll-normal-nopad">{{computed::skill_text}} value is:</span>
-      <span class="sheet-roll-normal">{{computed::target_skill}}</span>
-      <span>Target number is:</span>
-      <span class="sheet-roll-normal">{{computed::target_number}}</span>
-      {{#rollTotal() focus_apply 0}}
-      <span>Does a focus apply:</span>
-      <span class="sheet-roll-normal">No</span>
-      {{/rollTotal() focus_apply 0}}
-      {{#rollTotal() focus_apply 1}}
-      <span>Does a focus apply:</span>
-      <span class="sheet-roll-normal">Yes</span>
-      {{/rollTotal() focus_apply 1}}
-      <span style="border-top: 2px solid black;">Dice rolled:</span>
-      <span style="border-top: 2px solid black;" class="sheet-roll-bold-highlight">{{computed::roll1}}</span>
+      <span>Dice rolled:</span>
+      <span class="sheet-roll-bold-highlight">{{computed::roll1}}</span>
       <span>Number of successes:</span>
       <span class="sheet-roll-bold">{{computed::successes}}</span>
+      <span>Bonus momentum:</span>
+      <span class="sheet-roll-bold">{{computed::bonus_momentum}}</span>
       <span>Number of complications:</span>
       <span class="sheet-roll-bold">{{computed::complications}}</span>
+    </div>
+    <div class="sheet-show-details">
+      Show Details
+    </div>
+    <div class="sheet-details-wrapper">
+      <div class="sheet-details">
+        <span class="sheet-roll-normal-nopad">{{computed::attribute_text}} value is:</span>
+        <span class="sheet-roll-normal">{{computed::target_attribute}}</span>
+        <span class="sheet-roll-normal-nopad">{{computed::skill_text}} value is:</span>
+        <span class="sheet-roll-normal">{{computed::target_skill}}</span>
+        <span>Target number is:</span>
+        <span class="sheet-roll-normal">{{computed::target_number}}</span>
+        {{#rollTotal() focus_apply 0}}
+        <span>Does a focus apply:</span>
+        <span class="sheet-roll-normal">No</span>
+        {{/rollTotal() focus_apply 0}}
+        {{#rollTotal() focus_apply 1}}
+        <span>Does a focus apply:</span>
+        <span class="sheet-roll-normal">Yes</span>
+        {{/rollTotal() focus_apply 1}}
+        <span>Difficulty is:</span>
+        <span class="sheet-roll-normal">{{computed::difficulty}}</span>
+        <span>Crit range is:</span>
+        <span class="sheet-roll-normal">{{computed::crit_range}}</span>
+        <span>Normal success is:</span>
+        <span class="sheet-roll-normal">{{computed::success_range}}</span>
+        <span>Complication range is:</span>
+        <span class="sheet-roll-normal">{{computed::complication_range}}</span>
+      </div>
     </div>
   </div>
 </rolltemplate>
@@ -1053,11 +1078,10 @@
 
   <!-- Custom Roll Parsing -->
 
-
   stats.forEach(button => {
     on(`clicked:${button}-action`, () => {
       getAttrs(skills, async function(values) {
-        const results = await startRoll(`&{template:skill} {{title=@{character_name}}} {{subtitle=${button}}} {{num_dice=[[?{Dice|2}]]}} {{target_skill=[[?{Relevant Skill|None,0|Acedemia,1|Athletics,2|Engineering,3|Fighting,4|Medicine,5|Observation,6|Persuasion,7|Resilience,8|Stealth,9|Survival,10|Tactics,11|Vehicles,12}]]}} {{focus_apply=[[?{Does A Focus Apply|No,0|Yes,1}]]}} {{target_attribute=[[@{${button}}]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}}`);
+        const results = await startRoll(`&{template:skill} {{title=@{character_name}}} {{subtitle=${button}}} {{num_dice=[[?{Dice|2}]]}} {{target_skill=[[?{Relevant Skill|None,0|Acedemia,1|Athletics,2|Engineering,3|Fighting,4|Medicine,5|Observation,6|Persuasion,7|Resilience,8|Stealth,9|Survival,10|Tactics,11|Vehicles,12}]]}} {{focus_apply=[[?{Does A Focus Apply|No,0|Yes,1}]]}} {{difficulty=[[?{Difficulty|1}]]}} {{target_attribute=[[@{${button}}]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} }`);
 
         const target_skill = results.results.target_skill.result; //int select value 
         let target_skill_text = ""; //string of skill
@@ -1119,19 +1143,29 @@
         }
 
         const number_dice = results.results.num_dice.result;
+        const difficulty = results.results.difficulty.result;
         const target_attribute = results.results.target_attribute.result;
         const focus_apply = results.results.focus_apply.result;
         const focus_target = focus_apply == 1 ? skill_value : 1;
   
         let target_number = target_attribute + skill_value;
+        let complication_range = 21 - difficulty;
+        const complication_range_text = `${complication_range} - 20`;
   
         const dice = results.results.roll1.dice;
         let successCount = dice.filter(d => d <= target_number).length;
         successCount += dice.filter(d => d <= focus_target).length;
-        let complicationCount = dice.filter(d => d >= 20).length;
+        let complicationCount = dice.filter(d => d >= complication_range).length;
+
+        const success_range_text = `${focus_target + 1} - ${target_number}`;
+        const crit_range_text = `1 - ${focus_target}`;
 
         let target_attribute_text = `${button}`;
         target_attribute_text = target_attribute_text[0].toUpperCase() + target_attribute_text.slice(1);
+
+        let bonus_momentum = successCount - difficulty;
+        bonus_momentum = bonus_momentum < 0 ? 0 : bonus_momentum;
+        let outcome = successCount >= difficulty ? 1 : 0;
   
         finishRoll(
           results.rollId,
@@ -1143,7 +1177,13 @@
             target_attribute: target_attribute,
             target_skill: skill_value,
             skill_text: target_skill_text,
-            attribute_text: target_attribute_text
+            attribute_text: target_attribute_text,
+            difficulty: difficulty,
+            complication_range: complication_range_text,
+            success_range: success_range_text,
+            crit_range: crit_range_text,
+            bonus_momentum: bonus_momentum,
+            outcome: outcome
           }
         );      
       });
